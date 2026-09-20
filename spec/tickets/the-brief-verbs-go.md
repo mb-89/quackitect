@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -245,6 +245,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 099c2ec7708d · claude-code-remote · helper-24
+    hash_before: fc7526341b9e2d2280ff515fc616ccae1dd08567
+    hash_after: fc7526341b9e2d2280ff515fc616ccae1dd08567
+reason: done
 ---
 
 # Ask
@@ -503,82 +508,64 @@ The verdict round caught three readers the cut left standing, and each takes its
 <!-- every file you read, one a line -->
 <!-- the form is files -->
 
-- .claude/settings.json
-- .claude/skills/level0/lib/bash.js
+- spec/tickets/the-brief-verbs-go.md
+- spec/tickets/the-verbs-take-the-shell.md
+- spec/design_output/work.md
+- spec/design_output/review.md
+- spec/design_output/copilot.md
+- spec/design_output/private.md
+- spec/design_output/schema.md
+- spec/guidance/cloud.md
+- spec/guidance/review/reviewing.md
+- spec/schemas/handover.schema.yaml
+- spec/vocabulary/terms.yml
+- spec/funnel/level-zero-closes.md
+- src/scripts/work.js
+- src/scripts/work-stands.js
+- src/scripts/work-list.js
+- src/scripts/work-merge.js
+- src/scripts/branch-usage.js
+- src/lsp/schema_test.go
+- src/yaml/yaml_test.go
 - .claude/skills/level0/lib/copilot-dispatch.js
 - .claude/skills/level0/lib/copilot-runtime.js
 - .claude/skills/level0/lib/review.js
-- spec/design_output/bash.md
-- spec/design_output/copilot.md
-- spec/design_output/extension.md
-- spec/design_output/level0.md
-- spec/design_output/private.md
-- spec/design_output/pull.md
-- spec/design_output/review.md
-- spec/design_output/schema.md
-- spec/design_output/stop.md
-- spec/design_output/work.md
-- spec/guidance/cloud.md
-- spec/guidance/review/reviewing.md
-- spec/guidance/working.md
-- spec/rationales/cloud.md
-- spec/rationales/guidance.md
-- spec/rationales/reviewing.md
-- spec/rationales/working.md
-- spec/schemas/handover.schema.yaml
-- spec/tickets/the-brief-verbs-go.md
-- spec/tickets/the-pull-splits-by-topic.md
-- spec/vocabulary/terms.yml
-- src/lsp/schema_test.go
-- src/scripts/branch-usage.js
-- src/scripts/pull-chapter.js
-- src/scripts/pull-writes.js
-- src/scripts/review.js
-- src/scripts/stand.js
-- src/scripts/trust.js
-- src/scripts/work-answer.js
-- src/scripts/work-list.js
-- src/scripts/work-merge.js
-- src/scripts/work-stands.js
-- src/scripts/work.js
-- src/yaml/yaml_test.go
-- test/contract/session.test.js
-- test/level0/copilot-dispatch.test.js
-- test/level0/copilot-runtime.test.js
-- test/level0/ready.test.js
-- test/level0/review.test.js
-- test/level0/stand.test.js
-- test/level0/trunk.test.js
-- test/level0/verbs.test.js
-- test/level0/work-doors.js
+- test/level0/work.test.js
 - test/level0/work-group.test.js
 - test/level0/work-orphan.test.js
-- test/level0/work.test.js
+- test/level0/work-open.test.js
+- test/level0/work-answer.test.js
+- test/level0/review.test.js
+- test/level0/copilot-runtime.test.js
+- test/level0/copilot-dispatch.test.js
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `work-stands.js` drops `COL.kind`, and `work-list.js` still pads the queue place with it
-- the queue listing shifts its name column past single digits, because `padStart(undefined)` pads nothing
-- `USAGE` in `branch-usage.js` names the `new` verb, and `work.js` drops it from the verb table
-- `./RUNME.sh branch new <name>` prints the usage, so the row sends a reader at a verb that goes
-- the branch drops the case over `done` refusing a branch trunk stands ahead of
-- `ready` in `work.js` refuses a branch behind trunk, and no case drives that refusal
-- fix: give the queue place a width `work-list.js` owns, and cut the `new` row from `USAGE`
-- fix: drive `ready` on a branch behind trunk, so the refusal carries a case
+- `COL.place` stands in `work-stands.js`, and `work-list.js` pads the queue place with it
+- a case asserts every queue place pads to one width, so the names line up
+- `USAGE` drops its `new` row, and the verb table in `work.js` names no `new`
+- a group case drives `ready` on a branch behind trunk, and reads the sync line back
+- a case drives `done` on a branch carrying no group, so that refusal stands covered
+- `./RUNME.sh check` exits 0, and `./RUNME.sh branch list` names every branch with no kind column
+- every branch verb, the copilot lane and the review lane read the group ticket alone
+- the notes, the schema and `terms.yml` answer, and no reader of the root file stands
+- `copilot-runtime.js` asks a box for a fresh result and retro in `.se/HANDOVER.md`, as trunk asks
+- that wording stands outside the ask, and the ticket's retro chapter owns the retro
+- the Go fixtures name the root path as a string, which the approach keeps
+- `spec/funnel` and `spec/design_input` teach the brief, and the ask leaves that record alone
 - `branch review` reads no retro on the handback, and the retro step after this one writes it
-- the rest reads true: every verb reads the group ticket, and `./RUNME.sh check` exits zero
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change adds each fact once, and `USAGE` restates the `new` verb the code drops
+- `COL.place`, `ORPHAN` and `baseOnTrunk` each stand in one file, and the notes point there
 
 # Discussion
 
