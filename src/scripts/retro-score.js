@@ -3,7 +3,7 @@
 // count against this window's numbers, so an improvement nobody lands shows.
 // [[spec/design_input/the-agent-pulls-tickets]]
 
-import { fieldOf, NOTE_END, ticketNamed } from "./group.js";
+import { fieldOf, NOTE_END, ticketNamed } from "../engine/group.js";
 
 const TICKETS = "spec/tickets";
 const RETRO = "retro-";

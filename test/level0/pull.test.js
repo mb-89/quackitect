@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { fieldOf, recordIn, withEntry, withField } from "../../src/scripts/group.js";
+import { fieldOf, recordIn, withEntry, withField } from "../../src/engine/group.js";
 import { takeable, withPayload } from "../../src/scripts/pull.js";
 import { probeOf, startOf } from "../../src/scripts/serve.js";
 import { pulling } from "../../src/scripts/work.js";

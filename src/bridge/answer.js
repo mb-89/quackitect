@@ -19,8 +19,9 @@ export const SPOKE = "agent.spoke";
 export const SAYS = (why) =>
   [
     `${why}, and nothing has answered it. Answer it before the next tool call: write it in the`,
-    "chat as text, and call mcp__level0__report with the same text so the log carries it.",
-    "Say what you understood and what you do next. Then work.",
+    "chat as text, which pays this door the moment the chat shows it. Call mcp__level0__report",
+    "with the same text so the log carries it. Say what you understood and what you do next.",
+    "Then work.",
   ].join(" ");
 
 export function demands(box, why, block = "", onPaid = null) {

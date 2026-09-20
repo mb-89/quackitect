@@ -3,7 +3,7 @@
 // nothing, so the claim goes stale and the branch comes back to the queue.
 // [[spec/design_output/work#a-stale-group-is-yours]]
 
-import { aged, spanOf, STALE } from "./group.js";
+import { aged, spanOf, STALE } from "../engine/group.js";
 import {
   MS,
   noteOf,

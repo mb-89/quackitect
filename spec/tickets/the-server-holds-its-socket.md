@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-bridge-keeps-transport
 steps:
   - name: do
@@ -11,6 +11,12 @@ steps:
         form: text
         says: what you change, and what surprises you
 step: do
+record:
+  - step: do
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 156041771556aae8183d72d0ffddc5df691a9609
+    hash_after: 2412de08ec8b97cdef22366719de3ffa938912a3
+reason: done
 ---
 
 # Ask
@@ -39,6 +45,27 @@ Done is a server whose `keepAliveTimeout` runs past the window the hook idles in
 <!-- what you change, and what surprises you -->
 
 <!-- the form is text -->
+
+Trunk carries the change and the case, so this step changes no line and reads
+the diff against the ask.
+
+| what the ask asks for | where it stands |
+|---|---|
+| a `keepAliveTimeout` past the window the hook idles in | `IDLE` in `src/doors/wire.js` |
+| the header wait above it, which node wants | `HEADERS`, set off `IDLE` and a spare |
+| the two set where the server listens | `wire().listen`, which `serve` calls |
+| a test holding the number | `test/contract/wire.test.js` |
+
+The case reads the two off the listening server, and reads the header wait
+standing above the idle one. So a hand lowering either meets a red case.
+
+**What surprises.** Nothing in the bridge sets a timeout of its own, and the
+one place holding both stands behind the door. The server reaches the socket
+through `wire` alone, so the numbers move in one file.
+
+The three causes the Discussion sorts stay sorted. `the server answers nothing
+at` now stands for a server that is down, and the other two causes carry their
+own tickets.
 
 # Discussion
 

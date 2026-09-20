@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { recordIn } from "../../src/scripts/group.js";
+import { recordIn } from "../../src/engine/group.js";
 import { handFaults, handOf } from "../../src/scripts/pull.js";
 import { pulling } from "../../src/scripts/work.js";
 import { at, CHILD, doors, filled, heard, ROOT, standing } from "./pull-doors.js";

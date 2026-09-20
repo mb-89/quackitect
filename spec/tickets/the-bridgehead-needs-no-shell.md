@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-bridge-keeps-transport
 steps:
   - name: do
@@ -11,6 +11,12 @@ steps:
         form: text
         says: what you change, and what surprises you
 step: do
+record:
+  - step: do
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 7f9f99c5f2f6278841306db7691728f7d8aedb1a
+    hash_after: 7122700bfea429f841a4b8705b7a5a10d356daaf
+reason: done
 ---
 
 # Ask
@@ -46,6 +52,33 @@ Done is a bridgehead reaching the same answers with no shell:
 <!-- what you change, and what surprises you -->
 
 <!-- the form is text -->
+
+Trunk carries the change the ask names, and this step adds the cases holding
+it at the hook.
+
+| what the ask asks for | what stands |
+|---|---|
+| the two cloud variables read off the environment | `process.env` in the start script, exiting 3 |
+| the method root stated | `existsSync(method)`, exiting 4 |
+| node run, and its answer read | the hook's catch, reading a refused spawn as code 5 |
+| `node_modules` stated | `existsSync`, exiting 6 |
+| node put behind it, with the log as its output | `spawn` detached, the log file on both streams |
+
+`starts()` runs `["node", "-e", START, ...]`, so no shell stands between the
+hook and any guard.
+
+**What surprises.** `test/contract/cloud-start.test.js` drives the script and
+reads its codes, and nothing read what the hook spawns. A hand putting `sh`
+back in `starts()` would leave that file green.
+
+- `test/level0/start-road.test.js` reads the argv the hook spawns
+- the same file reads every guard standing inside the script
+- it holds the cases over the block a session outside the cage reads
+
+**The one shell left.** The install road this group adds runs the tree's own
+installer, which is a shell script. It stands past the cloud guard, so a box
+reaching it is a cloud box carrying `sh`. Every guard above it runs in node,
+and the comment beside the line says so.
 
 # Discussion
 

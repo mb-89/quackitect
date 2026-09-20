@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { SOURCE, STAMP, viewerOf } from "../../src/scripts/viewer.js";
+import { SOURCE, STAMP, viewerOf } from "../../src/scripts/tui-build.js";
 
 const ROOT = "/box";
 const EXE = `${ROOT}/.se/.runtime/bin/logview`;

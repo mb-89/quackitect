@@ -17,21 +17,40 @@ export const HEARD = {
   none: "the canary opens no answer",
 };
 
+// The line stands set in, on a line of its own. A reader finds it there without reading the wording around it. [[spec/design_output/level0#the-canary]]
+export function highlighted(sentence) {
+  return `    ${sentence}`;
+}
+
+// The wording that owes the line and the wording that pays it draw it the same way, so one reading finds it in both. [[spec/design_output/level0#the-canary]]
+function around(before, sentence, after) {
+  return [before.join(" "), highlighted(sentence), after.join(" ")].join("\n\n");
+}
+
 // [[spec/design_output/level0#the-canary-owes-a-debt]]
 export const OWES = {
   warns: (sentence) =>
-    [
-      "This session owes the canary. Open your answer with this line, first and",
-      `alone, word for word: ${sentence} The numbers come from what level zero`,
-      "loaded. Level zero refuses the next tool call until that line opens an",
-      "answer. The line ends no turn, so say what you do next under it and carry on.",
-    ].join(" "),
+    around(
+      [
+        "This session owes the canary. Open your answer with this line, first",
+        "and alone, word for word:",
+      ],
+      sentence,
+      [
+        "The numbers come from what level zero loaded. Level zero refuses the",
+        "next tool call until that line opens an answer. The line ends no turn,",
+        "so say what you do next under it and carry on.",
+      ],
+    ),
   denies: (sentence) =>
-    [
-      "This session owes the canary, and no answer opens with it. Open your next",
-      `answer with this line, first and alone, word for word: ${sentence}`,
-      "Level zero refuses every tool call until it stands.",
-    ].join(" "),
+    around(
+      [
+        "This session owes the canary, and no answer opens with it. Open your",
+        "next answer with this line, first and alone, word for word:",
+      ],
+      sentence,
+      ["Level zero refuses every tool call until it stands."],
+    ),
 };
 
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
@@ -225,16 +244,16 @@ export function canary(counts) {
 
 // The block the session reads with the canary in it. The line opens the answer, and the stop line closes it. [[spec/design_output/level0#the-canary]]
 export function canaryText(sentence) {
-  return [
-    "Open your FIRST answer with this line, first and alone, word for word:",
-    "",
-    `    ${sentence}`,
-    "",
-    "It says out loud that level zero holds this session, and the numbers",
-    "come from what it loaded. Write this line once and never again. The line",
-    "opens an answer and ends no turn: a turn ends on the stop line, last and",
-    "alone, and the two stand at opposite ends of the same answer.",
-  ].join("\n");
+  return around(
+    ["Open your FIRST answer with this line, first and alone, word for word:"],
+    sentence,
+    [
+      "It says out loud that level zero holds this session, and the numbers",
+      "come from what it loaded. Write this line once and never again. The line",
+      "opens an answer and ends no turn: a turn ends on the stop line, last and",
+      "alone, and the two stand at opposite ends of the same answer.",
+    ],
+  );
 }
 
 // The line stands first, so an answer quoting it later proves nothing. [[spec/design_output/level0#the-canary-opens-an-answer]]

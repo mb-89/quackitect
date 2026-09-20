@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -90,6 +90,13 @@ group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 step: design/draft
+record:
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 1637810c02ed9f1a4f0474c6df386845e465ee58
+    hash_after: 1637810c02ed9f1a4f0474c6df386845e465ee58
+reason: became
+successors: [the-canary-survives-a-restart]
 ---
 
 # Ask
@@ -232,3 +239,14 @@ every tool call carries the demand, and the answer repeats the line
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+[[spec/tickets/the-canary-survives-a-restart]] asks the same thing in the same
+group, and it stands closed. Each line of this ask reads there.
+
+| this ask | where it lands |
+|---|---|
+| a session writing the line once meets no second demand after a restart | the debt reads back off the session log |
+| a case covers the paid state surviving a bridge reconnect | `test/level0/canary-debt.test.js` |
+
+That ticket carries the wording of the demand as well, and the design chapter
+The debt survives a restart owns what it adds.

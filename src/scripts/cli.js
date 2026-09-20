@@ -51,7 +51,7 @@ import { renaming, renamingText } from "./rename.js";
 import { retro } from "./retro.js";
 import { stubInto } from "./stub.js";
 import { ticket } from "./ticket.js";
-import { whereIs } from "./tools.js";
+import { whereIs } from "../engine/tools.js";
 import {
   detach,
   entryFor,

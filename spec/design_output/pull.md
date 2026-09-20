@@ -417,7 +417,7 @@ in the tree refuses it. Then nothing lands. The ticket file goes back to
 what the hand writes, the index empties, and the hold stays. The pull answers
 `refused` with the hook's finding, so the hand fixes the line and hands back
 again. So a record's `hash_after` names a commit the branch holds, and a
-refused commit writes no record. `src/scripts/landed.js` holds the landing.
+refused commit writes no record. `src/scripts/pull-landed.js` holds the landing.
 
 # The fail
 
@@ -535,7 +535,7 @@ The verb reads the voice rules over the Ask too, and refuses one that breaks
 a rule at the error level. The Ask is the engine's from the open on, so the
 ticket door refuses every later hand there. A rule broken past the open
 stands in the lint over the tree until a person reaches for the door.
-`src/scripts/ask-lint.js` holds the run, and a box with no Vale opens as it
+`src/scripts/ticket-ask-lint.js` holds the run, and a box with no Vale opens as it
 stands.
 
 ## The blank lines stand

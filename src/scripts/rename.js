@@ -86,13 +86,18 @@ export function renamingText(it, from, to) {
     const said = renamedText(text, from, to);
     if (said === text) continue;
     it.disk.write(file, said);
-    wrote.push(file.slice(it.root.length + 1));
+    wrote.push(slashed(file.slice(it.root.length + 1)));
   }
   return { moved: [], wrote, skipped: shortened(it, held.skipped), why: "" };
 }
 
+// A path the answer names reads with slashes on every box, the way the tree spells it. [[spec/design_output/index#a-rename-reaches-a-name]]
+function slashed(one) {
+  return String(one).replaceAll("\\", "/");
+}
+
 function shortened(it, files) {
-  return [...(files ?? [])].map((one) => one.slice(it.root.length + 1));
+  return [...(files ?? [])].map((one) => slashed(one.slice(it.root.length + 1)));
 }
 
 // The move: the folder carries, then every reach rewrites. [[spec/design_output/index#a-rename-reaches-a-name]]
@@ -114,7 +119,7 @@ export function renaming(it, from, to) {
       const landing = it.join(target, ...rest.split("/"));
       it.disk.makeDir(landing.slice(0, landing.lastIndexOf("/")));
       it.disk.write(landing, it.disk.read(file));
-      moved.push(rest);
+      moved.push(slashed(rest));
     }
   } else {
     it.disk.write(target, it.disk.read(source));
@@ -134,7 +139,7 @@ export function renaming(it, from, to) {
     );
     if (said === text) continue;
     it.disk.write(file, said);
-    wrote.push(file.slice(it.root.length + 1));
+    wrote.push(slashed(file.slice(it.root.length + 1)));
   }
   return { moved, wrote, skipped: shortened(it, read.skipped), why: "" };
 }

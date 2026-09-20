@@ -11,7 +11,7 @@ import { reaches, refusedTodo, taggedIn } from "../../.claude/skills/level0/lib/
 import { landsOnTrunk, refusedVersion, touchesGit, TRUNK, versionRefs } from "../../.claude/skills/level0/lib/trunk.js";
 import { PROSE } from "../../.claude/skills/level0/lib/vale.js";
 import { refusedWarnings, warningsOn } from "../../.claude/skills/level0/lib/warnings.js";
-import { WORK_BRANCH } from "../scripts/group.js";
+import { WORK_BRANCH } from "../engine/group.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
 

@@ -18,7 +18,7 @@ import {
 } from "../bridge/findings.js";
 import { serverFaults, treeHere } from "./cli-check.js";
 import { bin, COL, files, it, outside, root, SHOWN } from "./cli-doors.js";
-import { readTools } from "./tools.js";
+import { readTools } from "../engine/tools.js";
 
 // What the last lint left standing at warning. The stamp takes it, and the stop door reads the stamp. [[spec/tickets/the-spawn-reaches-its-guidance]]
 let stood = [];

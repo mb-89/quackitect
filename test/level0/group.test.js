@@ -19,7 +19,7 @@ import {
   withField,
   withHashAfter,
   withoutField,
-} from "../../src/scripts/group.js";
+} from "../../src/engine/group.js";
 
 const NOTE = `---
 kind: [[ticket]]

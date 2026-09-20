@@ -4,11 +4,13 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import * as lib from "../../.claude/skills/level0/lib/pull.js";
 import {
   judgeAsk,
   judgeRefusal,
   PULL_CALL,
   pullSpec,
+  sessionOf,
   spawnPromptIn,
 } from "../../.claude/skills/level0/lib/pull.js";
 // The whole module, so a name the wrapper answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
@@ -30,6 +32,30 @@ const RULES = [
     rule: "Put the bottom line first.",
   },
 ];
+// The hooks level one registers, keyed by their event. A registration carries a filter between the event and the handler, so the last argument is the handler. [[spec/design_output/pull#the-checks]]
+async function hooksHere() {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const held = {};
+  register((event, ...rest) => {
+    held[event] = rest.at(-1);
+  }, {});
+  return held;
+}
+
+// The harness the hook reaches: the files it writes, the tool it registers first, and the lines it says. [[spec/design_output/pull#the-hand-and-the-hold]]
+function harness() {
+  const wrote = new Map();
+  const lines = [];
+  return {
+    wrote,
+    lines,
+    $: {
+      fs: { write: async (path, text) => void wrote.set(path, text) },
+      tool: { register: async () => {} },
+      ui: { log: (line) => lines.push(line) },
+    },
+  };
+}
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("the wrapper reads the prompt out of a spawn answer, and nothing out of any other", () => {
@@ -122,4 +148,41 @@ test("a label outside the set reads as follows, so a judge naming nothing refuse
   assert.equal(level1.ruleBroken("follows", RULES), "");
   assert.equal(level1.ruleBroken("voice-9", RULES), "");
   assert.equal(level1.ruleBroken("", RULES), "");
+});
+
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+test("the library beside the hook owns the one spelling of the session file", () => {
+  assert.equal(
+    lib.SESSION,
+    ".se/.runtime/session.json",
+    "the hook imports the path, so one copy stands",
+  );
+});
+
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+test("the session file takes the id every harness this tree meets spells", () => {
+  assert.equal(sessionOf({ session: { id: "s7" } }).id, "s7");
+  assert.equal(sessionOf({ sessionId: "s8" }).id, "s8");
+  assert.equal(sessionOf({ session_id: "s9" }).id, "s9");
+});
+
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+test("the registered session start writes the file the library names", async () => {
+  const held = await hooksHere();
+  const box = harness();
+  const e = { session_id: "s9", client: "claude-code" };
+  await held["session.start"](box.$, e, async (said) => said);
+  assert.deepEqual(JSON.parse(box.wrote.get(lib.SESSION) ?? "null"), {
+    id: "s9",
+    harness: "claude-code",
+  });
+});
+
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+test("an event naming no session writes nothing, and says the hand stands at the box", async () => {
+  const held = await hooksHere();
+  const box = harness();
+  await held["session.start"](box.$, {}, async (said) => said);
+  assert.equal(box.wrote.size, 0, "the fake holds no write");
+  assert.match(box.lines.join("\n"), /the hand stands at the box/);
 });

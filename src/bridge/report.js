@@ -1,5 +1,6 @@
-// The report tool. A text between calls reaches no hook until the turn ends,
-// so the agent answers an ask or a mid-turn prompt by calling this with the
+// The report tool. It carries an answer into the log, beside the chat road the
+// door reads. For the two roads, see [[spec/design_output/level0#what-the-door-reads]].
+// The agent answers an ask or a mid-turn prompt by calling this with the
 // text, which lands in the log as the reply at once.
 // [[spec/design_output/extension#the-ask-is-a-line]]
 

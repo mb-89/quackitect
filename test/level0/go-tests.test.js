@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { formatFaults, goEnvOf, goModulesIn } from "../../src/scripts/go-tests.js";
+import { formatFaults, goEnvOf, goModulesIn } from "../../src/scripts/cli-go.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const ROOT = "/tree";

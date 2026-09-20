@@ -5,7 +5,7 @@
 import { ASK, controlBlock, QUIET } from "../../.claude/skills/level0/lib/controls.js";
 import { demands } from "./answer.js";
 import { asks, writes } from "./config.js";
-import { statusAsks, statusLacks, statusShape } from "./status.js";
+import { statusAsks, statusLacks, statusShape } from "../engine/status.js";
 
 const FULL = "full";
 

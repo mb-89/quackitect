@@ -20,7 +20,12 @@ import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
 import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { CONFIG, fromJson } from "../../.claude/skills/level0/lib/vale.js";
-import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
+import {
+  POINTER,
+  PORT_BASE,
+  SETTINGS,
+  SETTINGS_LOCAL,
+} from "../../.claude/skills/level0/lib/vehicle.js";
 import { filesOn } from "../../.claude/skills/level0/lib/warnings.js";
 import { guidanceHere } from "../bridge/guidance.js";
 import {
@@ -49,10 +54,10 @@ import {
 } from "./cli-doors.js";
 import { namesIn, show, walk, warningsStood } from "./cli-read.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
-import { formatFaults, goEnvOf, goModulesIn } from "./go-tests.js";
+import { formatFaults, goEnvOf, goModulesIn } from "./cli-go.js";
 import { HOOKS } from "./precommit.js";
-import { writeSurvey } from "./tools.js";
-import { viewerOf } from "./viewer.js";
+import { writeSurvey } from "../engine/tools.js";
+import { viewerOf } from "./tui-build.js";
 
 export function serverFaults(where) {
   if (!files.exists(lsp)) return null;
@@ -305,26 +310,39 @@ export function pluginHolds() {
   return 0;
 }
 
-// [[spec/design_output/level0#the-bridgehead-and-the-server]]
-export async function serverHolds() {
-  const said = await serverSays();
-  if (said.ok) {
-    console.log(`The server stands at ${said.where}.`);
-    return 0;
+// What the probe found, and whether the check carries on past it. A box running no server reads every rule, and a server standing and failing its health call is red. [[spec/design_output/level0#the-check-reads-the-server]]
+export function serverRead(said) {
+  if (said?.ok) return { code: 0, line: `The server stands at ${said.where}.` };
+  if (said?.answers) {
+    return {
+      code: 1,
+      red: true,
+      line: `The server at ${said.where} fails its health call: ${said.why}`,
+    };
   }
-  console.error(`No server answers at ${said.where}: ${said.why}`);
-  console.error("Start it with ./RUNME.sh serve, or the hook button in the sidebar.");
-  return 1;
+  return {
+    code: 0,
+    line: `No server answers at ${said?.where}, so the rules run without one. Start it with ./RUNME.sh serve, or the hook button in the sidebar.`,
+  };
 }
 
-export async function serverSays() {
+// [[spec/design_output/level0#the-check-reads-the-server]]
+export async function serverHolds(get = fetch) {
+  const read = serverRead(await serverSays(get));
+  if (read.red) console.error(read.line);
+  else console.log(read.line);
+  return read.code;
+}
+
+// The answer of the probe: whether a server answers at all, and what it says of itself where it does. [[spec/design_output/level0#the-check-reads-the-server]]
+export async function serverSays(get = fetch) {
   const where = `http://127.0.0.1:${portHere()}/health`;
   try {
-    const answer = await fetch(where, { signal: AbortSignal.timeout(HEALTH_WAIT) });
+    const answer = await get(where, { signal: AbortSignal.timeout(HEALTH_WAIT) });
     const body = await answer.json();
-    return { ok: Boolean(body?.ok), where, why: String(body?.dead ?? "") };
+    return { answers: true, ok: Boolean(body?.ok), where, why: String(body?.dead ?? "") };
   } catch (bad) {
-    return { ok: false, where, why: bad?.message ?? String(bad) };
+    return { answers: false, ok: false, where, why: bad?.message ?? String(bad) };
   }
 }
 
@@ -447,6 +465,71 @@ export function sidebarSays() {
   return "unlinked: run ./RUNME.sh";
 }
 
+// The three settings files the client reads, the tree's own first. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+function settingsFiles(root, home) {
+  const rows = [
+    { at: join(root, SETTINGS), name: SETTINGS },
+    { at: join(root, SETTINGS_LOCAL), name: SETTINGS_LOCAL },
+  ];
+  // The name a reader sees joins with a slash on every box, and the path joins the way the box does. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+  if (home) rows.push({ at: join(home, SETTINGS), name: `${home}/${SETTINGS}` });
+  return rows;
+}
+
+// A command path parses as a URL, so a probe holds these two schemes alone. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+const REACHED = new Set(["http:", "https:"]);
+
+function addressOf(said) {
+  try {
+    const url = new URL(String(said));
+    return REACHED.has(url.protocol) ? url.href : "";
+  } catch {
+    return "";
+  }
+}
+
+// Every string a settings tree holds, whatever key carries it. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+function stringsIn(said, out = []) {
+  if (typeof said === "string") out.push(said);
+  else if (Array.isArray(said)) for (const one of said) stringsIn(one, out);
+  else if (said && typeof said === "object")
+    for (const one of Object.values(said)) stringsIn(one, out);
+  return out;
+}
+
+// Every hook address the settings files name, in reading order, each off the file naming it first. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+export function hooksNamed(disk, at, home) {
+  const found = new Map();
+  for (const file of settingsFiles(at, home)) {
+    let said = null;
+    try {
+      said = JSON.parse(String(disk.read(file.at)));
+    } catch {
+      continue;
+    }
+    for (const one of stringsIn(said?.hooks)) {
+      const where = addressOf(one);
+      if (where && !found.has(where)) found.set(where, { where, file: file.name });
+    }
+  }
+  return [...found.values()];
+}
+
+// One row a hook, off calls the probe runs together, so a box of dead hooks answers inside the first minute. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+export async function hookRows(found, get = fetch) {
+  return Promise.all(found.map((one) => hookRow(one, get)));
+}
+
+async function hookRow(one, get) {
+  const label = `hook ${new URL(one.where).host}`;
+  try {
+    await get(one.where, { signal: AbortSignal.timeout(HEALTH_WAIT) });
+    return [label, `stands at ${one.where}, off ${one.file}`];
+  } catch {
+    return [label, `warn: answers nothing at ${one.where}, off ${one.file}`];
+  }
+}
+
 export async function doctor() {
   const found = Object.keys(known).length ? known : writeSurvey(it, root, process.env);
   const rows = [
@@ -475,6 +558,7 @@ export async function doctor() {
       files.exists(join(root, TOOLS)) ? TOOLS : "absent, run ./RUNME.sh tools",
     ],
     ["server", await serverLine()],
+    ...(await hookRows(hooksNamed(files, root, homeIn(process.env)))),
   ];
   for (const [what, said] of rows) {
     console.log(`${what.padEnd(COL.tool)} ${String(said).trim() || "missing"}`);
@@ -494,8 +578,9 @@ export function hooksSay() {
   return `git reads ${said || "its own folder"}, so run ./RUNME.sh`;
 }
 
-export async function serverLine() {
-  const said = await serverSays();
+// The row the doctor prints under `server`, so a person asking after a fall reads it there. [[spec/design_output/level0#the-bridge-says-it-falls]]
+export async function serverLine(get = fetch) {
+  const said = await serverSays(get);
   return said.ok ? `stands at ${said.where}` : `none at ${said.where}`;
 }
 

@@ -14,6 +14,6 @@ require (
 
 replace quackitect/config => ../config
 
-replace quackitect/swap => ../swap
+replace quackitect/swap => ../engine/swap
 
 replace quackitect/yaml => ../yaml

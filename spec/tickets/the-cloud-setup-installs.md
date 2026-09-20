@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 depends_on:
   - the-runtime-folder-holds-state
@@ -30,6 +30,19 @@ group: the-bridge-keeps-transport
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 5513cd94dc5d37835ea9872cbc5db023abc3259d
+    hash_after: df65bbd03b6089066c35af762101367271c4aec5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -98,11 +111,15 @@ and works a whole turn outside every rule this tree holds.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -110,11 +127,33 @@ and works a whole turn outside every rule this tree holds.
 
 <!-- the form is text -->
 
+The start road installs the modules where they stand nowhere. So the clone
+replacing the tree takes the cage down for one session start, and no longer.
+
+| the code the road answers | what stands |
+|---|---|
+| 7 | the road installs the modules, then starts the server |
+| 6 | the install brings no modules, and no server starts |
+| 0 | the modules stand already, and the server starts |
+
+The road opens the log before it installs, so the install writes into
+`.se/.log/serve.log` beside the server. It runs `src/scripts/install.sh` under
+the skip list the setup names, and the hook hands that list down as an
+argument.
+
+The span the start road takes grows past a spawn, because an install waits. A
+session start reaches that road on a box whose first event finds no server
+alone.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change takes the first road of the Discussion, and the note under it says what that moves
+- the road's two answers for a missing install stood as one code, and the change parts them
+- the chapter The bridgehead starts it too owns the road, and the table of codes grows there
 
 # Discussion
 
@@ -152,3 +191,21 @@ Either road leaves two things open:
   drift.
 - `the-session-says-its-cage` carries the other half. A session missing the
   cage says so where a person reads it, and the log line stays for the record.
+
+The change takes the first road. The Discussion above reads the ruling it moves
+as one about ordering, and the chapter carries the new ordering now.
+
+| what the ruling says now | where it stands |
+|---|---|
+| the road installs where the modules stand nowhere | the chapter The bridgehead starts it too |
+| the setup installs, and the clone takes that half away | the table under the same chapter |
+
+Three lines of the ask name a fresh cloud clone, and this box carries its
+modules already. A run here decides none of the three.
+
+- a contract case drives the road over a tree carrying no modules, and reads the install and the server back
+- the same case reads the code the road answers, which the log line hangs on
+- a reader wanting the three read on a cloud box opens a session there, and reads `.se/.log/serve.log`
+
+The second road stays open, and the two stand together still. A box carrying
+both installs once.

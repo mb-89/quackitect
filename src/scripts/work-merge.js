@@ -12,7 +12,7 @@ import {
   ticketAt,
   ticketNamed,
   withoutField,
-} from "./group.js";
+} from "../engine/group.js";
 import {
   BRIEF,
   briefOf,

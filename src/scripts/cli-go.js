@@ -10,15 +10,24 @@ const MOD = "go.mod";
 // The tag the index builds its full-text search under, which every module ignores but the index. [[spec/design_output/index#the-compiler-it-needs]]
 const TAGS = "-tags=sqlite_fts5";
 
-// [[spec/design_output/index#the-compiler-it-needs]]
+// A folder under src holds a module, and a folder below that one holds a module too, because the engine folder takes one. [[spec/tickets/an-engine-takes-bridge-work]]
 export function goModulesIn(it) {
-  const at = it.join(it.root, SRC);
+  return modulesUnder(it, SRC).sort();
+}
+
+// Every module at or below a folder, read a folder at a time so a module inside a module stands. [[spec/tickets/an-engine-takes-bridge-work]]
+function modulesUnder(it, folder) {
+  const at = it.join(it.root, ...folder.split("/"));
   if (!it.disk.exists(at)) return [];
-  return it.disk
-    .list(at)
-    .filter((one) => one.kind === "dir" && it.disk.exists(it.join(at, one.name, MOD)))
-    .map((one) => `${SRC}/${one.name}`)
-    .sort();
+  const out = [];
+  for (const one of it.disk.list(at)) {
+    // A package folder holds no module of this tree, and it holds thousands of folders. [[spec/tickets/an-engine-takes-bridge-work]]
+    if (one.kind !== "dir" || one.name === "node_modules") continue;
+    const below = `${folder}/${one.name}`;
+    if (it.disk.exists(it.join(at, one.name, MOD))) out.push(below);
+    else out.push(...modulesUnder(it, below));
+  }
+  return out;
 }
 
 // The environment a Go test runs under, naming the pinned Zig where it stands. [[spec/design_output/index#the-compiler-it-needs]]
