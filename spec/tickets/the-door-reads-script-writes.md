@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -184,6 +184,10 @@ record:
     hash_after: 651977b2a35947e0fd567f17e9f5e38240cccce6
     returns: 2
     why: "`scriptsIn` asks `reaches`, and `reaches` answers false on every path outside; prose and code. So a tracked `.sh`, `.py` or `.rb` path names a script, and; `sh src/scripts/install.sh` and `bash ./RUNME.sh check` each hand the door a; file it reads off the disk.; The door refuses `sh src/scripts/install.sh` on that widening.; `writesInScript` reads `process.stdout.write` as a write, and pairs it with; the module the import above it names, so the refusal reads; `.claude/skills/level0/lib/servers.js` where the script writes no file. Hold; `scriptsIn` to the folders the chapter names, or pair a write with a path its; own call carries.; The road stands twice, and the two disagree. The chapter row names a script; under `.se/` or a temp folder, and `says` on this ticket reads \"A path; standing in the tree passes\". The code passes a tracked prose or code path; alone. Write the road the code takes, in the one place naming it.; `scriptText` in `src/bridge/bash.js` and `textAt` in `src/scripts/precommit.js`; each read a file off a disk and answer empty where it stands nowhere, under; two names. Keep one, and hand the disk in.; No case feeds `scriptsIn` a tracked `.sh` or `.py` path, so no test pins the; road either way. Add one, whichever road the fix takes.; What I check:; `./RUNME.sh check` answers 0 on the commit this branch stands on, and that; commit matches origin.; Every finding of the round before stands answered. `SHELLS`, `READERS`,; `BREAKS`, `baseName` and `clean` each stand once, in the splitter. `OUTSIDE`; goes, and the newline entry goes with it.; The case feeding the spellings of a temp folder asserts the count alone, so; it passes whatever path the reading names.; The ask lands on its first three bullets. A runner and a shell each name; their script, a copy out of the scratchpad refuses over `cp` and `mv`, and; the refusal names `mcp__level0__patch` and `mcp__level0__replace`.; `./RUNME.sh check` covers the script write and the refusal, and `VERBS` names; no test verb. `trunk-door.test.js` drives the same road over the disk.; `tested.js` and `precommit.js` stand outside the ask. Each answers the import; standing above the hunk, so each fixes a rule this branch adds and redesigns; nothing the ask leaves alone.; The route sends this ticket to a retro after this step, and no retro stands; in the handback yet."
+  - step: implement/reflect
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: df035adb800dffc93fa1911a55c9c3a13b1ef2fa
+    hash_after: df035adb800dffc93fa1911a55c9c3a13b1ef2fa
 ---
 
 # Ask
@@ -386,6 +390,21 @@ alone. So the copy goes, and one reader answers every spelling.
 The class is the one this branch checks for elsewhere. A rule finding a second
 copy of a fact stands in `src/lsp/restated.go`, and a hand still writes one in
 code, where no rule reads it yet.
+
+The third round names the class the fix itself fell into: a reading reaching
+past what its chapter says. `reaches` answers false on every path outside prose
+and code, so the reading took `sh src/scripts/install.sh` as a script, and the
+tree's own installer refused.
+
+| the class | the fault here | the fix for the class |
+|---|---|---|
+| a fix reaches past the words naming it | the reading asks a question meaning more than the chapter says | the reading asks the list the chapter names, which `FREE` already holds |
+| one thing stands under two names | `scriptText` and `textAt` read a file the same way, in two doors | the script module owns the reader, and both doors call it |
+| the road stands in three places, and the three disagree | the note, the evidence and the code each say a different set | the code names the set, and the note and the evidence read it back |
+
+A case now feeds the reading a tracked script, so the reach comes back where it
+happens. The narrow question answers the ask: a script under the private folder
+or a temp folder stands outside every rule, and that is the hole.
 
 ### checked
 
