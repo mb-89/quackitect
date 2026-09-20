@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -237,6 +237,12 @@ record:
       - name: check
         exit: 0
         said: 84 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box 1670436ae0bb · claude-code-remote · helper-25
+    hash_before: 78c06bc342372d44e271a03b7fb1584988c95283
+    hash_after: 78c06bc342372d44e271a03b7fb1584988c95283
+    returns: 3
+    why: "design: `spec/design_output/tree-view.md` says the base file marks a preset `Pressed`, and `spec/views/work.base` and `src/tui/tree/base.go` spell the key `pressed`.; craft: `src/tui/mouse_test.go` reads the wheel step under the filter pane as the bare number 3, where `frame.WheelStep` holds it.; craft: `src/tui/panes_test.go` reads the queue's sort key as the bare string \"queue\", where `work.QueueKey` holds it.; craft: The module's imports stand ahead of the standard library in the tree, the log and the work packages and in the root cases, and last in the frame and the draw packages, so one order stands for all.; The branch does what the ask calls for: `src/tui/main.go` is the root's one file past the cases, each tab stands under its folder, and every import runs down.; The last round's findings have their answer: the two notes name `Act`, `Band`, `LoadColours`, `FirstRow`, `HeadWide` and `Cut`, the case messages say the capital names, and the blank line is gone.; `go build ./...`, `go vet ./...` and `go test ./...` under `src/tui` answer 0, and `gofmt -l .` answers nothing.; `./RUNME.sh check` answers 0 on the branch, with 84 warnings standing and none in this ticket's files.; `./RUNME.sh branch review the-notes-point-true` reads check as 1, because its worktree lacks `.claude/skills/level0/.claude-plugin/plugin.json`, and the tree itself answers 0.; No retro stands in the handback, and the verdict step hands the ticket to one.; The layout case refuses a log file importing the work package, and the root case refuses a work file at the root, each fed one in a copy of the source.; The stamp case runs the build again on a move under a package, and leaves the binary standing on a moved case file.; Beyond the ask, the diff touches `.vale.ini` alone, and that section reaches a door file under a package."
 ---
 
 # Ask
@@ -497,9 +503,10 @@ spec/tickets/the-window-splits-by-tab.md
 spec/design_output/tui.md
 spec/design_output/tree-view.md
 spec/vocabulary/terms.yml
+spec/views/work.base
+src/tui/go.mod
 .vale.ini
 src/scripts/tui-build.js
-test/level0/viewer.test.js
 src/tui/door_test.go
 src/tui/draw/colour.go
 src/tui/draw/colour_test.go
@@ -568,6 +575,7 @@ src/tui/workdetail_test.go
 src/tui/workedit_test.go
 src/tui/workplace_test.go
 src/tui/workplaces_test.go
+test/level0/viewer.test.js
 
 ## verdict
 
@@ -577,23 +585,18 @@ src/tui/workplaces_test.go
 
 fail
 
-- design: The help table in `spec/design_output/tui.md` names `act`, `band`, `bands()` and `key()`, and the split gave each a capital.
-- design: `spec/design_output/tui.md` names `loadColours`, `overPane`, `firstRow` and `listWidth`, and the split gave each a capital.
-- design: `spec/design_output/tui.md` names `headWide` and `namesWide` under The mouse reaches the window, and the split gave each a capital.
-- design: The chapter's draw row names `cut`, `pad` and `oneLine`, and the split gave each a capital.
-- craft: `src/tui/tree/treeflag_test.go` keeps the blank line before the closing brace of `TestAValueFlagWearsATonePerValue`, which the last round named.
-- craft: `src/tui/frame_test.go` says `frame.HeadWide` and `frame.FootWide` to a reader, the way the last round's finding on that file read.
-- craft: `src/tui/door_test.go` says `tabMsg` and `tabNamed` to a reader, and the split gave each a capital.
-- craft: `src/tui/mouse_test.go` says `tabAt` and `src/tui/sort_test.go` says `columnAt`, and the split gave each a capital.
+- design: `spec/design_output/tree-view.md` says the base file marks a preset `Pressed`, and `spec/views/work.base` and `src/tui/tree/base.go` spell the key `pressed`.
+- craft: `src/tui/mouse_test.go` reads the wheel step under the filter pane as the bare number 3, where `frame.WheelStep` holds it.
+- craft: `src/tui/panes_test.go` reads the queue's sort key as the bare string "queue", where `work.QueueKey` holds it.
+- craft: The module's imports stand ahead of the standard library in the tree, the log and the work packages and in the root cases, and last in the frame and the draw packages, so one order stands for all.
 - The branch does what the ask calls for: `src/tui/main.go` is the root's one file past the cases, each tab stands under its folder, and every import runs down.
-- The last round's three design findings have their answer: the two notes point at `src/tui/frame` and `src/tui/tree`, and name `OpenDoor`, `TabMsg` and `TellPort`.
+- The last round's findings have their answer: the two notes name `Act`, `Band`, `LoadColours`, `FirstRow`, `HeadWide` and `Cut`, the case messages say the capital names, and the blank line is gone.
 - `go build ./...`, `go vet ./...` and `go test ./...` under `src/tui` answer 0, and `gofmt -l .` answers nothing.
-- `./RUNME.sh check` answers 0 on the branch, with 81 warnings standing, and the ones in this ticket's files stand in the ticket's own record.
-- `./RUNME.sh branch review` reads check as 1, because its worktree lacks `.claude/skills/level0/.claude-plugin/plugin.json`, and the tree itself answers 0.
+- `./RUNME.sh check` answers 0 on the branch, with 84 warnings standing and none in this ticket's files.
+- `./RUNME.sh branch review the-notes-point-true` reads check as 1, because its worktree lacks `.claude/skills/level0/.claude-plugin/plugin.json`, and the tree itself answers 0.
 - No retro stands in the handback, and the verdict step hands the ticket to one.
-- The layout case refuses a package importing what its row leaves out, and the root case refuses a tab file at the root.
+- The layout case refuses a log file importing the work package, and the root case refuses a work file at the root, each fed one in a copy of the source.
 - The stamp case runs the build again on a move under a package, and leaves the binary standing on a moved case file.
-- The widths, the wheel step, the floor width, the no-sort mark, the poll and the ticket schema each stand in one place now, and the cases read them there.
 - Beyond the ask, the diff touches `.vale.ini` alone, and that section reaches a door file under a package.
 
 ## checked
@@ -602,7 +605,7 @@ fail
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The constants and the poll stand once now, and the note's help table and mouse chapter keep the old spellings, so the findings name each.
+- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The chapter's table is the one list and the layout case reads it, and the two bare values and the note's spelling of `pressed` stand in the findings.
 
 # Discussion
 
