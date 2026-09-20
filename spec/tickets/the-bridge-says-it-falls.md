@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -105,6 +105,10 @@ record:
     hand: box fa49097ce66c · claude-code-remote
     hash_before: 9463ea56e738a5dbf2ef5c90ef8c03697a14bbcf
     hash_after: 082a68b85767412d83494d654eab1d63124e67be
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-16
+    hash_before: 562f827de25561435449745593ea62240a5a4f14
+    hash_after: 562f827de25561435449745593ea62240a5a4f14
 ---
 
 # Ask
@@ -212,18 +216,22 @@ own ticket, and this one mints none.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `seen` asks the server before `starts` runs, so every cloud session start draws a chat line
-- the draft scopes itself to a fall under a running session, and the change reaches the session start too
-- the case table wants a row for the session start, or `down` wants a guard on that event
-- line 47 of `spec/design_output/level0.md` carries the claim the change overturns, and the change table leaves it out
-- line 96 of that chapter reads the first cloud event as a log row alone, so it drifts too
-- `saidDown` takes the answer of `wrote`, so a failing log write repeats the line each event
-- what stands: `serverLine` answers `none at <the health call>`, and `doctor` prints it under `server`
-- the tree holds that doctor wording in the code alone, so the plan's case earns its place
-- the `$.ui.log` route matches `says` in the level one hook, so the helper shape holds
-- `./RUNME.sh check` answers 0 on this branch, and the retro stands absent
+- `seen` asks the server before `starts` runs, so the skip at `session.start` answers the first three findings
+- the change table names the answer table row and the start road paragraph, so findings four and five hold
+- `saidDown` takes the answer of `wrote`, and the draft moves the flag off it, so finding six holds
+- `serverLine` answers `none at <the health call>`, and `doctor` prints it under `server`
+- the tree holds that doctor wording in the code alone, so the draft's case earns its place
+- `says` in the level one hook wraps `$.ui.log` in a catch, so the helper shape holds
+- the start road harness offers `$.ui` nowhere, so the draft's quiet case holds
+- the two doc rows name a chapter each, and leave the file `spec/design_output/level0.md` out
+- the hook's route and the doctor's route differ, and the draft calls both the health call
+- the case table leaves out the doctor case the prose names twice
+- the line names two commands, and the draft leaves which two to the cage block wording
+- a caged cloud box draws the line at its first `prompt.context`, beside the cage block the same event carries
+- the draft touches the ticket file alone, so the diff stands inside the brief
+- `./RUNME.sh check` answers 0 on this branch, and the retro stands absent from the handback
 
 # implement
 
