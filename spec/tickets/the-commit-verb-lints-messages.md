@@ -89,12 +89,18 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: 1cc2ba86c7674ef65392e0200cc8a6314772a7d7
     hash_after: 1cc2ba86c7674ef65392e0200cc8a6314772a7d7
+  - step: design/review
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 771b790943eb27386b78dd3de6e672d0229d3616
+    hash_after: 771b790943eb27386b78dd3de6e672d0229d3616
+    returns: 1
+    why: "the message read stands already: `commitVoice`, under `src/bridge/bash.js`, which the bash door calls; it lints under the path `level0-commit.md`, and the approach names no path, so a second reader picks another; it calls `withoutTrailers` first, so a reader missing that lints the co-author lines a commit carries; `landed` composes its own message as the ticket name and its changes, so a free message reaches it nowhere; say whether the commit half comes out of `landed`, or the verb runs its own commit and leaves it standing; the ask names `./RUNME.sh test`, and the approach names no case file the refusal and the push land in; what holds: `STAMP` under `runs.js` carries the check, and `prepush.js` behind the push door reads it"
 ---
 
 # Ask
@@ -145,8 +151,17 @@ The cases drive a message the rules refuse to the findings with no commit, and a
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- the message read stands already: `commitVoice`, under `src/bridge/bash.js`, which the bash door calls
+- it lints under the path `level0-commit.md`, and the approach names no path, so a second reader picks another
+- it calls `withoutTrailers` first, so a reader missing that lints the co-author lines a commit carries
+- `landed` composes its own message as the ticket name and its changes, so a free message reaches it nowhere
+- say whether the commit half comes out of `landed`, or the verb runs its own commit and leaves it standing
+- the ask names `./RUNME.sh test`, and the approach names no case file the refusal and the push land in
+- what holds: `STAMP` under `runs.js` carries the check, and `prepush.js` behind the push door reads it
 
 # implement
 
