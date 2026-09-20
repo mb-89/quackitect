@@ -110,6 +110,16 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote · helper-21
     hash_before: 8cc28a0f1696d0a5ebe8556dce5b7f1de018d0f0
     hash_after: 8cc28a0f1696d0a5ebe8556dce5b7f1de018d0f0
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 574f43d33d9b5506703e625daf2b9a9633ee7081
+    hash_after: 574f43d33d9b5506703e625daf2b9a9633ee7081
+    returns: 1
+    why: the ask's case already stands, and the row the change adds offers nothing red
+    answered:
+      - name: tests
+        exit: 0
+        said: "# duration_ms 12414.261652"
 ---
 
 # Ask
@@ -186,20 +196,32 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/person-step.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case the ask names already stands, as the first case of `test/level0/person-step.test.js`. It drives a group at `children` and reads `branch unblock` out of the answer.
+
+So no test goes red here:
+
+- the change left is one pointer in the answers table, which `./RUNME.sh lint` covers
+- that pointer stands on the branch, and `./RUNME.sh lint spec/design_output/pull.md` passes
+
+What surprises: this is the second ticket of this group meeting the same wall. A `standard` route reaches `implement/tests-red`, and an ask wanting one row of prose offers nothing red. [[spec/tickets/a-route-closes-answered-asks]] carries that gap.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ask names the answers table and a case, and the change touches the table alone
+- the standing case drives `doors`, so git and the disk stand fake there
+- the row carries a pointer, so the prompt keeps its own wording in one place
 
 ## reflect
 

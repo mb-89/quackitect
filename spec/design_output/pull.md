@@ -21,7 +21,7 @@ it:
 |---|---|---|
 | `work` | one leaf of a ticket, with its fields, its guidance and the file to write in | the step, then pulls again naming the ticket |
 | `refused` | a check fails, and the findings stand one a line | fixes it, and the ticket stays in hand |
-| `wait` | nothing to hand out, and a reason per ticket the pull skips | says so, and stops |
+| `wait` | nothing to hand out, and a reason per ticket the pull skips | says so, and stops. Where a person's step is all that stands, the answer names the road out, and [[spec/design_output/work#a-person-step-leaves]] carries it |
 | `spawn` | the only open step excludes this hand, with a helper's name and its prompt | spawns that hand, and pulls again once it answers |
 | `done` | a hand under `--as` hands its one step back | stops, because a one-step hand takes no next leaf |
 
