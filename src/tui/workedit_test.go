@@ -253,7 +253,10 @@ func TestTheCursorMovesAcrossTheColumnsAndTheHeaderLightsIt(t *testing.T) {
 		t.Fatal("the cursor stops at the first column")
 	}
 	theWork(m).Tree.Schema = theWork(m).TicketRules()
-	if !strings.Contains(theWork(m).Tree.Header(120), draw.Open.Render(draw.Pad("name", 34))) {
+	// The lit cell opens with the open style's own sequence, whatever width the column takes. [[spec/design_output/tree-view#a-cell-takes-an-edit]]
+	lit := draw.Open.Render("name")
+	lit = lit[:strings.Index(lit, "name")+len("name")]
+	if !strings.Contains(theWork(m).Tree.Header(120), lit) || lit == "name" {
 		t.Fatalf("the column under the cursor stands lit, and the header reads %q", theWork(m).Tree.Header(120))
 	}
 }

@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/termenv"
 
 	"quackitect/config"
 )
@@ -97,4 +98,10 @@ func LevelStyle(level string) lipgloss.Style {
 // The colour a flag's tone wears, and the empty string where the config names none. [[spec/design_output/tui#colours]]
 func FlagColour(tone string) string {
 	return palette.flags[tone]
+}
+
+// What a case run does in place of the window's start: reads the colours, and takes true colour, because a case run writes to a pipe where the styles draw none. [[spec/tickets/the-colours-stand-in-config]]
+func LoadColoursForCases(root string) {
+	lipgloss.SetColorProfile(termenv.TrueColor)
+	LoadColours(root)
 }

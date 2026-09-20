@@ -14,7 +14,7 @@ func treeRoot() string { return filepath.Join("..", "..", "..") }
 
 // The window reads the colours at start, and a case run stands in for that start. [[spec/tickets/the-colours-stand-in-config]]
 func TestMain(m *testing.M) {
-	LoadColours(treeRoot())
+	LoadColoursForCases(treeRoot())
 	os.Exit(m.Run())
 }
 

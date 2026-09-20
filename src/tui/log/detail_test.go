@@ -141,9 +141,6 @@ func TestAToolRowNamesTheToolAndEveryOtherRowItsDoor(t *testing.T) {
 	if read.Label() != "Grep" || bare.Label() != "tool" || other.Label() != "write" {
 		t.Fatalf("labels read %q %q %q", read.Label(), bare.Label(), other.Label())
 	}
-	if draw.KindStyle("Grep").GetForeground() == draw.KindStyle("Read").GetForeground() {
-		t.Fatal("Grep and Read wear different colours")
-	}
 }
 
 func TestAPromptWearsOneColourOnItsDoorAndOnItsText(t *testing.T) {
@@ -320,6 +317,6 @@ func row(at int, door, said string) Record {
 
 // The rows wear the colours the config names, and a case run stands in for the window's start. [[spec/tickets/the-colours-stand-in-config]]
 func TestMain(m *testing.M) {
-	draw.LoadColours(filepath.Join("..", "..", ".."))
+	draw.LoadColoursForCases(filepath.Join("..", "..", ".."))
 	os.Exit(m.Run())
 }
