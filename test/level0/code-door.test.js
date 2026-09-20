@@ -7,7 +7,9 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { codeDoor } from "../../src/bridge/code.js";
+import { noteFor } from "../../src/bridge/split-ticket.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeProc } from "../../src/doors/fake/proc.js";
 
 const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
@@ -83,4 +85,59 @@ test("a write under every ceiling passes, and a cut to a file past its ceiling p
     it.box,
   );
   assert.match(grown.result.deny, /FileCeiling/);
+});
+
+// [[spec/design_output/level0#the-refusal-parks-the-work]]
+test("a file ceiling parks the cut, and the refusal names where it stands", async () => {
+  const it = box();
+  const ran = [];
+  it.box.root = ROOT;
+  it.box.node = "node";
+  it.box.proc = fakeProc({
+    node: (argv) => {
+      ran.push(argv);
+      return { exitCode: 0 };
+    },
+  });
+
+  const tall = new Array(7).fill("const one = 1;").join("\n");
+  const path = at("src/a.js");
+  const ask = [write(path, tall), { path, text: tall }, "src/a.js", tall, it.box];
+
+  const said = await codeDoor(...ask);
+  assert.match(said.result.deny, /FileCeiling/);
+  assert.match(said.result.deny, /parks this cut/, "the refusal names the note");
+  assert.equal(ran.length, 1, "the door runs the ticket verb once");
+
+  it.disk.write(at(noteFor("src/a.js")), "---\nkind: [[ticket]]\n---\n");
+  const again = await codeDoor(...ask);
+  assert.match(again.result.deny, /names this cut already/);
+  assert.equal(ran.length, 1, "a second refusal writes no second note");
+});
+
+// [[spec/design_output/level0#the-size-ceiling]]
+test("a function ceiling alone parks nothing, because no file waits on a cut", async () => {
+  const it = box();
+  it.box.root = ROOT;
+  it.box.proc = fakeProc({ node: () => ({ exitCode: 0 }) });
+
+  const long = [
+    "function s() {",
+    "  const a = 1;",
+    "  const b = 2;",
+    "  return a;",
+    "}",
+    "",
+  ].join("\n");
+  const path = at("src/b.js");
+  const said = await codeDoor(
+    write(path, long),
+    { path, text: long },
+    "src/b.js",
+    long,
+    it.box,
+  );
+
+  assert.match(said.result.deny, /FunctionCeiling/);
+  assert.doesNotMatch(said.result.deny, /parks this cut/);
 });

@@ -639,13 +639,17 @@ its target, leaving the rest in the source:
 holds every target and the rest, so `mcp__level0__undo` takes the whole cut
 back. For details, see [[spec/design_output/apply#the-journal-holds-both-halves]].
 
-### The refusal mints the work
+### The refusal parks the work
 
-A refusal naming the file ceiling mints a ticket off `trivial`, at
-`spec/tickets/split-<name>.md`, and the refusal names it. The ticket carries no
-group, so it stands loose on trunk where a person sorts it.
-`src/bridge/split-ticket.js` holds the mint, and the code door calls it. A
-second refusal on the same file names the ticket that stands, and writes none.
+A refusal naming the file ceiling parks a private ticket through
+`./RUNME.sh ticket note`, and the refusal names where it stands. The note lands
+under the private tickets folder, off git, and the retro decides it. A tracked
+ticket takes that road instead, because a door filling no ask leaves
+placeholders the lint names.
+
+`src/bridge/split-ticket.js` holds the call, and the code door makes it. A
+second refusal on the same file names the note that stands, and writes none. A
+refused run answers the line the verb says, so no refusal goes quiet.
 
 ## The path a rule reads
 

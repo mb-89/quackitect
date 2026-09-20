@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -159,6 +159,14 @@ record:
     hand: box 099c2ec7708d · claude-code-remote
     hash_before: e84f2499e217aaecafe44ed3c980d62427b55d6c
     hash_after: e84f2499e217aaecafe44ed3c980d62427b55d6c
+  - step: implement/change
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: e00516c2f8b2282ea09a6c35446c567cc01bfc89
+    hash_after: e00516c2f8b2282ea09a6c35446c567cc01bfc89
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask

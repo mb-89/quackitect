@@ -8,7 +8,7 @@ import { FOLDER as UNDONE } from "../../.claude/skills/level0/lib/undo.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { splitTicket, ticketFor } from "../../src/bridge/split-ticket.js";
+import { noteFor, splitTicket } from "../../src/bridge/split-ticket.js";
 import { cutsIn, splitText } from "../../src/scripts/split-cut.js";
 import { splitVerb } from "../../src/scripts/split-verb.js";
 
@@ -109,7 +109,7 @@ test("the verb writes every target, the rest and one journal entry", () => {
   const it = doors();
 
   const { code } = heard(() =>
-    splitVerb(it, ["split", SOURCE, "--to", "src/a.js", "--lines", "1-2"]),
+    splitVerb(it, [SOURCE, "--to", "src/a.js", "--lines", "1-2"]),
   );
 
   assert.equal(code, 0);
@@ -134,7 +134,7 @@ test("the dry flag names the cuts and writes nothing", () => {
   const it = doors();
 
   const { code, said } = heard(() =>
-    splitVerb(it, ["split", SOURCE, "--to", "src/a.js", "--lines", "1-2", "--dry"]),
+    splitVerb(it, [SOURCE, "--to", "src/a.js", "--lines", "1-2", "--dry"]),
   );
 
   assert.equal(code, 0);
@@ -143,34 +143,46 @@ test("the dry flag names the cuts and writes nothing", () => {
   assert.equal(it.disk.read(join(ROOT, SOURCE)), `${TEXT}\n`);
 });
 
-// [[spec/design_output/level0#the-size-ceiling]]
-test("the mint runs once a file, and a standing ticket stops the second", () => {
-  const at = ticketFor(SOURCE);
+const parking = (answers) => {
   const ran = [];
   const box = {
     root: ROOT,
-    join,
     node: "node",
     disk: fakeDisk({}),
     proc: fakeProc({
       node: (argv) => {
         ran.push(argv);
-        return { exitCode: 0 };
+        return answers;
       },
     }),
   };
+  return { box, ran };
+};
+
+// [[spec/design_output/level0#the-refusal-parks-the-work]]
+test("the note parks once a file, and a note standing stops the second", () => {
+  const at = noteFor(SOURCE);
+  const { box, ran } = parking({ exitCode: 0 });
 
   const first = splitTicket(box, SOURCE);
-  assert.match(first, /stands open for this cut/);
-  assert.equal(ran.length, 1, "the mint runs once");
-  assert.ok(ran[0].includes("--process=trivial"), "the ticket takes the trivial route");
-  assert.ok(
-    ran[0].some((one) => one.startsWith("--done_when=")),
-    "the three fields trivial asks for each carry a line",
-  );
+  assert.match(first, /parks this cut/);
+  assert.equal(ran.length, 1, "the verb runs once");
+  assert.deepEqual(ran[0].slice(2, 5), [
+    "ticket",
+    "note",
+    "split-long",
+  ]);
 
   box.disk.write(join(ROOT, at), "---\nkind: [[ticket]]\n---\n");
   const again = splitTicket(box, SOURCE);
   assert.match(again, /names this cut already/);
-  assert.equal(ran.length, 1, "the second refusal mints nothing");
+  assert.equal(ran.length, 1, "the second refusal writes nothing");
+});
+
+// [[spec/design_output/level0#the-refusal-parks-the-work]]
+test("a refused note answers the line the verb says, so no refusal goes quiet", () => {
+  const { box } = parking({ exitCode: 2, stderr: "a name nothing holds yet" });
+
+  assert.match(splitTicket(box, SOURCE), /stands unwritten: a name nothing holds yet/);
+  assert.equal(splitTicket({ disk: box.disk, root: ROOT }, SOURCE), "");
 });

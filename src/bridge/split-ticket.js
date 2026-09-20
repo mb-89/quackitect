@@ -1,40 +1,44 @@
-// The ticket a file ceiling mints, once a file. The code door calls it on a
-// refusal, and the mint verb writes the note.
-// [[spec/design_output/level0#the-size-ceiling]]
+// The note a file ceiling parks, once a file. The code door calls it on a
+// refusal, and the ticket verb writes the private ticket the retro decides.
+// [[spec/design_output/level0#the-refusal-parks-the-work]]
 
 import { join } from "node:path";
-import { TICKETS } from "../../.claude/skills/level0/lib/folders.js";
+import { TICKETS as NOTES } from "../../.claude/skills/level0/lib/folders.js";
 
-const PROCESS = "trivial";
-const PREFIX = "split-";
+const PREFIX = "split";
+// The name rule counts a name's words, and the prefix takes the first of them. [[spec/design_output/level0#a-name-meets-the-cap]]
+const WORDS = 4;
 
-// [[spec/design_output/level0#the-size-ceiling]]
-export function ticketFor(where) {
-  const name = String(where).split("/").pop().replace(/\.[^.]+$/, "");
-  return `${TICKETS}/${PREFIX}${name}.md`;
+// [[spec/design_output/level0#the-refusal-parks-the-work]]
+export function noteFor(where) {
+  const said = String(where)
+    .split("/")
+    .pop()
+    .replace(/\.[^.]+$/, "");
+  const parts = said.split(/[-_.]+/).filter(Boolean).slice(-WORDS);
+  return `${NOTES}/${[PREFIX, ...parts].join("-")}.md`;
 }
 
-// [[spec/design_output/level0#the-size-ceiling]]
+// [[spec/design_output/level0#the-refusal-parks-the-work]]
 export function splitTicket(box, where) {
   if (!box?.proc) return "";
-  const at = ticketFor(where);
+  const at = noteFor(where);
   if (box.disk.exists(join(box.root, at))) return `${at} names this cut already.`;
 
+  const name = at.split("/").pop().replace(/\.md$/, "");
   const ran = box.proc.run(
     [
       box.node ?? "node",
       join(box.root, "src", "scripts", "cli.js"),
-      "mint",
       "ticket",
-      at,
-      `--process=${PROCESS}`,
-      `--gain=${where} comes under the ceiling, so every write to it passes the door.`,
-      `--breaks=Every write to ${where} meets a refusal, and a hand squeezes lines to pass.`,
-      `--done_when=./RUNME.sh lint ${where} names no FileCeiling`,
+      "note",
+      name,
+      `${where} stands past the file ceiling, so a cut comes before the next write.`,
     ],
     { cwd: box.root },
   );
-  // A mint the box refuses leaves the refusal to stand on its own. [[spec/design_output/level0#the-size-ceiling]]
-  if (ran.exitCode !== 0) return "";
-  return `${at} stands open for this cut. Run ./RUNME.sh split ${where} to make it.`;
+  if (ran.exitCode !== 0) {
+    return `${at} stands unwritten: ${String(ran.stderr ?? ran.stdout ?? "").trim()}`;
+  }
+  return `${at} parks this cut. Run ./RUNME.sh split ${where} to make it.`;
 }

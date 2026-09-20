@@ -2,7 +2,6 @@
 // into targets, writes them through the undo journal, and leaves the rest.
 // [[spec/design_output/level0#the-size-ceiling]]
 
-import { join } from "node:path";
 import {
   FOLDER as UNDONE,
   journalOf,
@@ -12,15 +11,14 @@ import { cutsIn, splitText } from "./split-cut.js";
 
 export const BY = "split";
 
+// The flags stand in the design output, and this line is the terminal's own copy. [[spec/design_output/level0#a-verb-cuts-the-file]]
 const USAGE = [
-  "Usage: ./RUNME.sh split <file> --to <path> --lines <from>-<to> [...]\n",
-  "  --to <path>        one target the cut writes",
-  "  --lines <from>-<to> the lines that target takes, named after each --to",
-  "  --dry              the cuts it would write, and no write",
+  "Usage: ./RUNME.sh split <file> --to <path> --lines <from>-<to> [...] [--dry]",
 ];
 
 export function splitVerb(it, argv) {
-  const said = (argv ?? []).slice(1);
+  // The caller hands the flags alone, the way the verbs table hands `rest`. [[spec/design_output/level0#a-verb-cuts-the-file]]
+  const said = argv ?? [];
   const from = said.find((one) => !one.startsWith("--")) ?? "";
   if (!from || said.includes("--help")) {
     for (const row of USAGE) console.log(row);
@@ -67,12 +65,14 @@ function wrote(it, from, at, cut) {
   ];
 
   const stamp = it.clock.stamp();
+  // The entry names this run, so an undo takes this cut and no other. [[spec/design_output/apply#the-journal-holds-both-halves]]
+  const on = `${BY}:${stamp}`;
   const where = it.join(it.root, UNDONE, nameOf(stamp));
   it.disk.makeDir(it.join(it.root, UNDONE));
-  it.disk.write(where, `${JSON.stringify(journalOf(stamp, BY, BY, files), null, 2)}\n`);
+  it.disk.write(where, `${JSON.stringify(journalOf(stamp, on, BY, files), null, 2)}\n`);
 
   for (const one of files) it.disk.write(it.join(it.root, one.file), one.made);
-  console.log(`The cut stands, and mcp__level0__undo takes it back under ${BY}.`);
+  console.log(`The cut stands, and mcp__level0__undo takes it back under ${on}.`);
   return 0;
 }
 
@@ -80,5 +80,3 @@ function standing(it, path) {
   const where = it.join(it.root, path);
   return it.disk.exists(where) ? it.disk.read(where) : "";
 }
-
-export { join };
