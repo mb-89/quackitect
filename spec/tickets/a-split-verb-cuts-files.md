@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -155,6 +155,10 @@ record:
     hash_after: 272b2ce68a0fa531211fc60e55668c1e31474cf7
     returns: 1
     why: "the verb reads a target as its source: `splitVerb` slices `argv`, and `rest` carries no verb name; so `./RUNME.sh split <file>` cuts the file `--to` names, and the ask's first bullet stands unmet; the mint the door runs comes back refused: `gain names no field of a ticket note`; `trivial` asks `gain`, `breaks` and `done_when` under the ask, and the mint takes frontmatter fields alone; `splitTicket` reads a refused mint as silence, so a live refusal names no ticket; `ticketFor` builds `.se/tickets/split-<name>.md`, and the chapter names `spec/tickets/split-<name>.md`; the design review's note for implement stands unanswered: `splitTicket` reads existence, so a closed ticket blocks the mint; the approach names an open ticket, and the code reads any file standing at that path; `fakeProc` answers every argv the same, so the mint case asserts a call the real mint refuses; no case drives `codeDoor` past the file ceiling with a `proc` door, so the new branch fires under no test; the journal names `on` as `split`, and the approach names `on` as the session the write runs under; the retro stands absent from the handback, which `./RUNME.sh branch review` names; `./RUNME.sh check` exits 0, and `./RUNME.sh lint src/scripts` exits 0; `export { join }` at the foot of `src/scripts/split-verb.js` reaches nobody"
+  - step: implement/reflect
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: e84f2499e217aaecafe44ed3c980d62427b55d6c
+    hash_after: e84f2499e217aaecafe44ed3c980d62427b55d6c
 ---
 
 # Ask
@@ -299,14 +303,33 @@ The verb's own file and the door's mint both wait on this pair. Each takes a cas
 ### class
 
 <!-- the class of error the findings describe, and the fix for the class -->
-
 <!-- the form is text -->
+
+Every fault stands where a fake agrees with the code, and no case asks the tree. The cases prove the code against itself.
+
+| what the case feeds | what the tree answers |
+|---|---|
+| argv carrying the verb name | `rest` drops it, so the verb reads a target as its source |
+| a process answering any argv | the real mint refuses `--gain`, because the ask takes no flag |
+| a path off the private folder | the chapter names `spec/tickets`, and the two disagree |
+| no case at all over the door | the branch fires nowhere under test |
+
+The fix for the class runs in three moves:
+
+- feed each case the shape its caller sends, so `rest` and `argv` read alike
+- drive the real thing in `test/contract` where the claim is about the real thing
+- read the exit of every process the code runs, so a refusal answers a line
+
+The mint itself takes the third move further. A door minting a tracked ticket leaves placeholders the lint names, so the check turns red on a refusal. `./RUNME.sh ticket note` parks a private ticket off git, which the retro decides, and that road costs the tree nothing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the fix touches the verb, the mint, the door, the cases and the chapter naming the path
+- the disk, the clock and the process reach each piece as doors, and a contract case drives the real mint
+- the class above names the approach each hunk follows
 
 ## change
 
