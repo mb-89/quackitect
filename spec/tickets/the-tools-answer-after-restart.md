@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -126,6 +126,17 @@ record:
     hash_after: 30fee4007c7a91108d5bafc6c3a2ffd28f19920e
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 49a0cdd5b2c68ff8a83e75856ca14e493d661f4d
+    hash_after: 49a0cdd5b2c68ff8a83e75856ca14e493d661f4d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 415 test(s) pass in 38 file(s); green, src/engine/swap passes
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -331,11 +342,15 @@ as fakes, and the case touches memory alone.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -343,11 +358,35 @@ as fakes, and the case touches memory alone.
 
 <!-- the form is text -->
 
+The server restarts under a running session, and the box it builds carries none
+of what the session start fills. `fillsBox` fills the schemas, the survey and
+the specs, and `decide` runs it ahead of the door.
+
+| what lands | where |
+|---|---|
+| `fillsBox`, and the two calls into it | `src/bridge/server.js` |
+| `surveyHere` leaves the module | `src/bridge/guidance.js` |
+| the chapter saying why | [[spec/design_output/level0#a-restart-fills-the-box]] |
+| the cases | `test/level0/restart-box.test.js` |
+
+The mint is what this buys. `mintSpec` reads the kinds off `box.schemas`, and a
+fresh box holds none. So the kind list registers empty, and `mintedNote` throws
+on `schemas.get`. The tools block reads `box.tools` and `box.specs` the same
+way, and a fresh box leaves it short.
+
+The registration answers `box.specs` now, so `decide` builds the list once. A
+session start passes `again`, because the tree moves under a box that stands.
+The projections stay with `freshens`, which fills them on a fresh box already.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `server.js`, `guidance.js`, the level zero chapter and the cases
+- the cases build the box off `boxOf`, and every door it takes stands as a fake
+- `fillsBox` carries the line saying what it fills, and points at its chapter
 
 # verdict
 
