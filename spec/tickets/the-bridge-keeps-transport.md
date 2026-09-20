@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box fa49097ce66c · claude-code-remote
@@ -104,6 +104,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 9f3c045c581ee93e6956abc48aaee424f7560359
+    hash_after: 9f3c045c581ee93e6956abc48aaee424f7560359
 ---
 
 # Ask
@@ -187,11 +191,33 @@ those, and the engine takes the work the bridge does past transport.
 
 <!-- the form is list -->
 
+- `a-standing-stop-ends-turns`: a turn that ends stays ended, and the hook holds it closed
+- `the-canary-pays-once`: one line pays the canary for the session
+- `the-canary-survives-a-restart`: the debt reads the session log, so a restart keeps it
+- `the-answer-door-reads-chat`: the door lets the calls carrying the work through
+- `the-session-file-proves-itself`: a case drives the level one hook, and the wrapper reads every session id
+- `the-session-says-its-cage`: a session whose server stands down reads one block saying so
+- `the-bridgehead-needs-no-shell`: the start road runs node, so a Windows box starts its server
+- `the-cloud-setup-installs`: a cloud box installs its modules, so the cage reaches the first prompt
+- `the-check-starts-the-server`: one command off a fresh clone reads every rule
+- `the-server-holds-its-socket`: a kept socket outlives the gap between two events
+- `the-bridge-says-it-falls`: a bridge answering nothing says so in the chat, beside its log row
+- `the-doctor-probes-every-hook`: the doctor probes every hook address the settings files name
+- `the-tools-answer-after-restart`: a restarted server fills its box, so the tools register whole
+- `an-engine-takes-bridge-work`: each reader stands in the folder owning its topic
+- the private box drains, and `.vale.ini` gives it the register a ticket takes
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- the write door catches a voice break at the write, so a draft reaches its review clean
+- a spawned hand takes the step a `not:` rule holds away from me, and the route runs on
+- a verdict hand kills a mutant a case claims to catch, so the case earns its green
+- `./RUNME.sh check` answers every hand the same way, so a green branch stays green
+- the engine commits each hand-back, so the record and the tree move together
 
 ### badly
 
@@ -199,11 +225,25 @@ those, and the engine takes the work the bridge does past transport.
 
 <!-- the form is list -->
 
+- hands opening at once all took one leaf. The moment stands at `a-standing-stop-ends-turns`.
+- a review failed a draft back for a claim written from memory. The moment stands at `the-tools-answer-after-restart`.
+- the canary fix read a torn log line and answered false. The moment stands at `the-canary-survives-a-restart`.
+- the write door refuses the word a note's decision takes. The moment stands at `retro/notes` here.
+- a rename by `sed` pointed the server at a file standing nowhere. The moment stands at `an-engine-takes-bridge-work`.
+- the Vale span times out under load, and the check reads red. The moment stands at `two-checks-time-vale-out`.
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- [[spec/design_output/pull]]: the pull takes a held leaf out of its answer, so hands run beside each other
+- [[spec/guidance/review/reviewing]]: a draft names what it reads beside each claim
+- `.claude/skills/level0/lib/log.js`: every line-per-row reader takes the tolerant one
+- `.vale.ini`: the private box takes the register a ticket takes, which this branch lands
+- [[spec/guidance/working]]: a rename over many files runs through `mcp__level0__replace`
+- `spec/config/styles`: the rule carries a span a slow box meets, and a timeout reads apart from a rule
 
 ### thoughts
 
@@ -211,11 +251,27 @@ those, and the engine takes the work the bridge does past transport.
 
 <!-- the form is text -->
 
+The hand rule sets the pace here, and it carries a cost. A `not:` step wants a
+hand other than the one that wrote the step before it. So every review and every
+verdict opens a hand of its own, and each reads the tree from nothing.
+
+- the engine names the hand to spawn, so the road is clear, and the road is slow
+- a review failed a draft for a claim from memory more than once, each at a full round
+- the rule an answer takes covers it: make no assertion from recall
+
+The write door refuses a line, and the refusal names the rule and the line. So a
+fix takes one edit, and every answer on this branch holds to one voice. A hand
+reads that loop as friction, and the friction is the point.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact here points at the ticket or the file holding it, and repeats none of it
+- the retro writes no count, and names the command answering one
+- each field carries what its header asks for, and counts nothing
 
 ## cloud
 
