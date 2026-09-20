@@ -95,6 +95,11 @@ test("the survey writes every wanted tool into .se/.runtime/tools.json", () => {
     WANTED.map((one) => one.name),
   );
   assert.equal(pathOf(read, "vale"), `${BIN}/vale`);
+  assert.equal(
+    files.exists(`${ROOT}/${TOOLS}.part`),
+    false,
+    "the survey lands whole by a move, and leaves no part behind",
+  );
 });
 
 test("the survey reaches .se/.runtime/bin before any folder on the path variable", () => {

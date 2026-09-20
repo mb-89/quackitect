@@ -27,7 +27,10 @@ export function survey(doors, root, env) {
 export function writeSurvey(doors, root, env) {
   const found = survey(doors, root, env);
   doors.disk.makeDir(`${root}/${RUN}`);
-  doors.disk.write(`${root}/${TOOLS}`, `${JSON.stringify(found, null, 2)}\n`);
+  // The file lands whole or not at all, because a caller reading it mid-write runs the wrong binary. [[spec/design_output/tools#what-the-survey-writes]]
+  const part = `${root}/${TOOLS}.part`;
+  doors.disk.write(part, `${JSON.stringify(found, null, 2)}\n`);
+  doors.disk.move(part, `${root}/${TOOLS}`);
   return found;
 }
 
