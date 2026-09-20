@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -184,6 +184,10 @@ record:
     hash_after: e96b5bb7e4ca88e3294e5440b80a91a98c8e6d31
     returns: 2
     why: "`noteFor` reads the basename alone, so `src/bridge/code.js` and `src/doors/code.js` name one note; the second long file takes `names this cut already`, so its own cut parks nowhere; this tree holds many basenames twice, and no case feeds `noteFor` two paths of one name; fix: carry a folder word into the name, inside the five the name rule allows; `wrote` writes the journal entry, then throws ENOENT where a target's folder stands nowhere; the run answers a stack, and the reflect chapter asks for a line; `src/bridge/apply.js` answers a line on that same throw, so the journal's owner stands as the model; fix: make the target's folder, or refuse the range with the line the verb says; `--to` over a standing file replaces it whole, and the journal alone carries it back; the command line cuts a scratch file into two targets, and `mcp__level0__undo` takes the whole cut back; the ranges refuse a backwards range, a zero start, a reach past the end and an overlap; `--dry` names the cuts and writes nothing; `splitVerb` reads `rest` whole, so the source stands where the caller names it; the note parks through `./RUNME.sh ticket note`, off git, and `test/contract/split-note.test.js` drives it for real; `splitTicket` reads the exit, so a refused run answers `stands unwritten`; `test/level0/code-door.test.js` drives the door's branch both ways, and `fakeProc` throws on an untaught command; the journal names `on` as the run, and `mcp__level0__undo` takes the newest entry back; `export { join }` stands gone from `src/scripts/split-verb.js`; `./RUNME.sh check` exits 0, `./RUNME.sh lint src/scripts` exits 0, and `./RUNME.sh test` passes; the diff holds the verb, the cut, the note, the door, the chapter and three case files; every hunk serves the ask, and one chapter stands beside the code; the handback's retro chapter stands empty, which `./RUNME.sh branch review` names"
+  - step: implement/reflect
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 8d452d4a7c237643bfdf15b8ac36966cb194de22
+    hash_after: 8d452d4a7c237643bfdf15b8ac36966cb194de22
 ---
 
 # Ask
@@ -330,30 +334,27 @@ The verb's own file and the door's mint both wait on this pair. Each takes a cas
 <!-- the class of error the findings describe, and the fix for the class -->
 <!-- the form is text -->
 
-Every fault stands where a fake agrees with the code, and no case asks the tree. The cases prove the code against itself.
+Each fault takes the tree's shape for granted, where the tree guarantees nothing. One assumes a name stands alone, and one assumes a folder stands.
 
-| what the case feeds | what the tree answers |
+| what the code assumes | what the tree holds |
 |---|---|
-| argv carrying the verb name | `rest` drops it, so the verb reads a target as its source |
-| a process answering any argv | the real mint refuses `--gain`, because the ask takes no flag |
-| a path off the private folder | the chapter names `spec/tickets`, and the two disagree |
-| no case at all over the door | the branch fires nowhere under test |
+| a basename names one file | dozens of names stand twice, under different folders |
+| a target's folder stands | a target names a folder nothing holds yet |
 
-The fix for the class runs in three moves:
+The fix for the class runs in two moves:
 
-- feed each case the shape its caller sends, so `rest` and `argv` read alike
-- drive the real thing in `test/contract` where the claim is about the real thing
-- read the exit of every process the code runs, so a refusal answers a line
+- read what the tree holds before you key on it, so a folder word joins the name
+- make what a write needs, or refuse with the line the verb says
 
-The mint itself takes the third move further. A door minting a tracked ticket leaves placeholders the lint names, so the check turns red on a refusal. `./RUNME.sh ticket note` parks a private ticket off git, which the retro decides, and that road costs the tree nothing.
+`src/bridge/apply.js` owns the second move already. It catches the same throw the cut meets, and answers a line, so the cut follows that model.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the fix touches the verb, the mint, the door, the cases and the chapter naming the path
-- the disk, the clock and the process reach each piece as doors, and a contract case drives the real mint
+- the fix touches the note's name and the verb's write, and the cases beside each
+- the disk reaches both through a door, and `fakeDisk` drives each case
 - the class above names the approach each hunk follows
 
 ## change
