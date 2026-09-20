@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import { clock } from "../../src/doors/clock.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
-import { copyHere, produce } from "../../src/scripts/vehicle.js";
+import { identityHere, produce } from "../../src/scripts/vehicle.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -28,9 +28,9 @@ const SHELL =
 const quoted = (said) => String(said).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const either = (path) => `(?:${quoted(path)}|${quoted(path.split("\\").join("/"))})`;
 
-test("a copy carries the method, its run bits, and no private material", () => {
+test("a vehicle carries the method, its run bits, and no private material", () => {
   const where = files.tempDir("vehicle-");
-  const dest = join(where, "copy");
+  const dest = join(where, "vehicle");
   try {
     const put = produce(files, root, dest);
     assert.equal(put.ok, true);
@@ -41,7 +41,7 @@ test("a copy carries the method, its run bits, and no private material", () => {
     }
     assert.ok(
       files.exists(join(dest, ".claude/skills/level0/.claude-plugin/plugin.json")),
-      "the copy carries the marker, so it reads as a method root",
+      "the vehicle carries the marker, so it reads as a method root",
     );
     for (const path of [".git", ".se", "node_modules"]) {
       assert.equal(files.exists(join(dest, path)), false, `${path} stays behind`);
@@ -54,29 +54,29 @@ test("a copy carries the method, its run bits, and no private material", () => {
   }
 });
 
-test("a copy makes an identity of its own", () => {
+test("a vehicle makes an identity of its own", () => {
   const where = files.tempDir("vehicle-");
-  const dest = join(where, "copy");
+  const dest = join(where, "vehicle");
   try {
     produce(files, root, dest);
-    const mine = copyHere(files, clock(), root);
-    const other = copyHere(files, clock(), dest);
+    const mine = identityHere(files, clock(), root);
+    const other = identityHere(files, clock(), dest);
 
-    assert.ok(other, "the copy answers an identity");
+    assert.ok(other, "the vehicle answers an identity");
     assert.notEqual(
       other,
       mine,
-      "a copy holds its own, and never the one it came from",
+      "a vehicle holds its own, and never the one it came from",
     );
-    assert.equal(copyHere(files, clock(), dest), other, "and keeps it");
+    assert.equal(identityHere(files, clock(), dest), other, "and keeps it");
   } finally {
     files.remove(where);
   }
 });
 
-test("a copy answers its own verbs, with no tree behind it", () => {
+test("a vehicle answers its own verbs, with no tree behind it", () => {
   const where = files.tempDir("vehicle-");
-  const dest = join(where, "copy");
+  const dest = join(where, "vehicle");
   try {
     produce(files, root, dest);
 
@@ -85,7 +85,7 @@ test("a copy answers its own verbs, with no tree behind it", () => {
     files.makeDir(join(home, ".vscode", "extensions"));
     const said = outside.run([SHELL, "RUNME.sh", "vehicle"], {
       cwd: dest,
-      // The case proves the copy answers its verbs, so it reaches no network and no editor. [[spec/design_output/vehicle#a-vehicle-stands-alone]]
+      // The case proves the vehicle answers its verbs, so it reaches no network and no editor. [[spec/design_output/vehicle#a-vehicle-stands-alone]]
       env: {
         HOME: home,
         USERPROFILE: home,

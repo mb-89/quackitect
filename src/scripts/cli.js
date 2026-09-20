@@ -61,7 +61,7 @@ import {
   entryFor,
   produce,
   readRegister,
-  registerCopy,
+  registerVehicle,
   rootsHere,
 } from "./vehicle.js";
 import { voice } from "./voice.js";
@@ -181,7 +181,7 @@ export const verbs = {
     run: async () => asksIndex(["find", ...rest]),
   },
   vehicle: {
-    says: "this copy, the project it drives, and a copy made elsewhere",
+    says: "this vehicle, the project it drives, and a vehicle made elsewhere",
     run: async () => theVehicle(rest),
   },
   stub: {
@@ -222,7 +222,7 @@ if (verb === "help" || !verbs[verb]) {
 }
 process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
 
-// [[spec/design_output/vehicle#three-things-a-copy-needs]]
+// [[spec/design_output/vehicle#three-things-a-vehicle-needs]]
 export function theVehicle(argv) {
   const env = process.env;
   const said = argv[0] ?? "here";
@@ -232,7 +232,7 @@ export function theVehicle(argv) {
   if (said === "produce" || said === "into") {
     const dest = argv[1];
     if (!dest) {
-      console.error("se vehicle produce <folder>: say where the copy lands.");
+      console.error("se vehicle produce <folder>: say where the vehicle lands.");
       return 2;
     }
     const put = produce(files, pair.method, dest, said === "into");
@@ -247,7 +247,7 @@ export function theVehicle(argv) {
   if (said === "attach") {
     const settled = attachTo(files, env, it.clock, pair.work, pair.method, WINDOWS);
     console.log(
-      `${pair.work} names ${made.id} as the copy driving it, at port ${settled.port}.`,
+      `${pair.work} names ${made.id} as the vehicle driving it, at port ${settled.port}.`,
     );
     return 0;
   }
@@ -257,7 +257,7 @@ export function theVehicle(argv) {
     return 0;
   }
   if (said === "register") {
-    const wrote = registerCopy(files, env, made.entry, WINDOWS);
+    const wrote = registerVehicle(files, env, made.entry, WINDOWS);
     console.log(
       wrote ? `${made.id} stands in the register.` : "no register takes a write here.",
     );
@@ -266,7 +266,7 @@ export function theVehicle(argv) {
 
   console.log(`method  ${pair.method}`);
   console.log(`work    ${pair.work}`);
-  console.log(`copy    ${made.id}${pair.itself ? "  (this tree drives itself)" : ""}`);
+  console.log(`vehicle ${made.id}${pair.itself ? "  (this tree drives itself)" : ""}`);
   for (const one of readRegister(files, env, WINDOWS)) {
     console.log(`  ${one.id}  ${one.version}  ${one.method_root}`);
   }

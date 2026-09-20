@@ -1,20 +1,20 @@
-// A copy of this tooling, and the project it drives. A copy carries an
-// identity, a project names the copy driving it, and a register turns an
-// identity into a place, so either tree moves and the pair still holds.
-// [[spec/design_output/vehicle#three-things-a-copy-needs]]
+// A vehicle, and the project it drives. A vehicle carries an identity, a
+// project names the vehicle driving it, and a register turns an identity
+// into a place, so either tree moves and the pair still holds.
+// [[spec/design_output/vehicle#three-things-a-vehicle-needs]]
 
 import { RUN } from "./folders.js";
 
-export const COPY = `${RUN}/copy.json`;
+export const IDENTITY = `${RUN}/identity.json`;
 export const PROJECT = `${RUN}/project.json`;
 export const REGISTER = "registry.json";
 export const MARKER = ".claude/skills/level0/.claude-plugin/plugin.json";
 
-// [[spec/design_output/vehicle#what-travels-into-a-copy]]
+// [[spec/design_output/vehicle#what-travels-into-a-vehicle]]
 export const LEFT = [".git", ".se", "node_modules", "_to_delete"];
 
-// [[spec/design_output/vehicle#three-things-a-copy-needs]]
-export function copyOf(read, fresh, at) {
+// [[spec/design_output/vehicle#three-things-a-vehicle-needs]]
+export function identityOf(read, fresh, at) {
   const held = parsed(read);
   if (held?.id) return { record: held, made: false };
   return { record: { id: String(fresh), made: String(at) }, made: true };
@@ -90,8 +90,8 @@ export function pointerOf(read) {
   return { method: String(held.method), port: Number(held.port) || PORT_BASE };
 }
 
-// [[spec/design_output/vehicle#one-copy-is-no-question]]
-export function onlyCopy(list) {
+// [[spec/design_output/vehicle#one-vehicle-is-no-question]]
+export function onlyVehicle(list) {
   const roots = [];
   for (const one of list ?? []) {
     if (one?.method_root && !roots.includes(one.method_root))
@@ -100,7 +100,7 @@ export function onlyCopy(list) {
   return roots.length === 1 ? roots[0] : "";
 }
 
-// [[spec/design_output/vehicle#what-travels-into-a-copy]]
+// [[spec/design_output/vehicle#what-travels-into-a-vehicle]]
 export function travels(rel) {
   const said = String(rel ?? "")
     .split("\\")
