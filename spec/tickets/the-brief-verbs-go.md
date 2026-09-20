@@ -150,6 +150,16 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/change
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 51814ab54e01101d0ab923bb5966d3ab14a69a97
+    hash_after: 51814ab54e01101d0ab923bb5966d3ab14a69a97
+    returns: 2
+    why: the change spans the code, the cases, the Go cases and the notes, and this box leaves the tree green
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
