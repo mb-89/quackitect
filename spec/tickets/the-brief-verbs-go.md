@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -186,6 +186,17 @@ record:
       - name: tests
         exit: 0
         said: "# duration_ms 12620.990085"
+  - step: implement/tests-red
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 05d5b2745ee160de1822f4f4653e60d927651071
+    hash_after: b096e4ebc9843445a7415fa72df9ed8bd2a72be4
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -299,25 +310,25 @@ pass
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh test test/level0/work.test.js
+./RUNME.sh branch test test/level0/work.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-A case seeding a branch with both a root handover and a group ticket goes red, because `standingAll` reads the handover first. That case stood here, and it comes out again.
+The case seeding a branch with both a root handover and a group ticket goes red. `standingAll` reads the handover first, so the row draws `brief  held` where the group's own `todo  urgent` belongs.
 
-What surprises: a red case parks red. This box leaves the change to the next hand, so the case rides the approach in place of the tree, and `./RUNME.sh check` answers 0.
+What surprises: the field stood on `./RUNME.sh test`, whose last line is a duration, so the gate read no word from a run that failed. `./RUNME.sh branch test` is the verb answering one word, and the step's `needs` already names it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- this leaf leaves no case behind, so it touches no file the ask leaves out
-- the case the approach names drives `doorsSaying`, so git and the disk stand fake
-- the approach under `design/draft` names every place, and this leaf adds nothing beside it
+- the case lands in `test/level0/work.test.js`, which the ask's own command names
+- the case drives `doorsSaying`, so git and the disk stand fake
+- the comment over the case points at this ticket, and the approach under `design/draft` names every place
 
 ## reflect
 
