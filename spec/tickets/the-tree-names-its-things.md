@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -108,6 +108,11 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: af4a2d195ab9fbd93c1eada831bd663a30b5957d
     hash_after: af4a2d195ab9fbd93c1eada831bd663a30b5957d
+  - step: retro/cloud
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: a380185a0e5fa133c8b2a9c96aa95e007cd221b8
+    hash_after: a380185a0e5fa133c8b2a9c96aa95e007cd221b8
+reason: done
 ---
 
 # Ask
@@ -276,20 +281,38 @@ The retro's route asks for a reading of the box. This box works its own group, s
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- no tool stands missing, and `./RUNME.sh doctor` names each one it finds
+- the `gh` client stands nowhere, so GitHub goes through the MCP tools
+- no editor folder stands on this box, so the doctor draws no sidebar link
+- no host the proxy refuses meets this branch
+- nobody sits beside this box, so the cloud guidance answers every person step
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the write door refuses a shell redirect, so a write runs Read then Edit
+- the ticket door refuses a field of a step the round holds nowhere
+- `--back` commits the working tree, so a red case takes a `git checkout` to stand
+- the session binds to its group, so a private note waits on `ticket todo`
+- a compaction cuts the window, and the summary carries the work on
+- Vale refuses a line per rule, and each refusal names the rule and the line
+- `./RUNME.sh branch sync` answers that the branch carries every commit on trunk
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parks, because the cloud guidance answers each one on the box
+- the merge is where a person reads the calls this box makes
+- [[spec/tickets/the-window-splits-by-tab]] stands open, and it carries no group
+- [[spec/tickets/a-pointer-resolves]] stands open, and it carries no group
+- [[spec/tickets/the-unknown-runs-stays-quiet]] stands open, and it carries no group
+- `HANDOVER.md` names the result, this retro, and the probes under `.se/scripts`
 
 # Discussion
 
