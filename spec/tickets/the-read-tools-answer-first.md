@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -175,6 +175,17 @@ record:
     hash_after: 864909c7c04d8298d75e48b655e4fafff7cf365b
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 14f87c28806318f71b6555422b10a6697a75f141
+    hash_after: 14f87c28806318f71b6555422b10a6697a75f141
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -424,6 +435,12 @@ The hook's invariant narrows. It imports its own folder now, and nothing past it
 - `test/level0/vehicle.test.js` asserts each of those files travels
 
 The bridgehead installs nothing, so that line stands as it stands. `START` keeps its road, `REASONS` keeps every code, and a session start waits for nothing.
+
+The verdict round asks for one case a tool, and for every sentence carrying the old reason:
+
+- the cases loop over `READ_TOOLS`, so a tool added later joins them by standing in the list
+- `register` takes the wait as an option, so a case reads the running out in milliseconds
+- `src/scripts/serve.js` and the stub's design input each take the narrowed reason
 
 ### checked
 
