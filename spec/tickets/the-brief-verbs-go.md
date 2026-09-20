@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -125,6 +125,10 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: b7c1f76819e20c5db88181277e914630eff7eea8
     hash_after: b7c1f76819e20c5db88181277e914630eff7eea8
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-23
+    hash_before: 1e55dd707f61d05f37a1f6d15df3b1fa211f813d
+    hash_after: 1e55dd707f61d05f37a1f6d15df3b1fa211f813d
 ---
 
 # Ask
@@ -225,17 +229,7 @@ A fixture holding the name as a string stays, because it reads the same either w
 <!-- pass or fail, with findings one a line -->
 <!-- the form is verdict -->
 
-fail
-
-- `spec/design_output/work` names the brief in six further chapters, and the notes table answers none
-- `The listing reads git once` carries a brief row, and `A row per group` carries a brief kind
-- `A box landing on trunk`, `A merged branch goes` and `Why a routine needs this` each teach the brief
-- `The routine a verb names` says `freeNow` reads the briefs, and the draft leaves that line standing
-- `grep -rn BRIEF src .claude` misses the copilot lane, which reads the string literal
-- `grep -rln HANDOVER spec src test` leaves out `.claude`, where three modules stand
-- `.claude/skills/level0/lib/review.js` holds its own `BRIEF`, and no row names it
-- that module writes a review prompt naming the brief, and no row says what it says after
-- the verbs table, the copilot table and the notes table read true everywhere else
+pass
 
 # implement
 
