@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -175,6 +175,17 @@ record:
     hash_after: 652c8d68aa2d4aeeae151950bfc050b29eb88ff7
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 14b2a5d35903348148d45a64fb7ba047f641d60f
+    hash_after: 14b2a5d35903348148d45a64fb7ba047f641d60f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 7 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -388,39 +399,31 @@ The second class is the sharper one. A note under the private folder is a thing 
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-One verb renames, and three names rode it.
+The walk answers every file now, and each caller names the part it takes.
 
-| what lands | where |
+| what changes | how |
 |---|---|
-| the verb | `src/scripts/rename.js`, under `./RUNME.sh rename <from> <to>` |
-| its chapter | [[spec/design_output/index#a-rename-reaches-a-name]] |
-| the window's folder and module | `src/tui`, and `quackitect/tui` |
-| the window's note | [[spec/design_output/tui]] |
-| the stub's folders | the stub's own name, through `stubFolders` |
+| `filesUnder` | answers every file under a folder, whatever its ending |
+| `writtenFiles` | answers the ones a reader reads as text, which the rewrite takes |
+| the move | takes the whole list, so a file of any ending carries |
+| the ignore line | names the window's folder under its new name |
+| the page of markup and the vehicle note | each takes the name the code now owns |
+| `spec/tickets/the-window-splits-by-tab.md` | the folder per tab, minted where a reader finds it |
 
-The verb carries a name three ways. A folder moves with its files. A note moves as one file, and both forms of its name rewrite, because a reader reaches a note with its ending and without. A name standing as no path takes `--text`, which rewrites and moves nothing, and the module's name rode that.
+The round before this walked by a list of endings, and both callers read that as every file. So the move dropped what the list left out, and the rewrite reached neither a file without an ending nor a page of markup. A binary rode the folder move past the ignore line, and this round drops it.
 
-The move reaches git, because every reader of the tree asks git for its file list. The first run over the note left git unaware, and the schema case read the old name off that list.
+The park does not hold, and the verdict names that right. A note under the private folder is a thing git ignores, so a line the ask asks for stood in no tracked file. The split now stands as a ticket carrying the package table the design settled, and the branch hands it on.
 
-Two things the runs turn up, for the owner to weigh at the merge:
-
-| what it meets | what it costs |
-|---|---|
-| a case naming the old name as data | the rewrite reaches it, so this verb rewrote its own fixtures |
-| a name a file escapes, as a path written with backslashes | the word edge holds it nowhere, so it wants a hand |
-
-The case file now names a word the tree holds nowhere, which keeps it out of the next rewrite.
-
-The folder per tab stands open, as `.se/tickets/the-window-splits-by-tab.md`. The tree files reach the frame through `cut`, `pad`, `narrow` and three styles, so they part cleanly. The log tab and the work tab want the model exported, which reaches every file naming it. That is a refactor of its own, and it shares nothing with the verb this ticket builds.
+What this leaves for the owner at the merge. The bare word naming the older shape stands in the window's own files, in `viewerOf`, in the binary's name and in the vocabulary. The three renames this ticket ran moved a folder, a note and a module, and each left that word alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The verb and its case file, the stub's folders, and every file the three renames reach.
-- every door the change reaches has a fake. Each case drives the fake disk, and the git door rides as an option the case leaves out.
-- a comment names the approach the change implements. The verb's chapter stands under the index note, and each case points at this ticket.
+- the change touches no file the ask leaves out. The verb, its cases, the ignore line, the page of markup, the vehicle note, and the ticket this round mints.
+- every door the change reaches has a fake. Each case drives the fake disk, and the new case feeds it a file with no ending and a picture.
+- a comment names the approach the change implements. The walk's comment names what it answers, and each caller names the part it takes.
 
 # verdict
 
