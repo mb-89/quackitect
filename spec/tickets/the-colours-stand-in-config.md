@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -156,6 +156,17 @@ record:
     hash_after: da53813bfa8ee13e6fad1e278733afd9a16a6a03
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: afc2822403378f4e8729a67c7f077315f02ce23d
+    hash_after: afc2822403378f4e8729a67c7f077315f02ce23d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/config passes; green, src/viewer passes
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -365,26 +376,44 @@ The first finding asks what answers the line about the window's own code. The ca
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/config/config_test.go src/viewer/colour_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A person sets a colour in the config now, and the window reads it there.
+
+| what lands | where |
+|---|---|
+| the reader answering a key over the three layers | `src/config`, a module of its own |
+| the colour numbers | `spec/config/styles/colours.json` |
+| the read at start | `loadColours` in `src/viewer/colour.go`, called from `main.go` |
+| the shared module beside `quackitect/yaml` | `SHARED` in `src/scripts/viewer.js` |
+| the reader the server keeps | `src/lsp/config.go`, which calls the shared one |
+
+`grep -rn 'lipgloss.Color(' src/viewer` answers the case files alone, and a case walking the folder holds that. So the first line of `done_when` stands as a case, and a number a fixture carries costs it nothing.
+
+The file opens on a comment, the way every config file in the tree does. So the case reading it names the maps it wants, and leaves the rest of the file alone. A colour the file holds nowhere leaves the style plain, and the window wears the terminal's own.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The new module and the colours file. The three window files and their case files. The two module files and the shared list. The reader under the server, and the two notes.
+- every door the change reaches has a fake. Each case writes its own fixture root, and the window's case reads the shipped file alone.
+- a comment names the approach the change implements. Each new name points at the chapter the notes carry.
 
 # verdict
 
