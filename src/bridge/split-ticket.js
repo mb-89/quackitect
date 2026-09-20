@@ -9,13 +9,15 @@ const PREFIX = "split";
 // The name rule counts a name's words, and the prefix takes the first of them. [[spec/design_output/level0#a-name-meets-the-cap]]
 const WORDS = 4;
 
-// [[spec/design_output/level0#the-refusal-parks-the-work]]
+// A basename stands twice across this tree, so the folder above it joins the name. [[spec/design_output/level0#the-refusal-parks-the-work]]
 export function noteFor(where) {
-  const said = String(where)
-    .split("/")
-    .pop()
-    .replace(/\.[^.]+$/, "");
-  const parts = said.split(/[-_.]+/).filter(Boolean).slice(-WORDS);
+  const said = String(where).split(/[/\\]+/).filter(Boolean);
+  const name = (said.pop() ?? "").replace(/\.[^.]+$/, "");
+  const parts = [said.at(-1) ?? "", name]
+    .join("-")
+    .split(/[-_.]+/)
+    .filter(Boolean)
+    .slice(-WORDS);
   return `${NOTES}/${[PREFIX, ...parts].join("-")}.md`;
 }
 

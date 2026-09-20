@@ -129,6 +129,36 @@ test("the verb writes every target, the rest and one journal entry", () => {
   assert.equal(entry.files[0].did_not_exist, true);
 });
 
+// A target names a folder nothing holds yet, and a throw there answers a stack. [[spec/design_output/apply#the-journal-holds-both-halves]]
+test("a target under a folder nothing holds makes that folder, and writes", () => {
+  const it = doors();
+
+  const { code } = heard(() =>
+    splitVerb(it, [SOURCE, "--to", "src/fresh/a.js", "--lines", "1-2"]),
+  );
+
+  assert.equal(code, 0);
+  assert.equal(it.disk.read(join(ROOT, "src/fresh/a.js")), "one\ntwo\n");
+});
+
+// [[spec/design_output/apply#the-journal-holds-both-halves]]
+test("a write the disk refuses answers a line, and names the way back", () => {
+  const it = doors();
+  it.disk.write = () => {
+    throw new Error("the disk stands full");
+  };
+
+  const { code, said } = heard(() =>
+    splitVerb(it, [SOURCE, "--to", "src/a.js", "--lines", "1-2"]),
+  );
+
+  assert.equal(code, 1);
+  assert.match(said, /would not write/);
+  assert.match(said, /the disk stands full/);
+  assert.doesNotMatch(said, /at Object|at Module/, "no stack reaches the reader");
+  assert.equal(it.disk.exists(join(ROOT, "src/a.js")), false, "no target lands");
+});
+
 // [[spec/design_output/level0#the-size-ceiling]]
 test("the dry flag names the cuts and writes nothing", () => {
   const it = doors();
@@ -159,6 +189,14 @@ const parking = (answers) => {
   return { box, ran };
 };
 
+// A basename stands twice across this tree, so the note carries a folder word. [[spec/design_output/level0#the-refusal-parks-the-work]]
+test("two files of one name park two notes, because the folder joins the name", () => {
+  assert.notEqual(noteFor("src/bridge/code.js"), noteFor("src/doors/code.js"));
+  assert.match(noteFor("src/bridge/code.js"), /split-bridge-code\.md$/);
+  assert.match(noteFor("src/doors/code.js"), /split-doors-code\.md$/);
+  assert.match(noteFor("a.js"), /split-a\.md$/, "a bare name carries no folder");
+});
+
 // [[spec/design_output/level0#the-refusal-parks-the-work]]
 test("the note parks once a file, and a note standing stops the second", () => {
   const at = noteFor(SOURCE);
@@ -167,11 +205,7 @@ test("the note parks once a file, and a note standing stops the second", () => {
   const first = splitTicket(box, SOURCE);
   assert.match(first, /parks this cut/);
   assert.equal(ran.length, 1, "the verb runs once");
-  assert.deepEqual(ran[0].slice(2, 5), [
-    "ticket",
-    "note",
-    "split-long",
-  ]);
+  assert.deepEqual(ran[0].slice(2, 5), ["ticket", "note", "split-src-long"]);
 
   box.disk.write(join(ROOT, at), "---\nkind: [[ticket]]\n---\n");
   const again = splitTicket(box, SOURCE);

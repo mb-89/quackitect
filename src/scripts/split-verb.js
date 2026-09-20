@@ -68,12 +68,33 @@ function wrote(it, from, at, cut) {
   // The entry names this run, so an undo takes this cut and no other. [[spec/design_output/apply#the-journal-holds-both-halves]]
   const on = `${BY}:${stamp}`;
   const where = it.join(it.root, UNDONE, nameOf(stamp));
-  it.disk.makeDir(it.join(it.root, UNDONE));
-  it.disk.write(where, `${JSON.stringify(journalOf(stamp, on, BY, files), null, 2)}\n`);
+  try {
+    it.disk.makeDir(it.join(it.root, UNDONE));
+    it.disk.write(where, `${JSON.stringify(journalOf(stamp, on, BY, files), null, 2)}\n`);
+  } catch (bad) {
+    console.error(`The journal would not write, so nothing did: ${bad?.message ?? bad}`);
+    return 1;
+  }
 
-  for (const one of files) it.disk.write(it.join(it.root, one.file), one.made);
+  // A target names a folder nothing holds yet, and a throw here answers a stack. [[spec/design_output/apply#the-journal-holds-both-halves]]
+  for (const one of files) {
+    const path = it.join(it.root, one.file);
+    try {
+      it.disk.makeDir(folderOf(path));
+      it.disk.write(path, one.made);
+    } catch (bad) {
+      console.error(`${one.file} would not write, and ${where} holds the way back.`);
+      console.error(String(bad?.message ?? bad));
+      return 1;
+    }
+  }
   console.log(`The cut stands, and mcp__level0__undo takes it back under ${on}.`);
   return 0;
+}
+
+function folderOf(path) {
+  const cut = String(path).replace(/[/\\][^/\\]*$/, "");
+  return cut === String(path) ? "." : cut;
 }
 
 function standing(it, path) {
