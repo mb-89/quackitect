@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -217,6 +217,14 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: d515278999090dc8078d75406a74974eb3edfbbd
     hash_after: d515278999090dc8078d75406a74974eb3edfbbd
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 6a0f128fe9f9480c4f1ddd2c9e9cac3008e715f7
+    hash_after: 6a0f128fe9f9480c4f1ddd2c9e9cac3008e715f7
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
