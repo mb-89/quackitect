@@ -89,12 +89,18 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 1e5d89a75f884bc7be7d77ad4f31f9c887d8af1d
     hash_after: 1e5d89a75f884bc7be7d77ad4f31f9c887d8af1d
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-2
+    hash_before: 4504a852cc5e340fa0744f71419f0526b27967ec
+    hash_after: 4504a852cc5e340fa0744f71419f0526b27967ec
+    returns: 1
+    why: Name where `escalate --craft` sends a question the drafter raises on `design/draft`.; `target` answers the held leaf itself where `on_fail` stands empty, so the leaf stays put.; Name what `escalate --craft` owns beside the fail verdict, which already returns review to draft.; Name the rationale section each new rule takes, or leave the rule unstarred.
 ---
 
 # Ask
@@ -156,9 +162,12 @@ drafter. It asserts three things:
 
 ### verdict
 
-<!-- pass or fail, with findings one a line -->
+fail
 
-<!-- the form is verdict -->
+- Name where `escalate --craft` sends a question the drafter raises on `design/draft`.
+- `target` answers the held leaf itself where `on_fail` stands empty, so the leaf stays put.
+- Name what `escalate --craft` owns beside the fail verdict, which already returns review to draft.
+- Name the rationale section each new rule takes, or leave the rule unstarred.
 
 # implement
 
