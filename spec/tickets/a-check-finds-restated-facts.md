@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 48ee2a38e214aa067dd910d91e9302fcccf09095
     hash_after: 48ee2a38e214aa067dd910d91e9302fcccf09095
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-4
+    hash_before: 28fdafe3de7d68163d1f9e4d439ee1768431ca0f
+    hash_after: 28fdafe3de7d68163d1f9e4d439ee1768431ca0f
+    returns: 2
+    why: A named path asks the checker under `src/lsp`, and the module stands outside that road.; Say which checker holds each rule, because the editor and the check read the one under `src/lsp`.; Name the JavaScript the module blanks with, because `blanked` stands inside the projection.; Say the scope `RestatedTable` reads, and the rule file it lands in.; Name the level `RestatedTable` lands at, because the projection writes a level into every rule file.
 ---
 
 # Ask
@@ -177,12 +183,11 @@ So this one leaves no fault standing behind a green check.
 
 fail
 
-- The call site sits where a named path skips it. [[spec/design_output/tree#when-the-sweep-runs]]
-- `./RUNME.sh lint spec` runs Vale alone, and the ask wants that verb to name every place.
-- Name the file holding `restatedFaults`, because `tree.js` stands near the ceiling `code.fileLines` sets.
-- Name each bound's key, and its entry in `spec/config/level0.schema.json`, which every control takes.
-- The script rule blanks inside the projection, so name the JavaScript this rule blanks with.
-- Say which reading Vale keeps, because a paragraph against its own table reads one buffer.
+- A named path asks the checker under `src/lsp`, and the module stands outside that road.
+- Say which checker holds each rule, because the editor and the check read the one under `src/lsp`.
+- Name the JavaScript the module blanks with, because `blanked` stands inside the projection.
+- Say the scope `RestatedTable` reads, and the rule file it lands in.
+- Name the level `RestatedTable` lands at, because the projection writes a level into every rule file.
 
 # implement
 
