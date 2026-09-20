@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -121,6 +121,10 @@ record:
     hash_after: c671e415aa7f9f0d63b7098084ff17fb80ab8099
     returns: 1
     why: the hand takes it back
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 719143ebec1cb91b4e0d44002d7f38028385ed3b
+    hash_after: 719143ebec1cb91b4e0d44002d7f38028385ed3b
 ---
 
 # Ask
@@ -158,39 +162,36 @@ Where the values land wants a word too. `spec/config/styles` holds the Vale styl
 
 ### approach
 
-The config projects into a Go file, the way the paragraph schema projects into the Vale rules.
+The viewer asks the config for its colours, and holds what it reads.
 
-The ask names two roads, and this draft takes the second. A run time read asks the binary to find the root off the session path, and it reads a file on every start. A projection keeps the binary whole, and the write door guards the target for free.
-
-| what lands | where |
+| what the ruling under `Discussion` says | what this draft does |
 |---|---|
-| the values a person sets | `spec/config/colours.json` |
-| the shape a checker holds them to | `spec/config/colours.schema.json` |
-| the Go the projection writes | `src/viewer/palette.go`, generated |
-| the entry naming the three | `spec/config/projections.json` |
+| the reader asks the config for a key | a shared Go module answers a key out of a config file |
+| the values stand under `spec/config/styles` | they stand in `spec/config/styles/colours.json` |
 
-The values stand beside `level0.json` and outside `spec/config/styles`. That folder holds the Vale styles, and one of its four is a projection target already. So a reader meeting `styles` meets prose rules there, and meets the window's colours under a name of their own.
+The road the two drafts before this took, a projection into Go, drops here.
 
-**The shape.** `projection.js` names a shape a constant, and maps it to the ending its files take. A colour shape joins the shapes standing there, which `grep -n '"shape"' spec/config/projections.json` answers:
+**The reader.** `src/lsp/config.go` reads the three layers for `names.words` today. That read moves into a module of its own, `src/config`, and takes a key written with dots. `SHARED` in `src/scripts/viewer.js` carries the module across programs the way it carries `quackitect/yaml`, so the viewer builds against it.
 
-| what the shape does | where |
+| what the module answers | for |
 |---|---|
-| reads the JSON, and writes one Go file | a writer beside `rulesFrom` |
-| says the ending | the endings map |
-| refuses a hand edit to the target | the write door, which reads the entry already |
+| a value at a key, over the three layers | `src/lsp`, which keeps `names.words` and loses its own read |
+| the map a named file holds at a key | `src/viewer`, which takes its colours |
 
-**What moves.** `colour.go` keeps what it decides, and gives up what it names:
+**The root.** `workRoot` in `src/viewer/work.go` answers the root off the session path already. The colour read takes that root, so the window asks for no path of its own.
+
+**What moves.** `colour.go` keeps what it decides and gives up what it names:
 
 | what | after |
 |---|---|
-| `kindColours`, `toolColours`, the level colours, the four styles a name carries | the config |
-| `kindStyle`, `levelStyle`, `saidStyle`, the hash over an unknown kind | `colour.go`, reading the generated values |
+| `kindColours`, `toolColours`, the level colours, the styles a name carries, `spare` | `spec/config/styles/colours.json` |
+| `kindStyle`, `levelStyle`, `saidStyle`, the hash over a kind the list holds nowhere | `colour.go`, reading what the module answers |
 
-So the numbers stand in one file, and the reading stands in another. `grep -c` over `src/viewer` outside the generated file answers 0, which the first row of `done_when` asks for.
+The file carries one map per group, and a list naming which entries wear bold. The window reads it once, at start, and holds what it reads. A file the reader reaches nowhere leaves each colour empty, so the window wears the terminal's own and draws on. `grep -c` over `src/viewer` then answers 0, which the first line of `done_when` asks for.
 
-**The check.** `./RUNME.sh check` reads every projection against its source already, so a value a hand edits in the target turns the check red. The case covering it drives the projection over a small config, and reads the Go it writes.
+**The check.** A Go case drives the module over a fixture root, one case per layer, beside the cases `src/lsp` carries today. A second case reads the shipped file and asserts a colour for every kind `spec/design_output/viewer` names. So a kind losing its colour turns a case red.
 
-**The order.** This ticket lands first, and [[spec/tickets/a-rename-reaches-every-note]] carries the folder after it. That rename moves the generated file the way it moves every other, so it proves its own verb over a file a projection writes.
+**The order.** This ticket lands first, and [[spec/tickets/a-rename-reaches-every-note]] carries the folder after it. That rename then moves one config file and one reader, and no generated target.
 
 ## review
 
