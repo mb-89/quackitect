@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box 5fb6c1c050cd · claude-code-remote
@@ -87,6 +87,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-panel-reads-every-change took 4 commit(s) from main.
+  - step: split
+    hand: box 5fb6c1c050cd · claude-code-remote
+    hash_before: 6f6d0fb104745e4021fd275d3d60ef188b2c53f6
+    hash_after: 6f6d0fb104745e4021fd275d3d60ef188b2c53f6
 ---
 
 # Ask
@@ -116,11 +120,18 @@ The problems panel behaves as any language's does. Every file's findings stand o
 
 <!-- the form is list -->
 
+- [[spec/tickets/a-move-redraws-both-files]], on [[spec/processes/trivial]], closed done
+- [[spec/tickets/the-panel-lints-on-change]], on [[spec/processes/trivial]], closed done
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every child is small enough to review whole. Each child stands on the trivial route, with one leaf and one commit.
+- the children add up to the goal. The rows on open and off the disk stand from the earlier panel group, one child takes the move, and one the change as typed.
+- a child that waits on another names it under depends_on. Neither waits on the other, and neither names one.
 
 # children
 
