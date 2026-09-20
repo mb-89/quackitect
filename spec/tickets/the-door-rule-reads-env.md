@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -180,6 +180,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: d44ef3a19b7e61882c835a33ff1445493982e62d
+    hash_after: e5fcf588f8f1c6161677a2db858ed3b23d8710e0
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
