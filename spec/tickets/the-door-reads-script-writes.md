@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -178,6 +178,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-17
+    hash_before: 651977b2a35947e0fd567f17e9f5e38240cccce6
+    hash_after: 651977b2a35947e0fd567f17e9f5e38240cccce6
+    returns: 2
+    why: "`scriptsIn` asks `reaches`, and `reaches` answers false on every path outside; prose and code. So a tracked `.sh`, `.py` or `.rb` path names a script, and; `sh src/scripts/install.sh` and `bash ./RUNME.sh check` each hand the door a; file it reads off the disk.; The door refuses `sh src/scripts/install.sh` on that widening.; `writesInScript` reads `process.stdout.write` as a write, and pairs it with; the module the import above it names, so the refusal reads; `.claude/skills/level0/lib/servers.js` where the script writes no file. Hold; `scriptsIn` to the folders the chapter names, or pair a write with a path its; own call carries.; The road stands twice, and the two disagree. The chapter row names a script; under `.se/` or a temp folder, and `says` on this ticket reads \"A path; standing in the tree passes\". The code passes a tracked prose or code path; alone. Write the road the code takes, in the one place naming it.; `scriptText` in `src/bridge/bash.js` and `textAt` in `src/scripts/precommit.js`; each read a file off a disk and answer empty where it stands nowhere, under; two names. Keep one, and hand the disk in.; No case feeds `scriptsIn` a tracked `.sh` or `.py` path, so no test pins the; road either way. Add one, whichever road the fix takes.; What I check:; `./RUNME.sh check` answers 0 on the commit this branch stands on, and that; commit matches origin.; Every finding of the round before stands answered. `SHELLS`, `READERS`,; `BREAKS`, `baseName` and `clean` each stand once, in the splitter. `OUTSIDE`; goes, and the newline entry goes with it.; The case feeding the spellings of a temp folder asserts the count alone, so; it passes whatever path the reading names.; The ask lands on its first three bullets. A runner and a shell each name; their script, a copy out of the scratchpad refuses over `cp` and `mv`, and; the refusal names `mcp__level0__patch` and `mcp__level0__replace`.; `./RUNME.sh check` covers the script write and the refusal, and `VERBS` names; no test verb. `trunk-door.test.js` drives the same road over the disk.; `tested.js` and `precommit.js` stand outside the ask. Each answers the import; standing above the hunk, so each fixes a rule this branch adds and redesigns; nothing the ask leaves alone.; The route sends this ticket to a retro after this step, and no retro stands; in the handback yet."
 ---
 
 # Ask
@@ -494,12 +500,14 @@ in each. The copy answered one of the four.
     .claude/skills/level0/lib/scripted.js
     .claude/skills/level0/lib/tokens.js
     .claude/skills/level0/lib/tested.js
+    .claude/skills/level0/lib/code.js
+    .claude/skills/level0/lib/vale.js
     src/bridge/bash.js
     src/scripts/precommit.js
+    src/scripts/install.sh
+    RUNME.sh
     spec/design_output/bash.md
     test/level0/bash.test.js
-    test/level0/precommit.test.js
-    test/level0/tested.test.js
     test/level0/trunk-door.test.js
     spec/tickets/the-door-reads-script-writes.md
 
@@ -511,37 +519,45 @@ in each. The copy answered one of the four.
 
 fail
 
-- `bash.js` owns `SHELLS`, `READERS` and `BREAKS`. `scripted.js` carries a
-  second copy of each. Export the three beside `insideOf`, and import them.
-- `baseName` and `clean` each stand under one name in both modules. The two
-  `clean` read apart. The door's turns a backslash into a slash, and the script
-  reading strips a quote. Keep one of each.
-- `OUTSIDE` restates a slice of `FREE`, and the slice drifts already. The
-  reading takes `node $TMPDIR/edit.mjs`. It passes `node ${TMPDIR}/edit.mjs`
-  and `node $TMP/edit.mjs`. `reaches` answers false on all three spellings. Ask
-  `reaches` for the script path, or export `FREE` and read it.
-- `BREAKS` in `scripted.js` carries a newline entry. `tokensOf` hands a newline
-  back as `;`. Drop the entry.
+- `scriptsIn` asks `reaches`, and `reaches` answers false on every path outside
+  prose and code. So a tracked `.sh`, `.py` or `.rb` path names a script, and
+  `sh src/scripts/install.sh` and `bash ./RUNME.sh check` each hand the door a
+  file it reads off the disk.
+- The door refuses `sh src/scripts/install.sh` on that widening.
+  `writesInScript` reads `process.stdout.write` as a write, and pairs it with
+  the module the import above it names, so the refusal reads
+  `.claude/skills/level0/lib/servers.js` where the script writes no file. Hold
+  `scriptsIn` to the folders the chapter names, or pair a write with a path its
+  own call carries.
+- The road stands twice, and the two disagree. The chapter row names a script
+  under `.se/` or a temp folder, and `says` on this ticket reads "A path
+  standing in the tree passes". The code passes a tracked prose or code path
+  alone. Write the road the code takes, in the one place naming it.
+- `scriptText` in `src/bridge/bash.js` and `textAt` in `src/scripts/precommit.js`
+  each read a file off a disk and answer empty where it stands nowhere, under
+  two names. Keep one, and hand the disk in.
+- No case feeds `scriptsIn` a tracked `.sh` or `.py` path, so no test pins the
+  road either way. Add one, whichever road the fix takes.
 
 What I check:
 
-- `./RUNME.sh check` answers 0 on the commit this branch stands on. That commit
-  matches origin.
-- The ask lands on every bullet. A runner and a shell each name their script.
-  The copy out of the scratchpad refuses over `cp` and `mv`. The refusal names
-  `mcp__level0__patch` and `mcp__level0__replace`. The check carries both cases.
-- Each new case feeds the door a script writing a tracked path, and asserts the
-  refusal. `trunk-door.test.js` drives the same road over the disk.
-- `tested.js` and `precommit.js` stand outside the ask. The reading still wants
-  a test in the same delta. It answers the import standing above the hunk. So
-  it fixes the rule and keeps its shape.
-- `tokens.js` carries `tokensOf` out of a file at its line ceiling. `bash.js`
-  re-exports the name, so every caller stands as it reads.
-- A package script passes the reading, because `RUNNERS` stands outside
-  `scriptsIn`. `package.json` meets the rules where it stands, so the road
-  stays narrow.
-- The route sends this ticket to a retro after this step. That retro stands
-  ahead of the handback.
+- `./RUNME.sh check` answers 0 on the commit this branch stands on, and that
+  commit matches origin.
+- Every finding of the round before stands answered. `SHELLS`, `READERS`,
+  `BREAKS`, `baseName` and `clean` each stand once, in the splitter. `OUTSIDE`
+  goes, and the newline entry goes with it.
+- The case feeding the spellings of a temp folder asserts the count alone, so
+  it passes whatever path the reading names.
+- The ask lands on its first three bullets. A runner and a shell each name
+  their script, a copy out of the scratchpad refuses over `cp` and `mv`, and
+  the refusal names `mcp__level0__patch` and `mcp__level0__replace`.
+- `./RUNME.sh check` covers the script write and the refusal, and `VERBS` names
+  no test verb. `trunk-door.test.js` drives the same road over the disk.
+- `tested.js` and `precommit.js` stand outside the ask. Each answers the import
+  standing above the hunk, so each fixes a rule this branch adds and redesigns
+  nothing the ask leaves alone.
+- The route sends this ticket to a retro after this step, and no retro stands
+  in the handback yet.
 
 ## checked
 
@@ -549,9 +565,10 @@ What I check:
 
 <!-- the form is checklist -->
 
-- the road the change adds lands once, as a row in the chapter on what the door
-  refuses. Each new piece points at that heading. The names the reading stands
-  on land twice, which the findings above name.
+- the road the change adds stands twice and the two disagree. The chapter row
+  names a script under `.se/` or a temp folder, and `scriptsIn` names every path
+  outside prose and code. The disk reader stands twice too, as `scriptText` and
+  as `textAt`. Both findings stand above.
 
 # Discussion
 
