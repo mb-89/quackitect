@@ -450,6 +450,15 @@ The test-first rule this branch landed refused this change twice, both times
 rightly. So a test standing already counts where the door reads its text, and
 both commit doors hand that reader in.
 
+| the finding of the second round | what lands |
+|---|---|
+| the word sets stood twice | the splitter module owns each, and both readers take them there |
+| `baseName` and `clean` stood twice | the same module owns each |
+| the list of free paths stood twice, and drifted | the reading asks `reaches`, which answers every spelling |
+
+A case now feeds four spellings of a temp folder, and the reading names a script
+in each. The copy answered one of the four.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
