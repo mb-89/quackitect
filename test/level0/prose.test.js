@@ -1,6 +1,6 @@
 // The tool a hand runs over a draft before it writes. Vale stands as a fake
 // here, so the read alone speaks.
-// [[spec/design_output/level0#the-tool-reads-a-draft]]
+// [[spec/design_output/level0#a-note-reads-clean-first]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -14,10 +14,12 @@ const box = (found = []) => ({
     lint: async () => ({ ran: true, found }),
   },
   disk: { exists: () => false, read: () => "" },
+  log: { say: () => {} },
   root: "/tree",
+  method: "/tree",
 });
 
-// [[spec/design_output/level0#the-tool-reads-a-draft]]
+// [[spec/design_output/level0#a-note-reads-clean-first]]
 test("a clean draft answers no finding, and the tool writes nothing", async () => {
   const said = await readsDraft(
     { path: "spec/guidance/a.md", text: "A line.\n" },
@@ -27,10 +29,10 @@ test("a clean draft answers no finding, and the tool writes nothing", async () =
   assert.match(said, /No finding stands/);
 });
 
-// [[spec/design_output/level0#the-tool-reads-a-draft]]
+// [[spec/design_output/level0#a-note-reads-clean-first]]
 test("a draft carrying a fault answers the finding, with its rule and its line", async () => {
   const found = [
-    { rule: "VoiceVale.LongSentence", line: 1, column: 1, message: LONG, severity: 2 },
+    { rule: "VoiceShape.Antithesis", line: 1, column: 1, message: LONG, severity: 2 },
   ];
 
   const said = await readsDraft(
@@ -38,18 +40,18 @@ test("a draft carrying a fault answers the finding, with its rule and its line",
     box(found),
   );
 
-  assert.match(said, /VoiceVale\.LongSentence/);
+  assert.match(said, /VoiceShape\.Antithesis/);
   assert.match(said, /spec\/guidance\/a\.md/);
   assert.doesNotMatch(said, /refuse this write/, "the tool writes nothing to refuse");
 });
 
-// [[spec/design_output/level0#the-tool-reads-a-draft]]
+// [[spec/design_output/level0#a-note-reads-clean-first]]
 test("the tool takes a path and a text, and refuses a call missing either", async () => {
   assert.match(await readsDraft({ text: "A line.\n" }, box()), /path/);
   assert.match(await readsDraft({ path: "spec/guidance/a.md" }, box()), /text/);
 });
 
-// [[spec/design_output/level0#the-tool-reads-a-draft]]
+// [[spec/design_output/level0#a-note-reads-clean-first]]
 test("the module registers the pair the server imports for each bridge module", () => {
   const specs = SPECS();
 

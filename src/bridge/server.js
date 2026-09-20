@@ -38,6 +38,7 @@ import {
 } from "./guidance.js";
 import { freshens, projectionsHere, sourcesOf } from "./projection.js";
 import { movedCode } from "./reload.js";
+import { SPECS as proseSpecs, TOOLS as proseTools } from "./prose.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import {
   ANSWERED,
@@ -101,6 +102,7 @@ const TOOLS = {
   ...reviewTools,
   ...stopTools,
   ...reportTools,
+  ...proseTools,
 };
 
 export async function decide(said, box) {
@@ -120,6 +122,7 @@ function specsOf(box) {
     ...reviewSpecs(),
     ...stopSpecs(box),
     ...reportSpecs(),
+    ...proseSpecs(),
   ];
 }
 

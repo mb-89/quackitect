@@ -1013,6 +1013,25 @@ refusing nothing leaves open.
 The tool registers at the session's start, and `spec/guidance/working.md`
 carries the line that sends a session to it.
 
+## A note reads clean first
+
+`check_prose` does for a note what `check_answer` does for an answer. It takes
+`path` and `text`, reads the draft through the write door's own rules, and
+answers every finding at once:
+
+| what it reads | where that stands |
+|---|---|
+| the rules over a draft | `proseFaults`, exported from `src/bridge/write.js` |
+| the findings a note keeps | `readsProse`, under `src/bridge/prose.js` |
+| the wording of the answer | `answerFindings`, beside `refusal` |
+
+The door calls `proseFaults` too, so one read serves both and a clean draft
+passes the door on its first write. The tool writes nothing, so its answer
+opens on the rules reading a draft.
+
+`src/bridge/prose.js` holds the spec and the handler, and exports the `SPECS`
+and `TOOLS` pair `src/bridge/server.js` imports for each bridge module.
+
 # The question comes first
 
 A prompt carrying a question gets its answer first, in a table a reader takes in at a glance.

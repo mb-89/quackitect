@@ -112,8 +112,7 @@ function schemaDoor(e, writing, where, box) {
   return "";
 }
 
-// The one read over a draft's prose. The door calls it, and so does the tool a
-// hand runs before it writes. [[spec/design_output/level0#the-tool-reads-a-draft]]
+// [[spec/design_output/level0#a-note-reads-clean-first]]
 export async function proseFaults(text, where, box) {
   if (CODE.test(where) || !box.vale.stands()) return [];
   const said = await box.vale.lint(text, where);

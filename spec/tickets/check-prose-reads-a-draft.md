@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -130,6 +130,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 363caea7c1b5f821b33ff1d2d8c56af34c1a67f8
+    hash_after: 363caea7c1b5f821b33ff1d2d8c56af34c1a67f8
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -275,14 +283,18 @@ The door's own read moves to `proseFaults` in the same hunk, because a case over
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the read, the tool, the server's pair and the chapter the approach names
+- Vale reaches the read as a door, and the cases hand it a fake answering a finding
+- each header points at the chapter the approach names, and that chapter owns the table
 
 ## tests-green
 

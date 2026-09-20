@@ -5,9 +5,11 @@
 import { join } from "node:path";
 import model from "wink-eng-lite-web-model";
 import winkNLP from "wink-nlp";
+import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { pathsOf, wordsOf } from "../../.claude/skills/level0/lib/vocabulary.js";
 import { withContext, withoutFalsePast } from "./tense.js";
+import { proseFaults } from "./write.js";
 
 const nlp = winkNLP(model);
 const its = nlp.its;
@@ -23,12 +25,44 @@ const SILENT = new Set(["PUNCT", "SYM", "SPACE"]);
 export const PROSE = "check_prose";
 export const PROSE_CALL = `mcp__level0__${PROSE}`;
 
-export const SPECS = () => [];
+export const SPECS = () => [proseSpec()];
 export const TOOLS = { [PROSE_CALL]: readsDraft };
 
-// [[spec/design_output/level0#the-tool-reads-a-draft]]
-export async function readsDraft(_ask, _box) {
-  return "";
+// [[spec/design_output/level0#a-note-reads-clean-first]]
+function proseSpec() {
+  return {
+    name: PROSE,
+    description: [
+      "Reads a draft note through the write door's own rules and answers every",
+      "finding at once. It writes nothing. Pass the whole file as the write",
+      "would land it, so a table row reads with its header.",
+    ].join(" "),
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: {
+          type: "string",
+          description: "where the note lands, so the rules read the kind it is",
+        },
+        text: {
+          type: "string",
+          description: "the whole file as the write would land it",
+        },
+      },
+      required: ["path", "text"],
+    },
+  };
+}
+
+// [[spec/design_output/level0#a-note-reads-clean-first]]
+export async function readsDraft(ask, box) {
+  const where = String(ask?.path ?? "");
+  const text = ask?.text;
+  if (!where) return "This call names no path, and the rules read the kind a path names.";
+  if (typeof text !== "string") return "This call carries no text, so there is no draft to read.";
+
+  const found = await proseFaults(text, where, box);
+  return answerFindings(where, { found, band: found.length ? "rewrite" : "" });
 }
 
 export function readsProse(box, text, found) {
