@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -161,6 +161,10 @@ record:
     hash_after: d3e1a6f8d0a35afaef0ab3d20ce0187cfbc10a3a
     returns: 7
     why: "`.vale.ini` stands `[**/test/level0/*.js]` today, holding `FakeDoorsInTest =; YES`, and the table of sections the file gains names it as new. Grow the; section standing, the way the stub's bridgehead reads now. Leave; `**/test/contract/*.js` as the one section that row opens.; The module table writes `work.js` and `vehicle.js` bare, and every other row; and the platform table below write the whole path. Write one spelling of a; file name.; The findings of the round before stand answered. The markdown section takes a; line, and every section standing `DoorsOnly` off names the new rule. The; extension opens a section of its own under the new rule alone, and; `src/bridge/review.js` stands beside `src/scripts/cli*.js` in the later table.; The coverage reads complete otherwise. Every read of `process.env`,; `process.argv` and `process.platform` outside `src/doors` lands on the pass; list or in the module table. Every Go file importing `os/exec` sits in; `src/lsp` or `src/index`, the two packages the Go table moves.; `./RUNME.sh lint src` answers zero today, and the draft's diff touches this; ticket alone."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 0638763fbc79d062896625ae91411fb31b8ad01b
+    hash_after: 67ca5dfbdb080e0fd873f4d6b1769600d816f1ba
 ---
 
 # Ask
