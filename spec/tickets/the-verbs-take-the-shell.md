@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -108,6 +108,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: aa5ac86d5efcf98fa98d63f8044b8d76f3685b4f
+    hash_after: aa5ac86d5efcf98fa98d63f8044b8d76f3685b4f
 ---
 
 # Ask
@@ -182,38 +186,68 @@ work runs through the engine.
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/the-brief-verbs-go]] takes the brief out of the tree, so every verb reads the group ticket
+- [[spec/tickets/a-log-verb-reads-sessions]] lands `./RUNME.sh log`, narrowed by span, level, kind and count
+- [[spec/tickets/a-split-verb-cuts-files]] lands `./RUNME.sh split`, with one journal entry a cut
+- [[spec/tickets/check-prose-reads-a-draft]] lands `check_prose`, which reads a draft through the write door's rules
+- [[spec/tickets/the-commit-verb-lints-messages]] lands `./RUNME.sh commit`, which reads, commits, checks and pushes
+- [[spec/tickets/the-read-tools-answer-first]] registers the read tools at session start, so the first call pays for the server
+- three private notes become open tickets on trunk, each with its ask written
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- a verdict step refusing the hand that wrote the change caught a real fault every round it ran
+- a helper reading its findings against the tree beat any reading of the diff alone
+- a contract case driving the real verb caught the name rule a fake hid
+- the reflect step turned each round of findings into one class, and the class named the next fix
+- the write door refusing a shell write kept every field on the road the engine reads
 
 ### badly
 
 <!-- what did not, each with its moment in the log or the transcript -->
-
 <!-- the form is list -->
+
+- a fake agreeing with the code hid four faults in the split verb, which the verdict found
+- the commit verb printed one stream where the check writes its faults to the other
+- a cut left its readers standing three times: `COL.kind`, the `new` verb, and a deleted case
+- a refused payload reaching no disk made two leaves need a `--fail` to land a corrected field
+- the server behind `./RUNME.sh check` fell twice mid-session, and each fall read as a red check
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/files-read-the-closure]] makes a hand-spelled list read itself, so a new import reds a case
+- [[spec/tickets/one-post-a-tool-call]] cuts the second post a dead server takes
+- [[spec/tickets/split-names-its-source]] refuses a call naming no source
+- [[spec/guidance/code/testing]] rule 4 already names the fault behind the fakes, and the split verb met it anyway
+- a leaf whose field breaks a rule wants the `--fail` road named where the refusal prints
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The engine's shape does the work. A hand reading its own change passes it, and a hand of its own finds the fault. Every round of that cost one spawn and found something true.
+
+The cost lands on the fields. A refused payload reaches no disk, so a field breaking a prose rule leaves the old text standing. The reader then sees a pass over stale words. Twice the road out was a `--fail` naming the rule, then a `--back` to the leaf. That road works, and the refusal names neither half of it.
+
+The classes repeat. Two tickets failed on a fake agreeing with the code, and two on a cut leaving its readers standing. Both classes have the same cure: read what stands before you write, through a grep or through the real thing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact this retro adds stands in one place, and each line points at the ticket owning it
+- the numbers stand in the tickets and the commands, and this retro names none of its own
+- each header says what its file is for, and counts nothing
 
 ## cloud
 
