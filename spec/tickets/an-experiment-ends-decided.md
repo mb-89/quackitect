@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -149,6 +149,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-13
+    hash_before: 1feb0b9400be8f3da87b9c17e1f4658152c34629
+    hash_after: 1feb0b9400be8f3da87b9c17e1f4658152c34629
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the brief asks | no, the retro still closes over an open trial |; | is what the diff touches beyond the brief trivial | yes, the notes take the moved path |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, the handover names it as waiting |; | does every rule the branch adds carry a test | no, the hold itself runs nowhere |; | what grade do the findings take | design, the hold picks its mechanism |; The two folders leave, the route ends on `decide`, and the verb answers each open; trial. The hold the ask asks for reaches the route nowhere.; Findings, one a line:; A need names a verb this box holds, and reads the tree nowhere. [[spec/design_output/pull#a-need-is-a-verb]]; So `needs` carries the hold nowhere, and the audit step passes over an open trial.; Run `retro audit` from the audit step's evidence, the way its `effect` step runs its own verb.; Drive that step through the pull over an open trial, because the case drives the verb alone.; Point each note at `pull-tool.js`, the name the module lands under. `git grep hooks/level1.js` answers them.; Mint a trial its ticket, or say under the approach why this one ticket carries both decisions.; Take the row naming the old folder in the design input's twin file, or leave both inputs alone."
 ---
 
 # Ask
@@ -384,20 +390,77 @@ The audit reads the process a ticket names, where `retro notes` reads the folder
 ## read
 
 <!-- every file you read, one a line -->
-
 <!-- the form is files -->
+
+- .claude/skills/level0/.claude-plugin/plugin.json
+- .claude/skills/level0/hooks/hooks.json
+- .claude/skills/level0/hooks/pull-tool.js
+- .claude/skills/level0/lib/pull.js
+- .claude/skills/level1/.claude-plugin/plugin.json
+- .claude/skills/level1/hooks/hooks.json
+- .claude/skills/level1/hooks/level1.js
+- .claude/skills/level1/lib/pull.js
+- .claude/skills/pane/.claude-plugin/plugin.json
+- .claude/skills/pane/hooks/hooks.json
+- .claude/skills/pane/hooks/pane.js
+- .claude/skills/pane/tests/pane.test.ts
+- spec/design_input/the-agent-pulls-tickets.md
+- spec/design_output/pull.md
+- spec/design_output/work.md
+- spec/processes/experiment.yaml
+- spec/processes/retro.yaml
+- spec/tickets/agent-pulls-ticket.md
+- spec/tickets/an-experiment-ends-decided.md
+- spec/tickets/the-group-leaves-at-todo.md
+- spec/tickets/the-hand-carries-the-session.md
+- spec/tickets/the-judge-reads-answer-rules.md
+- spec/tickets/the-runtime-files-stand-apart.md
+- spec/tickets/the-session-file-proves-itself.md
+- spec/tickets/verbs-read-two-roots.md
+- src/scripts/cli-check.js
+- src/scripts/cli-doors.js
+- src/scripts/pull-route.js
+- src/scripts/retro.js
+- test/contract/tree.test.js
+- test/level0/experiment.test.js
+- test/level0/hand.test.js
+- test/level0/level1.test.js
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+| the question reviewing asks | the answer |
+|---|---|
+| does the branch do what the brief asks | no, the retro still closes over an open trial |
+| is what the diff touches beyond the brief trivial | yes, the notes take the moved path |
+| what does `./RUNME.sh check` answer | 0 on this commit |
+| does a retro stand in the handback | no, the handover names it as waiting |
+| does every rule the branch adds carry a test | no, the hold itself runs nowhere |
+| what grade do the findings take | design, the hold picks its mechanism |
+
+The two folders leave, the route ends on `decide`, and the verb answers each open
+trial. The hold the ask asks for reaches the route nowhere.
+
+Findings, one a line:
+
+- A need names a verb this box holds, and reads the tree nowhere. [[spec/design_output/pull#a-need-is-a-verb]]
+- So `needs` carries the hold nowhere, and the audit step passes over an open trial.
+- Run `retro audit` from the audit step's evidence, the way its `effect` step runs its own verb.
+- Drive that step through the pull over an open trial, because the case drives the verb alone.
+- Point each note at `pull-tool.js`, the name the module lands under. `git grep hooks/level1.js` answers them.
+- Mint a trial its ticket, or say under the approach why this one ticket carries both decisions.
+- Take the row naming the old folder in the design input's twin file, or leave both inputs alone.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place. [[spec/design_output/work#an-experiment-decides]] owns each decision, and the route, the verb and the moved module point at it. The notes repeat a path the tree holds nowhere, and the first finding names the fix.
 
 # Discussion
 
