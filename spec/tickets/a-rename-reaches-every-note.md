@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -223,6 +223,10 @@ record:
     hash_after: 420dea44e81f5d6fbdd1e5f993dcbdfba8f35d30
     returns: 3
     why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | no, a rewrite leaves two tracked sources standing |; | is what the diff touches beyond the ask trivial | yes, each file outside the ask takes the new name |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, and the branch's close owns it |; | does every rule the branch adds carry a test | yes, each move of the verb takes a case |; | does a case feed the rule something bad | yes, a picture, a longer word, and a name standing nowhere |; | what grade do the findings take | craft, because one separator carries the fix |; TL;DR:; This round closes each finding the verdict before it names.; `readsAsText` calls a file binary on a zero byte, and two tracked sources hold one.; So a rename drops every pointer in `src/scripts/viewer.js`, which names the window's folder.; The findings, one a line:; `spec/tickets/the-window-splits-by-tab.md` reads `state: open`, and `placesIn` queues an open ticket.; It names no `group`, and `placesIn` asks for none, so a free branch takes it.; `spec/design_output/tui.md` owns the package table, and the split ticket points at that chapter.; The ignore file names `src/tui/tui`, which a bare `go build` writes in that folder.; `spec/design_output/vehicle.md` points at `stubFolders`, which owns the stub's folder names.; `readsAsText` in `src/scripts/rename.js` answers false over a file holding a zero byte.; `src/scripts/viewer.js` and `src/extension/lib/grid.js` each join a key on that byte.; `writtenFiles` reads `readsAsText`, so a rewrite leaves both sources standing.; `src/scripts/viewer.js` holds `SOURCE`, which names the folder this ticket moves.; So the verb run today breaks the build it renames, and prints nothing about it.; The ending list of the round before carried that file, and this reader drops it.; No case feeds `readsAsText` a source holding that byte, so the hole passes green.; `./RUNME.sh check` exits 0, and `./RUNME.sh links` answers rows naming a process file alone.; The fixes, one a line:; Join those two keys on the unit separator, so no tracked source holds a zero byte.; Feed `readsAsText` a source holding a zero byte, and assert the rewrite reaches it.; That first fix costs one rebuild, because the source hash moves, and it buys a verb reaching every source.; Or answer for a file the reader leaves out, so a rename drops nothing in silence."
+  - step: implement/reflect
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 9a3e07829eadd8de9c6b20d66391412c3ea3e0a7
+    hash_after: 9a3e07829eadd8de9c6b20d66391412c3ea3e0a7
 ---
 
 # Ask
@@ -369,27 +373,28 @@ The second case carries the part that surprises me. A rewrite over the bare word
 <!-- the class of error the findings describe, and the fix for the class -->
 <!-- the form is text -->
 
-One class carries the findings, and it stands one step along from the round before.
+One class carries the finding, and three rounds of this ticket walk it.
 
-| the round | where the thing landed | who reads it there |
+| the round | the rule the reader held | what it left out, in silence |
 |---|---|---|
-| the one before | a note under the private folder | nobody, because git ignores that folder |
-| this one | a ticket reading `state: draft` | nobody, because the pull queues an open ticket |
+| the first | a list of endings | a file with no ending, and a page of markup |
+| the second | the same list, one layer down | the files a move carries |
+| this one | a zero byte reads as a picture | two tracked sources joining a key on that byte |
 
-The class is a thing parked where its reader looks nowhere. Each round moved the thing one step closer and stopped short of the reader. A mint writes a draft, and a draft waits for `ticket open`, which this round leaves unrun.
+Each round wrote a better rule, and each rule left something out with nothing said. So the class is a reader deciding what to skip while its caller stays quiet. A better rule moves the hole, and a hole nobody names is the fault.
 
-The fix for the class is one move: run the reader after you park a thing, and read what it answers. `./RUNME.sh ticket pull` from trunk is that reader for a ticket, and `git ls-files` is that reader for a file. A park stands where its reader answers it.
+The fix for the class is the verb answering for what it leaves out. `renaming` counts the files its reader drops, and the command line prints them under the reaches it rewrote. A hand then reads what the run skipped, and decides.
 
-The smaller findings ride the same shape. `BINARY` names endings, so a file without one reads as text, which is the ending list of the round before under another name. The ignore rows name a file the build writes nowhere. The package table stands in two tracked files, where the voice rule gives a fact one owner.
+The finding's own fix rides beside it. Two sources join a key on the zero byte, and the unit separator carries the same key with no reader calling it a picture. So the two sources read as text, and a case feeds the reader one holding that byte.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The verb, the ignore rows, the minted ticket, and the note taking the package table.
-- every door the change reaches has a fake. The case reading bytes hands its own disk, as each case beside it does.
-- a comment names the approach the change implements. The reader of bytes says why it reads them, and the note owns the table.
+- the change touches no file the ask leaves out. The verb, its cases, and the two sources joining a key on that byte.
+- every door the change reaches has a fake. Each case hands its own disk, and the new one feeds it a source holding a zero byte.
+- a comment names the approach the change implements. The verb says what it leaves out, and each key says why it joins on that mark.
 
 ## change
 
