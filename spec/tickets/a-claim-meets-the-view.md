@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -115,6 +115,12 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 5a53fd45f0c863c9634ad69445aa2aeab07de846
     hash_after: 5a53fd45f0c863c9634ad69445aa2aeab07de846
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-6
+    hash_before: 800d35921d241f1f1ab86a10a4949f22f271863f
+    hash_after: 800d35921d241f1f1ab86a10a4949f22f271863f
+    returns: 3
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | partly, the rule, the sweep and the case hold, the panel's own rows double |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does every rule the approach adds carry a case | yes, one case reads both fronts over the real tree |; | does every claim carry a proof | every row but one, and the panel row reads against the code |; TL;DR:; The switch under the server, the Biome guard and the missing chapter read true now.; The panel draws the checker's rows itself, beside the list the bridge answers.; Hand the panel no checker, and say what the case counts on each side.; The findings, one a line:; `panel.go` keeps `own` off `Sweep` and `extra` off the bridge, and draws both.; `serverFaults` runs that same `Sweep`, so the two lists carry one content.; So `readingOf` handing the panel the checker draws each of those rows twice.; The draft says the panel gains the checker, and the panel holds it already.; The design note says so too, in the source table of its panel chapter.; Say which front hands `readingOf` a checker, and hand the panel none.; Then the case reads the panel as its own sweep plus the bridge's list.; Drop the git door where no tree reader in JavaScript runs inside the bridge.; The rest holds: the guard, the switch, the chapter, the case's home, the rule's home."
 ---
 
 # Ask
@@ -182,31 +188,29 @@ fail
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the approach answer the ask | partly, the rule, the sweep and the case hold, one row stands unowned |
+| does the approach answer the ask | partly, the rule, the sweep and the case hold, the panel's own rows double |
 | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |
 | what does `./RUNME.sh check` answer | 0 on this commit |
 | does every rule the approach adds carry a case | yes, one case reads both fronts over the real tree |
-| does every claim carry a proof | the root row and the tools row read with the code now, the third row past it |
+| does every claim carry a proof | every row but one, and the panel row reads against the code |
 
 TL;DR:
 
-- The redraw answers the root fault and the tools fault the last round named.
-- The table names three ways the two fronts part, and the change list owns two.
-- Say which front owns the server's own rows, and what becomes of the switch under them.
+- The switch under the server, the Biome guard and the missing chapter read true now.
+- The panel draws the checker's rows itself, beside the list the bridge answers.
+- Hand the panel no checker, and say what the case counts on each side.
 
 The findings, one a line:
 
-- `lint` runs the tree reader and the schema reader only where `serverFaults` answers nothing.
-- An empty list from the server counts as an answer there, so both readers stand off.
-- `se-lsp check .` answers an empty list at exit 0 on this box.
-- So the check counts neither reader today, and `readingOf` turns both on for it.
-- Row three says `lint` adds both over a whole sweep, which reads past that switch.
-- Redraw row three with the switch, and say what the check counts after the change.
-- Say whether `lint` keeps `serverFaults` once `readingOf` stands, and which front owns those rows.
-- The server draws its own checks itself, so the panel holds them outside the findings route.
-- A case asserting one count turns red where those rows stand on one side alone.
-- The chapter the approach links stands nowhere in that note, so the change writes it.
-- The rest holds: the Biome guard, the case under `test/contract`, and the rule's home.
+- `panel.go` keeps `own` off `Sweep` and `extra` off the bridge, and draws both.
+- `serverFaults` runs that same `Sweep`, so the two lists carry one content.
+- So `readingOf` handing the panel the checker draws each of those rows twice.
+- The draft says the panel gains the checker, and the panel holds it already.
+- The design note says so too, in the source table of its panel chapter.
+- Say which front hands `readingOf` a checker, and hand the panel none.
+- Then the case reads the panel as its own sweep plus the bridge's list.
+- Drop the git door where no tree reader in JavaScript runs inside the bridge.
+- The rest holds: the guard, the switch, the chapter, the case's home, the rule's home.
 
 # implement
 
