@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box 51c5005e133c · claude-code-remote
     hash_before: ee9509dd2d41a15d8434a5fcfdf14695ee1b2509
+  - step: sync
+    hand: box 51c5005e133c · claude-code-remote
+    hash_before: c35f0536f104e7ac62fb9bf7ef80c41b6f685221
+    hash_after: 7466e24e17194c2092558f24dee3424dbda29602
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-work-tab-reads-tickets already carries every commit on main.
 ---
 
 # Ask
@@ -94,7 +102,7 @@ The work tab is a ticket editor. It queries the index for tickets, and a branch 
 
 <!-- branch sync, so the branch carries trunk -->
 
-<!-- the form is command -->
+    ./RUNME.sh branch sync
 
 # split
 
