@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: 589386013a93874a229c77e6a634f0b990c3df7d
     returns: 2
     why: "`src/viewer/filter.go` owns the log filter language, and `spec/design_output/viewer#the-filter-language` says it; the four flags spell that filtering a second time, and the approach points at neither owner; `plainRows` under `src/scripts/tui.js` reads `SESSION` and the rotated files under `OLD`; that function prints each row through `asRow`, and the verb the approach names reads the same; say which of the two owns the read, and point the other at it; `spanOf` answers seconds, and `timeOf` answers milliseconds; `queue.js` keeps `MS` for that crossing, so name the scale beside `--since`; `timeOf` answers one stamp, the rotated file's first line, so the table's word span misreads it; the install bullet names no case, and `test/contract/install.test.js` holds one case, on binaries rebuilding; name the case asserting a warm box prints no install line; the lib table reads true: `SESSION`, `OLD`, `rowsOf` and `asRow` export; `timeOf`, `writes` and `rank` export from the same file; `spanOf` exports from `src/scripts/group.js`, as the flags table says; the verbs map under `src/scripts/cli.js` holds no `log`, so the name stands free; `install.sh` guards both its `say` lines on `$missing`, and `./RUNME.sh branch list` prints neither here"
+  - step: design/draft
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 7df5e7414b2a11c05c751e62d1ebce319313a652
+    hash_after: 7df5e7414b2a11c05c751e62d1ebce319313a652
 ---
 
 # Ask
@@ -135,34 +139,39 @@ Each reading costs a fresh inline script, and the same filter goes in again and 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-`./RUNME.sh log` reads the session log through the lib that writes it, and the filters compose.
+`./RUNME.sh log` filters the rows the log reader already answers, and both owners keep what they own.
+
+Two owners stand, and this verb adds a third to neither:
+
+| what stands | where it stands | what the verb does |
+|---|---|---|
+| the read over `SESSION` and `OLD` | `plainRows`, under `src/scripts/tui.js` | the read moves to `src/scripts/log-read.js`, and both verbs call it |
+| the filter language | `filter.go`, under `src/viewer` | the verb takes flags, for the reason below |
+
+Go owns the language, and the verb runs in node before any Go build stands. So the verb carries flags, and [[spec/design_output/viewer#the-filter-language]] stays the language's one home. Each flag names the narrow filter it holds:
 
 | the flag | what it reads | the owner it calls |
 |---|---|---|
-| `--since <span>` | the lines stamped inside the span | `spanOf`, under `src/scripts/group.js` |
-| `--level <name>` | the lines at that level and above | `writes` and `rank` |
-| `--kind <name>` | the lines of that kind | the row's own field |
-| `--last <count>` | the last lines, after every filter above | the verb itself |
+| `--since <span>` | the rows stamped inside the span | `spanOf`, under `src/scripts/group.js` |
+| `--level <name>` | the rows at that level and above | `writes` and `rank` |
+| `--kind <name>` | the rows of that kind | the row's own field |
+| `--last <count>` | the last rows, after every filter above | the verb itself |
 
-`src/scripts/log-verb.js` holds the verb, and `src/scripts/cli.js` names it in the verbs map. The lib under `.claude/skills/level0/lib/log.js` answers each remaining piece:
+`spanOf` answers seconds, and a row's `at` answers a stamp. `queue.js` keeps `MS` for that crossing, and the verb reads the same constant.
 
-| what the verb needs | what the lib names |
-|---|---|
-| the file, and the rotated ones | `SESSION` and `OLD` |
-| the lines out of the text | `rowsOf` |
-| the row a reader sees | `asRow` |
-| the span a rotated file covers | `timeOf` |
+What the rotated files ask for:
 
-So the verb reads doors and composes, and it writes no shape of its own.
+- `timeOf` answers one stamp, off a rotated file's own name
+- so `--since` opens a rotated file where that stamp falls inside the span
+- `rowsOf` and `asRow` carry the rest, and the verb writes no shape of its own
 
 Where each thing stands after:
 
+- `src/scripts/log-verb.js` holds the verb, and `src/scripts/cli.js` names it in the verbs map
 - `spec/design_output/log.md` takes the chapter `One verb reads the log`, which owns the flags table
-- this approach's copy is the draft that chapter takes, and no second copy lands
-- `test/level0/log-verb.test.js` holds the cases, one a filter, over rows in memory
-- the install line already holds: `install.sh` guards both its lines on `$missing`, so a warm box says nothing
-
-A hand asking which kind fills the log runs `./RUNME.sh log --kind hook --last 20`.
+- `test/level0/log-verb.test.js` holds a case a filter, over rows in memory
+- `test/contract/install.test.js` takes a case asserting a warm tree runs the script silent
+- a hand asking which kind fills the log runs `./RUNME.sh log --kind hook --last 20`
 
 ## review
 
