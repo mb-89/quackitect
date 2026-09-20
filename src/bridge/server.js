@@ -26,6 +26,7 @@ import {
   onTurnEnd,
   SPOKE,
 } from "./answer.js";
+import { holdsGrace } from "./grace.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
@@ -54,6 +55,7 @@ import {
 import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.js";
 import {
   dropsHold,
+  ENDS_TURN,
   holdsCall,
   onRefactorAnswered,
   onStop,
@@ -197,7 +199,12 @@ function submitsPrompt(e, box) {
 async function onToolCall(e, box) {
   sawCall(e, box);
   asksForUpdate(e, box);
-  const held = letsThrough(holdsCall(e, box) ?? holdsForAnswer(e, box), { e }, box);
+  // The engine's own ask meets the call after the owner's hold and before the answer door. [[spec/design_output/stop#the-grace]]
+  const held = letsThrough(
+    holdsCall(e, box) ?? holdsGrace(e, box, ENDS_TURN) ?? holdsForAnswer(e, box),
+    { e },
+    box,
+  );
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (!passes(said)) return said;

@@ -56,9 +56,15 @@ func TestPThenADigitWritesTheTodoTheQueueReads(t *testing.T) {
 		t.Fatalf("two rows at a level put the second last, and the front reads:\n%s", frontAt(t, root, "one-group"))
 	}
 	m.work.Items = append(m.work.Items, Item{Name: "third", Keys: map[string]string{queueKey: "3", "path": "spec/tickets/third.md"}})
+	m.work.Items[0].Keys[todoKey] = ""
 	m = pressed(toRow(m, "one-group"), "p", "2")
 	if !strings.Contains(frontAt(t, root, "one-group"), "todo: third") {
 		t.Fatalf("place 2 names the row standing there, and the front reads:\n%s", frontAt(t, root, "one-group"))
+	}
+	// The same place again takes the todo off. [[spec/design_output/pull#a-todo-forces-a-place]]
+	m = pressed(toRow(m, "one-group"), "p", "2")
+	if strings.Contains(frontAt(t, root, "one-group"), "todo") || m.work.PlaceOf("one-group") != 2 {
+		t.Fatalf("the same digit again clears the todo, and the front reads:\n%s", frontAt(t, root, "one-group"))
 	}
 	m = pressed(toRow(m, "one-group"), "p", "5")
 	if !strings.Contains(m.workNotice, "no row stands at 5") {

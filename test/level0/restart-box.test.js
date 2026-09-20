@@ -51,6 +51,16 @@ test("a tool call on a fresh box registers the patch tool and the check tool", a
   assert.ok(specNamed(said.register, CHECK), "the check tool");
 });
 
+// The engine's ask meets every call through the server, so a spent grace refuses a read and lets the stop call through. [[spec/design_output/stop#the-grace]]
+test("a spent grace refuses a call through the server, and the stop call passes it", async () => {
+  const box = restarted();
+  box.grace = { id: "refactor", why: "Twelve warnings stand.", react: "end this turn with a stop line", left: 0 };
+  const said = await reads(box);
+  assert.match(String(said.result?.deny ?? ""), /The grace is spent/);
+  const stop = await decide({ event: "tool.call", e: { tool: "mcp__level0__stop", reason: "the-work-stands-complete" } }, box);
+  assert.equal(stop.result?.deny, undefined, "the call ending the turn passes the grace");
+});
+
 test("the mint spec names every kind the schemas hold", async () => {
   const said = await reads(restarted());
 

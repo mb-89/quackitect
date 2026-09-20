@@ -100,7 +100,7 @@ func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 	m := window(3)
 	m.tabs = []tab{logTab{}, stubTab{}}
 	drawn := renderParts(m.helpParts(60), 60)
-	for _, want := range []string{"GLOBAL", "1…9", "open the tab at that place", "THE LOG", "alt+⇧f", "PRESETS", "prompts and replies"} {
+	for _, want := range []string{"GLOBAL", "1…9", "open the tab at that place", "THE LOG"} {
 		if !strings.Contains(drawn, want) {
 			t.Fatalf("the help names %q, and reads:\n%s", want, drawn)
 		}
@@ -108,12 +108,13 @@ func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 	if strings.Index(drawn, "GLOBAL") > strings.Index(drawn, "THE LOG") {
 		t.Fatalf("the global band stands first, and the help reads:\n%s", drawn)
 	}
-	if strings.Index(drawn, "THE LOG") > strings.Index(drawn, "PRESETS") {
-		t.Fatalf("the tab band stands over the presets, and the help reads:\n%s", drawn)
+	// The presets stand in the filter pane alone. [[spec/design_output/tui#one-key-filters-the-line]]
+	if strings.Contains(drawn, "PRESETS") || strings.Contains(drawn, "prompts and replies") {
+		t.Fatalf("the help names no preset, and reads:\n%s", drawn)
 	}
 	work := press(m, "2")
 	drawn = renderParts(work.helpParts(60), 60)
-	for _, want := range []string{"THE WORK", "read the row", "THE TICKET", "open the note", "alt+1", "not done"} {
+	for _, want := range []string{"THE WORK", "read the row", "THE TICKET", "open the note"} {
 		if !strings.Contains(drawn, want) {
 			t.Fatalf("the open tab's band names %q, and the help reads:\n%s", want, drawn)
 		}
@@ -127,14 +128,15 @@ func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 func TestTheSelectionBandGoesWhileNothingStandsSelected(t *testing.T) {
 	t.Parallel()
 	m := window(0)
-	drawn := renderParts(m.helpParts(60), 60)
+	// The row's preset stands in the filter pane, and an empty log offers none. [[spec/design_output/tui#one-key-filters-the-line]]
+	drawn := renderParts(m.presetParts(), 60)
 	if strings.Contains(drawn, "this row's kind") {
-		t.Fatalf("an empty log selects nothing and offers no row preset, and the help reads:\n%s", drawn)
+		t.Fatalf("an empty log selects nothing and offers no row preset, and the pane reads:\n%s", drawn)
 	}
 	m = arrive(m, row(1, "tool", "line 1"))
-	drawn = renderParts(m.helpParts(60), 60)
+	drawn = renderParts(m.presetParts(), 60)
 	if !strings.Contains(drawn, "this row's kind") {
-		t.Fatalf("a selected row offers its kind as a preset, and the help reads:\n%s", drawn)
+		t.Fatalf("a selected row offers its kind as a preset, and the pane reads:\n%s", drawn)
 	}
 }
 

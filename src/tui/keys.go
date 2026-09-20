@@ -136,18 +136,7 @@ func (m model) helpParts(w int) []part {
 		parts = append(parts, held.lines()...)
 		parts = append(parts, part{})
 	}
-	// The open tab's presets stand as a band of their own, each under the key that presses it. [[spec/design_output/tui#one-key-filters-the-line]]
-	if said := m.tabs[m.open].Presets(&m); len(said) > 0 {
-		parts = append(parts, part{style: headStyle, text: "PRESETS"})
-		wide := 0
-		for _, one := range said {
-			wide = max(wide, len([]rune(keyShown(one.Key))))
-		}
-		for _, one := range said {
-			parts = append(parts, part{text: "  " + pad(keyShown(one.Key), wide) + "  " + one.Name})
-		}
-		parts = append(parts, part{})
-	}
+	// The presets stand in the filter pane alone, so the help names none. [[spec/design_output/tui#one-key-filters-the-line]]
 	return append(parts, part{text: strings.TrimSpace(HelpText)})
 }
 

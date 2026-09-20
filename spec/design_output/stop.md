@@ -161,6 +161,22 @@ heading and the stop line stand outside that reading.
 `stop.enabled` at false skips the hold above and votes at once. The switch
 takes the whole tooth out, and the call stands as part of the tooth.
 
+## The grace
+
+The engine wants something of the agent now and then, and a refusal with no
+warning is a wall. So an ask opens a grace. The engine says it on the next
+call, and lets a number of calls pass with the ask riding each result. Then
+it refuses every call until the agent reacts. `grace.js` holds it, one ask at
+a time, and the calls ending a turn pass whatever stands.
+
+| the ask | what opens it | what answers it |
+|---|---|---|
+| the refactoring hand | the list past `refactor.mostWarnings`, and a file at rest past `refactor.untouchedFor` | the turn's end, where the stop door spawns the hand |
+
+The list stands in `.se/.runtime/refactor.json`, one entry a warning, which
+the lint writes at each check. `refactor.grace` names the calls that pass.
+The plan step rides the same door next.
+
 # The vote
 
 Every rule carries a side, a priority and a way of firing. The turn ends where

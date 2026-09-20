@@ -5,6 +5,8 @@
 import { inRun } from "./folders.js";
 
 export const STAMP = inRun("check.json");
+// The list the lint leaves for the refactoring hand, one entry a warning. [[spec/design_output/stop#the-grace]]
+export const REFACTORS = inRun("refactor.json");
 const SHORT_SHA = 8;
 
 export function shortOf(sha) {

@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { REFACTORS, STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { batteryRun, stampFor } from "../../src/scripts/cli-stamp.js";
 
@@ -49,6 +50,9 @@ test("a green run stamps ok with no warning, and a red run stamps the code", () 
   const red = stampFor({ code: 1, sha: "abc", clean: false, at: AT });
   assert.equal(red.ok, false);
   assert.equal(red.clean, false);
+  // The list stands in its own file beside the stamp, because the hand changes what it names. [[spec/design_output/stop#the-grace]]
+  assert.match(REFACTORS, /refactor\.json$/);
+  assert.equal(REFACTORS.slice(0, REFACTORS.lastIndexOf("/")), STAMP.slice(0, STAMP.lastIndexOf("/")), "the list stands in the stamp's folder");
 });
 
 // [[spec/guidance/retro/effect]]

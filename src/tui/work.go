@@ -244,44 +244,13 @@ func (workTab) Keys(m *model) band {
 			m.work.Collapse(true)
 			return nil
 		}},
-		// [[spec/design_output/tui#the-work-tab-takes-edits]]
-		{bind("a d", "back one column, and on one column", "a", "d", "A", "D"), func(m *model, name string) tea.Cmd {
-			step := 1
-			if strings.EqualFold(name, "a") {
-				step = -1
-			}
-			if m.work != nil {
-				m.work.MoveCursor(step)
-			}
-			return nil
-		}},
-		{bind("e", "edit the cell under the cursor: enter writes, esc drops, shift+enter fills", "e"), func(m *model, _ string) tea.Cmd {
-			m.openEdit()
-			return nil
-		}},
-		// [[spec/design_output/pull#the-queue-is-an-outline]]
-		{bind("p 1…9", "place the row in the queue: p, then the place", placeKey), func(m *model, _ string) tea.Cmd {
+		// A place is the todo, and the same digit again takes it off. No cell opens here, because every field a person sets has a key of its own. [[spec/design_output/pull#the-queue-is-an-outline]]
+		{bind("p 1…9", "place the row in the queue: p, then the place, and the same place again clears it", placeKey), func(m *model, _ string) tea.Cmd {
 			m.openPlace()
 			return nil
 		}},
-		{bind("u t", "flip the urgent mark, and the todo mark", "u", "t"), func(m *model, name string) tea.Cmd {
-			key := urgentKey
-			if name == "t" {
-				key = todoKey
-			}
-			m.flip(key)
-			return nil
-		}},
-		// [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
-		{bind("m M", "mark a row, and M the run from the last mark", "m", "M"), func(m *model, name string) tea.Cmd {
-			if m.work == nil {
-				return nil
-			}
-			if name == "M" {
-				m.work.MarkRun()
-				return nil
-			}
-			m.work.Mark()
+		{bind("u", "flip the urgent mark", "u"), func(m *model, _ string) tea.Cmd {
+			m.flip(urgentKey)
 			return nil
 		}},
 	}}

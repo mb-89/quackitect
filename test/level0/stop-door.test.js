@@ -6,7 +6,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { dropsHold, onStop, reportStands, sawPrompt } from "../../src/bridge/stop.js";
+import { dropsHold, onStop, reportStands, sawCall, sawPrompt } from "../../src/bridge/stop.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -61,7 +61,7 @@ const RULES = `
 `;
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
-const REFACTOR = { parallel: true, mostWarnings: 2, mostAtOnce: 1, untouchedFor: "7d" };
+const REFACTOR = { parallel: true, mostWarnings: 2, mostAtOnce: 1, untouchedFor: "7d", grace: 1 };
 
 const NOW = 1_800_000_000;
 const WEEK = 604_800;
@@ -95,8 +95,13 @@ function box(files = {}, refactor = REFACTOR) {
   };
 }
 
-// The stamp the check leaves, which the refactoring rule reads. [[spec/tickets/the-spawn-reaches-its-guidance]]
+// The stamp the check leaves, and the list beside it, which the refactoring rule reads. [[spec/design_output/stop#the-grace]]
 function stamped(warnings, names) {
+  const list = Array.from({ length: warnings }, (_, at) => ({
+    file: names[at % names.length],
+    rule: "VoiceParagraph.Sentence",
+    line: at + 1,
+  }));
   return {
     [at(".se/.runtime/check.json")]: JSON.stringify({
       sha: "a1",
@@ -106,6 +111,7 @@ function stamped(warnings, names) {
       warnings,
       files: names,
     }),
+    [at(".se/.runtime/refactor.json")]: JSON.stringify(list),
   };
 }
 
@@ -227,6 +233,20 @@ test("the door answers the vote and the hand together, and the hand takes the fi
   assert.equal(said.spawn.file, "old.md");
   assert.match(said.spawn.prompt, /old\.md/);
   assert.equal(said.back.event, "refactor.answered");
+});
+
+// The list past the number with a file at rest asks for the turn over the grace, and the turn's end answers it. [[spec/design_output/stop#the-grace]]
+test("a call under a long list opens the grace, and the turn's end clears it", () => {
+  const it = box(stamped(9, ["old.md"]));
+  sawCall({ tool: "Read" }, it.box);
+  assert.equal(it.box.grace?.id, "refactor", "the call opens the ask");
+  assert.match(it.box.grace.why, /9 warnings stand/);
+  const said = onStop({ last_assistant_message: "Some text and no stop." }, it.box);
+  assert.equal(it.box.grace, null, "the turn's end is the reaction");
+  assert.equal(said.spawn.file, "old.md");
+  const fresh = box(stamped(9, ["new.md"]));
+  sawCall({ tool: "Read" }, fresh.box);
+  assert.equal(fresh.box.grace, undefined, "a list over files still warm asks nothing");
 });
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]

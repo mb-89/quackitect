@@ -429,20 +429,19 @@ restart.
 
 # The work tab takes edits
 
-A person edits a ticket where they read it. The cursor picks a column, a key
-opens the cell, and Enter writes the field into the ticket's own front. The
-index sees the write and hands the tab its tree again, so the row reads what
-the note now says. `workedit.go` holds it.
+A person edits a ticket where they read it, and each field a person sets has
+a key of its own. The write lands in the ticket's front. The index sees it
+and hands the tab its tree again, so the row reads what the note now says.
+`workedit.go` and `workplace.go` hold it.
 
 | key | what it does |
 |---|---|
-| `a`, `d` | back one column, and on one column, and the header lights the one under the cursor |
-| `e` | open the cell under the cursor, holding the value it carries |
-| Enter | write the value into the ticket, and close the edit |
-| Esc | put the old value back |
-| shift and Enter | write the value into every row the view holds, or the marked ones |
-| `u`, `t` | flip the urgent mark, and the todo mark, on the row or the marked rows |
-| `p`, then a digit | place the row in the queue at that digit, which writes its todo. For the rule, see [[spec/design_output/pull#a-todo-forces-a-place]] |
+| `u` | flip the urgent mark on the row |
+| `p`, then a digit | place the row in the queue at that digit, which writes its todo, and the same digit again takes the todo off. For the rule, see [[spec/design_output/pull#a-todo-forces-a-place]] |
+
+The tree view holds a cell edit too, with a column cursor, a key opening the
+cell, Enter writing and Esc dropping. The work tab binds no key to it, because
+its fields take the keys above and the name is the ticket's own.
 
 The write meets the door the way an agent's write does. The tab reads
 `spec/schemas/ticket.schema.yaml` for what a field takes and which field the

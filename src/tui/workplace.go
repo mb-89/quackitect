@@ -48,6 +48,9 @@ func (m *model) placeAt(key string) {
 	beside := m.work.PlacedBeside(one.Name)
 	value := flagOn
 	switch {
+	// The same place again takes the todo off, so the score places the row once more. [[spec/design_output/pull#a-todo-forces-a-place]]
+	case one.Keys[todoKey] != "" && one.Keys[todoKey] != flagOff && m.work.PlaceOf(one.Name) == n:
+		value = flagOff
 	case n == 1:
 	case n-1 < len(beside):
 		value = beside[n-1].Name
@@ -64,6 +67,25 @@ func (m *model) placeAt(key string) {
 		return
 	}
 	m.workNotice = fmt.Sprintf("%s takes place %d once the queue reads it", one.Name, n)
+}
+
+// The place a row holds at its own level, counted from one, and zero where it holds none. [[spec/design_output/pull#a-todo-forces-a-place]]
+func (t Tree) PlaceOf(name string) int {
+	placed := []Item{}
+	for _, held := range t.Siblings(name) {
+		if held.Keys[queueKey] != "" {
+			placed = append(placed, held)
+		}
+	}
+	sort.SliceStable(placed, func(a, b int) bool {
+		return under(placed[a].Keys[queueKey], placed[b].Keys[queueKey])
+	})
+	for at, held := range placed {
+		if held.Name == name {
+			return at + 1
+		}
+	}
+	return 0
 }
 
 // The rows beside one at its own level that hold a place, in place order, without the row itself. [[spec/design_output/pull#the-queue-is-an-outline]]

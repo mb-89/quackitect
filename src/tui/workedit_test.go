@@ -136,7 +136,7 @@ func TestAnEditInTheWorkTabWritesTheFieldToTheTicket(t *testing.T) {
 	t.Parallel()
 	m, root := editWindow(t)
 	m = toRow(toColumn(m, "group"), "a-child")
-	m = pressed(m, "e")
+	m = opened(m)
 	if !m.work.Editing() || m.work.Typed() != "one-group" {
 		t.Fatalf("the edit opens on the group the cell holds, and holds %q", m.work.Typed())
 	}
@@ -160,7 +160,7 @@ func TestEscapePutsTheOldValueBackAndWritesNothing(t *testing.T) {
 	t.Parallel()
 	m, root := editWindow(t)
 	m = toRow(toColumn(m, "group"), "a-child")
-	m = pressed(m, "e", "x", "esc")
+	m = pressed(opened(m), "x", "esc")
 	if m.work.Editing() {
 		t.Fatal("escape closes the edit")
 	}
@@ -176,7 +176,7 @@ func TestAFieldTheVerbsOwnRefusesTheEdit(t *testing.T) {
 	// The state stands in the flags now, so the step is the column the verbs own. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 	for _, key := range []string{"step"} {
 		held := toRow(toColumn(m, key), "a-child")
-		held = pressed(held, "e")
+		held = opened(held)
 		if held.work.Editing() {
 			t.Fatalf("no edit opens on %s", key)
 		}
@@ -187,7 +187,7 @@ func TestAFieldTheVerbsOwnRefusesTheEdit(t *testing.T) {
 			t.Fatal("the notice draws in the tab")
 		}
 	}
-	held := pressed(toRow(toColumn(m, "queue"), "a-child"), "e")
+	held := opened(toRow(toColumn(m, "queue"), "a-child"))
 	if held.work.Editing() || !strings.Contains(held.workNotice, "no ticket's front") {
 		t.Fatalf("a column the index derives refuses the edit, and the tab says %q", held.workNotice)
 	}
@@ -213,22 +213,35 @@ func TestAKeyFlipsAMarkAndWritesIt(t *testing.T) {
 	if m.work.Selected().Keys[urgentKey] != flagOn {
 		t.Fatal("the row wears the mark the moment the key flips it")
 	}
-	m = pressed(m, "u", "t")
+	m = pressed(m, "u")
 	said := noteAt(t, root)
-	if strings.Contains(said, "urgent") || !strings.Contains(said, "\ntodo: true\n") {
-		t.Fatalf("a mark flipped off leaves the front, and t writes the todo mark, and the note reads:\n%s", said)
+	if strings.Contains(said, "urgent") {
+		t.Fatalf("a mark flipped off leaves the front, and the note reads:\n%s", said)
+	}
+	// The todo takes no key of its own, because a place is the todo. [[spec/design_output/pull#a-todo-forces-a-place]]
+	if m = pressed(m, "t"); strings.Contains(noteAt(t, root), "todo") {
+		t.Fatal("t writes nothing")
 	}
 }
 
-// [[spec/design_output/tui#the-work-tab-takes-edits]]
+// The cell edit stays a road of the tree, and the work tab binds no key to it. [[spec/design_output/tui#the-work-tab-takes-edits]]
+func opened(m model) model {
+	m.openEdit()
+	return m
+}
+
+// [[spec/design_output/tree-view#a-cell-takes-an-edit]]
 func TestTheCursorMovesAcrossTheColumnsAndTheHeaderLightsIt(t *testing.T) {
 	t.Parallel()
 	m, _ := editWindow(t)
-	m = pressed(m, "d", "d")
+	m.work.MoveCursor(1)
+	m.work.MoveCursor(1)
 	if m.work.Cursor() != 2 {
-		t.Fatalf("two presses of d stand on the third column, and the cursor stands at %d", m.work.Cursor())
+		t.Fatalf("two moves stand on the third column, and the cursor stands at %d", m.work.Cursor())
 	}
-	m = pressed(m, "a", "a", "a")
+	for range 3 {
+		m.work.MoveCursor(-1)
+	}
 	if m.work.Cursor() != 0 {
 		t.Fatal("the cursor stops at the first column")
 	}
