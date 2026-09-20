@@ -89,12 +89,18 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: f47aad74858bba92290ad23b86b03f90612c29ee
     hash_after: f47aad74858bba92290ad23b86b03f90612c29ee
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-2
+    hash_before: 508497e79c37bfb21587a55e64c588b165a3d343
+    hash_after: 508497e79c37bfb21587a55e64c588b165a3d343
+    returns: 1
+    why: "| the finding | the fix |; |---|---|; | The import rule lands red. Modules under `src/bridge` stand with a test naming none of them | Name the route to green: the tests to write, or a rule firing on a changed module alone |; | The exception has no reader. `.githooks/pre-commit` hands the door the staged delta alone | Put the exception where a door already reads, or name the door reading the message |; | The first reading and the door disagree. `src/scripts/precommit.js` reads the staged delta, and the approach wants the branch against trunk | Say which text the hook and the check both read, because one text answers both |; | `.claude/skills/level0/lib/tree.js` stands near the bound `code.fileLines` sets | Name where the import rule lands, and what moves out to make room |; | `spec/design_output/tree.md` owns the table naming every tree rule | Add the row for the import rule, and link the note from the approach |; | `spec/design_output/doors.md` owns \"door\" for a thing under `src/doors` | Name the thing under `src/bridge` by its own word, so one word holds one thing |; What holds:; Rule five of [[spec/guidance/code/testing]] is the rule the ask points at.; A tree rule is the place for a rule weighing two files. [[spec/design_output/tree]]; `behaves` stands nowhere yet, so the third program writes it."
 ---
 
 # Ask
@@ -151,6 +157,23 @@ points at the check, and no reader holds the rule in memory.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+| the finding | the fix |
+|---|---|
+| The import rule lands red. Modules under `src/bridge` stand with a test naming none of them | Name the route to green: the tests to write, or a rule firing on a changed module alone |
+| The exception has no reader. `.githooks/pre-commit` hands the door the staged delta alone | Put the exception where a door already reads, or name the door reading the message |
+| The first reading and the door disagree. `src/scripts/precommit.js` reads the staged delta, and the approach wants the branch against trunk | Say which text the hook and the check both read, because one text answers both |
+| `.claude/skills/level0/lib/tree.js` stands near the bound `code.fileLines` sets | Name where the import rule lands, and what moves out to make room |
+| `spec/design_output/tree.md` owns the table naming every tree rule | Add the row for the import rule, and link the note from the approach |
+| `spec/design_output/doors.md` owns "door" for a thing under `src/doors` | Name the thing under `src/bridge` by its own word, so one word holds one thing |
+
+What holds:
+
+- Rule five of [[spec/guidance/code/testing]] is the rule the ask points at.
+- A tree rule is the place for a rule weighing two files. [[spec/design_output/tree]]
+- `behaves` stands nowhere yet, so the third program writes it.
 
 # implement
 
