@@ -60,10 +60,10 @@ the work.
 
 # A process is a form
 
-v4 rules a process a note, and that ruling cuts against a canvas. Six slots
+v4 rules a process a note, and that ruling cuts against a canvas. The slots
 settle the layout, so a drawing of one step adds nothing.
 
-That holds for one step. Six slots want a form, and a picture of six labelled
+That holds for one step. The slots want a form, and a picture of labelled
 boxes tells a reader what the form already says.
 
 # The steps make a graph
@@ -90,7 +90,7 @@ Both stand together: the step is a form, and the run is a graph.
 | a guard | `google/cel-go`, for a condition on a transition | Apache 2.0 |
 | the machine | `qmuntal/stateless` | Apache 2.0 |
 
-Two pieces of that design pay as well as the picture. The file carries its own
+That design pays past the picture as well. The file carries its own
 fixtures, so a test run holds the process to its own specification. And the
 runtime says what it does as it goes, so the canvas draws a run while it runs.
 
