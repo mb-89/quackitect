@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -105,6 +105,10 @@ record:
     hand: box 1670436ae0bb · claude-code-remote
     hash_before: 9ae8ec51a44ac0d3b37ddc170d32a2d159520a06
     hash_after: 9ae8ec51a44ac0d3b37ddc170d32a2d159520a06
+  - step: design/review
+    hand: box 1670436ae0bb · claude-code-remote · helper-4
+    hash_before: 480c7217d3c4fc70f2c40772d5fd9e741aa7a114
+    hash_after: 480c7217d3c4fc70f2c40772d5fd9e741aa7a114
 ---
 
 # Ask
@@ -162,12 +166,14 @@ the block for what to do next.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- The vote's `unknown` list misses a claimed rule the agent claims nowhere this turn, because `fires` in `lib/stop.js` answers false before it reads `runs`, so a typo in such a rule stays quiet until the agent claims it. Read every rule's `runs` in the door through `knowsCheck`, which `src/bridge/stop.js` exports already.
-- The line names the rule file, and `pool` in `lib/stop.js` drops the file name, so the door holds it nowhere. Name the rule id and the check, both of which the door holds.
-- The table under The mechanical checks in `spec/design_output/stop.md` lists `never`, and `CHECKS` in `src/bridge/stop.js` holds it nowhere, so a rule with `runs: never` writes the warn line every turn. Add `never` to `CHECKS` answering false, so the table and the door agree.
-- The case over the fake box stands right: `test/level0/stop-door.test.js` holds a fake `log.say` that keeps every row, so the case asserts the warn row there.
+- The approach does what the ask calls for: the door reads every rule's `runs` through `knowsCheck` once a turn, and writes one warn line a rule naming a check it holds nowhere.
+- The line names the rule id and the check, both of which the door holds, so the earlier finding on the file name stands answered.
+- `CHECKS` gains `never` answering false, so the table under The mechanical checks and the door agree, and the earlier finding stands answered.
+- The case drives the door over the fake box in `test/level0/stop-door.test.js`, whose fake `log.say` keeps every row, and asserts the warn row there, so the rule carries a test proving it fires.
+- The approach touches `src/bridge/stop.js` and the case alone, and leaves `decide`, `fires` and the design output as they stand, so nothing outside the ask moves.
+- Craft, for the drafter at implement: the case's rule carries a `runs` naming a check the door holds nowhere, and a `decides` of mechanical, so the vote reads it too.
 
 # implement
 
