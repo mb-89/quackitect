@@ -3,7 +3,6 @@
 
 export const USAGE = [
   "Usage: ./RUNME.sh branch <verb>\n",
-  "  new <name>    cut work/<name> from main with its group ticket, and push",
   "  open <group>  push work/<group> off main for a group ticket, so the cloud finds it",
   "  take          take the next branch marked todo, and print its ask",
   "  sync          take main into this branch before you start",

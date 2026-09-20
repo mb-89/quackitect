@@ -403,6 +403,33 @@ test("done on a group refuses while the battery answers nothing green", () => {
   assert.equal(recordIn(disk.read(on("one-group"))).at(-1).hash_after, undefined);
 });
 
+// [[spec/design_output/work#trunk-comes-in-last-too]]
+test("done on a group refuses where trunk stands ahead of it, and names the sync", () => {
+  const took = withEntry(GROUP_NOTE, {
+    step: "sync",
+    hand: "box 3f9a",
+    hash_before: "a1b2c3",
+  });
+  const { it, disk } = doorsSaying(
+    {
+      ...onBranch("work/one-group"),
+      "git rev-list --count HEAD..origin/main": { stdout: "3\n" },
+    },
+    { [on("one-group")]: took, ...green },
+  );
+
+  const { code, said } = heard(() => work(ROOT, ["done"], it));
+
+  assert.equal(code, 1);
+  assert.match(said, /main holds 3 commit\(s\) work\/one-group lacks/);
+  assert.match(said, /branch sync/);
+  assert.equal(
+    recordIn(disk.read(on("one-group"))).at(-1).hash_after,
+    undefined,
+    "the record stands where the sync is owed",
+  );
+});
+
 const merging = (extra = {}) => ({
   "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
   "git rev-parse HEAD": { stdout: `${SHA}\n` },

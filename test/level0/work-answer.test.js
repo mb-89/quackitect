@@ -6,12 +6,14 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
+import { COL, work } from "../../src/scripts/work.js";
 import { answer, answerHere, answerOf } from "../../src/scripts/work-answer.js";
 import {
   CHILD,
   doorsSaying,
   GROUP_AT,
   GROUP_NOTE,
+  heard,
   ROOT,
   remoteSaying,
 } from "./work-doors.js";
@@ -76,6 +78,22 @@ test("the flag writes the queue place, and no flag writes none", () => {
     [1, 2, 3],
     "the group's row takes a place beside its tickets",
   );
+});
+
+// [[spec/design_output/pull#the-queue-is-a-score]]
+test("the queue listing pads every place to one width, so the names line up", () => {
+  const { it } = doors();
+  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
+
+  const { code, said } = heard(() => work(ROOT, ["list", "", "--queue"], it));
+
+  assert.equal(code, 0);
+  const rows = said.split("\n").filter(Boolean);
+  assert.equal(rows.length, 3, "one row a thing in the queue");
+  for (const row of rows) {
+    assert.match(row, /^\s+\d {2}\S/, "the place stands padded, then two spaces");
+    assert.equal(row.indexOf("  ", COL.place - 1), COL.place, "one width for all");
+  }
 });
 
 // [[spec/design_output/work#one-verb-answers-git]]

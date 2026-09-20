@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -226,6 +226,14 @@ record:
     hand: box 099c2ec7708d · claude-code-remote
     hash_before: 8731aaef4ae5f58dc71e7e0c13147e007b55be9b
     hash_after: 8731aaef4ae5f58dc71e7e0c13147e007b55be9b
+  - step: implement/change
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 544be3d8524f833be7d93ad20be04280e22c27cd
+    hash_after: 544be3d8524f833be7d93ad20be04280e22c27cd
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -409,9 +417,9 @@ A cut leaving the code standing takes a case with it, and the last read catches 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches the verbs, the copilot lane, the notes and the cases the approach names
-- git and the disk stand faked through `doorsSaying`, and the copilot lane through `fakeDisk` and `fakeProc`
-- each module's header says what it reads now, and each moved chapter carries its link from the code
+- the fix touches `work-stands.js`, `work-list.js`, `branch-usage.js` and two case files the change already reaches
+- git and the disk stand faked through `doorsSaying`, which both new cases drive
+- the class under `implement/reflect` names the approach each hunk follows
 
 ## tests-green
 

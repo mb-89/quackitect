@@ -19,7 +19,7 @@ import {
 } from "./group.js";
 import { asText, framed, namesIn, REF_FORMAT, refsIn } from "./work-read.js";
 
-export const COL = { branch: 34, child: 32, status: 6, why: 24 };
+export const COL = { branch: 34, child: 32, place: 6, status: 6, why: 24 };
 export const MS = 1000;
 // [[spec/design_output/work#a-merged-branch-closes]]
 export const MINE = /^(work|claude)\//;

@@ -105,7 +105,7 @@ function queueOnly(it) {
     return 0;
   }
   for (const one of rows) {
-    const place = String(one.queue).padStart(COL.kind);
+    const place = String(one.queue).padStart(COL.place);
     console.log(`${place}  ${one.name.padEnd(COL.branch)} ${one.step}`);
   }
   return 0;
