@@ -175,7 +175,24 @@ a time, and the calls ending a turn pass whatever stands.
 
 The list stands in `.se/.runtime/refactor.json`, one entry a warning, which
 the lint writes at each check. `refactor.grace` names the calls that pass.
-The plan step rides the same door next.
+
+## The plan
+
+Where a model keeps a private todo list, this tree keeps it in the queue. A
+todo is a title and a detail line in `.se/.runtime/plan.json`, placed like a
+ticket, and drawn in the work tab with no link. A sentence is the light road,
+and a note or a ticket stays the road for anything that travels. `plan.js`
+holds the door.
+
+| every `plan.everyCalls` calls, the engine asks | what answers it |
+|---|---|
+| what you work on now, by title or ticket name | the plan names it, and the queue draws it held |
+| which todos you finished | they leave the queue |
+| which todos you add, each at its place | they land, up to `plan.mostOpen` open ones |
+
+The ask rides the grace. The answer rides the `plan` call today, and the
+next step lets it ride the agent's next message and level zero's own calls,
+because a built-in tool refuses a field its schema names nowhere.
 
 # The vote
 

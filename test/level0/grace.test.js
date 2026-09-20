@@ -37,6 +37,11 @@ test("the ask rides the calls it lets pass, and a spent grace refuses the next",
     third.result.deny,
     /The grace is spent, so this call is refused\. End this turn/,
   );
+  // The call the ask names passes a spent grace, because a refused answer locks the box. [[spec/design_output/stop#the-grace]]
+  const answering = box();
+  wants(answering.box, { ...ASK, calls: 0, tool: "mcp__level0__plan" });
+  assert.equal(holdsGrace({ tool: "mcp__level0__plan" }, answering.box), null);
+  assert.ok(holdsGrace({ tool: "Read" }, answering.box).result.deny);
   assert.equal(
     it.said.filter((row) => row[1] === "grace").length,
     2,

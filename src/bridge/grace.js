@@ -11,6 +11,8 @@ export function wants(box, ask) {
     id: String(ask.id ?? ""),
     why: String(ask.why ?? ""),
     react: String(ask.react ?? ""),
+    // The call that answers the ask, which passes whatever the grace holds, because a refused answer locks the box. [[spec/design_output/stop#the-grace]]
+    tool: String(ask.tool ?? ""),
     left: Math.max(0, Number(ask.calls) || 0),
   };
   box.log.say("info", "grace", `the engine wants ${box.grace.id}: ${box.grace.why}`, {
@@ -30,7 +32,8 @@ export function reacted(box, id) {
 // Every call meets the ask: the grace lets it pass with the ask riding, and a spent grace refuses it. [[spec/design_output/stop#the-grace]]
 export function holdsGrace(e, box, passes = new Set()) {
   const grace = box.grace;
-  if (!grace || e?.agentId || passes.has(String(e?.tool ?? ""))) return null;
+  const tool = String(e?.tool ?? "");
+  if (!grace || e?.agentId || passes.has(tool) || (grace.tool && tool === grace.tool)) return null;
   if (grace.left > 0) {
     grace.left -= 1;
     return { after: { context: [graceBlock(grace)] } };

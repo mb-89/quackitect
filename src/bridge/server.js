@@ -27,6 +27,7 @@ import {
   SPOKE,
 } from "./answer.js";
 import { holdsGrace } from "./grace.js";
+import { asksForPlan, SPECS as planSpecs, TOOLS as planTools } from "./plan.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
@@ -108,6 +109,7 @@ const TOOLS = {
   ...reviewTools,
   ...stopTools,
   ...reportTools,
+  ...planTools,
   ...proseTools,
 };
 
@@ -137,6 +139,7 @@ function specsOf(box) {
     ...reviewSpecs(),
     ...stopSpecs(box),
     ...reportSpecs(),
+    ...planSpecs(),
     ...proseSpecs(),
   ];
 }
@@ -199,6 +202,8 @@ function submitsPrompt(e, box) {
 async function onToolCall(e, box) {
   sawCall(e, box);
   asksForUpdate(e, box);
+  // The engine's three questions come round every so many of the agent's own calls. [[spec/design_output/stop#the-plan]]
+  if (!e?.agentId) asksForPlan(box, (box.calls = (box.calls ?? 0) + 1));
   // The engine's own ask meets the call after the owner's hold and before the answer door. [[spec/design_output/stop#the-grace]]
   const held = letsThrough(
     holdsCall(e, box) ?? holdsGrace(e, box, ENDS_TURN) ?? holdsForAnswer(e, box),

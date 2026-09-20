@@ -32,6 +32,12 @@
     "untouchedFor": "5m",
     "grace": 3
   },
+  "plan": {
+    "comment": "The engine's three questions every so many calls: what you work on, which todos you finished, which you add. The third stays away past mostOpen. spec/design_output/stop.md, chapter The plan, says the rest.",
+    "everyCalls": 10,
+    "mostOpen": 5,
+    "grace": 3
+  },
   "engine": {
     "comment": "The engine level one brings. spec/design_output/config.md, chapter The engine controls, says what each value means.",
     "binding": "queue"

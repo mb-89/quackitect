@@ -49,6 +49,8 @@ test("a tool call on a fresh box registers the patch tool and the check tool", a
 
   assert.ok(specNamed(said.register, PATCH), "the patch tool");
   assert.ok(specNamed(said.register, CHECK), "the check tool");
+  // The plan door registers its call beside the rest. [[spec/design_output/stop#the-plan]]
+  assert.ok(specNamed(said.register, "plan"), "the plan tool");
 });
 
 // The engine's ask meets every call through the server, so a spent grace refuses a read and lets the stop call through. [[spec/design_output/stop#the-grace]]
