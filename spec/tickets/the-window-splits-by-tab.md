@@ -89,12 +89,18 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
     hash_before: 9b115fd53d002bdb7a2533567dc8b2b132c3885e
     hash_after: 9b115fd53d002bdb7a2533567dc8b2b132c3885e
+  - step: design/review
+    hand: box 1670436ae0bb · claude-code-remote · helper-2
+    hash_before: b10ab9cd1427cee19ebf551044c8b4c502dd6483
+    hash_after: b10ab9cd1427cee19ebf551044c8b4c502dd6483
+    returns: 1
+    why: "design: The filter language in `filter.go` reads a log row and a tree item, so the log and the tree both read it. The chapter gives the tree the draw package alone, so the approach names the package the filter language lands in and what imports it.; design: The link in `link.go` draws in the tree and in the work tab, so the approach names the package it lands in.; design: The footer draws the log's order and floor, which the approach moves into the log tab, so the tab interface grows the method the footer reads them through.; craft: The build stamp reads every folder under `src/tui`, the draw, the tree and the frame among them, and the approach says the tab folders alone.; craft: `Frame` sets the log's rows, filter and floor, so the approach says how the root reaches them once they stand in the log tab.; craft: `saidStyle` in `colour.go` reads a log record, so it parts from the styles before they move to the draw package."
 ---
 
 # Ask
@@ -151,6 +157,15 @@ frame imports the draw and the tree packages alone.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- design: The filter language in `filter.go` reads a log row and a tree item, so the log and the tree both read it. The chapter gives the tree the draw package alone, so the approach names the package the filter language lands in and what imports it.
+- design: The link in `link.go` draws in the tree and in the work tab, so the approach names the package it lands in.
+- design: The footer draws the log's order and floor, which the approach moves into the log tab, so the tab interface grows the method the footer reads them through.
+- craft: The build stamp reads every folder under `src/tui`, the draw, the tree and the frame among them, and the approach says the tab folders alone.
+- craft: `Frame` sets the log's rows, filter and floor, so the approach says how the root reaches them once they stand in the log tab.
+- craft: `saidStyle` in `colour.go` reads a log record, so it parts from the styles before they move to the draw package.
 
 # implement
 
