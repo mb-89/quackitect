@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -105,6 +105,10 @@ record:
     hand: box fa49097ce66c · claude-code-remote
     hash_before: 0ca55c2c641de362c0dc0b682ebffbe56842183e
     hash_after: 0ca55c2c641de362c0dc0b682ebffbe56842183e
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-4
+    hash_before: 9c6d407f5dee5b289df025a62cc96d518cc2fa0d
+    hash_after: 9c6d407f5dee5b289df025a62cc96d518cc2fa0d
 ---
 
 # Ask
@@ -194,19 +198,18 @@ ticket covers the events after the server stands again.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- the reader sits in the registration branch of `decide`, which runs after the door. Seat it beside `freshens`.
-- the call meeting the restarted server reads an empty box under that order, which is the fault the ask names.
-- the four cases cover the registration and the context block. A case driving `tool.call` on a fresh box goes missing.
-- the reader refills the projections that `freshens` fills already on a fresh box. Leave that fill where it stands.
-- `box.tools` comes from `surveyHere`, which `src/bridge/guidance.js` exports nowhere. The change table names one file alone.
-- `decide` sets `box.specs` nowhere, and `toolsText` reads `box.specs ?? []`. Name that assignment in the change.
-- the mint throws on a fresh box, because `mintedNote` calls `schemas.get(kind)` over nothing. The draft names the empty enum alone.
-- `{ register }` registers on any event, by the answer table in `spec/design_output/level0.md`. The road for the patch tool holds.
+- the reader sits beside `freshens` in `decide`, ahead of the door. A restarted box fills before the first event.
+- the fault reads true. `SPECS` hands `mintSpec` an empty `box.schemas`, and the kind enum registers empty. `mintedNote` then throws on `schemas.get`.
+- the change table names `src/bridge/guidance.js`, where `surveyHere` stands unexported. It names the `box.specs` fill that `toolsText` reads.
+- the projections stay with `freshens`, which fills them on a fresh box itself.
+- the cases drive a `tool.call` on a fresh box, which the ask asks for. The mint case covers the throw.
 - the scope call holds. The window with no server standing belongs to [[spec/tickets/the-bridge-says-it-falls]].
-- the table on what a fresh box holds matches the tree. The write door fills `box.schemas` itself, and earns a row.
+- `./RUNME.sh check` exits 0 on this branch. The retro stands absent, which a branch mid-ticket calls for.
 - the draft touches the ticket file alone, so the diff stands inside the brief.
+- for implement: `decide` builds `specsOf(box)` again in its registration branch. Answer `box.specs` there instead.
+- for implement: the mint refuses an unknown kind, and writes a known one, once the schemas stand.
 
 # implement
 
