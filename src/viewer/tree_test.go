@@ -152,7 +152,7 @@ func TestADeclarationSayingFlatNestsNothing(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/tree-view#the-columns-stand-still]]
+// [[spec/design_output/tree-view#a-tab-joins-the-two]]
 func TestTheRowsScrollAndTheColumnNamesHold(t *testing.T) {
 	t.Parallel()
 	many := make([]Item, 0, 30)

@@ -5,9 +5,9 @@ status: done
 
 # Where it stands
 
-The branch closes seven tickets of `the-rules-hold-themselves`, and the tip
-stands green: `./RUNME.sh check` answers 0, and `./RUNME.sh branch review
-the-rules-hold-themselves` says the check passes.
+The branch closes seven tickets of `the-rules-hold-themselves`, and an eighth
+stands at its verdict. The tip stands green: `./RUNME.sh check` answers 0 on
+two runs of 23 seconds each, with no rule timing out.
 
 | ticket | what lands |
 |---|---|
@@ -18,18 +18,18 @@ the-rules-hold-themselves` says the check passes.
 | `runtime-half-takes-the-rest` | the register stands under the runtime half |
 | `a-project-adds-vale-rules` | the styles of both roots assemble, and the vale door reads them |
 | `a-check-finds-every-writer` | the escape binds to the line, and the installer meets its lists |
+| `a-check-finds-restated-facts` | three rules find one fact written in two places |
 
 Each one carries its evidence on its ticket. A hand other than the one making
 the change passes every verdict.
 
 # What waits
 
-Five tickets stand open in this group. Each carries an approach under its draft,
+Four tickets stand open in this group. Each carries an approach under its draft,
 and each waits for a hand other than this box to read it:
 
 | ticket | where it stands |
 |---|---|
-| `a-check-finds-restated-facts` | design/review |
 | `a-lint-holds-note-rules` | design/review |
 | `the-check-holds-test-first` | design/review |
 | `the-door-reads-script-writes` | design/review |
@@ -38,9 +38,21 @@ and each waits for a hand other than this box to read it:
 The pull writes the prompt for that hand. A box spawns it, and takes the
 implement steps itself once the review passes.
 
-## Two findings for the retro
+## The queue binds one hand
 
-The private folder dies with this box, so the two notes it holds stand here.
+The queue binds a session to the ticket it hands out. So a named pull answers
+that the ticket stands behind the queue, and the spawn prompt opens with a
+nameless pull for that reason. [[src/scripts/pull.js]]
+
+| what a box does | what it gets |
+|---|---|
+| spawns four hands at once | all four take the same leaf, and three drop their hold |
+| runs four hands at once | Vale gives up on a rule at two seconds, and the lint calls every voice rule unchecked |
+| spawns one hand at a time | the hand takes the leaf the queue hands it |
+
+## Three findings for the retro
+
+The private folder dies with this box, so the notes it holds stand here.
 
 The first: a lone code mark in prose leaves an odd count of that mark in the
 file. The script rules pair the marks in the order they stand. So every span
@@ -53,6 +65,13 @@ roads read the method's config. They are the answer gate, the findings road and
 the copilot road. So a rule a project alone holds refuses a write and passes the
 lint. Each road takes the pair of roots and calls the assembly, the way the door
 does.
+
+| the third finding | what it says |
+|---|---|
+| what happens | a heading rename leaves every pointer at its old slug reaching nothing |
+| where | a chapter of `spec/design_output/tree-view.md`, and two comments under `src/viewer` |
+| what the check says | nothing, on either comment |
+| the fix for the class | a check reads a pointer's own slug against the headings of the note it names |
 
 ## What this box leaves behind
 
