@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box a05106ef44c2 · claude-code-remote
@@ -103,6 +103,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box a05106ef44c2 · claude-code-remote
+    hash_before: 6aeaa4f833e550e058a92e79054568b155dc1185
+    hash_after: 6aeaa4f833e550e058a92e79054568b155dc1185
 ---
 
 # Ask
@@ -152,39 +156,42 @@ The findings the desk parked as private notes, each a defect an agent fixes with
 
 ### done
 
-<!-- what was done, one line a ticket or a thing -->
-
-<!-- the form is list -->
+- `a-test-importing-cli-exits`: the command line guards its main, and the register case it hid names the right file
+- `the-battery-flickers-under-load`: the check ran the number of times the ask names, and every run answered green
+- `the-respawn-answers-no-server`: the restart goes through the process door, watched, with the child's output in the serve log
+- `the-stop-line-loops-forever`: the cap ends a turn over the queue rule, and the runaway line writes at warn with its count
 
 ### well
 
-<!-- what went well, and what made it go well -->
-
-<!-- the form is list -->
+- each child landed as one commit, because the hand-back runs the tests and the check and refuses a red one
+- the guard brought a red case out of the empty pass, because the case then ran for the first time
+- the commit door refused the first hand-back, because the hook scripts changed with no test beside them. The transcript at the first pass of the first child
 
 ### badly
 
-<!-- what did not, each with its moment in the log or the transcript -->
-
-<!-- the form is list -->
+- the commit door refused the first hand-back, because the hook scripts' guards changed with no test beside them. The transcript at the first pass of the first child
+- the runaway line said no holds, because the tooth reset its count before the decision carried it. The red run of the stop door test after the flag went
+- a kill by pattern matched the shell running it, so the check loop started twice. The transcript at the relaunch of the loop
+- the prose rules refused the past tense and a half saying what a thing is not. The lint lines after the respawn chapter
 
 ### improve
 
-<!-- how each bad line stops happening, named by its home -->
-
-<!-- the form is list -->
+- a change widening past the ask reads the test-first rule first, and stays with the ask: `spec/guidance/working`
+- a change to a log line comes with a case asserting the words, so the count reads right first: `test/level0/stop-door.test.js`
+- a loop of the hand's own starts from a script file and stops by its task, with no kill by pattern: `.se/scripts`
+- a note meets the lint verb before the hand-back, because no write door holds a session the server misses: `spec/guidance/cloud`
 
 ### thoughts
 
-<!-- what the thoughts say that the actions do not, off the transcript -->
+The respawn could stay in the wire door or move to the process door. The ask names a fake process door, and no fake stands for the wire, so it moved. The queue rule's flag came from an earlier ticket, where the cap let a session with work end. This ask names the opposite fault, a session refusing the stop line over work it leaves untaken. The note now says the cap wins and the queue stands for the next prompt. So both faults have their answer there.
 
-<!-- the form is text -->
+The child's output went to a file and to no pipe. A pipe dies with the old server, and the child's next write to it errors. The canary line stood nowhere in this session, so no write door refused a write here, and the lint verb stood in for it.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- every fact stands in one place: the guard, the window, the log's name and the cap each live in one note
+- every number carries a name in one place: the window and the contract's waits stand as named constants. The runs table holds its counts
+- every header says what its file is for: the wire door's header names the listen alone, and no header counts
 
 ## cloud
 
