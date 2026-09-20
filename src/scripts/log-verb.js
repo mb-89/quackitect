@@ -7,6 +7,7 @@ import {
   atLevel,
   filesFor,
   lastOf,
+  NO_LOG,
   ofKind,
   rowsIn,
   within,
@@ -30,7 +31,7 @@ export function logVerb(it, argv) {
   const now = it.clock.now().getTime();
   const paths = filesFor(it, flagOf(said, "--since"), now);
   if (!paths.length) {
-    console.log("No log stands yet. A writer starts one the next time it says a line.");
+    console.log(NO_LOG);
     return 0;
   }
 

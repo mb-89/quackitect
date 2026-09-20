@@ -13,7 +13,7 @@ import {
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
 import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
-import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { MS, rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
 import {
@@ -56,7 +56,6 @@ export const KIND = "refactor";
 export const REFACTOR_ANSWERED = "refactor.answered";
 const BREAK = "SE_BREAK_ON_STOP";
 const HELPER = "general-purpose";
-const MS = 1000;
 const SAID = 200;
 const LINE = /^stop:\s*([a-z0-9-]+)\s*$/i;
 const PASS = { pass: true };

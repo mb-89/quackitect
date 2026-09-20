@@ -6,7 +6,7 @@
 
 import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { PORT } from "../bridge/window.js";
-import { asRow, filesFor, rowsIn, SESSION } from "./log-read.js";
+import { asRow, filesFor, NO_LOG, rowsIn, SESSION } from "./log-read.js";
 
 export const TABS = ["log", "work"];
 
@@ -64,7 +64,7 @@ function plainRows(it, argv, session, plain) {
       ? [session]
       : [];
   if (!read.length) {
-    console.log("No log stands yet. A writer starts one the next time it says a line.");
+    console.log(NO_LOG);
     return 0;
   }
   for (const path of read) {

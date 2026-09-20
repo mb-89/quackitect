@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -207,6 +207,14 @@ record:
     hand: box 099c2ec7708d · claude-code-remote
     hash_before: 62cfe183d9ec1ca0aa9d642c6f270842be93abc5
     hash_after: 62cfe183d9ec1ca0aa9d642c6f270842be93abc5
+  - step: implement/change
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 164528f91bba4659eeb00a2225e2943aa01afc66
+    hash_after: 164528f91bba4659eeb00a2225e2943aa01afc66
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -370,16 +378,16 @@ A move that leaves a copy standing costs the next reader a search, which the gre
 <!-- the tree builds and lints -->
 <!-- the form is command -->
 
-./RUNME.sh lint src test
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches the verb, the read, the cases and the chapter the approach names
-- the disk and the clock reach the verb as doors, and `fakeDisk` drives the cases
-- each header points at the chapter the approach names, and that chapter owns the flags
+- the fix touches the two modules keeping their own copy, and the two verbs sharing the line
+- the doors stand untouched, so every case beside them reads as it reads
+- the class under `implement/reflect` names the approach each hunk follows
 
 ## tests-green
 

@@ -15,6 +15,9 @@ import {
 import { spanOf } from "./group.js";
 
 const END = ".jsonl";
+// What a reader meets where no writer has said a line yet. [[spec/design_output/log#one-verb-reads-the-log]]
+export const NO_LOG =
+  "No log stands yet. A writer starts one the next time it says a line.";
 
 // [[spec/design_output/log#one-verb-reads-the-log]]
 export function within(rows, span, now) {
