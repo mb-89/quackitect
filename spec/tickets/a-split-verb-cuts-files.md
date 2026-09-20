@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -194,6 +194,17 @@ record:
     hash_after: 7986db8c0750c1a2328025fb00d298c0fb2f467a
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 5cbae2965ef4cb76f3bef4d03f3c74b511f7365e
+    hash_after: 5cbae2965ef4cb76f3bef4d03f3c74b511f7365e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 13 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -425,7 +436,14 @@ The refusal parks a private ticket through `./RUNME.sh ticket note`, and names w
 - a second refusal on the same file names the note that stands, and writes none
 - a refused run answers the line the verb says, so no refusal goes quiet
 
-The verdict round found every fault behind a fake agreeing with the code. `test/contract/split-note.test.js` drives the real verb now, and it catches the name rule the fake hid.
+Two verdict rounds found faults where the code takes the tree's shape for granted:
+
+| what the code assumed | what stands now |
+|---|---|
+| a basename names one file | the folder above it joins the note's name |
+| a target's folder stands | the write makes it, and a refusal answers a line |
+
+`test/contract/split-note.test.js` drives the real verb, and it catches the name rule a fake hid.
 
 ### checked
 
