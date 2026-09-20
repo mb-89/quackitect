@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -149,6 +149,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-13
+    hash_before: 36adad410996928249d857c7708a3ddf4c505106
+    hash_after: 36adad410996928249d857c7708a3ddf4c505106
+    returns: 1
+    why: "| the finding | the fix |; |---|---|; | No fake takes `behaves`, so a door test still reads nothing for a call its fake lacks. The approach hands the guard to every fake | Wrap each fake under `src/doors/fake` in the guard, and let a case prove one throws |; | Rule five of [[spec/guidance/code/testing]] points at no program, and the approach says that line points at the check | Put the link in the rule, the way rule ten points at [[spec/guidance/code/code]] |; | `untestedIn` drops the whole delta once any test file stands in it, so one stale test carries many changed modules | Pair a test with the file it names, or say under `says` what the loose reading buys |; | `test/level0/tools-door.test.js` takes a new subject, and the cases over the session-start survey and the tools block go. No test names them now | Put those cases back under their own name, and leave the new door its own file |; What holds:; `./RUNME.sh check` exits 0 on the commit this verdict stands on.; The change touches the readings, the guard, both doors, two notes and the tests, and nothing outside the brief.; Each rule takes a case feeding it something bad: a module no test imports, and a delta carrying no test.; The two doors read one text, because the hook pipes the staged delta the Bash door builds.; `HANDOVER.md` carries a retro chapter, and it records this ticket at an earlier step."
 ---
 
 # Ask
@@ -393,17 +399,61 @@ note says what the guard does. `./RUNME.sh lint` answers what either rule finds.
 
 <!-- the form is files -->
 
+    .claude/skills/level0/lib/tested.js
+    .claude/skills/level0/lib/tree.js
+    src/bridge/bash.js
+    src/scripts/precommit.js
+    .githooks/pre-commit
+    src/doors/fake/behaves.js
+    src/doors/fake/disk.js
+    src/doors/fake/git.js
+    spec/design_output/tree.md
+    spec/design_output/doors.md
+    spec/guidance/code/testing.md
+    spec/tickets/the-check-holds-test-first.md
+    test/level0/tested.test.js
+    test/level0/status.test.js
+    test/level0/prose.test.js
+    test/level0/apply-door.test.js
+    test/level0/ask-door.test.js
+    test/level0/config-door.test.js
+    test/level0/review-door.test.js
+    test/level0/search-door.test.js
+    test/level0/tools-door.test.js
+    test/level0/window-door.test.js
+    test/level0/guidance.test.js
+    HANDOVER.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+| the finding | the fix |
+|---|---|
+| No fake takes `behaves`, so a door test still reads nothing for a call its fake lacks. The approach hands the guard to every fake | Wrap each fake under `src/doors/fake` in the guard, and let a case prove one throws |
+| Rule five of [[spec/guidance/code/testing]] points at no program, and the approach says that line points at the check | Put the link in the rule, the way rule ten points at [[spec/guidance/code/code]] |
+| `untestedIn` drops the whole delta once any test file stands in it, so one stale test carries many changed modules | Pair a test with the file it names, or say under `says` what the loose reading buys |
+| `test/level0/tools-door.test.js` takes a new subject, and the cases over the session-start survey and the tools block go. No test names them now | Put those cases back under their own name, and leave the new door its own file |
+
+What holds:
+
+- `./RUNME.sh check` exits 0 on the commit this verdict stands on.
+- The change touches the readings, the guard, both doors, two notes and the tests, and nothing outside the brief.
+- Each rule takes a case feeding it something bad: a module no test imports, and a delta carrying no test.
+- The two doors read one text, because the hook pipes the staged delta the Bash door builds.
+- `HANDOVER.md` carries a retro chapter, and it records this ticket at an earlier step.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tree note tables the rule, the doors note holds the guard, and each module points at its chapter
 
 # Discussion
 
