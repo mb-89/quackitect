@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -129,6 +129,17 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote · helper-23
     hash_before: 1e55dd707f61d05f37a1f6d15df3b1fa211f813d
     hash_after: 1e55dd707f61d05f37a1f6d15df3b1fa211f813d
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 9aafbfe40e6a7719b161de01776f70d9ab73f543
+    hash_after: 9aafbfe40e6a7719b161de01776f70d9ab73f543
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -240,20 +251,27 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/work-brief-goes.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case seeds a branch carrying both a root handover and a group ticket. The listing reads the handover, so the kind column says `brief` where the ask wants `group`.
+
+What surprises: the two roads stand so close that one fixture holds both. `standingAll` reads the brief first, so the group's own standing hides behind a file the merge already drains.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the case stands in a file of its own, because `work.test.js` sits at the ceiling
+- the case drives `doorsSaying`, so git and the disk stand fake
+- the header names the one brief a work branch carries, and points at its chapter
 
 ## reflect
 
