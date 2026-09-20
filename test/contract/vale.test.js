@@ -6,7 +6,7 @@
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
-import { skip, test } from "node:test";
+import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { NOBODY } from "../../.claude/skills/level0/lib/private.js";
 import { disk } from "../../src/doors/disk.js";
@@ -19,8 +19,7 @@ import { at, NOTE, rulesIn } from "./ruled.js";
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const outside = proc();
-const { proves, stands } = rulesIn(root);
-const ifVale = stands ? test : skip;
+const { ifVale, proves } = rulesIn(root);
 
 // The real run teaches the fake, so the door answers the same through both. [[spec/design_output/doors#one-contract-test-per-door]]
 ifVale(
@@ -60,94 +59,108 @@ test("a box with no binary reads no rule, and says so", async () => {
   });
 });
 
-proves(
+ifVale(
   "a shouted lead is refused and an acronym inside a sentence passes",
-  {
-    shouted: "THIS IS THE SHOUTED PART, and it follows.",
-    acronym: "The engine reads SQLite and answers JSON.",
-  },
-  (said) => {
-    assert.ok(said.rules("shouted").includes("ShoutedLead"));
-    assert.ok(!said.rules("acronym").includes("ShoutedLead"));
-  },
+  proves(
+    {
+      shouted: "THIS IS THE SHOUTED PART, and it follows.",
+      acronym: "The engine reads SQLite and answers JSON.",
+    },
+    (said) => {
+      assert.ok(said.rules("shouted").includes("ShoutedLead"));
+      assert.ok(!said.rules("acronym").includes("ShoutedLead"));
+    },
+  ),
 );
 
-proves("antithesis is refused", { it: "It is a door rather than a window." }, (said) => {
-  assert.ok(said.rules("it").includes("Antithesis"));
-});
+ifVale(
+  "antithesis is refused",
+  proves({ it: "It is a door rather than a window." }, (said) => {
+    assert.ok(said.rules("it").includes("Antithesis"));
+  }),
+);
 
 // A marker places a claim in a tree that stands no more, and the rationales own that telling. [[spec/design_output/lsp#a-marker-carries-old-news]]
-proves(
+ifVale(
   "a history marker is refused and the standing claim passes",
-  {
-    usedTo: "The door used to read the config.",
-    previously: "The door previously names the file.",
-    standing: "The door reads the config.",
-  },
-  (said) => {
-    assert.ok(said.rules("usedTo").includes("History"));
-    assert.ok(said.rules("previously").includes("History"));
-    assert.ok(!said.rules("standing").includes("History"));
-  },
+  proves(
+    {
+      usedTo: "The door used to read the config.",
+      previously: "The door previously names the file.",
+      standing: "The door reads the config.",
+    },
+    (said) => {
+      assert.ok(said.rules("usedTo").includes("History"));
+      assert.ok(said.rules("previously").includes("History"));
+      assert.ok(!said.rules("standing").includes("History"));
+    },
+  ),
 );
 
-proves(
+ifVale(
   "the passive is refused and the active passes",
-  {
-    passive: "The file was written by the engine.",
-    active: "The engine writes the file.",
-  },
-  (said) => {
-    assert.ok(said.rules("passive").includes("Passive"));
-    assert.ok(!said.rules("active").includes("Passive"));
-  },
+  proves(
+    {
+      passive: "The file was written by the engine.",
+      active: "The engine writes the file.",
+    },
+    (said) => {
+      assert.ok(said.rules("passive").includes("Passive"));
+      assert.ok(!said.rules("active").includes("Passive"));
+    },
+  ),
 );
 
-proves(
+ifVale(
   "a table and a list are not paragraphs",
-  { table: "| a | b |\n| - | - |\n", list: "- one\n- two\n" },
-  (said) => {
+  proves({ table: "| a | b |\n| - | - |\n", list: "- one\n- two\n" }, (said) => {
     assert.deepEqual(said.rules("table"), []);
     assert.deepEqual(said.rules("list"), []);
-  },
+  }),
 );
 
-proves(
+ifVale(
   "fenced code carries none of these rules",
-  { fenced: "```\nTHIS IS SHOUTED CODE, and it is left alone.\n```\n" },
-  (said) => {
-    assert.deepEqual(said.rules("fenced"), []);
-  },
+  proves(
+    { fenced: "```\nTHIS IS SHOUTED CODE, and it is left alone.\n```\n" },
+    (said) => {
+      assert.deepEqual(said.rules("fenced"), []);
+    },
+  ),
 );
 
 const BINDS = "- The door shall refuse the write, and it should name the rule.\n";
 const INPUT = "spec/design_input/one.md";
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
-proves(
+ifVale(
   "the requirement register takes shall and should, and no other does",
-  {
-    input: at(BINDS, INPUT),
-    note: BINDS,
-    output: at(BINDS, "spec/design_output/one.md"),
-  },
-  (said) => {
-    assert.deepEqual(said.rules("input"), []);
-    for (const key of ["note", "output"])
-      assert.ok(said.rules(key).includes("Modal"), `${key} refuses shall and should`);
-  },
+  proves(
+    {
+      input: at(BINDS, INPUT),
+      note: BINDS,
+      output: at(BINDS, "spec/design_output/one.md"),
+    },
+    (said) => {
+      assert.deepEqual(said.rules("input"), []);
+      for (const key of ["note", "output"])
+        assert.ok(said.rules(key).includes("Modal"), `${key} refuses shall and should`);
+    },
+  ),
 );
 
-proves(
+ifVale(
   "the register outside the set stands refused inside it too",
-  { loose: at("- The door may refuse the write, and it would say why.\n", INPUT) },
-  (said) => {
-    assert.ok(said.rules("loose").includes("ModalRequirement"));
-    assert.ok(
-      !said.rules("loose").includes("Modal"),
-      "one modal rule reads a path, and one alone",
-    );
-  },
+  proves(
+    { loose: at("- The door may refuse the write, and it would say why.\n", INPUT) },
+    (said) => {
+      assert.ok(said.rules("loose").includes("ModalRequirement"));
+      assert.ok(
+        !said.rules("loose").includes("Modal"),
+        "one modal rule reads a path, and one alone",
+      );
+    },
+  ),
 );
 
 // [[spec/design_output/private#a-fixture-carries-no-shape]]
@@ -155,33 +168,37 @@ const SECRETS = ["/home", "fnordwick", "secrets"].join("/");
 const CALLED = ["+49 30", "1234 5678"].join(" ");
 
 // [[spec/design_output/private#the-shapes]]
-proves(
+ifVale(
   "the shapes rule refuses an address, a number, a date and a home path",
-  [
-    "Reach the owner at somebody@example.com when the box stalls.",
-    `Call ${CALLED} about it, and say what stalls.`,
-    "Measured on 2026-09-10 against client 2.1.267, on a cloud box.",
-    `The probe writes under ${SECRETS} and reads it back.`,
-    "A box answers C:\\Users\\fnordwick\\Desktop as the home folder there.",
-  ],
-  (said) => {
-    for (const key of [0, 1, 2, 3, 4])
-      assert.ok(said.rules(key).includes("Private"), said.text(key));
-  },
+  proves(
+    [
+      "Reach the owner at somebody@example.com when the box stalls.",
+      `Call ${CALLED} about it, and say what stalls.`,
+      "Measured on 2026-09-10 against client 2.1.267, on a cloud box.",
+      `The probe writes under ${SECRETS} and reads it back.`,
+      "A box answers C:\\Users\\fnordwick\\Desktop as the home folder there.",
+    ],
+    (said) => {
+      for (const key of [0, 1, 2, 3, 4])
+        assert.ok(said.rules(key).includes("Private"), said.text(key));
+    },
+  ),
 );
 
-proves(
+ifVale(
   "a nobody user, a version and an example pass the shapes rule",
-  [
-    "A cloud box writes under /home/user, and a fixture writes /Users/one.",
-    "A runner writes under /home/runner, and an agent under /home/claude.",
-    "Client 2.1.267 stands the same way, and the number 1024 passes.",
-    `    the indented example: 2026-09-08 and ${SECRETS}\n`,
-  ],
-  (said) => {
-    for (const key of [0, 1, 2, 3])
-      assert.ok(!said.rules(key).includes("Private"), said.text(key));
-  },
+  proves(
+    [
+      "A cloud box writes under /home/user, and a fixture writes /Users/one.",
+      "A runner writes under /home/runner, and an agent under /home/claude.",
+      "Client 2.1.267 stands the same way, and the number 1024 passes.",
+      `    the indented example: 2026-09-08 and ${SECRETS}\n`,
+    ],
+    (said) => {
+      for (const key of [0, 1, 2, 3])
+        assert.ok(!said.rules(key).includes("Private"), said.text(key));
+    },
+  ),
 );
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
@@ -192,58 +209,63 @@ const saidOf = (said, key, rule) =>
     .map((one) => one.message);
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
-proves(
+ifVale(
   "a word the list leaves out is refused, and the refusal names it",
-  { it: "The door refuses a flibbertigibbet." },
-  (said) => {
+  proves({ it: "The door refuses a flibbertigibbet." }, (said) => {
     const found = saidOf(said, "it", "Vocabulary");
     assert.equal(found.length, 1);
-    assert.match(found[0], /^flibbertigibbet stands outside the words this tree writes/);
+    assert.match(
+      found[0],
+      /^flibbertigibbet stands outside the words this tree writes/,
+    );
     assert.match(found[0], /terms\.yml/);
-  },
+  }),
 );
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
-proves(
+ifVale(
   "a word the list swaps is refused, and the refusal names the swap",
-  { it: "The door utilize the list." },
-  (said) => {
+  proves({ it: "The door utilize the list." }, (said) => {
     assert.deepEqual(saidOf(said, "it", "Vocabulary"), [
       "utilize stands outside the words this tree writes. Write use instead.",
     ]);
-  },
+  }),
 );
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
-proves(
+ifVale(
   "the words this tree writes pass, and so does what stands outside a layer",
-  [
-    "The door refuses a write, and the writer reads the refusal.",
-    "A run of doors reads the rules, and the rules stand in one folder.",
-    "The tree writes `flibbertigibbet` in a code span, so the rule reads past it.",
-    "A path like spec/vocabulary/words.yml stands outside the layer.",
-    "The owner reads [[spec/funnel/a-paragraph-has-a-schema]] first.",
-    "A capital past the first word names Flibbertigibbet, so it stands.",
-    "The door reads 2048 bytes and the rule passes over a digit.",
-  ],
-  (said) => {
-    for (const key of [0, 1, 2, 3, 4, 5, 6])
-      assert.deepEqual(saidOf(said, key, "Vocabulary"), [], said.text(key));
-  },
+  proves(
+    [
+      "The door refuses a write, and the writer reads the refusal.",
+      "A run of doors reads the rules, and the rules stand in one folder.",
+      "The tree writes `flibbertigibbet` in a code span, so the rule reads past it.",
+      "A path like spec/vocabulary/words.yml stands outside the layer.",
+      "The owner reads [[spec/funnel/a-paragraph-has-a-schema]] first.",
+      "A capital past the first word names Flibbertigibbet, so it stands.",
+      "The door reads 2048 bytes and the rule passes over a digit.",
+    ],
+    (said) => {
+      for (const key of [0, 1, 2, 3, 4, 5, 6])
+        assert.deepEqual(saidOf(said, key, "Vocabulary"), [], said.text(key));
+    },
+  ),
 );
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
-proves(
+ifVale(
   "a plural, a past form and an -ing form of a listed word stand",
-  [
-    "The door refuses a write, and the doors refused it.",
-    "The door is refusing a write, and the writer stands waiting.",
-    "The rules carry the tries a session tried.",
-  ],
-  (said) => {
-    for (const key of [0, 1, 2])
-      assert.deepEqual(saidOf(said, key, "Vocabulary"), [], said.text(key));
-  },
+  proves(
+    [
+      "The door refuses a write, and the doors refused it.",
+      "The door is refusing a write, and the writer stands waiting.",
+      "The rules carry the tries a session tried.",
+    ],
+    (said) => {
+      for (const key of [0, 1, 2])
+        assert.deepEqual(saidOf(said, key, "Vocabulary"), [], said.text(key));
+    },
+  ),
 );
 
 test("the shapes rule and the commit door pass one list of nobody users", () => {
@@ -258,31 +280,33 @@ const DESIGN = "spec/design_output/probe.md";
 const BARE = "The verb exits 0 on survives.\n";
 
 // [[spec/design_output/config#the-magic-numbers-take-names]]
-proves(
+ifVale(
   "a digit in a design note's prose is refused, and a version, a unit and a table pass",
-  {
-    bare: at(BARE, DESIGN),
-    quiet: at(
-      [
-        "Measured against client 2.1.267, a poll every 250 ms stands, and x86 ships.",
-        "",
-        "| what | count |",
-        "|---|---|",
-        "| events | 186 |",
-        "",
-        "1. The verb exits `0` on survives.",
-        "",
-      ].join("\n"),
-      DESIGN,
-    ),
-    note: BARE,
-  },
-  (said) => {
-    assert.ok(said.rules("bare").includes("DigitInProse"));
-    assert.deepEqual(
-      said.rules("quiet").filter((one) => one === "DigitInProse"),
-      [],
-    );
-    assert.ok(!said.rules("note").includes("DigitInProse"));
-  },
+  proves(
+    {
+      bare: at(BARE, DESIGN),
+      quiet: at(
+        [
+          "Measured against client 2.1.267, a poll every 250 ms stands, and x86 ships.",
+          "",
+          "| what | count |",
+          "|---|---|",
+          "| events | 186 |",
+          "",
+          "1. The verb exits `0` on survives.",
+          "",
+        ].join("\n"),
+        DESIGN,
+      ),
+      note: BARE,
+    },
+    (said) => {
+      assert.ok(said.rules("bare").includes("DigitInProse"));
+      assert.deepEqual(
+        said.rules("quiet").filter((one) => one === "DigitInProse"),
+        [],
+      );
+      assert.ok(!said.rules("note").includes("DigitInProse"));
+    },
+  ),
 );

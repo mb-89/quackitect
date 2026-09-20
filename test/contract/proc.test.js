@@ -3,7 +3,9 @@
 // [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import { test } from "node:test";
+import { disk } from "../../src/doors/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { proc } from "../../src/doors/proc.js";
 
@@ -48,6 +50,27 @@ test("a start answers what a run answers, in the real door and the fake alike", 
     }),
   );
   assert.deepEqual(fake, real);
+});
+
+// The tally the check names, one line a spawn, off the real door. [[spec/design_output/work#the-battery-answers-first]]
+test("a door told to tally writes the program's name, one line a spawn", () => {
+  const folder = disk().tempDir("tally-");
+  const tally = join(folder, "spawns.txt");
+  const was = process.env.SE_SPAWNS;
+  process.env.SE_SPAWNS = tally;
+  try {
+    const door = proc();
+    door.run(SAYS);
+    door.run(FAILS);
+    assert.deepEqual(disk().read(tally).trim().split("\n"), [
+      process.execPath,
+      process.execPath,
+    ]);
+  } finally {
+    if (was === undefined) delete process.env.SE_SPAWNS;
+    else process.env.SE_SPAWNS = was;
+    disk().remove(folder);
+  }
 });
 
 test("the fake refuses a command nobody taught it", () => {

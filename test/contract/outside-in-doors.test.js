@@ -13,7 +13,7 @@ import { at, configSections, ruleAt, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
-const { proves } = rulesIn(root);
+const { ifVale, proves } = rulesIn(root);
 
 const RULE = "OutsideInDoors";
 const GUARD = "DoorsOnly";
@@ -46,21 +46,23 @@ const NODE = ['import { readFileSync } from "node', ':fs";\n'].join("");
 const MODULE = "src/bridge/stop.js";
 const EXTENSION = "src/extension/extension.js";
 
-proves(
+ifVale(
   "the rule refuses a module past a root reading the environment, and a Go file importing the command package",
-  {
-    reads: at(READS, MODULE),
-    argv: at(ARGV, MODULE),
-    platform: at(PLATFORM, MODULE),
-    spawn: at(SPAWN, "src/lsp/check.go"),
-    node: at(NODE, EXTENSION),
-  },
-  (said) => {
-    for (const key of ["reads", "argv", "platform", "spawn"])
-      assert.ok(said.rules(key).includes(RULE), key);
-    // The extension takes a section of its own, so the import guard holds where it stands. [[spec/design_output/doors#a-door-reads-the-outside]]
-    assert.ok(said.rules("node").includes(GUARD));
-  },
+  proves(
+    {
+      reads: at(READS, MODULE),
+      argv: at(ARGV, MODULE),
+      platform: at(PLATFORM, MODULE),
+      spawn: at(SPAWN, "src/lsp/check.go"),
+      node: at(NODE, EXTENSION),
+    },
+    (said) => {
+      for (const key of ["reads", "argv", "platform", "spawn"])
+        assert.ok(said.rules(key).includes(RULE), key);
+      // The extension takes a section of its own, so the import guard holds where it stands. [[spec/design_output/doors#a-door-reads-the-outside]]
+      assert.ok(said.rules("node").includes(GUARD));
+    },
+  ),
 );
 
 // The sections of the config, read once, because every case below reads them the way Vale does. [[spec/design_output/doors#a-door-reads-the-outside]]

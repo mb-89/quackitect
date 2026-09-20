@@ -20,7 +20,11 @@ export const at = (text, where) => ({ text, where });
 // Vale's own glob over a section head, where a star spans a slash and braces name alternatives. The matcher in lib/paths.js reads a schema's globs, where a star stops at a slash, so this one stands beside it. [[spec/design_output/doors#a-door-reads-the-outside]]
 export function sectionMatches(head, path) {
   const said = new RegExp(`^${patternOf(head)}$`);
-  return said.test(String(path ?? "").split("\\").join("/"));
+  return said.test(
+    String(path ?? "")
+      .split("\\")
+      .join("/"),
+  );
 }
 
 function patternOf(glob) {
@@ -95,7 +99,10 @@ export function rulesIn(root, where = NOTE, { fixes = false } = {}) {
 
   // One run over the folder, and the findings a probe. [[spec/design_output/doors#one-contract-test-per-door]]
   const linted = (batch, folder) => {
-    const ran = run([config, "--output=JSON", "--no-exit", ...batch.map((_, i) => `p${i}`)], folder);
+    const ran = run(
+      [config, "--output=JSON", "--no-exit", ...batch.map((_, i) => `p${i}`)],
+      folder,
+    );
     const fault = faultIn(ran.stdout);
     if (fault || (ran.exitCode !== 0 && !ran.stdout)) {
       throw new Error(`vale ran not: ${fault || ran.stderr || "it answered nothing"}`);
@@ -136,17 +143,17 @@ export function rulesIn(root, where = NOTE, { fixes = false } = {}) {
     }
   };
 
-  // A case over a table of texts: the findings come off the one run, and the check reads them by key. [[spec/design_output/doors#one-contract-test-per-door]]
-  function proves(name, texts, check) {
+  // A case body over a table of texts: the findings come off the one run, and the check reads them by key. The file hands it to the runner itself, so the runner names that file. [[spec/design_output/doors#one-contract-test-per-door]]
+  function proves(texts, check) {
     const held = new Map(
       Object.entries(texts).map(([key, one]) => [key, declare(one)]),
     );
     const probe = (key) => {
       const one = held.get(String(key));
-      if (!one) throw new Error(`${name} declares no text ${key}`);
+      if (!one) throw new Error(`the case declares no text ${key}`);
       return one;
     };
-    (stands ? test : skip)(name, async () => {
+    return async () => {
       settle();
       await check({
         found: (key) => probe(key).found,
@@ -155,8 +162,8 @@ export function rulesIn(root, where = NOTE, { fixes = false } = {}) {
         fixed: (key) => probe(key).fixed,
         settled: (key) => probe(key).settled,
       });
-    });
+    };
   }
 
-  return { stands, proves, spawned: () => spawned };
+  return { stands, ifVale: stands ? test : skip, proves, spawned: () => spawned };
 }

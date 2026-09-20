@@ -89,7 +89,8 @@ test("a copy answers its own verbs, with no tree behind it", () => {
       env: {
         HOME: home,
         USERPROFILE: home,
-        SE_INSTALL_SKIP: "vale biome vale-ls index se-lsp editor-client editor-extensions",
+        SE_INSTALL_SKIP:
+          "vale biome vale-ls index se-lsp editor-client editor-extensions",
       },
     });
     assert.equal(said.exitCode, 0, said.stderr);

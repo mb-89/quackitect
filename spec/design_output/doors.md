@@ -128,7 +128,7 @@ minute under load, and a red under that load names no cause. So one helper,
 
 | what a file does | what the helper does |
 |---|---|
-| declares each case with its texts at the top | writes every text under the path it names, each in a folder of its own |
+| hands the runner a case body the helper builds over the case's texts, at the top | writes every text under the path it names, each in a folder of its own |
 | reads the findings a text by key inside the case | runs Vale once over the folder, on the first case |
 | asks for the fixer | runs the fixer twice more over the folder, and reads each text back after each round |
 

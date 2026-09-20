@@ -32,7 +32,7 @@ import { at, rulesIn } from "./ruled.js";
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const outside = proc();
-const { proves } = rulesIn(root);
+const { ifVale, proves } = rulesIn(root);
 
 const here = treeOf({
   disk: files,
@@ -154,17 +154,19 @@ test("the guidance notes this tree ships hold the shape guidance names", () => {
 });
 
 // [[spec/design_output/schema#the-underscore-parks-a-draft]]
-proves(
+ifVale(
   "a draft parked under an underscore breaks no rule the styles hold",
-  {
-    parked: at(PAST, "spec/guidance/_probe.md"),
-    named: at(PAST, "spec/guidance/probe.md"),
-  },
-  (said) => {
-    assert.deepEqual(said.rules("parked"), []);
-    assert.ok(
-      said.rules("named").length,
-      "the same text, named without the underscore, meets the rules",
-    );
-  },
+  proves(
+    {
+      parked: at(PAST, "spec/guidance/_probe.md"),
+      named: at(PAST, "spec/guidance/probe.md"),
+    },
+    (said) => {
+      assert.deepEqual(said.rules("parked"), []);
+      assert.ok(
+        said.rules("named").length,
+        "the same text, named without the underscore, meets the rules",
+      );
+    },
+  ),
 );
