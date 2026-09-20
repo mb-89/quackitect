@@ -11,7 +11,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
+	"strconv"
+	"strings"
 )
 
 // The key opening the chord, and the digits closing it. [[spec/design_output/tui#the-work-tab-takes-edits]]
@@ -44,20 +45,22 @@ func (m *model) placeAt(key string) {
 		return
 	}
 	n := int(key[0] - '0')
-	beside := m.work.PlacedBeside(one.Name)
+	mine := m.work.PlaceOf(one.Name)
 	value := flagOn
 	switch {
 	// The same place again takes the todo off, so the score places the row once more. [[spec/design_output/pull#a-todo-forces-a-place]]
-	case one.Keys[todoKey] != "" && one.Keys[todoKey] != flagOff && m.work.PlaceOf(one.Name) == n:
+	case one.Keys[todoKey] != "" && one.Keys[todoKey] != flagOff && mine == n:
 		value = flagOff
-	case n == 1:
-	case n-1 < len(beside):
-		value = beside[n-1].Name
-	case n-1 == len(beside):
-		value = lastPlaceWord
-	default:
-		m.workNotice = fmt.Sprintf("%d rows stand at this level, so no row stands at %d", len(beside)+1, n)
+	case mine == n:
+		m.workNotice = fmt.Sprintf("%s stands at %d already", one.Name, n)
 		return
+	case n == 1:
+	default:
+		value = m.work.anchorFor(one.Name, n, mine)
+		if value == "" {
+			m.workNotice = fmt.Sprintf("the places at this level end at %d, so no row stands at %d", m.work.LastPlace(one.Name), n)
+			return
+		}
 	}
 	// The override lands in the plan file on this box, so the ticket's front stays as it is and nothing travels. [[spec/design_output/pull#a-todo-forces-a-place]]
 	setValue(one, todoKey, flagOf(value != flagOff))
@@ -98,35 +101,57 @@ func writePlace(root, name, value string) error {
 	return os.WriteFile(file, append(said, '\n'), 0o644)
 }
 
-// The place a row holds at its own level, counted from one, and zero where it holds none. [[spec/design_output/pull#a-todo-forces-a-place]]
+// The place a row holds at its own level: the last segment of its queue number, and zero where it holds none or stands ahead of one. [[spec/design_output/pull#a-todo-forces-a-place]]
 func (t Tree) PlaceOf(name string) int {
-	placed := []Item{}
 	for _, held := range t.Siblings(name) {
-		if held.Keys[queueKey] != "" {
-			placed = append(placed, held)
-		}
-	}
-	sort.SliceStable(placed, func(a, b int) bool {
-		return under(placed[a].Keys[queueKey], placed[b].Keys[queueKey])
-	})
-	for at, held := range placed {
 		if held.Name == name {
-			return at + 1
+			return placeNumber(held.Keys[queueKey])
 		}
 	}
 	return 0
 }
 
-// The rows beside one at its own level that hold a place, in place order, without the row itself. [[spec/design_output/pull#the-queue-is-an-outline]]
-func (t Tree) PlacedBeside(name string) []Item {
-	out := []Item{}
+// The row a place stands before: the row at n where the row moves up, the row past n where it moves down, and last past the end. [[spec/design_output/pull#a-todo-forces-a-place]]
+func (t Tree) anchorFor(name string, n, mine int) string {
+	if mine == 0 || n < mine {
+		return t.SiblingAt(name, n)
+	}
+	if at := t.SiblingAt(name, n+1); at != "" {
+		return at
+	}
+	if t.LastPlace(name) >= n {
+		return lastPlaceWord
+	}
+	return ""
+}
+
+// The sibling standing at that place, by its own number, and nothing where none does. [[spec/design_output/pull#a-todo-forces-a-place]]
+func (t Tree) SiblingAt(name string, n int) string {
 	for _, held := range t.Siblings(name) {
-		if held.Name != name && held.Keys[queueKey] != "" {
-			out = append(out, held)
+		if held.Name != name && placeNumber(held.Keys[queueKey]) == n {
+			return held.Name
 		}
 	}
-	sort.SliceStable(out, func(a, b int) bool {
-		return under(out[a].Keys[queueKey], out[b].Keys[queueKey])
-	})
-	return out
+	return ""
+}
+
+// The highest place any sibling holds, so a press one past it means last. [[spec/design_output/pull#a-todo-forces-a-place]]
+func (t Tree) LastPlace(name string) int {
+	last := 0
+	for _, held := range t.Siblings(name) {
+		if held.Name != name {
+			last = max(last, placeNumber(held.Keys[queueKey]))
+		}
+	}
+	return last
+}
+
+// The number a place ends on, so `2.3` reads three, and a negative or empty place reads zero. [[spec/design_output/pull#a-todo-forces-a-place]]
+func placeNumber(place string) int {
+	segments := strings.Split(place, ".")
+	n, err := strconv.Atoi(segments[len(segments)-1])
+	if err != nil || n < 0 || strings.HasPrefix(place, "-") {
+		return 0
+	}
+	return n
 }

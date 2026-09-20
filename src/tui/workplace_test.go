@@ -68,20 +68,25 @@ func TestPThenADigitWritesTheTodoTheQueueReads(t *testing.T) {
 	m = pressed(toRow(m, "a-loose-one"), "p", "1")
 	m = pressed(toRow(m, "one-group"), "p", "1")
 	m.work.Items[0].Keys[queueKey], m.work.Items[1].Keys[queueKey] = "2", "1"
+	// The same place again takes the todo off, whatever rows stand ahead. [[spec/design_output/pull#a-todo-forces-a-place]]
 	m = pressed(toRow(m, "one-group"), "p", "2")
-	if placeIn(t, root, "one-group") != "last" {
-		t.Fatalf("two rows at a level put the second last, and the front reads:\n%s", frontAt(t, root, "one-group"))
+	if placeIn(t, root, "one-group") != "" || m.work.Items[0].Keys[todoKey] != flagOff {
+		t.Fatalf("the same digit again clears the todo, and the plan reads %q", placeIn(t, root, "one-group"))
+	}
+	m = pressed(toRow(m, "one-group"), "p", "2")
+	if !strings.Contains(m.workNotice, "already") {
+		t.Fatalf("a row at its own place with no todo says so, and the tab says %q", m.workNotice)
 	}
 	m.work.Items = append(m.work.Items, Item{Name: "third", Keys: map[string]string{queueKey: "3", "path": "spec/tickets/third.md"}})
-	m.work.Items[0].Keys[todoKey] = ""
-	m = pressed(toRow(m, "one-group"), "p", "2")
-	if placeIn(t, root, "one-group") != "third" {
-		t.Fatalf("place 2 names the row standing there, and the front reads:\n%s", frontAt(t, root, "one-group"))
+	m.work.rebuild()
+	// A row moving up stands before the row at that place, and one moving down stands before the row past it. [[spec/design_output/pull#a-todo-forces-a-place]]
+	m = pressed(toRow(m, "third"), "p", "2")
+	if placeIn(t, root, "third") != "one-group" {
+		t.Fatalf("place 2 from below names the row standing at 2, and the plan reads %q", placeIn(t, root, "third"))
 	}
-	// The same place again takes the todo off. [[spec/design_output/pull#a-todo-forces-a-place]]
-	m = pressed(toRow(m, "one-group"), "p", "2")
-	if placeIn(t, root, "one-group") != "" || m.work.PlaceOf("one-group") != 2 {
-		t.Fatalf("the same digit again clears the todo, and the front reads:\n%s", frontAt(t, root, "one-group"))
+	m = pressed(toRow(m, "a-loose-one"), "p", "3")
+	if placeIn(t, root, "a-loose-one") != "last" {
+		t.Fatalf("place 3 from above, past every row, reads last, and the plan reads %q", placeIn(t, root, "a-loose-one"))
 	}
 	m = pressed(toRow(m, "one-group"), "p", "5")
 	if !strings.Contains(m.workNotice, "no row stands at 5") {
@@ -106,8 +111,10 @@ func TestTheSiblingsOfARowStandAtItsOwnLevel(t *testing.T) {
 	if m.work.Siblings("nobody") != nil {
 		t.Fatal("a name the tree holds nowhere has no siblings")
 	}
-	beside := m.work.PlacedBeside("a-loose-one")
-	if len(beside) != 1 || beside[0].Name != "one-group" {
-		t.Fatalf("the placed rows beside one stand in place order without it, and read %v", beside)
+	if m.work.SiblingAt("a-loose-one", 1) != "one-group" || m.work.SiblingAt("a-loose-one", 2) != "" || m.work.LastPlace("a-loose-one") != 1 {
+		t.Fatal("a sibling stands at its own number, and the last place reads the highest beside the row")
+	}
+	if placeNumber("2.3") != 3 || placeNumber("-2") != 0 || placeNumber("") != 0 || placeNumber("0") != 0 {
+		t.Fatal("a place number reads the last segment, and a negative or empty place reads zero")
 	}
 }

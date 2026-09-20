@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+group: the-verbs-answer-their-asks
 steps:
   - name: do
     does: makes the change, with the test that covers it
