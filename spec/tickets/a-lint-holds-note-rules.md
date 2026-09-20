@@ -470,6 +470,19 @@ Rule twelve of `spec/guidance/guidance.md` leaves, with chapter 12 of its
 rationale. Most marked rules stand as one sentence, so a check over them asks
 for a rewrite of each, and `a-rule-names-its-failure` carries that work.
 
+The second round answers the verdict:
+
+| the finding | what lands |
+|---|---|
+| the schema note called `matches` a keyword drawing nothing | that note reads what the key does, and points at the chapter |
+| the new pieces pointed at the restated rules' chapter | two chapters of their own stand in `spec/design_output/lsp.md` |
+| `wantedChapters` worked out a place it already held | the caller takes what `sectionNamed` answers |
+| the marker rule stood off over the tickets, past the approach | the switch stays, and the config says why beside it |
+
+The last one is a call this hand makes. A ticket records what a hand saw, which
+is the reason the past tense stands there. The door refuses a hand the fields of
+a closed ticket, so a marker written there stands beyond every later hand.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
