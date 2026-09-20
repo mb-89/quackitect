@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 99a6e900398f9162aa8ad8952e8818d909595d30
     returns: 1
     why: The refusal names Read, Write and Edit today, and no module under the door; names `mcp__level0__patch` or `mcp__level0__replace`. "The way the line rule; names them now" reads a thing standing nowhere. Write the message the two; roads share, and name the module owning it.; `node --test test/level0/bash.test.js` hands a runner a path, and that file; carries `writeFileSync("README.md", ...)` inside a string. A reading taking; every runner argument as a script refuses a plain test run. Say what; `scriptsIn` counts as a script, and what the reading skips.; `writesInScript(body)` already answers the tracked paths a script's text; writes. `writesIn(segment, bodies)` already holds the name the approach gives; a new function of another shape. Reuse the first, add `scriptsIn` alone, and; leave the second name where it stands.; The seam where the read happens goes missing. `findings(command, most, it)`; takes no disk, and `box.disk.read` stands in the bridge. Say which of the two; takes the script's text, because the choice moves the cases between test; files.; A copy out of the scratchpad into a tracked path refuses today, asserted over; `mv` and `cp` in `test/level0/bash.test.js`. Say it stands, and point at that; assertion.; `./RUNME.sh test` names no verb this tree carries. `VERBS` holds check,; branch, tui and doctor, and `TestRunPointsSomewhere` points a test run at; `./RUNME.sh check`. Decide the verb covering the script write and the; refusal.; What I check:; The table's three roads hold. A redirection, an in-place edit and a copy each; land through `writesAPath` today, and a heredoc and `node -e` land through; `writesInScript`. The script file on disk is the one road open.; A script writing under `.se` or the scratchpad passes, because `reaches`; reads the target against `FREE`.; `fakeDisk` stands for the door tests, so the disk this reading takes has a; fake.
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: d23369408bd7bb1fc2fcfe165855026146e82107
+    hash_after: d23369408bd7bb1fc2fcfe165855026146e82107
 ---
 
 # Ask
@@ -135,22 +139,41 @@ file name. So the door reads the file the line names:
 | a runner and a script, such as `node` and a path | the script's own text, off the disk door |
 | a copy out of the scratchpad | the target path, which the same reading answers |
 
-The pieces, in `.claude/skills/level0/lib/bash.js` beside `writesAPath`:
+One piece lands in `.claude/skills/level0/lib/bash.js`, beside `writesAPath`:
 
-- `scriptsIn(command)` answers the paths a runner takes as its script, one a line
-- `writesIn(text)` answers the tracked paths a script's text writes, off the same parse
-- the door hands each script's text to that reading, so one rule answers both roads
-- a script writing under `.se` or the scratchpad passes, because the rule reads the target
+| the piece | what it does |
+|---|---|
+| `scriptsIn(command)` | answers the script paths a runner takes, one a line |
+| `writesInScript(text)` | stands as it reads, and answers what a script's text writes |
 
-The refusal names `mcp__level0__patch` and `mcp__level0__replace` as the road,
-the way the line rule names them now. So a hand meets one message, whichever
-road it takes.
+A script here is a file standing under `.se` or the scratchpad, which a runner
+takes as its first path. Both stand outside the tree git holds, so the voice
+rules reach neither, which is the hole the ask names.
 
-The cases stand in `test/level0/bash.test.js`, over a fake disk:
+| what the line reads | what the door does |
+|---|---|
+| `node .se/scripts/edit.mjs` | reads that file, and answers what it writes |
+| `node --test test/level0/bash.test.js` | passes, because the path stands in the tree |
+| `python3 /tmp/one.py` under the scratchpad | reads that file the same way |
 
-- a script writing a tracked path refuses
+The reading takes the disk, and `findings(command, most, it)` takes none. So the
+bridge hands a reader in: `it.script(path)` answers the text, off `box.disk`.
+The pure module stays pure, and `src/bridge/bash.js` holds the one call
+reaching the disk.
+
+The refusal message moves into one place, and both roads take it. It names
+`mcp__level0__patch` and `mcp__level0__replace` as the road, which the ask asks
+for and no module says today.
+
+The cases stand in `test/level0/bash.test.js`, over a reader a case hands in:
+
+- a script writing a tracked path refuses, and the message names the two tools
 - a script writing under the private folder passes
-- a copy out of the scratchpad into a tracked path refuses
+- a test run naming a tracked file passes, and the door reads nothing off it
+
+A copy out of the scratchpad into a tracked path refuses today, over `mv` and
+`cp`, and that case stands in the same file. `./RUNME.sh check` covers the pair,
+because `VERBS` names no test verb.
 
 ## review
 
