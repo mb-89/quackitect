@@ -218,7 +218,7 @@ between groups wants the `group` column, so the base file gained it. The
 mark keys stand in for the editor a mark carries open, which the tree view
 note still names as waiting.
 
-### checked
+- every fact stands once: the rows, the road and the door rule each stand in their own note
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
