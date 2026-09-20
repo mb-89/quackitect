@@ -29,22 +29,23 @@ the change passes every verdict.
 
 # What waits
 
-One ticket stands at its verdict, and a hand other than this box reads it. The
-pull writes the prompt for that hand, and a box spawns it.
+The group closes, and its retro stands written on the ticket. Nothing of this
+group waits.
 
-| ticket | where it stands |
-|---|---|
-| `the-door-rule-reads-env` | verdict |
+## The asks this branch opens
 
-## Two asks stand minted
-
-The work under this branch mints two asks of its own. Each stands at `draft`,
-outside any group, and waits for a pull:
+The work under this branch mints seven asks. Each stands at `draft`, outside any
+group, and waits for a pull:
 
 | ticket | what it asks |
 |---|---|
 | `a-rule-names-its-failure` | a guidance rule says the failure it guards, beside itself |
 | `a-door-holds-file-calls` | every Go package names its file reading in one file |
+| `a-door-holds-three-reads` | the door rule reaches the pid, the version and the exec path |
+| `a-pointer-reaches-a-heading` | a check reads a pointer's slug against the note it names |
+| `a-lone-mark-pairs-wrong` | the script rules pair the marks of a line, and of no other |
+| `every-road-reads-one-config` | every road reading a config calls the assembly |
+| `one-door-joins-a-path` | one place joins a path, and every caller asks it |
 
 ## The queue binds one hand
 
@@ -60,7 +61,8 @@ nameless pull for that reason. [[src/scripts/pull.js]]
 
 ## The findings the retro reads
 
-The private folder dies with this box, so the notes it holds stand here.
+The retro decides every private note, and five become the tickets above. The
+notes stand here too, because the private folder dies with this box.
 
 The first: a lone code mark in prose leaves an odd count of that mark in the
 file. The script rules pair the marks in the order they stand. So every span
