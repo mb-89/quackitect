@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -115,6 +115,12 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 98c618889abf2a47fa0887e2a34167bfd57c0c56
     hash_after: 98c618889abf2a47fa0887e2a34167bfd57c0c56
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-6
+    hash_before: 23efc7e9d7a176caa842d11f4d8684e1be2a36e2
+    hash_after: 23efc7e9d7a176caa842d11f4d8684e1be2a36e2
+    returns: 3
+    why: "| the finding | what to do |; |---|---|; | `spec/rationales/code/refactoring` names no file in the tree | Write `spec/rationales/refactoring`, and leave `spec/rationales/code` to the note it explains |; | The chapter-past-a-star table stops at the guidance notes | Add `spec/rationales/apply` 1 to 4, `extension` 1 to 5, `index` 1 to 3 and `vehicle` 1 to 2, whose notes mark no item at all |; | `spec/rationales/pull` carries no `explains` | Say what the star check answers where that key stands absent |; | `checkNote` takes a text and the schemas, and the write door hands it one buffer | Say where `underFaults` reads the note `explains` names, because its callers hold no tree |; | `spec/rationales/guidance` opens chapter 12 for the rule that leaves | Say whether that chapter goes with rule twelve |; Answered from the last round, one a line:; the star check reads from the marked rule to its chapter, and a chapter past a star passes; `History.yml` lists its markers, and they read present tense past `PastTense`; rule twelve leaves the note, and `RuleNamesItsFailure` leaves with it; the word list and the stop folder take `VoiceShape` alone, so the marker rule stands off both; the marker drift stands named, one file to a marker; `./RUNME.sh check` answers 0 on this branch, and the drift tables read as the tree stands, past the one path above."
 ---
 
 # Ask
@@ -226,22 +232,21 @@ fail
 
 | the finding | what to do |
 |---|---|
-| The drift table reads the star direction alone, and a rationale chapter whose rule carries no star stands the same drift | Say which direction `matches: explains` reads, and name that drift too where it reads both |
-| `History.yml` names no marker | List the words it refuses, and say what they catch past what `PastTense` holds already |
-| `RuleNamesItsFailure` names no test | Say what makes a rule pass it, because most rules stand as one sentence |
-| `.vale.ini` switches each `VoiceShape` rule off by name over `spec/vocabulary` and `spec/config/stop` | Say whether the new rule joins those two lists |
-| The drift the two Vale rules find stands unnamed | Name it the way the star drift stands named, so the lint at zero holds |
+| `spec/rationales/code/refactoring` names no file in the tree | Write `spec/rationales/refactoring`, and leave `spec/rationales/code` to the note it explains |
+| The chapter-past-a-star table stops at the guidance notes | Add `spec/rationales/apply` 1 to 4, `extension` 1 to 5, `index` 1 to 3 and `vehicle` 1 to 2, whose notes mark no item at all |
+| `spec/rationales/pull` carries no `explains` | Say what the star check answers where that key stands absent |
+| `checkNote` takes a text and the schemas, and the write door hands it one buffer | Say where `underFaults` reads the note `explains` names, because its callers hold no tree |
+| `spec/rationales/guidance` opens chapter 12 for the rule that leaves | Say whether that chapter goes with rule twelve |
 
 Answered from the last round, one a line:
 
-- the star check reads `matches: explains` in `underFaults`, and `StarNeedsSection` goes
-- `History.yml` lands beside `Antithesis.yml`, with its switch in `.vale.ini`
-- `RuleNamesItsFailure` lands beside `GuidanceChapter` under `VoiceShape`
-- each new rule opens at error, so the warning stage goes
-- rule twelve stays in the guidance note
-- the drift table names the four notes and their starred rules as the tree holds them
+- the star check reads from the marked rule to its chapter, and a chapter past a star passes
+- `History.yml` lists its markers, and they read present tense past `PastTense`
+- rule twelve leaves the note, and `RuleNamesItsFailure` leaves with it
+- the word list and the stop folder take `VoiceShape` alone, so the marker rule stands off both
+- the marker drift stands named, one file to a marker
 
-`./RUNME.sh check` answers 0 on this branch.
+`./RUNME.sh check` answers 0 on this branch, and the drift tables read as the tree stands, past the one path above.
 
 # implement
 
