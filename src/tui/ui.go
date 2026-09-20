@@ -78,6 +78,8 @@ type model struct {
 	rules      *ticketSchema
 	// The places the verb answers last, laid over each tree the index hands over. [[spec/design_output/tui#the-work-tab]]
 	places *workPlaces
+	// The place chord stands open, and the next key closes it. [[spec/design_output/tui#the-work-tab-takes-edits]]
+	placing bool
 	// Each tab holds a filter line of its own, and the pane shows the open tab's. [[spec/design_output/tui#the-filter-pane-takes-letters]]
 	sources []string
 	opened  bool
@@ -324,6 +326,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m.editing(msg)
 		}
 		m.workNotice = ""
+		// The place chord takes the next key, digit or not. [[spec/design_output/tui#the-work-tab-takes-edits]]
+		if m.placing {
+			m.placeAt(msg.String())
+			return m, nil
+		}
 		return m.key(msg.String())
 
 	case tea.MouseMsg:

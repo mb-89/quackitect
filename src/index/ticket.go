@@ -93,7 +93,7 @@ func ticketOf(path, id, text string, changed int64) Ticket {
 		Route:   routeOf(front["process"]),
 		Group:   front["group"],
 		Urgent:  front["urgent"] == "true",
-		Todo:    front["todo"] == "true",
+		Todo:    todoIn(front["todo"]),
 		Says:    askLine(body),
 		Changed: changed,
 	}
@@ -101,6 +101,12 @@ func ticketOf(path, id, text string, changed int64) Ticket {
 		one.Standing = groupStanding(state, head)
 	}
 	return one
+}
+
+// A todo is any value past false: a bare true, or the name of the row the ticket stands before. [[spec/design_output/pull#the-queue-is-an-outline]]
+func todoIn(said string) bool {
+	said = strings.Trim(strings.TrimSpace(said), `"'`)
+	return said != "" && said != "false"
 }
 
 // The route's own name, off the link the mint writes as a path or a hand writes as a name. [[spec/design_output/work#a-group-is-a-ticket]]

@@ -149,6 +149,16 @@ func TestAStandingReadsOffTheGroupsRecordThroughTheTicket(t *testing.T) {
 }
 
 // [[spec/design_output/work#held-derives-from-the-record]]
+// A todo names the row the ticket stands before, or reads true, and either lights the flag. [[spec/design_output/pull#the-queue-is-an-outline]]
+func TestATodoNamingARowLightsTheFlag(t *testing.T) {
+	t.Parallel()
+	for said, want := range map[string]bool{"true": true, "a-loose-one": true, `"a-loose-one"`: true, "false": false, "": false} {
+		if todoIn(said) != want {
+			t.Fatalf("todo %q reads %v", said, want)
+		}
+	}
+}
+
 func TestAGroupNobodyHoldsStandsAtTodo(t *testing.T) {
 	if heldIn("state: open\nrecord:\n  - step: sync\n    hash_before: aaa\n    hash_after: bbb\n") {
 		t.Fatal("an entry with both hashes holds nothing")

@@ -23,6 +23,7 @@ import {
   urgent,
   withEntry,
   withField,
+  todoOf,
 } from "../engine/group.js";
 import { noteRows, readsOf, writeHold } from "./guidance-hand.js";
 import { roleOf } from "./pull-hand-of.js";
@@ -102,9 +103,9 @@ export function handOut(it, who) {
   const all = ticketsHere(it);
   const groupTicket = all.find((one) => !one.private && one.name === who.group);
   // The tag says the next pull hands it first, on a note and on a ticket alike. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
-  const tagged = all.filter((one) => String(one.front.todo) === "true");
+  const tagged = all.filter((one) => todoOf(one.front) !== "");
   const privates = all.filter(
-    (one) => one.private && String(one.front.todo) !== "true",
+    (one) => one.private && todoOf(one.front) === "",
   );
   const at = weighing(it, all);
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
@@ -391,7 +392,7 @@ export function handRule(it, front, all, group, helper = false) {
     agent: Boolean(it.agent),
     ownerSays: Boolean(it.ownerSays),
     cloud: Boolean(it.cloud ?? inCloud(it.env ?? {})),
-    atRetro: String(front?.todo) === "true" || atRetro(all ?? [], group),
+    atRetro: todoOf(front) !== "" || atRetro(all ?? [], group),
   };
 }
 

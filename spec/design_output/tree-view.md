@@ -153,7 +153,7 @@ its marks:
 | U | the ticket carries the urgent mark | bad |
 | W | a hand holds it | good |
 | C | the group holds a branch on the cloud | good |
-| T | a hand parks it for the next pull | bad |
+| T | a todo forces its place, which [[spec/design_output/pull#a-todo-forces-a-place]] reads | bad |
 
 The letters hold fixed places, so nothing shifts as one lights. The keys stay
 ordinary keys, so a person filters on `urgent: true`, and `not urgent: true`

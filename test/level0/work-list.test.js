@@ -74,7 +74,7 @@ test("the json listing prints the one answer as a JSON object on one line", () =
   assert.ok(Array.isArray(answer.loose), "the answer carries the loose tickets");
   assert.equal(answer.branches[0].branch, "work/one-group");
   assert.ok(
-    answer.loose.some((one) => one.name === "a-loose-one"),
+    answer.loose.some((one) => one.name === "a-loose-one" && one.todo === false),
     "the loose tickets name the one on trunk",
   );
 });

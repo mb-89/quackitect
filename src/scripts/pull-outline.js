@@ -1,17 +1,19 @@
 // The queue as an outline. A row at the left takes one number, a ticket
 // under it a sub-number, and a person's row a negative number that sorts
-// first. One order feeds it: the person's rows by score, then the agent's.
+// first. Ordered lists feed it, and a todo moves a row before the one it
+// names, whatever the score says.
 // [[spec/design_output/pull#the-queue-is-an-outline]]
 
-import { CLOSED, fieldOf, GROUP } from "../engine/group.js";
+import { fieldOf, GROUP, todoOf } from "../engine/group.js";
 
-// The place of a ticket the pull holds back, which every order puts after the placed ones. [[spec/design_output/pull#the-queue-is-an-outline]]
-export const UNPLACED = "∞";
+// The words a todo carries in place of a row's name: the front of the level, and its end. [[spec/design_output/pull#the-queue-is-an-outline]]
+export const FIRST = "first";
+export const LAST = "last";
 
-// The outline, a place a name, off the two ordered lists and every ticket the tree holds. A ticket in neither list stands unplaced, and a closed one takes no place at all. [[spec/design_output/pull#the-queue-is-an-outline]]
-export function outlineIn(persons, agents, all) {
+// The outline, a place a name. The person's list comes first and counts down, the others count up, and a ticket in no list takes no place. [[spec/design_output/pull#the-queue-is-an-outline]]
+export function outlineIn(persons, rest, all) {
   const ordinal = new Map();
-  for (const one of [...persons, ...agents]) {
+  for (const one of [...persons, ...rest]) {
     if (!ordinal.has(one.name)) ordinal.set(one.name, ordinal.size);
   }
   const kids = kidsOf(all);
@@ -19,23 +21,19 @@ export function outlineIn(persons, agents, all) {
   const roots = all
     .map((one) => one.name)
     .filter((name) => !kids.parent.has(name))
-    .map((name) => ({ name, best: bestUnder(name, kids, ordinal, best) }))
-    .filter((one) => one.best !== undefined)
-    .sort((a, b) => a.best - b.best);
+    .filter((name) => bestUnder(name, kids, ordinal, best) !== undefined);
   const out = new Map();
-  // A person's row counts down to minus one, so the most pressing stands first, and the agent's count up from one. [[spec/design_output/pull#the-queue-is-an-outline]]
-  const own = roots.filter((one) => one.best < persons.length);
-  own.forEach((one, at) => {
-    numberUnder(one.name, String(at - own.length), kids, best, out);
+  const ordered = anchored(roots, kids, best);
+  // A person's row counts down to minus one, so the most pressing stands first, and the rest count up from one. [[spec/design_output/pull#the-queue-is-an-outline]]
+  const own = ordered.filter((name) => best.get(name) < persons.length);
+  own.forEach((name, at) => {
+    numberUnder(name, String(at - own.length), kids, best, out);
   });
-  roots
-    .filter((one) => one.best >= persons.length)
-    .forEach((one, at) => {
-      numberUnder(one.name, String(at + 1), kids, best, out);
+  ordered
+    .filter((name) => best.get(name) >= persons.length)
+    .forEach((name, at) => {
+      numberUnder(name, String(at + 1), kids, best, out);
     });
-  for (const one of all) {
-    if (!out.has(one.name) && fieldOf(one.text, "state") !== CLOSED) out.set(one.name, UNPLACED);
-  }
   return out;
 }
 
@@ -44,17 +42,19 @@ function kidsOf(all) {
   const names = new Set(all.map((one) => one.name));
   const parent = new Map();
   const under = new Map();
+  const todo = new Map();
   for (const one of all) {
+    todo.set(one.name, todoOf(one.front ?? {}));
     const group = fieldOf(one.text, GROUP);
     if (!group || group === one.name || !names.has(group)) continue;
     parent.set(one.name, group);
     if (!under.has(group)) under.set(group, []);
     under.get(group).push(one.name);
   }
-  return { parent, under };
+  return { parent, under, todo };
 }
 
-// The best ordinal in a subtree, which is what the subtree sorts by, and nothing where none of it stands in the queue. [[spec/design_output/pull#the-queue-is-an-outline]]
+// The best ordinal in a subtree, which is what the subtree sorts by, and nothing where none of it stands in a list. [[spec/design_output/pull#the-queue-is-an-outline]]
 function bestUnder(name, kids, ordinal, best, seen = new Set()) {
   if (best.has(name)) return best.get(name);
   if (seen.has(name)) return undefined;
@@ -68,15 +68,43 @@ function bestUnder(name, kids, ordinal, best, seen = new Set()) {
   return held;
 }
 
+// One level in order: by the best ordinal, then each todo moved before the row it names, or to the front where it names none standing here. [[spec/design_output/pull#the-queue-is-an-outline]]
+function anchored(names, kids, best) {
+  const order = [...names].sort((a, b) => best.get(a) - best.get(b));
+  const moved = order.filter((name) => kids.todo.get(name)).sort();
+  for (const name of moved) {
+    order.splice(order.indexOf(name), 1);
+    const said = kids.todo.get(name);
+    if (said === LAST) {
+      order.push(name);
+      continue;
+    }
+    const at = order.indexOf(levelOf(said, names, kids));
+    order.splice(at < 0 ? 0 : at, 0, name);
+  }
+  return order;
+}
+
+// The row of this level a todo's name stands under, so a todo naming a ticket inside a group lands before that group. [[spec/design_output/pull#the-queue-is-an-outline]]
+function levelOf(said, names, kids) {
+  let name = said;
+  const seen = new Set();
+  while (name && !names.includes(name) && !seen.has(name)) {
+    seen.add(name);
+    name = kids.parent.get(name);
+  }
+  return name ?? "";
+}
+
 // A row takes its number, and its kids take the number, a dot and their own place under it. [[spec/design_output/pull#the-queue-is-an-outline]]
 function numberUnder(name, place, kids, best, out) {
   out.set(name, place);
-  (kids.under.get(name) ?? [])
-    .filter((kid) => best.get(kid) !== undefined)
-    .sort((a, b) => best.get(a) - best.get(b))
-    .forEach((kid, at) => {
-      numberUnder(kid, `${place}.${at + 1}`, kids, best, out);
-    });
+  const under = (kids.under.get(name) ?? []).filter(
+    (kid) => best.get(kid) !== undefined,
+  );
+  anchored(under, kids, best).forEach((kid, at) => {
+    numberUnder(kid, `${place}.${at + 1}`, kids, best, out);
+  });
 }
 
 // Two places compare segment by segment as numbers, so `-2` stands before `1`, and `1.2` before `1.10`. [[spec/design_output/pull#the-queue-is-an-outline]]

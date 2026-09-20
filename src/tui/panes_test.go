@@ -25,6 +25,9 @@ func workWindow(t *testing.T, n int) model {
 		t.Fatal(err)
 	}
 	out, _ := m.Update(workMsg{tree: tree})
+	// The queue view keeps the placed rows, so a case lays places over the three rows the way the verb does. [[spec/design_output/pull#the-queue-is-an-outline]]
+	places, _ := placesIn([]byte(`{"branches":[{"name":"one-group","queue":"1","tickets":[{"name":"a-child","queue":"1.1"}]}],"loose":[{"name":"a-loose-one","queue":"2"}]}`))
+	out, _ = out.(model).Update(placesMsg{places: places})
 	return out.(model)
 }
 
@@ -51,9 +54,9 @@ func TestTheWorkTabUnderTheFilterPaneKeepsTheStripAndTheFooter(t *testing.T) {
 func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 	t.Parallel()
 	m := workWindow(t, 3)
-	// The queue opens the work tab with every row and no filter, sorted by place. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-	if said := m.sourceOf(1); said != "" {
-		t.Fatalf("the work tab opens on the queue, which filters nothing, and its line reads %q", said)
+	// The queue opens the work tab with the placed rows, sorted by place. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+	if said := m.sourceOf(1); said != "queue: /./" {
+		t.Fatalf("the work tab opens on the queue, which keeps the placed rows, and its line reads %q", said)
 	}
 	if said := m.work.Sorts(); len(said) != 1 || said[0].Key != queueKey {
 		t.Fatalf("the queue's sort takes hold at the start, and it reads %v", said)
@@ -66,9 +69,10 @@ func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 	if !strings.Contains(renderParts(work.presetParts(), 80), "alt+1  queue") {
 		t.Fatal("the pressed queue row stands in the pane")
 	}
-	work.work.SortOn("name")
+	work.input.SetValue("")
+	work.narrow("")
 	if work.tabs[work.open].Narrowed(&work) || work.pressed() != nil {
-		t.Fatal("a sort of a person's own lets go of the queue preset, and the funnel stands grey")
+		t.Fatal("a cleared line lets go of the queue preset, and the funnel stands grey")
 	}
 	m = alt(press(m, "2"), '2')
 	if m.sourceOf(1) != "held: true" {

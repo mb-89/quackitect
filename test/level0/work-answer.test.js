@@ -2,10 +2,11 @@
 // [[spec/design_output/work#one-reading-answers-git]]
 
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { COL, work } from "../../src/scripts/work.js";
-import { compareOutline, UNPLACED } from "../../src/scripts/pull-outline.js";
+import { compareOutline } from "../../src/scripts/pull-outline.js";
 import { answerOf } from "../../src/scripts/work-answer.js";
 import {
   CHILD,
@@ -155,7 +156,8 @@ test("a closed ticket on trunk stands off the queue, whatever a merged branch sa
     root: ROOT,
     clock: fakeClock("2026-01-01T03:00:00.000Z"),
   });
-  assert.equal(draft.loose.find((one) => one.name === "a-draft").queue, UNPLACED, "an open ticket the pull holds back stands unplaced");
+  assert.equal(draft.loose.find((one) => one.name === "a-draft").queue, "-1", "a draft waits on a person, so it takes a negative place");
+  assert.equal(draft.loose.find((one) => one.name === "a-loose-one").queue, "1");
   // A merged branch speaks for no ticket, so one trunk holds nowhere takes no place at all. [[spec/design_output/pull#the-queue-is-an-outline]]
   const orphan = answerOf({
     ...doorsSaying(
@@ -173,10 +175,43 @@ test("a closed ticket on trunk stands off the queue, whatever a merged branch sa
   assert.equal(listed.includes("gone-group"), false, "the listing leaves the unplaced out");
 });
 
+// A todo names the row the ticket stands before, and a bare tag puts it first, whatever the score says. [[spec/design_output/pull#the-queue-is-an-outline]]
+test("a todo moves a ticket before the row it names, and a private note takes a place too", () => {
+  const { it } = doorsSaying(
+    remoteSaying([], {
+      "origin/main:spec/tickets/a-loose-one.md": LOOSE,
+      "origin/main:spec/tickets/b-loose-one.md": LOOSE,
+      "origin/main:spec/tickets/c-loose-one.md": LOOSE.replace("state: open\n", "state: open\ntodo: a-loose-one\n"),
+      "origin/main:spec/tickets/d-loose-one.md": LOOSE.replace("state: open\n", "state: open\ntodo: true\n"),
+    }),
+    { [join(ROOT, ".se/tickets/parked.md")]: LOOSE },
+  );
+  it.root = ROOT;
+  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
+  const said = answerOf(it);
+  const place = (name) => said.loose.find((one) => one.name === name).queue;
+  assert.equal(place("d-loose-one"), "1", "a bare tag stands first");
+  assert.equal(place("c-loose-one"), "2", "a todo naming a row stands right before it");
+  assert.equal(place("a-loose-one"), "3");
+  const last = answerOf({
+    ...doorsSaying(
+      remoteSaying([], {
+        "origin/main:spec/tickets/a-loose-one.md": LOOSE.replace("state: open\n", "state: open\ntodo: last\n"),
+        "origin/main:spec/tickets/b-loose-one.md": LOOSE,
+      }),
+    ).it,
+    root: ROOT,
+    clock: fakeClock("2026-01-01T03:00:00.000Z"),
+  });
+  assert.equal(last.loose.find((one) => one.name === "a-loose-one").queue, "2", "a todo reading last puts the row at the level's end");
+  assert.ok(said.loose.find((one) => one.name === "c-loose-one").todo, "the todo flag lights on a placed ticket");
+  assert.match(place("parked"), /^\d+$/, "a private note on this box takes a place of its own");
+});
+
 // [[spec/design_output/pull#the-queue-is-an-outline]]
 test("an outline place compares segment by segment, and the unplaced stands last", () => {
-  const sorted = ["2", "1.10", UNPLACED, "1", "-1", "1.2", "-2", "10"].sort(compareOutline);
-  assert.deepEqual(sorted, ["-2", "-1", "1", "1.2", "1.10", "2", "10", UNPLACED]);
+  const sorted = ["2", "1.10", "1", "-1", "1.2", "-2", "10"].sort(compareOutline);
+  assert.deepEqual(sorted, ["-2", "-1", "1", "1.2", "1.10", "2", "10"]);
 });
 
 // A group on trunk with no branch stands in the answer with its kind, and its children beside it, so the tab nests them. [[spec/design_output/tree-view#the-name-column-nests]]

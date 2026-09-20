@@ -49,8 +49,8 @@ frontmatter:
       description: whether the pull hands this out first, over the order the score sets
 
     todo:
-      type: boolean
-      description: whether a hand parks this note here, and a note lacking it reads false
+      type: [boolean, string]
+      description: a place in the queue a hand forces, as true for the front or the name of the row this one stands before, and a note lacking it reads false
 
     step:
       type: string
@@ -263,8 +263,8 @@ frontmatter:
       description: the tickets this one became, on reason became
 
     todo:
-      type: boolean
-      description: the tag a hand puts on a note it parks, which the pull hands out first on this box
+      type: [boolean, string]
+      description: the tag a hand puts on a note it parks, which the pull hands out first on this box, or the name of the row it stands before
 
 body:
   headingLevel: 1

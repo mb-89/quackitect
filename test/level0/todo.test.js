@@ -29,6 +29,8 @@ test("a note carries todo true, and a note lacking the field reads false", () =>
   assert.equal(isTagged(TAGGED), true);
   assert.equal(isTagged(FREE), false);
   assert.equal(isTagged(OFF), false);
+  // A todo naming the row it stands before is a tag too. [[spec/design_output/pull#a-todo-forces-a-place]]
+  assert.equal(isTagged(noted("todo: a-loose-one\n")), true);
 });
 
 test("a file that is no note reads false, whatever it holds", () => {

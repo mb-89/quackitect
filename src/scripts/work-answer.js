@@ -5,7 +5,9 @@
 
 import {
   askOf,
+  CLOSED,
   dependsOn,
+  DRAFT,
   fieldOf,
   frontOf,
   GROUP,
@@ -13,9 +15,11 @@ import {
   isGroup,
   OPEN,
   stepOf,
+  todoOf,
   urgent,
 } from "../engine/group.js";
 import { takeable } from "./pull.js";
+import { ticketsHere } from "./pull-hand.js";
 import { leafOf, leavesOf } from "./pull-route.js";
 import { outlineIn } from "./pull-outline.js";
 import { queued, stoodHere } from "./pull-queue.js";
@@ -37,7 +41,7 @@ export function rowOfTicket(one, places, stood = new Map(), open = new Set()) {
     person: personStep(one.text),
     held: Boolean(heldIn(one.text)),
     waits: dependsOn(frontOf(one.text)).some((dep) => open.has(dep)),
-    todo: fieldOf(one.text, "todo") === "true",
+    todo: todoOf(frontOf(one.text)) !== "",
     // The whole ask travels, because the details draw it whole and the table draws none of it. [[spec/design_output/tui#the-work-tab]]
     says: askOf(one.text),
   };
@@ -79,7 +83,11 @@ export function firstLine(said) {
 export function ticketsIn(read) {
   const out = new Map();
   const standing = read.stand.filter((held) => !held.merged);
-  for (const one of [...standing.flatMap((held) => ownTickets(held)), ...read.loose]) {
+  for (const one of [
+    ...standing.flatMap((held) => ownTickets(held)),
+    ...read.loose,
+    ...(read.private ?? []),
+  ]) {
     if (!out.has(one.name)) out.set(one.name, { ...one, front: frontOf(one.text) });
   }
   return [...out.values()];
@@ -95,24 +103,32 @@ function ownTickets(held) {
 // The order the pull hands out, as an outline place a name. A person's open steps order first and count down, and the agent's takeable ones count up. [[spec/design_output/pull#the-queue-is-an-outline]]
 export function placesIn(it, read, stood) {
   const all = ticketsIn(read);
-  const open = all.filter((one) => fieldOf(one.text, "state") === OPEN);
+  const open = all.filter((one) => fieldOf(one.text, "state") !== CLOSED);
   const at = { clock: it.clock, weights: it.weights, stood };
-  const persons = queued(
-    open.filter((one) => personStep(one.text)),
-    all,
-    at,
-  );
+  // A person's step and a draft wait on a person. The agent's takeable steps count next, and every other open ticket after them. [[spec/design_output/pull#the-queue-is-an-outline]]
+  const persons = queued(open.filter(waitsOnPerson), all, at);
   const agents = queued(
-    open.filter((one) => !personStep(one.text) && takeable(it, one, all)),
+    open.filter((one) => !waitsOnPerson(one) && takeable(it, one, all)),
     all,
     at,
   );
-  return outlineIn(persons, agents, all);
+  const held = queued(
+    open.filter((one) => !waitsOnPerson(one) && !takeable(it, one, all)),
+    all,
+    at,
+  );
+  return outlineIn(persons, [...agents, ...held], all);
+}
+
+// [[spec/design_output/pull#the-queue-is-an-outline]]
+function waitsOnPerson(one) {
+  return personStep(one.text) || fieldOf(one.text, "state") === DRAFT;
 }
 
 // The queue rides every answer, because a reader of the listing wants each row's place. [[spec/design_output/pull#the-queue-is-a-score]]
 export function answerOf(it, queue = true) {
-  const read = readWork(it, true);
+  // The box's private notes stand in the queue beside trunk's tickets, because the pull hands them out too. [[spec/design_output/pull#the-queue-is-an-outline]]
+  const read = { ...readWork(it, true), private: privateHere(it) };
   const standing = standingAll(read.stand);
   const now = it.clock ? it.clock.now().getTime() : 0;
   const stood = queue ? stoodHere(it) : new Map();
@@ -153,8 +169,14 @@ export function answerOf(it, queue = true) {
       };
     }),
     // Every other ticket on trunk stands here, a group among them, and the tab nests each one under the group it names. [[spec/design_output/tree-view#the-name-column-nests]]
-    loose: read.loose
+    loose: [...read.loose, ...read.private]
       .filter((one) => !branched.has(one.name) && !branched.has(fieldOf(one.text, GROUP)))
       .map((one) => rowOfTicket(one, places, stood, open)),
   };
+}
+
+// The private notes on this box, read the way the pull reads them, and nothing where the box holds none. [[spec/design_output/pull#the-queue-is-an-outline]]
+function privateHere(it) {
+  if (!it.disk || !it.join) return [];
+  return ticketsHere(it).filter((one) => one.private);
 }

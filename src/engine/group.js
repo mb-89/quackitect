@@ -11,6 +11,7 @@ export const WORK_BRANCH = "work/";
 export const GROUP = "group";
 export const OPEN = "open";
 export const CLOSED = "closed";
+export const DRAFT = "draft";
 // The one mark a hand reads before it takes the next thing. [[spec/design_output/work#the-mark-and-what-waits]]
 export const URGENT = "urgent";
 
@@ -42,6 +43,14 @@ export function fieldOf(text, key) {
 // [[spec/design_output/work#the-mark-and-what-waits]]
 export function urgent(text) {
   return fieldOf(text, URGENT) === "true";
+}
+
+// The todo a front carries: nothing, `first` where it stands as a bare tag, or the name of the row it stands before. [[spec/design_output/pull#the-queue-is-an-outline]]
+export function todoOf(front) {
+  const said = front?.todo;
+  if (said === undefined || said === null || said === false || String(said) === "false") return "";
+  if (said === true || String(said).trim() === "true") return "first";
+  return String(said).trim();
 }
 
 // The tickets one waits for, a list or one line, with the branch prefix dropped. [[spec/design_output/work#the-mark-and-what-waits]]

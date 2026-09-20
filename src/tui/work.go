@@ -259,6 +259,11 @@ func (workTab) Keys(m *model) band {
 			m.openEdit()
 			return nil
 		}},
+		// [[spec/design_output/pull#the-queue-is-an-outline]]
+		{bind("p 1…9", "place the row in the queue: p, then the place", placeKey), func(m *model, _ string) tea.Cmd {
+			m.openPlace()
+			return nil
+		}},
 		{bind("u t", "flip the urgent mark, and the todo mark", "u", "t"), func(m *model, name string) tea.Cmd {
 			key := urgentKey
 			if name == "t" {

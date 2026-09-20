@@ -235,24 +235,44 @@ the cost stands beside the pull, once a pull.
 
 # The queue is an outline
 
-The score orders two lists: the open steps a person owns, and the open steps
-an agent takes. `pull-outline.js` numbers them as one outline, and every
-reader draws that number as it stands.
+Every open ticket takes a place, and a closed one takes none. The score
+orders three lists, and `pull-outline.js` numbers them as one outline, which
+every reader draws as it stands.
 
 | the row | its place |
 |---|---|
-| a person's step | negative, and the most pressing counts lowest, so `-2` stands over `-1` |
-| an agent's step | counts up from `1` |
-| a group | one number, off the best place among itself and its tickets |
+| a step a person owns, and a draft | negative, and the most pressing counts lowest, so `-2` stands over `-1` |
+| a step an agent takes now | counts up from `1` |
+| an open step the pull holds back: one waiting on a dependency, one another hand holds | counts on after the agent's |
+| a group | one number, where its best member stands |
 | a ticket under a group | the group's number, a dot, and its own place under it, as `1.2` |
-| an open ticket the pull holds back: a draft, one waiting on a dependency, one another hand holds | `∞`, which stands after every number |
-| a closed ticket | no place, so a view sorting by place puts it after the rest |
+| a private note on this box | a place of its own, because the pull hands it out too |
+| a closed ticket | none |
 
 An agent takes no negative place, so the person's rows stand for a person
 alone. The mark holds inside each list, so an urgent step leads the agent's
-rows and an urgent question leads the person's. A merged branch's copy of a
-ticket yields to trunk's, because trunk holds what the merge brings in. So a
-closed ticket leaves the queue whatever the branch says.
+rows and an urgent question leads the person's. Then the score orders: what
+waits under a ticket, how long it stands, how often a hand-back comes back.
+
+A standing branch speaks for its own group's tickets, and trunk speaks for
+the rest. A merged branch speaks for nothing, because trunk holds what the
+merge brings in. So a closed ticket leaves the queue whatever a branch says.
+
+## A todo forces a place
+
+A `todo` on a ticket overrides the score at its own level. The field names
+the row the ticket stands before, or one of two words:
+
+| the todo | where the ticket stands |
+|---|---|
+| the name of a row | right before that row, and before that row's group where the row nests |
+| `true` | first at its level |
+| `last` | last at its level |
+| a name standing nowhere | first at its level, because the row it names stands off the queue |
+
+The place moves as the queue drains, because the todo holds the order and
+no number. The work tab writes it under `p` and a digit, the pull hands a
+tagged ticket out first, and the `T` letter lights on every tagged row.
 
 The tab draws the place it reads and holds no rule of its own. A place
 compares segment by segment as numbers, so `1.10` stands after `1.2`, and

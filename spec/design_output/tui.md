@@ -408,9 +408,10 @@ The name links to its note. The state leads the flags as its first letter.
 The queue is an outline the pull owns, and git holds the branches. So the
 tab runs the verb behind each tree the index hands over, and lays its answer
 over the rows. `workplaces.go` holds that road, and a verb answering nothing
-leaves the last places standing. The tab opens on the queue: every row, no
-filter, sorted by place, so a person's rows stand first and the unplaced
-last. For the places, see [[spec/design_output/pull#the-queue-is-an-outline]].
+leaves the last places standing. The tab opens on the queue: the rows
+holding a place, sorted by it. So a person's rows stand first, and a closed
+ticket stands off it. For the places, see
+[[spec/design_output/pull#the-queue-is-an-outline]].
 
 | the part of the details | what it draws |
 |---|---|
@@ -441,6 +442,7 @@ the note now says. `workedit.go` holds it.
 | Esc | put the old value back |
 | shift and Enter | write the value into every row the view holds, or the marked ones |
 | `u`, `t` | flip the urgent mark, and the todo mark, on the row or the marked rows |
+| `p`, then a digit | place the row in the queue at that digit, which writes its todo. For the rule, see [[spec/design_output/pull#a-todo-forces-a-place]] |
 
 The write meets the door the way an agent's write does. The tab reads
 `spec/schemas/ticket.schema.yaml` for what a field takes and which field the

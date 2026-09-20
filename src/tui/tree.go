@@ -63,6 +63,25 @@ func NewTree(cols []Column, items []Item, nests bool) *Tree {
 	return t
 }
 
+// The items standing beside one at its own level: the roots, or its parent's kids, and nothing for a name the tree holds nowhere. [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
+func (t Tree) Siblings(name string) []Item {
+	return siblingsIn(t.Items, name)
+}
+
+func siblingsIn(items []Item, name string) []Item {
+	for _, one := range items {
+		if one.Name == name {
+			return items
+		}
+	}
+	for _, one := range items {
+		if held := siblingsIn(one.Kids, name); held != nil {
+			return held
+		}
+	}
+	return nil
+}
+
 // A change laid over every item, at every depth, after which the rows read again. [[spec/design_output/tree-view#an-item-carries-its-keys]]
 func (t *Tree) Amend(change func(*Item)) {
 	amend(t.Items, change)

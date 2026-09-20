@@ -26,6 +26,8 @@ flags:
 groups:
   - name: queue
     pressed: true
+    filters:
+      - queue: /./
     sort:
       - key: queue
   - name: held
