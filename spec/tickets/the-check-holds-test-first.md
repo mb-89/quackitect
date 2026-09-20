@@ -354,8 +354,8 @@ a rule with no reader. The rule now names the door and the check holding it.
 
 <!-- the form is checklist -->
 
-- the change touches the two readings, the guard, the two doors, two notes and the tests the rule asks for
-- every fake the tests reach comes from `src/doors/fake`, and the guard stands beside them
+- this round touches the fakes, the delta reading, the testing note and the two test files
+- each fake takes the guard, so a call it lacks throws with the door's name
 - each piece carries the pointer at the chapter saying what it reads
 
 ## tests-green

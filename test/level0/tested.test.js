@@ -11,6 +11,7 @@ import {
   untestedIn,
 } from "../../.claude/skills/level0/lib/tested.js";
 import { behaves } from "../../src/doors/fake/behaves.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 
@@ -86,4 +87,19 @@ test("a fake throws on the call it lacks, and answers the one it holds", () => {
 
   assert.equal(fake.read("one.md"), "a line");
   assert.throws(() => fake.write("one.md", "said"), /disk/);
+});
+
+test("the clock a test hands in takes the guard", () => {
+  const clock = fakeClock();
+
+  assert.equal(typeof clock.now().getTime(), "number");
+  assert.throws(() => clock.sleep(1), /clock/);
+});
+
+test("a change wants the test naming it, and a stray case carries none", () => {
+  const stray = delta("src/bridge/one.js", "test/level0/other.test.js");
+  assert.deepEqual(untestedIn(stray), ["src/bridge/one.js"]);
+
+  const named = delta("src/bridge/one.js", "test/level0/one.test.js");
+  assert.deepEqual(untestedIn(named), []);
 });
