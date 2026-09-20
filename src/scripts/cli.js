@@ -4,6 +4,7 @@
 
 import { dirname, join } from "node:path";
 import { RUN } from "../../.claude/skills/level0/lib/folders.js";
+import { runsHere } from "../../.claude/skills/level0/lib/paths.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
 import { SCHEMAS, schemasIn } from "../../.claude/skills/level0/lib/schema.js";
 import { fieldsIn, mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
@@ -208,15 +209,18 @@ export const verb = argv.find((a) => !a.startsWith("-")) ?? "help";
 export const where = argv.filter((a) => !a.startsWith("-") && a !== verb);
 export const rest = argv.slice(argv.indexOf(verb) + 1);
 
-if (verb === "help" || !verbs[verb]) {
-  if (verb !== "help") console.error(`se: there is no verb called ${verb}\n`);
-  console.log("Usage: ./RUNME.sh <verb> [path ...]\n");
-  for (const [name, one] of Object.entries(verbs)) {
-    console.log(`  ${name.padEnd(COL.verb)} ${one.says}`);
+// [[spec/design_output/doors#a-script-guards-its-main]]
+if (runsHere(import.meta.url, process.argv)) {
+  if (verb === "help" || !verbs[verb]) {
+    if (verb !== "help") console.error(`se: there is no verb called ${verb}\n`);
+    console.log("Usage: ./RUNME.sh <verb> [path ...]\n");
+    for (const [name, one] of Object.entries(verbs)) {
+      console.log(`  ${name.padEnd(COL.verb)} ${one.says}`);
+    }
+    process.exit(verb === "help" ? 0 : 2);
   }
-  process.exit(verb === "help" ? 0 : 2);
+  process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
 }
-process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
 
 // [[spec/design_output/vehicle#three-things-a-vehicle-needs]]
 export function theVehicle(argv) {

@@ -3,10 +3,9 @@
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { BINDING, GOD } from "../../.claude/skills/level0/lib/config.js";
 import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
-import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
+import { relativeTo, runsHere } from "../../.claude/skills/level0/lib/paths.js";
 import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { awake } from "../doors/awake.js";
 import { biome } from "../doors/biome.js";
@@ -26,20 +25,12 @@ import {
   onTurnEnd,
   SPOKE,
 } from "./answer.js";
-import { holdsGrace } from "./grace.js";
-import {
-  asksForPlan,
-  PLAN,
-  PLAN_CALL,
-  planField,
-  SPECS as planSpecs,
-  TOOLS as planTools,
-} from "./plan.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
 import { asks } from "./config.js";
 import { FINDINGS, findingsFor, heldFor } from "./findings.js";
+import { holdsGrace } from "./grace.js";
 import {
   onAgentSpawn,
   onPromptContext,
@@ -50,6 +41,14 @@ import {
   owesCanary,
   surveyHere,
 } from "./guidance.js";
+import {
+  asksForPlan,
+  PLAN,
+  PLAN_CALL,
+  planField,
+  SPECS as planSpecs,
+  TOOLS as planTools,
+} from "./plan.js";
 import { freshens } from "./projection.js";
 import { SPECS as proseSpecs, TOOLS as proseTools } from "./prose.js";
 import { movedCode } from "./reload.js";
@@ -155,13 +154,22 @@ function specsOf(box) {
 function withPlanField(spec) {
   if (spec.name === PLAN) return spec;
   const properties = { ...(spec.inputSchema?.properties ?? {}), plan: planField() };
-  return { ...spec, inputSchema: { ...(spec.inputSchema ?? { type: "object" }), properties } };
+  return {
+    ...spec,
+    inputSchema: { ...(spec.inputSchema ?? { type: "object" }), properties },
+  };
 }
 
 // The field on a level zero call answers the ask the way the plan call does. [[spec/design_output/stop#the-plan]]
 function planRides(e, box) {
   const tool = String(e?.tool ?? "");
-  if (!e?.plan || typeof e.plan !== "object" || !tool.startsWith("mcp__level0__") || tool === PLAN_CALL) return;
+  if (
+    !e?.plan ||
+    typeof e.plan !== "object" ||
+    !tool.startsWith("mcp__level0__") ||
+    tool === PLAN_CALL
+  )
+    return;
   planTools[PLAN_CALL](e.plan, box);
 }
 
@@ -421,7 +429,7 @@ function answer(response, status, said) {
   response.end(JSON.stringify(said));
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (runsHere(import.meta.url, process.argv)) {
   const args = process.argv.slice(2);
   const at = args.indexOf("--port");
   const method =

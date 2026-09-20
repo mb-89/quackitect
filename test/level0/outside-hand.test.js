@@ -5,6 +5,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { MARKER, REGISTER } from "../../.claude/skills/level0/lib/vehicle.js";
 import { guidanceHere } from "../../src/bridge/guidance.js";
 import { boxOf } from "../../src/bridge/server.js";
 import { registeredPort } from "../../src/bridge/vehicle.js";
@@ -38,9 +39,11 @@ test("the register splits its list the way the caller says", () => {
 // The port road hands the platform down, so a register list reads the same. [[spec/design_output/doors#a-door-reads-the-outside]]
 test("the port reading takes the platform and reaches the same register", () => {
   const files = fakeDisk({
-    "/one/register.json": JSON.stringify([
+    [`/one/${REGISTER}`]: JSON.stringify([
       { id: "abc123", port: 6543, method_root: "/tools", version: "0.1.0" },
     ]),
+    // The register keeps an entry whose method root carries the plugin, so the case writes the marker. [[spec/design_output/vehicle#the-register-holds-the-port]]
+    [`/tools/${MARKER}`]: "{}",
   });
   const env = { SE_REGISTRY: "/one;/two" };
   assert.equal(registeredPort(files, env, fakeClock(), "/tools", true), 6543);
