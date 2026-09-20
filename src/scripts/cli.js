@@ -27,6 +27,7 @@ import {
   standing,
   tools,
   treeHere,
+  commitDoors,
   splitDoors,
   tuiDoors,
   under,
@@ -152,6 +153,10 @@ export const verbs = {
   split: {
     says: "cut a file past the ceiling into the targets you name, with one undo",
     run: async () => (await import("./split-verb.js")).splitVerb(splitDoors(), rest),
+  },
+  commit: {
+    says: "read the message, land the commit, run the check, and push on green",
+    run: async () => (await import("./commit-verb.js")).commitVerb(commitDoors(), rest),
   },
   serve: {
     says: "the server behind the bridgehead, under the debugger with --inspect",

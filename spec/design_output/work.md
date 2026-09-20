@@ -430,6 +430,28 @@ from a trunk carrying none of that work. It then builds that work a second time.
 So `done` stops meaning "the session believes this passes". It comes to mean
 "a program runs on this commit, and it passes".
 
+## One verb feeds that stamp
+
+`./RUNME.sh commit "<message>"` lands a commit and leaves the stamp that `done`
+reads, in four steps:
+
+| the step | what it runs | what it answers on red |
+|---|---|---|
+| the message | `messageFaults`, exported from `src/bridge/bash.js` | every finding at once, and no commit |
+| the commit | `git add -A` and `git commit`, in the verb | what the pre-commit door says, with the staging back |
+| the check | `./RUNME.sh check`, which writes the stamp | the check's last line, and no push |
+| the push | `git push origin`, which the pre-push door reads | what that door says |
+
+What the run leaves behind:
+
+- nothing stages before the message reads clean, so a refused message leaves the tree standing
+- the push door reads the stamp this run writes, so no stale stamp stops a clean commit
+- `--no-push` leaves the branch where it stands
+
+The message read stands with the bash door, which reads the same rules over a
+`git commit` a hand types. For details, see
+[[spec/design_output/bash#a-commit-message-meets-voice]].
+
 The stamp lives under `.se`, which git ignores, so it travels nowhere. A
 different box reads its own answer, and `.github/workflows/check.yml` answers
 for a machine with no stake in it.

@@ -83,8 +83,7 @@ async function commandRules(command, _e, box) {
   return refusedCommand(command, found);
 }
 
-// The one read over a commit message. The door calls it, and so does the verb
-// a hand runs. [[spec/design_output/bash#a-commit-message-meets-voice]]
+// [[spec/design_output/bash#a-commit-message-meets-voice]]
 export async function messageFaults(message, box) {
   if (!box.vale.stands()) return [];
   const text = withoutTrailers(String(message ?? ""));
