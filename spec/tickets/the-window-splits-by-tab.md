@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 9b115fd53d002bdb7a2533567dc8b2b132c3885e
+    hash_after: 9b115fd53d002bdb7a2533567dc8b2b132c3885e
 ---
 
 # Ask
@@ -118,6 +123,24 @@ what it imports. Every import there runs down, so no loop stands.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The packages and their imports stand in
+[[spec/design_output/tui#the-packages-the-window-holds]], and the split follows
+that table. A tab owns its own state, so the frame reads no record and no
+ticket tree.
+
+| the piece | what it becomes |
+|---|---|
+| the model's log fields and the tailer | fields of the log tab, under `src/tui/log` |
+| the model's work fields and the places | fields of the work tab, under `src/tui/work` |
+| the tab interface | grows an `Init`, an `Update` over the tab's own messages and key modes, a `Narrow` for the filter line, and a `Press` for the mouse |
+| `Frame` and `newModel` | stay in the root package, which builds the tab list and hands it to the frame |
+| the tests | move with the code they drive, and the window tests stay in the root package |
+| the build stamp in `src/scripts/tui-build.js` | reads the tab folders too, so a change under one rebuilds the viewer |
+
+A name a tab package reads takes a capital, and the rename reaches every file
+naming it. The footer and the strip draw off what the open tab answers, so the
+frame imports the draw and the tree packages alone.
 
 ## review
 
