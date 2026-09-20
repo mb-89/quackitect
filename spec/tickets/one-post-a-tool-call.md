@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-bridgehead-carries-its-closure
 steps:
   - name: do
@@ -27,6 +27,19 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box 201f76ea75a2 · claude-code-remote
+    hash_before: b07fd7f3dc722ad86864210a93e6b5a7d0d80d7a
+    hash_after: b07fd7f3dc722ad86864210a93e6b5a7d0d80d7a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 14 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 3 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+reason: done
 ---
 
 # Ask
@@ -47,27 +60,25 @@ and a reader waits through both.
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/read-tools.test.js
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+A call of a read tool takes the `*` door every event takes, and the hook holds no door of its own for it. `seen` reads a tool call naming a read tool, and hands it to `reads`, which posts once, and answers where a server stands. Meeting none, it runs the start, waits on the health, and posts once more on the far side. So a dead server costs one post before the start and one after, in place of two before.
 
-<!-- the form is text -->
+What the fold changes beside the count. The `*` door hands the engine the `result` field of the server's answer. The old road handed it that field inside one more `result`, one wrap past the door. No live run reads which shape the engine takes, so the fold leans on the door, which every other tool call goes through. The old road also dropped the `register` list riding the first answer a fresh server gives. Both go through `seen` now.
+
+The cases drive the `*` door with a `next` chaining into any door filtered on the tool, the way the engine chains. So the count reads true whichever shape the hook takes. The fake server answers in the shape the real one does. The chapter The first call pays names the door and the count.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask. One post reaches a live server, the cases count the posts, and the loop covers each read tool.
+- the cleanup in it: the extra wrap and the dropped register list go with the fold, and says names both.
+- the road stands in `reads` alone, and the chapter names it, so no second door spells it
 
 # Discussion
 

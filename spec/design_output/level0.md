@@ -145,11 +145,17 @@ box whose first event finds no server alone.
 registers each at the session's start. That registration reaches no server, so
 a box whose server answers nothing carries the tools anyway.
 
-A call landing before the server stands takes three steps:
+A call of a read tool takes the `*` door every event takes, and no door of its
+own. So one post reaches a server that stands, and the answer rides back the
+way every other answer does, its `register` list among it. A call landing
+before the server stands takes three steps:
 
-- it asks the server once, and answers where one stands
+- it posts once, and answers where a server stands
 - it runs the start above, then reads `/health` every fifth of a second
 - `STARTING` caps that wait, and the wait running out answers the port and the log
+
+A dead server costs that one post before the start and one after it.
+`test/level0/read-tools.test.js` counts both over each read tool.
 
 So a hand calls `find` on its first turn, and that call pays for the server.
 

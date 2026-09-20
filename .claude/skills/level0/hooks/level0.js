@@ -66,7 +66,10 @@ const REASONS = {
   4: ["warn", "the method root is absent, so no server starts"],
   5: ["warn", "this box carries no node, so no server starts"],
   6: ["warn", "the install brings no modules, so no server starts"],
-  7: ["info", "the modules stand nowhere, so the bridgehead installs them and starts one"],
+  7: [
+    "info",
+    "the modules stand nowhere, so the bridgehead installs them and starts one",
+  ],
 };
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
@@ -110,9 +113,6 @@ export function register(on, options) {
   waiting = Number(options?.waiting) || STARTING;
   started = false;
   on("*", ($, e, next) => seen($, e, next));
-  for (const called of CALLED) {
-    on("tool.call", { tool: called }, ($, e, next) => reads($, called, e, next));
-  }
   on("turn.step", streams);
   // [[spec/design_output/pull#a-hand-of-its-own]]
   on("agent.spawn", async ($, e, next) => {
@@ -135,7 +135,9 @@ async function seen($, e, next) {
   const event = String(next?.event ?? "event");
   if (event === "engine.create") return next(e);
   if (event === "session.start") await opens($, e);
-  const answer = await ask($, event, e, next);
+  const answer = reading(event, e)
+    ? await reads($, event, e, next)
+    : await ask($, event, e, next);
   if (!answer) {
     if (event === "session.start") await starts($);
     // The server answers nothing, so the bridgehead says the cage stands down where a reader stands. [[spec/design_output/level0#a-session-says-its-cage]]
@@ -286,19 +288,24 @@ async function registers($, specs) {
   }
 }
 
-// A read tool called before the server stands brings it up, and answers on the far side. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-async function reads($, called, e, next) {
-  const first = await ask($, "tool.call", { ...e, tool: called }, { event: "tool.call" });
-  if (first?.result !== undefined) return { result: first.result };
+// A read tool's call takes the one door every event takes, and no door of its own, so one post reaches a server that stands. [[spec/design_output/level0#the-first-call-pays]]
+function reading(event, e) {
+  return event === "tool.call" && CALLED.includes(String(e?.tool ?? ""));
+}
+
+// A read tool called before the server stands brings it up, and posts once more on the far side. The answer takes the shape the server gives, so the door reads it the way it reads every other. [[spec/design_output/level0#the-first-call-pays]]
+async function reads($, event, e, next) {
+  const first = await ask($, event, e, next);
+  if (first) return first;
   await starts($);
   if (!(await healthy($))) {
     return {
-      result: `no server answers at ${url()}, so ${called} reads nothing. Run ./RUNME.sh serve, and read .se/.log/serve.log for what it says.`,
+      result: {
+        result: `no server answers at ${url()}, so ${String(e?.tool ?? "")} reads nothing. Run ./RUNME.sh serve, and read .se/.log/serve.log for what it says.`,
+      },
     };
   }
-  const said = await ask($, "tool.call", { ...e, tool: called }, { event: "tool.call" });
-  if (said?.result !== undefined) return { result: said.result };
-  return next(e);
+  return ask($, event, e, next);
 }
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
