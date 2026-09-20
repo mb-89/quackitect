@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -109,6 +109,17 @@ record:
     hand: box fa49097ce66c · claude-code-remote · helper-4
     hash_before: 9c6d407f5dee5b289df025a62cc96d518cc2fa0d
     hash_after: 9c6d407f5dee5b289df025a62cc96d518cc2fa0d
+  - step: implement/tests-red
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 4a93940562e7a57640eaebd34255ab96d0f9f349
+    hash_after: 4a93940562e7a57640eaebd34255ab96d0f9f349
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -223,17 +234,46 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The verb answers `assertion`, and most cases fail on their own assertion.
+
+| what the case asks | what a fresh box answers |
+|---|---|
+| the mint spec names every kind the schemas hold | an empty list of kinds |
+| the mint answers a refusal on an unknown kind | a `TypeError` off `schemas.get` |
+| the registration hands back the box's own list | a second list, built inside `decide` |
+| the tools block names the survey and the mint | no block, because the survey stands nowhere |
+
+Two cases pass on the tree as it stands. A tool call on a fresh box registers
+the patch tool and the check tool, and a second event registers nothing. That
+matches the review's reading: the registration road holds, and what rides it
+comes back empty.
+
+**What surprises me.** The fake bridgehead under `src/doors/fake` drops the
+register where the answer carries an `after` field. A canary debt puts one
+there on the first tool call, so a case driving the fake reads no registration
+at all. The cases call `decide` straight, and the fake stays as it stands.
+
+The box the cases build comes from `boxOf`, which takes every door as an
+argument. So the disk, the clock, the process, the log and the index all stand
+as fakes, and the case touches memory alone.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `test/level0/restart-box.test.js` alone, which the ask's second line calls for
+- the box comes from `boxOf` with a fake disk, clock, process, log and index
+- the head comment names the approach, and each helper carries the line saying what it builds
 
 ## reflect
 
