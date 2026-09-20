@@ -5,9 +5,9 @@ status: done
 
 # Where it stands
 
-The branch closes eight tickets of `the-rules-hold-themselves`. The tip stands
-green: `./RUNME.sh check` answers 0, `./RUNME.sh lint spec` answers 0 in under
-seven seconds, and `branch review` says nothing waits.
+The branch closes the tickets below, out of the group
+`the-rules-hold-themselves`. The tip stands green: `./RUNME.sh check` answers 0,
+and `branch review` says nothing waits.
 
 | ticket | what lands |
 |---|---|
@@ -19,24 +19,34 @@ seven seconds, and `branch review` says nothing waits.
 | `a-project-adds-vale-rules` | the styles of both roots assemble, and the vale door reads them |
 | `a-check-finds-every-writer` | the escape binds to the line, and the installer meets its lists |
 | `a-check-finds-restated-facts` | three rules find one fact written in two places, and one pass answers every path |
+| `a-lint-holds-note-rules` | the check reads a marked rule against the rationale it links |
+| `the-check-holds-test-first` | both doors refuse a code change standing with no test |
+| `the-door-reads-script-writes` | the shell door reads a script it runs, and refuses the writes inside |
 
 Each one carries its evidence on its ticket. A hand other than the one making
 the change passes every verdict.
 
 # What waits
 
-Four tickets stand open in this group. Each carries an approach under its draft,
-and each waits for a hand other than this box to read it:
+One ticket stands open in this group. It carries an approach under its draft,
+and waits for a hand other than this box to read it:
 
 | ticket | where it stands |
 |---|---|
-| `a-lint-holds-note-rules` | design/review |
-| `the-check-holds-test-first` | design/review |
-| `the-door-reads-script-writes` | design/review |
 | `the-door-rule-reads-env` | design/review |
 
 The pull writes the prompt for that hand. A box spawns it, and takes the
 implement steps itself once the review passes.
+
+## Two asks stand minted
+
+The work under this branch mints two asks of its own. Each stands at `draft`,
+outside any group, and waits for a pull:
+
+| ticket | what it asks |
+|---|---|
+| `a-rule-names-its-failure` | a guidance rule says the failure it guards, beside itself |
+| `a-door-holds-the-go-file-calls` | every Go package names its file reading in one file |
 
 ## The queue binds one hand
 
@@ -50,7 +60,7 @@ nameless pull for that reason. [[src/scripts/pull.js]]
 | runs four hands at once | Vale gives up on a rule at two seconds, and the lint calls every voice rule unchecked |
 | spawns one hand at a time | the hand takes the leaf the queue hands it |
 
-## Three findings for the retro
+## The findings the retro reads
 
 The private folder dies with this box, so the notes it holds stand here.
 
@@ -72,6 +82,18 @@ does.
 | where | a chapter of `spec/design_output/tree-view.md`, and two comments under `src/viewer` |
 | what the check says | nothing, on either comment |
 | the fix for the class | a check reads a pointer's own slug against the headings of the note it names |
+
+The last three notes stand against the code, and the door work under this branch
+finds each one:
+
+| note | what it says |
+|---|---|
+| `a-door-holds-three-reads` | three roots read the pid, the version and the exec path past the door rule |
+| `path-join-stands-twice` | one place joins a path through the door, and another writes the slash itself |
+| a write lands on a free file | the write tool takes a whole file, and a hand reading it as free loses the text |
+
+The write class wants the fix beside it. A hand reads a file before it writes
+one, and reaches for the patch road where the file stands already.
 
 ## What this box leaves behind
 
