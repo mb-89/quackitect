@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 4504a852cc5e340fa0744f71419f0526b27967ec
     returns: 1
     why: Name where `escalate --craft` sends a question the drafter raises on `design/draft`.; `target` answers the held leaf itself where `on_fail` stands empty, so the leaf stays put.; Name what `escalate --craft` owns beside the fail verdict, which already returns review to draft.; Name the rationale section each new rule takes, or leave the rule unstarred.
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 1f5ffebfe9bb2676a0d710a19355507584651e14
+    hash_after: 1f5ffebfe9bb2676a0d710a19355507584651e14
 ---
 
 # Ask
@@ -122,37 +126,38 @@ The agent builds ahead of the owner, and craft questions and settled ones take t
 
 ### approach
 
-The escalate verb grades the question, and a craft one goes back to its drafter.
+Two rules grade the question, and the roads the engine holds carry each grade.
 
-The notes under `spec/design_input` settle what the tree is for. A question
-those notes answer is craft, and the drafter answers it by reading. A question
-they leave open is design, and the owner answers that.
+The notes under `spec/design_input` settle what the tree is for. A question those notes answer is craft, and the drafter answers it by reading them. A question they leave open is design, and the owner answers that.
 
-| the question | who answers it | how it goes |
+| the grade | who answers it | the road it takes |
 |---|---|---|
-| design: what the tree is for, and what the owner wants of it | the owner | a person step, as `escalate` writes one today |
-| craft: which road the code takes inside what the design settles | the drafter | the leaf fails back to its drafter, carrying the question |
+| design | the owner | `branch escalate`, which puts a person step before the held leaf |
+| craft, found by the reviewer | the drafter | the fail verdict, which `on_fail: draft` routes today |
+| craft, found by the drafter | the drafter | the design input, read before the drafter offers a choice |
+
+The earlier draft asked for `escalate --craft`, and this one drops it. A craft question the reviewer finds already reaches the drafter through the fail verdict. A second road to one outcome breaks the rule of [[spec/guidance/working]] giving one thing one owner.
+
+A craft question the drafter raises reaches no verb, because the design input answers it. Where the input leaves it open the question is design, so `escalate` takes it. So the drafter's own leaf wants no `on_fail` of its own.
 
 | what changes | how |
 |---|---|
-| `escalate` in `pull.js` | takes `--craft`, which fails the leaf back to its drafter with the question as the reason |
-| `withPersonStep` in `pull-hand.js` | stands as it stands, and a design question alone reaches it |
-| `spec/guidance/working.md` | takes the drafter's rule under these tables |
-| `spec/guidance/review/reviewing.md` | takes the reviewer's rule beside it |
-| `test/level0/pull-escalate.test.js` | takes the case under those |
-| [[spec/design_output/pull#a-person-step-goes-in]] | says what each grade does |
+| `spec/guidance/working.md` | its seventh rule takes the drafter's half |
+| `spec/guidance/review/reviewing.md` | takes the reviewer's rule, one more on its list |
+| `test/level0/pull-escalate.test.js` | takes the case under this table |
+| [[spec/design_output/pull#a-person-step-goes-in]] | says which grade takes which road |
+| `escalate` in `pull.js` | stands as it stands, and a design question alone reaches it |
 
-The drafter's rule reads in two halves. Read `spec/design_input` before you
-offer the owner a choice. Ask the owner the design question before you build on
-an answer of your own.
+**The rules.** The working note caps its list at the count its schema names, so the drafter's half joins the seventh rule. That rule already governs what a hand decides while the owner stands away. Both rules land unstarred, because neither rationale note holds a section for them.
 
-The reviewer's rule reads: grade each question a return names as design or
-craft, and hand the craft ones back to the drafter.
+| the note | the rule it takes |
+|---|---|
+| `spec/guidance/working` | Read `spec/design_input`, then ask the owner a design question before you build your own answer. |
+| `spec/guidance/review/reviewing` | Grade each question a return names as design or craft, and hand a craft one back to the drafter. |
 
-The case drives `escalate` under `--craft` over a leaf whose route holds a
-drafter. It asserts three things:
+**The case.** It drives the fail verdict over a review leaf whose route carries `on_fail: draft`. It asserts three things:
 
-- the ticket stands at that drafter
+- the ticket stands at the drafter's leaf
 - the record carries the question as its reason
 - the route takes on no person step
 
