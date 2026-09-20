@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -115,6 +115,12 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 63ba308a28025da183a21964d0bd1ca9a2a61a04
     hash_after: 63ba308a28025da183a21964d0bd1ca9a2a61a04
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-6
+    hash_before: a1d0cfac1a84465ae895ca917c94e045df39f3c1
+    hash_after: a1d0cfac1a84465ae895ca917c94e045df39f3c1
+    returns: 3
+    why: "`./RUNME.sh lint spec` hands the checker a folder, and `Over` reads one path.; Say how a folder path reaches `RestatedPointer` and `RestatedRule`, because the ask names that verb.; Name the JavaScript writing `RestatedTable`, because the projection writes every rule file.; Name the `rules` entry carrying warning, because the projection writes the level from that map."
 ---
 
 # Ask
@@ -192,11 +198,10 @@ no fault standing behind a green check.
 
 fail
 
-- A named path asks the checker under `src/lsp`, and the module stands outside that road.
-- Say which checker holds each rule, because the editor and the check read the one under `src/lsp`.
-- Name the JavaScript the module blanks with, because `blanked` stands inside the projection.
-- Say the scope `RestatedTable` reads, and the rule file it lands in.
-- Name the level `RestatedTable` lands at, because the projection writes a level into every rule file.
+- `./RUNME.sh lint spec` hands the checker a folder, and `Over` reads one path.
+- Say how a folder path reaches `RestatedPointer` and `RestatedRule`, because the ask names that verb.
+- Name the JavaScript writing `RestatedTable`, because the projection writes every rule file.
+- Name the `rules` entry carrying warning, because the projection writes the level from that map.
 
 # implement
 
