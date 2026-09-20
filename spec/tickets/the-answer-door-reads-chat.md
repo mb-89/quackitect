@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box fa49097ce66c · claude-code-remote
     hash_before: 8957836c819b43e2d46ab96990d693e7a73faa42
     hash_after: 47f361632d2a55e801ee9d972611fcdf97d64e6c
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-11
+    hash_before: 6e73dceeee447f4bcd7029d590ddc9756fa978bd
+    hash_after: 6e73dceeee447f4bcd7029d590ddc9756fa978bd
+    returns: 2
+    why: the tree holds two `SAYS`, and the plan names the one under `src/bridge/answer.js` alone; the chapter "What the refusal says" quotes the `SAYS` of `.claude/skills/level0/lib/answer.js` today; a standing case in `test/level0/answer.test.js` asserts that second `SAYS`, and the plan skips it; the draft writes a count, and the log carries 44 rows today, so the count drifts; 35 of those 44 rows follow a call, so "every one of them" overstates the log; the ordering holds on 33 rows, where a displayed text stands between two calls; answers the earlier findings on the `onAgentSpoke` row, the change table, and the `SAYS` case; answers the earlier findings on both chapters, the refusal quote, and the log this box keeps; answers the earlier finding on the bullet count, now three bullets under "Three things the road does"; the three cases the plan names run against the door as written, so the shape holds; `./RUNME.sh check` answers 0 on this branch, and the branch review reads the retro as absent
 ---
 
 # Ask
@@ -197,15 +203,17 @@ The review decides it.
 
 fail
 
-- the table claims a case covers `onAgentSpoke`, and the tree holds none, so that row reads false
-- the change table leaves out `src/bridge/answer.js`, which the prose changes at `SAYS` and the refusal
-- a `SAYS` rewrite breaks the standing case asserting the report line, and the plan names no fix
-- the reply line chapter alone changes, and the paragraph under "What the door reads" keeps the opposite rule
-- the refusal quoted under "What the refusal says" drifts from `SAYS` today, and the plan skips it
-- the cited log pair stands outside the log this box keeps, though the ordering it claims holds
-- "Two things the road does" opens a list of three bullets
+- the tree holds two `SAYS`, and the plan names the one under `src/bridge/answer.js` alone
+- the chapter "What the refusal says" quotes the `SAYS` of `.claude/skills/level0/lib/answer.js` today
+- a standing case in `test/level0/answer.test.js` asserts that second `SAYS`, and the plan skips it
+- the draft writes a count, and the log carries 44 rows today, so the count drifts
+- 35 of those 44 rows follow a call, so "every one of them" overstates the log
+- the ordering holds on 33 rows, where a displayed text stands between two calls
+- answers the earlier findings on the `onAgentSpoke` row, the change table, and the `SAYS` case
+- answers the earlier findings on both chapters, the refusal quote, and the log this box keeps
+- answers the earlier finding on the bullet count, now three bullets under "Three things the road does"
 - the three cases the plan names run against the door as written, so the shape holds
-- `./RUNME.sh check` answers 0 on this branch, and the handback carries no retro
+- `./RUNME.sh check` answers 0 on this branch, and the branch review reads the retro as absent
 
 # implement
 
