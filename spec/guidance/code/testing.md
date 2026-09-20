@@ -15,4 +15,4 @@ rationale: [[spec/rationales/testing]]
 7. Share a fixture nobody writes to, and make what a test changes inside the test.
 8. Take the clock and the random source as arguments, so a failing case replays.
 9. Let every test run beside every other. A test needing an order is a red test.
-10. Run `./RUNME.sh check` before you finish, and read what it names.
+10. Read the rule on the check in [[spec/guidance/code/code]], which holds it over every change.

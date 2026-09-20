@@ -292,11 +292,17 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the checker, its front, the schema, the config pair, and the places the rules name
+- the Go fixture writes a tree of its own, and the Vale case drives the real binary
+- each rule and each piece carries the pointer at the chapter tabling the rules over two files
 
 ## tests-green
 

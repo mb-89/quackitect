@@ -19,6 +19,11 @@
     "dayScore": 1,
     "failScore": 5
   },
+  "restated": {
+    "comment": "The runs the restated rules refuse. A run is a count of words two places share, and spec/design_output/tree.md tables the rules reading them.",
+    "pointer": 4,
+    "rule": 6
+  },
   "refactor": {
     "comment": "The hand the stop door starts while the warnings stand past the number. spec/guidance/code/refactoring.md says what that hand does.",
     "parallel": true,

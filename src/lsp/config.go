@@ -34,6 +34,31 @@ func wordsHere(root string) int {
 	return out
 }
 
+// The runs the restated rules refuse, read off the same layers. [[spec/design_output/config#the-resolver-holds-the-layers]]
+func restatedHere(root string) (int, int) {
+	pointer, rule := 0, 0
+	for _, path := range []string{Tracked, Local} {
+		if said, held := numbersFrom(root, path, "restated"); held {
+			if one, whole := said["pointer"].(float64); whole {
+				pointer = int(one)
+			}
+			if one, whole := said["rule"].(float64); whole {
+				rule = int(one)
+			}
+		}
+	}
+	return pointer, rule
+}
+
+func numbersFrom(root, path, key string) (map[string]any, bool) {
+	read, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+	if err != nil {
+		return nil, false
+	}
+	said, held := parsedJSON(string(read))[key].(map[string]any)
+	return said, held
+}
+
 func wordsFrom(root, path string) (int, bool) {
 	read, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
 	if err != nil {

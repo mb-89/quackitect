@@ -56,12 +56,29 @@ func TestRestatedRuleStandsQuiet(t *testing.T) {
 	}
 }
 
+// The lint hands the checker a folder, so each note under it reads as its own. [[spec/design_output/lsp#one-checker-every-front-asks]]
+func TestPathsUnderWalksAFolder(t *testing.T) {
+	tree := fixture(t, map[string]string{
+		"spec/guidance/one.md":      "# Actionables\n\n1. Reach a door.\n",
+		"spec/design_output/two.md": "# A chapter\n\nA line.\n",
+	})
+
+	said := pathsUnder(tree, []string{"spec/guidance"})
+	if len(said) != 1 || said[0] != "spec/guidance/one.md" {
+		t.Fatalf("a folder reads as the notes under it, and this answers %v", said)
+	}
+
+	if one := pathsUnder(tree, []string{"spec/guidance/one.md"}); len(one) != 1 {
+		t.Fatalf("a named file stands as it reads, and this answers %v", one)
+	}
+}
+
 // The measure answers the run, and a code span or a link counts for nothing. [[spec/design_output/tree#the-rules-over-two-files]]
 func TestSharedRunAnswersTheLongestRun(t *testing.T) {
-	if said := sharedRun("the door reads the whole file", "a door reads the whole file now"); said != 4 {
-		t.Fatalf("the run holds four words, and the measure answers %d", said)
+	if said := sharedRun("the door reads the whole file", "a door reads the whole file now"); said != 5 {
+		t.Fatalf("the run holds five words, and the measure answers %d", said)
 	}
-	if said := sharedRun("`the door` reads [[a/note]]", "the door reads a note"); said != 0 {
-		t.Fatalf("a span and a link blank out, and the measure answers %d", said)
+	if said := sharedRun("`the door` reads [[a/note]]", "the door reads a note"); said != 1 {
+		t.Fatalf("a span and a link blank out, leaving one word, and this answers %d", said)
 	}
 }

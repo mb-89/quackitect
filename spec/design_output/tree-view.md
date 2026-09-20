@@ -47,7 +47,7 @@ what the ones before it leave, and cuts its text there with an ellipsis. So a
 long field reads in the last column at every width, and a row fills the width
 the tab hands it.
 
-## The columns stand still
+## A tab joins the two
 
 `Header` draws the line of column names, and `Rows` draws the rows. A tab joins
 the two, so the names stand still while the rows scroll under them. The log tab

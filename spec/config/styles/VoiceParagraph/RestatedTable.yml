@@ -1,0 +1,165 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: script
+message: "A paragraph says again what a cell of the table beside it holds."
+link: spec/funnel/a-paragraph-has-a-schema.md
+level: warning
+scope: raw
+script: |
+  text := import("text")
+
+  matches := []
+
+  blanked := func(said, pattern) {
+    found := text.re_find(pattern, said, -1)
+    if is_undefined(found) { return said }
+    parts := []
+    at := 0
+    for one in found {
+      m := one[0]
+      parts = append(parts, said[at:m.begin])
+      parts = append(parts, text.repeat(" ", m.end - m.begin))
+      at = m.end
+    }
+    parts = append(parts, said[at:])
+    return text.join(parts, "")
+  }
+
+  prose := ["does", "says", "checklist", "comment", "help", "ask"]
+
+  frontless := func(said) {
+    lines := text.split(said, "\n")
+    if len(lines) < 2 || text.trim_space(lines[0]) != "---" { return said }
+    out := []
+    inside := true
+    keep := false
+    for at, line in lines {
+      if at == 0 {
+        out = append(out, line)
+        continue
+      }
+      if inside && text.trim_space(line) == "---" {
+        inside = false
+        out = append(out, line)
+        continue
+      }
+      if !inside {
+        out = append(out, line)
+        continue
+      }
+      found := text.re_find(`^[ \t]*-?[ \t]*([A-Za-z_][A-Za-z0-9_]*):`, line, 1)
+      if !is_undefined(found) {
+        keep = false
+        for one in prose {
+          if one == found[0][1].text { keep = true }
+        }
+      }
+      if keep {
+        out = append(out, line)
+      } else {
+        out = append(out, text.repeat(" ", len(line)))
+      }
+    }
+    return text.join(out, "\n")
+  }
+
+  plain := func(said) {
+    out := frontless(said)
+    out = blanked(out, "(?s)```.*?```")
+    out = blanked(out, `(?s)~~~.*?~~~`)
+    out = blanked(out, `(?s)<!--.*?-->`)
+    out = blanked(out, `(?m)^(?:\t| {4,}).*$`)
+    out = blanked(out, "(?s)`[^`]*`")
+    out = blanked(out, `https?://[^\s)]+`)
+    out = blanked(out, `\[\[[^\]]*\]\]`)
+    out = blanked(out, `\[[^\]]*\]\([^)]*\)`)
+    out = blanked(out, `[A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+`)
+    return out
+  }
+
+  rows := func(said) {
+    out := []
+    at := 0
+    for line in text.split(frontless(said), "\n") {
+      out = append(out, {said: line, begin: at, end: at + len(line)})
+      at += len(line) + 1
+    }
+    return out
+  }
+
+  said := frontless(scope)
+  wordsOf := func(one) {
+    clean := text.re_replace("`[^`]*`", one, " ")
+    clean = text.re_replace(`\[\[[^\]]*\]\]`, clean, " ")
+    clean = text.re_replace(`[^a-z0-9]+`, text.to_lower(clean), " ")
+    return text.fields(clean)
+  }
+
+  run := func(a, b) {
+    most := 0
+    for i := 0; i < len(a); i++ {
+      for j := 0; j < len(b); j++ {
+        n := 0
+        for i+n < len(a) && j+n < len(b) && a[i+n] == b[j+n] { n = n + 1 }
+        if n > most { most = n }
+      }
+    }
+    return most
+  }
+
+  aside := func(line) {
+    said := text.trim_space(line)
+    if len(said) == 0 { return true }
+    if text.has_prefix(said, "#") { return true }
+    if text.has_prefix(said, "|") { return true }
+    if text.has_prefix(said, "-") { return true }
+    if text.has_prefix(said, ">") { return true }
+    return false
+  }
+
+  lines := rows(said)
+  at := 0
+  for at < len(lines) {
+    if !text.has_prefix(text.trim_space(lines[at].said), "|") {
+      at = at + 1
+      continue
+    }
+    from := at
+    cells := []
+    for at < len(lines) && text.has_prefix(text.trim_space(lines[at].said), "|") {
+      for cell in text.split(text.trim_space(lines[at].said), "|") {
+        one := text.trim_space(cell)
+        if len(one) > 0 && !text.re_match(`^[-: ]+$`, one) { cells = append(cells, wordsOf(one)) }
+      }
+      at = at + 1
+    }
+
+    near := []
+    up := from - 1
+    for up >= 0 && len(text.trim_space(lines[up].said)) == 0 { up = up - 1 }
+    for up >= 0 && !aside(lines[up].said) {
+      near = append(near, lines[up])
+      up = up - 1
+    }
+    down := at
+    for down < len(lines) && len(text.trim_space(lines[down].said)) == 0 { down = down + 1 }
+    for down < len(lines) && !aside(lines[down].said) {
+      near = append(near, lines[down])
+      down = down + 1
+    }
+
+    for row in near {
+      mine := wordsOf(row.said)
+      for cell in cells {
+        if run(mine, cell) >= 6 {
+          matches = append(matches, {
+            begin: row.begin,
+            end: row.end,
+            message: "This line says again what a cell of the table beside it holds. Cut it, and let the table carry it."
+          })
+          break
+        }
+      }
+    }
+  }
