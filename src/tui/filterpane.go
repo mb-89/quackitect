@@ -58,13 +58,46 @@ func (m model) presetParts() []part {
 	out := []part{{}}
 	for _, one := range said {
 		row := pad(keyShown(one.Key), wide) + "  " + one.Name
-		if m.input.Value() == one.Filter {
+		if m.presses(one) {
 			out = append(out, part{text: openStyle.Render(row), drawn: true})
 			continue
 		}
 		out = append(out, part{text: dimStyle.Render(row), drawn: true})
 	}
 	return out
+}
+
+// Whether a preset stands pressed: the line holds its filter, and a preset filtering nothing holds through its sort. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func (m model) presses(one preset) bool {
+	if m.input.Value() != one.Filter {
+		return false
+	}
+	if one.Filter != "" {
+		return true
+	}
+	return len(one.Sorts) > 0 && m.onWork() && sameSorts(m.work.Sorts(), one.Sorts)
+}
+
+// The preset the open tab holds pressed, and nil where the line is a person's own. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func (m model) pressed() *preset {
+	for _, one := range m.tabs[m.open].Presets(&m) {
+		if m.presses(one) {
+			return &one
+		}
+	}
+	return nil
+}
+
+func sameSorts(held, want []Sort) bool {
+	if len(held) != len(want) {
+		return false
+	}
+	for at := range held {
+		if held[at] != want[at] {
+			return false
+		}
+	}
+	return true
 }
 
 // The preset standing on a row of the pane, counted from the pane's top, so a press on it presses the preset. [[spec/design_output/tui#the-filter-pane-takes-letters]]

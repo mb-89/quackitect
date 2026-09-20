@@ -39,7 +39,7 @@ groups:
         down: true
   - name: urgent
     filters:
-      - urgent: true
+      - urgent: true and not state: closed
 views:
   - type: table
     name: every ticket

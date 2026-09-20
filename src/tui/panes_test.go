@@ -58,6 +58,18 @@ func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 	if said := m.work.Sorts(); len(said) != 1 || said[0].Key != queueKey {
 		t.Fatalf("the queue's sort takes hold at the start, and it reads %v", said)
 	}
+	// The queue is a pressed preset, so the funnel stands red, and a sort of a person's own lets go of it. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+	work := press(m, "2")
+	if !work.tabs[work.open].Narrowed(&work) || work.pressed() == nil || work.pressed().Name != "queue" {
+		t.Fatal("the work tab opens narrowed by the queue preset")
+	}
+	if !strings.Contains(renderParts(work.presetParts(), 80), "alt+1  queue") {
+		t.Fatal("the pressed queue row stands in the pane")
+	}
+	work.work.SortOn("name")
+	if work.tabs[work.open].Narrowed(&work) || work.pressed() != nil {
+		t.Fatal("a sort of a person's own lets go of the queue preset, and the funnel stands grey")
+	}
 	m = alt(press(m, "2"), '2')
 	if m.sourceOf(1) != "held: true" {
 		t.Fatalf("alt+2 writes the held preset, and the work's line reads %q", m.sourceOf(1))

@@ -3,12 +3,12 @@
 // first. One order feeds it: the person's rows by score, then the agent's.
 // [[spec/design_output/pull#the-queue-is-an-outline]]
 
-import { fieldOf, GROUP } from "../engine/group.js";
+import { CLOSED, fieldOf, GROUP } from "../engine/group.js";
 
-// The place of a ticket off the queue, which every order puts last. [[spec/design_output/pull#the-queue-is-an-outline]]
+// The place of a ticket the pull holds back, which every order puts after the placed ones. [[spec/design_output/pull#the-queue-is-an-outline]]
 export const UNPLACED = "∞";
 
-// The outline, a place a name, off the two ordered lists and every ticket the tree holds. A ticket in neither list stands unplaced. [[spec/design_output/pull#the-queue-is-an-outline]]
+// The outline, a place a name, off the two ordered lists and every ticket the tree holds. A ticket in neither list stands unplaced, and a closed one takes no place at all. [[spec/design_output/pull#the-queue-is-an-outline]]
 export function outlineIn(persons, agents, all) {
   const ordinal = new Map();
   for (const one of [...persons, ...agents]) {
@@ -34,7 +34,7 @@ export function outlineIn(persons, agents, all) {
       numberUnder(one.name, String(at + 1), kids, best, out);
     });
   for (const one of all) {
-    if (!out.has(one.name)) out.set(one.name, UNPLACED);
+    if (!out.has(one.name) && fieldOf(one.text, "state") !== CLOSED) out.set(one.name, UNPLACED);
   }
   return out;
 }

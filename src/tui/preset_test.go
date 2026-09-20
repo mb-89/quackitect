@@ -112,4 +112,8 @@ func TestABaseFileNamesThePresetsUnderGroups(t *testing.T) {
 			t.Fatalf("every other preset carries a filter, and %s carries none", one.Name)
 		}
 	}
+	// The urgent preset keeps the open ones, because a closed ticket asks nothing of anybody. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+	if last := said[len(said)-1]; last.Name != "urgent" || !strings.Contains(last.Filters, "not state: closed") {
+		t.Fatalf("urgent keeps the open tickets alone, and it reads %v", last)
+	}
 }

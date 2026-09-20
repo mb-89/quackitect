@@ -245,7 +245,8 @@ reader draws that number as it stands.
 | an agent's step | counts up from `1` |
 | a group | one number, off the best place among itself and its tickets |
 | a ticket under a group | the group's number, a dot, and its own place under it, as `1.2` |
-| a closed ticket, or one the pull hands out nowhere | `∞`, which every order puts last |
+| an open ticket the pull holds back: a draft, one waiting on a dependency, one another hand holds | `∞`, which stands after every number |
+| a closed ticket | no place, so a view sorting by place puts it after the rest |
 
 An agent takes no negative place, so the person's rows stand for a person
 alone. The mark holds inside each list, so an urgent step leads the agent's

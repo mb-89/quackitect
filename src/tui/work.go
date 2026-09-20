@@ -208,7 +208,10 @@ func workFields(root string, one Item) []part {
 	return out
 }
 
-func (workTab) Narrowed(m *model) bool { return m.work != nil && m.work.Narrowed() }
+// A pressed preset narrows the tab, the queue among them, so the funnel stands red while one holds. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func (workTab) Narrowed(m *model) bool {
+	return m.work != nil && (m.work.Narrowed() || m.pressed() != nil)
+}
 
 // [[spec/design_output/tui#the-help-reads-the-cursor]]
 func (workTab) Keys(m *model) band {

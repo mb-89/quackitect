@@ -140,10 +140,22 @@ test("a closed ticket on trunk stands off the queue, whatever a merged branch sa
   it.clock = fakeClock("2026-01-01T03:00:00.000Z");
   const said = answerOf(it);
   const gone = said.branches.find((one) => one.name === "gone-group");
-  assert.equal(gone.queue, UNPLACED, "a merged group stands off the queue");
-  assert.equal(gone.tickets[0].queue, UNPLACED, "and so does its ticket");
+  // A closed ticket takes no place at all, so the tab sorts it after the unplaced. [[spec/design_output/pull#the-queue-is-an-outline]]
+  assert.equal("queue" in gone, false, "a closed group takes no place");
+  assert.equal("queue" in gone.tickets[0], false, "and neither does its closed ticket");
   assert.equal(said.branches.find((one) => one.name === "one-group").queue, "1");
-  assert.equal(said.loose.some((one) => one.name === "its-child" && one.queue !== UNPLACED), false, "the stale copy places nothing");
+  assert.equal(said.loose.some((one) => one.name === "its-child" && "queue" in one), false, "the stale copy places nothing");
+  const draft = answerOf({
+    ...doorsSaying(
+      remoteSaying([], {
+        "origin/main:spec/tickets/a-draft.md": LOOSE.replace("state: open", "state: draft"),
+        "origin/main:spec/tickets/a-loose-one.md": LOOSE,
+      }),
+    ).it,
+    root: ROOT,
+    clock: fakeClock("2026-01-01T03:00:00.000Z"),
+  });
+  assert.equal(draft.loose.find((one) => one.name === "a-draft").queue, UNPLACED, "an open ticket the pull holds back stands unplaced");
   // A merged branch speaks for no ticket, so one trunk holds nowhere takes no place at all. [[spec/design_output/pull#the-queue-is-an-outline]]
   const orphan = answerOf({
     ...doorsSaying(
