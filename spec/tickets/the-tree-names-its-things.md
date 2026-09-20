@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -88,6 +88,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-tree-names-its-things already carries every commit on main.
+  - step: split
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 0b2890a9db284cd1f16e32365b33fe365f0764e7
+    hash_after: 0b2890a9db284cd1f16e32365b33fe365f0764e7
 ---
 
 # Ask
@@ -119,14 +123,34 @@ answers one of those, across the notes, the editor and the viewer.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- a-base-file-says-it
+- a-cell-takes-an-edit
+- a-claim-meets-the-view
+- a-person-reads-the-split
+- a-question-reaches-its-owner
+- a-rename-reaches-every-note
+- an-experiment-ends-decided
+- apply-lane-carries-a-hand
+- the-brand-names-the-plugin
+- the-colours-stand-in-config
+- the-controls-wire-up
+- the-help-reads-the-cursor
+- the-judge-reads-answer-rules
+- the-tree-draws-its-columns
+- the-tree-takes-a-filter
+- the-viewer-draws-the-note
+- the-window-grows-a-frame
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small enough to review whole, or is a group itself. Each one closes on a verdict a hand read whole.
+- the children add up to the goal, and nothing of the goal stands outside them. The goal's four lines each land, and one more ticket carries the folder per tab.
+- a child that waits on another names it under depends_on. The colours ticket lands before the rename, and each closed in that order.
 
 # children
 
