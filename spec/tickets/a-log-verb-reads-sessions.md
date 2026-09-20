@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -151,6 +151,12 @@ record:
       - name: check
         exit: 1
         said:      1  in all
+  - step: implement/tests-red
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 51f4b20359a3382c2cf54375374a0f72e695fb58
+    hash_after: 51f4b20359a3382c2cf54375374a0f72e695fb58
+    returns: 1
+    why: the hand takes it back
 ---
 
 # Ask
