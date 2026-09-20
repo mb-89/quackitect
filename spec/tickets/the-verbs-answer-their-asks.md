@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box fb2b49fba485 · claude-code-remote
@@ -103,6 +103,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box fb2b49fba485 · claude-code-remote
+    hash_before: 65fab3e004bd3155784cdc8c36481f1e22ae6e49
+    hash_after: 65fab3e004bd3155784cdc8c36481f1e22ae6e49
 ---
 
 # Ask
@@ -171,11 +175,20 @@ Three verbs answer what their asks name. a-route-closes-answered-asks closes a t
 
 <!-- the form is list -->
 
+- [[spec/tickets/a-route-closes-answered-asks]]: the hand-back takes `--answered <ticket>`, and the record names the answering ticket
+- [[spec/tickets/split-names-its-source]]: the split verb reads its source past every flag and its value
+- [[spec/tickets/the-index-answers-the-queue]]: closed answered by the ticket the tab's queue column stands on
+- the chapter [[spec/design_output/pull#answered]], and the source line under [[spec/design_output/level0#a-verb-cuts-the-file]]
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- every case drove fake doors, so no test touched the disk or git
+- the design note held one chapter a road, so the answered road took a chapter beside became
+- the third child closed on the road the first built, so this branch proved its own verdict
 
 ### badly
 
@@ -183,11 +196,19 @@ Three verbs answer what their asks name. a-route-closes-answered-asks closes a t
 
 <!-- the form is list -->
 
+- the first hand-back came back refused, where the refusal reads `expects green, and ./RUNME.sh test`. The bare test verb answers a duration line and no word
+- the second came back refused at the commit door, where the refusal reads `carries no test beside it`. The changed test imported neither module it drove
+- the first ticket's says ran past the shape rule, where the lint reads `A run holds 3 paragraphs`
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- the says line of the tests field in `spec/processes/trivial.yaml` names `branch test` as the verb answering `green`
+- the finding in `.claude/skills/level0/lib/tested.js` says a test stands beside a module where it imports it or carries its name
+- the hand writes a table before its prose, as [[spec/guidance/voice]] says, and lints the ticket before the hand-back
 
 ### thoughts
 
@@ -195,11 +216,24 @@ Three verbs answer what their asks name. a-route-closes-answered-asks closes a t
 
 <!-- the form is text -->
 
+| the call | the road taken | the road left |
+|---|---|---|
+| where the answerer stands | the record's `why`, because one place owns a thing | a `successors` entry, which says the name a second time and drifts |
+| how the third child closes | answered, because nothing new takes that work up | became, which the group's ask allowed |
+| who decides it | this box, and the merge is where a person reads the call | a person step, which a cloud box carries nobody to wait for |
+
+The third ticket's first line asks for a place in the index. The design puts
+the place in the pull's answer, and a todo in a file off git.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact stands in one place: the answered road stands in one chapter, and the code points at it
+- every number carries a name in one place: the change adds no number, and the schema's test copies say so in their headers
+- every header says what its file is for: the change adds no file, and the headers it touches count nothing
 
 ## cloud
 
