@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -108,6 +108,11 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: abbe6e5427ee71d000090e552e2c3ef961a225ec
     hash_after: abbe6e5427ee71d000090e552e2c3ef961a225ec
+  - step: retro/cloud
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: d0c6b0fbafc5b0fd1cc8cde552f5fe430d6cb30c
+    hash_after: d0c6b0fbafc5b0fd1cc8cde552f5fe430d6cb30c
+reason: done
 ---
 
 # Ask
@@ -264,19 +269,33 @@ a gap what the verbs already carry.
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
 
-<!-- the form is list -->
+- the harness refused a python write into the tree, at the rename of a shared reader
+- nothing else: every tool the branch wanted stood on the box
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
-<!-- the form is list -->
+- the shell door refuses a write into a tracked file, so every write took a tool
+- the test-first door refused three commits, each until a case stood beside the change
+- the write door refused a line at a time on the voice rules, most on the sentence cap
+- the file ceiling sent one module's growth into a file of its own
+- the plugin died each time a lib module changed, and `./RUNME.sh serve` brought it back
+- the branch took no conflict at sync, because trunk stood still under it
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
-<!-- the form is list -->
+- no person step stands parked, because every question this branch met got an answer here
+- [[spec/tickets/a-rule-names-its-failure]], minted off the guidance work
+- [[spec/tickets/a-door-holds-file-calls]], minted off the Go door work
+- [[spec/tickets/a-door-holds-three-reads]], off the note on the reads outside the rule
+- [[spec/tickets/a-pointer-reaches-a-heading]], off the note on a rename
+- [[spec/tickets/a-lone-mark-pairs-wrong]], off the note on the script rules
+- [[spec/tickets/every-road-reads-one-config]], off the note on the config roads
+- [[spec/tickets/one-door-joins-a-path]], off the note on the path join
+- `HANDOVER.md` names each ticket, the queue's one-hand rule, and what this box leaves
 
 # Discussion
 
