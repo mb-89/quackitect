@@ -1,0 +1,13 @@
+# A sentence opening on a count of the things beside it says what the
+# structure holds already: the list under it, the group's children, the
+# table's rows. The count goes stale as the structure moves, so the sentence
+# goes and the structure stands.
+# [[spec/guidance/voice]]
+extends: existence
+message: "'%s' counts what the structure beside it holds. Cut the count, and let the list, the table or the group say it."
+link: spec/guidance/voice.md
+level: warning
+ignorecase: false
+scope: sentence
+tokens:
+  - '(?:^|[.!?] )(?:Two|Three|Four|Five|Six|Seven|Eight|Nine|Ten|Eleven|Twelve) [a-z]+s\b'

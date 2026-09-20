@@ -271,3 +271,12 @@ ifVale(
     assert.ok(!(await inRegister(bare, "notes.md")).includes("DigitInProse"));
   },
 );
+
+// A sentence opening on a count of the things beside it says what the structure holds, so the count rule refuses it, and a count inside a sentence passes. [[spec/guidance/voice]]
+test("a sentence opening on a count of the things beside it is refused, and a count mid-sentence passes", async () => {
+  const note = "spec/design_output/probe.md";
+  const counted = "Three verbs answer what their asks name.\n";
+  assert.ok((await inRegister(counted, note)).includes("Counted"));
+  const quiet = "The verbs answer what their asks name, and two of them read the queue.\n";
+  assert.deepEqual((await inRegister(quiet, note)).filter((one) => one === "Counted"), []);
+});
