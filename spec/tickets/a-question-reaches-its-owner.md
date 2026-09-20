@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 1f5ffebfe9bb2676a0d710a19355507584651e14
     hash_after: 1f5ffebfe9bb2676a0d710a19355507584651e14
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-4
+    hash_before: cfce8ee10329dd002662da56afa239a2aa45aa0d
+    hash_after: cfce8ee10329dd002662da56afa239a2aa45aa0d
+    returns: 2
+    why: Name the file owning the case, because `pull-escalate.test.js` covers the escalation verb alone.; Name what the case asserts past the one in `pull.test.js`, which reads the leaf and the record.; Write the seventh rule of `spec/guidance/working` whole, because the table drops the sentence standing there.
 ---
 
 # Ask
@@ -169,10 +175,9 @@ A craft question the drafter raises reaches no verb, because the design input an
 
 fail
 
-- Name where `escalate --craft` sends a question the drafter raises on `design/draft`.
-- `target` answers the held leaf itself where `on_fail` stands empty, so the leaf stays put.
-- Name what `escalate --craft` owns beside the fail verdict, which already returns review to draft.
-- Name the rationale section each new rule takes, or leave the rule unstarred.
+- Name the file owning the case, because `pull-escalate.test.js` covers the escalation verb alone.
+- Name what the case asserts past the one in `pull.test.js`, which reads the leaf and the record.
+- Write the seventh rule of `spec/guidance/working` whole, because the table drops the sentence standing there.
 
 # implement
 
