@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -139,6 +139,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box fa49097ce66c · claude-code-remote · helper-17
+    hash_before: fe502d4fea13df7b613b5f7603b26fd3628dfc82
+    hash_after: fe502d4fea13df7b613b5f7603b26fd3628dfc82
+    returns: 1
+    why: "the ask lands: `down` says one line in the chat, and `doctor` names a bridge standing down; `url()` answers the event route, and line 176 of the bridgehead chapter calls it the health call; line 180 of that chapter repeats the health call wording, and the hook names the event route; the tree reads the health call as `/health` at lines 228, 235 and 238 of that chapter; fix: name the event route at both lines, so a reader of the chapter reads the code; the case over a failing session log asserts one chat line, which `toldDown` holds alone; a probe reverting the flag move keeps that case green, and the row writes go 2 to 4; so the flag move answering finding six carries no case proving it fires; fix: add a case counting the rows a failing log takes, one a fall; `spec/design_output/extension.md` line 341 says a dead server leaves the agent running the same; the change gives that agent a chat line, and the pointer under line 341 reaches the old chapter; fix: correct line 341, and point it at the chapter this branch adds; the session start case and the once case each break under a mutant, so both guards hold; the diff reaches six files, and `serverLine(get = fetch)` opens the doctor to a fake door; `./RUNME.sh check` answers 0 on this branch; `./RUNME.sh branch review` reads the retro as absent from the handback; a local box running no server draws the line at its first `prompt.context`; the cage chapter's code 3 reasoning covers the block alone, so that silence holds"
 ---
 
 # Ask
@@ -424,17 +430,52 @@ holds the doctor's wording where a person asks after a fall later.
 
 <!-- the form is files -->
 
+- .claude/skills/level0/hooks/level0.js
+- .claude/skills/level1/hooks/level1.js
+- spec/design_output/extension.md
+- spec/design_output/level0.md
+- spec/design_output/vehicle.md
+- spec/guidance/review/reviewing.md
+- spec/tickets/the-answer-door-reads-chat.md
+- spec/tickets/the-bridge-says-it-falls.md
+- src/scripts/cli-check.js
+- test/level0/check-server.test.js
+- test/level0/start-road.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+- the ask lands: `down` says one line in the chat, and `doctor` names a bridge standing down
+- `url()` answers the event route, and line 176 of the bridgehead chapter calls it the health call
+- line 180 of that chapter repeats the health call wording, and the hook names the event route
+- the tree reads the health call as `/health` at lines 228, 235 and 238 of that chapter
+- fix: name the event route at both lines, so a reader of the chapter reads the code
+- the case over a failing session log asserts one chat line, which `toldDown` holds alone
+- a probe reverting the flag move keeps that case green, and the row writes go 2 to 4
+- so the flag move answering finding six carries no case proving it fires
+- fix: add a case counting the rows a failing log takes, one a fall
+- `spec/design_output/extension.md` line 341 says a dead server leaves the agent running the same
+- the change gives that agent a chat line, and the pointer under line 341 reaches the old chapter
+- fix: correct line 341, and point it at the chapter this branch adds
+- the session start case and the once case each break under a mutant, so both guards hold
+- the diff reaches six files, and `serverLine(get = fetch)` opens the doctor to a fake door
+- `./RUNME.sh check` answers 0 on this branch
+- `./RUNME.sh branch review` reads the retro as absent from the handback
+- a local box running no server draws the line at its first `prompt.context`
+- the cage chapter's code 3 reasoning covers the block alone, so that silence holds
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the chapter owns the road, each new comment points at it, and two lines name the wrong route
 
 # Discussion
 
