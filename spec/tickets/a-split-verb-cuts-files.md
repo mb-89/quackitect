@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -136,6 +136,17 @@ record:
     hash_after: cb7d8c850e3b189311c3e5afa092ac7d37d02325
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: abd8ba20a9c5eec60b34dae06cca73675d6f22f6
+    hash_after: abd8ba20a9c5eec60b34dae06cca73675d6f22f6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -318,26 +329,49 @@ The verb's own file and the door's mint both wait on this pair. Each takes a cas
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/split.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`./RUNME.sh split <file>` cuts a file into the targets a caller names, and the journal takes the whole cut back.
+
+| the piece | its file |
+|---|---|
+| the ranges and the cut over text | `src/scripts/split-cut.js` |
+| the verb, and the write through the journal | `src/scripts/split-verb.js` |
+| the ticket a refusal mints | `src/bridge/split-ticket.js`, which the code door calls |
+
+The ranges refuse before any file opens. Four refusals stand: a range reading backwards, a range starting at zero, a range past the last line, and two ranges reaching one line.
+
+One journal entry holds every target and the rest, under `by: split`. So `mcp__level0__undo` takes the whole cut back, and a half-written cut stands nowhere.
+
+The door mints once a file:
+
+- a refusal naming the file ceiling mints a ticket off `trivial`, and names it in the refusal
+- the ticket lands at `spec/tickets/split-<name>.md` and carries no group
+- a second refusal on the same file names the ticket that stands, and writes none
+- the three fields `trivial` asks for each take a line the door writes
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place, and the chapter owns the flags table
+- the ranges and the cut take text alone, so the cases touch memory
+- each header says what its file is for, and counts nothing
 
 # verdict
 
