@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -214,6 +214,17 @@ record:
     hash_after: 4d71046df64560799abe223a8bdb198723242f19
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 5602dafd5614f88497cd8e3a9ccba849616009ba
+    hash_after: 5602dafd5614f88497cd8e3a9ccba849616009ba
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/config passes; green, src/viewer passes
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -464,20 +475,20 @@ A person sets a colour in the config now, and the window reads it there.
 | the read at start | `loadColours` in `src/viewer/colour.go`, called from `main.go` |
 | the shared module beside `quackitect/yaml` | `SHARED` in `src/scripts/viewer.js` |
 | the reader the server keeps | `src/lsp/config.go`, which calls the shared one |
-| the gate reading Go format | `goHolds` in `src/scripts/cli-check.js` |
+| the gate reading Go format | `goHolds` in `src/scripts/cli-check.js`, with `formatFaults` beside the module list |
 
-The round before this left a file the Go formatter writes another way, and no gate read that. So the check now names each such file, one line a file, beside the module's own cases. A probe file carrying a bad indent turns the check red and names itself.
+The chapter the Go reader wants stands under [[spec/design_output/config#the-go-reader]]. Every pointer in the two readers names it. The chapter owning the battery now says what the format gate does, so that gate's pointer names a chapter answering for it.
 
-The spare colours stand as a list, so the file's order is the order the window reads. `List` in the shared reader answers a list, where `Map` answers a map. The file's comment points at [[spec/design_output/viewer#colours]], which holds what each map carries.
+The gate's half writing the findings takes a string and answers lines, so a case drives it with no tool standing. `test/level0/go-tests.test.js` holds that case beside the module list and the run's environment. The gate reaching every pointer stands as a note for the retro. A walk of the tracked files answers a count far past this ticket.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The check gains the format gate the class fix names. Every other file stands in the approach's table.
-- every door the change reaches has a fake. The gate runs its tool through the door the check runs every other tool through.
-- a comment names the approach the change implements. The gate carries a line naming the class it closes, and each new name points at its chapter.
+- the change touches no file the ask leaves out. The two chapters the pointers want, the gate's own half with its case, and the note this round mints.
+- every door the change reaches has a fake. The case drives the gate's half over a string, and the module list over a fake disk.
+- a comment names the approach the change implements. Each pointer names a chapter that stands, and the case names the round that wired the gate.
 
 # verdict
 
