@@ -9,9 +9,16 @@ import { schemaFaults } from "../../.claude/skills/level0/lib/schema.js";
 import { treeFaults } from "../../.claude/skills/level0/lib/tree.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { WARNING } from "../../.claude/skills/level0/lib/warnings.js";
-import { findingsOver, readThrough, showOf, walkOver } from "../bridge/findings.js";
+import {
+  biomeFor,
+  findingsOver,
+  readThrough,
+  showOf,
+  walkOver,
+} from "../bridge/findings.js";
 import { serverFaults, treeHere } from "./cli-check.js";
-import { bin, biome, COL, files, it, outside, root, SHOWN } from "./cli-doors.js";
+import { bin, COL, files, it, outside, root, SHOWN } from "./cli-doors.js";
+import { readTools } from "./tools.js";
 
 // What the last lint left standing at warning. The stamp takes it, and the stop door reads the stamp. [[spec/tickets/the-spawn-reaches-its-guidance]]
 let stood = [];
@@ -46,14 +53,8 @@ export function readThroughTheReader(found) {
   return readThrough({ disk: files, join, root }, found);
 }
 
-export async function lint(where) {
-  stood = [];
-  if (!files.exists(bin)) {
-    console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
-    return 2;
-  }
-  const began = it.clock.now().getTime();
-
+// The command line's own reading, which `lint` prints and a case counts. [[spec/design_output/lsp#one-checker-every-front-asks]]
+export async function readingFor(where) {
   // [[spec/design_output/lsp]]
   const got = await findingsOver(
     {
@@ -62,7 +63,7 @@ export async function lint(where) {
       join,
       root,
       vale: bin,
-      biome: files.exists(biome) ? biome : "",
+      biome: biomeFor(files, root, readTools(files, root)),
       // The check names what stands past a ceiling as a warning, and the write door refuses the growth. [[spec/design_output/level0#the-size-ceiling]]
       ceilings: {
         function: await it.config.ask("code.functionLines"),
@@ -71,11 +72,7 @@ export async function lint(where) {
     },
     where,
   );
-  if (got.fault) {
-    console.error(got.fault);
-    console.error("Vale read no file, so every rule it holds stands unchecked.");
-    return 1;
-  }
+  if (got.fault) return { found: [], fault: got.fault };
   const found = got.found;
 
   // [[spec/design_output/lsp#one-checker-every-front-asks]]
@@ -88,6 +85,24 @@ export async function lint(where) {
     found.push(...treeFaults(tree).filter((one) => one.rule !== "StopFolderIsData"));
     found.push(...schemaFaults(tree));
   }
+  return { found, fault: "" };
+}
+
+export async function lint(where) {
+  stood = [];
+  if (!files.exists(bin)) {
+    console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
+    return 2;
+  }
+  const began = it.clock.now().getTime();
+
+  const got = await readingFor(where);
+  if (got.fault) {
+    console.error(got.fault);
+    console.error("Vale read no file, so every rule it holds stands unchecked.");
+    return 1;
+  }
+  const found = got.found;
 
   const ms = it.clock.now().getTime() - began;
   if (!found.length) {

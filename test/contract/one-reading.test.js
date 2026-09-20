@@ -1,5 +1,5 @@
 // One reading answers both fronts. The case drives the real tools over the
-// real tree, so it stands here and not beside a fake.
+// real tree, which is what puts it here.
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 
 import assert from "node:assert/strict";
@@ -8,7 +8,11 @@ import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 // The whole module, so a name the reader answers nowhere yet fails an assertion. [[spec/tickets/a-claim-meets-the-view]]
 import * as findings from "../../src/bridge/findings.js";
+import { boxOf } from "../../src/bridge/server.js";
 import { disk } from "../../src/doors/disk.js";
+import { serverFaults } from "../../src/scripts/cli-check.js";
+// The whole module, so a name the command line answers nowhere yet fails an assertion. [[spec/tickets/a-claim-meets-the-view]]
+import * as reading from "../../src/scripts/cli-read.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -37,33 +41,27 @@ test("the guard hands nothing where no binary stands, and the path where one doe
   );
   const nowhere = { exists: () => false, read: () => "" };
   assert.equal(findings.biomeFor(nowhere, "/tree", {}), "");
-  const standing = {
-    exists: (at) => at === "/tree/node_modules/.bin/biome",
-    read: () => "",
-  };
-  assert.equal(
-    findings.biomeFor(standing, "/tree", {}),
-    "/tree/node_modules/.bin/biome",
-  );
+  const at = "/tree/.se/.runtime/bin/biome";
+  const standing = { exists: (one) => one === at, read: () => "" };
+  assert.equal(findings.biomeFor(standing, "/tree", {}), at);
 });
 
 // The line of done_when asking for a sweep the way the panel does. [[spec/tickets/a-claim-meets-the-view]]
-test("each front's route answers one count over the whole tree", async () => {
-  assert.equal(
-    typeof findings.readingCounts,
-    "function",
-    "the shared reader answers readingCounts",
-  );
-  const said = await findings.readingCounts(root);
+test("each front's own route answers one list over the whole tree", async () => {
+  assert.equal(typeof findings.linesNamed, "function", "the reader answers linesNamed");
+  assert.equal(typeof reading.readingFor, "function", "the command line answers readingFor");
 
-  assert.equal(
-    said.panel.length,
-    said.check.length,
-    `the panel reads ${said.panel.length} and the check reads ${said.check.length}`,
-  );
+  // The two sweeps run one after the other, because two Vale runs over one tree collide. [[spec/tickets/a-claim-meets-the-view]]
+  const drawn = await findings.findingsFor(boxOf(root), findings.FINDINGS);
+  const printed = await reading.readingFor(["."]);
+
+  const panel = findings.linesNamed([...drawn.found, ...(serverFaults(["."]) ?? [])]);
+  const check = findings.linesNamed(printed.found);
+
   const alone = (one, other) => one.filter((row) => !other.includes(row));
-  assert.deepEqual(alone(said.panel, said.check), [], "the panel holds no file alone");
-  assert.deepEqual(alone(said.check, said.panel), [], "the check holds no file alone");
+  assert.deepEqual(alone(panel, check), [], "the panel names no line alone");
+  assert.deepEqual(alone(check, panel), [], "the check names no line alone");
+  assert.equal(panel.length, check.length);
 });
 
 // The rule the ask asks for, read off the note that ships. [[spec/tickets/a-claim-meets-the-view]]
