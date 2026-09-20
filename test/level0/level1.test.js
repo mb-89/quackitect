@@ -57,6 +57,26 @@ function harness() {
   };
 }
 
+// The engine takes one session start a module and counts them in the source. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+test("the module registers one session start, and it registers the pull tool and the read tools", async () => {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const { READ_TOOLS } = await import("../../.claude/skills/level0/hooks/level0.js");
+  const counts = {};
+  const starts = [];
+  register((event, ...rest) => {
+    counts[event] = (counts[event] ?? 0) + 1;
+    if (event === "session.start") starts.push(rest.at(-1));
+  }, {});
+  assert.equal(counts["session.start"], 1, "one start a module");
+
+  const registered = [];
+  const box = harness();
+  box.$.tool.register = async (spec) => void registered.push(spec.name);
+  await starts[0](box.$, { session_id: "s1", client: "claude-code" }, async (said) => said);
+  assert.equal(registered[0], "pull", "the pull tool registers first");
+  for (const one of READ_TOOLS) assert.ok(registered.includes(one.name), one.name);
+});
+
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("the wrapper reads the prompt out of a spawn answer, and nothing out of any other", () => {
   const said =

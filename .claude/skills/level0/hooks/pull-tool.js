@@ -4,7 +4,7 @@
 // [[spec/design_output/pull#the-checks]]
 
 // One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
-import { register as bridgehead } from "./level0.js";
+import { READ_TOOLS, register as bridgehead } from "./level0.js";
 import {
   judgeAsk,
   judgeLabels,
@@ -27,9 +27,14 @@ const JUDGE = "--judge";
 const SPAWNS = 3;
 
 export function register(on, options) {
+  // The engine takes one session start a module, so the bridgehead registers none and this one registers its read tools beside the pull. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
   bridgehead(on, options);
   on("session.start", async ($, e, next) => {
-    await $.tool.register(pullSpec());
+    for (const spec of [pullSpec(), ...READ_TOOLS]) {
+      try {
+        await $.tool.register(spec);
+      } catch {}
+    }
     // [[spec/design_output/pull#the-hand-and-the-hold]]
     await wrote($, sessionOf(e));
     return next(e);

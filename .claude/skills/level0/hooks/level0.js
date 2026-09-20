@@ -103,17 +103,13 @@ export const READ_TOOLS = [findSpec(), patchSpec(), replaceSpec(), undoSpec()];
 const CALLED = READ_TOOLS.map((one) => `mcp__level0__${one.name}`);
 const HEALTH = 200;
 
+// The engine takes one session start a module and counts them in the source, so this registers none: the module wrapping this one holds the start and calls startsSession from it. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export function register(on, options) {
   method = String(options?.method ?? "");
   // A caller hands the wait in, so a case reads the running out without burning the span. [[spec/design_output/level0#the-first-call-pays]]
   waiting = Number(options?.waiting) || STARTING;
   started = false;
   on("*", ($, e, next) => seen($, e, next));
-  // A server answering nothing at session start leaves a box with no read tool all session. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-  on("session.start", async ($, e, next) => {
-    await registers($, READ_TOOLS);
-    return next(e);
-  });
   for (const called of CALLED) {
     on("tool.call", { tool: called }, ($, e, next) => reads($, called, e, next));
   }
