@@ -89,12 +89,18 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
     hash_before: b13f91a700d1a75a30488b4049afbed27769dcef
     hash_after: b13f91a700d1a75a30488b4049afbed27769dcef
+  - step: design/review
+    hand: box 1670436ae0bb · claude-code-remote · helper-2
+    hash_before: 0039c099bc3da2c41110d653726f5bde3a69431c
+    hash_after: 0039c099bc3da2c41110d653726f5bde3a69431c
+    returns: 1
+    why: "The vote's `unknown` list misses a claimed rule the agent claims nowhere this turn, because `fires` in `lib/stop.js` answers false before it reads `runs`, so a typo in such a rule stays quiet until the agent claims it. Read every rule's `runs` in the door through `knowsCheck`, which `src/bridge/stop.js` exports already.; The line names the rule file, and `pool` in `lib/stop.js` drops the file name, so the door holds it nowhere. Name the rule id and the check, both of which the door holds.; The table under The mechanical checks in `spec/design_output/stop.md` lists `never`, and `CHECKS` in `src/bridge/stop.js` holds it nowhere, so a rule with `runs: never` writes the warn line every turn. Add `never` to `CHECKS` answering false, so the table and the door agree.; The case over the fake box stands right: `test/level0/stop-door.test.js` holds a fake `log.say` that keeps every row, so the case asserts the warn row there."
 ---
 
 # Ask
@@ -149,6 +155,13 @@ to do next.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- The vote's `unknown` list misses a claimed rule the agent claims nowhere this turn, because `fires` in `lib/stop.js` answers false before it reads `runs`, so a typo in such a rule stays quiet until the agent claims it. Read every rule's `runs` in the door through `knowsCheck`, which `src/bridge/stop.js` exports already.
+- The line names the rule file, and `pool` in `lib/stop.js` drops the file name, so the door holds it nowhere. Name the rule id and the check, both of which the door holds.
+- The table under The mechanical checks in `spec/design_output/stop.md` lists `never`, and `CHECKS` in `src/bridge/stop.js` holds it nowhere, so a rule with `runs: never` writes the warn line every turn. Add `never` to `CHECKS` answering false, so the table and the door agree.
+- The case over the fake box stands right: `test/level0/stop-door.test.js` holds a fake `log.say` that keeps every row, so the case asserts the warn row there.
 
 # implement
 
