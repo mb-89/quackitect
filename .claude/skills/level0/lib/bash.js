@@ -6,7 +6,7 @@ import { CODE } from "./code.js";
 import { overLong } from "./names.js";
 import { NOTES } from "./private.js";
 import { scriptWrites } from "./scripted.js";
-import { tokensOf } from "./tokens.js";
+import { baseName, BREAKS, clean, READERS, SHELLS, tokensOf } from "./tokens.js";
 import { PROSE } from "./vale.js";
 
 export { tokensOf };
@@ -15,7 +15,6 @@ export const VERBS = ["check", "branch", "tui", "doctor"];
 
 const HOME = NOTES.split("/")[0];
 
-const BREAKS = new Set(["&&", "||", "|", ";", "&", "(", ")"]);
 const REDIRECTS = new Set([">", ">>", "&>"]);
 
 const FREE = [
@@ -33,8 +32,6 @@ const PASSES = new Set(["sudo", "env", "command", "nohup", "time", "exec"]);
 const EDITS = new Set(["sed", "perl"]);
 const COPIES = new Set(["cp", "mv"]);
 const TAKES = new Set(["-I", "-n", "-P", "-L", "-d", "-s", "-a", "-E"]);
-const SHELLS = new Set(["sh", "bash", "zsh", "dash"]);
-const READERS = new Set(["python", "python3", "node", "ruby", "perl", "php", "deno"]);
 const RUNNERS = new Set(["npm", "pnpm", "yarn", "bun"]);
 
 const VALUED = ["m", "F", "C", "c", "t", "S", "u"];
@@ -519,15 +516,3 @@ function lineOf(command, said) {
   return String(command).slice(0, at).split("\n").length;
 }
 
-function baseName(word) {
-  return String(word ?? "")
-    .split(/[/\\]/)
-    .pop()
-    .replace(/\.exe$/i, "");
-}
-
-function clean(path) {
-  return String(path ?? "")
-    .replace(/\\/g, "/")
-    .replace(/^\.\//, "");
-}

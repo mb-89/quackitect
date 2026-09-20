@@ -2,6 +2,23 @@
 // command starts here, so one parse answers the door and the script reading.
 // [[spec/design_output/bash#what-the-door-reads]]
 
+export const SHELLS = new Set(["sh", "bash", "zsh", "dash"]);
+export const READERS = new Set(["python", "python3", "node", "ruby", "perl", "php", "deno"]);
+export const BREAKS = new Set(["&&", "||", "|", ";", "&", "(", ")"]);
+
+export function baseName(word) {
+  return String(word ?? "")
+    .split(/[/\\]/)
+    .pop()
+    .replace(/\.exe$/i, "");
+}
+
+export function clean(path) {
+  return String(path ?? "")
+    .replace(/\\/g, "/")
+    .replace(/^\.\//, "");
+}
+
 export const OPERATORS = [
   "<<<",
   "&&",

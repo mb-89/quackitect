@@ -2,14 +2,8 @@
 // way a redirection does, so the door reads the file the line names.
 // [[spec/design_output/bash#a-shell-writes-nothing]]
 
-import { insideOf } from "./bash.js";
-import { tokensOf } from "./tokens.js";
-
-const SHELLS = new Set(["sh", "bash", "zsh", "dash"]);
-const READERS = new Set(["python", "python3", "node", "ruby", "perl", "php", "deno"]);
-const BREAKS = new Set(["&&", "||", "|", ";", "\n"]);
-// A script stands outside the tree git holds, so no rule reads it there. [[spec/design_output/bash#a-shell-writes-nothing]]
-const OUTSIDE = [/^\.se(\/|$)/, /^\/tmp\//, /^\/var\/tmp\//, /^\$TMPDIR(\/|$)/];
+import { insideOf, reaches } from "./bash.js";
+import { baseName, BREAKS, clean, READERS, SHELLS, tokensOf } from "./tokens.js";
 
 // [[spec/design_output/bash#a-shell-writes-nothing]]
 export function scriptsIn(command) {
@@ -18,7 +12,8 @@ export function scriptsIn(command) {
     const name = baseName(words[0]);
     if (!SHELLS.has(name) && !READERS.has(name)) continue;
     const said = words.slice(1).find((one) => !one.startsWith("-"));
-    if (said && OUTSIDE.some((one) => one.test(clean(said)))) out.push(clean(said));
+    // A script the rules read stands under their own doors, so the reading takes what they leave. [[spec/design_output/bash#a-shell-writes-nothing]]
+    if (said && !reaches(said)) out.push(clean(said));
   }
   return out;
 }
@@ -54,17 +49,4 @@ function linesIn(command) {
     if (!one.op) out[out.length - 1].push(one.text);
   }
   return out.filter((one) => one.length);
-}
-
-function baseName(word) {
-  return String(word ?? "")
-    .split(/[/\\]/)
-    .pop()
-    .replace(/\.exe$/i, "");
-}
-
-function clean(said) {
-  return String(said ?? "")
-    .replace(/^["']|["']$/g, "")
-    .replace(/^\.\//, "");
 }

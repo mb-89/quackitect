@@ -356,6 +356,20 @@ test("a runner and a shell each name their script, and a tracked path names none
   assert.deepEqual(scriptsIn("node src/scripts/cli.js check"), []);
 });
 
+test("every spelling of a temp folder names a script, because one reader answers", () => {
+  // A brace beside the dollar reads as a template to the formatter, so the case joins it. [[spec/design_output/bash#a-shell-writes-nothing]]
+  const braced = ["node $", "{TMPDIR}", "/edit.mjs"].join("");
+
+  for (const said of [
+    "node $TMPDIR/edit.mjs",
+    braced,
+    "node $TMP/edit.mjs",
+    "node /var/tmp/edit.mjs",
+  ]) {
+    assert.equal(scriptsIn(said).length, 1, said);
+  }
+});
+
 test("a script writing a tracked path refuses, and the message names the script", () => {
   const said = "node .se/scripts/edit.mjs";
   const script = () => 'writeFileSync("README.md", "one");\n';

@@ -448,8 +448,8 @@ both commit doors hand that reader in.
 
 <!-- the form is checklist -->
 
-- the change touches the door, two new modules, both commit doors, the note and the cases
-- the disk stands behind a reader, so every case here touches memory alone
+- this round touches the splitter, the script reading and one case, and no file past them
+- the disk stands behind the reader a case hands in, so the cases touch memory alone
 - each piece carries the pointer at the chapter tabling what the door refuses
 
 # verdict
