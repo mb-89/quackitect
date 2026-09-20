@@ -4,13 +4,12 @@
 package main
 
 import (
-	"quackitect/tui/draw"
-
-	"quackitect/tui/frame"
-
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
+
+	"quackitect/tui/draw"
+	"quackitect/tui/frame"
 )
 
 func click(m frame.Model, x, y int) frame.Model {
@@ -113,7 +112,7 @@ func TestThePressAndTheWheelReachTheRowsWhileTheFilterTakesLetters(t *testing.T)
 		t.Fatalf("a press selects the first row under the pane, and the cursor stands at %d", logTab(m).At())
 	}
 	m = wheel(m, 10, false)
-	if logTab(m).At() != 3 {
+	if logTab(m).At() != frame.WheelStep {
 		t.Fatalf("the wheel moves the log under the pane, and the cursor stands at %d", logTab(m).At())
 	}
 }

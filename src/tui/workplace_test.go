@@ -4,16 +4,15 @@
 package main
 
 import (
-	"quackitect/tui/tree"
-
-	"quackitect/tui/frame"
-	"quackitect/tui/work"
-
 	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"quackitect/tui/frame"
+	"quackitect/tui/tree"
+	"quackitect/tui/work"
 )
 
 // A window whose roots carry places, with every ticket on disk. [[spec/design_output/tui#the-work-tab-takes-edits]]

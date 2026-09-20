@@ -4,17 +4,16 @@
 package main
 
 import (
-	"quackitect/tui/draw"
-
-	"quackitect/tui/frame"
-	"quackitect/tui/log"
-
 	"fmt"
 	"strings"
 	"testing"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+
+	"quackitect/tui/draw"
+	"quackitect/tui/frame"
+	"quackitect/tui/log"
 )
 
 func row(at int, door, said string) log.Record {

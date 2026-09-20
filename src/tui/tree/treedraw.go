@@ -7,11 +7,11 @@
 package tree
 
 import (
-	"quackitect/tui/draw"
-
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+
+	"quackitect/tui/draw"
 )
 
 const (

@@ -4,9 +4,9 @@
 package main
 
 import (
-	"quackitect/tui/frame"
-
 	"testing"
+
+	"quackitect/tui/frame"
 )
 
 const testPort = 6599

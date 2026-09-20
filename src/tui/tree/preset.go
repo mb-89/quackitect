@@ -7,10 +7,10 @@
 package tree
 
 import (
-	"quackitect/tui/draw"
-
 	"sort"
 	"strings"
+
+	"quackitect/tui/draw"
 )
 
 // [[spec/design_output/tree-view#a-preset-carries-its-sort]]

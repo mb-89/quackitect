@@ -7,15 +7,15 @@
 package main
 
 import (
-	"quackitect/tui/frame"
-	"quackitect/tui/log"
-	"quackitect/tui/work"
-
 	"path/filepath"
 	"strings"
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
+
+	"quackitect/tui/frame"
+	"quackitect/tui/log"
+	"quackitect/tui/work"
 )
 
 // A window holding the log and a loaded work tree, the way a person opens it. [[spec/design_output/tui#the-work-tab]]
@@ -62,7 +62,7 @@ func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 	if said := m.SourceOf(1); said != "queue: /./" {
 		t.Fatalf("the work tab opens on the queue, which keeps the placed rows, and its line reads %q", said)
 	}
-	if said := theWork(m).Tree.Sorts(); len(said) != 1 || said[0].Key != "queue" {
+	if said := theWork(m).Tree.Sorts(); len(said) != 1 || said[0].Key != work.QueueKey {
 		t.Fatalf("the queue's sort takes hold at the start, and it reads %v", said)
 	}
 	// The queue is a pressed preset, so the funnel stands red, and a sort of a person's own lets go of it. [[spec/design_output/tree-view#a-preset-carries-its-sort]]

@@ -186,7 +186,7 @@ like one a person types, and the sort takes hold with it.
 | a line a person types | it is the whole filter, and a preset is one way to write it |
 
 A preset stands under `groups` in the base file, with its `filters` and its
-`sort`. One the file marks `Pressed` opens the line when the view opens. So a
+`sort`. One the file marks `pressed` opens the line when the view opens. So a
 person reads the filter that narrows the rows, and clears it in the pane. A
 preset carrying a sort and no filter keeps every row, so an empty line is
 that view. The pane and its presets are the window's, and every tab offers

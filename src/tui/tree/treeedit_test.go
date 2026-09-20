@@ -4,12 +4,12 @@
 package tree
 
 import (
-	"quackitect/tui/draw"
-
 	"strings"
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
+
+	"quackitect/tui/draw"
 )
 
 type states struct{ allowed []string }

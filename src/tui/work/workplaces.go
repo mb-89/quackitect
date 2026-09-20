@@ -6,14 +6,14 @@
 package work
 
 import (
-	"quackitect/tui/tree"
-
 	"encoding/json"
 	"os"
 	"path/filepath"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+
+	"quackitect/tui/tree"
 )
 
 // The survey's file, whose folder .claude/skills/level0/lib/folders.js owns and whose name src/lsp/tree.go spells too, because a Go module imports no JavaScript. [[spec/design_output/tools#what-the-survey-writes]]

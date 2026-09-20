@@ -6,8 +6,6 @@
 package log
 
 import (
-	"quackitect/tui/frame"
-
 	"bytes"
 	"os"
 	"path/filepath"
@@ -16,6 +14,8 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/fsnotify/fsnotify"
+
+	"quackitect/tui/frame"
 )
 
 type LinesMsg struct {

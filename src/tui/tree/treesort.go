@@ -7,11 +7,11 @@
 package tree
 
 import (
-	"quackitect/tui/draw"
-
 	"sort"
 	"strconv"
 	"strings"
+
+	"quackitect/tui/draw"
 )
 
 // [[spec/design_output/tree-view#a-sort-holds-several-keys]]

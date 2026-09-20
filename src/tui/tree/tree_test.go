@@ -4,12 +4,12 @@
 package tree
 
 import (
-	"quackitect/tui/draw"
-
 	"strings"
 	"testing"
 
 	"github.com/charmbracelet/x/ansi"
+
+	"quackitect/tui/draw"
 )
 
 func item(name, state, says string, kids ...Item) Item {

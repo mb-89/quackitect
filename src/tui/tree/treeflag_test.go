@@ -4,11 +4,11 @@
 package tree
 
 import (
-	"quackitect/tui/draw"
-
 	"fmt"
 	"strings"
 	"testing"
+
+	"quackitect/tui/draw"
 )
 
 func flagCols() []Column {

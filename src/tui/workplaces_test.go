@@ -5,13 +5,13 @@
 package main
 
 import (
-	"quackitect/tui/frame"
-	"quackitect/tui/work"
-
 	"strings"
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
+
+	"quackitect/tui/frame"
+	"quackitect/tui/work"
 )
 
 const answerSaid = `{

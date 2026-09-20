@@ -7,14 +7,14 @@
 package work
 
 import (
-	"quackitect/tui/tree"
-
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	"quackitect/tui/tree"
 )
 
 // The key opening the chord, and the digits closing it. [[spec/design_output/tui#the-work-tab-takes-edits]]

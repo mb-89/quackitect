@@ -6,10 +6,10 @@
 package tree
 
 import (
-	"quackitect/tui/draw"
-
 	"sort"
 	"strings"
+
+	"quackitect/tui/draw"
 )
 
 // [[spec/design_output/tree-view#the-filter-reads-an-item]]

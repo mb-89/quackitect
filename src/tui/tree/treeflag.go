@@ -8,11 +8,11 @@
 package tree
 
 import (
-	"quackitect/tui/draw"
-
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+
+	"quackitect/tui/draw"
 )
 
 // The column whose letters the flags draw in. [[spec/design_output/tree-view#a-flag-draws-a-letter]]

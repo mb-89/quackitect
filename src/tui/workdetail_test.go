@@ -5,14 +5,13 @@
 package main
 
 import (
-	"quackitect/tui/draw"
-	"quackitect/tui/tree"
-
-	"quackitect/tui/frame"
-	"quackitect/tui/work"
-
 	"strings"
 	"testing"
+
+	"quackitect/tui/draw"
+	"quackitect/tui/frame"
+	"quackitect/tui/tree"
+	"quackitect/tui/work"
 )
 
 // The details draw the flags, the rest of the front, then the ask, and nothing off the body. [[spec/design_output/tui#the-work-tab]]

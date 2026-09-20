@@ -4,14 +4,13 @@
 package main
 
 import (
-	"quackitect/tui/draw"
-
-	"quackitect/tui/frame"
-	"quackitect/tui/log"
-
 	"strings"
 	"testing"
 	"time"
+
+	"quackitect/tui/draw"
+	"quackitect/tui/frame"
+	"quackitect/tui/log"
 )
 
 func threeLevels() frame.Model {

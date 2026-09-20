@@ -7,10 +7,10 @@
 package tree
 
 import (
-	"quackitect/tui/draw"
-
 	"strconv"
 	"strings"
+
+	"quackitect/tui/draw"
 )
 
 // [[spec/design_output/tree-view#an-item-carries-its-keys]]

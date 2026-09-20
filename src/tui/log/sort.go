@@ -8,12 +8,12 @@
 package log
 
 import (
-	"quackitect/tui/draw"
-	"quackitect/tui/frame"
-
 	"fmt"
 	"sort"
 	"strings"
+
+	"quackitect/tui/draw"
+	"quackitect/tui/frame"
 )
 
 const SortNone = -1

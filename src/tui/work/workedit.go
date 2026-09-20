@@ -7,8 +7,6 @@
 package work
 
 import (
-	"quackitect/tui/tree"
-
 	"errors"
 	"fmt"
 	"os"
@@ -16,6 +14,8 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+
+	"quackitect/tui/tree"
 	"quackitect/yaml"
 )
 

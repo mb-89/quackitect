@@ -6,10 +6,6 @@
 package main
 
 import (
-	"quackitect/tui/draw"
-
-	"quackitect/tui/work"
-
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -20,6 +16,9 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"quackitect/tui/draw"
+	"quackitect/tui/work"
 )
 
 const indexRowsSaid = `[

@@ -7,10 +7,9 @@
 package frame
 
 import (
-	"time"
-
 	"fmt"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/x/ansi"

@@ -5,12 +5,6 @@
 package main
 
 import (
-	"quackitect/tui/draw"
-
-	"quackitect/tui/frame"
-	"quackitect/tui/tree"
-	"quackitect/tui/work"
-
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,6 +12,11 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+
+	"quackitect/tui/draw"
+	"quackitect/tui/frame"
+	"quackitect/tui/tree"
+	"quackitect/tui/work"
 )
 
 const childNote = `---

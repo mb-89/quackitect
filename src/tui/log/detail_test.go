@@ -4,18 +4,18 @@
 package log
 
 import (
-	"os"
-	"path/filepath"
-	"quackitect/tui/draw"
-	"quackitect/tui/frame"
-
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
+
+	"quackitect/tui/draw"
+	"quackitect/tui/frame"
 )
 
 func details(all []Record, at int) string {

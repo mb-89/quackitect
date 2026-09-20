@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -243,6 +243,10 @@ record:
     hash_after: 78c06bc342372d44e271a03b7fb1584988c95283
     returns: 3
     why: "design: `spec/design_output/tree-view.md` says the base file marks a preset `Pressed`, and `spec/views/work.base` and `src/tui/tree/base.go` spell the key `pressed`.; craft: `src/tui/mouse_test.go` reads the wheel step under the filter pane as the bare number 3, where `frame.WheelStep` holds it.; craft: `src/tui/panes_test.go` reads the queue's sort key as the bare string \"queue\", where `work.QueueKey` holds it.; craft: The module's imports stand ahead of the standard library in the tree, the log and the work packages and in the root cases, and last in the frame and the draw packages, so one order stands for all.; The branch does what the ask calls for: `src/tui/main.go` is the root's one file past the cases, each tab stands under its folder, and every import runs down.; The last round's findings have their answer: the two notes name `Act`, `Band`, `LoadColours`, `FirstRow`, `HeadWide` and `Cut`, the case messages say the capital names, and the blank line is gone.; `go build ./...`, `go vet ./...` and `go test ./...` under `src/tui` answer 0, and `gofmt -l .` answers nothing.; `./RUNME.sh check` answers 0 on the branch, with 84 warnings standing and none in this ticket's files.; `./RUNME.sh branch review the-notes-point-true` reads check as 1, because its worktree lacks `.claude/skills/level0/.claude-plugin/plugin.json`, and the tree itself answers 0.; No retro stands in the handback, and the verdict step hands the ticket to one.; The layout case refuses a log file importing the work package, and the root case refuses a work file at the root, each fed one in a copy of the source.; The stamp case runs the build again on a move under a package, and leaves the binary standing on a moved case file.; Beyond the ask, the diff touches `.vale.ini` alone, and that section reaches a door file under a package."
+  - step: implement/reflect
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: d47d955168f851fa2a7f30a0139d461712045c48
+    hash_after: d47d955168f851fa2a7f30a0139d461712045c48
 ---
 
 # Ask
@@ -387,18 +391,14 @@ under an alias.
 
 <!-- the form is text -->
 
-The third round names one class, and it is the first round's first class
-again: a rename that left its readers behind. The last round repointed the
-notes at the moved files and left the names inside them, and the case
-messages, as they stood.
+The fourth round names three classes, each one of the earlier rounds' in
+small.
 
 | the class | the finding | the fix |
 |---|---|---|
-| a rename that left its readers behind | the notes and the case messages named the window's things by their old names | list every name the split touched, and search the notes and the cases for each one before the hand-back, in code spans and in strings alike |
-
-The search this round ran names every file of the window by its package path
-in the two notes, and every renamed name the notes and the case messages
-carry. The blank line the moved case left is gone.
+| a rename that reached a data key | the tree-view note said the base file marks a preset with a capital, and the file spells the key small | a search for a renamed name reads what each hit is: a name in code, or a key in a file |
+| a value spelled where a name holds it | a wheel step and a sort key stood as a bare number and a bare string in two cases | search the cases for every constant the split exported, and read each one through its name |
+| two orders for one thing | the module's own imports stood first in some files and last in others | one order in every file: the standard library, the outside modules, then this module's packages |
 
 ### checked
 

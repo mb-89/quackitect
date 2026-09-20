@@ -4,10 +4,10 @@
 package tree
 
 import (
-	"quackitect/tui/draw"
-
 	"strings"
 	"testing"
+
+	"quackitect/tui/draw"
 )
 
 func markItems() []Item {
