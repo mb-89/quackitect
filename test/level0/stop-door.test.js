@@ -292,7 +292,7 @@ ${RULES}`;
   );
 });
 
-// The table of checks names never, so a rule running it stands off the vote and writes no line. [[spec/design_output/stop#the-mechanical-checks]]
+// The table of checks holds what an unbuilt rule runs, so such a rule stands off the vote and writes no line. [[spec/design_output/stop#the-mechanical-checks]]
 test("a rule running never fires nothing and writes no warn line", () => {
   const unbuilt = `
 - id: the-unbuilt-rule

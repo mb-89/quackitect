@@ -361,17 +361,18 @@ what it imports. Every import there runs down, so no loop stands.
 The packages, what each holds and what each imports stand in
 [[spec/design_output/tui#the-packages-the-window-holds]], and the split
 follows that table. The chapter's rows take what each round finds standing
-between the packages, so the chapter stays the one list.
+between the packages, so the chapter stays the one list. A tab owns its own
+state, so the frame reads no record and no ticket tree.
 
-A tab owns its own state, so the frame reads no record and no ticket tree.
-The model's log fields and the tailer become fields of the log tab, the
-model's work fields and the places become fields of the work tab, and the
-place chord's tree reads and the laying of places over a tree become
-functions of the work tab over a tree. The index start parts from the
-window's door to the work tab, which names the binary. The
-root package builds the tab list, hands it to the frame, and keeps `Frame`,
-which reaches the log tab's rows, filter and floor through its exported
-fields.
+| the piece | where it lands |
+|---|---|
+| the model's log fields and the tailer | fields of the log tab |
+| the model's work fields and the places | fields of the work tab |
+| the place chord's tree reads, and the laying of places over a tree | functions of the work tab over a tree |
+| the index start | the work tab, which names the binary, out of the window's door |
+| the tab list | the root package builds it and hands it to the frame |
+| `Frame` | the root package, reaching the log tab's rows, filter and floor through its
+exported fields.
 
 The tab interface grows what the frame reads through it:
 
@@ -386,17 +387,20 @@ The tab interface grows what the frame reads through it:
 | `Marks` | the footer draws the order and the floor off the first tab, which is the log |
 
 A binding in a tab's band carries a mark letting it through while the filter
-pane takes letters, and `alt+l` carries it, so the floor rises under the pane
-the way it does today.
+pane takes letters. `alt+l` carries it. The floor rises under the pane the way
+it does today.
 
 The tests move with the code they drive, and the window tests stay in the root
 package. They reach the log tab's and the work tab's fields through the tabs
-the model holds, and each tab exports the fields a case reads. The frame
-exports the fields and the methods the window tests read: the pane, the box,
-the input, the size, the sources, the marks and the strip among them. A name a tab
-package reads takes a capital, and the rename reaches every file naming it. The
-build stamp in `src/scripts/tui-build.js` lists the files standing in the
-folders it names, so it changes to walk every package under `src/tui`, and a
+the model holds. Each tab exports the fields a case reads.
+
+| what the frame exports | why |
+|---|---|
+| the pane, the box, the input, the size, the sources, the marks and the strip | the window tests read them |
+| a name a tab package reads, with a capital | the rename reaches every file naming it |
+
+The build stamp in `src/scripts/tui-build.js` lists the files standing in the
+folders it names. It changes to walk every package under `src/tui`, so a
 change under any of them rebuilds the viewer.
 
 ## review
@@ -446,12 +450,12 @@ it lies.
 |---|---|
 | each package imports what the chapter says and no more | the frame's folder holds no Go file |
 | the root holds the window alone | a colour file stands at the root |
-| a move under a package of the window rebuilds the viewer | the stamp reads the root folder alone, so the second build never runs |
+| a move under a package of the window rebuilds the viewer | the stamp reads the root folder alone, so the build runs once |
 
 The layout case reads the chapter's table as a map, so the table is the one
-list and the case follows it. What surprises me is that the root package's
-own file names clash with the Go parser's packages, so the case names them
-under an alias.
+list and the case follows it. What surprises me is a clash of names. The root
+package's own file names shadow the Go parser's packages, so the case names
+them under an alias.
 
 ### checked
 
@@ -460,7 +464,7 @@ under an alias.
 <!-- the form is checklist -->
 
 - the change touches no file the ask leaves out. The window's files, the build stamp and its case, the chapter, and this ticket.
-- every door the change reaches has a fake. The stamp case drives the build over the fake disk and the fake process, and the layout case reads the tree the tests run in.
+- every door the change reaches has a fake. The stamp case drives the build over the fake disk and the fake process. The layout case reads the tree the tests run in.
 - a comment names the approach the change implements. Each case points at the chapter holding the table.
 
 ## reflect
@@ -473,14 +477,14 @@ under an alias.
 
 <!-- the form is text -->
 
-I am wrong in the last round's reflect: a case run writes to a pipe, and the
-styles draw no colour there, so a palette loaded or not changed what no case
-asserted. The sixth round names two classes.
+I am wrong in the last round's reflect. A case run writes to a pipe. The styles
+draw no colour there. A palette loaded or not changed what no case asserted.
+The sixth round names two classes.
 
 | the class | the finding | the fix |
 |---|---|---|
 | a claim made from recall, and read nowhere | the reflect said a probe turns a case red, and a probe run in a copy turned none | run the probe before writing that it turns anything red |
-| an assertion that reads bare text | every colour assertion passed with the styles drawing nothing, and one copied assertion stood in two packages | one start in the draw package takes true colour and reads the palette, every package's cases call it, and the lit head case reads the open style's own sequence. The copied assertion stands in the draw package alone |
+| an assertion that reads bare text | every colour assertion passed with the styles drawing nothing, and one copied assertion stood in two packages | one start in the draw package takes true colour and reads the palette, every package's cases call it. The lit head case reads the open style's own sequence. The copied assertion stands in the draw package alone |
 
 ### checked
 
@@ -510,8 +514,8 @@ asserted. The sixth round names two classes.
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The window's files, the build stamp and its case, the chapter, the Vale section naming a door file, and this ticket.
-- every door the change reaches has a fake. The stamp case drives the build over the fake disk and the fake process, and the window cases drive the tabs over folders a case writes.
+- the change touches no file the ask leaves out. The window's files, the build stamp with its case, the chapter, the Vale door section and this ticket.
+- every door the change reaches has a fake. The stamp case drives the build over the fake disk and the fake process. The window cases drive the tabs over folders a case writes.
 - a comment names the approach the change implements. Each package's files point at the chapter, and the tab interface names what the frame reads beside each method.
 
 ## tests-green
@@ -553,12 +557,12 @@ runs down. A reader opens one folder to read one tab.
 | the Vale section for a door file reaches a package | the work tab's door runs the verbs, and the rule reads it as a door |
 | the tree gains `Append` and `CursorTo` | the work tab adds the plan's rows beside the ones the index hands over, and a case opens an edit on one column |
 
-The tests move with the code they drive. The tree's, the draw package's and
-the log's cases stand in their packages, and the window's cases stay at the
-root and reach a tab through the model. The second round repoints the notes
-at the moved files, exports the widths, the wheel step, the floor width, the
-no-sort mark and the ticket schema the cases read, and puts the poll in the
-frame, which both tabs import.
+The tests move with the code they drive. The tree's, the draw package's and the
+log's cases stand in their packages. The window's cases stay at the root and
+reach a tab through the model. The second round repoints the notes at the moved
+files. It exports the widths, the wheel step, the floor width, the no-sort mark
+and the ticket schema the cases read. It puts the poll in the frame, which both
+tabs import.
 
 ### checked
 
@@ -566,8 +570,8 @@ frame, which both tabs import.
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The window's files, the build stamp and its case, the chapter, the Vale section naming a door file, and this ticket.
-- every door the change reaches has a fake. The stamp case drives the build over the fake disk and the fake process, and the window cases drive the tabs over folders a case writes.
+- the change touches no file the ask leaves out. The window's files, the build stamp with its case, the chapter, the Vale door section and this ticket.
+- every door the change reaches has a fake. The stamp case drives the build over the fake disk and the fake process. The window cases drive the tabs over folders a case writes.
 - a comment names the approach the change implements. Each package's files point at the chapter, and the tab interface names what the frame reads beside each method.
 
 # verdict
@@ -580,85 +584,85 @@ frame, which both tabs import.
 
 <!-- the form is files -->
 
-spec/guidance/review/reviewing.md
-spec/tickets/the-window-splits-by-tab.md
-spec/design_output/tui.md
-spec/design_output/tree-view.md
-spec/vocabulary/terms.yml
-src/tui/go.mod
+- spec/guidance/review/reviewing.md
+- spec/tickets/the-window-splits-by-tab.md
+- spec/design_output/tui.md
+- spec/design_output/tree-view.md
+- spec/vocabulary/terms.yml
+- src/tui/go.mod
 .vale.ini
-src/scripts/tui-build.js
-test/level0/viewer.test.js
-src/tui/door_test.go
-src/tui/draw/colour.go
-src/tui/draw/colour_test.go
-src/tui/draw/filter.go
-src/tui/draw/link.go
-src/tui/draw/text.go
-src/tui/draw/wrap.go
-src/tui/footer.go
-src/tui/frame/door.go
-src/tui/frame/filterpane.go
-src/tui/frame/footer.go
-src/tui/frame/help.go
-src/tui/frame/keys.go
-src/tui/frame/model.go
-src/tui/frame/mouse.go
-src/tui/frame/part.go
-src/tui/frame/tabs.go
-src/tui/frame_root_test.go
-src/tui/frame_test.go
-src/tui/keys.go
-src/tui/layout_test.go
-src/tui/log/detail.go
-src/tui/log/detail_test.go
-src/tui/log/record.go
-src/tui/log/said.go
-src/tui/log/sort.go
-src/tui/log/tab.go
-src/tui/log/tail.go
-src/tui/log/tail_test.go
-src/tui/main.go
-src/tui/model_test.go
-src/tui/mouse.go
-src/tui/mouse_test.go
-src/tui/panes_test.go
-src/tui/shipped_test.go
-src/tui/sort_test.go
-src/tui/tabs.go
-src/tui/testdata/session.jsonl
-src/tui/tree/base.go
-src/tui/tree/base_test.go
-src/tui/tree/palette_test.go
-src/tui/tree/preset.go
-src/tui/tree/preset_test.go
-src/tui/tree/tree.go
-src/tui/tree/tree_test.go
-src/tui/tree/treedraw.go
-src/tui/tree/treeedit.go
-src/tui/tree/treeedit_test.go
-src/tui/tree/treefilter.go
-src/tui/tree/treeflag.go
-src/tui/tree/treeflag_test.go
-src/tui/tree/treemark.go
-src/tui/tree/treemark_test.go
-src/tui/tree/treesort.go
-src/tui/tree/treesort_test.go
-src/tui/ui.go
-src/tui/window_test.go
-src/tui/work.go
-src/tui/work/door.go
-src/tui/work/work.go
-src/tui/work/workedit.go
-src/tui/work/workindex.go
-src/tui/work/workitems.go
-src/tui/work/workplace.go
-src/tui/work/workplaces.go
-src/tui/work_test.go
-src/tui/workdetail_test.go
-src/tui/workedit_test.go
-src/tui/workplace_test.go
-src/tui/workplaces_test.go
+- src/scripts/tui-build.js
+- test/level0/viewer.test.js
+- src/tui/door_test.go
+- src/tui/draw/colour.go
+- src/tui/draw/colour_test.go
+- src/tui/draw/filter.go
+- src/tui/draw/link.go
+- src/tui/draw/text.go
+- src/tui/draw/wrap.go
+- src/tui/footer.go
+- src/tui/frame/door.go
+- src/tui/frame/filterpane.go
+- src/tui/frame/footer.go
+- src/tui/frame/help.go
+- src/tui/frame/keys.go
+- src/tui/frame/model.go
+- src/tui/frame/mouse.go
+- src/tui/frame/part.go
+- src/tui/frame/tabs.go
+- src/tui/frame_root_test.go
+- src/tui/frame_test.go
+- src/tui/keys.go
+- src/tui/layout_test.go
+- src/tui/log/detail.go
+- src/tui/log/detail_test.go
+- src/tui/log/record.go
+- src/tui/log/said.go
+- src/tui/log/sort.go
+- src/tui/log/tab.go
+- src/tui/log/tail.go
+- src/tui/log/tail_test.go
+- src/tui/main.go
+- src/tui/model_test.go
+- src/tui/mouse.go
+- src/tui/mouse_test.go
+- src/tui/panes_test.go
+- src/tui/shipped_test.go
+- src/tui/sort_test.go
+- src/tui/tabs.go
+- src/tui/testdata/session.jsonl
+- src/tui/tree/base.go
+- src/tui/tree/base_test.go
+- src/tui/tree/palette_test.go
+- src/tui/tree/preset.go
+- src/tui/tree/preset_test.go
+- src/tui/tree/tree.go
+- src/tui/tree/tree_test.go
+- src/tui/tree/treedraw.go
+- src/tui/tree/treeedit.go
+- src/tui/tree/treeedit_test.go
+- src/tui/tree/treefilter.go
+- src/tui/tree/treeflag.go
+- src/tui/tree/treeflag_test.go
+- src/tui/tree/treemark.go
+- src/tui/tree/treemark_test.go
+- src/tui/tree/treesort.go
+- src/tui/tree/treesort_test.go
+- src/tui/ui.go
+- src/tui/window_test.go
+- src/tui/work.go
+- src/tui/work/door.go
+- src/tui/work/work.go
+- src/tui/work/workedit.go
+- src/tui/work/workindex.go
+- src/tui/work/workitems.go
+- src/tui/work/workplace.go
+- src/tui/work/workplaces.go
+- src/tui/work_test.go
+- src/tui/workdetail_test.go
+- src/tui/workedit_test.go
+- src/tui/workplace_test.go
+- src/tui/workplaces_test.go
 
 ## verdict
 
@@ -672,18 +676,18 @@ pass
 - Every import in the chapter's table runs down, and the layout case reads the table.
 - The last round's findings have their answer. `LoadColoursForCases` in `src/tui/draw/colour.go` takes true colour and reads the palette, and every package's start calls it.
 - The lit head case in `src/tui/workedit_test.go` reads the open style's own sequence, and the copied assertion stands in `src/tui/draw/colour_test.go` alone.
-- A probe in a copy of the module fed the cases a profile drawing no colour, and the lit head case turned red.
+- A probe in a copy of the module fed the cases a profile drawing no colour. The lit head case turned red.
 - A probe drew the funnel dim and the sorted column plain. The funnel cases in `src/tui/frame_test.go` and `src/tui/model_test.go` and the bar case in `src/tui/sort_test.go` turned red.
 - A probe left the head under the cursor unlit, and the lit head case turned red.
 - The reflect names the claim it made from recall, and the fix it names is the one the branch carries.
-- `LoadColoursForCases` stands in a file the window builds from, the way the exported fields the cases read do, and that is no fault.
+- `LoadColoursForCases` stands in a file the window builds from, the way the exported fields the cases read do. That is no fault.
 - Every function the six deleted root files held stands in a package now, under the name the notes say.
 - `go build ./...`, `go vet ./...` and `go test ./...` under `src/tui` answer 0. `gofmt -l .` and `go mod tidy -diff` answer nothing.
 - `./RUNME.sh check` answers 0 on the branch, with 76 warnings standing. The 29 in this ticket's file stand in the ticket's own record.
 - `./RUNME.sh branch review the-notes-point-true` reads check as 1, because its worktree lacks a plugin file git leaves out. The tree itself answers 0.
 - No retro stands in the handback, and the verdict step hands the ticket to one.
-- The layout case refuses a log file importing the work package, and the root case refuses a work file at the root. A probe fed each one in a copy of the module.
-- The stamp case runs the build again on a move under a package, and leaves the binary standing on a moved case file.
+- The layout case refuses a log file importing the work package. The root case refuses a work file at the root. A probe fed each one in a copy of the module.
+- The stamp case runs the build again on a move under a package. Leaves the binary standing on a moved case file.
 - Beyond the ask, the diff touches `.vale.ini` alone, and that section reaches a door file under a package.
 
 ## checked
@@ -692,7 +696,7 @@ pass
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The chapter's table is the one list, and the layout case reads it. The colour start stands in the draw package alone, and every package's cases call it. The fixture stands in `src/tui/testdata/session.jsonl`, and both packages read it.
+- every fact the change adds stands in one place, and a note points at the file holding it. The chapter's table is the one list, and the layout case reads it. The colour start stands in the draw package alone, and every package's cases call it. The fixture stands in `src/tui/testdata/session.jsonl`, and both packages read it.
 
 # Discussion
 

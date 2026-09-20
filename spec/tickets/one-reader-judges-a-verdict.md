@@ -93,17 +93,18 @@ step: design/draft
 
 # Ask
 
-A hand-back and the lint read one evidence field the same way, so a verdict
-that passes the pull leaves no warning for the refactoring hand. Today the
-pull's voice check passes a verdict carrying semicolons and long list items,
-and `./RUNME.sh lint` names each line at warning the moment the hand-back lands.
+A hand-back and the lint read one evidence field the same way. A verdict that
+passes the pull leaves no warning for the refactoring hand. Today the pull's
+voice check passes a verdict carrying semicolons and long list items.
+`./RUNME.sh lint` names each line at warning the moment the hand-back lands.
+
 So a review hand writes what the pull takes, and the next lint over the tree
-carries the debt. The evidence a ticket holds is prose the tree tracks, and
-one reader over it costs less than two readers disagreeing. For details, see
+carries the debt. The evidence a ticket holds is prose the tree tracks, and one
+reader over it costs less than two readers disagreeing. For details, see
 [[spec/design_output/pull#the-voice-reads-the-evidence]].
 
 - the pull reads a hand-back's fields with the rules the lint holds over a ticket, at the same level
-- a case feeds the pull a verdict carrying a semicolon, and the hand-back comes back refused where the lint would warn
+- a case feeds the pull a verdict carrying a semicolon. The hand-back comes back refused where the lint would warn
 - `./RUNME.sh check` answers 0
 
 # design

@@ -30,13 +30,15 @@ step: do
 
 # Ask
 
-A pointer with the ending off reads as a live link in the links verb the way
-it reads in the pointer gate, so the two agree on every pointer. Today the index
-resolves a link to the exact path, to the path with `.md`, to a note's id and to
-a folder, and a ticket names its process with the ending off. So
-`./RUNME.sh links` names every process pointer dead, and its answer says nothing
-a reader acts on. `EveryPointerResolves` in `src/lsp/pointer.go` tries `.yaml`
-and `.yml` too, and one resolver in a package both modules import would answer
+A pointer with the ending off reads as a live link in the links verb the way it
+reads in the pointer gate. The two agree on every pointer. Today the index
+resolves a link to the exact path, to the path with `.md`, to a note's id and
+to a folder.
+
+A ticket names its process with the ending off. So `./RUNME.sh
+links` names every process pointer dead, and its answer says nothing a reader
+acts on. `EveryPointerResolves` in `src/lsp/pointer.go` tries `.yaml` and
+`.yml` too, and one resolver in a package both modules import would answer
 both. For details, see [[spec/design_output/index#a-note-and-its-links]] and
 [[spec/design_output/lsp#every-pointer-resolves]].
 

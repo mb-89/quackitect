@@ -183,7 +183,7 @@ warn line a rule naming a check it holds nowhere.
 | `onStop` in `src/bridge/stop.js` | before the vote, asks `knowsCheck` of every rule carrying a `runs`, and writes `warn` under `stop` for each one it holds nowhere, naming the rule id and the check |
 | `CHECKS` in `src/bridge/stop.js` | gains `never`, answering false, so the table under The mechanical checks and the door agree |
 | `decide` in the hook's `lib/stop.js` | stays as it is, because the vote skips a claimed rule the agent claims nowhere, and the door's own read catches those too |
-| the case | drives the door over the fake box with a rule whose `runs` names nothing, and asserts one warn row in the fake log naming the rule and the check |
+| the case | drives the door over the fake box with a rule whose `runs` names nothing. Asserts one warn row in the fake log naming the rule and the check |
 | the design output | stays as it is, because the sentence promising the line stands there already |
 
 The line names the rule id and the check, because the door holds both and the
@@ -203,12 +203,12 @@ the block for what to do next.
 
 pass
 
-- The approach does what the ask calls for: the door reads every rule's `runs` through `knowsCheck` once a turn, and writes one warn line a rule naming a check it holds nowhere.
-- The line names the rule id and the check, both of which the door holds, so the earlier finding on the file name stands answered.
-- `CHECKS` gains `never` answering false, so the table under The mechanical checks and the door agree, and the earlier finding stands answered.
-- The case drives the door over the fake box in `test/level0/stop-door.test.js`, whose fake `log.say` keeps every row, and asserts the warn row there, so the rule carries a test proving it fires.
-- The approach touches `src/bridge/stop.js` and the case alone, and leaves `decide`, `fires` and the design output as they stand, so nothing outside the ask moves.
-- Craft, for the drafter at implement: the case's rule carries a `runs` naming a check the door holds nowhere, and a `decides` of mechanical, so the vote reads it too.
+- The approach does what the ask calls for. The door reads every rule's `runs` through `knowsCheck` once a turn. Writes one warn line a rule naming a check it holds nowhere.
+- The line names the rule id and the check, both of which the door holds. The earlier finding on the file name stands answered.
+- `CHECKS` gains `never` answering false. The table under The mechanical checks and the door agree. The earlier finding stands answered.
+- The case drives the door over the fake box in `test/level0/stop-door.test.js`, whose fake `log.say` keeps every row. Asserts the warn row there. The rule carries a test proving it fires.
+- The approach touches `src/bridge/stop.js` and the case alone. Leaves `decide`, `fires` and the design output as they stand. Nothing outside the ask moves.
+- Craft, for the drafter at implement. The case's rule carries a `runs` naming a check the door holds nowhere. A `decides` of mechanical. The vote reads it too.
 
 # implement
 
@@ -239,10 +239,10 @@ fake box it holds already.
 | a rule running `never` writes no warn line | passes, because the door writes no line today |
 
 What surprises me is that the door already writes a warn line for a claim
-naming no reason, and holds the reader for a rule's check two lines away from
-it. The second case passes before the change and earns its place after it,
-because the change writes a line for every unknown check and `never` stands
-in the door's table nowhere yet.
+naming no reason. Holds the reader for a rule's check two lines away from it.
+The second case passes before the change and earns its place after it. The
+change writes a line for every unknown check and `never` stands in the door's
+table nowhere yet.
 
 ### checked
 
@@ -371,14 +371,14 @@ pass
 - The branch does what the ask calls for. `warnsUnknown` writes one warn line a rule naming a check the door holds nowhere.
 - The line names the rule id and the check, and the row carries both as fields, as the approach says.
 - `never` stands in `CHECKS` answering false, so the table under The mechanical checks and the door agree.
-- The case feeds the door a rule with a typo in `runs` and asserts the one warn row in the fake log.
+- The case feeds the door a rule with a typo in `runs`. It asserts the one warn row in the fake log.
 - A second case feeds the door `never` and asserts silence, so the new check carries its own proof.
 - `./RUNME.sh check` answers 0 on this branch, with 43 standing at warning.
 - The hunk on `spec/tickets/a-pointer-resolves.md` puts one file name in a code span, a trivial fix outside the ask.
 - The other hunks outside the ask are Biome's line wraps, and redesign nothing.
 - The handback names no retro, and none stands there.
-- Craft, for the drafter at leisure: the assertion message at line 283 of the case file earns one Antithesis warning, and the hand drains it.
-- `./RUNME.sh branch review` fails on its own worktree, a missing `plugin.json`, so this verdict reads git and the check by hand.
+- Craft, for the drafter at leisure. The assertion message at line 283 of the case file earns one Antithesis warning. The hand drains it.
+- `./RUNME.sh branch review` fails on its own worktree, a missing `plugin.json`. This verdict reads git and the check by hand.
 
 ## checked
 
@@ -386,7 +386,7 @@ pass
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The line's promise stands in `spec/design_output/stop.md` alone, and the function, the check and both cases point at that chapter.
+- every fact the change adds stands in one place, and a note points at the file holding it. The line's promise stands in `spec/design_output/stop.md` alone, and the function, the check and both cases point at that chapter.
 
 # Discussion
 

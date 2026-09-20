@@ -253,11 +253,11 @@ the table of tree rules takes a row.
 <!-- the form is verdict -->
 
 pass
-- the approach covers each bullet of the ask: a tree rule reads every pointer, an error makes the check refuse, and the tree gets repointed
-- the approach resolves a path the way the index's `pointsAt` does, and lists `.yaml` and `.yml` where the index tries `.md` alone; the drafter names which of the two the rule follows, or the case for the third suffix
-- the index holds a `dangling` query over the same dead pointers; the rule says beside it why a second reader stands in the language server, or reads the index's answer
-- the approach names no case feeding the rule a chapter nobody wrote; the tests-red step writes that case, and it asserts the rule refuses
-- the design output takes a chapter and a row in the table of tree rules, so the rule stands in one place
+- the approach covers each bullet of the ask. A tree rule reads every pointer, an error makes the check refuse. The tree gets repointed
+- the approach resolves a path the way the index's `pointsAt` does. Lists `.yaml` and `.yml` where the index tries `.md` alone. The drafter names which of the two the rule follows, or the case for the third suffix
+- the index holds a `dangling` query over the same dead pointers. The rule says beside it why a second reader stands in the language server, or reads the index's answer
+- the approach names no case feeding the rule a chapter nobody wrote. The tests-red step writes that case. It asserts the rule refuses
+- the design output takes a chapter and a row in the table of tree rules. The rule stands in one place
 
 # implement
 
@@ -285,11 +285,11 @@ against it.
 
 | the case | what it holds open |
 |---|---|
-| a chapter nobody wrote is refused | the rule answers nothing |
-| a note nobody wrote is refused | the rule answers nothing |
+| the rule refuses a chapter nobody wrote | the rule answers nothing |
+| the rule refuses a note nobody wrote | the rule answers nothing |
 | a comment in code is read | the rule answers nothing |
 | sound pointers stand quiet | passes over the stub, because nothing draws over nothing |
-| a quoted shape is skipped | passes over the stub, for the same reason |
+| the rule reads past a quoted shape | passes over the stub, for the same reason |
 
 The two quiet cases pass before the rule stands, and they earn their place once
 it does. Each one names a shape the rule reads past, and a rule reading it
@@ -303,7 +303,7 @@ string a test writes each do.
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The rule, its case file, the server's note, the tree rules table, this ticket, and every file carrying a dead pointer.
+- the change touches no file the ask leaves out. The rule, its case file, the server's note, the tree rules table, this ticket. Every file carrying a dead pointer.
 - every door the change reaches has a fake. Each case writes its own fixture root, and the rule reads the tree handed in and nothing outside it.
 - a comment names the approach the change implements. The rule and each case point at the chapter the design output takes.
 
@@ -322,7 +322,7 @@ small.
 
 | the class | the finding | the fix |
 |---|---|---|
-| a fix landed on the case at hand, and not on the class | the yaml reading took a `reads` line and read past a checklist item | read every yaml line, and guard the shape by what a script writes inside the brackets: a quote or a bracket |
+| a fix landed on the case at hand, and the class stood | the yaml reading took a `reads` line and read past a checklist item | read every yaml line, and guard the shape by what a script writes inside the brackets: a quote or a bracket |
 | a fact said nowhere | the order `sorted` puts findings in stood in no note | one line in the tree note names it |
 | a fix bending a shape to fit a number | two rule names on one line held the file under its ceiling | the rules list moves to the checker's file, where the sweep runs it |
 
@@ -336,7 +336,7 @@ names.
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The fixes stay in the rule, its cases, the checker, the two notes, and the two yaml files whose shapes now stand in angle brackets.
+- the change touches no file the ask leaves out. The fixes stay in the rule, its cases, the checker, the two notes. The two yaml files whose shapes now stand in angle brackets.
 - every door the change reaches has a fake. The process case feeds the rule a checklist item and a guarded script line in its own fixture root.
 - a comment names the approach the change implements. The guard carries a line pointing at the chapter.
 
@@ -358,7 +358,7 @@ names.
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The rule and its cases, the registry and the per-file check, the server's note, the tree rules table, the commit door and its case, and the files whose pointers stood dead.
+- the change touches no file the ask leaves out. The rule and its cases, the registry and the per-file check stand in the diff. So do the server's note, the tree rules table and the commit door with its case. So do the files whose pointers stood dead.
 - every door the change reaches has a fake. The rule reads the tree handed in, and each case writes its own fixture root.
 - a comment names the approach the change implements. The rule and each case point at the chapter the server's note now carries.
 
@@ -410,7 +410,7 @@ its own case.
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The commit door's reading of a comment-only hunk stands outside the ask, and the hand-back met it on the first commit, so the fix rides here with its case.
+- the change touches no file the ask leaves out. The commit door's reading of a comment-only hunk stands outside the ask. The hand-back met it on the first commit. The fix rides here with its case.
 - every door the change reaches has a fake. The rule reads the tree handed in, and the door's case feeds it a delta in memory.
 - a comment names the approach the change implements. The rule, its cases and the door's new lines each point at the chapter owning them.
 
@@ -487,12 +487,12 @@ its own case.
 
 pass
 
-- The rule, its six cases, the rules list in `check.go`, the per-file check and the repointed tree do what the ask calls for.
+- The rule, its six cases, the rules list in `check.go` and the per-file check do what the ask calls for. So does the repointed tree.
 - Each fix the last round named landed. The rule reads a yaml file whole, and a case feeds it a checklist item.
-- The two shapes stand in angle brackets, `sorted` has its line in the tree note, and `Rules` holds one name a row.
-- Fed a copy of the tree a dead pointer on line 48 of `retro.yaml`, and `./RUNME.sh lint` answers 1 naming the line.
+- The two shapes stand in angle brackets, `sorted` has its line in the tree note. `Rules` holds one name a row.
+- Fed a copy of the tree a dead pointer on line 48 of `retro.yaml`. `./RUNME.sh lint` answers 1 naming the line.
 - `./RUNME.sh branch test src/lsp/pointer_test.go` answers green.
-- `./RUNME.sh check` on the branch answers 0, with 36 warnings: 31 in this ticket, 2 in the server note, 3 in other tickets.
+- `./RUNME.sh check` on the branch answers 0, with 36 warnings. 31 in this ticket, 2 in the server note, 3 in other tickets.
 - `./RUNME.sh branch review` answers check 1 on the ignored `plugin.json` the review worktree lacks. That is the box, and the branch's own check answers 0.
 - No retro stands in the handback.
 - `gofmt` names no file in `src/lsp`.
@@ -507,7 +507,7 @@ pass
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The rule's chapter holds what it reads and what it skips, and the code and the cases point at it. The order `sorted` gives stands in the tree note alone.
+- every fact the change adds stands in one place, and a note points at the file holding it. The rule's chapter holds what it reads and what it skips, and the code and the cases point at it. The order `sorted` gives stands in the tree note alone.
 
 # Discussion
 

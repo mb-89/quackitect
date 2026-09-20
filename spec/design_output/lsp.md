@@ -167,12 +167,12 @@ runs, and `Speaks` in `src/lsp/lsp.go` answers it:
 The language client is the extension's one dependency, pinned in its manifest.
 The installer links it beside the extension, so no copy travels.
 
-## A finding draws as a diagnostic
+## A finding is a diagnostic
 
-`drawsAs` turns one finding into one diagnostic: the rule is the code, the
-message is the text, and the range runs from the column to the end of the
-line. A finding counts its line and column from one and the editor from zero,
-so the draw takes one off each.
+`drawsAs` turns one finding into one diagnostic. The rule is the code, the
+message is the text. The range runs from the column to the end of the line. A
+finding counts its line and column from one and the editor from zero, so the
+draw takes one off each.
 
 # The standing file
 

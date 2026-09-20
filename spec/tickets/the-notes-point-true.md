@@ -180,11 +180,11 @@ A reader follows a pointer and lands where it says. A check nobody holds says so
 
 <!-- the form is list -->
 
-- [[spec/tickets/a-pointer-resolves]]: the server gains `EveryPointerResolves`, which follows every pointer a tracked file writes into its chapter, and the tree loses every dead pointer
-- [[spec/tickets/the-unknown-runs-stays-quiet]]: the stop door writes one warn line a rule naming a check it holds nowhere, and `never` joins its checks
-- [[spec/tickets/the-window-splits-by-tab]]: the window's one package becomes the six the chapter names, a tab owns its state, and every import runs down
+- [[spec/tickets/a-pointer-resolves]]: the server gains `EveryPointerResolves`, which follows every pointer into its chapter. The tree loses every dead pointer
+- [[spec/tickets/the-unknown-runs-stays-quiet]]: the stop door writes one warn line a rule naming a check it holds nowhere. The unbuilt check joins its table
+- [[spec/tickets/the-window-splits-by-tab]]: the window's one package becomes the six the chapter names. A tab owns its state, and every import runs down
 - the commit door passes a hunk adding comment lines alone, with its case
-- the server note gains the chapters its code pointed at, and the tree note names the order a finding list takes
+- the server note gains the chapters its code pointed at. The tree note names the order a finding list takes
 - trunk comes into the branch, and the split carries trunk's held place, its cloud inheritance and its route tones
 - three private notes decided: one done, and two became [[spec/tickets/the-links-verb-tries-yaml]] and [[spec/tickets/one-reader-judges-a-verdict]]
 
@@ -194,10 +194,10 @@ A reader follows a pointer and lands where it says. A check nobody holds says so
 
 <!-- the form is list -->
 
-- the review hands read the ask against the code and found what the drafter left out, because each round read the earlier findings and the tree as it stood
-- the pointer gate found a dead pointer the scan of this box missed, because the rule reads a note's front and the scan read the body alone
-- the layout case in `src/tui/layout_test.go` reads the chapter's table as a map, so the chapter stayed the one list through six review rounds
-- the check stayed green at every hand-back, because each step ran the tests it touched before the pull ran the battery
+- the review hands read the ask against the code and found what the drafter left out. Each round read the earlier findings and the tree as it stood
+- the pointer gate found a dead pointer the scan of this box missed. The rule reads a note's front and the scan read the body alone
+- the layout case in `src/tui/layout_test.go` reads the chapter's table as a map. The chapter stayed the one list through six review rounds
+- the check stayed green at every hand-back. Each step ran the tests it touched before the pull ran the battery
 
 ### badly
 
@@ -205,12 +205,12 @@ A reader follows a pointer and lands where it says. A check nobody holds says so
 
 <!-- the form is list -->
 
-- the commit door refused the change hand-back on a-pointer-resolves for comment-only repoints in eight files, in the record of that step, and the fix to the door rode a ticket about pointers
-- a refused commit put the staging back, and the next lint read the old paths of the moved window files as empty Go, in the log at the window's change step
-- the window split's design took six review rounds and its verdict six, each round naming names the last left behind, in the ticket's record
-- the mechanical rename of the frame's files reached prose and pointers in comments, in the transcript at the split's first pass, and every file came back rewritten by hand
-- a claim in a reflect said a probe turns a case red, and no probe had run, in the fifth verdict's record
-- the private notes stood behind the group's own leaf until each took the tag, in the transcript at the retro's notes step
+- the commit door refused the change hand-back on a-pointer-resolves, in the record of that step. Eight files carried comment-only repoints. The fix to the door rode a ticket about pointers
+- a refused commit put the staging back, in the log at the window's change step. The next lint read the moved window files' old paths as empty Go
+- the window split's design took six review rounds and its verdict six, in the ticket's record. Each round named names the last left behind
+- the mechanical rename reached prose and pointers in the frame's comments, in the transcript at the split's first pass. Every file came back rewritten
+- a claim in a reflect said a probe turns a case red. No probe had run, in the fifth verdict's record
+- the private notes stood behind the group's own leaf, in the transcript at the retro's notes step. Each moved ahead once it took the tag
 - `./RUNME.sh branch review` failed in every verdict on a plugin file its worktree lacks, in each verdict's findings
 
 ### improve
@@ -221,10 +221,10 @@ A reader follows a pointer and lands where it says. A check nobody holds says so
 
 - the commit door reads a hunk adding comment lines alone as no code, in `.claude/skills/level0/lib/tested.js`, and this branch carries it
 - a refused hand-back leaves the staging as it stood, in `src/scripts/pull.js`, so the lint reads the tree the hand left
-- a rename lists every name it touches and searches the notes, the case messages and the data keys for each before the hand-back, in [[spec/guidance/code/refactoring]]
-- a rename runs over code lines alone and leaves a comment and a pointer as they stand, in the hand's own script under `.se/scripts`
-- a reflect names what a probe answered, and no probe it never ran, in [[spec/guidance/review/reviewing]]
-- a note a hand mints names its group, so the pull hands it to the retro without the tag, in `src/scripts/ticket.js`
+- a rename lists every name it touches, in [[spec/guidance/code/refactoring]]. It searches the notes, the case messages and the data keys for each before the hand-back
+- a rename runs over code lines alone, in the hand's own script under `.se/scripts`. A comment and a pointer stand as they were
+- a reflect names what a probe answered, in [[spec/guidance/review/reviewing]]. A probe it ran is the one it names
+- a note a hand mints names its group. The pull hands it to the retro without the tag, in `src/scripts/ticket.js`
 - `./RUNME.sh branch review` builds its worktree with the plugin file git leaves out, in `src/scripts/work.js`
 
 ### thoughts
@@ -233,14 +233,26 @@ A reader follows a pointer and lands where it says. A check nobody holds says so
 
 <!-- the form is text -->
 
-The review rounds on the window split read as a long tail. Each hand found a
-smaller thing than the last, and each thing was real. A rename touches more
-readers than the code: the notes, the case messages, the data keys, the
-tables. The class named in the second reflect held through the sixth round,
-and a search before the hand-back would have closed it in one.
+The review rounds on the window split read as a long tail:
 
-The pointer gate paid for itself on its own branch: it found a dead pointer
-in a closed ticket's record, and every review hand read the notes it repointed.
+| the round | what it found |
+|---|---|
+| the first | the notes named the moved files where they stood |
+| the middle ones | the names inside the notes and the case messages, the constants the cases spelled, and the import order |
+| the last | the colour assertions read bare text, and one fixture stood twice |
+
+Each hand found a smaller thing than the last, and each thing was real. A
+rename touches more readers than the code:
+
+- the notes
+- the case messages
+- the data keys
+- the tables
+
+The class named in the second reflect held through the sixth round, and a
+search before the hand-back would have closed it in one. The pointer gate paid
+for itself on its own branch. It found a dead pointer in a closed ticket's
+record, and every review hand read the notes it repointed.
 
 The scan this box wrote before the rule stood, under `.se/scripts`, read the
 tree the way the rule does now, and the rule replaced it:
@@ -293,8 +305,8 @@ for (const f of files) {
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The pointer rule's chapter holds its reading, the tree rules table points at it, and the window's chapter holds the packages' one list.
-- every number the change adds carries a name in one place, and a copy a technical reason forces says so beside it. The widths, the wheel step, the floor width, the poll and the no-sort mark each carry a name, and the held place spelled again in Go says why beside it.
+- every fact the change adds stands in one place, and a note points at the file holding it. The pointer rule's chapter holds its reading, and the tree rules table points at it. The window's chapter holds the packages' one list.
+- every number the change adds carries a name in one place. A copy a technical reason forces says so beside it. The widths, the wheel step, the floor width, the poll and the no-sort mark each carry a name. The held place spelled again in Go says why beside it.
 - every header the change writes says what its file is for, and counts nothing. Each new file opens on what it holds, and none counts its lines or its sections.
 
 ## cloud
@@ -315,9 +327,9 @@ for (const f of files) {
 
 <!-- the form is list -->
 
-- a conflict at sync, in seven files, where trunk moved the window's places and tones and the branch moved the files
+- a conflict at sync, in seven files. Trunk moved the window's places and tones and the branch moved the files
 - the commit hook, which refused comment-only repoints once and a code change whose test landed a step earlier twice
-- `./RUNME.sh branch review`, which fails in its worktree on a plugin file git leaves out, so every verdict hand read git and the check by hand
+- `./RUNME.sh branch review`, which fails in its worktree on a plugin file git leaves out. Every verdict hand read git and the check by hand
 
 ### left
 
@@ -326,8 +338,8 @@ for (const f of files) {
 <!-- the form is list -->
 
 - no person step parked
-- [[spec/tickets/the-links-verb-tries-yaml]] minted with no group, on the trivial route, for the index to resolve a process pointer with the ending off
-- [[spec/tickets/one-reader-judges-a-verdict]] minted with no group, on the standard route, for the pull to read a hand-back's fields at the lint's level
+- [[spec/tickets/the-links-verb-tries-yaml]] minted with no group, on the trivial route. The index resolves a process pointer with the ending off
+- [[spec/tickets/one-reader-judges-a-verdict]] minted with no group, on the standard route. The pull reads a hand-back's fields at the lint's level
 - the handover says the branch stands at done, with the check green on its tip and trunk taken in
 
 # Discussion
