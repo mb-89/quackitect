@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -131,6 +131,10 @@ record:
     hash_after: 1a72525f2a423fd2eac0a7bce64a80d7346b3ed7
     returns: 4
     why: "`src/scripts/vehicle.js` carries no `it`: `registerDirs` and `readRegister`; open on `(files, env)`, and `cli.js`, `cli-doors.js` and; `src/bridge/vehicle.js` call them that way. The `windows` `cli-check.js`; builds rides the viewer's hand alone, and vehicle sees none of it. Say which; caller carries the platform in, or stand the file off as a root.; The pass list opens `**/src/extension/*.js`, and `.vale.ini` stands; `**/src/extension/editor*.js` off already, so two sections cover the editor; files. Grow the section standing, the way the stub's row reads now.; The rule draws on `process.env`, `process.argv` and `process.platform`, and; `src/scripts/vehicle.js` reads `process.pid` outside a door. Name what the; scope leaves to a later ticket, beside the three reads it takes.; The findings of the round before stand answered. The spawn in; `src/index/main.go` moves into `src/index/door.go`. The Go scope reads; `os/exec` in the table and the paragraph alike. `trust.js` and `copilot.js`; reach the pass list, and the stub's bridgehead keeps its one section."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: feea15d7cece4654886fa5fd6d5ee41d40af4e1b
+    hash_after: feea15d7cece4654886fa5fd6d5ee41d40af4e1b
 ---
 
 # Ask
@@ -181,7 +185,7 @@ The readings:
 | `**/src/scripts/trust.js`, `**/src/scripts/copilot.js` | each opens on its own line of arguments, the way a hook does |
 | `**/src/scripts/editor.js` | the editor's own root, which reads the environment on its entry line |
 | `**/src/bridge/server.js` | the server root builds the box each door reads |
-| `**/src/extension/*.js` | the extension stands as its own door layer, as the editor files do |
+| the section standing `editor*.js` off reads `*.js` | the extension stands as its own door layer, as the editor files do |
 | `**/src/*/door.go` | each Go package names the outside in that one file |
 
 Every other module takes the value off the hand. The implement step moves them,
@@ -192,7 +196,7 @@ and the two the ask names open the list:
 | `src/scripts/pull-hand.js` | `it.env`, and the read of the process goes |
 | `src/bridge/stop.js` | `box.env`, and the break mark rides the box beside it |
 | `work.js` | `it.env`, off the hand the root builds |
-| `vehicle.js` | `it.windows`, which `cli-check.js` builds onto the hand |
+| `vehicle.js` | `windows`, beside the `env` its callers hand it today |
 | `src/bridge/bash.js`, `src/bridge/guidance.js` | `box.env`, off the box the server builds |
 
 `process.platform` reads the same way. `cli-check.js` builds `windows` onto the
@@ -202,10 +206,14 @@ stands off in `.vale.ini` today, so no section opens over it twice.
 | what reads the platform | what it takes |
 |---|---|
 | `src/scripts/cli-read.js`, `src/scripts/copilot.js` | each stands off as a root |
-| `src/scripts/vehicle.js` | `it.windows`, off the hand |
+| `src/scripts/vehicle.js` | a `windows` argument, because it takes `(files, env)` and no hand |
 
 So `./RUNME.sh lint src` answers clean, and the rule names every read a later
 hand writes.
+
+The rule reads the three the ask names, and `process.pid` stands outside it.
+`src/scripts/vehicle.js` reads that one, and a private note carries it for the
+retro to decide.
 
 The Go rule reads an import of `os/exec`, which runs a command. Each package
 names that import in its `door.go`, and `src/index` holds one today.
