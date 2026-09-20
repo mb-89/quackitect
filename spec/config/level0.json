@@ -20,7 +20,7 @@
     "failScore": 5
   },
   "restated": {
-    "comment": "The runs the restated rules refuse. A run is a count of words two places share, and spec/design_output/tree.md tables the rules reading them.",
+    "comment": "The runs the restated rules refuse. A run is a count of words two places share, and spec/design_output/lsp.md says what the rules reading them weigh.",
     "pointer": 4,
     "rule": 6
   },

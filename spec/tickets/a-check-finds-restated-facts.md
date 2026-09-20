@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -188,6 +188,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-17
+    hash_before: 5c490f19f84f35f0eb6efdc46a53fcba425ca9d0
+    hash_after: 5c490f19f84f35f0eb6efdc46a53fcba425ca9d0
+    returns: 2
+    why: "The branch answers the ask: three rules draw, and `./RUNME.sh lint spec` names every place.; `spec/config/level0.json` says the tree note tables the restated rules, and it tables none.; [[spec/design_output/lsp#a-second-copy-draws]] owns that table, so the comment names the wrong note.; The fix for it stands uncommitted in the working tree. Commit it, or the tip stays wrong.; `spec/schemas/paragraph.schema.yaml` names that same tree chapter over `restated.table`. Name the owner.; What holds, so the fixes stay small:; `./RUNME.sh check` answers 0: 1253 cases pass, none fails, every projection reads as projected.; `./RUNME.sh lint spec` answers 0 in under seven seconds, where it crawled past two minutes.; The tree holds the one pass, and a case proves three asks cost one.; A changed buffer drops the findings, and the next ask pays the pass again.; A scratch tree draws `RestatedPointer` and `RestatedRule` off the binary, handed a folder.; Vale draws `RestatedTable` over a line beside a table, live.; A bound of nothing holds its rule off, which answers the missing block, and a case proves it.; `restatedHere` reads the tracked file, the environment and the local one, as `wordsHere` does.; The dead anchors under `src/viewer` stand committed at the tip.; The handover carries a retro, and its third finding names the class both fixes fall under.; The files past this ask belong to the group's other tickets, and none redesigns this one."
 ---
 
 # Ask
@@ -460,24 +466,14 @@ following a pointer lands on the chapter describing it.
 - src/lsp/config.go
 - src/lsp/main.go
 - src/lsp/tree.go
-- src/scripts/cli-read.js
-- src/scripts/cli-check.js
-- src/scripts/cli-doors.js
-- .claude/skills/level0/lib/paragraph.js
-- .claude/skills/level0/lib/paragraph-rules.js
-- .claude/commands/se-config-restated-pointer.md
-- .claude/commands/se-config-restated-rule.md
 - spec/config/level0.json
 - spec/config/level0.schema.json
 - spec/schemas/paragraph.schema.yaml
+- spec/config/styles/VoiceParagraph/RestatedTable.yml
 - .vale.ini
+- spec/design_output/lsp.md
 - spec/design_output/tree.md
 - spec/design_output/tree-view.md
-- spec/design_output/viewer.md
-- spec/guidance/code/testing.md
-- spec/guidance/code/code.md
-- test/contract/paragraph.test.js
-- test/level0/paragraph.test.js
 - src/viewer/treedraw.go
 - src/viewer/tree_test.go
 
@@ -489,27 +485,25 @@ following a pointer lands on the chapter describing it.
 
 fail
 
-- `restatedOver` reads the whole tree once per path, so a folder costs the notes under it squared.
-- `se-lsp check spec` runs past two minutes here, and `se-lsp check .` answers in under two.
-- So `./RUNME.sh lint spec`, the verb the ask names, crawls where the sweep stays quick.
-- One note costs half a second, and the binary at the branch point answers it at once.
-- The fix: read the tree once inside `checks`, key the findings by file, hand each `Over` its own.
-- `spec/design_output/tree-view.md` renames a chapter, and two pointers still name the old anchor.
-- `src/viewer/treedraw.go` and `src/viewer/tree_test.go` carry that dead anchor at the tip.
-- The working tree holds the fix for those two, uncommitted. Commit it, or the tip stays broken.
-- `restatedHere` claims the layers the resolver reads, and skips the environment `wordsHere` reads.
-- A tree missing the `restated` block leaves both bounds at nothing, so every pointer draws. Floor them.
+- The branch answers the ask: three rules draw, and `./RUNME.sh lint spec` names every place.
+- `spec/config/level0.json` says the tree note tables the restated rules, and it tables none.
+- [[spec/design_output/lsp#a-second-copy-draws]] owns that table, so the comment names the wrong note.
+- The fix for it stands uncommitted in the working tree. Commit it, or the tip stays wrong.
+- `spec/schemas/paragraph.schema.yaml` names that same tree chapter over `restated.table`. Name the owner.
 
 What holds, so the fixes stay small:
 
-- `./RUNME.sh check` answers 0 on a quiet box, and the handover carries a retro.
-- Vale gives up on a rule where hands run beside each other, which the handover names already.
-- The handover names the dead anchor as a retro finding, with the fix for the class.
-- The rules fire live: a note retelling the chapter its pointer names draws `RestatedPointer`.
-- Each Go case feeds the rule a bad pair and a good one, and each answers right.
-- The sweep draws nothing over the tree, so the three places the branch names take their fix.
-- Each bound stands in one place, and `spec/config/level0.schema.json` types the pair.
-- `RestatedTable` stands off over tickets alone, where a line weighs its table on purpose.
+- `./RUNME.sh check` answers 0: 1253 cases pass, none fails, every projection reads as projected.
+- `./RUNME.sh lint spec` answers 0 in under seven seconds, where it crawled past two minutes.
+- The tree holds the one pass, and a case proves three asks cost one.
+- A changed buffer drops the findings, and the next ask pays the pass again.
+- A scratch tree draws `RestatedPointer` and `RestatedRule` off the binary, handed a folder.
+- Vale draws `RestatedTable` over a line beside a table, live.
+- A bound of nothing holds its rule off, which answers the missing block, and a case proves it.
+- `restatedHere` reads the tracked file, the environment and the local one, as `wordsHere` does.
+- The dead anchors under `src/viewer` stand committed at the tip.
+- The handover carries a retro, and its third finding names the class both fixes fall under.
+- The files past this ask belong to the group's other tickets, and none redesigns this one.
 
 ## checked
 
@@ -517,7 +511,7 @@ What holds, so the fixes stay small:
 
 <!-- the form is checklist -->
 
-- Every fact the change adds stands once, and each piece points at the chapter tabling the rules. The two bounds stand in `spec/config/level0.json`, the table bound in the paragraph schema, and the generated commands name their source. The one fact in two places is the renamed chapter, which two Go pointers still name by the old anchor.
+- Each bound stands in one place: the two in `spec/config/level0.json`, the third in the paragraph schema. The chapter [[spec/design_output/lsp#a-second-copy-draws]] owns what the rules weigh, and the code points there. Two comments name `spec/design_output/tree.md` instead, which tables the rules over two files and holds none of these three. That is the fact standing in the wrong place, and the two fixes above put it right.
 
 # Discussion
 
