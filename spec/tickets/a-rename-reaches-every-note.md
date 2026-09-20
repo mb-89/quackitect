@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -233,6 +233,17 @@ record:
     hash_after: 2f576760c6ae966efb39bc862131bbab0475ba73
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 93b3ca081d60e89d3c083c5cd16c135ffc455b0f
+    hash_after: 93b3ca081d60e89d3c083c5cd16c135ffc455b0f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -447,18 +458,26 @@ The finding's own fix rides beside it. Two sources join a key on the zero byte, 
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-The split now stands where a pull hands it out, and the reader looks at bytes.
+The verb answers for what its reader leaves out, so no reach drops in silence.
 
 | what changes | how |
 |---|---|
-| `spec/tickets/the-window-splits-by-tab.md` | reads `state: open`, so the queue offers it |
-| the package table | stands once, under [[spec/design_output/tui#the-packages-the-window-holds]] |
-| `readsAsText` | reads the file's own bytes, where the round before read its ending |
-| the ignore rows | name the file the build writes, and the dead pair goes |
+| `writtenFiles` | answers the files it reads, and the ones it skips beside them |
+| `renaming` and `renamingText` | carry that list out as `skipped` |
+| the command line | prints each skipped file under the reaches it rewrote |
+| `src/scripts/viewer.js` and `src/extension/lib/grid.js` | join a key on the unit separator |
 
-The round before minted the ticket as a draft, and a draft waits for `ticket open`. So the ask's first line stood in a file no pull offers. The ticket now stands open and free of a group. That is what a pull on trunk hands out, and the branch taking it decides its own.
+Three rounds of this ticket wrote three readers, and each left something out with nothing said. An ending list, then the same list one layer down, then a zero byte reading as a picture. The zero byte is the usual rule, and this tree held two sources joining a key on it.
 
-The reader of a file now looks for the byte a text file holds nowhere. An ending list is the same fault as the walk the round before this one fixed, one layer down. A picture with no ending carries its bytes now, and a case feeds the verb exactly that.
+One of those sources names the window's folder, which this ticket moves. So a run of the verb today would leave the build pointing at a folder that moved. The two keys now join on the unit separator, and a walk of the tracked files answers no source holding a zero byte.
+
+| the round | the rule its reader held |
+|---|---|
+| the first | a list of endings |
+| the second | the same list, one layer down |
+| this one | the file's own bytes, and the answer naming what it skips |
+
+The standing fix is the answer. A rule that skips says what it skips, and a hand reads the list and decides. A case feeds the verb a source holding that byte and asserts the run names it.
 
 What this leaves for the owner at the merge. The bare word naming the older shape stands in the window's own files, in `viewerOf`, in the binary's name and in the vocabulary. The three renames this ticket ran moved a folder, a note and a module, and each left that word alone.
 
@@ -467,9 +486,9 @@ What this leaves for the owner at the merge. The bare word naming the older shap
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The verb, its cases, the ignore rows, the minted ticket, and the note taking the package table.
-- every door the change reaches has a fake. The case reading bytes hands its own disk, as each case beside it does.
-- a comment names the approach the change implements. The reader of bytes says why it reads them, and the note owns the table.
+- the change touches no file the ask leaves out. The verb, its cases, the command line's print, and the two sources joining a key.
+- every door the change reaches has a fake. Each case hands its own disk, and the new one feeds it a source holding a zero byte.
+- a comment names the approach the change implements. The verb says what it leaves out, and each key says why it joins on that mark.
 
 # verdict
 
