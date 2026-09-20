@@ -205,9 +205,13 @@ A cloud box worked this branch and hands it back. The handover stands here, and 
 | [[spec/tickets/the-take-skips-an-orphan]] | closed done |
 | [[spec/tickets/release-keeps-local-commits]] | closed done |
 | [[spec/tickets/a-return-asks-another-hand]] | closed became, on the successor below |
-| the seven others | open, each with its approach written, each at `design/review` |
+| [[spec/tickets/the-pull-names-the-unblock]] | closed became, its row landed, its route parked |
+| [[spec/tickets/the-brief-verbs-go]] | open at `implement/change`, its approach reviewed and passed |
+| the five others | open at `design/review`, each with its approach written |
 
-Every open child carries a drafted approach. The next box spawns one hand a child, and the route runs on from there.
+The next box takes `the-brief-verbs-go` first, because a parked leaf scores ahead of the rest. Its approach names every reader, note and case, and the change spans the code, the cases, the Go cases and the notes.
+
+The five at `design/review` each want one spawned hand. The pull reaches them once the ticket above moves.
 
 What this box met:
 
