@@ -167,6 +167,24 @@ rests on a reader's memory.
 
 <!-- the form is command -->
 
+    ./RUNME.sh retro notes
+
+Every note on this box carries its outcome and what the successor takes. Five
+become tickets in the tree, and one drops because a wider note holds it:
+
+| the note | what it becomes |
+|---|---|
+| `a-door-holds-the-pid` | dropped, because `a-door-holds-three-reads` names the pid |
+| `a-door-holds-three-reads` | [[spec/tickets/a-door-holds-three-reads]] |
+| `a-rename-breaks-its-pointers` | [[spec/tickets/a-pointer-reaches-a-heading]] |
+| `an-odd-mark-breaks-pairing` | [[spec/tickets/a-lone-mark-pairs-wrong]] |
+| `every-road-reads-one-config` | [[spec/tickets/every-road-reads-one-config]] |
+| `path-join-stands-twice` | [[spec/tickets/one-door-joins-a-path]] |
+
+The command answers 1, because a note closes through the pull and the pull hands
+a leaf of this group on a work branch. So no hand here takes a note in hand.
+[[spec/tickets/a-retro-closes-its-notes]] carries that gap.
+
 ## write
 
 <!-- writes the retro over the box's own window -->
