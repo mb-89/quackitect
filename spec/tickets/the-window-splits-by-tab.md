@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -145,6 +145,10 @@ record:
     hand: box 1670436ae0bb · claude-code-remote
     hash_before: 9c52e77ae070fb00c2457ed080e9b3f0dfa0bcca
     hash_after: 23137b471c2d6c72667d5c9e8c2e5bdf4c67380c
+  - step: design/review
+    hand: box 1670436ae0bb · claude-code-remote · helper-12
+    hash_before: 74b158aa825209a6272060698a2276a3bb5517ad
+    hash_after: 74b158aa825209a6272060698a2276a3bb5517ad
 ---
 
 # Ask
@@ -225,9 +229,15 @@ change under any of them rebuilds the viewer.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- design: The log tab reads the draw package's styles and cuts, the work tab reads the tree and the draw package, and the window reads the palette and the filter language, so the log row, the work row and the window row each name every package they import.
+| finding | what stands |
+|---|---|
+| `./RUNME.sh check` answers 0 on the branch | 56 warnings stand, and none is this ticket's |
+| Every import in the chapter's table runs down | the draw package reads no other package, and the tree reads the draw package alone |
+| The last round's finding has its answer | the log row, the work row and the window row each name every package they import |
+| The window tests read `loadWork` and `placesIn` | the window row names each tab, so the root reaches them |
+| The frame reads no record and no tree after the split | the tab interface's methods carry what the keys, the mouse, the pane and the footer read today |
 
 # implement
 
