@@ -27,9 +27,9 @@ one tab reads them all. These packages part it, and every import runs down:
 | `src/tui/draw` | `cut`, `pad`, `oneLine`, `Wrap`, the gutter, the filter language, the link, the palette and the styles | `quackitect/config`, for the palette |
 | `src/tui/tree` | the tree, the rows it draws and the base file | `src/tui/draw`, and `quackitect/yaml` for the base file |
 | `src/tui/frame` | `Model`, the `Tab` interface, the parts a pane renders, the keys, the mouse, the strip, the filter pane, the help, the footer and the window's door | the draw and the tree packages |
-| `src/tui/log` | the log tab: its records, its tailer, its columns, its details and the said style | `src/tui/frame` |
-| `src/tui/work` | the work tab: its tree, its edit, its places, the index calls and the index start | `src/tui/frame`, and `quackitect/yaml` for the ticket schema |
-| `src/tui` | the window, which builds the tab list | the frame and each tab |
+| `src/tui/log` | the log tab: its records, its tailer, its columns, its details and the said style | the frame and the draw packages |
+| `src/tui/work` | the work tab: its tree, its edit, its places, the index calls and the index start | the frame, the tree and the draw packages, and `quackitect/yaml` for the ticket schema |
+| `src/tui` | the window, which builds the tab list | the frame, each tab, and the draw package for the palette and the filter language |
 
 The tree files reach the frame through the draw package alone, so they part
 first. A tab package reads `model`, so each name it reads takes a capital, and
