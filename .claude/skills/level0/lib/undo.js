@@ -2,7 +2,6 @@
 // refuses the restore and the text comes back out of the entry itself.
 // [[spec/design_output/apply#the-journal-holds-both-halves]]
 
-
 import { inRun } from "./folders.js";
 export const FOLDER = inRun("undo");
 export const UNDO = "undo";
@@ -22,7 +21,10 @@ export function undoSpec() {
     inputSchema: {
       type: "object",
       properties: {
-        on: { type: "string", description: "the change to take back, as the apply named it" },
+        on: {
+          type: "string",
+          description: "the change to take back, as the apply named it",
+        },
       },
     },
   };

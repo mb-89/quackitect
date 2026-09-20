@@ -57,11 +57,10 @@ A date in prose says when somebody looks, which is nothing a reader acts on.
 The client version beside it already says which build. So a date in prose
 goes, and the version stays.
 
-## The brief stands outside
+## The handover stands outside
 
-Git ignores `.se/HANDOVER.md`, so the two checks at the door pass it on.
-`HANDOVER.md` at the root is the authored half, and it meets every rule the
-tree holds.
+Git ignores `.se/HANDOVER.md`, so the two checks at the door pass it on. It
+reaches one reader once, and level zero deletes the copy it reads.
 
 # The run and the token
 

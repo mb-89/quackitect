@@ -6,22 +6,26 @@
 
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import { STAMP, saysGreen, stampOf } from "../../.claude/skills/level0/lib/runs.js";
 import {
   reaches,
   refusedTodo,
   taggedIn,
 } from "../../.claude/skills/level0/lib/todo.js";
-import { refusedVersion, TRUNK, VERSION } from "../../.claude/skills/level0/lib/trunk.js";
+import {
+  refusedVersion,
+  TRUNK,
+  VERSION,
+} from "../../.claude/skills/level0/lib/trunk.js";
 import { CONFIG, fromJson, PROSE } from "../../.claude/skills/level0/lib/vale.js";
 import {
   refusedWarnings,
   warningsOn,
 } from "../../.claude/skills/level0/lib/warnings.js";
-import { whereIs } from "../engine/tools.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
+import { whereIs } from "../engine/tools.js";
 
 export const STDIN = 0;
 export const ZEROS = /^0+$/;
@@ -40,7 +44,9 @@ export function refsIn(text) {
 export function holds(refs, stampText, carried = () => [], warnings = () => []) {
   // [[spec/design_output/work#a-version-branch-stands]]
   const versions = refs
-    .filter((one) => VERSION.test(String(one.remote ?? "").replace(/^refs\/heads\//, "")))
+    .filter((one) =>
+      VERSION.test(String(one.remote ?? "").replace(/^refs\/heads\//, "")),
+    )
     .filter((one) => ZEROS.test(String(one.sha ?? "")))
     .map((one) => ({ name: one.remote.replace(/^refs\/heads\//, ""), how: "delete" }));
   if (versions.length) return { code: 1, said: refusedVersion(versions) };
@@ -113,9 +119,12 @@ export function lintedBy(outside, root, vale) {
   return (names) => {
     const read = names.filter((one) => PROSE.test(one));
     if (!read.length || !vale) return [];
-    const ran = outside.run([vale, `--config=${CONFIG}`, "--output=JSON", "--no-exit", ...read], {
-      cwd: root,
-    });
+    const ran = outside.run(
+      [vale, `--config=${CONFIG}`, "--output=JSON", "--no-exit", ...read],
+      {
+        cwd: root,
+      },
+    );
     return fromJson(ran.stdout);
   };
 }

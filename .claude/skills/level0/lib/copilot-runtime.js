@@ -1,18 +1,20 @@
 // Copilot's level zero, with every outside operation supplied by doors.
 // [[spec/design_output/copilot#one-runtime]]
 
+import { ticketAt, ticketNamed } from "../../../../src/engine/group.js";
+import { readTools, whereIs } from "../../../../src/engine/tools.js";
+import { heldReadsIn } from "../../../../src/scripts/guidance-hand.js";
+import { groupStanding } from "../../../../src/scripts/work.js";
+import { candidateRun } from "./candidate-check.js";
 import { CODE, formatText, lintText as lintCode } from "./code.js";
 import { bindsHere, carried, countsOf, standingLayer } from "./guidance.js";
 import { mutations } from "./mutations.js";
 import { refusal } from "./refuse.js";
 import { landsOnTrunk } from "./trunk.js";
 import { lintText } from "./vale.js";
-import { readTools, whereIs } from "../../../../src/engine/tools.js";
-import { statusOf } from "../../../../src/scripts/work.js";
-import { heldReadsIn } from "../../../../src/scripts/guidance-hand.js";
-import { candidateRun } from "./candidate-check.js";
 
 export const TOOL_WAIT = 4000;
+const SESSION_HANDOVER = ".se/HANDOVER.md";
 const FILES_A_CALL = 8;
 const BATCH = 4;
 const RETRIES = 3;
@@ -31,9 +33,35 @@ export async function handle(event, it) {
   return it.session.withState(event.session, async (state, save, claim, release) => {
     const cloud = event.surface === "cloud";
     const read = (name) => it.disk.read(it.session.path(name));
+    // A work branch carries its group ticket, and that is what the verbs move. [[spec/design_output/work#a-group-is-a-ticket]]
+    const readGroup = (name) => {
+      const at = it.session.path(ticketAt(ticketNamed(String(name ?? ""))));
+      return it.disk.exists(at) ? it.disk.read(at) : "";
+    };
     const run = (argv, options = {}) =>
-      it.proc.run(argv, { ...options, cwd: options.cwd ?? it.root, timeoutMs: TOOL_WAIT });
+      it.proc.run(argv, {
+        ...options,
+        cwd: options.cwd ?? it.root,
+        timeoutMs: TOOL_WAIT,
+      });
     const checker = candidateRun(it, run);
+    // The session handover reaches one reader once, so the read consumes it. [[spec/design_output/private#the-handover-stands-outside]]
+    const takeHandover = (path) => {
+      let held = state.handovers.find((one) => one.path === path);
+      if (!held && it.disk.exists(it.session.path(path))) {
+        const text = read(path);
+        if (!text.trim()) return;
+        claim(path, text);
+        held = { path, text, consumed: false };
+        state.handovers.push(held);
+        save();
+      }
+      if (!held || held.consumed) return;
+      if (it.disk.exists(it.session.path(path)) && read(path) === held.text)
+        it.disk.remove(it.session.path(path));
+      held.consumed = true;
+      save();
+    };
     const branch = () => {
       const result = run(["git", "rev-parse", "--abbrev-ref", "HEAD"]);
       if (result.exitCode !== 0) throw new Error("Cannot identify the work branch.");
@@ -60,7 +88,7 @@ export async function handle(event, it) {
             "Dispatch Copilot through the existing work branch pull request. Do not switch to another branch.",
           );
         }
-        if (cloud && statusOf(read("HANDOVER.md")) !== "held") {
+        if (cloud && groupStanding(readGroup(state.branch)) !== "held") {
           throw new Error(
             "The dispatcher must claim this work branch before the session starts.",
           );
@@ -71,23 +99,7 @@ export async function handle(event, it) {
         state.started = true;
         save();
       }
-      for (const path of [".se/HANDOVER.md", "HANDOVER.md"]) {
-        let held = state.handovers.find((one) => one.path === path);
-        if (!held && it.disk.exists(it.session.path(path))) {
-          const text = read(path);
-          if (!text.trim()) continue;
-          claim(path, text);
-          held = { path, text, consumed: false };
-          state.handovers.push(held);
-          save();
-        }
-        if (held && !held.consumed) {
-          if (it.disk.exists(it.session.path(path)) && read(path) === held.text)
-            it.disk.remove(it.session.path(path));
-          held.consumed = true;
-          save();
-        }
-      }
+      takeHandover(SESSION_HANDOVER);
       const env = cloud ? { ...it.env, SE_CLOUD: "1" } : it.env;
       const notes = it.disk
         .list(it.join(it.root, "spec/guidance"))
@@ -211,10 +223,11 @@ export async function handle(event, it) {
           issues.push(`Write a fresh result and retro to ${handover.path}.`);
       }
       if (cloud) {
-        const result = it.disk.exists(it.session.path("HANDOVER.md"))
-          ? read("HANDOVER.md")
-          : "";
-        if (branch() !== state.branch || !["done", "todo"].includes(statusOf(result)))
+        const result = readGroup(state.branch);
+        if (
+          branch() !== state.branch ||
+          !["done", "todo"].includes(groupStanding(result))
+        )
           issues.push(
             "Run branch done, or branch release if incomplete, on the assigned branch.",
           );

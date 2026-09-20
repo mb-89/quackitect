@@ -20,7 +20,6 @@ import {
   DONE,
   HELD,
   MERGED,
-  noteOf,
   readWork,
   standingAll,
   waitingOn,
@@ -68,8 +67,7 @@ export function list(it, _name, argv) {
 
 // [[spec/design_output/work#a-row-per-group]]
 function rowOf(one, standing, now, it) {
-  const text = noteOf(one);
-  const kind = one.brief ? "brief" : GROUP;
+  const text = one.ticket;
   const status = standing.get(one.branch) || "no status";
   const waits = waitingOn(text, standing);
   const why = waits.length ? `waits for ${waits.join(", ")}` : markOf(text);
@@ -81,7 +79,7 @@ function rowOf(one, standing, now, it) {
     name: one.name,
     age,
     stale,
-    said: `${one.branch.padEnd(COL.branch)} ${kind.padEnd(COL.kind)} ${status.padEnd(COL.status)} ${why.padEnd(COL.why)} ${age}`,
+    said: `${one.branch.padEnd(COL.branch)} ${status.padEnd(COL.status)} ${why.padEnd(COL.why)} ${age}`,
   };
 }
 
@@ -119,7 +117,7 @@ function queueOnly(it) {
     return 0;
   }
   for (const one of rows) {
-    const place = String(one.queue).padStart(COL.kind);
+    const place = String(one.queue).padStart(COL.place);
     console.log(`${place}  ${one.name.padEnd(COL.branch)} ${one.step}`);
   }
   return 0;

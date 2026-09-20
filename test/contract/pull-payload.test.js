@@ -5,8 +5,8 @@
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { disk as realDisk } from "../../src/doors/disk.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -14,7 +14,9 @@ import { fakeGit } from "../../src/doors/fake/git.js";
 import { pulling } from "../../src/scripts/work.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const SCHEMA = realDisk().read(join(HERE, "..", "..", "spec", "schemas", "ticket.schema.yaml"));
+const SCHEMA = realDisk().read(
+  join(HERE, "..", "..", "spec", "schemas", "ticket.schema.yaml"),
+);
 const ROOT = "/tree";
 const SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
 const BRANCH = "work/one-group";
@@ -149,9 +151,18 @@ test("a refused payload leaves the ticket as it stood, and rides the hold to the
 test("a ticket with no step field hands back at its first leaf, so the hold reads as fresh", () => {
   const { it, disk } = doors();
   disk.write(TICKET, CHILD.replace("step: implement/tests-red\n", ""));
-  const said = heard(() => pulling(ROOT, ["pull", "a-child", "--pass", "--fields", SHORT], it));
-  assert.ok(!said.said.includes("stands at no step now"), "a missing step is the first leaf");
-  assert.match(said.said, /checked under implement\/tests-red holds 1 line/, "the checks read the payload");
+  const said = heard(() =>
+    pulling(ROOT, ["pull", "a-child", "--pass", "--fields", SHORT], it),
+  );
+  assert.ok(
+    !said.said.includes("stands at no step now"),
+    "a missing step is the first leaf",
+  );
+  assert.match(
+    said.said,
+    /checked under implement\/tests-red holds 1 line/,
+    "the checks read the payload",
+  );
 });
 
 test("a refusal at the cap fails the ticket back as it stood, and the refused payload reaches no disk", () => {
@@ -164,5 +175,9 @@ test("a refusal at the cap fails the ticket back as it stood, and the refused pa
   assert.ok(!/^- one$/m.test(landed), "the refused payload reaches no disk");
   assert.ok(!landed.includes("node --test"));
   assert.ok(!landed.includes("name: settle"), "and the cap inserts no step");
-  assert.match(landed, /why: "the hand-back met refused 1 times/, "the reason rides the record");
+  assert.match(
+    landed,
+    /why: "the hand-back met refused 1 times/,
+    "the reason rides the record",
+  );
 });

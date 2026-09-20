@@ -142,9 +142,8 @@ The sweep reads the same three rows, so `./RUNME.sh check` turns red on a
 stranger already standing in the tree. A draft under an underscore stays
 outside every rule, because `tree.paths()` and the door both drop it first.
 
-The handover schema governs `HANDOVER.md` at the root and `.se/HANDOVER.md`, so
-its `governs` names two paths and no folder. Two folder names differ from the
-kind they hold, `spec/rationales` for `rationale` and `spec/design_input` for
+The handover schema governs `.se/HANDOVER.md`, so its `governs` names one path
+and no folder. Two folder names differ from the kind they hold, `spec/rationales` for `rationale` and `spec/design_input` for
 `design_input`. A glob says the folder outright, so no rule about names holds.
 
 # A finding names the section

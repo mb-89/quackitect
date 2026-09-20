@@ -221,7 +221,9 @@ steps:
   );
   assert.deepEqual(weighed(said), []);
 
-  const bad = weighed(said.replace("  - step: design/review", "  - step: design/nowhere"));
+  const bad = weighed(
+    said.replace("  - step: design/review", "  - step: design/nowhere"),
+  );
   assert.deepEqual(
     bad.map((one) => one.rule),
     ["Schema.step"],

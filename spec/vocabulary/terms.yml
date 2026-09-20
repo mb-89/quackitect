@@ -20,7 +20,6 @@ terms:
   - {word: bottom line, defines: "[[spec/guidance/voice]]"}
   - {word: box, defines: "[[spec/design_output/vehicle]]"}
   - {word: branch, defines: "[[spec/design_output/work#what-a-work-branch-is]]"}
-  - {word: brief, defines: "[[spec/design_output/work#two-handovers]]"}
   - {word: cage, defines: "[[spec/design_output/level0#the-write-door]]"}
   - {word: canary, defines: "[[spec/design_output/level0#the-canary]]"}
   - {word: canvas, defines: "[[spec/funnel/a-process-is-data]]"}
@@ -66,7 +65,7 @@ terms:
   - {word: guidance, defines: "[[spec/guidance/guidance]]"}
   - {word: hand, defines: "[[spec/design_output/work#the-take-writes-the-record]]"}
   - {word: handback, defines: "[[spec/design_output/review]]"}
-  - {word: handover, defines: "[[spec/design_output/work#two-handovers]]"}
+  - {word: handover, defines: "[[spec/design_output/work#one-handover-stands]]"}
   - {word: harness, defines: "[[spec/design_output/level0#the-harness-surface]]"}
   - {word: hash, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
   - {word: helper, defines: "[[spec/design_output/level0#the-helper-takes-the-guidance]]"}
@@ -177,7 +176,7 @@ terms:
   - {word: headless, defines: "[[spec/design_output/level0#what-the-probe-does]]"}
   - {word: hover, defines: "[[spec/design_output/extension]]"}
   - {word: hyphen, defines: "[[spec/funnel/a-paragraph-has-a-schema]]"}
-  - {word: idempotent, defines: "[[spec/design_output/work#every-brief-carries-the-contract]]"}
+  - {word: idempotent, defines: "[[spec/design_output/pull#the-hand-back-matches-the-hold]]"}
   - {word: indent, defines: "[[spec/design_output/schema]]"}
   - {word: kebab, defines: "[[spec/design_output/config]]"}
   - {word: lexer, defines: "[[spec/design_output/bash]]"}

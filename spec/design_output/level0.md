@@ -21,8 +21,13 @@ Level zero is two pieces. The bridgehead, `hooks/level0.js`, is the module the
 client loads, and the one hook a project carries: one door for every event,
 `*`, and one function behind it. It posts each event to the server at the
 port, with the root the session works in, and does what the answer says. It
-imports nothing, so a project carries the file alone. The project knows
-nothing of where the method stands on the disk.
+imports its own folder alone, so a project carries that folder and nothing
+past it. The project knows nothing of where the method stands on the disk.
+
+Those imports buy the read tools their registration:
+
+- the hook names each spec at the session's start, so a box whose server answers nothing carries them
+- a file under `lib` failing to load blocks the hook, which is the cost
 
 A second hook stands beside the door, on `turn.step`, because a stream reaches
 a generator alone. It keeps the step's text as the chunks arrive, and posts it
@@ -87,7 +92,7 @@ A desk pull starts nothing, and a take that fails starts nothing.
 
 The line it runs is the bridgehead's own, imported from the hook. So one text
 starts the server on both roads, and one table names what each code says. The
-stub's bridgehead keeps a copy, because that file imports nothing.
+stub's bridgehead keeps a copy, because that file imports nothing at all.
 
 ## The bridgehead starts it too
 
@@ -98,8 +103,8 @@ road runs once. That silence says nothing to the person, because the road runs
 under it. For details, see
 [[spec/design_output/level0#the-bridge-says-it-falls]].
 
-The road is one shell line, because the hook imports nothing and stands outside
-node. The shell reads the environment itself and answers a code:
+The road is one shell line, because the hook stands outside node and its own
+folder reaches no shell. The shell reads the environment itself and answers a code:
 
 | the code | what stands | what the log carries |
 |---|---|---|
@@ -133,6 +138,20 @@ So the road runs `src/scripts/install.sh` itself, under the skip list the setup
 names, and answers `7` where it does. That install waits, because a session
 holding no cage reads no rule at all. A session start pays it once, and on a
 box whose first event finds no server alone.
+
+### The first call pays
+
+`READ_TOOLS` in the hook names the four tools a hand reads with, and the hook
+registers each at the session's start. That registration reaches no server, so
+a box whose server answers nothing carries the tools anyway.
+
+A call landing before the server stands takes three steps:
+
+- it asks the server once, and answers where one stands
+- it runs the start above, then reads `/health` every fifth of a second
+- `STARTING` caps that wait, and the wait running out answers the port and the log
+
+So a hand calls `find` on its first turn, and that call pays for the server.
 
 ## A fix reaches the session
 
@@ -811,6 +830,34 @@ The door reads the text before and after the write. A file already past its
 ceiling takes a cut and refuses a growth. So the tree's debt shrinks with every
 write and grows with none, and `./RUNME.sh lint src test` names it.
 
+### A verb cuts the file
+
+`./RUNME.sh split <file>` takes the ranges a caller names and writes each into
+its target, leaving the rest in the source:
+
+| the flag | what it takes |
+|---|---|
+| `<file>` | the file the cut reads |
+| `--to <path> --lines <from>-<to>` | one target and its range, named again for each target |
+| `--dry` | the cuts it names, on the way to no write |
+
+`src/scripts/split-cut.js` owns the ranges and the cut over text, and
+`src/scripts/split-verb.js` writes them. One journal entry under `by: split`
+holds every target and the rest, so `mcp__level0__undo` takes the whole cut
+back. For details, see [[spec/design_output/apply#the-journal-holds-both-halves]].
+
+### The refusal parks the work
+
+A refusal naming the file ceiling parks a private ticket through
+`./RUNME.sh ticket note`, and the refusal names where it stands. The note lands
+under the private tickets folder, off git, and the retro decides it. A tracked
+ticket takes that road instead, because a door filling no ask leaves
+placeholders the lint names.
+
+`src/bridge/split-ticket.js` holds the call, and the code door makes it. A
+second refusal on the same file names the note that stands, and writes none. A
+refused run answers the line the verb says, so no refusal goes quiet.
+
 ## The path a rule reads
 
 Hand every rule the path the repo root holds. Vale scopes on it.
@@ -1213,6 +1260,25 @@ refusing nothing leaves open.
 The tool registers at the session's start, and `spec/guidance/working.md`
 carries the line that sends a session to it.
 
+## A note reads clean first
+
+`check_prose` does for a note what `check_answer` does for an answer. It takes
+`path` and `text`, reads the draft through the write door's own rules, and
+answers every finding at once:
+
+| what it reads | where that stands |
+|---|---|
+| the rules over a draft | `proseFaults`, exported from `src/bridge/write.js` |
+| the findings a note keeps | `readsProse`, under `src/bridge/prose.js` |
+| the wording of the answer | `answerFindings`, beside `refusal` |
+
+The door calls `proseFaults` too, so one read serves both and a clean draft
+passes the door on its first write. The tool writes nothing, so it takes the
+wording `check_answer` takes, and the refusal wording stays with the door.
+
+`src/bridge/prose.js` holds the spec and the handler, and exports the `SPECS`
+and `TOOLS` pair `src/bridge/server.js` imports for each bridge module.
+
 # The question comes first
 
 A prompt carrying a question gets its answer first, in a table a reader takes in at a glance.
@@ -1308,8 +1374,8 @@ A heading, a file name, a folder name and a branch name each hold the words
 colon inside one through `OneTitle`, because both turn one title into two.
 
 Vale reads what a file holds, and its path stays outside that. So
-`.claude/skills/level0/lib/names.js` counts a name instead. `branch new` refuses a
-long branch, and `NameHoldsTheWords` holds every path git tracks.
+`.claude/skills/level0/lib/names.js` counts a name instead. The mint refuses a
+long ticket name, and `NameHoldsTheWords` holds every path git tracks.
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
 The config holds the cap as `names.words`, and the caller hands it to

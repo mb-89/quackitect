@@ -25,6 +25,7 @@ import {
   SETTINGS,
   SETTINGS_LOCAL,
 } from "../../.claude/skills/level0/lib/vehicle.js";
+import { vale } from "../doors/vale.js";
 import { guidanceHere } from "../bridge/guidance.js";
 import {
   bin,
@@ -91,6 +92,28 @@ export function tuiDoors() {
     viewer: viewerHere,
     names: namesIn,
     show,
+    // The log verb reads a span against now, and a door answers the clock. [[spec/guidance/code/testing]]
+    clock: it.clock,
+  };
+}
+
+// The split verb writes files and a journal entry, and the clock names that entry. [[spec/design_output/level0#the-size-ceiling]]
+export function splitDoors() {
+  return { root, join, disk: files, clock: it.clock };
+}
+
+// The commit verb reads the message through Vale, lands it, and runs the check. [[spec/design_output/work#the-battery-answers-first]]
+export function commitDoors() {
+  return {
+    root,
+    method: root,
+    join,
+    node: it.node ?? "node",
+    git: it.git,
+    disk: files,
+    proc: outside,
+    log: it.log,
+    vale: vale(files, outside, root),
   };
 }
 

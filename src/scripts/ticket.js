@@ -48,7 +48,9 @@ export function ticket(root, argv, doors) {
     console.log(
       "  update <ticket>     copy the ticket's process onto the steps it has yet to reach",
     );
-    console.log("  open <ticket>       open a draft whose ask stands written, so a hand can pull it");
+    console.log(
+      "  open <ticket>       open a draft whose ask stands written, so a hand can pull it",
+    );
     console.log(
       "  todo <ticket>       park it for the next pull, and --off takes the tag away",
     );
@@ -138,7 +140,10 @@ function todo(it, name, argv) {
     return 2;
   }
 
-  it.disk.write(at.path, off ? withoutField(text, TODO) : withField(text, TODO, "true"));
+  it.disk.write(
+    at.path,
+    off ? withoutField(text, TODO) : withField(text, TODO, "true"),
+  );
   console.log(
     off
       ? `${at.said} carries no ${TODO}, and a push takes it away from here.`
@@ -192,10 +197,16 @@ function open(it, name) {
   const ask = note.sections.find((one) => one.header.toLowerCase() === "ask");
   const rows = askLines(ask);
   if (!rows.some((row) => row.trim())) {
-    console.error(`${at.said} holds an empty ask, and open waits for one. Write the ask first.`);
+    console.error(
+      `${at.said} holds an empty ask, and open waits for one. Write the ask first.`,
+    );
     return 1;
   }
-  const found = askFaults(it, at.path.split("\\").join("/").replace(`${it.root}/`, ""), rows);
+  const found = askFaults(
+    it,
+    at.path.split("\\").join("/").replace(`${it.root}/`, ""),
+    rows,
+  );
   if (found.length) {
     console.error(askRefusal(at.said, found));
     return 1;
@@ -293,7 +304,9 @@ function ticketAt(it, name) {
     const path = it.join(it.root, ...`${folder}/${said}.md`.split("/"));
     if (it.disk.exists(path)) standing.push({ path, said: `${folder}/${said}.md` });
   }
-  const live = standing.find((one) => fieldOf(it.disk.read(one.path), "state") !== "closed");
+  const live = standing.find(
+    (one) => fieldOf(it.disk.read(one.path), "state") !== "closed",
+  );
   if (live || standing.length) return live ?? standing[0];
   const direct = it.join(it.root, ...String(name).split("/"));
   return it.disk.exists(direct) ? { path: direct, said: String(name) } : null;

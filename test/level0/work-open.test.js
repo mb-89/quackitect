@@ -12,9 +12,9 @@ import {
   GROUP_NOTE,
   groupRemote,
   heard,
+  ROOT,
   ranGit,
   remoteSaying,
-  ROOT,
   SHA,
 } from "./work-doors.js";
 

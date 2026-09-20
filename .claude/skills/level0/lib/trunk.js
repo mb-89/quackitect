@@ -54,7 +54,9 @@ function versionsIn(rest) {
   const verb = rest.find((one) => !one.startsWith("-"));
   if (verb !== "push" && verb !== "branch") return [];
   const drops = rest.some((one) => ["--delete", "-d", "-D"].includes(one));
-  const forces = rest.some((one) => one === "--force" || one === "-f" || one.startsWith("--force-with-lease"));
+  const forces = rest.some(
+    (one) => one === "--force" || one === "-f" || one.startsWith("--force-with-lease"),
+  );
   const found = [];
   for (const word of rest) {
     if (word.startsWith("-")) continue;

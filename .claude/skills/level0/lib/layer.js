@@ -42,7 +42,11 @@ export function inherits(disk, method, work) {
     read: (rel) => {
       if (!over.exists(rel)) return under.read(rel);
       if (!under.exists(rel) || !String(rel).endsWith(".json")) return over.read(rel);
-      return JSON.stringify(deeply(parsed(under.read(rel)), parsed(over.read(rel))), null, 2);
+      return JSON.stringify(
+        deeply(parsed(under.read(rel)), parsed(over.read(rel))),
+        null,
+        2,
+      );
     },
     list: (rel) => layered(under.list(rel), over.list(rel)),
   };

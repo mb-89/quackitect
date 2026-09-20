@@ -11,8 +11,8 @@ import {
   entryOf,
   MARKER,
   onlyCopy,
-  pairOf,
   PROJECT,
+  pairOf,
   REGISTER,
   registers,
   resolves,
@@ -26,7 +26,10 @@ const STAMP_TAIL = 12;
 const HEX = 16;
 
 export function methodRootFrom(files, start) {
-  let here = String(start ?? "").split("\\").join("/").replace(/\/+$/, "");
+  let here = String(start ?? "")
+    .split("\\")
+    .join("/")
+    .replace(/\/+$/, "");
   while (here) {
     if (files.exists(join(here, MARKER))) return here;
     const up = here.slice(0, here.lastIndexOf("/"));
@@ -65,7 +68,8 @@ export function readRegister(files, env, windows = false) {
   for (const dir of registerDirs(env, windows)) {
     const said = readIf(files, join(dir, REGISTER));
     for (const one of parsedList(said)) {
-      if (one?.method_root && files.exists(join(one.method_root, MARKER))) out.push(one);
+      if (one?.method_root && files.exists(join(one.method_root, MARKER)))
+        out.push(one);
     }
   }
   return out;
@@ -77,7 +81,10 @@ export function registerCopy(files, env, entry, windows = false) {
     const at = join(dir, REGISTER);
     try {
       files.makeDir(dir);
-      files.write(at, `${JSON.stringify(registers(readIf(files, at), entry), null, 2)}\n`);
+      files.write(
+        at,
+        `${JSON.stringify(registers(readIf(files, at), entry), null, 2)}\n`,
+      );
       wrote = true;
     } catch {}
   }
@@ -114,7 +121,8 @@ export function produce(files, method, dest, into) {
   if (!into && files.exists(dest)) {
     return { ok: false, why: `${dest} stands already. A copy lands in a new place` };
   }
-  if (dest === method) return { ok: false, why: "a copy lands beside its method, elsewhere" };
+  if (dest === method)
+    return { ok: false, why: "a copy lands beside its method, elsewhere" };
 
   let count = 0;
   const walk = (rel) => {

@@ -24,8 +24,6 @@ export const HARNESS = [
   ["CLAUDECODE", "claude-code"],
 ];
 
-
-
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 export function agentOf(env) {
   for (const [key, name] of HARNESS) {
@@ -51,7 +49,8 @@ export function handOf(it) {
   if (held.id) parts.push(`session ${held.id}`);
   if (agent) parts.push(agent);
   // The hold git ignores carries who, and the record carries the role. [[spec/design_output/pull#the-hand-rule]]
-  if (parts.length === 1 && !it.agent) return named(PERSON, it.git?.authorName?.() ?? "");
+  if (parts.length === 1 && !it.agent)
+    return named(PERSON, it.git?.authorName?.() ?? "");
   return parts.join(" · ");
 }
 

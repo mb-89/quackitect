@@ -63,7 +63,8 @@ export const POINTER = ".se/.runtime/vehicle.json";
 
 export function portOf(list, method) {
   for (const one of list ?? []) {
-    if (one?.method_root && same(one.method_root, method) && Number(one.port)) return Number(one.port);
+    if (one?.method_root && same(one.method_root, method) && Number(one.port))
+      return Number(one.port);
   }
   return 0;
 }
@@ -71,7 +72,10 @@ export function portOf(list, method) {
 export function withPort(list, entry) {
   const taken = new Set(
     (list ?? [])
-      .filter((one) => one?.id !== entry.id && !same(one?.method_root ?? "", entry.method_root))
+      .filter(
+        (one) =>
+          one?.id !== entry.id && !same(one?.method_root ?? "", entry.method_root),
+      )
       .map((one) => Number(one?.port) || 0),
   );
   let port = PORT_BASE;
@@ -90,14 +94,17 @@ export function pointerOf(read) {
 export function onlyCopy(list) {
   const roots = [];
   for (const one of list ?? []) {
-    if (one?.method_root && !roots.includes(one.method_root)) roots.push(one.method_root);
+    if (one?.method_root && !roots.includes(one.method_root))
+      roots.push(one.method_root);
   }
   return roots.length === 1 ? roots[0] : "";
 }
 
 // [[spec/design_output/vehicle#what-travels-into-a-copy]]
 export function travels(rel) {
-  const said = String(rel ?? "").split("\\").join("/");
+  const said = String(rel ?? "")
+    .split("\\")
+    .join("/");
   if (!said || said === ".") return false;
   return !LEFT.includes(said.split("/")[0]);
 }
@@ -123,7 +130,9 @@ function rooted(said) {
 const DRIVE = /^[A-Za-z]:\//;
 
 function slashed(said) {
-  return String(said ?? "").split("\\").join("/");
+  return String(said ?? "")
+    .split("\\")
+    .join("/");
 }
 
 function parsed(read) {
@@ -216,7 +225,9 @@ export function linkOf(id, name, upstream, version, at) {
 export function settingsOf(read) {
   const held = parsed(read);
   if (!held || typeof held !== "object" || Array.isArray(held)) return {};
-  return Object.fromEntries(Object.entries(held).filter(([key]) => !key.startsWith("$")));
+  return Object.fromEntries(
+    Object.entries(held).filter(([key]) => !key.startsWith("$")),
+  );
 }
 
 // [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]

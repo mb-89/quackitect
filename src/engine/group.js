@@ -152,7 +152,8 @@ export function withHashAfter(text, after) {
 // Where each row of the record opens and ends, so a caller reaches one entry. [[spec/design_output/work#held-derives-from-the-record]]
 function entrySpans(rows, opens, ends) {
   const starts = [];
-  for (let at = opens + 1; at < ends; at++) if (rows[at].startsWith("  - ")) starts.push(at);
+  for (let at = opens + 1; at < ends; at++)
+    if (rows[at].startsWith("  - ")) starts.push(at);
   return starts.map((one, which) => ({
     opens: one,
     ends: which + 1 < starts.length ? starts[which + 1] : ends,
@@ -207,7 +208,13 @@ export function aged(seconds) {
 function entryRows(entry) {
   const out = [];
   for (const [key, said] of Object.entries(entry)) {
-    if (said === undefined || said === null || String(said) === "" || (Array.isArray(said) && !said.length)) continue;
+    if (
+      said === undefined ||
+      said === null ||
+      String(said) === "" ||
+      (Array.isArray(said) && !said.length)
+    )
+      continue;
     const lead = out.length ? "    " : "  - ";
     if (!Array.isArray(said)) {
       out.push(`${lead}${key}: ${quoted(said)}`);
@@ -215,7 +222,9 @@ function entryRows(entry) {
     }
     out.push(`${lead}${key}:`);
     for (const one of said) {
-      const pairs = Object.entries(one ?? {}).filter(([, value]) => value !== undefined && value !== null);
+      const pairs = Object.entries(one ?? {}).filter(
+        ([, value]) => value !== undefined && value !== null,
+      );
       for (const [at, [name, value]] of pairs.entries()) {
         out.push(`${at ? "        " : "      - "}${name}: ${quoted(value)}`);
       }

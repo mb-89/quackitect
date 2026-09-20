@@ -26,6 +26,8 @@ import {
   standing,
   tools,
   treeHere,
+  commitDoors,
+  splitDoors,
   tuiDoors,
   under,
 } from "./cli-check.js";
@@ -157,6 +159,18 @@ export const verbs = {
   tui: {
     says: "the window this tree builds: the log, the work, and a tab it opens on",
     run: async () => (await import("./tui.js")).openTui(tuiDoors(), rest),
+  },
+  log: {
+    says: "the session log, narrowed by span, level, kind and count",
+    run: async () => (await import("./log-verb.js")).logVerb(tuiDoors(), rest),
+  },
+  split: {
+    says: "cut a file past the ceiling into the targets you name, with one undo",
+    run: async () => (await import("./split-verb.js")).splitVerb(splitDoors(), rest),
+  },
+  commit: {
+    says: "read the message, land the commit, run the check, and push on green",
+    run: async () => (await import("./commit-verb.js")).commitVerb(commitDoors(), rest),
   },
   serve: {
     says: "the server behind the bridgehead, under the debugger with --inspect",

@@ -3,11 +3,10 @@
 // answer, and every column naming an order reads the same one.
 // [[spec/design_output/pull#the-queue-is-a-score]]
 
+import { MS } from "../../.claude/skills/level0/lib/log.js";
 import { dependsOn, spanOf, TICKETS, urgent } from "../engine/group.js";
 import { entriesOf } from "./pull-writes.js";
 
-// A second reads as this many of what a clock answers. [[spec/design_output/pull#the-queue-is-a-score]]
-const MS = 1000;
 const DAY = spanOf("1d");
 
 // Every ticket waiting on each one, read straight off `depends_on`. [[spec/design_output/pull#the-queue-is-a-score]]
@@ -64,7 +63,8 @@ export function queued(list, all, it = {}) {
     score: scoreOf(one, waits, it.stood, it.weights, now),
   }));
   scored.sort(
-    (a, b) => b.mark - a.mark || b.score - a.score || a.one.name.localeCompare(b.one.name),
+    (a, b) =>
+      b.mark - a.mark || b.score - a.score || a.one.name.localeCompare(b.one.name),
   );
   return scored.map((held) => held.one);
 }

@@ -14,15 +14,13 @@ import {
   withoutField,
 } from "../engine/group.js";
 import {
-  BRIEF,
-  briefOf,
+  baseOnTrunk,
   childrenHere,
   DONE,
   dirty,
   groupStanding,
   MINE,
   mergedHere,
-  statusOf,
   textAt,
 } from "./work-stands.js";
 
@@ -42,8 +40,11 @@ export function merge(it, name) {
 
   it.git.run(["fetch", "--prune", "origin"], true);
   const ticket = textAt(it, `origin/${branch}`, ticketAt(name));
-  const group = isGroup(ticket);
-  const status = group ? groupStanding(ticket) : statusOf(briefOf(it, branch));
+  if (!isGroup(ticket)) {
+    console.error(`${branch} carries no group at ${ticketAt(name)}.`);
+    return 1;
+  }
+  const status = groupStanding(ticket);
   if (status !== DONE) {
     console.error(`${branch} stands at ${status || "no status"}, so it is not ready.`);
     return 1;
@@ -68,10 +69,8 @@ export function merge(it, name) {
     return 1;
   }
 
-  const freed = group ? freeChildren(it, name) : [];
-  const dropped = it.git.run(["rm", "--cached", "-q", BRIEF], true).ok;
-  if (dropped) dropBrief(it);
-  if (freed.length || dropped) it.git.run(["commit", "--amend", "--no-edit"], true);
+  const freed = freeChildren(it, name);
+  if (freed.length) it.git.run(["commit", "--amend", "--no-edit"], true);
 
   // [[spec/design_output/work#the-merge-lands-the-truth]]
   const said = checkSays(it);
@@ -93,17 +92,18 @@ export function merge(it, name) {
 
 // [[spec/design_output/work#the-merge-lands-the-truth]]
 function movedOnTrunk(it, branch) {
-  const base = it.git.run(["merge-base", `origin/${TRUNK}`, `origin/${branch}`], true);
-  if (!base.ok || !base.out) return [];
+  // One read answers what trunk and a branch share, and the listing reads it too. [[spec/design_output/work#the-listing-reads-git-once]]
+  const { base } = baseOnTrunk(it, branch);
+  if (!base) return [];
 
   const touched = it.git.run(
-    ["diff", "--name-only", `${base.out}..origin/${branch}`, "--", TICKETS],
+    ["diff", "--name-only", `${base}..origin/${branch}`, "--", TICKETS],
     true,
   );
   const out = [];
   for (const path of touched.out.split("\n").filter(Boolean)) {
     const said = it.git.run(
-      ["diff", "--unified=0", `${base.out}..origin/${TRUNK}`, "--", path],
+      ["diff", "--unified=0", `${base}..origin/${TRUNK}`, "--", path],
       true,
     );
     const lines = said.out
@@ -139,11 +139,6 @@ function checkSays(it) {
     .trim()
     .split("\n");
   return { ok: ran.exitCode === 0, says: rows.at(-1) ?? "" };
-}
-
-function dropBrief(it) {
-  const path = it.join(it.root, BRIEF);
-  if (it.disk.exists(path)) it.disk.remove(path);
 }
 
 // [[spec/design_output/work#a-merged-branch-closes]]

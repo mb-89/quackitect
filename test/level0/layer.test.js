@@ -4,7 +4,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { configOf } from "../../.claude/skills/level0/lib/config.js";
-import { deeply, inherits, layered, rooted } from "../../.claude/skills/level0/lib/layer.js";
+import {
+  deeply,
+  inherits,
+  layered,
+  rooted,
+} from "../../.claude/skills/level0/lib/layer.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 test("a name the work root repeats replaces the method's", () => {
@@ -92,7 +97,8 @@ const two = () =>
   fakeDisk({
     "/tools/spec/guidance/voice.md": "the method says",
     "/tools/spec/guidance/working.md": "stands",
-    "/tools/spec/config/level0.json": '{"log":{"level":"info"},"stop":{"enabled":true}}',
+    "/tools/spec/config/level0.json":
+      '{"log":{"level":"info"},"stop":{"enabled":true}}',
     "/stub/spec/guidance/voice.md": "the work says",
     "/stub/spec/guidance/house.md": "joins",
     "/stub/spec/config/level0.json": '{"log":{"level":"warn"}}',
@@ -110,14 +116,11 @@ test("the reader answers the work root's file where it stands, else the method's
 
 test("the reader lists a folder as the union, with the work root's name winning", () => {
   const said = inherits(two(), "/tools", "/stub").list("spec/guidance");
-  assert.deepEqual(
-    said.map((one) => [one.name, one.kind, one.layer]).sort(),
-    [
-      ["house.md", "file", "work"],
-      ["voice.md", "file", "work"],
-      ["working.md", "file", "method"],
-    ],
-  );
+  assert.deepEqual(said.map((one) => [one.name, one.kind, one.layer]).sort(), [
+    ["house.md", "file", "work"],
+    ["voice.md", "file", "work"],
+    ["working.md", "file", "method"],
+  ]);
   assert.deepEqual(inherits(two(), "/tools", "/stub").list("spec/nowhere"), []);
 });
 
@@ -134,8 +137,15 @@ test("a tree driving itself reads its one root, and rooted is that reader", () =
   assert.equal(one.read("spec/guidance/voice.md"), "the method says");
   assert.equal(one.exists("spec/guidance/house.md"), false);
   assert.deepEqual(
-    rooted(two(), "/tools").list("spec/guidance").map((one) => one.name).sort(),
+    rooted(two(), "/tools")
+      .list("spec/guidance")
+      .map((one) => one.name)
+      .sort(),
     ["voice.md", "working.md"],
   );
-  assert.equal(rooted(two(), "").exists("/stub/spec/guidance/house.md"), true, "an empty root reads the path as it stands");
+  assert.equal(
+    rooted(two(), "").exists("/stub/spec/guidance/house.md"),
+    true,
+    "an empty root reads the path as it stands",
+  );
 });

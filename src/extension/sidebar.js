@@ -103,7 +103,11 @@ function sidebarOf(door) {
       if (message?.kind === "run") {
         const runs = await lineOf(message);
         if (runs === undefined) return undefined;
-        await logbook.say("info", "sidebar", `${message.key ?? "a button"} runs ${runs}`);
+        await logbook.say(
+          "info",
+          "sidebar",
+          `${message.key ?? "a button"} runs ${runs}`,
+        );
         return door.runs(runs);
       }
       if (message?.kind === "show") return shows(door, String(message.reads ?? ""));
@@ -138,7 +142,9 @@ async function shows(door, folder) {
   if (!folder) return undefined;
   const name = newestIn(await door.list(folder));
   if (!name) {
-    return door.says(["No log stands yet. A door writes one the next time it says a line."]);
+    return door.says([
+      "No log stands yet. A door writes one the next time it says a line.",
+    ]);
   }
   return door.says(rowsIn(await door.read(`${folder}/${name}`)));
 }

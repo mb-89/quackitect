@@ -74,17 +74,28 @@ export function register(files, folder, mine) {
   const text = files.exists(where) ? files.read(where) : "[]";
   const said = readEntries(text);
   if (said.unreadable) {
-    return { wrote: false, why: "the list reads as no JSON at all, so it stands as it is" };
+    return {
+      wrote: false,
+      why: "the list reads as no JSON at all, so it stands as it is",
+    };
   }
 
   const found = upsert(said, mine);
   if (found.lost.length) {
-    return { wrote: false, why: `writing would lose ${found.lost.join(", ")}, so nothing went in` };
+    return {
+      wrote: false,
+      why: `writing would lose ${found.lost.join(", ")}, so nothing went in`,
+    };
   }
 
   if (files.exists(where)) files.write(join(folder, KEPT), text);
   files.write(where, `${JSON.stringify(found.entries)}\n`);
-  return { wrote: true, why: found.replaced ? "the entry stood already, and it stands again" : "the entry went in" };
+  return {
+    wrote: true,
+    why: found.replaced
+      ? "the entry stood already, and it stands again"
+      : "the entry went in",
+  };
 }
 
 // [[spec/design_output/extension#the-link-stands]]
@@ -95,16 +106,22 @@ export function linkedAt(files, dest, source) {
 
 export function linkAt(files, dest, source) {
   if (!shape(dest).includes("/.vscode/extensions/")) {
-    return { linked: false, why: `${dest} stands outside the editor's folder, so nothing goes there` };
+    return {
+      linked: false,
+      why: `${dest} stands outside the editor's folder, so nothing goes there`,
+    };
   }
-  if (linkedAt(files, dest, source)) return { linked: true, why: "the link stands already" };
+  if (linkedAt(files, dest, source))
+    return { linked: true, why: "the link stands already" };
   // [[spec/design_output/extension#a-link-pointing-nowhere]]
   const nowhere = files.isLink(dest) && !files.exists(dest);
   if (nowhere || files.exists(dest)) files.remove(dest);
   files.link(source, dest);
   return {
     linked: true,
-    why: nowhere ? "a link pointing nowhere went, and the link went in" : "the link went in",
+    why: nowhere
+      ? "a link pointing nowhere went, and the link went in"
+      : "the link went in",
   };
 }
 
@@ -158,9 +175,14 @@ function main(env, verb) {
   const linked = linkAt(files, dest, source);
   console.log(`${id}: ${linked.why}.`);
   if (!linked.linked) return 1;
-  const found = register(files, folder, entryFor(id, said.version, dest, clock().now().getTime()));
+  const found = register(
+    files,
+    folder,
+    entryFor(id, said.version, dest, clock().now().getTime()),
+  );
   console.log(`${id}: ${found.why}.`);
   return found.wrote ? 0 : 1;
 }
 
-if (process.argv[1]?.endsWith("editor.js")) process.exit(main(process.env, process.argv[2]));
+if (process.argv[1]?.endsWith("editor.js"))
+  process.exit(main(process.env, process.argv[2]));

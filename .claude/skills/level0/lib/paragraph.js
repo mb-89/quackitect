@@ -172,7 +172,10 @@ export function rulesFrom(said, banner = "", lists = null) {
   for (const [name, body] of grammar(layers.grammar ?? {})) put(name, body);
 
   // [[spec/design_output/projection#a-layer-writes-two-files]]
-  const binding = { ...(layers.grammar ?? {}), ...(said?.registers?.requirement?.grammar ?? {}) };
+  const binding = {
+    ...(layers.grammar ?? {}),
+    ...(said?.registers?.requirement?.grammar ?? {}),
+  };
   const modals = modal(binding);
   if (modals) put("ModalRequirement.yml", modals);
   // [[spec/funnel/a-paragraph-has-a-schema]]
@@ -202,10 +205,11 @@ function file(banner, body) {
   return `${rows.map((one) => `# ${one}`).join("\n")}\n${body}`;
 }
 
-
 // [[spec/design_output/projection#the-grammar-rules]]
 function left(layer) {
-  return (layer?.exceptions ?? []).map((one) => String(one?.word ?? one)).filter(Boolean);
+  return (layer?.exceptions ?? [])
+    .map((one) => String(one?.word ?? one))
+    .filter(Boolean);
 }
 
 // [[spec/design_output/projection#the-second-target]]
@@ -301,7 +305,6 @@ function markup(layer) {
     "}",
   ]);
 }
-
 
 // [[spec/design_output/projection#the-list-opens-an-answer]]
 const OPENS_LIST = [
@@ -473,9 +476,6 @@ function listItem(layer) {
 }
 
 
-
-
-
 // [[spec/design_output/projection#the-grammar-rules]]
 function grammar(layer) {
   const out = new Map();
@@ -493,12 +493,7 @@ function grammar(layer) {
     );
     out.set(
       "Progressive.yml",
-      sequenced(
-        "Write the simple tense: '%s %s'.",
-        BEING,
-        "VBG",
-        left,
-      ),
+      sequenced("Write the simple tense: '%s %s'.", BEING, "VBG", left),
     );
   }
 
@@ -595,4 +590,3 @@ function hedge(layer) {
     "",
   ].join("\n");
 }
-

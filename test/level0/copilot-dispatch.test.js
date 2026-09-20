@@ -9,6 +9,12 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { fakeSession } from "../../src/doors/fake/session.js";
 
+const GROUP_AT = "/tree/spec/tickets/example.md";
+const group = (record) =>
+  `---\nkind: [[ticket]]\nstate: open\nprocess: [[group]]\n${record}---\n\n# Ask\n\nA group.\n`;
+const FREE = group("");
+const HELD = group("record:\n  - step: sync\n    hash_before: a1\n");
+
 function fixture() {
   const pull = {
     number: 7,
@@ -21,7 +27,7 @@ function fixture() {
     root: "/tree",
     join: posix.join,
     session: fakeSession("/tree"),
-    disk: fakeDisk({ "/tree/HANDOVER.md": "---\nstatus: todo\n---\nA brief." }),
+    disk: fakeDisk({ [GROUP_AT]: FREE }),
     branch: "main",
     head: "0".repeat(40),
     remoteHead: "0".repeat(40),
@@ -32,11 +38,11 @@ function fixture() {
       assert.equal(root, it.root);
       assert.deepEqual(args, ["take"]);
       assert.equal(it.branch, "main");
-      assert.match(it.disk.read("/tree/HANDOVER.md"), /status: todo/);
+      assert.equal(it.disk.read(GROUP_AT), FREE);
       it.claims++;
       it.branch = "work/example";
       it.head = it.claims.toString(16).padStart(40, "0");
-      it.disk.write("/tree/HANDOVER.md", "---\nstatus: held\n---\nA brief.");
+      it.disk.write(GROUP_AT, HELD);
       return 0;
     },
   };
@@ -100,7 +106,7 @@ test("a new claim on the same branch sends a distinct dispatch request", async (
   const it = fixture();
   await dispatch(it);
   const firstAttempt = it.head;
-  it.disk.write("/tree/HANDOVER.md", "---\nstatus: todo\n---\nContinue the work.");
+  it.disk.write(GROUP_AT, FREE);
   it.branch = "main";
   await dispatch(it);
   assert.equal(it.claims, 2);

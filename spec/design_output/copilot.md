@@ -102,7 +102,7 @@ dispatch there. Inspect `.se/.runtime/copilot` if a process exits before recordi
 claim. Do not release a branch while its worker can still push to it.
 
 After a successful request, switch this checkout to main to dispatch another.
-A timeout leaves the remote brief held. Inspect its commits and stop the job.
+A timeout leaves the remote group held. Inspect its commits and stop the job.
 Then use the existing branch release command before assigning it again.
 Only a person calls branch merge after reviewing the durable result and retro.
 
@@ -149,7 +149,7 @@ This proposal adds no rule category and changes no harness behavior yet.
 
 | Guarantee | Current owner | Recommendation |
 | --- | --- | --- |
-| Preserve the brief until a result exists | `session.withState` and `handle` | Keep the session door contract and mock-based handover tests. |
+| Preserve the handover until a result exists | `session.withState` and `handle` | Keep the session door contract and mock-based handover tests. |
 | Request each work try once | `dispatch` | Keep mock-based retry tests, and check live job acceptance separately. |
 | Keep the worker on its work branch | Level-zero guards and host credentials | Retain branch-specific credentials, and use repository rules to reserve merging for a person. |
 | Accept only a commit whose checks pass | Human review, and hooks check selected writes | Add a required CI status for the exact candidate commit. |

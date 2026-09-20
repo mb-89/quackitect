@@ -1,7 +1,8 @@
 // Dispatch from a person's checkout; workers keep the shared work contract.
 // [[spec/design_output/copilot#dispatch-and-recovery]]
 
-import { statusOf, work } from "../../../../src/scripts/work.js";
+import { ticketAt, ticketNamed } from "../../../../src/engine/group.js";
+import { groupStanding, work } from "../../../../src/scripts/work.js";
 
 const GIT_WAIT = 30000;
 
@@ -53,9 +54,10 @@ export async function dispatch(it) {
       );
     if (state.sent)
       return `Already requested on ${state.url}. Inspect the Copilot job before any retry.`;
-    const brief = it.disk.read(it.join(it.root, "HANDOVER.md"));
-    if (statusOf(brief) !== "held")
-      throw new Error("Dispatch requires a held work brief.");
+    const at = it.join(it.root, ticketAt(ticketNamed(state.branch)));
+    const ticket = it.disk.exists(at) ? it.disk.read(at) : "";
+    if (groupStanding(ticket) !== "held")
+      throw new Error("Dispatch requires a held work group.");
     run(["git", "push", "origin", state.branch]);
     if (!state.attempt) {
       state.attempt = run(["git", "rev-parse", "HEAD"]);
@@ -92,7 +94,7 @@ export async function dispatch(it) {
         "--title",
         state.branch,
         "--body",
-        "Work is claimed. Copilot writes the result and retro to HANDOVER.md. A person reviews and merges.",
+        "Work is claimed. Copilot writes the result and retro onto the group ticket. A person reviews and merges.",
       ]);
       pull = JSON.parse(
         run([
@@ -135,7 +137,7 @@ export async function dispatch(it) {
         "--body",
         [
           marker,
-          "@copilot Work on this pull request's existing head branch. Read the held HANDOVER.md through level zero. Run branch sync, not branch take. Commit and push checkpoints, write your result and retro, then run branch done or branch release. Open no new pull request; leave merging to a person.",
+          "@copilot Work on this pull request's existing head branch. Read the held group ticket through level zero. Run branch sync, not branch take. Commit and push checkpoints, write your result and retro onto that ticket, then run branch done or branch release. Open no new pull request; leave merging to a person.",
         ].join("\n\n"),
       ]);
     }

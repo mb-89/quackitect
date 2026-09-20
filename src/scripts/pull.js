@@ -108,11 +108,14 @@ export function pull(it, argv) {
   const asking = Boolean(name) && !named && !verdict.said && !held;
   if (asking && it.binding === QUEUE) {
     console.error(`${name} stands behind the queue, because this session binds to it.`);
-    console.error("Run ./RUNME.sh ticket pull with no name, and take what it hands you.");
+    console.error(
+      "Run ./RUNME.sh ticket pull with no name, and take what it hands you.",
+    );
     return 2;
   }
   who.wanted = asking ? name : "";
-  if (!named && (verdict.said || (name && held))) return handBack(it, who, name, verdict);
+  if (!named && (verdict.said || (name && held)))
+    return handBack(it, who, name, verdict);
   if (held) return stillHeld(it, held);
   // The plain pull hands out at the queue alone, and this gate stands above every road it closes. [[spec/design_output/config#the-engine-controls]]
   if (!asking && !handsOut(it.binding)) {
@@ -209,14 +212,19 @@ export function escalate(it, argv) {
 
   const put = withPersonStep(it, one, held.step, question, options);
   if (!put.path) {
-    say(REFUSED, [`${held.step} takes no person step, and ${one.name} stands as it stood.`]);
+    say(REFUSED, [
+      `${held.step} takes no person step, and ${one.name} stands as it stood.`,
+    ]);
     return 1;
   }
 
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   const finding = landed(it, one, [`${held.step} waits for a person at ${put.path}`]);
   if (finding) {
-    say(REFUSED, ["the hook refuses the commit, so the person step lands not:", finding]);
+    say(REFUSED, [
+      "the hook refuses the commit, so the person step lands not:",
+      finding,
+    ]);
     return 1;
   }
   dropHold(it, hand);
@@ -537,7 +545,11 @@ export function refused(it, who, one, leaf, held, found) {
   // The cap sends the leaf back with the findings, because a step a box inserts waits for a person nobody sends. [[spec/design_output/pull#the-hand-back-refused]]
   if (Number(it.refusals) > 0 && count >= Number(it.refusals)) {
     if (one.stood) one.text = one.stood;
-    say(REFUSED, [...found, "", `${count} refusals in a row, so ${leaf.path} goes back.`]);
+    say(REFUSED, [
+      ...found,
+      "",
+      `${count} refusals in a row, so ${leaf.path} goes back.`,
+    ]);
     return failed(
       it,
       who,

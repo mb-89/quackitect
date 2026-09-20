@@ -354,7 +354,11 @@ test("the queue holds work where a free open ticket has a leaf a hand takes, or 
   const group = (mark) =>
     `---\nkind: [[ticket]]\nstate: open\n${mark}process: [[spec/processes/group]]\nsteps:\n  - name: split\n---\n\n# Ask\n\nA group.\n`;
   assert.equal(queueHolds([group("")]), false, "an unmarked group is the cloud's");
-  assert.equal(queueHolds([group("urgent: true\n")]), true, "a marked group is the desk's");
+  assert.equal(
+    queueHolds([group("urgent: true\n")]),
+    true,
+    "a marked group is the desk's",
+  );
   assert.equal(queueHolds([]), false);
 });
 

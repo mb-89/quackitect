@@ -26,7 +26,7 @@ no switch holding a branch back.
 | half | who runs it | what it answers |
 |---|---|---|
 | the verb | `./RUNME.sh branch review <name>` | the check and the retro |
-| the reader | the `review_branch` tool | the brief, the diff and the tests |
+| the reader | the `review_branch` tool | the ask, the diff and the tests |
 
 The verb stands alone. A person runs it, reads the diff themselves, and has the
 mechanical answers in front of them while they do.
@@ -35,15 +35,15 @@ mechanical answers in front of them while they do.
 
 | the thing | where it comes from |
 |---|---|
-| the brief | `HANDOVER.md` at the branch's first commit |
-| the handback | `HANDOVER.md` as the branch carries it now |
+| the ask | the group ticket at the branch's first commit |
+| the handback | the group ticket as the branch carries it now |
 | the shape of the diff | `git diff --stat main...<ref>` |
 | the whole diff | `git diff main...<ref>` |
 | the check | `./RUNME.sh check` on that branch |
 
-The brief and the handback are one file at two commits. `branch new` writes the
-brief in the branch's first commit, so `git rev-list --reverse main..<ref>`
-names the commit the brief lives in, and the tip carries the handback.
+The ask and the handback are one file at two commits. `branch open` cuts the
+branch off trunk's tree, so `git rev-list --reverse main..<ref>` names the
+commit the ask stands in, and the tip carries the handback.
 
 `--json` prints the whole gathering as one object, which is what the hook reads.
 
@@ -97,7 +97,7 @@ gets them inside the standing layer and the prompt names no rule twice.
 The reader answers one JSON object, and `readerSays` reads it back:
 
     {
-      "brief": "done, and nothing beyond it",
+      "ask": "done, and nothing beyond it",
       "beyond": "src/doors/git.js, a one-line fix, trivial",
       "tests": "2 rules added, 1 carries no test:\nStopRule fires on nothing",
       "fix": 2
@@ -108,8 +108,8 @@ lands in the report under `reader`, whole, and counts as one thing to fix. So a
 reader that wanders still hands its reading over.
 
 `report` takes the gathering and this answer as two arguments, because both
-carry a key called `brief`. The verb passes the first alone, so a report with
-no reader behind it prints the two rows the verb owns and no brief.
+carry a key called `ask`. The verb passes the first alone, so a report with no
+reader behind it prints the two rows the verb owns and no ask.
 
 # What the report looks like
 
@@ -119,7 +119,7 @@ Short, and every line something to do:
 
     check      passes
     retro      present
-    brief      done, and nothing beyond it
+    ask        done, and nothing beyond it
     tests      2 rules added, 1 carries no test:
                VoiceShape.StopRule fires on nothing under test
     beyond     src/doors/git.js, a one-line fix, trivial
@@ -127,10 +127,9 @@ Short, and every line something to do:
     2 things to fix, and the merge is a desk's.
 
 The count adds the reader's `fix` to what the verb finds: a red check counts
-one, and an absent retro counts one. A brief carries its retro under a heading
-naming it. A group branch carries no brief, so the verb reads the group ticket
-as the handback, and `retroOnTicket` reads a filled line under its retro
-chapter. A report with nothing to fix fits on one line:
+one, and an absent retro counts one. The verb reads the group ticket as the
+handback, and `retroOnTicket` reads a filled line under its retro chapter. A
+report with nothing to fix fits on one line:
 
     work/the-config-holds-numbers   nothing to fix, and the merge is a desk's.
 

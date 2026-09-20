@@ -22,7 +22,7 @@ export function probeOf(node, port) {
   return [node, "-e", asks];
 }
 
-// One line starts the server on both roads, and the bridgehead holds it, because that hook imports nothing and every other caller imports it there. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+// One line starts the server on both roads, and the bridgehead holds it, because that hook reaches no module past its own folder and every other caller imports it there. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export function startOf(root, node = "node") {
   return [node, "-e", START, root, root];
 }

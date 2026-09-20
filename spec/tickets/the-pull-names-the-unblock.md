@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: design
@@ -90,7 +90,52 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: implement/tests-red
+record:
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: adec70e31a69ba47cfa791dad14052d89937c8a5
+    hash_after: adec70e31a69ba47cfa791dad14052d89937c8a5
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-20
+    hash_before: 33d5ccdadcd43fdec697d400b391e98d615b7e3d
+    hash_after: 33d5ccdadcd43fdec697d400b391e98d615b7e3d
+    returns: 1
+    why: The case the approach adds stands already in `test/level0/person-step.test.js`, at its first test.; That case seeds a group at `children` with one open child, on branch `work/one-group`.; So the objection naming a free ticket reads wrong, because `pull.js` takes the group off the branch name.; Name what the standing case lacks, or drop the case from the plan.; The `wait` row in `spec/design_output/pull.md` carries no pointer, so that change holds.
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: ab61e6dc3d7a9692c62920f8539faf4f109561b8
+    hash_after: ab61e6dc3d7a9692c62920f8539faf4f109561b8
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-21
+    hash_before: 8cc28a0f1696d0a5ebe8556dce5b7f1de018d0f0
+    hash_after: 8cc28a0f1696d0a5ebe8556dce5b7f1de018d0f0
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 574f43d33d9b5506703e625daf2b9a9633ee7081
+    hash_after: 574f43d33d9b5506703e625daf2b9a9633ee7081
+    returns: 1
+    why: the ask's case already stands, and the row the change adds offers nothing red
+    answered:
+      - name: tests
+        exit: 0
+        said: "# duration_ms 12414.261652"
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 53c12bc1e601139656d466733043a0b16310cd68
+    hash_after: 53c12bc1e601139656d466733043a0b16310cd68
+    returns: 2
+    why: the ask's case already stands, and the row the change adds offers nothing red
+    answered:
+      - name: tests
+        exit: 0
+        said: "# duration_ms 12595.533367"
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: b8908075560edb3e7158a12cfa406d9a21ba488e
+    hash_after: b8908075560edb3e7158a12cfa406d9a21ba488e
+reason: became
+successors: [a-route-closes-answered-asks]
 ---
 
 # Ask
@@ -128,8 +173,24 @@ A cloud box clears a person's wall itself, because the pull names the verb that 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The wait answer already names the unblock road, and a case already drives a group at `children`. So this ticket lands the answers table row.
+
+| what stands | where |
+|---|---|
+| the prompt naming the mint, the open, the unblock and the done | `unblockPrompt` in `src/scripts/spawn.js` |
+| the pull printing it where a person's step is all that stands | `handOut` in `src/scripts/pull-hand.js` |
+| the case driving a group at `children` with one open child | the first case of `test/level0/person-step.test.js` |
+
+That case seeds the group on branch `work/one-group`, and `pull.js` takes the group off the branch name. It asserts the mint, the open, the unblock and the done out of the answer.
+
+What changes:
+
+- the `wait` row of the answers table points at [[spec/design_output/work#a-person-step-leaves]]
+- the row's own words stay, because the prompt keeps its wording in one place
+
+The objection: the ask asks for a case, and this plan adds none. A second case over the same shape drives the same lines, and the standing one already holds them.
 
 ## review
 
@@ -138,8 +199,9 @@ A cloud box clears a person's wall itself, because the pull names the verb that 
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
 
 # implement
 
@@ -150,20 +212,32 @@ A cloud box clears a person's wall itself, because the pull names the verb that 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/person-step.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case the ask names already stands, as the first case of `test/level0/person-step.test.js`. It drives a group at `children` and reads `branch unblock` out of the answer.
+
+So no test goes red here:
+
+- the change left is one pointer in the answers table, which `./RUNME.sh lint` covers
+- that pointer stands on the branch, and `./RUNME.sh lint spec/design_output/pull.md` passes
+
+What surprises: this is the second ticket of this group meeting the same wall. A `standard` route reaches `implement/tests-red`, and an ask wanting one row of prose offers nothing red. [[spec/tickets/a-route-closes-answered-asks]] carries that gap.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ask names the answers table and a case, and the change touches the table alone
+- the standing case drives `doors`, so git and the disk stand fake there
+- the row carries a pointer, so the prompt keeps its own wording in one place
 
 ## reflect
 

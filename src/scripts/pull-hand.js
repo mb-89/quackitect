@@ -11,13 +11,13 @@ export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
 import {
   CLOSED,
+  dependsOn,
   fieldOf,
   frontOf,
   GROUP,
   isGroup,
   NOTE_END,
   OPEN,
-  dependsOn,
   TICKETS,
   ticketNamed,
   urgent,
@@ -216,7 +216,8 @@ export function takeable(it, one, all = [], group = "") {
   const leaf = leafOf(front, path);
   if (!leaf) return "";
   // [[spec/tickets/the-one-answer-takes-shape]]
-  if (!writesHere(leaf, handRule(it, front, all, group)).writes) return "";
+  // The session spawns the hand a helper leaf waits for, so a harness on the box holds the group. [[spec/tickets/the-spawn-answers-a-helper]]
+  if (!writesHere(leaf, handRule(it, front, all, group, it.agent)).writes) return "";
   if (leaf.needs.some((need) => !holdsVerb(need))) return "";
   return leaf.path;
 }
@@ -363,8 +364,17 @@ export function childrenSay(all, name) {
 
 // [[spec/design_output/pull#the-hand-rule]]
 export function admits(it, who, one, leaf, all) {
-  const said = writesHere(leaf, handRule(it, one.front, all, who.group));
-  if (!said.writes) return { why: said.why, ...(said.person ? { person: leaf } : {}) };
+  const rule = handRule(it, one.front, all, who.group, who.oneStep);
+  const said = writesHere(leaf, rule);
+  if (!said.writes) {
+    // A box carrying a harness spawns the hand a helper leaf waits for. [[spec/tickets/the-spawn-answers-a-helper]]
+    const spawns = String(leaf.by) === HELPER && Boolean(it.agent);
+    return {
+      why: said.why,
+      ...(said.person ? { person: leaf } : {}),
+      ...(spawns ? { other: leaf } : {}),
+    };
+  }
   const lacking = leaf.needs.filter((need) => !holdsVerb(need));
   if (lacking.length)
     return { why: `needs ${lacking.join(", ")}, which this box lacks` };
@@ -374,8 +384,10 @@ export function admits(it, who, one, leaf, all) {
 }
 
 // The hand the one answer reads: who this is, and what the group stands at. [[spec/tickets/the-one-answer-takes-shape]]
-export function handRule(it, front, all, group) {
+// The helper answer differs by road, so the caller hands it in: the hand-out reads the hand under --as, and the leave reads the harness on the box. [[spec/tickets/the-spawn-answers-a-helper]]
+export function handRule(it, front, all, group, helper = false) {
   return {
+    helper: Boolean(helper),
     agent: Boolean(it.agent),
     ownerSays: Boolean(it.ownerSays),
     cloud: Boolean(it.cloud ?? inCloud(it.env ?? {})),

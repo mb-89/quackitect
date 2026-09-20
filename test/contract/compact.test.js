@@ -32,7 +32,10 @@ ifAsked(
 
     assert.match(ran.stdout, /survives|drops/, ran.stderr);
     const read = readsCompaction(rowsHere());
-    assert.ok([SURVIVES, DROPS].includes(read.answer), `the verb answers ${read.answer}`);
+    assert.ok(
+      [SURVIVES, DROPS].includes(read.answer),
+      `the verb answers ${read.answer}`,
+    );
     assert.ok(read.reads >= 2, `the layer reaches the session ${read.reads} time(s)`);
     assert.equal(ran.exitCode, read.answer === SURVIVES ? 0 : 1);
   },

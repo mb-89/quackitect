@@ -18,9 +18,9 @@ import {
   mintNote,
   processHash,
   readYaml,
+  SEVERITY,
   schemaFaults,
   schemasIn,
-  SEVERITY,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { lintText } from "../../.claude/skills/level0/lib/vale.js";
@@ -64,8 +64,13 @@ test("every note schema reads, names a chapter, and names the kind its file name
     const kind = name.slice(0, -".schema.yaml".length);
     const said = readYaml(here.read(`spec/schemas/${name}`));
     assert.equal(String(said.kind ?? ""), kind, `${name} names ${kind}`);
-    assert.equal(schemas.has(kind), isNoteSchema(said), `${kind} reads as a note schema`);
-    if (isNoteSchema(said)) assert.ok(said.body.sections.length, `${kind} names a chapter`);
+    assert.equal(
+      schemas.has(kind),
+      isNoteSchema(said),
+      `${kind} reads as a note schema`,
+    );
+    if (isNoteSchema(said))
+      assert.ok(said.body.sections.length, `${kind} names a chapter`);
   }
 });
 
@@ -78,7 +83,11 @@ test("every schema names the paths it governs, and each note stands under its ow
     if (!path.endsWith(".md")) continue;
     const governor = governorOf(schemas, path);
     if (!governor) continue;
-    assert.equal(kindOf(here.read(path)), governor.kind, `${path} reads as a ${governor.kind}`);
+    assert.equal(
+      kindOf(here.read(path)),
+      governor.kind,
+      `${path} reads as a ${governor.kind}`,
+    );
   }
 });
 

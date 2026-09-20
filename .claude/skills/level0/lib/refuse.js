@@ -27,7 +27,7 @@ export function grown(found) {
   return [
     `A word outside the core is jargon until a note defines it. Write a core word, or`,
     `add ${namesThe(words)} to ${TERMS} as`,
-    "`- {word: <the word>, defines: \"[[<the note>]]\"}` where that note defines it,",
+    '`- {word: <the word>, defines: "[[<the note>]]"}` where that note defines it,',
     "and write the line again. The next write reads the new rule.",
   ].join("\n");
 }
@@ -43,7 +43,9 @@ function outsideIn(found) {
   const out = new Set();
   for (const one of found ?? []) {
     if (!String(one?.rule ?? "").endsWith(VOCABULARY)) continue;
-    const said = String(one?.said ?? "").trim().toLowerCase();
+    const said = String(one?.said ?? "")
+      .trim()
+      .toLowerCase();
     if (said) out.add(said);
   }
   return [...out];

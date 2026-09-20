@@ -2,23 +2,23 @@
 // [[spec/design_output/copilot#setup-and-discovery]]
 
 import { dirname, join, relative } from "node:path";
-import { inRun } from "../../.claude/skills/level0/lib/folders.js";
-import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { fileURLToPath } from "node:url";
-import { disk } from "../doors/disk.js";
-import { git } from "../doors/git.js";
-import { proc } from "../doors/proc.js";
-import { session } from "../doors/session.js";
-import { clock } from "../doors/clock.js";
-import { log } from "../doors/log.js";
 import {
   eventOf,
   failureOf,
   replyOf,
 } from "../../.claude/skills/level0/lib/copilot.js";
+import { dispatch } from "../../.claude/skills/level0/lib/copilot-dispatch.js";
 import { handle, TOOL_WAIT } from "../../.claude/skills/level0/lib/copilot-runtime.js";
 import { setup } from "../../.claude/skills/level0/lib/copilot-setup.js";
-import { dispatch } from "../../.claude/skills/level0/lib/copilot-dispatch.js";
+import { inRun } from "../../.claude/skills/level0/lib/folders.js";
+import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
+import { clock } from "../doors/clock.js";
+import { disk } from "../doors/disk.js";
+import { git } from "../doors/git.js";
+import { log } from "../doors/log.js";
+import { proc } from "../doors/proc.js";
+import { session } from "../doors/session.js";
 
 const DEADLINE = 20000;
 const LEAST_LEFT = 100;

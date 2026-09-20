@@ -6,13 +6,13 @@ kind: [[design_output]]
 
 `src/scripts/work.js` holds every verb over a work branch, and
 `src/engine/group.js` holds what a group's ticket reads and writes. This note
-covers the branch, the group on it, the brief that drains, and the round trip.
+covers the branch, the group on it, and the round trip.
 
 # What a work branch is
 
-One piece of work, held by one branch named `work/<name>`. The branch carries a
-group ticket, or the brief the last of the old branches still carries. The
-branch is the unit, and a session works it whole.
+One piece of work, held by one branch named `work/<name>`. The branch carries
+its group ticket at `spec/tickets/<name>.md`, and that ticket names the branch.
+The branch is the unit, and a session works it whole.
 
 # A version branch stands
 
@@ -58,13 +58,6 @@ one schema covers everything that moves, and `spec/schemas` names no group kind.
 
 A group of one ticket is the ordinary case, and a group of five is the same
 shape.
-
-## A brief drains first
-
-A branch carrying `HANDOVER.md` is a brief branch, whatever else stands on it.
-A group ticket in place of that file turns it into a group. `take` hands
-out every brief branch before it hands out a group, so the branches standing
-before the ticket system finish under the verbs they carry.
 
 # The take writes the record
 
@@ -137,19 +130,31 @@ notes hold.
 
 # The listing reads git once
 
-`branch list` asks git three times, whatever stands on the remote:
+`branch list` reads git in four asks, whatever stands on the remote:
 
 | the read | the process | what it answers |
 |---|---|---|
 | the refs | `for-each-ref` | every work branch, its tip, the time on that tip, and whether trunk holds it |
 | the paths | `cat-file --batch` | the ticket names each tip carries |
-| the contents | `cat-file --batch` | the brief and every ticket the paths name |
+| the contents | `cat-file --batch` | every ticket the paths name |
+| the base | `merge-base`, once a branch | what trunk and that branch share |
 
 The fetch stands off that path. `branch list --fetch` asks for it, and `take`
 and the routine's trigger fetch on their own, because each acts on the remote.
 
 A tree object carries a name as bytes, so the paths read raw. For details, see
 [[spec/design_output/doors#a-raw-run-keeps-bytes]].
+
+git answers the base red where trunk and a branch share none, which is what a
+rewrite of trunk leaves behind:
+
+| what git answers | the standing | what follows |
+|---|---|---|
+| a commit | the words below | the branch keeps the standing its note says |
+| red | `orphan` | the listing marks it, and `take` passes over it and says so |
+
+A branch at `orphan` reaches no sync, so a box takes it and stalls. The merge
+reads the same base, so one read answers both.
 
 # A row per group
 
@@ -158,8 +163,7 @@ A tree object carries a name as bytes, so the paths read raw. For details, see
 | column | says |
 |---|---|
 | the name | the branch, or the ticket's file name |
-| the kind | `group`, `brief` or `ticket` |
-| the status | `todo`, `held`, `done` or `merged` |
+| the status | `todo`, `held`, `done`, `merged` or `orphan` |
 | the why | the mark, or what it waits for |
 | the age | the age of the tip, on a held branch |
 
@@ -176,11 +180,8 @@ and the held ones together, and runs no `git show` by hand:
 | column | says |
 |---|---|
 | the name | the ticket's file name |
-| the kind | `ticket` |
 | the status | `open` or `closed` |
 | the why | the step it stands at, or its mark where it names no step |
-
-A brief carries no such row, because a brief names no tickets.
 
 ## A stale group is yours
 
@@ -228,6 +229,17 @@ group:
 | the ticket stands open, in this group, at a step `by: person` | the ticket closes `state: closed`, `reason: became`, `successors: [<name>]` |
 | the successor stands open and names no group | the question that step asks, under the successor's `Discussion`, beside the ticket it comes from |
 
+A question rides the frontmatter on one line, so it carries its own lines as
+`\n`. The unblock writes them back under `Discussion`:
+
+| the question | how it lands |
+|---|---|
+| one line | a list item under the bullet |
+| several lines | its own block, so a table stays a table |
+
+A semicolon whitespace follows cuts one question from the next. So a word
+carrying a semicolon stays whole.
+
 So `branch done` meets no open child, the group closes, and one push carries the
 successor with it. The person answers on a ticket of their own, and every step
 behind them runs on.
@@ -260,59 +272,41 @@ the verb refuses it. So a desk mints the successor off this route:
 `test/contract/process.test.js` reads that route off disk and holds it open, and
 `test/level0/unblock.test.js` mints off it and runs the verb.
 
-# Two handovers
+# One handover stands
 
-| file | tracked | who reads it | where it can stand |
-|---|---|---|---|
-| `.se/HANDOVER.md` | no | the next session on this box | anywhere |
-| `HANDOVER.md` | yes | whoever works the branch | a work branch alone |
+`.se/HANDOVER.md` is untracked, stands on one box, and carries what the next
+session on that box reads. Level zero reads it at `session.start`, hands it to
+the agent as a context block, and deletes it. So it stays fresh, and nobody
+keeps a rule about clearing it.
 
-Level zero reads both at `session.start`, hands each to the agent as a context
-block, and deletes both. So each one stays fresh, and nobody keeps a rule about
-clearing it.
+# What the standing says
 
-# What the status says
+A branch's standing comes off its group ticket, and the record is what moves:
 
-The handover carries frontmatter, and its `status` is the one field that moves:
-
-| status | means | who sets it |
+| standing | means | who sets it |
 |---|---|---|
-| `todo` | waiting for somebody | `branch new` |
-| `held` | a session has it | `branch take`, by pushing |
-| `done` | the result is on the branch | `branch done` |
+| `todo` | waiting for somebody | `branch open`, and `branch release` |
+| `held` | a session has it | `branch take`, by pushing an open record entry |
+| `done` | a hand answered every leaf it takes | `branch done` |
 
 A claim is a push. Two sessions reaching for one branch means one of them meets
-a rejected push and takes the next.
+a rejected push and takes the next. For details, see
+[[spec/design_output/work#held-derives-from-the-record]].
 
 # The round trip
 
-1. Write the brief to `HANDOVER.md` on `main`.
-2. `./RUNME.sh branch new <name>` cuts the branch, stamps `status: todo`, commits
-   and pushes. `main` loses the file in the same act.
+1. `./RUNME.sh mint ticket spec/tickets/<name>.md --process=group` writes the
+   group ticket on `main`, and a desk fills its ask.
+2. `./RUNME.sh branch open <name>` pushes `work/<name>` off trunk, standing at
+   `todo`.
 3. A session works the branch and pushes to it. A cloud session stops there,
    because the harness holds `main` shut and a cloud box opens no pull request.
-4. That session writes its result and its retro into `HANDOVER.md`, then runs
-   `./RUNME.sh branch done`, which stamps `status: done` and pushes.
+4. That session answers the group's leaves, writes its retro under the ticket's
+   retro chapter, then runs `./RUNME.sh branch done`.
 5. `./RUNME.sh branch list --done` names every branch standing at `done`.
 
-# Every brief carries the contract
-
-`branch new` appends `## How this branch ends` to a brief that carries none, so
-every branch says how it closes. The append is idempotent, and a brief already
-carrying the section stays as it stands.
-
-The contract says what a branch does:
-
-- run `branch sync` first, which takes `main` in
-- push each time a thing lands
-- write the result and the retro back into `HANDOVER.md`
-- run `branch sync` again, so trunk comes in last too
-- run `branch done`
-- run `branch release` on stopping early
-- run `branch merge` from trunk, which a cloud box leaves to a box off the cloud
-
-A brief depends on nothing outside itself, so a cloud session aiming at one
-branch reads it and knows how to finish.
+The pull's hand-out says what a branch does next, so no branch carries a copy
+of it. For details, see [[spec/design_output/pull#the-hand-out]].
 
 # A branch moves clean
 
@@ -335,6 +329,15 @@ box committing its work moves it into the reset's path.
 
 The guard reads a `work/` branch alone. Trunk takes a merge a desk pushes later,
 and `onBranch` resets no trunk.
+
+| the verb | what it hands the guard |
+|---|---|
+| `branch release` | the branch it names |
+| `branch take` | the branch it picks, once the sort names one |
+
+So each verb reads the branch the reset lands on, beside the branch the box
+stands on. The take reads twice, because it learns which branch it lands on
+after the first reading.
 
 # Trunk comes in first
 
@@ -361,8 +364,9 @@ ever runs.
 
 # A box landing on trunk
 
-A cloud session starting on `main` gets no brief, because trunk carries none.
-Level zero notices that and hands over a block naming `./RUNME.sh branch take`.
+A cloud session starting on `main` holds no work, because trunk carries no work
+branch. Level zero notices that and hands over a block naming
+`./RUNME.sh branch take`.
 
 So a box needs no prompt about work at all. Starting it on trunk is enough, and
 saying "take work" only agrees with what it already reads.
@@ -455,12 +459,37 @@ from a session that runs no plugin, and `install.sh` points git at it beside
 the commit hook. A push to a work branch meets neither, because mid-work
 carries red.
 
+## One verb feeds that stamp
+
+`./RUNME.sh commit "<message>"` lands a commit and leaves the stamp that `done`
+reads, in four steps:
+
+| the step | what it runs | what it answers on red |
+|---|---|---|
+| the message | `messageFaults`, exported from `src/bridge/bash.js` | every finding at once, and no commit |
+| the commit | `git add -A` and `git commit`, in the verb | what git says, with the staging back |
+| the check | `./RUNME.sh check`, which writes the stamp | what the check says, and no push |
+| the push | `git push origin`, which the pre-push door reads | what that door says |
+
+Each step prints what its run answers, on both streams. The check writes its
+faults to the error stream, so a read of one stream alone names a line standing
+clean.
+
+What the run leaves behind:
+
+- nothing stages before the message reads clean, so a refused message leaves the tree standing
+- the push door reads the stamp this run writes, so no stale stamp stops a clean commit
+- `--no-push` leaves the branch where it stands
+
+The message read stands with the bash door, which reads the same rules over a
+`git commit` a hand types. For details, see
+[[spec/design_output/bash#a-commit-message-meets-voice]].
+
 # A merged branch goes
 
 `branch merge <name>` runs on `main` and takes a branch standing at `done`. A
 group stands at `done` where its ticket reads `state: closed`. It merges with
-`--no-ff`, so the branch keeps its shape in the history, and drops
-`HANDOVER.md` inside the same commit: trunk carries no brief.
+`--no-ff`, so the branch keeps its shape in the history.
 
 A conflict stops the merge and leaves it standing, because resolving it belongs
 to the person merging.
@@ -493,7 +522,7 @@ origin. Naming no branch closes every one of them. It reaches two kinds:
 
 | branch | cut by | throwaway once |
 |---|---|---|
-| `work/<name>` | `branch new` | trunk holds its commits |
+| `work/<name>` | `branch open` | trunk holds its commits |
 | `claude/<name>` | the platform, for a routine run | trunk holds its commits |
 
 Deleting a remote branch whose merge sits on this box alone loses the work. So
@@ -537,19 +566,19 @@ what level zero asks.
 
 # Why a routine needs this
 
-A routine starts on `main` and takes no branch argument, so a pointed cloud
-agent gets its brief and a routine gets none.
+A routine starts on `main` and takes no branch argument. A person names the
+branch to a pointed cloud agent, and names none to a routine.
 
 Level zero reads its context at `session.start`, before any checkout. A hook
 sees nothing of a branch the session switches to afterwards.
 
-So `./RUNME.sh branch take` prints the brief to standard output. The agent reads
-it from the command, and one routine prompt then serves every branch:
+So `./RUNME.sh branch take` prints the group's ask to standard output. The agent
+reads it from the command, and one routine prompt then serves every branch:
 
     ./RUNME.sh branch take
 
-That verb fetches, picks a branch carrying a brief, checks it out, claims it by
-pushing, and prints what to do. A session losing the race meets a rejected
+That verb fetches, picks a branch carrying a group ticket, checks it out, claims
+it by pushing, and prints what to do. A session losing the race meets a rejected
 push and takes the next one.
 
 # The routine a verb names
@@ -566,5 +595,5 @@ holds and the token stays inside that process. A shell verb reaches neither, so
 It prints the routine, the id, and every branch standing free. A branch on that
 list is one a box takes, so the length of the list says how many boxes to fire.
 
-`freeNow` answers that list from the briefs alone, and `take` picks the first of
-it. So the verb and the box share one rule.
+`freeNow` answers that list from the group tickets alone, and `take` picks the
+first of it. So the verb and the box share one rule.

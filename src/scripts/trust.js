@@ -1,6 +1,6 @@
 // THE TRUST FLAG, WRITTEN BEFORE A SESSION STARTS. A cloud box clones this tree
 // into a folder nobody trusts, so the client skips the plugin scan and level
-// zero holds nothing there: no write door, no brief, no canary. The flag sits in
+// zero holds nothing there: no write door, no handover, no canary. The flag sits in
 // ~/.claude.json, outside the tree, so no tracked file moves it. An environment
 // names this script as its setup, and it runs while no session holds the file.
 // [[spec/design_output/level0#the-setup-writes-the-flag]]

@@ -194,7 +194,7 @@ The work verb, by topic:
 |---|---|---|
 | the round trip | new, take, sync, done and release | [[spec/design_output/work#the-round-trip]] |
 | the trunk | merge, close and what reads as merged | [[spec/design_output/work#a-merged-branch-closes]] |
-| the reading | read, review and list | [[spec/design_output/work#what-the-status-says]] |
+| the reading | read, review and list | [[spec/design_output/work#what-the-standing-says]] |
 
 The command line comes down the same way, one module per verb group, each heading with the chapter its verbs serve.
 

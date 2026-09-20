@@ -9,6 +9,10 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { fakeSession } from "../../src/doors/fake/session.js";
 
+const GROUP_AT = "/tree/spec/tickets/example.md";
+const HELD_GROUP =
+  "---\nkind: [[ticket]]\nstate: open\nprocess: [[group]]\nrecord:\n  - step: sync\n    hash_before: a1\n---\n\n# Ask\n\nA group.\n";
+
 function fixture() {
   const root = "/tree";
   const disk = fakeDisk({
@@ -17,7 +21,7 @@ function fixture() {
     "/tree/.se/.runtime/bin/biome": "",
     "/tree/spec/guidance/voice.md":
       "# Actionables\n\n1. Write clearly.\n2. Keep it short.\n",
-    "/tree/HANDOVER.md": "Do the work.",
+    "/tree/.se/HANDOVER.md": "Do the work.",
   });
   const proc = fakeProc({
     "git rev-parse --abbrev-ref HEAD": { stdout: "work/example\n" },
@@ -71,7 +75,7 @@ test("startup injects actual rules and retains a consumed handover", async () =>
   const result = await handle(event("SessionStart"), it);
   assert.match(result.context, /rules: 2/);
   assert.match(result.context, /Do the work/);
-  assert.equal(it.disk.exists("/tree/HANDOVER.md"), false);
+  assert.equal(it.disk.exists("/tree/.se/HANDOVER.md"), false);
   assert.equal(it.session.records.get("one").handovers[0].text, "Do the work.");
   assert.match((await handle(event("SessionStart"), it)).context, /Do the work/);
   assert.equal(
@@ -118,9 +122,14 @@ test("a session can write its local handover and other SE files", async () => {
     {},
   );
   it.disk.write("/tree/.se/HANDOVER.md", "Result and retro.");
-  it.disk.write("/tree/HANDOVER.md", "Result and retro.");
-  assert.deepEqual(await handle(create(".se/.runtime/copilot/state.json", "{}"), it), {});
-  assert.deepEqual(await handle(create(".se/.runtime/bin/vale", "replacement"), it), {});
+  assert.deepEqual(
+    await handle(create(".se/.runtime/copilot/state.json", "{}"), it),
+    {},
+  );
+  assert.deepEqual(
+    await handle(create(".se/.runtime/bin/vale", "replacement"), it),
+    {},
+  );
   assert.match(
     (await handle(create(".se/HANDOVER.md", "bad prose"), it)).deny,
     /fewer words/,
@@ -190,7 +199,7 @@ test("missing initialization refuses and formatting waits until completion", asy
     false,
   );
   it.disk.write("/tree/a.js", "const value=1");
-  it.disk.write("/tree/HANDOVER.md", "The result and retro.");
+  it.disk.write("/tree/.se/HANDOVER.md", "The result and retro.");
   await handle(event("Stop"), it);
   assert.equal(it.disk.read("/tree/a.js"), "const value = 1;\n");
 });
@@ -201,7 +210,7 @@ test("cloud requires a claimed work branch", async () => {
     handle(event("SessionStart", { surface: "cloud" }), it),
     /claim/,
   );
-  it.disk.write("/tree/HANDOVER.md", "---\nstatus: held\n---\nDo the work.");
+  it.disk.write(GROUP_AT, HELD_GROUP);
   await handle(event("SessionStart", { surface: "cloud" }), it);
   const result = await handle(
     event("PreToolUse", {
@@ -230,7 +239,7 @@ test("invalid checker reports refuse instead of passing silently", async () => {
 
 test("cloud guards every tool and leaves PR operations to the dispatcher", async () => {
   const it = fixture();
-  it.disk.write("/tree/HANDOVER.md", "---\nstatus: held\n---\nDo the work.");
+  it.disk.write(GROUP_AT, HELD_GROUP);
   await handle(event("SessionStart", { surface: "cloud" }), it);
   for (const command of [
     "git switch main",
@@ -270,7 +279,7 @@ test("completion rechecks changed content and bounds forced retries", async () =
     it,
   );
   it.disk.write("/tree/a.md", "good prose");
-  it.disk.write("/tree/HANDOVER.md", "Result and retro.");
+  it.disk.write("/tree/.se/HANDOVER.md", "Result and retro.");
   assert.deepEqual(await handle(event("Stop"), it), {});
   it.disk.write("/tree/a.md", "bad prose");
   assert.match((await handle(event("Stop"), it)).block, /fewer words/);
@@ -285,7 +294,7 @@ test("completion rechecks changed content and bounds forced retries", async () =
 test("twenty valid files finish in five batches without spending failure retries", async () => {
   const it = fixture();
   await handle(event("SessionStart"), it);
-  it.disk.write("/tree/HANDOVER.md", "Result and retro.");
+  it.disk.write("/tree/.se/HANDOVER.md", "Result and retro.");
   for (let index = 0; index < 20; index++) {
     const filePath = `result-${index}.md`;
     assert.deepEqual(

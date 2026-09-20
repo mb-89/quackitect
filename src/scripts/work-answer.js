@@ -16,8 +16,8 @@ import {
   stepOf,
   urgent,
 } from "../engine/group.js";
-import { leafOf, leavesOf } from "./pull-route.js";
 import { takeable } from "./pull.js";
+import { leafOf, leavesOf } from "./pull-route.js";
 import { queued, stoodHere } from "./pull-queue.js";
 import { staleClaim } from "./work-free.js";
 import { readWork, standingAll } from "./work-stands.js";
@@ -116,13 +116,13 @@ export function answerOf(it, queue = false) {
         when: one.when,
         merged: one.merged,
         status: standing.get(one.branch) ?? "",
-        kind: one.brief ? "brief" : GROUP,
+        kind: GROUP,
         step: one.ticket ? stepOf(one.ticket) : "",
         progress: one.ticket ? progressOf(one.ticket) : "",
         person: Boolean(one.ticket) && personStep(one.ticket),
         urgent: Boolean(one.ticket) && urgent(one.ticket),
         held: Boolean(one.ticket) && Boolean(heldIn(one.ticket)),
-        says: firstLine(askOf(one.ticket || one.brief)),
+        says: firstLine(askOf(one.ticket)),
         age,
         stale,
         ...(place === undefined ? {} : { queue: place }),

@@ -68,7 +68,9 @@ function grepAsked(e) {
 // [[spec/design_output/index#a-type-is-a-glob]]
 function globOf(e) {
   const said = String(e.glob ?? "");
-  const kind = String(e.type ?? "").trim().toLowerCase();
+  const kind = String(e.type ?? "")
+    .trim()
+    .toLowerCase();
   if (!kind) return said;
   if (said) return null;
   return KINDS[kind] ?? null;

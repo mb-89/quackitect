@@ -4,8 +4,8 @@
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { clock } from "../../src/doors/clock.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
@@ -22,7 +22,9 @@ const GIT_BASH = [
   `${process.env.LocalAppData}\\Programs\\Git\\bin\\bash.exe`,
 ];
 const SHELL =
-  process.platform === "win32" ? (GIT_BASH.find((one) => files.exists(one)) ?? "bash") : "sh";
+  process.platform === "win32"
+    ? (GIT_BASH.find((one) => files.exists(one)) ?? "bash")
+    : "sh";
 const quoted = (said) => String(said).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const either = (path) => `(?:${quoted(path)}|${quoted(path.split("\\").join("/"))})`;
 
@@ -61,7 +63,11 @@ test("a copy makes an identity of its own", () => {
     const other = copyHere(files, clock(), dest);
 
     assert.ok(other, "the copy answers an identity");
-    assert.notEqual(other, mine, "a copy holds its own, and never the one it came from");
+    assert.notEqual(
+      other,
+      mine,
+      "a copy holds its own, and never the one it came from",
+    );
     assert.equal(copyHere(files, clock(), dest), other, "and keeps it");
   } finally {
     files.remove(where);
@@ -87,7 +93,11 @@ test("a copy answers its own verbs, with no tree behind it", () => {
       },
     });
     assert.equal(said.exitCode, 0, said.stderr);
-    assert.match(said.stdout, new RegExp(`method\\s+${either(dest)}`), "it names itself as method");
+    assert.match(
+      said.stdout,
+      new RegExp(`method\\s+${either(dest)}`),
+      "it names itself as method",
+    );
     assert.match(said.stdout, new RegExp(`work\\s+${either(dest)}`), "and as work");
     assert.match(said.stdout, /drives itself/);
     assert.equal(

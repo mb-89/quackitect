@@ -21,7 +21,7 @@ it:
 |---|---|---|
 | `work` | one leaf of a ticket, with its fields, its guidance and the file to write in | the step, then pulls again naming the ticket |
 | `refused` | a check fails, and the findings stand one a line | fixes it, and the ticket stays in hand |
-| `wait` | nothing to hand out, and a reason per ticket the pull skips | says so, and stops |
+| `wait` | nothing to hand out, and a reason per ticket the pull skips | says so, and stops. Where a person's step is all that stands, the answer names the road out, and [[spec/design_output/work#a-person-step-leaves]] carries it |
 | `spawn` | the only open step excludes this hand, with a helper's name and its prompt | spawns that hand, and pulls again once it answers |
 | `done` | a hand under `--as` hands its one step back | stops, because a one-step hand takes no next leaf |
 
@@ -245,7 +245,22 @@ that a session's helper reviews none of its work yields to that ruling.
 | the pull says | who acts |
 |---|---|
 | `spawn`, a helper name and a prompt | the wrapper calls the harness, or the session spawns a subagent with the prompt |
-| `spawn`, off a plugin | nobody: the shell moves nothing, the step stays parked for a person or a spawned hand, and the answer says so |
+| `spawn`, off a plugin | nobody: the shell moves nothing, the step stays parked, and the answer says so |
+
+Two roads reach that answer, and each names its own taker:
+
+| the leaf | who takes it |
+|---|---|
+| one the `not:` rule excludes | a person, or the hand the engine spawns |
+| one under `by: helper` | the hand the engine spawns, and nobody else |
+
+A leaf under `by: helper` reads by the road that asks. The hand-out asks whether
+this hand stands under `--as`, and `branch done` asks whether the box carries a
+harness to spawn one with. So a box carrying a harness holds the group until
+that hand lands, and a box off one leaves the group open behind it.
+
+| the pull says | who acts |
+|---|---|
 | `work` under `--as <helper>` | the spawned hand, which takes that one leaf |
 | `done` after its hand-back | the spawned hand stops, and the session pulls again |
 
@@ -264,11 +279,11 @@ helper read apart in the prompt and in the record.
 
 ## The hand-back matches the hold
 
-The hold names the ticket, the step and the take hash. The pull refuses a
-hand-back naming another ticket. The record answers one already where an
-entry for this step carries the hold's hash as `hash_before` and a
-`hash_after`. That one gets the answer on record, pushes where the push is
-still owed, and drops the hold.
+The hold names the ticket, the step and the take hash, so a hand-back is
+idempotent: one sent twice moves the ticket once. The pull refuses a hand-back
+naming another ticket. The record answers one already where an entry for this
+step carries the hold's hash as `hash_before` and a `hash_after`. That one gets
+the answer on record, pushes where the push is still owed, and drops the hold.
 
 A hold is stale where the ticket stands at another step, or where the take
 hash is no ancestor of the tip. Then the hold drops, and the hand pulls again.

@@ -47,7 +47,9 @@ export function carriesTheName(line, name) {
   const said = String(name ?? "");
   if (!said) return false;
   const escaped = said.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(`(^|[^A-Za-z0-9])${escaped}([^A-Za-z0-9]|$)`).test(String(line ?? ""));
+  return new RegExp(`(^|[^A-Za-z0-9])${escaped}([^A-Za-z0-9]|$)`).test(
+    String(line ?? ""),
+  );
 }
 
 const HAS_SEPARATOR = /[@/\\]|[a-z0-9]\.[a-z0-9]/;
@@ -370,7 +372,11 @@ function namesOf(box) {
 
   if (namesAPerson(user)) out.push({ what: "the user of this box", said: user });
   if (home) {
-    const last = home.split(/[/\\]+/).filter(Boolean).pop() ?? "";
+    const last =
+      home
+        .split(/[/\\]+/)
+        .filter(Boolean)
+        .pop() ?? "";
     if (namesAPerson(last)) out.push({ what: "the home folder here", said: home });
   }
   if (namesAPerson(name)) out.push({ what: "the git name here", said: name });

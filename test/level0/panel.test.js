@@ -210,7 +210,10 @@ test("a row hovers its help, and carries the words the filter reads", () => {
 test("a value carrying markup lands as text, and closes no tag", () => {
   const said = panelHtml({
     tree: treeIn(SCHEMA, [
-      { path: ".se/.runtime/config.json", said: { log: { level: '"><script>x</script>' } } },
+      {
+        path: ".se/.runtime/config.json",
+        said: { log: { level: '"><script>x</script>' } },
+      },
     ]),
   });
   assert.ok(!said.includes("<script>x</script>"), "the value draws no tag");

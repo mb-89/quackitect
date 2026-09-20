@@ -18,7 +18,11 @@ export function fakeBridgehead(box) {
       await box.log.event(said, answer);
       raised.push({ said, answer });
       if (answer.needs === "reply") {
-        return it.raise("agent.spoke", { tool: e?.tool, agentId: e?.agentId, text: it.spoken }, origin);
+        return it.raise(
+          "agent.spoke",
+          { tool: e?.tool, agentId: e?.agentId, text: it.spoken },
+          origin,
+        );
       }
       if (answer.result !== undefined) return { result: answer.result };
       if (answer.event !== undefined) return { next: answer.event };

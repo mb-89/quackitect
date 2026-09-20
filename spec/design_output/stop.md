@@ -257,7 +257,7 @@ A wrong answer leaves the box where it does one of these:
 
 - it spends, sends or opens a door: money, a message to somebody outside, a secret
 - it loses work nobody rebuilds: a dropped commit, a deleted row, a release
-- it stands outside the brief: a product call the brief leaves open
+- it stands outside the ask: a product call the group's ask leaves open
 
 The reason this replaces asks whether a person answers, and a person answers
 anything. That test lets every hard call out of the box, so a cloud box ends its
@@ -377,7 +377,7 @@ covers the owner standing there.
 # What the todo list says
 
 `work-waiting` reads the todo list, which is one of the two work states
-standing today. The other is the branch: a brief at `held` says this session
+standing today. The other is the branch: a group at `held` says this session
 holds work the owner gives it.
 
 Client 2.1.266 carries no `TodoWrite`. Its list is `TaskCreate` and

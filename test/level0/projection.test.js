@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { inherits, rooted } from "../../.claude/skills/level0/lib/layer.js";
 import {
   COMMANDS,
   configPath,
@@ -22,7 +23,6 @@ import {
   widgetsIn,
   writesOf,
 } from "../../.claude/skills/level0/lib/projection.js";
-import { inherits, rooted } from "../../.claude/skills/level0/lib/layer.js";
 import { freshens } from "../../src/bridge/projection.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
@@ -278,8 +278,14 @@ test("an entry naming what it writes owns those files, and its neighbour owns th
   const retro = { ...ENTRY, name: "the retro command", writes: ["se-retro.md"] };
   const entries = [config, retro];
 
-  assert.equal(ownerOf(entries, ".claude/commands/se-config-log-level-info.md"), config);
-  assert.equal(ownerOf(entries, ".claude/commands/se-agent-control-hold-off.md"), config);
+  assert.equal(
+    ownerOf(entries, ".claude/commands/se-config-log-level-info.md"),
+    config,
+  );
+  assert.equal(
+    ownerOf(entries, ".claude/commands/se-agent-control-hold-off.md"),
+    config,
+  );
   assert.equal(ownerOf(entries, ".claude/commands/se-retro.md"), retro);
   assert.equal(
     ownerOf([ENTRY, retro], ".claude/commands/se-config-log-level-info.md"),
@@ -498,12 +504,20 @@ test("readAll reads a source off the work root where it stands, else the method'
     "/stub/spec/guidance/house.md": house,
     "/tools/.claude/output-styles/level0.md": "the vehicle's own",
   });
-  const said = readAll([STYLED], inherits(disk, "/tools", "/stub"), rooted(disk, "/stub"));
+  const said = readAll(
+    [STYLED],
+    inherits(disk, "/tools", "/stub"),
+    rooted(disk, "/stub"),
+  );
 
   const style = said.wanted.get(`.claude/output-styles/${STYLE_NAME}.md`);
   assert.match(style, /Keep the house rule/, "the stub's note joins");
   assert.match(style, /Put the bottom line first/, "the vehicle's note comes down");
-  assert.equal(said.standing.size, 0, "a target the vehicle holds counts for nothing in the stub");
+  assert.equal(
+    said.standing.size,
+    0,
+    "a target the vehicle holds counts for nothing in the stub",
+  );
 });
 
 test("a JSON source both roots hold joins key by key, so every command of the vehicle's stands", () => {
@@ -512,7 +526,11 @@ test("a JSON source both roots hold joins key by key, so every command of the ve
     [`/tools/${SCHEMA}`]: SAID,
     [`/stub/${SOURCE}`]: JSON.stringify({ log: { level: "warn" } }),
   });
-  const said = readAll([ENTRY], inherits(disk, "/tools", "/stub"), rooted(disk, "/stub"));
+  const said = readAll(
+    [ENTRY],
+    inherits(disk, "/tools", "/stub"),
+    rooted(disk, "/stub"),
+  );
   assert.equal(said.wanted.size, 7);
 });
 
@@ -532,7 +550,16 @@ test("the server's projection lands every target under the work root, off the me
   };
   freshens(box);
 
-  assert.ok(disk.exists(`/stub/.claude/output-styles/${STYLE_NAME}.md`), "the target lands in the work root");
-  assert.ok(!disk.exists(`/tools/.claude/output-styles/${STYLE_NAME}.md`), "and none in the method root");
-  assert.ok(box.sources.has("spec/guidance/voice.md"), "the source stays a path the write door marks stale");
+  assert.ok(
+    disk.exists(`/stub/.claude/output-styles/${STYLE_NAME}.md`),
+    "the target lands in the work root",
+  );
+  assert.ok(
+    !disk.exists(`/tools/.claude/output-styles/${STYLE_NAME}.md`),
+    "and none in the method root",
+  );
+  assert.ok(
+    box.sources.has("spec/guidance/voice.md"),
+    "the source stays a path the write door marks stale",
+  );
 });

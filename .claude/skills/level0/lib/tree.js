@@ -10,9 +10,9 @@ import { carriesTheName, namesAPerson } from "./private.js";
 import {
   EDITOR_EXTENSIONS,
   EDITOR_SETTINGS,
+  EDITOR_VALE_INI,
   EXTENSIONS,
   namesTheBinaries,
-  EDITOR_VALE_INI,
 } from "./servers.js";
 import { decide, pool, RULES as STOP } from "./stop.js";
 import { everyModuleTested } from "./tested.js";
@@ -471,7 +471,11 @@ export function nothingPrivateTravels(tree) {
 }
 
 function homeNames(home) {
-  const who = String(home).split(/[/\\]+/).filter(Boolean).pop() ?? "";
+  const who =
+    String(home)
+      .split(/[/\\]+/)
+      .filter(Boolean)
+      .pop() ?? "";
   return namesAPerson(who);
 }
 

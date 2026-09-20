@@ -3,22 +3,11 @@
 // [[spec/design_output/index#the-door-answers-the-tools]]
 
 import { asked, said as saidOf } from "../../.claude/skills/level0/lib/index.js";
+import { FIND, findSpec } from "../../.claude/skills/level0/lib/search.js";
 
-export const FIND = "find";
 const PASS = { pass: true };
 
-export function findSpec() {
-  return {
-    name: FIND,
-    description:
-      "Finds the lines in this tree carrying the words, ranked by the index. Ask it before a Grep over the tree, because it reads the rows and not the disk.",
-    inputSchema: {
-      type: "object",
-      properties: { words: { type: "string", description: "The words to look for." } },
-      required: ["words"],
-    },
-  };
-}
+export { FIND, findSpec };
 
 // [[spec/design_output/index#the-door-answers-the-tools]]
 export function answersFromIndex(e, box) {
@@ -52,7 +41,8 @@ export function runsFind(e, box) {
 export function warmIndex(box) {
   const said = box.index.warm();
   if (!said.warmed) return;
-  if (said.dead) box.log.say("warn", "index", "the index is dead", { detail: said.dead });
+  if (said.dead)
+    box.log.say("warn", "index", "the index is dead", { detail: said.dead });
   else box.log.say("info", "index", "the index is warm");
 }
 
@@ -62,7 +52,12 @@ export function deadIndexLine(why) {
 
 function globShape(answer) {
   const filenames = answer?.paths ?? [];
-  return { durationMs: 0, numFiles: filenames.length, filenames, truncated: Boolean(answer?.cut) };
+  return {
+    durationMs: 0,
+    numFiles: filenames.length,
+    filenames,
+    truncated: Boolean(answer?.cut),
+  };
 }
 
 function grepShape(e, answer) {
@@ -83,5 +78,7 @@ function grepShape(e, answer) {
 
 function findSaid(rows) {
   if (!Array.isArray(rows) || !rows.length) return "Nothing carries those words.";
-  return rows.map((one) => `${one.path}:${one.line}: ${String(one.text ?? "").trim()}`).join("\n");
+  return rows
+    .map((one) => `${one.path}:${one.line}: ${String(one.text ?? "").trim()}`)
+    .join("\n");
 }

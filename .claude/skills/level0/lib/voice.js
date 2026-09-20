@@ -154,7 +154,9 @@ export function tabled(head, rows, right = []) {
   return all
     .map((row) =>
       row
-        .map((one, i) => (right.includes(i) ? one.padStart(wide[i]) : one.padEnd(wide[i])))
+        .map((one, i) =>
+          right.includes(i) ? one.padStart(wide[i]) : one.padEnd(wide[i]),
+        )
         .join("  ")
         .trimEnd(),
     )

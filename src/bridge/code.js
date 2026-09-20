@@ -2,9 +2,10 @@
 // the size ceiling comes back refused.
 // [[spec/design_output/level0#the-formatter-applies-itself]]
 
+import { FILE_RULE, grows } from "../../.claude/skills/level0/lib/size.js";
 import { refusal } from "../../.claude/skills/level0/lib/refuse.js";
-import { grows } from "../../.claude/skills/level0/lib/size.js";
 import { asks } from "./config.js";
+import { splitTicket } from "./split-ticket.js";
 
 export async function codeDoor(e, writing, where, whole, box) {
   // [[spec/design_output/level0#the-size-ceiling]]
@@ -18,7 +19,11 @@ export async function codeDoor(e, writing, where, whole, box) {
       rule: grown[0]?.rule,
       tool: String(e.tool),
     });
-    return { result: { deny: refusal(where, grown) } };
+    // A file past the file ceiling takes a ticket, so the cut becomes work somebody sees. [[spec/design_output/level0#the-size-ceiling]]
+    const minted = grown.some((one) => one.rule === FILE_RULE)
+      ? splitTicket(box, where)
+      : "";
+    return { result: { deny: [refusal(where, grown), minted].filter(Boolean).join("\n") } };
   }
   if (!box.biome.stands()) return { pass: true };
   let text = whole;
@@ -36,7 +41,8 @@ export async function codeDoor(e, writing, where, whole, box) {
     });
     return { result: { deny: refusal(where, found) } };
   }
-  if (e.tool === "Write" && text !== writing.text) return { event: { ...e, content: text } };
+  if (e.tool === "Write" && text !== writing.text)
+    return { event: { ...e, content: text } };
   return { pass: true };
 }
 

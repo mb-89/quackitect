@@ -285,7 +285,7 @@ settles the stub the way the sidebar's hook button does:
 |---|---|
 | the register entry with its port | `~/.se/.runtime/registry.json` |
 | the pointer | `.se/.runtime/vehicle.json` in the stub |
-| the vehicle's hook and its two manifests | `.claude/skills/level0` in the stub |
+| the vehicle's hook, its two manifests and the lib files the hook imports | `.claude/skills/level0` in the stub |
 
 So the bridgehead rewrites the plugin folder beside its own. The client loads
 that hook at the next start, because it scans plugins once. The road then

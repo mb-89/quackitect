@@ -3,12 +3,12 @@
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
+import { candidateRun } from "../../.claude/skills/level0/lib/candidate-check.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 import { readTools, whereIs } from "../../src/engine/tools.js";
-import { candidateRun } from "../../.claude/skills/level0/lib/candidate-check.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();

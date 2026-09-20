@@ -8,17 +8,19 @@ import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { TICKETS } from "../../src/engine/group.js";
-import { BRIEF } from "../../src/scripts/work.js";
 import { REF_FORMAT } from "../../src/scripts/work-read.js";
 
 export const ROOT = "/tree";
-export const HERE = join(ROOT, BRIEF);
 
 export function doorsSaying(answers, files = {}) {
   const said = fakeGit(answers, ROOT);
   const disk = fakeDisk(files);
   // A case names its own environment, so the box running it changes no answer. [[spec/guidance/code/testing]]
-  return { it: { proc: said.proc, disk, git: said, join, env: {} }, outside: said, disk };
+  return {
+    it: { proc: said.proc, disk, git: said, join, env: {} },
+    outside: said,
+    disk,
+  };
 }
 
 export function heard(what) {
@@ -168,7 +170,6 @@ export const groupRemote = (note = GROUP_NOTE, more = {}) => ({
   "git ls-remote --heads origin work/*": {
     stdout: "aaa\trefs/heads/work/one-group\n",
   },
-  "git show origin/work/one-group:HANDOVER.md": { exitCode: 1 },
   [`git show origin/work/one-group:${GROUP_AT}`]: { stdout: note },
   "git rev-parse --abbrev-ref HEAD": { stdout: "work/one-group\n" },
   "git rev-parse HEAD": { stdout: `${SHA}\n` },

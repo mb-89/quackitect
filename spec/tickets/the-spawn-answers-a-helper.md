@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: design
@@ -90,12 +90,81 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
     hash_before: 6895aca948d260403eb59cc9325a61c45499a508
     hash_after: 6895aca948d260403eb59cc9325a61c45499a508
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 60a78552c6259007bde5c3aec1e0241840908d7c
+    hash_after: 60a78552c6259007bde5c3aec1e0241840908d7c
+    returns: 1
+    why: "`takeable` stands in `src/scripts/pull-hand.js`, and `src/scripts/pull.js` re-exports it; the gate naming `helper` beside `person` and `children` stands in `writesHere`; that function stands under `.claude/skills/level0/lib/ticket.js`, so the change lands there; in that function the agent line stands above the helper line, so name it above; the gate reads the box off the hand `handRule` builds, so name the field it gains there; `the-spawn-takes-a-step` stands closed, and a hand writes under `Discussion` alone there [[spec/guidance/tickets]]; that line drops its count, because a command answers it [[spec/guidance/voice]]"
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 9e40a26457e2993b848dcd0d239c13e1ee4f9819
+    hash_after: 9e40a26457e2993b848dcd0d239c13e1ee4f9819
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-4
+    hash_before: 87ba6fe294419f8415350cf9ef6bdb83fea7fd5f
+    hash_after: 87ba6fe294419f8415350cf9ef6bdb83fea7fd5f
+    returns: 2
+    why: "`writes: true` on a helper leaf hands it to this session, because `handOut` returns `handed` first; say where the spawn fires: `admits` answers `other` today off `excludes` alone; `handRule` gains no field, so the gate cannot tell the helper under `--as` from the session; name the two places `the-spawn-takes-a-step` names: `admits`, and `admits` under `--as`; the count stands in a step chapter of that closed ticket, which a `Discussion` line leaves standing"
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 76c3a09858d563f7a73aaa99fe1d87e8dec15d98
+    hash_after: 76c3a09858d563f7a73aaa99fe1d87e8dec15d98
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-6
+    hash_before: dffe1e5723e27b0b4f697ee5871a543751d8c390
+    hash_after: dffe1e5723e27b0b4f697ee5871a543751d8c390
+    returns: 3
+    why: "`branch done` refuses while `takeable` answers a path, so a parked leaf lets the box leave; the approach reads that backwards, saying a parked leaf holds the group open; `who.oneStep` carries a flag off `--as`, and carries no name; `handRule` takes no `who` at either call site, so name the argument it gains; the ticket door refuses a hand's write to a step chapter of a closed ticket; say which hand drops the count there, because a `Discussion` line leaves it standing; name the taker per road, because a spawn off `not:` admits a person too"
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: a28e7874652cdbbff9e7787b127aed02bb6ed328
+    hash_after: a28e7874652cdbbff9e7787b127aed02bb6ed328
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-8
+    hash_before: 34e8b8a756c0d14c9a6332b48ea9d42715274670
+    hash_after: 34e8b8a756c0d14c9a6332b48ea9d42715274670
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 02f87cca866e6dc072b076e7acfe23b7d0635e54
+    hash_after: 02f87cca866e6dc072b076e7acfe23b7d0635e54
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: e3c0c5d7d301c98b1f67750dac55e4515a4d8f08
+    hash_after: e3c0c5d7d301c98b1f67750dac55e4515a4d8f08
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 186c4acb81cc069f61eaa079368593b7ced07446
+    hash_after: 186c4acb81cc069f61eaa079368593b7ced07446
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 24 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-13
+    hash_before: 9e6d1da4a7cc7484a5f0391ed5e3e0cdf9a26c2d
+    hash_after: 9e6d1da4a7cc7484a5f0391ed5e3e0cdf9a26c2d
+reason: done
 ---
 
 # Ask
@@ -121,34 +190,34 @@ A leaf `by: helper` parks today. The spawn answer passes it, a hand under `--as`
 
 ### approach
 
-A helper leaf gates on the box, the way an agent step gates, and the helper is its one taker.
+The gate reads one field, and each caller answers it for the road it stands on.
 
-| the finding | where it lands |
+| the answer | where it lands |
 |---|---|
-| the gate | `takeable` in `src/scripts/pull.js` |
-| the taker | the spawn row of [[spec/design_output/pull#a-hand-of-its-own]] |
+| the gate | `writesHere`, under `.claude/skills/level0/lib/ticket.js` |
+| the field | `handRule` in `src/scripts/pull-hand.js`, which gains an argument for it |
+| the spawn | `admits` in that same file |
+| the taker, per road | the spawn row of [[spec/design_output/pull#a-hand-of-its-own]] |
 | the case | `test/level0/pull.test.js` |
-| the count | [[spec/tickets/the-spawn-takes-a-step]], which reads three |
+| the count | the `Discussion` of [[spec/tickets/the-spawn-takes-a-step]] |
 
-**The gate.** `takeable` parks a helper leaf on every box, because it names `helper` beside `person` and `children`. An agent step reads one line below it, and that line gates on the box. The helper leaf moves to that shape:
+The gate line reads `by: helper` and asks one question: does this hand take a helper leaf? `handRule` takes that answer as an argument, because neither call site reads it off `it`.
 
-| the box | what the leaf reads |
-|---|---|
-| carrying a harness | takeable, because the session spawns the hand |
-| off a harness | parked, because the shell moves nothing |
+| the caller | what it hands in | what the box then does |
+|---|---|---|
+| `admits`, the pull's hand-out | the flag `who.oneStep` carries off `--as` | the spawned hand takes the leaf, and the session reads the spawn answer |
+| `takeable`, which `standsOpen` reads | the harness on the box | `branch done` refuses on a harness box, and leaves on one off it |
 
-`branch done` then holds the group open where a spawn stands, and closes it where none does. That is the wall the ask names, with one side answering on each box.
+So a box carrying a harness holds the group until the helper lands, and a box off one leaves the group open behind it.
 
-**The taker.** The design row reads "parked for a person or a spawned hand". A leaf under `by: helper` admits one taker, so the row names the helper alone. `takeable` already refuses a person there, and the row now says the same.
+- `admits` answers `other` for a helper leaf on a harness box, so `handOut` prints the spawn prompt
+- the spawn row names a helper as the taker of a leaf under `by: helper`
+- the same row names a person or a helper for a leaf the `not:` rule excludes
+- the cases drive a group whose only open leaf reads `by: helper`, one box a side
 
-**The case.** The ask's third row wants the shell answer proven. Two cases in `pull.test.js` drive one group whose only open leaf reads `by: helper`:
+A box off a harness reads the shell's own answer. A box carrying one reads `spawn`, the helper name and the prompt. A pull under `--as` takes the leaf.
 
-| the box the case builds | what it reads |
-|---|---|
-| carrying no harness | the shell's own answer, which moves nothing |
-| carrying a harness | `spawn`, the helper name, and the prompt |
-
-**The count.** The prompt `spawnPrompt` writes carries four steps, and two of them carry a command. `the-spawn-takes-a-step` reads three. That note takes the correction, and names `spawnPrompt` as what answers it.
+The count stands in a step chapter of a closed ticket, and the ticket door refuses a hand's write there. So the `Discussion` line carries the correction, and names `spawnPrompt` as what answers the count. A reader of that chapter alone still reads the stale number, which is what the door costs.
 
 ## review
 
@@ -157,8 +226,9 @@ A helper leaf gates on the box, the way an agent step gates, and the helper is i
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
 
 # implement
 
@@ -169,20 +239,27 @@ A helper leaf gates on the box, the way an agent step gates, and the helper is i
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/pull.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The spawn case and the `--as` case stand red. The parking case stands green already, because `writesHere` refuses a helper leaf on every box.
+
+What surprises: the ask reads the park as the fault, and the park is the half that holds. The fault stands on the other side, where a harness box parks the leaf too and the group holds open.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the cases stand in `test/level0/pull.test.js`, which the ask's last row names
+- the cases drive `doors` in `pull-doors.js`, so git and the disk stand fake
+- a comment over the fixture names this ticket, and every case points at it
 
 ## reflect
 
@@ -207,14 +284,18 @@ A helper leaf gates on the box, the way an agent step gates, and the helper is i
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ask names the gate, the spawn and the cases, and two standing cases in `pull-steps.test.js` moved off `by: helper`
+- the cases drive `doors`, so git, the disk and the clock stand fake
+- each hunk carries a comment pointing at [[spec/design_output/pull#a-hand-of-its-own]]
 
 ## tests-green
 
@@ -223,26 +304,41 @@ A helper leaf gates on the box, the way an agent step gates, and the helper is i
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/pull.test.js test/level0/level1.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A leaf under `by: helper` asks one question of the hand: does this hand take a helper leaf? The gate stands in `writesHere`, and `handRule` carries the answer in as an argument.
+
+| the road | what it hands in | what follows |
+|---|---|---|
+| the hand-out, through `admits` | the hand under `--as` | the spawned hand takes the leaf, and the session reads `spawn` |
+| the leave, through `takeable` | the harness on the box | `branch done` holds a harness box, and leaves one off it |
+
+So a box carrying a harness spawns the hand and closes the group behind it. A box off a harness parks the leaf and leaves the group open for the next box.
+
+Two standing cases parked a child on `by: helper` to hold a group still. That park now answers `spawn`, so both cases park on a verb the box lacks, which holds each case's own subject.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ask names the gate, the spawn and the cases, and two standing cases moved off `by: helper`
+- the cases drive `doors`, so git, the disk and the clock stand fake
+- each hunk carries a comment pointing at [[spec/design_output/pull#a-hand-of-its-own]]
 
 # verdict
 
@@ -251,20 +347,34 @@ A helper leaf gates on the box, the way an agent step gates, and the helper is i
 ## read
 
 <!-- every file you read, one a line -->
-
 <!-- the form is files -->
+
+- .claude/skills/level0/lib/ticket.js
+- spec/design_output/pull.md
+- spec/guidance/tickets.md
+- spec/tickets/the-spawn-answers-a-helper.md
+- spec/tickets/the-spawn-takes-a-step.md
+- spec/tickets/the-unblock-keeps-its-shape.md
+- src/scripts/pull-chapter.js
+- src/scripts/pull-hand.js
+- src/scripts/pull.js
+- src/scripts/spawn.js
+- test/level0/pull-steps.test.js
+- test/level0/pull.test.js
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the two roads stand once, in the pull note, and every comment points there by link
 
 # Discussion
 

@@ -46,8 +46,8 @@ the step it takes, in the same turn.
 ## 4. A piece opens the next
 
 A session stopping after one piece hands the owner a decision they made when
-they set the work. The brief is the queue, and it already says where the work
-ends.
+they set the work. The group's ask is the queue, and it already says where the
+work ends.
 
 So the session carries on to that end. The three grounds below are the exits.
 
@@ -60,7 +60,7 @@ sensible on its own day. So the list closes at three.
 |---|---|
 | a discussion opens | the owner |
 | a mistake here is dear to undo | the work |
-| the work stands complete | the brief |
+| the work stands complete | the ask |
 
 The stop table under [[spec/design_output/stop]] holds the same three
 mechanically, so the hook and this note answer alike.
@@ -102,18 +102,18 @@ carries the reading, the plan and the result.
 ## 10. Trivial goes in
 
 A branch tripping over a fault either fixes it or carries it forward. A trivial
-fix costs a line, and a reader tells it from the brief at a glance.
+fix costs a line, and a reader tells it from the ask at a glance.
 
-A deeper fix costs the brief. It buries the work somebody asked for under work
+A deeper fix costs the ask. It buries the work somebody asked for under work
 nobody asked for. So it becomes a finding, and the code stands.
 
-## 11. The owner reads a brief
+## 11. The owner reads an ask
 
-A brief leaving for the cloud becomes the whole job of a session nobody watches.
+An ask leaving for the cloud becomes the whole job of a session nobody watches.
 One wrong line in it spends a box.
 
-So the owner reads a brief before it lands. That costs one reading, and it buys
-back every session the brief would misdirect.
+So the owner reads the ask before it lands. That costs one reading, and it buys
+back every session the ask would misdirect.
 
 ## 14. One place owns a thing
 

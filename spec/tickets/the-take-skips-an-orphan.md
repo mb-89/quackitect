@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: design
@@ -90,12 +90,87 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
     hash_before: 372edf2ccc0e7222883028c2a1b2b2ebeebf03c2
     hash_after: 372edf2ccc0e7222883028c2a1b2b2ebeebf03c2
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 30d9aa356a8b5e42a2101d829acdbb0eb82661c9
+    hash_after: 30d9aa356a8b5e42a2101d829acdbb0eb82661c9
+    returns: 1
+    why: "`standingAll` stands in `src/scripts/work-stands.js`, and `src/scripts/work.js` imports it; `branches` stands in that same file, so the standing and the list read one place; `movedOnTrunk` stands unexported in `src/scripts/work-merge.js`, so name what carries its read across; `take` stands in `src/scripts/work.js`, so the row reading `the same file` names two files; the counts of refs and of standing words drop, because `git merge-base` answers them [[spec/guidance/voice]]; the owner's row stands on a cloud branch, so say what this box does with those refs [[spec/guidance/cloud]]"
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 142ebe3ef48ccec6aeae2fa7acd8d880c5e9c50a
+    hash_after: 142ebe3ef48ccec6aeae2fa7acd8d880c5e9c50a
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-4
+    hash_before: 6ca52d0acd8478c8db2a9f9d64921b368bd25c3b
+    hash_after: 6ca52d0acd8478c8db2a9f9d64921b368bd25c3b
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 2af9f5366f122d0b5700382551ad3d93effeaef8
+    hash_after: 2af9f5366f122d0b5700382551ad3d93effeaef8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 9022b52413ccacaee9582f0b281154e30df9c40b
+    hash_after: 9022b52413ccacaee9582f0b281154e30df9c40b
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 9a6e5b32b39a4ffcb623c2524aec7fa2789927c6
+    hash_after: 9a6e5b32b39a4ffcb623c2524aec7fa2789927c6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 2 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-9
+    hash_before: 33f5704f21869c55e3f64dd9e3ceb4ebcb051d51
+    hash_after: 33f5704f21869c55e3f64dd9e3ceb4ebcb051d51
+    returns: 1
+    why: the status column in `spec/design_output/work.md` names four words, and the listing prints `orphan`; that chapter says `branch list` asks git three times, and `refsHere` adds a read a branch
+  - step: implement/reflect
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 6220161619c07f3563535c2fec26e9a0b571838a
+    hash_after: 6220161619c07f3563535c2fec26e9a0b571838a
+  - step: implement/reflect
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 3e44bedbb2826eb5e83e5728b869442a6cad00fe
+    hash_after: 3e44bedbb2826eb5e83e5728b869442a6cad00fe
+    returns: 1
+    why: the hand takes it back
+  - step: implement/reflect
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 53aac64f96deaea0ce11886987e924f6d9cbd825
+    hash_after: 53aac64f96deaea0ce11886987e924f6d9cbd825
+  - step: verdict
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-9
+    hash_before: 044f2741deaa29c7ad145621017631cbfae45546
+    hash_after: 044f2741deaa29c7ad145621017631cbfae45546
+    returns: 2
+    why: the hand takes it back
+  - step: verdict
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-9
+    hash_before: e736b98a262f33028b22adb5ac3b8901547dc716
+    hash_after: e736b98a262f33028b22adb5ac3b8901547dc716
+reason: done
 ---
 
 # Ask
@@ -122,37 +197,28 @@ A rewrite of trunk leaves five refs sharing no ancestor with it. The take picks 
 
 One question answers it: does the branch share an ancestor with trunk?
 
-`git merge-base origin/main origin/<branch>` answers 0 where one stands, and non-zero where none does. `movedOnTrunk` in `src/scripts/work.js` already asks git that question, so the verbs read one shape.
+`git merge-base origin/main origin/<branch>` answers 0 where one stands. `movedOnTrunk` in `src/scripts/work-merge.js` already asks git that, and it stands unexported today.
 
 | what changes | where |
 |---|---|
-| the standing reads `orphan` | `standingAll` in `src/scripts/work.js` |
-| the take passes over it, and names it | `take` in the same file |
-| the row marks it | the list's row builder |
-| the case drives one orphan and one branch | `test/level0/work.test.js` |
+| a read naming an orphan, exported | `src/scripts/work-merge.js` |
+| the standing reads `orphan` | `standingAll` in `src/scripts/work-stands.js` |
+| the listing marks it | `refsHere` in that same file |
+| the take passes over it, and names it | `take` in `src/scripts/work.js` |
+| the case drives one orphan beside one branch | `test/level0/work.test.js` |
 
-**The standing.** `standingAll` maps a branch to one of four words today. An orphan reads ahead of all four, because a branch no sync reaches takes no work whatever its brief says:
+The standing:
 
 | what git answers | the standing |
 |---|---|
-| `merge-base` non-zero | `orphan` |
-| anything else | the four words it reads today |
+| `merge-base` fails | `orphan` |
+| anything else | the words it reads today |
 
-**The take.** `take` walks the branches at `todo` and picks the first. An orphan stands outside `todo` once the standing names it, so the take passes it over. The take then says which branches it skipped, and why, so a box reads the reason.
+`take` walks the branches at `todo` and picks the first. An orphan reads `orphan` in place of `todo`, so the take passes it over and says which it skipped.
 
-**The case.** `fakeGit` answers a command by name, so a case answers `merge-base` non-zero for one branch and 0 for another. The take then answers the second, and the said names the first as skipped.
+`fakeGit` answers a command by name, so the case answers `merge-base` red for one branch and green for another. The take answers the second, and the said names the first.
 
-**The count.** Seven refs stand orphaned today, and `git merge-base origin/main <ref>` answers which:
-
-| the refs | what they are |
-|---|---|
-| `v1`, `v2`, `v3`, `v4` | four trunks this tree stood on before |
-| `group/level0`, `group/voice` | two group branches off an older trunk |
-| `se/claims` | one branch off an older trunk |
-
-The ask reads five, and it names none under `work/`. `branches` reads `work/*` alone, so the take reaches none of these seven today. The guard holds for the next rewrite, where a `work/` branch falls the same way.
-
-So the owner's row stands on its own: these seven wait for a person to close them or cut them again.
+What this box does with the refs standing orphaned: it leaves them. `branches` reads `work/*` alone, so the take reaches none of them, and the guard covers the next rewrite. A person who wants one gone runs git.
 
 ## review
 
@@ -161,8 +227,11 @@ So the owner's row stands on its own: these seven wait for a person to close the
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+
+- the take reads `refsHere`, and the closing paragraph names `branches`, which no caller uses
 
 # implement
 
@@ -173,20 +242,27 @@ So the owner's row stands on its own: these seven wait for a person to close the
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/work-orphan.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The take reaches for the orphan first, because its brief stands urgent. So the skip shows where the sort puts the orphan ahead of the branch a box can work.
+
+What surprises: the write door answers a file ceiling where these cases go in beside the take's own. They stand in a file of their own, which is the cut [[spec/tickets/a-split-verb-cuts-files]] asks a verb for.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the cases stand in `test/level0/work-orphan.test.js`, and the ask names a test over the take
+- the cases drive `doorsSaying`, so git and the disk stand fake
+- the header and each case point at [[spec/design_output/work#the-listing-reads-git-once]]
 
 ## reflect
 
@@ -195,14 +271,25 @@ So the owner's row stands on its own: these seven wait for a person to close the
 ### class
 
 <!-- the class of error the findings describe, and the fix for the class -->
-
 <!-- the form is text -->
+
+The class: a change adds a value to a set, and a note somewhere else teaches that set. The note then reads stale, and a reader acts on the old set.
+
+Both findings are that:
+
+- `orphan` joins the status words, and the status table teaches that set
+- the base read joins the listing's asks, and the chapter's opening line teaches it
+
+The fix for the class: `./RUNME.sh find` names every note teaching that set, and the change carries each. A count in prose is the same fault one step on, so the line names the reads and counts none.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the fix touches the two notes the findings name, and nothing else
+- the notes carry no door, so no fake stands here
+- the reads table and the status table each say what the code now answers
 
 ## change
 
@@ -211,14 +298,18 @@ So the owner's row stands on its own: these seven wait for a person to close the
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the listing, the standing, the take and the merge's own read of the base
+- the cases drive `doorsSaying`, so git and the disk stand fake
+- each hunk carries a comment pointing at [[spec/design_output/work#the-listing-reads-git-once]]
 
 ## tests-green
 
@@ -227,26 +318,42 @@ So the owner's row stands on its own: these seven wait for a person to close the
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/work-orphan.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The listing asks `merge-base` what trunk and each branch share. git answers red where they share none, and that branch stands at `orphan`.
+
+| the verb | what it does with an orphan |
+|---|---|
+| `branch list` | marks the row, so a reader sees why no box takes it |
+| `branch take` | passes over it, and says which branch it skips |
+| `branch merge` | reads the same base, so one read answers both |
+
+A branch sharing no ancestor with trunk reaches no sync. A box taking one stalls on unrelated histories and spends its session there.
+
+The refs standing orphaned on this remote stay standing. `git ls-remote --heads origin` names them, and each stands outside `work/`, which the listing reads. So the take reaches none of them, and this guard covers the next rewrite of trunk. A hand wanting one gone runs git.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the listing, the standing, the take and the merge's own read of the base
+- the cases drive `doorsSaying`, so git and the disk stand fake
+- each hunk carries a comment pointing at [[spec/design_output/work#the-listing-reads-git-once]]
 
 # verdict
 
@@ -255,20 +362,154 @@ So the owner's row stands on its own: these seven wait for a person to close the
 ## read
 
 <!-- every file you read, one a line -->
-
 <!-- the form is files -->
+
+- .claude/skills/level0/hooks/level0.js
+- .claude/skills/level0/lib/answer.js
+- .claude/skills/level0/lib/apply.js
+- .claude/skills/level0/lib/bash.js
+- .claude/skills/level0/lib/config.js
+- .claude/skills/level0/lib/copilot-runtime.js
+- .claude/skills/level0/lib/guidance.js
+- .claude/skills/level0/lib/index.js
+- .claude/skills/level0/lib/layer.js
+- .claude/skills/level0/lib/log.js
+- .claude/skills/level0/lib/paragraph.js
+- .claude/skills/level0/lib/private.js
+- .claude/skills/level0/lib/projection.js
+- .claude/skills/level0/lib/refuse.js
+- .claude/skills/level0/lib/review.js
+- .claude/skills/level0/lib/schema.js
+- .claude/skills/level0/lib/snippets.js
+- .claude/skills/level0/lib/stop.js
+- .claude/skills/level0/lib/ticket.js
+- .claude/skills/level0/lib/tools.js
+- .claude/skills/level0/lib/tree.js
+- .claude/skills/level0/lib/trunk.js
+- .claude/skills/level0/lib/undo.js
+- .claude/skills/level0/lib/vehicle.js
+- .claude/skills/level0/lib/vocabulary.js
+- .claude/skills/level0/lib/voice.js
+- .claude/skills/level0/lib/warnings.js
+- .claude/skills/pane/hooks/pane.js
+- spec/design_output/work.md
+- spec/tickets/the-spawn-takes-a-step.md
+- spec/tickets/the-take-skips-an-orphan.md
+- spec/tickets/voice-rules-skip-the-record.md
+- src/bridge/answer.js
+- src/bridge/apply.js
+- src/bridge/ask.js
+- src/bridge/bash.js
+- src/bridge/code.js
+- src/bridge/findings.js
+- src/bridge/projection.js
+- src/bridge/review.js
+- src/bridge/search.js
+- src/bridge/server.js
+- src/bridge/status.js
+- src/bridge/stop.js
+- src/bridge/tools.js
+- src/bridge/vehicle.js
+- src/bridge/write.js
+- src/doors/fake/bridgehead.js
+- src/doors/git.js
+- src/doors/index.js
+- src/doors/log.js
+- src/doors/session.js
+- src/extension/lib/rows.js
+- src/extension/sidebar.js
+- src/extension/webview/clicks.js
+- src/scripts/copilot.js
+- src/scripts/editor.js
+- src/scripts/group.js
+- src/scripts/hand.js
+- src/scripts/prepush.js
+- src/scripts/probe.js
+- src/scripts/pull-hand.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
+- src/scripts/queue.js
+- src/scripts/retro.js
+- src/scripts/review.js
+- src/scripts/stand.js
+- src/scripts/stub.js
+- src/scripts/ticket.js
+- src/scripts/tools.js
+- src/scripts/unblock.js
+- src/scripts/vehicle.js
+- src/scripts/viewer.js
+- src/scripts/voice.js
+- src/scripts/work-answer.js
+- src/scripts/work-merge.js
+- src/scripts/work-read.js
+- src/scripts/work-stands.js
+- src/scripts/work.js
+- src/stub/.claude/skills/level0/hooks/bridgehead.js
+- test/contract/biome.test.js
+- test/contract/candidate-check.test.js
+- test/contract/cloud-start.test.js
+- test/contract/compact.test.js
+- test/contract/disk.test.js
+- test/contract/index.test.js
+- test/contract/pull-payload.test.js
+- test/contract/schema.test.js
+- test/contract/shape.test.js
+- test/contract/stop-rules.test.js
+- test/contract/stub.test.js
+- test/contract/ticket.test.js
+- test/contract/tree.test.js
+- test/contract/vale.test.js
+- test/contract/vehicle.test.js
+- test/contract/vocabulary.test.js
+- test/contract/wire.test.js
+- test/level0/besides.test.js
+- test/level0/bridgehead.test.js
+- test/level0/copilot-runtime.test.js
+- test/level0/fixtures.js
+- test/level0/guidance.test.js
+- test/level0/hand.test.js
+- test/level0/layer.test.js
+- test/level0/panel.test.js
+- test/level0/person-step.test.js
+- test/level0/projection.test.js
+- test/level0/pull-leaves.test.js
+- test/level0/pull-steps.test.js
+- test/level0/retro-mint.test.js
+- test/level0/roots.test.js
+- test/level0/serve.test.js
+- test/level0/session-layer.test.js
+- test/level0/stop-door.test.js
+- test/level0/stub.test.js
+- test/level0/ticket.test.js
+- test/level0/tools.test.js
+- test/level0/unblock.test.js
+- test/level0/vehicle.test.js
+- test/level0/verbs.test.js
+- test/level0/voiceverb.test.js
+- test/level0/warnings.test.js
+- test/level0/work-answer.test.js
+- test/level0/work-doors.js
+- test/level0/work-group.test.js
+- test/level0/work-open.test.js
+- test/level0/work-orphan.test.js
+- test/level0/work.test.js
+- test/level0/write.test.js
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the status words and the four reads stand in [[spec/design_output/work#the-listing-reads-git-once]], and each hunk points at it
+- `baseOnTrunk` stands in one place, and the listing and the merge read it
+- the sweep under this ticket's name reads as a formatter pass, and it moves no behaviour
 
 # Discussion
 

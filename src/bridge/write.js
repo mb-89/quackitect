@@ -6,7 +6,11 @@ import { join } from "node:path";
 import { CODE } from "../../.claude/skills/level0/lib/code.js";
 import { marked, staleFault } from "../../.claude/skills/level0/lib/marks.js";
 import { isDraft, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
-import { carriedFrom, NOTES, refusedPrivate } from "../../.claude/skills/level0/lib/private.js";
+import {
+  carriedFrom,
+  NOTES,
+  refusedPrivate,
+} from "../../.claude/skills/level0/lib/private.js";
 import { refusal } from "../../.claude/skills/level0/lib/refuse.js";
 import {
   checkNote,
@@ -79,7 +83,10 @@ function markDoor(e, writing, where, box) {
 // [[spec/design_output/private#the-door-reads-the-notes]]
 function privateDoor(e, writing, where, box) {
   if (where.startsWith(".se/")) return "";
-  const carried = carriedFrom(writing.text, readFolder(box.disk, join(box.root, NOTES), ".md"));
+  const carried = carriedFrom(
+    writing.text,
+    readFolder(box.disk, join(box.root, NOTES), ".md"),
+  );
   if (!carried) return "";
   box.log.say("warn", "private", `refused a ${carried.how} out of ${carried.note}`, {
     file: where,
@@ -99,33 +106,52 @@ function schemaDoor(e, writing, where, box) {
   const governor = governorOf(schemas, where);
   const stranger = governor ? strangerFault(whole, governor, where) : null;
   if (stranger) {
-    box.log.say("warn", "schema", `refused a stranger in ${where}`, { file: where, rule: stranger.rule, tool: String(e.tool) });
+    box.log.say("warn", "schema", `refused a stranger in ${where}`, {
+      file: where,
+      rule: stranger.rule,
+      tool: String(e.tool),
+    });
     return refusedKind(where, governor, stranger);
   }
 
   const schema = schemas.get(kind);
   const found = schema ? checkNote(whole, schema, where, schemas) : [];
   if (found.length) {
-    box.log.say("warn", "schema", `refused ${found.length} line(s) in ${where}`, { file: where, rule: found[0]?.rule, tool: String(e.tool) });
+    box.log.say("warn", "schema", `refused ${found.length} line(s) in ${where}`, {
+      file: where,
+      rule: found[0]?.rule,
+      tool: String(e.tool),
+    });
     return refusedNote(where, kind, found);
   }
 
   // [[spec/design_output/schema#the-three-places]]
-  const held = schema ? ticketFaults(textAt(box.disk, writing.path), whole, schema, where) : [];
+  const held = schema
+    ? ticketFaults(textAt(box.disk, writing.path), whole, schema, where)
+    : [];
   if (held.length) {
-    box.log.say("warn", "ticket", `refused ${held.length} line(s) in ${where}`, { file: where, rule: held[0]?.rule, tool: String(e.tool) });
+    box.log.say("warn", "ticket", `refused ${held.length} line(s) in ${where}`, {
+      file: where,
+      rule: held[0]?.rule,
+      tool: String(e.tool),
+    });
     return refusedTicket(where, kind, held);
   }
   return "";
 }
 
+// [[spec/design_output/level0#a-note-reads-clean-first]]
+export async function proseFaults(text, where, box) {
+  if (CODE.test(where) || !box.vale.stands()) return [];
+  const said = await box.vale.lint(text, where);
+  if (!said.ran) return [];
+  return readsProse(box, text, said.found);
+}
+
 // [[spec/design_output/level0#the-write-door]]
 async function voiceDoor(e, writing, where, box) {
-  if (CODE.test(writing.path) || !box.vale.stands()) return "";
   const whole = wholeAfter(e, writing, box.disk);
-  const said = await box.vale.lint(whole, where);
-  if (!said.ran) return "";
-  const found = readsProse(box, whole, said.found);
+  const found = await proseFaults(whole, where, box);
   if (!found.length) return "";
   box.log.say("warn", "vale", `refused ${found.length} line(s) in ${where}`, {
     file: where,
@@ -141,7 +167,10 @@ function asWrite(e) {
   if (e.tool === "Write") return { path, text: String(e.content ?? "") };
   if (e.tool === "Edit") return { path, text: String(e.new_string ?? "") };
   if (e.tool === "MultiEdit" && Array.isArray(e.edits)) {
-    return { path, text: e.edits.map((one) => String(one?.new_string ?? "")).join("\n") };
+    return {
+      path,
+      text: e.edits.map((one) => String(one?.new_string ?? "")).join("\n"),
+    };
   }
   return undefined;
 }
@@ -174,7 +203,9 @@ function readFolder(disk, folder, end) {
   try {
     return disk
       .list(folder)
-      .filter((one) => one.kind === "file" && one.name.endsWith(end) && !isDraft(one.name))
+      .filter(
+        (one) => one.kind === "file" && one.name.endsWith(end) && !isDraft(one.name),
+      )
       .map((one) => ({ name: one.name, text: disk.read(join(folder, one.name)) }));
   } catch {
     return [];

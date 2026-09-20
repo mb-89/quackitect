@@ -13,7 +13,18 @@ import {
 import { attach, copyHere, readRegister, registerCopy } from "../scripts/vehicle.js";
 
 const HOOK = ".claude/skills/level0";
-const FILES = ["hooks/level0.js", "hooks/hooks.json", ".claude-plugin/plugin.json"];
+// The hook imports its own folder, so the copy takes what it reaches. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+const FILES = [
+  "hooks/level0.js",
+  "hooks/hooks.json",
+  ".claude-plugin/plugin.json",
+  "lib/apply.js",
+  "lib/folders.js",
+  "lib/log.js",
+  "lib/search.js",
+  "lib/undo.js",
+  "lib/vehicle.js",
+];
 
 export function vehicleOf(disk, env, time, work, windows = false) {
   const pointed = pointerOf(readIf(disk, join(work, POINTER)));
@@ -31,7 +42,10 @@ export function makesProject(disk, env, time, work, vehicle, windows = false) {
     disk.write(to, disk.read(join(vehicle, HOOK, rel)));
   }
   disk.makeDir(join(work, POINTER, ".."));
-  disk.write(join(work, POINTER), `${JSON.stringify({ method: vehicle, port }, null, 2)}\n`);
+  disk.write(
+    join(work, POINTER),
+    `${JSON.stringify({ method: vehicle, port }, null, 2)}\n`,
+  );
   return { method: vehicle, port, itself: false, made: true };
 }
 
@@ -49,7 +63,10 @@ export function attachTo(disk, env, time, work, vehicle, windows = false) {
 }
 
 export function isVehicle(disk, folder) {
-  return disk.exists(join(folder, MARKER)) && disk.exists(join(folder, "src", "bridge", "server.js"));
+  return (
+    disk.exists(join(folder, MARKER)) &&
+    disk.exists(join(folder, "src", "bridge", "server.js"))
+  );
 }
 
 export function registeredPort(disk, env, time, method, windows = false) {
@@ -57,7 +74,10 @@ export function registeredPort(disk, env, time, method, windows = false) {
   const known = portOf(held, method);
   if (known) return known;
   const id = copyHere(disk, time, method);
-  const entry = withPort(held, entryOf(id, versionOf(disk, method), method, time.stamp()));
+  const entry = withPort(
+    held,
+    entryOf(id, versionOf(disk, method), method, time.stamp()),
+  );
   registerCopy(disk, env, entry, windows);
   return entry.port;
 }

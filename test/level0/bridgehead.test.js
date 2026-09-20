@@ -193,7 +193,10 @@ test("a cloud box with an empty register clones the upstream from vehicle.json, 
 
 test("a stub holding the pointer runs no command and hands no block", async () => {
   const files = stub({
-    [`${STUB}/.se/.runtime/vehicle.json`]: JSON.stringify({ method: "/desk/acme", port: 6511 }),
+    [`${STUB}/.se/.runtime/vehicle.json`]: JSON.stringify({
+      method: "/desk/acme",
+      port: 6511,
+    }),
   });
   const outside = fakeGit({}, STUB);
   const { context } = await started(files, outside);
@@ -219,7 +222,10 @@ test("a vehicle at SE_VEHICLE clones nothing, and the attach runs its RUNME", as
   );
   assert.deepEqual(argvs[1], attachOf("/desk/acme", STUB));
   assert.equal(argvs.length, 2, "a server answering at the port starts no second one");
-  assert.equal(JSON.parse(files.read(`${STUB}/.se/.runtime/vehicle.json`)).method, "/desk/acme");
+  assert.equal(
+    JSON.parse(files.read(`${STUB}/.se/.runtime/vehicle.json`)).method,
+    "/desk/acme",
+  );
 });
 
 test("a register entry naming the record's identity is the vehicle", async () => {

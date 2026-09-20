@@ -90,7 +90,14 @@ export function cloneOf(link, env) {
 }
 
 export function attachOf(vehicle, work) {
-  return ["env", `SE_WORK_ROOT=${work}`, "sh", `${vehicle}/RUNME.sh`, "vehicle", "attach"];
+  return [
+    "env",
+    `SE_WORK_ROOT=${work}`,
+    "sh",
+    `${vehicle}/RUNME.sh`,
+    "vehicle",
+    "attach",
+  ];
 }
 
 export function serveOf(vehicle) {

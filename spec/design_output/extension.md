@@ -63,9 +63,9 @@ every field in use.
 A key naming no group is config alone. It draws in the bottom section with
 every other value. So a new button is an edit to the schema and no code change.
 
-## The brief says the declaration
+## The ask says the declaration
 
-The brief for this branch puts these fields in `spec/config/level0.json`. This
+The ask behind this work puts these fields in `spec/config/level0.json`. This
 tree splits that file in two already. The tracked file holds the values a
 person edits, and the schema beside it says the type of each key. A widget
 field goes where the type stands, so one key stays one entry.

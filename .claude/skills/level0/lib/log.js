@@ -9,6 +9,8 @@ export const FOLDER = LOG;
 export const SESSION = `${FOLDER}/session.jsonl`;
 export const OLD = `${FOLDER}/old`;
 export const LOG_TOOL = "log";
+// A stamp answers milliseconds, and a span answers seconds, so a reader crossing the two multiplies by this. [[spec/design_output/log#one-verb-reads-the-log]]
+export const MS = 1000;
 
 // [[spec/design_output/log#an-answer-stands-in-chat]]
 export const ANSWER_KIND = "answer";
@@ -82,13 +84,21 @@ export function logSpec() {
     inputSchema: {
       type: "object",
       properties: {
-        kind: { type: "string", description: `What the line is, such as ${ANSWER_KIND}, status or note.` },
+        kind: {
+          type: "string",
+          description: `What the line is, such as ${ANSWER_KIND}, status or note.`,
+        },
         said: {
           type: "string",
-          description: "One sentence, 80 characters at most. An answer carries its whole text here.",
+          description:
+            "One sentence, 80 characters at most. An answer carries its whole text here.",
         },
         text: { type: "string", description: "The whole text, where said runs short." },
-        level: { type: "string", enum: LEVELS, description: "debug, info, warn, error or fatal." },
+        level: {
+          type: "string",
+          enum: LEVELS,
+          description: "debug, info, warn, error or fatal.",
+        },
       },
       required: ["kind", "said"],
     },

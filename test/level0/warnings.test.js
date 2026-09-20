@@ -47,13 +47,20 @@ test("the filter keeps a warning on a file the push carries, and drops the rest"
 
 // [[spec/tickets/one-list-holds-the-warnings]]
 test("the files read once each, in order, whatever the rows say", () => {
-  const rows = [found("b.md", "warning"), found("a.md", "warning"), found("b.md", "warning")];
+  const rows = [
+    found("b.md", "warning"),
+    found("a.md", "warning"),
+    found("b.md", "warning"),
+  ];
   assert.deepEqual(filesOn(rows), ["a.md", "b.md"]);
 });
 
 // [[spec/tickets/one-list-holds-the-warnings]]
 test("the refusal names each file, each rule and the command that reads them", () => {
-  const said = refusedWarnings([found("a.md", "warning"), found("b.md", "warning", "Shape")]);
+  const said = refusedWarnings([
+    found("a.md", "warning"),
+    found("b.md", "warning", "Shape"),
+  ]);
 
   assert.match(said, /a\.md/);
   assert.match(said, /b\.md/);
@@ -106,5 +113,8 @@ test("a warning on a file the push leaves alone holds no push", () => {
   const carried = () => [{ name: "a.md", text: "" }];
   const elsewhere = () => [found("spec/tickets/old.md", "warning")];
 
-  assert.deepEqual(holds(refsIn(toWork), "", carried, elsewhere), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toWork), "", carried, elsewhere), {
+    code: 0,
+    said: "",
+  });
 });

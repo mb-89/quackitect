@@ -51,18 +51,31 @@ test("a box with no binary formats nothing, and says so", async () => {
 ifBiome("a bare number in code is refused, and a test keeps its literals", async () => {
   const folder = files.tempDir("magic-");
   const config = JSON.parse(files.read(join(root, "spec", "config", "biome.json")));
-  files.write(join(folder, "biome.json"), JSON.stringify({ ...config, vcs: { enabled: false } }));
+  files.write(
+    join(folder, "biome.json"),
+    JSON.stringify({ ...config, vcs: { enabled: false } }),
+  );
   const code = "export function wait(x) {\n  return x * 4000;\n}\n";
   files.makeDir(join(folder, "src"));
   files.makeDir(join(folder, "test"));
   files.write(join(folder, "src", "probe.js"), code);
   files.write(join(folder, "test", "probe.test.js"), code);
   const ran = proc().run(
-    [bin, "lint", `--config-path=${folder}`, "--reporter=json", "--max-diagnostics=none", "src", "test"],
+    [
+      bin,
+      "lint",
+      `--config-path=${folder}`,
+      "--reporter=json",
+      "--max-diagnostics=none",
+      "src",
+      "test",
+    ],
     { cwd: folder },
   );
   files.remove(folder);
-  const found = fromJson(ran.stdout, "").filter((one) => one.rule === "style/noMagicNumbers");
+  const found = fromJson(ran.stdout, "").filter(
+    (one) => one.rule === "style/noMagicNumbers",
+  );
   assert.deepEqual(
     found.map((one) => one.file.split("\\").join("/")),
     ["src/probe.js"],

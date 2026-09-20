@@ -43,7 +43,7 @@ function listing(flag = []) {
 test("the listing shows open work alone by default", () => {
   const said = listing();
 
-  assert.match(said, /work\/one-group\s+group\s+todo/);
+  assert.match(said, /work\/one-group\s+todo/);
   assert.match(said, /^ {2}a-child\s+ticket\s+open/m);
   assert.match(said, /^a-loose-one\s+ticket\s+open/m);
   assert.doesNotMatch(said, /a-done-child/, "a closed child stays off the default");
@@ -60,5 +60,5 @@ test("the listing shows everything under --all", () => {
 
   assert.match(said, /^ {2}a-done-child\s+ticket\s+closed/m);
   assert.match(said, /^a-closed-one\s+ticket\s+closed/m);
-  assert.match(said, /work\/landed\s+group\s+merged/);
+  assert.match(said, /work\/landed\s+merged/);
 });

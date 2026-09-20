@@ -3,9 +3,24 @@
 // [[spec/design_output/apply#the-write-tools]]
 
 import { join } from "node:path";
-import { applied, filesIn, PATCH, patchSpec, REPLACE, replaceSpec } from "../../.claude/skills/level0/lib/apply.js";
+import {
+  applied,
+  filesIn,
+  PATCH,
+  patchSpec,
+  REPLACE,
+  replaceSpec,
+} from "../../.claude/skills/level0/lib/apply.js";
 import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
-import { FOLDER as UNDONE, journalOf, nameOf, newestOn, restores, UNDO, undoSpec } from "../../.claude/skills/level0/lib/undo.js";
+import {
+  journalOf,
+  nameOf,
+  newestOn,
+  restores,
+  UNDO,
+  FOLDER as UNDONE,
+  undoSpec,
+} from "../../.claude/skills/level0/lib/undo.js";
 import { marksOf, marksSeen, onWrite } from "./write.js";
 
 export const SPECS = () => [patchSpec(), replaceSpec(), undoSpec()];
@@ -31,7 +46,11 @@ async function replaces(e, box) {
     const hits = Object.values(took.counts).reduce((n, one) => n + one, 0);
     const wanted = e.expect_count;
     if (wanted !== undefined && Number(wanted) !== hits) {
-      return { result: { result: `the pattern matches ${hits} times, and expect_count says ${wanted}` } };
+      return {
+        result: {
+          result: `the pattern matches ${hits} times, and expect_count says ${wanted}`,
+        },
+      };
     }
   }
   return lands(e, took, box);
@@ -52,8 +71,12 @@ async function lands(e, took, box) {
 
 async function checked(took, box) {
   for (const one of took.files) {
-    const said = await onWrite({ tool: "Write", file_path: one.file, content: one.made }, box);
-    if (said?.result?.deny) return `${one.file} refuses the batch, and nothing is written.\n\n${said.result.deny}`;
+    const said = await onWrite(
+      { tool: "Write", file_path: one.file, content: one.made },
+      box,
+    );
+    if (said?.result?.deny)
+      return `${one.file} refuses the batch, and nothing is written.\n\n${said.result.deny}`;
   }
   return "";
 }
@@ -64,7 +87,10 @@ function writes(took, on, box) {
   const where = join(box.root, UNDONE, nameOf(at));
   try {
     box.disk.makeDir(join(box.root, UNDONE));
-    box.disk.write(where, `${JSON.stringify(journalOf(at, on, "level0", took.files), null, 2)}\n`);
+    box.disk.write(
+      where,
+      `${JSON.stringify(journalOf(at, on, "level0", took.files), null, 2)}\n`,
+    );
   } catch (bad) {
     return `the undo journal would not write, so nothing did: ${bad?.message ?? bad}`;
   }
@@ -77,7 +103,10 @@ function writes(took, on, box) {
       return `${one.file} would not write: ${bad?.message ?? bad}\nThe tree stands part written. Run undo to put it back, out of ${where}.`;
     }
   }
-  box.log.say("info", "apply", `${wrote.length} file(s) written`, { detail: on, file: where });
+  box.log.say("info", "apply", `${wrote.length} file(s) written`, {
+    detail: on,
+    file: where,
+  });
   return [
     `${wrote.length} file(s) written, and ${relativeTo(box.root, where)} holds what they said before.`,
     ...wrote.map((one) => `  ${one} (${took.counts[one]} place(s))`),
@@ -88,9 +117,15 @@ function writes(took, on, box) {
 
 function wouldLand(took) {
   const rows = took.files
-    .map((one) => `  ${one.file} (${took.counts[one.file]} place(s))${one.born ? ", new" : ""}`)
+    .map(
+      (one) =>
+        `  ${one.file} (${took.counts[one.file]} place(s))${one.born ? ", new" : ""}`,
+    )
     .sort();
-  return [`${took.files.length} file(s) would change, and nothing is written.`, ...rows].join("\n");
+  return [
+    `${took.files.length} file(s) would change, and nothing is written.`,
+    ...rows,
+  ].join("\n");
 }
 
 // [[spec/design_output/apply#drift-refuses-the-restore]]
@@ -98,7 +133,8 @@ async function undoes(e, box) {
   const on = String(e.on ?? "");
   const folder = join(box.root, UNDONE);
   const names = list(box.disk, folder).filter((one) => one.endsWith(".json"));
-  if (!names.length) return said(box, false, "nothing to undo: no apply journal stands here", on);
+  if (!names.length)
+    return said(box, false, "nothing to undo: no apply journal stands here", on);
   const entries = {};
   for (const name of names) {
     try {
@@ -107,9 +143,17 @@ async function undoes(e, box) {
   }
   const newest = newestOn(names, entries, on);
   if (!newest) {
-    return said(box, false, `nothing of ${on || "this session"} to undo: an undo takes back what its own name wrote`, on);
+    return said(
+      box,
+      false,
+      `nothing of ${on || "this session"} to undo: an undo takes back what its own name wrote`,
+      on,
+    );
   }
-  const held = readsFiles(box, newest.entry.files.map((one) => one.file));
+  const held = readsFiles(
+    box,
+    newest.entry.files.map((one) => one.file),
+  );
   const put = restores(newest.entry, held);
   if (!put.ok) return said(box, false, put.why, on);
 
@@ -144,7 +188,10 @@ function sweeps(e, box) {
     return { why: `the pattern compiles to nothing: ${bad?.message ?? bad}` };
   }
   const answer = box.index.ask("grep", { pattern, glob, limit: 0 });
-  if (!answer) return { why: "the index is dead, so the sweep has no list. Run ./RUNME.sh, then try again" };
+  if (!answer)
+    return {
+      why: "the index is dead, so the sweep has no list. Run ./RUNME.sh, then try again",
+    };
   const paths = (answer.files ?? []).map((one) => one.path);
   if (!paths.length) return { why: "the pattern matches nothing under that glob" };
   const held = readsFiles(box, paths);
@@ -152,7 +199,13 @@ function sweeps(e, box) {
   for (const path of paths) {
     shape.lastIndex = 0;
     if (!shape.test(held[path]?.text ?? "")) continue;
-    ops.push({ file: path, op: "regex", pattern, replacement: String(e.replacement ?? ""), flags: String(e.flags ?? "") });
+    ops.push({
+      file: path,
+      op: "regex",
+      pattern,
+      replacement: String(e.replacement ?? ""),
+      flags: String(e.flags ?? ""),
+    });
   }
   if (!ops.length) return { why: "the pattern matches nothing under that glob" };
   return { held, ops };
@@ -180,8 +233,11 @@ function readsFiles(box, paths) {
 }
 
 function inTheTree(root, path) {
-  const rel = relativeTo(root, String(path ?? "")).split("\\").join("/");
-  if (!rel || rel.startsWith("/") || rel.startsWith("../") || /^[A-Za-z]:/.test(rel)) return "";
+  const rel = relativeTo(root, String(path ?? ""))
+    .split("\\")
+    .join("/");
+  if (!rel || rel.startsWith("/") || rel.startsWith("../") || /^[A-Za-z]:/.test(rel))
+    return "";
   return rel;
 }
 

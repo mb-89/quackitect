@@ -56,7 +56,8 @@ function glanceOf(e) {
   const out = {};
   for (const key of GLANCE) {
     const value = e?.[key];
-    if (value !== undefined && value !== null && typeof value !== "object") out[key] = String(value);
+    if (value !== undefined && value !== null && typeof value !== "object")
+      out[key] = String(value);
   }
   return out;
 }
@@ -76,7 +77,12 @@ function headOf(said) {
 
 function fieldsOf(said, answer) {
   const e = said?.e;
-  const text = typeof e?.text === "string" ? e.text : typeof e?.answer === "string" ? e.answer : "";
+  const text =
+    typeof e?.text === "string"
+      ? e.text
+      : typeof e?.answer === "string"
+        ? e.answer
+        : "";
   return {
     event: String(said?.event ?? "event"),
     ...glanceOf(e),

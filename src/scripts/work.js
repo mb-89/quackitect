@@ -1,9 +1,7 @@
-// Work branches. A branch named work/<name> carries one piece of work: a group
-// ticket at spec/tickets/<name>.md, or the brief a cloud box reads at
-// HANDOVER.md while the last of them drains.
+// Work branches. A branch named work/<name> carries one piece of work: the
+// group ticket at spec/tickets/<name>.md.
 // [[spec/design_output/work#the-round-trip]]
 
-import { overLong } from "../../.claude/skills/level0/lib/names.js";
 import {
   STAMP,
   saysGreen,
@@ -51,25 +49,18 @@ import { answer } from "./work-answer.js";
 import { list } from "./work-list.js";
 import { close, merge } from "./work-merge.js";
 import {
-  BRIEF,
-  briefOf,
   childrenHere,
   DONE,
   dirty,
   groupStanding,
-  HELD,
-  noteOf,
-  push,
-  setStatus,
+  ORPHAN,
   standingAll,
   standingIn,
   standOf,
-  statusOf,
   sync,
   TODO,
   textAt,
   waitingOn,
-  withContract,
   workBranchHere,
 } from "./work-stands.js";
 
@@ -80,7 +71,6 @@ export function work(root, argv, doors) {
   const what = argv[0];
   const name = argv[1];
   const doing = {
-    new: newWork,
     open: openGroup,
     take,
     sync,
@@ -134,12 +124,14 @@ export function cloud(root, argv, doors) {
   return argv[0] ? 2 : 0;
 }
 
-const LOUD = ["new", "open", "take", "done", "release", "merge", "close", "unblock"];
+const LOUD = ["open", "take", "done", "release", "merge", "close", "unblock"];
 
 // A group reaches the cloud as a branch of its own, pushed off trunk, so no hand runs git for it. [[spec/design_output/work#a-group-is-a-ticket]]
 function openGroup(it, name) {
   if (!name) {
-    console.error("branch open needs a group: ./RUNME.sh branch open the-window-grows-tabs");
+    console.error(
+      "branch open needs a group: ./RUNME.sh branch open the-window-grows-tabs",
+    );
     return 2;
   }
   const at = ticketAt(name);
@@ -165,7 +157,9 @@ function openGroup(it, name) {
   }
   const mark = markOff(it, branch);
   if (!mark) {
-    console.error(`The commit that opens ${branch} came back refused, so nothing is pushed.`);
+    console.error(
+      `The commit that opens ${branch} came back refused, so nothing is pushed.`,
+    );
     return 1;
   }
   if (!it.git.run(["push", "origin", `${mark}:refs/heads/${branch}`]).ok) {
@@ -198,43 +192,6 @@ function tell(it, what, code) {
     .then(() => code);
 }
 
-function newWork(it, name) {
-  if (!name) {
-    console.error("branch new needs a name: ./RUNME.sh branch new fix-lsp");
-    return 2;
-  }
-  if (overLong(name, it.words)) {
-    console.error(`A branch name holds ${it.words} words, and ${name} holds more.`);
-    return 2;
-  }
-  const branch = `work/${name}`;
-  const path = it.join(it.root, BRIEF);
-
-  if (!it.disk.exists(path)) {
-    console.error(`Write the brief to ${BRIEF} first, saying what this work is.`);
-    console.error(
-      "Level zero reads it on the branch and hands it to whoever works it.",
-    );
-    return 2;
-  }
-
-  const on = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
-  if (on !== TRUNK) {
-    console.error(`branch new cuts from ${TRUNK}, and this is ${on}.`);
-    return 2;
-  }
-
-  const brief = setStatus(withContract(it.disk.read(path)), TODO);
-  if (!it.git.run(["switch", "-c", branch]).ok) return 1;
-  if (!push(it, branch, brief, "the brief")) return 1;
-  it.git.run(["switch", TRUNK], true);
-  it.git.run(["push", "-u", "origin", branch], true);
-
-  console.log(`${branch} is pushed as ${TODO}, and ${BRIEF} left ${TRUNK} with it.`);
-  console.log("Point a cloud agent at that branch, or let a routine take it.");
-  return 0;
-}
-
 // [[spec/design_output/work#why-a-routine-needs-this]]
 // A name picks one branch, which is the owner's road onto a group from a desk. [[spec/design_output/pull#the-engine-takes-the-branch]]
 function take(it, name = "") {
@@ -245,6 +202,10 @@ function take(it, name = "") {
   const stand = standOf(it);
   const standing = standingAll(stand);
   const open = stand.filter((one) => standing.get(one.branch) === TODO);
+  // A branch sharing no ancestor with trunk reaches no sync, so the take says which it passes over. [[spec/design_output/work#the-listing-reads-git-once]]
+  for (const one of stand.filter((held) => standing.get(held.branch) === ORPHAN)) {
+    console.log(`${one.branch} shares no ancestor with trunk, so this take skips it.`);
+  }
 
   if (!open.length) {
     console.log(`No work branch stands at ${TODO}. Nothing to take.`);
@@ -264,24 +225,23 @@ function take(it, name = "") {
     console.log(`Every branch at ${TODO} waits for another. Nothing to take.`);
     for (const one of open) {
       console.log(
-        `  ${one.branch} waits for ${waitingOn(noteOf(one), standing).join(", ")}`,
+        `  ${one.branch} waits for ${waitingOn(one.ticket, standing).join(", ")}`,
       );
     }
     return 0;
   }
 
-  // [[spec/design_output/work#a-brief-drains-first]]
-  const held = free.filter((one) => one.brief);
-  const wanted = held.length ? held : free;
+  const wanted = [...free];
   wanted.sort(
     (a, b) =>
-      Number(urgent(noteOf(b))) - Number(urgent(noteOf(a))) ||
+      Number(urgent(b.ticket)) - Number(urgent(a.ticket)) ||
       a.branch.localeCompare(b.branch),
   );
 
   const one = wanted[0];
+  // The reset under onBranch lands on the branch this take picks, so that branch meets the same read as the one the box stands on. [[spec/design_output/work#a-branch-moves-clean]]
+  if (dirty(it, one.branch)) return 2;
   if (!onBranch(it, one.branch)) return 1;
-  if (one.brief) return claimBrief(it, one.branch);
   // A box with nothing at a step it can take leaves the group at todo, before it writes a line. [[spec/tickets/the-group-leaves-at-todo]]
   const stands = standsOpen(it, one.name, it.join(it.root, ticketAt(one.name)));
   if (stands.open.length && !stands.busy.length) {
@@ -330,24 +290,6 @@ function parkedFiles(it) {
     }));
 }
 
-function claimBrief(it, branch) {
-  const brief = it.disk.read(it.join(it.root, BRIEF));
-  if (!push(it, branch, setStatus(brief, HELD), HELD)) {
-    console.error(refusedPush(branch));
-    return 1;
-  }
-
-  if (sync(it) === 1) {
-    console.error(`Resolve the conflict on ${branch}, then read the brief again.`);
-    return 1;
-  }
-
-  console.log(`You are on ${branch}, and it now stands at ${HELD}.`);
-  console.log(`Write your result into ${BRIEF}, then run ./RUNME.sh branch done.\n`);
-  console.log(brief.trim());
-  return 0;
-}
-
 // The take names why the push came back, because a race is one road and a door turning it away is another, and a reader clears each one differently. [[spec/design_output/work#the-take-writes-the-record]]
 function refusedPush(branch) {
   return [
@@ -392,30 +334,22 @@ function claimGroup(it, one) {
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
 
+// [[spec/design_output/work#a-group-is-a-ticket]]
 function finish(it) {
   const branch = workBranchHere(it, "done");
   if (!branch) return 2;
-  // [[spec/design_output/work#a-brief-drains-first]]
   const name = ticketNamed(branch);
   const at = ticketAt(name);
-  const group = it.join(it.root, at);
-  const brief = it.join(it.root, BRIEF);
-  const path = it.disk.exists(brief) ? brief : group;
+  const path = it.join(it.root, at);
   if (!it.disk.exists(path)) {
-    console.error(`Write your result to ${BRIEF} first. It is what comes back.`);
+    console.error(`${branch} carries no ${at}, so there is nothing to hand back.`);
     return 2;
   }
 
   const stopped = ready(it, branch);
   if (stopped.code) return stopped.code;
 
-  if (path === group) return leaves(it, branch, at, path, stopped.says);
-
-  if (!push(it, branch, setStatus(it.disk.read(path), DONE), DONE)) return 1;
-  console.log(`${branch} stands at ${DONE}, and ${stopped.says}.`);
-  console.log(`Run ./RUNME.sh branch merge ${name} from ${TRUNK}.`);
-  console.log("A cloud box stops here, because the harness holds trunk shut.");
-  return 0;
+  return leaves(it, branch, at, path, stopped.says);
 }
 
 // [[spec/design_output/work#trunk-comes-in-last-too]]
@@ -502,30 +436,24 @@ function batterySays(it) {
   return saysGreen(stampOf(text), it.git.run(["rev-parse", "HEAD"], true).out);
 }
 
+// [[spec/design_output/work#a-stale-group-is-yours]]
 function release(it, name) {
   const here = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   const branch = name ? `${WORK_BRANCH}${name}` : workBranchHere(it, "release");
   if (!branch || dirty(it, branch)) return 2;
-  const brief = briefOf(it, branch);
   const named = ticketNamed(branch);
-  const ticket = brief ? "" : textAt(it, `origin/${branch}`, ticketAt(named));
-  if (!brief && !isGroup(ticket)) {
-    console.error(`${branch} carries no ${BRIEF} and no group.`);
+  const ticket = textAt(it, `origin/${branch}`, ticketAt(named));
+  if (!isGroup(ticket)) {
+    console.error(`${branch} carries no group at ${ticketAt(named)}.`);
     return 1;
   }
-  const standing = brief ? statusOf(brief) : groupStanding(ticket);
-  if (standing === DONE) {
+  if (groupStanding(ticket) === DONE) {
     console.error(`${branch} stands at ${DONE}. Read it before you reopen it.`);
     return 1;
   }
 
   if (!onBranch(it, branch)) return 1;
-  if (!brief) return letGo(it, branch, named, here);
-  if (!push(it, branch, setStatus(brief, TODO), TODO)) return 1;
-  if (here !== branch) it.git.run(["switch", here], true);
-
-  console.log(`${branch} stands at ${TODO} again, and is free for anybody.`);
-  return 0;
+  return letGo(it, branch, named, here);
 }
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
@@ -551,14 +479,16 @@ function letGo(it, branch, name, here) {
   return 0;
 }
 
+// [[spec/design_output/work#a-group-is-a-ticket]]
 function read(it, name) {
   if (!name) {
     console.error("branch read needs a name: ./RUNME.sh branch read fix-lsp");
     return 2;
   }
-  const said = briefOf(it, `work/${name}`);
-  if (!said) {
-    console.error(`work/${name} carries no ${BRIEF}.`);
+  const at = ticketAt(name);
+  const said = textAt(it, `origin/work/${name}`, at);
+  if (!isGroup(said)) {
+    console.error(`work/${name} carries no group at ${at}.`);
     return 1;
   }
   console.log(said);

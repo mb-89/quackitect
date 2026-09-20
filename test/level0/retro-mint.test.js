@@ -52,10 +52,11 @@ function doors(classes) {
         return { exitCode: 0 };
       },
     "node src/scripts/cli.js ticket open the-land-verb-lands": { exitCode: 0 },
-    "node src/scripts/cli.js mint ticket spec/tickets/a-second-ticket.md --process=standard": {
-      exitCode: 2,
-      stderr: "the ask names a word outside the vocabulary",
-    },
+    "node src/scripts/cli.js mint ticket spec/tickets/a-second-ticket.md --process=standard":
+      {
+        exitCode: 2,
+        stderr: "the ask names a word outside the vocabulary",
+      },
   });
   return { disk, proc, join, root: ROOT };
 }
