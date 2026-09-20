@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -227,6 +227,14 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: ea66db9ca702011de8b7a4b9d495ffb2bf24a30f
     hash_after: ea66db9ca702011de8b7a4b9d495ffb2bf24a30f
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: ed36b0b4867ea98a9fe9e85ecace89555e821df0
+    hash_after: ed36b0b4867ea98a9fe9e85ecace89555e821df0
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -421,7 +429,7 @@ The second class is a hand's, and one block answers it.
 
 ### lint
 
-    ./RUNME.sh lint src/scripts/pull.js src/scripts/pull-route.js src/bridge/stop.js src/bridge/server.js .claude/skills/level0/lib/config.js test/level0/binding.test.js test/contract/stop-rules.test.js
+    ./RUNME.sh lint src/scripts/pull.js src/scripts/pull-route.js src/bridge/stop.js src/bridge/server.js .claude/skills/level0/lib/config.js test/level0/binding.test.js test/level0/stop-door.test.js test/contract/stop-rules.test.js
 
 ### checked
 

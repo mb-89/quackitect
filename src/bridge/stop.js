@@ -290,8 +290,10 @@ export function knowsCheck(name) {
 }
 
 function ranHere(name, held) {
+  // A table answers the keys every object carries, so the read asks it first. [[spec/design_output/stop#the-mechanical-checks]]
+  if (!knowsCheck(name)) return undefined;
   if (standsDown(name, asks(held.box, BINDING))) return false;
-  return CHECKS[name]?.(held);
+  return CHECKS[name](held);
 }
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
