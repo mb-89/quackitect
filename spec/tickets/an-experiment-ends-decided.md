@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -119,6 +119,17 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote · helper-6
     hash_before: 6821c12e0e2ce4b4cbdd6d5855e255a1283d8e30
     hash_after: 6821c12e0e2ce4b4cbdd6d5855e255a1283d8e30
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 647f73e8f0b658879fb8cd48ef122f9f4d32a978
+    hash_after: 647f73e8f0b658879fb8cd48ef122f9f4d32a978
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -229,20 +240,35 @@ Findings, one a line:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/experiment.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The command answers assertion, and each case fails on its own assertion.
+
+| the case | what it holds open |
+|---|---|
+| the audit names each open trial | `openTrials` stands nowhere |
+| the audit step holds over one, and passes over none | the verb answers no `audit` |
+| the process a trial names | `EXPERIMENT` stands nowhere |
+
+The hold reads the way `notes` reads the private folder, and that one walks a folder. This one walks the tickets and reads a field, because a trial stands under `spec/tickets` beside every other ticket. So the reader asks the process a ticket names.
+
+That surprises me. The two holds of the retro look alike from the route, and they part at the reader. One asks where a ticket stands, and the other asks what process it runs.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. One case file and this ticket.
+- every door the change reaches has a fake. Each case hands the retro its own disk and its own log.
+- a comment names the approach the change implements. The file's header names the hold, and each case points at this ticket.
 
 ## reflect
 
