@@ -7,8 +7,8 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  brandOf,
   brandedJson,
+  brandOf,
   emptyBrand,
 } from "../../.claude/skills/level0/lib/vehicle.js";
 import { disk } from "../doors/disk.js";
@@ -18,15 +18,37 @@ export const PLUGIN = ".claude/skills/level0/.claude-plugin/plugin.json";
 export const ICON_SOURCE = "spec/config/brand/icon.svg";
 export const ICON_TARGET = "src/extension/icon.svg";
 
+// The shape each manifest takes where none stands, so a fresh clone carries both and git holds neither. The brand lands through brandedJson. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+const SHAPES = {
+  [MARKETPLACE]: {
+    name: "",
+    owner: { name: "" },
+    plugins: [
+      {
+        name: "level0",
+        description:
+          "Level zero, run from the vehicle's own folder. A stub names this folder as a marketplace and enables the plugin, and carries no copy.",
+        source: "./.claude/skills/level0",
+      },
+    ],
+  },
+  [PLUGIN]: {
+    name: "level0",
+    description:
+      "Level zero: the rules that shape what the agent writes, taken inside the harness process, and the pull as a tool with the judge behind it. The voice rules hold at the write door on turn one of a clone that has never been built.",
+    author: { name: "" },
+  },
+};
+
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 export function stamps(files, root, brand) {
   const done = [];
   for (const rel of [MARKETPLACE, PLUGIN]) {
     const at = join(root, ...rel.split("/"));
-    const was = readIf(files, at);
-    if (was === null) continue;
+    const was = readIf(files, at) ?? JSON.stringify(shapeOf(files, root, rel));
     const made = brandedJson(was, brand);
     if (made === was) continue;
+    files.makeDir(dirname(at));
     files.write(at, made);
     done.push(rel);
   }
@@ -39,6 +61,18 @@ export function stamps(files, root, brand) {
     done.push(ICON_TARGET);
   }
   return done;
+}
+
+// The plugin's version is the tree's own, read off package.json. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+function shapeOf(files, root, rel) {
+  const shape = SHAPES[rel];
+  if (rel !== PLUGIN) return shape;
+  try {
+    const { version } = JSON.parse(readIf(files, join(root, "package.json")));
+    return version ? { ...shape, version } : shape;
+  } catch {
+    return shape;
+  }
 }
 
 function readIf(files, at) {

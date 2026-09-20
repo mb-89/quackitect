@@ -5,7 +5,9 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -24,6 +26,8 @@ const (
 	bridgeWait = 3 * time.Minute
 	// The pause between two asks while no bridge answers yet, so the panel fills once one stands. [[spec/design_output/lsp#the-panel-reads-the-battery]]
 	bridgeRetry = 5 * time.Second
+	// The pause after the last change before the bridge reads the buffer, so a burst of typing costs one ask. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+	lintQuiet = time.Second
 )
 
 // The source a finding comes from, so an open file leaves Biome to its own server. [[spec/design_output/lsp]]
@@ -55,9 +59,32 @@ func bridgeFindings(root string, paths []string) ([]Finding, bool) {
 		return nil, false
 	}
 	defer answer.Body.Close()
+	return decoded(answer.Body)
+}
 
+// Asks the bridge over the buffers the editor holds, as they stand, and answers false where no bridge answers. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+func bridgeHeld(root string, held map[string]string) ([]Finding, bool) {
+	list := []map[string]string{}
+	for path, text := range held {
+		list = append(list, map[string]string{"path": path, "text": text})
+	}
+	body, err := json.Marshal(map[string]any{"held": list})
+	if err != nil {
+		return nil, false
+	}
+	where := "http://127.0.0.1:" + strconv.Itoa(portOf(root)) + findingsRoute
+	client := http.Client{Timeout: bridgeWait}
+	answer, err := client.Post(where, "application/json", bytes.NewReader(body))
+	if err != nil {
+		return nil, false
+	}
+	defer answer.Body.Close()
+	return decoded(answer.Body)
+}
+
+func decoded(body io.Reader) ([]Finding, bool) {
 	var said bridgeAnswer
-	if err := json.NewDecoder(answer.Body).Decode(&said); err != nil || !said.OK {
+	if err := json.NewDecoder(body).Decode(&said); err != nil || !said.OK {
 		return nil, false
 	}
 	return said.Found, true

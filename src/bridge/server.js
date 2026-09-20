@@ -4,8 +4,8 @@
 
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { BINDING, GOD } from "../../.claude/skills/level0/lib/config.js";
+import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { awake } from "../doors/awake.js";
@@ -17,6 +17,7 @@ import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
 import { wire } from "../doors/wire.js";
+import { projectionsHere, sourcesOf } from "../engine/projection.js";
 import {
   holdsForAnswer,
   onAgentSpoke,
@@ -29,7 +30,7 @@ import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
 import { asks } from "./config.js";
-import { FINDINGS, findingsFor } from "./findings.js";
+import { FINDINGS, findingsFor, heldFor } from "./findings.js";
 import {
   onAgentSpawn,
   onPromptContext,
@@ -40,10 +41,9 @@ import {
   owesCanary,
   surveyHere,
 } from "./guidance.js";
-import { projectionsHere, sourcesOf } from "../engine/projection.js";
 import { freshens } from "./projection.js";
-import { movedCode } from "./reload.js";
 import { SPECS as proseSpecs, TOOLS as proseTools } from "./prose.js";
+import { movedCode } from "./reload.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import {
   ANSWERED,
@@ -278,6 +278,21 @@ export function serve(method, port = PORT_BASE, say = console.log) {
             found: [],
             fault: String(error?.message ?? error),
           }),
+      );
+      return;
+    }
+    // A buffer the editor holds reads here as typed, so no source waits for a save. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+    if (request.method === "POST" && request.url === FINDINGS) {
+      readBody(request, (body) =>
+        heldFor(own, body).then(
+          (said) => answer(response, OK, said),
+          (error) =>
+            answer(response, OK, {
+              ok: false,
+              found: [],
+              fault: String(error?.message ?? error),
+            }),
+        ),
       );
       return;
     }

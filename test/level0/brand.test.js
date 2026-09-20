@@ -81,7 +81,10 @@ test("the shim names the vehicle a marketplace, and enables the brand's plugin",
 
 test("the shim keeps every key the settings already hold", () => {
   assert.equal(typeof shimSettings, "function", "vehicle.js answers shimSettings");
-  const was = JSON.stringify({ env: { A: "1" }, enabledPlugins: ["other@old"] });
+  const was = JSON.stringify({
+    env: { A: "1" },
+    enabledPlugins: ["other@old"],
+  });
   const held = JSON.parse(shimSettings(was, "/vehicles/acme", "acme"));
   assert.deepEqual(held.env, { A: "1" });
   assert.ok(held.enabledPlugins.includes("other@old"), "the standing id stays");
@@ -108,8 +111,14 @@ test("a vehicle whose folder slugs to nothing refuses the stub, and writes nothi
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 test("the stamp writes the brand into the marketplace, the plugin and the icon", () => {
   const files = fakeDisk({
-    [join("/v", MARKETPLACE)]: JSON.stringify({ name: "old", owner: { name: "old" } }),
-    [join("/v", PLUGIN)]: JSON.stringify({ name: "level0", author: { name: "old" } }),
+    [join("/v", MARKETPLACE)]: JSON.stringify({
+      name: "old",
+      owner: { name: "old" },
+    }),
+    [join("/v", PLUGIN)]: JSON.stringify({
+      name: "level0",
+      author: { name: "old" },
+    }),
     [join("/v", ICON_SOURCE)]: "<svg/>",
   });
   const done = stamps(files, "/v", "acme");
@@ -120,9 +129,16 @@ test("the stamp writes the brand into the marketplace, the plugin and the icon",
   assert.equal(files.read(join("/v", ICON_TARGET)), "<svg/>");
 });
 
+const BRANDED = {
+  [join("/v", MARKETPLACE)]:
+    `${JSON.stringify({ name: "acme", owner: { name: "acme" } }, null, 2)}\n`,
+  [join("/v", PLUGIN)]:
+    `${JSON.stringify({ name: "level0", author: { name: "acme" } }, null, 2)}\n`,
+};
+
 test("a stamp over a tree already reading the brand writes nothing", () => {
   const files = fakeDisk({
-    [join("/v", MARKETPLACE)]: `${JSON.stringify({ name: "acme", owner: { name: "acme" } }, null, 2)}\n`,
+    ...BRANDED,
     [join("/v", ICON_SOURCE)]: "<svg/>",
     [join("/v", ICON_TARGET)]: "<svg/>",
   });
@@ -130,7 +146,26 @@ test("a stamp over a tree already reading the brand writes nothing", () => {
 });
 
 test("a tree carrying no brand icon leaves the extension's own alone", () => {
-  const files = fakeDisk({ [join("/v", ICON_TARGET)]: "<svg id='own'/>" });
+  const files = fakeDisk({
+    ...BRANDED,
+    [join("/v", ICON_TARGET)]: "<svg id='own'/>",
+  });
   assert.deepEqual(stamps(files, "/v", "acme"), []);
   assert.equal(files.read(join("/v", ICON_TARGET)), "<svg id='own'/>");
+});
+
+// Git holds neither manifest, so a fresh clone gets both off the stamp. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+test("a fresh clone gets both manifests off the stamp, reading the brand and the tree's version", () => {
+  const files = fakeDisk({
+    [join("/v", "package.json")]: '{"version":"0.1.0"}',
+  });
+  assert.deepEqual(stamps(files, "/v", "acme"), [MARKETPLACE, PLUGIN]);
+  const market = JSON.parse(files.read(join("/v", MARKETPLACE)));
+  assert.equal(market.name, "acme");
+  assert.equal(market.plugins[0].source, "./.claude/skills/level0");
+  const plugin = JSON.parse(files.read(join("/v", PLUGIN)));
+  assert.equal(plugin.name, "level0");
+  assert.equal(plugin.author.name, "acme");
+  assert.equal(plugin.version, "0.1.0");
+  assert.deepEqual(stamps(files, "/v", "acme"), []);
 });
