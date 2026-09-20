@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: bde5798a60bb1aedcd14793f4102e8e81173e080
     returns: 1
     why: "the span `--since` takes has an owner already: `spanOf` under `src/scripts/group.js`, which `work.staleAfter` reads. The lib table names none, so an implementer writes a second parser; the flags table stands on this ticket, and the approach sends the same table into the design output. Say which of the two owns it, and point the other at it; the chapter the design output takes carries no title, so a reader finds no place for it; the ask names `./RUNME.sh test`, and the approach names no case file the filters land in; the ask's install line already holds: `./RUNME.sh branch list` on a warm box prints none of it. Say that, and name the case holding it there; the two tables read true: every name under `.claude/skills/level0/lib/log.js` exports, and `src/scripts/cli.js` holds the verbs map the verb joins"
+  - step: design/draft
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 9841e79a0915ff919c359a251a0f1f01a5bc5332
+    hash_after: 9841e79a0915ff919c359a251a0f1f01a5bc5332
 ---
 
 # Ask
@@ -127,30 +131,32 @@ Each reading costs a fresh inline script, and the same filter goes in again and 
 
 `./RUNME.sh log` reads the session log through the lib that writes it, and the filters compose.
 
-| the flag | what it reads |
-|---|---|
-| `--since <span>` | the lines stamped inside the span, such as `10m` or `2h` |
-| `--level <name>` | the lines at that level and above, through `writes` |
-| `--kind <name>` | the lines of that kind |
-| `--last <count>` | the last lines, after every filter above |
+| the flag | what it reads | the owner it calls |
+|---|---|---|
+| `--since <span>` | the lines stamped inside the span | `spanOf`, under `src/scripts/group.js` |
+| `--level <name>` | the lines at that level and above | `writes` and `rank` |
+| `--kind <name>` | the lines of that kind | the row's own field |
+| `--last <count>` | the last lines, after every filter above | the verb itself |
 
-`src/scripts/log-verb.js` holds the verb, and `src/scripts/cli.js` names it beside the others. The lib under `.claude/skills/level0/lib/log.js` already answers each piece:
+`src/scripts/log-verb.js` holds the verb, and `src/scripts/cli.js` names it in the verbs map. The lib under `.claude/skills/level0/lib/log.js` answers each remaining piece:
 
 | what the verb needs | what the lib names |
 |---|---|
 | the file, and the rotated ones | `SESSION` and `OLD` |
 | the lines out of the text | `rowsOf` |
-| the level ladder | `writes` and `rank` |
 | the row a reader sees | `asRow` |
 | the span a rotated file covers | `timeOf` |
 
 So the verb reads doors and composes, and it writes no shape of its own.
 
-- a hand asking which kind fills the log runs `./RUNME.sh log --kind hook --last 20`
-- `install.sh` writes a line where it installs one, so a warm box answers with none
-- the cases drive each filter over rows in memory, because the lib takes text and answers rows
+Where each thing stands after:
 
-[[spec/design_output/log]] takes a chapter naming the verb and its flags.
+- `spec/design_output/log.md` takes the chapter `One verb reads the log`, which owns the flags table
+- this approach's copy is the draft that chapter takes, and no second copy lands
+- `test/level0/log-verb.test.js` holds the cases, one a filter, over rows in memory
+- the install line already holds: `install.sh` guards both its lines on `$missing`, so a warm box says nothing
+
+A hand asking which kind fills the log runs `./RUNME.sh log --kind hook --last 20`.
 
 ## review
 
