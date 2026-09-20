@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -128,6 +128,10 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: f675c71cc3f09695a133b1712807d5f8478b298a
     hash_after: f675c71cc3f09695a133b1712807d5f8478b298a
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-7
+    hash_before: 0c67da24f8ba825b2705465c78cf10e665e61b47
+    hash_after: 0c67da24f8ba825b2705465c78cf10e665e61b47
 ---
 
 # Ask
@@ -233,9 +237,16 @@ answer rules reach the answer gate alone, which holds them already.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- Name the note beside the number in a label. A leaf reads several notes, and the material flattens them. So chapter numbering hands the classify call two labels under one number, and a refusal names two rules.
+- the label carries the note's path and the number, so one label reaches one rule
+- `forEvidence` keeps the chapter's number, so a refusal names the line the note holds
+- the mark writes `^`, and `actionables` strips it the way it strips the star
+- the schema row and the [[spec/design_output/pull#the-checks]] row stand in the table
+- a leaf whose rules all carry the mark hands an empty list, and the judge stands silent
+- the diff touches this ticket alone
+- `./RUNME.sh check` answers 0
+- the handback carries no retro, which the branch owes at done
 
 # implement
 
