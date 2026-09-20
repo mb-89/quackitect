@@ -5,9 +5,9 @@ status: done
 
 # Where it stands
 
-The branch closes seven tickets of `the-rules-hold-themselves`, and an eighth
-stands at its verdict. The tip stands green: `./RUNME.sh check` answers 0 on
-two runs of 23 seconds each, with no rule timing out.
+The branch closes eight tickets of `the-rules-hold-themselves`. The tip stands
+green: `./RUNME.sh check` answers 0, `./RUNME.sh lint spec` answers 0 in under
+seven seconds, and `branch review` says nothing waits.
 
 | ticket | what lands |
 |---|---|
@@ -18,7 +18,7 @@ two runs of 23 seconds each, with no rule timing out.
 | `runtime-half-takes-the-rest` | the register stands under the runtime half |
 | `a-project-adds-vale-rules` | the styles of both roots assemble, and the vale door reads them |
 | `a-check-finds-every-writer` | the escape binds to the line, and the installer meets its lists |
-| `a-check-finds-restated-facts` | three rules find one fact written in two places |
+| `a-check-finds-restated-facts` | three rules find one fact written in two places, and one pass answers every path |
 
 Each one carries its evidence on its ticket. A hand other than the one making
 the change passes every verdict.

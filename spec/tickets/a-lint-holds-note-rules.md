@@ -89,12 +89,18 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 57005e0893d436fc164ecbaafdff228c38b608bb
     hash_after: 57005e0893d436fc164ecbaafdff228c38b608bb
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-2
+    hash_before: 1674b8341abf3251dda3e726d5336b8e8f823ed4
+    hash_after: 1674b8341abf3251dda3e726d5336b8e8f823ed4
+    returns: 1
+    why: "| the finding | what to do |; |---|---|; | `matches: explains` in the rationale schema owns the star-to-chapter rule | Read that key in `underFaults`, and drop `StarNeedsSection` |; | The paragraph schema names no bad word, by its own header | Put the `History` markers beside `Antithesis.yml` |; | `.vale.ini` switches `PastTense` off over `spec/rationales` | Switch `History` off there the same way |; | `RuleNamesItsFailure` reads one buffer, and `tree.js` holds the pair rules | Put it beside `GuidanceChapter` under `VoiceShape` |; | Four notes star a rule whose rationale opens no chapter | Name the landing for each, below |; | `fault()` writes severity error | Say where the warning stage lives, or drop the stage |; | The failure rule answers rule twelve | Keep rule twelve in the note |; The drift the star rule finds, which the lint at zero wants cleared:; | the note | the starred rule standing with no chapter |; |---|---|; | `spec/guidance/cloud.md` | ten, fourteen, fifteen |; | `spec/guidance/tickets.md` | eight, nine, ten |; | `spec/guidance/working.md` | six, eleven |; | `spec/guidance/code/code.md` | ten |"
 ---
 
 # Ask
@@ -149,6 +155,27 @@ to error in the change leaving the tree clean.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+| the finding | what to do |
+|---|---|
+| `matches: explains` in the rationale schema owns the star-to-chapter rule | Read that key in `underFaults`, and drop `StarNeedsSection` |
+| The paragraph schema names no bad word, by its own header | Put the `History` markers beside `Antithesis.yml` |
+| `.vale.ini` switches `PastTense` off over `spec/rationales` | Switch `History` off there the same way |
+| `RuleNamesItsFailure` reads one buffer, and `tree.js` holds the pair rules | Put it beside `GuidanceChapter` under `VoiceShape` |
+| Four notes star a rule whose rationale opens no chapter | Name the landing for each, below |
+| `fault()` writes severity error | Say where the warning stage lives, or drop the stage |
+| The failure rule answers rule twelve | Keep rule twelve in the note |
+
+The drift the star rule finds, which the lint at zero wants cleared:
+
+| the note | the starred rule standing with no chapter |
+|---|---|
+| `spec/guidance/cloud.md` | ten, fourteen, fifteen |
+| `spec/guidance/tickets.md` | eight, nine, ten |
+| `spec/guidance/working.md` | six, eleven |
+| `spec/guidance/code/code.md` | ten |
 
 # implement
 
