@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: e0e917c2bfbf38d110d363a6555b197e0cecb84a
     hash_after: e0e917c2bfbf38d110d363a6555b197e0cecb84a
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-4
+    hash_before: f5090a0e166b1a0fc90025362269192edd6a80de
+    hash_after: f5090a0e166b1a0fc90025362269192edd6a80de
+    returns: 2
+    why: The Go section names `src/lsp/doors.go`, and that file stands nowhere.; `src/viewer` and `src/index` each call theirs `door.go`. Take that name.; The Go reading reaches `src/viewer`, `src/index` and `src/swap` too. The; approach names a section for none of the three. Each package imports `os` in; several files at once. So one door file a package leaves the rule refusing; every other file of it. Say which file of each package names the outside, and; how the rest of the package reaches it.; `src/extension/extension.js` reads the platform. `.vale.ini` stands off; `editor*.js` alone, and the extension reaches no door under `src/doors`. Put; it in the pass list, beside the editor files.; `src/scripts/editor.js` reads the environment on its entry line, and; `cli*.js` misses it. Put it in one of the two tables.; The three findings of the round before stand answered. The pass list moves to; `.vale.ini`, the Go section carries a name, and the module table says what; each read takes. `process.platform` riding down from a root holds.; `src/extension/node_modules` stays out of reach, because the index skips it.
 ---
 
 # Ask
@@ -182,19 +188,22 @@ answers clean, and the rule names every read a later hand writes.
 
 fail
 
-- The approach puts the pass list in `DoorsOnly.yml`. A rule there reads the
-  raw text of a file alone, so a list of roots in the rule file stands unread.
-  `.vale.ini` owns that fact already, in the sections standing the rule off
-  `src/doors` and the editor files. Put the roots there.
-- The approach gives `src/lsp` a door file and names no section standing the
-  Go reading off it. Name it, beside the sections `.vale.ini` already holds.
-- The approach hands the reads outside the two the ask names to the implement
-  step. The ask asks for a clean `./RUNME.sh lint src`, so say which of them
-  move behind a door and which take the value off the hand. A read of
-  `process.platform` that builds a path is the case the criterion leaves open.
-- The rest holds. `DoorsOnly.yml` stands, and `.vale.ini` runs it over `.go`
-  beside `.js`. The hand `src/scripts/cli-doors.js` builds carries `env`, so
-  the two reads the ask names take `it.env` and `box.env` as written.
+- The Go section names `src/lsp/doors.go`, and that file stands nowhere.
+  `src/viewer` and `src/index` each call theirs `door.go`. Take that name.
+- The Go reading reaches `src/viewer`, `src/index` and `src/swap` too. The
+  approach names a section for none of the three. Each package imports `os` in
+  several files at once. So one door file a package leaves the rule refusing
+  every other file of it. Say which file of each package names the outside, and
+  how the rest of the package reaches it.
+- `src/extension/extension.js` reads the platform. `.vale.ini` stands off
+  `editor*.js` alone, and the extension reaches no door under `src/doors`. Put
+  it in the pass list, beside the editor files.
+- `src/scripts/editor.js` reads the environment on its entry line, and
+  `cli*.js` misses it. Put it in one of the two tables.
+- The three findings of the round before stand answered. The pass list moves to
+  `.vale.ini`, the Go section carries a name, and the module table says what
+  each read takes. `process.platform` riding down from a root holds.
+  `src/extension/node_modules` stays out of reach, because the index skips it.
 
 # implement
 
