@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 78f9a22d83b1eafd9aae8b88d1376cf6e2f9764e
     returns: 1
     why: "`seen` asks the server before `starts` runs, so every cloud session start draws a chat line; the draft scopes itself to a fall under a running session, and the change reaches the session start too; the case table wants a row for the session start, or `down` wants a guard on that event; line 47 of `spec/design_output/level0.md` carries the claim the change overturns, and the change table leaves it out; line 96 of that chapter reads the first cloud event as a log row alone, so it drifts too; `saidDown` takes the answer of `wrote`, so a failing log write repeats the line each event; what stands: `serverLine` answers `none at <the health call>`, and `doctor` prints it under `server`; the tree holds that doctor wording in the code alone, so the plan's case earns its place; the `$.ui.log` route matches `says` in the level one hook, so the helper shape holds; `./RUNME.sh check` answers 0 on this branch, and the retro stands absent"
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 9463ea56e738a5dbf2ef5c90ef8c03697a14bbcf
+    hash_after: 082a68b85767412d83494d654eab1d63124e67be
 ---
 
 # Ask
