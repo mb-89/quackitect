@@ -3,7 +3,9 @@
 // [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import { test } from "node:test";
+import { disk } from "../../src/doors/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { proc } from "../../src/doors/proc.js";
 
@@ -48,6 +50,44 @@ test("a start answers what a run answers, in the real door and the fake alike", 
     }),
   );
   assert.deepEqual(fake, real);
+});
+
+// A respawn watched for a window: a child ending inside it answers its exit, and one standing past it answers no fall. [[spec/design_output/level0#a-restart-watches-its-child]]
+const LIVES = [process.execPath, "-e", "setTimeout(() => {}, 3000)"];
+const FALL_WAIT = 3000;
+const STAND_WAIT = 200;
+
+test("a respawn answers a fall inside the window, and none past it, in the real door and the fake alike", async () => {
+  const respawned = async (door) => [
+    await door.respawn(FAILS, { waitMs: FALL_WAIT }),
+    await door.respawn(LIVES, { waitMs: STAND_WAIT }),
+  ];
+  const real = await respawned(proc());
+  assert.deepEqual(real, [
+    { fell: true, exitCode: 3 },
+    { fell: false, exitCode: null },
+  ]);
+  const fake = await respawned(
+    fakeProc({
+      [FAILS.join(" ")]: { exitCode: 3 },
+      [LIVES.join(" ")]: { stands: true },
+    }),
+  );
+  assert.deepEqual(fake, real);
+});
+
+// The child's words outlive the door's own process, so they land in the file the caller names. [[spec/design_output/level0#a-restart-watches-its-child]]
+test("a respawn writes the child's output into the file it is handed", async () => {
+  const files = disk();
+  const out = join(files.tempDir("respawn-"), "serve.log");
+  const SAYS_AND_FALLS = [
+    process.execPath,
+    "-e",
+    "console.error('the disk answers nothing'); process.exit(3)",
+  ];
+  const said = await proc().respawn(SAYS_AND_FALLS, { out, waitMs: FALL_WAIT });
+  assert.equal(said.fell, true);
+  assert.match(files.read(out), /the disk answers nothing/);
 });
 
 test("the fake refuses a command nobody taught it", () => {
