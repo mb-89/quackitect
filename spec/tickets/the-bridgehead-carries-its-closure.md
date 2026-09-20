@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -107,6 +107,11 @@ record:
     hand: box 201f76ea75a2 · claude-code-remote
     hash_before: f550532b04c55ebcb04b82315f62d0ba433b208d
     hash_after: f550532b04c55ebcb04b82315f62d0ba433b208d
+  - step: retro/cloud
+    hand: box 201f76ea75a2 · claude-code-remote
+    hash_before: 49946158086e4dd12c0ce7d49058d6c5c63dd4d1
+    hash_after: 49946158086e4dd12c0ce7d49058d6c5c63dd4d1
+reason: done
 ---
 
 # Ask
