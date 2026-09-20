@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -130,6 +130,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 86b8e099600d03c578aa8838a503feb44ea35035
+    hash_after: 86b8e099600d03c578aa8838a503feb44ea35035
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -271,14 +279,18 @@ The span case names the scale the review asks about. A row's stamp answers milli
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src test
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the verb, the read, the cases and the chapter the approach names
+- the disk and the clock reach the verb as doors, and `fakeDisk` drives the cases
+- each header points at the chapter the approach names, and that chapter owns the flags
 
 ## tests-green
 

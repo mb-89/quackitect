@@ -89,6 +89,8 @@ export function tuiDoors() {
     viewer: viewerHere,
     names: namesIn,
     show,
+    // The log verb reads a span against now, and a door answers the clock. [[spec/guidance/code/testing]]
+    clock: it.clock,
   };
 }
 

@@ -144,6 +144,10 @@ export const verbs = {
     says: "the window this tree builds: the log, the work, and a tab it opens on",
     run: async () => (await import("./tui.js")).openTui(tuiDoors(), rest),
   },
+  log: {
+    says: "the session log, narrowed by span, level, kind and count",
+    run: async () => (await import("./log-verb.js")).logVerb(tuiDoors(), rest),
+  },
   serve: {
     says: "the server behind the bridgehead, under the debugger with --inspect",
     run: async () => serveBridge(rest),

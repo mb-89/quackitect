@@ -9,6 +9,8 @@ export const FOLDER = LOG;
 export const SESSION = `${FOLDER}/session.jsonl`;
 export const OLD = `${FOLDER}/old`;
 export const LOG_TOOL = "log";
+// A stamp answers milliseconds, and a span answers seconds, so a reader crossing the two multiplies by this. [[spec/design_output/log#one-verb-reads-the-log]]
+export const MS = 1000;
 
 // [[spec/design_output/log#an-answer-stands-in-chat]]
 export const ANSWER_KIND = "answer";

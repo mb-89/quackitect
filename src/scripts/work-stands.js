@@ -3,6 +3,7 @@
 // stand in work.js and work-merge.js beside this file.
 // [[spec/design_output/work#a-group-is-a-ticket]]
 
+import { MS } from "../../.claude/skills/level0/lib/log.js";
 import { isTagged, reaches } from "../../.claude/skills/level0/lib/todo.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import {
@@ -20,7 +21,7 @@ import {
 import { asText, framed, namesIn, REF_FORMAT, refsIn } from "./work-read.js";
 
 export const COL = { branch: 34, child: 32, place: 6, status: 6, why: 24 };
-export const MS = 1000;
+export { MS };
 // [[spec/design_output/work#a-merged-branch-closes]]
 export const MINE = /^(work|claude)\//;
 export const TODO = "todo";

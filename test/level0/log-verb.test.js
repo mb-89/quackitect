@@ -36,7 +36,11 @@ test("a span keeps the rows stamped inside it, and drops the ones before", () =>
     "the door refuses a write",
     "two lines come back",
   ]);
-  assert.deepEqual(said(within(rows, "15m", NOW)), ["two lines come back"]);
+  assert.deepEqual(said(within(rows, "15m", NOW)), [
+    "the door refuses a write",
+    "two lines come back",
+  ]);
+  assert.deepEqual(said(within(rows, "5m", NOW)), ["two lines come back"]);
   assert.deepEqual(said(within(rows, "1d", NOW)).length, 4);
 });
 

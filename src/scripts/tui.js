@@ -4,14 +4,9 @@
 // prints the rows plain instead.
 // [[spec/design_output/viewer#the-verb-builds-it]]
 
-import {
-  asRow,
-  FOLDER as LOG_FOLDER,
-  OLD,
-  rowsOf,
-  SESSION,
-} from "../../.claude/skills/level0/lib/log.js";
+import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { PORT } from "../bridge/window.js";
+import { asRow, filesFor, rowsIn, SESSION } from "./log-read.js";
 
 export const TABS = ["log", "work"];
 
@@ -62,23 +57,19 @@ const WAIT = 500;
 
 // [[spec/design_output/viewer#the-verb-builds-it]]
 function plainRows(it, argv, session, plain) {
-  const old = it.join(it.root, OLD);
-  const read = [
-    ...(argv.includes("--all") && it.disk.exists(old)
-      ? it
-          .names(old, ".jsonl")
-          .sort()
-          .map((name) => it.join(old, name))
-      : []),
-    ...(it.disk.exists(session) ? [session] : []),
-  ];
+  // The read over the log stands in log-read.js, and the log verb calls the same one. [[spec/design_output/log#one-verb-reads-the-log]]
+  const read = argv.includes("--all")
+    ? filesFor(it, "", 0)
+    : it.disk.exists(session)
+      ? [session]
+      : [];
   if (!read.length) {
     console.log("No log stands yet. A writer starts one the next time it says a line.");
     return 0;
   }
   for (const path of read) {
     console.log(it.show(path));
-    for (const one of rowsOf(it.disk.read(path))) console.log(asRow(one));
+    for (const one of rowsIn(it, [path])) console.log(asRow(one));
   }
   if (!plain) {
     console.log("");

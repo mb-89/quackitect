@@ -1,10 +1,12 @@
 // The read over the session log and the rotated files beside it, and the four
-// narrow filters a caller composes over the rows it answers.
+// narrow filters a caller composes over the rows it answers. The verb over
+// them stands in log-verb.js.
 // [[spec/design_output/log#one-verb-reads-the-log]]
 
 import {
+  asRow,
+  MS,
   OLD,
-  rank,
   rowsOf,
   SESSION,
   timeOf,
@@ -12,31 +14,52 @@ import {
 } from "../../.claude/skills/level0/lib/log.js";
 import { spanOf } from "./group.js";
 
-// A span answers seconds, and a row's stamp answers milliseconds. [[spec/design_output/log#one-verb-reads-the-log]]
-export const MS = 1000;
+const END = ".jsonl";
 
+// [[spec/design_output/log#one-verb-reads-the-log]]
 export function within(rows, span, now) {
-  return rows;
+  const seconds = spanOf(span);
+  if (!seconds) return rows;
+  const from = now - seconds * MS;
+  return rows.filter((one) => Date.parse(String(one.at)) >= from);
 }
 
+// [[spec/design_output/log#what-a-box-writes]]
 export function atLevel(rows, level) {
-  return rows;
+  if (!level) return rows;
+  return rows.filter((one) => writes(level, one.level));
 }
 
+// [[spec/design_output/log#one-verb-reads-the-log]]
 export function ofKind(rows, kind) {
-  return rows;
+  if (!kind) return rows;
+  return rows.filter((one) => String(one.kind) === String(kind));
 }
 
+// [[spec/design_output/log#one-verb-reads-the-log]]
 export function lastOf(rows, count) {
-  return rows;
+  const many = Number(count);
+  if (!Number.isFinite(many) || many <= 0) return rows;
+  return rows.slice(-many);
 }
 
+// A rotated file carries its first stamp in its name, so a span opens the ones it reaches. [[spec/design_output/log#a-session-rotates-its-file]]
 export function filesFor(it, span, now) {
-  return [];
+  const old = it.join(it.root, OLD);
+  const seconds = spanOf(span);
+  const from = seconds ? now - seconds * MS : 0;
+  const rotated = it.disk.exists(old) ? it.names(old, END).sort() : [];
+  const out = rotated
+    .filter((name) => !from || timeOf(name) >= from)
+    .map((name) => it.join(old, name));
+  const here = it.join(it.root, SESSION);
+  if (it.disk.exists(here)) out.push(here);
+  return out;
 }
 
+// [[spec/design_output/log#one-verb-reads-the-log]]
 export function rowsIn(it, paths) {
   return paths.flatMap((path) => rowsOf(it.disk.read(path)));
 }
 
-export { OLD, rank, rowsOf, SESSION, timeOf, writes, spanOf };
+export { asRow, OLD, SESSION };

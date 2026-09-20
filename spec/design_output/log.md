@@ -160,6 +160,28 @@ named by the time of its first line, and starts `session.jsonl` empty:
 empties the session file. The log keeps every session, and the viewer shows the
 current one alone.
 
+# One verb reads the log
+
+`./RUNME.sh log` answers the rows the log holds, narrowed by four flags:
+
+| the flag | what it reads | the owner it calls |
+|---|---|---|
+| `--since <span>` | the rows whose stamp falls inside the span | `spanOf`, under `src/scripts/group.js` |
+| `--level <name>` | the rows at that level and above | `writes` and `rank` |
+| `--kind <name>` | the rows of that kind | the row's own field |
+| `--last <count>` | the last rows, after every filter above | the verb itself |
+
+`src/scripts/log-read.js` owns the read over the session file and the rotated
+ones, and `tui --plain` calls the same one. The verb narrows what that read
+answers, and prints each row through `asRow`.
+
+A span answers seconds, and a row's stamp answers milliseconds. `MS` beside
+`timeOf` in `lib/log.js` crosses the two, and every reader takes it from there.
+
+The window's filter language stands elsewhere, and these flags reach for none of
+it. Go owns that language, and this verb runs in node before any Go build
+stands. For details, see [[spec/design_output/viewer#the-filter-language]].
+
 # The log tool
 
 Level zero registers `mcp__level0__log`. The agent calls it with a kind and one
