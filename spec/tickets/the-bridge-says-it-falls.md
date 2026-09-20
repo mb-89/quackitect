@@ -323,11 +323,17 @@ switch is what reads a fall apart from a server standing down from the start.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the bridgehead, its cases, and the chapters naming the old claim
+- the bridgehead meets a fake wire, a fake file system and a fake chat log
+- the chapter The bridge says it falls carries the road, and each new line points there
 
 ## tests-green
 

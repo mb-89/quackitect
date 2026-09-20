@@ -24,6 +24,8 @@ let port = PORT;
 let root = "";
 let method = "";
 let saidDown = false;
+// The chat line stands apart from the row, so a session start writing the row still leaves the line to say. [[spec/design_output/level0#the-bridge-says-it-falls]]
+let toldDown = false;
 let started = false;
 let stepText = "";
 // What the start road answered where it stood down, so the first prompt says the cage is missing. [[spec/design_output/level0#a-session-says-its-cage]]
@@ -189,6 +191,7 @@ async function ask($, event, e, next) {
     });
     if (!said.ok) throw new Error(`status ${said.status}`);
     saidDown = false;
+    toldDown = false;
     // The server answers, so the cage stands and no block says it is missing. [[spec/design_output/level0#a-session-says-its-cage]]
     cage = null;
     return JSON.parse(said.text || "{}");
@@ -265,14 +268,39 @@ function merged(said, after) {
   return out;
 }
 
+// A fall reaches the person at the moment it falls, beside the row the log takes. The session start says nothing to them, because the start road runs under it. [[spec/design_output/level0#the-bridge-says-it-falls]]
 async function down($, event, error) {
-  if (saidDown) return;
-  saidDown = await wrote($, {
-    level: "warn",
-    said: `the server answers nothing at ${url()}`,
-    event,
-    detail: String(error?.message ?? error),
-  });
+  const why = String(error?.message ?? error);
+  if (!saidDown) {
+    saidDown = true;
+    await wrote($, {
+      level: "warn",
+      said: `the server answers nothing at ${url()}`,
+      event,
+      detail: why,
+    });
+  }
+  if (toldDown || event === "session.start") return;
+  toldDown = true;
+  says($, fellText(why));
+}
+
+// The one line a person reads where the bridge falls. [[spec/design_output/level0#the-bridge-says-it-falls]]
+export function fellText(why) {
+  return [
+    `LEVEL ZERO ANSWERS NOTHING. The server answers nothing at ${url()}, so no`,
+    "rule, no write door and no stop hook reaches this session. It says:",
+    `${String(why ?? "").trim()}.`,
+    "Say so in your next answer, and run ./RUNME.sh serve to start it again.",
+    "Run ./RUNME.sh doctor where that fails, which names what this box holds.",
+  ].join(" ");
+}
+
+// The line reaches the person through the harness, and a harness carrying no such door leaves the row alone. [[spec/design_output/level0#the-bridge-says-it-falls]]
+function says($, line) {
+  try {
+    $.ui.log(line);
+  } catch {}
 }
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]

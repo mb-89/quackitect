@@ -44,7 +44,7 @@ where both roots are one folder.
 | `{ register }` | registers the tools it names, one by one |
 | `{ needs: "reply" }` | posts the step's text and the last texts as `agent.spoke`, and does what that answer says |
 | `{ spawn, back }` | spawns the helper, and posts what it says under the event `back` names |
-| nothing, the server down | hands the event on, and writes one `warn` line, once |
+| nothing, the server down | hands the event on, writes one `warn` line, and says it once in the chat |
 
 The server is plain node under `src/bridge`, one file a topic, and the header
 of each file says which door it holds. `server.js` holds the doors, god mode
@@ -94,7 +94,9 @@ stub's bridgehead keeps a copy, because that file imports nothing.
 The take verb reaches a cloud box that pulls work. A cloud session opening on
 a prompt reaches no verb at all, so the bridgehead carries the same start. The
 session's first event answers nothing, the `warn` line lands, and the start
-road runs once.
+road runs once. That silence says nothing to the person, because the road runs
+under it. For details, see
+[[spec/design_output/level0#the-bridge-says-it-falls]].
 
 The road is one shell line, because the hook imports nothing and stands outside
 node. The shell reads the environment itself and answers a code:
@@ -162,6 +164,36 @@ server. Before it exits, the server writes the error and its stack to the log
 at `fatal`. So the log names why the server falls, and the next start reads
 as a fresh one. A kill from outside the process writes nothing, so a log
 ending on no `fatal` line names a kill.
+
+## The bridge says it falls
+
+A server falling under a running session leaves the doors passing quietly. The
+row naming the fall sits in a file nobody opens, and the check finds it minutes
+later. So the bridgehead says it where a person stands.
+
+| what the bridgehead does | when |
+|---|---|
+| writes one `warn` row naming the health call | the first event the server answers nothing for |
+| says one line in the chat, through `$.ui.log` | the first such event past the session start |
+| drops both marks | the server answers again |
+
+The line names the health call, what the wire says, and the two commands a
+person runs: `./RUNME.sh serve`, and `./RUNME.sh doctor` where that fails.
+
+The session start says nothing to the person. `seen` posts every event to the
+server first, and runs the start road under a `session.start` the server
+answers nothing for. So that silence is the road standing ready, and a line
+there reads false on every healthy cloud start.
+
+| the mark | what it holds |
+|---|---|
+| the row's mark | one row a fall |
+| the chat's mark | one line a fall, standing apart so a session start keeps the line unsaid |
+
+The two marks stand apart, because a session start writes the row and leaves
+the line. A harness offering no `$.ui` leaves the row alone, and nothing
+throws. `./RUNME.sh doctor` names the server under `server`, where a person
+asks after it later.
 
 ## A session says its cage
 

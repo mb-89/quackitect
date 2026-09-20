@@ -47,7 +47,10 @@ function harness({ answers = false, exitCode = 0, stderr = "", ui = true, logs =
     },
   };
   if (ui) $.ui = { log: (line) => said.push(String(line)) };
-  return { wrote, ran, said, $, serves: (on) => void (up = on) };
+  function serves(on) {
+    up = on;
+  }
+  return { wrote, ran, said, $, serves };
 }
 
 // One event through the bridgehead's own door, so a case drives the road event by event. [[spec/tickets/the-bridge-says-it-falls]]
