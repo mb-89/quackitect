@@ -12,14 +12,25 @@ import (
 	"testing"
 )
 
-func changeFrame(uris ...string) json.RawMessage {
-	changes := []map[string]any{}
-	for _, uri := range uris {
-		changes = append(changes, map[string]any{"uri": uri, "type": 2})
-	}
+func changeOf(uri string, kind int) map[string]any {
+	return map[string]any{"uri": uri, "type": kind}
+}
+
+func frameOf(changes ...map[string]any) json.RawMessage {
 	said, _ := json.Marshal(map[string]any{"changes": changes})
 	return said
 }
+
+func changeFrame(uris ...string) json.RawMessage {
+	changes := []map[string]any{}
+	for _, uri := range uris {
+		changes = append(changes, changeOf(uri, changed))
+	}
+	return frameOf(changes...)
+}
+
+// A name past the word cap draws on any path, so a moved file carries a finding wherever it lands. [[spec/tickets/a-move-redraws-both-files]]
+const longName = "one-two-three-four-five-six.md"
 
 func TestInitializedAsksTheEditorToWatchEveryFile(t *testing.T) {
 	tree := sweptTree(t, nil)
@@ -58,14 +69,87 @@ func TestAFileTheDiskMendsLeavesThePanel(t *testing.T) {
 
 func TestAChangeUnderTheFoldersNoRuleReadsRedrawsNothing(t *testing.T) {
 	root := t.TempDir()
-	got := changedIn(root, changeFrame(
+	got, gone := changedIn(root, changeFrame(
 		uriOf(filepath.Join(root, ".se", ".log", "session.jsonl")),
 		uriOf(filepath.Join(root, "node_modules", "x", "a.js")),
 		uriOf(filepath.Join(root, "src", "a.js")),
 		uriOf(filepath.Join(root, "src", "a.js")),
 	))
-	if fmt.Sprint(got) != "[src/a.js]" {
-		t.Fatalf("the change reads %v", got)
+	if fmt.Sprint(got) != "[src/a.js]" || len(gone) != 0 {
+		t.Fatalf("the change reads %v, and drops %v", got, gone)
+	}
+}
+
+// The watcher's own types say which path redraws and which path goes, and a path named twice reads its last type. [[spec/tickets/a-move-redraws-both-files]]
+func TestADeleteAndACreateEachNameTheirPath(t *testing.T) {
+	root := t.TempDir()
+	got, gone := changedIn(root, frameOf(
+		changeOf(uriOf(filepath.Join(root, "src", "old.go")), deleted),
+		changeOf(uriOf(filepath.Join(root, "src", "new.go")), created),
+		changeOf(uriOf(filepath.Join(root, "src", "back.go")), deleted),
+		changeOf(uriOf(filepath.Join(root, "src", "back.go")), created),
+	))
+	if fmt.Sprint(got) != "[src/new.go src/back.go]" || fmt.Sprint(gone) != "[src/old.go]" {
+		t.Fatalf("the change redraws %v, and drops %v", got, gone)
+	}
+}
+
+func TestARenameOnDiskClearsTheOldRowAndDrawsTheNew(t *testing.T) {
+	tree := sweptTree(t, nil)
+	out := &bytes.Buffer{}
+	one := &server{checker: &Checker{tree: tree}, out: out, panel: newPanel()}
+	old := uriOf(filepath.Join(tree.Root, "HANDOVER.md"))
+	moved := uriOf(filepath.Join(tree.Root, longName))
+	one.panel.own["HANDOVER.md"] = one.checker.Over("HANDOVER.md")
+	one.shows(tree, "HANDOVER.md")
+
+	if err := os.Rename(filepath.Join(tree.Root, "HANDOVER.md"), filepath.Join(tree.Root, longName)); err != nil {
+		t.Fatal(err)
+	}
+	one.refreshes(frameOf(changeOf(old, deleted), changeOf(moved, created)))
+
+	drawn := urisDrawn(spoken(t, out.String()))
+	if drawn[old] != 0 {
+		t.Fatalf("the old path still draws %d finding(s)", drawn[old])
+	}
+	if drawn[moved] == 0 {
+		t.Fatal("the new path draws nothing")
+	}
+	if _, held := one.panel.own["HANDOVER.md"]; held {
+		t.Fatal("the server's own list still names the old path")
+	}
+}
+
+func TestADeletedFolderTakesEveryRowUnderIt(t *testing.T) {
+	tree := sweptTree(t, nil)
+	out := &bytes.Buffer{}
+	one := &server{checker: &Checker{tree: tree}, out: out, panel: newPanel()}
+	rows := []string{"src/viewer/a.go", "src/viewer/b.go"}
+	for _, path := range rows {
+		one.panel.own[path] = []Finding{{File: path, Rule: "Gofmt", Line: 1, Column: 1, Severity: SeverityWarning, Source: "tree"}}
+		one.panel.shown[path] = true
+	}
+
+	one.refreshes(frameOf(changeOf(uriOf(filepath.Join(tree.Root, "src", "viewer")), deleted)))
+
+	drawn := urisDrawn(spoken(t, out.String()))
+	for _, path := range rows {
+		uri := uriOf(filepath.Join(tree.Root, path))
+		if said, drew := drawn[uri]; !drew || said != 0 {
+			t.Fatalf("%s draws %d finding(s), drawn %v", path, said, drew)
+		}
+	}
+}
+
+func TestACreatedFolderDrawsEveryFileUnderIt(t *testing.T) {
+	tree := sweptTree(t, map[string]string{"moved/" + longName: standing})
+	out := &bytes.Buffer{}
+	one := &server{checker: &Checker{tree: tree}, out: out, panel: newPanel()}
+
+	one.refreshes(frameOf(changeOf(uriOf(filepath.Join(tree.Root, "moved")), created)))
+
+	if drawn := urisDrawn(spoken(t, out.String())); drawn[uriOf(filepath.Join(tree.Root, "moved", longName))] == 0 {
+		t.Fatal("the file under the new folder draws nothing")
 	}
 }
 

@@ -60,10 +60,17 @@ over the whole tree.
 
 At its start the server asks the editor to watch every file under the root.
 The editor then names each file that changes on disk, whoever changes it: an
-agent, git, or a script. The server redraws each named file off the disk and
-asks the bridge again for it, so a finding leaves once its file passes. An open
-file follows the editor's buffer, and a change under a folder the battery skips
-redraws nothing.
+agent, git, or a script. The server reads the type each change carries.
+
+| the change | what the panel does |
+|---|---|
+| a new or a changed file | redraws it off the disk, and the bridge answers for it again |
+| a deleted file | takes its row with it, and no rule reads it |
+| a folder, on either side | stands for every file under it |
+
+So a finding leaves once its file passes, and a moved folder leaves no row
+behind. An open file follows the editor's buffer, and a change under a folder
+the battery skips redraws nothing.
 
 # The config reads absolute paths
 

@@ -226,6 +226,10 @@ a marketplace, so its `name` and its owner's name take the brand. A file
 carrying an `author` is a plugin, so its author takes the brand and its own
 name stands. A file carrying neither comes back as it stands.
 
+Git holds neither file. Where one stands nowhere, as on a fresh clone, the stamp
+writes it from the shape `src/scripts/brand.js` holds, and the plugin's version
+reads off `package.json`. So every box carries both, and no box commits them.
+
 The extension's icon reads the brand folder. `spec/config/brand/icon.svg` is
 the mark a vehicle draws, and the install script writes it to the path
 `src/extension/package.json` names. Git ignores that target, so one icon

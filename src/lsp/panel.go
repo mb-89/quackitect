@@ -128,19 +128,24 @@ func (one *server) closes(where string) {
 }
 
 func (one *server) showsAll(tree *Tree) {
-	paths := map[string]bool{}
-	for path := range one.panel.own {
-		paths[path] = true
-	}
-	for path := range one.panel.extra {
-		paths[path] = true
-	}
-	for path := range one.panel.shown {
-		paths[path] = true
-	}
-	for path := range paths {
+	for path := range one.panel.paths() {
 		one.shows(tree, path)
 	}
+}
+
+// Every path a list names or a row draws. [[spec/design_output/lsp]]
+func (one *panel) paths() map[string]bool {
+	out := map[string]bool{}
+	for path := range one.own {
+		out[path] = true
+	}
+	for path := range one.extra {
+		out[path] = true
+	}
+	for path := range one.shown {
+		out[path] = true
+	}
+	return out
 }
 
 // An open file leaves Biome to its own server, which draws it as it is typed. Vale stays here, because the battery's list carries the tense reader's veto. [[spec/design_output/lsp]]
