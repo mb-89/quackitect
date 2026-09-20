@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -129,6 +129,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box fa49097ce66c · claude-code-remote · helper-7
+    hash_before: 8448d4f19d68a9476dad9e9d275687dbd652a3c4
+    hash_after: 8448d4f19d68a9476dad9e9d275687dbd652a3c4
+reason: done
 ---
 
 # Ask
@@ -409,17 +414,49 @@ is what shows a hand the line to take out.
 
 <!-- the form is files -->
 
+- .claude/settings.json
+- .claude/skills/level0/lib/vehicle.js
+- spec/design_output/level0.md
+- spec/guidance/review/reviewing.md
+- spec/tickets/the-bridge-says-it-falls.md
+- spec/tickets/the-doctor-probes-every-hook.md
+- src/scripts/cli-check.js
+- src/scripts/cli-doors.js
+- src/scripts/serve.js
+- test/level0/doctor-hooks.test.js
+- test/level0/start-road.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- line one of the ask lands: `hooksNamed` reads the three settings files and keeps `http:` and `https:` alone
+- line two lands: a dead hook reads as `warn: answers nothing at <the address>, off <the file>`
+- line three lands as an argument, because `.gitignore` holds that file and no hunk reaches it
+- this box carries no `.claude/settings.local.json`, so the row a hand acts on is all the tree gives
+- line four lands: `test/level0/doctor-hooks.test.js` holds 12 cases, and one feeds a hook answering nothing
+- `./RUNME.sh check` answers 0 on `8448d4f1`, 1292 cases green and 2 skipped
+- `./RUNME.sh branch review` reads the retro as absent from the handback
+- a mutant dropping the scheme guard turns the command case red, 1 against 11
+- a mutant giving a dead hook the standing row turns two cases red, 2 against 10
+- the nine findings of design/review each land, and the chapter carries the call on line three
+- the diff reaches six files, and every one serves the four lines of the ask
+- the line in `test/level0/start-road.test.js` settles the last ticket's own minor finding, which counts trivial
+- the label takes `URL.host`, so an address on a default port carries no port
+- the chapter reads that label as `hook <host>:<port>`, which stands minor
+- `HEALTH_WAIT` stands twice still, in `src/scripts/cli-doors.js` and `src/scripts/serve.js`, and this branch adds no third
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the chapter at [[spec/design_output/level0#the-doctor-probes-every-hook]] holds the approach, and each function points at it. `vehicle.js` owns the two settings names, and `cli-doors.js` owns the wait.
 
 # Discussion
 
