@@ -436,9 +436,9 @@ case now feeds that template, so it asserts on the list and no filter.
 
 <!-- the form is checklist -->
 
-- this round touches the four remaining fakes, the delta reading and its case
-- every fake under `src/doors/fake` takes the guard, so a call it lacks throws
-- each piece carries the pointer at the chapter saying what it reads
+- this round touches the delta reading and its case, and nothing else
+- the case feeds the reading a fake, the stub's template and a module wanting a test
+- the list of skipped paths carries the pointer at the chapter saying why
 
 ## tests-green
 

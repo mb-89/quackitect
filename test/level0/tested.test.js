@@ -47,12 +47,13 @@ test("a change and its test in one delta pass", () => {
   );
 });
 
-test("a fake and a projection target want no test of their own", () => {
+test("a fake and the stub's template want no test of their own", () => {
   assert.deepEqual(untestedIn(delta("src/doors/fake/disk.js")), []);
   assert.deepEqual(
-    untestedIn(delta("spec/config/styles/VoiceParagraph/Sentence.yml")),
+    untestedIn(delta("src/stub/.claude/skills/level0/hooks/bridgehead.js")),
     [],
   );
+  assert.deepEqual(untestedIn(delta("src/bridge/one.js")), ["src/bridge/one.js"]);
 });
 
 test("a module of the server no test names comes back", () => {

@@ -4,7 +4,8 @@
 
 const AT = "+++ b/";
 const SOURCE = /^src\/.*\.js$/;
-const FAKE = /^src\/doors\/fake\//;
+// A fake stands in for a door, and the stub's template rides out as a copy. [[spec/design_output/tree#the-rules-over-two-files]]
+const COPIED = [/^src\/doors\/fake\//, /^src\/stub\//];
 const TEST = /^test\/.*\.js$/;
 const SERVER = /^src\/bridge\/[^/]+\.js$/;
 
@@ -24,17 +25,13 @@ export function hunksIn(delta) {
   return out;
 }
 
-export function filesIn(delta) {
-  return [...hunksIn(delta).keys()];
-}
-
 // A test of its own for each file, so one stray case carries no other. [[spec/design_output/tree#the-rules-over-two-files]]
 export function untestedIn(delta) {
   const hunks = hunksIn(delta);
   const files = [...hunks.keys()];
   const tests = files.filter((one) => TEST.test(one));
   return files
-    .filter((one) => SOURCE.test(one) && !FAKE.test(one))
+    .filter((one) => SOURCE.test(one) && !COPIED.some((said) => said.test(one)))
     .filter((one) => !tests.some((test) => names(test, one, hunks.get(test) ?? [])));
 }
 
