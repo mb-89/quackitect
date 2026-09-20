@@ -7,6 +7,7 @@ import { bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
 import { NOTES, privateNow } from "../../.claude/skills/level0/lib/private.js";
 import { refusedCommand, refusedDelta } from "../../.claude/skills/level0/lib/refuse.js";
 import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import { refusedTest, untestedIn } from "../../.claude/skills/level0/lib/tested.js";
 import { reaches, refusedTodo, taggedIn } from "../../.claude/skills/level0/lib/todo.js";
 import { landsOnTrunk, refusedVersion, touchesGit, TRUNK, versionRefs } from "../../.claude/skills/level0/lib/trunk.js";
 import { PROSE } from "../../.claude/skills/level0/lib/vale.js";
@@ -24,6 +25,7 @@ export async function onBash(e, box) {
   const checks = [
     commandRules,
     privateDelta,
+    testedDelta,
     todoOnPush,
     warningsOnPush,
     trunkGuard,
@@ -91,6 +93,19 @@ async function privateDelta(command, _e, box) {
     rule: found[0].rule,
   });
   return refusedDelta(found);
+}
+
+// A change and the test proving it land together. [[spec/design_output/tree#the-rules-over-two-files]]
+async function testedDelta(command, _e, box) {
+  if (!commitIn(command)) return "";
+  const found = untestedIn(await git(box, ["diff", "--cached", "--unified=0"]));
+  if (!found.length) return "";
+  box.log.say("warn", "tested", `refused ${found.length} file(s) with no test`, {
+    tool: "Bash",
+    file: found[0],
+    rule: "EveryModuleTested",
+  });
+  return refusedTest(found);
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]

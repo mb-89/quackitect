@@ -11,6 +11,7 @@ import {
   privateNow,
 } from "../../.claude/skills/level0/lib/private.js";
 import { refusedDelta } from "../../.claude/skills/level0/lib/refuse.js";
+import { refusedTest, untestedIn } from "../../.claude/skills/level0/lib/tested.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
@@ -24,8 +25,11 @@ export async function holds(it, delta) {
     box: () => boxOf(it),
     notes: () => notesOf(it),
   });
-  if (!found.length) return { code: 0, said: "" };
-  return { code: 1, said: refusedDelta(found) };
+  if (found.length) return { code: 1, said: refusedDelta(found) };
+
+  const missing = untestedIn(delta);
+  if (missing.length) return { code: 1, said: refusedTest(missing) };
+  return { code: 0, said: "" };
 }
 
 // [[spec/design_output/private#the-box-names-the-owner]]

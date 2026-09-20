@@ -30,6 +30,7 @@ Biome holds.
 | `SurveyNamesInstalls` | `src/scripts/install.sh`, `lib/tools.js` |
 | `InstallerHoldsTheNames` | `src/scripts/install.sh`, `lib/folders.js` |
 | `SurveyFindsNode` | `.se/.runtime/tools.json`, the node running the sweep |
+| `EveryModuleTested` | a module of the server, and the tests importing it |
 
 # Why lint prints them
 

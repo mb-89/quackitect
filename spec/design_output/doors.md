@@ -63,6 +63,10 @@ tests its own script, so no door here has a mock.
 The fake clock stands still until a test moves it with `tick`, so a case that
 reads the time replays.
 
+`behaves` stands beside the fakes as the guard they share. It wraps a fake, and
+a call the fake holds no answer for throws with the door's name. So a test
+driving a door through a fake asserts on something.
+
 # The bridgehead stands under hooks
 
 The bridgehead is a door: it sits in the agent's path, and it is the outside

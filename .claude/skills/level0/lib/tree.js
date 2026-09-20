@@ -15,6 +15,7 @@ import {
   EDITOR_VALE_INI,
 } from "./servers.js";
 import { decide, pool, RULES as STOP } from "./stop.js";
+import { everyModuleTested } from "./tested.js";
 import { BIN, installedTools, loopNames, TOOLS, WANTED } from "./tools.js";
 
 export const INSTALL = "src/scripts/install.sh";
@@ -526,6 +527,7 @@ export function surveyFindsNode(tree) {
 }
 
 export const RULES = [
+  everyModuleTested,
   settingsNameBinaries,
   editorDrawsWriteRules,
   biomeOnWindows,

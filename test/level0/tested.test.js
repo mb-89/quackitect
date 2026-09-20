@@ -35,13 +35,13 @@ const fakeTree = (seed, paths = []) =>
   });
 
 test("a change with no test beside it comes back named", () => {
-  const said = untestedIn(delta("src/bridge/ask.js"));
-  assert.deepEqual(said, ["src/bridge/ask.js"]);
+  const said = untestedIn(delta("src/bridge/one.js"));
+  assert.deepEqual(said, ["src/bridge/one.js"]);
 });
 
 test("a change and its test in one delta pass", () => {
   assert.deepEqual(
-    untestedIn(delta("src/bridge/ask.js", "test/level0/ask.test.js")),
+    untestedIn(delta("src/bridge/one.js", "test/level0/one.test.js")),
     [],
   );
 });
@@ -57,25 +57,25 @@ test("a fake and a projection target want no test of their own", () => {
 test("a module of the server no test names comes back", () => {
   const tree = fakeTree(
     {
-      "src/bridge/ask.js": "export const ask = 1;\n",
+      "src/bridge/one.js": "export const ask = 1;\n",
       "test/level0/other.test.js": "import { one } from '../../src/bridge/other.js';\n",
     },
-    ["src/bridge/ask.js", "test/level0/other.test.js"],
+    ["src/bridge/one.js", "test/level0/other.test.js"],
   );
 
   const found = everyModuleTested(tree);
   assert.equal(found.length, 1);
-  assert.equal(found[0].file, "src/bridge/ask.js");
+  assert.equal(found[0].file, "src/bridge/one.js");
   assert.equal(found[0].rule, "EveryModuleTested");
 });
 
 test("a module a test imports stands quiet", () => {
   const tree = fakeTree(
     {
-      "src/bridge/ask.js": "export const ask = 1;\n",
-      "test/level0/ask.test.js": "import { ask } from '../../src/bridge/ask.js';\n",
+      "src/bridge/one.js": "export const ask = 1;\n",
+      "test/level0/one.test.js": "import { one } from '../../src/bridge/one.js';\n",
     },
-    ["src/bridge/ask.js", "test/level0/ask.test.js"],
+    ["src/bridge/one.js", "test/level0/one.test.js"],
   );
 
   assert.deepEqual(everyModuleTested(tree), []);

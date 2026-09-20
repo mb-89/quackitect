@@ -297,11 +297,17 @@ test driving a door through one asserts on nothing until the guard lands.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the two readings, the guard, the two doors, two notes and the tests the rule asks for
+- every fake the tests reach comes from `src/doors/fake`, and the guard stands beside them
+- each piece carries the pointer at the chapter saying what it reads
 
 ## tests-green
 
