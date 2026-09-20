@@ -173,6 +173,19 @@ record:
     hash_after: f036c0ea4eb87f104960e6a3ce30c0a3547b2ef5
     returns: 2
     why: the hand takes it back
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 49f131dfdd6a6d43b490d3e69fce515299d0a759
+    hash_after: 49f131dfdd6a6d43b490d3e69fce515299d0a759
+    returns: 3
+    why: the says field carries four paragraphs in one run, and this hand-back rewrites it as a table
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 1
+        said:      1  in all
 ---
 
 # Ask
@@ -354,20 +367,31 @@ A row's stamp answers milliseconds, `spanOf` answers seconds, and `MS` crosses t
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-The verb, the read and the cases all stand, and the check answers red on one line of this ticket.
+`./RUNME.sh log` answers the rows the log holds, narrowed by four flags, and two owners keep what they own.
 
-`seen` under `implement/tests-red` carries four paragraphs in one run, which `Shape` refuses. The ticket door refuses a hand's fix to a field it passes, so `./RUNME.sh ticket pull --back implement/tests-red` is the road.
+| what the verb does | where it stands |
+|---|---|
+| the four filters over rows | `src/scripts/log-read.js` |
+| the read over the session file and the rotated ones | the same file, which `tui --plain` calls too |
+| the flags and the printing | `src/scripts/log-verb.js` |
+| the row a reader sees | `asRow`, which both verbs call |
 
-This leaf fails for that one line. The hand takes the ticket back, rewrites the field as a list, and walks the leaves forward again.
+The filter language keeps its owner. `src/viewer/filter.go` holds it, the window reads it, and these flags reach for none of it. Go owns that language, and this verb runs in node before any Go build stands.
+
+Two numbers move to one owner each:
+
+- `MS` stands beside `timeOf` in the level0 log lib, where a span crossing a stamp needs it
+- `work-stands.js` takes it from there, so one place answers the seconds a stamp costs
+- the install case asserts both announcement lines wait on a missing want, so a warm tree runs silent
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches the verb, the read, the cases and the chapter the approach names
-- the disk and the clock reach the verb as doors, and `fakeDisk` drives the cases
-- each header points at the chapter the approach names, and that chapter owns the flags
+- every fact the change adds stands in one place, and the chapter owns the flags table
+- `MS` takes one owner, and the notes point at that file
+- each header says what its file is for, and counts nothing
 
 # verdict
 
