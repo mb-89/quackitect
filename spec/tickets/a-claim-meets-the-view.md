@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -146,6 +146,17 @@ record:
     hash_after: 6e73dc4063fc539785a13ccdd8536e237d5d5d4a
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 5bf89a8b12bf4bb8247eabed0c2add08cb2b0436
+    hash_after: 5bf89a8b12bf4bb8247eabed0c2add08cb2b0436
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -326,26 +337,47 @@ The count case asks the shared reader for both routes, so the case holds one nam
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/one-reading.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A claim of green now carries the count the owner's panel draws.
+
+| what lands | where |
+|---|---|
+| the guard naming Biome for both fronts | `biomeFor` in `src/bridge/findings.js` |
+| the command line's own reading, as a list | `readingFor` in `src/scripts/cli-read.js`, which `lint` prints |
+| the lines a reading names, sorted | `linesNamed` beside the guard |
+| the case holding the two fronts together | `test/contract/one-reading.test.js` |
+| the rule | the fifth rule of `spec/guidance/working` |
+| the chapter `src/lsp/check.go` points at | [[spec/design_output/lsp#one-checker-every-front-asks]] |
+
+The guard was the one parting. `whereIs` falls back to the bare name, so the panel asked for a tool standing nowhere while the check skipped it. Both now read the guard, so a box carrying no Biome answers one list.
+
+What this costs, for the owner to weigh at the merge. The case sweeps the whole tree once per front, and `./RUNME.sh check` carries that. The two sweeps run one after the other, because two Vale runs over one tree part their answers.
+
+The rule joins the fifth rule of the working note. The note's schema caps its list, so a rule of its own stands nowhere there. The fifth rule already governs the claim that the work stands complete, which is where a claim of done belongs.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The shared reader, the command line's half, the case file, and the two notes the approach names.
+- every door the change reaches has a fake. The guard case hands its own disk. The count case drives the real tools, which is what puts it under test/contract.
+- a comment names the approach the change implements. Each new name points at the chapter this round writes.
 
 # verdict
 
