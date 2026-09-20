@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -233,6 +233,17 @@ record:
     hash_after: ed36b0b4867ea98a9fe9e85ecace89555e821df0
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: baadae3a1d289e561f7698c46d4563b375dc3729
+    hash_after: baadae3a1d289e561f7698c46d4563b375dc3729
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 23 test(s) pass in 3 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -443,7 +454,7 @@ The second class is a hand's, and one block answers it.
 
 ### tests
 
-    ./RUNME.sh branch test test/level0/binding.test.js test/contract/stop-rules.test.js
+    ./RUNME.sh branch test test/level0/binding.test.js test/level0/stop-door.test.js test/contract/stop-rules.test.js
 
 ### check
 
@@ -487,6 +498,11 @@ The round after that found the contract case reading a type, where its title
 promises a set. So the door holds its checks in a table, `knowsCheck` answers
 what stands in it, and the case asks that of every shipped name. It asks the
 same of a name nobody wrote, and reads false.
+
+The round after that found the table reading a key every object carries. A rule
+at `runs: constructor` reached a function, and its answer read as a firing
+check. So `ranHere` asks `knowsCheck` ahead of the table, and a case drives a
+rule at that name and reads the stop standing.
 
 ### checked
 
