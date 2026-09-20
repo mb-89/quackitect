@@ -1,6 +1,6 @@
 // The viewer's build, over a fake box. The fake go writes the binary it is asked
 // for, so each case reads back what a real build leaves behind.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

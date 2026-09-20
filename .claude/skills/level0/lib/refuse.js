@@ -70,7 +70,7 @@ export function answerFindings(where, it) {
   return [head, "", ...bodyOf(where, found), taught(found), ...road(found)].join("\n");
 }
 
-// The answer stands as sent, so the note teaches and asks for nothing. [[spec/design_output/level0#the-findings-ride-the-next-call]]
+// The answer stands as sent, so the note teaches and asks for nothing. [[spec/design_output/level0#the-findings-ride-the-call]]
 export function gateNote(where, it) {
   const found = it?.found ?? [];
   return [

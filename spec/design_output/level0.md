@@ -450,8 +450,7 @@ Measured against client 2.1.267, in a session past `4096` messages: at `tool.cal
 also answers its newest `4096` alone, so a position in it shifts.
 
 So the answer gate reads the step first and the transcript second, and lets the
-calls of a response in flight pass. For details, see
-[[spec/design_output/level0#a-step-carries-the-answer]].
+calls of a response in flight pass.
 
 ## Arguments arrive on the event
 
@@ -974,7 +973,7 @@ or `none`. The first one alone pays. A line with other counts comes out of a
 block the session lacks, so it owes what silence owes.
 
 While the debt stands, `tool.call` behaves the way the owner's prompt door
-behaves. For details, see [[spec/design_output/level0#one-warning-then-a-refusal]].
+behaves. For details, see [[spec/design_output/level0#the-first-call-is-free]].
 
 | the call | what it meets | the `gate` line |
 |---|---|---|

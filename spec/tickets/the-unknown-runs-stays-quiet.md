@@ -136,9 +136,9 @@ warn line a name.
 | the case | drives the door over the fake box with a rule whose `runs` names nothing, and asserts one warn line stands in the log |
 | the design output | stays as it is, because the sentence promising the line stands there already |
 
-The line stands in the log and nowhere in the block the door answers, because
-the owner reads the log for a rule at fault, and the agent reads the block for
-what to do next.
+The line stands in the log, and nowhere in the block the door answers. The
+owner reads the log for a rule at fault, and the agent reads the block for what
+to do next.
 
 ## review
 

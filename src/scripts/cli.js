@@ -1,6 +1,6 @@
 // The command line. One verb a row, each one naming what it does and the
 // function behind it, and the dispatch at the foot of the table.
-// [[spec/design_output/level0#one-command-does-it]]
+// [[spec/design_output/editor#one-command-opens-the-editor]]
 
 import { dirname, join } from "node:path";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";

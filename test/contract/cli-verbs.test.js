@@ -1,6 +1,6 @@
 // The command line's own table, read as text because the module exits at
 // import: every verb says what it does, and the vehicle verb says vehicle.
-// [[spec/design_output/level0#one-command-does-it]]
+// [[spec/design_output/editor#one-command-opens-the-editor]]
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
@@ -11,7 +11,7 @@ import { disk } from "../../src/doors/disk.js";
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const source = disk().read(join(root, "src", "scripts", "cli.js"));
 
-// The table's rows, each a verb naming what it says, on one line or over two. [[spec/design_output/level0#one-command-does-it]]
+// The table's rows, each a verb naming what it says, on one line or over two. [[spec/design_output/editor#one-command-opens-the-editor]]
 const saysOf = (verb) => {
   const found = new RegExp(`^  ${verb}: \\{\\s*says: "([^"]*)"`, "m").exec(source);
   return found ? found[1] : "";

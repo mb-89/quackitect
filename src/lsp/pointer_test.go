@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-const EveryPointerResolves = "EveryPointerResolves"
-
 // A pointer naming a chapter nobody wrote reads as a live link and teaches nothing, so the rule refuses it. [[spec/design_output/lsp#every-pointer-resolves]]
 func TestEveryPointerResolvesRefusesAChapterNobodyWrote(t *testing.T) {
 	tree := fixture(t, map[string]string{
@@ -68,7 +66,7 @@ func TestEveryPointerResolvesStandsQuietOverSoundPointers(t *testing.T) {
 // A code span, a fenced block, an indented block and a placeholder quote the shape, so the rule reads no pointer there. [[spec/design_output/lsp#every-pointer-resolves]]
 func TestEveryPointerResolvesSkipsAQuotedShape(t *testing.T) {
 	tree := fixture(t, map[string]string{
-		"spec/guidance/two.md": "# A rule\n\n" +
+		"spec/guidance/two.md": "---\nkind: [[guidance]]\nsays: \"a `[[spec/nowhere#in-the-front]]` quoted\"\n---\n\n# A rule\n\n" +
 			"Write `[[spec/nowhere]]` in a span, or [[<name>]] as a placeholder.\n\n" +
 			"```\n[[spec/nowhere#in-a-fence]]\n```\n\n" +
 			"    kind: [[nowhere-indented]]\n",

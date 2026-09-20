@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 8253e502f6b51ef91543a79ff814c1fb9eeba6da
+    hash_after: 8253e502f6b51ef91543a79ff814c1fb9eeba6da
+    answered:
+      - name: lint
+        exit: 0
+        said: 21 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
@@ -155,9 +163,9 @@ The gate is one tree rule of the language server, so the check, the panel and
 | what it answers | one error a dead pointer, naming the file and the line, so the check refuses it |
 | what the tree fixes | every pointer standing dead today, repointed at the chapter that moved or the note that renamed |
 
-The rule reads a comment line alone in a code file, because a pointer in a
-string literal is a fixture a test writes, and the tree holds such fixtures
-already. The design output for the server takes a chapter on this rule, and
+In a code file the rule reads a comment line alone. A pointer in a string
+literal is a fixture a test writes, and the tree holds such fixtures already.
+The design output for the server takes a chapter on this rule, and
 the table of tree rules takes a row.
 
 ## review
@@ -210,10 +218,10 @@ against it.
 | a quoted shape is skipped | passes over the stub, for the same reason |
 
 The two quiet cases pass before the rule stands, and they earn their place once
-it does: each one names a shape the rule reads past, and a rule reading it
-would draw there. What surprises me is how many shapes quote a pointer: a code
-span, a fence, an indented example, a placeholder in angle brackets, and a
-string a test writes.
+it does. Each one names a shape the rule reads past, and a rule reading it
+would draw there. What surprises me is how many shapes quote a pointer. A code
+span, a fence, an indented example, a placeholder in angle brackets and a
+string a test writes each do.
 
 ### checked
 
@@ -221,7 +229,7 @@ string a test writes.
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The rule, its case file, the server's design output and the tree rules table, this ticket, and every file carrying a pointer standing dead today.
+- the change touches no file the ask leaves out. The rule, its case file, the server's note, the tree rules table, this ticket, and every file carrying a dead pointer.
 - every door the change reaches has a fake. Each case writes its own fixture root, and the rule reads the tree handed in and nothing outside it.
 - a comment names the approach the change implements. The rule and each case point at the chapter the design output takes.
 
@@ -251,11 +259,17 @@ string a test writes.
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The rule and its cases, the registry and the per-file check, the server's note, the tree rules table, and the files whose pointers stood dead.
+- every door the change reaches has a fake. The rule reads the tree handed in, and each case writes its own fixture root.
+- a comment names the approach the change implements. The rule and each case point at the chapter the server's note now carries.
 
 ## tests-green
 

@@ -119,7 +119,7 @@ export function stepReads(it, held) {
   return leafOf(frontOf(it.disk.read(at)), held.step)?.reads ?? [];
 }
 
-// [[spec/design_output/pull#a-leaf-inherits]]
+// [[spec/design_input/the-agent-pulls-tickets#the-route]]
 export function walkOf(front) {
   return entriesIn(front?.steps, "steps");
 }
@@ -133,7 +133,7 @@ export function stepPathOf(front) {
   return String(front?.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
 }
 
-// [[spec/design_output/pull#a-leaf-inherits]]
+// [[spec/design_input/the-agent-pulls-tickets#the-route]]
 export function leafOf(front, path) {
   const walk = walkOf(front);
   const leaf = walk.find((one) => one.path === path && one.leaf);

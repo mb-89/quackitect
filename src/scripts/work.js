@@ -180,7 +180,7 @@ function markOff(it, branch) {
   return said.ok ? said.out.trim() : "";
 }
 
-// [[spec/design_output/log#which-door-says-what]]
+// [[spec/design_output/log#which-kind-says-what]]
 function tell(it, what, code) {
   if (!it.log) return code;
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;

@@ -522,7 +522,7 @@ var Rules = []func(*Tree) []Finding{
 	nameHoldsTheWords,
 	nothingPrivateTravels,
 	surveyNamesInstalls,
-	surveyFindsNode,
+	surveyFindsNode, everyPointerResolves,
 }
 
 // [[spec/design_output/tree#what-a-rule-answers]]

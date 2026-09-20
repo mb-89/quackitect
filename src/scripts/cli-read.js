@@ -1,6 +1,6 @@
 // What the command line reads: the version, the index, the notes a reader
 // asks for, and the walk over a folder.
-// [[spec/design_output/tree#the-reader]]
+// [[spec/design_output/tree#the-tree-handed-in]]
 
 import { join } from "node:path";
 import { BIN as INDEX_BIN } from "../../.claude/skills/level0/lib/index.js";

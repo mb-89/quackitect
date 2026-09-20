@@ -48,7 +48,7 @@ Two more kinds come out of the gate:
 - `gate` carries a call the gate warns or refuses, at `warn`.
 - `god` carries a refusal god mode passes, at `warn`.
 
-For details, see [[spec/design_output/level0#a-step-carries-the-answer]].
+For details, see [[spec/design_output/level0#a-step-arrives-late]].
 
 # Which kind says what
 
@@ -180,7 +180,7 @@ A span answers seconds, and a row's stamp answers milliseconds. `MS` beside
 
 The window's filter language stands elsewhere, and these flags reach for none of
 it. Go owns that language, and this verb runs in node before any Go build
-stands. For details, see [[spec/design_output/viewer#the-filter-language]].
+stands. For details, see [[spec/design_output/tui#the-filter-language]].
 
 # The log tool
 

@@ -266,7 +266,7 @@ place of a dialog asking whether a person means it.
 
 Every press that writes, every run and every edit in the config tree writes a
 `sidebar` line to the door log. For details, see
-[[spec/design_output/log#which-door-says-what]].
+[[spec/design_output/log#which-kind-says-what]].
 
 - One press writes `stop.hold is finish`, with the detail `one press`.
 - Five presses write `stop.hold is stop`, with the detail `5 presses`.

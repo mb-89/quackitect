@@ -175,7 +175,7 @@ test("the re-prompt says why it carries on, then asks every unclaimed stop, in f
   assert.ok(said.split("\n").length <= 5, "five lines at most");
 });
 
-// [[spec/design_output/stop#the-stop-is-one-call]]
+// [[spec/design_output/stop#the-stop-is-one-line]]
 test("the tool takes one reason out of the rules, and names each one", () => {
   const spec = stopSpec(TABLE);
   assert.equal(spec.name, "stop");
@@ -210,7 +210,7 @@ test("a sound reason stands, a fact over it falls, and an unknown id says so", (
   );
 });
 
-// [[spec/design_output/stop#a-turn-with-no-call]]
+// [[spec/design_output/stop#a-turn-with-no-line]]
 test("the ask for a stop names the call and every id, in five lines", () => {
   const said = askForStop(TABLE);
   assert.match(said, /^This turn ends with no stop, so it holds open\./);
