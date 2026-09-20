@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: d96e6e0801486d05a93bb86eb8cf4fc2c6ab7918
     returns: 2
     why: "| the finding | the fix |; |---|---|; | A tree rule reads no delta. The reader answers `read`, `exists`, `names`, `paths`, `words`, `node` and `box`, and the import rule wants the modules the delta touches [[spec/design_output/tree#the-tree-handed-in]] | Read the whole tree and say what turns the red green, or name a door that holds a delta and land the rule there |; | A whole-tree import rule lands red, and the work carrying the modules stands nowhere. No ticket under `spec/tickets` holds them | Mint that ticket before this one lands, or carry the modules here |; | The commit door is two, and the table names one. `lib/bash.js` with the hook takes a session, `.githooks/pre-commit` takes a person [[spec/design_output/private#two-doors-one-check]] | Name the one module both doors call, the way `privateNow` holds the private rule for both |; | Each door has its fake beside it under `src/doors/fake`, and `behaves` is a fake of no door [[spec/design_output/doors#a-fake-behaves]] | Land `behaves` where a helper over the fakes stands, and link the chapter owning the rule |; | The module count and its table stand in prose, and the first test written drifts them [[spec/guidance/voice]] | Name the command answering the count, and cut the table |; What holds:; The modules the table names are exactly the `src/bridge` modules no test imports today.; The staged delta answers the hook and the Bash check both, so the second finding of the last round lands.; The delta carries the whole answer, so no exception rides on the commit message.; The row and the link land on the note owning every rule over two files. [[spec/design_output/tree#the-rules-over-two-files]]"
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 67bc57fc48bc53560785cd24489b2b7a943b65d7
+    hash_after: 67bc57fc48bc53560785cd24489b2b7a943b65d7
 ---
 
 # Ask
@@ -140,42 +144,40 @@ Three programs stand, one for each line the ask names:
 
 | what holds it | where it lands | what it reads |
 |---|---|---|
-| the commit door | `src/scripts/precommit.js` | the staged delta, which the hook pipes in |
-| a rule over a pair | `.claude/skills/level0/lib/tested.js` | a module of the server the delta touches, against the paths the tests import |
+| a reading both commit doors call | `.claude/skills/level0/lib/tested.js` | a staged delta, and the test files standing in it |
+| a rule over a pair | the same module, in the tree rules | every module of the server, against the paths the tests import |
 | a fake's own guard | `src/doors/fake/behaves.js` | a call the fake lacks, which throws in place of answering nothing |
 
 The readings:
 
-- the door reads the staged delta alone, the one text the hook and the Bash check both read
 - a change touching a tracked `.js` under `src` wants a test file in the same delta
-- the rule reads a source file outside the fakes and outside a projection target
-- the import rule reads a test naming the module by path, so a change to it comes back named
-- `behaves(fake, name)` wraps each fake in one place, and every door's fake takes it there
+- the delta reading skips the fakes and every projection target
+- the import rule reads a test naming a module by path, so a module nobody drives comes back named
+- `behaves(fake, name)` wraps a fake in one place, and every door's fake takes it there
 
 The delta carries the whole answer, so no exception rides on the commit message.
 A hand meeting the refusal writes the test, and the door names the rule and the
 file it stands on.
 
-The import rule reads the modules the delta touches, so it lands green and bites
-on each change from here. Nine modules of the server stand with no test naming
-them today:
+Two doors take the commit, and both call the one reading, the way both call
+`privateNow` today. [[spec/design_output/private#two-doors-one-check]]
 
-| the module | the module |
+| the door | who meets it |
 |---|---|
-| `apply.js` | `ask.js` |
-| `config.js` | `prose.js` |
-| `review.js` | `search.js` |
-| `status.js` | `tools.js` |
-| `window.js` | |
+| `.claude/skills/level0/lib/bash.js` | a session |
+| `src/scripts/precommit.js`, behind `.githooks/pre-commit` | a person at a terminal |
 
-Each one comes back the first time a hand touches it, and
-`a-test-names-every-module` carries the nine as its own work.
+A tree rule reads the tree and no delta, so the import rule reads every module
+of the server. It lands red on the modules no test names, and the implement step
+writes a test for each. `./RUNME.sh lint` answers how many stand today, and the
+rule names each one.
 
-`.claude/skills/level0/lib/tree.js` stands within a few lines of the bound
-`code.fileLines` sets, so the new rule takes a module of its own beside it.
-`spec/design_output/tree.md` tables every rule weighing two files, so the table
-takes the row for this one, and the design output says what each program reads.
-[[spec/design_output/tree#the-rules-over-two-files]]
+| what moves | where it lands |
+|---|---|
+| the delta reading and the import rule | a module beside `tree.js`, which stands near the bound `code.fileLines` sets |
+| the row naming the new rule | the table the tree note holds [[spec/design_output/tree#the-rules-over-two-files]] |
+| the guard a fake takes | `src/doors/fake/behaves.js`, beside the fake of each door |
+| the line saying what a fake owes | the chapter the doors note holds [[spec/design_output/doors#a-fake-behaves]] |
 
 Rule five of [[spec/guidance/code/testing]] is the rule these hold. So that line
 points at the check, and no reader holds the rule in memory.
