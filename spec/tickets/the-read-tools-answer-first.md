@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box 099c2ec7708d · claude-code-remote
     hash_before: 2c02125ca5f0d2fc6378e8cbe65fe33b57dee72e
     hash_after: 2c02125ca5f0d2fc6378e8cbe65fe33b57dee72e
+  - step: design/review
+    hand: box 099c2ec7708d · claude-code-remote · helper-4
+    hash_before: 93644d2ae38826ab2a8a8dd64cd72bee5a699962
+    hash_after: 93644d2ae38826ab2a8a8dd64cd72bee5a699962
+    returns: 2
+    why: "`test/level0/bridgehead.test.js` owns the stub's install road under [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]. Name another home.; `test/level0/hand.test.js` drives the hook's `register` today, so the cases land beside it.; the chapter puts the install on the setup, and the approach puts it on `START`. Say what that sentence becomes.; an implementer guesses the install command and the code the start answers.; `REASONS` code 6 says the setup brings no modules. Say what that code answers once the install road stands.; the chapter holds a session start to milliseconds, and an install takes minutes. Name that cost.; `patchSpec`, `replaceSpec` and `undoSpec` already stand under `.claude/skills/level0/lib`, so the first row overstates the move.; what holds:; the narrowed invariant reads against the tree. Every import under `lib` is relative or `node:`, and the plugin ships the folder whole.; `.claude/skills/level1/hooks/level1.js` already registers a tool at `session.start` and holds the same narrowed invariant.; `findSpec` in `src/bridge/search.js` and `SPECS` in `src/bridge/apply.js` both read as the approach names them.; the server answers `/health`, so the tool road's wait stands.; the three constants the approach hands back to their owners are `PORT`, `SESSION` and `HAND_FILE`.; every finding of the earlier `why` stands answered."
 ---
 
 # Ask
@@ -171,13 +177,22 @@ Where each thing stands after:
 
 fail
 
-- the hook's header says it imports nothing, three times, and it re-spells constants for that reason
-- say what that invariant becomes, because specs under `lib` make the hook import
-- say what happens to the constants the hook spells again today, which that invariant forces
-- the third row carries a bare number. `REASONS` in the hook names code 6, so point there
-- the specs' new home carries no file name. `findSpec` stands in `src/bridge/search.js`, and `SPECS` in `src/bridge/apply.js`
-- the ask asks for a case per tool, and the approach names no case file
-- what holds: `START`, `register` and `REASONS` all stand in the hook, and the chapter takes the order
+- `test/level0/bridgehead.test.js` owns the stub's install road under [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]. Name another home.
+- `test/level0/hand.test.js` drives the hook's `register` today, so the cases land beside it.
+- the chapter puts the install on the setup, and the approach puts it on `START`. Say what that sentence becomes.
+- an implementer guesses the install command and the code the start answers.
+- `REASONS` code 6 says the setup brings no modules. Say what that code answers once the install road stands.
+- the chapter holds a session start to milliseconds, and an install takes minutes. Name that cost.
+- `patchSpec`, `replaceSpec` and `undoSpec` already stand under `.claude/skills/level0/lib`, so the first row overstates the move.
+
+what holds:
+
+- the narrowed invariant reads against the tree. Every import under `lib` is relative or `node:`, and the plugin ships the folder whole.
+- `.claude/skills/level1/hooks/level1.js` already registers a tool at `session.start` and holds the same narrowed invariant.
+- `findSpec` in `src/bridge/search.js` and `SPECS` in `src/bridge/apply.js` both read as the approach names them.
+- the server answers `/health`, so the tool road's wait stands.
+- the three constants the approach hands back to their owners are `PORT`, `SESSION` and `HAND_FILE`.
+- every finding of the earlier `why` stands answered.
 
 # implement
 
