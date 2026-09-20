@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -141,6 +141,10 @@ record:
     hash_after: f125f932c65b5d0ee3d991432e55358de934e553
     returns: 5
     why: The tests read the environment, and the pass list names none of them.; `test/contract/*.js` reads `process.env` and `process.platform`, and; `test/level0/*.js` sets `process.env` around a case. The `check` verb runs; `lint` over the whole tree, so the rule turns the check red. Say which of the; two folders stands off, and which takes the value off a hand.; A section stands a file off `DoorsOnly` whole, and that rule refuses a `node:`; import outside the doors today. So every root the pass list gains gives that; refusal up beside the environment read. Say whether a rule file of its own; carries the reading, or the roots give the import guard up.; The Go table names `src/lsp`, `src/index`, `src/viewer` and `src/swap`, and; `src/yaml` stands outside it. Name that package beside the four, with what; moves for it.; `src/scripts/cli-check.js` reads `process.version`, and; `src/scripts/cli-doors.js` reads `process.execPath`. The pass list covers both; files, so name the two reads beside `process.pid`, where the scope hands a; read to the later ticket.; The findings of the round before stand answered. `src/scripts/vehicle.js`; takes a `windows` argument off its callers, the extension grows the section; standing, and `process.pid` rides a private note to the retro.
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: ccfad8d001cd53c38c97829d2d2ff223592e15e9
+    hash_after: ccfad8d001cd53c38c97829d2d2ff223592e15e9
 ---
 
 # Ask
@@ -168,11 +172,14 @@ Code reads the environment and runs commands in place, and a test of it touches 
 
 One rule file grows the reading, and the lint config says where it stands off:
 
-| what grows | where it stands |
+| what stands | where |
 |---|---|
-| the environment read | `spec/config/styles/VoiceVale/DoorsOnly.yml`, beside the imports it refuses |
-| the Go reading | the same file, over an import of `os/exec` |
+| the environment read, and the Go import of `os/exec` | `spec/config/styles/VoiceVale/OutsideInDoors.yml`, a rule of its own |
 | the places standing off | `.vale.ini`, in a section for each, the way the fakes stand off today |
+
+The reading takes a rule file of its own, because a section standing a file off
+`DoorsOnly` gives up its import guard as well. A root reads the environment and
+imports no door, so the two rules want two switches.
 
 A rule under `spec/config/styles` reads one buffer and no path, so the pass list
 belongs where every other path rule stands. `.vale.ini` already holds a section
@@ -186,6 +193,7 @@ The readings:
 
 | the section `.vale.ini` gains | why it stands off |
 |---|---|
+| `**/test/contract/*.js`, `**/test/level0/*.js` | a case reads the environment to drive a door, and sets one around itself |
 | `**/src/scripts/cli*.js` | the command roots build the `it` every verb takes |
 | `**/src/scripts/precommit.js`, `**/src/scripts/prepush.js` | each is a hook a person's git runs, and it builds its own |
 | `**/src/scripts/trust.js`, `**/src/scripts/copilot.js` | each opens on its own line of arguments, the way a hook does |
@@ -217,9 +225,16 @@ stands off in `.vale.ini` today, so no section opens over it twice.
 So `./RUNME.sh lint src` answers clean, and the rule names every read a later
 hand writes.
 
-The rule reads the three the ask names, and `process.pid` stands outside it.
-`src/scripts/vehicle.js` reads that one, and a private note carries it for the
-retro to decide.
+The rule reads the three the ask names, and three more reads stand outside it:
+
+| the read | where it stands |
+|---|---|
+| `process.pid` | `src/scripts/vehicle.js` |
+| `process.version` | `src/scripts/cli-check.js` |
+| `process.execPath` | `src/scripts/cli-doors.js` |
+
+A private note carries the three, and the retro decides whether the rule grows
+to meet them.
 
 The Go rule reads an import of `os/exec`, which runs a command. Each package
 names that import in its `door.go`, and `src/index` holds one today.
@@ -228,7 +243,7 @@ names that import in its `door.go`, and `src/index` holds one today.
 |---|---|
 | `src/lsp` | the command running of four files, into a `door.go` of its own |
 | `src/index` | the spawn of the resident in `main.go`, into the `door.go` standing there |
-| `src/viewer`, `src/swap` | nothing, because neither runs a command |
+| `src/viewer`, `src/swap`, `src/yaml` | nothing, because none of the three runs a command |
 
 The `os` import, which reads a file, stands in a file of nearly every Go
 package. `./RUNME.sh lint src` answers how many, and a rule over it asks for a
