@@ -56,6 +56,15 @@ test("a fake and the stub's template want no test of their own", () => {
   assert.deepEqual(untestedIn(delta("src/bridge/one.js")), ["src/bridge/one.js"]);
 });
 
+// An editor file loads under the editor's own runtime, so no case imports it. [[spec/design_output/doors#a-door-reads-the-outside]]
+test("an editor file wants no test of its own, and its neighbour wants one", () => {
+  assert.deepEqual(untestedIn(delta("src/extension/editor-process.js")), []);
+  assert.deepEqual(untestedIn(delta("src/extension/editor.js")), []);
+  assert.deepEqual(untestedIn(delta("src/extension/sidebar.js")), [
+    "src/extension/sidebar.js",
+  ]);
+});
+
 test("a module of the server no test names comes back", () => {
   const tree = fakeTree(
     {

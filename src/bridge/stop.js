@@ -160,7 +160,7 @@ export function onStop(e, box) {
     prompts: prompts.split("\n")[0],
   });
   // The owner reads a stop under the debugger, so the server started with the break flag pauses here with the reason and what prompts after. [[spec/design_output/stop#a-standing-stop-ends-it]]
-  if (process.env[BREAK]) {
+  if (box.env?.[BREAK]) {
     const paused = { why, prompts, claimed, decision: detail(said, said.inARow) };
     // biome-ignore lint/suspicious/noDebugger: level0: NoDebugger - the owner asks the server to pause at every stop under the debugger
     debugger;
@@ -259,7 +259,7 @@ function ranHere(name, held) {
   if (name === "queue-waits") return queueWaits(held.box);
   if (name === "no-stop-line") return !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed);
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
-  if (name === "a-person-sits-here") return !inCloud(held.box.env ?? process.env);
+  if (name === "a-person-sits-here") return !inCloud(held.box.env ?? {});
   // [[spec/tickets/the-spawn-reaches-its-guidance]]
   if (name === "warnings-standing") return handWanted(held.box);
   return undefined;
@@ -298,7 +298,7 @@ function privateStands(box) {
 
 // THE CHAT IS NEW WHILE NOBODY HAS SAID WHAT TO DO IN IT. The session log holds one prompt row a turn and rotates at a session start, so the count survives a restart of the server and starts again with the next chat, and a cloud box carrying nobody to ask reads false. [[spec/design_output/stop#the-chat-is-new]]
 function chatIsNew(box) {
-  if (inCloud(box.env ?? process.env)) return false;
+  if (inCloud(box.env ?? {})) return false;
   return promptsIn(box) <= 1;
 }
 
@@ -314,7 +314,7 @@ function promptsIn(box) {
 
 // A desk bound to the queue on trunk has work while a free ticket stands, so a stop on completion waits. [[spec/design_output/stop#the-mechanical-checks]]
 function queueWaits(box) {
-  if (inCloud(box.env ?? process.env)) return false;
+  if (inCloud(box.env ?? {})) return false;
   if (asks(box, "engine.binding") !== "queue") return false;
   if (branchOf(box) !== "main") return false;
   const texts = readFolder(box.disk, join(box.work, "spec", "tickets"), ".md").map((one) => one.text);

@@ -412,11 +412,15 @@ Each holds its claim once the rule lands.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out: the rule file, the config, the modules the tables name
+- every door the change reaches has a fake: the trunk case hands its box an `env` of its own
+- a comment names the approach the change implements: each new comment points at the doors chapter
 
 ## tests-green
 

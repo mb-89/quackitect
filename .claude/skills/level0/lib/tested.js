@@ -4,8 +4,8 @@
 
 const AT = "+++ b/";
 const SOURCE = /^src\/.*\.js$/;
-// A fake stands in for a door, and the stub's template rides out as a copy. [[spec/design_output/tree#the-rules-over-two-files]]
-const COPIED = [/^src\/doors\/fake\//, /^src\/stub\//];
+// A fake, the stub's template and the editor files each take no case of their own. [[spec/design_output/tree#the-rules-over-two-files]]
+const COPIED = [/^src\/doors\/fake\//, /^src\/stub\//, /^src\/extension\/editor/];
 const TEST = /^test\/.*\.js$/;
 const SERVER = /^src\/bridge\/[^/]+\.js$/;
 

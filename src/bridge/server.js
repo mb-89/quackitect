@@ -196,6 +196,8 @@ export function boxOf(method, work = method, doors = {}) {
     method,
     work,
     root: work,
+    // The root builds the box, so the modules past it read the environment here. [[spec/design_output/doors#a-door-reads-the-outside]]
+    env: doors.env ?? process.env,
     disk: files,
     clock: time,
     proc: outside,
@@ -340,7 +342,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     ) ?? process.cwd();
   const port =
     Number(at >= 0 ? args[at + 1] : process.env.SE_BRIDGE_PORT) ||
-    registeredPort(disk(), process.env, clock(), method);
+    registeredPort(disk(), process.env, clock(), method, process.platform === "win32");
   await takesOver(port);
   serve(method, port);
 }

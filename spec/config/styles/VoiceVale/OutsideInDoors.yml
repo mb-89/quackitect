@@ -1,0 +1,32 @@
+extends: script
+message: "Only a door reads the outside. Take the value off the hand."
+link: spec/guidance/code/testing.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  reads := ["process.env", "process.argv", "process.platform"]
+
+  lines := text.split(scope, "\n")
+  matches := []
+  offset := 0
+
+  for i := 0; i < len(lines); i++ {
+    line := lines[i]
+    at := offset
+    offset += len(line) + 1
+    t := text.trim_space(line)
+
+    if text.has_prefix(t, "//") { continue }
+
+    hit := false
+    for j := 0; j < len(reads); j++ {
+      if text.contains(t, reads[j]) { hit = true }
+    }
+    if text.re_match(`"os/exec"`, t) { hit = true }
+
+    if hit {
+      matches = append(matches, {begin: at, end: at + len(line)})
+    }
+  }

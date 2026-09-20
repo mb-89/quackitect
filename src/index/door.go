@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -57,6 +58,31 @@ type door struct {
 
 func standingPath(root string) string {
 	return filepath.Join(root, Runtime, "index.json")
+}
+
+// The command line asks for a door, and this spawns the resident where none stands. [[spec/design_output/doors#a-door-reads-the-outside]]
+func starts(root string) error {
+	self, err := os.Executable()
+	if err != nil {
+		return err
+	}
+
+	one := exec.Command(self, "serve")
+	one.Dir = root
+	one.Env = append(os.Environ(), "QUACKITECT_ROOT="+root)
+	one.Stdout, one.Stderr = nil, nil
+	if err := one.Start(); err != nil {
+		return err
+	}
+	go one.Wait()
+
+	for waited := 0; waited < startPolls; waited++ {
+		if _, err := standingOf(root); err == nil {
+			return nil
+		}
+		time.Sleep(startPollPause)
+	}
+	return errorOf("the door took longer than thirty seconds to stand")
 }
 
 func Serve(root, at string) (func(), net.Listener, error) {

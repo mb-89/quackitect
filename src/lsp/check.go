@@ -4,7 +4,6 @@
 package main
 
 import (
-	"os/exec"
 	"strings"
 )
 
@@ -88,8 +87,3 @@ func (one *Checker) Sweep() []Finding {
 }
 
 func (one *Checker) Tree() *Tree { return one.tree }
-
-func runs(name string, argv ...string) (string, error) {
-	said, err := exec.Command(name, argv...).Output()
-	return string(said), err
-}

@@ -9,7 +9,6 @@ import (
 
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -124,9 +123,7 @@ func (one *Tree) Paths() []string {
 
 // [[spec/design_output/tree#the-tree-handed-in]]
 func gitHolds(root string) []string {
-	said := exec.Command("git", "ls-files")
-	said.Dir = root
-	read, err := said.Output()
+	read, err := gitFiles(root)
 	if err != nil {
 		return nil
 	}

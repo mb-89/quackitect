@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"strings"
@@ -233,27 +232,4 @@ func posts(standing Standing, method string) (answer, error) {
 
 	var out answer
 	return out, json.NewDecoder(said.Body).Decode(&out)
-}
-
-func starts(root string) error {
-	self, err := os.Executable()
-	if err != nil {
-		return err
-	}
-
-	one := exec.Command(self, "serve")
-	one.Dir = root
-	one.Env = append(os.Environ(), "QUACKITECT_ROOT="+root)
-	if err := one.Start(); err != nil {
-		return err
-	}
-	go one.Wait()
-
-	for waited := 0; waited < standPolls; waited++ {
-		if _, err := standingOf(root); err == nil {
-			return nil
-		}
-		time.Sleep(standPoll)
-	}
-	return errorOf(fmt.Sprintf("the server took longer than %s to stand", time.Duration(standPolls)*standPoll))
 }

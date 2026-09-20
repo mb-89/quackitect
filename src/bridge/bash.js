@@ -48,11 +48,11 @@ export function onDescribe(e) {
 // [[spec/design_output/bash#a-shell-writes-nothing]]
 async function commandRules(command, _e, box) {
   const found = findings(command, asks(box, "names.words"), {
-    cloud: onACloud(),
+    cloud: onACloud(box),
     script: (path) => fileText(box.disk, box.work, path),
   });
   found.push(...(await commitVoice(command, box)));
-  if (!onACloud() && skipsTheHook(command)) {
+  if (!onACloud(box) && skipsTheHook(command)) {
     box.log.say("warn", "private", "a commit steps past the hook", { tool: "Bash", detail: command });
   }
   if (!found.length) return "";
@@ -196,7 +196,7 @@ function trunkGuard(command, _e, box) {
       ].join("\n");
     }
   }
-  if (!onACloud()) return "";
+  if (!onACloud(box)) return "";
   if (!takesABranch(box)) return "";
   box.log.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, { tool: "Bash", detail: command });
   return [
@@ -234,7 +234,7 @@ function git(box, args) {
 }
 
 function boxHere(box) {
-  const env = process.env;
+  const env = box.env ?? {};
   return {
     user: env.USER || env.USERNAME || env.LOGNAME || "",
     home: env.HOME || env.USERPROFILE || "",
@@ -254,6 +254,7 @@ function notesIn(box) {
   }
 }
 
-function onACloud() {
-  return bindsHere(CLOUD, { CLAUDE_CODE_REMOTE: process.env.CLAUDE_CODE_REMOTE ?? "", SE_CLOUD: process.env.SE_CLOUD ?? "" });
+function onACloud(box) {
+  const env = box.env ?? {};
+  return bindsHere(CLOUD, { CLAUDE_CODE_REMOTE: env.CLAUDE_CODE_REMOTE ?? "", SE_CLOUD: env.SE_CLOUD ?? "" });
 }

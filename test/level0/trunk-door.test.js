@@ -14,8 +14,12 @@ const SHA = "abc123";
 const HEAD = "git rev-parse --abbrev-ref HEAD";
 const PUSH = "git push origin main";
 
-function box(branch, green = true) {
+const CLOUD = { CLAUDE_CODE_REMOTE: "true" };
+
+// The box carries the environment, so a case sets one on it and touches nothing outside. [[spec/design_output/doors#a-door-reads-the-outside]]
+function box(branch, green = true, env = CLOUD) {
   return {
+    env,
     disk: fakeDisk({
       [`${ROOT}/${STAMP}`]: JSON.stringify({
         sha: green ? SHA : "0000",
@@ -34,34 +38,20 @@ function box(branch, green = true) {
   };
 }
 
-// The door reads the variable past an await, so the case holds it until the answer stands. [[spec/design_output/work#a-box-writes-its-branch]]
-async function onACloud(what) {
-  const was = process.env.CLAUDE_CODE_REMOTE;
-  process.env.CLAUDE_CODE_REMOTE = "true";
-  try {
-    return await what();
-  } finally {
-    if (was === undefined) delete process.env.CLAUDE_CODE_REMOTE;
-    else process.env.CLAUDE_CODE_REMOTE = was;
-  }
-}
-
 const denied = (said) => String(said?.result?.deny ?? "");
 
 test("a work branch in hand hands the work back, and trunk stays shut", async () => {
-  const said = await onACloud(() => onBash({ command: PUSH }, box("work/a-thing")));
+  const said = await onBash({ command: PUSH }, box("work/a-thing"));
   assert.match(denied(said), /hands it back/);
 });
 
 test("a session outside the queue lands its own work on trunk", async () => {
-  const said = await onACloud(() => onBash({ command: PUSH }, box("claude/a-thing")));
+  const said = await onBash({ command: PUSH }, box("claude/a-thing"));
   assert.equal(denied(said), "", "the door says nothing");
 });
 
 test("a red battery refuses the push on any branch", async () => {
-  const said = await onACloud(() =>
-    onBash({ command: PUSH }, box("claude/a-thing", false)),
-  );
+  const said = await onBash({ command: PUSH }, box("claude/a-thing", false));
   assert.match(denied(said), /green battery/);
 });
 

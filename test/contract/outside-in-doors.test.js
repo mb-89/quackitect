@@ -1,7 +1,7 @@
 // The rule holding the outside inside a door, through the real Vale. The path
 // Vale reads picks the section, so each case hands it the name of a file and
 // reads the rules that answer.
-// [[spec/design_output/doors#one-door-per-outside-thing]]
+// [[spec/design_output/doors#a-door-reads-the-outside]]
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
@@ -23,7 +23,7 @@ const GUARD = "DoorsOnly";
 
 const AT = "spec/config/styles/VoiceVale/OutsideInDoors.yml";
 
-// Every root the approach names passes, and the rule file says so in one place. [[spec/design_output/doors#one-door-per-outside-thing]]
+// Every root the approach names passes, and the rule file says so in one place. [[spec/design_output/doors#a-door-reads-the-outside]]
 const ROOTS = [
   "src/scripts/cli-doors.js",
   "src/scripts/cli-check.js",
@@ -96,7 +96,7 @@ ifVale("the rule passes a note naming the read in prose", async () => {
   );
 });
 
-// The extension takes a section of its own, so the import guard holds where it stands. [[spec/design_output/doors#one-door-per-outside-thing]]
+// The extension takes a section of its own, so the import guard holds where it stands. [[spec/design_output/doors#a-door-reads-the-outside]]
 ifVale("the extension passes the read and keeps its import guard", async () => {
   assert.ok(!(await ruledAt(PLATFORM, "src/extension/extension.js")).includes(RULE));
   assert.ok((await ruledAt(NODE, "src/extension/extension.js")).includes(GUARD));

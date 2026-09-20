@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"strconv"
@@ -191,26 +190,3 @@ func asRaw(said map[string]any) json.RawMessage {
 	return out
 }
 
-func starts(root string) error {
-	self, err := os.Executable()
-	if err != nil {
-		return err
-	}
-
-	one := exec.Command(self, "serve")
-	one.Dir = root
-	one.Env = append(os.Environ(), "QUACKITECT_ROOT="+root)
-	one.Stdout, one.Stderr = nil, nil
-	if err := one.Start(); err != nil {
-		return err
-	}
-	go one.Wait()
-
-	for waited := 0; waited < startPolls; waited++ {
-		if _, err := standingOf(root); err == nil {
-			return nil
-		}
-		time.Sleep(startPollPause)
-	}
-	return errorOf("the door took longer than thirty seconds to stand")
-}

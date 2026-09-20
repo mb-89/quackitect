@@ -28,6 +28,24 @@ Vale holds the line: `DoorsOnly` refuses a `node:` import, a `Date.now`, a
 `new Date()` and a `Math.random` anywhere but `src/doors`. The modules reaching
 nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
 
+# A door reads the outside
+
+`OutsideInDoors` holds the reads a `node:` import misses:
+
+| what the rule refuses | what a module takes |
+|---|---|
+| `process.env` and `process.argv` | `it.env` or `box.env`, off the hand a root builds |
+| `process.platform` | a `windows` argument the root reads once |
+| the Go import running a command | a call into the package's `door.go` |
+
+A root stands off the rule, because it builds the hand every module past it
+reads. `.vale.ini` names each one in a section, beside the doors and their
+fakes. The two rules take two switches, because a file standing off one wants
+the other.
+
+`test/contract/outside-in-doors.test.js` drives Vale over the name of each
+file, so a section a hand writes meets its case.
+
 # A raw run keeps bytes
 
 `proc.run` answers text. A caller passing `raw` gets a character a byte, so a

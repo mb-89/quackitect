@@ -37,7 +37,7 @@ export function guidanceHere(
   disk,
   method,
   work = method,
-  env = process.env,
+  env = {},
   tooth = true,
   argv = [],
 ) {
@@ -69,7 +69,7 @@ function readsGuidance(box) {
     box.disk,
     box.method,
     box.work,
-    process.env,
+    box.env ?? {},
     asks(box, TOOTH) !== false,
   );
 }
@@ -152,7 +152,7 @@ function surveyHere(box) {
   return writeSurvey(
     { disk: box.disk, proc: box.proc },
     box.work,
-    box.env ?? process.env,
+    box.env ?? {},
   );
 }
 
