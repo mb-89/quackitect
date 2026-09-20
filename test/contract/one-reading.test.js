@@ -51,11 +51,12 @@ test("each front's own route answers one list over the whole tree", async () => 
   assert.equal(typeof findings.linesNamed, "function", "the reader answers linesNamed");
   assert.equal(typeof reading.readingFor, "function", "the command line answers readingFor");
 
-  // The two sweeps run one after the other, because two Vale runs over one tree collide. [[spec/tickets/a-claim-meets-the-view]]
-  const drawn = await findings.findingsFor(boxOf(root), findings.FINDINGS);
-  const printed = await reading.readingFor(["."]);
+  // The two sweeps run one after the other, because two Vale runs over one tree collide. One folder proves the contract, where the whole tree costs the battery a minute under load. [[spec/tickets/a-claim-meets-the-view]]
+  const folder = "spec/guidance";
+  const drawn = await findings.findingsFor(boxOf(root), `${findings.FINDINGS}?path=${folder}`);
+  const printed = await reading.readingFor([folder]);
 
-  const panel = findings.linesNamed([...drawn.found, ...(serverFaults(["."]) ?? [])]);
+  const panel = findings.linesNamed([...drawn.found, ...(serverFaults([folder]) ?? [])]);
   const check = findings.linesNamed(printed.found);
 
   const alone = (one, other) => one.filter((row) => !other.includes(row));
