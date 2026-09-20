@@ -234,6 +234,24 @@ test("an outline place compares segment by segment, and the unplaced stands last
   assert.deepEqual(sorted, ["-2", "-1", "1", "1.2", "1.10", "2", "10"]);
 });
 
+// A sentence todo stands in the queue as a row of its own, placed by its anchor, with no link. [[spec/design_output/stop#the-plan]]
+test("the plan's todos stand in the answer as rows with a place", () => {
+  const { it } = doors({
+    [join(ROOT, ".se/.runtime/plan.json")]: JSON.stringify({
+      working: "",
+      todos: [{ title: "read the note", details: "the one on the grace", todo: "true" }],
+    }),
+  });
+  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
+  const said = answerOf(it);
+  const row = said.loose.find((one) => one.name === "read the note");
+  assert.equal(row.kind, "todo");
+  assert.equal(row.todo, true);
+  assert.equal(row.says, "the one on the grace");
+  assert.equal(row.queue, "1", "a bare anchor puts the todo first");
+  assert.equal(said.branches[0].queue, "2");
+});
+
 // The override lives in the plan file on this box, over the front, and lights the todo letter. [[spec/design_output/pull#a-todo-forces-a-place]]
 test("an override in the plan file moves the row and lights its todo, and travels into no ticket", () => {
   const { it } = doors({

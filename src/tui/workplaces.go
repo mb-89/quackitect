@@ -28,7 +28,12 @@ type workPlaces struct {
 	queue map[string]string
 	cloud map[string]bool
 	todo  map[string]bool
+	// The plan's own todos, which the index holds nowhere, so the tab adds them as rows. [[spec/design_output/stop#the-plan]]
+	rows []answerRow
 }
+
+// The kind a sentence todo carries, which draws with no link. [[spec/design_output/stop#the-plan]]
+const kindTodo = "todo"
 
 type placesMsg struct {
 	places workPlaces
@@ -40,6 +45,8 @@ type answerRow struct {
 	Name    string      `json:"name"`
 	Queue   string      `json:"queue"`
 	Todo    bool        `json:"todo"`
+	Kind    string      `json:"kind"`
+	Says    string      `json:"says"`
 	Merged  bool        `json:"merged"`
 	Tickets []answerRow `json:"tickets"`
 }
@@ -66,6 +73,9 @@ func placesIn(said []byte) (workPlaces, error) {
 	}
 	for _, one := range answer.Loose {
 		out.place(one)
+		if one.Kind == kindTodo {
+			out.rows = append(out.rows, one)
+		}
 	}
 	return out, nil
 }
@@ -88,6 +98,21 @@ func (t *Tree) Placed(p workPlaces) {
 			one.Keys[todoKey] = flagOf(said)
 		}
 	})
+	// A sentence todo the tree lacks lands as a row of its own, at the left, with no path and no link. [[spec/design_output/stop#the-plan]]
+	standing := map[string]bool{}
+	for _, one := range t.Items {
+		standing[one.Name] = true
+	}
+	for _, row := range p.rows {
+		if standing[row.Name] {
+			continue
+		}
+		t.Items = append(t.Items, Item{Name: row.Name, Keys: map[string]string{
+			"kind": kindTodo, "state": "open", queueKey: row.Queue, todoKey: flagOf(true),
+			cloudKey: flagOf(false), "urgent": flagOf(false), "says": row.Says,
+		}})
+	}
+	t.rebuild()
 }
 
 // The verb runs off the tab, and its answer lands as a message. [[spec/design_output/tui#the-work-tab]]

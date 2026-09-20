@@ -103,12 +103,13 @@ function ownTickets(held) {
 
 // The order the pull hands out, as an outline place a name. A person's open steps order first and count down, and the agent's takeable ones count up. [[spec/design_output/pull#the-queue-is-an-outline]]
 export function placesIn(it, read, stood) {
-  const all = ticketsIn(read);
+  const plan = planHere(it);
+  // A sentence todo stands in the queue as a row of its own, placed by its anchor and held by nobody. [[spec/design_output/stop#the-plan]]
+  const all = [...ticketsIn(read), ...todoRows(plan)];
   const open = all.filter((one) => fieldOf(one.text, "state") !== CLOSED);
   const at = { clock: it.clock, weights: it.weights, stood };
   // A person's step and a draft wait on a person. The agent's takeable steps count next, and every other open ticket after them. [[spec/design_output/pull#the-queue-is-an-outline]]
   // A ticket a hand holds, or the one the plan names, stands at zero. [[spec/design_output/pull#the-queue-is-an-outline]]
-  const plan = planHere(it);
   const inHand = open.filter((one) => Boolean(heldIn(one.text)) || one.name === plan.working);
   const free = open.filter((one) => !inHand.includes(one));
   const persons = queued(free.filter(waitsOnPerson), all, at);
@@ -129,10 +130,41 @@ export function placesIn(it, read, stood) {
 export function planHere(it) {
   try {
     const said = JSON.parse(it.disk.read(it.join(it.root, ...PLANS.split("/"))));
-    return { working: String(said?.working ?? ""), places: said?.places ?? {} };
+    return { working: String(said?.working ?? ""), places: said?.places ?? {}, todos: [said?.todos ?? []].flat() };
   } catch {
-    return { working: "", places: {} };
+    return { working: "", places: {}, todos: [] };
   }
+}
+
+// The plan's todos as the queue reads them: a name, an anchor, and no text, so the score skips them and the anchor places them. [[spec/design_output/stop#the-plan]]
+function todoRows(plan) {
+  return plan.todos
+    .filter((one) => one?.title)
+    .map((one) => ({ name: String(one.title), path: "", text: "", front: { todo: one.todo ?? "last" }, plan: true }));
+}
+
+// The plan's todos as rows of the answer, which the tab draws beside the tickets with no link. [[spec/design_output/stop#the-plan]]
+function planRows(plan, places) {
+  return plan.todos
+    .filter((one) => one?.title)
+    .map((one) => {
+      const place = places.get(String(one.title));
+      return {
+        name: String(one.title),
+        kind: "todo",
+        state: OPEN,
+        step: "",
+        progress: "",
+        group: "",
+        urgent: false,
+        person: false,
+        held: false,
+        waits: false,
+        todo: true,
+        says: String(one.details ?? ""),
+        ...(place === undefined ? {} : { queue: place }),
+      };
+    });
 }
 
 // [[spec/design_output/pull#the-queue-is-an-outline]]
@@ -188,9 +220,12 @@ export function answerOf(it, queue = true) {
       };
     }),
     // Every other ticket on trunk stands here, a group among them, and the tab nests each one under the group it names. [[spec/design_output/tree-view#the-name-column-nests]]
-    loose: [...read.loose, ...read.private]
-      .filter((one) => !branched.has(one.name) && !branched.has(fieldOf(one.text, GROUP)))
-      .map((one) => rowOfTicket(one, places, stood, open, overrides)),
+    loose: [
+      ...[...read.loose, ...read.private]
+        .filter((one) => !branched.has(one.name) && !branched.has(fieldOf(one.text, GROUP)))
+        .map((one) => rowOfTicket(one, places, stood, open, overrides)),
+      ...planRows(planHere(it), places),
+    ],
   };
 }
 

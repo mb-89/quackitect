@@ -80,6 +80,30 @@ func TestThePlacesLandOverTheTreeAndALaterTreeTakesThemAgain(t *testing.T) {
 	}
 }
 
+// A sentence todo the index holds nowhere lands as a row of its own, with its place and no link. [[spec/design_output/stop#the-plan]]
+func TestASentenceTodoLandsAsARowWithNoLink(t *testing.T) {
+	t.Parallel()
+	m := press(workWindow(t, 3), "2")
+	places, _ := placesIn([]byte(`{"branches":[],"loose":[{"name":"read the note","kind":"todo","queue":"1","todo":true,"says":"the one on the grace"}]}`))
+	out, _ := m.Update(placesMsg{places: places})
+	m = out.(model)
+	rows := m.work.Rows(120, 8)
+	if !strings.Contains(rows, "read the note") {
+		t.Fatalf("the todo stands as a row, and the rows read:\n%s", rows)
+	}
+	last := m.work.Items[len(m.work.Items)-1]
+	if last.Name != "read the note" || last.Keys["kind"] != kindTodo || last.Keys[todoKey] != "true" || last.Keys["says"] != "the one on the grace" {
+		t.Fatalf("the todo row carries its kind, its todo and its says, and reads %v", last)
+	}
+	if m.work.LinkOf != nil && m.work.LinkOf(last) != "" {
+		t.Fatal("a sentence todo links nowhere")
+	}
+	out, _ = m.Update(placesMsg{places: places})
+	if n := len(out.(model).work.Items); n != len(m.work.Items) {
+		t.Fatalf("a second answer adds the todo once, and %d items stand", n)
+	}
+}
+
 // A root holding no verb answers at once, with the reason and no places. [[spec/design_output/work#one-reading-answers-git]]
 func TestARootHoldingNoVerbAnswersWhy(t *testing.T) {
 	t.Parallel()

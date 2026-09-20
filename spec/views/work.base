@@ -39,6 +39,9 @@ groups:
   - name: urgent
     filters:
       - urgent: true and not state: closed
+  - name: todos
+    filters:
+      - todo: true
 views:
   - type: table
     name: every ticket

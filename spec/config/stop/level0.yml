@@ -18,7 +18,7 @@
   priority: 100
   decides: claimed
   runs: a-report-stands
-  asks: Does the last thing the owner said open a discussion, and does this same message carry the report with the table What the agent needs above the stop line?
+  asks: Does the last thing the owner said open a discussion in their own words, past a question you answer yourself, and does this same message carry the report with the table What the agent needs above the stop line?
   says: The owner opens a discussion, and the report stands in this message, so this turn ends and waits.
 
 - id: the-owner-says-carry-on

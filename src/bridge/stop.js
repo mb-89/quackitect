@@ -51,6 +51,8 @@ import { reacted, wants } from "./grace.js";
 import { REPORT_CALL } from "./report.js";
 
 const ENABLED = "stop.enabled";
+// The calls the finish hold lets pass before it refuses them the way the stop hold does. [[spec/design_output/stop#the-grace]]
+const GRACE_FINISH = "grace.finish";
 const MOST = "stop.mostInARow";
 // The refactoring hand this door starts. [[spec/tickets/the-spawn-reaches-its-guidance]]
 const REFACTOR = {
@@ -90,7 +92,11 @@ export function holdsCall(e, box) {
   }
   box.held = hold;
   const tool = String(e?.tool ?? "");
-  if (hold === STOP && !ENDS_TURN.has(tool)) {
+  // The finish hold is a grace: the block rides this many calls, and then the calls meet the stop hold's refusal. [[spec/design_output/stop#the-grace]]
+  if (hold === FINISH) box.finishCalls = (box.finishCalls ?? 0) + 1;
+  const most = Number(asks(box, GRACE_FINISH) ?? 0);
+  const spent = hold === FINISH && most > 0 && box.finishCalls > most;
+  if ((hold === STOP || spent) && !ENDS_TURN.has(tool)) {
     box.log.say(
       "debug",
       "hold",
@@ -120,6 +126,7 @@ export function dropsHold(e, box) {
   if (e?.agentId) return { pass: true };
   const hold = String(asks(box, HOLD) ?? OFF);
   box.held = "";
+  box.finishCalls = 0;
   if (hold !== FINISH && hold !== STOP) return { pass: true };
   // The mark the vote reads, so a hold dropped here still ends the turn it stood in. [[spec/design_output/stop#the-hold-outlives-its-drop]]
   box.stood = hold;

@@ -32,6 +32,11 @@
     "untouchedFor": "5m",
     "grace": 3
   },
+  "grace": {
+    "comment": "The calls the engine lets pass before an ask refuses them: the owner's ask for an update, and the finish hold before it stops hard. spec/design_output/stop.md, chapter The grace, says the rest.",
+    "update": 5,
+    "finish": 10
+  },
   "plan": {
     "comment": "The engine's three questions every so many calls: what you work on, which todos you finished, which you add. The third stays away past mostOpen. spec/design_output/stop.md, chapter The plan, says the rest.",
     "everyCalls": 10,

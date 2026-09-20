@@ -172,6 +172,9 @@ a time, and the calls ending a turn pass whatever stands.
 | the ask | what opens it | what answers it |
 |---|---|---|
 | the refactoring hand | the list past `refactor.mostWarnings`, and a file at rest past `refactor.untouchedFor` | the turn's end, where the stop door spawns the hand |
+| the plan's three questions | every `plan.everyCalls` calls | a `plan` field on a level zero call, or the `plan` call |
+| the owner's ask for an update | the sidebar's ask, with `grace.update` calls before the reply is due | the reply, in the chat and through `report` |
+| the finish hold | the sidebar's hold at finish, with `grace.finish` calls before the calls refuse | the turn's end |
 
 The list stands in `.se/.runtime/refactor.json`, one entry a warning, which
 the lint writes at each check. `refactor.grace` names the calls that pass.
@@ -190,11 +193,11 @@ holds the door.
 | which todos you finish | they leave the queue |
 | which todos you add, each at its place | they land, up to `plan.mostOpen` open ones |
 
-The ask rides the grace, and the answer rides a channel the owner never
-reads: a `plan` field on any level zero call, or the `plan` call where none
-is due. A built-in tool refuses a field its schema names nowhere, so the
-answer rides no such call. The log shows what changed, and the queue shows
-the rest: the row at zero, a new row, a row gone. The count starts over at
+The ask rides the grace. The answer rides a channel off the chat: a `plan`
+field on any level zero call, or the `plan` call where none is due. A
+built-in tool refuses a field its schema names nowhere, so the answer rides
+no such call. The log shows each change, and the queue shows the rest: the
+row at zero, a new row, a row gone. The count starts over at
 an answer, and the grace stands past a batch of calls sent at once.
 
 # The vote

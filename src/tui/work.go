@@ -60,7 +60,13 @@ func loadWork(path string) (*Tree, error) {
 	tree.Flagged(one.Flags)
 	tree.Presets(one.Presets)
 	// A name in the table links to its note, so the details carry no path. [[spec/design_output/tree-view#a-value-carries-a-link]]
-	tree.LinkOf = func(item Item) string { return fileAddress(root, pathOf(item)) }
+	tree.LinkOf = func(item Item) string {
+		// A sentence todo is no note, so its name links nowhere. [[spec/design_output/stop#the-plan]]
+		if item.Keys["kind"] == kindTodo {
+			return ""
+		}
+		return fileAddress(root, pathOf(item))
+	}
 	return tree, nil
 }
 

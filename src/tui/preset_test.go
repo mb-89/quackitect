@@ -113,7 +113,12 @@ func TestABaseFileNamesThePresetsUnderGroups(t *testing.T) {
 		}
 	}
 	// The urgent preset keeps the open ones, because a closed ticket asks nothing of anybody. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-	if last := said[len(said)-1]; last.Name != "urgent" || !strings.Contains(last.Filters, "not state: closed") {
-		t.Fatalf("urgent keeps the open tickets alone, and it reads %v", last)
+	urgent := said[len(said)-2]
+	if urgent.Name != "urgent" || !strings.Contains(urgent.Filters, "not state: closed") {
+		t.Fatalf("urgent keeps the open tickets alone, and it reads %v", urgent)
+	}
+	// The todos preset keeps every row a todo places, the sentence todos among them. [[spec/design_output/stop#the-plan]]
+	if last := said[len(said)-1]; last.Name != "todos" || last.Filters != "todo: true" {
+		t.Fatalf("the todos preset stands last on alt+5, and it reads %v", last)
 	}
 }
