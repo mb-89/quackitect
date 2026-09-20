@@ -56,6 +56,11 @@ test("one call adds todos at their place, finishes some, and names the work in h
   plan({ working: "write the test", done: ["read the note"] }, it.box);
   held = plansHere(it.box);
   assert.equal(held.working, "write the test");
+  // Finishing the thing in hand names it done, and the hand stands empty. [[spec/design_output/stop#the-plan]]
+  plan({ done: ["write the test"] }, it.box);
+  assert.equal(plansHere(it.box).working, "");
+  assert.deepEqual(plansHere(it.box).todos, []);
+  plan({ working: "write the test" }, it.box);
   assert.deepEqual(
     held.todos.map((one) => one.title),
     ["write the test"],

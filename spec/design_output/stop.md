@@ -253,6 +253,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` |
 | `chat-is-new` | the session log holds one prompt row at most, the box is no cloud box, and the answer names no next step |
 | `a-report-stands` | the message ending the turn carries the heading What the agent needs with a numbered row under it |
+| `the-plan-is-empty` | the plan holds no todo and nothing in hand, so a claim of done stands on an empty plan |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
 | `never` | nothing, which is what an unbuilt rule takes |
 

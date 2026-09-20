@@ -116,6 +116,8 @@ function plans(e, box) {
   }
   const working = String(e?.working ?? "").trim();
   if (working) plan.working = working;
+  // Finishing the thing in hand names it done, and the hand stands empty. [[spec/design_output/stop#the-plan]]
+  if (done.has(plan.working)) plan.working = "";
   writes(box, plan);
   reacted(box, PLAN);
   // The count starts over at an answer, so the next ask stands the full span away. [[spec/design_output/stop#the-plan]]
