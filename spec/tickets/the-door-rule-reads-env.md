@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -199,6 +199,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-21
+    hash_before: 08254b211f1d0c3df706dd0d39dbf98afb15c3cb
+    hash_after: 770c5622a63efde37130c770fd84870748d9ae39
+reason: done
 ---
 
 # Ask
@@ -502,17 +507,84 @@ test-first rule passes, because each loads under the editor's own runtime.
 
 <!-- the form is files -->
 
+    .vale.ini
+    spec/config/styles/VoiceVale/OutsideInDoors.yml
+    spec/design_output/doors.md
+    .claude/skills/level0/lib/tested.js
+    src/bridge/bash.js
+    src/bridge/guidance.js
+    src/bridge/server.js
+    src/bridge/stop.js
+    src/bridge/vehicle.js
+    src/extension/editor-process.js
+    src/index/door.go
+    src/index/main.go
+    src/lsp/check.go
+    src/lsp/door.go
+    src/lsp/main.go
+    src/lsp/private.go
+    src/lsp/tree.go
+    src/scripts/cli.js
+    src/scripts/cli-doors.js
+    src/scripts/hand.js
+    src/scripts/pull-hand.js
+    src/scripts/vehicle.js
+    src/scripts/work.js
+    test/contract/outside-in-doors.test.js
+    test/level0/outside-hand.test.js
+    test/level0/stop-door.test.js
+    test/level0/tested.test.js
+    test/level0/trunk-door.test.js
+    spec/tickets/the-door-rule-reads-env.md
+    spec/tickets/a-door-holds-file-calls.md
+    spec/tickets/a-door-holds-the-go-file-calls.md
+    HANDOVER.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- The ask's first criterion lands. The rule refuses `process.env`,
+  `process.argv` and `process.platform` outside a door, and `.vale.ini` alone
+  names what stands off.
+- The third lands. `pull-hand.js` takes `it.env`, `stop.js` takes `box.env`,
+  and the hand `cli-doors.js` builds carries the map both read.
+- The fourth lands. `./RUNME.sh lint src` answers 0 on the commit this branch
+  stands on, and that commit matches origin.
+- The second lands by half. The Go rule reads `os/exec`, and the file calls
+  ride the draft ticket `a-door-holds-file-calls`, the split design/review
+  passed.
+- `./RUNME.sh check` answers 0 on that commit, and `./RUNME.sh branch review
+  the-rules-hold-themselves` finds nothing to fix.
+- The rule carries a case feeding it a bad line a read, which asserts the
+  refusal by name through the real Vale. No case skips, so Vale ran.
+- One code file stands outside the approach's tables. `tested.js` grows the
+  no-case list by the editor files, and a case in `tested.test.js` holds it. It
+  redesigns nothing.
+- The branch renames the minted ask to `a-door-holds-file-calls`, so the name
+  meets the word cap two contract cases read. The rename carries no other
+  change.
+- A retro stands in `HANDOVER.md`, under the chapter the findings reach, and
+  `a-door-holds-three-reads` carries the reads the rule leaves out.
+- The pid read stands on `a-door-holds-the-pid` and on
+  `a-door-holds-three-reads` alike, under the private folder. The retro drops
+  one.
+- `[*.{js,ts,tsx,go}]` writes `DoorsOnly = YES` and leaves the new rule to the
+  style default. The case over `src/bridge/stop.js` proves it fires either way.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- one place owns each fact the change adds, and a note points at the file. The
+  tokens stand in `OutsideInDoors.yml`, and the pass list in `.vale.ini`. The
+  doors chapter points at both, and copies neither.
 
 # Discussion
 
