@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box 5387e4f82b24 · claude-code-remote
@@ -88,6 +88,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-rules-hold-themselves already carries every commit on main.
+  - step: split
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: c3ba8d9eeae47807912fa6261236885b40c1c659
+    hash_after: 7829ca90d33aa8c189e9817722b9d4d894588373
 ---
 
 # Ask
