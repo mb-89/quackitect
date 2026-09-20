@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -168,6 +168,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box fa49097ce66c · claude-code-remote · helper-18
+    hash_before: 749d85e106ddf72c6060fd299252ec97c06b934c
+    hash_after: 749d85e106ddf72c6060fd299252ec97c06b934c
+reason: done
 ---
 
 # Ask
@@ -484,12 +489,9 @@ wording where a person asks after a fall later. The chapter names the route
 <!-- the form is files -->
 
 - .claude/skills/level0/hooks/level0.js
-- .claude/skills/level1/hooks/level1.js
 - spec/design_output/extension.md
 - spec/design_output/level0.md
-- spec/design_output/vehicle.md
 - spec/guidance/review/reviewing.md
-- spec/tickets/the-answer-door-reads-chat.md
 - spec/tickets/the-bridge-says-it-falls.md
 - src/scripts/cli-check.js
 - test/level0/check-server.test.js
@@ -501,26 +503,22 @@ wording where a person asks after a fall later. The chapter names the route
 
 <!-- the form is verdict -->
 
-fail
+pass
 
 - the ask lands: `down` says one line in the chat, and `doctor` names a bridge standing down
-- `url()` answers the event route, and line 176 of the bridgehead chapter calls it the health call
-- line 180 of that chapter repeats the health call wording, and the hook names the event route
-- the tree reads the health call as `/health` at lines 228, 235 and 238 of that chapter
-- fix: name the event route at both lines, so a reader of the chapter reads the code
-- the case over a failing session log asserts one chat line, which `toldDown` holds alone
-- a probe reverting the flag move keeps that case green, and the row writes go 2 to 4
-- so the flag move answering finding six carries no case proving it fires
-- fix: add a case counting the rows a failing log takes, one a fall
-- `spec/design_output/extension.md` line 341 says a dead server leaves the agent running the same
-- the change gives that agent a chat line, and the pointer under line 341 reaches the old chapter
-- fix: correct line 341, and point it at the chapter this branch adds
+- fix one lands: line 176 of the bridgehead chapter names the event route
+- line 180 of that chapter points at `url()`, which answers `/event` at line 35 of the hook
+- lines 228 to 238 keep the health call wording for the check's probe, which reads `/health`
+- fix two lands: the failing-log case counts the rows through `tries` on the fake
+- a mutant giving `saidDown` the answer of the write turns that case red, 3 against 1
+- fix three lands: line 341 of the extension chapter gives that agent its chat line
+- the pointer under line 341 reaches the chapter this branch adds, and that anchor stands
 - the session start case and the once case each break under a mutant, so both guards hold
-- the diff reaches six files, and `serverLine(get = fetch)` opens the doctor to a fake door
-- `./RUNME.sh check` answers 0 on this branch
+- the doctor case drives `serverLine` over a fake door, one fall and one server standing
+- the diff reaches seven files, and each one serves the two lines of the ask
+- `./RUNME.sh check` answers 0 on this branch, 1278 cases green and 2 skipped
 - `./RUNME.sh branch review` reads the retro as absent from the handback
-- a local box running no server draws the line at its first `prompt.context`
-- the cage chapter's code 3 reasoning covers the block alone, so that silence holds
+- one case message says health call where its assertion reads the event port, which stands minor
 
 ## checked
 
@@ -528,7 +526,7 @@ fail
 
 <!-- the form is checklist -->
 
-- the chapter owns the road, each new comment points at it, and two lines name the wrong route
+- the fall chapter holds the road, and the two older lines point at it in place of repeating it
 
 # Discussion
 
