@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -226,6 +226,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 099c2ec7708d · claude-code-remote · helper-20
+    hash_before: 94993f9727afe6489ce6a6512dc65dda22412d80
+    hash_after: 94993f9727afe6489ce6a6512dc65dda22412d80
+reason: done
 ---
 
 # Ask
@@ -464,12 +469,10 @@ The verdict round asks for one owner on two things, and each takes it:
 - src/scripts/tui.js
 - src/scripts/cli.js
 - src/scripts/cli-check.js
-- src/scripts/group.js
 - src/scripts/queue.js
 - src/scripts/work-stands.js
 - src/scripts/install.sh
 - src/bridge/stop.js
-- src/extension/sidebar.js
 - .claude/skills/level0/lib/log.js
 - spec/design_output/log.md
 - test/level0/log-verb.test.js
@@ -480,24 +483,27 @@ The verdict round asks for one owner on two things, and each takes it:
 <!-- pass or fail, findings one a line -->
 <!-- the form is verdict -->
 
-fail
+pass
 
 - the ask holds: `./RUNME.sh log` narrows the rows by span, level, kind and count
 - `./RUNME.sh check` answers exit 0 on this commit
-- `./RUNME.sh branch review the-verbs-take-the-shell` answers check passes, and no retro stands
-- the diff beyond the ask holds two trivial hunks, and neither redesigns what the ask leaves alone
-- the clock door lands in `src/scripts/cli-check.js`, and `MS` points home from `src/scripts/work-stands.js`
-- the cases cover each filter, and the install case goes red where a guard falls off a `say` line
-- the design review asks for one `MS` owner, and two copies stand outside the log lib
-- fix: `src/bridge/stop.js` and `src/scripts/queue.js` each keep an `MS` of their own, so point both at the lib
-- fix: `src/scripts/log-verb.js` copies the no-log line out of `src/scripts/tui.js`, so give it one owner
+- `./RUNME.sh branch review the-verbs-take-the-shell` answers check passes, and the retro waits on this verdict
+- `MS` stands once, in `.claude/skills/level0/lib/log.js`, and no second copy greps out of the tree
+- `work-stands.js`, `queue.js` and `stop.js` each import it, so the first finding lands
+- `NO_LOG` stands once, in `src/scripts/log-read.js`, and `log-verb.js` and `tui.js` each import it
+- `plainRows` calls `filesFor` and `rowsIn`, so one owner holds the read over the session file
+- every hunk serves the ask, and none redesigns what the ask leaves alone
+- the cases cover each filter, and each bad name asserts an empty answer
+- the install case goes red where a guard falls off the `Ready.` line
+- `./RUNME.sh log --help` prints each flag, and the flags together answer rows on this box
+- `narrowed` and the flag reading carry no case, and the ask names the filters alone
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the chapter owns the flags table, and the fail names the no-log line and `MS` as the copies standing
+- the chapter owns the flags table, and `MS` and `NO_LOG` each stand in one file
 
 # Discussion
 
