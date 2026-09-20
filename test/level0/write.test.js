@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
-import { marksSeen, onWrite } from "../../src/bridge/write.js";
+import { errorsIn, marksSeen, onWrite } from "../../src/bridge/write.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
@@ -127,4 +127,14 @@ test("the same bad ticket written into the vehicle's own tree is refused the sam
     root: METHOD,
   });
   assert.match(said?.result?.deny ?? "", /steps/);
+});
+
+// A rule of form reads warning, and the write lands with it standing for the refactoring hand. [[spec/rationales/voice#11-form-and-substance]]
+test("a warning lets the write land, and an error refuses it", () => {
+  const warned = { rule: "VoiceParagraph.Sentence", line: 1, severity: "warning" };
+  const erred = { rule: "VoiceParagraph.Vocabulary", line: 1, severity: "error" };
+  const bare = { rule: "VoiceVale.History", line: 1 };
+  assert.deepEqual(errorsIn([warned]), [], "a warning alone refuses nothing");
+  assert.deepEqual(errorsIn([warned, erred, bare]), [erred, bare], "an error stands, and a finding naming no side reads error");
+  assert.deepEqual(errorsIn(undefined), []);
 });

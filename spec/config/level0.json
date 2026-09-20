@@ -29,7 +29,7 @@
     "parallel": true,
     "mostWarnings": 25,
     "mostAtOnce": 1,
-    "untouchedFor": "7d"
+    "untouchedFor": "5m"
   },
   "engine": {
     "comment": "The engine level one brings. spec/design_output/config.md, chapter The engine controls, says what each value means.",

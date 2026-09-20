@@ -38,6 +38,7 @@ import {
 import { WORK_BRANCH } from "../engine/group.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
+import { errorsIn } from "./write.js";
 
 const COMMIT = "level0-commit.md";
 const PASS = { pass: true };
@@ -89,13 +90,13 @@ async function commandRules(command, _e, box) {
   return refusedCommand(command, found);
 }
 
-// [[spec/design_output/bash#a-commit-message-meets-voice]]
+// A message meets the voice rules, and a break of form lands the way a write does. [[spec/rationales/voice#11-form-and-substance]]
 export async function messageFaults(message, box) {
   if (!box.vale.stands()) return [];
   const text = withoutTrailers(String(message ?? ""));
   if (!text.trim()) return [];
   const ran = await box.vale.lint(text, COMMIT);
-  return ran.ran ? readsProse(box, text, ran.found) : [];
+  return ran.ran ? errorsIn(readsProse(box, text, ran.found)) : [];
 }
 
 // [[spec/design_output/bash#a-commit-message-meets-voice]]

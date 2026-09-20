@@ -148,10 +148,15 @@ export async function proseFaults(text, where, box) {
   return readsProse(box, text, said.found);
 }
 
+// A rule reading warning is a break of form, and the write lands with it standing for the refactoring hand. [[spec/rationales/voice#11-form-and-substance]]
+export function errorsIn(found) {
+  return (found ?? []).filter((one) => String(one?.severity ?? "error") !== "warning");
+}
+
 // [[spec/design_output/level0#the-write-door]]
 async function voiceDoor(e, writing, where, box) {
   const whole = wholeAfter(e, writing, box.disk);
-  const found = await proseFaults(whole, where, box);
+  const found = errorsIn(await proseFaults(whole, where, box));
   if (!found.length) return "";
   box.log.say("warn", "vale", `refused ${found.length} line(s) in ${where}`, {
     file: where,
