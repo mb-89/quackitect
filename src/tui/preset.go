@@ -1,6 +1,6 @@
 // A preset is a filter somebody wrote down, and it carries a sort beside it. A
-// press puts both in, and a press again takes the filter off. The person then
-// changes either one, and the preset holds nothing after the press. A slice is
+// press writes the filter into the line every tab types into, so it reads and
+// clears like one a person types, and the sort takes hold with it. A slice is
 // the same thing over the values one column carries, so it costs no line.
 // [[spec/design_output/tree-view#a-preset-carries-its-sort]]
 
@@ -19,7 +19,7 @@ type Preset struct {
 	Pressed bool
 }
 
-// [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+// The presets the file names, and the sort of the one pressed there takes hold at the start. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
 func (t *Tree) Presets(said []Preset) {
 	t.presets = append([]Preset(nil), said...)
 	for _, one := range t.presets {
@@ -27,54 +27,36 @@ func (t *Tree) Presets(said []Preset) {
 			t.sorts = append([]Sort(nil), one.Sorts...)
 		}
 	}
-	t.applyPresets()
+	t.rebuild()
 }
 
 // [[spec/design_output/tree-view#a-preset-carries-its-sort]]
 func (t Tree) PresetList() []Preset { return append([]Preset(nil), t.presets...) }
 
-// A press adds a preset to what already stands, and a press again takes it off. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-func (t *Tree) Press(name string) {
-	for at, one := range t.presets {
-		if one.Name != name {
-			continue
-		}
-		t.presets[at].Pressed = !one.Pressed
-		if t.presets[at].Pressed && len(one.Sorts) > 0 {
-			t.sorts = append([]Sort(nil), one.Sorts...)
-		}
-		t.applyPresets()
-		return
-	}
-}
-
-// What a person types stands beside the presses, and narrows with them. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-func (t *Tree) Filtering(said string) {
-	t.typed = said
-	t.applyPresets()
-}
-
-// The filter the presses and the typed line add up to. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-func (t *Tree) applyPresets() {
-	said := make([]string, 0, len(t.presets)+1)
+// The filter the file presses at the start, which the line opens with. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func (t Tree) Opening() string {
+	said := make([]string, 0, len(t.presets))
 	for _, one := range t.presets {
 		if one.Pressed && strings.TrimSpace(one.Filters) != "" {
-			said = append(said, "("+one.Filters+")")
+			said = append(said, one.Filters)
 		}
 	}
-	if strings.TrimSpace(t.typed) != "" {
-		said = append(said, "("+t.typed+")")
-	}
-	if len(said) == 0 {
+	return strings.Join(said, " and ")
+}
+
+// The line a person types is the whole filter, and a preset is what wrote it. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func (t *Tree) Filtering(said string) error {
+	t.typed = said
+	if strings.TrimSpace(said) == "" {
 		t.Narrow(Filter{})
-		return
+		return nil
 	}
-	held, err := ParseFilter(strings.Join(said, " and "))
+	held, err := ParseFilter(said)
 	if err != nil {
-		t.rebuild()
-		return
+		return err
 	}
 	t.Narrow(held)
+	return nil
 }
 
 // The values one column carries, each a preset of its own, so a slice costs no line. [[spec/design_output/tree-view#a-preset-carries-its-sort]]

@@ -163,13 +163,45 @@ func TestTheTabReadsTheBaseFileAndTheIndexOffTheLogsOwnPath(t *testing.T) {
 		t.Fatalf("the group, its ticket and the loose one stand, and %d rows do", tree.Len())
 	}
 	head := tree.Header(120)
-	for _, one := range []string{"name", "state", "standing", "flags", "step", "group", "says"} {
+	for _, one := range []string{"name", "flags", "step", "group", "queue"} {
 		if !strings.Contains(head, one) {
 			t.Fatalf("the column %s stands in the names, and they read %q", one, head)
 		}
 	}
 	if strings.Join(door.asked, " ") != "tickets" {
 		t.Fatalf("the tab asks the door for the tickets and nothing else, and asked %v", door.asked)
+	}
+	// The table draws no ask, no state and no kind: the state leads the flags, the mark says which row is a group, and the details draw the ask whole. [[spec/design_output/tui#the-work-tab]]
+	for _, gone := range []string{"says", "state", "kind", "standing"} {
+		if strings.Contains(head, gone) {
+			t.Fatalf("the column %s stands off the table, and the names read %q", gone, head)
+		}
+	}
+}
+
+// A ticket naming another row nests under it, at any depth, and one naming a row nobody holds stands at the left. [[spec/design_output/tree-view#the-name-column-nests]]
+func TestATicketNestsUnderTheRowItNamesAtAnyDepth(t *testing.T) {
+	t.Parallel()
+	items, err := ReadWorkItems(`[
+		{"name": "its-child", "route": "trivial", "state": "open", "group": "a-group", "says": "One piece."},
+		{"name": "a-group", "route": "group", "state": "open", "group": "", "says": "Two as one."},
+		{"name": "grandchild", "route": "trivial", "state": "open", "group": "its-child", "says": ""},
+		{"name": "alone", "route": "trivial", "state": "open", "group": "nobody", "says": ""}
+	]`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(items) != 2 || items[0].Name != "a-group" || items[1].Name != "alone" {
+		t.Fatalf("the group and the ticket naming no standing row stand at the left, and the roots read %v", items)
+	}
+	if items[0].Keys["kind"] != kindGroup || items[1].Keys["kind"] != kindTicket {
+		t.Fatalf("the kind reads off the route, and it reads %v", items)
+	}
+	if len(items[0].Kids) != 1 || items[0].Kids[0].Name != "its-child" {
+		t.Fatalf("the child nests under its group, and the kids read %v", items[0].Kids)
+	}
+	if len(items[0].Kids[0].Kids) != 1 || items[0].Kids[0].Kids[0].Name != "grandchild" {
+		t.Fatalf("a child's own child nests under it, and the kids read %v", items[0].Kids[0].Kids)
 	}
 }
 

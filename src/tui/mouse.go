@@ -23,7 +23,11 @@ func firstRow() int { return headWide + namesWide }
 
 // [[spec/design_output/tui#the-mouse-reaches-the-window]]
 func (m model) mouse(msg tea.MouseMsg) (tea.Model, tea.Cmd) {
+	// The strip answers a press under every pane, so a tab switches while the filter stands open. [[spec/design_output/tui#a-number-opens-a-tab]]
 	if m.pane == paneFilter {
+		if msg.Button == tea.MouseButtonLeft && msg.Action == tea.MouseActionPress && msg.Y == stripRow {
+			m.pressStrip(msg.X)
+		}
 		return m, nil
 	}
 	switch msg.Button {

@@ -1,7 +1,7 @@
 // The work tab. It draws every ticket this tree holds, nested under its group,
 // off the rows the index answers. A change under the tree wakes the index,
 // and the index wakes this tab, so it redraws with no key pressed and polls
-// nothing. No file stands between the index and the tab.
+// nothing. The details draw one row whole, with its links.
 // [[spec/design_output/tui#the-work-tab]]
 
 package main
@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -21,6 +20,9 @@ import (
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]
 const workBaseAt = "spec/views/work.base"
+
+// The keys the details draw as fields, in this order, and the rest they leave to the flags and the text. [[spec/design_output/tui#the-work-tab]]
+var detailKeys = []string{"step", "group", "standing", "route", "queue", "path"}
 
 // [[spec/design_output/tui#the-work-tab]]
 type workTab struct{}
@@ -56,44 +58,26 @@ func loadWork(path string) (*Tree, error) {
 	tree.Sorted(one.Sorts)
 	// [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 	tree.Flagged(one.Flags)
-	// A preset pressed in the file stands pressed when the tab opens. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
 	tree.Presets(one.Presets)
 	return tree, nil
 }
 
-// The buttons the filter panel draws, each with the key that presses it. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-func workPresets(m *model) []part {
+// The presets the base file names, each under a number with alt. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func (workTab) Presets(m *model) []preset {
 	if m.work == nil {
 		return nil
 	}
 	said := m.work.PresetList()
-	if len(said) == 0 {
-		return nil
-	}
-	names := make([]string, 0, len(said))
+	out := make([]preset, 0, len(said))
 	for at, one := range said {
-		name := fmt.Sprintf("alt+%d %s", at+1, one.Name)
-		if one.Pressed {
-			names = append(names, openStyle.Render("["+name+"]"))
-			continue
-		}
-		names = append(names, dimStyle.Render(" "+name+" "))
+		out = append(out, preset{
+			Name:   one.Name,
+			Filter: one.Filters,
+			Key:    fmt.Sprintf("alt+%d", at+1),
+			Sorts:  one.Sorts,
+		})
 	}
-	return []part{{}, {text: strings.Join(names, " "), drawn: true}}
-}
-
-// A number under alt presses the preset standing at that place. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-func pressPreset(m *model, name string) bool {
-	if m.work == nil || !strings.HasPrefix(name, "alt+") {
-		return false
-	}
-	at, err := strconv.Atoi(strings.TrimPrefix(name, "alt+"))
-	said := m.work.PresetList()
-	if err != nil || at < 1 || at > len(said) {
-		return false
-	}
-	m.work.Press(said[at-1].Name)
-	return true
+	return out
 }
 
 // [[spec/design_output/tui#the-work-tab]]
@@ -162,7 +146,7 @@ func workWaits(m *model, w, rows int) []string {
 	return lines
 }
 
-// [[spec/design_output/tui#the-work-tab]]
+// The details of one row: the name as a link, the fields, every flag in the column's order, then the whole ask. [[spec/design_output/tui#the-work-tab]]
 func (workTab) Detail(m *model, w int) []part {
 	if m.work == nil {
 		return []part{{text: cut("A row of the work browser shows its note here.", w)}}
@@ -171,9 +155,53 @@ func (workTab) Detail(m *model, w int) []part {
 	if one == nil {
 		return []part{{text: cut("No row stands under the cursor.", w)}}
 	}
-	out := make([]part, 0, len(one.Keys)+1)
-	for _, line := range strings.Split(one.Detail(), "\n") {
-		out = append(out, part{text: cut(line, w)})
+	root := workRoot(m.path)
+	out := []part{{text: headStyle.Bold(true).Render(linked(one.Name, fileAddress(root, pathOf(*one)))), drawn: true}}
+	out = append(out, workFields(root, *one)...)
+	out = append(out, part{})
+	for _, held := range m.work.States(*one) {
+		out = append(out, part{text: flagStyle(held).Render(fmt.Sprintf("%s  %-8s %s", strings.ToUpper(held.Letter), held.Key, held.Value)), drawn: true})
+	}
+	says := strings.TrimSpace(one.Keys["says"])
+	if says == "" {
+		return out
+	}
+	out = append(out, part{})
+	for _, line := range strings.Split(Wrap(says, w), "\n") {
+		out = append(out, part{text: withLinks(root, line), drawn: true})
+	}
+	return out
+}
+
+// The path a row names, or the ticket's own place under the tickets folder. [[spec/design_output/tree-view#a-value-carries-a-link]]
+func pathOf(one Item) string {
+	if said := strings.TrimSpace(one.Keys["path"]); said != "" {
+		return said
+	}
+	return ticketPath(one.Name)
+}
+
+// The fields a row carries, one a line, each value a link where the tree resolves it. [[spec/design_output/tree-view#a-value-carries-a-link]]
+func workFields(root string, one Item) []part {
+	wide := 0
+	for _, key := range detailKeys {
+		if strings.TrimSpace(one.Keys[key]) != "" {
+			wide = max(wide, len(key))
+		}
+	}
+	out := []part{}
+	for _, key := range detailKeys {
+		value := strings.TrimSpace(one.Keys[key])
+		if value == "" {
+			continue
+		}
+		switch key {
+		case "group":
+			value = linked(value, fileAddress(root, ticketPath(value)))
+		case "path":
+			value = linked(value, fileAddress(root, value))
+		}
+		out = append(out, part{text: dimStyle.Render(fmt.Sprintf("%-*s  ", wide, key)) + value, drawn: true})
 	}
 	return out
 }
@@ -183,10 +211,6 @@ func (workTab) Narrowed(m *model) bool { return m.work != nil && m.work.Narrowed
 // [[spec/design_output/tui#the-help-reads-the-cursor]]
 func (workTab) Keys(m *model) band {
 	return band{name: "THE WORK", acts: []act{
-		{bind("1 2", "the log, and the work", "1", "2"), func(m *model, name string) tea.Cmd {
-			m.openTab(int(name[0] - '0'))
-			return nil
-		}},
 		{bind("w s", "one row up, one row down", "w", "s", "W", "S"), func(m *model, name string) tea.Cmd {
 			step := 1
 			if strings.EqualFold(name, "w") {
@@ -194,6 +218,7 @@ func (workTab) Keys(m *model) band {
 			}
 			if m.work != nil {
 				m.work.Move(step)
+				m.loadPane()
 			}
 			return nil
 		}},
@@ -201,6 +226,17 @@ func (workTab) Keys(m *model) band {
 			if m.work != nil {
 				m.work.Toggle()
 			}
+			return nil
+		}},
+		{bind("+ -", "open every group, and close every one", "+", "-"), func(m *model, name string) tea.Cmd {
+			if m.work == nil {
+				return nil
+			}
+			if name == "+" {
+				m.work.Expand(true)
+				return nil
+			}
+			m.work.Collapse(true)
 			return nil
 		}},
 		// [[spec/design_output/tui#the-work-tab-takes-edits]]

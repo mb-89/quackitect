@@ -1,17 +1,17 @@
-// The work tab's items, read off the rows the index answers. A group's row
-// carries the tickets naming it under it, and a ticket naming no group, or one
-// the rows hold nowhere, stands at the left. Nothing here opens a file.
+// The work tab's items, read off the rows the index answers. A ticket naming
+// another row nests under it, whatever route the parent rides, and a ticket
+// naming no row stands at the left. Nothing here opens a file.
 // [[spec/design_output/tui#the-work-tab]]
 
 package main
 
 import "encoding/json"
 
-// A row every item carries, so the filter reads one word for every kind. [[spec/design_output/tui#the-work-tab]]
-const workKind = "ticket"
-
-// The route a group rides, the word [[spec/design_output/index#the-index-answers-the-tickets]] answers under route.
-const groupRoute = "group"
+// The kinds a row carries, off the route a group rides, which the mark draws and the filter reads. [[spec/design_output/tree-view#the-name-column-nests]]
+const (
+	kindTicket = "ticket"
+	kindGroup  = "group"
+)
 
 // The standing a held branch gives, one of the words [[spec/design_output/work#what-the-standing-says]] names.
 const heldStanding = "held"
@@ -39,33 +39,50 @@ func ReadWorkItems(text string) ([]Item, error) {
 	return itemsOfTickets(rows), nil
 }
 
-// [[spec/design_output/tui#the-work-tab]]
+// A row naming another row as its group nests under it, and the rest stand at the left in the order the rows come. [[spec/design_output/tree-view#the-name-column-nests]]
 func itemsOfTickets(rows []ticketRow) []Item {
-	groups := map[string]int{}
-	out := make([]Item, 0, len(rows))
+	items := make(map[string]*Item, len(rows))
+	order := make([]string, 0, len(rows))
 	for _, one := range rows {
-		if one.Route == groupRoute {
-			groups[one.Name] = len(out)
-			out = append(out, itemOfTicket(one))
-		}
+		held := itemOfTicket(one)
+		items[one.Name] = &held
+		order = append(order, one.Name)
 	}
-	for _, one := range rows {
-		if one.Route == groupRoute {
+	roots := make([]string, 0, len(rows))
+	for _, name := range order {
+		one := items[name]
+		parent, found := items[one.Keys["group"]]
+		if found && parent != one {
+			parent.Kids = append(parent.Kids, *one)
 			continue
 		}
-		if at, held := groups[one.Group]; held {
-			out[at].Kids = append(out[at].Kids, itemOfTicket(one))
-			continue
-		}
-		out = append(out, itemOfTicket(one))
+		roots = append(roots, name)
+	}
+	out := make([]Item, 0, len(roots))
+	for _, name := range roots {
+		out = append(out, withKids(items, *items[name]))
 	}
 	return out
 }
 
+// A parent's kids landed before their own kids did, so the tree reads the map once more on the way down. [[spec/design_output/tree-view#the-name-column-nests]]
+func withKids(items map[string]*Item, one Item) Item {
+	kids := make([]Item, 0, len(one.Kids))
+	for _, kid := range one.Kids {
+		kids = append(kids, withKids(items, *items[kid.Name]))
+	}
+	one.Kids = kids
+	return one
+}
+
 // [[spec/design_output/tui#the-work-tab]]
 func itemOfTicket(one ticketRow) Item {
+	kind := kindTicket
+	if one.Route == kindGroup {
+		kind = kindGroup
+	}
 	return Item{Name: one.Name, Keys: map[string]string{
-		"kind":     workKind,
+		"kind":     kind,
 		"path":     one.Path,
 		"state":    one.State,
 		"step":     one.Step,

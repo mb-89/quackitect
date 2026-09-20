@@ -114,6 +114,10 @@ func (m model) bands() []band {
 
 // [[spec/design_output/tui#the-help-reads-the-cursor]]
 func (m model) key(name string) (tea.Model, tea.Cmd) {
+	// A preset's key stands before the bands, so the same key presses it over the tab and under the pane. [[spec/design_output/tui#one-key-filters-the-line]]
+	if m.pressKey(name) {
+		return m, nil
+	}
 	for _, held := range m.bands() {
 		for _, one := range held.acts {
 			if matches(name, one.key) {
@@ -132,7 +136,27 @@ func (m model) helpParts(w int) []part {
 		parts = append(parts, held.lines()...)
 		parts = append(parts, part{})
 	}
+	// The open tab's presets stand as a band of their own, each under the key that presses it. [[spec/design_output/tui#one-key-filters-the-line]]
+	if said := m.tabs[m.open].Presets(&m); len(said) > 0 {
+		parts = append(parts, part{style: headStyle, text: "PRESETS"})
+		wide := 0
+		for _, one := range said {
+			wide = max(wide, len([]rune(keyShown(one.Key))))
+		}
+		for _, one := range said {
+			parts = append(parts, part{text: "  " + pad(keyShown(one.Key), wide) + "  " + one.Name})
+		}
+		parts = append(parts, part{})
+	}
 	return append(parts, part{text: strings.TrimSpace(HelpText)})
+}
+
+// A key reads as a person presses it, so a capital under alt reads as shift. [[spec/design_output/tui#the-help-reads-the-cursor]]
+func keyShown(name string) string {
+	if strings.HasPrefix(name, "alt+") && len(name) == len("alt+")+1 && name[len(name)-1] >= 'A' && name[len(name)-1] <= 'Z' {
+		return "alt+shift+" + strings.ToLower(name[len(name)-1:])
+	}
+	return name
 }
 
 // [[spec/design_output/tui#the-help-reads-the-cursor]]

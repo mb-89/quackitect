@@ -9,7 +9,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"regexp"
 	"strings"
 	"time"
 
@@ -78,6 +77,9 @@ type model struct {
 	// [[spec/design_output/tui#the-work-tab-takes-edits]]
 	workNotice string
 	rules      *ticketSchema
+	// Each tab holds a filter line of its own, and the pane shows the open tab's. [[spec/design_output/tui#the-filter-pane-takes-letters]]
+	sources []string
+	opened  bool
 }
 
 func newModel(path string, zone *time.Location) model {
@@ -86,18 +88,28 @@ func newModel(path string, zone *time.Location) model {
 	input.PromptStyle = barStyle
 	input.Placeholder = "type to narrow the log"
 	input.Cursor.SetMode(cursor.CursorStatic)
+	tabs := []tab{logTab{}, workTab{}}
 	return model{
-		tabs:   []tab{logTab{}, workTab{}},
-		path:   path,
-		zone:   zone,
-		sel:    -1,
-		follow: true,
-		floor:  "info",
-		sortAt: sortNone,
-		box:    viewport.New(firstPaneWidth, firstPaneHeight),
-		input:  input,
-		tailer: newTailer(path),
+		tabs:    tabs,
+		path:    path,
+		zone:    zone,
+		sel:     -1,
+		follow:  true,
+		floor:   "info",
+		sortAt:  sortNone,
+		box:     viewport.New(firstPaneWidth, firstPaneHeight),
+		input:   input,
+		tailer:  newTailer(path),
+		sources: make([]string, len(tabs)),
 	}
+}
+
+// The filter line the tab at that place holds. [[spec/design_output/tui#the-filter-pane-takes-letters]]
+func (m model) sourceOf(at int) string {
+	if at < 0 || at >= len(m.sources) {
+		return ""
+	}
+	return m.sources[at]
 }
 
 // [[spec/design_output/tui#the-work-tab]]
@@ -128,10 +140,6 @@ func (m model) at() int {
 
 // [[spec/design_output/tui#the-filter-holds-the-selection]]
 func (m *model) rebuild() {
-	// One language narrows every tab, and the tree joins the line with its presses. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-	if m.work != nil {
-		m.work.Filtering(m.filter.Source)
-	}
 	m.view = m.view[:0]
 	for index, r := range m.all {
 		if Rank(r.Level) >= Rank(m.floor) && m.filter.Match(r) {
@@ -223,10 +231,7 @@ func (m *model) loadPane() {
 		if m.filterBad != "" {
 			parts = append(parts, part{style: levelStyle("error"), text: m.filterBad})
 		}
-		// [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-		if m.onWork() {
-			parts = append(parts, workPresets(m)...)
-		}
+		parts = append(parts, m.presetParts()...)
 		parts = append(parts, part{}, part{text: FilterHelp})
 	default:
 		parts = m.tabs[m.open].Detail(m, m.box.Width)
@@ -276,7 +281,16 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.work, m.workWhy = msg.tree, msg.why
 			if m.work != nil {
-				m.work.Filtering(m.filter.Source)
+				// The first answer opens the line on the preset the file presses, and a later one keeps what stands. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+				at := m.tabNamed("work") - 1
+				if !m.opened && at >= 0 {
+					m.sources[at] = m.work.Opening()
+					m.opened = true
+					if m.open == at {
+						m.input.SetValue(m.sources[at])
+					}
+				}
+				m.work.Filtering(m.sourceOf(at))
 			}
 			m.loadPane()
 		}
@@ -328,15 +342,6 @@ func (m model) typing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "enter", "esc", "alt+f":
 		m.openPane(paneFilter)
 		return m, nil
-	case "alt+F", "alt+q":
-		m.quick(msg.String())
-		return m, nil
-	// [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-	case "alt+1", "alt+2", "alt+3", "alt+4", "alt+5", "alt+6", "alt+7", "alt+8", "alt+9":
-		if pressPreset(&m, msg.String()) {
-			m.loadPane()
-		}
-		return m, nil
 	case "alt+l":
 		m.raiseFloor()
 		return m, nil
@@ -350,6 +355,10 @@ func (m model) typing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.jump(msg.String())
 		return m, nil
 	}
+	// A preset's key presses it under the pane as well as over the tab. [[spec/design_output/tui#one-key-filters-the-line]]
+	if m.pressKey(msg.String()) {
+		return m, nil
+	}
 	before := m.input.Value()
 	var cmd tea.Cmd
 	m.input, cmd = m.input.Update(msg)
@@ -358,6 +367,53 @@ func (m model) typing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	}
 	m.loadPane()
 	return m, cmd
+}
+
+// The key a preset names presses it, in any tab, under any pane. [[spec/design_output/tui#one-key-filters-the-line]]
+func (m *model) pressKey(name string) bool {
+	for _, one := range m.tabs[m.open].Presets(m) {
+		if one.Key == name {
+			m.pressPreset(one)
+			return true
+		}
+	}
+	return false
+}
+
+// A press writes the preset's filter into the line, and the same press again clears it. The sort it carries takes hold. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func (m *model) pressPreset(one preset) {
+	said := one.Filter
+	if m.input.Value() == said {
+		said = ""
+	}
+	m.input.SetValue(said)
+	if len(one.Sorts) > 0 && m.onWork() {
+		m.work.Sorted(one.Sorts)
+	}
+	m.narrow(said)
+	m.loadPane()
+}
+
+// One row a preset: its key, its name and the filter it writes, lit where the line holds it. [[spec/design_output/tui#the-filter-pane-takes-letters]]
+func (m model) presetParts() []part {
+	said := m.tabs[m.open].Presets(&m)
+	if len(said) == 0 {
+		return nil
+	}
+	wide := 0
+	for _, one := range said {
+		wide = max(wide, len(one.Key)+len(one.Name)+1)
+	}
+	out := []part{{}}
+	for _, one := range said {
+		row := fmt.Sprintf("%-*s  %s", wide, one.Key+" "+one.Name, one.Filter)
+		if m.input.Value() == one.Filter {
+			out = append(out, part{text: openStyle.Render(row), drawn: true})
+			continue
+		}
+		out = append(out, part{text: dimStyle.Render(row), drawn: true})
+	}
+	return out
 }
 
 // [[spec/design_output/tui#alt-l-raises-the-floor]]
@@ -382,37 +438,33 @@ func (m *model) toError() {
 	}
 }
 
-// [[spec/design_output/tui#one-key-filters-the-line]]
-func (m *model) quick(name string) {
-	said := talkFilter
-	if name == "alt+F" {
-		if m.sel < 0 || m.sel >= len(m.all) {
-			return
-		}
-		r := m.all[m.sel]
-		said = fmt.Sprintf("kind: /^%s$/", regexp.QuoteMeta(r.Kind))
-		if r.Label() != r.Kind {
-			said = fmt.Sprintf("tool: /^%s$/", regexp.QuoteMeta(r.Label()))
-		}
+// The line narrows the open tab and no other, and each tab keeps its own. [[spec/design_output/tui#the-filter-pane-takes-letters]]
+func (m *model) narrow(said string) {
+	if m.open >= 0 && m.open < len(m.sources) {
+		m.sources[m.open] = said
 	}
-	if m.input.Value() == said {
-		said = ""
+	if m.onWork() {
+		err := m.work.Filtering(said)
+		m.filterBad = filterWhy(err)
+		return
 	}
-	m.input.SetValue(said)
-	m.narrow(said)
-	m.loadPane()
+	f, err := ParseFilter(said)
+	m.filterBad = filterWhy(err)
+	if err == nil {
+		m.filter = f
+		m.rebuild()
+	}
 }
 
-func (m *model) narrow(said string) {
-	f, err := ParseFilter(said)
+// What a line that parses not says under itself. [[spec/design_output/tui#the-filter-language]]
+func filterWhy(err error) string {
 	switch {
+	case err == nil:
+		return ""
 	case errors.Is(err, ErrIncomplete):
-		m.filterBad = "still typing"
-	case err != nil:
-		m.filterBad = err.Error()
+		return "still typing"
 	default:
-		m.filter, m.filterBad = f, ""
-		m.rebuild()
+		return err.Error()
 	}
 }
 

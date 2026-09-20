@@ -55,16 +55,16 @@ test("the answer names every branch, the tickets on it and the loose ones", () =
   );
 });
 
-// [[spec/design_output/pull#the-queue-is-a-score]]
-test("the flag writes the queue place, and no flag writes none", () => {
+// The queue rides every answer, so the tab draws each row's place. [[spec/design_output/pull#the-queue-is-a-score]]
+test("the answer carries the queue place by default, and a caller turns it off", () => {
   const { it } = doors();
   it.clock = fakeClock("2026-01-01T03:00:00.000Z");
 
-  const bare = answerOf(it);
-  assert.equal("queue" in bare.loose[0], false, "no flag leaves the place out");
+  const bare = answerOf(it, false);
+  assert.equal("queue" in bare.loose[0], false, "a caller asking for none gets none");
   assert.equal("queue" in bare.branches[0].tickets[0], false);
 
-  const said = answerOf(it, true);
+  const said = answerOf(it);
   const places = [
     ...said.branches.map((one) => one.queue),
     ...said.branches.flatMap((one) => one.tickets).map((one) => one.queue),
@@ -75,6 +75,27 @@ test("the flag writes the queue place, and no flag writes none", () => {
     [1, 2, 3],
     "the group's row takes a place beside its tickets",
   );
+});
+
+// A group on trunk with no branch stands in the answer with its kind, and its children beside it, so the tab nests them. [[spec/design_output/tree-view#the-name-column-nests]]
+test("the answer carries a group with no branch, its children, and the whole ask", () => {
+  const { it } = doorsSaying(
+    remoteSaying([{ branch: "work/one-group", tip: "aaa", when: 1767225600 }], {
+      [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+      "work/one-group:spec/tickets/a-child.md": CHILD("one-group", "open"),
+      "origin/main:spec/tickets/a-loose-one.md": LOOSE,
+      "origin/main:spec/tickets/a-loose-group.md": GROUP_NOTE,
+      "origin/main:spec/tickets/its-child.md": CHILD("a-loose-group", "open"),
+    }),
+  );
+  it.root = ROOT;
+  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
+  const said = answerOf(it);
+
+  const names = said.loose.map((one) => `${one.name}:${one.kind}:${one.group}`).sort();
+  assert.deepEqual(names, ["a-loose-group:group:", "a-loose-one:ticket:", "its-child:ticket:a-loose-group"]);
+  assert.equal(said.loose.find((one) => one.name === "a-loose-group").says, "Two tickets that land as one.");
+  assert.equal(said.branches[0].says, "Two tickets that land as one.", "a branch row carries the whole ask too");
 });
 
 // [[spec/design_output/pull#the-queue-is-a-score]]

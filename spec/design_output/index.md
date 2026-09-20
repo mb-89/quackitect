@@ -140,7 +140,7 @@ opens no file and no git for it. `ticket.go` holds it, and
 | `state`, `step`, `group`, `urgent`, `todo` | the fields off the top of the front |
 | `route` | the process the ticket rides, as its own name, so `group` marks a group |
 | `standing` | what the branch gives it, as the words below |
-| `says` | the first line the Ask chapter says, past the mint's comments |
+| `says` | the whole Ask chapter, past the mint's comments, which the tab's details draw |
 
 A key nested under `record` or `steps` shadows no field, because the reader
 takes the top of the front alone. A branch informs a ticket's standing and

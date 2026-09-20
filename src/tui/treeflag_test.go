@@ -92,12 +92,36 @@ func TestABaseFileNamesTheLettersAndTheKeysTheyRead(t *testing.T) {
 	if len(said) == 0 {
 		t.Fatal("this tree's own base file names its letters")
 	}
-	if said[0].Letter != "U" || said[0].Key != "urgent" {
-		t.Fatalf("the first letter reads the urgent mark, and it reads %v", said[0])
+	// The state leads the flags as the first letter of its value, and the marks follow. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+	if said[0].Key != "state" || !said[0].Value {
+		t.Fatalf("the first flag draws the state's first letter, and it reads %v", said[0])
+	}
+	if said[1].Letter != "U" || said[1].Key != "urgent" {
+		t.Fatalf("the second letter reads the urgent mark, and it reads %v", said[1])
 	}
 	for _, one := range said {
-		if one.Letter == "" || one.Key == "" {
+		if (one.Letter == "" && !one.Value) || one.Key == "" {
 			t.Fatalf("every letter names its key, and %v names none", one)
 		}
+	}
+}
+
+// A flag over a value draws the value's first letter, upper, and a dash where the value stands empty. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+func TestAValueFlagDrawsTheValuesFirstLetter(t *testing.T) {
+	t.Parallel()
+	tree := NewTree(sortCols(), []Item{
+		{Name: "open-one", Keys: map[string]string{"state": "open", "urgent": "true"}},
+		{Name: "bare", Keys: map[string]string{"state": "", "urgent": "false"}},
+	}, false)
+	tree.Flagged([]Flag{{Key: "state", Value: true}, {Letter: "U", Key: "urgent"}})
+	if said := tree.Letters(tree.Items[0]); said != "OU" {
+		t.Fatalf("an open urgent row reads OU, and it reads %q", said)
+	}
+	if said := tree.Letters(tree.Items[1]); said != "-u" {
+		t.Fatalf("a bare row reads a dash and a dim mark, and it reads %q", said)
+	}
+	states := tree.States(tree.Items[0])
+	if len(states) != 2 || !states[0].On || states[0].Value != "open" || states[1].Place != 1 {
+		t.Fatalf("the states carry the value and the place, and they read %v", states)
 	}
 }

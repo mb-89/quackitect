@@ -167,13 +167,29 @@ details and how the filter reads. It stands under the bands.
 
 # The filter pane takes letters
 
-`alt+f` opens the filter in the pane: a line to type into, and the language
-under it. While it stands open, every letter types into the line, `w` and `s`
-too, and the list narrows with each key. The arrows scroll the pane. The page
-keys, Home and End still step through the log.
+`alt+f` opens the filter in the pane: a line to type into, the presets the
+open tab offers, and the language under them. While it stands open, every
+letter types into the line, `w` and `s` too, and the open tab narrows with
+each key. The arrows scroll the pane. The page keys, Home and End still step
+through the log.
 
 Enter, Esc and `alt+f` close the pane, and the filter keeps holding. A person
 opens the pane again to change or clear it.
+
+The pane is the window's, and so are the details and the help. Each tab holds
+a filter line of its own, and the line shows the open tab's, named in its
+placeholder. A tab switch under any open pane keeps the pane, which then draws
+off the new tab. A number types into the line while the filter stands open.
+So the strip is the road to another tab there, and a press on it switches.
+
+| the tab | its presets |
+|---|---|
+| the log | the talk under `alt+q`, and the selected row's kind under `alt+shift+f` |
+| the work | the groups of its base file, each under a number with alt |
+
+A preset is one row of the pane: its key, its name and the filter it writes.
+The row stands lit while the line holds that filter. For what a press does,
+see [[spec/design_output/tree-view#a-preset-carries-its-sort]].
 
 # The filter language
 
@@ -366,10 +382,19 @@ and the presets. For the view itself, see [[spec/design_output/tree-view]].
 | the door's port | the standing file the door writes, off the root two folders over the log |
 | a door standing nowhere | the binary's own `standing` verb, which puts one up and drops a stale one |
 
-A group's row carries the tickets naming it, and a ticket naming no group, or
-one the rows hold nowhere, stands at the left. A held group and its tickets
-wear the `W` letter, off the standing the index answers. The window's `Init`
-asks for the tick from nothing, and each answer hands the tab its tree again.
+A ticket naming another row nests under it, at any depth, and one naming a row
+the rows hold nowhere stands at the left. The mark before the name says which
+row is a group, so no column says it. A held group and its tickets wear the
+`W` letter, off the standing the index answers. The window's `Init` asks for
+the tick from nothing, and each answer hands the tab its tree again.
+
+The table draws the name, the flags, the step, the group and the queue, and
+the table stands as it is when a pane opens. The state leads the flags as its
+first letter. The details draw the row whole: the name as a link, the fields,
+then every flag in the column's order in its own colour. The whole ask stands
+under them, with every note link in it clickable. The queue column stands
+empty until the index answers each row's place, which waits for a ticket of
+its own.
 
 `workindex.go` holds the road to the door, and `workitems.go` turns the rows
 into items. A box with no door and no binary draws the reason in the tab, and

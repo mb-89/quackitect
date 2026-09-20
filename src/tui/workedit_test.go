@@ -171,7 +171,8 @@ func TestEscapePutsTheOldValueBackAndWritesNothing(t *testing.T) {
 func TestAFieldTheVerbsOwnRefusesTheEdit(t *testing.T) {
 	t.Parallel()
 	m, root := editWindow(t)
-	for _, key := range []string{"state", "step"} {
+	// The state stands in the flags now, so the step is the column the verbs own. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+	for _, key := range []string{"step"} {
 		held := toRow(toColumn(m, key), "a-child")
 		held = pressed(held, "e")
 		if held.work.Editing() {
@@ -184,7 +185,7 @@ func TestAFieldTheVerbsOwnRefusesTheEdit(t *testing.T) {
 			t.Fatal("the notice draws in the tab")
 		}
 	}
-	held := pressed(toRow(toColumn(m, "standing"), "a-child"), "e")
+	held := pressed(toRow(toColumn(m, "queue"), "a-child"), "e")
 	if held.work.Editing() || !strings.Contains(held.workNotice, "no ticket's front") {
 		t.Fatalf("a column the index derives refuses the edit, and the tab says %q", held.workNotice)
 	}

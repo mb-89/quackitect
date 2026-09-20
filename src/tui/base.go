@@ -29,10 +29,11 @@ type View struct {
 	Flags     []Flag
 }
 
-// A boolean key and the letter standing for it in the flags column. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+// A boolean key and the letter standing for it in the flags column, or a key whose value's first letter stands there. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 type Flag struct {
 	Letter string
 	Key    string
+	Value  bool
 }
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]
@@ -104,10 +105,11 @@ func flagsIn(said, whole *yaml.Doc) []Flag {
 			}
 			letter := yaml.AsString(one.Get("letter"))
 			key := yaml.AsString(one.Get("key"))
-			if letter == "" || key == "" {
+			value := yaml.AsBool(one.Get("value"))
+			if key == "" || (letter == "" && !value) {
 				continue
 			}
-			out = append(out, Flag{Letter: letter, Key: key})
+			out = append(out, Flag{Letter: letter, Key: key, Value: value})
 		}
 		// A view naming none falls through to the file, which names them once. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 		if len(out) > 0 {

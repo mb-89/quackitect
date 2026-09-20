@@ -1,16 +1,15 @@
-filters:
-  - kind: ticket
 properties:
   name:
     opensNote: true
 columnSize:
   name: 34
-  state: 8
-  standing: 9
   flags: 5
-  step: 10
-  group: 20
+  step: 14
+  group: 26
+  queue: 6
 flags:
+  - key: state
+    value: true
   - letter: U
     key: urgent
   - letter: W
@@ -22,29 +21,30 @@ groups:
     pressed: true
     filters:
       - not state: closed
+  - name: queue
+    filters:
+      - queue: /./
+    sort:
+      - key: queue
   - name: held
     filters:
-      - standing: held
+      - held: true
   - name: unsorted
     filters:
       - "state: draft or not group: /./"
-    sort:
-      - key: name
 views:
   - type: table
     name: every ticket
     order:
       - name
-      - state
-      - standing
       - flags
       - step
       - group
-      - says
+      - queue
     nest: group
     sort:
       - key: urgent
         down: true
-      - key: name
+      - key: queue
     collapsed:
       - closed

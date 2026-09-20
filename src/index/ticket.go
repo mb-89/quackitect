@@ -155,9 +155,10 @@ func heldIn(head string) bool {
 	return held
 }
 
-// The first line the Ask chapter says, past the comments the mint leaves. [[spec/design_output/index#the-index-answers-the-tickets]]
+// The whole Ask chapter, past the comments the mint leaves, because the tab's details draw it whole. [[spec/design_output/index#the-index-answers-the-tickets]]
 func askLine(body string) string {
 	inAsk := false
+	out := []string{}
 	for _, line := range strings.Split(body, "\n") {
 		bare := strings.TrimSpace(line)
 		switch {
@@ -166,15 +167,15 @@ func askLine(body string) string {
 			continue
 		case strings.HasPrefix(bare, "#"):
 			if inAsk {
-				return ""
+				return strings.TrimSpace(strings.Join(out, "\n"))
 			}
 			continue
-		case !inAsk || bare == "" || strings.HasPrefix(bare, commentOpen):
+		case !inAsk || strings.HasPrefix(bare, commentOpen):
 			continue
 		}
-		return bare
+		out = append(out, line)
 	}
-	return ""
+	return strings.TrimSpace(strings.Join(out, "\n"))
 }
 
 // The keys standing at the top of the front, so a key nested under record or steps shadows none of them. [[spec/design_output/index#the-index-answers-the-tickets]]
