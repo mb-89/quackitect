@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -208,6 +208,12 @@ record:
       - name: check
         exit: 0
         said: 81 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box 1670436ae0bb · claude-code-remote · helper-21
+    hash_before: c3541d47a18991b705513541cc01a1f4d07dd37c
+    hash_after: c3541d47a18991b705513541cc01a1f4d07dd37c
+    returns: 2
+    why: "design: The help table in `spec/design_output/tui.md` names `act`, `band`, `bands()` and `key()`, and the split gave each a capital.; design: `spec/design_output/tui.md` names `loadColours`, `overPane`, `firstRow` and `listWidth`, and the split gave each a capital.; design: `spec/design_output/tui.md` names `headWide` and `namesWide` under The mouse reaches the window, and the split gave each a capital.; design: The chapter's draw row names `cut`, `pad` and `oneLine`, and the split gave each a capital.; craft: `src/tui/tree/treeflag_test.go` keeps the blank line before the closing brace of `TestAValueFlagWearsATonePerValue`, which the last round named.; craft: `src/tui/frame_test.go` says `frame.HeadWide` and `frame.FootWide` to a reader, the way the last round's finding on that file read.; craft: `src/tui/door_test.go` says `tabMsg` and `tabNamed` to a reader, and the split gave each a capital.; craft: `src/tui/mouse_test.go` says `tabAt` and `src/tui/sort_test.go` says `columnAt`, and the split gave each a capital.; The branch does what the ask calls for: `src/tui/main.go` is the root's one file past the cases, each tab stands under its folder, and every import runs down.; The last round's three design findings have their answer: the two notes point at `src/tui/frame` and `src/tui/tree`, and name `OpenDoor`, `TabMsg` and `TellPort`.; `go build ./...`, `go vet ./...` and `go test ./...` under `src/tui` answer 0, and `gofmt -l .` answers nothing.; `./RUNME.sh check` answers 0 on the branch, with 81 warnings standing, and the ones in this ticket's files stand in the ticket's own record.; `./RUNME.sh branch review` reads check as 1, because its worktree lacks `.claude/skills/level0/.claude-plugin/plugin.json`, and the tree itself answers 0.; No retro stands in the handback, and the verdict step hands the ticket to one.; The layout case refuses a package importing what its row leaves out, and the root case refuses a tab file at the root.; The stamp case runs the build again on a move under a package, and leaves the binary standing on a moved case file.; The widths, the wheel step, the floor width, the no-sort mark, the poll and the ticket schema each stand in one place now, and the cases read them there.; Beyond the ask, the diff touches `.vale.ini` alone, and that section reaches a door file under a package."
 ---
 
 # Ask
@@ -466,8 +472,6 @@ spec/tickets/the-window-splits-by-tab.md
 spec/design_output/tui.md
 spec/design_output/tree-view.md
 spec/vocabulary/terms.yml
-src/scripts/pull-chapter.js
-src/scripts/pull-writes.js
 .vale.ini
 src/scripts/tui-build.js
 test/level0/viewer.test.js
@@ -548,22 +552,23 @@ src/tui/workplaces_test.go
 
 fail
 
-- design: `spec/design_output/tui.md` names `src/tui/mouse.go` under The mouse reaches the window, and the file stands under `src/tui/frame` now.
-- design: `spec/design_output/tui.md` names `src/tui/door.go`, `openDoor`, `tabMsg` and `tellPort` under A second launch hands over, and the split moved the file and gave each name a capital.
-- design: `spec/design_output/tree-view.md` names `src/tui/tree.go` and `src/tui/treedraw.go` under Scope, and both stand under `src/tui/tree` now.
-- craft: `src/tui/sort_test.go`, `src/tui/mouse_test.go` and `src/tui/model_test.go` spell the column widths, the wheel step, the floor width and the no-sort mark as bare numbers, where `stampWide`, `levelWide`, `kindWide`, `wheelStep`, `floorWide` and `sortNone` hold them.
-- craft: `poll` stands in `src/tui/log/tail.go` and again in `src/tui/work/work.go`, and the one package held it once.
-- craft: `logTab` in `src/tui/main.go` and `theLog` in `src/tui/window_test.go` read the same tab the same way.
-- craft: the rename reached the case messages, so `src/tui/frame_test.go` and `src/tui/panes_test.go` say "frame.Band" and "frame.Preset" to a reader, and `src/tui/log/detail_test.go` writes the filter key as `Text:`.
-- craft: `SchemaOf` and `TicketRules` in `src/tui/work/workedit.go` answer `ticketSchema`, a type the package keeps to itself.
-- craft: `src/tui/tree/treeflag_test.go` keeps a blank line where the moved case stood.
-- The branch does what the ask calls for: `ls src/tui/*.go` names the window's own files, each tab stands under a folder of its own, and every import in the chapter's table runs down.
-- `go build ./...` and `go test ./...` under `src/tui` answer 0, and `go vet ./...` and `gofmt -l .` answer nothing.
-- `./RUNME.sh check` answers 0 on the branch, with 64 warnings standing and none of them this ticket's.
-- `./RUNME.sh branch review` reads check as 1, because its worktree lacks `.claude/skills/level0/.claude-plugin/plugin.json`, which git leaves out, and the tree itself answers 0.
+- design: The help table in `spec/design_output/tui.md` names `act`, `band`, `bands()` and `key()`, and the split gave each a capital.
+- design: `spec/design_output/tui.md` names `loadColours`, `overPane`, `firstRow` and `listWidth`, and the split gave each a capital.
+- design: `spec/design_output/tui.md` names `headWide` and `namesWide` under The mouse reaches the window, and the split gave each a capital.
+- design: The chapter's draw row names `cut`, `pad` and `oneLine`, and the split gave each a capital.
+- craft: `src/tui/tree/treeflag_test.go` keeps the blank line before the closing brace of `TestAValueFlagWearsATonePerValue`, which the last round named.
+- craft: `src/tui/frame_test.go` says `frame.HeadWide` and `frame.FootWide` to a reader, the way the last round's finding on that file read.
+- craft: `src/tui/door_test.go` says `tabMsg` and `tabNamed` to a reader, and the split gave each a capital.
+- craft: `src/tui/mouse_test.go` says `tabAt` and `src/tui/sort_test.go` says `columnAt`, and the split gave each a capital.
+- The branch does what the ask calls for: `src/tui/main.go` is the root's one file past the cases, each tab stands under its folder, and every import runs down.
+- The last round's three design findings have their answer: the two notes point at `src/tui/frame` and `src/tui/tree`, and name `OpenDoor`, `TabMsg` and `TellPort`.
+- `go build ./...`, `go vet ./...` and `go test ./...` under `src/tui` answer 0, and `gofmt -l .` answers nothing.
+- `./RUNME.sh check` answers 0 on the branch, with 81 warnings standing, and the ones in this ticket's files stand in the ticket's own record.
+- `./RUNME.sh branch review` reads check as 1, because its worktree lacks `.claude/skills/level0/.claude-plugin/plugin.json`, and the tree itself answers 0.
 - No retro stands in the handback, and the verdict step hands the ticket to one.
-- The layout case refuses a package importing what its row leaves out: a file under `src/tui/log` importing `src/tui/work` fails it by name.
+- The layout case refuses a package importing what its row leaves out, and the root case refuses a tab file at the root.
 - The stamp case runs the build again on a move under a package, and leaves the binary standing on a moved case file.
+- The widths, the wheel step, the floor width, the no-sort mark, the poll and the ticket schema each stand in one place now, and the cases read them there.
 - Beyond the ask, the diff touches `.vale.ini` alone, and that section reaches a door file under a package.
 
 ## checked
@@ -572,7 +577,7 @@ fail
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place, and a note points at the file instead of repeating it. Three notes point at files the split moved, and the root cases spell the log's widths beside the constants, so the findings name each.
+- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The constants and the poll stand once now, and the note's help table and mouse chapter keep the old spellings, so the findings name each.
 
 # Discussion
 
