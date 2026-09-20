@@ -206,7 +206,7 @@ A cloud box worked this branch and hands it back. The handover stands here, and 
 | [[spec/tickets/release-keeps-local-commits]] | closed done |
 | [[spec/tickets/a-return-asks-another-hand]] | closed became, on the successor below |
 | [[spec/tickets/the-pull-names-the-unblock]] | closed became, its row landed, its route parked |
-| [[spec/tickets/the-brief-verbs-go]] | open at `implement/change`, its approach reviewed and passed |
+| [[spec/tickets/the-brief-verbs-go]] | open at `implement/tests-red`, its approach reviewed and passed |
 | the five others | open at `design/review`, each with its approach written |
 
 The next box takes `the-brief-verbs-go` first, because a parked leaf scores ahead of the rest. Its approach names every reader, note and case, and the change spans the code, the cases, the Go cases and the notes.
