@@ -108,6 +108,24 @@ test("a code change with no test beside it refuses at this door too", async () =
   assert.match(said.said, /no test beside it/);
 });
 
+test("a test file standing nowhere leaves the change refused", async () => {
+  const code = [
+    "diff --git a/src/bridge/one.js b/src/bridge/one.js",
+    "+++ b/src/bridge/one.js",
+    "@@ -0,0 +1 @@",
+    "+export const one = 1;",
+    "diff --git a/test/level0/other.test.js b/test/level0/other.test.js",
+    "+++ b/test/level0/other.test.js",
+    "@@ -0,0 +1 @@",
+    "+assert.equal(two, 2);",
+    "",
+  ].join("\n");
+
+  const said = await holds(box(), code);
+  assert.equal(said.code, 1);
+  assert.match(said.said, /src\/bridge\/one\.js/);
+});
+
 test("a test standing already carries the change, because the door reads it", async () => {
   const code = [
     "diff --git a/src/bridge/one.js b/src/bridge/one.js",

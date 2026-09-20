@@ -356,6 +356,17 @@ test("a runner and a shell each name their script, and a tracked path names none
   assert.deepEqual(scriptsIn("node src/scripts/cli.js check"), []);
 });
 
+test("a script the rules already read names no script here", () => {
+  for (const said of [
+    "bash src/scripts/install.sh",
+    "python3 src/tools/gen.py",
+    "bash ./RUNME.sh check",
+    "node src/scripts/cli.js branch done",
+  ]) {
+    assert.deepEqual(scriptsIn(said), [], said);
+  }
+});
+
 test("every spelling of a temp folder names a script, because one reader answers", () => {
   // A brace beside the dollar reads as a template to the formatter, so the case joins it. [[spec/design_output/bash#a-shell-writes-nothing]]
   const braced = ["node $", "{TMPDIR}", "/edit.mjs"].join("");

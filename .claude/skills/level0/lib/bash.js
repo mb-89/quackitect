@@ -17,7 +17,8 @@ const HOME = NOTES.split("/")[0];
 
 const REDIRECTS = new Set([">", ">>", "&>"]);
 
-const FREE = [
+// The paths no rule reads, which is where a hand writes a script. [[spec/design_output/bash#a-shell-writes-nothing]]
+export const FREE = [
   /^\.se(\/|$)/,
   /^\.git(\/|$)/,
   /^\/tmp\//,

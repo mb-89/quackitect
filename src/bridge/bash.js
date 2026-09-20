@@ -7,6 +7,7 @@ import { bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
 import { NOTES, privateNow } from "../../.claude/skills/level0/lib/private.js";
 import { refusedCommand, refusedDelta } from "../../.claude/skills/level0/lib/refuse.js";
 import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import { fileText } from "../../.claude/skills/level0/lib/scripted.js";
 import { refusedTest, untestedIn } from "../../.claude/skills/level0/lib/tested.js";
 import { reaches, refusedTodo, taggedIn } from "../../.claude/skills/level0/lib/todo.js";
 import { landsOnTrunk, refusedVersion, touchesGit, TRUNK, versionRefs } from "../../.claude/skills/level0/lib/trunk.js";
@@ -48,7 +49,7 @@ export function onDescribe(e) {
 async function commandRules(command, _e, box) {
   const found = findings(command, asks(box, "names.words"), {
     cloud: onACloud(),
-    script: (path) => scriptText(box, path),
+    script: (path) => fileText(box.disk, box.work, path),
   });
   found.push(...(await commitVoice(command, box)));
   if (!onACloud() && skipsTheHook(command)) {
@@ -102,7 +103,7 @@ async function privateDelta(command, _e, box) {
 async function testedDelta(command, _e, box) {
   if (!commitIn(command)) return "";
   const found = untestedIn(await git(box, ["diff", "--cached", "--unified=0"]), (path) =>
-    scriptText(box, path),
+    fileText(box.disk, box.work, path),
   );
   if (!found.length) return "";
   box.log.say("warn", "tested", `refused ${found.length} file(s) with no test`, {
@@ -111,16 +112,6 @@ async function testedDelta(command, _e, box) {
     rule: "EveryModuleTested",
   });
   return refusedTest(found);
-}
-
-// The door reads a script off the disk, and a file standing nowhere reads empty. [[spec/design_output/bash#a-shell-writes-nothing]]
-function scriptText(box, path) {
-  const at = path.startsWith("/") ? path : `${box.work}/${path}`;
-  try {
-    return box.disk.exists(at) ? String(box.disk.read(at)) : "";
-  } catch {
-    return "";
-  }
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
