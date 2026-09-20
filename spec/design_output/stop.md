@@ -193,6 +193,12 @@ holds the door.
 | which todos you finish | they leave the queue |
 | which todos you add, each at its place | they land, up to `plan.mostOpen` open ones |
 
+The count of calls reaches the number, and the ask stands due. It lands on the
+first call no other ask holds, and the count starts over at the answer alone.
+So a standing update or refactor ask delays it, and the ask lands once the
+agent answers that one. A hand answering nothing spends the grace and meets the
+refusal.
+
 The ask rides the grace. The answer rides a channel off the chat: a `plan`
 field on any level zero call, or the `plan` call where none is due. A
 built-in tool refuses a field its schema names nowhere, so the answer rides

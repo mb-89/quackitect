@@ -12,6 +12,7 @@ import {
   refusedPrivate,
 } from "../../.claude/skills/level0/lib/private.js";
 import { refusal } from "../../.claude/skills/level0/lib/refuse.js";
+import { REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
 import {
   checkNote,
   END,
@@ -24,6 +25,12 @@ import {
   strangerFault,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { refusedTicket, ticketFaults } from "../../.claude/skills/level0/lib/ticket.js";
+import {
+  mergedWarnings,
+  rowOf,
+  WARNING,
+  warnedNote,
+} from "../../.claude/skills/level0/lib/warnings.js";
 import {
   fieldOf,
   GROUP as GROUP_KEY,
@@ -49,8 +56,9 @@ export async function onWrite(e, box) {
   if (/^([A-Za-z]:)?[\\/]/.test(where) || isDraft(where)) return PASS;
 
   const checks = [markDoor, ownerDoor, privateDoor, schemaDoor, voiceDoor];
+  const held = {};
   for (const check of checks) {
-    const found = await check(e, writing, where, box);
+    const found = await check(e, writing, where, box, held);
     if (found) return { result: { deny: found } };
   }
   marksStale(where, box);
@@ -62,7 +70,7 @@ export async function onWrite(e, box) {
     return said;
   }
   marksSeen(box, where, whole);
-  return PASS;
+  return warnsOf(e, where, held.warned, box) ?? PASS;
 }
 
 // [[spec/design_output/level0#a-write-meets-its-mark]]
@@ -134,7 +142,13 @@ function schemaDoor(e, writing, where, box) {
 
   // [[spec/design_output/schema#the-three-places]]
   const held = schema
-    ? ticketFaults(textAt(box.disk, writing.path), whole, schema, where, kidsOf(where, box))
+    ? ticketFaults(
+        textAt(box.disk, writing.path),
+        whole,
+        schema,
+        where,
+        kidsOf(where, box),
+      )
     : [];
   if (held.length) {
     box.log.say("warn", "ticket", `refused ${held.length} line(s) in ${where}`, {
@@ -161,16 +175,48 @@ export function errorsIn(found) {
 }
 
 // [[spec/design_output/level0#the-write-door]]
-async function voiceDoor(e, writing, where, box) {
+async function voiceDoor(e, writing, where, box, held) {
   const whole = wholeAfter(e, writing, box.disk);
-  const found = errorsIn(await proseFaults(whole, where, box));
-  if (!found.length) return "";
+  const all = await proseFaults(whole, where, box);
+  const found = errorsIn(all);
+  if (!found.length) {
+    held.warned = all.filter((one) => String(one?.severity ?? "") === WARNING);
+    return "";
+  }
   box.log.say("warn", "vale", `refused ${found.length} line(s) in ${where}`, {
     file: where,
     rule: found[0]?.rule,
     tool: String(e.tool),
   });
   return refusal(where, found);
+}
+
+// A write landing with a warning puts the rows on the refactoring hand's list, writes them to the log, and tells the agent to carry on. [[spec/design_output/level0#a-warning-feeds-the-list]]
+function warnsOf(e, where, warned, box) {
+  if (!warned) return null;
+  const at = join(box.work, ...REFACTORS.split("/"));
+  let list = [];
+  try {
+    list = JSON.parse(String(box.disk.read(at)));
+  } catch {
+    list = [];
+  }
+  const held = [list].flat().some((one) => String(one?.file ?? "") === where);
+  if (!held && !warned.length) return null;
+  const merged = mergedWarnings(list, where, warned);
+  try {
+    box.disk.write(at, `${JSON.stringify(merged, null, 2)}\n`);
+  } catch {
+    // The runtime folder stands on every box the server runs on, so a miss here is a fake with no folder. [[spec/design_output/level0#a-warning-feeds-the-list]]
+  }
+  if (!warned.length) return null;
+  box.log.say("warn", "vale", `${warned.length} line(s) stand at warning in ${where}`, {
+    file: where,
+    rule: warned[0]?.rule,
+    tool: String(e.tool),
+    detail: warned.map(rowOf).join("\n"),
+  });
+  return { after: { context: [warnedNote(where, warned, merged.length)] } };
 }
 
 function asWrite(e) {

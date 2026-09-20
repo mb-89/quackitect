@@ -6,9 +6,16 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { PLANS } from "../../.claude/skills/level0/lib/runs.js";
+import { reacted, wants } from "../../src/bridge/grace.js";
+import {
+  asksForPlan,
+  PLAN,
+  PLAN_CALL,
+  plansHere,
+  TOOLS,
+} from "../../src/bridge/plan.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { asksForPlan, PLAN_CALL, plansHere, TOOLS } from "../../src/bridge/plan.js";
 
 const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
@@ -67,7 +74,11 @@ test("one call adds todos at their place, finishes some, and names the work in h
   );
   assert.ok(it.disk.exists(at(PLANS)), "the plan stands in the runtime file");
   // The plan carries the overrides a place writes, and an empty map where none stands. [[spec/design_output/pull#a-todo-forces-a-place]]
-  assert.deepEqual(held.places, {}, "the places stand as a map, empty until a place is written");
+  assert.deepEqual(
+    held.places,
+    {},
+    "the places stand as a map, empty until a place is written",
+  );
 });
 
 // Past the number, a new todo stays out, and the answer says to finish one or write a ticket. [[spec/design_output/stop#the-plan]]
@@ -93,10 +104,29 @@ test("the ask opens every so many calls, answers the tool, and drops its third q
   assert.equal(it.box.calls, 0, "the count starts over at an answer");
   plan({ add: [{ title: "one" }, { title: "two" }] }, it.box);
   assert.equal(asksForPlan(it.box, 20), true);
-  assert.match(it.box.grace.why, /^You work on the door\. /, "the ask reminds of the work in hand");
+  assert.match(
+    it.box.grace.why,
+    /^You work on the door\. /,
+    "the ask reminds of the work in hand",
+  );
   assert.doesNotMatch(
     it.box.grace.why,
     /add/,
     "the third question stays away past the number",
   );
+});
+
+// A standing ask delays the plan's ask, which lands once that one is answered, because the count starts over at the answer alone. [[spec/design_output/stop#the-plan]]
+test("the ask due behind another ask lands on the first call after that one is answered", () => {
+  const it = box();
+  assert.equal(
+    wants(it.box, { id: "update", why: "an update", react: "report", calls: 5 }),
+    true,
+  );
+  assert.equal(asksForPlan(it.box, 10), false, "another ask holds the grace");
+  assert.equal(asksForPlan(it.box, 11), false, "and still holds it");
+  reacted(it.box, "update");
+  assert.equal(asksForPlan(it.box, 12), true, "the plan's ask lands on the next call");
+  assert.equal(it.box.grace.id, PLAN);
+  assert.equal(asksForPlan(it.box, 13), false, "one ask stands at a time");
 });

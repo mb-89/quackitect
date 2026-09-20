@@ -90,15 +90,59 @@ test("a ticket under the stub keeping the vehicle's schema passes, and the stub 
   assert.deepEqual(said, { pass: true });
 });
 
+// A warning lets the write land, puts the rows on the refactoring hand's list, and tells the agent to carry on. [[spec/design_output/level0#a-warning-feeds-the-list]]
+test("a write at warning lands, feeds the refactor list, and the note after it says carry on", async () => {
+  const at = join(WORK, "spec", "tickets", "warned.md");
+  const warning = (rule) => ({
+    file: "spec/tickets/warned.md",
+    rule,
+    line: 5,
+    column: 1,
+    message: "Cut this one in two.",
+    severity: "warning",
+  });
+  const it = box({ [join(WORK, ".se", ".runtime", "refactor.json")]: "[]\n" });
+  let found = [warning("VoiceVale.Passive")];
+  it.vale = { stands: () => true, lint: async () => ({ ran: true, found }) };
+
+  const said = await onWrite(write(at, GOOD), it);
+  assert.equal(said?.result?.deny, undefined, "the write lands");
+  assert.match(
+    said?.after?.context?.[0] ?? "",
+    /stand at warning, and the write lands/,
+  );
+  assert.match(said.after.context[0], /carry on/);
+  const list = JSON.parse(it.disk.read(join(WORK, ".se", ".runtime", "refactor.json")));
+  assert.deepEqual(
+    list.map((one) => `${one.file} ${one.rule}`),
+    ["spec/tickets/warned.md VoiceVale.Passive"],
+  );
+
+  found = [];
+  const clean = await onWrite(write(at, GOOD), it);
+  assert.deepEqual(clean, { pass: true });
+  assert.deepEqual(
+    JSON.parse(it.disk.read(join(WORK, ".se", ".runtime", "refactor.json"))),
+    [],
+    "a clean write takes the file's rows off the list",
+  );
+});
+
 // The door reads the children off the work root, so a group's ask naming one comes back refused. [[spec/design_output/work#a-group-is-a-ticket]]
 test("a group's ask naming a child of its own comes back refused", async () => {
   const kid = GOOD.replace("state: open\n", "state: open\ngroup: parent\n");
   const it = box({ [join(WORK, "spec", "tickets", "kid.md")]: kid });
   const parent = GOOD.replace("A small thing.", "The group carries kid and closes it.");
-  const said = await onWrite(write(join(WORK, "spec", "tickets", "parent.md"), parent), it);
+  const said = await onWrite(
+    write(join(WORK, "spec", "tickets", "parent.md"), parent),
+    it,
+  );
   assert.ok(said?.result?.deny, "the door refuses");
   assert.match(said.result.deny, /restated/);
-  const quiet = await onWrite(write(join(WORK, "spec", "tickets", "parent.md"), GOOD), it);
+  const quiet = await onWrite(
+    write(join(WORK, "spec", "tickets", "parent.md"), GOOD),
+    it,
+  );
   assert.deepEqual(quiet, { pass: true });
 });
 
@@ -147,6 +191,10 @@ test("a warning lets the write land, and an error refuses it", () => {
   const erred = { rule: "VoiceParagraph.Vocabulary", line: 1, severity: "error" };
   const bare = { rule: "VoiceVale.History", line: 1 };
   assert.deepEqual(errorsIn([warned]), [], "a warning alone refuses nothing");
-  assert.deepEqual(errorsIn([warned, erred, bare]), [erred, bare], "an error stands, and a finding naming no side reads error");
+  assert.deepEqual(
+    errorsIn([warned, erred, bare]),
+    [erred, bare],
+    "an error stands, and a finding naming no side reads error",
+  );
   assert.deepEqual(errorsIn(undefined), []);
 });

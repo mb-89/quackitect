@@ -783,6 +783,17 @@ The private half answers first, so a note's own words stop at the door. The
 refusal closes by asking the writer to hold that rule for the rest of the turn.
 A refusal teaching one line costs a round trip on every line.
 
+## A warning feeds the list
+
+A rule at warning is a break of form, and the write lands over it. The door
+puts the file's rows on the refactoring hand's list, in place of the rows the
+file held there. It writes each row to the log under the warning. The context
+after the call tells the agent that the rows stand and the work goes on.
+
+So the list fills as the tree changes, and the hand fires off it during a
+session. The check's lint writes the whole list again, so the two meet.
+[[spec/design_output/stop#the-grace]] says when the hand wants the turn.
+
 ## A write meets its mark
 
 Separate hands on one tree drop each other's work. One reads a file, the other

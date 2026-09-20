@@ -65,7 +65,7 @@ agent, git, or a script. The server reads the type each change carries.
 
 | the change | what the panel does |
 |---|---|
-| a new or a changed file | redraws it off the disk, and the bridge answers for it again |
+| a new or a changed file | redraws it off the disk, drops the bridge's rows on it, and asks the bridge again until one answers |
 | a deleted file | takes its row with it, and no rule reads it |
 | a folder, on either side | stands for every file under it |
 
