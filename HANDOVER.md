@@ -18,31 +18,40 @@ The branch carries every commit the pull writes, and the remote holds each one.
 | the-window-grows-a-frame | the same |
 | a-person-reads-the-split | three modules take the header they owe |
 | apply-lane-carries-a-hand | the write door keeps a mark against each path |
+| the-brand-names-the-plugin | a vehicle stamps its folder name on the marketplace |
+| the-controls-wire-up | the binding reaches the pull and the stop hook |
 
-`a-write-meets-its-hash` lands through `apply-lane-carries-a-hand`, and
-[[spec/design_output/level0#a-write-meets-its-mark]] holds the mechanism. A
-write over a file the mark disagrees with comes back refused, and the refusal
-asks for a read. Every agent write in this tree meets that door now.
+Three of those land a feature, and each one reaches past this branch:
+
+| the feature | what a reader opens |
+|---|---|
+| the write door's mark | [[spec/design_output/level0#a-write-meets-its-mark]] |
+| the brand a vehicle stamps | [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]] |
+| the engine binding | [[spec/design_output/config#the-engine-controls]] |
+
+The mark reaches every agent write in this tree. A read sets it, a write over a
+disk the mark disagrees with comes back refused, and the refusal asks for a
+read. So one hand writing a file drops nothing another hand puts there.
 
 | the ticket standing open | where |
 |---|---|
-| the-brand-names-the-plugin | design/review, waiting for a hand other than this box |
-| the-judge-reads-answer-rules | design/review, the same |
-| the-controls-wire-up | design/review, the same |
+| the-judge-reads-answer-rules | implement/tests-red, and its design passes |
+| the-viewer-draws-the-note | verdict, waiting for a hand other than this box |
 | a-claim-meets-the-view | design/review, the same |
 | a-question-reaches-its-owner | design/review, the same |
 | a-rename-reaches-every-note | design/review, the same |
 | an-experiment-ends-decided | design/review, the same |
 | the-colours-stand-in-config | design/review, the same |
-| the-viewer-draws-the-note | verdict, waiting for a hand other than this box |
 
 # What waits
 
 | the thing | what the next reader does |
 |---|---|
-| nine tickets at a review step | spawns a hand of its own for each, as the pull's prompt says |
-| the group's split chapter | the group ticket stands at `sync`, and its children stand already |
-| the autonomy half of the-controls-wire-up | reads the cut this box takes, which the Discussion carries |
+| the-judge-reads-answer-rules | takes implement/tests-red, which stands free |
+| six tickets at a review step | spawns a hand of its own for each, as the pull's prompt says |
+| the retro | the branch's close writes it, and `branch review` names it |
+| `.se/tickets/the-unknown-runs-stays-quiet.md` | a private note a hand parks, which the retro decides |
+| `.se/scripts/binding-probe.test.js` | a hand's probe, which git ignores and the retro drops |
 
 # What this box rules
 
@@ -59,7 +68,8 @@ the merge is where the owner reads each call.
 
 | the thing | what it answers |
 |---|---|
-| the tests evidence on six tickets | each names `go -C src/viewer test ./...`, and the door reads `green` |
+| the tests evidence on six tickets | each names a go command, and the door reads the first word `green` |
 | the mark door, half in place | it refuses this box's own writes until the read half stands |
 | a shell write to a tracked file | `ShellWritesNothing` refuses a heredoc, and Read with Edit carries it |
+| a review step | it wants a hand apart from the drafting one, so each takes a spawn |
 | the `answer` chapter of apply-lane-carries-a-hand | this box writes a second wording over the owner's ruling, and the Discussion names it |
