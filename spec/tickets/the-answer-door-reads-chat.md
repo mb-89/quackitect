@@ -89,12 +89,18 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
     hash_before: 110e6960d7e56b40cc1b1106e1432715bd5bd0f3
     hash_after: 135d102b2930583c69c9220e94820e065701c0ce
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-10
+    hash_before: 90b2ac3bd6d3198cef6225c150eacb7367f2c25a
+    hash_after: 90b2ac3bd6d3198cef6225c150eacb7367f2c25a
+    returns: 1
+    why: the table claims a case covers `onAgentSpoke`, and the tree holds none, so that row reads false; the change table leaves out `src/bridge/answer.js`, which the prose changes at `SAYS` and the refusal; a `SAYS` rewrite breaks the standing case asserting the report line, and the plan names no fix; the reply line chapter alone changes, and the paragraph under "What the door reads" keeps the opposite rule; the refusal quoted under "What the refusal says" drifts from `SAYS` today, and the plan skips it; the cited log pair stands outside the log this box keeps, though the ordering it claims holds; "Two things the road does" opens a list of three bullets; the three cases the plan names run against the door as written, so the shape holds; `./RUNME.sh check` answers 0 on this branch, and the handback carries no retro
 ---
 
 # Ask
@@ -169,6 +175,18 @@ The review decides it.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- the table claims a case covers `onAgentSpoke`, and the tree holds none, so that row reads false
+- the change table leaves out `src/bridge/answer.js`, which the prose changes at `SAYS` and the refusal
+- a `SAYS` rewrite breaks the standing case asserting the report line, and the plan names no fix
+- the reply line chapter alone changes, and the paragraph under "What the door reads" keeps the opposite rule
+- the refusal quoted under "What the refusal says" drifts from `SAYS` today, and the plan skips it
+- the cited log pair stands outside the log this box keeps, though the ordering it claims holds
+- "Two things the road does" opens a list of three bullets
+- the three cases the plan names run against the door as written, so the shape holds
+- `./RUNME.sh check` answers 0 on this branch, and the handback carries no retro
 
 # implement
 
