@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box 1670436ae0bb · claude-code-remote
     hash_before: 755d043c1c6aed5c3de31802fd11036d1226ef27
+  - step: sync
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 941b12c531dce1b1f0dff4a8d998ff88602155bf
+    hash_after: e7a38e81128a6d9534245818278b0261624815a7
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-notes-point-true already carries every commit on main.
 ---
 
 # Ask
