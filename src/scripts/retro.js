@@ -9,7 +9,7 @@ import { effect } from "../engine/retro/effect.js";
 import { matrix } from "../engine/retro/matrix.js";
 import { mint } from "../engine/retro/mint.js";
 import { timeline } from "../engine/retro/timeline.js";
-import { fieldOf, NOTE_END, ticketNamed } from "./group.js";
+import { fieldOf, NOTE_END, TICKETS, ticketNamed } from "../engine/group.js";
 import { collect } from "./retro-collect.js";
 import { newRetro } from "./retro-new.js";
 import { score } from "./retro-score.js";
@@ -19,6 +19,8 @@ export function retro(root, argv, doors) {
   const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
   if (what === "notes") return notes(it);
+  // [[spec/design_output/work#an-experiment-decides]]
+  if (what === "audit") return audit(it);
   // [[spec/design_input/the-agent-pulls-tickets]]
   if (what === "collect") return collect(it, argv[1], argv.includes("--again"));
   // [[spec/guidance/retro/chapter]]
@@ -68,7 +70,44 @@ export function retro(root, argv, doors) {
   return what ? 2 : 0;
 }
 
-// [[spec/design_output/pull#a-need-is-a-verb]]
+// The process a trial runs, which the audit reads off each ticket. [[spec/design_output/work#an-experiment-decides]]
+export const EXPERIMENT = "spec/processes/experiment";
+
+// Every trial standing open, so a retro closing over one leaves the tree carrying it. [[spec/design_output/work#an-experiment-decides]]
+export function openTrials(it) {
+  const at = it.join(it.root, ...TICKETS.split("/"));
+  if (!it.disk.exists(at)) return [];
+  return it.disk
+    .list(at)
+    .filter((one) => one.kind === "file" && one.name.endsWith(NOTE_END))
+    .map((one) => ({
+      name: ticketNamed(one.name),
+      text: it.disk.read(it.join(at, one.name)),
+    }))
+    .filter((one) => bare(fieldOf(one.text, "process")) === EXPERIMENT)
+    .filter((one) => fieldOf(one.text, "state") !== "closed");
+}
+
+function bare(said) {
+  return String(said ?? "")
+    .trim()
+    .replace(/^\[\[|\]\]$/g, "");
+}
+
+// [[spec/design_output/work#an-experiment-decides]]
+function audit(it) {
+  const open = openTrials(it);
+  if (!open.length) {
+    console.log("Every experiment stands decided, so the retro closes.");
+    return 0;
+  }
+  console.log(
+    `${open.length} experiment(s) stand open. Take each one to its decide step, then run this again:`,
+  );
+  for (const one of open) console.log(`  ${one.name}`);
+  return 1;
+}
+
 function notes(it) {
   const at = it.join(it.root, ...NOTES.split("/"));
   const open = it.disk.exists(at)

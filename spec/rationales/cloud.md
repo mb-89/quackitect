@@ -60,7 +60,21 @@ session to collect it later.
 The box holds the only copy of anything uncommitted. There is no second chance
 to collect it, because nothing survives the session.
 
-## 6. A person blocks no branch
+## 6. Why the merge reviews
+
+A question handed out of a cloud box buys nothing a merge does not buy later,
+and costs the branch its whole session. The owner reads the change at the merge
+either way.
+
+So the box decides and writes what it weighs beside the answer. The hand at the
+merge then judges the call with the code in front of it.
+
+| what costs what | the price |
+|---|---|
+| a wrong call the merge catches | one review |
+| a branch parked on a question | the session parking it, and every session meeting it again |
+
+## 7. A person blocks no branch
 
 A cloud box runs while nobody sits beside it. So a step whose `by` reads
 `person` waits the whole session, and the branch waits with it. Every step
@@ -95,20 +109,6 @@ question this branch meets. The mechanics follow it.
 | `branch unblock` | the verb refuses, and names the pull instead |
 | a claim that a wrong answer outlives the branch | the rule wants a person sitting here, and none does |
 
-## 7. Why the merge reviews
-
-A question handed out of a cloud box buys nothing a merge does not buy later,
-and costs the branch its whole session. The owner reads the change at the merge
-either way.
-
-So the box decides and writes what it weighs beside the answer. The hand at the
-merge then judges the call with the code in front of it.
-
-| what costs what | the price |
-|---|---|
-| a wrong call the merge catches | one review |
-| a branch parked on a question | the session parking it, and every session meeting it again |
-
 ## 8. What a leaving branch owes
 
 A branch merges whole. What the box decides stands written where the merge reads
@@ -118,7 +118,26 @@ The alternative is a branch held open until a person answers. That blocks the
 tickets depending on it, and a dependency reads a closed ticket, not a finished
 one. So finishing is what frees the chain.
 
-## 9. The check greens first
+## 9. A branch stands mid-step
+
+A branch handed back mid-step hands the next box a ticket whose evidence stops
+half written. That box reads the ask, reads the record, and works out where the
+last hand stood, before it writes a line of its own.
+
+That reading costs a session, and it buys what the first box already knew. So a
+box carrying a question it can answer answers it, and a box meeting a step it
+can work carries the branch to done.
+
+## 10. A left step waits again
+
+A step an agent can take, left standing, meets the next box unchanged. The next
+box reads it, takes it, and pays the reading the last box already paid.
+
+One group left two agent steps open at the release. Both stood at the same leaf
+when the branch came back, and the second box spent its first minutes learning
+what the first box knew.
+
+## 11. The check greens first
 
 A box read the check red, named the four lines a verb wrote, and left them.
 Three of the four stood on the branch before that box took it. The reading went:
@@ -137,7 +156,7 @@ verb writes the frontmatter. So a joined `why` line read as one sentence, past
 the code span cap. Blanking that block in the three rules that miss it costs
 four lines, and it greens every ticket the verbs write.
 
-## 11. One session, one branch
+## 14. One session, one branch
 
 A session reading this note from `take` to `done` finds no line saying it stops
 there. So it offers a second branch, having just closed its own, which is the
@@ -151,7 +170,7 @@ A branch listing also goes stale inside a session. `work list` reads origin at
 the moment of the call, and an hour of work later another session has moved what
 it named. So run it again before naming a status out loud.
 
-## 12. Saying the commit
+## 15. Saying the commit
 
 A cloud box clones the branch tip as it stood when the session began. Somebody
 pushing a minute later leaves the box behind while it reports itself current.

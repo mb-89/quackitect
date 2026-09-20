@@ -8,7 +8,7 @@ import winkNLP from "wink-nlp";
 import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { pathsOf, wordsOf } from "../../.claude/skills/level0/lib/vocabulary.js";
-import { withContext, withoutFalsePast } from "./tense.js";
+import { withContext, withoutFalsePast } from "../engine/tense.js";
 import { proseFaults } from "./write.js";
 
 const nlp = winkNLP(model);

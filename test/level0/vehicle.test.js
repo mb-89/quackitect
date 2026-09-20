@@ -122,12 +122,12 @@ test("the register turns an identity into a place", () => {
 
 test("an entry naming a place nobody holds is skipped", () => {
   const files = tree({
-    "/home/.se/registry.json": JSON.stringify([
+    "/home/user/.se/.runtime/registry.json": JSON.stringify([
       entryOf("abc123", "0.1.0", "/tools", "now"),
       entryOf("gone999", "0.1.0", "/vanished", "now"),
     ]),
   });
-  const list = readRegister(files, { HOME: "/home" });
+  const list = readRegister(files, { HOME: "/home/user" });
   assert.deepEqual(
     list.map((one) => one.id),
     ["abc123"],
@@ -249,7 +249,7 @@ test("attach writes the driver, the register entry with its port, the pointer an
     );
   }
   assert.equal(files.read(`/stub/${MARKER}`), "{}", "the manifest");
-  const entry = JSON.parse(files.read("/home/agent/.se/registry.json")).find(
+  const entry = JSON.parse(files.read("/home/agent/.se/.runtime/registry.json")).find(
     (one) => one.id === "abc123",
   );
   assert.equal(entry.method_root, "/tools", "the register entry");

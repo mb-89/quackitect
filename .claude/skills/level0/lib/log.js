@@ -112,6 +112,18 @@ export function rowsOf(text) {
     .map((row) => JSON.parse(row));
 }
 
+// Every row a text holds, leaving out a line no parser takes. Two writers appending at once tear one line, and a reader of the log stands on the rest. [[spec/design_output/log#every-writer-appends]]
+export function rowsIn(text) {
+  const out = [];
+  for (const row of String(text).split("\n")) {
+    if (!row.trim()) continue;
+    try {
+      out.push(JSON.parse(row));
+    } catch {}
+  }
+  return out;
+}
+
 export function nameOf(stamp, id) {
   const said = String(stamp);
   const time = said.slice(CLOCK.from, CLOCK.to).split(":").join("-");

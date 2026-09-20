@@ -25,7 +25,7 @@ two roots, and a copy that knows which project it drives.
 |---|---|
 | a copy carries an identity | `.se/.runtime/copy.json` in the method tree |
 | a project names the copy driving it | `.se/.runtime/project.json` in the work tree |
-| a register turns an identity into a place | `~/.se/registry.json` |
+| a register turns an identity into a place | `~/.se/.runtime/registry.json` |
 
 A path alone does none of this. It goes stale the moment either tree moves,
 and the pair then names a place that holds something else.
@@ -77,6 +77,27 @@ changes, and `./RUNME.sh config` says which layer answers a key.
 A projection declaration joins the same way where it is JSON. Its targets land
 in the work root, because that is the tree a person opens.
 
+## The styles assemble once
+
+A project writes a rule of its own, and the method's rules keep standing over
+it. Both roots hold their styles under `spec/config/styles`, and `assemble` in
+`src/scripts/styles.js` writes the pair into one folder:
+
+| what the assembly writes | where it stands |
+|---|---|
+| the styles both roots hold | `.se/vale/styles` under the work root |
+| the config naming that folder | `.se/vale/.vale.ini` beside it |
+
+The method's files land first, and a name the work root holds again replaces
+one. The config comes from the work root where it holds one, and from the
+method otherwise. The vale door hands that config to Vale, and a tree driving
+itself hands its own.
+
+The private folder stands off git, so nobody edits what the assembly writes.
+The assembly writes again where a source reads newer than the derived config.
+It writes again too where the names the roots hold differ from the copies
+standing there, so a rule a root drops refuses no write.
+
 ## A vehicle stands alone
 
 A vehicle carries the whole method and answers for itself. It reaches back to
@@ -107,9 +128,11 @@ about this machine: the copy stands somewhere else.
 
 ## The register places an identity
 
-Every copy writes itself into `~/.se/registry.json`, or into each folder
-`SE_REGISTRY` names. The reader drops an entry whose method root holds no
-marker. A folder that holds something else now answers about that something.
+Every copy writes itself into `~/.se/.runtime/registry.json`, or into each folder
+`SE_REGISTRY` names, which holds the file straight. The reader drops an entry
+whose method root holds no marker. A folder that holds something else now
+answers about that something. A box carrying the register straight under the
+private folder meets the move in `src/scripts/install.sh`.
 
 ## The register holds the port
 
@@ -155,7 +178,7 @@ says what the verb puts into each.
 
 | file | the verb puts |
 |---|---|
-| `project/spec/tickets/`, `project/spec/guidance/`, `project/src/` | one `.gitkeep`, so the empty folder travels with git |
+| the folders `stubFolders` names, under the stub's own name | one `.gitkeep`, so the empty folder travels with git |
 | `vehicle.json` | the record below |
 | `RUNME.sh` | the shim, with its run bit |
 | `.claude/settings.json` | the vehicle's tracked settings, key by key, with none of its comments |
@@ -174,6 +197,39 @@ says what the verb puts into each.
 A vehicle with no remote has no upstream a cloud box can clone, so the verb
 refuses until `--upstream` names one. A vehicle the button made has no git
 yet, and this is where that shows.
+
+## The brand a vehicle stamps
+
+The brand is the slug of the vehicle's folder name. A marketplace name takes no
+dot and no space. So `brandOf` lowers the case, turns each run of characters
+outside `a-z0-9` into a hyphen, and cuts a hyphen off each end.
+
+| the folder | the brand |
+|---|---|
+| `quackitect` | `quackitect` |
+| `my.app` | `my-app` |
+| `Acme Tools` | `acme-tools` |
+| `.hidden` | `hidden` |
+| `...` | the empty brand, which the stamp refuses |
+
+The brand reaches three names. The plugin name stands at `level0`, so every
+`mcp__level0` tool keeps the name it carries:
+
+| what reads the brand | who writes it |
+|---|---|
+| the marketplace name and its owner | the install script, ahead of every verb |
+| the plugin's author | the same |
+| the stub's enabled id, `level0@<brand>` | the shim |
+
+`brandedJson` carries the rule for the two files. A file carrying an `owner` is
+a marketplace, so its `name` and its owner's name take the brand. A file
+carrying an `author` is a plugin, so its author takes the brand and its own
+name stands. A file carrying neither comes back as it stands.
+
+The extension's icon reads the brand folder. `spec/config/brand/icon.svg` is
+the mark a vehicle draws, and the install script writes it to the path
+`src/extension/package.json` names. Git ignores that target, so one icon
+stands. Two vehicles wear two marks, and nothing holds those two in step.
 
 ## Two roads to the vehicle
 
@@ -227,7 +283,7 @@ settles the stub the way the sidebar's hook button does:
 
 | the verb writes | where |
 |---|---|
-| the register entry with its port | `~/.se/registry.json` |
+| the register entry with its port | `~/.se/.runtime/registry.json` |
 | the pointer | `.se/.runtime/vehicle.json` in the stub |
 | the vehicle's hook, its two manifests and the lib files the hook imports | `.claude/skills/level0` in the stub |
 

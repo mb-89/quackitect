@@ -6,7 +6,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { onStop } from "../../src/bridge/stop.js";
+import { dropsHold, onStop, sawPrompt } from "../../src/bridge/stop.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -101,6 +101,34 @@ function stamped(warnings, names) {
   };
 }
 
+// A cloud box reads its own map, so the queue rule stands off without any read outside. [[spec/design_output/doors#a-door-reads-the-outside]]
+test("the queue rule reads the cloud off the box's own environment", () => {
+  const free =
+    "---\nkind: [[ticket]]\nstate: open\nurgency: soon\nsteps:\n  - name: do\n---\n\n# Ask\n\nA thing.\n";
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+
+  const here = box({ [at("spec/tickets/a-free.md")]: free });
+  here.box.env = { CLAUDE_CODE_REMOTE: "true" };
+  const said = onStop(done, here.box);
+  assert.deepEqual(said, { pass: true }, "a cloud box reads no queue");
+
+  const desk = box({ [at("spec/tickets/a-free.md")]: free });
+  const held = onStop(done, desk.box);
+  assert.match(held.result.block, /The queue holds work for this box/);
+
+  // A box carrying no map reads as a desk, whatever the process around it says. [[spec/design_output/doors#a-door-reads-the-outside]]
+  const bare = box({ [at("spec/tickets/a-free.md")]: free });
+  bare.box.env = undefined;
+  const was = process.env.CLAUDE_CODE_REMOTE;
+  process.env.CLAUDE_CODE_REMOTE = "true";
+  try {
+    assert.match(onStop(done, bare.box).result.block, /The queue holds work for this box/);
+  } finally {
+    if (was === undefined) delete process.env.CLAUDE_CODE_REMOTE;
+    else process.env.CLAUDE_CODE_REMOTE = was;
+  }
+});
+
 test("a standing stop line ends the turn, and nothing prompts after it", () => {
   const it = box();
   const said = onStop(
@@ -140,6 +168,24 @@ test("a turn with no stop line holds, and the block names the reasons", () => {
     /names no stop reason/,
     "the log carries what prompts after",
   );
+});
+
+// A rule naming a check the door holds nowhere stands out of the vote. [[spec/design_output/stop#the-mechanical-checks]]
+test("a rule running a name every object carries fires nothing", () => {
+  const fired = `
+- id: the-stop-hook-holds-this-turn
+  side: continue
+  priority: 90
+  decides: mechanical
+  runs: constructor
+  says: A name nobody wrote holds this turn open.
+${RULES}`;
+  const it = box({ [at("spec/config/stop/level0.yml")]: fired });
+  const said = onStop(
+    { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" },
+    it.box,
+  );
+  assert.deepEqual(said, { pass: true }, "the stop stands, and the strange rule fires nothing");
 });
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
@@ -202,4 +248,73 @@ test("the queue holds a stop on completion while a free ticket stands", () => {
     it.box,
   );
   assert.match(said.result.block, /The queue holds work for this box/);
+});
+
+// The two rules the owner's hold fires, which the fixture above leaves out. [[spec/design_output/stop#the-hold]]
+const HOLD_RULES = `
+- id: the-owner-holds-this-session
+  side: stop
+  priority: 85
+  decides: mechanical
+  runs: owner-holds
+  says: The owner holds this session at stop, so this turn ends here.
+
+- id: the-owner-asks-to-finish
+  side: stop
+  priority: 84
+  decides: mechanical
+  runs: owner-finishes
+  says: The owner holds this session at finish, so this turn ends with the piece in hand.
+${RULES}`;
+
+// A box whose owner holds the session, over the two rules that hold fires. [[spec/design_output/stop#the-hold]]
+function heldBox(hold) {
+  return box({
+    [at("spec/config/level0.json")]: JSON.stringify({
+      stop: { enabled: true, mostInARow: 3, hold },
+      engine: { binding: "queue" },
+      refactor: REFACTOR,
+    }),
+    [at("spec/config/stop/level0.yml")]: HOLD_RULES,
+  });
+}
+
+const ENDS = { last_assistant_message: "The work stands where it is." };
+
+// [[spec/tickets/a-standing-stop-ends-turns]]
+test("a hold standing at the stop ends the turn", () => {
+  const it = heldBox("stop");
+  assert.deepEqual(onStop(ENDS, it.box), { pass: true });
+  assert.match(it.said[0][2], /the turn ends/);
+});
+
+// [[spec/tickets/a-standing-stop-ends-turns]]
+test("a hold the turn's end drops still ends that turn", () => {
+  const it = heldBox("stop");
+  dropsHold({}, it.box);
+  assert.deepEqual(
+    onStop(ENDS, it.box),
+    { pass: true },
+    "the hold stood in this turn, so the turn ends over the standing work",
+  );
+});
+
+// [[spec/tickets/a-standing-stop-ends-turns]]
+test("a hold at finish the turn's end drops still ends that turn", () => {
+  const it = heldBox("finish");
+  dropsHold({}, it.box);
+  assert.deepEqual(onStop(ENDS, it.box), { pass: true });
+});
+
+// [[spec/tickets/a-standing-stop-ends-turns]]
+test("a prompt opens a turn, so the hold of the turn before ends nothing", () => {
+  const it = heldBox("stop");
+  dropsHold({}, it.box);
+  sawPrompt({}, it.box);
+  const said = onStop(ENDS, it.box);
+  assert.match(
+    said.result.block,
+    /names no stop reason/,
+    "the next turn holds open on its own reasons",
+  );
 });

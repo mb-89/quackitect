@@ -20,8 +20,8 @@ import {
   schemasFrom,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { TODO } from "../../.claude/skills/level0/lib/todo.js";
-import { askFaults, askRefusal } from "./ask-lint.js";
-import { fieldOf, GROUP, withField, withoutField } from "./group.js";
+import { askFaults, askRefusal } from "./ticket-ask-lint.js";
+import { fieldOf, GROUP, withField, withoutField } from "../engine/group.js";
 import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
 

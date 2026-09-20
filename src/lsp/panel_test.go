@@ -35,8 +35,39 @@ func TestAnOpenFileLeavesBiomeToItsOwnServerAndKeepsTheRest(t *testing.T) {
 }
 
 func TestAPathTheBridgeSpellsWithBackslashesMeetsTheSamePath(t *testing.T) {
-	got := grouped([]Finding{{File: "src\\viewer\\wrap.go"}, {File: "src/viewer/wrap.go"}})
-	if len(got["src/viewer/wrap.go"]) != 2 {
+	got := grouped([]Finding{{File: "src\\tui\\wrap.go"}, {File: "src/tui/wrap.go"}})
+	if len(got["src/tui/wrap.go"]) != 2 {
 		t.Fatalf("the two spellings stand apart: %v", got)
+	}
+}
+
+// A move or a delete leaves the file's findings behind in both lists, and the row must go with the file. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+func TestAFileTheDiskNoLongerHoldsDrawsNothingAndDropsItsLists(t *testing.T) {
+	tree := sweptTree(t, nil)
+	out := &bytes.Buffer{}
+	one := &server{checker: &Checker{tree: tree}, out: out, panel: newPanel()}
+	path := "src/viewer/gone.go"
+	uri := uriOf(filepath.Join(tree.Root, path))
+	one.panel.own[path] = []Finding{{File: path, Rule: "Gofmt", Line: 1, Column: 1, Severity: SeverityWarning, Source: "tree"}}
+	one.panel.extra[path] = []Finding{{File: path, Rule: "VoiceVale.Tense", Line: 1, Column: 1, Severity: SeverityWarning, Source: fromVale}}
+	one.panel.shown[path] = true
+
+	one.shows(tree, path)
+
+	if said := urisDrawn(spoken(t, out.String()))[uri]; said != 0 {
+		t.Fatalf("a file standing nowhere draws %d findings, and it draws none", said)
+	}
+	if _, held := one.panel.own[path]; held {
+		t.Fatal("the server's own list still names the file")
+	}
+	if _, held := one.panel.extra[path]; held {
+		t.Fatal("the bridge's list still names the file")
+	}
+
+	tree.Holds(path, "package main\n")
+	one.panel.extra[path] = []Finding{{File: path, Rule: "VoiceVale.Tense", Line: 1, Column: 1, Severity: SeverityWarning, Source: fromVale}}
+	one.shows(tree, path)
+	if said := urisDrawn(spoken(t, out.String()))[uri]; said != 1 {
+		t.Fatalf("an open file the disk lacks draws %d findings, and it draws its one", said)
 	}
 }

@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
@@ -105,13 +105,37 @@ func serves(root string) int {
 }
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
+// A front hands this verb a folder, so every path under it reads as one of its own. [[spec/design_output/lsp#one-checker-every-front-asks]]
+func pathsUnder(tree *Tree, where []string) []string {
+	out := []string{}
+	for _, one := range where {
+		said := relativeTo(tree.Root, one)
+		if !isFolder(tree.Root, said) {
+			out = append(out, one)
+			continue
+		}
+		under := strings.TrimSuffix(slashed(said), "/") + "/"
+		for _, path := range tree.Paths() {
+			if strings.HasPrefix(path, under) {
+				out = append(out, path)
+			}
+		}
+	}
+	return out
+}
+
+func isFolder(root, path string) bool {
+	said, err := os.Stat(filepath.Join(root, filepath.FromSlash(path)))
+	return err == nil && said.IsDir()
+}
+
 func checks(root string, where []string) int {
 	checker := checkerAt(root)
 	found := []Finding{}
 	if len(where) == 0 || (len(where) == 1 && where[0] == ".") {
 		found = checker.Sweep()
 	} else {
-		for _, one := range where {
+		for _, one := range pathsUnder(checker.Tree(), where) {
 			found = append(found, checker.Over(one)...)
 		}
 		found = sorted(found)
@@ -208,27 +232,4 @@ func posts(standing Standing, method string) (answer, error) {
 
 	var out answer
 	return out, json.NewDecoder(said.Body).Decode(&out)
-}
-
-func starts(root string) error {
-	self, err := os.Executable()
-	if err != nil {
-		return err
-	}
-
-	one := exec.Command(self, "serve")
-	one.Dir = root
-	one.Env = append(os.Environ(), "QUACKITECT_ROOT="+root)
-	if err := one.Start(); err != nil {
-		return err
-	}
-	go one.Wait()
-
-	for waited := 0; waited < standPolls; waited++ {
-		if _, err := standingOf(root); err == nil {
-			return nil
-		}
-		time.Sleep(standPoll)
-	}
-	return errorOf(fmt.Sprintf("the server took longer than %s to stand", time.Duration(standPolls)*standPoll))
 }

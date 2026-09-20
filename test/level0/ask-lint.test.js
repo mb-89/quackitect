@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { askFaults } from "../../src/scripts/ask-lint.js";
+import { askFaults } from "../../src/scripts/ticket-ask-lint.js";
 import { askLines, ticket } from "../../src/scripts/ticket.js";
 
 const ROOT = "/tree";

@@ -187,7 +187,7 @@ at a time, and reaches no row to change it.
 - the work tab draws every ticket, nested under its group
 - a write to a ticket redraws the tab with no key pressed
 - the queue column answers the order the pull hands out
-- `go -C src/viewer test ./...` is green
+- `go -C src/tui test ./...` is green
 - `./RUNME.sh check` is green
 
 # sync

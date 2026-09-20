@@ -64,7 +64,7 @@ Without it the owner types the filter by hand each time, and the log verb loses 
 
 <!-- the form is command -->
 
-    cd src/viewer && go test ./... && echo green
+    cd src/tui && go test ./... && echo green
 
 ## check
 

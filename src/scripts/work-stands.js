@@ -17,7 +17,7 @@ import {
   ticketAt,
   ticketNamed,
   WORK_BRANCH,
-} from "./group.js";
+} from "../engine/group.js";
 import { asText, framed, namesIn, REF_FORMAT, refsIn } from "./work-read.js";
 
 export const COL = { branch: 34, child: 32, place: 6, status: 6, why: 24 };

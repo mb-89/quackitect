@@ -7,6 +7,7 @@ import { test } from "node:test";
 import {
   guesses,
   installedTools,
+  loopNames,
   pathOf,
   placesFor,
   rebuilt,
@@ -18,7 +19,7 @@ import {
 } from "../../.claude/skills/level0/lib/tools.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { readTools, survey, whereIs, writeSurvey } from "../../src/scripts/tools.js";
+import { readTools, survey, whereIs, writeSurvey } from "../../src/engine/tools.js";
 
 const ROOT = "/box";
 const BIN = `${ROOT}/.se/.runtime/bin`;
@@ -94,6 +95,11 @@ test("the survey writes every wanted tool into .se/.runtime/tools.json", () => {
     WANTED.map((one) => one.name),
   );
   assert.equal(pathOf(read, "vale"), `${BIN}/vale`);
+  assert.equal(
+    files.exists(`${ROOT}/${TOOLS}.part`),
+    false,
+    "the survey lands whole by a move, and leaves no part behind",
+  );
 });
 
 test("the survey reaches .se/.runtime/bin before any folder on the path variable", () => {
@@ -215,4 +221,31 @@ test("a registered tool's line is the first sentence of its description", () => 
     "- `mcp__level0__find`: Finds the lines carrying the words.",
     "- `mcp__level0__mint_note`: Writes a note under its schema.",
   ]);
+});
+
+// The installer names the list each loop carries, so a rule reads the pair. [[spec/design_input/the-runtime-files-stand-apart]]
+test("the reader answers each loop under the list its marker names", () => {
+  const text = [
+    "# folders.js owns these names as RENAMED.",
+    'for one in "$root/.se/run" "$root/.se/runtime"; do',
+    "  mv $one $new",
+    "done",
+    "",
+    "# folders.js owns these names as MOVED.",
+    "for one in bin hold \\",
+    "  box.json; do",
+    "  mv $one $new",
+    "done",
+    "",
+    'for one in "$root/.se/old"; do',
+    "  echo $one",
+    "done",
+    "",
+  ].join("\n");
+
+  const said = loopNames(text);
+
+  assert.deepEqual(said.RENAMED, ["run", "runtime"], "a path reads as its name");
+  assert.deepEqual(said.MOVED, ["bin", "hold", "box.json"], "a line carries over");
+  assert.deepEqual(said.unmarked, [12], "a loop naming no list comes back by its line");
 });

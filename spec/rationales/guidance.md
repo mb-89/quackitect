@@ -86,24 +86,3 @@ session writes a new one, under the same name:
 A session that finishes without writing one leaves the next session with
 nothing, and the branch says `held` for ever.
 
-## 12. A rule carries its because
-
-The cloud chapter stated what to do and left out what goes wrong. A box read
-past it and reached for the engine's stamp instead, handing out two calls it
-owned. [[spec/rationales/cloud]] carries that failure.
-
-Version four wrote each rule with its failure beside it:
-
-- Refactor or change behavior, one to a commit, because a green suite says nothing about which breaks.
-- Leave the shape better than the speed, because a fast function nobody reads is a defect.
-
-The instruction and the failure ride together. A reader holding half the rule
-still holds what it guards, so they apply it where it bites.
-
-Rule 2 sends the argument to a rationale, and this reads as its opposite. The
-split is by size. The rationale carries the argument, the measurement and the
-history, and the rule carries one clause naming what breaks.
-
-Rules 9, 10 and 11 above already read that way, so the practice stands older
-than the rule. A list item caps its sentence at twenty words, which is why the
-rule and its reason stand as two sentences.

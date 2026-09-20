@@ -37,7 +37,7 @@ record:
     answered:
       - name: tests
         exit: 0
-        said: green, 10 test(s) pass in 1 file(s); green, src/viewer passes
+        said: green, 10 test(s) pass in 1 file(s); green, src/tui passes
       - name: check
         exit: 0
         said: 84 stand at warning, which the panel draws and check allows.
@@ -46,7 +46,7 @@ reason: done
 
 # Ask
 
-The tree view sorts by nothing. `src/viewer/sort.go` sorts the log, and it
+The tree view sorts by nothing. `src/tui/sort.go` sorts the log, and it
 reads the log's own columns and rows by name, one key at a time.
 
 | what a board wants | what `sort.go` holds |
@@ -71,7 +71,7 @@ carries its own sort, which is the ticket after this one.
 - a press on a column head sorts by it, and a second turns it around
 - a person picks a second key the same way, and it stands under the first
 - the items stay as they stand, and the sort reaches the rows alone
-- `go -C src/viewer test ./...` is green
+- `go -C src/tui test ./...` is green
 - `./RUNME.sh check` is green
 
 # do

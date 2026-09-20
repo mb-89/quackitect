@@ -145,6 +145,11 @@ func (one *server) showsAll(tree *Tree) {
 
 // An open file leaves Biome to its own server, which draws it as it is typed. Vale stays here, because the battery's list carries the tense reader's veto. [[spec/design_output/lsp]]
 func (one *server) shows(tree *Tree, path string) {
+	// A file the disk no longer holds draws nothing, whoever last found something in it, so a move or a delete clears its row. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+	if !tree.Held(path) && !tree.Exists(path) {
+		delete(one.panel.own, path)
+		delete(one.panel.extra, path)
+	}
 	said := append([]Finding{}, one.panel.own[path]...)
 	for _, extra := range one.panel.extra[path] {
 		if one.panel.open[path] && extra.Source == fromBiome {

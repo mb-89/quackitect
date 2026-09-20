@@ -5,6 +5,7 @@
 
 import { hashText } from "./hash.js";
 import { isDraft, matches } from "./paths.js";
+import { slugOf } from "./slug.js";
 
 export const SCHEMAS = "spec/schemas";
 export const END = ".schema.yaml";
@@ -1268,13 +1269,7 @@ function flatOf(said) {
   return flat;
 }
 
-// [[spec/design_output/schema#the-fields-a-caller-names]]
-export function slugOf(said) {
-  return String(said ?? "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
+export { slugOf };
 
 function handedIn(fields) {
   const out = new Map();

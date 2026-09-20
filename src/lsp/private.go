@@ -5,7 +5,6 @@ package main
 
 import (
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
 )
@@ -59,15 +58,7 @@ func boxHere(root string) Box {
 		}
 		return ""
 	}
-	asked := func(key string) string {
-		said := exec.Command("git", "config", key)
-		said.Dir = root
-		read, err := said.Output()
-		if err != nil {
-			return ""
-		}
-		return strings.TrimSpace(string(read))
-	}
+	asked := func(key string) string { return gitSays(root, key) }
 	return Box{
 		User:  first("USER", "USERNAME", "LOGNAME"),
 		Home:  first("HOME", "USERPROFILE"),

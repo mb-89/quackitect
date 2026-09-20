@@ -24,6 +24,7 @@ const REACHES = new Set(["AskUserQuestion"]);
 export const SAYS = [
   "The owner asked something and nothing has answered it. Write the answer in",
   "the chat, as text: what you understood and what you do next. Then work.",
+  "The chat pays this door the moment it shows that answer.",
   "The log takes the answer from the chat, so the log tool answers nothing.",
 ].join("\n");
 

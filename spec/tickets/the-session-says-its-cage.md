@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: do
@@ -28,6 +28,19 @@ group: the-bridge-keeps-transport
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 654afc861adf427224bf179c19436ca55b8479a0
+    hash_after: 1d1c883e7258a3070597a22de7bc1f307f1a678a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 16 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -72,11 +85,15 @@ The fault behind this ticket ran a whole session before anybody asked. The one
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -84,13 +101,41 @@ The fault behind this ticket ran a whole session before anybody asked. The one
 
 <!-- the form is text -->
 
+A session outside the cage says so in the block it reads first, so a reader
+tells it from a session holding its rules.
+
+| what the bridgehead does | when |
+|---|---|
+| holds the code the start road answers | the road stands down at a warning |
+| hands one `level0-cage` block to the prompt | the server answers nothing under it |
+| drops what it holds | the server answers |
+
+`cageText` builds the block off the code alone, so the table of codes stays the
+one place naming what each means. The block carries the code, what that code
+means, what the road itself says, and the two commands a person runs.
+
+A code carrying no warning holds nothing. So a desk box, where a person starts
+the server, reads the same as it does today.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change answers each line of the ask, and the Discussion names the one road it leaves
+- the hook held what the road answered nowhere, and the change gives that one name
+- the chapter A session says its cage owns the block, and `cageText` reads the codes off `reasonOf`
+
 # Discussion
+
+The ask says the line lands in the first answer, and the change hands a block
+to the first prompt instead. A block is what the bridgehead can hand with no
+server standing.
+
+- the block asks the agent for that opening line, which is the nearest a hook reaches
+- an agent writing past the block leaves a reader the `warn` line in the log, which stands as it does
+- a session whose server starts late reads no block, because the server's answer drops what the road held
 
 The line comes from the bridgehead, because the server is the missing piece.
 The bridgehead already reads the code and already holds the sentence.

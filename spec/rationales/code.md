@@ -26,3 +26,19 @@ what it does, what it refuses, and why its shape is what it is.
 Both take the same form. A section per subject, and a link from whatever the
 section explains. The link resolves as a path first and then as a note name, so
 `[[spec/design_output/level0#the-write-door]]` reaches one heading.
+
+## 10. A function stands twice
+
+A hand writing a function the tree already holds leaves two, and each takes its
+own fixes from then on. The reader meets both and learns which one runs by
+trying.
+
+A search costs a minute, and it answers three ways:
+
+| what the search finds | what the hand does |
+|---|---|
+| the function | calls it |
+| one standing close | takes that one further |
+| nothing | writes it |
+
+The cost falls on the hand writing, and the saving on every hand reading.

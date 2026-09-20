@@ -10,7 +10,7 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { onward } from "../../src/scripts/pull-writes.js";
-import { unblockPrompt } from "../../src/scripts/spawn.js";
+import { unblockPrompt } from "../../src/scripts/pull-spawn.js";
 import { pulling } from "../../src/scripts/work.js";
 import { SCHEMA } from "./pull-schema.js";
 

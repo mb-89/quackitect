@@ -9,7 +9,6 @@ import (
 
 	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -30,9 +29,26 @@ type Tree struct {
 	Node  string
 	Box   Box
 
-	guard   sync.Mutex
-	overlay map[string]string
-	held    []string
+	guard    sync.Mutex
+	overlay  map[string]string
+	held     []string
+	restated []Finding
+	passed   bool
+}
+
+// The restated rules read every note, so the tree holds the one pass and each front pays it once. [[spec/design_output/lsp#a-second-copy-draws]]
+func (one *Tree) Restated(pass func() []Finding) []Finding {
+	one.guard.Lock()
+	found, passed := one.restated, one.passed
+	one.guard.Unlock()
+	if passed {
+		return found
+	}
+	found = pass()
+	one.guard.Lock()
+	one.restated, one.passed = found, true
+	one.guard.Unlock()
+	return found
 }
 
 func treeAt(root string) *Tree {
@@ -44,14 +60,22 @@ func (one *Tree) Holds(path, text string) {
 	one.guard.Lock()
 	defer one.guard.Unlock()
 	one.overlay[slashed(path)] = text
-	one.held = nil
+	one.held, one.restated, one.passed = nil, nil, false
 }
 
 func (one *Tree) Drops(path string) {
 	one.guard.Lock()
 	defer one.guard.Unlock()
 	delete(one.overlay, slashed(path))
-	one.held = nil
+	one.held, one.restated, one.passed = nil, nil, false
+}
+
+// Whether an editor holds the file's text, which stands in for the disk. [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+func (one *Tree) Held(path string) bool {
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	_, open := one.overlay[slashed(path)]
+	return open
 }
 
 func (one *Tree) Read(path string) string {
@@ -107,9 +131,7 @@ func (one *Tree) Paths() []string {
 
 // [[spec/design_output/tree#the-tree-handed-in]]
 func gitHolds(root string) []string {
-	said := exec.Command("git", "ls-files")
-	said.Dir = root
-	read, err := said.Output()
+	read, err := gitFiles(root)
 	if err != nil {
 		return nil
 	}
@@ -152,7 +174,7 @@ func diskHolds(root string) []string {
 func (one *Tree) Forgets() {
 	one.guard.Lock()
 	defer one.guard.Unlock()
-	one.held = nil
+	one.held, one.restated, one.passed = nil, nil, false
 }
 
 const (
@@ -164,7 +186,8 @@ const (
 	Offered   = ".vscode/extensions.json"
 	// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
 	ToolsAt = ".se/.runtime/tools.json"
-	Bin     = ".se/.runtime/bin"
+	// The runtime folder folders.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
+	Bin = ".se/.runtime/bin"
 )
 
 // [[spec/design_output/editor#what-the-editor-runs]]

@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
-import { CLOSED, recordIn, urgent, withEntry, withField } from "../../src/scripts/group.js";
+import { CLOSED, recordIn, urgent, withEntry, withField } from "../../src/engine/group.js";
 import {
   changedIn,
   DONE,

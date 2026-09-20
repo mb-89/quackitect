@@ -44,7 +44,9 @@ puts it in the rest, and a no puts it in the runtime folder.
 - a word standing in a private note alone comes back from a `find`
 - a module that imports takes the name from the owner
 - a module importing none of it names the owner in a comment beside the copy
-- `PrivateFolderOwned` refuses a spelling naming neither
+- `PrivateFolderOwned` reads the spelling's own line and the comment run above it
+- so an import of the owner covers the line it stands on, and no other
+- `InstallerHoldsTheNames` weighs each loop of the installer against the list it names
 
 Private means a person's name, a handle, an address, a number, a date in prose
 and a path on a disk. Unstructured input somebody stores for later is private

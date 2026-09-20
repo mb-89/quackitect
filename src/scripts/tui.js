@@ -2,7 +2,7 @@
 // names. A window already standing takes the tab over its own port and the
 // second launch ends, so one window stands at a time. A tree carrying no Go
 // prints the rows plain instead.
-// [[spec/design_output/viewer#the-verb-builds-it]]
+// [[spec/design_output/tui#the-verb-builds-it]]
 
 import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { PORT } from "../bridge/window.js";
@@ -10,14 +10,14 @@ import { asRow, filesFor, NO_LOG, rowsIn, SESSION } from "./log-read.js";
 
 export const TABS = ["log", "work"];
 
-// [[spec/design_output/viewer#a-tab-the-caller-names]]
+// [[spec/design_output/tui#a-tab-the-caller-names]]
 export function tabWanted(argv) {
   const at = argv.indexOf("--tab");
   const said = at >= 0 ? argv[at + 1] : argv.find((one) => TABS.includes(one));
   return TABS.includes(said) ? said : "";
 }
 
-// [[spec/design_output/viewer#the-verb-builds-it]]
+// [[spec/design_output/tui#the-verb-builds-it]]
 export async function openTui(it, argv) {
   const plain = argv.includes("--plain");
   const viewer = plain ? { exe: "", why: "" } : it.viewer();
@@ -27,7 +27,7 @@ export async function openTui(it, argv) {
   return plainRows(it, argv, session, plain);
 }
 
-// [[spec/design_output/viewer#a-second-launch-hands-over]]
+// [[spec/design_output/tui#a-second-launch-hands-over]]
 async function opens(it, exe, session, tab) {
   it.disk.makeDir(it.join(it.root, LOG_FOLDER));
   if (await told(tab || TABS[0])) {
@@ -38,7 +38,7 @@ async function opens(it, exe, session, tab) {
   return it.proc.run([exe, ...opts, session], { cwd: it.root, inherit: true }).exitCode;
 }
 
-// Whether a window already standing took the tab. [[spec/design_output/viewer#a-second-launch-hands-over]]
+// Whether a window already standing took the tab. [[spec/design_output/tui#a-second-launch-hands-over]]
 async function told(tab) {
   try {
     const answer = await fetch(`http://127.0.0.1:${PORT}/tab`, {
@@ -55,7 +55,7 @@ async function told(tab) {
 
 const WAIT = 500;
 
-// [[spec/design_output/viewer#the-verb-builds-it]]
+// [[spec/design_output/tui#the-verb-builds-it]]
 function plainRows(it, argv, session, plain) {
   // The read over the log stands in log-read.js, and the log verb calls the same one. [[spec/design_output/log#one-verb-reads-the-log]]
   const read = argv.includes("--all")

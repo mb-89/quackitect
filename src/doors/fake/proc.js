@@ -2,11 +2,13 @@
 // failure the test sees, so a silent wrong answer stays impossible.
 // [[spec/design_output/doors#a-fake-behaves]]
 
+import { behaves } from "./behaves.js";
+
 export function fakeProc(answers = {}) {
   const ran = [];
   const table = new Map(Object.entries(answers));
 
-  return {
+  return behaves({
     ran,
     teach: (argv, said) => void table.set(key(argv), said),
     // The fake answers a start the way it answers a run, on the next tick. [[spec/design_output/lsp]]
@@ -26,7 +28,7 @@ export function fakeProc(answers = {}) {
         stderr: answer.stderr ?? "",
       };
     },
-  };
+  }, "proc");
 }
 
 function key(argv) {

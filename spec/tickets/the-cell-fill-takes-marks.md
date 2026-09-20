@@ -37,7 +37,7 @@ record:
     answered:
       - name: tests
         exit: 0
-        said: green, src/viewer passes
+        said: green, src/tui passes
       - name: check
         exit: 0
         said: 82 stand at warning, which the panel draws and check allows.
@@ -76,7 +76,7 @@ refusing a value is already said. [[spec/design_output/tree-view#a-schema-refuse
 - a fill with nothing marked reaches the view, as it does today
 - a filter change takes every mark off
 - an afternoon of edits lands in one press
-- `go -C src/viewer test ./...` is green
+- `go -C src/tui test ./...` is green
 - `./RUNME.sh check` is green
 
 # do

@@ -182,8 +182,13 @@ These keywords answer a finding today:
 | `x-names` | a value naming no entry of the list it points at |
 | `x-earlier` | a value naming an entry at or after its own |
 
-`tense`, `detailMarker`, `description` and `matches` answer none. Vale holds
-the tense, a person reads the marker, and `matches` reaches a second file.
+`tense`, `detailMarker` and `description` answer none. Vale holds the tense, and
+a person reads the marker.
+
+`matches` names a frontmatter key, and the note that key points at marks the
+items a chapter here argues. So the checker reads a second file for it, and the
+write door passes over it with one buffer in hand.
+[[spec/design_output/lsp#a-marked-rule-wants-argument]]
 
 # The checker walks every key
 

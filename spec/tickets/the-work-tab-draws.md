@@ -63,7 +63,7 @@ The file filters to `kind: ticket`, and `nest` names `group`.
 
 The view redraws on a write. The index answers a registered query, and the
 window's own door takes the call, the way it takes a tab today. For details, see
-[[spec/design_output/viewer#a-second-launch-hands-over]].
+[[spec/design_output/tui#a-second-launch-hands-over]].
 
 The gain is a board a person reads. Every later ticket in this group adds to a
 tab that already draws, so each one lands small.
@@ -73,7 +73,7 @@ tab that already draws, so each one lands small.
 - a ticket in no group draws at the left, with no mark
 - the filter reads the log's language over a ticket's keys
 - nothing here writes a ticket, and the edit waits for its own ticket
-- `go -C src/viewer test ./...` is green
+- `go -C src/tui test ./...` is green
 - `./RUNME.sh check` is green
 
 # do

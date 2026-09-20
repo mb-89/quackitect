@@ -232,7 +232,7 @@ test("a register entry naming the record's identity is the vehicle", async () =>
   const files = stub({
     "/elsewhere/acme/RUNME.sh": "run me",
     [`/elsewhere/acme/${HOOK}`]: "the hook",
-    [`${HOME}/.se/registry.json`]: JSON.stringify([
+    [`${HOME}/.se/.runtime/registry.json`]: JSON.stringify([
       { id: "abc123", method_root: "/elsewhere/acme", port: 6512 },
     ]),
   });

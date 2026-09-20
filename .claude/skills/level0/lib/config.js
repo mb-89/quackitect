@@ -12,6 +12,11 @@ export const LOCAL = `${RUN}/config.json`;
 export const FOLDER = ".se";
 export const PREFIX = "SE_";
 
+// Where a session takes its work from. [[spec/design_output/config#the-engine-controls]]
+export const BINDING = "engine.binding";
+export const QUEUE = "queue";
+export const GOD = "god";
+
 const SAID = "comment";
 
 // [[spec/design_output/config#a-key-names-a-path]]

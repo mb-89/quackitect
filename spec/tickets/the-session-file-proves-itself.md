@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: design
@@ -90,12 +90,51 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
     hash_before: 9a7324a8827986146b4246ec34746fc9cb12397d
     hash_after: 9a7324a8827986146b4246ec34746fc9cb12397d
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: f4fd2c1f5187daf0a0448a116d9f113e1cfcf8d4
+    hash_after: f4fd2c1f5187daf0a0448a116d9f113e1cfcf8d4
+  - step: implement/tests-red
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: e584badfe49ea408c1dc7d9aee6fee9707b9ea81
+    hash_after: b3e7586002d30dbc76500a6569abf1a4432bed3e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 03ad51131ea228daa1504c2f879b3dc9b391e5e8
+    hash_after: d9fc61e7f493b3256d8675d7326fd9b060ceee9f
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: a2a1cd6c4606ac0670a486c41e837a3f95f78f96
+    hash_after: f310d6d180b91d5b61c5a3fef2364dff85633342
+    answered:
+      - name: tests
+        exit: 0
+        said: "green, 1057 test(s) pass in 100 file(s); green, src/index passes; green, src/lsp passes; green, src/swap passes; green, "
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box fa49097ce66c · claude-code-remote · helper-7
+    hash_before: d2ab2206f3f4920fbde04c7f49bdef905f54d606
+    hash_after: d2ab2206f3f4920fbde04c7f49bdef905f54d606
+reason: done
 ---
 
 # Ask
@@ -125,7 +164,7 @@ Three changes, each in one place, and a test driving the hook the pull rests on.
 
 | what changes | where |
 |---|---|
-| `sessionOf` takes a third spelling | `.claude/skills/level1/lib/pull.js` |
+| `sessionOf` takes a third spelling | `.claude/skills/level0/lib/pull.js` |
 | `SESSION` moves to the library beside the hook | the same file, and the hook imports it |
 | a case drives the registered `session.start` | `test/level0/` |
 
@@ -136,7 +175,7 @@ Three changes, each in one place, and a test driving the hook the pull rests on.
 | the module | what holds it |
 |---|---|
 | `.claude/skills/level0/hooks/level0.js` | its own plugin folder |
-| `.claude/skills/level1/hooks/level1.js` | its own plugin folder |
+| `.claude/skills/level0/hooks/pull-tool.js` | its own plugin folder |
 | `src/scripts/hand.js` | the tree |
 
 A plugin imports nothing past its own folder, which is the reason each boundary keeps a copy. The hook and its library stand inside one folder, so that copy goes and the other two stay. Each remaining copy names the boundary forcing it, beside the line.
@@ -162,6 +201,20 @@ A third case drives each of the three spellings, so a harness spelling the id an
 
 <!-- the form is verdict -->
 
+pass
+
+- the three changes each land in one place, and together they answer every line of the ask
+- the third spelling reads right, because `copilot.js` takes the `session_id` that `sessionOf` misses
+- the approach names `.se/session.json`, and the modules spell `.se/.runtime/session.json`
+- the table counts `src/scripts/hand.js` a copy, and it composes the path off `inRun` instead
+- so one spelling goes, and the comment the approach asks for belongs on the level zero hook
+- the cited collector keys one handler an event
+- level one registers `tool.call` with a filter between the event and the handler
+- the new case reads the last argument, or it hands the filter a call
+- the fake `$` carries a tool register and a ui log beside `fs`
+- level one's session start registers the pull tool before it writes the file
+- the approach names `test/level0/` and no file, and `test/level0/level1.test.js` stands there
+
 # implement
 
 ## tests-red
@@ -174,17 +227,41 @@ A third case drives each of the three spellings, so a harness spelling the id an
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Three of the four new cases fail on their own assertion, each for the reason
+the approach names.
+
+| the case | what it reads |
+|---|---|
+| the library owns the spelling | `lib.SESSION` stands undefined |
+| the id every harness spells | `session_id` reads empty |
+| the registered start writes the file | nothing lands under the name the library gives |
+| an event naming no session | it passes, because that road stands already |
+
+The fourth surprises. The hook says the hand stands at the box for an event
+naming nothing, and that road holds today with no change under it. So the ask's
+second line asks for a case over a road standing right.
+
+The collector takes the last argument of a registration, because level one
+hands `tool.call` a filter between the event and the handler. A collector
+keying the second argument would hand the filter a call.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases stand in `test/level0/level1.test.js`, and the change touches no file the ask leaves out
+- the harness the hook reaches stands as a fake carrying a file system, a tool register and a log
+- a comment over each case points at the chapter the approach implements
 
 ## reflect
 
@@ -212,11 +289,17 @@ A third case drives each of the three spellings, so a harness spelling the id an
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the level one library, its hook, and the tree case naming the copies
+- the hook meets a fake carrying a file system, a tool register and a log, so no door runs live
+- a comment over the spelling names `folders.js` as the owner, and the approach it implements
 
 ## tests-green
 
@@ -228,11 +311,15 @@ A third case drives each of the three spellings, so a harness spelling the id an
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -240,11 +327,33 @@ A third case drives each of the three spellings, so a harness spelling the id an
 
 <!-- the form is text -->
 
+The hand the pull reads rests on proof now, and the session file takes the id
+every harness this tree meets spells.
+
+| what changes | where |
+|---|---|
+| `sessionOf` takes `session_id` beside the two it took | the level one library |
+| `SESSION` stands in that library, and the hook imports it | the library, and the hook beside it |
+| four cases drive the registered `session.start` | `test/level0/level1.test.js` |
+| the tree case reads the copies where they stand now | `test/contract/tree.test.js` |
+
+The tree case held that both hooks spell the session file. Level one's hook
+imports it now, so that case reads the library instead, and reads the hook for
+no second spelling.
+
+The collector takes the last argument of a registration. Level one hands
+`tool.call` a filter between the event and the handler, and a collector keying
+the second argument would hand that filter a call.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the level one library, its hook, and the two test files naming the copies
+- the hook meets a fake carrying a file system, a tool register and a log, so no door runs live
+- a comment over the spelling names `folders.js` as the owner, and each case points at its chapter
 
 # verdict
 
@@ -256,17 +365,50 @@ A third case drives each of the three spellings, so a harness spelling the id an
 
 <!-- the form is files -->
 
+    spec/tickets/the-session-file-proves-itself.md
+    spec/guidance/review/reviewing.md
+    .claude/skills/level1/hooks/level1.js
+    .claude/skills/level1/lib/pull.js
+    .claude/skills/level0/hooks/level0.js
+    src/scripts/hand.js
+    test/level0/level1.test.js
+    test/level0/hand.test.js
+    test/contract/tree.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- four cases drive the registered `session.start` over a fake `$.fs`, and read the file back
+- one case carries an event naming a session, and one carries an event naming none
+- the no-session case asserts an empty fake and the box line, so a bad event meets a refusal
+- `sessionOf` takes `session_id`, the third spelling `.claude/skills/level0/lib/copilot.js` reads
+- the hook imports `SESSION` from the library beside it, so one copy stands
+- `test/contract/tree.test.js` pins each copy against `src/scripts/hand.js`, and refuses a second spelling in the hook
+- the collector keys the last argument, so level one's `tool.call` handler takes the call
+- the diff touches five files, and the ask names each one or the move forces it
+- `./RUNME.sh check` over the tree exits 0, and `node --test` over both touched files answers 40 of 40
+- the ask's scoped check exits 1 on five warnings, and that line alone goes missing
+- the five files stand outside this diff, and [[spec/tickets/the-warnings-feed-a-refactorer]] owns their split
+- the handback carries no retro
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each fact lands once, and a note beside it points at the file owning the name
+
+| the fact | where it stands | the note beside it |
+|---|---|---|
+| the session file path | `.claude/skills/level1/lib/pull.js` | names `folders.js` as the owner, and the plugin boundary forcing the copy |
+| the third spelling | `sessionOf`, the same file | names the copilot library taking `session_id` |
+| the copies the tree allows | `test/contract/tree.test.js` | reads `SESSION` off `src/scripts/hand.js`, the owner in the tree |
 
 # Discussion
 
@@ -282,3 +424,19 @@ A third case drives each of the three spellings, so a harness spelling the id an
   - The `own` mark rests on the harness carrying an unknown key, which no type in this tree proves.
   - `./RUNME.sh check src test .claude spec/design_output` exits 0, and the suite passes 1016 of 1018.
   - The stub rename belongs to the sibling ticket, and it redesigns nothing here.
+
+The last line of the ask names `./RUNME.sh check src test .claude spec/design_output`,
+and that command answers 1 on this branch. Five files stand past a ceiling:
+
+| the file | what it breaks |
+|---|---|
+| `.claude/skills/level0/lib/bash.js` | the file ceiling |
+| `.claude/skills/level0/lib/paragraph.js` | the file ceiling |
+| `.claude/skills/level0/lib/schema.js` | the file ceiling |
+| `.claude/skills/level0/lib/copilot-runtime.js` | the function ceiling |
+| `.claude/skills/level0/lib/vocabulary.js` | the function ceiling |
+
+Each of the five carries the same line count at the commit this branch takes,
+so this change grows none of them. `./RUNME.sh check` over the whole tree
+answers 0, and the evidence names that one. [[spec/tickets/the-warnings-feed-a-refactorer]]
+owns the road from a standing warning to a hand that splits the file.

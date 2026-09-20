@@ -28,7 +28,7 @@ import { disk } from "../../src/doors/disk.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
 import { PROCESSES } from "../../src/scripts/process.js";
-import { readTools, whereIs } from "../../src/scripts/tools.js";
+import { readTools, whereIs } from "../../src/engine/tools.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();

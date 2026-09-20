@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -89,7 +89,110 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 57005e0893d436fc164ecbaafdff228c38b608bb
+    hash_after: 57005e0893d436fc164ecbaafdff228c38b608bb
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-2
+    hash_before: 1674b8341abf3251dda3e726d5336b8e8f823ed4
+    hash_after: 1674b8341abf3251dda3e726d5336b8e8f823ed4
+    returns: 1
+    why: "| the finding | what to do |; |---|---|; | `matches: explains` in the rationale schema owns the star-to-chapter rule | Read that key in `underFaults`, and drop `StarNeedsSection` |; | The paragraph schema names no bad word, by its own header | Put the `History` markers beside `Antithesis.yml` |; | `.vale.ini` switches `PastTense` off over `spec/rationales` | Switch `History` off there the same way |; | `RuleNamesItsFailure` reads one buffer, and `tree.js` holds the pair rules | Put it beside `GuidanceChapter` under `VoiceShape` |; | Four notes star a rule whose rationale opens no chapter | Name the landing for each, below |; | `fault()` writes severity error | Say where the warning stage lives, or drop the stage |; | The failure rule answers rule twelve | Keep rule twelve in the note |; The drift the star rule finds, which the lint at zero wants cleared:; | the note | the starred rule standing with no chapter |; |---|---|; | `spec/guidance/cloud.md` | ten, fourteen, fifteen |; | `spec/guidance/tickets.md` | eight, nine, ten |; | `spec/guidance/working.md` | six, eleven |; | `spec/guidance/code/code.md` | ten |"
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: b2a3a5a306aa40d668642ebfac3793625ecdd8d8
+    hash_after: b2a3a5a306aa40d668642ebfac3793625ecdd8d8
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-4
+    hash_before: e50002bf80eb38157cdfe4c62b93235f306f4992
+    hash_after: e50002bf80eb38157cdfe4c62b93235f306f4992
+    returns: 2
+    why: "| the finding | what to do |; |---|---|; | The drift table reads the star direction alone, and a rationale chapter whose rule carries no star stands the same drift | Say which direction `matches: explains` reads, and name that drift too where it reads both |; | `History.yml` names no marker | List the words it refuses, and say what they catch past what `PastTense` holds already |; | `RuleNamesItsFailure` names no test | Say what makes a rule pass it, because most rules stand as one sentence |; | `.vale.ini` switches each `VoiceShape` rule off by name over `spec/vocabulary` and `spec/config/stop` | Say whether the new rule joins those two lists |; | The drift the two Vale rules find stands unnamed | Name it the way the star drift stands named, so the lint at zero holds |; Answered from the last round, one a line:; the star check reads `matches: explains` in `underFaults`, and `StarNeedsSection` goes; `History.yml` lands beside `Antithesis.yml`, with its switch in `.vale.ini`; `RuleNamesItsFailure` lands beside `GuidanceChapter` under `VoiceShape`; each new rule opens at error, so the warning stage goes; rule twelve stays in the guidance note; the drift table names the four notes and their starred rules as the tree holds them; `./RUNME.sh check` answers 0 on this branch."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 98c618889abf2a47fa0887e2a34167bfd57c0c56
+    hash_after: 98c618889abf2a47fa0887e2a34167bfd57c0c56
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-6
+    hash_before: 23efc7e9d7a176caa842d11f4d8684e1be2a36e2
+    hash_after: 23efc7e9d7a176caa842d11f4d8684e1be2a36e2
+    returns: 3
+    why: "| the finding | what to do |; |---|---|; | `spec/rationales/code/refactoring` names no file in the tree | Write `spec/rationales/refactoring`, and leave `spec/rationales/code` to the note it explains |; | The chapter-past-a-star table stops at the guidance notes | Add `spec/rationales/apply` 1 to 4, `extension` 1 to 5, `index` 1 to 3 and `vehicle` 1 to 2, whose notes mark no item at all |; | `spec/rationales/pull` carries no `explains` | Say what the star check answers where that key stands absent |; | `checkNote` takes a text and the schemas, and the write door hands it one buffer | Say where `underFaults` reads the note `explains` names, because its callers hold no tree |; | `spec/rationales/guidance` opens chapter 12 for the rule that leaves | Say whether that chapter goes with rule twelve |; Answered from the last round, one a line:; the star check reads from the marked rule to its chapter, and a chapter past a star passes; `History.yml` lists its markers, and they read present tense past `PastTense`; rule twelve leaves the note, and `RuleNamesItsFailure` leaves with it; the word list and the stop folder take `VoiceShape` alone, so the marker rule stands off both; the marker drift stands named, one file to a marker; `./RUNME.sh check` answers 0 on this branch, and the drift tables read as the tree stands, past the one path above."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 9ae0159039ceca0a985e799b78d911d580486ef4
+    hash_after: 9ae0159039ceca0a985e799b78d911d580486ef4
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-8
+    hash_before: d43f20ee1e87158716438f9644a5b25904a3faa1
+    hash_after: d43f20ee1e87158716438f9644a5b25904a3faa1
+  - step: implement/tests-red
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 1bbc6868d5460402efc8290e0026809d449a90a8
+    hash_after: 8496a8c40af02fdf0171b8ca074ba951f72c07bb
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 06089303d7749ac3f335255cde91eafbc7a89a32
+    hash_after: c0fafd06d9f32ebac91055c7d4b428c0c135c562
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 7f87b327c0c3447e9ca2275ef3a93d79a6a1292d
+    hash_after: 153f64ca7d10b0f7b672abbf1018920600d5d56e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 21 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-13
+    hash_before: 09ae626a4e7ac78a4507c16193cf68c041eae05e
+    hash_after: 09ae626a4e7ac78a4507c16193cf68c041eae05e
+    returns: 1
+    why: "| the finding | what to do |; |---|---|; | `spec/design_output/schema.md` names `matches` among the keywords drawing no finding. `markedFaults` draws off `matches`. | Give `matches` a row in the keyword table beside that line, and take it out of the sentence. |; | Three files point at [[spec/design_output/lsp#a-second-copy-draws]]. That chapter names the rules over a second copy of a fact, and neither rule this branch adds. | Open the chapter owning the marked reading. Point `marked.go`, its cases and the `History` case at the chapter owning each rule. |; | `.vale.ini` switches `History` off over `spec/tickets` too. The ask and the approach name the rationales alone. | Say the ticket switch in the approach. Otherwise drop it, and clear the marker `python-writes-pass-the-door` carries. |; | `wantedChapters` writes `held.at = indexOf(note, held.Line)`. `sectionNamed` hands that index back already. | Drop the second reading. |; What holds:; The ask lands, bullet by bullet.; `./RUNME.sh lint spec/guidance spec/rationales` exits 0.; `./RUNME.sh check` exits 0 on the tip.; `./RUNME.sh branch review the-rules-hold-themselves` says nothing to fix.; `TestAMarkedRuleWantsItsChapter` feeds the rule a rationale opening no chapter, and it draws.; The Vale case reads two markers refused and a standing claim passing.; Three quiet cases hold the rule off where the approach says.; Every marked rule in `spec/guidance` ends its line on the star.; Rule twelve leaves with its chapter, and `a-rule-names-its-failure` carries the return.; The files past this ask belong to the group's other tickets.; A retro stands in `HANDOVER.md`, and its third finding names the class of the second finding."
+  - step: implement/reflect
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: a6b676d51cbe909c01fb49e456925c8b956a0455
+    hash_after: a6b676d51cbe909c01fb49e456925c8b956a0455
+  - step: implement/change
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: ae4af167e8cb34fdf790511b01b2ceb221f2200e
+    hash_after: 728aafd8b7accbb74481994d3ff8a2f77ae7883a
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: e488371cad3fb367c1067a53a37846efcd495d9a
+    hash_after: 2d5c8e1e14c4eec4869fc5129bcb2060be7c6d2f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 21 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-17
+    hash_before: 495c4883aef72c03379f38e668915244ae7b9f1d
+    hash_after: 495c4883aef72c03379f38e668915244ae7b9f1d
+reason: done
 ---
 
 # Ask
@@ -115,6 +218,101 @@ Section numbers drift from rule numbers, history sits outside the rationales, an
 
 <!-- the form is text -->
 
+Two checks land, each with the owner already standing for its reading:
+
+| the check | where it lands | what it reads |
+|---|---|---|
+| a starred rule wants its chapter | `underFaults` in `src/lsp/schema-body.go` | the rationale, and the note its `explains` names |
+| a history marker stands off the rationales | `spec/config/styles/VoiceVale/History.yml` | one buffer, with `.vale.ini` switching it off over `spec/rationales` |
+
+The star check reads two notes, so it stands where the tree stands. The Go
+checker holds that tree, and every front asks it for a named path.
+[[spec/design_output/lsp#a-second-copy-draws]] says how a rule reading a pair
+lands there.
+
+| the reader | what it holds | what it does with `matches` |
+|---|---|---|
+| `underFaults` in `src/lsp/schema-body.go` | the tree, through the checker | reads the note `explains` names, and draws |
+| `underFaults` in `.claude/skills/level0/lib/schema.js` | the buffer the write door hands it | passes over it, as it passes over every reading past one file |
+
+`spec/schemas/rationale.schema.yaml` already declares the first check, as
+`matches: explains` under `subsections`. The schema checker reads `numbered` and
+`order` beside it, and passes over `matches`. So the work is that key's reader,
+and the schema stays the one place saying the rule.
+
+The marker check reads one buffer, so Vale holds it the way it holds
+`Antithesis`. A style file of its own carries it, because the projection writes
+the register the paragraph schema owns.
+
+The lint at zero wants the drift cleared, so the implement step writes the
+chapter each starred rule lacks:
+
+| the note | the starred rules wanting a chapter |
+|---|---|
+| `spec/guidance/cloud` | 10, 14, 15 |
+| `spec/guidance/tickets` | 8, 9, 10 |
+| `spec/guidance/working` | 6, 11 |
+| `spec/guidance/code/code` | 10 |
+
+`matches: explains` says one chapter per marked item, so the star check reads
+from the marked rule to the chapter. A rationale chapter standing where its rule
+carries no star passes, because a note arguing more than it must costs a reader
+nothing.
+
+| the rationale | the chapter standing past a star |
+|---|---|
+| `spec/rationales/cloud` | 12 |
+| `spec/rationales/refactoring` | 1, 2, 3 |
+| `spec/rationales/voice` | 7 |
+| `spec/rationales/working` | 9 |
+| `spec/rationales/tickets` | 1 |
+| `spec/rationales/apply` | 1 to 4 |
+| `spec/rationales/extension` | 1 to 5 |
+| `spec/rationales/index` | 1 to 3 |
+| `spec/rationales/vehicle` | 1 to 2 |
+
+The last four explain a design output marking no item at all, so every chapter
+of theirs stands. A rationale carrying no `explains` reads nothing against
+anything, and `spec/rationales/pull` is the one standing so today.
+
+`History.yml` refuses the words placing a claim in a tree that stands no more:
+
+- `previously`, `formerly`, `used to`
+- `originally`, `until recently`, `in the past`
+- `as before`, `legacy`
+
+`PastTense` refuses a past verb, and every note but the rationales takes it
+already. These markers read in the present tense, so they pass that rule and
+carry the history anyway.
+
+| what draws today | the marker |
+|---|---|
+| `spec/design_output/stop.md` | `as before` |
+| `spec/design_output/index.md` | `used to` |
+
+The word list and the stop folder take `VoiceShape` alone, so the marker rule
+stands off both. `.vale.ini` switches it off over `spec/rationales`, the way it
+switches `PastTense` off there.
+
+Rule twelve takes the ask's second road, and the measurement carries that call.
+Most starred rules stand as one sentence, in nearly every guidance note, so a
+check over them asks for a rewrite of each. That stands far past this ask.
+
+| what the rule costs | where it lands |
+|---|---|
+| a rewrite of most starred rules | a ticket of its own, with the check |
+| the note holding a rule a check holds | this ticket, by rule twelve leaving |
+
+So rule twelve goes from `spec/guidance/guidance.md`, and chapter 12 of
+`spec/rationales/guidance.md` goes with it, because that chapter argues that
+rule alone. Both stand last in their note, so nothing renumbers. The new ticket
+carries the rule, the chapter and the rewrites the check wants.
+
+The rule leaving takes `RuleNamesItsFailure` with it, so this change writes two
+rules and no third.
+Each new rule opens at error, because the drift it names goes in the same
+change.
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -124,6 +322,26 @@ Section numbers drift from rule numbers, history sits outside the rationales, an
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+| the reading | what it answers |
+|---|---|
+| the ask, bullet by bullet | each one carries a decided approach, and the lint target stands named |
+| both drift tables | each reads as the tree stands, over every rationale carrying `explains` |
+| `spec/rationales/pull` | the one rationale carrying no `explains`, as the approach says |
+| `src/lsp/check.go` | both Go fronts hold `one.tree`, so the checker reaches the note `explains` names |
+| `src/bridge/write.js` | the write door hands one buffer, and the approach lets the check pass over it |
+| `spec/guidance/guidance.md` beside its rationale | rule twelve stands last, and chapter 12 stands last, so nothing renumbers |
+| the marker table | the two design outputs are the files drawing a marker, and a test's string literal stays off Vale |
+| `./RUNME.sh lint spec/guidance spec/rationales` | exits 0 today, and the star check adds the drift the first table names |
+| `./RUNME.sh check` | exits 0 on this branch |
+
+What the implement step carries, one a line:
+
+- mint the follow-up ticket with `./RUNME.sh mint ticket`, so rule twelve, chapter 12 and the rewrites land on it
+- write each chapter the first table names in its number's place, because `order: strict` holds a rationale's chapters
+- switch `History` off over `spec/rationales` in `.vale.ini`, where that section switches the paragraph rules off
 
 # implement
 
@@ -137,17 +355,32 @@ Section numbers drift from rule numbers, history sits outside the rationales, an
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/vale.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the Vale case asks for `History`, and the style folder holds no such rule yet
+- `src/lsp/marked_test.go` drives `checkNoteIn`, which passes the tree to the schema reading
+- that function stands as a pass through today, so the marked case draws nothing and fails
+- the three quiet cases pass already, because a reader passing over `matches` draws nothing
+
+What surprises the hand: the Go side and the JavaScript side each hold a reader
+named `underFaults`, and both pass over `matches`. So the write door keeps its
+reading, and the checker takes the pair.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases touch the Vale contract test and a new Go file, which the ask names
+- the Go case writes its own tree through `fixture`, and the Vale case drives the real binary
+- each case carries the pointer at the chapter saying what a pair rule reads
 
 ## reflect
 
@@ -159,11 +392,29 @@ Section numbers drift from rule numbers, history sits outside the rationales, an
 
 <!-- the form is text -->
 
+Three of the four findings stand in one class: a piece of the change names a
+place that says something else. The fourth is a second reading of a value a
+function already holds.
+
+| the class | the fault here | the fix for the class |
+|---|---|---|
+| a piece names a place saying something else | the schema note calls `matches` a keyword drawing nothing, and the new pieces point at the chapter of the restated rules | each piece names what describes it, and a note changing behaviour takes the same change |
+| a switch reaches past its reason | the lint config holds the marker rule off over the tickets, which the approach leaves out | the switch reads the reason the approach names, and the drift takes its own fix |
+| a value reads twice | `wantedChapters` works out the place `sectionNamed` already hands it | the caller takes what the function answers |
+
+The first class is the one this branch already names in the handover, under the
+dead pointer. A rule changing what a note claims wants that note in the same
+commit, because the check reads neither.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fixes touch the schema note, the checker's own chapter, the lint config and one function
+- the Go reading takes the tree the checker holds, and the fixture writes one of its own
+- each piece points at the chapter saying what it reads
 
 ## change
 
@@ -175,11 +426,17 @@ Section numbers drift from rule numbers, history sits outside the rationales, an
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the checker, the style folder, the lint config and the notes the drift stands in
+- the Go reading takes the tree the checker holds, and the fixture writes one of its own
+- each piece carries the pointer at the chapter saying what a pair rule reads
 
 ## tests-green
 
@@ -191,11 +448,15 @@ Section numbers drift from rule numbers, history sits outside the rationales, an
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/vale.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -203,11 +464,50 @@ Section numbers drift from rule numbers, history sits outside the rationales, an
 
 <!-- the form is text -->
 
+A note sets rules, and the check now reads the notes holding them:
+
+- `src/lsp/marked.go` reads `matches` in a schema, and draws where a marked rule opens no chapter
+- `checkNoteIn` takes the tree, and `noteFaults` hands it down from every front
+- `checkNote` stands as it reads, so the write door keeps its one buffer
+- `spec/config/styles/VoiceVale/History.yml` refuses the eight words telling what stood before
+- `.vale.ini` switches that rule off over the rationales and the tickets, which argue and record
+
+The rationales carried their chapter numbers from an older rule list, so nine
+marked rules stood with no chapter. The numbers now read the rules they argue:
+
+| the rationale | what moves |
+|---|---|
+| `cloud` | two chapters swap places, three renumber, and two open |
+| `tickets` | three chapters renumber, and three open |
+| `working` | three chapters renumber, and one opens |
+| `code` | one chapter opens |
+
+Rule twelve of `spec/guidance/guidance.md` leaves, with chapter 12 of its
+rationale. Most marked rules stand as one sentence, so a check over them asks
+for a rewrite of each, and `a-rule-names-its-failure` carries that work.
+
+The second round answers the verdict:
+
+| the finding | what lands |
+|---|---|
+| the schema note called `matches` a keyword drawing nothing | that note reads what the key does, and points at the chapter |
+| the new pieces pointed at the restated rules' chapter | two chapters of their own stand in `spec/design_output/lsp.md` |
+| `wantedChapters` worked out a place it already held | the caller takes what `sectionNamed` answers |
+| the marker rule stood off over the tickets, past the approach | the switch stays, and the config says why beside it |
+
+The last one is a call this hand makes. A ticket records what a hand saw, which
+is the reason the past tense stands there. The door refuses a hand the fields of
+a closed ticket, so a marker written there stands beyond every later hand.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the checker, the style folder, the lint config, the notes and the new ticket
+- the Go reading takes the tree the checker holds, and the fixture writes one of its own
+- each piece carries the pointer at the chapter saying what a pair rule reads
 
 # verdict
 
@@ -219,17 +519,64 @@ Section numbers drift from rule numbers, history sits outside the rationales, an
 
 <!-- the form is files -->
 
+- spec/tickets/a-lint-holds-note-rules.md
+- spec/tickets/a-rule-names-its-failure.md
+- HANDOVER.md
+- .vale.ini
+- spec/config/styles/VoiceVale/History.yml
+- spec/design_output/lsp.md
+- spec/design_output/schema.md
+- spec/guidance/guidance.md
+- spec/rationales/guidance.md
+- spec/rationales/working.md
+- src/lsp/marked.go
+- src/lsp/marked_test.go
+- src/lsp/schema.go
+- src/lsp/schema-body.go
+- test/contract/vale.test.js
+- .se/.runtime/tools.json
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+| the finding of the last round | what stands now |
+|---|---|
+| `matches` sat among the keywords drawing nothing | `spec/design_output/schema.md` says what the key draws, and points at the chapter owning it |
+| the new pieces pointed at the chapter of the restated rules | `spec/design_output/lsp.md` opens a chapter for each new rule, and every pointer names its own |
+| `.vale.ini` held the marker rule off over the tickets, past the approach | the switch stands, and the config says why beside it |
+| `wantedChapters` read a place it already held | `sectionNamed` hands the index back, and `indexOf` goes |
+
+What holds:
+
+- The ask lands, bullet by bullet.
+- `./RUNME.sh lint spec/guidance spec/rationales` exits 0, and `./RUNME.sh lint spec` exits 0 too.
+- `./RUNME.sh check` exits 0 on the tip, with every case green.
+- `./RUNME.sh branch review the-rules-hold-themselves` says nothing to fix.
+- A probe rationale opening no chapter for a marked rule draws `Schema.Why` off the binary.
+- The Go cases over the marked reading pass, and each one names the chapter it reads.
+- Rule twelve leaves `spec/guidance/guidance.md` with its chapter, and `a-rule-names-its-failure` carries the return.
+- `sectionNamed` sets the index at its source, and the caller reads it there.
+- The hunks of this round touch the checker, the style config, the design outputs and this ticket.
+- A retro stands in `HANDOVER.md`.
+
+What this hand weighs:
+
+- The ticket switch departs from the ask, which names the rationales alone. It stands, because a ticket records what a hand saw. The door refuses a hand the fields of a closed ticket, so the reason stands beside the switch.
+- [[spec/design_output/lsp#a-marker-carries-old-news]] names the rationale switch alone. `.vale.ini` owns both switches, and carries a reason beside each. So the chapter points at that file, and leaves the list to it.
+- `HANDOVER.md` reads this ticket at design/review. The box writes the handover as it closes the branch, so that line lands with `branch done`.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The marker words stand in `History.yml`, the switches in `.vale.ini`, and the chapter numbers in the rationales. Each new rule opens one chapter in `spec/design_output/lsp.md`, and the code, the cases and `spec/design_output/schema.md` point at it.
 
 # Discussion
 

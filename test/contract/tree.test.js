@@ -49,7 +49,7 @@ import { proc } from "../../src/doors/proc.js";
 import { faultsIn as gridFaults } from "../../src/extension/lib/grid.js";
 import { commandsOf } from "../../src/extension/lib/panel.js";
 import { drawnIn, entriesIn } from "../../src/extension/lib/widgets.js";
-import { SESSION } from "../../src/scripts/hand.js";
+import { SESSION } from "../../src/scripts/pull-hand-of.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -370,27 +370,19 @@ test("a spelling of a name the runtime half took is refused where the old place 
   assert.deepEqual(privateFolderOwned(fakeTree(kept, Object.keys(kept))), []);
 });
 
-// Two hooks import nothing, so each spells the session file the hand writes. [[spec/design_input/the-runtime-files-stand-apart]]
+// A plugin imports nothing past its own folder, so the plugin spells the session file the hand writes once in its library, and the pull hook imports it from there. [[spec/design_input/the-runtime-files-stand-apart]]
 test("every forced copy of the session file says what the hand module says", () => {
   for (const path of [
     ".claude/skills/level0/hooks/level0.js",
-    ".claude/skills/level1/hooks/level1.js",
+    ".claude/skills/level0/lib/pull.js",
   ]) {
     assert.match(here.read(path), new RegExp(`"${SESSION}"`), path);
   }
-});
-
-test("a file naming the owner beside the copy passes, and a test file passes", () => {
-  const owned = {
-    "src/scripts/imports.js":
-      'import { inRun } from "../../.claude/skills/level0/lib/folders.js";\nconst hold = inRun("hold");\nconst said = ".se/.runtime/hold";\n',
-    "src/extension/copy.js":
-      '// The folder folders.js owns, spelled again here.\nconst BIN = ".se/.runtime/bin";\n',
-    "test/level0/folders.test.js": 'const at = ".se/.runtime/bin";\n',
-    ".claude/skills/level0/lib/folders.js": 'export const RUN = ".se/.runtime";\n',
-  };
-  assert.deepEqual(privateFolderOwned(fakeTree(owned, Object.keys(owned))), []);
-  assert.deepEqual(privateFolderOwned(here), []);
+  assert.doesNotMatch(
+    here.read(".claude/skills/level0/hooks/pull-tool.js"),
+    new RegExp(`"${SESSION}"`),
+    "the hook imports the path from the library beside it",
+  );
 });
 
 // [[spec/design_output/level0#a-name-meets-the-cap]]

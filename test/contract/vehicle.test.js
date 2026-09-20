@@ -85,10 +85,11 @@ test("a copy answers its own verbs, with no tree behind it", () => {
     files.makeDir(join(home, ".vscode", "extensions"));
     const said = outside.run([SHELL, "RUNME.sh", "vehicle"], {
       cwd: dest,
+      // The case proves the copy answers its verbs, so it reaches no network and no editor. [[spec/design_output/vehicle#a-vehicle-stands-alone]]
       env: {
         HOME: home,
         USERPROFILE: home,
-        SE_INSTALL_SKIP: "index se-lsp editor-client",
+        SE_INSTALL_SKIP: "vale biome vale-ls index se-lsp editor-client editor-extensions",
       },
     });
     assert.equal(said.exitCode, 0, said.stderr);

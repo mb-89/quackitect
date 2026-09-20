@@ -4,8 +4,8 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { STALE } from "../../src/scripts/group.js";
-import { freeIn, freeNow, staleClaim, staleSpan } from "../../src/scripts/stand.js";
+import { STALE } from "../../src/engine/group.js";
+import { freeIn, freeNow, staleClaim, staleSpan } from "../../src/scripts/work-free.js";
 import { DONE, HELD, standingOf, TODO } from "../../src/scripts/work.js";
 
 // A group's standing comes off its state and its record, so a case writes those. [[spec/design_output/work#held-derives-from-the-record]]

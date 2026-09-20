@@ -4,51 +4,48 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
+
+	"quackitect/config"
 )
 
 const (
-	Tracked = "spec/config/level0.json"
-	// The local layer, owned by .claude/skills/level0/lib/folders.js and spelled again here because a Go module imports no JavaScript. [[spec/design_output/config#the-three-layers]]
-	Local   = ".se/.runtime/config.json"
+	Tracked = config.Tracked
+	Local   = config.Local
 	WordsAt = "names.words"
 	WordsIn = "SE_NAMES_WORDS"
+	// The block holding the two runs the restated rules refuse. [[spec/design_output/config#the-resolver-holds-the-layers]]
+	Restated  = "restated"
+	PointerIn = "SE_RESTATED_POINTER"
+	RuleIn    = "SE_RESTATED_RULE"
 )
 
+// The shared reader answers the key, and this one turns what it answers into a count. [[spec/design_output/config#the-go-reader]]
 func wordsHere(root string) int {
-	out := 0
-	if said, held := wordsFrom(root, Tracked); held {
-		out = said
-	}
-	if said := strings.TrimSpace(os.Getenv(WordsIn)); said != "" {
-		if whole, err := strconv.Atoi(said); err == nil {
-			out = whole
-		}
-	}
-	if said, held := wordsFrom(root, Local); held {
-		out = said
-	}
-	return out
+	return countAt(root, WordsAt)
 }
 
-func wordsFrom(root, path string) (int, bool) {
-	read, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
-	if err != nil {
-		return 0, false
-	}
-	said := parsedJSON(string(read))
-	names, held := said["names"].(map[string]any)
+// The runs the restated rules refuse, read off the same layers as the words. [[spec/design_output/config#the-resolver-holds-the-layers]]
+func restatedHere(root string) (int, int) {
+	return countAt(root, "restated.pointer"), countAt(root, "restated.rule")
+}
+
+// A count the shared reader answers, or zero where the key stands nowhere. [[spec/design_output/config#the-go-reader]]
+func countAt(root, key string) int {
+	said, held := config.Value(root, key)
 	if !held {
-		return 0, false
+		return 0
 	}
-	words, whole := names["words"].(float64)
-	if !whole {
-		return 0, false
+	switch one := said.(type) {
+	case float64:
+		return int(one)
+	case string:
+		if whole, err := strconv.Atoi(one); err == nil {
+			return whole
+		}
 	}
-	return int(words), true
+	return 0
 }
 
 // [[spec/design_output/tools#what-the-survey-writes]]

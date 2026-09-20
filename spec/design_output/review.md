@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`src/scripts/review.js` gathers what a reader wants off a branch. This note
+`src/scripts/work-review.js` gathers what a reader wants off a branch. This note
 covers the verb, the worktree it runs in, and the questions it answers.
 
 # What the reader is

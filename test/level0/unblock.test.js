@@ -5,12 +5,15 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { mintedNote, schemasFrom } from "../../.claude/skills/level0/lib/schema.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { fieldOf } from "../../src/scripts/group.js";
+import { fieldOf } from "../../src/engine/group.js";
+import { withRoute } from "../../src/scripts/process.js";
 import { takeable } from "../../src/scripts/pull.js";
 import { work } from "../../src/scripts/work.js";
+import { TICKET_SCHEMA } from "./fixtures.js";
 
 const ROOT = "/tree",
   SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
@@ -365,4 +368,71 @@ test("a sibling waiting on the child it unblocks becomes takeable, so the chain 
     "design",
     "the closed child frees it",
   );
+});
+
+// The route a successor stands on, which test/contract/process.test.js holds to the shipped file. [[spec/design_output/work#a-successor-stands-on-question]]
+const QUESTION_ROUTE = `for: a question only a person answers
+ask:
+  - name: question
+    form: text
+    says: what a person decides
+steps:
+  - name: answer
+    does: answers the question the ask carries
+    by: person
+    to: engine
+    input: ask
+    evidence:
+      - name: answer
+        form: text
+        says: the answer
+  - name: do
+    does: carries the answer out
+    from: anyone
+    by: anyone
+    to: retro
+    input: answer
+    evidence:
+      - name: says
+        form: text
+        says: what changes and why
+`;
+
+// The mint copies the route onto the ticket, the way the verb tells a desk to write one. [[spec/design_output/work#a-successor-stands-on-question]]
+function mintedOffQuestion() {
+  const held = fakeDisk({ [at("spec/processes/question.yaml")]: QUESTION_ROUTE });
+  const schemas = schemasFrom([{ text: TICKET_SCHEMA }]);
+  const copied = withRoute(held, ROOT, join, schemas.get("ticket"), {
+    state: "open",
+    process: "question",
+  });
+  assert.equal(copied.why, undefined, "the route copies onto the ticket");
+
+  const made = mintedNote(schemas, {
+    kind: "ticket",
+    path: "spec/tickets/a-successor.md",
+    fields: copied.fields,
+  });
+  assert.equal(made.why, undefined, "the mint answers a note");
+  return made.text;
+}
+
+// A successor off this route opens at a person step, so the verb takes it. A route opening where an agent works closes the road again, and this case reads it. [[spec/design_output/work#a-successor-stands-on-question]]
+test("the verb takes a successor the mint writes off the question route", () => {
+  const { it, disk } = doors(
+    standing(CHILD(), { [at("spec/tickets/a-successor.md")]: mintedOffQuestion() }),
+  );
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["unblock", "a-child", "a-successor"], it),
+  );
+
+  assert.equal(code, 0, said);
+  const now = disk.read(at("spec/tickets/a-child.md"));
+  assert.equal(fieldOf(now, "state"), "closed", "the child closes");
+  assert.equal(fieldOf(now, "reason"), "became", "it closes as became");
+
+  const successor = disk.read(at("spec/tickets/a-successor.md"));
+  assert.match(successor, /no test drives the hook/, "the question rides along");
+  assert.match(successor, /# Discussion/, "the chapter stands where it lands");
 });

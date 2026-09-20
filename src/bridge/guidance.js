@@ -20,15 +20,20 @@ import {
   styled,
 } from "../../.claude/skills/level0/lib/guidance.js";
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
+import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { toolLines, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { heldReadsIn } from "../scripts/guidance-hand.js";
-import { readTools, writeSurvey } from "../scripts/tools.js";
+import { readTools, writeSurvey } from "../engine/tools.js";
 import { asks } from "./config.js";
 import { deadIndexLine } from "./search.js";
 
 const GUIDANCE = "spec/guidance";
 const TOOTH = "stop.enabled";
+// The kind onSessionCompact writes its line under, which the read-back looks for. [[spec/design_output/level0#the-debt-survives-a-restart]]
+const COMPACT = "compact";
+// The kind the paid line stands under, which onTurnSaid writes. [[spec/design_output/level0#the-debt-survives-a-restart]]
+const DOOR = "level0";
 export const TOOLS_BLOCK = "level0-tools";
 const TOOLS_HEADING = "# What this box has";
 
@@ -37,7 +42,7 @@ export function guidanceHere(
   disk,
   method,
   work = method,
-  env = process.env,
+  env = {},
   tooth = true,
   argv = [],
 ) {
@@ -69,7 +74,7 @@ function readsGuidance(box) {
     box.disk,
     box.method,
     box.work,
-    process.env,
+    box.env ?? {},
     asks(box, TOOTH) !== false,
   );
 }
@@ -104,9 +109,35 @@ function readBelow(reads, folder) {
   });
 }
 
-// [[spec/design_output/level0#the-canary-owes-a-debt]]
-function pastTurnOne() {
-  return { reads: 1, firstTurn: false, owes: true };
+// The session the box holds for this call, built where a restart dropped it. [[spec/design_output/level0#the-debt-survives-a-restart]]
+function sessionHere(box) {
+  if (!box.session) box.session = afterARestart(box);
+  return box.session;
+}
+
+// A restart drops the box and the harness session runs on, so the debt comes back off the log. The log rotates at a session start, so what stands in it belongs to this session. [[spec/design_output/level0#the-debt-survives-a-restart]]
+function afterARestart(box) {
+  const paid = paidInLog(box);
+  return { reads: 1, firstTurn: false, paid, owes: !paid };
+}
+
+// The last of the two marks says where the debt stands: the line pays it, and a compaction opens it again. [[spec/design_output/level0#the-debt-survives-a-restart]]
+function paidInLog(box) {
+  let rows = [];
+  try {
+    rows = rowsIn(String(box.disk.read(join(box.work, SESSION))));
+  } catch {
+    return false;
+  }
+  return pays(rows.filter((one) => pays(one) || opens(one)).at(-1));
+}
+
+function pays(row) {
+  return row?.kind === DOOR && row?.said === HEARD.same;
+}
+
+function opens(row) {
+  return row?.kind === COMPACT;
 }
 
 function guidanceOf(box) {
@@ -124,8 +155,7 @@ export function onSessionStart(_e, box) {
 // [[spec/design_output/level0#the-guidance-stays-put]]
 export function onPromptContext(_e, box) {
   const held = guidanceOf(box);
-  if (!box.session) box.session = pastTurnOne();
-  const session = box.session;
+  const session = sessionHere(box);
   session.reads += 1;
   const blocks = blocksOf(held, box.index.dead(), toolsText(box));
   box.log.say("info", "context", `${blocks.length} block(s) reach the session`, {
@@ -146,13 +176,13 @@ function blocksOf(held, dead, tools) {
 }
 
 // [[spec/design_output/tools#the-session-reads-the-survey]]
-function surveyHere(box) {
+export function surveyHere(box) {
   const found = readTools(box.disk, box.work);
   if (Object.keys(found).length) return found;
   return writeSurvey(
     { disk: box.disk, proc: box.proc },
     box.work,
-    box.env ?? process.env,
+    box.env ?? {},
   );
 }
 
@@ -182,21 +212,19 @@ export function onTurnSaid(e, box) {
 
 // The line pays once a session, so no later answer opens the debt again. [[spec/design_output/level0#the-line-lands-once]]
 function paid(box, answer) {
-  if (!box.session) box.session = pastTurnOne();
-  const session = box.session;
+  const session = sessionHere(box);
   if (session.paid) return true;
   const sentence = guidanceOf(box).sentence;
   if (canaryIn(answer, sentence).found !== "same") return false;
   session.paid = true;
   session.owes = false;
-  box.log.say("info", "level0", HEARD.same, { detail: sentence });
+  box.log.say("info", DOOR, HEARD.same, { detail: sentence });
   return true;
 }
 
 // [[spec/design_output/level0#the-canary-owes-a-debt]]
 export function onTurnComplete(e, box) {
-  if (!box.session) box.session = pastTurnOne();
-  const session = box.session;
+  const session = sessionHere(box);
   if (e?.reason !== "answer") return { pass: true };
   if (paid(box, e.answer)) {
     session.firstTurn = false;
@@ -206,7 +234,7 @@ export function onTurnComplete(e, box) {
     const sentence = guidanceOf(box).sentence;
     session.firstTurn = false;
     session.owes = true;
-    box.log.say("warn", "level0", HEARD[canaryIn(e.answer, sentence).found], {
+    box.log.say("warn", DOOR, HEARD[canaryIn(e.answer, sentence).found], {
       detail: sentence,
     });
   }
@@ -214,8 +242,7 @@ export function onTurnComplete(e, box) {
 }
 
 export function owesCanary(e, box) {
-  if (!box.session) box.session = pastTurnOne();
-  const session = box.session;
+  const session = sessionHere(box);
   if (!session.owes || e?.agentId) return null;
   const sentence = guidanceOf(box).sentence;
   box.log.say("debug", "gate", `asked ${e?.tool ?? "a call"} for the canary`, {
@@ -228,7 +255,10 @@ export function owesCanary(e, box) {
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
 export function onSessionCompact(e, box) {
   box.guidance = readsGuidance(box);
-  if (box.session) box.session.owes = true;
+  const session = sessionHere(box);
+  session.owes = true;
+  // The debt opens again, so the line that paid it pays no second time. [[spec/design_output/level0#the-debt-survives-a-restart]]
+  session.paid = false;
   box.log.say("info", "compact", "a compaction runs, and the guidance reads again", {
     trigger: String(e?.trigger ?? "unknown"),
     messages: Array.isArray(e?.messages) ? e.messages.length : 0,

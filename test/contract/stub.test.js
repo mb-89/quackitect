@@ -115,7 +115,11 @@ test("the shim hands a verb to the vehicle it names", () => {
     assert.equal(said.ok, true, said.why);
     const ran = outside.run(["sh", "RUNME.sh", "vehicle"], {
       cwd: dest,
-      env: { SE_VEHICLE: root, SE_INSTALL_SKIP: "index se-lsp editor-client" },
+      // The shim proves the hand-over, so it reaches no network and no editor. [[spec/design_output/vehicle#a-vehicle-stands-alone]]
+      env: {
+        SE_VEHICLE: root,
+        SE_INSTALL_SKIP: "vale biome vale-ls index se-lsp editor-client editor-extensions",
+      },
     });
     assert.equal(ran.exitCode, 0, ran.stderr);
     assert.match(
@@ -236,7 +240,8 @@ test("a vehicle with no remote refuses, and the folder stands as it was", () => 
 test("the command line writes a stub where it says, and refuses with no folder", () => {
   const where = files.tempDir("stub-");
   const dest = join(where, "stub");
-  const env = { SE_INSTALL_SKIP: "index se-lsp editor-client" };
+  // The case proves the stub's files, so it reaches no network and no editor. [[spec/design_output/vehicle#a-vehicle-stands-alone]]
+  const env = { SE_INSTALL_SKIP: "vale biome vale-ls index se-lsp editor-client editor-extensions" };
   try {
     const bare = outside.run([process.execPath, "src/scripts/cli.js", "stub"], {
       cwd: root,
@@ -351,7 +356,9 @@ slow(
         files.read(join(cloned, ".claude", "skills", "level0", "hooks", "level0.js")),
         "the hook is the clone's",
       );
-      const entry = JSON.parse(files.read(join(home, ".se", "registry.json"))).find(
+      const entry = JSON.parse(
+        files.read(join(home, ".se", ".runtime", "registry.json")),
+      ).find(
         (one) => one.method_root === cloned,
       );
       assert.equal(

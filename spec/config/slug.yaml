@@ -1,0 +1,19 @@
+# The slug turning a heading into the anchor a pointer names. One source holds
+# the cases, and each tool chain drives its own function off them.
+# The chapter names the moves, and each case here pins one of them.
+# [[spec/design_output/vocabulary#the-slug-reads-one-source]]
+cases:
+  - heading: A group is a ticket
+    anchor: a-group-is-a-ticket
+  - heading: The owner's prompt comes first
+    anchor: the-owners-prompt-comes-first
+  - heading: The stub's files
+    anchor: the-stubs-files
+  - heading: "`slugOf` matches a name"
+    anchor: slugof-matches-a-name
+  - heading: "A copy, a name and a date"
+    anchor: a-copy-a-name-and-a-date
+  - heading: "One place owns a thing."
+    anchor: one-place-owns-a-thing
+  - heading: Rule 7 stands
+    anchor: rule-7-stands

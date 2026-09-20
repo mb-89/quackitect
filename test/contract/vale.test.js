@@ -8,10 +8,10 @@ import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { NOBODY } from "../../.claude/skills/level0/lib/private.js";
 import { lintText } from "../../.claude/skills/level0/lib/vale.js";
-import { withoutFalsePast } from "../../src/bridge/tense.js";
+import { withoutFalsePast } from "../../src/engine/tense.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
-import { readTools, whereIs } from "../../src/scripts/tools.js";
+import { readTools, whereIs } from "../../src/engine/tools.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -53,6 +53,13 @@ ifVale(
 
 ifVale("antithesis is refused", async () => {
   assert.ok((await ruled("It is a door rather than a window.")).includes("Antithesis"));
+});
+
+// A marker places a claim in a tree that stands no more, and the rationales own that telling. [[spec/design_output/lsp#a-marker-carries-old-news]]
+ifVale("a history marker is refused and the standing claim passes", async () => {
+  assert.ok((await ruled("The door used to read the config.")).includes("History"));
+  assert.ok((await ruled("The door previously names the file.")).includes("History"));
+  assert.ok(!(await ruled("The door reads the config.")).includes("History"));
 });
 
 ifVale("the passive is refused and the active passes", async () => {

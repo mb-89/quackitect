@@ -106,6 +106,12 @@ func strangerFault(text string, schema *yaml.Doc, where string) (Finding, bool) 
 }
 
 // [[spec/design_output/schema#a-finding-names-the-section]]
+// A reading past one buffer wants the tree, and the write door holds none. [[spec/design_output/lsp#a-marked-rule-wants-argument]]
+func checkNoteIn(tree *Tree, text string, schema *yaml.Doc, where string) []Finding {
+	out := checkNote(text, schema, where)
+	return append(out, markedFaults(tree, readNote(text), schema, where)...)
+}
+
 func checkNote(text string, schema *yaml.Doc, where string) []Finding {
 	note := readNote(text)
 	kind := yaml.AsString(schema.Get("kind"))
@@ -255,13 +261,13 @@ func schemaFaults(tree *Tree) []Finding {
 			continue
 		}
 		text := tree.Read(path)
-		out = append(out, noteFaults(schemas, path, text)...)
+		out = append(out, noteFaults(tree, schemas, path, text)...)
 	}
 	return out
 }
 
 // [[spec/design_output/schema#the-sweep-over-the-tree]]
-func noteFaults(schemas *Kinds, path, text string) []Finding {
+func noteFaults(tree *Tree, schemas *Kinds, path, text string) []Finding {
 	out := []Finding{}
 	kind := kindOf(text)
 	governor := governorOf(schemas, path)
@@ -281,7 +287,7 @@ func noteFaults(schemas *Kinds, path, text string) []Finding {
 		return append(out, schemaFault("Kind", path, 1,
 			fmt.Sprintf("%s names no schema, and %s holds %s.", kind, Schemas, strings.Join(schemas.Names(), ", "))))
 	}
-	out = append(out, checkNote(text, schema, path)...)
+	out = append(out, checkNoteIn(tree, text, schema, path)...)
 	return append(out, placeholderFaults(text, schema, path)...)
 }
 

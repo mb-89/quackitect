@@ -361,3 +361,17 @@ test("the queue holds work where a free open ticket has a leaf a hand takes, or 
   );
   assert.equal(queueHolds([]), false);
 });
+
+// The pull reads a group by its own name, so the branch spelling hides a child from its group. [[spec/design_output/work#a-group-is-a-ticket]]
+test("a group named as a branch is refused, and the bare name passes", () => {
+  const naming = (said) => open.replace("state: open\n", `state: open\ngroup: ${said}\n`);
+
+  const found = weighed(naming("work/one-group"), naming("work/one-group"));
+  assert.deepEqual(
+    found.map((one) => one.rule),
+    ["Ticket.group"],
+  );
+  assert.match(found[0].message, /write one-group in place of work\/one-group/);
+
+  assert.deepEqual(weighed(naming("one-group"), naming("one-group")), []);
+});

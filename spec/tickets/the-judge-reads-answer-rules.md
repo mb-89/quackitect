@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
-step: design/person-1
+state: closed
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -120,6 +120,87 @@ record:
     hash_after: 8ca072d847c565e5fadaea8b05ec7454957981e4
     returns: 2
     why: Name the note beside the number in a label. A leaf reads several notes, and the material flattens them. So chapter numbering hands the classify call two labels under one number, and a refusal names two rules.
+  - step: design/person-1
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 9183b66a38b54f46c165b7d3c1c38c787ebdeb8b
+    hash_after: 9183b66a38b54f46c165b7d3c1c38c787ebdeb8b
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: f675c71cc3f09695a133b1712807d5f8478b298a
+    hash_after: f675c71cc3f09695a133b1712807d5f8478b298a
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-7
+    hash_before: 0c67da24f8ba825b2705465c78cf10e665e61b47
+    hash_after: 0c67da24f8ba825b2705465c78cf10e665e61b47
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 0f18222b7f8f8c4409486bf31bda410db901d041
+    hash_after: 0f18222b7f8f8c4409486bf31bda410db901d041
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 10 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 89d13b0031887d1b346837c72ebca97e76edf80d
+    hash_after: 89d13b0031887d1b346837c72ebca97e76edf80d
+    returns: 1
+    why: the hand takes it back
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: a5bdcd95250494a172a38885fcdb37a05209ad18
+    hash_after: a5bdcd95250494a172a38885fcdb37a05209ad18
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 12 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: ba59402d45f450265344f87ab2bb48a596562f31
+    hash_after: ba59402d45f450265344f87ab2bb48a596562f31
+    returns: 2
+    why: the hand takes it back
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 2581b81744407e872b42de6c40c126314406dfa2
+    hash_after: 2581b81744407e872b42de6c40c126314406dfa2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 11 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 6f38b6aa113c7aa846ab07ccf9857e8b4e672954
+    hash_after: 6f38b6aa113c7aa846ab07ccf9857e8b4e672954
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 201fd0e3b377d851630008332f39720037e166a7
+    hash_after: 201fd0e3b377d851630008332f39720037e166a7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 44 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-18
+    hash_before: ed44b86e896e0977f9121f7141d69673cd30996e
+    hash_after: ed44b86e896e0977f9121f7141d69673cd30996e
+reason: done
 ---
 
 # Ask
@@ -144,9 +225,30 @@ Today the judge answers breaks over every hand-back on a cloud box. One run met 
 
 ### answer
 
-<!-- the answer, which the step behind this one reads -->
+A label names the note and the number, so one label reaches one rule.
 
-<!-- the form is text -->
+`notesSaid` opens a run per note and numbers from one inside it. So a leaf
+reading two notes hands the judge two rules under each number. The label
+carries the note's name with it, and each label then reaches one rule.
+
+| what the leaf reads | the labels it hands the judge |
+|---|---|
+| `spec/guidance/voice` | `voice-1` up to the last rule the note carries |
+| `spec/guidance/code/code` | `code-code-1` and its siblings |
+| a leaf whose rules all carry the mark | `follows` alone |
+
+The label is the note's path under `spec/guidance`, with each slash as a
+hyphen, then a hyphen and the rule's number in that note. `follows` stands
+beside them, and a label outside the set reads as `follows`.
+
+A refusal reads the label back to the note it names, so it says the note, the
+number and the rule's own line. A reader then opens one place.
+
+What this call weighs, on a box nobody sits beside:
+
+- the numbering inside a note stands as it stands, so the hand-out changes none of it
+- two notes share a last segment, so the label carries the whole path under the folder
+- the owner rules at the merge, and a shorter label costs a rename of one function
 
 ## draft
 
@@ -162,10 +264,10 @@ Today the judge answers breaks over every hand-back on a cloud box. One run met 
 |---|---|
 | the guidance schema | takes a second mark beside `detailMarker`, as `answerMarker: "^"` |
 | the guidance library | strips the mark in `actionables`, and answers `forEvidence` |
-| the material in the pull | reads the rules through `forEvidence`, each with its chapter number |
-| the wrapper under level one | asks by number, and names the rule it hears |
+| the material in the pull | reads the rules through `forEvidence`, each with its label |
+| the wrapper under level one | asks by label, and names the note and the rule it hears |
 | the voice note | marks its two answer rules with a trailing `^` |
-| [[spec/design_output/pull#the-checks]] | says the judge answers a number, and what each answer does |
+| [[spec/design_output/pull#the-checks]] | says the judge answers a label, and what each answer does |
 
 A rule that describes an answer ends in `^`, the way a rule wanting argument
 ends in `*`. `actionables` strips both, so every reader of the chapter reads
@@ -174,11 +276,21 @@ the rule whole and the output style shows no mark. A second reader,
 chapter. So a refusal naming rule 15 names line 15 of the note, and the
 hand-out's numbering stays the one numbering.
 
-The judge then names what it finds. The classify call takes the labels
-`follows` and one number per rule it hands over. A number answers the first
-rule the evidence breaks, and the refusal names that number with the rule's
-own line. A label outside the set reads as `follows`, because a judge naming
-nothing refuses nothing.
+A label names the note beside that number, because a leaf reads several notes
+and `notesSaid` numbers from one inside each. The label is the note's path
+under `spec/guidance`, with each slash as a hyphen, then a hyphen and the
+number:
+
+| the note a leaf reads | the labels it hands the judge |
+|---|---|
+| `spec/guidance/voice` | `voice-1` up to the last rule the note carries |
+| `spec/guidance/code/code` | `code-code-1` and its siblings |
+
+The judge then names what it finds. The classify call takes `follows` and one
+label per rule it hands over. A label answers the first rule the evidence
+breaks. The refusal reads that label back to its note, naming the note, the
+number and the rule's own line. A label outside the set reads as `follows`,
+because a judge naming nothing refuses nothing.
 
 A leaf whose rules all carry the mark hands the judge an empty list. The judge
 stands silent there, as it does today where the reads name no note. So the
@@ -194,9 +306,16 @@ answer rules reach the answer gate alone, which holds them already.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- Name the note beside the number in a label. A leaf reads several notes, and the material flattens them. So chapter numbering hands the classify call two labels under one number, and a refusal names two rules.
+- the label carries the note's path and the number, so one label reaches one rule
+- `forEvidence` keeps the chapter's number, so a refusal names the line the note holds
+- the mark writes `^`, and `actionables` strips it the way it strips the star
+- the schema row and the [[spec/design_output/pull#the-checks]] row stand in the table
+- a leaf whose rules all carry the mark hands an empty list, and the judge stands silent
+- the diff touches this ticket alone
+- `./RUNME.sh check` answers 0
+- the handback carries no retro, which the branch owes at done
 
 # implement
 
@@ -207,20 +326,42 @@ fail
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/guidance.test.js test/level0/level1.test.js test/level0/pull-leaves.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The command answers assertion, and every failing case fails on its own assertion.
+
+| the case | what it holds open |
+|---|---|
+| the answer mark strips the way the star does | `actionables` leaves the mark standing |
+| a label carries the note's path beside the number | `labelOf` stands nowhere |
+| the rules for evidence drop the marked one | `forEvidence` stands nowhere |
+| a note of marked rules hands an empty list | the same |
+| a mark in a code span reads as the bare one | the same |
+| the judge's question names each rule by its label | `judgeAsk` numbers from one |
+| the labels open on follows | `judgeLabels` stands nowhere |
+| a label reads back to the note and the line | `ruleBroken` stands nowhere |
+| a label outside the set reads as follows | the same |
+| the judge's material names the rules its reads name | the material hands plain strings |
+| the judge's ask leaves the answer rules out | the material keeps every rule |
+| the shipped note keeps its answer rules out | the note carries no mark |
+
+A named import of a name the module answers nowhere breaks the whole file, and the door reads build over it. So each new case takes the module whole and asks the name is a function first. That surprises me: a red case for a name nobody writes yet stays red where the case takes the module whole. The standing case over `judgeAsk` numbers plain strings, so the label shape turns it red beside the new ones.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. Four case files and this ticket, one per piece the approach names.
+- every door the change reaches has a fake. The pull cases reach the disk through the fake in the pull doors. The library cases touch memory alone. The case reading the shipped note stands under test/contract.
+- a comment names the approach the change implements. Each case carries a line pointing at this ticket, and the fixture comment names the answer mark.
 
 ## reflect
 
@@ -245,14 +386,18 @@ fail
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. Each file the approach's table names, and no other.
+- every door the change reaches has a fake. The change reaches no door, and each new reader takes the text its caller hands it.
+- a comment names the approach the change implements. Each new function points at the chapter the approach names.
 
 ## tests-green
 
@@ -261,26 +406,45 @@ fail
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/guidance.test.js test/level0/level1.test.js test/level0/pull-leaves.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The judge now answers a label, and each label names one rule.
+
+| what changes | how |
+|---|---|
+| the guidance schema | carries `answerMarker` beside `detailMarker` |
+| the guidance library | strips both marks, and answers `labelOf` and `forEvidence` |
+| the pull's material | hands one labelled rule per rule the leaf's reads name |
+| the wrapper under level one | asks by label, and `ruleBroken` reads a label back to its note |
+| the voice note | marks its two answer rules |
+| [[spec/design_output/pull#the-checks]] | carries the two sections under it |
+
+A rule describing an answer ends in the answer mark, the way a rule wanting argument ends in the star. `forEvidence` drops the marked rules and keeps the chapter's own numbering. So a refusal names the note, the number and the rule's own line, and a reader opens one place.
+
+The note writes the mark in a code span, because the paragraph rules admit the character nowhere else in prose. The library strips either form, so every reader of the chapter reads the rule whole.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. Each file the approach's table names, and the case files beside them.
+- every door the change reaches has a fake. The pull cases reach the disk through the fake in the pull doors.
+- a comment names the approach the change implements. Each new function points at the chapter the approach names.
 
 # verdict
 
@@ -292,17 +456,64 @@ fail
 
 <!-- the form is files -->
 
+- .claude/skills/level0/lib/guidance.js
+- .claude/skills/level0/lib/projection.js
+- .claude/skills/level0/hooks/pull-tool.js
+- .claude/skills/level0/lib/pull.js
+- spec/design_output/pull.md
+- spec/guidance/review/reviewing.md
+- spec/guidance/voice.md
+- spec/schemas/guidance.schema.yaml
+- spec/tickets/the-judge-reads-answer-rules.md
+- src/scripts/pull.js
+- test/contract/guidance-rules.test.js
+- test/level0/guidance.test.js
+- test/level0/level1.test.js
+- test/level0/pull-leaves.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+| the question reviewing asks | the answer |
+|---|---|
+| does the branch do what the ask asks | yes, each done_when line lands |
+| is what the diff touches beyond the ask trivial | yes, the hunks stand inside the approach's table and its case files |
+| what does `./RUNME.sh check` answer | 0, with the server standing |
+| does a retro stand in the handback | no, and `branch review` names it at the branch's close |
+| does every rule the change adds carry a case | yes, each reader the change adds carries one |
+| does a case feed the rule something bad | yes, a label outside the set answers nothing |
+
+TL;DR:
+
+- The judge answers a label, and the label names the note, the number and the line.
+- Each finding of the design round lands.
+- `./RUNME.sh branch test` over the case files answers green.
+- `./RUNME.sh check` answers 0.
+- The retro stands open for the branch, and this ticket owes none.
+
+What reads true against the tree, one a line:
+
+- `forEvidence` counts every item and drops the marked one, so its number holds the chapter's.
+- `labelOf` writes the note's path with each slash as a hyphen, so two notes stand apart.
+- `markOf` reads the mark bare or in a code span, and `actionables` strips either.
+- `judgeLabels` opens on `follows`, and `ruleBroken` answers an empty line for a label outside the set.
+- `judged` returns before the model where the material holds no rule, so the judge stands silent.
+- `judgeMaterial` hands one labelled rule per rule the leaf's reads name.
+- The voice note marks its answer rules, and the contract case reads the note on the disk.
+- `spec/design_output/pull.md` carries the two chapters the approach names, and points at the schema.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place. The label's shape stands in `labelOf`, and the pull chapter points at the schema for the marks.
 
 # Discussion
 

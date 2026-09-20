@@ -225,6 +225,11 @@ layer, because the formatter and the compiler hold those. Each script rule
 blanks them before it reads, and the blank keeps the length, so an offset still
 points at the line under it.
 
+The frontmatter keeps the fields a person writes, which
+`spec/schemas/paragraph.schema.yaml` names under its prose list. So the rules
+read a `does` and a `says`. They read past the `asks`, the `why` and the `said`
+the engine writes, because a hand rewording one writes over the record.
+
 ## The grammar rules
 
 The tagger misreads a heading, a table cell and a quoted command, so the

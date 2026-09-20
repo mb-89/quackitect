@@ -37,7 +37,7 @@ record:
     answered:
       - name: tests
         exit: 0
-        said: green, src/viewer passes
+        said: green, src/tui passes
       - name: check
         exit: 0
         said: 83 stand at warning, which the panel draws and check allows.
@@ -75,7 +75,7 @@ types, and the common questions take one press.
 - `not done` stands pressed at the open, and a press takes it off
 - a person changing the sort after a press keeps that sort
 - a column's values draw as slices, with no line in the base file
-- `go -C src/viewer test ./...` is green
+- `go -C src/tui test ./...` is green
 - `./RUNME.sh check` is green
 
 # do

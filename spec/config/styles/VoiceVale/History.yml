@@ -1,0 +1,14 @@
+extends: existence
+message: "'%s' tells what stood before. Say what stands, and argue the change in spec/rationales."
+link: spec/guidance/voice.md
+level: error
+ignorecase: true
+tokens:
+  - 'previously'
+  - 'formerly'
+  - 'used to'
+  - 'originally'
+  - 'until recently'
+  - 'in the past'
+  - 'as before'
+  - 'legacy'

@@ -10,7 +10,7 @@ the shape of a line, who says what, and who reads it back.
 # What one line looks like
 
 One JSON object per line, in one file per session: `.se/.log/session.jsonl`.
-The viewer reads it. For details, see [[spec/design_output/viewer]].
+The viewer reads it. For details, see [[spec/design_output/tui]].
 
 | field | holds | on the row |
 |---|---|---|
@@ -119,7 +119,7 @@ A level the reader does not know reads as `info`, and a missing object reads as
 line stays off its disk until it asks for it. `writes` decides, and every
 writer asks it before the line lands. The viewer holds a floor of its own over
 what the disk carries. For details, see
-[[spec/design_output/viewer#alt-l-raises-the-floor]].
+[[spec/design_output/tui#alt-l-raises-the-floor]].
 
 # Where the writer stands
 

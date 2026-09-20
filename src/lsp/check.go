@@ -4,12 +4,14 @@
 package main
 
 import (
-	"os/exec"
 	"strings"
 )
 
 type Checker struct {
 	tree *Tree
+	// The runs the restated rules refuse, off the config. [[spec/design_output/lsp#a-second-copy-draws]]
+	pointer int
+	rule    int
 }
 
 func checkerAt(root string) *Checker {
@@ -17,7 +19,8 @@ func checkerAt(root string) *Checker {
 	tree.Words = wordsHere(root)
 	tree.Node = nodeHere()
 	tree.Box = boxHere(root)
-	return &Checker{tree: tree}
+	pointer, rule := restatedHere(root)
+	return &Checker{tree: tree, pointer: pointer, rule: rule}
 }
 
 // [[spec/design_output/tree#the-rules-over-two-files]]
@@ -39,7 +42,7 @@ func (one *Checker) Over(path string) []Finding {
 
 	out := []Finding{}
 	if strings.HasSuffix(where, ".md") {
-		out = append(out, noteFaults(schemasIn(one.tree), where, one.tree.Read(where))...)
+		out = append(out, noteFaults(one.tree, schemasIn(one.tree), where, one.tree.Read(where))...)
 	}
 	if part := overLong(where, one.tree.Words); part != "" {
 		out = append(out, fault("NameHoldsTheWords", where, 1,
@@ -49,7 +52,29 @@ func (one *Checker) Over(path string) []Finding {
 		out = append(out, rule(one.tree)...)
 	}
 	out = append(out, syntaxFaults(one.tree, where)...)
+	// A note says again what another holds, so the rule reads the pair. [[spec/design_output/lsp#a-second-copy-draws]]
+	if strings.HasSuffix(where, ".md") {
+		out = append(out, restatedOver(one, where)...)
+	}
 	return sorted(out)
+}
+
+// [[spec/design_output/lsp#a-second-copy-draws]]
+func restatedOver(one *Checker, where string) []Finding {
+	out := []Finding{}
+	for _, said := range one.restatedAll() {
+		if said.File == where {
+			out = append(out, said)
+		}
+	}
+	return out
+}
+
+// [[spec/design_output/lsp#a-second-copy-draws]]
+func (one *Checker) restatedAll() []Finding {
+	return one.tree.Restated(func() []Finding {
+		return restatedFaults(one.tree, one.pointer, one.rule)
+	})
 }
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
@@ -57,12 +82,8 @@ func (one *Checker) Sweep() []Finding {
 	one.tree.Forgets()
 	out := append(treeFaults(one.tree), schemaFaults(one.tree)...)
 	out = append(out, syntaxSweep(one.tree)...)
+	out = append(out, one.restatedAll()...)
 	return sorted(out)
 }
 
 func (one *Checker) Tree() *Tree { return one.tree }
-
-func runs(name string, argv ...string) (string, error) {
-	said, err := exec.Command(name, argv...).Output()
-	return string(said), err
-}

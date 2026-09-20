@@ -49,10 +49,11 @@ import { graphIn } from "./graph.js";
 import { probe } from "./probe.js";
 import { withRoute } from "./process.js";
 import { pullArgvOf } from "./pull-tool.js";
+import { renaming, renamingText } from "./rename.js";
 import { retro } from "./retro.js";
 import { stubInto } from "./stub.js";
 import { ticket } from "./ticket.js";
-import { whereIs } from "./tools.js";
+import { whereIs } from "../engine/tools.js";
 import {
   detach,
   entryFor,
@@ -63,6 +64,9 @@ import {
 } from "./vehicle.js";
 import { voice } from "./voice.js";
 import { cloud, pulling, work } from "./work.js";
+
+// The root reads the platform once, and the register road takes it off the hand. [[spec/design_output/doors#a-door-reads-the-outside]]
+const WINDOWS = process.platform === "win32";
 
 export const verbs = {
   check: {
@@ -186,6 +190,11 @@ export const verbs = {
     says: "the index itself: standing, reindex, or same <path>",
     run: async () => asksIndex(rest.length ? rest : ["standing"]),
   },
+  // [[spec/design_output/index#a-rename-reaches-a-name]]
+  rename: {
+    says: "move a name and rewrite every reach: rename <from> <to>",
+    run: async () => renameHere(rest),
+  },
 };
 
 export const argv = process.argv.slice(2);
@@ -226,7 +235,7 @@ export function theVehicle(argv) {
     return 0;
   }
   if (said === "attach") {
-    const settled = attachTo(files, env, it.clock, pair.work, pair.method);
+    const settled = attachTo(files, env, it.clock, pair.work, pair.method, WINDOWS);
     console.log(
       `${pair.work} names ${made.id} as the copy driving it, at port ${settled.port}.`,
     );
@@ -238,7 +247,7 @@ export function theVehicle(argv) {
     return 0;
   }
   if (said === "register") {
-    const wrote = registerCopy(files, env, made.entry);
+    const wrote = registerCopy(files, env, made.entry, WINDOWS);
     console.log(
       wrote ? `${made.id} stands in the register.` : "no register takes a write here.",
     );
@@ -248,9 +257,35 @@ export function theVehicle(argv) {
   console.log(`method  ${pair.method}`);
   console.log(`work    ${pair.work}`);
   console.log(`copy    ${made.id}${pair.itself ? "  (this tree drives itself)" : ""}`);
-  for (const one of readRegister(files, env)) {
+  for (const one of readRegister(files, env, WINDOWS)) {
     console.log(`  ${one.id}  ${one.version}  ${one.method_root}`);
   }
+  return 0;
+}
+
+// [[spec/design_output/index#a-rename-reaches-a-name]]
+export function renameHere(argv) {
+  const [from, to] = argv.filter((one) => !one.startsWith("-"));
+  if (!from || !to) {
+    console.error("se rename <from> <to>: say the name that moves and the one it takes.");
+    return 2;
+  }
+  const it = { disk: files, join, root, git: git(outside, root) };
+  // A module's name stands as no path, so `--text` rewrites it and moves nothing. [[spec/design_output/index#a-rename-reaches-a-name]]
+  const said = argv.includes("--text")
+    ? renamingText(it, from, to)
+    : renaming(it, from, to);
+  if (said.why) {
+    console.error(said.why);
+    return 1;
+  }
+  console.log(`${from} stands at ${to}.`);
+  for (const one of said.wrote) console.log(`  ${one}`);
+  // A rule that skips says what it skips, so a hand reads what the run left out. [[spec/design_output/index#a-rename-reaches-a-name]]
+  for (const one of said.skipped ?? []) {
+    console.log(`  the reader reads ${one} as a picture, so the rewrite leaves it alone`);
+  }
+  console.log("Run ./RUNME.sh links, then ./RUNME.sh check.");
   return 0;
 }
 
@@ -299,7 +334,7 @@ export function serveBridge(argv) {
   }).exitCode;
 }
 
-// [[spec/design_output/viewer#the-verb-builds-it]]
+// [[spec/design_output/tui#the-verb-builds-it]]
 
 export function test() {
   const ran = outside.run([process.execPath, "--test", TESTS, CONTRACT_TESTS], {

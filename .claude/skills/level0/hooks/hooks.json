@@ -1,6 +1,6 @@
 {
-  "description": "Level zero, small: one closure on every door, which logs what it gets at debug and hands the event on.",
+  "description": "Level zero: one closure on every door, which logs what it gets at debug and hands the event on, and the pull as a tool with the judge behind it.",
   "modules": [
-    "./level0.js"
+    "./pull-tool.js"
   ]
 }

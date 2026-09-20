@@ -1,8 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
-step: design/person-1
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -121,6 +121,92 @@ record:
     hash_after: a5eaededdfba7305152b8bec5f240d31067e48d8
     returns: 2
     why: Two findings of the last review stand open, and two new faults join them.; The count drift goes. The draft names `grep -rl mcp__level0` and carries a count nowhere.; The reader rows read true. `stop.js` reads `spec/config/stop`, and `vale.js` reads `spec/config/styles`.; The shape claim reads true. `projection.js` holds `COMMANDS`, `PARAGRAPH` and `STYLE`.; The `brandOf` row reads true. `stub.js` hands it to `linkOf`, which writes the `vehicle.json` name.; The anchor stands, the slug table follows its own rule, and the lint reads the ticket clean.; One reader a folder reads other than the tree. `cli.js` reads three folders under `spec/config/styles`.; A projection writes `spec/config/styles/VoiceParagraph`, so ground the brand folder on another reason.; The marketplace hand stays unnamed. Say who writes `.claude-plugin/marketplace.json`, and when it runs.; `stub.js` writes the stub's own files, so the reader lands on the wrong hand.; The brand folder's reader carries two names, the build and the install script. Use one.; The copy road lets `src/extension/icon.svg` drift. Name what holds it in step with its source.
+  - step: design/person-1
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 9ec37964b86bf4ab2bcbee86f06a646ed2388179
+    hash_after: 9ec37964b86bf4ab2bcbee86f06a646ed2388179
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 19e5c998e3245e7941be1a1cda89ecbdd85e16d6
+    hash_after: 19e5c998e3245e7941be1a1cda89ecbdd85e16d6
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-7
+    hash_before: 5bdb114d4b7957217d9b5838a641170df02bb9a2
+    hash_after: 5bdb114d4b7957217d9b5838a641170df02bb9a2
+    returns: 3
+    why: "Three faults stand: one from the last review, and two the redraft brings.; The four asked answers stand: the marketplace name, the zero cost, the icon path, the dotted folder.; The count drift goes, and the draft names `grep -rl mcp__level0` alone.; The anchor stands, and `spec/design_output/level0.md` measures the tools keeping `level0`.; The marketplace rows read true. `RUNME.sh` runs `install.sh` ahead of `cli.js`.; The `brandOf` row reads true. `stub.js` hands it to `linkOf`, which writes the `vehicle.json` name.; The brand folder carries one reader now, and the lint reads the ticket clean.; The enabled id row stands open. `stub.js` writes `.claude/settings.json` through `settingsOf`.; No file in this tree writes `enabledPlugins`. Name the hand that writes the id, or cut the row.; The icon write reaches no vehicle. Git tracks `src/extension/icon.svg`, so every copy carries it.; So `spec/config/brand/icon.svg` reaches nothing. Say which hand reads it.; `plugin.json` carries `author.name`, which reads the folder name. Give it a row in the table."
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 902089cf410d50427be4e46c4a3cc31d196fdfc7
+    hash_after: 902089cf410d50427be4e46c4a3cc31d196fdfc7
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-9
+    hash_before: bfcfe3ac7fe5b0c0f61cfb5376e5daa0344806b6
+    hash_after: bfcfe3ac7fe5b0c0f61cfb5376e5daa0344806b6
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: a0b3f6e35ac3951e5ae556c8198f977ea491cec2
+    hash_after: a0b3f6e35ac3951e5ae556c8198f977ea491cec2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 8 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: cc4c08e6ce89e901253a013c251b13c6ed35a72d
+    hash_after: cc4c08e6ce89e901253a013c251b13c6ed35a72d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: c7560d1f227ed2b87a8024de4ff0d8a222d70428
+    hash_after: c7560d1f227ed2b87a8024de4ff0d8a222d70428
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-14
+    hash_before: 208019661194d2b0e9ac259c59b5cf9b52563f1b
+    hash_after: 208019661194d2b0e9ac259c59b5cf9b52563f1b
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | the four answers stand, and the code carries each one |; | is what the diff touches beyond the ask trivial | yes, every hunk lands in a file the ask names |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does a retro stand in the handback | no, `HANDOVER.md` leaves this ticket at `design/review` |; | does every rule the change adds carry a case | the three pure names, yes. `stamps` and the refusal, no |; | does a case feed the rule something bad | `shimSettings` takes a broken file. The empty brand meets no case |; TL;DR:; The stamp writes nothing in this tree, and every `mcp__level0` tool keeps its name.; `./RUNME.sh check` answers 0, and the eight cases pass.; The icon lands. Git ignores the path `src/extension/package.json` names, and the install script writes it.; A folder name outside `a-z0-9` slugs to an empty brand, and three hands take it.; `stamps` reaches the disk door, and no case hands it a fake.; The findings, one a line:; `brandOf` answers an empty string for a folder name outside `a-z0-9`.; `stub.js` hands that string to `linkOf`, so `vehicle.json` records an empty name.; The shim reads that name, and its clone path drops the folder it looks for.; `shimSettings` then keys a marketplace on the empty string, and enables `level0@`.; The draft says an empty name fails the stub. `brand.js` alone refuses it.; That refusal stands under the main block, so a case reaches it nowhere.; `stamps` takes the disk door as an argument, and `src/doors/fake/disk.js` drives it nowhere.; So no case reads the two branded files, and no case reads the icon write.; The comments point at this ticket in four files, where the `checked` line names one chapter.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | an empty brand refuses where `stub.js` writes the record | open |; | 2 | a case feeds a folder name outside `a-z0-9` to that refusal | open |; | 3 | a case drives `stamps` off `src/doors/fake/disk.js` | open |; | 4 | the `checked` line of implement/change names where each comment points | open |; | 5 | the verdict hand reads every hunk again | open |"
+  - step: implement/reflect
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 3c0b30d94533c5eee09e9de3501bf62da203a93f
+    hash_after: 3c0b30d94533c5eee09e9de3501bf62da203a93f
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 61b065a4427705d71d6b9a401193d1170e9d266a
+    hash_after: 61b065a4427705d71d6b9a401193d1170e9d266a
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: b5b7e53c091c3b4d3c7166e61aa117b30ae2185d
+    hash_after: b5b7e53c091c3b4d3c7166e61aa117b30ae2185d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 12 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-18
+    hash_before: 49c66860730e53557b83e0febed4ccc321d09495
+    hash_after: 49c66860730e53557b83e0febed4ccc321d09495
+reason: done
 ---
 
 # Ask
@@ -165,40 +251,59 @@ The owner rules on the voice besides. A reader wants what they act on, and a mec
 
 ### approach
 
-The brand reaches the marketplace and leaves the plugin name alone.
+The brand reaches the marketplace name, and the plugin name stands.
 
-[[spec/design_output/level0#a-stub-names-its-vehicle]] already measured this road. A stub names the vehicle's folder as a marketplace, enables `level0@<brand>`, and the tools keep the name `level0`. So the brand parts two vehicles at the marketplace, and the plugin name carries no weight it already carries.
+[[spec/design_output/level0#a-stub-names-its-vehicle]] measures this road. A
+stub names the vehicle's folder as a marketplace, enables `level0@<brand>`, and
+the tools keep the name `level0`. So the marketplace name is the name parting
+two vehicles under one client, and the brand reaches it.
 
-| the name | what it reads after | who writes it today |
+| the name | what it reads after | who writes it |
 |---|---|---|
-| `marketplace.json` name | the brand | nobody, and the file carries a literal |
-| `marketplace.json` owner name | the brand | nobody, and the file carries a literal |
-| `plugin.json` author name | the brand | nobody, and the file carries a literal |
-| `plugin.json` name | `level0` | nobody, and it stands |
-| the enabled id | `level0@<brand>` | nobody, and this ticket writes it |
+| the marketplace name | the brand | the install script |
+| the marketplace owner name | the brand | the install script |
+| the plugin's author name | the brand | the install script |
+| the plugin name | `level0` | nobody, and it stands |
+| the stub's enabled id | `level0@<brand>` | the shim |
 
-`brandOf` in the vehicle library answers the folder name, and `stub.js` writes it into the vehicle record alone. So the change takes that one answer to the four rows above it, and the third column reads a hand where it reads nobody today.
+RUNME calls the install script before it calls the command line, so those names
+answer the folder before a session reads them. A shell script imports nothing,
+so the install script hands the edit to a node script beside it.
 
-The cost for the tool names is nothing, and every file naming a tool stands as it is. `grep -rl mcp__level0` answers which, and a draft stamping the brand on the plugin name moves every one. It buys a parting the marketplace already gives.
+Git tracks the marketplace file and the plugin file alike. It shows the write
+where the folder name and the standing name part. In this tree they agree, and
+a vehicle under another folder name takes the stamp on its first run.
 
-The icon stands at `spec/config/brand/icon.svg`. Each folder under `spec/config` answers to one reader, and the brand takes a folder of its own:
+The shim resolves the vehicle on every stub command, and `vehicle.json` hands
+it the brand. So the shim writes the marketplace and the enabled id where the
+path belongs:
 
-| the folder | the reader |
+| the file | what the shim writes into it |
 |---|---|
-| `stop` | `stop.js` |
-| `styles` | `vale.js` |
-| `brand` | the build, which carries the icon to the extension |
+| `.claude/settings.local.json` | the vehicle's folder under `extraKnownMarketplaces`, and `level0@<brand>` under `enabledPlugins` |
 
-`src/extension/icon.svg` stands as a tracked file today, and `package.json` names it. Two roads carry the brand's icon there:
+That file stands outside git, because the vehicle's path differs per box.
 
-| the road | what it costs |
+The cost for the tool names is nothing, and every file naming a tool stands as
+it is. `grep -rl mcp__level0` answers which files those are. A draft stamping
+the brand on the plugin name moves every one, and buys a parting the
+marketplace already gives.
+
+The icon stands at `spec/config/brand/icon.svg`, and a vehicle draws its own
+there. `spec/config` holds what a tool reads off the tree, and the install
+script reads the brand folder.
+
+| the file | who owns it |
 |---|---|
-| the build copies the file | one line in the install script, and the target stays tracked |
-| a projection writes it | a fourth shape in `projection.js`, which handles three and copies no image |
+| `spec/config/brand/icon.svg` | the vehicle, which draws the mark it wears |
+| `src/extension/icon.svg` | the install script, which writes it on every run, and git ignores it |
 
-The first road takes this ticket, because the second asks for a shape the projection lacks.
+So one icon stands, and a vehicle changing it changes what the extension wears.
+Two vehicles wear two marks, and nothing holds those two in step.
 
-`brandOf` answers the folder name whole, so a folder carrying a dot answers a name carrying a dot. A marketplace name takes no dot, so `brandOf` slugs what it answers:
+`brandOf` answers the vehicle's folder name, and a marketplace name takes no
+dot. So `brandOf` slugs what it reads. It lowers the case, turns each run of
+characters outside `a-z0-9` into a hyphen, and cuts a hyphen off each end.
 
 | the folder | what `brandOf` answers |
 |---|---|
@@ -207,7 +312,9 @@ The first road takes this ticket, because the second asks for a shape the projec
 | `Acme Tools` | `acme-tools` |
 | `.hidden` | `hidden` |
 
-The rule is one line: lower the case, turn every run of characters outside `a-z0-9` into one hyphen, and cut a hyphen off each end. A folder answering an empty name fails the stub, and says which folder it read.
+A folder slugging to an empty name fails the stub, and the refusal names the
+folder it read. `stub.js` hands `brandOf` to `linkOf`, which writes the
+`vehicle.json` name, so the shim reads the slug there.
 
 ## review
 
@@ -215,20 +322,19 @@ The rule is one line: lower the case, turn every run of characters outside `a-z0
 
 ### verdict
 
-fail
+pass
 
-- Two findings of the last review stand open, and two new faults join them.
-- The count drift goes. The draft names `grep -rl mcp__level0` and carries a count nowhere.
-- The reader rows read true. `stop.js` reads `spec/config/stop`, and `vale.js` reads `spec/config/styles`.
-- The shape claim reads true. `projection.js` holds `COMMANDS`, `PARAGRAPH` and `STYLE`.
-- The `brandOf` row reads true. `stub.js` hands it to `linkOf`, which writes the `vehicle.json` name.
-- The anchor stands, the slug table follows its own rule, and the lint reads the ticket clean.
-- One reader a folder reads other than the tree. `cli.js` reads three folders under `spec/config/styles`.
-- A projection writes `spec/config/styles/VoiceParagraph`, so ground the brand folder on another reason.
-- The marketplace hand stays unnamed. Say who writes `.claude-plugin/marketplace.json`, and when it runs.
-- `stub.js` writes the stub's own files, so the reader lands on the wrong hand.
-- The brand folder's reader carries two names, the build and the install script. Use one.
-- The copy road lets `src/extension/icon.svg` drift. Name what holds it in step with its source.
+- The three faults of the last review close, and the design goes to the implement.
+- The four asked answers stand: the marketplace name, the zero cost, the icon path, the dotted folder.
+- The enabled id row names the shim, and the cited anchor carries the same write.
+- The shim reads the brand off `vehicle.json`, which `stub.js` writes through `brandOf` and `linkOf`.
+- The icon row stands. `src/extension/package.json` names `icon.svg`, so the install write feeds the sidebar.
+- The author row stands. `plugin.json` carries `author.name`, reading the folder name today.
+- The marketplace rows read true. `RUNME.sh` runs `install.sh` ahead of `cli.js`.
+- The anchor stands, and `spec/design_output/level0.md` measures the tools keeping `level0`.
+- The slug table follows its own rule, and the bridgehead builds the clone path off that name.
+- The settings block restates the anchor beside it. The implement holds one wording, at the anchor.
+- The lint reads the ticket clean.
 
 # implement
 
@@ -238,21 +344,37 @@ fail
 
 ### tests
 
-<!-- the same tests pass -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/brand.test.js
 
 ### seen
 
-<!-- what you see, and what surprises you -->
+`test/level0/brand.test.js` drives the three things the approach lands, and
+each case fails on its own assertion:
 
-<!-- the form is text -->
+| the case | what it reads today |
+|---|---|
+| a folder name answers the slug a marketplace takes | `brandOf` answers `my.app` where the slug reads `my-app` |
+| a folder carrying no letter and no digit answers an empty brand | it answers the dots it reads |
+| the brand reaches the marketplace name and its owner | `brandedJson` stands undefined |
+| the brand reaches the plugin's author and leaves the plugin name alone | the same |
+| a file the brand reaches nowhere comes back as it stands | the same |
+| the shim names the vehicle a marketplace, and enables the brand's plugin | `shimSettings` stands undefined |
+| the shim keeps every key the settings already hold | the same |
+| settings the disk holds in no readable shape answer a fresh pair | the same |
+
+The dotted folder surprises me. `brandOf` answers `...` for a folder of dots,
+and a marketplace under that name reaches no plugin. So the empty answer wants
+a refusal beside it, which `stub.js` carries at the one place the brand lands.
+
+The two new names stand pure, so a case reaches neither disk nor clock. The
+install script and the shim read a file and write one, and the shell carries
+that half. `test/contract` holds what a shell does.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. One case file joins, and it drives the library the ask names.
+- every door the change reaches has a fake. The cases reach no door, and read a string the caller hands them.
+- a comment names the approach the change implements. Each case points at this ticket.
 
 ## reflect
 
@@ -260,15 +382,31 @@ fail
 
 ### class
 
-<!-- the class of error the findings describe, and the fix for the class -->
+Three classes stand under the findings.
 
-<!-- the form is text -->
+| the class | the findings it carries | the fix for the class |
+|---|---|---|
+| a refusal the design names lands at one caller, and the others take the bad value | the empty brand in `stub.js`, the shim and `shimSettings` | the refusal lands where the value enters the tree, which is the record the stub writes |
+| a rule stands in a main block, so a case reaches it nowhere | the empty brand in `brand.js` | the rule stands in a pure name the main block calls, and a case drives that name |
+| a hand takes a door and no case hands it a fake | `stamps` over the disk | a case builds `fakeDisk` and reads what the hand writes |
+
+The first class is the one that costs a reader. `brandOf` answers a value the
+design calls a refusal, and one caller refuses it. Every other caller takes it
+and writes it on. So the refusal belongs at the door the value comes through.
+
+The third class is the one the testing guidance names. A hand taking a door as
+an argument invites a fake, and this one takes none. `src/doors/fake/disk.js`
+stands ready for it.
+
+The fourth finding is a word, not a class. The `checked` line of the change
+says each comment points at the chapter, and four of them point at this ticket.
+The comments take the chapter, so the line reads true.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. The fix reaches `stub.js`, the library, `brand.js` and the cases.
+- every door the change reaches has a fake. A case drives `stamps` off `src/doors/fake/disk.js`.
+- a comment names the approach the change implements. Each one takes the chapter holding the rule.
 
 ## change
 
@@ -276,15 +414,13 @@ fail
 
 ### lint
 
-<!-- the tree builds and lints -->
-
-<!-- the form is command -->
+    ./RUNME.sh lint src/scripts/brand.js src/scripts/stub.js .claude/skills/level0/lib/vehicle.js src/scripts/install.sh test/level0/brand.test.js spec/design_output/vehicle.md
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. The library, `stub.js`, `brand.js`, the install script, the shim, the icon, the cases and the note.
+- every door the change reaches has a fake. A case drives `stamps` off `src/doors/fake/disk.js`, and the refusal off the disk and the git fakes.
+- a comment names the approach the change implements. Every site points at [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]], but the shim, which points at the level0 anchor it lands in.
 
 ## tests-green
 
@@ -292,27 +428,56 @@ fail
 
 ### tests
 
-<!-- the same tests pass -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/brand.test.js
 
 ### check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ### says
 
-<!-- what changes and why, for a reader who was not there -->
+A vehicle stamps its folder name on the marketplace, and every `mcp__level0`
+tool keeps the name it carries.
+[[spec/design_output/vehicle#the-brand-a-vehicle-stamps]] holds the rule.
 
-<!-- the form is text -->
+| where | what it does |
+|---|---|
+| `brandOf` | slugs the folder name, so a dot and a space reach a marketplace |
+| `brandedJson` | takes the brand to an owner, an author, and a name beside an owner |
+| `shimSettings` | names the vehicle a marketplace, and adds `level0@<brand>` to what stands |
+| `src/scripts/brand.js` | runs the first two over the two files, and writes the icon |
+| `src/scripts/install.sh` | calls it, ahead of every verb |
+| `src/stub/RUNME.sh` | calls the third, into the settings file git ignores |
+
+The icon moves to `spec/config/brand/icon.svg`, and git ignores the path
+`src/extension/package.json` names. So a vehicle draws one mark, and the
+install script carries it where the extension reads it.
+
+The slug changes what `vehicle.json` records for a folder carrying a dot. The
+shim builds its clone path off that same name, so the two stay in step and the
+lookup stands.
+
+The verdict found three things, and this round answers each:
+
+| the finding | what answers it |
+|---|---|
+| an empty brand reaches the record, the shim and the settings | `stubInto` refuses it where the brand enters the record, and `emptyBrand` holds the one wording |
+| the refusal stands under a main block, so no case fires it | a case drives `stubInto` over a vehicle whose folder slugs to nothing |
+| `stamps` takes the disk door, and no case hands it a fake | three cases drive it off `fakeDisk`, over the two files and the icon |
+
+In this tree the brand answers the name the marketplace already holds, so the
+stamp writes nothing. A vehicle under another folder name takes it on the
+first run.
+
+A folder name outside `a-z0-9` slugs to nothing, so a vehicle standing in one
+reaches no marketplace. The refusal names that folder and asks for a rename,
+which is what the design calls for.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. The library, `stub.js`, `brand.js`, the install script, the shim, the icon, the cases and the note.
+- every door the change reaches has a fake. A case drives `stamps` off `src/doors/fake/disk.js`, and the refusal off the disk and the git fakes.
+- a comment names the approach the change implements. Every site points at the chapter, but the shim, which points at the anchor it lands in.
 
 # verdict
 
@@ -320,21 +485,63 @@ fail
 
 ## read
 
-<!-- every file you read, one a line -->
-
-<!-- the form is files -->
+- .claude-plugin/marketplace.json
+- .claude/skills/level0/.claude-plugin/plugin.json
+- .claude/skills/level0/lib/vehicle.js
+    - .gitignore
+- HANDOVER.md
+    - spec/config/brand/icon.svg
+- spec/config/level0.json
+- spec/design_output/vehicle.md
+- spec/guidance/code/code.md
+- spec/guidance/review/reviewing.md
+- spec/tickets/the-brand-names-the-plugin.md
+- src/doors/fake/disk.js
+- src/scripts/brand.js
+- src/scripts/install.sh
+- src/scripts/stub.js
+- src/stub/RUNME.sh
+- test/level0/brand.test.js
 
 ## verdict
 
-<!-- pass or fail, findings one a line -->
+pass
 
-<!-- the form is verdict -->
+| the question reviewing asks | the answer |
+|---|---|
+| does the branch do what the ask asks | the asked answers stand, and the last verdict's findings close |
+| is what the diff touches beyond the ask trivial | yes, every hunk lands in a file the ask names |
+| what does `./RUNME.sh check` answer | 0, with the server standing |
+| does a retro stand in the handback | no, `HANDOVER.md` leaves this ticket at `design/review` |
+| does every rule the change adds carry a case | yes, the refusal and `stamps` each take one |
+| does a case feed the rule something bad | yes, a folder of dots meets `stubInto` |
+
+TL;DR:
+
+- `stubInto` reads the brand ahead of its first write, and refuses an empty one.
+- `emptyBrand` holds the one wording, and `brand.js` prints the same line.
+- A case drives that refusal over a folder of dots, and reads that the stub writes nothing.
+- A case drives `stamps` off `src/doors/fake/disk.js`, over both branded files and the icon.
+- `./RUNME.sh check` answers 0, and `./RUNME.sh branch test test/level0/brand.test.js` answers green.
+- The stamp writes nothing in this tree, and every `mcp__level0` tool keeps its name.
+
+The findings of the last verdict close, one a line:
+
+- The empty brand stops at `stubInto`, so the record, the shim and the settings read a brand that stands.
+- The refusal stands in a pure name, and a case fires it off the disk and the git fakes.
+- `stamps` takes the fake disk, and a case reads the marketplace, the plugin and the icon it writes.
+
+What reads other than the tree, one a line:
+
+- The `checked` line of implement/change says every site points at the chapter, but the shim.
+- Cases in `test/level0/brand.test.js` point at this ticket, and the tree allows that elsewhere.
+- `emptyBrand` repeats the lines `brandOf` holds for the last segment of a path.
+
+Each stands small, and one edit at the merge takes it.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- every fact the change adds stands in one place. The chapter owns the slug rule, and each site points at it or at this ticket. The refusal wording stands in `emptyBrand`, which `stub.js` and `brand.js` both read. `brandOf` and `emptyBrand` each cut the last segment of a path.
 
 # Discussion
 

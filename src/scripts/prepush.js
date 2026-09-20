@@ -25,7 +25,7 @@ import {
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
-import { whereIs } from "./tools.js";
+import { whereIs } from "../engine/tools.js";
 
 export const STDIN = 0;
 export const ZEROS = /^0+$/;

@@ -3,7 +3,7 @@
 // [[spec/design_output/level0#the-formatter-applies-itself]]
 
 import { formatText, lintText } from "../../.claude/skills/level0/lib/code.js";
-import { readTools, whereIs } from "../scripts/tools.js";
+import { readTools, whereIs } from "../engine/tools.js";
 
 export function biome(disk, proc, root) {
   const found = whereIs(disk, root, "biome", readTools(disk, root));

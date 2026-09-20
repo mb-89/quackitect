@@ -1,7 +1,7 @@
 // Dispatch from a person's checkout; workers keep the shared work contract.
 // [[spec/design_output/copilot#dispatch-and-recovery]]
 
-import { ticketAt, ticketNamed } from "../../../../src/scripts/group.js";
+import { ticketAt, ticketNamed } from "../../../../src/engine/group.js";
 import { groupStanding, work } from "../../../../src/scripts/work.js";
 
 const GIT_WAIT = 30000;

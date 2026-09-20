@@ -12,7 +12,7 @@ import {
   timeOf,
   writes,
 } from "../../.claude/skills/level0/lib/log.js";
-import { spanOf } from "./group.js";
+import { spanOf } from "../engine/group.js";
 
 const END = ".jsonl";
 // What a reader meets where no writer has said a line yet. [[spec/design_output/log#one-verb-reads-the-log]]

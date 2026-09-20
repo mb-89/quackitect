@@ -20,7 +20,9 @@ registered() {
   [ -n "$id" ] || return 0
   old_ifs=$IFS
   IFS=';'
-  for dir in ${SE_REGISTRY:-$HOME/.se}; do
+  # The runtime folder .claude/skills/level0/lib/folders.js owns, spelled again
+  # here because a stub carries no vehicle and a shell script imports nothing.
+  for dir in ${SE_REGISTRY:-$HOME/.se/.runtime}; do
     IFS=$old_ifs
     file="$dir/registry.json"
     [ -f "$file" ] || continue
@@ -42,5 +44,22 @@ if [ ! -f "$vehicle/RUNME.sh" ]; then
   printf '%s\n' "No vehicle stands for $name: set SE_VEHICLE to its folder, or let the bridgehead clone $upstream into $cloned on the first session." >&2
   exit 1
 fi
+
+# The vehicle's folder is a marketplace, and this stub enables the plugin under
+# the brand. The path differs per box, so it lands in the file git ignores.
+# [[spec/design_output/level0#a-stub-names-its-vehicle]]
+node -e '
+  const [lib, at, vehicle, brand] = process.argv.slice(1);
+  const { shimSettings } = await import(lib);
+  const fs = await import("node:fs");
+  let was = "";
+  try { was = fs.readFileSync(at, "utf8"); } catch {}
+  const made = shimSettings(was, vehicle, brand);
+  if (made !== was) {
+    fs.mkdirSync(at.replace(/[\/][^\/]*$/, ""), { recursive: true });
+    fs.writeFileSync(at, made);
+  }
+' "$vehicle/.claude/skills/level0/lib/vehicle.js" "$here/.claude/settings.local.json" "$vehicle" "$name" 2>/dev/null ||
+  printf '%s\n' "The marketplace reached no settings, so this session loads the plugin from wherever it already stands." >&2
 
 SE_WORK_ROOT="$here" exec sh "$vehicle/RUNME.sh" "$@"

@@ -1,9 +1,9 @@
 // Copilot's level zero, with every outside operation supplied by doors.
 // [[spec/design_output/copilot#one-runtime]]
 
+import { ticketAt, ticketNamed } from "../../../../src/engine/group.js";
+import { readTools, whereIs } from "../../../../src/engine/tools.js";
 import { heldReadsIn } from "../../../../src/scripts/guidance-hand.js";
-import { readTools, whereIs } from "../../../../src/scripts/tools.js";
-import { ticketAt, ticketNamed } from "../../../../src/scripts/group.js";
 import { groupStanding } from "../../../../src/scripts/work.js";
 import { candidateRun } from "./candidate-check.js";
 import { CODE, formatText, lintText as lintCode } from "./code.js";

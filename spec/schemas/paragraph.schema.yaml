@@ -19,7 +19,8 @@ misreads: 3
 # break and the push door names it nowhere. A rule reading warning lets the
 # write land, and the lint over the files a push carries names it.
 # [[spec/tickets/one-list-holds-the-warnings]]
-rules: {}
+rules:
+  RestatedTable: warning
 
 # The frontmatter answers to its own schema, so these rules leave it alone. A
 # key below names a field a person writes prose into, and the rules read the
@@ -62,6 +63,12 @@ layers:
     paragraphsPerRun: 3
     listWhen: three or more parallel things stand in one sentence
     exceptions: []
+
+  # A paragraph beside a table says what the table leaves unsaid, so a run of
+  # words standing in both reads as one fact in two places.
+  # [[spec/design_output/lsp#a-second-copy-draws]]
+  restated:
+    table: 6
 
   sentence:
     words:
