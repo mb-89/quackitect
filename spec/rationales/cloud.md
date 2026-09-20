@@ -14,14 +14,15 @@ A routine starts on `main` and takes no branch argument. Level zero reads its
 context at `session.start`, before any checkout, so a hook sees nothing of a
 branch the session moves to afterwards.
 
-`work take` closes that gap by printing the brief to standard output. The agent
-reads it from the command, and one routine prompt then serves every branch.
+`work take` closes that gap by printing the group's ask to standard output. The
+agent reads it from the command, and one routine prompt then serves every
+branch.
 
 ## 2. A pointed agent needs nothing
 
-A cloud agent aimed at `work/<name>` starts on the branch, so `HANDOVER.md` sits
-in the tree at `session.start` and level zero hands it over. That path needs no
-command, which is why the two entries differ.
+A cloud agent aimed at `work/<name>` starts on the branch, so the group ticket
+sits in the tree at `session.start` and the pull hands its leaf over. That path
+needs no take, which is why the two entries differ.
 
 ## 3. Trunk comes in by hand
 
@@ -143,7 +144,7 @@ there. So it offers a second branch, having just closed its own, which is the
 reading the words allow.
 
 Two rules come close and both read as scope advice inside one branch. Rule 4
-draws the edge of the brief and says nothing about the session. Rule 7 says
+draws the edge of the branch and says nothing about the session. Rule 7 says
 `work done` is last of these steps, and says nothing about the session either.
 
 A branch listing also goes stale inside a session. `work list` reads origin at

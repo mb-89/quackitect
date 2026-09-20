@@ -10,11 +10,11 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { probeOf, startOf } from "../../src/scripts/serve.js";
 import { pulling } from "../../src/scripts/work.js";
-import { remoteSaying } from "./work-doors.js";
+import { GROUP_NOTE, remoteSaying } from "./work-doors.js";
 
 const ROOT = "/tree";
-const BRIEF =
-  "---\nstatus: done\n---\n\n# The brief\n\nOne thing.\n\n# What surprises me\n\nNothing.\n";
+// A group stands done where its ticket reads closed. [[spec/design_output/work#held-derives-from-the-record]]
+const CLOSED_GROUP = GROUP_NOTE.replace("state: open", "state: closed");
 
 function heard(what) {
   const lines = [];
@@ -34,7 +34,7 @@ function doors(cloud) {
       "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
       "git rev-parse HEAD": { stdout: "b818c390c02737351bf1b73aba36a573d34d2ecc\n" },
       ...remoteSaying([{ branch: "work/one-done", tip: "aaa" }], {
-        "work/one-done:HANDOVER.md": BRIEF,
+        "work/one-done:spec/tickets/one-done.md": CLOSED_GROUP,
       }),
       "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
       "git status --porcelain": { stdout: "" },

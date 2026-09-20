@@ -6,10 +6,19 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { work } from "../../src/scripts/work.js";
-import { doorsSaying, HERE, heard, ROOT, ranGit, remoteSaying } from "./work-doors.js";
+import {
+  doorsSaying,
+  GROUP_NOTE,
+  HAND,
+  heard,
+  on,
+  ROOT,
+  ranGit,
+  remoteSaying,
+} from "./work-doors.js";
 
 // [[spec/design_output/work#the-listing-reads-git-once]]
-const ORPHANED = (brief) => ({
+const ORPHANED = () => ({
   ...remoteSaying(
     [
       { branch: "work/orphan", tip: "aaa" },
@@ -17,11 +26,8 @@ const ORPHANED = (brief) => ({
     ],
     {
       // The orphan stands urgent, so the take reaches for it first and the skip shows. [[spec/design_output/work#the-listing-reads-git-once]]
-      "work/orphan:HANDOVER.md": brief.replace(
-        "status: todo",
-        "status: todo\nurgent: true",
-      ),
-      "work/fine:HANDOVER.md": brief,
+      "work/orphan:spec/tickets/orphan.md": GROUP_NOTE,
+      "work/fine:spec/tickets/fine.md": GROUP_NOTE.replace("urgent: true\n", ""),
     },
   ),
   "git merge-base origin/main origin/work/orphan": { exitCode: 1, stdout: "" },
@@ -30,14 +36,13 @@ const ORPHANED = (brief) => ({
 
 // [[spec/design_output/work#the-listing-reads-git-once]]
 test("take passes over a branch sharing no ancestor with trunk, and names it", () => {
-  const brief = "---\nstatus: todo\n---\n\n# Do the thing\n";
   const { it, outside } = doorsSaying(
     {
-      ...ORPHANED(brief),
+      ...ORPHANED(),
       "git rev-parse --abbrev-ref HEAD": { stdout: "work/fine\n" },
       "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
     },
-    { [HERE]: brief },
+    { [on("fine")]: GROUP_NOTE.replace("urgent: true\n", ""), ...HAND },
   );
 
   const { code, said } = heard(() => work(ROOT, ["take"], it));
@@ -56,14 +61,10 @@ test("take passes over a branch sharing no ancestor with trunk, and names it", (
 
 // [[spec/design_output/work#the-listing-reads-git-once]]
 test("list marks a branch sharing no ancestor with trunk", () => {
-  const { it } = doorsSaying(ORPHANED("---\nstatus: todo\n---\n"));
+  const { it } = doorsSaying(ORPHANED());
 
   const { said } = heard(() => work(ROOT, ["list"], it));
 
-  assert.match(
-    said,
-    /work\/orphan\s+brief\s+orphan/,
-    "the row says why no box takes it",
-  );
-  assert.match(said, /work\/fine\s+brief\s+todo/, "and the other reads as it stood");
+  assert.match(said, /work\/orphan\s+orphan/, "the row says why no box takes it");
+  assert.match(said, /work\/fine\s+todo/, "and the other reads as it stood");
 });

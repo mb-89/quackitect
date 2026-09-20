@@ -1,11 +1,10 @@
-// What every work verb reads before it moves a thing: the status a note
-// carries, the branches standing, and the trunk coming in. The verbs stand in
-// work.js and work-merge.js beside this file.
+// What every work verb reads before it moves a thing: the standing a group
+// ticket carries, the branches standing, and the trunk coming in. The verbs
+// stand in work.js and work-merge.js beside this file.
 // [[spec/design_output/work#a-group-is-a-ticket]]
 
 import { isTagged, reaches } from "../../.claude/skills/level0/lib/todo.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
-import { CONTRACT_HEADING, contractRows } from "./branch-usage.js";
 import {
   CLOSED,
   fieldOf,
@@ -20,8 +19,7 @@ import {
 } from "./group.js";
 import { asText, framed, namesIn, REF_FORMAT, refsIn } from "./work-read.js";
 
-export const BRIEF = "HANDOVER.md";
-export const COL = { branch: 34, child: 32, kind: 6, status: 6, why: 24 };
+export const COL = { branch: 34, child: 32, status: 6, why: 24 };
 export const MS = 1000;
 // [[spec/design_output/work#a-merged-branch-closes]]
 export const MINE = /^(work|claude)\//;
@@ -34,13 +32,6 @@ export const ORPHAN = "orphan";
 export const ROUTINE = { name: "do_work", id: "trig_01EenLoDAB3NdmANnRM9mSh6" };
 export const DONE = "done";
 export const MERGED = "merged";
-
-export function statusOf(text) {
-  const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""));
-  if (!front) return "";
-  const said = /^status:\s*(\S+)\s*$/m.exec(front[1]);
-  return said ? said[1].toLowerCase() : "";
-}
 
 export function dependsOn(text) {
   const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""));
@@ -92,11 +83,11 @@ export function waitingOn(text, standing) {
   });
 }
 
-export function standingOf(briefs, merged = new Set()) {
+export function standingOf(tickets, merged = new Set()) {
   return new Map(
-    [...briefs].map(([branch, text]) => [
+    [...tickets].map(([branch, text]) => [
       branch,
-      merged.has(branch) ? MERGED : statusOf(text),
+      merged.has(branch) ? MERGED : groupStanding(text),
     ]),
   );
 }
@@ -154,7 +145,6 @@ export function readWork(it, trunk = false) {
   const paths = pathsIn(it, where);
 
   const asks = [
-    ...refs.map((one) => `${one.tip}:${BRIEF}`),
     ...where.flatMap((one) =>
       paths.get(one).map((name) => `${one}:${TICKETS}/${name}`),
     ),
@@ -188,15 +178,13 @@ function pathsIn(it, where) {
   );
 }
 
-// [[spec/design_output/work#a-brief-drains-first]]
+// [[spec/design_output/work#a-group-is-a-ticket]]
 function standing(one, held, ticketsAt) {
   const name = one.branch.replace(WORK_BRANCH, "");
-  const brief = held(`${one.tip}:${BRIEF}`);
-  const ticket = brief ? "" : held(`${one.tip}:${ticketAt(name)}`);
+  const ticket = held(`${one.tip}:${ticketAt(name)}`);
   return {
     ...one,
     name,
-    brief,
     ticket: isGroup(ticket) ? ticket : "",
     tickets: ticketsAt(one.tip),
   };
@@ -212,19 +200,9 @@ export function standingAll(stand) {
   return new Map(
     stand.map((one) => [
       one.branch,
-      one.orphan
-        ? ORPHAN
-        : one.merged
-          ? MERGED
-          : one.brief
-            ? statusOf(one.brief)
-            : groupStanding(one.ticket),
+      one.orphan ? ORPHAN : one.merged ? MERGED : groupStanding(one.ticket),
     ]),
   );
-}
-
-export function noteOf(one) {
-  return one.brief || one.ticket;
 }
 
 export function textAt(it, ref, path) {
@@ -249,17 +227,6 @@ export function ticketsOn(it, ref) {
     .map((path) => ({ path, name: ticketNamed(path), text: textAt(it, ref, path) }));
 }
 
-export function setStatus(text, to) {
-  const said = String(text ?? "");
-  if (/^---\r?\n[\s\S]*?\r?\n---/.test(said)) {
-    if (/^status:\s*\S+\s*$/m.test(said)) {
-      return said.replace(/^status:\s*\S+\s*$/m, `status: ${to}`);
-    }
-    return said.replace(/^---\r?\n/, `---\nstatus: ${to}\n`);
-  }
-  return `---\nkind: [[handover]]\nstatus: ${to}\n---\n\n${said.trimStart()}`;
-}
-
 export function branches(it) {
   it.git.run(["fetch", "--prune", "origin"], true);
   const said = it.git.run(["ls-remote", "--heads", "origin", "work/*"], true);
@@ -267,11 +234,6 @@ export function branches(it) {
     .split("\n")
     .filter(Boolean)
     .map((row) => row.split("\t")[1].replace("refs/heads/", ""));
-}
-
-export function briefOf(it, branch) {
-  const said = it.git.run(["show", `origin/${branch}:${BRIEF}`], true);
-  return said.ok ? said.out : "";
 }
 
 // Work stands two ways, and a branch moves over neither. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
@@ -327,13 +289,6 @@ export function parkedHere(it, name) {
   return it.disk.exists(at) && isTagged(it.disk.read(at));
 }
 
-export function push(it, branch, was, why) {
-  it.disk.write(it.join(it.root, BRIEF), was);
-  it.git.run(["add", BRIEF], true);
-  it.git.run(["commit", "-m", `${branch}: ${why}`], true);
-  return it.git.run(["push", "origin", branch]).ok;
-}
-
 // [[spec/design_output/work#trunk-comes-in-first]]
 export function sync(it) {
   const branch = workBranchHere(it, "sync");
@@ -361,15 +316,6 @@ export function sync(it) {
 
   console.log(`${branch} took ${behind} commit(s) from ${TRUNK}.`);
   return 0;
-}
-
-export { CONTRACT_HEADING };
-
-// [[spec/design_output/work#every-brief-carries-the-contract]]
-export function withContract(brief) {
-  const said = String(brief ?? "").trimEnd();
-  if (said.includes(CONTRACT_HEADING)) return `${said}\n`;
-  return contractRows(said, TRUNK, BRIEF);
 }
 
 // [[spec/design_output/work#a-box-leaves]]

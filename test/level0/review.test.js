@@ -11,7 +11,6 @@ import {
   readerAsks,
   readerSays,
   report,
-  retroIn,
   retroOnTicket,
   reviewSpec,
   TOOL,
@@ -30,8 +29,10 @@ const REF = `origin/${BRANCH}`;
 const FIRST = "1111111111111111111111111111111111111111";
 const AT = join(ROOT, WORKTREE, "work-the-config-holds-numbers");
 
-const BRIEF = "---\nstatus: todo\n---\n\n# Hold the numbers\n";
-const HANDBACK = "---\nstatus: done\n---\n\n# It holds\n\n# Retro\n\nOne surprise.\n";
+const TICKET_AT = `spec/tickets/${NAME}.md`;
+const ASK =
+  "---\nkind: [[ticket]]\nstate: open\nprocess: [[group]]\n---\n\n# Ask\n\nHold the numbers.\n\n# retro\n\n## write\n\n### done\n\n<!-- what was done -->\n";
+const HANDBACK = ASK.replace("<!-- what was done -->", "- it holds");
 
 function heard(what) {
   const lines = [];
@@ -54,8 +55,8 @@ const standing = (more = {}) => ({
   },
   "git rev-parse --verify --quiet origin/main": { stdout: "bbb\n" },
   [`git rev-list --reverse origin/main..${REF}`]: { stdout: `${FIRST}\n2222\n` },
-  [`git show ${FIRST}:HANDOVER.md`]: { stdout: BRIEF },
-  [`git show ${REF}:HANDOVER.md`]: { stdout: HANDBACK },
+  [`git show ${FIRST}:${TICKET_AT}`]: { stdout: ASK },
+  [`git show ${REF}:${TICKET_AT}`]: { stdout: HANDBACK },
   [`git diff --stat origin/main...${REF}`]: { stdout: " src/a.js | 2 +-\n" },
   [`git diff origin/main...${REF}`]: { stdout: "diff --git a/src/a.js\n" },
   "git worktree prune": { exitCode: 0 },
@@ -77,23 +78,6 @@ function doorsSaying(answers, files = {}) {
 
 const ranGit = (said) => said.ran.map((one) => one.argv.join(" "));
 
-test("a retro reads from a heading, and its absence reads as absent", () => {
-  assert.equal(retroIn("# The result\n\n## Retro\n\nA surprise.\n"), true);
-  assert.equal(retroIn("# The result\n\n# My retrospective\n\nA surprise.\n"), true);
-  assert.equal(retroIn("# The result\n\nI wrote a retro somewhere.\n"), false);
-  assert.equal(retroIn(""), false);
-  // [[spec/design_output/work#every-brief-carries-the-contract]]
-  assert.equal(retroIn("# Where it stands\n\n# What surprises me\n\nA trap.\n"), true);
-  assert.equal(
-    retroIn("# Where it stands\n\n# The dead end I meet\n\nA wall.\n"),
-    true,
-  );
-  assert.equal(
-    retroIn("# Where it stands\n\nA surprise stands in this line.\n"),
-    false,
-  );
-});
-
 // [[spec/design_output/review#the-questions]]
 test("a group's retro reads off its ticket, and an empty retro chapter reads as absent", () => {
   const empty =
@@ -109,14 +93,9 @@ test("a group's retro reads off its ticket, and an empty retro chapter reads as 
     false,
     "no retro chapter",
   );
-  assert.equal(
-    retroIn(empty),
-    true,
-    "the heading alone fools the brief reader, so a ticket takes its own",
-  );
 });
 
-test("the verb gathers the brief, the handback and both diffs", () => {
+test("the verb gathers the ask, the handback and both diffs", () => {
   const { it } = doorsSaying(standing());
 
   const { code, said } = heard(() => work(ROOT, ["review", NAME, "--json"], it));
@@ -125,7 +104,7 @@ test("the verb gathers the brief, the handback and both diffs", () => {
   const material = JSON.parse(said);
   assert.equal(material.branch, BRANCH);
   assert.equal(material.ref, REF);
-  assert.equal(material.brief, BRIEF.trim());
+  assert.equal(material.ask, ASK.trim());
   assert.equal(material.handback, HANDBACK.trim());
   assert.match(material.stat, /src\/a\.js/);
   assert.match(material.diff, /diff --git/);
@@ -219,7 +198,7 @@ test("the report names the branch, every answer and the count", () => {
   const said = report(
     { branch: BRANCH, check: { ok: true, code: 0 }, retro: true },
     {
-      brief: "done, and nothing beyond it",
+      ask: "done, and nothing beyond it",
       beyond: "src/scripts/tools.js, a one-line fix, trivial",
       tests: "2 rules added, 1 carries no test:\nStopRule fires on nothing",
       fix: 2,
@@ -237,7 +216,7 @@ test("the report names the branch, every answer and the count", () => {
 test("a report with nothing to fix fits on one line", () => {
   const said = report(
     { branch: BRANCH, check: { ok: true, code: 0 }, retro: true },
-    { brief: "done, and nothing beyond it", fix: 0 },
+    { ask: "done, and nothing beyond it", fix: 0 },
   );
 
   assert.equal(said.split("\n").length, 1);
@@ -258,7 +237,7 @@ test("a red check and an absent retro each count one thing to fix", () => {
 test("the report holds no merge back, whatever it finds", () => {
   const bad = report(
     { branch: BRANCH, check: { ok: false, code: 1 }, retro: false },
-    { brief: "the brief asks for two things, and one lands", fix: 4 },
+    { ask: "the ask calls for two things, and one lands", fix: 4 },
   );
 
   assert.match(bad, /Run branch merge once every fix lands\./);
@@ -266,11 +245,11 @@ test("the report holds no merge back, whatever it finds", () => {
 });
 
 test("the reader answers JSON, and a fenced answer reads the same", () => {
-  const plain = readerSays('{"brief":"done","beyond":"none","tests":"all","fix":1}');
-  assert.deepEqual(plain, { fix: 1, brief: "done", beyond: "none", tests: "all" });
+  const plain = readerSays('{"ask":"done","beyond":"none","tests":"all","fix":1}');
+  assert.deepEqual(plain, { fix: 1, ask: "done", beyond: "none", tests: "all" });
 
   const fenced = readerSays(
-    'Here it is:\n```json\n{"brief":"done","beyond":"none","tests":"all","fix":1}\n```\n',
+    'Here it is:\n```json\n{"ask":"done","beyond":"none","tests":"all","fix":1}\n```\n',
   );
   assert.deepEqual(fenced, plain);
 });
@@ -293,11 +272,11 @@ test("a list in an answer reads as one line each", () => {
 
 test("the reader prompt carries the material and the rules", () => {
   const asked = readerAsks(
-    { branch: BRANCH, brief: BRIEF, handback: HANDBACK, stat: "a | 1", diff: "@@" },
+    { branch: BRANCH, ask: ASK, handback: HANDBACK, stat: "a | 1", diff: "@@" },
     "1. Do the thing. *",
   );
 
-  assert.match(asked, /Does the branch do what the brief asks/);
+  assert.match(asked, /Does the branch do what the ask calls for/);
   assert.match(asked, /trivial fix/);
   assert.match(asked, /proving it fires/);
   assert.match(asked, /Hold the numbers/);
@@ -346,9 +325,9 @@ test("the report says what a red check broke on, under the check row", () => {
 });
 
 // [[spec/design_output/review#what-the-report-looks-like]]
-test("the verb alone prints the two rows it owns, and no brief", () => {
+test("the verb alone prints the two rows it owns, and no ask", () => {
   const { it } = doorsSaying(
-    standing({ [`git show ${REF}:HANDOVER.md`]: { stdout: BRIEF } }),
+    standing({ [`git show ${REF}:${TICKET_AT}`]: { stdout: ASK } }),
   );
 
   const { code, said } = heard(() => work(ROOT, ["review", NAME], it));
@@ -356,7 +335,7 @@ test("the verb alone prints the two rows it owns, and no brief", () => {
   assert.equal(code, 0);
   assert.match(said, /^check {6}passes$/m);
   assert.match(said, /^retro {6}absent from the handback$/m);
-  assert.equal(said.includes("Hold the numbers"), false, "the brief stays out");
+  assert.equal(said.includes("Hold the numbers"), false, "the ask stays out");
   assert.match(said, /^1 thing to fix\. Run branch merge once every fix lands\.$/m);
 });
 

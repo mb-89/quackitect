@@ -279,11 +279,11 @@ helper read apart in the prompt and in the record.
 
 ## The hand-back matches the hold
 
-The hold names the ticket, the step and the take hash. The pull refuses a
-hand-back naming another ticket. The record answers one already where an
-entry for this step carries the hold's hash as `hash_before` and a
-`hash_after`. That one gets the answer on record, pushes where the push is
-still owed, and drops the hold.
+The hold names the ticket, the step and the take hash, so a hand-back is
+idempotent: one sent twice moves the ticket once. The pull refuses a hand-back
+naming another ticket. The record answers one already where an entry for this
+step carries the hold's hash as `hash_before` and a `hash_after`. That one gets
+the answer on record, pushes where the push is still owed, and drops the hold.
 
 A hold is stale where the ticket stands at another step, or where the take
 hash is no ancestor of the tip. Then the hold drops, and the hand pulls again.

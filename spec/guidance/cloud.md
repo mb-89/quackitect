@@ -10,7 +10,7 @@ rationale: [[spec/rationales/cloud]]
 # Actionables
 
 1. Run `./RUNME.sh ticket pull` first where you start on `main`. The branch you start on carries no work. *
-2. Read the brief level zero hands you on a `work/` branch. Level zero deletes the copy it reads. *
+2. Read the ask `./RUNME.sh branch take` prints on a `work/` branch. It names the group this box works. *
 3. Take `main` in first, with `./RUNME.sh branch sync`. A late conflict costs the work standing behind it. *
 4. Work the branch you hold, and stop at its edge. A change nobody wants buries the one somebody wants. *
 5. Commit and push each time you finish a thing. This box dies and takes its working tree with it. *
@@ -20,7 +20,7 @@ rationale: [[spec/rationales/cloud]]
 9. Carry the branch to done, and stop for no answer you can write yourself. A branch standing mid-step costs the next box a session. *
 10. Finish every step an agent takes before you leave. A step you leave meets the next box and waits again. *
 11. Green the check before you hand the branch back, whatever hand puts the fault there. A fault with no owner outlives every hand that meets it. *
-12. Write your result, your retro and every script under `.se/scripts` into `HANDOVER.md`. Git carries what this box learns, and nothing else does.
-13. Run `./RUNME.sh branch done` last, and stop at the push. It sets the status the next box reads.
+12. Write your result, your retro and every script under `.se/scripts` into the group's retro. Git carries what this box learns, and nothing else does.
+13. Run `./RUNME.sh branch done` last, and stop at the push. It sets the standing the next box reads.
 14. Work one branch a session, and leave the next branch to the next session. A second branch buries the first in one review. *
 15. Say which commit you stand on, and whether it matches origin. This box reports itself current while somebody pushes past it. *

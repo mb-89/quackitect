@@ -32,7 +32,6 @@ import {
   green,
   groupRemote,
   HAND,
-  HERE,
   heard,
   on,
   onBranch,
@@ -195,37 +194,6 @@ test("a take meeting a rejected push names both roads, and claims no race", () =
   assert.match(said, /a push door turning it away is another/);
 });
 
-// [[spec/design_output/work#a-brief-drains-first]]
-test("take serves a brief before a group, and the group once no brief stands", () => {
-  const brief = "---\nstatus: todo\n---\n\n# Do the thing\n";
-  const two = (said) => ({
-    ...groupRemote(),
-    ...remoteSaying(
-      [
-        { branch: "work/a-brief", tip: "aaa" },
-        { branch: "work/one-group", tip: "bbb" },
-      ],
-      {
-        "work/a-brief:HANDOVER.md": said,
-        [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
-      },
-    ),
-  });
-  const both = two(brief);
-
-  const first = doorsSaying(both, { [HERE]: brief, ...HAND });
-  assert.equal(heard(() => work(ROOT, ["take"], first.it)).code, 0);
-  assert.ok(
-    ranGit(first.outside).includes("git switch work/a-brief"),
-    "the brief goes first, whatever its mark",
-  );
-
-  const held = two(brief.replace(TODO, HELD));
-  const next = doorsSaying(held, { [on("one-group")]: GROUP_NOTE, ...HAND });
-  assert.equal(heard(() => work(ROOT, ["take"], next.it)).code, 0);
-  assert.ok(ranGit(next.outside).includes("git switch work/one-group"));
-});
-
 // [[spec/design_output/work#held-derives-from-the-record]]
 test("a group holds where the record says so, and stands free where it says nothing", () => {
   const took = withEntry(GROUP_NOTE, {
@@ -242,7 +210,7 @@ test("a group holds where the record says so, and stands free where it says noth
 });
 
 // [[spec/design_output/work#a-row-per-group]]
-test("list names a group, a brief and a loose ticket, each as its own kind", () => {
+test("list names a group and a loose ticket, each on its own row", () => {
   const loose = CHILD("one-group", "open").replace("group: one-group\n", "");
   const { it } = doorsSaying(
     groupRemote(
@@ -261,7 +229,7 @@ test("list names a group, a brief and a loose ticket, each as its own kind", () 
   const { code, said } = heard(() => work(ROOT, ["list"], it));
 
   assert.equal(code, 0);
-  assert.match(said, /work\/one-group\s+group\s+held\s+urgent\s+3h/);
+  assert.match(said, /work\/one-group\s+held\s+urgent\s+3h/);
   assert.match(said, /a-loose-one\s+ticket\s+open/);
   assert.doesNotMatch(said, /^one-group\s+ticket/m, "a group is no loose ticket");
 });
@@ -283,7 +251,7 @@ test("a group row carries a row per ticket naming it, off the branch tip", () =>
   const { code, said } = heard(() => work(ROOT, ["list"], it));
 
   assert.equal(code, 0);
-  assert.match(said, /work\/one-group\s+group\s+todo/);
+  assert.match(said, /work\/one-group\s+todo/);
   assert.match(said, /^ {2}a-child\s+ticket\s+open\s+do$/m);
   assert.doesNotMatch(
     said,
@@ -298,19 +266,17 @@ test("a group row carries a row per ticket naming it, off the branch tip", () =>
 });
 
 // [[spec/design_output/work#a-ticket-under-its-group]]
-test("a brief carries no ticket row, and a child naming no step says its mark", () => {
-  const brief = "---\nstatus: todo\n---\n\n# Do the thing\n";
+test("a branch carrying no group names no ticket, and a child with no step says its mark", () => {
   const { it } = doorsSaying(
-    remoteSaying([{ branch: "work/a-brief", tip: "aaa" }], {
-      "work/a-brief:HANDOVER.md": brief,
-      "work/a-brief:spec/tickets/a-child.md": CHILD("a-brief", "open"),
+    remoteSaying([{ branch: "work/no-group", tip: "aaa" }], {
+      "work/no-group:spec/tickets/a-child.md": CHILD("no-group", "open"),
     }),
   );
 
   const { said } = heard(() => work(ROOT, ["list"], it));
 
-  assert.match(said, /work\/a-brief\s+brief\s+todo/);
-  assert.doesNotMatch(said, /a-child/, "a brief names no tickets");
+  assert.match(said, /work\/no-group\s+no status/);
+  assert.doesNotMatch(said, /a-child/, "a branch carrying no group names no tickets");
   assert.equal(
     whyOf(CHILD("one-group", "open")),
     "do",
@@ -460,7 +426,6 @@ const merging = (extra = {}) => ({
   },
   [`git diff --unified=0 base111..origin/main -- ${GROUP_AT}`]: { stdout: "" },
   "git merge --no-ff --no-edit origin/work/one-group": { exitCode: 0 },
-  "git rm --cached -q HANDOVER.md": { exitCode: 1 },
   [`node ${join(ROOT, "src/scripts/cli.js")} check`]: {
     exitCode: 0,
     stdout: "green\n",

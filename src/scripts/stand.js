@@ -4,7 +4,7 @@
 // [[spec/design_output/work#a-stale-group-is-yours]]
 
 import { aged, STALE, spanOf } from "./group.js";
-import { MS, noteOf, ROUTINE, standingAll, standOf, TODO, waitingOn } from "./work.js";
+import { MS, ROUTINE, standingAll, standOf, TODO, waitingOn } from "./work.js";
 
 // The read carries the tip's own time, so the age costs no process. [[spec/design_output/work#the-listing-reads-git-once]]
 export function tipAge(one, now) {
@@ -33,7 +33,7 @@ export function freeIn(stand, standing, it = null, now = 0) {
     .filter(
       (one) => standing.get(one.branch) === TODO || staleHere(it, now, one, standing),
     )
-    .filter((one) => !waitingOn(noteOf(one), standing).length);
+    .filter((one) => !waitingOn(one.ticket, standing).length);
 }
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
@@ -43,11 +43,10 @@ function staleHere(it, now, one, standing) {
 }
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
-export function freeNow(briefs, merged = new Set()) {
-  const stand = [...briefs].map(([branch, brief]) => ({
+export function freeNow(tickets, merged = new Set()) {
+  const stand = [...tickets].map(([branch, ticket]) => ({
     branch,
-    brief,
-    ticket: "",
+    ticket,
     merged: merged.has(branch),
   }));
   return freeIn(stand, standingAll(stand)).map((one) => one.branch);

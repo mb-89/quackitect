@@ -10,16 +10,13 @@ import {
   withoutField,
 } from "./group.js";
 import {
-  BRIEF,
   baseOnTrunk,
-  briefOf,
   childrenHere,
   DONE,
   dirty,
   groupStanding,
   MINE,
   mergedHere,
-  statusOf,
   textAt,
 } from "./work-stands.js";
 
@@ -39,8 +36,11 @@ export function merge(it, name) {
 
   it.git.run(["fetch", "--prune", "origin"], true);
   const ticket = textAt(it, `origin/${branch}`, ticketAt(name));
-  const group = isGroup(ticket);
-  const status = group ? groupStanding(ticket) : statusOf(briefOf(it, branch));
+  if (!isGroup(ticket)) {
+    console.error(`${branch} carries no group at ${ticketAt(name)}.`);
+    return 1;
+  }
+  const status = groupStanding(ticket);
   if (status !== DONE) {
     console.error(`${branch} stands at ${status || "no status"}, so it is not ready.`);
     return 1;
@@ -65,10 +65,8 @@ export function merge(it, name) {
     return 1;
   }
 
-  const freed = group ? freeChildren(it, name) : [];
-  const dropped = it.git.run(["rm", "--cached", "-q", BRIEF], true).ok;
-  if (dropped) dropBrief(it);
-  if (freed.length || dropped) it.git.run(["commit", "--amend", "--no-edit"], true);
+  const freed = freeChildren(it, name);
+  if (freed.length) it.git.run(["commit", "--amend", "--no-edit"], true);
 
   // [[spec/design_output/work#the-merge-lands-the-truth]]
   const said = checkSays(it);
@@ -137,11 +135,6 @@ function checkSays(it) {
     .trim()
     .split("\n");
   return { ok: ran.exitCode === 0, says: rows.at(-1) ?? "" };
-}
-
-function dropBrief(it) {
-  const path = it.join(it.root, BRIEF);
-  if (it.disk.exists(path)) it.disk.remove(path);
 }
 
 // [[spec/design_output/work#a-merged-branch-closes]]

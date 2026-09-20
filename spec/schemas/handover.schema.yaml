@@ -1,12 +1,9 @@
-# What one session hands the next, and what one branch hands whoever works it.
-# `HANDOVER.md` at the root carries a brief, and `.se/HANDOVER.md` carries a
-# session. One kind covers both, because a reader meets the same shape.
+# What one session hands the next on one box, at `.se/HANDOVER.md`.
 #
 # A handover reaches one reader once, and level zero deletes the copy it reads.
 # So it carries a message, and the rules that hold documentation stand off it.
 #
-# `work.js` reads status already, and a typo in it goes quiet. The enum below
-# refuses it instead.
+# A typo in `status` goes quiet. The enum below refuses it instead.
 #
 # The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
 # The body half is this project's own, borrowed from https://document-schema.org.
@@ -14,7 +11,6 @@
 kind: handover
 
 governs:
-  - HANDOVER.md
   - .se/HANDOVER.md
 
 frontmatter:
@@ -31,7 +27,7 @@ frontmatter:
 
     status:
       enum: [todo, held, done]
-      description: where the work stands, and the verbs move it
+      description: where the session leaves the work it hands on
 
     urgent:
       type: boolean
@@ -56,5 +52,4 @@ body:
       required: true
       description: what the next reader does, one row per thing
 
-# A chapter between the two carries its own name. `work.js` appends `How this
-# branch runs` as a subsection, and that contract stands outside these two.
+# A chapter between the two carries its own name.

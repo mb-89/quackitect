@@ -6,19 +6,11 @@ import { inRun } from "./folders.js";
 
 export const TOOL = "review_branch";
 export const CALLED = `mcp__level0__${TOOL}`;
-export const BRIEF = "HANDOVER.md";
 export const WORKTREE = inRun("review");
 export const DIFF_CAP = 120000;
 const NAME_WIDTH = 10;
 
-export const ASKED = ["brief", "beyond", "tests"];
-
-// [[spec/design_output/review#the-questions]]
-// [[spec/design_output/work#every-brief-carries-the-contract]]
-export function retroIn(text) {
-  const heading = /^#{1,6}[^\S\n]+[^\n]*\b(?:retro\w*|surprises?|dead ends?)\b/im;
-  return heading.test(String(text ?? ""));
-}
+export const ASKED = ["ask", "beyond", "tests"];
 
 // A group carries its retro on its ticket, under the retro chapter, so a filled line there reads as present. [[spec/design_output/review#the-questions]]
 export function retroOnTicket(text) {
@@ -38,11 +30,11 @@ export function reviewSpec() {
   return {
     name: TOOL,
     description: [
-      "Reads a work branch against the brief it was cut with, and answers a",
-      "short report: what the branch does, what it touches beyond the brief,",
-      "which rules it adds without a test, whether the check passes, and",
-      "whether the handback carries a retro. It holds no merge back. Takes one",
-      "branch name, with or without the work/ prefix.",
+      "Reads a work branch against the ask its group ticket carries, and",
+      "answers a short report: what the branch does, what it touches beyond",
+      "the ask, which rules it adds without a test, whether the check passes,",
+      "and whether the handback carries a retro. It holds no merge back. Takes",
+      "one branch name, with or without the work/ prefix.",
     ].join(" "),
     inputSchema: {
       type: "object",
@@ -68,15 +60,15 @@ export function readerAsks(material, rules) {
     "",
     "## Question one",
     "",
-    "Does the branch do what the brief asks? Name what the brief asks for and",
-    "goes missing, or say it is done.",
+    "Does the branch do what the ask calls for? Name what the ask calls for",
+    "and goes missing, or say it is done.",
     "",
     "## Question two",
     "",
-    "Is everything the diff touches beyond the brief a trivial fix? A branch",
-    "fixes what it trips over, so a file outside the brief is no fault by",
-    "itself. A diversion is: a redesign of something the brief leaves alone.",
-    "Name the files beyond the brief and say which kind each one is.",
+    "Is everything the diff touches beyond the ask a trivial fix? A branch",
+    "fixes what it trips over, so a file outside the ask is no fault by",
+    "itself. A diversion is: a redesign of something the ask leaves alone.",
+    "Name the files beyond the ask and say which kind each one is.",
     "",
     "## Question three",
     "",
@@ -89,9 +81,9 @@ export function readerAsks(material, rules) {
     "",
     String(rules ?? "").trim(),
     "",
-    "# The brief, as the branch was cut with it",
+    "# The group ticket, as the branch was cut with it",
     "",
-    fence(material.brief),
+    fence(material.ask),
     "",
     "# The handback, as the branch carries it now",
     "",
@@ -113,7 +105,7 @@ export function readerAsks(material, rules) {
     fence(
       JSON.stringify(
         {
-          brief: "done, and nothing beyond it",
+          ask: "done, and nothing beyond it",
           beyond: "src/doors/git.js, a one-line fix, trivial",
           tests: "2 rules added, 1 carries no test:\nStopRule fires on nothing",
           fix: 2,
@@ -143,7 +135,7 @@ export function readerSays(text) {
     for (const key of ASKED) out[key] = line(read[key]);
     return out;
   } catch {
-    return { fix: 1, brief: "", beyond: "", tests: "", unread: said.trim() };
+    return { fix: 1, ask: "", beyond: "", tests: "", unread: said.trim() };
   }
 }
 
@@ -165,7 +157,7 @@ export function report(said, read = {}) {
   const rows = [
     ["check", check.ok ? "passes" : redly(check)],
     ["retro", said.retro ? "present" : "absent from the handback"],
-    ["brief", read.brief],
+    ["ask", read.ask],
     ["tests", read.tests],
     ["beyond", read.beyond],
     ["reader", unread],
