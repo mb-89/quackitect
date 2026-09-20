@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: children
+step: retro/notes
 record:
   - step: sync
     hand: box fa49097ce66c · claude-code-remote
@@ -92,6 +92,10 @@ record:
     hand: box fa49097ce66c · claude-code-remote
     hash_before: eece86491dd64d1b9e71bf59dfcd2f041561440f
     hash_after: eece86491dd64d1b9e71bf59dfcd2f041561440f
+  - step: children
+    hand: the engine
+    hash_before: 02237bc0be71b193126b2526574b8e69a7fbfe87
+    hash_after: 02237bc0be71b193126b2526574b8e69a7fbfe87
 ---
 
 # Ask
