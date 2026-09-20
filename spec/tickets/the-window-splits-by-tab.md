@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -179,6 +179,12 @@ record:
       - name: check
         exit: 0
         said: 64 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box 1670436ae0bb · claude-code-remote · helper-17
+    hash_before: fd5cb8f86fb2e0ba24d37025b7133fcf3e9efc65
+    hash_after: fd5cb8f86fb2e0ba24d37025b7133fcf3e9efc65
+    returns: 1
+    why: "design: `spec/design_output/tui.md` names `src/tui/mouse.go` under The mouse reaches the window, and the file stands under `src/tui/frame` now.; design: `spec/design_output/tui.md` names `src/tui/door.go`, `openDoor`, `tabMsg` and `tellPort` under A second launch hands over, and the split moved the file and gave each name a capital.; design: `spec/design_output/tree-view.md` names `src/tui/tree.go` and `src/tui/treedraw.go` under Scope, and both stand under `src/tui/tree` now.; craft: `src/tui/sort_test.go`, `src/tui/mouse_test.go` and `src/tui/model_test.go` spell the column widths, the wheel step, the floor width and the no-sort mark as bare numbers, where `stampWide`, `levelWide`, `kindWide`, `wheelStep`, `floorWide` and `sortNone` hold them.; craft: `poll` stands in `src/tui/log/tail.go` and again in `src/tui/work/work.go`, and the one package held it once.; craft: `logTab` in `src/tui/main.go` and `theLog` in `src/tui/window_test.go` read the same tab the same way.; craft: the rename reached the case messages, so `src/tui/frame_test.go` and `src/tui/panes_test.go` say \"frame.Band\" and \"frame.Preset\" to a reader, and `src/tui/log/detail_test.go` writes the filter key as `Text:`.; craft: `SchemaOf` and `TicketRules` in `src/tui/work/workedit.go` answer `ticketSchema`, a type the package keeps to itself.; craft: `src/tui/tree/treeflag_test.go` keeps a blank line where the moved case stood.; The branch does what the ask calls for: `ls src/tui/*.go` names the window's own files, each tab stands under a folder of its own, and every import in the chapter's table runs down.; `go build ./...` and `go test ./...` under `src/tui` answer 0, and `go vet ./...` and `gofmt -l .` answer nothing.; `./RUNME.sh check` answers 0 on the branch, with 64 warnings standing and none of them this ticket's.; `./RUNME.sh branch review` reads check as 1, because its worktree lacks `.claude/skills/level0/.claude-plugin/plugin.json`, which git leaves out, and the tree itself answers 0.; No retro stands in the handback, and the verdict step hands the ticket to one.; The layout case refuses a package importing what its row leaves out: a file under `src/tui/log` importing `src/tui/work` fails it by name.; The stamp case runs the build again on a move under a package, and leaves the binary standing on a moved case file.; Beyond the ask, the diff touches `.vale.ini` alone, and that section reaches a door file under a package."
 ---
 
 # Ask
@@ -414,17 +420,118 @@ root and reach a tab through the model.
 
 <!-- the form is files -->
 
+spec/guidance/review/reviewing.md
+spec/tickets/the-window-splits-by-tab.md
+spec/design_output/tui.md
+spec/design_output/tree-view.md
+spec/vocabulary/terms.yml
+src/scripts/pull-chapter.js
+src/scripts/pull-writes.js
+.vale.ini
+src/scripts/tui-build.js
+test/level0/viewer.test.js
+src/tui/door_test.go
+src/tui/draw/colour.go
+src/tui/draw/colour_test.go
+src/tui/draw/filter.go
+src/tui/draw/link.go
+src/tui/draw/text.go
+src/tui/draw/wrap.go
+src/tui/footer.go
+src/tui/frame/door.go
+src/tui/frame/filterpane.go
+src/tui/frame/footer.go
+src/tui/frame/help.go
+src/tui/frame/keys.go
+src/tui/frame/model.go
+src/tui/frame/mouse.go
+src/tui/frame/part.go
+src/tui/frame/tabs.go
+src/tui/frame_root_test.go
+src/tui/frame_test.go
+src/tui/keys.go
+src/tui/layout_test.go
+src/tui/log/detail.go
+src/tui/log/detail_test.go
+src/tui/log/record.go
+src/tui/log/said.go
+src/tui/log/sort.go
+src/tui/log/tab.go
+src/tui/log/tail.go
+src/tui/log/tail_test.go
+src/tui/main.go
+src/tui/model_test.go
+src/tui/mouse.go
+src/tui/mouse_test.go
+src/tui/panes_test.go
+src/tui/shipped_test.go
+src/tui/sort_test.go
+src/tui/tabs.go
+src/tui/tree/base.go
+src/tui/tree/base_test.go
+src/tui/tree/preset.go
+src/tui/tree/preset_test.go
+src/tui/tree/tree.go
+src/tui/tree/tree_test.go
+src/tui/tree/treedraw.go
+src/tui/tree/treeedit.go
+src/tui/tree/treeedit_test.go
+src/tui/tree/treefilter.go
+src/tui/tree/treeflag.go
+src/tui/tree/treeflag_test.go
+src/tui/tree/treemark.go
+src/tui/tree/treemark_test.go
+src/tui/tree/treesort.go
+src/tui/tree/treesort_test.go
+src/tui/ui.go
+src/tui/window_test.go
+src/tui/work.go
+src/tui/work/door.go
+src/tui/work/work.go
+src/tui/work/workedit.go
+src/tui/work/workindex.go
+src/tui/work/workitems.go
+src/tui/work/workplace.go
+src/tui/work/workplaces.go
+src/tui/work_test.go
+src/tui/workdetail_test.go
+src/tui/workedit_test.go
+src/tui/workplace_test.go
+src/tui/workplaces_test.go
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+- design: `spec/design_output/tui.md` names `src/tui/mouse.go` under The mouse reaches the window, and the file stands under `src/tui/frame` now.
+- design: `spec/design_output/tui.md` names `src/tui/door.go`, `openDoor`, `tabMsg` and `tellPort` under A second launch hands over, and the split moved the file and gave each name a capital.
+- design: `spec/design_output/tree-view.md` names `src/tui/tree.go` and `src/tui/treedraw.go` under Scope, and both stand under `src/tui/tree` now.
+- craft: `src/tui/sort_test.go`, `src/tui/mouse_test.go` and `src/tui/model_test.go` spell the column widths, the wheel step, the floor width and the no-sort mark as bare numbers, where `stampWide`, `levelWide`, `kindWide`, `wheelStep`, `floorWide` and `sortNone` hold them.
+- craft: `poll` stands in `src/tui/log/tail.go` and again in `src/tui/work/work.go`, and the one package held it once.
+- craft: `logTab` in `src/tui/main.go` and `theLog` in `src/tui/window_test.go` read the same tab the same way.
+- craft: the rename reached the case messages, so `src/tui/frame_test.go` and `src/tui/panes_test.go` say "frame.Band" and "frame.Preset" to a reader, and `src/tui/log/detail_test.go` writes the filter key as `Text:`.
+- craft: `SchemaOf` and `TicketRules` in `src/tui/work/workedit.go` answer `ticketSchema`, a type the package keeps to itself.
+- craft: `src/tui/tree/treeflag_test.go` keeps a blank line where the moved case stood.
+- The branch does what the ask calls for: `ls src/tui/*.go` names the window's own files, each tab stands under a folder of its own, and every import in the chapter's table runs down.
+- `go build ./...` and `go test ./...` under `src/tui` answer 0, and `go vet ./...` and `gofmt -l .` answer nothing.
+- `./RUNME.sh check` answers 0 on the branch, with 64 warnings standing and none of them this ticket's.
+- `./RUNME.sh branch review` reads check as 1, because its worktree lacks `.claude/skills/level0/.claude-plugin/plugin.json`, which git leaves out, and the tree itself answers 0.
+- No retro stands in the handback, and the verdict step hands the ticket to one.
+- The layout case refuses a package importing what its row leaves out: a file under `src/tui/log` importing `src/tui/work` fails it by name.
+- The stamp case runs the build again on a move under a package, and leaves the binary standing on a moved case file.
+- Beyond the ask, the diff touches `.vale.ini` alone, and that section reaches a door file under a package.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place, and a note points at the file instead of repeating it. Three notes point at files the split moved, and the root cases spell the log's widths beside the constants, so the findings name each.
 
 # Discussion
 
