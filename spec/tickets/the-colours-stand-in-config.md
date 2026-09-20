@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -185,6 +185,17 @@ record:
     hash_after: 4c672c1c0b493c2abbb83f3d944c3af67fe97cbd
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: b945f1cf4f8722a281748aa79ab3f5b97a773ad3
+    hash_after: b945f1cf4f8722a281748aa79ab3f5b97a773ad3
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/config passes; green, src/viewer passes
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -435,19 +446,20 @@ A person sets a colour in the config now, and the window reads it there.
 | the read at start | `loadColours` in `src/viewer/colour.go`, called from `main.go` |
 | the shared module beside `quackitect/yaml` | `SHARED` in `src/scripts/viewer.js` |
 | the reader the server keeps | `src/lsp/config.go`, which calls the shared one |
+| the gate reading Go format | `goHolds` in `src/scripts/cli-check.js` |
 
-`grep -rn 'lipgloss.Color(' src/viewer` answers the case files alone, and a case walking the folder holds that. So the first line of `done_when` stands as a case, and a number a fixture carries costs it nothing.
+The round before this left a file the Go formatter writes another way, and no gate read that. So the check now names each such file, one line a file, beside the module's own cases. A probe file carrying a bad indent turns the check red and names itself.
 
-The file opens on a comment, the way every config file in the tree does. So the case reading it names the maps it wants, and leaves the rest of the file alone. A colour the file holds nowhere leaves the style plain, and the window wears the terminal's own.
+The spare colours stand as a list, so the file's order is the order the window reads. `List` in the shared reader answers a list, where `Map` answers a map. The file's comment points at [[spec/design_output/viewer#colours]], which holds what each map carries.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The new module and the colours file. The three window files and their case files. The two module files and the shared list. The reader under the server, and the two notes.
-- every door the change reaches has a fake. Each case writes its own fixture root, and the window's case reads the shipped file alone.
-- a comment names the approach the change implements. Each new name points at the chapter the notes carry.
+- the change touches no file the ask leaves out. The check gains the format gate the class fix names. Every other file stands in the approach's table.
+- every door the change reaches has a fake. The gate runs its tool through the door the check runs every other tool through.
+- a comment names the approach the change implements. The gate carries a line naming the class it closes, and each new name points at its chapter.
 
 # verdict
 
