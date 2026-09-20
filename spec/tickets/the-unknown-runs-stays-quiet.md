@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -126,6 +126,17 @@ record:
     hash_after: fc582e2cc12da4a8264af9885dda592b544c75a1
     answered:
       - name: lint
+        exit: 0
+        said: 43 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: implement/tests-green
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 1d116db0aba79674e5bdb71bb84f337b147d4375
+    hash_after: 1d116db0aba79674e5bdb71bb84f337b147d4375
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 18 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: 43 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
