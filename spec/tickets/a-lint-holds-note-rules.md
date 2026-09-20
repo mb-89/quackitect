@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -159,6 +159,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-13
+    hash_before: 09ae626a4e7ac78a4507c16193cf68c041eae05e
+    hash_after: 09ae626a4e7ac78a4507c16193cf68c041eae05e
+    returns: 1
+    why: "| the finding | what to do |; |---|---|; | `spec/design_output/schema.md` names `matches` among the keywords drawing no finding. `markedFaults` draws off `matches`. | Give `matches` a row in the keyword table beside that line, and take it out of the sentence. |; | Three files point at [[spec/design_output/lsp#a-second-copy-draws]]. That chapter names the rules over a second copy of a fact, and neither rule this branch adds. | Open the chapter owning the marked reading. Point `marked.go`, its cases and the `History` case at the chapter owning each rule. |; | `.vale.ini` switches `History` off over `spec/tickets` too. The ask and the approach name the rationales alone. | Say the ticket switch in the approach. Otherwise drop it, and clear the marker `python-writes-pass-the-door` carries. |; | `wantedChapters` writes `held.at = indexOf(note, held.Line)`. `sectionNamed` hands that index back already. | Drop the second reading. |; What holds:; The ask lands, bullet by bullet.; `./RUNME.sh lint spec/guidance spec/rationales` exits 0.; `./RUNME.sh check` exits 0 on the tip.; `./RUNME.sh branch review the-rules-hold-themselves` says nothing to fix.; `TestAMarkedRuleWantsItsChapter` feeds the rule a rationale opening no chapter, and it draws.; The Vale case reads two markers refused and a standing claim passing.; Three quiet cases hold the rule off where the approach says.; Every marked rule in `spec/guidance` ends its line on the star.; Rule twelve leaves with its chapter, and `a-rule-names-its-failure` carries the return.; The files past this ask belong to the group's other tickets.; A retro stands in `HANDOVER.md`, and its third finding names the class of the second finding."
 ---
 
 # Ask
@@ -454,17 +460,67 @@ for a rewrite of each, and `a-rule-names-its-failure` carries that work.
 
 <!-- the form is files -->
 
+- spec/guidance/review/reviewing.md
+- spec/tickets/a-lint-holds-note-rules.md
+- spec/tickets/a-rule-names-its-failure.md
+- HANDOVER.md
+- .vale.ini
+- spec/config/styles/VoiceVale/History.yml
+- spec/schemas/rationale.schema.yaml
+- src/lsp/marked.go
+- src/lsp/marked_test.go
+- src/lsp/schema.go
+- src/lsp/schema_test.go
+- src/lsp/check.go
+- src/scripts/styles.js
+- spec/guidance/guidance.md
+- spec/rationales/guidance.md
+- spec/rationales/cloud.md
+- spec/rationales/tickets.md
+- spec/rationales/working.md
+- spec/rationales/code.md
+- spec/design_output/lsp.md
+- spec/design_output/schema.md
+- spec/design_output/index.md
+- spec/design_output/stop.md
+- test/contract/vale.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+| the finding | what to do |
+|---|---|
+| `spec/design_output/schema.md` names `matches` among the keywords drawing no finding. `markedFaults` draws off `matches`. | Give `matches` a row in the keyword table beside that line, and take it out of the sentence. |
+| Three files point at [[spec/design_output/lsp#a-second-copy-draws]]. That chapter names the rules over a second copy of a fact, and neither rule this branch adds. | Open the chapter owning the marked reading. Point `marked.go`, its cases and the `History` case at the chapter owning each rule. |
+| `.vale.ini` switches `History` off over `spec/tickets` too. The ask and the approach name the rationales alone. | Say the ticket switch in the approach. Otherwise drop it, and clear the marker `python-writes-pass-the-door` carries. |
+| `wantedChapters` writes `held.at = indexOf(note, held.Line)`. `sectionNamed` hands that index back already. | Drop the second reading. |
+
+What holds:
+
+- The ask lands, bullet by bullet.
+- `./RUNME.sh lint spec/guidance spec/rationales` exits 0.
+- `./RUNME.sh check` exits 0 on the tip.
+- `./RUNME.sh branch review the-rules-hold-themselves` says nothing to fix.
+- `TestAMarkedRuleWantsItsChapter` feeds the rule a rationale opening no chapter, and it draws.
+- The Vale case reads two markers refused and a standing claim passing.
+- Three quiet cases hold the rule off where the approach says.
+- Every marked rule in `spec/guidance` ends its line on the star.
+- Rule twelve leaves with its chapter, and `a-rule-names-its-failure` carries the return.
+- The files past this ask belong to the group's other tickets.
+- A retro stands in `HANDOVER.md`, and its third finding names the class of the second finding.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The markers stand in `History.yml` alone, and the chapter numbers in the rationales. The first two findings name the notes reading against the code.
 
 # Discussion
 
