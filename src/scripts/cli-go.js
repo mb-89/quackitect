@@ -21,7 +21,8 @@ function modulesUnder(it, folder) {
   if (!it.disk.exists(at)) return [];
   const out = [];
   for (const one of it.disk.list(at)) {
-    if (one.kind !== "dir") continue;
+    // A package folder holds no module of this tree, and it holds thousands of folders. [[spec/tickets/an-engine-takes-bridge-work]]
+    if (one.kind !== "dir" || one.name === "node_modules") continue;
     const below = `${folder}/${one.name}`;
     if (it.disk.exists(it.join(at, one.name, MOD))) out.push(below);
     else out.push(...modulesUnder(it, below));
