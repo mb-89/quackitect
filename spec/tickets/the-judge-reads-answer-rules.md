@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -149,6 +149,17 @@ record:
     hash_after: 89d13b0031887d1b346837c72ebca97e76edf80d
     returns: 1
     why: the hand takes it back
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: a5bdcd95250494a172a38885fcdb37a05209ad18
+    hash_after: a5bdcd95250494a172a38885fcdb37a05209ad18
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 12 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -276,7 +287,7 @@ pass
 <!-- the same tests pass -->
 <!-- the form is command -->
 
-./RUNME.sh branch test test/level0/guidance.test.js test/level0/level1.test.js test/level0/pull-leaves.test.js
+./RUNME.sh branch test test/level0/guidance.test.js test/level0/level1.test.js test/level0/pull-leaves.test.js test/contract/guidance-rules.test.js
 
 ### seen
 
@@ -285,30 +296,30 @@ pass
 
 The command answers assertion, and every failing case fails on its own assertion.
 
-A named import of a name the module answers nowhere breaks the whole file, and the door reads build over it. So each new case takes the module whole and asks the name is a function first. That surprises me: a red case for a name nobody writes yet stays red where the case takes the module whole.
-
-The standing case over `judgeAsk` numbers plain strings, so the label shape turns it red beside the new ones. The change makes it green again.
-
 | the case | what it holds open |
 |---|---|
 | the answer mark strips the way the star does | `actionables` leaves the mark standing |
 | a label carries the note's path beside the number | `labelOf` stands nowhere |
 | the rules for evidence drop the marked one | `forEvidence` stands nowhere |
 | a note of marked rules hands an empty list | the same |
+| a mark in a code span reads as the bare one | the same |
 | the judge's question names each rule by its label | `judgeAsk` numbers from one |
 | the labels open on follows | `judgeLabels` stands nowhere |
 | a label reads back to the note and the line | `ruleBroken` stands nowhere |
 | a label outside the set reads as follows | the same |
 | the judge's material names the rules its reads name | the material hands plain strings |
 | the judge's ask leaves the answer rules out | the material keeps every rule |
+| the shipped note keeps its answer rules out | the note carries no mark |
+
+A named import of a name the module answers nowhere breaks the whole file, and the door reads build over it. So each new case takes the module whole and asks the name is a function first. That surprises me: a red case for a name nobody writes yet stays red where the case takes the module whole. The standing case over `judgeAsk` numbers plain strings, so the label shape turns it red beside the new ones.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. Three case files and this ticket, one case file per piece the approach names.
-- every door the change reaches has a fake. The pull cases reach the disk through the fake in the pull doors, and the library cases touch memory alone.
+- the change touches no file the ask leaves out. Four case files and this ticket, one per piece the approach names.
+- every door the change reaches has a fake. The pull cases reach the disk through the fake in the pull doors. The library cases touch memory alone. The case reading the shipped note stands under test/contract.
 - a comment names the approach the change implements. Each case carries a line pointing at this ticket, and the fixture comment names the answer mark.
 
 ## reflect

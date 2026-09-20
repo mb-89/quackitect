@@ -3,7 +3,7 @@
 // the record, moves the step, commits, pushes, and hands out the next leaf.
 // [[spec/design_output/pull#the-answers]]
 
-import { forEvidence } from "../../.claude/skills/level0/lib/guidance.js";
+import { actionables } from "../../.claude/skills/level0/lib/guidance.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { checkNote } from "../../.claude/skills/level0/lib/schema.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
@@ -303,9 +303,8 @@ export function judgeMaterial(it, held, name) {
       .filter(([field, rows]) => rows.length && !commands.has(field))
       .flatMap(([field, rows]) => [`${field}:`, ...rows]),
   ].join("\n");
-  // A label names the note beside the number, so one label reaches one rule. [[spec/design_output/pull#the-checks]]
   const rules = (leaf?.reads ?? []).flatMap((path) =>
-    forEvidence(guidanceText(it, path), path),
+    actionables(guidanceText(it, path)),
   );
   console.log(
     JSON.stringify({ ticket: held.ticket, step: held.step, evidence, rules }),

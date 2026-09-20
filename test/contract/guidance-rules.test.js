@@ -6,7 +6,9 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { test } from "node:test";
-import { actionables, forEvidence } from "../../.claude/skills/level0/lib/guidance.js";
+import { actionables } from "../../.claude/skills/level0/lib/guidance.js";
+// The whole module, so a name the library answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
+import * as lib from "../../.claude/skills/level0/lib/guidance.js";
 import { disk } from "../../src/doors/disk.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -15,8 +17,9 @@ const text = disk().read(join(root, "spec", "guidance", "voice.md"));
 
 // [[spec/tickets/the-judge-reads-answer-rules]]
 test("the shipped voice note keeps its answer rules out of the judge's material", () => {
+  assert.equal(typeof lib.forEvidence, "function", "the library answers forEvidence");
   const said = actionables(text);
-  const rules = forEvidence(text, NOTE);
+  const rules = lib.forEvidence(text, NOTE);
 
   assert.ok(rules.length, "the note hands the judge rules");
   assert.ok(rules.length < said.length, "the marked rules stand out of the material");
