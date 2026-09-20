@@ -16,49 +16,57 @@ async function hookHere() {
   return import(`../../.claude/skills/level0/hooks/level0.js?case=${made}`);
 }
 
-// The harness the bridgehead reaches: a wire, a file system and a process. [[spec/design_output/doors#a-fake-behaves]]
-function harness({ answers = false, exitCode = 0, stderr = "" } = {}) {
+// The harness the bridgehead reaches: a wire, a file system, a process and the lines a person reads. [[spec/design_output/doors#a-fake-behaves]]
+function harness({ answers = false, exitCode = 0, stderr = "", ui = true, logs = true } = {}) {
   const wrote = new Map();
   const ran = [];
-  return {
-    wrote,
-    ran,
-    $: {
-      http: {
-        fetch: async () => {
-          if (!answers) throw new Error("fetch failed");
-          return { ok: true, status: 200, text: JSON.stringify({ pass: true }) };
-        },
+  const said = [];
+  let up = answers;
+  const $ = {
+    http: {
+      fetch: async () => {
+        if (!up) throw new Error("fetch failed");
+        return { ok: true, status: 200, text: JSON.stringify({ pass: true }) };
       },
-      fs: {
-        read: async (path) => {
-          if (!wrote.has(path)) throw new Error("no file");
-          return wrote.get(path);
-        },
-        write: async (path, text) => void wrote.set(path, text),
+    },
+    fs: {
+      read: async (path) => {
+        if (!wrote.has(path)) throw new Error("no file");
+        return wrote.get(path);
       },
-      process: {
-        run: async (argv) => {
-          ran.push(argv);
-          return { exitCode, stderr };
-        },
+      write: async (path, text) => {
+        if (!logs) throw new Error("the log stands read only");
+        wrote.set(path, text);
+      },
+    },
+    process: {
+      run: async (argv) => {
+        ran.push(argv);
+        return { exitCode, stderr };
       },
     },
   };
+  if (ui) $.ui = { log: (line) => said.push(String(line)) };
+  return { wrote, ran, said, $, serves: (on) => void (up = on) };
 }
 
-async function opensThen(hook, box, e) {
+// One event through the bridgehead's own door, so a case drives the road event by event. [[spec/tickets/the-bridge-says-it-falls]]
+function runner(hook, box) {
   const held = {};
   hook.register((event, ...rest) => {
     held[event] = rest.at(-1);
   }, {});
   const star = held["*"];
-  const runs = (event, said) =>
+  return (event, said) =>
     star(
       box.$,
-      said,
+      said ?? {},
       Object.assign(async (back) => back ?? {}, { event }),
     );
+}
+
+async function opensThen(hook, box, e) {
+  const runs = runner(hook, box);
   await runs("session.start", { cwd: HERE });
   return runs("prompt.context", e ?? {});
 }
@@ -142,4 +150,82 @@ test("the block names the code, what it means, and what a person runs", async ()
   const said = hook.cageText(NO_MODULES, "");
   assert.match(said, new RegExp(hook.reasonOf(NO_MODULES)[1]));
   assert.match(said, /RUNME\.sh/);
+});
+
+// A fall reaches the person at the moment it falls, beside the row the log takes. [[spec/tickets/the-bridge-says-it-falls]]
+test("a server answering nothing at a later event says so in the chat", async () => {
+  const hook = await hookHere();
+  const box = harness();
+  const runs = runner(hook, box);
+  await runs("session.start", { cwd: HERE });
+  await runs("tool.call", { tool: "Read" });
+
+  const lines = box.said.join("\n");
+  assert.match(lines, /answers nothing/, "the chat carries the fall");
+  assert.match(lines, /6510/, "and names the health call");
+  assert.match(lines, /RUNME\.sh serve/, "and what a person runs");
+});
+
+// [[spec/tickets/the-bridge-says-it-falls]]
+test("the session start says nothing, because the start road runs under it", async () => {
+  const hook = await hookHere();
+  const box = harness();
+  const runs = runner(hook, box);
+  await runs("session.start", { cwd: HERE });
+
+  assert.deepEqual(box.said, [], "a healthy cloud start draws no line");
+  assert.match(
+    [...box.wrote.values()].join("\n"),
+    /answers nothing/,
+    "the log row stands as it does",
+  );
+});
+
+// [[spec/tickets/the-bridge-says-it-falls]]
+test("a second event answering nothing says it once", async () => {
+  const hook = await hookHere();
+  const box = harness();
+  const runs = runner(hook, box);
+  await runs("session.start", { cwd: HERE });
+  await runs("tool.call", { tool: "Read" });
+  await runs("tool.call", { tool: "Edit" });
+
+  assert.equal(box.said.length, 1, "the flag holds the line to one");
+});
+
+// [[spec/tickets/the-bridge-says-it-falls]]
+test("a server answering, then falling, says it again", async () => {
+  const hook = await hookHere();
+  const box = harness({ answers: true });
+  const runs = runner(hook, box);
+  await runs("session.start", { cwd: HERE });
+  await runs("tool.call", { tool: "Read" });
+  assert.deepEqual(box.said, [], "a standing server draws no line");
+
+  box.serves(false);
+  await runs("tool.call", { tool: "Edit" });
+  assert.equal(box.said.length, 1, "the fall after an answer says so");
+});
+
+// [[spec/tickets/the-bridge-says-it-falls]]
+test("a harness carrying no chat log leaves the row alone", async () => {
+  const hook = await hookHere();
+  const box = harness({ ui: false });
+  const runs = runner(hook, box);
+  await runs("session.start", { cwd: HERE });
+  await runs("tool.call", { tool: "Read" });
+
+  assert.match([...box.wrote.values()].join("\n"), /answers nothing/);
+});
+
+// [[spec/tickets/the-bridge-says-it-falls]]
+test("a session log that takes no write leaves the chat line paid", async () => {
+  const hook = await hookHere();
+  const box = harness({ logs: false });
+  const runs = runner(hook, box);
+  await runs("session.start", { cwd: HERE });
+  await runs("tool.call", { tool: "Read" });
+  await runs("tool.call", { tool: "Edit" });
+
+  assert.equal(box.said.length, 1, "the flag stands off the log's answer");
 });

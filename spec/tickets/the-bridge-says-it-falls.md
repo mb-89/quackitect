@@ -245,17 +245,46 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Six cases stand in `test/level0/start-road.test.js`, and four fail on their
+own assertion.
+
+| the case | what it reads |
+|---|---|
+| a fall at a later event | one chat line, and the chat stands empty |
+| the session start | no chat line, which holds today |
+| two events answering nothing | one line, and the chat stands empty |
+| a server answering, then falling | a line after the fall, and the chat stands empty |
+| a harness carrying no chat log | the row alone, which holds today |
+| a session log taking no write | one line, and the chat stands empty |
+
+The two passing cases guard the road. The session start draws nothing today
+because nothing draws anything, so that case turns green the moment the guard
+lands wrong.
+
+**What surprises.** The harness of this file offers the bridgehead a wire, a
+file system and a process, and no chat log at all. So the road the ask wants
+has nobody to speak to under a case until the fake grows one.
+
+The fake grows a chat log and a switch that takes the server down mid-run. That
+switch is what reads a fall apart from a server standing down from the start.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases reach the one test file holding this road, and nothing else changes
+- the bridgehead meets a fake wire, a fake file system and a fake chat log
+- a comment over each case points at this ticket, which carries the approach
 
 ## reflect
 
