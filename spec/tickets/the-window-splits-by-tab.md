@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: 26ff5a9f663ef22eecf1e2bf97200e2bcac0f0f7
     returns: 2
     why: "design: The chapter names what `src/tui/draw` holds, and the approach adds the filter language and the link there, so the chapter's row takes them and the approach points at the chapter alone.; design: The filter pane lights a pressed preset off the work tree's sorts in `presses`, so the tab interface grows the method the pane reads a pressed preset through.; craft: The pane and the help read `part` and `renderParts` in `detail.go`, so those part to the frame before the details move to the log tab.; craft: The build stamp lists the files standing directly under the folders `foldersOf` names, so the approach says the stamp changes to walk the packages.; craft: `gutterWide` in `sort.go` is read by the tree's draw and sort, so it parts to the draw package before the columns move to the log tab."
+  - step: design/draft
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 84bdba8a528c2eb061bb48711c943b3436a1b1e8
+    hash_after: 84bdba8a528c2eb061bb48711c943b3436a1b1e8
 ---
 
 # Ask
@@ -147,9 +151,9 @@ ticket tree.
 
 | the piece | where it lands |
 |---|---|
-| `cut`, `pad`, `oneLine`, `Wrap`, the palette and the styles | `src/tui/draw`, which imports nothing of this tree's |
-| the filter language in `filter.go` | `src/tui/draw`, because the log row and the tree item both read it, and the tree imports the draw package alone |
-| the link in `link.go` | `src/tui/draw`, because the tree draws it and the work tab draws it |
+| `cut`, `pad`, `oneLine`, `Wrap`, `gutterWide`, the palette and the styles | `src/tui/draw`, which imports nothing of this tree's |
+| the filter language in `filter.go` and the link in `link.go` | `src/tui/draw`, because the tree and a tab both read them, and the tree imports the draw package alone. The chapter's row for the draw package takes them, so the approach and the chapter say one thing |
+| `part` and `renderParts` in `detail.go` | `src/tui/frame`, because the panes and the help read them, and they part before the details move to the log tab |
 | `saidStyle` in `colour.go` | the log tab, because it reads a log record, and the styles part from it first |
 | the tree, its rows, its edit, its marks, its sorts, its flags and the base file | `src/tui/tree` |
 | the place chord's tree reads | the work tab, as functions over a tree, because the tree knows no queue key |
@@ -167,14 +171,16 @@ The tab interface grows what the frame reads through it:
 | `Move` and `Jump` | the arrows, the page keys, home and end move the open tab's selection |
 | `Press` | a press on the left side reaches the open tab |
 | `Narrow` and `Sorted` | the filter line and a preset's sort reach the open tab |
+| `Pressed` | the pane lights a preset carrying a sort alone off the tab's own order |
 | `Marks` | the footer draws the order and the floor off the first tab, which is the log |
 
 `Frame` in the root package reaches the log tab through its exported fields,
 and sets its rows, its filter and its floor there. A name a tab package reads
 takes a capital, and the rename reaches every file naming it. The tests move
 with the code they drive, and the window tests stay in the root package. The
-build stamp in `src/scripts/tui-build.js` reads every folder under `src/tui`,
-so a change under any package rebuilds the viewer.
+build stamp in `src/scripts/tui-build.js` lists the files standing in the
+folders it names, so it changes to walk every package under `src/tui`, and a
+change under any of them rebuilds the viewer.
 
 ## review
 
