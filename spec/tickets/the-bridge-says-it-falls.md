@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -155,6 +155,17 @@ record:
     hash_after: b689a36ba3cc53131eb05f93878e552c7e33a158
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: f07dae3e1e07023c2fd825d3c8cb6b7290e97d25
+    hash_after: 0a371db4684261c89452676b620e670330f0eb38
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 397 test(s) pass in 37 file(s); green, src/engine/swap passes
+      - name: check
         exit: 0
         said: The rules pass.
 ---
