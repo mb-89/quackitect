@@ -36,3 +36,12 @@ from the network, and one swept the whole tree twice. So the check times each
 part and keeps the slowest cases, collect keeps one report a retro, and effect
 reads the two side by side. A part or a case that grows is a finding like any
 other. A case that earns its time no more is one to cut.
+
+## 7. A case earns its time
+
+The slowest cases spawn real programs: Vale, a shell, a node. A reading of
+the first battery report found two hundred Vale spawns across seven files
+running at once. The load alone turned a green case red. So the reader asks
+of each slow case what it proves, and what it reaches past a fake. A case
+proving a rule over one line spawns once over a text of many lines. A case
+proving a copy stands alone reaches no network and no editor.
