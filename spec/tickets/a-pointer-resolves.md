@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -129,6 +129,12 @@ record:
       - name: check
         exit: 0
         said: 23 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box 1670436ae0bb · claude-code-remote · helper-7
+    hash_before: 1fedd6676ad31afb25a895f91f751c0779142fc0
+    hash_after: 1fedd6676ad31afb25a895f91f751c0779142fc0
+    returns: 1
+    why: "The rule, its five cases, the row in `Rules` and the per-file check do what the ask calls for.; The chapter-nobody-wrote case feeds the rule a dead pointer and asserts one error naming the file and the line.; `./RUNME.sh check` on the branch answers 0, with 23 warnings, all in this ticket.; `./RUNME.sh branch review` answers check 1 on an untracked `plugin.json` the review worktree lacks. That is the box, and the branch's own check answers 0.; No retro stands in the handback.; Craft: `lib/tested.js` and `test/level0/tested.test.js` stand whole in tabs. `spec/config/biome.json` says space, and `biome format` refuses both. Format them back, so the hunk shows the one function it adds.; Craft: `lsp#one-shape-every-door-prints` writes the Finding shape a third time, after `tree#what-a-rule-answers` and `schema#a-finding-names-the-section`. Point at one of them.; Craft: `tree#the-rules-over-two-files` says its rules live in `lib/tree.js`, and the new row names a Go rule. One line says the server holds this one.; Design: a `reads:` line of a process file writes a pointer a reader follows, and the rule reads a comment alone outside a note. A dead pointer there passes the check. The approach scoped it so and the review passed it, so this goes to design and not to the drafter.; The rule tries `.yaml` and `.yml` where the index tries `.md` alone. The sound-pointers case covers a process file, and the chapter names the endings without the reason. Trivial.; The sentence split in `the-unknown-runs-stays-quiet.md` stands outside the ask and redesigns nothing."
 ---
 
 # Ask
@@ -342,17 +348,92 @@ a fixture a test writes. The door's change carries its own case.
 
 <!-- the form is files -->
 
+- spec/guidance/review/reviewing.md
+- spec/tickets/a-pointer-resolves.md
+- src/lsp/pointer.go
+- src/lsp/pointer_test.go
+- src/lsp/check.go
+- src/lsp/main.go
+- src/lsp/serve.go
+- src/lsp/tree.go
+- src/lsp/restated.go
+- src/lsp/note.go
+- src/lsp/fixture_test.go
+- src/index/index.go
+- spec/design_output/lsp.md
+- spec/design_output/tree.md
+- spec/design_output/schema.md
+- spec/design_output/index.md
+- spec/design_output/editor.md
+- spec/design_output/work.md
+- spec/design_output/pull.md
+- spec/design_output/level0.md
+- spec/design_output/log.md
+- spec/design_output/extension.md
+- spec/design_input/the-agent-pulls-tickets.md
+- spec/guidance/voice.md
+- spec/schemas/guidance.schema.yaml
+- spec/schemas/paragraph.schema.yaml
+- spec/processes/retro.yaml
+- spec/config/biome.json
+- .claude/output-styles/level0.md
+- .claude/skills/level0/lib/tested.js
+- .claude/skills/level0/lib/answer.js
+- .claude/skills/level0/lib/refuse.js
+- .claude/skills/level0/lib/stop.js
+- test/level0/tested.test.js
+- test/level0/stop.test.js
+- test/level0/pull-leaves.test.js
+- test/level0/projection.test.js
+- test/level0/states.test.js
+- test/level0/viewer.test.js
+- test/level0/window-door.test.js
+- test/contract/cli-verbs.test.js
+- src/bridge/bash.js
+- src/bridge/findings.js
+- src/bridge/stop.js
+- src/scripts/cli.js
+- src/scripts/cli-check.js
+- src/scripts/cli-doors.js
+- src/scripts/cli-read.js
+- src/scripts/guidance-hand.js
+- src/scripts/pull-route.js
+- src/scripts/pull.js
+- src/scripts/work-answer.js
+- src/scripts/work.js
+- src/tui/help.go
+- src/tui/tree_test.go
+- spec/tickets/a-log-verb-reads-sessions.md
+- spec/tickets/a-step-changes-hands.md
+- spec/tickets/the-unknown-runs-stays-quiet.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+- The rule, its five cases, the row in `Rules` and the per-file check do what the ask calls for.
+- The chapter-nobody-wrote case feeds the rule a dead pointer and asserts one error naming the file and the line.
+- `./RUNME.sh check` on the branch answers 0, with 23 warnings, all in this ticket.
+- `./RUNME.sh branch review` answers check 1 on an untracked `plugin.json` the review worktree lacks. That is the box, and the branch's own check answers 0.
+- No retro stands in the handback.
+- Craft: `lib/tested.js` and `test/level0/tested.test.js` stand whole in tabs. `spec/config/biome.json` says space, and `biome format` refuses both. Format them back, so the hunk shows the one function it adds.
+- Craft: `lsp#one-shape-every-door-prints` writes the Finding shape a third time, after `tree#what-a-rule-answers` and `schema#a-finding-names-the-section`. Point at one of them.
+- Craft: `tree#the-rules-over-two-files` says its rules live in `lib/tree.js`, and the new row names a Go rule. One line says the server holds this one.
+- Design: a `reads:` line of a process file writes a pointer a reader follows, and the rule reads a comment alone outside a note. A dead pointer there passes the check. The approach scoped it so and the review passed it, so this goes to design and not to the drafter.
+- The rule tries `.yaml` and `.yml` where the index tries `.md` alone. The sound-pointers case covers a process file, and the chapter names the endings without the reason. Trivial.
+- The sentence split in `the-unknown-runs-stays-quiet.md` stands outside the ask and redesigns nothing.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place, and a note points at the file instead of repeating it. Four of the five new chapters own their facts, and every repoint lands on a chapter that stands. The Finding table repeats two notes, and the fix above names it.
 
 # Discussion
 
