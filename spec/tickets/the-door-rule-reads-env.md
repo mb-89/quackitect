@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -135,6 +135,12 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: feea15d7cece4654886fa5fd6d5ee41d40af4e1b
     hash_after: feea15d7cece4654886fa5fd6d5ee41d40af4e1b
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-10
+    hash_before: f125f932c65b5d0ee3d991432e55358de934e553
+    hash_after: f125f932c65b5d0ee3d991432e55358de934e553
+    returns: 5
+    why: The tests read the environment, and the pass list names none of them.; `test/contract/*.js` reads `process.env` and `process.platform`, and; `test/level0/*.js` sets `process.env` around a case. The `check` verb runs; `lint` over the whole tree, so the rule turns the check red. Say which of the; two folders stands off, and which takes the value off a hand.; A section stands a file off `DoorsOnly` whole, and that rule refuses a `node:`; import outside the doors today. So every root the pass list gains gives that; refusal up beside the environment read. Say whether a rule file of its own; carries the reading, or the roots give the import guard up.; The Go table names `src/lsp`, `src/index`, `src/viewer` and `src/swap`, and; `src/yaml` stands outside it. Name that package beside the four, with what; moves for it.; `src/scripts/cli-check.js` reads `process.version`, and; `src/scripts/cli-doors.js` reads `process.execPath`. The pass list covers both; files, so name the two reads beside `process.pid`, where the scope hands a; read to the later ticket.; The findings of the round before stand answered. `src/scripts/vehicle.js`; takes a `windows` argument off its callers, the extension grows the section; standing, and `process.pid` rides a private note to the retro.
 ---
 
 # Ask
@@ -241,21 +247,25 @@ door in each. So this ticket holds the rule to `os/exec`, and
 
 fail
 
-- `src/scripts/vehicle.js` carries no `it`: `registerDirs` and `readRegister`
-  open on `(files, env)`, and `cli.js`, `cli-doors.js` and
-  `src/bridge/vehicle.js` call them that way. The `windows` `cli-check.js`
-  builds rides the viewer's hand alone, and vehicle sees none of it. Say which
-  caller carries the platform in, or stand the file off as a root.
-- The pass list opens `**/src/extension/*.js`, and `.vale.ini` stands
-  `**/src/extension/editor*.js` off already, so two sections cover the editor
-  files. Grow the section standing, the way the stub's row reads now.
-- The rule draws on `process.env`, `process.argv` and `process.platform`, and
-  `src/scripts/vehicle.js` reads `process.pid` outside a door. Name what the
-  scope leaves to a later ticket, beside the three reads it takes.
-- The findings of the round before stand answered. The spawn in
-  `src/index/main.go` moves into `src/index/door.go`. The Go scope reads
-  `os/exec` in the table and the paragraph alike. `trust.js` and `copilot.js`
-  reach the pass list, and the stub's bridgehead keeps its one section.
+- The tests read the environment, and the pass list names none of them.
+  `test/contract/*.js` reads `process.env` and `process.platform`, and
+  `test/level0/*.js` sets `process.env` around a case. The `check` verb runs
+  `lint` over the whole tree, so the rule turns the check red. Say which of the
+  two folders stands off, and which takes the value off a hand.
+- A section stands a file off `DoorsOnly` whole, and that rule refuses a `node:`
+  import outside the doors today. So every root the pass list gains gives that
+  refusal up beside the environment read. Say whether a rule file of its own
+  carries the reading, or the roots give the import guard up.
+- The Go table names `src/lsp`, `src/index`, `src/viewer` and `src/swap`, and
+  `src/yaml` stands outside it. Name that package beside the four, with what
+  moves for it.
+- `src/scripts/cli-check.js` reads `process.version`, and
+  `src/scripts/cli-doors.js` reads `process.execPath`. The pass list covers both
+  files, so name the two reads beside `process.pid`, where the scope hands a
+  read to the later ticket.
+- The findings of the round before stand answered. `src/scripts/vehicle.js`
+  takes a `windows` argument off its callers, the extension grows the section
+  standing, and `process.pid` rides a private note to the retro.
 
 # implement
 
