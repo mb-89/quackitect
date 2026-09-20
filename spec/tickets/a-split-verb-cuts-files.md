@@ -89,12 +89,18 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: 258c594894a140c023429cb14b35509ce9f17ed6
     hash_after: 258c594894a140c023429cb14b35509ce9f17ed6
+  - step: design/review
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 9ba66489302a66beb6191050d36b1eb605d31e44
+    hash_after: 9ba66489302a66beb6191050d36b1eb605d31e44
+    returns: 1
+    why: "the mint says nothing about a second refusal, so one file past the ceiling takes a ticket each time; say which hand runs the mint: the door itself, or the hand the refusal names; the journal's writer reads as a verb. Name `src/bridge/apply.js`, the batch edit behind the patch and replace tools; the flags table stands here and in the level0 note. Say which of the two owns it; the ask names `./RUNME.sh test`, and the approach names no case file the cut and the mint land in; `sizeFaults`, `FILE_RULE`, `journalOf` and the `trivial` process all stand, and the ceiling chapter takes the verb; `./RUNME.sh lint src test` answers clean, so the verb guards the next file and cuts none today"
 ---
 
 # Ask
@@ -152,8 +158,17 @@ The refusal that mints:
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- the mint says nothing about a second refusal, so one file past the ceiling takes a ticket each time
+- say which hand runs the mint: the door itself, or the hand the refusal names
+- the journal's writer reads as a verb. Name `src/bridge/apply.js`, the batch edit behind the patch and replace tools
+- the flags table stands here and in the level0 note. Say which of the two owns it
+- the ask names `./RUNME.sh test`, and the approach names no case file the cut and the mint land in
+- `sizeFaults`, `FILE_RULE`, `journalOf` and the `trivial` process all stand, and the ceiling chapter takes the verb
+- `./RUNME.sh lint src test` answers clean, so the verb guards the next file and cuts none today
 
 # implement
 
