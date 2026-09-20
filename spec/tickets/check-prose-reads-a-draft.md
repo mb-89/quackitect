@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -149,6 +149,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 099c2ec7708d · claude-code-remote · helper-11
+    hash_before: 596e5590af3e8f6884ca7542016051c09e9df96a
+    hash_after: 596e5590af3e8f6884ca7542016051c09e9df96a
+    returns: 1
+    why: "The tool registers and answers nothing, so the ask's first two bullets stand open.; `readsDraft` answers a bare string, where `onToolCall` takes `{ result: { result: text } }`.; A live call to the tool answers the engine line naming no hook for it.; So the tool reads a draft and hands the reader no finding.; Every other handler carries the shape: `reports`, `runsFind`, `claims`, `reviewsBranch`.; `test/level0/prose.test.js` asserts the handler is a function, and reads no answer through the dispatch.; The fix: answer `{ result: { result: text } }`, and drive `TOOLS[PROSE_CALL]` in a case.; What stands:; `./RUNME.sh check` answers 0 on this commit, and 1264 cases run.; The diff touches the six files the ask and the approach name, and nothing else.; `proseFaults` holds the door's read once, and `voiceDoor` keeps its logging and its refusal.; `CODE.test(where)` reads the same extension the old guard reads, so the door holds its ground.; `spec/design_output/level0.md` carries the chapter, and `src/bridge/server.js` registers the pair.; The branch review answers retro absent from the handback, which the route takes after this step."
 ---
 
 # Ask
@@ -366,20 +372,53 @@ What a caller hands in:
 ## read
 
 <!-- every file you read, one a line -->
-
 <!-- the form is files -->
+
+- spec/tickets/check-prose-reads-a-draft.md
+- src/bridge/write.js
+- src/bridge/prose.js
+- src/bridge/server.js
+- src/bridge/report.js
+- src/bridge/search.js
+- test/level0/prose.test.js
+- spec/design_output/level0.md
+- .claude/skills/level0/lib/refuse.js
+- .claude/skills/level0/lib/code.js
+- .claude/skills/level0/lib/answer.js
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+The tool registers and answers nothing, so the ask's first two bullets stand open.
+
+- `readsDraft` answers a bare string, where `onToolCall` takes `{ result: { result: text } }`.
+- A live call to the tool answers the engine line naming no hook for it.
+- So the tool reads a draft and hands the reader no finding.
+- Every other handler carries the shape: `reports`, `runsFind`, `claims`, `reviewsBranch`.
+- `test/level0/prose.test.js` asserts the handler is a function, and reads no answer through the dispatch.
+- The fix: answer `{ result: { result: text } }`, and drive `TOOLS[PROSE_CALL]` in a case.
+
+What stands:
+
+- `./RUNME.sh check` answers 0 on this commit, and 1264 cases run.
+- The diff touches the six files the ask and the approach name, and nothing else.
+- `proseFaults` holds the door's read once, and `voiceDoor` keeps its logging and its refusal.
+- `CODE.test(where)` reads the same extension the old guard reads, so the door holds its ground.
+- `spec/design_output/level0.md` carries the chapter, and `src/bridge/server.js` registers the pair.
+- The branch review answers retro absent from the handback, which the route takes after this step.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The chapter `A note reads clean first` owns the tool's table, and no other note repeats it.
+- Each new header and each case points at that chapter by link, so one place owns the fact.
+- The finding above names the file and the line, and repeats no code the tree holds.
 
 # Discussion
 
