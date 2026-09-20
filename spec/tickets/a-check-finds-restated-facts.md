@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 6a13ae8d7f28100b1d965bdbe2a123cb63564677
     returns: 1
     why: "The call site sits where a named path skips it. [[spec/design_output/tree#when-the-sweep-runs]]; `./RUNME.sh lint spec` runs Vale alone, and the ask wants that verb to name every place.; Name the file holding `restatedFaults`, because `tree.js` stands near the ceiling `code.fileLines` sets.; Name each bound's key, and its entry in `spec/config/level0.schema.json`, which every control takes.; The script rule blanks inside the projection, so name the JavaScript this rule blanks with.; Say which reading Vale keeps, because a paragraph against its own table reads one buffer."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 48ee2a38e214aa067dd910d91e9302fcccf09095
+    hash_after: 48ee2a38e214aa067dd910d91e9302fcccf09095
 ---
 
 # Ask
@@ -126,30 +130,40 @@ A sentence counts its own table, a header retells its pointer, and the copies dr
 
 <!-- the form is text -->
 
-One measure answers the three: the longest run of words two places share.
+One measure answers the three: the longest run of words two places share. Each
+rule lands where its reading belongs, because Vale hands a rule one buffer:
 
-| the finding | what it reads | what it draws on |
+| the finding | where it lands | what it reads |
 |---|---|---|
-| `RestatedTable` | a paragraph touching a table, against the cells of that table | a shared run |
-| `RestatedPointer` | a heading, against the heading its pointer names | a shared run |
-| `RestatedRule` | a rule line, against every rule line of another guidance note | a longer shared run |
+| `RestatedTable` | the paragraph schema, projected into Vale | a paragraph and the table touching it, in one buffer |
+| `RestatedPointer` | `restatedFaults` in `.claude/skills/level0/lib/restated.js` | a heading, and the heading its pointer names in another note |
+| `RestatedRule` | the same module | a rule line, against every rule line of another guidance note |
+
+The two reading a pair of notes stand in a module of their own, because
+`tree.js` stands near the ceiling `code.fileLines` sets.
 
 The pieces:
 
-- `sharedRun(a, b)` in a module of its own answers the longest run two texts share
-- `restatedFaults(tree, bounds)` walks the notes and hands each pair to that one function
-- the lint calls it beside `treeFaults` in `src/scripts/cli-read.js`, so the verb names every place
-- each bound takes a name under `spec/config/level0.json`, so a reader moves it and touches no code
-
-The reader:
-
+- `sharedRun(a, b)` answers the longest run two texts share, and each rule reads its own bound
+- the module blanks a code span, a link and a fence, the way `blanked` reads beside the prose reader
 - a pointer resolves through the slug the vocabulary note names, so it reads the heading a reader clicks
-- a code span, a link and a fence blank first, the way every script rule blanks them
-- a table row reads as cells, so a sentence matching one cell draws and a table matching itself draws nothing
+- a rule line reads as the text after its number, so the mark before it counts for nothing
 
-The rule lands at warning, and the implement step lists what it names over the
-tree. The ticket cleaning those places turns it to error. So this one leaves no
-fault standing behind a green check.
+The lint calls it for a named path too. The tree rules run over the whole tree
+alone today, so this one takes the paths in hand and reads the notes under
+them. [[spec/design_output/tree#when-the-sweep-runs]]
+
+Each bound takes a key, and each key an entry in `spec/config/level0.schema.json`:
+
+| key | what it bounds |
+|---|---|
+| `restated.table` | the run a paragraph shares with the table touching it |
+| `restated.pointer` | the run a heading shares with the heading its pointer names |
+| `restated.rule` | the run two rule lines of two notes share |
+
+The two rules in JavaScript land at warning, and the implement step lists what
+they name over the tree. The ticket cleaning those places turns them to error.
+So this one leaves no fault standing behind a green check.
 
 ## review
 
