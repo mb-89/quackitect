@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box a05106ef44c2 · claude-code-remote
     hash_before: e109f61cc1a6b3ccea6e04166b53198a4a4dd376
+  - step: sync
+    hand: box a05106ef44c2 · claude-code-remote
+    hash_before: aa55a245ab13fbae267d4d2ad4508efc0b2f767d
+    hash_after: aa55a245ab13fbae267d4d2ad4508efc0b2f767d
+    answered:
+      - name: sync
+        exit: 0
+        said: work/findings already carries every commit on main.
 ---
 
 # Ask
@@ -91,9 +99,7 @@ The findings the desk parked as private notes, each a defect an agent fixes with
 
 ## sync
 
-<!-- branch sync, so the branch carries trunk -->
-
-<!-- the form is command -->
+./RUNME.sh branch sync
 
 # split
 
