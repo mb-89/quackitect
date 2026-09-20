@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -183,6 +183,17 @@ record:
     hash_after: 6f38b6aa113c7aa846ab07ccf9857e8b4e672954
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 201fd0e3b377d851630008332f39720037e166a7
+    hash_after: 201fd0e3b377d851630008332f39720037e166a7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 44 test(s) pass in 3 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -390,26 +401,45 @@ A named import of a name the module answers nowhere breaks the whole file, and t
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/guidance.test.js test/level0/level1.test.js test/level0/pull-leaves.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The judge now answers a label, and each label names one rule.
+
+| what changes | how |
+|---|---|
+| the guidance schema | carries `answerMarker` beside `detailMarker` |
+| the guidance library | strips both marks, and answers `labelOf` and `forEvidence` |
+| the pull's material | hands one labelled rule per rule the leaf's reads name |
+| the wrapper under level one | asks by label, and `ruleBroken` reads a label back to its note |
+| the voice note | marks its two answer rules |
+| [[spec/design_output/pull#the-checks]] | carries the two sections under it |
+
+A rule describing an answer ends in the answer mark, the way a rule wanting argument ends in the star. `forEvidence` drops the marked rules and keeps the chapter's own numbering. So a refusal names the note, the number and the rule's own line, and a reader opens one place.
+
+The note writes the mark in a code span, because the paragraph rules admit the character nowhere else in prose. The library strips either form, so every reader of the chapter reads the rule whole.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. Each file the approach's table names, and the case files beside them.
+- every door the change reaches has a fake. The pull cases reach the disk through the fake in the pull doors.
+- a comment names the approach the change implements. Each new function points at the chapter the approach names.
 
 # verdict
 
