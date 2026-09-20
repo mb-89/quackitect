@@ -291,7 +291,7 @@ const CHECKS = {
   "no-stop-line": (held) =>
     !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed),
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
-  "a-person-sits-here": (held) => !inCloud(held.box.env ?? process.env),
+  "a-person-sits-here": (held) => !inCloud(held.box.env ?? {}),
   // [[spec/tickets/the-spawn-reaches-its-guidance]]
   "warnings-standing": (held) => handWanted(held.box),
 };
@@ -357,7 +357,7 @@ function promptsIn(box) {
 
 // A desk bound to the queue on trunk has work while a free ticket stands, so a stop on completion waits. [[spec/design_output/stop#the-mechanical-checks]]
 function queueWaits(box) {
-  if (inCloud(box.env ?? process.env)) return false;
+  if (inCloud(box.env ?? {})) return false;
   if (asks(box, BINDING) !== QUEUE) return false;
   if (branchOf(box) !== "main") return false;
   const texts = readFolder(box.disk, join(box.work, "spec", "tickets"), ".md").map((one) => one.text);

@@ -115,6 +115,18 @@ test("the queue rule reads the cloud off the box's own environment", () => {
   const desk = box({ [at("spec/tickets/a-free.md")]: free });
   const held = onStop(done, desk.box);
   assert.match(held.result.block, /The queue holds work for this box/);
+
+  // A box carrying no map reads as a desk, whatever the process around it says. [[spec/design_output/doors#a-door-reads-the-outside]]
+  const bare = box({ [at("spec/tickets/a-free.md")]: free });
+  bare.box.env = undefined;
+  const was = process.env.CLAUDE_CODE_REMOTE;
+  process.env.CLAUDE_CODE_REMOTE = "true";
+  try {
+    assert.match(onStop(done, bare.box).result.block, /The queue holds work for this box/);
+  } finally {
+    if (was === undefined) delete process.env.CLAUDE_CODE_REMOTE;
+    else process.env.CLAUDE_CODE_REMOTE = was;
+  }
 });
 
 test("a standing stop line ends the turn, and nothing prompts after it", () => {

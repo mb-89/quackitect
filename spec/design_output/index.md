@@ -119,9 +119,8 @@ Each one is a walk the tree takes in one call:
 | write | the folder's move, then a rewrite of each reach | every pointer the read names |
 | prove | the rows `links` answers, then `./RUNME.sh check` | a row naming the old name, then every other rule |
 
-The read move asks two readers, because each answers half. `linksIn` in
-`src/index/front.go` records a note link, so the link table holds those alone.
-A Go import, a shell path and a word in prose stand outside it.
+The read asks two readers, because each answers half: `linksIn` in
+`src/index/front.go` records a note link alone, and the walk finds the rest.
 
 A reach stands on a word edge, so `renamedText` leaves a longer word alone. The
 prove move reads rows, because `links` calls `dangling` and answers a clean exit
