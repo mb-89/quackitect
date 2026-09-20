@@ -239,9 +239,7 @@ test("the standing layer joins the method's guidance with the work root's, file 
   assert.equal(alone.notes, 2, "a tree driving itself reads its one root");
 });
 
-// A rule describing an answer ends in the answer mark, the way a rule wanting
-// argument ends in the star.
-// [[spec/tickets/the-judge-reads-answer-rules]]
+// A rule describing an answer ends in the answer mark. [[spec/tickets/the-judge-reads-answer-rules]]
 const marked = `---
 kind: [[guidance]]
 scope: ["everybody"]
@@ -298,4 +296,14 @@ test("a note whose rules all carry the mark hands an empty list, so the judge st
   assert.equal(typeof lib.forEvidence, "function", "the library answers forEvidence");
   const all = `---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. One answer rule. ^\n2. Another answer rule. ^\n`;
   assert.deepEqual(lib.forEvidence(all, "spec/guidance/voice"), []);
+});
+
+// A note writes the mark in a code span, because a paragraph admits the character nowhere else. [[spec/tickets/the-judge-reads-answer-rules]]
+test("a mark in a code span reads as the bare one, and strips the same way", () => {
+  const spanned = marked.replace("nowhere. ^", "nowhere. `^`");
+  assert.deepEqual(actionables(spanned), actionables(marked));
+  assert.deepEqual(
+    lib.forEvidence(spanned, "spec/guidance/voice"),
+    lib.forEvidence(marked, "spec/guidance/voice"),
+  );
 });

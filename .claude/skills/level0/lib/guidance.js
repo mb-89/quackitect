@@ -89,7 +89,17 @@ function frontOf(text) {
   return out;
 }
 
-export function actionables(text) {
+// The mark a rule describing an answer carries, beside the star a rule wanting argument carries. [[spec/design_output/pull#the-checks]]
+export const ANSWER_MARK = "^";
+
+// A note writes the mark in a code span, because a paragraph admits the character nowhere else. [[spec/design_output/pull#the-checks]]
+const MARK = /\s*`?([*^])`?$/;
+
+function markOf(raw) {
+  return MARK.exec(String(raw).trimEnd())?.[1] ?? "";
+}
+
+function itemsIn(text) {
   const chapter = parse(text).chapters.Actionables;
   if (!chapter) return [];
 
@@ -109,7 +119,37 @@ export function actionables(text) {
     }
   }
   if (held) out.push(held);
-  return out.map((one) => one.replace(/\s*\*$/, "").trim()).filter(Boolean);
+  return out;
+}
+
+function stripped(one) {
+  return String(one).replace(MARK, "").trim();
+}
+
+export function actionables(text) {
+  return itemsIn(text).map(stripped).filter(Boolean);
+}
+
+// The label naming one rule: the note's path under the guidance folder, then its number in that note. [[spec/design_output/pull#the-checks]]
+export function labelOf(path, number) {
+  const bare = String(path ?? "")
+    .replace(/\.md$/, "")
+    .replace(/^spec\/guidance\//, "");
+  return `${bare.replace(/\//g, "-")}-${number}`;
+}
+
+// The rules the judge reads over evidence: the chapter's own numbering, with the marked rules out. [[spec/design_output/pull#the-checks]]
+export function forEvidence(text, path) {
+  const out = [];
+  let number = 0;
+  for (const raw of itemsIn(text)) {
+    const rule = stripped(raw);
+    if (!rule) continue;
+    number += 1;
+    if (markOf(raw) === ANSWER_MARK) continue;
+    out.push({ label: labelOf(path, number), note: String(path ?? ""), number, rule });
+  }
+  return out;
 }
 
 // The entries of a note's scope, whether the frontmatter writes them inline or one to a line. [[spec/tickets/the-spawn-reaches-its-guidance]]

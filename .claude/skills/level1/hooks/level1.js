@@ -4,12 +4,12 @@
 // [[spec/design_output/pull#the-checks]]
 
 import {
-  BREAKS,
   judgeAsk,
+  judgeLabels,
   judgeRefusal,
-  LABELS,
   PULL_CALL,
   pullSpec,
+  ruleBroken,
   sessionOf,
   spawnPromptIn,
 } from "../lib/pull.js";
@@ -111,15 +111,16 @@ async function judged($, e) {
 
   let said;
   try {
-    said = await $.model.classify(judgeAsk(material.evidence, material.rules), LABELS, {
-      model: judge.model,
-    });
+    said = await $.model.classify(
+      judgeAsk(material.evidence, material.rules),
+      judgeLabels(material.rules),
+      { model: judge.model },
+    );
   } catch {
     return "";
   }
-  return said === BREAKS
-    ? judgeRefusal(`the judge answers ${said} over ${material.step}`)
-    : "";
+  const broke = ruleBroken(said, material.rules);
+  return broke ? judgeRefusal(`at ${material.step}, ${broke}`) : "";
 }
 
 function parsed(text) {
