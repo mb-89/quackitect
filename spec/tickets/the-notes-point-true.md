@@ -95,6 +95,8 @@ A reader follows a pointer and lands where it says. a-pointer-resolves lands eve
 
 <!-- the form is command -->
 
+./RUNME.sh branch sync
+
 # split
 
 <!-- mints the children, or assigns standing tickets, each naming this group -->
@@ -105,11 +107,19 @@ A reader follows a pointer and lands where it says. a-pointer-resolves lands eve
 
 <!-- the form is list -->
 
+- [[spec/tickets/a-pointer-resolves]], on [[spec/processes/standard]], closed
+- [[spec/tickets/the-unknown-runs-stays-quiet]], on [[spec/processes/standard]], closed
+- [[spec/tickets/the-window-splits-by-tab]], on [[spec/processes/standard]], closed
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every child is small enough to review whole, or is a group itself. Each child stands on the standard route, and a verdict hand read each one whole.
+- the children add up to the goal, and nothing of the goal stands outside them. The three children the ask names are the three standing, and the ask names no fourth.
+- a child that waits on another names it under depends_on. None waits on another, so none names one.
 
 # children
 
