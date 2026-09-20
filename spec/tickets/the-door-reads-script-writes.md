@@ -267,17 +267,32 @@ What I check:
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/bash.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- five cases drive the script reading, and three fail on their own assertion
+- `scriptsIn` answers an empty list today, so the door reads no file
+- the quiet cases pass already, because a door reading nothing refuses nothing
+- the reader a case hands in counts its own calls, so a test run proves the skip
+
+What surprises the hand: `.claude/skills/level0/lib/bash.js` stands at the line
+ceiling. So the reading takes a module of its own, `lib/scripted.js`, and the
+door calls it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases touch the door's test file and the new module, which the approach names
+- the disk stands behind a reader a case hands in, so the cases touch memory alone
+- each case carries the pointer at the chapter tabling what the door refuses
 
 ## reflect
 

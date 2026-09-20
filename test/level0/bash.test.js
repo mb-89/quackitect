@@ -16,6 +16,7 @@ import {
   verbLine,
   writesAPath,
 } from "../../.claude/skills/level0/lib/bash.js";
+import { scriptsIn } from "../../.claude/skills/level0/lib/scripted.js";
 
 const rules = (command, most = 5, it = {}) =>
   findings(command, most, it).map((one) => one.rule);
@@ -344,6 +345,52 @@ test("a cloud box refuses the escape, and a desk box reads no rule in it", () =>
   const said = 'git commit --no-verify -m "one"';
   assert.deepEqual(rules(said, 5, { cloud: true }), ["CommitMeetsTheDoor"]);
   assert.deepEqual(rules(said), []);
+});
+
+// A script file carries the write past the line, so the door reads the file. [[spec/design_output/bash#a-shell-writes-nothing]]
+test("a runner and a shell each name their script, and a tracked path names none", () => {
+  assert.deepEqual(scriptsIn("node .se/scripts/edit.mjs"), [".se/scripts/edit.mjs"]);
+  assert.deepEqual(scriptsIn("sh .se/scripts/edit.sh"), [".se/scripts/edit.sh"]);
+  assert.deepEqual(scriptsIn("python3 /tmp/one.py"), ["/tmp/one.py"]);
+  assert.deepEqual(scriptsIn("node --test test/level0/bash.test.js"), []);
+  assert.deepEqual(scriptsIn("node src/scripts/cli.js check"), []);
+});
+
+test("a script writing a tracked path refuses, and the message names the script", () => {
+  const said = "node .se/scripts/edit.mjs";
+  const script = () => 'writeFileSync("README.md", "one");\n';
+
+  assert.deepEqual(rules(said, 5, { script }), ["ShellWritesNothing"]);
+
+  const one = findings(said, 5, { script })[0];
+  assert.match(one.message, /\.se\/scripts\/edit\.mjs/);
+  assert.match(one.message, /mcp__level0__patch/);
+  assert.match(one.message, /mcp__level0__replace/);
+});
+
+test("a shell script writing by redirection refuses the same way", () => {
+  const script = () => "cat > spec/guidance/x.md <<'EOF'\nsaid\nEOF\n";
+
+  assert.deepEqual(rules("sh .se/scripts/edit.sh", 5, { script }), [
+    "ShellWritesNothing",
+  ]);
+});
+
+test("a script writing nowhere the rules reach passes", () => {
+  const script = () => 'writeFileSync(".se/draft.md", "one");\n';
+
+  assert.deepEqual(rules("node .se/scripts/edit.mjs", 5, { script }), []);
+});
+
+test("a test run reads no script, and the door hands its reader nothing", () => {
+  let asked = 0;
+  const script = () => {
+    asked += 1;
+    return 'writeFileSync("README.md", "one");\n';
+  };
+
+  assert.deepEqual(rules("node --test test/level0/bash.test.js", 5, { script }), []);
+  assert.equal(asked, 0);
 });
 
 // [[spec/design_output/bash#the-description-names-verbs]]
