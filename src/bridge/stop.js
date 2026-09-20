@@ -3,7 +3,7 @@
 // [[spec/design_output/stop#the-vote]]
 
 import { join } from "node:path";
-import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
+import { CHECK, NEEDS_HEADING } from "../../.claude/skills/level0/lib/answer.js";
 import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import {
   controlBlock,
@@ -163,9 +163,16 @@ function claims(e, box) {
   });
   return {
     result: {
-      result: `The claim stands. End the message now with the line stop: ${reason}, alone and last.`,
+      result: `The claim stands. Write the answer, and end that same message with the line stop: ${reason} on a line of its own, last. The owner reads that one message.`,
     },
   };
+}
+
+// The message ending the turn carries the report, so the owner reads what the talk is about where the stop line stands. [[spec/design_output/stop#a-talk-follows-a-report]]
+export function reportStands(text) {
+  const said = String(text ?? "");
+  const at = said.indexOf(NEEDS_HEADING);
+  return at >= 0 && /^\|\s*1\s*\|/m.test(said.slice(at));
 }
 
 export function onStop(e, box) {
@@ -305,13 +312,8 @@ function lastLineReason(text) {
   return found ? found[1] : "";
 }
 
-// The checks reading the engine's own work. [[spec/design_output/config#the-engine-controls]]
-export const ENGINE_CHECKS = [
-  "ticket-in-hand",
-  "group-in-hand",
-  "work-waiting",
-  "warnings-standing",
-];
+// The checks reading the engine's own work. The warnings stay off this list, because a warning lands under every binding and the hand drains it. [[spec/design_output/config#the-engine-controls]]
+export const ENGINE_CHECKS = ["ticket-in-hand", "group-in-hand", "work-waiting"];
 
 // [[spec/design_output/config#the-engine-controls]]
 export function standsDown(name, binding) {
@@ -329,12 +331,14 @@ const CHECKS = {
   "group-in-hand": (held) => groupInHand(held.box),
   "ticket-in-hand": (held) => holdStands(held.box) || privateStands(held.box),
   "queue-waits": (held) => queueWaits(held.box),
-  "no-stop-line": (held) =>
-    !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed),
+  // A claim a fact denies reads as no stop line, so the turn holds and the fact re-prompts. [[spec/design_output/stop#a-talk-follows-a-report]]
+  "no-stop-line": (held) => !claimStands(held),
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
   "a-person-sits-here": (held) => !inCloud(held.box.env ?? {}),
   // [[spec/tickets/the-spawn-reaches-its-guidance]]
   "warnings-standing": (held) => handWanted(held.box),
+  // [[spec/design_output/stop#a-talk-follows-a-report]]
+  "a-report-stands": (held) => reportStands(held.text),
 };
 
 // [[spec/design_output/stop#the-mechanical-checks]]
@@ -347,6 +351,14 @@ function ranHere(name, held) {
   if (!knowsCheck(name)) return undefined;
   if (standsDown(name, asks(held.box, BINDING))) return false;
   return CHECKS[name](held);
+}
+
+// A claim stands where its reason is one this tree holds, and the check its rule names answers true. [[spec/design_output/stop#a-talk-follows-a-report]]
+function claimStands(held) {
+  const rule = stopReasons(rulesOf(held.box)).find((one) => one.id === held.claimed);
+  if (!rule) return false;
+  if (!rule.runs) return true;
+  return Boolean(ranHere(rule.runs, held));
 }
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]

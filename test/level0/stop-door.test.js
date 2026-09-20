@@ -6,7 +6,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { dropsHold, onStop, sawPrompt } from "../../src/bridge/stop.js";
+import { dropsHold, onStop, reportStands, sawPrompt } from "../../src/bridge/stop.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -14,6 +14,14 @@ const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
 
 const RULES = `
+- id: the-owner-asks-to-talk
+  side: stop
+  priority: 100
+  decides: claimed
+  runs: a-report-stands
+  asks: Does the last thing the owner said open a discussion, and does this message carry the report?
+  says: The owner opens a discussion, and the report stands, so this turn ends and waits.
+
 - id: the-queue-holds-work
   side: continue
   priority: 80
@@ -142,6 +150,27 @@ test("a standing stop line ends the turn, and nothing prompts after it", () => {
     "one stop line in the log",
   );
   assert.match(it.said[0][2], /the turn ends/);
+});
+
+// A talk stop with no report in the same message holds the turn, and one under the needs table ends it. [[spec/design_output/stop#a-talk-follows-a-report]]
+test("a talk stop ends the turn only where the same message carries the report", () => {
+  const bare = onStop({ last_assistant_message: "stop: the-owner-asks-to-talk" }, box().box);
+  assert.match(bare.result.block, /the-owner-asks-to-talk: .*carry the report/);
+  const report = [
+    "The work stands here.",
+    "",
+    "# What the agent needs",
+    "",
+    "| No. | question | proposed answer |",
+    "|---|---|---|",
+    "| 1 | which road | the short one |",
+    "",
+    "stop: the-owner-asks-to-talk",
+  ].join("\n");
+  const it = box();
+  assert.deepEqual(onStop({ last_assistant_message: report }, it.box), { pass: true });
+  assert.match(it.said[0][2], /the turn ends/);
+  assert.equal(reportStands("# What the agent needs\n\nnothing under it"), false, "a heading with no row is no report");
 });
 
 test("a helper's turn end passes untouched, so a refused helper answer reaches no owner turn", () => {

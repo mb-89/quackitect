@@ -17,8 +17,9 @@
   side: stop
   priority: 100
   decides: claimed
-  asks: Does the last thing the owner said open a discussion?
-  says: The owner opens a discussion, so this turn ends and waits.
+  runs: a-report-stands
+  asks: Does the last thing the owner said open a discussion, and does this same message carry the report with the table What the agent needs above the stop line?
+  says: The owner opens a discussion, and the report stands in this message, so this turn ends and waits.
 
 - id: the-owner-says-carry-on
   side: continue

@@ -46,7 +46,8 @@ last message:
 The ids come from the stop side rules the agent claims, in
 `spec/config/stop/level0.yml`. The line stands in the chat where the owner
 reads it, so a stop is a thing spoken out loud. The report above it carries
-prose alone, and the line comes last.
+prose alone, and the line comes last. The two stand in one message, because
+the owner's view shows the last message alone.
 
 The stop door reads the last line at the turn's end and runs the vote:
 
@@ -212,6 +213,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `group-in-hand` | this branch's group carries a take with no hand-back |
 | `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` |
 | `chat-is-new` | the session log holds one prompt row at most, the box is no cloud box, and the answer names no next step |
+| `a-report-stands` | the message ending the turn carries the heading What the agent needs with a numbered row under it |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
 | `never` | nothing, which is what an unbuilt rule takes |
 
@@ -241,7 +243,15 @@ agent, and a check reads the tree. So the tree wins:
 | `an-update-is-worth-giving` | what the agent takes the owner to want |
 
 A stop the owner drives carries no flag. `the-owner-asks-to-talk` reads the
-owner's own words, so it stands over every check.
+owner's own words, so it stands over every check but one.
+
+## A talk follows a report
+
+A stop line with no report above it tells the owner nothing to talk about.
+So `the-owner-asks-to-talk` runs `a-report-stands`: the message ending the
+turn carries the needs table, or the claim fires nothing and the turn holds.
+The report and the line stand in one message, because the owner's view shows
+the last message alone.
 
 The band table puts `90` to `100` in the owner's hands. A claim about the agent's
 own work stands there today, and it overrides every check reading the branch. The

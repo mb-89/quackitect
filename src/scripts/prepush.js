@@ -18,15 +18,10 @@ import {
   VERSION,
 } from "../../.claude/skills/level0/lib/trunk.js";
 import { CONFIG, fromJson, PROSE } from "../../.claude/skills/level0/lib/vale.js";
-import {
-  refusedWarnings,
-  warningsOn,
-} from "../../.claude/skills/level0/lib/warnings.js";
 import { readThrough } from "../bridge/findings.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
-import { whereIs } from "../engine/tools.js";
 
 export const STDIN = 0;
 export const ZEROS = /^0+$/;
@@ -42,7 +37,7 @@ export function refsIn(text) {
     });
 }
 
-export function holds(refs, stampText, carried = () => [], warnings = () => []) {
+export function holds(refs, stampText, carried = () => []) {
   // [[spec/design_output/work#a-version-branch-stands]]
   const versions = refs
     .filter((one) =>
@@ -73,12 +68,7 @@ export function holds(refs, stampText, carried = () => [], warnings = () => []) 
     if (found.length) return { code: 1, said: refusedTodo(found) };
   }
 
-  // [[spec/tickets/one-list-holds-the-warnings]]
-  for (const one of refs) {
-    const names = carried(one).map((held) => String(held?.name ?? ""));
-    const found = warningsOn(warnings(names), names);
-    if (found.length) return { code: 1, said: refusedWarnings(found) };
-  }
+  // A warning holds no push, because the refactoring hand drains it on the box. [[spec/design_output/config#the-engine-controls]]
   return { code: 0, said: "" };
 }
 
@@ -136,12 +126,7 @@ async function main() {
   const outside = proc();
   const at = join(root, STAMP);
   const stamp = files.exists(at) ? files.read(at) : "";
-  const said = holds(
-    refsIn(files.read(STDIN)),
-    stamp,
-    carriedBy(git(outside, root)),
-    lintedBy(outside, root, whereIs(files, root, "vale"), files),
-  );
+  const said = holds(refsIn(files.read(STDIN)), stamp, carriedBy(git(outside, root)));
   if (said.code !== 0) console.error(said.said);
   return said.code;
 }

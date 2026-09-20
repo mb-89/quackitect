@@ -61,3 +61,13 @@ test("a message carrying a warning lands, and one carrying an error is refused",
 test("a merge commit passes the door whole", async () => {
   assert.equal(denied(await onBash({ command: COMMIT }, box(true))), "");
 });
+
+// A warning holds no push, because the refactoring hand drains it on the box. [[spec/design_output/config#the-engine-controls]]
+test("a push off a work branch lands whatever the lint says", async () => {
+  const warned = [{ rule: "VoiceVale.Passive", line: 1, column: 1, severity: "warning", message: "passive" }];
+  const it = {
+    ...box(false),
+    vale: { stands: () => true, lint: async () => ({ ran: true, found: warned }) },
+  };
+  assert.equal(denied(await onBash({ command: "git push origin claude/a-thing" }, it)), "");
+});

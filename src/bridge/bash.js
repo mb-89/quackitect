@@ -30,11 +30,6 @@ import {
   touchesGit,
   versionRefs,
 } from "../../.claude/skills/level0/lib/trunk.js";
-import { PROSE } from "../../.claude/skills/level0/lib/vale.js";
-import {
-  refusedWarnings,
-  warningsOn,
-} from "../../.claude/skills/level0/lib/warnings.js";
 import { WORK_BRANCH } from "../engine/group.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
@@ -51,7 +46,6 @@ export async function onBash(e, box) {
     privateDelta,
     testedDelta,
     todoOnPush,
-    warningsOnPush,
     trunkGuard,
     versionGuard,
   ];
@@ -175,50 +169,7 @@ function todoOnPush(command, _e, box) {
   return refusedTodo(found);
 }
 
-// [[spec/tickets/one-list-holds-the-warnings]]
-async function warningsOnPush(command, _e, box) {
-  if (!touchesGit(command).pushes) return "";
-  const names = [
-    ...new Set(
-      git(box, ["log", "--format=", "--name-only", "HEAD", "--not", "--remotes"])
-        .split("\n")
-        .map((row) => row.trim())
-        .filter(Boolean),
-    ),
-  ];
-  const found = warningsOn(await lintedHere(box, names), names);
-  if (!found.length) return "";
-  box.log.say("warn", "bash", `refused a push over ${found[0].rule}`, {
-    tool: "Bash",
-    file: found[0].file,
-  });
-  return refusedWarnings(found);
-}
-
-// [[spec/tickets/one-list-holds-the-warnings]]
-async function lintedHere(box, names) {
-  const read = names.filter((one) => PROSE.test(one));
-  if (!read.length || !box.vale?.stands()) return [];
-  const found = [];
-  for (const name of read) {
-    const whole = textAt(box, name);
-    if (!whole) continue;
-    const said = await box.vale.lint(whole, name);
-    if (said.ran)
-      found.push(
-        ...readsProse(box, whole, said.found).map((one) => ({ ...one, file: name })),
-      );
-  }
-  return found;
-}
-
-function textAt(box, name) {
-  try {
-    return String(box.disk.read(`${box.work}/${name}`));
-  } catch {
-    return "";
-  }
-}
+// A warning holds no push, because the refactoring hand drains it on the box, so no door here reads the warnings. [[spec/design_output/config#the-engine-controls]]
 
 // [[spec/design_output/work#a-version-branch-stands]]
 function versionGuard(command, _e, box) {

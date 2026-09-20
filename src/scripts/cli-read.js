@@ -135,7 +135,7 @@ export async function lint(where) {
   if (refused) return 1;
   console.log("");
   console.log(
-    `${found.length} stand at warning. A commit lands over them, and check answers red, so no push reaches ${TRUNK}.`,
+    `${found.length} stand at warning. A commit and a push land over them, and the refactoring hand drains them past ${TRUNK}'s check.`,
   );
   return 1;
 }

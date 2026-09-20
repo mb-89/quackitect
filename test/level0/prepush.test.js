@@ -92,6 +92,8 @@ test("a push whose delta carries a tagged note refuses, and names the file", () 
 test("a push whose delta carries an untagged note lands", () => {
   const carried = () => [{ name: "spec/tickets/slow-lint.md", text: FREE }];
   assert.deepEqual(holds(refsIn(toWork), "", carried), { code: 0, said: "" });
+  // A warning holds no push, so the door takes no lint. [[spec/design_output/config#the-engine-controls]]
+  assert.equal(holds.length, 2, "the door reads the refs and the stamp, then the delta, and no warnings");
 });
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
