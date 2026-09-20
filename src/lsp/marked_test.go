@@ -45,7 +45,7 @@ func rationaleSchema(t *testing.T) *yaml.Doc {
 
 const markedNote = "# Actionables\n\n1. Reach a door. *\n2. Write a fake.\n3. Take the clock. *\n"
 
-// A marked rule wants the chapter arguing it, and the rationale carries that chapter. [[spec/design_output/lsp#a-second-copy-draws]]
+// A marked rule wants the chapter arguing it, and the rationale carries that chapter. [[spec/design_output/lsp#a-marked-rule-wants-argument]]
 func TestAMarkedRuleWantsItsChapter(t *testing.T) {
 	tree := fixture(t, map[string]string{"spec/guidance/one.md": markedNote})
 	text := "---\nkind: [[rationale]]\nexplains: [[spec/guidance/one]]\n---\n\n# Why\n\n## 1. The door stands\n\nA line.\n"
@@ -57,7 +57,7 @@ func TestAMarkedRuleWantsItsChapter(t *testing.T) {
 	}
 }
 
-// Every marked rule carries its chapter, so the rule stands quiet. [[spec/design_output/lsp#a-second-copy-draws]]
+// Every marked rule carries its chapter, so the rule stands quiet. [[spec/design_output/lsp#a-marked-rule-wants-argument]]
 func TestEveryMarkedRuleCarriesItsChapter(t *testing.T) {
 	tree := fixture(t, map[string]string{"spec/guidance/one.md": markedNote})
 	text := "---\nkind: [[rationale]]\nexplains: [[spec/guidance/one]]\n---\n\n# Why\n\n## 1. The door stands\n\nA line.\n\n## 3. The clock comes in\n\nA line.\n"
@@ -67,7 +67,7 @@ func TestEveryMarkedRuleCarriesItsChapter(t *testing.T) {
 	}
 }
 
-// A chapter past the marked rules stands, because a note arguing more costs a reader nothing. [[spec/design_output/lsp#a-second-copy-draws]]
+// A chapter past the marked rules stands, because a note arguing more costs a reader nothing. [[spec/design_output/lsp#a-marked-rule-wants-argument]]
 func TestAChapterPastAMarkStands(t *testing.T) {
 	tree := fixture(t, map[string]string{"spec/guidance/one.md": markedNote})
 	text := "---\nkind: [[rationale]]\nexplains: [[spec/guidance/one]]\n---\n\n# Why\n\n## 1. The door stands\n\nA line.\n\n## 2. The fake behaves\n\nA line.\n\n## 3. The clock comes in\n\nA line.\n"
@@ -77,7 +77,7 @@ func TestAChapterPastAMarkStands(t *testing.T) {
 	}
 }
 
-// The write door hands one buffer, so the pair reading stands off there. [[spec/design_output/lsp#a-second-copy-draws]]
+// The write door hands one buffer, so the pair reading stands off there. [[spec/design_output/lsp#a-marked-rule-wants-argument]]
 func TestNoTreeHoldsTheMarkedReading(t *testing.T) {
 	text := "---\nkind: [[rationale]]\nexplains: [[spec/guidance/one]]\n---\n\n# Why\n\n## 1. The door stands\n\nA line.\n"
 
@@ -86,7 +86,7 @@ func TestNoTreeHoldsTheMarkedReading(t *testing.T) {
 	}
 }
 
-// A rationale naming no note reads nothing against anything. [[spec/design_output/lsp#a-second-copy-draws]]
+// A rationale naming no note reads nothing against anything. [[spec/design_output/lsp#a-marked-rule-wants-argument]]
 func TestARationaleNamingNoNoteStandsQuiet(t *testing.T) {
 	tree := fixture(t, map[string]string{"spec/guidance/one.md": markedNote})
 	text := "---\nkind: [[rationale]]\n---\n\n# Why\n\n## 1. The door stands\n\nA line.\n"

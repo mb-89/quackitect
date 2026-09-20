@@ -71,3 +71,33 @@ once. A buffer the editor changes drops them, and the next ask pays again.
 
 Vale carries the third rule of the set, over a line beside a table. For how it
 lands, see [[spec/design_output/projection#a-layer-writes-two-files]].
+
+# A marked rule wants argument
+
+A guidance note marks the rules wanting an argument, and the rationale beside it
+carries a chapter for each. `src/lsp/marked.go` reads the pair, off the schema
+key `matches`. [[spec/design_output/schema#what-each-keyword-draws]]
+
+| what it reads | where it comes from |
+|---|---|
+| the key naming the note | `matches` under `subsections` in the schema |
+| the note itself | the frontmatter key that names it, as a link |
+| the marked items there | a numbered line closing on a star |
+| the chapters here | the numbered headings under the chapter the schema names |
+
+A marked item with no chapter of its number draws, at the chapter holding them.
+A chapter past the marked items stands, because a note arguing more than it must
+costs a reader nothing.
+
+The reading takes two notes, so it stands where the tree stands. `checkNoteIn`
+takes the tree and `checkNote` reads the one buffer beside it, which is what the
+write door hands in.
+
+# A marker carries old news
+
+`spec/config/styles/VoiceVale/History.yml` refuses the words placing a claim in
+a tree that stands no more. The past tense rule reads a verb, and these markers
+read in the present, so they pass it and carry the history anyway.
+
+The rationales argue a change, so `.vale.ini` switches this rule off there, the
+way it switches the past tense off.

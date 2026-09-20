@@ -1,7 +1,7 @@
 // The chapter a marked item wants. A schema saying `matches` names the
 // frontmatter key holding the note, and every marked item there wants a
 // chapter of its number here.
-// [[spec/design_output/lsp#a-second-copy-draws]]
+// [[spec/design_output/lsp#a-marked-rule-wants-argument]]
 package main
 
 import (
@@ -19,7 +19,7 @@ var (
 	linkOut    = regexp.MustCompile(`\[\[([^\]]+)\]\]`)
 )
 
-// [[spec/design_output/lsp#a-second-copy-draws]]
+// [[spec/design_output/lsp#a-marked-rule-wants-argument]]
 func markedFaults(tree *Tree, note Note, schema *yaml.Doc, where string) []Finding {
 	out := []Finding{}
 	if tree == nil {
@@ -48,7 +48,7 @@ func markedFaults(tree *Tree, note Note, schema *yaml.Doc, where string) []Findi
 	return out
 }
 
-// [[spec/design_output/lsp#a-second-copy-draws]]
+// [[spec/design_output/lsp#a-marked-rule-wants-argument]]
 func wantedChapters(tree *Tree, note Note, rule, spec *yaml.Doc, level int, where string) []Finding {
 	header := yaml.AsString(rule.Get("header"))
 	held, stands := sectionNamed(note, header, level)
@@ -64,7 +64,6 @@ func wantedChapters(tree *Tree, note Note, rule, spec *yaml.Doc, level int, wher
 	if spec.Has("headingLevel") {
 		under = yaml.AsInt(spec.Get("headingLevel"))
 	}
-	held.at = indexOf(note, held.Line)
 	stood := chaptersHeld(note, held, under)
 
 	out := []Finding{}
@@ -87,15 +86,6 @@ func sectionNamed(note Note, header string, level int) (standingAt, bool) {
 	return standingAt{}, false
 }
 
-func indexOf(note Note, line int) int {
-	for at, one := range note.Sections {
-		if one.Line == line {
-			return at
-		}
-	}
-	return 0
-}
-
 func chaptersHeld(note Note, held standingAt, level int) map[int]bool {
 	out := map[int]bool{}
 	for _, one := range note.Sections[held.at+1:] {
@@ -113,7 +103,7 @@ func chaptersHeld(note Note, held standingAt, level int) map[int]bool {
 	return out
 }
 
-// [[spec/design_output/lsp#a-second-copy-draws]]
+// [[spec/design_output/lsp#a-marked-rule-wants-argument]]
 func linkedTo(note Note, key string) string {
 	said := yaml.AsString(note.Front.Said.Get(key))
 	if said == "" {
@@ -125,7 +115,7 @@ func linkedTo(note Note, key string) string {
 	return strings.TrimSpace(said)
 }
 
-// [[spec/design_output/lsp#a-second-copy-draws]]
+// [[spec/design_output/lsp#a-marked-rule-wants-argument]]
 func markedIn(tree *Tree, path string) []int {
 	out := []int{}
 	if path == "" {

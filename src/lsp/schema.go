@@ -106,7 +106,7 @@ func strangerFault(text string, schema *yaml.Doc, where string) (Finding, bool) 
 }
 
 // [[spec/design_output/schema#a-finding-names-the-section]]
-// A reading past one buffer wants the tree, and the write door holds none. [[spec/design_output/lsp#a-second-copy-draws]]
+// A reading past one buffer wants the tree, and the write door holds none. [[spec/design_output/lsp#a-marked-rule-wants-argument]]
 func checkNoteIn(tree *Tree, text string, schema *yaml.Doc, where string) []Finding {
 	out := checkNote(text, schema, where)
 	return append(out, markedFaults(tree, readNote(text), schema, where)...)

@@ -55,7 +55,7 @@ ifVale("antithesis is refused", async () => {
   assert.ok((await ruled("It is a door rather than a window.")).includes("Antithesis"));
 });
 
-// A marker places a claim in a tree that stands no more, and the rationales own that telling. [[spec/design_output/lsp#a-second-copy-draws]]
+// A marker places a claim in a tree that stands no more, and the rationales own that telling. [[spec/design_output/lsp#a-marker-carries-old-news]]
 ifVale("a history marker is refused and the standing claim passes", async () => {
   assert.ok((await ruled("The door used to read the config.")).includes("History"));
   assert.ok((await ruled("The door previously names the file.")).includes("History"));
