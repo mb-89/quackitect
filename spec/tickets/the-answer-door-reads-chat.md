@@ -251,17 +251,43 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Four cases stand in `test/level0/answer-door.test.js`, and one fails on its
+own assertion.
+
+| the case | what it reads |
+|---|---|
+| a text shown between two calls | it pays the demand, which holds today |
+| the call after that text | it meets no refusal, which holds today |
+| a display carrying blank text | the demand stands, which holds today |
+| the door's words say the chat pays | the words leave that out |
+
+**What surprises.** The road works whole. The door pays off a displayed text
+between two calls, and the call under it passes, with no line of code changed.
+
+So the fault the ask names lives in the wording and the chapters alone. An
+agent reads the door's words and the design, and both tell it to call the
+report before the next call. The behaviour under them pays already.
+
+The three green cases hold that road where nothing held it. The red one carries
+the change the ask asks for.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases reach the one test file the approach names, and nothing else changes
+- the door meets a fake box carrying a log alone, so no door runs live
+- a comment over each new case points at this ticket, which carries the approach
 
 ## reflect
 

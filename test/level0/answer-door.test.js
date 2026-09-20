@@ -6,7 +6,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { ANSWER_KIND, rowOf } from "../../.claude/skills/level0/lib/log.js";
-import { demands, holdsForAnswer, pays, SAYS } from "../../src/bridge/answer.js";
+import {
+  demands,
+  holdsForAnswer,
+  onMessageDisplay,
+  pays,
+  SAYS,
+} from "../../src/bridge/answer.js";
 
 function box() {
   const said = [];
@@ -50,6 +56,40 @@ test("the door's words put the chat first and the report beside it", () => {
   const said = SAYS("The owner sent a prompt");
   assert.match(said, /write it in the chat as text/);
   assert.match(said, /mcp__level0__report with the same text/);
+  assert.match(said, /pays/, "and the words say the chat pays it");
+});
+
+// The client posts every displayed text, so a text between two calls reaches the door. [[spec/tickets/the-answer-door-reads-chat]]
+test("a text the chat shows between two calls pays the demand", () => {
+  const it = box();
+  demands(it, "The owner sent a prompt");
+  holdsForAnswer({ tool: "Read" }, it);
+
+  onMessageDisplay({ delta: "Understood: the door first, then the chapters." }, it);
+  assert.equal(it.demand, null, "the displayed text pays it");
+  assert.equal(it.said.at(-1)[1], "reply", "and the log carries the reply");
+});
+
+// [[spec/tickets/the-answer-door-reads-chat]]
+test("the call after a text the chat shows meets no refusal", () => {
+  const it = box();
+  demands(it, "The owner sent a prompt");
+  holdsForAnswer({ tool: "Read" }, it);
+  onMessageDisplay({ delta: "The work goes on." }, it);
+
+  assert.deepEqual(holdsForAnswer({ tool: "Read" }, it), null);
+  assert.deepEqual(holdsForAnswer({ tool: "Edit" }, it), null);
+});
+
+// [[spec/tickets/the-answer-door-reads-chat]]
+test("a display carrying no text leaves the demand standing", () => {
+  const it = box();
+  demands(it, "The owner sent a prompt");
+  holdsForAnswer({ tool: "Read" }, it);
+
+  onMessageDisplay({ delta: "   " }, it);
+  assert.notEqual(it.demand, null, "the demand stands over an empty text");
+  assert.deepEqual(holdsForAnswer({ tool: "Read" }, it), { needs: "reply" });
 });
 
 // [[spec/design_output/log#an-answer-stands-in-chat]]
