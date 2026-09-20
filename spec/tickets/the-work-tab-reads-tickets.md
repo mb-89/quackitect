@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box 51c5005e133c · claude-code-remote
@@ -87,6 +87,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-work-tab-reads-tickets already carries every commit on main.
+  - step: split
+    hand: box 51c5005e133c · claude-code-remote
+    hash_before: c95648a1710b977ea275d2f4f440aebe8fbb1e87
+    hash_after: c95648a1710b977ea275d2f4f440aebe8fbb1e87
 ---
 
 # Ask
@@ -112,13 +116,18 @@ The work tab is a ticket editor. It queries the index for tickets, and a branch 
 
 <!-- every child as a link, one a line, with its process -->
 
-<!-- the form is list -->
+- [[spec/tickets/the-index-answers-tickets]], trivial
+- [[spec/tickets/the-index-fires-on-change]], trivial
+- [[spec/tickets/the-work-tab-asks-index]], trivial
+- [[spec/tickets/the-work-tab-takes-edits]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-<!-- the form is checklist -->
+- every child is small enough to review whole: each lands as one commit of one module and its note
+- the children add up to the goal: the query, the callback, the tab reading both, and the edit writing back
+- a child that waits on another names it: none names one, because the pull hands them out in the order they build on
 
 # children
 
