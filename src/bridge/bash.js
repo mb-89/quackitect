@@ -102,8 +102,12 @@ async function privateDelta(command, _e, box) {
 // A change and the test proving it land together. [[spec/design_output/tree#the-rules-over-two-files]]
 async function testedDelta(command, _e, box) {
   if (!commitIn(command)) return "";
-  const found = untestedIn(await git(box, ["diff", "--cached", "--unified=0"]), (path) =>
-    fileText(box.disk, box.work, path),
+  // Git holds a merge in progress under MERGE_HEAD, so the read asks git where it stands. [[spec/design_output/tree#the-rules-over-two-files]]
+  const merging = Boolean(await git(box, ["rev-parse", "-q", "--verify", "MERGE_HEAD"]));
+  const found = untestedIn(
+    await git(box, ["diff", "--cached", "--unified=0"]),
+    (path) => fileText(box.disk, box.work, path),
+    merging,
   );
   if (!found.length) return "";
   box.log.say("warn", "tested", `refused ${found.length} file(s) with no test`, {

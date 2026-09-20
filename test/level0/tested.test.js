@@ -35,6 +35,12 @@ const fakeTree = (seed, paths = []) =>
     root: FAKE,
   });
 
+// A merge carries other commits' code, and each met the door with its own test. [[spec/design_output/tree#the-rules-over-two-files]]
+test("a merge passes whole, because its code landed with tests already", () => {
+  assert.deepEqual(untestedIn(delta("src/bridge/one.js"), undefined, true), []);
+  assert.deepEqual(untestedIn(delta("src/bridge/one.js"), undefined, false), ["src/bridge/one.js"]);
+});
+
 test("a change with no test beside it comes back named", () => {
   const said = untestedIn(delta("src/bridge/one.js"));
   assert.deepEqual(said, ["src/bridge/one.js"]);

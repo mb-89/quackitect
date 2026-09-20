@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { boxOf, holds, notesOf } from "../../src/scripts/precommit.js";
+import { boxOf, holds, merging, notesOf } from "../../src/scripts/precommit.js";
 
 const ROOT = "/tree";
 
@@ -119,6 +119,8 @@ test("a merge commit passes the test door, because its code landed with tests al
     "",
   ].join("\n");
 
+  assert.equal(merging(box({}, { merging: true })), true, "git names the merge in progress");
+  assert.equal(merging(box()), false);
   const said = await holds(box({}, { merging: true }), code);
   assert.deepEqual(said, { code: 0, said: "" });
 });

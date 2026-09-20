@@ -25,8 +25,9 @@ export function hunksIn(delta) {
   return out;
 }
 
-// A test of its own for each file, so one stray case carries no other. [[spec/design_output/tree#the-rules-over-two-files]]
-export function untestedIn(delta, read) {
+// A test of its own for each file, so one stray case carries no other. A merge carries other commits' code, and each met this door with its own test, so it passes whole. [[spec/design_output/tree#the-rules-over-two-files]]
+export function untestedIn(delta, read, merging = false) {
+  if (merging) return [];
   const hunks = hunksIn(delta);
   const files = [...hunks.keys()];
   const tests = files.filter((one) => TEST.test(one));

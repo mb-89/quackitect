@@ -28,9 +28,7 @@ export async function holds(it, delta) {
   });
   if (found.length) return { code: 1, said: refusedDelta(found) };
 
-  // A merge carries other commits' code, and each of those met the door with its own test. [[spec/design_output/tree#the-rules-over-two-files]]
-  if (merging(it)) return { code: 0, said: "" };
-  const missing = untestedIn(delta, (path) => fileText(it.disk, it.root, path));
+  const missing = untestedIn(delta, (path) => fileText(it.disk, it.root, path), merging(it));
   if (missing.length) return { code: 1, said: refusedTest(missing) };
   return { code: 0, said: "" };
 }
