@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -194,6 +194,10 @@ record:
     hash_after: 5c490f19f84f35f0eb6efdc46a53fcba425ca9d0
     returns: 2
     why: "The branch answers the ask: three rules draw, and `./RUNME.sh lint spec` names every place.; `spec/config/level0.json` says the tree note tables the restated rules, and it tables none.; [[spec/design_output/lsp#a-second-copy-draws]] owns that table, so the comment names the wrong note.; The fix for it stands uncommitted in the working tree. Commit it, or the tip stays wrong.; `spec/schemas/paragraph.schema.yaml` names that same tree chapter over `restated.table`. Name the owner.; What holds, so the fixes stay small:; `./RUNME.sh check` answers 0: 1253 cases pass, none fails, every projection reads as projected.; `./RUNME.sh lint spec` answers 0 in under seven seconds, where it crawled past two minutes.; The tree holds the one pass, and a case proves three asks cost one.; A changed buffer drops the findings, and the next ask pays the pass again.; A scratch tree draws `RestatedPointer` and `RestatedRule` off the binary, handed a folder.; Vale draws `RestatedTable` over a line beside a table, live.; A bound of nothing holds its rule off, which answers the missing block, and a case proves it.; `restatedHere` reads the tracked file, the environment and the local one, as `wordsHere` does.; The dead anchors under `src/viewer` stand committed at the tip.; The handover carries a retro, and its third finding names the class both fixes fall under.; The files past this ask belong to the group's other tickets, and none redesigns this one."
+  - step: implement/reflect
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: db63ab8d26a15c1630a7709dd866b62edecd7361
+    hash_after: db63ab8d26a15c1630a7709dd866b62edecd7361
 ---
 
 # Ask
@@ -345,7 +349,19 @@ once.
 
 The second class turns a rule hardest on the tree carrying no config. A bound
 reading zero passes every comparison, so a missing block draws a fault on every
-pointer. So each bound floors at the value the shipped config names.
+pointer. So each bound floors at one, and a tree carrying no block draws nothing.
+The shipped config owns each number, so the code copies neither.
+
+The second round adds one class: a piece names the note standing where its
+subject used to stand.
+
+| the class | the fault here | the fix for the class |
+|---|---|---|
+| a pointer names the neighbour of its owner | the config comment and the schema comment name the note tabling the older rules | each comment names the chapter owning what it describes |
+
+The class stands behind the dead anchors too: a pointer holds a name, and
+nothing checks that the name still says what the pointer means. The handover
+carries it as a finding, because the check answering it wants a ticket.
 
 ### checked
 

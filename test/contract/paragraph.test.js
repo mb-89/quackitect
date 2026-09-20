@@ -230,7 +230,7 @@ ifVale("the rules read past the engine's field, and hold a person's own", async 
   await refuses("CodeSpans", note("does"), where);
 });
 
-// A sentence restating the table beside it drifts from that table. [[spec/design_output/tree#the-rules-over-two-files]]
+// A sentence restating the table beside it drifts from that table. [[spec/design_output/lsp#a-second-copy-draws]]
 ifVale("a paragraph restating the table beside it is refused", async () => {
   const table = ["", "| what stands | what it does |", "|---|---|"].join("\n");
   const said = (lead, cell) => `${lead}\n${table}\n| ${cell} | it names the line |\n`;

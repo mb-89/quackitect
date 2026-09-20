@@ -66,7 +66,7 @@ layers:
 
   # A paragraph beside a table says what the table leaves unsaid, so a run of
   # words standing in both reads as one fact in two places.
-  # [[spec/design_output/tree#the-rules-over-two-files]]
+  # [[spec/design_output/lsp#a-second-copy-draws]]
   restated:
     table: 6
 
