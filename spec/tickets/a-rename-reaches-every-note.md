@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: f3164a73dff9ad0b71e3b0cc4267f8b1525d576a
     returns: 2
     why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, the folder table meets an import loop Go refuses |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |; | does the verb the approach adds carry a proof | no, the prove move reads an exit that stays 0 |; | does every claim carry a proof | yes, each row reads true against the code |; | what grade do the findings take | design, because each one moves the approach |; TL;DR:; A tab method takes `*model`, so a tab package and the frame reach each other.; `./RUNME.sh links` exits 0 over the rows it answers, so a stale pointer rides along.; `spec/design_output/viewer` carries the old name, and the two renames leave it standing.; The findings, one a line:; `tab` in `src/viewer/tabs.go` passes `*model` into every method but `Name`.; `src/viewer/ui.go` holds `model`, so a tab package reaches back into the frame.; `newModel` builds `[]tab{logTab{}, workTab{}}`, so the frame reaches each tab package.; Both reaches standing shuts an import loop, and the Go build refuses it.; So the approach says where `model` lands, and the folder table stands on that.; `./RUNME.sh links` calls `dangling`, and exits 0 over every row it answers.; So the prove move reads the rows naming the old name, and asserts none stands.; The ask asks a name to say what the thing is, and that note names the viewer.; So the rename list holds `spec/design_output/viewer` beside the folder and the stub.; The read move, the write move and the stub rows each read true against the code."
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 1a6533e8e864e028acdb8c1d18762b5d0a1e6d00
+    hash_after: 1a6533e8e864e028acdb8c1d18762b5d0a1e6d00
 ---
 
 # Ask
@@ -132,12 +136,13 @@ The viewer, the stub and the tree keep names from an older shape, and each renam
 
 ### approach
 
-One verb renames, and the two standing names ride it. So the verb carries its own proof, and the next rename costs one command.
+One verb renames, and the standing names ride it. So the verb carries its own proof, and the next rename costs one command.
 
 | what changes | how |
 |---|---|
 | `./RUNME.sh rename <from> <to>` | moves a path, and rewrites every reach it finds |
 | `src/viewer` | becomes `src/tui`, with a package per tab under it |
+| `spec/design_output/viewer` | becomes `spec/design_output/tui`, and every pointer naming it rides the verb |
 | `STUB_FOLDERS` in `.claude/skills/level0/lib/vehicle.js` | holds the stub's own name where it holds `project` today |
 | [[spec/design_output/index]] | says what the verb asks the index, because that note owns the questions the index answers |
 
@@ -147,24 +152,27 @@ The verb works in three moves:
 |---|---|---|
 | read | the index's `links`, then `grep` over the tracked files | a note link, then an import, a path and a name in prose |
 | write | the move, then a rewrite of each reach the read answers | the pointers the read found |
-| prove | `./RUNME.sh links`, then `./RUNME.sh check` | a note link resolving to nothing, then every other rule |
+| prove | the rows `./RUNME.sh links` answers, then `./RUNME.sh check` | a row naming the old name, then every other rule |
 
 The read move asks two readers, because each answers half. `linksIn` in `src/index/front.go` records a note link, so the link table holds those alone. A Go import, a shell path and a name in prose stand outside it, and `grep` over the tracked files answers those.
 
-The prove move runs both commands for the same reason. `./RUNME.sh links` with no name answers `dangling`, which names a note link resolving to nothing. Every other stale reach turns up where the check builds and runs the tree, which is the last line the ask asks for.
+The prove move reads rows, because `./RUNME.sh links` calls `dangling` and exits 0 over every row it answers. So the verb asserts no row names the old name, then runs the check, which is the last line the ask asks for.
 
-**The folders.** Go binds a package to a folder, so a folder per tab parts one package into several. A name crossing a folder edge takes a capital, and the rest stay lowercase inside their tab. That cost buys a reader who opens one tab.
+**The packages.** A tab method takes `*model`, and `model` stands in the frame. So a folder per tab shuts an import loop, which the Go build refuses. The type the two sides share lands in a package neither of them holds:
 
-| the folder | what it holds |
-|---|---|
-| `src/tui` | the frame, the keys, the help and the footer |
-| `src/tui/log` | the log tab |
-| `src/tui/work` | the work tab |
-| `src/tui/tree` | the tree view every tab after the log draws |
+| the package | what it holds | what it imports |
+|---|---|---|
+| `src/tui/frame` | `model`, the `tab` interface, and the rendering a tab calls | nothing of this tree's |
+| `src/tui/log` | the log tab | `src/tui/frame` |
+| `src/tui/work` | the work tab | `src/tui/frame` |
+| `src/tui/tree` | the tree view every tab after the log draws | `src/tui/frame` |
+| `src/tui` | the window, which builds the tab list | the frame and each tab |
+
+So the imports run one way, from the window through each tab to the frame. That costs a capital on each name the frame hands out, and it buys a reader who opens one tab.
 
 **The stub.** `STUB_FOLDERS` holds its paths under a literal `project`, and `stubInto` reads that constant. Each takes the stub folder's own name instead, so a reader opening a stub reads the project it names.
 
-The verb lands first, and the two renames run through it. A rename a hand makes by sweep proves nothing about the verb.
+The verb lands first, and the renames run through it. A rename a hand makes by sweep proves nothing about the verb.
 
 ## review
 
