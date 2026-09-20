@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -217,6 +217,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-21
+    hash_before: 52c26a1666e427d34d3777ca2b2c4b1e5ccda817
+    hash_after: 52c26a1666e427d34d3777ca2b2c4b1e5ccda817
+reason: done
 ---
 
 # Ask
@@ -505,17 +510,19 @@ chapter owning it.
 - src/lsp/check.go
 - src/lsp/config.go
 - src/lsp/main.go
-- src/lsp/tree.go
 - spec/config/level0.json
 - spec/config/level0.schema.json
 - spec/schemas/paragraph.schema.yaml
 - spec/config/styles/VoiceParagraph/RestatedTable.yml
+- .claude/skills/level0/lib/paragraph.js
+- .claude/skills/level0/lib/paragraph-rules.js
 - .vale.ini
 - spec/design_output/lsp.md
 - spec/design_output/tree.md
 - spec/design_output/tree-view.md
 - src/viewer/treedraw.go
 - src/viewer/tree_test.go
+- test/contract/paragraph.test.js
 
 ## verdict
 
@@ -523,25 +530,25 @@ chapter owning it.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- The branch answers the ask: three rules draw, and `./RUNME.sh lint spec` names every place.
-- `spec/config/level0.json` says the tree note tables the restated rules, and it tables none.
-- [[spec/design_output/lsp#a-second-copy-draws]] owns that table, so the comment names the wrong note.
-- The fix for it stands uncommitted in the working tree. Commit it, or the tip stays wrong.
-- `spec/schemas/paragraph.schema.yaml` names that same tree chapter over `restated.table`. Name the owner.
+- `spec/config/level0.json` names `spec/design_output/lsp.md`, the note owning what the rules weigh.
+- `spec/schemas/paragraph.schema.yaml` names [[spec/design_output/lsp#a-second-copy-draws]] over `restated.table`.
+- `test/contract/paragraph.test.js` names that chapter too, where it named the neighbour.
+- The working tree stands clean, so the tip carries every fix the last round asked for.
 
-What holds, so the fixes stay small:
+What holds:
 
-- `./RUNME.sh check` answers 0: 1253 cases pass, none fails, every projection reads as projected.
-- `./RUNME.sh lint spec` answers 0 in under seven seconds, where it crawled past two minutes.
-- The tree holds the one pass, and a case proves three asks cost one.
-- A changed buffer drops the findings, and the next ask pays the pass again.
+- The branch answers the ask: the rules draw, and `./RUNME.sh lint spec` names every place.
+- `./RUNME.sh check` answers 0, every case passes, and every projection reads as projected.
+- `./RUNME.sh lint spec` answers 0, in seconds where it crawled past the minute.
+- `./RUNME.sh branch review the-rules-hold-themselves` answers nothing to fix.
 - A scratch tree draws `RestatedPointer` and `RestatedRule` off the binary, handed a folder.
-- Vale draws `RestatedTable` over a line beside a table, live.
-- A bound of nothing holds its rule off, which answers the missing block, and a case proves it.
-- `restatedHere` reads the tracked file, the environment and the local one, as `wordsHere` does.
-- The dead anchors under `src/viewer` stand committed at the tip.
+- Vale draws `RestatedTable` live, over a line saying again what the cell beside it holds.
+- Each rule carries a case feeding it a bad pair and a good one, and each answers right.
+- The sweep draws nothing over this tree, so the places the branch names took their fix.
+- `spec/design_output/tree#the-rules-over-two-files` stands live, so the pointers left on it reach a chapter.
+- Both pointers under `src/viewer` name [[spec/design_output/tree-view#a-tab-joins-the-two]], which stands.
 - The handover carries a retro, and its third finding names the class both fixes fall under.
 - The files past this ask belong to the group's other tickets, and none redesigns this one.
 
@@ -551,7 +558,7 @@ What holds, so the fixes stay small:
 
 <!-- the form is checklist -->
 
-- Each bound stands in one place: the two in `spec/config/level0.json`, the third in the paragraph schema. The chapter [[spec/design_output/lsp#a-second-copy-draws]] owns what the rules weigh, and the code points there. Two comments name `spec/design_output/tree.md` instead, which tables the rules over two files and holds none of these three. That is the fact standing in the wrong place, and the two fixes above put it right.
+- Each bound stands in one place, and [[spec/design_output/lsp#a-second-copy-draws]] owns what the rules weigh. The code, the config comment, the schema comment and the case point there. The projected rule file names its source. No fact this change adds stands twice.
 
 # Discussion
 
