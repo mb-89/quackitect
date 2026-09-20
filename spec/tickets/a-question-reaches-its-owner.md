@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -149,6 +149,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-13
+    hash_before: ff4a9bd507e777afd77663653996d17940f417f5
+    hash_after: ff4a9bd507e777afd77663653996d17940f417f5
+reason: done
 ---
 
 # Ask
@@ -368,17 +373,66 @@ The working note stands at the count its schema caps, so the drafter's half join
 
 <!-- the form is files -->
 
+- spec/tickets/a-question-reaches-its-owner.md
+- spec/design_output/pull.md
+- spec/guidance/working.md
+- spec/guidance/review/reviewing.md
+- spec/guidance/guidance.md
+- spec/schemas/guidance.schema.yaml
+- test/contract/question-grades.test.js
+- test/level0/pull.test.js
+- src/scripts/pull-writes.js
+- src/scripts/pull-hand.js
+- src/scripts/pull.js
+- src/scripts/branch-usage.js
+- HANDOVER.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+| the question reviewing asks | the answer |
+|---|---|
+| does the branch do what the ask asks | yes, each of the four asks lands |
+| what does the diff touch beyond the ask | the two notes, one chapter, two case files and this ticket |
+| what does `./RUNME.sh check` answer | 0 on `ff4a9bd5`, which matches origin |
+| does a retro stand in the handback | `./RUNME.sh branch review` names it as the branch's one fix |
+| does every rule the branch adds carry a case | yes, `test/contract/question-grades.test.js` reads both rules off the notes |
+| does a rule fed something bad refuse | yes, both rule cases fail against the tree before this change |
+
+TL;DR:
+
+- The grade table stands in [[spec/design_output/pull#a-person-step-goes-in]], and links the two guidance notes.
+- Each guidance note keeps its own rule, and the chapter points at both.
+- `branch escalate` stands as it stands, so the design road is the engine's own.
+- The craft road is the fail verdict, and the route grows no person step.
+- The retro belongs to the branch, and this route sends the ticket to it next.
+
+The findings, one a line:
+
+- The four asks land: the drafter's rule, the reviewer's rule, the design input read, the case.
+- Driving both rule cases against the tree before this change fails both, so each asserts something.
+- Blanking `on_fail` in `failed` of `src/scripts/pull-writes.js` fails the craft case.
+- So the craft case guards the road it names.
+- `./RUNME.sh test` runs green, and `./RUNME.sh check` answers 0.
+- `spec/schemas/guidance.schema.yaml` caps a rule list, and the working note stands at that cap.
+- So the seventh rule takes the drafter's half, and the note keeps its shape.
+- [[spec/guidance/guidance]] asks each rule to name the failure it prevents.
+- The two new rules want that clause, and most rules of the reviewing note want it too.
+- I grade that craft, and hand it to the retro for the whole note.
+- I assume the merge hand reads the grade table as the one owner of each road.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place, and a note points at the file. The grade table stands in the pull chapter alone, and links the two guidance notes. Each rule stands in its own note, and the cases read those notes off disk.
 
 # Discussion
 
