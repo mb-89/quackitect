@@ -75,11 +75,19 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box fa49097ce66c · claude-code-remote
     hash_before: c09f7d6b59b03a07bef340db575ad54235c99398
+  - step: sync
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 9f8eaf16be55eb3c26138d03d43e72b056b6d826
+    hash_after: 9f8eaf16be55eb3c26138d03d43e72b056b6d826
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-bridge-keeps-transport already carries every commit on main.
 ---
 
 # Ask
