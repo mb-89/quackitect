@@ -89,12 +89,18 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: f3207481318c868ec4e9cd220a99279670c51544
     hash_after: f3207481318c868ec4e9cd220a99279670c51544
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-2
+    hash_before: ec36534a027da40fa81b8f4c0ad64c97f1d49a6b
+    hash_after: ec36534a027da40fa81b8f4c0ad64c97f1d49a6b
+    returns: 1
+    why: The approach puts the pass list in `DoorsOnly.yml`. A rule there reads the; raw text of a file alone, so a list of roots in the rule file stands unread.; `.vale.ini` owns that fact already, in the sections standing the rule off; `src/doors` and the editor files. Put the roots there.; The approach gives `src/lsp` a door file and names no section standing the; Go reading off it. Name it, beside the sections `.vale.ini` already holds.; The approach hands the reads outside the two the ask names to the implement; step. The ask asks for a clean `./RUNME.sh lint src`, so say which of them; move behind a door and which take the value off the hand. A read of; `process.platform` that builds a path is the case the criterion leaves open.; The rest holds. `DoorsOnly.yml` stands, and `.vale.ini` runs it over `.go`; beside `.js`. The hand `src/scripts/cli-doors.js` builds carries `env`, so; the two reads the ask names take `it.env` and `box.env` as written.
 ---
 
 # Ask
@@ -152,6 +158,22 @@ one or adds its file to the list with the reason beside it.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- The approach puts the pass list in `DoorsOnly.yml`. A rule there reads the
+  raw text of a file alone, so a list of roots in the rule file stands unread.
+  `.vale.ini` owns that fact already, in the sections standing the rule off
+  `src/doors` and the editor files. Put the roots there.
+- The approach gives `src/lsp` a door file and names no section standing the
+  Go reading off it. Name it, beside the sections `.vale.ini` already holds.
+- The approach hands the reads outside the two the ask names to the implement
+  step. The ask asks for a clean `./RUNME.sh lint src`, so say which of them
+  move behind a door and which take the value off the hand. A read of
+  `process.platform` that builds a path is the case the criterion leaves open.
+- The rest holds. `DoorsOnly.yml` stands, and `.vale.ini` runs it over `.go`
+  beside `.js`. The hand `src/scripts/cli-doors.js` builds carries `env`, so
+  the two reads the ask names take `it.env` and `box.env` as written.
 
 # implement
 
