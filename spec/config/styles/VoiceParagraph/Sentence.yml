@@ -4,7 +4,7 @@
 extends: occurrence
 message: "A sentence holds 25 words. Cut this one in two."
 link: spec/funnel/a-paragraph-has-a-schema.md
-level: error
+level: warning
 scope: sentence
 max: 25
 token: '\b\w+\b'

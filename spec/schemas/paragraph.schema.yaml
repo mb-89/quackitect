@@ -18,9 +18,29 @@ misreads: 3
 # writes. A rule this map leaves out reads error, so the write door refuses its
 # break and the push door names it nowhere. A rule reading warning lets the
 # write land, and the lint over the files a push carries names it.
-# [[spec/tickets/one-list-holds-the-warnings]]
+#
+# A rule of form reads warning: a cap on a sentence, a list item or a paragraph,
+# a tense, a register, a mark on the page. The refactoring hand drains those,
+# and the meaning stands. A rule of substance reads error: a word outside the
+# core, and the answer register, because no hand mends an answer after it lands.
+# [[spec/rationales/voice#11-form-and-substance]]
 rules:
   RestatedTable: warning
+  Sentence: warning
+  ListItem: warning
+  Paragraph: warning
+  Markup: warning
+  Characters: warning
+  CodeSpans: warning
+  Shape: warning
+  PastTense: warning
+  Auxiliary: warning
+  Progressive: warning
+  Modal: warning
+  Hedge: warning
+  Contraction: warning
+  Latin: warning
+  EtCetera: warning
 
 # The frontmatter answers to its own schema, so these rules leave it alone. A
 # key below names a field a person writes prose into, and the rules read the

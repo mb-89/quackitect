@@ -4,7 +4,7 @@
 extends: sequence
 message: "Write the simple tense: '%s %s'."
 link: spec/funnel/a-paragraph-has-a-schema.md
-level: error
+level: warning
 ignorecase: true
 exceptions:
   - am approved
