@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -232,6 +232,17 @@ record:
     hash_after: 544be3d8524f833be7d93ad20be04280e22c27cd
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: ed7fd895604b23075ae0e82c113ff3f7518ee9e4
+    hash_after: ed7fd895604b23075ae0e82c113ff3f7518ee9e4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 24 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -452,7 +463,7 @@ Each verb walked two roads before, one for a branch carrying the root handover a
 |---|---|
 | `take` | the group's record, and it prints the ask |
 | `done` | the group's leaves, and it writes `hash_after` |
-| `release` | the group's record, which `letGo` already wrote |
+| `release` | the group's record, which `letGo` already writes |
 | `read` and `review` | the group ticket as the text they show |
 | `list` | the one kind, so the kind column goes |
 | `merge` | the group's state, and it drops no file |
@@ -460,9 +471,19 @@ Each verb walked two roads before, one for a branch carrying the root handover a
 
 The copilot lane read the root file three ways: the claim, the standing at session start, and the result at the end. Each reads the group ticket now, through `groupStanding`. Its loop over two handover paths reads the session handover alone.
 
-The review lane called its first question the brief. It calls it the ask, and the reader prompt shows the group ticket. `retroIn` goes, because `retroOnTicket` is the one road left.
+Three more things move with it:
 
-The session handover stays. It reaches one reader once, level zero deletes the copy it reads, and its schema governs that one path.
+- the review lane calls its first question the ask, and its prompt shows the group ticket
+- `retroIn` goes, because `retroOnTicket` is the one road left
+- the session handover stays, and its schema governs that one path
+
+The verdict round caught three readers the cut left standing, and each takes its fix:
+
+| what the cut drops | what stands now |
+|---|---|
+| `COL.kind` | `COL.place`, which the queue listing pads with |
+| the `new` verb | `USAGE` drops its row, so the usage names the verbs that stand |
+| a case over `ready` | a group case drives the refusal, and a second drives the queue width |
 
 ### checked
 
@@ -470,7 +491,7 @@ The session handover stays. It reaches one reader once, level zero deletes the c
 <!-- the form is checklist -->
 
 - every fact the change adds stands in one place, and the notes point at the file holding it
-- the name rule stands at the mint alone, so `branch open` carries no copy of it
+- the column widths stand in `COL`, and the queue place takes its own name there
 - each header says what its file is for, and counts nothing
 
 # verdict
