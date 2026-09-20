@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -125,6 +125,10 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 9ae0159039ceca0a985e799b78d911d580486ef4
     hash_after: 9ae0159039ceca0a985e799b78d911d580486ef4
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-8
+    hash_before: d43f20ee1e87158716438f9644a5b25904a3faa1
+    hash_after: d43f20ee1e87158716438f9644a5b25904a3faa1
 ---
 
 # Ask
@@ -255,25 +259,25 @@ change.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-| the finding | what to do |
+| the reading | what it answers |
 |---|---|
-| `spec/rationales/code/refactoring` names no file in the tree | Write `spec/rationales/refactoring`, and leave `spec/rationales/code` to the note it explains |
-| The chapter-past-a-star table stops at the guidance notes | Add `spec/rationales/apply` 1 to 4, `extension` 1 to 5, `index` 1 to 3 and `vehicle` 1 to 2, whose notes mark no item at all |
-| `spec/rationales/pull` carries no `explains` | Say what the star check answers where that key stands absent |
-| `checkNote` takes a text and the schemas, and the write door hands it one buffer | Say where `underFaults` reads the note `explains` names, because its callers hold no tree |
-| `spec/rationales/guidance` opens chapter 12 for the rule that leaves | Say whether that chapter goes with rule twelve |
+| the ask, bullet by bullet | each one carries a decided approach, and the lint target stands named |
+| both drift tables | each reads as the tree stands, over every rationale carrying `explains` |
+| `spec/rationales/pull` | the one rationale carrying no `explains`, as the approach says |
+| `src/lsp/check.go` | both Go fronts hold `one.tree`, so the checker reaches the note `explains` names |
+| `src/bridge/write.js` | the write door hands one buffer, and the approach lets the check pass over it |
+| `spec/guidance/guidance.md` beside its rationale | rule twelve stands last, and chapter 12 stands last, so nothing renumbers |
+| the marker table | the two design outputs are the files drawing a marker, and a test's string literal stays off Vale |
+| `./RUNME.sh lint spec/guidance spec/rationales` | exits 0 today, and the star check adds the drift the first table names |
+| `./RUNME.sh check` | exits 0 on this branch |
 
-Answered from the last round, one a line:
+What the implement step carries, one a line:
 
-- the star check reads from the marked rule to its chapter, and a chapter past a star passes
-- `History.yml` lists its markers, and they read present tense past `PastTense`
-- rule twelve leaves the note, and `RuleNamesItsFailure` leaves with it
-- the word list and the stop folder take `VoiceShape` alone, so the marker rule stands off both
-- the marker drift stands named, one file to a marker
-
-`./RUNME.sh check` answers 0 on this branch, and the drift tables read as the tree stands, past the one path above.
+- mint the follow-up ticket with `./RUNME.sh mint ticket`, so rule twelve, chapter 12 and the rewrites land on it
+- write each chapter the first table names in its number's place, because `order: strict` holds a rationale's chapters
+- switch `History` off over `spec/rationales` in `.vale.ini`, where that section switches the paragraph rules off
 
 # implement
 
