@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -213,6 +213,10 @@ record:
     hash_after: 45aaa37ab73fcce2f84e2b4b7d64c9b4afb13a61
     returns: 3
     why: "| the finding | the fix |; |---|---|; | The case named for a projection target asserts nothing. `untestedIn` holds no projection reading, and the path it feeds is no `.js` under `src`, so `SOURCE` alone draws the empty list | Feed the case a path the rule would otherwise name, or drop the half and cut the promise from the approach |; | The approach says the delta reading skips every projection target. No target `spec/config/projections.json` names lands under `src`, so the line describes a reading standing nowhere | Say which paths under `src` the reading skips, and let one list in the code carry them |; | `filesIn` stands exported from `tested.js`, and no module calls it. A reader takes it for a door of the rule, and nothing drives it | Drop the export, or name the caller it lands for |; What holds:; `./RUNME.sh check` exits 0 on `45aaa37a`, and the branch matches origin.; The four lines of the ask each take a program: the delta reading, the tree rule and the guard.; Rule five of [[spec/guidance/code/testing]] names the commit door and the tree rule.; Every fake under `src/doors/fake` takes `behaves`, and a case drives `fakeClock` into a call it lacks.; `hunksIn` keys the added lines by file, and a case feeds it one changed module importing another.; Both doors read one text, because the Bash door and the hook hand the staged delta to `untestedIn`.; Each rule takes a case feeding it something bad: a module no test imports, and a stray test.; The nine tests the import rule forces each assert on the module they name.; `test/level0/tools-door.test.js` stands as it stands on trunk, and its survey cases hold.; The change touches the readings, the guard, both doors, two notes and the tests. It reaches nothing outside the brief.; `HANDOVER.md` carries a retro chapter, with three findings for the retro to weigh."
+  - step: implement/reflect
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 09b70059784fe9460ec1fda514acd4ff1722f368
+    hash_after: 09b70059784fe9460ec1fda514acd4ff1722f368
 ---
 
 # Ask
@@ -390,6 +394,19 @@ The third round names one class, and the same class twice over:
 The second is the same fault the first round met, one layer down: a rule passing
 on the weakest reading. So the delta reading now keys the added lines by file,
 and each test answers for itself.
+
+The fourth round names one class, three times over: a piece says more than it
+does.
+
+| the class | the fault here | the fix for the class |
+|---|---|---|
+| a case asserts past what the code reads | the projection case feeds a path the source filter drops, so it asserts on the filter alone | each case feeds a path the rule would otherwise name |
+| a promise stands beside a reading that holds it nowhere | the approach names every projection target, and the reading skips the fakes alone | the code names what it skips, and the evidence reads that list back |
+| an export stands with no caller | `filesIn` reads as a door of the rule, and nothing calls it | the module exports what a caller takes, and the rest stays inside |
+
+One list is the fix for all three. The delta reading skips the fakes, which
+stand in for a door, and the stub's template, which a verb copies whole. The
+case now feeds that template, so it asserts on the list and no filter.
 
 ### checked
 
