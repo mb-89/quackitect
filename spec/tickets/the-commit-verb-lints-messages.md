@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -109,6 +109,17 @@ record:
     hand: box 099c2ec7708d · claude-code-remote · helper-4
     hash_before: ddc4302a55ac99ea5ef319c90223c61472261205
     hash_after: ddc4302a55ac99ea5ef319c90223c61472261205
+  - step: implement/tests-red
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 23a2b68cf64070a3e149e90db8128c75dcaf8a82
+    hash_after: 23a2b68cf64070a3e149e90db8128c75dcaf8a82
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -198,20 +209,33 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/commit-verb.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Four cases go red on their own assertions. `commitVerb` answers zero and reaches no door, so each case reads back a tree nothing touched.
+
+What surprises:
+
+- the fifth case passes already, because it asserts a push nobody makes
+- a case holding a promise where it wants a code reads as a build fault
+- so the gate says build where every failure is an assertion, and awaiting the call clears it
+
+The door's own read moves to `messageFaults` in the same hunk. `commitVoice` parses a shell command, and the verb holds a message string. One export serves both, so the path and the trailer strip stay in one place.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the cases land in `test/level0/commit-verb.test.js`, beside the cases over `landed` and the push door
+- git, the disk, the process and Vale each reach the verb as a door, and the fakes drive all four
+- the header of `messageFaults` points at the chapter owning the message read
 
 ## reflect
 

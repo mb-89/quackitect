@@ -83,22 +83,28 @@ async function commandRules(command, _e, box) {
   return refusedCommand(command, found);
 }
 
+// The one read over a commit message. The door calls it, and so does the verb
+// a hand runs. [[spec/design_output/bash#a-commit-message-meets-voice]]
+export async function messageFaults(message, box) {
+  if (!box.vale.stands()) return [];
+  const text = withoutTrailers(String(message ?? ""));
+  if (!text.trim()) return [];
+  const ran = await box.vale.lint(text, COMMIT);
+  return ran.ran ? readsProse(box, text, ran.found) : [];
+}
+
 // [[spec/design_output/bash#a-commit-message-meets-voice]]
 async function commitVoice(command, box) {
   const said = commitIn(command);
-  if (!said || !box.vale.stands()) return [];
-  let text = String(said.text ?? "");
+  if (!said) return [];
   if (said.form === "file") {
     try {
-      text = String(box.disk.read(said.file));
+      return await messageFaults(box.disk.read(said.file), box);
     } catch {
       return [];
     }
   }
-  text = withoutTrailers(text);
-  if (!text.trim()) return [];
-  const ran = await box.vale.lint(text, COMMIT);
-  return ran.ran ? readsProse(box, text, ran.found) : [];
+  return await messageFaults(said.text, box);
 }
 
 // [[spec/design_output/private#two-doors-one-check]]
