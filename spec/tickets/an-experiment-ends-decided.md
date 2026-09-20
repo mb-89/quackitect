@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -236,6 +236,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-19
+    hash_before: 83dbc4dc416b546e877ce12b2389485209eb6f2a
+    hash_after: 83dbc4dc416b546e877ce12b2389485209eb6f2a
+reason: done
 ---
 
 # Ask
@@ -532,7 +537,7 @@ A closed ticket still names the old folder in its own record of what stood then,
 <!-- pass or fail, findings one a line -->
 <!-- the form is verdict -->
 
-fail
+pass
 
 | the question reviewing asks | the answer |
 |---|---|
@@ -541,27 +546,26 @@ fail
 | what does `./RUNME.sh check` answer | 0 on this commit |
 | does a retro stand in the handback | no, the branch's close writes it |
 | does every rule the branch adds carry a test | yes, I drove the verb over an open trial and it refused |
-| what grade do the findings take | craft, a field of this ticket holds a count that reads false |
+| what grade do the findings take | none stands open |
 
-I drove `retro audit` over a tree carrying an open trial, and it named the trial
-and refused. The Discussion answers the approach row, which stands under a step
-no round after it reopens. The `says` chapter stands otherwise: this round held
-`implement/tests-green` and wrote its other fields, so that chapter takes the
-fix where a reader meets the count.
+I drove `retro audit` over a fake tree holding an open trial, and it named the
+trial and refused. Over the tree as it stands the verb answers 0. `git grep
+skills/level1` and `git grep skills/pane` reach the closed tickets alone, where
+each record names the folder as it stood. The finding of the last round lands,
+and the count leaves the `says` chapter.
 
 Findings, one a line:
 
-- The `says` chapter writes a count of the closed tickets naming the old folder.
-- `git grep skills/level1 -- spec/tickets` names a ticket the count leaves out, so it reads false.
-- This round answers `implement/tests-green` again, so the hand writes that chapter.
-- Name the command there in place of the count, and leave the Discussion row standing.
+- The `says` chapter names `git grep skills/level1 -- spec/tickets`, and carries no count.
+- The Discussion row stands, and takes the approach row to the note owning that fact.
+- None stands open.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place. [[spec/design_output/work#an-experiment-decides]] owns the decision and the hold. The route, the verb and the cases point there, and the Discussion takes the approach row there. The `says` chapter keeps a count of its own, which the findings name.
+- every fact the change adds stands in one place. [[spec/design_output/work#an-experiment-decides]] owns the decision and the hold. The route, the verb and the cases point there. The Discussion takes the approach row there, and the `says` chapter names a command in place of a count.
 
 # Discussion
 
