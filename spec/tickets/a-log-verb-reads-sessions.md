@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -186,6 +186,17 @@ record:
       - name: check
         exit: 1
         said:      1  in all
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: a8c83549a6aac5a9081968bbafaeb876627a8f00
+    hash_after: a8c83549a6aac5a9081968bbafaeb876627a8f00
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
