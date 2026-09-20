@@ -89,12 +89,18 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 8c3cbf655d1c012f211fad758ea0f0b857d74fde
     hash_after: 8c3cbf655d1c012f211fad758ea0f0b857d74fde
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-2
+    hash_before: 99a6e900398f9162aa8ad8952e8818d909595d30
+    hash_after: 99a6e900398f9162aa8ad8952e8818d909595d30
+    returns: 1
+    why: The refusal names Read, Write and Edit today, and no module under the door; names `mcp__level0__patch` or `mcp__level0__replace`. "The way the line rule; names them now" reads a thing standing nowhere. Write the message the two; roads share, and name the module owning it.; `node --test test/level0/bash.test.js` hands a runner a path, and that file; carries `writeFileSync("README.md", ...)` inside a string. A reading taking; every runner argument as a script refuses a plain test run. Say what; `scriptsIn` counts as a script, and what the reading skips.; `writesInScript(body)` already answers the tracked paths a script's text; writes. `writesIn(segment, bodies)` already holds the name the approach gives; a new function of another shape. Reuse the first, add `scriptsIn` alone, and; leave the second name where it stands.; The seam where the read happens goes missing. `findings(command, most, it)`; takes no disk, and `box.disk.read` stands in the bridge. Say which of the two; takes the script's text, because the choice moves the cases between test; files.; A copy out of the scratchpad into a tracked path refuses today, asserted over; `mv` and `cp` in `test/level0/bash.test.js`. Say it stands, and point at that; assertion.; `./RUNME.sh test` names no verb this tree carries. `VERBS` holds check,; branch, tui and doctor, and `TestRunPointsSomewhere` points a test run at; `./RUNME.sh check`. Decide the verb covering the script write and the; refusal.; What I check:; The table's three roads hold. A redirection, an in-place edit and a copy each; land through `writesAPath` today, and a heredoc and `node -e` land through; `writesInScript`. The script file on disk is the one road open.; A script writing under `.se` or the scratchpad passes, because `reaches`; reads the target against `FREE`.; `fakeDisk` stands for the door tests, so the disk this reading takes has a; fake.
 ---
 
 # Ask
@@ -155,6 +161,42 @@ The cases stand in `test/level0/bash.test.js`, over a fake disk:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- The refusal names Read, Write and Edit today, and no module under the door
+  names `mcp__level0__patch` or `mcp__level0__replace`. "The way the line rule
+  names them now" reads a thing standing nowhere. Write the message the two
+  roads share, and name the module owning it.
+- `node --test test/level0/bash.test.js` hands a runner a path, and that file
+  carries `writeFileSync("README.md", ...)` inside a string. A reading taking
+  every runner argument as a script refuses a plain test run. Say what
+  `scriptsIn` counts as a script, and what the reading skips.
+- `writesInScript(body)` already answers the tracked paths a script's text
+  writes. `writesIn(segment, bodies)` already holds the name the approach gives
+  a new function of another shape. Reuse the first, add `scriptsIn` alone, and
+  leave the second name where it stands.
+- The seam where the read happens goes missing. `findings(command, most, it)`
+  takes no disk, and `box.disk.read` stands in the bridge. Say which of the two
+  takes the script's text, because the choice moves the cases between test
+  files.
+- A copy out of the scratchpad into a tracked path refuses today, asserted over
+  `mv` and `cp` in `test/level0/bash.test.js`. Say it stands, and point at that
+  assertion.
+- `./RUNME.sh test` names no verb this tree carries. `VERBS` holds check,
+  branch, tui and doctor, and `TestRunPointsSomewhere` points a test run at
+  `./RUNME.sh check`. Decide the verb covering the script write and the
+  refusal.
+
+What I check:
+
+- The table's three roads hold. A redirection, an in-place edit and a copy each
+  land through `writesAPath` today, and a heredoc and `node -e` land through
+  `writesInScript`. The script file on disk is the one road open.
+- A script writing under `.se` or the scratchpad passes, because `reaches`
+  reads the target against `FREE`.
+- `fakeDisk` stands for the door tests, so the disk this reading takes has a
+  fake.
 
 # implement
 
