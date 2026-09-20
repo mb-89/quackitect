@@ -403,15 +403,32 @@ code note, which holds that rule over every change. The tree view note renames a
 heading the viewer note already carries. The lint config turns the table rule
 off over tickets, where a line beside a table weighs it on purpose.
 
+The second round answers the verdict's findings:
+
+| the finding | what lands |
+|---|---|
+| the pass ran once per path | the tree holds the findings, and every front reads the one pass |
+| `se-lsp check spec` ran past two minutes | the same command answers in a second, and `./RUNME.sh lint spec` in six |
+| the bounds read two layers | the reader takes the environment between the tracked file and the local one |
+| a missing block drew every pair | a bound under one holds its rule off, the way the name cap reads its own |
+| the rename left two pointers reaching nothing | both name the chapter the note now carries |
+
+The bounds take no floor in the code, because the shipped config owns each
+number. A tree carrying none draws nothing, which is the quiet side to fail on.
+
+`spec/design_output/lsp.md` gains the chapter saying what the two Go rules weigh
+and what the bounds do. Every piece of the set points there, so a reader
+following a pointer lands on the chapter describing it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
-- the change touches the checker, its front, the schema, the config pair, and the places the rules name
+- this round touches the tree's memo, the checker, the config reader, the bound guard and the note
 - the Go fixture writes a tree of its own, and the Vale case drives the real binary
-- each rule and each piece carries the pointer at the chapter tabling the rules over two files
+- each piece points at the chapter saying what the rules weigh and how the pass runs
 
 # verdict
 
