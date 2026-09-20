@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -204,6 +204,10 @@ record:
     hash_after: 2dd4c5fdd171c97b78dff58b23601cf3ac6b0834
     returns: 2
     why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | yes, the numbers stand in one config file and the window reads them there |; | is what the diff touches beyond the ask trivial | yes, the shared reader, the format gate and the two notes the approach names |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does a retro stand in the handback | no, and `HANDOVER.md` gives that line to the branch's close |; | does every rule the branch adds carry a case | no, the format gate carries none |; | does that case refuse something bad | the colour case does, and the format gate refuses by a hand alone |; TL;DR:; Every line the round before left open lands. `gofmt -l src` names no file, and the chapter names no colour in words.; The branch writes a link to a chapter standing nowhere. It takes a live link out to do it.; The class the reflect step names repeats. A dead link rides in no gate, as a Go format rode in none.; The findings, one a line:; `[[spec/design_output/config#a-go-program-reads-the-config]]` names a chapter `spec/design_output/config.md` holds nowhere, so the shared reader stands in no note.; `src/lsp/config.go` points at [[spec/design_output/config#the-resolver-holds-the-layers]] on `main`, and at the absent chapter here. So the branch trades a live link for a dead one.; `goFormat` in `src/scripts/cli-check.js` points at [[spec/design_output/index#the-compiler-it-needs]], which holds the C compiler and says nothing of Go format.; The format gate carries no case. `grep -rln gofmt src test` answers `src/scripts/cli-check.js` alone. The `says` field above reads that a probe file turns the check red.; A file reading other than `gofmt` writes it, dropped under `src/config`, turns `goHolds` red and reads by name. So the gate holds, and the tree proves it nowhere.; `./RUNME.sh check` reads no link, so this round's fault rides in the gap the format fault rode in.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the chapter the shared reader's comments name stands in `spec/design_output/config.md` | open |; | 2 | the format gate's comment names a chapter saying what the check reads | open |; | 3 | a case drives the format gate over a bad file, and asserts the gate names it | open |; | 4 | the verdict hand reads the branch again | open |"
+  - step: implement/reflect
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 3e4c79151adb5a3168a779d60b0a13cb98fed331
+    hash_after: 3e4c79151adb5a3168a779d60b0a13cb98fed331
 ---
 
 # Ask
@@ -377,19 +381,19 @@ The first finding asks what answers the line about the window's own code. The ca
 <!-- the class of error the findings describe, and the fix for the class -->
 <!-- the form is text -->
 
-Three classes carry the six findings.
+One class carries every finding: a claim no gate reads.
 
-| the class | the findings in it | the fix for the class |
-|---|---|---|
-| a rule no gate reads | the spare blank line, and the gate that misses it | `gofmt -l` runs beside `go test`, one call a module, in `goHolds` |
-| a fact standing twice | the comment, the colour words, the path the case spells | each place points at the one holding the fact |
-| an order read off text | the spare keys sorting as text | the list keeps the file's own order |
+| the finding | the claim nobody reads |
+|---|---|
+| the chapter the two readers point at | the pointer resolves to a heading the note holds |
+| the pointer the format gate carries | the chapter it names says what the code does |
+| the gate standing with no case | the answer in `says` that a bad file turns the check red |
 
-The first class is the one the verdict names. Every rule this tree holds runs at the write door or in the check. Go's own format runs in neither, so a hand's eye is the only gate, and an eye misses a blank line.
+The round before this closed the same class over Go format. A tool ran in no gate, so a hand's eye stood for it. This round finds the class again, one layer up: a pointer resolves in no gate, and a gate the tree proves nowhere answers to nobody.
 
-The second class is the voice rule about saying a thing once. A value moving out of code leaves prose behind it, and that prose goes stale where nobody points it at the new home.
+The fix inside this ticket is two halves. The pointers become true, one by writing the chapter the readers want and one by pointing at the chapter that owns the battery. The gate's own half moves into a function a case drives, beside the module list it belongs to.
 
-The third class is narrower. A map carries no order, so a list written as a map reads its order off its keys. Text order and number order part at the tenth key.
+The fix for the whole class is a gate reading every pointer. `node` over a walk of the tracked files answers how many resolve nowhere today, and the count reaches far past this ticket. So the gate stands as a ticket of its own, which this round mints as a note for the retro to place.
 
 ### checked
 
