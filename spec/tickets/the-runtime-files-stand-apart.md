@@ -479,7 +479,7 @@ A module that imports takes the name from the owner. A module that imports none 
 - .claude/skills/level0/lib/tree.js
 - .claude/skills/level0/lib/undo.js
 - .claude/skills/level0/lib/voice.js
-- .claude/skills/level1/hooks/level1.js
+- .claude/skills/level0/hooks/pull-tool.js
     - .gitignore
 - .vale.ini
 - .vscode/settings.json
@@ -501,7 +501,7 @@ A module that imports takes the name from the owner. A module that imports none 
 - spec/design_output/stop.md
 - spec/design_output/tools.md
 - spec/design_output/tree.md
-- spec/design_output/viewer.md
+- spec/design_output/tui.md
 - spec/design_output/work.md
 - spec/guidance/cloud.md
 - spec/guidance/review/reviewing.md

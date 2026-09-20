@@ -18,6 +18,8 @@ import {
   standingLayer,
   styled,
 } from "../../.claude/skills/level0/lib/guidance.js";
+// The whole module, so a name the library answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
+import * as lib from "../../.claude/skills/level0/lib/guidance.js";
 import { guidanceHere } from "../../src/bridge/guidance.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
@@ -235,4 +237,73 @@ test("the standing layer joins the method's guidance with the work root's, file 
 
   const alone = guidanceHere(disk, "/tools", "/tools", {}, true);
   assert.equal(alone.notes, 2, "a tree driving itself reads its one root");
+});
+
+// A rule describing an answer ends in the answer mark. [[spec/tickets/the-judge-reads-answer-rules]]
+const marked = `---
+kind: [[guidance]]
+scope: ["everybody"]
+---
+
+# Actionables
+
+1. The first rule, which a hand keeps over evidence.
+2. The rule describing an answer, which evidence keeps nowhere. ^
+3. The third rule, which a hand keeps over evidence.
+`;
+
+// [[spec/tickets/the-judge-reads-answer-rules]]
+test("the answer mark strips the way the star does, so every reader reads the rule whole", () => {
+  assert.deepEqual(actionables(marked), [
+    "The first rule, which a hand keeps over evidence.",
+    "The rule describing an answer, which evidence keeps nowhere.",
+    "The third rule, which a hand keeps over evidence.",
+  ]);
+});
+
+// [[spec/tickets/the-judge-reads-answer-rules]]
+test("a label carries the note's path under the guidance folder beside the number", () => {
+  assert.equal(typeof lib.labelOf, "function", "the library answers labelOf");
+  assert.equal(lib.labelOf("spec/guidance/voice", 1), "voice-1");
+  assert.equal(
+    lib.labelOf("spec/guidance/code/code", 3),
+    "code-code-3",
+    "two notes sharing a last segment stand apart",
+  );
+});
+
+// [[spec/tickets/the-judge-reads-answer-rules]]
+test("the rules for evidence drop the marked one and keep the number the chapter gives", () => {
+  assert.equal(typeof lib.forEvidence, "function", "the library answers forEvidence");
+  assert.deepEqual(lib.forEvidence(marked, "spec/guidance/voice"), [
+    {
+      label: "voice-1",
+      note: "spec/guidance/voice",
+      number: 1,
+      rule: "The first rule, which a hand keeps over evidence.",
+    },
+    {
+      label: "voice-3",
+      note: "spec/guidance/voice",
+      number: 3,
+      rule: "The third rule, which a hand keeps over evidence.",
+    },
+  ]);
+});
+
+// [[spec/tickets/the-judge-reads-answer-rules]]
+test("a note whose rules all carry the mark hands an empty list, so the judge stands silent", () => {
+  assert.equal(typeof lib.forEvidence, "function", "the library answers forEvidence");
+  const all = `---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. One answer rule. ^\n2. Another answer rule. ^\n`;
+  assert.deepEqual(lib.forEvidence(all, "spec/guidance/voice"), []);
+});
+
+// A note writes the mark in a code span, because a paragraph admits the character nowhere else. [[spec/tickets/the-judge-reads-answer-rules]]
+test("a mark in a code span reads as the bare one, and strips the same way", () => {
+  const spanned = marked.replace("nowhere. ^", "nowhere. `^`");
+  assert.deepEqual(actionables(spanned), actionables(marked));
+  assert.deepEqual(
+    lib.forEvidence(spanned, "spec/guidance/voice"),
+    lib.forEvidence(marked, "spec/guidance/voice"),
+  );
 });

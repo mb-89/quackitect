@@ -9,7 +9,7 @@ import { mintedNote, schemasFrom } from "../../.claude/skills/level0/lib/schema.
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { fieldOf } from "../../src/scripts/group.js";
+import { fieldOf } from "../../src/engine/group.js";
 import { withRoute } from "../../src/scripts/process.js";
 import { takeable } from "../../src/scripts/pull.js";
 import { work } from "../../src/scripts/work.js";

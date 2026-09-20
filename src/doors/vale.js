@@ -5,7 +5,7 @@
 
 import { lintText } from "../../.claude/skills/level0/lib/vale.js";
 import { assemble } from "../scripts/styles.js";
-import { readTools, whereIs } from "../scripts/tools.js";
+import { readTools, whereIs } from "../engine/tools.js";
 
 export function vale(disk, proc, method, work = method) {
   const found = whereIs(disk, method, "vale", readTools(disk, method));

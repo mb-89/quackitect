@@ -3,13 +3,23 @@
 // move a branch stand in work.js beside this file.
 // [[spec/design_output/work#a-row-per-group]]
 
-import { fieldOf, GROUP, isGroup, OPEN, stepOf, URGENT, urgent } from "./group.js";
-import { staleClaim } from "./stand.js";
+import {
+  CLOSED,
+  fieldOf,
+  GROUP,
+  isGroup,
+  OPEN,
+  stepOf,
+  URGENT,
+  urgent,
+} from "../engine/group.js";
+import { staleClaim } from "./work-free.js";
 import { answerOf } from "./work-answer.js";
 import {
   COL,
   DONE,
   HELD,
+  MERGED,
   noteOf,
   readWork,
   standingAll,
@@ -28,14 +38,15 @@ export function list(it, _name, argv) {
   const standing = standingAll(stand);
   if (said.includes("--done")) return doneOnly(stand, standing);
   const now = it.clock ? it.clock.now().getTime() : 0;
-  const rows = stand.flatMap((one) => [
-    rowOf(one, standing, now, it),
-    ...childRows(one),
-  ]);
-  const loose = looseRows(read.loose);
+  // The listing shows what waits on somebody, and a flag asks for the rest. [[spec/design_output/work#a-row-per-group]]
+  const all = said.includes("--all");
+  const rows = stand
+    .filter((one) => all || standing.get(one.branch) !== MERGED)
+    .flatMap((one) => [rowOf(one, standing, now, it), ...childRows(one, all)]);
+  const loose = looseRows(read.loose, all);
 
   if (!rows.length && !loose.length) {
-    console.log("No group and no loose ticket stands.");
+    console.log(all ? "No group and no loose ticket stands." : "Nothing stands open.");
     return 0;
   }
 
@@ -75,10 +86,11 @@ function rowOf(one, standing, now, it) {
 }
 
 // [[spec/design_output/work#a-ticket-under-its-group]]
-function childRows(one) {
+function childRows(one, all = false) {
   if (!one.ticket) return [];
   return one.tickets
     .filter((child) => fieldOf(child.text, GROUP) === one.name)
+    .filter((child) => all || stateOf(child.text) !== CLOSED)
     .map((child) => ({
       stale: false,
       said: `  ${child.name.padEnd(COL.child)} ticket ${stateOf(child.text).padEnd(COL.status)} ${whyOf(child.text)}`,
@@ -124,9 +136,10 @@ export function whyOf(text) {
 }
 
 // [[spec/design_output/work#a-row-per-group]]
-function looseRows(loose) {
+function looseRows(loose, all = false) {
   return loose
     .filter((one) => !fieldOf(one.text, GROUP) && !isGroup(one.text))
+    .filter((one) => all || stateOf(one.text) !== CLOSED)
     .map((one) => ({
       stale: false,
       said: `${one.name.padEnd(COL.branch)} ticket ${(fieldOf(one.text, "state") || OPEN).padEnd(COL.status)} ${markOf(one.text)}`,

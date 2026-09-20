@@ -178,7 +178,7 @@ says what the verb puts into each.
 
 | file | the verb puts |
 |---|---|
-| `project/spec/tickets/`, `project/spec/guidance/`, `project/src/` | one `.gitkeep`, so the empty folder travels with git |
+| the folders `stubFolders` names, under the stub's own name | one `.gitkeep`, so the empty folder travels with git |
 | `vehicle.json` | the record below |
 | `RUNME.sh` | the shim, with its run bit |
 | `.claude/settings.json` | the vehicle's tracked settings, key by key, with none of its comments |
@@ -197,6 +197,39 @@ says what the verb puts into each.
 A vehicle with no remote has no upstream a cloud box can clone, so the verb
 refuses until `--upstream` names one. A vehicle the button made has no git
 yet, and this is where that shows.
+
+## The brand a vehicle stamps
+
+The brand is the slug of the vehicle's folder name. A marketplace name takes no
+dot and no space. So `brandOf` lowers the case, turns each run of characters
+outside `a-z0-9` into a hyphen, and cuts a hyphen off each end.
+
+| the folder | the brand |
+|---|---|
+| `quackitect` | `quackitect` |
+| `my.app` | `my-app` |
+| `Acme Tools` | `acme-tools` |
+| `.hidden` | `hidden` |
+| `...` | the empty brand, which the stamp refuses |
+
+The brand reaches three names. The plugin name stands at `level0`, so every
+`mcp__level0` tool keeps the name it carries:
+
+| what reads the brand | who writes it |
+|---|---|
+| the marketplace name and its owner | the install script, ahead of every verb |
+| the plugin's author | the same |
+| the stub's enabled id, `level0@<brand>` | the shim |
+
+`brandedJson` carries the rule for the two files. A file carrying an `owner` is
+a marketplace, so its `name` and its owner's name take the brand. A file
+carrying an `author` is a plugin, so its author takes the brand and its own
+name stands. A file carrying neither comes back as it stands.
+
+The extension's icon reads the brand folder. `spec/config/brand/icon.svg` is
+the mark a vehicle draws, and the install script writes it to the path
+`src/extension/package.json` names. Git ignores that target, so one icon
+stands. Two vehicles wear two marks, and nothing holds those two in step.
 
 ## Two roads to the vehicle
 

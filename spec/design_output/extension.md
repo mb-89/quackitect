@@ -317,7 +317,7 @@ widget: the verb writes the local file, and the watcher does the rest.
 The log action runs `./RUNME.sh tui`, which opens the window on its log tab, in
 a terminal beside the editor. An action opening another program hands a person
 that program's keys. So the declaration carries them and the hover says them.
-For details, see [[spec/design_output/viewer#the-keys]].
+For details, see [[spec/design_output/tui#the-keys]].
 
 The rule holds for every action. Where an action starts another program, its hover names
 the keys that program needs, and the declaration carries them beside the
@@ -338,9 +338,11 @@ the first `return` in it. So the break stands as a red dot in the file, and a
 person turns it into a log point or a condition. The dot moves with the
 function, and a dot standing on that line already stays.
 
-A dead server blocks nothing, so the agent runs the same with the light dark.
-The sidebar writes the start and the stop at `info`, and so does the server.
-For details, see [[spec/design_output/level0#the-bridgehead-and-the-server]].
+A dead server blocks nothing, so the agent's calls go through with the light
+dark. The bridgehead says so once in the chat, and the log takes a row beside
+it. The sidebar writes the start and the stop at `info`, and so does the
+server. For details, see
+[[spec/design_output/level0#the-bridge-says-it-falls]].
 
 ## Two buttons make both
 
@@ -407,8 +409,8 @@ answer as the widget falling back to rest.
 | `short` | any reply |
 | `full` | a reply in the shape of `spec/config/status.yaml` |
 
-A reply written as chat text between calls reaches no hook until the turn
-ends, so the tool is the road. For details, see
+The tool carries the reply into the log, and the chat carries it to the owner.
+Each road pays the ask on its own. For details, see
 [[spec/design_output/level0#what-the-door-reads]].
 
 The shape stands in `spec/config/status.yaml`: each chapter a heading with text

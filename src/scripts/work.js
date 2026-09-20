@@ -12,7 +12,7 @@ import {
 } from "../../.claude/skills/level0/lib/runs.js";
 import { TODO as PARKED } from "../../.claude/skills/level0/lib/todo.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
-import { USAGE } from "./branch-usage.js";
+import { USAGE } from "./work-usage.js";
 import {
   askOf,
   CLOSED,
@@ -31,7 +31,7 @@ import {
   withField,
   withHashAfter,
   withoutField,
-} from "./group.js";
+} from "../engine/group.js";
 import { guidance } from "./guidance-verb.js";
 import {
   escalate,
@@ -42,11 +42,11 @@ import {
   stepPathOf,
   takeable,
 } from "./pull.js";
-import { readyToMerge, review } from "./review.js";
+import { readyToMerge, review } from "./work-review.js";
 import { serving } from "./serve.js";
-import { freeIn, trigger } from "./stand.js";
-import { testVerb } from "./test-verb.js";
-import { unblock } from "./unblock.js";
+import { freeIn, trigger } from "./work-free.js";
+import { testVerb } from "./work-test.js";
+import { unblock } from "./work-unblock.js";
 import { answer } from "./work-answer.js";
 import { list } from "./work-list.js";
 import { close, merge } from "./work-merge.js";

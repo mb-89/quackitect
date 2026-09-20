@@ -5,6 +5,8 @@
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
+import { BINDING, GOD } from "../../.claude/skills/level0/lib/config.js";
+import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { biome } from "../doors/biome.js";
 import { clock } from "../doors/clock.js";
@@ -35,8 +37,10 @@ import {
   onTurnComplete,
   onTurnSaid,
   owesCanary,
+  surveyHere,
 } from "./guidance.js";
-import { freshens, projectionsHere, sourcesOf } from "./projection.js";
+import { projectionsHere, sourcesOf } from "../engine/projection.js";
+import { freshens } from "./projection.js";
 import { movedCode } from "./reload.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import {
@@ -59,7 +63,7 @@ import {
 } from "./stop.js";
 import { TOOLS as handTools, SPECS as toolSpecs } from "./tools.js";
 import { registeredPort } from "./vehicle.js";
-import { onWrite, schemasHere } from "./write.js";
+import { marksSeen, onWrite, schemasHere } from "./write.js";
 
 const OK = 200;
 const NOT_FOUND = 404;
@@ -68,8 +72,6 @@ const TAKEOVER_PROBE = 2000;
 const TAKEOVER_PAUSE = 100;
 const TAKEOVER_TRIES = 50;
 const PASS = { pass: true };
-const GOD = "god";
-const BINDING = "engine.binding";
 
 const DOORS = {
   "session.start": opensSession,
@@ -91,6 +93,7 @@ const DOORS = {
 const TOOLS = {
   Grep: answersFromIndex,
   Glob: answersFromIndex,
+  Read: onRead,
   Write: onWrite,
   Edit: onWrite,
   MultiEdit: onWrite,
@@ -104,12 +107,21 @@ const TOOLS = {
 };
 
 export async function decide(said, box) {
+  fillsBox(box);
   freshens(box, String(said?.event ?? ""));
   const door = DOORS[String(said?.event ?? "")] ?? pass;
   const answer = letsThrough((await door(said?.e ?? {}, box)) ?? PASS, said, box);
   if (box.registered || String(said?.event ?? "") === "engine.create") return answer;
   box.registered = true;
-  return { ...answer, register: answer.register ?? specsOf(box) };
+  return { ...answer, register: answer.register ?? box.specs };
+}
+
+// The fields a session start fills, filled again where a restart hands the box over bare. The door and the registration both read them, so this runs ahead of both. A session start passes `again`, because the tree moves under a box that stands. The survey stays with `onSessionStart`, which owns it. [[spec/design_output/level0#a-restart-fills-the-box]]
+function fillsBox(box, again = false) {
+  if (again || !box.schemas) box.schemas = schemasHere(box.disk, box.method);
+  if (!box.tools) box.tools = surveyHere(box);
+  if (again || !box.specs) box.specs = specsOf(box);
+  return box;
 }
 
 function specsOf(box) {
@@ -124,6 +136,18 @@ function specsOf(box) {
 }
 
 function pass() {
+  return PASS;
+}
+
+// A read hands the agent the text, so the mark comes off it. [[spec/design_output/level0#a-write-meets-its-mark]]
+function onRead(e, box) {
+  const path = String(e?.file_path ?? "");
+  if (!path) return PASS;
+  try {
+    marksSeen(box, relativeTo(box.root, path), String(box.disk.read(path)));
+  } catch {
+    // [[spec/design_output/level0#a-write-meets-its-mark]]
+  }
   return PASS;
 }
 
@@ -153,14 +177,12 @@ function letsThrough(answer, said, box) {
 
 function opensSession(e, box) {
   onSessionStart(e, box);
-  box.schemas = schemasHere(box.disk, box.method);
   box.projections = projectionsHere(box.disk, box.method);
   box.sources = sourcesOf(box.projections, box.disk, box.method, box.work);
   box.restale = "the session start";
   warmIndex(box);
   box.registered = true;
-  box.specs = specsOf(box);
-  return { register: box.specs, pass: true };
+  return { register: fillsBox(box, true).specs, pass: true };
 }
 
 function submitsPrompt(e, box) {

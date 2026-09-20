@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`src/viewer/tree.go` and `src/viewer/treedraw.go` hold the view drawing a tree
+`src/tui/tree.go` and `src/tui/treedraw.go` hold the view drawing a tree
 and a table at once. This note covers the items, the columns, the nesting and
 what the view draws. Every tab drawing rows with a shape takes this one view.
 [[spec/design_input/the-tree-view-editor]]
@@ -51,7 +51,7 @@ the tab hands it.
 
 `Header` draws the line of column names, and `Rows` draws the rows. A tab joins
 the two, so the names stand still while the rows scroll under them. The log tab
-draws its own names the same way. [[spec/design_output/viewer#the-columns-stand-still]]
+draws its own names the same way. [[spec/design_output/tui#the-columns-stand-still]]
 
 ## The name column nests
 
@@ -83,7 +83,7 @@ item already stands.
 
 The view filters in the language the log filter reads, so a person learns one
 language and types it in every tab.
-[[spec/design_output/viewer#the-filter-language]]
+[[spec/design_output/tui#the-filter-language]]
 
 An item answers the three questions the language asks of a row:
 
@@ -94,7 +94,7 @@ An item answers the three questions the language asks of a row:
 | `details: word` | every key and its value, a line each |
 
 A key no item carries matches nothing, the way a column no row carries does.
-[[spec/design_output/viewer#a-name-nobody-knows]]
+[[spec/design_output/tui#a-name-nobody-knows]]
 
 ## A parent stands for it
 
@@ -190,7 +190,7 @@ tests and the view's join with `and`. So the file says what a row is, and a
 view narrows it further.
 
 A test reads as a line of the filter language.
-[[spec/design_output/viewer#the-filter-language]]
+[[spec/design_output/tui#the-filter-language]]
 
 | how a test stands in the file | what the reader takes |
 |---|---|

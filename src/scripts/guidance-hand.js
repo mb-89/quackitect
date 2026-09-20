@@ -11,7 +11,7 @@ import {
 import { actionables, bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
-import { agentOf, BOX, handOf } from "./hand.js";
+import { agentOf, BOX, handOf } from "./pull-hand-of.js";
 
 export const HOLDS = OWNED_HOLDS;
 export const HOLD = OWNED_HOLD;

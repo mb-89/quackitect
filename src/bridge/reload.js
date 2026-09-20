@@ -7,6 +7,8 @@ import { join } from "node:path";
 
 export const CODE_ROOTS = [
   "src/bridge",
+  // The engine answers the questions the doors ask, so a fix there reaches the session the same way. [[spec/tickets/an-engine-takes-bridge-work]]
+  "src/engine",
   "src/doors",
   ".claude/skills/level0/lib",
   ".claude/skills/level0/hooks",

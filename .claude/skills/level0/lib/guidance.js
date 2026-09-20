@@ -17,21 +17,40 @@ export const HEARD = {
   none: "the canary opens no answer",
 };
 
+// The line stands set in, on a line of its own. A reader finds it there without reading the wording around it. [[spec/design_output/level0#the-canary]]
+export function highlighted(sentence) {
+  return `    ${sentence}`;
+}
+
+// The wording that owes the line and the wording that pays it draw it the same way, so one reading finds it in both. [[spec/design_output/level0#the-canary]]
+function around(before, sentence, after) {
+  return [before.join(" "), highlighted(sentence), after.join(" ")].join("\n\n");
+}
+
 // [[spec/design_output/level0#the-canary-owes-a-debt]]
 export const OWES = {
   warns: (sentence) =>
-    [
-      "This session owes the canary. Open your answer with this line, first and",
-      `alone, word for word: ${sentence} The numbers come from what level zero`,
-      "loaded. Level zero refuses the next tool call until that line opens an",
-      "answer. The line ends no turn, so say what you do next under it and carry on.",
-    ].join(" "),
+    around(
+      [
+        "This session owes the canary. Open your answer with this line, first",
+        "and alone, word for word:",
+      ],
+      sentence,
+      [
+        "The numbers come from what level zero loaded. Level zero refuses the",
+        "next tool call until that line opens an answer. The line ends no turn,",
+        "so say what you do next under it and carry on.",
+      ],
+    ),
   denies: (sentence) =>
-    [
-      "This session owes the canary, and no answer opens with it. Open your next",
-      `answer with this line, first and alone, word for word: ${sentence}`,
-      "Level zero refuses every tool call until it stands.",
-    ].join(" "),
+    around(
+      [
+        "This session owes the canary, and no answer opens with it. Open your",
+        "next answer with this line, first and alone, word for word:",
+      ],
+      sentence,
+      ["Level zero refuses every tool call until it stands."],
+    ),
 };
 
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
@@ -89,7 +108,17 @@ function frontOf(text) {
   return out;
 }
 
-export function actionables(text) {
+// The mark a rule describing an answer carries, beside the star a rule wanting argument carries. [[spec/design_output/pull#the-checks]]
+export const ANSWER_MARK = "^";
+
+// A note writes the mark in a code span, because a paragraph admits the character nowhere else. [[spec/design_output/pull#the-checks]]
+const MARK = /\s*`?([*^])`?$/;
+
+function markOf(raw) {
+  return MARK.exec(String(raw).trimEnd())?.[1] ?? "";
+}
+
+function itemsIn(text) {
   const chapter = parse(text).chapters.Actionables;
   if (!chapter) return [];
 
@@ -109,7 +138,37 @@ export function actionables(text) {
     }
   }
   if (held) out.push(held);
-  return out.map((one) => one.replace(/\s*\*$/, "").trim()).filter(Boolean);
+  return out;
+}
+
+function stripped(one) {
+  return String(one).replace(MARK, "").trim();
+}
+
+export function actionables(text) {
+  return itemsIn(text).map(stripped).filter(Boolean);
+}
+
+// The label naming one rule: the note's path under the guidance folder, then its number in that note. [[spec/design_output/pull#the-checks]]
+export function labelOf(path, number) {
+  const bare = String(path ?? "")
+    .replace(/\.md$/, "")
+    .replace(/^spec\/guidance\//, "");
+  return `${bare.replace(/\//g, "-")}-${number}`;
+}
+
+// The rules the judge reads over evidence: the chapter's own numbering, with the marked rules out. [[spec/design_output/pull#the-checks]]
+export function forEvidence(text, path) {
+  const out = [];
+  let number = 0;
+  for (const raw of itemsIn(text)) {
+    const rule = stripped(raw);
+    if (!rule) continue;
+    number += 1;
+    if (markOf(raw) === ANSWER_MARK) continue;
+    out.push({ label: labelOf(path, number), note: String(path ?? ""), number, rule });
+  }
+  return out;
 }
 
 // The entries of a note's scope, whether the frontmatter writes them inline or one to a line. [[spec/tickets/the-spawn-reaches-its-guidance]]
@@ -185,16 +244,16 @@ export function canary(counts) {
 
 // The block the session reads with the canary in it. The line opens the answer, and the stop line closes it. [[spec/design_output/level0#the-canary]]
 export function canaryText(sentence) {
-  return [
-    "Open your FIRST answer with this line, first and alone, word for word:",
-    "",
-    `    ${sentence}`,
-    "",
-    "It says out loud that level zero holds this session, and the numbers",
-    "come from what it loaded. Write this line once and never again. The line",
-    "opens an answer and ends no turn: a turn ends on the stop line, last and",
-    "alone, and the two stand at opposite ends of the same answer.",
-  ].join("\n");
+  return around(
+    ["Open your FIRST answer with this line, first and alone, word for word:"],
+    sentence,
+    [
+      "It says out loud that level zero holds this session, and the numbers",
+      "come from what it loaded. Write this line once and never again. The line",
+      "opens an answer and ends no turn: a turn ends on the stop line, last and",
+      "alone, and the two stand at opposite ends of the same answer.",
+    ],
+  );
 }
 
 // The line stands first, so an answer quoting it later proves nothing. [[spec/design_output/level0#the-canary-opens-an-answer]]

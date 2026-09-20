@@ -296,11 +296,11 @@ rules refuse reaches no branch.
 
 Every check but the judge runs in the shell, so a person's hand-back meets them too.
 
-The wrapper under `.claude/skills/level1` imports nothing past its own folder,
+The wrapper under `.claude/skills/level0` imports nothing past its own folder,
 because the plugin validator refuses an import that leaves it. So the shell
 hands it the material: `ticket pull <ticket> --judge` prints the leaf's
 evidence and the rules its reads name, as JSON. The wrapper asks the model
-once over that, and a `breaks` answers `refused` before the shell runs. The
+once over that, and a label answers `refused` before the shell runs. The
 judge run carries the `--fields` payload of the hand-back. The material lays
 the payload over the ticket before it reads the evidence, so the judge reads
 what the hand writes.
@@ -309,6 +309,45 @@ The evidence holds the prose fields alone. The leaf names the form of each
 field it asks for. So the material leaves out a field whose form reads
 `command`, and a heading carrying no line. A chapter of commands hands the
 wrapper nothing, and the wrapper then skips the judge.
+
+### The judge answers a label
+
+The judge picks one answer from `follows` and one label per rule it holds.
+`judgeLabels` builds that set, and `ruleBroken` reads a label back to its
+rule. So an answer names the rule, and the refusal carries the note, the
+number and the rule's own line.
+
+| the answer | what it does |
+|---|---|
+| `follows` | the shell runs, and the hand-back carries on |
+| a label the material holds | `judgeRefusal` names the note, the number and the line |
+| a label outside the set | the same as `follows`, because a judge naming nothing refuses nothing |
+
+A label is the note's path under `spec/guidance`, with each slash as a hyphen,
+then a hyphen and the rule's number in that note. `labelOf` writes it, and
+`forEvidence` hands one per rule. A leaf reads several notes, and `actionables`
+numbers from one inside each, so the note's name keeps one label on one rule.
+
+### A rule describing an answer
+
+`forEvidence` drops the rules a note marks, and keeps the chapter's own
+numbering across the drop. So a label names the line the note holds under that
+number, and a reader opens one place.
+
+| the mark a rule ends in | what it says |
+|---|---|
+| the star | the rationale this note links argues for the rule |
+| the answer mark | the rule describes an answer, which evidence carries nowhere |
+
+`spec/schemas/guidance.schema.yaml` names both marks. A note writes the answer
+mark in a code span, because a paragraph admits the character nowhere else,
+and `actionables` strips either form. So every reader of the chapter reads the
+rule whole, and the output style shows no mark.
+
+Evidence carries no answer, so a judge reading an answer rule over evidence
+refuses a hand that keeps every rule. The answer gate holds those rules
+already. A leaf whose rules all carry the mark hands the wrapper an empty
+list, and the judge stands silent there.
 
 ## The fields hold their forms
 
@@ -378,7 +417,7 @@ in the tree refuses it. Then nothing lands. The ticket file goes back to
 what the hand writes, the index empties, and the hold stays. The pull answers
 `refused` with the hook's finding, so the hand fixes the line and hands back
 again. So a record's `hash_after` names a commit the branch holds, and a
-refused commit writes no record. `src/scripts/landed.js` holds the landing.
+refused commit writes no record. `src/scripts/pull-landed.js` holds the landing.
 
 # The fail
 
@@ -394,6 +433,17 @@ the record carries what each command says. The fields of the chapter still have
 to stand, because a fail says why in them.
 
 ## A person step goes in
+
+A question carries a grade, and the grade picks the road:
+
+| the grade | who answers it | the road |
+|---|---|---|
+| design, which the notes under `spec/design_input` leave open | the owner | `branch escalate`, which inserts the person step below |
+| craft, which those notes settle | the drafter | the fail verdict, which `on_fail` routes to the drafting step |
+
+So a craft question reaches the drafter through a road the engine holds
+already, and the route takes on no person step. [[spec/guidance/working]] and
+[[spec/guidance/review/reviewing]] each carry the rule naming the grade.
 
 `withPersonStep` puts a step named `person-<n>` before the target, `by:
 person`, `to: engine`, with the question under `asks` and one `answer`
@@ -485,7 +535,7 @@ The verb reads the voice rules over the Ask too, and refuses one that breaks
 a rule at the error level. The Ask is the engine's from the open on, so the
 ticket door refuses every later hand there. A rule broken past the open
 stands in the lint over the tree until a person reaches for the door.
-`src/scripts/ask-lint.js` holds the run, and a box with no Vale opens as it
+`src/scripts/ticket-ask-lint.js` holds the run, and a box with no Vale opens as it
 stands.
 
 ## The blank lines stand

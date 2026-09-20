@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: do
@@ -28,6 +28,19 @@ group: the-bridge-keeps-transport
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 2197b46350bd24aaa6a92819728ca768e9638717
+    hash_after: c2aa1367e93569170aba8993572cf697476acefd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 11 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -71,11 +84,15 @@ agent writes past reading, which is the opposite of what it stands for.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -83,12 +100,47 @@ agent writes past reading, which is the opposite of what it stands for.
 
 <!-- the form is text -->
 
+The debt stands in the session log, so a server restart leaves it where it is.
+The log rotates at a session start, so what it carries belongs to the session
+running.
+
+| what changes | why |
+|---|---|
+| `afterARestart` reads the marks back | the paid line pays, and a compaction line after it opens the debt again |
+| `sessionHere` builds the session a box lacks | the copies of that build at each reader go |
+| the name of that builder changes | the old one names a turn and answers a restart |
+| a compaction takes the payment off | the line lands once more after one |
+| `highlighted` owns the shape of the line | the wording that owes it and the one that pays it draw it alike |
+
+Without the last of those, a paid session meets a debt no line pays: the
+payment stands, and the door reads it first.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change answers every line of the ask, and the Discussion says where it departs
+- the copied build of the session is the cleanup the change reveals, and `sessionHere` takes it
+- the chapter The debt survives a restart owns what the change adds, and every comment it touches points there
+
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The ask says a restart before the line asks once, and once alone. This change
+leaves the gate alone.
+
+- the chapter The canary owes a debt owns what the gate does call by call
+- a restart opens one debt, and the gate behaves under it the way that chapter says
+- read the ask's line as one debt a restart, not one demand a call
+- a reader wanting the demand itself thinned owns that in the chapter
+
+The ask names no compaction, and the change takes the payment off at one.
+
+- the log carries the paid mark and the compaction mark alike
+- the box and the log answer the same thing only where a compaction clears the payment in the box too
+
+[[spec/tickets/the-canary-pays-once]] stands in this group as a draft. It asks
+what this ticket answers, and wants handing back with `--became` onto this one.

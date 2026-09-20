@@ -1,9 +1,13 @@
+// Which tickets stand, which of them a hand takes, and who takes which leaf.
+// The offer, the hold, and the rules a hand meets on its way to one.
+// [[spec/design_output/pull#the-hand-out]]
+
 import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { entryNamed, reRouted } from "../../.claude/skills/level0/lib/schema.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 
-export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
+export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
 import {
   CLOSED,
@@ -19,10 +23,10 @@ import {
   urgent,
   withEntry,
   withField,
-} from "./group.js";
+} from "../engine/group.js";
 import { noteRows, readsOf, writeHold } from "./guidance-hand.js";
-import { roleOf } from "./hand.js";
-import { landed } from "./landed.js";
+import { roleOf } from "./pull-hand-of.js";
+import { landed } from "./pull-landed.js";
 import { workAnswer } from "./pull-chapter.js";
 import {
   DONE,
@@ -36,8 +40,8 @@ import {
   walkOf,
 } from "./pull-route.js";
 import { entriesOf, pushed, returnsOf, shut, target, tipOf } from "./pull-writes.js";
-import { queued, stoodHere } from "./queue.js";
-import { HELPER, SPAWN, spawnPrompt, unblockPrompt } from "./spawn.js";
+import { queued, stoodHere } from "./pull-queue.js";
+import { HELPER, SPAWN, spawnPrompt, unblockPrompt } from "./pull-spawn.js";
 import { NOTES, schemasHere } from "./ticket.js";
 
 export function ticketsHere(it) {
@@ -235,7 +239,7 @@ export function offer(it, who, one, all) {
   return admits(it, who, one, moved.leaf, all);
 }
 
-export { dependsOn } from "./group.js";
+export { dependsOn } from "../engine/group.js";
 
 // [[spec/design_output/pull#children-before-their-group]]
 export function closedHere(it, all, dep) {

@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { statusAsks, statusLacks, statusShape } from "../../src/bridge/status.js";
+import { statusAsks, statusLacks, statusShape } from "../../src/engine/status.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const SHAPE =

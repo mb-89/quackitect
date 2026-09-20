@@ -1,8 +1,0 @@
-{
-  "name": "level1",
-  "description": "Level one: the pull as a tool. The shell verb is the pull, and this wraps it for a session holding the plugin, so the judge reads a hand-back where a shell reaches no model.",
-  "version": "0.1.0",
-  "author": {
-    "name": "quackitect"
-  }
-}

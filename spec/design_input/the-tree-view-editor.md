@@ -94,7 +94,7 @@ person clicks are the groups, and the columns a view opens with are the order.
 
 A column cutting its text costs a reader nothing, because Enter opens the whole
 item beside the tree. The details hold every field, the way the log rows do
-today. [[spec/design_output/viewer#the-details]]
+today. [[spec/design_output/tui#the-details]]
 
 # A value carries a link
 
@@ -119,7 +119,7 @@ so the road stands open. What the click reaches waits for a look of its own.
 
 The filter reads the language the log filter reads, over the fields an item
 carries. So a person learns one language and uses it in every tab.
-[[spec/design_output/viewer#the-filter-language]]
+[[spec/design_output/tui#the-filter-language]]
 
 | what a person does | what the view does |
 |---|---|

@@ -1,10 +1,16 @@
+// The route a ticket walks: its steps, the leaf it stands at, and what that
+// leaf inherits from the steps above it. The names and the verbs a route reads
+// stand here beside it.
+// [[spec/design_output/pull#what-a-hand-out-reads]]
+
+import { QUEUE } from "../../.claude/skills/level0/lib/config.js";
 import { HOLDS as OWNED_HOLDS } from "../../.claude/skills/level0/lib/folders.js";
 
 import { entriesIn } from "../../.claude/skills/level0/lib/schema.js";
 
-export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
+export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
-import { frontOf } from "./group.js";
+import { frontOf } from "../engine/group.js";
 import {
   asOf,
   handsAgain,
@@ -15,7 +21,7 @@ import {
   readsOf,
   writeHold,
 } from "./guidance-hand.js";
-import { agentOf, BOX, handOf, roleOf } from "./hand.js";
+import { agentOf, BOX, handOf, roleOf } from "./pull-hand-of.js";
 
 export const HOLDS = OWNED_HOLDS;
 export const WORK = "work";
@@ -54,6 +60,8 @@ export const VERBS = {
   ticket: ["pull", "note", "update", "open"],
   retro: [
     "notes",
+    // [[spec/design_output/work#an-experiment-decides]]
+    "audit",
     "collect",
     "new",
     "timeline",
@@ -64,6 +72,13 @@ export const VERBS = {
     "mint",
   ],
 };
+
+export { QUEUE };
+
+// [[spec/design_output/config#the-engine-controls]]
+export function handsOut(binding) {
+  return (String(binding ?? "").trim() || QUEUE) === QUEUE;
+}
 
 // [[spec/design_output/pull#a-need-is-a-verb]]
 export function holdsVerb(need, verbs = VERBS) {

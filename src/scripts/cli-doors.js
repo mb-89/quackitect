@@ -12,8 +12,8 @@ import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { homeIn } from "./editor.js";
-import { handDoors } from "./hand.js";
-import { readTools, whereIs } from "./tools.js";
+import { handDoors } from "./pull-hand-of.js";
+import { readTools, whereIs } from "../engine/tools.js";
 import { rootsHere } from "./vehicle.js";
 
 export const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -97,7 +97,6 @@ export const lsp = whereIs(files, root, "se-lsp", known);
 export const GUIDANCE = join(root, "spec", "guidance");
 export const DOORS = join(root, "src", "doors");
 export const PLUGIN = join(".claude", "skills", "level0");
-export const LEVEL1 = join(".claude", "skills", "level1");
 export const CONTRACT = join(root, "test", "contract");
 export const settings = it.config;
 // The glob the rules read past, owned by the findings every front reads. [[spec/design_output/lsp]]

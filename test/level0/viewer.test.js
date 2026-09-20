@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { SOURCE, STAMP, viewerOf } from "../../src/scripts/viewer.js";
+import { SOURCE, STAMP, viewerOf } from "../../src/scripts/tui-build.js";
 
 const ROOT = "/box";
 const EXE = `${ROOT}/.se/.runtime/bin/logview`;
@@ -15,7 +15,7 @@ const BUILD = `go build -o ${EXE}.new .`;
 const source = () =>
   fakeDisk({
     [`${ROOT}/${SOURCE}/main.go`]: "package main",
-    [`${ROOT}/${SOURCE}/go.mod`]: "module quackitect/viewer",
+    [`${ROOT}/${SOURCE}/go.mod`]: "module quackitect/tui",
     [`${ROOT}/${SOURCE}/ui_test.go`]: "package main",
   });
 
@@ -36,7 +36,7 @@ test("a box with no binary builds one in the viewer's folder and stamps its sour
   assert.match(disk.read(`${ROOT}/${STAMP}`), /^[0-9a-f]{16}\n$/);
 });
 
-// [[spec/design_output/viewer#the-verb-builds-it]]
+// [[spec/design_output/tui#the-verb-builds-it]]
 test("a build lands beside the running binary, and the old one steps aside by rename", () => {
   const disk = source();
   disk.write(EXE, "old binary");
@@ -123,7 +123,7 @@ test("a Windows box builds logview.exe", () => {
   assert.equal(viewerOf({ disk, proc, root: ROOT, windows: true }).exe, `${EXE}.exe`);
 });
 
-// [[spec/design_output/viewer#the-verb-builds-it]]
+// [[spec/design_output/tui#the-verb-builds-it]]
 test("a move in the shared module rebuilds the viewer", () => {
   const disk = source();
   const proc = goWrites(disk);

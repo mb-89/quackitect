@@ -13,7 +13,7 @@ import {
   withEntry,
   withField,
   withHashAfter,
-} from "../../src/scripts/group.js";
+} from "../../src/engine/group.js";
 import { probeOf, startOf } from "../../src/scripts/serve.js";
 import {
   DONE,

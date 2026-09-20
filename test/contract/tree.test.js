@@ -33,6 +33,7 @@ import {
   nothingPrivateTravels,
   settingsNameBinaries,
   stopFolderIsData,
+  privateFolderOwned,
   surveyFindsNode,
   surveyNamesInstalls,
   treeFaults,
@@ -40,7 +41,7 @@ import {
 } from "../../.claude/skills/level0/lib/tree.js";
 import { EDITOR_VALE_INI } from "../../.claude/skills/level0/lib/servers.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
-import { SESSION } from "../../src/scripts/hand.js";
+import { SESSION } from "../../src/scripts/pull-hand-of.js";
 import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
@@ -322,14 +323,61 @@ test("a line deleting a log file is refused", () => {
   assert.deepEqual(noLogDeleted(here), []);
 });
 
-// Two hooks import nothing, so each spells the session file the hand writes. [[spec/design_input/the-runtime-files-stand-apart]]
+// [[spec/design_input/the-runtime-files-stand-apart]]
+test("a file spelling the runtime folder without naming its owner is refused", () => {
+  const found = privateFolderOwned(
+    fakeTree(
+      {
+        "src/scripts/stray.js": 'const at = "x";\nconst hold = ".se/.runtime/hold";\n',
+        "src/index/split.go": 'const at = ".se", ".runtime"\n',
+      },
+      ["src/scripts/stray.js", "src/index/split.go"],
+    ),
+  );
+
+  assert.deepEqual(
+    found.map((one) => [one.rule, one.file, one.line]),
+    [
+      ["PrivateFolderOwned", "src/scripts/stray.js", 2],
+      ["PrivateFolderOwned", "src/index/split.go", 1],
+    ],
+  );
+});
+
+// A reader the move left behind spells the old place, and that is the drift. [[spec/design_input/the-runtime-files-stand-apart]]
+test("a spelling of a name the runtime half took is refused where the old place stands", () => {
+  const stale = {
+    "src/bridge/left.js": 'const at = join(work, ".se", "hold");\n',
+    "src/scripts/old.js": 'const bin = ".se/bin";\nconst log = ".se/.log";\n',
+  };
+  assert.deepEqual(
+    privateFolderOwned(fakeTree(stale, Object.keys(stale))).map((one) => [
+      one.file,
+      one.line,
+    ]),
+    [
+      ["src/bridge/left.js", 1],
+      ["src/scripts/old.js", 1],
+    ],
+  );
+
+  const kept = { "src/scripts/rest.js": 'const notes = ".se/notes";\n' };
+  assert.deepEqual(privateFolderOwned(fakeTree(kept, Object.keys(kept))), []);
+});
+
+// A plugin imports nothing past its own folder, so the plugin spells the session file the hand writes once in its library, and the pull hook imports it from there. [[spec/design_input/the-runtime-files-stand-apart]]
 test("every forced copy of the session file says what the hand module says", () => {
   for (const path of [
     ".claude/skills/level0/hooks/level0.js",
-    ".claude/skills/level1/hooks/level1.js",
+    ".claude/skills/level0/lib/pull.js",
   ]) {
     assert.match(here.read(path), new RegExp(`"${SESSION}"`), path);
   }
+  assert.doesNotMatch(
+    here.read(".claude/skills/level0/hooks/pull-tool.js"),
+    new RegExp(`"${SESSION}"`),
+    "the hook imports the path from the library beside it",
+  );
 });
 
 // [[spec/design_output/level0#a-name-meets-the-cap]]

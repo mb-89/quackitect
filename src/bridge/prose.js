@@ -7,7 +7,7 @@ import model from "wink-eng-lite-web-model";
 import winkNLP from "wink-nlp";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { pathsOf, wordsOf } from "../../.claude/skills/level0/lib/vocabulary.js";
-import { withContext, withoutFalsePast } from "./tense.js";
+import { withContext, withoutFalsePast } from "../engine/tense.js";
 
 const nlp = winkNLP(model);
 const its = nlp.its;

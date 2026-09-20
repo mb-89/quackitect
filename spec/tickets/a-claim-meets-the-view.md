@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -89,7 +89,81 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: d25806695a0da7af29c9e5bc9f2d245bb0a673d7
+    hash_after: d25806695a0da7af29c9e5bc9f2d245bb0a673d7
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-2
+    hash_before: 12daafca92339622360654afc74b1cc19f9c11c9
+    hash_after: 12daafca92339622360654afc74b1cc19f9c11c9
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | partly, the rule and the sweep hold, the table of doors does not |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit, with the server standing |; | does every rule the approach adds carry a case | yes, one case drives the sweep under both door sets |; | does every claim carry a proof | no, the root row and the tools row read against the code |; TL;DR:; The rule and the sweep stand as drafted.; The table of doors names what parts the two callers wrong, and leaves out what bites.; Redraw that table off the code, and say how the case reaches the count the check prints.; The findings, one a line:; Both callers hand the method root, so neither one reads a tree the other leaves alone.; `lint` takes its root from `cli-doors`, and `findingsFor` takes `box.method`.; `rootsHere` reads the method root off the marker above that module, so no caller hands the work root.; The tools row reads against the code, because `cli-doors` names each tool through `whereIs` over the same survey.; The parting that stands is the Biome guard. `lint` hands an empty path where no binary stands.; `findingsFor` hands the bare name there, so the panel runs a Biome the check skips.; `lint` also adds `serverFaults` past the sweep, and the tree and schema readers where the server binary is missing.; A case asserting one count over one door set turns red there. Say which side owns each of those three.; The case drives two door sets over a fake tree, and reads nothing the check prints.; The ask wants the case red where its count differs from the check's. Say how the case reaches that count."
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 3326ed8aab7dff8859dd685e7a4a324431996eed
+    hash_after: 3326ed8aab7dff8859dd685e7a4a324431996eed
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-4
+    hash_before: 0a4186598075cc5987b5e7256a856d45bb4f8c87
+    hash_after: 0a4186598075cc5987b5e7256a856d45bb4f8c87
+    returns: 2
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | partly, the rule, the sweep and the case hold, one row stands unowned |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does every rule the approach adds carry a case | yes, one case reads both fronts over the real tree |; | does every claim carry a proof | the root row and the tools row read with the code now, the third row past it |; TL;DR:; The redraw answers the root fault and the tools fault the last round named.; The table names three ways the two fronts part, and the change list owns two.; Say which front owns the server's own rows, and what becomes of the switch under them.; The findings, one a line:; `lint` runs the tree reader and the schema reader only where `serverFaults` answers nothing.; An empty list from the server counts as an answer there, so both readers stand off.; `se-lsp check .` answers an empty list at exit 0 on this box.; So the check counts neither reader today, and `readingOf` turns both on for it.; Row three says `lint` adds both over a whole sweep, which reads past that switch.; Redraw row three with the switch, and say what the check counts after the change.; Say whether `lint` keeps `serverFaults` once `readingOf` stands, and which front owns those rows.; The server draws its own checks itself, so the panel holds them outside the findings route.; A case asserting one count turns red where those rows stand on one side alone.; The chapter the approach links stands nowhere in that note, so the change writes it.; The rest holds: the Biome guard, the case under `test/contract`, and the rule's home."
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 5a53fd45f0c863c9634ad69445aa2aeab07de846
+    hash_after: 5a53fd45f0c863c9634ad69445aa2aeab07de846
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-6
+    hash_before: 800d35921d241f1f1ab86a10a4949f22f271863f
+    hash_after: 800d35921d241f1f1ab86a10a4949f22f271863f
+    returns: 3
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | partly, the rule, the sweep and the case hold, the panel's own rows double |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does every rule the approach adds carry a case | yes, one case reads both fronts over the real tree |; | does every claim carry a proof | every row but one, and the panel row reads against the code |; TL;DR:; The switch under the server, the Biome guard and the missing chapter read true now.; The panel draws the checker's rows itself, beside the list the bridge answers.; Hand the panel no checker, and say what the case counts on each side.; The findings, one a line:; `panel.go` keeps `own` off `Sweep` and `extra` off the bridge, and draws both.; `serverFaults` runs that same `Sweep`, so the two lists carry one content.; So `readingOf` handing the panel the checker draws each of those rows twice.; The draft says the panel gains the checker, and the panel holds it already.; The design note says so too, in the source table of its panel chapter.; Say which front hands `readingOf` a checker, and hand the panel none.; Then the case reads the panel as its own sweep plus the bridge's list.; Drop the git door where no tree reader in JavaScript runs inside the bridge.; The rest holds: the guard, the switch, the chapter, the case's home, the rule's home."
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 870488c8ceea22cf0cf305a62b53ef50947e6da3
+    hash_after: 870488c8ceea22cf0cf305a62b53ef50947e6da3
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-8
+    hash_before: f937ee861d4fed0f3e51e61e10fc4224e9ebcfb9
+    hash_after: f937ee861d4fed0f3e51e61e10fc4224e9ebcfb9
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 647ed7c4f80977b35605c66a89dc56d1afd31b28
+    hash_after: 647ed7c4f80977b35605c66a89dc56d1afd31b28
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 6e73dc4063fc539785a13ccdd8536e237d5d5d4a
+    hash_after: 6e73dc4063fc539785a13ccdd8536e237d5d5d4a
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 5bf89a8b12bf4bb8247eabed0c2add08cb2b0436
+    hash_after: 5bf89a8b12bf4bb8247eabed0c2add08cb2b0436
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-13
+    hash_before: 0931a3bd1f73685522de4a02267896a172f834ad
+    hash_after: 0931a3bd1f73685522de4a02267896a172f834ad
+reason: done
 ---
 
 # Ask
@@ -111,9 +185,45 @@ The agent reports green while the owner's panel draws a screen full of findings.
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+One guard answers both fronts, and a case holds their counts equal.
 
-<!-- the form is text -->
+The checker stays where it stands. Each front already reaches the same rules, by a route of its own:
+
+| the front | what it draws |
+|---|---|
+| the panel | its own `Sweep` in `src/lsp/panel.go`, and the bridge's findings beside it |
+| the check | `findingsOver`, and `serverFaults` over that same `Sweep` |
+
+So moving the checker into the shared reader draws every tree row and schema row twice. The earlier draft asked for that, and this one drops it.
+
+One thing parts the two lists:
+
+| what parts them | `lint` in `cli-read.js` | `findingsFor` in `findings.js` |
+|---|---|---|
+| the Biome guard | hands the empty string where no binary stands | hands the bare name the survey answers |
+
+`whereIs` falls back to the bare name, so the panel asks for a tool standing nowhere. `lint` hands the empty string, and the sweep skips Biome. So one tree answers two lists on a box carrying no Biome.
+
+The rest reads the same on both sides. The roots agree, because `root` in `cli-doors.js` and `box.method` name one tree. The tools agree, because each front reads the same survey file. The tree readers and the schema readers stand behind `serverFaults`, which answers nothing where no server stands.
+
+| what changes | how |
+|---|---|
+| `src/bridge/findings.js` | holds the guard, so both fronts name Biome one way |
+| `src/scripts/cli-read.js` | takes that guard, and holds none of its own |
+| `spec/design_output/lsp` | takes the chapter `src/lsp/check.go` points at, which stands nowhere yet |
+| `test/contract/one-reading.test.js` | takes the case under this table |
+| `spec/guidance/working.md` | takes the rule under that |
+
+**The case.** It stands under `test/contract`, because it drives the real tools over the real tree. It counts each front's route over the whole tree:
+
+| the side it counts | what it asks |
+|---|---|
+| the panel | `findingsFor` over the bridge's box, and `se-lsp check` beside it |
+| the check | `findingsOver` under the command line's doors, and `serverFaults` beside it |
+
+The case asserts one count. Where the two part it names the file each side holds alone, so a reader opens that file. `./RUNME.sh check` runs it in the battery, so a claim of green carries the count the owner's panel draws.
+
+**The rule.** It reads: read a claim of done in the owner's own view before you make it. It lands in the Actionables of `spec/guidance/working`, beside the rules on what a session owes the owner.
 
 ## review
 
@@ -121,9 +231,33 @@ The agent reports green while the owner's panel draws a screen full of findings.
 
 ### verdict
 
-<!-- pass or fail, with findings one a line -->
+pass
 
-<!-- the form is verdict -->
+| the question reviewing asks | the answer |
+|---|---|
+| does the approach answer the ask | yes, the rule, the sweep, the case and the count each stand |
+| is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |
+| what does `./RUNME.sh check` answer | 0 on this commit, with the server standing |
+| does every rule the approach adds carry a case | yes, one case reads both fronts over the real tree |
+| does every claim carry a proof | yes, each row of both tables reads true against the code |
+
+TL;DR:
+
+- The draft leaves the checker where it stands, so the panel's own rows stay single.
+- Every row of the two tables reads true against the code.
+- The change list carries the guard, the chapter, the case and the rule.
+
+The findings, one a line:
+
+- `panel.go` draws `own` off `Sweep` and `extra` off the bridge, as the first table says.
+- `se-lsp check` sweeps that same checker, so `serverFaults` answers the panel's own rows.
+- The guard parts the two fronts alone: `lint` hands the empty string, `findingsFor` the bare name.
+- `whereIs` falls back to the bare name, so a box carrying Biome nowhere parts the lists.
+- The roots agree, because `cli-doors` and `box.method` each name the method root.
+- The tools agree, because both fronts read the survey through `readTools` and `whereIs`.
+- The tree reader and the schema reader run where `serverFaults` answers nothing, and the panel stands with that server.
+- The chapter `src/lsp/check.go` points at stands nowhere in the note, and the change writes it.
+- The case belongs under `test/contract`, which drives the real tools over the real tree.
 
 # implement
 
@@ -134,20 +268,36 @@ The agent reports green while the owner's panel draws a screen full of findings.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/one-reading.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The command answers assertion, and each case fails on its own assertion.
+
+| the case | what it holds open |
+|---|---|
+| one guard names Biome for both fronts | `biomeFor` stands nowhere, and the command line holds its own guard |
+| the guard hands nothing where no binary stands | `biomeFor` stands nowhere |
+| each front's route answers one count | `readingCounts` stands nowhere |
+| the working note asks for a claim read in the owner's view | the note carries no such rule |
+
+Every case stands under `test/contract`, because each reads the tree that ships or drives the real tools. A case over a fake would read a guard nobody runs.
+
+The count case asks the shared reader for both routes, so the case holds one name and the reader holds the doors. That surprises me: the first shape had the case build each front's doors, which put the command line's wiring in a case file. The shape here leaves each front's doors where that front owns them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. One case file and this ticket.
+- every door the change reaches has a fake. The guard case hands its own disk, and the rest read the tree that ships.
+- a comment names the approach the change implements. The file's header names the chapter, and each case points at this ticket.
 
 ## reflect
 
@@ -172,14 +322,18 @@ The agent reports green while the owner's panel draws a screen full of findings.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The shared reader, the command line's half, the case file, and the two notes the approach names.
+- every door the change reaches has a fake. The guard case hands its own disk. The count case drives the real tools, which is what puts it under test/contract.
+- a comment names the approach the change implements. Each new name points at the chapter this round writes.
 
 ## tests-green
 
@@ -188,26 +342,47 @@ The agent reports green while the owner's panel draws a screen full of findings.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/one-reading.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A claim of green now carries the count the owner's panel draws.
+
+| what lands | where |
+|---|---|
+| the guard naming Biome for both fronts | `biomeFor` in `src/bridge/findings.js` |
+| the command line's own reading, as a list | `readingFor` in `src/scripts/cli-read.js`, which `lint` prints |
+| the lines a reading names, sorted | `linesNamed` beside the guard |
+| the case holding the two fronts together | `test/contract/one-reading.test.js` |
+| the rule | the fifth rule of `spec/guidance/working` |
+| the chapter `src/lsp/check.go` points at | [[spec/design_output/lsp#one-checker-every-front-asks]] |
+
+The guard was the one parting. `whereIs` falls back to the bare name, so the panel asked for a tool standing nowhere while the check skipped it. Both now read the guard, so a box carrying no Biome answers one list.
+
+What this costs, for the owner to weigh at the merge. The case sweeps the whole tree once per front, and `./RUNME.sh check` carries that. The two sweeps run one after the other, because two Vale runs over one tree part their answers.
+
+The rule joins the fifth rule of the working note. The note's schema caps its list, so a rule of its own stands nowhere there. The fifth rule already governs the claim that the work stands complete, which is where a claim of done belongs.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The shared reader, the command line's half, the case file, and the two notes the approach names.
+- every door the change reaches has a fake. The guard case hands its own disk. The count case drives the real tools, which is what puts it under test/contract.
+- a comment names the approach the change implements. Each new name points at the chapter this round writes.
 
 # verdict
 
@@ -215,21 +390,66 @@ The agent reports green while the owner's panel draws a screen full of findings.
 
 ## read
 
-<!-- every file you read, one a line -->
-
-<!-- the form is files -->
+- src/bridge/findings.js
+- src/scripts/cli-read.js
+- src/scripts/cli-doors.js
+- src/scripts/cli-check.js
+- test/contract/one-reading.test.js
+- spec/design_output/lsp.md
+- spec/guidance/working.md
+- spec/rationales/working.md
+- spec/schemas/guidance.schema.yaml
+- spec/guidance/review/reviewing.md
+- spec/tickets/a-claim-meets-the-view.md
+- HANDOVER.md
 
 ## verdict
 
-<!-- pass or fail, findings one a line -->
+pass
 
-<!-- the form is verdict -->
+| the question reviewing asks | the answer |
+|---|---|
+| does the branch do what the ask asks | yes, the rule, the sweep, the count and the green check each stand |
+| is what the diff touches beyond the ask trivial | yes, the diff reaches the six files the approach names |
+| what does `./RUNME.sh check` answer | 0 |
+| does a retro stand in the handback | `branch review` reads the handback and names the retro absent |
+| does every rule the change adds carry a case | yes, the guard, the count and the note's rule each carry one |
+| does a case feed the rule something bad | yes, the guard case hands a disk that holds no binary |
+
+TL;DR:
+
+- Each line of the ask lands, and `./RUNME.sh check` holds the new case green.
+- The Biome guard is the one parting, and `biomeFor` now answers both fronts.
+- Two small duplications stand, and the merge hand decides them.
+
+The findings, one a line:
+
+- `biomeFor` holds the guard alone, and `findingsFor` and `readingFor` both name Biome through it.
+- The guard case hands a disk holding no binary, and the guard answers the empty string.
+- A file breaking a rule under `spec/guidance` draws one list on each front.
+- On a tree the rules pass, the count case reads an empty list against an empty list.
+- So the count case guards a regression, and holds nothing apart on the commit the battery reads.
+- `readTools` runs again inside `readingFor`, while `cli-doors.js` already holds that survey as `known`.
+- `cli-check.js` keeps its own guard on the same path, for running the formatter.
+- `spec/rationales/working.md` argues the three grounds, and carries no argument for the clause beside them.
+- The schema caps the working note at its present list, so the clause joining the fifth rule reads right.
+- The handback carries no retro, and the branch's close writes it.
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | one guard names Biome for both fronts | closed |
+| 2 | a battery case sweeps every tracked file the way the panel does | closed |
+| 3 | the working note asks for a claim read in the owner's own view | closed |
+| 4 | `./RUNME.sh check` holds that case green | closed |
+| 5 | `readingFor` takes `known` from `cli-doors.js`, so the survey stands in one place | open |
+| 6 | the working rationale argues the clause the fifth rule takes | open |
+| 7 | the branch hands back a retro before a desk merges it | open |
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- every fact the change adds stands in one place, and a note points at the file holding it. `biomeFor` holds the guard alone, and the design chapter points at the case file.
 
 # Discussion
 

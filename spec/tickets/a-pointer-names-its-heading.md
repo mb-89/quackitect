@@ -201,7 +201,7 @@ The scan under `.se/scripts` lists the notes:
 - [[spec/design_output/schema]]
 - [[spec/design_output/stop]]
 - [[spec/design_output/tree-view]]
-- [[spec/design_output/viewer]]
+- [[spec/design_output/tui]]
 - [[spec/design_output/work]]
 
 [[spec/design_output/lsp]] carries most of them, because it holds its scope

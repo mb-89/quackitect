@@ -37,6 +37,7 @@ function box(seed = {}, said = {}) {
     git: fakeGit({
       "git config user.name": { stdout: said.name ?? "" },
       "git config user.email": { stdout: said.email ?? "" },
+      "git rev-parse -q --verify MERGE_HEAD": { exitCode: said.merging ? 0 : 1 },
     }),
     env: said.env ?? {},
     join: (...parts) => parts.join("/"),
@@ -106,6 +107,20 @@ test("a code change with no test beside it refuses at this door too", async () =
   const said = await holds(box(), code);
   assert.equal(said.code, 1);
   assert.match(said.said, /no test beside it/);
+});
+
+// A merge carries other commits' code, and each met the door with its own test. [[spec/design_output/tree#the-rules-over-two-files]]
+test("a merge commit passes the test door, because its code landed with tests already", async () => {
+  const code = [
+    "diff --git a/src/bridge/one.js b/src/bridge/one.js",
+    "+++ b/src/bridge/one.js",
+    "@@ -0,0 +1 @@",
+    "+export const one = 1;",
+    "",
+  ].join("\n");
+
+  const said = await holds(box({}, { merging: true }), code);
+  assert.deepEqual(said, { code: 0, said: "" });
 });
 
 test("a test file standing nowhere leaves the change refused", async () => {

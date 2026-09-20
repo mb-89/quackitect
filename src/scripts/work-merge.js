@@ -1,3 +1,7 @@
+// The trunk end of a work branch: merge takes a done branch into trunk, and
+// close deletes a branch trunk already carries.
+// [[spec/design_output/work#a-merged-branch-closes]]
+
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import {
   CLOSED,
@@ -8,7 +12,7 @@ import {
   ticketAt,
   ticketNamed,
   withoutField,
-} from "./group.js";
+} from "../engine/group.js";
 import {
   BRIEF,
   briefOf,

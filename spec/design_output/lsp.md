@@ -36,6 +36,26 @@ A file redraws on four roads:
 | the editor saves or closes a file | that file, and a save asks the bridge again |
 | anything changes a file on disk | that file, off the disk and the bridge |
 
+## One checker every front asks
+
+Three fronts ask for a reading, and each reaches one rule set:
+
+| the front | what it asks |
+|---|---|
+| the editor's panel | this server's own sweep, and the bridge beside it |
+| `./RUNME.sh check` | the bridge's sweep, and `se-lsp check` over that same sweep |
+| a person, at `se-lsp check` | the sweep alone |
+
+`Checker` in `src/lsp/check.go` holds this server's half, and `findingsOver` in
+`src/bridge/findings.js` holds the bridge's. The tree readers and the schema
+readers in `src/scripts/cli-read.js` stand behind `se-lsp check`, for a box
+carrying no server.
+
+One guard names each tool for both fronts. `biomeFor` in the bridge hands the
+empty string where no binary stands, so a box carrying no Biome reads one list.
+`test/contract/one-reading.test.js` holds the two fronts against each other
+over the whole tree.
+
 # The panel follows the disk
 
 At its start the server asks the editor to watch every file under the root.

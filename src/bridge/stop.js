@@ -13,11 +13,16 @@ import {
 import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
 import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
-import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { stampOf, STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { drains, standsPast, takesFile } from "../../.claude/skills/level0/lib/warnings.js";
-import { spanOf, ticketAt, WORK_BRANCH } from "../scripts/group.js";
+import {
+  BINDING,
+  GOD,
+  QUEUE,
+} from "../../.claude/skills/level0/lib/config.js";
+import { spanOf, ticketAt, WORK_BRANCH } from "../engine/group.js";
 import { heldGroup, openPrivate, queueHolds } from "../../.claude/skills/level0/lib/ticket.js";
 import {
   decide,
@@ -93,14 +98,24 @@ export function refusedByHold(tool) {
   ].join(" ");
 }
 
-// The hold ends the turn it lands in, so the turn's end puts it back. [[spec/design_output/stop#the-hold]]
-export function dropsHold(_e, box) {
+// The hold ends the turn it lands in, so the turn's end puts it back. A helper's turn end touches neither, the way every door beside this one skips one. [[spec/design_output/stop#the-hold]]
+export function dropsHold(e, box) {
+  if (e?.agentId) return { pass: true };
   const hold = String(asks(box, HOLD) ?? OFF);
   box.held = "";
   if (hold !== FINISH && hold !== STOP) return { pass: true };
+  // The mark the vote reads, so a hold dropped here still ends the turn it stood in. [[spec/design_output/stop#the-hold-outlives-its-drop]]
+  box.stood = hold;
   writes(box, HOLD, OFF);
   box.log.say("debug", "config", `the hold stood at ${hold}, and drops to ${OFF}`);
   return { pass: true };
+}
+
+// The hold that stands over this turn: the one the owner holds now, or the one the turn's end dropped. [[spec/design_output/stop#the-hold-outlives-its-drop]]
+export function holdHere(box) {
+  const hold = String(asks(box, HOLD) ?? OFF);
+  if (hold === FINISH || hold === STOP) return hold;
+  return String(box.stood ?? OFF);
 }
 
 export function sawCall(e, box) {
@@ -109,9 +124,10 @@ export function sawCall(e, box) {
   todosOf(box).sawCall(e);
 }
 
-// A prompt from outside this plugin opens a turn, and the tooth counts them. [[spec/design_output/stop#the-tooth-holds-its-state]]
+// A prompt from outside this plugin opens a turn, and the tooth counts them. A hold is one turn long, so the mark of the turn before drops here. [[spec/design_output/stop#the-tooth-holds-its-state]]
 export function sawPrompt(e, box) {
   if (e?.agentId) return;
+  box.stood = "";
   toothOf_(box).sawPrompt(Boolean(e?.mine));
 }
 
@@ -146,7 +162,8 @@ export function onStop(e, box) {
   const text = String(e?.last_assistant_message ?? "");
   const claimed = box.claim ?? lastLineReason(text);
   box.claim = null;
-  const hold = String(asks(box, HOLD) ?? OFF);
+  // The hold that stood over this turn, so the order the two events arrive in decides nothing. [[spec/design_output/stop#the-hold-outlives-its-drop]]
+  const hold = holdHere(box);
   const off = asks(box, ENABLED) === false;
   const decision = decide(rules, {
     claimed,
@@ -247,22 +264,48 @@ function lastLineReason(text) {
   return found ? found[1] : "";
 }
 
-function ranHere(name, held) {
-  if (name === "stop-hook-off") return held.off;
-  if (name === "owner-holds") return held.hold === STOP;
-  if (name === "owner-finishes") return held.hold === FINISH;
+// The checks reading the engine's own work. [[spec/design_output/config#the-engine-controls]]
+export const ENGINE_CHECKS = [
+  "ticket-in-hand",
+  "group-in-hand",
+  "work-waiting",
+  "warnings-standing",
+];
+
+// [[spec/design_output/config#the-engine-controls]]
+export function standsDown(name, binding) {
+  return String(binding) === GOD && ENGINE_CHECKS.includes(name);
+}
+
+// Every check this door answers, one a key. [[spec/design_output/stop#the-mechanical-checks]]
+const CHECKS = {
+  "stop-hook-off": (held) => held.off,
+  "owner-holds": (held) => held.hold === STOP,
+  "owner-finishes": (held) => held.hold === FINISH,
   // An answer naming a next step takes no free stop, so the turn holds open where the agent says what it does next. [[spec/design_output/stop#the-chat-is-new]]
-  if (name === "chat-is-new") return chatIsNew(held.box) && !namesNext(held.text);
-  if (name === "work-waiting") return todosOf(held.box).standing();
-  if (name === "group-in-hand") return groupInHand(held.box);
-  if (name === "ticket-in-hand") return holdStands(held.box) || privateStands(held.box);
-  if (name === "queue-waits") return queueWaits(held.box);
-  if (name === "no-stop-line") return !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed);
+  "chat-is-new": (held) => chatIsNew(held.box) && !namesNext(held.text),
+  "work-waiting": (held) => todosOf(held.box).standing(),
+  "group-in-hand": (held) => groupInHand(held.box),
+  "ticket-in-hand": (held) => holdStands(held.box) || privateStands(held.box),
+  "queue-waits": (held) => queueWaits(held.box),
+  "no-stop-line": (held) =>
+    !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed),
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
-  if (name === "a-person-sits-here") return !inCloud(held.box.env ?? {});
+  "a-person-sits-here": (held) => !inCloud(held.box.env ?? process.env),
   // [[spec/tickets/the-spawn-reaches-its-guidance]]
-  if (name === "warnings-standing") return handWanted(held.box);
-  return undefined;
+  "warnings-standing": (held) => handWanted(held.box),
+};
+
+// [[spec/design_output/stop#the-mechanical-checks]]
+export function knowsCheck(name) {
+  return Object.hasOwn(CHECKS, String(name));
+}
+
+function ranHere(name, held) {
+  // A table answers the keys every object carries, so the read asks it first. [[spec/design_output/stop#the-mechanical-checks]]
+  if (!knowsCheck(name)) return undefined;
+  if (standsDown(name, asks(held.box, BINDING))) return false;
+  return CHECKS[name](held);
 }
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
@@ -304,7 +347,7 @@ function chatIsNew(box) {
 
 function promptsIn(box) {
   try {
-    return rowsOf(String(box.disk.read(join(box.work, SESSION)))).filter(
+    return rowsIn(String(box.disk.read(join(box.work, SESSION)))).filter(
       (one) => one.kind === "prompt",
     ).length;
   } catch {
@@ -314,8 +357,8 @@ function promptsIn(box) {
 
 // A desk bound to the queue on trunk has work while a free ticket stands, so a stop on completion waits. [[spec/design_output/stop#the-mechanical-checks]]
 function queueWaits(box) {
-  if (inCloud(box.env ?? {})) return false;
-  if (asks(box, "engine.binding") !== "queue") return false;
+  if (inCloud(box.env ?? process.env)) return false;
+  if (asks(box, BINDING) !== QUEUE) return false;
   if (branchOf(box) !== "main") return false;
   const texts = readFolder(box.disk, join(box.work, "spec", "tickets"), ".md").map((one) => one.text);
   return queueHolds(texts);

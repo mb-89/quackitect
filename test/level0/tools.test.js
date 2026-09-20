@@ -19,7 +19,7 @@ import {
 } from "../../.claude/skills/level0/lib/tools.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { readTools, survey, whereIs, writeSurvey } from "../../src/scripts/tools.js";
+import { readTools, survey, whereIs, writeSurvey } from "../../src/engine/tools.js";
 
 const ROOT = "/box";
 const BIN = `${ROOT}/.se/.runtime/bin`;

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: do
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-tree-names-its-things
 step: do
+record:
+  - step: do
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 2b044e5bd1517469d24bfe28274d7f9e79e5bd7e
+    hash_after: 2b044e5bd1517469d24bfe28274d7f9e79e5bd7e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui passes
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -47,7 +60,7 @@ reads the work and changes none of it.
 - Enter writes the value, and Escape puts the old one back
 - the fill reaches every row the view holds, and a filter says how far
 - the completion offers the schema's values, and the data's where no schema names any
-- `go -C src/viewer test ./...` is green
+- `go -C src/tui test ./...` is green
 
 # do
 
@@ -55,7 +68,7 @@ reads the work and changes none of it.
 
 ## tests
 
-    go -C src/viewer test ./...
+    ./RUNME.sh branch test src/tui/treeedit_test.go
 
 ## check
 

@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { TICKETS } from "../../src/scripts/group.js";
+import { TICKETS } from "../../src/engine/group.js";
 import { BRIEF } from "../../src/scripts/work.js";
 import { REF_FORMAT } from "../../src/scripts/work-read.js";
 

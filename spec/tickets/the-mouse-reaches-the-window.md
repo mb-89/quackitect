@@ -64,7 +64,7 @@ meanwhile.
 
 ## tests
 
-    (cd src/viewer && go test ./...) > /dev/null 2>&1 && echo green
+    (cd src/tui && go test ./...) > /dev/null 2>&1 && echo green
 
 ## check
 
@@ -116,11 +116,11 @@ Two facts in the code stood behind that reading, and either one alone accounts f
 
 | the fact | where it stood |
 |---|---|
-| `main.go` built the program with `tea.WithAltScreen()` alone, so the window asked the terminal for no mouse event | `src/viewer/main.go` |
-| no file under `src/viewer` named `MouseMsg`, so an arriving event met no hand | `src/viewer` |
+| `main.go` built the program with `tea.WithAltScreen()` alone, so the window asked the terminal for no mouse event | `src/tui/main.go` |
+| no file under `src/tui` named `MouseMsg`, so an arriving event met no hand | `src/tui` |
 
 Bubble Tea reports the mouse where the program asks with `WithMouseCellMotion` or `WithAllMotion`, and the window asked with neither. The terminal was answering correctly the whole time.
 
-The owner asked for the mouse, and named the work editor as where it pays. So this ticket turns from a reading into the change, and `src/viewer/mouse.go` carries it.
+The owner asked for the mouse, and named the work editor as where it pays. So this ticket turns from a reading into the change, and `src/tui/mouse.go` carries it.
 
 One cost rides with it. A window holding the mouse takes the terminal's own text selection, so a drag marks rows. Most terminals give the selection back under a held shift.

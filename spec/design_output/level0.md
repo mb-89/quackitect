@@ -44,7 +44,7 @@ where both roots are one folder.
 | `{ register }` | registers the tools it names, one by one |
 | `{ needs: "reply" }` | posts the step's text and the last texts as `agent.spoke`, and does what that answer says |
 | `{ spawn, back }` | spawns the helper, and posts what it says under the event `back` names |
-| nothing, the server down | hands the event on, and writes one `warn` line, once |
+| nothing, the server down | hands the event on, writes one `warn` line, and says it once in the chat |
 
 The server is plain node under `src/bridge`, one file a topic, and the header
 of each file says which door it holds. `server.js` holds the doors, god mode
@@ -94,7 +94,9 @@ stub's bridgehead keeps a copy, because that file imports nothing.
 The take verb reaches a cloud box that pulls work. A cloud session opening on
 a prompt reaches no verb at all, so the bridgehead carries the same start. The
 session's first event answers nothing, the `warn` line lands, and the start
-road runs once.
+road runs once. That silence says nothing to the person, because the road runs
+under it. For details, see
+[[spec/design_output/level0#the-bridge-says-it-falls]].
 
 The road is one shell line, because the hook imports nothing and stands outside
 node. The shell reads the environment itself and answers a code:
@@ -104,20 +106,33 @@ node. The shell reads the environment itself and answers a code:
 | 3 | no cloud variable, so a person starts it | nothing |
 | 4 | the method root stands nowhere | one `warn` line |
 | 5 | the box carries no node | one `warn` line |
-| 6 | the setup brings no modules | one `warn` line |
+| 6 | the install brings no modules | one `warn` line |
+| 7 | the road installs the modules, then starts the server | one `info` line |
 | 0 | the server starts behind the session | one `info` line |
 
 `CLAUDE_CODE_REMOTE` and `SE_CLOUD` say a box is a cloud box, the same pair the
 cloud guidance binds on. The operating system decides nothing here, because a
 person at a local box wants the button and a cloud box wants the server.
 
-The call comes back in milliseconds: the line backgrounds the server and sends
-its output to `.se/.log/serve.log`, so a session start waits for nothing. The
-server answers the next event in about a second. A first event landing before
-it stands reads no rules, and the log names the piece that misses.
+The call comes back in milliseconds where the modules stand. The line
+backgrounds the server and sends its output to `.se/.log/serve.log`, so a
+session start waits for nothing. The server answers the next event in about a
+second. A first event landing before it stands reads no rules, and the log
+names the piece that misses.
 
-The bridgehead installs nothing. The setup installs, and a box whose setup runs
-nowhere says so on the line the table above names.
+The road brings the modules where they stand nowhere. A cloud box clones the
+repository fresh when the container starts. The half of the setup writing into
+the tree goes with the old one:
+
+| what the setup writes | where it lands | what the clone does |
+|---|---|---|
+| the trust flag and the mode | the home of the box | leaves them standing |
+| the modules and the installed binaries | the tree | replaces the tree |
+
+So the road runs `src/scripts/install.sh` itself, under the skip list the setup
+names, and answers `7` where it does. That install waits, because a session
+holding no cage reads no rule at all. A session start pays it once, and on a
+box whose first event finds no server alone.
 
 ## A fix reaches the session
 
@@ -149,6 +164,150 @@ server. Before it exits, the server writes the error and its stack to the log
 at `fatal`. So the log names why the server falls, and the next start reads
 as a fresh one. A kill from outside the process writes nothing, so a log
 ending on no `fatal` line names a kill.
+
+## The bridge says it falls
+
+A server falling under a running session leaves the doors passing quietly. The
+row naming the fall sits in a file nobody opens, and the check finds it minutes
+later. So the bridgehead says it where a person stands.
+
+| what the bridgehead does | when |
+|---|---|
+| writes one `warn` row naming the event route | the first event the server answers nothing for |
+| says one line in the chat, through `$.ui.log` | the first such event past the session start |
+| drops both marks | the server answers again |
+
+The route both name is the one the bridgehead posts to, which `url()` answers.
+The line names it, what the wire says, and the two commands a person runs:
+`./RUNME.sh serve`, and `./RUNME.sh doctor` where that fails.
+
+The session start says nothing to the person. `seen` posts every event to the
+server first, and runs the start road under a `session.start` the server
+answers nothing for. So that silence is the road standing ready, and a line
+there reads false on every healthy cloud start.
+
+| the mark | what it holds |
+|---|---|
+| the row's mark | one row a fall |
+| the chat's mark | one line a fall, standing apart so a session start keeps the line unsaid |
+
+The two marks stand apart, because a session start writes the row and leaves
+the line. A harness offering no `$.ui` leaves the row alone, and nothing
+throws. `./RUNME.sh doctor` names the server under `server`, where a person
+asks after it later.
+
+## A session says its cage
+
+A session whose server stays down reads like one whose server stands. The agent
+inside it reads no rule and writes past every door, and it says nothing about
+either. An agent outside the cage is the one reader who cannot see the fault.
+
+So the bridgehead says it where a reader stands. The start road stands down at
+a `warn` code, and the first `prompt.context` the server answers nothing for
+carries one block, `level0-cage`:
+
+| what the block names | why a reader wants it |
+|---|---|
+| the code the start road answers | it says which piece is missing |
+| what that code means | a reader takes it without the table |
+| what the road itself says | the error under the code |
+| `./RUNME.sh`, then `./RUNME.sh serve` | what a person runs to fix it |
+
+`cageText` in `hooks/level0.js` builds the block. The hook holds that code until
+a server answers. The block asks the agent to open its first answer with one
+line saying level zero stands down. A person then tells two sessions apart at a
+glance.
+
+A box whose server stands reaches none of this. The answer of the server clears
+what the road holds, so a session reading the rules reads the canary alone.
+
+A code carrying no `warn` carries no block either. `3` says a person starts the
+server at this box, and a person standing there reads the sidebar.
+
+## A restart fills the box
+
+The server restarts under a running session, and the harness sends one
+`session.start` a session. So the box a restart builds carries none of what the
+session start fills, and the session runs on.
+
+| what a session start fills | who reads it | what a fresh box holds |
+|---|---|---|
+| `box.schemas` | the mint spec, the mint, the write door | nothing |
+| `box.tools`, `box.specs` | the block naming what this box has | nothing |
+| `box.projections`, `box.sources` | the write door | nothing, and `freshens` fills them |
+| the warm index | the search tools | a cold index |
+
+`fillsBox` in `src/bridge/server.js` fills the schemas, the survey and the
+specs. `decide` runs it ahead of the door, so the door and the registration
+both read a full box. A session start passes `again`, because the tree moves
+under a box that stands.
+
+The mint is what this buys. `mintSpec` reads the kinds off `box.schemas`. A
+fresh box holds none, so the kind list registers empty and `mintedNote` throws
+on `schemas.get`. The tools block reads `box.tools` and `box.specs` the same
+way, and a fresh box leaves it short.
+
+## The check reads the server
+
+`./RUNME.sh check` probes the health call and carries on. A box out of a fresh
+clone runs no server, and the rules over the tree hold there all the same. So
+the probe says what it meets, and leaves the battery running.
+
+| what the probe meets | what the check says | what it answers |
+|---|---|---|
+| a server answering well | the server stands, and where | green |
+| a server answering ill | the health call it fails, and why | red |
+| no server at all | no server answers, and how to start one | green |
+
+A server standing and failing its own health call is the one red here.
+Something runs there, and it names itself broken. `serverRead` in
+`src/scripts/cli-check.js` reads the three apart, and `serverSays` takes the
+fetch as a door, so a test drives each one.
+
+`./RUNME.sh doctor` names the server still. That verb is where a reader asks
+after what this box has.
+
+## The doctor probes every hook
+
+A hook answering nothing writes a failure on every event, and the session runs
+blind to it. So `./RUNME.sh doctor` reads the addresses the settings files
+name, and says which one answers.
+
+| the file | who writes it | does git track it |
+|---|---|---|
+| `.claude/settings.json` | this tree | yes |
+| `.claude/settings.local.json` | the box | no |
+| the settings under the home of the box | the box | no |
+
+`SETTINGS` and `SETTINGS_LOCAL` in `.claude/skills/level0/lib/vehicle.js` own
+those names, and the home file takes the first of them under the home path.
+`hooksNamed` in `src/scripts/cli-check.js` reads them in that order, and takes
+every string under `hooks`. It keeps the ones a URL parses as `http:` or
+`https:`.
+
+A command hook holds a path, and `new URL` takes a Windows path as a URL. So
+the reader holds those schemes alone, and a command hook stands outside the
+list. Two files naming one address read as one row, off the file naming it
+first.
+
+| what the probe meets | the row under the address |
+|---|---|
+| an answer, whatever its status | `stands at <the address>, off <the file>` |
+| nothing, inside the wait | `warn: answers nothing at <the address>, off <the file>` |
+
+A reply carrying a failing status stands, because a box answering a status
+listens there. `hookRows` runs the calls together, so a box naming several dead
+hooks answers inside the first minute. The wait is `HEALTH_WAIT` in
+`src/scripts/cli-doors.js`, which the server probe reads too.
+
+The row's label reads `hook` beside the host of the address. A host carries its
+port, and leaves the one its scheme takes by default. `doctor` pads a label to
+one width, so the rows stand in line. The word `warn` opens the printed row,
+and the doctor writes no log line of its own.
+
+The entry at the dead port lives in `.claude/settings.local.json`, which git
+ignores. So a hand on the box it belongs to takes that line out, and this row
+is what shows them the entry.
 
 # The harness surface
 
@@ -586,6 +745,35 @@ The private half answers first, so a note's own words stop at the door. The
 refusal closes by asking the writer to hold that rule for the rest of the turn.
 A refusal teaching one line costs a round trip on every line.
 
+## A write meets its mark
+
+Two hands on one tree drop each other's work. One reads a file, the other
+writes it, and the first write lands over text the other leaves. So the door
+keeps a mark against each path, and a write meets it.
+
+| when | what the door does |
+|---|---|
+| content reaches the agent, by a read or by its own write landing | it hashes that text and keeps it against the path |
+| the agent writes that path | it hashes what the disk holds now |
+| the two agree | the write lands |
+| the two differ | it refuses, and asks for a read |
+| the disk holds the path nowhere | the write lands, because a new file agrees with anything |
+
+Which read sets the mark is the whole of the mechanism. The door reads the file
+for itself on every edit, so a mark off that read compares against itself. The
+mark comes off the read reaching the agent.
+
+The hand carries nothing. `lib/marks.js` holds the hash and the refusal, and
+the box holds the marks against the tree it serves. This door writes a refusal
+of its own, because the voice refusal opens on the prose rules and says the
+wrong thing here. It names the file, says which of the two cases stands, and
+asks for a read.
+
+The door answers ahead of the write, so a write the engine drops leaves the
+mark ahead of the disk. The next write refuses and asks for a read, which costs
+a read and keeps the tree whole. The batch lane reads every file inside the
+call that writes it. That read is the agent's own, so the lane takes no token.
+
 ## The door reaches a helper
 
 A subagent's writes go through the same `tool.call` chain, so the door reads
@@ -742,6 +930,31 @@ The probe after a compaction pays nothing. It reads the canary through
 `heardCanary` on a session holding the line already, so a second debt stays
 shut.
 
+## The debt survives a restart
+
+A restart is ordinary. `reload.js` restarts the server where the code under its
+roots moves, so a session working on level zero's own code meets it often. The
+box dies with the process, and the harness session runs on. A debt held in the
+box alone comes back at every restart, and the gate then asks a session that
+says the line already.
+
+So the debt stands in the session log, which rotates at a session start. The
+marks it reads are there already: the paid line `onTurnSaid` writes, and the
+compaction line `onSessionCompact` writes.
+
+| the last mark in the log | what the box reads back |
+|---|---|
+| the paid line | the debt stands clear, and the gate stays quiet |
+| the compaction line | the debt stands, and the gate asks again |
+| neither | the debt stands, and the gate asks again |
+
+`afterARestart` in `src/bridge/guidance.js` builds the session a restart takes,
+and `sessionHere` is the one place calling it. A session opening on
+this box reaches `onSessionStart` instead, which writes the state fresh.
+
+A compaction opens the debt again and takes the payment off with it, so the
+line lands once more after one.
+
 ## The line lands once
 
 A turn holds open while the agent works. A debt clearing at the turn's end
@@ -787,16 +1000,20 @@ The door opens a demand for what a person waits for. It holds every
 
 | what pays | when |
 |---|---|
-| the first text of a turn | `classic.MessageDisplay` fires for it, before the first call |
+| any text the chat shows | `classic.MessageDisplay` fires for it, before the call under it |
 | a call to `mcp__level0__report` with the text | at once, between calls |
 | the turn's last text | at `turn.complete`, where the demand still stands |
 
-A text written between calls pays nothing on its own. The client hands it to
-no hook until the turn ends. The transcript behind `$.session.messages()`
-flushes late, sometimes a turn late. The step's stream carries text for the
-first step alone. The bridgehead still posts the last four texts of the
-transcript on a hold. The door pays on any text since the demand that fits,
-so a flush landing late pays too.
+The client posts `classic.MessageDisplay` for every text it shows, a text
+between two calls among them. Each event carries that text under `delta`, and
+`onMessageDisplay` pays the demand with it. So a chat answer pays the door on
+its own, and the call under it passes.
+
+The other roads stay. The transcript behind `$.session.messages()` flushes
+late, sometimes a turn late. The step's stream carries text for the first step
+alone. The bridgehead still posts the last four texts of the transcript on a
+hold. The door pays on any text since the demand that fits, so a flush landing
+late pays too.
 
 ## What counts as owed
 
@@ -847,9 +1064,16 @@ where no pay stands. For details, see
 [[spec/design_output/log#the-answer-under-its-prompt]].
 
 The owner reads the chat, and a hook writes no chat text. So a mid-turn answer
-goes to both places. The agent writes it in the chat as text, and calls the
-report with the same text for the log. The refusal and the report's result say
-so. The report pays the demand at once, so no call after it meets the door.
+goes to both places. The chat pays the door, and the report carries the same
+text into the log.
+
+| the road | what it buys |
+|---|---|
+| the chat | the owner reads the answer, and the door takes it as paid |
+| the report | the log carries the answer, where a retro reads it |
+
+The refusal and the report's result say both. Either road pays the demand at
+once, so no call after one meets the door.
 
 ## The owner binds god
 
@@ -870,11 +1094,15 @@ delivery receipts, so a door reading it bites the wrong turn.
 
 ## What the refusal says
 
-    The owner sent a prompt. The owner asked something and nothing has
-    answered it. Say back what you understood and what you do next, then work.
+    The owner asked something and nothing has answered it. Write the answer in
+    the chat, as text: what you understood and what you do next. Then work.
+    The chat pays this door the moment it shows that answer.
+    The log takes the answer from the chat, so the log tool answers nothing.
 
-The refusal opens with the demand. The rest is the rule in its own words, and a refusal quoting the rule teaches it
-better than a refusal naming it.
+The refusal opens with the demand. The rest is the rule in its own words, and
+a refusal quoting the rule teaches it better than a refusal naming it. `SAYS`
+in `.claude/skills/level0/lib/answer.js` holds these words, and a case there
+asserts each line of them.
 
 ## Where it must not bite
 
@@ -1103,7 +1331,8 @@ answers that the rules pass.
 
 | folder | holder |
 |---|---|
-| `spec/config/styles` | Vale reads it, and `.vale.ini` says which style reaches which path |
+| `spec/config/styles` | Vale reads its style folders, and `.vale.ini` says which style reaches which path |
+| `spec/config/styles/colours.json` | the window reads it, as [[spec/design_output/tui#colours]] says |
 | `spec/config/biome.json` | Biome reads it |
 
 The comments in `.vale.ini` say why each section stands.
@@ -1161,7 +1390,7 @@ stands behind Vale's finding with one general veto:
 | its -s or -ing form, `skips`, `standing` | present on its face, and the finding falls |
 | another form, `wrote`, `did`, `failed` | past, and the finding stands |
 
-`src/bridge/tense.js` reads the line the finding stands in through wink-nlp,
+`src/engine/tense.js` reads the line the finding stands in through wink-nlp,
 which hands a lemma a token. Two more vetoes ride the same reader, in
 `src/bridge/prose.js`. The three doors reading prose call that one entry: the
 write door, the draft check and the commit message. A `vale` line at debug
