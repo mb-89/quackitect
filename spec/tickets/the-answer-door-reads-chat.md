@@ -126,7 +126,7 @@ the door refuses the calls that carry the work, after the answer stands
 
 - the road stands already, and nothing holds it
 - the cases the ask names go in `test/level0/answer-door.test.js`
-- the chapter naming the two places changes with them
+- the door's wording and two chapters change beside them
 
 **What stands.** `onMessageDisplay` in `src/bridge/answer.js` reads the text
 the chat shows and pays the demand with it. The server wires it at
@@ -135,33 +135,48 @@ the chat shows and pays the demand with it. The server wires it at
 | the road | what pays | what covers it |
 |---|---|---|
 | the report tool | `pays` | a case in `answer-door.test.js` |
-| the bridgehead's texts | `onAgentSpoke` | a case in the same file |
+| the bridgehead's texts | `onAgentSpoke` | nothing |
 | the chat | `onMessageDisplay` | nothing |
 
-**Measured here.** This box shows the text reaching the server before the call
-under it. One pair off `.se/.log/session.jsonl`: the display lands at
-`22:45:48.097`, and the call after it at `22:45:48.975`.
+**Measured here.** `.se/.log/session.jsonl` on this box carries 43 rows for
+`classic.MessageDisplay`, and every one of them lands after a tool call of the
+same turn. Each carries the text under `delta`.
 
-**The change.** Three cases, and one chapter.
+So the client posts the event for a text between two calls, and the door reads
+it there. A reader wanting the count again runs the log through `rowsIn` and
+counts the event.
+
+**The chapters.** Two chapters carry the old reading, and the measurement above
+overturns one line of each.
+
+| the chapter | what it says today | what it says after |
+|---|---|---|
+| What the door reads | the first text of a turn pays, and a text between calls pays nothing | every displayed text pays, because the client posts each one |
+| The reply line | the agent writes the chat and calls the report | the chat pays, and the report writes the log |
+| What the refusal says | a refusal the code left behind | the refusal `SAYS` builds today |
+
+**The change.** The cases, the door's wording, and the chapters.
 
 | what changes | where |
 |---|---|
-| a case pays the demand off a displayed text | `test/level0/answer-door.test.js` |
+| a case pays the demand off a text shown between two calls | `test/level0/answer-door.test.js` |
 | a case reads no refusal on the call after it | the same file |
-| a case leaves a demand standing where the text is empty | the same file |
-| the chapter says the chat pays, and the report writes the log | the reply line chapter |
+| a case leaves the demand standing where the text is empty | the same file |
+| `SAYS` and the refusal say the chat pays | `src/bridge/answer.js` |
+| the standing case over `SAYS` reads the new words | `answer-door.test.js` |
+| the three chapters above | `spec/design_output/level0.md` |
 
-The chapter reads today as though the agent owes both. A chat answer pays, and
-the report stays the way the log takes the same text. So the wording of the
-door changes with it, in `SAYS` and in the refusal.
+The standing case asserts the words `mcp__level0__report with the same text`.
+`SAYS` keeps the report beside the chat, so that case changes with the wording
+and holds the same claim.
 
-**What the cases will show.** Two things the road does that nobody decided.
+**What the cases show.** Three things the road does that nobody decides.
 
 - any displayed text pays, so one word pays as well as an answer
 - the score of an answer stands in the other door, which reads a draft
 - a harness sending no display event leaves the report road, as it works today
 
-**What this leaves.** The first of those two wants a ruling: a text under a
+**What this leaves.** The first of those three wants a ruling: a text under a
 length pays nothing, or every text pays and the score door alone judges. The
 ask says an answer in the chat pays at once, so the cases take that reading.
 The review decides it.
