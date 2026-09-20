@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-notes-point-true
 steps:
   - name: design
@@ -139,6 +139,11 @@ record:
       - name: check
         exit: 0
         said: 43 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box 1670436ae0bb · claude-code-remote · helper-9
+    hash_before: 785fe959a77173afd7d392bd64f9d84c89ffcbff
+    hash_after: 785fe959a77173afd7d392bd64f9d84c89ffcbff
+reason: done
 ---
 
 # Ask
@@ -346,17 +351,42 @@ promises the line already.
 
 <!-- the form is files -->
 
+- spec/guidance/review/reviewing.md
+- spec/tickets/the-unknown-runs-stays-quiet.md
+- spec/tickets/a-pointer-resolves.md
+- src/bridge/stop.js
+- test/level0/stop-door.test.js
+- spec/design_output/stop.md
+- .claude/skills/level0/lib/stop.js
+- spec/vocabulary/terms.yml
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- The branch does what the ask calls for. `warnsUnknown` writes one warn line a rule naming a check the door holds nowhere.
+- The line names the rule id and the check, and the row carries both as fields, as the approach says.
+- `never` stands in `CHECKS` answering false, so the table under The mechanical checks and the door agree.
+- The case feeds the door a rule with a typo in `runs` and asserts the one warn row in the fake log.
+- A second case feeds the door `never` and asserts silence, so the new check carries its own proof.
+- `./RUNME.sh check` answers 0 on this branch, with 43 standing at warning.
+- The hunk on `spec/tickets/a-pointer-resolves.md` puts one file name in a code span, a trivial fix outside the ask.
+- The other hunks outside the ask are Biome's line wraps, and redesign nothing.
+- The handback names no retro, and none stands there.
+- Craft, for the drafter at leisure: the assertion message at line 283 of the case file earns one Antithesis warning, and the hand drains it.
+- `./RUNME.sh branch review` fails on its own worktree, a missing `plugin.json`, so this verdict reads git and the check by hand.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The line's promise stands in `spec/design_output/stop.md` alone, and the function, the check and both cases point at that chapter.
 
 # Discussion
 
