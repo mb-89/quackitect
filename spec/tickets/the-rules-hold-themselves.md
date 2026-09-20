@@ -124,11 +124,26 @@ rests on a reader's memory.
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-question-process-gets-tests]], trivial, which holds the successor road open
+- [[spec/tickets/the-rule-shares-one-slug]], question, which gives the slug one owner
+- [[spec/tickets/voice-rules-skip-the-record]], trivial, which guards the fields the engine writes
+- [[spec/tickets/group-key-takes-one-spelling]], trivial, which refuses a group named as a branch
+- [[spec/tickets/runtime-half-takes-the-rest]], trivial, which stands the register under the runtime half
+- [[spec/tickets/a-project-adds-vale-rules]], standard, which assembles the styles of both roots
+- [[spec/tickets/a-check-finds-every-writer]], standard, which binds the escape to its line
+- [[spec/tickets/a-check-finds-restated-facts]], standard, which finds one fact written twice
+- [[spec/tickets/a-lint-holds-note-rules]], standard, which reads a marked rule against its rationale
+- [[spec/tickets/the-check-holds-test-first]], standard, which refuses a change standing with no test
+- [[spec/tickets/the-door-reads-script-writes]], standard, which reads the script a command runs
+- [[spec/tickets/the-door-rule-reads-env]], standard, which holds the outside inside a door
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-<!-- the form is checklist -->
+- every child is small enough to review whole, or is a group itself: each carries one rule and its check
+- the children add up to the goal, and nothing stands outside them: the file calls ride a minted ask
+- a child that waits on another names it under depends_on: none waits, because each holds its own rule
 
 # children
 
