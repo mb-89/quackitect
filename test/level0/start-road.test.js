@@ -21,6 +21,8 @@ function harness({ answers = false, exitCode = 0, stderr = "", ui = true, logs =
   const wrote = new Map();
   const ran = [];
   const said = [];
+  // Every write the log takes, failing or landing, so a case counts what the row's mark holds. [[spec/tickets/the-bridge-says-it-falls]]
+  const tries = [];
   let up = answers;
   const $ = {
     http: {
@@ -35,6 +37,7 @@ function harness({ answers = false, exitCode = 0, stderr = "", ui = true, logs =
         return wrote.get(path);
       },
       write: async (path, text) => {
+        tries.push(String(text));
         if (!logs) throw new Error("the log stands read only");
         wrote.set(path, text);
       },
@@ -50,7 +53,7 @@ function harness({ answers = false, exitCode = 0, stderr = "", ui = true, logs =
   function serves(on) {
     up = on;
   }
-  return { wrote, ran, said, $, serves };
+  return { wrote, ran, said, tries, $, serves };
 }
 
 // One event through the bridgehead's own door, so a case drives the road event by event. [[spec/tickets/the-bridge-says-it-falls]]
@@ -222,7 +225,7 @@ test("a harness carrying no chat log leaves the row alone", async () => {
 });
 
 // [[spec/tickets/the-bridge-says-it-falls]]
-test("a session log that takes no write leaves the chat line paid", async () => {
+test("a session log that takes no write takes one row a fall", async () => {
   const hook = await hookHere();
   const box = harness({ logs: false });
   const runs = runner(hook, box);
@@ -230,5 +233,7 @@ test("a session log that takes no write leaves the chat line paid", async () => 
   await runs("tool.call", { tool: "Read" });
   await runs("tool.call", { tool: "Edit" });
 
-  assert.equal(box.said.length, 1, "the flag stands off the log's answer");
+  const falls = box.tries.filter((one) => one.includes("answers nothing"));
+  assert.equal(falls.length, 1, "the row's mark stands off the answer of the write");
+  assert.equal(box.said.length, 1, "and the chat line stands at one");
 });

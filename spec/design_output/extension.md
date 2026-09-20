@@ -338,9 +338,11 @@ the first `return` in it. So the break stands as a red dot in the file, and a
 person turns it into a log point or a condition. The dot moves with the
 function, and a dot standing on that line already stays.
 
-A dead server blocks nothing, so the agent runs the same with the light dark.
-The sidebar writes the start and the stop at `info`, and so does the server.
-For details, see [[spec/design_output/level0#the-bridgehead-and-the-server]].
+A dead server blocks nothing, so the agent's calls go through with the light
+dark. The bridgehead says so once in the chat, and the log takes a row beside
+it. The sidebar writes the start and the stop at `info`, and so does the
+server. For details, see
+[[spec/design_output/level0#the-bridge-says-it-falls]].
 
 ## Two buttons make both
 

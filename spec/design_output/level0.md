@@ -173,12 +173,13 @@ later. So the bridgehead says it where a person stands.
 
 | what the bridgehead does | when |
 |---|---|
-| writes one `warn` row naming the health call | the first event the server answers nothing for |
+| writes one `warn` row naming the event route | the first event the server answers nothing for |
 | says one line in the chat, through `$.ui.log` | the first such event past the session start |
 | drops both marks | the server answers again |
 
-The line names the health call, what the wire says, and the two commands a
-person runs: `./RUNME.sh serve`, and `./RUNME.sh doctor` where that fails.
+The route both name is the one the bridgehead posts to, which `url()` answers.
+The line names it, what the wire says, and the two commands a person runs:
+`./RUNME.sh serve`, and `./RUNME.sh doctor` where that fails.
 
 The session start says nothing to the person. `seen` posts every event to the
 server first, and runs the start road under a `session.start` the server
