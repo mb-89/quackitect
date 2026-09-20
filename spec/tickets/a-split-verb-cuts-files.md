@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box 099c2ec7708d · claude-code-remote
     hash_before: 3d23fed7b1fbe96664ed331b1035f7dd38f599bb
     hash_after: 3d23fed7b1fbe96664ed331b1035f7dd38f599bb
+  - step: design/review
+    hand: box 099c2ec7708d · claude-code-remote · helper-4
+    hash_before: 141fb7a55dceafdff6b4f7c437e82fd05c5c9177
+    hash_after: 141fb7a55dceafdff6b4f7c437e82fd05c5c9177
+    returns: 2
+    why: the verb's code takes no owner file here. `src/scripts/cli.js` holds the verbs table, and each verb takes a module; the mint on refusal takes no owner file. `src/bridge/code.js` holds the door reading `grows`; the minted ticket's fields stand unnamed. `trivial` asks `gain`, `breaks` and `done_when`, so the door fills three; the minted ticket's path and `group` stand unnamed, so the implementer picks both; the journal entry's `on` and `by` stand unnamed. The command line carries no undo verb, and the `undo` tool takes the newest entry; the size lib holds `sizeFaults`, `FILE_RULE` and `grows`; the undo lib holds `journalOf`, and `spec/processes` holds `trivial`; `src/bridge/apply.js` stands as the batch edit behind the patch and replace tools; `spec/design_output/level0.md` holds `The size ceiling`, so the flags table takes an owner; `./RUNME.sh lint src/scripts` and `./RUNME.sh lint src test` both answer the rules pass; the earlier read's seven findings each take an answer here
 ---
 
 # Ask
@@ -174,13 +180,17 @@ Where each thing stands after:
 
 fail
 
-- the mint says nothing about a second refusal, so one file past the ceiling takes a ticket each time
-- say which hand runs the mint: the door itself, or the hand the refusal names
-- the journal's writer reads as a verb. Name `src/bridge/apply.js`, the batch edit behind the patch and replace tools
-- the flags table stands here and in the level0 note. Say which of the two owns it
-- the ask names `./RUNME.sh test`, and the approach names no case file the cut and the mint land in
-- `sizeFaults`, `FILE_RULE`, `journalOf` and the `trivial` process all stand, and the ceiling chapter takes the verb
-- `./RUNME.sh lint src test` answers clean, so the verb guards the next file and cuts none today
+- the verb's code takes no owner file here. `src/scripts/cli.js` holds the verbs table, and each verb takes a module
+- the mint on refusal takes no owner file. `src/bridge/code.js` holds the door reading `grows`
+- the minted ticket's fields stand unnamed. `trivial` asks `gain`, `breaks` and `done_when`, so the door fills three
+- the minted ticket's path and `group` stand unnamed, so the implementer picks both
+- the journal entry's `on` and `by` stand unnamed. The command line carries no undo verb, and the `undo` tool takes the newest entry
+- the size lib holds `sizeFaults`, `FILE_RULE` and `grows`
+- the undo lib holds `journalOf`, and `spec/processes` holds `trivial`
+- `src/bridge/apply.js` stands as the batch edit behind the patch and replace tools
+- `spec/design_output/level0.md` holds `The size ceiling`, so the flags table takes an owner
+- `./RUNME.sh lint src/scripts` and `./RUNME.sh lint src test` both answer the rules pass
+- the earlier read's seven findings each take an answer here
 
 # implement
 
