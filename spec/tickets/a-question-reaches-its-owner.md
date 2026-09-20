@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -115,6 +115,10 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 322993965b44c982f43a2dddba2606d1d54a2024
     hash_after: 322993965b44c982f43a2dddba2606d1d54a2024
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-6
+    hash_before: e30c07a9816c072df2f01fb5dfd159adab51d698
+    hash_after: e30c07a9816c072df2f01fb5dfd159adab51d698
 ---
 
 # Ask
@@ -177,11 +181,31 @@ A craft question the drafter raises reaches no verb, because the design input an
 
 ### verdict
 
-fail
+pass
 
-- Name the file owning the case, because `pull-escalate.test.js` covers the escalation verb alone.
-- Name what the case asserts past the one in `pull.test.js`, which reads the leaf and the record.
-- Write the seventh rule of `spec/guidance/working` whole, because the table drops the sentence standing there.
+| the question reviewing asks | the answer |
+|---|---|
+| does the approach answer the ask | yes, the two rules, the design input read and the case each stand |
+| is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |
+| what does `./RUNME.sh check` answer | 0 on this commit, with the server standing |
+| does every rule the approach adds carry a case | yes, the case drives the fail route the reviewer's rule names |
+| does every claim carry a proof | yes, each row of both tables reads true against the code |
+
+TL;DR:
+
+- The case lands in `test/level0/pull.test.js`, beside the fail route that file already holds.
+- Its third assertion goes past that case: the route takes on no person step.
+- The seventh rule of `spec/guidance/working` stands whole, and the drafter's half joins it.
+- Both rules land unstarred, so neither rationale note wants a chapter.
+
+The findings, one a line:
+
+- `escalate` puts a person step before the held leaf, as [[spec/design_output/pull#a-person-step-goes-in]] says.
+- A fail sets `step` to `on_fail`, or to the held leaf where none stands, so the drafter's leaf wants none.
+- `spec/schemas/guidance.schema.yaml` caps a list at fifteen, which the working note already reaches.
+- The reviewing note stands under that cap, so the reviewer's rule joins its list.
+- Each new rule holds its sentences under the list item bound of `spec/schemas/paragraph.schema.yaml`.
+- `pull-escalate.test.js` covers the verb alone, so the craft case belongs beside the fail route.
 
 # implement
 
