@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -125,6 +125,10 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 2c3653b24a853fdf9a725df1ec3f4dbf144b04f7
     hash_after: 2c3653b24a853fdf9a725df1ec3f4dbf144b04f7
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-8
+    hash_before: 0643feab029aa69a514a65475935acd8cfeb18e0
+    hash_after: 0643feab029aa69a514a65475935acd8cfeb18e0
 ---
 
 # Ask
@@ -191,33 +195,36 @@ The verb lands first, and the renames run through it. A rename a hand makes by s
 
 ### verdict
 
-fail
+pass
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the approach answer the ask | no, the frame and the tree package reach each other |
+| does the approach answer the ask | yes, each of the four bullets meets a move |
 | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |
 | what does `./RUNME.sh check` answer | 0 on this commit |
 | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |
 | does the verb the approach adds carry a proof | yes, the prove move reads rows, then the check |
-| does every claim carry a proof | no, the tree row's import direction reads false |
-| what grade do the findings take | design, because the package table moves |
+| does every claim carry a proof | yes, each row reads true against the code |
+| what grade do the findings take | none, the draft closes every finding before it |
 
 TL;DR:
 
-- `model` holds a `*Tree`, so the frame package imports the tree package.
-- The tree draws through `cut` and `dimStyle`, which the frame holds.
-- Both reaches standing shuts an import loop, and the Go build refuses it.
+- The draw package takes `cut` and the styles, so the tree stops reaching the frame.
+- The window builds the tab list, so the frame stops reaching a tab package.
+- Every arrow the package table draws runs down, and the Go build takes it.
 
 The findings, one a line:
 
-- `src/viewer/ui.go` holds `work *Tree` on `model`, so the frame reaches the tree.
-- `Tree.Rows` in `src/viewer/treedraw.go` calls `cut` and `dimStyle` to draw a row.
-- `cut` stands in `src/viewer/ui.go`, and `dimStyle` in `src/viewer/colour.go`.
-- So the tree reaches back, against the one-way arrow the package table draws.
-- So the approach says where the width helper and the styles land, and the table stands on that.
-- The tab rows, the read move, the write move, the prove move and the stub rows read true.
-- The draft closes every finding the two rounds before this one name.
+- `cut` and `pad` stand in `src/viewer/ui.go`, and the draw package takes both.
+- `Tree.Rows` in `src/viewer/treedraw.go` draws through `cut` and `dimStyle`.
+- The tree's own files reach `model` nowhere, so the tree stands under the frame.
+- `newModel` in `src/viewer/ui.go` builds the tab list, and the window takes that line.
+- `linksIn` in `src/index/front.go` records a note link, and `grep` answers the rest.
+- `./RUNME.sh links` calls `dangling`, which exits 0, so the prove move reads its rows.
+- `STUB_FOLDERS` in `.claude/skills/level0/lib/vehicle.js` holds the literal `project`.
+- `stubInto` in `src/scripts/stub.js` reads that constant, so one edit reaches the stub.
+- `spec/design_output/index` owns the questions the index answers, and the verb asks one.
+- The rename list holds `spec/design_output/viewer`, which the ask's first bullet reaches.
 
 # implement
 
