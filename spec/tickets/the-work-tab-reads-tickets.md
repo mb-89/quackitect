@@ -262,6 +262,7 @@ note still names as waiting.
 
 <!-- what anybody adds, at any time, on this ticket -->
 
-The Vale paths case read a raw finding off the level zero note, and the push
-door had just asked for that note to stand clean. So the case now feeds Vale a
-flagged line on stdin, and no tracked note has to carry a warning for it.
+The Vale paths case read a raw finding off the level zero note. The push door
+asks for that note to stand clean, so the two pulled against each other. The
+case now feeds Vale a flagged line on stdin, and no tracked note carries a
+warning for it.
