@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 51c5005e133c · claude-code-remote
@@ -103,6 +103,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box 51c5005e133c · claude-code-remote
+    hash_before: 3bcecebc2b2a2ce42eea31a88323c5ae80a6594c
+    hash_after: 3bcecebc2b2a2ce42eea31a88323c5ae80a6594c
 ---
 
 # Ask
@@ -163,37 +167,64 @@ The work tab is a ticket editor. It queries the index for tickets, and a branch 
 
 <!-- what was done, one line a ticket or a thing -->
 
-<!-- the form is list -->
+- [[spec/tickets/the-index-answers-tickets]]: the index answers `tickets`, with the standing off the group's record
+- [[spec/tickets/the-index-fires-on-change]]: the door holds a `changes` call until a sweep, and answers the tick
+- [[spec/tickets/the-work-tab-asks-index]]: the tab asks the door, redraws on the tick, and the answer file goes
+- [[spec/tickets/the-work-tab-takes-edits]]: a cursor, a cell edit and two mark keys write the ticket's front
+- the plugin manifests: the brand stamp writes both where a clone holds none, so three contract cases stand green
+- the door over a fresh tree: `serves` makes the runtime folder first
+- the sync: trunk came in with one conflict in the installer, resolved by keeping both sides
+- twelve lines of three notes: reworded past the tense reader, so the push door opens
 
 ### well
 
 <!-- what went well, and what made it go well -->
 
-<!-- the form is list -->
+- the pull carried each ticket to its commit and push, so the box took the next leaf each time
+- the door's JSON shape took `tickets` and `changes` as two cases and no new transport
+- a fake door on a port the standing file names let every tab case run with no binary
+- the schema file already said which field the verbs own, so the tab reads it and holds no list
 
 ### badly
 
 <!-- what did not, each with its moment in the log or the transcript -->
 
-<!-- the form is list -->
+- the first hand-back of the first ticket met three red contract cases the clone brought, at the first check
+- the node fixture case stood under `test/level0` until the check named the rule, one hand-back later
+- the process call stood in the wrong Go file until the lint named `door.go`, at the third ticket's lint
+- a python slice on the group ticket cut a heading short, at the split, and cost one refused hand-back
+- the push door refused twelve tense findings in notes off trunk, at the sync hand-back
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
-<!-- the form is list -->
+- the manifests: `stamps` in `src/scripts/brand.js` writes them now, so no clone meets that red again
+- the test folder: `spec/guidance/code/testing` names the contract folder for a real binary, so a hand reads it first
+- the process call: `spec/design_output/doors` says the Go import runs in `door.go`, and a hand reads it before writing a client
+- the slice: a heading match reads the whole line, which `mcp__level0__patch` does and a substring does not
+- the tense reader: `spec/config/styles/VoiceParagraph/PastTense.yml` flags nouns as verbs, and a person weighs its words
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 
-<!-- the form is text -->
+The ask said a branch informs a ticket's standing and nothing more, and the
+record on the group ticket already carried that standing. So the index reads
+no git, and the answer file the verbs wrote had nothing left to say. The
+queue place and the progress went with it, because the tab draws what the
+index answers and the index answers what the notes hold. A person moving work
+between groups wants the `group` column, so the base file gained it. The
+mark keys stand in for the editor a mark carries open, which the tree view
+note still names as waiting.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-<!-- the form is checklist -->
+- every fact stands once: the rows in the index note, the road in the TUI note, the door rule in the schema note
+- every number carries a name: the waits stand as named constants in `door.go` and `workindex.go`
+- every header says what its file is for: each new Go file opens on what it holds, and counts nothing
 
 ## cloud
 
