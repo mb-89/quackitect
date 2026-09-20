@@ -6,7 +6,13 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { dropsHold, onStop, reportStands, sawCall, sawPrompt } from "../../src/bridge/stop.js";
+import {
+  dropsHold,
+  onStop,
+  reportStands,
+  sawCall,
+  sawPrompt,
+} from "../../src/bridge/stop.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -61,7 +67,13 @@ const RULES = `
 `;
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
-const REFACTOR = { parallel: true, mostWarnings: 2, mostAtOnce: 1, untouchedFor: "7d", grace: 1 };
+const REFACTOR = {
+  parallel: true,
+  mostWarnings: 2,
+  mostAtOnce: 1,
+  untouchedFor: "7d",
+  grace: 1,
+};
 
 const NOW = 1_800_000_000;
 const WEEK = 604_800;
@@ -136,7 +148,10 @@ test("the queue rule reads the cloud off the box's own environment", () => {
   const was = process.env.CLAUDE_CODE_REMOTE;
   process.env.CLAUDE_CODE_REMOTE = "true";
   try {
-    assert.match(onStop(done, bare.box).result.block, /The queue holds work for this box/);
+    assert.match(
+      onStop(done, bare.box).result.block,
+      /The queue holds work for this box/,
+    );
   } finally {
     if (was === undefined) delete process.env.CLAUDE_CODE_REMOTE;
     else process.env.CLAUDE_CODE_REMOTE = was;
@@ -160,7 +175,10 @@ test("a standing stop line ends the turn, and nothing prompts after it", () => {
 
 // A talk stop with no report in the same message holds the turn, and one under the needs table ends it. [[spec/design_output/stop#a-talk-follows-a-report]]
 test("a talk stop ends the turn only where the same message carries the report", () => {
-  const bare = onStop({ last_assistant_message: "stop: the-owner-asks-to-talk" }, box().box);
+  const bare = onStop(
+    { last_assistant_message: "stop: the-owner-asks-to-talk" },
+    box().box,
+  );
   assert.match(bare.result.block, /the-owner-asks-to-talk: .*carry the report/);
   const report = [
     "The work stands here.",
@@ -176,7 +194,11 @@ test("a talk stop ends the turn only where the same message carries the report",
   const it = box();
   assert.deepEqual(onStop({ last_assistant_message: report }, it.box), { pass: true });
   assert.match(it.said[0][2], /the turn ends/);
-  assert.equal(reportStands("# What the agent needs\n\nnothing under it"), false, "a heading with no row is no report");
+  assert.equal(
+    reportStands("# What the agent needs\n\nnothing under it"),
+    false,
+    "a heading with no row is no report",
+  );
 });
 
 test("a helper's turn end passes untouched, so a refused helper answer reaches no owner turn", () => {
@@ -220,7 +242,60 @@ ${RULES}`;
     { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" },
     it.box,
   );
-  assert.deepEqual(said, { pass: true }, "the stop stands, and the strange rule fires nothing");
+  assert.deepEqual(
+    said,
+    { pass: true },
+    "the stop stands, and the strange rule fires nothing",
+  );
+});
+
+// A rule naming a check the door holds nowhere says so in the log, so the hand that wrote it reads its own mistake. [[spec/design_output/stop#the-mechanical-checks]]
+test("a rule naming a check the door holds nowhere writes one warn line naming the rule and the check", () => {
+  const typo = `
+- id: the-moon-is-full
+  side: continue
+  priority: 60
+  decides: mechanical
+  runs: moon-is-full
+  says: The moon is full, so this turn holds.
+${RULES}`;
+  const it = box({ [at("spec/config/stop/level0.yml")]: typo });
+  const said = onStop(
+    { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" },
+    it.box,
+  );
+  assert.deepEqual(
+    said,
+    { pass: true },
+    "the strange rule fires nothing, and the stop stands",
+  );
+  const warned = it.said.filter((row) => row[0] === "warn" && row[1] === "stop");
+  assert.equal(warned.length, 1, "one warn line a rule");
+  assert.match(warned[0][2], /the-moon-is-full/, "the line names the rule");
+  assert.match(warned[0][2], /moon-is-full/, "the line names the check");
+});
+
+// The table of checks names never, so a rule running it stands off the vote and writes no line. [[spec/design_output/stop#the-mechanical-checks]]
+test("a rule running never fires nothing and writes no warn line", () => {
+  const unbuilt = `
+- id: the-unbuilt-rule
+  side: continue
+  priority: 60
+  decides: mechanical
+  runs: never
+  says: An unbuilt rule holds nothing.
+${RULES}`;
+  const it = box({ [at("spec/config/stop/level0.yml")]: unbuilt });
+  const said = onStop(
+    { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" },
+    it.box,
+  );
+  assert.deepEqual(said, { pass: true });
+  assert.deepEqual(
+    it.said.filter((row) => row[0] === "warn" && row[1] === "stop"),
+    [],
+    "never is a check the door holds",
+  );
 });
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]

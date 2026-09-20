@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -109,6 +109,17 @@ record:
     hand: box 1670436ae0bb · claude-code-remote · helper-4
     hash_before: 480c7217d3c4fc70f2c40772d5fd9e741aa7a114
     hash_after: 480c7217d3c4fc70f2c40772d5fd9e741aa7a114
+  - step: implement/tests-red
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 04fa73f97bf69a3e73c9a8329b29ea0e34cbb426
+    hash_after: 04fa73f97bf69a3e73c9a8329b29ea0e34cbb426
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -187,17 +198,37 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/level0/stop-door.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The command answers assertion. Two cases join the stop door's file, over the
+fake box it holds already.
+
+| the case | what it holds open |
+|---|---|
+| a rule naming a check the door holds nowhere writes one warn line | the log holds no warn row, so the count fails |
+| a rule running `never` writes no warn line | passes, because the door writes no line today |
+
+What surprises me is that the door already writes a warn line for a claim
+naming no reason, and holds the reader for a rule's check two lines away from
+it. The second case passes before the change and earns its place after it,
+because the change writes a line for every unknown check and `never` stands
+in the door's table nowhere yet.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The door, its case file and this ticket.
+- every door the change reaches has a fake. The cases drive the door over the fake disk, the fake process and a log that keeps every row.
+- a comment names the approach the change implements. Each case points at the chapter promising the line.
 
 ## reflect
 
