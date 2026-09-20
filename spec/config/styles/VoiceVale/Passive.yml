@@ -1,7 +1,7 @@
 extends: sequence
 message: "Write in the active voice and name who acts: '%s %s'."
 link: spec/guidance/voice.md
-level: error
+level: warning
 ignorecase: true
 tokens:
   - pattern: '(?:am|are|were|being|is|been|was|be)'

@@ -4,7 +4,7 @@
 extends: existence
 message: "Cut the hedge '%s'. Say the thing, or name the measure."
 link: spec/funnel/a-paragraph-has-a-schema.md
-level: error
+level: warning
 ignorecase: true
 tokens:
   - '\bjust\b'
