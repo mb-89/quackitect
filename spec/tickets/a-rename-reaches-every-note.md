@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -121,6 +121,10 @@ record:
     hash_after: 712681471b328341be22add5d1aca0cd9971ce4f
     returns: 3
     why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, the frame and the tree package reach each other |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |; | does the verb the approach adds carry a proof | yes, the prove move reads rows, then the check |; | does every claim carry a proof | no, the tree row's import direction reads false |; | what grade do the findings take | design, because the package table moves |; TL;DR:; `model` holds a `*Tree`, so the frame package imports the tree package.; The tree draws through `cut` and `dimStyle`, which the frame holds.; Both reaches standing shuts an import loop, and the Go build refuses it.; The findings, one a line:; `src/viewer/ui.go` holds `work *Tree` on `model`, so the frame reaches the tree.; `Tree.Rows` in `src/viewer/treedraw.go` calls `cut` and `dimStyle` to draw a row.; `cut` stands in `src/viewer/ui.go`, and `dimStyle` in `src/viewer/colour.go`.; So the tree reaches back, against the one-way arrow the package table draws.; So the approach says where the width helper and the styles land, and the table stands on that.; The tab rows, the read move, the write move, the prove move and the stub rows read true.; The draft closes every finding the two rounds before this one name."
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 2c3653b24a853fdf9a725df1ec3f4dbf144b04f7
+    hash_after: 2c3653b24a853fdf9a725df1ec3f4dbf144b04f7
 ---
 
 # Ask
@@ -164,17 +168,18 @@ The read move asks two readers, because each answers half. `linksIn` in `src/ind
 
 The prove move reads rows, because `./RUNME.sh links` calls `dangling` and exits 0 over every row it answers. So the verb asserts no row names the old name, then runs the check, which is the last line the ask asks for.
 
-**The packages.** A tab method takes `*model`, and `model` stands in the frame. So a folder per tab shuts an import loop, which the Go build refuses. The type the two sides share lands in a package neither of them holds:
+**The packages.** A tab method takes `*model`, `model` holds the tree, and the tree draws through the frame's own helpers. So a folder per tab shuts an import loop, which the Go build refuses. What two sides share lands below both of them:
 
 | the package | what it holds | what it imports |
 |---|---|---|
-| `src/tui/frame` | `model`, the `tab` interface, and the rendering a tab calls | nothing of this tree's |
+| `src/tui/draw` | `cut`, the palette, the styles, and the parts a detail holds | nothing of this tree's |
+| `src/tui/tree` | the tree and the rows it draws | `src/tui/draw` |
+| `src/tui/frame` | `model`, the `tab` interface, and the rendering a tab calls | the draw and the tree packages |
 | `src/tui/log` | the log tab | `src/tui/frame` |
 | `src/tui/work` | the work tab | `src/tui/frame` |
-| `src/tui/tree` | the tree view every tab after the log draws | `src/tui/frame` |
 | `src/tui` | the window, which builds the tab list | the frame and each tab |
 
-So the imports run one way, from the window through each tab to the frame. That costs a capital on each name the frame hands out, and it buys a reader who opens one tab.
+So every arrow runs down: the window to each tab, each tab to the frame, the frame to the tree and the drawing. That costs a capital on each name a package hands out, and it buys a reader who opens one tab.
 
 **The stub.** `STUB_FOLDERS` holds its paths under a literal `project`, and `stubInto` reads that constant. Each takes the stub folder's own name instead, so a reader opening a stub reads the project it names.
 
