@@ -445,8 +445,12 @@ session start writing the row leaves the line unsaid, so the fall at the next
 event still reaches the person.
 
 The row's mark stands off the answer of the write, so a log taking no write
-leaves the line paid. `serverLine` takes the fetch as a door now, so a case
-holds the doctor's wording where a person asks after a fall later.
+takes one row a fall. A case counts those rows, and putting the old line back
+turns that case red.
+
+`serverLine` takes the fetch as a door now, so a case holds the doctor's
+wording where a person asks after a fall later. The chapter names the route
+`url()` answers, which is the one the bridgehead posts to.
 
 ### checked
 
