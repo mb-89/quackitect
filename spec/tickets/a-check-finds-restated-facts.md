@@ -232,17 +232,28 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/paragraph.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the Vale case asks for `RestatedTable`, which the projection writes nowhere yet
+- the Go cases stand beside it, and `go test ./...` under `src/lsp` fails three of them
+- the stubs answer nothing, so each case reads an empty list where it wants a finding
+- what surprises the hand: the Go front holds a fixture, so a case writes its own tree
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the checker, its front, the schema, the config pair, and the cases
+- the Go fixture writes a tree of its own, and the Vale case drives the real binary
+- each rule carries the pointer at the chapter tabling the rules over two files
 
 ## reflect
 
