@@ -29,7 +29,7 @@ const (
 func main() {
 	argv := os.Args[1:]
 	if len(argv) == 0 {
-		fmt.Fprintln(os.Stderr, "usage: se-index <serve|find|notes|links|dangling|same|reindex|standing> [words]\n       se-index call <method> <json params>")
+		fmt.Fprintln(os.Stderr, "usage: se-index <serve|find|notes|links|dangling|same|tickets|changes|reindex|standing> [words]\n       se-index call <method> <json params>")
 		os.Exit(2)
 	}
 
@@ -58,6 +58,11 @@ func rootHere() (string, error) {
 }
 
 func serves(root string) int {
+	// A fresh tree holds no runtime folder yet, and the database needs one to open in. [[spec/design_output/index#the-door-owns-the-database]]
+	if err := os.MkdirAll(filepath.Join(root, Runtime), 0o755); err != nil {
+		fmt.Fprintln(os.Stderr, "the runtime folder did not stand:", err)
+		return 1
+	}
 	stop, _, err := Serve(root, filepath.Join(root, Runtime, "index.db"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "the index door did not stand:", err)
@@ -180,6 +185,8 @@ func asked(argv []string) (string, json.RawMessage) {
 			params["target"] = argv[1]
 		case "same":
 			params["path"] = argv[1]
+		case "changes":
+			params["since"], _ = strconv.Atoi(argv[1])
 		}
 	}
 	return argv[0], asRaw(params)

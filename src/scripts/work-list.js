@@ -100,7 +100,7 @@ function stateOf(text) {
   return fieldOf(text, "state") || OPEN;
 }
 
-// The order the pull hands out, off the one answer a board reads too. [[spec/design_output/work#one-verb-answers-git]]
+// The order the pull hands out, off the one answer a board reads too. [[spec/design_output/work#one-reading-answers-git]]
 function queueOnly(it) {
   const said = answerOf(it, true);
   const held = new Map();

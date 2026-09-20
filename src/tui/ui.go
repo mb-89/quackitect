@@ -72,9 +72,12 @@ type model struct {
 	tailer    *tailer
 	err       error
 	// [[spec/design_output/tui#the-work-tab]]
-	work    *Tree
-	workWhy string
-	workAt  time.Time
+	work     *Tree
+	workWhy  string
+	workTick int64
+	// [[spec/design_output/tui#the-work-tab-takes-edits]]
+	workNotice string
+	rules      *ticketSchema
 }
 
 func newModel(path string, zone *time.Location) model {
@@ -99,7 +102,7 @@ func newModel(path string, zone *time.Location) model {
 
 // [[spec/design_output/tui#the-work-tab]]
 func (m model) Init() tea.Cmd {
-	return tea.Batch(m.tailer.cmd(), workCmd(m.path, time.Time{}))
+	return tea.Batch(m.tailer.cmd(), workCmd(m.path, 0))
 }
 
 // [[spec/design_output/tui#the-window-is-a-split]]
@@ -268,19 +271,27 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// [[spec/design_output/tui#the-work-tab]]
 	case workMsg:
 		if !msg.same {
+			if msg.tree != nil {
+				msg.tree.Carry(m.work)
+			}
 			m.work, m.workWhy = msg.tree, msg.why
 			if m.work != nil {
 				m.work.Filtering(m.filter.Source)
 			}
 			m.loadPane()
 		}
-		m.workAt = msg.at
-		return m, workCmd(m.path, m.workAt)
+		m.workTick = msg.tick
+		return m, workCmd(m.path, m.workTick)
 
 	case tea.KeyMsg:
 		if m.pane == paneFilter {
 			return m.typing(msg)
 		}
+		// An open edit takes every key, the way the filter line does. [[spec/design_output/tui#the-work-tab-takes-edits]]
+		if m.onWork() && m.work.Editing() {
+			return m.editing(msg)
+		}
+		m.workNotice = ""
 		return m.key(msg.String())
 
 	case tea.MouseMsg:

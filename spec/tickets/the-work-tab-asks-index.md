@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-work-tab-reads-tickets
 step: do
+record:
+  - step: do
+    hand: box 51c5005e133c · claude-code-remote
+    hash_before: 5ded9bf48ea823f61d47b756a335a9bab91b11f6
+    hash_after: 5ded9bf48ea823f61d47b756a335a9bab91b11f6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 3 file(s); green, src/tui passes
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -48,27 +61,35 @@ The tab waits for `branch answer`, and a person opening the TUI reads an empty t
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+The work tab reads the index and no file. It asks `tickets` for its rows and
+holds a `changes` call for the redraw. So a change under the tree reaches the
+tab through the index, and the tab polls nothing. For the road and the rows,
+see [[spec/design_output/tui#the-work-tab]].
 
-<!-- the form is text -->
+| what went | what stands in its place |
+|---|---|
+| `branch answer`, and the file it wrote | `answerOf` stays for `branch list --queue`, and writes nothing |
+| the poll on the file's time | the tick the index answers, held until a sweep |
+| the columns the pull scored | `standing` and `step`, off what the index answers |
+
+The base file names what the index answers and nothing more. So the queue
+place, the progress and the person letter go, because a branch informs a
+ticket's standing and nothing more. The cases stand a fake door up on a port
+the standing file names, so `go -C src/tui test ./...` reads no binary.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask: the tab reads the index, no file stands under `src`, and the note says so
+- the cleanup it reveals: the answer verb and its reader go, and the listing keeps the one reading it needs
+- every fact stands once: the road stands in the TUI note, and the rows point at the index note
 
 # Discussion
 

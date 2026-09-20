@@ -34,7 +34,7 @@ mkdir -p "$run"
 # folders.js owns these names as MOVED.
 for one in bin hold review undo measure copilot box.json session.json \
   tools.json hold.json check.json index.db index.json lsp.json copilot-cloud \
-  show-panel config.json identity.json project.json work.json vehicle.json; do
+  show-panel config.json identity.json project.json vehicle.json; do
   old="$root/.se/$one"
   new="$run/$one"
   [ -d "$old" ] || [ -f "$old" ] || continue

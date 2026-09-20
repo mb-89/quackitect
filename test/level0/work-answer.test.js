@@ -1,13 +1,11 @@
-// The one answer about git. One verb writes it, a flag adds the order, and a
-// reader meeting no file says so.
-// [[spec/design_output/work#one-verb-answers-git]]
+// The one reading of git. One function reads it, and a flag adds the order.
+// [[spec/design_output/work#one-reading-answers-git]]
 
 import assert from "node:assert/strict";
-import { join } from "node:path";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { COL, work } from "../../src/scripts/work.js";
-import { answer, answerHere, answerOf } from "../../src/scripts/work-answer.js";
+import { answerOf } from "../../src/scripts/work-answer.js";
 import {
   CHILD,
   doorsSaying,
@@ -18,7 +16,6 @@ import {
   remoteSaying,
 } from "./work-doors.js";
 
-const ANSWER_AT = join(ROOT, ".se", ".runtime", "work.json");
 const LOOSE = CHILD("one-group", "open").replace("group: one-group\n", "");
 
 const doors = (files = {}) => {
@@ -34,7 +31,7 @@ const doors = (files = {}) => {
   return said;
 };
 
-// [[spec/design_output/work#one-verb-answers-git]]
+// [[spec/design_output/work#one-reading-answers-git]]
 test("the answer names every branch, the tickets on it and the loose ones", () => {
   const { it } = doors();
   it.clock = fakeClock("2026-01-01T03:00:00.000Z");
@@ -94,27 +91,4 @@ test("the queue listing pads every place to one width, so the names line up", ()
     assert.match(row, /^\s+\d {2}\S/, "the place stands padded, then two spaces");
     assert.equal(row.indexOf("  ", COL.place - 1), COL.place, "one width for all");
   }
-});
-
-// [[spec/design_output/work#one-verb-answers-git]]
-test("the verb writes the file, and a reader meeting none says so", () => {
-  const { it, disk } = doors();
-  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
-
-  assert.match(answerHere(it).why, /stands nowhere/);
-  assert.equal(answerHere(it).said, null);
-
-  assert.equal(answer(it, []), 0);
-  const read = answerHere(it);
-  assert.equal(read.why, "");
-  assert.equal(read.said.branches[0].branch, "work/one-group");
-  assert.match(disk.read(ANSWER_AT), /^\{/);
-});
-
-// [[spec/design_output/work#one-verb-answers-git]]
-test("a file no reader parses says so, and hands back nothing", () => {
-  const { it } = doors({ [ANSWER_AT]: "{ this is no json" });
-  const read = answerHere(it);
-  assert.equal(read.said, null);
-  assert.match(read.why, /reads as no JSON/);
 });

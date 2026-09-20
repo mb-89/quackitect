@@ -43,6 +43,8 @@ type Tree struct {
 	flat    []twig
 	sel     int
 	top     int
+	cur     int
+	wrote   []string
 }
 
 type twig struct {
@@ -161,6 +163,29 @@ func (t *Tree) shutAll(items []Item, above string) {
 			t.shutAll(one.Kids, here)
 		}
 	}
+}
+
+// The column the cursor stands on, which an edit opens. [[spec/design_output/tui#the-work-tab-takes-edits]]
+func (t Tree) Cursor() int { return t.cur }
+
+// [[spec/design_output/tui#the-work-tab-takes-edits]]
+func (t *Tree) MoveCursor(step int) {
+	t.cur = max(0, min(t.cur+step, len(t.Cols)-1))
+}
+
+// A tree handed over again keeps the place a person stands at, so a redraw moves nothing under them. [[spec/design_output/tui#the-work-tab]]
+func (t *Tree) Carry(from *Tree) {
+	if from == nil {
+		return
+	}
+	t.cur = min(from.cur, len(t.Cols)-1)
+	t.Schema = from.Schema
+	for at := range from.shut {
+		t.shut[at] = true
+	}
+	t.rebuild()
+	t.sel = max(0, min(from.sel, len(t.flat)-1))
+	t.top = from.top
 }
 
 // [[spec/design_output/tree-view#the-view-draws-a-tree]]

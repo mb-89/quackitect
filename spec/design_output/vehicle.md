@@ -129,9 +129,9 @@ about this machine: the vehicle stands somewhere else.
 ## The register places an identity
 
 Every vehicle writes itself into `~/.se/.runtime/registry.json`, or into each folder
-`SE_REGISTRY` names, which holds the file straight. The reader drops an entry
+`SE_REGISTRY` names, which keeps the file whole. The reader drops an entry
 whose method root holds no marker. A folder that holds something else now
-answers about that something. A box carrying the register straight under the
+answers about that something. A box carrying the register right under the
 private folder meets the move in `src/scripts/install.sh`.
 
 ## The register holds the port
@@ -297,7 +297,7 @@ ends in three steps:
 
 | step | what happens |
 |---|---|
-| the server | where the pointer's port answers nothing, the last command starts the vehicle's server detached |
+| the server | where the pointer's port answers nothing, the last command starts the vehicle's server on its own |
 | the line | the bridgehead writes one line to the stub's session log, and says it |
 | the block | one context block asks the session to say the vehicle stands and end the turn |
 
@@ -314,7 +314,7 @@ One routine run against a stub repo proves the road on a cloud box, read off
 the run's log. It takes three things:
 
 - a stub repo
-- an environment carrying the trust setup the level zero chapter names
+- an environment carrying the trust that the level zero chapter names
 - a routine whose prompt is `./RUNME.sh ticket pull`
 
 Nothing on a desk stands in for it.

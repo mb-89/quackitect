@@ -6,18 +6,15 @@ properties:
 columnSize:
   name: 34
   state: 8
-  flags: 7
-  progress: 9
-  queue: 6
+  standing: 9
+  flags: 5
+  step: 10
+  group: 20
 flags:
   - letter: U
     key: urgent
-  - letter: "Y"
-    key: person
   - letter: W
     key: held
-  - letter: B
-    key: waits
   - letter: T
     key: todo
 groups:
@@ -25,35 +22,29 @@ groups:
     pressed: true
     filters:
       - not state: closed
-  - name: queue
+  - name: held
     filters:
-      - queue: /./
-    sort:
-      - key: queue
-  - name: yours
-    filters:
-      - person: true
-    sort:
-      - key: stood
+      - standing: held
   - name: unsorted
     filters:
       - "state: draft or not group: /./"
     sort:
-      - key: stood
+      - key: name
 views:
   - type: table
     name: every ticket
     order:
       - name
       - state
+      - standing
       - flags
-      - progress
-      - queue
+      - step
+      - group
       - says
     nest: group
     sort:
-      - key: person
+      - key: urgent
         down: true
-      - key: queue
+      - key: name
     collapsed:
       - closed

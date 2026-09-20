@@ -13,6 +13,9 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"time"
 )
 
@@ -82,4 +85,18 @@ func (m model) tabNamed(name string) int {
 		}
 	}
 	return 0
+}
+
+// The binary's own standing verb puts a door up where none stands, and drops a stale one. [[spec/design_output/index#a-door-comes-back]]
+func startIndex(root string) error {
+	binary := filepath.Join(root, filepath.FromSlash(indexBinAt))
+	if _, err := os.Stat(binary); err != nil {
+		return fmt.Errorf("no index stands here: %s is unbuilt, and ./RUNME.sh builds it", indexBinAt)
+	}
+	one := exec.Command(binary, "standing")
+	one.Dir = root
+	if out, err := one.CombinedOutput(); err != nil {
+		return fmt.Errorf("the index door did not stand: %s", bytes.TrimSpace(out))
+	}
+	return nil
 }

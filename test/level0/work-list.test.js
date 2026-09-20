@@ -3,6 +3,7 @@
 // [[spec/design_output/work#a-row-per-group]]
 
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import { test } from "node:test";
 import { work } from "../../src/scripts/work.js";
 import {
@@ -18,7 +19,11 @@ const closedLoose = CHILD("", "closed").replace("group: \n", "");
 
 // [[spec/design_output/work#a-row-per-group]]
 function listing(flag = []) {
-  const { it } = doorsSaying(
+  return listed(flag).said;
+}
+
+function listed(flag = []) {
+  const { it, disk } = doorsSaying(
     remoteSaying(
       [
         { branch: "work/one-group", tip: "aaa" },
@@ -37,8 +42,15 @@ function listing(flag = []) {
       },
     ),
   );
-  return heard(() => work(ROOT, ["list", "", ...flag], it)).said;
+  return { ...heard(() => work(ROOT, ["list", "", ...flag], it)), disk };
 }
+
+// The order comes off one reading of git, and no verb writes it to a file. [[spec/design_output/work#one-reading-answers-git]]
+test("the queue listing reads git once, and writes no file under the runtime folder", () => {
+  const { said, disk } = listed(["--queue"]);
+  assert.match(said, /a-child|a-loose-one/, "the order names the open tickets");
+  assert.equal(disk.exists(join(ROOT, ".se", ".runtime", "work.json")), false);
+});
 
 test("the listing shows open work alone by default", () => {
   const said = listing();

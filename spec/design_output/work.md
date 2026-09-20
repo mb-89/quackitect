@@ -111,22 +111,20 @@ all:
 | a newest entry with `hash_before` and no `hash_after` | `held` |
 | `state: closed` on the ticket | `done` |
 
-# One verb answers git
+# One reading answers git
 
-`branch answer` writes what git knows into one file, and a board, a terminal and
-the pull all read that one answer:
+`answerOf` in `src/scripts/work-answer.js` reads what git knows once, and
+`branch list --queue` orders that one reading. No verb writes it to a file.
+The work tab reads the index instead, where a branch informs a ticket's
+standing and nothing more. For what the tab draws, see
+[[spec/design_output/tui#the-work-tab]].
 
 | the key | what it carries |
 |---|---|
 | `branches` | every work branch, its tip, the time on it, its status and its kind |
 | `branches[].tickets` | the tickets on that branch, each with its state and its step |
 | `loose` | the tickets on trunk naming no group |
-| `queue` on a ticket | the place the pull hands it out, which `--queue` writes |
-
-The file stands beside the work a reader reads, so the index walks it and a
-write wakes a reader. The engine's own state stays in the runtime half, which
-the index skips. A reader meeting no file says so, and the board draws what the
-notes hold.
+| `queue` on a ticket | the place the pull hands it out, which the flag adds |
 
 # The listing reads git once
 
@@ -145,7 +143,7 @@ and the routine's trigger fetch on their own, because each acts on the remote.
 A tree object carries a name as bytes, so the paths read raw. For details, see
 [[spec/design_output/doors#a-raw-run-keeps-bytes]].
 
-git answers the base red where trunk and a branch share none, which is what a
+git fails on the base where trunk and a branch share none, which is what a
 rewrite of trunk leaves behind:
 
 | what git answers | the standing | what follows |
@@ -173,7 +171,7 @@ responsible for it.
 
 ## A ticket under its group
 
-A group row carries a row per ticket naming it, indented under it, read off the
+A group row carries a row per ticket naming it, indented under it, taken off the
 branch tip `list` already fetches. So a reader on trunk sees the loose tickets
 and the held ones together, and runs no `git show` by hand:
 
@@ -259,7 +257,7 @@ open into its ask. [[spec/guidance/cloud]] says why the cloud road differs.
 A successor stands on [[spec/processes/question]], and the verb takes it because
 that route opens at a step waiting for a person:
 
-| the step it opens at | what it buys |
+| the step it opens at | what it gives |
 |---|---|
 | `answer`, under `by: person` | the person answers on their own time |
 | `do`, under `by: anyone` | the hand behind the answer carries it out |
@@ -481,7 +479,7 @@ What the run leaves behind:
 - the push door reads the stamp this run writes, so no stale stamp stops a clean commit
 - `--no-push` leaves the branch where it stands
 
-The message read stands with the bash door, which reads the same rules over a
+The reading of the message stands with the bash door, which reads the same rules over a
 `git commit` a hand types. For details, see
 [[spec/design_output/bash#a-commit-message-meets-voice]].
 

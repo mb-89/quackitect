@@ -37,7 +37,12 @@ func (t Tree) Header(w int) string {
 	wide := t.widths(w)
 	cells := make([]string, 0, len(t.Cols))
 	for at, one := range t.Cols {
-		cells = append(cells, pad(cut(one.Name, wide[at]), wide[at]))
+		cell := pad(cut(one.Name, wide[at]), wide[at])
+		// The column under the cursor stands lit, so a person reads where an edit opens. [[spec/design_output/tui#the-work-tab-takes-edits]]
+		if at == t.cur && t.Schema != nil {
+			cell = openStyle.Render(cell)
+		}
+		cells = append(cells, cell)
 	}
 	return headStyle.Render(cut(strings.Join(cells, " "), w))
 }

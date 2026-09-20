@@ -22,8 +22,8 @@ const RATIONALE = "spec/rationales/arguing.md";
 const DESIGN = "spec/design_output/level0.md";
 
 // A miss says what vale wrote, on both streams, because a red under load names its cause there. [[spec/design_output/lsp#the-panel-reads-the-battery]]
-const saidOf = (argv) => {
-  const ran = outside.run([bin, "--output=line", "--no-exit", ...argv], { cwd: root });
+const saidOf = (argv, stdin = "") => {
+  const ran = outside.run([bin, "--output=line", "--no-exit", ...argv], { cwd: root, stdin });
   const lines = String(ran.stdout ?? "")
     .split("\n")
     .filter(Boolean);
@@ -116,11 +116,14 @@ ifVale("a rule the work root alone holds refuses a write there, and none in the 
   assert.deepEqual(inMethod.found, [], "the project's rule refuses nothing in the method");
 });
 
+// A line carrying a finding by construction, because a tracked note standing at warning reaches no push. [[spec/design_output/lsp#the-panel-reads-the-battery]]
+const FLAGGED = "The reader wrote this line in the past tense, and it names 3 things in prose.\n";
+
 ifVale("the config the workspace hands the Vale extension draws nothing", () => {
   const settings = JSON.parse(files.read(join(root, ".vscode/settings.json")));
   const config = settings["vale.valeCLI.config"];
-  const raw = saidOf([DESIGN]);
-  assert.ok(raw.lines.length > 0, `the file carries a raw finding to hide; vale said:\n${raw.why}`);
-  const hidden = saidOf([`--config=${join(root, config)}`, join(root, DESIGN)]);
+  const raw = saidOf(["--ext=.md"], FLAGGED);
+  assert.ok(raw.lines.length > 0, `the line carries a raw finding to hide; vale said:\n${raw.why}`);
+  const hidden = saidOf([`--config=${join(root, config)}`, "--ext=.md"], FLAGGED);
   assert.equal(hidden.lines.length, 0, `the editor config still draws; vale said:\n${hidden.why}`);
 });

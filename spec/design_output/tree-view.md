@@ -271,5 +271,7 @@ matches, and it ignores case.
 A caller builds the `Schema` out of the schemas this tree already holds, and a
 view with none reads its own data. [[spec/design_output/schema]]
 
-The editor reading the type its schema names, and a mark carrying its editor
-open, each wait for the ticket that draws a tab.
+The work tab is the first to wire the edit, and a key there flips a mark in
+place of an editor standing open. For details, see
+[[spec/design_output/tui#the-work-tab-takes-edits]]. The editor reading the
+type its schema names still waits.

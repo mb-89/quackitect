@@ -69,6 +69,20 @@ test("a file the brand reaches nowhere comes back as it stands", () => {
   assert.equal(JSON.parse(brandedJson(was, "acme")).version, "0.1.0");
 });
 
+// A fresh clone holds neither manifest, so the stamp writes both. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+test("a clone holding no manifest gets both, stamped with the brand", () => {
+  const files = fakeDisk({ "/v/acme/RUNME.sh": "run me" });
+  assert.deepEqual(stamps(files, "/v/acme", "acme"), [MARKETPLACE, PLUGIN]);
+  const market = JSON.parse(files.read(`/v/acme/${MARKETPLACE}`));
+  assert.equal(market.name, "acme");
+  assert.equal(market.owner.name, "acme");
+  assert.equal(market.plugins[0].source, "./.claude/skills/level0");
+  const plugin = JSON.parse(files.read(`/v/acme/${PLUGIN}`));
+  assert.equal(plugin.name, "level0");
+  assert.equal(plugin.author.name, "acme");
+  assert.deepEqual(stamps(files, "/v/acme", "acme"), [], "a second stamp writes nothing");
+});
+
 // [[spec/tickets/the-brand-names-the-plugin]]
 test("the shim names the vehicle a marketplace, and enables the brand's plugin", () => {
   assert.equal(typeof shimSettings, "function", "vehicle.js answers shimSettings");

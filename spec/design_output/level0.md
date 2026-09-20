@@ -79,7 +79,7 @@ change of a door. Three headless turns say so, against client 2.1.269:
 Nobody presses the hook button on a cloud box. So the pull that takes a
 branch there ends on the server, through `src/scripts/serve.js`. It probes
 the health answer at the port the pointer names. Where nothing answers, it
-starts the server detached, the way the stub's bridgehead does. The pull's
+starts the server on its own, the way the stub's bridgehead does. The pull's
 last line says which of the three stands:
 
 | what stands | the line says |
@@ -325,7 +325,7 @@ every string under `hooks`. It keeps the ones a URL parses as `http:` or
 
 A command hook holds a path, and `new URL` takes a Windows path as a URL. So
 the reader holds those schemes alone, and a command hook stands outside the
-list. Two files naming one address read as one row, off the file naming it
+list. Two files naming one address stand as one row, off the file naming it
 first.
 
 | what the probe meets | the row under the address |
@@ -504,7 +504,7 @@ One headless turn a road says so:
 | a dynamic import of a file URL outside the folder | the loader: a hooks module imports its own files by relative path, and nothing else |
 | a relative path climbing past the folder | the loader: outside the plugin's folder |
 | a link inside the folder pointing out | the loader: no such file under the folder |
-| the code read as text, built with `Function` | the sandbox refuses code built from a string |
+| code standing as text, built with `Function` | the sandbox refuses code built from a string |
 | a copy of `hooks` and `lib` inside the folder | nothing, and the owner refuses a copy in a tree |
 
 Two more things the probes answer. `claude plugin validate` follows `$` into
@@ -797,7 +797,7 @@ keeps a mark against each path, and a write meets it.
 | the two differ | it refuses, and asks for a read |
 | the disk holds the path nowhere | the write lands, because a new file agrees with anything |
 
-Which read sets the mark is the whole of the mechanism. The door reads the file
+The reading that sets the mark is the whole of the mechanism. The door reads the file
 for itself on every edit, so a mark off that read compares against itself. The
 mark comes off the read reaching the agent.
 
@@ -843,7 +843,7 @@ comment counts none.
 | who reads it | what it does |
 |---|---|
 | the code door | refuses a write that grows past a ceiling, and names the function or the file and its lines |
-| `./RUNME.sh check` | names what stands past a ceiling as a warning, so the panel draws it and the check answers red |
+| `./RUNME.sh check` | names what stands past a ceiling as a warning, so the panel draws it and the check fails |
 
 The door reads the text before and after the write. A file already past its
 ceiling takes a cut and refuses a growth. So the tree's debt shrinks with every
@@ -1100,7 +1100,7 @@ and `opensATurn`, which read a prompt the same way. The demand then holds the
 count of `note` rows the log carries at that moment.
 
 The note lands from the shell, so the server's own rows carry none of it. The
-door reads the session log off the disk at every call and counts the rows of
+door reads the session log from the disk at every call and counts the rows of
 kind `note`. A count past the one the demand holds pays it. The reply line
 carries the newest note's own text, so the next demand sees what the log
 carries.
@@ -1133,7 +1133,7 @@ The owner reads the chat, and a hook writes no chat text. So a mid-turn answer
 goes to both places. The chat pays the door, and the report carries the same
 text into the log.
 
-| the road | what it buys |
+| the road | what it gives |
 |---|---|
 | the chat | the owner reads the answer, and the door takes it as paid |
 | the report | the log carries the answer, where a retro reads it |
@@ -1266,7 +1266,7 @@ the band `rewrite` in that line, and nothing more hangs on it.
     you write next, and fix the lines you already wrote if they break it.
 
 The score reaches the log line alone. A finding names a rule and a line, and the
-agent fixes both. A rate names nothing to fix, so the refusal leaves it out and
+agent repairs both. A rate names nothing to fix, so the refusal leaves it out and
 the retro reads it from the log.
 
 ## The tool reads a draft

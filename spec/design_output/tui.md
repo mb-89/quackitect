@@ -354,10 +354,63 @@ wants that selection back, and most terminals give it back under a held shift.
 
 # The work tab
 
-The strip carries the log and the work. The work tab stands empty and says so,
-so a person reads that the window holds two things. The number keys carry
-between them. The tree view, its base file and its source of items land in this
-tab next.
+The strip carries the log and the work. The work tab draws every ticket this
+tree holds in the tree view, nested under its group. No file stands between
+the index and the tab. `spec/views/work.base` says the columns, the letters
+and the presets. For the view itself, see [[spec/design_output/tree-view]].
+
+| what the tab holds | where it comes from |
+|---|---|
+| the rows | `tickets`, which [[spec/design_output/index#the-index-answers-the-tickets]] answers |
+| the redraw | `changes`, which [[spec/design_output/index#the-index-fires-on-change]] holds until a sweep |
+| the door's port | the standing file the door writes, off the root two folders over the log |
+| a door standing nowhere | the binary's own `standing` verb, which puts one up and drops a stale one |
+
+A group's row carries the tickets naming it, and a ticket naming no group, or
+one the rows hold nowhere, stands at the left. A held group and its tickets
+wear the `W` letter, off the standing the index answers. The window's `Init`
+asks for the tick from nothing, and each answer hands the tab its tree again.
+
+`workindex.go` holds the road to the door, and `workitems.go` turns the rows
+into items. A box with no door and no binary draws the reason in the tab, and
+asks again after a pause. So a build landing later reaches the tab with no
+restart.
+
+# The work tab takes edits
+
+A person edits a ticket where they read it. The cursor picks a column, a key
+opens the cell, and Enter writes the field into the ticket's own front. The
+index sees the write and hands the tab its tree again, so the row reads what
+the note now says. `workedit.go` holds it.
+
+| key | what it does |
+|---|---|
+| `a`, `d` | back one column, and on one column, and the header lights the one under the cursor |
+| `e` | open the cell under the cursor, holding the value it carries |
+| Enter | write the value into the ticket, and close the edit |
+| Esc | put the old value back |
+| shift and Enter | write the value into every row the view holds, or the marked ones |
+| `u`, `t` | flip the urgent mark, and the todo mark, on the row or the marked rows |
+
+The write meets the door the way an agent's write does. The tab reads
+`spec/schemas/ticket.schema.yaml` for what a field takes and which field the
+verbs own, and it holds no list of its own. For the rule, see
+[[spec/design_output/schema#the-verbs-own-their-fields]].
+
+| the column | what an edit meets |
+|---|---|
+| a field the verbs own, as `state` or `step` | a refusal naming the field, and nothing opens |
+| a column the index derives, as `standing` or `says` | a refusal saying the front holds no such field |
+| a field a person writes, as `group` | the cell opens, and the completion offers what the schema names |
+
+A refusal draws on the tab's last line, and the next key clears it. An edit
+reaches the ticket through the `path` its row carries, and sets the one
+top-level field. A value that is empty, or a mark standing off, drops the
+field. A value a YAML reader trips on stands quoted, the way the record quotes
+its own.
+
+A tree handed over again carries the cursor, the selection and the open groups
+across, so a redraw moves nothing under a person's hands.
 
 # A tab the caller names
 
