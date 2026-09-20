@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -188,6 +188,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-17
+    hash_before: ca07c7fd3a1b9008d9686a1a0063295a1d78d81c
+    hash_after: ca07c7fd3a1b9008d9686a1a0063295a1d78d81c
+    returns: 2
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | no, the split ticket stands `draft`, and the queue takes `open` |; | is what the diff touches beyond the ask trivial | yes, each file outside the ask takes the new name |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |; | does every rule the branch adds carry a test | yes, each move of the verb takes a case |; | does a case feed the rule something bad | yes, a file with no ending, a picture, and a name standing nowhere |; | what grade do the findings take | craft, because one verb run and one field carry the fix |; TL;DR:; This round closes each of the five findings the verdict before it names.; `spec/tickets/the-window-splits-by-tab.md` stands `draft`, and the queue reads `open` alone.; So the ask's first bullet lands in a ticket no pull hands out.; The findings, one a line:; `filesUnder` in `src/scripts/rename.js` answers every file, whatever the ending of its name.; A case feeds the move a file with no ending and a picture, and asserts each lands.; `spec/funnel/a-button-makes-a-vehicle.html` and the ignore file each take the new name.; `git ls-files` names no binary under the window's folder, so this round drops it.; `spec/design_output/vehicle.md` points at `stubFolders`, which owns the stub's folder names.; `spec/tickets/the-window-splits-by-tab.md` stands tracked, and carries the package table.; `placesIn` in `src/scripts/work-answer.js` queues a ticket whose `state` reads `open`.; That ticket reads `draft`, so the queue holds it nowhere and no pull hands it out.; Its Ask passes Vale, so `./RUNME.sh ticket open` takes it as it stands.; It names no `group`, where every sibling on this branch names one.; `BINARY` in `src/scripts/rename.js` reads an ending, so a binary with none rewrites.; The ignore file names `src/tui/viewer`, which the module `quackitect/tui` builds nowhere.; The package table stands in this ticket's approach and in the ticket it mints.; `./RUNME.sh check` exits 0, and `./RUNME.sh links` answers no row holding a renamed name.; `HANDOVER.md` carries no retro, and `./RUNME.sh branch review` names that as its one fix.; The fixes, one a line:; Run `./RUNME.sh ticket open the-window-splits-by-tab`, so the queue reaches it.; Name `group: the-tree-names-its-things` on it, so it lands under this branch.; Read a file by the bytes it holds, so a binary with no ending stands.; Drop the `src/tui/viewer` rows from the ignore file, which name a build standing nowhere.; Point this ticket's approach at the minted ticket, which owns the package table now.; Write the retro into `HANDOVER.md` before the branch hands back."
 ---
 
 # Ask
@@ -435,8 +441,10 @@ What this leaves for the owner at the merge. The bare word naming the older shap
 
 <!-- the form is files -->
 
+- .claude/skills/level0/lib/vale.js
 - .claude/skills/level0/lib/vehicle.js
 - .github/workflows/check.yml
+    - .gitignore
 - HANDOVER.md
 - spec/config/styles/colours.json
 - spec/design_input/the-tree-view-editor.md
@@ -466,6 +474,7 @@ What this leaves for the owner at the merge. The bare word naming the older shap
 - spec/tickets/the-viewer-draws-the-note.md
 - spec/tickets/the-viewer-filters-the-talk.md
 - spec/tickets/the-window-grows-a-frame.md
+- spec/tickets/the-window-splits-by-tab.md
 - spec/tickets/the-work-editor-draws.md
 - spec/tickets/the-work-tab-draws.md
 - spec/tickets/verbs-read-two-roots.md
@@ -473,11 +482,17 @@ What this leaves for the owner at the merge. The bare word naming the older shap
 - src/bridge/window.js
 - src/config/config_test.go
 - src/lsp/panel_test.go
+- src/scripts/ask-lint.js
 - src/scripts/cli.js
+- src/scripts/pull.js
 - src/scripts/rename.js
 - src/scripts/stub.js
+- src/scripts/ticket.js
 - src/scripts/tui.js
 - src/scripts/viewer.js
+- src/scripts/work-answer.js
+- src/scripts/work-list.js
+- src/scripts/work.js
 - src/tui/base.go
 - src/tui/base_test.go
 - src/tui/colour.go
@@ -539,45 +554,45 @@ fail
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the branch do what the ask asks | no, the folder per tab stands nowhere tracked |
-| is what the diff touches beyond the ask trivial | no, a built binary lands under the window's folder |
+| does the branch do what the ask asks | no, the split ticket stands `draft`, and the queue takes `open` |
+| is what the diff touches beyond the ask trivial | yes, each file outside the ask takes the new name |
 | what does `./RUNME.sh check` answer | 0 on this commit |
 | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |
 | does every rule the branch adds carry a test | yes, each move of the verb takes a case |
-| does a case feed the rule something bad | yes, a name standing nowhere answers a fault |
-| what grade do the findings take | craft, because the approach carries each fix already |
+| does a case feed the rule something bad | yes, a file with no ending, a picture, and a name standing nowhere |
+| what grade do the findings take | craft, because one verb run and one field carry the fix |
 
 TL;DR:
 
-- The verb walks an ending list, so the ignore file and an `.html` keep the old name.
-- That stale ignore row lets the window's built binary into git.
-- The approach's package table lands nowhere, and a private note git ignores carries it.
+- This round closes each of the five findings the verdict before it names.
+- `spec/tickets/the-window-splits-by-tab.md` stands `draft`, and the queue reads `open` alone.
+- So the ask's first bullet lands in a ticket no pull hands out.
 
 The findings, one a line:
 
-- `TEXT` in `src/scripts/rename.js` matches a list of endings, so a name outside it stands.
-- `git grep -n src/viewer` names `.gitignore` and `spec/funnel/a-button-makes-a-vehicle.html`, each keeping the old name.
-- `git ls-files -s src/tui/viewer` names a tracked binary, which the change commit adds.
-- `.gitignore` names the window's binary under its old folder, so the move carried it past.
-- `filesUnder` answers text files alone, and `renaming` removes the source, so a move drops the rest.
-- No case feeds the verb a file the ending list leaves out, so the hole passes green.
-- `spec/design_output/vehicle.md` names the stub's folders under a literal `project`, which `stubFolders` makes false.
-- The ask's first bullet, a folder per tab, stands under `.se/tickets`, which git ignores.
-- The park's ground, that the split shares nothing with the verb, reads false against the ask.
-- The design review passed the package table as this ticket's answer to that bullet.
-- `spec/design_output/tui.md` names the viewer in prose, beside `viewerOf` and `src/scripts/viewer.js`.
-- `./RUNME.sh links` answers no row naming a renamed thing, and `./RUNME.sh check` exits 0.
+- `filesUnder` in `src/scripts/rename.js` answers every file, whatever the ending of its name.
+- A case feeds the move a file with no ending and a picture, and asserts each lands.
+- `spec/funnel/a-button-makes-a-vehicle.html` and the ignore file each take the new name.
+- `git ls-files` names no binary under the window's folder, so this round drops it.
+- `spec/design_output/vehicle.md` points at `stubFolders`, which owns the stub's folder names.
+- `spec/tickets/the-window-splits-by-tab.md` stands tracked, and carries the package table.
+- `placesIn` in `src/scripts/work-answer.js` queues a ticket whose `state` reads `open`.
+- That ticket reads `draft`, so the queue holds it nowhere and no pull hands it out.
+- Its Ask passes Vale, so `./RUNME.sh ticket open` takes it as it stands.
+- It names no `group`, where every sibling on this branch names one.
+- `BINARY` in `src/scripts/rename.js` reads an ending, so a binary with none rewrites.
+- The ignore file names `src/tui/viewer`, which the module `quackitect/tui` builds nowhere.
+- The package table stands in this ticket's approach and in the ticket it mints.
+- `./RUNME.sh check` exits 0, and `./RUNME.sh links` answers no row holding a renamed name.
 - `HANDOVER.md` carries no retro, and `./RUNME.sh branch review` names that as its one fix.
 
 The fixes, one a line:
 
-- Read a file by what it holds, not by the ending of its name.
-- Carry every file a folder holds, so a move drops no binary and no image.
-- Feed the verb a name outside the ending list and a binary, and assert each lands.
-- Rewrite `.gitignore` and `spec/funnel/a-button-makes-a-vehicle.html` onto the new name.
-- Drop the window's built binary from git, and ignore it under its new folder.
-- Point `spec/design_output/vehicle.md` at `stubFolders`, which owns the stub's folder names.
-- Land the package table the approach draws, or mint a tracked ticket carrying it.
+- Run `./RUNME.sh ticket open the-window-splits-by-tab`, so the queue reaches it.
+- Name `group: the-tree-names-its-things` on it, so it lands under this branch.
+- Read a file by the bytes it holds, so a binary with no ending stands.
+- Drop the `src/tui/viewer` rows from the ignore file, which name a build standing nowhere.
+- Point this ticket's approach at the minted ticket, which owns the package table now.
 - Write the retro into `HANDOVER.md` before the branch hands back.
 
 ## checked
@@ -586,7 +601,7 @@ The fixes, one a line:
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place, and a note points at the file. The verb's chapter stands under `spec/design_output/index`, and each function points at it. The stub's folder rows in `spec/design_output/vehicle.md` repeat what `stubFolders` owns, and read false, which a finding names.
+- every fact the change adds stands in one place, and a note points at the file. `spec/design_output/index` owns the verb's chapter, and each function in `src/scripts/rename.js` points at it. `spec/design_output/vehicle.md` points at `stubFolders` where it listed the stub's folders. The package table stands twice, in this ticket's approach and in the ticket it mints, which a finding names.
 
 # Discussion
 
