@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -217,6 +217,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-19
+    hash_before: 420dea44e81f5d6fbdd1e5f993dcbdfba8f35d30
+    hash_after: 420dea44e81f5d6fbdd1e5f993dcbdfba8f35d30
+    returns: 3
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | no, a rewrite leaves two tracked sources standing |; | is what the diff touches beyond the ask trivial | yes, each file outside the ask takes the new name |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, and the branch's close owns it |; | does every rule the branch adds carry a test | yes, each move of the verb takes a case |; | does a case feed the rule something bad | yes, a picture, a longer word, and a name standing nowhere |; | what grade do the findings take | craft, because one separator carries the fix |; TL;DR:; This round closes each finding the verdict before it names.; `readsAsText` calls a file binary on a zero byte, and two tracked sources hold one.; So a rename drops every pointer in `src/scripts/viewer.js`, which names the window's folder.; The findings, one a line:; `spec/tickets/the-window-splits-by-tab.md` reads `state: open`, and `placesIn` queues an open ticket.; It names no `group`, and `placesIn` asks for none, so a free branch takes it.; `spec/design_output/tui.md` owns the package table, and the split ticket points at that chapter.; The ignore file names `src/tui/tui`, which a bare `go build` writes in that folder.; `spec/design_output/vehicle.md` points at `stubFolders`, which owns the stub's folder names.; `readsAsText` in `src/scripts/rename.js` answers false over a file holding a zero byte.; `src/scripts/viewer.js` and `src/extension/lib/grid.js` each join a key on that byte.; `writtenFiles` reads `readsAsText`, so a rewrite leaves both sources standing.; `src/scripts/viewer.js` holds `SOURCE`, which names the folder this ticket moves.; So the verb run today breaks the build it renames, and prints nothing about it.; The ending list of the round before carried that file, and this reader drops it.; No case feeds `readsAsText` a source holding that byte, so the hole passes green.; `./RUNME.sh check` exits 0, and `./RUNME.sh links` answers rows naming a process file alone.; The fixes, one a line:; Join those two keys on the unit separator, so no tracked source holds a zero byte.; Feed `readsAsText` a source holding a zero byte, and assert the rewrite reaches it.; That first fix costs one rebuild, because the source hash moves, and it buys a verb reaching every source.; Or answer for a file the reader leaves out, so a rename drops nothing in silence."
 ---
 
 # Ask
@@ -462,7 +468,6 @@ What this leaves for the owner at the merge. The bare word naming the older shap
 
 <!-- the form is files -->
 
-- .claude/skills/level0/lib/vale.js
 - .claude/skills/level0/lib/vehicle.js
 - .github/workflows/check.yml
     - .gitignore
@@ -478,6 +483,7 @@ What this leaves for the owner at the merge. The bare word naming the older shap
 - spec/design_output/tui.md
 - spec/design_output/vehicle.md
 - spec/funnel/a-button-makes-a-vehicle.html
+- spec/schemas/ticket.schema.yaml
 - spec/tickets/a-base-file-says-it.md
 - spec/tickets/a-cell-takes-an-edit.md
 - spec/tickets/a-pointer-names-its-heading.md
@@ -502,18 +508,16 @@ What this leaves for the owner at the merge. The bare word naming the older shap
 - spec/vocabulary/terms.yml
 - src/bridge/window.js
 - src/config/config_test.go
+- src/extension/lib/grid.js
 - src/lsp/panel_test.go
-- src/scripts/ask-lint.js
 - src/scripts/cli.js
-- src/scripts/pull.js
+- src/scripts/pull-chapter.js
+- src/scripts/pull-writes.js
 - src/scripts/rename.js
 - src/scripts/stub.js
-- src/scripts/ticket.js
 - src/scripts/tui.js
 - src/scripts/viewer.js
 - src/scripts/work-answer.js
-- src/scripts/work-list.js
-- src/scripts/work.js
 - src/tui/base.go
 - src/tui/base_test.go
 - src/tui/colour.go
@@ -575,46 +579,42 @@ fail
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the branch do what the ask asks | no, the split ticket stands `draft`, and the queue takes `open` |
+| does the branch do what the ask asks | no, a rewrite leaves two tracked sources standing |
 | is what the diff touches beyond the ask trivial | yes, each file outside the ask takes the new name |
 | what does `./RUNME.sh check` answer | 0 on this commit |
-| does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |
+| does a retro stand in the handback | no, and the branch's close owns it |
 | does every rule the branch adds carry a test | yes, each move of the verb takes a case |
-| does a case feed the rule something bad | yes, a file with no ending, a picture, and a name standing nowhere |
-| what grade do the findings take | craft, because one verb run and one field carry the fix |
+| does a case feed the rule something bad | yes, a picture, a longer word, and a name standing nowhere |
+| what grade do the findings take | craft, because one separator carries the fix |
 
 TL;DR:
 
-- This round closes each of the five findings the verdict before it names.
-- `spec/tickets/the-window-splits-by-tab.md` stands `draft`, and the queue reads `open` alone.
-- So the ask's first bullet lands in a ticket no pull hands out.
+- This round closes each finding the verdict before it names.
+- `readsAsText` calls a file binary on a zero byte, and two tracked sources hold one.
+- So a rename drops every pointer in `src/scripts/viewer.js`, which names the window's folder.
 
 The findings, one a line:
 
-- `filesUnder` in `src/scripts/rename.js` answers every file, whatever the ending of its name.
-- A case feeds the move a file with no ending and a picture, and asserts each lands.
-- `spec/funnel/a-button-makes-a-vehicle.html` and the ignore file each take the new name.
-- `git ls-files` names no binary under the window's folder, so this round drops it.
+- `spec/tickets/the-window-splits-by-tab.md` reads `state: open`, and `placesIn` queues an open ticket.
+- It names no `group`, and `placesIn` asks for none, so a free branch takes it.
+- `spec/design_output/tui.md` owns the package table, and the split ticket points at that chapter.
+- The ignore file names `src/tui/tui`, which a bare `go build` writes in that folder.
 - `spec/design_output/vehicle.md` points at `stubFolders`, which owns the stub's folder names.
-- `spec/tickets/the-window-splits-by-tab.md` stands tracked, and carries the package table.
-- `placesIn` in `src/scripts/work-answer.js` queues a ticket whose `state` reads `open`.
-- That ticket reads `draft`, so the queue holds it nowhere and no pull hands it out.
-- Its Ask passes Vale, so `./RUNME.sh ticket open` takes it as it stands.
-- It names no `group`, where every sibling on this branch names one.
-- `BINARY` in `src/scripts/rename.js` reads an ending, so a binary with none rewrites.
-- The ignore file names `src/tui/viewer`, which the module `quackitect/tui` builds nowhere.
-- The package table stands in this ticket's approach and in the ticket it mints.
-- `./RUNME.sh check` exits 0, and `./RUNME.sh links` answers no row holding a renamed name.
-- `HANDOVER.md` carries no retro, and `./RUNME.sh branch review` names that as its one fix.
+- `readsAsText` in `src/scripts/rename.js` answers false over a file holding a zero byte.
+- `src/scripts/viewer.js` and `src/extension/lib/grid.js` each join a key on that byte.
+- `writtenFiles` reads `readsAsText`, so a rewrite leaves both sources standing.
+- `src/scripts/viewer.js` holds `SOURCE`, which names the folder this ticket moves.
+- So the verb run today breaks the build it renames, and prints nothing about it.
+- The ending list of the round before carried that file, and this reader drops it.
+- No case feeds `readsAsText` a source holding that byte, so the hole passes green.
+- `./RUNME.sh check` exits 0, and `./RUNME.sh links` answers rows naming a process file alone.
 
 The fixes, one a line:
 
-- Run `./RUNME.sh ticket open the-window-splits-by-tab`, so the queue reaches it.
-- Name `group: the-tree-names-its-things` on it, so it lands under this branch.
-- Read a file by the bytes it holds, so a binary with no ending stands.
-- Drop the `src/tui/viewer` rows from the ignore file, which name a build standing nowhere.
-- Point this ticket's approach at the minted ticket, which owns the package table now.
-- Write the retro into `HANDOVER.md` before the branch hands back.
+- Join those two keys on the unit separator, so no tracked source holds a zero byte.
+- Feed `readsAsText` a source holding a zero byte, and assert the rewrite reaches it.
+- That first fix costs one rebuild, because the source hash moves, and it buys a verb reaching every source.
+- Or answer for a file the reader leaves out, so a rename drops nothing in silence.
 
 ## checked
 
@@ -622,7 +622,7 @@ The fixes, one a line:
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place, and a note points at the file. `spec/design_output/index` owns the verb's chapter, and each function in `src/scripts/rename.js` points at it. `spec/design_output/vehicle.md` points at `stubFolders` where it listed the stub's folders. The package table stands twice, in this ticket's approach and in the ticket it mints, which a finding names.
+- every fact the change adds stands in one place, and a note points at the file. [[spec/design_output/tui#the-packages-the-window-holds]] owns the package table now. `spec/tickets/the-window-splits-by-tab.md` points at that chapter. This ticket's approach holds a second copy of it. An approach records a design the review passes, and a note owns what a reader acts on. So this verdict takes the note as the owner, and leaves the approach standing. The verb's chapter stands the same way, in [[spec/design_output/index#a-rename-reaches-a-name]] and in the approach. `spec/design_output/vehicle.md` points at `stubFolders`, which owns the stub's folder names.
 
 # Discussion
 
