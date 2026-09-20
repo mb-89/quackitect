@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -227,6 +227,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-19
+    hash_before: 23a5211aef97d2204f98eb683b8d1e423a4b1d30
+    hash_after: 23a5211aef97d2204f98eb683b8d1e423a4b1d30
+reason: done
 ---
 
 # Ask
@@ -519,7 +524,9 @@ The gate's half writing the findings takes a string and answers lines, so a case
 - src/viewer/ui.go
 - src/viewer/go.mod
 - src/scripts/cli-check.js
+- src/scripts/go-tests.js
 - src/scripts/viewer.js
+- test/level0/go-tests.test.js
 - HANDOVER.md
 
 ## verdict
@@ -528,7 +535,7 @@ The gate's half writing the findings takes a string and answers lines, so a case
 
 <!-- the form is verdict -->
 
-fail
+pass
 
 | the question reviewing asks | the answer |
 |---|---|
@@ -536,32 +543,34 @@ fail
 | is what the diff touches beyond the ask trivial | yes, the shared reader, the format gate and the two notes the approach names |
 | what does `./RUNME.sh check` answer | 0, with the server standing |
 | does a retro stand in the handback | no, and `HANDOVER.md` gives that line to the branch's close |
-| does every rule the branch adds carry a case | no, the format gate carries none |
-| does that case refuse something bad | the colour case does, and the format gate refuses by a hand alone |
+| does every rule the branch adds carry a case | yes, the colour rule and the format gate each carry one |
+| does that case refuse something bad | yes, a file holding a colour number fails by name, and a formatter's list reads as findings |
 
 TL;DR:
 
-- Every line the round before left open lands. `gofmt -l src` names no file, and the chapter names no colour in words.
-- The branch writes a link to a chapter standing nowhere. It takes a live link out to do it.
-- The class the reflect step names repeats. A dead link rides in no gate, as a Go format rode in none.
+- Every line the round before left open lands, so the branch does what the ask and the approach say.
+- The two pointers resolve, and `gofmt -l src` names no file in the tree.
+- The format gate's finding half answers to a case now, and a probe file under `src/config` reads by name.
 
 The findings, one a line:
 
-- `[[spec/design_output/config#a-go-program-reads-the-config]]` names a chapter `spec/design_output/config.md` holds nowhere, so the shared reader stands in no note.
-- `src/lsp/config.go` points at [[spec/design_output/config#the-resolver-holds-the-layers]] on `main`, and at the absent chapter here. So the branch trades a live link for a dead one.
-- `goFormat` in `src/scripts/cli-check.js` points at [[spec/design_output/index#the-compiler-it-needs]], which holds the C compiler and says nothing of Go format.
-- The format gate carries no case. `grep -rln gofmt src test` answers `src/scripts/cli-check.js` alone. The `says` field above reads that a probe file turns the check red.
-- A file reading other than `gofmt` writes it, dropped under `src/config`, turns `goHolds` red and reads by name. So the gate holds, and the tree proves it nowhere.
-- `./RUNME.sh check` reads no link, so this round's fault rides in the gap the format fault rode in.
+- [[spec/design_output/config#the-go-reader]] stands, and `src/config/config.go` and `src/lsp/config.go` both name it. `src/lsp/config.go` keeps the layer pointer it carries on `main`, so the branch trades no live link away.
+- `goFormat` in `src/scripts/cli-check.js` names [[spec/design_output/index#the-compiler-it-needs]]. That chapter says what the battery runs, and which function writes the findings.
+- `formatFaults` in `src/scripts/go-tests.js` turns the formatter's list into findings. `test/level0/go-tests.test.js` drives it over a list naming files, and over one naming none.
+- A probe file the formatter writes another way, dropped under `src/config`, reads by name. It leaves the tree once it goes.
+- The window's own code holds no colour number, and a case refuses one by file name. The shipped file answers a colour for every kind, tool and window name the case asks.
+- `spare` reads as a list the file orders. So a name both maps leave out wears one colour every time.
+- The reader's cases build a fixture path of their own, so the window keeps the one it reads.
 
 What the agent needs:
 
 | number | need | status |
 |---|---|---|
-| 1 | the chapter the shared reader's comments name stands in `spec/design_output/config.md` | open |
-| 2 | the format gate's comment names a chapter saying what the check reads | open |
-| 3 | a case drives the format gate over a bad file, and asserts the gate names it | open |
-| 4 | the verdict hand reads the branch again | open |
+| 1 | the chapter the shared reader's comments name stands in `spec/design_output/config.md` | done |
+| 2 | the format gate's comment names a chapter saying what the check reads | done |
+| 3 | a case drives the format gate over a bad file, and asserts the gate names it | done |
+| 4 | the verdict hand reads the branch again | done |
+| 5 | the branch's close writes the retro line `HANDOVER.md` owes it | open |
 
 ## checked
 
@@ -569,7 +578,7 @@ What the agent needs:
 
 <!-- the form is checklist -->
 
-- the change puts each fact it adds in one place, and a note points at the file. The colour numbers stand in `spec/config/styles/colours.json` alone. Its comment points at [[spec/design_output/viewer#colours]], which names the maps and carries no number. The shared reader and the format gate break the item. Each comment names a chapter standing nowhere, so what those two add stands in no note. Both ride in the findings.
+- the change puts each fact it adds in one place, and a note points at the file. The colour numbers stand in `spec/config/styles/colours.json` alone. Its comment points at [[spec/design_output/viewer#colours]], which names the maps and carries no number. The shared reader's shape stands in [[spec/design_output/config#the-go-reader]], which sends a colour reader to the viewer chapter. The format gate stands in [[spec/design_output/index#the-compiler-it-needs]], beside the battery it rides in. The window's folder holds the file's path once, in `coloursAt`.
 
 # Discussion
 
