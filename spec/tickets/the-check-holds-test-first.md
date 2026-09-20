@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -184,6 +184,10 @@ record:
     hash_after: 56b19596b10e6b5da0d1a2cc576d2e1bff090def
     returns: 2
     why: "| the finding | the fix |; |---|---|; | The `disk`, `proc`, `session` and `bridgehead` fakes take no guard. A door test through one still reads `undefined` for a call the fake lacks | Wrap each of them in `behaves`, and let a case prove the disk fake throws |; | `says` holds that the disk and the process fakes answer through a closure. Each fake here returns an object literal, `clock` among them | Write the reason the code carries, or drop the line as each fake takes the guard |; | `names` reads the import off the whole delta. So a changed module another changed module imports passes on one unrelated test | Read the import off the hunk the test carries, and take a case feeding it that delta |; What holds:; `./RUNME.sh check` exits 0 on the commit this verdict stands on.; `test/level0/tools-door.test.js` stands as it stands on trunk, and the hand tools take their own file.; Rule five of [[spec/guidance/code/testing]] names the commit door and the tree rule.; The `clock`, `git` and `log` fakes take the guard. A case drives the clock into a call it lacks.; Both doors read one text, because the hook pipes the staged delta the Bash door builds.; Each rule takes a case feeding it something bad. A module no test imports, and a delta carrying a stray test.; The change touches the readings, the guard, both doors, the notes and the tests. It reaches nothing outside the brief.; The code answering the last round lands under the reflect commit. The change commit carries the note and the cases.; `HANDOVER.md` carries a retro chapter, and it records this ticket at design/review."
+  - step: implement/reflect
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 78e7fe71e262a7482d3f4a989805fa50be1995c9
+    hash_after: 78e7fe71e262a7482d3f4a989805fa50be1995c9
 ---
 
 # Ask
@@ -350,6 +354,17 @@ it held, and the check says nothing where the cases it drops pass elsewhere.
 
 Rule five of the testing note names no program, which is the first class again:
 a rule with no reader. The rule now names the door and the check holding it.
+
+The third round names one class, and the same class twice over:
+
+| the class | the fault here | the fix for the class |
+|---|---|---|
+| a piece lands halfway, and the note says it lands whole | four fakes take no guard, and the evidence names a difference standing nowhere | every caller takes it, and the evidence says what a hand can read back |
+| a reading takes more text than its subject | `names` reads the import off the whole delta, so a source file importing another passes for a test | each file answers off its own hunk, which the delta already holds apart |
+
+The second is the same fault the first round met, one layer down: a rule passing
+on the weakest reading. So the delta reading now keys the added lines by file,
+and each test answers for itself.
 
 ### checked
 
