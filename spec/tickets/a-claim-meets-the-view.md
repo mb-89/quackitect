@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -121,6 +121,10 @@ record:
     hash_after: 800d35921d241f1f1ab86a10a4949f22f271863f
     returns: 3
     why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | partly, the rule, the sweep and the case hold, the panel's own rows double |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does every rule the approach adds carry a case | yes, one case reads both fronts over the real tree |; | does every claim carry a proof | every row but one, and the panel row reads against the code |; TL;DR:; The switch under the server, the Biome guard and the missing chapter read true now.; The panel draws the checker's rows itself, beside the list the bridge answers.; Hand the panel no checker, and say what the case counts on each side.; The findings, one a line:; `panel.go` keeps `own` off `Sweep` and `extra` off the bridge, and draws both.; `serverFaults` runs that same `Sweep`, so the two lists carry one content.; So `readingOf` handing the panel the checker draws each of those rows twice.; The draft says the panel gains the checker, and the panel holds it already.; The design note says so too, in the source table of its panel chapter.; Say which front hands `readingOf` a checker, and hand the panel none.; Then the case reads the panel as its own sweep plus the bridge's list.; Drop the git door where no tree reader in JavaScript runs inside the bridge.; The rest holds: the guard, the switch, the chapter, the case's home, the rule's home."
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 870488c8ceea22cf0cf305a62b53ef50947e6da3
+    hash_after: 870488c8ceea22cf0cf305a62b53ef50947e6da3
 ---
 
 # Ask
@@ -142,39 +146,43 @@ The agent reports green while the owner's panel draws a screen full of findings.
 
 ### approach
 
-One reading answers the panel and the check, and a case holds their counts equal.
+One guard answers both fronts, and a case holds their counts equal.
 
-`findingsOver` in `src/bridge/findings.js` stands as the shared sweep. Both callers reach it, and two things part what each one ends with:
+The checker stays where it stands. Each front already reaches the same rules, by a route of its own:
+
+| the front | what it draws |
+|---|---|
+| the panel | its own `Sweep` in `src/lsp/panel.go`, and the bridge's findings beside it |
+| the check | `findingsOver`, and `serverFaults` over that same `Sweep` |
+
+So moving the checker into the shared reader draws every tree row and schema row twice. The earlier draft asked for that, and this one drops it.
+
+One thing parts the two lists:
 
 | what parts them | `lint` in `cli-read.js` | `findingsFor` in `findings.js` |
 |---|---|---|
-| the Biome guard | hands the empty string where no binary stands | hands the name the survey answers, standing or not |
-| the checker the server holds | asks `se-lsp check`, with the tree and schema readers behind it | asks neither |
+| the Biome guard | hands the empty string where no binary stands | hands the bare name the survey answers |
 
-The tree rules and the schema rules belong to one road. `src/lsp/check.go` holds them, and the readers in `cli-read.js` stand behind it for a box carrying no server. The guard there reads an answer of none as an answer. That is right, because a server answering an empty list read the tree and found nothing.
+`whereIs` falls back to the bare name, so the panel asks for a tool standing nowhere. `lint` hands the empty string, and the sweep skips Biome. So one tree answers two lists on a box carrying no Biome.
 
-The roots agree, and the first draft read them apart. `root` in `cli-doors.js` and `box.method` both name the tree the module stands in. The tools agree too, because each caller reads the same survey file.
+The rest reads the same on both sides. The roots agree, because `root` in `cli-doors.js` and `box.method` name one tree. The tools agree, because each front reads the same survey file. The tree readers and the schema readers stand behind `serverFaults`, which answers nothing where no server stands.
 
 | what changes | how |
 |---|---|
-| `src/bridge/findings.js` | answers `readingOf`: the sweep, then the checker, then the readers behind it |
-| `src/scripts/cli-read.js` | takes `readingOf`, and prints what it answers |
-| `src/bridge/server.js` | the box takes a git door, which the tree reader behind the checker wants |
+| `src/bridge/findings.js` | holds the guard, so both fronts name Biome one way |
+| `src/scripts/cli-read.js` | takes that guard, and holds none of its own |
 | `spec/design_output/lsp` | takes the chapter `src/lsp/check.go` points at, which stands nowhere yet |
 | `test/contract/one-reading.test.js` | takes the case under this table |
 | `spec/guidance/working.md` | takes the rule under that |
 
-**What each front owns after.** Neither front owns a row of the first table.
+**The case.** It stands under `test/contract`, because it drives the real tools over the real tree. It counts each front's route over the whole tree:
 
-| the piece | who owns it after |
+| the side it counts | what it asks |
 |---|---|
-| the Biome guard | `readingOf`, so one rule answers both fronts |
-| the checker, and the readers behind it | `readingOf`, which each front hands doors |
-| the printing | `lint`, over what `readingOf` answers |
+| the panel | `findingsFor` over the bridge's box, and `se-lsp check` beside it |
+| the check | `findingsOver` under the command line's doors, and `serverFaults` beside it |
 
-`readingOf` takes its readers from the caller, so `findings.js` reaches no command line door. So the panel gains the checker and the guard behind it, and the check keeps what it prints today.
-
-**The case.** It stands under `test/contract`, because it drives the real tools over the real tree. It asks each front's reader for the whole tree and asserts one count. Where the two part it names the file each side holds alone. `./RUNME.sh check` runs it in the battery, so a claim of green carries the count the owner's panel draws.
+The case asserts one count. Where the two part it names the file each side holds alone, so a reader opens that file. `./RUNME.sh check` runs it in the battery, so a claim of green carries the count the owner's panel draws.
 
 **The rule.** It reads: read a claim of done in the owner's own view before you make it. It lands in the Actionables of `spec/guidance/working`, beside the rules on what a session owes the owner.
 
