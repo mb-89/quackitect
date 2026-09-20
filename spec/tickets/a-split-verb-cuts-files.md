@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: 141fb7a55dceafdff6b4f7c437e82fd05c5c9177
     returns: 2
     why: the verb's code takes no owner file here. `src/scripts/cli.js` holds the verbs table, and each verb takes a module; the mint on refusal takes no owner file. `src/bridge/code.js` holds the door reading `grows`; the minted ticket's fields stand unnamed. `trivial` asks `gain`, `breaks` and `done_when`, so the door fills three; the minted ticket's path and `group` stand unnamed, so the implementer picks both; the journal entry's `on` and `by` stand unnamed. The command line carries no undo verb, and the `undo` tool takes the newest entry; the size lib holds `sizeFaults`, `FILE_RULE` and `grows`; the undo lib holds `journalOf`, and `spec/processes` holds `trivial`; `src/bridge/apply.js` stands as the batch edit behind the patch and replace tools; `spec/design_output/level0.md` holds `The size ceiling`, so the flags table takes an owner; `./RUNME.sh lint src/scripts` and `./RUNME.sh lint src test` both answer the rules pass; the earlier read's seven findings each take an answer here
+  - step: design/draft
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: e9d0693219c480673f64f0613014f0cc2459ae65
+    hash_after: e9d0693219c480673f64f0613014f0cc2459ae65
 ---
 
 # Ask
@@ -143,22 +147,41 @@ Every write to a long file meets a refusal, and hands squeeze lines to get past 
 | `--to <path> --lines <from>-<to>` | one target and the range it takes, named again for each target |
 | `--dry` | the cuts it would write, and no write |
 
-| what the verb needs | what stands |
+Where the code lands:
+
+| the piece | its file |
+|---|---|
+| the verb | `src/scripts/split-verb.js`, which `src/scripts/cli.js` names in the verbs table |
+| the mint on a refusal | `src/bridge/code.js`, the one caller of `grows` |
+| the ranges and the cut over text | `src/scripts/split-cut.js`, which the cases drive in memory |
+
+What each piece calls:
+
+| what it needs | what stands |
 |---|---|
 | the ceiling and the faults | `sizeFaults` and `FILE_RULE`, under `.claude/skills/level0/lib/size.js` |
 | the undo | the journal under `.claude/skills/level0/lib/undo.js` |
 | the journal's writer | `src/bridge/apply.js`, the batch edit behind the patch and replace tools |
 | the ticket | `./RUNME.sh mint ticket <path> --process=trivial` |
 
-The verb writes every target and the rest of the source through the journal, so one `undo` puts the whole cut back.
+The verb writes every target and the rest of the source through the journal, in one entry. The entry names `on` as the session the write runs under and `by` as `split`, so `mcp__level0__undo` takes the whole cut as its newest entry. The command line carries no undo verb, and this change adds none.
 
 The refusal that mints:
 
 - the write door reads `grows`, so a file past the ceiling takes a cut and refuses a growth
-- the door itself mints, off `trivial`, and the refusal names the ticket it writes
-- it reads `spec/tickets` first, and mints where no open split ticket names that file
+- `src/bridge/code.js` mints, and the refusal names the ticket it writes
+- the ticket lands at `spec/tickets/split-<name>.md`, off the source file's own name
+- it carries no `group`, so it stands loose on trunk where a person sorts it
+- the door reads `spec/tickets` first, and mints where no open split ticket names that file
 - a second refusal on the same file names the standing ticket, and writes none
-- the ask names the file, what the lint says, and the topics the cut follows
+
+What the door writes into the three fields `trivial` asks for:
+
+| the field | what the door writes |
+|---|---|
+| `gain` | the file comes under the ceiling, so every write to it passes the door |
+| `breaks` | every write to the file meets a refusal, and a hand squeezes lines to pass |
+| `done_when` | `./RUNME.sh lint <file>` names no `FileCeiling` |
 
 Where each thing stands after:
 
@@ -166,8 +189,7 @@ Where each thing stands after:
 - this approach's copy is the draft that chapter takes, and no second copy lands
 - `test/level0/split.test.js` holds the cases: each flag, the undo, and the mint
 - a case feeds the door a file past the ceiling twice, and asserts one ticket
-
-`./RUNME.sh lint src test` answers clean today, so the verb guards the next file and cuts none.
+- `./RUNME.sh lint src test` answers clean today, so the verb guards the next file
 
 ## review
 
