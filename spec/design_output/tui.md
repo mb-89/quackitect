@@ -354,10 +354,27 @@ wants that selection back, and most terminals give it back under a held shift.
 
 # The work tab
 
-The strip carries the log and the work. The work tab stands empty and says so,
-so a person reads that the window holds two things. The number keys carry
-between them. The tree view, its base file and its source of items land in this
-tab next.
+The strip carries the log and the work. The work tab draws every ticket this
+tree holds in the tree view, nested under its group. No file stands between
+the index and the tab. `spec/views/work.base` says the columns, the letters
+and the presets. For the view itself, see [[spec/design_output/tree-view]].
+
+| what the tab holds | where it comes from |
+|---|---|
+| the rows | `tickets`, which [[spec/design_output/index#the-index-answers-the-tickets]] answers |
+| the redraw | `changes`, which [[spec/design_output/index#the-index-fires-on-change]] holds until a sweep |
+| the door's port | the standing file the door writes, off the root two folders over the log |
+| a door standing nowhere | the binary's own `standing` verb, which puts one up and drops a stale one |
+
+A group's row carries the tickets naming it, and a ticket naming no group, or
+one the rows hold nowhere, stands at the left. A held group and its tickets
+wear the `W` letter, off the standing the index answers. The window's `Init`
+asks for the tick from nothing, and each answer hands the tab its tree again.
+
+`workindex.go` holds the road to the door, and `workitems.go` turns the rows
+into items. A box with no door and no binary draws the reason in the tab, and
+asks again after a pause. So a build landing later reaches the tab with no
+restart.
 
 # A tab the caller names
 

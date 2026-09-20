@@ -1,11 +1,13 @@
 // The work tab. It draws every ticket this tree holds, nested under its group,
-// off the one answer the work verb writes. A write to that answer redraws the
-// tab with no key pressed, and nothing here writes a ticket.
+// off the rows the index answers. A change under the tree wakes the index,
+// and the index wakes this tab, so it redraws with no key pressed and polls
+// nothing. No file stands between the index and the tab.
 // [[spec/design_output/tui#the-work-tab]]
 
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -16,9 +18,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
-
-// The work answer of [[spec/design_output/work#one-verb-answers-git]], owned by .claude/skills/level0/lib/folders.js and spelled again here because a Go module imports no JavaScript.
-const workAnswerAt = ".se/.runtime/work.json"
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]
 const workBaseAt = "spec/views/work.base"
@@ -34,22 +33,9 @@ func workRoot(path string) string {
 }
 
 // [[spec/design_output/tui#the-work-tab]]
-func workAt(path string) string {
-	return filepath.Join(workRoot(path), filepath.FromSlash(workAnswerAt))
-}
-
-// The time the answer carries, which says whether a reader reads it again. [[spec/design_output/tui#the-work-tab]]
-func workStamp(path string) time.Time {
-	info, err := os.Stat(workAt(path))
-	if err != nil {
-		return time.Time{}
-	}
-	return info.ModTime()
-}
-
-// [[spec/design_output/tui#the-work-tab]]
 func loadWork(path string) (*Tree, error) {
-	base, err := os.ReadFile(filepath.Join(workRoot(path), filepath.FromSlash(workBaseAt)))
+	root := workRoot(path)
+	base, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(workBaseAt)))
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +43,7 @@ func loadWork(path string) (*Tree, error) {
 	if err != nil {
 		return nil, err
 	}
-	said, err := os.ReadFile(workAt(path))
+	said, err := askIndex(root, "tickets", map[string]any{})
 	if err != nil {
 		return nil, err
 	}
@@ -114,23 +100,34 @@ func pressPreset(m *model, name string) bool {
 type workMsg struct {
 	tree *Tree
 	why  string
-	at   time.Time
+	tick int64
 	same bool
 }
 
-// A poll answers the answer's own time, so a write redraws with no key pressed. [[spec/design_output/tui#the-work-tab]]
-func workCmd(path string, was time.Time) tea.Cmd {
+// The index holds the call until a sweep past the tick, and the tab reads the rows again then. [[spec/design_output/index#the-index-fires-on-change]]
+func workCmd(path string, was int64) tea.Cmd {
 	return func() tea.Msg {
-		time.Sleep(poll)
-		at := workStamp(path)
-		if at.Equal(was) {
-			return workMsg{at: at, same: true}
+		root := workRoot(path)
+		said, err := askIndex(root, "changes", map[string]any{"since": was})
+		if err != nil {
+			// A door answering nowhere costs a pause before the next ask, so a dead index spins nothing. [[spec/design_output/tui#the-work-tab]]
+			time.Sleep(poll)
+			return workMsg{why: err.Error(), tick: was}
+		}
+		var at struct {
+			Tick int64 `json:"tick"`
+		}
+		if err := json.Unmarshal(said, &at); err != nil {
+			return workMsg{why: err.Error(), tick: was}
+		}
+		if at.Tick == was {
+			return workMsg{tick: at.Tick, same: true}
 		}
 		tree, err := loadWork(path)
 		if err != nil {
-			return workMsg{why: err.Error(), at: at}
+			return workMsg{why: err.Error(), tick: at.Tick}
 		}
-		return workMsg{tree: tree, at: at}
+		return workMsg{tree: tree, tick: at.Tick}
 	}
 }
 
@@ -145,7 +142,7 @@ func (workTab) Left(m *model, w, rows int) string {
 
 // [[spec/design_output/tui#the-work-tab]]
 func workWaits(m *model, w, rows int) []string {
-	said := "Run ./RUNME.sh branch answer, and this tab draws what it writes."
+	said := "The index answers this tab, and it draws the moment a door stands."
 	if m.workWhy != "" {
 		said = m.workWhy
 	}

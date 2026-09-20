@@ -1,107 +1,80 @@
-// The work tab's items, read off the one answer the work verb writes. The
-// editor opens no git process: it reads that file and nothing else, so the
-// board is as fresh as the last write. A group's row carries its tickets
-// under it, and a ticket naming no group stands at the left.
-// [[spec/design_output/work#one-verb-answers-git]]
+// The work tab's items, read off the rows the index answers. A group's row
+// carries the tickets naming it under it, and a ticket naming no group, or one
+// the rows hold nowhere, stands at the left. Nothing here opens a file.
+// [[spec/design_output/tui#the-work-tab]]
 
 package main
 
-import (
-	"encoding/json"
-	"strconv"
-)
+import "encoding/json"
 
-// A row every item carries, so the filter reads one word for every kind. [[spec/design_output/work#one-verb-answers-git]]
+// A row every item carries, so the filter reads one word for every kind. [[spec/design_output/tui#the-work-tab]]
 const workKind = "ticket"
 
-type workTicket struct {
+// The route a group rides, the word [[spec/design_output/index#the-index-answers-the-tickets]] answers under route.
+const groupRoute = "group"
+
+// The standing a held branch gives, one of the words [[spec/design_output/work#what-the-standing-says]] names.
+const heldStanding = "held"
+
+// One row of the index's answer. [[spec/design_output/index#the-index-answers-the-tickets]]
+type ticketRow struct {
 	Name     string `json:"name"`
+	Path     string `json:"path"`
 	State    string `json:"state"`
 	Step     string `json:"step"`
-	Progress string `json:"progress"`
+	Route    string `json:"route"`
 	Group    string `json:"group"`
 	Urgent   bool   `json:"urgent"`
-	Person   bool   `json:"person"`
-	Held     bool   `json:"held"`
-	Waits    bool   `json:"waits"`
 	Todo     bool   `json:"todo"`
-	Stood    int    `json:"stood"`
-	Queue    int    `json:"queue"`
+	Standing string `json:"standing"`
 	Says     string `json:"says"`
 }
 
-type workBranch struct {
-	Branch   string       `json:"branch"`
-	Name     string       `json:"name"`
-	Status   string       `json:"status"`
-	Kind     string       `json:"kind"`
-	Step     string       `json:"step"`
-	Progress string       `json:"progress"`
-	Person   bool         `json:"person"`
-	Urgent   bool         `json:"urgent"`
-	Held     bool         `json:"held"`
-	Age      string       `json:"age"`
-	Queue    int          `json:"queue"`
-	Says     string       `json:"says"`
-	Tickets  []workTicket `json:"tickets"`
-}
-
-type workAnswer struct {
-	Branches []workBranch `json:"branches"`
-	Loose    []workTicket `json:"loose"`
-}
-
-// [[spec/design_output/work#one-verb-answers-git]]
+// [[spec/design_output/tui#the-work-tab]]
 func ReadWorkItems(text string) ([]Item, error) {
-	var said workAnswer
-	if err := json.Unmarshal([]byte(text), &said); err != nil {
+	var rows []ticketRow
+	if err := json.Unmarshal([]byte(text), &rows); err != nil {
 		return nil, err
 	}
-	out := make([]Item, 0, len(said.Branches)+len(said.Loose))
-	for _, one := range said.Branches {
-		kids := make([]Item, 0, len(one.Tickets))
-		for _, held := range one.Tickets {
-			kids = append(kids, itemOfTicket(held))
-		}
-		out = append(out, Item{Name: one.Name, Keys: map[string]string{
-			"kind":     workKind,
-			"state":    one.Status,
-			"step":     one.Step,
-			"progress": one.Progress,
-			"queue":    placeOf(one.Queue),
-			"age":      one.Age,
-			"group":    "",
-			"urgent":   flagOf(one.Urgent),
-			"person":   flagOf(one.Person),
-			"held":     flagOf(one.Held),
-			"waits":    flagOf(false),
-			"todo":     flagOf(false),
-			"stood":    "",
-			"says":     one.Says,
-		}, Kids: kids})
-	}
-	for _, one := range said.Loose {
-		out = append(out, itemOfTicket(one))
-	}
-	return out, nil
+	return itemsOfTickets(rows), nil
 }
 
-// [[spec/design_output/work#one-verb-answers-git]]
-func itemOfTicket(one workTicket) Item {
+// [[spec/design_output/tui#the-work-tab]]
+func itemsOfTickets(rows []ticketRow) []Item {
+	groups := map[string]int{}
+	out := make([]Item, 0, len(rows))
+	for _, one := range rows {
+		if one.Route == groupRoute {
+			groups[one.Name] = len(out)
+			out = append(out, itemOfTicket(one))
+		}
+	}
+	for _, one := range rows {
+		if one.Route == groupRoute {
+			continue
+		}
+		if at, held := groups[one.Group]; held {
+			out[at].Kids = append(out[at].Kids, itemOfTicket(one))
+			continue
+		}
+		out = append(out, itemOfTicket(one))
+	}
+	return out
+}
+
+// [[spec/design_output/tui#the-work-tab]]
+func itemOfTicket(one ticketRow) Item {
 	return Item{Name: one.Name, Keys: map[string]string{
 		"kind":     workKind,
+		"path":     one.Path,
 		"state":    one.State,
 		"step":     one.Step,
-		"progress": one.Progress,
-		"queue":    placeOf(one.Queue),
-		"age":      "",
+		"route":    one.Route,
 		"group":    one.Group,
+		"standing": one.Standing,
 		"urgent":   flagOf(one.Urgent),
-		"person":   flagOf(one.Person),
-		"held":     flagOf(one.Held),
-		"waits":    flagOf(one.Waits),
 		"todo":     flagOf(one.Todo),
-		"stood":    placeOf(one.Stood),
+		"held":     flagOf(one.Standing == heldStanding),
 		"says":     one.Says,
 	}}
 }
@@ -112,12 +85,4 @@ func flagOf(yes bool) string {
 		return "true"
 	}
 	return "false"
-}
-
-// A ticket the queue leaves out carries no place, and the column stands empty. [[spec/design_output/pull#the-queue-is-a-score]]
-func placeOf(at int) string {
-	if at <= 0 {
-		return ""
-	}
-	return strconv.Itoa(at)
 }

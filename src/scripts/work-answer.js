@@ -1,9 +1,8 @@
-// The one answer about git a reader opens. `branch answer` writes it, and the
-// board, the terminal and the pull all read the same file, so none of the three
-// drifts from the others.
-// [[spec/design_output/work#one-verb-answers-git]]
+// The one reading of git the listing takes. `answerOf` reads the branches
+// and their tickets once, and `branch list --queue` orders that reading, so
+// the listing and the pull read one truth.
+// [[spec/design_output/work#one-reading-answers-git]]
 
-import { ANSWER } from "../../.claude/skills/level0/lib/folders.js";
 import {
   askOf,
   dependsOn,
@@ -22,7 +21,7 @@ import { queued, stoodHere } from "./pull-queue.js";
 import { staleClaim } from "./work-free.js";
 import { readWork, standingAll } from "./work-stands.js";
 
-// [[spec/design_output/work#one-verb-answers-git]]
+// [[spec/design_output/work#one-reading-answers-git]]
 export function rowOfTicket(one, places, stood = new Map(), open = new Set()) {
   const said = {
     name: one.name,
@@ -45,7 +44,7 @@ export function rowOfTicket(one, places, stood = new Map(), open = new Set()) {
   return place === undefined ? said : { ...said, queue: place };
 }
 
-// The leaf a ticket stands on, of the leaves its route holds. [[spec/design_output/work#one-verb-answers-git]]
+// The leaf a ticket stands on, of the leaves its route holds. [[spec/design_output/work#one-reading-answers-git]]
 export function progressOf(text) {
   const front = frontOf(text);
   const leaves = leavesOf(front);
@@ -60,10 +59,10 @@ export function personStep(text) {
   return String(leaf?.by ?? "") === "person";
 }
 
-// The last column takes what it fits, so the answer carries this much of a line. [[spec/design_output/work#one-verb-answers-git]]
+// The last column takes what it fits, so the answer carries this much of a line. [[spec/design_output/work#one-reading-answers-git]]
 const SAYS_CUT = 160;
 
-// The ask's first line, which the last column carries. [[spec/design_output/work#one-verb-answers-git]]
+// The ask's first line, which the last column carries. [[spec/design_output/work#one-reading-answers-git]]
 export function firstLine(said) {
   const row = String(said ?? "")
     .split("\n")
@@ -72,7 +71,7 @@ export function firstLine(said) {
   return (row ?? "").slice(0, SAYS_CUT);
 }
 
-// Every ticket the answer names, each once, with a branch's copy first. [[spec/design_output/work#one-verb-answers-git]]
+// Every ticket the answer names, each once, with a branch's copy first. [[spec/design_output/work#one-reading-answers-git]]
 export function ticketsIn(read) {
   const out = new Map();
   for (const one of [...read.stand.flatMap((held) => held.tickets), ...read.loose]) {
@@ -91,7 +90,7 @@ export function placesIn(it, read, stood) {
   return new Map(queued(open, all, at).map((one, place) => [one.name, place + 1]));
 }
 
-// [[spec/design_output/work#one-verb-answers-git]]
+// [[spec/design_output/work#one-reading-answers-git]]
 export function answerOf(it, queue = false) {
   const read = readWork(it, true);
   const standing = standingAll(read.stand);
@@ -135,29 +134,4 @@ export function answerOf(it, queue = false) {
       .filter((one) => !fieldOf(one.text, GROUP) && !isGroup(one.text))
       .map((one) => rowOfTicket(one, places, stood, open)),
   };
-}
-
-// [[spec/design_output/work#one-verb-answers-git]]
-export function answer(it, argv = []) {
-  const said = answerOf(it, argv.includes("--queue"));
-  const at = it.join(it.root, ...ANSWER.split("/"));
-  it.disk.write(at, `${JSON.stringify(said, null, 2)}\n`);
-  console.log(`${ANSWER} carries what git knows, and a reader opens it.`);
-  return 0;
-}
-
-// A reader meeting no file says so, and the board draws what the notes hold. [[spec/design_output/work#one-verb-answers-git]]
-export function answerHere(it) {
-  const at = it.join(it.root, ...ANSWER.split("/"));
-  if (!it.disk.exists(at)) {
-    return {
-      said: null,
-      why: `${ANSWER} stands nowhere. Run ./RUNME.sh branch answer.`,
-    };
-  }
-  try {
-    return { said: JSON.parse(it.disk.read(at)), why: "" };
-  } catch (error) {
-    return { said: null, why: `${ANSWER} reads as no JSON: ${error.message}` };
-  }
 }

@@ -45,7 +45,6 @@ import { serving } from "./serve.js";
 import { freeIn, trigger } from "./work-free.js";
 import { testVerb } from "./work-test.js";
 import { unblock } from "./work-unblock.js";
-import { answer } from "./work-answer.js";
 import { list } from "./work-list.js";
 import { close, merge } from "./work-merge.js";
 import {
@@ -81,8 +80,6 @@ export function work(root, argv, doors) {
     read,
     review,
     list,
-    // [[spec/design_output/work#one-verb-answers-git]]
-    answer: (it, _name, argv) => answer(it, (argv ?? []).slice(1)),
     // [[spec/design_output/pull#a-person-step-goes-in]]
     escalate: (it, _name, argv) => escalate(it, argv),
     // [[spec/design_output/pull#the-work-answer]]

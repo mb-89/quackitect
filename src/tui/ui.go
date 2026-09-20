@@ -72,9 +72,9 @@ type model struct {
 	tailer    *tailer
 	err       error
 	// [[spec/design_output/tui#the-work-tab]]
-	work    *Tree
-	workWhy string
-	workAt  time.Time
+	work     *Tree
+	workWhy  string
+	workTick int64
 }
 
 func newModel(path string, zone *time.Location) model {
@@ -99,7 +99,7 @@ func newModel(path string, zone *time.Location) model {
 
 // [[spec/design_output/tui#the-work-tab]]
 func (m model) Init() tea.Cmd {
-	return tea.Batch(m.tailer.cmd(), workCmd(m.path, time.Time{}))
+	return tea.Batch(m.tailer.cmd(), workCmd(m.path, 0))
 }
 
 // [[spec/design_output/tui#the-window-is-a-split]]
@@ -274,8 +274,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			m.loadPane()
 		}
-		m.workAt = msg.at
-		return m, workCmd(m.path, m.workAt)
+		m.workTick = msg.tick
+		return m, workCmd(m.path, m.workTick)
 
 	case tea.KeyMsg:
 		if m.pane == paneFilter {

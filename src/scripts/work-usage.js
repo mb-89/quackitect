@@ -11,7 +11,6 @@ export const USAGE = [
   "  read <name>   print what stands on work/<name>",
   "  review <name> gather what a reader needs, and answer the report",
   "  list [--all|--done|--queue|--fetch] what stands open, everything, the done ones, the pull's order, or the refs again",
-  "  answer [--queue] write what git knows into one file a reader opens, with the order or without",
   "  merge <name>  take a done branch into main",
   "  close [name]  delete a branch already inside main, or every one",
   "  escalate <question> [--options a,b,c] put a person step before the leaf in hand",
