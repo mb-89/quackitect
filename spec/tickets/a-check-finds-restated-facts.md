@@ -322,11 +322,15 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/paragraph.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -334,11 +338,30 @@ pass
 
 <!-- the form is text -->
 
+A fact written in two places drifts, so three rules find the second copy:
+
+- `src/lsp/restated.go` holds the Go pair: one over a pointer, one over a rule name
+- a chapter naming a pointer another chapter already names draws at the second
+- a note naming a rule the guidance holds draws where the wording shares a run of words
+- `RestatedTable` comes out of the paragraph schema, over a line beside a table
+- `pathsUnder` in `src/lsp/main.go` walks a folder, so the check reads every note under a path
+- `spec/config/level0.json` carries the two bounds, and the schema beside it types them
+- the rule files stand at warning, so a draft moves while the count settles
+
+Three places the new rules name take their fix. The testing note points at the
+code note, which holds that rule over every change. The tree view note renames a
+heading the viewer note already carries. The lint config turns the table rule
+off over tickets, where a line beside a table weighs it on purpose.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the checker, its front, the schema, the config pair, and the places the rules name
+- the Go fixture writes a tree of its own, and the Vale case drives the real binary
+- each rule and each piece carries the pointer at the chapter tabling the rules over two files
 
 # verdict
 
