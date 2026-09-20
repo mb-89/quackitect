@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: b10ab9cd1427cee19ebf551044c8b4c502dd6483
     returns: 1
     why: "design: The filter language in `filter.go` reads a log row and a tree item, so the log and the tree both read it. The chapter gives the tree the draw package alone, so the approach names the package the filter language lands in and what imports it.; design: The link in `link.go` draws in the tree and in the work tab, so the approach names the package it lands in.; design: The footer draws the log's order and floor, which the approach moves into the log tab, so the tab interface grows the method the footer reads them through.; craft: The build stamp reads every folder under `src/tui`, the draw, the tree and the frame among them, and the approach says the tab folders alone.; craft: `Frame` sets the log's rows, filter and floor, so the approach says how the root reaches them once they stand in the log tab.; craft: `saidStyle` in `colour.go` reads a log record, so it parts from the styles before they move to the draw package."
+  - step: design/draft
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 3fee8dc860ac12ba54d103f9bce503b2424a3f6f
+    hash_after: 3fee8dc860ac12ba54d103f9bce503b2424a3f6f
 ---
 
 # Ask
@@ -135,18 +139,36 @@ The packages and their imports stand in
 that table. A tab owns its own state, so the frame reads no record and no
 ticket tree.
 
-| the piece | what it becomes |
+| the piece | where it lands |
 |---|---|
-| the model's log fields and the tailer | fields of the log tab, under `src/tui/log` |
-| the model's work fields and the places | fields of the work tab, under `src/tui/work` |
-| the tab interface | grows an `Init`, an `Update` over the tab's own messages and key modes, a `Narrow` for the filter line, and a `Press` for the mouse |
-| `Frame` and `newModel` | stay in the root package, which builds the tab list and hands it to the frame |
-| the tests | move with the code they drive, and the window tests stay in the root package |
-| the build stamp in `src/scripts/tui-build.js` | reads the tab folders too, so a change under one rebuilds the viewer |
+| `cut`, `pad`, `oneLine`, `Wrap`, the palette and the styles | `src/tui/draw`, which imports nothing of this tree's |
+| the filter language in `filter.go` | `src/tui/draw`, because the log row and the tree item both read it, and the tree imports the draw package alone |
+| the link in `link.go` | `src/tui/draw`, because the tree draws it and the work tab draws it |
+| `saidStyle` in `colour.go` | the log tab, because it reads a log record, and the styles part from it first |
+| the tree, its rows, its edit, its marks, its sorts, its flags and the base file | `src/tui/tree` |
+| the place chord's tree reads | the work tab, as functions over a tree, because the tree knows no queue key |
+| the model, the tab interface, the keys, the mouse, the strip, the panes, the footer, the help and the window's door | `src/tui/frame` |
+| the model's log fields, the tailer, the records, the columns and the details | fields and files of the log tab, under `src/tui/log` |
+| the model's work fields, the places, the index calls and the ticket edit | fields and files of the work tab, under `src/tui/work` |
+| `main`, `runWindow`, `Frame`, `ParseSize` and the model builder | the root package, which builds the tab list and hands it to the frame |
 
-A name a tab package reads takes a capital, and the rename reaches every file
-naming it. The footer and the strip draw off what the open tab answers, so the
-frame imports the draw and the tree packages alone.
+The tab interface grows what the frame reads through it:
+
+| the method | what the frame does with it |
+|---|---|
+| `Init` | batches each tab's first command |
+| `Update` | hands a tab the messages and key modes it owns, and takes the first tab that answers |
+| `Move` and `Jump` | the arrows, the page keys, home and end move the open tab's selection |
+| `Press` | a press on the left side reaches the open tab |
+| `Narrow` and `Sorted` | the filter line and a preset's sort reach the open tab |
+| `Marks` | the footer draws the order and the floor off the first tab, which is the log |
+
+`Frame` in the root package reaches the log tab through its exported fields,
+and sets its rows, its filter and its floor there. A name a tab package reads
+takes a capital, and the rename reaches every file naming it. The tests move
+with the code they drive, and the window tests stay in the root package. The
+build stamp in `src/scripts/tui-build.js` reads every folder under `src/tui`,
+so a change under any package rebuilds the viewer.
 
 ## review
 
