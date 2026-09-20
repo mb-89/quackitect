@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box 201f76ea75a2 · claude-code-remote
     hash_before: b8bf880f1d5ba9c3f07b0ae0689835a47cb8c964
+  - step: sync
+    hand: box 201f76ea75a2 · claude-code-remote
+    hash_before: 9f1f5c7b1b9cd2c27c23c23770d78405ffe62646
+    hash_after: 9f1f5c7b1b9cd2c27c23c23770d78405ffe62646
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-bridgehead-carries-its-closure already carries every commit on main.
 ---
 
 # Ask
@@ -93,7 +101,7 @@ A stub carries every file its bridgehead imports, and a dead server costs one ro
 
 <!-- branch sync, so the branch carries trunk -->
 
-<!-- the form is command -->
+    ./RUNME.sh branch sync
 
 # split
 
