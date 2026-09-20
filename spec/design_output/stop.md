@@ -190,10 +190,12 @@ holds the door.
 | which todos you finish | they leave the queue |
 | which todos you add, each at its place | they land, up to `plan.mostOpen` open ones |
 
-The ask rides the grace, and the answer rides the `plan` call today. The
-next step lets it ride the agent's next message and level zero's own calls.
-A built-in tool refuses a field its schema names nowhere, so the answer
-rides no such call.
+The ask rides the grace, and the answer rides a channel the owner never
+reads: a `plan` field on any level zero call, or the `plan` call where none
+is due. A built-in tool refuses a field its schema names nowhere, so the
+answer rides no such call. The log shows what changed, and the queue shows
+the rest: the row at zero, a new row, a row gone. The count starts over at
+an answer, and the grace stands past a batch of calls sent at once.
 
 # The vote
 

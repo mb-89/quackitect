@@ -63,6 +63,15 @@ function planSpec() {
   };
 }
 
+// The field any level zero call carries, so the answer rides a call the agent makes anyway and costs none of its own. [[spec/design_output/stop#the-plan]]
+export function planField() {
+  return {
+    type: "object",
+    description: "The answer to the engine's three questions, riding this call: what you work on, which todos you finished, which you add.",
+    properties: planSpec().inputSchema.properties,
+  };
+}
+
 // The todos this box holds, off the runtime file, and none where the file stands nowhere. [[spec/design_output/stop#the-plan]]
 export function plansHere(box) {
   try {
@@ -109,6 +118,8 @@ function plans(e, box) {
   if (working) plan.working = working;
   writes(box, plan);
   reacted(box, PLAN);
+  // The count starts over at an answer, so the next ask stands the full span away. [[spec/design_output/stop#the-plan]]
+  box.calls = 0;
   box.log.say(
     "info",
     PLAN,

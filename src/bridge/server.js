@@ -27,7 +27,14 @@ import {
   SPOKE,
 } from "./answer.js";
 import { holdsGrace } from "./grace.js";
-import { asksForPlan, SPECS as planSpecs, TOOLS as planTools } from "./plan.js";
+import {
+  asksForPlan,
+  PLAN,
+  PLAN_CALL,
+  planField,
+  SPECS as planSpecs,
+  TOOLS as planTools,
+} from "./plan.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
@@ -141,7 +148,21 @@ function specsOf(box) {
     ...reportSpecs(),
     ...planSpecs(),
     ...proseSpecs(),
-  ];
+  ].map(withPlanField);
+}
+
+// Every level zero call takes the plan's answer as a field, so it rides a call the agent makes anyway. [[spec/design_output/stop#the-plan]]
+function withPlanField(spec) {
+  if (spec.name === PLAN) return spec;
+  const properties = { ...(spec.inputSchema?.properties ?? {}), plan: planField() };
+  return { ...spec, inputSchema: { ...(spec.inputSchema ?? { type: "object" }), properties } };
+}
+
+// The field on a level zero call answers the ask the way the plan call does. [[spec/design_output/stop#the-plan]]
+function planRides(e, box) {
+  const tool = String(e?.tool ?? "");
+  if (!e?.plan || typeof e.plan !== "object" || !tool.startsWith("mcp__level0__") || tool === PLAN_CALL) return;
+  planTools[PLAN_CALL](e.plan, box);
 }
 
 function pass() {
@@ -204,6 +225,7 @@ async function onToolCall(e, box) {
   asksForUpdate(e, box);
   // The engine's three questions come round every so many of the agent's own calls. [[spec/design_output/stop#the-plan]]
   if (!e?.agentId) {
+    planRides(e, box);
     box.calls = (box.calls ?? 0) + 1;
     asksForPlan(box, box.calls);
   }

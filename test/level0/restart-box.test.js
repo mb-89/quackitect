@@ -9,6 +9,7 @@ import { test } from "node:test";
 import { MINT_TOOL } from "../../.claude/skills/level0/lib/schema.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { TOOLS_BLOCK } from "../../src/bridge/guidance.js";
+import { plansHere } from "../../src/bridge/plan.js";
 import { boxOf, decide } from "../../src/bridge/server.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -51,6 +52,15 @@ test("a tool call on a fresh box registers the patch tool and the check tool", a
   assert.ok(specNamed(said.register, CHECK), "the check tool");
   // The plan door registers its call beside the rest. [[spec/design_output/stop#the-plan]]
   assert.ok(specNamed(said.register, "plan"), "the plan tool");
+});
+
+// The plan's answer rides any level zero call as a field, so it costs no call of its own. [[spec/design_output/stop#the-plan]]
+test("a plan field on a level zero call answers the ask, and every such call takes the field", async () => {
+  const box = restarted();
+  const said = await reads(box);
+  assert.ok(specNamed(said.register, "report").inputSchema.properties.plan, "the report call takes the field");
+  await decide({ event: "tool.call", e: { tool: "mcp__level0__report", text: "hi", plan: { working: "the door" } } }, box);
+  assert.equal(plansHere(box).working, "the door");
 });
 
 // The server counts the agent's own calls, so the plan's ask comes round on them and on no helper's. [[spec/design_output/stop#the-plan]]

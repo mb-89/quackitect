@@ -143,6 +143,8 @@ function waitsOnPerson(one) {
 export function answerOf(it, queue = true) {
   // The box's private notes stand in the queue beside trunk's tickets, because the pull hands them out too. [[spec/design_output/pull#the-queue-is-an-outline]]
   const read = { ...readWork(it, true), private: privateHere(it) };
+  // A desk's own edit stands on the disk before any commit, so trunk's copy reads off the working tree where the file stands there. [[spec/design_output/pull#a-todo-forces-a-place]]
+  read.loose = read.loose.map((one) => diskCopy(it, one));
   const standing = standingAll(read.stand);
   const now = it.clock ? it.clock.now().getTime() : 0;
   const stood = queue ? stoodHere(it) : new Map();
@@ -187,6 +189,16 @@ export function answerOf(it, queue = true) {
       .filter((one) => !branched.has(one.name) && !branched.has(fieldOf(one.text, GROUP)))
       .map((one) => rowOfTicket(one, places, stood, open)),
   };
+}
+
+// The working tree's copy of a trunk ticket, where one stands, so a place a person writes moves the row before any commit. [[spec/design_output/pull#a-todo-forces-a-place]]
+function diskCopy(it, one) {
+  if (!it.disk || !it.join || !one?.path) return one;
+  try {
+    return { ...one, text: String(it.disk.read(it.join(it.root, ...String(one.path).split("/")))) };
+  } catch {
+    return one;
+  }
 }
 
 // The private notes on this box, read the way the pull reads them, and nothing where the box holds none. [[spec/design_output/pull#the-queue-is-an-outline]]

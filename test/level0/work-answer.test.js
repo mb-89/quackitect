@@ -234,6 +234,17 @@ test("an outline place compares segment by segment, and the unplaced stands last
   assert.deepEqual(sorted, ["-2", "-1", "1", "1.2", "1.10", "2", "10"]);
 });
 
+// A place a person writes stands on the disk before any commit, and the verb reads it there. [[spec/design_output/pull#a-todo-forces-a-place]]
+test("the desk's own copy of a trunk ticket outranks git's, so a todo moves the row at once", () => {
+  const { it } = doors({
+    [join(ROOT, "spec/tickets/a-loose-one.md")]: LOOSE.replace("state: open\n", "state: open\ntodo: true\n"),
+  });
+  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
+  const said = answerOf(it);
+  assert.equal(said.loose.find((one) => one.name === "a-loose-one").queue, "1", "the todo on the disk puts the row first");
+  assert.equal(said.branches[0].queue, "2");
+});
+
 // A group on trunk with no branch stands in the answer with its kind, and its children beside it, so the tab nests them. [[spec/design_output/tree-view#the-name-column-nests]]
 test("the answer carries a group with no branch, its children, and the whole ask", () => {
   const { it } = doorsSaying(

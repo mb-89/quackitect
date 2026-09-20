@@ -80,8 +80,10 @@ test("the ask opens every so many calls, answers the tool, and drops its third q
   assert.equal(it.box.grace.tool, PLAN_CALL, "the ask names the call that answers it");
   assert.match(it.box.grace.react, /mcp__level0__plan/, "the ask says what answers it");
   assert.match(it.box.grace.why, /work on now.*finish.*add/);
+  it.box.calls = 10;
   plan({ working: "the door" }, it.box);
   assert.equal(it.box.grace, null, "the call answers the ask");
+  assert.equal(it.box.calls, 0, "the count starts over at an answer");
   plan({ add: [{ title: "one" }, { title: "two" }] }, it.box);
   assert.equal(asksForPlan(it.box, 20), true);
   assert.doesNotMatch(
