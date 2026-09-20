@@ -188,8 +188,8 @@ The reading takes a rule file of its own, because a section standing a file off
 imports no door, so the two rules want two switches.
 
 A rule under `spec/config/styles` reads one buffer and no path, so the pass list
-belongs where every other path rule stands. `.vale.ini` already holds a section
-for the doors, their fakes, the editor and the hooks modules.
+belongs where every other path rule stands. Vale skips its own styles folder, so
+the rule file meets none of its own tokens.
 
 The readings:
 
@@ -197,7 +197,21 @@ The readings:
 - a root builds the hand every other module takes, so it reads the environment once
 - the Go rule reads an import line, so one file of a package names the outside
 
-| the section `.vale.ini` gains | why it stands off |
+Every section standing `DoorsOnly` off names the new rule as well. A door reads
+the environment, a fake stands in for a door, and a hooks module runs where no
+door reaches:
+
+| the section standing today | why the new rule stands off there too |
+|---|---|
+| `**/src/doors/*.js` | `src/doors/proc.js` hands a child the environment it holds |
+| `**/src/doors/fake/*.js` | a fake stands in for a door, and takes the same road |
+| `**/.claude/skills/level0/hooks/*.js` | the hooks module reads the environment on its entry line |
+| `**/src/stub/.claude/skills/level0/hooks/*.js` | the stub copies that module out of the template |
+| `[*.{md,markdown,txt}]` | a note names the read in prose, and two tickets do today |
+
+The sections `.vale.ini` gains, each naming the new rule alone:
+
+| the section | why it stands off |
 |---|---|
 | `**/test/contract/*.js`, `**/test/level0/*.js` | a case reads the environment to drive a door, and sets one around itself |
 | `**/src/scripts/cli*.js` | the command roots build the `it` every verb takes |
@@ -205,8 +219,13 @@ The readings:
 | `**/src/scripts/trust.js`, `**/src/scripts/copilot.js` | each opens on its own line of arguments, the way a hook does |
 | `**/src/scripts/editor.js` | the editor's own root, which reads the environment on its entry line |
 | `**/src/bridge/server.js` | the server root builds the box each door reads |
-| the section standing `editor*.js` off reads `*.js` | the extension stands as its own door layer, as the editor files do |
+| `**/src/extension/*.js` | the extension loads as CommonJS, so its own files are its door layer |
 | `**/src/*/door.go` | each Go package names the outside in that one file |
+
+The extension takes a section of its own, because the section standing
+`editor*.js` off gives up the `node:` import guard where it grows. The new
+section names the new rule alone, so that guard holds over
+`src/extension/extension.js` and `src/extension/sidebar.js`.
 
 Every other module takes the value off the hand. The implement step moves them,
 and the two the ask names open the list:
@@ -233,14 +252,15 @@ hand writes.
 
 The rule reads the three the ask names, and three more reads stand outside it:
 
-| the read | where it stands |
-|---|---|
-| `process.pid` | `src/scripts/vehicle.js` |
-| `process.version` | `src/scripts/cli-check.js` |
-| `process.execPath` | `src/scripts/cli-doors.js` |
+| the read | where it stands | what a grown rule meets |
+|---|---|---|
+| `process.pid` | `src/scripts/vehicle.js` | a module past a root |
+| `process.execPath` | `src/bridge/review.js` | a module past a root |
+| `process.version`, `process.execPath` | `src/scripts/cli*.js` | a root the list passes already |
 
-A private note carries the three, and the retro decides whether the rule grows
-to meet them.
+A private note carries the reads, and the retro decides whether the rule grows
+to meet them. The doors and the editor files read the exec path too, and the
+sections above pass all three.
 
 The Go rule reads an import of `os/exec`, which runs a command. Each package
 names that import in its `door.go`, and `src/index` holds one today.
