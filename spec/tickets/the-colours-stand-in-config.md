@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -175,6 +175,10 @@ record:
     hash_after: 86bd2655e59892adebd5d925716d233748015161
     returns: 1
     why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | yes, the numbers stand in one config file and the window reads them there |; | is what the diff touches beyond the ask trivial | yes, the shared reader and the two notes the approach names |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does a retro stand in the handback | no |; | does every rule the branch adds carry a case | yes, a case per layer over a fixture root, and a case walking the window's own folder |; | does that case refuse something bad | yes, a file holding a colour number fails it by name |; TL;DR:; The road lands. `grep -rn 'lipgloss.Color(\"' src/viewer` answers the case file alone, and the window asks the config for what it wears.; `gofmt -l src` names `src/viewer/tabs.go`, and names no other file in the tree. The `openStyle` the change lifts leaves its blank line behind.; Go format rides in no gate, so this step catches that or nothing does.; The findings, one a line:; `src/viewer/tabs.go` carries a spare blank line where `openStyle` stood, and `gofmt -l src` names it. The same command over `main` names nothing.; `./RUNME.sh check` runs the cases and the rules, and reads no Go format. So the class this fault belongs to rides in no gate.; `spec/config/styles/colours.json` spells the spare list and the bold map in its comment. [[spec/design_output/viewer#colours]] spells both again, so point the comment at the chapter.; [[spec/design_output/viewer#colours]] names a colour in words for the prompt, the reply, the warning and the error. The file owns those values now, so a person editing one leaves the prose standing.; `spare` stands as a map keyed by a number written as text, and `orderedValues` sorts those keys as text. A key growing past one digit then reads out of its place.; `src/config/config_test.go` spells the colours file's path, where `coloursAt` in `src/viewer/colour.go` owns it. The fixture wants a path of its own.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | `gofmt -l src` names no file | open |; | 2 | the reflect step names the class, and says where a Go format gate stands | open |; | 3 | the colours file's comment points at the chapter | open |; | 4 | the colour words in [[spec/design_output/viewer#colours]] point at the file | open |; | 5 | the verdict hand reads the branch again | open |"
+  - step: implement/reflect
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 884bf3931dba0cb4ab981d45f219fe12b26e1641
+    hash_after: 884bf3931dba0cb4ab981d45f219fe12b26e1641
 ---
 
 # Ask
@@ -346,14 +350,30 @@ The first finding asks what answers the line about the window's own code. The ca
 ### class
 
 <!-- the class of error the findings describe, and the fix for the class -->
-
 <!-- the form is text -->
+
+Three classes carry the six findings.
+
+| the class | the findings in it | the fix for the class |
+|---|---|---|
+| a rule no gate reads | the spare blank line, and the gate that misses it | `gofmt -l` runs beside `go test`, one call a module, in `goHolds` |
+| a fact standing twice | the comment, the colour words, the path the case spells | each place points at the one holding the fact |
+| an order read off text | the spare keys sorting as text | the list keeps the file's own order |
+
+The first class is the one the verdict names. Every rule this tree holds runs at the write door or in the check. Go's own format runs in neither, so a hand's eye is the only gate, and an eye misses a blank line.
+
+The second class is the voice rule about saying a thing once. A value moving out of code leaves prose behind it, and that prose goes stale where nobody points it at the new home.
+
+The third class is narrower. A map carries no order, so a list written as a map reads its order off its keys. Text order and number order part at the tenth key.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The check gains the format gate, which the class fix names. Every other file stands in the table the approach carries.
+- every door the change reaches has a fake. The gate runs the tool through the door the check runs every other tool through.
+- a comment names the approach the change implements. The gate carries a line naming the class it closes.
 
 ## change
 
