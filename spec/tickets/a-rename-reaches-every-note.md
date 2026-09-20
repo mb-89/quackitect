@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -194,6 +194,10 @@ record:
     hash_after: ca07c7fd3a1b9008d9686a1a0063295a1d78d81c
     returns: 2
     why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | no, the split ticket stands `draft`, and the queue takes `open` |; | is what the diff touches beyond the ask trivial | yes, each file outside the ask takes the new name |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |; | does every rule the branch adds carry a test | yes, each move of the verb takes a case |; | does a case feed the rule something bad | yes, a file with no ending, a picture, and a name standing nowhere |; | what grade do the findings take | craft, because one verb run and one field carry the fix |; TL;DR:; This round closes each of the five findings the verdict before it names.; `spec/tickets/the-window-splits-by-tab.md` stands `draft`, and the queue reads `open` alone.; So the ask's first bullet lands in a ticket no pull hands out.; The findings, one a line:; `filesUnder` in `src/scripts/rename.js` answers every file, whatever the ending of its name.; A case feeds the move a file with no ending and a picture, and asserts each lands.; `spec/funnel/a-button-makes-a-vehicle.html` and the ignore file each take the new name.; `git ls-files` names no binary under the window's folder, so this round drops it.; `spec/design_output/vehicle.md` points at `stubFolders`, which owns the stub's folder names.; `spec/tickets/the-window-splits-by-tab.md` stands tracked, and carries the package table.; `placesIn` in `src/scripts/work-answer.js` queues a ticket whose `state` reads `open`.; That ticket reads `draft`, so the queue holds it nowhere and no pull hands it out.; Its Ask passes Vale, so `./RUNME.sh ticket open` takes it as it stands.; It names no `group`, where every sibling on this branch names one.; `BINARY` in `src/scripts/rename.js` reads an ending, so a binary with none rewrites.; The ignore file names `src/tui/viewer`, which the module `quackitect/tui` builds nowhere.; The package table stands in this ticket's approach and in the ticket it mints.; `./RUNME.sh check` exits 0, and `./RUNME.sh links` answers no row holding a renamed name.; `HANDOVER.md` carries no retro, and `./RUNME.sh branch review` names that as its one fix.; The fixes, one a line:; Run `./RUNME.sh ticket open the-window-splits-by-tab`, so the queue reaches it.; Name `group: the-tree-names-its-things` on it, so it lands under this branch.; Read a file by the bytes it holds, so a binary with no ending stands.; Drop the `src/tui/viewer` rows from the ignore file, which name a build standing nowhere.; Point this ticket's approach at the minted ticket, which owns the package table now.; Write the retro into `HANDOVER.md` before the branch hands back."
+  - step: implement/reflect
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 0887558208a91bac98d8c437250847ad76b39b87
+    hash_after: 0887558208a91bac98d8c437250847ad76b39b87
 ---
 
 # Ask
@@ -340,27 +344,27 @@ The second case carries the part that surprises me. A rewrite over the bare word
 <!-- the class of error the findings describe, and the fix for the class -->
 <!-- the form is text -->
 
-Two classes carry the findings.
+One class carries the findings, and it stands one step along from the round before.
 
-| the class | the findings in it | the fix for the class |
+| the round | where the thing landed | who reads it there |
 |---|---|---|
-| a walk answers a part, and its caller reads it as the whole | the tracked binary, the two names the rewrite misses, the files a move drops | `filesUnder` answers every file, and each caller names the part it wants |
-| a decision lands where git holds nothing | the folder per tab, parked as a note | the split mints as a tracked ticket, which the branch hands on |
+| the one before | a note under the private folder | nobody, because git ignores that folder |
+| this one | a ticket reading `state: draft` | nobody, because the pull queues an open ticket |
 
-The first class is one function read two ways. `filesUnder` filters by ending, and both callers take it as every file. The move copies that list and removes the source, so a file outside the list falls away. The rewrite reads the same list, so a name with no ending and a page of markup stand outside every rename.
+The class is a thing parked where its reader looks nowhere. Each round moved the thing one step closer and stopped short of the reader. A mint writes a draft, and a draft waits for `ticket open`, which this round leaves unrun.
 
-The binary under the window's folder is that class standing. The move carried it, the ignore line named the old path, and the rewrite reached neither. The note repeating the stub's folders is the voice rule about one owner, and it lands in the same round.
+The fix for the class is one move: run the reader after you park a thing, and read what it answers. `./RUNME.sh ticket pull` from trunk is that reader for a ticket, and `git ls-files` is that reader for a file. A park stands where its reader answers it.
 
-The second class is the sharper one. A note under the private folder is a thing git ignores, so a line the ask asks for stands in no tracked file. The verdict names that right: either the split lands here, or it mints as a ticket a reader finds. This round mints it.
+The smaller findings ride the same shape. `BINARY` names endings, so a file without one reads as text, which is the ending list of the round before under another name. The ignore rows name a file the build writes nowhere. The package table stands in two tracked files, where the voice rule gives a fact one owner.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The verb, its cases, the ignore line, the page of markup, the vehicle note, and the ticket this round mints.
-- every door the change reaches has a fake. Each case drives the fake disk, and the new case feeds it a file with no ending.
-- a comment names the approach the change implements. The walk's comment names what it answers, and each caller names the part it takes.
+- the change touches no file the ask leaves out. The verb, the ignore rows, the minted ticket, and the note taking the package table.
+- every door the change reaches has a fake. The case reading bytes hands its own disk, as each case beside it does.
+- a comment names the approach the change implements. The reader of bytes says why it reads them, and the note owns the table.
 
 ## change
 
