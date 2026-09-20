@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -129,6 +129,17 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote · helper-8
     hash_before: f937ee861d4fed0f3e51e61e10fc4224e9ebcfb9
     hash_after: f937ee861d4fed0f3e51e61e10fc4224e9ebcfb9
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 647ed7c4f80977b35605c66a89dc56d1afd31b28
+    hash_after: 647ed7c4f80977b35605c66a89dc56d1afd31b28
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -233,20 +244,36 @@ The findings, one a line:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/one-reading.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The command answers assertion, and each case fails on its own assertion.
+
+| the case | what it holds open |
+|---|---|
+| one guard names Biome for both fronts | `biomeFor` stands nowhere, and the command line holds its own guard |
+| the guard hands nothing where no binary stands | `biomeFor` stands nowhere |
+| each front's route answers one count | `readingCounts` stands nowhere |
+| the working note asks for a claim read in the owner's view | the note carries no such rule |
+
+Every case stands under `test/contract`, because each reads the tree that ships or drives the real tools. A case over a fake would read a guard nobody runs.
+
+The count case asks the shared reader for both routes, so the case holds one name and the reader holds the doors. That surprises me: the first shape had the case build each front's doors, which put the command line's wiring in a case file. The shape here leaves each front's doors where that front owns them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. One case file and this ticket.
+- every door the change reaches has a fake. The guard case hands its own disk, and the rest read the tree that ships.
+- a comment names the approach the change implements. The file's header names the chapter, and each case points at this ticket.
 
 ## reflect
 
