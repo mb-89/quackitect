@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 508497e79c37bfb21587a55e64c588b165a3d343
     returns: 1
     why: "| the finding | the fix |; |---|---|; | The import rule lands red. Modules under `src/bridge` stand with a test naming none of them | Name the route to green: the tests to write, or a rule firing on a changed module alone |; | The exception has no reader. `.githooks/pre-commit` hands the door the staged delta alone | Put the exception where a door already reads, or name the door reading the message |; | The first reading and the door disagree. `src/scripts/precommit.js` reads the staged delta, and the approach wants the branch against trunk | Say which text the hook and the check both read, because one text answers both |; | `.claude/skills/level0/lib/tree.js` stands near the bound `code.fileLines` sets | Name where the import rule lands, and what moves out to make room |; | `spec/design_output/tree.md` owns the table naming every tree rule | Add the row for the import rule, and link the note from the approach |; | `spec/design_output/doors.md` owns \"door\" for a thing under `src/doors` | Name the thing under `src/bridge` by its own word, so one word holds one thing |; What holds:; Rule five of [[spec/guidance/code/testing]] is the rule the ask points at.; A tree rule is the place for a rule weighing two files. [[spec/design_output/tree]]; `behaves` stands nowhere yet, so the third program writes it."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 3a1ce80be7534909ad81d02232a9ab310fd74e5c
+    hash_after: 3a1ce80be7534909ad81d02232a9ab310fd74e5c
 ---
 
 # Ask
@@ -130,20 +134,42 @@ Three programs stand, one for each line the ask names:
 
 | what holds it | where it lands | what it reads |
 |---|---|---|
-| the commit door | `src/scripts/precommit.js` | the branch against trunk: a change under `src` wants a test in that delta |
-| a tree rule | `.claude/skills/level0/lib/tree.js` | every module under `src/bridge`, against the paths the tests import |
-| a fake's own guard | `src/doors/fake` | a call the fake lacks, which throws in place of answering nothing |
+| the commit door | `src/scripts/precommit.js` | the staged delta, which the hook pipes in |
+| a rule over a pair | `.claude/skills/level0/lib/tested.js` | a module of the server the delta touches, against the paths the tests import |
+| a fake's own guard | `src/doors/fake/behaves.js` | a call the fake lacks, which throws in place of answering nothing |
 
 The readings:
 
-- the delta spans the branch, so a test landing in an earlier commit counts as beside it
-- the rule reads a source file as a tracked `.js` under `src`, outside the fakes and outside a projection target
-- the import rule reads a test naming the module by path, so a door nobody drives comes back named
+- the door reads the staged delta alone, the one text the hook and the Bash check both read
+- a change touching a tracked `.js` under `src` wants a test file in the same delta
+- the rule reads a source file outside the fakes and outside a projection target
+- the import rule reads a test naming the module by path, so a change to it comes back named
 - `behaves(fake, name)` wraps each fake in one place, and every door's fake takes it there
 
-A change carrying no test names why on one line of the commit message, and the
-door reads that line. So the record holds the exception, and a reader meets it
-where the change stands.
+The delta carries the whole answer, so no exception rides on the commit message.
+A hand meeting the refusal writes the test, and the door names the rule and the
+file it stands on.
+
+The import rule reads the modules the delta touches, so it lands green and bites
+on each change from here. Nine modules of the server stand with no test naming
+them today:
+
+| the module | the module |
+|---|---|
+| `apply.js` | `ask.js` |
+| `config.js` | `prose.js` |
+| `review.js` | `search.js` |
+| `status.js` | `tools.js` |
+| `window.js` | |
+
+Each one comes back the first time a hand touches it, and
+`a-test-names-every-module` carries the nine as its own work.
+
+`.claude/skills/level0/lib/tree.js` stands within a few lines of the bound
+`code.fileLines` sets, so the new rule takes a module of its own beside it.
+`spec/design_output/tree.md` tables every rule weighing two files, so the table
+takes the row for this one, and the design output says what each program reads.
+[[spec/design_output/tree#the-rules-over-two-files]]
 
 Rule five of [[spec/guidance/code/testing]] is the rule these hold. So that line
 points at the check, and no reader holds the rule in memory.
