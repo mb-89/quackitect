@@ -182,7 +182,7 @@ per step, Children and private tickets, and the three rules at the top.
 | the derived `children` | `work.js` | a parent advances once every child closes `done` or `became`, and a `dropped` child sends it to `on_fail` |
 | the private queue | `work.js` | a box's private tickets come after the group's run out |
 | the stop rule | `spec/config/stop/level1.yml` | `work-waiting` reads the session's hold |
-| the plugin wrapper | `.claude/skills/level1/` | the pull runs under the tool, and the judge check runs there alone |
+| the plugin wrapper | `.claude/skills/level0/` | the pull runs under the tool, and the judge check runs there alone |
 
 **The rules to hold.**
 
@@ -351,7 +351,7 @@ splice stands as a term under spec/vocabulary/terms.yml, so the hand-back passes
     - .claude/skills/level0/lib/ticket.js
     - .claude/skills/level0/lib/todo.js
     - .claude/skills/level0/lib/vocabulary.js
-    - .claude/skills/level0/hooks/level1.js
+    - .claude/skills/level0/hooks/pull-tool.js
     - .claude/skills/level0/lib/pull.js
     - .vale.ini
     - spec/config/level0.json

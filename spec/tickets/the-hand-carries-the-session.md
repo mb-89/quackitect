@@ -376,7 +376,7 @@ The hand now names the box, the session on it and the agent inside it, and the p
 
 - .claude/skills/level0/hooks/level0.js
 - .claude/skills/level0/lib/copilot.js
-- .claude/skills/level0/hooks/level1.js
+- .claude/skills/level0/hooks/pull-tool.js
 - .claude/skills/level0/lib/pull.js
 - .vale.ini
 - spec/design_output/pull.md

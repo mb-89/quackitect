@@ -136,7 +136,7 @@ Three changes, each in one place, and a test driving the hook the pull rests on.
 | the module | what holds it |
 |---|---|
 | `.claude/skills/level0/hooks/level0.js` | its own plugin folder |
-| `.claude/skills/level0/hooks/level1.js` | its own plugin folder |
+| `.claude/skills/level0/hooks/pull-tool.js` | its own plugin folder |
 | `src/scripts/hand.js` | the tree |
 
 A plugin imports nothing past its own folder, which is the reason each boundary keeps a copy. The hook and its library stand inside one folder, so that copy goes and the other two stay. Each remaining copy names the boundary forcing it, beside the line.

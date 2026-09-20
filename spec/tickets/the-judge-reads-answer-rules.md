@@ -458,7 +458,7 @@ The note writes the mark in a code span, because the paragraph rules admit the c
 
 - .claude/skills/level0/lib/guidance.js
 - .claude/skills/level0/lib/projection.js
-- .claude/skills/level0/hooks/level1.js
+- .claude/skills/level0/hooks/pull-tool.js
 - .claude/skills/level0/lib/pull.js
 - spec/design_output/pull.md
 - spec/guidance/review/reviewing.md

@@ -498,12 +498,17 @@ runs `run`, then `decide`, which a person takes:
 | grow | a ticket of its own carries it, and the experiment closes `became` |
 
 `retro audit` answers the trials standing open, and the retro's `audit` step
-names it as a need. So a retro closing over an open trial leaves the tree
-carrying that trial, and the step holds until each one decides.
+runs it as a command its evidence names. A need names a verb a box holds, and
+reads the tree nowhere. So the hold stands in the evidence, and the need stands
+beside it.
 
 The audit's checklist carries the same rule for a hand to read, and points at
 the verb. The verb owns the rule, because a hand reading a list misses what a
 walk of the tickets answers.
+
+A trial minted before this process ends under the ticket closing it, which
+records the decision and the reason. Every trial after this one carries a
+ticket of the process from its first day, as the route above says.
 
 # A box off a branch
 

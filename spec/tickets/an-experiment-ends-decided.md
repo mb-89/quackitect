@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -159,6 +159,14 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: d33c174fc296a61f0962bf009d1b445417c9e063
     hash_after: d33c174fc296a61f0962bf009d1b445417c9e063
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 76d502f16c050f351f6ef017bb13c0490c795418
+    hash_after: 76d502f16c050f351f6ef017bb13c0490c795418
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -193,7 +201,7 @@ Level one holds the tool a hand pulls through and the judge reading a hand-back.
 |---|---|
 | `spec/processes/experiment.yaml` | a route whose last step is `decide` |
 | `spec/processes/retro.yaml` | its `audit` step holds while an experiment ticket stands open |
-| `.claude/skills/level0/hooks/level1.js` | takes the wrapper's hook module, beside the one level zero holds |
+| `.claude/skills/level0/hooks/pull-tool.js` | takes the wrapper's hook module, beside the one level zero holds |
 | `.claude/skills/level0/lib/pull.js` | takes the wrapper's library, beside the libraries level zero holds |
 | `.claude/skills/level0/hooks/hooks.json` | names the second module in its `modules` list |
 | `.claude/skills/level0/.claude-plugin/plugin.json` | keeps its own name, and its description says the pull tool rides here |
@@ -347,9 +355,9 @@ The other rows ride the same shape. A name a hand writes stands until a reader r
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The process, the retro's route and verb, the two folders, and every file reaching them.
-- every door the change reaches has a fake. The audit's cases hand the retro their own disk and log.
-- a comment names the approach the change implements. The one module says why it calls the bridgehead, and the note names each decision.
+- the change touches no file the ask leaves out. The retro's route, the notes naming the moved module, the design input's twin, and one case file.
+- every door the change reaches has a fake. The verb's cases hand their own disk, and the route cases read the tree under test/contract.
+- a comment names the approach the change implements. The step's evidence says what the verb answers, and the note says what a decided trial leaves.
 
 ## tests-green
 
@@ -416,7 +424,7 @@ The audit reads the process a ticket names, where `retro notes` reads the folder
 - .claude/skills/level0/hooks/hooks.json
 - .claude/skills/level0/hooks/pull-tool.js
 - .claude/skills/level0/lib/pull.js
-- .claude/skills/level1/.claude-plugin/plugin.json
+- .claude/skills/level0/.claude-plugin/plugin.json
 - .claude/skills/level1/hooks/hooks.json
 - .claude/skills/level1/hooks/level1.js
 - .claude/skills/level1/lib/pull.js
