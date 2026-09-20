@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -121,6 +121,10 @@ record:
     hash_after: a1d0cfac1a84465ae895ca917c94e045df39f3c1
     returns: 3
     why: "`./RUNME.sh lint spec` hands the checker a folder, and `Over` reads one path.; Say how a folder path reaches `RestatedPointer` and `RestatedRule`, because the ask names that verb.; Name the JavaScript writing `RestatedTable`, because the projection writes every rule file.; Name the `rules` entry carrying warning, because the projection writes the level from that map."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: ec2576e45e1c08e43a87cea00bfbfad6d2ec29ac
+    hash_after: ec2576e45e1c08e43a87cea00bfbfad6d2ec29ac
 ---
 
 # Ask
@@ -178,9 +182,17 @@ Each bound stands where its rule reads it:
 | `restated.pointer` | `spec/config/level0.json`, with its entry in `spec/config/level0.schema.json` |
 | `restated.rule` | the same pair |
 
+A folder reaches the pair through the front:
+
+- `checks` in `src/lsp/main.go` hands each argument to `Over`, and `Over` reads one path
+- so `checks` walks a folder into the notes under it, off `Tree.Paths`, and hands each one over
+- `rulesFrom` in `.claude/skills/level0/lib/paragraph.js` writes the Vale rule off the schema
+- `sideOf` there reads the level out of the schema's `rules` map, which gains `RestatedTable: warning`
+
 The cases: the Go pair stands in `src/lsp/restated_test.go`, over the tree its
 fixture writes. The Vale rule takes a case in `test/contract/paragraph.test.js`,
-beside the rules the same schema projects.
+beside the rules the same schema projects. A case over `checks` hands it a
+folder, and reads a finding of a note under it.
 
 Each rule lands at warning, and the implement step lists what it names over the
 tree. The ticket cleaning those places turns them to error. So this one leaves
