@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -178,6 +178,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box fa49097ce66c · claude-code-remote · helper-14
+    hash_before: fbf6af86af3d4e7d4fdcd75f17f07cf706c82f69
+    hash_after: fbf6af86af3d4e7d4fdcd75f17f07cf706c82f69
+reason: done
 ---
 
 # Ask
@@ -480,15 +485,16 @@ the chat does.
 <!-- the form is files -->
 
 - .claude/skills/level0/lib/answer.js
+- spec/design_output/extension.md
 - spec/design_output/level0.md
 - spec/tickets/the-answer-door-reads-chat.md
 - src/bridge/answer.js
+- src/bridge/report.js
 - test/level0/answer-door.test.js
 - test/level0/answer.test.js
 - src/bridge/server.js
-- src/bridge/report.js
-- spec/design_output/extension.md
-- src/engine/projection.js
+- src/bridge/ask.js
+- spec/guidance/review/reviewing.md
 
 ## verdict
 
@@ -496,19 +502,24 @@ the chat does.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- the header of `src/bridge/report.js` holds the claim this branch overturns, that a chat text waits for turn end
-- `spec/design_output/extension.md` line 410 holds the same claim, and links to the chapter now saying the opposite
-- an ask under `ask.wanted` takes a fitting chat text too, so that chapter's rule about the tool reads false
-- the chapter What the refusal says quotes the lib `SAYS` in full, and the case holds the constant alone
-- so the chapter's claim that a case keeps the two together overstates what the tree holds
-- the three display cases run green before the change, and the wording case alone carries red
-- `onMessageDisplay` pays off `delta`, and `src/bridge/server.js` wires it at `classic.MessageDisplay`
-- the blank-text case feeds the door an empty delta and asserts the refusal `{ needs: "reply" }`
-- the change reaches the six files the design table names, and each hunk answers a row of it
+- the branch answers the ask: a chat answer pays the door, and the call under it passes
+- `onMessageDisplay` reads `delta` and pays, and `src/bridge/server.js` wires it at `classic.MessageDisplay`
+- three cases cover a text between two calls, the call under it, and a blank text
+- the blank-text case feeds the door an empty delta and reads the refusal `{ needs: "reply" }`
+- the header of `src/bridge/report.js` links at the chapter, so the first finding of the last verdict lands
+- `spec/design_output/extension.md` names both roads, so the second and third findings land
+- a fitting chat text pays an ask too, because `onMessageDisplay` reads `fits` before it pays
+- the chapter What the refusal says quotes the lib `SAYS` word for word today
+- the case in `test/level0/answer.test.js` reads three of the four lines of that `SAYS`
+- so the chapter line "a case there asserts each line of them" overstates what the case holds
+- the wording case in `answer-door.test.js` matches a bare `pays`, which a looser rewrite passes too
+- the header of `src/bridge/answer.js` names the bridgehead road alone, and the chat road goes unnamed
+- the diff reaches eight files, each answering a row of the design table or a finding
+- a search over the tree turns up no other copy of the claim this branch overturns
 - `./RUNME.sh check` answers 0 on this branch
-- the branch review reads the retro as absent
+- the branch review reads the retro as absent from the handback
 
 ## checked
 
@@ -516,7 +527,7 @@ fail
 
 <!-- the form is checklist -->
 
-- two `SAYS` constants each serve one door, and the chapter repeats the lib words, so findings four and five stand
+- the chapter owns the claim, both copies link at it, and the quoted `SAYS` names its file
 
 # Discussion
 
