@@ -242,6 +242,25 @@ test("the manifest names every file with its size and source, and the verb print
   assert.equal(record.counts, undefined, "a count derives off the manifest");
 });
 
+// [[spec/guidance/retro/effect]]
+test("collect keeps the battery's report beside the record, one a retro", () => {
+  const battery = { parts: { tests: 12 }, total: 12, slowest: [{ name: "a case", ms: 9 }] };
+  const stamp = { sha: "abc123", ok: true, clean: true, warnings: 0, battery };
+  const it = doors({ ...FILES, [at(".se/.runtime/check.json")]: JSON.stringify(stamp) });
+
+  heard(() => retro(ROOT, ["collect", RETRO], it));
+
+  assert.deepEqual(JSON.parse(it.disk.read(at(`.se/.retro/${RETRO}/battery.json`))), battery);
+
+  const bare = doors();
+  heard(() => retro(ROOT, ["collect", RETRO], bare));
+  assert.equal(
+    bare.disk.exists(at(`.se/.retro/${RETRO}/battery.json`)),
+    false,
+    "a stamp carrying no report leaves none behind",
+  );
+});
+
 // The last retro's collect opens the window, and the memory is standing state. [[spec/guidance/retro/collect]]
 test("a transcript older than the last collect stays out, and the memory comes whole", () => {
   const before = Date.parse("2026-09-10T00:00:00.000Z");

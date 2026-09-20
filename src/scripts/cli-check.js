@@ -14,7 +14,6 @@ import {
   readAll,
   staleIn,
 } from "../../.claude/skills/level0/lib/projection.js";
-import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
 import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
@@ -26,7 +25,6 @@ import {
   SETTINGS,
   SETTINGS_LOCAL,
 } from "../../.claude/skills/level0/lib/vehicle.js";
-import { filesOn } from "../../.claude/skills/level0/lib/warnings.js";
 import { guidanceHere } from "../bridge/guidance.js";
 import {
   bin,
@@ -52,7 +50,7 @@ import {
   STYLES,
   settings,
 } from "./cli-doors.js";
-import { namesIn, show, walk, warningsStood } from "./cli-read.js";
+import { namesIn, show, walk } from "./cli-read.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { formatFaults, goEnvOf, goModulesIn } from "./cli-go.js";
 import { HOOKS } from "./precommit.js";
@@ -354,24 +352,7 @@ export function portHere() {
   }
 }
 
-// [[spec/design_output/work#the-battery-answers-first]]
-export function stamped(code) {
-  const sha = it.git.run(["rev-parse", "HEAD"], true).out;
-  const clean = !it.git.run(["status", "--porcelain"], true).out;
-  // The list the lint left, so a door reading the stamp counts the warnings without a lint of its own. [[spec/tickets/the-spawn-reaches-its-guidance]]
-  const stood = warningsStood();
-  const said = {
-    sha,
-    ok: code === 0,
-    clean,
-    at: it.clock.now().toISOString(),
-    warnings: stood.length,
-    files: filesOn(stood),
-  };
-  files.makeDir(join(root, ".se"));
-  files.write(join(root, STAMP), `${JSON.stringify(said, null, 2)}\n`);
-  return code;
-}
+// The stamp the check leaves stands in cli-stamp.js. [[spec/design_output/work#the-battery-answers-first]]
 
 // [[spec/guidance/code/testing]]
 

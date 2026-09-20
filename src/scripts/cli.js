@@ -23,7 +23,6 @@ import {
   projectionsHold,
   readConfig,
   serverHolds,
-  stamped,
   standing,
   tools,
   treeHere,
@@ -42,7 +41,10 @@ import {
   root,
   TESTS,
 } from "./cli-doors.js";
+import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { asksIndex, lint, version } from "./cli-read.js";
+import { batteryOf } from "./battery.js";
+import { batteryRun, stamped } from "./cli-stamp.js";
 import { graphIn } from "./graph.js";
 import { probe } from "./probe.js";
 import { withRoute } from "./process.js";
@@ -65,20 +67,28 @@ import { cloud, pulling, work } from "./work.js";
 
 // The root reads the platform once, and the register road takes it off the hand. [[spec/design_output/doors#a-door-reads-the-outside]]
 const WINDOWS = process.platform === "win32";
+// The runner writes its TAP beside the stamp, so the battery's report names the slowest cases. [[spec/guidance/retro/effect]]
+const TAP = `${RUN}/tests.tap`;
 
 export const verbs = {
   check: {
     says: "the tests, the doors, the server, then the rules over the tree",
-    run: async (w) =>
-      stamped(
-        test() ||
-          goHolds() ||
-          doorsHold() ||
-          projectionsHold() ||
-          pluginHolds() ||
-          (await serverHolds()) ||
-          (await lint(w)),
-      ),
+    // Each part runs timed, so the stamp carries the battery's report and a retro reads it. [[spec/guidance/retro/effect]]
+    run: async (w) => {
+      const { code, parts } = await batteryRun(
+        [
+          ["tests", () => test()],
+          ["go", () => goHolds()],
+          ["doors", () => doorsHold()],
+          ["projections", () => projectionsHold()],
+          ["plugin", () => pluginHolds()],
+          ["server", () => serverHolds()],
+          ["rules", () => lint(w)],
+        ],
+        it.clock,
+      );
+      return stamped(code, batteryOf(parts, tapHere()));
+    },
   },
   lint: { says: "the rules over the tree, or over what you name", run: lint },
   fix: { says: "the fixes a program can make", run: fix },
@@ -323,11 +333,27 @@ export function serveBridge(argv) {
 // [[spec/design_output/tui#the-verb-builds-it]]
 
 export function test() {
-  const ran = outside.run([process.execPath, "--test", TESTS, CONTRACT_TESTS], {
-    cwd: root,
-    inherit: true,
-  });
+  files.makeDir(join(root, ...RUN.split("/")));
+  const ran = outside.run(
+    [
+      process.execPath,
+      "--test",
+      "--test-reporter=spec",
+      "--test-reporter-destination=stdout",
+      "--test-reporter=tap",
+      `--test-reporter-destination=${join(root, ...TAP.split("/"))}`,
+      TESTS,
+      CONTRACT_TESTS,
+    ],
+    { cwd: root, inherit: true },
+  );
   return ran.exitCode;
+}
+
+// [[spec/guidance/retro/effect]]
+function tapHere() {
+  const at = join(root, ...TAP.split("/"));
+  return files.exists(at) ? files.read(at) : "";
 }
 
 // [[spec/design_output/projection#what-goes-where-is-data]]

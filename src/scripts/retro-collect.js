@@ -6,6 +6,7 @@
 
 import { LOG, PRIVATE, RETRO } from "../../.claude/skills/level0/lib/folders.js";
 import { STAMP, saysGreen, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import { BATTERY } from "../engine/retro/effect.js";
 import { holdsAnywhere } from "./guidance-hand.js";
 import { outsideInto } from "./retro-outside.js";
 
@@ -83,6 +84,9 @@ export function collect(it, name, again = false) {
     it.join(home, COLLECTED),
     `${JSON.stringify({ at, since: since ? new Date(since).toISOString() : "", folders: outside.folders }, null, 2)}\n`,
   );
+  // The battery's report the retro opens on, kept one a retro, so the next effect step reads the two side by side. [[spec/guidance/retro/effect]]
+  const report = parsed(read(it, it.join(it.root, ...STAMP.split("/"))))?.battery;
+  if (report) it.disk.write(it.join(home, BATTERY), `${JSON.stringify(report, null, 2)}\n`);
 
   said(name, counts, outside.folders, since);
   for (const one of refused) console.error(`  refused ${one.path}: ${one.refused}`);

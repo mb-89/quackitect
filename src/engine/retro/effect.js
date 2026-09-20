@@ -3,11 +3,28 @@
 // [[spec/guidance/retro/effect]]
 
 import { RETRO } from "../../../.claude/skills/level0/lib/folders.js";
+import { batteryDelta } from "../../scripts/battery.js";
 import { CLASSES, RATES, ratesOf, recordOf } from "./classes.js";
 import { homeOf } from "./timeline.js";
 
 export const EFFECT = "effect.json";
+// The battery's report collect keeps, one a retro, read here against the last retro's. [[spec/guidance/retro/effect]]
+export const BATTERY = "battery.json";
 const COLLECTED = "collected.json";
+
+// The two reports side by side, or nothing where this retro holds none. [[spec/guidance/retro/effect]]
+export function batteryEffect(it, name, last) {
+  const read = (retro) => {
+    try {
+      return JSON.parse(it.disk.read(it.join(homeOf(it, retro), BATTERY)));
+    } catch {
+      return null;
+    }
+  };
+  const now = read(name);
+  if (!now) return null;
+  return { last: last ?? "", ...batteryDelta(last ? read(last) : null, now), slowest: now.slowest ?? [] };
+}
 
 // The retro before this one holding class fixes, by the time its collect ran. [[spec/guidance/retro/effect]]
 export function lastRetro(it, name) {
@@ -52,10 +69,11 @@ export function effect(it, name) {
     return 2;
   }
   const last = lastRetro(it, name);
+  const battery = batteryEffect(it, name, last);
   if (!last) {
     it.disk.write(
       it.join(homeOf(it, name), EFFECT),
-      `${JSON.stringify({ last: "", classes: [] }, null, 2)}\n`,
+      `${JSON.stringify({ last: "", classes: [], battery }, null, 2)}\n`,
     );
     console.log("No earlier retro holds class fixes, so nothing stands to measure.");
     return 0;
@@ -74,11 +92,16 @@ export function effect(it, name) {
   }));
   it.disk.write(
     it.join(homeOf(it, name), EFFECT),
-    `${JSON.stringify({ last, classes: rows }, null, 2)}\n`,
+    `${JSON.stringify({ last, classes: rows, battery }, null, 2)}\n`,
   );
   for (const one of rows) {
     console.log(
       `${one.id}  ${one.before.rate} to ${one.now.rate} an hour  ${one.verdict}  ${one.class}`,
+    );
+  }
+  if (battery) {
+    console.log(
+      `battery  ${battery.total.before} to ${battery.total.now} ms  ${battery.fresh.length} new, ${battery.grown.length} grown, ${battery.gone.length} gone`,
     );
   }
   return 0;

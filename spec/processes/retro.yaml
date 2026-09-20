@@ -56,6 +56,7 @@ steps:
       - every piece of work lands in the place owning its topic
       - every experiment stands decided, which `retro audit` answers
       - every refusal teaches the hand, and no hand retries it blind
+      - the battery's report reads beside the last retro's, and every part or case that grows has a finding, as [[spec/guidance/retro/effect]] asks
     evidence:
       - name: audits
         form: list

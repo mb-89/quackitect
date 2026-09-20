@@ -98,7 +98,7 @@ function bottomLine(record, rates) {
 function effectOf(effect) {
   const out = ["## Effect of the last retro", ""];
   if (!effect?.classes?.length)
-    return [...out, "No earlier retro holds class fixes.", ""];
+    return [...out, "No earlier retro holds class fixes.", "", ...batteryOf(effect?.battery)];
   out.push(
     `Measured against ${effect.last}.`,
     "",
@@ -110,6 +110,31 @@ function effectOf(effect) {
       `| ${one.id} · ${one.class} | ${one.fix} | ${one.before.rate} | ${one.now.rate} | ${one.verdict} |`,
     );
   }
+  return [...out, "", ...batteryOf(effect.battery)];
+}
+
+// The battery's report against the last retro's: each part's time, and the cases new, grown and gone. [[spec/guidance/retro/effect]]
+function batteryOf(battery) {
+  if (!battery) return [];
+  const out = ["### The battery", ""];
+  out.push(
+    `${battery.total.before} ms at the last retro, ${battery.total.now} ms at this one.`,
+    "",
+    "| part | before | now | delta |",
+    "|---|---|---|---|",
+  );
+  for (const one of battery.parts) {
+    out.push(`| ${one.part} | ${one.before} | ${one.now} | ${one.delta} |`);
+  }
+  const rows = (title, items, cell) => {
+    if (!items?.length) return [];
+    return ["", `${title}:`, "", ...items.map((one) => `- ${cell(one)}`)];
+  };
+  out.push(
+    ...rows("New among the slowest", battery.fresh, (one) => `${one.name} (${one.ms} ms)`),
+    ...rows("Grown", battery.grown, (one) => `${one.name} (${one.before} to ${one.ms} ms)`),
+    ...rows("Gone from the slowest", battery.gone, (one) => `${one.name} (${one.ms} ms)`),
+  );
   return [...out, ""];
 }
 

@@ -4,9 +4,18 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+// The whole module, so the stamp's move out of it holds. [[spec/design_output/work#the-battery-answers-first]]
+import * as check from "../../src/scripts/cli-check.js";
 import { serverHolds, serverLine, serverRead } from "../../src/scripts/cli-check.js";
+import { stamped } from "../../src/scripts/cli-stamp.js";
 
 const WHERE = "http://127.0.0.1:6510/health";
+
+// The check reads and the stamp writes, so the two stand in two files under the file ceiling. [[spec/design_output/work#the-battery-answers-first]]
+test("the check answers no stamp of its own, and the stamp module answers it", () => {
+  assert.equal(check.stamped, undefined, "cli-check.js hands the stamp to cli-stamp.js");
+  assert.equal(typeof stamped, "function");
+});
 
 // A fetch door answering the health call, so the probe runs off the wire. [[spec/design_output/doors#a-fake-behaves]]
 const answers = (body) => async () => ({ json: async () => body });

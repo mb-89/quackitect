@@ -27,3 +27,12 @@ missed its cause.
 A class whose rate holds returns as a class of this retro, so its next fix
 aims at the cause the first one missed. Left out, it reads as solved, and
 the next retro inherits the gap.
+
+## 5. The battery is evidence too
+
+The battery grew from ninety seconds to eleven minutes across four branches,
+and nobody saw it, because no run kept its time. Two cases fetched binaries
+from the network, and one swept the whole tree twice. So the check times each
+part and keeps the slowest cases, collect keeps one report a retro, and effect
+reads the two side by side. A part or a case that grows is a finding like any
+other. A case that earns its time no more is one to cut.

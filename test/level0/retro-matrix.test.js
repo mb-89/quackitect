@@ -170,3 +170,26 @@ test("the report puts the field feedback beside the chapters", () => {
   assert.match(report, /\| \| c1 · the morning \| feedback · field feedback \|/);
   assert.match(report, /\| code \| · \| feedback\.code\.1 \|/);
 });
+
+// [[spec/guidance/retro/effect]]
+test("the report draws the battery beside the effect, part by part, with the cases that moved", () => {
+  const effect = {
+    last: "retro-0000000",
+    classes: [],
+    battery: {
+      total: { before: 1300, now: 1820 },
+      parts: [{ part: "tests", before: 1000, now: 1500, delta: 500 }],
+      fresh: [{ name: "arrives", ms: 80 }],
+      grown: [{ name: "grows", before: 100, ms: 200 }],
+      gone: [{ name: "leaves", ms: 50 }],
+    },
+  };
+  const report = reportOf(RETRO, [], { effect });
+  assert.match(report, /### The battery/);
+  assert.match(report, /1300 ms at the last retro, 1820 ms at this one\./);
+  assert.match(report, /\| tests \| 1000 \| 1500 \| 500 \|/);
+  assert.match(report, /- arrives \(80 ms\)/);
+  assert.match(report, /- grows \(100 to 200 ms\)/);
+  assert.match(report, /- leaves \(50 ms\)/);
+  assert.doesNotMatch(reportOf(RETRO, [], { effect: { classes: [] } }), /The battery/);
+});
