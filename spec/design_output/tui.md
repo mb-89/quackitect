@@ -270,7 +270,7 @@ the Vale styles share, and `loadColours` in `colour.go` holds what it reads.
 | `window` | the bar, the rule, the header, the open tab and the selected row |
 | `bold` | the names wearing heavy type |
 | `spare` | the colour a name both maps leave out falls back to |
-| `flags` | a lit flag by its tone: `good`, `bad`, a route's own name, or plain `on`, and one `off` |
+| `flags` | a lit flag by its tone: `good`, `bad`, a state's or a route's own name, or plain `on`, and one `off` |
 
 A kind the text column colours reads its number off the `kinds` map. So the two
 columns of one row wear one colour, and the number stands in one place.

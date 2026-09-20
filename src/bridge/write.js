@@ -24,6 +24,13 @@ import {
   strangerFault,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { refusedTicket, ticketFaults } from "../../.claude/skills/level0/lib/ticket.js";
+import {
+  fieldOf,
+  GROUP as GROUP_KEY,
+  NOTE_END,
+  TICKETS,
+  ticketNamed,
+} from "../engine/group.js";
 import { codeDoor } from "./code.js";
 import { marksStale, ownerDoor } from "./projection.js";
 import { readsProse } from "./prose.js";
@@ -127,7 +134,7 @@ function schemaDoor(e, writing, where, box) {
 
   // [[spec/design_output/schema#the-three-places]]
   const held = schema
-    ? ticketFaults(textAt(box.disk, writing.path), whole, schema, where)
+    ? ticketFaults(textAt(box.disk, writing.path), whole, schema, where, kidsOf(where, box))
     : [];
   if (held.length) {
     box.log.say("warn", "ticket", `refused ${held.length} line(s) in ${where}`, {
@@ -202,6 +209,15 @@ function textAt(disk, path) {
   } catch {
     return null;
   }
+}
+
+// The tickets naming this one under group, so the ask door knows what the children say already. [[spec/design_output/work#a-group-is-a-ticket]]
+function kidsOf(where, box) {
+  if (!where.startsWith(`${TICKETS}/`)) return [];
+  const name = ticketNamed(where);
+  return readFolder(box.disk, join(box.work, ...TICKETS.split("/")), NOTE_END)
+    .filter((one) => fieldOf(one.text, GROUP_KEY) === name)
+    .map((one) => ticketNamed(one.name));
 }
 
 function readFolder(disk, folder, end) {

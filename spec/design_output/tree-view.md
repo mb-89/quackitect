@@ -154,7 +154,7 @@ its marks:
 
 | the letter | the key it reads | its tone |
 |---|---|---|
-| the state's first | the state, as its value | good on `open`, bad on `draft`, plain on `closed` |
+| the state's first | the state, as its value | good on `open`, bad on `draft`, and `held` and `closed` each its own |
 | the route's first | the route, as its value: N for a note, T trivial, S standard, G group | the route's own, off the `flags` map |
 | U | the ticket carries the urgent mark | bad |
 | C | the group holds a branch on the cloud, and its tickets inherit it | plain, because the cloud is neither good nor bad |
@@ -166,8 +166,10 @@ keeps the rest.
 
 A letter, its key and its tone stand under `flags` in the base file. A flag
 marked `value` draws its value's first letter in place of one. It names a
-tone a value under `tones`, so `open` and `closed` wear two colours. A new
-flag costs one line there, because the key already stands. The `flags` map of
+tone a value under `tones`. Each value of a flag wears a colour of its own,
+because a reader tells a state by its colour before its letter.
+
+A new flag costs one line there, because the key already stands. The `flags` map of
 [[spec/design_output/tui#colours]] holds the colours. A good tone wears the
 green, a bad one the red, and no tone the plain colour.
 

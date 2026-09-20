@@ -30,7 +30,7 @@ step: do
 
 # Ask
 
-The write door refuses prose that says again what the structured data beside it holds, and a count spelled in words the way it refuses a digit. Today a group's ask names its children, which stand under it already, and a count as four passes the digit rule. Done when a group's ask naming a child's name comes back refused with the rule's name, a count in words meets DigitInProse, and a case proves each.
+The write door refuses prose that says again what the structured data beside it holds. It refuses a count spelled in words the way it refuses a digit. Today a group's ask names its children, which stand under it already, and a count as four passes the digit rule. Done when a group's ask naming a child comes back refused with the rule's name, and a count in words meets DigitInProse. A case proves each.
 
 # do
 
@@ -38,27 +38,25 @@ The write door refuses prose that says again what the structured data beside it 
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+```
+node --test test/level0/ticket.test.js test/level0/write.test.js test/contract/vale.test.js
+```
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+```
+./RUNME.sh check
+```
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
-
-<!-- the form is text -->
+The ticket door gains a rule, `Ticket.restated`. A group's ask naming one of its children comes back refused, because the children stand under the group already. The write door reads the children off the work root, the tickets naming the group under `group`. The digit rule, `DigitInProse`, now reads a count spelled in words before a plural the way it reads a digit. The count rule that watched sentence openings alone folds into it, so one rule owns the count.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask: the refusal names its rule, and a count in words meets the digit rule
+- the cleanup is in the change: the sentence-opening count rule goes, and the digit rule carries its message
+- every fact stands in one place: the work note names the refusal, and the digit rule says what it counts
 
 # Discussion
 

@@ -61,14 +61,14 @@ runs it.
 
 A sentence saying what the structure beside it shows says it twice, and the
 structure is the copy that cannot drift. A count of a list needs no time to go
-wrong: a sentence saying four regions above a list of six hands the reader two
+wrong. A sentence saying four regions above a list of six hands the reader two
 answers. A group naming its members in its ask rots the day a child moves. The
 children under it stand right. A sentence saying two notes link says what the
 link says.
 
 The rule replaced one asking the writer to list what a compression cut. That
 rule asked for a record nobody read, and the door holds the count on its own at
-[[spec/config/styles/VoiceVale/Counted.yml]].
+[[spec/config/styles/VoiceVale/DigitInProse.yml]].
 
 ## 10. Parallel things
 

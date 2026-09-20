@@ -90,6 +90,18 @@ test("a ticket under the stub keeping the vehicle's schema passes, and the stub 
   assert.deepEqual(said, { pass: true });
 });
 
+// The door reads the children off the work root, so a group's ask naming one comes back refused. [[spec/design_output/work#a-group-is-a-ticket]]
+test("a group's ask naming a child of its own comes back refused", async () => {
+  const kid = GOOD.replace("state: open\n", "state: open\ngroup: parent\n");
+  const it = box({ [join(WORK, "spec", "tickets", "kid.md")]: kid });
+  const parent = GOOD.replace("A small thing.", "The group carries kid and closes it.");
+  const said = await onWrite(write(join(WORK, "spec", "tickets", "parent.md"), parent), it);
+  assert.ok(said?.result?.deny, "the door refuses");
+  assert.match(said.result.deny, /restated/);
+  const quiet = await onWrite(write(join(WORK, "spec", "tickets", "parent.md"), GOOD), it);
+  assert.deepEqual(quiet, { pass: true });
+});
+
 // [[spec/design_output/level0#a-write-meets-its-mark]]
 test("a write over a standing file this hand has read none of comes back refused", async () => {
   const at = join(WORK, "spec", "tickets", "good.md");
