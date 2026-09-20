@@ -13,8 +13,9 @@ import (
 )
 
 const (
-	opens = "textDocument/didOpen"
-	saves = "textDocument/didSave"
+	opens   = "textDocument/didOpen"
+	changes = "textDocument/didChange"
+	saves   = "textDocument/didSave"
 )
 
 type panel struct {
@@ -22,14 +23,17 @@ type panel struct {
 	extra map[string][]Finding
 	open  map[string]bool
 	shown map[string]bool
+	// The open files changed since the bridge last read them, which the next ask carries together. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+	pending map[string]bool
 }
 
 func newPanel() *panel {
 	return &panel{
-		own:   map[string][]Finding{},
-		extra: map[string][]Finding{},
-		open:  map[string]bool{},
-		shown: map[string]bool{},
+		own:     map[string][]Finding{},
+		extra:   map[string][]Finding{},
+		open:    map[string]bool{},
+		shown:   map[string]bool{},
+		pending: map[string]bool{},
 	}
 }
 
@@ -83,7 +87,7 @@ func (one *server) asksBridge(paths []string) bool {
 	return true
 }
 
-// An open, a change or a save redraws that file, and a save asks the bridge again for it. [[spec/design_output/lsp]]
+// An open, a change or a save redraws that file. A save asks the bridge again for it off the disk, and a change asks after the quiet span, off the buffer. [[spec/design_output/lsp]]
 func (one *server) draws(where, text, method string) {
 	if where == "" {
 		return
@@ -107,6 +111,48 @@ func (one *server) draws(where, text, method string) {
 	one.guard.Unlock()
 	if method == saves {
 		go one.asksBridge([]string{at})
+	}
+	if method == changes {
+		one.asksSoon(at)
+	}
+}
+
+// A change waits the quiet span, and every change inside it joins one ask. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+func (one *server) asksSoon(at string) {
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	one.panel.pending[at] = true
+	if one.timer != nil {
+		one.timer.Stop()
+	}
+	one.timer = time.AfterFunc(one.quiet, one.asksHeld)
+}
+
+// The bridge reads every pending buffer as it stands, and each file redraws with the answer. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+func (one *server) asksHeld() {
+	tree := one.checker.Tree()
+	one.guard.Lock()
+	held := map[string]string{}
+	for at := range one.panel.pending {
+		if one.panel.open[at] {
+			held[at] = tree.Read(at)
+		}
+	}
+	one.panel.pending = map[string]bool{}
+	one.guard.Unlock()
+	if len(held) == 0 {
+		return
+	}
+	found, ok := bridgeHeld(tree.Root, held)
+	if !ok {
+		return
+	}
+	got := grouped(found)
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	for at := range held {
+		one.panel.extra[at] = got[at]
+		one.shows(tree, at)
 	}
 }
 

@@ -32,7 +32,8 @@ A file redraws on four roads:
 | road | what redraws |
 |---|---|
 | the server starts | every file, off this server's sweep and one ask to the bridge |
-| the editor opens a file, or a person types in it | that file, off the buffer |
+| the editor opens a file | that file, off the buffer |
+| a person types in a file | that file off the buffer, and the bridge again after the quiet span |
 | the editor saves or closes a file | that file, and a save asks the bridge again |
 | anything changes a file on disk | that file, off the disk and the bridge |
 
@@ -71,6 +72,24 @@ agent, git, or a script. The server reads the type each change carries.
 So a finding leaves once its file passes, and a moved folder leaves no row
 behind. An open file follows the editor's buffer, and a change under a folder
 the battery skips redraws nothing.
+
+# The panel lints as typed
+
+A change to an open file waits the quiet span `lintQuiet` names in
+`src/lsp/bridge.go`, and every change inside that span joins one ask. The ask
+carries each buffer as it stands to `POST /findings`, and `heldOver` in
+`src/bridge/findings.js` reads it there.
+
+| what reads the buffer | how |
+|---|---|
+| Vale | through the Vale door, at the buffer's own path, so the config sections match |
+| the tense reader | over the buffer's text |
+| the code faults | over the buffer's text |
+| Biome | nowhere, because its own server draws an open file |
+
+So a Vale finding leaves as a person fixes the line, and no source waits for a
+save. A file the editor closes inside the span asks nothing, because its buffer stands no
+more.
 
 # The config reads absolute paths
 

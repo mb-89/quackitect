@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 const (
@@ -62,11 +63,14 @@ type server struct {
 	out     io.Writer
 	guard   sync.Mutex
 	panel   *panel
+	// The quiet span a change waits before the bridge reads the buffer, and the timer counting it. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+	quiet time.Duration
+	timer *time.Timer
 }
 
 // [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
 func Speaks(checker *Checker, in io.Reader, out io.Writer) error {
-	one := &server{checker: checker, out: out, panel: newPanel()}
+	one := &server{checker: checker, out: out, panel: newPanel(), quiet: lintQuiet}
 	reader := bufio.NewReader(in)
 	for {
 		said, err := reads(reader)
