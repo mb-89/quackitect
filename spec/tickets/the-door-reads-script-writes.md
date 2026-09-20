@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: 9af5813f212797c77a8fadcfc72dadd1e685c8b7
     returns: 2
     why: "`writesInScript(body)` hands every hit back under `how: \"a heredoc\"`, and the; refusal reads `${one.how} into ${one.path}`. A script write then refuses with; \"a heredoc into README.md\", which names a heredoc where the command carries a; script file. Say where `how` takes the script path.; The draft has the refusal message move into one place, and this ticket wants; that place named. The words stand in `findings` in; `.claude/skills/level0/lib/bash.js`, and `refusedCommand` in `lib/refuse.js`; owns the shape every finding takes. Name the one holding the words, and write; the words.; The message today names Read, Write and Edit, and the draft has both roads; take the new one. A redirection making a file wants Write, and the working; rules name Edit for one spot. Say whether Write and Edit stand beside the; two.; A shell script stands outside this reading. `sh .se/scripts/edit.sh` writing; by redirection is the hole the ask names, and `scriptsIn` answers a reader; alone. `insideOf` routes a shell body to `writesAPath` and a reader body to; `writesInScript` today, so hand the script text to `insideOf`, and say a; shell script counts.; The design output wants a row. The module points at; [[spec/design_output/bash#a-shell-writes-nothing]], whose table names every; road the door refuses and every road it passes. Write the script file into; both columns.; What I check:; `./RUNME.sh check` answers 0 on this commit, and the draft commit touches; this ticket alone.; The reading skips a path standing in the tree, so `node --test; test/level0/bash.test.js` passes. That finding stands answered.; `writesInScript` stands as it reads and `writesIn` keeps its name, so the; collision goes. That finding stands answered.; `it.script(path)` off `box.disk` names the seam, and `src/bridge/bash.js`; hands `findings` an `it` today. That finding stands answered.; A copy out of the scratchpad refuses today, asserted over `cp .se/draft.md; README.md` and `mv /tmp/one.md spec/guidance/new.md` in; `test/level0/bash.test.js`. That finding stands answered.; `VERBS` names check, branch, tui and doctor, so `./RUNME.sh check` is the; verb covering the pair. That finding stands answered."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: c7b64b2bedd0ffd17c1abbe17756a460576c1d35
+    hash_after: c7b64b2bedd0ffd17c1abbe17756a460576c1d35
 ---
 
 # Ask
@@ -149,12 +153,21 @@ One piece lands in `.claude/skills/level0/lib/bash.js`, beside `writesAPath`:
 
 | the piece | what it does |
 |---|---|
-| `scriptsIn(command)` | answers the script paths a runner takes, one a line |
-| `writesInScript(text)` | stands as it reads, and answers what a script's text writes |
+| `scriptsIn(command)` | answers the script paths a runner or a shell takes, one a line |
+| `insideOf(name, text)` | stands as it reads, and routes a shell text and a reader text |
+| `writesInScript(text)` | stands as it reads, and answers what a reader's text writes |
 
 A script here is a file standing under `.se` or the scratchpad, which a runner
-takes as its first path. Both stand outside the tree git holds, so the voice
-rules reach neither, which is the hole the ask names.
+or a shell takes as its first path. Both stand outside the tree git holds, so
+the voice rules reach neither, which is the hole the ask names.
+
+`insideOf` already splits the two bodies: a shell text goes to `writesAPath`,
+and a reader text to `writesInScript`. So `sh .se/scripts/edit.sh` writing by
+redirection lands, and `node .se/scripts/edit.mjs` lands beside it.
+
+The door names the script where it refuses, so each hit takes `how: "the script
+<path>"` off the reading. A heredoc inside that script then reads as the script,
+and a hand meets the file it wrote.
 
 | what the line reads | what the door does |
 |---|---|
@@ -167,9 +180,17 @@ bridge hands a reader in: `it.script(path)` answers the text, off `box.disk`.
 The pure module stays pure, and `src/bridge/bash.js` holds the one call
 reaching the disk.
 
-The refusal message moves into one place, and both roads take it. It names
-`mcp__level0__patch` and `mcp__level0__replace` as the road, which the ask asks
-for and no module says today.
+`findings` in the same module holds the words of the refusal, and
+`refusedCommand` in `lib/refuse.js` holds the shape around them. So the words
+stay where they stand, and one row answers both roads:
+
+| what the message names | why |
+|---|---|
+| `mcp__level0__patch` and `mcp__level0__replace` | the ask names them, and a script write is many lines |
+| Write | a redirection making a file wants the whole text |
+| Edit | one spot in a file standing already |
+
+A hand meets the four in one line, ordered by the size of the change.
 
 The cases stand in `test/level0/bash.test.js`, over a reader a case hands in:
 
@@ -180,6 +201,14 @@ The cases stand in `test/level0/bash.test.js`, over a reader a case hands in:
 A copy out of the scratchpad into a tracked path refuses today, over `mv` and
 `cp`, and that case stands in the same file. `./RUNME.sh check` covers the pair,
 because `VERBS` names no test verb.
+
+One table names every road the door refuses, and every road it passes. So it
+takes the script in both columns.
+[[spec/design_output/bash#a-shell-writes-nothing]]
+
+| the door refuses | the door passes |
+|---|---|
+| a runner or a shell taking a script under `.se` or the scratchpad, writing such a path | the same script, writing nowhere the rules reach |
 
 ## review
 
