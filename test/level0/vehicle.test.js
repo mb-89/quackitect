@@ -5,9 +5,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   attaches,
-  identityOf,
   drivenOf,
   entryOf,
+  identityOf,
+  importsOf,
+  modulesOf,
   onlyVehicle,
   pairOf,
   portOf,
@@ -16,13 +18,13 @@ import {
   same,
   travels,
 } from "../../.claude/skills/level0/lib/vehicle.js";
-import { attachTo } from "../../src/bridge/vehicle.js";
+import { attachTo, filesOf } from "../../src/bridge/vehicle.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import {
   attach,
-  identityHere,
   detach,
+  identityHere,
   methodRootFrom,
   produce,
   readRegister,
@@ -145,7 +147,11 @@ test("one vehicle is no question", () => {
 
 test("a project reaches its driver through the register", () => {
   const files = tree();
-  registerVehicle(files, { HOME: "/home" }, entryOf("abc123", "0.1.0", "/tools", "now"));
+  registerVehicle(
+    files,
+    { HOME: "/home" },
+    entryOf("abc123", "0.1.0", "/tools", "now"),
+  );
   attach(files, fakeClock(), "/work", "abc123");
 
   const pair = rootsHere(files, { HOME: "/home" }, "/work");
@@ -206,19 +212,95 @@ test("the work root comes from SE_WORK_ROOT where the shim sets it, and off the 
   assert.deepEqual(plain, rootsHere(files, { HOME: "/home" }, "/tools"));
 });
 
-test("attach writes the driver, the register entry with its port, the pointer and the hook", () => {
-  const files = tree({
-    "/tools/.claude/skills/level0/hooks/level0.js": "the hook",
-    "/tools/.claude/skills/level0/hooks/hooks.json": '{"modules":["./level0.js"]}',
+// The hook's closure, spelled as a fake plugin folder whose imports run three deep: the manifest names the module, the module imports the hook, the hook imports a lib, and that lib imports another. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+const PLUGIN = "/tools/.claude/skills/level0";
+function plugin(hook = 'import { a } from "../lib/apply.js";\n') {
+  return {
+    [`${PLUGIN}/hooks/hooks.json`]: '{"modules":["./pull-tool.js"]}',
+    [`${PLUGIN}/hooks/pull-tool.js`]:
+      'import { register } from "./level0.js";\nimport {\n  judgeAsk,\n} from "../lib/pull.js";\n',
+    [`${PLUGIN}/hooks/level0.js`]: hook,
+    [`${PLUGIN}/lib/apply.js`]:
+      'import { inRun } from "./folders.js";\nexport const a = 1;\n',
+    [`${PLUGIN}/lib/folders.js`]: "the folders lib",
+    [`${PLUGIN}/lib/pull.js`]: "the pull lib",
+    [`${PLUGIN}/lib/log.js`]: "the log lib",
+    [`${PLUGIN}/lib/stray.js`]: "a lib nothing imports",
     "/tools/package.json": '{"version":"0.1.0"}',
-    // The hook imports its own folder, so the copy takes what it reaches. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
-    ...Object.fromEntries(
-      ["apply", "folders", "log", "search", "undo", "vehicle"].map((one) => [
-        `/tools/.claude/skills/level0/lib/${one}.js`,
-        `the ${one} lib`,
-      ]),
+  };
+}
+
+// [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+test("a module's imports read off its source: the relative ones, in any shape, and none from a package", () => {
+  const source = [
+    'import { a } from "../lib/apply.js";',
+    "import {",
+    "  b,",
+    '} from "./level0.js";',
+    "import c from './c.js';",
+    'import "./side.js";',
+    'export { d } from "../lib/d.js";',
+    'import { join } from "node:path";',
+    'import test from "node:test";',
+    '// import { gone } from "./gone.js";',
+    'const said = "from ./text.js";',
+  ].join("\n");
+  assert.deepEqual(importsOf(source), [
+    "../lib/apply.js",
+    "./level0.js",
+    "./c.js",
+    "./side.js",
+    "../lib/d.js",
+  ]);
+  assert.deepEqual(importsOf(""), []);
+});
+
+test("the hooks manifest names the modules, each under the hooks folder", () => {
+  assert.deepEqual(modulesOf('{"modules":["./pull-tool.js","./other.js"]}'), [
+    "hooks/pull-tool.js",
+    "hooks/other.js",
+  ]);
+  assert.deepEqual(modulesOf("not json"), []);
+  assert.deepEqual(modulesOf("{}"), []);
+});
+
+test("the copy takes the two manifests and the closure of the modules' imports, and leaves the rest", () => {
+  const files = tree(plugin());
+  assert.deepEqual(filesOf(files, "/tools").sort(), [
+    ".claude-plugin/plugin.json",
+    "hooks/hooks.json",
+    "hooks/level0.js",
+    "hooks/pull-tool.js",
+    "lib/apply.js",
+    "lib/folders.js",
+    "lib/pull.js",
+  ]);
+});
+
+test("a hook taking a new import hands the copy that file", () => {
+  const files = tree(plugin());
+  attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools");
+  assert.equal(
+    files.exists("/stub/.claude/skills/level0/lib/log.js"),
+    false,
+    "the hook imports no log lib yet",
+  );
+
+  const grown = tree(
+    plugin(
+      'import { a } from "../lib/apply.js";\nimport { SESSION } from "../lib/log.js";\n',
     ),
-  });
+  );
+  attachTo(grown, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools");
+  assert.equal(
+    grown.read("/stub/.claude/skills/level0/lib/log.js"),
+    "the log lib",
+    "the copy reads the new import off the hook",
+  );
+});
+
+test("attach writes the driver, the register entry with its port, the pointer and the hook's closure", () => {
+  const files = tree(plugin());
   const said = attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools");
   assert.equal(said.method, "/tools");
   assert.equal(said.port, 6510);
@@ -232,23 +314,35 @@ test("attach writes the driver, the register entry with its port, the pointer an
     { method: "/tools", port: 6510 },
     "the pointer",
   );
+  const stub = "/stub/.claude/skills/level0";
   assert.equal(
-    files.read("/stub/.claude/skills/level0/hooks/level0.js"),
-    "the hook",
-    "the hook",
+    files.read(`${stub}/hooks/hooks.json`),
+    '{"modules":["./pull-tool.js"]}',
+    "the hooks manifest",
   );
   assert.equal(
-    files.read("/stub/.claude/skills/level0/hooks/hooks.json"),
-    '{"modules":["./level0.js"]}',
+    files.read(`${stub}/.claude-plugin/plugin.json`),
+    "{}",
+    "the plugin manifest",
   );
-  for (const one of ["apply", "folders", "log", "search", "undo", "vehicle"]) {
+  for (const rel of [
+    "hooks/pull-tool.js",
+    "hooks/level0.js",
+    "lib/apply.js",
+    "lib/folders.js",
+    "lib/pull.js",
+  ]) {
     assert.equal(
-      files.read(`/stub/.claude/skills/level0/lib/${one}.js`),
-      `the ${one} lib`,
-      `the ${one} lib travels, because the hook imports it`,
+      files.read(`${stub}/${rel}`),
+      files.read(`${PLUGIN}/${rel}`),
+      `${rel} travels, because the closure reaches it`,
     );
   }
-  assert.equal(files.read(`/stub/${MARKER}`), "{}", "the manifest");
+  assert.equal(
+    files.exists(`${stub}/lib/stray.js`),
+    false,
+    "a lib nothing imports stays behind",
+  );
   const entry = JSON.parse(files.read("/home/agent/.se/.runtime/registry.json")).find(
     (one) => one.id === "abc123",
   );

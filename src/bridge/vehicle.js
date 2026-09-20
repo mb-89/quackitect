@@ -1,30 +1,26 @@
 // The vehicle a project carries, and the port the register hands it.
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
 
-import { join } from "node:path";
+import { join, posix } from "node:path";
 import {
   entryOf,
+  HOOKS,
+  importsOf,
+  MANIFESTS,
   MARKER,
+  modulesOf,
+  PLUGIN_FOLDER,
   POINTER,
   pointerOf,
   portOf,
   withPort,
 } from "../../.claude/skills/level0/lib/vehicle.js";
-import { attach, identityHere, readRegister, registerVehicle } from "../scripts/vehicle.js";
-
-const HOOK = ".claude/skills/level0";
-// The hook imports its own folder, so the copy takes what it reaches. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
-const FILES = [
-  "hooks/level0.js",
-  "hooks/hooks.json",
-  ".claude-plugin/plugin.json",
-  "lib/apply.js",
-  "lib/folders.js",
-  "lib/log.js",
-  "lib/search.js",
-  "lib/undo.js",
-  "lib/vehicle.js",
-];
+import {
+  attach,
+  identityHere,
+  readRegister,
+  registerVehicle,
+} from "../scripts/vehicle.js";
 
 export function vehicleOf(disk, env, time, work, windows = false) {
   const pointed = pointerOf(readIf(disk, join(work, POINTER)));
@@ -36,10 +32,10 @@ export function vehicleOf(disk, env, time, work, windows = false) {
 
 export function makesProject(disk, env, time, work, vehicle, windows = false) {
   const port = registeredPort(disk, env, time, vehicle, windows);
-  for (const rel of FILES) {
-    const to = join(work, HOOK, rel);
+  for (const rel of filesOf(disk, vehicle)) {
+    const to = join(work, PLUGIN_FOLDER, rel);
     disk.makeDir(join(to, ".."));
-    disk.write(to, disk.read(join(vehicle, HOOK, rel)));
+    disk.write(to, disk.read(join(vehicle, PLUGIN_FOLDER, rel)));
   }
   disk.makeDir(join(work, POINTER, ".."));
   disk.write(
@@ -47,6 +43,21 @@ export function makesProject(disk, env, time, work, vehicle, windows = false) {
     `${JSON.stringify({ method: vehicle, port }, null, 2)}\n`,
   );
   return { method: vehicle, port, itself: false, made: true };
+}
+
+// The files a stub takes: the two manifests, the modules the hooks manifest names, and the closure of their imports, read off the source itself. So a hook taking a new import hands the copy that file, and no list here goes stale. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+export function filesOf(disk, vehicle) {
+  const out = [...MANIFESTS];
+  const queue = modulesOf(readIf(disk, join(vehicle, PLUGIN_FOLDER, HOOKS)));
+  while (queue.length) {
+    const rel = queue.shift();
+    if (out.includes(rel)) continue;
+    out.push(rel);
+    for (const one of importsOf(readIf(disk, join(vehicle, PLUGIN_FOLDER, rel)))) {
+      queue.push(posix.join(posix.dirname(rel), one));
+    }
+  }
+  return out;
 }
 
 export function settles(disk, env, time, work, vehicle, windows = false) {
