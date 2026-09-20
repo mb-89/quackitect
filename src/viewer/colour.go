@@ -7,7 +7,6 @@ package main
 
 import (
 	"hash/fnv"
-	"sort"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -43,7 +42,7 @@ func loadColours(root string) {
 	palette.levels = config.Map(root, coloursAt, "levels")
 	palette.window = config.Map(root, coloursAt, "window")
 	palette.bold = config.Map(root, coloursAt, "bold")
-	palette.spare = orderedValues(config.Map(root, coloursAt, "spare"))
+	palette.spare = config.List(root, coloursAt, "spare")
 
 	dimStyle = windowStyle("dim")
 	barStyle = windowStyle("bar")
@@ -51,20 +50,6 @@ func loadColours(root string) {
 	headStyle = windowStyle("head")
 	openStyle = windowStyle("tab")
 	rowSelected = lipgloss.Color(palette.window["selected"])
-}
-
-// A map carries no order, so the spare list reads its keys in order. [[spec/design_output/viewer#colours]]
-func orderedValues(said map[string]string) []string {
-	names := make([]string, 0, len(said))
-	for name := range said {
-		names = append(names, name)
-	}
-	sort.Strings(names)
-	out := make([]string, 0, len(names))
-	for _, name := range names {
-		out = append(out, said[name])
-	}
-	return out
 }
 
 // A colour the config holds nowhere leaves the style plain, so the window wears the terminal's own. [[spec/design_output/viewer#colours]]

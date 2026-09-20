@@ -56,6 +56,23 @@ func Map(root, path, key string) map[string]string {
 	return out
 }
 
+// The list a named file holds at a key, in the order the file writes it. [[spec/design_output/config#a-go-program-reads-the-config]]
+func List(root, path, key string) []string {
+	said, found := valueIn(read(root, path), key)
+	if !found {
+		return []string{}
+	}
+	held, ok := said.([]any)
+	if !ok {
+		return []string{}
+	}
+	out := make([]string, 0, len(held))
+	for _, one := range held {
+		out = append(out, stringOf(one))
+	}
+	return out
+}
+
 func stringOf(one any) string {
 	if text, ok := one.(string); ok {
 		return text

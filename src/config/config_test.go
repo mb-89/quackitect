@@ -82,9 +82,10 @@ func TestAKeyNobodyWritesAnswersNothing(t *testing.T) {
 	}
 }
 
-// The colours stand in a named file, and no layer sets one. [[spec/tickets/the-colours-stand-in-config]]
+// A named file's values stand in that file, and no layer sets one. [[spec/tickets/the-colours-stand-in-config]]
 func TestAMapReadsTheFileTheCallerNames(t *testing.T) {
-	at := "spec/config/styles/colours.json"
+	// A path of the case's own, because src/viewer owns the one the window reads. [[spec/tickets/the-colours-stand-in-config]]
+	at := "spec/config/styles/a-fixture.json"
 	root := rootWith(t, map[string]string{
 		at:      `{"kinds": {"level0": "141", "note": "181"}}`,
 		Tracked: `{"kinds": {"level0": "1"}}`,
@@ -103,5 +104,27 @@ func TestAMapReadsTheFileTheCallerNames(t *testing.T) {
 	}
 	if held := Map(root, "spec/config/styles/nobody.json", "kinds"); len(held) != 0 {
 		t.Fatalf("a file standing nowhere answers %v", held)
+	}
+}
+
+// A list keeps the order the file writes, where a map keeps none. [[spec/tickets/the-colours-stand-in-config]]
+func TestAListReadsInTheOrderTheFileWrites(t *testing.T) {
+	at := "spec/config/styles/a-fixture.json"
+	root := rootWith(t, map[string]string{
+		at: `{"spare": ["67", "103", "9", "144"]}`,
+	})
+
+	said := List(root, at, "spare")
+	want := []string{"67", "103", "9", "144"}
+	if len(said) != len(want) {
+		t.Fatalf("the list reads %v", said)
+	}
+	for at := range want {
+		if said[at] != want[at] {
+			t.Fatalf("the list reads %v, and the file writes %v", said, want)
+		}
+	}
+	if held := List(root, at, "kinds"); len(held) != 0 {
+		t.Fatalf("a key the file holds nowhere answers %v", held)
 	}
 }

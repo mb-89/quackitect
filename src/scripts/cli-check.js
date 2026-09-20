@@ -119,9 +119,27 @@ export function goHolds() {
       console.log("go stands nowhere, so the Go tests go unrun here.");
       return 0;
     }
-    worst = worst || ran.exitCode;
+    worst = worst || ran.exitCode || goFormat(folder, env);
   }
   return worst;
+}
+
+// Go's own format rides in no other gate, so the check holds it. [[spec/design_output/index#the-compiler-it-needs]]
+function goFormat(folder, env) {
+  let ran;
+  try {
+    ran = outside.run(["gofmt", "-l", "."], { cwd: join(root, folder), env });
+  } catch {
+    return 0;
+  }
+  const names = `${ran.stdout ?? ""}`
+    .split("\n")
+    .map((one) => one.trim())
+    .filter(Boolean);
+  for (const name of names) {
+    console.log(`${folder}/${name}: Gofmt: the file reads other than gofmt writes it.`);
+  }
+  return names.length ? 1 : 0;
 }
 
 // [[spec/design_output/config#the-verb-names-the-layer]]

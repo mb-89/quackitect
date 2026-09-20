@@ -1,5 +1,5 @@
 {
-  "comment": "THE COLOURS THE WINDOW WEARS. Each value is a terminal colour number, and src/viewer reads them here. A person sets a colour by editing this file, and the window wears it at the next start. The bold map names which entries wear bold, and spare holds the colours a kind the kinds map names nowhere falls back to.",
+  "comment": "THE COLOURS THE WINDOW WEARS. Each value is a terminal colour number. A person sets a colour by editing this file, and the window wears it at the next start. What each map holds stands in spec/design_output/viewer.md, under Colours.",
   "kinds": {
     "prompt": "220",
     "reply": "114",
@@ -57,14 +57,5 @@
     "error": "yes",
     "fatal": "yes"
   },
-  "spare": {
-    "0": "67",
-    "1": "103",
-    "2": "139",
-    "3": "144",
-    "4": "151",
-    "5": "181",
-    "6": "187",
-    "7": "152"
-  }
+  "spare": ["67", "103", "139", "144", "151", "181", "187", "152"]
 }

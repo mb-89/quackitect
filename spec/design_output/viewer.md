@@ -207,10 +207,10 @@ stands as an `unparsed` row holding its raw text.
 
 # Colours
 
-- A prompt wears yellow in heavy type, on its kind and on its text.
-- A reply wears green, in heavy type on its kind.
-- A warning wears amber text, and an error red.
-- Every other kind wears its own colour, out of the `kinds` map in the config.
+- A prompt wears its colour in heavy type, on its kind and on its text.
+- A reply wears its colour, in heavy type on its kind.
+- A warning and an error each wear a colour of their own, out of the `levels` map.
+- Every other kind wears its own colour, out of the `kinds` map.
 - A note wears its own colour, on its kind and on its text.
 - A tool row wears the colour of its tool, out of the `tools` map.
 

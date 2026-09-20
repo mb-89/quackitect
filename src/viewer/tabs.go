@@ -90,7 +90,6 @@ func (m *model) openTab(n int) {
 	m.box.GotoTop()
 }
 
-
 // [[spec/design_output/viewer#the-header-holds-the-tabs]]
 func (m model) renderStrip() string {
 	names := make([]string, 0, len(m.tabs))

@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -179,6 +179,14 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 884bf3931dba0cb4ab981d45f219fe12b26e1641
     hash_after: 884bf3931dba0cb4ab981d45f219fe12b26e1641
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 4c672c1c0b493c2abbb83f3d944c3af67fe97cbd
+    hash_after: 4c672c1c0b493c2abbb83f3d944c3af67fe97cbd
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -391,9 +399,9 @@ The third class is narrower. A map carries no order, so a list written as a map 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The new module and the colours file. The three window files and their case files. The two module files and the shared list. The reader under the server, and the two notes.
-- every door the change reaches has a fake. Each case writes its own fixture root, and the window's case reads the shipped file alone.
-- a comment names the approach the change implements. Each new name points at the chapter the notes carry.
+- the change touches no file the ask leaves out. The check gains the format gate the class fix names. Every other file stands in the approach's table.
+- every door the change reaches has a fake. The gate runs its tool through the door the check runs every other tool through.
+- a comment names the approach the change implements. The gate carries a line naming the class it closes, and each new name points at its chapter.
 
 ## tests-green
 
