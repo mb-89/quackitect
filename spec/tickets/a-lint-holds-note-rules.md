@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -165,6 +165,10 @@ record:
     hash_after: 09ae626a4e7ac78a4507c16193cf68c041eae05e
     returns: 1
     why: "| the finding | what to do |; |---|---|; | `spec/design_output/schema.md` names `matches` among the keywords drawing no finding. `markedFaults` draws off `matches`. | Give `matches` a row in the keyword table beside that line, and take it out of the sentence. |; | Three files point at [[spec/design_output/lsp#a-second-copy-draws]]. That chapter names the rules over a second copy of a fact, and neither rule this branch adds. | Open the chapter owning the marked reading. Point `marked.go`, its cases and the `History` case at the chapter owning each rule. |; | `.vale.ini` switches `History` off over `spec/tickets` too. The ask and the approach name the rationales alone. | Say the ticket switch in the approach. Otherwise drop it, and clear the marker `python-writes-pass-the-door` carries. |; | `wantedChapters` writes `held.at = indexOf(note, held.Line)`. `sectionNamed` hands that index back already. | Drop the second reading. |; What holds:; The ask lands, bullet by bullet.; `./RUNME.sh lint spec/guidance spec/rationales` exits 0.; `./RUNME.sh check` exits 0 on the tip.; `./RUNME.sh branch review the-rules-hold-themselves` says nothing to fix.; `TestAMarkedRuleWantsItsChapter` feeds the rule a rationale opening no chapter, and it draws.; The Vale case reads two markers refused and a standing claim passing.; Three quiet cases hold the rule off where the approach says.; Every marked rule in `spec/guidance` ends its line on the star.; Rule twelve leaves with its chapter, and `a-rule-names-its-failure` carries the return.; The files past this ask belong to the group's other tickets.; A retro stands in `HANDOVER.md`, and its third finding names the class of the second finding."
+  - step: implement/reflect
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: a6b676d51cbe909c01fb49e456925c8b956a0455
+    hash_after: a6b676d51cbe909c01fb49e456925c8b956a0455
 ---
 
 # Ask
@@ -364,11 +368,29 @@ reading, and the checker takes the pair.
 
 <!-- the form is text -->
 
+Three of the four findings stand in one class: a piece of the change names a
+place that says something else. The fourth is a second reading of a value a
+function already holds.
+
+| the class | the fault here | the fix for the class |
+|---|---|---|
+| a piece names a place saying something else | the schema note calls `matches` a keyword drawing nothing, and the new pieces point at the chapter of the restated rules | each piece names what describes it, and a note changing behaviour takes the same change |
+| a switch reaches past its reason | the lint config holds the marker rule off over the tickets, which the approach leaves out | the switch reads the reason the approach names, and the drift takes its own fix |
+| a value reads twice | `wantedChapters` works out the place `sectionNamed` already hands it | the caller takes what the function answers |
+
+The first class is the one this branch already names in the handover, under the
+dead pointer. A rule changing what a note claims wants that note in the same
+commit, because the check reads neither.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fixes touch the schema note, the checker's own chapter, the lint config and one function
+- the Go reading takes the tree the checker holds, and the fixture writes one of its own
+- each piece points at the chapter saying what it reads
 
 ## change
 
