@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -165,6 +165,17 @@ record:
     hash_after: c744b42f27788aac4f8852aca7c7aaf56353687e
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 29e3ba47940713df005c0727c08838c3bd19d649
+    hash_after: 29e3ba47940713df005c0727c08838c3bd19d649
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -375,7 +386,7 @@ The fix for the class runs in two moves:
 
 One read serves both. `voiceDoor` held the lint and the filter inline before, and both move to `proseFaults`. The door keeps its logging and its refusal, so one place owns the read and a clean draft passes the door on its first write.
 
-The tool writes nothing, so its answer opens on the rules reading a draft. `refusal` opens on a line refusing a write, and `answerFindings` beside it carries the wording a tool answer takes.
+The tool writes nothing, so it takes the wording `check_answer` takes. `refusal` opens on a line refusing a write, and the door keeps that one.
 
 What a caller hands in:
 
@@ -383,6 +394,9 @@ What a caller hands in:
 - `text`, the whole file as the write would land it
 - a call missing either answers the line naming what it lacks
 - `src/bridge/server.js` imports the `SPECS` and `TOOLS` pair, so the tool registers with the rest
+- each case reads the answer through the dispatch, so the shape it wants is the shape it asserts
+
+The verdict round found the handler answering its own shape. Every handler beside it answers the shape the dispatch unwraps, and this one takes it now.
 
 ### checked
 
