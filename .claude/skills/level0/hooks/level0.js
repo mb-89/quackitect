@@ -25,6 +25,7 @@ let root = "";
 let method = "";
 let saidDown = false;
 let started = false;
+let waiting = STARTING;
 let stepText = "";
 
 const url = () => `http://127.0.0.1:${port}/event`;
@@ -75,6 +76,9 @@ const HEALTH = 200;
 
 export function register(on, options) {
   method = String(options?.method ?? "");
+  // A caller hands the wait in, so a case reads the running out without burning the span. [[spec/design_output/level0#the-first-call-pays]]
+  waiting = Number(options?.waiting) || STARTING;
+  started = false;
   on("*", ($, e, next) => seen($, e, next));
   // A server answering nothing at session start leaves a box with no read tool all session. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
   on("session.start", async ($, e, next) => {
@@ -265,7 +269,7 @@ async function reads($, called, e, next) {
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 async function healthy($) {
-  const until = Date.now() + STARTING;
+  const until = Date.now() + waiting;
   while (Date.now() < until) {
     try {
       const said = await $.http.fetch(`http://127.0.0.1:${port}/health`, {

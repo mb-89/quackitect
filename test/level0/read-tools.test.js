@@ -1,7 +1,7 @@
 // The read tools registering at session start, and the first call bringing the
 // server up. The hook reaches the outside through the engine's own doors, so
 // this drives it over a fake session.
-// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+// [[spec/design_output/level0#the-first-call-pays]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -32,13 +32,20 @@ function engine(answers = {}) {
     fs: { read: async () => "", write: async () => {} },
     ui: { log: () => {} },
   };
-  return { on, $, held, registered, ran, asked };
+  return { on, $, held, registered, ran, asked, waiting: answers.waiting };
 }
 
 const firing = (it, event, filter) =>
   it.held.find(
     (one) => one.event === event && (!filter || one.filter?.tool === filter),
   );
+
+// The hook holds one start a session, so each case takes a session of its own. [[spec/design_output/level0#the-first-call-pays]]
+const opened = (answers) => {
+  const it = engine(answers);
+  register(it.on, { waiting: it.waiting });
+  return it;
+};
 
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 test("the hook names every read tool, so a reader knows what registers", () => {
@@ -50,10 +57,9 @@ test("the hook names every read tool, so a reader knows what registers", () => {
   );
 });
 
-// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+// [[spec/design_output/level0#the-first-call-pays]]
 test("the session start registers every read tool, whatever the server answers", async () => {
-  const it = engine();
-  register(it.on, {});
+  const it = opened();
 
   const start = firing(it, "session.start");
   assert.ok(start, "the hook takes the session start");
@@ -66,39 +72,39 @@ test("the session start registers every read tool, whatever the server answers",
   );
 });
 
-// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-test("a call meeting no server starts one, waits on its health, and calls again", async () => {
-  const it = engine({
-    fetch: (where, count) => {
-      if (where.endsWith("/health"))
-        return count > 2 ? { ok: true, status: 200 } : null;
-      return count === 1
-        ? null
-        : { ok: true, status: 200, text: '{"result":"a line"}' };
-    },
+// The ask asks a case a tool, so the loop names each one the hook registers. [[spec/design_output/level0#the-first-call-pays]]
+for (const spec of READ_TOOLS) {
+  const called = `mcp__level0__${spec.name}`;
+
+  test(`a ${spec.name} call meeting no server starts one, and calls again`, async () => {
+    const it = opened({
+      fetch: (where, count) => {
+        if (where.endsWith("/health"))
+          return count > 2 ? { ok: true, status: 200 } : null;
+        return count === 1
+          ? null
+          : { ok: true, status: 200, text: '{"result":"a line"}' };
+      },
+    });
+
+    const call = firing(it, "tool.call", called);
+    assert.ok(call, `the hook takes a call of ${spec.name}`);
+    const said = await call.run(it.$, {}, (e) => e);
+
+    assert.ok(it.ran.length, "the start runs where the server answers nothing");
+    assert.ok(
+      it.asked.some((one) => one.where.endsWith("/health")),
+      "the wait reads the server's health",
+    );
+    assert.equal(said.result, "a line", "the second call answers the reader");
   });
-  register(it.on, {});
 
-  const call = firing(it, "tool.call", "mcp__level0__find");
-  assert.ok(call, "the hook takes the call of each read tool");
-  const said = await call.run(it.$, { words: "one" }, (e) => e);
+  test(`a ${spec.name} wait running out names the port and the log`, async () => {
+    const it = opened({ fetch: () => null, waiting: 20 });
 
-  assert.ok(it.ran.length, "the start runs where the server answers nothing");
-  assert.ok(
-    it.asked.some((one) => one.where.endsWith("/health")),
-    "the wait reads the server's health",
-  );
-  assert.equal(said.result, "a line", "the second call answers the reader");
-});
+    const said = await firing(it, "tool.call", called).run(it.$, {}, (e) => e);
 
-// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-test("a wait running out answers the line naming the port and the log", async () => {
-  const it = engine({ fetch: () => null });
-  register(it.on, {});
-
-  const call = firing(it, "tool.call", "mcp__level0__find");
-  const said = await call.run(it.$, { words: "one" }, (e) => e);
-
-  assert.match(String(said.result), /6510/, "the line names the port");
-  assert.match(String(said.result), /serve\.log/, "the line names the log");
-});
+    assert.match(String(said.result), /6510/, "the line names the port");
+    assert.match(String(said.result), /serve\.log/, "the line names the log");
+  });
+}

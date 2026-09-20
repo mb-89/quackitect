@@ -101,8 +101,8 @@ a prompt reaches no verb at all, so the bridgehead carries the same start. The
 session's first event answers nothing, the `warn` line lands, and the start
 road runs once.
 
-The road is one shell line, because the hook imports nothing and stands outside
-node. The shell reads the environment itself and answers a code:
+The road is one shell line, because the hook stands outside node and its own
+folder reaches no shell. The shell reads the environment itself and answers a code:
 
 | the code | what stands | what the log carries |
 |---|---|---|
