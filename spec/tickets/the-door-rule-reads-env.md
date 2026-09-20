@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: f5090a0e166b1a0fc90025362269192edd6a80de
     returns: 2
     why: The Go section names `src/lsp/doors.go`, and that file stands nowhere.; `src/viewer` and `src/index` each call theirs `door.go`. Take that name.; The Go reading reaches `src/viewer`, `src/index` and `src/swap` too. The; approach names a section for none of the three. Each package imports `os` in; several files at once. So one door file a package leaves the rule refusing; every other file of it. Say which file of each package names the outside, and; how the rest of the package reaches it.; `src/extension/extension.js` reads the platform. `.vale.ini` stands off; `editor*.js` alone, and the extension reaches no door under `src/doors`. Put; it in the pass list, beside the editor files.; `src/scripts/editor.js` reads the environment on its entry line, and; `cli*.js` misses it. Put it in one of the two tables.; The three findings of the round before stand answered. The pass list moves to; `.vale.ini`, the Go section carries a name, and the module table says what; each read takes. `process.platform` riding down from a root holds.; `src/extension/node_modules` stays out of reach, because the index skips it.
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 818cfead149a26113864a5ab5364bf3869f6718a
+    hash_after: 818cfead149a26113864a5ab5364bf3869f6718a
 ---
 
 # Ask
@@ -158,9 +162,11 @@ The readings:
 |---|---|
 | `**/src/scripts/cli*.js` | the command roots build the `it` every verb takes |
 | `**/src/scripts/precommit.js`, `**/src/scripts/prepush.js` | each is a hook a person's git runs, and it builds its own |
+| `**/src/scripts/editor.js` | the editor's own root, which reads the environment on its entry line |
 | `**/src/bridge/server.js` | the server root builds the box each door reads |
+| `**/src/extension/*.js` | the extension stands as its own door layer, as the editor files do |
 | `**/src/stub/**` | the template rides out as a copy, and the vehicle owns it |
-| `**/src/lsp/doors.go` | the Go door file names the outside for its package |
+| `**/src/*/door.go` | each Go package names the outside in that one file |
 
 Every other module takes the value off the hand. The implement step moves them,
 and the two the ask names open the list:
@@ -175,6 +181,20 @@ and the two the ask names open the list:
 `process.platform` reads the same way: a root reads it once and hands it down,
 and `src/scripts/cli-read.js` stands off as a root. So `./RUNME.sh lint src`
 answers clean, and the rule names every read a later hand writes.
+
+The Go rule reads an import of `os/exec`, which runs a command. Each package
+names that import in its `door.go`, and `src/index` holds one today.
+
+| the package | what moves |
+|---|---|
+| `src/lsp` | the command running of four files, into a `door.go` of its own |
+| `src/index` | nothing, because `door.go` stands there already |
+| `src/viewer`, `src/swap` | nothing, because neither runs a command |
+
+The `os` import, which reads a file, stands in a file of nearly every Go
+package. `./RUNME.sh lint src` answers how many, and a rule over it asks for a
+door in each. So this ticket holds the rule to `os/exec`, and
+`a-door-holds-the-go-file-calls` carries the rest.
 
 ## review
 
