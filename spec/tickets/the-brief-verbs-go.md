@@ -166,6 +166,16 @@ record:
     hash_after: 842fc913c23a7919dcb34c655c865c9d46ecb542
     returns: 1
     why: the hand takes it back
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: fdae28aa75157064b3bf8de8324dbb8fa4a5cbcf
+    hash_after: fdae28aa75157064b3bf8de8324dbb8fa4a5cbcf
+    returns: 2
+    why: the case goes red only beside the change, and this box leaves the tree green
+    answered:
+      - name: tests
+        exit: 0
+        said: "# duration_ms 12445.668614"
 ---
 
 # Ask
@@ -279,25 +289,25 @@ pass
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh branch test test/level0/work-brief-goes.test.js
+./RUNME.sh test test/level0/work.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-The case seeds a branch carrying both a root handover and a group ticket. The listing reads the handover, so the kind column says `brief` where the ask wants `group`.
+A case seeding a branch with both a root handover and a group ticket goes red, because `standingAll` reads the handover first. That case stood here, and it comes out again.
 
-What surprises: the two roads stand so close that one fixture holds both. `standingAll` reads the brief first, so the group's own standing hides behind a file the merge already drains.
+What surprises: a red case parks red. This box leaves the change to the next hand, so the case rides the approach in place of the tree, and `./RUNME.sh check` answers 0.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the case stands in a file of its own, because `work.test.js` sits at the ceiling
-- the case drives `doorsSaying`, so git and the disk stand fake
-- the header names the one brief a work branch carries, and points at its chapter
+- this leaf leaves no case behind, so it touches no file the ask leaves out
+- the case the approach names drives `doorsSaying`, so git and the disk stand fake
+- the approach under `design/draft` names every place, and this leaf adds nothing beside it
 
 ## reflect
 
