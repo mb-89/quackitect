@@ -332,11 +332,37 @@ switch is what reads a fall apart from a server standing down from the start.
 
 <!-- the form is text -->
 
+**The class.** A claim written from what a name suggests, in place of what the
+code answers. The three findings each read that way.
+
+| the finding | what the name suggests | what the code answers |
+|---|---|---|
+| the chapter calls the posting route the health call | a health call, because the chapter names one nearby | `url()` answers `/event` |
+| the failing-log case reads as proof of the flag move | the case names the flag, so it holds the flag | the case passes under the old flag too |
+| the overturned claim stands in one note | one note carries it, because the change reaches one | a second note carries it as well |
+
+**The fix for the class.** A claim about the code earns a run, and a case
+earns a mutation.
+
+- read the value a name answers before writing what it holds
+- put the old line back under a case, and keep the case where it turns red
+- search the tree for the claim a change overturns, past the note the change opens
+
+The second of those is what the verdict itself does. It reads a case green
+under the old line, and a case a mutation leaves green tests the test.
+
+The change takes that road. The chapter names the route the code answers, the
+case counts what the flag holds, and the second note follows the claim.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fix reaches the chapter, the case and the second note, each named by the verdict
+- the case counts the writes the fake takes, so the fake carries that count
+- each line points at the chapter owning the road, which carries the approach
 
 ## change
 
