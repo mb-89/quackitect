@@ -126,8 +126,8 @@ The work tab is a ticket editor. It queries the index for tickets, and a branch 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 - every child is small enough to review whole: each lands as one commit of one module and its note
-- the children add up to the goal: the query, the callback, the tab reading both, and the edit writing back
-- a child that waits on another names it: none names one, because the pull hands them out in the order they build on
+- the children add up to the goal: the query, the callback, the tab reading both, and the edit
+- a child that waits on another names it: none names one, and the pull hands them out in order
 
 # children
 
