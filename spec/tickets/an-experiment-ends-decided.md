@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: 37ed6315e1f9eb42673c1e3b2655b3482966d7eb
     returns: 2
     why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, the move lands two files level zero already holds |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |; | does every rule the approach adds carry a test | yes, the hold names a case each side |; | what grade do the findings take | design, each one decides what the approach does |; The seven findings of the last round all land. Three stand open.; Findings, one a line:; Say how `hooks/hooks.json` merges, because level zero holds a file of that name.; Say how `.claude-plugin/plugin.json` merges, because level zero holds a file of that name.; Add `spec/design_output/pull.md` to what changes, because it names the folder the wrapper leaves."
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 2ecf956449605a50c5ab70bc696e6f1b10f14700
+    hash_after: 2ecf956449605a50c5ab70bc696e6f1b10f14700
 ---
 
 # Ask
@@ -145,7 +149,11 @@ Level one holds the tool a hand pulls through and the judge reading a hand-back.
 |---|---|
 | `spec/processes/experiment.yaml` | a route whose last step is `decide` |
 | `spec/processes/retro.yaml` | its `audit` step holds while an experiment ticket stands open |
-| `.claude/skills/level0` | takes level one's hooks and library, under the names they carry |
+| `.claude/skills/level0/hooks/level1.js` | takes the wrapper's hook module, beside the one level zero holds |
+| `.claude/skills/level0/lib/pull.js` | takes the wrapper's library, beside the libraries level zero holds |
+| `.claude/skills/level0/hooks/hooks.json` | names the second module in its `modules` list |
+| `.claude/skills/level0/.claude-plugin/plugin.json` | keeps its own name, and its description says the pull tool rides here |
+| [[spec/design_output/pull]] | names the folder level zero holds as the wrapper's home |
 | `.claude/skills/level1` and `.claude/skills/pane` | leave, each under a ticket of the experiment process |
 | `test/level0/level1.test.js`, `test/level0/hand.test.js`, `test/contract/tree.test.js` | take the path level zero holds |
 | `src/scripts/cli-doors.js` | `LEVEL1` names the folder level zero holds |
