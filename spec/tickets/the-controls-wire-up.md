@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -217,6 +217,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-21
+    hash_before: 3135a734db77266a4881dfc33247b7bf9de1b3e2
+    hash_after: 3135a734db77266a4881dfc33247b7bf9de1b3e2
+    returns: 3
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | yes, the three done_when lines land |; | is what the diff touches beyond the ask trivial | yes, this round touches the stop door, one case file and this ticket |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does a retro stand in the handback | no, and `branch review` names it at the branch's close |; | does every rule the change adds carry a case | yes, the gate and `knowsCheck` each carry one |; | does a case feed the rule something bad | yes, the case asks `knowsCheck` a name nobody wrote |; TL;DR:; The finding of the last round lands, and the case holds the shipped names against the door.; `CHECKS` gives the door one table, and `knowsCheck` opens that table to a case.; The table carries the object prototype, so `ranHere` reads a function for `constructor`.; So `ranHere` and `knowsCheck` part on such a name, which is the class this round sets out to close.; `## reflect` carries two `### checked` blocks, one a round.; The findings, one a line:; `ranHere` answers `CHECKS[name]?.(held)`, and reads the prototype where the table holds nothing.; `CHECKS.constructor` is `Object`, which answers the held box, so a rule naming it fires.; `toString` and `valueOf` answer the same way, where `knowsCheck` answers false for each.; spec/design_output/stop.md says a `runs` the code holds nowhere answers false and writes a warn line.; The chain this hunk replaces answers undefined for those names, so the hunk moves that road.; The fix: gate the table read on `knowsCheck`, and carry a case over `runs: constructor`.; `## reflect` carries this round's `### checked` beside the block the round before wrote.; The fix: hold one `### checked` block under `## reflect`.; What reads true against the tree, one a line:; `CHECKS` in `src/bridge/stop.js` holds a key for each name the shipped rules use.; `ranHere` asks `standsDown` first, so `ENGINE_CHECKS` stands down at `god`.; The contract case asks `knowsCheck` of every shipped name, and of a name nobody wrote.; The case leaves `never` out, and spec/design_output/stop.md names `never` as the value answering nothing.; `./RUNME.sh check` answers 0, with the server standing.; `./RUNME.sh branch review` names the retro alone, and the branch's close writes it.; This hand stands on the tip 3135a734, and that tip matches origin.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | `ranHere` answers nothing for a name the object prototype holds | open |; | 2 | one `### checked` block stands under `## reflect` | open |; | 3 | the verdict hand reads the branch again | open |"
 ---
 
 # Ask
@@ -486,22 +492,16 @@ same of a name nobody wrote, and reads false.
 
 ## read
 
-- .claude/skills/level0/lib/config.js
 - .claude/skills/level0/lib/stop.js
-- HANDOVER.md
 - spec/config/stop/level0.yml
 - spec/config/stop/level1.yml
-- spec/design_output/config.md
+- spec/design_output/stop.md
 - spec/guidance/review/reviewing.md
 - spec/tickets/the-controls-wire-up.md
-- src/bridge/server.js
+- spec/tickets/the-runtime-files-stand-apart.md
 - src/bridge/stop.js
-- src/scripts/pull-route.js
-- src/scripts/pull.js
-- src/scripts/work.js
 - test/contract/stop-rules.test.js
 - test/level0/binding.test.js
-- test/level0/pull-doors.js
 
 ## verdict
 
@@ -510,48 +510,52 @@ fail
 | the question reviewing asks | the answer |
 |---|---|
 | does the branch do what the ask asks | yes, the three done_when lines land |
-| is what the diff touches beyond the ask trivial | yes, the server hunk moves two imports |
+| is what the diff touches beyond the ask trivial | yes, this round touches the stop door, one case file and this ticket |
 | what does `./RUNME.sh check` answer | 0, with the server standing |
 | does a retro stand in the handback | no, and `branch review` names it at the branch's close |
-| does every rule the change adds carry a case | the gate does, and the check list takes none |
-| does a case feed the rule something bad | the pull cases do, and the contract case holds nothing |
+| does every rule the change adds carry a case | yes, the gate and `knowsCheck` each carry one |
+| does a case feed the rule something bad | yes, the case asks `knowsCheck` a name nobody wrote |
 
 TL;DR:
 
-- Four of the five needs land, and the gate now stands above the branch-take.
-- A cloud box on trunk at `god` reads the wait, and the take stands untouched.
-- Three cases drive `pull` over the fakes, so the first done_when line lands.
-- `queueWaits` reads `BINDING`, and the pull's named-ticket refusal reads `QUEUE`.
-- The contract case's name promises a guard its assertions leave out.
+- The finding of the last round lands, and the case holds the shipped names against the door.
+- `CHECKS` gives the door one table, and `knowsCheck` opens that table to a case.
+- The table carries the object prototype, so `ranHere` reads a function for `constructor`.
+- So `ranHere` and `knowsCheck` part on such a name, which is the class this round sets out to close.
+- `## reflect` carries two `### checked` blocks, one a round.
 
 The findings, one a line:
 
-- The contract case says every shipped check stands in one list or the other.
-- Its first loop asks whether `standsDown` answers a boolean, which holds for any string.
-- A shipped name outside both lists meets that loop, and the case passes green.
-- `EVERY` in `test/level0/binding.test.js` stands as a copy, and this round moves its comment alone.
-- So need 3 of the last round stands open, and a check joining the rules lands in neither list.
-- The fix: hold the shipped names against the list the stop door answers.
+- `ranHere` answers `CHECKS[name]?.(held)`, and reads the prototype where the table holds nothing.
+- `CHECKS.constructor` is `Object`, which answers the held box, so a rule naming it fires.
+- `toString` and `valueOf` answer the same way, where `knowsCheck` answers false for each.
+- spec/design_output/stop.md says a `runs` the code holds nowhere answers false and writes a warn line.
+- The chain this hunk replaces answers undefined for those names, so the hunk moves that road.
+- The fix: gate the table read on `knowsCheck`, and carry a case over `runs: constructor`.
+- `## reflect` carries this round's `### checked` beside the block the round before wrote.
+- The fix: hold one `### checked` block under `## reflect`.
 
 What reads true against the tree, one a line:
 
-- The gate stands above the branch-take, under the hand-back and the hold, in `src/scripts/pull.js`.
-- A cloud box on trunk at `god` answers wait, and reaches the take nowhere.
-- The same box at `queue` reaches the take, so the gate closes that road alone.
-- The config library owns `BINDING`, `QUEUE` and `GOD`, and four files read them there.
-- `./RUNME.sh check` answers 0, and `branch test` answers green over the two case files.
+- `CHECKS` in `src/bridge/stop.js` holds a key for each name the shipped rules use.
+- `ranHere` asks `standsDown` first, so `ENGINE_CHECKS` stands down at `god`.
+- The contract case asks `knowsCheck` of every shipped name, and of a name nobody wrote.
+- The case leaves `never` out, and spec/design_output/stop.md names `never` as the value answering nothing.
+- `./RUNME.sh check` answers 0, with the server standing.
 - `./RUNME.sh branch review` names the retro alone, and the branch's close writes it.
+- This hand stands on the tip 3135a734, and that tip matches origin.
 
 What the agent needs:
 
 | number | need | status |
 |---|---|---|
-| 1 | the contract case refuses a shipped check landing in neither list | open |
-| 2 | the verdict hand reads the branch again | open |
+| 1 | `ranHere` answers nothing for a name the object prototype holds | open |
+| 2 | one `### checked` block stands under `## reflect` | open |
+| 3 | the verdict hand reads the branch again | open |
 
 ## checked
 
-- every fact the change adds stands in one place. The config library owns the key and its two values. The pull, its route, the stop door and the server read them there. Each new site points at the chapter owning what a binding value means. The check names stand copied in `test/level0/binding.test.js`. No case holds that copy against the rules owning them.
+- every fact the change adds stands in one place. `CHECKS` in `src/bridge/stop.js` owns the names, and `knowsCheck` opens that table to a case. Each comment points at spec/design_output/stop.md, which owns what a `runs` value answers. The case reads `never` off that same chapter. The ticket says one thing twice, because `## reflect` carries two `### checked` blocks.
 
 # Discussion
 
