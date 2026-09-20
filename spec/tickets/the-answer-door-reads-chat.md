@@ -335,6 +335,32 @@ the change the ask asks for.
 
 <!-- the form is text -->
 
+**The class.** One claim stands in four places, and the change reaches one of
+them. The chapter says a text between two calls pays now, and three copies of
+the old claim stand on.
+
+| where the old claim stands | what it says |
+|---|---|
+| the chapter What the door reads | changed |
+| the header of `src/bridge/report.js` | a text between calls reaches no hook |
+| the paragraph under the reply table of `spec/design_output/extension.md` | the same, and it links at the changed chapter |
+| the chapter's own line on the case over `SAYS` | it claims a case the tree holds nowhere |
+
+The design guidance names this: one place owns a thing, and every other place
+points at it. A claim copied into a header and a second note drifts the moment
+one copy moves.
+
+**The fix for the class.** A change to a claim starts with a search for the
+claim, across the code and the notes alike.
+
+- search the tree for the words of the claim before changing the place holding it
+- change every copy the search names, or point it at the owner
+- write the owner into the copy that stays, so the next reader follows one link
+- claim a case stands only where the search names the file holding it
+
+This ticket's change takes that road: the two copies point at the chapter, and
+the line claiming a case says what the case holds.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
