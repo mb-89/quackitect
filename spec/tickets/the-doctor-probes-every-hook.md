@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 4e674422989775cf1135c5fa4d26af76490e4c9f
+    hash_after: 4e674422989775cf1135c5fa4d26af76490e4c9f
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -313,11 +321,17 @@ review's call, and the change step says so in the chapter.
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `cli-check.js`, `vehicle.js`, the level zero chapter and the cases, which the ask's four lines call for
+- `hooksNamed` takes the disk as an argument, and `hookRows` takes the wire, so a case drives each over a fake
+- the chapter at `[[spec/design_output/level0#the-doctor-probes-every-hook]]` holds the approach, and each function points at it
 
 ## tests-green
 

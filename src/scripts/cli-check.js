@@ -20,7 +20,12 @@ import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
 import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { CONFIG, fromJson } from "../../.claude/skills/level0/lib/vale.js";
-import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
+import {
+  POINTER,
+  PORT_BASE,
+  SETTINGS,
+  SETTINGS_LOCAL,
+} from "../../.claude/skills/level0/lib/vehicle.js";
 import { filesOn } from "../../.claude/skills/level0/lib/warnings.js";
 import { guidanceHere } from "../bridge/guidance.js";
 import {
@@ -447,14 +452,68 @@ export function sidebarSays() {
   return "unlinked: run ./RUNME.sh";
 }
 
-// Every hook address the settings files name, in reading order, each with the file naming it first. [[spec/tickets/the-doctor-probes-every-hook]]
-export function hooksNamed(_disk, _root, _home) {
-  return [];
+// The three settings files the client reads, the tree's own first. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+function settingsFiles(root, home) {
+  const rows = [
+    { at: join(root, SETTINGS), name: SETTINGS },
+    { at: join(root, SETTINGS_LOCAL), name: SETTINGS_LOCAL },
+  ];
+  if (home) rows.push({ at: join(home, SETTINGS), name: join(home, SETTINGS) });
+  return rows;
 }
 
-// One doctor row a hook, off one probe the addresses run together. [[spec/tickets/the-doctor-probes-every-hook]]
-export async function hookRows(_found, _get = fetch) {
-  return [];
+// A command path parses as a URL, so a probe holds these two schemes alone. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+const REACHED = new Set(["http:", "https:"]);
+
+function addressOf(said) {
+  try {
+    const url = new URL(String(said));
+    return REACHED.has(url.protocol) ? url.href : "";
+  } catch {
+    return "";
+  }
+}
+
+// Every string a settings tree holds, whatever key carries it. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+function stringsIn(said, out = []) {
+  if (typeof said === "string") out.push(said);
+  else if (Array.isArray(said)) for (const one of said) stringsIn(one, out);
+  else if (said && typeof said === "object")
+    for (const one of Object.values(said)) stringsIn(one, out);
+  return out;
+}
+
+// Every hook address the settings files name, in reading order, each off the file naming it first. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+export function hooksNamed(disk, at, home) {
+  const found = new Map();
+  for (const file of settingsFiles(at, home)) {
+    let said = null;
+    try {
+      said = JSON.parse(String(disk.read(file.at)));
+    } catch {
+      continue;
+    }
+    for (const one of stringsIn(said?.hooks)) {
+      const where = addressOf(one);
+      if (where && !found.has(where)) found.set(where, { where, file: file.name });
+    }
+  }
+  return [...found.values()];
+}
+
+// One row a hook, off calls the probe runs together, so a box of dead hooks answers inside the first minute. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+export async function hookRows(found, get = fetch) {
+  return Promise.all(found.map((one) => hookRow(one, get)));
+}
+
+async function hookRow(one, get) {
+  const label = `hook ${new URL(one.where).host}`;
+  try {
+    await get(one.where, { signal: AbortSignal.timeout(HEALTH_WAIT) });
+    return [label, `stands at ${one.where}, off ${one.file}`];
+  } catch {
+    return [label, `warn: answers nothing at ${one.where}, off ${one.file}`];
+  }
 }
 
 export async function doctor() {
@@ -485,6 +544,7 @@ export async function doctor() {
       files.exists(join(root, TOOLS)) ? TOOLS : "absent, run ./RUNME.sh tools",
     ],
     ["server", await serverLine()],
+    ...(await hookRows(hooksNamed(files, root, homeIn(process.env)))),
   ];
   for (const [what, said] of rows) {
     console.log(`${what.padEnd(COL.tool)} ${String(said).trim() || "missing"}`);

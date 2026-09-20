@@ -244,6 +244,47 @@ fetch as a door, so a test drives each one.
 `./RUNME.sh doctor` names the server still. That verb is where a reader asks
 after what this box has.
 
+## The doctor probes every hook
+
+A hook answering nothing writes a failure on every event, and the session runs
+blind to it. So `./RUNME.sh doctor` reads the addresses the settings files
+name, and says which one answers.
+
+| the file | who writes it | does git track it |
+|---|---|---|
+| `.claude/settings.json` | this tree | yes |
+| `.claude/settings.local.json` | the box | no |
+| the settings under the home of the box | the box | no |
+
+`SETTINGS` and `SETTINGS_LOCAL` in `.claude/skills/level0/lib/vehicle.js` own
+those names, and the home file takes the first of them under the home path.
+`hooksNamed` in `src/scripts/cli-check.js` reads them in that order, and takes
+every string under `hooks`. It keeps the ones a URL parses as `http:` or
+`https:`.
+
+A command hook holds a path, and `new URL` takes a Windows path as a URL. So
+the reader holds those schemes alone, and a command hook stands outside the
+list. Two files naming one address read as one row, off the file naming it
+first.
+
+| what the probe meets | the row under the address |
+|---|---|
+| an answer, whatever its status | `stands at <the address>, off <the file>` |
+| nothing, inside the wait | `warn: answers nothing at <the address>, off <the file>` |
+
+A reply carrying a failing status stands, because a box answering a status
+listens there. `hookRows` runs the calls together, so a box naming several dead
+hooks answers inside the first minute. The wait is `HEALTH_WAIT` in
+`src/scripts/cli-doors.js`, which the server probe reads too.
+
+The row's label reads `hook <host>:<port>`, because `doctor` pads a label to
+one width. The word `warn` opens the printed row, and the doctor writes no log
+line of its own.
+
+The entry at the dead port lives in `.claude/settings.local.json`, which git
+ignores. So a hand on the box it belongs to takes that line out, and this row
+is what shows them the entry.
+
 # The harness surface
 
 Every line here comes from running it against client 2.1.263. The
