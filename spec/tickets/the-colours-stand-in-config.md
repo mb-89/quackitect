@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -131,6 +131,10 @@ record:
     hash_after: 252583fa2270dab17d966fcad45135065be0f228
     returns: 3
     why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | in part, and the first line of `done_when` goes missing |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the approach adds carry a case | yes, a case a layer over a fixture root and a case over the shipped file |; | does every claim carry a proof | one fails, the grep the draft cites over `src/viewer` |; TL;DR:; The road holds. The redraft takes the reader the owner rules for, and lands the values under `spec/config/styles`.; The move stops at `colour.go`. A colour number stands outside it, so the grep the draft cites answers other than 0.; The notes naming what moves get no line in the draft.; The findings, one a line:; `src/viewer/ui.go` wears the selected row's background, and `src/viewer/tabs.go` wears the open tab.; `grep -rc` over `src/viewer` reads those files, so the first line of `done_when` fails.; The table of what moves names `colour.go` alone. Name both files there, or say why each colour stands in Go.; `src/viewer/detail_test.go` asserts the prompt's colour by number. Say whether that case reads the config or holds a fixture.; `spec/design_output/viewer#colours` points the reader at `kindColours` in `colour.go`. Name the line the move rewrites.; `spec/design_output/level0.md` gives `spec/config/styles` to Vale. A JSON file there wants that line to name the other kind.; The earlier findings close: the reader road, the folder the ruling names, and the shared reader riding `SHARED`.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the table of what moves names every file under `src/viewer` holding a colour | open |; | 2 | the draft says what the standing case asserting a colour by number reads | open |; | 3 | the draft names the notes the move rewrites | open |; | 4 | the review hand reads the approach again | open |"
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: ab5ba40b770e73b6e889d0685e20f88be572088c
+    hash_after: ab5ba40b770e73b6e889d0685e20f88be572088c
 ---
 
 # Ask
@@ -186,16 +190,27 @@ The road the two drafts before this took, a projection into Go, drops here.
 
 **The root.** `workRoot` in `src/viewer/work.go` answers the root off the session path already. The colour read takes that root, so the window asks for no path of its own.
 
-**What moves.** `colour.go` keeps what it decides and gives up what it names:
+**What moves.** Every colour number under `src/viewer` moves, and `grep -rn 'lipgloss.Color("' src/viewer` answers which files hold one:
 
-| what | after |
+| the file | what it gives up |
 |---|---|
-| `kindColours`, `toolColours`, the level colours, the styles a name carries, `spare` | `spec/config/styles/colours.json` |
-| `kindStyle`, `levelStyle`, `saidStyle`, the hash over a kind the list holds nowhere | `colour.go`, reading what the module answers |
+| `colour.go` | `kindColours`, `toolColours`, the level colours, the styles a name carries, `spare` |
+| `tabs.go` | `openStyle`, the colour the open tab wears |
+| `ui.go` | the background the selected row wears |
+| `detail_test.go` | the numbers it asserts, which read the fixture the case builds |
 
-The file carries one map per group, and a list naming which entries wear bold. The window reads it once, at start, and holds what it reads. A file the reader reaches nowhere leaves each colour empty, so the window wears the terminal's own and draws on. `grep -c` over `src/viewer` then answers 0, which the first line of `done_when` asks for.
+Each file keeps what it decides. `kindStyle`, `levelStyle`, `saidStyle` and the hash over a kind the list holds nowhere stay in `colour.go`, reading what the module answers. The window reads the file once, at start, and holds what it reads.
 
-**The check.** A Go case drives the module over a fixture root, one case per layer, beside the cases `src/lsp` carries today. A second case reads the shipped file and asserts a colour for every kind `spec/design_output/viewer` names. So a kind losing its colour turns a case red.
+**The case reading a number.** `detail_test.go` asserts the prompt's colour by its number today. It takes a fixture root the case writes, so it reads the config the module reads and asserts against the fixture's own number. No case reads the shipped file for a number.
+
+**What the notes say after.** Two lines point at what moves, and the change rewrites both:
+
+| the note | the line |
+|---|---|
+| [[spec/design_output/viewer#colours]] | points a kind's colour at `kindColours` in `colour.go`, and points it at the config file after |
+| [[spec/design_output/level0]] | gives `spec/config/styles` to Vale, and names the colours file standing beside the styles after |
+
+**The check.** A Go case drives the module over a fixture root, one case per layer, beside the cases `src/lsp` carries today. A second case reads the shipped file and asserts a colour for every kind [[spec/design_output/viewer#colours]] names. A file the reader reaches nowhere leaves each colour empty, so the window wears the terminal's own and draws on.
 
 **The order.** This ticket lands first, and [[spec/tickets/a-rename-reaches-every-note]] carries the folder after it. That rename then moves one config file and one reader, and no generated target.
 
