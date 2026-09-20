@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box fb2b49fba485 · claude-code-remote
@@ -87,6 +87,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-verbs-answer-their-asks already carries every commit on main.
+  - step: split
+    hand: box fb2b49fba485 · claude-code-remote
+    hash_before: d4e3208a2fd3b784a8804869a894a23f3280592a
+    hash_after: d4e3208a2fd3b784a8804869a894a23f3280592a
 ---
 
 # Ask
@@ -115,11 +119,19 @@ Three verbs answer what their asks name. a-route-closes-answered-asks closes a t
 
 <!-- the form is list -->
 
+- [[spec/tickets/a-route-closes-answered-asks]], trivial, which closes a ticket whose ask another ticket answers
+- [[spec/tickets/split-names-its-source]], trivial, which reads the source past every flag and its value
+- [[spec/tickets/the-index-answers-the-queue]], trivial, which closes answered by the ticket the tab's queue column stands on
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: each is one trivial ticket, and the largest touches one verb and its tests
+- the children add up to the goal: the ask names three verbs, and one child stands for each
+- no child waits on another: the third closes on the road the first builds, and it took that road after the first closed
 
 # children
 
