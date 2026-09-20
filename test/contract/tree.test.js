@@ -369,6 +369,7 @@ test("a spelling of a name the runtime half took is refused where the old place 
 test("every forced copy of the session file says what the hand module says", () => {
   for (const path of [
     ".claude/skills/level0/hooks/level0.js",
+    ".claude/skills/level0/hooks/pull-tool.js",
     ".claude/skills/level1/lib/pull.js",
   ]) {
     assert.match(here.read(path), new RegExp(`"${SESSION}"`), path);

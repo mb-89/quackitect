@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: do
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-tree-names-its-things
 step: do
+record:
+  - step: do
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: b4a1424e6cf0e79002118f7be3d4fb4624191d6a
+    hash_after: b4a1424e6cf0e79002118f7be3d4fb4624191d6a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui passes
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -45,7 +58,7 @@ language a tab, and the footer marks something different in each.
 - an item answers the three questions the language asks of a row
 - a node stands while it matches, or while an item under it matches
 - a child matching nothing goes, even under a parent that matches
-- `go -C src/viewer test ./...` is green
+- `go -C src/tui test ./...` is green
 
 # do
 
@@ -53,7 +66,7 @@ language a tab, and the footer marks something different in each.
 
 ## tests
 
-    go -C src/viewer test ./...
+    ./RUNME.sh branch test src/tui/treeflag_test.go
 
 ## check
 
@@ -90,4 +103,4 @@ alone.
 
 Each tab holding its own filter waits for the tab that draws this view. The
 footer already asks the open tab whether one holds.
-[[spec/design_output/viewer#the-footer-carries-status]]
+[[spec/design_output/tui#the-footer-carries-status]]

@@ -142,6 +142,24 @@ test("a turn with no stop line holds, and the block names the reasons", () => {
   );
 });
 
+// A rule naming a check the door holds nowhere stands out of the vote. [[spec/design_output/stop#the-mechanical-checks]]
+test("a rule running a name every object carries fires nothing", () => {
+  const fired = `
+- id: the-stop-hook-holds-this-turn
+  side: continue
+  priority: 90
+  decides: mechanical
+  runs: constructor
+  says: A name nobody wrote holds this turn open.
+${RULES}`;
+  const it = box({ [at("spec/config/stop/level0.yml")]: fired });
+  const said = onStop(
+    { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" },
+    it.box,
+  );
+  assert.deepEqual(said, { pass: true }, "the stop stands, and the strange rule fires nothing");
+});
+
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
 test("the door answers the vote and the hand together, and the hand takes the file outside the window", () => {
   const it = box(stamped(9, ["old.md", "new.md"]));

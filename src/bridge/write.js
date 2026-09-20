@@ -4,6 +4,7 @@
 
 import { join } from "node:path";
 import { CODE } from "../../.claude/skills/level0/lib/code.js";
+import { marked, staleFault } from "../../.claude/skills/level0/lib/marks.js";
 import { isDraft, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import { carriedFrom, NOTES, refusedPrivate } from "../../.claude/skills/level0/lib/private.js";
 import { refusal } from "../../.claude/skills/level0/lib/refuse.js";
@@ -36,15 +37,43 @@ export async function onWrite(e, box) {
   const where = relativeTo(box.root, writing.path);
   if (/^([A-Za-z]:)?[\\/]/.test(where) || isDraft(where)) return PASS;
 
-  const checks = [ownerDoor, privateDoor, schemaDoor, voiceDoor];
+  const checks = [markDoor, ownerDoor, privateDoor, schemaDoor, voiceDoor];
   for (const check of checks) {
     const found = await check(e, writing, where, box);
     if (found) return { result: { deny: found } };
   }
   marksStale(where, box);
+  const whole = wholeAfter(e, writing, box.disk);
   // [[spec/design_output/level0#the-formatter-applies-itself]]
-  if (CODE.test(writing.path)) return codeDoor(e, writing, where, wholeAfter(e, writing, box.disk), box);
+  if (CODE.test(writing.path)) {
+    const said = await codeDoor(e, writing, where, whole, box);
+    if (!said?.result?.deny) marksSeen(box, where, said?.event?.content ?? whole);
+    return said;
+  }
+  marksSeen(box, where, whole);
   return PASS;
+}
+
+// [[spec/design_output/level0#a-write-meets-its-mark]]
+export function marksOf(box) {
+  if (!box.marks) box.marks = new Map();
+  return box.marks;
+}
+
+// [[spec/design_output/level0#a-write-meets-its-mark]]
+export function marksSeen(box, where, text) {
+  marked(marksOf(box), where, text);
+}
+
+// [[spec/design_output/level0#a-write-meets-its-mark]]
+function markDoor(e, writing, where, box) {
+  const found = staleFault(marksOf(box), where, textAt(box.disk, writing.path));
+  if (!found) return "";
+  box.log.say("warn", "mark", `refused a write over a stale read of ${where}`, {
+    file: where,
+    tool: String(e.tool),
+  });
+  return found;
 }
 
 // [[spec/design_output/private#the-door-reads-the-notes]]

@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import * as lib from "../../.claude/skills/level1/lib/pull.js";
+import * as lib from "../../.claude/skills/level0/lib/pull.js";
 import {
   judgeAsk,
   judgeRefusal,
@@ -12,12 +12,29 @@ import {
   pullSpec,
   sessionOf,
   spawnPromptIn,
-} from "../../.claude/skills/level1/lib/pull.js";
+} from "../../.claude/skills/level0/lib/pull.js";
+// The whole module, so a name the wrapper answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
+import * as level1 from "../../.claude/skills/level0/lib/pull.js";
 import { pullArgvOf } from "../../src/scripts/pull-tool.js";
 
+// The rules a leaf hands the judge, each label naming one rule. [[spec/tickets/the-judge-reads-answer-rules]]
+const RULES = [
+  {
+    label: "voice-1",
+    note: "spec/guidance/voice",
+    number: 1,
+    rule: "Say what is.",
+  },
+  {
+    label: "voice-3",
+    note: "spec/guidance/voice",
+    number: 3,
+    rule: "Put the bottom line first.",
+  },
+];
 // The hooks level one registers, keyed by their event. A registration carries a filter between the event and the handler, so the last argument is the handler. [[spec/design_output/pull#the-checks]]
 async function hooksHere() {
-  const { register } = await import("../../.claude/skills/level1/hooks/level1.js");
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
   const held = {};
   register((event, ...rest) => {
     held[event] = rest.at(-1);
@@ -99,17 +116,38 @@ test("the tool's input reads into the same words a person types", () => {
 });
 
 // [[spec/design_output/pull#the-checks]]
-test("the judge's question carries every rule numbered and the evidence whole", () => {
-  const ask = judgeAsk("The approach.\nchecked:\n- one", [
-    "Say what is.",
-    "Put the bottom line first.",
-  ]);
-  assert.match(ask, /1\. Say what is\.\n2\. Put the bottom line first\./);
+test("the judge's question names each rule by its label and carries the evidence whole", () => {
+  const ask = judgeAsk("The approach.\nchecked:\n- one", RULES);
+  assert.match(ask, /voice-1: Say what is\.\nvoice-3: Put the bottom line first\./);
   assert.match(ask, /Evidence:\nThe approach\.\nchecked:\n- one$/);
   assert.match(
     judgeRefusal("the judge answers breaks over design/draft"),
     /^refused\n/,
   );
+});
+
+// [[spec/tickets/the-judge-reads-answer-rules]]
+test("the labels the judge picks from open on follows, one label a rule after it", () => {
+  assert.equal(typeof level1.judgeLabels, "function", "the wrapper answers judgeLabels");
+  assert.deepEqual(level1.judgeLabels(RULES), ["follows", "voice-1", "voice-3"]);
+  assert.deepEqual(level1.judgeLabels([]), ["follows"]);
+});
+
+// [[spec/tickets/the-judge-reads-answer-rules]]
+test("a label reads back to the note, the number and the rule's own line", () => {
+  assert.equal(typeof level1.ruleBroken, "function", "the wrapper answers ruleBroken");
+  const said = level1.ruleBroken("voice-3", RULES);
+  assert.match(said, /spec\/guidance\/voice/, "the refusal names the note");
+  assert.match(said, /rule 3/, "the refusal names the number");
+  assert.match(said, /Put the bottom line first\./, "the refusal names the line");
+});
+
+// [[spec/tickets/the-judge-reads-answer-rules]]
+test("a label outside the set reads as follows, so a judge naming nothing refuses nothing", () => {
+  assert.equal(typeof level1.ruleBroken, "function", "the wrapper answers ruleBroken");
+  assert.equal(level1.ruleBroken("follows", RULES), "");
+  assert.equal(level1.ruleBroken("voice-9", RULES), "");
+  assert.equal(level1.ruleBroken("", RULES), "");
 });
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]

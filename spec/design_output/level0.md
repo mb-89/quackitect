@@ -745,6 +745,35 @@ The private half answers first, so a note's own words stop at the door. The
 refusal closes by asking the writer to hold that rule for the rest of the turn.
 A refusal teaching one line costs a round trip on every line.
 
+## A write meets its mark
+
+Two hands on one tree drop each other's work. One reads a file, the other
+writes it, and the first write lands over text the other leaves. So the door
+keeps a mark against each path, and a write meets it.
+
+| when | what the door does |
+|---|---|
+| content reaches the agent, by a read or by its own write landing | it hashes that text and keeps it against the path |
+| the agent writes that path | it hashes what the disk holds now |
+| the two agree | the write lands |
+| the two differ | it refuses, and asks for a read |
+| the disk holds the path nowhere | the write lands, because a new file agrees with anything |
+
+Which read sets the mark is the whole of the mechanism. The door reads the file
+for itself on every edit, so a mark off that read compares against itself. The
+mark comes off the read reaching the agent.
+
+The hand carries nothing. `lib/marks.js` holds the hash and the refusal, and
+the box holds the marks against the tree it serves. This door writes a refusal
+of its own, because the voice refusal opens on the prose rules and says the
+wrong thing here. It names the file, says which of the two cases stands, and
+asks for a read.
+
+The door answers ahead of the write, so a write the engine drops leaves the
+mark ahead of the disk. The next write refuses and asks for a read, which costs
+a read and keeps the tree whole. The batch lane reads every file inside the
+call that writes it. That read is the agent's own, so the lane takes no token.
+
 ## The door reaches a helper
 
 A subagent's writes go through the same `tool.call` chain, so the door reads
@@ -1302,7 +1331,8 @@ answers that the rules pass.
 
 | folder | holder |
 |---|---|
-| `spec/config/styles` | Vale reads it, and `.vale.ini` says which style reaches which path |
+| `spec/config/styles` | Vale reads its style folders, and `.vale.ini` says which style reaches which path |
+| `spec/config/styles/colours.json` | the window reads it, as [[spec/design_output/tui#colours]] says |
 | `spec/config/biome.json` | Biome reads it |
 
 The comments in `.vale.ini` say why each section stands.

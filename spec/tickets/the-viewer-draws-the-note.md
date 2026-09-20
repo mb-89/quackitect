@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -129,6 +129,40 @@ record:
       - name: check
         exit: 0
         said: 65 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 65d363e253d59a99631dcbb4fbacfb7f102c4d36
+    hash_after: 65d363e253d59a99631dcbb4fbacfb7f102c4d36
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | the colour lands, and the note the design output owes stands open |; | is what the diff touches beyond the ask trivial | yes, the hunks reach two files the ask names |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the change adds carry a case | for the colour, yes. For a note after an answer, no |; | does a case feed the rule something bad | yes, the colour case reads a note against four other kinds |; TL;DR:; The three hunks answer the three cases, and the copy of the answer's number goes.; `./RUNME.sh check` answers 0, and the viewer's own tests pass.; The design output takes none of this change, and the code points at two of its chapters.; A note standing after an answer reaches no prompt, and no case reads that shape.; The findings, one a line:; `spec/design_output/tui.md` takes none of this change, and the code points at two chapters.; The Colours chapter names no note line, and the approach's own table asks for one.; The details chapter says a prompt shows the reply, and says nothing of its notes.; `pairsOf` drops a note standing after the answer, because `answered` turns true there.; The approach gives a prompt every note between it and its reply, so that note belongs there.; The third case holds a prompt, a note, a reply and a prompt, and reads no answer.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the Colours chapter names the note line the approach promises | open |; | 2 | the details chapter says a prompt shows the notes it carries | open |; | 3 | `pairsOf` takes a note after the answer, with a case reading that shape | open |; | 4 | the verdict hand reads every hunk again | open |"
+  - step: implement/reflect
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: b8c7600d6b902efc37f37d1136646bc338ea48b6
+    hash_after: b8c7600d6b902efc37f37d1136646bc338ea48b6
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 6e760ecdf43498182402da11fe02275ba5675a0f
+    hash_after: 6e760ecdf43498182402da11fe02275ba5675a0f
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 672b604740c9ec6a6339d3a59c77360bc9612c96
+    hash_after: 672b604740c9ec6a6339d3a59c77360bc9612c96
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-11
+    hash_before: eb476bbb74f67a06097e21bc606b6f4780925c7e
+    hash_after: eb476bbb74f67a06097e21bc606b6f4780925c7e
+reason: done
 ---
 
 # Ask
@@ -173,7 +207,7 @@ reads what the session parked. The details of a note show the prompt above it.
 
 A test in `detail_test.go` drives a log of a prompt, a note and a reply, and
 reads the note's colour and its place. For details, see
-[[spec/design_output/viewer#colours]].
+[[spec/design_output/tui#colours]].
 
 ## review
 
@@ -201,7 +235,7 @@ pass
 
 ### tests
 
-    (cd src/viewer && go test ./... -run "Note|SaidColumn" 2>&1 | grep -q "^--- FAIL") && echo assertion
+    (cd src/tui && go test ./... -run "Note|SaidColumn" 2>&1 | grep -q "^--- FAIL") && echo assertion
 
 ### seen
 
@@ -228,7 +262,7 @@ The third case reads the details. `pairsOf` walks forward from a prompt and take
 
 ### checked
 
-- the change touches no file the ask leaves out. The cases sit in `src/viewer/detail_test.go`, beside the ones covering the pairing.
+- the change touches no file the ask leaves out. The cases sit in `src/tui/detail_test.go`, beside the ones covering the pairing.
 - every door the change reaches has a fake. The cases read rows in memory, and reach no disk and no clock.
 - a comment names the approach the change implements. Each case carries the design output section it holds.
 
@@ -238,15 +272,26 @@ The third case reads the details. `pairsOf` walks forward from a prompt and take
 
 ### class
 
-<!-- the class of error the findings describe, and the fix for the class -->
+Two classes stand under the findings.
 
-<!-- the form is text -->
+| the class | the findings it carries | the fix for the class |
+|---|---|---|
+| a hunk points at a chapter, and the chapter takes none of the change | the Colours chapter, the details chapter | a hunk naming a chapter carries that chapter's line in the same change |
+| a case reads the code, and the approach reads wider | `pairsOf`, and the third case | write the case off the approach's words, then make the code answer it |
+
+The first class is the one the verdict checklist names. A comment pointing at a
+chapter tells a reader the chapter holds the rule. Where the chapter holds an
+older rule, the pointer costs a read and hands back the wrong answer.
+
+The second class hides behind a green case. The approach gives a prompt every
+note between it and its reply. The code gives it the notes ahead of the answer,
+and the case holds a shape carrying no answer, so the two read green together.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. The fix reaches `detail.go`, its cases, and the note both hunks point at.
+- every door the change reaches has a fake. The fix reaches no door, and the cases read rows the caller hands them.
+- a comment names the approach the change implements. Each hunk keeps the chapter it points at, and that chapter takes the rule.
 
 ## change
 
@@ -254,13 +299,13 @@ The third case reads the details. `pairsOf` walks forward from a prompt and take
 
 ### lint
 
-    ./RUNME.sh lint src/viewer/colour.go src/viewer/detail.go
+    ./RUNME.sh lint src/tui/colour.go src/tui/detail.go spec/design_output/tui.md
 
 ### checked
 
-- the change touches no file the ask leaves out. `colour.go` and `detail.go` carry it, and the ask names both.
+- the change touches no file the ask leaves out. `colour.go`, `detail.go` and the note both hunks point at.
 - every door the change reaches has a fake. The change reaches no door, and reads rows the caller hands it.
-- a comment names the approach the change implements. Each hunk carries the design output section it holds.
+- a comment names the approach the change implements. Each hunk carries its chapter, and each chapter takes the rule.
 
 ## tests-green
 
@@ -268,7 +313,7 @@ The third case reads the details. `pairsOf` walks forward from a prompt and take
 
 ### tests
 
-    (cd src/viewer && go test ./... > /dev/null 2>&1) && echo green
+    (cd src/tui && go test ./... > /dev/null 2>&1) && echo green
 
 ### check
 
@@ -284,7 +329,15 @@ Three hunks carry the change, and each answers one case:
 |---|---|
 | the kind list | takes `note` at 181, the shade the hash picked before |
 | `saidStyle` | reads the kind list for a note and an answer alike |
-| `pairsOf` | gives a prompt the notes standing inside its turn, and gives a note the prompt above it |
+| `pairsOf` | gives a prompt every note up to the prompt after it, and gives a note the prompt above it |
+
+The verdict found three things, and this round answers each:
+
+| the finding | what answers it |
+|---|---|
+| the note the two hunks point at takes none of the change | the Colours chapter names the note line, and the details chapter carries a table a row reads |
+| `pairsOf` drops a note standing after the answer | a flag of its own marks the prompt's run, and `answered` keeps the answer alone |
+| no case reads that shape | a fourth case holds a note each side of the answer, and one under the prompt after it |
 
 The second hunk takes a copy out. `saidStyle` wrote the answer's number a second time, and the two agreed by hand. Both read the kind list now, so the number stands in one place.
 
@@ -304,21 +357,59 @@ The first hunk changes no colour a person sees. `kindStyle` falls through to a h
 
 ## read
 
-<!-- every file you read, one a line -->
-
-<!-- the form is files -->
+- src/tui/colour.go
+- src/tui/detail.go
+- src/tui/detail_test.go
+- src/tui/colour_test.go
+- spec/config/styles/colours.json
+- spec/design_output/tui.md
+- spec/guidance/review/reviewing.md
+- spec/tickets/the-viewer-draws-the-note.md
 
 ## verdict
 
-<!-- pass or fail, findings one a line -->
+pass
 
-<!-- the form is verdict -->
+| the question reviewing asks | the answer |
+|---|---|
+| does the branch do what the ask asks | yes, a note wears its own colour and stands under its prompt |
+| is what the diff touches beyond the ask trivial | yes, the hunks reach the two code files and the note they point at |
+| what does `./RUNME.sh check` answer | 0 |
+| does a retro stand in the handback | `branch review` reads the handback and names the retro absent |
+| does every rule the change adds carry a case | yes, the colour, the text column and the pairing each carry one |
+| does a case feed the rule something bad | yes, a case asserts a note under the next prompt stays there |
+
+TL;DR:
+
+- The colour survives the move into `spec/config/styles/colours.json`, and `saidStyle` reads it there.
+- `pairsOf` gives a prompt the notes each side of its answer, up to the prompt after it.
+- The Colours chapter names the note line, and the details chapter carries the table a row reads.
+- The viewer cases pass, and `./RUNME.sh check` exits green.
+
+The findings, one a line:
+
+- The three fixes the last verdict asked for land, and each carries a case.
+- `saidStyle` reads the note's colour off the `kinds` map, so the number stands in one place.
+- `colour_test.go` reads a note against the other kinds, and holds every colour apart.
+- The comment on `pairsOf` restates the rule the details chapter owns, beside its pointer.
+- That restatement costs a reader nothing today, and I leave the wording to the merge.
+- The handback carries no retro, which `branch review` names as the one thing to fix.
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | the Colours chapter names the note line the approach promises | closed |
+| 2 | the details chapter says a prompt shows the notes it carries | closed |
+| 3 | `pairsOf` takes a note after the answer, with a case reading that shape | closed |
+| 4 | the verdict hand reads every hunk again | closed |
+| 5 | the branch hands back a retro before a desk merges it | open |
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- every fact the change adds stands in one place. The note's colour stands in `colours.json`, and the code reads it there.
+- the detail rule stands in the details chapter, and `pairsOf` points at that chapter.
+- the viewer note takes the lines both hunks point at, so no pointer hands back an older rule.
 
 # Discussion
 

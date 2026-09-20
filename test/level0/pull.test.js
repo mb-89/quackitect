@@ -459,6 +459,32 @@ test("a verdict field decides, the flag is refused there, and a fail sends the t
   assert.match(said, /fails design\/review back to design\/draft/);
 });
 
+// A craft question rides the fail verdict, so the route grows no person step. [[spec/tickets/a-question-reaches-its-owner]]
+test("a craft question reaches the drafter, and the route takes on no person step", () => {
+  const took = withEntry(CHILD("open", "design/review"), {
+    step: "design/draft",
+    hand: "box other",
+    hash_before: SHA,
+    hash_after: SHA,
+  });
+  const { it, disk } = doors(standing(took));
+  heard(() => pulling(ROOT, ["pull"], it));
+
+  const craft = "which road the reader takes inside the design";
+  disk.write(
+    at("spec/tickets/a-child.md"),
+    filled(took, "### verdict", `fail\n- ${craft}`),
+  );
+  const { code } = heard(() => pulling(ROOT, ["pull", "a-child"], it));
+
+  assert.equal(code, 0);
+  const now = disk.read(at("spec/tickets/a-child.md"));
+  assert.equal(fieldOf(now, "step"), "design/draft", "the drafter takes it back");
+  assert.match(recordIn(now).at(-1).why, /which road the reader takes/);
+  assert.doesNotMatch(now, /person-\d/, "a craft question inserts no person step");
+  assert.doesNotMatch(now, /by: person/, "and names no person as its hand");
+});
+
 // A step whose evidence stands red is a step a hand fails. [[spec/design_output/pull#the-fail]]
 test("a fail runs the step's commands for the record, and none of them refuses it", () => {
   const child = withPayload(

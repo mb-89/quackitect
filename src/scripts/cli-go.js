@@ -39,3 +39,12 @@ export function goEnvOf(it) {
   }
   return { GOFLAGS: TAGS };
 }
+
+// The findings the Go formatter's list reads as, one a file it names. [[spec/design_output/index#the-compiler-it-needs]]
+export function formatFaults(folder, said) {
+  return `${said ?? ""}`
+    .split("\n")
+    .map((one) => one.trim())
+    .filter(Boolean)
+    .map((name) => `${folder}/${name}: Gofmt: the file reads another way than the formatter writes it.`);
+}

@@ -1138,7 +1138,7 @@ the only fact it meets is a route.
 | the processes | `spec/processes/<name>.yaml`, six of them, in the tree now |
 | the emitter | one module the editor reads, beside the verbs |
 | the verbs | `src/scripts/work.js`, under `./RUNME.sh branch` |
-| the tool wrapper and the spawn | `.claude/skills/level1/`, beside level zero |
+| the tool wrapper and the spawn | `.claude/skills/level0/`, in the one module the plugin holds |
 | the stop rule | `spec/config/stop/level1.yml` |
 | the hold and the box id | `.se/hold/<hand>.json`, `.se/box.json` |
 | the config | the `engine` and `work` sections of `spec/config/level0.json` |

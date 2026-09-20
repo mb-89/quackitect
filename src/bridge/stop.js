@@ -17,6 +17,11 @@ import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { stampOf, STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { drains, standsPast, takesFile } from "../../.claude/skills/level0/lib/warnings.js";
+import {
+  BINDING,
+  GOD,
+  QUEUE,
+} from "../../.claude/skills/level0/lib/config.js";
 import { spanOf, ticketAt, WORK_BRANCH } from "../engine/group.js";
 import { heldGroup, openPrivate, queueHolds } from "../../.claude/skills/level0/lib/ticket.js";
 import {
@@ -259,22 +264,48 @@ function lastLineReason(text) {
   return found ? found[1] : "";
 }
 
-function ranHere(name, held) {
-  if (name === "stop-hook-off") return held.off;
-  if (name === "owner-holds") return held.hold === STOP;
-  if (name === "owner-finishes") return held.hold === FINISH;
+// The checks reading the engine's own work. [[spec/design_output/config#the-engine-controls]]
+export const ENGINE_CHECKS = [
+  "ticket-in-hand",
+  "group-in-hand",
+  "work-waiting",
+  "warnings-standing",
+];
+
+// [[spec/design_output/config#the-engine-controls]]
+export function standsDown(name, binding) {
+  return String(binding) === GOD && ENGINE_CHECKS.includes(name);
+}
+
+// Every check this door answers, one a key. [[spec/design_output/stop#the-mechanical-checks]]
+const CHECKS = {
+  "stop-hook-off": (held) => held.off,
+  "owner-holds": (held) => held.hold === STOP,
+  "owner-finishes": (held) => held.hold === FINISH,
   // An answer naming a next step takes no free stop, so the turn holds open where the agent says what it does next. [[spec/design_output/stop#the-chat-is-new]]
-  if (name === "chat-is-new") return chatIsNew(held.box) && !namesNext(held.text);
-  if (name === "work-waiting") return todosOf(held.box).standing();
-  if (name === "group-in-hand") return groupInHand(held.box);
-  if (name === "ticket-in-hand") return holdStands(held.box) || privateStands(held.box);
-  if (name === "queue-waits") return queueWaits(held.box);
-  if (name === "no-stop-line") return !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed);
+  "chat-is-new": (held) => chatIsNew(held.box) && !namesNext(held.text),
+  "work-waiting": (held) => todosOf(held.box).standing(),
+  "group-in-hand": (held) => groupInHand(held.box),
+  "ticket-in-hand": (held) => holdStands(held.box) || privateStands(held.box),
+  "queue-waits": (held) => queueWaits(held.box),
+  "no-stop-line": (held) =>
+    !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed),
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
-  if (name === "a-person-sits-here") return !inCloud(held.box.env ?? process.env);
+  "a-person-sits-here": (held) => !inCloud(held.box.env ?? process.env),
   // [[spec/tickets/the-spawn-reaches-its-guidance]]
-  if (name === "warnings-standing") return handWanted(held.box);
-  return undefined;
+  "warnings-standing": (held) => handWanted(held.box),
+};
+
+// [[spec/design_output/stop#the-mechanical-checks]]
+export function knowsCheck(name) {
+  return Object.hasOwn(CHECKS, String(name));
+}
+
+function ranHere(name, held) {
+  // A table answers the keys every object carries, so the read asks it first. [[spec/design_output/stop#the-mechanical-checks]]
+  if (!knowsCheck(name)) return undefined;
+  if (standsDown(name, asks(held.box, BINDING))) return false;
+  return CHECKS[name](held);
 }
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
@@ -327,7 +358,7 @@ function promptsIn(box) {
 // A desk bound to the queue on trunk has work while a free ticket stands, so a stop on completion waits. [[spec/design_output/stop#the-mechanical-checks]]
 function queueWaits(box) {
   if (inCloud(box.env ?? process.env)) return false;
-  if (asks(box, "engine.binding") !== "queue") return false;
+  if (asks(box, BINDING) !== QUEUE) return false;
   if (branchOf(box) !== "main") return false;
   const texts = readFolder(box.disk, join(box.work, "spec", "tickets"), ".md").map((one) => one.text);
   return queueHolds(texts);

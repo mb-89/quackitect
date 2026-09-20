@@ -47,6 +47,7 @@ import { graphIn } from "./graph.js";
 import { probe } from "./probe.js";
 import { withRoute } from "./process.js";
 import { pullArgvOf } from "./pull-tool.js";
+import { renaming, renamingText } from "./rename.js";
 import { retro } from "./retro.js";
 import { stubInto } from "./stub.js";
 import { ticket } from "./ticket.js";
@@ -172,6 +173,11 @@ export const verbs = {
     says: "the index itself: standing, reindex, or same <path>",
     run: async () => asksIndex(rest.length ? rest : ["standing"]),
   },
+  // [[spec/design_output/index#a-rename-reaches-a-name]]
+  rename: {
+    says: "move a name and rewrite every reach: rename <from> <to>",
+    run: async () => renameHere(rest),
+  },
 };
 
 export const argv = process.argv.slice(2);
@@ -240,6 +246,32 @@ export function theVehicle(argv) {
   return 0;
 }
 
+// [[spec/design_output/index#a-rename-reaches-a-name]]
+export function renameHere(argv) {
+  const [from, to] = argv.filter((one) => !one.startsWith("-"));
+  if (!from || !to) {
+    console.error("se rename <from> <to>: say the name that moves and the one it takes.");
+    return 2;
+  }
+  const it = { disk: files, join, root, git: git(outside, root) };
+  // A module's name stands as no path, so `--text` rewrites it and moves nothing. [[spec/design_output/index#a-rename-reaches-a-name]]
+  const said = argv.includes("--text")
+    ? renamingText(it, from, to)
+    : renaming(it, from, to);
+  if (said.why) {
+    console.error(said.why);
+    return 1;
+  }
+  console.log(`${from} stands at ${to}.`);
+  for (const one of said.wrote) console.log(`  ${one}`);
+  // A rule that skips says what it skips, so a hand reads what the run left out. [[spec/design_output/index#a-rename-reaches-a-name]]
+  for (const one of said.skipped ?? []) {
+    console.log(`  the reader reads ${one} as a picture, so the rewrite leaves it alone`);
+  }
+  console.log("Run ./RUNME.sh links, then ./RUNME.sh check.");
+  return 0;
+}
+
 // [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
 export function theStub(argv) {
   const flag = argv.indexOf("--upstream");
@@ -285,7 +317,7 @@ export function serveBridge(argv) {
   }).exitCode;
 }
 
-// [[spec/design_output/viewer#the-verb-builds-it]]
+// [[spec/design_output/tui#the-verb-builds-it]]
 
 export function test() {
   const ran = outside.run([process.execPath, "--test", TESTS, CONTRACT_TESTS], {

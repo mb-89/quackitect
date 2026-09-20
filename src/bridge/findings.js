@@ -82,6 +82,12 @@ export async function findingsOver(it, asked) {
   return { found, fault: "" };
 }
 
+// One guard answers both fronts, because a tool standing nowhere is no tool. [[spec/design_output/lsp#one-checker-every-front-asks]]
+export function biomeFor(files, root, known) {
+  const at = whereIs(files, root, "biome", known);
+  return files.exists(at) ? at : "";
+}
+
 // The server's answer to GET /findings, over the paths the query names or the whole tree. [[spec/design_output/lsp]]
 export async function findingsFor(box, url) {
   const asked = new URL(String(url), "http://here").searchParams.getAll("path");
@@ -93,7 +99,7 @@ export async function findingsFor(box, url) {
       join,
       root: box.method,
       vale: whereIs(box.disk, box.method, "vale", known),
-      biome: whereIs(box.disk, box.method, "biome", known),
+      biome: biomeFor(box.disk, box.method, known),
       ceilings: {
         function: asks(box, "code.functionLines"),
         file: asks(box, "code.fileLines"),
@@ -102,6 +108,13 @@ export async function findingsFor(box, url) {
     asked.length ? asked : [WHOLE],
   );
   return { ok: !got.fault, found: got.found, fault: got.fault };
+}
+
+// What a reading names, sorted, so a case holds one front's list against the other's. [[spec/design_output/lsp#one-checker-every-front-asks]]
+export function linesNamed(found) {
+  return [...(found ?? [])]
+    .map((one) => `${one.file ?? ""}:${one.line}:${one.rule}`)
+    .sort();
 }
 
 function from(one, source) {

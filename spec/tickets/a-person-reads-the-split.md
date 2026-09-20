@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: answer
@@ -36,7 +36,24 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
-step: answer
+step: do
+record:
+  - step: answer
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 6cdfc9c02d00d6ee857ae042cf10c4df84f22c27
+    hash_after: 6cdfc9c02d00d6ee857ae042cf10c4df84f22c27
+  - step: do
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: b80b1b52be3096cdd3a32d9402a53223e6a22c68
+    hash_after: b80b1b52be3096cdd3a32d9402a53223e6a22c68
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 64 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -75,33 +92,56 @@ The review hands that ticket back to its draft, and the draft reaches its escala
 
 <!-- the form is text -->
 
+The approach stands, and the split it names has landed. The header a module
+owes stays open.
+
+| what the ask asks | what the tree answers |
+|---|---|
+| `./RUNME.sh lint src/scripts` names no `FileCeiling` | it names none |
+| `./RUNME.sh lint test/level0` names no `FileCeiling` | it names none |
+| `./RUNME.sh check` exits 0 | it exits 0, with the server standing |
+| every module the split mints heads with what it is for | `pull-hand.js`, `pull-route.js` and `work-merge.js` open on an import |
+
+So the `do` step writes a header on each module the table names, in the shape
+[[spec/guidance/code]] asks for.
+
+The findings the review names reach a draft that closed `became`. The tree
+carries the approach now, and the tree is what a reader acts on. So the `do`
+step leaves that draft where it stands.
+
+What this call weighs, on a box nobody sits beside:
+
+- the split landed elsewhere, so this answer reads the tree
+- a closed ticket's draft is history, and a reader reaches the tree instead
+- the header work stands whichever way the owner rules on the draft at the merge
+
 # do
 
 <!-- carries the answer out, with the test that covers it -->
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/pull.test.js test/level0/pull-steps.test.js test/level0/work.test.js
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+`pull-hand.js`, `pull-route.js` and `work-merge.js` open on a header saying
+what the file holds, and pointing at the chapter that explains it. Every other
+module the split minted already opened on one, so this brings the three that
+stood apart into line with them.
 
-<!-- the form is text -->
+The header is the whole change. The modules keep every export and every line of
+behaviour they carried, so the tests covering them answer as they did.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the answer: the answer names those modules, and the change writes a header on each
+- the cleanup it reveals: none, because a header touches nothing the module does
+- the header says what the file is for, and points at the chapter holding the rest
 
 # Discussion
 

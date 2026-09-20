@@ -140,11 +140,61 @@ export const SETTINGS = ".claude/settings.json";
 // The file the box writes beside the tree's own, which git leaves alone. [[spec/design_output/level0#the-doctor-probes-every-hook]]
 export const SETTINGS_LOCAL = ".claude/settings.local.json";
 export const KEEP = ".gitkeep";
-export const STUB_FOLDERS = ["project/spec/tickets", "project/spec/guidance", "project/src"];
+// The folders a stub opens with, under the name the stub itself carries. [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
+export const STUB_INSIDE = ["spec/tickets", "spec/guidance", "src"];
 
-export function brandOf(method) {
+// [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
+export function stubFolders(name) {
+  const said = folderOf(name) || "project";
+  return STUB_INSIDE.map((one) => `${said}/${one}`);
+}
+
+// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+export function folderOf(method) {
   const parts = slashed(method).replace(/\/+$/, "").split("/");
   return parts[parts.length - 1] ?? "";
+}
+
+// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+export function brandOf(method) {
+  return folderOf(method)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+export function emptyBrand(method) {
+  return `${folderOf(method)} carries no letter and no digit, so it slugs to an empty brand. Rename the folder to one a marketplace takes, or move the vehicle into one.`;
+}
+
+// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+export function brandedJson(text, brand) {
+  const held = parsed(text);
+  if (!held || typeof held !== "object" || Array.isArray(held)) return String(text);
+  const out = { ...held };
+  if (out.owner && typeof out.owner === "object") {
+    out.owner = { ...out.owner, name: brand };
+    out.name = brand;
+  }
+  if (out.author && typeof out.author === "object") {
+    out.author = { ...out.author, name: brand };
+  }
+  return `${JSON.stringify(out, null, 2)}\n`;
+}
+
+// [[spec/design_output/level0#a-stub-names-its-vehicle]]
+export function shimSettings(text, vehicle, brand) {
+  const held = parsed(text);
+  const out = held && typeof held === "object" && !Array.isArray(held) ? { ...held } : {};
+  out.extraKnownMarketplaces = {
+    ...(out.extraKnownMarketplaces ?? {}),
+    [brand]: { source: { source: "directory", path: vehicle } },
+  };
+  const id = `level0@${brand}`;
+  const standing = Array.isArray(out.enabledPlugins) ? out.enabledPlugins : [];
+  out.enabledPlugins = standing.includes(id) ? standing : [...standing, id];
+  return `${JSON.stringify(out, null, 2)}\n`;
 }
 
 export function upstreamOf(remote, named) {
@@ -168,6 +218,8 @@ export function settingsOf(read) {
   return Object.fromEntries(Object.entries(held).filter(([key]) => !key.startsWith("$")));
 }
 
-export function stubFiles(template) {
-  return [...STUB_FOLDERS.map((one) => `${one}/${KEEP}`), LINK, SETTINGS, ...(template ?? [])];
+// [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
+export function stubFiles(template, name) {
+  const folders = stubFolders(name).map((one) => `${one}/${KEEP}`);
+  return [...folders, LINK, SETTINGS, ...(template ?? [])];
 }

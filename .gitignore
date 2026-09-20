@@ -18,11 +18,15 @@
 # default branch, so committing them is what keeps level zero active there.
 
 node_modules/
-src/viewer/viewer
-src/viewer/viewer.exe
+src/tui/tui
+src/tui/tui.exe
 src/index/index
 src/index/index.exe
 src/lsp/lsp
 src/lsp/lsp.exe
 src/yaml/yaml
 src/yaml/yaml.exe
+
+# The install script writes this from spec/config/brand/icon.svg, which the
+# vehicle owns. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+src/extension/icon.svg

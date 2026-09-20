@@ -497,5 +497,9 @@ fi
 
 node "$root/src/scripts/copilot.js" setup auto
 
+# The brand this folder carries reaches the marketplace, the plugin's author
+# and the extension's icon. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+node "$root/src/scripts/brand.js" || say "  the brand reached no name, so the marketplace keeps the one it holds." >&2
+
 [ -n "$missing" ] && say "Ready."
 exit 0

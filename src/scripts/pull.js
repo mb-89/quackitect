@@ -3,7 +3,7 @@
 // the record, moves the step, commits, pushes, and hands out the next leaf.
 // [[spec/design_output/pull#the-answers]]
 
-import { actionables } from "../../.claude/skills/level0/lib/guidance.js";
+import { forEvidence } from "../../.claude/skills/level0/lib/guidance.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { checkNote } from "../../.claude/skills/level0/lib/schema.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
@@ -41,8 +41,10 @@ import {
 } from "./pull-hand.js";
 import {
   DONE,
+  handsOut,
   leafOf,
   leavesOf,
+  QUEUE,
   REFUSED,
   say,
   stillHeld,
@@ -104,7 +106,7 @@ export function pull(it, argv) {
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
   // A name with a leaf in hand hands that leaf back. A name with none asks for that ticket. [[spec/design_output/pull#the-hand-out]]
   const asking = Boolean(name) && !named && !verdict.said && !held;
-  if (asking && it.binding === "queue") {
+  if (asking && it.binding === QUEUE) {
     console.error(`${name} stands behind the queue, because this session binds to it.`);
     console.error("Run ./RUNME.sh ticket pull with no name, and take what it hands you.");
     return 2;
@@ -112,6 +114,14 @@ export function pull(it, argv) {
   who.wanted = asking ? name : "";
   if (!named && (verdict.said || (name && held))) return handBack(it, who, name, verdict);
   if (held) return stillHeld(it, held);
+  // The plain pull hands out at the queue alone, and this gate stands above every road it closes. [[spec/design_output/config#the-engine-controls]]
+  if (!asking && !handsOut(it.binding)) {
+    say(WAIT, [
+      `this session binds to ${it.binding}, so the pull hands nothing out.`,
+      `Name a ticket to take one, or set engine.binding to ${QUEUE}.`,
+    ]);
+    return 0;
+  }
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
   // A hand asking for one ticket takes no branch, because the queue answers neither. [[spec/design_output/pull#the-hand-out]]
   if (onTrunk && it.take && !asking) {
@@ -293,8 +303,9 @@ export function judgeMaterial(it, held, name) {
       .filter(([field, rows]) => rows.length && !commands.has(field))
       .flatMap(([field, rows]) => [`${field}:`, ...rows]),
   ].join("\n");
+  // A label names the note beside the number, so one label reaches one rule. [[spec/design_output/pull#the-checks]]
   const rules = (leaf?.reads ?? []).flatMap((path) =>
-    actionables(guidanceText(it, path)),
+    forEvidence(guidanceText(it, path), path),
   );
   console.log(
     JSON.stringify({ ticket: held.ticket, step: held.step, evidence, rules }),

@@ -4,6 +4,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { applied, filesIn } from "../../.claude/skills/level0/lib/apply.js";
+import { agrees, marked, staleFault } from "../../.claude/skills/level0/lib/marks.js";
 import {
   journalOf,
   nameOf,
@@ -167,4 +168,31 @@ test("a file the apply made comes out rather than back", () => {
   const said = restores(entry, { "new.md": { exists: true, text: "hello\n" } });
   assert.deepEqual(said.removes, ["new.md"]);
   assert.equal(said.writes.length, 0);
+});
+
+// [[spec/design_output/level0#a-write-meets-its-mark]]
+test("a path the disk holds nowhere writes with no mark", () => {
+  assert.equal(staleFault(new Map(), "one.md", null), "");
+});
+
+test("a write over a file this hand has read none of comes back refused", () => {
+  const said = staleFault(new Map(), "one.md", "alpha\n");
+  assert.match(said, /has read none of it/);
+});
+
+test("a write over the text the mark carries lands", () => {
+  const held = marked(new Map(), "one.md", "alpha\n");
+  assert.equal(staleFault(held, "one.md", "alpha\n"), "");
+});
+
+test("a write over a file moving after the read comes back refused", () => {
+  const held = marked(new Map(), "one.md", "alpha\n");
+  const said = staleFault(held, "one.md", "beta\n");
+  assert.match(said, /moved on the disk after you read it/);
+});
+
+test("a mark reaches the path it names alone", () => {
+  const held = marked(new Map(), "one.md", "alpha\n");
+  assert.equal(agrees(held, "one.md", "alpha\n"), true);
+  assert.equal(agrees(held, "two.md", "alpha\n"), false);
 });

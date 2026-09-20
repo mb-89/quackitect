@@ -40,7 +40,6 @@ import {
   HEALTH_WAIT,
   it,
   known,
-  LEVEL1,
   lsp,
   OURS,
   outside,
@@ -55,7 +54,7 @@ import {
 } from "./cli-doors.js";
 import { namesIn, show, walk, warningsStood } from "./cli-read.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
-import { goEnvOf, goModulesIn } from "./cli-go.js";
+import { formatFaults, goEnvOf, goModulesIn } from "./cli-go.js";
 import { HOOKS } from "./precommit.js";
 import { writeSurvey } from "../engine/tools.js";
 import { viewerOf } from "./tui-build.js";
@@ -124,9 +123,22 @@ export function goHolds() {
       console.log("go stands nowhere, so the Go tests go unrun here.");
       return 0;
     }
-    worst = worst || ran.exitCode;
+    worst = worst || ran.exitCode || goFormat(folder, env);
   }
   return worst;
+}
+
+// Go's own format rides in no other gate, so the check holds it. [[spec/design_output/index#the-compiler-it-needs]]
+function goFormat(folder, env) {
+  let ran;
+  try {
+    ran = outside.run(["gofmt", "-l", "."], { cwd: join(root, folder), env });
+  } catch {
+    return 0;
+  }
+  const faults = formatFaults(folder, ran.stdout);
+  for (const one of faults) console.log(one);
+  return faults.length ? 1 : 0;
 }
 
 // [[spec/design_output/config#the-verb-names-the-layer]]
@@ -283,7 +295,8 @@ export function project() {
 // [[spec/design_output/schema#the-fields-a-caller-names]]
 
 export function pluginHolds() {
-  for (const plugin of [PLUGIN, LEVEL1]) {
+  // One plugin stands, because the wrapper's trial ends kept. [[spec/design_output/work#an-experiment-decides]]
+  for (const plugin of [PLUGIN]) {
     const ran = validatePlugin(outside.run, plugin, root);
     if (ran.exitCode === 0) continue;
     if (!ran.stdout && !ran.stderr) {
