@@ -207,9 +207,9 @@ The readings:
 - a root builds the hand every other module takes, so it reads the environment once
 - the Go rule reads an import line, so one file of a package names the outside
 
-Every section standing `DoorsOnly` off names the new rule as well. A door reads
-the environment, a fake stands in for a door, and a hooks module runs where no
-door reaches:
+A section `.vale.ini` holds today grows to name the new rule. A door reads the
+environment, and a fake stands in for a door. A hooks module runs where no door
+reaches, and a case drives a door:
 
 | the section standing today | why the new rule stands off there too |
 |---|---|
@@ -217,13 +217,14 @@ door reaches:
 | `**/src/doors/fake/*.js` | a fake stands in for a door, and takes the same road |
 | `**/.claude/skills/level0/hooks/*.js` | the hooks module reads the environment on its entry line |
 | `**/src/stub/.claude/skills/level0/hooks/*.js` | the stub copies that module out of the template |
+| `**/test/level0/*.js` | a case reads the environment to drive a door, and sets one around itself |
 | `[*.{md,markdown,txt}]` | a note names the read in prose, and two tickets do today |
 
 The sections `.vale.ini` gains, each naming the new rule alone:
 
 | the section | why it stands off |
 |---|---|
-| `**/test/contract/*.js`, `**/test/level0/*.js` | a case reads the environment to drive a door, and sets one around itself |
+| `**/test/contract/*.js` | a case reads the environment to drive a door, and sets one around itself |
 | `**/src/scripts/cli*.js` | the command roots build the `it` every verb takes |
 | `**/src/scripts/precommit.js`, `**/src/scripts/prepush.js` | each is a hook a person's git runs, and it builds its own |
 | `**/src/scripts/trust.js`, `**/src/scripts/copilot.js` | each opens on its own line of arguments, the way a hook does |
@@ -244,8 +245,8 @@ and the two the ask names open the list:
 |---|---|
 | `src/scripts/pull-hand.js` | `it.env`, and the read of the process goes |
 | `src/bridge/stop.js` | `box.env`, and the break mark rides the box beside it |
-| `work.js` | `it.env`, off the hand the root builds |
-| `vehicle.js` | `windows`, beside the `env` its callers hand it today |
+| `src/scripts/work.js` | `it.env`, off the hand the root builds |
+| `src/scripts/vehicle.js` | `windows`, beside the `env` its callers hand it today |
 | `src/bridge/bash.js`, `src/bridge/guidance.js` | `box.env`, off the box the server builds |
 
 `process.platform` reads the same way. `cli-check.js` builds `windows` onto the
