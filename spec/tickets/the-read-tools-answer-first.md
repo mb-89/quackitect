@@ -89,12 +89,18 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: aea57a0ab08f3573035259dcb4b2268fc10b3981
     hash_after: aea57a0ab08f3573035259dcb4b2268fc10b3981
+  - step: design/review
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 703fa45aa005c5361748df70aea64f032c5045fd
+    hash_after: 703fa45aa005c5361748df70aea64f032c5045fd
+    returns: 1
+    why: "the hook's header says it imports nothing, three times, and it re-spells constants for that reason; say what that invariant becomes, because specs under `lib` make the hook import; say what happens to the constants the hook spells again today, which that invariant forces; the third row carries a bare number. `REASONS` in the hook names code 6, so point there; the specs' new home carries no file name. `findSpec` stands in `src/bridge/search.js`, and `SPECS` in `src/bridge/apply.js`; the ask asks for a case per tool, and the approach names no case file; what holds: `START`, `register` and `REASONS` all stand in the hook, and the chapter takes the order"
 ---
 
 # Ask
@@ -148,8 +154,17 @@ So a hand calls `find` on its first turn, and that call pays for the server.
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- the hook's header says it imports nothing, three times, and it re-spells constants for that reason
+- say what that invariant becomes, because specs under `lib` make the hook import
+- say what happens to the constants the hook spells again today, which that invariant forces
+- the third row carries a bare number. `REASONS` in the hook names code 6, so point there
+- the specs' new home carries no file name. `findSpec` stands in `src/bridge/search.js`, and `SPECS` in `src/bridge/apply.js`
+- the ask asks for a case per tool, and the approach names no case file
+- what holds: `START`, `register` and `REASONS` all stand in the hook, and the chapter takes the order
 
 # implement
 
