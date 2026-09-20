@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box 201f76ea75a2 · claude-code-remote
@@ -87,6 +87,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-bridgehead-carries-its-closure already carries every commit on main.
+  - step: split
+    hand: box 201f76ea75a2 · claude-code-remote
+    hash_before: ad34cdc0e72a3be94bcc6186fa08ead637716098
+    hash_after: ad34cdc0e72a3be94bcc6186fa08ead637716098
 ---
 
 # Ask
@@ -111,13 +115,16 @@ A stub carries every file its bridgehead imports, and a dead server costs one ro
 
 <!-- every child as a link, one a line, with its process -->
 
-<!-- the form is list -->
+- [[spec/tickets/files-read-the-closure]], trivial
+- [[spec/tickets/one-post-a-tool-call]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-<!-- the form is checklist -->
+- each child touches one module, one case file and one chapter, and reads whole in one sitting
+- the closure and the count are the two halves of the ask, and the goal names nothing past them
+- neither child waits on the other, so neither names a depends_on
 
 # children
 
