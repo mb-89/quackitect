@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -105,6 +105,10 @@ record:
     hand: box 099c2ec7708d · claude-code-remote
     hash_before: 56e10c5ec0b9914077c061757367e69ee2547f75
     hash_after: 56e10c5ec0b9914077c061757367e69ee2547f75
+  - step: design/review
+    hand: box 099c2ec7708d · claude-code-remote · helper-4
+    hash_before: ddc4302a55ac99ea5ef319c90223c61472261205
+    hash_after: ddc4302a55ac99ea5ef319c90223c61472261205
 ---
 
 # Ask
@@ -171,15 +175,19 @@ Where each thing stands after:
 <!-- pass or fail, with findings one a line -->
 <!-- the form is verdict -->
 
-fail
+pass
 
-- the message read stands already: `commitVoice`, under `src/bridge/bash.js`, which the bash door calls
-- it lints under the path `level0-commit.md`, and the approach names no path, so a second reader picks another
-- it calls `withoutTrailers` first, so a reader missing that lints the co-author lines a commit carries
-- `landed` composes its own message as the ticket name and its changes, so a free message reaches it nowhere
-- say whether the commit half comes out of `landed`, or the verb runs its own commit and leaves it standing
-- the ask names `./RUNME.sh test`, and the approach names no case file the refusal and the push land in
-- what holds: `STAMP` under `runs.js` carries the check, and `prepush.js` behind the push door reads it
+- `commitVoice`, `level0-commit.md`, `withoutTrailers` and `readsProse` each stand where the approach puts them
+- `landed`, `STAMP` and `prepush.js` stand where it names them too
+- the redraft answers every finding the record carries, down to the commit half and the case file
+- `commitVoice` stays unexported, and it parses a shell command, so the verb lifts that read behind a seam
+- the approach names the path, the strip and the findings reader, so that seam lands in one behavior
+- one owner stands on each thing it adds: the verb file, the verbs map, the case file, the chapter
+- [[spec/design_output/work#the-battery-answers-first]] resolves, and that chapter owns the stamp and both push doors
+- `./RUNME.sh check` writes the stamp on the new commit, so the push meets no stale stamp
+- `test/level0/commit-verb.test.js` fits the names beside `landed.test.js` and `prepush.test.js`
+- link [[spec/design_output/bash#a-commit-message-meets-voice]], which owns the path and the strip, and drop the why-it-matters column
+
 
 # implement
 
