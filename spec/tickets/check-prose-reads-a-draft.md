@@ -89,12 +89,18 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: 09b61b89224ccd5cfb4f8a8d943b8d3e9b1ee1d1
     hash_after: 09b61b89224ccd5cfb4f8a8d943b8d3e9b1ee1d1
+  - step: design/review
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: ed778c0da59e8b60125e4b1865dac1795d3c783b
+    hash_after: ed778c0da59e8b60125e4b1865dac1795d3c783b
+    returns: 1
+    why: "the write door stands in `src/bridge/write.js`, and `voiceDoor` runs the read this tool reuses; name `wholeAfter` and `readsProse` beside it, because the whole-file read and its filter both stand there; `refusal` stands under `.claude/skills/level0/lib/refuse.js`, so the table points there for it; the tool's own module is unnamed. Say which file holds its spec and its handler; the ask names `./RUNME.sh test`, and the approach names no case file the two drafts land in; what holds: `mutations` answers the whole file a write lands, so the ask's third row stands already; `CHECK` under `answer.js` names `check_answer`, and the chapter the tool joins stands"
 ---
 
 # Ask
@@ -145,8 +151,17 @@ The cases drive a clean draft to an empty list, and a draft carrying a long sent
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- the write door stands in `src/bridge/write.js`, and `voiceDoor` runs the read this tool reuses
+- name `wholeAfter` and `readsProse` beside it, because the whole-file read and its filter both stand there
+- `refusal` stands under `.claude/skills/level0/lib/refuse.js`, so the table points there for it
+- the tool's own module is unnamed. Say which file holds its spec and its handler
+- the ask names `./RUNME.sh test`, and the approach names no case file the two drafts land in
+- what holds: `mutations` answers the whole file a write lands, so the ask's third row stands already
+- `CHECK` under `answer.js` names `check_answer`, and the chapter the tool joins stands
 
 # implement
 
