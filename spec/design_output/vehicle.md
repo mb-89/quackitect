@@ -6,31 +6,31 @@ refines: ["[[spec/design_input/a-stub-takes-its-vehicle]]"]
 # Scope
 
 `src/scripts/vehicle.js` carries this tooling into another project. This note
-covers the copy, the project it drives, and the roots between them. For the
+covers the vehicle, the project it drives, and the roots between them. For the
 argument, see [[spec/rationales/vehicle]].
 
-# A copy and its project
+# A vehicle and its project
 
 This tooling exists to work on projects that are other than itself. That needs
-two roots, and a copy that knows which project it drives.
+two roots, and a vehicle that knows which project it drives.
 
 | root | what it is |
 |---|---|
-| method | where this copy of the tooling stands: the rules and the guidance |
+| method | where the tooling stands: the rules and the guidance |
 | work | the folder under the agent's hands |
 
-## Three things a copy needs
+## Three things a vehicle needs
 
 | what | where it lives |
 |---|---|
-| a copy carries an identity | `.se/.runtime/copy.json` in the method tree |
-| a project names the copy driving it | `.se/.runtime/project.json` in the work tree |
+| a vehicle carries an identity | `.se/.runtime/identity.json` in the method tree |
+| a project names the vehicle driving it | `.se/.runtime/project.json` in the work tree |
 | a register turns an identity into a place | `~/.se/.runtime/registry.json` |
 
 A path alone does none of this. It goes stale the moment either tree moves,
 and the pair then names a place that holds something else.
 
-The identity lives in the method tree, so a produced copy makes its own and a
+The identity lives in the method tree, so a produced vehicle makes its own and a
 moved tree keeps the one it has.
 
 ## A marker names the root
@@ -49,7 +49,7 @@ the same folder. `./RUNME.sh vehicle` says so:
 
     method  /home/user/quackitect
     work    /home/user/quackitect
-    copy    d425a54ca0335  (this tree drives itself)
+    vehicle d425a54ca0335  (this tree drives itself)
 
 Where the two agree, every path stays as it reads. Where they differ, the
 method root carries the rules, the guidance and the judged styles. The files
@@ -57,7 +57,7 @@ under the agent's hands stay in the work root.
 
 ## The work root inherits
 
-A copy hands its rules down, and the work root takes them the way a class takes
+A vehicle hands its rules down, and the work root takes them the way a class takes
 what it extends. The unit is the file.
 
 | what the work root does | what stands |
@@ -104,19 +104,19 @@ A vehicle carries the whole method and answers for itself. It reaches back to
 its origin for nothing at all. A corporate machine holds the vehicle, and the
 tree behind it stands outside every wall that machine sits inside.
 
-Proven against a real copy, in `test/contract/vehicle.test.js`:
+Proven against a real vehicle, in `test/contract/vehicle.test.js`:
 
-| what stands | what the copy answers |
+| what stands | what the vehicle answers |
 |---|---|
 | its identity | its own, and other than its origin's |
 | its roots | itself as method and as work |
 | its contract tests | every one green, out of its own folder |
 | its answer to `vehicle` | no path naming its origin |
 
-A fresh copy takes two steps that any fresh clone takes: `git init`, and one
+A fresh vehicle takes two steps that any fresh clone takes: `git init`, and one
 run of `RUNME`, which surveys the tools and builds what it needs.
 
-The run bit travels with the scripts. A copy whose `RUNME.sh` arrives
+The run bit travels with the scripts. A vehicle whose `RUNME.sh` arrives
 a file nobody can run answers `Permission denied`, and the vehicle stands there unable to
 take its own first step.
 
@@ -124,11 +124,11 @@ take its own first step.
 
 `attach` writes the identity into the work tree, and `detach` takes it out so
 the next start asks again. An identity the register cannot place is a fact
-about this machine: the copy stands somewhere else.
+about this machine: the vehicle stands somewhere else.
 
 ## The register places an identity
 
-Every copy writes itself into `~/.se/.runtime/registry.json`, or into each folder
+Every vehicle writes itself into `~/.se/.runtime/registry.json`, or into each folder
 `SE_REGISTRY` names, which holds the file straight. The reader drops an entry
 whose method root holds no marker. A folder that holds something else now
 answers about that something. A box carrying the register straight under the
@@ -149,12 +149,12 @@ and the pointer, and nothing else of the vehicle. The bridgehead reads the
 port off the pointer at session start. `.se` stays off git, so a clone gets
 the pointer back from the same press.
 
-## One copy is no question
+## One vehicle is no question
 
-A project naming no driver, on a machine holding exactly one copy, takes that
-copy. Two copies make a question, and the project answers it with `attach`.
+A project naming no driver, on a machine holding exactly one vehicle, takes that
+vehicle. Two vehicles make a question, and the project answers it with `attach`.
 
-## What travels into a copy
+## What travels into a vehicle
 
 `produce` walks the method tree and leaves four things behind:
 
@@ -165,7 +165,7 @@ copy. Two copies make a question, and the project answers it with `attach`.
 | `node_modules` | what a package manager writes |
 | `_to_delete` | what somebody means to remove |
 
-A copy lands in a new folder. `vehicle into <folder>` writes into one that
+A vehicle lands in a new folder. `vehicle into <folder>` writes into one that
 stands already, which is how a folder becomes a vehicle where it sits.
 
 # A stub takes its vehicle
@@ -188,7 +188,7 @@ says what the verb puts into each.
 
 | field | reads off |
 |---|---|
-| `vehicle` | the identity in `.se/.runtime/copy.json`, made where it stands unmade |
+| `vehicle` | the identity in `.se/.runtime/identity.json`, made where it stands unmade |
 | `name` | the folder the vehicle stands in, which is the brand |
 | `upstream` | `git remote get-url origin` in the vehicle, or what `--upstream` names |
 | `version` | the vehicle's `package.json` |

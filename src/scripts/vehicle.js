@@ -1,16 +1,16 @@
-// A copy of this tooling, made and placed. The pure half decides, the disk
+// A vehicle, made and placed. The pure half decides, the disk
 // door writes, and a project keeps the identity of whatever drives it.
-// [[spec/design_output/vehicle#three-things-a-copy-needs]]
+// [[spec/design_output/vehicle#three-things-a-vehicle-needs]]
 
 import { dirname, join } from "node:path";
 import {
   attaches,
-  COPY,
-  copyOf,
+  IDENTITY,
+  identityOf,
   drivenOf,
   entryOf,
   MARKER,
-  onlyCopy,
+  onlyVehicle,
   PROJECT,
   pairOf,
   REGISTER,
@@ -39,10 +39,10 @@ export function methodRootFrom(files, start) {
   return "";
 }
 
-// [[spec/design_output/vehicle#three-things-a-copy-needs]]
-export function copyHere(files, time, method) {
-  const at = join(method, COPY);
-  const said = copyOf(readIf(files, at), idOf(time), time.stamp());
+// [[spec/design_output/vehicle#three-things-a-vehicle-needs]]
+export function identityHere(files, time, method) {
+  const at = join(method, IDENTITY);
+  const said = identityOf(readIf(files, at), idOf(time), time.stamp());
   if (said.made) {
     files.makeDir(dirname(at));
     files.write(at, `${JSON.stringify(said.record, null, 2)}\n`);
@@ -75,7 +75,7 @@ export function readRegister(files, env, windows = false) {
   return out;
 }
 
-export function registerCopy(files, env, entry, windows = false) {
+export function registerVehicle(files, env, entry, windows = false) {
   let wrote = false;
   for (const dir of registerDirs(env, windows)) {
     const at = join(dir, REGISTER);
@@ -113,16 +113,16 @@ export function rootsHere(files, env, start) {
   const list = readRegister(files, env);
   const driven = drivenOf(readIf(files, join(work, PROJECT)));
   const named = driven ? resolves(list, driven.driver) : "";
-  return pairOf(named || onlyCopy(list), work);
+  return pairOf(named || onlyVehicle(list), work);
 }
 
-// [[spec/design_output/vehicle#what-travels-into-a-copy]]
+// [[spec/design_output/vehicle#what-travels-into-a-vehicle]]
 export function produce(files, method, dest, into) {
   if (!into && files.exists(dest)) {
-    return { ok: false, why: `${dest} stands already. A copy lands in a new place` };
+    return { ok: false, why: `${dest} stands already. A vehicle lands in a new place` };
   }
   if (dest === method)
-    return { ok: false, why: "a copy lands beside its method, elsewhere" };
+    return { ok: false, why: "a vehicle lands beside its method, elsewhere" };
 
   let count = 0;
   const walk = (rel) => {
@@ -147,7 +147,7 @@ export function produce(files, method, dest, into) {
 }
 
 export function entryFor(files, time, env, method, version) {
-  const id = copyHere(files, time, method);
+  const id = identityHere(files, time, method);
   return { id, entry: entryOf(id, version, method, time.stamp()), env };
 }
 

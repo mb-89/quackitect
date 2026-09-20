@@ -10,7 +10,7 @@ import {
   portOf,
   withPort,
 } from "../../.claude/skills/level0/lib/vehicle.js";
-import { attach, copyHere, readRegister, registerCopy } from "../scripts/vehicle.js";
+import { attach, identityHere, readRegister, registerVehicle } from "../scripts/vehicle.js";
 
 const HOOK = ".claude/skills/level0";
 // The hook imports its own folder, so the copy takes what it reaches. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
@@ -58,7 +58,7 @@ export function settles(disk, env, time, work, vehicle, windows = false) {
 
 // [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
 export function attachTo(disk, env, time, work, vehicle, windows = false) {
-  attach(disk, time, work, copyHere(disk, time, vehicle));
+  attach(disk, time, work, identityHere(disk, time, vehicle));
   return settles(disk, env, time, work, vehicle, windows);
 }
 
@@ -73,12 +73,12 @@ export function registeredPort(disk, env, time, method, windows = false) {
   const held = readRegister(disk, env, windows);
   const known = portOf(held, method);
   if (known) return known;
-  const id = copyHere(disk, time, method);
+  const id = identityHere(disk, time, method);
   const entry = withPort(
     held,
     entryOf(id, versionOf(disk, method), method, time.stamp()),
   );
-  registerCopy(disk, env, entry, windows);
+  registerVehicle(disk, env, entry, windows);
   return entry.port;
 }
 

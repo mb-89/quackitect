@@ -1,14 +1,14 @@
-// A copy, the project it drives, and the register between them.
+// A vehicle, the project it drives, and the register between them.
 // [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
   attaches,
-  copyOf,
+  identityOf,
   drivenOf,
   entryOf,
-  onlyCopy,
+  onlyVehicle,
   pairOf,
   portOf,
   registers,
@@ -21,12 +21,12 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import {
   attach,
-  copyHere,
+  identityHere,
   detach,
   methodRootFrom,
   produce,
   readRegister,
-  registerCopy,
+  registerVehicle,
   rootsHere,
 } from "../../src/scripts/vehicle.js";
 
@@ -38,14 +38,14 @@ function tree(extra = {}) {
     "/tools/RUNME.sh": "run me",
     "/tools/spec/guidance/voice.md": "# Actionables\n\n1. Say it plain.",
     "/tools/.git/HEAD": "ref: main",
-    "/tools/.se/.runtime/copy.json":
+    "/tools/.se/.runtime/identity.json":
       '{"id":"abc123","made":"2026-01-01T00:00:00.000Z"}',
     ...extra,
   });
 }
 
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
-test("a Windows root in either case is one copy, so the register keeps one entry and one port", () => {
+test("a Windows root in either case is one vehicle, so the register keeps one entry and one port", () => {
   assert.equal(same("C:\\work\\tree", "c:/work/tree/"), true);
   assert.equal(
     same("/home/user/Tree", "/home/user/tree"),
@@ -65,25 +65,25 @@ test("a Windows root in either case is one copy, so the register keeps one entry
   assert.equal(portOf(JSON.parse(upper), "c:\\work\\tree"), 6510);
 });
 
-test("a copy keeps the identity it holds, and makes one where it holds none", () => {
-  const held = copyOf('{"id":"abc123"}', "fresh", "now");
+test("a vehicle keeps the identity it holds, and makes one where it holds none", () => {
+  const held = identityOf('{"id":"abc123"}', "fresh", "now");
   assert.equal(held.record.id, "abc123");
   assert.equal(held.made, false);
 
-  const fresh = copyOf("", "fresh", "now");
+  const fresh = identityOf("", "fresh", "now");
   assert.equal(fresh.record.id, "fresh");
   assert.equal(fresh.made, true);
 });
 
 test("the identity lives in the method tree", () => {
   const files = tree();
-  assert.equal(copyHere(files, fakeClock(), "/tools"), "abc123");
+  assert.equal(identityHere(files, fakeClock(), "/tools"), "abc123");
 
-  const bare = tree({ "/tools/.se/.runtime/copy.json": undefined });
-  bare.remove("/tools/.se/.runtime/copy.json");
-  const made = copyHere(bare, fakeClock(), "/tools");
+  const bare = tree({ "/tools/.se/.runtime/identity.json": undefined });
+  bare.remove("/tools/.se/.runtime/identity.json");
+  const made = identityHere(bare, fakeClock(), "/tools");
   assert.ok(made);
-  assert.equal(copyHere(bare, fakeClock(), "/tools"), made);
+  assert.equal(identityHere(bare, fakeClock(), "/tools"), made);
 });
 
 test("a root is found by the marker it carries", () => {
@@ -134,18 +134,18 @@ test("an entry naming a place nobody holds is skipped", () => {
   );
 });
 
-test("one copy is no question", () => {
-  assert.equal(onlyCopy([entryOf("a", "1", "/tools", "now")]), "/tools");
+test("one vehicle is no question", () => {
+  assert.equal(onlyVehicle([entryOf("a", "1", "/tools", "now")]), "/tools");
   assert.equal(
-    onlyCopy([entryOf("a", "1", "/one", "now"), entryOf("b", "1", "/two", "now")]),
+    onlyVehicle([entryOf("a", "1", "/one", "now"), entryOf("b", "1", "/two", "now")]),
     "",
   );
-  assert.equal(onlyCopy([]), "");
+  assert.equal(onlyVehicle([]), "");
 });
 
 test("a project reaches its driver through the register", () => {
   const files = tree();
-  registerCopy(files, { HOME: "/home" }, entryOf("abc123", "0.1.0", "/tools", "now"));
+  registerVehicle(files, { HOME: "/home" }, entryOf("abc123", "0.1.0", "/tools", "now"));
   attach(files, fakeClock(), "/work", "abc123");
 
   const pair = rootsHere(files, { HOME: "/home" }, "/work");
@@ -174,22 +174,22 @@ test("the shim's work root beats the tree the command line runs in", () => {
   assert.equal(blank.work, "/tools", "a blank value names nothing");
 });
 
-test("the copy carries the method and nothing private", () => {
+test("the vehicle carries the method and nothing private", () => {
   const files = tree();
-  const put = produce(files, "/tools", "/copy");
+  const put = produce(files, "/tools", "/vehicle");
   assert.equal(put.ok, true);
 
-  assert.equal(files.exists(`/copy/${MARKER}`), true);
-  assert.equal(files.exists("/copy/spec/guidance/voice.md"), true);
-  assert.equal(files.exists("/copy/.git/HEAD"), false);
-  assert.equal(files.exists("/copy/.se/.runtime/copy.json"), false);
+  assert.equal(files.exists(`/vehicle/${MARKER}`), true);
+  assert.equal(files.exists("/vehicle/spec/guidance/voice.md"), true);
+  assert.equal(files.exists("/vehicle/.git/HEAD"), false);
+  assert.equal(files.exists("/vehicle/.se/.runtime/identity.json"), false);
 
   assert.equal(travels(".git"), false);
   assert.equal(travels(".se/.runtime/bin/vale"), false);
   assert.equal(travels("src/parts/one.js"), true);
 });
 
-test("a copy lands in a new place, and never over its own method", () => {
+test("a vehicle lands in a new place, and never over its own method", () => {
   const files = tree();
   files.makeDir("/taken");
   assert.equal(produce(files, "/tools", "/taken").ok, false);
