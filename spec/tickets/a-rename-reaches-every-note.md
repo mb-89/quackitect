@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: c9fae140c4344a7f632bcef7824225fcd9f99743
     returns: 1
     why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, the read move and the prove move miss a path reach |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit, with the server standing |; | does the verb the approach adds carry a proof | no, the prove move rests on `links` alone |; | does every claim carry a proof | no, three rows read false against the code |; TL;DR:; The index link table holds a note link alone, so a path reach stands outside it.; `./RUNME.sh links` answers the note links resolving to nothing, so a stale import passes green.; The literal `project` stands in the vehicle library, which the approach's table leaves out.; `spec/design_output/tree` owns the rules weighing two files, so the verb wants another owner.; The findings, one a line:; `linksIn` in `src/index/front.go` records a note link, and the link table holds those alone.; So the read move asks `grep` beside `links`, and the approach names the two.; `./RUNME.sh links` answers `dangling`, which names a note link resolving to nothing.; So the prove move runs `./RUNME.sh check` too, as the ask's last bullet asks.; `STUB_FOLDERS` holds the literal `project` in `.claude/skills/level0/lib/vehicle.js`.; `stubInto` reads that constant, so the rename reaches a file the table leaves out.; `spec/design_output/index` owns the questions the index answers, and the verb asks one.; `spec/design_output/viewer` carries the old name, and every note link naming it rides along.; The folder table matches the two tabs `src/viewer/ui.go` builds, the log and the work."
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: f040bbc750f7329f8e73dffa9d88432da60abf0c
+    hash_after: f040bbc750f7329f8e73dffa9d88432da60abf0c
 ---
 
 # Ask
@@ -122,32 +126,28 @@ The viewer, the stub and the tree keep names from an older shape, and each renam
 
 ### approach
 
-One verb renames, and the two standing names ride it. So the verb carries its
-own proof, and the next rename costs one command.
+One verb renames, and the two standing names ride it. So the verb carries its own proof, and the next rename costs one command.
 
 | what changes | how |
 |---|---|
-| `./RUNME.sh rename <from> <to>` | moves a path, and rewrites every reach the index answers |
-| `src/index` | answers the reaches of a path, beside the note links it answers today |
+| `./RUNME.sh rename <from> <to>` | moves a path, and rewrites every reach it finds |
 | `src/viewer` | becomes `src/tui`, with a package per tab under it |
-| `stub.js` | writes the project's own name where it writes `project` today |
-| [[spec/design_output/tree]] | says what the verb reaches, and what it leaves alone |
+| `STUB_FOLDERS` in `.claude/skills/level0/lib/vehicle.js` | holds the stub's own name where it holds `project` today |
+| [[spec/design_output/index]] | says what the verb asks the index, because that note owns the questions the index answers |
 
 The verb works in three moves:
 
-| the move | what it does |
-|---|---|
-| read | asks the index every file reaching the old name |
-| write | moves the path, then rewrites each reach the read answers |
-| prove | runs `./RUNME.sh links`, which names no stale pointer |
+| the move | what it asks | what it catches |
+|---|---|---|
+| read | the index's `links`, then `grep` over the tracked files | a note link, then an import, a path and a name in prose |
+| write | the move, then a rewrite of each reach the read answers | the pointers the read found |
+| prove | `./RUNME.sh links`, then `./RUNME.sh check` | a note link resolving to nothing, then every other rule |
 
-The index holds the reaches already. `src/index/door.go` answers `links` and
-`dangling` over a note, and a path takes the same road. So the verb asks one
-door, and no sweep of its own stands beside it.
+The read move asks two readers, because each answers half. `linksIn` in `src/index/front.go` records a note link, so the link table holds those alone. A Go import, a shell path and a name in prose stand outside it, and `grep` over the tracked files answers those.
 
-Go binds a package to a folder, so a folder per tab parts one package into
-several. A name crossing a folder edge takes a capital, and the rest stay
-lowercase inside their tab. That cost buys a reader who opens one tab.
+The prove move runs both commands for the same reason. `./RUNME.sh links` with no name answers `dangling`, which names a note link resolving to nothing. Every other stale reach turns up where the check builds and runs the tree, which is the last line the ask asks for.
+
+**The folders.** Go binds a package to a folder, so a folder per tab parts one package into several. A name crossing a folder edge takes a capital, and the rest stay lowercase inside their tab. That cost buys a reader who opens one tab.
 
 | the folder | what it holds |
 |---|---|
@@ -156,12 +156,9 @@ lowercase inside their tab. That cost buys a reader who opens one tab.
 | `src/tui/work` | the work tab |
 | `src/tui/tree` | the tree view every tab after the log draws |
 
-`stubInto` writes its folders under a literal `project` today. Each takes the
-stub folder's own name instead, so a reader opening a stub reads the project
-it names.
+**The stub.** `STUB_FOLDERS` holds its paths under a literal `project`, and `stubInto` reads that constant. Each takes the stub folder's own name instead, so a reader opening a stub reads the project it names.
 
-The verb lands first, and the two renames run through it. A rename a hand makes
-by sweep proves nothing about the verb.
+The verb lands first, and the two renames run through it. A rename a hand makes by sweep proves nothing about the verb.
 
 ## review
 
