@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -136,6 +136,17 @@ record:
     hash_after: 363caea7c1b5f821b33ff1d2d8c56af34c1a67f8
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 40b2e17d5e903272bc0d852bf50065d04c1fdce8
+    hash_after: 40b2e17d5e903272bc0d852bf50065d04c1fdce8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -303,26 +314,50 @@ The door's own read moves to `proseFaults` in the same hunk, because a case over
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/prose.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`check_prose` reads a draft through the write door's own rules, and answers every finding at once.
+
+| what the tool reaches | where it stands |
+|---|---|
+| the read the door runs | `proseFaults`, the new export of `src/bridge/write.js` |
+| the findings a note keeps | `readsProse`, under `src/bridge/prose.js` |
+| the wording of the answer | `answerFindings`, beside `refusal` |
+| the spec and the handler | `src/bridge/prose.js`, beside the filter it holds |
+
+One read serves both. `voiceDoor` held the lint and the filter inline before, and both move to `proseFaults`. The door keeps its logging and its refusal, so one place owns the read and a clean draft passes the door on its first write.
+
+The tool writes nothing, so its answer opens on the rules reading a draft. `refusal` opens on a line refusing a write, and `answerFindings` beside it carries the wording a tool answer takes.
+
+What a caller hands in:
+
+- `path`, so the rules read the kind the path names
+- `text`, the whole file as the write would land it
+- a call missing either answers the line naming what it lacks
+- `src/bridge/server.js` imports the `SPECS` and `TOOLS` pair, so the tool registers with the rest
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place, and the chapter owns the table
+- the read takes a text and a path, so the cases touch memory
+- each header says what its file is for, and counts nothing
 
 # verdict
 
