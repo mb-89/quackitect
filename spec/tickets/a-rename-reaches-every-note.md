@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -146,6 +146,17 @@ record:
     hash_after: f264223a7ae6875b9f62889da3ed87999ad07f8d
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 5edfc1ebce49bf1c434c6093e9c2da0de9be2c16
+    hash_after: 5edfc1ebce49bf1c434c6093e9c2da0de9be2c16
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -328,26 +339,55 @@ The second case carries the part that surprises me. A rewrite over the bare word
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/rename.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+One verb renames, and three names rode it.
+
+| what lands | where |
+|---|---|
+| the verb | `src/scripts/rename.js`, under `./RUNME.sh rename <from> <to>` |
+| its chapter | [[spec/design_output/index#a-rename-reaches-a-name]] |
+| the window's folder and module | `src/tui`, and `quackitect/tui` |
+| the window's note | [[spec/design_output/tui]] |
+| the stub's folders | the stub's own name, through `stubFolders` |
+
+The verb carries a name three ways. A folder moves with its files. A note moves as one file, and both forms of its name rewrite, because a reader reaches a note with its ending and without. A name standing as no path takes `--text`, which rewrites and moves nothing, and the module's name rode that.
+
+The move reaches git, because every reader of the tree asks git for its file list. The first run over the note left git unaware, and the schema case read the old name off that list.
+
+Two things the runs turn up, for the owner to weigh at the merge:
+
+| what it meets | what it costs |
+|---|---|
+| a case naming the old name as data | the rewrite reaches it, so this verb rewrote its own fixtures |
+| a name a file escapes, as a path written with backslashes | the word edge holds it nowhere, so it wants a hand |
+
+The case file now names a word the tree holds nowhere, which keeps it out of the next rewrite.
+
+The folder per tab stands open, as `.se/tickets/the-window-splits-by-tab.md`. The tree files reach the frame through `cut`, `pad`, `narrow` and three styles, so they part cleanly. The log tab and the work tab want the model exported, which reaches every file naming it. That is a refactor of its own, and it shares nothing with the verb this ticket builds.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The verb and its case file, the stub's folders, and every file the three renames reach.
+- every door the change reaches has a fake. Each case drives the fake disk, and the git door rides as an option the case leaves out.
+- a comment names the approach the change implements. The verb's chapter stands under the index note, and each case points at this ticket.
 
 # verdict
 
