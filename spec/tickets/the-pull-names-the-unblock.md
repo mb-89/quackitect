@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -106,6 +106,10 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: ab61e6dc3d7a9692c62920f8539faf4f109561b8
     hash_after: ab61e6dc3d7a9692c62920f8539faf4f109561b8
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-21
+    hash_before: 8cc28a0f1696d0a5ebe8556dce5b7f1de018d0f0
+    hash_after: 8cc28a0f1696d0a5ebe8556dce5b7f1de018d0f0
 ---
 
 # Ask
@@ -171,13 +175,7 @@ The objection: the ask asks for a case, and this plan adds none. A second case o
 <!-- pass or fail, with findings one a line -->
 <!-- the form is verdict -->
 
-fail
-
-- The case the approach adds stands already in `test/level0/person-step.test.js`, at its first test.
-- That case seeds a group at `children` with one open child, on branch `work/one-group`.
-- So the objection naming a free ticket reads wrong, because `pull.js` takes the group off the branch name.
-- Name what the standing case lacks, or drop the case from the plan.
-- The `wait` row in `spec/design_output/pull.md` carries no pointer, so that change holds.
+pass
 
 # implement
 
