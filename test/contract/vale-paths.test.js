@@ -34,9 +34,16 @@ const saidOf = (argv) => {
   ]
     .filter((one) => one.trim())
     .join("\n");
+  // A vale that ran not answers no line, and that reads as no finding unless the exit says otherwise here. [[spec/guidance/retro/effect]]
+  assert.equal(ran.exitCode, 0, `vale ran not: ${why}`);
   return { lines, why };
 };
-const linesOf = (argv) => saidOf(argv).lines.length;
+// The two shapes read one list, and a miss says what each run wrote. [[spec/design_output/lsp#the-panel-reads-the-battery]]
+const sameLines = (one, other) => {
+  const a = saidOf(one);
+  const b = saidOf(other);
+  assert.equal(a.lines.length, b.lines.length, `absolute:\n${a.why}\nrelative:\n${b.why}`);
+};
 
 test("every section of the config naming a folder opens on a double star", () => {
   const heads = files
@@ -51,8 +58,8 @@ test("every section of the config naming a folder opens on a double star", () =>
 });
 
 ifVale("a rationale reads the same by its absolute path as by its relative one", () => {
-  assert.equal(linesOf([join(root, RATIONALE)]), linesOf([RATIONALE]));
-  assert.equal(linesOf([join(root, DESIGN)]), linesOf([DESIGN]));
+  sameLines([join(root, RATIONALE)], [RATIONALE]);
+  sameLines([join(root, DESIGN)], [DESIGN]);
 });
 
 const STYLES = "spec/config/styles";
