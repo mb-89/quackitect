@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -131,6 +131,10 @@ record:
     hash_after: f4ea7e56fc39b19e283fdc514c7b4a1f480019ab
     returns: 4
     why: "design: The palette in `colour.go` reads `quackitect/config`, and the base reader in `base.go` reads `quackitect/yaml`, so the draw row and the tree row each name the shared module the package imports.; design: The frame's pane draws the filter pane in `filterpane.go` and the help in `help.go`, so the chapter's frame row takes them.; craft: `startIndex` in `door.go` reads the index binary the work tab names, so it parts from the door to the work tab before the door moves to the frame.; craft: `Placed` in `workplaces.go` is a method of the tree reading the work tab's keys, so it becomes a function of the work tab over a tree, the way the place chord's reads do.; craft: The window tests read the frame's own fields and methods, `pane`, `box`, `input` and `renderMarks` among them, and the approach says what a tab exports alone, so it says what the frame exports to the root's tests.; craft: The approach lists what the draw package, the frame and the log tab take after the chapter's rows take it, so the approach points at the chapter alone."
+  - step: design/draft
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 935807cac5a667f7827b7ee1e31480c0634114c4
+    hash_after: 08e9649baa3c438e1673ce0ff0267efd322122d2
 ---
 
 # Ask
@@ -162,16 +166,15 @@ what it imports. Every import there runs down, so no loop stands.
 
 The packages, what each holds and what each imports stand in
 [[spec/design_output/tui#the-packages-the-window-holds]], and the split
-follows that table. The chapter's rows take what this round finds standing
-between the packages, so the chapter stays the one list: the filter language,
-the link, the gutter, the wrap and the one-line cut land in the draw package,
-the parts and their rendering land in the frame, and the said style lands in
-the log tab.
+follows that table. The chapter's rows take what each round finds standing
+between the packages, so the chapter stays the one list.
 
 A tab owns its own state, so the frame reads no record and no ticket tree.
 The model's log fields and the tailer become fields of the log tab, the
 model's work fields and the places become fields of the work tab, and the
-place chord's tree reads become functions of the work tab over a tree. The
+place chord's tree reads and the laying of places over a tree become
+functions of the work tab over a tree. The index start parts from the
+window's door to the work tab, which names the binary. The
 root package builds the tab list, hands it to the frame, and keeps `Frame`,
 which reaches the log tab's rows, filter and floor through its exported
 fields.
@@ -194,7 +197,9 @@ the way it does today.
 
 The tests move with the code they drive, and the window tests stay in the root
 package. They reach the log tab's and the work tab's fields through the tabs
-the model holds, and each tab exports the fields a case reads. A name a tab
+the model holds, and each tab exports the fields a case reads. The frame
+exports the fields and the methods the window tests read: the pane, the box,
+the input, the size, the sources, the marks and the strip among them. A name a tab
 package reads takes a capital, and the rename reaches every file naming it. The
 build stamp in `src/scripts/tui-build.js` lists the files standing in the
 folders it names, so it changes to walk every package under `src/tui`, and a
