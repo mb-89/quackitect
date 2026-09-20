@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -207,6 +207,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-21
+    hash_before: 5e28a847bf616f37117290ecde7dca092c77c2cf
+    hash_after: 5e28a847bf616f37117290ecde7dca092c77c2cf
+reason: done
 ---
 
 # Ask
@@ -546,17 +551,14 @@ reads it meets that rule already.
     .claude/skills/level0/lib/bash.js
     .claude/skills/level0/lib/scripted.js
     .claude/skills/level0/lib/tokens.js
-    .claude/skills/level0/lib/tested.js
-    .claude/skills/level0/lib/code.js
-    .claude/skills/level0/lib/vale.js
     src/bridge/bash.js
     src/scripts/precommit.js
-    src/scripts/install.sh
-    RUNME.sh
     spec/design_output/bash.md
     test/level0/bash.test.js
+    test/level0/precommit.test.js
     test/level0/trunk-door.test.js
     spec/tickets/the-door-reads-script-writes.md
+    HANDOVER.md
 
 ## verdict
 
@@ -564,47 +566,39 @@ reads it meets that rule already.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `scriptsIn` asks `reaches`, and `reaches` answers false on every path outside
-  prose and code. So a tracked `.sh`, `.py` or `.rb` path names a script, and
-  `sh src/scripts/install.sh` and `bash ./RUNME.sh check` each hand the door a
-  file it reads off the disk.
-- The door refuses `sh src/scripts/install.sh` on that widening.
-  `writesInScript` reads `process.stdout.write` as a write, and pairs it with
-  the module the import above it names, so the refusal reads
-  `.claude/skills/level0/lib/servers.js` where the script writes no file. Hold
-  `scriptsIn` to the folders the chapter names, or pair a write with a path its
-  own call carries.
-- The road stands twice, and the two disagree. The chapter row names a script
-  under `.se/` or a temp folder, and `says` on this ticket reads "A path
-  standing in the tree passes". The code passes a tracked prose or code path
-  alone. Write the road the code takes, in the one place naming it.
-- `scriptText` in `src/bridge/bash.js` and `textAt` in `src/scripts/precommit.js`
-  each read a file off a disk and answer empty where it stands nowhere, under
-  two names. Keep one, and hand the disk in.
-- No case feeds `scriptsIn` a tracked `.sh` or `.py` path, so no test pins the
-  road either way. Add one, whichever road the fix takes.
+- Every finding of the round before stands answered. `scriptsIn` asks `FREE`,
+  the door's own list of the paths no rule reads. So `sh src/scripts/install.sh`
+  and `bash ./RUNME.sh check` name no script, and the installer passes.
+- `fileText` in the script module reads a file for both commit doors, and
+  `scriptText` and `textAt` go with it.
+- A case feeds the reading four scripts standing in the tree, and asserts it
+  names none. So a test pins the road.
+- The road reads the same in the three places naming it: the chapter row, the
+  `says` field on this ticket, and `scriptsIn` through `FREE`.
 
 What I check:
 
 - `./RUNME.sh check` answers 0 on the commit this branch stands on, and that
   commit matches origin.
-- Every finding of the round before stands answered. `SHELLS`, `READERS`,
-  `BREAKS`, `baseName` and `clean` each stand once, in the splitter. `OUTSIDE`
-  goes, and the newline entry goes with it.
-- The case feeding the spellings of a temp folder asserts the count alone, so
-  it passes whatever path the reading names.
-- The ask lands on its first three bullets. A runner and a shell each name
-  their script, a copy out of the scratchpad refuses over `cp` and `mv`, and
-  the refusal names `mcp__level0__patch` and `mcp__level0__replace`.
-- `./RUNME.sh check` covers the script write and the refusal, and `VERBS` names
-  no test verb. `trunk-door.test.js` drives the same road over the disk.
+- The ask lands on every bullet. A runner and a shell each name their script.
+  A copy out of the scratchpad refuses over `cp` and `mv`.
+- The refusal names `mcp__level0__patch` and `mcp__level0__replace`, and
+  `./RUNME.sh check` covers the script write and the refusal. `VERBS` names no
+  test verb.
+- Each case feeds the door a script writing a tracked path. The refusal it
+  asserts names the target and the script, and a script writing under the
+  private folder passes.
+- `trunk-door.test.js` drives the same road over the disk, off a file the case
+  writes there.
 - `tested.js` and `precommit.js` stand outside the ask. Each answers the import
-  standing above the hunk, so each fixes a rule this branch adds and redesigns
-  nothing the ask leaves alone.
-- The route sends this ticket to a retro after this step, and no retro stands
-  in the handback yet.
+  standing above the hunk. So each fixes a rule this branch adds, and each
+  leaves the design around it as it reads.
+- `notesOf` joins a path through `it.join`, and `fileText` joins one with a
+  slash. Both answer the same on this tree, and a note parks the shape.
+- The route sends this ticket to a retro after this step, and the handover
+  carries three findings the retro reads.
 
 ## checked
 
@@ -612,10 +606,10 @@ What I check:
 
 <!-- the form is checklist -->
 
-- the road the change adds stands twice and the two disagree. The chapter row
-  names a script under `.se/` or a temp folder, and `scriptsIn` names every path
-  outside prose and code. The disk reader stands twice too, as `scriptText` and
-  as `textAt`. Both findings stand above.
+- every fact the change adds stands in one place. `FREE` stands in the door,
+  and the script reading imports it. The splitter owns each word set. The
+  script module owns `fileText`, and `findings` holds the words of the refusal.
+  Each piece carries the pointer at the chapter row naming the road.
 
 # Discussion
 
