@@ -22,21 +22,19 @@ and `branch review` says nothing waits.
 | `a-lint-holds-note-rules` | the check reads a marked rule against the rationale it links |
 | `the-check-holds-test-first` | both doors refuse a code change standing with no test |
 | `the-door-reads-script-writes` | the shell door reads a script it runs, and refuses the writes inside |
+| `the-door-rule-reads-env` | a rule holds the environment, the arguments and the platform inside a door |
 
 Each one carries its evidence on its ticket. A hand other than the one making
 the change passes every verdict.
 
 # What waits
 
-One ticket stands open in this group. It carries an approach under its draft,
-and waits for a hand other than this box to read it:
+One ticket stands at its verdict, and a hand other than this box reads it. The
+pull writes the prompt for that hand, and a box spawns it.
 
 | ticket | where it stands |
 |---|---|
-| `the-door-rule-reads-env` | design/review |
-
-The pull writes the prompt for that hand. A box spawns it, and takes the
-implement steps itself once the review passes.
+| `the-door-rule-reads-env` | verdict |
 
 ## Two asks stand minted
 
