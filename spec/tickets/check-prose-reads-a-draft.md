@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box 099c2ec7708d · claude-code-remote
     hash_before: e2f80914c88351f79b6db87329587f1df880536c
     hash_after: e2f80914c88351f79b6db87329587f1df880536c
+  - step: design/review
+    hand: box 099c2ec7708d · claude-code-remote · helper-4
+    hash_before: e10beaf2ae704287c354d02ab01a6ce04c50d4fe
+    hash_after: e10beaf2ae704287c354d02ab01a6ce04c50d4fe
+    returns: 2
+    why: "The approach answers every line of the earlier `why`, and two things leave the agent guessing.; `src/bridge/server.js` imports a `SPECS` and `TOOLS` pair per module. Name the pair `src/bridge/prose.js` exports, so the tool registers.; `src/bridge/write.js` exports `onWrite` and `wholeAfter`, and `voiceDoor` stands behind them. Name the one exported function the door and the tool both call, so one place owns the read.; `readsProse` stands in `src/bridge/prose.js`, and the table puts it beside `voiceDoor` under `write.js`. Point that row at the file holding it.; The write door reads `wholeAfter`, and `mutations` reaches the copilot runtime alone. Name `wholeAfter` where the ask's third bullet stands.; `refusal` opens on the line refusing a write, and the tool writes nothing. `answerFindings`, in the same file, carries the wording a tool answer takes.; What holds:; `voiceDoor` and `wholeAfter` both stand in `src/bridge/write.js`.; `refusal` stands under `.claude/skills/level0/lib/refuse.js`.; `CHECK` under `answer.js` names `check_answer`, beside `checkSpec`.; [[spec/design_output/level0#the-gate-reads-the-answer]] stands, and the chapter `The tool reads a draft` sits under it.; No test reads `src/bridge/prose.js`, so `test/level0/prose.test.js` takes a fresh owner.; `./RUNME.sh test` runs `node --test` over `test/level0`, so the two cases run there.; `wholeAfter` answers the whole file a write lands, so the ask's third bullet stands.; The draft picks the first road the Discussion names, so that question closes."
 ---
 
 # Ask
@@ -172,13 +178,24 @@ Where each thing stands after:
 
 fail
 
-- the write door stands in `src/bridge/write.js`, and `voiceDoor` runs the read this tool reuses
-- name `wholeAfter` and `readsProse` beside it, because the whole-file read and its filter both stand there
-- `refusal` stands under `.claude/skills/level0/lib/refuse.js`, so the table points there for it
-- the tool's own module is unnamed. Say which file holds its spec and its handler
-- the ask names `./RUNME.sh test`, and the approach names no case file the two drafts land in
-- what holds: `mutations` answers the whole file a write lands, so the ask's third row stands already
-- `CHECK` under `answer.js` names `check_answer`, and the chapter the tool joins stands
+The approach answers every line of the earlier `why`, and two things leave the agent guessing.
+
+- `src/bridge/server.js` imports a `SPECS` and `TOOLS` pair per module. Name the pair `src/bridge/prose.js` exports, so the tool registers.
+- `src/bridge/write.js` exports `onWrite` and `wholeAfter`, and `voiceDoor` stands behind them. Name the one exported function the door and the tool both call, so one place owns the read.
+- `readsProse` stands in `src/bridge/prose.js`, and the table puts it beside `voiceDoor` under `write.js`. Point that row at the file holding it.
+- The write door reads `wholeAfter`, and `mutations` reaches the copilot runtime alone. Name `wholeAfter` where the ask's third bullet stands.
+- `refusal` opens on the line refusing a write, and the tool writes nothing. `answerFindings`, in the same file, carries the wording a tool answer takes.
+
+What holds:
+
+- `voiceDoor` and `wholeAfter` both stand in `src/bridge/write.js`.
+- `refusal` stands under `.claude/skills/level0/lib/refuse.js`.
+- `CHECK` under `answer.js` names `check_answer`, beside `checkSpec`.
+- [[spec/design_output/level0#the-gate-reads-the-answer]] stands, and the chapter `The tool reads a draft` sits under it.
+- No test reads `src/bridge/prose.js`, so `test/level0/prose.test.js` takes a fresh owner.
+- `./RUNME.sh test` runs `node --test` over `test/level0`, so the two cases run there.
+- `wholeAfter` answers the whole file a write lands, so the ask's third bullet stands.
+- The draft picks the first road the Discussion names, so that question closes.
 
 # implement
 
