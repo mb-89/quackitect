@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -155,6 +155,10 @@ record:
     hash_after: 36adad410996928249d857c7708a3ddf4c505106
     returns: 1
     why: "| the finding | the fix |; |---|---|; | No fake takes `behaves`, so a door test still reads nothing for a call its fake lacks. The approach hands the guard to every fake | Wrap each fake under `src/doors/fake` in the guard, and let a case prove one throws |; | Rule five of [[spec/guidance/code/testing]] points at no program, and the approach says that line points at the check | Put the link in the rule, the way rule ten points at [[spec/guidance/code/code]] |; | `untestedIn` drops the whole delta once any test file stands in it, so one stale test carries many changed modules | Pair a test with the file it names, or say under `says` what the loose reading buys |; | `test/level0/tools-door.test.js` takes a new subject, and the cases over the session-start survey and the tools block go. No test names them now | Put those cases back under their own name, and leave the new door its own file |; What holds:; `./RUNME.sh check` exits 0 on the commit this verdict stands on.; The change touches the readings, the guard, both doors, two notes and the tests, and nothing outside the brief.; Each rule takes a case feeding it something bad: a module no test imports, and a delta carrying no test.; The two doors read one text, because the hook pipes the staged delta the Bash door builds.; `HANDOVER.md` carries a retro chapter, and it records this ticket at an earlier step."
+  - step: implement/reflect
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 64d36e9aaded00447371e86471dbed1604df7512
+    hash_after: 64d36e9aaded00447371e86471dbed1604df7512
 ---
 
 # Ask
@@ -306,11 +310,31 @@ test driving a door through one asserts on nothing until the guard lands.
 
 <!-- the form is text -->
 
+The four findings name three classes, and one of them cost a pair of cases:
+
+| the class | the fault here | the fix for the class |
+|---|---|---|
+| a piece lands with nobody calling it | `behaves` stood in its own case alone, so every fake answered a missing call with nothing | the change wires each caller, and a case drives one of them |
+| a rule passes on the weakest reading | one test file in a delta carried every changed file beside it | each change wants the test naming it, by name or by import |
+| a write lands on a file a hand reads as free | `tools-door.test.js` held the survey cases, and a write took them | a new file takes a new name, and a write reads the file first |
+
+The third class is the dear one. A write over a file already standing drops what
+it held, and the check says nothing where the cases it drops pass elsewhere.
+`test/level0/tools-door.test.js` stands as it stood, and the hand tools take
+`test/level0/hand-tools.test.js`.
+
+Rule five of the testing note names no program, which is the first class again:
+a rule with no reader. The rule now names the door and the check holding it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fixes touch the fakes, the delta reading, the testing note and the two test files
+- each fake takes the guard, so a call it lacks throws with the door's name
+- each piece points at the chapter saying what it reads
 
 ## change
 

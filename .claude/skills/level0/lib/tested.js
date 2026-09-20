@@ -19,11 +19,21 @@ export function filesIn(delta) {
   return out;
 }
 
-// [[spec/design_output/tree#the-rules-over-two-files]]
+// A test of its own for each file, so one stray case carries no other. [[spec/design_output/tree#the-rules-over-two-files]]
 export function untestedIn(delta) {
   const files = filesIn(delta);
-  if (files.some((one) => TEST.test(one))) return [];
-  return files.filter((one) => SOURCE.test(one) && !FAKE.test(one));
+  const tests = files.filter((one) => TEST.test(one));
+  const said = String(delta ?? "");
+  return files
+    .filter((one) => SOURCE.test(one) && !FAKE.test(one))
+    .filter((one) => !tests.some((test) => names(test, one, said)));
+}
+
+// A test names the file it drives by its import, or by the name it carries. [[spec/design_output/tree#the-rules-over-two-files]]
+function names(test, path, delta) {
+  const one = path.split("/").pop().replace(/\.js$/, "");
+  const said = test.split("/").pop().replace(/\.test\.js$/, "");
+  return said === one || said.startsWith(`${one}-`) || importsIt(delta, path);
 }
 
 // [[spec/design_output/tree#the-rules-over-two-files]]
