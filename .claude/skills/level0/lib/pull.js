@@ -28,12 +28,14 @@ export function pullSpec() {
         ticket: { type: "string", description: "the ticket in hand, on a hand-back" },
         verdict: {
           type: "string",
-          enum: ["pass", "fail", "became"],
-          description: "pass, fail with a reason, or became with the successor",
+          enum: ["pass", "fail", "became", "answered"],
+          description:
+            "pass, fail with a reason, became with the successor, or answered with the ticket answering the ask",
         },
         reason: {
           type: "string",
-          description: "the reason on a fail, or the successor on a became",
+          description:
+            "the reason on a fail, the successor on a became, or the answering ticket on an answered",
         },
         fields: {
           type: "object",

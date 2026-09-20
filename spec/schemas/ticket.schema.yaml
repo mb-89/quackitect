@@ -41,7 +41,7 @@ frontmatter:
       description: whether anybody pulls it, and the pull writes this
 
     reason:
-      enum: [done, dropped, became]
+      enum: [done, dropped, became, answered]
       description: how the work stopped, on a closed ticket alone
 
     urgent:

@@ -112,6 +112,10 @@ test("the tool's input reads into the same words a person types", () => {
     "a-group",
   ]);
   assert.deepEqual(
+    tool({ ticket: "a-child", verdict: "answered", reason: "a-group" }),
+    ["pull", "a-child", "--answered", "a-group"],
+  );
+  assert.deepEqual(
     tool({ ticket: "a-child", verdict: "pass", fields: { approach: "x" } }),
     ["pull", "a-child", "--pass", "--fields", '{"approach":"x"}'],
   );
@@ -132,6 +136,7 @@ test("the tool's input reads into the same words a person types", () => {
     "pass",
     "fail",
     "became",
+    "answered",
   ]);
 });
 

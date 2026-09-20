@@ -13,7 +13,7 @@ export function toolArgv(said = {}) {
   const verdict = String(said.verdict ?? "").trim();
   if (ticket) out.push(ticket);
   if (verdict === "pass") out.push("--pass");
-  if (verdict === "fail" || verdict === "became") {
+  if (verdict === "fail" || verdict === "became" || verdict === "answered") {
     out.push(`--${verdict}`, String(said.reason ?? "").trim());
   }
   if (said.fields && typeof said.fields === "object") {

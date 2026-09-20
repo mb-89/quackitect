@@ -40,7 +40,7 @@ export function ticket(root, argv, doors) {
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh ticket <verb>\n");
     console.log(
-      "  pull [ticket]       take the next leaf of this group, or hand one back with --pass, --fail, --became",
+      "  pull [ticket]       take the next leaf of this group, or hand one back with --pass, --fail, --became, --answered",
     );
     console.log(
       "  note <name> <line>  write a private ticket off the note process, and carry on",
