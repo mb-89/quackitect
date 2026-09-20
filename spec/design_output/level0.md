@@ -224,6 +224,29 @@ what the road holds, so a session reading the rules reads the canary alone.
 A code carrying no `warn` carries no block either. `3` says a person starts the
 server at this box, and a person standing there reads the sidebar.
 
+## A restart fills the box
+
+The server restarts under a running session, and the harness sends one
+`session.start` a session. So the box a restart builds carries none of what the
+session start fills, and the session runs on.
+
+| what a session start fills | who reads it | what a fresh box holds |
+|---|---|---|
+| `box.schemas` | the mint spec, the mint, the write door | nothing |
+| `box.tools`, `box.specs` | the block naming what this box has | nothing |
+| `box.projections`, `box.sources` | the write door | nothing, and `freshens` fills them |
+| the warm index | the search tools | a cold index |
+
+`fillsBox` in `src/bridge/server.js` fills the schemas, the survey and the
+specs. `decide` runs it ahead of the door, so the door and the registration
+both read a full box. A session start passes `again`, because the tree moves
+under a box that stands.
+
+The mint is what this buys. `mintSpec` reads the kinds off `box.schemas`. A
+fresh box holds none, so the kind list registers empty and `mintedNote` throws
+on `schemas.get`. The tools block reads `box.tools` and `box.specs` the same
+way, and a fresh box leaves it short.
+
 ## The check reads the server
 
 `./RUNME.sh check` probes the health call and carries on. A box out of a fresh

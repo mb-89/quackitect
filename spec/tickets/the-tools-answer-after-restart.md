@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -120,6 +120,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 30fee4007c7a91108d5bafc6c3a2ffd28f19920e
+    hash_after: 30fee4007c7a91108d5bafc6c3a2ffd28f19920e
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -301,11 +309,17 @@ as fakes, and the case touches memory alone.
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `server.js`, `guidance.js`, the level zero chapter and the cases
+- the cases build the box off `boxOf`, and every door it takes stands as a fake
+- the chapter at [[spec/design_output/level0#a-restart-fills-the-box]] holds the approach, and `fillsBox` points at it
 
 ## tests-green
 

@@ -176,7 +176,7 @@ function blocksOf(held, dead, tools) {
 }
 
 // [[spec/design_output/tools#the-session-reads-the-survey]]
-function surveyHere(box) {
+export function surveyHere(box) {
   const found = readTools(box.disk, box.work);
   if (Object.keys(found).length) return found;
   return writeSurvey(
