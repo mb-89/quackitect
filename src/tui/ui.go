@@ -34,7 +34,7 @@ const (
 	leastInputWidth = 10
 	listExtraShare  = 10
 	// [[spec/design_output/tui#one-key-filters-the-line]]
-	talkFilter = "kind: /^(prompt|reply)$/"
+	promptsFilter = "kind: /^(prompt|reply)$/"
 )
 
 type pane int

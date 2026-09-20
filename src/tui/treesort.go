@@ -83,14 +83,21 @@ func (t Tree) before(one, two Item) bool {
 	return false
 }
 
-// Two numbers read as numbers, so a place past nine stands under a place under it. [[spec/design_output/tree-view#a-sort-holds-several-keys]]
+// Two numbers read as numbers, and an outline place segment by segment, so `-2` stands under `1`, and `1.2` under `1.10`. [[spec/design_output/pull#the-queue-is-an-outline]]
 func under(left, right string) bool {
-	one, first := strconv.Atoi(strings.TrimSpace(left))
-	two, second := strconv.Atoi(strings.TrimSpace(right))
-	if first == nil && second == nil {
-		return one < two
+	a := strings.Split(strings.TrimSpace(left), ".")
+	b := strings.Split(strings.TrimSpace(right), ".")
+	for at := 0; at < len(a) && at < len(b); at++ {
+		one, first := strconv.Atoi(a[at])
+		two, second := strconv.Atoi(b[at])
+		if first != nil || second != nil {
+			return left < right
+		}
+		if one != two {
+			return one < two
+		}
 	}
-	return left < right
+	return len(a) < len(b)
 }
 
 // The column the screen column x stands on, and the empty name past the last. [[spec/design_output/tree-view#a-sort-holds-several-keys]]

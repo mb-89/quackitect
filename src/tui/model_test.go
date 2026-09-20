@@ -381,7 +381,7 @@ func TestAltQKeepsThePromptsAndTheRepliesAndTheSameChordClearsIt(t *testing.T) {
 	m := arrive(mixed(), row(6, "reply", "hello"))
 	m = press(m, "end")
 	m = chord(m, altQ)
-	if m.input.Value() != talkFilter || len(m.view) != 3 || m.pane != paneShut {
+	if m.input.Value() != promptsFilter || len(m.view) != 3 || m.pane != paneShut {
 		t.Fatalf("alt+q keeps the two prompts and the reply and opens no pane, and got %q %v %d", m.input.Value(), m.view, m.pane)
 	}
 	if !strings.Contains(m.renderMarks(), levelStyle("error").Render(filterMark)) {
@@ -401,7 +401,7 @@ func TestAnotherChordReplacesTheFilterAndLeavesTheHeaderShort(t *testing.T) {
 	t.Parallel()
 	m := chord(press(mixed(), "home"), altShiftF)
 	m = chord(m, altQ)
-	if m.input.Value() != talkFilter {
+	if m.input.Value() != promptsFilter {
 		t.Fatalf("a second chord writes its own filter, and got %q", m.input.Value())
 	}
 	strip := m.renderStrip()

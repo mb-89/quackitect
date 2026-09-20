@@ -52,6 +52,18 @@ test("the queue listing reads git once, and writes no file under the runtime fol
   assert.equal(disk.exists(join(ROOT, ".se", ".runtime", "work.json")), false);
 });
 
+// The listing is the order the pull hands out, in outline order, and the unplaced stay off it. [[spec/design_output/pull#the-queue-is-an-outline]]
+test("the queue listing prints the placed rows in outline order and leaves the unplaced out", () => {
+  const { said } = listed(["--queue"]);
+  const rows = said.split("\n").filter(Boolean);
+  const places = new Map(rows.map((row) => row.trim().split(/\s+/)).map(([place, name]) => [name, place]));
+  assert.equal(places.get("a-child"), `${places.get("one-group")}.1`, "the ticket stands under its group's number");
+  assert.match(places.get("a-loose-one"), /^\d+$/, "the loose one takes a number of its own");
+  assert.equal(places.has("a-done-child"), false, "a closed ticket stands off the listing");
+  assert.equal(places.has("landed"), false, "a merged group stands off the listing");
+  assert.equal(places.has("a-closed-one"), false, "a closed loose one stands off the listing");
+});
+
 // The work tab parses the one answer, so the flag prints it as JSON on one line. [[spec/design_output/work#one-reading-answers-git]]
 test("the json listing prints the one answer as a JSON object on one line", () => {
   const { said, code } = listed(["--json"]);

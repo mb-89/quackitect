@@ -8,6 +8,9 @@ columnSize:
 flags:
   - key: state
     value: true
+    tones:
+      open: good
+      draft: bad
   - letter: U
     key: urgent
     tone: bad
@@ -21,13 +24,8 @@ flags:
     key: todo
     tone: bad
 groups:
-  - name: not done
-    pressed: true
-    filters:
-      - not state: closed
   - name: queue
-    filters:
-      - queue: /./
+    pressed: true
     sort:
       - key: queue
   - name: held
@@ -39,9 +37,9 @@ groups:
     sort:
       - key: changed
         down: true
-  - name: unsorted
+  - name: urgent
     filters:
-      - "state: draft or not group: /./"
+      - urgent: true
 views:
   - type: table
     name: every ticket
@@ -51,8 +49,6 @@ views:
       - queue
     nest: group
     sort:
-      - key: urgent
-        down: true
       - key: queue
     collapsed:
       - closed

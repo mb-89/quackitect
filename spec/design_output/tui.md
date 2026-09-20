@@ -189,8 +189,8 @@ stands for every tab, because the strip names the tab.
 
 | the tab | its presets |
 |---|---|
-| the log | the talk under `alt+q`, and the selected row's kind under `alt+⇧f` |
-| the work | the groups of its base file, each under a number with alt |
+| the log | the prompts and the replies under `alt+q`, and the selected row's kind under `alt+⇧f` |
+| the work | the groups of its base file, each under a number with alt: the queue, held, recently done, urgent |
 
 A preset is one row of the pane: its key and its name, and nothing else,
 because its filter runs long. The row stands lit while the line holds that
@@ -216,7 +216,7 @@ one too.
 
 ## One key filters the line
 
-- `alt+q` keeps the prompts and the replies: the talk.
+- `alt+q` keeps the prompts and the replies.
 - `alt+⇧f` keeps every line of the selected line's kind. On a tool line the kind is the tool, as `Read`.
 
 The key writes its filter into the filter line, as `kind: /^prompt$/`, so it
@@ -405,10 +405,12 @@ The table draws the name, the flags and the queue, and it stands as it is
 when a pane opens. The nesting says the group, and the details say the step.
 The name links to its note. The state leads the flags as its first letter.
 
-The queue is a score the pull owns, and git holds the branches. So the tab
-runs the verb behind each tree the index hands over, and lays its answer
+The queue is an outline the pull owns, and git holds the branches. So the
+tab runs the verb behind each tree the index hands over, and lays its answer
 over the rows. `workplaces.go` holds that road, and a verb answering nothing
-leaves the last places standing.
+leaves the last places standing. The tab opens on the queue: every row, no
+filter, sorted by place, so a person's rows stand first and the unplaced
+last. For the places, see [[spec/design_output/pull#the-queue-is-an-outline]].
 
 | the part of the details | what it draws |
 |---|---|

@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"strconv"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -26,7 +25,7 @@ const placesWait = 60 * time.Second
 
 // What the answer carries that the tab lays over its rows: each row's place, and the groups holding a branch. [[spec/design_output/work#one-reading-answers-git]]
 type workPlaces struct {
-	queue map[string]int
+	queue map[string]string
 	cloud map[string]bool
 }
 
@@ -38,7 +37,7 @@ type placesMsg struct {
 // One row of the answer, with the fields the tab reads and no other. [[spec/design_output/work#one-reading-answers-git]]
 type answerRow struct {
 	Name    string      `json:"name"`
-	Queue   int         `json:"queue"`
+	Queue   string      `json:"queue"`
 	Merged  bool        `json:"merged"`
 	Tickets []answerRow `json:"tickets"`
 }
@@ -52,7 +51,7 @@ func placesIn(said []byte) (workPlaces, error) {
 	if err := json.Unmarshal(said, &answer); err != nil {
 		return workPlaces{}, err
 	}
-	out := workPlaces{queue: map[string]int{}, cloud: map[string]bool{}}
+	out := workPlaces{queue: map[string]string{}, cloud: map[string]bool{}}
 	for _, one := range answer.Branches {
 		// A branch row stands for its group, and a merged one stands for a group off the cloud. [[spec/design_output/work#a-row-per-group]]
 		if !one.Merged {
@@ -69,8 +68,9 @@ func placesIn(said []byte) (workPlaces, error) {
 	return out, nil
 }
 
+// A place is an outline number, as `1`, `1.2` or `-1`, and a row the pull places nowhere carries none. [[spec/design_output/pull#the-queue-is-an-outline]]
 func (p workPlaces) place(one answerRow) {
-	if one.Queue > 0 {
+	if one.Queue != "" {
 		p.queue[one.Name] = one.Queue
 	}
 }
@@ -78,10 +78,7 @@ func (p workPlaces) place(one answerRow) {
 // The places laid over the tree's items, so the queue column and the cloud letter read them. [[spec/design_output/tui#the-work-tab]]
 func (t *Tree) Placed(p workPlaces) {
 	t.Amend(func(one *Item) {
-		one.Keys[queueKey] = ""
-		if place, held := p.queue[one.Name]; held {
-			one.Keys[queueKey] = strconv.Itoa(place)
-		}
+		one.Keys[queueKey] = p.queue[one.Name]
 		one.Keys[cloudKey] = flagOf(p.cloud[one.Name])
 	})
 }

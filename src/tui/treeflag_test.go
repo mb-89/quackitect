@@ -85,6 +85,30 @@ func TestALetterWearsItsToneWhileLitAndGreyWhileOff(t *testing.T) {
 	}
 }
 
+// A value flag names a tone a value, so an open ticket and a closed one wear two colours. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+func TestAValueFlagWearsATonePerValue(t *testing.T) {
+	t.Parallel()
+	tree := NewTree(sortCols(), []Item{
+		{Name: "open-one", Keys: map[string]string{"state": "open"}},
+		{Name: "shut-one", Keys: map[string]string{"state": "closed"}},
+	}, false)
+	tree.Flagged([]Flag{{Key: "state", Value: true, Tones: map[string]string{"open": toneGood}}})
+	if said := tree.States(tree.Items[0])[0]; said.Tone != toneGood || said.Letter != "O" {
+		t.Fatalf("an open state wears the good tone, and reads %v", said)
+	}
+	if said := tree.States(tree.Items[1])[0]; said.Tone != "" || said.Letter != "C" {
+		t.Fatalf("a closed state wears the plain tone, and reads %v", said)
+	}
+	root := workTree(t)
+	shipped, err := loadWork(logOf(root))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if said := shipped.Flags()[0].Tones; said["open"] != toneGood || said["closed"] == toneGood {
+		t.Fatalf("this tree's base file tones open and closed apart, and reads %v", said)
+	}
+}
+
 // The keys stay ordinary keys, so the filter needs no new word. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 func TestAFilterOverAFlagReadsItAsAnOrdinaryKey(t *testing.T) {
 	t.Parallel()

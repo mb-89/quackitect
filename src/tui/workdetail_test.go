@@ -89,7 +89,7 @@ func TestRecentlyDoneSortsByTheChangeTimeTheTableHides(t *testing.T) {
 	}
 	out, _ := m.Update(workMsg{tree: tree})
 	m = press(out.(model), "2")
-	m = alt(m, '4')
+	m = alt(m, '3')
 	if m.input.Value() != "state: closed" {
 		t.Fatalf("recently done keeps the closed tickets, and the line reads %q", m.input.Value())
 	}

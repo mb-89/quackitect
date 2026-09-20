@@ -149,7 +149,7 @@ its marks:
 
 | the letter | the key it reads | its tone |
 |---|---|---|
-| the state's first | the state, as its value | plain |
+| the state's first | the state, as its value | good on `open`, bad on `draft`, plain on `closed` |
 | U | the ticket carries the urgent mark | bad |
 | W | a hand holds it | good |
 | C | the group holds a branch on the cloud | good |
@@ -160,8 +160,9 @@ ordinary keys, so a person filters on `urgent: true`, and `not urgent: true`
 keeps the rest.
 
 A letter, its key and its tone stand under `flags` in the base file. A flag
-marked `value` draws its value's first letter in place of one. So a new flag
-costs one line there, because the key already stands. The `flags` map of
+marked `value` draws its value's first letter in place of one. It names a
+tone a value under `tones`, so `open` and `closed` wear two colours. A new
+flag costs one line there, because the key already stands. The `flags` map of
 [[spec/design_output/tui#colours]] holds the colours. A good tone wears the
 green, a bad one the red, and no tone the plain colour.
 
@@ -182,9 +183,10 @@ like one a person types, and the sort takes hold with it.
 
 A preset stands under `groups` in the base file, with its `filters` and its
 `sort`. One the file marks `pressed` opens the line when the view opens. So a
-person reads the filter that narrows the rows, and clears it in the pane. The
-pane and its presets are the window's, and every tab offers its own rows.
-[[spec/design_output/tui#the-filter-pane-takes-letters]]
+person reads the filter that narrows the rows, and clears it in the pane. A
+preset carrying a sort and no filter keeps every row, so an empty line is
+that view. The pane and its presets are the window's, and every tab offers
+its own rows. [[spec/design_output/tui#the-filter-pane-takes-letters]]
 
 A sort reads any key an item carries, in a column or not. So a preset orders
 the rows by a time the table hides, and the newest done ticket stands first.

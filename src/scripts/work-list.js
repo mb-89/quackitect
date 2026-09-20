@@ -13,6 +13,7 @@ import {
   URGENT,
   urgent,
 } from "../engine/group.js";
+import { compareOutline, UNPLACED } from "./pull-outline.js";
 import { staleClaim } from "./work-free.js";
 import { answerOf } from "./work-answer.js";
 import {
@@ -114,9 +115,12 @@ function queueOnly(it) {
     ...said.branches.flatMap((row) => row.tickets),
     ...said.loose,
   ]) {
-    if (typeof one.queue === "number" && !held.has(one.name)) held.set(one.name, one);
+    // The listing is the order the pull hands out, so an unplaced row stays off it. [[spec/design_output/pull#the-queue-is-an-outline]]
+    if (one.queue !== undefined && one.queue !== UNPLACED && !held.has(one.name)) {
+      held.set(one.name, one);
+    }
   }
-  const rows = [...held.values()].sort((a, b) => a.queue - b.queue);
+  const rows = [...held.values()].sort((a, b) => compareOutline(a.queue, b.queue));
   if (!rows.length) {
     console.log("No ticket stands in the queue.");
     return 0;

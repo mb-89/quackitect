@@ -13,12 +13,12 @@ import (
 
 const answerSaid = `{
   "branches": [
-    {"branch": "work/one-group", "name": "one-group", "merged": false, "queue": 2,
-     "tickets": [{"name": "a-child", "queue": 1}]},
+    {"branch": "work/one-group", "name": "one-group", "merged": false, "queue": "2",
+     "tickets": [{"name": "a-child", "queue": "2.1"}]},
     {"branch": "work/gone-group", "name": "gone-group", "merged": true,
      "tickets": []}
   ],
-  "loose": [{"name": "a-loose-one", "queue": 3}, {"name": "unplaced"}]
+  "loose": [{"name": "a-loose-one", "queue": "-1"}, {"name": "unplaced"}]
 }`
 
 // [[spec/design_output/work#one-reading-answers-git]]
@@ -28,8 +28,8 @@ func TestTheAnswerReadsAsPlacesAndTheGroupsOnACloud(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if said.queue["a-child"] != 1 || said.queue["one-group"] != 2 || said.queue["a-loose-one"] != 3 {
-		t.Fatalf("every placed row carries its place, and the places read %v", said.queue)
+	if said.queue["a-child"] != "2.1" || said.queue["one-group"] != "2" || said.queue["a-loose-one"] != "-1" {
+		t.Fatalf("every placed row carries its outline place, and the places read %v", said.queue)
 	}
 	if _, held := said.queue["unplaced"]; held {
 		t.Fatal("a row the pull places nowhere carries no place")
@@ -53,6 +53,10 @@ func TestThePlacesLandOverTheTreeAndALaterTreeTakesThemAgain(t *testing.T) {
 	rows := m.work.Rows(120, 8)
 	if !strings.Contains(rows, "one-group") || m.work.Items[0].Keys[queueKey] != "2" {
 		t.Fatalf("the group carries its place, and the rows read:\n%s", rows)
+	}
+	// A person's row carries a negative place, so the queue sort puts it first. [[spec/design_output/pull#the-queue-is-an-outline]]
+	if said := namesOf(m.work); strings.Join(said, " ") != "a-loose-one one-group a-child" {
+		t.Fatalf("the person's row stands first, then the group and its ticket, and the rows read %v", said)
 	}
 	if m.work.Items[0].Keys[cloudKey] != "true" || m.work.Items[0].Kids[0].Keys[cloudKey] != "false" {
 		t.Fatal("the group lights the cloud letter, and its ticket lights none")

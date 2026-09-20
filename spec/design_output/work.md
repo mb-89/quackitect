@@ -124,7 +124,7 @@ standing and nothing more. For what the tab draws, see
 | `branches` | every work branch, its tip, the time on it, its status and its kind |
 | `branches[].tickets` | the tickets on that branch, each with its state and its step |
 | `loose` | the tickets on trunk naming no group |
-| `queue` on a ticket | the place the pull hands it out, which the flag adds |
+| `queue` on a ticket | its outline place, which [[spec/design_output/pull#the-queue-is-an-outline]] numbers |
 
 A flag asks for that one reading in place of the rows.
 

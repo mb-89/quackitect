@@ -76,9 +76,9 @@ func (logTab) Keys(m *model) band {
 
 func (logTab) Selection(_ *model) band { return band{} }
 
-// The log's presets: the talk, and the kind of the selected row. [[spec/design_output/tui#one-key-filters-the-line]]
+// The log's presets: the prompts and the replies, and the kind of the selected row. [[spec/design_output/tui#one-key-filters-the-line]]
 func (logTab) Presets(m *model) []preset {
-	out := []preset{{Name: "the talk", Filter: talkFilter, Key: "alt+q"}}
+	out := []preset{{Name: "prompts and replies", Filter: promptsFilter, Key: "alt+q"}}
 	if m.sel >= 0 && m.sel < len(m.all) {
 		r := m.all[m.sel]
 		said := fmt.Sprintf("kind: /^%s$/", regexp.QuoteMeta(r.Kind))

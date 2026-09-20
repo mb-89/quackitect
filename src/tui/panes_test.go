@@ -51,10 +51,18 @@ func TestTheWorkTabUnderTheFilterPaneKeepsTheStripAndTheFooter(t *testing.T) {
 func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 	t.Parallel()
 	m := workWindow(t, 3)
-	if said := m.sourceOf(1); said != "not state: closed" {
-		t.Fatalf("the work tab opens on the preset the file presses, and its line reads %q", said)
+	// The queue opens the work tab with every row and no filter, sorted by place. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+	if said := m.sourceOf(1); said != "" {
+		t.Fatalf("the work tab opens on the queue, which filters nothing, and its line reads %q", said)
 	}
-	m = press(alt(m, 'f'), "l", "i", "n", "e", " ", "2")
+	if said := m.work.Sorts(); len(said) != 1 || said[0].Key != queueKey {
+		t.Fatalf("the queue's sort takes hold at the start, and it reads %v", said)
+	}
+	m = alt(press(m, "2"), '2')
+	if m.sourceOf(1) != "held: true" {
+		t.Fatalf("alt+2 writes the held preset, and the work's line reads %q", m.sourceOf(1))
+	}
+	m = press(alt(press(m, "1"), 'f'), "l", "i", "n", "e", " ", "2")
 	if m.filter.Empty() || m.sourceOf(0) != "line 2" {
 		t.Fatalf("the log's line narrows the log, and it reads %q", m.sourceOf(0))
 	}
@@ -64,7 +72,7 @@ func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 	if m.open != 1 {
 		t.Fatalf("the press lands on the work tab, and tab %d stands open", m.open)
 	}
-	if m.input.Value() != "not state: closed" {
+	if m.input.Value() != "held: true" {
 		t.Fatalf("the work tab's line comes up on the switch, and the line reads %q", m.input.Value())
 	}
 	if m.filter.Empty() {
@@ -80,25 +88,25 @@ func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 func TestAPresetWritesItsFilterIntoTheLineAndAgainClearsIt(t *testing.T) {
 	t.Parallel()
 	m := alt(window(3), 'q')
-	if m.input.Value() != talkFilter || m.filter.Empty() {
-		t.Fatalf("alt+q writes the talk into the line, and it reads %q", m.input.Value())
+	if m.input.Value() != promptsFilter || m.filter.Empty() {
+		t.Fatalf("alt+q writes the prompts and replies into the line, and it reads %q", m.input.Value())
 	}
 	m = alt(m, 'q')
 	if m.input.Value() != "" || !m.filter.Empty() {
 		t.Fatalf("alt+q again clears the line, and it reads %q", m.input.Value())
 	}
 	m = alt(press(workWindow(t, 3), "2"), '2')
-	if m.input.Value() != "queue: /./" {
+	if m.input.Value() != "held: true" {
 		t.Fatalf("alt+2 writes the second preset's filter, and the line reads %q", m.input.Value())
 	}
 	pane := renderParts(alt(m, 'f').presetParts(), 80)
-	for _, want := range []string{"alt+1  not done", "alt+2  queue", "alt+4  recently done"} {
+	for _, want := range []string{"alt+1  queue", "alt+2  held", "alt+3  recently done", "alt+4  urgent"} {
 		if !strings.Contains(pane, want) {
 			t.Fatalf("the pane names each preset with its key and name, and reads:\n%s", pane)
 		}
 	}
 	// The filter stays off the row, because it runs long. [[spec/design_output/tui#the-filter-pane-takes-letters]]
-	if strings.Contains(pane, "queue: /./") {
+	if strings.Contains(pane, "held: true") {
 		t.Fatalf("the pane draws no filter beside a preset, and reads:\n%s", pane)
 	}
 }
@@ -107,13 +115,9 @@ func TestAPresetWritesItsFilterIntoTheLineAndAgainClearsIt(t *testing.T) {
 func TestAPressOnAPresetRowPressesItAndARowStillSelectsUnderThePane(t *testing.T) {
 	t.Parallel()
 	m := alt(press(workWindow(t, 3), "2"), 'f')
-	m = alt(m, '1')
-	if m.input.Value() != "" {
-		t.Fatalf("alt+1 again clears the pressed line, and it reads %q", m.input.Value())
-	}
 	// The first preset stands two rows under the line: the line, the blank, then the rows. [[spec/design_output/tui#the-filter-pane-takes-letters]]
 	m = click(m, m.listWidth()+4, headWide+2+1)
-	if m.input.Value() != "queue: /./" || !m.work.Narrowed() {
+	if m.input.Value() != "held: true" || !m.work.Narrowed() {
 		t.Fatalf("a press on the second row writes its filter and narrows the tab, and the line reads %q", m.input.Value())
 	}
 	if m.presetAt(0) != nil || m.presetAt(1) != nil {

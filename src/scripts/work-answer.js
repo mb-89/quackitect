@@ -17,6 +17,7 @@ import {
 } from "../engine/group.js";
 import { takeable } from "./pull.js";
 import { leafOf, leavesOf } from "./pull-route.js";
+import { outlineIn } from "./pull-outline.js";
 import { queued, stoodHere } from "./pull-queue.js";
 import { staleClaim } from "./work-free.js";
 import { readWork, standingAll } from "./work-stands.js";
@@ -74,23 +75,44 @@ export function firstLine(said) {
   return (row ?? "").slice(0, SAYS_CUT);
 }
 
-// Every ticket the answer names, each once, with a branch's copy first. [[spec/design_output/work#one-reading-answers-git]]
+// Every ticket the answer names, each once. A standing branch speaks for its own group and its tickets, trunk for the rest, and a merged branch for nothing trunk holds. [[spec/design_output/work#one-reading-answers-git]]
 export function ticketsIn(read) {
   const out = new Map();
-  for (const one of [...read.stand.flatMap((held) => held.tickets), ...read.loose]) {
+  const standing = read.stand.filter((held) => !held.merged);
+  const landed = read.stand.filter((held) => held.merged);
+  for (const one of [
+    ...standing.flatMap((held) => ownTickets(held)),
+    ...read.loose,
+    ...landed.flatMap((held) => held.tickets),
+  ]) {
     if (!out.has(one.name)) out.set(one.name, { ...one, front: frontOf(one.text) });
   }
   return [...out.values()];
 }
 
-// The order the pull hands out, as a place a name. [[spec/design_output/pull#the-queue-is-a-score]]
+// The tickets a branch owns: its group's and the ones naming that group. Any other ticket on it is a stale copy of trunk's. [[spec/design_output/pull#the-queue-is-an-outline]]
+function ownTickets(held) {
+  return held.tickets.filter(
+    (one) => one.name === held.name || fieldOf(one.text, GROUP) === held.name,
+  );
+}
+
+// The order the pull hands out, as an outline place a name. A person's open steps order first and count down, and the agent's takeable ones count up. [[spec/design_output/pull#the-queue-is-an-outline]]
 export function placesIn(it, read, stood) {
   const all = ticketsIn(read);
-  const open = all.filter(
-    (one) => fieldOf(one.text, "state") === OPEN && takeable(it, one, all),
-  );
+  const open = all.filter((one) => fieldOf(one.text, "state") === OPEN);
   const at = { clock: it.clock, weights: it.weights, stood };
-  return new Map(queued(open, all, at).map((one, place) => [one.name, place + 1]));
+  const persons = queued(
+    open.filter((one) => personStep(one.text)),
+    all,
+    at,
+  );
+  const agents = queued(
+    open.filter((one) => !personStep(one.text) && takeable(it, one, all)),
+    all,
+    at,
+  );
+  return outlineIn(persons, agents, all);
 }
 
 // The queue rides every answer, because a reader of the listing wants each row's place. [[spec/design_output/pull#the-queue-is-a-score]]

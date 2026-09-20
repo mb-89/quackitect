@@ -233,6 +233,30 @@ hands out, and the column a board draws reads that answer.
 A ticket's age comes off one `git log` over the folder holding the tickets, so
 the cost stands beside the pull, once a pull.
 
+# The queue is an outline
+
+The score orders two lists: the open steps a person owns, and the open steps
+an agent takes. `pull-outline.js` numbers them as one outline, and every
+reader draws that number as it stands.
+
+| the row | its place |
+|---|---|
+| a person's step | negative, and the most pressing counts lowest, so `-2` stands over `-1` |
+| an agent's step | counts up from `1` |
+| a group | one number, off the best place among itself and its tickets |
+| a ticket under a group | the group's number, a dot, and its own place under it, as `1.2` |
+| a closed ticket, or one the pull hands out nowhere | `∞`, which every order puts last |
+
+An agent takes no negative place, so the person's rows stand for a person
+alone. The mark holds inside each list, so an urgent step leads the agent's
+rows and an urgent question leads the person's. A merged branch's copy of a
+ticket yields to trunk's, because trunk holds what the merge brings in. So a
+closed ticket leaves the queue whatever the branch says.
+
+The tab draws the place it reads and holds no rule of its own. A place
+compares segment by segment as numbers, so `1.10` stands after `1.2`, and
+`branch list --queue` prints the placed rows in that order.
+
 # A hand of its own
 
 A step under `not` excludes the hand the record names on the step it names,

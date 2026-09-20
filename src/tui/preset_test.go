@@ -103,12 +103,13 @@ func TestABaseFileNamesThePresetsUnderGroups(t *testing.T) {
 	if len(said) == 0 {
 		t.Fatal("this tree's own base file names its presets")
 	}
-	if said[0].Name != "not done" || !said[0].Pressed {
-		t.Fatalf("not done stands in when the tab opens, and it reads %v", said[0])
+	// The queue opens the tab: no filter, every row, sorted by place. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+	if said[0].Name != "queue" || !said[0].Pressed || said[0].Filters != "" || len(said[0].Sorts) == 0 {
+		t.Fatalf("the queue stands in when the tab opens, and it reads %v", said[0])
 	}
-	for _, one := range said {
+	for _, one := range said[1:] {
 		if strings.TrimSpace(one.Filters) == "" {
-			t.Fatalf("every preset carries a filter, and %s carries none", one.Name)
+			t.Fatalf("every other preset carries a filter, and %s carries none", one.Name)
 		}
 	}
 }

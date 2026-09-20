@@ -40,6 +40,19 @@ func sameNames(t *testing.T, said, want []string) {
 	}
 }
 
+// An outline place reads segment by segment, so a person's negative place stands first and a tenth child after the second. [[spec/design_output/pull#the-queue-is-an-outline]]
+func TestAnOutlinePlaceReadsSegmentBySegment(t *testing.T) {
+	t.Parallel()
+	for _, pair := range [][2]string{{"-2", "-1"}, {"-1", "1"}, {"1", "1.1"}, {"1.2", "1.10"}, {"1.10", "2"}, {"2", "10"}} {
+		if !under(pair[0], pair[1]) || under(pair[1], pair[0]) {
+			t.Fatalf("%s stands under %s", pair[0], pair[1])
+		}
+	}
+	if under("1", "1") || !under("alpha", "beta") {
+		t.Fatal("equal places stand level, and words read as words")
+	}
+}
+
 // [[spec/design_output/tree-view#a-sort-holds-several-keys]]
 func TestASortOrdersTheRowsAndANumberReadsAsANumber(t *testing.T) {
 	t.Parallel()

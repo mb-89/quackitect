@@ -65,7 +65,12 @@ func (t Tree) States(one Item) []flagState {
 			if value != "" {
 				letter = strings.ToUpper(value[:1])
 			}
-			out = append(out, flagState{Letter: letter, Key: held.Key, Value: value, On: value != "", Place: at, Tone: held.Tone})
+			// The value picks its tone off the map, and the flag's own tone stands where the map names none. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+			tone := held.Tone
+			if said, named := held.Tones[value]; named {
+				tone = said
+			}
+			out = append(out, flagState{Letter: letter, Key: held.Key, Value: value, On: value != "", Place: at, Tone: tone})
 			continue
 		}
 		on := strings.EqualFold(value, "true")

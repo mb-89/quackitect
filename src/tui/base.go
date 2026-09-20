@@ -35,6 +35,8 @@ type Flag struct {
 	Key    string
 	Value  bool
 	Tone   string
+	// A value flag names a tone a value, so open and closed wear two colours. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+	Tones map[string]string
 }
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]
@@ -110,7 +112,13 @@ func flagsIn(said, whole *yaml.Doc) []Flag {
 			if key == "" || (letter == "" && !value) {
 				continue
 			}
-			out = append(out, Flag{Letter: letter, Key: key, Value: value, Tone: yaml.AsString(one.Get("tone"))})
+			out = append(out, Flag{
+				Letter: letter,
+				Key:    key,
+				Value:  value,
+				Tone:   yaml.AsString(one.Get("tone")),
+				Tones:  tonesOf(yaml.AsDoc(one.Get("tones"))),
+			})
 		}
 		// A view naming none falls through to the file, which names them once. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 		if len(out) > 0 {
@@ -118,6 +126,18 @@ func flagsIn(said, whole *yaml.Doc) []Flag {
 		}
 	}
 	return nil
+}
+
+// The tone a value wears, by value, off the `tones` map a value flag carries. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+func tonesOf(said *yaml.Doc) map[string]string {
+	if said == nil {
+		return nil
+	}
+	out := map[string]string{}
+	for _, key := range said.Keys() {
+		out[key] = yaml.AsString(said.Get(key))
+	}
+	return out
 }
 
 // A preset a file writes down stands under `groups`, with its filter and its sort. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
