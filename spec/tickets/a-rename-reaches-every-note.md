@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -169,6 +169,14 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 2e36b35730efdb21a10fc2433d42ea1adddb984a
     hash_after: 2e36b35730efdb21a10fc2433d42ea1adddb984a
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 652c8d68aa2d4aeeae151950bfc050b29eb88ff7
+    hash_after: 652c8d68aa2d4aeeae151950bfc050b29eb88ff7
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -353,9 +361,9 @@ The second class is the sharper one. A note under the private folder is a thing 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The verb and its case file, the stub's folders, and every file the three renames reach.
-- every door the change reaches has a fake. Each case drives the fake disk, and the git door rides as an option the case leaves out.
-- a comment names the approach the change implements. The verb's chapter stands under the index note, and each case points at this ticket.
+- the change touches no file the ask leaves out. The verb, its cases, the ignore line, the page of markup, the vehicle note, and the ticket this round mints.
+- every door the change reaches has a fake. Each case drives the fake disk, and the new case feeds it a file with no ending and a picture.
+- a comment names the approach the change implements. The walk's comment names what it answers, and each caller names the part it takes.
 
 ## tests-green
 

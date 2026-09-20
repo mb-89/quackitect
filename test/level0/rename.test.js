@@ -47,6 +47,36 @@ test("a rewrite answers the old name as the new one, and leaves a longer word al
   assert.equal(rename.renamedText(text, "gadge", NEW), text, "a longer word stands");
 });
 
+// A file with no ending and a page of markup each reach a name. [[spec/tickets/a-rename-reaches-every-note]]
+test("the move carries a file of any ending, and the rewrite reaches one too", () => {
+  assert.equal(typeof rename.writtenFiles, "function", "the verb answers writtenFiles");
+  const disk = fakeDisk({
+    [at(`src/${OLD}/main.go`)]: "package main\n",
+    [at(`src/${OLD}/Makefile`)]: `all: src/${OLD}\n`,
+    [at(`src/${OLD}/icon.png`)]: "\u0089PNG\r\n",
+    [at(".gitignore")]: `src/${OLD}/${OLD}\n`,
+    [at("spec/funnel/a-page.html")]: `<code>src/${OLD}</code>\n`,
+  });
+  const it = { disk, join, root: ROOT };
+
+  const said = rename.renaming(it, `src/${OLD}`, `src/${NEW}`);
+
+  assert.equal(said.why, "");
+  assert.equal(disk.exists(at(`src/${NEW}/Makefile`)), true, "a file with no ending moves");
+  assert.equal(disk.exists(at(`src/${NEW}/icon.png`)), true, "and a picture moves too");
+  assert.match(
+    disk.read(at(".gitignore")),
+    /src\/widget\/gadget/,
+    "a file with no ending rewrites, and the name after the path stands",
+  );
+  assert.match(disk.read(at("spec/funnel/a-page.html")), /src\/widget/, "a page of markup rewrites");
+  assert.equal(
+    disk.read(at(`src/${NEW}/icon.png`)),
+    "\u0089PNG\r\n",
+    "a picture carries its bytes, because the rewrite reads it nowhere",
+  );
+});
+
 // [[spec/tickets/a-rename-reaches-every-note]]
 test("the move carries the folder and rewrites every file reaching it", () => {
   assert.equal(typeof rename.renaming, "function", "the verb answers renaming");

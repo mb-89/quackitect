@@ -155,7 +155,7 @@ says what the verb puts into each.
 
 | file | the verb puts |
 |---|---|
-| `project/spec/tickets/`, `project/spec/guidance/`, `project/src/` | one `.gitkeep`, so the empty folder travels with git |
+| the folders `stubFolders` names, under the stub's own name | one `.gitkeep`, so the empty folder travels with git |
 | `vehicle.json` | the record below |
 | `RUNME.sh` | the shim, with its run bit |
 | `.claude/settings.json` | the vehicle's tracked settings, key by key, with none of its comments |

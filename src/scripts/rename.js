@@ -1,10 +1,11 @@
 // The rename verb. One name moves, and every reach the tree writes moves with
 // it: an import, a path, a note link and a word in prose.
-// [[spec/design_output/index#the-questions-it-answers]]
+// [[spec/design_output/index#a-rename-reaches-a-name]]
 
-// The folders a walk leaves alone, as the findings reader leaves them. [[spec/design_output/index#the-questions-it-answers]]
+// The folders a walk leaves alone, as the findings reader leaves them. [[spec/design_output/index#a-rename-reaches-a-name]]
 const SKIP = new Set([".git", "node_modules", ".se", ".claude-plugin", "bin"]);
-const TEXT = /\.(js|mjs|cjs|go|md|json|yaml|yml|sh|ts|txt|mod|sum)$/i;
+// What a rewrite leaves alone, because a rewrite of it writes nonsense. [[spec/design_output/index#a-rename-reaches-a-name]]
+const BINARY = /\.(png|jpe?g|gif|ico|svgz|pdf|zip|gz|tar|woff2?|ttf|otf|wasm|exe|db|sqlite3?)$/i;
 
 function edged(name) {
   return new RegExp(
@@ -13,7 +14,7 @@ function edged(name) {
   );
 }
 
-// A line naming the old name, with the number a reader opens. [[spec/design_output/index#the-questions-it-answers]]
+// A line naming the old name, with the number a reader opens. [[spec/design_output/index#a-rename-reaches-a-name]]
 export function reachesIn(text, from) {
   const out = [];
   const rows = String(text ?? "").split("\n");
@@ -23,12 +24,12 @@ export function reachesIn(text, from) {
   return out;
 }
 
-// The text with each reach rewritten, and a longer word left standing. [[spec/design_output/index#the-questions-it-answers]]
+// The text with each reach rewritten, and a longer word left standing. [[spec/design_output/index#a-rename-reaches-a-name]]
 export function renamedText(text, from, to) {
   return String(text ?? "").replace(edged(from), String(to));
 }
 
-// Every text file under the root, which the rewrite walks. [[spec/design_output/index#the-questions-it-answers]]
+// Every file under a folder, whatever its ending. A caller names the part it wants. [[spec/design_output/index#a-rename-reaches-a-name]]
 export function filesUnder(it, where) {
   const out = [];
   const into = (at) => {
@@ -42,14 +43,19 @@ export function filesUnder(it, where) {
       if (SKIP.has(one.name)) continue;
       const next = it.join(at, one.name);
       if (one.kind === "dir") into(next);
-      else if (TEXT.test(one.name)) out.push(next);
+      else out.push(next);
     }
   };
   into(where);
   return out.sort();
 }
 
-// A note reaches a reader two ways, as a path and as a link without its ending. [[spec/design_output/index#the-questions-it-answers]]
+// The files a rewrite reads: every one a reader reads as text. [[spec/design_output/index#a-rename-reaches-a-name]]
+export function writtenFiles(it, where) {
+  return filesUnder(it, where).filter((one) => !BINARY.test(one));
+}
+
+// A note reaches a reader two ways, as a path and as a link without its ending. [[spec/design_output/index#a-rename-reaches-a-name]]
 export function formsOf(from, to) {
   const out = [[String(from), String(to)]];
   const bare = String(from).replace(/\.md$/, "");
@@ -60,7 +66,7 @@ export function formsOf(from, to) {
 // A name standing as no path, such as a module's, which rewrites and moves nothing. [[spec/design_output/index#a-rename-reaches-a-name]]
 export function renamingText(it, from, to) {
   const wrote = [];
-  for (const file of filesUnder(it, it.root)) {
+  for (const file of writtenFiles(it, it.root)) {
     const text = it.disk.read(file);
     const said = renamedText(text, from, to);
     if (said === text) continue;
@@ -100,7 +106,7 @@ export function renaming(it, from, to) {
   it.git?.run(["add", "-A", String(from), String(to)], true);
 
   const wrote = [];
-  for (const file of filesUnder(it, it.root)) {
+  for (const file of writtenFiles(it, it.root)) {
     const text = it.disk.read(file);
     const said = formsOf(from, to).reduce(
       (held, [one, other]) => renamedText(held, one, other),

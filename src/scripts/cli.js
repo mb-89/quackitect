@@ -173,7 +173,7 @@ export const verbs = {
     says: "the index itself: standing, reindex, or same <path>",
     run: async () => asksIndex(rest.length ? rest : ["standing"]),
   },
-  // [[spec/design_output/index#the-questions-it-answers]]
+  // [[spec/design_output/index#a-rename-reaches-a-name]]
   rename: {
     says: "move a name and rewrite every reach: rename <from> <to>",
     run: async () => renameHere(rest),
