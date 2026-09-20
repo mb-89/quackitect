@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -130,6 +130,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 14a8f8915516367b6a9ff566a3cbd8c47f54817f
+    hash_after: 14a8f8915516367b6a9ff566a3cbd8c47f54817f
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -280,14 +288,18 @@ That surprises me at a tests-red step. The step wants red, and a guard over a st
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The two notes, the chapter naming the roads, and the two case files.
+- every door the change reaches has a fake. The route case drives the pull doors' fake disk. The rule cases read the notes that ship.
+- a comment names the approach the change implements. The chapter names each grade and its road, and each case points at this ticket.
 
 ## tests-green
 

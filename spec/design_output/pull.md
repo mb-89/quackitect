@@ -434,6 +434,17 @@ to stand, because a fail says why in them.
 
 ## A person step goes in
 
+A question carries a grade, and the grade picks the road:
+
+| the grade | who answers it | the road |
+|---|---|---|
+| design, which the notes under `spec/design_input` leave open | the owner | `branch escalate`, which inserts the person step below |
+| craft, which those notes settle | the drafter | the fail verdict, which `on_fail` routes to the drafting step |
+
+So a craft question reaches the drafter through a road the engine holds
+already, and the route takes on no person step. [[spec/guidance/working]] and
+[[spec/guidance/review/reviewing]] each carry the rule naming the grade.
+
 `withPersonStep` puts a step named `person-<n>` before the target, `by:
 person`, `to: engine`, with the question under `asks` and one `answer`
 field. It points `step` at the inserted row and leaves the state at `open`,
