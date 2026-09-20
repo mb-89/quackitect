@@ -1,6 +1,6 @@
 // The facts a note restates. One measure answers both rules: the longest run of
 // words two places share, over the notes a pointer ties together.
-// [[spec/design_output/tree#the-rules-over-two-files]]
+// [[spec/design_output/lsp#a-second-copy-draws]]
 package main
 
 import (
@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	// The rule over a heading retelling the heading its pointer names. [[spec/design_output/tree#the-rules-over-two-files]]
+	// The rule over a heading retelling the heading its pointer names. [[spec/design_output/lsp#a-second-copy-draws]]
 	RestatedPointer = "RestatedPointer"
-	// The rule over one rule line standing in two guidance notes. [[spec/design_output/tree#the-rules-over-two-files]]
+	// The rule over one rule line standing in two guidance notes. [[spec/design_output/lsp#a-second-copy-draws]]
 	RestatedRule = "RestatedRule"
 	guidanceIn   = "spec/guidance/"
 )
@@ -27,17 +27,21 @@ var (
 	quotesOut = regexp.MustCompile("[`']")
 )
 
-// [[spec/design_output/tree#the-rules-over-two-files]]
+// [[spec/design_output/lsp#a-second-copy-draws]]
 func restatedFaults(tree *Tree, pointer, rule int) []Finding {
 	out := []Finding{}
-	for _, path := range notesIn(tree) {
-		out = append(out, pointerFaults(tree, path, pointer)...)
+	if pointer > 0 {
+		for _, path := range notesIn(tree) {
+			out = append(out, pointerFaults(tree, path, pointer)...)
+		}
 	}
-	out = append(out, ruleFaults(tree, rule)...)
+	if rule > 0 {
+		out = append(out, ruleFaults(tree, rule)...)
+	}
 	return sorted(out)
 }
 
-// A note names a chapter of another note, and its own heading says the same thing twice. [[spec/design_output/tree#the-rules-over-two-files]]
+// A note names a chapter of another note, and its own heading says the same thing twice. [[spec/design_output/lsp#a-second-copy-draws]]
 func pointerFaults(tree *Tree, path string, most int) []Finding {
 	out := []Finding{}
 	rows := yaml.SplitLines(tree.Read(path))
@@ -54,7 +58,7 @@ func pointerFaults(tree *Tree, path string, most int) []Finding {
 	return out
 }
 
-// One rule standing in two guidance notes drifts, because a hand rewords one of them. [[spec/design_output/tree#the-rules-over-two-files]]
+// One rule standing in two guidance notes drifts, because a hand rewords one of them. [[spec/design_output/lsp#a-second-copy-draws]]
 func ruleFaults(tree *Tree, most int) []Finding {
 	out := []Finding{}
 	held := map[string][]ruleAt{}
@@ -93,7 +97,7 @@ func sameRules(path string, mine []ruleAt, other string, theirs []ruleAt, most i
 	return out
 }
 
-// The longest run of words two texts share, with a code span and a link blanked out. [[spec/design_output/tree#the-rules-over-two-files]]
+// The longest run of words two texts share, with a code span and a link blanked out. [[spec/design_output/lsp#a-second-copy-draws]]
 func sharedRun(one, other string) int {
 	mine := wordsOf(one)
 	theirs := wordsOf(other)

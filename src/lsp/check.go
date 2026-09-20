@@ -10,7 +10,7 @@ import (
 
 type Checker struct {
 	tree *Tree
-	// The runs the restated rules refuse, off the config. [[spec/design_output/tree#the-rules-over-two-files]]
+	// The runs the restated rules refuse, off the config. [[spec/design_output/lsp#a-second-copy-draws]]
 	pointer int
 	rule    int
 }
@@ -53,17 +53,17 @@ func (one *Checker) Over(path string) []Finding {
 		out = append(out, rule(one.tree)...)
 	}
 	out = append(out, syntaxFaults(one.tree, where)...)
-	// A note says again what another holds, so the rule reads the pair. [[spec/design_output/tree#the-rules-over-two-files]]
+	// A note says again what another holds, so the rule reads the pair. [[spec/design_output/lsp#a-second-copy-draws]]
 	if strings.HasSuffix(where, ".md") {
 		out = append(out, restatedOver(one, where)...)
 	}
 	return sorted(out)
 }
 
-// [[spec/design_output/tree#the-rules-over-two-files]]
+// [[spec/design_output/lsp#a-second-copy-draws]]
 func restatedOver(one *Checker, where string) []Finding {
 	out := []Finding{}
-	for _, said := range restatedFaults(one.tree, one.pointer, one.rule) {
+	for _, said := range one.restatedAll() {
 		if said.File == where {
 			out = append(out, said)
 		}
@@ -71,12 +71,19 @@ func restatedOver(one *Checker, where string) []Finding {
 	return out
 }
 
+// [[spec/design_output/lsp#a-second-copy-draws]]
+func (one *Checker) restatedAll() []Finding {
+	return one.tree.Restated(func() []Finding {
+		return restatedFaults(one.tree, one.pointer, one.rule)
+	})
+}
+
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 func (one *Checker) Sweep() []Finding {
 	one.tree.Forgets()
 	out := append(treeFaults(one.tree), schemaFaults(one.tree)...)
 	out = append(out, syntaxSweep(one.tree)...)
-	out = append(out, restatedFaults(one.tree, one.pointer, one.rule)...)
+	out = append(out, one.restatedAll()...)
 	return sorted(out)
 }
 

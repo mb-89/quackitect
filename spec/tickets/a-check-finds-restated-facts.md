@@ -350,7 +350,7 @@ pointer. So each bound floors at the value the shipped config names.
 
 <!-- the form is checklist -->
 
-- the change touches the checker, its front, the schema, the config pair, and the places the rules name
+- this round touches the tree's memo, the checker, the config reader and the bound guard
 - the Go fixture writes a tree of its own, and the Vale case drives the real binary
 - each rule and each piece carries the pointer at the chapter tabling the rules over two files
 

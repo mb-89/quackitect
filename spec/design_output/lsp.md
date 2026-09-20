@@ -50,3 +50,24 @@ redraws nothing.
 Vale matches a section of `.vale.ini` against the path it receives, and an
 editor hands it an absolute one. So every section naming a folder opens on
 `**/`, and a contract test holds that.
+
+# A second copy draws
+
+`src/lsp/restated.go` holds two rules over a second copy of a fact. One measure
+answers both: the longest run of words two places share.
+
+| the rule | what it weighs | the bound it reads |
+|---|---|---|
+| `RestatedPointer` | a heading, against the heading its pointer names | `restated.pointer` |
+| `RestatedRule` | a numbered rule, against the same rule in another guidance note | `restated.rule` |
+
+A bound of nothing holds its rule off, the way the name cap reads its own. So a
+tree carrying no `restated` block draws neither rule, and a person turns one off
+by writing zero.
+
+The pass reads every note, so the tree holds its findings and each front pays it
+once. A buffer the editor changes drops them, and the next ask pays again.
+`Over` hands one file its own share, and the sweep hands back the whole list.
+
+Vale carries the third rule of the set, over a line beside a table. For how it
+lands, see [[spec/design_output/projection#a-layer-writes-two-files]].

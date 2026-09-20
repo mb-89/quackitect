@@ -39,7 +39,7 @@ export function codeSpans(layer) {
   ]);
 }
 
-// A paragraph beside a table says again what a cell of it holds, and the two drift apart. [[spec/design_output/tree#the-rules-over-two-files]]
+// A paragraph beside a table says again what a cell of it holds, and the two drift apart. [[spec/design_output/lsp#a-second-copy-draws]]
 export function restatedTable(layer) {
   const most = Number(layer.table);
 
@@ -53,7 +53,7 @@ export function restatedTable(layer) {
   ]);
 }
 
-// The words a line holds, with a code span and a link blanked out. [[spec/design_output/tree#the-rules-over-two-files]]
+// The words a line holds, with a code span and a link blanked out. [[spec/design_output/lsp#a-second-copy-draws]]
 const WORDS = [
   "wordsOf := func(one) {",
   '  clean := text.re_replace("`[^`]*`", one, " ")',
@@ -64,7 +64,7 @@ const WORDS = [
   "",
 ];
 
-// The longest run of words two places share. [[spec/design_output/tree#the-rules-over-two-files]]
+// The longest run of words two places share. [[spec/design_output/lsp#a-second-copy-draws]]
 const RUN = [
   "run := func(a, b) {",
   "  most := 0",
@@ -80,7 +80,7 @@ const RUN = [
   "",
 ];
 
-// A heading, a row, an item and a quote stand outside the paragraph beside a table. [[spec/design_output/tree#the-rules-over-two-files]]
+// A heading, a row, an item and a quote stand outside the paragraph beside a table. [[spec/design_output/lsp#a-second-copy-draws]]
 const ASIDE = [
   "aside := func(line) {",
   "  said := text.trim_space(line)",
@@ -94,7 +94,7 @@ const ASIDE = [
   "",
 ];
 
-// Each table takes the cells it holds and the lines touching it. [[spec/design_output/tree#the-rules-over-two-files]]
+// Each table takes the cells it holds and the lines touching it. [[spec/design_output/lsp#a-second-copy-draws]]
 function walk(most) {
   return [
     "lines := rows(said)",

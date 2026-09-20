@@ -30,9 +30,26 @@ type Tree struct {
 	Node  string
 	Box   Box
 
-	guard   sync.Mutex
-	overlay map[string]string
-	held    []string
+	guard    sync.Mutex
+	overlay  map[string]string
+	held     []string
+	restated []Finding
+	passed   bool
+}
+
+// The restated rules read every note, so the tree holds the one pass and each front pays it once. [[spec/design_output/lsp#a-second-copy-draws]]
+func (one *Tree) Restated(pass func() []Finding) []Finding {
+	one.guard.Lock()
+	found, passed := one.restated, one.passed
+	one.guard.Unlock()
+	if passed {
+		return found
+	}
+	found = pass()
+	one.guard.Lock()
+	one.restated, one.passed = found, true
+	one.guard.Unlock()
+	return found
 }
 
 func treeAt(root string) *Tree {
@@ -44,14 +61,14 @@ func (one *Tree) Holds(path, text string) {
 	one.guard.Lock()
 	defer one.guard.Unlock()
 	one.overlay[slashed(path)] = text
-	one.held = nil
+	one.held, one.restated, one.passed = nil, nil, false
 }
 
 func (one *Tree) Drops(path string) {
 	one.guard.Lock()
 	defer one.guard.Unlock()
 	delete(one.overlay, slashed(path))
-	one.held = nil
+	one.held, one.restated, one.passed = nil, nil, false
 }
 
 func (one *Tree) Read(path string) string {
@@ -152,7 +169,7 @@ func diskHolds(root string) []string {
 func (one *Tree) Forgets() {
 	one.guard.Lock()
 	defer one.guard.Unlock()
-	one.held = nil
+	one.held, one.restated, one.passed = nil, nil, false
 }
 
 const (

@@ -16,6 +16,10 @@ const (
 	Local   = ".se/.runtime/config.json"
 	WordsAt = "names.words"
 	WordsIn = "SE_NAMES_WORDS"
+	// The block holding the two runs the restated rules refuse. [[spec/design_output/config#the-resolver-holds-the-layers]]
+	Restated  = "restated"
+	PointerIn = "SE_RESTATED_POINTER"
+	RuleIn    = "SE_RESTATED_RULE"
 )
 
 func wordsHere(root string) int {
@@ -37,17 +41,33 @@ func wordsHere(root string) int {
 // The runs the restated rules refuse, read off the same layers. [[spec/design_output/config#the-resolver-holds-the-layers]]
 func restatedHere(root string) (int, int) {
 	pointer, rule := 0, 0
-	for _, path := range []string{Tracked, Local} {
-		if said, held := numbersFrom(root, path, "restated"); held {
-			if one, whole := said["pointer"].(float64); whole {
-				pointer = int(one)
-			}
-			if one, whole := said["rule"].(float64); whole {
-				rule = int(one)
-			}
-		}
+	if said, held := numbersFrom(root, Tracked, Restated); held {
+		pointer, rule = boundIn(said, "pointer", pointer), boundIn(said, "rule", rule)
+	}
+	pointer, rule = wholeIn(PointerIn, pointer), wholeIn(RuleIn, rule)
+	if said, held := numbersFrom(root, Local, Restated); held {
+		pointer, rule = boundIn(said, "pointer", pointer), boundIn(said, "rule", rule)
 	}
 	return pointer, rule
+}
+
+func boundIn(said map[string]any, key string, out int) int {
+	if one, whole := said[key].(float64); whole {
+		return int(one)
+	}
+	return out
+}
+
+func wholeIn(name string, out int) int {
+	said := strings.TrimSpace(os.Getenv(name))
+	if said == "" {
+		return out
+	}
+	whole, err := strconv.Atoi(said)
+	if err != nil {
+		return out
+	}
+	return whole
 }
 
 func numbersFrom(root, path, key string) (map[string]any, bool) {
