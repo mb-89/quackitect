@@ -111,3 +111,24 @@ ifBuilt("a ticket's standing reads off its group's branch through the ticket", (
     it.ask("stop", {});
   }
 });
+
+// The change reaches a caller within a second of the write, so a reader redraws and polls nothing. [[spec/design_output/index#the-index-fires-on-change]]
+ifBuilt("a changes call fires within a second of a ticket write", () => {
+  const work = files.tempDir("changes-");
+  files.makeDir(join(work, "spec", "tickets"));
+  files.write(join(work, "spec", "tickets", "a-child.md"), child(""));
+  const time = clock();
+  const it = index(files, proc(), time, root, work);
+  try {
+    const first = it.ask("changes", { since: 0 });
+    assert.ok(first?.tick >= 1, `the walk on the way up counts one, and the tick reads ${first?.tick}`);
+    files.write(join(work, "spec", "tickets", "late.md"), child(""));
+    const started = time.now().getTime();
+    const next = it.ask("changes", { since: first.tick });
+    const took = time.now().getTime() - started;
+    assert.ok(next?.tick > first.tick, "a sweep past the write counts one more");
+    assert.ok(took < 1000, `the call fires within a second, and took ${took}ms`);
+  } finally {
+    it.ask("stop", {});
+  }
+});

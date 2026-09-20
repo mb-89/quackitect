@@ -29,7 +29,7 @@ const (
 func main() {
 	argv := os.Args[1:]
 	if len(argv) == 0 {
-		fmt.Fprintln(os.Stderr, "usage: se-index <serve|find|notes|links|dangling|same|tickets|reindex|standing> [words]\n       se-index call <method> <json params>")
+		fmt.Fprintln(os.Stderr, "usage: se-index <serve|find|notes|links|dangling|same|tickets|changes|reindex|standing> [words]\n       se-index call <method> <json params>")
 		os.Exit(2)
 	}
 
@@ -185,6 +185,8 @@ func asked(argv []string) (string, json.RawMessage) {
 			params["target"] = argv[1]
 		case "same":
 			params["path"] = argv[1]
+		case "changes":
+			params["since"], _ = strconv.Atoi(argv[1])
 		}
 	}
 	return argv[0], asRaw(params)

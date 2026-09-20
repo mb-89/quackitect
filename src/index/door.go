@@ -25,6 +25,8 @@ const (
 	burstSettleDelay  = 200 * time.Millisecond
 	decimalBase       = 10
 	stopGraceDelay    = 100 * time.Millisecond
+	// A changes call waits this long for a sweep, under the wait a caller gives a post. [[spec/design_output/index#the-index-fires-on-change]]
+	changesWait = 25 * time.Second
 )
 
 type Standing struct {
@@ -54,6 +56,16 @@ type door struct {
 	eyes  *fsnotify.Watcher
 
 	pending atomic.Bool
+
+	// The count of sweeps so far, and the channel a sweep closes to wake every waiting changes call. [[spec/design_output/index#the-index-fires-on-change]]
+	tick     atomic.Int64
+	wake     chan struct{}
+	wakeLock sync.Mutex
+}
+
+// What a changes call answers: the tick the rows stand at. [[spec/design_output/index#the-index-fires-on-change]]
+type Tick struct {
+	Tick int64 `json:"tick"`
 }
 
 func standingPath(root string) string {
@@ -94,7 +106,8 @@ func Serve(root, at string) (func(), net.Listener, error) {
 		return nil, nil, err
 	}
 
-	one := &door{db: db, root: root, dirty: make(chan struct{}, 1)}
+	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{})}
+	one.tick.Store(1)
 	listen, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return nil, nil, err
@@ -158,6 +171,49 @@ func (one *door) sweeps() {
 func (one *door) settles() {
 	if one.pending.Swap(false) {
 		Reindex(one.db, one.root)
+		one.moved()
+	}
+}
+
+// A sweep that wrote counts one, and wakes every changes call waiting on it. [[spec/design_output/index#the-index-fires-on-change]]
+func (one *door) moved() {
+	one.wakeLock.Lock()
+	defer one.wakeLock.Unlock()
+	one.tick.Add(1)
+	close(one.wake)
+	one.wake = make(chan struct{})
+}
+
+// The tick now, and the channel the next sweep closes. [[spec/design_output/index#the-index-fires-on-change]]
+func (one *door) standingAt() (int64, chan struct{}) {
+	one.wakeLock.Lock()
+	defer one.wakeLock.Unlock()
+	return one.tick.Load(), one.wake
+}
+
+// A changes call holds until a sweep past the tick it names, or the wait runs out, and answers the tick then. [[spec/design_output/index#the-index-fires-on-change]]
+func (one *door) awaits(w http.ResponseWriter, r *http.Request, said call) {
+	var asked struct {
+		Since int64 `json:"since"`
+	}
+	if len(said.Params) > 0 {
+		json.Unmarshal(said.Params, &asked)
+	}
+	patience := time.After(changesWait)
+	for {
+		tick, wake := one.standingAt()
+		if tick > asked.Since {
+			writes(w, answer{Result: Tick{Tick: tick}, ID: said.ID})
+			return
+		}
+		select {
+		case <-wake:
+		case <-patience:
+			writes(w, answer{Result: Tick{Tick: tick}, ID: said.ID})
+			return
+		case <-r.Context().Done():
+			return
+		}
 	}
 }
 
@@ -165,6 +221,12 @@ func (one *door) took(w http.ResponseWriter, r *http.Request) {
 	var said call
 	if err := json.NewDecoder(r.Body).Decode(&said); err != nil {
 		writes(w, answer{Error: "the call reads as no JSON", ID: said.ID})
+		return
+	}
+
+	// The wait for a sweep holds no guard, so every other call answers past it. [[spec/design_output/index#the-index-fires-on-change]]
+	if strings.ToLower(said.Method) == "changes" {
+		one.awaits(w, r, said)
 		return
 	}
 

@@ -84,7 +84,7 @@ the rows. For the keys, see
 So a branch informs a ticket's standing and nothing more, and the reader opens
 no git for it. The fixture case stands in `test/contract/index.test.js`, and
 the discussion says why. The manifests left git and nothing wrote them again, so three
-contract cases stood red on every fresh clone, and the stamp now writes them. The node case under `test/level0` drives the built binary over
+contract cases stood red on every fresh clone, and the stamp now writes them. The contract case drives the built binary over
 a tree it writes, and skips where no binary stands. The Go cases under
 `src/index` prove the same fields and standings with no door running.
 

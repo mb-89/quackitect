@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-work-tab-reads-tickets
 step: do
+record:
+  - step: do
+    hand: box 51c5005e133c · claude-code-remote
+    hash_before: 733b6dedf6dda4c2617ee754f99cdd0ee52e0e45
+    hash_after: 733b6dedf6dda4c2617ee754f99cdd0ee52e0e45
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s); green, src/index passes
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -47,27 +60,35 @@ The work tab polls a file's time every second, and a change reaches it late or n
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+The door answers `changes`. The call names the tick a reader holds, waits for
+a sweep past it, and answers the tick then. So a reader redraws on each answer
+and polls nothing. For the shape, see
+[[spec/design_output/index#the-index-fires-on-change]].
 
-<!-- the form is text -->
+| what | where it stands |
+|---|---|
+| the tick | `door.go`, counted one at the walk up and one a sweep that wrote |
+| the wait | `awaits`, which holds no guard, so every other call answers past it |
+| the proof | a Go case writing a file, and a contract case timing the call |
+
+The wake is a channel a sweep closes and makes again. So every waiting call
+wakes at once, and the sweep blocks on none of them. A call outliving its wait
+answers the tick it holds. That wait stands under the one a caller gives a
+post, so a reader asks again and no post times out.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask: the door exposes the subscription, and both cases cover it with a written file
+- the cleanup it reveals: none, because the sweep already stood in one place and the tick hangs off it
+- every fact stands once: the shape stands in the index note, and the code points at its chapter
 
 # Discussion
 

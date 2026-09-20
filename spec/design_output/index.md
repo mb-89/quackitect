@@ -92,6 +92,24 @@ sweep carries what it holds.
 A box where no watch stands still answers, out of the walk the door makes on
 the way up.
 
+## The index fires on change
+
+A reader wanting to redraw on a change asks `changes` and names the tick it
+holds. The call holds until a sweep moves the rows past that tick, and answers
+the tick then. So a reader calls again with the tick it takes, and each answer is a
+change. A reader holding no tick names zero, and the walk on the way up counts
+one.
+
+| what the reader meets | what the call answers |
+|---|---|
+| a sweep past the tick it names | the tick now, the moment the sweep lands |
+| no sweep inside the wait | the tick it holds, so the reader asks again |
+| the door going down | the call fails, and the reader starts a door the way every caller does |
+
+The wait holds no guard, so every other call answers past a waiting one. The
+sweep settles a burst first, so a change reaches the reader inside a second of
+the write. `awaits` in `door.go` holds the call, and a contract case times it.
+
 ## The questions it answers
 
 Each one is a walk the tree takes in one call:
@@ -106,6 +124,7 @@ Each one is a walk the tree takes in one call:
 | `dangling` | every link naming nothing this tree holds |
 | `same` | every file carrying the size and hash of another |
 | `tickets` | every ticket with its fields, and the standing its group's branch gives it |
+| `changes` | the tick past the one a caller names, once a sweep moves the rows |
 | `reindex` | the walk again, now |
 | `standing` | the root the door holds, and how many files it counts |
 
