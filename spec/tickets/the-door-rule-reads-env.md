@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -155,6 +155,12 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 71af5c91b66d1eb075e83ecb2ddf2f7b2b9d5c87
     hash_after: 810049a7e3c941e3e665254614868ac96cd6f7e1
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-14
+    hash_before: d3e1a6f8d0a35afaef0ab3d20ce0187cfbc10a3a
+    hash_after: d3e1a6f8d0a35afaef0ab3d20ce0187cfbc10a3a
+    returns: 7
+    why: "`.vale.ini` stands `[**/test/level0/*.js]` today, holding `FakeDoorsInTest =; YES`, and the table of sections the file gains names it as new. Grow the; section standing, the way the stub's bridgehead reads now. Leave; `**/test/contract/*.js` as the one section that row opens.; The module table writes `work.js` and `vehicle.js` bare, and every other row; and the platform table below write the whole path. Write one spelling of a; file name.; The findings of the round before stand answered. The markdown section takes a; line, and every section standing `DoorsOnly` off names the new rule. The; extension opens a section of its own under the new rule alone, and; `src/bridge/review.js` stands beside `src/scripts/cli*.js` in the later table.; The coverage reads complete otherwise. Every read of `process.env`,; `process.argv` and `process.platform` outside `src/doors` lands on the pass; list or in the module table. Every Go file importing `os/exec` sits in; `src/lsp` or `src/index`, the two packages the Go table moves.; `./RUNME.sh lint src` answers zero today, and the draft's diff touches this; ticket alone."
 ---
 
 # Ask
@@ -292,27 +298,23 @@ door in each. So this ticket holds the rule to `os/exec`, and
 
 fail
 
-- The new rule joins `VoiceVale`, and the section over `*.md` names it nowhere.
-  `DoorsOnly` stands off there because a note writes `process.env` in its prose,
-  and a ticket in the tree does today. `[formats]` reads a `.yml` as markdown
-  too, so the rule file meets its own tokens. Name the line the markdown
-  section takes.
-- The sections standing `DoorsOnly` off today name the new rule nowhere:
-  `src/doors/*.js`, their fakes, the hooks module and the stub's bridgehead.
-  `src/doors/proc.js` reads `process.env`, so `./RUNME.sh lint src` comes back
-  red on a door. Say that each section takes a line for the new rule beside the
-  one it holds.
-- Growing the section over `editor*.js` to `*.js` gives the `node:` import guard
-  up for `src/extension/extension.js` and `src/extension/sidebar.js`. The
-  approach opens a rule file of its own so a pass keeps that guard. Open the
-  wider glob under the new rule alone, and leave `DoorsOnly` where it stands.
-- `src/bridge/review.js` reads `process.execPath` as well, and the table naming
-  the reads a later ticket carries stands `src/scripts/cli-doors.js` alone.
-  Name the second file beside it.
-- The findings of the round before stand answered. The test folders reach the
-  pass list, and the reading takes a rule file of its own. `src/yaml` stands in
-  the Go table, and the later ticket carries `process.version` and
-  `process.execPath` beside `process.pid`.
+- `.vale.ini` stands `[**/test/level0/*.js]` today, holding `FakeDoorsInTest =
+  YES`, and the table of sections the file gains names it as new. Grow the
+  section standing, the way the stub's bridgehead reads now. Leave
+  `**/test/contract/*.js` as the one section that row opens.
+- The module table writes `work.js` and `vehicle.js` bare, and every other row
+  and the platform table below write the whole path. Write one spelling of a
+  file name.
+- The findings of the round before stand answered. The markdown section takes a
+  line, and every section standing `DoorsOnly` off names the new rule. The
+  extension opens a section of its own under the new rule alone, and
+  `src/bridge/review.js` stands beside `src/scripts/cli*.js` in the later table.
+- The coverage reads complete otherwise. Every read of `process.env`,
+  `process.argv` and `process.platform` outside `src/doors` lands on the pass
+  list or in the module table. Every Go file importing `os/exec` sits in
+  `src/lsp` or `src/index`, the two packages the Go table moves.
+  `./RUNME.sh lint src` answers zero today, and the draft's diff touches this
+  ticket alone.
 
 # implement
 
