@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -165,6 +165,10 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 0638763fbc79d062896625ae91411fb31b8ad01b
     hash_after: 67ca5dfbdb080e0fd873f4d6b1769600d816f1ba
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-16
+    hash_before: 92a37e4384279a272b0566985001860b643a7256
+    hash_after: 92a37e4384279a272b0566985001860b643a7256
 ---
 
 # Ask
@@ -301,25 +305,28 @@ door in each. So this ticket holds the rule to `os/exec`, and
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `.vale.ini` stands `[**/test/level0/*.js]` today, holding `FakeDoorsInTest =
-  YES`, and the table of sections the file gains names it as new. Grow the
-  section standing, the way the stub's bridgehead reads now. Leave
-  `**/test/contract/*.js` as the one section that row opens.
-- The module table writes `work.js` and `vehicle.js` bare, and every other row
-  and the platform table below write the whole path. Write one spelling of a
-  file name.
-- The findings of the round before stand answered. The markdown section takes a
-  line, and every section standing `DoorsOnly` off names the new rule. The
-  extension opens a section of its own under the new rule alone, and
-  `src/bridge/review.js` stands beside `src/scripts/cli*.js` in the later table.
-- The coverage reads complete otherwise. Every read of `process.env`,
-  `process.argv` and `process.platform` outside `src/doors` lands on the pass
-  list or in the module table. Every Go file importing `os/exec` sits in
-  `src/lsp` or `src/index`, the two packages the Go table moves.
-  `./RUNME.sh lint src` answers zero today, and the draft's diff touches this
-  ticket alone.
+- The findings of the round before stand answered. `**/test/level0/*.js` moves
+  into the table of sections growing, and the module table writes each file's
+  whole path.
+- Every read of `process.env`, `process.argv` and `process.platform` outside
+  `src/doors` lands on the pass list or in the module table. `git ls-files
+  '*.js' | xargs grep -lE 'process\.(env|argv|platform)'` answers the list, and
+  every name on it sits in one of the two.
+- Every Go file importing `os/exec` sits in `src/lsp` or `src/index`, which
+  `grep -rl os/exec --include=*.go src` answers. The section over
+  `**/src/*/door.go` stands both packages off, and `src/viewer`, `src/swap` and
+  `src/yaml` import none.
+- The rule file stands under `StylesPath`, which Vale skips, so it meets none of
+  its own tokens. The markdown section takes the new rule, and `grep -rl` over
+  `*.md` names the tickets writing those tokens in prose.
+- `./RUNME.sh lint src` answers zero today, `./RUNME.sh branch review
+  the-rules-hold-themselves` finds nothing to fix, and the draft's diff touches
+  this ticket alone.
+- The table of sections growing writes `[*.{md,markdown,txt}]` in brackets and
+  every other row of that column bare. Write one spelling of a section, where
+  the implement step copies the list into `.vale.ini`.
 
 # implement
 
