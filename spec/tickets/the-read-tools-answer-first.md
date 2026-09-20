@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -146,6 +146,17 @@ record:
     hash_after: 64fd48f14891db8df7d9df81beb80584371fb9ba
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: c04f8d7875c82f085830eb4cbc224300a784159f
+    hash_after: c04f8d7875c82f085830eb4cbc224300a784159f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -345,26 +356,49 @@ The engine hands a hook one `on`, and the hook names the events it takes. So a c
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/read-tools.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hook registers every read tool at the session's start, and the first call brings the server up.
+
+| what stands now | where |
+|---|---|
+| `READ_TOOLS`, naming the four specs | the hook, which registers each at session start |
+| the tool road, one handler a tool | the hook, which starts the server and waits |
+| `findSpec` | `.claude/skills/level0/lib/search.js`, where the bridge points |
+
+A call landing before the server stands asks once, runs the start, reads `/health` every fifth of a second, and asks again. `STARTING` caps that wait. The wait running out answers the port and the log the server writes to.
+
+The hook's invariant narrows. It imports its own folder now, and nothing past it:
+
+- `PORT_BASE` comes from `lib/vehicle.js` and `SESSION` from `lib/log.js`, each from its owner
+- a file under `lib` failing to load blocks the hook, which is what this buys the registration
+- the stub's copy takes the six lib files the hook reaches, so an import dies nowhere there
+- `test/level0/vehicle.test.js` asserts each of those files travels
+
+The bridgehead installs nothing, so that line stands as it stands. `START` keeps its road, `REASONS` keeps every code, and a session start waits for nothing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place, and each note names the piece it owns
+- the hook reaches the outside through the engine's doors, and the cases fake all four
+- each header says what its file is for, and counts nothing
 
 # verdict
 
