@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -207,6 +207,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-21
+    hash_before: 45aaa37ab73fcce2f84e2b4b7d64c9b4afb13a61
+    hash_after: 45aaa37ab73fcce2f84e2b4b7d64c9b4afb13a61
+    returns: 3
+    why: "| the finding | the fix |; |---|---|; | The case named for a projection target asserts nothing. `untestedIn` holds no projection reading, and the path it feeds is no `.js` under `src`, so `SOURCE` alone draws the empty list | Feed the case a path the rule would otherwise name, or drop the half and cut the promise from the approach |; | The approach says the delta reading skips every projection target. No target `spec/config/projections.json` names lands under `src`, so the line describes a reading standing nowhere | Say which paths under `src` the reading skips, and let one list in the code carry them |; | `filesIn` stands exported from `tested.js`, and no module calls it. A reader takes it for a door of the rule, and nothing drives it | Drop the export, or name the caller it lands for |; What holds:; `./RUNME.sh check` exits 0 on `45aaa37a`, and the branch matches origin.; The four lines of the ask each take a program: the delta reading, the tree rule and the guard.; Rule five of [[spec/guidance/code/testing]] names the commit door and the tree rule.; Every fake under `src/doors/fake` takes `behaves`, and a case drives `fakeClock` into a call it lacks.; `hunksIn` keys the added lines by file, and a case feeds it one changed module importing another.; Both doors read one text, because the Bash door and the hook hand the staged delta to `untestedIn`.; Each rule takes a case feeding it something bad: a module no test imports, and a stray test.; The nine tests the import rule forces each assert on the module they name.; `test/level0/tools-door.test.js` stands as it stands on trunk, and its survey cases hold.; The change touches the readings, the guard, both doors, two notes and the tests. It reaches nothing outside the brief.; `HANDOVER.md` carries a retro chapter, with three findings for the retro to weigh."
 ---
 
 # Ask
@@ -502,9 +508,10 @@ The third round closes the two the second left open:
 <!-- the form is files -->
 
     .claude/skills/level0/lib/tested.js
+    .claude/skills/level0/lib/tree.js
+    .claude/skills/level0/lib/projection.js
     src/bridge/bash.js
     src/scripts/precommit.js
-    .githooks/pre-commit
     src/doors/fake/behaves.js
     src/doors/fake/clock.js
     src/doors/fake/git.js
@@ -513,9 +520,9 @@ The third round closes the two the second left open:
     src/doors/fake/proc.js
     src/doors/fake/session.js
     src/doors/fake/bridgehead.js
+    spec/config/projections.json
     spec/design_output/tree.md
     spec/design_output/doors.md
-    spec/design_output/private.md
     spec/guidance/code/testing.md
     spec/tickets/the-check-holds-test-first.md
     test/level0/tested.test.js
@@ -523,6 +530,12 @@ The third round closes the two the second left open:
     test/level0/tools-door.test.js
     test/level0/review-door.test.js
     test/level0/window-door.test.js
+    test/level0/apply-door.test.js
+    test/level0/ask-door.test.js
+    test/level0/config-door.test.js
+    test/level0/search-door.test.js
+    test/level0/status.test.js
+    test/level0/prose.test.js
     HANDOVER.md
 
 ## verdict
@@ -535,21 +548,23 @@ fail
 
 | the finding | the fix |
 |---|---|
-| The `disk`, `proc`, `session` and `bridgehead` fakes take no guard. A door test through one still reads `undefined` for a call the fake lacks | Wrap each of them in `behaves`, and let a case prove the disk fake throws |
-| `says` holds that the disk and the process fakes answer through a closure. Each fake here returns an object literal, `clock` among them | Write the reason the code carries, or drop the line as each fake takes the guard |
-| `names` reads the import off the whole delta. So a changed module another changed module imports passes on one unrelated test | Read the import off the hunk the test carries, and take a case feeding it that delta |
+| The case named for a projection target asserts nothing. `untestedIn` holds no projection reading, and the path it feeds is no `.js` under `src`, so `SOURCE` alone draws the empty list | Feed the case a path the rule would otherwise name, or drop the half and cut the promise from the approach |
+| The approach says the delta reading skips every projection target. No target `spec/config/projections.json` names lands under `src`, so the line describes a reading standing nowhere | Say which paths under `src` the reading skips, and let one list in the code carry them |
+| `filesIn` stands exported from `tested.js`, and no module calls it. A reader takes it for a door of the rule, and nothing drives it | Drop the export, or name the caller it lands for |
 
 What holds:
 
-- `./RUNME.sh check` exits 0 on the commit this verdict stands on.
-- `test/level0/tools-door.test.js` stands as it stands on trunk, and the hand tools take their own file.
+- `./RUNME.sh check` exits 0 on `45aaa37a`, and the branch matches origin.
+- The four lines of the ask each take a program: the delta reading, the tree rule and the guard.
 - Rule five of [[spec/guidance/code/testing]] names the commit door and the tree rule.
-- The `clock`, `git` and `log` fakes take the guard. A case drives the clock into a call it lacks.
-- Both doors read one text, because the hook pipes the staged delta the Bash door builds.
-- Each rule takes a case feeding it something bad. A module no test imports, and a delta carrying a stray test.
-- The change touches the readings, the guard, both doors, the notes and the tests. It reaches nothing outside the brief.
-- The code answering the last round lands under the reflect commit. The change commit carries the note and the cases.
-- `HANDOVER.md` carries a retro chapter, and it records this ticket at design/review.
+- Every fake under `src/doors/fake` takes `behaves`, and a case drives `fakeClock` into a call it lacks.
+- `hunksIn` keys the added lines by file, and a case feeds it one changed module importing another.
+- Both doors read one text, because the Bash door and the hook hand the staged delta to `untestedIn`.
+- Each rule takes a case feeding it something bad: a module no test imports, and a stray test.
+- The nine tests the import rule forces each assert on the module they name.
+- `test/level0/tools-door.test.js` stands as it stands on trunk, and its survey cases hold.
+- The change touches the readings, the guard, both doors, two notes and the tests. It reaches nothing outside the brief.
+- `HANDOVER.md` carries a retro chapter, with three findings for the retro to weigh.
 
 ## checked
 
@@ -557,7 +572,7 @@ What holds:
 
 <!-- the form is checklist -->
 
-- the tree note tables the rule and the doors note holds the guard, and each module points at its chapter. The `says` line on the fakes stands against the code
+- the tree note tables the rule, the doors note holds the guard, and each module points at its chapter. One fact stands twice: the approach names a projection reading the code lacks
 
 # Discussion
 
