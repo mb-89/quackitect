@@ -289,3 +289,12 @@ fail
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The approach names `src/bridge/prose.js` as the tool's home, and that file stands
+already: it owns `readsProse`, the filter the same approach points at. The
+reviewer decides between two roads, and the draft says neither.
+
+| the road | what it costs |
+|---|---|
+| the tool joins `src/bridge/prose.js` | the prose reader's file grows a spec and a handler |
+| the tool takes a file of its own | a name beside the reader, such as `src/bridge/draft.js` |
