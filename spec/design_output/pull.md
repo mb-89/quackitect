@@ -300,7 +300,7 @@ The wrapper under `.claude/skills/level1` imports nothing past its own folder,
 because the plugin validator refuses an import that leaves it. So the shell
 hands it the material: `ticket pull <ticket> --judge` prints the leaf's
 evidence and the rules its reads name, as JSON. The wrapper asks the model
-once over that, and a label answers `refused` before the shell runs. The
+once over that, and a `breaks` answers `refused` before the shell runs. The
 judge run carries the `--fields` payload of the hand-back. The material lays
 the payload over the ticket before it reads the evidence, so the judge reads
 what the hand writes.
@@ -309,45 +309,6 @@ The evidence holds the prose fields alone. The leaf names the form of each
 field it asks for. So the material leaves out a field whose form reads
 `command`, and a heading carrying no line. A chapter of commands hands the
 wrapper nothing, and the wrapper then skips the judge.
-
-### The judge answers a label
-
-The judge picks one answer from `follows` and one label per rule it holds.
-`judgeLabels` builds that set, and `ruleBroken` reads a label back to its
-rule. So an answer names the rule, and the refusal carries the note, the
-number and the rule's own line.
-
-| the answer | what it does |
-|---|---|
-| `follows` | the shell runs, and the hand-back carries on |
-| a label the material holds | `judgeRefusal` names the note, the number and the line |
-| a label outside the set | the same as `follows`, because a judge naming nothing refuses nothing |
-
-A label is the note's path under `spec/guidance`, with each slash as a hyphen,
-then a hyphen and the rule's number in that note. `labelOf` writes it, and
-`forEvidence` hands one per rule. A leaf reads several notes, and `actionables`
-numbers from one inside each, so the note's name keeps one label on one rule.
-
-### A rule describing an answer
-
-`forEvidence` drops the rules a note marks, and keeps the chapter's own
-numbering across the drop. So a label names the line the note holds under that
-number, and a reader opens one place.
-
-| the mark a rule ends in | what it says |
-|---|---|
-| the star | the rationale this note links argues for the rule |
-| the answer mark | the rule describes an answer, which evidence carries nowhere |
-
-`spec/schemas/guidance.schema.yaml` names both marks. A note writes the answer
-mark in a code span, because a paragraph admits the character nowhere else,
-and `actionables` strips either form. So every reader of the chapter reads the
-rule whole, and the output style shows no mark.
-
-Evidence carries no answer, so a judge reading an answer rule over evidence
-refuses a hand that keeps every rule. The answer gate holds those rules
-already. A leaf whose rules all carry the mark hands the wrapper an empty
-list, and the judge stands silent there.
 
 ## The fields hold their forms
 

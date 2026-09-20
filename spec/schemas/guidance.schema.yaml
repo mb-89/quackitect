@@ -5,10 +5,6 @@
 # `Actionables` alone and links its rationale. A Motivation chapter would carry
 # the argument a second time, and the rationale is where it belongs.
 #
-# A rule ending in the answer marker describes an answer, which evidence carries
-# nowhere, so the judge of spec/design_output/pull.md reads it over none. Every
-# reader strips both marks.
-#
 # The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
 # The body half is this project's own, borrowed from https://document-schema.org.
 # A value written [[like this]] is a link, and the name inside is the value.
@@ -61,7 +57,6 @@ body:
       list: true
       ordered: true
       detailMarker: "*"
-      answerMarker: "^"
       tense: present
       maxItems: 15
       description: one rule per item, in the active voice, as an instruction

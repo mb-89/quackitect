@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -166,6 +166,17 @@ record:
     hash_after: ba59402d45f450265344f87ab2bb48a596562f31
     returns: 2
     why: the hand takes it back
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 2581b81744407e872b42de6c40c126314406dfa2
+    hash_after: 2581b81744407e872b42de6c40c126314406dfa2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 11 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -293,7 +304,7 @@ pass
 <!-- the same tests pass -->
 <!-- the form is command -->
 
-./RUNME.sh branch test test/level0/guidance.test.js test/level0/level1.test.js test/level0/pull-leaves.test.js test/contract/guidance-rules.test.js
+./RUNME.sh branch test test/level0/guidance.test.js test/level0/level1.test.js test/level0/pull-leaves.test.js
 
 ### seen
 
