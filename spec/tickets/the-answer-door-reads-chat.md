@@ -326,11 +326,17 @@ the change the ask asks for.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the two refusals, their two cases, and the three chapters the approach names
+- the door meets a fake box carrying a log alone, so the cases run no door live
+- each new line points at this ticket or at the chapter owning what it says
 
 ## tests-green
 

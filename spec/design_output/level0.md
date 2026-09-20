@@ -873,16 +873,20 @@ The door opens a demand for what a person waits for. It holds every
 
 | what pays | when |
 |---|---|
-| the first text of a turn | `classic.MessageDisplay` fires for it, before the first call |
+| any text the chat shows | `classic.MessageDisplay` fires for it, before the call under it |
 | a call to `mcp__level0__report` with the text | at once, between calls |
 | the turn's last text | at `turn.complete`, where the demand still stands |
 
-A text written between calls pays nothing on its own. The client hands it to
-no hook until the turn ends. The transcript behind `$.session.messages()`
-flushes late, sometimes a turn late. The step's stream carries text for the
-first step alone. The bridgehead still posts the last four texts of the
-transcript on a hold. The door pays on any text since the demand that fits,
-so a flush landing late pays too.
+The client posts `classic.MessageDisplay` for every text it shows, a text
+between two calls among them. Each event carries that text under `delta`, and
+`onMessageDisplay` pays the demand with it. So a chat answer pays the door on
+its own, and the call under it passes.
+
+The other roads stay. The transcript behind `$.session.messages()` flushes
+late, sometimes a turn late. The step's stream carries text for the first step
+alone. The bridgehead still posts the last four texts of the transcript on a
+hold. The door pays on any text since the demand that fits, so a flush landing
+late pays too.
 
 ## What counts as owed
 
@@ -933,9 +937,16 @@ where no pay stands. For details, see
 [[spec/design_output/log#the-answer-under-its-prompt]].
 
 The owner reads the chat, and a hook writes no chat text. So a mid-turn answer
-goes to both places. The agent writes it in the chat as text, and calls the
-report with the same text for the log. The refusal and the report's result say
-so. The report pays the demand at once, so no call after it meets the door.
+goes to both places. The chat pays the door, and the report carries the same
+text into the log.
+
+| the road | what it buys |
+|---|---|
+| the chat | the owner reads the answer, and the door takes it as paid |
+| the report | the log carries the answer, where a retro reads it |
+
+The refusal and the report's result say both. Either road pays the demand at
+once, so no call after one meets the door.
 
 ## The owner binds god
 
@@ -956,11 +967,15 @@ delivery receipts, so a door reading it bites the wrong turn.
 
 ## What the refusal says
 
-    The owner sent a prompt. The owner asked something and nothing has
-    answered it. Say back what you understood and what you do next, then work.
+    The owner asked something and nothing has answered it. Write the answer in
+    the chat, as text: what you understood and what you do next. Then work.
+    The chat pays this door the moment it shows that answer.
+    The log takes the answer from the chat, so the log tool answers nothing.
 
-The refusal opens with the demand. The rest is the rule in its own words, and a refusal quoting the rule teaches it
-better than a refusal naming it.
+The refusal opens with the demand. The rest is the rule in its own words, and
+a refusal quoting the rule teaches it better than a refusal naming it. `SAYS`
+in `.claude/skills/level0/lib/answer.js` holds these words, and a case over it
+keeps the two together.
 
 ## Where it must not bite
 
