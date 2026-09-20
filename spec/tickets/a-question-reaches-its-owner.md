@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: cfce8ee10329dd002662da56afa239a2aa45aa0d
     returns: 2
     why: Name the file owning the case, because `pull-escalate.test.js` covers the escalation verb alone.; Name what the case asserts past the one in `pull.test.js`, which reads the leaf and the record.; Write the seventh rule of `spec/guidance/working` whole, because the table drops the sentence standing there.
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 322993965b44c982f43a2dddba2606d1d54a2024
+    hash_after: 322993965b44c982f43a2dddba2606d1d54a2024
 ---
 
 # Ask
@@ -150,7 +154,7 @@ A craft question the drafter raises reaches no verb, because the design input an
 |---|---|
 | `spec/guidance/working.md` | its seventh rule takes the drafter's half |
 | `spec/guidance/review/reviewing.md` | takes the reviewer's rule, one more on its list |
-| `test/level0/pull-escalate.test.js` | takes the case under this table |
+| `test/level0/pull.test.js` | takes the case under this table, beside the fail route it holds |
 | [[spec/design_output/pull#a-person-step-goes-in]] | says which grade takes which road |
 | `escalate` in `pull.js` | stands as it stands, and a design question alone reaches it |
 
@@ -158,7 +162,7 @@ A craft question the drafter raises reaches no verb, because the design input an
 
 | the note | the rule it takes |
 |---|---|
-| `spec/guidance/working` | Read `spec/design_input`, then ask the owner a design question before you build your own answer. |
+| `spec/guidance/working` | Name the assumption you take where the owner says to carry on, and take it. Read `spec/design_input`, then ask the owner a design question before you build your own answer. |
 | `spec/guidance/review/reviewing` | Grade each question a return names as design or craft, and hand a craft one back to the drafter. |
 
 **The case.** It drives the fail verdict over a review leaf whose route carries `on_fail: draft`. It asserts three things:
