@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box 099c2ec7708d · claude-code-remote
     hash_before: 9841e79a0915ff919c359a251a0f1f01a5bc5332
     hash_after: 9841e79a0915ff919c359a251a0f1f01a5bc5332
+  - step: design/review
+    hand: box 099c2ec7708d · claude-code-remote · helper-4
+    hash_before: 589386013a93874a229c77e6a634f0b990c3df7d
+    hash_after: 589386013a93874a229c77e6a634f0b990c3df7d
+    returns: 2
+    why: "`src/viewer/filter.go` owns the log filter language, and `spec/design_output/viewer#the-filter-language` says it; the four flags spell that filtering a second time, and the approach points at neither owner; `plainRows` under `src/scripts/tui.js` reads `SESSION` and the rotated files under `OLD`; that function prints each row through `asRow`, and the verb the approach names reads the same; say which of the two owns the read, and point the other at it; `spanOf` answers seconds, and `timeOf` answers milliseconds; `queue.js` keeps `MS` for that crossing, so name the scale beside `--since`; `timeOf` answers one stamp, the rotated file's first line, so the table's word span misreads it; the install bullet names no case, and `test/contract/install.test.js` holds one case, on binaries rebuilding; name the case asserting a warm box prints no install line; the lib table reads true: `SESSION`, `OLD`, `rowsOf` and `asRow` export; `timeOf`, `writes` and `rank` export from the same file; `spanOf` exports from `src/scripts/group.js`, as the flags table says; the verbs map under `src/scripts/cli.js` holds no `log`, so the name stands free; `install.sh` guards both its `say` lines on `$missing`, and `./RUNME.sh branch list` prints neither here"
 ---
 
 # Ask
@@ -169,12 +175,21 @@ A hand asking which kind fills the log runs `./RUNME.sh log --kind hook --last 2
 
 fail
 
-- the span `--since` takes has an owner already: `spanOf` under `src/scripts/group.js`, which `work.staleAfter` reads. The lib table names none, so an implementer writes a second parser
-- the flags table stands on this ticket, and the approach sends the same table into the design output. Say which of the two owns it, and point the other at it
-- the chapter the design output takes carries no title, so a reader finds no place for it
-- the ask names `./RUNME.sh test`, and the approach names no case file the filters land in
-- the ask's install line already holds: `./RUNME.sh branch list` on a warm box prints none of it. Say that, and name the case holding it there
-- the two tables read true: every name under `.claude/skills/level0/lib/log.js` exports, and `src/scripts/cli.js` holds the verbs map the verb joins
+- `src/viewer/filter.go` owns the log filter language, and `spec/design_output/viewer#the-filter-language` says it
+- the four flags spell that filtering a second time, and the approach points at neither owner
+- `plainRows` under `src/scripts/tui.js` reads `SESSION` and the rotated files under `OLD`
+- that function prints each row through `asRow`, and the verb the approach names reads the same
+- say which of the two owns the read, and point the other at it
+- `spanOf` answers seconds, and `timeOf` answers milliseconds
+- `queue.js` keeps `MS` for that crossing, so name the scale beside `--since`
+- `timeOf` answers one stamp, the rotated file's first line, so the table's word span misreads it
+- the install bullet names no case, and `test/contract/install.test.js` holds one case, on binaries rebuilding
+- name the case asserting a warm box prints no install line
+- the lib table reads true: `SESSION`, `OLD`, `rowsOf` and `asRow` export
+- `timeOf`, `writes` and `rank` export from the same file
+- `spanOf` exports from `src/scripts/group.js`, as the flags table says
+- the verbs map under `src/scripts/cli.js` holds no `log`, so the name stands free
+- `install.sh` guards both its `say` lines on `$missing`, and `./RUNME.sh branch list` prints neither here
 
 # implement
 
