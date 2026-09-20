@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -222,6 +222,10 @@ record:
     hash_after: ca61e937d707c1f7fa2b2c03ddbf167c20fe8dea
     returns: 1
     why: "`work-stands.js` drops `COL.kind`, and `work-list.js` still pads the queue place with it; the queue listing shifts its name column past single digits, because `padStart(undefined)` pads nothing; `USAGE` in `branch-usage.js` names the `new` verb, and `work.js` drops it from the verb table; `./RUNME.sh branch new <name>` prints the usage, so the row sends a reader at a verb that goes; the branch drops the case over `done` refusing a branch trunk stands ahead of; `ready` in `work.js` refuses a branch behind trunk, and no case drives that refusal; fix: give the queue place a width `work-list.js` owns, and cut the `new` row from `USAGE`; fix: drive `ready` on a branch behind trunk, so the refusal carries a case; `branch review` reads no retro on the handback, and the retro step after this one writes it; the rest reads true: every verb reads the group ticket, and `./RUNME.sh check` exits zero"
+  - step: implement/reflect
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 8731aaef4ae5f58dc71e7e0c13147e007b55be9b
+    hash_after: 8731aaef4ae5f58dc71e7e0c13147e007b55be9b
 ---
 
 # Ask
@@ -362,14 +366,32 @@ What surprises: the field stood on `./RUNME.sh test`, whose last line is a durat
 ### class
 
 <!-- the class of error the findings describe, and the fix for the class -->
-
 <!-- the form is text -->
+
+A cut leaves its readers standing. Each finding names one name this branch drops, and one place still reaching for it.
+
+| what the cut drops | what still reaches for it |
+|---|---|
+| `COL.kind` | `work-list.js`, padding the queue place with it |
+| the `new` verb | `USAGE`, which keeps its row |
+| a case over `ready` | the refusal stands, and no case drives it |
+
+The fix for the class runs in three reads:
+
+- grep the tree for every name the cut drops, and read each hit
+- grep for every verb the cut drops, so its usage row goes with it
+- for each case the cut deletes, ask what code it drives, and whether that code stands
+
+A cut leaving the code standing takes a case with it, and the last read catches that one.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the fix touches `work-list.js`, `branch-usage.js` and the work cases, each a file the change already reaches
+- git and the disk stand faked through `doorsSaying`, as the case over `ready` drives them
+- the class above names the approach the fix follows, and each hunk carries it
 
 ## change
 
