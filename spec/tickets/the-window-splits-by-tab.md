@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -121,6 +121,10 @@ record:
     hash_after: fa22bf73f57952e01f4d3b570c835e33a7da10e1
     returns: 3
     why: "design: The chapter's draw row reads `cut`, `pad`, `narrow`, the palette and the styles, and the approach's row reads `oneLine`, `Wrap`, `gutterWide`, the filter language and the link beside them, so the two tables say two lists; the chapter's row takes the approach's list, and the approach points at the chapter alone.; craft: The window tests read the model's fields, `sel`, `view`, `all` and `work` among them, and the model moves to the frame, so the approach says what the tests in the root package read them through.; craft: `typing` raises the floor on `alt+l` under the filter pane, so the approach says how a tab's key reaches the tab while the pane takes letters."
+  - step: design/draft
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: e9a215e0da951abf189cfa6d6a26eabd83ef9ed5
+    hash_after: e9a215e0da951abf189cfa6d6a26eabd83ef9ed5
 ---
 
 # Ask
@@ -150,23 +154,21 @@ what it imports. Every import there runs down, so no loop stands.
 
 <!-- the form is text -->
 
-The packages and their imports stand in
-[[spec/design_output/tui#the-packages-the-window-holds]], and the split follows
-that table. A tab owns its own state, so the frame reads no record and no
-ticket tree.
+The packages, what each holds and what each imports stand in
+[[spec/design_output/tui#the-packages-the-window-holds]], and the split
+follows that table. The chapter's rows take what this round finds standing
+between the packages, so the chapter stays the one list: the filter language,
+the link, the gutter, the wrap and the one-line cut land in the draw package,
+the parts and their rendering land in the frame, and the said style lands in
+the log tab.
 
-| the piece | where it lands |
-|---|---|
-| `cut`, `pad`, `oneLine`, `Wrap`, `gutterWide`, the palette and the styles | `src/tui/draw`, which imports nothing of this tree's |
-| the filter language in `filter.go` and the link in `link.go` | `src/tui/draw`, because the tree and a tab both read them, and the tree imports the draw package alone. The chapter's row for the draw package takes them, so the approach and the chapter say one thing |
-| `part` and `renderParts` in `detail.go` | `src/tui/frame`, because the panes and the help read them, and they part before the details move to the log tab |
-| `saidStyle` in `colour.go` | the log tab, because it reads a log record, and the styles part from it first |
-| the tree, its rows, its edit, its marks, its sorts, its flags and the base file | `src/tui/tree` |
-| the place chord's tree reads | the work tab, as functions over a tree, because the tree knows no queue key |
-| the model, the tab interface, the keys, the mouse, the strip, the panes, the footer, the help and the window's door | `src/tui/frame` |
-| the model's log fields, the tailer, the records, the columns and the details | fields and files of the log tab, under `src/tui/log` |
-| the model's work fields, the places, the index calls and the ticket edit | fields and files of the work tab, under `src/tui/work` |
-| `main`, `runWindow`, `Frame`, `ParseSize` and the model builder | the root package, which builds the tab list and hands it to the frame |
+A tab owns its own state, so the frame reads no record and no ticket tree.
+The model's log fields and the tailer become fields of the log tab, the
+model's work fields and the places become fields of the work tab, and the
+place chord's tree reads become functions of the work tab over a tree. The
+root package builds the tab list, hands it to the frame, and keeps `Frame`,
+which reaches the log tab's rows, filter and floor through its exported
+fields.
 
 The tab interface grows what the frame reads through it:
 
@@ -180,10 +182,14 @@ The tab interface grows what the frame reads through it:
 | `Pressed` | the pane lights a preset carrying a sort alone off the tab's own order |
 | `Marks` | the footer draws the order and the floor off the first tab, which is the log |
 
-`Frame` in the root package reaches the log tab through its exported fields,
-and sets its rows, its filter and its floor there. A name a tab package reads
-takes a capital, and the rename reaches every file naming it. The tests move
-with the code they drive, and the window tests stay in the root package. The
+A binding in a tab's band carries a mark letting it through while the filter
+pane takes letters, and `alt+l` carries it, so the floor rises under the pane
+the way it does today.
+
+The tests move with the code they drive, and the window tests stay in the root
+package. They reach the log tab's and the work tab's fields through the tabs
+the model holds, and each tab exports the fields a case reads. A name a tab
+package reads takes a capital, and the rename reaches every file naming it. The
 build stamp in `src/scripts/tui-build.js` lists the files standing in the
 folders it names, so it changes to walk every package under `src/tui`, and a
 change under any of them rebuilds the viewer.
