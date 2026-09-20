@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: e50002bf80eb38157cdfe4c62b93235f306f4992
     returns: 2
     why: "| the finding | what to do |; |---|---|; | The drift table reads the star direction alone, and a rationale chapter whose rule carries no star stands the same drift | Say which direction `matches: explains` reads, and name that drift too where it reads both |; | `History.yml` names no marker | List the words it refuses, and say what they catch past what `PastTense` holds already |; | `RuleNamesItsFailure` names no test | Say what makes a rule pass it, because most rules stand as one sentence |; | `.vale.ini` switches each `VoiceShape` rule off by name over `spec/vocabulary` and `spec/config/stop` | Say whether the new rule joins those two lists |; | The drift the two Vale rules find stands unnamed | Name it the way the star drift stands named, so the lint at zero holds |; Answered from the last round, one a line:; the star check reads `matches: explains` in `underFaults`, and `StarNeedsSection` goes; `History.yml` lands beside `Antithesis.yml`, with its switch in `.vale.ini`; `RuleNamesItsFailure` lands beside `GuidanceChapter` under `VoiceShape`; each new rule opens at error, so the warning stage goes; rule twelve stays in the guidance note; the drift table names the four notes and their starred rules as the tree holds them; `./RUNME.sh check` answers 0 on this branch."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 98c618889abf2a47fa0887e2a34167bfd57c0c56
+    hash_after: 98c618889abf2a47fa0887e2a34167bfd57c0c56
 ---
 
 # Ask
@@ -136,22 +140,21 @@ Section numbers drift from rule numbers, history sits outside the rationales, an
 
 <!-- the form is text -->
 
-Each of the three checks goes to the owner already standing for its reading:
+Two checks land, each with the owner already standing for its reading:
 
 | the check | where it lands | what it reads |
 |---|---|---|
 | a starred rule wants its chapter | `underFaults` in `.claude/skills/level0/lib/schema.js` | the guidance note, and the rationale its frontmatter names |
 | a history marker stands off the rationales | `spec/config/styles/VoiceVale/History.yml` | one buffer, with `.vale.ini` switching it off over `spec/rationales` |
-| a rule names the failure it prevents | `spec/config/styles/VoiceShape/RuleNamesItsFailure.yml` | the `Actionables` list of one guidance note |
 
 `spec/schemas/rationale.schema.yaml` already declares the first check, as
 `matches: explains` under `subsections`. The schema checker reads `numbered` and
 `order` beside it, and passes over `matches`. So the work is that key's reader,
 and the schema stays the one place saying the rule.
 
-The two others read one buffer each, so Vale holds them the way it holds
-`Antithesis` and `GuidanceCap`. A style file of its own carries each, because
-the projection writes the register the paragraph schema owns.
+The marker check reads one buffer, so Vale holds it the way it holds
+`Antithesis`. A style file of its own carries it, because the projection writes
+the register the paragraph schema owns.
 
 The lint at zero wants the drift cleared, so the implement step writes the
 chapter each starred rule lacks:
@@ -163,9 +166,51 @@ chapter each starred rule lacks:
 | `spec/guidance/working` | 6, 11 |
 | `spec/guidance/code/code` | 10 |
 
-Rule twelve of the guidance note is the one the failure check holds, so it stays
-where it stands. Each new rule opens at error, because the drift it names goes
-in the same change.
+`matches: explains` says one chapter per marked item, so the star check reads
+from the marked rule to the chapter. A rationale chapter standing where its rule
+carries no star passes, because a note arguing more than it must costs a reader
+nothing.
+
+| the rationale | the chapter standing past a star |
+|---|---|
+| `spec/rationales/cloud` | 12 |
+| `spec/rationales/code/refactoring` | 1, 2, 3 |
+| `spec/rationales/voice` | 7 |
+| `spec/rationales/working` | 9 |
+| `spec/rationales/tickets` | 1 |
+
+`History.yml` refuses the words placing a claim in a tree that stands no more:
+
+- `previously`, `formerly`, `used to`
+- `originally`, `until recently`, `in the past`
+- `as before`, `legacy`
+
+`PastTense` refuses a past verb, and every note but the rationales takes it
+already. These markers read in the present tense, so they pass that rule and
+carry the history anyway.
+
+| what draws today | the marker |
+|---|---|
+| `spec/design_output/stop.md` | `as before` |
+| `spec/design_output/index.md` | `used to` |
+
+The word list and the stop folder take `VoiceShape` alone, so the marker rule
+stands off both. `.vale.ini` switches it off over `spec/rationales`, the way it
+switches `PastTense` off there.
+
+Rule twelve takes the ask's second road, and the measurement carries that call.
+Most starred rules stand as one sentence, in nearly every guidance note, so a
+check over them asks for a rewrite of each. That stands far past this ask.
+
+| what the rule costs | where it lands |
+|---|---|
+| a rewrite of most starred rules | a ticket of its own, with the check |
+| the note holding a rule a check holds | this ticket, by rule twelve leaving |
+
+So rule twelve goes from `spec/guidance/guidance.md`. The rule leaving takes
+`RuleNamesItsFailure` with it, so this change writes two rules and no third.
+Each new rule opens at error, because the drift it names goes in the same
+change.
 
 ## review
 
