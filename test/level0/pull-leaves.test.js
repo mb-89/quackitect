@@ -240,13 +240,55 @@ test("the judge's material is the leaf's evidence and the rules its reads name, 
     ticket: "a-child",
     step: "design/draft",
     evidence: "approach:\nThe approach.",
-    rules: ["Say what is.", "Put the bottom line first."],
+    rules: [
+      {
+        label: "voice-1",
+        note: "spec/guidance/voice",
+        number: 1,
+        rule: "Say what is.",
+      },
+      {
+        label: "voice-2",
+        note: "spec/guidance/voice",
+        number: 2,
+        rule: "Put the bottom line first.",
+      },
+    ],
   });
   const none = doors(standing());
   assert.equal(
     heard(() => pulling(ROOT, ["pull", "a-child", "--judge"], none.it)).said,
     "null",
   );
+});
+
+// The judge reads the rules that fit evidence, and a rule describing an answer stands out. [[spec/tickets/the-judge-reads-answer-rules]]
+test("the judge's ask leaves the answer rules out, and labels the rules it keeps", () => {
+  const note =
+    "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say what is. *\n2. Open an answer with a table. ^\n3. Put the bottom line first.\n";
+  const { it } = doors(
+    standing(filled(CHILD(), "### approach", "The approach."), GROUP_NOTE, {
+      [at("spec/guidance/voice.md")]: note,
+    }),
+  );
+  heard(() => pulling(ROOT, ["pull"], it));
+
+  const { said } = heard(() => pulling(ROOT, ["pull", "a-child", "--judge"], it));
+
+  assert.deepEqual(JSON.parse(said).rules, [
+    {
+      label: "voice-1",
+      note: "spec/guidance/voice",
+      number: 1,
+      rule: "Say what is.",
+    },
+    {
+      label: "voice-3",
+      note: "spec/guidance/voice",
+      number: 3,
+      rule: "Put the bottom line first.",
+    },
+  ]);
 });
 
 // [[spec/tickets/the-group-leaves-at-todo]]
