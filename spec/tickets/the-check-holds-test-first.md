@@ -327,11 +327,15 @@ test driving a door through one asserts on nothing until the guard lands.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/tested.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -339,11 +343,34 @@ test driving a door through one asserts on nothing until the guard lands.
 
 <!-- the form is text -->
 
+A change and its test land together, and three programs hold that:
+
+| what lands | where |
+|---|---|
+| `untestedIn`, over a staged delta | `.claude/skills/level0/lib/tested.js` |
+| `everyModuleTested`, over the tree | the same module, in the tree rules |
+| `behaves`, the guard a fake takes | `src/doors/fake/behaves.js` |
+
+Both commit doors call the delta reading, the way both call `privateNow`: the
+session meets it in `src/bridge/bash.js`, and a person at a terminal meets it
+through `src/scripts/precommit.js`.
+
+The import rule asks for the import and no bare path, because a path inside a
+string reads as prose. Every module of the server now carries a test naming it,
+and the nine that stood without one take the cases this change writes.
+
+The two notes take their line: the tree note tables the new rule, and the doors
+note says what the guard does. `./RUNME.sh lint` answers what either rule finds.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the two readings, the guard, both doors, two notes and the nine tests
+- every fake the tests reach comes from `src/doors/fake`, and the guard stands beside them
+- each piece carries the pointer at the chapter saying what it reads
 
 # verdict
 
