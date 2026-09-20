@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -160,6 +160,12 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: ba59402d45f450265344f87ab2bb48a596562f31
+    hash_after: ba59402d45f450265344f87ab2bb48a596562f31
+    returns: 2
+    why: the hand takes it back
 ---
 
 # Ask
