@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -120,6 +120,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: bfc3c8551749549fe5e1c3974b5d78f0970645b3
+    hash_after: d8db1c28accde551de53a65c310d505b5d173548
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
