@@ -136,3 +136,17 @@ test("a move in the shared module rebuilds the viewer", () => {
   viewerOf({ disk, proc, root: ROOT });
   assert.equal(proc.ran.length, ran + 1, "a move in the shared module builds again");
 });
+
+// A tab stands under a folder of its own, and a move there rebuilds the viewer the way a move at the root does. [[spec/design_output/tui#the-packages-the-window-holds]]
+test("a move under a package of the window rebuilds the viewer", () => {
+  const disk = source();
+  const proc = goWrites(disk);
+  disk.write(`${ROOT}/${SOURCE}/work/work.go`, "package work");
+  viewerOf({ disk, proc, root: ROOT });
+  const ran = proc.ran.length;
+  viewerOf({ disk, proc, root: ROOT });
+  assert.equal(proc.ran.length, ran, "a tree standing still runs no second build");
+  disk.write(`${ROOT}/${SOURCE}/work/work.go`, "package work // moved");
+  viewerOf({ disk, proc, root: ROOT });
+  assert.equal(proc.ran.length, ran + 1, "a move under a package builds again");
+});

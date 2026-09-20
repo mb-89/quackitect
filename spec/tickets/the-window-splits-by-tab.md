@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -149,6 +149,17 @@ record:
     hand: box 1670436ae0bb · claude-code-remote · helper-12
     hash_before: 74b158aa825209a6272060698a2276a3bb5517ad
     hash_after: 74b158aa825209a6272060698a2276a3bb5517ad
+  - step: implement/tests-red
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 92f53b3f760a65fcff4cf0c985f1a1224dc79edb
+    hash_after: 92f53b3f760a65fcff4cf0c985f1a1224dc79edb
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -251,17 +262,37 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh branch test src/tui/layout_test.go test/level0/viewer.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The command answers assertion. Three cases stand, and each reads the tree as
+it lies.
+
+| the case | what it holds open |
+|---|---|
+| each package imports what the chapter says and no more | the frame's folder holds no Go file |
+| the root holds the window alone | a colour file stands at the root |
+| a move under a package of the window rebuilds the viewer | the stamp reads the root folder alone, so the second build never runs |
+
+The layout case reads the chapter's table as a map, so the table is the one
+list and the case follows it. What surprises me is that the root package's
+own file names clash with the Go parser's packages, so the case names them
+under an alias.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The window's files, the build stamp and its case, the chapter, and this ticket.
+- every door the change reaches has a fake. The stamp case drives the build over the fake disk and the fake process, and the layout case reads the tree the tests run in.
+- a comment names the approach the change implements. Each case points at the chapter holding the table.
 
 ## reflect
 
