@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -136,6 +136,17 @@ record:
     hash_after: 14a8f8915516367b6a9ff566a3cbd8c47f54817f
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: d29f13d0e1d0fedc76d7b574a54546866936fb50
+    hash_after: d29f13d0e1d0fedc76d7b574a54546866936fb50
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 21 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -308,26 +319,44 @@ That surprises me at a tests-red step. The step wants red, and a guard over a st
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/question-grades.test.js test/level0/pull.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A question now carries a grade, and the grade picks the road.
+
+| what lands | where |
+|---|---|
+| the drafter's rule | the seventh rule of `spec/guidance/working` |
+| the reviewer's rule | one more rule in `spec/guidance/review/reviewing` |
+| the table naming each grade and its road | [[spec/design_output/pull#a-person-step-goes-in]] |
+| the case guarding the craft road | `test/level0/pull.test.js`, beside the fail route |
+| the cases reading the two notes | `test/contract/question-grades.test.js` |
+
+The engine gains no verb. A craft question the reviewer finds reaches the drafter through the fail verdict, which `on_fail` routes. A design question reaches the owner through `branch escalate`, as it did before this ticket.
+
+The working note stands at the count its schema caps, so the drafter's half joins the seventh rule. That rule governs what a hand decides while the owner stands away, which is where the design question belongs. Both rules land unstarred, because neither rationale note holds a section for them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The two notes, the chapter naming the roads, and the two case files.
+- every door the change reaches has a fake. The route case drives the pull doors' fake disk. The rule cases read the notes that ship.
+- a comment names the approach the change implements. The chapter names each grade and its road, and each case points at this ticket.
 
 # verdict
 
