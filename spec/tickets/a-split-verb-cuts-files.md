@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -165,6 +165,17 @@ record:
     hash_after: e00516c2f8b2282ea09a6c35446c567cc01bfc89
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 140f3894a58a511421b9bb549151fb1a7267e426
+    hash_after: 140f3894a58a511421b9bb549151fb1a7267e426
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -382,24 +393,24 @@ The mint itself takes the third move further. A door minting a tracked ticket le
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-`./RUNME.sh split <file>` cuts a file into the targets a caller names, and the journal takes the whole cut back.
+`./RUNME.sh split <file>` cuts a file into the targets a caller names, and one journal entry takes the whole cut back.
 
 | the piece | its file |
 |---|---|
 | the ranges and the cut over text | `src/scripts/split-cut.js` |
 | the verb, and the write through the journal | `src/scripts/split-verb.js` |
-| the ticket a refusal mints | `src/bridge/split-ticket.js`, which the code door calls |
+| the note a refusal parks | `src/bridge/split-ticket.js`, which the code door calls |
 
 The ranges refuse before any file opens. Four refusals stand: a range reading backwards, a range starting at zero, a range past the last line, and two ranges reaching one line.
 
-One journal entry holds every target and the rest, under `by: split`. So `mcp__level0__undo` takes the whole cut back, and a half-written cut stands nowhere.
+The refusal parks a private ticket through `./RUNME.sh ticket note`, and names where it stands:
 
-The door mints once a file:
+- the note lands off git, so the retro decides it and the check stays green
+- a door minting a tracked ticket leaves placeholders the lint names, which turns the check red
+- a second refusal on the same file names the note that stands, and writes none
+- a refused run answers the line the verb says, so no refusal goes quiet
 
-- a refusal naming the file ceiling mints a ticket off `trivial`, and names it in the refusal
-- the ticket lands at `spec/tickets/split-<name>.md` and carries no group
-- a second refusal on the same file names the ticket that stands, and writes none
-- the three fields `trivial` asks for each take a line the door writes
+The verdict round found every fault behind a fake agreeing with the code. `test/contract/split-note.test.js` drives the real verb now, and it catches the name rule the fake hid.
 
 ### checked
 
@@ -407,7 +418,7 @@ The door mints once a file:
 <!-- the form is checklist -->
 
 - every fact the change adds stands in one place, and the chapter owns the flags table
-- the ranges and the cut take text alone, so the cases touch memory
+- the ranges and the cut take text alone, and a contract case drives the real verb
 - each header says what its file is for, and counts nothing
 
 # verdict
