@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -165,6 +165,10 @@ record:
     hash_after: 392861ea045f595ece4592a0fd65b4b48c71e4f8
     returns: 1
     why: what blocks:; The ask asks a case a tool, and `test/level0/read-tools.test.js` drives `find` alone.; `patch`, `replace` and `undo` reach no case through the bridgehead, so the second bullet stands open.; The approach names one case a tool too, so the implement step falls short of its own design.; Drive the four names in one loop over `firing`, each with no server standing.; The chapter The bridgehead starts it too says the hook imports nothing, and the change breaks that.; Narrow that sentence the way the chapter above it narrows its own.; notes, which block nothing:; `src/scripts/serve.js` carries the same stale reason in a header comment.; `spec/design_input/a-stub-takes-its-vehicle.md` names the hook and its two manifests alone.; The wait case burns the whole `STARTING` span, so the file runs long.; `started` in the hook holds across cases in one file, so a later case reads an earlier one's start.; A dead server posts `tool.call` twice, once from the `*` door and once from the tool road.; what holds:; `./RUNME.sh check` answers exit 0, and the server stands at the health port.; The copy list closes under its own imports, over the six lib files the hook reaches.; Every lib file the hook reaches, and every file those reach, travels in `FILES`.; No file in that closure imports `node:`, so a stub loads each one.; Dropping `lib/log.js` from `FILES` reds `test/level0/vehicle.test.js` on the missing file.; Dropping `undoSpec` from `READ_TOOLS` reds two cases in `test/level0/read-tools.test.js`.; Stripping the port from the line the wait answers reds the wait case.; `findSpec` stands in one place, and `src/bridge/search.js` points there.; Every file the diff touches stands inside the ask, and no hunk redesigns what the ask leaves alone.; No retro stands in the handback, and this step routes to one.; The tip matches origin, and the working tree stands clean.
+  - step: implement/reflect
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 89165e20af84f6bb0cdd9f0866b67b99d3664f35
+    hash_after: 89165e20af84f6bb0cdd9f0866b67b99d3664f35
 ---
 
 # Ask
@@ -326,14 +330,30 @@ The engine hands a hook one `on`, and the hook names the events it takes. So a c
 ### class
 
 <!-- the class of error the findings describe, and the fix for the class -->
-
 <!-- the form is text -->
+
+The change covers one of four, and leaves the rest to the reader's faith. Each finding names a place where one stands for many.
+
+| what the change does once | what the ask asks |
+|---|---|
+| a case over `find` | a case a tool, over all four |
+| one sentence narrowed | every sentence carrying that reason |
+
+The fix for the class runs in two moves:
+
+- drive the names in one loop, so a tool added later joins the cases by standing in the list
+- grep the tree for the reason a change breaks, and narrow each line the grep names
+
+The second move catches the notes beside the blockers. `src/scripts/serve.js` carries the same reason in its header, and the design input names the copy list as it stood.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the fix touches the cases, the hook's header, two notes and one design input
+- the engine's doors stand faked, and the loop drives each tool over its own fake session
+- the class above names the approach each hunk follows
 
 ## change
 
