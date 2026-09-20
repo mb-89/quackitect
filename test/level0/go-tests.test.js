@@ -18,10 +18,10 @@ function box(files = {}) {
 test("a folder under src holding a module file is a module, and one holding none is not", () => {
   const it = box({
     [at("src/config/go.mod")]: "module quackitect/config\n",
-    [at("src/viewer/go.mod")]: "module quackitect/viewer\n",
+    [at("src/tui/go.mod")]: "module quackitect/tui\n",
     [at("src/scripts/cli.js")]: "",
   });
-  assert.deepEqual(goModulesIn(it), ["src/config", "src/viewer"]);
+  assert.deepEqual(goModulesIn(it), ["src/config", "src/tui"]);
   assert.deepEqual(goModulesIn(box()), [], "a tree with no src folder holds no module");
 });
 

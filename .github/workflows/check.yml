@@ -15,8 +15,8 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version-file: src/viewer/go.mod
-          cache-dependency-path: src/viewer/go.sum
+          go-version-file: src/tui/go.mod
+          cache-dependency-path: src/tui/go.sum
 
       # The installer downloads each binary from a pinned release. The key
       # names those versions, so a bump fetches them once and no run after.

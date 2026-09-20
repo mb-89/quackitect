@@ -2,7 +2,7 @@
 // window's: the strip, the split, the pane and the footer. A tab draws the left
 // side, says what the details hold, and says whether a filter holds in it. The
 // log is the first, and it draws its rows under a line of column names.
-// [[spec/design_output/viewer#the-window-is-a-split]]
+// [[spec/design_output/tui#the-window-is-a-split]]
 
 package main
 
@@ -14,10 +14,10 @@ import (
 	"github.com/charmbracelet/x/ansi"
 )
 
-// [[spec/design_output/viewer#a-number-opens-a-tab]]
+// [[spec/design_output/tui#a-number-opens-a-tab]]
 const mostTabs = 9
 
-// The strip's right end, which the key draws and a press reaches. [[spec/design_output/viewer#the-header-holds-the-tabs]]
+// The strip's right end, which the key draws and a press reaches. [[spec/design_output/tui#the-header-holds-the-tabs]]
 const helpKey = "alt+? help "
 
 type tab interface {
@@ -29,7 +29,7 @@ type tab interface {
 	Selection(m *model) band
 }
 
-// [[spec/design_output/viewer#the-columns-stand-still]]
+// [[spec/design_output/tui#the-columns-stand-still]]
 type logTab struct{}
 
 func (logTab) Name() string { return "log" }
@@ -42,7 +42,7 @@ func (logTab) Detail(m *model, w int) []part { return detailOf(m.all, m.sel, m.z
 
 func (logTab) Narrowed(m *model) bool { return !m.filter.Empty() }
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 func (logTab) Keys(m *model) band {
 	return band{name: "THE LOG", acts: []act{
 		{bind("w s", "one row up, one row down", "w", "s", "W", "S"), func(m *model, name string) tea.Cmd {
@@ -65,7 +65,7 @@ func (logTab) Keys(m *model) band {
 	}}
 }
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 func (logTab) Selection(m *model) band {
 	if m.sel < 0 || m.sel >= len(m.all) {
 		return band{}
@@ -80,7 +80,7 @@ func quicken(m *model, name string) tea.Cmd {
 	return nil
 }
 
-// [[spec/design_output/viewer#a-number-opens-a-tab]]
+// [[spec/design_output/tui#a-number-opens-a-tab]]
 func (m *model) openTab(n int) {
 	if n < 1 || n > len(m.tabs) || n > mostTabs {
 		return
@@ -90,7 +90,7 @@ func (m *model) openTab(n int) {
 	m.box.GotoTop()
 }
 
-// [[spec/design_output/viewer#the-header-holds-the-tabs]]
+// [[spec/design_output/tui#the-header-holds-the-tabs]]
 func (m model) renderStrip() string {
 	names := make([]string, 0, len(m.tabs))
 	for at, one := range m.tabs {
@@ -113,7 +113,7 @@ func (m model) renderStrip() string {
 	return strip + strings.Repeat(" ", gap) + key
 }
 
-// The text one tab takes in the strip, which the strip draws and a press measures. [[spec/design_output/viewer#the-header-holds-the-tabs]]
+// The text one tab takes in the strip, which the strip draws and a press measures. [[spec/design_output/tui#the-header-holds-the-tabs]]
 func tabName(at int, one tab) string {
 	return fmt.Sprintf(" %d %s ", at+1, one.Name())
 }

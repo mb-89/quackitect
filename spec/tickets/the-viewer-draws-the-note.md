@@ -134,7 +134,7 @@ record:
     hash_before: 65d363e253d59a99631dcbb4fbacfb7f102c4d36
     hash_after: 65d363e253d59a99631dcbb4fbacfb7f102c4d36
     returns: 1
-    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | the colour lands, and the note the design output owes stands open |; | is what the diff touches beyond the ask trivial | yes, the hunks reach two files the ask names |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the change adds carry a case | for the colour, yes. For a note after an answer, no |; | does a case feed the rule something bad | yes, the colour case reads a note against four other kinds |; TL;DR:; The three hunks answer the three cases, and the copy of the answer's number goes.; `./RUNME.sh check` answers 0, and the viewer's own tests pass.; The design output takes none of this change, and the code points at two of its chapters.; A note standing after an answer reaches no prompt, and no case reads that shape.; The findings, one a line:; `spec/design_output/viewer.md` takes none of this change, and the code points at two chapters.; The Colours chapter names no note line, and the approach's own table asks for one.; The details chapter says a prompt shows the reply, and says nothing of its notes.; `pairsOf` drops a note standing after the answer, because `answered` turns true there.; The approach gives a prompt every note between it and its reply, so that note belongs there.; The third case holds a prompt, a note, a reply and a prompt, and reads no answer.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the Colours chapter names the note line the approach promises | open |; | 2 | the details chapter says a prompt shows the notes it carries | open |; | 3 | `pairsOf` takes a note after the answer, with a case reading that shape | open |; | 4 | the verdict hand reads every hunk again | open |"
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | the colour lands, and the note the design output owes stands open |; | is what the diff touches beyond the ask trivial | yes, the hunks reach two files the ask names |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the change adds carry a case | for the colour, yes. For a note after an answer, no |; | does a case feed the rule something bad | yes, the colour case reads a note against four other kinds |; TL;DR:; The three hunks answer the three cases, and the copy of the answer's number goes.; `./RUNME.sh check` answers 0, and the viewer's own tests pass.; The design output takes none of this change, and the code points at two of its chapters.; A note standing after an answer reaches no prompt, and no case reads that shape.; The findings, one a line:; `spec/design_output/tui.md` takes none of this change, and the code points at two chapters.; The Colours chapter names no note line, and the approach's own table asks for one.; The details chapter says a prompt shows the reply, and says nothing of its notes.; `pairsOf` drops a note standing after the answer, because `answered` turns true there.; The approach gives a prompt every note between it and its reply, so that note belongs there.; The third case holds a prompt, a note, a reply and a prompt, and reads no answer.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the Colours chapter names the note line the approach promises | open |; | 2 | the details chapter says a prompt shows the notes it carries | open |; | 3 | `pairsOf` takes a note after the answer, with a case reading that shape | open |; | 4 | the verdict hand reads every hunk again | open |"
   - step: implement/reflect
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: b8c7600d6b902efc37f37d1136646bc338ea48b6
@@ -207,7 +207,7 @@ reads what the session parked. The details of a note show the prompt above it.
 
 A test in `detail_test.go` drives a log of a prompt, a note and a reply, and
 reads the note's colour and its place. For details, see
-[[spec/design_output/viewer#colours]].
+[[spec/design_output/tui#colours]].
 
 ## review
 
@@ -235,7 +235,7 @@ pass
 
 ### tests
 
-    (cd src/viewer && go test ./... -run "Note|SaidColumn" 2>&1 | grep -q "^--- FAIL") && echo assertion
+    (cd src/tui && go test ./... -run "Note|SaidColumn" 2>&1 | grep -q "^--- FAIL") && echo assertion
 
 ### seen
 
@@ -262,7 +262,7 @@ The third case reads the details. `pairsOf` walks forward from a prompt and take
 
 ### checked
 
-- the change touches no file the ask leaves out. The cases sit in `src/viewer/detail_test.go`, beside the ones covering the pairing.
+- the change touches no file the ask leaves out. The cases sit in `src/tui/detail_test.go`, beside the ones covering the pairing.
 - every door the change reaches has a fake. The cases read rows in memory, and reach no disk and no clock.
 - a comment names the approach the change implements. Each case carries the design output section it holds.
 
@@ -299,7 +299,7 @@ and the case holds a shape carrying no answer, so the two read green together.
 
 ### lint
 
-    ./RUNME.sh lint src/viewer/colour.go src/viewer/detail.go spec/design_output/viewer.md
+    ./RUNME.sh lint src/tui/colour.go src/tui/detail.go spec/design_output/tui.md
 
 ### checked
 
@@ -313,7 +313,7 @@ and the case holds a shape carrying no answer, so the two read green together.
 
 ### tests
 
-    (cd src/viewer && go test ./... > /dev/null 2>&1) && echo green
+    (cd src/tui && go test ./... > /dev/null 2>&1) && echo green
 
 ### check
 
@@ -357,12 +357,12 @@ The first hunk changes no colour a person sees. `kindStyle` falls through to a h
 
 ## read
 
-- src/viewer/colour.go
-- src/viewer/detail.go
-- src/viewer/detail_test.go
-- src/viewer/colour_test.go
+- src/tui/colour.go
+- src/tui/detail.go
+- src/tui/detail_test.go
+- src/tui/colour_test.go
 - spec/config/styles/colours.json
-- spec/design_output/viewer.md
+- spec/design_output/tui.md
 - spec/guidance/review/reviewing.md
 - spec/tickets/the-viewer-draws-the-note.md
 

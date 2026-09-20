@@ -144,7 +144,7 @@ program in the tree calls it:
 `Value` walks a key written with dots, so `names.words` reads the `words` of
 the `names` object. A named file takes no layer, because a person setting a
 colour sets it in one place. The window reads its colours that way, as
-[[spec/design_output/viewer#colours]] says.
+[[spec/design_output/tui#colours]] says.
 
 The module rides `SHARED` in `src/scripts/viewer.js`, so the window's build
 carries it beside `quackitect/yaml`.

@@ -2,7 +2,7 @@
 // The window reads the registration the help draws, so a key nobody registers
 // reaches the help nowhere and works nowhere. Three bands stand: the global
 // one, the one the open tab adds, and the one the selected thing adds.
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 
 package main
 
@@ -14,13 +14,13 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 type act struct {
 	key key.Binding
 	do  func(m *model, name string) tea.Cmd
 }
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 type band struct {
 	name string
 	acts []act
@@ -34,7 +34,7 @@ func (b band) bindings() []key.Binding {
 	return out
 }
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 func bind(shown, sentence string, names ...string) key.Binding {
 	return key.NewBinding(key.WithKeys(names...), key.WithHelp(shown, sentence))
 }
@@ -56,7 +56,7 @@ func numbers() []string {
 	return out
 }
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 func globalBand() band {
 	return band{name: "GLOBAL", acts: []act{
 		{bind("1…9", "open the tab at that place", numbers()...), func(m *model, name string) tea.Cmd {
@@ -102,7 +102,7 @@ func jumping(m *model, name string) tea.Cmd {
 	return nil
 }
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 func (m model) bands() []band {
 	open := m.tabs[m.open]
 	out := []band{globalBand(), open.Keys(&m)}
@@ -112,7 +112,7 @@ func (m model) bands() []band {
 	return out
 }
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 func (m model) key(name string) (tea.Model, tea.Cmd) {
 	for _, held := range m.bands() {
 		for _, one := range held.acts {
@@ -124,7 +124,7 @@ func (m model) key(name string) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 func (m model) helpParts(w int) []part {
 	var parts []part
 	for _, held := range m.bands() {
@@ -135,7 +135,7 @@ func (m model) helpParts(w int) []part {
 	return append(parts, part{text: strings.TrimSpace(HelpText)})
 }
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 func (b band) lines() []part {
 	wide := 0
 	for _, one := range b.bindings() {

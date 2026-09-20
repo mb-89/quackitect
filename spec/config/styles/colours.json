@@ -1,5 +1,5 @@
 {
-  "comment": "THE COLOURS THE WINDOW WEARS. Each value is a terminal colour number. A person sets a colour by editing this file, and the window wears it at the next start. What each map holds stands in spec/design_output/viewer.md, under Colours.",
+  "comment": "THE COLOURS THE WINDOW WEARS. Each value is a terminal colour number. A person sets a colour by editing this file, and the window wears it at the next start. What each map holds stands in spec/design_output/tui.md, under Colours.",
   "kinds": {
     "prompt": "220",
     "reply": "114",

@@ -416,7 +416,7 @@ A stub lints under the vehicle's rules, so the config comes off the method root.
     spec/design_output/tree-view.md
     spec/design_output/tree.md
     spec/design_output/vehicle.md
-    spec/design_output/viewer.md
+    spec/design_output/tui.md
     spec/design_output/work.md
     spec/funnel/a-paragraph-has-a-schema.md
     spec/guidance/cloud.md
@@ -560,34 +560,34 @@ A stub lints under the vehicle's rules, so the config comes off the method root.
     src/stub/.claude/skills/level0/.claude-plugin/plugin.json
     src/stub/.claude/skills/level0/hooks/bridgehead.js
     src/stub/.claude/skills/level0/hooks/hooks.json
-    src/viewer/base.go
-    src/viewer/base_test.go
-    src/viewer/colour.go
-    src/viewer/detail.go
-    src/viewer/detail_test.go
-    src/viewer/door.go
-    src/viewer/door_test.go
-    src/viewer/footer.go
-    src/viewer/frame_test.go
-    src/viewer/go.mod
-    src/viewer/help.go
-    src/viewer/keys.go
-    src/viewer/main.go
-    src/viewer/model_test.go
-    src/viewer/mouse.go
-    src/viewer/mouse_test.go
-    src/viewer/sort.go
-    src/viewer/sort_test.go
-    src/viewer/tabs.go
-    src/viewer/tree.go
-    src/viewer/tree_test.go
-    src/viewer/treedraw.go
-    src/viewer/treeedit.go
-    src/viewer/treeedit_test.go
-    src/viewer/treefilter.go
-    src/viewer/ui.go
-    src/viewer/work.go
-    src/viewer/wrap.go
+    src/tui/base.go
+    src/tui/base_test.go
+    src/tui/colour.go
+    src/tui/detail.go
+    src/tui/detail_test.go
+    src/tui/door.go
+    src/tui/door_test.go
+    src/tui/footer.go
+    src/tui/frame_test.go
+    src/tui/go.mod
+    src/tui/help.go
+    src/tui/keys.go
+    src/tui/main.go
+    src/tui/model_test.go
+    src/tui/mouse.go
+    src/tui/mouse_test.go
+    src/tui/sort.go
+    src/tui/sort_test.go
+    src/tui/tabs.go
+    src/tui/tree.go
+    src/tui/tree_test.go
+    src/tui/treedraw.go
+    src/tui/treeedit.go
+    src/tui/treeedit_test.go
+    src/tui/treefilter.go
+    src/tui/ui.go
+    src/tui/work.go
+    src/tui/wrap.go
     src/yaml/go.mod
     src/yaml/value.go
     src/yaml/yaml.go

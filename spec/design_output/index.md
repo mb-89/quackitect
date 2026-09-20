@@ -108,6 +108,25 @@ Each one is a walk the tree used to take:
 | `reindex` | the walk again, now |
 | `standing` | the root the door holds, and how many files it counts |
 
+## A rename reaches a name
+
+`./RUNME.sh rename <from> <to>` moves a name and carries every reach with it.
+`src/scripts/rename.js` holds it, and it works in three moves:
+
+| the move | what it asks | what it catches |
+|---|---|---|
+| read | `links` above, then a walk of the text files | a note link, then an import, a path and a word in prose |
+| write | the folder's move, then a rewrite of each reach | every pointer the read names |
+| prove | the rows `links` answers, then `./RUNME.sh check` | a row naming the old name, then every other rule |
+
+The read move asks two readers, because each answers half. `linksIn` in
+`src/index/front.go` records a note link, so the link table holds those alone.
+A Go import, a shell path and a word in prose stand outside it.
+
+A reach stands on a word edge, so `renamedText` leaves a longer word alone. The
+prove move reads rows, because `links` calls `dangling` and answers a clean exit
+over every row it prints. So the verb asserts no row names the old name.
+
 ## The rank is BM25
 
 FTS5 ranks with BM25, and `ORDER BY rank` takes it. Both word questions carry

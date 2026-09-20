@@ -100,7 +100,7 @@ record:
     hash_before: 0a4ec85b0a388eb3f34006feba035e885ac46729
     hash_after: 0a4ec85b0a388eb3f34006feba035e885ac46729
     returns: 1
-    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | yes, and it names the road it takes and why |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the approach adds carry a case | yes, the case drives the projection and reads the Go |; | does every claim carry a proof | yes but one, and the shape count reads other than the tree |; TL;DR:; The road holds. A projection keeps the binary whole, and `spec/config/styles/VoiceParagraph` stands as the pattern.; The write door guards a target already. `ownerDoor` refuses a write to any target `projections.json` names.; The folder call holds. `styles` carries the Vale styles, and a name of its own suits the colours.; The shape count reads other than the tree, and the target's name sits one letter from a standing file.; The findings, one a line:; `projection.js` holds four shapes today, and `retro command` is the one the draft leaves out.; So the colour shape joins as the fifth. Name all four, or name the command answering the count.; `src/viewer/colours.go` stands one letter from `src/viewer/colour.go`, in one package.; Give the target a name a reader parts from the reader beside it, such as `colourvalues.go`.; [[spec/tickets/a-rename-reaches-every-note]] moves `src/viewer` under another name. Name which lands first.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the shape count reads the tree, or names the command answering it | open |; | 2 | the generated target takes a name a reader parts from `colour.go` | open |; | 3 | the draft names which of the two folder tickets lands first | open |; | 4 | the review hand reads the approach again | open |"
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | yes, and it names the road it takes and why |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the approach adds carry a case | yes, the case drives the projection and reads the Go |; | does every claim carry a proof | yes but one, and the shape count reads other than the tree |; TL;DR:; The road holds. A projection keeps the binary whole, and `spec/config/styles/VoiceParagraph` stands as the pattern.; The write door guards a target already. `ownerDoor` refuses a write to any target `projections.json` names.; The folder call holds. `styles` carries the Vale styles, and a name of its own suits the colours.; The shape count reads other than the tree, and the target's name sits one letter from a standing file.; The findings, one a line:; `projection.js` holds four shapes today, and `retro command` is the one the draft leaves out.; So the colour shape joins as the fifth. Name all four, or name the command answering the count.; `src/tui/colours.go` stands one letter from `src/tui/colour.go`, in one package.; Give the target a name a reader parts from the reader beside it, such as `colourvalues.go`.; [[spec/tickets/a-rename-reaches-every-note]] moves `src/tui` under another name. Name which lands first.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the shape count reads the tree, or names the command answering it | open |; | 2 | the generated target takes a name a reader parts from `colour.go` | open |; | 3 | the draft names which of the two folder tickets lands first | open |; | 4 | the review hand reads the approach again | open |"
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 3d20683e3ca37238ea9b78270575d336ab7e5c04
@@ -110,7 +110,7 @@ record:
     hash_before: a69bafd762d2e94a3e63c4bdacb8809d8cd53016
     hash_after: a69bafd762d2e94a3e63c4bdacb8809d8cd53016
     returns: 2
-    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, it takes the road the owner rules against under `Discussion` |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the approach adds carry a case | the case it names covers the projection, which the ruling drops |; | does every claim carry a proof | yes, and the earlier findings land |; TL;DR:; The owner rules twice under `Discussion`. The redraft answers neither ruling.; The tree bears the owner out. Each file carrying that reads as the ruling says.; The three earlier findings close. A redraft keeps what they fixed.; The findings, one a line:; The draft projects a Go file. The owner rules the reader asks the config for a key.; `src/lsp/config.go` reads the three layers for a key. So a Go program reading config stands.; `SHARED` in `src/scripts/viewer.js` carries `quackitect/yaml` across programs. So a shared reader rides standing machinery.; The draft puts the values beside `level0.json`. The owner rules they stand under `spec/config/styles`.; `spec/config/projections.json` names one target under `spec/config/styles`. So a file beside it stands free.; The redraft names the command answering the shape count. It names `src/viewer/palette.go`, and it names this ticket first.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the draft takes the reader road the owner rules for | open |; | 2 | the values land under `spec/config/styles` | open |; | 3 | the draft names where the shared reader stands, and the key the viewer asks it for | open |; | 4 | the review hand reads the approach again | open |"
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, it takes the road the owner rules against under `Discussion` |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the approach adds carry a case | the case it names covers the projection, which the ruling drops |; | does every claim carry a proof | yes, and the earlier findings land |; TL;DR:; The owner rules twice under `Discussion`. The redraft answers neither ruling.; The tree bears the owner out. Each file carrying that reads as the ruling says.; The three earlier findings close. A redraft keeps what they fixed.; The findings, one a line:; The draft projects a Go file. The owner rules the reader asks the config for a key.; `src/lsp/config.go` reads the three layers for a key. So a Go program reading config stands.; `SHARED` in `src/scripts/viewer.js` carries `quackitect/yaml` across programs. So a shared reader rides standing machinery.; The draft puts the values beside `level0.json`. The owner rules they stand under `spec/config/styles`.; `spec/config/projections.json` names one target under `spec/config/styles`. So a file beside it stands free.; The redraft names the command answering the shape count. It names `src/tui/palette.go`, and it names this ticket first.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the draft takes the reader road the owner rules for | open |; | 2 | the values land under `spec/config/styles` | open |; | 3 | the draft names where the shared reader stands, and the key the viewer asks it for | open |; | 4 | the review hand reads the approach again | open |"
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 56322670ee42c5ff24f37be947fd8fecbf3a6a44
@@ -130,7 +130,7 @@ record:
     hash_before: 252583fa2270dab17d966fcad45135065be0f228
     hash_after: 252583fa2270dab17d966fcad45135065be0f228
     returns: 3
-    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | in part, and the first line of `done_when` goes missing |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the approach adds carry a case | yes, a case a layer over a fixture root and a case over the shipped file |; | does every claim carry a proof | one fails, the grep the draft cites over `src/viewer` |; TL;DR:; The road holds. The redraft takes the reader the owner rules for, and lands the values under `spec/config/styles`.; The move stops at `colour.go`. A colour number stands outside it, so the grep the draft cites answers other than 0.; The notes naming what moves get no line in the draft.; The findings, one a line:; `src/viewer/ui.go` wears the selected row's background, and `src/viewer/tabs.go` wears the open tab.; `grep -rc` over `src/viewer` reads those files, so the first line of `done_when` fails.; The table of what moves names `colour.go` alone. Name both files there, or say why each colour stands in Go.; `src/viewer/detail_test.go` asserts the prompt's colour by number. Say whether that case reads the config or holds a fixture.; `spec/design_output/viewer#colours` points the reader at `kindColours` in `colour.go`. Name the line the move rewrites.; `spec/design_output/level0.md` gives `spec/config/styles` to Vale. A JSON file there wants that line to name the other kind.; The earlier findings close: the reader road, the folder the ruling names, and the shared reader riding `SHARED`.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the table of what moves names every file under `src/viewer` holding a colour | open |; | 2 | the draft says what the standing case asserting a colour by number reads | open |; | 3 | the draft names the notes the move rewrites | open |; | 4 | the review hand reads the approach again | open |"
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | in part, and the first line of `done_when` goes missing |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the approach adds carry a case | yes, a case a layer over a fixture root and a case over the shipped file |; | does every claim carry a proof | one fails, the grep the draft cites over `src/tui` |; TL;DR:; The road holds. The redraft takes the reader the owner rules for, and lands the values under `spec/config/styles`.; The move stops at `colour.go`. A colour number stands outside it, so the grep the draft cites answers other than 0.; The notes naming what moves get no line in the draft.; The findings, one a line:; `src/tui/ui.go` wears the selected row's background, and `src/tui/tabs.go` wears the open tab.; `grep -rc` over `src/tui` reads those files, so the first line of `done_when` fails.; The table of what moves names `colour.go` alone. Name both files there, or say why each colour stands in Go.; `src/tui/detail_test.go` asserts the prompt's colour by number. Say whether that case reads the config or holds a fixture.; `spec/design_output/tui#colours` points the reader at `kindColours` in `colour.go`. Name the line the move rewrites.; `spec/design_output/level0.md` gives `spec/config/styles` to Vale. A JSON file there wants that line to name the other kind.; The earlier findings close: the reader road, the folder the ruling names, and the shared reader riding `SHARED`.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the table of what moves names every file under `src/tui` holding a colour | open |; | 2 | the draft says what the standing case asserting a colour by number reads | open |; | 3 | the draft names the notes the move rewrites | open |; | 4 | the review hand reads the approach again | open |"
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: ab5ba40b770e73b6e889d0685e20f88be572088c
@@ -165,7 +165,7 @@ record:
     answered:
       - name: tests
         exit: 0
-        said: green, src/config passes; green, src/viewer passes
+        said: green, src/config passes; green, src/tui passes
       - name: check
         exit: 0
         said: The rules pass.
@@ -174,7 +174,7 @@ record:
     hash_before: 86bd2655e59892adebd5d925716d233748015161
     hash_after: 86bd2655e59892adebd5d925716d233748015161
     returns: 1
-    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | yes, the numbers stand in one config file and the window reads them there |; | is what the diff touches beyond the ask trivial | yes, the shared reader and the two notes the approach names |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does a retro stand in the handback | no |; | does every rule the branch adds carry a case | yes, a case per layer over a fixture root, and a case walking the window's own folder |; | does that case refuse something bad | yes, a file holding a colour number fails it by name |; TL;DR:; The road lands. `grep -rn 'lipgloss.Color(\"' src/viewer` answers the case file alone, and the window asks the config for what it wears.; `gofmt -l src` names `src/viewer/tabs.go`, and names no other file in the tree. The `openStyle` the change lifts leaves its blank line behind.; Go format rides in no gate, so this step catches that or nothing does.; The findings, one a line:; `src/viewer/tabs.go` carries a spare blank line where `openStyle` stood, and `gofmt -l src` names it. The same command over `main` names nothing.; `./RUNME.sh check` runs the cases and the rules, and reads no Go format. So the class this fault belongs to rides in no gate.; `spec/config/styles/colours.json` spells the spare list and the bold map in its comment. [[spec/design_output/viewer#colours]] spells both again, so point the comment at the chapter.; [[spec/design_output/viewer#colours]] names a colour in words for the prompt, the reply, the warning and the error. The file owns those values now, so a person editing one leaves the prose standing.; `spare` stands as a map keyed by a number written as text, and `orderedValues` sorts those keys as text. A key growing past one digit then reads out of its place.; `src/config/config_test.go` spells the colours file's path, where `coloursAt` in `src/viewer/colour.go` owns it. The fixture wants a path of its own.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | `gofmt -l src` names no file | open |; | 2 | the reflect step names the class, and says where a Go format gate stands | open |; | 3 | the colours file's comment points at the chapter | open |; | 4 | the colour words in [[spec/design_output/viewer#colours]] point at the file | open |; | 5 | the verdict hand reads the branch again | open |"
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | yes, the numbers stand in one config file and the window reads them there |; | is what the diff touches beyond the ask trivial | yes, the shared reader and the two notes the approach names |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does a retro stand in the handback | no |; | does every rule the branch adds carry a case | yes, a case per layer over a fixture root, and a case walking the window's own folder |; | does that case refuse something bad | yes, a file holding a colour number fails it by name |; TL;DR:; The road lands. `grep -rn 'lipgloss.Color(\"' src/tui` answers the case file alone, and the window asks the config for what it wears.; `gofmt -l src` names `src/tui/tabs.go`, and names no other file in the tree. The `openStyle` the change lifts leaves its blank line behind.; Go format rides in no gate, so this step catches that or nothing does.; The findings, one a line:; `src/tui/tabs.go` carries a spare blank line where `openStyle` stood, and `gofmt -l src` names it. The same command over `main` names nothing.; `./RUNME.sh check` runs the cases and the rules, and reads no Go format. So the class this fault belongs to rides in no gate.; `spec/config/styles/colours.json` spells the spare list and the bold map in its comment. [[spec/design_output/tui#colours]] spells both again, so point the comment at the chapter.; [[spec/design_output/tui#colours]] names a colour in words for the prompt, the reply, the warning and the error. The file owns those values now, so a person editing one leaves the prose standing.; `spare` stands as a map keyed by a number written as text, and `orderedValues` sorts those keys as text. A key growing past one digit then reads out of its place.; `src/config/config_test.go` spells the colours file's path, where `coloursAt` in `src/tui/colour.go` owns it. The fixture wants a path of its own.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | `gofmt -l src` names no file | open |; | 2 | the reflect step names the class, and says where a Go format gate stands | open |; | 3 | the colours file's comment points at the chapter | open |; | 4 | the colour words in [[spec/design_output/tui#colours]] point at the file | open |; | 5 | the verdict hand reads the branch again | open |"
   - step: implement/reflect
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 884bf3931dba0cb4ab981d45f219fe12b26e1641
@@ -194,7 +194,7 @@ record:
     answered:
       - name: tests
         exit: 0
-        said: green, src/config passes; green, src/viewer passes
+        said: green, src/config passes; green, src/tui passes
       - name: check
         exit: 0
         said: The rules pass.
@@ -223,7 +223,7 @@ record:
     answered:
       - name: tests
         exit: 0
-        said: green, src/config passes; green, src/viewer passes
+        said: green, src/config passes; green, src/tui passes
       - name: check
         exit: 0
         said: The rules pass.
@@ -238,7 +238,7 @@ reason: done
 
 A person sets a colour where they set every other value, and the code names it. The owner reads one file to see what the window wears.
 
-`src/viewer/colour.go` holds 38 colour numbers, and `grep -c` over the file answers that. A person wanting the window a shade darker reads Go, edits Go, and builds Go.
+`src/tui/colour.go` holds 38 colour numbers, and `grep -c` over the file answers that. A person wanting the window a shade darker reads Go, edits Go, and builds Go.
 
 | what stands in code today | how many |
 |---|---|
@@ -257,7 +257,7 @@ The second road matches the tree, because `spec/config/styles/VoiceParagraph` al
 
 Where the values land wants a word too. `spec/config/styles` holds the Vale styles, and one of its folders is a projection target. So a reader meets prose rules and window colours under one name.
 
-- the colour numbers stand in one file under `spec/config`, and `grep -c` over `src/viewer` answers 0 outside the generated file
+- the colour numbers stand in one file under `spec/config`, and `grep -c` over `src/tui` answers 0 outside the generated file
 - the note says which road the change takes, and why
 - `./RUNME.sh check` answers 0
 
@@ -283,11 +283,11 @@ The road the two drafts before this took, a projection into Go, drops here.
 | what the module answers | for |
 |---|---|
 | a value at a key, over the three layers | `src/lsp`, which keeps `names.words` and loses its own read |
-| the map a named file holds at a key | `src/viewer`, which takes its colours |
+| the map a named file holds at a key | `src/tui`, which takes its colours |
 
-**The root.** `workRoot` in `src/viewer/work.go` answers the root off the session path already. The colour read takes that root, so the window asks for no path of its own.
+**The root.** `workRoot` in `src/tui/work.go` answers the root off the session path already. The colour read takes that root, so the window asks for no path of its own.
 
-**What moves.** Every colour number under `src/viewer` moves, and `grep -rn 'lipgloss.Color("' src/viewer` answers which files hold one:
+**What moves.** Every colour number under `src/tui` moves, and `grep -rn 'lipgloss.Color("' src/tui` answers which files hold one:
 
 | the file | what it gives up |
 |---|---|
@@ -304,10 +304,10 @@ Each file keeps what it decides. `kindStyle`, `levelStyle`, `saidStyle` and the 
 
 | the note | the line |
 |---|---|
-| [[spec/design_output/viewer#colours]] | points a kind's colour at `kindColours` in `colour.go`, and points it at the config file after |
+| [[spec/design_output/tui#colours]] | points a kind's colour at `kindColours` in `colour.go`, and points it at the config file after |
 | [[spec/design_output/level0]] | gives `spec/config/styles` to Vale, and names the colours file standing beside the styles after |
 
-**The check.** A Go case drives the module over a fixture root, one case per layer, beside the cases `src/lsp` carries today. A second case reads the shipped file and asserts a colour for every kind [[spec/design_output/viewer#colours]] names. A file the reader reaches nowhere leaves each colour empty, so the window wears the terminal's own and draws on.
+**The check.** A Go case drives the module over a fixture root, one case per layer, beside the cases `src/lsp` carries today. A second case reads the shipped file and asserts a colour for every kind [[spec/design_output/tui#colours]] names. A file the reader reaches nowhere leaves each colour empty, so the window wears the terminal's own and draws on.
 
 **The order.** This ticket lands first, and [[spec/tickets/a-rename-reaches-every-note]] carries the folder after it. That rename then moves one config file and one reader, and no generated target.
 
@@ -330,14 +330,14 @@ pass
 TL;DR:
 
 - The road holds, and the earlier findings close.
-- The table of what moves names every file `grep -rln 'lipgloss.Color(' src/viewer` answers.
+- The table of what moves names every file `grep -rln 'lipgloss.Color(' src/tui` answers.
 - The lines standing open go to the implement step, and none of them moves the road.
 
 The findings, one a line:
 
-- The first line of `done_when` names a generated file. This road generates none. Say which command over `src/viewer` answers that line, and what a case's fixture number does to it.
+- The first line of `done_when` names a generated file. This road generates none. Say which command over `src/tui` answers that line, and what a case's fixture number does to it.
 - The module answers a colour out of a named file, and `names.words` out of the three layers. Say whether a local layer sets a colour. The ask puts a colour where every other value stands.
-- [[spec/design_output/viewer#colours]] names `toolColours` on a line of its own. The change rewrites that line beside the `kindColours` one.
+- [[spec/design_output/tui#colours]] names `toolColours` on a line of its own. The change rewrites that line beside the `kindColours` one.
 - `src/lsp/go.mod` requires local modules today, so `src/config` joins them there.
 - The earlier findings close. The table names every file holding a colour. The standing case reads a fixture root, and the draft names both notes.
 
@@ -361,7 +361,7 @@ What the agent needs:
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh branch test src/config/config_test.go src/viewer/colour_test.go
+./RUNME.sh branch test src/config/config_test.go src/tui/colour_test.go
 
 ### seen
 
@@ -457,7 +457,7 @@ The fix for the whole class is a gate reading every pointer. `node` over a walk 
 <!-- the same tests pass -->
 <!-- the form is command -->
 
-./RUNME.sh branch test src/config/config_test.go src/viewer/colour_test.go
+./RUNME.sh branch test src/config/config_test.go src/tui/colour_test.go
 
 ### check
 
@@ -477,7 +477,7 @@ A person sets a colour in the config now, and the window reads it there.
 |---|---|
 | the reader answering a key over the three layers | `src/config`, a module of its own |
 | the colour numbers | `spec/config/styles/colours.json` |
-| the read at start | `loadColours` in `src/viewer/colour.go`, called from `main.go` |
+| the read at start | `loadColours` in `src/tui/colour.go`, called from `main.go` |
 | the shared module beside `quackitect/yaml` | `SHARED` in `src/scripts/viewer.js` |
 | the reader the server keeps | `src/lsp/config.go`, which calls the shared one |
 | the gate reading Go format | `goHolds` in `src/scripts/cli-check.js`, with `formatFaults` beside the module list |
@@ -507,7 +507,7 @@ The gate's half writing the findings takes a string and answers lines, so a case
 
 - spec/tickets/the-colours-stand-in-config.md
 - spec/config/styles/colours.json
-- spec/design_output/viewer.md
+- spec/design_output/tui.md
 - spec/design_output/level0.md
 - spec/design_output/config.md
 - spec/design_output/index.md
@@ -516,13 +516,13 @@ The gate's half writing the findings takes a string and answers lines, so a case
 - src/config/go.mod
 - src/lsp/config.go
 - src/lsp/go.mod
-- src/viewer/colour.go
-- src/viewer/colour_test.go
-- src/viewer/detail_test.go
-- src/viewer/tabs.go
-- src/viewer/main.go
-- src/viewer/ui.go
-- src/viewer/go.mod
+- src/tui/colour.go
+- src/tui/colour_test.go
+- src/tui/detail_test.go
+- src/tui/tabs.go
+- src/tui/main.go
+- src/tui/ui.go
+- src/tui/go.mod
 - src/scripts/cli-check.js
 - src/scripts/go-tests.js
 - src/scripts/viewer.js
@@ -578,7 +578,7 @@ What the agent needs:
 
 <!-- the form is checklist -->
 
-- the change puts each fact it adds in one place, and a note points at the file. The colour numbers stand in `spec/config/styles/colours.json` alone. Its comment points at [[spec/design_output/viewer#colours]], which names the maps and carries no number. The shared reader's shape stands in [[spec/design_output/config#the-go-reader]], which sends a colour reader to the viewer chapter. The format gate stands in [[spec/design_output/index#the-compiler-it-needs]], beside the battery it rides in. The window's folder holds the file's path once, in `coloursAt`.
+- the change puts each fact it adds in one place, and a note points at the file. The colour numbers stand in `spec/config/styles/colours.json` alone. Its comment points at [[spec/design_output/tui#colours]], which names the maps and carries no number. The shared reader's shape stands in [[spec/design_output/config#the-go-reader]], which sends a colour reader to the viewer chapter. The format gate stands in [[spec/design_output/index#the-compiler-it-needs]], beside the battery it rides in. The window's folder holds the file's path once, in `coloursAt`.
 
 # Discussion
 

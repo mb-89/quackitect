@@ -36,7 +36,7 @@ record:
     answered:
       - name: tests
         exit: 0
-        said: green, src/viewer passes
+        said: green, src/tui passes
       - name: check
         exit: 0
         said: The rules pass.
@@ -61,7 +61,7 @@ cutting then read differently in each one, and a person learns each tab again.
 - the last column cuts its text, and a row fills the width it takes
 - a parent collapses and expands, and one call reaches every parent
 - a declaration saying flat draws every item at the left, with no mark
-- `go -C src/viewer test ./...` is green
+- `go -C src/tui test ./...` is green
 
 # do
 
@@ -69,7 +69,7 @@ cutting then read differently in each one, and a person learns each tab again.
 
 ## tests
 
-    ./RUNME.sh branch test src/viewer/tree_test.go
+    ./RUNME.sh branch test src/tui/tree_test.go
 
 ## check
 

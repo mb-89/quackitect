@@ -1,7 +1,7 @@
 // The colour each kind wears. A prompt wears bold yellow across its whole row,
 // and a reply wears bold green, so a turn reads at a glance. A tool row wears
 // the colour of the tool it names. The numbers stand in the config.
-// [[spec/design_output/viewer#colours]]
+// [[spec/design_output/tui#colours]]
 
 package main
 
@@ -13,7 +13,7 @@ import (
 	"quackitect/config"
 )
 
-// The file the colours stand in, under the folder the Vale styles share. [[spec/design_output/viewer#colours]]
+// The file the colours stand in, under the folder the Vale styles share. [[spec/design_output/tui#colours]]
 const coloursAt = "spec/config/styles/colours.json"
 
 var palette struct {
@@ -25,7 +25,7 @@ var palette struct {
 	spare  []string
 }
 
-// The styles the window wears outside a row, which the read below fills. [[spec/design_output/viewer#colours]]
+// The styles the window wears outside a row, which the read below fills. [[spec/design_output/tui#colours]]
 var (
 	dimStyle    lipgloss.Style
 	barStyle    lipgloss.Style
@@ -35,7 +35,7 @@ var (
 	rowSelected lipgloss.Color
 )
 
-// The window reads the colours once, at start, and holds what it reads. [[spec/design_output/viewer#colours]]
+// The window reads the colours once, at start, and holds what it reads. [[spec/design_output/tui#colours]]
 func loadColours(root string) {
 	palette.kinds = config.Map(root, coloursAt, "kinds")
 	palette.tools = config.Map(root, coloursAt, "tools")
@@ -52,7 +52,7 @@ func loadColours(root string) {
 	rowSelected = lipgloss.Color(palette.window["selected"])
 }
 
-// A colour the config holds nowhere leaves the style plain, so the window wears the terminal's own. [[spec/design_output/viewer#colours]]
+// A colour the config holds nowhere leaves the style plain, so the window wears the terminal's own. [[spec/design_output/tui#colours]]
 func styleOf(name, colour string) lipgloss.Style {
 	out := lipgloss.NewStyle()
 	if colour != "" {
@@ -101,7 +101,7 @@ func saidStyle(r Record) lipgloss.Style {
 		return kindStyle("prompt")
 	case "reply":
 		return kindStyle("reply").Bold(false)
-	// The kind list names the colour once, and the said column reads it there. [[spec/design_output/viewer#colours]]
+	// The kind list names the colour once, and the said column reads it there. [[spec/design_output/tui#colours]]
 	case "answer", "note":
 		return lipgloss.NewStyle().Foreground(kindStyle(r.Kind).GetForeground())
 	}

@@ -2,7 +2,7 @@
 // and a footer of status marks. w and s move the log, the arrows scroll the
 // pane, a number opens a tab, and enter, alt+? and alt+f open the details, the
 // help and the filter in that pane.
-// [[spec/design_output/viewer#the-keys]]
+// [[spec/design_output/tui#the-keys]]
 
 package main
 
@@ -35,7 +35,7 @@ const (
 	leastPaneWidth  = 10
 	leastInputWidth = 10
 	listExtraShare  = 10
-	// [[spec/design_output/viewer#one-key-filters-the-line]]
+	// [[spec/design_output/tui#one-key-filters-the-line]]
 	talkFilter = "kind: /^(prompt|reply)$/"
 )
 
@@ -71,7 +71,7 @@ type model struct {
 	w, h      int
 	tailer    *tailer
 	err       error
-	// [[spec/design_output/viewer#the-work-tab]]
+	// [[spec/design_output/tui#the-work-tab]]
 	work    *Tree
 	workWhy string
 	workAt  time.Time
@@ -97,12 +97,12 @@ func newModel(path string, zone *time.Location) model {
 	}
 }
 
-// [[spec/design_output/viewer#the-work-tab]]
+// [[spec/design_output/tui#the-work-tab]]
 func (m model) Init() tea.Cmd {
 	return tea.Batch(m.tailer.cmd(), workCmd(m.path, time.Time{}))
 }
 
-// [[spec/design_output/viewer#the-window-is-a-split]]
+// [[spec/design_output/tui#the-window-is-a-split]]
 func (m model) body() int { return max(2, m.h-headWide-footWide) }
 
 func (m model) rows() int { return max(1, m.body()-namesWide) }
@@ -123,7 +123,7 @@ func (m model) at() int {
 	return -1
 }
 
-// [[spec/design_output/viewer#the-filter-holds-the-selection]]
+// [[spec/design_output/tui#the-filter-holds-the-selection]]
 func (m *model) rebuild() {
 	// One language narrows every tab, and the tree joins the line with its presses. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
 	if m.work != nil {
@@ -206,7 +206,7 @@ func (m *model) openPane(want pane) {
 	m.box.GotoTop()
 }
 
-// [[spec/design_output/viewer#the-pane-holds-still]]
+// [[spec/design_output/tui#the-pane-holds-still]]
 func (m *model) loadPane() {
 	if m.pane == paneShut {
 		return
@@ -265,7 +265,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.loadPane()
 		return m, m.tailer.cmd()
 
-	// [[spec/design_output/viewer#the-work-tab]]
+	// [[spec/design_output/tui#the-work-tab]]
 	case workMsg:
 		if !msg.same {
 			m.work, m.workWhy = msg.tree, msg.why
@@ -286,7 +286,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.MouseMsg:
 		return m.mouse(msg)
 
-	// [[spec/design_output/viewer#a-second-launch-hands-over]]
+	// [[spec/design_output/tui#a-second-launch-hands-over]]
 	case tabMsg:
 		if n := m.tabNamed(msg.name); n > 0 {
 			m.openTab(n)
@@ -309,7 +309,7 @@ func (m *model) jump(name string) {
 	}
 }
 
-// [[spec/design_output/viewer#the-filter-pane-takes-letters]]
+// [[spec/design_output/tui#the-filter-pane-takes-letters]]
 func (m model) typing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
 	case "ctrl+c":
@@ -349,14 +349,14 @@ func (m model) typing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-// [[spec/design_output/viewer#alt-l-raises-the-floor]]
+// [[spec/design_output/tui#alt-l-raises-the-floor]]
 func (m *model) raiseFloor() {
 	m.floor = ladder[(Rank(m.floor)+1)%len(ladder)]
 	m.rebuild()
 	m.loadPane()
 }
 
-// [[spec/design_output/viewer#e-finds-the-newest-error]]
+// [[spec/design_output/tui#e-finds-the-newest-error]]
 func (m *model) toError() {
 	here := m.at()
 	onError := here >= 0 && strings.EqualFold(m.all[m.view[here]].Level, "error")
@@ -371,7 +371,7 @@ func (m *model) toError() {
 	}
 }
 
-// [[spec/design_output/viewer#one-key-filters-the-line]]
+// [[spec/design_output/tui#one-key-filters-the-line]]
 func (m *model) quick(name string) {
 	said := talkFilter
 	if name == "alt+F" {
@@ -405,7 +405,7 @@ func (m *model) narrow(said string) {
 	}
 }
 
-// [[spec/design_output/viewer#the-window-is-a-split]]
+// [[spec/design_output/tui#the-window-is-a-split]]
 func (m model) View() string {
 	if m.h == 0 {
 		return ""
@@ -420,7 +420,7 @@ func (m model) View() string {
 	return head + "\n" + body + "\n" + m.renderFooter()
 }
 
-// [[spec/design_output/viewer#the-columns-stand-still]]
+// [[spec/design_output/tui#the-columns-stand-still]]
 func (m model) renderNames(w int) string {
 	cells := make([]string, 0, len(logColumns))
 	for i, one := range logColumns {
@@ -458,7 +458,7 @@ func (m model) renderRows(w, rows int) string {
 	return lipgloss.NewStyle().Width(w).Render(strings.Join(lines, "\n"))
 }
 
-// [[spec/design_output/viewer#colours]]
+// [[spec/design_output/tui#colours]]
 func (m model) renderRow(r Record, selected bool, w int) string {
 	gutter := "  "
 	if selected {

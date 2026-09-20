@@ -3,7 +3,7 @@
 // it, and the sort reads the key out of it. A press on the column already
 // sorting flips the direction, and a fourth press puts the log back in the order
 // it arrived.
-// [[spec/design_output/viewer#the-columns-stand-still]]
+// [[spec/design_output/tui#the-columns-stand-still]]
 
 package main
 
@@ -13,21 +13,21 @@ import (
 	"strings"
 )
 
-// The gutter each row opens with, and the room the footer's sort mark takes. [[spec/design_output/viewer#the-columns-stand-still]]
+// The gutter each row opens with, and the room the footer's sort mark takes. [[spec/design_output/tui#the-columns-stand-still]]
 const (
 	gutterWide = 2
 	sortWide   = 7
 	sortNone   = -1
 )
 
-// A column of the log: what it is called, how wide it stands, and what it sorts on. [[spec/design_output/viewer#the-columns-stand-still]]
+// A column of the log: what it is called, how wide it stands, and what it sorts on. [[spec/design_output/tui#the-columns-stand-still]]
 type column struct {
 	name string
 	wide int
 	key  func(m *model, r Record) string
 }
 
-// The last column takes what room is left, so its width reads 0. [[spec/design_output/viewer#the-columns-stand-still]]
+// The last column takes what room is left, so its width reads 0. [[spec/design_output/tui#the-columns-stand-still]]
 var logColumns = []column{
 	{"time", stampWide, func(m *model, r Record) string { return r.At.UTC().Format("20060102150405.000000000") }},
 	{"level", levelWide, func(_ *model, r Record) string { return fmt.Sprintf("%02d", Rank(r.Level)) }},
@@ -35,7 +35,7 @@ var logColumns = []column{
 	{"said", 0, func(_ *model, r Record) string { return strings.ToLower(oneLine(r.Said)) }},
 }
 
-// The column the screen column x stands on, and sortNone where it stands past the last name. [[spec/design_output/viewer#the-columns-stand-still]]
+// The column the screen column x stands on, and sortNone where it stands past the last name. [[spec/design_output/tui#the-columns-stand-still]]
 func columnAt(x, w int) int {
 	at := gutterWide
 	for i, one := range logColumns {
@@ -51,7 +51,7 @@ func columnAt(x, w int) int {
 	return sortNone
 }
 
-// A press on a column sorts by it, presses again to flip, and a third puts the arrival order back. [[spec/design_output/viewer#the-columns-stand-still]]
+// A press on a column sorts by it, presses again to flip, and a third puts the arrival order back. [[spec/design_output/tui#the-columns-stand-still]]
 func (m *model) sortOn(at int) {
 	switch {
 	case at == sortNone:
@@ -67,7 +67,7 @@ func (m *model) sortOn(at int) {
 	m.loadPane()
 }
 
-// The view in the order the sorted column names, and in arrival order where none sorts. [[spec/design_output/viewer#the-columns-stand-still]]
+// The view in the order the sorted column names, and in arrival order where none sorts. [[spec/design_output/tui#the-columns-stand-still]]
 func (m *model) applySort() {
 	if m.sortAt < 0 || m.sortAt >= len(logColumns) {
 		return
@@ -82,7 +82,7 @@ func (m *model) applySort() {
 	})
 }
 
-// What the footer says about the order, which stands empty where none sorts. [[spec/design_output/viewer#the-footer-carries-status]]
+// What the footer says about the order, which stands empty where none sorts. [[spec/design_output/tui#the-footer-carries-status]]
 func (m model) sortSays() string {
 	if m.sortAt < 0 || m.sortAt >= len(logColumns) {
 		return ""

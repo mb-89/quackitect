@@ -1,7 +1,7 @@
 // The work tab. It draws every ticket this tree holds, nested under its group,
 // off the one answer the work verb writes. A write to that answer redraws the
 // tab with no key pressed, and nothing here writes a ticket.
-// [[spec/design_output/viewer#the-work-tab]]
+// [[spec/design_output/tui#the-work-tab]]
 
 package main
 
@@ -23,22 +23,22 @@ const workAnswerAt = ".se/.runtime/work.json"
 // [[spec/design_output/tree-view#a-base-file-says-it]]
 const workBaseAt = "spec/views/work.base"
 
-// [[spec/design_output/viewer#the-work-tab]]
+// [[spec/design_output/tui#the-work-tab]]
 type workTab struct{}
 
 func (workTab) Name() string { return "work" }
 
-// The log stands two folders under the root, so the root reads off its path. [[spec/design_output/viewer#the-work-tab]]
+// The log stands two folders under the root, so the root reads off its path. [[spec/design_output/tui#the-work-tab]]
 func workRoot(path string) string {
 	return filepath.Dir(filepath.Dir(filepath.Dir(path)))
 }
 
-// [[spec/design_output/viewer#the-work-tab]]
+// [[spec/design_output/tui#the-work-tab]]
 func workAt(path string) string {
 	return filepath.Join(workRoot(path), filepath.FromSlash(workAnswerAt))
 }
 
-// The time the answer carries, which says whether a reader reads it again. [[spec/design_output/viewer#the-work-tab]]
+// The time the answer carries, which says whether a reader reads it again. [[spec/design_output/tui#the-work-tab]]
 func workStamp(path string) time.Time {
 	info, err := os.Stat(workAt(path))
 	if err != nil {
@@ -47,7 +47,7 @@ func workStamp(path string) time.Time {
 	return info.ModTime()
 }
 
-// [[spec/design_output/viewer#the-work-tab]]
+// [[spec/design_output/tui#the-work-tab]]
 func loadWork(path string) (*Tree, error) {
 	base, err := os.ReadFile(filepath.Join(workRoot(path), filepath.FromSlash(workBaseAt)))
 	if err != nil {
@@ -110,7 +110,7 @@ func pressPreset(m *model, name string) bool {
 	return true
 }
 
-// [[spec/design_output/viewer#the-work-tab]]
+// [[spec/design_output/tui#the-work-tab]]
 type workMsg struct {
 	tree *Tree
 	why  string
@@ -118,7 +118,7 @@ type workMsg struct {
 	same bool
 }
 
-// A poll answers the answer's own time, so a write redraws with no key pressed. [[spec/design_output/viewer#the-work-tab]]
+// A poll answers the answer's own time, so a write redraws with no key pressed. [[spec/design_output/tui#the-work-tab]]
 func workCmd(path string, was time.Time) tea.Cmd {
 	return func() tea.Msg {
 		time.Sleep(poll)
@@ -134,7 +134,7 @@ func workCmd(path string, was time.Time) tea.Cmd {
 	}
 }
 
-// [[spec/design_output/viewer#the-work-tab]]
+// [[spec/design_output/tui#the-work-tab]]
 func (workTab) Left(m *model, w, rows int) string {
 	if m.work == nil {
 		return lipgloss.NewStyle().Width(w).Render(strings.Join(workWaits(m, w, rows), "\n"))
@@ -143,7 +143,7 @@ func (workTab) Left(m *model, w, rows int) string {
 	return m.work.Header(w) + "\n" + m.work.Rows(w, rows)
 }
 
-// [[spec/design_output/viewer#the-work-tab]]
+// [[spec/design_output/tui#the-work-tab]]
 func workWaits(m *model, w, rows int) []string {
 	said := "Run ./RUNME.sh branch answer, and this tab draws what it writes."
 	if m.workWhy != "" {
@@ -160,7 +160,7 @@ func workWaits(m *model, w, rows int) []string {
 	return lines
 }
 
-// [[spec/design_output/viewer#the-work-tab]]
+// [[spec/design_output/tui#the-work-tab]]
 func (workTab) Detail(m *model, w int) []part {
 	if m.work == nil {
 		return []part{{text: cut("A row of the work browser shows its note here.", w)}}
@@ -178,7 +178,7 @@ func (workTab) Detail(m *model, w int) []part {
 
 func (workTab) Narrowed(m *model) bool { return m.work != nil && m.work.Narrowed() }
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 func (workTab) Keys(m *model) band {
 	return band{name: "THE WORK", acts: []act{
 		{bind("1 2", "the log, and the work", "1", "2"), func(m *model, name string) tea.Cmd {

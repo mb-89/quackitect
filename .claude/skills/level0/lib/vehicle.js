@@ -138,7 +138,14 @@ export const LINK = "vehicle.json";
 export const TEMPLATE = "src/stub";
 export const SETTINGS = ".claude/settings.json";
 export const KEEP = ".gitkeep";
-export const STUB_FOLDERS = ["project/spec/tickets", "project/spec/guidance", "project/src"];
+// The folders a stub opens with, under the name the stub itself carries. [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
+export const STUB_INSIDE = ["spec/tickets", "spec/guidance", "src"];
+
+// [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
+export function stubFolders(name) {
+  const said = folderOf(name) || "project";
+  return STUB_INSIDE.map((one) => `${said}/${one}`);
+}
 
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 export function folderOf(method) {
@@ -209,6 +216,8 @@ export function settingsOf(read) {
   return Object.fromEntries(Object.entries(held).filter(([key]) => !key.startsWith("$")));
 }
 
-export function stubFiles(template) {
-  return [...STUB_FOLDERS.map((one) => `${one}/${KEEP}`), LINK, SETTINGS, ...(template ?? [])];
+// [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
+export function stubFiles(template, name) {
+  const folders = stubFolders(name).map((one) => `${one}/${KEEP}`);
+  return [...folders, LINK, SETTINGS, ...(template ?? [])];
 }

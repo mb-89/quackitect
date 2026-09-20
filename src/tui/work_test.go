@@ -1,6 +1,6 @@
 // The work tab, over a tree a case writes. The items come off the answer the
 // work verb writes, and the base file this tree ships says the columns.
-// [[spec/design_output/viewer#the-work-tab]]
+// [[spec/design_output/tui#the-work-tab]]
 
 package main
 
@@ -37,7 +37,7 @@ const workAnswerSaid = `{
 }
 `
 
-// The tree a window reads: the base file this project ships, and one answer. [[spec/design_output/viewer#the-work-tab]]
+// The tree a window reads: the base file this project ships, and one answer. [[spec/design_output/tui#the-work-tab]]
 func workTree(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
@@ -89,7 +89,7 @@ func TestAGroupCarriesItsTicketsAndALooseOneStandsAtTheLeft(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/viewer#the-work-tab]]
+// [[spec/design_output/tui#the-work-tab]]
 func TestTheTabReadsTheBaseFileAndTheAnswerOffTheLogsOwnPath(t *testing.T) {
 	t.Parallel()
 	root := workTree(t)
@@ -133,7 +133,7 @@ func TestTheFilterReadsATicketsKeysInTheLogsOwnLanguage(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/viewer#the-work-tab]]
+// [[spec/design_output/tui#the-work-tab]]
 func TestTheWindowDrawsEveryTicketNestedUnderItsGroup(t *testing.T) {
 	t.Parallel()
 	root := workTree(t)
@@ -154,7 +154,7 @@ func TestTheWindowDrawsEveryTicketNestedUnderItsGroup(t *testing.T) {
 	}
 }
 
-// A write to the answer hands the tab a tree again, with no key pressed. [[spec/design_output/viewer#the-work-tab]]
+// A write to the answer hands the tab a tree again, with no key pressed. [[spec/design_output/tui#the-work-tab]]
 func TestAWriteToTheAnswerHandsTheTabItsTreeAgain(t *testing.T) {
 	t.Parallel()
 	root := workTree(t)
@@ -178,7 +178,7 @@ func TestAWriteToTheAnswerHandsTheTabItsTreeAgain(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/viewer#the-work-tab]]
+// [[spec/design_output/tui#the-work-tab]]
 func TestATabMeetingNoAnswerSaysSoAndDrawsNothingElse(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

@@ -1,6 +1,6 @@
 // The log viewer. It shows the session log it is handed, follows every line
 // that lands, and starts again when a new session rotates the file.
-// [[spec/design_output/viewer]]
+// [[spec/design_output/tui]]
 
 package main
 
@@ -34,7 +34,7 @@ func main() {
 		os.Exit(2)
 	}
 	path := flag.Arg(0)
-	// The colours stand in the config, and the window reads them once. [[spec/design_output/viewer#colours]]
+	// The colours stand in the config, and the window reads them once. [[spec/design_output/tui#colours]]
 	loadColours(workRoot(path))
 
 	if *frame {
@@ -58,7 +58,7 @@ func main() {
 	}
 }
 
-// The window, with its door open for as long as it stands. A port already held means a window already stands, so this one hands its tab over and ends. [[spec/design_output/viewer#a-second-launch-hands-over]]
+// The window, with its door open for as long as it stands. A port already held means a window already stands, so this one hands its tab over and ends. [[spec/design_output/tui#a-second-launch-hands-over]]
 func runWindow(path, tab string, mouse bool) error {
 	start := newModel(path, time.Local)
 	if n := start.tabNamed(tab); n > 0 {
@@ -82,7 +82,7 @@ func runWindow(path, tab string, mouse bool) error {
 	return err
 }
 
-// What the window asks the terminal for. The mouse rides a switch, because a window taking it takes the terminal's text selection with it. [[spec/design_output/viewer#the-mouse-reaches-the-window]]
+// What the window asks the terminal for. The mouse rides a switch, because a window taking it takes the terminal's text selection with it. [[spec/design_output/tui#the-mouse-reaches-the-window]]
 func windowOpts(mouse bool) []tea.ProgramOption {
 	opts := []tea.ProgramOption{tea.WithAltScreen()}
 	if mouse {
@@ -91,7 +91,7 @@ func windowOpts(mouse bool) []tea.ProgramOption {
 	return opts
 }
 
-// [[spec/design_output/viewer#one-frame]]
+// [[spec/design_output/tui#one-frame]]
 func Frame(path string, w, h int, opened, narrow, floor string, zone *time.Location) (string, error) {
 	m := newModel(path, zone)
 	m.w, m.h = w, h

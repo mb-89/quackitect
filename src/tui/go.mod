@@ -1,4 +1,4 @@
-module quackitect/viewer
+module quackitect/tui
 
 go 1.27
 

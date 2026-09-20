@@ -84,7 +84,7 @@ func TestAKeyNobodyWritesAnswersNothing(t *testing.T) {
 
 // A named file's values stand in that file, and no layer sets one. [[spec/tickets/the-colours-stand-in-config]]
 func TestAMapReadsTheFileTheCallerNames(t *testing.T) {
-	// A path of the case's own, because src/viewer owns the one the window reads. [[spec/tickets/the-colours-stand-in-config]]
+	// A path of the case's own, because src/tui owns the one the window reads. [[spec/tickets/the-colours-stand-in-config]]
 	at := "spec/config/styles/a-fixture.json"
 	root := rootWith(t, map[string]string{
 		at:      `{"kinds": {"level0": "141", "note": "181"}}`,

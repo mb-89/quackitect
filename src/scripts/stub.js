@@ -12,8 +12,8 @@ import {
   same,
   SETTINGS,
   settingsOf,
-  STUB_FOLDERS,
   stubFiles,
+  stubFolders,
   TEMPLATE,
   upstreamOf,
 } from "../../.claude/skills/level0/lib/vehicle.js";
@@ -46,7 +46,8 @@ export function stubInto(files, git, time, method, dest, said = {}) {
   );
 
   files.makeDir(dest);
-  for (const folder of STUB_FOLDERS) {
+  // A reader opening a stub reads the project it names. [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
+  for (const folder of stubFolders(dest)) {
     files.makeDir(join(dest, folder));
     files.write(join(dest, folder, KEEP), "");
   }
@@ -59,7 +60,7 @@ export function stubInto(files, git, time, method, dest, said = {}) {
     files.write(at, files.read(join(method, TEMPLATE, rel)));
     if (rel.endsWith(".sh")) files.runnable(at);
   }
-  return { ok: true, files: stubFiles(template) };
+  return { ok: true, files: stubFiles(template, dest) };
 }
 
 function walk(files, at, rel = "") {

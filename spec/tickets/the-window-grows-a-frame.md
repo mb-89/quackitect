@@ -36,7 +36,7 @@ record:
     answered:
       - name: tests
         exit: 0
-        said: green, src/viewer passes
+        said: green, src/tui passes
       - name: check
         exit: 0
         said: The rules pass.
@@ -61,7 +61,7 @@ window then reads differently in each one.
 - a number past the tabs leaves the open one alone
 - the footer carries the floor in four columns at its right end
 - the footer carries a funnel beside it while a filter holds
-- `go -C src/viewer test ./...` is green
+- `go -C src/tui test ./...` is green
 
 # do
 
@@ -69,7 +69,7 @@ window then reads differently in each one.
 
 ## tests
 
-    ./RUNME.sh branch test src/viewer/frame_test.go
+    ./RUNME.sh branch test src/tui/frame_test.go
 
 ## check
 

@@ -1,6 +1,6 @@
 // Wrapping a detail so nothing is cut off. A continuation lines up under the
 // value, and a word wider than the pane breaks where it stands.
-// [[spec/design_output/viewer#the-details]]
+// [[spec/design_output/tui#the-details]]
 
 package main
 

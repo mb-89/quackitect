@@ -317,7 +317,7 @@ widget: the verb writes the local file, and the watcher does the rest.
 The log action runs `./RUNME.sh tui`, which opens the window on its log tab, in
 a terminal beside the editor. An action opening another program hands a person
 that program's keys. So the declaration carries them and the hover says them.
-For details, see [[spec/design_output/viewer#the-keys]].
+For details, see [[spec/design_output/tui#the-keys]].
 
 The rule holds for every action. Where an action starts another program, its hover names
 the keys that program needs, and the declaration carries them beside the

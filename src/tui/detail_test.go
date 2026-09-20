@@ -162,11 +162,11 @@ func TestEveryKnownDoorAndToolWearsItsOwnColour(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/viewer#the-filter-language]]
+// [[spec/design_output/tui#the-filter-language]]
 func TestTheFilterReadsKQL(t *testing.T) {
 	t.Parallel()
 	rows := []Record{
-		{Level: "info", Kind: "tool", Said: "src/viewer/ui.go", Extra: map[string]string{"tool": "Read"}},
+		{Level: "info", Kind: "tool", Said: "src/tui/ui.go", Extra: map[string]string{"tool": "Read"}},
 		{Level: "warn", Kind: "vale", Said: "1 line breaks a rule", Extra: map[string]string{"detail": "DoorsOnly"}},
 		{Level: "info", Kind: "prompt", Said: "are you bound?", Text: "are you bound? say so"},
 	}
@@ -228,8 +228,8 @@ func TestAWrappedValueLinesUpUnderItself(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/viewer#the-details]]
-// A note takes a colour of its own, and the said column wears it too. [[spec/design_output/viewer#colours]]
+// [[spec/design_output/tui#the-details]]
+// A note takes a colour of its own, and the said column wears it too. [[spec/design_output/tui#colours]]
 func TestANoteTakesAColourOfItsOwnInBothColumns(t *testing.T) {
 	t.Parallel()
 	mark := kindStyle("note").GetForeground()
@@ -246,7 +246,7 @@ func TestANoteTakesAColourOfItsOwnInBothColumns(t *testing.T) {
 	}
 }
 
-// The colour stands in the kind list alone, so the said column reads it there. [[spec/design_output/viewer#colours]]
+// The colour stands in the kind list alone, so the said column reads it there. [[spec/design_output/tui#colours]]
 func TestTheSaidColumnReadsTheKindListAndNamesNoColourOfItsOwn(t *testing.T) {
 	t.Parallel()
 	for _, kind := range []string{"note", "answer"} {
@@ -256,7 +256,7 @@ func TestTheSaidColumnReadsTheKindListAndNamesNoColourOfItsOwn(t *testing.T) {
 	}
 }
 
-// A person opening the prompt reads what the session parked under it. [[spec/design_output/viewer#the-details]]
+// A person opening the prompt reads what the session parked under it. [[spec/design_output/tui#the-details]]
 func TestAPromptShowsTheNoteItCarriesAndTheNoteShowsItsPrompt(t *testing.T) {
 	t.Parallel()
 	all := []Record{
@@ -276,7 +276,7 @@ func TestAPromptShowsTheNoteItCarriesAndTheNoteShowsItsPrompt(t *testing.T) {
 	}
 }
 
-// A note after the answer stands with the prompt too, up to the prompt after it. [[spec/design_output/viewer#the-details]]
+// A note after the answer stands with the prompt too, up to the prompt after it. [[spec/design_output/tui#the-details]]
 func TestAPromptShowsTheNotesOnBothSidesOfItsAnswer(t *testing.T) {
 	t.Parallel()
 	all := []Record{

@@ -1133,7 +1133,7 @@ answers that the rules pass.
 | folder | holder |
 |---|---|
 | `spec/config/styles` | Vale reads its style folders, and `.vale.ini` says which style reaches which path |
-| `spec/config/styles/colours.json` | the window reads it, as [[spec/design_output/viewer#colours]] says |
+| `spec/config/styles/colours.json` | the window reads it, as [[spec/design_output/tui#colours]] says |
 | `spec/config/biome.json` | Biome reads it |
 
 The comments in `.vale.ini` say why each section stands.

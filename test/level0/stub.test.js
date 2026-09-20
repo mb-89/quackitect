@@ -7,9 +7,10 @@ import test from "node:test";
 import {
   brandOf,
   linkOf,
-  STUB_FOLDERS,
   settingsOf,
+  STUB_INSIDE,
   stubFiles,
+  stubFolders,
   upstreamOf,
 } from "../../.claude/skills/level0/lib/vehicle.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
@@ -108,14 +109,24 @@ test("the settings keep every tracked key and drop every comment", () => {
 });
 
 test("the list names the folders, the record, the settings and the template", () => {
-  const said = stubFiles(["RUNME.sh", `${PLUGIN}/hooks/hooks.json`]);
-  for (const folder of STUB_FOLDERS)
+  const said = stubFiles(["RUNME.sh", `${PLUGIN}/hooks/hooks.json`], "/here/a-shop");
+  for (const folder of stubFolders("/here/a-shop"))
     assert.ok(said.includes(`${folder}/.gitkeep`), folder);
   assert.ok(said.includes("vehicle.json"));
   assert.ok(said.includes(".claude/settings.json"));
   assert.ok(said.includes("RUNME.sh"));
   assert.ok(said.includes(`${PLUGIN}/hooks/hooks.json`));
-  assert.equal(said.length, STUB_FOLDERS.length + 4);
+  assert.equal(said.length, STUB_INSIDE.length + 4);
+});
+
+// A reader opening a stub reads the project it names. [[spec/tickets/a-rename-reaches-every-note]]
+test("the folders take the stub's own name, and a nameless one falls back", () => {
+  assert.deepEqual(stubFolders("/here/a-shop"), [
+    "a-shop/spec/tickets",
+    "a-shop/spec/guidance",
+    "a-shop/src",
+  ]);
+  assert.deepEqual(stubFolders(""), STUB_INSIDE.map((one) => `project/${one}`));
 });
 
 test("a stub holds every file the list names, and nothing else", () => {

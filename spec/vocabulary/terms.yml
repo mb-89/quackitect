@@ -90,7 +90,7 @@ terms:
   - {word: note, defines: "[[spec/design_output/schema]]"}
   - {word: orphan, defines: "[[spec/funnel/a-process-is-data]]"}
   - {word: owner, defines: "[[spec/guidance/voice]]"}
-  - {word: pane, defines: "[[spec/design_output/viewer]]"}
+  - {word: pane, defines: "[[spec/design_output/tui]]"}
   - {word: panel, defines: "[[spec/design_output/extension]]"}
   - {word: paragraph, defines: "[[spec/schemas/paragraph.schema]]"}
   - {word: parse, defines: "[[spec/design_output/schema#the-reader-and-the-checker]]"}
@@ -138,21 +138,21 @@ terms:
   - {word: tagger, defines: "[[spec/schemas/paragraph.schema]]"}
   - {word: take, defines: "[[spec/design_output/work#the-take-writes-the-record]]"}
   - {word: term, defines: "[[spec/vocabulary/terms]]"}
-  - {word: terminal, defines: "[[spec/design_output/viewer]]"}
+  - {word: terminal, defines: "[[spec/design_output/tui]]"}
   - {word: ticket, defines: "[[spec/schemas/ticket.schema]]"}
   - {word: token, defines: "[[spec/design_output/level0#the-score-is-a-rate]]"}
   - {word: tooth, defines: "[[spec/design_output/stop#what-the-tooth-is]]"}
   - {word: transcript, defines: "[[spec/design_output/level0#what-the-door-reads]]"}
   - {word: tree, defines: "[[spec/design_output/vehicle]]"}
   - {word: trunk, defines: "[[spec/design_output/work#trunk-comes-in-first]]"}
-  - {word: tui, defines: "[[spec/design_output/viewer#the-verb-builds-it]]"}
+  - {word: tui, defines: "[[spec/design_output/tui#the-verb-builds-it]]"}
   - {word: urgent, defines: "[[spec/design_output/work#the-mark-and-what-waits]]"}
   - {word: vale, defines: "[[spec/design_output/level0#the-write-door]]"}
   - {word: ini, defines: "[[spec/design_output/projection#a-layer-writes-two-files]]"}
   - {word: vehicle, defines: "[[spec/design_output/vehicle]]"}
   - {word: verb, defines: "[[spec/design_output/work]]"}
   - {word: verdict, defines: "[[spec/design_output/review]]"}
-  - {word: viewer, defines: "[[spec/design_output/viewer]]"}
+  - {word: viewer, defines: "[[spec/design_output/tui]]"}
   - {word: vocabulary, defines: "[[spec/vocabulary/core]]"}
   - {word: watcher, defines: "[[spec/design_output/index#the-watcher-keeps-it-warm]]"}
   - {word: webview, defines: "[[spec/design_output/extension]]"}
@@ -225,7 +225,7 @@ terms:
   - {word: escalation, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
   - {word: flatten, defines: "[[spec/design_output/private]]"}
   - {word: guardrail, defines: "[[spec/design_output/level0#the-write-door]]"}
-  - {word: gutter, defines: "[[spec/design_output/viewer]]"}
+  - {word: gutter, defines: "[[spec/design_output/tui]]"}
   - {word: ideation, defines: "[[spec/design_output/extension]]"}
   - {word: inherit, defines: "[[spec/design_output/vehicle#the-work-root-inherits]]"}
   - {word: inject, defines: "[[spec/design_output/copilot]]"}

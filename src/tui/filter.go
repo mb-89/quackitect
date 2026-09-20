@@ -1,7 +1,7 @@
 // The filter language: KQL, the one Kibana uses, with Lucene's /pattern/ for a
 // regular expression. A half-typed filter answers ErrIncomplete, and a pattern
 // that fails to compile answers its own error.
-// [[spec/design_output/viewer#the-filter-language]]
+// [[spec/design_output/tui#the-filter-language]]
 
 package main
 
@@ -40,7 +40,7 @@ func (n andNode) match(r Row) bool { return n.l.match(r) && n.r.match(r) }
 func (n orNode) match(r Row) bool  { return n.l.match(r) || n.r.match(r) }
 func (n notNode) match(r Row) bool { return !n.n.match(r) }
 
-// [[spec/design_output/viewer#a-name-nobody-knows]]
+// [[spec/design_output/tui#a-name-nobody-knows]]
 func (c clause) match(r Row) bool {
 	switch strings.ToLower(c.field) {
 	case "":

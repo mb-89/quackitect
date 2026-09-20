@@ -210,7 +210,7 @@ func erase(m model, n int) model {
 	return m
 }
 
-// [[spec/design_output/viewer#alt-l-raises-the-floor]]
+// [[spec/design_output/tui#alt-l-raises-the-floor]]
 func TestAltLRaisesTheFloorAndComesRoundAgain(t *testing.T) {
 	t.Parallel()
 	m := newModel("no/such/log.jsonl", time.UTC)
@@ -342,7 +342,7 @@ var (
 	altQ      = tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'q'}, Alt: true}
 )
 
-// [[spec/design_output/viewer#one-key-filters-the-line]]
+// [[spec/design_output/tui#one-key-filters-the-line]]
 func TestAltShiftFKeepsTheSelectedKindAndTheSameChordClearsIt(t *testing.T) {
 	t.Parallel()
 	if altShiftF.String() != "alt+F" || altQ.String() != "alt+q" {
@@ -416,7 +416,7 @@ func TestAnotherChordReplacesTheFilterAndLeavesTheHeaderShort(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/viewer#e-finds-the-newest-error]]
+// [[spec/design_output/tui#e-finds-the-newest-error]]
 func TestEJumpsToTheNewestErrorAndAgainToTheOneBefore(t *testing.T) {
 	t.Parallel()
 	m := window(10)

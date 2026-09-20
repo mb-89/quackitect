@@ -1,7 +1,7 @@
 // What the right pane shows for one row: its kind and time, the fields its writer
 // added, and the whole text. A prompt shows the reply ending its turn, and a
 // reply shows every prompt of that turn.
-// [[spec/design_output/viewer#the-details]]
+// [[spec/design_output/tui#the-details]]
 
 package main
 
@@ -38,7 +38,7 @@ func pairsOf(all []Record, at int) []Record {
 					out = append(out, all[next])
 					answered = true
 				}
-			// Every note between this prompt and the next one shows under it, ahead of the answer and after it. [[spec/design_output/viewer#the-details]]
+			// Every note between this prompt and the next one shows under it, ahead of the answer and after it. [[spec/design_output/tui#the-details]]
 			case "note":
 				if mine {
 					out = append(out, all[next])

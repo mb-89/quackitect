@@ -36,7 +36,7 @@ record:
     answered:
       - name: tests
         exit: 0
-        said: green, src/viewer passes
+        said: green, src/tui passes
       - name: check
         exit: 0
         said: The rules pass.
@@ -58,7 +58,7 @@ column move, and the views spread over the tabs that draw them.
 - a file names several views, each with its columns and their room
 - a view's own key wins over the file's, and the tests join with `and`
 - a file saying too little answers the one reason it reads no view
-- `go -C src/viewer test ./...` is green
+- `go -C src/tui test ./...` is green
 
 # do
 
@@ -66,7 +66,7 @@ column move, and the views spread over the tabs that draw them.
 
 ## tests
 
-    ./RUNME.sh branch test src/viewer/base_test.go
+    ./RUNME.sh branch test src/tui/base_test.go
 
 ## check
 

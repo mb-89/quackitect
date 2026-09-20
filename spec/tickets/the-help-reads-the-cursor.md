@@ -36,7 +36,7 @@ record:
     answered:
       - name: tests
         exit: 0
-        said: green, src/viewer passes
+        said: green, src/tui passes
       - name: check
         exit: 0
         said: The rules pass.
@@ -59,7 +59,7 @@ then drift, and a person reads a key that works nowhere.
 - the help opens on a global band, then the open tab's band, then the selection's
 - a band the window has nothing for goes
 - a key nobody registers works nowhere
-- `go -C src/viewer test ./...` is green
+- `go -C src/tui test ./...` is green
 
 # do
 
@@ -67,7 +67,7 @@ then drift, and a person reads a key that works nowhere.
 
 ## tests
 
-    ./RUNME.sh branch test src/viewer/frame_test.go
+    ./RUNME.sh branch test src/tui/frame_test.go
 
 ## check
 

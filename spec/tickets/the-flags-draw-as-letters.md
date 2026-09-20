@@ -37,7 +37,7 @@ record:
     answered:
       - name: tests
         exit: 0
-        said: green, src/viewer passes
+        said: green, src/tui passes
       - name: check
         exit: 0
         said: 81 stand at warning, which the panel draws and check allows.
@@ -68,7 +68,7 @@ Three things follow:
 - a new flag costs a line in the base file, because the key already stands
 
 The letters hold fixed places, so nothing shifts as one lights. `renderMarks`
-in `src/viewer/footer.go` draws the footer that way, and this is that function
+in `src/tui/footer.go` draws the footer that way, and this is that function
 once a row.
 
 The gain is one column saying five things. A person reads a row's whole state
@@ -78,7 +78,7 @@ in five characters, and filters on any one of them.
 - `urgent: true` keeps the lit rows, and `not urgent: true` keeps the rest
 - a flag no row carries draws dim on every row
 - adding a letter costs a line in the base file
-- `go -C src/viewer test ./...` is green
+- `go -C src/tui test ./...` is green
 - `./RUNME.sh check` is green
 
 # do

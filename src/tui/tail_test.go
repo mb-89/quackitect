@@ -87,7 +87,7 @@ func TestAHalfLineWaitsForItsEnd(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/viewer#a-rotation-starts-it-again]]
+// [[spec/design_output/tui#a-rotation-starts-it-again]]
 func TestARotatedSessionStartsTheReadAgainOnItsOwnLines(t *testing.T) {
 	t.Parallel()
 	path := filepath.Join(t.TempDir(), "session.jsonl")

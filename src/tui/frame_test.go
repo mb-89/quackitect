@@ -12,7 +12,7 @@ import (
 	"github.com/charmbracelet/x/ansi"
 )
 
-// [[spec/design_output/viewer#the-window-is-a-split]]
+// [[spec/design_output/tui#the-window-is-a-split]]
 type stubTab struct{}
 
 func (stubTab) Name() string { return "work" }
@@ -37,7 +37,7 @@ func (stubTab) Selection(m *model) band {
 	}}
 }
 
-// [[spec/design_output/viewer#the-header-holds-the-tabs]]
+// [[spec/design_output/tui#the-header-holds-the-tabs]]
 func TestTheStripNamesEveryTabAndTheHelpKeyAboveARule(t *testing.T) {
 	t.Parallel()
 	lines := strings.Split(window(3).View(), "\n")
@@ -64,7 +64,7 @@ func TestTheStripNamesEveryTabAndTheHelpKeyAboveARule(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/viewer#a-number-opens-a-tab]]
+// [[spec/design_output/tui#a-number-opens-a-tab]]
 func TestANumberOpensTheTabAtThatPlaceAndAnyOtherLeavesTheOpenOne(t *testing.T) {
 	t.Parallel()
 	m := window(3)
@@ -90,7 +90,7 @@ func TestANumberOpensTheTabAtThatPlaceAndAnyOtherLeavesTheOpenOne(t *testing.T) 
 	}
 }
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 	t.Parallel()
 	m := window(3)
@@ -119,7 +119,7 @@ func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 func TestTheSelectionBandGoesWhileNothingStandsSelected(t *testing.T) {
 	t.Parallel()
 	m := window(0)
@@ -134,7 +134,7 @@ func TestTheSelectionBandGoesWhileNothingStandsSelected(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 func TestAKeyNobodyRegistersDoesNothing(t *testing.T) {
 	t.Parallel()
 	m := window(5)
@@ -146,7 +146,7 @@ func TestAKeyNobodyRegistersDoesNothing(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/viewer#the-footer-carries-status]]
+// [[spec/design_output/tui#the-footer-carries-status]]
 func TestTheFooterCarriesTheFloorAndAFunnelAtFixedPlaces(t *testing.T) {
 	t.Parallel()
 	m := window(5)

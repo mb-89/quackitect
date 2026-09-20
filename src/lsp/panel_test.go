@@ -35,8 +35,8 @@ func TestAnOpenFileLeavesBiomeToItsOwnServerAndKeepsTheRest(t *testing.T) {
 }
 
 func TestAPathTheBridgeSpellsWithBackslashesMeetsTheSamePath(t *testing.T) {
-	got := grouped([]Finding{{File: "src\\viewer\\wrap.go"}, {File: "src/viewer/wrap.go"}})
-	if len(got["src/viewer/wrap.go"]) != 2 {
+	got := grouped([]Finding{{File: "src\\tui\\wrap.go"}, {File: "src/tui/wrap.go"}})
+	if len(got["src/tui/wrap.go"]) != 2 {
 		t.Fatalf("the two spellings stand apart: %v", got)
 	}
 }

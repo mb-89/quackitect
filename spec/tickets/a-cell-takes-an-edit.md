@@ -36,7 +36,7 @@ record:
     answered:
       - name: tests
         exit: 0
-        said: green, src/viewer passes
+        said: green, src/tui passes
       - name: check
         exit: 0
         said: The rules pass.
@@ -60,7 +60,7 @@ reads the work and changes none of it.
 - Enter writes the value, and Escape puts the old one back
 - the fill reaches every row the view holds, and a filter says how far
 - the completion offers the schema's values, and the data's where no schema names any
-- `go -C src/viewer test ./...` is green
+- `go -C src/tui test ./...` is green
 
 # do
 
@@ -68,7 +68,7 @@ reads the work and changes none of it.
 
 ## tests
 
-    ./RUNME.sh branch test src/viewer/treeedit_test.go
+    ./RUNME.sh branch test src/tui/treeedit_test.go
 
 ## check
 

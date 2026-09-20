@@ -1,6 +1,6 @@
 // One row of the log, read from the JSON line a writer appends. A line that does
 // not parse still stands as a row, because the viewer shows what the file holds.
-// [[spec/design_output/viewer#one-row]]
+// [[spec/design_output/tui#one-row]]
 
 package main
 
@@ -75,7 +75,7 @@ func textOf(value any) string {
 	return fmt.Sprint(value)
 }
 
-// The ladder Python's logging climbs. A level nobody knows stands as info. [[spec/design_output/viewer#alt-l-raises-the-floor]]
+// The ladder Python's logging climbs. A level nobody knows stands as info. [[spec/design_output/tui#alt-l-raises-the-floor]]
 var ladder = []string{"debug", "info", "warn", "error", "fatal"}
 
 func Rank(level string) int {
@@ -87,7 +87,7 @@ func Rank(level string) int {
 	return 1
 }
 
-// [[spec/design_output/viewer#one-row]]
+// [[spec/design_output/tui#one-row]]
 func (r Record) Label() string {
 	if tool := r.Extra["tool"]; r.Kind == "tool" && tool != "" {
 		return tool
@@ -102,7 +102,7 @@ func (r Record) Body() string {
 	return r.Said
 }
 
-// [[spec/design_output/viewer#the-filter-language]]
+// [[spec/design_output/tui#the-filter-language]]
 func (r Record) Field(name string) (string, bool) {
 	switch strings.ToLower(name) {
 	case "time", "t":

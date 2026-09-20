@@ -1,7 +1,7 @@
 // Lines arriving in the session log. The operating system wakes the reader on
 // every write, and a poll stands behind it. A rotated file starts the reading
 // again from its top.
-// [[spec/design_output/viewer#how-a-line-arrives]]
+// [[spec/design_output/tui#how-a-line-arrives]]
 
 package main
 
@@ -56,7 +56,7 @@ func newTailer(path string) *tailer {
 	return t
 }
 
-// [[spec/design_output/viewer#a-rotation-starts-it-again]]
+// [[spec/design_output/tui#a-rotation-starts-it-again]]
 func (t *tailer) read() ([]Record, bool, error) {
 	body, err := os.ReadFile(t.path)
 	if os.IsNotExist(err) {

@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`src/viewer` holds the window this tree draws in a terminal. This note covers
+`src/tui` holds the window this tree draws in a terminal. This note covers
 the window, its tabs, its keys, the filter, and how a line arrives.
 
 # The viewer
@@ -13,7 +13,7 @@ the window, its tabs, its keys, the filter, and how a line arrives.
 carries a strip of tabs, the open tab on the left, one pane on the right and a
 footer of status marks. The log is the first tab.
 
-It is a Go program on Bubble Tea, in `src/viewer`. It reads
+It is a Go program on Bubble Tea, in `src/tui`. It reads
 `.se/.log/session.jsonl`, the one file every writer appends to. For details,
 see [[spec/design_output/log#every-writer-appends]].
 
@@ -313,13 +313,13 @@ rule.
 
 # The mouse reaches the window
 
-The window asks the terminal for the mouse, and `src/viewer/mouse.go` is the one
+The window asks the terminal for the mouse, and `src/tui/mouse.go` is the one
 place reading where an event lands:
 
 | the event | what it reaches |
 |---|---|
 | a press on row 0 | the tab under it, or the help at the strip's right end |
-| a press on the column names | the sort, which [[spec/design_output/viewer#the-columns-stand-still]] covers |
+| a press on the column names | the sort, which [[spec/design_output/tui#the-columns-stand-still]] covers |
 | a press on a list row | that row, as the selection |
 | the wheel over the list | the log, three rows a notch |
 | the wheel over the open pane | the pane's own scroll |
@@ -357,7 +357,7 @@ hands out none. So one window stands at a time:
 | the port free | opens the door, and draws the window |
 | the port held | hands its tab to the window standing, says so, and ends |
 
-`src/viewer/door.go` holds both directions in one shape. `openDoor` takes a
+`src/tui/door.go` holds both directions in one shape. `openDoor` takes a
 `POST /tab` carrying `{"tab":"work"}` and puts a `tabMsg` into the window, and
 `tellPort` sends that same shape to a port. So the window reads a tab from
 another process, and reaches another port with the words it takes.
@@ -367,5 +367,5 @@ a door answering `ok` means a window already stands.
 
 # The check runs its tests
 
-`./RUNME.sh check` runs `go test ./...` in `src/viewer` after the node tests. A
+`./RUNME.sh check` runs `go test ./...` in `src/tui` after the node tests. A
 box without Go says so in one line and goes on.
