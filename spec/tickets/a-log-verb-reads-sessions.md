@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -213,6 +213,17 @@ record:
     hash_after: 164528f91bba4659eeb00a2225e2943aa01afc66
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: ba79ee19c7bb57e15dc2170b95fdeeb3dba1bb85
+    hash_after: ba79ee19c7bb57e15dc2170b95fdeeb3dba1bb85
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -412,21 +423,21 @@ A move that leaves a copy standing costs the next reader a search, which the gre
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-`./RUNME.sh log` answers the rows the log holds, narrowed by four flags, and two owners keep what they own.
+`./RUNME.sh log` answers the rows the log holds, narrowed by four flags, and each thing the verb reaches has one owner.
 
 | what the verb does | where it stands |
 |---|---|
 | the four filters over rows | `src/scripts/log-read.js` |
 | the read over the session file and the rotated ones | the same file, which `tui --plain` calls too |
 | the flags and the printing | `src/scripts/log-verb.js` |
-| the row a reader sees | `asRow`, which both verbs call |
+| the line where no log stands | `NO_LOG`, which both verbs print |
 
 The filter language keeps its owner. `src/viewer/filter.go` holds it, the window reads it, and these flags reach for none of it. Go owns that language, and this verb runs in node before any Go build stands.
 
-Two numbers move to one owner each:
+The verdict round asks for one owner on two things, and each takes it:
 
 - `MS` stands beside `timeOf` in the level0 log lib, where a span crossing a stamp needs it
-- `work-stands.js` takes it from there, so one place answers the seconds a stamp costs
+- `work-stands.js`, `queue.js` and `stop.js` each take it from there, so one grep answers
 - the install case asserts both announcement lines wait on a missing want, so a warm tree runs silent
 
 ### checked
@@ -435,7 +446,7 @@ Two numbers move to one owner each:
 <!-- the form is checklist -->
 
 - every fact the change adds stands in one place, and the chapter owns the flags table
-- `MS` takes one owner, and the notes point at that file
+- `MS` and the no-log line each take one owner, and every caller points there
 - each header says what its file is for, and counts nothing
 
 # verdict
