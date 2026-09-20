@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -125,6 +125,12 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 122656e2eac3e79371dc42494e4ebdedb902ce07
     hash_after: 122656e2eac3e79371dc42494e4ebdedb902ce07
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-8
+    hash_before: 1a72525f2a423fd2eac0a7bce64a80d7346b3ed7
+    hash_after: 1a72525f2a423fd2eac0a7bce64a80d7346b3ed7
+    returns: 4
+    why: "`src/scripts/vehicle.js` carries no `it`: `registerDirs` and `readRegister`; open on `(files, env)`, and `cli.js`, `cli-doors.js` and; `src/bridge/vehicle.js` call them that way. The `windows` `cli-check.js`; builds rides the viewer's hand alone, and vehicle sees none of it. Say which; caller carries the platform in, or stand the file off as a root.; The pass list opens `**/src/extension/*.js`, and `.vale.ini` stands; `**/src/extension/editor*.js` off already, so two sections cover the editor; files. Grow the section standing, the way the stub's row reads now.; The rule draws on `process.env`, `process.argv` and `process.platform`, and; `src/scripts/vehicle.js` reads `process.pid` outside a door. Name what the; scope leaves to a later ticket, beside the three reads it takes.; The findings of the round before stand answered. The spawn in; `src/index/main.go` moves into `src/index/door.go`. The Go scope reads; `os/exec` in the table and the paragraph alike. `trust.js` and `copilot.js`; reach the pass list, and the stub's bridgehead keeps its one section."
 ---
 
 # Ask
@@ -227,29 +233,21 @@ door in each. So this ticket holds the rule to `os/exec`, and
 
 fail
 
-- `src/index/main.go` imports `os/exec` to spawn the resident, and
-  `src/index/door.go` imports none. The table says nothing moves for
-  `src/index`, and the pass list stands `door.go` off alone, so the rule
-  refuses `main.go`. Say whether the spawn moves into `door.go` or `main.go`
-  joins the pass list.
-- The first table draws the Go rule over an import of `os` or `os/exec`, and
-  the closing paragraph holds it to `os/exec`. The hand implementing reads two
-  rules. Write the scope once.
-- `src/scripts/trust.js` and `src/scripts/copilot.js` read `process.argv` on
-  their entry lines, the way `precommit.js` and `prepush.js` do. The module
-  table hands each `it.env` alone, so the rule refuses those lines. Put each in
-  one of the two tables.
-- `src/scripts/copilot.js` and `src/scripts/vehicle.js` read
-  `process.platform`, and the platform sentence names `cli-read.js` alone.
-  `cli-check.js` builds `windows` onto the hand, so say whether the two take
-  that off the hand or stand off as roots.
-- `.vale.ini` stands the stub's bridgehead off already, and `**/src/stub/**`
-  opens a second section over the same file. Grow the section standing, and
-  open no second.
-- The findings of the round before stand answered. The Go section takes
-  `door.go`, `src/viewer` and `src/swap` import no `os/exec`, and
-  `src/extension/*.js` and `src/scripts/editor.js` reach the pass list. The
-  file calls ride `a-door-holds-the-go-file-calls`, which stands in the tree.
+- `src/scripts/vehicle.js` carries no `it`: `registerDirs` and `readRegister`
+  open on `(files, env)`, and `cli.js`, `cli-doors.js` and
+  `src/bridge/vehicle.js` call them that way. The `windows` `cli-check.js`
+  builds rides the viewer's hand alone, and vehicle sees none of it. Say which
+  caller carries the platform in, or stand the file off as a root.
+- The pass list opens `**/src/extension/*.js`, and `.vale.ini` stands
+  `**/src/extension/editor*.js` off already, so two sections cover the editor
+  files. Grow the section standing, the way the stub's row reads now.
+- The rule draws on `process.env`, `process.argv` and `process.platform`, and
+  `src/scripts/vehicle.js` reads `process.pid` outside a door. Name what the
+  scope leaves to a later ticket, beside the three reads it takes.
+- The findings of the round before stand answered. The spawn in
+  `src/index/main.go` moves into `src/index/door.go`. The Go scope reads
+  `os/exec` in the table and the paragraph alike. `trust.js` and `copilot.js`
+  reach the pass list, and the stub's bridgehead keeps its one section.
 
 # implement
 
