@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -149,6 +149,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-13
+    hash_before: 26f0498e80ca965c2042c0fa839470a3d6fc76bb
+    hash_after: 26f0498e80ca965c2042c0fa839470a3d6fc76bb
+    returns: 1
+    why: "`bash.js` owns `SHELLS`, `READERS` and `BREAKS`. `scripted.js` carries a; second copy of each. Export the three beside `insideOf`, and import them.; `baseName` and `clean` each stand under one name in both modules. The two; `clean` read apart. The door's turns a backslash into a slash, and the script; reading strips a quote. Keep one of each.; `OUTSIDE` restates a slice of `FREE`, and the slice drifts already. The; reading takes `node $TMPDIR/edit.mjs`. It passes `node ${TMPDIR}/edit.mjs`; and `node $TMP/edit.mjs`. `reaches` answers false on all three spellings. Ask; `reaches` for the script path, or export `FREE` and read it.; `BREAKS` in `scripted.js` carries a newline entry. `tokensOf` hands a newline; back as `;`. Drop the entry.; What I check:; `./RUNME.sh check` answers 0 on the commit this branch stands on. That commit; matches origin.; The ask lands on every bullet. A runner and a shell each name their script.; The copy out of the scratchpad refuses over `cp` and `mv`. The refusal names; `mcp__level0__patch` and `mcp__level0__replace`. The check carries both cases.; Each new case feeds the door a script writing a tracked path, and asserts the; refusal. `trunk-door.test.js` drives the same road over the disk.; `tested.js` and `precommit.js` stand outside the ask. The reading still wants; a test in the same delta. It answers the import standing above the hunk. So; it fixes the rule and keeps its shape.; `tokens.js` carries `tokensOf` out of a file at its line ceiling. `bash.js`; re-exports the name, so every caller stands as it reads.; A package script passes the reading, because `RUNNERS` stands outside; `scriptsIn`. `package.json` meets the rules where it stands, so the road; stays narrow.; The route sends this ticket to a retro after this step. That retro stands; ahead of the handback."
 ---
 
 # Ask
@@ -430,17 +436,68 @@ both commit doors hand that reader in.
 
 <!-- the form is files -->
 
+    .claude/skills/level0/lib/bash.js
+    .claude/skills/level0/lib/scripted.js
+    .claude/skills/level0/lib/tokens.js
+    .claude/skills/level0/lib/tested.js
+    src/bridge/bash.js
+    src/scripts/precommit.js
+    spec/design_output/bash.md
+    test/level0/bash.test.js
+    test/level0/precommit.test.js
+    test/level0/tested.test.js
+    test/level0/trunk-door.test.js
+    spec/tickets/the-door-reads-script-writes.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+- `bash.js` owns `SHELLS`, `READERS` and `BREAKS`. `scripted.js` carries a
+  second copy of each. Export the three beside `insideOf`, and import them.
+- `baseName` and `clean` each stand under one name in both modules. The two
+  `clean` read apart. The door's turns a backslash into a slash, and the script
+  reading strips a quote. Keep one of each.
+- `OUTSIDE` restates a slice of `FREE`, and the slice drifts already. The
+  reading takes `node $TMPDIR/edit.mjs`. It passes `node ${TMPDIR}/edit.mjs`
+  and `node $TMP/edit.mjs`. `reaches` answers false on all three spellings. Ask
+  `reaches` for the script path, or export `FREE` and read it.
+- `BREAKS` in `scripted.js` carries a newline entry. `tokensOf` hands a newline
+  back as `;`. Drop the entry.
+
+What I check:
+
+- `./RUNME.sh check` answers 0 on the commit this branch stands on. That commit
+  matches origin.
+- The ask lands on every bullet. A runner and a shell each name their script.
+  The copy out of the scratchpad refuses over `cp` and `mv`. The refusal names
+  `mcp__level0__patch` and `mcp__level0__replace`. The check carries both cases.
+- Each new case feeds the door a script writing a tracked path, and asserts the
+  refusal. `trunk-door.test.js` drives the same road over the disk.
+- `tested.js` and `precommit.js` stand outside the ask. The reading still wants
+  a test in the same delta. It answers the import standing above the hunk. So
+  it fixes the rule and keeps its shape.
+- `tokens.js` carries `tokensOf` out of a file at its line ceiling. `bash.js`
+  re-exports the name, so every caller stands as it reads.
+- A package script passes the reading, because `RUNNERS` stands outside
+  `scriptsIn`. `package.json` meets the rules where it stands, so the road
+  stays narrow.
+- The route sends this ticket to a retro after this step. That retro stands
+  ahead of the handback.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the road the change adds lands once, as a row in the chapter on what the door
+  refuses. Each new piece points at that heading. The names the reading stands
+  on land twice, which the findings above name.
 
 # Discussion
 
