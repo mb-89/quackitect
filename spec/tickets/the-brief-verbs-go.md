@@ -140,6 +140,16 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 8c7eefa0825b8193aeaf34c9dfdd7d8347ef6054
+    hash_after: 8c7eefa0825b8193aeaf34c9dfdd7d8347ef6054
+    returns: 1
+    why: the change spans the code, the cases, the Go cases and the notes, and this box leaves the tree green
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -296,14 +306,18 @@ What surprises: the two roads stand so close that one fixture holds both. `stand
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- this leaf lands no hunk, so it touches no file the ask leaves out
+- the case standing red drives `doorsSaying`, so git and the disk stand fake
+- the approach under `design/draft` names every place, and this leaf adds nothing beside it
 
 ## tests-green
 
