@@ -4,8 +4,8 @@
 
 // The folders a walk leaves alone, as the findings reader leaves them. [[spec/design_output/index#a-rename-reaches-a-name]]
 const SKIP = new Set([".git", "node_modules", ".se", ".claude-plugin", "bin"]);
-// What a rewrite leaves alone, because a rewrite of it writes nonsense. [[spec/design_output/index#a-rename-reaches-a-name]]
-const BINARY = /\.(png|jpe?g|gif|ico|svgz|pdf|zip|gz|tar|woff2?|ttf|otf|wasm|exe|db|sqlite3?)$/i;
+// How far into a file the reader looks for the byte a text file holds nowhere. [[spec/design_output/index#a-rename-reaches-a-name]]
+const SNIFF = 4096;
 
 function edged(name) {
   return new RegExp(
@@ -50,9 +50,16 @@ export function filesUnder(it, where) {
   return out.sort();
 }
 
+// A text file holds no zero byte, so the reader looks for one and leaves the ending alone. [[spec/design_output/index#a-rename-reaches-a-name]]
+export function readsAsText(said) {
+  return !String(said ?? "")
+    .slice(0, SNIFF)
+    .includes("\u0000");
+}
+
 // The files a rewrite reads: every one a reader reads as text. [[spec/design_output/index#a-rename-reaches-a-name]]
 export function writtenFiles(it, where) {
-  return filesUnder(it, where).filter((one) => !BINARY.test(one));
+  return filesUnder(it, where).filter((one) => readsAsText(it.disk.read(one)));
 }
 
 // A note reaches a reader two ways, as a path and as a link without its ending. [[spec/design_output/index#a-rename-reaches-a-name]]

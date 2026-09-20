@@ -17,6 +17,25 @@ It is a Go program on Bubble Tea, in `src/tui`. It reads
 `.se/.log/session.jsonl`, the one file every writer appends to. For details,
 see [[spec/design_output/log#every-writer-appends]].
 
+## The packages the window holds
+
+One folder holds every file the window builds from today, and a reader wanting
+one tab reads them all. These packages part it, and every import runs down:
+
+| the package | what it holds | what it imports |
+|---|---|---|
+| `src/tui/draw` | `cut`, `pad`, `narrow`, the palette and the styles | nothing of this tree's |
+| `src/tui/tree` | the tree and the rows it draws | `src/tui/draw` |
+| `src/tui/frame` | `model`, the `tab` interface, and the rendering a tab calls | the draw and the tree packages |
+| `src/tui/log` | the log tab | `src/tui/frame` |
+| `src/tui/work` | the work tab | `src/tui/frame` |
+| `src/tui` | the window, which builds the tab list | the frame and each tab |
+
+The tree files reach the frame through the draw package alone, so they part
+first. A tab package reads `model`, so each name it reads takes a capital, and
+that reaches every file naming one. [[spec/tickets/the-window-splits-by-tab]]
+carries the work.
+
 # The keys
 
 | key | what it does |

@@ -20,8 +20,6 @@
 node_modules/
 src/tui/tui
 src/tui/tui.exe
-src/tui/viewer
-src/tui/viewer.exe
 src/index/index
 src/index/index.exe
 src/lsp/lsp

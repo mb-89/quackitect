@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -198,6 +198,14 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 0887558208a91bac98d8c437250847ad76b39b87
     hash_after: 0887558208a91bac98d8c437250847ad76b39b87
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: daeecd44452ae2fba3d998e6106a9a6ad38e5930
+    hash_after: daeecd44452ae2fba3d998e6106a9a6ad38e5930
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -382,9 +390,9 @@ The smaller findings ride the same shape. `BINARY` names endings, so a file with
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The verb, its cases, the ignore line, the page of markup, the vehicle note, and the ticket this round mints.
-- every door the change reaches has a fake. Each case drives the fake disk, and the new case feeds it a file with no ending and a picture.
-- a comment names the approach the change implements. The walk's comment names what it answers, and each caller names the part it takes.
+- the change touches no file the ask leaves out. The verb, its cases, the ignore rows, the minted ticket, and the note taking the package table.
+- every door the change reaches has a fake. The case reading bytes hands its own disk, as each case beside it does.
+- a comment names the approach the change implements. The reader of bytes says why it reads them, and the note owns the table.
 
 ## tests-green
 

@@ -53,7 +53,9 @@ test("the move carries a file of any ending, and the rewrite reaches one too", (
   const disk = fakeDisk({
     [at(`src/${OLD}/main.go`)]: "package main\n",
     [at(`src/${OLD}/Makefile`)]: `all: src/${OLD}\n`,
-    [at(`src/${OLD}/icon.png`)]: "\u0089PNG\r\n",
+    // A picture with no ending, so the reader looks at its bytes. [[spec/tickets/a-rename-reaches-every-note]]
+    [at(`src/${OLD}/icon.png`)]: `\u0089PNG\u0000src/${OLD}\r\n`,
+    [at(`src/${OLD}/a-picture`)]: `\u0089PNG\u0000src/${OLD}\r\n`,
     [at(".gitignore")]: `src/${OLD}/${OLD}\n`,
     [at("spec/funnel/a-page.html")]: `<code>src/${OLD}</code>\n`,
   });
@@ -72,9 +74,16 @@ test("the move carries a file of any ending, and the rewrite reaches one too", (
   assert.match(disk.read(at("spec/funnel/a-page.html")), /src\/widget/, "a page of markup rewrites");
   assert.equal(
     disk.read(at(`src/${NEW}/icon.png`)),
-    "\u0089PNG\r\n",
+    `\u0089PNG\u0000src/${OLD}\r\n`,
     "a picture carries its bytes, because the rewrite reads it nowhere",
   );
+  assert.equal(
+    disk.read(at(`src/${NEW}/a-picture`)),
+    `\u0089PNG\u0000src/${OLD}\r\n`,
+    "and the reader looks at the bytes, so an ending decides nothing",
+  );
+  assert.equal(rename.readsAsText("a line of text\n"), true);
+  assert.equal(rename.readsAsText("\u0089PNG\u0000"), false);
 });
 
 // [[spec/tickets/a-rename-reaches-every-note]]

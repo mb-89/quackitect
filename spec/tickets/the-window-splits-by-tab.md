@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -88,6 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
+step: design/draft
 ---
 
 # Ask
@@ -97,21 +98,9 @@ A reader opens one folder to read one tab, and the window's parts stand apart.
 `src/tui` holds every file the window builds from, and `ls src/tui/*.go | wc -l`
 answers how many. A reader wanting the work tab reads them all.
 
-[[spec/tickets/a-rename-reaches-every-note]] carries the folder to its name, and
-its approach settles where each package lands:
-
-| the package | what it holds | what it imports |
-|---|---|---|
-| `src/tui/draw` | `cut`, `pad`, `narrow`, the palette and the styles | nothing of this tree's |
-| `src/tui/tree` | the tree and the rows it draws | `src/tui/draw` |
-| `src/tui/frame` | `model`, the `tab` interface, and the rendering a tab calls | the draw and the tree packages |
-| `src/tui/log` | the log tab | `src/tui/frame` |
-| `src/tui/work` | the work tab | `src/tui/frame` |
-| `src/tui` | the window, which builds the tab list | the frame and each tab |
-
-The tree files reach the frame through the draw package alone, so they part
-first. The log tab and the work tab want the model exported, which reaches
-every file naming it.
+[[spec/tickets/a-rename-reaches-every-note]] carries the folder to its name.
+[[spec/design_output/tui#the-packages-the-window-holds]] names each package and
+what it imports. Every import there runs down, so no loop stands.
 
 - `ls src/tui/*.go` names the window's own files, and each tab stands under a folder of its own
 - `go build ./...` under `src/tui` answers 0, so no import loop stands
