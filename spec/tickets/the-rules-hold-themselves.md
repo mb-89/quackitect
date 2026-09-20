@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box 5387e4f82b24 · claude-code-remote
@@ -96,6 +96,14 @@ record:
     hand: the engine
     hash_before: d25d7ba765f7c7d60bdec235141438879eea96ef
     hash_after: d25d7ba765f7c7d60bdec235141438879eea96ef
+  - step: retro/notes
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: f2d490bfab1dec16f43734536a93f476b2a601b8
+    hash_after: 3d7f59d54d61074f5e01a220128c3682dce1b5cd
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
