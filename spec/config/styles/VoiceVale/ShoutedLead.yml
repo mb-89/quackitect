@@ -1,7 +1,7 @@
 extends: existence
 message: "A paragraph opens plainly. Write '%s' as a sentence."
 link: spec/guidance/voice.md
-level: error
+level: warning
 scope: paragraph
 nonword: true
 tokens:

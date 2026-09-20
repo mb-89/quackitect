@@ -17,7 +17,7 @@ import {
   TEMPLATE,
   upstreamOf,
 } from "../../.claude/skills/level0/lib/vehicle.js";
-import { copyHere } from "./vehicle.js";
+import { identityHere } from "./vehicle.js";
 
 // [[spec/design_output/vehicle#the-record-names-the-vehicle]]
 export function stubInto(files, git, time, method, dest, said = {}) {
@@ -39,7 +39,7 @@ export function stubInto(files, git, time, method, dest, said = {}) {
 
   const template = walk(files, join(method, TEMPLATE));
   const record = linkOf(
-    copyHere(files, time, method),
+    identityHere(files, time, method),
     brand,
     upstream,
     versionOf(files, method),

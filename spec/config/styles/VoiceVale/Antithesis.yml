@@ -1,7 +1,7 @@
 extends: existence
 message: "Say what is. '%s' opens a half that says what the thing is not."
 link: spec/guidance/voice.md
-level: error
+level: warning
 ignorecase: false
 tokens:
   - 'rather than'

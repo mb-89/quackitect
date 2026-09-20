@@ -94,7 +94,7 @@ Nothing yet.
 `;
 
 export const HAND = {
-  [join(ROOT, ".se/.runtime/copy.json")]: JSON.stringify({ id: "d462e994b4cef" }),
+  [join(ROOT, ".se/.runtime/identity.json")]: JSON.stringify({ id: "d462e994b4cef" }),
 };
 export const GROUP_AT = "spec/tickets/one-group.md";
 export const on = (name) => join(ROOT, `spec/tickets/${name}.md`);

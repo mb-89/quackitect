@@ -35,7 +35,7 @@ function vehicle() {
     "/tools/RUNME.sh": "run me",
     "/tools/package.json": '{"version":"0.1.0"}',
     "/tools/.claude/settings.json": SETTINGS,
-    "/tools/.se/.runtime/copy.json":
+    "/tools/.se/.runtime/identity.json":
       '{"id":"abc123","made":"2026-01-01T00:00:00.000Z"}',
     "/tools/src/scripts/cli.js": "the verbs",
     "/tools/src/stub/RUNME.sh": "the shim",

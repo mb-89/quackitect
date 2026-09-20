@@ -34,7 +34,7 @@ mkdir -p "$run"
 # folders.js owns these names as MOVED.
 for one in bin hold review undo measure copilot box.json session.json \
   tools.json hold.json check.json index.db index.json lsp.json copilot-cloud \
-  show-panel config.json copy.json project.json work.json vehicle.json; do
+  show-panel config.json identity.json project.json work.json vehicle.json; do
   old="$root/.se/$one"
   new="$run/$one"
   [ -d "$old" ] || [ -f "$old" ] || continue
@@ -44,6 +44,15 @@ for one in bin hold review undo measure copilot box.json session.json \
   # A file a running process holds stays where it stands, and a later run moves it.
   mv "$old" "$new" 2>/dev/null || true
 done
+
+# The identity wore the name copy.json before, so a box carrying that name
+# keeps the identity it made. folders.js owns the name it takes.
+if [ -f "$run/copy.json" ] && [ ! -f "$run/identity.json" ]; then
+  mv "$run/copy.json" "$run/identity.json" 2>/dev/null || true
+fi
+if [ -f "$root/.se/copy.json" ] && [ ! -f "$run/identity.json" ]; then
+  mv "$root/.se/copy.json" "$run/identity.json" 2>/dev/null || true
+fi
 
 # The register stands in the home folder, under the same runtime half. A box
 # carrying it straight under .se hands the reader nothing, so this moves it. The
@@ -481,7 +490,7 @@ get() {
 }
 
 # SE_INSTALL_SKIP names the wants a caller leaves out, so a test vehicle builds
-# no index and links no editor while it proves the copy stands alone.
+# no index and links no editor while it proves the vehicle stands alone.
 missing=""
 for one in node modules vale biome vale-ls go index se-lsp editor-client editor-link \
   editor-extensions git-hooks; do

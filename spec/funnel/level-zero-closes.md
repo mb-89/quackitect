@@ -42,7 +42,7 @@ help` names the verbs, `./RUNME.sh rules` the mechanical rules, and
 | the doors and the fakes | one door per outside thing, a fake that behaves, and a contract test per door | `doors` |
 | the tree rules | the rules over two files, and the names past five words | `tree` |
 | the schemas and `mint` | one schema per kind of note, checked at the door and on the sweep | `schema` |
-| the vehicle | a copy that drives another project, and the roots between them | `vehicle` |
+| the vehicle | a tree that drives another project, and the roots between them | `vehicle` |
 | the editor | one sidebar, two language servers, and settings that travel | `extension`, `editor` |
 | god mode and health | a cage holding nothing says so, and refuses the work until somebody fixes it | `level0` |
 | the Copilot surface | one level zero over two harnesses, through a runtime of its own | `copilot` |

@@ -11,8 +11,8 @@ cases:
     anchor: the-stubs-files
   - heading: "`slugOf` matches a name"
     anchor: slugof-matches-a-name
-  - heading: "A copy, a name and a date"
-    anchor: a-copy-a-name-and-a-date
+  - heading: "A vehicle, a name and a date"
+    anchor: a-vehicle-a-name-and-a-date
   - heading: "One place owns a thing."
     anchor: one-place-owns-a-thing
   - heading: Rule 7 stands

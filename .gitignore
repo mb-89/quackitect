@@ -35,3 +35,7 @@ src/extension/icon.svg
 # box, with the brand stamped in, so git holds neither. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 .claude-plugin/marketplace.json
 .claude/skills/level0/.claude-plugin/plugin.json
+
+# The editor's command line writes its crash log into the folder it runs in,
+# and the install runs it here to link the sidebar. [[spec/design_output/editor#what-the-editor-runs]]
+debug.log

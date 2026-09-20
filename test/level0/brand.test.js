@@ -29,7 +29,7 @@ function nameless(at) {
     [`${at}/RUNME.sh`]: "run me",
     [`${at}/package.json`]: '{"version":"0.1.0"}',
     [`${at}/.claude/settings.json`]: "{}",
-    [`${at}/.se/.runtime/copy.json`]: '{"id":"abc","made":"2026-01-01T00:00:00.000Z"}',
+    [`${at}/.se/.runtime/identity.json`]: '{"id":"abc","made":"2026-01-01T00:00:00.000Z"}',
   });
 }
 
