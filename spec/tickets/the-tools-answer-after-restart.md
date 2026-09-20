@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 4950ae0fa9291bb147c2ee8a94b23ef5e46c5516
     returns: 1
     why: the reader sits in the registration branch of `decide`, which runs after the door. Seat it beside `freshens`.; the call meeting the restarted server reads an empty box under that order, which is the fault the ask names.; the four cases cover the registration and the context block. A case driving `tool.call` on a fresh box goes missing.; the reader refills the projections that `freshens` fills already on a fresh box. Leave that fill where it stands.; `box.tools` comes from `surveyHere`, which `src/bridge/guidance.js` exports nowhere. The change table names one file alone.; `decide` sets `box.specs` nowhere, and `toolsText` reads `box.specs ?? []`. Name that assignment in the change.; the mint throws on a fresh box, because `mintedNote` calls `schemas.get(kind)` over nothing. The draft names the empty enum alone.; `{ register }` registers on any event, by the answer table in `spec/design_output/level0.md`. The road for the patch tool holds.; the scope call holds. The window with no server standing belongs to [[spec/tickets/the-bridge-says-it-falls]].; the table on what a fresh box holds matches the tree. The write door fills `box.schemas` itself, and earns a row.; the draft touches the ticket file alone, so the diff stands inside the brief.
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 0ca55c2c641de362c0dc0b682ebffbe56842183e
+    hash_after: 0ca55c2c641de362c0dc0b682ebffbe56842183e
 ---
 
 # Ask
@@ -124,50 +128,55 @@ a hand writes a script where a dead tool stands, and the guidance points at noth
 
 <!-- the form is text -->
 
-- one reader filling a box that a restart hands over bare
-- the specs built off that reader, so a registration carries what it names
-- cases driving such a box, the way a restart hands one over
+- one reader filling the fields a session start fills, run where the box holds none
+- `decide` runs it beside `freshens`, so the door and the registration read a full box
+- cases driving a fresh box, the way a restart hands one over
 
 **What stands.** `opensSession` fills the box at `session.start`, and a restart
 builds a new box with none of it. The harness sends one `session.start` a
 session, and the session runs on past a restart.
 
-| what `opensSession` fills | who reads it | what a fresh box holds |
+| what a session start fills | who reads it | what a fresh box holds |
 |---|---|---|
-| `box.schemas` | the mint spec, and the mint itself | nothing |
+| `box.schemas` | the mint spec, the mint, the write door | nothing, and the write door fills it itself |
 | `box.tools` | the block naming what this box has | nothing |
-| `box.projections`, `box.sources` | the write door | the door fills them itself |
+| `box.specs` | the same block | nothing |
+| `box.projections`, `box.sources` | the write door | nothing, and `freshens` fills them itself |
 | the warm index | the search tools | a cold index |
 
 **The fault.** `SPECS` in `src/bridge/tools.js` builds the mint spec off
 `box.schemas`. A fresh box gives it no kinds, so the spec registers an empty
-list of them and no call satisfies it. The description then names the folder
-and lists nothing after it.
+list of them and no call satisfies it. `mintedNote` then throws on
+`schemas.get`, and the tool call answers an error.
 
 The registration itself goes out. `decide` answers `register` where
-`box.registered` stands false, and a fresh box stands false. So the tools come
-back named, and the mint comes back empty.
+`box.registered` stands false, and a fresh box stands false. The answer table
+in [[spec/design_output/level0]] takes `register` on any event, so the road
+holds. The tools come back named, and the mint comes back empty.
 
-**The change.** One reader fills what the session start fills, and every road
-into the box runs it first.
+**The change.** One reader fills what a fresh box lacks, and `decide` runs it
+ahead of the door.
 
 | what changes | where |
 |---|---|
-| a reader filling the schemas, the tools and the projections | `src/bridge/server.js` |
-| `opensSession` calls it, in place of the lines it holds | the same file |
-| `decide` calls it where the box holds none of them | the same file |
-| `specsOf` runs after it, so a registration carries the kinds | the same file |
+| a reader filling `box.schemas`, `box.tools` and `box.specs` | `src/bridge/server.js` |
+| `decide` calls it beside `freshens`, ahead of the door | the same file |
+| `opensSession` calls it in place of the lines it holds | the same file |
+| `surveyHere` leaves the module, so the reader reads the survey | `src/bridge/guidance.js` |
 
 The reader reads the way `guidanceOf` does: it fills a field once and answers
-it after. The warm index stays out of it, because a cold index answers and
-warms itself.
+it after. `box.specs` takes `specsOf(box)` there, so the block naming what this
+box has reads a full list. The projections stay with `freshens`, which fills
+them on a fresh box already. The warm index stays out, because a cold index
+answers and warms itself.
 
 **The cases.** Each drives a box holding no session start, the way a restart
 hands one over.
 
+- a `tool.call` on a fresh box registers the patch tool and the check tool
 - the mint spec names every kind the schemas hold
-- the patch tool and the check tool stand in the same registration
-- a second event registers nothing, because the first one did
+- the mint tool answers a refusal on a fresh box, in place of throwing
+- a second event registers nothing, because the first one registers
 - the block naming what this box has reaches the session
 
 **What this leaves.** A tool call landing inside the restart window meets no
