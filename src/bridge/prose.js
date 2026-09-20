@@ -20,6 +20,17 @@ const LINK = /\[\[[^\]]*\]\]|\[[^\]]*\]\([^)]*\)/g;
 const MARKER = /^[ \t]*(?:[-*+]|[0-9]+[.)])\s+/;
 const SILENT = new Set(["PUNCT", "SYM", "SPACE"]);
 
+export const PROSE = "check_prose";
+export const PROSE_CALL = `mcp__level0__${PROSE}`;
+
+export const SPECS = () => [];
+export const TOOLS = { [PROSE_CALL]: readsDraft };
+
+// [[spec/design_output/level0#the-tool-reads-a-draft]]
+export async function readsDraft(_ask, _box) {
+  return "";
+}
+
 export function readsProse(box, text, found) {
   const caps = capsOf(box);
   let kept = withoutFalsePast(text, found);

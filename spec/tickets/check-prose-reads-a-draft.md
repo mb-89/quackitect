@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -119,6 +119,17 @@ record:
     hand: box 099c2ec7708d · claude-code-remote · helper-6
     hash_before: d3af706b852722850fb10f93feaaad823100952d
     hash_after: d3af706b852722850fb10f93feaaad823100952d
+  - step: implement/tests-red
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 79c6c219f5c4591fb3022767acffad241dc12f8a
+    hash_after: 79c6c219f5c4591fb3022767acffad241dc12f8a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -213,20 +224,33 @@ The approach answers both `why` lines, and every name it cites stands in the tre
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/prose.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Four cases go red on their own assertions. `readsDraft` answers an empty line and `SPECS` answers an empty list, so each case reads back nothing where it asks for a finding.
+
+What surprises:
+
+- the gate wants an assertion, so the module loads before the cases run
+- a name the module lacks reads as a build fault, which the gate refuses
+- so the exports stand with empty bodies, and the change fills each one
+
+The door's own read moves to `proseFaults` in the same hunk, because a case over the tool calls the read the door calls. The door keeps its logging and its refusal, and the read stands in one place.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the cases land in `test/level0/prose.test.js`, which the approach names
+- Vale reaches the read as a door, and the case hands it a fake answering a finding
+- the header of `proseFaults` points at the chapter the approach names
 
 ## reflect
 

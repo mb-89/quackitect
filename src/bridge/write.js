@@ -112,13 +112,19 @@ function schemaDoor(e, writing, where, box) {
   return "";
 }
 
+// The one read over a draft's prose. The door calls it, and so does the tool a
+// hand runs before it writes. [[spec/design_output/level0#the-tool-reads-a-draft]]
+export async function proseFaults(text, where, box) {
+  if (CODE.test(where) || !box.vale.stands()) return [];
+  const said = await box.vale.lint(text, where);
+  if (!said.ran) return [];
+  return readsProse(box, text, said.found);
+}
+
 // [[spec/design_output/level0#the-write-door]]
 async function voiceDoor(e, writing, where, box) {
-  if (CODE.test(writing.path) || !box.vale.stands()) return "";
   const whole = wholeAfter(e, writing, box.disk);
-  const said = await box.vale.lint(whole, where);
-  if (!said.ran) return "";
-  const found = readsProse(box, whole, said.found);
+  const found = await proseFaults(whole, where, box);
   if (!found.length) return "";
   box.log.say("warn", "vale", `refused ${found.length} line(s) in ${where}`, {
     file: where,
