@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: design
@@ -130,6 +130,12 @@ record:
       - name: tests
         exit: 0
         said: "# duration_ms 12595.533367"
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: b8908075560edb3e7158a12cfa406d9a21ba488e
+    hash_after: b8908075560edb3e7158a12cfa406d9a21ba488e
+reason: became
+successors: [a-route-closes-answered-asks]
 ---
 
 # Ask
