@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: b2a3a5a306aa40d668642ebfac3793625ecdd8d8
     hash_after: b2a3a5a306aa40d668642ebfac3793625ecdd8d8
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-4
+    hash_before: e50002bf80eb38157cdfe4c62b93235f306f4992
+    hash_after: e50002bf80eb38157cdfe4c62b93235f306f4992
+    returns: 2
+    why: "| the finding | what to do |; |---|---|; | The drift table reads the star direction alone, and a rationale chapter whose rule carries no star stands the same drift | Say which direction `matches: explains` reads, and name that drift too where it reads both |; | `History.yml` names no marker | List the words it refuses, and say what they catch past what `PastTense` holds already |; | `RuleNamesItsFailure` names no test | Say what makes a rule pass it, because most rules stand as one sentence |; | `.vale.ini` switches each `VoiceShape` rule off by name over `spec/vocabulary` and `spec/config/stop` | Say whether the new rule joins those two lists |; | The drift the two Vale rules find stands unnamed | Name it the way the star drift stands named, so the lint at zero holds |; Answered from the last round, one a line:; the star check reads `matches: explains` in `underFaults`, and `StarNeedsSection` goes; `History.yml` lands beside `Antithesis.yml`, with its switch in `.vale.ini`; `RuleNamesItsFailure` lands beside `GuidanceChapter` under `VoiceShape`; each new rule opens at error, so the warning stage goes; rule twelve stays in the guidance note; the drift table names the four notes and their starred rules as the tree holds them; `./RUNME.sh check` answers 0 on this branch."
 ---
 
 # Ask
@@ -175,22 +181,22 @@ fail
 
 | the finding | what to do |
 |---|---|
-| `matches: explains` in the rationale schema owns the star-to-chapter rule | Read that key in `underFaults`, and drop `StarNeedsSection` |
-| The paragraph schema names no bad word, by its own header | Put the `History` markers beside `Antithesis.yml` |
-| `.vale.ini` switches `PastTense` off over `spec/rationales` | Switch `History` off there the same way |
-| `RuleNamesItsFailure` reads one buffer, and `tree.js` holds the pair rules | Put it beside `GuidanceChapter` under `VoiceShape` |
-| Four notes star a rule whose rationale opens no chapter | Name the landing for each, below |
-| `fault()` writes severity error | Say where the warning stage lives, or drop the stage |
-| The failure rule answers rule twelve | Keep rule twelve in the note |
+| The drift table reads the star direction alone, and a rationale chapter whose rule carries no star stands the same drift | Say which direction `matches: explains` reads, and name that drift too where it reads both |
+| `History.yml` names no marker | List the words it refuses, and say what they catch past what `PastTense` holds already |
+| `RuleNamesItsFailure` names no test | Say what makes a rule pass it, because most rules stand as one sentence |
+| `.vale.ini` switches each `VoiceShape` rule off by name over `spec/vocabulary` and `spec/config/stop` | Say whether the new rule joins those two lists |
+| The drift the two Vale rules find stands unnamed | Name it the way the star drift stands named, so the lint at zero holds |
 
-The drift the star rule finds, which the lint at zero wants cleared:
+Answered from the last round, one a line:
 
-| the note | the starred rule standing with no chapter |
-|---|---|
-| `spec/guidance/cloud.md` | ten, fourteen, fifteen |
-| `spec/guidance/tickets.md` | eight, nine, ten |
-| `spec/guidance/working.md` | six, eleven |
-| `spec/guidance/code/code.md` | ten |
+- the star check reads `matches: explains` in `underFaults`, and `StarNeedsSection` goes
+- `History.yml` lands beside `Antithesis.yml`, with its switch in `.vale.ini`
+- `RuleNamesItsFailure` lands beside `GuidanceChapter` under `VoiceShape`
+- each new rule opens at error, so the warning stage goes
+- rule twelve stays in the guidance note
+- the drift table names the four notes and their starred rules as the tree holds them
+
+`./RUNME.sh check` answers 0 on this branch.
 
 # implement
 
