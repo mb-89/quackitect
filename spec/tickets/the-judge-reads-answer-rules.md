@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -177,6 +177,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 6f38b6aa113c7aa846ab07ccf9857e8b4e672954
+    hash_after: 6f38b6aa113c7aa846ab07ccf9857e8b4e672954
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -362,14 +370,18 @@ A named import of a name the module answers nowhere breaks the whole file, and t
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. Each file the approach's table names, and no other.
+- every door the change reaches has a fake. The change reaches no door, and each new reader takes the text its caller hands it.
+- a comment names the approach the change implements. Each new function points at the chapter the approach names.
 
 ## tests-green
 

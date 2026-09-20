@@ -5,8 +5,7 @@
 
 export const PULL_TOOL = "pull";
 export const PULL_CALL = `mcp__level1__${PULL_TOOL}`;
-export const LABELS = ["follows", "breaks"];
-export const BREAKS = "breaks";
+export const FOLLOWS = "follows";
 
 export function pullSpec() {
   return {
@@ -44,11 +43,11 @@ export function pullSpec() {
 
 // [[spec/design_output/pull#the-checks]]
 export function judgeAsk(evidence, rules) {
-  const listed = (rules ?? []).map((one, i) => `${i + 1}. ${one}`).join("\n");
+  const listed = (rules ?? []).map((one) => `${one.label}: ${one.rule}`).join("\n");
   return [
     "A hand wrote this evidence at one step of a ticket, and the step reads the",
-    "guidance below. Answer follows where the evidence keeps every rule, and",
-    "breaks where one line of it breaks a rule.",
+    "rules below, each under its own label. Answer follows where the evidence",
+    "keeps every rule. Answer the label of the first rule one line of it breaks.",
     "",
     "Guidance:",
     listed,
@@ -56,6 +55,17 @@ export function judgeAsk(evidence, rules) {
     "Evidence:",
     String(evidence ?? "").trim(),
   ].join("\n");
+}
+
+// The labels the judge picks from: follows, then one label a rule. [[spec/design_output/pull#the-checks]]
+export function judgeLabels(rules) {
+  return [FOLLOWS, ...(rules ?? []).map((one) => String(one.label))];
+}
+
+// The label read back to its note, so a refusal names the note, the number and the line. [[spec/design_output/pull#the-checks]]
+export function ruleBroken(label, rules) {
+  const found = (rules ?? []).find((one) => String(one.label) === String(label));
+  return found ? `${found.note} rule ${found.number}: ${found.rule}` : "";
 }
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
