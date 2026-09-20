@@ -14,16 +14,15 @@ import {
 import { overLong } from "../../.claude/skills/level0/lib/names.js";
 import {
   entriesIn,
-  mintedNote,
   readNote,
-  reRouted,
   schemasFrom,
 } from "../../.claude/skills/level0/lib/schema.js";
+import { mintedNote, reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { TODO } from "../../.claude/skills/level0/lib/todo.js";
-import { askFaults, askRefusal } from "./ticket-ask-lint.js";
 import { fieldOf, GROUP, withField, withoutField } from "../engine/group.js";
 import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
+import { askFaults, askRefusal } from "./ticket-ask-lint.js";
 
 export const NOTES = TICKETS;
 export const HOLDS = OWNED_HOLDS;
@@ -105,7 +104,9 @@ function note(it, name, argv) {
       ...(parks ? { [TODO]: true } : {}),
       process: held.link,
       process_hash: held.hash,
-      steps: talks ? personDecides(fromHold(held.route, holdOf(it))) : fromHold(held.route, holdOf(it)),
+      steps: talks
+        ? personDecides(fromHold(held.route, holdOf(it)))
+        : fromHold(held.route, holdOf(it)),
       step: firstLeafOf(held.route),
       Ask: [askRows(held.ask), "", line].join("\n").trim(),
     },
@@ -129,7 +130,9 @@ function note(it, name, argv) {
 
 // A note asking for a discussion waits for a person, so the pull hands it to no agent at a desk. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 function personDecides(steps) {
-  return [steps ?? []].flat().map((one) => (one?.name ? { ...one, by: "person" } : one));
+  return [steps ?? []]
+    .flat()
+    .map((one) => (one?.name ? { ...one, by: "person" } : one));
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]

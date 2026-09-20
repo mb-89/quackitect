@@ -68,7 +68,7 @@ export function holds(refs, stampText, carried = () => []) {
     if (found.length) return { code: 1, said: refusedTodo(found) };
   }
 
-  // A warning holds no push, because the refactoring hand drains it on the box. [[spec/design_output/config#the-engine-controls]]
+  // A warning reads red in the battery, so the stamp holds the push here and in the session's door alike. [[spec/design_output/work#the-battery-answers-first]]
   return { code: 0, said: "" };
 }
 

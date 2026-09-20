@@ -3,16 +3,16 @@
 // [[spec/design_output/level0#one-command-does-it]]
 
 import { dirname, join } from "node:path";
+import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
-import {
-  fieldsIn,
-  mintedNote,
-  SCHEMAS,
-  schemasIn,
-} from "../../.claude/skills/level0/lib/schema.js";
+import { SCHEMAS, schemasIn } from "../../.claude/skills/level0/lib/schema.js";
+import { fieldsIn, mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { attachTo } from "../bridge/vehicle.js";
 import { git } from "../doors/git.js";
+import { whereIs } from "../engine/tools.js";
+import { batteryOf } from "./battery.js";
 import {
+  commitDoors,
   doctor,
   doorsHold,
   fix,
@@ -23,11 +23,10 @@ import {
   projectionsHold,
   readConfig,
   serverHolds,
+  splitDoors,
   standing,
   tools,
   treeHere,
-  commitDoors,
-  splitDoors,
   tuiDoors,
   under,
 } from "./cli-check.js";
@@ -43,9 +42,7 @@ import {
   root,
   TESTS,
 } from "./cli-doors.js";
-import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { asksIndex, lint, version } from "./cli-read.js";
-import { batteryOf } from "./battery.js";
 import { batteryRun, stamped } from "./cli-stamp.js";
 import { graphIn } from "./graph.js";
 import { probe } from "./probe.js";
@@ -55,7 +52,6 @@ import { renaming, renamingText } from "./rename.js";
 import { retro } from "./retro.js";
 import { stubInto } from "./stub.js";
 import { ticket } from "./ticket.js";
-import { whereIs } from "../engine/tools.js";
 import {
   detach,
   entryFor,
@@ -277,7 +273,9 @@ export function theVehicle(argv) {
 export function renameHere(argv) {
   const [from, to] = argv.filter((one) => !one.startsWith("-"));
   if (!from || !to) {
-    console.error("se rename <from> <to>: say the name that moves and the one it takes.");
+    console.error(
+      "se rename <from> <to>: say the name that moves and the one it takes.",
+    );
     return 2;
   }
   const it = { disk: files, join, root, git: git(outside, root) };
@@ -293,7 +291,9 @@ export function renameHere(argv) {
   for (const one of said.wrote) console.log(`  ${one}`);
   // A rule that skips says what it skips, so a hand reads what the run left out. [[spec/design_output/index#a-rename-reaches-a-name]]
   for (const one of said.skipped ?? []) {
-    console.log(`  the reader reads ${one} as a picture, so the rewrite leaves it alone`);
+    console.log(
+      `  the reader reads ${one} as a picture, so the rewrite leaves it alone`,
+    );
   }
   console.log("Run ./RUNME.sh links, then ./RUNME.sh check.");
   return 0;

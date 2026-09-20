@@ -31,7 +31,7 @@ step: do
 
 # Ask
 
-The command line's main stands behind a guard, so a test importing src/scripts/cli.js registers its cases and runs them. Today the import meets the usage and the exit, so test/level0/outside-hand.test.js passes empty and the test-first door reads a pass that proves nothing. Done when node --test test/level0/outside-hand.test.js reports its cases, and a case that fails turns the run red.
+The command line's main stands behind a guard, so a test importing src/scripts/cli.js registers its cases and runs them. Today the import meets the usage and the exit. So test/level0/outside-hand.test.js passes empty, and the test-first door reads a pass that proves nothing. Done when node --test test/level0/outside-hand.test.js reports its cases, and a case that fails turns the run red.
 
 # do
 

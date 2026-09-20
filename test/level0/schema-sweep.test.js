@@ -6,18 +6,20 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   checkNote,
-  fieldsIn,
   governorOf,
   MINT_TOOL,
-  mintedNote,
-  mintNote,
-  mintSpec,
   placeholderFaults,
   refusedKind,
   schemaFaults,
   schemasIn,
   strangerFault,
 } from "../../.claude/skills/level0/lib/schema.js";
+import {
+  fieldsIn,
+  mintedNote,
+  mintNote,
+  mintSpec,
+} from "../../.claude/skills/level0/lib/schema-mint.js";
 import { GOVERNED, governedTree, NOTE, SCHEMA, treeWith } from "./schema-notes.js";
 
 const SCHEMA_TEXT = `kind: note

@@ -71,7 +71,7 @@ The Vale extension downloads its own vale-ls into per-extension storage and
 checks a SHA-256. It reads `vale.valeCLI.path` for the Vale binary alone, so no
 setting points it at `.se/.runtime/bin/vale-ls`.
 
-So the copy in `.se/.runtime/bin` serves two readers: `doctor`, and an editor that starts
+So the copy in `.se/.runtime/bin` serves both readers: `doctor`, and an editor that starts
 a server binary by path. A download that fails costs one warning line, and
 `./RUNME.sh` goes on, because Vale and Biome carry the doors.
 

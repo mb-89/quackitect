@@ -6,7 +6,7 @@ kind: [[design_output]]
 
 `spec/vocabulary` holds the words a paragraph writes, and
 `.claude/skills/level0/lib/vocabulary.js` reads them into the one rule the
-projection writes. This note covers the three lists, the rule, the refusal and
+projection writes. This note covers the lists, the rule, the refusal and
 the retro's part.
 
 # The vocabulary is three lists

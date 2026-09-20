@@ -9,7 +9,7 @@ reads one, how it weighs a note against one, and what it answers.
 
 | the piece | where |
 |---|---|
-| the reader and the checker | `.claude/skills/level0/lib/schema.js` |
+| the reader and the checker | `.claude/skills/level0/lib/schema*.js`, one module a topic |
 | the ticket door | `.claude/skills/level0/lib/ticket.js` |
 | the sweep, beside the tree rules | `src/scripts/cli.js` |
 | the underscore skip | `lib/paths.js`, and every caller of it |
@@ -18,7 +18,19 @@ reads one, how it weighs a note against one, and what it answers.
 
 # The reader and the checker
 
-Two halves stand in one module:
+The reader and the checker stand in one folder, one module a topic. The
+`schema.js` module re-exports what the checker reads, so a caller names one file:
+
+| the module | what it holds |
+|---|---|
+| `schema.js` | the checker over the frontmatter, the sweep, and the refusals |
+| `schema-read.js` | the note reader |
+| `schema-yaml.js` | the YAML reader |
+| `schema-fault.js` | the finding, the small readers of a value, and the pointer to another shape |
+| `schema-route.js` | the route checks and the hash |
+| `schema-body.js` | the body checks and the placeholder |
+| `schema-table.js` | the table under a chapter |
+| `schema-mint.js` | the mint and its tool, which a caller imports on its own |
 
 | it takes | it answers |
 |---|---|
@@ -50,7 +62,7 @@ The reader holds the subset the schema files use, and nothing past it:
 6. a link, written `[[name]]`
 
 A link reads as one string, before a flow list ever does. `[[guidance]]` opens
-and closes with a bracket, so the order of those two cases decides it.
+and closes with a bracket, so the order of those cases decides it.
 
 # What a note reads as
 
@@ -91,7 +103,7 @@ map answers the schema for that kind.
 
 # A schema names its chapters
 
-`spec/schemas` holds three shapes, and one key tells each from the others:
+`spec/schemas` holds the shapes below, and one key tells each from the others:
 
 | the shape | what it names | who reads it |
 |---|---|---|
@@ -130,7 +142,7 @@ Each schema takes a `governs` list, one glob a line:
 
 `governorOf(schemas, path)` answers which schema holds a path, and a path no
 schema governs stands as it stands today. In a governed folder the door holds
-three things:
+the following:
 
 | the write | what happens |
 |---|---|
@@ -138,7 +150,7 @@ three things:
 | a note of another kind | refused, naming the kind the folder holds |
 | a file with no `kind` | refused, naming the schema and `mint_note` as the road |
 
-The sweep reads the same three rows, so `./RUNME.sh check` turns red on a
+The sweep reads the same rows, so `./RUNME.sh check` turns red on a
 stranger already standing in the tree. A draft under an underscore stays
 outside every rule, because `tree.paths()` and the door both drop it first.
 
@@ -221,9 +233,9 @@ how the route's `steps` key names itself, and how the tree nests.
 across files resolves. A caller handing in the note kinds alone resolves a
 pointer into those, and a pointer it cannot read weighs nothing.
 
-# Three keywords name a step
+# Keywords that name a step
 
-A route is a tree of named steps, and three keywords reach into it:
+A route is a tree of named steps, and the keywords below reach into it:
 
 | keyword | the value | what it holds |
 |---|---|---|
@@ -231,7 +243,7 @@ A route is a tree of named steps, and three keywords reach into it:
 | `x-names` | the list a value names an entry of | the value names an entry |
 | `x-earlier` | the same list | the entry stands before the one holding the key |
 
-Three modifiers ride them:
+The modifiers below ride them:
 
 | modifier | what it does |
 |---|---|
@@ -245,7 +257,7 @@ an entry from the top second, and a path with a slash exactly. So `draft` inside
 
 # A comment counts toward nothing
 
-`mint` writes each description as a one-line HTML comment. Two readers pass
+`mint` writes each description as a one-line HTML comment. The readers below pass
 over it:
 
 1. `itemsIn` strips a comment before it counts an item, so a template costs
@@ -395,7 +407,7 @@ The schemas load once, at `session.start`. An `Edit` hands the door the edited
 lines alone, so `wholeAfter` reads the file and applies the edit first. The door
 then weighs the whole note it leaves behind.
 
-A departure stands refused, and the refusal names each finding and two ways on:
+A departure stands refused, and the refusal names each finding and the ways on below:
 
 - `./RUNME.sh mint <kind> <path>` writes the shape the schema names.
 - A draft named `_name.md` stands outside every rule while it settles.
@@ -434,10 +446,10 @@ reads that and nothing of its own:
 `placesIn` reads the route, finds the leaf `step` names, and answers the heading
 of each of its evidence fields. A chapter outside that set stands refused where
 the write changes its lines. So a phase's chapter and another leaf's fields are
-the engine's, and the three fields stay with the verbs. The ask stays open to a
+the engine's, and the other fields stay with the verbs. The ask stays open to a
 hand at every state, because a hand fixes what the rules refuse in it.
 
-Two leaves name one field alike, as `tests` under `tests-red` and under
+Leaves name one field alike, as `tests` under `tests-red` and under
 `tests-green`. So the door names an old chapter by its level, its header and
 its place among the chapters of that name. Each one then reads against its
 own.

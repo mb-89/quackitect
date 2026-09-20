@@ -10,7 +10,7 @@ note covers the tools and the journal behind them. For the argument, see
 
 # The write tools
 
-Level zero registers three tools the agent calls: `patch` edits files,
+Level zero registers the tools the agent calls: `patch` edits files,
 `replace` sweeps one pattern across the tree, and `undo` puts either one back.
 
 | tool | what it is for |
@@ -78,7 +78,7 @@ outside git, so an overwritten file lives in the entry or nowhere.
 ## An entry says whose apply
 
 An entry carries the `on` its apply names, and an undo walks past every entry
-another name writes. So ten agents on one tree each take back their own change.
+another name writes. So many agents on one tree each take back their own change.
 
 ## The entry names its time
 

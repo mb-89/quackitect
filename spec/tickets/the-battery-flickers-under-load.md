@@ -31,7 +31,7 @@ step: do
 
 # Ask
 
-The full check answers the same colour on every run, so a merge lands on the tree and no luck. Today a case goes red under load on a different file each run, and each file passes alone. Done when ten runs of ./RUNME.sh check answer green in a row, and the case that went red names the load it met and holds a wait for it.
+The full check answers the same colour on every run, so a merge lands on the tree and no luck. Today a case goes red under load on a different file each run, and each file passes alone. Done when ten runs of ./RUNME.sh check answer green in a row. The case that went red names the load it met and holds a wait for it.
 
 # do
 
@@ -63,4 +63,4 @@ The full check answers the same colour on every run, so a merge lands on the tre
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The Vale paths contract case went red on the Private script rule's own timeout, in checks running one after another. No other load stood on the box. The case now runs Vale again where a line names that timeout, up to a small number of runs. It stops at the first run that finishes. The count of green runs in a row the ask names stays open.

@@ -5,15 +5,11 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import {
-  checkNote,
-  itemsIn,
-  kindOf,
-  mintNote,
-  readNote,
-  readYaml,
-  SEVERITY,
-} from "../../.claude/skills/level0/lib/schema.js";
+import { checkNote, readYaml } from "../../.claude/skills/level0/lib/schema.js";
+import { itemsIn } from "../../.claude/skills/level0/lib/schema-body.js";
+import { SEVERITY } from "../../.claude/skills/level0/lib/schema-fault.js";
+import { mintNote } from "../../.claude/skills/level0/lib/schema-mint.js";
+import { kindOf, readNote } from "../../.claude/skills/level0/lib/schema-read.js";
 import { cellsOf, rowsIn } from "../../.claude/skills/level0/lib/schema-table.js";
 import { found, good, messages, NOTE, rules, SCHEMA, shown, swap } from "./schema-notes.js";
 

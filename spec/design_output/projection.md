@@ -10,7 +10,7 @@ This note covers the projections, the door refusing a target, and the verb.
 # One source, written everywhere
 
 `spec/config/level0.json` says what every value is. A slash command that sets
-one has to exist as a file. Hand writing both gives two files that agree for
+one has to exist as a file. Hand writing both leaves files that agree for
 about a month.
 
 So the tree projects. v4 rules it this way, and the ruling stands:
@@ -44,7 +44,7 @@ so adding one is an edit to data and no program changes:
 | `schema` | the file saying the type of each key, and its options |
 | `wrap` | `frontmatter` writes the mark into a description, `none` writes none |
 
-Two entries share the command folder, so each one names what it writes. The
+Entries share the command folder, so each one names what it writes. The
 owner lookup prefers the entry whose globs match the path, and an entry naming
 no `writes` owns whatever no neighbour claims.
 
@@ -89,9 +89,9 @@ commands together in a menu nobody else fills, and the path follows:
 Every value the declaration carries takes the config path: `config`, then the
 section, then the leaf. That is the tree the config section draws.
 
-The leaf keeps the case the key holds. A name holds five words, and
-`se-config-stop-most-in-a-row` holds eight, so kebab casing the leaf writes a
-name this tree refuses.
+The leaf keeps the case the key holds. A name holds `names.words` words at
+most, and `se-config-stop-most-in-a-row` holds more, so kebab casing the leaf
+writes a name this tree refuses.
 
 ## A widget takes its path
 
@@ -100,7 +100,7 @@ path: the group in kebab case, then the leaf. So the hold button in agent
 control answers `se-agent-control-hold-stopped`, and the config tree answers
 `se-config-stop-hold-stopped`. Both run the same verb.
 
-A group holding two toggles on one leaf names each by its section and leaf.
+A group holding toggles on one leaf names each by its section and leaf.
 An action takes no command, because it runs a program and sets no value. The
 sidebar hover names the widget path. For details, see
 [[spec/design_output/extension#a-button-names-its-commands]].
@@ -124,7 +124,7 @@ at the width a person holds.
 
 ## How a command sets it
 
-Two roads stand open, and this tree takes the second:
+The roads below stand open, and this tree takes the second:
 
 | road | what it costs |
 |---|---|
@@ -177,7 +177,7 @@ holds one file per check, and the comment at the top of each names its layer.
 ## A layer writes two files
 
 A Vale rule file carries one `extends`, and a script rule carries one scope. So
-a layer writing two kinds of check writes two files:
+a layer writing several kinds of check writes the files below:
 
 | why two | which |
 |---|---|
@@ -237,7 +237,7 @@ grammar layer stays a blacklist inside the whitelist. The schema carries the
 words it misreads, one word and one reason each, and the projector writes them
 into every rule reading a tag.
 
-Two shapes of the YAML matter:
+These shapes of the YAML matter:
 
 | the piece | the shape |
 |---|---|
@@ -297,7 +297,7 @@ compare, so a source standing apart writes no target.
 
 `writesOf` takes one entry and the texts it reads, and answers a map from path
 to text. It touches no disk, so a fake disk drives the whole relation in a test
-and the same function answers three callers:
+and the same function answers every caller below:
 
 | caller | what it does with the answer |
 |---|---|
@@ -350,7 +350,7 @@ disk, and refuses a difference:
     A projection is read-only, so edit the source it names instead.
     Run ./RUNME.sh project, which writes every target again.
 
-`staleIn` answers three kinds, so a person reads which one stands:
+`staleIn` answers the kinds below, so a person reads which one stands:
 
 | kind | what it means |
 |---|---|

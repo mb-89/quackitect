@@ -84,7 +84,7 @@ at every call and at the turn's end:
 | `finish` | the block rides: put the work down, start nothing new | the tooth votes |
 | `stop` | every call but the three below meets a refusal | the turn ends over the standing work |
 
-Three calls pass the hold at `stop`, because a turn ends through them: the
+The calls below pass the hold at `stop`, because a turn ends through them: the
 report, the stop claim and the answer check. Each carries the block, so the
 line stands in the answer to every call a held session makes. The hold at
 `stop` fires the rule `the-owner-holds-this-session` on the stop side, over
@@ -92,7 +92,7 @@ every continue rule but the owner's own word. A `hold` line at `debug` says
 what the door does.
 
 The hold is the stop hook's opposite. The hook holds a turn open, and the hold
-ends it, at two strengths:
+ends it, at the strengths below:
 
 | strength | what the owner asks for | which rule ends it |
 |---|---|---|
@@ -100,7 +100,7 @@ ends it, at two strengths:
 | `stop` | end this turn now | `the-owner-holds-this-session`, at 85 |
 
 The agent judges where that point stands at `finish`, because the work in
-hand decides it. At `stop` the door decides, and the three calls above are
+hand decides it. At `stop` the door decides, and the calls above are
 what it leaves.
 
 Each stands over every continue rule but the owner's own word, the queue's
@@ -112,14 +112,14 @@ because the press is the owner's word and the prompt carries its own.
 
 ## The hold outlives its drop
 
-Two events end a turn, and they arrive in either order:
+The events below end a turn, and they arrive in either order:
 
 | the event | the door | what it does with the hold |
 |---|---|---|
 | `turn.complete` | `dropsHold` | writes it back to `off` |
 | `classic.Stop` | `onStop` | reads it, and the vote runs |
 
-A drop landing first leaves the vote reading `off`. The two rules ending a turn
+A drop landing first leaves the vote reading `off`. The rules ending a turn
 for the owner lose there, a continue rule wins, and the turn reopens over work
 the owner puts down.
 
@@ -212,7 +212,7 @@ nothing fires over ends, because the stop side stands at a floor of zero. So a
 continue rule wins by standing above that floor, and a tie goes to the stop
 side.
 
-Four bands hold the numbers, so a later level lands without renumbering:
+The bands below hold the numbers, so a later level lands without renumbering:
 
 | band | who writes there |
 |---|---|
@@ -221,7 +221,7 @@ Four bands hold the numbers, so a later level lands without renumbering:
 | 1 to 49 | a preference |
 | 0 | the off switch |
 
-Three numbers carry an argument, and they stay where they stand:
+The priorities below carry an argument, and they stay where they stand:
 
 | priority | stands | so |
 |---|---|---|
@@ -317,7 +317,7 @@ turn on a question it owns.
 
 `the-chat-is-new` is the opening turn's reason. A person opens a chat, nobody
 names the work yet, and the agent answers with what it sees and asks. The check
-reads two things:
+reads the following:
 
 | what it reads | it stands where |
 |---|---|
@@ -352,12 +352,12 @@ The second vote reads the same facts, so the first answer stands.
 
 The other road is a line last in the answer, which the tooth reads back. It
 costs a challenge, and the challenge costs a second answer for every stop, so
-the owner reads two endings. The call costs one line in the transcript, and
+the owner reads both endings. The call costs one line in the transcript, and
 its absence holds the turn open.
 
 # The tooth holds its state
 
-`toothOf` holds three counts in module state, and the hook holds the claim
+`toothOf` holds the counts below in module state, and the hook holds the claim
 beside it:
 
 | count | what it stands for |
@@ -390,7 +390,7 @@ Vale writes its own.
 
 # What the re-prompt says
 
-The re-prompt carries three things, and the ids stand one to a line:
+The re-prompt carries the following, and the ids stand one to a line:
 
 - the `says` of the winning continue rule, and the call to make
 - the `asks` of every stop rule with no claim on it

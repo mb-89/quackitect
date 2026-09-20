@@ -68,7 +68,7 @@ group works on a branch, and the cloud takes that branch. So a desk pull
 meeting an open group standing without a branch cuts `work/<name>` from trunk.
 It pushes the branch, and the group leaves the desk's queue with that.
 
-A desk takes a group on two roads alone, and both run through the pull:
+A desk takes a group on either road alone, and both run through the pull:
 
 | road | the desk types | the engine does |
 |---|---|---|
@@ -182,7 +182,7 @@ A hand is the box, the session on it, and the agent inside it where the
 harness names one. `.se/.runtime/box.json` carries the box id, and the engine mints one
 where none stands. It takes the random source as an argument, so a test
 replays. `.se/.runtime/session.json` carries the session id and the harness name, and
-the plugin wrapper writes it at `session.start`. The pull reads the two files
+the plugin wrapper writes it at `session.start`. The pull reads both files
 into one hand.
 
 | the pull reads | the hand |
@@ -236,7 +236,7 @@ the cost stands beside the pull, once a pull.
 # The queue is an outline
 
 Every open ticket takes a place, and a closed one takes none. The score
-orders three lists, and `pull-outline.js` numbers them as one outline, which
+orders the lists, and `pull-outline.js` numbers them as one outline, which
 every reader draws as it stands.
 
 | the row | its place |
@@ -267,7 +267,7 @@ holds: the queue computes first, and the override lays over it. The work
 tab writes it under `places` in `.se/.runtime/plan.json`, so it stands on
 this box alone, travels into no ticket and reaches no git. A private note's
 own `todo` field reads the same way. The value names the row the ticket
-stands before, or one of two words:
+stands before, or one of the words below:
 
 | the todo | where the ticket stands |
 |---|---|
@@ -298,7 +298,7 @@ that a session's helper reviews none of its work yields to that ruling.
 | `spawn`, a helper name and a prompt | the wrapper calls the harness, or the session spawns a subagent with the prompt |
 | `spawn`, off a plugin | nobody: the shell moves nothing, the step stays parked, and the answer says so |
 
-Two roads reach that answer, and each names its own taker:
+The roads below reach that answer, and each names its own taker:
 
 | the leaf | who takes it |
 |---|---|
@@ -317,13 +317,13 @@ that hand lands, and a box off one leaves the group open behind it.
 
 `--as <name>` appends ` · <name>` to the hand, with a hold of its own.
 Such a hand works one step: its hand-back answers `done` and hands nothing
-out. The record names the helper on the leaf, so `not` reads the two hands
+out. The record names the helper on the leaf, so `not` reads the hands
 apart.
 
 Level zero tags every other spawn. Its `agent.spawn` hook reads the session
 file and puts one line at the head of the prompt. The line says this helper
 is the session's own hand, and it pulls under no `--as`. A spawn the wrapper makes
-itself marks its payload `own`, and carries no tag, because that hand is its own. So the two kinds of
+itself marks its payload `own`, and carries no tag, because that hand is its own. So the kinds of
 helper read apart in the prompt and in the record.
 
 # The hand-back
@@ -536,7 +536,7 @@ hand reaches the person step, and one mechanism inserts every kind.
 
 The escalation verb is the one road a step goes in by, so a count inserts
 none. The owner rules that a step a box writes waits for a person the box
-cannot reach. Two counts stand, and each answers on its own road:
+cannot reach. The counts below stand, and each answers on its own road:
 
 | the count | what the pull does |
 |---|---|
@@ -634,7 +634,7 @@ see count too.
 The run names the tap reporter. Node past version 23 answers a pipe with the
 spec reporter too, so the count reads the tap lines.
 
-The tests stand in two languages, and the verb runs both. A changed `*.test.js`
+The tests stand in Node and Go, and the verb runs both. A changed `*.test.js`
 joins the node run, and a changed `*_test.go` names the module under `src` that
 holds it, which the verb runs with `go test`. The answer reads green where
 every run does, and it names the first that does not.
