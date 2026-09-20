@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -149,6 +149,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 099c2ec7708d · claude-code-remote · helper-11
+    hash_before: 272b2ce68a0fa531211fc60e55668c1e31474cf7
+    hash_after: 272b2ce68a0fa531211fc60e55668c1e31474cf7
+    returns: 1
+    why: "the verb reads a target as its source: `splitVerb` slices `argv`, and `rest` carries no verb name; so `./RUNME.sh split <file>` cuts the file `--to` names, and the ask's first bullet stands unmet; the mint the door runs comes back refused: `gain names no field of a ticket note`; `trivial` asks `gain`, `breaks` and `done_when` under the ask, and the mint takes frontmatter fields alone; `splitTicket` reads a refused mint as silence, so a live refusal names no ticket; `ticketFor` builds `.se/tickets/split-<name>.md`, and the chapter names `spec/tickets/split-<name>.md`; the design review's note for implement stands unanswered: `splitTicket` reads existence, so a closed ticket blocks the mint; the approach names an open ticket, and the code reads any file standing at that path; `fakeProc` answers every argv the same, so the mint case asserts a call the real mint refuses; no case drives `codeDoor` past the file ceiling with a `proc` door, so the new branch fires under no test; the journal names `on` as `split`, and the approach names `on` as the session the write runs under; the retro stands absent from the handback, which `./RUNME.sh branch review` names; `./RUNME.sh check` exits 0, and `./RUNME.sh lint src/scripts` exits 0; `export { join }` at the foot of `src/scripts/split-verb.js` reaches nobody"
 ---
 
 # Ask
@@ -380,20 +386,57 @@ The door mints once a file:
 ## read
 
 <!-- every file you read, one a line -->
-
 <!-- the form is files -->
+
+- spec/tickets/a-split-verb-cuts-files.md
+- spec/design_output/level0.md
+- spec/processes/trivial.yaml
+- spec/schemas/ticket.schema.yaml
+- src/bridge/code.js
+- src/bridge/split-ticket.js
+- src/bridge/apply.js
+- src/bridge/write.js
+- src/bridge/server.js
+- src/scripts/cli.js
+- src/scripts/cli-check.js
+- src/scripts/split-cut.js
+- src/scripts/split-verb.js
+- src/scripts/log-verb.js
+- src/doors/fake/proc.js
+- test/level0/split.test.js
+- test/level0/code-door.test.js
+- .claude/skills/level0/lib/undo.js
+- .claude/skills/level0/lib/folders.js
+- .claude/skills/level0/lib/schema.js
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- the verb reads a target as its source: `splitVerb` slices `argv`, and `rest` carries no verb name
+- so `./RUNME.sh split <file>` cuts the file `--to` names, and the ask's first bullet stands unmet
+- the mint the door runs comes back refused: `gain names no field of a ticket note`
+- `trivial` asks `gain`, `breaks` and `done_when` under the ask, and the mint takes frontmatter fields alone
+- `splitTicket` reads a refused mint as silence, so a live refusal names no ticket
+- `ticketFor` builds `.se/tickets/split-<name>.md`, and the chapter names `spec/tickets/split-<name>.md`
+- the design review's note for implement stands unanswered: `splitTicket` reads existence, so a closed ticket blocks the mint
+- the approach names an open ticket, and the code reads any file standing at that path
+- `fakeProc` answers every argv the same, so the mint case asserts a call the real mint refuses
+- no case drives `codeDoor` past the file ceiling with a `proc` door, so the new branch fires under no test
+- the journal names `on` as `split`, and the approach names `on` as the session the write runs under
+- the retro stands absent from the handback, which `./RUNME.sh branch review` names
+- `./RUNME.sh check` exits 0, and `./RUNME.sh lint src/scripts` exits 0
+- `export { join }` at the foot of `src/scripts/split-verb.js` reaches nobody
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the chapter owns the flags, and `USAGE` repeats them. The ticket's path stands twice, and the two disagree
 
 # Discussion
 
