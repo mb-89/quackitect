@@ -65,7 +65,7 @@ test("a dependency in a flow list reads without its brackets or its quotes", () 
 
 // [[spec/design_output/work#a-dependency-waits-for-trunk]]
 test("a branch waits for a dependency until trunk holds it", () => {
-  const brief =
+  const ticket =
     "---\ndepends_on:\n  - open\n  - busy\n  - ready\n  - merged\n  - gone\n---\n";
   const standing = new Map([
     ["work/open", TODO],
@@ -73,7 +73,7 @@ test("a branch waits for a dependency until trunk holds it", () => {
     ["work/ready", DONE],
     ["work/merged", MERGED],
   ]);
-  assert.deepEqual(waitingOn(brief, standing), ["open", "busy", "ready"]);
+  assert.deepEqual(waitingOn(ticket, standing), ["open", "busy", "ready"]);
 });
 
 // [[spec/design_output/work#the-mark-and-what-waits]]

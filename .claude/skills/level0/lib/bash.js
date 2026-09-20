@@ -223,7 +223,7 @@ export function findings(command, most, it = {}) {
     out.push(
       row(said, "BranchNameHoldsFive", one, [
         `A name holds ${most} words, and ${part} holds more. Cut it, or run`,
-        "./RUNME.sh branch new <name>, which cuts the branch and writes its brief.",
+        "./RUNME.sh branch open <group>, which pushes the branch its group names.",
       ]),
     );
   }

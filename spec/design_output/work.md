@@ -478,7 +478,7 @@ origin. Naming no branch closes every one of them. It reaches two kinds:
 
 | branch | cut by | throwaway once |
 |---|---|---|
-| `work/<name>` | `branch new` | trunk holds its commits |
+| `work/<name>` | `branch open` | trunk holds its commits |
 | `claude/<name>` | the platform, for a routine run | trunk holds its commits |
 
 Deleting a remote branch whose merge sits on this box alone loses the work. So

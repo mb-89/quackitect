@@ -85,7 +85,7 @@ test("a claim younger than the span stands fresh, and an older one stands stale"
 // A box that runs out of session hands nothing back, so the claim comes back on its own. [[spec/design_output/work#a-stale-group-is-yours]]
 test("the take passes over a fresh claim, and takes a stale one", () => {
   const standing = new Map([["work/one", HELD]]);
-  const stood = (secondsAgo) => [tip(secondsAgo, { brief: said(HELD), ticket: "" })];
+  const stood = (secondsAgo) => [tip(secondsAgo, { ticket: said(HELD) })];
 
   const fresh = freeIn(stood(HOUR), standing, box("12h"), NOW);
   assert.deepEqual(fresh, [], "a box still holds it, so the take passes over");
@@ -101,8 +101,8 @@ test("the take passes over a fresh claim, and takes a stale one", () => {
 // [[spec/design_output/work#a-dependency-waits-for-trunk]]
 test("a stale claim waiting on a dependency stays out of the take", () => {
   const stand = [
-    { branch: "work/one", brief: said(HELD, "two"), ticket: "" },
-    { branch: "work/two", brief: said(TODO), ticket: "" },
+    { branch: "work/one", ticket: said(HELD, "two") },
+    { branch: "work/two", ticket: said(TODO) },
   ];
   const standing = new Map([
     ["work/one", HELD],
@@ -117,7 +117,7 @@ test("a stale claim waiting on a dependency stays out of the take", () => {
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
 test("a take carrying no clock reads no claim as stale", () => {
-  const stand = [{ branch: "work/one", brief: said(HELD), ticket: "" }];
+  const stand = [{ branch: "work/one", ticket: said(HELD) }];
   const standing = new Map([["work/one", HELD]]);
 
   assert.deepEqual(freeIn(stand, standing), [], "no clock, so the age reads nowhere");

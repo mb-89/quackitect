@@ -14,8 +14,8 @@ checkout takes, and that price bought three answers a program could not give.
 
 | the question | who answers |
 |---|---|
-| Does the branch do what the brief asks? | the reader |
-| Is what it touches beyond the brief trivial? | the reader |
+| Does the branch do what the ask calls for? | the reader |
+| Is what it touches beyond the ask trivial? | the reader |
 | Does `./RUNME.sh check` pass? | the verb |
 | Does the handback carry a retro? | the verb |
 | Does every added rule carry a test? | the reader |
@@ -26,10 +26,10 @@ Read this note again on any of three signs:
 - the reader answers one of the five questions wrongly, twice
 - a person merges against the report and turns out right, twice
 
-## 1. The brief is the claim
+## 1. The ask is the claim
 
-A branch makes one claim: it does what its brief asks. A diff shows what changed
-and says nothing about that claim.
+A branch makes one claim: it does what its group's ask calls for. A diff shows
+what changed and says nothing about that claim.
 
 So the first question weighs the two together, and it names what goes missing. A
 program reading the diff alone answers neither half.
@@ -37,7 +37,7 @@ program reading the diff alone answers neither half.
 ## 2. The trivial fix goes in
 
 `spec/guidance/working.md` rule nine sends a trivial fix in and a deeper one to
-a finding. A file outside the brief is then no fault by itself.
+a finding. A file outside the ask is then no fault by itself.
 
 The reader asks whether the extra is trivial, and stops there. The next question
 decides the rest.
@@ -60,11 +60,11 @@ asserting a rule exists passes on a rule that decides nothing.
 So the question is what the test feeds in, and what it asserts comes back. A
 refusal is the one piece of evidence that a rule holds.
 
-## 7. A diversion costs the brief
+## 7. A diversion costs the ask
 
-The fault in a file outside the brief is a diversion, a redesign of something
-the brief leaves alone. Telling that apart from a trivial fix takes a reading of
-the diff.
+The fault in a file outside the ask is a diversion, a redesign of something the
+ask leaves alone. Telling that apart from a trivial fix takes a reading of the
+diff.
 
 A model answers it. A count of touched files answers something else.
 

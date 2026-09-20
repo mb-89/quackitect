@@ -1080,8 +1080,8 @@ A heading, a file name, a folder name and a branch name each hold the words
 colon inside one through `OneTitle`, because both turn one title into two.
 
 Vale reads what a file holds, and its path stays outside that. So
-`.claude/skills/level0/lib/names.js` counts a name instead. `branch new` refuses a
-long branch, and `NameHoldsTheWords` holds every path git tracks.
+`.claude/skills/level0/lib/names.js` counts a name instead. The mint refuses a
+long ticket name, and `NameHoldsTheWords` holds every path git tracks.
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
 The config holds the cap as `names.words`, and the caller hands it to

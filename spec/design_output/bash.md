@@ -121,15 +121,15 @@ The same parse answers whether the commit steps past the pre-commit hook, and
 
 # A branch meets the cap
 
-`branch new` refuses a long name, and `git checkout -b` reaches the same tree.
+The mint refuses a long name, and `git checkout -b` reaches the same tree.
 `overLong` in `lib/names.js` counts the words, and the door calls it on:
 
 - `git checkout -b <name>`, and `-B`
 - `git switch -c <name>`, `-C`, and `--create`
 
 `git branch <name>` cuts a branch too, and the door reads none of it today.
-The refusal names `./RUNME.sh branch new <name>`, which cuts the branch and
-writes its brief in one act.
+The refusal names `./RUNME.sh branch open <group>`, which pushes the branch its
+group names.
 
 # A test run points somewhere
 

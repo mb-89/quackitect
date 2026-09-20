@@ -16,7 +16,7 @@ rationale: [[spec/rationales/working]]
 8. Put a script of your own under `.se/scripts`, which git ignores.
 9. Read `.se/.runtime/tools.json` for the path of a tool, and run `./RUNME.sh tools` where that file is absent.
 10. Fix what you trip over where the fix is trivial. Where it runs deeper, write the finding down and leave the code alone. *
-11. Show a brief to the owner before it reaches the cloud, and push nothing they have yet to read. *
+11. Show a group's ask to the owner before it reaches the cloud, and push nothing they have yet to read. *
 12. Run `check_answer` over a draft answer past sixty words before you send it. A draft checked there meets the gate clean.
 13. Change many lines or files with `mcp__level0__patch` and `mcp__level0__replace`, and one spot with Edit.
 14. One place owns a thing, and every other place points at it. Search for the owner before you write, and where one stands, write the pointer. This holds over a note, a number, a rule, a name and a line of code alike. *

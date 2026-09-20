@@ -208,7 +208,7 @@ test("a table pads each column, and the numbers stand to the right", () => {
   ]);
 });
 
-test("the two tables read the way the brief draws them", () => {
+test("the two tables read the way the design draws them", () => {
   const rows = measuredRows([
     {
       file: "003-answer.md",
