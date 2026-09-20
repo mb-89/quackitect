@@ -247,7 +247,7 @@ note still names as waiting.
 
 - a conflict at sync: the installer's list of moved files, where trunk and this branch each changed a name
 - a test that fails on the box alone: three contract cases over the plugin manifests, red on every fresh clone
-- the commit hook: a code change with no test beside it, answered with two cases over the usage and the listing
+- the commit hook: a code change with no test beside it, answered with two cases over the usage rows
 - the push hook: twelve tense findings in three notes, and a list item over its words, each reworded
 
 ### left
