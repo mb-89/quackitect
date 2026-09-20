@@ -157,6 +157,16 @@ record:
     hash_after: 51f4b20359a3382c2cf54375374a0f72e695fb58
     returns: 1
     why: the hand takes it back
+  - step: implement/tests-red
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 52bf602c1e1af453ba2029506e493b249dd590ee
+    hash_after: 52bf602c1e1af453ba2029506e493b249dd590ee
+    returns: 2
+    why: the seen field carries four paragraphs in one run, and this hand-back rewrites it as a list
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
 ---
 
 # Ask
@@ -262,9 +272,13 @@ pass
 
 Five cases go red on their own assertions. Each filter in `src/scripts/log-read.js` answers the rows whole, so each case reads back what it hands in.
 
-What surprises: the sixth case passes already. `rowsIn` composes `rowsOf` over the paths a caller hands it, and that composition needs no body of its own.
+What surprises:
 
-The span case names the scale the review asks about. A row's stamp answers milliseconds, `spanOf` answers seconds, and `MS` in the module crosses them. The change moves that constant to the file owning the log's shapes, so the crossing stands beside `timeOf`.
+- the sixth case passes already, because `rowsIn` composes `rowsOf` over the paths
+- that composition needs no body of its own
+- the span case names the scale the review asks about
+
+A row's stamp answers milliseconds, `spanOf` answers seconds, and `MS` crosses them. The change moves that constant beside `timeOf`, in the file owning the log's shapes.
 
 ### checked
 
