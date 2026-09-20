@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -125,6 +125,10 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: ec2576e45e1c08e43a87cea00bfbfad6d2ec29ac
     hash_after: ec2576e45e1c08e43a87cea00bfbfad6d2ec29ac
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-8
+    hash_before: 39ae88961368b782dd9e3d5cfd72a2c00b8943e7
+    hash_after: 39ae88961368b782dd9e3d5cfd72a2c00b8943e7
 ---
 
 # Ask
@@ -208,12 +212,13 @@ no fault standing behind a green check.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `./RUNME.sh lint spec` hands the checker a folder, and `Over` reads one path.
-- Say how a folder path reaches `RestatedPointer` and `RestatedRule`, because the ask names that verb.
-- Name the JavaScript writing `RestatedTable`, because the projection writes every rule file.
-- Name the `rules` entry carrying warning, because the projection writes the level from that map.
+- `Over` in `src/lsp/check.go` reads one path, and the draft walks a folder off `Tree.Paths`.
+- `Tree.Paths` stands in `src/lsp/tree.go`, so `checks` reaches each note under `spec`.
+- `rulesFrom` in `.claude/skills/level0/lib/paragraph.js` writes the rule file the draft names.
+- `sideOf` there reads the level from the `rules` map, which admits warning.
+- Each rule carries its home, its reading, its bound, its level and its cases.
 
 # implement
 
