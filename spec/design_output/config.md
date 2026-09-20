@@ -128,6 +128,27 @@ the resolver and hands the value in:
 The tooth reads its cap at each turn end, so a write to the per-box file
 mid-session reaches the turn after it.
 
+## The Go reader
+
+A Go module imports no JavaScript, so the resolver above reaches it nowhere.
+`src/config` is the shared module answering the same layers, and every Go
+program in the tree calls it:
+
+| what it answers | what it reads |
+|---|---|
+| `Value(root, key)` | the tracked file, then the variable, then the local file |
+| `Map(root, path, key)` | the map a named file holds at a key, off that file alone |
+| `List(root, path, key)` | the list a named file holds at a key, in the file's own order |
+| `EnvOf(key)` | the variable a key reads, as the key upper-cased under `SE_` |
+
+`Value` walks a key written with dots, so `names.words` reads the `words` of
+the `names` object. A named file takes no layer, because a person setting a
+colour sets it in one place. The window reads its colours that way, as
+[[spec/design_output/viewer#colours]] says.
+
+The module rides `SHARED` in `src/scripts/viewer.js`, so the window's build
+carries it beside `quackitect/yaml`.
+
 # The verb names the layer
 
 `./RUNME.sh config` prints every key, its value, and the layer answering it:

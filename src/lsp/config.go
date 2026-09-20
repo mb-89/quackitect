@@ -17,7 +17,7 @@ const (
 	WordsIn = "SE_NAMES_WORDS"
 )
 
-// The shared reader answers the key, and this one turns what it answers into a count. [[spec/design_output/config#a-go-program-reads-the-config]]
+// The shared reader answers the key, and this one turns what it answers into a count. [[spec/design_output/config#the-go-reader]]
 func wordsHere(root string) int {
 	said, held := config.Value(root, WordsAt)
 	if !held {

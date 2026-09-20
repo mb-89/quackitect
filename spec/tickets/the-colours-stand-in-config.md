@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -208,6 +208,14 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 3e4c79151adb5a3168a779d60b0a13cb98fed331
     hash_after: 3e4c79151adb5a3168a779d60b0a13cb98fed331
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 4d71046df64560799abe223a8bdb198723242f19
+    hash_after: 4d71046df64560799abe223a8bdb198723242f19
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -420,9 +428,9 @@ The fix for the whole class is a gate reading every pointer. `node` over a walk 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The check gains the format gate the class fix names. Every other file stands in the approach's table.
-- every door the change reaches has a fake. The gate runs its tool through the door the check runs every other tool through.
-- a comment names the approach the change implements. The gate carries a line naming the class it closes, and each new name points at its chapter.
+- the change touches no file the ask leaves out. The two chapters the pointers want, the gate's own half with its case, and the note this round mints.
+- every door the change reaches has a fake. The case drives the gate's half over a string, and the module list over a fake disk.
+- a comment names the approach the change implements. Each pointer names a chapter that stands, and the case names the round that wired the gate.
 
 ## tests-green
 

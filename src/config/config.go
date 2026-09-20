@@ -1,6 +1,6 @@
 // The config a Go program reads. One reader answers a key over the three
 // layers, and answers the map a named file holds at a key.
-// [[spec/design_output/config#a-go-program-reads-the-config]]
+// [[spec/design_output/config#the-go-reader]]
 package config
 
 import (
@@ -17,7 +17,7 @@ const (
 	Local   = ".se/.runtime/config.json"
 )
 
-// [[spec/design_output/config#a-go-program-reads-the-config]]
+// [[spec/design_output/config#the-go-reader]]
 func EnvOf(key string) string {
 	said := strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(key))
 	return "SE_" + said
@@ -39,7 +39,7 @@ func Value(root, key string) (any, bool) {
 	return out, held
 }
 
-// The map a named file holds at a key, read off that file and no layer. [[spec/design_output/config#a-go-program-reads-the-config]]
+// The map a named file holds at a key, read off that file and no layer. [[spec/design_output/config#the-go-reader]]
 func Map(root, path, key string) map[string]string {
 	said, found := valueIn(read(root, path), key)
 	if !found {
@@ -56,7 +56,7 @@ func Map(root, path, key string) map[string]string {
 	return out
 }
 
-// The list a named file holds at a key, in the order the file writes it. [[spec/design_output/config#a-go-program-reads-the-config]]
+// The list a named file holds at a key, in the order the file writes it. [[spec/design_output/config#the-go-reader]]
 func List(root, path, key string) []string {
 	said, found := valueIn(read(root, path), key)
 	if !found {

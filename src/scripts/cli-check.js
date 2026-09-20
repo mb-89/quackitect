@@ -50,7 +50,7 @@ import {
 } from "./cli-doors.js";
 import { namesIn, show, walk, warningsStood } from "./cli-read.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
-import { goEnvOf, goModulesIn } from "./go-tests.js";
+import { formatFaults, goEnvOf, goModulesIn } from "./go-tests.js";
 import { HOOKS } from "./precommit.js";
 import { writeSurvey } from "./tools.js";
 import { viewerOf } from "./viewer.js";
@@ -132,14 +132,9 @@ function goFormat(folder, env) {
   } catch {
     return 0;
   }
-  const names = `${ran.stdout ?? ""}`
-    .split("\n")
-    .map((one) => one.trim())
-    .filter(Boolean);
-  for (const name of names) {
-    console.log(`${folder}/${name}: Gofmt: the file reads other than gofmt writes it.`);
-  }
-  return names.length ? 1 : 0;
+  const faults = formatFaults(folder, ran.stdout);
+  for (const one of faults) console.log(one);
+  return faults.length ? 1 : 0;
 }
 
 // [[spec/design_output/config#the-verb-names-the-layer]]

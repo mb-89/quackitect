@@ -252,6 +252,12 @@ fault reads as anything but a missing compiler.
 compiles the full-text module in only when asked, so a build carrying the one
 carries the other.
 
+The battery runs each module's tests, then the Go formatter over that module's
+folder. A file the formatter writes another way turns the check red, and the
+check names that file. `formatFaults` in `src/scripts/go-tests.js` writes the
+findings, and a case drives it. A box carrying no formatter leaves the gate
+silent, the way a box carrying no Go leaves the tests unrun.
+
 ## A dead index speaks
 
 - Outcome: a session with no working index hears it on turn one, and nothing falls back in silence.
