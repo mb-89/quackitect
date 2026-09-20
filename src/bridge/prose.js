@@ -54,16 +54,20 @@ function proseSpec() {
   };
 }
 
-// [[spec/design_output/level0#a-note-reads-clean-first]]
+// The dispatch unwraps one shape, which every handler beside this one answers. [[spec/design_output/level0#a-note-reads-clean-first]]
 export async function readsDraft(ask, box) {
   const where = String(ask?.path ?? "");
   const text = ask?.text;
-  if (!where) return "This call names no path, and the rules read the kind a path names.";
-  if (typeof text !== "string") return "This call carries no text, so there is no draft to read.";
+  if (!where) return said("This call names no path, and the rules read the kind a path names.");
+  if (typeof text !== "string") {
+    return said("This call carries no text, so there is no draft to read.");
+  }
 
   const found = await proseFaults(text, where, box);
-  return answerFindings(where, { found, band: found.length ? "rewrite" : "" });
+  return said(answerFindings(where, { found, band: found.length ? "rewrite" : "" }));
 }
+
+const said = (text) => ({ result: { result: text } });
 
 export function readsProse(box, text, found) {
   const caps = capsOf(box);

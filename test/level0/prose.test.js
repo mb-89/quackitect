@@ -19,12 +19,20 @@ const box = (found = []) => ({
   method: "/tree",
 });
 
+// The dispatch unwraps one shape, so every case reads the answer through it. [[spec/design_output/level0#a-note-reads-clean-first]]
+const answered = async (ask, it) => {
+  const said = await TOOLS[PROSE_CALL](ask, it);
+  assert.equal(
+    typeof said?.result?.result,
+    "string",
+    "the answer takes the tool shape",
+  );
+  return said.result.result;
+};
+
 // [[spec/design_output/level0#a-note-reads-clean-first]]
 test("a clean draft answers no finding, and the tool writes nothing", async () => {
-  const said = await readsDraft(
-    { path: "spec/guidance/a.md", text: "A line.\n" },
-    box(),
-  );
+  const said = await answered({ path: "spec/guidance/a.md", text: "A line.\n" }, box());
 
   assert.match(said, /No finding stands/);
 });
@@ -35,7 +43,7 @@ test("a draft carrying a fault answers the finding, with its rule and its line",
     { rule: "VoiceShape.Antithesis", line: 1, column: 1, message: LONG, severity: 2 },
   ];
 
-  const said = await readsDraft(
+  const said = await answered(
     { path: "spec/guidance/a.md", text: `${LONG}\n` },
     box(found),
   );
@@ -47,8 +55,8 @@ test("a draft carrying a fault answers the finding, with its rule and its line",
 
 // [[spec/design_output/level0#a-note-reads-clean-first]]
 test("the tool takes a path and a text, and refuses a call missing either", async () => {
-  assert.match(await readsDraft({ text: "A line.\n" }, box()), /path/);
-  assert.match(await readsDraft({ path: "spec/guidance/a.md" }, box()), /text/);
+  assert.match(await answered({ text: "A line.\n" }, box()), /path/);
+  assert.match(await answered({ path: "spec/guidance/a.md" }, box()), /text/);
 });
 
 // [[spec/design_output/level0#a-note-reads-clean-first]]
@@ -61,5 +69,5 @@ test("the module registers the pair the server imports for each bridge module", 
     "path",
     "text",
   ]);
-  assert.equal(typeof TOOLS[PROSE_CALL], "function");
+  assert.equal(TOOLS[PROSE_CALL], readsDraft, "the pair names the handler");
 });

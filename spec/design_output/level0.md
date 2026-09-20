@@ -1026,8 +1026,8 @@ answers every finding at once:
 | the wording of the answer | `answerFindings`, beside `refusal` |
 
 The door calls `proseFaults` too, so one read serves both and a clean draft
-passes the door on its first write. The tool writes nothing, so its answer
-opens on the rules reading a draft.
+passes the door on its first write. The tool writes nothing, so it takes the
+wording `check_answer` takes, and the refusal wording stays with the door.
 
 `src/bridge/prose.js` holds the spec and the handler, and exports the `SPECS`
 and `TOOLS` pair `src/bridge/server.js` imports for each bridge module.
