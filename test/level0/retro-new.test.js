@@ -98,6 +98,7 @@ test("retro new opens the ticket, so a hand pulls it without a second command", 
   const said = it.disk.read(at(`spec/tickets/retro-${TIP.slice(0, 7)}.md`));
   assert.match(said, /^state: open$/m, "the mint opens it");
   assert.match(said, /^step: collect$/m, "it stands at the route's first leaf");
+  assert.doesNotMatch(said, /^urgent:/m, "a retro waits its turn, so the mint sets no mark");
 });
 
 // The owner says why, and the ask carries those words. [[spec/design_input/the-agent-pulls-tickets]]

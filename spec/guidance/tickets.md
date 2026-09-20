@@ -18,3 +18,4 @@ rationale: [[spec/rationales/tickets]]
 10. Put a thing for later on a ticket, and in no memory folder. A memory folder stands on one box, and the retro drains it into the tree. *
 11. Name the group a ticket lands in under `group`, and read a group as one branch with children. [[spec/design_output/work]]
 12. Run `./RUNME.sh ticket update <ticket>` after a process file changes, so the leaves ahead take the new route.
+13. Mark a ticket `urgent` where a break stops work until somebody fixes it, and mark no other. A defect that waits stands unmarked, and so does every finding a retro mints. *

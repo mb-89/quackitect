@@ -60,3 +60,15 @@ the tree, where a clone and a cloud box read it.
 A branch is the one thing git decides on. So the claim on a group is a push, and
 two boxes reaching for one group meet one rejected push. The children ride the
 branch, and the merge is the verdict over the sum.
+
+## 13. The mark means stopped work
+
+The queue orders every ticket by its score, and the mark overrides the score.
+So the mark carries meaning only while few tickets carry it. The three urgency
+words collapsed to one mark. Before that, agents minted eighty-three tickets
+as `now` and forty-two as anything else, and the collapse carried the count
+over.
+
+A mark on most rows orders nothing. So the mark takes one meaning: work stops
+here until somebody fixes it. A retro's finding is a defect that waits, and the
+owner marks the few that do not.
