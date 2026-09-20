@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -151,6 +151,10 @@ record:
     hash_after: 9ce24c777acc53fc86f136ddb7f8eda7dd555dd2
     returns: 6
     why: The new rule joins `VoiceVale`, and the section over `*.md` names it nowhere.; `DoorsOnly` stands off there because a note writes `process.env` in its prose,; and a ticket in the tree does today. `[formats]` reads a `.yml` as markdown; too, so the rule file meets its own tokens. Name the line the markdown; section takes.; The sections standing `DoorsOnly` off today name the new rule nowhere:; `src/doors/*.js`, their fakes, the hooks module and the stub's bridgehead.; `src/doors/proc.js` reads `process.env`, so `./RUNME.sh lint src` comes back; red on a door. Say that each section takes a line for the new rule beside the; one it holds.; Growing the section over `editor*.js` to `*.js` gives the `node:` import guard; up for `src/extension/extension.js` and `src/extension/sidebar.js`. The; approach opens a rule file of its own so a pass keeps that guard. Open the; wider glob under the new rule alone, and leave `DoorsOnly` where it stands.; `src/bridge/review.js` reads `process.execPath` as well, and the table naming; the reads a later ticket carries stands `src/scripts/cli-doors.js` alone.; Name the second file beside it.; The findings of the round before stand answered. The test folders reach the; pass list, and the reading takes a rule file of its own. `src/yaml` stands in; the Go table, and the later ticket carries `process.version` and; `process.execPath` beside `process.pid`.
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 71af5c91b66d1eb075e83ecb2ddf2f7b2b9d5c87
+    hash_after: 810049a7e3c941e3e665254614868ac96cd6f7e1
 ---
 
 # Ask
