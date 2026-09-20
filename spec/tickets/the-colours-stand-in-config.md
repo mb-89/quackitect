@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -169,6 +169,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-15
+    hash_before: 86bd2655e59892adebd5d925716d233748015161
+    hash_after: 86bd2655e59892adebd5d925716d233748015161
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | yes, the numbers stand in one config file and the window reads them there |; | is what the diff touches beyond the ask trivial | yes, the shared reader and the two notes the approach names |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does a retro stand in the handback | no |; | does every rule the branch adds carry a case | yes, a case per layer over a fixture root, and a case walking the window's own folder |; | does that case refuse something bad | yes, a file holding a colour number fails it by name |; TL;DR:; The road lands. `grep -rn 'lipgloss.Color(\"' src/viewer` answers the case file alone, and the window asks the config for what it wears.; `gofmt -l src` names `src/viewer/tabs.go`, and names no other file in the tree. The `openStyle` the change lifts leaves its blank line behind.; Go format rides in no gate, so this step catches that or nothing does.; The findings, one a line:; `src/viewer/tabs.go` carries a spare blank line where `openStyle` stood, and `gofmt -l src` names it. The same command over `main` names nothing.; `./RUNME.sh check` runs the cases and the rules, and reads no Go format. So the class this fault belongs to rides in no gate.; `spec/config/styles/colours.json` spells the spare list and the bold map in its comment. [[spec/design_output/viewer#colours]] spells both again, so point the comment at the chapter.; [[spec/design_output/viewer#colours]] names a colour in words for the prompt, the reply, the warning and the error. The file owns those values now, so a person editing one leaves the prose standing.; `spare` stands as a map keyed by a number written as text, and `orderedValues` sorts those keys as text. A key growing past one digit then reads out of its place.; `src/config/config_test.go` spells the colours file's path, where `coloursAt` in `src/viewer/colour.go` owns it. The fixture wants a path of its own.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | `gofmt -l src` names no file | open |; | 2 | the reflect step names the class, and says where a Go format gate stands | open |; | 3 | the colours file's comment points at the chapter | open |; | 4 | the colour words in [[spec/design_output/viewer#colours]] point at the file | open |; | 5 | the verdict hand reads the branch again | open |"
 ---
 
 # Ask
@@ -425,17 +431,73 @@ The file opens on a comment, the way every config file in the tree does. So the 
 
 <!-- the form is files -->
 
+- spec/tickets/the-colours-stand-in-config.md
+- spec/config/styles/colours.json
+- spec/design_output/viewer.md
+- spec/design_output/level0.md
+- src/config/config.go
+- src/config/config_test.go
+- src/config/go.mod
+- src/lsp/config.go
+- src/lsp/go.mod
+- src/viewer/colour.go
+- src/viewer/colour_test.go
+- src/viewer/detail_test.go
+- src/viewer/main.go
+- src/viewer/tabs.go
+- src/viewer/ui.go
+- src/viewer/go.mod
+- src/scripts/viewer.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+| the question reviewing asks | the answer |
+|---|---|
+| does the branch do what the ask asks | yes, the numbers stand in one config file and the window reads them there |
+| is what the diff touches beyond the ask trivial | yes, the shared reader and the two notes the approach names |
+| what does `./RUNME.sh check` answer | 0, with the server standing |
+| does a retro stand in the handback | no |
+| does every rule the branch adds carry a case | yes, a case per layer over a fixture root, and a case walking the window's own folder |
+| does that case refuse something bad | yes, a file holding a colour number fails it by name |
+
+TL;DR:
+
+- The road lands. `grep -rn 'lipgloss.Color("' src/viewer` answers the case file alone, and the window asks the config for what it wears.
+- `gofmt -l src` names `src/viewer/tabs.go`, and names no other file in the tree. The `openStyle` the change lifts leaves its blank line behind.
+- Go format rides in no gate, so this step catches that or nothing does.
+
+The findings, one a line:
+
+- `src/viewer/tabs.go` carries a spare blank line where `openStyle` stood, and `gofmt -l src` names it. The same command over `main` names nothing.
+- `./RUNME.sh check` runs the cases and the rules, and reads no Go format. So the class this fault belongs to rides in no gate.
+- `spec/config/styles/colours.json` spells the spare list and the bold map in its comment. [[spec/design_output/viewer#colours]] spells both again, so point the comment at the chapter.
+- [[spec/design_output/viewer#colours]] names a colour in words for the prompt, the reply, the warning and the error. The file owns those values now, so a person editing one leaves the prose standing.
+- `spare` stands as a map keyed by a number written as text, and `orderedValues` sorts those keys as text. A key growing past one digit then reads out of its place.
+- `src/config/config_test.go` spells the colours file's path, where `coloursAt` in `src/viewer/colour.go` owns it. The fixture wants a path of its own.
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | `gofmt -l src` names no file | open |
+| 2 | the reflect step names the class, and says where a Go format gate stands | open |
+| 3 | the colours file's comment points at the chapter | open |
+| 4 | the colour words in [[spec/design_output/viewer#colours]] point at the file | open |
+| 5 | the verdict hand reads the branch again | open |
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change puts each fact it adds in one place, and the note points at the file. The numbers stand in `spec/config/styles/colours.json` alone. [[spec/design_output/viewer#colours]] names the maps and carries no number. The file's comment spells the spare list the chapter spells. The chapter names a colour in words per kind the file owns. Both repeats ride in the findings.
 
 # Discussion
 
