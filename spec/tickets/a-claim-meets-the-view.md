@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -159,6 +159,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-13
+    hash_before: 0931a3bd1f73685522de4a02267896a172f834ad
+    hash_after: 0931a3bd1f73685522de4a02267896a172f834ad
+reason: done
 ---
 
 # Ask
@@ -385,21 +390,66 @@ The rule joins the fifth rule of the working note. The note's schema caps its li
 
 ## read
 
-<!-- every file you read, one a line -->
-
-<!-- the form is files -->
+- src/bridge/findings.js
+- src/scripts/cli-read.js
+- src/scripts/cli-doors.js
+- src/scripts/cli-check.js
+- test/contract/one-reading.test.js
+- spec/design_output/lsp.md
+- spec/guidance/working.md
+- spec/rationales/working.md
+- spec/schemas/guidance.schema.yaml
+- spec/guidance/review/reviewing.md
+- spec/tickets/a-claim-meets-the-view.md
+- HANDOVER.md
 
 ## verdict
 
-<!-- pass or fail, findings one a line -->
+pass
 
-<!-- the form is verdict -->
+| the question reviewing asks | the answer |
+|---|---|
+| does the branch do what the ask asks | yes, the rule, the sweep, the count and the green check each stand |
+| is what the diff touches beyond the ask trivial | yes, the diff reaches the six files the approach names |
+| what does `./RUNME.sh check` answer | 0 |
+| does a retro stand in the handback | `branch review` reads the handback and names the retro absent |
+| does every rule the change adds carry a case | yes, the guard, the count and the note's rule each carry one |
+| does a case feed the rule something bad | yes, the guard case hands a disk that holds no binary |
+
+TL;DR:
+
+- Each line of the ask lands, and `./RUNME.sh check` holds the new case green.
+- The Biome guard is the one parting, and `biomeFor` now answers both fronts.
+- Two small duplications stand, and the merge hand decides them.
+
+The findings, one a line:
+
+- `biomeFor` holds the guard alone, and `findingsFor` and `readingFor` both name Biome through it.
+- The guard case hands a disk holding no binary, and the guard answers the empty string.
+- A file breaking a rule under `spec/guidance` draws one list on each front.
+- On a tree the rules pass, the count case reads an empty list against an empty list.
+- So the count case guards a regression, and holds nothing apart on the commit the battery reads.
+- `readTools` runs again inside `readingFor`, while `cli-doors.js` already holds that survey as `known`.
+- `cli-check.js` keeps its own guard on the same path, for running the formatter.
+- `spec/rationales/working.md` argues the three grounds, and carries no argument for the clause beside them.
+- The schema caps the working note at its present list, so the clause joining the fifth rule reads right.
+- The handback carries no retro, and the branch's close writes it.
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | one guard names Biome for both fronts | closed |
+| 2 | a battery case sweeps every tracked file the way the panel does | closed |
+| 3 | the working note asks for a claim read in the owner's own view | closed |
+| 4 | `./RUNME.sh check` holds that case green | closed |
+| 5 | `readingFor` takes `known` from `cli-doors.js`, so the survey stands in one place | open |
+| 6 | the working rationale argues the clause the fifth rule takes | open |
+| 7 | the branch hands back a retro before a desk merges it | open |
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- every fact the change adds stands in one place, and a note points at the file holding it. `biomeFor` holds the guard alone, and the design chapter points at the case file.
 
 # Discussion
 
