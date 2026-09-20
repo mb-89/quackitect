@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -111,6 +111,10 @@ record:
     hash_after: a69bafd762d2e94a3e63c4bdacb8809d8cd53016
     returns: 2
     why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, it takes the road the owner rules against under `Discussion` |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the approach adds carry a case | the case it names covers the projection, which the ruling drops |; | does every claim carry a proof | yes, and the earlier findings land |; TL;DR:; The owner rules twice under `Discussion`. The redraft answers neither ruling.; The tree bears the owner out. Each file carrying that reads as the ruling says.; The three earlier findings close. A redraft keeps what they fixed.; The findings, one a line:; The draft projects a Go file. The owner rules the reader asks the config for a key.; `src/lsp/config.go` reads the three layers for a key. So a Go program reading config stands.; `SHARED` in `src/scripts/viewer.js` carries `quackitect/yaml` across programs. So a shared reader rides standing machinery.; The draft puts the values beside `level0.json`. The owner rules they stand under `spec/config/styles`.; `spec/config/projections.json` names one target under `spec/config/styles`. So a file beside it stands free.; The redraft names the command answering the shape count. It names `src/viewer/palette.go`, and it names this ticket first.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the draft takes the reader road the owner rules for | open |; | 2 | the values land under `spec/config/styles` | open |; | 3 | the draft names where the shared reader stands, and the key the viewer asks it for | open |; | 4 | the review hand reads the approach again | open |"
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 56322670ee42c5ff24f37be947fd8fecbf3a6a44
+    hash_after: 56322670ee42c5ff24f37be947fd8fecbf3a6a44
 ---
 
 # Ask
