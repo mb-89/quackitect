@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -204,6 +204,17 @@ record:
     hash_after: daeecd44452ae2fba3d998e6106a9a6ad38e5930
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 07fdeabe02a99ae84cdb21819c84c92495860afc
+    hash_after: 07fdeabe02a99ae84cdb21819c84c92495860afc
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 7 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -417,20 +428,18 @@ The smaller findings ride the same shape. `BINARY` names endings, so a file with
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-The walk answers every file now, and each caller names the part it takes.
+The split now stands where a pull hands it out, and the reader looks at bytes.
 
 | what changes | how |
 |---|---|
-| `filesUnder` | answers every file under a folder, whatever its ending |
-| `writtenFiles` | answers the ones a reader reads as text, which the rewrite takes |
-| the move | takes the whole list, so a file of any ending carries |
-| the ignore line | names the window's folder under its new name |
-| the page of markup and the vehicle note | each takes the name the code now owns |
-| `spec/tickets/the-window-splits-by-tab.md` | the folder per tab, minted where a reader finds it |
+| `spec/tickets/the-window-splits-by-tab.md` | reads `state: open`, so the queue offers it |
+| the package table | stands once, under [[spec/design_output/tui#the-packages-the-window-holds]] |
+| `readsAsText` | reads the file's own bytes, where the round before read its ending |
+| the ignore rows | name the file the build writes, and the dead pair goes |
 
-The round before this walked by a list of endings, and both callers read that as every file. So the move dropped what the list left out, and the rewrite reached neither a file without an ending nor a page of markup. A binary rode the folder move past the ignore line, and this round drops it.
+The round before minted the ticket as a draft, and a draft waits for `ticket open`. So the ask's first line stood in a file no pull offers. The ticket now stands open and free of a group. That is what a pull on trunk hands out, and the branch taking it decides its own.
 
-The park does not hold, and the verdict names that right. A note under the private folder is a thing git ignores, so a line the ask asks for stood in no tracked file. The split now stands as a ticket carrying the package table the design settled, and the branch hands it on.
+The reader of a file now looks for the byte a text file holds nowhere. An ending list is the same fault as the walk the round before this one fixed, one layer down. A picture with no ending carries its bytes now, and a case feeds the verb exactly that.
 
 What this leaves for the owner at the merge. The bare word naming the older shape stands in the window's own files, in `viewerOf`, in the binary's name and in the vocabulary. The three renames this ticket ran moved a folder, a note and a module, and each left that word alone.
 
@@ -439,9 +448,9 @@ What this leaves for the owner at the merge. The bare word naming the older shap
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The verb, its cases, the ignore line, the page of markup, the vehicle note, and the ticket this round mints.
-- every door the change reaches has a fake. Each case drives the fake disk, and the new case feeds it a file with no ending and a picture.
-- a comment names the approach the change implements. The walk's comment names what it answers, and each caller names the part it takes.
+- the change touches no file the ask leaves out. The verb, its cases, the ignore rows, the minted ticket, and the note taking the package table.
+- every door the change reaches has a fake. The case reading bytes hands its own disk, as each case beside it does.
+- a comment names the approach the change implements. The reader of bytes says why it reads them, and the note owns the table.
 
 # verdict
 
