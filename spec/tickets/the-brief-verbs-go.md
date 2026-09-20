@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -203,6 +203,17 @@ record:
     hash_after: 934280e2a9b184603d546923aafaf36334d2a048
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 2a390b9bde6b3b28ac3e5ec0c989bd693e5a3191
+    hash_after: 2a390b9bde6b3b28ac3e5ec0c989bd693e5a3191
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 24 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -381,26 +392,50 @@ What surprises: the field stood on `./RUNME.sh test`, whose last line is a durat
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/work.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The brief left the tree. A work branch carries its group ticket under `spec/tickets`, and every verb reads that one note.
+
+Each verb walked two roads before, one for a branch carrying the root handover and one for a branch carrying a group. Each walks the group road alone now:
+
+| the verb | what it reads now |
+|---|---|
+| `take` | the group's record, and it prints the ask |
+| `done` | the group's leaves, and it writes `hash_after` |
+| `release` | the group's record, which `letGo` already wrote |
+| `read` and `review` | the group ticket as the text they show |
+| `list` | the one kind, so the kind column goes |
+| `merge` | the group's state, and it drops no file |
+| `new` | goes, because the mint writes the ticket and `open` pushes the branch |
+
+The copilot lane read the root file three ways: the claim, the standing at session start, and the result at the end. Each reads the group ticket now, through `groupStanding`. Its loop over two handover paths reads the session handover alone.
+
+The review lane called its first question the brief. It calls it the ask, and the reader prompt shows the group ticket. `retroIn` goes, because `retroOnTicket` is the one road left.
+
+The session handover stays. It reaches one reader once, level zero deletes the copy it reads, and its schema governs that one path.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place, and the notes point at the file holding it
+- the name rule stands at the mint alone, so `branch open` carries no copy of it
+- each header says what its file is for, and counts nothing
 
 # verdict
 
