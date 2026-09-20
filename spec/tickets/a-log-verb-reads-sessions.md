@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -119,6 +119,17 @@ record:
     hand: box 099c2ec7708d · claude-code-remote · helper-6
     hash_before: 640a18af6e72737c2db52d8df22fa016236ee38b
     hash_after: 640a18af6e72737c2db52d8df22fa016236ee38b
+  - step: implement/tests-red
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: cf82ce2dc149bcd923863f828cf55fea28db3e6d
+    hash_after: cf82ce2dc149bcd923863f828cf55fea28db3e6d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -213,20 +224,29 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/log-verb.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Five cases go red on their own assertions. Each filter in `src/scripts/log-read.js` answers the rows whole, so each case reads back what it hands in.
+
+What surprises: the sixth case passes already. `rowsIn` composes `rowsOf` over the paths a caller hands it, and that composition needs no body of its own.
+
+The span case names the scale the review asks about. A row's stamp answers milliseconds, `spanOf` answers seconds, and `MS` in the module crosses them. The change moves that constant to the file owning the log's shapes, so the crossing stands beside `timeOf`.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the cases land in `test/level0/log-verb.test.js`, which the approach names
+- the disk stands faked through `fakeDisk`, and the filters take rows in memory
+- the header of `src/scripts/log-read.js` points at the chapter the approach names
 
 ## reflect
 

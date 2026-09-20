@@ -1,0 +1,114 @@
+// The log verb, driven through fake doors: the four filters over rows in
+// memory, and the files a span opens.
+// [[spec/design_output/log#one-verb-reads-the-log]]
+
+import assert from "node:assert/strict";
+import { join } from "node:path";
+import { test } from "node:test";
+import { OLD, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import {
+  atLevel,
+  filesFor,
+  lastOf,
+  ofKind,
+  rowsIn,
+  within,
+} from "../../src/scripts/log-read.js";
+
+const ROOT = "/tree";
+const NOW = Date.parse("2026-01-01T12:00:00.000Z");
+
+const row = (at, level, kind, said) => ({ at, level, kind, said });
+const rows = [
+  row("2026-01-01T09:00:00.000Z", "debug", "hook", "the door reads a write"),
+  row("2026-01-01T11:30:00.000Z", "info", "work", "take answered 0"),
+  row("2026-01-01T11:50:00.000Z", "warn", "hook", "the door refuses a write"),
+  row("2026-01-01T11:59:00.000Z", "error", "vale", "two lines come back"),
+];
+
+const said = (held) => held.map((one) => one.said);
+
+// [[spec/design_output/log#one-verb-reads-the-log]]
+test("a span keeps the rows stamped inside it, and drops the ones before", () => {
+  assert.deepEqual(said(within(rows, "1h", NOW)), [
+    "take answered 0",
+    "the door refuses a write",
+    "two lines come back",
+  ]);
+  assert.deepEqual(said(within(rows, "15m", NOW)), ["two lines come back"]);
+  assert.deepEqual(said(within(rows, "1d", NOW)).length, 4);
+});
+
+// [[spec/design_output/log#what-a-box-writes]]
+test("a level keeps that level and every one above it", () => {
+  assert.deepEqual(said(atLevel(rows, "warn")), [
+    "the door refuses a write",
+    "two lines come back",
+  ]);
+  assert.deepEqual(said(atLevel(rows, "debug")).length, 4);
+  assert.deepEqual(said(atLevel(rows, "fatal")), []);
+});
+
+// [[spec/design_output/log#one-verb-reads-the-log]]
+test("a kind keeps the rows of that kind, and no other", () => {
+  assert.deepEqual(said(ofKind(rows, "hook")), [
+    "the door reads a write",
+    "the door refuses a write",
+  ]);
+  assert.deepEqual(said(ofKind(rows, "nothing")), []);
+});
+
+// [[spec/design_output/log#one-verb-reads-the-log]]
+test("a count keeps the last rows, and a count past the rows keeps them all", () => {
+  assert.deepEqual(said(lastOf(rows, 2)), [
+    "the door refuses a write",
+    "two lines come back",
+  ]);
+  assert.deepEqual(said(lastOf(rows, 9)).length, 4);
+  assert.deepEqual(said(lastOf(rows, 0)).length, 4, "no count keeps every row");
+});
+
+// A rotated file carries its first stamp in its name, so a span opens the ones it reaches. [[spec/design_output/log#a-session-rotates-its-file]]
+test("a span opens the session file and every rotated file it reaches", () => {
+  const old = join(ROOT, OLD);
+  const it = {
+    root: ROOT,
+    join,
+    disk: fakeDisk({
+      [join(ROOT, SESSION)]: "",
+      [join(old, "2026-01-01T11-00-00-aaa.jsonl")]: "",
+      [join(old, "2025-12-30T08-00-00-bbb.jsonl")]: "",
+    }),
+    names: (at, end) =>
+      it.disk
+        .list(at)
+        .filter((one) => one.name.endsWith(end))
+        .map((one) => one.name),
+  };
+
+  const near = filesFor(it, "2h", NOW);
+  assert.deepEqual(near, [
+    join(old, "2026-01-01T11-00-00-aaa.jsonl"),
+    join(ROOT, SESSION),
+  ]);
+
+  const far = filesFor(it, "10d", NOW);
+  assert.equal(far.length, 3, "a wider span reaches the older file too");
+  assert.equal(far.at(-1), join(ROOT, SESSION), "the session file reads last");
+});
+
+// [[spec/design_output/log#one-verb-reads-the-log]]
+test("the rows read out of every file the span opens, in the order they stand", () => {
+  const at = join(ROOT, SESSION);
+  const it = {
+    disk: fakeDisk({
+      [at]: `${JSON.stringify(rows[0])}\n${JSON.stringify(rows[1])}\n`,
+    }),
+  };
+
+  assert.deepEqual(said(rowsIn(it, [at])), [
+    "the door reads a write",
+    "take answered 0",
+  ]);
+});
