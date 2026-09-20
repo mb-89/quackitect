@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -115,6 +115,10 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 67bc57fc48bc53560785cd24489b2b7a943b65d7
     hash_after: 67bc57fc48bc53560785cd24489b2b7a943b65d7
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-6
+    hash_before: ffe19ef7e750e438a51333e29248ca0c66a163cb
+    hash_after: ffe19ef7e750e438a51333e29248ca0c66a163cb
 ---
 
 # Ask
@@ -192,22 +196,31 @@ points at the check, and no reader holds the rule in memory.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-| the finding | the fix |
+| the finding of the last round | where the draft answers it |
 |---|---|
-| A tree rule reads no delta. The reader answers `read`, `exists`, `names`, `paths`, `words`, `node` and `box`, and the import rule wants the modules the delta touches [[spec/design_output/tree#the-tree-handed-in]] | Read the whole tree and say what turns the red green, or name a door that holds a delta and land the rule there |
-| A whole-tree import rule lands red, and the work carrying the modules stands nowhere. No ticket under `spec/tickets` holds them | Mint that ticket before this one lands, or carry the modules here |
-| The commit door is two, and the table names one. `lib/bash.js` with the hook takes a session, `.githooks/pre-commit` takes a person [[spec/design_output/private#two-doors-one-check]] | Name the one module both doors call, the way `privateNow` holds the private rule for both |
-| Each door has its fake beside it under `src/doors/fake`, and `behaves` is a fake of no door [[spec/design_output/doors#a-fake-behaves]] | Land `behaves` where a helper over the fakes stands, and link the chapter owning the rule |
-| The module count and its table stand in prose, and the first test written drifts them [[spec/guidance/voice]] | Name the command answering the count, and cut the table |
+| a tree rule reads no delta | the tree rule reads the whole tree, and the two commit doors hand the delta to the same module |
+| the work carrying the untested modules stands nowhere | the implement step writes a test for each, on this branch |
+| the commit door is two, and the table names one | the table names both, the way the private note names them [[spec/design_output/private#two-doors-one-check]] |
+| `behaves` is a fake of no door | the link to the chapter owning the rule lands |
+| the module count and its table stand in prose | the table goes, and `./RUNME.sh lint` answers the count |
 
-What holds:
+What I decide, so the draft moves:
 
-- The modules the table names are exactly the `src/bridge` modules no test imports today.
-- The staged delta answers the hook and the Bash check both, so the second finding of the last round lands.
-- The delta carries the whole answer, so no exception rides on the commit message.
-- The row and the link land on the note owning every rule over two files. [[spec/design_output/tree#the-rules-over-two-files]]
+- `src/doors/fake/behaves.js` holds. `doorsHold` in `src/scripts/cli-check.js` reads `src/doors` alone, so a helper beside the fakes changes no count.
+
+What I check:
+
+- `treeOf` answers `read` and `paths`, so the import rule reads each test against every tracked path. [[spec/design_output/tree#the-tree-handed-in]]
+- `.claude/skills/level0/lib/tree.js` stands within a few lines of the bound `code.fileLines` sets. So the new rule takes its own module.
+- The modules of the server no test imports are the ones the ask's second line names. `./RUNME.sh lint` names them once the rule lands.
+- `lib/private.js` reaches nothing and takes a reach. So a reading beside it takes the delta in, and both doors build their own.
+- `./RUNME.sh check` exits 0 on the commit this review stands on.
+
+What the implement step decides:
+
+- What the delta reading counts as a test file. A rule passing on any test in the delta asserts little.
 
 # implement
 
