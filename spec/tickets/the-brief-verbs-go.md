@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -216,6 +216,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 099c2ec7708d · claude-code-remote · helper-20
+    hash_before: cbe5bc0b8305cbfad1a524eaf49126832c6b121f
+    hash_after: ca61e937d707c1f7fa2b2c03ddbf167c20fe8dea
+    returns: 1
+    why: "`work-stands.js` drops `COL.kind`, and `work-list.js` still pads the queue place with it; the queue listing shifts its name column past single digits, because `padStart(undefined)` pads nothing; `USAGE` in `branch-usage.js` names the `new` verb, and `work.js` drops it from the verb table; `./RUNME.sh branch new <name>` prints the usage, so the row sends a reader at a verb that goes; the branch drops the case over `done` refusing a branch trunk stands ahead of; `ready` in `work.js` refuses a branch behind trunk, and no case drives that refusal; fix: give the queue place a width `work-list.js` owns, and cut the `new` row from `USAGE`; fix: drive `ready` on a branch behind trunk, so the refusal carries a case; `branch review` reads no retro on the handback, and the retro step after this one writes it; the rest reads true: every verb reads the group ticket, and `./RUNME.sh check` exits zero"
 ---
 
 # Ask
@@ -444,20 +450,84 @@ The session handover stays. It reaches one reader once, level zero deletes the c
 ## read
 
 <!-- every file you read, one a line -->
-
 <!-- the form is files -->
+
+- .claude/settings.json
+- .claude/skills/level0/lib/bash.js
+- .claude/skills/level0/lib/copilot-dispatch.js
+- .claude/skills/level0/lib/copilot-runtime.js
+- .claude/skills/level0/lib/review.js
+- spec/design_output/bash.md
+- spec/design_output/copilot.md
+- spec/design_output/extension.md
+- spec/design_output/level0.md
+- spec/design_output/private.md
+- spec/design_output/pull.md
+- spec/design_output/review.md
+- spec/design_output/schema.md
+- spec/design_output/stop.md
+- spec/design_output/work.md
+- spec/guidance/cloud.md
+- spec/guidance/review/reviewing.md
+- spec/guidance/working.md
+- spec/rationales/cloud.md
+- spec/rationales/guidance.md
+- spec/rationales/reviewing.md
+- spec/rationales/working.md
+- spec/schemas/handover.schema.yaml
+- spec/tickets/the-brief-verbs-go.md
+- spec/tickets/the-pull-splits-by-topic.md
+- spec/vocabulary/terms.yml
+- src/lsp/schema_test.go
+- src/scripts/branch-usage.js
+- src/scripts/pull-chapter.js
+- src/scripts/pull-writes.js
+- src/scripts/review.js
+- src/scripts/stand.js
+- src/scripts/trust.js
+- src/scripts/work-answer.js
+- src/scripts/work-list.js
+- src/scripts/work-merge.js
+- src/scripts/work-stands.js
+- src/scripts/work.js
+- src/yaml/yaml_test.go
+- test/contract/session.test.js
+- test/level0/copilot-dispatch.test.js
+- test/level0/copilot-runtime.test.js
+- test/level0/ready.test.js
+- test/level0/review.test.js
+- test/level0/stand.test.js
+- test/level0/trunk.test.js
+- test/level0/verbs.test.js
+- test/level0/work-doors.js
+- test/level0/work-group.test.js
+- test/level0/work-orphan.test.js
+- test/level0/work.test.js
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- `work-stands.js` drops `COL.kind`, and `work-list.js` still pads the queue place with it
+- the queue listing shifts its name column past single digits, because `padStart(undefined)` pads nothing
+- `USAGE` in `branch-usage.js` names the `new` verb, and `work.js` drops it from the verb table
+- `./RUNME.sh branch new <name>` prints the usage, so the row sends a reader at a verb that goes
+- the branch drops the case over `done` refusing a branch trunk stands ahead of
+- `ready` in `work.js` refuses a branch behind trunk, and no case drives that refusal
+- fix: give the queue place a width `work-list.js` owns, and cut the `new` row from `USAGE`
+- fix: drive `ready` on a branch behind trunk, so the refusal carries a case
+- `branch review` reads no retro on the handback, and the retro step after this one writes it
+- the rest reads true: every verb reads the group ticket, and `./RUNME.sh check` exits zero
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change adds each fact once, and `USAGE` restates the `new` verb the code drops
 
 # Discussion
 
