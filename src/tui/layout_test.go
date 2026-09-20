@@ -33,6 +33,9 @@ func importsOf(t *testing.T, folder string) map[string]bool {
 		t.Fatalf("%s holds no Go file, and each package holds one at least", folder)
 	}
 	for _, name := range names {
+		if strings.HasSuffix(name, "_test.go") {
+			continue
+		}
 		file, err := goparser.ParseFile(gotoken.NewFileSet(), name, nil, goparser.ImportsOnly)
 		if err != nil {
 			t.Fatal(err)
@@ -69,6 +72,9 @@ func TestTheRootHoldsTheWindowAlone(t *testing.T) {
 	t.Parallel()
 	names, _ := filepath.Glob("*.go")
 	for _, name := range names {
+		if strings.HasSuffix(name, "_test.go") {
+			continue
+		}
 		for _, part := range []string{"work", "record", "tail", "tree", "colour", "filter"} {
 			if strings.HasPrefix(name, part) {
 				t.Fatalf("%s stands at the root, and its package holds it", name)

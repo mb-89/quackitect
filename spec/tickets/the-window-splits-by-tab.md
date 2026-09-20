@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -160,6 +160,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: c7f49ef1f157a5332dcd1b9ce31924df2aa3d6e6
+    hash_after: c7f49ef1f157a5332dcd1b9ce31924df2aa3d6e6
+    answered:
+      - name: lint
+        exit: 0
+        said: 64 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
@@ -320,11 +328,17 @@ under an alias.
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The window's files, the build stamp and its case, the chapter, the Vale section naming a door file, and this ticket.
+- every door the change reaches has a fake. The stamp case drives the build over the fake disk and the fake process, and the window cases drive the tabs over folders a case writes.
+- a comment names the approach the change implements. Each package's files point at the chapter, and the tab interface names what the frame reads beside each method.
 
 ## tests-green
 
@@ -336,11 +350,15 @@ under an alias.
 
 <!-- the form is command -->
 
+./RUNME.sh branch test src/tui/layout_test.go test/level0/viewer.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -348,11 +366,32 @@ under an alias.
 
 <!-- the form is text -->
 
+The window's one package becomes the six the chapter names, and every import
+runs down. A reader opens one folder to read one tab.
+
+| the change | why |
+|---|---|
+| `src/tui/draw`, `src/tui/tree`, `src/tui/frame`, `src/tui/log` and `src/tui/work` | each holds what the chapter's row says, and imports what its row says |
+| the `Tab` interface grows | the frame reads no record and no ticket tree, so the keys, the mouse, the pane and the footer reach a tab through it |
+| the log tab and the work tab own their state | the model's log fields and work fields move into the tabs, and each tab exports what the window tests read |
+| the root package builds the tab list | `newModel` hands the log tab and the work tab to the frame, and `Frame` reaches the log tab's rows through its fields |
+| the build stamp walks every package | a move under a tab's folder rebuilds the viewer |
+| the Vale section for a door file reaches a package | the work tab's door runs the verbs, and the rule reads it as a door |
+| the tree gains `Append` and `CursorTo` | the work tab adds the plan's rows beside the ones the index hands over, and a case opens an edit on one column |
+
+The tests move with the code they drive. The tree's, the draw package's and
+the log's cases stand in their packages, and the window's cases stay at the
+root and reach a tab through the model.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The window's files, the build stamp and its case, the chapter, the Vale section naming a door file, and this ticket.
+- every door the change reaches has a fake. The stamp case drives the build over the fake disk and the fake process, and the window cases drive the tabs over folders a case writes.
+- a comment names the approach the change implements. Each package's files point at the chapter, and the tab interface names what the frame reads beside each method.
 
 # verdict
 

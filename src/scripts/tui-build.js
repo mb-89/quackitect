@@ -63,18 +63,33 @@ export function foldersOf(root) {
 export function sourceHash(disk, folders) {
   const parts = [];
   for (const folder of [folders].flat()) {
-    if (!disk.exists(folder)) continue;
-    const names = disk
-      .list(folder)
-      .filter((one) => one.kind === "file" && /\.(go|mod|sum)$/.test(one.name))
-      .filter((one) => !one.name.endsWith("_test.go"))
-      .map((one) => one.name)
-      .sort();
-    for (const name of names) {
-      parts.push(`${folder}/${name}${JOIN}${disk.read(`${folder}/${name}`)}`);
+    for (const path of sourcesUnder(disk, folder)) {
+      parts.push(`${path}${JOIN}${disk.read(path)}`);
     }
   }
   return hashText(parts.join(JOIN));
+}
+
+// Every source file under a folder and its packages, so a move under a tab's folder rebuilds the viewer. [[spec/design_output/tui#the-packages-the-window-holds]]
+function sourcesUnder(disk, folder) {
+  if (!disk.exists(folder)) return [];
+  const out = [];
+  for (const one of [...disk.list(folder)].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  )) {
+    if (one.kind === "dir") {
+      out.push(...sourcesUnder(disk, `${folder}/${one.name}`));
+      continue;
+    }
+    if (
+      one.kind === "file" &&
+      /\.(go|mod|sum)$/.test(one.name) &&
+      !one.name.endsWith("_test.go")
+    ) {
+      out.push(`${folder}/${one.name}`);
+    }
+  }
+  return out;
 }
 
 function built(proc, argv, cwd) {

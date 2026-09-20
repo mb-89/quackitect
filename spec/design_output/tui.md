@@ -31,10 +31,18 @@ one tab reads them all. These packages part it, and every import runs down:
 | `src/tui/work` | the work tab: its tree, its edit, its places, the index calls and the index start | the frame, the tree and the draw packages, and `quackitect/yaml` for the ticket schema |
 | `src/tui` | the window, which builds the tab list | the frame, each tab, and the draw package for the palette and the filter language |
 
-The tree files reach the frame through the draw package alone, so they part
-first. A tab package reads `model`, so each name it reads takes a capital, and
-that reaches every file naming one. [[spec/tickets/the-window-splits-by-tab]]
-carries the work.
+A tab owns its own rows and its own state, so the frame reads no record and
+no ticket tree. The `Tab` interface in `src/tui/frame/tabs.go` names what the
+frame reads of a tab. That is its first command, the arrivals and key modes it
+owns, its left side and its details, its keys and its presets. It is also a
+move and a jump, a press, the filter line, a preset's sort, and the marks the
+footer draws.
+
+The footer draws the order and the floor off the first tab, which is the log. A
+binding a tab marks as working under the filter pane reaches it while the line
+takes letters, and `alt+l` carries the mark. The build stamp walks every
+package under `src/tui`, so a move under any of them rebuilds the viewer.
+[[spec/tickets/the-window-splits-by-tab]] carries the work.
 
 # The keys
 
