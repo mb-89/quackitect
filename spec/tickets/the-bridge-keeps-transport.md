@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -108,6 +108,11 @@ record:
     hand: box fa49097ce66c · claude-code-remote
     hash_before: 9f3c045c581ee93e6956abc48aaee424f7560359
     hash_after: 9f3c045c581ee93e6956abc48aaee424f7560359
+  - step: retro/cloud
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 8882f70ac33d82ab614135f87b2b19f7208b15f3
+    hash_after: 8882f70ac33d82ab614135f87b2b19f7208b15f3
+reason: done
 ---
 
 # Ask
@@ -283,17 +288,34 @@ reads that loop as friction, and the friction is the point.
 
 <!-- the form is list -->
 
+- the box carries no editor folder, so `doctor` reads the sidebar link as absent
+- no host the proxy refused in this window, because the work reaches the tree alone
+- no install failed, and every tool the survey wants answers at `./RUNME.sh doctor`
+- no right the platform refused, and no tool call met a permission gate
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- `./RUNME.sh branch sync` reads the branch as carrying trunk, so no conflict stands
+- the write door refused a write at each voice break, and named the rule and the line
+- the private door refused a home path in a case, which then took a user naming nobody
+- the hand rule refused my own hand at each review and each verdict, so each opened a hand
+- the stop hook held the turn open, so the route ran leaf by leaf with no prompt between
+- no case fails on this box alone, and `./RUNME.sh check` answers 0 at every hand-back
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- no person step stands parked, because every leaf here takes an agent
+- the notes deciding as `became` name their successor, and nothing stands minted for them
+- `HANDOVER.md` carries those successors in a table, because the private box goes with this box
+- the handover names the timeout that reads red now and then, and how to tell it apart
 
 # Discussion
 
