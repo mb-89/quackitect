@@ -89,12 +89,18 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: e5c9abde2eab783b0474065d8ad16b1685f9e9c1
     hash_after: e5c9abde2eab783b0474065d8ad16b1685f9e9c1
+  - step: design/review
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 83db305002f2f014ced0157acea94ea6273d39b9
+    hash_after: bde5798a60bb1aedcd14793f4102e8e81173e080
+    returns: 1
+    why: "the span `--since` takes has an owner already: `spanOf` under `src/scripts/group.js`, which `work.staleAfter` reads. The lib table names none, so an implementer writes a second parser; the flags table stands on this ticket, and the approach sends the same table into the design output. Say which of the two owns it, and point the other at it; the chapter the design output takes carries no title, so a reader finds no place for it; the ask names `./RUNME.sh test`, and the approach names no case file the filters land in; the ask's install line already holds: `./RUNME.sh branch list` on a warm box prints none of it. Say that, and name the case holding it there; the two tables read true: every name under `.claude/skills/level0/lib/log.js` exports, and `src/scripts/cli.js` holds the verbs map the verb joins"
 ---
 
 # Ask
@@ -153,8 +159,16 @@ So the verb reads doors and composes, and it writes no shape of its own.
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- the span `--since` takes has an owner already: `spanOf` under `src/scripts/group.js`, which `work.staleAfter` reads. The lib table names none, so an implementer writes a second parser
+- the flags table stands on this ticket, and the approach sends the same table into the design output. Say which of the two owns it, and point the other at it
+- the chapter the design output takes carries no title, so a reader finds no place for it
+- the ask names `./RUNME.sh test`, and the approach names no case file the filters land in
+- the ask's install line already holds: `./RUNME.sh branch list` on a warm box prints none of it. Say that, and name the case holding it there
+- the two tables read true: every name under `.claude/skills/level0/lib/log.js` exports, and `src/scripts/cli.js` holds the verbs map the verb joins
 
 # implement
 
