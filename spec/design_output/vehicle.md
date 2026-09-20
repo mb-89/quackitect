@@ -116,6 +116,14 @@ Proven against a real copy, in `test/contract/vehicle.test.js`:
 A fresh copy takes two steps that any fresh clone takes: `git init`, and one
 run of `RUNME`, which surveys the tools and builds what it needs.
 
+The case runs that `RUNME` over a fake install, so it proves the verbs and
+waits for no fetch. `test/contract/fetching.js` names the wants that reach
+past the box, and the case skips every one through `SE_INSTALL_SKIP`. The copy
+borrows the method's modules through a link, and the survey this box holds.
+Its home is a folder the case makes. The stub's cases point the shim at a
+vehicle of one script the file writes. So a shim case proves the hand-over,
+and runs no install.
+
 The run bit travels with the scripts. A copy whose `RUNME.sh` arrives
 a file nobody can run answers `Permission denied`, and the vehicle stands there unable to
 take its own first step.

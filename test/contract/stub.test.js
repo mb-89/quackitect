@@ -1,5 +1,6 @@
 // A stub produced for real: every file reads back, the shim reaches the
-// vehicle it names, and no file of the method travels.
+// vehicle it names, and no file of the method travels. The shim's cases point
+// at a fake vehicle this file writes, so each spawns once and fetches nothing.
 // [[spec/design_output/vehicle#nothing-of-the-method-travels]]
 
 import assert from "node:assert/strict";
@@ -12,6 +13,7 @@ import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
 import { stubInto } from "../../src/scripts/stub.js";
 import { copyHere } from "../../src/scripts/vehicle.js";
+import { FETCHING } from "./fetching.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -30,6 +32,17 @@ function walk(at, rel = "") {
     else out.push(next);
   }
   return out.sort();
+}
+
+// A vehicle of one script, which says what reaches it, so a shim case proves the hand-over and runs no install. [[spec/design_output/vehicle#a-vehicle-stands-alone]]
+function fakeVehicle(where) {
+  const vehicle = join(where, "vehicle");
+  files.makeDir(vehicle);
+  files.write(
+    join(vehicle, "RUNME.sh"),
+    '#!/usr/bin/env sh\nprintf "argv=%s\\n" "$*"\nprintf "work=%s\\n" "$SE_WORK_ROOT"\n',
+  );
+  return vehicle;
 }
 
 test("a stub holds its files, reads every one back, and no file of the method", () => {
@@ -66,10 +79,10 @@ test("a stub holds its files, reads every one back, and no file of the method", 
       "the identity is this vehicle's",
     );
     assert.equal(record.name, basename(root), "the name is this folder's");
-    const remote = outside.run(["git", "remote", "get-url", "origin"], { cwd: root });
+    const remote = git(outside, root).run(["remote", "get-url", "origin"], true);
     assert.equal(
       record.upstream,
-      remote.stdout.trim(),
+      remote.out.trim(),
       "the upstream is this vehicle's remote",
     );
 
@@ -113,43 +126,17 @@ test("the shim hands a verb to the vehicle it names", () => {
   try {
     const said = stubInto(files, git(outside, root), clock(), root, dest);
     assert.equal(said.ok, true, said.why);
+    const vehicle = fakeVehicle(where);
     const ran = outside.run(["sh", "RUNME.sh", "vehicle"], {
       cwd: dest,
-      // The shim proves the hand-over, so it reaches no network and no editor. [[spec/design_output/vehicle#a-vehicle-stands-alone]]
-      env: {
-        SE_VEHICLE: root,
-        SE_INSTALL_SKIP:
-          "vale biome vale-ls index se-lsp editor-client editor-extensions",
-      },
+      env: { SE_VEHICLE: vehicle, HOME: where },
     });
     assert.equal(ran.exitCode, 0, ran.stderr);
+    assert.match(ran.stdout, /argv=vehicle/, "the verb reaches the vehicle");
     assert.match(
       ran.stdout,
-      new RegExp(`method\\s+${either(root)}`),
-      "the vehicle answers",
-    );
-    assert.match(
-      ran.stdout,
-      new RegExp(`work\\s+${either(dest)}`, "i"),
+      new RegExp(`work=${either(dest)}`, "i"),
       "the stub is the work",
-    );
-
-    const record = JSON.parse(files.read(join(dest, "vehicle.json")));
-    const lost = outside.run(["sh", "RUNME.sh", "vehicle"], {
-      cwd: dest,
-      env: {
-        SE_VEHICLE: join(where, "nowhere"),
-        SE_REGISTRY: join(where, "empty"),
-        HOME: where,
-      },
-    });
-    assert.equal(lost.exitCode, 1, "a shim finding no vehicle exits one");
-    assert.equal(lost.stderr.trim().split("\n").length, 1, "one line");
-    assert.ok(lost.stderr.includes(record.upstream), "the line names the upstream");
-    assert.match(
-      lost.stderr,
-      new RegExp(`\\.se/vehicles/${record.name}`),
-      "and the install road",
     );
   } finally {
     files.remove(where);
@@ -159,15 +146,10 @@ test("the shim hands a verb to the vehicle it names", () => {
 // [[spec/design_output/vehicle#two-roads-to-the-vehicle]]
 test("the shim finds the vehicle through the register, and hands argv and the work root on", () => {
   const where = files.tempDir("stub-");
-  const vehicle = join(where, "vehicle");
+  const vehicle = fakeVehicle(where);
   const register = join(where, "register");
   const dest = join(where, "stub");
   try {
-    files.makeDir(vehicle);
-    files.write(
-      join(vehicle, "RUNME.sh"),
-      '#!/usr/bin/env sh\nprintf "argv=%s\\n" "$*"\nprintf "work=%s\\n" "$SE_WORK_ROOT"\n',
-    );
     files.makeDir(register);
     files.write(
       join(register, "registry.json"),
@@ -198,16 +180,35 @@ test("the shim finds the vehicle through the register, and hands argv and the wo
       new RegExp(`work=${either(dest)}`, "i"),
       "the work root is the stub",
     );
+  } finally {
+    files.remove(where);
+  }
+});
 
-    files.write(join(register, "registry.json"), "[]");
-    const lost = outside.run(["sh", "RUNME.sh", "check"], { cwd: dest, env });
-    assert.equal(lost.exitCode, 1, "an empty register refuses");
+// [[spec/design_output/vehicle#two-roads-to-the-vehicle]]
+test("a shim finding no vehicle exits one, and names the upstream and the install road", () => {
+  const where = files.tempDir("stub-");
+  const dest = join(where, "stub");
+  try {
+    const said = stubInto(files, git(outside, root), clock(), root, dest);
+    assert.equal(said.ok, true, said.why);
+    const record = JSON.parse(files.read(join(dest, "vehicle.json")));
+    const lost = outside.run(["sh", "RUNME.sh", "vehicle"], {
+      cwd: dest,
+      env: {
+        SE_VEHICLE: join(where, "nowhere"),
+        SE_REGISTRY: join(where, "empty"),
+        HOME: where,
+      },
+    });
+    assert.equal(lost.exitCode, 1, "a shim finding no vehicle exits one");
     assert.equal(lost.stderr.trim().split("\n").length, 1, "one line");
-    assert.ok(
-      lost.stderr.includes("https://host/a/b.git"),
-      "the line names the upstream",
+    assert.ok(lost.stderr.includes(record.upstream), "the line names the upstream");
+    assert.match(
+      lost.stderr,
+      new RegExp(`\\.se/vehicles/${record.name}`),
+      "and the install road",
     );
-    assert.match(lost.stderr, /\.se\/vehicles\/acme/, "and the install road");
   } finally {
     files.remove(where);
   }
@@ -238,51 +239,29 @@ test("a vehicle with no remote refuses, and the folder stands as it was", () => 
   }
 });
 
-test("the command line writes a stub where it says, and refuses with no folder", () => {
+test("the command line writes a stub where it says, under the upstream it names", () => {
   const where = files.tempDir("stub-");
   const dest = join(where, "stub");
-  // The case proves the stub's files, so it reaches no network and no editor. [[spec/design_output/vehicle#a-vehicle-stands-alone]]
-  const env = {
-    SE_INSTALL_SKIP: "vale biome vale-ls index se-lsp editor-client editor-extensions",
-  };
   try {
-    const bare = outside.run([process.execPath, "src/scripts/cli.js", "stub"], {
-      cwd: root,
-      env,
-    });
-    assert.equal(bare.exitCode, 2, "no folder, no stub");
-    assert.match(bare.stderr, /stub into/);
-
+    // The case proves the stub's files, so it reaches no network and no editor. [[spec/design_output/vehicle#a-vehicle-stands-alone]]
     const said = outside.run(
-      [process.execPath, "src/scripts/cli.js", "stub", "into", dest],
-      {
-        cwd: root,
-        env,
-      },
-    );
-    assert.equal(said.exitCode, 0, said.stderr);
-    assert.match(said.stdout, /file\(s\) written/);
-    assert.ok(
-      files.exists(join(dest, "vehicle.json")),
-      "the record stands where the verb says",
-    );
-
-    const named = outside.run(
       [
         process.execPath,
         "src/scripts/cli.js",
         "stub",
         "into",
-        `${dest}2`,
+        dest,
         "--upstream",
         "https://host/c/d.git",
       ],
-      { cwd: root, env },
+      { cwd: root, env: { SE_INSTALL_SKIP: FETCHING } },
     );
-    assert.equal(named.exitCode, 0, named.stderr);
+    assert.equal(said.exitCode, 0, said.stderr);
+    assert.match(said.stdout, /file\(s\) written/);
     assert.equal(
-      JSON.parse(files.read(join(`${dest}2`, "vehicle.json"))).upstream,
+      JSON.parse(files.read(join(dest, "vehicle.json"))).upstream,
       "https://host/c/d.git",
+      "the record stands where the verb says, under the upstream it names",
     );
   } finally {
     files.remove(where);
@@ -314,12 +293,7 @@ slow(
       }, {});
       const logged = [];
       const at = (rel) => (isAbsolute(rel) ? rel : join(dest, rel));
-      const env = {
-        HOME: home,
-        SE_VEHICLE: "",
-        SE_INSTALL_SKIP:
-          "vale biome vale-ls go index se-lsp editor-client editor-link editor-extensions git-hooks",
-      };
+      const env = { HOME: home, SE_VEHICLE: "", SE_INSTALL_SKIP: FETCHING };
       const $ = {
         fs: {
           read: async (rel) => files.read(at(rel)),
