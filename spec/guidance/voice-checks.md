@@ -12,3 +12,10 @@ style: true
 3. Make no assertion from recall. Check it first. *
 4. Put no number in prose, because a number goes stale. A date fixing a source stands. *
 5. Make sure a thing stands nowhere already, before you write it. *
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 4 | the verb that counts the warnings | the tree holds forty warnings |
+| 5 | a search for the owner, then the write | a second copy of a standing rule |

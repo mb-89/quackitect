@@ -42,7 +42,8 @@ const RULES = `
   priority: 45
   decides: claimed
   yields: true
-  asks: Does the work stand complete?
+  runs: the-plan-is-empty
+  asks: Does the work stand complete, with no todo open in the plan and nothing in hand there?
   says: The work stands complete, so this turn ends.
 
 - id: warnings-stand-past-the-number
@@ -179,6 +180,17 @@ test("a talk stop ends the turn only where the same message carries the report",
   assert.equal(reportStands("# What the agent needs\n\nnothing under it"), false, "a heading with no row is no report");
 });
 
+// A claim of done meets the plan: a todo open or a thing in hand holds the turn, and an empty plan lets it end. [[spec/design_output/stop#the-plan]]
+test("a claim of done holds while the plan holds a todo or a thing in hand", () => {
+  const done = { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" };
+  const busy = box({ [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "the door", todos: [] }) });
+  assert.match(onStop(done, busy.box).result.block, /nothing in hand/);
+  const parked = box({ [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [{ title: "one" }] }) });
+  assert.match(onStop(done, parked.box).result.block, /no todo open/);
+  const empty = box({ [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [] }) });
+  assert.deepEqual(onStop(done, empty.box), { pass: true });
+});
+
 test("a helper's turn end passes untouched, so a refused helper answer reaches no owner turn", () => {
   const it = box();
   const said = onStop(
@@ -195,7 +207,7 @@ test("a turn with no stop line holds, and the block names the reasons", () => {
   assert.match(said.result.block, /names no stop reason/);
   assert.match(
     said.result.block,
-    /the-work-stands-complete: Does the work stand complete\?/,
+    /the-work-stands-complete: Does the work stand complete/,
   );
   assert.match(it.said[0][2], /the turn holds/);
   assert.match(

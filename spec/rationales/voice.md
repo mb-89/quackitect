@@ -43,7 +43,7 @@ many steps it runs, and a folder decides what is in it.
 A document repeating one of those makes a decision it does not own, and the two
 drift apart with nothing to catch them. A link keeps one answer.
 
-## 7. Say it once
+## 7. Single point of truth
 
 A reader meeting the same sentence twice reads neither, and the copies drift
 apart the moment somebody corrects one of them.
@@ -57,9 +57,18 @@ A count holds on the day somebody writes it and rots after, and nothing tells
 the reader which day that was. So the prose names the command and the reader
 runs it.
 
-A count of a list needs no time to go wrong. A sentence saying four regions
-above a list of six hands the reader two answers, and the list is the one that
-cannot drift.
+## 9. Self-evident facts
+
+A sentence saying what the structure beside it shows says it twice, and the
+structure is the copy that cannot drift. A count of a list needs no time to go
+wrong. A sentence saying four regions above a list of six hands the reader two
+answers. A group naming its members in its ask rots the day a child moves. The
+children under it stand right. A sentence saying two notes link says what the
+link says.
+
+The rule replaced one asking the writer to list what a compression cut. That
+rule asked for a record nobody read, and the door holds the count on its own at
+[[spec/config/styles/VoiceVale/DigitInProse.yml]].
 
 ## 10. Parallel things
 

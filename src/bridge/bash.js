@@ -169,7 +169,7 @@ function todoOnPush(command, _e, box) {
   return refusedTodo(found);
 }
 
-// A warning holds no push, because the refactoring hand drains it on the box, so no door here reads the warnings. [[spec/design_output/config#the-engine-controls]]
+// A warning reads red in the battery, so the trunk guard below holds a push over one without a rule of its own. [[spec/design_output/work#the-battery-answers-first]]
 
 // [[spec/design_output/work#a-version-branch-stands]]
 function versionGuard(command, _e, box) {

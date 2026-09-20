@@ -59,8 +59,8 @@ reply with the arrows and steps to the next row with `s`, and both hold.
 
 `e` moves to the newest line at `error`. On an error already, it moves to the
 error before it, so pressed again it walks back through them. With no error it
-leaves the selection where it stands. The help names it, and the header stays
-at three keys.
+leaves the selection where it stands. The help names it, and the header keeps
+its key count.
 
 Following is where the selection stands. On the newest row the window follows,
 and anywhere above it the window holds still while rows arrive.
@@ -92,9 +92,9 @@ open.
 
 ## A number opens a tab
 
-A number one to nine opens the tab at that place, wherever a field takes no
-letters. A number past the tabs leaves the open one alone. Nine tabs is the
-ceiling, and a tree wanting a tenth says so then.
+A number opens the tab it names, from one to nine, wherever a field takes no
+letters. A number past the tabs leaves the open one alone. The tabs top out
+at nine, and a tree wanting one more says so then.
 
 The filter line takes letters, so a number types into it, and the numbers reach
 the tabs again once it lets go.
@@ -126,15 +126,16 @@ where its thing stands off.
 | the right end | the floor, in four columns | always |
 | beside it | a funnel | a filter holds in the open tab |
 
-The floor reads as its first four letters in capitals, and wears the colour of
-the level it names, so `INFO` stands dark and `WARN` stands amber. The funnel
+The floor reads as four capital letters cut from the level's name. The floor
+wears the colour of the level it names, so `INFO` stands dark and `WARN`
+stands amber. The funnel
 stands red while a filter holds, and dark otherwise. The list grows as the tree
 grows.
 
 # The help reads the cursor
 
 `alt+?` shows the help in the pane, and it is the one way there. The help opens
-on three bands, in this order:
+on the bands below, in this order:
 
 | band | what it names |
 |---|---|
@@ -207,7 +208,7 @@ The language is KQL, the one Kibana uses, plus Lucene's `/pattern/`.
 - A bare word searches the level, the kind or tool, `said`, `text` and every field.
 - `name: value` searches one column, and a writer names any field the line carries.
 - `details: word` searches what the details show for the line.
-- A word joining two terms combines them, and terms side by side mean `and`.
+- A word joining terms combines them, and terms side by side mean `and`.
 - `val*` is the wildcard, and `/pattern/` a regular expression.
 
 Matching ignores case. A half-typed filter answers `still typing` and keeps the
@@ -270,13 +271,13 @@ the Vale styles share, and `loadColours` in `colour.go` holds what it reads.
 | `window` | the bar, the rule, the header, the open tab and the selected row |
 | `bold` | the names wearing heavy type |
 | `spare` | the colour a name both maps leave out falls back to |
-| `flags` | a lit flag by its tone: `good`, `bad`, a route's own name, or plain `on`, and one `off` |
+| `flags` | a lit flag by its tone: `good`, `bad`, a state's or a route's own name, or plain `on`, and one `off` |
 
 A kind the text column colours reads its number off the `kinds` map. So the two
 columns of one row wear one colour, and the number stands in one place.
 
 A name both maps leave out takes a spare colour by a hash of the name. So it
-wears the same colour every time. A test holds every colour in the two maps
+wears the same colour every time. A test holds every colour in both maps
 apart, and a second test asserts the shipped file holds a colour per kind.
 
 The selected row wears a bar in the gutter and the background the `window` map

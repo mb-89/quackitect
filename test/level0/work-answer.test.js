@@ -226,6 +226,21 @@ test("a ticket in hand stands at place zero", () => {
   assert.equal(place("in-hand"), "0", "a take puts the ticket at zero");
   assert.equal(place("named"), "0", "the plan's working ticket stands at zero");
   assert.equal(place("a-loose-one"), "1");
+  // A row at zero reads held, whatever its front says. [[spec/design_output/pull#the-queue-is-an-outline]]
+  assert.equal(said.loose.find((one) => one.name === "in-hand").state, "held");
+  assert.equal(said.loose.find((one) => one.name === "a-loose-one").state, "open");
+  // The work the plan names stands at zero as a row of its own where nothing carries its name. [[spec/design_output/stop#the-plan]]
+  const bare = answerOf({
+    ...doorsSaying(remoteSaying([], { "origin/main:spec/tickets/a-loose-one.md": LOOSE }), {
+      [join(ROOT, ".se/.runtime/plan.json")]: JSON.stringify({ working: "the report", todos: [] }),
+    }).it,
+    root: ROOT,
+    clock: fakeClock("2026-01-01T03:00:00.000Z"),
+  });
+  const row = bare.loose.find((one) => one.name === "the report");
+  assert.equal(row.queue, "0");
+  assert.equal(row.state, "held");
+  assert.equal(row.kind, "todo");
 });
 
 // [[spec/design_output/pull#the-queue-is-an-outline]]

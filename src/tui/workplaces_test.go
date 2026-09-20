@@ -97,7 +97,7 @@ func TestThePlacesLandOverTheTreeAndALaterTreeTakesThemAgain(t *testing.T) {
 func TestASentenceTodoLandsAsARowWithNoLink(t *testing.T) {
 	t.Parallel()
 	m := press(workWindow(t, 3), "2")
-	places, _ := placesIn([]byte(`{"branches":[],"loose":[{"name":"read the note","kind":"todo","queue":"1","todo":true,"says":"the one on the grace"}]}`))
+	places, _ := placesIn([]byte(`{"branches":[],"loose":[{"name":"read the note","kind":"todo","queue":"0","todo":true,"says":"the one on the grace"}]}`))
 	out, _ := m.Update(placesMsg{places: places})
 	m = out.(model)
 	rows := m.work.Rows(120, 8)
@@ -107,6 +107,10 @@ func TestASentenceTodoLandsAsARowWithNoLink(t *testing.T) {
 	last := m.work.Items[len(m.work.Items)-1]
 	if last.Name != "read the note" || last.Keys["kind"] != kindTodo || last.Keys[todoKey] != "true" || last.Keys["says"] != "the one on the grace" {
 		t.Fatalf("the todo row carries its kind, its todo and its says, and reads %v", last)
+	}
+	// A row at zero reads held, the sentence todo and the ticket alike. [[spec/design_output/pull#the-queue-is-an-outline]]
+	if last.Keys["state"] != heldState {
+		t.Fatalf("a todo at zero reads held, and reads %q", last.Keys["state"])
 	}
 	if m.work.LinkOf != nil && m.work.LinkOf(last) != "" {
 		t.Fatal("a sentence todo links nowhere")

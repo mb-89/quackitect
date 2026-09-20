@@ -271,3 +271,15 @@ ifVale(
     assert.ok(!(await inRegister(bare, "notes.md")).includes("DigitInProse"));
   },
 );
+
+// A count spelled in words before the things it counts meets the digit rule, and a word counting nothing passes. [[spec/guidance/voice]]
+test("a count in words before a plural meets the digit rule, and a count word alone passes", async () => {
+  const note = "spec/design_output/probe.md";
+  const counted = "Three verbs answer what their asks name, and the list has four rows.\n";
+  assert.equal(
+    (await inRegister(counted, note)).filter((one) => one === "DigitInProse").length,
+    2,
+  );
+  const quiet = "The verbs answer what their asks name, and two of them read the queue.\n";
+  assert.deepEqual((await inRegister(quiet, note)).filter((one) => one === "DigitInProse"), []);
+});

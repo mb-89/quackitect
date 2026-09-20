@@ -16,3 +16,10 @@ rationale: [[spec/rationales/testing]]
 8. Take the clock and the random source as arguments, so a failing case replays.
 9. Let every test run beside every other. A test needing an order is a red test.
 10. Read the rule on the check in [[spec/guidance/code/code]], which holds it over every change.
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 4 | a fake disk that reads what it writes | a double answering a scripted string |
+| 5 | a red test before the code | code first, a test after |

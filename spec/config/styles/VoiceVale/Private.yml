@@ -25,6 +25,14 @@ script: |
   nobody := ["user", "root", "one", "somebody", "nobody", "agent", "claude", "runner", "ubuntu", "vscode"]
   fence := "``" + "`"
 
+  // Every shape compiles once for the file, because a compile a line for each shape is what runs the rule past Vale's own clock under the battery's load.
+  compiled := []
+  for shape in shapes {
+    compiled = append(compiled, text.re_compile(shape))
+  }
+  indented := text.re_compile(`^    \S`)
+  home := text.re_compile(`^(?:/home/|/Users/|[A-Za-z]:[\\/][Uu]sers[\\/])`)
+
   lines := text.split(scope, "\n")
   matches := []
   offset := 0
@@ -41,7 +49,7 @@ script: |
       continue
     }
     if fenced { continue }
-    if text.re_match(`^    \S`, line) { continue }
+    if indented.match(line) { continue }
 
     // An inline code span is an example too, so it blanks out and the offsets
     // of everything beside it stay where they stand.
@@ -56,12 +64,12 @@ script: |
       }
     }
 
-    for shape in shapes {
-      found := text.re_find(shape, read, -1)
+    for re in compiled {
+      found := re.find(read, -1)
       if is_error(found) || found == undefined { continue }
       for hit in found {
         span := hit[0]
-        who := text.re_replace(`^(?:/home/|/Users/|[A-Za-z]:[\\/][Uu]sers[\\/])`, span.text, "")
+        who := home.replace(span.text, "")
         known := false
         for name in nobody {
           if who == name { known = true }

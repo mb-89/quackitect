@@ -8,6 +8,9 @@ export const SEVERITY = "error";
 export const HAND = "hand";
 export const ANSWERED = "answered:";
 export const GROUP = "group";
+// The chapter a hand fills at the mint, and the rule refusing a child's name in it. [[spec/design_output/work#a-group-is-a-ticket]]
+const ASK = "Ask";
+const RESTATED = "restated";
 
 // The branch a group lands on carries the group's name under this. [[spec/design_output/work#a-group-is-a-ticket]]
 const BRANCH = "work/";
@@ -70,17 +73,43 @@ export function heldGroup(text) {
 }
 
 // [[spec/design_output/schema#the-three-places]]
-export function ticketFaults(was, now, schema, where) {
+export function ticketFaults(was, now, schema, where, kids = []) {
   const note = readNote(now);
   const old = readNote(was);
-  if (!old.front.stands) return [...engineFaults(note, schema, where), ...groupFaults(note, where)];
+  if (!old.front.stands)
+    return [
+      ...engineFaults(note, schema, where),
+      ...groupFaults(note, where),
+      ...askFaults(note, where, kids),
+    ];
 
   return [
     ...verbFaults(old, note, schema, where),
     ...placeFaults(old, note, schema, where),
     ...engineFaults(note, schema, where),
     ...groupFaults(note, where),
+    ...askFaults(note, where, kids),
   ];
+}
+
+// A group's children stand under it already, so an ask naming one says it twice, and the copy in prose is the one that rots. [[spec/design_output/work#a-group-is-a-ticket]]
+function askFaults(note, where, kids) {
+  const ask = note.sections.find((one) => one.level === 1 && one.header.trim() === ASK);
+  if (!ask || !kids.length) return [];
+  const out = [];
+  ask.own.forEach((line, at) => {
+    const named = kids.find((kid) => kid && line.includes(kid));
+    if (!named) return;
+    out.push(
+      fault(
+        RESTATED,
+        where,
+        ask.line + at + 1,
+        `the ask names ${named}, which stands under the group already. Cut the name, and let the children say it.`,
+      ),
+    );
+  });
+  return out;
 }
 
 // A group is a ticket, and its own name is the spelling the pull reads. A child naming the branch instead stands outside every group, and its group closes over it. [[spec/design_output/work#a-group-is-a-ticket]]

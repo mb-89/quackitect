@@ -27,7 +27,7 @@ without it. A tool this tree asks no version of carries its path alone.
 # Reading the path variable
 
 The survey looks in `.se/.runtime/bin` first, then in each folder the path variable
-names. Two variables shape that walk, and neither names a platform:
+names. The variables below shape that walk, and neither names a platform:
 
 | variable | says |
 |---|---|

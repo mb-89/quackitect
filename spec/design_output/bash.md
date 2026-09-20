@@ -172,7 +172,7 @@ no argument and answers one constant string.
 
 # What stands unproven
 
-Two things here rest on the type declaration alone, so read them again before
+The claims below rest on the type declaration alone, so read them again before
 you trust them:
 
 | the claim | why it stands unproven |
@@ -187,7 +187,7 @@ name costs a silent hook and no error.
 # What every refusal owes
 
 A refusal that only says no teaches nothing. `refusedCommand` in
-`lib/refuse.js` writes each one, and every finding names three things:
+`lib/refuse.js` writes each one, and every finding names what stands below:
 
 - the rule, by the name a person greps for
 - what the door reads, as the path, the name or the command

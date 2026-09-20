@@ -83,7 +83,7 @@ record:
 
 # Ask
 
-Four findings the desk parked as private notes, each a defect an agent fixes with no word from the owner. `a-test-importing-cli-exits` guards the command line's main, `the-battery-flickers-under-load` holds the check one colour under load, `the-respawn-answers-no-server` logs a fallen server, and `the-stop-line-loops-forever` ends a turn past the tooth's number.
+The findings the desk parked as private notes, each a defect an agent fixes with no word from the owner.
 
 # sync
 
