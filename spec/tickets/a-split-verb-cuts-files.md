@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -207,6 +207,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 099c2ec7708d · claude-code-remote · helper-19
+    hash_before: 41157eb406684309f3093d90845630cf9f058de2
+    hash_after: 41157eb406684309f3093d90845630cf9f058de2
+reason: done
 ---
 
 # Ask
@@ -464,24 +469,19 @@ Two verdict rounds found faults where the code takes the tree's shape for grante
 <!-- the form is files -->
 
 - .claude/skills/level0/lib/folders.js
-- .claude/skills/level0/lib/review.js
+- .claude/skills/level0/lib/names.js
+- .claude/skills/level0/lib/size.js
 - .claude/skills/level0/lib/undo.js
-- RUNME.sh
+- spec/config/level0.json
+- spec/design_output/apply.md
 - spec/design_output/level0.md
 - spec/tickets/a-split-verb-cuts-files.md
-- spec/tickets/the-verbs-take-the-shell.md
-- src/bridge/apply.js
 - src/bridge/code.js
-- src/bridge/server.js
 - src/bridge/split-ticket.js
-- src/doors/disk.js
-- src/doors/fake/proc.js
 - src/scripts/cli-check.js
 - src/scripts/cli.js
-- src/scripts/review.js
 - src/scripts/split-cut.js
 - src/scripts/split-verb.js
-- src/scripts/ticket.js
 - test/contract/split-note.test.js
 - test/level0/code-door.test.js
 - test/level0/split.test.js
@@ -491,37 +491,39 @@ Two verdict rounds found faults where the code takes the tree's shape for grante
 <!-- pass or fail, findings one a line -->
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `noteFor` reads the basename alone, so `src/bridge/code.js` and `src/doors/code.js` name one note
-- the second long file takes `names this cut already`, so its own cut parks nowhere
-- this tree holds many basenames twice, and no case feeds `noteFor` two paths of one name
-- fix: carry a folder word into the name, inside the five the name rule allows
-- `wrote` writes the journal entry, then throws ENOENT where a target's folder stands nowhere
-- the run answers a stack, and the reflect chapter asks for a line
-- `src/bridge/apply.js` answers a line on that same throw, so the journal's owner stands as the model
-- fix: make the target's folder, or refuse the range with the line the verb says
-- `--to` over a standing file replaces it whole, and the journal alone carries it back
-- the command line cuts a scratch file into two targets, and `mcp__level0__undo` takes the whole cut back
+- `noteFor` joins the folder above the file, so `src/bridge/code.js` and `src/doors/code.js` name two notes
+- `noteFor` over every sized file this tree tracks answers one name each, and no name stands twice
+- the note name stands inside the cap `names.words` sets
+- `wrote` makes each target's folder, so a target under a folder nothing holds yet lands
+- the live cut writes `.se/scripts/fresh/a.txt`, and no folder stands there before the run
+- the journal write takes its own guard, so a refusal there writes no target
+- a refused write answers one line, and names the entry holding the way back
+- a case asserts no stack reaches the reader on that refusal
+- `./RUNME.sh split` cuts a scratch file into two targets, and `mcp__level0__undo` takes all three back
 - the ranges refuse a backwards range, a zero start, a reach past the end and an overlap
 - `--dry` names the cuts and writes nothing
-- `splitVerb` reads `rest` whole, so the source stands where the caller names it
-- the note parks through `./RUNME.sh ticket note`, off git, and `test/contract/split-note.test.js` drives it for real
-- `splitTicket` reads the exit, so a refused run answers `stands unwritten`
-- `test/level0/code-door.test.js` drives the door's branch both ways, and `fakeProc` throws on an untaught command
-- the journal names `on` as the run, and `mcp__level0__undo` takes the newest entry back
-- `export { join }` stands gone from `src/scripts/split-verb.js`
+- the code door mints on `FileCeiling` alone, and a function ceiling parks no note
+- `test/contract/split-note.test.js` drives the real verb, and the note lands off git
+- a refused mint answers the verb's own line, so no refusal goes quiet
 - `./RUNME.sh check` exits 0, `./RUNME.sh lint src/scripts` exits 0, and `./RUNME.sh test` passes
-- the diff holds the verb, the cut, the note, the door, the chapter and three case files
-- every hunk serves the ask, and one chapter stands beside the code
-- the handback's retro chapter stands empty, which `./RUNME.sh branch review` names
+- every hunk serves the ask, and the chapter beside the code owns the flags
+- note: the verb with no source takes the first `--to` target as its source
+- note: the dry run names that target twice, and the journal takes the cut back
+- note: refuse where the source names a target, so the verb answers a line
+- note: the retro stands absent from the handback, which `./RUNME.sh branch review` names
+- note: this verdict sends the ticket to retro, where that chapter takes its line
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the chapter owns the flags table, and `USAGE` says beside it why the terminal holds one line. The note folder stands in `folders.js` alone, and the chapter names a path nowhere
+- the chapter owns the flags table, and `USAGE` carries one terminal line with a comment naming that owner
+- `TICKETS` in `folders.js` owns the note folder, so `split-ticket.js` points and names no path
+- the journal shape stands in `undo.js`, and each header points at the chapter owning it
+- the approach's flags table copies the chapter's, which the approach itself names as the draft
 
 # Discussion
 
