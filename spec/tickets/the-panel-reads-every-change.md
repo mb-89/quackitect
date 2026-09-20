@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -107,6 +107,11 @@ record:
     hand: box 5fb6c1c050cd · claude-code-remote
     hash_before: 82cf68778d31bc61db4e7248843c39293e5bda5c
     hash_after: 82cf68778d31bc61db4e7248843c39293e5bda5c
+  - step: retro/cloud
+    hand: box 5fb6c1c050cd · claude-code-remote
+    hash_before: f72af47ac606e554e359c8abbe0cce75cb8ad8c9
+    hash_after: f72af47ac606e554e359c8abbe0cce75cb8ad8c9
+reason: done
 ---
 
 # Ask
@@ -247,6 +252,8 @@ The door fix lands here because the branch stands otherwise.
 
 <!-- the form is list -->
 
+- no tool, host, right or install stands missing. The setup installs Vale, Biome, both language servers and the index at the take.
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
@@ -265,6 +272,10 @@ The door fix lands here because the branch stands otherwise.
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- no person step stands parked
+- no ticket stands minted with no group
+- the handover: trunk carries none, and this branch writes none. The retro above and the done line say what the next box reads.
 
 # Discussion
 
