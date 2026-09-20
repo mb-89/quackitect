@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -203,6 +203,10 @@ record:
     hash_after: 0a7d3bafd69120926468721523ec2db41286dc4f
     returns: 1
     why: "the ask holds: `./RUNME.sh log` narrows the rows by span, level, kind and count; `./RUNME.sh check` answers exit 0 on this commit; `./RUNME.sh branch review the-verbs-take-the-shell` answers check passes, and no retro stands; the diff beyond the ask holds two trivial hunks, and neither redesigns what the ask leaves alone; the clock door lands in `src/scripts/cli-check.js`, and `MS` points home from `src/scripts/work-stands.js`; the cases cover each filter, and the install case goes red where a guard falls off a `say` line; the design review asks for one `MS` owner, and two copies stand outside the log lib; fix: `src/bridge/stop.js` and `src/scripts/queue.js` each keep an `MS` of their own, so point both at the lib; fix: `src/scripts/log-verb.js` copies the no-log line out of `src/scripts/tui.js`, so give it one owner"
+  - step: implement/reflect
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 62cfe183d9ec1ca0aa9d642c6f270842be93abc5
+    hash_after: 62cfe183d9ec1ca0aa9d642c6f270842be93abc5
 ---
 
 # Ask
@@ -332,14 +336,30 @@ A row's stamp answers milliseconds, `spanOf` answers seconds, and `MS` crosses t
 ### class
 
 <!-- the class of error the findings describe, and the fix for the class -->
-
 <!-- the form is text -->
+
+A move names one owner, and the copies outside the moved file stand on. Both findings name one thing spelled twice.
+
+| what carries two spellings | where the second stands |
+|---|---|
+| the seconds a stamp costs | `src/bridge/stop.js` and `src/scripts/queue.js` |
+| the line a reader meets where no log stands | `src/scripts/log-verb.js`, beside `src/scripts/tui.js` |
+
+The fix for the class runs in two reads:
+
+- grep the tree for the value, then for the sentence, and read each hit
+- point every hit at the owner, so the grep answers one place
+
+A move that leaves a copy standing costs the next reader a search, which the grep above ends.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the fix touches the two modules keeping their own copy, and the verb the change adds
+- the doors stand untouched, so every case beside them reads as it reads
+- the class above names the approach each hunk follows
 
 ## change
 
