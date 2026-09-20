@@ -231,3 +231,21 @@ What this box leaves for a person:
 - a private note under the box names a take-back sweeping a sibling's work into one commit
 
 The read tools stood absent until the server came up, which [[spec/tickets/the-read-tools-answer-first]] names. So the early reads ran through the shell, which is the fault this group opens on.
+
+A second box hands it on. Ten of the twelve children close, and two stand open:
+
+| the child | where it stands | what it wants |
+|---|---|---|
+| [[spec/tickets/the-commit-verb-lints-messages]] | `implement/tests-red` | its approach passes, so the cases come next |
+| [[spec/tickets/the-read-tools-answer-first]] | `design/review` | a hand other than this box reads the approach |
+
+What this box learns, for the hand after it:
+
+- a `verdict` and a `design/review` each want a hand of their own, which the pull's spawn answer names
+- a helper reads its findings against the tree, and every round of that catches a real fault
+- a fake agreeing with the code hides what a contract case catches, so drive the real thing
+- a refused payload reaches no disk, so a field breaking a rule leaves the old text standing
+- `./RUNME.sh ticket pull --drop` frees a hand, and `--back <leaf>` then moves a ticket to a leaf it answers
+- `./RUNME.sh check` wants the server, which `./RUNME.sh serve` starts, and a long run outlives it
+
+Two private notes stand under the box for the retro: one on a take-back, and one on the split verb's source reading.
