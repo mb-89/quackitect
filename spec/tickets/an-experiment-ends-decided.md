@@ -89,12 +89,18 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 5dfb13d2512cf94223b9febb353210abd4b5ae9e
     hash_after: 5dfb13d2512cf94223b9febb353210abd4b5ae9e
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-2
+    hash_before: 5bb6d89f88172d1b5129caec03d9ac08284274b8
+    hash_after: 5bb6d89f88172d1b5129caec03d9ac08284274b8
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, the removals reach past what it names |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |; | does every rule the approach adds carry a test | no, the retro's hold names none |; | what grade do the findings take | design, each one decides what the approach does |; Findings, one a line:; Name the decision each of the two plugins takes, so its row reaches a named end.; Name where the code of each leaving plugin lands, because the ask reads both as live.; The reach misses the tests importing the level one path: `test/level0/level1.test.js`, `test/level0/hand.test.js`, `test/contract/tree.test.js`.; `.claude/skills/pane/tests/pane.test.ts` stands inside a folder that leaves, so name its new home.; `./RUNME.sh links` answers the notes alone, so name the command answering the code reaching a path.; Name the step of the retro's route holding the refusal, and the test feeding it an open trial.; The retro's audit checklist already asks that every experiment stands decided, so say which of the two owns the rule."
 ---
 
 # Ask
@@ -158,9 +164,26 @@ so the removal reaches each one.
 
 ### verdict
 
-<!-- pass or fail, with findings one a line -->
+fail
 
-<!-- the form is verdict -->
+| the question reviewing asks | the answer |
+|---|---|
+| does the approach answer the ask | no, the removals reach past what it names |
+| is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |
+| what does `./RUNME.sh check` answer | 0 on this commit |
+| does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |
+| does every rule the approach adds carry a test | no, the retro's hold names none |
+| what grade do the findings take | design, each one decides what the approach does |
+
+Findings, one a line:
+
+- Name the decision each of the two plugins takes, so its row reaches a named end.
+- Name where the code of each leaving plugin lands, because the ask reads both as live.
+- The reach misses the tests importing the level one path: `test/level0/level1.test.js`, `test/level0/hand.test.js`, `test/contract/tree.test.js`.
+- `.claude/skills/pane/tests/pane.test.ts` stands inside a folder that leaves, so name its new home.
+- `./RUNME.sh links` answers the notes alone, so name the command answering the code reaching a path.
+- Name the step of the retro's route holding the refusal, and the test feeding it an open trial.
+- The retro's audit checklist already asks that every experiment stands decided, so say which of the two owns the rule.
 
 # implement
 
