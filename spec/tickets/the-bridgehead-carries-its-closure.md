@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box 201f76ea75a2 · claude-code-remote
@@ -95,6 +95,14 @@ record:
     hand: the engine
     hash_before: c209b93a568d9aafb7e4e7ebc2262c7b6d59987d
     hash_after: c209b93a568d9aafb7e4e7ebc2262c7b6d59987d
+  - step: retro/notes
+    hand: box 201f76ea75a2 · claude-code-remote
+    hash_before: 38406ac0fe1187ec48b04a257309ea3e093db53a
+    hash_after: 38406ac0fe1187ec48b04a257309ea3e093db53a
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -142,7 +150,7 @@ A stub carries every file its bridgehead imports, and a dead server costs one ro
 
 <!-- retro notes, which passes when the private folder is empty -->
 
-<!-- the form is command -->
+    ./RUNME.sh retro notes
 
 ## write
 
