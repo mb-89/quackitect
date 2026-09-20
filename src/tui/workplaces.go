@@ -27,6 +27,7 @@ const placesWait = 60 * time.Second
 type workPlaces struct {
 	queue map[string]string
 	cloud map[string]bool
+	todo  map[string]bool
 }
 
 type placesMsg struct {
@@ -38,6 +39,7 @@ type placesMsg struct {
 type answerRow struct {
 	Name    string      `json:"name"`
 	Queue   string      `json:"queue"`
+	Todo    bool        `json:"todo"`
 	Merged  bool        `json:"merged"`
 	Tickets []answerRow `json:"tickets"`
 }
@@ -51,7 +53,7 @@ func placesIn(said []byte) (workPlaces, error) {
 	if err := json.Unmarshal(said, &answer); err != nil {
 		return workPlaces{}, err
 	}
-	out := workPlaces{queue: map[string]string{}, cloud: map[string]bool{}}
+	out := workPlaces{queue: map[string]string{}, cloud: map[string]bool{}, todo: map[string]bool{}}
 	for _, one := range answer.Branches {
 		// A branch row stands for its group, and a merged one stands for a group off the cloud. [[spec/design_output/work#a-row-per-group]]
 		if !one.Merged {
@@ -73,6 +75,7 @@ func (p workPlaces) place(one answerRow) {
 	if one.Queue != "" {
 		p.queue[one.Name] = one.Queue
 	}
+	p.todo[one.Name] = one.Todo
 }
 
 // The places laid over the tree's items, so the queue column and the cloud letter read them. [[spec/design_output/tui#the-work-tab]]
@@ -80,6 +83,10 @@ func (t *Tree) Placed(p workPlaces) {
 	t.Amend(func(one *Item) {
 		one.Keys[queueKey] = p.queue[one.Name]
 		one.Keys[cloudKey] = flagOf(p.cloud[one.Name])
+		// The todo letter reads the verb's answer, which folds the override on this box into the front's tag. [[spec/design_output/pull#a-todo-forces-a-place]]
+		if said, held := p.todo[one.Name]; held {
+			one.Keys[todoKey] = flagOf(said)
+		}
 	})
 }
 

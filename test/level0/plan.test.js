@@ -61,6 +61,8 @@ test("one call adds todos at their place, finishes some, and names the work in h
     ["write the test"],
   );
   assert.ok(it.disk.exists(at(PLANS)), "the plan stands in the runtime file");
+  // The plan carries the overrides a place writes, and an empty map where none stands. [[spec/design_output/pull#a-todo-forces-a-place]]
+  assert.deepEqual(held.places, {}, "the places stand as a map, empty until a place is written");
 });
 
 // Past the number, a new todo stays out, and the answer says to finish one or write a ticket. [[spec/design_output/stop#the-plan]]

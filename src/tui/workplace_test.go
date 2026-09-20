@@ -4,6 +4,7 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -19,6 +20,22 @@ func placedWindow(t *testing.T) (model, string) {
 	places, _ := placesIn([]byte(`{"branches":[{"name":"one-group","queue":"1","tickets":[{"name":"a-child","queue":"1.1"}]}],"loose":[{"name":"a-loose-one","queue":"2"}]}`))
 	m.work.Placed(places)
 	return m, root
+}
+
+// The override a place writes, off the plan file on this box, and nothing where none stands. [[spec/design_output/pull#a-todo-forces-a-place]]
+func placeIn(t *testing.T, root, name string) string {
+	t.Helper()
+	text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(planAt)))
+	if err != nil {
+		return ""
+	}
+	var plan struct {
+		Places map[string]string `json:"places"`
+	}
+	if err := json.Unmarshal(text, &plan); err != nil {
+		t.Fatal(err)
+	}
+	return plan.Places[name]
 }
 
 func frontAt(t *testing.T, root, name string) string {
@@ -40,11 +57,11 @@ func TestPThenADigitWritesTheTodoTheQueueReads(t *testing.T) {
 		t.Fatalf("p opens the chord and says what it waits for, and the tab says %q", m.workNotice)
 	}
 	m = pressed(m, "1")
-	if m.placing || !strings.Contains(frontAt(t, root, "a-loose-one"), "todo: true") {
+	if m.placing || placeIn(t, root, "a-loose-one") != "true" || strings.Contains(frontAt(t, root, "a-loose-one"), "todo") {
 		t.Fatalf("place 1 writes a bare todo, and the front reads:\n%s", frontAt(t, root, "a-loose-one"))
 	}
 	m = pressed(toRow(m, "one-group"), "p", "2")
-	if !strings.Contains(frontAt(t, root, "one-group"), "todo: last") {
+	if placeIn(t, root, "one-group") != "last" {
 		t.Fatalf("the last place reads last, and the front reads:\n%s", frontAt(t, root, "one-group"))
 	}
 	m = pressed(toRow(m, "a-child"), "p", "1")
@@ -52,18 +69,18 @@ func TestPThenADigitWritesTheTodoTheQueueReads(t *testing.T) {
 	m = pressed(toRow(m, "one-group"), "p", "1")
 	m.work.Items[0].Keys[queueKey], m.work.Items[1].Keys[queueKey] = "2", "1"
 	m = pressed(toRow(m, "one-group"), "p", "2")
-	if !strings.Contains(frontAt(t, root, "one-group"), "todo: last") {
+	if placeIn(t, root, "one-group") != "last" {
 		t.Fatalf("two rows at a level put the second last, and the front reads:\n%s", frontAt(t, root, "one-group"))
 	}
 	m.work.Items = append(m.work.Items, Item{Name: "third", Keys: map[string]string{queueKey: "3", "path": "spec/tickets/third.md"}})
 	m.work.Items[0].Keys[todoKey] = ""
 	m = pressed(toRow(m, "one-group"), "p", "2")
-	if !strings.Contains(frontAt(t, root, "one-group"), "todo: third") {
+	if placeIn(t, root, "one-group") != "third" {
 		t.Fatalf("place 2 names the row standing there, and the front reads:\n%s", frontAt(t, root, "one-group"))
 	}
 	// The same place again takes the todo off. [[spec/design_output/pull#a-todo-forces-a-place]]
 	m = pressed(toRow(m, "one-group"), "p", "2")
-	if strings.Contains(frontAt(t, root, "one-group"), "todo") || m.work.PlaceOf("one-group") != 2 {
+	if placeIn(t, root, "one-group") != "" || m.work.PlaceOf("one-group") != 2 {
 		t.Fatalf("the same digit again clears the todo, and the front reads:\n%s", frontAt(t, root, "one-group"))
 	}
 	m = pressed(toRow(m, "one-group"), "p", "5")

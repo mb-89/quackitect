@@ -329,7 +329,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// The place chord takes the next key, digit or not. [[spec/design_output/tui#the-work-tab-takes-edits]]
 		if m.placing {
 			m.placeAt(msg.String())
-			return m, nil
+			// The plan file wakes no index, so the tab asks the verb again itself. [[spec/design_output/pull#a-todo-forces-a-place]]
+			return m, placesCmd(workRoot(m.path))
 		}
 		return m.key(msg.String())
 

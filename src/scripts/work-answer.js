@@ -28,7 +28,7 @@ import { staleClaim } from "./work-free.js";
 import { readWork, standingAll } from "./work-stands.js";
 
 // [[spec/design_output/work#one-reading-answers-git]]
-export function rowOfTicket(one, places, stood = new Map(), open = new Set()) {
+export function rowOfTicket(one, places, stood = new Map(), open = new Set(), overrides = {}) {
   const said = {
     name: one.name,
     // A ticket is a ticket or a group, and the tab draws which. [[spec/design_output/tree-view#the-columns-read-the-item]]
@@ -42,7 +42,7 @@ export function rowOfTicket(one, places, stood = new Map(), open = new Set()) {
     person: personStep(one.text),
     held: Boolean(heldIn(one.text)),
     waits: dependsOn(frontOf(one.text)).some((dep) => open.has(dep)),
-    todo: todoOf(frontOf(one.text)) !== "",
+    todo: todoOf(frontOf(one.text)) !== "" || Boolean(overrides[one.name]),
     // The whole ask travels, because the details draw it whole and the table draws none of it. [[spec/design_output/tui#the-work-tab]]
     says: askOf(one.text),
   };
@@ -108,8 +108,8 @@ export function placesIn(it, read, stood) {
   const at = { clock: it.clock, weights: it.weights, stood };
   // A person's step and a draft wait on a person. The agent's takeable steps count next, and every other open ticket after them. [[spec/design_output/pull#the-queue-is-an-outline]]
   // A ticket a hand holds, or the one the plan names, stands at zero. [[spec/design_output/pull#the-queue-is-an-outline]]
-  const working = workingHere(it);
-  const inHand = open.filter((one) => Boolean(heldIn(one.text)) || one.name === working);
+  const plan = planHere(it);
+  const inHand = open.filter((one) => Boolean(heldIn(one.text)) || one.name === plan.working);
   const free = open.filter((one) => !inHand.includes(one));
   const persons = queued(free.filter(waitsOnPerson), all, at);
   const agents = queued(
@@ -122,15 +122,16 @@ export function placesIn(it, read, stood) {
     all,
     at,
   );
-  return outlineIn(persons, inHand, [...agents, ...back], all);
+  return outlineIn(persons, inHand, [...agents, ...back], all, plan.places);
 }
 
-// The ticket or todo the plan names as the work in hand, off the box's plan file. [[spec/design_output/stop#the-plan]]
-function workingHere(it) {
+// The plan this box holds: the work in hand, and the overrides a place writes, off the plan file. [[spec/design_output/stop#the-plan]]
+export function planHere(it) {
   try {
-    return String(JSON.parse(it.disk.read(it.join(it.root, ...PLANS.split("/")))).working ?? "");
+    const said = JSON.parse(it.disk.read(it.join(it.root, ...PLANS.split("/"))));
+    return { working: String(said?.working ?? ""), places: said?.places ?? {} };
   } catch {
-    return "";
+    return { working: "", places: {} };
   }
 }
 
@@ -149,6 +150,8 @@ export function answerOf(it, queue = true) {
   const now = it.clock ? it.clock.now().getTime() : 0;
   const stood = queue ? stoodHere(it) : new Map();
   const places = queue ? placesIn(it, read, stood) : new Map();
+  // The overrides light the todo letter, so a person reads which rows a place moves. [[spec/design_output/pull#a-todo-forces-a-place]]
+  const overrides = planHere(it).places;
   // A branch row stands for its group, so a trunk ticket under that group rides the branch and no other row. [[spec/design_output/work#one-verb-answers-git]]
   const branched = new Set(read.stand.map((one) => one.name));
   // A ticket waiting on one still open carries the flag saying so. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
@@ -181,13 +184,13 @@ export function answerOf(it, queue = true) {
         ...(place === undefined ? {} : { queue: place }),
         tickets: one.tickets
           .filter((child) => fieldOf(child.text, GROUP) === one.name)
-          .map((child) => rowOfTicket(child, places, stood, open)),
+          .map((child) => rowOfTicket(child, places, stood, open, overrides)),
       };
     }),
     // Every other ticket on trunk stands here, a group among them, and the tab nests each one under the group it names. [[spec/design_output/tree-view#the-name-column-nests]]
     loose: [...read.loose, ...read.private]
       .filter((one) => !branched.has(one.name) && !branched.has(fieldOf(one.text, GROUP)))
-      .map((one) => rowOfTicket(one, places, stood, open)),
+      .map((one) => rowOfTicket(one, places, stood, open, overrides)),
   };
 }
 

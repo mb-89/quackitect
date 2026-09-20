@@ -7,7 +7,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"sort"
 )
 
@@ -36,10 +39,6 @@ func (m *model) placeAt(key string) {
 	if len(key) != 1 || key[0] < firstPlace || key[0] > lastPlace {
 		return
 	}
-	if why := m.ticketRules().refuses(todoKey); why != "" {
-		m.workNotice = why
-		return
-	}
 	one := m.work.Selected()
 	if one == nil {
 		return
@@ -60,13 +59,43 @@ func (m *model) placeAt(key string) {
 		m.workNotice = fmt.Sprintf("%d rows stand at this level, so no row stands at %d", len(beside)+1, n)
 		return
 	}
-	setValue(one, todoKey, value)
-	setValue(one, editedKey, todoKey)
-	if err := writeTicket(workRoot(m.path), *one); err != nil {
+	// The override lands in the plan file on this box, so the ticket's front stays as it is and nothing travels. [[spec/design_output/pull#a-todo-forces-a-place]]
+	setValue(one, todoKey, flagOf(value != flagOff))
+	if err := writePlace(workRoot(m.path), one.Name, value); err != nil {
 		m.workNotice = err.Error()
 		return
 	}
 	m.workNotice = fmt.Sprintf("%s takes place %d once the queue reads it", one.Name, n)
+}
+
+// The plan file this box holds, whose folder folders.js owns and whose name lib/runs.js owns, spelled again here because a Go module imports neither. [[spec/design_output/stop#the-plan]]
+const planAt = ".se/.runtime/plan.json"
+
+// The override lands under places in the plan file, and the same place again takes it out. [[spec/design_output/pull#a-todo-forces-a-place]]
+func writePlace(root, name, value string) error {
+	file := filepath.Join(root, filepath.FromSlash(planAt))
+	plan := map[string]any{}
+	if text, err := os.ReadFile(file); err == nil {
+		_ = json.Unmarshal(text, &plan)
+	}
+	places, _ := plan["places"].(map[string]any)
+	if places == nil {
+		places = map[string]any{}
+	}
+	if value == flagOff {
+		delete(places, name)
+	} else {
+		places[name] = value
+	}
+	plan["places"] = places
+	said, err := json.MarshalIndent(plan, "", "  ")
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(file), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(file, append(said, '\n'), 0o644)
 }
 
 // The place a row holds at its own level, counted from one, and zero where it holds none. [[spec/design_output/pull#a-todo-forces-a-place]]

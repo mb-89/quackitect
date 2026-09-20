@@ -234,6 +234,19 @@ test("an outline place compares segment by segment, and the unplaced stands last
   assert.deepEqual(sorted, ["-2", "-1", "1", "1.2", "1.10", "2", "10"]);
 });
 
+// The override lives in the plan file on this box, over the front, and lights the todo letter. [[spec/design_output/pull#a-todo-forces-a-place]]
+test("an override in the plan file moves the row and lights its todo, and travels into no ticket", () => {
+  const { it } = doors({
+    [join(ROOT, ".se/.runtime/plan.json")]: JSON.stringify({ places: { "a-loose-one": "true" } }),
+  });
+  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
+  const said = answerOf(it);
+  const row = said.loose.find((one) => one.name === "a-loose-one");
+  assert.equal(row.queue, "1", "the override puts the row first");
+  assert.equal(row.todo, true, "the override lights the todo");
+  assert.equal(said.branches[0].queue, "2");
+});
+
 // A place a person writes stands on the disk before any commit, and the verb reads it there. [[spec/design_output/pull#a-todo-forces-a-place]]
 test("the desk's own copy of a trunk ticket outranks git's, so a todo moves the row at once", () => {
   const { it } = doors({

@@ -11,12 +11,12 @@ export const FIRST = "first";
 export const LAST = "last";
 
 // The outline, a place a name. The person's list comes first and counts down, the others count up, and a ticket in no list takes no place. [[spec/design_output/pull#the-queue-is-an-outline]]
-export function outlineIn(persons, held, rest, all) {
+export function outlineIn(persons, held, rest, all, places = {}) {
   const ordinal = new Map();
   for (const one of [...persons, ...held, ...rest]) {
     if (!ordinal.has(one.name)) ordinal.set(one.name, ordinal.size);
   }
-  const kids = kidsOf(all);
+  const kids = kidsOf(all, places);
   const best = new Map();
   const roots = all
     .map((one) => one.name)
@@ -43,13 +43,14 @@ export function outlineIn(persons, held, rest, all) {
 }
 
 // A ticket names its group, so the tree reads both ways off one pass. [[spec/design_output/pull#the-queue-is-an-outline]]
-function kidsOf(all) {
+function kidsOf(all, places = {}) {
   const names = new Set(all.map((one) => one.name));
   const parent = new Map();
   const under = new Map();
   const todo = new Map();
   for (const one of all) {
-    todo.set(one.name, todoOf(one.front ?? {}));
+    // The override on this box stands over the front's tag, and travels nowhere. [[spec/design_output/pull#a-todo-forces-a-place]]
+    todo.set(one.name, String(places?.[one.name] ?? "") || todoOf(one.front ?? {}));
     const group = fieldOf(one.text, GROUP);
     if (!group || group === one.name || !names.has(group)) continue;
     parent.set(one.name, group);

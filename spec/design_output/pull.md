@@ -261,8 +261,12 @@ merge brings in. So a closed ticket leaves the queue whatever a branch says.
 
 ## A todo forces a place
 
-A `todo` on a ticket overrides the score at its own level. The field names
-the row the ticket stands before, or one of two words:
+A todo overrides the score at its own level. It is an overlay this box
+holds: the queue computes first, and the override lays over it. The work
+tab writes it under `places` in `.se/.runtime/plan.json`, so it stands on
+this box alone, travels into no ticket and reaches no git. A private note's
+own `todo` field reads the same way. The value names the row the ticket
+stands before, or one of two words:
 
 | the todo | where the ticket stands |
 |---|---|

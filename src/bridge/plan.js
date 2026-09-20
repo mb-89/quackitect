@@ -77,10 +77,10 @@ export function plansHere(box) {
   try {
     const said = JSON.parse(String(box.disk.read(join(box.work, PLANS))));
     return said && typeof said === "object"
-      ? { working: "", todos: [], ...said }
-      : { working: "", todos: [] };
+      ? { working: "", todos: [], places: {}, ...said }
+      : { working: "", todos: [], places: {} };
   } catch {
-    return { working: "", todos: [] };
+    return { working: "", todos: [], places: {} };
   }
 }
 
