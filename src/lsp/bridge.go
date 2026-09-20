@@ -18,8 +18,8 @@ import (
 const (
 	findingsRoute = "/findings"
 	// The runtime folder folders.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
-	pointerAt     = ".se/.runtime/vehicle.json"
-	portBase      = 6510
+	pointerAt = ".se/.runtime/vehicle.json"
+	portBase  = 6510
 	// A sweep over the whole tree runs Vale over every note, so the wait stands long. [[spec/design_output/lsp]]
 	bridgeWait = 3 * time.Minute
 	// The pause between two asks while no bridge answers yet, so the panel fills once one stands. [[spec/design_output/lsp#the-panel-reads-the-battery]]

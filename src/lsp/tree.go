@@ -70,6 +70,14 @@ func (one *Tree) Drops(path string) {
 	one.held, one.restated, one.passed = nil, nil, false
 }
 
+// Whether an editor holds the file's text, which stands in for the disk. [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+func (one *Tree) Held(path string) bool {
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	_, open := one.overlay[slashed(path)]
+	return open
+}
+
 func (one *Tree) Read(path string) string {
 	said := slashed(path)
 	one.guard.Lock()
@@ -179,7 +187,7 @@ const (
 	// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
 	ToolsAt = ".se/.runtime/tools.json"
 	// The runtime folder folders.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
-	Bin     = ".se/.runtime/bin"
+	Bin = ".se/.runtime/bin"
 )
 
 // [[spec/design_output/editor#what-the-editor-runs]]

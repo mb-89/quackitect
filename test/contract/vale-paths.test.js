@@ -27,7 +27,14 @@ const saidOf = (argv) => {
   const lines = String(ran.stdout ?? "")
     .split("\n")
     .filter(Boolean);
-  return { lines, why: `${lines.join("\n")}\n${String(ran.stderr ?? "")}`.trim() };
+  const why = [
+    `exit ${ran.exitCode ?? "none"}${ran.error ? `, ${ran.error?.message ?? ran.error}` : ""}`,
+    lines.join("\n"),
+    String(ran.stderr ?? ""),
+  ]
+    .filter((one) => one.trim())
+    .join("\n");
+  return { lines, why };
 };
 const linesOf = (argv) => saidOf(argv).lines.length;
 
