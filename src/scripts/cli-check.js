@@ -458,7 +458,8 @@ function settingsFiles(root, home) {
     { at: join(root, SETTINGS), name: SETTINGS },
     { at: join(root, SETTINGS_LOCAL), name: SETTINGS_LOCAL },
   ];
-  if (home) rows.push({ at: join(home, SETTINGS), name: join(home, SETTINGS) });
+  // The name a reader sees joins with a slash on every box, and the path joins the way the box does. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+  if (home) rows.push({ at: join(home, SETTINGS), name: `${home}/${SETTINGS}` });
   return rows;
 }
 
