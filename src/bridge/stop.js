@@ -13,11 +13,7 @@ import {
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
 import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
-import {
-  BINDING,
-  GOD,
-  QUEUE,
-} from "../../.claude/skills/level0/lib/config.js";
+import { BINDING, GOD, QUEUE } from "../../.claude/skills/level0/lib/config.js";
 import { MS, rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
@@ -208,6 +204,7 @@ export function onStop(e, box) {
   // The hold that stood over this turn, so the order the two events arrive in decides nothing. [[spec/design_output/stop#the-hold-outlives-its-drop]]
   const hold = holdHere(box);
   const off = asks(box, ENABLED) === false;
+  warnsUnknown(rules, box);
   const decision = decide(rules, {
     claimed,
     ran: (name) => ranHere(name, { off, hold, box, claimed, text }),
@@ -302,7 +299,12 @@ function wroteIn(box, names) {
 function restingFile(box) {
   const files = filesOn(listHere(box));
   const now = Math.floor(box.clock.now().getTime() / MS);
-  return takesFile(files, wroteIn(box, files), now, spanOf(asks(box, REFACTOR.untouched)));
+  return takesFile(
+    files,
+    wroteIn(box, files),
+    now,
+    spanOf(asks(box, REFACTOR.untouched)),
+  );
 }
 
 // The list the lint leaves, one entry a warning, which the hand drains. [[spec/design_output/stop#the-grace]]
@@ -364,6 +366,8 @@ const CHECKS = {
   "warnings-standing": (held) => handWanted(held.box),
   // [[spec/design_output/stop#a-talk-follows-a-report]]
   "a-report-stands": (held) => reportStands(held.text),
+  // What an unbuilt rule runs, so it stands off the vote and writes no line. [[spec/design_output/stop#the-mechanical-checks]]
+  never: () => false,
 };
 
 // [[spec/design_output/stop#the-mechanical-checks]]
@@ -384,6 +388,19 @@ function claimStands(held) {
   if (!rule) return false;
   if (!rule.runs) return true;
   return Boolean(ranHere(rule.runs, held));
+}
+
+// A rule naming a check this door holds nowhere says so in the log, once a turn, so the hand that wrote it reads its own mistake. The vote skips a claimed rule the agent claims nowhere, so the door reads every rule itself. [[spec/design_output/stop#the-mechanical-checks]]
+function warnsUnknown(rules, box) {
+  for (const one of rules) {
+    if (!one.runs || knowsCheck(one.runs)) continue;
+    box.log.say(
+      "warn",
+      "stop",
+      `${one.id} runs ${one.runs}, which this door holds nowhere, so the rule fires nothing`,
+      { rule: one.id, detail: String(one.runs) },
+    );
+  }
 }
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]

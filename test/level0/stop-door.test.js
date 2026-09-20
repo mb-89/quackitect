@@ -273,6 +273,11 @@ ${RULES}`;
   assert.equal(warned.length, 1, "one warn line a rule");
   assert.match(warned[0][2], /the-moon-is-full/, "the line names the rule");
   assert.match(warned[0][2], /moon-is-full/, "the line names the check");
+  assert.deepEqual(
+    warned[0][3],
+    { rule: "the-moon-is-full", detail: "moon-is-full" },
+    "the row carries the rule and the check as fields, so the log verb narrows on them",
+  );
 });
 
 // The table of checks names never, so a rule running it stands off the vote and writes no line. [[spec/design_output/stop#the-mechanical-checks]]

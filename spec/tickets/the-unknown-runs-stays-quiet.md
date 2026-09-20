@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -120,6 +120,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: fc582e2cc12da4a8264af9885dda592b544c75a1
+    hash_after: fc582e2cc12da4a8264af9885dda592b544c75a1
+    answered:
+      - name: lint
+        exit: 0
+        said: 43 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
@@ -256,11 +264,17 @@ in the door's table nowhere yet.
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The door, its case file and this ticket.
+- every door the change reaches has a fake. The line reaches the log door, and the cases hand in a log that keeps every row.
+- a comment names the approach the change implements. The new function and the new check each point at the chapter promising the line.
 
 ## tests-green
 
@@ -272,11 +286,15 @@ in the door's table nowhere yet.
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/level0/stop-door.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -284,11 +302,28 @@ in the door's table nowhere yet.
 
 <!-- the form is text -->
 
+The stop door reads every rule's `runs` once a turn, and writes one warn line
+under `stop` for each check it holds nowhere. The line names the rule and the
+check, so a hand with a typo in a rule file reads its own mistake in the log.
+
+| the change | why |
+|---|---|
+| `warnsUnknown` in `src/bridge/stop.js`, before the vote | the vote skips a claimed rule the agent claims nowhere, so the door reads every rule itself |
+| `never` in the door's checks, answering false | the design output names it as what an unbuilt rule runs, and the door held it nowhere |
+| two cases over the fake box | one asserts the line for a typo, and one asserts silence for `never` |
+
+The vote in the hook stays as it is, and so does the design output, which
+promises the line already.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The door, its case file and this ticket.
+- every door the change reaches has a fake. The cases drive the door over the fake box, and read the line off a log that keeps every row.
+- a comment names the approach the change implements. The function and the check point at the chapter promising the line.
 
 # verdict
 

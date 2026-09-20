@@ -452,7 +452,7 @@ its own case.
 - test/level0/tested.test.js
 - src/scripts/cli.js
 - src/scripts/cli-check.js
-- .gitignore
+- `.gitignore`
 - .claude/skills/level0/lib/answer.js
 - .claude/skills/level0/lib/stop.js
 - spec/design_output/extension.md
