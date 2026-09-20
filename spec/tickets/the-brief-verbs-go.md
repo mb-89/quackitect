@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -121,6 +121,10 @@ record:
     hash_after: a641a4ea258f70b01d3516af38380d745c48bd81
     returns: 3
     why: "`spec/design_output/work` names the brief in six further chapters, and the notes table answers none; `The listing reads git once` carries a brief row, and `A row per group` carries a brief kind; `A box landing on trunk`, `A merged branch goes` and `Why a routine needs this` each teach the brief; `The routine a verb names` says `freeNow` reads the briefs, and the draft leaves that line standing; `grep -rn BRIEF src .claude` misses the copilot lane, which reads the string literal; `grep -rln HANDOVER spec src test` leaves out `.claude`, where three modules stand; `.claude/skills/level0/lib/review.js` holds its own `BRIEF`, and no row names it; that module writes a review prompt naming the brief, and no row says what it says after; the verbs table, the copilot table and the notes table read true everywhere else"
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: b7c1f76819e20c5db88181277e914630eff7eea8
+    hash_after: b7c1f76819e20c5db88181277e914630eff7eea8
 ---
 
 # Ask
@@ -152,14 +156,12 @@ Every brief has merged, so the verbs carry two roads and walk one. A reader of t
 
 `HANDOVER.md` at the root goes, `.se/HANDOVER.md` stays, and the group ticket takes the brief's work.
 
-The schema calls both files a handover, and the two carry different things. `HANDOVER.md` is the brief this ticket removes. `.se/HANDOVER.md` is a session one box hands the next, and it stands as it stands.
+`grep -rn HANDOVER spec src test .claude` names every reader, note and case. The constant `BRIEF` names fewer, because the copilot lane reads the string itself.
 
 | the file | what it carries | after |
 |---|---|---|
 | `HANDOVER.md`, tracked, on a work branch | the brief | goes |
 | `.se/HANDOVER.md`, untracked, on any box | the session | stays |
-
-`grep -rn BRIEF src .claude` names every reader, and `grep -rln HANDOVER spec src test` names every note and case.
 
 | where the brief stands | what stands after |
 |---|---|
@@ -169,11 +171,11 @@ The schema calls both files a handover, and the two carry different things. `HAN
 | `release`, and the status it writes | the group's record, which `letGo` already writes |
 | `list`, which names a kind | the one kind, so the column goes |
 | `new`, which takes a brief off trunk | the group ticket, which the mint writes |
-| `src/scripts/work-merge.js` and `src/scripts/work-stands.js` | the group ticket, at the path the ticket names |
+| `BRIEF` in `src/scripts/work-stands.js` | goes, with the readers above |
+| `BRIEF` in `.claude/skills/level0/lib/review.js` | goes, and its review prompt names the group ticket |
+| `src/scripts/work-merge.js` | the group ticket, at the path the ticket names |
 
-Every branch on this box carries a group, so each verb walks the group road and the other road stands dead. The change reads each verb, cuts the brief half, and leaves the group half as it stands.
-
-The copilot lane, read by read:
+The copilot lane reads the string itself:
 
 | where | what stands after |
 |---|---|
@@ -183,27 +185,36 @@ The copilot lane, read by read:
 | `copilot-runtime.js`, the loop over both paths | the loop reads `.se/HANDOVER.md` alone |
 | `copilot-runtime.js`, the result read | the group ticket |
 
-Each note naming the brief answers:
+[[spec/design_output/work]] names the brief in these chapters, and each answers:
+
+| the chapter | what stands after |
+|---|---|
+| Scope | the group on the branch, and the brief line goes |
+| What a work branch is | the group ticket names the branch |
+| A brief drains first | goes whole, because one road stands |
+| The listing reads git once | the reads table drops its brief row |
+| A row per group | the kind column goes, and the row reads one kind |
+| Two handovers | one handover, and the table reads one row |
+| The round trip | the trip runs through the group ticket |
+| Every brief carries the contract | goes, because the pull's hand-out says it |
+| A box landing on trunk | the group ticket, which trunk carries |
+| A merged branch goes | the merge drops the brief line |
+| Why a routine needs this | the take prints the group's ask |
+| The routine a verb names | `freeNow` answers off the group tickets |
+
+Each note outside that one answers too:
 
 | the note | what stands after |
 |---|---|
-| work, What a work branch is | the group ticket names the branch, and the brief line goes |
-| work, A brief drains first | goes whole, because one road stands |
-| work, What the status says | the group's `state` and its record say it |
-| work, Two handovers | one handover, and the table reads one row |
-| work, The round trip | the trip runs through the group ticket |
-| work, Every brief carries the contract | the contract goes, because the hand-out says it |
 | [[spec/design_output/private]] | the rows and the door line name `.se/HANDOVER.md` alone |
 | [[spec/design_output/schema]] | the schema line names `.se/HANDOVER.md` alone |
 | [[spec/design_output/review]] | the brief row and the handback row read the group ticket |
 | [[spec/guidance/cloud]] | a box writes its result into the group's retro |
 | [[spec/schemas]] | the handover kind keeps `.se/HANDOVER.md`, and drops the root file |
 
-The rows above under `work` stand in [[spec/design_output/work]], chapter by chapter.
-
 `test/level0` drives the brief road, and `src/lsp` drives the root file as a governed path. Each case moves to the group ticket it stands for, and the schema case drops the root path.
 
-`withContract` writes the routine's steps into a brief, and the pull's hand-out says the same to a hand. So the contract goes with the brief, and `branch new` takes a group name in place of a file.
+A fixture holding the name as a string stays, because it reads the same either way.
 
 ## review
 
