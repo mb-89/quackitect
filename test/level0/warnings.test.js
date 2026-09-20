@@ -68,15 +68,12 @@ test("the refusal names each file, each rule and the command that reads them", (
   assert.match(said, /RUNME\.sh lint/);
 });
 
-// [[spec/tickets/one-list-holds-the-warnings]]
-test("a push carrying a file at warning is refused, and one carrying none passes", () => {
+// A warning holds no push, because the refactoring hand drains it on the box, so the door reads no lint. [[spec/design_output/config#the-engine-controls]]
+test("a push carrying a file at warning lands, and the door reads no lint", () => {
   const carried = () => [{ name: "a.md", text: "" }];
   const warned = () => [found("a.md", "warning")];
-  const clean = () => [found("a.md", "error")];
 
-  assert.equal(holds(refsIn(toWork), "", carried, warned).code, 1);
-  assert.match(holds(refsIn(toWork), "", carried, warned).said, /a\.md/);
-  assert.deepEqual(holds(refsIn(toWork), "", carried, clean), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toWork), "", carried, warned), { code: 0, said: "" });
   assert.deepEqual(holds(refsIn(toWork), "", carried), { code: 0, said: "" });
 });
 

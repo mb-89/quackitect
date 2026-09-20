@@ -1,22 +1,17 @@
 // The lint's reading of a tree: the warnings stand as a list the stamp
-// carries, and the sentence the lint ends on says where they go.
+// carries, and the list stands empty before any lint runs.
 // [[spec/design_output/config#the-engine-controls]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { warningsStood } from "../../src/scripts/cli-read.js";
+import { version, warningsStood } from "../../src/scripts/cli-read.js";
 
-// A warning lands under every door, and the refactoring hand drains it, so the lint says so and names no push it holds. [[spec/design_output/config#the-engine-controls]]
-test("the warnings stand as a list, and the lint's last line names the hand and no held push", () => {
-  assert.ok(
-    Array.isArray(warningsStood()),
-    "the warnings stand as a list before any lint",
+// A warning lands under every door, and the refactoring hand drains the list the stamp carries. [[spec/design_output/config#the-engine-controls]]
+test("the warnings stand as a list, empty before any lint, and the version reads as text", () => {
+  assert.deepEqual(
+    warningsStood(),
+    [],
+    "the warnings stand as an empty list before any lint",
   );
-  const text = readFileSync(
-    new URL("../../src/scripts/cli-read.js", import.meta.url),
-    "utf8",
-  );
-  assert.match(text, /the refactoring hand drains them/);
-  assert.doesNotMatch(text, /no push reaches/);
+  assert.equal(typeof version(), "string");
 });
