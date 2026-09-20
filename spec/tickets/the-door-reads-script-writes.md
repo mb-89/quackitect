@@ -503,6 +503,15 @@ both commit doors hand that reader in.
 A case now feeds four spellings of a temp folder, and the reading names a script
 in each. The copy answered one of the four.
 
+| the finding of the third round | what lands |
+|---|---|
+| the reading took every path outside prose and code | it asks `FREE`, the list of paths no rule reads |
+| the tree's own installer refused | a case feeds four tracked scripts, and the reading names none |
+| the reader stood under two names | `fileText` stands in the script module, and both doors call it |
+
+`sh src/scripts/install.sh` passes again, because a script standing where a rule
+reads it meets that rule already.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
