@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -197,6 +197,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 6cbdb6d0064a36e9a090315ca4c62b013e372476
+    hash_after: 934280e2a9b184603d546923aafaf36334d2a048
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -362,9 +370,9 @@ What surprises: the field stood on `./RUNME.sh test`, whose last line is a durat
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- this leaf lands no hunk, so it touches no file the ask leaves out
-- the case standing red drives `doorsSaying`, so git and the disk stand fake
-- the approach under `design/draft` names every place, and this leaf adds nothing beside it
+- the change touches the verbs, the copilot lane, the notes and the cases the approach names
+- git and the disk stand faked through `doorsSaying`, and the copilot lane through `fakeDisk` and `fakeProc`
+- each module's header says what it reads now, and each moved chapter carries its link from the code
 
 ## tests-green
 
