@@ -447,6 +447,16 @@ export function sidebarSays() {
   return "unlinked: run ./RUNME.sh";
 }
 
+// Every hook address the settings files name, in reading order, each with the file naming it first. [[spec/tickets/the-doctor-probes-every-hook]]
+export function hooksNamed(_disk, _root, _home) {
+  return [];
+}
+
+// One doctor row a hook, off one probe the addresses run together. [[spec/tickets/the-doctor-probes-every-hook]]
+export async function hookRows(_found, _get = fetch) {
+  return [];
+}
+
 export async function doctor() {
   const found = Object.keys(known).length ? known : writeSurvey(it, root, process.env);
   const rows = [
