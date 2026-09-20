@@ -89,12 +89,18 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: d25806695a0da7af29c9e5bc9f2d245bb0a673d7
     hash_after: d25806695a0da7af29c9e5bc9f2d245bb0a673d7
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-2
+    hash_before: 12daafca92339622360654afc74b1cc19f9c11c9
+    hash_after: 12daafca92339622360654afc74b1cc19f9c11c9
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | partly, the rule and the sweep hold, the table of doors does not |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit, with the server standing |; | does every rule the approach adds carry a case | yes, one case drives the sweep under both door sets |; | does every claim carry a proof | no, the root row and the tools row read against the code |; TL;DR:; The rule and the sweep stand as drafted.; The table of doors names what parts the two callers wrong, and leaves out what bites.; Redraw that table off the code, and say how the case reaches the count the check prints.; The findings, one a line:; Both callers hand the method root, so neither one reads a tree the other leaves alone.; `lint` takes its root from `cli-doors`, and `findingsFor` takes `box.method`.; `rootsHere` reads the method root off the marker above that module, so no caller hands the work root.; The tools row reads against the code, because `cli-doors` names each tool through `whereIs` over the same survey.; The parting that stands is the Biome guard. `lint` hands an empty path where no binary stands.; `findingsFor` hands the bare name there, so the panel runs a Biome the check skips.; `lint` also adds `serverFaults` past the sweep, and the tree and schema readers where the server binary is missing.; A case asserting one count over one door set turns red there. Say which side owns each of those three.; The case drives two door sets over a fake tree, and reads nothing the check prints.; The ask wants the case red where its count differs from the check's. Say how the case reaches that count."
 ---
 
 # Ask
@@ -153,9 +159,34 @@ what a session owes the owner.
 
 ### verdict
 
-<!-- pass or fail, with findings one a line -->
+fail
 
-<!-- the form is verdict -->
+| the question reviewing asks | the answer |
+|---|---|
+| does the approach answer the ask | partly, the rule and the sweep hold, the table of doors does not |
+| is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |
+| what does `./RUNME.sh check` answer | 0 on this commit, with the server standing |
+| does every rule the approach adds carry a case | yes, one case drives the sweep under both door sets |
+| does every claim carry a proof | no, the root row and the tools row read against the code |
+
+TL;DR:
+
+- The rule and the sweep stand as drafted.
+- The table of doors names what parts the two callers wrong, and leaves out what bites.
+- Redraw that table off the code, and say how the case reaches the count the check prints.
+
+The findings, one a line:
+
+- Both callers hand the method root, so neither one reads a tree the other leaves alone.
+- `lint` takes its root from `cli-doors`, and `findingsFor` takes `box.method`.
+- `rootsHere` reads the method root off the marker above that module, so no caller hands the work root.
+- The tools row reads against the code, because `cli-doors` names each tool through `whereIs` over the same survey.
+- The parting that stands is the Biome guard. `lint` hands an empty path where no binary stands.
+- `findingsFor` hands the bare name there, so the panel runs a Biome the check skips.
+- `lint` also adds `serverFaults` past the sweep, and the tree and schema readers where the server binary is missing.
+- A case asserting one count over one door set turns red there. Say which side owns each of those three.
+- The case drives two door sets over a fake tree, and reads nothing the check prints.
+- The ask wants the case red where its count differs from the check's. Say how the case reaches that count.
 
 # implement
 
