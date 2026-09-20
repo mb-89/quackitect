@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -115,6 +115,10 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: c7b64b2bedd0ffd17c1abbe17756a460576c1d35
     hash_after: c7b64b2bedd0ffd17c1abbe17756a460576c1d35
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-6
+    hash_before: 2d5ec7a5f800191fd5212c5986b9b4eb360f2b34
+    hash_after: 2d5ec7a5f800191fd5212c5986b9b4eb360f2b34
 ---
 
 # Ask
@@ -220,46 +224,37 @@ takes the script in both columns.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `writesInScript(body)` hands every hit back under `how: "a heredoc"`, and the
-  refusal reads `${one.how} into ${one.path}`. A script write then refuses with
-  "a heredoc into README.md", which names a heredoc where the command carries a
-  script file. Say where `how` takes the script path.
-- The draft has the refusal message move into one place, and this ticket wants
-  that place named. The words stand in `findings` in
-  `.claude/skills/level0/lib/bash.js`, and `refusedCommand` in `lib/refuse.js`
-  owns the shape every finding takes. Name the one holding the words, and write
-  the words.
-- The message today names Read, Write and Edit, and the draft has both roads
-  take the new one. A redirection making a file wants Write, and the working
-  rules name Edit for one spot. Say whether Write and Edit stand beside the
-  two.
-- A shell script stands outside this reading. `sh .se/scripts/edit.sh` writing
-  by redirection is the hole the ask names, and `scriptsIn` answers a reader
-  alone. `insideOf` routes a shell body to `writesAPath` and a reader body to
-  `writesInScript` today, so hand the script text to `insideOf`, and say a
-  shell script counts.
-- The design output wants a row. The module points at
-  [[spec/design_output/bash#a-shell-writes-nothing]], whose table names every
-  road the door refuses and every road it passes. Write the script file into
-  both columns.
+- The piece table names the set "a runner or a shell". `RUNNERS` in the same
+  module holds the package runners. This reading wants `SHELLS` and `READERS`,
+  which `fedTo` and `inlineIn` already read. Write the two names the module
+  owns, and say whether a package script counts.
+- The draft orders the tools in the message by the size of the change. Its
+  table reads `mcp__level0__patch`, `mcp__level0__replace`, Write, Edit, and a
+  whole file is the larger change. Fix the order, or drop the line.
+- The message today opens on Read, and the table leaves Read out. Say whether
+  Read stands beside the rest.
 
 What I check:
 
-- `./RUNME.sh check` answers 0 on this commit, and the draft commit touches
-  this ticket alone.
-- The reading skips a path standing in the tree, so `node --test
-  test/level0/bash.test.js` passes. That finding stands answered.
-- `writesInScript` stands as it reads and `writesIn` keeps its name, so the
-  collision goes. That finding stands answered.
-- `it.script(path)` off `box.disk` names the seam, and `src/bridge/bash.js`
-  hands `findings` an `it` today. That finding stands answered.
-- A copy out of the scratchpad refuses today, asserted over `cp .se/draft.md
-  README.md` and `mv /tmp/one.md spec/guidance/new.md` in
-  `test/level0/bash.test.js`. That finding stands answered.
-- `VERBS` names check, branch, tui and doctor, so `./RUNME.sh check` is the
-  verb covering the pair. That finding stands answered.
+- `./RUNME.sh check` answers 0 on this commit, and the commit touches this
+  ticket alone.
+- A newline reads as `;`, which `BREAKS` holds. So `writesAPath` over a shell
+  script's text reads it a line at a time, and `sh .se/scripts/edit.sh` lands
+  as the draft says.
+- `writesIn` overwrites `how` at each call to `insideOf` today. A hit taking
+  `how: "the script <path>"` costs the caller one line, and that finding
+  stands answered.
+- `findings` holds the words of the refusal, and `refusedCommand` holds the
+  shape around them. The words move nowhere, and that finding stands answered.
+- The table the module points at names every road the door refuses. The draft
+  writes the script into both its columns, and that finding stands answered.
+- A copy out of the scratchpad refuses today. `cp .se/draft.md README.md` and
+  `mv /tmp/one.md spec/guidance/new.md` assert it in
+  `test/level0/bash.test.js`.
+- `VERBS` names check, branch, tui and doctor. So `./RUNME.sh check` is the
+  verb covering the script write and the refusal.
 # implement
 
 ## tests-red
