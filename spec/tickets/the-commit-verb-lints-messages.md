@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -145,6 +145,10 @@ record:
     hash_after: 86465d81f2499b26a0acf2abd6e1299e38eee022
     returns: 1
     why: "`commit-verb.js` prints the check's last `stdout` line on red, and the check writes faults to `stderr`; a red check under the fakes names the server line as its reason, and the fault reaches nobody; fix: print the check's `stderr` beside its `stdout`, so a red check names itself; `commit-verb.test.js` teaches the red case a fault on `stdout`, which agrees with the code; fix: teach that case `stderr`, and assert the verb prints what the check refuses; `## One verb feeds that stamp` lands mid-chapter, so two stamp paragraphs fall under it; fix: move that heading under the paragraph naming the two push doors; every header points at `#the-battery-answers-first`, so the new chapter takes no inbound link; a failing `git add -A` answers \"git staged nothing\", which names the wrong fault; a clean tree answers \"The commit door refuses this commit\", and git says nothing stands to commit; holds: the verb refuses a live bad message, names three findings at once, and stages nothing; holds: `./RUNME.sh check` answers exit 0 on 86465d81; holds: five cases pass over fake doors, and `fakeGit` drives the real git door; holds: `messageFaults` keeps the path, the trailer strip and the findings read in one place; holds: `branch review` answers \"retro absent from the handback\", so no retro stands there; holds: the diff touches the verb, the verbs map, the shared read, the cases and two notes"
+  - step: implement/reflect
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: f9c2ced188a30fa11e12cc7554ee592e32e02a09
+    hash_after: f9c2ced188a30fa11e12cc7554ee592e32e02a09
 ---
 
 # Ask
@@ -269,14 +273,31 @@ The door's own read moves to `messageFaults` in the same hunk. `commitVoice` par
 ### class
 
 <!-- the class of error the findings describe, and the fix for the class -->
-
 <!-- the form is text -->
+
+Each line names a fault out of a guess. The verb guesses what stands wrong, and the case teaches that guess back to it.
+
+| what the verb says | what stands |
+|---|---|
+| the check's last `stdout` line | the check writes its faults to `stderr` |
+| `git staged nothing` | `git add` refusing names its own reason |
+| `The commit door refuses` | a clean tree makes git say nothing stands to commit |
+
+The fix for the class runs in two moves:
+
+- read what the run answers, on both streams, and print that in place of a guess
+- teach each case the stream the real thing writes to, so the case refuses the guess
+
+The chapter carries the same shape. `One verb feeds that stamp` lands mid-chapter, so the paragraphs above it fall under a heading they predate. It moves under the last of them, and each header pointing at the old anchor takes the new one.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the fix touches the verb, its cases and the chapter, each a file the change already reaches
+- git, the process and Vale reach the verb as doors, and the cases drive each
+- the class above names the approach each hunk follows
 
 ## change
 
