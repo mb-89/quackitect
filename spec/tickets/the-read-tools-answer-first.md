@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -188,6 +188,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 099c2ec7708d · claude-code-remote · helper-17
+    hash_before: 3a2b30a0b3543a6351aa086ccea8c30a3fcd72ff
+    hash_after: 3a2b30a0b3543a6351aa086ccea8c30a3fcd72ff
+reason: done
 ---
 
 # Ask
@@ -460,21 +465,17 @@ The verdict round asks for one case a tool, and for every sentence carrying the 
 <!-- every file you read, one a line -->
 <!-- the form is files -->
 
-- spec/tickets/the-read-tools-answer-first.md
 - .claude/skills/level0/hooks/level0.js
 - .claude/skills/level0/lib/search.js
-- .claude/skills/level0/lib/apply.js
-- .claude/skills/level0/lib/folders.js
-- .claude/skills/level0/lib/log.js
-- .claude/skills/level0/lib/undo.js
-- .claude/skills/level0/lib/vehicle.js
-- src/bridge/search.js
-- src/bridge/vehicle.js
-- src/bridge/server.js
-- src/scripts/serve.js
+- .claude/skills/level1/hooks/level1.js
+- spec/design_input/a-stub-takes-its-vehicle.md
 - spec/design_output/level0.md
 - spec/design_output/vehicle.md
-- spec/design_input/a-stub-takes-its-vehicle.md
+- spec/tickets/the-read-tools-answer-first.md
+- src/bridge/search.js
+- src/bridge/vehicle.js
+- src/scripts/serve.js
+- src/stub/.claude/skills/level0/hooks/bridgehead.js
 - test/level0/read-tools.test.js
 - test/level0/vehicle.test.js
 
@@ -483,45 +484,37 @@ The verdict round asks for one case a tool, and for every sentence carrying the 
 <!-- pass or fail, findings one a line -->
 <!-- the form is verdict -->
 
-fail
-
-what blocks:
-
-- The ask asks a case a tool, and `test/level0/read-tools.test.js` drives `find` alone.
-- `patch`, `replace` and `undo` reach no case through the bridgehead, so the second bullet stands open.
-- The approach names one case a tool too, so the implement step falls short of its own design.
-- Drive the four names in one loop over `firing`, each with no server standing.
-- The chapter The bridgehead starts it too says the hook imports nothing, and the change breaks that.
-- Narrow that sentence the way the chapter above it narrows its own.
-
-notes, which block nothing:
-
-- `src/scripts/serve.js` carries the same stale reason in a header comment.
-- `spec/design_input/a-stub-takes-its-vehicle.md` names the hook and its two manifests alone.
-- The wait case burns the whole `STARTING` span, so the file runs long.
-- `started` in the hook holds across cases in one file, so a later case reads an earlier one's start.
-- A dead server posts `tool.call` twice, once from the `*` door and once from the tool road.
+pass
 
 what holds:
 
+- `test/level0/read-tools.test.js` loops over `READ_TOOLS`, so find, patch, replace and undo each take two cases.
+- Dropping `patchSpec()` from `READ_TOOLS` reds the naming case and the start case.
+- Dropping the `started` reset reds the tool cases, so one case reads no other's start.
+- Dropping `serve.log` from the running-out line reds every wait case.
+- `register` takes the wait as an option, so the running-out cases finish fast.
+- The chapter The bridgehead starts it too names the shell alone, and drops the stale import claim.
+- `src/scripts/serve.js` and `spec/design_input/a-stub-takes-its-vehicle.md` carry that narrowed reason.
+- The stub's own bridgehead imports nothing, so the chapter The cloud starts the server reads true.
+- The hook's closure holds lib files alone, each import relative, so a stub loads every one.
+- `FILES` takes those files, and `test/level0/vehicle.test.js` reds where one drops out.
 - `./RUNME.sh check` answers exit 0, and the server stands at the health port.
-- The copy list closes under its own imports, over the six lib files the hook reaches.
-- Every lib file the hook reaches, and every file those reach, travels in `FILES`.
-- No file in that closure imports `node:`, so a stub loads each one.
-- Dropping `lib/log.js` from `FILES` reds `test/level0/vehicle.test.js` on the missing file.
-- Dropping `undoSpec` from `READ_TOOLS` reds two cases in `test/level0/read-tools.test.js`.
-- Stripping the port from the line the wait answers reds the wait case.
-- `findSpec` stands in one place, and `src/bridge/search.js` points there.
 - Every file the diff touches stands inside the ask, and no hunk redesigns what the ask leaves alone.
 - No retro stands in the handback, and this step routes to one.
 - The tip matches origin, and the working tree stands clean.
+
+notes, which block nothing:
+
+- `FILES` in `src/bridge/vehicle.js` spells the hook's closure by hand, and its case spells it again.
+- A new import in the hook reds nothing, so a stub loses that file.
+- A dead server posts `tool.call` twice, once through the `*` door and once through the tool road.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- `FILES` in `src/bridge/vehicle.js` owns the copy list, and `spec/design_output/vehicle.md` points at it. `spec/design_input/a-stub-takes-its-vehicle.md` repeats the shape the change leaves behind.
+- `findSpec` moves to `lib/search.js`, and `src/bridge/search.js` re-exports it. `READ_TOOLS` stands in the hook alone, and the chapter The first call pays points there. `FILES` spells the hook's closure by hand, and its case spells it again, which stands as a note.
 
 # Discussion
 
