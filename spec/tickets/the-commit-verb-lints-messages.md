@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -155,6 +155,17 @@ record:
     hash_after: a4f4373c3135533065859cd2e865427a90bc65c8
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 5827d0f8bbc165513151ffaa37c22e5228ec4087
+    hash_after: 5827d0f8bbc165513151ffaa37c22e5228ec4087
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -355,11 +366,13 @@ The chapter carries the same shape. `One verb feeds that stamp` lands mid-chapte
 | the step | what it runs | what it answers on red |
 |---|---|---|
 | the message | `messageFaults`, exported from `src/bridge/bash.js` | every finding at once, and no commit |
-| the commit | `git add -A` and `git commit`, in the verb | what the door says, with the staging back |
-| the check | `./RUNME.sh check`, which writes the stamp | the check's last line, and no push |
+| the commit | `git add -A` and `git commit`, in the verb | what git says, with the staging back |
+| the check | `./RUNME.sh check`, which writes the stamp | what the check says, and no push |
 | the push | `git push origin`, which the pre-push door reads | what that door says |
 
 One read serves both. `commitVoice` held the trailer strip and the lint inline, and both move to `messageFaults`. The door parses a shell command and the verb holds a message string, so the path and the strip stay in one place.
+
+Each step prints what its run answers, on both streams. The check writes its faults to the error stream, so a read of one stream alone names a line standing clean.
 
 What the run leaves behind:
 
