@@ -75,8 +75,8 @@ func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 		t.Fatal("a cleared line lets go of the queue preset, and the funnel stands grey")
 	}
 	m = alt(press(m, "2"), '2')
-	if m.sourceOf(1) != "held: true" {
-		t.Fatalf("alt+2 writes the held preset, and the work's line reads %q", m.sourceOf(1))
+	if m.sourceOf(1) != "queue: /^0$/" {
+		t.Fatalf("alt+2 writes the in-hand preset, and the work's line reads %q", m.sourceOf(1))
 	}
 	m = press(alt(press(m, "1"), 'f'), "l", "i", "n", "e", " ", "2")
 	if m.filter.Empty() || m.sourceOf(0) != "line 2" {
@@ -88,7 +88,7 @@ func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 	if m.open != 1 {
 		t.Fatalf("the press lands on the work tab, and tab %d stands open", m.open)
 	}
-	if m.input.Value() != "held: true" {
+	if m.input.Value() != "queue: /^0$/" {
 		t.Fatalf("the work tab's line comes up on the switch, and the line reads %q", m.input.Value())
 	}
 	if m.filter.Empty() {
@@ -112,17 +112,17 @@ func TestAPresetWritesItsFilterIntoTheLineAndAgainClearsIt(t *testing.T) {
 		t.Fatalf("alt+q again clears the line, and it reads %q", m.input.Value())
 	}
 	m = alt(press(workWindow(t, 3), "2"), '2')
-	if m.input.Value() != "held: true" {
+	if m.input.Value() != "queue: /^0$/" {
 		t.Fatalf("alt+2 writes the second preset's filter, and the line reads %q", m.input.Value())
 	}
 	pane := renderParts(alt(m, 'f').presetParts(), 80)
-	for _, want := range []string{"alt+1  queue", "alt+2  held", "alt+3  recently done", "alt+4  urgent"} {
+	for _, want := range []string{"alt+1  queue", "alt+2  in hand", "alt+3  recently done", "alt+4  urgent"} {
 		if !strings.Contains(pane, want) {
 			t.Fatalf("the pane names each preset with its key and name, and reads:\n%s", pane)
 		}
 	}
 	// The filter stays off the row, because it runs long. [[spec/design_output/tui#the-filter-pane-takes-letters]]
-	if strings.Contains(pane, "held: true") {
+	if strings.Contains(pane, "queue: /^0$/") {
 		t.Fatalf("the pane draws no filter beside a preset, and reads:\n%s", pane)
 	}
 }
@@ -133,7 +133,7 @@ func TestAPressOnAPresetRowPressesItAndARowStillSelectsUnderThePane(t *testing.T
 	m := alt(press(workWindow(t, 3), "2"), 'f')
 	// The first preset stands two rows under the line: the line, the blank, then the rows. [[spec/design_output/tui#the-filter-pane-takes-letters]]
 	m = click(m, m.listWidth()+4, headWide+2+1)
-	if m.input.Value() != "held: true" || !m.work.Narrowed() {
+	if m.input.Value() != "queue: /^0$/" || !m.work.Narrowed() {
 		t.Fatalf("a press on the second row writes its filter and narrows the tab, and the line reads %q", m.input.Value())
 	}
 	if m.presetAt(0) != nil || m.presetAt(1) != nil {

@@ -18,6 +18,7 @@ import {
   todoOf,
   urgent,
 } from "../engine/group.js";
+import { PLANS } from "../../.claude/skills/level0/lib/runs.js";
 import { takeable } from "./pull.js";
 import { ticketsHere } from "./pull-hand.js";
 import { leafOf, leavesOf } from "./pull-route.js";
@@ -106,18 +107,31 @@ export function placesIn(it, read, stood) {
   const open = all.filter((one) => fieldOf(one.text, "state") !== CLOSED);
   const at = { clock: it.clock, weights: it.weights, stood };
   // A person's step and a draft wait on a person. The agent's takeable steps count next, and every other open ticket after them. [[spec/design_output/pull#the-queue-is-an-outline]]
-  const persons = queued(open.filter(waitsOnPerson), all, at);
+  // A ticket a hand holds, or the one the plan names, stands at zero. [[spec/design_output/pull#the-queue-is-an-outline]]
+  const working = workingHere(it);
+  const inHand = open.filter((one) => Boolean(heldIn(one.text)) || one.name === working);
+  const free = open.filter((one) => !inHand.includes(one));
+  const persons = queued(free.filter(waitsOnPerson), all, at);
   const agents = queued(
-    open.filter((one) => !waitsOnPerson(one) && takeable(it, one, all)),
+    free.filter((one) => !waitsOnPerson(one) && takeable(it, one, all)),
     all,
     at,
   );
-  const held = queued(
-    open.filter((one) => !waitsOnPerson(one) && !takeable(it, one, all)),
+  const back = queued(
+    free.filter((one) => !waitsOnPerson(one) && !takeable(it, one, all)),
     all,
     at,
   );
-  return outlineIn(persons, [...agents, ...held], all);
+  return outlineIn(persons, inHand, [...agents, ...back], all);
+}
+
+// The ticket or todo the plan names as the work in hand, off the box's plan file. [[spec/design_output/stop#the-plan]]
+function workingHere(it) {
+  try {
+    return String(JSON.parse(it.disk.read(it.join(it.root, ...PLANS.split("/")))).working ?? "");
+  } catch {
+    return "";
+  }
 }
 
 // [[spec/design_output/pull#the-queue-is-an-outline]]

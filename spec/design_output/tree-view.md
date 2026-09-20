@@ -156,7 +156,6 @@ its marks:
 |---|---|---|
 | the state's first | the state, as its value | good on `open`, bad on `draft`, plain on `closed` |
 | U | the ticket carries the urgent mark | bad |
-| W | a hand holds it | good |
 | C | the group holds a branch on the cloud | good |
 | T | a todo forces its place, which [[spec/design_output/pull#a-todo-forces-a-place]] reads | bad |
 

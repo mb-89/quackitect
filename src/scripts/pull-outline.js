@@ -11,9 +11,9 @@ export const FIRST = "first";
 export const LAST = "last";
 
 // The outline, a place a name. The person's list comes first and counts down, the others count up, and a ticket in no list takes no place. [[spec/design_output/pull#the-queue-is-an-outline]]
-export function outlineIn(persons, rest, all) {
+export function outlineIn(persons, held, rest, all) {
   const ordinal = new Map();
-  for (const one of [...persons, ...rest]) {
+  for (const one of [...persons, ...held, ...rest]) {
     if (!ordinal.has(one.name)) ordinal.set(one.name, ordinal.size);
   }
   const kids = kidsOf(all);
@@ -29,8 +29,13 @@ export function outlineIn(persons, rest, all) {
   own.forEach((name, at) => {
     numberUnder(name, String(at - own.length), kids, best, out);
   });
+  // A ticket in hand stands at zero, so the queue shows what a hand holds and no letter says it. [[spec/design_output/pull#the-queue-is-an-outline]]
+  const inHand = persons.length + held.length;
+  for (const name of ordered.filter((name) => best.get(name) >= persons.length && best.get(name) < inHand)) {
+    numberUnder(name, "0", kids, best, out);
+  }
   ordered
-    .filter((name) => best.get(name) >= persons.length)
+    .filter((name) => best.get(name) >= inHand)
     .forEach((name, at) => {
       numberUnder(name, String(at + 1), kids, best, out);
     });

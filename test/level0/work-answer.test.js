@@ -208,6 +208,26 @@ test("a todo moves a ticket before the row it names, and a private note takes a 
   assert.match(place("parked"), /^\d+$/, "a private note on this box takes a place of its own");
 });
 
+// A ticket a hand holds, or the one the plan names, stands at zero, ahead of the agent's rows. [[spec/design_output/pull#the-queue-is-an-outline]]
+test("a ticket in hand stands at place zero", () => {
+  const held = CHILD("", "open").replace("group: \n", "record:\n  - step: do\n    hash_before: aaa\n");
+  const { it } = doorsSaying(
+    remoteSaying([], {
+      "origin/main:spec/tickets/a-loose-one.md": LOOSE,
+      "origin/main:spec/tickets/in-hand.md": held,
+      "origin/main:spec/tickets/named.md": LOOSE,
+    }),
+    { [join(ROOT, ".se/.runtime/plan.json")]: JSON.stringify({ working: "named", todos: [] }) },
+  );
+  it.root = ROOT;
+  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
+  const said = answerOf(it);
+  const place = (name) => said.loose.find((one) => one.name === name).queue;
+  assert.equal(place("in-hand"), "0", "a take puts the ticket at zero");
+  assert.equal(place("named"), "0", "the plan's working ticket stands at zero");
+  assert.equal(place("a-loose-one"), "1");
+});
+
 // [[spec/design_output/pull#the-queue-is-an-outline]]
 test("an outline place compares segment by segment, and the unplaced stands last", () => {
   const sorted = ["2", "1.10", "1", "-1", "1.2", "-2", "10"].sort(compareOutline);

@@ -14,9 +14,6 @@ flags:
   - letter: U
     key: urgent
     tone: bad
-  - letter: W
-    key: held
-    tone: good
   - letter: C
     key: cloud
     tone: good
@@ -30,9 +27,9 @@ groups:
       - queue: /./
     sort:
       - key: queue
-  - name: held
+  - name: in hand
     filters:
-      - held: true
+      - queue: /^0$/
   - name: recently done
     filters:
       - state: closed

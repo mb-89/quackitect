@@ -190,7 +190,7 @@ stands for every tab, because the strip names the tab.
 | the tab | its presets |
 |---|---|
 | the log | the prompts and the replies under `alt+q`, and the selected row's kind under `alt+⇧f` |
-| the work | the groups of its base file, each under a number with alt: the queue, held, recently done, urgent |
+| the work | the groups of its base file, each under a number with alt: the queue, in hand, recently done, urgent |
 
 A preset is one row of the pane: its key and its name, and nothing else,
 because its filter runs long. The row stands lit while the line holds that
@@ -396,10 +396,10 @@ and the presets. For the view itself, see [[spec/design_output/tree-view]].
 
 A ticket naming another row nests under it, at any depth, and one naming a row
 the rows hold nowhere stands at the left. The mark before the name says which
-row is a group, so no column says it. A held group and its tickets wear the
-`W` letter, off the standing the index answers. A group holding a branch
-wears the `C` letter, off the verb's answer. The window's `Init` asks for
-the tick from nothing, and each answer hands the tab its tree again.
+row is a group, so no column says it. A ticket in hand stands at place zero
+in the queue, so no letter says it. A group holding a branch wears the `C`
+letter, off the verb's answer. The window's `Init` asks for the tick from
+nothing, and each answer hands the tab its tree again.
 
 The table draws the name, the flags and the queue, and it stands as it is
 when a pane opens. The nesting says the group, and the details say the step.
