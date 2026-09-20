@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 3326ed8aab7dff8859dd685e7a4a324431996eed
     hash_after: 3326ed8aab7dff8859dd685e7a4a324431996eed
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-4
+    hash_before: 0a4186598075cc5987b5e7256a856d45bb4f8c87
+    hash_after: 0a4186598075cc5987b5e7256a856d45bb4f8c87
+    returns: 2
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | partly, the rule, the sweep and the case hold, one row stands unowned |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does every rule the approach adds carry a case | yes, one case reads both fronts over the real tree |; | does every claim carry a proof | the root row and the tools row read with the code now, the third row past it |; TL;DR:; The redraw answers the root fault and the tools fault the last round named.; The table names three ways the two fronts part, and the change list owns two.; Say which front owns the server's own rows, and what becomes of the switch under them.; The findings, one a line:; `lint` runs the tree reader and the schema reader only where `serverFaults` answers nothing.; An empty list from the server counts as an answer there, so both readers stand off.; `se-lsp check .` answers an empty list at exit 0 on this box.; So the check counts neither reader today, and `readingOf` turns both on for it.; Row three says `lint` adds both over a whole sweep, which reads past that switch.; Redraw row three with the switch, and say what the check counts after the change.; Say whether `lint` keeps `serverFaults` once `readingOf` stands, and which front owns those rows.; The server draws its own checks itself, so the panel holds them outside the findings route.; A case asserting one count turns red where those rows stand on one side alone.; The chapter the approach links stands nowhere in that note, so the change writes it.; The rest holds: the Biome guard, the case under `test/contract`, and the rule's home."
 ---
 
 # Ask
@@ -163,30 +169,31 @@ fail
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the approach answer the ask | partly, the rule and the sweep hold, the table of doors does not |
+| does the approach answer the ask | partly, the rule, the sweep and the case hold, one row stands unowned |
 | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |
-| what does `./RUNME.sh check` answer | 0 on this commit, with the server standing |
-| does every rule the approach adds carry a case | yes, one case drives the sweep under both door sets |
-| does every claim carry a proof | no, the root row and the tools row read against the code |
+| what does `./RUNME.sh check` answer | 0 on this commit |
+| does every rule the approach adds carry a case | yes, one case reads both fronts over the real tree |
+| does every claim carry a proof | the root row and the tools row read with the code now, the third row past it |
 
 TL;DR:
 
-- The rule and the sweep stand as drafted.
-- The table of doors names what parts the two callers wrong, and leaves out what bites.
-- Redraw that table off the code, and say how the case reaches the count the check prints.
+- The redraw answers the root fault and the tools fault the last round named.
+- The table names three ways the two fronts part, and the change list owns two.
+- Say which front owns the server's own rows, and what becomes of the switch under them.
 
 The findings, one a line:
 
-- Both callers hand the method root, so neither one reads a tree the other leaves alone.
-- `lint` takes its root from `cli-doors`, and `findingsFor` takes `box.method`.
-- `rootsHere` reads the method root off the marker above that module, so no caller hands the work root.
-- The tools row reads against the code, because `cli-doors` names each tool through `whereIs` over the same survey.
-- The parting that stands is the Biome guard. `lint` hands an empty path where no binary stands.
-- `findingsFor` hands the bare name there, so the panel runs a Biome the check skips.
-- `lint` also adds `serverFaults` past the sweep, and the tree and schema readers where the server binary is missing.
-- A case asserting one count over one door set turns red there. Say which side owns each of those three.
-- The case drives two door sets over a fake tree, and reads nothing the check prints.
-- The ask wants the case red where its count differs from the check's. Say how the case reaches that count.
+- `lint` runs the tree reader and the schema reader only where `serverFaults` answers nothing.
+- An empty list from the server counts as an answer there, so both readers stand off.
+- `se-lsp check .` answers an empty list at exit 0 on this box.
+- So the check counts neither reader today, and `readingOf` turns both on for it.
+- Row three says `lint` adds both over a whole sweep, which reads past that switch.
+- Redraw row three with the switch, and say what the check counts after the change.
+- Say whether `lint` keeps `serverFaults` once `readingOf` stands, and which front owns those rows.
+- The server draws its own checks itself, so the panel holds them outside the findings route.
+- A case asserting one count turns red where those rows stand on one side alone.
+- The chapter the approach links stands nowhere in that note, so the change writes it.
+- The rest holds: the Biome guard, the case under `test/contract`, and the rule's home.
 
 # implement
 
