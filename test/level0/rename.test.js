@@ -84,6 +84,29 @@ test("the move carries a file of any ending, and the rewrite reaches one too", (
   );
   assert.equal(rename.readsAsText("a line of text\n"), true);
   assert.equal(rename.readsAsText("\u0089PNG\u0000"), false);
+  assert.deepEqual(
+    said.skipped,
+    [`src/${NEW}/a-picture`, `src/${NEW}/icon.png`],
+    "the run answers for each file its reader leaves out",
+  );
+});
+
+// A source joining a key on a zero byte reads as a picture, and a run says so. [[spec/tickets/a-rename-reaches-every-note]]
+test("a source the reader leaves out stands in the answer, so no reach drops in silence", () => {
+  const disk = fakeDisk({
+    [at(`src/${OLD}/main.go`)]: "package main\n",
+    [at("src/scripts/one.js")]: `const KEY = "\u0000";\nexport const SOURCE = "src/${OLD}";\n`,
+  });
+  const it = { disk, join, root: ROOT };
+
+  const said = rename.renaming(it, `src/${OLD}`, `src/${NEW}`);
+
+  assert.deepEqual(said.skipped, ["src/scripts/one.js"], "the run names the file it skips");
+  assert.match(
+    disk.read(at("src/scripts/one.js")),
+    /src\/gadget/,
+    "and the reach in it stands, which is what the answer warns of",
+  );
 });
 
 // [[spec/tickets/a-rename-reaches-every-note]]

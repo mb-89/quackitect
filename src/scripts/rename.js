@@ -57,9 +57,16 @@ export function readsAsText(said) {
     .includes("\u0000");
 }
 
-// The files a rewrite reads: every one a reader reads as text. [[spec/design_output/index#a-rename-reaches-a-name]]
+// The files a rewrite reads, beside the ones its reader leaves out. A rule that skips says what it skips. [[spec/design_output/index#a-rename-reaches-a-name]]
 export function writtenFiles(it, where) {
-  return filesUnder(it, where).filter((one) => readsAsText(it.disk.read(one)));
+  const read = [];
+  const skipped = [];
+  for (const one of filesUnder(it, where)) {
+    if (readsAsText(it.disk.read(one))) read.push(one);
+    else skipped.push(one);
+  }
+  read.skipped = skipped;
+  return read;
 }
 
 // A note reaches a reader two ways, as a path and as a link without its ending. [[spec/design_output/index#a-rename-reaches-a-name]]
@@ -73,14 +80,19 @@ export function formsOf(from, to) {
 // A name standing as no path, such as a module's, which rewrites and moves nothing. [[spec/design_output/index#a-rename-reaches-a-name]]
 export function renamingText(it, from, to) {
   const wrote = [];
-  for (const file of writtenFiles(it, it.root)) {
+  const held = writtenFiles(it, it.root);
+  for (const file of held) {
     const text = it.disk.read(file);
     const said = renamedText(text, from, to);
     if (said === text) continue;
     it.disk.write(file, said);
     wrote.push(file.slice(it.root.length + 1));
   }
-  return { moved: [], wrote, why: "" };
+  return { moved: [], wrote, skipped: shortened(it, held.skipped), why: "" };
+}
+
+function shortened(it, files) {
+  return [...(files ?? [])].map((one) => one.slice(it.root.length + 1));
 }
 
 // The move: the folder carries, then every reach rewrites. [[spec/design_output/index#a-rename-reaches-a-name]]
@@ -113,15 +125,16 @@ export function renaming(it, from, to) {
   it.git?.run(["add", "-A", String(from), String(to)], true);
 
   const wrote = [];
-  for (const file of writtenFiles(it, it.root)) {
+  const read = writtenFiles(it, it.root);
+  for (const file of read) {
     const text = it.disk.read(file);
     const said = formsOf(from, to).reduce(
-      (held, [one, other]) => renamedText(held, one, other),
+      (one, [name, other]) => renamedText(one, name, other),
       text,
     );
     if (said === text) continue;
     it.disk.write(file, said);
     wrote.push(file.slice(it.root.length + 1));
   }
-  return { moved, wrote, why: "" };
+  return { moved, wrote, skipped: shortened(it, read.skipped), why: "" };
 }

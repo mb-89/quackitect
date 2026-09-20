@@ -264,6 +264,10 @@ export function renameHere(argv) {
   }
   console.log(`${from} stands at ${to}.`);
   for (const one of said.wrote) console.log(`  ${one}`);
+  // A rule that skips says what it skips, so a hand reads what the run left out. [[spec/design_output/index#a-rename-reaches-a-name]]
+  for (const one of said.skipped ?? []) {
+    console.log(`  the reader reads ${one} as a picture, so the rewrite leaves it alone`);
+  }
   console.log("Run ./RUNME.sh links, then ./RUNME.sh check.");
   return 0;
 }

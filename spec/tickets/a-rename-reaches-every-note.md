@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -227,6 +227,14 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 9a3e07829eadd8de9c6b20d66391412c3ea3e0a7
     hash_after: 9a3e07829eadd8de9c6b20d66391412c3ea3e0a7
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 2f576760c6ae966efb39bc862131bbab0475ba73
+    hash_after: 2f576760c6ae966efb39bc862131bbab0475ba73
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -412,9 +420,9 @@ The finding's own fix rides beside it. Two sources join a key on the zero byte, 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The verb, its cases, the ignore rows, the minted ticket, and the note taking the package table.
-- every door the change reaches has a fake. The case reading bytes hands its own disk, as each case beside it does.
-- a comment names the approach the change implements. The reader of bytes says why it reads them, and the note owns the table.
+- the change touches no file the ask leaves out. The verb, its cases, the command line's print, and the two sources joining a key.
+- every door the change reaches has a fake. Each case hands its own disk, and the new one feeds it a source holding a zero byte.
+- a comment names the approach the change implements. The verb says what it leaves out, and each key says why it joins on that mark.
 
 ## tests-green
 
