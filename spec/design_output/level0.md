@@ -1478,8 +1478,10 @@ stands behind Vale's finding with one general veto:
 `src/engine/tense.js` reads the line the finding stands in through wink-nlp,
 which hands a lemma a token. Two more vetoes ride the same reader, in
 `src/bridge/prose.js`. The three doors reading prose call that one entry: the
-write door, the draft check and the commit message. A `vale` line at debug
-counts what the reader lets stand.
+write door, the draft check and the commit message. The check and the terminal
+push door take the tense veto alone, through `readThrough` in
+`src/bridge/findings.js`, so a push carries the list the check reads. A `vale`
+line at debug counts what the reader lets stand.
 
 | Vale finds | the reader says |
 |---|---|
