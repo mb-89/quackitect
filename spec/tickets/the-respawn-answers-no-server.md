@@ -60,11 +60,13 @@ A reload that restarts the server leaves a server standing, or writes why it fel
 
 ## says
 
-The restart hands the new server to the process door. The door starts it detached with its output in the serve log, and watches it for a window. A child ending inside the window is a fall. Then the old server writes one fatal line naming the exit and the line the child writes. A child standing past the window is the server, and the old one exits clean. The respawn leaves the wire door, because starting a process is the process door's work. So the fake process door drives the fall in a case. The serve log's name stands once, in the log library, and the start road and the chat line read it there.
+The restart hands the new server to the process door. The door starts it detached with its output in the serve log, and watches it for a window. A child ending inside the window is a fall. Then the old server writes one fatal line naming the exit and the line the child writes. A child standing past the window is the server, and the old one exits clean.
+
+The respawn leaves the wire door, because starting a process is the process door's work. So the fake process door drives the fall in a case. The serve log's name stands once, in the log library, and the start road and the chat line read it there.
 
 ## checked
 
-- the change follows the ask: a fall writes its reason to the log, and a case drives it through the fake door
+- the change follows the ask: a fall logs its reason, and a case drives it through a fake door
 - the cleanup is in the change: the respawn leaves the wire door, and the serve log's name stands once
 - every fact stands in one place: the design note holds the window and the file, and the code points there
 

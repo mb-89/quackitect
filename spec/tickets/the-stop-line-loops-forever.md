@@ -60,11 +60,13 @@ A turn ends after the tooth refuses the stop line the number of times the config
 
 ## says
 
-The cap on holds in a row ends a turn over every continue rule, the queue's among them. The flag that held the queue rule past the cap goes, from the rule file, the tooth and the design note. So the last stop line the config allows under the queue binding ends the turn, and the next prompt reads the queue again. The vote's log line writes at warn where the tooth lets go, and it names the holds the cap read, where it named none before. A case drives the stop lines the ask names over a free ticket under the queue binding, and reads the last turn end and its line.
+The cap on holds in a row ends a turn over every continue rule, the queue's among them. The flag that held the queue rule past the cap goes, from the rule file, the tooth and the design note.
+
+So the last stop line the config allows under the queue binding ends the turn, and the next prompt reads the queue again. The vote's log line writes at warn where the tooth lets go. It names the holds the cap read, where it named none before. A case drives the stop lines the ask names over a free ticket under the queue binding. It reads the last turn end and its line.
 
 ## checked
 
-- the change follows the ask: the cap ends the turn under the queue binding, and the log line names the runaway at warn
+- the change follows the ask: the cap ends the turn under the queue binding, and the log names the runaway
 - the cleanup is in the change: the flag goes from the rule file, the tooth, the note and the fixtures
 - every fact stands in one place: the stop note's chapter holds the rule, and the tooth points at it
 

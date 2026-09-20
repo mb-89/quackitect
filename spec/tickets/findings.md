@@ -183,7 +183,7 @@ The findings the desk parked as private notes, each a defect an agent fixes with
 
 - a change widening past the ask reads the test-first rule first, and stays with the ask: `spec/guidance/working`
 - a change to a log line comes with a case asserting the words, so the count reads right first: `test/level0/stop-door.test.js`
-- a loop of the hand's own starts from a script file and stops by its task, with no kill by pattern: `.se/scripts`
+- a loop of the hand's own starts from a script file and stops by its task: `.se/scripts`
 - a note meets the lint verb before the hand-back, because no write door holds a session the server misses: `spec/guidance/cloud`
 
 ### thoughts
@@ -194,7 +194,7 @@ The child's output went to a file and to no pipe. A pipe dies with the old serve
 
 ### checked
 
-- every fact stands in one place: the guard, the window, the log's name and the cap each live in one note
+- every fact stands in one place: the guard, the window, the log's name and the cap live in one note
 - every number carries a name in one place: the window and the contract's waits stand as named constants. The runs table holds its counts
 - every header says what its file is for: the wire door's header names the listen alone, and no header counts
 
@@ -214,7 +214,7 @@ The child's output went to a file and to no pipe. A pipe dies with the old serve
 ### left
 
 - no person step stands parked, and no ticket stands minted outside this group
-- the hook scripts keep a guard of their own beside `runsHere`, because the commit door wants a test beside each. A hand changing those tests takes them
+- the hook scripts keep a guard of their own beside `runsHere`, because the commit door wants a test each. A hand changing those tests takes them
 - the handover says: branch done marks this branch, and the desk reads the group before the merge into main
 
 # Discussion

@@ -64,7 +64,7 @@ The wait stands in the Vale paths case. It runs Vale again where a line names Va
 
 ## checked
 
-- the change follows the ask: the runs answered green in a row, and the red case names its load and waits on it
+- the change follows the ask: the runs answered green in a row, and the red case waits on its load
 - the cleanup is in the change: the runs revealed none
 - every fact stands in one place: the case holds the wait, and this ticket points at the case
 
