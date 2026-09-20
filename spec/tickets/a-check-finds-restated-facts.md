@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: 28fdafe3de7d68163d1f9e4d439ee1768431ca0f
     returns: 2
     why: A named path asks the checker under `src/lsp`, and the module stands outside that road.; Say which checker holds each rule, because the editor and the check read the one under `src/lsp`.; Name the JavaScript the module blanks with, because `blanked` stands inside the projection.; Say the scope `RestatedTable` reads, and the rule file it lands in.; Name the level `RestatedTable` lands at, because the projection writes a level into every rule file.
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 63ba308a28025da183a21964d0bd1ca9a2a61a04
+    hash_after: 63ba308a28025da183a21964d0bd1ca9a2a61a04
 ---
 
 # Ask
@@ -136,40 +140,45 @@ A sentence counts its own table, a header retells its pointer, and the copies dr
 
 <!-- the form is text -->
 
-One measure answers the three: the longest run of words two places share. Each
-rule lands where its reading belongs, because Vale hands a rule one buffer:
+One measure answers the three: the longest run of words two places share. The
+checker under `src/lsp` answers a named path, so the two rules reading a pair of
+notes land there:
 
 | the finding | where it lands | what it reads |
 |---|---|---|
-| `RestatedTable` | the paragraph schema, projected into Vale | a paragraph and the table touching it, in one buffer |
-| `RestatedPointer` | `restatedFaults` in `.claude/skills/level0/lib/restated.js` | a heading, and the heading its pointer names in another note |
-| `RestatedRule` | the same module | a rule line, against every rule line of another guidance note |
+| `RestatedTable` | `spec/config/styles/VoiceParagraph/RestatedTable.yml`, which the paragraph schema projects | one buffer, under `scope: raw`, at `level: warning` |
+| `RestatedPointer` | `restatedFaults` in `src/lsp/restated.go` | a heading, and the heading its pointer names in another note |
+| `RestatedRule` | the same file | a rule line, against every rule line of another guidance note |
 
-The two reading a pair of notes stand in a module of their own, because
-`tree.js` stands near the ceiling `code.fileLines` sets.
+Why each home:
 
-The pieces:
+- `Checker.Over` answers a named path, and `Checker.Sweep` answers the tree
+- a paragraph and the table touching it stand in one buffer, which is what Vale hands a rule
+- the rules in JavaScript weigh two files for the write door, and a named path asks none of them
 
-- `sharedRun(a, b)` answers the longest run two texts share, and each rule reads its own bound
-- the module blanks a code span, a link and a fence, the way `blanked` reads beside the prose reader
-- a pointer resolves through the slug the vocabulary note names, so it reads the heading a reader clicks
-- a rule line reads as the text after its number, so the mark before it counts for nothing
+The pieces in Go:
 
-The lint calls it for a named path too. The tree rules run over the whole tree
-alone today, so this one takes the paths in hand and reads the notes under
-them. [[spec/design_output/tree#when-the-sweep-runs]]
+- `sharedRun(a, b)` answers the longest run of words two texts share
+- the reading blanks a fence with `fenceAt`, and a code span and a link each with its own pattern
+- `sectionsOf` answers the headings, and the slug turns one into the anchor a pointer names
+- the slug reads its cases from the source [[spec/design_output/vocabulary#the-slug-reads-one-source]] names
+- `Over` reads the note in hand against the notes its pointers name, and `Sweep` reads every note
 
-Each bound takes a key, and each key an entry in `spec/config/level0.schema.json`:
+Each bound stands where its rule reads it:
 
-| key | what it bounds |
+| the bound | where it stands |
 |---|---|
-| `restated.table` | the run a paragraph shares with the table touching it |
-| `restated.pointer` | the run a heading shares with the heading its pointer names |
-| `restated.rule` | the run two rule lines of two notes share |
+| the run a paragraph shares with its table | the paragraph schema, beside the caps it projects |
+| `restated.pointer` | `spec/config/level0.json`, with its entry in `spec/config/level0.schema.json` |
+| `restated.rule` | the same pair |
 
-The two rules in JavaScript land at warning, and the implement step lists what
-they name over the tree. The ticket cleaning those places turns them to error.
-So this one leaves no fault standing behind a green check.
+The cases: the Go pair stands in `src/lsp/restated_test.go`, over the tree its
+fixture writes. The Vale rule takes a case in `test/contract/paragraph.test.js`,
+beside the rules the same schema projects.
+
+Each rule lands at warning, and the implement step lists what it names over the
+tree. The ticket cleaning those places turns them to error. So this one leaves
+no fault standing behind a green check.
 
 ## review
 
