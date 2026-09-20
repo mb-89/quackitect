@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 5387e4f82b24 · claude-code-remote
@@ -104,6 +104,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: abbe6e5427ee71d000090e552e2c3ef961a225ec
+    hash_after: abbe6e5427ee71d000090e552e2c3ef961a225ec
 ---
 
 # Ask
@@ -185,37 +189,72 @@ rests on a reader's memory.
 
 <!-- what was done, one line a ticket or a thing -->
 
-<!-- the form is list -->
+- `the-question-process-gets-tests`: a contract case holds the successor road open
+- `the-rule-shares-one-slug`: one module owns the slug, and a source holds its cases
+- `voice-rules-skip-the-record`: a case guards the fields the engine writes
+- `group-key-takes-one-spelling`: the ticket door refuses a group named as a branch
+- `runtime-half-takes-the-rest`: the register stands under the runtime half
+- `a-project-adds-vale-rules`: the styles of both roots assemble, and the door reads them
+- `a-check-finds-every-writer`: the escape binds to its line, and the installer meets its lists
+- `a-check-finds-restated-facts`: three rules find one fact written twice, in one pass
+- `a-lint-holds-note-rules`: the check reads a marked rule against the rationale it links
+- `the-check-holds-test-first`: both commit doors refuse a change standing with no test
+- `the-door-reads-script-writes`: the shell door reads the script a command runs
+- `the-door-rule-reads-env`: a rule holds the environment and the platform inside a door
+- six private notes decide, and five become tickets standing in the tree
 
 ### well
 
 <!-- what went well, and what made it go well -->
 
-<!-- the form is list -->
+- every rule this branch writes carries a case, so a later hand meets the rule
+- the one-hand-a-step rule caught four designs the first draft got wrong
+- the restated pass drops from minutes to about a second, because the tree holds it
+- the write door named the fault and the line each time, so a fix took one round
+- the engine's own doors refused three commits of mine, and each refusal was right
 
 ### badly
 
 <!-- what did not, each with its moment in the log or the transcript -->
 
-<!-- the form is list -->
+- four hands spawned at once took the same leaf, and three dropped their hold
+- a write landed on a whole test file, and the text of a standing case went
+- a reviewer hand ran a checkout and wiped an uncommitted fix, twice
+- `the-door-rule-reads-env` failed design review seven times, each on a real finding
+- a minted ticket's name held six words, and two contract cases came back red on it
+- I read the retro's note step as a gap, and the `todo` tag was the road
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
-<!-- the form is list -->
+- spawn one hand at a time, because the queue binds one session to one ticket
+- read a file before a write lands on it, and reach for the patch road
+- tell each spawned hand to run no git command changing the working tree
+- read the whole approach against the tree before the hand-back, the way a review does
+- `./RUNME.sh mint` takes the name cap, so a long name stops at the mint
+- read the verbs for a road before calling a step impossible
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 
-<!-- the form is text -->
+The branch's own rules refused my work more often than any reviewer. That reads
+as the point of it: a rule a program holds costs the writer the same as it costs
+every later hand.
+
+The design rounds cost the most, and each finding was one the tree could answer
+for itself. A hand reading `.vale.ini` and the tree before drafting would have
+found the sections the draft missed. The one thing I misread was a step, calling
+a gap what the verbs already carry.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-<!-- the form is checklist -->
+- every fact the change adds stands in one place: each note points at the file holding it
+- every number carries a name in one place: no count stands in prose here
+- every header says what its file is for: each new file opens on such a header
 
 ## cloud
 
