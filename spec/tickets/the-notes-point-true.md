@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 1670436ae0bb · claude-code-remote
@@ -103,6 +103,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: e1380ffae1afb765b0451f3b532ff0ca4ed26ae3
+    hash_after: e1380ffae1afb765b0451f3b532ff0ca4ed26ae3
 ---
 
 # Ask
