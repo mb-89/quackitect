@@ -176,6 +176,16 @@ record:
       - name: tests
         exit: 0
         said: "# duration_ms 12445.668614"
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 8d3261f797e9dd711767a05e5f34b8fa8e31ca95
+    hash_after: 8d3261f797e9dd711767a05e5f34b8fa8e31ca95
+    returns: 3
+    why: the case goes red only beside the change, and this box leaves the tree green
+    answered:
+      - name: tests
+        exit: 0
+        said: "# duration_ms 12620.990085"
 ---
 
 # Ask
