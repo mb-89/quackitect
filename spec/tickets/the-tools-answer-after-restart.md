@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -139,6 +139,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box fa49097ce66c · claude-code-remote · helper-9
+    hash_before: 0748e10f79eecd29bd3ef520ebba817465fd1cdf
+    hash_after: 0748e10f79eecd29bd3ef520ebba817465fd1cdf
+reason: done
 ---
 
 # Ask
@@ -398,17 +403,53 @@ The projections stay with `freshens`, which fills them on a fresh box already.
 
 <!-- the form is files -->
 
+- spec/config/projections.json
+- spec/design_output/level0.md
+- spec/guidance/code/code.md
+- spec/guidance/review/reviewing.md
+- spec/tickets/the-doctor-probes-every-hook.md
+- spec/tickets/the-tools-answer-after-restart.md
+- src/bridge/guidance.js
+- src/bridge/projection.js
+- src/bridge/server.js
+- src/bridge/tools.js
+- src/bridge/write.js
+- src/engine/projection.js
+- test/level0/restart-box.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- line one lands: `fillsBox` fills `box.schemas`, `box.tools` and `box.specs`. The mint spec names the kinds now.
+- line two lands: `test/level0/restart-box.test.js` drives six cases on a box carrying no session start.
+- two of those cases drive a `tool.call` straight, the way the ask's second line asks.
+- the fault reads true: 4 of the 6 cases fail on `30fee400`, and all 6 pass on `0748e10f`
+- the mint case feeds the kind `nothing` and reads back a refusal, in place of a `TypeError`
+- a mutant dropping the survey fill turns case six red, 1 against 5
+- a mutant handing the registration `specsOf(box)` again turns case five red, 1 against 5
+- `./RUNME.sh check` answers 0 on `0748e10f`, 1296 cases green and 2 skipped
+- `./RUNME.sh branch review` reads the retro as absent from the handback, which a branch mid-group calls for
+- the order holds: `fillsBox` runs ahead of `freshens`, and no projection target sits under `spec/schemas`
+- the fields the table leaves out fill themselves, because `guidanceOf`, `sessionHere` and `freshens` each fill one
+- `fillsBox` reaches every event now, `engine.create` among them, and each guard holds the fill to once
+- the ten findings of design/review land, the two it leaves for implement among them
+- the diff reaches five files, and every one serves the two lines of the ask
+- minor: the comment on `fillsBox` carries four sentences, and one stands word for word in its chapter. Cut the three the chapter owns. [[spec/guidance/code/code]]
+- minor: `schemaDoor` in `src/bridge/write.js` fills `box.schemas` the same way, and this branch adds no third
+- minor: case one passes without the change too, so it guards the road in place of proving the fix
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the chapter at [[spec/design_output/level0#a-restart-fills-the-box]] owns the approach, and `fillsBox` points at it. The fill itself stands once, because `fillsBox` calls `schemasHere`, `surveyHere` and `specsOf` where they stand. The one repeat is the comment's third sentence, which the finding above names.
 
 # Discussion
 
