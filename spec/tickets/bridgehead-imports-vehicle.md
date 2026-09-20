@@ -110,7 +110,7 @@ successors: [bridgehead-probe-lands]
 # Ask
 
 <!-- gain, as text: what is gained by doing it, and not only what it does -->
-Proof that a stub can carry a small plugin of its own and still run the vehicle's hooks. Without it the bridgehead has no road, and the stub design falls back to a copy.
+Proof that a stub can carry a small plugin of its own and still run the vehicle's hooks. Without it the bridgehead has no road, and the stub design falls back to a second tree.
 
 <!-- breaks, as text: what breaks if it is never done -->
 Every stub branch builds on a guess, and the first cloud run finds out the hard way.
@@ -136,7 +136,7 @@ Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-The probe stands under test/fixtures/bridgehead, a plugin of its own. Its one module reads the vehicle file at session start, imports the module it names, and hands every event on. Four import shapes go through `claude plugin validate` and one headless turn each. A chapter of the design output names the one that holds. For details, see [[spec/design_output/level0#a-bridgehead-imports-a-copy]].
+The probe stands under test/fixtures/bridgehead, a plugin of its own. Its one module reads the vehicle file at session start, imports the module it names, and hands every event on. Four import shapes go through `claude plugin validate` and one headless turn each. A chapter of the design output names the one that holds. For details, see [[spec/design_output/level0#a-stub-names-its-vehicle]].
 
 ## review
 
@@ -150,7 +150,7 @@ The probe stands under test/fixtures/bridgehead, a plugin of its own. Its one mo
 pass
 - The approach covers every line of done_when.
 - The probe reads the vehicle file at session start and forwards session.start, tool.call and turn.complete.
-- The chapter names the shape that holds, a relative path to a copy, and three that fail.
+- The chapter names the shape that holds, a relative path inside the plugin folder, and three that fail.
 - The chapter says the plugin check passes on all four shapes, and the client admits one.
 - The test proves the forwarding on a fake harness, and its five tests pass.
 - The chapter notes a tool answers under the plugin name, which the stub design takes up.

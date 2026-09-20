@@ -536,7 +536,7 @@ The fourth round answers the last three:
 | the promise of a projection reading | `COPIED` names the fakes and the stub, which is the whole list |
 | `filesIn` standing with no caller | the function goes, and `hunksIn` answers the callers it had |
 
-The stub's template rides out as a copy of the vehicle, so a change there wants
+The stub's template rides out as a second vehicle, so a change there wants
 no test of its own. The fakes stand in for a door, and their contract test
 drives the door itself.
 

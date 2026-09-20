@@ -52,7 +52,7 @@ writes stand outside it still:
 | `config.json` | the values a window holds for its own session |
 | `vehicle.json` | the pointer a bridgehead reads before anything else |
 | `registry.json` | the register turning an identity into a place |
-| `copy.json`, `project.json` | the identity of a copy, and the project it drives |
+| `identity.json`, `project.json` | the identity of a vehicle, and the project it drives |
 
 Each name stands in more than one place. A live bridgehead hook spells it, the
 editor extension spells it, and the language server spells it again. So the move

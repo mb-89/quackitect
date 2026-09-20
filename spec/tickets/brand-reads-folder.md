@@ -195,7 +195,7 @@ entries out of the list. That is the proof the ask names.
 
 - a second link writes the same bytes as the first
 - the manifest and the icon travel tracked, so the first link in a fresh vehicle writes them once
-- `produce` stamps the copy's manifests and writes its icon, so a vehicle lands under its own brand
+- `produce` stamps a vehicle's manifests and writes its icon, so it lands under its own brand
 
 ## review
 
