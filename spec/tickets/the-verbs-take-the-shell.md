@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -92,6 +92,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-verbs-take-the-shell already carries every commit on main.
+  - step: split
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 8e88395e94168f09e5ed78aa602dd101a3d71cf5
+    hash_after: 8e88395e94168f09e5ed78aa602dd101a3d71cf5
 ---
 
 # Ask
@@ -120,14 +124,29 @@ work runs through the engine.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/a-log-verb-reads-sessions]], standard
+- [[spec/tickets/a-return-asks-another-hand]], standard
+- [[spec/tickets/a-split-verb-cuts-files]], standard
+- [[spec/tickets/check-prose-reads-a-draft]], standard
+- [[spec/tickets/release-keeps-local-commits]], standard
+- [[spec/tickets/the-brief-verbs-go]], standard
+- [[spec/tickets/the-commit-verb-lints-messages]], standard
+- [[spec/tickets/the-pull-names-the-unblock]], standard
+- [[spec/tickets/the-read-tools-answer-first]], standard
+- [[spec/tickets/the-spawn-answers-a-helper]], standard
+- [[spec/tickets/the-take-skips-an-orphan]], standard
+- [[spec/tickets/the-unblock-keeps-its-shape]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child lands one verb or one door, which a reviewer reads whole in one pass
+- the ask names a hand spelling out in the shell, and each child takes one of those
+- no child waits on another, so none names a `depends_on`
 
 # children
 
