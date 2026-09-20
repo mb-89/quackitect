@@ -462,8 +462,13 @@ The second round answers the verdict:
 | one stray test carried every change | each change wants the test naming it, by file name or by import |
 | a write dropped two standing cases | `tools-door.test.js` stands as it stood, and the hand tools take their own file |
 
-The disk and the process fakes answer through a closure, so the three taking the
-guard today are the ones returning a plain map.
+The third round closes the two the second left open:
+
+| the finding | what lands |
+|---|---|
+| four fakes stood without the guard | every fake under `src/doors/fake` takes it, and the check stays green |
+| the evidence named a difference standing nowhere | this table says what a hand reads back |
+| the import read off the whole delta | `hunksIn` keys the added lines by file, and each test answers off its own |
 
 ### checked
 
