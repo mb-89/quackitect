@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: verdict
 steps:
   - name: design
@@ -196,6 +196,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-18
+    hash_before: ed44b86e896e0977f9121f7141d69673cd30996e
+    hash_after: ed44b86e896e0977f9121f7141d69673cd30996e
+reason: done
 ---
 
 # Ask
@@ -451,17 +456,64 @@ The note writes the mark in a code span, because the paragraph rules admit the c
 
 <!-- the form is files -->
 
+- .claude/skills/level0/lib/guidance.js
+- .claude/skills/level0/lib/projection.js
+- .claude/skills/level1/hooks/level1.js
+- .claude/skills/level1/lib/pull.js
+- spec/design_output/pull.md
+- spec/guidance/review/reviewing.md
+- spec/guidance/voice.md
+- spec/schemas/guidance.schema.yaml
+- spec/tickets/the-judge-reads-answer-rules.md
+- src/scripts/pull.js
+- test/contract/guidance-rules.test.js
+- test/level0/guidance.test.js
+- test/level0/level1.test.js
+- test/level0/pull-leaves.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+| the question reviewing asks | the answer |
+|---|---|
+| does the branch do what the ask asks | yes, each done_when line lands |
+| is what the diff touches beyond the ask trivial | yes, the hunks stand inside the approach's table and its case files |
+| what does `./RUNME.sh check` answer | 0, with the server standing |
+| does a retro stand in the handback | no, and `branch review` names it at the branch's close |
+| does every rule the change adds carry a case | yes, each reader the change adds carries one |
+| does a case feed the rule something bad | yes, a label outside the set answers nothing |
+
+TL;DR:
+
+- The judge answers a label, and the label names the note, the number and the line.
+- Each finding of the design round lands.
+- `./RUNME.sh branch test` over the case files answers green.
+- `./RUNME.sh check` answers 0.
+- The retro stands open for the branch, and this ticket owes none.
+
+What reads true against the tree, one a line:
+
+- `forEvidence` counts every item and drops the marked one, so its number holds the chapter's.
+- `labelOf` writes the note's path with each slash as a hyphen, so two notes stand apart.
+- `markOf` reads the mark bare or in a code span, and `actionables` strips either.
+- `judgeLabels` opens on `follows`, and `ruleBroken` answers an empty line for a label outside the set.
+- `judged` returns before the model where the material holds no rule, so the judge stands silent.
+- `judgeMaterial` hands one labelled rule per rule the leaf's reads name.
+- The voice note marks its answer rules, and the contract case reads the note on the disk.
+- `spec/design_output/pull.md` carries the two chapters the approach names, and points at the schema.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place. The label's shape stands in `labelOf`, and the pull chapter points at the schema for the marks.
 
 # Discussion
 
