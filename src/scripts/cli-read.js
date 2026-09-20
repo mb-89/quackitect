@@ -106,7 +106,7 @@ export async function lint(where) {
 
   const ms = it.clock.now().getTime() - began;
   if (!found.length) {
-    // The rules passing is the expected road, so the row stands at debug and the floor hides it. [[spec/design_output/log#which-door-says-what]]
+    // The rules passing is the expected road, so the row stands at debug and the floor hides it. [[spec/design_output/log#which-kind-says-what]]
     await it.log.say("debug", "vale", `the rules pass over ${where.join(" ")}`, { ms });
     console.log("The rules pass.");
     return 0;

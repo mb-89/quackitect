@@ -245,7 +245,7 @@ in a closed ticket's record, and every review hand read the notes it repointed.
 The scan this box wrote before the rule stood, under `.se/scripts`, read the
 tree the way the rule does now, and the rule replaced it:
 
-```
+~~~
 // Every [[pointer]] a tracked file writes, and where each one lands.
 import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -285,7 +285,7 @@ for (const f of files) {
     }
   });
 }
-```
+~~~
 
 ### checked
 
