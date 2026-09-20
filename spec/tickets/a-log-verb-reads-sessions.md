@@ -138,6 +138,19 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 33dcd8370b545808ed49eaef32366cddd03349a5
+    hash_after: 33dcd8370b545808ed49eaef32366cddd03349a5
+    returns: 1
+    why: the seen field under implement/tests-red breaks Shape, so the tree check answers red
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 1
+        said:      1  in all
 ---
 
 # Ask
@@ -299,26 +312,36 @@ The span case names the scale the review asks about. A row's stamp answers milli
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/log-verb.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The verb, the read and the cases all stand, and the check answers red on one line of this ticket.
+
+`seen` under `implement/tests-red` carries four paragraphs in one run, which `Shape` refuses. The ticket door refuses a hand's fix to a field it passes, so `./RUNME.sh ticket pull --back implement/tests-red` is the road.
+
+This leaf fails for that one line. The hand takes the ticket back, rewrites the field as a list, and walks the leaves forward again.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the verb, the read, the cases and the chapter the approach names
+- the disk and the clock reach the verb as doors, and `fakeDisk` drives the cases
+- each header points at the chapter the approach names, and that chapter owns the flags
 
 # verdict
 
