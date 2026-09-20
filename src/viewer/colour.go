@@ -1,89 +1,107 @@
 // The colour each kind wears. A prompt wears bold yellow across its whole row,
 // and a reply wears bold green, so a turn reads at a glance. A tool row wears
-// the colour of the tool it names.
+// the colour of the tool it names. The numbers stand in the config.
 // [[spec/design_output/viewer#colours]]
 
 package main
 
 import (
 	"hash/fnv"
+	"sort"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"quackitect/config"
 )
 
+// The file the colours stand in, under the folder the Vale styles share. [[spec/design_output/viewer#colours]]
+const coloursAt = "spec/config/styles/colours.json"
+
+var palette struct {
+	kinds  map[string]string
+	tools  map[string]string
+	levels map[string]string
+	window map[string]string
+	bold   map[string]string
+	spare  []string
+}
+
+// The styles the window wears outside a row, which the read below fills. [[spec/design_output/viewer#colours]]
 var (
-	dimStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("243"))
-	barStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("111")).Bold(true)
-	ruleStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("238"))
-	headStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("252")).Bold(true)
-	promptStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("220")).Bold(true)
-	replyStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("114")).Bold(true)
+	dimStyle    lipgloss.Style
+	barStyle    lipgloss.Style
+	ruleStyle   lipgloss.Style
+	headStyle   lipgloss.Style
+	openStyle   lipgloss.Style
+	rowSelected lipgloss.Color
 )
 
-var kindColours = map[string]string{
-	"level0":   "141",
-	"config":   "180",
-	"sidebar":  "213",
-	"project":  "109",
-	"bash":     "173",
-	"stop":     "146",
-	"agent":    "176",
-	"review":   "79",
-	"answer":   "121",
-	"gate":     "168",
-	"bug":      "197",
-	"write":    "222",
-	"vale":     "150",
-	"judge":    "183",
-	"work":     "117",
-	"note":     "181",
-	"unparsed": "208",
+// The window reads the colours once, at start, and holds what it reads. [[spec/design_output/viewer#colours]]
+func loadColours(root string) {
+	palette.kinds = config.Map(root, coloursAt, "kinds")
+	palette.tools = config.Map(root, coloursAt, "tools")
+	palette.levels = config.Map(root, coloursAt, "levels")
+	palette.window = config.Map(root, coloursAt, "window")
+	palette.bold = config.Map(root, coloursAt, "bold")
+	palette.spare = orderedValues(config.Map(root, coloursAt, "spare"))
+
+	dimStyle = windowStyle("dim")
+	barStyle = windowStyle("bar")
+	ruleStyle = windowStyle("rule")
+	headStyle = windowStyle("head")
+	openStyle = windowStyle("tab")
+	rowSelected = lipgloss.Color(palette.window["selected"])
 }
 
-var toolColours = map[string]string{
-	"Read":       "75",
-	"Grep":       "81",
-	"Glob":       "110",
-	"Edit":       "215",
-	"Write":      "209",
-	"Bash":       "179",
-	"PowerShell": "137",
-	"Agent":      "170",
-	"WebFetch":   "115",
-	"WebSearch":  "122",
+// A map carries no order, so the spare list reads its keys in order. [[spec/design_output/viewer#colours]]
+func orderedValues(said map[string]string) []string {
+	names := make([]string, 0, len(said))
+	for name := range said {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	out := make([]string, 0, len(names))
+	for _, name := range names {
+		out = append(out, said[name])
+	}
+	return out
 }
 
-var spare = []string{"67", "103", "139", "144", "151", "181", "187", "152"}
+// A colour the config holds nowhere leaves the style plain, so the window wears the terminal's own. [[spec/design_output/viewer#colours]]
+func styleOf(name, colour string) lipgloss.Style {
+	out := lipgloss.NewStyle()
+	if colour != "" {
+		out = out.Foreground(lipgloss.Color(colour))
+	}
+	if palette.bold[name] != "" {
+		out = out.Bold(true)
+	}
+	return out
+}
+
+func windowStyle(name string) lipgloss.Style {
+	return styleOf(name, palette.window[name])
+}
 
 func kindStyle(kind string) lipgloss.Style {
-	switch kind {
-	case "prompt":
-		return promptStyle
-	case "reply":
-		return replyStyle
+	if colour, found := palette.kinds[kind]; found {
+		return styleOf(kind, colour)
 	}
-	if colour, found := kindColours[kind]; found {
-		return lipgloss.NewStyle().Foreground(lipgloss.Color(colour))
+	if colour, found := palette.tools[kind]; found {
+		return styleOf(kind, colour)
 	}
-	if colour, found := toolColours[kind]; found {
-		return lipgloss.NewStyle().Foreground(lipgloss.Color(colour))
+	if len(palette.spare) == 0 {
+		return lipgloss.NewStyle()
 	}
 	sum := fnv.New32a()
 	sum.Write([]byte(kind))
-	return lipgloss.NewStyle().Foreground(lipgloss.Color(spare[sum.Sum32()%uint32(len(spare))]))
+	return styleOf(kind, palette.spare[sum.Sum32()%uint32(len(palette.spare))])
 }
 
 func levelStyle(level string) lipgloss.Style {
-	switch strings.ToLower(level) {
-	case "debug":
-		return lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
-	case "warn":
-		return lipgloss.NewStyle().Foreground(lipgloss.Color("214")).Bold(true)
-	case "error":
-		return lipgloss.NewStyle().Foreground(lipgloss.Color("203")).Bold(true)
-	case "fatal":
-		return lipgloss.NewStyle().Foreground(lipgloss.Color("199")).Bold(true)
+	said := strings.ToLower(level)
+	if colour, found := palette.levels[said]; found {
+		return styleOf(said, colour)
 	}
 	return dimStyle
 }
@@ -95,9 +113,9 @@ func saidStyle(r Record) lipgloss.Style {
 	}
 	switch r.Kind {
 	case "prompt":
-		return promptStyle
+		return kindStyle("prompt")
 	case "reply":
-		return replyStyle.Bold(false)
+		return kindStyle("reply").Bold(false)
 	// The kind list names the colour once, and the said column reads it there. [[spec/design_output/viewer#colours]]
 	case "answer", "note":
 		return lipgloss.NewStyle().Foreground(kindStyle(r.Kind).GetForeground())

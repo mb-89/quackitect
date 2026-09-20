@@ -10,28 +10,41 @@ import (
 	"testing"
 )
 
-// The file the ruling under the ticket's Discussion names. [[spec/tickets/the-colours-stand-in-config]]
-const coloursAt = "spec/config/styles/colours.json"
-
 func treeRoot() string { return filepath.Join("..", "..") }
+
+// The window reads the colours at start, and a case run stands in for that start. [[spec/tickets/the-colours-stand-in-config]]
+func TestMain(m *testing.M) {
+	loadColours(treeRoot())
+	os.Exit(m.Run())
+}
 
 func TestTheShippedFileHoldsAColourForEveryKindTheWindowDraws(t *testing.T) {
 	read, err := os.ReadFile(filepath.Join(treeRoot(), filepath.FromSlash(coloursAt)))
 	if err != nil {
 		t.Fatalf("the colours file reads: %v", err)
 	}
-	var said map[string]map[string]string
+	// The file opens on a comment the way every config file in the tree does. [[spec/tickets/the-colours-stand-in-config]]
+	var said struct {
+		Kinds  map[string]string `json:"kinds"`
+		Tools  map[string]string `json:"tools"`
+		Window map[string]string `json:"window"`
+	}
 	if err := json.Unmarshal(read, &said); err != nil {
 		t.Fatalf("the colours file parses: %v", err)
 	}
 	for _, kind := range []string{"level0", "config", "note", "answer", "prompt", "reply"} {
-		if said["kinds"][kind] == "" {
+		if said.Kinds[kind] == "" {
 			t.Fatalf("the kinds map holds no colour for %q", kind)
 		}
 	}
 	for _, tool := range []string{"Read", "Edit", "Bash"} {
-		if said["tools"][tool] == "" {
+		if said.Tools[tool] == "" {
 			t.Fatalf("the tools map holds no colour for %q", tool)
+		}
+	}
+	for _, name := range []string{"dim", "bar", "rule", "head", "selected", "tab"} {
+		if said.Window[name] == "" {
+			t.Fatalf("the window map holds no colour for %q", name)
 		}
 	}
 }

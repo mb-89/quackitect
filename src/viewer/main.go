@@ -34,6 +34,8 @@ func main() {
 		os.Exit(2)
 	}
 	path := flag.Arg(0)
+	// The colours stand in the config, and the window reads them once. [[spec/design_output/viewer#colours]]
+	loadColours(workRoot(path))
 
 	if *frame {
 		w, h, err := ParseSize(*size)

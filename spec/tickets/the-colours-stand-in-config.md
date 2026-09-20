@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -150,6 +150,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: da53813bfa8ee13e6fad1e278733afd9a16a6a03
+    hash_after: da53813bfa8ee13e6fad1e278733afd9a16a6a03
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -337,14 +345,18 @@ The first finding asks what answers the line about the window's own code. The ca
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The new module and the colours file. The three window files and their case files. The two module files and the shared list. The reader under the server, and the two notes.
+- every door the change reaches has a fake. Each case writes its own fixture root, and the window's case reads the shipped file alone.
+- a comment names the approach the change implements. Each new name points at the chapter the notes carry.
 
 ## tests-green
 

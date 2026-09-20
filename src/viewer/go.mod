@@ -36,3 +36,7 @@ require (
 require quackitect/yaml v0.0.0
 
 replace quackitect/yaml => ../yaml
+
+require quackitect/config v0.0.0
+
+replace quackitect/config => ../config

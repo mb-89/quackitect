@@ -4,51 +4,34 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
+
+	"quackitect/config"
 )
 
 const (
-	Tracked = "spec/config/level0.json"
-	// The local layer, owned by .claude/skills/level0/lib/folders.js and spelled again here because a Go module imports no JavaScript. [[spec/design_output/config#the-three-layers]]
-	Local   = ".se/.runtime/config.json"
+	Tracked = config.Tracked
+	Local   = config.Local
 	WordsAt = "names.words"
 	WordsIn = "SE_NAMES_WORDS"
 )
 
+// The shared reader answers the key, and this one turns what it answers into a count. [[spec/design_output/config#a-go-program-reads-the-config]]
 func wordsHere(root string) int {
-	out := 0
-	if said, held := wordsFrom(root, Tracked); held {
-		out = said
+	said, held := config.Value(root, WordsAt)
+	if !held {
+		return 0
 	}
-	if said := strings.TrimSpace(os.Getenv(WordsIn)); said != "" {
-		if whole, err := strconv.Atoi(said); err == nil {
-			out = whole
+	switch one := said.(type) {
+	case float64:
+		return int(one)
+	case string:
+		if whole, err := strconv.Atoi(one); err == nil {
+			return whole
 		}
 	}
-	if said, held := wordsFrom(root, Local); held {
-		out = said
-	}
-	return out
-}
-
-func wordsFrom(root, path string) (int, bool) {
-	read, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
-	if err != nil {
-		return 0, false
-	}
-	said := parsedJSON(string(read))
-	names, held := said["names"].(map[string]any)
-	if !held {
-		return 0, false
-	}
-	words, whole := names["words"].(float64)
-	if !whole {
-		return 0, false
-	}
-	return int(words), true
+	return 0
 }
 
 // [[spec/design_output/tools#what-the-survey-writes]]

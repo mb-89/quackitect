@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
 )
 
@@ -91,7 +90,6 @@ func (m *model) openTab(n int) {
 	m.box.GotoTop()
 }
 
-var openStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("111")).Bold(true)
 
 // [[spec/design_output/viewer#the-header-holds-the-tabs]]
 func (m model) renderStrip() string {

@@ -210,18 +210,33 @@ stands as an `unparsed` row holding its raw text.
 - A prompt wears yellow in heavy type, on its kind and on its text.
 - A reply wears green, in heavy type on its kind.
 - A warning wears amber text, and an error red.
-- Every other kind wears its own colour, out of `kindColours` in `colour.go`.
+- Every other kind wears its own colour, out of the `kinds` map in the config.
 - A note wears its own colour, on its kind and on its text.
-- A tool row wears the colour of its tool, out of `toolColours`.
+- A tool row wears the colour of its tool, out of the `tools` map.
 
-A kind the said column colours reads its number off `kindColours`. So the two
+A person sets every one of those numbers in `spec/config/styles/colours.json`,
+and the window reads the file once at start. The file stands under the folder
+the Vale styles share, and `loadColours` in `colour.go` holds what it reads.
+
+| the map the file holds | what wears it |
+|---|---|
+| `kinds` | a kind's row, on both of its columns |
+| `tools` | a tool row, named by its tool |
+| `levels` | a row at debug, warn, error or fatal |
+| `window` | the bar, the rule, the header, the open tab and the selected row |
+| `bold` | the names wearing heavy type |
+| `spare` | the colour a name both maps leave out falls back to |
+
+A kind the text column colours reads its number off the `kinds` map. So the two
 columns of one row wear one colour, and the number stands in one place.
 
-A name both tables leave out takes a spare colour by a hash of the name. So it
-wears the same colour every time. A test holds every colour in the two tables
-apart.
+A name both maps leave out takes a spare colour by a hash of the name. So it
+wears the same colour every time. A test holds every colour in the two maps
+apart, and a second test asserts the shipped file holds a colour per kind.
 
-The selected row wears a bar in the gutter and a grey background.
+The selected row wears a bar in the gutter and the background the `window` map
+names. A colour the file holds nowhere leaves the style plain, so the window
+wears the terminal's own and draws on.
 
 # The details
 

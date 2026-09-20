@@ -143,8 +143,9 @@ func TestAToolRowNamesTheToolAndEveryOtherRowItsDoor(t *testing.T) {
 
 func TestEveryKnownDoorAndToolWearsItsOwnColour(t *testing.T) {
 	t.Parallel()
-	seen := map[string]string{"220": "prompt", "114": "reply"}
-	for _, table := range []map[string]string{kindColours, toolColours} {
+	// The numbers stand in the config, so the case reads them there. [[spec/tickets/the-colours-stand-in-config]]
+	seen := map[string]string{}
+	for _, table := range []map[string]string{palette.kinds, palette.tools} {
 		for name, colour := range table {
 			if other, found := seen[colour]; found {
 				t.Fatalf("%s and %s both wear %s", name, other, colour)
@@ -153,10 +154,11 @@ func TestEveryKnownDoorAndToolWearsItsOwnColour(t *testing.T) {
 		}
 	}
 	if kindStyle("prompt").GetBackground() != (lipgloss.NoColor{}) {
-		t.Fatal("a prompt wears yellow text, and no background")
+		t.Fatal("a prompt wears its own text colour, and no background")
 	}
-	if kindStyle("prompt").GetForeground() != lipgloss.Color("220") || saidStyle(row(1, "prompt", "x")).GetForeground() != lipgloss.Color("220") {
-		t.Fatal("a prompt wears yellow on its door and on its text")
+	prompt := lipgloss.Color(palette.kinds["prompt"])
+	if kindStyle("prompt").GetForeground() != prompt || saidStyle(row(1, "prompt", "x")).GetForeground() != prompt {
+		t.Fatal("a prompt wears one colour on its door and on its text")
 	}
 }
 

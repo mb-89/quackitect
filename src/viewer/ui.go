@@ -474,7 +474,7 @@ func (m model) renderRow(r Record, selected bool, w int) string {
 
 	mark := func(style lipgloss.Style) lipgloss.Style {
 		if selected {
-			return style.Background(lipgloss.Color("236"))
+			return style.Background(rowSelected)
 		}
 		return style
 	}

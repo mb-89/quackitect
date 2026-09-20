@@ -1,0 +1,70 @@
+{
+  "comment": "THE COLOURS THE WINDOW WEARS. Each value is a terminal colour number, and src/viewer reads them here. A person sets a colour by editing this file, and the window wears it at the next start. The bold map names which entries wear bold, and spare holds the colours a kind the kinds map names nowhere falls back to.",
+  "kinds": {
+    "prompt": "220",
+    "reply": "114",
+    "level0": "141",
+    "config": "180",
+    "sidebar": "213",
+    "project": "109",
+    "bash": "173",
+    "stop": "146",
+    "agent": "176",
+    "review": "79",
+    "answer": "121",
+    "gate": "168",
+    "bug": "197",
+    "write": "222",
+    "vale": "150",
+    "judge": "183",
+    "work": "117",
+    "note": "181",
+    "unparsed": "208"
+  },
+  "tools": {
+    "Read": "75",
+    "Grep": "81",
+    "Glob": "110",
+    "Edit": "215",
+    "Write": "209",
+    "Bash": "179",
+    "PowerShell": "137",
+    "Agent": "170",
+    "WebFetch": "115",
+    "WebSearch": "122"
+  },
+  "levels": {
+    "debug": "240",
+    "warn": "214",
+    "error": "203",
+    "fatal": "199"
+  },
+  "window": {
+    "dim": "243",
+    "bar": "111",
+    "rule": "238",
+    "head": "252",
+    "selected": "236",
+    "tab": "111"
+  },
+  "bold": {
+    "prompt": "yes",
+    "reply": "yes",
+    "bar": "yes",
+    "head": "yes",
+    "tab": "yes",
+    "warn": "yes",
+    "error": "yes",
+    "fatal": "yes"
+  },
+  "spare": {
+    "0": "67",
+    "1": "103",
+    "2": "139",
+    "3": "144",
+    "4": "151",
+    "5": "181",
+    "6": "187",
+    "7": "152"
+  }
+}
