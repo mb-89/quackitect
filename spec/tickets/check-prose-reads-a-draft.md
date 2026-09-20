@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -155,6 +155,10 @@ record:
     hash_after: 596e5590af3e8f6884ca7542016051c09e9df96a
     returns: 1
     why: "The tool registers and answers nothing, so the ask's first two bullets stand open.; `readsDraft` answers a bare string, where `onToolCall` takes `{ result: { result: text } }`.; A live call to the tool answers the engine line naming no hook for it.; So the tool reads a draft and hands the reader no finding.; Every other handler carries the shape: `reports`, `runsFind`, `claims`, `reviewsBranch`.; `test/level0/prose.test.js` asserts the handler is a function, and reads no answer through the dispatch.; The fix: answer `{ result: { result: text } }`, and drive `TOOLS[PROSE_CALL]` in a case.; What stands:; `./RUNME.sh check` answers 0 on this commit, and 1264 cases run.; The diff touches the six files the ask and the approach name, and nothing else.; `proseFaults` holds the door's read once, and `voiceDoor` keeps its logging and its refusal.; `CODE.test(where)` reads the same extension the old guard reads, so the door holds its ground.; `spec/design_output/level0.md` carries the chapter, and `src/bridge/server.js` registers the pair.; The branch review answers retro absent from the handback, which the route takes after this step."
+  - step: implement/reflect
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 9a5db02674556f98f569c08e514683fadb023efd
+    hash_after: 9a5db02674556f98f569c08e514683fadb023efd
 ---
 
 # Ask
@@ -284,14 +288,30 @@ The door's own read moves to `proseFaults` in the same hunk, because a case over
 ### class
 
 <!-- the class of error the findings describe, and the fix for the class -->
-
 <!-- the form is text -->
+
+The handler answers its own shape, and the dispatch takes another. Every case reads the function directly, so none meets the shape the caller wants.
+
+| what the case reads | what the caller reads |
+|---|---|
+| the handler's own answer, a string | `{ result: { result: text } }`, which `onToolCall` unwraps |
+| the handler stands as a function | the engine answers no line, because the shape falls through |
+
+The fix for the class runs in two moves:
+
+- read the shape a sibling already answers, and take it
+- drive the case through the dispatch, so the shape it wants is the shape it asserts
+
+`reports` under `src/bridge/report.js` answers that shape today, and every other handler in the tree does. So one read of a sibling closes this, and the case asserts the wrapped answer.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the fix touches the handler and the cases beside it, each a file the change already reaches
+- Vale reaches the read as a door, and the cases hand it a fake answering a finding
+- the class above names the approach each hunk follows
 
 ## change
 
