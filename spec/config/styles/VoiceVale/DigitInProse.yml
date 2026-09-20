@@ -5,7 +5,7 @@
 extends: script
 message: "'%s' stands in prose. Put the number in a table, name the command that answers it, or point at the file holding it."
 link: spec/guidance/voice.md
-level: error
+level: warning
 scope: raw
 script: |
   text := import("text")

@@ -7,7 +7,7 @@ import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { inRun } from "../../.claude/skills/level0/lib/folders.js";
 
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
-import { COPY } from "../../.claude/skills/level0/lib/vehicle.js";
+import { IDENTITY } from "../../.claude/skills/level0/lib/vehicle.js";
 
 export const BOX = inRun("box.json");
 export const SESSION = inRun("session.json");
@@ -65,11 +65,11 @@ function named(role, who) {
   return said ? `${role} ${said}` : role;
 }
 
-// The box file stands under the work root, and the copy record under the method root, so a stub names its own box. [[spec/design_output/vehicle#the-work-root-inherits]]
+// The box file stands under the work root, and the identity under the method root, so a stub names its own box. [[spec/design_output/vehicle#the-work-root-inherits]]
 function boxOf(it) {
   for (const [root, path] of [
     [it.root, BOX],
-    [it.method ?? it.root, COPY],
+    [it.method ?? it.root, IDENTITY],
   ]) {
     const id = parsed(readIf(it, root, path))?.id;
     if (id) return id;

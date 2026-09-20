@@ -69,3 +69,19 @@ which status.
 
 So parallel items go one to a line, each with what stands against it. This binds
 a chat answer as much as a file, because the reader is the same person.
+
+## 11. Form and substance
+
+A rule breaks in two ways. A break of form leaves the meaning standing. That is
+a sentence past the cap, a list item past its cap, a past tense, a passive, a
+mark outside the set. A hand fixes it without knowing what the line is for, so
+the refactoring hand takes it, and the write lands. A break of substance says
+a wrong thing: a word outside the core, a private name, a read past the doors.
+No hand fixes that without the writer, so the door refuses it there.
+
+The answer register stands with substance, although its rules are of form. An
+answer lands in the chat and no hand fixes it after, so its gate refuses.
+
+The owner drew the line after a day of writes refused on a word count. Each
+one cost a turn, while the refactoring hand stood idle at twenty-five
+warnings.

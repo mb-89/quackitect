@@ -11,7 +11,7 @@ import { disk } from "../../src/doors/disk.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
 import { stubInto } from "../../src/scripts/stub.js";
-import { copyHere } from "../../src/scripts/vehicle.js";
+import { identityHere } from "../../src/scripts/vehicle.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -62,7 +62,7 @@ test("a stub holds its files, reads every one back, and no file of the method", 
     const record = JSON.parse(files.read(join(dest, "vehicle.json")));
     assert.equal(
       record.vehicle,
-      copyHere(files, clock(), root),
+      identityHere(files, clock(), root),
       "the identity is this vehicle's",
     );
     assert.equal(record.name, basename(root), "the name is this folder's");
@@ -343,7 +343,7 @@ slow(
       const driver = JSON.parse(files.read(join(dest, ".se", "project.json"))).driver;
       assert.equal(
         driver,
-        copyHere(files, clock(), cloned),
+        identityHere(files, clock(), cloned),
         "the driver is the clone's identity",
       );
       const pointer = JSON.parse(

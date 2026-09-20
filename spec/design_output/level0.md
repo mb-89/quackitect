@@ -184,6 +184,25 @@ at `fatal`. So the log names why the server falls, and the next start reads
 as a fresh one. A kill from outside the process writes nothing, so a log
 ending on no `fatal` line names a kill.
 
+## The server holds off sleep
+
+A box asleep answers no hook, so a session under agent control dies with the
+screen. While the server runs, the box holds off sleep, and the display sleeps
+as it likes. The hook's light in the sidebar is the sign. Green means the box
+stays up, and the switch beside it that stops the server lets the box go.
+
+The awake door holds a child process that asks the system for the hold, the
+way a system's own tool does. The child reads its standard input and exits at
+its end. So a server that dies takes the hold with it, and no hold outlives
+the light.
+
+| the box | the child |
+|---|---|
+| Windows | a shell asking `SetThreadExecutionState` for the system, and waiting on its input |
+| a Mac | `caffeinate` waiting on the server's own process |
+| Linux | `systemd-inhibit` over `cat`, which ends with its input |
+| any other | no child, and the door says so once in the log |
+
 ## The bridge says it falls
 
 A server falling under a running session leaves the doors passing quietly. The

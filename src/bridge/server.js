@@ -8,6 +8,7 @@ import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { BINDING, GOD } from "../../.claude/skills/level0/lib/config.js";
 import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
+import { awake } from "../doors/awake.js";
 import { biome } from "../doors/biome.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
@@ -229,6 +230,7 @@ export function boxOf(method, work = method, doors = {}) {
     index: doors.index ?? index(files, outside, time, method, work),
     vale: doors.vale ?? vale(files, outside, method, work),
     biome: doors.biome ?? biome(files, outside, method),
+    awake: doors.awake ?? awake(),
     log:
       doors.log ?? log(files, time, { folder: join(work, LOG_FOLDER), level: "debug" }),
   };
@@ -247,13 +249,17 @@ export function serve(method, port = PORT_BASE, say = console.log) {
   const boxes = boxesOf(method);
   const own = boxes(method);
   const where = `http://127.0.0.1:${port}`;
+  // The box stays up while the server runs, and the stop lets it go. [[spec/design_output/level0#the-server-holds-off-sleep]]
+  const held = own.awake.hold();
   const stop = async () => {
+    held.release();
     await own.log.say("info", "bridge", `the server stops at ${where}`);
     server.close();
     process.exit(0);
   };
 
   const restart = () => {
+    held.release();
     own.log.say("info", "bridge", `the server restarts at ${where}`);
     server.close(() => {
       wire().respawn(process.argv.slice(1));

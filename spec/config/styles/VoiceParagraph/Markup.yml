@@ -4,7 +4,7 @@
 extends: script
 message: "This markup stands outside what a paragraph admits."
 link: spec/funnel/a-paragraph-has-a-schema.md
-level: error
+level: warning
 scope: raw
 script: |
   text := import("text")

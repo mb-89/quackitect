@@ -4,7 +4,7 @@
 extends: occurrence
 message: "A paragraph holds 6 sentences. Break this one."
 link: spec/funnel/a-paragraph-has-a-schema.md
-level: error
+level: warning
 scope: paragraph
 max: 6
 token: '[.!?](?:\s|$)'

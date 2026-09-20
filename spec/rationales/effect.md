@@ -44,4 +44,4 @@ the first battery report found two hundred Vale spawns across seven files
 running at once. The load alone turned a green case red. So the reader asks
 of each slow case what it proves, and what it reaches past a fake. A case
 proving a rule over one line spawns once over a text of many lines. A case
-proving a copy stands alone reaches no network and no editor.
+proving a vehicle stands alone reaches no network and no editor.

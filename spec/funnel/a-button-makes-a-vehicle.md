@@ -1,22 +1,22 @@
 ---
 kind: [[funnel]]
-about: "the vehicle system: one button in the sidebar makes an independent copy of this tree that works on itself"
+about: "the vehicle system: one button in the sidebar makes a vehicle out of this tree that works on itself"
 ---
 
 # Scope
 
-The owner wants one button in the sidebar. A press makes a vehicle: an independent copy of this tree, in a folder the owner names. The vehicle works on itself and on a project of its own. The vehicle is the point. The brand it carries is a detail under it.
+The owner wants one button in the sidebar. A press makes a vehicle: this tree again, standing on its own in a folder the owner names. The vehicle works on itself and on a project of its own. The vehicle is the point. The brand it carries is a detail under it.
 
 This note collects what the owner asks, what stands in the tree, and what stands open, so a design input can follow. The drawings of the method and project split stand beside it in `a-button-makes-a-vehicle.html`.
 
 # Why a vehicle
 
-- Some environments reach no GitHub, so a company puts the copy into its own version control.
+- Some environments reach no GitHub, so a company puts the vehicle into its own version control.
 - The company fills it with guidance, norms and standards that stay proprietary.
-- The copy reaches back to its origin for nothing.
+- The vehicle reaches back to its origin for nothing.
 - An engine update, which moves changes between origin and vehicle, is an idea for later.
 
-| the copy carries | the copy leaves behind |
+| the vehicle carries | the vehicle leaves behind |
 |---|---|
 | the whole method: rules, guidance, verbs, doors | the origin's git history |
 | an identity of its own | the origin's private material under `.se` |
@@ -29,9 +29,9 @@ One press makes a vehicle in the folder the press asks for.
 | step | what happens |
 |---|---|
 | the press | the editor asks for a folder |
-| the copy | `produce` walks the method tree into it, as `./RUNME.sh vehicle into <folder>` does today |
+| the walk | `produce` walks the method tree into it, as `./RUNME.sh vehicle into <folder>` does today |
 | the first run | `git init`, and one `RUNME` that surveys the tools and builds what it needs |
-| the editor | the copy's extension lands beside this one, under its own brand |
+| the editor | the vehicle's extension lands beside this one, under its own brand |
 
 - The button stands beside the engine's play and stop marks.
 - Its icon stands in the config beside the six the sidebar draws today, so the owner picks the mark.
@@ -56,7 +56,7 @@ A stub is a bare project the method drives from outside, and the project runs wi
 | shape | holds | who drives it |
 |---|---|---|
 | the engine | this tree, the method | itself |
-| a vehicle | a copy of the method under its own brand | itself |
+| a vehicle | the method again, under its own brand | itself |
 | a stub | a project's spec and product, and the bridgehead | the vehicle it starts with, or the engine |
 
 - v1 holds this shape as `quack start stubs <folder>`: a small set of link files, and nothing copied in.
@@ -82,9 +82,9 @@ The bridgehead is what the stub carries so an agent starting in the stub meets t
 
 | what | where |
 |---|---|
-| the copy verb, and a copy that stands alone | `./RUNME.sh vehicle`, `src/scripts/vehicle.js`, `spec/design_output/vehicle.md` |
-| the identity, the register and the project's driver | `.se/copy.json`, `~/.se/registry.json`, `.se/project.json` |
-| the proof | `test/contract/vehicle.test.js`, 73 contract tests out of the copy's own folder |
+| the vehicle verb, and a vehicle that stands alone | `./RUNME.sh vehicle`, `src/scripts/vehicle.js`, `spec/design_output/vehicle.md` |
+| the identity, the register and the project's driver | `.se/.runtime/identity.json`, `~/.se/.runtime/registry.json`, `.se/.runtime/project.json` |
+| the proof | `test/contract/vehicle.test.js`, 73 contract tests out of the vehicle's own folder |
 | the name written in | 30 places, the extension manifest and the view id first |
 
 # What stands open

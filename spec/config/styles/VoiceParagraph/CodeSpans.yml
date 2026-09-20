@@ -4,7 +4,7 @@
 extends: script
 message: "A sentence holds 4 code spans."
 link: spec/funnel/a-paragraph-has-a-schema.md
-level: error
+level: warning
 scope: raw
 script: |
   text := import("text")
