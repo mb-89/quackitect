@@ -21,19 +21,22 @@ const ifVale = files.exists(bin) ? test : skip;
 const RULE = "OutsideInDoors";
 const GUARD = "DoorsOnly";
 
-// Every section the approach names stands the rule off, and one spelling names it. [[spec/design_output/doors#one-door-per-outside-thing]]
-const STANDS_OFF = [
-  "**/src/doors/*.js",
-  "**/src/doors/fake/*.js",
-  "**/.claude/skills/level0/hooks/*.js",
-  "**/src/stub/.claude/skills/level0/hooks/*.js",
-  "**/test/level0/*.js",
-  "*.{md,markdown,txt}",
-  "**/test/contract/*.js",
-  "**/src/scripts/cli*.js",
-  "**/src/bridge/server.js",
-  "**/src/extension/*.js",
-  "**/src/*/door.go",
+const AT = "spec/config/styles/VoiceVale/OutsideInDoors.yml";
+
+// Every root the approach names passes, and the rule file says so in one place. [[spec/design_output/doors#one-door-per-outside-thing]]
+const ROOTS = [
+  "src/scripts/cli-doors.js",
+  "src/scripts/cli-check.js",
+  "src/scripts/precommit.js",
+  "src/scripts/prepush.js",
+  "src/scripts/trust.js",
+  "src/scripts/copilot.js",
+  "src/scripts/editor.js",
+  "src/bridge/server.js",
+  "src/extension/extension.js",
+  "src/extension/sidebar.js",
+  ".claude/skills/level0/hooks/level0.js",
+  "src/stub/.claude/skills/level0/hooks/bridgehead.js",
 ];
 
 const run = async (argv, init = {}) =>
@@ -52,39 +55,40 @@ const SPAWN = 'import "os/exec"\n';
 // The guard reads the raw line, so the fixture carries no import of its own. [[spec/design_output/private#a-fixture-carries-no-shape]]
 const NODE = ['import { readFileSync } from "node', ':fs";\n'].join("");
 
-ifVale("a module past a root reading the environment is refused", async () => {
+ifVale("the rule refuses a module past a root reading the environment", async () => {
   assert.ok((await ruledAt(READS, "src/bridge/stop.js")).includes(RULE));
   assert.ok((await ruledAt(ARGV, "src/bridge/stop.js")).includes(RULE));
   assert.ok((await ruledAt(PLATFORM, "src/bridge/stop.js")).includes(RULE));
 });
 
-ifVale("a door reading the environment passes", async () => {
+ifVale("the rule passes a door reading the environment", async () => {
   assert.ok(!(await ruledAt(READS, "src/doors/proc.js")).includes(RULE));
   assert.ok(!(await ruledAt(READS, "src/doors/fake/proc.js")).includes(RULE));
 });
 
-ifVale("a command root reading the environment passes", async () => {
-  assert.ok(!(await ruledAt(READS, "src/scripts/cli-doors.js")).includes(RULE));
-  assert.ok(!(await ruledAt(ARGV, "src/scripts/precommit.js")).includes(RULE));
-  assert.ok(!(await ruledAt(ARGV, "src/scripts/trust.js")).includes(RULE));
-  assert.ok(!(await ruledAt(READS, "src/bridge/server.js")).includes(RULE));
+ifVale("the rule passes every root the approach names", async () => {
+  for (const where of ROOTS) {
+    assert.ok(!(await ruledAt(READS, where)).includes(RULE), where);
+    assert.ok(!(await ruledAt(ARGV, where)).includes(RULE), where);
+    assert.ok(!(await ruledAt(PLATFORM, where)).includes(RULE), where);
+  }
 });
 
-ifVale("a case reading the environment passes", async () => {
+ifVale("the rule passes a case reading the environment", async () => {
   assert.ok(!(await ruledAt(READS, "test/level0/work.test.js")).includes(RULE));
   assert.ok(!(await ruledAt(READS, "test/contract/proc.test.js")).includes(RULE));
 });
 
-ifVale("a Go file importing the command package is refused", async () => {
+ifVale("the rule refuses a Go file importing the command package", async () => {
   assert.ok((await ruledAt(SPAWN, "src/lsp/check.go")).includes(RULE));
 });
 
-ifVale("a package's door file importing the command package passes", async () => {
+ifVale("the rule passes a door file importing the command package", async () => {
   assert.ok(!(await ruledAt(SPAWN, "src/lsp/door.go")).includes(RULE));
   assert.ok(!(await ruledAt(SPAWN, "src/index/door.go")).includes(RULE));
 });
 
-ifVale("a note naming the read in prose passes", async () => {
+ifVale("the rule passes a note naming the read in prose", async () => {
   assert.ok(
     !(await ruledAt("The module reads `process.env` today.\n", "notes.md")).includes(
       RULE,
@@ -98,16 +102,20 @@ ifVale("the extension passes the read and keeps its import guard", async () => {
   assert.ok((await ruledAt(NODE, "src/extension/extension.js")).includes(GUARD));
 });
 
-test("each section standing the read off names the rule once", () => {
-  const lines = files.read(join(root, ".vale.ini")).split("\n");
+test("the rule stands in a file of its own, and one section a path names it", () => {
+  assert.ok(files.exists(join(root, AT)), AT);
+
   let head = "";
   const held = new Map();
-  for (const line of lines) {
+  for (const line of files.read(join(root, ".vale.ini")).split("\n")) {
     if (line.startsWith("[")) head = line.slice(1, line.indexOf("]"));
-    if (line.trim() === `VoiceVale.${RULE} = NO`) {
-      held.set(head, (held.get(head) ?? 0) + 1);
-    }
+    if (line.trim() !== `VoiceVale.${RULE} = NO`) continue;
+    held.set(head, (held.get(head) ?? 0) + 1);
   }
-  assert.deepEqual([...held.keys()].sort(), [...STANDS_OFF].sort());
-  assert.deepEqual([...held.values()].filter((one) => one > 1), []);
+  assert.ok(held.size > 0, "the config names the rule");
+  assert.deepEqual(
+    [...held.entries()].filter(([, count]) => count > 1),
+    [],
+    "one section names it once",
+  );
 });

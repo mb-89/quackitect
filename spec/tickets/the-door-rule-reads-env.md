@@ -338,28 +338,22 @@ pass
 
 <!-- the tests you write fail on their own assertion -->
 
-```
-$ node --test test/contract/outside-in-doors.test.js
-not ok 1 - a module past a root reading the environment is refused
-ok 2 - a door reading the environment passes
-ok 3 - a command root reading the environment passes
-ok 4 - a case reading the environment passes
-not ok 5 - a Go file importing the command package is refused
-ok 6 - a package's door file importing the command package passes
-ok 7 - a note naming the read in prose passes
-ok 8 - the extension passes the read and keeps its import guard
-not ok 9 - each section standing the read off names the rule once
-# tests 9
-# pass 6
-# fail 3
-```
+<!-- the form is command -->
+
+    ./RUNME.sh branch test test/contract/outside-in-doors.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 Three cases come back red on their own assertion, and each names the rule the
-tree lacks. The three are the two refusals and the config reading.
+tree lacks:
+
+| the case coming back red | what it claims |
+|---|---|
+| the rule refuses a module past a root reading the environment | the rule draws on the three reads |
+| the rule refuses a Go file importing the command package | the rule draws on the Go import |
+| the rule stands in a file of its own | `.vale.ini` names it, and one section a path holds it once |
 
 `test/contract/outside-in-doors.test.js` drives the real Vale, because a rule
 asserted against a stub is a rule nobody runs. The path handed in picks the
