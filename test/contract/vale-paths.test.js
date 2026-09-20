@@ -19,12 +19,15 @@ const ifVale = files.exists(bin) ? test : skip;
 const RATIONALE = "spec/rationales/arguing.md";
 const DESIGN = "spec/design_output/level0.md";
 
-const linesOf = (argv) => {
+// A miss says what vale wrote, on both streams, because a red under load names its cause there. [[spec/design_output/lsp#the-panel-reads-the-battery]]
+const saidOf = (argv) => {
   const ran = outside.run([bin, "--output=line", "--no-exit", ...argv], { cwd: root });
-  return String(ran.stdout ?? "")
+  const lines = String(ran.stdout ?? "")
     .split("\n")
-    .filter(Boolean).length;
+    .filter(Boolean);
+  return { lines, why: `${lines.join("\n")}\n${String(ran.stderr ?? "")}`.trim() };
 };
+const linesOf = (argv) => saidOf(argv).lines.length;
 
 test("every section of the config naming a folder opens on a double star", () => {
   const heads = files
@@ -46,6 +49,8 @@ ifVale("a rationale reads the same by its absolute path as by its relative one",
 ifVale("the config the workspace hands the Vale extension draws nothing", () => {
   const settings = JSON.parse(files.read(join(root, ".vscode/settings.json")));
   const config = settings["vale.valeCLI.config"];
-  assert.ok(linesOf([DESIGN]) > 0, "the file carries a raw finding to hide");
-  assert.equal(linesOf([`--config=${join(root, config)}`, join(root, DESIGN)]), 0);
+  const raw = saidOf([DESIGN]);
+  assert.ok(raw.lines.length > 0, `the file carries a raw finding to hide; vale said:\n${raw.why}`);
+  const hidden = saidOf([`--config=${join(root, config)}`, join(root, DESIGN)]);
+  assert.equal(hidden.lines.length, 0, `the editor config still draws; vale said:\n${hidden.why}`);
 });
