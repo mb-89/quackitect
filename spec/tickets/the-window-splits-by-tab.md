@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -295,6 +295,12 @@ record:
       - name: check
         exit: 0
         said: 84 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box 1670436ae0bb · claude-code-remote · helper-33
+    hash_before: 0456ad8141eb24b8731d0ff02f846a783dbd99a8
+    hash_after: 0456ad8141eb24b8731d0ff02f846a783dbd99a8
+    returns: 5
+    why: "craft: The reflect says a probe feeding a case no palette turns it red. A probe in a copy of the module fed the root and the tree no palette, and every case passed.; craft: `go test` writes to a pipe, so `lipgloss` draws no colour there. So `draw.Dim.Render(\"F\")` reads `F` with the palette loaded or not.; craft: The funnel's red in `src/tui/frame_test.go` and `src/tui/model_test.go` still asserts nothing. So does the bar in `src/tui/sort_test.go`.; craft: The lit head case in `src/tui/workedit_test.go` pads the name to 34, and the header draws it at 44. A start setting the colour profile turns that case red, and no other.; craft: `src/tui/log/detail_test.go` and `src/tui/draw/colour_test.go` each assert Grep and Read wear two colours. The split spelled one assertion in two packages.; The branch does what the ask calls for: `src/tui/main.go` is the root's one file past the cases, and each tab stands under its folder.; Every import in the chapter's table runs down, and the layout case reads the table.; The last round's fixture finding has its answer: `src/tui/testdata/session.jsonl` holds the three lines, and both packages read it.; The last round's palette finding has a start in each package, and the start changes what no case asserts.; `go build ./...`, `go vet ./...` and `go test ./...` under `src/tui` answer 0, and `gofmt -l .` answers nothing.; `./RUNME.sh check` answers 0 on the branch, with 84 warnings standing, and the ones in this ticket's files stand in the ticket's own record.; `./RUNME.sh branch review the-notes-point-true` reads check as 1, because its worktree lacks a plugin file git leaves out, and the tree itself answers 0.; No retro stands in the handback, and the verdict step hands the ticket to one.; The layout case refuses a log file importing the work package, and the root case refuses a work file at the root, each fed one in a copy of the module.; The stamp case runs the build again on a move under a package, and leaves the binary standing on a moved case file.; Beyond the ask, the diff touches `.vale.ini` alone, and that section reaches a door file under a package."
 ---
 
 # Ask
@@ -553,7 +559,6 @@ src/tui/go.mod
 .vale.ini
 src/scripts/tui-build.js
 test/level0/viewer.test.js
-src/tui/colour_test.go
 src/tui/door_test.go
 src/tui/draw/colour.go
 src/tui/draw/colour_test.go
@@ -591,8 +596,10 @@ src/tui/panes_test.go
 src/tui/shipped_test.go
 src/tui/sort_test.go
 src/tui/tabs.go
+src/tui/testdata/session.jsonl
 src/tui/tree/base.go
 src/tui/tree/base_test.go
+src/tui/tree/palette_test.go
 src/tui/tree/preset.go
 src/tui/tree/preset_test.go
 src/tui/tree/tree.go
@@ -631,14 +638,18 @@ src/tui/workplaces_test.go
 
 fail
 
-- craft: The root package and the tree package load no palette in their cases, and `src/tui/colour_test.go` loaded it for the one package with `TestMain`, so every colour assertion there passes on bare text.
-- craft: A probe in a copy of the module fed those cases a palette check, and each failed: the funnel's red in `src/tui/frame_test.go` and `src/tui/model_test.go`, the sorted column's bar in `src/tui/sort_test.go`, the lit column head in `src/tui/workedit_test.go`, and the tone in `src/tui/tree/treeflag_test.go` each assert nothing.
-- craft: `src/tui/frame_root_test.go` and `src/tui/log/tail_test.go` each spell the three fixture lines and `put`, and `src/tui/model_test.go` and `src/tui/log/detail_test.go` each spell `row`, so one fixture stands in two packages.
-- The branch does what the ask calls for: `src/tui/main.go` is the root's one file past the cases, each tab stands under its folder, and every import runs down.
-- The last round's findings have their answer: the note spells `pressed`, the two cases read `frame.WheelStep` and `work.QueueKey`, and one import order stands in every file.
+- craft: The reflect says a probe feeding a case no palette turns it red. A probe in a copy of the module fed the root and the tree no palette, and every case passed.
+- craft: `go test` writes to a pipe, so `lipgloss` draws no colour there. So `draw.Dim.Render("F")` reads `F` with the palette loaded or not.
+- craft: The funnel's red in `src/tui/frame_test.go` and `src/tui/model_test.go` still asserts nothing. So does the bar in `src/tui/sort_test.go`.
+- craft: The lit head case in `src/tui/workedit_test.go` pads the name to 34, and the header draws it at 44. A start setting the colour profile turns that case red, and no other.
+- craft: `src/tui/log/detail_test.go` and `src/tui/draw/colour_test.go` each assert Grep and Read wear two colours. The split spelled one assertion in two packages.
+- The branch does what the ask calls for: `src/tui/main.go` is the root's one file past the cases, and each tab stands under its folder.
+- Every import in the chapter's table runs down, and the layout case reads the table.
+- The last round's fixture finding has its answer: `src/tui/testdata/session.jsonl` holds the three lines, and both packages read it.
+- The last round's palette finding has a start in each package, and the start changes what no case asserts.
 - `go build ./...`, `go vet ./...` and `go test ./...` under `src/tui` answer 0, and `gofmt -l .` answers nothing.
-- `./RUNME.sh check` answers 0 on the branch, with 82 warnings standing, and the ones in this ticket's files stand in the ticket's own record.
-- `./RUNME.sh branch review the-notes-point-true` reads check as 1, because its worktree lacks `.claude/skills/level0/.claude-plugin/plugin.json`, and the tree itself answers 0.
+- `./RUNME.sh check` answers 0 on the branch, with 84 warnings standing, and the ones in this ticket's files stand in the ticket's own record.
+- `./RUNME.sh branch review the-notes-point-true` reads check as 1, because its worktree lacks a plugin file git leaves out, and the tree itself answers 0.
 - No retro stands in the handback, and the verdict step hands the ticket to one.
 - The layout case refuses a log file importing the work package, and the root case refuses a work file at the root, each fed one in a copy of the module.
 - The stamp case runs the build again on a move under a package, and leaves the binary standing on a moved case file.
@@ -650,7 +661,7 @@ fail
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The chapter's table is the one list and the layout case reads it, and the fixtures standing in two packages are in the findings.
+- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The chapter's table is the one list and the layout case reads it. The one assertion spelled in two packages stands in the findings.
 
 # Discussion
 
