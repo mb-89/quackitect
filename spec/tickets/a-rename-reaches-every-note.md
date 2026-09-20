@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -159,6 +159,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-15
+    hash_before: 2d206e3d1bc8e20604e57c8a383793e88c9b5213
+    hash_after: 2d206e3d1bc8e20604e57c8a383793e88c9b5213
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | no, the folder per tab stands nowhere tracked |; | is what the diff touches beyond the ask trivial | no, a built binary lands under the window's folder |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |; | does every rule the branch adds carry a test | yes, each move of the verb takes a case |; | does a case feed the rule something bad | yes, a name standing nowhere answers a fault |; | what grade do the findings take | craft, because the approach carries each fix already |; TL;DR:; The verb walks an ending list, so the ignore file and an `.html` keep the old name.; That stale ignore row lets the window's built binary into git.; The approach's package table lands nowhere, and a private note git ignores carries it.; The findings, one a line:; `TEXT` in `src/scripts/rename.js` matches a list of endings, so a name outside it stands.; `git grep -n src/viewer` names `.gitignore` and `spec/funnel/a-button-makes-a-vehicle.html`, each keeping the old name.; `git ls-files -s src/tui/viewer` names a tracked binary, which the change commit adds.; `.gitignore` names the window's binary under its old folder, so the move carried it past.; `filesUnder` answers text files alone, and `renaming` removes the source, so a move drops the rest.; No case feeds the verb a file the ending list leaves out, so the hole passes green.; `spec/design_output/vehicle.md` names the stub's folders under a literal `project`, which `stubFolders` makes false.; The ask's first bullet, a folder per tab, stands under `.se/tickets`, which git ignores.; The park's ground, that the split shares nothing with the verb, reads false against the ask.; The design review passed the package table as this ticket's answer to that bullet.; `spec/design_output/tui.md` names the viewer in prose, beside `viewerOf` and `src/scripts/viewer.js`.; `./RUNME.sh links` answers no row naming a renamed thing, and `./RUNME.sh check` exits 0.; `HANDOVER.md` carries no retro, and `./RUNME.sh branch review` names that as its one fix.; The fixes, one a line:; Read a file by what it holds, not by the ending of its name.; Carry every file a folder holds, so a move drops no binary and no image.; Feed the verb a name outside the ending list and a binary, and assert each lands.; Rewrite `.gitignore` and `spec/funnel/a-button-makes-a-vehicle.html` onto the new name.; Drop the window's built binary from git, and ignore it under its new folder.; Point `spec/design_output/vehicle.md` at `stubFolders`, which owns the stub's folder names.; Land the package table the approach draws, or mint a tracked ticket carrying it.; Write the retro into `HANDOVER.md` before the branch hands back."
 ---
 
 # Ask
@@ -399,17 +405,158 @@ The folder per tab stands open, as `.se/tickets/the-window-splits-by-tab.md`. Th
 
 <!-- the form is files -->
 
+- .claude/skills/level0/lib/vehicle.js
+- .github/workflows/check.yml
+- HANDOVER.md
+- spec/config/styles/colours.json
+- spec/design_input/the-tree-view-editor.md
+- spec/design_output/config.md
+- spec/design_output/extension.md
+- spec/design_output/index.md
+- spec/design_output/level0.md
+- spec/design_output/log.md
+- spec/design_output/tree-view.md
+- spec/design_output/tui.md
+- spec/design_output/vehicle.md
+- spec/funnel/a-button-makes-a-vehicle.html
+- spec/tickets/a-base-file-says-it.md
+- spec/tickets/a-cell-takes-an-edit.md
+- spec/tickets/a-pointer-names-its-heading.md
+- spec/tickets/a-preset-carries-its-sort.md
+- spec/tickets/a-rename-reaches-every-note.md
+- spec/tickets/the-cell-fill-takes-marks.md
+- spec/tickets/the-colours-stand-in-config.md
+- spec/tickets/the-flags-draw-as-letters.md
+- spec/tickets/the-help-reads-the-cursor.md
+- spec/tickets/the-mouse-reaches-the-window.md
+- spec/tickets/the-runtime-files-stand-apart.md
+- spec/tickets/the-tree-draws-its-columns.md
+- spec/tickets/the-tree-sorts-several-keys.md
+- spec/tickets/the-tree-takes-a-filter.md
+- spec/tickets/the-viewer-draws-the-note.md
+- spec/tickets/the-viewer-filters-the-talk.md
+- spec/tickets/the-window-grows-a-frame.md
+- spec/tickets/the-work-editor-draws.md
+- spec/tickets/the-work-tab-draws.md
+- spec/tickets/verbs-read-two-roots.md
+- spec/vocabulary/terms.yml
+- src/bridge/window.js
+- src/config/config_test.go
+- src/lsp/panel_test.go
+- src/scripts/cli.js
+- src/scripts/rename.js
+- src/scripts/stub.js
+- src/scripts/tui.js
+- src/scripts/viewer.js
+- src/tui/base.go
+- src/tui/base_test.go
+- src/tui/colour.go
+- src/tui/colour_test.go
+- src/tui/detail.go
+- src/tui/detail_test.go
+- src/tui/door.go
+- src/tui/door_test.go
+- src/tui/filter.go
+- src/tui/footer.go
+- src/tui/frame_test.go
+- src/tui/go.mod
+- src/tui/go.sum
+- src/tui/help.go
+- src/tui/keys.go
+- src/tui/main.go
+- src/tui/model_test.go
+- src/tui/mouse.go
+- src/tui/mouse_test.go
+- src/tui/preset.go
+- src/tui/preset_test.go
+- src/tui/record.go
+- src/tui/sort.go
+- src/tui/sort_test.go
+- src/tui/tabs.go
+- src/tui/tail.go
+- src/tui/tail_test.go
+- src/tui/tree.go
+- src/tui/tree_test.go
+- src/tui/treedraw.go
+- src/tui/treeedit.go
+- src/tui/treeedit_test.go
+- src/tui/treefilter.go
+- src/tui/treeflag.go
+- src/tui/treeflag_test.go
+- src/tui/treemark.go
+- src/tui/treemark_test.go
+- src/tui/treesort.go
+- src/tui/treesort_test.go
+- src/tui/ui.go
+- src/tui/viewer
+- src/tui/work.go
+- src/tui/work_test.go
+- src/tui/workitems.go
+- src/tui/wrap.go
+- test/level0/go-tests.test.js
+- test/level0/pull-leaves.test.js
+- test/level0/rename.test.js
+- test/level0/stub.test.js
+- test/level0/viewer.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+| the question reviewing asks | the answer |
+|---|---|
+| does the branch do what the ask asks | no, the folder per tab stands nowhere tracked |
+| is what the diff touches beyond the ask trivial | no, a built binary lands under the window's folder |
+| what does `./RUNME.sh check` answer | 0 on this commit |
+| does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |
+| does every rule the branch adds carry a test | yes, each move of the verb takes a case |
+| does a case feed the rule something bad | yes, a name standing nowhere answers a fault |
+| what grade do the findings take | craft, because the approach carries each fix already |
+
+TL;DR:
+
+- The verb walks an ending list, so the ignore file and an `.html` keep the old name.
+- That stale ignore row lets the window's built binary into git.
+- The approach's package table lands nowhere, and a private note git ignores carries it.
+
+The findings, one a line:
+
+- `TEXT` in `src/scripts/rename.js` matches a list of endings, so a name outside it stands.
+- `git grep -n src/viewer` names `.gitignore` and `spec/funnel/a-button-makes-a-vehicle.html`, each keeping the old name.
+- `git ls-files -s src/tui/viewer` names a tracked binary, which the change commit adds.
+- `.gitignore` names the window's binary under its old folder, so the move carried it past.
+- `filesUnder` answers text files alone, and `renaming` removes the source, so a move drops the rest.
+- No case feeds the verb a file the ending list leaves out, so the hole passes green.
+- `spec/design_output/vehicle.md` names the stub's folders under a literal `project`, which `stubFolders` makes false.
+- The ask's first bullet, a folder per tab, stands under `.se/tickets`, which git ignores.
+- The park's ground, that the split shares nothing with the verb, reads false against the ask.
+- The design review passed the package table as this ticket's answer to that bullet.
+- `spec/design_output/tui.md` names the viewer in prose, beside `viewerOf` and `src/scripts/viewer.js`.
+- `./RUNME.sh links` answers no row naming a renamed thing, and `./RUNME.sh check` exits 0.
+- `HANDOVER.md` carries no retro, and `./RUNME.sh branch review` names that as its one fix.
+
+The fixes, one a line:
+
+- Read a file by what it holds, not by the ending of its name.
+- Carry every file a folder holds, so a move drops no binary and no image.
+- Feed the verb a name outside the ending list and a binary, and assert each lands.
+- Rewrite `.gitignore` and `spec/funnel/a-button-makes-a-vehicle.html` onto the new name.
+- Drop the window's built binary from git, and ignore it under its new folder.
+- Point `spec/design_output/vehicle.md` at `stubFolders`, which owns the stub's folder names.
+- Land the package table the approach draws, or mint a tracked ticket carrying it.
+- Write the retro into `HANDOVER.md` before the branch hands back.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place, and a note points at the file. The verb's chapter stands under `spec/design_output/index`, and each function points at it. The stub's folder rows in `spec/design_output/vehicle.md` repeat what `stubFolders` owns, and read false, which a finding names.
 
 # Discussion
 
