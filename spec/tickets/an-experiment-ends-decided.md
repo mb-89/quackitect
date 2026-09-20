@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -165,6 +165,17 @@ record:
     hash_after: 76d502f16c050f351f6ef017bb13c0490c795418
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 0b0d9297eff743fd94fd037674e2165ce40c4540
+    hash_after: 0b0d9297eff743fd94fd037674e2165ce40c4540
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -368,7 +379,7 @@ The other rows ride the same shape. A name a hand writes stands until a reader r
 <!-- the same tests pass -->
 <!-- the form is command -->
 
-./RUNME.sh branch test test/level0/experiment.test.js
+./RUNME.sh branch test test/level0/experiment.test.js test/contract/experiment.test.js
 
 ### check
 
@@ -382,34 +393,29 @@ The other rows ride the same shape. A name a hand writes stands until a reader r
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-Each trial now ends on a decision, and the retro holds until it does.
+The hold now runs, because a rule the engine reads as a name holds nothing.
 
-| what lands | where |
+| what changes | how |
 |---|---|
-| the route a trial runs, ending on `decide` | `spec/processes/experiment.yaml` |
-| the verb answering the trials standing open | `retro audit` in `src/scripts/retro.js` |
-| the need the retro's audit step names | `spec/processes/retro.yaml` |
-| what an experiment is, and what each decision does | [[spec/design_output/work#an-experiment-decides]] |
+| the retro's `audit` step | takes `retro audit` as a command its evidence names |
+| the notes naming the moved module | point at `pull-tool.js`, the name it lands under |
+| the design input's twin page | takes the folder level zero holds |
+| `test/contract/experiment.test.js` | reads both routes, and asserts the hold runs |
 
-The two standing trials each take their decision:
+The round before wrote the hold as a need. `holdsVerb` splits a need and asks the table of verbs, so a need answers whether a box can run a thing. The run itself waits for evidence, and the audit step now carries it beside the `effect` step's own.
 
-| the trial | the decision | what follows |
-|---|---|---|
-| the level one wrapper | keep | its hook and its library move under `.claude/skills/level0` |
-| the pane | drop | the editor draws the same widgets, and the folder goes |
+A trial minted before this process ends under the ticket closing it, which is what this one does for the two standing trials. [[spec/design_output/work#an-experiment-decides]] says so, and every trial after carries a ticket of the process from its first day.
 
-The wrapper's move met a rule the approach missed. A plugin's manifest names one hook module, so two entries meet a refusal. The bridgehead imports nothing, which is its own rule, so the moved module imports the bridgehead and calls its register first. One module then carries both.
-
-The audit reads the process a ticket names, where `retro notes` reads the folder a note sits in. A trial stands under `spec/tickets` beside every other ticket, so the folder answers nothing and the process answers it. A case drives the step over an open trial and over none.
+Three closed tickets still name the old folder in their own record of what stood then. A record names a thing as it stood, so those stay. `git grep skills/level1` over the live half answers nothing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The process, the retro's route and verb, the two folders, and every file reaching them.
-- every door the change reaches has a fake. The audit's cases hand the retro their own disk and log.
-- a comment names the approach the change implements. The one module says why it calls the bridgehead, and the note names each decision.
+- the change touches no file the ask leaves out. The retro's route, the notes naming the moved module, the design input's twin, and one case file.
+- every door the change reaches has a fake. The verb's cases hand their own disk, and the route cases read the tree under test/contract.
+- a comment names the approach the change implements. The step's evidence says what the verb answers, and the note says what a decided trial leaves.
 
 # verdict
 
