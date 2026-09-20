@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -119,6 +119,17 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote · helper-6
     hash_before: e30c07a9816c072df2f01fb5dfd159adab51d698
     hash_after: e30c07a9816c072df2f01fb5dfd159adab51d698
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 22111c66e9074a3b4be91575303d90058a179002
+    hash_after: 22111c66e9074a3b4be91575303d90058a179002
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -216,20 +227,35 @@ The findings, one a line:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/question-grades.test.js test/level0/pull.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The command answers assertion, and both failing cases fail on their own assertion.
+
+| the case | what it holds open |
+|---|---|
+| the working note asks the owner a design question | the seventh rule carries its own sentence alone |
+| the reviewing note grades each question | the note carries no rule naming a grade |
+| a craft question reaches the drafter | this one passes, because the fail route carries it today |
+
+The third case passes the moment it stands, and that is what the approach says. A craft question rides the fail verdict, and the route grows no person step. So the case guards a road the engine holds already.
+
+That surprises me at a tests-red step. The step wants red, and a guard over a standing road answers green. The two rule cases carry the red, so the command answers assertion and the guard rides beside them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. One case file beside the fail route, one contract case file, and this ticket.
+- every door the change reaches has a fake. The route case drives the pull doors' fake disk. The rule cases read the notes that ship.
+- a comment names the approach the change implements. Each case carries a line pointing at this ticket.
 
 ## reflect
 
