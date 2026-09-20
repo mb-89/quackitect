@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -125,6 +125,10 @@ record:
     hand: box 099c2ec7708d · claude-code-remote
     hash_before: b70660fe8d933469e97f46d36cebea9f8837aa42
     hash_after: b70660fe8d933469e97f46d36cebea9f8837aa42
+  - step: design/review
+    hand: box 099c2ec7708d · claude-code-remote · helper-8
+    hash_before: d4d32372cec7ae9d59433e715726b068f05a1992
+    hash_after: d4d32372cec7ae9d59433e715726b068f05a1992
 ---
 
 # Ask
@@ -217,23 +221,29 @@ Where each thing stands after:
 <!-- pass or fail, with findings one a line -->
 <!-- the form is verdict -->
 
-fail
-
-- `src/bridge/vehicle.js` copies `hooks/level0.js` and its manifests into a stub, so an import of `../lib` dies there.
-- `test/level0/vehicle.test.js` asserts the file list that copy takes, so the change reaches a case the ask leaves out. Name it.
-- the invariant sentence stands under [[spec/design_output/level0#the-bridgehead-and-the-server]], and the approach names the start chapter alone. Say what it becomes.
-- the row naming the stub's copy stands under [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]. Say what that row becomes.
-- an implementer guesses the wait on `/health` and the answer where that wait runs out.
+pass
 
 what holds:
 
-- every finding of both earlier `why` lines stands answered.
-- `findSpec`, `patchSpec`, `replaceSpec` and `undoSpec` stand where the approach names them.
-- `lib/apply.js`, `lib/undo.js` and `lib/folders.js` carry no `node:` import, so the hook's environment takes them.
-- `PORT_BASE` stands in `lib/vehicle.js`, and `SESSION` stands in `lib/log.js`.
+- `findSpec` stands in `src/bridge/search.js` and imports nothing, so the move to `lib/search.js` takes no import.
+- `patchSpec` and `replaceSpec` stand in `lib/apply.js`, where the approach puts them.
+- `undoSpec` stands in `lib/undo.js`, where the approach puts it.
+- `FILES` in `src/bridge/vehicle.js` names the hook and its two manifests, so the copy table reads true.
+- The copy list closes under its own imports, and no module in it reaches `node:`.
+- `test/level0/vehicle.test.js` asserts each copied file, so its list grows with `FILES`.
 - `test/level0/hand.test.js` drives the hook's `register`, so the cases land beside it.
-- `.claude/skills/level1/hooks/level1.js` registers a tool at `session.start` already.
-- `REASONS` holds code 6, and [[spec/design_output/level0#the-bridgehead-starts-it-too]] says the bridgehead installs nothing.
+- `PORT_BASE` stands in `lib/vehicle.js`, and `SESSION` stands in `lib/log.js`.
+- `HAND_FILE` stands in no lib module, so it takes the new home the approach names.
+- The server answers `/health`, and `STARTING` caps the wait the approach puts on it.
+- Every anchor the approach links stands in its note.
+- `.claude/skills/level1/hooks/level1.js` registers a spec at `session.start` and holds the narrowed invariant.
+- The register at session start covers `find`, `patch`, `replace` and `undo`, which the ask calls for.
+- Every finding of all three earlier `why` lines stands answered.
+
+what the implement step carries:
+
+- `spec/design_output/level0.md` carries the invariant in two more chapters, on the cloud start and the start road.
+- The implementer narrows both sentences the way the approach narrows the first.
 
 
 # implement
