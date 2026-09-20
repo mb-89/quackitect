@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -178,6 +178,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-15
+    hash_before: 915a6fd70328c9b18ab2e3faaa7a18be19c3acbe
+    hash_after: 915a6fd70328c9b18ab2e3faaa7a18be19c3acbe
+    returns: 2
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the brief asks | yes, the folders leave and the hold runs |; | is what the diff touches beyond the brief trivial | yes, the check and the doors drop a dead name |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, the handover names it as waiting |; | does every rule the branch adds carry a test | yes, the verb refuses, and a case reads the step |; | what grade do the findings take | craft, the approach and the note disagree on one fact |; I drove `retro audit` over a tree carrying an open trial, and it refused and named; the trial. The findings of the last round land. The approach still says what this; branch stopped doing, so a reader at the merge meets two answers to one question.; Findings, one a line:; The approach row says each folder leaves under a ticket of the experiment process, and neither does.; Take that row to what [[spec/design_output/work#an-experiment-decides]] says, that this ticket closes both.; The `says` chapter counts the closed tickets naming the old folder, and `git grep skills/level1` answers more.; Name that command in place of the count, because a count in prose goes stale."
 ---
 
 # Ask
@@ -430,7 +436,7 @@ Three closed tickets still name the old folder in their own record of what stood
 - .claude/skills/level0/hooks/hooks.json
 - .claude/skills/level0/hooks/pull-tool.js
 - .claude/skills/level0/lib/pull.js
-- .claude/skills/level0/.claude-plugin/plugin.json
+- .claude/skills/level1/.claude-plugin/plugin.json
 - .claude/skills/level1/hooks/hooks.json
 - .claude/skills/level1/hooks/level1.js
 - .claude/skills/level1/lib/pull.js
@@ -438,27 +444,35 @@ Three closed tickets still name the old folder in their own record of what stood
 - .claude/skills/pane/hooks/hooks.json
 - .claude/skills/pane/hooks/pane.js
 - .claude/skills/pane/tests/pane.test.ts
+- HANDOVER.md
+- spec/design_input/the-agent-pulls-tickets.html
 - spec/design_input/the-agent-pulls-tickets.md
 - spec/design_output/pull.md
 - spec/design_output/work.md
+- spec/guidance/review/reviewing.md
 - spec/processes/experiment.yaml
 - spec/processes/retro.yaml
 - spec/tickets/agent-pulls-ticket.md
 - spec/tickets/an-experiment-ends-decided.md
+- spec/tickets/the-agent-pulls-a-ticket.md
 - spec/tickets/the-group-leaves-at-todo.md
 - spec/tickets/the-hand-carries-the-session.md
 - spec/tickets/the-judge-reads-answer-rules.md
 - spec/tickets/the-runtime-files-stand-apart.md
 - spec/tickets/the-session-file-proves-itself.md
+- spec/tickets/the-spawn-takes-a-step.md
 - spec/tickets/verbs-read-two-roots.md
 - src/scripts/cli-check.js
 - src/scripts/cli-doors.js
+- src/scripts/pull-chapter.js
 - src/scripts/pull-route.js
 - src/scripts/retro.js
+- test/contract/experiment.test.js
 - test/contract/tree.test.js
 - test/level0/experiment.test.js
 - test/level0/hand.test.js
 - test/level0/level1.test.js
+- test/level0/pull-leaves.test.js
 
 ## verdict
 
@@ -469,32 +483,30 @@ fail
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the branch do what the brief asks | no, the retro still closes over an open trial |
-| is what the diff touches beyond the brief trivial | yes, the notes take the moved path |
+| does the branch do what the brief asks | yes, the folders leave and the hold runs |
+| is what the diff touches beyond the brief trivial | yes, the check and the doors drop a dead name |
 | what does `./RUNME.sh check` answer | 0 on this commit |
 | does a retro stand in the handback | no, the handover names it as waiting |
-| does every rule the branch adds carry a test | no, the hold itself runs nowhere |
-| what grade do the findings take | design, the hold picks its mechanism |
+| does every rule the branch adds carry a test | yes, the verb refuses, and a case reads the step |
+| what grade do the findings take | craft, the approach and the note disagree on one fact |
 
-The two folders leave, the route ends on `decide`, and the verb answers each open
-trial. The hold the ask asks for reaches the route nowhere.
+I drove `retro audit` over a tree carrying an open trial, and it refused and named
+the trial. The findings of the last round land. The approach still says what this
+branch stopped doing, so a reader at the merge meets two answers to one question.
 
 Findings, one a line:
 
-- A need names a verb this box holds, and reads the tree nowhere. [[spec/design_output/pull#a-need-is-a-verb]]
-- So `needs` carries the hold nowhere, and the audit step passes over an open trial.
-- Run `retro audit` from the audit step's evidence, the way its `effect` step runs its own verb.
-- Drive that step through the pull over an open trial, because the case drives the verb alone.
-- Point each note at `pull-tool.js`, the name the module lands under. `git grep hooks/level1.js` answers them.
-- Mint a trial its ticket, or say under the approach why this one ticket carries both decisions.
-- Take the row naming the old folder in the design input's twin file, or leave both inputs alone.
+- The approach row says each folder leaves under a ticket of the experiment process, and neither does.
+- Take that row to what [[spec/design_output/work#an-experiment-decides]] says, that this ticket closes both.
+- The `says` chapter counts the closed tickets naming the old folder, and `git grep skills/level1` answers more.
+- Name that command in place of the count, because a count in prose goes stale.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place. [[spec/design_output/work#an-experiment-decides]] owns each decision, and the route, the verb and the moved module point at it. The notes repeat a path the tree holds nowhere, and the first finding names the fix.
+- every fact the change adds stands in one place. [[spec/design_output/work#an-experiment-decides]] owns the decision and the hold, and the route, the verb and the cases point at it. The approach repeats where the two decisions land, and it says the opposite, which the first finding names.
 
 # Discussion
 
