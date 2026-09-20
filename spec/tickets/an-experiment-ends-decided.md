@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -213,6 +213,10 @@ record:
     hash_after: 962f344e022d606cddffaa38b8d6b4be687ad25b
     returns: 3
     why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the brief asks | yes, the folders leave and the hold runs |; | is what the diff touches beyond the brief trivial | yes, this round writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, the branch's close writes it |; | does every rule the branch adds carry a test | yes, I drove the verb over an open trial and it refused |; | what grade do the findings take | craft, a field of this ticket holds a count that reads false |; I drove `retro audit` over a tree carrying an open trial, and it named the trial; and refused. The Discussion answers the approach row, which stands under a step; no round after it reopens. The `says` chapter stands otherwise: this round held; `implement/tests-green` and wrote its other fields, so that chapter takes the; fix where a reader meets the count.; Findings, one a line:; The `says` chapter writes a count of the closed tickets naming the old folder.; `git grep skills/level1 -- spec/tickets` names a ticket the count leaves out, so it reads false.; This round answers `implement/tests-green` again, so the hand writes that chapter.; Name the command there in place of the count, and leave the Discussion row standing."
+  - step: implement/reflect
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: d515278999090dc8078d75406a74974eb3edfbbd
+    hash_after: d515278999090dc8078d75406a74974eb3edfbbd
 ---
 
 # Ask
@@ -362,27 +366,27 @@ That surprises me. The two holds of the retro look alike from the route, and the
 <!-- the class of error the findings describe, and the fix for the class -->
 <!-- the form is text -->
 
-One class carries both findings: a closed field holds a fact the work moves past.
+One class carries the finding: a field read as closed while the round holds it open.
 
-| the field | what it says | what stands |
+| the field | what the round before said | what stands |
 |---|---|---|
-| the approach, under design | each folder leaves under a ticket of the experiment process | this one ticket closes both |
-| the `says` chapter, under tests-green | a count of the closed tickets naming the old folder | a command answers that count |
+| the approach, under design | a closed field keeps the record of its round | true, because no round after it holds that step |
+| the `says` chapter, under tests-green | the same | false, because this round answers that step again |
 
-A field of a closed step is the record of its round, and the ticket door holds it there. So a correction reaches a reader two ways: the note owning the fact, and the Discussion chapter a hand writes at any time.
+The door keys a writable field off the leaf the front matter names. So a round standing at a step opens every field of that step, and the round before wrote `class` and `checked` on exactly that ground. It then read `says` as closed and sent its correction elsewhere.
 
-The fix for the class is writing the correction where a reader of this ticket meets it. The Discussion takes one line per field, each naming what the field says and what stands. [[spec/design_output/work#an-experiment-decides]] already owns the first fact, so the line points there.
+The fix for the class is asking the door. A round holds the fields of the leaf it stands at, and the pull's answer names each one. So the correction lands in the field the hand holds, and the Discussion carries what no round reopens.
 
-The second finding is the voice rule about a count. A count in prose goes stale, and a command answers it fresh. So the Discussion names `git grep skills/level1` in place of the number, and the line says what the command answers.
+The count is wrong as well as stale. `git grep skills/level1 -- spec/tickets` names a ticket the number leaves out, at the commit that wrote it and now. So the chapter names the command, and a reader runs it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. This ticket's Discussion chapter alone.
+- the change touches no file the ask leaves out. This ticket's tests-green chapter alone.
 - every door the change reaches has a fake. The change reaches no door, because it writes prose into a ticket.
-- a comment names the approach the change implements. Each line names the field it corrects and the place owning the fact.
+- a comment names the approach the change implements. The chapter names the command answering the count, and the Discussion row stands.
 
 ## change
 
