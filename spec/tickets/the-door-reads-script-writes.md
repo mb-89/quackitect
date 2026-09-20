@@ -361,11 +361,15 @@ door calls it.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/bash.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -373,11 +377,37 @@ door calls it.
 
 <!-- the form is text -->
 
+A script file carried a write past every rule, and the door now reads the file:
+
+| what lands | where |
+|---|---|
+| `scriptsIn`, the script paths a line names | `.claude/skills/level0/lib/scripted.js` |
+| `scriptWrites`, the writes inside each one | the same module, through `insideOf` |
+| the reader off the disk | `src/bridge/bash.js`, as `it.script` |
+| the splitter both modules take | `.claude/skills/level0/lib/tokens.js` |
+
+A script here stands under `.se` or a temp folder, where no rule reads it. A
+path standing in the tree passes, so `node --test test/level0/bash.test.js`
+reads nothing off the disk.
+
+The refusal now names four roads, by the size of the change: Write for a whole
+file, Edit for one spot, and `mcp__level0__patch` or `mcp__level0__replace` for
+many. The door's file stood at its line ceiling, so the splitter moved out and
+the script reading took a module of its own.
+
+The test-first rule this branch landed refused this change twice, both times
+rightly. So a test standing already counts where the door reads its text, and
+both commit doors hand that reader in.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the door, two new modules, both commit doors, the note and the cases
+- the disk stands behind a reader, so every case here touches memory alone
+- each piece carries the pointer at the chapter tabling what the door refuses
 
 # verdict
 
