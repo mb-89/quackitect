@@ -22,7 +22,7 @@ import (
 const workBaseAt = "spec/views/work.base"
 
 // The keys the details draw as fields, in this order, and the rest they leave to the flags and the text. [[spec/design_output/tui#the-work-tab]]
-var detailKeys = []string{"step", "group", "standing", "route", "queue", "path"}
+var detailKeys = []string{"step", "group", "standing", "route", queueKey}
 
 // [[spec/design_output/tui#the-work-tab]]
 type workTab struct{}
@@ -59,6 +59,8 @@ func loadWork(path string) (*Tree, error) {
 	// [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 	tree.Flagged(one.Flags)
 	tree.Presets(one.Presets)
+	// A name in the table links to its note, so the details carry no path. [[spec/design_output/tree-view#a-value-carries-a-link]]
+	tree.LinkOf = func(item Item) string { return fileAddress(root, pathOf(item)) }
 	return tree, nil
 }
 
@@ -146,7 +148,7 @@ func workWaits(m *model, w, rows int) []string {
 	return lines
 }
 
-// The details of one row: the name as a link, the fields, every flag in the column's order, then the whole ask. [[spec/design_output/tui#the-work-tab]]
+// The details of one row, in three parts: every flag in the column's order, the rest of the front, then the whole ask. [[spec/design_output/tui#the-work-tab]]
 func (workTab) Detail(m *model, w int) []part {
 	if m.work == nil {
 		return []part{{text: cut("A row of the work browser shows its note here.", w)}}
@@ -156,11 +158,14 @@ func (workTab) Detail(m *model, w int) []part {
 		return []part{{text: cut("No row stands under the cursor.", w)}}
 	}
 	root := workRoot(m.path)
-	out := []part{{text: headStyle.Bold(true).Render(linked(one.Name, fileAddress(root, pathOf(*one)))), drawn: true}}
-	out = append(out, workFields(root, *one)...)
-	out = append(out, part{})
+	// The name heads the details as text, because the table's own name carries the link. [[spec/design_output/tree-view#a-value-carries-a-link]]
+	out := []part{{text: headStyle.Bold(true).Render(one.Name), drawn: true}, {}}
 	for _, held := range m.work.States(*one) {
-		out = append(out, part{text: flagStyle(held).Render(fmt.Sprintf("%s  %-8s %s", strings.ToUpper(held.Letter), held.Key, held.Value)), drawn: true})
+		out = append(out, part{text: flagStyle(held).Render(fmt.Sprintf("%s  %-8s %s", held.Letter, held.Key, held.Value)), drawn: true})
+	}
+	if fields := workFields(root, *one); len(fields) > 0 {
+		out = append(out, part{})
+		out = append(out, fields...)
 	}
 	says := strings.TrimSpace(one.Keys["says"])
 	if says == "" {
@@ -195,11 +200,8 @@ func workFields(root string, one Item) []part {
 		if value == "" {
 			continue
 		}
-		switch key {
-		case "group":
+		if key == "group" {
 			value = linked(value, fileAddress(root, ticketPath(value)))
-		case "path":
-			value = linked(value, fileAddress(root, value))
 		}
 		out = append(out, part{text: dimStyle.Render(fmt.Sprintf("%-*s  ", wide, key)) + value, drawn: true})
 	}

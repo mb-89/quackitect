@@ -141,6 +141,7 @@ opens no file and no git for it. `ticket.go` holds it, and
 | `route` | the process the ticket rides, as its own name, so `group` marks a group |
 | `standing` | what the branch gives it, as the words below |
 | `says` | the whole Ask chapter, past the mint's comments, which the tab's details draw |
+| `changed` | the time of the file's last change, off the `file` table, so a view sorts the newest done ticket first |
 
 A key nested under `record` or `steps` shadows no field, because the reader
 takes the top of the front alone. A branch informs a ticket's standing and

@@ -100,7 +100,7 @@ func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 	m := window(3)
 	m.tabs = []tab{logTab{}, stubTab{}}
 	drawn := renderParts(m.helpParts(60), 60)
-	for _, want := range []string{"GLOBAL", "1…9", "open the tab at that place", "THE LOG", "alt+shift+f", "PRESETS", "the talk"} {
+	for _, want := range []string{"GLOBAL", "1…9", "open the tab at that place", "THE LOG", "alt+⇧f", "PRESETS", "the talk"} {
 		if !strings.Contains(drawn, want) {
 			t.Fatalf("the help names %q, and reads:\n%s", want, drawn)
 		}

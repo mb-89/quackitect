@@ -64,29 +64,53 @@ func (t Tree) Rows(w, rows int) string {
 	return lipgloss.NewStyle().Width(w).Render(strings.Join(lines, "\n"))
 }
 
-// [[spec/design_output/tree-view#the-name-column-nests]]
+// Each cell wears its own style, so the letters keep their colours and the name its link on a selected row. [[spec/design_output/tree-view#the-name-column-nests]]
 func (t Tree) row(one twig, selected bool, wide []int) string {
 	cells := make([]string, 0, len(t.Cols))
 	for at, col := range t.Cols {
-		if t.edits(one, col) {
-			cells = append(cells, pad(cut(t.edit.input.View(), wide[at]), wide[at]))
-			continue
-		}
-		said := one.item.Keys[col.Key]
 		switch {
+		case t.edits(one, col):
+			cells = append(cells, pad(cut(t.edit.input.View(), wide[at]), wide[at]))
 		case at == 0:
-			said = t.nameOf(one)
+			cells = append(cells, t.nameCell(one, wide[at], selected))
 		// [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 		case col.Key == flagsKey:
-			said = t.Letters(one.item)
+			cells = append(cells, t.lettersCell(one.item, wide[at], selected))
+		default:
+			cells = append(cells, styled(pad(cut(one.item.Keys[col.Key], wide[at]), wide[at]), selected))
 		}
-		cells = append(cells, pad(cut(said, wide[at]), wide[at]))
 	}
-	line := strings.Join(cells, " ")
+	return strings.Join(cells, styled(" ", selected))
+}
+
+// A selected cell wears the bar, and any other stands plain. [[spec/design_output/tree-view#the-view-draws-a-tree]]
+func styled(said string, selected bool) string {
 	if selected {
-		return barStyle.Render(line)
+		return barStyle.Render(said)
 	}
-	return line
+	return said
+}
+
+// The name cell: the nesting and the mark, then the name as a link where the tree resolves one. [[spec/design_output/tree-view#a-value-carries-a-link]]
+func (t Tree) nameCell(one twig, wide int, selected bool) string {
+	head := t.nameHead(one)
+	name := cut(one.item.Name, max(0, wide-len([]rune(head))))
+	if t.LinkOf != nil {
+		name = linked(name, t.LinkOf(one.item))
+	}
+	return styled(pad(head+name, wide), selected)
+}
+
+// Every letter in its own colour, and the room after them in the row's. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+func (t Tree) lettersCell(one Item, wide int, selected bool) string {
+	said := make([]string, 0, len(t.flags))
+	for at, held := range t.States(one) {
+		if at >= wide {
+			break
+		}
+		said = append(said, flagStyle(held).Render(held.Letter))
+	}
+	return strings.Join(said, "") + styled(strings.Repeat(" ", max(0, wide-len(said))), selected)
 }
 
 // [[spec/design_output/tree-view#a-cell-takes-an-edit]]
@@ -96,25 +120,37 @@ func (t Tree) edits(one twig, col Column) bool {
 
 // [[spec/design_output/tree-view#the-name-column-nests]]
 func (t Tree) nameOf(one twig) string {
-	if !t.Nests {
-		return markedName(t, one)
-	}
-	mark := strings.Repeat(" ", markWide)
-	switch {
-	case one.kids && t.shut[one.at]:
-		mark = "▸ "
-	case one.kids:
-		mark = "▾ "
-	}
-	return strings.Repeat(" ", one.depth*nestWide) + mark + markedName(t, one)
+	return t.nameHead(one) + one.item.Name
 }
 
-// A marked row draws its mark, so a person reads what a fill reaches. [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
-func markedName(t Tree, one twig) string {
-	if t.marks[one.at] {
-		return "● " + one.item.Name
+// What stands before the name: the nesting, the mark of a parent, and the dot of a marked row. [[spec/design_output/tree-view#the-name-column-nests]]
+func (t Tree) nameHead(one twig) string {
+	head := ""
+	if t.Nests {
+		mark := strings.Repeat(" ", markWide)
+		switch {
+		case one.kids && t.shut[one.at]:
+			mark = "▸ "
+		case one.kids:
+			mark = "▾ "
+		}
+		head = strings.Repeat(" ", one.depth*nestWide) + mark
 	}
-	return one.item.Name
+	// A marked row draws its dot, so a person reads what a fill reaches. [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
+	if t.marks[one.at] {
+		head += "● "
+	}
+	return head
+}
+
+// Whether the column x stands on the mark before the selected row's name, where a press opens the parent. [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
+func (t Tree) OnMark(x int) bool {
+	held := t.twig()
+	if held == nil || !held.kids || !t.Nests {
+		return false
+	}
+	from := held.depth * nestWide
+	return x >= from && x < from+markWide
 }
 
 // [[spec/design_output/tree-view#the-view-draws-a-tree]]

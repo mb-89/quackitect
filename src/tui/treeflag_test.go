@@ -4,6 +4,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -34,29 +35,53 @@ func flagTree() *Tree {
 	return tree
 }
 
-// [[spec/design_output/tree-view#a-flag-draws-a-letter]]
-func TestARowDrawsEveryLetterLitOrDimInAFixedPlace(t *testing.T) {
+// Every letter stands upper in its place, and the states say which stand lit. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+func TestARowDrawsEveryLetterUpperInAFixedPlaceAndTheStatesSayWhichAreLit(t *testing.T) {
 	t.Parallel()
 	tree := flagTree()
-	if said := tree.Letters(flagItems()[0]); said != "UyWb" {
-		t.Fatalf("the lit row reads UyWb, and it reads %q", said)
+	for _, one := range flagItems() {
+		if said := tree.Letters(one); said != "UYWB" {
+			t.Fatalf("every row reads UYWB, and %s reads %q", one.Name, said)
+		}
 	}
-	if said := tree.Letters(flagItems()[1]); said != "uywb" {
-		t.Fatalf("the dim row reads uywb, and it reads %q", said)
+	lit := []bool{}
+	for _, held := range tree.States(flagItems()[0]) {
+		lit = append(lit, held.On)
 	}
-	if said := tree.Rows(60, 2); !strings.Contains(said, "UyWb") {
+	if fmt.Sprint(lit) != "[true false true false]" {
+		t.Fatalf("the lit row lights U and W, and the states read %v", lit)
+	}
+	if said := tree.Rows(60, 2); !strings.Contains(said, "U") || !strings.Contains(said, "lit") {
 		t.Fatalf("the column draws the letters, and the rows read %q", said)
 	}
 }
 
-// A flag no row carries draws dim on every row. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
-func TestAFlagNoRowCarriesDrawsDimOnEveryRow(t *testing.T) {
+// A flag no row carries stands off on every row. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+func TestAFlagNoRowCarriesStandsOffOnEveryRow(t *testing.T) {
 	t.Parallel()
 	tree := flagTree()
 	for _, one := range flagItems() {
-		if !strings.Contains(tree.Letters(one), "b") {
-			t.Fatalf("the unknown flag draws dim, and the row reads %q", tree.Letters(one))
+		states := tree.States(one)
+		if last := states[len(states)-1]; last.On || last.Letter != "B" {
+			t.Fatalf("the unknown flag stands off and upper, and it reads %v", last)
 		}
+	}
+}
+
+// A lit letter wears its tone, and one off wears the grey, the way the footer's funnel does. [[spec/design_output/tui#colours]]
+func TestALetterWearsItsToneWhileLitAndGreyWhileOff(t *testing.T) {
+	t.Parallel()
+	good := flagStyle(flagState{Letter: "W", On: true, Tone: toneGood})
+	bad := flagStyle(flagState{Letter: "U", On: true, Tone: toneBad})
+	off := flagStyle(flagState{Letter: "U", On: false, Tone: toneBad})
+	if !good.GetBold() || !bad.GetBold() || off.GetBold() {
+		t.Fatal("a lit letter stands bold, and one off stands plain")
+	}
+	if fmt.Sprint(good.GetForeground()) == fmt.Sprint(off.GetForeground()) && palette.flags != nil {
+		t.Fatal("a lit letter and one off wear two colours")
+	}
+	if len(flagTree().Flags()) == 0 || flagTree().Flags()[0].Tone != "" {
+		t.Fatal("a flag naming no tone carries none, and lights in the plain colour")
 	}
 }
 
@@ -117,8 +142,8 @@ func TestAValueFlagDrawsTheValuesFirstLetter(t *testing.T) {
 	if said := tree.Letters(tree.Items[0]); said != "OU" {
 		t.Fatalf("an open urgent row reads OU, and it reads %q", said)
 	}
-	if said := tree.Letters(tree.Items[1]); said != "-u" {
-		t.Fatalf("a bare row reads a dash and a dim mark, and it reads %q", said)
+	if said := tree.Letters(tree.Items[1]); said != "-U" {
+		t.Fatalf("a bare row reads a dash and an unlit mark, and it reads %q", said)
 	}
 	states := tree.States(tree.Items[0])
 	if len(states) != 2 || !states[0].On || states[0].Value != "open" || states[1].Place != 1 {

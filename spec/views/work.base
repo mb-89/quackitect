@@ -2,20 +2,24 @@ properties:
   name:
     opensNote: true
 columnSize:
-  name: 34
-  flags: 5
-  step: 14
-  group: 26
+  name: 44
+  flags: 6
   queue: 6
 flags:
   - key: state
     value: true
   - letter: U
     key: urgent
+    tone: bad
   - letter: W
     key: held
+    tone: good
+  - letter: C
+    key: cloud
+    tone: good
   - letter: T
     key: todo
+    tone: bad
 groups:
   - name: not done
     pressed: true
@@ -29,6 +33,12 @@ groups:
   - name: held
     filters:
       - held: true
+  - name: recently done
+    filters:
+      - state: closed
+    sort:
+      - key: changed
+        down: true
   - name: unsorted
     filters:
       - "state: draft or not group: /./"
@@ -38,8 +48,6 @@ views:
     order:
       - name
       - flags
-      - step
-      - group
       - queue
     nest: group
     sort:

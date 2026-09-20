@@ -97,7 +97,6 @@ func (m *model) openTab(n int) {
 	}
 	m.open = n - 1
 	m.input.SetValue(m.sourceOf(m.open))
-	m.input.Placeholder = "type to narrow the " + m.tabs[m.open].Name()
 	m.resize()
 	m.box.GotoTop()
 }

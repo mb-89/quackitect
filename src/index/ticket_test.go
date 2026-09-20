@@ -106,6 +106,26 @@ func TestTheIndexAnswersEveryTicketWithItsFields(t *testing.T) {
 	}
 }
 
+// [[spec/design_output/index#the-index-answers-the-tickets]]
+func TestATicketCarriesTheTimeItsFileLastChanged(t *testing.T) {
+	db := opened(t, ticketTree(t))
+	said, err := Tickets(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	held := byName(said)["a-child"]
+	if held.Changed == 0 {
+		t.Fatal("a ticket carries the time its file last changed, and this one carries none")
+	}
+	var stored int64
+	if err := db.QueryRow(`SELECT mtime FROM file WHERE path = ?`, held.Path).Scan(&stored); err != nil {
+		t.Fatal(err)
+	}
+	if held.Changed != stored {
+		t.Fatalf("the ticket carries the mtime the file table stores, %d, and reads %d", stored, held.Changed)
+	}
+}
+
 // [[spec/design_output/work#held-derives-from-the-record]]
 func TestAStandingReadsOffTheGroupsRecordThroughTheTicket(t *testing.T) {
 	db := opened(t, ticketTree(t))

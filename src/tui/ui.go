@@ -7,7 +7,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -77,6 +76,8 @@ type model struct {
 	// [[spec/design_output/tui#the-work-tab-takes-edits]]
 	workNotice string
 	rules      *ticketSchema
+	// The places the verb answers last, laid over each tree the index hands over. [[spec/design_output/tui#the-work-tab]]
+	places *workPlaces
 	// Each tab holds a filter line of its own, and the pane shows the open tab's. [[spec/design_output/tui#the-filter-pane-takes-letters]]
 	sources []string
 	opened  bool
@@ -86,7 +87,8 @@ func newModel(path string, zone *time.Location) model {
 	input := textinput.New()
 	input.Prompt = "filter "
 	input.PromptStyle = barStyle
-	input.Placeholder = "type to narrow the log"
+	// One placeholder for every tab, because the strip names the tab already. [[spec/design_output/tui#the-filter-pane-takes-letters]]
+	input.Placeholder = "type to narrow"
 	input.Cursor.SetMode(cursor.CursorStatic)
 	tabs := []tab{logTab{}, workTab{}}
 	return model{
@@ -227,11 +229,7 @@ func (m *model) loadPane() {
 	case paneHelp:
 		parts = m.helpParts(m.box.Width)
 	case paneFilter:
-		parts = []part{{text: m.input.View(), drawn: true}}
-		if m.filterBad != "" {
-			parts = append(parts, part{style: levelStyle("error"), text: m.filterBad})
-		}
-		parts = append(parts, m.presetParts()...)
+		parts = append(m.filterHead(), m.presetParts()...)
 		parts = append(parts, part{}, part{text: FilterHelp})
 	default:
 		parts = m.tabs[m.open].Detail(m, m.box.Width)
@@ -275,6 +273,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// [[spec/design_output/tui#the-work-tab]]
 	case workMsg:
+		next := []tea.Cmd{}
 		if !msg.same {
 			if msg.tree != nil {
 				msg.tree.Carry(m.work)
@@ -290,12 +289,31 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 						m.input.SetValue(m.sources[at])
 					}
 				}
+				if m.places != nil {
+					m.work.Placed(*m.places)
+				}
 				m.work.Filtering(m.sourceOf(at))
+				// A change under the tree moves the queue too, so the verb runs again behind each tree. [[spec/design_output/tui#the-work-tab]]
+				next = append(next, placesCmd(workRoot(m.path)))
 			}
 			m.loadPane()
 		}
 		m.workTick = msg.tick
-		return m, workCmd(m.path, m.workTick)
+		return m, tea.Batch(append(next, workCmd(m.path, m.workTick))...)
+
+	// The verb's answer lands over the tree standing now, and a later tree takes it again. [[spec/design_output/tui#the-work-tab]]
+	case placesMsg:
+		if msg.why != "" {
+			return m, nil
+		}
+		places := msg.places
+		m.places = &places
+		if m.work != nil {
+			m.work.Placed(places)
+			m.work.Filtering(m.sourceOf(m.tabNamed("work") - 1))
+			m.loadPane()
+		}
+		return m, nil
 
 	case tea.KeyMsg:
 		if m.pane == paneFilter {
@@ -369,53 +387,6 @@ func (m model) typing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-// The key a preset names presses it, in any tab, under any pane. [[spec/design_output/tui#one-key-filters-the-line]]
-func (m *model) pressKey(name string) bool {
-	for _, one := range m.tabs[m.open].Presets(m) {
-		if one.Key == name {
-			m.pressPreset(one)
-			return true
-		}
-	}
-	return false
-}
-
-// A press writes the preset's filter into the line, and the same press again clears it. The sort it carries takes hold. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-func (m *model) pressPreset(one preset) {
-	said := one.Filter
-	if m.input.Value() == said {
-		said = ""
-	}
-	m.input.SetValue(said)
-	if len(one.Sorts) > 0 && m.onWork() {
-		m.work.Sorted(one.Sorts)
-	}
-	m.narrow(said)
-	m.loadPane()
-}
-
-// One row a preset: its key, its name and the filter it writes, lit where the line holds it. [[spec/design_output/tui#the-filter-pane-takes-letters]]
-func (m model) presetParts() []part {
-	said := m.tabs[m.open].Presets(&m)
-	if len(said) == 0 {
-		return nil
-	}
-	wide := 0
-	for _, one := range said {
-		wide = max(wide, len(one.Key)+len(one.Name)+1)
-	}
-	out := []part{{}}
-	for _, one := range said {
-		row := fmt.Sprintf("%-*s  %s", wide, one.Key+" "+one.Name, one.Filter)
-		if m.input.Value() == one.Filter {
-			out = append(out, part{text: openStyle.Render(row), drawn: true})
-			continue
-		}
-		out = append(out, part{text: dimStyle.Render(row), drawn: true})
-	}
-	return out
-}
-
 // [[spec/design_output/tui#alt-l-raises-the-floor]]
 func (m *model) raiseFloor() {
 	m.floor = ladder[(Rank(m.floor)+1)%len(ladder)]
@@ -435,36 +406,6 @@ func (m *model) toError() {
 			m.moveTo(p)
 			return
 		}
-	}
-}
-
-// The line narrows the open tab and no other, and each tab keeps its own. [[spec/design_output/tui#the-filter-pane-takes-letters]]
-func (m *model) narrow(said string) {
-	if m.open >= 0 && m.open < len(m.sources) {
-		m.sources[m.open] = said
-	}
-	if m.onWork() {
-		err := m.work.Filtering(said)
-		m.filterBad = filterWhy(err)
-		return
-	}
-	f, err := ParseFilter(said)
-	m.filterBad = filterWhy(err)
-	if err == nil {
-		m.filter = f
-		m.rebuild()
-	}
-}
-
-// What a line that parses not says under itself. [[spec/design_output/tui#the-filter-language]]
-func filterWhy(err error) string {
-	switch {
-	case err == nil:
-		return ""
-	case errors.Is(err, ErrIncomplete):
-		return "still typing"
-	default:
-		return err.Error()
 	}
 }
 

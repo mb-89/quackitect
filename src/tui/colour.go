@@ -23,6 +23,7 @@ var palette struct {
 	window map[string]string
 	bold   map[string]string
 	spare  []string
+	flags  map[string]string
 }
 
 // The styles the window wears outside a row, which the read below fills. [[spec/design_output/tui#colours]]
@@ -43,6 +44,7 @@ func loadColours(root string) {
 	palette.window = config.Map(root, coloursAt, "window")
 	palette.bold = config.Map(root, coloursAt, "bold")
 	palette.spare = config.List(root, coloursAt, "spare")
+	palette.flags = config.Map(root, coloursAt, "flags")
 
 	dimStyle = windowStyle("dim")
 	barStyle = windowStyle("bar")

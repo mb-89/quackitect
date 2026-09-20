@@ -140,30 +140,33 @@ opens on the rows a person owns, then the place the queue gives.
 
 # A flag draws a letter
 
-A row carries one boolean key a flag, and one column draws them as letters. A
-letter stands lit where its key reads true, and dim where it reads false. The
-first place draws the state's own first letter, upper, so a row reads `O` for
-open, `D` for draft and `C` for closed before its marks:
+A row carries one boolean key a flag, and one column draws them as letters.
+Every letter stands upper in its fixed place, lit or not, the way the funnel
+in the footer stands. A letter wears a colour where its key reads true, and
+grey where it reads false. The first place draws the state's own first
+letter, so a row reads `O` for open, `D` for draft and `C` for closed before
+its marks:
 
-| the letter | the key it reads |
-|---|---|
-| the state's first | the state, as its value |
-| U | the ticket carries the urgent mark |
-| W | a hand holds it |
-| T | a hand parks it for the next pull |
+| the letter | the key it reads | its tone |
+|---|---|---|
+| the state's first | the state, as its value | plain |
+| U | the ticket carries the urgent mark | bad |
+| W | a hand holds it | good |
+| C | the group holds a branch on the cloud | good |
+| T | a hand parks it for the next pull | bad |
 
 The letters hold fixed places, so nothing shifts as one lights. The keys stay
 ordinary keys, so a person filters on `urgent: true`, and `not urgent: true`
 keeps the rest.
 
-A letter and its key stand under `flags` in the base file, and a flag marked
-`value` draws its value's first letter in place of one. So a new flag costs
-one line there, because the key already stands.
+A letter, its key and its tone stand under `flags` in the base file. A flag
+marked `value` draws its value's first letter in place of one. So a new flag
+costs one line there, because the key already stands. The `flags` map of
+[[spec/design_output/tui#colours]] holds the colours. A good tone wears the
+green, a bad one the red, and no tone the plain colour.
 
 The details draw every flag in the column's order, one a line, with its key
-and its value. A lit flag wears a colour of its own, off the spare colours in
-the flag's place. A dim one wears the dim style, so a person reads which stand
-at a glance.
+and its value. Each wears the colour the column gives it.
 
 # A preset carries its sort
 
@@ -183,6 +186,9 @@ person reads the filter that narrows the rows, and clears it in the pane. The
 pane and its presets are the window's, and every tab offers its own rows.
 [[spec/design_output/tui#the-filter-pane-takes-letters]]
 
+A sort reads any key an item carries, in a column or not. So a preset orders
+the rows by a time the table hides, and the newest done ticket stands first.
+
 A slice is the same thing over the values one column carries. A column answers
 the buttons, so a slice costs no line in the file and moves as the data does.
 
@@ -195,11 +201,12 @@ escape.
 
 | the value | what the link opens |
 |---|---|
-| the name of a row | the note the row's path names |
-| a group | that group's ticket |
+| the name of a row, in the table | the note the row's path names |
+| a group, in the details | that group's ticket |
 | a note link in the ask | the note it names, a ticket by its bare name |
 
-A value resolving to nothing draws as text.
+A value resolving to nothing draws as text. The tree holds the address of a
+name under `LinkOf`, and a tree naming none draws the names as text.
 
 # A base file says it
 

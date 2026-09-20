@@ -264,7 +264,7 @@ func TestAltFOpensTheFilterAndLettersNarrowTheLog(t *testing.T) {
 	m := window(0)
 	m = arrive(m, row(1, "prompt", "are you bound?"), row(2, "tool", "Read"), row(3, "reply", "yes, bound"))
 	m = alt(m, 'f')
-	if m.pane != paneFilter || !strings.Contains(m.box.View(), "THE FILTER") {
+	if m.pane != paneFilter || !strings.Contains(m.box.View(), "THE LANGUAGE") {
 		t.Fatalf("alt+f opens the filter, and the pane shows:\n%s", m.box.View())
 	}
 	m = typed(m, "kind: reply or s")
@@ -408,11 +408,13 @@ func TestAnotherChordReplacesTheFilterAndLeavesTheHeaderShort(t *testing.T) {
 	if strings.Contains(strip, "shift") || strings.Contains(strip, "alt+q") {
 		t.Fatalf("the strip names no chord, and reads %q", strip)
 	}
-	if !strings.Contains(FilterHelp, "alt+shift+f") || !strings.Contains(FilterHelp, "alt+q") {
-		t.Fatal("the filter pane names both chords")
+	// The presets name the chords, once, and the language under them names none. [[spec/design_output/tui#the-filter-pane-takes-letters]]
+	pane := renderParts(m.presetParts(), 80)
+	if !strings.Contains(pane, "alt+⇧f") || !strings.Contains(pane, "alt+q") {
+		t.Fatalf("the presets name both chords, and read:\n%s", pane)
 	}
-	if strings.Contains(FilterHelp, "ctrl+f") || strings.Contains(HelpText, "ctrl+f") {
-		t.Fatal("no help names the chord that went")
+	if strings.Contains(FilterHelp, "alt+") || strings.Contains(HelpText, "ctrl+f") {
+		t.Fatal("the language names no chord, and no help names the chord that went")
 	}
 }
 

@@ -32,6 +32,11 @@ export function list(it, _name, argv) {
   if (said.includes("--fetch")) it.git.fetch();
   // [[spec/design_output/pull#the-queue-is-a-score]]
   if (said.includes("--queue")) return queueOnly(it);
+  // The one answer as JSON, which the work tab reads for the places and the branches. [[spec/design_output/work#one-reading-answers-git]]
+  if (said.includes("--json")) {
+    console.log(JSON.stringify(answerOf(it, true)));
+    return 0;
+  }
   const read = readWork(it, true);
   const stand = read.stand;
   const standing = standingAll(stand);

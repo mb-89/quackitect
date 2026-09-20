@@ -36,12 +36,14 @@ type Ticket struct {
 	Todo     bool   `json:"todo"`
 	Standing string `json:"standing"`
 	Says     string `json:"says"`
+	// The time the file last changed, off the file table, so a view sorts the newest done ticket first. [[spec/design_output/index#the-index-answers-the-tickets]]
+	Changed int64 `json:"changed"`
 }
 
 // [[spec/design_output/index#the-index-answers-the-tickets]]
 func Tickets(db *sql.DB) ([]Ticket, error) {
 	rows, err := db.Query(
-		`SELECT n.path, n.id, n.kind, f.text FROM note n JOIN file f ON f.path = n.path ORDER BY n.path`)
+		`SELECT n.path, n.id, n.kind, f.text, f.mtime FROM note n JOIN file f ON f.path = n.path ORDER BY n.path`)
 	if err != nil {
 		return nil, err
 	}
@@ -51,13 +53,14 @@ func Tickets(db *sql.DB) ([]Ticket, error) {
 	groups := map[string]string{}
 	for rows.Next() {
 		var path, id, kind, text string
-		if err := rows.Scan(&path, &id, &kind, &text); err != nil {
+		var changed int64
+		if err := rows.Scan(&path, &id, &kind, &text, &changed); err != nil {
 			return nil, err
 		}
 		if linkName(kind) != ticketKind {
 			continue
 		}
-		one := ticketOf(path, id, text)
+		one := ticketOf(path, id, text, changed)
 		if one.Route == groupRoute {
 			groups[one.Name] = one.Standing
 		}
@@ -75,7 +78,7 @@ func Tickets(db *sql.DB) ([]Ticket, error) {
 	return out, nil
 }
 
-func ticketOf(path, id, text string) Ticket {
+func ticketOf(path, id, text string, changed int64) Ticket {
 	head, body, _ := fenced(text)
 	front := topOf(head)
 	state := front["state"]
@@ -83,15 +86,16 @@ func ticketOf(path, id, text string) Ticket {
 		state = openState
 	}
 	one := Ticket{
-		Name:   id,
-		Path:   path,
-		State:  state,
-		Step:   front["step"],
-		Route:  routeOf(front["process"]),
-		Group:  front["group"],
-		Urgent: front["urgent"] == "true",
-		Todo:   front["todo"] == "true",
-		Says:   askLine(body),
+		Name:    id,
+		Path:    path,
+		State:   state,
+		Step:    front["step"],
+		Route:   routeOf(front["process"]),
+		Group:   front["group"],
+		Urgent:  front["urgent"] == "true",
+		Todo:    front["todo"] == "true",
+		Says:    askLine(body),
+		Changed: changed,
 	}
 	if one.Route == groupRoute {
 		one.Standing = groupStanding(state, head)

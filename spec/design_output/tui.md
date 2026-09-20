@@ -177,19 +177,27 @@ Enter, Esc and `alt+f` close the pane, and the filter keeps holding. A person
 opens the pane again to change or clear it.
 
 The pane is the window's, and so are the details and the help. Each tab holds
-a filter line of its own, and the line shows the open tab's, named in its
-placeholder. A tab switch under any open pane keeps the pane, which then draws
-off the new tab. A number types into the line while the filter stands open.
-So the strip is the road to another tab there, and a press on it switches.
+a filter line of its own, and the line shows the open tab's. One placeholder
+stands for every tab, because the strip names the tab.
+
+| under the open pane | what it does |
+|---|---|
+| a tab switch | keeps the pane, which then draws off the new tab |
+| a number | types into the line, so the strip is the road to another tab |
+| a press on the strip | switches the tab |
+| a press on a row | selects it, and the wheel moves the rows |
 
 | the tab | its presets |
 |---|---|
-| the log | the talk under `alt+q`, and the selected row's kind under `alt+shift+f` |
+| the log | the talk under `alt+q`, and the selected row's kind under `alt+⇧f` |
 | the work | the groups of its base file, each under a number with alt |
 
-A preset is one row of the pane: its key, its name and the filter it writes.
-The row stands lit while the line holds that filter. For what a press does,
-see [[spec/design_output/tree-view#a-preset-carries-its-sort]].
+A preset is one row of the pane: its key and its name, and nothing else,
+because its filter runs long. The row stands lit while the line holds that
+filter. A press on the row presses the preset, the way its key does, and the
+tab narrows at once. The pane names each key once, and the language under the
+rows names none. For what a press does, see
+[[spec/design_output/tree-view#a-preset-carries-its-sort]].
 
 # The filter language
 
@@ -209,12 +217,13 @@ one too.
 ## One key filters the line
 
 - `alt+q` keeps the prompts and the replies: the talk.
-- `alt+shift+f` keeps every line of the selected line's kind. On a tool line the kind is the tool, as `Read`.
+- `alt+⇧f` keeps every line of the selected line's kind. On a tool line the kind is the tool, as `Read`.
 
 The key writes its filter into the filter line, as `kind: /^prompt$/`, so it
 reads and edits like one a person types. The same key again clears the filter.
-The filter pane names each key, and the strip names none. The floor under
-`alt+l` keeps a level, so no key filters by level.
+The filter pane names each key as its preset's row, and the strip names none.
+The help draws a shift chord with the `⇧` sign, so the row stays short. The
+floor under `alt+l` keeps a level, so no key filters by level.
 
 ## A name nobody knows
 
@@ -261,6 +270,7 @@ the Vale styles share, and `loadColours` in `colour.go` holds what it reads.
 | `window` | the bar, the rule, the header, the open tab and the selected row |
 | `bold` | the names wearing heavy type |
 | `spare` | the colour a name both maps leave out falls back to |
+| `flags` | a lit flag by its tone, `good` or `bad` or plain `on`, and one `off` |
 
 A kind the text column colours reads its number off the `kinds` map. So the two
 columns of one row wear one colour, and the number stands in one place.
@@ -355,10 +365,11 @@ place reading where an event lands:
 |---|---|
 | a press on row 0 | the tab under it, or the help at the strip's right end |
 | a press on the column names | the sort, which [[spec/design_output/tui#the-columns-stand-still]] covers |
-| a press on a list row | that row, as the selection |
+| a press on a list row | that row, as the selection, under any pane |
+| a press on the mark before a group | the group opens, or closes |
+| a press on a preset's row in the filter pane | the preset, as its key presses it |
 | the wheel over the list | the log, three rows a notch |
 | the wheel over the open pane | the pane's own scroll |
-| any event while the filter takes letters | nothing, so typing stands undisturbed |
 
 `mouse.go` reads the geometry the window already holds, so a moving split
 carries the mouse with it. `firstRow()` names the row the list opens on, out of
@@ -381,20 +392,32 @@ and the presets. For the view itself, see [[spec/design_output/tree-view]].
 | the redraw | `changes`, which [[spec/design_output/index#the-index-fires-on-change]] holds until a sweep |
 | the door's port | the standing file the door writes, off the root two folders over the log |
 | a door standing nowhere | the binary's own `standing` verb, which puts one up and drops a stale one |
+| the places and the branches | `branch list --json`, which [[spec/design_output/work#one-reading-answers-git]] answers, run behind each tree |
 
 A ticket naming another row nests under it, at any depth, and one naming a row
 the rows hold nowhere stands at the left. The mark before the name says which
 row is a group, so no column says it. A held group and its tickets wear the
-`W` letter, off the standing the index answers. The window's `Init` asks for
+`W` letter, off the standing the index answers. A group holding a branch
+wears the `C` letter, off the verb's answer. The window's `Init` asks for
 the tick from nothing, and each answer hands the tab its tree again.
 
-The table draws the name, the flags, the step, the group and the queue, and
-the table stands as it is when a pane opens. The state leads the flags as its
-first letter. The details draw the row whole: the name as a link, the fields,
-then every flag in the column's order in its own colour. The whole ask stands
-under them, with every note link in it clickable. The queue column stands
-empty until the index answers each row's place, which waits for a ticket of
-its own.
+The table draws the name, the flags and the queue, and it stands as it is
+when a pane opens. The nesting says the group, and the details say the step.
+The name links to its note. The state leads the flags as its first letter.
+
+The queue is a score the pull owns, and git holds the branches. So the tab
+runs the verb behind each tree the index hands over, and lays its answer
+over the rows. `workplaces.go` holds that road, and a verb answering nothing
+leaves the last places standing.
+
+| the part of the details | what it draws |
+|---|---|
+| the flags | every flag in the column's order, in its own colour |
+| the front | the rest of the fields, one a line |
+| the ask | the whole ask, with every note link in it clickable |
+
+Nothing off the body draws there, because the name in the table opens the
+note.
 
 `workindex.go` holds the road to the door, and `workitems.go` turns the rows
 into items. A box with no door and no binary draws the reason in the tab, and

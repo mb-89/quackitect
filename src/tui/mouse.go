@@ -21,15 +21,8 @@ const (
 // The first row a list line stands on, under the strip, the rule and the names. [[spec/design_output/tui#the-window-is-a-split]]
 func firstRow() int { return headWide + namesWide }
 
-// [[spec/design_output/tui#the-mouse-reaches-the-window]]
+// The mouse reaches the window under every pane, so a row selects and a tab switches while the filter takes letters. [[spec/design_output/tui#the-mouse-reaches-the-window]]
 func (m model) mouse(msg tea.MouseMsg) (tea.Model, tea.Cmd) {
-	// The strip answers a press under every pane, so a tab switches while the filter stands open. [[spec/design_output/tui#a-number-opens-a-tab]]
-	if m.pane == paneFilter {
-		if msg.Button == tea.MouseButtonLeft && msg.Action == tea.MouseActionPress && msg.Y == stripRow {
-			m.pressStrip(msg.X)
-		}
-		return m, nil
-	}
 	switch msg.Button {
 	case tea.MouseButtonWheelUp:
 		m.wheel(msg.X, -wheelStep)
@@ -63,6 +56,12 @@ func (m *model) press(x, y int) {
 		return
 	}
 	if m.overPane(x) {
+		// A press on a preset's row presses it, so the filter lands and applies at once. [[spec/design_output/tui#the-filter-pane-takes-letters]]
+		if m.pane == paneFilter {
+			if one := m.presetAt(y - headWide); one != nil {
+				m.pressPreset(*one)
+			}
+		}
 		return
 	}
 	// A press on the work tab reaches its tree, which holds its own order. [[spec/design_output/tree-view#a-sort-holds-several-keys]]
@@ -95,6 +94,10 @@ func (m *model) pressWork(x, y int) {
 	}
 	if y >= firstRow() {
 		m.work.MoveToRow(y - firstRow())
+		// A press on the mark before a group opens it, and closes it again. [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
+		if m.work.OnMark(x) {
+			m.work.Toggle()
+		}
 		m.loadPane()
 	}
 }

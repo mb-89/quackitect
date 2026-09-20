@@ -70,8 +70,9 @@ func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 	if m.filter.Empty() {
 		t.Fatal("the log keeps its own filter while the work tab stands open")
 	}
-	if !strings.Contains(m.input.Placeholder, "work") {
-		t.Fatalf("the line names the open tab, and it says %q", m.input.Placeholder)
+	// One placeholder stands for every tab, because the strip names the tab. [[spec/design_output/tui#the-filter-pane-takes-letters]]
+	if m.input.Placeholder != "type to narrow" {
+		t.Fatalf("the line names no tab, and it says %q", m.input.Placeholder)
 	}
 }
 
@@ -91,10 +92,42 @@ func TestAPresetWritesItsFilterIntoTheLineAndAgainClearsIt(t *testing.T) {
 		t.Fatalf("alt+2 writes the second preset's filter, and the line reads %q", m.input.Value())
 	}
 	pane := renderParts(alt(m, 'f').presetParts(), 80)
-	for _, want := range []string{"alt+1 not done", "alt+2 queue", "queue: /./"} {
+	for _, want := range []string{"alt+1  not done", "alt+2  queue", "alt+4  recently done"} {
 		if !strings.Contains(pane, want) {
-			t.Fatalf("the pane names each preset with its key and filter, and reads:\n%s", pane)
+			t.Fatalf("the pane names each preset with its key and name, and reads:\n%s", pane)
 		}
+	}
+	// The filter stays off the row, because it runs long. [[spec/design_output/tui#the-filter-pane-takes-letters]]
+	if strings.Contains(pane, "queue: /./") {
+		t.Fatalf("the pane draws no filter beside a preset, and reads:\n%s", pane)
+	}
+}
+
+// A press on a preset's row writes its filter and applies it, and a press on a row under the pane selects the row. [[spec/design_output/tui#the-filter-pane-takes-letters]]
+func TestAPressOnAPresetRowPressesItAndARowStillSelectsUnderThePane(t *testing.T) {
+	t.Parallel()
+	m := alt(press(workWindow(t, 3), "2"), 'f')
+	m = alt(m, '1')
+	if m.input.Value() != "" {
+		t.Fatalf("alt+1 again clears the pressed line, and it reads %q", m.input.Value())
+	}
+	// The first preset stands two rows under the line: the line, the blank, then the rows. [[spec/design_output/tui#the-filter-pane-takes-letters]]
+	m = click(m, m.listWidth()+4, headWide+2+1)
+	if m.input.Value() != "queue: /./" || !m.work.Narrowed() {
+		t.Fatalf("a press on the second row writes its filter and narrows the tab, and the line reads %q", m.input.Value())
+	}
+	if m.presetAt(0) != nil || m.presetAt(1) != nil {
+		t.Fatal("the line and the blank under it hold no preset")
+	}
+	m = alt(m, '2')
+	m = click(m, 4, firstRow()+1)
+	if m.work.At() != 1 || m.pane != paneFilter {
+		t.Fatalf("a press on the second row selects it under the pane, and the cursor stands at %d", m.work.At())
+	}
+	log := alt(window(5), 'f')
+	log = click(log, 10, firstRow()+2)
+	if log.at() != 2 || log.pane != paneFilter {
+		t.Fatalf("a press on a log row selects it under the pane, and the cursor stands at %d", log.at())
 	}
 }
 

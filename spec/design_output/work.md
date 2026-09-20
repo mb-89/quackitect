@@ -126,6 +126,13 @@ standing and nothing more. For what the tab draws, see
 | `loose` | the tickets on trunk naming no group |
 | `queue` on a ticket | the place the pull hands it out, which the flag adds |
 
+A flag asks for that one reading in place of the rows.
+
+| the flag | what the listing answers |
+|---|---|
+| `--queue` | the order the pull hands out, a place a name |
+| `--json` | the reading as JSON on one line, which the work tab reads for the places and the branches |
+
 # The listing reads git once
 
 `branch list` reads git in four asks, whatever stands on the remote:

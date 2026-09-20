@@ -27,10 +27,12 @@ type Column struct {
 
 // [[spec/design_output/tree-view#the-view-draws-a-tree]]
 type Tree struct {
-	Cols    []Column
-	Items   []Item
-	Nests   bool
-	Schema  Schema
+	Cols   []Column
+	Items  []Item
+	Nests  bool
+	Schema Schema
+	// The address a row's name links to, and nil where the names link nowhere. [[spec/design_output/tree-view#a-value-carries-a-link]]
+	LinkOf  func(Item) string
 	filter  Filter
 	sorts   []Sort
 	presets []Preset
@@ -59,6 +61,19 @@ func NewTree(cols []Column, items []Item, nests bool) *Tree {
 	t := &Tree{Cols: cols, Items: items, Nests: nests, shut: map[string]bool{}}
 	t.rebuild()
 	return t
+}
+
+// A change laid over every item, at every depth, after which the rows read again. [[spec/design_output/tree-view#an-item-carries-its-keys]]
+func (t *Tree) Amend(change func(*Item)) {
+	amend(t.Items, change)
+	t.rebuild()
+}
+
+func amend(items []Item, change func(*Item)) {
+	for at := range items {
+		change(&items[at])
+		amend(items[at].Kids, change)
+	}
 }
 
 // [[spec/design_output/tree-view#a-parent-expands-and-collapses]]

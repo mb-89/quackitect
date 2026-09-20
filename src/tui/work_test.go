@@ -163,7 +163,7 @@ func TestTheTabReadsTheBaseFileAndTheIndexOffTheLogsOwnPath(t *testing.T) {
 		t.Fatalf("the group, its ticket and the loose one stand, and %d rows do", tree.Len())
 	}
 	head := tree.Header(120)
-	for _, one := range []string{"name", "flags", "step", "group", "queue"} {
+	for _, one := range []string{"name", "flags", "queue"} {
 		if !strings.Contains(head, one) {
 			t.Fatalf("the column %s stands in the names, and they read %q", one, head)
 		}
@@ -171,8 +171,8 @@ func TestTheTabReadsTheBaseFileAndTheIndexOffTheLogsOwnPath(t *testing.T) {
 	if strings.Join(door.asked, " ") != "tickets" {
 		t.Fatalf("the tab asks the door for the tickets and nothing else, and asked %v", door.asked)
 	}
-	// The table draws no ask, no state and no kind: the state leads the flags, the mark says which row is a group, and the details draw the ask whole. [[spec/design_output/tui#the-work-tab]]
-	for _, gone := range []string{"says", "state", "kind", "standing"} {
+	// The table draws the name, the flags and the queue alone: the nesting says the group, and the details draw the rest. [[spec/design_output/tui#the-work-tab]]
+	for _, gone := range []string{"says", "state", "kind", "standing", "step", "group"} {
 		if strings.Contains(head, gone) {
 			t.Fatalf("the column %s stands off the table, and the names read %q", gone, head)
 		}

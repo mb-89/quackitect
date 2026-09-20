@@ -52,6 +52,21 @@ test("the queue listing reads git once, and writes no file under the runtime fol
   assert.equal(disk.exists(join(ROOT, ".se", ".runtime", "work.json")), false);
 });
 
+// The work tab parses the one answer, so the flag prints it as JSON on one line. [[spec/design_output/work#one-reading-answers-git]]
+test("the json listing prints the one answer as a JSON object on one line", () => {
+  const { said, code } = listed(["--json"]);
+  assert.equal(code, 0);
+  assert.equal(said.includes("\n"), false, "the answer stands on one line");
+  const answer = JSON.parse(said);
+  assert.ok(Array.isArray(answer.branches), "the answer carries the branches");
+  assert.ok(Array.isArray(answer.loose), "the answer carries the loose tickets");
+  assert.equal(answer.branches[0].branch, "work/one-group");
+  assert.ok(
+    answer.loose.some((one) => one.name === "a-loose-one"),
+    "the loose tickets name the one on trunk",
+  );
+});
+
 test("the listing shows open work alone by default", () => {
   const said = listing();
 

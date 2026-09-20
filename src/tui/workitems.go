@@ -5,7 +5,10 @@
 
 package main
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 // The kinds a row carries, off the route a group rides, which the mark draws and the filter reads. [[spec/design_output/tree-view#the-name-column-nests]]
 const (
@@ -28,7 +31,14 @@ type ticketRow struct {
 	Todo     bool   `json:"todo"`
 	Standing string `json:"standing"`
 	Says     string `json:"says"`
+	Changed  int64  `json:"changed"`
 }
+
+// The keys the verb's answer lays over the rows, which the index holds nowhere. [[spec/design_output/tui#the-work-tab]]
+const (
+	queueKey = "queue"
+	cloudKey = "cloud"
+)
 
 // [[spec/design_output/tui#the-work-tab]]
 func ReadWorkItems(text string) ([]Item, error) {
@@ -92,8 +102,18 @@ func itemOfTicket(one ticketRow) Item {
 		"urgent":   flagOf(one.Urgent),
 		"todo":     flagOf(one.Todo),
 		"held":     flagOf(one.Standing == heldStanding),
+		cloudKey:   flagOf(false),
+		"changed":  changedOf(one.Changed),
 		"says":     one.Says,
 	}}
+}
+
+// The time the file changed, as a number the sort reads, and nothing where the index knows none. [[spec/design_output/tree-view#a-sort-holds-several-keys]]
+func changedOf(when int64) string {
+	if when <= 0 {
+		return ""
+	}
+	return fmt.Sprint(when)
 }
 
 // A flag stays an ordinary key, so the filter reads `urgent: true` and no new word. [[spec/design_output/tree-view#a-flag-draws-a-letter]]

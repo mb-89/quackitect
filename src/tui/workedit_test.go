@@ -48,6 +48,8 @@ func editWindow(t *testing.T) (model, string) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	// The shipped table draws no group column, so the edit road runs over one a case adds. [[spec/design_output/tui#the-work-tab-takes-edits]]
+	tree.Cols = append(tree.Cols, Column{Name: "group", Key: "group", Wide: columnWide}, Column{Name: "step", Key: "step", Wide: columnWide})
 	m := newModel(path, time.UTC)
 	m.w, m.h = 120, 24
 	m.work = tree

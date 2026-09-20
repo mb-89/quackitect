@@ -151,10 +151,13 @@ func (m model) helpParts(w int) []part {
 	return append(parts, part{text: strings.TrimSpace(HelpText)})
 }
 
-// A key reads as a person presses it, so a capital under alt reads as shift. [[spec/design_output/tui#the-help-reads-the-cursor]]
+// The sign the help draws for shift, so a chord stays short. [[spec/design_output/tui#the-help-reads-the-cursor]]
+const shiftSign = "⇧"
+
+// A key reads as a person presses it, so a capital under alt reads as alt, the shift sign and the letter. [[spec/design_output/tui#the-help-reads-the-cursor]]
 func keyShown(name string) string {
 	if strings.HasPrefix(name, "alt+") && len(name) == len("alt+")+1 && name[len(name)-1] >= 'A' && name[len(name)-1] <= 'Z' {
-		return "alt+shift+" + strings.ToLower(name[len(name)-1:])
+		return "alt+" + shiftSign + strings.ToLower(name[len(name)-1:])
 	}
 	return name
 }
