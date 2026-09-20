@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -139,6 +139,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 099c2ec7708d · claude-code-remote · helper-9
+    hash_before: 86465d81f2499b26a0acf2abd6e1299e38eee022
+    hash_after: 86465d81f2499b26a0acf2abd6e1299e38eee022
+    returns: 1
+    why: "`commit-verb.js` prints the check's last `stdout` line on red, and the check writes faults to `stderr`; a red check under the fakes names the server line as its reason, and the fault reaches nobody; fix: print the check's `stderr` beside its `stdout`, so a red check names itself; `commit-verb.test.js` teaches the red case a fault on `stdout`, which agrees with the code; fix: teach that case `stderr`, and assert the verb prints what the check refuses; `## One verb feeds that stamp` lands mid-chapter, so two stamp paragraphs fall under it; fix: move that heading under the paragraph naming the two push doors; every header points at `#the-battery-answers-first`, so the new chapter takes no inbound link; a failing `git add -A` answers \"git staged nothing\", which names the wrong fault; a clean tree answers \"The commit door refuses this commit\", and git says nothing stands to commit; holds: the verb refuses a live bad message, names three findings at once, and stages nothing; holds: `./RUNME.sh check` answers exit 0 on 86465d81; holds: five cases pass over fake doors, and `fakeGit` drives the real git door; holds: `messageFaults` keeps the path, the trailer strip and the findings read in one place; holds: `branch review` answers \"retro absent from the handback\", so no retro stands there; holds: the diff touches the verb, the verbs map, the shared read, the cases and two notes"
 ---
 
 # Ask
@@ -349,20 +355,52 @@ What the run leaves behind:
 ## read
 
 <!-- every file you read, one a line -->
-
 <!-- the form is files -->
+
+- spec/tickets/the-commit-verb-lints-messages.md
+- spec/tickets/the-verbs-take-the-shell.md
+- spec/design_output/work.md
+- src/bridge/bash.js
+- src/scripts/commit-verb.js
+- src/scripts/cli.js
+- src/scripts/cli-check.js
+- src/scripts/cli-doors.js
+- src/doors/git.js
+- src/doors/vale.js
+- src/doors/fake/git.js
+- test/level0/commit-verb.test.js
+- RUNME.sh
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- `commit-verb.js` prints the check's last `stdout` line on red, and the check writes faults to `stderr`
+- a red check under the fakes names the server line as its reason, and the fault reaches nobody
+- fix: print the check's `stderr` beside its `stdout`, so a red check names itself
+- `commit-verb.test.js` teaches the red case a fault on `stdout`, which agrees with the code
+- fix: teach that case `stderr`, and assert the verb prints what the check refuses
+- `## One verb feeds that stamp` lands mid-chapter, so two stamp paragraphs fall under it
+- fix: move that heading under the paragraph naming the two push doors
+- every header points at `#the-battery-answers-first`, so the new chapter takes no inbound link
+- a failing `git add -A` answers "git staged nothing", which names the wrong fault
+- a clean tree answers "The commit door refuses this commit", and git says nothing stands to commit
+- holds: the verb refuses a live bad message, names three findings at once, and stages nothing
+- holds: `./RUNME.sh check` answers exit 0 on 86465d81
+- holds: five cases pass over fake doors, and `fakeGit` drives the real git door
+- holds: `messageFaults` keeps the path, the trailer strip and the findings read in one place
+- holds: `branch review` answers "retro absent from the handback", so no retro stands there
+- holds: the diff touches the verb, the verbs map, the shared read, the cases and two notes
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `messageFaults` owns the message read, and the chapter points at the bash note for the rules
 
 # Discussion
 
