@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 5bb6d89f88172d1b5129caec03d9ac08284274b8
     returns: 1
     why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, the removals reach past what it names |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |; | does every rule the approach adds carry a test | no, the retro's hold names none |; | what grade do the findings take | design, each one decides what the approach does |; Findings, one a line:; Name the decision each of the two plugins takes, so its row reaches a named end.; Name where the code of each leaving plugin lands, because the ask reads both as live.; The reach misses the tests importing the level one path: `test/level0/level1.test.js`, `test/level0/hand.test.js`, `test/contract/tree.test.js`.; `.claude/skills/pane/tests/pane.test.ts` stands inside a folder that leaves, so name its new home.; `./RUNME.sh links` answers the notes alone, so name the command answering the code reaching a path.; Name the step of the retro's route holding the refusal, and the test feeding it an open trial.; The retro's audit checklist already asks that every experiment stands decided, so say which of the two owns the rule."
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 4c32cd1120ae536b7558ab836f4038e7db2cc467
+    hash_after: 4c32cd1120ae536b7558ab836f4038e7db2cc467
 ---
 
 # Ask
@@ -122,15 +126,23 @@ The level one and pane plugins stand on after their question settles, and hands 
 
 ### approach
 
-An experiment carries a `decide` step from its first day, and the retro holds
-on it. So the two standing plugins leave by that road.
+An experiment carries a `decide` step from its first day, and the retro holds on it. So the two standing plugins leave by that road, each with its decision named.
+
+| the plugin | the decision | where its code goes |
+|---|---|---|
+| `.claude/skills/level1` | keep | the pull tool, the judge and the spawn move into `.claude/skills/level0` |
+| `.claude/skills/pane` | drop | the editor draws the same widgets, as [[spec/design_output/extension#one-declaration-draws-it]] says |
+
+Level one holds the tool a hand pulls through and the judge reading a hand-back. The tree runs both every session, so the trial ends kept. The pane draws beside the transcript what the sidebar draws already, so the trial ends dropped.
 
 | what changes | how |
 |---|---|
 | `spec/processes/experiment.yaml` | a route whose last step is `decide` |
-| the retro's route | holds while an experiment ticket stands open |
-| `.claude/skills/level1` | leaves, under a ticket of that process |
-| `.claude/skills/pane` | the same |
+| `spec/processes/retro.yaml` | its `audit` step holds while an experiment ticket stands open |
+| `.claude/skills/level0` | takes level one's hooks and library, under the names they carry |
+| `.claude/skills/level1` and `.claude/skills/pane` | leave, each under a ticket of the experiment process |
+| `test/level0/level1.test.js`, `test/level0/hand.test.js`, `test/contract/tree.test.js` | take the path level zero holds |
+| `src/scripts/cli-doors.js` | `LEVEL1` names the folder level zero holds |
 | [[spec/design_output/work]] | says what an experiment is, and what each decision does |
 
 The route, one step a row:
@@ -149,14 +161,20 @@ What each decision does:
 | drop | the code leaves, and the ticket closes on the reason |
 | grow | a ticket of its own carries it, and the experiment closes `became` |
 
-The retro's hold reads the way `retro notes` reads the private folder. It asks
-for every open ticket of the experiment process, and answers the names it
-finds. A retro closing over an open trial leaves the tree carrying that trial.
+**The hold.** The retro's `audit` step carries the checklist item naming every experiment decided. That item is a hand's read, and the hold is the machine's. So the item points at the hold, and the hold owns the rule.
 
-The two removals reach past the folders. `cli-doors.js` names the level one
-path, `spec/config/stop/level1.yml` holds its stop rules, and the design
-outputs name both plugins. `./RUNME.sh links` answers every note reaching them,
-so the removal reaches each one.
+`retro audit` answers `wait` while a ticket of the experiment process stands open, and names each one. A case drives that step over a fake tree holding one open trial, and asserts the wait names it. A second case holds a tree whose trials all close, and asserts the step passes.
+
+**The reach.**
+
+| the reader | what it answers |
+|---|---|
+| `./RUNME.sh links` | a note reaching a note |
+| `git grep skills/level1`, `git grep skills/pane` | a line of code reaching a path |
+
+Each removal runs both before it lands, because the first reader answers a note alone.
+
+The pane's own case file leaves with the folder, because the widgets it drives stand under `src/extension` with cases of their own. The level one cases take the path level zero holds, and stay.
 
 ## review
 
