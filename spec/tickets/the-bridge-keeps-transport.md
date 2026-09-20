@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box fa49097ce66c · claude-code-remote
@@ -96,6 +96,14 @@ record:
     hand: the engine
     hash_before: 02237bc0be71b193126b2526574b8e69a7fbfe87
     hash_after: 02237bc0be71b193126b2526574b8e69a7fbfe87
+  - step: retro/notes
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: fcd48eea6334a0461a1093b17dad21b6103cb1da
+    hash_after: fcd48eea6334a0461a1093b17dad21b6103cb1da
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -166,6 +174,8 @@ those, and the engine takes the work the bridge does past transport.
 <!-- retro notes, which passes when the private folder is empty -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh retro notes
 
 ## write
 

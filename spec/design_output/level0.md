@@ -300,9 +300,10 @@ listens there. `hookRows` runs the calls together, so a box naming several dead
 hooks answers inside the first minute. The wait is `HEALTH_WAIT` in
 `src/scripts/cli-doors.js`, which the server probe reads too.
 
-The row's label reads `hook <host>:<port>`, because `doctor` pads a label to
-one width. The word `warn` opens the printed row, and the doctor writes no log
-line of its own.
+The row's label reads `hook` beside the host of the address. A host carries its
+port, and leaves the one its scheme takes by default. `doctor` pads a label to
+one width, so the rows stand in line. The word `warn` opens the printed row,
+and the doctor writes no log line of its own.
 
 The entry at the dead port lives in `.claude/settings.local.json`, which git
 ignores. So a hand on the box it belongs to takes that line out, and this row
