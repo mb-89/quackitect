@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 4c32cd1120ae536b7558ab836f4038e7db2cc467
     hash_after: 4c32cd1120ae536b7558ab836f4038e7db2cc467
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-4
+    hash_before: 37ed6315e1f9eb42673c1e3b2655b3482966d7eb
+    hash_after: 37ed6315e1f9eb42673c1e3b2655b3482966d7eb
+    returns: 2
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, the move lands two files level zero already holds |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |; | does every rule the approach adds carry a test | yes, the hold names a case each side |; | what grade do the findings take | design, each one decides what the approach does |; The seven findings of the last round all land. Three stand open.; Findings, one a line:; Say how `hooks/hooks.json` merges, because level zero holds a file of that name.; Say how `.claude-plugin/plugin.json` merges, because level zero holds a file of that name.; Add `spec/design_output/pull.md` to what changes, because it names the folder the wrapper leaves."
 ---
 
 # Ask
@@ -186,22 +192,20 @@ fail
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the approach answer the ask | no, the removals reach past what it names |
+| does the approach answer the ask | no, the move lands two files level zero already holds |
 | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |
 | what does `./RUNME.sh check` answer | 0 on this commit |
 | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |
-| does every rule the approach adds carry a test | no, the retro's hold names none |
+| does every rule the approach adds carry a test | yes, the hold names a case each side |
 | what grade do the findings take | design, each one decides what the approach does |
+
+The seven findings of the last round all land. Three stand open.
 
 Findings, one a line:
 
-- Name the decision each of the two plugins takes, so its row reaches a named end.
-- Name where the code of each leaving plugin lands, because the ask reads both as live.
-- The reach misses the tests importing the level one path: `test/level0/level1.test.js`, `test/level0/hand.test.js`, `test/contract/tree.test.js`.
-- `.claude/skills/pane/tests/pane.test.ts` stands inside a folder that leaves, so name its new home.
-- `./RUNME.sh links` answers the notes alone, so name the command answering the code reaching a path.
-- Name the step of the retro's route holding the refusal, and the test feeding it an open trial.
-- The retro's audit checklist already asks that every experiment stands decided, so say which of the two owns the rule.
+- Say how `hooks/hooks.json` merges, because level zero holds a file of that name.
+- Say how `.claude-plugin/plugin.json` merges, because level zero holds a file of that name.
+- Add `spec/design_output/pull.md` to what changes, because it names the folder the wrapper leaves.
 
 # implement
 
