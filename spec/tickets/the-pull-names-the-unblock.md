@@ -120,6 +120,16 @@ record:
       - name: tests
         exit: 0
         said: "# duration_ms 12414.261652"
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 53c12bc1e601139656d466733043a0b16310cd68
+    hash_after: 53c12bc1e601139656d466733043a0b16310cd68
+    returns: 2
+    why: the ask's case already stands, and the row the change adds offers nothing red
+    answered:
+      - name: tests
+        exit: 0
+        said: "# duration_ms 12595.533367"
 ---
 
 # Ask
