@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box 14d41de46d55 · claude-code-remote
     hash_before: 31676ae5da7ea90ff1619f293b12642b80958af4
+  - step: sync
+    hand: box 14d41de46d55 · claude-code-remote
+    hash_before: 7bb7a863c8a2f4a7dce3a3ad2648640ea937dd6f
+    hash_after: a94e4d0e35428c2797ccd768e60af0fec1c08cdf
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-battery-earns-its-time already carries every commit on main.
 ---
 
 # Ask
@@ -92,9 +100,7 @@ The battery proves each door once against the real program, and every other case
 
 ## sync
 
-<!-- branch sync, so the branch carries trunk -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch sync
 
 # split
 
