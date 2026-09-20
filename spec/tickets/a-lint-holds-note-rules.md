@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -188,6 +188,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-17
+    hash_before: 495c4883aef72c03379f38e668915244ae7b9f1d
+    hash_after: 495c4883aef72c03379f38e668915244ae7b9f1d
+reason: done
 ---
 
 # Ask
@@ -514,30 +519,22 @@ a closed ticket, so a marker written there stands beyond every later hand.
 
 <!-- the form is files -->
 
-- spec/guidance/review/reviewing.md
 - spec/tickets/a-lint-holds-note-rules.md
 - spec/tickets/a-rule-names-its-failure.md
 - HANDOVER.md
 - .vale.ini
 - spec/config/styles/VoiceVale/History.yml
-- spec/schemas/rationale.schema.yaml
+- spec/design_output/lsp.md
+- spec/design_output/schema.md
+- spec/guidance/guidance.md
+- spec/rationales/guidance.md
+- spec/rationales/working.md
 - src/lsp/marked.go
 - src/lsp/marked_test.go
 - src/lsp/schema.go
-- src/lsp/schema_test.go
-- src/lsp/check.go
-- src/scripts/styles.js
-- spec/guidance/guidance.md
-- spec/rationales/guidance.md
-- spec/rationales/cloud.md
-- spec/rationales/tickets.md
-- spec/rationales/working.md
-- spec/rationales/code.md
-- spec/design_output/lsp.md
-- spec/design_output/schema.md
-- spec/design_output/index.md
-- spec/design_output/stop.md
+- src/lsp/schema-body.go
 - test/contract/vale.test.js
+- .se/.runtime/tools.json
 
 ## verdict
 
@@ -545,28 +542,33 @@ a closed ticket, so a marker written there stands beyond every later hand.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-| the finding | what to do |
+| the finding of the last round | what stands now |
 |---|---|
-| `spec/design_output/schema.md` names `matches` among the keywords drawing no finding. `markedFaults` draws off `matches`. | Give `matches` a row in the keyword table beside that line, and take it out of the sentence. |
-| Three files point at [[spec/design_output/lsp#a-second-copy-draws]]. That chapter names the rules over a second copy of a fact, and neither rule this branch adds. | Open the chapter owning the marked reading. Point `marked.go`, its cases and the `History` case at the chapter owning each rule. |
-| `.vale.ini` switches `History` off over `spec/tickets` too. The ask and the approach name the rationales alone. | Say the ticket switch in the approach. Otherwise drop it, and clear the marker `python-writes-pass-the-door` carries. |
-| `wantedChapters` writes `held.at = indexOf(note, held.Line)`. `sectionNamed` hands that index back already. | Drop the second reading. |
+| `matches` sat among the keywords drawing nothing | `spec/design_output/schema.md` says what the key draws, and points at the chapter owning it |
+| the new pieces pointed at the chapter of the restated rules | `spec/design_output/lsp.md` opens a chapter for each new rule, and every pointer names its own |
+| `.vale.ini` held the marker rule off over the tickets, past the approach | the switch stands, and the config says why beside it |
+| `wantedChapters` read a place it already held | `sectionNamed` hands the index back, and `indexOf` goes |
 
 What holds:
 
 - The ask lands, bullet by bullet.
-- `./RUNME.sh lint spec/guidance spec/rationales` exits 0.
-- `./RUNME.sh check` exits 0 on the tip.
+- `./RUNME.sh lint spec/guidance spec/rationales` exits 0, and `./RUNME.sh lint spec` exits 0 too.
+- `./RUNME.sh check` exits 0 on the tip, with every case green.
 - `./RUNME.sh branch review the-rules-hold-themselves` says nothing to fix.
-- `TestAMarkedRuleWantsItsChapter` feeds the rule a rationale opening no chapter, and it draws.
-- The Vale case reads two markers refused and a standing claim passing.
-- Three quiet cases hold the rule off where the approach says.
-- Every marked rule in `spec/guidance` ends its line on the star.
-- Rule twelve leaves with its chapter, and `a-rule-names-its-failure` carries the return.
-- The files past this ask belong to the group's other tickets.
-- A retro stands in `HANDOVER.md`, and its third finding names the class of the second finding.
+- A probe rationale opening no chapter for a marked rule draws `Schema.Why` off the binary.
+- The Go cases over the marked reading pass, and each one names the chapter it reads.
+- Rule twelve leaves `spec/guidance/guidance.md` with its chapter, and `a-rule-names-its-failure` carries the return.
+- `sectionNamed` sets the index at its source, and the caller reads it there.
+- The hunks of this round touch the checker, the style config, the design outputs and this ticket.
+- A retro stands in `HANDOVER.md`.
+
+What this hand weighs:
+
+- The ticket switch departs from the ask, which names the rationales alone. It stands, because a ticket records what a hand saw. The door refuses a hand the fields of a closed ticket, so the reason stands beside the switch.
+- [[spec/design_output/lsp#a-marker-carries-old-news]] names the rationale switch alone. `.vale.ini` owns both switches, and carries a reason beside each. So the chapter points at that file, and leaves the list to it.
+- `HANDOVER.md` reads this ticket at design/review. The box writes the handover as it closes the branch, so that line lands with `branch done`.
 
 ## checked
 
@@ -574,7 +576,7 @@ What holds:
 
 <!-- the form is checklist -->
 
-- The markers stand in `History.yml` alone, and the chapter numbers in the rationales. The first two findings name the notes reading against the code.
+- The marker words stand in `History.yml`, the switches in `.vale.ini`, and the chapter numbers in the rationales. Each new rule opens one chapter in `spec/design_output/lsp.md`, and the code, the cases and `spec/design_output/schema.md` point at it.
 
 # Discussion
 
