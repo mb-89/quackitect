@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -246,6 +246,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-25
+    hash_before: 30ffc89bda86320298e87e571e35d1d26d50de19
+    hash_after: 30ffc89bda86320298e87e571e35d1d26d50de19
+reason: done
 ---
 
 # Ask
@@ -517,19 +522,18 @@ rule at that name and reads the stop standing.
 ## read
 
 - .claude/skills/level0/lib/stop.js
-- spec/config/stop/level0.yml
-- spec/config/stop/level1.yml
+- .claude/skills/level0/lib/vehicle.js
 - spec/design_output/stop.md
 - spec/guidance/review/reviewing.md
 - spec/tickets/the-controls-wire-up.md
-- spec/tickets/the-runtime-files-stand-apart.md
 - src/bridge/stop.js
 - test/contract/stop-rules.test.js
 - test/level0/binding.test.js
+- test/level0/stop-door.test.js
 
 ## verdict
 
-fail
+pass
 
 | the question reviewing asks | the answer |
 |---|---|
@@ -537,49 +541,49 @@ fail
 | is what the diff touches beyond the ask trivial | yes, this round touches the stop door, one case file and this ticket |
 | what does `./RUNME.sh check` answer | 0, with the server standing |
 | does a retro stand in the handback | no, and `branch review` names it at the branch's close |
-| does every rule the change adds carry a case | yes, the gate and `knowsCheck` each carry one |
-| does a case feed the rule something bad | yes, the case asks `knowsCheck` a name nobody wrote |
+| does every rule the change adds carry a case | yes, the gate over the table carries one |
+| does a case feed the rule something bad | yes, a rule at `runs: constructor` meets the door and fires nothing |
 
 TL;DR:
 
-- The finding of the last round lands, and the case holds the shipped names against the door.
-- `CHECKS` gives the door one table, and `knowsCheck` opens that table to a case.
-- The table carries the object prototype, so `ranHere` reads a function for `constructor`.
-- So `ranHere` and `knowsCheck` part on such a name, which is the class this round sets out to close.
-- `## reflect` carries two `### checked` blocks, one a round.
-
-The findings, one a line:
-
-- `ranHere` answers `CHECKS[name]?.(held)`, and reads the prototype where the table holds nothing.
-- `CHECKS.constructor` is `Object`, which answers the held box, so a rule naming it fires.
-- `toString` and `valueOf` answer the same way, where `knowsCheck` answers false for each.
-- spec/design_output/stop.md says a `runs` the code holds nowhere answers false and writes a warn line.
-- The chain this hunk replaces answers undefined for those names, so the hunk moves that road.
-- The fix: gate the table read on `knowsCheck`, and carry a case over `runs: constructor`.
-- `## reflect` carries this round's `### checked` beside the block the round before wrote.
-- The fix: hold one `### checked` block under `## reflect`.
+- Both findings of the last round land, so this verdict passes.
+- `ranHere` asks `knowsCheck` ahead of the table, so a prototype name answers nothing.
+- The new case fails on the tip before this round, and passes on this one.
+- One `### checked` block stands under `## reflect`.
+- One thing reads other than the tree, and it stands outside these hunks.
 
 What reads true against the tree, one a line:
 
-- `CHECKS` in `src/bridge/stop.js` holds a key for each name the shipped rules use.
-- `ranHere` asks `standsDown` first, so `ENGINE_CHECKS` stands down at `god`.
-- The contract case asks `knowsCheck` of every shipped name, and of a name nobody wrote.
-- The case leaves `never` out, and spec/design_output/stop.md names `never` as the value answering nothing.
+- `ranHere` in `src/bridge/stop.js` answers undefined where `knowsCheck` answers false.
+- `knowsCheck` reads `Object.hasOwn`, so a name the prototype carries stands out.
+- `constructor`, `toString` and `valueOf` each answer false there.
+- The case in `test/level0/stop-door.test.js` drives a rule at that name and reads the stop standing.
+- That case fails on the tip ea66db9c, so it holds the fix and asserts something.
+- `fires` in the level0 stop library takes an undefined answer out of the vote.
+- `## reflect` carries one `### checked` block, and the ticket says that thing once.
+- The comment and the case each point at spec/design_output/stop.md, which owns the rule.
+- The vehicle hunk moves one name and drops a copy, which the brand ticket's verdict asks for.
 - `./RUNME.sh check` answers 0, with the server standing.
-- `./RUNME.sh branch review` names the retro alone, and the branch's close writes it.
-- This hand stands on the tip 3135a734, and that tip matches origin.
+- `./RUNME.sh branch test` answers green over every case file the branch holds.
+- This hand stands on the tip 30ffc89b, and that tip matches origin.
+
+What reads other than the tree, one a line:
+
+- spec/design_output/stop.md says a `runs` the code holds nowhere writes one warn line.
+- The vote carries its unknown list out, and every caller drops it, so no line reaches the log.
+- The tip before this branch answers the same way, so this stands outside these hunks.
+- A private note parks it, named the-unknown-runs-stays-quiet, and the retro decides it.
 
 What the agent needs:
 
 | number | need | status |
 |---|---|---|
-| 1 | `ranHere` answers nothing for a name the object prototype holds | open |
-| 2 | one `### checked` block stands under `## reflect` | open |
-| 3 | the verdict hand reads the branch again | open |
+| 1 | the branch's close writes the retro | open |
+| 2 | a desk merges the branch | open |
 
 ## checked
 
-- every fact the change adds stands in one place. `CHECKS` in `src/bridge/stop.js` owns the names, and `knowsCheck` opens that table to a case. Each comment points at spec/design_output/stop.md, which owns what a `runs` value answers. The case reads `never` off that same chapter. The ticket says one thing twice, because `## reflect` carries two `### checked` blocks.
+- every fact the change adds stands in one place. `knowsCheck` in `src/bridge/stop.js` owns what names the door holds. `ranHere` reads the answer there, and copies the list nowhere. The comment and the case each point at spec/design_output/stop.md, which owns what a `runs` value answers. The ticket carries one `### checked` block under `## reflect`.
 
 # Discussion
 
