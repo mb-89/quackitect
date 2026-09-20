@@ -5,7 +5,9 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { READ_TOOLS, register } from "../../.claude/skills/level0/hooks/level0.js";
+import { READ_TOOLS } from "../../.claude/skills/level0/hooks/level0.js";
+// The plugin loads the pull module, which holds the one session start and calls the bridgehead's register. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+import { register } from "../../.claude/skills/level0/hooks/pull-tool.js";
 
 // The engine hands a hook one `on`, and the hook names the events it takes. [[spec/design_output/level0#the-bridgehead-and-the-server]]
 function engine(answers = {}) {
@@ -65,10 +67,11 @@ test("the session start registers every read tool, whatever the server answers",
   assert.ok(start, "the hook takes the session start");
   await start.run(it.$, {}, (e) => e);
 
+  const reads = READ_TOOLS.map((one) => one.name);
   assert.deepEqual(
-    it.registered.map((one) => one.name).sort(),
+    it.registered.map((one) => one.name).filter((one) => reads.includes(one)).sort(),
     ["find", "patch", "replace", "undo"],
-    "every tool registers with no server standing",
+    "every read tool registers with no server standing, beside the pull",
   );
 });
 
