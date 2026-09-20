@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 1674b8341abf3251dda3e726d5336b8e8f823ed4
     returns: 1
     why: "| the finding | what to do |; |---|---|; | `matches: explains` in the rationale schema owns the star-to-chapter rule | Read that key in `underFaults`, and drop `StarNeedsSection` |; | The paragraph schema names no bad word, by its own header | Put the `History` markers beside `Antithesis.yml` |; | `.vale.ini` switches `PastTense` off over `spec/rationales` | Switch `History` off there the same way |; | `RuleNamesItsFailure` reads one buffer, and `tree.js` holds the pair rules | Put it beside `GuidanceChapter` under `VoiceShape` |; | Four notes star a rule whose rationale opens no chapter | Name the landing for each, below |; | `fault()` writes severity error | Say where the warning stage lives, or drop the stage |; | The failure rule answers rule twelve | Keep rule twelve in the note |; The drift the star rule finds, which the lint at zero wants cleared:; | the note | the starred rule standing with no chapter |; |---|---|; | `spec/guidance/cloud.md` | ten, fourteen, fifteen |; | `spec/guidance/tickets.md` | eight, nine, ten |; | `spec/guidance/working.md` | six, eleven |; | `spec/guidance/code/code.md` | ten |"
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: b2a3a5a306aa40d668642ebfac3793625ecdd8d8
+    hash_after: b2a3a5a306aa40d668642ebfac3793625ecdd8d8
 ---
 
 # Ask
@@ -126,25 +130,36 @@ Section numbers drift from rule numbers, history sits outside the rationales, an
 
 <!-- the form is text -->
 
-Three findings land, and each one goes where its reading belongs:
+Each of the three checks goes to the owner already standing for its reading:
 
-| the finding | where it lands | what it reads |
+| the check | where it lands | what it reads |
 |---|---|---|
-| `History` | the paragraph schema, projected into Vale | a marker list, off over `spec/rationales` |
-| `StarNeedsSection` | a rule in `.claude/skills/level0/lib/tree.js` | a guidance note, and the rationale its frontmatter names |
-| `RuleNamesItsFailure` | the same module | a rule line, and the failure standing beside the instruction |
+| a starred rule wants its chapter | `underFaults` in `.claude/skills/level0/lib/schema.js` | the guidance note, and the rationale its frontmatter names |
+| a history marker stands off the rationales | `spec/config/styles/VoiceVale/History.yml` | one buffer, with `.vale.ini` switching it off over `spec/rationales` |
+| a rule names the failure it prevents | `spec/config/styles/VoiceShape/RuleNamesItsFailure.yml` | the `Actionables` list of one guidance note |
 
-The readings:
+`spec/schemas/rationale.schema.yaml` already declares the first check, as
+`matches: explains` under `subsections`. The schema checker reads `numbered` and
+`order` beside it, and passes over `matches`. So the work is that key's reader,
+and the schema stays the one place saying the rule.
 
-- a starred rule takes its number, and the rationale wants a section opening on that number
-- the marker list stands beside the words the tree refuses, so one source holds both
-- a rule line reads as two sentences: what the reader does, and what breaks without it
-- the star rule and the failure rule read a pair of files, so they stand where the tree rules stand
+The two others read one buffer each, so Vale holds them the way it holds
+`Antithesis` and `GuidanceCap`. A style file of its own carries each, because
+the projection writes the register the paragraph schema owns.
 
-Rule twelve is the one the failure rule holds, so it stays in the note. Each
-finding lands at warning, and the implement step names every place it draws.
-The notes take the second sentence where it stands missing, and each rule turns
-to error in the change leaving the tree clean.
+The lint at zero wants the drift cleared, so the implement step writes the
+chapter each starred rule lacks:
+
+| the note | the starred rules wanting a chapter |
+|---|---|
+| `spec/guidance/cloud` | 10, 14, 15 |
+| `spec/guidance/tickets` | 8, 9, 10 |
+| `spec/guidance/working` | 6, 11 |
+| `spec/guidance/code/code` | 10 |
+
+Rule twelve of the guidance note is the one the failure check holds, so it stays
+where it stands. Each new rule opens at error, because the drift it names goes
+in the same change.
 
 ## review
 
