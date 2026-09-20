@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -145,6 +145,10 @@ record:
     hash_after: fe502d4fea13df7b613b5f7603b26fd3628dfc82
     returns: 1
     why: "the ask lands: `down` says one line in the chat, and `doctor` names a bridge standing down; `url()` answers the event route, and line 176 of the bridgehead chapter calls it the health call; line 180 of that chapter repeats the health call wording, and the hook names the event route; the tree reads the health call as `/health` at lines 228, 235 and 238 of that chapter; fix: name the event route at both lines, so a reader of the chapter reads the code; the case over a failing session log asserts one chat line, which `toldDown` holds alone; a probe reverting the flag move keeps that case green, and the row writes go 2 to 4; so the flag move answering finding six carries no case proving it fires; fix: add a case counting the rows a failing log takes, one a fall; `spec/design_output/extension.md` line 341 says a dead server leaves the agent running the same; the change gives that agent a chat line, and the pointer under line 341 reaches the old chapter; fix: correct line 341, and point it at the chapter this branch adds; the session start case and the once case each break under a mutant, so both guards hold; the diff reaches six files, and `serverLine(get = fetch)` opens the doctor to a fake door; `./RUNME.sh check` answers 0 on this branch; `./RUNME.sh branch review` reads the retro as absent from the handback; a local box running no server draws the line at its first `prompt.context`; the cage chapter's code 3 reasoning covers the block alone, so that silence holds"
+  - step: implement/reflect
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: b0ff40d4a6f0ba71d5ab28a8dcc9c5e36be20d31
+    hash_after: 202d385b0831748f52ef99d2bf2557d237fb6284
 ---
 
 # Ask
