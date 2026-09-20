@@ -254,7 +254,7 @@ names that import in its `door.go`, and `src/index` holds one today.
 The `os` import, which reads a file, stands in a file of nearly every Go
 package. `./RUNME.sh lint src` answers how many, and a rule over it asks for a
 door in each. So this ticket holds the rule to `os/exec`, and
-`a-door-holds-the-go-file-calls` carries the rest.
+`a-door-holds-file-calls` carries the rest.
 
 ## review
 

@@ -46,7 +46,7 @@ outside any group, and waits for a pull:
 | ticket | what it asks |
 |---|---|
 | `a-rule-names-its-failure` | a guidance rule says the failure it guards, beside itself |
-| `a-door-holds-the-go-file-calls` | every Go package names its file reading in one file |
+| `a-door-holds-file-calls` | every Go package names its file reading in one file |
 
 ## The queue binds one hand
 
