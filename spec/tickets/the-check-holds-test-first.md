@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -236,6 +236,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-25
+    hash_before: 89620d39b17e529c2ed56ad127c63be406b708b4
+    hash_after: 89620d39b17e529c2ed56ad127c63be406b708b4
+reason: done
 ---
 
 # Ask
@@ -557,7 +562,6 @@ drives the door itself.
 
     .claude/skills/level0/lib/tested.js
     .claude/skills/level0/lib/tree.js
-    .claude/skills/level0/lib/projection.js
     src/bridge/bash.js
     src/scripts/precommit.js
     src/doors/fake/behaves.js
@@ -569,6 +573,7 @@ drives the door itself.
     src/doors/fake/session.js
     src/doors/fake/bridgehead.js
     spec/config/projections.json
+    spec/config/level0.json
     spec/design_output/tree.md
     spec/design_output/doors.md
     spec/guidance/code/testing.md
@@ -592,27 +597,36 @@ drives the door itself.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-| the finding | the fix |
+| the finding of the last round | where the branch answers it |
 |---|---|
-| The case named for a projection target asserts nothing. `untestedIn` holds no projection reading, and the path it feeds is no `.js` under `src`, so `SOURCE` alone draws the empty list | Feed the case a path the rule would otherwise name, or drop the half and cut the promise from the approach |
-| The approach says the delta reading skips every projection target. No target `spec/config/projections.json` names lands under `src`, so the line describes a reading standing nowhere | Say which paths under `src` the reading skips, and let one list in the code carry them |
-| `filesIn` stands exported from `tested.js`, and no module calls it. A reader takes it for a door of the rule, and nothing drives it | Drop the export, or name the caller it lands for |
+| the case named for a projection target asserts nothing | the case feeds the fake, the stub's template and a module wanting a test, and asserts the third comes back named |
+| the approach promises a projection reading the code lacks | `COPIED` carries the whole list, and the comment beside it says why each path stands there |
+| `filesIn` stands exported with no caller | the function goes, and `untestedIn` calls `hunksIn` in its place |
 
 What holds:
 
-- `./RUNME.sh check` exits 0 on `45aaa37a`, and the branch matches origin.
-- The four lines of the ask each take a program: the delta reading, the tree rule and the guard.
+- `./RUNME.sh check` exits 0 on `89620d39`, and the branch matches origin.
+- `./RUNME.sh branch review` answers nothing to fix on this branch.
+- Each line of the ask takes a program: the delta reading, the tree rule and the guard.
 - Rule five of [[spec/guidance/code/testing]] names the commit door and the tree rule.
-- Every fake under `src/doors/fake` takes `behaves`, and a case drives `fakeClock` into a call it lacks.
-- `hunksIn` keys the added lines by file, and a case feeds it one changed module importing another.
-- Both doors read one text, because the Bash door and the hook hand the staged delta to `untestedIn`.
-- Each rule takes a case feeding it something bad: a module no test imports, and a stray test.
-- The nine tests the import rule forces each assert on the module they name.
-- `test/level0/tools-door.test.js` stands as it stands on trunk, and its survey cases hold.
-- The change touches the readings, the guard, both doors, two notes and the tests. It reaches nothing outside the brief.
-- `HANDOVER.md` carries a retro chapter, with three findings for the retro to weigh.
+- The tree note tables `EveryModuleTested`, and the doors note holds what the guard does.
+- Every fake under `src/doors/fake` takes `behaves`, and a case drives `fakeClock` past it.
+- Both doors read one text: each hands the staged delta to `untestedIn`.
+- A case feeds each rule something bad: a module no test imports, and a stray test.
+- A case feeds the delta reading a changed module another changed module imports.
+- Every module of the server the rule names takes a test importing it by path.
+- The range touches the readings, the guard, both doors, two notes and the tests.
+- It reaches nothing the ask leaves alone.
+- `HANDOVER.md` carries a retro chapter, and this ticket's findings stand in the record.
+
+What the retro weighs, and what fails nothing here:
+
+- The approach reads that the delta reading skips every projection target.
+- No projection target lands under `src`, and the reflect chapter names the line already.
+- `hunksIn` stands exported, and `untestedIn` alone calls it.
+- It reads as a door of the rule, and no module outside takes it.
 
 ## checked
 
@@ -620,7 +634,9 @@ What holds:
 
 <!-- the form is checklist -->
 
-- the tree note tables the rule, the doors note holds the guard, and each module points at its chapter. One fact stands twice: the approach names a projection reading the code lacks
+- one place owns each fact the change adds: `COPIED` owns what the reading skips
+- the tree note owns the rule's row, and the doors note owns the guard
+- each module points at the chapter it stands under, and repeats none of it
 
 # Discussion
 
