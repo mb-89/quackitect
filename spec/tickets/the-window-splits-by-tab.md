@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -166,6 +166,17 @@ record:
     hash_after: c7f49ef1f157a5332dcd1b9ce31924df2aa3d6e6
     answered:
       - name: lint
+        exit: 0
+        said: 64 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: implement/tests-green
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: cf57f2a2f730775edc80f1ddcddb2094dad77549
+    hash_after: cf57f2a2f730775edc80f1ddcddb2094dad77549
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 12 test(s) pass in 1 file(s); green, src/tui passes
+      - name: check
         exit: 0
         said: 64 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
