@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -99,6 +99,17 @@ record:
     hand: box 1670436ae0bb · claude-code-remote · helper-2
     hash_before: e4e832b29007cf969cd3f943b3553789173741d4
     hash_after: e4e832b29007cf969cd3f943b3553789173741d4
+  - step: implement/tests-red
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: ecff47a224da20b7c6b20b98c009cd1dca0aa1df
+    hash_after: ecff47a224da20b7c6b20b98c009cd1dca0aa1df
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/lsp fails
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -178,17 +189,41 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh branch test src/lsp/pointer_test.go
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The command answers assertion. Go refuses a package calling a name nobody
+wrote, so `pointer.go` ships the rule answering nothing, and each case asserts
+against it.
+
+| the case | what it holds open |
+|---|---|
+| a chapter nobody wrote is refused | the rule answers nothing |
+| a note nobody wrote is refused | the rule answers nothing |
+| a comment in code is read | the rule answers nothing |
+| sound pointers stand quiet | passes over the stub, because nothing draws over nothing |
+| a quoted shape is skipped | passes over the stub, for the same reason |
+
+The two quiet cases pass before the rule stands, and they earn their place once
+it does: each one names a shape the rule reads past, and a rule reading it
+would draw there. What surprises me is how many shapes quote a pointer: a code
+span, a fence, an indented example, a placeholder in angle brackets, and a
+string a test writes.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The rule, its case file, the server's design output and the tree rules table, this ticket, and every file carrying a pointer standing dead today.
+- every door the change reaches has a fake. Each case writes its own fixture root, and the rule reads the tree handed in and nothing outside it.
+- a comment names the approach the change implements. The rule and each case point at the chapter the design output takes.
 
 ## reflect
 
