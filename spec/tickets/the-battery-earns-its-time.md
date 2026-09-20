@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box 14d41de46d55 · claude-code-remote
@@ -87,6 +87,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-battery-earns-its-time already carries every commit on main.
+  - step: split
+    hand: box 14d41de46d55 · claude-code-remote
+    hash_before: 9f050c6e1f94f1ff72ecdc638ffb17daa18d5105
+    hash_after: 9f050c6e1f94f1ff72ecdc638ffb17daa18d5105
 ---
 
 # Ask
@@ -108,15 +112,18 @@ The battery proves each door once against the real program, and every other case
 
 ## children
 
-<!-- every child as a link, one a line, with its process -->
-
-<!-- the form is list -->
+- [[spec/tickets/a-door-proves-once]], trivial
+- [[spec/tickets/a-vale-case-spawns-once]], trivial
+- [[spec/tickets/one-reading-proves-one-file]], trivial
+- [[spec/tickets/the-roots-case-reads-globs]], trivial
+- [[spec/tickets/the-stamp-counts-every-spawn]], trivial
+- [[spec/tickets/the-vehicle-case-fakes-install]], trivial
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- each child is one file or one field of the stamp, and a reader holds it whole
+- the six add up to the goal: each door once, the rules off one run, the stamp naming what grew
+- the children stood minted before the take, and none waits on another
 
 # children
 
