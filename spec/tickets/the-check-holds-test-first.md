@@ -512,6 +512,18 @@ The third round closes the two the second left open:
 | the evidence named a difference standing nowhere | this table says what a hand reads back |
 | the import read off the whole delta | `hunksIn` keys the added lines by file, and each test answers off its own |
 
+The fourth round answers the last three:
+
+| the finding | what lands |
+|---|---|
+| a case feeding a path the filter drops | the case feeds the stub's template, and a module wanting a test beside it |
+| the promise of a projection reading | `COPIED` names the fakes and the stub, which is the whole list |
+| `filesIn` standing with no caller | the function goes, and `hunksIn` answers the callers it had |
+
+The stub's template rides out as a copy of the vehicle, so a change there wants
+no test of its own. The fakes stand in for a door, and their contract test
+drives the door itself.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
