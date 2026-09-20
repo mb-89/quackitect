@@ -234,17 +234,31 @@ What the implement step decides:
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/tested.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- `test/level0/tested.test.js` drives the two readings and the guard a fake takes
+- three cases fail on their own assertion, and the stubs answer an empty list
+- the quiet cases pass already, because an empty list draws nothing
+- the delta case reads the shape `addedIn` reads, so one parser answers both doors
+
+What surprises the hand: a fake answers a call it lacks with nothing today. So a
+test driving a door through one asserts on nothing until the guard lands.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases touch one test file, one module and the fakes' guard, which the approach names
+- the tree case writes its own tree through the disk and git fakes
+- each case carries the pointer at the chapter tabling the rules over two files
 
 ## reflect
 
