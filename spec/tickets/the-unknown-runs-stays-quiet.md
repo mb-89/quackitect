@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 0039c099bc3da2c41110d653726f5bde3a69431c
     returns: 1
     why: "The vote's `unknown` list misses a claimed rule the agent claims nowhere this turn, because `fires` in `lib/stop.js` answers false before it reads `runs`, so a typo in such a rule stays quiet until the agent claims it. Read every rule's `runs` in the door through `knowsCheck`, which `src/bridge/stop.js` exports already.; The line names the rule file, and `pool` in `lib/stop.js` drops the file name, so the door holds it nowhere. Name the rule id and the check, both of which the door holds.; The table under The mechanical checks in `spec/design_output/stop.md` lists `never`, and `CHECKS` in `src/bridge/stop.js` holds it nowhere, so a rule with `runs: never` writes the warn line every turn. Add `never` to `CHECKS` answering false, so the table and the door agree.; The case over the fake box stands right: `test/level0/stop-door.test.js` holds a fake `log.say` that keeps every row, so the case asserts the warn row there."
+  - step: design/draft
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 9ae8ec51a44ac0d3b37ddc170d32a2d159520a06
+    hash_after: 9ae8ec51a44ac0d3b37ddc170d32a2d159520a06
 ---
 
 # Ask
@@ -132,19 +136,21 @@ it stands outside that branch's hunks.
 
 <!-- the form is text -->
 
-The stop door reads the `unknown` list the vote answers already, and writes one
-warn line a name.
+The stop door reads every rule's `runs` itself, once a turn, and writes one
+warn line a rule naming a check it holds nowhere.
 
 | the piece | what changes |
 |---|---|
-| `onStop` in `src/bridge/stop.js` | after the vote, writes `warn` under `stop` for each distinct name in `unknown`, naming the check and the rule file |
-| `decide` in the hook's `lib/stop.js` | stays as it is, because it carries the names out today |
-| the case | drives the door over the fake box with a rule whose `runs` names nothing, and asserts one warn line stands in the log |
+| `onStop` in `src/bridge/stop.js` | before the vote, asks `knowsCheck` of every rule carrying a `runs`, and writes `warn` under `stop` for each one it holds nowhere, naming the rule id and the check |
+| `CHECKS` in `src/bridge/stop.js` | gains `never`, answering false, so the table under The mechanical checks and the door agree |
+| `decide` in the hook's `lib/stop.js` | stays as it is, because the vote skips a claimed rule the agent claims nowhere, and the door's own read catches those too |
+| the case | drives the door over the fake box with a rule whose `runs` names nothing, and asserts one warn row in the fake log naming the rule and the check |
 | the design output | stays as it is, because the sentence promising the line stands there already |
 
-The line stands in the log, and nowhere in the block the door answers. The
-owner reads the log for a rule at fault, and the agent reads the block for what
-to do next.
+The line names the rule id and the check, because the door holds both and the
+file name nowhere. The line stands in the log, and nowhere in the block the
+door answers. The owner reads the log for a rule at fault, and the agent reads
+the block for what to do next.
 
 ## review
 
