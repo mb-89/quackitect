@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -197,6 +197,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 099c2ec7708d · claude-code-remote · helper-16
+    hash_before: 0a7d3bafd69120926468721523ec2db41286dc4f
+    hash_after: 0a7d3bafd69120926468721523ec2db41286dc4f
+    returns: 1
+    why: "the ask holds: `./RUNME.sh log` narrows the rows by span, level, kind and count; `./RUNME.sh check` answers exit 0 on this commit; `./RUNME.sh branch review the-verbs-take-the-shell` answers check passes, and no retro stands; the diff beyond the ask holds two trivial hunks, and neither redesigns what the ask leaves alone; the clock door lands in `src/scripts/cli-check.js`, and `MS` points home from `src/scripts/work-stands.js`; the cases cover each filter, and the install case goes red where a guard falls off a `say` line; the design review asks for one `MS` owner, and two copies stand outside the log lib; fix: `src/bridge/stop.js` and `src/scripts/queue.js` each keep an `MS` of their own, so point both at the lib; fix: `src/scripts/log-verb.js` copies the no-log line out of `src/scripts/tui.js`, so give it one owner"
 ---
 
 # Ask
@@ -411,20 +417,48 @@ Two numbers move to one owner each:
 ## read
 
 <!-- every file you read, one a line -->
-
 <!-- the form is files -->
+
+- spec/tickets/a-log-verb-reads-sessions.md
+- src/scripts/log-read.js
+- src/scripts/log-verb.js
+- src/scripts/tui.js
+- src/scripts/cli.js
+- src/scripts/cli-check.js
+- src/scripts/group.js
+- src/scripts/queue.js
+- src/scripts/work-stands.js
+- src/scripts/install.sh
+- src/bridge/stop.js
+- src/extension/sidebar.js
+- .claude/skills/level0/lib/log.js
+- spec/design_output/log.md
+- test/level0/log-verb.test.js
+- test/contract/install.test.js
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- the ask holds: `./RUNME.sh log` narrows the rows by span, level, kind and count
+- `./RUNME.sh check` answers exit 0 on this commit
+- `./RUNME.sh branch review the-verbs-take-the-shell` answers check passes, and no retro stands
+- the diff beyond the ask holds two trivial hunks, and neither redesigns what the ask leaves alone
+- the clock door lands in `src/scripts/cli-check.js`, and `MS` points home from `src/scripts/work-stands.js`
+- the cases cover each filter, and the install case goes red where a guard falls off a `say` line
+- the design review asks for one `MS` owner, and two copies stand outside the log lib
+- fix: `src/bridge/stop.js` and `src/scripts/queue.js` each keep an `MS` of their own, so point both at the lib
+- fix: `src/scripts/log-verb.js` copies the no-log line out of `src/scripts/tui.js`, so give it one owner
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the chapter owns the flags table, and the fail names the no-log line and `MS` as the copies standing
 
 # Discussion
 
