@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -223,6 +223,10 @@ record:
     hash_after: 3135a734db77266a4881dfc33247b7bf9de1b3e2
     returns: 3
     why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | yes, the three done_when lines land |; | is what the diff touches beyond the ask trivial | yes, this round touches the stop door, one case file and this ticket |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does a retro stand in the handback | no, and `branch review` names it at the branch's close |; | does every rule the change adds carry a case | yes, the gate and `knowsCheck` each carry one |; | does a case feed the rule something bad | yes, the case asks `knowsCheck` a name nobody wrote |; TL;DR:; The finding of the last round lands, and the case holds the shipped names against the door.; `CHECKS` gives the door one table, and `knowsCheck` opens that table to a case.; The table carries the object prototype, so `ranHere` reads a function for `constructor`.; So `ranHere` and `knowsCheck` part on such a name, which is the class this round sets out to close.; `## reflect` carries two `### checked` blocks, one a round.; The findings, one a line:; `ranHere` answers `CHECKS[name]?.(held)`, and reads the prototype where the table holds nothing.; `CHECKS.constructor` is `Object`, which answers the held box, so a rule naming it fires.; `toString` and `valueOf` answer the same way, where `knowsCheck` answers false for each.; spec/design_output/stop.md says a `runs` the code holds nowhere answers false and writes a warn line.; The chain this hunk replaces answers undefined for those names, so the hunk moves that road.; The fix: gate the table read on `knowsCheck`, and carry a case over `runs: constructor`.; `## reflect` carries this round's `### checked` beside the block the round before wrote.; The fix: hold one `### checked` block under `## reflect`.; What reads true against the tree, one a line:; `CHECKS` in `src/bridge/stop.js` holds a key for each name the shipped rules use.; `ranHere` asks `standsDown` first, so `ENGINE_CHECKS` stands down at `god`.; The contract case asks `knowsCheck` of every shipped name, and of a name nobody wrote.; The case leaves `never` out, and spec/design_output/stop.md names `never` as the value answering nothing.; `./RUNME.sh check` answers 0, with the server standing.; `./RUNME.sh branch review` names the retro alone, and the branch's close writes it.; This hand stands on the tip 3135a734, and that tip matches origin.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | `ranHere` answers nothing for a name the object prototype holds | open |; | 2 | one `### checked` block stands under `## reflect` | open |; | 3 | the verdict hand reads the branch again | open |"
+  - step: implement/reflect
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: ea66db9ca702011de8b7a4b9d495ffb2bf24a30f
+    hash_after: ea66db9ca702011de8b7a4b9d495ffb2bf24a30f
 ---
 
 # Ask
@@ -387,32 +391,28 @@ drives that half over a fake box.
 
 ### class
 
-One class stands under this round's finding.
+Two classes stand under this round's findings.
 
 | the class | the finding it carries | the fix for the class |
 |---|---|---|
-| an assertion reads a shape, where the claim reads a set | the contract case over the shipped names | the door answers which names it knows, and the case holds the shipped names against that |
+| a lookup reads a key the table holds nowhere | the rule at `runs: constructor` | the read asks the table first, and answers nothing where the table holds nothing |
+| a field answers twice in one chapter | the doubled block under `## reflect` | one block stands, and the round rewrites it |
 
-The case its title promises refuses a shipped name the door answers nowhere.
-The assertion it carries reads the type of an answer, which any string wins. So
-the title and the assertion part, and the green tells a reader nothing.
+The first class is one a chain of comparisons had no room for. A table keyed by
+a name answers the keys every object carries, so a name nobody wrote reaches a
+function. That function answers a value the vote reads as a firing check, and a
+rule takes such a name out of a config file.
 
-The door knows its names in a chain of comparisons, so nothing outside it can
-ask what the chain holds. A table keyed by the name answers both: the door
-reads it, and a case asks it what stands in it.
+`knowsCheck` already answers what the table holds. So the read asks it, and the
+door's answer and the door's behaviour say one thing. A case drives a rule at
+that name and reads the door refusing it.
 
-The three classes of the round before stand answered, and the rounds hold them.
+The second class is a hand's, and one block answers it.
 
 ### checked
 
 - the change touches no file the ask leaves out. The stop door and the two case files.
 - every door the change reaches has a fake. The contract case drives the shipped rules, which is what a contract case is for.
-- a comment names the approach the change implements. Each site points at the chapter owning the binding.
-
-### checked
-
-- the change touches no file the ask leaves out. The pull, its route, the stop door and the cases.
-- every door the change reaches has a fake. The pull case drives the fakes `test/level0/pull-doors.js` builds.
 - a comment names the approach the change implements. Each site points at the chapter owning the binding.
 
 ## change
