@@ -82,3 +82,16 @@ func (t Tree) fillWhere() []string {
 	}
 	return out
 }
+
+// The marked items themselves, so a key over marks reaches each one. [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
+func (t Tree) MarkedItems() []*Item {
+	out := []*Item{}
+	for _, one := range t.flat {
+		if t.marks[one.at] {
+			if held := t.itemAt(one.at); held != nil {
+				out = append(out, held)
+			}
+		}
+	}
+	return out
+}

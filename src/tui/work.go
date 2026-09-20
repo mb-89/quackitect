@@ -136,6 +136,11 @@ func (workTab) Left(m *model, w, rows int) string {
 	if m.work == nil {
 		return lipgloss.NewStyle().Width(w).Render(strings.Join(workWaits(m, w, rows), "\n"))
 	}
+	// A notice takes the last line while one stands, so a refusal reads where the edit was. [[spec/design_output/tui#the-work-tab-takes-edits]]
+	if m.workNotice != "" {
+		m.work.Scroll(rows - 1)
+		return m.work.Header(w) + "\n" + m.work.Rows(w, rows-1) + "\n" + levelStyle("warn").Render(cut(m.workNotice, w))
+	}
 	m.work.Scroll(rows)
 	return m.work.Header(w) + "\n" + m.work.Rows(w, rows)
 }
@@ -196,6 +201,29 @@ func (workTab) Keys(m *model) band {
 			if m.work != nil {
 				m.work.Toggle()
 			}
+			return nil
+		}},
+		// [[spec/design_output/tui#the-work-tab-takes-edits]]
+		{bind("a d", "back one column, and on one column", "a", "d", "A", "D"), func(m *model, name string) tea.Cmd {
+			step := 1
+			if strings.EqualFold(name, "a") {
+				step = -1
+			}
+			if m.work != nil {
+				m.work.MoveCursor(step)
+			}
+			return nil
+		}},
+		{bind("e", "edit the cell under the cursor: enter writes, esc drops, shift+enter fills", "e"), func(m *model, _ string) tea.Cmd {
+			m.openEdit()
+			return nil
+		}},
+		{bind("u t", "flip the urgent mark, and the todo mark", "u", "t"), func(m *model, name string) tea.Cmd {
+			key := urgentKey
+			if name == "t" {
+				key = todoKey
+			}
+			m.flip(key)
 			return nil
 		}},
 		// [[spec/design_output/tree-view#a-fill-reaches-the-marks]]

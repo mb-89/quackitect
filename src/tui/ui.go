@@ -75,6 +75,9 @@ type model struct {
 	work     *Tree
 	workWhy  string
 	workTick int64
+	// [[spec/design_output/tui#the-work-tab-takes-edits]]
+	workNotice string
+	rules      *ticketSchema
 }
 
 func newModel(path string, zone *time.Location) model {
@@ -268,6 +271,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// [[spec/design_output/tui#the-work-tab]]
 	case workMsg:
 		if !msg.same {
+			if msg.tree != nil {
+				msg.tree.Carry(m.work)
+			}
 			m.work, m.workWhy = msg.tree, msg.why
 			if m.work != nil {
 				m.work.Filtering(m.filter.Source)
@@ -281,6 +287,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.pane == paneFilter {
 			return m.typing(msg)
 		}
+		// An open edit takes every key, the way the filter line does. [[spec/design_output/tui#the-work-tab-takes-edits]]
+		if m.onWork() && m.work.Editing() {
+			return m.editing(msg)
+		}
+		m.workNotice = ""
 		return m.key(msg.String())
 
 	case tea.MouseMsg:

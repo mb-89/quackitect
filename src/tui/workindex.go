@@ -16,11 +16,11 @@ import (
 	"time"
 )
 
-// The door's standing file and the binary, owned by door.go under src/index and lib/index.js, and spelled again here because a Go module imports neither. [[spec/design_output/index#the-door-owns-the-database]]
-const (
-	indexStandingAt = ".se/.runtime/index.json"
-	indexBinAt      = ".se/.runtime/bin/se-index"
-)
+// The door's standing file, whose folder .claude/skills/level0/lib/folders.js owns and whose name door.go under src/index owns, spelled again here because a Go module imports neither. [[spec/design_output/index#the-door-owns-the-database]]
+const indexStandingAt = ".se/.runtime/index.json"
+
+// The binary, whose folder .claude/skills/level0/lib/folders.js owns and whose name lib/index.js owns, spelled again here for the same reason. [[spec/design_output/index#the-door-owns-the-database]]
+const indexBinAt = ".se/.runtime/bin/se-index"
 
 // A call waits past the changes wait the door holds, so a held call answers before the client lets go. [[spec/design_output/index#the-index-fires-on-change]]
 const indexCallWait = 40 * time.Second

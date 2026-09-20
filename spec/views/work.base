@@ -9,6 +9,7 @@ columnSize:
   standing: 9
   flags: 5
   step: 10
+  group: 20
 flags:
   - letter: U
     key: urgent
@@ -38,6 +39,7 @@ views:
       - standing
       - flags
       - step
+      - group
       - says
     nest: group
     sort:

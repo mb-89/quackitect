@@ -32,6 +32,9 @@ type Edit struct {
 	offer []string
 }
 
+// The key an item carries naming the field its last write changed, so a writer past the tree reads which one. [[spec/design_output/tui#the-work-tab-takes-edits]]
+const editedKey = "edited"
+
 // [[spec/design_output/tree-view#a-cell-takes-an-edit]]
 func (t *Tree) Open(col int) bool {
 	held := t.twig()
@@ -112,6 +115,7 @@ func (t *Tree) Fill() []string {
 // [[spec/design_output/tree-view#a-schema-refuses-a-value]]
 func (t *Tree) write(where []string, key, said string) []string {
 	var left []string
+	t.wrote = t.wrote[:0]
 	for _, at := range where {
 		one := t.itemAt(at)
 		if one == nil {
@@ -122,8 +126,21 @@ func (t *Tree) write(where []string, key, said string) []string {
 			continue
 		}
 		setValue(one, key, said)
+		setValue(one, editedKey, key)
+		t.wrote = append(t.wrote, at)
 	}
 	return left
+}
+
+// The items the last take or fill wrote, so a writer past the tree reaches each one. [[spec/design_output/tui#the-work-tab-takes-edits]]
+func (t Tree) Written() []Item {
+	out := make([]Item, 0, len(t.wrote))
+	for _, at := range t.wrote {
+		if one := t.itemAt(at); one != nil {
+			out = append(out, *one)
+		}
+	}
+	return out
 }
 
 // [[spec/design_output/tree-view#the-completion-knows-the-field]]

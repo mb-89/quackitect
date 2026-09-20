@@ -162,8 +162,8 @@ func TestTheTabReadsTheBaseFileAndTheIndexOffTheLogsOwnPath(t *testing.T) {
 	if tree.Len() != 3 {
 		t.Fatalf("the group, its ticket and the loose one stand, and %d rows do", tree.Len())
 	}
-	head := tree.Header(80)
-	for _, one := range []string{"name", "state", "standing", "flags", "step", "says"} {
+	head := tree.Header(120)
+	for _, one := range []string{"name", "state", "standing", "flags", "step", "group", "says"} {
 		if !strings.Contains(head, one) {
 			t.Fatalf("the column %s stands in the names, and they read %q", one, head)
 		}
