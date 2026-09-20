@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -112,6 +112,11 @@ record:
     hand: box 099c2ec7708d · claude-code-remote
     hash_before: aa5ac86d5efcf98fa98d63f8044b8d76f3685b4f
     hash_after: aa5ac86d5efcf98fa98d63f8044b8d76f3685b4f
+  - step: retro/cloud
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 35977ecb5eb8cb83e5a3a368e4fe4934083c6b6c
+    hash_after: 35977ecb5eb8cb83e5a3a368e4fe4934083c6b6c
+reason: done
 ---
 
 # Ask
@@ -256,20 +261,33 @@ The classes repeat. Two tickets failed on a fake agreeing with the code, and two
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the read tools stood absent until `./RUNME.sh serve` came up, which is the fault [[spec/tickets/the-read-tools-answer-first]] closes
+- so the early reads ran through the shell, which is the fault this group opens on
+- a helper met a refusal on a mutated tree, and read the cases through `node --test` instead
+- a helper met a refusal over a guard it wanted to cut, and proved the same case another way
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the write door refuses a shell write, so every field rides `ticket pull --fields`
+- a heredoc naming a tracked path reads as a shell write to it, and a payload file clears that
+- the ticket door refuses a fix to a field it passes, so a `--fail` then a `--back` is the road
+- a refused payload reaches no disk, so a field breaking a prose rule leaves the old text standing
+- `./RUNME.sh check` wants the server, and a run past its span leaves the check red on nothing
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- three tickets stand open on trunk, each minted from a private note this box drained
+- [[spec/tickets/files-read-the-closure]], [[spec/tickets/one-post-a-tool-call]] and [[spec/tickets/split-names-its-source]] name no group
+- the refs sharing no ancestor with trunk stay standing, because the take passes over them
+- a person merges this branch from trunk, and the discussion above names what each child lands
 
 # Discussion
 
