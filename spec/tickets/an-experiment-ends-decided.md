@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -136,6 +136,17 @@ record:
     hash_after: e785ec62a95f97f67c05f72a73b11b3a45f587d3
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 11505c6659903c8c0a3d0d72a45c31fd23dd24f8
+    hash_after: 11505c6659903c8c0a3d0d72a45c31fd23dd24f8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 3 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -321,26 +332,50 @@ That surprises me. The two holds of the retro look alike from the route, and the
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/experiment.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Each trial now ends on a decision, and the retro holds until it does.
+
+| what lands | where |
+|---|---|
+| the route a trial runs, ending on `decide` | `spec/processes/experiment.yaml` |
+| the verb answering the trials standing open | `retro audit` in `src/scripts/retro.js` |
+| the need the retro's audit step names | `spec/processes/retro.yaml` |
+| what an experiment is, and what each decision does | [[spec/design_output/work#an-experiment-decides]] |
+
+The two standing trials each take their decision:
+
+| the trial | the decision | what follows |
+|---|---|---|
+| the level one wrapper | keep | its hook and its library move under `.claude/skills/level0` |
+| the pane | drop | the editor draws the same widgets, and the folder goes |
+
+The wrapper's move met a rule the approach missed. A plugin's manifest names one hook module, so two entries meet a refusal. The bridgehead imports nothing, which is its own rule, so the moved module imports the bridgehead and calls its register first. One module then carries both.
+
+The audit reads the process a ticket names, where `retro notes` reads the folder a note sits in. A trial stands under `spec/tickets` beside every other ticket, so the folder answers nothing and the process answers it. A case drives the step over an open trial and over none.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The process, the retro's route and verb, the two folders, and every file reaching them.
+- every door the change reaches has a fake. The audit's cases hand the retro their own disk and log.
+- a comment names the approach the change implements. The one module says why it calls the bridgehead, and the note names each decision.
 
 # verdict
 
