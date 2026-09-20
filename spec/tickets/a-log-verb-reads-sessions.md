@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -115,6 +115,10 @@ record:
     hand: box 099c2ec7708d · claude-code-remote
     hash_before: 7df5e7414b2a11c05c751e62d1ebce319313a652
     hash_after: 7df5e7414b2a11c05c751e62d1ebce319313a652
+  - step: design/review
+    hand: box 099c2ec7708d · claude-code-remote · helper-6
+    hash_before: 640a18af6e72737c2db52d8df22fa016236ee38b
+    hash_after: 640a18af6e72737c2db52d8df22fa016236ee38b
 ---
 
 # Ask
@@ -182,23 +186,23 @@ Where each thing stands after:
 <!-- pass or fail, with findings one a line -->
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `src/viewer/filter.go` owns the log filter language, and `spec/design_output/viewer#the-filter-language` says it
-- the four flags spell that filtering a second time, and the approach points at neither owner
-- `plainRows` under `src/scripts/tui.js` reads `SESSION` and the rotated files under `OLD`
-- that function prints each row through `asRow`, and the verb the approach names reads the same
-- say which of the two owns the read, and point the other at it
-- `spanOf` answers seconds, and `timeOf` answers milliseconds
-- `queue.js` keeps `MS` for that crossing, so name the scale beside `--since`
-- `timeOf` answers one stamp, the rotated file's first line, so the table's word span misreads it
-- the install bullet names no case, and `test/contract/install.test.js` holds one case, on binaries rebuilding
-- name the case asserting a warm box prints no install line
-- the lib table reads true: `SESSION`, `OLD`, `rowsOf` and `asRow` export
+- `queue.js` holds `MS` inside its own module, so another owner serves the verb
+- `src/scripts/work-stands.js` exports `MS`, and `src/bridge/stop.js` holds a third copy
+- name that one owner at implementation, and point the other copies at it
+- every other name the approach cites holds
+- `spanOf` exports from `src/scripts/group.js`, and answers seconds
+- `SESSION`, `OLD`, `rowsOf` and `asRow` export from the level0 log lib
 - `timeOf`, `writes` and `rank` export from the same file
-- `spanOf` exports from `src/scripts/group.js`, as the flags table says
+- `timeOf` parses the stamp off a rotated file's name, as the approach says
+- a row's `at` holds an ISO stamp, so the verb parses it to milliseconds
+- `plainRows` under `src/scripts/tui.js` reads `SESSION` and `OLD`
+- the move to `src/scripts/log-read.js` puts one owner on that read
+- `src/viewer/filter.go` owns the filter language, and the viewer chapter `The filter language` stands
 - the verbs map under `src/scripts/cli.js` holds no `log`, so the name stands free
-- `install.sh` guards both its `say` lines on `$missing`, and `./RUNME.sh branch list` prints neither here
+- `spec/design_output/log.md` stands, and its new chapter owns the flags table
+- `RUNME.sh` runs `install.sh` on every verb, so the install case lands in the contract test
 
 # implement
 
