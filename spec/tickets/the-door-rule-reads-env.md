@@ -338,19 +338,48 @@ pass
 
 <!-- the tests you write fail on their own assertion -->
 
-<!-- the form is command -->
+```
+$ node --test test/contract/outside-in-doors.test.js
+not ok 1 - a module past a root reading the environment is refused
+ok 2 - a door reading the environment passes
+ok 3 - a command root reading the environment passes
+ok 4 - a case reading the environment passes
+not ok 5 - a Go file importing the command package is refused
+ok 6 - a package's door file importing the command package passes
+ok 7 - a note naming the read in prose passes
+ok 8 - the extension passes the read and keeps its import guard
+not ok 9 - each section standing the read off names the rule once
+# tests 9
+# pass 6
+# fail 3
+```
 
 ### seen
 
 <!-- what you see, and what surprises you -->
 
-<!-- the form is text -->
+Three cases come back red on their own assertion, and each names the rule the
+tree lacks. The three are the two refusals and the config reading.
+
+`test/contract/outside-in-doors.test.js` drives the real Vale, because a rule
+asserted against a stub is a rule nobody runs. The path handed in picks the
+section, so one case a path stands every row of the approach's tables. Two
+things surprise me:
+
+- Vale answers a bare rule name, so a case reading `VoiceVale.DoorsOnly` matches nothing
+- the guard reads the raw line, so a fixture holding an import draws a fault on the case
+
+The second costs a lint round, and the fixture splits the text in two. The six
+green cases are green today, because a rule standing nowhere refuses nothing.
+Each holds its claim once the rule lands.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out: one test file lands, and the ticket beside it
+- every door the change reaches has a fake: the case drives the real Vale, so it stands under `test/contract`
+- a comment names the approach the change implements: the head and two comments point at the doors note
 
 ## reflect
 
