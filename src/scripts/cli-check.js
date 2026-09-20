@@ -94,6 +94,11 @@ export function tuiDoors() {
   };
 }
 
+// The split verb writes files and a journal entry, and the clock names that entry. [[spec/design_output/level0#the-size-ceiling]]
+export function splitDoors() {
+  return { root, join, disk: files, clock: it.clock };
+}
+
 export function viewerHere() {
   return viewerOf({
     disk: files,

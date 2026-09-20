@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -130,6 +130,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: cb7d8c850e3b189311c3e5afa092ac7d37d02325
+    hash_after: cb7d8c850e3b189311c3e5afa092ac7d37d02325
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -290,14 +298,18 @@ The verb's own file and the door's mint both wait on this pair. Each takes a cas
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the verb, the cut, the mint, the door and the chapter the approach names
+- the disk, the clock and the process reach each piece as doors, and the fakes drive all three
+- each header points at the chapter the approach names, and that chapter owns the flags
 
 ## tests-green
 

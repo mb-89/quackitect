@@ -27,6 +27,7 @@ import {
   standing,
   tools,
   treeHere,
+  splitDoors,
   tuiDoors,
   under,
 } from "./cli-check.js";
@@ -147,6 +148,10 @@ export const verbs = {
   log: {
     says: "the session log, narrowed by span, level, kind and count",
     run: async () => (await import("./log-verb.js")).logVerb(tuiDoors(), rest),
+  },
+  split: {
+    says: "cut a file past the ceiling into the targets you name, with one undo",
+    run: async () => (await import("./split-verb.js")).splitVerb(splitDoors(), rest),
   },
   serve: {
     says: "the server behind the bridgehead, under the debugger with --inspect",

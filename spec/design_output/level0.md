@@ -623,6 +623,30 @@ The door reads the text before and after the write. A file already past its
 ceiling takes a cut and refuses a growth. So the tree's debt shrinks with every
 write and grows with none, and `./RUNME.sh lint src test` names it.
 
+### A verb cuts the file
+
+`./RUNME.sh split <file>` takes the ranges a caller names and writes each into
+its target, leaving the rest in the source:
+
+| the flag | what it takes |
+|---|---|
+| `<file>` | the file the cut reads |
+| `--to <path> --lines <from>-<to>` | one target and its range, named again for each target |
+| `--dry` | the cuts it names, on the way to no write |
+
+`src/scripts/split-cut.js` owns the ranges and the cut over text, and
+`src/scripts/split-verb.js` writes them. One journal entry under `by: split`
+holds every target and the rest, so `mcp__level0__undo` takes the whole cut
+back. For details, see [[spec/design_output/apply#the-journal-holds-both-halves]].
+
+### The refusal mints the work
+
+A refusal naming the file ceiling mints a ticket off `trivial`, at
+`spec/tickets/split-<name>.md`, and the refusal names it. The ticket carries no
+group, so it stands loose on trunk where a person sorts it.
+`src/bridge/split-ticket.js` holds the mint, and the code door calls it. A
+second refusal on the same file names the ticket that stands, and writes none.
+
 ## The path a rule reads
 
 Hand every rule the path the repo root holds. Vale scopes on it.
