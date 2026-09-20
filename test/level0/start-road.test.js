@@ -168,7 +168,7 @@ test("a server answering nothing at a later event says so in the chat", async ()
 
   const lines = box.said.join("\n");
   assert.match(lines, /answers nothing/, "the chat carries the fall");
-  assert.match(lines, /6510/, "and names the health call");
+  assert.match(lines, /6510/, "and names the address the event route holds");
   assert.match(lines, /RUNME\.sh serve/, "and what a person runs");
 });
 

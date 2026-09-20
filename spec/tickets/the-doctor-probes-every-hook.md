@@ -89,12 +89,16 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
     hash_before: 8db360a439c2b09c473fbbed07d6c3197c77eae5
     hash_after: 8db360a439c2b09c473fbbed07d6c3197c77eae5
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-2
+    hash_before: cf62081cf9b6de8857cadddb6a32c462e3a8e464
+    hash_after: cf62081cf9b6de8857cadddb6a32c462e3a8e464
 ---
 
 # Ask
@@ -179,6 +183,39 @@ line, and the doctor is what shows them the entry.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass. The approach answers the four lines of the ask, and the findings below
+stand for the implement step to settle.
+
+| what the review asks | what stands |
+|---|---|
+| the approach against the ask | the reader answers line one, the warn row line two, the argument under **The third line** line three, the cases line four |
+| what the branch touches beyond the brief | this ticket carries no hunk yet |
+| `./RUNME.sh check` | exit 0, on `cf62081c` |
+| a retro in the handback | none stands |
+| a test proving the rule fires | the cases feed a dead hook and read the warn row off it |
+
+Findings, one a line:
+
+- The branch answers line three of the ask with the doctor's row and no hunk,
+  because git ignores that file. Carry that call into the verdict step.
+- `warn` names a log level and a printed row in this tree. Say which one the
+  doctor writes.
+- Read `.claude/settings.json` off `SETTINGS` in
+  `.claude/skills/level0/lib/vehicle.js`, and name the box's two files beside
+  it, so one place owns each path.
+- `new URL()` takes a Windows command path, so a command hook reads as an
+  address. Keep `http:` and `https:` alone.
+- Say what a hook's row label holds, because `doctor` pads a label to
+  `COL.tool` and two files carry two hooks of one name.
+- Probe the addresses together, so a box naming several dead hooks answers
+  inside the first minute.
+- `HEALTH_WAIT` stands twice, in `src/scripts/cli-doors.js` and
+  `src/scripts/serve.js`. Point the probe at the first, and add no third.
+- Say whether a reply carrying a failing status stands or warns, because the
+  fake in the test answers one.
+- Commit or drop the modification standing in
+  `test/level0/start-road.test.js`, which the branch's last ticket left.
 
 # implement
 
