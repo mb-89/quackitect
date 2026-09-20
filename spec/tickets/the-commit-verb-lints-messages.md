@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 771b790943eb27386b78dd3de6e672d0229d3616
     returns: 1
     why: "the message read stands already: `commitVoice`, under `src/bridge/bash.js`, which the bash door calls; it lints under the path `level0-commit.md`, and the approach names no path, so a second reader picks another; it calls `withoutTrailers` first, so a reader missing that lints the co-author lines a commit carries; `landed` composes its own message as the ticket name and its changes, so a free message reaches it nowhere; say whether the commit half comes out of `landed`, or the verb runs its own commit and leaves it standing; the ask names `./RUNME.sh test`, and the approach names no case file the refusal and the push land in; what holds: `STAMP` under `runs.js` carries the check, and `prepush.js` behind the push door reads it"
+  - step: design/draft
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 56e10c5ec0b9914077c061757367e69ee2547f75
+    hash_after: 56e10c5ec0b9914077c061757367e69ee2547f75
 ---
 
 # Ask
@@ -125,24 +129,38 @@ Each commit costs three rounds at the door, and every push on main meets a stale
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-`./RUNME.sh commit` reads the message through the voice rules, lands it, runs the check, and pushes on green.
+`./RUNME.sh commit` reads the message through the read the bash door runs, lands it, runs the check, and pushes on green.
 
 | the step | what it runs | what it answers on red |
 |---|---|---|
-| the message | the prose rules `.claude/skills/level0/lib/vale.js` names | every finding at once, and no commit |
-| the commit | `landed` in `src/scripts/landed.js`, which stages and commits | what the pre-commit door says |
-| the check | `./RUNME.sh check`, which writes the stamp `runs.js` names | the check's own findings, and no push |
+| the message | `commitVoice`, under `src/bridge/bash.js` | every finding at once, and no commit |
+| the commit | git, through the verb's own call | what the pre-commit door says |
+| the check | `./RUNME.sh check`, which writes the stamp | the check's own findings, and no push |
 | the push | git, which the pre-push door reads | what that door says |
 
-So the push door reads the stamp this run wrote, and a stale stamp stops no clean commit.
+The message read stands already, and the verb calls that one:
 
-- the message runs through the read a note runs through, so one wording holds both
+| what the read carries | why it matters |
+|---|---|
+| the path `level0-commit.md` | Vale scopes on a path, and this one names the message's rules |
+| `withoutTrailers`, under `.claude/skills/level0/lib/bash.js` | a co-author line reads as prose otherwise |
+| `readsProse` | it keeps the findings a note keeps |
+
+`landed` under `src/scripts/landed.js` stays as it stands, because it writes a ticket and composes its own message. The verb runs its own `git add` and `git commit`, and puts the tree back where the pre-commit door refuses.
+
+What the run leaves behind:
+
 - nothing stages before the message reads clean, so a refused message leaves the tree standing
-- `landed` puts the file back where the pre-commit door refuses, so a refusal lands nothing
+- `STAMP` under `.claude/skills/level0/lib/runs.js` carries the check this run writes
+- `src/scripts/prepush.js` behind the push door reads that stamp, so no stale stamp stops a clean commit
 
-The cases drive a message the rules refuse to the findings with no commit, and a clean one through to the push.
+Where each thing stands after:
 
-[[spec/design_output/work#the-battery-answers-first]] takes the verb beside the door it feeds.
+- `src/scripts/commit-verb.js` holds the verb, and `src/scripts/cli.js` names it in the verbs map
+- `test/level0/commit-verb.test.js` holds the cases, over fake doors
+- one case drives a message the rules refuse to the findings, with no commit
+- one case drives a clean message through the commit, the check and the push
+- [[spec/design_output/work#the-battery-answers-first]] takes the verb beside the door it feeds
 
 ## review
 
