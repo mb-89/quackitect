@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -223,6 +223,17 @@ record:
     hash_after: 6a0f128fe9f9480c4f1ddd2c9e9cac3008e715f7
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: e8e71b72ef359b0f0b0eca1e9404ecbb3486cd42
+    hash_after: e8e71b72ef359b0f0b0eca1e9404ecbb3486cd42
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -452,7 +463,7 @@ The round before wrote the hold as a need. `holdsVerb` splits a need and asks th
 
 A trial minted before this process ends under the ticket closing it, which is what this one does for the two standing trials. [[spec/design_output/work#an-experiment-decides]] says so, and every trial after carries a ticket of the process from its first day.
 
-Three closed tickets still name the old folder in their own record of what stood then. A record names a thing as it stood, so those stay. `git grep skills/level1` over the live half answers nothing.
+A closed ticket still names the old folder in its own record of what stood then, and `git grep skills/level1 -- spec/tickets` answers each one. A record names a thing as it stood, so those stay. The same command over the live half answers nothing.
 
 ### checked
 
