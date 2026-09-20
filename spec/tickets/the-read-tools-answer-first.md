@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -129,6 +129,17 @@ record:
     hand: box 099c2ec7708d · claude-code-remote · helper-8
     hash_before: d4d32372cec7ae9d59433e715726b068f05a1992
     hash_after: d4d32372cec7ae9d59433e715726b068f05a1992
+  - step: implement/tests-red
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 7ee7555ba111bfca10b4aab69a23f8c25909fba5
+    hash_after: 7ee7555ba111bfca10b4aab69a23f8c25909fba5
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -255,20 +266,33 @@ what the implement step carries:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/read-tools.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Four cases go red on their own assertions. `READ_TOOLS` stands empty and the hook takes neither the session start nor a tool call, so each case reads back nothing.
+
+What surprises:
+
+- the cases land in a file of their own, because `test/level0/hand.test.js` drives the pull
+- that file names the hook nowhere, so a case over `register` takes a fresh owner
+- `test/level0/besides.test.js` drives the hook over a fake session, and these cases take its shape
+
+The engine hands a hook one `on`, and the hook names the events it takes. So a case reads the handlers off that call, and drives each with its own fake session.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the cases land in `test/level0/read-tools.test.js`, beside the other cases over the hook
+- the engine's own doors stand faked: the tool register, the process, the fetch and the log
+- the header of `READ_TOOLS` points at the chapter the approach names
 
 ## reflect
 

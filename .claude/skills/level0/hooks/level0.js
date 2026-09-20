@@ -65,6 +65,10 @@ export function spawnTagOf(held) {
   return `You are the hand of session ${id} on this box, so you pull under no --as.`;
 }
 
+// The tools a hand reads with, registered at the session's start so the first
+// call reaches one. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+export const READ_TOOLS = [];
+
 export function register(on, options) {
   method = String(options?.method ?? "");
   on("*", ($, e, next) => seen($, e, next));
