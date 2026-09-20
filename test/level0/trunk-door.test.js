@@ -64,3 +64,20 @@ test("a red battery refuses the push on any branch", async () => {
   );
   assert.match(denied(said), /green battery/);
 });
+
+// The door reads the script a command runs, off the disk it holds. [[spec/design_output/bash#a-shell-writes-nothing]]
+test("the door reads a script off the disk, and refuses the write inside it", async () => {
+  const it = box("claude/a-thing");
+  it.disk.write(`${ROOT}/.se/scripts/edit.mjs`, 'writeFileSync("README.md", "one");\n');
+
+  const said = await onBash({ command: "node .se/scripts/edit.mjs" }, it);
+
+  assert.match(denied(said), /README\.md/);
+  assert.match(denied(said), /\.se\/scripts\/edit\.mjs/);
+});
+
+test("a script standing nowhere leaves the command alone", async () => {
+  const said = await onBash({ command: "node .se/scripts/gone.mjs" }, box("claude/a-thing"));
+
+  assert.equal(denied(said), "", "the door says nothing");
+});

@@ -52,6 +52,7 @@ refuses a shell command landing a file the rules cover.
 | a heredoc into a shell or a reader, writing such a path | the same, writing nowhere the rules reach |
 | `bash -c` or `node -e` writing such a path | the same, writing nowhere the rules reach |
 | the same, behind `xargs` or `find -exec` | a target the parse reads as `{}` |
+| a runner or a shell taking a script under `.se/` or a temp folder, writing such a path | the same script, writing nowhere the rules reach |
 
 The rules cover what Vale and Biome read: `.md`, `.markdown`, `.txt`, and the
 JavaScript and JSON that `CODE` names. A path under `.se/`, `.git/`,

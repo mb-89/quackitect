@@ -46,7 +46,10 @@ export function onDescribe(e) {
 
 // [[spec/design_output/bash#a-shell-writes-nothing]]
 async function commandRules(command, _e, box) {
-  const found = findings(command, asks(box, "names.words"), { cloud: onACloud() });
+  const found = findings(command, asks(box, "names.words"), {
+    cloud: onACloud(),
+    script: (path) => scriptText(box, path),
+  });
   found.push(...(await commitVoice(command, box)));
   if (!onACloud() && skipsTheHook(command)) {
     box.log.say("warn", "private", "a commit steps past the hook", { tool: "Bash", detail: command });
@@ -98,7 +101,9 @@ async function privateDelta(command, _e, box) {
 // A change and the test proving it land together. [[spec/design_output/tree#the-rules-over-two-files]]
 async function testedDelta(command, _e, box) {
   if (!commitIn(command)) return "";
-  const found = untestedIn(await git(box, ["diff", "--cached", "--unified=0"]));
+  const found = untestedIn(await git(box, ["diff", "--cached", "--unified=0"]), (path) =>
+    scriptText(box, path),
+  );
   if (!found.length) return "";
   box.log.say("warn", "tested", `refused ${found.length} file(s) with no test`, {
     tool: "Bash",
@@ -106,6 +111,16 @@ async function testedDelta(command, _e, box) {
     rule: "EveryModuleTested",
   });
   return refusedTest(found);
+}
+
+// The door reads a script off the disk, and a file standing nowhere reads empty. [[spec/design_output/bash#a-shell-writes-nothing]]
+function scriptText(box, path) {
+  const at = path.startsWith("/") ? path : `${box.work}/${path}`;
+  try {
+    return box.disk.exists(at) ? String(box.disk.read(at)) : "";
+  } catch {
+    return "";
+  }
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]

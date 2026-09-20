@@ -26,20 +26,23 @@ export function hunksIn(delta) {
 }
 
 // A test of its own for each file, so one stray case carries no other. [[spec/design_output/tree#the-rules-over-two-files]]
-export function untestedIn(delta) {
+export function untestedIn(delta, read) {
   const hunks = hunksIn(delta);
   const files = [...hunks.keys()];
   const tests = files.filter((one) => TEST.test(one));
   return files
     .filter((one) => SOURCE.test(one) && !COPIED.some((said) => said.test(one)))
-    .filter((one) => !tests.some((test) => names(test, one, hunks.get(test) ?? [])));
+    .filter((one) => !tests.some((test) => names(test, one, hunks.get(test) ?? [], read)));
 }
 
 // A test names the file it drives by its import, or by the name it carries. [[spec/design_output/tree#the-rules-over-two-files]]
-function names(test, path, added) {
+function names(test, path, added, read) {
   const one = path.split("/").pop().replace(/\.js$/, "");
   const said = test.split("/").pop().replace(/\.test\.js$/, "");
-  return said === one || said.startsWith(`${one}-`) || importsIt(added.join("\n"), path);
+  if (said === one || said.startsWith(`${one}-`)) return true;
+  if (importsIt(added.join("\n"), path)) return true;
+  // A test standing already imports the module above the hunk, so the reading asks the file. [[spec/design_output/tree#the-rules-over-two-files]]
+  return importsIt(String(read?.(test) ?? ""), path);
 }
 
 // [[spec/design_output/tree#the-rules-over-two-files]]

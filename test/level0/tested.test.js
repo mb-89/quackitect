@@ -105,6 +105,17 @@ test("a change wants the test naming it, and a stray case carries none", () => {
   assert.deepEqual(untestedIn(named), []);
 });
 
+test("a test standing already counts, because the reading asks its text", () => {
+  const said = delta("src/bridge/one.js", "test/level0/other.test.js");
+  const read = (path) =>
+    path === "test/level0/other.test.js"
+      ? "import { one } from '../../src/bridge/one.js';\n"
+      : "";
+
+  assert.deepEqual(untestedIn(said), ["src/bridge/one.js"]);
+  assert.deepEqual(untestedIn(said, read), []);
+});
+
 test("the import counts off the test's own hunk, and off no other file's", () => {
   const said = [
     "diff --git a/src/bridge/one.js b/src/bridge/one.js",

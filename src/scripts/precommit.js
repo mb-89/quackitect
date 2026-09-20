@@ -27,9 +27,19 @@ export async function holds(it, delta) {
   });
   if (found.length) return { code: 1, said: refusedDelta(found) };
 
-  const missing = untestedIn(delta);
+  const missing = untestedIn(delta, (path) => textAt(it, path));
   if (missing.length) return { code: 1, said: refusedTest(missing) };
   return { code: 0, said: "" };
+}
+
+// A test standing already names its module above the hunk, so the door reads the file. [[spec/design_output/tree#the-rules-over-two-files]]
+function textAt(it, path) {
+  const at = it.join(it.root, path);
+  try {
+    return it.disk.exists(at) ? String(it.disk.read(at)) : "";
+  } catch {
+    return "";
+  }
 }
 
 // [[spec/design_output/private#the-box-names-the-owner]]

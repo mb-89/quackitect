@@ -331,11 +331,17 @@ door calls it.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the door, its new module, the splitter, the bridge and the note
+- the disk stands behind `it.script`, so the door's own cases touch memory alone
+- each piece carries the pointer at the chapter tabling what the door refuses
 
 ## tests-green
 

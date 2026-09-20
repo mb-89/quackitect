@@ -5,28 +5,16 @@
 import { CODE } from "./code.js";
 import { overLong } from "./names.js";
 import { NOTES } from "./private.js";
+import { scriptWrites } from "./scripted.js";
+import { tokensOf } from "./tokens.js";
 import { PROSE } from "./vale.js";
+
+export { tokensOf };
 
 export const VERBS = ["check", "branch", "tui", "doctor"];
 
 const HOME = NOTES.split("/")[0];
 
-const OPERATORS = [
-  "<<<",
-  "&&",
-  "||",
-  ">>",
-  "&>",
-  ">&",
-  "<<",
-  ">",
-  "<",
-  "|",
-  ";",
-  "&",
-  "(",
-  ")",
-];
 const BREAKS = new Set(["&&", "||", "|", ";", "&", "(", ")"]);
 const REDIRECTS = new Set([">", ">>", "&>"]);
 
@@ -206,12 +194,12 @@ export function findings(command, most, it = {}) {
   const said = String(command ?? "");
   const out = [];
 
-  for (const one of writesAPath(said)) {
+  for (const one of [...writesAPath(said), ...scriptWrites(said, it.script)]) {
     out.push(
       row(said, "ShellWritesNothing", one.path, [
         `A shell writes past every rule in this tree, so ${one.how} into ${one.path}`,
-        `meets none. Read ${one.path} with Read, then write it with Write or change`,
-        "it with Edit.",
+        `meets none. Read ${one.path} with Read. Write the whole file with Write, one`,
+        "spot with Edit, and many with mcp__level0__patch or mcp__level0__replace.",
       ]),
     );
   }
@@ -355,7 +343,7 @@ function runsIn(words) {
   return out.filter((one) => one.length);
 }
 
-function insideOf(name, body) {
+export function insideOf(name, body) {
   return SHELLS.has(name) ? writesAPath(body) : writesInScript(body);
 }
 
@@ -447,64 +435,6 @@ function withoutHeredocs(text) {
   }
   if (waiting) bodies.set(waiting.word, waiting.body.join("\n"));
   return { text: kept.join("\n"), bodies };
-}
-
-export function tokensOf(text) {
-  const out = [];
-  let cur = "";
-  let quoted = false;
-  const flush = () => {
-    if (cur || quoted) out.push({ text: cur });
-    cur = "";
-    quoted = false;
-  };
-
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (c === "'" || c === '"') {
-      let at = i + 1;
-      while (at < text.length && text[at] !== c) {
-        if (c === '"' && text[at] === "\\" && at + 1 < text.length) {
-          cur += text[at + 1];
-          at += 2;
-          continue;
-        }
-        cur += text[at];
-        at++;
-      }
-      quoted = true;
-      i = at;
-      continue;
-    }
-    if (c === "\\" && i + 1 < text.length) {
-      if (text[i + 1] === "\n") {
-        i++;
-        continue;
-      }
-      cur += text[i + 1];
-      i++;
-      continue;
-    }
-    if (c === "\n") {
-      flush();
-      out.push({ text: ";", op: true });
-      continue;
-    }
-    if (/\s/.test(c)) {
-      flush();
-      continue;
-    }
-    const op = OPERATORS.find((one) => text.startsWith(one, i));
-    if (op) {
-      flush();
-      out.push({ text: op, op: true });
-      i += op.length - 1;
-      continue;
-    }
-    cur += c;
-  }
-  flush();
-  return out;
 }
 
 function wordsIn(segment) {
