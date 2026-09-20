@@ -72,8 +72,8 @@ test("the answer carries the queue place by default, and a caller turns it off",
     ...said.branches.flatMap((one) => one.tickets).map((one) => one.queue),
     ...said.loose.map((one) => one.queue),
   ].sort();
-  // The group takes one number, and its ticket a sub-number under it. [[spec/design_output/pull#the-queue-is-an-outline]]
-  assert.deepEqual(places, ["1", "1.1", "2"], "the group's row takes a place, and its ticket a sub-place");
+  // The group stands on a cloud branch, so it and its ticket stand at infinity, and the loose one takes the first place. [[spec/design_output/pull#the-queue-is-an-outline]]
+  assert.deepEqual(places, ["1", "∞", "∞"], "the cloud's rows stand past every number");
 });
 
 const PERSON = `---
@@ -112,8 +112,8 @@ test("a person's step takes a negative place ahead of the agent's rows", () => {
   const place = (name) => said.loose.find((one) => one.name === name).queue;
   assert.equal(place("ask-me-first"), "-2", "the marked question stands first");
   assert.equal(place("ask-me"), "-1");
-  assert.equal(said.branches[0].queue, "1", "the agent's rows count up from one");
-  assert.equal(place("a-loose-one"), "2");
+  assert.equal(said.branches[0].queue, "∞", "the cloud's group stands past every number");
+  assert.equal(place("a-loose-one"), "1", "the agent's rows count up from one");
 });
 
 // A closed ticket leaves the queue, and trunk's copy outranks a merged branch's, because trunk holds what landed. [[spec/design_output/pull#the-queue-is-an-outline]]
@@ -144,7 +144,7 @@ test("a closed ticket on trunk stands off the queue, whatever a merged branch sa
   // A closed ticket takes no place at all, so the tab sorts it after the unplaced. [[spec/design_output/pull#the-queue-is-an-outline]]
   assert.equal("queue" in gone, false, "a closed group takes no place");
   assert.equal("queue" in gone.tickets[0], false, "and neither does its closed ticket");
-  assert.equal(said.branches.find((one) => one.name === "one-group").queue, "1");
+  assert.equal(said.branches.find((one) => one.name === "one-group").queue, "∞");
   assert.equal(said.loose.some((one) => one.name === "its-child" && "queue" in one), false, "the stale copy places nothing");
   const draft = answerOf({
     ...doorsSaying(
@@ -226,6 +226,21 @@ test("a ticket in hand stands at place zero", () => {
   assert.equal(place("in-hand"), "0", "a take puts the ticket at zero");
   assert.equal(place("named"), "0", "the plan's working ticket stands at zero");
   assert.equal(place("a-loose-one"), "1");
+  // A row at zero reads held, whatever its front says. [[spec/design_output/pull#the-queue-is-an-outline]]
+  assert.equal(said.loose.find((one) => one.name === "in-hand").state, "held");
+  assert.equal(said.loose.find((one) => one.name === "a-loose-one").state, "open");
+  // The work the plan names stands at zero as a row of its own where nothing carries its name. [[spec/design_output/stop#the-plan]]
+  const bare = answerOf({
+    ...doorsSaying(remoteSaying([], { "origin/main:spec/tickets/a-loose-one.md": LOOSE }), {
+      [join(ROOT, ".se/.runtime/plan.json")]: JSON.stringify({ working: "the report", todos: [] }),
+    }).it,
+    root: ROOT,
+    clock: fakeClock("2026-01-01T03:00:00.000Z"),
+  });
+  const row = bare.loose.find((one) => one.name === "the report");
+  assert.equal(row.queue, "0");
+  assert.equal(row.state, "held");
+  assert.equal(row.kind, "todo");
 });
 
 // [[spec/design_output/pull#the-queue-is-an-outline]]
@@ -249,7 +264,7 @@ test("the plan's todos stand in the answer as rows with a place", () => {
   assert.equal(row.todo, true);
   assert.equal(row.says, "the one on the grace");
   assert.equal(row.queue, "1", "a bare anchor puts the todo first");
-  assert.equal(said.branches[0].queue, "2");
+  assert.equal(said.branches[0].queue, "∞");
 });
 
 // The override lives in the plan file on this box, over the front, and lights the todo letter. [[spec/design_output/pull#a-todo-forces-a-place]]
@@ -262,7 +277,7 @@ test("an override in the plan file moves the row and lights its todo, and travel
   const row = said.loose.find((one) => one.name === "a-loose-one");
   assert.equal(row.queue, "1", "the override puts the row first");
   assert.equal(row.todo, true, "the override lights the todo");
-  assert.equal(said.branches[0].queue, "2");
+  assert.equal(said.branches[0].queue, "∞");
 });
 
 // A place a person writes stands on the disk before any commit, and the verb reads it there. [[spec/design_output/pull#a-todo-forces-a-place]]
@@ -273,7 +288,7 @@ test("the desk's own copy of a trunk ticket outranks git's, so a todo moves the 
   it.clock = fakeClock("2026-01-01T03:00:00.000Z");
   const said = answerOf(it);
   assert.equal(said.loose.find((one) => one.name === "a-loose-one").queue, "1", "the todo on the disk puts the row first");
-  assert.equal(said.branches[0].queue, "2");
+  assert.equal(said.branches[0].queue, "∞");
 });
 
 // A group on trunk with no branch stands in the answer with its kind, and its children beside it, so the tab nests them. [[spec/design_output/tree-view#the-name-column-nests]]
@@ -306,7 +321,8 @@ test("the queue listing pads every place to one width, so the names line up", ()
 
   assert.equal(code, 0);
   const rows = said.split("\n").filter(Boolean);
-  assert.equal(rows.length, 3, "one row a thing in the queue");
+  // The group and its ticket stand on the cloud, so this box's listing holds the loose one alone. [[spec/design_output/pull#the-queue-is-an-outline]]
+  assert.equal(rows.length, 1, "one row a thing this box takes");
   for (const row of rows) {
     assert.match(row, /^\s*[-\d.]+ {2}\S/, "the place stands padded, then two spaces");
     assert.equal(row.indexOf("  ", COL.place - 1), COL.place, "one width for all");

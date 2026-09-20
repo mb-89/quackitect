@@ -56,8 +56,9 @@ one schema covers everything that moves, and `spec/schemas` names no group kind.
 | its children | every ticket under `spec/tickets` naming it under `group` |
 | the claim | the push that writes the record |
 
-A group of one ticket is the ordinary case, and a group of five is the same
-shape.
+A group of one ticket is the ordinary case, and a group of many is the same
+shape. The children stand under the group, so the write door refuses an ask
+naming one of them. The ask says what the group adds up to.
 
 # The take writes the record
 
@@ -70,7 +71,7 @@ shape.
 
 `step` is the leaf the group stands on, `hand` names the box out of
 `.se/.runtime/identity.json`, and `hash_before` is the branch tip at the claim. The push decides:
-two boxes reaching for one group means one of them meets a rejected push and
+boxes reaching for one group mean one of them meets a rejected push and
 takes the next.
 
 The take reads the group before it writes that entry, through the same line
@@ -135,7 +136,7 @@ A flag asks for that one reading in place of the rows.
 
 # The listing reads git once
 
-`branch list` reads git in four asks, whatever stands on the remote:
+`branch list` reads git in the asks below, whatever stands on the remote:
 
 | the read | the process | what it answers |
 |---|---|---|
@@ -198,7 +199,7 @@ the age of the tip is the signal:
 | under `work.staleAfter` | a box holds the group, and nothing asks |
 | past it | the group is a person's, and `list` puts it under yours |
 
-Under yours it carries three answers, and each is a verb:
+Under yours it carries the answers below, and each is a verb:
 
 | the answer | the verb | what it does |
 |---|---|---|
@@ -249,7 +250,7 @@ So `branch done` meets no open child, the group closes, and one push carries the
 successor with it. The person answers on a ticket of their own, and every step
 behind them runs on.
 
-The verb refuses four things:
+The verb refuses these:
 
 - a hand standing on a cloud box, which answers the step itself
 - a ticket standing where a hand can take it
@@ -294,7 +295,7 @@ A branch's standing comes off its group ticket, and the record is what moves:
 | `held` | a session has it | `branch take`, by pushing an open record entry |
 | `done` | a hand answered every leaf it takes | `branch done` |
 
-A claim is a push. Two sessions reaching for one branch means one of them meets
+A claim is a push. Sessions reaching for one branch mean one of them meets
 a rejected push and takes the next. For details, see
 [[spec/design_output/work#held-derives-from-the-record]].
 
@@ -319,7 +320,7 @@ of it. For details, see [[spec/design_output/pull#the-hand-out]].
 onto origin. That reset makes the checkout match what the queue holds, and it
 drops whatever the box holds past it.
 
-So `dirty` guards every branch move, and work stands two ways:
+So `dirty` guards every branch move, and work stands the ways below:
 
 | what stands | what reads it | the way out |
 |---|---|---|
@@ -376,7 +377,7 @@ branch. Level zero notices that and hands over a block naming
 So a box needs no prompt about work at all. Starting it on trunk is enough, and
 saying "take work" only agrees with what it already reads.
 
-Three things hold together for that block to appear:
+The following hold together for that block to appear:
 
 - a cloud variable carries a value
 - the branch is `main`
@@ -439,9 +440,9 @@ from a trunk carrying none of that work. It then builds that work a second time.
 `branch done` reads a stamp before it claims anything. `./RUNME.sh check` writes
 `.se/.runtime/check.json` on every run, naming the commit it stands on:
 
-    { "sha": "...", "ok": true, "clean": true, "at": "..." }
+    { "sha": "...", "ok": true, "clean": true, "at": "...", "warnings": 0, "files": [] }
 
-`done` refuses on four counts, and each names itself:
+`done` refuses on the counts below, and each names itself:
 
 | the stamp says | done answers |
 |---|---|
@@ -449,15 +450,18 @@ from a trunk carrying none of that work. It then builds that work a second time.
 | another commit | the check names that one instead |
 | an unclean tree | the check reads what the commit lacks |
 | red | the check says red, with the time |
+| a warning standing | how many stand, in how many files, and the lint that names them |
 
 So `done` stops meaning "the session believes this passes". It comes to mean
-"a program runs on this commit, and it passes".
+"a program runs on this commit, and it passes with no warning standing". One
+reading, `saysGreen` in `lib/runs.js`, answers `done`, the pre-push hook and
+the Bash door alike, so a warning holds every road off the box.
 
 The stamp lives under `.se`, which git ignores, so it travels nowhere. A
 different box reads its own answer, and `.github/workflows/check.yml` answers
 for a machine with no stake in it.
 
-A push to trunk reads the same stamp at two doors, and each stands without the
+A push to trunk reads the same stamp at both doors, and each stands without the
 other. The Bash door refuses a session's push on a red, stale, unclean or
 absent stamp. `.githooks/pre-push` refuses the same push from a terminal, or
 from a session that runs no plugin, and `install.sh` points git at it beside
@@ -467,7 +471,7 @@ carries red.
 ## One verb feeds that stamp
 
 `./RUNME.sh commit "<message>"` lands a commit and leaves the stamp that `done`
-reads, in four steps:
+reads, in the steps below:
 
 | the step | what it runs | what it answers on red |
 |---|---|---|
@@ -523,7 +527,7 @@ the history of one group and what it holds.
 # A merged branch closes
 
 `branch close [name]` deletes a branch git says is inside `main`, here and on
-origin. Naming no branch closes every one of them. It reaches two kinds:
+origin. Naming no branch closes every one of them. It reaches the kinds below:
 
 | branch | cut by | throwaway once |
 |---|---|---|

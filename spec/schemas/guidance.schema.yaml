@@ -1,9 +1,12 @@
 # A guidance note carries the rules for one audience, and nothing else. The
 # argument for a starred rule stands in the rationale this note links.
 #
-# One chapter stands here, because spec/guidance/guidance.md says a note holds
-# `Actionables` alone and links its rationale. A Motivation chapter would carry
-# the argument a second time, and the rationale is where it belongs.
+# Two chapters stand here, because spec/guidance/guidance.md says a note holds
+# `Actionables`, an `Examples` table under them, and links its rationale. A
+# Motivation chapter would carry the argument a second time, and the rationale
+# is where it belongs. An example gives a model the shape a rule names: what
+# to do and what not to do. The rows go to the rules the tree sees fail, so a
+# rule takes several, one or none.
 #
 # A rule ending in the answer marker describes an answer, which evidence carries
 # nowhere, so the judge of spec/design_output/pull.md reads it over none. Every
@@ -65,3 +68,11 @@ body:
       tense: present
       maxItems: 15
       description: one rule per item, in the active voice, as an instruction
+
+    - header: Examples
+      required: false
+      position: last
+      table:
+        heads: [the rule, do, do not]
+        namesOf: Actionables
+      description: rows for the rules the tree sees fail, each naming its rule by number, with what to do and what not to do

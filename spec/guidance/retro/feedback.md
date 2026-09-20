@@ -12,3 +12,10 @@ rationale: [[spec/rationales/feedback]]
 4. Write each confirmed point as a private note: `./RUNME.sh ticket note <name> "<line>"`.
 5. Discuss a point before its note where it leaves a question open, and write the note once it settles. *
 6. Implement nothing at this step. A note says what the owner wants, and a later step decides it. *
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 3 | the point in your words, then the owner's confirm | a note written before the confirm |
+| 6 | a note saying what the owner wants | a fix built during feedback |

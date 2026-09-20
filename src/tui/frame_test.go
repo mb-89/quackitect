@@ -20,6 +20,8 @@ type stubTab struct{}
 
 func (stubTab) Name() string { return "work" }
 
+func (stubTab) Label(*frame.Model) string { return "work" }
+
 func (stubTab) Init(*frame.Model) tea.Cmd { return nil }
 
 func (stubTab) Update(*frame.Model, tea.Msg) (bool, tea.Cmd) { return false, nil }

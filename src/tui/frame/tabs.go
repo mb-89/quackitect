@@ -30,6 +30,8 @@ const HelpKey = "alt+? help "
 // What the frame reads of a tab. [[spec/design_output/tui#the-packages-the-window-holds]]
 type Tab interface {
 	Name() string
+	// The text after the number in the strip, which the work tab counts the rows this box takes behind. [[spec/design_output/tui#the-work-tab]]
+	Label(m *Model) string
 	// The tab's first command, which the window batches. [[spec/design_output/tui#the-work-tab]]
 	Init(m *Model) tea.Cmd
 	// The arrivals and the key modes the tab owns, and whether it took the one handed in. [[spec/design_output/tui#the-work-tab-takes-edits]]
@@ -89,7 +91,7 @@ func (m Model) TabNamed(name string) int {
 func (m Model) RenderStrip() string {
 	names := make([]string, 0, len(m.Tabs))
 	for at, one := range m.Tabs {
-		name := tabName(at, one)
+		name := m.tabName(at, one)
 		style := draw.Dim
 		if at == m.Open {
 			style = draw.Open
@@ -109,6 +111,6 @@ func (m Model) RenderStrip() string {
 }
 
 // The text one tab takes in the strip, which the strip draws and a press measures. [[spec/design_output/tui#the-header-holds-the-tabs]]
-func tabName(at int, one Tab) string {
-	return fmt.Sprintf(" %d %s ", at+1, one.Name())
+func (m Model) tabName(at int, one Tab) string {
+	return fmt.Sprintf(" %d %s ", at+1, one.Label(&m))
 }

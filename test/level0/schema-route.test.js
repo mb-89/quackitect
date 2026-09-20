@@ -4,11 +4,9 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import {
-  mintNote,
-  placeholderFaults,
-  readNote,
-} from "../../.claude/skills/level0/lib/schema.js";
+import { placeholderFaults } from "../../.claude/skills/level0/lib/schema-body.js";
+import { mintNote } from "../../.claude/skills/level0/lib/schema-mint.js";
+import { readNote } from "../../.claude/skills/level0/lib/schema-read.js";
 import { ROUTE, ROUTED, routed } from "./schema-notes.js";
 
 const route = `---

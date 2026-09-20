@@ -149,6 +149,23 @@ export function actionables(text) {
   return itemsIn(text).map(stripped).filter(Boolean);
 }
 
+// The rows of the Examples table, which give a hand the shape each rule names. [[spec/design_output/level0#the-examples-ride-the-rules]]
+export function examples(text) {
+  const chapter = parse(text).chapters.Examples;
+  if (!chapter) return [];
+  return chapter
+    .split(/\r?\n/)
+    .map((one) => one.trim())
+    .filter((one) => one.startsWith("|"));
+}
+
+// A note's rules, numbered, and its Examples table under them. [[spec/design_output/level0#the-examples-ride-the-rules]]
+export function rulesOf(text) {
+  const rules = actionables(text).map((one, i) => `${i + 1}. ${one}`);
+  const shown = examples(text);
+  return shown.length ? [...rules, "", ...shown] : rules;
+}
+
 // The label naming one rule: the note's path under the guidance folder, then its number in that note. [[spec/design_output/pull#the-checks]]
 export function labelOf(path, number) {
   const bare = String(path ?? "")
@@ -280,11 +297,10 @@ export function countsOf(notes) {
 export function standingLayer(notes, read = []) {
   const said = [];
   for (const note of carried(notes, read)) {
-    const rules = actionables(note.text);
-    if (!rules.length) continue;
+    if (!actionables(note.text).length) continue;
     said.push(`### ${titleOf(note)}`);
     said.push("");
-    said.push(...rules.map((one, i) => `${i + 1}. ${one}`));
+    said.push(...rulesOf(note.text));
     said.push("");
   }
   return said.join("\n").trim();

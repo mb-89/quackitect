@@ -101,6 +101,12 @@ func TestAValueFlagWearsATonePerValue(t *testing.T) {
 	if said := tree.States(tree.Items[1])[0]; said.Tone != "" || said.Letter != "C" {
 		t.Fatalf("a closed state wears the plain tone, and reads %v", said)
 	}
+	// A route names its own tone, so a note and a trivial ticket wear two colours. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+	routes := NewTree(sortCols(), []Item{{Name: "parked", Keys: map[string]string{"route": "note"}}}, false)
+	routes.Flagged([]Flag{{Key: "route", Value: true, Tones: map[string]string{"note": "note"}}})
+	if said := routes.States(routes.Items[0])[0]; said.Tone != "note" || said.Letter != "N" {
+		t.Fatalf("a note reads N in its own tone, and reads %v", said)
+	}
 }
 
 // The keys stay ordinary keys, so the filter needs no new word. [[spec/design_output/tree-view#a-flag-draws-a-letter]]

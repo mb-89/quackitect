@@ -13,12 +13,26 @@ style: true
 4. State a fact you own. Otherwise write "For details, see [[<link>]]". *
 5. Use the same word for the same thing every time.
 6. Write what the audience acts on.
-7. Say a thing once, and point at the place saying it. A second wording drifts faster than a second copy. A copy a technical reason forces says so beside it. [[spec/guidance/working]]
+7. Follow the single point of truth principle: state a thing once, and reference it everywhere else. [[spec/guidance/working]]
 8. Name the command that answers a count, and write no count a command answers. *
-9. List what a compression cut, each sentence surviving elsewhere or cut on purpose.
+9. Do not state self-evident facts, because the structure beside a sentence says what a reader sees there.
 10. Write three or more parallel things one to a line, each with its status. *
 11. A tracked file holds no name, no address, no date in prose and no disk path.
 12. Name the role, and leave the person out: the owner, the agent, the reader, the reviewer, the maintainer.
 13. Open an answer with a table of the questions the prompt asks, then the TL;DR list. `^`
 14. Close an answer ending on a stop call with the numbered table What the agent needs. `^`
 15. Write a core word, or a term a note defines. Add a term with its note, and add no jargon. [[spec/vocabulary/terms.yml]]
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 1 | the door refuses a write past the cap | the door does not take everything |
+| 6 | run the verb, then read its last line | the history of why the verb exists |
+| 7 | a note states a number once, and every other note links to it | two notes each carrying the same rule in their own words |
+| 7 | a pointer at the note owning the mechanism | an aside explaining a door another note owns |
+| 7 | | a rule restated in a design note beside its link |
+| 8 | the lint verb counts the warnings | the tree holds forty warnings |
+| 9 | the list stands, and the sentence above it says what the reader does with it | a sentence before a list saying how many items the list holds |
+| 9 | the group's ask says what the group adds up to | a group's ask naming its members or their count |
+| 9 | | a sentence saying two notes link where the link stands |

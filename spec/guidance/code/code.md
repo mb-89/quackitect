@@ -16,3 +16,11 @@ rationale: [[spec/rationales/code]]
 8. Keep the shebang on line one where a file runs as a program.
 9. Name a number that carries a meaning once. A number a person sets is a config key, and every other a constant at the top of its module. [[spec/design_output/config#the-magic-numbers-take-names]]
 10. Search for the function before you write it. Where one stands, call it, and where one stands close, take it further. *
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 1 | a name saying what the line does | a comment saying what the line does |
+| 9 | a constant at the top of the module | the same number in three places |
+| 10 | a call to the standing function | a second function doing the same |

@@ -13,10 +13,10 @@ import {
   checkNote,
   dataSchemasIn,
   governorOf,
-  mintNote,
   refOf,
   schemasIn,
 } from "../../.claude/skills/level0/lib/schema.js";
+import { mintNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { disk } from "../../src/doors/disk.js";
 import { git } from "../../src/doors/git.js";

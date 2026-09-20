@@ -17,3 +17,12 @@ rationale: [[spec/rationales/guidance]]
 9. Write a new handover before you finish, because level zero consumes the one it finds. *
 10. Write this chapter to stand alone, because level zero hands the reader this and nothing else.
 11. Call `mint_note` to write a new note, because a governed folder holds one kind alone. [[spec/schemas]]
+12. Give a rule the tree sees fail its rows under `Examples`: what to do, and what not to do. A rule that holds takes none. *
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 1 | run the check before you hand the branch back | the check exists and reads the tree |
+| 8 | the door refuses the write | the door refused the write |
+| 9 | a handover naming what stands and what waits | a session ending on the handover it finds |

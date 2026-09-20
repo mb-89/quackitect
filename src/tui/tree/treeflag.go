@@ -86,8 +86,9 @@ func FlagStyle(held FlagState) lipgloss.Style {
 	if !held.On {
 		return colourOr(draw.FlagColour(ToneOff), draw.Dim)
 	}
+	// A tone names a colour of the flags map, good or bad or a route's own, and one the map lacks wears the plain colour. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 	tone := held.Tone
-	if tone != ToneGood && tone != ToneBad {
+	if draw.FlagColour(tone) == "" {
 		tone = toneOn
 	}
 	return colourOr(draw.FlagColour(tone), draw.Open).Bold(true)

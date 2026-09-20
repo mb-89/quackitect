@@ -30,12 +30,23 @@ type Places struct {
 	Queue map[string]string
 	Cloud map[string]bool
 	Todo  map[string]bool
+	// The rows this box takes: every placed row past the cloud's, which the strip counts behind the tab's name. [[spec/design_output/tui#the-work-tab]]
+	Takeable int
 	// The plan's own todos, which the index holds nowhere, so the tab adds them as rows. [[spec/design_output/stop#the-plan]]
 	Rows []answerRow
 }
 
 // The kind a sentence todo carries, which draws with no link. [[spec/design_output/stop#the-plan]]
 const KindTodo = "todo"
+
+// The place of a row the cloud holds, which src/scripts/pull-outline.js owns and a Go module spells again. [[spec/design_output/pull#the-queue-is-an-outline]]
+const cloudPlace = "∞"
+
+// The place of the work in hand and the state it reads, which src/scripts/work-answer.js owns and a Go module spells again. [[spec/design_output/pull#the-queue-is-an-outline]]
+const (
+	heldPlace = "0"
+	HeldState = "held"
+)
 
 type PlacesMsg struct {
 	Places Places
@@ -65,12 +76,16 @@ func PlacesIn(said []byte) (Places, error) {
 	out := Places{Queue: map[string]string{}, Cloud: map[string]bool{}, Todo: map[string]bool{}}
 	for _, one := range answer.Branches {
 		// A branch row stands for its group, and a merged one stands for a group off the cloud. [[spec/design_output/work#a-row-per-group]]
+		// A group's tickets inherit its cloud, because the branch carries them all. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 		if !one.Merged {
 			out.Cloud[one.Name] = true
 		}
 		out.place(one)
 		for _, child := range one.Tickets {
 			out.place(child)
+			if !one.Merged {
+				out.Cloud[child.Name] = true
+			}
 		}
 	}
 	for _, one := range answer.Loose {
@@ -79,6 +94,7 @@ func PlacesIn(said []byte) (Places, error) {
 			out.Rows = append(out.Rows, one)
 		}
 	}
+	out.Takeable = out.countTakeable()
 	return out, nil
 }
 
@@ -90,11 +106,26 @@ func (p Places) place(one answerRow) {
 	p.Todo[one.Name] = one.Todo
 }
 
+// The rows this box takes: placed, and off the cloud. [[spec/design_output/tui#the-work-tab]]
+func (p Places) countTakeable() int {
+	n := 0
+	for _, place := range p.Queue {
+		if place != cloudPlace {
+			n++
+		}
+	}
+	return n
+}
+
 // The places laid over the tree's items, so the queue column and the cloud letter read them. [[spec/design_output/tui#the-work-tab]]
 func Placed(t *tree.Tree, p Places) {
 	t.Amend(func(one *tree.Item) {
 		one.Keys[QueueKey] = p.Queue[one.Name]
 		one.Keys[CloudKey] = flagOf(p.Cloud[one.Name])
+		// A row at zero stands in hand, so its state reads held whatever the index says. [[spec/design_output/pull#the-queue-is-an-outline]]
+		if p.Queue[one.Name] == heldPlace {
+			one.Keys["state"] = HeldState
+		}
 		// The todo letter reads the verb's answer, which folds the override on this box into the front's tag. [[spec/design_output/pull#a-todo-forces-a-place]]
 		if said, held := p.Todo[one.Name]; held {
 			one.Keys[TodoKey] = flagOf(said)
@@ -110,8 +141,12 @@ func Placed(t *tree.Tree, p Places) {
 		if standing[row.Name] {
 			continue
 		}
+		state := "open"
+		if row.Queue == heldPlace {
+			state = HeldState
+		}
 		added = append(added, tree.Item{Name: row.Name, Keys: map[string]string{
-			"kind": KindTodo, "state": "open", QueueKey: row.Queue, TodoKey: flagOf(true),
+			"kind": KindTodo, "state": state, QueueKey: row.Queue, TodoKey: flagOf(row.Todo),
 			CloudKey: flagOf(false), "urgent": flagOf(false), "says": row.Says,
 		}})
 	}

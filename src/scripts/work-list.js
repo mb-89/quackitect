@@ -13,7 +13,7 @@ import {
   URGENT,
   urgent,
 } from "../engine/group.js";
-import { compareOutline } from "./pull-outline.js";
+import { CLOUD_PLACE, compareOutline } from "./pull-outline.js";
 import { staleClaim } from "./work-free.js";
 import { answerOf } from "./work-answer.js";
 import {
@@ -115,7 +115,8 @@ function queueOnly(it) {
     ...said.branches.flatMap((row) => row.tickets),
     ...said.loose,
   ]) {
-    if (one.queue !== undefined && !held.has(one.name)) {
+    // The listing is this box's order, so a row the cloud holds stays off it. [[spec/design_output/pull#the-queue-is-an-outline]]
+    if (one.queue !== undefined && one.queue !== CLOUD_PLACE && !held.has(one.name)) {
       held.set(one.name, one);
     }
   }

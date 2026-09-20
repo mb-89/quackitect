@@ -25,6 +25,9 @@ type panel struct {
 	shown map[string]bool
 	// The open files changed since the bridge last read them, which the next ask carries together. [[spec/design_output/lsp#the-panel-lints-as-typed]]
 	pending map[string]bool
+	// The files the bridge owes an answer for, asked again until one answers, and whether an ask runs now. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+	owed     map[string]bool
+	draining bool
 }
 
 func newPanel() *panel {
@@ -34,6 +37,7 @@ func newPanel() *panel {
 		open:    map[string]bool{},
 		shown:   map[string]bool{},
 		pending: map[string]bool{},
+		owed:    map[string]bool{},
 	}
 }
 
@@ -104,16 +108,56 @@ func (one *server) draws(where, text, method string) {
 	if method == opens {
 		one.panel.open[at] = true
 	}
+	// A save changes the file, so the rows the bridge drew for it go, and the bridge draws them again. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+	if method == saves {
+		delete(one.panel.extra, at)
+	}
 	for path, said := range got {
 		one.panel.own[path] = said
 		one.shows(tree, path)
 	}
 	one.guard.Unlock()
 	if method == saves {
-		go one.asksBridge([]string{at})
+		go one.owes([]string{at})
 	}
 	if method == changes {
 		one.asksSoon(at)
+	}
+}
+
+// The bridge owes an answer for these paths. One ask runs at a time, and it asks again after the pause until the bridge answers, so a file changed while no bridge stands draws its rows once one does. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+func (one *server) owes(paths []string) {
+	one.guard.Lock()
+	for _, at := range paths {
+		one.panel.owed[at] = true
+	}
+	if one.panel.draining {
+		one.guard.Unlock()
+		return
+	}
+	one.panel.draining = true
+	one.guard.Unlock()
+	for {
+		one.guard.Lock()
+		asked := []string{}
+		for at := range one.panel.owed {
+			asked = append(asked, at)
+		}
+		if len(asked) == 0 {
+			one.panel.draining = false
+			one.guard.Unlock()
+			return
+		}
+		one.guard.Unlock()
+		if one.asksBridge(asked) {
+			one.guard.Lock()
+			for _, at := range asked {
+				delete(one.panel.owed, at)
+			}
+			one.guard.Unlock()
+			continue
+		}
+		time.Sleep(bridgeRetry)
 	}
 }
 
@@ -145,6 +189,16 @@ func (one *server) asksHeld() {
 	}
 	found, ok := bridgeHeld(tree.Root, held)
 	if !ok {
+		// No bridge answers, so the rows it drew before go, because they read a text the buffer no longer holds, and the disk's rows come once a bridge stands. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+		paths := []string{}
+		one.guard.Lock()
+		for at := range held {
+			delete(one.panel.extra, at)
+			one.shows(tree, at)
+			paths = append(paths, at)
+		}
+		one.guard.Unlock()
+		go one.owes(paths)
 		return
 	}
 	got := grouped(found)

@@ -44,6 +44,7 @@ import { spanOf, ticketAt, WORK_BRANCH } from "../engine/group.js";
 import { holdsTurn } from "./answer.js";
 import { asks, writes } from "./config.js";
 import { reacted, wants } from "./grace.js";
+import { plansHere } from "./plan.js";
 import { REPORT_CALL } from "./report.js";
 
 const ENABLED = "stop.enabled";
@@ -368,7 +369,15 @@ const CHECKS = {
   "a-report-stands": (held) => reportStands(held.text),
   // What an unbuilt rule runs, so it stands off the vote and writes no line. [[spec/design_output/stop#the-mechanical-checks]]
   never: () => false,
+  // A claim of done stands on an empty plan: no todo open, and nothing in hand. [[spec/design_output/stop#the-plan]]
+  "the-plan-is-empty": (held) => planEmpty(held.box),
 };
+
+// [[spec/design_output/stop#the-plan]]
+export function planEmpty(box) {
+  const plan = plansHere(box);
+  return plan.todos.length === 0 && !plan.working;
+}
 
 // [[spec/design_output/stop#the-mechanical-checks]]
 export function knowsCheck(name) {

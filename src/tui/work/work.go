@@ -48,6 +48,14 @@ func New(path string) *Tab { return &Tab{Path: path} }
 
 func (*Tab) Name() string { return "work" }
 
+// The rows this box takes stand behind the name, once the verb answers. [[spec/design_output/tui#the-work-tab]]
+func (t *Tab) Label(_ *frame.Model) string {
+	if t.Places != nil {
+		return fmt.Sprintf("work (%d)", t.Places.Takeable)
+	}
+	return "work"
+}
+
 // The log stands two folders under the root, so the root reads off its path. [[spec/design_output/tui#the-work-tab]]
 func Root(path string) string {
 	return filepath.Dir(filepath.Dir(filepath.Dir(path)))

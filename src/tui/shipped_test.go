@@ -61,8 +61,12 @@ func TestABaseFileNamesTheLettersAndTheKeysTheyRead(t *testing.T) {
 	if said[0].Key != "state" || !said[0].Value {
 		t.Fatalf("the first flag draws the state's first letter, and it reads %v", said[0])
 	}
-	if said[1].Letter != "U" || said[1].Key != "urgent" {
-		t.Fatalf("the second letter reads the urgent mark, and it reads %v", said[1])
+	// The route stands second as a value, so a note reads N and a trivial ticket T. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+	if said[1].Key != "route" || !said[1].Value {
+		t.Fatalf("the second flag draws the route's first letter, and it reads %v", said[1])
+	}
+	if said[2].Letter != "U" || said[2].Key != "urgent" {
+		t.Fatalf("the third letter reads the urgent mark, and it reads %v", said[2])
 	}
 	for _, one := range said {
 		if (one.Letter == "" && !one.Value) || one.Key == "" {

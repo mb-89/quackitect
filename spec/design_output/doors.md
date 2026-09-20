@@ -40,7 +40,7 @@ nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
 
 A root stands off the rule, because it builds the hand every module past it
 reads. `.vale.ini` names each one in a section, beside the doors and their
-fakes. The two rules take two switches, because a file standing off one wants
+fakes. Each rule takes its own switch, because a file standing off one wants
 the other.
 
 `test/contract/outside-in-doors.test.js` drives Vale over the name of each
@@ -111,7 +111,7 @@ A fake with nothing behind it drifts from the thing it stands for. So each door
 carries one test in `test/contract` under its own name, driving the real thing
 and asserting the fake answers the same.
 
-No pattern holds a rule spanning two folders, so the command line holds this
+No pattern holds a rule spanning both folders, so the command line holds this
 one. `./RUNME.sh doors` reads both folders and names every door standing
 without a contract test. `check` runs it after the tests, before the rules.
 

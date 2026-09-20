@@ -82,7 +82,7 @@ func (m *Model) pressStrip(x int) {
 func (m Model) TabAt(x int) int {
 	at := 0
 	for i, one := range m.Tabs {
-		wide := ansi.StringWidth(tabName(i, one))
+		wide := ansi.StringWidth(m.tabName(i, one))
 		if x >= at && x < at+wide {
 			return i + 1
 		}

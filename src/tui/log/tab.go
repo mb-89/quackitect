@@ -51,6 +51,8 @@ func New(path string, zone *time.Location) *Tab {
 
 func (*Tab) Name() string { return "log" }
 
+func (*Tab) Label(_ *frame.Model) string { return "log" }
+
 func (t *Tab) Init(_ *frame.Model) tea.Cmd { return t.Tailer.cmd() }
 
 // The lines that arrive and the error that stops them are this tab's, and every key mode is the frame's. [[spec/design_output/tui#how-a-line-arrives]]

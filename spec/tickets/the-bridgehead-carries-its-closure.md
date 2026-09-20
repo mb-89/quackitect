@@ -79,7 +79,7 @@ step: sync
 
 # Ask
 
-A stub carries every file its bridgehead imports, and a dead server costs one round and no more. The two tickets here tighten the bridgehead: files-read-the-closure reads the closure off the imports, and one-post-a-tool-call posts each event once.
+A stub carries every file its bridgehead imports, and a dead server costs one round and no more. The tickets here tighten the bridgehead.
 
 # sync
 

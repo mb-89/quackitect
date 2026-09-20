@@ -83,7 +83,7 @@ record:
 
 # Ask
 
-A reader follows a pointer and lands where it says. a-pointer-resolves lands every pointer on its chapter, the-unknown-runs-stays-quiet logs a check nobody holds, and the-window-splits-by-tab puts the window's parts apart, one folder a tab.
+A reader follows a pointer and lands where it says. A check nobody holds says so in the log, and the window's parts stand apart, one folder a tab.
 
 # sync
 

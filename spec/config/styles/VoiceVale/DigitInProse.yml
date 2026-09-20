@@ -1,7 +1,10 @@
 # A digit in a design note's prose is a count a command answers or a value a
 # file holds, so it belongs in a table, a heading, a link or a code span. A
 # version, a measurement with its unit, a token carrying letters and a list
-# number stand, because the notes need those where they are.
+# number stand, because the notes need those where they are. A count spelled
+# in words before a plural is the same number, and where it counts the
+# structure beside it, the structure says it already.
+# [[spec/guidance/voice]]
 extends: script
 message: "'%s' stands in prose. Put the number in a table, name the command that answers it, or point at the file holding it."
 link: spec/guidance/voice.md
@@ -53,7 +56,7 @@ script: |
     read = text.re_replace(`^(\s*)\d+[.)]\s`, read, "$1   ")
 
     found := text.re_find(`\d+(?:\.\d+)*`, read, -1)
-    if is_error(found) || found == undefined { continue }
+    if is_error(found) || found == undefined { found = [] }
     for hit in found {
       span := hit[0]
       before := read[:span.begin]
@@ -62,6 +65,14 @@ script: |
       if text.contains(span.text, ".") { continue }
       if text.re_match(units, after) { continue }
       if text.re_match(named, before) { continue }
+      matches = append(matches, {begin: at + span.begin, end: at + span.end})
+    }
+
+    // A count spelled in words before the things it counts is the same number, and the structure beside it says it already.
+    words := text.re_find(`\b((?:[Tt]wo|[Tt]hree|[Ff]our|[Ff]ive|[Ss]ix|[Ss]even|[Ee]ight|[Nn]ine|[Tt]en|[Ee]leven|[Tt]welve)) [a-z]+s\b`, read, -1)
+    if is_error(words) || words == undefined { continue }
+    for hit in words {
+      span := hit[1]
       matches = append(matches, {begin: at + span.begin, end: at + span.end})
     }
   }
