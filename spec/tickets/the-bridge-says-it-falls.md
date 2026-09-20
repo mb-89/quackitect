@@ -353,11 +353,15 @@ switch is what reads a fall apart from a server standing down from the start.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -365,11 +369,39 @@ switch is what reads a fall apart from a server standing down from the start.
 
 <!-- the form is text -->
 
+A person learns the bridge stands down at the moment it does, where they
+stand.
+
+| what the bridgehead does | when |
+|---|---|
+| writes one `warn` row naming the health call | the first event the server answers nothing for |
+| says one line through the harness log | the first such event past the session start |
+| drops both marks | the server answers again |
+
+The line names the health call, what the wire says, and the two commands a
+person runs. A harness offering no such log leaves the row alone.
+
+- `seen` posts the event first and runs the start road under it
+- so a healthy cloud start answers nothing at `session.start` by design
+- a line at that moment reads false on every such start, and the line skips it
+
+Two marks stand apart. One holds the row, and one holds the chat line. A
+session start writing the row leaves the line unsaid, so the fall at the next
+event still reaches the person.
+
+The row's mark stands off the answer of the write, so a log taking no write
+leaves the line paid. `serverLine` takes the fetch as a door now, so a case
+holds the doctor's wording where a person asks after a fall later.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the bridgehead, the doctor's line, their cases, and the chapters naming the claim
+- the bridgehead meets a fake wire, a fake file system and a fake chat log
+- the chapter The bridge says it falls carries the road, and each new line points there
 
 # verdict
 

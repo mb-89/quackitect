@@ -494,8 +494,9 @@ export function hooksSay() {
   return `git reads ${said || "its own folder"}, so run ./RUNME.sh`;
 }
 
-export async function serverLine() {
-  const said = await serverSays();
+// The row the doctor prints under `server`, so a person asking after a fall reads it there. [[spec/design_output/level0#the-bridge-says-it-falls]]
+export async function serverLine(get = fetch) {
+  const said = await serverSays(get);
   return said.ok ? `stands at ${said.where}` : `none at ${said.where}`;
 }
 

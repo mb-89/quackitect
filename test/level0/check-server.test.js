@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { serverHolds, serverRead } from "../../src/scripts/cli-check.js";
+import { serverHolds, serverLine, serverRead } from "../../src/scripts/cli-check.js";
 
 const WHERE = "http://127.0.0.1:6510/health";
 
@@ -62,4 +62,14 @@ test("the probe over a fake door answers what the read says", async () => {
   const none = await said(silent());
   assert.equal(none.code, 0);
   assert.ok(none.lines.join("\n").includes("./RUNME.sh serve"));
+});
+
+// A person asking after a fall reads the doctor, so its wording stands held. [[spec/tickets/the-bridge-says-it-falls]]
+test("the doctor names a bridge standing down, and one standing up", async () => {
+  assert.match(await serverLine(silent()), /^none at http/, "a bridge standing down");
+  assert.match(
+    await serverLine(answers({ ok: true })),
+    /^stands at http/,
+    "and a bridge answering",
+  );
 });
