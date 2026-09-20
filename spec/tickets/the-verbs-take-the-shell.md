@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -122,6 +122,10 @@ record:
     hash_after: 9e57b7d976c8df2b73b873a7a9d5efa86e882c77
     returns: 1
     why: the hand takes it back
+  - step: retro/write
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 5b97a0bbe323fe47004958e248ebe6178f8cdbd2
+    hash_after: 5b97a0bbe323fe47004958e248ebe6178f8cdbd2
 reason: done
 ---
 
@@ -247,9 +251,7 @@ work runs through the engine.
 
 The engine's shape does the work. A hand reading its own change passes it, and a hand of its own finds the fault. Every round of that cost one spawn and found something true.
 
-The cost lands on the fields. A refused payload reaches no disk, so a field breaking a prose rule leaves the old text standing. The reader then sees a pass over stale words. Twice the road out was a `--fail` naming the rule, then a `--back` to the leaf. That road works, and the refusal names neither half of it.
-
-The classes repeat. Two tickets failed on a fake agreeing with the code, and two on a cut leaving its readers standing. Both classes have the same cure: read what stands before you write, through a grep or through the real thing.
+The cost lands on the fields. A refused payload reaches no disk, so a field breaking a prose rule leaves the old text standing. Twice the road out was a `--fail` naming the rule, then a `--back` to the leaf, and the refusal names neither half. The classes repeat as well: two tickets failed on a fake agreeing with the code, and two on a cut leaving its readers standing. Both classes have the same cure: read what stands before you write.
 
 ### checked
 
