@@ -3,9 +3,9 @@
 // [[spec/design_output/level0#the-size-ceiling]]
 
 import {
-  FOLDER as UNDONE,
   journalOf,
   nameOf,
+  FOLDER as UNDONE,
 } from "../../.claude/skills/level0/lib/undo.js";
 import { cutsIn, splitText } from "./split-cut.js";
 
@@ -16,13 +16,21 @@ const USAGE = [
   "Usage: ./RUNME.sh split <file> --to <path> --lines <from>-<to> [...] [--dry]",
 ];
 
+// The flags taking a value, so the value reads as no source. [[spec/design_output/level0#a-verb-cuts-the-file]]
+const VALUED = ["--to", "--lines"];
+
 export function splitVerb(it, argv) {
   // The caller hands the flags alone, the way the verbs table hands `rest`. [[spec/design_output/level0#a-verb-cuts-the-file]]
   const said = argv ?? [];
-  const from = said.find((one) => !one.startsWith("--")) ?? "";
-  if (!from || said.includes("--help")) {
+  if (said.includes("--help")) {
     for (const row of USAGE) console.log(row);
-    return from ? 0 : 2;
+    return 0;
+  }
+  const from = sourceOf(said);
+  if (!from) {
+    console.error("A split names the file it cuts first, and this call names none.");
+    for (const row of USAGE) console.log(row);
+    return 2;
   }
 
   const at = it.join(it.root, from);
@@ -34,6 +42,12 @@ export function splitVerb(it, argv) {
   const read = cutsIn(said);
   if (read.why) {
     console.error(read.why);
+    return 2;
+  }
+  if (read.cuts.some((one) => one.path === from)) {
+    console.error(
+      `${from} is the source and a target, so the cut writes over what it reads.`,
+    );
     return 2;
   }
 
@@ -70,9 +84,14 @@ function wrote(it, from, at, cut) {
   const where = it.join(it.root, UNDONE, nameOf(stamp));
   try {
     it.disk.makeDir(it.join(it.root, UNDONE));
-    it.disk.write(where, `${JSON.stringify(journalOf(stamp, on, BY, files), null, 2)}\n`);
+    it.disk.write(
+      where,
+      `${JSON.stringify(journalOf(stamp, on, BY, files), null, 2)}\n`,
+    );
   } catch (bad) {
-    console.error(`The journal would not write, so nothing did: ${bad?.message ?? bad}`);
+    console.error(
+      `The journal would not write, so nothing did: ${bad?.message ?? bad}`,
+    );
     return 1;
   }
 
@@ -90,6 +109,19 @@ function wrote(it, from, at, cut) {
   }
   console.log(`The cut stands, and mcp__level0__undo takes it back under ${on}.`);
   return 0;
+}
+
+// The first token standing outside a flag and outside a flag's value. [[spec/design_output/level0#a-verb-cuts-the-file]]
+export function sourceOf(argv) {
+  const said = argv ?? [];
+  for (let at = 0; at < said.length; at++) {
+    if (VALUED.includes(said[at])) {
+      at++;
+      continue;
+    }
+    if (!said[at].startsWith("--")) return said[at];
+  }
+  return "";
 }
 
 function folderOf(path) {
