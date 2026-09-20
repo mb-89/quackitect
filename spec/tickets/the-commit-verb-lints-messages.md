@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -126,6 +126,17 @@ record:
     hash_after: 4988ef13a92f92a5e06a1871802fda551c9be416
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 483e4c136efdb0c8664c87d4e8a6f3fa0412044f
+    hash_after: 483e4c136efdb0c8664c87d4e8a6f3fa0412044f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -288,26 +299,48 @@ The door's own read moves to `messageFaults` in the same hunk. `commitVoice` par
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/commit-verb.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`./RUNME.sh commit "<message>"` reads the message, lands the commit, runs the check, and pushes on green.
+
+| the step | what it runs | what it answers on red |
+|---|---|---|
+| the message | `messageFaults`, exported from `src/bridge/bash.js` | every finding at once, and no commit |
+| the commit | `git add -A` and `git commit`, in the verb | what the door says, with the staging back |
+| the check | `./RUNME.sh check`, which writes the stamp | the check's last line, and no push |
+| the push | `git push origin`, which the pre-push door reads | what that door says |
+
+One read serves both. `commitVoice` held the trailer strip and the lint inline, and both move to `messageFaults`. The door parses a shell command and the verb holds a message string, so the path and the strip stay in one place.
+
+What the run leaves behind:
+
+- nothing stages before the message reads clean, so a refused message leaves the tree standing
+- the push door reads the stamp this run writes, so no stale stamp stops a clean commit
+- `landed` under `src/scripts/landed.js` stands as it stands, because it writes a ticket and names its own message
+- `--no-push` leaves the branch where it stands
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place, and the chapter owns the table
+- the message read takes a string and a box, so the cases touch memory
+- each header says what its file is for, and counts nothing
 
 # verdict
 
