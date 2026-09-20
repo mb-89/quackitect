@@ -212,6 +212,8 @@ func (one *door) answers(said call) (any, error) {
 		return Links(one.db, asked.Target)
 	case "dangling":
 		return Dangling(one.db)
+	case "tickets":
+		return Tickets(one.db)
 	case "same":
 		return Same(one.db, asked.Path)
 	case "reindex":

@@ -43,3 +43,71 @@ test("a box with no binary answers nothing, and says so", () => {
   assert.match(it.warm().dead, /^no .*se-index stands on this box$/);
   assert.match(it.dead(), /stands on this box$/);
 });
+
+// [[spec/design_output/index#the-index-answers-the-tickets]]
+const HELD_GROUP = `---
+kind: [[ticket]]
+state: open
+process: [[group]]
+step: children
+steps:
+  - name: children
+    by: children
+record:
+  - step: children
+    hand: box one
+    hash_before: aaa
+---
+
+# Ask
+
+Two tickets that land as one.
+
+# children
+
+# Discussion
+`;
+
+const child = (group) => `---
+kind: [[ticket]]
+state: open
+group: ${group}
+process: [[trivial]]
+step: do
+steps:
+  - name: do
+---
+
+# Ask
+
+One piece of it.
+
+# do
+
+# Discussion
+`;
+
+// The tickets, asked of the built binary over a tree the case writes, so the standing a branch gives a ticket reads off the group's record and no git. [[spec/design_output/index#the-index-answers-the-tickets]]
+ifBuilt("a ticket's standing reads off its group's branch through the ticket", () => {
+  const work = files.tempDir("tickets-");
+  files.makeDir(join(work, "spec", "tickets"));
+  for (const [at, text] of [
+    ["one-group.md", HELD_GROUP],
+    ["a-child.md", child("one-group")],
+    ["a-loose-one.md", child("").replace("group: \n", "")],
+  ]) {
+    files.write(join(work, "spec", "tickets", at), text);
+  }
+  const it = index(files, proc(), clock(), root, work);
+  try {
+    const rows = new Map(it.ask("tickets", {}).map((one) => [one.name, one]));
+    assert.equal(rows.get("one-group").standing, "held", "an open record entry holds the group");
+    assert.equal(rows.get("a-child").standing, "held", "a child stands where its group's branch stands");
+    assert.equal(rows.get("a-loose-one").standing, "", "a ticket in no group carries no standing");
+    assert.equal(rows.get("a-child").group, "one-group");
+    assert.equal(rows.get("a-child").state, "open");
+    assert.equal(rows.get("a-child").step, "do");
+  } finally {
+    it.ask("stop", {});
+  }
+});

@@ -105,8 +105,29 @@ Each one is a walk the tree takes in one call:
 | `links` | what reaches a note, which is what a person asks before moving one |
 | `dangling` | every link naming nothing this tree holds |
 | `same` | every file carrying the size and hash of another |
+| `tickets` | every ticket with its fields, and the standing its group's branch gives it |
 | `reindex` | the walk again, now |
 | `standing` | the root the door holds, and how many files it counts |
+
+## The index answers the tickets
+
+`tickets` answers every note of kind `ticket`, one row a ticket, and a reader
+opens no file and no git for it. `ticket.go` holds it, and
+`./RUNME.sh index tickets` prints the rows.
+
+| the key | what it carries |
+|---|---|
+| `name`, `path` | the note's id, and where it stands |
+| `state`, `step`, `group`, `urgent`, `todo` | the fields off the top of the front |
+| `route` | the process the ticket rides, as its own name, so `group` marks a group |
+| `standing` | what the branch gives it, as the words below |
+| `says` | the first line the Ask chapter says, past the mint's comments |
+
+A key nested under `record` or `steps` shadows no field, because the reader
+takes the top of the front alone. A branch informs a ticket's standing and
+nothing more. A group's standing derives from its own record. For details, see
+[[spec/design_output/work#held-derives-from-the-record]]. A ticket naming a
+group answers its group's standing, and a ticket in no group carries none.
 
 ## A rename reaches a name
 

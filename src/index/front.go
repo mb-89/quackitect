@@ -14,24 +14,9 @@ type linkAt struct {
 }
 
 func frontOf(text string) (map[string]string, string) {
-	said := strings.ReplaceAll(text, "\r\n", "\n")
-	if !strings.HasPrefix(said, openFence) {
-		return map[string]string{}, said
-	}
-	start := len(openFence)
-	end := strings.Index(said[start:], "\n---")
-	if end < 0 {
-		return map[string]string{}, said
-	}
-
-	head := said[start : start+end]
-	body := said[start+end:]
-	if cut := strings.Index(body, "\n"); cut >= 0 {
-		if rest := strings.Index(body[cut+1:], "\n"); rest >= 0 {
-			body = body[cut+1+rest+1:]
-		} else {
-			body = ""
-		}
+	head, body, ok := fenced(text)
+	if !ok {
+		return map[string]string{}, body
 	}
 
 	front := map[string]string{}
@@ -47,6 +32,30 @@ func frontOf(text string) (map[string]string, string) {
 		}
 	}
 	return front, body
+}
+
+// The text between the two rulers, and the body after them. A note with no fence answers its whole text as the body. [[spec/design_output/index#a-note-and-its-links]]
+func fenced(text string) (head, body string, ok bool) {
+	said := strings.ReplaceAll(text, "\r\n", "\n")
+	if !strings.HasPrefix(said, openFence) {
+		return "", said, false
+	}
+	start := len(openFence)
+	end := strings.Index(said[start:], "\n---")
+	if end < 0 {
+		return "", said, false
+	}
+
+	head = said[start : start+end]
+	body = said[start+end:]
+	if cut := strings.Index(body, "\n"); cut >= 0 {
+		if rest := strings.Index(body[cut+1:], "\n"); rest >= 0 {
+			body = body[cut+1+rest+1:]
+		} else {
+			body = ""
+		}
+	}
+	return head, body, true
 }
 
 func linksIn(front map[string]string, body string) []linkAt {
