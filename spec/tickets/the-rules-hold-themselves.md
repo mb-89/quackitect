@@ -104,6 +104,8 @@ rests on a reader's memory.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch sync
+
 # split
 
 <!-- mints the children, or assigns standing tickets, each naming this group -->
