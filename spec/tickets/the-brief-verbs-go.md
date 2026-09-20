@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -115,6 +115,12 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: 4039a66eebd569cb12590b944f8bcd706dfbf890
     hash_after: 4039a66eebd569cb12590b944f8bcd706dfbf890
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-22
+    hash_before: a641a4ea258f70b01d3516af38380d745c48bd81
+    hash_after: a641a4ea258f70b01d3516af38380d745c48bd81
+    returns: 3
+    why: "`spec/design_output/work` names the brief in six further chapters, and the notes table answers none; `The listing reads git once` carries a brief row, and `A row per group` carries a brief kind; `A box landing on trunk`, `A merged branch goes` and `Why a routine needs this` each teach the brief; `The routine a verb names` says `freeNow` reads the briefs, and the draft leaves that line standing; `grep -rn BRIEF src .claude` misses the copilot lane, which reads the string literal; `grep -rln HANDOVER spec src test` leaves out `.claude`, where three modules stand; `.claude/skills/level0/lib/review.js` holds its own `BRIEF`, and no row names it; that module writes a review prompt naming the brief, and no row says what it says after; the verbs table, the copilot table and the notes table read true everywhere else"
 ---
 
 # Ask
@@ -210,12 +216,15 @@ The rows above under `work` stand in [[spec/design_output/work]], chapter by cha
 
 fail
 
-- `spec/design_output/private.md` names the root file twice, and the notes table leaves it out
-- `spec/design_output/schema.md` says the schema governs both files, so that note answers too
-- `spec/design_output/review.md` names the root file in its own table, which the draft leaves out
-- `BRIEF` also stands in `src/scripts/work-merge.js` and `src/scripts/work-stands.js`
-- the language server tests under `src/lsp` drive the root file as a governed path
-- the counts and the how-many column drop, because a grep answers them, and one reads stale [[spec/guidance/voice]]
+- `spec/design_output/work` names the brief in six further chapters, and the notes table answers none
+- `The listing reads git once` carries a brief row, and `A row per group` carries a brief kind
+- `A box landing on trunk`, `A merged branch goes` and `Why a routine needs this` each teach the brief
+- `The routine a verb names` says `freeNow` reads the briefs, and the draft leaves that line standing
+- `grep -rn BRIEF src .claude` misses the copilot lane, which reads the string literal
+- `grep -rln HANDOVER spec src test` leaves out `.claude`, where three modules stand
+- `.claude/skills/level0/lib/review.js` holds its own `BRIEF`, and no row names it
+- that module writes a review prompt naming the brief, and no row says what it says after
+- the verbs table, the copilot table and the notes table read true everywhere else
 
 # implement
 
