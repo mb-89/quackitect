@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box 14d41de46d55 · claude-code-remote
@@ -95,6 +95,14 @@ record:
     hand: the engine
     hash_before: 0db2ea19db50871e4c2918712aef5bd958ce1045
     hash_after: 0db2ea19db50871e4c2918712aef5bd958ce1045
+  - step: retro/notes
+    hand: box 14d41de46d55 · claude-code-remote
+    hash_before: 9a82e91efbb242c1126a42d944c8850cb330e694
+    hash_after: 9a82e91efbb242c1126a42d944c8850cb330e694
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -139,9 +147,7 @@ The battery proves each door once against the real program, and every other case
 
 ### drained
 
-<!-- retro notes, which passes when the private folder is empty -->
-
-<!-- the form is command -->
+    ./RUNME.sh retro notes
 
 ## write
 
