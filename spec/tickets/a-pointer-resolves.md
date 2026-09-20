@@ -89,12 +89,16 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
     hash_before: 066dd6d0948f12034dc3619fe1158243afcc856b
     hash_after: 066dd6d0948f12034dc3619fe1158243afcc856b
+  - step: design/review
+    hand: box 1670436ae0bb · claude-code-remote · helper-2
+    hash_before: e4e832b29007cf969cd3f943b3553789173741d4
+    hash_after: e4e832b29007cf969cd3f943b3553789173741d4
 ---
 
 # Ask
@@ -154,6 +158,13 @@ the table of tree rules takes a row.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- the approach covers each bullet of the ask: a tree rule reads every pointer, an error makes the check refuse, and the tree gets repointed
+- the approach resolves a path the way the index's `pointsAt` does, and lists `.yaml` and `.yml` where the index tries `.md` alone; the drafter names which of the two the rule follows, or the case for the third suffix
+- the index holds a `dangling` query over the same dead pointers; the rule says beside it why a second reader stands in the language server, or reads the index's answer
+- the approach names no case feeding the rule a chapter nobody wrote; the tests-red step writes that case, and it asserts the rule refuses
+- the design output takes a chapter and a row in the table of tree rules, so the rule stands in one place
 
 # implement
 
