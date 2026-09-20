@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box 1670436ae0bb · claude-code-remote
     hash_before: 3fee8dc860ac12ba54d103f9bce503b2424a3f6f
     hash_after: 3fee8dc860ac12ba54d103f9bce503b2424a3f6f
+  - step: design/review
+    hand: box 1670436ae0bb · claude-code-remote · helper-4
+    hash_before: 26ff5a9f663ef22eecf1e2bf97200e2bcac0f0f7
+    hash_after: 26ff5a9f663ef22eecf1e2bf97200e2bcac0f0f7
+    returns: 2
+    why: "design: The chapter names what `src/tui/draw` holds, and the approach adds the filter language and the link there, so the chapter's row takes them and the approach points at the chapter alone.; design: The filter pane lights a pressed preset off the work tree's sorts in `presses`, so the tab interface grows the method the pane reads a pressed preset through.; craft: The pane and the help read `part` and `renderParts` in `detail.go`, so those part to the frame before the details move to the log tab.; craft: The build stamp lists the files standing directly under the folders `foldersOf` names, so the approach says the stamp changes to walk the packages.; craft: `gutterWide` in `sort.go` is read by the tree's draw and sort, so it parts to the draw package before the columns move to the log tab."
 ---
 
 # Ask
@@ -182,12 +188,11 @@ so a change under any package rebuilds the viewer.
 
 fail
 
-- design: The filter language in `filter.go` reads a log row and a tree item, so the log and the tree both read it. The chapter gives the tree the draw package alone, so the approach names the package the filter language lands in and what imports it.
-- design: The link in `link.go` draws in the tree and in the work tab, so the approach names the package it lands in.
-- design: The footer draws the log's order and floor, which the approach moves into the log tab, so the tab interface grows the method the footer reads them through.
-- craft: The build stamp reads every folder under `src/tui`, the draw, the tree and the frame among them, and the approach says the tab folders alone.
-- craft: `Frame` sets the log's rows, filter and floor, so the approach says how the root reaches them once they stand in the log tab.
-- craft: `saidStyle` in `colour.go` reads a log record, so it parts from the styles before they move to the draw package.
+- design: The chapter names what `src/tui/draw` holds, and the approach adds the filter language and the link there, so the chapter's row takes them and the approach points at the chapter alone.
+- design: The filter pane lights a pressed preset off the work tree's sorts in `presses`, so the tab interface grows the method the pane reads a pressed preset through.
+- craft: The pane and the help read `part` and `renderParts` in `detail.go`, so those part to the frame before the details move to the log tab.
+- craft: The build stamp lists the files standing directly under the folders `foldersOf` names, so the approach says the stamp changes to walk the packages.
+- craft: `gutterWide` in `sort.go` is read by the tree's draw and sort, so it parts to the draw package before the columns move to the log tab.
 
 # implement
 
