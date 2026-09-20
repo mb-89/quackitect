@@ -367,6 +367,10 @@ the line claiming a case says what the case holds.
 
 <!-- the form is checklist -->
 
+- the fix reaches the two copies the verdict names, and the ask covers the claim they hold
+- the copies carry prose alone, so no door of theirs wants a fake
+- each copy points at the chapter owning the claim, which carries the approach
+
 ## change
 
 <!-- makes the change -->
