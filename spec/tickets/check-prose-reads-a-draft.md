@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: ed778c0da59e8b60125e4b1865dac1795d3c783b
     returns: 1
     why: "the write door stands in `src/bridge/write.js`, and `voiceDoor` runs the read this tool reuses; name `wholeAfter` and `readsProse` beside it, because the whole-file read and its filter both stand there; `refusal` stands under `.claude/skills/level0/lib/refuse.js`, so the table points there for it; the tool's own module is unnamed. Say which file holds its spec and its handler; the ask names `./RUNME.sh test`, and the approach names no case file the two drafts land in; what holds: `mutations` answers the whole file a write lands, so the ask's third row stands already; `CHECK` under `answer.js` names `check_answer`, and the chapter the tool joins stands"
+  - step: design/draft
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: e2f80914c88351f79b6db87329587f1df880536c
+    hash_after: e2f80914c88351f79b6db87329587f1df880536c
 ---
 
 # Ask
@@ -129,10 +133,20 @@ Every note costs three or four refusals at the write door, and a table loses row
 
 | what it takes | what it answers |
 |---|---|
-| `path`, so the rules read the kind the path names | every finding, one a line, through `refusal` |
+| `path`, so the rules read the kind the path names | every finding, one a line |
 | `text`, the whole file as the write would land it | nothing on disk |
 
-The tool registers beside `check_answer`, which `.claude/skills/level0/lib/answer.js` names. The read it runs is the one the write door runs over a mutation, so a clean draft passes that door on its first write.
+What the tool reaches, each in its own place:
+
+| what the tool needs | where it stands |
+|---|---|
+| the door itself | `voiceDoor`, under `src/bridge/write.js` |
+| the whole file a write lands | `wholeAfter`, beside it |
+| the findings a note keeps | `readsProse`, beside it |
+| the shape of the answer | `refusal`, under `.claude/skills/level0/lib/refuse.js` |
+| the name beside it | `CHECK`, under `.claude/skills/level0/lib/answer.js` |
+
+`src/bridge/prose.js` holds the tool's spec and its handler, so the door keeps its own file. The handler calls the same read `voiceDoor` calls, so a clean draft passes that door on its first write.
 
 The ask's third row stands already:
 
@@ -140,9 +154,12 @@ The ask's third row stands already:
 - so a table row reads with its header, and an edit reads with the lines around it
 - the refusal names the file and the line, which a whole-file read answers
 
-The cases drive a clean draft to an empty list, and a draft carrying a long sentence to the finding naming it.
+Where each thing stands after:
 
-[[spec/design_output/level0#the-gate-reads-the-answer]] takes the tool beside the answer gate.
+- `test/level0/prose.test.js` holds the cases, over text in memory
+- one case drives a clean draft to an empty list
+- one case drives a draft carrying a long sentence to the finding naming it
+- [[spec/design_output/level0#the-gate-reads-the-answer]] takes the tool beside the answer gate
 
 ## review
 
