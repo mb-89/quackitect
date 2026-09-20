@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -169,6 +169,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box fa49097ce66c · claude-code-remote · helper-9
+    hash_before: 6c84e8f22521d6abf8140bb44a12c7b4c6021196
+    hash_after: 6c84e8f22521d6abf8140bb44a12c7b4c6021196
+reason: done
 ---
 
 # Ask
@@ -561,17 +566,151 @@ passes`, which reads the two module readers end to end.
 
 <!-- the form is files -->
 
+- .claude/skills/level0/lib/copilot-runtime.js
+- spec/design_output/level0.md
+- spec/design_output/pull.md
+- spec/design_output/review.md
+- spec/design_output/tools.md
+- spec/design_output/viewer.md
+- spec/design_output/work.md
+- spec/tickets/an-engine-takes-bridge-work.md
+- src/bridge/ask.js
+- src/bridge/bash.js
+- src/bridge/findings.js
+- src/bridge/guidance.js
+- src/bridge/projection.js
+- src/bridge/prose.js
+- src/bridge/reload.js
+- src/bridge/server.js
+- src/bridge/status.js
+- src/bridge/stop.js
+- src/bridge/tense.js
+- src/doors/biome.js
+- src/doors/vale.js
+- src/engine/group.js
+- src/engine/projection.js
+- src/engine/status.js
+- src/engine/swap/go.mod
+- src/engine/swap/swap.go
+- src/engine/swap/swap_test.go
+- src/engine/tense.js
+- src/engine/tools.js
+- src/index/go.mod
+- src/lsp/go.mod
+- src/scripts/ask-lint.js
+- src/scripts/branch-usage.js
+- src/scripts/cli-check.js
+- src/scripts/cli-doors.js
+- src/scripts/cli-go.js
+- src/scripts/cli.js
+- src/scripts/go-tests.js
+- src/scripts/group.js
+- src/scripts/guidance-hand.js
+- src/scripts/hand.js
+- src/scripts/landed.js
+- src/scripts/prepush.js
+- src/scripts/pull-chapter.js
+- src/scripts/pull-hand-of.js
+- src/scripts/pull-hand.js
+- src/scripts/pull-landed.js
+- src/scripts/pull-queue.js
+- src/scripts/pull-route.js
+- src/scripts/pull-spawn.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
+- src/scripts/queue.js
+- src/scripts/retro-new.js
+- src/scripts/retro-score.js
+- src/scripts/retro.js
+- src/scripts/review.js
+- src/scripts/spawn.js
+- src/scripts/stand.js
+- src/scripts/test-verb.js
+- src/scripts/ticket-ask-lint.js
+- src/scripts/ticket.js
+- src/scripts/tools.js
+- src/scripts/tui-build.js
+- src/scripts/unblock.js
+- src/scripts/viewer.js
+- src/scripts/work-answer.js
+- src/scripts/work-free.js
+- src/scripts/work-list.js
+- src/scripts/work-merge.js
+- src/scripts/work-review.js
+- src/scripts/work-stands.js
+- src/scripts/work-test.js
+- src/scripts/work-unblock.js
+- src/scripts/work-usage.js
+- src/scripts/work.js
+- src/swap/go.mod
+- src/swap/swap.go
+- src/swap/swap_test.go
+- test/contract/biome.test.js
+- test/contract/candidate-check.test.js
+- test/contract/compact.test.js
+- test/contract/paragraph.test.js
+- test/contract/schema.test.js
+- test/contract/shape.test.js
+- test/contract/tree.test.js
+- test/contract/vale-fix.test.js
+- test/contract/vale-paths.test.js
+- test/contract/vale.test.js
+- test/level0/ask-lint.test.js
+- test/level0/folders.test.js
+- test/level0/go-modules.test.js
+- test/level0/group.test.js
+- test/level0/landed.test.js
+- test/level0/person-step.test.js
+- test/level0/pull-escalate.test.js
+- test/level0/pull-fields.test.js
+- test/level0/pull-leaves.test.js
+- test/level0/pull-person.test.js
+- test/level0/pull-steps.test.js
+- test/level0/pull.test.js
+- test/level0/queue.test.js
+- test/level0/quoted.test.js
+- test/level0/review.test.js
+- test/level0/stand.test.js
+- test/level0/tools.test.js
+- test/level0/unblock.test.js
+- test/level0/viewer.test.js
+- test/level0/work-doors.js
+- test/level0/work-group.test.js
+- test/level0/work.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- The four moves land, and `src/engine` holds status, tense, the projection readers, swap, group and tools.
+- `src/bridge/projection.js` keeps `ownerDoor`, `marksStale` and `freshens`, and imports the two readers.
+- `src/index/go.mod` and `src/lsp/go.mod` each name `../engine/swap`.
+- `goModulesIn` walks any depth under `src`, and answers the five modules this tree holds.
+- `goModulesOf` takes the handle, and answers `src/engine/swap` for a test standing there.
+- `test/level0/go-modules.test.js` drives both readers over a fake disk in five cases.
+- Two cases assert a refusal: a folder holding no module, and a test outside every module.
+- `./RUNME.sh check` exits 0, and the Go run names `quackitect/swap` among five modules.
+- Every file under `src/scripts` carries a group prefix, its own verb name, or a setup role.
+- The six notes naming a moving path follow the move, and a grep over the tree finds none stale.
+- A retro stands absent from the handback, which suits a ticket at verdict.
+- `reload.js` takes `src/engine`, and `test/level0/reload.test.js` names that root nowhere.
+- Add a reload case over a file under `src/engine`, so that entry carries a test.
+- The folder rule stands in this ticket alone, and no note under `spec/design_output` carries it.
+- `src/engine/tools.js` shares a name with `src/bridge/tools.js`, as the old layout shares one too.
+- `modulesUnder` walks `src/extension/node_modules`, which costs little here and grows with that folder.
+- The says field reads `src/scripts` as a verb's folder, and eight files there stand outside that table.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The notes point at a path and repeat no fact, and the folder rule stands in this ticket alone.
 
 # Discussion
 
