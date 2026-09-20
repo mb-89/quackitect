@@ -13,7 +13,18 @@ import {
 import { attach, copyHere, readRegister, registerCopy } from "../scripts/vehicle.js";
 
 const HOOK = ".claude/skills/level0";
-const FILES = ["hooks/level0.js", "hooks/hooks.json", ".claude-plugin/plugin.json"];
+// The hook imports its own folder, so the copy takes what it reaches. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+const FILES = [
+  "hooks/level0.js",
+  "hooks/hooks.json",
+  ".claude-plugin/plugin.json",
+  "lib/apply.js",
+  "lib/folders.js",
+  "lib/log.js",
+  "lib/search.js",
+  "lib/undo.js",
+  "lib/vehicle.js",
+];
 
 export function vehicleOf(disk, env, time, work) {
   const pointed = pointerOf(readIf(disk, join(work, POINTER)));

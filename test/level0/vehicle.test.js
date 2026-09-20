@@ -211,6 +211,13 @@ test("attach writes the driver, the register entry with its port, the pointer an
     "/tools/.claude/skills/level0/hooks/level0.js": "the hook",
     "/tools/.claude/skills/level0/hooks/hooks.json": '{"modules":["./level0.js"]}',
     "/tools/package.json": '{"version":"0.1.0"}',
+    // The hook imports its own folder, so the copy takes what it reaches. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+    ...Object.fromEntries(
+      ["apply", "folders", "log", "search", "undo", "vehicle"].map((one) => [
+        `/tools/.claude/skills/level0/lib/${one}.js`,
+        `the ${one} lib`,
+      ]),
+    ),
   });
   const said = attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools");
   assert.equal(said.method, "/tools");
@@ -234,6 +241,13 @@ test("attach writes the driver, the register entry with its port, the pointer an
     files.read("/stub/.claude/skills/level0/hooks/hooks.json"),
     '{"modules":["./level0.js"]}',
   );
+  for (const one of ["apply", "folders", "log", "search", "undo", "vehicle"]) {
+    assert.equal(
+      files.read(`/stub/.claude/skills/level0/lib/${one}.js`),
+      `the ${one} lib`,
+      `the ${one} lib travels, because the hook imports it`,
+    );
+  }
   assert.equal(files.read(`/stub/${MARKER}`), "{}", "the manifest");
   const entry = JSON.parse(files.read("/home/agent/.se/registry.json")).find(
     (one) => one.id === "abc123",

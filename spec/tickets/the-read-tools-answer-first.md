@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -140,6 +140,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 64fd48f14891db8df7d9df81beb80584371fb9ba
+    hash_after: 64fd48f14891db8df7d9df81beb80584371fb9ba
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -317,14 +325,18 @@ The engine hands a hook one `on`, and the hook names the events it takes. So a c
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the hook, the spec it moves, the stub's copy, two cases and three notes
+- the engine's own doors stand faked: the tool register, the process, the fetch and the log
+- each header points at the chapter the approach names, and that chapter owns the order
 
 ## tests-green
 

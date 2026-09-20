@@ -3,22 +3,11 @@
 // [[spec/design_output/index#the-door-answers-the-tools]]
 
 import { asked, said as saidOf } from "../../.claude/skills/level0/lib/index.js";
+import { FIND, findSpec } from "../../.claude/skills/level0/lib/search.js";
 
-export const FIND = "find";
 const PASS = { pass: true };
 
-export function findSpec() {
-  return {
-    name: FIND,
-    description:
-      "Finds the lines in this tree carrying the words, ranked by the index. Ask it before a Grep over the tree, because it reads the rows and not the disk.",
-    inputSchema: {
-      type: "object",
-      properties: { words: { type: "string", description: "The words to look for." } },
-      required: ["words"],
-    },
-  };
-}
+export { FIND, findSpec };
 
 // [[spec/design_output/index#the-door-answers-the-tools]]
 export function answersFromIndex(e, box) {

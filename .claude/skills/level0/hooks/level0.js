@@ -1,14 +1,17 @@
 // THE BRIDGEHEAD. The one hook a project carries: it posts every event to the
 // server at the port and does what the answer says, and a second hook reads
-// the step's stream. It imports nothing, and a dead server blocks nothing.
+// the step's stream. It imports its own folder alone, and a dead server blocks
+// nothing.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
-// The port base of [[spec/design_output/vehicle#the-register-holds-the-port]], held again here because this hook imports nothing.
-const PORT = 6510;
+import { patchSpec, replaceSpec } from "../lib/apply.js";
+import { SESSION } from "../lib/log.js";
+import { findSpec } from "../lib/search.js";
+import { undoSpec } from "../lib/undo.js";
+import { PORT_BASE as PORT } from "../lib/vehicle.js";
+
 const POINTER = ".se/.runtime/vehicle.json";
-// The log of [[spec/design_input/the-runtime-files-stand-apart]], which stands outside the runtime half because the retro collects it. It is owned by log.js and spelled again here because this hook imports nothing.
-const SESSION = ".se/.log/session.jsonl";
-// The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], under the runtime folder folders.js owns and spelled again here because this hook imports nothing.
+// The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], under the runtime folder folders.js owns.
 const HAND_FILE = ".se/.runtime/session.json";
 const COMPACT = "session.compact";
 const LIMIT = 4_000_000;
@@ -65,13 +68,22 @@ export function spawnTagOf(held) {
   return `You are the hand of session ${id} on this box, so you pull under no --as.`;
 }
 
-// The tools a hand reads with, registered at the session's start so the first
-// call reaches one. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-export const READ_TOOLS = [];
+// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+export const READ_TOOLS = [findSpec(), patchSpec(), replaceSpec(), undoSpec()];
+const CALLED = READ_TOOLS.map((one) => `mcp__level0__${one.name}`);
+const HEALTH = 200;
 
 export function register(on, options) {
   method = String(options?.method ?? "");
   on("*", ($, e, next) => seen($, e, next));
+  // A server answering nothing at session start leaves a box with no read tool all session. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+  on("session.start", async ($, e, next) => {
+    await registers($, READ_TOOLS);
+    return next(e);
+  });
+  for (const called of CALLED) {
+    on("tool.call", { tool: called }, ($, e, next) => reads($, called, e, next));
+  }
   on("turn.step", streams);
   // [[spec/design_output/pull#a-hand-of-its-own]]
   on("agent.spawn", async ($, e, next) => {
@@ -234,6 +246,36 @@ async function registers($, specs) {
       await $.tool.register(spec);
     } catch {}
   }
+}
+
+// A read tool called before the server stands brings it up, and answers on the far side. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+async function reads($, called, e, next) {
+  const first = await ask($, "tool.call", { ...e, tool: called }, { event: "tool.call" });
+  if (first?.result !== undefined) return { result: first.result };
+  await starts($);
+  if (!(await healthy($))) {
+    return {
+      result: `no server answers at ${url()}, so ${called} reads nothing. Run ./RUNME.sh serve, and read .se/.log/serve.log for what it says.`,
+    };
+  }
+  const said = await ask($, "tool.call", { ...e, tool: called }, { event: "tool.call" });
+  if (said?.result !== undefined) return { result: said.result };
+  return next(e);
+}
+
+// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+async function healthy($) {
+  const until = Date.now() + STARTING;
+  while (Date.now() < until) {
+    try {
+      const said = await $.http.fetch(`http://127.0.0.1:${port}/health`, {
+        method: "GET",
+      });
+      if (said?.ok) return true;
+    } catch {}
+    await new Promise((done) => setTimeout(done, HEALTH));
+  }
+  return false;
 }
 
 function merged(said, after) {

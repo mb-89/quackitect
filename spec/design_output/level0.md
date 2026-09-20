@@ -21,8 +21,13 @@ Level zero is two pieces. The bridgehead, `hooks/level0.js`, is the module the
 client loads, and the one hook a project carries: one door for every event,
 `*`, and one function behind it. It posts each event to the server at the
 port, with the root the session works in, and does what the answer says. It
-imports nothing, so a project carries the file alone. The project knows
-nothing of where the method stands on the disk.
+imports its own folder alone, so a project carries that folder and nothing
+past it. The project knows nothing of where the method stands on the disk.
+
+Those imports buy the read tools their registration:
+
+- the hook names each spec at the session's start, so a box whose server answers nothing carries them
+- a file under `lib` failing to load blocks the hook, which is the cost
 
 A second hook stands beside the door, on `turn.step`, because a stream reaches
 a generator alone. It keeps the step's text as the chunks arrive, and posts it
@@ -87,7 +92,7 @@ A desk pull starts nothing, and a take that fails starts nothing.
 
 The line it runs is the bridgehead's own, imported from the hook. So one text
 starts the server on both roads, and one table names what each code says. The
-stub's bridgehead keeps a copy, because that file imports nothing.
+stub's bridgehead keeps a copy, because that file imports nothing at all.
 
 ## The bridgehead starts it too
 
@@ -118,6 +123,20 @@ it stands reads no rules, and the log names the piece that misses.
 
 The bridgehead installs nothing. The setup installs, and a box whose setup runs
 nowhere says so on the line the table above names.
+
+### The first call pays
+
+`READ_TOOLS` in the hook names the four tools a hand reads with, and the hook
+registers each at the session's start. That registration reaches no server, so
+a box whose server answers nothing carries the tools anyway.
+
+A call landing before the server stands takes three steps:
+
+- it asks the server once, and answers where one stands
+- it runs the start above, then reads `/health` every fifth of a second
+- `STARTING` caps that wait, and the wait running out answers the port and the log
+
+So a hand calls `find` on its first turn, and that call pays for the server.
 
 ## A fix reaches the session
 
