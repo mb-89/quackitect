@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -102,6 +102,10 @@ record:
     hash_after: 33d5ccdadcd43fdec697d400b391e98d615b7e3d
     returns: 1
     why: The case the approach adds stands already in `test/level0/person-step.test.js`, at its first test.; That case seeds a group at `children` with one open child, on branch `work/one-group`.; So the objection naming a free ticket reads wrong, because `pull.js` takes the group off the branch name.; Name what the standing case lacks, or drop the case from the plan.; The `wait` row in `spec/design_output/pull.md` carries no pointer, so that change holds.
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: ab61e6dc3d7a9692c62920f8539faf4f109561b8
+    hash_after: ab61e6dc3d7a9692c62920f8539faf4f109561b8
 ---
 
 # Ask
@@ -141,23 +145,22 @@ A cloud box clears a person's wall itself, because the pull names the verb that 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-The wait answer already names the unblock road, so this ticket lands the table row and the case a group shapes.
+The wait answer already names the unblock road, and a case already drives a group at `children`. So this ticket lands the answers table row.
 
 | what stands | where |
 |---|---|
 | the prompt naming the mint, the open, the unblock and the done | `unblockPrompt` in `src/scripts/spawn.js` |
 | the pull printing it where a person's step is all that stands | `handOut` in `src/scripts/pull-hand.js` |
-| a case reading that prompt off a plain pull | `test/level0/person-step.test.js` |
+| the case driving a group at `children` with one open child | the first case of `test/level0/person-step.test.js` |
+
+That case seeds the group on branch `work/one-group`, and `pull.js` takes the group off the branch name. It asserts the mint, the open, the unblock and the done out of the answer.
 
 What changes:
 
 - the `wait` row of the answers table points at [[spec/design_output/work#a-person-step-leaves]]
-- a case drives a group at `children` whose one open child waits at a person's step
-- that case reads `branch unblock` out of the answer
+- the row's own words stay, because the prompt keeps its wording in one place
 
-The row carries a link, because the prompt keeps its own words in one place.
-
-The objection: the plain case already reads the same lines. It reads them off a free ticket, and the ask names the group shape, where the group's own leaf competes for the same answer.
+The objection: the ask asks for a case, and this plan adds none. A second case over the same shape drives the same lines, and the standing one already holds them.
 
 ## review
 
