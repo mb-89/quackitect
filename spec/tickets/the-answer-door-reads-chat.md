@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: 6e73dceeee447f4bcd7029d590ddc9756fa978bd
     returns: 2
     why: the tree holds two `SAYS`, and the plan names the one under `src/bridge/answer.js` alone; the chapter "What the refusal says" quotes the `SAYS` of `.claude/skills/level0/lib/answer.js` today; a standing case in `test/level0/answer.test.js` asserts that second `SAYS`, and the plan skips it; the draft writes a count, and the log carries 44 rows today, so the count drifts; 35 of those 44 rows follow a call, so "every one of them" overstates the log; the ordering holds on 33 rows, where a displayed text stands between two calls; answers the earlier findings on the `onAgentSpoke` row, the change table, and the `SAYS` case; answers the earlier findings on both chapters, the refusal quote, and the log this box keeps; answers the earlier finding on the bullet count, now three bullets under "Three things the road does"; the three cases the plan names run against the door as written, so the shape holds; `./RUNME.sh check` answers 0 on this branch, and the branch review reads the retro as absent
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: de19c56112d536e49ae506441c524c4c8ccf1993
+    hash_after: 7b95a88b002539244f003de1862a742db68d6656
 ---
 
 # Ask
