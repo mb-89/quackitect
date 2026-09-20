@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -107,6 +107,11 @@ record:
     hand: box a05106ef44c2 · claude-code-remote
     hash_before: 6aeaa4f833e550e058a92e79054568b155dc1185
     hash_after: 6aeaa4f833e550e058a92e79054568b155dc1185
+  - step: retro/cloud
+    hand: box a05106ef44c2 · claude-code-remote
+    hash_before: d260e283dd631fec93f85af6ddbe1535d0174cd6
+    hash_after: d260e283dd631fec93f85af6ddbe1535d0174cd6
+reason: done
 ---
 
 # Ask
@@ -199,21 +204,18 @@ The child's output went to a file and to no pipe. A pipe dies with the old serve
 
 ### lacked
 
-<!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
-<!-- the form is list -->
+- nothing: the install at the start brought every tool, the proxy refused no host, and the platform refused no right
 
 ### met
 
-<!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
-<!-- the form is list -->
+- the pre-commit hook, at the first child's first hand-back, over the hook scripts changing with no test beside them
+- no trunk guard, no conflict at sync, no cap, and no test that fails on this box alone
 
 ### left
 
-<!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
-<!-- the form is list -->
+- no person step stands parked, and no ticket stands minted outside this group
+- the hook scripts keep a guard of their own beside `runsHere`, because the commit door wants a test beside each. A hand changing those tests takes them
+- the handover says: branch done marks this branch, and the desk reads the group before the merge into main
 
 # Discussion
 
