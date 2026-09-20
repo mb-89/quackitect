@@ -27,6 +27,8 @@ import {
 import {
   doorsSaying,
   green,
+  GROUP_AT,
+  GROUP_NOTE,
   HERE,
   heard,
   onBranch,
@@ -577,3 +579,19 @@ test("done refuses where the battery answers nothing green", () => {
 });
 
 // A branch carrying a group ticket is a group. [[spec/design_output/work#a-group-is-a-ticket]]
+
+// The brief left the tree, so every verb reads the group alone. [[spec/tickets/the-brief-verbs-go]]
+test("list reads the group on a branch a root handover also stands on", () => {
+  const { it } = doorsSaying(
+    remoteSaying([{ branch: "work/one-group", tip: "aaa" }], {
+      "work/one-group:HANDOVER.md": "---\nstatus: held\n---\n",
+      [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+    }),
+  );
+
+  const { code, said } = heard(() => work(ROOT, ["list"], it));
+
+  assert.equal(code, 0);
+  assert.match(said, /work\/one-group\s+todo\s+urgent/, "the group's own standing");
+  assert.doesNotMatch(said, /brief/, "the kind column goes with the brief");
+});
