@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -115,6 +115,10 @@ record:
     hand: box 099c2ec7708d · claude-code-remote
     hash_before: e9d0693219c480673f64f0613014f0cc2459ae65
     hash_after: e9d0693219c480673f64f0613014f0cc2459ae65
+  - step: design/review
+    hand: box 099c2ec7708d · claude-code-remote · helper-6
+    hash_before: 36ee3423bfe8ec7c11b64c6ea095f9af1d9bc905
+    hash_after: 36ee3423bfe8ec7c11b64c6ea095f9af1d9bc905
 ---
 
 # Ask
@@ -200,19 +204,20 @@ Where each thing stands after:
 <!-- pass or fail, with findings one a line -->
 <!-- the form is verdict -->
 
-fail
+pass
 
-- the verb's code takes no owner file here. `src/scripts/cli.js` holds the verbs table, and each verb takes a module
-- the mint on refusal takes no owner file. `src/bridge/code.js` holds the door reading `grows`
-- the minted ticket's fields stand unnamed. `trivial` asks `gain`, `breaks` and `done_when`, so the door fills three
-- the minted ticket's path and `group` stand unnamed, so the implementer picks both
-- the journal entry's `on` and `by` stand unnamed. The command line carries no undo verb, and the `undo` tool takes the newest entry
+- `src/scripts/cli.js` holds the verbs table, so `src/scripts/split-verb.js` lands as one row
+- `src/bridge/code.js` stands as the one caller of `grows`, so the mint takes an owner
 - the size lib holds `sizeFaults`, `FILE_RULE` and `grows`
 - the undo lib holds `journalOf`, and `spec/processes` holds `trivial`
-- `src/bridge/apply.js` stands as the batch edit behind the patch and replace tools
-- `spec/design_output/level0.md` holds `The size ceiling`, so the flags table takes an owner
-- `./RUNME.sh lint src/scripts` and `./RUNME.sh lint src test` both answer the rules pass
-- the earlier read's seven findings each take an answer here
+- the door fills `gain`, `breaks` and `done_when`, which `trivial` asks for
+- the ticket lands at a named path and stands loose on trunk, so the implementer reads both
+- the journal entry names `on` and `by`, and `journalOf` takes `by` as an argument
+- `spec/design_output/level0.md` holds `The size ceiling`, so the flags table takes one owner
+- `test/level0/split.test.js` runs under `./RUNME.sh test`, and a case asserts one ticket on two refusals
+- `./RUNME.sh lint src/scripts` exits 0 today, so the verb guards the next file
+- each finding of the two earlier reads takes an answer here
+- for implement: the mint refuses a path that stands, so a closed split ticket blocks a fresh mint
 
 # implement
 
