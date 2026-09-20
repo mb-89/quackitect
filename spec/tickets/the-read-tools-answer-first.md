@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -121,6 +121,10 @@ record:
     hash_after: c8a3cdf15d74319922624104e2ae614f20e839b9
     returns: 3
     why: "`src/bridge/vehicle.js` copies `hooks/level0.js` and its manifests into a stub, so an import of `../lib` dies there.; `test/level0/vehicle.test.js` asserts the file list that copy takes, so the change reaches a case the ask leaves out. Name it.; the invariant sentence stands under [[spec/design_output/level0#the-bridgehead-and-the-server]], and the approach names the start chapter alone. Say what it becomes.; the row naming the stub's copy stands under [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]. Say what that row becomes.; an implementer guesses the wait on `/health` and the answer where that wait runs out.; what holds:; every finding of both earlier `why` lines stands answered.; `findSpec`, `patchSpec`, `replaceSpec` and `undoSpec` stand where the approach names them.; `lib/apply.js`, `lib/undo.js` and `lib/folders.js` carry no `node:` import, so the hook's environment takes them.; `PORT_BASE` stands in `lib/vehicle.js`, and `SESSION` stands in `lib/log.js`.; `test/level0/hand.test.js` drives the hook's `register`, so the cases land beside it.; `.claude/skills/level1/hooks/level1.js` registers a tool at `session.start` already.; `REASONS` holds code 6, and [[spec/design_output/level0#the-bridgehead-starts-it-too]] says the bridgehead installs nothing."
+  - step: design/draft
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: b70660fe8d933469e97f46d36cebea9f8837aa42
+    hash_after: b70660fe8d933469e97f46d36cebea9f8837aa42
 ---
 
 # Ask
@@ -150,12 +154,6 @@ The plugin registers every read tool at session start, and the first call brings
 | the specs ride the server's answer to `session.start` | a box whose server answers nothing carries no read tool all session |
 | `starts` runs after that answer falls | the start lands, and the registration stands already past |
 
-| what changes | where |
-|---|---|
-| `findSpec` moves under the skill folder | `.claude/skills/level0/lib/search.js`, and `src/bridge/search.js` points there |
-| `register` names all four specs at session start | the plugin's `register` |
-| a handler meeting no server starts one, waits on its health, and calls again | the plugin's tool road |
-
 Three of the four specs stand under the skill folder already:
 
 | the spec | where it stands today |
@@ -164,21 +162,40 @@ Three of the four specs stand under the skill folder already:
 | `undoSpec` | `.claude/skills/level0/lib/undo.js` |
 | `findSpec` | `src/bridge/search.js`, which the move takes |
 
-The bridgehead installs nothing, and the chapter's line on that stands as it stands. A session start waits for nothing, as that chapter says.
-
-| what keeps its shape | what it answers |
+| what changes | where |
 |---|---|
-| `START` | the same road, with the same codes |
-| `REASONS` | every code, code 6 among them |
+| `findSpec` moves under the skill folder | `.claude/skills/level0/lib/search.js`, and the bridge points there |
+| `register` names all four specs at session start | the plugin's `register` |
+| a handler meeting no server starts one, waits on its health, and calls again | the plugin's tool road |
 
-A handler meeting a code from the start answers the line `REASONS` names for it. So a box whose setup brings no modules says that, in place of standing silent.
+The bridgehead installs nothing, and that line stands as it stands. A session start waits for nothing, as its chapter says. `START` keeps its road and `REASONS` keeps every code. A handler meeting a code from the start answers the line `REASONS` names for it.
+
+The tool road's wait:
+
+- the handler asks `/health` every 200 milliseconds, and `STARTING` in the hook caps that wait
+- the wait running out answers the line naming the port and the log the server writes to
+- a call after that wait reaches the server, and the answer rides back as the tool's own
 
 What the hook's invariant becomes:
 
-- the hook imports nothing outside `.claude/skills/level0`, and the plugin ships that folder whole
-- `PORT`, `SESSION` and `HAND_FILE` each come from their owner
+- the hook imports its own folder, and nothing outside `.claude/skills/level0`
+- `PORT_BASE` from `lib/vehicle.js` and `SESSION` from `lib/log.js` each come from their owner
+- `HAND_FILE` stands in no lib module, so it takes one, beside the folder `folders.js` owns
 - a file under `lib` failing to load blocks the hook, which is what this buys the registration
 - `.claude/skills/level1/hooks/level1.js` holds that same narrowed invariant already
+
+The stub takes the same files. `FILES` in `src/bridge/vehicle.js` copies the hook and its two manifests today, so an import of `../lib` dies in a stub:
+
+| what the copy takes now | what it takes after |
+|---|---|
+| `hooks/level0.js` and its two manifests | the same three |
+| nothing under `lib` | `lib/apply.js`, `lib/undo.js`, `lib/folders.js`, `lib/search.js`, `lib/vehicle.js` and `lib/log.js` |
+
+Each note naming that copy takes the new list:
+
+- [[spec/design_output/level0#the-bridgehead-and-the-server]] carries the invariant sentence, which becomes the narrowed one
+- [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]] carries the copy's row, which names the lib files
+- `test/level0/vehicle.test.js` asserts that copy file by file, so its list grows with `FILES`
 
 So a hand calls `find` on its first turn, and that call pays for the server.
 
@@ -187,6 +204,7 @@ Where each thing stands after:
 - `test/level0/hand.test.js` takes the cases, because it drives the hook's `register` today
 - one case a tool, each with no server standing, reading the answer the handler gives
 - one case drives a start answering a code, and reads the line the handler says
+- one case drives the wait running out, and reads the line naming the port
 - the answer's `register` list stands, so a server carrying a newer spec still names it
 - [[spec/design_output/level0#the-bridgehead-starts-it-too]] takes the order
 
