@@ -89,12 +89,16 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
     hash_before: 783b7e57c9dfc19139b57a67586509f777e4ecb4
     hash_after: 783b7e57c9dfc19139b57a67586509f777e4ecb4
+  - step: design/review
+    hand: box d40a1b367f4d · claude-code-remote · helper-2
+    hash_before: b40b04e059e8cae8eec0d2cc94bcd66116a934ca
+    hash_after: b40b04e059e8cae8eec0d2cc94bcd66116a934ca
 ---
 
 # Ask
@@ -144,6 +148,15 @@ The design output for the door rule stands at [[spec/design_output/doors#a-door-
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+The rule file, the sections, each package named, the tree's constructor and its reading methods, and the contract test stand in the tree.
+The rule row and the contract case answer the import bullet with a refusal at a module path and a pass at a door path.
+The doors row answers the one-file bullet, and the lint run over the tree proves it.
+The fake row and the tree case answer the fake bullet, with a memory disk behind the server's tree.
+The callers row answers the lint bullet, and the pure reads out of the standard library keep the callers off the import.
+The door section in the config reaches one folder under the source root, so the wider glob the draft names is what holds the swap package.
+The fake reaches the server package alone, and the other packages keep the real disk in their cases under the test section the draft adds.
 
 # implement
 
