@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: misc
 steps:
   - name: design
@@ -129,6 +129,11 @@ record:
       - name: check
         exit: 0
         said: 108 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-21
+    hash_before: 156d83f601b532177749fa77a0fd7b773914d207
+    hash_after: 156d83f601b532177749fa77a0fd7b773914d207
+reason: done
 ---
 
 # Ask
@@ -317,17 +322,56 @@ A shape rule reads the Actionables chapter of a guidance note and counts the sen
 
 <!-- the form is files -->
 
+- spec/tickets/a-rule-names-its-failure.md
+- spec/guidance/review/reviewing.md
+- spec/guidance/guidance.md
+- spec/rationales/guidance.md
+- spec/config/styles/VoiceShape/MarkedRuleNamesFailure.yml
+- spec/config/styles/VoiceShape/GuidanceCap.yml
+- test/contract/shape.test.js
+- .vale.ini
+- .claude/output-styles/level0.md
+- spec/guidance/arguing.md
+- spec/guidance/code/code.md
+- spec/guidance/code/testing.md
+- spec/guidance/retro/audit.md
+- spec/guidance/retro/chapter.md
+- spec/guidance/retro/classify.md
+- spec/guidance/retro/collect.md
+- spec/guidance/retro/effect.md
+- spec/guidance/retro/feedback.md
+- spec/guidance/retro/read.md
+- spec/guidance/retro/signals.md
+- spec/guidance/retro/verify.md
+- spec/guidance/tickets.md
+- spec/guidance/voice-checks.md
+- spec/guidance/voice.md
+- spec/guidance/working.md
+- spec/tickets/every-road-reads-one-config.md
+
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+The rule reads the Actionables chapter the way the cap rule does, and the lint over the guidance answers green.
+The case feeds the rule a marked rule of one sentence and a clause opened by because, and asserts it refuses each.
+Every marked rule under the guidance names its failure in a second sentence, and the projection carries the same lines.
+The second sentence of the fourth signals rule says the machinery let the agent down, and that reads as the past tense.
+The diff touches no file past the ask, and the project verb writes the projection off the guidance.
+
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The check stands in the rule file alone and the argument in the rationale chapter alone, the guidance rule names the check and the test comment links the note, and the projection copies the guidance by design.
+
 
 # Discussion
 
