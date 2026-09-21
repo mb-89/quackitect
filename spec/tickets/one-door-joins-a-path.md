@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: misc
 steps:
   - name: design
@@ -158,6 +158,11 @@ record:
       - name: check
         exit: 0
         said: 140 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-26
+    hash_before: 999a1db1c9c83194b0c68e3a18811f837b421e6a
+    hash_after: 999a1db1c9c83194b0c68e3a18811f837b421e6a
+reason: done
 ---
 
 # Ask
@@ -352,17 +357,39 @@ The shared reading of a file takes the hand and joins the path through the hand'
 
 <!-- the form is files -->
 
+- .claude/skills/level0/lib/scripted.js
+- src/bridge/bash.js
+- src/scripts/precommit.js
+- test/level0/precommit.test.js
+- test/level0/trunk-door.test.js
+- spec/tickets/one-door-joins-a-path.md
+- spec/guidance/review/reviewing.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- `fileText` takes the hand and joins through `it.join`, and every caller hands it a hand, so the first bullet stands.
+- `holds` hands its own hand to `fileText`, and the slash it wrote is gone, so the second bullet stands.
+- The case in `test/level0/precommit.test.js` drives `holds` under a join of its own over one fake disk, which runs the notes reading and the test reading both, and the record says it fails on its own assertion before the change, so the third bullet stands.
+- The check on the tests-green commit exits zero by the record, and the lint over `src` exits zero here.
+- The three test files pass here, and the door's standing script case drives `reader` in `src/bridge/bash.js`.
+- The dotted case and its comment are gone from `test/level0/trunk-door.test.js`, and the hunk left there adds one blank line at the end, which redesigns nothing.
+- `notesIn` and `batteryHere` in `src/bridge/bash.js` still write the slash, and the ask names the hook alone, so that stays outside this ticket.
+- The reflect chapter names the class as a case written for the commit door's ask and not for the change, and the fix lands as the dropped case.
+- No handback stands on this ticket, so no retro question rides along.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The fact that the hand's join is the one place a path joins stands in the comment over `fileText`, and the comments over `reader` and the case point at the ticket instead of repeating it.
 
 # Discussion
 
