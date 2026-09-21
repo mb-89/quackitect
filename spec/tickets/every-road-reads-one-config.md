@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: misc
 steps:
   - name: design
@@ -129,6 +129,11 @@ record:
       - name: check
         exit: 0
         said: 123 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-23
+    hash_before: 1c07b18e5b3a3a5ee2b8ba53d24547d0947e4197
+    hash_after: 1c07b18e5b3a3a5ee2b8ba53d24547d0947e4197
+reason: done
 ---
 
 # Ask
@@ -317,17 +322,47 @@ The findings road hands Vale the config the assembly writes over the pair of roo
 
 <!-- the form is files -->
 
+- spec/tickets/every-road-reads-one-config.md
+- spec/guidance/review/reviewing.md
+- spec/design_output/vehicle.md
+- src/bridge/findings.js
+- src/bridge/tools.js
+- src/bridge/server.js
+- src/doors/vale.js
+- src/scripts/copilot.js
+- src/scripts/styles.js
+- src/scripts/vehicle.js
+- .claude/skills/level0/lib/copilot-runtime.js
+- .claude/skills/level0/lib/vale.js
+- .claude/skills/level0/lib/vehicle.js
+- .claude/skills/level0/lib/code.js
+- test/contract/one-config.test.js
+- test/level0/findings.test.js
+- test/level0/copilot-runtime.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- The findings road hands Vale the config `assemble` answers over the pair and runs from the work root, as the approach names.
+- The copilot root reads the pair off `rootsHere` and hands `check` the assembled config and the work root, and the answer gate stands as it is through the door.
+- The contract case feeds a project's own rule bad text on each road through the real Vale, and asserts each road names the rule.
+- The unit case for `check` asserts the config and the working folder reach the process.
+- The lint, the contract case and the unit cases pass here, and the record holds the check green.
+- `configOf` builds the pair by hand where `pairOf` stands in `.claude/skills/level0/lib/vehicle.js`, as the door does too, so a later ticket can draw both to it.
+- `it.styles?.()` lets a root without `styles` fall back to the bare config, which a fixture reaches and no real root does.
+- The findings road now runs Biome from the work root with a config path relative to it, so a project root holding no `spec/config` reads no Biome finding, which stands outside this ask.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- Each road's comment names `spec/design_output/vehicle#the-styles-assemble-once`, where the assembly's facts stand once, and the contract case names the ticket instead of restating the rule.
 
 # Discussion
 
