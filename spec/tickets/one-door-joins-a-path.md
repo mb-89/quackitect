@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -129,6 +129,12 @@ record:
       - name: check
         exit: 0
         said: 137 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-25
+    hash_before: 85f359362e9695bd46e4629cc7c987387f397999
+    hash_after: 85f359362e9695bd46e4629cc7c987387f397999
+    returns: 1
+    why: "The case in `test/level0/trunk-door.test.js` over a dotted script path passes on the old slash join too, because `clean` in `tokens.js` strips the leading dot before the door reads, so it proves nothing about the change: drop it, or hand the door a path the old join loses.; The comment over that case credits the join with a fact `clean` owns, so the note repeats a fact standing elsewhere: point it at `tokens.js` or drop it with the case.; `fileText` takes the hand and joins through `it.join`, and every caller hands it a hand, so the first bullet stands.; `holds` hands its own hand to `fileText`, and the slash it wrote is gone, so the second bullet stands.; The remaining case in `test/level0/precommit.test.js` drives `holds` under a join of its own over one fake disk, which runs the notes reading and the test reading both, and the record says it fails on its own assertion before the change, so the third bullet stands.; The notes reading takes its empty branch under that join, because the fake disk lists children by slash, and the standing notes case covers the full branch under the slash join.; The check on the tests-green commit exits zero by the record, and the lint over `src` exits zero here.; The three test files pass here, and the door's standing script case drives `reader` in `src/bridge/bash.js` already.; `notesIn` and `batteryHere` in `src/bridge/bash.js` still write the slash, and the ask names the hook alone, so that stays outside this ticket.; No handback stands on this ticket, so no retro question rides along."
 ---
 
 # Ask
@@ -315,17 +321,44 @@ The shared reading of a file takes the hand and joins the path through the hand'
 
 <!-- the form is files -->
 
+- spec/tickets/one-door-joins-a-path.md
+- spec/guidance/review/reviewing.md
+- .claude/skills/level0/lib/scripted.js
+- src/scripts/precommit.js
+- src/bridge/bash.js
+- test/level0/precommit.test.js
+- test/level0/trunk-door.test.js
+- src/doors/fake/disk.js
+- .claude/skills/level0/lib/private.js
+- .claude/skills/level0/lib/tested.js
+- .claude/skills/level0/lib/tokens.js
+- .claude/skills/level0/lib/bash.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+The case in `test/level0/trunk-door.test.js` over a dotted script path passes on the old slash join too, because `clean` in `tokens.js` strips the leading dot before the door reads, so it proves nothing about the change: drop it, or hand the door a path the old join loses.
+The comment over that case credits the join with a fact `clean` owns, so the note repeats a fact standing elsewhere: point it at `tokens.js` or drop it with the case.
+`fileText` takes the hand and joins through `it.join`, and every caller hands it a hand, so the first bullet stands.
+`holds` hands its own hand to `fileText`, and the slash it wrote is gone, so the second bullet stands.
+The remaining case in `test/level0/precommit.test.js` drives `holds` under a join of its own over one fake disk, which runs the notes reading and the test reading both, and the record says it fails on its own assertion before the change, so the third bullet stands.
+The notes reading takes its empty branch under that join, because the fake disk lists children by slash, and the standing notes case covers the full branch under the slash join.
+The check on the tests-green commit exits zero by the record, and the lint over `src` exits zero here.
+The three test files pass here, and the door's standing script case drives `reader` in `src/bridge/bash.js` already.
+`notesIn` and `batteryHere` in `src/bridge/bash.js` still write the slash, and the ask names the hook alone, so that stays outside this ticket.
+No handback stands on this ticket, so no retro question rides along.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the join stands in `fileText` alone, and the notes in `scripted.js`, `bash.js` and the hook's case point at the ticket; the trunk-door note claims a fact `clean` owns, and the first finding asks for it to move or go
 
 # Discussion
 
