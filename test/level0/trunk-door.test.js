@@ -81,12 +81,3 @@ test("a script standing nowhere leaves the command alone", async () => {
   assert.equal(denied(said), "", "the door says nothing");
 });
 
-// The door joins the script's path through the path module, so a dotted path reads as the plain one. [[spec/tickets/one-door-joins-a-path]]
-test("the door reads a script named with a leading dot through the one join", async () => {
-  const it = box("claude/a-thing");
-  it.disk.write(`${ROOT}/.se/scripts/edit.mjs`, 'writeFileSync("README.md", "one");\n');
-
-  const said = await onBash({ command: "node ./.se/scripts/edit.mjs" }, it);
-
-  assert.match(denied(said), /README\.md/);
-});
