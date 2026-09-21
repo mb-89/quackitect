@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -180,6 +180,17 @@ record:
     hash_after: 0c61e0f750d034c2531137af1a8610b4ff3be5ed
     answered:
       - name: lint
+        exit: 0
+        said: 35 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: implement/tests-green
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: cf82db27ed40f2af2f3ce0e4b56f0f35925bdb28
+    hash_after: cf82db27ed40f2af2f3ce0e4b56f0f35925bdb28
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 23 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: 35 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
@@ -334,11 +345,17 @@ The class: a record written in the wrong place. The second round's verdict stood
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/vale.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -346,11 +363,19 @@ The class: a record written in the wrong place. The second round's verdict stood
 
 <!-- the form is text -->
 
+The blanking runs two passes. The first blanks a span inside one line, so a lone mark finds no opening mark on the line under it. The second blanks a span wrapping over one line break, because the notes wrap their prose at a column and a span wraps with it. A lone mark stays unblanked on its own line, and the fault over it names that line. The case feeds both shapes: an item and a paragraph with a blank line between, and two items in a row. It asserts a fault stands on the item's line, and none on the line under it.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change stays in the shared blanking, the projected rule files, and the one case
+- the case drives Vale itself, and no fake stands in for it
+- the comment on the pattern names the order of the two passes and the ticket
+
 
 # verdict
 
