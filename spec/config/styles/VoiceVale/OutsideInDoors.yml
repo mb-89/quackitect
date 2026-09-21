@@ -24,7 +24,7 @@ script: |
     for j := 0; j < len(reads); j++ {
       if text.contains(t, reads[j]) { hit = true }
     }
-    if text.re_match(`"os/exec"`, t) { hit = true }
+    if text.re_match(`^(?:import )?"os(?:/[a-z]+)?"$`, t) { hit = true }
 
     if hit {
       matches = append(matches, {begin: at, end: at + len(line)})

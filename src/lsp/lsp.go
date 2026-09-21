@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"io"
 	"net/url"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -255,7 +254,7 @@ func uriOf(path string) string {
 	return "file://" + (&url.URL{Path: said}).EscapedPath()
 }
 
-var _ = os.Stdout
+var _ = stdout
 
 type errorOf string
 

@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: fd69b88ce70e20b26aac7aa4afdba7e9d5027018
+    hash_after: fd69b88ce70e20b26aac7aa4afdba7e9d5027018
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -233,11 +241,19 @@ The fake reaches the server package alone, and the other packages keep the real 
 
 <!-- the form is command -->
 
+./RUNME.sh lint src
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the rule, the config sections, the five Go packages' doors and callers, the door note's table and the cases
+- the tree in the server package reads through a disk with a memory fake beside it, and the other packages call their door, as the approach says
+- each door file's header and each wrapper's comment name the door note, and the disk interface names the ticket
+
 
 ## tests-green
 

@@ -11,7 +11,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"path/filepath"
 	"time"
 )
@@ -39,7 +38,7 @@ type indexAnswer struct {
 
 // [[spec/design_output/index#the-door-owns-the-database]]
 func indexPort(root string) (int, error) {
-	said, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(indexStandingAt)))
+	said, err := readFile(filepath.Join(root, filepath.FromSlash(indexStandingAt)))
 	if err != nil {
 		return 0, err
 	}

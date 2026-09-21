@@ -7,13 +7,14 @@ package main
 
 import (
 	"bytes"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
+	"errors"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/fsnotify/fsnotify"
+	"io/fs"
 )
 
 const poll = 250 * time.Millisecond
@@ -58,8 +59,8 @@ func newTailer(path string) *tailer {
 
 // [[spec/design_output/tui#a-rotation-starts-it-again]]
 func (t *tailer) read() ([]Record, bool, error) {
-	body, err := os.ReadFile(t.path)
-	if os.IsNotExist(err) {
+	body, err := readFile(t.path)
+	if errors.Is(err, fs.ErrNotExist) {
 		return nil, false, nil
 	}
 	if err != nil {

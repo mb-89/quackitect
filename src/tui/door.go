@@ -11,6 +11,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/fs"
 	"net"
 	"net/http"
 	"os"
@@ -109,3 +111,14 @@ func startIndex(root string) error {
 	}
 	return nil
 }
+
+// The outside every other file of this package reads through. [[spec/design_output/doors#a-door-reads-the-outside]]
+var stderr io.Writer = os.Stderr
+
+func exits(code int)                       { os.Exit(code) }
+func readFile(path string) ([]byte, error) { return os.ReadFile(path) }
+func writeFile(path string, data []byte, mode fs.FileMode) error {
+	return os.WriteFile(path, data, mode)
+}
+func statOf(path string) (fs.FileInfo, error)     { return os.Stat(path) }
+func makeDir(path string, mode fs.FileMode) error { return os.MkdirAll(path, mode) }

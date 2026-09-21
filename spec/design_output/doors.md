@@ -37,6 +37,7 @@ nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
 | `process.env` and `process.argv` | `it.env` or `box.env`, off the hand a root builds |
 | `process.platform` | a `windows` argument the root reads once |
 | the Go import running a command | a call into the package's `door.go` |
+| the Go import of `os`, or a package under it | a call into the package's `door.go`, which names each read once, and the tree in `src/lsp` reads through a disk a case fakes |
 
 A root stands off the rule, because it builds the hand every module past it
 reads. `.vale.ini` names each one in a section, beside the doors and their
