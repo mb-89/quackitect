@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -129,6 +129,12 @@ record:
       - name: check
         exit: 0
         said: 74 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-16
+    hash_before: af00125074df14589fea31ee461d612c6cff0491
+    hash_after: af00125074df14589fea31ee461d612c6cff0491
+    returns: 1
+    why: "`src/bridge/vehicle.js` calls `identityHere` with no pid at both of its calls, so an identity made through the port road ends in `NaN`.; The server root reads the pid nowhere and its box carries none, so the bridge module has nothing to take off the hand.; The rule grows the three reads, and the contract case feeds each at a module's path and asserts the refusal, then at every root and door and asserts a pass.; The review takes the node path off the box, and a case names its own node and asserts the spawn runs on it.; Every remaining read of the three stands under a section `.vale.ini` holds off the rule, and the lint exits at zero.; The note's table grows one row a read, and each changed read carries a comment naming the note.; The fix is craft: hand the pid into the bridge module's calls off the root that reaches it, and a case asserts the identity it makes ends in the pid."
 ---
 
 # Ask
@@ -318,17 +324,52 @@ The door rule's list grows the pid, the node version and the exec path, so a mod
 
 <!-- the form is files -->
 
+- spec/tickets/a-door-holds-three-reads.md
+- spec/guidance/review/reviewing.md
+- spec/config/styles/VoiceVale/OutsideInDoors.yml
+- spec/design_output/doors.md
+- .vale.ini
+- src/bridge/review.js
+- src/bridge/server.js
+- src/bridge/vehicle.js
+- src/scripts/cli-doors.js
+- src/scripts/cli.js
+- src/scripts/stub.js
+- src/scripts/vehicle.js
+- test/contract/outside-in-doors.test.js
+- test/contract/stub.test.js
+- test/contract/vehicle.test.js
+- test/level0/brand.test.js
+- test/level0/outside-hand.test.js
+- test/level0/review-door.test.js
+- test/level0/stub.test.js
+- test/level0/vehicle.test.js
+
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+`src/bridge/vehicle.js` calls `identityHere` with no pid at both of its calls, so an identity made through the port road ends in `NaN`.
+The server root reads the pid nowhere and its box carries none, so the bridge module has nothing to take off the hand.
+The rule grows the three reads, and the contract case feeds each at a module's path and asserts the refusal, then at every root and door and asserts a pass.
+The review takes the node path off the box, and a case names its own node and asserts the spawn runs on it.
+Every remaining read of the three stands under a section `.vale.ini` holds off the rule, and the lint exits at zero.
+The note's table grows one row a read, and each changed read carries a comment naming the note.
+The fix is craft: hand the pid into the bridge module's calls off the root that reaches it, and a case asserts the identity it makes ends in the pid.
+
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the list of reads stands in the rule file alone, the note's table pairs each read with what a module takes instead and repeats no other file, and the contract case holds each read only as a bad line it feeds the rule
+
 
 # Discussion
 
