@@ -36,6 +36,9 @@ nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
 |---|---|
 | `process.env` and `process.argv` | `it.env` or `box.env`, off the hand a root builds |
 | `process.platform` | a `windows` argument the root reads once |
+| `process.pid` | `it.pid`, off the hand a root builds, so an identity replays |
+| `process.version` | the root alone reads it, for the survey |
+| `process.execPath` | `it.node` or `box.node`, off the root |
 | the Go import running a command | a call into the package's `door.go` |
 | the Go import of `os`, or a package under it | a call into the package's `door.go`, which names each read once, and the tree in `src/lsp` reads through a disk a case fakes |
 

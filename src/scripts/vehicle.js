@@ -39,10 +39,10 @@ export function methodRootFrom(files, start) {
   return "";
 }
 
-// [[spec/design_output/vehicle#three-things-a-vehicle-needs]]
-export function identityHere(files, time, method) {
+// The pid comes off the hand a root builds, so an identity replays in a case. [[spec/design_output/doors#a-door-reads-the-outside]]
+export function identityHere(files, time, method, pid) {
   const at = join(method, IDENTITY);
-  const said = identityOf(readIf(files, at), idOf(time), time.stamp());
+  const said = identityOf(readIf(files, at), idOf(time, pid), time.stamp());
   if (said.made) {
     files.makeDir(dirname(at));
     files.write(at, `${JSON.stringify(said.record, null, 2)}\n`);
@@ -50,9 +50,9 @@ export function identityHere(files, time, method) {
   return said.record.id;
 }
 
-function idOf(time) {
+function idOf(time, pid) {
   const digits = time.stamp().replace(/[^0-9]/g, "");
-  return `${Number(digits.slice(-STAMP_TAIL)).toString(HEX)}${process.pid.toString(HEX)}`;
+  return `${Number(digits.slice(-STAMP_TAIL)).toString(HEX)}${Number(pid).toString(HEX)}`;
 }
 
 // [[spec/design_output/vehicle#the-register-places-an-identity]]
@@ -146,8 +146,8 @@ export function produce(files, method, dest, into) {
   return { ok: true, count };
 }
 
-export function entryFor(files, time, env, method, version) {
-  const id = identityHere(files, time, method);
+export function entryFor(files, time, env, method, version, pid) {
+  const id = identityHere(files, time, method, pid);
   return { id, entry: entryOf(id, version, method, time.stamp()), env };
 }
 

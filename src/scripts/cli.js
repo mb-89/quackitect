@@ -223,7 +223,7 @@ export function theVehicle(argv) {
   const env = process.env;
   const said = argv[0] ?? "here";
   const pair = rootsHere(files, env, root);
-  const made = entryFor(files, it.clock, env, pair.method, version());
+  const made = entryFor(files, it.clock, env, pair.method, version(), it.pid);
 
   if (said === "produce" || said === "into") {
     const dest = argv[1];
@@ -319,6 +319,7 @@ export function theStub(argv) {
     it.clock,
     pair.method,
     atRoot(dest),
+    it.pid,
     {
       upstream,
     },

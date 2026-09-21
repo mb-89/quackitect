@@ -261,6 +261,7 @@ export function boxOf(method, work = method, doors = {}) {
     root: work,
     // The root builds the box, so the modules past it read the environment here. [[spec/design_output/doors#a-door-reads-the-outside]]
     env: doors.env ?? process.env,
+    node: doors.node ?? process.execPath,
     disk: files,
     clock: time,
     proc: outside,

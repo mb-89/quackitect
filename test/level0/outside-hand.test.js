@@ -17,9 +17,16 @@ import { work } from "../../src/scripts/work.js";
 
 const CLOUD = { CLAUDE_CODE_REMOTE: "true" };
 
-test("the box a root builds carries the environment", () => {
+test("the box a root builds carries the environment and the node path", () => {
   const said = boxOf("/tree", "/tree", { disk: fakeDisk(), clock: fakeClock() });
   assert.equal(typeof said.env, "object");
+  assert.equal(typeof said.node, "string");
+  const named = boxOf("/tree", "/tree", {
+    disk: fakeDisk(),
+    clock: fakeClock(),
+    node: "/node/bin/node",
+  });
+  assert.equal(named.node, "/node/bin/node", "a case names its own node");
 });
 
 test("the hand rule reads the cloud off the hand, and none off the box", () => {

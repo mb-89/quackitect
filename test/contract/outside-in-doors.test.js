@@ -11,6 +11,7 @@ import { lintText } from "../../.claude/skills/level0/lib/vale.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 import { readTools, whereIs } from "../../src/engine/tools.js";
+import { it } from "../../src/scripts/cli-doors.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -155,4 +156,11 @@ ifVale("the rule passes every root and every door reading the three", async () =
     assert.ok(!(await ruledAt(VERSION, where)).includes(RULE), where);
     assert.ok(!(await ruledAt(EXEC, where)).includes(RULE), where);
   }
+});
+
+// The hand the command root builds carries the pid and the node path, so a module past it reads neither in place. [[spec/design_output/doors#a-door-reads-the-outside]]
+test("the hand a root builds carries the pid and the node path", () => {
+  assert.equal(typeof it.pid, "number");
+  assert.equal(typeof it.node, "string");
+  assert.ok(it.node.length > 0);
 });

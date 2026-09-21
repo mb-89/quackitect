@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 77d37a4d517dc74d99a711bbf96163466cf9a6fa
+    hash_after: 77d37a4d517dc74d99a711bbf96163466cf9a6fa
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -233,11 +241,19 @@ The doors and their fakes keep their reads under the sections standing, and the 
 
 <!-- the form is command -->
 
+./RUNME.sh lint src
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the rule, the two modules, the two roots that hand the value in, the stub's entry, the note's table and the cases
+- the identity and the review take the value off the hand or the box, which every case fakes
+- each changed read carries a comment naming the door note
+
 
 ## tests-green
 
@@ -249,11 +265,17 @@ The doors and their fakes keep their reads under the sections standing, and the 
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/outside-in-doors.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -261,11 +283,19 @@ The doors and their fakes keep their reads under the sections standing, and the 
 
 <!-- the form is text -->
 
+The door rule's list grows the pid, the node version and the exec path, so a module past a root reading one of them meets the rule. Two modules held such a read. The identity in the vehicle module now takes the pid as an argument, and the command root hands it in off the hand it builds, so a case hands a pid of its own and the identity replays. The review door takes the node path off the box, which the server root puts there as `node`, the way the command root already does. Every door and every root keeps its read under the section standing for it, and the note's table names each of the three reads beside what a module takes instead.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the rule, the two modules, the two roots, the stub's entry, the note's table and the cases
+- the identity's case hands a pid of its own, and the Vale case drives the real binary
+- each changed read carries a comment naming the door note
+
 
 # verdict
 

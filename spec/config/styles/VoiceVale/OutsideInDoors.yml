@@ -6,7 +6,7 @@ scope: raw
 script: |
   text := import("text")
 
-  reads := ["process.env", "process.argv", "process.platform"]
+  reads := ["process.env", "process.argv", "process.platform", "process.pid", "process.version", "process.execPath"]
 
   lines := text.split(scope, "\n")
   matches := []
