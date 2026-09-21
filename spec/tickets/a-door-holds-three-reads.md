@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -99,6 +99,17 @@ record:
     hand: box d40a1b367f4d · claude-code-remote · helper-15
     hash_before: afa7b4ea74759bc13095e252ff5c007e4e5bdf3c
     hash_after: afa7b4ea74759bc13095e252ff5c007e4e5bdf3c
+  - step: implement/tests-red
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: f10c071997dd7e05fca4b92294ef2a38e04adc90
+    hash_after: f10c071997dd7e05fca4b92294ef2a38e04adc90
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -171,17 +182,30 @@ The doors and their fakes keep their reads under the sections standing, and the 
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/outside-in-doors.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the case feeds the rule each of the three reads at a module's path, and the rule passes all three, because its list names the environment, the arguments and the platform alone
+- the case over every root and every door passes already
+- what surprises the hand: nothing, because the rule reads a fixed list and the three stand outside it
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases stand in the Vale contract test alone, and the change reaches the rule and the two modules
+- the cases drive the real Vale, and the two modules take the value off the hand, which a case fakes
+- each case's comment names the door note, and the two modules' comments name the same
+
 
 ## reflect
 

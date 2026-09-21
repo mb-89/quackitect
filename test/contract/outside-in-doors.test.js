@@ -137,3 +137,22 @@ ifVale("the rule passes the door of every Go package, and a Go case", async () =
   }
   assert.ok(!(await ruledAt(OS, "src/lsp/tree_test.go")).includes(RULE));
 });
+
+// A module reading the pid, the node version or the exec path in place takes the box into every case of it. [[spec/design_output/doors#a-door-reads-the-outside]]
+const PID = "const owner = String(process.pid);\n";
+const VERSION = 'const node = process.version.replace(/^v/, "");\n';
+const EXEC = "const argv = [process.execPath, script];\n";
+
+ifVale("the rule refuses a module past a root reading the pid, the version or the exec path", async () => {
+  assert.ok((await ruledAt(PID, "src/scripts/vehicle.js")).includes(RULE));
+  assert.ok((await ruledAt(VERSION, "src/bridge/review.js")).includes(RULE));
+  assert.ok((await ruledAt(EXEC, "src/bridge/review.js")).includes(RULE));
+});
+
+ifVale("the rule passes every root and every door reading the three", async () => {
+  for (const where of [...ROOTS, "src/doors/session.js", "src/doors/fake/proc.js"]) {
+    assert.ok(!(await ruledAt(PID, where)).includes(RULE), where);
+    assert.ok(!(await ruledAt(VERSION, where)).includes(RULE), where);
+    assert.ok(!(await ruledAt(EXEC, where)).includes(RULE), where);
+  }
+});
