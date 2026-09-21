@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -118,6 +118,17 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 1e593a008b42b873981765aa3d8be4ec763867de
+    hash_after: 1e593a008b42b873981765aa3d8be4ec763867de
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 11 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 59 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
@@ -265,11 +276,17 @@ The fake reaches the server package alone, and the other packages keep the real 
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/outside-in-doors.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -277,11 +294,19 @@ The fake reaches the server package alone, and the other packages keep the real 
 
 <!-- the form is text -->
 
+The door rule refuses a Go import line naming `os` or a package under it, beside the command import it refused before. The config lets a `door.go` at any depth under the source root stand off the rule, and a Go case too, because a case drives the real thing over a folder it writes. Each Go package names the outside in its `door.go` alone: a reading, a writing, a stat, a folder, a remove, the executable, the environment, the arguments, the exit, the streams, the pid and the stop signal. The config and swap packages take a `door.go` of their own, and every other file calls the door's name. The server's tree reads through a disk interface the door defines, the real one behind it, and a memory disk in the cases, so a case drives the tree with no folder on the box. The path readers move out of the tree file into `holds.go`, because the tree file crossed the file ceiling.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the rule, the config sections, the five Go packages' doors and callers, the door note's table and the cases
+- the tree reads through the memory disk in its case, and the Vale case drives the real binary
+- the door files and the disk interface name the door note and the ticket
+
 
 # verdict
 
