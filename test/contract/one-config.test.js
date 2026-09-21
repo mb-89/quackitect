@@ -4,8 +4,6 @@
 // [[spec/tickets/every-road-reads-one-config]]
 
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -29,7 +27,7 @@ const TEXT = `The door reads ${WORD} and refuses it.\n`;
 
 // A work root beside this tree, holding one rule of its own and a config naming it. [[spec/tickets/every-road-reads-one-config]]
 function workRoot() {
-  const work = mkdtempSync(join(tmpdir(), "one-config-"));
+  const work = files.tempDir("one-config-");
   files.makeDir(join(work, ...STYLES.split("/"), "VoiceProject"));
   files.write(
     join(work, ...STYLES.split("/"), "VoiceProject", "Ours.yml"),
@@ -79,6 +77,6 @@ ifVale("a rule a project alone carries refuses on every road", async () => {
     const copilot = await runtime.check(TEXT, NOTE, { vale: bin, biome: "", run, config, cwd: work });
     assert.match(copilot, new RegExp(RULE), "the copilot road refuses the word");
   } finally {
-    rmSync(work, { recursive: true, force: true });
+    files.remove(work);
   }
 });
