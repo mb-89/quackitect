@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -135,6 +135,10 @@ record:
     hash_after: af00125074df14589fea31ee461d612c6cff0491
     returns: 1
     why: "`src/bridge/vehicle.js` calls `identityHere` with no pid at both of its calls, so an identity made through the port road ends in `NaN`.; The server root reads the pid nowhere and its box carries none, so the bridge module has nothing to take off the hand.; The rule grows the three reads, and the contract case feeds each at a module's path and asserts the refusal, then at every root and door and asserts a pass.; The review takes the node path off the box, and a case names its own node and asserts the spawn runs on it.; Every remaining read of the three stands under a section `.vale.ini` holds off the rule, and the lint exits at zero.; The note's table grows one row a read, and each changed read carries a comment naming the note.; The fix is craft: hand the pid into the bridge module's calls off the root that reaches it, and a case asserts the identity it makes ends in the pid."
+  - step: implement/reflect
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 7bcf87db7bbe8963ab450e68febd681ad213a3ef
+    hash_after: 7bcf87db7bbe8963ab450e68febd681ad213a3ef
 ---
 
 # Ask
@@ -242,11 +246,19 @@ The doors and their fakes keep their reads under the sections standing, and the 
 
 <!-- the form is text -->
 
+The class: a signature changed at its definition and at the callers one search found, and not at the callers a second road holds. The identity took a pid, the command root handed it in, and the bridge's vehicle module still called the old shape, so an identity made through the port road ended in no number. The fix for the class: search for every caller of a changed name before the change closes, and give the case a tree with no identity, because a tree holding one never runs the road that makes it.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fix touches the bridge's vehicle module, its two roots and the cases, and nothing the ask leaves out
+- the bridge takes the pid off the box or the hand, which every case fakes
+- the changed calls carry the comment naming the door note
+
 
 ## change
 
