@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { posix } from "node:path";
 import { test } from "node:test";
-import { handle } from "../../.claude/skills/level0/lib/copilot-runtime.js";
+import { check, handle } from "../../.claude/skills/level0/lib/copilot-runtime.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { fakeSession } from "../../src/doors/fake/session.js";
@@ -349,4 +349,23 @@ test("a hold standing drops its step's note from the layer the runtime hands", a
   );
   assert.match(result.context, /Answer first\./);
   assert.match(result.context, /rules: 1/);
+});
+
+// The copilot check hands Vale the config the root assembles, and runs from the work root, so a project's rule reads on this road. [[spec/design_output/vehicle#the-styles-assemble-once]]
+test("the check hands Vale the assembled config and the work root", async () => {
+  const seen = [];
+  const run = async (argv, init) => {
+    seen.push({ argv, init });
+    return { exitCode: 0, stdout: "{}" };
+  };
+  const said = await check("A note.\n", "notes.md", {
+    vale: "/bin/vale",
+    biome: "/bin/biome",
+    run,
+    config: ".se/vale/.vale.ini",
+    cwd: "/project",
+  });
+  assert.equal(said, "");
+  assert.ok(seen[0].argv.includes("--config=.se/vale/.vale.ini"), seen[0].argv.join(" "));
+  assert.equal(seen[0].init.cwd, "/project");
 });

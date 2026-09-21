@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 4dad98b733958f088f295fa60b467713fb5b657b
+    hash_after: 4dad98b733958f088f295fa60b467713fb5b657b
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -232,11 +240,19 @@ The copilot root builds no pair today, so the change imports `rootsHere` from th
 
 <!-- the form is command -->
 
+./RUNME.sh lint src
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the findings road, the copilot road and its root, and the cases, and the answer gate stands as it is
+- each road reaches Vale alone, which the unit cases fake and the contract case drives
+- each road's change names the vehicle note's chapter on the assembly
+
 
 ## tests-green
 
@@ -248,11 +264,17 @@ The copilot root builds no pair today, so the change imports `rootsHere` from th
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/one-config.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -260,11 +282,19 @@ The copilot root builds no pair today, so the change imports `rootsHere` from th
 
 <!-- the form is text -->
 
+The findings road hands Vale the config the assembly writes over the pair of roots, and runs from the work root, where a project's notes stand. The copilot root reads the pair the vehicle module answers and hands the road a way to the assembled config, and the road's check takes that config and runs from the work root. The answer gate lints through the door, which assembled the pair already, so it stands as it is. The contract case writes a work root beside this tree holding one rule of its own, and asserts the answer gate, the findings road and the copilot check each refuse the word that rule names.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the findings road, the copilot road and its root, and the cases
+- the contract case drives the real Vale over a work root it writes and removes, and the unit cases fake the process
+- each road's change names the vehicle note's chapter on the assembly
+
 
 # verdict
 
