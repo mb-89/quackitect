@@ -89,12 +89,16 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
     hash_before: c5170eec116cc969e27807521797e4d4550064ad
     hash_after: c5170eec116cc969e27807521797e4d4550064ad
+  - step: design/review
+    hand: box d40a1b367f4d · claude-code-remote · helper-22
+    hash_before: aac3088b08ed7c36e94931b663a418d73f43d864
+    hash_after: aac3088b08ed7c36e94931b663a418d73f43d864
 ---
 
 # Ask
@@ -146,6 +150,11 @@ Each road hands Vale the config the assembly writes, off the pair of roots, and 
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+The three roads and the pair each meet a named change, and the contract case feeds a project's rule bad text on every road.
+The findings road runs Vale from the method root, so the change runs it from the work root the way the door does.
+The copilot root builds no pair today, so the change imports `rootsHere` from the vehicle script and hands the pair in.
 
 # implement
 
