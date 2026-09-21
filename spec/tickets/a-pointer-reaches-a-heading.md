@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: misc
 steps:
   - name: design
@@ -129,6 +129,11 @@ record:
       - name: check
         exit: 0
         said: 95 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-19
+    hash_before: 3112091fdf9587b8ffbc4102ed2dec97f3b1944f
+    hash_after: 3112091fdf9587b8ffbc4102ed2dec97f3b1944f
+reason: done
 ---
 
 # Ask
@@ -315,17 +320,94 @@ The server reads every pointer a tracked file carries, resolves the note the way
 
 <!-- the form is files -->
 
+- .claude/skills/level0/lib/answer.js
+- .claude/skills/level0/lib/refuse.js
+- .claude/skills/level0/lib/schema-body.js
+- .claude/skills/level0/lib/schema-route.js
+- .claude/skills/level0/lib/stop.js
+- .claude/skills/level0/lib/tested.js
+- spec/design_input/the-agent-pulls-tickets.html
+- spec/design_output/extension.md
+- spec/design_output/level0.md
+- spec/design_output/log.md
+- spec/design_output/lsp.md
+- spec/guidance/review/reviewing.md
+- spec/tickets/a-pointer-reaches-a-heading.md
+- spec/tickets/a-step-changes-hands.md
+- spec/tickets/the-colours-stand-in-config.md
+- src/bridge/bash.js
+- src/bridge/findings.js
+- src/bridge/stop.js
+- src/extension/editor.js
+- src/extension/extension.js
+- src/extension/lib/lsp.js
+- src/index/door.go
+- src/index/index.go
+- src/index/watch.go
+- src/lsp/anchor.go
+- src/lsp/anchor_test.go
+- src/lsp/check.go
+- src/lsp/door.go
+- src/lsp/finding.go
+- src/lsp/lsp.go
+- src/lsp/main.go
+- src/lsp/marked.go
+- src/lsp/panel.go
+- src/lsp/paths.go
+- src/lsp/restated.go
+- src/lsp/schema-body.go
+- src/lsp/schema.go
+- src/lsp/schema_test.go
+- src/lsp/serve.go
+- src/lsp/tree.go
+- src/scripts/cli-check.js
+- src/scripts/cli-doors.js
+- src/scripts/cli-read.js
+- src/scripts/cli.js
+- src/scripts/guidance-hand.js
+- src/scripts/install.sh
+- src/scripts/pull-route.js
+- src/scripts/pull.js
+- src/scripts/work-answer.js
+- src/scripts/work.js
+- src/tui/help.go
+- src/tui/tail.go
+- src/tui/tree_test.go
+- test/contract/cli-mint-callers.test.js
+- test/contract/cli-read.test.js
+- test/contract/cli-verbs.test.js
+- test/contract/ticket.test.js
+- test/contract/tree.test.js
+- test/level0/lsp.test.js
+- test/level0/projection.test.js
+- test/level0/pull-leaves.test.js
+- test/level0/schema-route.test.js
+- test/level0/stop.test.js
+- test/level0/work.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+The check draws DeadAnchor with the file, the line and the anchor, and a probe note with a pointer at a heading its note lacks draws it at error.
+The cases feed a pointer at a heading the note lacks and assert the draw, and the server's tests pass.
+The lint exits zero, and the built server carries the rule.
+The comment-only commit lands past the door rightly, because the door reads a source path as code without reading the hunk, and the anchor check proves each pointer it moves.
+The ask names a viewer folder the tree holds nowhere, and the sweep names every dead pointer the tree holds instead.
+The import moves under the index and the tui stand beyond the ask as a trivial fix.
+The comment and the chapter hand a pointer at a note the tree lacks to a link check the server holds nowhere, so such a pointer draws nothing.
+The note ending pair stands in three files now, and the anchor check adds the third copy beside the heading resolver of the restated rule.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The chapter names the check and the heading resolver by their file and repeats no message text, and the one fact the change copies is the note ending pair, named in the findings.
 
 # Discussion
 
