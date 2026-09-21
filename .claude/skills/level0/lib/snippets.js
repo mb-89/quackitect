@@ -71,8 +71,9 @@ const HELPERS = new Map([
       "  out = blanked(out, `(?s)~~~.*?~~~`)",
       "  out = blanked(out, `(?s)<!--.*?-->`)",
       "  out = blanked(out, `(?m)^(?:\\t| {4,}).*$`)",
-      // A span wraps over one line break at most, so a lone mark reaches no span past the next line. [[spec/tickets/a-lone-mark-pairs-wrong]]
-      '  out = blanked(out, "`[^`\\n]*(?:\\n[^`\\n]*)?`")',
+      // A span inside one line blanks first, then a span wrapping over one line break, so a lone mark takes no opening mark off the next line. [[spec/tickets/a-lone-mark-pairs-wrong]]
+      '  out = blanked(out, "`[^`\\n]*`")',
+      '  out = blanked(out, "`[^`\\n]*\\n[^`\\n]*`")',
       "  out = blanked(out, `https?://[^\\s)]+`)",
       "  out = blanked(out, `\\[\\[[^\\]]*\\]\\]`)",
       "  out = blanked(out, `\\[[^\\]]*\\]\\([^)]*\\)`)",

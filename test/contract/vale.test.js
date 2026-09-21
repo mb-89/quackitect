@@ -284,20 +284,20 @@ test("a count in words before a plural meets the digit rule, and a count word al
   assert.deepEqual((await inRegister(quiet, note)).filter((one) => one === "DigitInProse"), []);
 });
 
-// A mark pairs inside its own line, so a lone one leaves the span under it whole and every fault names the item's line. [[spec/tickets/a-lone-mark-pairs-wrong]]
+// A span inside one line pairs first, so a lone mark takes no opening mark off the line under it, and every fault names the item's line. [[spec/tickets/a-lone-mark-pairs-wrong]]
 ifVale("a lone mark on a list item pairs with no span under it", async () => {
-  const text = [
-    "- the mark ` opens a span, and the door reads it",
-    "",
-    "The door reads `x` on this line, and the rule leaves it alone.",
-    "",
-  ].join("\n");
-  const said = await lintText(text, "notes.md", { run, bin });
-  assert.ok(said.ran, `vale ran: ${said.why}`);
-  const lines = said.found.map((one) => one.line);
-  assert.ok(!lines.includes(3), `the paragraph line draws: ${JSON.stringify(said.found)}`);
-  assert.ok(
-    lines.every((one) => one === 1),
-    `a fault stands off the item's line: ${JSON.stringify(said.found)}`,
-  );
+  const shapes = [
+    ["- the mark ` opens a span, and the door reads it", "", "The door reads `x` on this line, and the rule leaves it alone."],
+    ["- the mark ` opens a span, and the door reads it", "- the door reads `x` on this item, and the rule leaves it alone"],
+  ];
+  for (const shape of shapes) {
+    const said = await lintText(`${shape.join("\n")}\n`, "notes.md", { run, bin });
+    assert.ok(said.ran, `vale ran: ${said.why}`);
+    const lines = said.found.map((one) => one.line);
+    assert.ok(lines.includes(1), `no fault names the item's line: ${JSON.stringify(said.found)}`);
+    assert.ok(
+      lines.every((one) => one === 1),
+      `a fault stands off the item's line: ${JSON.stringify(said.found)}`,
+    );
+  }
 });

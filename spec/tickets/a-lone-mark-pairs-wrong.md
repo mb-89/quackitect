@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -145,6 +145,14 @@ record:
     hand: box d40a1b367f4d · claude-code-remote
     hash_before: a6eb98ca126201efc9f317eaf955b5b187b6f520
     hash_after: a6eb98ca126201efc9f317eaf955b5b187b6f520
+  - step: implement/change
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 72eaf3524c8892b681609400f38801275c81d96e
+    hash_after: 72eaf3524c8892b681609400f38801275c81d96e
+    answered:
+      - name: lint
+        exit: 0
+        said: 57 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
@@ -282,9 +290,9 @@ The class: a fix proved on the one shape the ask names, and not on the shape bes
 
 <!-- the form is checklist -->
 
-- the change touches the shared blanking, the rule files the project verb writes off it, and the case
-- the rules reach Vale alone, and the case drives the real one the way every case in `test/contract` does
-- the comment on the pattern names the ticket, and says a span wraps over one line break at most, because the notes wrap their prose and a span wraps with it
+- the change stays in the shared blanking, the projected rule files, and the one case
+- the case drives Vale itself, and no fake stands in for it
+- the comment on the pattern names the order of the two passes and the ticket
 
 
 ## tests-green
@@ -297,17 +305,11 @@ The class: a fix proved on the one shape the ask names, and not on the shape bes
 
 <!-- the form is command -->
 
-./RUNME.sh branch test test/contract/vale.test.js
-
-
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
-
-./RUNME.sh check
-
 
 ### says
 
@@ -315,19 +317,11 @@ The class: a fix proved on the one shape the ask names, and not on the shape bes
 
 <!-- the form is text -->
 
-The blanking every script rule shares paired a code span over the whole text, so a lone mark on one line took the opening mark of the next span as its partner, and the closing mark of that span stood alone two lines below the cause. The pattern now stops a span at one line break: a span wraps with the prose it stands in, and the notes wrap at a column, so a span crossing one line break is a span, and a mark reaching past the next line is a lone one. The fault over a lone mark names the line the mark stands on, and the paragraph under it draws nothing. The rule files under `VoiceParagraph` carry the pattern as the project verb writes them, and nobody edits them by hand.
-
-
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
-
-- the change stands in the shared blanking, the rule files projected off it, and the one case
-- the case drives Vale itself, the one door the rules reach, and no fake stands in
-- the pattern's comment names the ticket and the reason the span crosses one line break
-
 
 # verdict
 
