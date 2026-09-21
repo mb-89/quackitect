@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 2d52b1412f3c3303a66b62824b1c271e1bb40133
+    hash_after: 2d52b1412f3c3303a66b62824b1c271e1bb40133
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -232,11 +240,19 @@ A second sentence stays under the list item cap of twenty words, or the lint ref
 
 <!-- the form is command -->
 
+./RUNME.sh lint spec/guidance
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the rule file, every guidance note holding a marked rule of one sentence, the guidance rule, its rationale chapter, the projections off the guidance, and the cases
+- the rule reaches Vale alone, and the cases drive the real one
+- the rule file links the guidance note, and the new rule names the rule file
+
 
 ## tests-green
 

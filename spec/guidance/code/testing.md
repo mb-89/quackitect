@@ -6,9 +6,9 @@ rationale: [[spec/rationales/testing]]
 
 # Actionables
 
-1. Reach the outside through a door under `src/doors`, and nowhere else. *
+1. Reach the outside through a door under `src/doors`, and nowhere else. A module reading the outside in place takes the box into every test of it. *
 2. Write a normal test against a fake from `src/doors/fake`. It touches memory and nothing else. *
-3. Put a test that drives the real thing in `test/contract`, one per door. *
+3. Put a test that drives the real thing in `test/contract`, one per door. A door nobody drives fails on the first box its fake misses. *
 4. Write a fake that behaves. A double scripting the answer tests the script. *
 5. Open a hard piece with a design doc, and a simple one with the test. Then write the code, and watch a test fail for the reason you expect before you make it pass. The commit door refuses a change standing with no test, and `EveryModuleTested` reads the tree. *
 6. Name a test as the claim it makes, and assert every word of that claim.

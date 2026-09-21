@@ -11,7 +11,7 @@ style: true
 2. Ask of each sentence whether it stands inside your authority. Point at who owns it where it does not. *
 3. Make no assertion from recall. Check it first. *
 4. Put no number in prose, because a number goes stale. A date fixing a source stands. *
-5. Make sure a thing stands nowhere already, before you write it. *
+5. Make sure a thing stands nowhere already, before you write it. A second copy drifts from the first, and a reader finds the wrong one. *
 
 # Examples
 

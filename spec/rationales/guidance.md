@@ -109,3 +109,15 @@ The rows stand in a chapter of their own, so each rule stays one line the
 judge reads. The projection carries the table under the rules, so the shape
 reaches the agent with the rule.
 
+## 13. The failure beside the rule
+
+A rule standing as one instruction leaves a reader guessing what breaks
+without it. The reader then applies it where it costs and skips it where it
+bites. The instruction alone says nothing about which case is which.
+A second sentence naming the failure hands the reader the reason with the
+rule. A reader holding half of it then still holds what it guards.
+
+The check counts sentences on a marked rule alone. An unmarked rule holds no
+argument, so it takes no second sentence. The ticket
+[[spec/tickets/a-rule-names-its-failure]] carries the change that wrote every
+marked rule under `spec/guidance` in two sentences.
