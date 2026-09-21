@@ -110,3 +110,22 @@ ifVale("no prose rule reaches a shell script", async () => {
     [],
   );
 });
+
+// A reader holding half a rule still holds what it guards, so a marked rule names the failure in a second sentence. [[spec/guidance/guidance]]
+const marked = (rules) => `${front("")}# Actionables\n\n${rules.join("\n")}\n`;
+
+ifVale("a marked rule standing as one sentence is refused, and two sentences pass", async () => {
+  const one = marked(["1. Run the check before you hand the branch back. *"]);
+  assert.ok((await ruled(one, NOTE)).includes("VoiceShape.MarkedRuleNamesFailure"));
+  const two = marked([
+    "1. Run the check before you hand the branch back. A red branch costs the reader a round. *",
+    "2. Read `spec/guidance/voice.md` first, because it holds the register. *",
+  ]);
+  const found = (await ruled(two, NOTE)).filter((rule) => rule === "VoiceShape.MarkedRuleNamesFailure");
+  assert.equal(found.length, 1, "the clause opened by because is one sentence, and the two sentences pass");
+});
+
+ifVale("an unmarked rule standing as one sentence passes the marked rule check", async () => {
+  const bare = marked(["1. Run the check before you hand the branch back."]);
+  assert.ok(!(await ruled(bare, NOTE)).includes("VoiceShape.MarkedRuleNamesFailure"));
+});

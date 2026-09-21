@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -99,6 +99,17 @@ record:
     hand: box d40a1b367f4d · claude-code-remote · helper-20
     hash_before: 141fc89d9930393cb80db588ade508ce3a7c940f
     hash_after: 141fc89d9930393cb80db588ade508ce3a7c940f
+  - step: implement/tests-red
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: c1438220558299ffdcca63692890cdc72560a748
+    hash_after: c1438220558299ffdcca63692890cdc72560a748
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -170,17 +181,30 @@ A second sentence stays under the list item cap of twenty words, or the lint ref
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/shape.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the case feeds Vale a guidance note with a marked rule of one sentence, and no rule refuses it, because the shape folder holds no such rule yet
+- the case with two sentences and the case with an unmarked rule pass already
+- what surprises the hand: the shared chapter fixture in this test writes one-sentence marked rules, so the case writes a fixture of its own
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases stand in the shape contract test, and the change reaches the rule file, the guidance notes, the guidance rule and its rationale chapter
+- the cases drive the real Vale, and the rule reaches no door past it
+- each case's comment names the guidance note, and the rule file links it
+
 
 ## reflect
 
