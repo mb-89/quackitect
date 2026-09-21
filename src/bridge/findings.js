@@ -30,7 +30,7 @@ import {
 } from "../extension/lib/grid.js";
 import { asks } from "./config.js";
 
-// The folders no rule reads: the private folder, the packages, git, and a draft under an underscore. [[spec/design_output/tree#the-reader]]
+// The folders no rule reads: the private folder, the packages, git, and a draft under an underscore. [[spec/design_output/tree#the-tree-handed-in]]
 export const PARKED = [
   "{.se,node_modules,.git,.claude/types,.claude/worktrees}/**",
   "**/_*",
@@ -165,7 +165,7 @@ function from(one, source) {
   return { ...one, source };
 }
 
-// [[spec/design_output/tree#the-reader]]
+// [[spec/design_output/tree#the-tree-handed-in]]
 export function walkOver(it, where, wanted = PROSE) {
   const out = [];
   const into = (path) => {
@@ -189,7 +189,7 @@ export function walkOver(it, where, wanted = PROSE) {
   return out;
 }
 
-// A path reads relative to the root in forward slashes, whichever slash either one arrives in. [[spec/design_output/tree#the-reader]]
+// A path reads relative to the root in forward slashes, whichever slash either one arrives in. [[spec/design_output/tree#the-tree-handed-in]]
 export function showOf(it, file) {
   const path = String(file).split("\\").join("/");
   const root = String(it.root).split("\\").join("/").replace(/\/+$/, "");

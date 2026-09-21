@@ -219,7 +219,7 @@ export function answerOf(it, queue = true) {
   const places = queue ? placesIn(it, read, stood) : new Map();
   // The overrides light the todo letter, so a person reads which rows a place moves. [[spec/design_output/pull#a-todo-forces-a-place]]
   const overrides = planHere(it).places;
-  // A branch row stands for its group, so a trunk ticket under that group rides the branch and no other row. [[spec/design_output/work#one-verb-answers-git]]
+  // A branch row stands for its group, so a trunk ticket under that group rides the branch and no other row. [[spec/design_output/work#one-reading-answers-git]]
   const branched = new Set(read.stand.map((one) => one.name));
   // A ticket waiting on one still open carries the flag saying so. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
   const open = new Set(

@@ -182,7 +182,7 @@ function versionGuard(command, _e, box) {
   return refusedVersion(found);
 }
 
-// [[spec/design_output/work#a-red-battery-pushes-nothing]]
+// [[spec/design_output/work#the-battery-answers-first]]
 function trunkGuard(command, _e, box) {
   const how = landsOnTrunk(
     command,
@@ -223,7 +223,7 @@ function trunkGuard(command, _e, box) {
   ].join("\n");
 }
 
-// A CLOUD BOX HOLDING A WORK BRANCH HANDS IT BACK, AND EVERY OTHER CLOUD SESSION LANDS ITS OWN WORK. The queue owns a work branch, so a cloud box taking one carries it to the hand-back and moves trunk nowhere. A session outside that flow answers to the owner alone, and the green battery is the door it meets. [[spec/design_output/work#a-red-battery-pushes-nothing]]
+// A CLOUD BOX HOLDING A WORK BRANCH HANDS IT BACK, AND EVERY OTHER CLOUD SESSION LANDS ITS OWN WORK. The queue owns a work branch, so a cloud box taking one carries it to the hand-back and moves trunk nowhere. A session outside that flow answers to the owner alone, and the green battery is the door it meets. [[spec/design_output/work#the-battery-answers-first]]
 function takesABranch(box) {
   return git(box, ["rev-parse", "--abbrev-ref", "HEAD"]).startsWith(WORK_BRANCH);
 }

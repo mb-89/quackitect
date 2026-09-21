@@ -1,6 +1,6 @@
 // The doors the command line runs behind, and where each tool stands. Every
 // other cli file reads this one, and this one reads none of them.
-// [[spec/design_output/doors#the-doors-stand-once]]
+// [[spec/design_output/doors#one-door-per-outside-thing]]
 
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";

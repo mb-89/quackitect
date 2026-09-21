@@ -1,6 +1,6 @@
 // What the check runs past the tests: the server, the grid, the viewer, the
 // projections, the plugin, the doors, the rules and the sidebar.
-// [[spec/design_output/level0#the-check]]
+// [[spec/design_output/level0#the-check-reads-the-server]]
 
 import { dirname, join, resolve, sep } from "node:path";
 import { CONFIG_DIR } from "../../.claude/skills/level0/lib/code.js";
