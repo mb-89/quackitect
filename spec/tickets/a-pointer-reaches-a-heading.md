@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -99,6 +99,17 @@ record:
     hand: box d40a1b367f4d · claude-code-remote · helper-18
     hash_before: 5da6e0185f683d04253aa81d56cd888612d47457
     hash_after: 5da6e0185f683d04253aa81d56cd888612d47457
+  - step: implement/tests-red
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 0b789021bb261c31a424ff358ae8035bde484967
+    hash_after: 0b789021bb261c31a424ff358ae8035bde484967
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/lsp fails
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -168,17 +179,30 @@ The check reads a raw row, so the case says what a pointer inside a code span dr
 
 <!-- the form is command -->
 
+./RUNME.sh branch test src/lsp/anchor_test.go
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the check stands as a name answering nothing, so each case reads an empty list where it wants a finding
+- the fixture writes a tree of its own, so a case names a note, a pointer at its heading, a pointer at a heading it lacks, and a pointer at a note the tree lacks
+- what surprises the hand: the branch test reads a Go case that builds and fails as an assertion, and one that builds not as a build fault, so the stub stands first
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases stand beside the check in the server package, and the change reaches the check, its fronts, the note and the pointers the sweep names
+- the cases drive the tree over a folder the fixture writes, and the check reaches no door past the tree
+- the check's header and each case's comment name the chapter the note takes
+
 
 ## reflect
 
