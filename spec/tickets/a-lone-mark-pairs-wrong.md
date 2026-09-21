@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: misc
 steps:
   - name: design
@@ -193,6 +193,11 @@ record:
       - name: check
         exit: 0
         said: 35 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-13
+    hash_before: e94777c0d9703e7bc95618e37529c0f7d8693551
+    hash_after: e94777c0d9703e7bc95618e37529c0f7d8693551
+reason: done
 ---
 
 # Ask
@@ -387,17 +392,49 @@ The blanking runs two passes. The first blanks a span inside one line, so a lone
 
 <!-- the form is files -->
 
+- spec/tickets/a-lone-mark-pairs-wrong.md
+- spec/guidance/review/reviewing.md
+- .claude/skills/level0/lib/snippets.js
+- spec/config/styles/VoiceParagraph/Characters.yml
+- spec/config/styles/VoiceParagraph/CodeSpans.yml
+- spec/config/styles/VoiceParagraph/ListItem.yml
+- spec/config/styles/VoiceParagraph/Markup.yml
+- spec/config/styles/VoiceParagraph/RestatedTable.yml
+- spec/config/styles/VoiceParagraph/Shape.yml
+- spec/config/styles/VoiceParagraph/ShapeAnswer.yml
+- spec/config/styles/VoiceParagraph/Vocabulary.yml
+- test/contract/vale.test.js
+- .se/scripts/probe-lone-mark.mjs
+
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- The blanking pairs a span inside one line first, then a span over one line break, so a lone mark takes no opening mark off the line under it.
+- The probe feeds Vale an item with a lone mark, a blank line and a paragraph with one span, and the one fault names the item's line.
+- The probe feeds Vale two items in a row, and the one fault names the item's line again.
+- The probe feeds Vale a span wrapping over one line break, and no fault stands on either line.
+- The case in `test/contract/vale.test.js` holds both shapes, asserts a fault names the item's line, and asserts none stands off it.
+- The eight rule files under `spec/config/styles/VoiceParagraph` carry the same two lines the shared function writes, and nothing beyond.
+- The branch test answers green, and `./RUNME.sh check` answers zero on this tip.
+- `./RUNME.sh branch review misc` says the check answers one in its worktree, on a case that runs without Vale and stands outside this ask.
+- `./RUNME.sh branch review misc` marks the handback retro absent, and the route hands this ticket to a retro after this step.
+- The commits touch the shared blanking, the projected rule files and the one case, and nothing beyond the ask.
+- Both craft findings of the first round land, and no design question stands.
+
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the two patterns stand once in the shared function in `snippets.js`, the rule files take them off it through the project verb, and the comment on the pattern and the case both point at the ticket instead of repeating the approach
+
 
 # Discussion
 
