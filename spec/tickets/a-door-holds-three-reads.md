@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: misc
 steps:
   - name: design
@@ -158,6 +158,11 @@ record:
       - name: check
         exit: 0
         said: 78 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-17
+    hash_before: 53a36df808c4f173c411ae4b3c10570149ec7acf
+    hash_after: 53a36df808c4f173c411ae4b3c10570149ec7acf
+reason: done
 ---
 
 # Ask
@@ -355,17 +360,51 @@ The door rule's list grows the pid, the node version and the exec path. The iden
 
 <!-- the form is files -->
 
+- spec/tickets/a-door-holds-three-reads.md
+- spec/guidance/review/reviewing.md
+- .vale.ini
+- spec/config/styles/VoiceVale/OutsideInDoors.yml
+- spec/design_output/doors.md
+- src/bridge/review.js
+- src/bridge/server.js
+- src/bridge/vehicle.js
+- src/extension/editor-process.js
+- src/scripts/cli-doors.js
+- src/scripts/cli.js
+- src/scripts/stub.js
+- src/scripts/vehicle.js
+- test/contract/outside-in-doors.test.js
+- test/contract/stub.test.js
+- test/contract/vehicle.test.js
+- test/level0/brand.test.js
+- test/level0/outside-hand.test.js
+- test/level0/review-door.test.js
+- test/level0/stub.test.js
+- test/level0/vehicle.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+The rule's list grows the three reads, and the contract case feeds each at a module's path and asserts the refusal, then at every root and door and asserts a pass.
+The identity takes the pid on every road: the command root hands `it.pid`, the server root hands its own to the port road, and the editor's process file hands its own.
+A case gives the port road a tree with no identity and asserts the identity it makes ends in the pid the case hands.
+The review takes the node path off the box, and a case names its own node and asserts the spawn runs on it.
+Every remaining read of the three stands under a section `.vale.ini` holds off, and the lint exits at zero.
+The branch test runs the Vale cases green, and the vehicle, stub, review and hand cases pass under node.
+The box carries a `pid` no module reads yet, because the server root hands its own pid to the port road itself, and that is craft rather than a fault.
+The refusing case in `test/level0/stub.test.js` calls `stubInto` with no pid, and passes because the refusal returns before the identity, so it is craft too.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the list of reads stands in the rule file alone, the pid and the node path each come off one root hand, and the note's table and each changed read's comment link the door note instead of restating it
 
 # Discussion
 
