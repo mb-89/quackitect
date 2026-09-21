@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -135,6 +135,10 @@ record:
     hash_after: 85f359362e9695bd46e4629cc7c987387f397999
     returns: 1
     why: "The case in `test/level0/trunk-door.test.js` over a dotted script path passes on the old slash join too, because `clean` in `tokens.js` strips the leading dot before the door reads, so it proves nothing about the change: drop it, or hand the door a path the old join loses.; The comment over that case credits the join with a fact `clean` owns, so the note repeats a fact standing elsewhere: point it at `tokens.js` or drop it with the case.; `fileText` takes the hand and joins through `it.join`, and every caller hands it a hand, so the first bullet stands.; `holds` hands its own hand to `fileText`, and the slash it wrote is gone, so the second bullet stands.; The remaining case in `test/level0/precommit.test.js` drives `holds` under a join of its own over one fake disk, which runs the notes reading and the test reading both, and the record says it fails on its own assertion before the change, so the third bullet stands.; The notes reading takes its empty branch under that join, because the fake disk lists children by slash, and the standing notes case covers the full branch under the slash join.; The check on the tests-green commit exits zero by the record, and the lint over `src` exits zero here.; The three test files pass here, and the door's standing script case drives `reader` in `src/bridge/bash.js` already.; `notesIn` and `batteryHere` in `src/bridge/bash.js` still write the slash, and the ask names the hook alone, so that stays outside this ticket.; No handback stands on this ticket, so no retro question rides along."
+  - step: implement/reflect
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 2e23d9de6718ca3866a2878a2449e0f5c073b603
+    hash_after: 2e23d9de6718ca3866a2878a2449e0f5c073b603
 ---
 
 # Ask
@@ -239,11 +243,19 @@ Every file and function the draft names stands in the tree, and `src/bridge/bash
 
 <!-- the form is text -->
 
+The class: a case written to satisfy the commit door's ask for a test beside a file, and not to prove the change. The dotted path case passed under the old join too, because the token cleaner strips the leading dot before the door reads, so it asserted a fact another module owns. The fix for the class: a case names what the change makes true and what the old code made false, and a file with no such case for it takes no case at all. The door's standing script case drives the reader already, so the dotted case goes.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fix touches the bash door's test alone, and nothing the ask leaves out
+- the cases drive the hook and the door over fake disks
+- the reading's comment names the ticket, and the dropped case's comment goes with it
+
 
 ## change
 
