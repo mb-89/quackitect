@@ -70,7 +70,7 @@ script: |
     out = blanked(out, `(?s)~~~.*?~~~`)
     out = blanked(out, `(?s)<!--.*?-->`)
     out = blanked(out, `(?m)^(?:\t| {4,}).*$`)
-    out = blanked(out, "(?s)`[^`]*`")
+    out = blanked(out, "`[^`\n]*(?:\n[^`\n]*)?`")
     out = blanked(out, `https?://[^\s)]+`)
     out = blanked(out, `\[\[[^\]]*\]\]`)
     out = blanked(out, `\[[^\]]*\]\([^)]*\)`)

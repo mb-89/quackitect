@@ -71,7 +71,8 @@ const HELPERS = new Map([
       "  out = blanked(out, `(?s)~~~.*?~~~`)",
       "  out = blanked(out, `(?s)<!--.*?-->`)",
       "  out = blanked(out, `(?m)^(?:\\t| {4,}).*$`)",
-      '  out = blanked(out, "(?s)`[^`]*`")',
+      // A span wraps over one line break at most, so a lone mark reaches no span past the next line. [[spec/tickets/a-lone-mark-pairs-wrong]]
+      '  out = blanked(out, "`[^`\\n]*(?:\\n[^`\\n]*)?`")',
       "  out = blanked(out, `https?://[^\\s)]+`)",
       "  out = blanked(out, `\\[\\[[^\\]]*\\]\\]`)",
       "  out = blanked(out, `\\[[^\\]]*\\]\\([^)]*\\)`)",

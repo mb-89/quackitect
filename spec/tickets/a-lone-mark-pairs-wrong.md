@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -116,6 +116,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 1aa8f0dfbfdbeabe273b56fb829b32b812f9aa7d
+    hash_after: 1aa8f0dfbfdbeabe273b56fb829b32b812f9aa7d
+    answered:
+      - name: lint
+        exit: 0
+        said: 35 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
@@ -236,11 +244,19 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the shared blanking, the rule files the project verb writes off it, and the case
+- the rules reach Vale alone, and the case drives the real one the way every case in `test/contract` does
+- the comment on the pattern names the ticket, and says a span wraps over one line break at most, because the notes wrap their prose and a span wraps with it
+
 
 ## tests-green
 
