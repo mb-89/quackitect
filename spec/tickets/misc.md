@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -107,6 +107,11 @@ record:
     hand: box d40a1b367f4d · claude-code-remote
     hash_before: adab088c41e7e1c3e72308dbf023db29127d650d
     hash_after: adab088c41e7e1c3e72308dbf023db29127d650d
+  - step: retro/cloud
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 228222560befe3167beb43ebf0fd2f7a65291a14
+    hash_after: 228222560befe3167beb43ebf0fd2f7a65291a14
+reason: done
 ---
 
 # Ask
@@ -262,17 +267,32 @@ The transcript shows each ticket walked in order, and the thoughts show the orde
 
 <!-- the form is list -->
 
+- the index's Go cases fail on the box without the build tag the check passes, so a hand running them by hand met a missing module at the change step of the file calls ticket
+- nothing else: the proxy refused no host, the platform refused no right, and the installer stood every tool
+
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the commit hook refused a change with no test beside it at the change step of five tickets, and each took a case, save the seven comment-only pointer fixes that landed past it by hand
+- the file ceiling met the server's tree file at the change step of the file calls ticket, and the path readers moved to a file of their own
+- the branch review's worktree fails a contract case that runs without Vale, on the base too, so it stands outside every ask here
+- no conflict met the sync, and the trunk guard met no push
+
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/a-comment-hunk-carries-no-code]] stands open at its draft with no group, minted off the note this box parked
+- the craft findings the verdicts left for a later hand: the stop channel standing in two doors, the note ending pair in three files, the box's pid no module reads, a link check for a pointer at a note the tree lacks, and the slashes two readings in the bash door still write
+- no person step parked, and the handover says the seven tickets close done and the branch waits for a merge
+
 
 # Discussion
 
