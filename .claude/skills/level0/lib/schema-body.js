@@ -61,7 +61,7 @@ export function bodyFaults(note, spec, kind, where) {
   return out;
 }
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 export function chaptersWanted(sections, front, level) {
   const out = [];
   for (const one of sections ?? []) {

@@ -1,6 +1,6 @@
 // The command line. One verb a row, each one naming what it does and the
 // function behind it, and the dispatch at the foot of the table.
-// [[spec/design_output/level0#one-command-does-it]]
+// [[spec/design_output/level0#what-level-zero-is]]
 
 import { dirname, join } from "node:path";
 import { RUN } from "../../.claude/skills/level0/lib/folders.js";

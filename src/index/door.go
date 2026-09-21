@@ -6,22 +6,22 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"io"
+	"io/fs"
 	"net"
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
-	"io"
-	"io/fs"
-	"os/signal"
-	"syscall"
 )
 
 const (

@@ -113,7 +113,7 @@ test("a small set of options takes one file each, and a number takes an argument
   );
 });
 
-// [[spec/design_output/projection#a-name-carries-the-key]]
+// [[spec/design_output/projection#a-name-carries-the-path]]
 test("a name carries the path it sits on, and the leaf keeps its case", () => {
   assert.equal(nameOf(configPath("judge.model").stem), "se-config-judge-model.md");
   assert.equal(

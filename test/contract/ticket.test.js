@@ -1,7 +1,7 @@
 // The two schemas level one ships, read off disk and driven through the real
 // checker. One fixture per refusal, so a nested fault, a bad path and an orphan
 // field each come back with the line they stand on.
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 
 import assert from "node:assert/strict";
 import { dirname } from "node:path";
@@ -171,7 +171,7 @@ test("a fault nested two lists deep names the line it stands on", () => {
   );
 });
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 test("a path naming no step of this route is refused, with the steps it holds", () => {
   const one = weighed(
     routed.replace("step: implement/change", "step: implement/ship"),
@@ -181,7 +181,7 @@ test("a path naming no step of this route is refused, with the steps it holds", 
   assert.match(one.message, /implement\/change/);
 });
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 test("an orphan field on a step is refused, and the render's chapter with it", () => {
   const bad = weighed(
     routed.replace("        does: makes the change", "        writes: a thing"),
@@ -193,7 +193,7 @@ test("an orphan field on a step is refused, and the render's chapter with it", (
   assert.equal(bad[0].line, 22);
 });
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 test("a chapter missing for an evidence field is refused", () => {
   const bad = weighed(routed.replace("### lint\n", ""));
   assert.deepEqual(

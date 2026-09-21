@@ -61,7 +61,7 @@ func treeOver(root string, disk Disk) *Tree {
 	return &Tree{Root: root, disk: disk, overlay: map[string]string{}}
 }
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 func (one *Tree) Holds(path, text string) {
 	one.guard.Lock()
 	defer one.guard.Unlock()
@@ -76,7 +76,7 @@ func (one *Tree) Drops(path string) {
 	one.held, one.restated, one.passed = nil, nil, false
 }
 
-// Whether an editor holds the file's text, which stands in for the disk. [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// Whether an editor holds the file's text, which stands in for the disk. [[spec/design_output/lsp#one-checker-every-front-asks]]
 func (one *Tree) Held(path string) bool {
 	one.guard.Lock()
 	defer one.guard.Unlock()

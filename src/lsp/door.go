@@ -1,5 +1,6 @@
-// The one file of this package running a command. Every other file calls one of
-// these, so a reader finds the outside in one place.
+// The one file of this package reading the outside: a command, a file, the
+// streams and the signals. Every other file calls one of these, so a reader
+// finds the outside in one place.
 // [[spec/design_output/doors#a-door-reads-the-outside]]
 package main
 

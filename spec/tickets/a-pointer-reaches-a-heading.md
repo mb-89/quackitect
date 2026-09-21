@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 25bb4b5a94cbb75408da66f3065ec64579339bf6
+    hash_after: ddb78f8d2536a73c485b4d7bb53aac030c6e5a1a
+    answered:
+      - name: lint
+        exit: 0
+        said: 95 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
@@ -230,11 +238,19 @@ The check reads a raw row, so the case says what a pointer inside a code span dr
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the check, its two fronts, the note's chapter, the pointers the sweep named, and the cases
+- the check reads the tree, which the cases drive over a folder the fixture writes
+- the check's header and each of its functions name the chapter the note takes
+
 
 ## tests-green
 
@@ -246,11 +262,17 @@ The check reads a raw row, so the case says what a pointer inside a code span dr
 
 <!-- the form is command -->
 
+./RUNME.sh branch test src/lsp/anchor_test.go
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -258,11 +280,19 @@ The check reads a raw row, so the case says what a pointer inside a code span dr
 
 <!-- the form is text -->
 
+The server reads every pointer a tracked file carries, resolves the note the way the restated rule does, and reads the anchor against the headings the note holds. A note that stands and holds no such heading draws `DeadAnchor` on the pointer's line, at error, and the message names the anchor. The one-file front and the sweep both run it, so the panel and the lint draw the same finding. The sweep named every pointer standing broken in the tree, and each one now names a heading its note holds, or the funnel note where the schema note held no chapter for it. The note's chapter says what draws and what stays with the link check.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the check, its two fronts, the note's chapter, the pointers the sweep named, and the cases
+- the cases drive the tree over a folder the fixture writes, and the lint drives the built server
+- the check's header and each of its functions name the chapter the note takes
+
 
 # verdict
 

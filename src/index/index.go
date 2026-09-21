@@ -7,13 +7,13 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
+	"errors"
+	"io/fs"
 	"path/filepath"
 	"strconv"
 	"strings"
 
-	"errors"
 	_ "github.com/mattn/go-sqlite3" // the real SQLite, through cgo, so FTS5 answers
-	"io/fs"
 )
 
 const shape = `

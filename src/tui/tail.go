@@ -7,14 +7,14 @@ package main
 
 import (
 	"bytes"
+	"errors"
+	"io/fs"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"errors"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/fsnotify/fsnotify"
-	"io/fs"
 )
 
 const poll = 250 * time.Millisecond

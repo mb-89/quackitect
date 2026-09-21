@@ -69,7 +69,7 @@ func rootHere() (string, error) {
 	return filepath.Abs(said)
 }
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 func speaks(root string) int {
 	out := bufio.NewWriter(stdout)
 	defer out.Flush()
@@ -163,7 +163,7 @@ func asks(root, method string) int {
 	return 0
 }
 
-// [[spec/design_output/lsp#the-port-and-the-standing-file]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 func reaches(root, method string) (answer, error) {
 	for try := 0; try < tries; try++ {
 		standing, err := standingOf(root)
@@ -187,7 +187,7 @@ func reaches(root, method string) (answer, error) {
 	return answer{}, errorOf("the server does not answer, and one would not start")
 }
 
-// [[spec/design_output/lsp#the-port-and-the-standing-file]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 func current(said Standing, root string) bool {
 	if said.Root != "" && said.Root != root {
 		return false

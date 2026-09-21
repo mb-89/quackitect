@@ -4,10 +4,10 @@
 package main
 
 import (
+	"io/fs"
 	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
-	"io/fs"
 )
 
 func watches(root string, one *door) (*fsnotify.Watcher, error) {

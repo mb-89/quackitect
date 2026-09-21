@@ -102,7 +102,7 @@ test("done says one line to the log, naming the branch and the code", async () =
     [on("one-group")]: withField(took, "state", CLOSED),
     ...green,
   });
-  // A verb answering zero writes at debug, so the row shows on a box writing that floor and on no other. [[spec/design_output/log#which-door-says-what]]
+  // A verb answering zero writes at debug, so the row shows on a box writing that floor and on no other. [[spec/design_output/log#which-kind-says-what]]
   it.log = fakeLog(fakeClock(), { folder: "/log", id: "a6f8c43b", level: "debug" });
 
   const code = await heard(() => work(ROOT, ["done"], it)).code;

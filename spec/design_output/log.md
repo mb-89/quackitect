@@ -48,7 +48,7 @@ Two more kinds come out of the gate:
 - `gate` carries a call the gate warns or refuses, at `warn`.
 - `god` carries a refusal god mode passes, at `warn`.
 
-For details, see [[spec/design_output/level0#a-step-carries-the-answer]].
+For details, see [[spec/design_output/level0#what-the-door-reads]].
 
 # Which kind says what
 

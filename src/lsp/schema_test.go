@@ -111,7 +111,7 @@ body:
       position: last
 `
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 func TestAStepNamesItsOwnChapter(t *testing.T) {
 	schema := yaml.AsDoc(yaml.Read(ticketSchema))
 	note := "---\nkind: [[ticket]]\nsteps:\n  - name: do\n    does: makes it\n---\n\n# Ask\n\nA thing.\n\n# do\n\nDone.\n\n# Discussion\n"
