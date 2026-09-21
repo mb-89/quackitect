@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: b00b3c099e8bc72da1316dd0274ad8f51d935506
+    hash_after: b00b3c099e8bc72da1316dd0274ad8f51d935506
 ---
 
 # Ask
@@ -116,6 +121,20 @@ box it runs on into every case of it.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The door rule grows the three reads, and the two modules past a root that hold one take the value off the hand.
+
+| piece | where | what changes |
+|---|---|---|
+| the rule | `spec/config/styles/VoiceVale/OutsideInDoors.yml` | the list of reads grows `process.pid`, `process.version` and `process.execPath` |
+| the roots | `.vale.ini` | none: every section standing off the rule keeps its read, and the contract test's pass list says which they are |
+| the identity | `src/scripts/vehicle.js` | `identityHere` takes the pid as an argument, and the root behind each verb hands it `process.pid` off the hand it builds. A case hands a pid of its own, so an identity replays |
+| the review | `src/bridge/review.js` | the helper's spawn takes the node path off the box, which the server root puts there as `node`, the way the command root already does |
+| the doors | `src/doors/awake.js`, `src/doors/session.js`, `src/doors/wire.js` | none: a door reads the outside, and the sections say so already |
+| the case | `test/contract/outside-in-doors.test.js` | feeds each of the three reads at a module's path and asserts the rule refuses it, then at every root of the pass list and asserts it passes |
+
+The table at [[spec/design_output/doors#a-door-reads-the-outside]] takes three rows, one a read, so the rule and the note say the same list.
+
 
 ## review
 
