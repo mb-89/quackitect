@@ -89,12 +89,16 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
     hash_before: b00b3c099e8bc72da1316dd0274ad8f51d935506
     hash_after: b00b3c099e8bc72da1316dd0274ad8f51d935506
+  - step: design/review
+    hand: box d40a1b367f4d · claude-code-remote · helper-15
+    hash_before: afa7b4ea74759bc13095e252ff5c007e4e5bdf3c
+    hash_after: afa7b4ea74759bc13095e252ff5c007e4e5bdf3c
 ---
 
 # Ask
@@ -145,6 +149,15 @@ The table at [[spec/design_output/doors#a-door-reads-the-outside]] takes three r
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+The rule file holds the list of reads the draft grows, so the first bullet takes a concrete change.
+The pid read in `src/scripts/vehicle.js` and the exec path read in `src/bridge/review.js` are the only reads of the three past a root, and the draft moves both.
+The command root builds `node` off the exec path, and `boxOf` in `src/bridge/server.js` reads the environment in one place, so the review's change lands beside it.
+`identityHere` calls `idOf` in `src/scripts/vehicle.js`, and each caller reaches back to a root that builds a hand.
+Every other read of the three stands under a section the pass list holds, so the lint bullet follows from the two moves.
+The contract case feeds each read at a module's path and asserts a refusal, then at every root of the pass list and asserts a pass, so the rule carries a test that fires.
+The doors and their fakes keep their reads under the sections standing, and the note's table grows one row a read.
 
 # implement
 
