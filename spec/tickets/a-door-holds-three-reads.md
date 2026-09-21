@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -147,6 +147,17 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: a352247757ff225887a2c0f44aad6e948d476f3c
+    hash_after: a352247757ff225887a2c0f44aad6e948d476f3c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 14 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 78 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
@@ -302,11 +313,17 @@ The class: a signature changed at its definition and at the callers one search f
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/outside-in-doors.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -314,11 +331,19 @@ The class: a signature changed at its definition and at the callers one search f
 
 <!-- the form is text -->
 
+The door rule's list grows the pid, the node version and the exec path. The identity takes the pid as an argument on every road: the command root hands it off the hand, the server root puts it on the box and hands it to the port road, and the editor's process file hands its own. A case gives the port road a tree with no identity and asserts the identity it makes ends in the pid. The review door takes the node path off the box, and the note's table names each of the three reads beside what a module takes instead.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the rule, the identity's callers on every road, the roots, the note's table and the cases
+- the port road's case hands a pid of its own over a fake disk, and the Vale case drives the real binary
+- each changed read carries a comment naming the door note
+
 
 # verdict
 
