@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: e4179b2d3b37dc9d0213123833d835b3d4521eb5
+    hash_after: e4179b2d3b37dc9d0213123833d835b3d4521eb5
 ---
 
 # Ask
@@ -116,6 +121,19 @@ comments under `src/viewer` carry two such pointers today.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The server reads every pointer's anchor against the headings of the note it names, and a lint over the tree draws each one reaching nothing.
+
+| piece | where | what changes |
+|---|---|---|
+| the check | `src/lsp/anchor.go` | reads every tracked file for `[[note#anchor]]`, resolves the note the way the restated rule does, and draws `DeadAnchor` over a pointer whose note stands and holds no heading slugging to that anchor. The message names the file, the line and the anchor, and the headings the note holds stay out of it |
+| the fronts | `src/lsp/check.go` | `Over` runs it on the one path, and `Sweep` over the tree, so `./RUNME.sh lint` and the panel draw the same finding |
+| the slug | `src/lsp/restated.go` | `headingNamed` stands as the one resolver, and the check calls it |
+| the pointers | every file the sweep names today | each one moves to the heading the note holds now, or the note takes the chapter back where the code still describes it |
+| the case | `src/lsp/anchor_test.go` | a tree with a note holding one heading: a pointer at that heading passes, a pointer at a heading the note lacks draws with its line and anchor, and a pointer at a note the tree lacks draws nothing here, because the link check owns that |
+
+[[spec/design_output/lsp#a-second-copy-draws]] takes a chapter beside it saying what the check reads, and the code points at that chapter.
+
 
 ## review
 
