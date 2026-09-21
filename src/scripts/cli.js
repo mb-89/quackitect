@@ -241,7 +241,7 @@ export function theVehicle(argv) {
     return 0;
   }
   if (said === "attach") {
-    const settled = attachTo(files, env, it.clock, pair.work, pair.method, WINDOWS);
+    const settled = attachTo(files, env, it.clock, pair.work, pair.method, it.pid, WINDOWS);
     console.log(
       `${pair.work} names ${made.id} as the vehicle driving it, at port ${settled.port}.`,
     );

@@ -220,7 +220,7 @@ test("attach writes the driver, the register entry with its port, the pointer an
       ]),
     ),
   });
-  const said = attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools");
+  const said = attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools", 7);
   assert.equal(said.method, "/tools");
   assert.equal(said.port, 6510);
   assert.equal(
@@ -262,6 +262,7 @@ test("attach writes the driver, the register entry with its port, the pointer an
     fakeClock(),
     "/stub",
     "/tools",
+    7,
   );
   assert.equal(again.port, 6510, "a second attach keeps the port");
 });

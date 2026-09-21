@@ -27,6 +27,15 @@ test("the box a root builds carries the environment and the node path", () => {
     node: "/node/bin/node",
   });
   assert.equal(named.node, "/node/bin/node", "a case names its own node");
+  assert.equal(typeof said.pid, "number");
+});
+
+// A tree with no identity runs the road that makes one, and the pid the case hands ends it. [[spec/design_output/doors#a-door-reads-the-outside]]
+test("the port road makes an identity off the pid the root hands in", () => {
+  const files = fakeDisk({ "/tools/package.json": '{"version":"0.1.0"}' });
+  registeredPort(files, { SE_REGISTRY: "/reg" }, fakeClock(), "/tools", 7, false);
+  const made = JSON.parse(files.read("/tools/.se/.runtime/identity.json"));
+  assert.ok(made.id.endsWith("7"), `the identity reads ${made.id}`);
 });
 
 test("the hand rule reads the cloud off the hand, and none off the box", () => {
@@ -50,7 +59,7 @@ test("the port reading takes the platform and reaches the same register", () => 
     ]),
   });
   const env = { SE_REGISTRY: "/one;/two" };
-  assert.equal(registeredPort(files, env, fakeClock(), "/tools", true), 6543);
+  assert.equal(registeredPort(files, env, fakeClock(), "/tools", 7, true), 6543);
 });
 
 test("the guidance reading takes an empty map where nobody hands one", () => {

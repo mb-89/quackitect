@@ -26,16 +26,16 @@ const FILES = [
   "lib/vehicle.js",
 ];
 
-export function vehicleOf(disk, env, time, work, windows = false) {
+export function vehicleOf(disk, env, time, work, pid, windows = false) {
   const pointed = pointerOf(readIf(disk, join(work, POINTER)));
   if (pointed) return { ...pointed, itself: false, made: false };
   if (!isVehicle(disk, work)) return null;
-  const port = registeredPort(disk, env, time, work, windows);
+  const port = registeredPort(disk, env, time, work, pid, windows);
   return { method: work, port, itself: true, made: false };
 }
 
-export function makesProject(disk, env, time, work, vehicle, windows = false) {
-  const port = registeredPort(disk, env, time, vehicle, windows);
+export function makesProject(disk, env, time, work, vehicle, pid, windows = false) {
+  const port = registeredPort(disk, env, time, vehicle, pid, windows);
   for (const rel of FILES) {
     const to = join(work, HOOK, rel);
     disk.makeDir(join(to, ".."));
@@ -49,17 +49,18 @@ export function makesProject(disk, env, time, work, vehicle, windows = false) {
   return { method: vehicle, port, itself: false, made: true };
 }
 
-export function settles(disk, env, time, work, vehicle, windows = false) {
+export function settles(disk, env, time, work, vehicle, pid, windows = false) {
   return (
-    vehicleOf(disk, env, time, work, windows) ??
-    makesProject(disk, env, time, work, vehicle, windows)
+    vehicleOf(disk, env, time, work, pid, windows) ??
+    makesProject(disk, env, time, work, vehicle, pid, windows)
   );
 }
 
 // [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
-export function attachTo(disk, env, time, work, vehicle, windows = false) {
-  attach(disk, time, work, identityHere(disk, time, vehicle));
-  return settles(disk, env, time, work, vehicle, windows);
+// The pid comes off the root, so an identity made here replays in a case. [[spec/design_output/doors#a-door-reads-the-outside]]
+export function attachTo(disk, env, time, work, vehicle, pid, windows = false) {
+  attach(disk, time, work, identityHere(disk, time, vehicle, pid));
+  return settles(disk, env, time, work, vehicle, pid, windows);
 }
 
 export function isVehicle(disk, folder) {
@@ -69,11 +70,11 @@ export function isVehicle(disk, folder) {
   );
 }
 
-export function registeredPort(disk, env, time, method, windows = false) {
+export function registeredPort(disk, env, time, method, pid, windows = false) {
   const held = readRegister(disk, env, windows);
   const known = portOf(held, method);
   if (known) return known;
-  const id = identityHere(disk, time, method);
+  const id = identityHere(disk, time, method, pid);
   const entry = withPort(
     held,
     entryOf(id, versionOf(disk, method), method, time.stamp()),
