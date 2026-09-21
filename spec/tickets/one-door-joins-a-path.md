@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -147,6 +147,17 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: e3a906fa91aab76cffa8172f7ef4cd6a51e5ab80
+    hash_after: e3a906fa91aab76cffa8172f7ef4cd6a51e5ab80
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 11 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 140 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
@@ -299,11 +310,17 @@ The class: a case written to satisfy the commit door's ask for a test beside a f
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/level0/precommit.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -311,11 +328,19 @@ The class: a case written to satisfy the commit door's ask for a test beside a f
 
 <!-- the form is text -->
 
+The shared reading of a file takes the hand and joins the path through the hand's own join, so the hook's two readings part ways on nothing. The hook hands its own hand in, which carried the join already. The bash door's box carries no join, so the door builds a small reader off the work root and the join of the path module, the pure import the door rule passes. A case hands the hook a join of its own over a fake disk and asserts the hook finds the standing test under that join. The door's standing script case drives its reader.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the shared reading, the hook, the bash door and the hook's case
+- the case drives the hook over a fake disk and a fake git, and touches nothing else
+- the reading's comment names the ticket, and the bash door's reader names it too
+
 
 # verdict
 
