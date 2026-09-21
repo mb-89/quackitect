@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 783b7e57c9dfc19139b57a67586509f777e4ecb4
+    hash_after: 783b7e57c9dfc19139b57a67586509f777e4ecb4
 ---
 
 # Ask
@@ -115,6 +120,20 @@ case then depends on the tree it runs in.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The `os` import stands in each package's `door.go`, the rule refuses it anywhere else, and the server's tree reads through a disk a test fakes.
+
+| piece | where | what changes |
+|---|---|---|
+| the rule | `spec/config/styles/VoiceVale/OutsideInDoors.yml` | refuses a Go import line naming `os` or a package under it, beside the `os/exec` line it holds |
+| the sections | `.vale.ini` | `[**/src/**/door.go]` stands off the rule, so a package under `src/engine` reads as the rest; `[**/src/**/*_test.go]` stands off it too, because a Go case drives the real thing over a folder it writes, the way `test/contract` does |
+| the doors | `door.go` in `src/config`, `src/lsp`, `src/tui`, `src/engine/swap`, `src/index` | each names the outside once: a reading, a writing, a stat, a folder, a remove, the executable, the environment, the arguments, the exit, the standard streams, the pid, and the interrupt. `src/config` and `src/engine/swap` get a `door.go`; the other three grow theirs |
+| the callers | every other `.go` file importing `os` | calls the door's name for the same thing. `os.FileInfo` and `os.DirEntry` read as `fs.FileInfo` and `fs.DirEntry` out of `io/fs`, and `os.IsNotExist` as `errors.Is` over `fs.ErrNotExist`, both pure |
+| the fake | `src/lsp` | `Tree` holds a `Disk`, the interface `door.go` defines with the real one beside it. `treeAt` builds the real disk, and `fake_test.go` holds a memory disk that behaves: what a case writes, it reads back, and a stat or a listing answers out of the same map |
+| the cases | `src/lsp/tree_test.go`, `test/contract/outside-in-doors.test.js` | one drives `Read`, `Exists`, `Names` and `Paths` over the fake, with no folder on the box; the other feeds Vale an `os` import at a module's path and at a `door.go` path, and asserts the rule refuses one and passes the other |
+
+The design output for the door rule stands at [[spec/design_output/doors#a-door-reads-the-outside]], and its table takes the Go import row.
+
 
 ## review
 

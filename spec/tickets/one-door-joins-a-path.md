@@ -117,6 +117,19 @@ join, and another writes the slash itself.
 
 <!-- the form is text -->
 
+The hand's `join` is the one place a path joins, and `fileText` takes it.
+
+| reading in `src/scripts/precommit.js` | joins through | change |
+|---|---|---|
+| `notesOf` | `it.join` | none |
+| `holds`, through `fileText` | a slash `fileText` writes itself | `fileText` takes the hand |
+
+- `fileText(it, path)` in `.claude/skills/level0/lib/scripted.js` reads `it.disk`, `it.root` and `it.join`, and writes no slash. An absolute path stays as it is.
+- `src/scripts/precommit.js` hands `fileText` its `it`, which carries the join already.
+- `src/bridge/bash.js` hands it the box's disk and work root with the `join` of `node:path`, the pure import the door rule passes.
+- A case in `test/level0/precommit.test.js` drives `holds` over a fake disk with a join of its own, and asserts the reading reaches the file that join names and no path with a slash the hand never wrote.
+
+
 ## review
 
 <!-- reads the approach against the ask -->
