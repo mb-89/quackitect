@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -124,6 +124,17 @@ record:
       - name: lint
         exit: 0
         said: 35 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: implement/tests-green
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 7795d17fc5960982a6f0f6b6330d5578e32fb6ad
+    hash_after: 7795d17fc5960982a6f0f6b6330d5578e32fb6ad
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 23 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 37 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
@@ -268,11 +279,17 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/vale.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -280,11 +297,19 @@ pass
 
 <!-- the form is text -->
 
+The blanking every script rule shares paired a code span over the whole text, so a lone mark on one line took the opening mark of the next span as its partner, and the closing mark of that span stood alone two lines below the cause. The pattern now stops a span at one line break: a span wraps with the prose it stands in, and the notes wrap at a column, so a span crossing one line break is a span, and a mark reaching past the next line is a lone one. The fault over a lone mark names the line the mark stands on, and the paragraph under it draws nothing. The rule files under `VoiceParagraph` carry the pattern as the project verb writes them, and nobody edits them by hand.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change stands in the shared blanking, the rule files projected off it, and the one case
+- the case drives Vale itself, the one door the rules reach, and no fake stands in
+- the pattern's comment names the ticket and the reason the span crosses one line break
+
 
 # verdict
 
