@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hand: box d40a1b367f4d · claude-code-remote
     hash_before: df632e032ed85cc06ea0ba2c26df36d657ea723f
     hash_after: df632e032ed85cc06ea0ba2c26df36d657ea723f
+  - step: design/review
+    hand: box d40a1b367f4d · claude-code-remote · helper-3
+    hash_before: 3cb8aaab3df67de2c9e557d51798e1ef90d20a7f
+    hash_after: 3cb8aaab3df67de2c9e557d51798e1ef90d20a7f
 ---
 
 # Ask
@@ -150,6 +154,13 @@ The source holds the sentence-level pairing in `paragraph-rules.js` already, bec
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- The plain function in snippets.js stands where the approach says, and its span pattern is the one place pairing over the whole text.
+- Stopping the span pattern at a line break answers the first bullet, and the rules under VoiceParagraph take it through the project verb.
+- A lone mark left unblanked on its own line makes every fault name that line, which answers the second bullet.
+- The case in vale.test.js holds the list item with the lone mark and the paragraph with one span, and asserts the paragraph line draws nothing.
+- The paragraph rules already pair inside a sentence, so the change leaves them alone.
 
 # implement
 
