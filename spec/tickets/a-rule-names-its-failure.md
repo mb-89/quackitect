@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 856c3db4bcf415a2eb6fbe66249dca4f406c5cb7
+    hash_after: 856c3db4bcf415a2eb6fbe66249dca4f406c5cb7
 ---
 
 # Ask
@@ -116,6 +121,20 @@ reader then applies it where it costs and skips it where it bites.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+A shape rule refuses a marked rule standing as one sentence, every marked rule under `spec/guidance` takes the failure as its second sentence, and the guidance note says so in a rule of its own.
+
+| piece | where | what changes |
+|---|---|---|
+| the check | `spec/config/styles/VoiceShape/MarkedRuleNamesFailure.yml` | a script rule over the Actionables chapter: a numbered line ending in the mark counts its sentences with code spans and links blanked, and one sentence refuses with the line |
+| the sections | `.vale.ini` | none: both guidance sections read `VoiceShape` already |
+| the rules | every note under `spec/guidance` | each marked rule standing as one sentence takes a second: the failure it prevents, or the cost a reader pays otherwise. A clause opened by `because` splits into that second sentence |
+| the rule | `spec/guidance/guidance.md` | a new rule: write a marked rule as the instruction and then the failure it prevents, marked itself |
+| the argument | `spec/rationales/guidance.md` | the chapter that rule wants, saying why half a rule holds what it guards |
+| the case | `test/contract/shape.test.js` | a marked rule of one sentence at a guidance path refuses, a marked rule of two passes, and an unmarked rule of one passes |
+
+`./RUNME.sh lint spec/guidance` answers 0 once every note carries the second sentence.
+
 
 ## review
 

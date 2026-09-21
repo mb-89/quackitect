@@ -118,6 +118,20 @@ the lint.
 
 <!-- the form is text -->
 
+Each road hands Vale the config the assembly writes, off the pair of roots, and one contract case proves a project's rule refuses on every road.
+
+| road | where | reads today | reads after |
+|---|---|---|---|
+| the answer gate | `src/bridge/tools.js` | `box.vale.lint`, the door, which assembles already | the same, and the case proves it |
+| the findings road | `src/bridge/findings.js` | the method's `.vale.ini` by name | `assemble(it.disk, pair)` over `box.method` and `box.work`, and the config it answers |
+| the copilot road | `.claude/skills/level0/lib/copilot-runtime.js` | Vale's default config under the root | `assemble` over the pair `rootsHere` answers in `src/scripts/copilot.js`, handed in as `it.method` and `it.work` |
+
+- `assemble` stands in `src/scripts/styles.js` and takes the pair the vale door builds, so the three roads call it as it stands.
+- A contract case in `test/contract/styles.test.js` writes a work root beside this tree holding one rule of its own, refusing a word, and asserts the findings road, the copilot check and the answer gate each name that rule over a text carrying the word.
+
+`./RUNME.sh check` answers 0 once the roads agree.
+
+
 ## review
 
 <!-- reads the approach against the ask -->
