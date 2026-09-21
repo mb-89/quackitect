@@ -89,12 +89,16 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
     hash_before: 856c3db4bcf415a2eb6fbe66249dca4f406c5cb7
     hash_after: 856c3db4bcf415a2eb6fbe66249dca4f406c5cb7
+  - step: design/review
+    hand: box d40a1b367f4d · claude-code-remote · helper-20
+    hash_before: 141fc89d9930393cb80db588ade508ce3a7c940f
+    hash_after: 141fc89d9930393cb80db588ade508ce3a7c940f
 ---
 
 # Ask
@@ -145,6 +149,14 @@ A shape rule refuses a marked rule standing as one sentence, every marked rule u
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+The check reads the Actionables chapter the way the cap rule does, and both guidance sections of the vale config read VoiceShape already.
+The rewrite reaches eighty-three of the one hundred twenty-six marked rules, across twenty notes.
+The shared chapter fixture in the shape test writes one-sentence marked rules, so the new case writes a fixture of its own.
+The guidance note holds twelve rules, so the new rule stands under the cap.
+The rationale numbers its chapters by rule, so the new chapter takes the new rule's number.
+A second sentence stays under the list item cap of twenty words, or the lint refuses the note.
 
 # implement
 
