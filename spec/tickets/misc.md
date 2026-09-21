@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box d40a1b367f4d · claude-code-remote
     hash_before: d4054418ac93462a3245b794fd231fd0d83e70b7
+  - step: sync
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 82ff7b56335664bba826a4ec53c101e29c6f90ad
+    hash_after: 82ff7b56335664bba826a4ec53c101e29c6f90ad
+    answered:
+      - name: sync
+        exit: 0
+        said: work/misc already carries every commit on main.
 ---
 
 # Ask
@@ -94,6 +102,9 @@ Small tickets that share no topic, so one branch takes them all and this box swi
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+./RUNME.sh branch sync
+
 
 # split
 
