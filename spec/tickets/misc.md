@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box d40a1b367f4d · claude-code-remote
@@ -87,6 +87,10 @@ record:
       - name: sync
         exit: 0
         said: work/misc already carries every commit on main.
+  - step: split
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 5748967f44d03ad92c37373785e0b55edfd6d210
+    hash_after: 5748967f44d03ad92c37373785e0b55edfd6d210
 ---
 
 # Ask
@@ -116,11 +120,25 @@ Small tickets that share no topic, so one branch takes them all and this box swi
 
 <!-- the form is list -->
 
+- [[spec/tickets/a-door-holds-file-calls]], on [[spec/processes/standard]]
+- [[spec/tickets/a-door-holds-three-reads]], on [[spec/processes/standard]]
+- [[spec/tickets/a-lone-mark-pairs-wrong]], on [[spec/processes/standard]]
+- [[spec/tickets/a-pointer-reaches-a-heading]], on [[spec/processes/standard]]
+- [[spec/tickets/a-rule-names-its-failure]], on [[spec/processes/standard]]
+- [[spec/tickets/every-road-reads-one-config]], on [[spec/processes/standard]]
+- [[spec/tickets/one-door-joins-a-path]], on [[spec/processes/standard]]
+
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each child stood as one ask with four bullets, and one hand read each whole in a round
+- the children are the seven drafts the group named, and the group holds no goal past them
+- no child waited on another, so none names a dependency
+
 
 # children
 
