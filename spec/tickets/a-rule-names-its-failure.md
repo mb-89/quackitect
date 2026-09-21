@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -118,6 +118,17 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 3f8eedb3c30f9acb218b018dbc3fc8248d54ec28
+    hash_after: 3f8eedb3c30f9acb218b018dbc3fc8248d54ec28
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 108 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
@@ -264,11 +275,17 @@ A second sentence stays under the list item cap of twenty words, or the lint ref
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/shape.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -276,11 +293,19 @@ A second sentence stays under the list item cap of twenty words, or the lint ref
 
 <!-- the form is text -->
 
+A shape rule reads the Actionables chapter of a guidance note and counts the sentences of each marked rule, with code spans and links blanked. A marked rule of one sentence refuses at error, so the lint over the guidance goes red until the rule names the failure it prevents. Every marked rule under the guidance folder that stood as one sentence now carries a second: the failure, or the cost a reader pays otherwise. A clause opened by because became that second sentence. The guidance note takes a rule saying so, marked itself, and the rationale takes the chapter arguing it. The projections off the guidance carry the new wording.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the rule file, the guidance notes, the guidance rule, its rationale chapter, the projections and the cases
+- the cases drive the real Vale over a note of their own, and the lint drives it over the guidance
+- the rule file links the guidance note, and the new rule names the rule file
+
 
 # verdict
 
