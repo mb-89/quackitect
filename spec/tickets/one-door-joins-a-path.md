@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 6116e64d8ab8ee46c2bbc837619438c991b328ad
+    hash_after: 6116e64d8ab8ee46c2bbc837619438c991b328ad
 ---
 
 # Ask
