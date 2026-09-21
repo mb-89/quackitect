@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -174,6 +174,14 @@ record:
     hand: box d40a1b367f4d · claude-code-remote
     hash_before: 3b25ba2fc795885540047c8a5104c0a9a9260d44
     hash_after: 3b25ba2fc795885540047c8a5104c0a9a9260d44
+  - step: implement/change
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 0c61e0f750d034c2531137af1a8610b4ff3be5ed
+    hash_after: 0c61e0f750d034c2531137af1a8610b4ff3be5ed
+    answered:
+      - name: lint
+        exit: 0
+        said: 35 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
@@ -302,11 +310,19 @@ The class: a record written in the wrong place. The second round's verdict stood
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change stays in the shared blanking, the projected rule files, and the one case
+- the case drives Vale itself, and no fake stands in for it
+- the comment on the pattern names the order of the two passes and the ticket
+
 
 ## tests-green
 
