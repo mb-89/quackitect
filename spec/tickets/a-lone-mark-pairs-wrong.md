@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -105,6 +105,17 @@ record:
     hand: box d40a1b367f4d · claude-code-remote · helper-3
     hash_before: 3cb8aaab3df67de2c9e557d51798e1ef90d20a7f
     hash_after: 3cb8aaab3df67de2c9e557d51798e1ef90d20a7f
+  - step: implement/tests-red
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: dd02f78a5f562dddf3e3bc38379dd8b4ca349205
+    hash_after: dd02f78a5f562dddf3e3bc38379dd8b4ca349205
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -174,17 +185,30 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/vale.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the case feeds Vale a list item with a lone mark and a paragraph with one span under it
+- the paragraph's line draws `Characters` over the closing mark of its span, and the item's line draws nothing
+- what surprises the hand: the blanking hides the lone mark and the opening mark both, so the one mark left unpaired is the closing one, two lines below its cause
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the case stands in the Vale contract test, and the change reaches the one function every script rule shares
+- the case drives the real Vale, as every case in `test/contract` does, and the rules reach no door past it
+- the case's comment names the approach, and the change to the shared function takes the same pointer
+
 
 ## reflect
 
