@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -99,6 +99,17 @@ record:
     hand: box d40a1b367f4d · claude-code-remote · helper-22
     hash_before: aac3088b08ed7c36e94931b663a418d73f43d864
     hash_after: aac3088b08ed7c36e94931b663a418d73f43d864
+  - step: implement/tests-red
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 9fba8ef3214e5971821c30fc1ba298ed42beb9d2
+    hash_after: 9fba8ef3214e5971821c30fc1ba298ed42beb9d2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -168,17 +179,32 @@ The copilot root builds no pair today, so the change imports `rootsHere` from th
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/one-config.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the case writes a work root beside this tree with one rule of its own, and a config naming the method's style beside it
+- the answer gate refuses the word, because the door assembles the pair already
+- the findings road hands Vale the bare config name from the work root, so Vale stops on a style it finds nowhere, and the case fails on the fault
+- the copilot road's check stands unexported, so the case fails before it drives it
+- what surprises the hand: the findings road runs from the method root today, so a project's own note reads through the method's rules alone
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the case stands in a contract test of its own, and the change reaches the findings road, the copilot road and the copilot root
+- the case drives the real Vale through the door, the findings road and the copilot check, over a work root it writes and removes
+- the case's comment names the ticket, and each road's change names the vehicle note's chapter on the assembly
+
 
 ## reflect
 
