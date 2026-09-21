@@ -5,7 +5,8 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { mintedNote, schemasFrom } from "../../.claude/skills/level0/lib/schema.js";
+import { schemasFrom } from "../../.claude/skills/level0/lib/schema.js";
+import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";

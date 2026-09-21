@@ -6,7 +6,7 @@ refines:
 
 # Scope
 
-One level zero holds two surfaces. This note covers the runtime under
+One level zero holds both surfaces. This note covers the runtime under
 `src/scripts/copilot.js` and the decisions it hands each surface.
 
 # Events and feedback
@@ -47,7 +47,7 @@ receipt. Judged rule messages reach context without a classification call.
 Completion formats code the session touches and checks results in bounded batches.
 Cloud completion also checks the assigned branch, clean tree and remote head.
 
-Check four files per completion batch. Spend failure retries on actual issues.
+Check a fixed number of files in each completion batch. Spend failure retries on actual issues.
 request another batch without spending that budget when valid files remain.
 Keep handover claims until every batch passes. Host continuation limits still
 apply. The local retry counter cannot override them.

@@ -13,3 +13,9 @@ rationale: [[spec/rationales/verifying]]
 5. Name the check holding a fix in place where the rule for it stands already. *
 6. Run `./RUNME.sh retro mint <retro>`, which mints one ticket a class standing open.
 7. Run `./RUNME.sh retro matrix <retro>` again, so the report carries each status and ticket.
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 2 | fixed, with where it stands | a ticket for a standing fix |

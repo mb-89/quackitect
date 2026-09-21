@@ -14,6 +14,30 @@ export function warningsOn(found, names) {
     .filter((one) => held.has(String(one?.file ?? "")));
 }
 
+// A write landing with a warning puts its rows on the list in place of the file's old rows, so the list follows every file as it changes. [[spec/design_output/level0#a-warning-feeds-the-list]]
+export function mergedWarnings(list, file, found) {
+  const kept = [list ?? []].flat().filter((one) => String(one?.file ?? "") !== file);
+  const rows = [found ?? []]
+    .flat()
+    .filter((one) => String(one?.severity ?? "") === WARNING)
+    .map((one) => ({ ...one, file, source: "door" }));
+  return [...kept, ...rows];
+}
+
+// One row as the log and the agent read it. [[spec/design_output/level0#a-warning-feeds-the-list]]
+export function rowOf(one) {
+  return `${one?.file ?? ""}:${one?.line ?? 0} ${one?.rule ?? ""}: ${one?.message ?? ""}`;
+}
+
+// What the agent reads after a write lands with a warning: the rows, and that the work goes on. [[spec/design_output/level0#a-warning-feeds-the-list]]
+export function warnedNote(file, found, standing) {
+  return [
+    `${found.length} line(s) of ${file} stand at warning, and the write lands. The refactoring hand drains them, so carry on.`,
+    ...found.map((one) => `  ${rowOf(one)}`),
+    `The list holds ${standing} row(s) now.`,
+  ].join("\n");
+}
+
 // [[spec/tickets/one-list-holds-the-warnings]]
 export function filesOn(found) {
   return [...new Set([found ?? []].flat().map((one) => String(one?.file ?? "")))]

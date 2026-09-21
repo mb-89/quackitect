@@ -5,7 +5,7 @@ kind: [[design_output]]
 # Scope
 
 `src/extension` draws one sidebar in the editor. This note covers the
-declaration behind it, the five widgets, and the grid holding them.
+declaration behind it, the widgets, and the grid holding them.
 
 # The sidebar draws the tree
 
@@ -88,7 +88,7 @@ keys. This branch draws its light dark, because nothing writes a heartbeat yet.
 
 # What waits for level one
 
-Three controls stand in the schema and draw nowhere. Each names its widget, its
+Several controls stand in the schema and draw nowhere. Each names its widget, its
 options and its mark, and each leaves the group open:
 
 | control | at rest | one click | five clicks |
@@ -169,8 +169,8 @@ theme moves the page with no redraw.
 
 ## A mark a person types
 
-`icon` carries the emoji, as a person types them. One field says it, because two
-fields for one mark are two things to keep in step. A mark written the old way,
+`icon` carries the emoji, as a person types them. One field says it, because
+separate fields for one mark must stay in step. A mark written the old way,
 as `U+270B`, draws the same character.
 
 The buttons, their marks and their ladders stand in one file,
@@ -192,7 +192,7 @@ carries a style attribute nowhere and the policy holds.
 
 # The grid check
 
-A section holds a grid five columns wide. A widget names `row`, `column`,
+A section holds a grid of fixed width. A widget names `row`, `column`,
 `rowSpan` and `colSpan`, a hole is legal, and moving one widget leaves every
 other entry alone.
 
@@ -204,7 +204,7 @@ Naming coordinates costs one check, and `faultsIn` runs it:
 | a widget past the fifth column | `reaches column 6, and the grid is 5 wide` |
 
 `./RUNME.sh lint` runs the check. `lineOf` names the line the entry opens on,
-so the finding points at the entry. Two groups each hold their own grid, so one
+so the finding points at the entry. Each group holds its own grid, so one
 cell in both is no fault.
 
 # The bottom section
@@ -214,7 +214,7 @@ and a tree:
 
 - the top level names the config files, one node each
 - below that, the sections and the keys under them
-- two columns: the key, and an editor matching the type
+- each row shows the key and an editor matching its type
 - the unit stands beside the editor where a value has one
 - hovering a row shows the `help`
 
@@ -269,7 +269,7 @@ Every press that writes, every run and every edit in the config tree writes a
 [[spec/design_output/log#which-door-says-what]].
 
 - One press writes `stop.hold is finish`, with the detail `one press`.
-- Five presses write `stop.hold is stop`, with the detail `5 presses`.
+- The far press writes `stop.hold is stop`, with the detail `5 presses`.
 - The log button writes `log.open runs ./RUNME.sh tui`.
 - An edit in the config tree writes `stop.mostInARow is 5`, with the detail `the config tree`.
 
@@ -309,7 +309,7 @@ folder and finds nothing to refuse: the rule names `node:` imports, and
 ## The watcher draws it again
 
 The door watches the schema, the tracked file and the local file. A change to
-any of the three draws the page again. That is how a slash command moves a
+any of them draws the page again. That is how a slash command moves a
 widget: the verb writes the local file, and the watcher does the rest.
 
 ## The log opens a terminal
@@ -346,7 +346,7 @@ server. For details, see
 
 ## Two buttons make both
 
-Two actions stand in the section `engine`, beside where the engine's play
+The actions below stand in the section `engine`, beside where the engine's play
 and stop marks land. Each carries `asks` set to `folder`, and its `runs`
 carries `<folder>` where the folder goes:
 
@@ -366,12 +366,12 @@ A press on one goes this way:
 So the verbs behind the buttons stay the ones the shell runs. A refusal from
 a verb stands in the terminal, where the owner reads it. The marks are
 the owner's to swap in the schema. The fake door in the sidebar test answers
-the folder, and a contract test reads the two entries off the declaration on
+the folder, and a contract test reads both entries off the declaration on
 disk.
 
 # What level zero holds
 
-Three controls work with no engine, because the stop table and the standing
+The controls below work with no engine, because the stop table and the standing
 block already read `.se/.runtime/config.json`:
 
 | control | how it lands |
@@ -437,8 +437,8 @@ Every layer but the drawing runs with no editor:
 # The editor finds it
 
 `./RUNME.sh` links the folder and names it in the editor's own list, so a clone
-draws the sidebar with nothing typed. Two steps in the install loop, and both
-are wants: a box carrying no editor answers them and prints nothing.
+draws the sidebar with nothing typed. The steps below in the install loop are
+wants: a box carrying no editor answers them and prints nothing.
 
 | step | what it does | where it stops |
 |---|---|---|
@@ -446,7 +446,7 @@ are wants: a box carrying no editor answers them and prints nothing.
 | `editor-extensions` | installs the two ids the settings point at | no `code` on the PATH |
 
 The link points at the tree, so an edit draws on the next window and no second
-install stands between them. `servers.js` holds the two ids, so the shell names
+install stands between them. `servers.js` holds both ids, so the shell names
 none of its own.
 
 ## The link stands
@@ -529,7 +529,7 @@ ticks the ones they want, and the choice rides in the view state, so it stands
 through a redraw.
 
 Config starts unticked. A person reaching for a key ticks it open, and the
-panel stays four buttons wide for everybody else.
+panel stays the same width for everybody else.
 
 ## Config stands at the foot
 
@@ -588,7 +588,7 @@ which is the entry a person there already takes.
 - The extension holds its own reader of a key, because `lib/config.js` in the
   plugin is a module and VS Code loads a script. Fold the two together where
   the extension takes a build.
-- The sidebar reads the two files and leaves the environment layer to
+- The sidebar reads both files and leaves the environment layer to
   `./RUNME.sh config`, which names the layer answering each key.
 - A projection writing `src/extension/package.json` from the declaration waits,
   because no widget here contributes a command.

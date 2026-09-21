@@ -40,6 +40,12 @@ const kindTodo = "todo"
 // The place of a row the cloud holds, which src/scripts/pull-outline.js owns and a Go module spells again. [[spec/design_output/pull#the-queue-is-an-outline]]
 const cloudPlace = "∞"
 
+// The place of the work in hand and the state it reads, which src/scripts/work-answer.js owns and a Go module spells again. [[spec/design_output/pull#the-queue-is-an-outline]]
+const (
+	heldPlace = "0"
+	heldState = "held"
+)
+
 type placesMsg struct {
 	places workPlaces
 	why    string
@@ -114,6 +120,10 @@ func (t *Tree) Placed(p workPlaces) {
 	t.Amend(func(one *Item) {
 		one.Keys[queueKey] = p.queue[one.Name]
 		one.Keys[cloudKey] = flagOf(p.cloud[one.Name])
+		// A row at zero stands in hand, so its state reads held whatever the index says. [[spec/design_output/pull#the-queue-is-an-outline]]
+		if p.queue[one.Name] == heldPlace {
+			one.Keys["state"] = heldState
+		}
 		// The todo letter reads the verb's answer, which folds the override on this box into the front's tag. [[spec/design_output/pull#a-todo-forces-a-place]]
 		if said, held := p.todo[one.Name]; held {
 			one.Keys[todoKey] = flagOf(said)
@@ -128,8 +138,12 @@ func (t *Tree) Placed(p workPlaces) {
 		if standing[row.Name] {
 			continue
 		}
+		state := "open"
+		if row.Queue == heldPlace {
+			state = heldState
+		}
 		t.Items = append(t.Items, Item{Name: row.Name, Keys: map[string]string{
-			"kind": kindTodo, "state": "open", queueKey: row.Queue, todoKey: flagOf(true),
+			"kind": kindTodo, "state": state, queueKey: row.Queue, todoKey: flagOf(row.Todo),
 			cloudKey: flagOf(false), "urgent": flagOf(false), "says": row.Says,
 		}})
 	}

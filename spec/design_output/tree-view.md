@@ -14,8 +14,8 @@ each wait for a ticket of their own.
 
 # The view draws a tree
 
-A view carries three things: the columns, the items and whether it nests.
-`NewTree` takes the three and flattens the items into the rows it draws.
+A view carries the columns, the items and whether it nests.
+`NewTree` takes them and flattens the items into the rows it draws.
 
 | what | what it holds |
 |---|---|
@@ -61,7 +61,7 @@ draws its own names the same way. [[spec/design_output/tui#the-columns-stand-sti
 ## The name column nests
 
 The first column draws the mark, the nesting and the name, whatever key it
-reads. A row stands two columns in for each step of depth. The mark reads `▾`
+reads. A row stands a pair of columns in for each step of depth. The mark reads `▾`
 while the item stands open, `▸` while it stands collapsed, and blank on an item
 with nothing under it. So the mark says which row is a group, and no column
 says it again.
@@ -97,7 +97,7 @@ The view filters in the language the log filter reads, so a person learns one
 language and types it in every tab.
 [[spec/design_output/tui#the-filter-language]]
 
-An item answers the three questions the language asks of a row:
+An item answers the questions the language asks of a row:
 
 | the question | what an item answers |
 |---|---|
@@ -136,7 +136,7 @@ nesting survives every order a person picks.
 | presses it a third time | drops that key, and the ones beside it stand |
 | presses another head | adds that key under the first |
 
-A later key breaks the ties an earlier one leaves. Two values reading as
+A later key breaks the ties an earlier one leaves. Values reading as
 numbers compare as numbers, and a row carrying no value for a key stands after
 the rows that carry one.
 
@@ -154,7 +154,7 @@ its marks:
 
 | the letter | the key it reads | its tone |
 |---|---|---|
-| the state's first | the state, as its value | good on `open`, bad on `draft`, plain on `closed` |
+| the state's first | the state, as its value | good on `open`, bad on `draft`, and `held` and `closed` each its own |
 | the route's first | the route, as its value: N for a note, T trivial, S standard, G group | the route's own, off the `flags` map |
 | U | the ticket carries the urgent mark | bad |
 | C | the group holds a branch on the cloud, and its tickets inherit it | plain, because the cloud is neither good nor bad |
@@ -162,12 +162,12 @@ its marks:
 
 The letters hold fixed places, so nothing shifts as one lights. The keys stay
 ordinary keys, so a person filters on `urgent: true`, and `not urgent: true`
-keeps the rest.
+keeps the rest. A letter, its key and its tone stand under `flags` in the base
+file. A flag marked `value` draws its value's first letter in place of one. It
+names a tone a value under `tones`. Each value of a flag wears a colour of its
+own, because a reader tells a state by its colour before its letter.
 
-A letter, its key and its tone stand under `flags` in the base file. A flag
-marked `value` draws its value's first letter in place of one. It names a
-tone a value under `tones`, so `open` and `closed` wear two colours. A new
-flag costs one line there, because the key already stands. The `flags` map of
+A new flag costs one line there, because the key already stands. The `flags` map of
 [[spec/design_output/tui#colours]] holds the colours. A good tone wears the
 green, a bad one the red, and no tone the plain colour.
 

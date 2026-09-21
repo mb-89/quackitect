@@ -464,9 +464,12 @@ Each stands under `process.schema.yaml` and holds the ask's fields under
 A note is the smallest ticket, and it is where most work starts. A hand that
 meets an idea, a bug or a doubt mid-work writes a note and carries on. Its
 hold stays where it is. `ticket note` takes a name and a line, writes `from`
-off the hold as the ticket and step in hand, and answers at once. The note is
-private and stays on the box. Its ask is one field, `line`, and the field's
-`says` carries three hints and nothing else:
+off the hold as the ticket and step in hand, and answers at once.
+
+With `--talk` the decide step reads `by: person`. So a note asking for a
+discussion waits for the owner, and the pull hands it to no agent at a desk.
+The note is private and stays on the box. Its ask is one field, `line`, and
+the field's `says` carries three hints and nothing else:
 
 - the smallest case that shows it
 - why it matters

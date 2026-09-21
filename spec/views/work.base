@@ -10,7 +10,9 @@ flags:
     value: true
     tones:
       open: good
+      held: held
       draft: bad
+      closed: closed
   - key: route
     value: true
     tones:

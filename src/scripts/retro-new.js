@@ -3,7 +3,7 @@
 // retro-collect.js beside this file.
 // [[spec/design_input/the-agent-pulls-tickets]]
 
-import { mintedNote } from "../../.claude/skills/level0/lib/schema.js";
+import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { firstLeaf } from "../engine/group.js";
 import { askRows, processAt } from "./process.js";
 import { pull } from "./pull.js";

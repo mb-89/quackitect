@@ -13,11 +13,8 @@ import {
   tableFaults,
 } from "../../.claude/skills/level0/lib/answer.js";
 import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
-import {
-  MINT_TOOL,
-  mintedNote,
-  mintSpec,
-} from "../../.claude/skills/level0/lib/schema.js";
+import { MINT_TOOL } from "../../.claude/skills/level0/lib/schema.js";
+import { mintedNote, mintSpec } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
 import { onWrite } from "./write.js";

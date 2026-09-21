@@ -79,7 +79,7 @@ step: sync
 
 # Ask
 
-Three verbs answer what their asks name. a-route-closes-answered-asks closes a ticket whose ask another group answers, split-names-its-source cuts the file a caller names, and the-index-answers-the-queue lands the place the queue verb answers today in the index, or closes as became.
+The verbs here answer what their asks name, and the queue's place lands in the index or the ticket closes as became.
 
 # sync
 

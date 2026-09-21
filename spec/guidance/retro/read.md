@@ -14,3 +14,9 @@ rationale: [[spec/rationales/reading]]
 6. Point an improvement at the question it answers by its id, and a question at its improvement the same way. *
 7. Read every script a hand writes, and say whether the engine takes it or the guidance makes it needless. *
 8. Run `./RUNME.sh retro matrix <retro>` once every column stands, and read the table it draws.
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 1 | the lines the chapter file names | a line from the chapter after |

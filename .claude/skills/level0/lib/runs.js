@@ -49,5 +49,14 @@ export function saysGreen(stamp, sha) {
   }
   if (!stamp.clean) return { green: false, says: "the check ran over an unclean tree" };
   if (!stamp.ok) return { green: false, says: `the check answered red at ${stamp.at}` };
+  // A warning standing anywhere in the tree reads red, so nothing leaves the box over one. [[spec/design_output/work#the-battery-answers-first]]
+  const warned = Number(stamp.warnings ?? 0);
+  if (warned > 0) {
+    const files = [stamp.files ?? []].flat().length;
+    return {
+      green: false,
+      says: `${warned} warning(s) stand in ${files} file(s), which ./RUNME.sh lint names`,
+    };
+  }
   return { green: true, says: `the check passes on ${shortOf(sha)}` };
 }

@@ -83,7 +83,7 @@ record:
 
 # Ask
 
-Seven small tickets that share no topic, so one branch takes them all and this box switches off. Each stands at its design draft: a-door-holds-file-calls, a-door-holds-three-reads, a-lone-mark-pairs-wrong, a-pointer-reaches-a-heading, a-rule-names-its-failure, every-road-reads-one-config and one-door-joins-a-path. The route of each child says the rest.
+Small tickets that share no topic, so one branch takes them all and this box switches off. Each stands at its design draft, and the route of each says the rest.
 
 # sync
 
