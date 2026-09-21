@@ -174,3 +174,28 @@ test("a delta lifting six words out of a note answers one", async () => {
   assert.equal(said.code, 1);
   assert.match(said.said, /NoteTextStaysHome/);
 });
+
+// One place joins a path, and the reading of a standing test asks the hand for it. [[spec/tickets/one-door-joins-a-path]]
+test("the reading of a standing test joins its path through the hand's own join", async () => {
+  const join = (...parts) => parts.join("|");
+  const delta = `diff --git a/src/one.js b/src/one.js
+--- a/src/one.js
++++ b/src/one.js
+@@ -1,0 +2 @@
++export const two = 2;
+diff --git a/test/level0/other.test.js b/test/level0/other.test.js
+--- a/test/level0/other.test.js
++++ b/test/level0/other.test.js
+@@ -3,0 +4 @@
++test("two", () => {});
+`;
+  const it = {
+    ...box(),
+    join,
+    disk: fakeDisk({
+      [join(ROOT, "test/level0/other.test.js")]: 'import { two } from "../../src/one.js";\n',
+    }),
+  };
+  const said = await holds(it, delta);
+  assert.equal(said.code, 0, said.said);
+});

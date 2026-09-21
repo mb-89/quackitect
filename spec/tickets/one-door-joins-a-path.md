@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -99,6 +99,17 @@ record:
     hand: box d40a1b367f4d · claude-code-remote · helper-24
     hash_before: bb88563c9bdf2adbae518374cfc353b4c769f0c6
     hash_after: bb88563c9bdf2adbae518374cfc353b4c769f0c6
+  - step: implement/tests-red
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 637391c6ac85159593537ef9c0dfd6cb019d5a9a
+    hash_after: 637391c6ac85159593537ef9c0dfd6cb019d5a9a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -168,17 +179,30 @@ Every file and function the draft names stands in the tree, and `src/bridge/bash
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/level0/precommit.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the case hands the hook a join of its own and a fake disk holding a standing test under that join
+- the hook reads the test through a slash it writes itself, finds nothing, and refuses the delta as untested
+- what surprises the hand: the notes' reading joins through the hand already, so the two readings in one file part ways on the separator alone
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the case stands in the hook's test, and the change reaches the shared reading, the hook and the bash door
+- the case drives the hook over a fake disk and a fake git, and touches nothing else
+- the case's comment names the ticket, and the reading's comment names it too
+
 
 ## reflect
 
