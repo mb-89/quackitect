@@ -289,7 +289,7 @@ The transcript shows each ticket walked in order, and the thoughts show the orde
 
 <!-- the form is list -->
 
-- [[spec/tickets/a-comment-hunk-carries-no-code]] stands open at its draft with no group, minted off the note this box parked
+- [[spec/tickets/a-comment-hunk-is-prose]] stands open at its draft with no group, minted off the note this box parked
 - the craft findings the verdicts left for a later hand: the stop channel standing in two doors, the note ending pair in three files, the box's pid no module reads, a link check for a pointer at a note the tree lacks, and the slashes two readings in the bash door still write
 - no person step parked, and the handover says the seven tickets close done and the branch waits for a merge
 
