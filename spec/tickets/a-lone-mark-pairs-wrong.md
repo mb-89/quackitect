@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -164,6 +164,12 @@ record:
       - name: check
         exit: 0
         said: 57 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-12
+    hash_before: a15703c2f38e5e18410d88353dc800fad610482d
+    hash_after: a15703c2f38e5e18410d88353dc800fad610482d
+    returns: 2
+    why: "the reason for a span over one line break holds: the notes wrap their prose at a column, and spans wrap with it in `spec/design_output/bash.md` and other design notes, so a span stopping at a line break draws faults on lines a hand leaves alone; the first bullet goes missing where the next line holds a span: my probe feeds Vale a list item carrying a lone mark and a second item with one span right under it, and the fault lands on the second item's line, because the lone mark takes the opening mark off that line; the case in `test/contract/vale.test.js` puts a blank line between the item and the paragraph, so it passes around that gap, and two items in a row is the common shape; the fix in `snippets.js`: blank a span inside one line first, then a span over one line break, so a lone mark takes no opening mark off the next line; my probe shows that order keeps the wrapped spans and the blank case whole; the case asserts no fault on the paragraph line and every fault on the item's line, and it passes with no fault at all; assert a fault stands on the item's line, because a test asserting nothing passes; `./RUNME.sh check` answers zero on this tip, and the branch test answers green; `./RUNME.sh branch review misc` says the check answers one in its worktree, on a case in `test/contract/vale.test.js` that runs without Vale and fails the same way on the base, so it stands outside this ask; `./RUNME.sh branch review misc` marks the handback retro absent, and the route hands this ticket to a retro after this step; the commits touch the shared blanking, the rule files the project verb writes off it, and the one case, and nothing beyond the ask; the questions above are craft, because the design of one wrapped line stands, and the order of the pairing and the missing assertion go back to the hand; pass; the blanking pairs a span inside one line first, so a lone mark takes no opening mark off the line under it; my probe feeds Vale an item with a lone mark, a blank line and a paragraph with one span, and the one fault names the item's line; my probe feeds Vale two items in a row, and the one fault names the item's line again; my probe feeds Vale a span wrapping over one line break, and no fault stands on either line; a lone mark above a wrapped span draws one fault on its own line, and the wrapped span stays whole; the case in `test/contract/vale.test.js` holds both shapes, and asserts a fault names the item's line and none stands off it; the branch test answers green, and `./RUNME.sh check` answers zero on this tip; `./RUNME.sh branch review misc` says the check answers one in its worktree, on a stub case that fails the same way on the base; `./RUNME.sh branch review misc` marks the handback retro absent, and the route hands this ticket to a retro after this step; the commits touch the shared blanking, the rule files the project verb writes off it, and the one case, and nothing beyond the ask; both findings of the first round are craft, and both land: the order of the passes and the assertion on the item's line"
 ---
 
 # Ask
@@ -372,6 +378,20 @@ The blanking now runs two passes. The first blanks a span inside one line, so a 
 - test/contract/vale.test.js
 - src/scripts/work-review.js
 - spec/design_output/bash.md
+- spec/tickets/a-lone-mark-pairs-wrong.md
+- spec/guidance/review/reviewing.md
+- .claude/skills/level0/lib/snippets.js
+- .claude/skills/level0/lib/vale.js
+- spec/config/styles/VoiceParagraph/Characters.yml
+- spec/config/styles/VoiceParagraph/CodeSpans.yml
+- spec/config/styles/VoiceParagraph/ListItem.yml
+- spec/config/styles/VoiceParagraph/Markup.yml
+- spec/config/styles/VoiceParagraph/RestatedTable.yml
+- spec/config/styles/VoiceParagraph/Shape.yml
+- spec/config/styles/VoiceParagraph/ShapeAnswer.yml
+- spec/config/styles/VoiceParagraph/Vocabulary.yml
+- test/contract/vale.test.js
+- src/scripts/work-review.js
 
 ## verdict
 
@@ -390,6 +410,18 @@ fail
 - `./RUNME.sh branch review misc` marks the handback retro absent, and the route hands this ticket to a retro after this step
 - the commits touch the shared blanking, the rule files the project verb writes off it, and the one case, and nothing beyond the ask
 - the questions above are craft, because the design of one wrapped line stands, and the order of the pairing and the missing assertion go back to the hand
+pass
+- the blanking pairs a span inside one line first, so a lone mark takes no opening mark off the line under it
+- my probe feeds Vale an item with a lone mark, a blank line and a paragraph with one span, and the one fault names the item's line
+- my probe feeds Vale two items in a row, and the one fault names the item's line again
+- my probe feeds Vale a span wrapping over one line break, and no fault stands on either line
+- a lone mark above a wrapped span draws one fault on its own line, and the wrapped span stays whole
+- the case in `test/contract/vale.test.js` holds both shapes, and asserts a fault names the item's line and none stands off it
+- the branch test answers green, and `./RUNME.sh check` answers zero on this tip
+- `./RUNME.sh branch review misc` says the check answers one in its worktree, on a stub case that fails the same way on the base
+- `./RUNME.sh branch review misc` marks the handback retro absent, and the route hands this ticket to a retro after this step
+- the commits touch the shared blanking, the rule files the project verb writes off it, and the one case, and nothing beyond the ask
+- both findings of the first round are craft, and both land: the order of the passes and the assertion on the item's line
 
 ## checked
 
@@ -397,6 +429,7 @@ fail
 
 <!-- the form is checklist -->
 - the span pattern stands in `snippets.js` alone with a comment pointing at this ticket, the rule files carry it as the project verb writes them, and the check finds none standing over
+- the span patterns stand in `snippets.js` alone with a note pointing at this ticket, and every rule file opening with the blanking carries the same lines the project verb writes
 
 
 # Discussion
