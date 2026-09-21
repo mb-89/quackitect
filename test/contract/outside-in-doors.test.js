@@ -119,3 +119,21 @@ test("the rule stands in a file of its own, and one section a path names it", ()
     "one section names it once",
   );
 });
+
+// A Go package names the outside in its door.go, so an import of os anywhere else is a module reading the box in place. [[spec/tickets/a-door-holds-file-calls]]
+const OS = 'import (\n\t"fmt"\n\t"os"\n)\n';
+const OS_SIGNAL = 'import "os/signal"\n';
+
+ifVale("the rule refuses a Go import of os outside the package's door", async () => {
+  assert.ok((await ruledAt(OS, "src/lsp/tree.go")).includes(RULE));
+  assert.ok((await ruledAt(OS_SIGNAL, "src/index/main.go")).includes(RULE));
+  assert.ok((await ruledAt(OS, "src/engine/swap/swap.go")).includes(RULE));
+});
+
+ifVale("the rule passes the door of every Go package, and a Go case", async () => {
+  for (const where of ["src/lsp/door.go", "src/index/door.go", "src/engine/swap/door.go"]) {
+    assert.ok(!(await ruledAt(OS, where)).includes(RULE), where);
+    assert.ok(!(await ruledAt(SPAWN, where)).includes(RULE), where);
+  }
+  assert.ok(!(await ruledAt(OS, "src/lsp/tree_test.go")).includes(RULE));
+});

@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -99,6 +99,17 @@ record:
     hand: box d40a1b367f4d · claude-code-remote · helper-2
     hash_before: b40b04e059e8cae8eec0d2cc94bcd66116a934ca
     hash_after: b40b04e059e8cae8eec0d2cc94bcd66116a934ca
+  - step: implement/tests-red
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 4303130bf199a676675638cf00469d8cb7d6d701
+    hash_after: 4303130bf199a676675638cf00469d8cb7d6d701
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -170,17 +181,31 @@ The fake reaches the server package alone, and the other packages keep the real 
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/outside-in-doors.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the Vale case feeds the rule a Go import of `os` at a module's path, and the rule passes it, because the rule names the command import alone
+- the case at a door's path passes already, and so does the case at a test's path
+- the Go case over the memory disk waits for the interface, because a case naming a field the tree lacks builds nothing, and the branch test reads a build fault as no assertion
+- what surprises the hand: the door section in the config reaches one folder under the source root, so the swap package's door reads as a module today
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases stand in the Vale contract test, and the Go case joins the tree's test with the change
+- the Vale case drives the real binary, and the Go case drives the memory disk the package holds
+- each case's comment names the ticket, and the door's interface takes the same pointer
+
 
 ## reflect
 
