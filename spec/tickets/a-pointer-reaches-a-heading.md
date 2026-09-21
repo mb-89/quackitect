@@ -89,12 +89,16 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
     hash_before: e4179b2d3b37dc9d0213123833d835b3d4521eb5
     hash_after: e4179b2d3b37dc9d0213123833d835b3d4521eb5
+  - step: design/review
+    hand: box d40a1b367f4d · claude-code-remote · helper-18
+    hash_before: 5da6e0185f683d04253aa81d56cd888612d47457
+    hash_after: 5da6e0185f683d04253aa81d56cd888612d47457
 ---
 
 # Ask
@@ -144,6 +148,13 @@ The server reads every pointer's anchor against the headings of the note it name
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+The check, the fronts and the slug rows name `Over`, `Sweep` and `headingNamed`, and each stands in the tree.
+The case row feeds a pointer at a heading the note lacks and asserts the draw, so the rule carries its test.
+The pointers row covers every dead pointer the sweep names, and the tree holds many past the two the ask names.
+Lint exits red on an error and green over a warning, so the finding stands at error while a pointer reaches nothing.
+The check reads a raw row, so the case says what a pointer inside a code span draws.
 
 # implement
 
