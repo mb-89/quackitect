@@ -165,11 +165,11 @@ The `os` import stands in each package's `door.go`, the rule refuses it anywhere
 | piece | where | what changes |
 |---|---|---|
 | the rule | `spec/config/styles/VoiceVale/OutsideInDoors.yml` | refuses a Go import line naming `os` or a package under it, beside the `os/exec` line it holds |
-| the sections | `.vale.ini` | `[**/src/**/door.go]` stands off the rule, so a package under `src/engine` reads as the rest; `[**/src/**/*_test.go]` stands off it too, because a Go case drives the real thing over a folder it writes, the way `test/contract` does |
-| the doors | `door.go` in `src/config`, `src/lsp`, `src/tui`, `src/engine/swap`, `src/index` | each names the outside once: a reading, a writing, a stat, a folder, a remove, the executable, the environment, the arguments, the exit, the standard streams, the pid, and the interrupt. `src/config` and `src/engine/swap` get a `door.go`; the other three grow theirs |
+| the sections | `.vale.ini` | `[**/src/**/door.go]` stands off the rule, so a package under `src/engine` reads as the rest. `[**/src/**/*_test.go]` stands off it too. A Go case drives the real thing over a folder it writes, the way `test/contract` does |
+| the doors | `door.go` in `src/config`, `src/lsp`, `src/tui`, `src/engine/swap`, `src/index` | each names the outside once: the reads, the writes, the process and the interrupt. `src/config` and `src/engine/swap` get a `door.go`, and the other three grow theirs |
 | the callers | every other `.go` file importing `os` | calls the door's name for the same thing. `os.FileInfo` and `os.DirEntry` read as `fs.FileInfo` and `fs.DirEntry` out of `io/fs`, and `os.IsNotExist` as `errors.Is` over `fs.ErrNotExist`, both pure |
-| the fake | `src/lsp` | `Tree` holds a `Disk`, the interface `door.go` defines with the real one beside it. `treeAt` builds the real disk, and `fake_test.go` holds a memory disk that behaves: what a case writes, it reads back, and a stat or a listing answers out of the same map |
-| the cases | `src/lsp/tree_test.go`, `test/contract/outside-in-doors.test.js` | one drives `Read`, `Exists`, `Names` and `Paths` over the fake, with no folder on the box; the other feeds Vale an `os` import at a module's path and at a `door.go` path, and asserts the rule refuses one and passes the other |
+| the fake | `src/lsp` | `Tree` holds a `Disk`, the interface `door.go` defines with the real one beside it. `treeAt` builds the real disk. `fake_test.go` holds a memory disk that behaves: what a case writes, it reads back. A stat or a listing answers out of the same map |
+| the cases | `src/lsp/tree_test.go`, `test/contract/outside-in-doors.test.js` | one drives `Read`, `Exists`, `Names` and `Paths` over the fake, with no folder on the box. The other feeds Vale an `os` import at a module's path and at a `door.go` path. It asserts the rule refuses one and passes the other |
 
 The design output for the door rule stands at [[spec/design_output/doors#a-door-reads-the-outside]], and its table takes the Go import row.
 
@@ -185,12 +185,12 @@ The design output for the door rule stands at [[spec/design_output/doors#a-door-
 <!-- the form is verdict -->
 
 pass
-The rule file, the sections, each package named, the tree's constructor and its reading methods, and the contract test stand in the tree.
+- The rule file, the sections, each package named, the tree's constructor and its reading methods stand in the tree. So does the contract test.
 The rule row and the contract case answer the import bullet with a refusal at a module path and a pass at a door path.
 The doors row answers the one-file bullet, and the lint run over the tree proves it.
 The fake row and the tree case answer the fake bullet, with a memory disk behind the server's tree.
 The callers row answers the lint bullet, and the pure reads out of the standard library keep the callers off the import.
-The door section in the config reaches one folder under the source root, so the wider glob the draft names is what holds the swap package.
+- The door section in the config reaches one folder under the source root. The wider glob the draft names is what holds the swap package.
 The fake reaches the server package alone, and the other packages keep the real disk in their cases under the test section the draft adds.
 
 # implement
@@ -214,10 +214,10 @@ The fake reaches the server package alone, and the other packages keep the real 
 
 <!-- the form is text -->
 
-- the Vale case feeds the rule a Go import of `os` at a module's path, and the rule passes it, because the rule names the command import alone
+- the Vale case feeds the rule a Go import of `os` at a module's path, and the rule passes it. The rule names the command import alone
 - the case at a door's path passes already, and so does the case at a test's path
-- the Go case over the memory disk waits for the interface, because a case naming a field the tree lacks builds nothing, and the branch test reads a build fault as no assertion
-- what surprises the hand: the door section in the config reaches one folder under the source root, so the swap package's door reads as a module today
+- the Go case over the memory disk waits for the interface. A case naming a field the tree lacks builds nothing. The branch test reads a build fault as no assertion
+- what surprises the hand: the door section in the config reaches one folder under the source root. The swap package's door reads as a module today
 
 
 ### checked
@@ -266,8 +266,10 @@ The fake reaches the server package alone, and the other packages keep the real 
 
 <!-- the form is checklist -->
 
-- the change touches the rule, the config sections, the five Go packages' doors and callers, the door note's table and the cases
-- the tree in the server package reads through a disk with a memory fake beside it, and the other packages call their door, as the approach says
+- the change touches the rule, the config sections, and the five Go packages' doors and callers
+- the change touches the door note's table and the cases
+- the tree in the server package reads through a disk with a memory fake beside it
+- the other packages call their door, as the approach says
 - each door file's header and each wrapper's comment name the door note, and the disk interface names the ticket
 
 
@@ -299,7 +301,13 @@ The fake reaches the server package alone, and the other packages keep the real 
 
 <!-- the form is text -->
 
-The door rule refuses a Go import line naming `os` or a package under it, beside the command import it refused before. The config lets a `door.go` at any depth under the source root stand off the rule, and a Go case too, because a case drives the real thing over a folder it writes. Each Go package names the outside in its `door.go` alone: a reading, a writing, a stat, a folder, a remove, the executable, the environment, the arguments, the exit, the streams, the pid and the stop signal. The config and swap packages take a `door.go` of their own, and every other file calls the door's name. The server's tree reads through a disk interface the door defines, the real one behind it, and a memory disk in the cases, so a case drives the tree with no folder on the box. The path readers move out of the tree file into `holds.go`, because the tree file crossed the file ceiling.
+The door rule refuses a Go import line naming `os` or a package under it, beside the command import it refused before. The config lets a `door.go` at any depth under the source root stand off the rule. A Go case stands off it too, because a case drives the real thing over a folder it writes.
+- Each Go package names the outside in its `door.go` alone. That is the reads and writes of a file and a folder.
+- The door names the process too. That is the executable, the environment, the arguments, the exit, the streams, the pid and the stop signal.
+- The config and swap packages take a `door.go` of their own, and every other file calls the door's name.
+- The server's tree reads through a disk interface the door defines.
+- The real disk stands behind it, and a memory disk in the cases. So a case drives the tree with no folder on the box.
+- The path readers move out of the tree file into `holds.go`, because the tree file crossed the file ceiling.
 
 
 ### checked
@@ -308,7 +316,8 @@ The door rule refuses a Go import line naming `os` or a package under it, beside
 
 <!-- the form is checklist -->
 
-- the change touches the rule, the config sections, the five Go packages' doors and callers, the door note's table and the cases
+- the change touches the rule, the config sections, and the five Go packages' doors and callers
+- the change touches the door note's table and the cases
 - the tree reads through the memory disk in its case, and the Vale case drives the real binary
 - the door files and the disk interface name the door note and the ticket
 
@@ -371,7 +380,8 @@ The door rule refuses a Go import line naming `os` or a package under it, beside
 <!-- the form is verdict -->
 
 pass
-The rule refuses an import of os or a package under it at a module path, and the contract case feeds it one and asserts the refusal.
+
+- The rule refuses an import of os or a package under it at a module path. The contract case feeds it one and asserts the refusal.
 The door of each package and a Go case stand off the rule in one section each, and the lint over the tree passes.
 Each package names the outside in its door alone, and no file past a door or a case imports os.
 The tree reads through the disk the door defines, and the case drives it over the memory disk with no folder on the box.
@@ -380,7 +390,7 @@ The case over the fake still reaches git through the door before it walks the me
 The stop channel stands in two doors word for word, where the swap package both import stands to hold it once.
 The header of the server's door names the command alone, and the file holds the reads too.
 A standard import lands under the third-party group in four files, which reads off the rest of the tree.
-The group branch carries the drafts and the record of the sibling tickets beside this one, and none of them redesigns what this ask leaves alone.
+- The group branch carries the drafts and the record of the sibling tickets beside this one. None of them redesigns what this ask leaves alone.
 
 ## checked
 
@@ -388,7 +398,7 @@ The group branch carries the drafts and the record of the sibling tickets beside
 
 <!-- the form is checklist -->
 
-- the door note's row points at each door and at the tree's disk, the doors and the disk interface name the note or the ticket, and the config comment points at the door instead of restating the rule
+- the door note's row points at each door and at the tree's disk. The doors and the disk interface name the note or the ticket, and the config comment points at the door
 
 # Discussion
 

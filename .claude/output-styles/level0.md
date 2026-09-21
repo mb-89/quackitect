@@ -14,7 +14,7 @@ reason and the line.
 ## arguing
 
 1. Open on the fault in the owner's framing, and answer the question under it. An answer inside a wrong frame answers the wrong question.
-2. Grade a claim you cannot check, and name what backs it. A claim stated as fact from memory misleads the reader who trusts it.
+2. Grade a claim you cannot check, and name what backs it. A claim with nothing behind it costs the reader a check of their own.
 3. Cite a source by author and year. A reader checks the argument there, and a bare claim gives them nowhere to look.
 4. State the strongest objection to your own answer, and answer it. An answer that meets no objection falls to the first one a reader raises.
 5. Argue the strongest form of a view you refuse, and refuse that form.

@@ -197,10 +197,10 @@ The hand's `join` is the one place a path joins, and `fileText` takes it.
 | `notesOf` | `it.join` | none |
 | `holds`, through `fileText` | a slash `fileText` writes itself | `fileText` takes the hand |
 
-- `fileText(it, path)` in `.claude/skills/level0/lib/scripted.js` reads `it.disk`, `it.root` and `it.join`, and writes no slash. An absolute path stays as it is.
+- `fileText(it, path)` in `.claude/skills/level0/lib/scripted.js` reads the disk, the root and the join off the hand, and writes no slash. An absolute path stays as it is.
 - `src/scripts/precommit.js` hands `fileText` its `it`, which carries the join already.
-- `src/bridge/bash.js` hands it the box's disk and work root with the `join` of `node:path`, the pure import the door rule passes.
-- A case in `test/level0/precommit.test.js` drives `holds` over a fake disk with a join of its own, and asserts the reading reaches the file that join names and no path with a slash the hand never wrote.
+- `src/bridge/bash.js` hands it the box's disk and work root with the `join` of `node:path`. That is the pure import the door rule passes.
+- A case in `test/level0/precommit.test.js` drives `holds` over a fake disk with a join of its own. It asserts the reading reaches the file that join names.
 
 
 ## review
@@ -241,9 +241,10 @@ Every file and function the draft names stands in the tree, and `src/bridge/bash
 
 <!-- the form is text -->
 
-- the case hands the hook a join of its own and a fake disk holding a standing test under that join
+- the case hands the hook a join of its own
+- the fake disk holds a standing test under that join
 - the hook reads the test through a slash it writes itself, finds nothing, and refuses the delta as untested
-- what surprises the hand: the notes' reading joins through the hand already, so the two readings in one file part ways on the separator alone
+- what surprises the hand: the notes' reading joins through the hand already. The two readings in one file part ways on the separator alone
 
 
 ### checked
@@ -267,7 +268,10 @@ Every file and function the draft names stands in the tree, and `src/bridge/bash
 
 <!-- the form is text -->
 
-The class: a case written to satisfy the commit door's ask for a test beside a file, and not to prove the change. The dotted path case passed under the old join too, because the token cleaner strips the leading dot before the door reads, so it asserted a fact another module owns. The fix for the class: a case names what the change makes true and what the old code made false, and a file with no such case for it takes no case at all. The door's standing script case drives the reader already, so the dotted case goes.
+The class: a case written to satisfy the commit door's ask for a test beside a file. It held no proof of the change.
+- The dotted path case passed under the old join too. The token cleaner strips the leading dot before the door reads, so the case asserted a fact another module owns.
+- The fix for the class: a case names what the change makes true and what the old code made false. A file with no such case for it takes no case at all.
+- The door's standing script case drives the reader already, so the dotted case goes.
 
 
 ### checked
@@ -333,7 +337,12 @@ The class: a case written to satisfy the commit door's ask for a test beside a f
 
 <!-- the form is text -->
 
-The shared reading of a file takes the hand and joins the path through the hand's own join, so the hook's two readings part ways on nothing. The hook hands its own hand in, which carried the join already. The bash door's box carries no join, so the door builds a small reader off the work root and the join of the path module, the pure import the door rule passes. A case hands the hook a join of its own over a fake disk and asserts the hook finds the standing test under that join. The door's standing script case drives its reader.
+The shared reading of a file takes the hand and joins the path through the hand's own join. So the hook's two readings part ways on nothing. The hook hands its own hand in, which carried the join already.
+- The bash door's box carries no join.
+- So the door builds a small reader off the work root and the join of the path module. That join is the pure import the door rule passes.
+- A case hands the hook a join of its own over a fake disk.
+- It asserts the hook finds the standing test under that join.
+- The door's standing script case drives its reader.
 
 
 ### checked
@@ -374,13 +383,13 @@ The shared reading of a file takes the hand and joins the path through the hand'
 pass
 
 - `fileText` takes the hand and joins through `it.join`, and every caller hands it a hand, so the first bullet stands.
-- `holds` hands its own hand to `fileText`, and the slash it wrote is gone, so the second bullet stands.
-- The case in `test/level0/precommit.test.js` drives `holds` under a join of its own over one fake disk, which runs the notes reading and the test reading both, and the record says it fails on its own assertion before the change, so the third bullet stands.
+- `holds` hands its own hand to `fileText`, and writes no slash now, so the second bullet stands.
+- The case in `test/level0/precommit.test.js` drives `holds` under a join of its own over one fake disk. That runs the notes reading and the test reading both. The record says it fails on its own assertion before the change, so the third bullet stands.
 - The check on the tests-green commit exits zero by the record, and the lint over `src` exits zero here.
 - The three test files pass here, and the door's standing script case drives `reader` in `src/bridge/bash.js`.
-- The dotted case and its comment are gone from `test/level0/trunk-door.test.js`, and the hunk left there adds one blank line at the end, which redesigns nothing.
-- `notesIn` and `batteryHere` in `src/bridge/bash.js` still write the slash, and the ask names the hook alone, so that stays outside this ticket.
-- The reflect chapter names the class as a case written for the commit door's ask and not for the change, and the fix lands as the dropped case.
+- The dotted case and its comment left `test/level0/trunk-door.test.js`. The hunk left there adds one blank line at the end, which redesigns nothing.
+- `notesIn` and `batteryHere` in `src/bridge/bash.js` still write the slash. The ask names the hook alone, so that stays outside this ticket.
+- The reflect chapter names the class. That is a case written for the commit door's ask, with no proof of the change. The dropped case is the fix.
 - No handback stands on this ticket, so no retro question rides along.
 
 ## checked
@@ -389,7 +398,7 @@ pass
 
 <!-- the form is checklist -->
 
-- The fact that the hand's join is the one place a path joins stands in the comment over `fileText`, and the comments over `reader` and the case point at the ticket instead of repeating it.
+- The fact that the hand's join is the one place a path joins stands in the comment over `fileText`. The comments over `reader` and the case point at the ticket.
 
 # Discussion
 

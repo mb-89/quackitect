@@ -161,11 +161,11 @@ reader then applies it where it costs and skips it where it bites.
 
 <!-- the form is text -->
 
-A shape rule refuses a marked rule standing as one sentence, every marked rule under `spec/guidance` takes the failure as its second sentence, and the guidance note says so in a rule of its own.
+A shape rule refuses a marked rule standing as one sentence. Every marked rule under `spec/guidance` takes the failure as its second sentence. The guidance note says so in a rule of its own.
 
 | piece | where | what changes |
 |---|---|---|
-| the check | `spec/config/styles/VoiceShape/MarkedRuleNamesFailure.yml` | a script rule over the Actionables chapter: a numbered line ending in the mark counts its sentences with code spans and links blanked, and one sentence refuses with the line |
+| the check | `spec/config/styles/VoiceShape/MarkedRuleNamesFailure.yml` | a script rule over the Actionables chapter. A numbered line ending in the mark counts its sentences with code spans and links blanked. One sentence refuses with the line |
 | the sections | `.vale.ini` | none: both guidance sections read `VoiceShape` already |
 | the rules | every note under `spec/guidance` | each marked rule standing as one sentence takes a second: the failure it prevents, or the cost a reader pays otherwise. A clause opened by `because` splits into that second sentence |
 | the rule | `spec/guidance/guidance.md` | a new rule: write a marked rule as the instruction and then the failure it prevents, marked itself |
@@ -214,9 +214,9 @@ A second sentence stays under the list item cap of twenty words, or the lint ref
 
 <!-- the form is text -->
 
-- the case feeds Vale a guidance note with a marked rule of one sentence, and no rule refuses it, because the shape folder holds no such rule yet
+- the case feeds Vale a guidance note with a marked rule of one sentence, and no rule refuses it. The shape folder holds no such rule yet
 - the case with two sentences and the case with an unmarked rule pass already
-- what surprises the hand: the shared chapter fixture in this test writes one-sentence marked rules, so the case writes a fixture of its own
+- what surprises the hand: the shared chapter fixture in this test writes one-sentence marked rules. So the case writes a fixture of its own
 
 
 ### checked
@@ -225,7 +225,8 @@ A second sentence stays under the list item cap of twenty words, or the lint ref
 
 <!-- the form is checklist -->
 
-- the cases stand in the shape contract test, and the change reaches the rule file, the guidance notes, the guidance rule and its rationale chapter
+- the cases stand in the shape contract test
+- the change reaches the rule file, the guidance notes, the guidance rule and its rationale chapter
 - the cases drive the real Vale, and the rule reaches no door past it
 - each case's comment names the guidance note, and the rule file links it
 
@@ -265,7 +266,9 @@ A second sentence stays under the list item cap of twenty words, or the lint ref
 
 <!-- the form is checklist -->
 
-- the change touches the rule file, every guidance note holding a marked rule of one sentence, the guidance rule, its rationale chapter, the projections off the guidance, and the cases
+- the change touches the rule file, the guidance notes holding a marked rule of one sentence, and the guidance rule
+- the change touches the rationale chapter
+- the change touches the projections off the guidance, and the cases
 - the rule reaches Vale alone, and the cases drive the real one
 - the rule file links the guidance note, and the new rule names the rule file
 
@@ -370,7 +373,7 @@ The diff touches no file past the ask, and the project verb writes the projectio
 
 <!-- the form is checklist -->
 
-- The check stands in the rule file alone and the argument in the rationale chapter alone, the guidance rule names the check and the test comment links the note, and the projection copies the guidance by design.
+- The check stands in the rule file alone, and the argument in the rationale chapter alone. The guidance rule names the check, the test comment links the note, and the projection copies the guidance by design.
 
 
 # Discussion

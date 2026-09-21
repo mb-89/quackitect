@@ -226,14 +226,14 @@ under that line pairs wrong.
 
 <!-- the form is text -->
 
-The blanking every script rule shares pairs a code span inside one line, so a lone mark stays on its own line and the span under it reads whole.
+The blanking every script rule shares pairs a code span inside one line. So a lone mark stays on its own line, and the span under it reads whole.
 
 | piece | where | what changes |
 |---|---|---|
 | the pairing | `.claude/skills/level0/lib/snippets.js`, the `plain` function | the span pattern stops at a line break, so a mark pairs with a mark on its own line and with no other |
-| the rules | `spec/config/styles/VoiceParagraph/*.yml` | `./RUNME.sh project` writes them again off the one function, and nothing is edited by hand |
-| the fault | the rules reading the blanked text | a lone mark now stands unblanked on its own line, so the fault a rule draws over it names that line, and a span under it pairs and blanks as before |
-| the case | `test/contract/vale.test.js` | a list item carrying a lone mark, a blank line, then a paragraph with one span: the paragraph's line draws nothing, and every fault stands on the item's line |
+| the rules | `spec/config/styles/VoiceParagraph/*.yml` | `./RUNME.sh project` writes them again off the one function, and nobody edits them by hand |
+| the fault | the rules reading the blanked text | a lone mark now stands unblanked on its own line, so the fault a rule draws over it names that line. A span under it pairs and blanks as before |
+| the case | `test/contract/vale.test.js` | a list item carrying a lone mark, a blank line, then a paragraph with one span. The paragraph's line draws nothing, and every fault stands on the item's line |
 
 The source holds the sentence-level pairing in `paragraph-rules.js` already, because a sentence stands inside a line. The one place still pairing over the whole text is the shared blanking, and this change takes it there.
 
@@ -249,10 +249,10 @@ The source holds the sentence-level pairing in `paragraph-rules.js` already, bec
 <!-- the form is verdict -->
 
 pass
-- The plain function in snippets.js stands where the approach says, and its span pattern is the one place pairing over the whole text.
-- Stopping the span pattern at a line break answers the first bullet, and the rules under VoiceParagraph take it through the project verb.
+- The plain function in snippets.js stands where the approach says. Its span pattern is the one place pairing over the whole text.
+- Stopping the span pattern at a line break answers the first bullet. The rules under VoiceParagraph take it through the project verb.
 - A lone mark left unblanked on its own line makes every fault name that line, which answers the second bullet.
-- The case in vale.test.js holds the list item with the lone mark and the paragraph with one span, and asserts the paragraph line draws nothing.
+- The case in vale.test.js holds the list item with the lone mark and the paragraph with one span. It asserts the paragraph line draws nothing.
 - The paragraph rules already pair inside a sentence, so the change leaves them alone.
 
 # implement
@@ -278,7 +278,7 @@ pass
 
 - the case feeds Vale a list item with a lone mark and a paragraph with one span under it
 - the paragraph's line draws `Characters` over the closing mark of its span, and the item's line draws nothing
-- what surprises the hand: the blanking hides the lone mark and the opening mark both, so the one mark left unpaired is the closing one, two lines below its cause
+- what surprises the hand: the blanking hides the lone mark and the opening mark both. So the one mark left unpaired is the closing one, two lines below its cause
 
 
 ### checked
@@ -302,7 +302,7 @@ pass
 
 <!-- the form is text -->
 
-The class: a record written in the wrong place. The second round's verdict stood under the first round's lines in the same chapter, so the field's first line still read fail, and the pull took the old word. The fix for the class: a chapter holds one round's fields, and a new round clears the old ones first, because the record in the frontmatter carries them already. The code stands as the second round found it, and no change to it rides this round.
+The class: a record written in the wrong place. The second round's verdict stood under the first round's lines in the same chapter. So the field's first line still read fail, and the pull took the old word. The fix for the class: a chapter holds one round's fields, and a new round clears the old ones first. The record in the frontmatter carries them already. The code stands as the second round found it, and no change to it rides this round.
 
 
 ### checked
@@ -414,15 +414,15 @@ The blanking runs two passes. The first blanks a span inside one line, so a lone
 <!-- the form is verdict -->
 
 pass
-- The blanking pairs a span inside one line first, then a span over one line break, so a lone mark takes no opening mark off the line under it.
-- The probe feeds Vale an item with a lone mark, a blank line and a paragraph with one span, and the one fault names the item's line.
+- The blanking pairs a span inside one line first, then a span over one line break. So a lone mark takes no opening mark off the line under it.
+- The probe feeds Vale an item with a lone mark, a blank line and a paragraph with one span. The one fault names the item's line.
 - The probe feeds Vale two items in a row, and the one fault names the item's line again.
 - The probe feeds Vale a span wrapping over one line break, and no fault stands on either line.
 - The case in `test/contract/vale.test.js` holds both shapes, asserts a fault names the item's line, and asserts none stands off it.
 - The eight rule files under `spec/config/styles/VoiceParagraph` carry the same two lines the shared function writes, and nothing beyond.
 - The branch test answers green, and `./RUNME.sh check` answers zero on this tip.
-- `./RUNME.sh branch review misc` says the check answers one in its worktree, on a case that runs without Vale and stands outside this ask.
-- `./RUNME.sh branch review misc` marks the handback retro absent, and the route hands this ticket to a retro after this step.
+- `./RUNME.sh branch review misc` says the check answers one in its worktree. That is a case that runs without Vale, and it stands outside this ask.
+- `./RUNME.sh branch review misc` marks the handback retro absent. The route hands this ticket to a retro after this step.
 - The commits touch the shared blanking, the projected rule files and the one case, and nothing beyond the ask.
 - Both craft findings of the first round land, and no design question stands.
 
@@ -433,7 +433,8 @@ pass
 
 <!-- the form is checklist -->
 
-- the two patterns stand once in the shared function in `snippets.js`, the rule files take them off it through the project verb, and the comment on the pattern and the case both point at the ticket instead of repeating the approach
+- the two patterns stand once in the shared function in `snippets.js`. The rule files take them off it through the project verb
+- the comment on the pattern and the case both point at the ticket
 
 
 # Discussion

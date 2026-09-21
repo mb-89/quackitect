@@ -93,17 +93,17 @@ step: design/draft
 
 # Ask
 
-A door reading the shape of a change and not its lines refuses a change it has
-no rule over, so the commit door reads the hunk it refuses.
+A door reading the shape of a change refuses a change it has no rule over. So
+the commit door reads the hunk it refuses.
 
 The commit door asks for a test beside every source file a delta changes. It
-reads the path alone, so a hunk holding comment lines and nothing else meets
-the same refusal as a change to code, and a pointer fix in seven modules
-landed past the door by hand.
+reads the path alone. So a hunk holding comment lines alone meets the refusal
+a change to code meets. A pointer fix in seven modules landed past the door by
+hand.
 
 - The commit door reads a hunk holding comment lines alone as prose, and asks no test for it.
 - A hunk holding one line of code beside a comment meets the door as before.
-- A case feeds the door a comment-only delta and a mixed one, and asserts the first passes and the second refuses.
+- A case feeds the door a comment-only delta and a mixed one. The first passes, and the second refuses.
 - `./RUNME.sh check` exits 0.
 
 # design

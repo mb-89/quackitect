@@ -199,9 +199,9 @@ The door rule grows the three reads, and the two modules past a root that hold o
 | the identity | `src/scripts/vehicle.js` | `identityHere` takes the pid as an argument, and the root behind each verb hands it `process.pid` off the hand it builds. A case hands a pid of its own, so an identity replays |
 | the review | `src/bridge/review.js` | the helper's spawn takes the node path off the box, which the server root puts there as `node`, the way the command root already does |
 | the doors | `src/doors/awake.js`, `src/doors/session.js`, `src/doors/wire.js` | none: a door reads the outside, and the sections say so already |
-| the case | `test/contract/outside-in-doors.test.js` | feeds each of the three reads at a module's path and asserts the rule refuses it, then at every root of the pass list and asserts it passes |
+| the case | `test/contract/outside-in-doors.test.js` | feeds each of the three reads at a module's path and asserts the rule refuses it. Then it feeds each at every root of the pass list and asserts it passes |
 
-The table at [[spec/design_output/doors#a-door-reads-the-outside]] takes three rows, one a read, so the rule and the note say the same list.
+The table at [[spec/design_output/doors#a-door-reads-the-outside]] takes three rows, one a read. The rule and the note say the same list.
 
 
 ## review
@@ -215,12 +215,12 @@ The table at [[spec/design_output/doors#a-door-reads-the-outside]] takes three r
 <!-- the form is verdict -->
 
 pass
-The rule file holds the list of reads the draft grows, so the first bullet takes a concrete change.
+- The rule file holds the list of reads the draft grows, so the first bullet takes a concrete change.
 The pid read in `src/scripts/vehicle.js` and the exec path read in `src/bridge/review.js` are the only reads of the three past a root, and the draft moves both.
 The command root builds `node` off the exec path, and `boxOf` in `src/bridge/server.js` reads the environment in one place, so the review's change lands beside it.
 `identityHere` calls `idOf` in `src/scripts/vehicle.js`, and each caller reaches back to a root that builds a hand.
 Every other read of the three stands under a section the pass list holds, so the lint bullet follows from the two moves.
-The contract case feeds each read at a module's path and asserts a refusal, then at every root of the pass list and asserts a pass, so the rule carries a test that fires.
+- The contract case feeds each read at a module's path and asserts a refusal. Then it feeds each at every root of the pass list and asserts a pass. So the rule carries a test that fires.
 The doors and their fakes keep their reads under the sections standing, and the note's table grows one row a read.
 
 # implement
@@ -244,7 +244,7 @@ The doors and their fakes keep their reads under the sections standing, and the 
 
 <!-- the form is text -->
 
-- the case feeds the rule each of the three reads at a module's path, and the rule passes all three, because its list names the environment, the arguments and the platform alone
+- the case feeds the rule each of the three reads at a module's path, and the rule passes all three. Its list names the environment, the arguments and the platform alone
 - the case over every root and every door passes already
 - what surprises the hand: nothing, because the rule reads a fixed list and the three stand outside it
 
@@ -270,7 +270,7 @@ The doors and their fakes keep their reads under the sections standing, and the 
 
 <!-- the form is text -->
 
-The class: a signature changed at its definition and at the callers one search found, and not at the callers a second road holds. The identity took a pid, the command root handed it in, and the bridge's vehicle module still called the old shape, so an identity made through the port road ended in no number. The fix for the class: search for every caller of a changed name before the change closes, and give the case a tree with no identity, because a tree holding one never runs the road that makes it.
+The class: a signature changed at its definition and at the callers one search found, while a second road held callers of its own. The identity took a pid, and the command root handed it in. The bridge's vehicle module still called the old shape, so an identity made through the port road ended in no number. The fix for the class: search for every caller of a changed name before the change closes. Give the case a tree with no identity, because a tree holding one skips the road that makes it.
 
 
 ### checked
@@ -303,7 +303,8 @@ The class: a signature changed at its definition and at the callers one search f
 
 <!-- the form is checklist -->
 
-- the change touches the rule, the identity's callers on every road, the roots that hand the pid in, the note's table and the cases
+- the change touches the rule, the identity's callers on every road, and the roots that hand the pid in
+- the change touches the note's table and the cases
 - the bridge and the identity take the pid off the box or the hand, which every case fakes
 - each changed read carries a comment naming the door note
 
@@ -336,7 +337,10 @@ The class: a signature changed at its definition and at the callers one search f
 
 <!-- the form is text -->
 
-The door rule's list grows the pid, the node version and the exec path. The identity takes the pid as an argument on every road: the command root hands it off the hand, the server root puts it on the box and hands it to the port road, and the editor's process file hands its own. A case gives the port road a tree with no identity and asserts the identity it makes ends in the pid. The review door takes the node path off the box, and the note's table names each of the three reads beside what a module takes instead.
+The door rule's list grows the pid, the node version and the exec path. The identity takes the pid as an argument on every road. The command root hands it off the hand. The server root puts it on the box and hands it to the port road, and the editor's process file hands its own.
+- A case gives the port road a tree with no identity. It asserts the identity it makes ends in the pid.
+- The review door takes the node path off the box.
+- The note's table names each of the three reads beside what a module takes instead.
 
 
 ### checked
@@ -346,7 +350,8 @@ The door rule's list grows the pid, the node version and the exec path. The iden
 <!-- the form is checklist -->
 
 - the change touches the rule, the identity's callers on every road, the roots, the note's table and the cases
-- the port road's case hands a pid of its own over a fake disk, and the Vale case drives the real binary
+- the port road's case hands a pid of its own over a fake disk
+- the Vale case drives the real binary
 - each changed read carries a comment naming the door note
 
 
@@ -389,13 +394,13 @@ The door rule's list grows the pid, the node version and the exec path. The iden
 <!-- the form is verdict -->
 
 pass
-The rule's list grows the three reads, and the contract case feeds each at a module's path and asserts the refusal, then at every root and door and asserts a pass.
-The identity takes the pid on every road: the command root hands `it.pid`, the server root hands its own to the port road, and the editor's process file hands its own.
-A case gives the port road a tree with no identity and asserts the identity it makes ends in the pid the case hands.
+
+- The rule's list grows the three reads. The contract case feeds each at a module's path and asserts the refusal. Then it feeds each at every root and door and asserts a pass.
+- A case gives the port road a tree with no identity. It asserts the identity it makes ends in the pid the case hands.
 The review takes the node path off the box, and a case names its own node and asserts the spawn runs on it.
 Every remaining read of the three stands under a section `.vale.ini` holds off, and the lint exits at zero.
 The branch test runs the Vale cases green, and the vehicle, stub, review and hand cases pass under node.
-The box carries a `pid` no module reads yet, because the server root hands its own pid to the port road itself, and that is craft rather than a fault.
+- The box carries a `pid` no module reads yet. The server root hands its own pid to the port road, and that is craft.
 The refusing case in `test/level0/stub.test.js` calls `stubInto` with no pid, and passes because the refusal returns before the identity, so it is craft too.
 
 ## checked
@@ -404,7 +409,7 @@ The refusing case in `test/level0/stub.test.js` calls `stubInto` with no pid, an
 
 <!-- the form is checklist -->
 
-- the list of reads stands in the rule file alone, the pid and the node path each come off one root hand, and the note's table and each changed read's comment link the door note instead of restating it
+- the list of reads stands in the rule file alone. The pid and the node path each come off one root hand. The note's table and each changed read's comment link the door note
 
 # Discussion
 

@@ -162,7 +162,7 @@ the lint.
 
 <!-- the form is text -->
 
-Each road hands Vale the config the assembly writes, off the pair of roots, and one contract case proves a project's rule refuses on every road.
+Each road hands Vale the config the assembly writes, off the pair of roots. One contract case proves a project's rule refuses on every road.
 
 | road | where | reads today | reads after |
 |---|---|---|---|
@@ -170,8 +170,8 @@ Each road hands Vale the config the assembly writes, off the pair of roots, and 
 | the findings road | `src/bridge/findings.js` | the method's `.vale.ini` by name | `assemble(it.disk, pair)` over `box.method` and `box.work`, and the config it answers |
 | the copilot road | `.claude/skills/level0/lib/copilot-runtime.js` | Vale's default config under the root | `assemble` over the pair `rootsHere` answers in `src/scripts/copilot.js`, handed in as `it.method` and `it.work` |
 
-- `assemble` stands in `src/scripts/styles.js` and takes the pair the vale door builds, so the three roads call it as it stands.
-- A contract case in `test/contract/styles.test.js` writes a work root beside this tree holding one rule of its own, refusing a word, and asserts the findings road, the copilot check and the answer gate each name that rule over a text carrying the word.
+- `assemble` stands in `src/scripts/styles.js` and takes the pair the vale door builds. The three roads call it as it stands.
+- A contract case in `test/contract/styles.test.js` writes a work root beside this tree holding one rule of its own. It asserts the findings road, the copilot check and the answer gate each name that rule.
 
 `./RUNME.sh check` answers 0 once the roads agree.
 
@@ -187,6 +187,9 @@ Each road hands Vale the config the assembly writes, off the pair of roots, and 
 <!-- the form is verdict -->
 
 pass
+- The three roads and the pair each meet a named change. The contract case feeds a project's rule bad text on every road.
+- The findings road runs Vale from the method root. The change runs it from the work root, the way the door does.
+
 The three roads and the pair each meet a named change, and the contract case feeds a project's rule bad text on every road.
 The findings road runs Vale from the method root, so the change runs it from the work root the way the door does.
 The copilot root builds no pair today, so the change imports `rootsHere` from the vehicle script and hands the pair in.
@@ -212,11 +215,12 @@ The copilot root builds no pair today, so the change imports `rootsHere` from th
 
 <!-- the form is text -->
 
-- the case writes a work root beside this tree with one rule of its own, and a config naming the method's style beside it
+- the case writes a work root beside this tree with one rule of its own
+- the work root's config names the method's style beside its own
 - the answer gate refuses the word, because the door assembles the pair already
-- the findings road hands Vale the bare config name from the work root, so Vale stops on a style it finds nowhere, and the case fails on the fault
+- the findings road hands Vale the bare config name from the work root. Vale stops on a style it finds nowhere, and the case fails on the fault
 - the copilot road's check stands unexported, so the case fails before it drives it
-- what surprises the hand: the findings road runs from the method root today, so a project's own note reads through the method's rules alone
+- what surprises the hand: the findings road runs from the method root today. A project's own note reads through the method's rules alone
 
 
 ### checked
@@ -225,8 +229,10 @@ The copilot root builds no pair today, so the change imports `rootsHere` from th
 
 <!-- the form is checklist -->
 
-- the case stands in a contract test of its own, and the change reaches the findings road, the copilot road and the copilot root
-- the case drives the real Vale through the door, the findings road and the copilot check, over a work root it writes and removes
+- the case stands in a contract test of its own
+- the change reaches the findings road, the copilot road and the copilot root
+- the case drives the real Vale through the door, the findings road and the copilot check
+- the case runs over a work root it writes and removes
 - the case's comment names the ticket, and each road's change names the vehicle note's chapter on the assembly
 
 
@@ -265,7 +271,8 @@ The copilot root builds no pair today, so the change imports `rootsHere` from th
 
 <!-- the form is checklist -->
 
-- the change touches the findings road, the copilot road and its root, and the cases, and the answer gate stands as it is
+- the change touches the findings road, the copilot road and its root, and the cases
+- the answer gate stands as it is
 - each road reaches Vale alone, which the unit cases fake and the contract case drives
 - each road's change names the vehicle note's chapter on the assembly
 
@@ -298,7 +305,10 @@ The copilot root builds no pair today, so the change imports `rootsHere` from th
 
 <!-- the form is text -->
 
-The findings road hands Vale the config the assembly writes over the pair of roots, and runs from the work root, where a project's notes stand. The copilot root reads the pair the vehicle module answers and hands the road a way to the assembled config, and the road's check takes that config and runs from the work root. The answer gate lints through the door, which assembled the pair already, so it stands as it is. The contract case writes a work root beside this tree holding one rule of its own, and asserts the answer gate, the findings road and the copilot check each refuse the word that rule names.
+The findings road hands Vale the config the assembly writes over the pair of roots. It runs from the work root, where a project's notes stand. The copilot root reads the pair the vehicle module answers. It hands the road a way to the assembled config, and the road's check takes that config and runs from the work root.
+- The answer gate lints through the door, which assembled the pair already, so it stands as it is.
+- The contract case writes a work root beside this tree holding one rule of its own.
+- It asserts the answer gate, the findings road and the copilot check each refuse the word that rule names.
 
 
 ### checked
@@ -308,7 +318,8 @@ The findings road hands Vale the config the assembly writes over the pair of roo
 <!-- the form is checklist -->
 
 - the change touches the findings road, the copilot road and its root, and the cases
-- the contract case drives the real Vale over a work root it writes and removes, and the unit cases fake the process
+- the contract case drives the real Vale over a work root it writes and removes
+- the unit cases fake the process
 - each road's change names the vehicle note's chapter on the assembly
 
 
@@ -347,14 +358,14 @@ The findings road hands Vale the config the assembly writes over the pair of roo
 <!-- the form is verdict -->
 
 pass
-- The findings road hands Vale the config `assemble` answers over the pair and runs from the work root, as the approach names.
-- The copilot root reads the pair off `rootsHere` and hands `check` the assembled config and the work root, and the answer gate stands as it is through the door.
-- The contract case feeds a project's own rule bad text on each road through the real Vale, and asserts each road names the rule.
+- The findings road hands Vale the config `assemble` answers over the pair, and runs from the work root. That is what the approach names.
+- The copilot root reads the pair off `rootsHere` and hands `check` the assembled config and the work root. The answer gate stands as it is, through the door.
+- The contract case feeds a project's own rule bad text on each road through the real Vale. It asserts each road names the rule.
 - The unit case for `check` asserts the config and the working folder reach the process.
 - The lint, the contract case and the unit cases pass here, and the record holds the check green.
-- `configOf` builds the pair by hand where `pairOf` stands in `.claude/skills/level0/lib/vehicle.js`, as the door does too, so a later ticket can draw both to it.
-- `it.styles?.()` lets a root without `styles` fall back to the bare config, which a fixture reaches and no real root does.
-- The findings road now runs Biome from the work root with a config path relative to it, so a project root holding no `spec/config` reads no Biome finding, which stands outside this ask.
+- `configOf` builds the pair by hand where `pairOf` stands in `.claude/skills/level0/lib/vehicle.js`, as the door does too. A later ticket can draw both to it.
+- `it.styles?.()` lets a root without `styles` fall back to the bare config. A fixture reaches that, and no real root does.
+- The findings road now runs Biome from the work root with a config path relative to it. A project root holding no `spec/config` reads no Biome finding, which stands outside this ask.
 
 ## checked
 
@@ -362,7 +373,7 @@ pass
 
 <!-- the form is checklist -->
 
-- Each road's comment names `spec/design_output/vehicle#the-styles-assemble-once`, where the assembly's facts stand once, and the contract case names the ticket instead of restating the rule.
+- Each road's comment names `spec/design_output/vehicle#the-styles-assemble-once`, where the assembly's facts stand once. The contract case names the ticket, and restates no rule.
 
 # Discussion
 

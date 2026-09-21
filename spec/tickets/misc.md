@@ -189,10 +189,10 @@ Small tickets that share no topic, so one branch takes them all and this box swi
 <!-- the form is list -->
 
 - a-lone-mark-pairs-wrong: the shared blanking pairs a span inside one line first, then over one line break
-- a-door-holds-file-calls: the door rule refuses an `os` import outside a package's door, and the server's tree reads through a disk a case fakes
-- a-door-holds-three-reads: the door rule refuses the pid, the version and the exec path past a root, and the two modules take them off the hand
-- a-pointer-reaches-a-heading: the server draws a pointer at a heading its note lacks, and every such pointer in the tree names a heading now
-- a-rule-names-its-failure: a shape rule refuses a marked rule of one sentence, and every marked rule under the guidance names its failure
+- a-door-holds-file-calls: the door rule refuses an `os` import outside a package's door. The server's tree reads through a disk a case fakes
+- a-door-holds-three-reads: the door rule refuses the pid, the version and the exec path past a root. The two modules take them off the hand
+- a-pointer-reaches-a-heading: the server draws a pointer at a heading its note lacks. Every such pointer in the tree names a heading now
+- a-rule-names-its-failure: a shape rule refuses a marked rule of one sentence. Every marked rule under the guidance names its failure
 - every-road-reads-one-config: the findings road and the copilot road hand Vale the config the assembly writes
 - one-door-joins-a-path: the shared file reading joins through the hand's own join
 
@@ -203,10 +203,10 @@ Small tickets that share no topic, so one branch takes them all and this box swi
 
 <!-- the form is list -->
 
-- the reviews and the verdicts came from hands of their own, and each round found a real gap: a shape the case skipped, a caller a search missed, a pass written under a fail
+- the reviews and the verdicts came from hands of their own, and each round found a real gap. One found a shape the case skipped, one a caller a search missed, one a pass written under a fail
 - the pull commits and pushes at every hand-back, so the branch stood current on the remote through the whole session
-- the commit door's ask for a test beside each change made every module change carry a case, and the cases caught the fake disk's shape and a missing style
-- the route's tests-red step made each case fail on its own assertion first, and the stubs answering nothing made that cheap for a Go check
+- the commit door's ask for a test beside each change made every module change carry a case. The cases caught the fake disk's shape and a missing style
+- the route's tests-red step made each case fail on its own assertion first. The stubs answering nothing made that cheap for a Go check
 
 
 ### badly
@@ -215,12 +215,12 @@ Small tickets that share no topic, so one branch takes them all and this box swi
 
 <!-- the form is list -->
 
-- the first design of the lone mark stopped a span at a line break, and the lint over the tree rose by many warnings before the probe over the wrapped spans, at the first change step of that ticket
-- a second-round verdict wrote its pass under the first round's fail, and the field read fail, so the ticket took a third round, at the verdict step of the lone mark ticket
-- the pid change missed the bridge's own caller of the identity, and the verdict caught an identity ending in no number, at the first verdict of the three reads ticket
-- a loop handing back drafts appended one approach five times after a vocabulary refusal, at the draft step of the lone mark ticket
-- the commit door refused seven comment-only pointer fixes, and they landed past the door by hand, at the change step of the pointer ticket
-- the reviewer helpers could take no ticket by name, because the queue binding hands the top leaf to any hand, so each ticket ran alone from review to verdict
+- the first design of the lone mark stopped a span at a line break. The lint over the tree rose by many warnings before the probe over the wrapped spans. That stood at the ticket's first change step
+- a second-round verdict wrote its pass under the first round's fail, and the field read fail. The ticket took a third round, at the verdict step of the lone mark ticket
+- the pid change missed the bridge's own caller of the identity. The verdict caught an identity ending in no number, at the first verdict of the three reads ticket
+- a loop handing back drafts appended one approach five times after a vocabulary refusal. That stood at the draft step of the lone mark ticket
+- the commit door refused seven comment-only pointer fixes, at the change step of the pointer ticket. They landed past the door by hand
+- the reviewer helpers could take no ticket by name, because the queue binding hands the top leaf to any hand. So each ticket ran alone from review to verdict
 
 
 ### improve
@@ -229,12 +229,14 @@ Small tickets that share no topic, so one branch takes them all and this box swi
 
 <!-- the form is list -->
 
-- the lint over the whole tree runs before a rule change hands back, so a rule breaking standing prose shows at the change step, named in `spec/guidance/code/testing.md` under the check rule
-- a verdict chapter holds one round, and the pull clears the last round's fields before it hands the step out again, named in `src/scripts/pull.js` under the fail
+- the lint over the whole tree runs before a rule change hands back. A rule breaking standing prose then shows at the change step
+- that stands in `spec/guidance/code/testing.md` under the check rule
+- a verdict chapter holds one round. The pull clears the last round's fields before it hands the step out again
+- that stands in `src/scripts/pull.js` under the fail
 - a changed signature meets a search for every caller before the change closes, named in `spec/guidance/code/code.md` under the search rule
 - a hand-back that comes back refused stops a loop, named in the hand's own script under `.se/scripts`
-- the commit door reads a hunk holding comment lines alone as prose, named in `.claude/skills/level0/lib/tested.js`, and the note this box parked becomes that ticket
-- the pull hands a helper the ticket its spawn prompt names, so two hands work two tickets at once, named in `src/scripts/pull.js` under the hand-out
+- the commit door reads a hunk holding comment lines alone as prose, in `.claude/skills/level0/lib/tested.js`. The note this box parked becomes that ticket
+- the pull hands a helper the ticket its spawn prompt names, so two hands work two tickets at once. This stands in `src/scripts/pull.js` under the hand-out
 
 
 ### thoughts
@@ -243,7 +245,15 @@ Small tickets that share no topic, so one branch takes them all and this box swi
 
 <!-- the form is text -->
 
-The transcript shows each ticket walked in order, and the thoughts show the order was the queue's choice, not the hand's: the binding refused a name, so the small tickets waited behind the large one. The thoughts weighed a change to the binding and left it, because the order changes the outcome nowhere. The thoughts also weighed writing the missing server chapters back and chose to repoint every pointer at a chapter standing today, because a chapter written from the code alone says what the code says twice. The comment-only commit past the door was a judgment the thoughts made in the open: the door's rule is over code, and a pointer in a comment is prose, so the commit says so and the note parks the door's reading for a ticket. The one thing the thoughts kept returning to is the span pairing: the ask said one line, the tree said one line break, and the first verdict said the order of the two passes decides it. The tree was right on all three.
+The transcript shows each ticket walked in order. The thoughts show the order was the queue's choice: the binding refused a name, so the small tickets waited behind the large one. The thoughts weighed a change to the binding and left it, because the order changes the outcome nowhere.
+- The thoughts weighed writing the missing server chapters back.
+- They chose to repoint every pointer at a chapter standing today. A chapter written from the code alone says what the code says twice.
+- The comment-only commit past the door was a judgment the thoughts made in the open.
+- The door's rule is over code, and a pointer in a comment is prose.
+- So the commit says so, and the note parks the door's reading for a ticket.
+- The one thing the thoughts kept returning to is the span pairing.
+- The ask said one line, and the tree said one line break. The first verdict said the order of the two passes decides it.
+- The tree was right on all three.
 
 
 ### checked
@@ -252,9 +262,13 @@ The transcript shows each ticket walked in order, and the thoughts show the orde
 
 <!-- the form is checklist -->
 
-- each fact the children add stands once: the span patterns in the shared blanking, the reads list in the door rule, the disk interface in the server's door, the anchor check in its file, the sentence count in the shape rule, the assembly in the styles module, the join in the reading, and each note points at its file
-- the children add one number, the count of sentences a marked rule holds, and the shape rule names it beside the message; the door files copy no number
-- each header the children write says what its file is for: the door of each package, the anchor check, the path readers, the memory fake, and each counts nothing
+- each fact the children add stands once, and each note points at its file
+- the facts: the span patterns in the shared blanking, and the reads list in the door rule
+- the disk interface in the server's door
+- more facts: the anchor check in its file
+- more facts: the sentence count in the shape rule, the assembly in the styles module, the join in the reading
+- the children add one number, the count of sentences a marked rule holds. The shape rule names it beside the message, and the door files copy no number
+- each header the children write says what its file is for, and counts nothing. That holds for the door of each package, the anchor check, the path readers and the memory fake
 
 
 ## cloud
@@ -267,7 +281,7 @@ The transcript shows each ticket walked in order, and the thoughts show the orde
 
 <!-- the form is list -->
 
-- the index's Go cases fail on the box without the build tag the check passes, so a hand running them by hand met a missing module at the change step of the file calls ticket
+- the index's Go cases fail on the box without the build tag the check passes. A hand running them by hand met a missing module at the change step of the file calls ticket
 - nothing else: the proxy refused no host, the platform refused no right, and the installer stood every tool
 
 
@@ -277,9 +291,10 @@ The transcript shows each ticket walked in order, and the thoughts show the orde
 
 <!-- the form is list -->
 
-- the commit hook refused a change with no test beside it at the change step of five tickets, and each took a case, save the seven comment-only pointer fixes that landed past it by hand
-- the file ceiling met the server's tree file at the change step of the file calls ticket, and the path readers moved to a file of their own
-- the branch review's worktree fails a contract case that runs without Vale, on the base too, so it stands outside every ask here
+- the commit hook refused a change with no test beside it at the change step of five tickets. Each took a case
+- the seven comment-only pointer fixes landed past the hook by hand
+- the file ceiling met the server's tree file at the change step of the file calls ticket. The path readers moved to a file of their own
+- the branch review's worktree fails a contract case that runs without Vale. It fails on the base too, so it stands outside every ask here
 - no conflict met the sync, and the trunk guard met no push
 
 
@@ -290,7 +305,10 @@ The transcript shows each ticket walked in order, and the thoughts show the orde
 <!-- the form is list -->
 
 - [[spec/tickets/a-comment-hunk-is-prose]] stands open at its draft with no group, minted off the note this box parked
-- the craft findings the verdicts left for a later hand: the stop channel standing in two doors, the note ending pair in three files, the box's pid no module reads, a link check for a pointer at a note the tree lacks, and the slashes two readings in the bash door still write
+- the craft findings the verdicts left for a later hand: the stop channel in two doors
+- the note ending pair in three files
+- more of them: the box's pid no module reads, and a link check for a pointer at a missing note
+- the slashes two readings in the bash door still write
 - no person step parked, and the handover says the seven tickets close done and the branch waits for a merge
 
 
