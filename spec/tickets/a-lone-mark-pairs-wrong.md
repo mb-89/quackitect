@@ -90,6 +90,13 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 step: design/draft
+record:
+  - step: design/draft
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: af7294222f297e0c666d1de2ca2edbd4ea676f89
+    hash_after: af7294222f297e0c666d1de2ca2edbd4ea676f89
+    returns: 1
+    why: "the hand-back met refused 5 times: design/draft breaks Vocabulary at line 11 of its chapter: snippet stands outside the words this tree writes. Write a core word, or add snippet to spec/vocabulary/terms.yml with the note that defines it."
 ---
 
 # Ask
@@ -117,6 +124,66 @@ under that line pairs wrong.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The blanking every script rule shares pairs a code span inside one line, so a lone mark stays on its own line and the span under it reads whole.
+
+| piece | where | what changes |
+|---|---|---|
+| the pairing | `.claude/skills/level0/lib/snippets.js`, the `plain` snippet | the span pattern stops at a line break, so a mark pairs with a mark on its own line and with no other |
+| the rules | `spec/config/styles/VoiceParagraph/*.yml` | `./RUNME.sh project` writes them again off the one snippet, and nothing is edited by hand |
+| the fault | the rules reading the blanked text | a lone mark now stands unblanked on its own line, so the fault a rule draws over it names that line, and a span under it pairs and blanks as before |
+| the case | `test/contract/vale.test.js` | a list item carrying a lone mark, a blank line, then a paragraph with one span: the paragraph's line draws nothing, and every fault stands on the item's line |
+
+The source holds the sentence-level pairing in `paragraph-rules.js` already, because a sentence stands inside a line. The one place still pairing over the whole text is the shared snippet, and this change takes it there.
+
+The blanking every script rule shares pairs a code span inside one line, so a lone mark stays on its own line and the span under it reads whole.
+
+| piece | where | what changes |
+|---|---|---|
+| the pairing | `.claude/skills/level0/lib/snippets.js`, the `plain` snippet | the span pattern stops at a line break, so a mark pairs with a mark on its own line and with no other |
+| the rules | `spec/config/styles/VoiceParagraph/*.yml` | `./RUNME.sh project` writes them again off the one snippet, and nothing is edited by hand |
+| the fault | the rules reading the blanked text | a lone mark now stands unblanked on its own line, so the fault a rule draws over it names that line, and a span under it pairs and blanks as before |
+| the case | `test/contract/vale.test.js` | a list item carrying a lone mark, a blank line, then a paragraph with one span: the paragraph's line draws nothing, and every fault stands on the item's line |
+
+The source holds the sentence-level pairing in `paragraph-rules.js` already, because a sentence stands inside a line. The one place still pairing over the whole text is the shared snippet, and this change takes it there.
+
+The blanking every script rule shares pairs a code span inside one line, so a lone mark stays on its own line and the span under it reads whole.
+
+| piece | where | what changes |
+|---|---|---|
+| the pairing | `.claude/skills/level0/lib/snippets.js`, the `plain` snippet | the span pattern stops at a line break, so a mark pairs with a mark on its own line and with no other |
+| the rules | `spec/config/styles/VoiceParagraph/*.yml` | `./RUNME.sh project` writes them again off the one snippet, and nothing is edited by hand |
+| the fault | the rules reading the blanked text | a lone mark now stands unblanked on its own line, so the fault a rule draws over it names that line, and a span under it pairs and blanks as before |
+| the case | `test/contract/vale.test.js` | a list item carrying a lone mark, a blank line, then a paragraph with one span: the paragraph's line draws nothing, and every fault stands on the item's line |
+
+The source holds the sentence-level pairing in `paragraph-rules.js` already, because a sentence stands inside a line. The one place still pairing over the whole text is the shared snippet, and this change takes it there.
+
+The blanking every script rule shares pairs a code span inside one line, so a lone mark stays on its own line and the span under it reads whole.
+
+| piece | where | what changes |
+|---|---|---|
+| the pairing | `.claude/skills/level0/lib/snippets.js`, the `plain` snippet | the span pattern stops at a line break, so a mark pairs with a mark on its own line and with no other |
+| the rules | `spec/config/styles/VoiceParagraph/*.yml` | `./RUNME.sh project` writes them again off the one snippet, and nothing is edited by hand |
+| the fault | the rules reading the blanked text | a lone mark now stands unblanked on its own line, so the fault a rule draws over it names that line, and a span under it pairs and blanks as before |
+| the case | `test/contract/vale.test.js` | a list item carrying a lone mark, a blank line, then a paragraph with one span: the paragraph's line draws nothing, and every fault stands on the item's line |
+
+The source holds the sentence-level pairing in `paragraph-rules.js` already, because a sentence stands inside a line. The one place still pairing over the whole text is the shared snippet, and this change takes it there.
+
+The blanking every script rule shares pairs a code span inside one line, so a lone mark stays on its own line and the span under it reads whole.
+
+| piece | where | what changes |
+|---|---|---|
+| the pairing | `.claude/skills/level0/lib/snippets.js`, the `plain` snippet | the span pattern stops at a line break, so a mark pairs with a mark on its own line and with no other |
+| the rules | `spec/config/styles/VoiceParagraph/*.yml` | `./RUNME.sh project` writes them again off the one snippet, and nothing is edited by hand |
+| the fault | the rules reading the blanked text | a lone mark now stands unblanked on its own line, so the fault a rule draws over it names that line, and a span under it pairs and blanks as before |
+| the case | `test/contract/vale.test.js` | a list item carrying a lone mark, a blank line, then a paragraph with one span: the paragraph's line draws nothing, and every fault stands on the item's line |
+
+The source holds the sentence-level pairing in `paragraph-rules.js` already, because a sentence stands inside a line. The one place still pairing over the whole text is the shared snippet, and this change takes it there.
+
+
+
+
+
 
 ## review
 
