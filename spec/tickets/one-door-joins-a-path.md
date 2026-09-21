@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d40a1b367f4d · claude-code-remote
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: b9d481d756b6600545222f082da97c7ead012be6
+    hash_after: b9d481d756b6600545222f082da97c7ead012be6
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -230,11 +238,19 @@ Every file and function the draft names stands in the tree, and `src/bridge/bash
 
 <!-- the form is command -->
 
+./RUNME.sh lint src
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the shared reading, the hook, the bash door and the hook's case
+- the reading reaches the disk the hand carries, which the case fakes
+- the reading's comment names the ticket, and the bash door's reader names it too
+
 
 ## tests-green
 
@@ -246,11 +262,17 @@ Every file and function the draft names stands in the tree, and `src/bridge/bash
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/level0/precommit.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -258,11 +280,19 @@ Every file and function the draft names stands in the tree, and `src/bridge/bash
 
 <!-- the form is text -->
 
+The shared reading of a file takes the hand and joins the path through the hand's own join, so the hook's two readings part ways on nothing. The hook hands its own hand in, which carried the join already. The bash door's box carries no join, so the door builds a small reader off the work root and the join of the path module, the pure import the door rule passes. A case hands the hook a join of its own over a fake disk and asserts the hook finds the standing test under that join.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the shared reading, the hook, the bash door and the hook's case
+- the case drives the hook over a fake disk and a fake git, and touches nothing else
+- the reading's comment names the ticket, and the bash door's reader names it too
+
 
 # verdict
 

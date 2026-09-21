@@ -199,3 +199,14 @@ diff --git a/test/level0/other.test.js b/test/level0/other.test.js
   const said = await holds(it, delta);
   assert.equal(said.code, 0, said.said);
 });
+
+// Both readings ask the same hand for the join, so a disk under another separator answers both. [[spec/tickets/one-door-joins-a-path]]
+test("the notes reading joins through the same hand as the test reading", () => {
+  const join = (...parts) => parts.join("|");
+  const it = {
+    ...box(),
+    join,
+    disk: fakeDisk({ [join(ROOT, ".se/tickets", "one.md")]: "a note\n" }),
+  };
+  assert.deepEqual(notesOf(it), [{ name: ".se/tickets/one.md", text: "a note\n" }]);
+});

@@ -2,6 +2,7 @@
 // over a command line runs here before the command does.
 // [[spec/design_output/bash#what-the-door-reads]]
 
+import { join } from "node:path";
 import {
   commitIn,
   findings,
@@ -62,11 +63,16 @@ export function onDescribe(e) {
   return { after: { description: verbLine() } };
 }
 
+// The box carries no join, so the door hands the reading the work root and the join of the path module. [[spec/tickets/one-door-joins-a-path]]
+function reader(box) {
+  return { disk: box.disk, root: box.work, join };
+}
+
 // [[spec/design_output/bash#a-shell-writes-nothing]]
 async function commandRules(command, _e, box) {
   const found = findings(command, asks(box, "names.words"), {
     cloud: onACloud(box),
-    script: (path) => fileText(box.disk, box.work, path),
+    script: (path) => fileText(reader(box), path),
   });
   found.push(...(await commitVoice(command, box)));
   if (!onACloud(box) && skipsTheHook(command)) {
@@ -131,7 +137,7 @@ async function testedDelta(command, _e, box) {
   const merging = Boolean(await git(box, ["rev-parse", "-q", "--verify", "MERGE_HEAD"]));
   const found = untestedIn(
     await git(box, ["diff", "--cached", "--unified=0"]),
-    (path) => fileText(box.disk, box.work, path),
+    (path) => fileText(reader(box), path),
     merging,
   );
   if (!found.length) return "";
