@@ -161,6 +161,39 @@ export function became(it, who, one, leaf, held, successor, answered) {
   return onward(it, who, [`${one.name} closes became ${successor}.`]);
 }
 
+// [[spec/design_output/pull#answered]]
+export function answeredBy(it, who, one, leaf, held, answerer, answered) {
+  if (answerer === one.name) {
+    say(REFUSED, [`${one.name} answers no ask of its own. Name the ticket answering it.`]);
+    return 1;
+  }
+  if (!ticketsHere(it).some((held) => held.name === answerer)) {
+    say(REFUSED, [
+      `${answerer} stands nowhere. Name the ticket answering this ask, then hand back --answered ${answerer}.`,
+    ]);
+    return 1;
+  }
+  const text = withEntry(one.text, {
+    step: leaf.path,
+    hand: roleOf(who.hand),
+    hash_before: held.hash,
+    hash_after: one.private ? "" : tipOf(it),
+    why: `${answerer} answers this ask`,
+    answered,
+  });
+  one.text = shut(text, frontOf(text), "answered");
+  const finding = landed(it, one, [`closes answered by ${answerer}`]);
+  if (finding) return unlanded(one, leaf, finding);
+  dropHold(it, who.hand);
+  if (!one.private && !pushed(it, who.branch)) {
+    say(REFUSED, [
+      `${who.branch} moves under this hand-back, and one rebase fell short. The hand-back stands here, so push ${who.branch} and pull again.`,
+    ]);
+    return 1;
+  }
+  return onward(it, who, [`${one.name} closes answered by ${answerer}.`]);
+}
+
 // [[spec/design_output/pull#a-hand-of-its-own]]
 export function onward(it, who, rows) {
   dropHold(it, who.hand);

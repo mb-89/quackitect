@@ -52,6 +52,7 @@ import {
   WORK,
 } from "./pull-route.js";
 import {
+  answeredBy,
   became,
   entriesOf,
   failed,
@@ -153,7 +154,7 @@ function groupDone(group) {
 }
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
-export const TAKES = ["--as", "--fail", "--became", "--back", "--fields"];
+export const TAKES = ["--as", "--fail", "--became", "--answered", "--back", "--fields"];
 
 export function positionalOf(rest) {
   for (let i = 0; i < rest.length; i++) {
@@ -323,13 +324,18 @@ export function judgeMaterial(it, held, name) {
 
 // [[spec/design_output/pull#the-hand-out]]
 export function verdictFlag(rest) {
-  const said = rest.find((one) => /^--(pass|fail|became|back)(=|$)/.test(one));
+  const said = rest.find((one) => /^--(pass|fail|became|answered|back)(=|$)/.test(one));
   if (!said) return { said: "" };
-  const [, word, eq, inline] = /^--(pass|fail|became|back)(=)?(.*)$/.exec(said);
+  const [, word, eq, inline] = /^--(pass|fail|became|answered|back)(=)?(.*)$/.exec(said);
   const after = eq ? inline : (rest[rest.indexOf(said) + 1] ?? "");
   if (word === "pass") return { said: "pass" };
   if (!after || after.startsWith("--")) {
-    const takes = { fail: "a reason", became: "the successor", back: "the leaf" }[word];
+    const takes = {
+      fail: "a reason",
+      became: "the successor",
+      answered: "the ticket answering the ask",
+      back: "the leaf",
+    }[word];
     return { why: `--${word} takes ${takes}: --${word} "..."` };
   }
   return { said: word, reason: after };
@@ -514,8 +520,8 @@ export function handBack(it, who, name, verdict) {
     }
   }
   const chapter = chapterOf(one.text, leaf.path);
-  // A became leaves the leaf's fields to the successor, so the hold and the hand alone decide. [[spec/design_output/pull#became]]
-  const becomes = verdict.said === "became";
+  // A became leaves the leaf's fields to the successor, and an answered leaves them to the answerer, so the hold and the hand alone decide. [[spec/design_output/pull#became]]
+  const becomes = verdict.said === "became" || verdict.said === "answered";
   if (!becomes) {
     found.push(...formFaults(it, one, leaf, chapter, held));
     if (!found.length) found.push(...voiceFaults(it, one, leaf, chapter));
@@ -534,6 +540,8 @@ export function handBack(it, who, name, verdict) {
 
   if (said.said === "became")
     return became(it, who, one, leaf, held, said.reason, answered);
+  if (said.said === "answered")
+    return answeredBy(it, who, one, leaf, held, said.reason, answered);
   if (said.said === "fail")
     return failed(it, who, one, leaf, held, said.reason, answered);
   return passed(it, who, one, leaf, held, answered);

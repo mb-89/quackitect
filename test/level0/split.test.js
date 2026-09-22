@@ -5,12 +5,12 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { FOLDER as UNDONE } from "../../.claude/skills/level0/lib/undo.js";
+import { noteFor, splitTicket } from "../../src/bridge/split-ticket.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { noteFor, splitTicket } from "../../src/bridge/split-ticket.js";
 import { cutsIn, splitText } from "../../src/scripts/split-cut.js";
-import { splitVerb } from "../../src/scripts/split-verb.js";
+import { sourceOf, splitVerb } from "../../src/scripts/split-verb.js";
 
 const TEXT = ["one", "two", "three", "four", "five"].join("\n");
 
@@ -127,6 +127,44 @@ test("the verb writes every target, the rest and one journal entry", () => {
     ["src/a.js", SOURCE],
   );
   assert.equal(entry.files[0].did_not_exist, true);
+});
+
+// [[spec/design_output/level0#a-verb-cuts-the-file]]
+test("a call naming no source comes back refused, and a target's path reads as no source", () => {
+  const it = doors();
+  assert.equal(sourceOf(["--to", "src/a.js", "--lines", "1-2", "--dry"]), "");
+  assert.equal(sourceOf(["--dry", SOURCE, "--to", "src/a.js"]), SOURCE);
+
+  const { code, said } = heard(() =>
+    splitVerb(it, ["--to", "src/a.js", "--lines", "1-2"]),
+  );
+  assert.equal(code, 2);
+  assert.match(said, /names the file it cuts first, and this call names none/);
+  assert.equal(it.disk.exists(join(ROOT, "src/a.js")), false);
+  assert.equal(it.disk.read(join(ROOT, SOURCE)), `${TEXT}\n`);
+});
+
+// [[spec/design_output/level0#a-verb-cuts-the-file]]
+test("a source naming itself as a target comes back refused, and nothing writes", () => {
+  const it = doors();
+
+  const { code, said } = heard(() =>
+    splitVerb(it, [
+      SOURCE,
+      "--to",
+      "src/a.js",
+      "--lines",
+      "1-2",
+      "--to",
+      SOURCE,
+      "--lines",
+      "4-5",
+    ]),
+  );
+  assert.equal(code, 2);
+  assert.match(said, /is the source and a target/);
+  assert.equal(it.disk.exists(join(ROOT, "src/a.js")), false);
+  assert.equal(it.disk.read(join(ROOT, SOURCE)), `${TEXT}\n`);
 });
 
 // A target names a folder nothing holds yet, and a throw there answers a stack. [[spec/design_output/apply#the-journal-holds-both-halves]]

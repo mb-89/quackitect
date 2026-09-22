@@ -26,7 +26,7 @@ it:
 | `done` | a hand under `--as` hands its one step back | stops, because a one-step hand takes no next leaf |
 
 The hand-out is `ticket pull`. The hand-back is `ticket pull <ticket>` with a
-verdict: `--pass`, `--fail "why"` or `--became <ticket>`. A leaf holding a
+verdict: `--pass`, `--fail "why"`, `--became <ticket>` or `--answered <ticket>`. A leaf holding a
 `verdict` field takes the verdict from the field, and the pull refuses the flag
 there.
 
@@ -120,7 +120,7 @@ derives it at every hand-out:
 |---|---|
 | one closes `dropped` | writes a return on the step, and sends the group to its `on_fail` |
 | one stands open | waits, and names the child it waits for |
-| every one closes `done` or `became` | writes a pass by `the engine`, and moves on |
+| every one closes `done`, `became` or `answered` | writes a pass by `the engine`, and moves on |
 
 A group at `children` hands no leaf out while a child stands open. So a box
 with nothing at a step it can take writes no retro. The wait names the person
@@ -580,6 +580,15 @@ to ask.
 successor. The successor stands in the tree already, or the pull refuses.
 The hand-back checks the hold and the hand, and reads no field of the leaf,
 because the successor carries the work from here.
+
+# Answered
+
+`--answered <ticket>` closes the ticket with `reason: answered`, and the
+record entry's `why` names the ticket answering its ask. That ticket stands
+in the tree and is another one, or the pull refuses. The hand-back checks the
+hold and the hand, and reads no field of the leaf, because the answering
+ticket carries the evidence. The reason tells the two closes apart: `became`
+names where the work goes on, and `answered` names where it stands done.
 
 # The private queue
 

@@ -21,7 +21,7 @@ frontmatter:
       x-engine: true
       description: whether anybody pulls it
     reason:
-      enum: [done, dropped, became]
+      enum: [done, dropped, became, answered]
       description: how the work stopped
     urgent:
       type: boolean

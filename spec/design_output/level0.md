@@ -887,6 +887,10 @@ its target, leaving the rest in the source:
 | `--to <path> --lines <from>-<to>` | one target and its range, named again for each target |
 | `--dry` | the cuts it names, on the way to no write |
 
+The source is the first word standing outside a flag and its value. A call
+naming none comes back refused, and so does a source that is a target too,
+because that cut writes over what it reads.
+
 `src/scripts/split-cut.js` owns the ranges and the cut over text, and
 `src/scripts/split-verb.js` writes them. One journal entry under `by: split`
 holds every target and the rest, so `mcp__level0__undo` takes the whole cut

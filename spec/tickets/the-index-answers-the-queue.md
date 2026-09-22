@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-verbs-answer-their-asks
 steps:
   - name: do
@@ -27,6 +27,13 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box fb2b49fba485 · claude-code-remote
+    hash_before: d860f8e59531e62b812f2339c2f7e8503ff165e9
+    hash_after: d860f8e59531e62b812f2339c2f7e8503ff165e9
+    why: the-work-tab-draws answers this ask
+reason: answered
 ---
 
 # Ask
@@ -73,3 +80,19 @@ The queue column stands empty, because the tab reads the index and the index hol
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+This ticket closes answered by [[spec/tickets/the-work-tab-draws]], and lands
+no place in the index. The gain stands: a person reads what comes next off the
+tab.
+
+| the ask wants | what stands | where it says so |
+|---|---|---|
+| the tab draws the place in its queue column | the tab runs `branch list --json` behind each tree the index hands over, and lays the places over the rows | [[spec/design_output/tui#the-work-tab]] |
+| one scorer stands, and the two readers point at it | the pull owns the outline, and the verb and the tab read its answer | [[spec/design_output/pull#the-queue-is-an-outline]] |
+| the index answers a place a ticket | the index holds no place, because the queue is the pull's and a todo is an override in the plan file | [[spec/design_output/pull#a-todo-forces-a-place]] |
+
+The first line of the ask names the road the design refuses. The place
+reads off the score, the score reads git for the ages, and a todo lays over
+it from a file off git. So a place in the index would stand a second scorer,
+or a copy that goes stale between two reads. `src/tui/workplaces_test.go`
+covers the column drawing the verb's places, and `./RUNME.sh check` runs it.

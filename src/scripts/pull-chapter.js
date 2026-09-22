@@ -61,7 +61,7 @@ export function workAnswer(it, one, leaf) {
     );
   } else {
     rows.push(
-      `Hand it back: ./RUNME.sh ticket pull ${one.name} --pass, or --fail "why", or --became <ticket>.`,
+      `Hand it back: ./RUNME.sh ticket pull ${one.name} --pass, or --fail "why", or --became <ticket>, or --answered <ticket>.`,
     );
   }
   return rows.join("\n");

@@ -6,14 +6,9 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { fieldOf } from "../../src/engine/group.js";
-import {
-  chapterOf,
-  commandsRun,
-  holdOf,
-  leafOf,
-  takeable,
-  verdictIn,
-} from "../../src/scripts/pull.js";
+import { chapterOf, commandsRun, verdictIn } from "../../src/scripts/pull-chapter.js";
+import { entriesOf } from "../../src/scripts/pull-writes.js";
+import { holdOf, leafOf, takeable } from "../../src/scripts/pull.js";
 import { goModulesOf, goSays, testSays } from "../../src/scripts/work-test.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { pulling, work } from "../../src/scripts/work.js";
@@ -52,6 +47,47 @@ test("became closes the ticket with its successor, reads no field of the leaf, a
   assert.equal(fieldOf(now, "state"), "closed");
   assert.equal(fieldOf(now, "reason"), "became");
   assert.equal(fieldOf(now, "successors"), "a-successor");
+});
+
+// [[spec/design_output/pull#answered]]
+test("answered closes the ticket, the record names the ticket answering it, and it refuses itself or a ticket standing nowhere", () => {
+  const { it, disk } = doors(
+    standing(CHILD(), GROUP_NOTE, {
+      [at("spec/tickets/an-answerer.md")]: CHILD("closed", ""),
+    }),
+  );
+  const out = heard(() => pulling(ROOT, ["pull"], it));
+  assert.match(out.said, /or --answered <ticket>\./);
+
+  const bare = heard(() => pulling(ROOT, ["pull", "a-child", "--answered"], it));
+  assert.equal(bare.code, 2);
+  assert.match(bare.said, /--answered takes the ticket answering the ask/);
+
+  const missing = heard(() =>
+    pulling(ROOT, ["pull", "a-child", "--answered", "nobody"], it),
+  );
+  assert.equal(missing.code, 1);
+  assert.match(missing.said, /nobody stands nowhere/);
+
+  const itself = heard(() =>
+    pulling(ROOT, ["pull", "a-child", "--answered", "a-child"], it),
+  );
+  assert.equal(itself.code, 1);
+  assert.match(itself.said, /a-child answers no ask of its own/);
+  assert.equal(fieldOf(disk.read(at("spec/tickets/a-child.md")), "state"), "open");
+
+  const { code, said } = heard(() =>
+    pulling(ROOT, ["pull", "a-child", "--answered", "an-answerer"], it),
+  );
+  assert.equal(code, 0);
+  assert.match(said, /a-child closes answered by an-answerer/);
+  const now = disk.read(at("spec/tickets/a-child.md"));
+  assert.equal(fieldOf(now, "state"), "closed");
+  assert.equal(fieldOf(now, "reason"), "answered");
+  assert.equal(fieldOf(now, "successors"), "");
+  const entry = entriesOf(readNote(now).front.said).at(-1);
+  assert.equal(entry.step, "design/draft");
+  assert.equal(entry.why, "an-answerer answers this ask");
 });
 
 // [[spec/design_output/pull#the-work-answer]]
