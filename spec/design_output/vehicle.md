@@ -245,7 +245,7 @@ ignores the targets alone:
 
 So a fresh clone carries no target, and the stamp writes each one on the first
 run. A target reading the brand already stays as it is. The icon is the mark a
-vehicle draws, and two vehicles wear two marks, and nothing holds those two in
+vehicle draws. Each vehicle wears its own mark, and nothing holds the marks in
 step.
 
 ## Two roads to the vehicle

@@ -470,7 +470,7 @@ retro. For what a retro reads off it, see [[spec/guidance/retro/effect]].
 | `red` | each red case, with the error line the runner writes under it |
 | `spawns` | the spawns the tests make, and how many of them are Vale |
 
-Two writers feed the report while the tests run:
+The report fills while the tests run:
 
 | writer | writes |
 |---|---|

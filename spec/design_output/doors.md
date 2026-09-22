@@ -146,8 +146,8 @@ minute under load, and a red under that load names no cause. So one helper,
 | reads the findings a text by key inside the case | runs Vale once over the folder, on the first case |
 | asks for the fixer | runs the fixer twice more over the folder, and reads each text back after each round |
 
-So a file spawns Vale once, or three times where it proves the fixer, and a
-case proves its rule off findings in memory. A text declared inside a case
+So a file spawns Vale once, and again for each round where it proves the
+fixer. A case proves its rule off findings in memory. A text declared inside a case
 comes after that run, so the helper runs again for it.
 
 The helper reads the config's own sections too, with Vale's glob, where a star

@@ -151,9 +151,9 @@ The verbs here answer what their asks name, and the queue's place lands in the i
 
 <!-- the form is checklist -->
 
-- every child is small enough to review whole: each is one trivial ticket, and the largest touches one verb and its tests
+- every child is small enough to review whole. Each is one trivial ticket, and the largest touches one verb and its tests
 - the children add up to the goal: the ask names three verbs, and one child stands for each
-- no child waits on another: the third closes on the road the first builds, and it took that road after the first closed
+- no child waits on another. The last closes on the road the first builds, and it took that road after the first closed
 
 # children
 
@@ -238,7 +238,7 @@ the place in the pull's answer, and a todo in a file off git.
 <!-- the form is checklist -->
 
 - every fact stands in one place: the answered road stands in one chapter, and the code points at it
-- every number carries a name in one place: the change adds no number, and the schema's test copies say so in their headers
+- every number carries a name in one place. The change adds no number, and the schema's test copies say so in their headers
 - every header says what its file is for: the change adds no file, and the headers it touches count nothing
 
 ## cloud
@@ -274,7 +274,7 @@ the place in the pull's answer, and a todo in a file off git.
 
 - no person step parked: the box decided the third child's close itself
 - no ticket minted: the improve lines stand in the retro, and none runs deeper than a line
-- the handover: `branch done` sets the standing, and the merge reads the discussion under [[spec/tickets/the-index-answers-the-queue]] for the road the design refuses
+- the handover: `branch done` sets the standing. The merge reads the discussion under [[spec/tickets/the-index-answers-the-queue]] for the road the design refuses
 
 # Discussion
 

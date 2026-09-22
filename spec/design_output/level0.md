@@ -148,7 +148,7 @@ a box whose server answers nothing carries the tools anyway.
 A call of a read tool takes the `*` door every event takes, and no door of its
 own. So one post reaches a server that stands, and the answer rides back the
 way every other answer does, its `register` list among it. A call landing
-before the server stands takes three steps:
+before the server stands takes the steps below:
 
 - it posts once, and answers where a server stands
 - it runs the start above, then reads `/health` every fifth of a second

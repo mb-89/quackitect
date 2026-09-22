@@ -587,7 +587,7 @@ because the successor carries the work from here.
 record entry's `why` names the ticket answering its ask. That ticket stands
 in the tree and is another one, or the pull refuses. The hand-back checks the
 hold and the hand, and reads no field of the leaf, because the answering
-ticket carries the evidence. The reason tells the two closes apart: `became`
+ticket carries the evidence. The reason tells the closes apart: `became`
 names where the work goes on, and `answered` names where it stands done.
 
 # The private queue
