@@ -1,0 +1,112 @@
+// Lines arriving in the session log. The operating system wakes the reader on
+// every write, and a poll stands behind it. A rotated file starts the reading
+// again from its top.
+// [[spec/design_output/tui#how-a-line-arrives]]
+
+package log
+
+import (
+	"bytes"
+	"errors"
+	"io/fs"
+	"path/filepath"
+	"strings"
+	"time"
+
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/fsnotify/fsnotify"
+
+	"quackitect/tui/frame"
+)
+
+type LinesMsg struct {
+	Recs      []Record
+	Restarted bool
+}
+
+type tailErrMsg struct{ err error }
+
+type tailer struct {
+	path string
+	held []byte
+	wake chan struct{}
+}
+
+func newTailer(path string) *tailer {
+	t := &tailer{path: path, wake: make(chan struct{}, 1)}
+	watch, err := fsnotify.NewWatcher()
+	if err != nil {
+		return t
+	}
+	if watch.Add(filepath.Dir(path)) != nil {
+		watch.Close()
+		return t
+	}
+	name := filepath.Base(path)
+	go func() {
+		for event := range watch.Events {
+			if filepath.Base(event.Name) != name {
+				continue
+			}
+			select {
+			case t.wake <- struct{}{}:
+			default:
+			}
+		}
+	}()
+	return t
+}
+
+// [[spec/design_output/tui#a-rotation-starts-it-again]]
+func (t *tailer) Read() ([]Record, bool, error) {
+	body, err := readFile(t.path)
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil, false, nil
+	}
+	if err != nil {
+		return nil, false, err
+	}
+	restarted := false
+	if !bytes.HasPrefix(body, t.held) {
+		if bytes.HasPrefix(t.held, body) {
+			return nil, false, nil
+		}
+		t.held = nil
+		restarted = true
+	}
+	fresh := body[len(t.held):]
+	end := bytes.LastIndexByte(fresh, '\n')
+	if end < 0 {
+		return nil, restarted, nil
+	}
+	t.held = append(t.held, fresh[:end+1]...)
+	var out []Record
+	var last time.Time
+	for _, line := range strings.Split(string(fresh[:end]), "\n") {
+		line = strings.TrimRight(line, "\r")
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
+		r := ParseRecord(line)
+		if r.At.IsZero() {
+			r.At = last
+		}
+		last = r.At
+		out = append(out, r)
+	}
+	return out, restarted, nil
+}
+
+func (t *tailer) cmd() tea.Cmd {
+	return func() tea.Msg {
+		select {
+		case <-t.wake:
+		case <-time.After(frame.Poll):
+		}
+		recs, restarted, err := t.Read()
+		if err != nil {
+			return tailErrMsg{err}
+		}
+		return LinesMsg{Recs: recs, Restarted: restarted}
+	}
+}

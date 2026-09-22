@@ -52,6 +52,9 @@ func (one *Checker) Over(path string) []Finding {
 		out = append(out, rule(one.tree)...)
 	}
 	out = append(out, syntaxFaults(one.tree, where)...)
+	// A pointer this file writes lands where it says, so the editor draws a dead one under the line. [[spec/design_output/lsp#every-pointer-resolves]]
+	out = append(out, pointerFaultsIn(one.tree, placesIn(one.tree), where)...)
+	// And the anchor it names stands as a heading of the note it points at. [[spec/design_output/lsp#a-pointer-reaches-a-heading]]
 	out = append(out, anchorFaults(one.tree, where)...)
 	// A note says again what another holds, so the rule reads the pair. [[spec/design_output/lsp#a-second-copy-draws]]
 	if strings.HasSuffix(where, ".md") {
@@ -76,6 +79,29 @@ func (one *Checker) restatedAll() []Finding {
 	return one.tree.Restated(func() []Finding {
 		return restatedFaults(one.tree, one.pointer, one.rule)
 	})
+}
+
+// Every rule over the whole tree, which the sweep runs. [[spec/design_output/tree#what-a-rule-answers]]
+var Rules = []func(*Tree) []Finding{
+	settingsNameBinaries,
+	editorDrawsWriteRules,
+	biomeOnWindows,
+	extensionsOnOffer,
+	noLogDeleted,
+	nameHoldsTheWords,
+	nothingPrivateTravels,
+	surveyNamesInstalls,
+	surveyFindsNode,
+	everyPointerResolves,
+}
+
+// [[spec/design_output/tree#what-a-rule-answers]]
+func treeFaults(tree *Tree) []Finding {
+	out := []Finding{}
+	for _, rule := range Rules {
+		out = append(out, rule(tree)...)
+	}
+	return out
 }
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]

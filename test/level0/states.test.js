@@ -1,6 +1,6 @@
 // The status bar and the toasts, read out of the values alone. A state stands
 // where a key leaves rest, and a toast marks the moment it leaves.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

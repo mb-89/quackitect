@@ -1,6 +1,6 @@
 // The window's own door stands one port above the bridge, so a second launch
 // reaches the first.
-// [[spec/design_output/viewer#a-second-launch-hands-over]]
+// [[spec/design_output/tui#a-second-launch-hands-over]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

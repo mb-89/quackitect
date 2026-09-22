@@ -1,124 +1,15 @@
-// The window's door. The window listens on its own port so a second launch
-// reaches the first, hands it a tab and ends. The door reads one shape both
-// ways, so the window sends to another port with the same words it takes.
-// A port already held means a window already stands, and the caller says so.
-// [[spec/design_output/tui#a-second-launch-hands-over]]
+// The window root's door. The root prints its refusals and ends the process
+// here, so every other file of this package reads the box nowhere.
+// [[spec/design_output/doors#a-door-reads-the-outside]]
 
 package main
 
 import (
-	"bytes"
-	"context"
-	"encoding/json"
-	"fmt"
 	"io"
-	"io/fs"
-	"net"
-	"net/http"
 	"os"
-	"os/exec"
-	"path/filepath"
-	"time"
 )
-
-// The port the window holds, one below the bridge's, where the register hands out none, and the wait a call takes. [[spec/design_output/tui#a-second-launch-hands-over]]
-const (
-	windowPort = 6509
-	callWait   = 500 * time.Millisecond
-)
-
-// What the door carries, in both directions. [[spec/design_output/tui#a-second-launch-hands-over]]
-type said struct {
-	Tab string `json:"tab"`
-}
-
-// The arrival a taken call puts into the window. [[spec/design_output/tui#a-second-launch-hands-over]]
-type tabMsg struct{ name string }
-
-// Opens the door, and answers the server so the caller closes it. A port already held answers an error, which says a window already stands. [[spec/design_output/tui#a-second-launch-hands-over]]
-func openDoor(port int, take func(tea any)) (*http.Server, error) {
-	at, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
-	if err != nil {
-		return nil, err
-	}
-	mux := http.NewServeMux()
-	mux.HandleFunc("/tab", func(w http.ResponseWriter, r *http.Request) {
-		var one said
-		if err := json.NewDecoder(r.Body).Decode(&one); err != nil {
-			http.Error(w, "the body reads as no tab", http.StatusBadRequest)
-			return
-		}
-		take(tabMsg{name: one.Tab})
-		w.Header().Set("content-type", "application/json")
-		fmt.Fprint(w, `{"ok":true}`)
-	})
-	server := &http.Server{Handler: mux, ReadHeaderTimeout: callWait}
-	go func() { _ = server.Serve(at) }()
-	return server, nil
-}
-
-// Hands a tab to whatever stands on that port, and answers whether it took it. [[spec/design_output/tui#a-second-launch-hands-over]]
-func tellPort(port int, tab string) bool {
-	body, err := json.Marshal(said{Tab: tab})
-	if err != nil {
-		return false
-	}
-	ctx, stop := context.WithTimeout(context.Background(), callWait)
-	defer stop()
-	where := fmt.Sprintf("http://127.0.0.1:%d/tab", port)
-	call, err := http.NewRequestWithContext(ctx, http.MethodPost, where, bytes.NewReader(body))
-	if err != nil {
-		return false
-	}
-	call.Header.Set("content-type", "application/json")
-	answer, err := http.DefaultClient.Do(call)
-	if err != nil {
-		return false
-	}
-	defer answer.Body.Close()
-	return answer.StatusCode == http.StatusOK
-}
-
-// The tab of that name, counted from 1, and 0 where the window holds none. [[spec/design_output/tui#a-tab-the-caller-names]]
-func (m model) tabNamed(name string) int {
-	for at, one := range m.tabs {
-		if one.Name() == name {
-			return at + 1
-		}
-	}
-	return 0
-}
-
-// A verb of the tree runs under the root, and answers what it prints. A run past the wait dies, and answers the deadline. [[spec/design_output/tui#the-work-tab]]
-func runVerb(root, program string, argv []string, wait time.Duration) ([]byte, error) {
-	ctx, stop := context.WithTimeout(context.Background(), wait)
-	defer stop()
-	one := exec.CommandContext(ctx, program, argv...)
-	one.Dir = root
-	return one.Output()
-}
-
-// The binary's own standing verb puts a door up where none stands, and drops a stale one. [[spec/design_output/index#a-door-comes-back]]
-func startIndex(root string) error {
-	binary := filepath.Join(root, filepath.FromSlash(indexBinAt))
-	if _, err := os.Stat(binary); err != nil {
-		return fmt.Errorf("no index stands here: %s is unbuilt, and ./RUNME.sh builds it", indexBinAt)
-	}
-	one := exec.Command(binary, "standing")
-	one.Dir = root
-	if out, err := one.CombinedOutput(); err != nil {
-		return fmt.Errorf("the index door did not stand: %s", bytes.TrimSpace(out))
-	}
-	return nil
-}
 
 // The outside every other file of this package reads through. [[spec/design_output/doors#a-door-reads-the-outside]]
 var stderr io.Writer = os.Stderr
 
-func exits(code int)                       { os.Exit(code) }
-func readFile(path string) ([]byte, error) { return os.ReadFile(path) }
-func writeFile(path string, data []byte, mode fs.FileMode) error {
-	return os.WriteFile(path, data, mode)
-}
-func statOf(path string) (fs.FileInfo, error)     { return os.Stat(path) }
-func makeDir(path string, mode fs.FileMode) error { return os.MkdirAll(path, mode) }
+func exits(code int) { os.Exit(code) }

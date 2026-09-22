@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`src/tui/tree.go` and `src/tui/treedraw.go` hold the view drawing a tree
+`src/tui/tree/tree.go` and `src/tui/tree/treedraw.go` hold the view drawing a tree
 and a table at once. This note covers the items, the columns, the nesting and
 what the view draws. Every tab drawing rows with a shape takes this one view.
 [[spec/design_input/the-tree-view-editor]]
@@ -68,7 +68,7 @@ says it again.
 
 The key under `nest` in the base file says how a child finds its parent. A row
 whose value under that key names another row's name stands under it, at any
-depth. A row naming a parent nobody holds stands at the left. `workitems.go`
+depth. A row naming a parent nobody holds stands at the left. `src/tui/work/workitems.go`
 builds that tree off the rows the index answers, and a branch informs a row's
 standing and nothing more.
 
@@ -203,7 +203,7 @@ the buttons, so a slice costs no line in the file and moves as the data does.
 
 A value this tree resolves draws as a link, and a click opens what it names.
 The terminal takes the link as the escape every terminal reads, and the
-editor's own terminal opens a file address in the editor. `link.go` writes the
+editor's own terminal opens a file address in the editor. `src/tui/draw/link.go` writes the
 escape.
 
 | the value | what the link opens |

@@ -67,7 +67,7 @@ test("each schema module stands under the file ceiling the config names", () => 
   assert.deepEqual(over, []);
 });
 
-// The command line exits at import, so its text says which module it mints through. [[spec/design_output/level0#what-level-zero-is]]
+// The command line exits at import, so its text says which module it mints through. [[spec/design_output/editor#one-command-opens-the-editor]]
 test("the command line, the tools, the hand and the retro reach the mint through its own module", () => {
   const cli = String(files.read(join(root, "src", "scripts", "cli.js")));
   assert.match(

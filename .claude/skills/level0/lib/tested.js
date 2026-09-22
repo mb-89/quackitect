@@ -8,6 +8,8 @@ const SOURCE = /^src\/.*\.js$/;
 const COPIED = [/^src\/doors\/fake\//, /^src\/stub\//, /^src\/extension\/editor/];
 const TEST = /^test\/.*\.js$/;
 const SERVER = /^src\/bridge\/[^/]+\.js$/;
+// A line that is a comment or blank, so a hunk adding these alone changes no code. [[spec/design_output/tree#the-rules-over-two-files]]
+const COMMENT = /^\s*(\/\/|\/\*|\*|$)/;
 
 // Each file answers off its own hunk, so one file's line reads for no other. [[spec/design_output/tree#the-rules-over-two-files]]
 export function hunksIn(delta) {
@@ -33,13 +35,24 @@ export function untestedIn(delta, read, merging = false) {
   const tests = files.filter((one) => TEST.test(one));
   return files
     .filter((one) => SOURCE.test(one) && !COPIED.some((said) => said.test(one)))
-    .filter((one) => !tests.some((test) => names(test, one, hunks.get(test) ?? [], read)));
+    .filter((one) => codeIn(hunks.get(one) ?? []))
+    .filter(
+      (one) => !tests.some((test) => names(test, one, hunks.get(test) ?? [], read)),
+    );
+}
+
+// A hunk adding comment lines alone changes no code, so it asks for no test. A hunk adding nothing took code away, and that still asks. [[spec/design_output/tree#the-rules-over-two-files]]
+function codeIn(added) {
+  return added.length === 0 || added.some((line) => !COMMENT.test(line));
 }
 
 // A test names the file it drives by its import, or by the name it carries. [[spec/design_output/tree#the-rules-over-two-files]]
 function names(test, path, added, read) {
   const one = path.split("/").pop().replace(/\.js$/, "");
-  const said = test.split("/").pop().replace(/\.test\.js$/, "");
+  const said = test
+    .split("/")
+    .pop()
+    .replace(/\.test\.js$/, "");
   if (said === one || said.startsWith(`${one}-`)) return true;
   if (importsIt(added.join("\n"), path)) return true;
   // A test standing already imports the module above the hunk, so the reading asks the file. [[spec/design_output/tree#the-rules-over-two-files]]

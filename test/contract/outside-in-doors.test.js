@@ -10,8 +10,6 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { at, configSections, ruleAt, rulesIn } from "./ruled.js";
-import { proc } from "../../src/doors/proc.js";
-import { readTools, whereIs } from "../../src/engine/tools.js";
 import { it } from "../../src/scripts/cli-doors.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));

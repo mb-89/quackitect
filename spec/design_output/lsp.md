@@ -141,7 +141,7 @@ each one.
 
 A guidance note marks the rules wanting an argument, and the rationale beside it
 carries a chapter for each. `src/lsp/marked.go` reads the pair, off the schema
-key `matches`. [[spec/design_output/schema#keywords-that-name-a-step]]
+key `matches`. [[spec/design_output/schema#a-finding-names-the-section]]
 
 | what it reads | where it comes from |
 |---|---|
@@ -167,3 +167,82 @@ read in the present, so they pass it and carry the history anyway.
 
 The rationales argue a change, so `.vale.ini` switches this rule off there, the
 way it switches the past tense off.
+
+# The editor speaks over stdio
+
+The extension starts `se-lsp` over the language server protocol, on the binary
+under the runtime folder. A box carrying no binary keeps the sidebar and loses
+the server. `serverAsk` in `src/extension/lib/lsp.js` says what the client
+runs, and `Speaks` in `src/lsp/lsp.go` answers it:
+
+| the editor sends | the server does |
+|---|---|
+| `initialize` | names itself, and asks for the whole text on every change |
+| `initialized` | sweeps the tree, and watches the files the tree rules read |
+| a document opens, changes or saves | holds that buffer in the tree in place of the disk, and draws it |
+| a document closes | drops the buffer, so the disk answers again |
+| `shutdown`, then `exit` | answers, and ends |
+
+The language client is the extension's one dependency, pinned in its manifest.
+The installer links it beside the extension, so no copy travels.
+
+## A finding is a diagnostic
+
+`drawsAs` turns one finding into one diagnostic. The rule is the code, the
+message is the text. The range runs from the column to the end of the line. A
+finding counts its line and column from one and the editor from zero, so the
+draw takes one off each.
+
+# The standing file
+
+`se-lsp serve` holds a resident server on a loopback port, so a caller pays the
+start once. `Serve` in `src/lsp/serve.go` writes where it stands into
+`.se/.runtime/lsp.json`, the way the index door writes its own:
+
+| the field | what it says |
+|---|---|
+| `port` | where the server listens |
+| `pid` | the process holding it |
+| `root` | the tree it reads |
+| `stamp` | the binary's own time and size |
+
+`reaches` in `src/lsp/main.go` reads that file first. A server answering on
+that port with the same root and stamp takes the call. It tells a stale one to stop, drops the file, and starts a
+fresh server, as many times as `tries` there allows.
+
+# The build beside the index
+
+The server is pure Go, so it needs no compiler and no network. It shares no
+step with the index, which is C and waits on a compiler. `lsp_here` in
+`src/scripts/install.sh` builds again where a source file stands newer than the
+binary. A binary older than its source lints against rules the tree no longer
+carries.
+
+# Every pointer resolves
+
+`EveryPointerResolves` in `src/lsp/pointer.go` follows every pointer a tracked
+file writes, and names each one landing nowhere as an error. So the check
+refuses it, and the panel draws it under the line.
+
+| what it reads | where |
+|---|---|
+| a note's frontmatter | every key but `kind`, which names a taxonomy and no file |
+| a note's body | every line outside a code span, a fenced block and an indented block |
+| a yaml file | every line outside a code span, because a `reads` line and a checklist item there are pointers a reader follows |
+| any other text file | the comment on a line, from where it opens |
+
+A target carrying `<` or `>` is a shape a document spells out, and one carrying
+a quote or a bracket is a script guarding the shape. Neither reads as a pointer.
+
+A pointer resolves the way the index resolves a link, and then one step
+further. The file is the exact path, the path with `.md`, `.yaml` or `.yml` on
+the end, a note's id, or a folder, in that order. The index tries `.md`
+alone, and a ticket names its process with the ending off, so this rule tries
+the two a process file wears. A chapter after `#` names a
+heading of that note by its slug. A chapter of a file holding no headings
+resolves nowhere. For the slug, see [[spec/design_output/vocabulary#the-slug-reads-one-source]].
+
+In a code file the rule reads a comment alone. A pointer in a string is a
+fixture a test writes, and this tree holds such fixtures. `./RUNME.sh links`
+reads the notes off the index and answers what reaches nothing. This rule reads
+every file, and reaches into the chapter.

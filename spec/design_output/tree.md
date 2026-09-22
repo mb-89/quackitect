@@ -31,6 +31,11 @@ Biome holds.
 | `InstallerHoldsTheNames` | `src/scripts/install.sh`, `lib/folders.js` |
 | `SurveyFindsNode` | `.se/.runtime/tools.json`, the node running the sweep |
 | `EveryModuleTested` | a module of the server, and the tests importing it |
+| `EveryPointerResolves` | every pointer a tracked file writes, and the note or chapter it names. The server holds this one, in `src/lsp/pointer.go`. For details, see [[spec/design_output/lsp#every-pointer-resolves]] |
+
+The commit door reads the staged delta with `EveryModuleTested` too, and asks
+for a test beside each source file the delta changes. A hunk adding comment
+lines alone changes no code, so it asks for none.
 
 # Why lint prints them
 
@@ -51,6 +56,9 @@ door in this tree already answers:
 
 `line()` in `lib/refuse.js` prints one. `pathInScript` in `lib/scripts.js`
 answers the same shape.
+
+`sorted` in `src/lsp/finding.go` puts every list in one order: the file, the
+line, then the rule.
 
 A finding names a file that stands on disk, so the panel opens it. A rule with
 no line to point at answers the first line. A rule that finds the key at fault

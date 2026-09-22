@@ -146,7 +146,7 @@ func (one *server) took(said message) bool {
 	return false
 }
 
-// [[spec/design_output/lsp#one-checker-every-front-asks]]
+// [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
 func drawsAs(said Finding, rows []string) diagnostic {
 	line := said.Line - 1
 	if line < 0 {

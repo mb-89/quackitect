@@ -12,6 +12,11 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+
+	"quackitect/tui/draw"
+	"quackitect/tui/frame"
+	"quackitect/tui/tree"
+	"quackitect/tui/work"
 )
 
 const childNote = `---
@@ -34,30 +39,30 @@ One piece of it.
 `
 
 // The window over a tree with a door standing, the schema this tree ships, and one ticket on disk. [[spec/design_output/tui#the-work-tab-takes-edits]]
-func editWindow(t *testing.T) (model, string) {
+func editWindow(t *testing.T) (frame.Model, string) {
 	t.Helper()
 	root := workTree(t)
-	schema, err := os.ReadFile(filepath.Join("..", "..", ticketSchemaAt))
+	schema, err := os.ReadFile(filepath.Join("..", "..", work.TicketSchemaAt))
 	if err != nil {
-		t.Fatalf("this tree ships %s, and it read %v", ticketSchemaAt, err)
+		t.Fatalf("this tree ships %s, and it read %v", work.TicketSchemaAt, err)
 	}
-	writeAt(t, root, ticketSchemaAt, string(schema))
+	writeAt(t, root, work.TicketSchemaAt, string(schema))
 	writeAt(t, root, "spec/tickets/a-child.md", childNote)
 	path := logOf(root)
-	tree, err := loadWork(path)
+	held, err := work.Load(path)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// The shipped table draws no group column, so the edit road runs over one a case adds. [[spec/design_output/tui#the-work-tab-takes-edits]]
-	tree.Cols = append(tree.Cols, Column{Name: "group", Key: "group", Wide: columnWide}, Column{Name: "step", Key: "step", Wide: columnWide})
+	held.Cols = append(held.Cols, tree.Column{Name: "group", Key: "group", Wide: tree.ColumnWide}, tree.Column{Name: "step", Key: "step", Wide: tree.ColumnWide})
 	m := newModel(path, time.UTC)
-	m.w, m.h = 120, 24
-	m.work = tree
-	m.openTab(m.tabNamed("work"))
+	m.W, m.H = 120, 24
+	theWork(m).Tree = held
+	m.OpenTab(m.TabNamed("work"))
 	return m, root
 }
 
-func pressed(m model, keys ...string) model {
+func pressed(m frame.Model, keys ...string) frame.Model {
 	for _, one := range keys {
 		var msg tea.KeyMsg
 		switch one {
@@ -73,24 +78,26 @@ func pressed(m model, keys ...string) model {
 			msg = tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune(one)}
 		}
 		next, _ := m.Update(msg)
-		m = next.(model)
+		m = next.(frame.Model)
 	}
 	return m
 }
 
-func toColumn(m model, key string) model {
-	for at, col := range m.work.Cols {
+func toColumn(m frame.Model, key string) frame.Model {
+	for at, col := range theWork(m).Tree.Cols {
 		if col.Key == key {
-			m.work.cur = at
+			theWork(m).Tree.CursorTo(at)
 		}
 	}
 	return m
 }
 
-func toRow(m model, name string) model {
-	for at, one := range m.work.flat {
-		if one.item.Name == name {
-			m.work.MoveTo(at)
+func toRow(m frame.Model, name string) frame.Model {
+	held := theWork(m).Tree
+	for at := 0; at < held.Len(); at++ {
+		held.MoveTo(at)
+		if held.Selected().Name == name {
+			break
 		}
 	}
 	return m
@@ -108,11 +115,11 @@ func noteAt(t *testing.T, root string) string {
 // [[spec/design_output/schema#the-verbs-own-their-fields]]
 func TestTheSchemaNamesWhatAFieldTakesAndWhoOwnsIt(t *testing.T) {
 	t.Parallel()
-	text, err := os.ReadFile(filepath.Join("..", "..", ticketSchemaAt))
+	text, err := os.ReadFile(filepath.Join("..", "..", work.TicketSchemaAt))
 	if err != nil {
 		t.Fatal(err)
 	}
-	said := schemaOf(string(text))
+	said := work.SchemaOf(string(text))
 	if got := said.Takes("state"); strings.Join(got, " ") != "draft open closed" {
 		t.Fatalf("the state takes the three words the schema names, and reads %v", got)
 	}
@@ -126,7 +133,7 @@ func TestTheSchemaNamesWhatAFieldTakesAndWhoOwnsIt(t *testing.T) {
 			t.Fatalf("%s is a person's to write, and the schema knows it", key)
 		}
 	}
-	if said.Knows("standing") || said.refuses("standing") == "" {
+	if said.Knows("standing") || said.Refuses("standing") == "" {
 		t.Fatal("a column the index derives stands in no front, and the tab refuses it")
 	}
 }
@@ -137,15 +144,15 @@ func TestAnEditInTheWorkTabWritesTheFieldToTheTicket(t *testing.T) {
 	m, root := editWindow(t)
 	m = toRow(toColumn(m, "group"), "a-child")
 	m = opened(m)
-	if !m.work.Editing() || m.work.Typed() != "one-group" {
-		t.Fatalf("the edit opens on the group the cell holds, and holds %q", m.work.Typed())
+	if !theWork(m).Tree.Editing() || theWork(m).Tree.Typed() != "one-group" {
+		t.Fatalf("the edit opens on the group the cell holds, and holds %q", theWork(m).Tree.Typed())
 	}
 	m = pressed(m, "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "t", "w", "o", "-", "g", "r", "o", "u", "p", "enter")
-	if m.work.Editing() {
+	if theWork(m).Tree.Editing() {
 		t.Fatal("enter closes the edit")
 	}
-	if m.workNotice != "" {
-		t.Fatalf("a write that lands names nothing, and the tab says %q", m.workNotice)
+	if theWork(m).Notice != "" {
+		t.Fatalf("a write that lands names nothing, and the tab says %q", theWork(m).Notice)
 	}
 	if !strings.Contains(noteAt(t, root), "\ngroup: two-group\n") {
 		t.Fatalf("enter writes the field into the ticket's front, and the note reads:\n%s", noteAt(t, root))
@@ -161,7 +168,7 @@ func TestEscapePutsTheOldValueBackAndWritesNothing(t *testing.T) {
 	m, root := editWindow(t)
 	m = toRow(toColumn(m, "group"), "a-child")
 	m = pressed(opened(m), "x", "esc")
-	if m.work.Editing() {
+	if theWork(m).Tree.Editing() {
 		t.Fatal("escape closes the edit")
 	}
 	if noteAt(t, root) != childNote {
@@ -177,19 +184,19 @@ func TestAFieldTheVerbsOwnRefusesTheEdit(t *testing.T) {
 	for _, key := range []string{"step"} {
 		held := toRow(toColumn(m, key), "a-child")
 		held = opened(held)
-		if held.work.Editing() {
+		if theWork(held).Tree.Editing() {
 			t.Fatalf("no edit opens on %s", key)
 		}
-		if !strings.Contains(held.workNotice, "the verbs' to write") {
-			t.Fatalf("the tab says the verbs own %s, and says %q", key, held.workNotice)
+		if !strings.Contains(theWork(held).Notice, "the verbs' to write") {
+			t.Fatalf("the tab says the verbs own %s, and says %q", key, theWork(held).Notice)
 		}
 		if !strings.Contains(held.View(), "the verbs' to write") {
 			t.Fatal("the notice draws in the tab")
 		}
 	}
 	held := opened(toRow(toColumn(m, "queue"), "a-child"))
-	if held.work.Editing() || !strings.Contains(held.workNotice, "no ticket's front") {
-		t.Fatalf("a column the index derives refuses the edit, and the tab says %q", held.workNotice)
+	if theWork(held).Tree.Editing() || !strings.Contains(theWork(held).Notice, "no ticket's front") {
+		t.Fatalf("a column the index derives refuses the edit, and the tab says %q", theWork(held).Notice)
 	}
 	if noteAt(t, root) != childNote {
 		t.Fatal("a refused edit writes nothing")
@@ -203,14 +210,14 @@ func TestAKeyFlipsAMarkAndWritesIt(t *testing.T) {
 	m = toRow(m, "a-child")
 	// The index calls the row urgent, so the first press turns the mark off, and a note carrying none drops nothing. [[spec/design_output/tui#the-work-tab-takes-edits]]
 	m = pressed(m, "u")
-	if m.work.Selected().Keys[urgentKey] != flagOff || noteAt(t, root) != childNote {
-		t.Fatalf("u turns the mark off, the tab says %q, and the note reads:\n%s", m.workNotice, noteAt(t, root))
+	if theWork(m).Tree.Selected().Keys[work.UrgentKey] != work.FlagOff || noteAt(t, root) != childNote {
+		t.Fatalf("u turns the mark off, the tab says %q, and the note reads:\n%s", theWork(m).Notice, noteAt(t, root))
 	}
 	m = pressed(m, "u")
 	if !strings.Contains(noteAt(t, root), "\nurgent: true\n") {
-		t.Fatalf("u writes the urgent mark on, the tab says %q, and the note reads:\n%s", m.workNotice, noteAt(t, root))
+		t.Fatalf("u writes the urgent mark on, the tab says %q, and the note reads:\n%s", theWork(m).Notice, noteAt(t, root))
 	}
-	if m.work.Selected().Keys[urgentKey] != flagOn {
+	if theWork(m).Tree.Selected().Keys[work.UrgentKey] != work.FlagOn {
 		t.Fatal("the row wears the mark the moment the key flips it")
 	}
 	m = pressed(m, "u")
@@ -225,8 +232,8 @@ func TestAKeyFlipsAMarkAndWritesIt(t *testing.T) {
 }
 
 // The cell edit stays a road of the tree, and the work tab binds no key to it. [[spec/design_output/tui#the-work-tab-takes-edits]]
-func opened(m model) model {
-	m.openEdit()
+func opened(m frame.Model) frame.Model {
+	theWork(m).OpenEdit()
 	return m
 }
 
@@ -234,43 +241,46 @@ func opened(m model) model {
 func TestTheCursorMovesAcrossTheColumnsAndTheHeaderLightsIt(t *testing.T) {
 	t.Parallel()
 	m, _ := editWindow(t)
-	m.work.MoveCursor(1)
-	m.work.MoveCursor(1)
-	if m.work.Cursor() != 2 {
-		t.Fatalf("two moves stand on the third column, and the cursor stands at %d", m.work.Cursor())
+	theWork(m).Tree.MoveCursor(1)
+	theWork(m).Tree.MoveCursor(1)
+	if theWork(m).Tree.Cursor() != 2 {
+		t.Fatalf("two moves stand on the third column, and the cursor stands at %d", theWork(m).Tree.Cursor())
 	}
 	for range 3 {
-		m.work.MoveCursor(-1)
+		theWork(m).Tree.MoveCursor(-1)
 	}
-	if m.work.Cursor() != 0 {
+	if theWork(m).Tree.Cursor() != 0 {
 		t.Fatal("the cursor stops at the first column")
 	}
-	m.work.Schema = m.ticketRules()
-	if !strings.Contains(m.work.Header(120), openStyle.Render(pad("name", 34))) {
-		t.Fatalf("the column under the cursor stands lit, and the header reads %q", m.work.Header(120))
+	theWork(m).Tree.Schema = theWork(m).TicketRules()
+	// The lit cell opens with the open style's own sequence, whatever width the column takes. [[spec/design_output/tree-view#a-cell-takes-an-edit]]
+	lit := draw.Open.Render("name")
+	lit = lit[:strings.Index(lit, "name")+len("name")]
+	if !strings.Contains(theWork(m).Tree.Header(120), lit) || lit == "name" {
+		t.Fatalf("the column under the cursor stands lit, and the header reads %q", theWork(m).Tree.Header(120))
 	}
 }
 
 // [[spec/design_output/tui#the-work-tab-takes-edits]]
 func TestAFrontTakesAFieldSetDroppedAndAdded(t *testing.T) {
 	t.Parallel()
-	said, ok := withField("---\nkind: [[ticket]]\ngroup: one\n---\n\nbody\n", "group", "two")
+	said, ok := work.WithField("---\nkind: [[ticket]]\ngroup: one\n---\n\nbody\n", "group", "two")
 	if !ok || !strings.Contains(said, "\ngroup: two\n") {
 		t.Fatalf("a field standing takes the value, and reads:\n%s", said)
 	}
-	said, _ = withField("---\nkind: [[ticket]]\ngroup: one\n---\n\nbody\n", "group", "")
+	said, _ = work.WithField("---\nkind: [[ticket]]\ngroup: one\n---\n\nbody\n", "group", "")
 	if strings.Contains(said, "group") {
 		t.Fatal("an empty value drops the field")
 	}
-	said, _ = withField("---\nkind: [[ticket]]\n---\n\nbody\n", "urgent", "true")
+	said, _ = work.WithField("---\nkind: [[ticket]]\n---\n\nbody\n", "urgent", "true")
 	if !strings.HasPrefix(said, "---\nkind: [[ticket]]\nurgent: true\n---\n") {
 		t.Fatalf("a field standing nowhere lands before the closing fence, and reads:\n%s", said)
 	}
-	said, _ = withField("---\nkind: [[ticket]]\n---\n", "group", "a: b")
+	said, _ = work.WithField("---\nkind: [[ticket]]\n---\n", "group", "a: b")
 	if !strings.Contains(said, `group: "a: b"`) {
 		t.Fatalf("a value a reader trips on stands quoted, and reads:\n%s", said)
 	}
-	if _, ok := withField("no front here\n", "group", "two"); ok {
+	if _, ok := work.WithField("no front here\n", "group", "two"); ok {
 		t.Fatal("a note with no front takes no field")
 	}
 }

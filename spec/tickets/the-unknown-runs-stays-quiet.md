@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-notes-point-true
 steps:
   - name: design
@@ -89,7 +89,61 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: b13f91a700d1a75a30488b4049afbed27769dcef
+    hash_after: b13f91a700d1a75a30488b4049afbed27769dcef
+  - step: design/review
+    hand: box 1670436ae0bb · claude-code-remote · helper-2
+    hash_before: 0039c099bc3da2c41110d653726f5bde3a69431c
+    hash_after: 0039c099bc3da2c41110d653726f5bde3a69431c
+    returns: 1
+    why: "The vote's `unknown` list misses a claimed rule the agent claims nowhere this turn, because `fires` in `lib/stop.js` answers false before it reads `runs`, so a typo in such a rule stays quiet until the agent claims it. Read every rule's `runs` in the door through `knowsCheck`, which `src/bridge/stop.js` exports already.; The line names the rule file, and `pool` in `lib/stop.js` drops the file name, so the door holds it nowhere. Name the rule id and the check, both of which the door holds.; The table under The mechanical checks in `spec/design_output/stop.md` lists `never`, and `CHECKS` in `src/bridge/stop.js` holds it nowhere, so a rule with `runs: never` writes the warn line every turn. Add `never` to `CHECKS` answering false, so the table and the door agree.; The case over the fake box stands right: `test/level0/stop-door.test.js` holds a fake `log.say` that keeps every row, so the case asserts the warn row there."
+  - step: design/draft
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 9ae8ec51a44ac0d3b37ddc170d32a2d159520a06
+    hash_after: 9ae8ec51a44ac0d3b37ddc170d32a2d159520a06
+  - step: design/review
+    hand: box 1670436ae0bb · claude-code-remote · helper-4
+    hash_before: 480c7217d3c4fc70f2c40772d5fd9e741aa7a114
+    hash_after: 480c7217d3c4fc70f2c40772d5fd9e741aa7a114
+  - step: implement/tests-red
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 04fa73f97bf69a3e73c9a8329b29ea0e34cbb426
+    hash_after: 04fa73f97bf69a3e73c9a8329b29ea0e34cbb426
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: fc582e2cc12da4a8264af9885dda592b544c75a1
+    hash_after: fc582e2cc12da4a8264af9885dda592b544c75a1
+    answered:
+      - name: lint
+        exit: 0
+        said: 43 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: implement/tests-green
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 1d116db0aba79674e5bdb71bb84f337b147d4375
+    hash_after: 1d116db0aba79674e5bdb71bb84f337b147d4375
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 18 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 43 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box 1670436ae0bb · claude-code-remote · helper-9
+    hash_before: 785fe959a77173afd7d392bd64f9d84c89ffcbff
+    hash_after: 785fe959a77173afd7d392bd64f9d84c89ffcbff
+reason: done
 ---
 
 # Ask
@@ -121,6 +175,22 @@ it stands outside that branch's hunks.
 
 <!-- the form is text -->
 
+The stop door reads every rule's `runs` itself, once a turn, and writes one
+warn line a rule naming a check it holds nowhere.
+
+| the piece | what changes |
+|---|---|
+| `onStop` in `src/bridge/stop.js` | before the vote, asks `knowsCheck` of every rule carrying a `runs`, and writes `warn` under `stop` for each one it holds nowhere, naming the rule id and the check |
+| `CHECKS` in `src/bridge/stop.js` | gains `never`, answering false, so the table under The mechanical checks and the door agree |
+| `decide` in the hook's `lib/stop.js` | stays as it is, because the vote skips a claimed rule the agent claims nowhere, and the door's own read catches those too |
+| the case | drives the door over the fake box with a rule whose `runs` names nothing. Asserts one warn row in the fake log naming the rule and the check |
+| the design output | stays as it is, because the sentence promising the line stands there already |
+
+The line names the rule id and the check, because the door holds both and the
+file name nowhere. The line stands in the log, and nowhere in the block the
+door answers. The owner reads the log for a rule at fault, and the agent reads
+the block for what to do next.
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -130,6 +200,15 @@ it stands outside that branch's hunks.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- The approach does what the ask calls for. The door reads every rule's `runs` through `knowsCheck` once a turn. Writes one warn line a rule naming a check it holds nowhere.
+- The line names the rule id and the check, both of which the door holds. The earlier finding on the file name stands answered.
+- `CHECKS` gains `never` answering false. The table under The mechanical checks and the door agree. The earlier finding stands answered.
+- The case drives the door over the fake box in `test/level0/stop-door.test.js`, whose fake `log.say` keeps every row. Asserts the warn row there. The rule carries a test proving it fires.
+- The approach touches `src/bridge/stop.js` and the case alone. Leaves `decide`, `fires` and the design output as they stand. Nothing outside the ask moves.
+- Craft, for the drafter at implement. The case's rule carries a `runs` naming a check the door holds nowhere. A `decides` of mechanical. The vote reads it too.
 
 # implement
 
@@ -143,17 +222,37 @@ it stands outside that branch's hunks.
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/level0/stop-door.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The command answers assertion. Two cases join the stop door's file, over the
+fake box it holds already.
+
+| the case | what it holds open |
+|---|---|
+| a rule naming a check the door holds nowhere writes one warn line | the log holds no warn row, so the count fails |
+| a rule running `never` writes no warn line | passes, because the door writes no line today |
+
+What surprises me is that the door already writes a warn line for a claim
+naming no reason. Holds the reader for a rule's check two lines away from it.
+The second case passes before the change and earns its place after it. The
+change writes a line for every unknown check and `never` stands in the door's
+table nowhere yet.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The door, its case file and this ticket.
+- every door the change reaches has a fake. The cases drive the door over the fake disk, the fake process and a log that keeps every row.
+- a comment names the approach the change implements. Each case points at the chapter promising the line.
 
 ## reflect
 
@@ -181,11 +280,17 @@ it stands outside that branch's hunks.
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The door, its case file and this ticket.
+- every door the change reaches has a fake. The line reaches the log door, and the cases hand in a log that keeps every row.
+- a comment names the approach the change implements. The new function and the new check each point at the chapter promising the line.
 
 ## tests-green
 
@@ -197,11 +302,15 @@ it stands outside that branch's hunks.
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/level0/stop-door.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -209,11 +318,28 @@ it stands outside that branch's hunks.
 
 <!-- the form is text -->
 
+The stop door reads every rule's `runs` once a turn, and writes one warn line
+under `stop` for each check it holds nowhere. The line names the rule and the
+check, so a hand with a typo in a rule file reads its own mistake in the log.
+
+| the change | why |
+|---|---|
+| `warnsUnknown` in `src/bridge/stop.js`, before the vote | the vote skips a claimed rule the agent claims nowhere, so the door reads every rule itself |
+| `never` in the door's checks, answering false | the design output names it as what an unbuilt rule runs, and the door held it nowhere |
+| two cases over the fake box | one asserts the line for a typo, and one asserts silence for `never` |
+
+The vote in the hook stays as it is, and so does the design output, which
+promises the line already.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The door, its case file and this ticket.
+- every door the change reaches has a fake. The cases drive the door over the fake box, and read the line off a log that keeps every row.
+- a comment names the approach the change implements. The function and the check point at the chapter promising the line.
 
 # verdict
 
@@ -225,17 +351,42 @@ it stands outside that branch's hunks.
 
 <!-- the form is files -->
 
+- spec/guidance/review/reviewing.md
+- spec/tickets/the-unknown-runs-stays-quiet.md
+- spec/tickets/a-pointer-resolves.md
+- src/bridge/stop.js
+- test/level0/stop-door.test.js
+- spec/design_output/stop.md
+- .claude/skills/level0/lib/stop.js
+- spec/vocabulary/terms.yml
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- The branch does what the ask calls for. `warnsUnknown` writes one warn line a rule naming a check the door holds nowhere.
+- The line names the rule id and the check, and the row carries both as fields, as the approach says.
+- `never` stands in `CHECKS` answering false, so the table under The mechanical checks and the door agree.
+- The case feeds the door a rule with a typo in `runs`. It asserts the one warn row in the fake log.
+- A second case feeds the door `never` and asserts silence, so the new check carries its own proof.
+- `./RUNME.sh check` answers 0 on this branch, with 43 standing at warning.
+- The hunk on `spec/tickets/a-pointer-resolves.md` puts one file name in a code span, a trivial fix outside the ask.
+- The other hunks outside the ask are Biome's line wraps, and redesign nothing.
+- The handback names no retro, and none stands there.
+- Craft, for the drafter at leisure. The assertion message at line 283 of the case file earns one Antithesis warning. The hand drains it.
+- `./RUNME.sh branch review` fails on its own worktree, a missing `plugin.json`. This verdict reads git and the check by hand.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place, and a note points at the file holding it. The line's promise stands in `spec/design_output/stop.md` alone, and the function, the check and both cases point at that chapter.
 
 # Discussion
 

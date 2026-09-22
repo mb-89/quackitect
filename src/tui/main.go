@@ -12,6 +12,11 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+
+	"quackitect/tui/draw"
+	"quackitect/tui/frame"
+	"quackitect/tui/log"
+	"quackitect/tui/work"
 )
 
 const (
@@ -34,7 +39,7 @@ func main() {
 	}
 	path := flag.Arg(0)
 	// The colours stand in the config, and the window reads them once. [[spec/design_output/tui#colours]]
-	loadColours(workRoot(path))
+	draw.LoadColours(work.Root(path))
 
 	if *frame {
 		w, h, err := ParseSize(*size)
@@ -60,14 +65,14 @@ func main() {
 // The window, with its door open for as long as it stands. A port already held means a window already stands, so this one hands its tab over and ends. [[spec/design_output/tui#a-second-launch-hands-over]]
 func runWindow(path, tab string, mouse bool) error {
 	start := newModel(path, time.Local)
-	if n := start.tabNamed(tab); n > 0 {
-		start.openTab(n)
+	if n := start.TabNamed(tab); n > 0 {
+		start.OpenTab(n)
 	}
 	program := tea.NewProgram(start, windowOpts(mouse)...)
 
-	door, err := openDoor(windowPort, func(msg any) { program.Send(msg) })
+	door, err := frame.OpenDoor(frame.WindowPort, func(msg any) { program.Send(msg) })
 	if err != nil {
-		if tellPort(windowPort, tab) {
+		if frame.TellPort(frame.WindowPort, tab) {
 			fmt.Fprintln(stderr, "A window already stands, and it takes the tab.")
 			return nil
 		}
@@ -90,36 +95,45 @@ func windowOpts(mouse bool) []tea.ProgramOption {
 	return opts
 }
 
+// The window over the log tab and the work tab, in that order, so the log is the first tab. [[spec/design_output/tui#the-packages-the-window-holds]]
+func newModel(path string, zone *time.Location) frame.Model {
+	return frame.New(path, zone, []frame.Tab{log.New(path, zone), work.New(path)})
+}
+
+// The log tab the window holds first, which the frame draws its footer off. [[spec/design_output/tui#the-packages-the-window-holds]]
+func logTab(m frame.Model) *log.Tab { return m.Tabs[0].(*log.Tab) }
+
 // [[spec/design_output/tui#one-frame]]
 func Frame(path string, w, h int, opened, narrow, floor string, zone *time.Location) (string, error) {
 	m := newModel(path, zone)
-	m.w, m.h = w, h
-	recs, _, err := m.tailer.read()
+	m.W, m.H = w, h
+	held := logTab(m)
+	recs, _, err := held.Tailer.Read()
 	if err != nil {
 		return "", err
 	}
-	m.all = recs
+	held.All = recs
 	if floor != "" {
-		m.floor = floor
+		held.Floor = floor
 	}
 	if narrow != "" {
-		f, err := ParseFilter(narrow)
+		f, err := draw.ParseFilter(narrow)
 		if err != nil {
 			return "", err
 		}
-		m.filter = f
-		m.input.SetValue(narrow)
+		held.Filter = f
+		m.Input.SetValue(narrow)
 	}
-	m.rebuild()
+	held.Rebuild(m.Rows())
 	switch opened {
 	case "details":
-		m.openPane(paneDetails)
+		m.OpenPane(frame.PaneDetails)
 	case "help":
-		m.openPane(paneHelp)
+		m.OpenPane(frame.PaneHelp)
 	case "filter":
-		m.openPane(paneFilter)
+		m.OpenPane(frame.PaneFilter)
 	}
-	m.resize()
+	m.Resize()
 	return settle(m.View()), nil
 }
 

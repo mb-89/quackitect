@@ -1,7 +1,7 @@
 // The resident server on a loopback port. It writes where it stands into
 // the standing file, the way the index door writes its own, so a second
 // caller finds the first server and a stale file gives way.
-// [[spec/design_output/lsp#one-checker-every-front-asks]]
+// [[spec/design_output/lsp#the-standing-file]]
 package main
 
 import (
@@ -53,7 +53,7 @@ func standingPath(root string) string {
 	return filepath.Join(root, ".se", ".runtime", "lsp.json")
 }
 
-// [[spec/design_output/lsp#one-checker-every-front-asks]]
+// [[spec/design_output/lsp#the-standing-file]]
 func Serve(root string) (*http.Server, net.Listener, error) {
 	one := &door{checker: checkerAt(root)}
 	listen, err := net.Listen("tcp", "127.0.0.1:0")
@@ -132,7 +132,7 @@ func (one *door) answers(said call) (any, error) {
 	return nil, errorOf("no method called " + said.Method)
 }
 
-// [[spec/design_output/lsp#one-checker-every-front-asks]]
+// [[spec/design_output/lsp#the-standing-file]]
 func stampHere() string {
 	self, err := executableOf()
 	if err != nil {

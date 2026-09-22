@@ -71,7 +71,7 @@ script: |
         matches = append(matches, {
           begin: at,
           end: at + len(line),
-          message: held.word + " names no defining note. Write defines: \"[[the note]]\", because a term with no note is jargon."
+          message: held.word + " names no defining note. Write defines: \"[[<the note>]]\", because a term with no note is jargon."
         })
       }
       continue

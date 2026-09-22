@@ -16,6 +16,9 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"quackitect/tui/draw"
+	"quackitect/tui/work"
 )
 
 const indexRowsSaid = `[
@@ -90,18 +93,18 @@ func workTree(t *testing.T) string {
 func workTreeWith(t *testing.T, rows string) (string, *fakeDoor) {
 	t.Helper()
 	root := t.TempDir()
-	base, err := os.ReadFile(filepath.Join("..", "..", workBaseAt))
+	base, err := os.ReadFile(filepath.Join("..", "..", work.BaseAt))
 	if err != nil {
-		t.Fatalf("this tree ships %s, and it read %v", workBaseAt, err)
+		t.Fatalf("this tree ships %s, and it read %v", work.BaseAt, err)
 	}
-	writeAt(t, root, workBaseAt, string(base))
+	writeAt(t, root, work.BaseAt, string(base))
 	writeAt(t, root, ".se/.log/session.jsonl", "")
 	door := &fakeDoor{rows: rows, tick: 1}
 	server := httptest.NewServer(door)
 	t.Cleanup(server.Close)
 	port := server.Listener.Addr().(interface{ String() string }).String()
 	port = port[strings.LastIndex(port, ":")+1:]
-	writeAt(t, root, indexStandingAt, fmt.Sprintf(`{"port":%s,"pid":0,"root":%q}`, port, root))
+	writeAt(t, root, work.IndexStandingAt, fmt.Sprintf(`{"port":%s,"pid":0,"root":%q}`, port, root))
 	return root, door
 }
 
@@ -123,7 +126,7 @@ func logOf(root string) string {
 // [[spec/design_output/tui#the-work-tab]]
 func TestAGroupCarriesItsTicketsAndALooseOneStandsAtTheLeft(t *testing.T) {
 	t.Parallel()
-	items, err := ReadWorkItems(indexRowsSaid)
+	items, err := work.ReadWorkItems(indexRowsSaid)
 	if err != nil {
 		t.Fatalf("the rows read, and answered %v", err)
 	}
@@ -145,7 +148,7 @@ func TestAGroupCarriesItsTicketsAndALooseOneStandsAtTheLeft(t *testing.T) {
 	if items[1].Keys["urgent"] != "false" || items[1].Keys["held"] != "false" {
 		t.Fatal("an unmarked ticket carries no mark")
 	}
-	orphan, _ := ReadWorkItems(strings.ReplaceAll(indexRowsSaid, `"group": "one-group"`, `"group": "nobody"`))
+	orphan, _ := work.ReadWorkItems(strings.ReplaceAll(indexRowsSaid, `"group": "one-group"`, `"group": "nobody"`))
 	if len(orphan) != 3 {
 		t.Fatalf("a ticket naming a group the rows hold nowhere stands at the left, and %d rows do", len(orphan))
 	}
@@ -155,7 +158,7 @@ func TestAGroupCarriesItsTicketsAndALooseOneStandsAtTheLeft(t *testing.T) {
 func TestTheTabReadsTheBaseFileAndTheIndexOffTheLogsOwnPath(t *testing.T) {
 	t.Parallel()
 	root, door := workTreeWith(t, indexRowsSaid)
-	tree, err := loadWork(logOf(root))
+	tree, err := work.Load(logOf(root))
 	if err != nil {
 		t.Fatalf("the tab reads its base file and asks the door, and answered %v", err)
 	}
@@ -182,7 +185,7 @@ func TestTheTabReadsTheBaseFileAndTheIndexOffTheLogsOwnPath(t *testing.T) {
 // A ticket naming another row nests under it, at any depth, and one naming a row nobody holds stands at the left. [[spec/design_output/tree-view#the-name-column-nests]]
 func TestATicketNestsUnderTheRowItNamesAtAnyDepth(t *testing.T) {
 	t.Parallel()
-	items, err := ReadWorkItems(`[
+	items, err := work.ReadWorkItems(`[
 		{"name": "its-child", "route": "trivial", "state": "open", "group": "a-group", "says": "One piece."},
 		{"name": "a-group", "route": "group", "state": "open", "group": "", "says": "Two as one."},
 		{"name": "grandchild", "route": "trivial", "state": "open", "group": "its-child", "says": ""},
@@ -194,7 +197,7 @@ func TestATicketNestsUnderTheRowItNamesAtAnyDepth(t *testing.T) {
 	if len(items) != 2 || items[0].Name != "a-group" || items[1].Name != "alone" {
 		t.Fatalf("the group and the ticket naming no standing row stand at the left, and the roots read %v", items)
 	}
-	if items[0].Keys["kind"] != kindGroup || items[1].Keys["kind"] != kindTicket {
+	if items[0].Keys["kind"] != work.KindGroup || items[1].Keys["kind"] != work.KindTicket {
 		t.Fatalf("the kind reads off the route, and it reads %v", items)
 	}
 	if len(items[0].Kids) != 1 || items[0].Kids[0].Name != "its-child" {
@@ -209,11 +212,11 @@ func TestATicketNestsUnderTheRowItNamesAtAnyDepth(t *testing.T) {
 func TestTheFilterReadsATicketsKeysInTheLogsOwnLanguage(t *testing.T) {
 	t.Parallel()
 	root := workTree(t)
-	tree, err := loadWork(logOf(root))
+	tree, err := work.Load(logOf(root))
 	if err != nil {
 		t.Fatal(err)
 	}
-	f, err := ParseFilter("group:one-group")
+	f, err := draw.ParseFilter("group:one-group")
 	if err != nil {
 		t.Fatalf("the filter reads, and answered %v", err)
 	}
@@ -224,7 +227,7 @@ func TestTheFilterReadsATicketsKeysInTheLogsOwnLanguage(t *testing.T) {
 	if tree.Len() != 2 {
 		t.Fatalf("the group stands for its child, and %d rows do", tree.Len())
 	}
-	tree.Narrow(Filter{})
+	tree.Narrow(draw.Filter{})
 	if tree.Len() != 3 {
 		t.Fatalf("an empty filter keeps every row, and %d stand", tree.Len())
 	}
@@ -235,14 +238,14 @@ func TestTheWindowDrawsEveryTicketNestedUnderItsGroup(t *testing.T) {
 	t.Parallel()
 	root := workTree(t)
 	path := logOf(root)
-	tree, err := loadWork(path)
+	tree, err := work.Load(path)
 	if err != nil {
 		t.Fatal(err)
 	}
 	m := newModel(path, time.UTC)
-	m.w, m.h = 120, 24
-	m.work = tree
-	m.openTab(m.tabNamed("work"))
+	m.W, m.H = 120, 24
+	theWork(m).Tree = tree
+	m.OpenTab(m.TabNamed("work"))
 	said := m.View()
 	for _, one := range []string{"one-group", "a-child", "a-loose-one"} {
 		if !strings.Contains(said, one) {
@@ -257,17 +260,17 @@ func TestAChangeTheIndexFiresHandsTheTabItsTreeAgain(t *testing.T) {
 	root, door := workTreeWith(t, indexRowsSaid)
 	path := logOf(root)
 
-	first, ok := workCmd(path, 0)().(workMsg)
-	if !ok || first.same || first.tree == nil || first.tick != 1 {
+	first, ok := work.Cmd(path, 0)().(work.Msg)
+	if !ok || first.Same || first.Tree == nil || first.Tick != 1 {
 		t.Fatalf("the first ask reads the rows and hands a tree over, and answered %+v", first)
 	}
 
 	door.says(strings.ReplaceAll(indexRowsSaid, "a-child", "a-second"))
-	next, ok := workCmd(path, first.tick)().(workMsg)
-	if !ok || next.same || next.tree == nil || next.tick != 2 {
+	next, ok := work.Cmd(path, first.Tick)().(work.Msg)
+	if !ok || next.Same || next.Tree == nil || next.Tick != 2 {
 		t.Fatalf("a change hands the tab a tree again, and answered %+v", next)
 	}
-	if !strings.Contains(next.tree.Rows(120, 8), "a-second") {
+	if !strings.Contains(next.Tree.Rows(120, 8), "a-second") {
 		t.Fatal("the tree the change hands over draws what the index now says")
 	}
 	if strings.Join(door.asked, " ") != "changes tickets changes tickets" {
@@ -280,17 +283,17 @@ func TestATabMeetingNoDoorAndNoBinarySaysSo(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	writeAt(t, root, ".se/.log/session.jsonl", "")
-	if _, err := loadWork(logOf(root)); err == nil {
+	if _, err := work.Load(logOf(root)); err == nil {
 		t.Fatal("a tree carrying no base file answers why")
 	}
-	base, _ := os.ReadFile(filepath.Join("..", "..", workBaseAt))
-	writeAt(t, root, workBaseAt, string(base))
-	_, err := loadWork(logOf(root))
+	base, _ := os.ReadFile(filepath.Join("..", "..", work.BaseAt))
+	writeAt(t, root, work.BaseAt, string(base))
+	_, err := work.Load(logOf(root))
 	if err == nil || !strings.Contains(err.Error(), "unbuilt") {
 		t.Fatalf("a box with no door and no binary says the index is unbuilt, and answered %v", err)
 	}
-	said, ok := workCmd(logOf(root), 0)().(workMsg)
-	if !ok || said.tree != nil || said.why == "" {
+	said, ok := work.Cmd(logOf(root), 0)().(work.Msg)
+	if !ok || said.Tree != nil || said.Why == "" {
 		t.Fatalf("the ask hands the tab the reason, and answered %+v", said)
 	}
 }

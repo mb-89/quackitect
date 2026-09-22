@@ -205,6 +205,7 @@ export function onStop(e, box) {
   // The hold that stood over this turn, so the order the two events arrive in decides nothing. [[spec/design_output/stop#the-hold-outlives-its-drop]]
   const hold = holdHere(box);
   const off = asks(box, ENABLED) === false;
+  warnsUnknown(rules, box);
   const decision = decide(rules, {
     claimed,
     ran: (name) => ranHere(name, { off, hold, box, claimed, text }),
@@ -372,6 +373,8 @@ const CHECKS = {
   "warnings-standing": (held) => handWanted(held.box),
   // [[spec/design_output/stop#a-talk-follows-a-report]]
   "a-report-stands": (held) => reportStands(held.text),
+  // What an unbuilt rule runs, so it stands off the vote and writes no line. [[spec/design_output/stop#the-mechanical-checks]]
+  never: () => false,
   // A claim of done stands on an empty plan: no todo open, and nothing in hand. [[spec/design_output/stop#the-plan]]
   "the-plan-is-empty": (held) => planEmpty(held.box),
 };
@@ -400,6 +403,19 @@ function claimStands(held) {
   if (!rule) return false;
   if (!rule.runs) return true;
   return Boolean(ranHere(rule.runs, held));
+}
+
+// A rule naming a check this door holds nowhere says so in the log, once a turn, so the hand that wrote it reads its own mistake. The vote skips a claimed rule the agent claims nowhere, so the door reads every rule itself. [[spec/design_output/stop#the-mechanical-checks]]
+function warnsUnknown(rules, box) {
+  for (const one of rules) {
+    if (!one.runs || knowsCheck(one.runs)) continue;
+    box.log.say(
+      "warn",
+      "stop",
+      `${one.id} runs ${one.runs}, which this door holds nowhere, so the rule fires nothing`,
+      { rule: one.id, detail: String(one.runs) },
+    );
+  }
 }
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]

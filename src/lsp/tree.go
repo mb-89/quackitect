@@ -478,27 +478,6 @@ func surveyFindsNode(tree *Tree) []Finding {
 }
 
 // [[spec/design_output/tree#what-a-rule-answers]]
-var Rules = []func(*Tree) []Finding{
-	settingsNameBinaries,
-	editorDrawsWriteRules,
-	biomeOnWindows,
-	extensionsOnOffer,
-	noLogDeleted,
-	nameHoldsTheWords,
-	nothingPrivateTravels,
-	surveyNamesInstalls,
-	surveyFindsNode,
-}
-
-// [[spec/design_output/tree#what-a-rule-answers]]
-func treeFaults(tree *Tree) []Finding {
-	out := []Finding{}
-	for _, rule := range Rules {
-		out = append(out, rule(tree)...)
-	}
-	return out
-}
-
 func unread(rule, where string) Finding {
 	return fault(rule, where, 1,
 		"This file reads as no JSON, so every rule over it stands unchecked.")

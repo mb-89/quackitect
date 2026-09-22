@@ -163,7 +163,7 @@ func asks(root, method string) int {
 	return 0
 }
 
-// [[spec/design_output/lsp#one-checker-every-front-asks]]
+// [[spec/design_output/lsp#the-standing-file]]
 func reaches(root, method string) (answer, error) {
 	for try := 0; try < tries; try++ {
 		standing, err := standingOf(root)
@@ -187,7 +187,7 @@ func reaches(root, method string) (answer, error) {
 	return answer{}, errorOf("the server does not answer, and one would not start")
 }
 
-// [[spec/design_output/lsp#one-checker-every-front-asks]]
+// [[spec/design_output/lsp#the-standing-file]]
 func current(said Standing, root string) bool {
 	if said.Root != "" && said.Root != root {
 		return false

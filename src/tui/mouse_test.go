@@ -7,93 +7,96 @@ import (
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
+
+	"quackitect/tui/draw"
+	"quackitect/tui/frame"
 )
 
-func click(m model, x, y int) model {
+func click(m frame.Model, x, y int) frame.Model {
 	msg := tea.MouseMsg{X: x, Y: y, Button: tea.MouseButtonLeft, Action: tea.MouseActionPress}
 	next, _ := m.Update(msg)
-	return next.(model)
+	return next.(frame.Model)
 }
 
-func wheel(m model, x int, up bool) model {
+func wheel(m frame.Model, x int, up bool) frame.Model {
 	button := tea.MouseButtonWheelDown
 	if up {
 		button = tea.MouseButtonWheelUp
 	}
 	msg := tea.MouseMsg{X: x, Y: 5, Button: button, Action: tea.MouseActionPress}
 	next, _ := m.Update(msg)
-	return next.(model)
+	return next.(frame.Model)
 }
 
 func TestAPressOnARowSelectsThatRowAndAPressBelowTheLastOneHoldsIt(t *testing.T) {
 	t.Parallel()
 	m := window(5)
-	m = click(m, 10, firstRow())
-	if m.at() != 0 {
-		t.Fatalf("a press on the first row selects it, and the cursor stands at %d", m.at())
+	m = click(m, 10, frame.FirstRow())
+	if logTab(m).At() != 0 {
+		t.Fatalf("a press on the first row selects it, and the cursor stands at %d", logTab(m).At())
 	}
-	m = click(m, 10, firstRow()+2)
-	if m.at() != 2 {
-		t.Fatalf("a press on the third row selects it, and the cursor stands at %d", m.at())
+	m = click(m, 10, frame.FirstRow()+2)
+	if logTab(m).At() != 2 {
+		t.Fatalf("a press on the third row selects it, and the cursor stands at %d", logTab(m).At())
 	}
-	m = click(m, 10, firstRow()+9)
-	if m.at() != 2 {
-		t.Fatalf("a press past the last row holds the cursor, and it stands at %d", m.at())
+	m = click(m, 10, frame.FirstRow()+9)
+	if logTab(m).At() != 2 {
+		t.Fatalf("a press past the last row holds the cursor, and it stands at %d", logTab(m).At())
 	}
 }
 
 func TestAPressOnTheNamesRowSortsAndOpensNoPane(t *testing.T) {
 	t.Parallel()
-	m := click(window(5), gutterWide, namesRow)
-	if m.sortAt != 0 {
-		t.Fatalf("a press on the first name sorts by it, and the sort stands at %d", m.sortAt)
+	m := click(window(5), draw.GutterWide, frame.NamesRow)
+	if logTab(m).SortAt != 0 {
+		t.Fatalf("a press on the first name sorts by it, and the sort stands at %d", logTab(m).SortAt)
 	}
-	if m.pane != paneShut {
-		t.Fatalf("a press on the names row opens no pane, and the pane reads %d", m.pane)
+	if m.Pane != frame.PaneShut {
+		t.Fatalf("a press on the names row opens no pane, and the pane reads %d", m.Pane)
 	}
 }
 
 func TestAPressOnTheStripOpensTheTabUnderItAndTheHelpAtItsRightEnd(t *testing.T) {
 	t.Parallel()
 	m := window(5)
-	if n := m.tabAt(3); n != 1 {
-		t.Fatalf("the log tab stands under column 3, and tabAt answers %d", n)
+	if n := m.TabAt(3); n != 1 {
+		t.Fatalf("the log tab stands under column 3, and TabAt answers %d", n)
 	}
-	if n := m.tabAt(90); n != 0 {
-		t.Fatalf("no tab stands under column 90, and tabAt answers %d", n)
+	if n := m.TabAt(90); n != 0 {
+		t.Fatalf("no tab stands under column 90, and TabAt answers %d", n)
 	}
-	m = click(m, m.w-2, stripRow)
-	if m.pane != paneHelp {
-		t.Fatalf("a press on the help key opens the help, and the pane reads %d", m.pane)
+	m = click(m, m.W-2, frame.StripRow)
+	if m.Pane != frame.PaneHelp {
+		t.Fatalf("a press on the help key opens the help, and the pane reads %d", m.Pane)
 	}
-	m = click(m, m.w-2, stripRow)
-	if m.pane != paneShut {
-		t.Fatalf("a second press shuts the help, and the pane reads %d", m.pane)
+	m = click(m, m.W-2, frame.StripRow)
+	if m.Pane != frame.PaneShut {
+		t.Fatalf("a second press shuts the help, and the pane reads %d", m.Pane)
 	}
 }
 
 func TestTheWheelMovesTheLogOverTheListAndScrollsThePaneOverThePane(t *testing.T) {
 	t.Parallel()
 	m := window(30)
-	m = click(m, 10, firstRow())
-	was := m.at()
+	m = click(m, 10, frame.FirstRow())
+	was := logTab(m).At()
 	m = wheel(m, 10, false)
-	if m.at() != was+wheelStep {
-		t.Fatalf("the wheel carries %d rows down, and the cursor moved from %d to %d", wheelStep, was, m.at())
+	if logTab(m).At() != was+frame.WheelStep {
+		t.Fatalf("the wheel carries %d rows down, and the cursor moved from %d to %d", frame.WheelStep, was, logTab(m).At())
 	}
 	m = wheel(m, 10, true)
-	if m.at() != was {
-		t.Fatalf("the wheel carries %d rows back up, and the cursor stands at %d", wheelStep, m.at())
+	if logTab(m).At() != was {
+		t.Fatalf("the wheel carries %d rows back up, and the cursor stands at %d", frame.WheelStep, logTab(m).At())
 	}
 
 	m = press(m, "enter")
-	if m.pane != paneDetails {
-		t.Fatalf("enter opens the details, and the pane reads %d", m.pane)
+	if m.Pane != frame.PaneDetails {
+		t.Fatalf("enter opens the details, and the pane reads %d", m.Pane)
 	}
-	held := m.at()
-	m = wheel(m, m.listWidth()+1, false)
-	if m.at() != held {
-		t.Fatalf("the wheel over the pane holds the cursor, and it moved to %d", m.at())
+	held := logTab(m).At()
+	m = wheel(m, m.ListWidth()+1, false)
+	if logTab(m).At() != held {
+		t.Fatalf("the wheel over the pane holds the cursor, and it moved to %d", logTab(m).At())
 	}
 }
 
@@ -101,15 +104,15 @@ func TestTheWheelMovesTheLogOverTheListAndScrollsThePaneOverThePane(t *testing.T
 func TestThePressAndTheWheelReachTheRowsWhileTheFilterTakesLetters(t *testing.T) {
 	t.Parallel()
 	m := alt(window(5), 'f')
-	if m.pane != paneFilter {
-		t.Fatalf("alt+f opens the filter, and the pane reads %d", m.pane)
+	if m.Pane != frame.PaneFilter {
+		t.Fatalf("alt+f opens the filter, and the pane reads %d", m.Pane)
 	}
-	m = click(m, 10, firstRow())
-	if m.at() != 0 || m.pane != paneFilter {
-		t.Fatalf("a press selects the first row under the pane, and the cursor stands at %d", m.at())
+	m = click(m, 10, frame.FirstRow())
+	if logTab(m).At() != 0 || m.Pane != frame.PaneFilter {
+		t.Fatalf("a press selects the first row under the pane, and the cursor stands at %d", logTab(m).At())
 	}
 	m = wheel(m, 10, false)
-	if m.at() != wheelStep {
-		t.Fatalf("the wheel moves the log under the pane, and the cursor stands at %d", m.at())
+	if logTab(m).At() != frame.WheelStep {
+		t.Fatalf("the wheel moves the log under the pane, and the cursor stands at %d", logTab(m).At())
 	}
 }

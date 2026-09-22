@@ -65,7 +65,7 @@ layers:
   markup:
     admits:
       - a code span
-      - a link, [[wiki]] or [text](target)
+      - a link, [[<wiki>]] or [text](target)
       - a fence
       - a table
       - a list item, ordered or not

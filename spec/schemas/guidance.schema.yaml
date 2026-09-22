@@ -14,7 +14,7 @@
 #
 # The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
 # The body half is this project's own, borrowed from https://document-schema.org.
-# A value written [[like this]] is a link, and the name inside is the value.
+# A value written [[<name>]] is a link, and the name inside is the value.
 #
 # A bound a rule already holds stays with that rule. The sentence layer of
 # spec/schemas/paragraph.schema.yaml bounds every sentence here, so this file

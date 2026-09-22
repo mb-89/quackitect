@@ -1,6 +1,6 @@
 // The viewer's build, over a fake box. The fake go writes the binary it is asked
 // for, so each case reads back what a real build leaves behind.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -135,4 +135,30 @@ test("a move in the shared module rebuilds the viewer", () => {
   disk.write(`${ROOT}/src/yaml/yaml.go`, "package yaml // moved");
   viewerOf({ disk, proc, root: ROOT });
   assert.equal(proc.ran.length, ran + 1, "a move in the shared module builds again");
+});
+
+// A tab stands under a folder of its own, and a move there rebuilds the viewer the way a move at the root does. [[spec/design_output/tui#the-packages-the-window-holds]]
+test("a move under a package of the window rebuilds the viewer", () => {
+  const disk = source();
+  const proc = goWrites(disk);
+  disk.write(`${ROOT}/${SOURCE}/work/work.go`, "package work");
+  viewerOf({ disk, proc, root: ROOT });
+  const ran = proc.ran.length;
+  viewerOf({ disk, proc, root: ROOT });
+  assert.equal(proc.ran.length, ran, "a tree standing still runs no second build");
+  disk.write(`${ROOT}/${SOURCE}/work/work.go`, "package work // moved");
+  viewerOf({ disk, proc, root: ROOT });
+  assert.equal(proc.ran.length, ran + 1, "a move under a package builds again");
+});
+
+// A case file under a package stays out of the stamp, the way one at the root does. [[spec/design_output/tui#the-verb-builds-it]]
+test("a changed case file under a package leaves the binary standing", () => {
+  const disk = source();
+  const proc = goWrites(disk);
+  disk.write(`${ROOT}/${SOURCE}/work/work_test.go`, "package work");
+  viewerOf({ disk, proc, root: ROOT });
+  const ran = proc.ran.length;
+  disk.write(`${ROOT}/${SOURCE}/work/work_test.go`, "package work // moved");
+  viewerOf({ disk, proc, root: ROOT });
+  assert.equal(proc.ran.length, ran, "a case file under a package builds nothing");
 });

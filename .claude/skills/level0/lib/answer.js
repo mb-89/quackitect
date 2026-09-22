@@ -28,7 +28,7 @@ export const SAYS = [
   "The log takes the answer from the chat, so the log tool answers nothing.",
 ].join("\n");
 
-// [[spec/design_output/level0#what-the-refusal-says]]
+// [[spec/design_output/level0#the-first-call-is-free]]
 export function warns(why) {
   return [
     `${why}, and nothing has answered it yet. Write the answer in the chat, as`,
@@ -397,7 +397,7 @@ export function bandOf(score, bands, found) {
   return CLEAN;
 }
 
-// [[spec/design_output/level0#the-gate-reads-the-answer]]
+// [[spec/design_output/level0#the-findings-ride-the-call]]
 export function gateOf() {
   let waiting = null;
 

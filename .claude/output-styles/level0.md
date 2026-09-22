@@ -50,7 +50,7 @@ reason and the line.
 1. Say what is, not what isnt. Write what a thing does and what the reader does next.
 2. Put the bottom line first, and the detail under it.
 3. Reach for a list, a table or a diagram first, and write prose where none of the three fits. Prose hides a structure the reader has to rebuild.
-4. State a fact you own. Otherwise write "For details, see [[link]]".
+4. State a fact you own. Otherwise write "For details, see [[<link>]]".
 5. Use the same word for the same thing every time.
 6. Write what the audience acts on.
 7. Follow the single point of truth principle: state a thing once, and reference it everywhere else. [[spec/guidance/working]]

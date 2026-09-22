@@ -289,6 +289,60 @@ ${RULES}`;
   );
 });
 
+// A rule naming a check the door holds nowhere says so in the log, so the hand that wrote it reads its own mistake. [[spec/design_output/stop#the-mechanical-checks]]
+test("a rule naming a check the door holds nowhere writes one warn line naming the rule and the check", () => {
+  const typo = `
+- id: the-moon-is-full
+  side: continue
+  priority: 60
+  decides: mechanical
+  runs: moon-is-full
+  says: The moon is full, so this turn holds.
+${RULES}`;
+  const it = box({ [at("spec/config/stop/level0.yml")]: typo });
+  const said = onStop(
+    { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" },
+    it.box,
+  );
+  assert.deepEqual(
+    said,
+    { pass: true },
+    "the strange rule fires nothing, and the stop stands",
+  );
+  const warned = it.said.filter((row) => row[0] === "warn" && row[1] === "stop");
+  assert.equal(warned.length, 1, "one warn line a rule");
+  assert.match(warned[0][2], /the-moon-is-full/, "the line names the rule");
+  assert.match(warned[0][2], /moon-is-full/, "the line names the check");
+  assert.deepEqual(
+    warned[0][3],
+    { rule: "the-moon-is-full", detail: "moon-is-full" },
+    "the row carries the rule and the check as fields, so the log verb narrows on them",
+  );
+});
+
+// The table of checks holds what an unbuilt rule runs, so such a rule stands off the vote and writes no line. [[spec/design_output/stop#the-mechanical-checks]]
+test("a rule running never fires nothing and writes no warn line", () => {
+  const unbuilt = `
+- id: the-unbuilt-rule
+  side: continue
+  priority: 60
+  decides: mechanical
+  runs: never
+  says: An unbuilt rule holds nothing.
+${RULES}`;
+  const it = box({ [at("spec/config/stop/level0.yml")]: unbuilt });
+  const said = onStop(
+    { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" },
+    it.box,
+  );
+  assert.deepEqual(said, { pass: true });
+  assert.deepEqual(
+    it.said.filter((row) => row[0] === "warn" && row[1] === "stop"),
+    [],
+    "never is a check the door holds",
+  );
+});
+
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
 test("the door answers the vote and the hand together, and the hand takes the file outside the window", () => {
   const it = box(stamped(9, ["old.md", "new.md"]));

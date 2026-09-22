@@ -38,7 +38,9 @@ const fakeTree = (seed, paths = []) =>
 // A merge carries other commits' code, and each met the door with its own test. [[spec/design_output/tree#the-rules-over-two-files]]
 test("a merge passes whole, because its code landed with tests already", () => {
   assert.deepEqual(untestedIn(delta("src/bridge/one.js"), undefined, true), []);
-  assert.deepEqual(untestedIn(delta("src/bridge/one.js"), undefined, false), ["src/bridge/one.js"]);
+  assert.deepEqual(untestedIn(delta("src/bridge/one.js"), undefined, false), [
+    "src/bridge/one.js",
+  ]);
 });
 
 test("a change with no test beside it comes back named", () => {
@@ -110,6 +112,28 @@ test("the clock a test hands in takes the guard", () => {
 
   assert.equal(typeof clock.now().getTime(), "number");
   assert.throws(() => clock.sleep(1), /clock/);
+});
+
+// A pointer in a comment moves, and the door asks nothing, because no code moves with it. [[spec/design_output/tree#the-rules-over-two-files]]
+test("a hunk adding comment lines alone asks for no test, and a hunk taking code away still does", () => {
+  const commented = [
+    "diff --git a/src/bridge/one.js b/src/bridge/one.js",
+    "+++ b/src/bridge/one.js",
+    "@@ -3,1 +3,2 @@",
+    "+// [[spec/design_output/tree#the-rules-over-two-files]]",
+    "+",
+    "",
+  ].join("\n");
+  assert.deepEqual(untestedIn(commented), []);
+
+  const removed = [
+    "diff --git a/src/bridge/one.js b/src/bridge/one.js",
+    "+++ b/src/bridge/one.js",
+    "@@ -3,1 +3,0 @@",
+    "-export const one = 1;",
+    "",
+  ].join("\n");
+  assert.deepEqual(untestedIn(removed), ["src/bridge/one.js"]);
 });
 
 test("a change wants the test naming it, and a stray case carries none", () => {
