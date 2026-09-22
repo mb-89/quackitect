@@ -397,7 +397,7 @@ The owner named the wait as the defect, and the split names what the retro named
 
 This group waits on one person's line, under design/person-1 on the child.
 
-- the design already answers the finding: [[spec/design_output/pull#the-five-answers]] names five in the heading, the Scope line and the table
+- the design already answers the finding: [[spec/design_output/pull#the-answers]] names five in the heading, the Scope line and the table
 - the person writes one line under the child's answer field and hands the step back
 - the route then runs on to design/draft
 - a third box meets the same wall and writes no third retro, because a second copy is a defect

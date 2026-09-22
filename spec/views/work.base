@@ -1,59 +1,66 @@
-filters:
-  - kind: ticket
 properties:
   name:
     opensNote: true
 columnSize:
-  name: 34
-  state: 8
-  flags: 7
-  progress: 9
+  name: 44
+  flags: 6
   queue: 6
 flags:
+  - key: state
+    value: true
+    tones:
+      open: good
+      held: held
+      draft: bad
+      closed: closed
+  - key: route
+    value: true
+    tones:
+      note: note
+      trivial: trivial
+      standard: standard
+      group: group
+      question: question
+      retro: retro
   - letter: U
     key: urgent
-  - letter: "Y"
-    key: person
-  - letter: W
-    key: held
-  - letter: B
-    key: waits
+    tone: bad
+  - letter: C
+    key: cloud
   - letter: T
     key: todo
+    tone: bad
 groups:
-  - name: not done
-    pressed: true
-    filters:
-      - not state: closed
   - name: queue
+    pressed: true
     filters:
       - queue: /./
     sort:
       - key: queue
-  - name: yours
+  - name: in hand
     filters:
-      - person: true
-    sort:
-      - key: stood
-  - name: unsorted
+      - queue: /^0$/
+  - name: recently done
     filters:
-      - "state: draft or not group: /./"
+      - state: closed
     sort:
-      - key: stood
+      - key: changed
+        down: true
+  - name: urgent
+    filters:
+      - urgent: true and not state: closed
+  - name: todos
+    filters:
+      - todo: true
 views:
   - type: table
     name: every ticket
     order:
       - name
-      - state
       - flags
-      - progress
       - queue
-      - says
     nest: group
     sort:
-      - key: person
-        down: true
       - key: queue
     collapsed:
       - closed

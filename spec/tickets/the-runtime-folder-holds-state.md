@@ -62,7 +62,7 @@ reader reads:
 | `check.json`, `check.log` | the battery |
 | `hold/`, `vehicle.json`, `show-panel` | the holds, the pointer, and the flag |
 | `bin/` | the binaries the install puts there |
-| `review/` | a git worktree, which is a second copy of the whole tree |
+| `review/` | a git worktree, which is a second checkout of the whole tree |
 | `measure/` | what the voice verb writes, one file a span |
 
 | what stays under `.se` | why a reader wants it |

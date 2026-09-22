@@ -8,11 +8,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
-	"os/signal"
 	"path/filepath"
 	"strconv"
-	"syscall"
 	"time"
 
 	"quackitect/swap"
@@ -27,28 +24,28 @@ const (
 )
 
 func main() {
-	argv := os.Args[1:]
+	argv := argsOf()[1:]
 	if len(argv) == 0 {
-		fmt.Fprintln(os.Stderr, "usage: se-index <serve|find|notes|links|dangling|same|reindex|standing> [words]\n       se-index call <method> <json params>")
-		os.Exit(2)
+		fmt.Fprintln(stderr, "usage: se-index <serve|find|notes|links|dangling|same|tickets|changes|reindex|standing> [words]\n       se-index call <method> <json params>")
+		exits(2)
 	}
 
 	root, err := rootHere()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		fmt.Fprintln(stderr, err)
+		exits(1)
 	}
 
 	if argv[0] == "serve" {
-		os.Exit(serves(root))
+		exits(serves(root))
 	}
-	os.Exit(asks(root, argv))
+	exits(asks(root, argv))
 }
 
 func rootHere() (string, error) {
-	said := os.Getenv("QUACKITECT_ROOT")
+	said := envOf("QUACKITECT_ROOT")
 	if said == "" {
-		here, err := os.Getwd()
+		here, err := workDirOf()
 		if err != nil {
 			return "", err
 		}
@@ -58,17 +55,19 @@ func rootHere() (string, error) {
 }
 
 func serves(root string) int {
-	stop, _, err := Serve(root, filepath.Join(root, Runtime, "index.db"))
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "the index door did not stand:", err)
+	// A fresh tree holds no runtime folder yet, and the database needs one to open in. [[spec/design_output/index#the-door-owns-the-database]]
+	if err := makeDir(filepath.Join(root, Runtime), 0o755); err != nil {
+		fmt.Fprintln(stderr, "the runtime folder did not stand:", err)
 		return 1
 	}
-	defer os.Remove(standingPath(root))
+	stop, _, err := Serve(root, filepath.Join(root, Runtime, "index.db"))
+	if err != nil {
+		fmt.Fprintln(stderr, "the index door did not stand:", err)
+		return 1
+	}
+	defer removeFile(standingPath(root))
 
-	said := make(chan os.Signal, 1)
-	signal.Notify(said, os.Interrupt, syscall.SIGTERM)
-	swap.Watches(func() { said <- os.Interrupt })
-	<-said
+	<-stops(swap.Watches)
 	stop()
 	return 0
 }
@@ -76,17 +75,17 @@ func serves(root string) int {
 func asks(root string, argv []string) int {
 	said, err := reaches(root, argv)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(stderr, err)
 		return 1
 	}
 	if said.Error != "" {
-		fmt.Fprintln(os.Stderr, said.Error)
+		fmt.Fprintln(stderr, said.Error)
 		return 1
 	}
 
 	out, err := json.MarshalIndent(said.Result, "", "  ")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(stderr, err)
 		return 1
 	}
 	fmt.Println(string(out))
@@ -106,7 +105,7 @@ func reaches(root string, argv []string) (answer, error) {
 		if err == nil && standing.Port != 0 && !stands(standing, root) {
 			posts(standing, []string{"stop"})
 		}
-		os.Remove(standingPath(root))
+		removeFile(standingPath(root))
 		if err := starts(root); err != nil {
 			return answer{}, err
 		}
@@ -124,7 +123,7 @@ func stands(said Standing, root string) bool {
 
 func standingOf(root string) (Standing, error) {
 	var standing Standing
-	said, err := os.ReadFile(standingPath(root))
+	said, err := readFile(standingPath(root))
 	if err != nil {
 		return standing, err
 	}
@@ -180,6 +179,8 @@ func asked(argv []string) (string, json.RawMessage) {
 			params["target"] = argv[1]
 		case "same":
 			params["path"] = argv[1]
+		case "changes":
+			params["since"], _ = strconv.Atoi(argv[1])
 		}
 	}
 	return argv[0], asRaw(params)

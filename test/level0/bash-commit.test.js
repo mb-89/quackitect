@@ -46,6 +46,28 @@ test("a commit carrying code and no test is refused at the door", async () => {
   );
 });
 
+// A break of form in the message lands, and a break of substance refuses it. [[spec/rationales/voice#11-form-and-substance]]
+test("a message carrying a warning lands, and one carrying an error is refused", async () => {
+  const saying = (found) => ({
+    ...box(true),
+    vale: { stands: () => true, lint: async () => ({ ran: true, found }) },
+  });
+  const warned = [{ rule: "VoiceVale.Passive", line: 1, column: 1, severity: "warning", message: "passive" }];
+  assert.equal(denied(await onBash({ command: COMMIT }, saying(warned))), "");
+  const erred = [{ rule: "VoiceParagraph.Vocabulary", line: 1, column: 1, severity: "error", message: "jargon" }];
+  assert.match(denied(await onBash({ command: COMMIT }, saying(erred))), /Vocabulary/);
+});
+
 test("a merge commit passes the door whole", async () => {
   assert.equal(denied(await onBash({ command: COMMIT }, box(true))), "");
+});
+
+// A warning holds no push, because the refactoring hand drains it on the box. [[spec/design_output/config#the-engine-controls]]
+test("a push off a work branch lands whatever the lint says", async () => {
+  const warned = [{ rule: "VoiceVale.Passive", line: 1, column: 1, severity: "warning", message: "passive" }];
+  const it = {
+    ...box(false),
+    vale: { stands: () => true, lint: async () => ({ ran: true, found: warned }) },
+  };
+  assert.equal(denied(await onBash({ command: "git push origin claude/a-thing" }, it)), "");
 });

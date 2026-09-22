@@ -17,8 +17,9 @@
   side: stop
   priority: 100
   decides: claimed
-  asks: Does the last thing the owner said open a discussion?
-  says: The owner opens a discussion, so this turn ends and waits.
+  runs: a-report-stands
+  asks: Does the last thing the owner said open a discussion in their own words, past a question you answer yourself, and does this same message carry the report with the table What the agent needs above the stop line?
+  says: The owner opens a discussion, and the report stands in this message, so this turn ends and waits.
 
 - id: the-owner-says-carry-on
   side: continue
@@ -83,7 +84,8 @@
   priority: 45
   decides: claimed
   yields: true
-  asks: Does the work stand complete?
+  runs: the-plan-is-empty
+  asks: Does the work stand complete, with no todo open in the plan and nothing in hand there?
   says: The work stands complete, so this turn ends.
 
 - id: an-update-is-worth-giving

@@ -9,9 +9,10 @@ export const TODO = "todo";
 
 const NOTE = ".md";
 
-// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+// A tag is any value past false: a bare true, or the name of the row the ticket stands before. [[spec/design_output/pull#the-queue-is-an-outline]]
 export function isTagged(text) {
-  return readNote(text).front.said?.[TODO] === true;
+  const said = readNote(text).front.said?.[TODO];
+  return said !== undefined && said !== null && said !== false && String(said) !== "false";
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]

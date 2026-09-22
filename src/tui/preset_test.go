@@ -20,71 +20,58 @@ func presetTree() *Tree {
 	return NewTree(sortCols(), presetItems(), false)
 }
 
-// [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-func TestAPressPutsThePresetsFilterAndItsSortIn(t *testing.T) {
+// The line is the whole filter, and a preset is what wrote it. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func TestTheLineIsTheWholeFilterAndAnEmptyLineKeepsEveryRow(t *testing.T) {
+	t.Parallel()
+	tree := presetTree()
+	tree.Presets([]Preset{{Name: "not done", Filters: "not state: closed", Pressed: true}})
+	sameNames(t, namesOf(tree), []string{"open-one", "shut-one", "mine"})
+
+	if err := tree.Filtering(tree.Opening()); err != nil {
+		t.Fatal(err)
+	}
+	sameNames(t, namesOf(tree), []string{"open-one", "mine"})
+
+	if err := tree.Filtering("person: person"); err != nil {
+		t.Fatal(err)
+	}
+	sameNames(t, namesOf(tree), []string{"mine"})
+
+	if err := tree.Filtering(""); err != nil {
+		t.Fatal(err)
+	}
+	sameNames(t, namesOf(tree), []string{"open-one", "shut-one", "mine"})
+}
+
+// The preset the file presses opens the line, and its sort takes hold at the start. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func TestThePressedPresetOpensTheLineAndItsSortTakesHold(t *testing.T) {
 	t.Parallel()
 	tree := presetTree()
 	tree.Presets([]Preset{
 		{Name: "not done", Filters: "not state: closed"},
-		{Name: "queue", Filters: "queue: /./", Sorts: []Sort{{Key: "queue"}}},
+		{Name: "queue", Filters: "queue: /./", Sorts: []Sort{{Key: "queue"}}, Pressed: true},
 	})
-	sameNames(t, namesOf(tree), []string{"open-one", "shut-one", "mine"})
-
-	tree.Press("queue")
-	sameNames(t, namesOf(tree), []string{"mine", "open-one"})
+	if said := tree.Opening(); said != "queue: /./" {
+		t.Fatalf("the pressed preset's filter opens the line, and it reads %q", said)
+	}
 	if said := tree.Sorts(); len(said) != 1 || said[0].Key != "queue" {
-		t.Fatalf("the press puts the preset's sort in, and it reads %v", said)
+		t.Fatalf("the pressed preset's sort takes hold, and it reads %v", said)
+	}
+	if said := presetTree().Opening(); said != "" {
+		t.Fatalf("a tree with no pressed preset opens on an empty line, and it reads %q", said)
 	}
 }
 
-// [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-func TestASecondPresetNarrowsBothAndAPressAgainTakesItOff(t *testing.T) {
+// A line that parses not says why, and the last good filter stands. [[spec/design_output/tui#the-filter-language]]
+func TestALineThatParsesNotKeepsTheLastGoodFilter(t *testing.T) {
 	t.Parallel()
 	tree := presetTree()
-	tree.Presets([]Preset{
-		{Name: "not done", Filters: "not state: closed", Pressed: true},
-		{Name: "yours", Filters: "person: person"},
-	})
-	sameNames(t, namesOf(tree), []string{"open-one", "mine"})
-
-	tree.Press("yours")
-	sameNames(t, namesOf(tree), []string{"mine"})
-
-	tree.Press("yours")
-	sameNames(t, namesOf(tree), []string{"open-one", "mine"})
-
-	tree.Press("not done")
-	sameNames(t, namesOf(tree), []string{"open-one", "shut-one", "mine"})
-}
-
-// [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-func TestAPersonChangingTheSortAfterAPressKeepsThatSort(t *testing.T) {
-	t.Parallel()
-	tree := presetTree()
-	tree.Presets([]Preset{{Name: "queue", Filters: "state: open", Sorts: []Sort{{Key: "queue"}}}})
-	tree.Press("queue")
-	tree.SortOn("name")
-
-	said := tree.Sorts()
-	if len(said) != 2 || said[1].Key != "name" {
-		t.Fatalf("the person's key stands under the preset's, and they read %v", said)
+	if err := tree.Filtering("state: open"); err != nil {
+		t.Fatal(err)
 	}
-	tree.Press("queue")
-	if len(tree.Sorts()) != 2 {
-		t.Fatalf("taking the filter off leaves the sort, and it reads %v", tree.Sorts())
+	if err := tree.Filtering("state: /("); err == nil {
+		t.Fatal("a pattern that compiles not answers why")
 	}
-}
-
-// [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-func TestATypedLineJoinsThePressesAndNarrowsWithThem(t *testing.T) {
-	t.Parallel()
-	tree := presetTree()
-	tree.Presets([]Preset{{Name: "not done", Filters: "not state: closed", Pressed: true}})
-
-	tree.Filtering("person: person")
-	sameNames(t, namesOf(tree), []string{"mine"})
-
-	tree.Filtering("")
 	sameNames(t, namesOf(tree), []string{"open-one", "mine"})
 }
 
@@ -116,12 +103,22 @@ func TestABaseFileNamesThePresetsUnderGroups(t *testing.T) {
 	if len(said) == 0 {
 		t.Fatal("this tree's own base file names its presets")
 	}
-	if said[0].Name != "not done" || !said[0].Pressed {
-		t.Fatalf("not done stands in when the tab opens, and it reads %v", said[0])
+	// The queue opens the tab: the placed rows, sorted by place. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+	if said[0].Name != "queue" || !said[0].Pressed || said[0].Filters != "queue: /./" || len(said[0].Sorts) == 0 {
+		t.Fatalf("the queue stands in when the tab opens, and it reads %v", said[0])
 	}
 	for _, one := range said {
 		if strings.TrimSpace(one.Filters) == "" {
-			t.Fatalf("every preset carries a filter, and %s carries none", one.Name)
+			t.Fatalf("every other preset carries a filter, and %s carries none", one.Name)
 		}
+	}
+	// The urgent preset keeps the open ones, because a closed ticket asks nothing of anybody. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+	urgent := said[len(said)-2]
+	if urgent.Name != "urgent" || !strings.Contains(urgent.Filters, "not state: closed") {
+		t.Fatalf("urgent keeps the open tickets alone, and it reads %v", urgent)
+	}
+	// The todos preset keeps every row a todo places, the sentence todos among them. [[spec/design_output/stop#the-plan]]
+	if last := said[len(said)-1]; last.Name != "todos" || last.Filters != "todo: true" {
+		t.Fatalf("the todos preset stands last on alt+5, and it reads %v", last)
 	}
 }

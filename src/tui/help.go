@@ -1,7 +1,7 @@
 // What alt+? and alt+f open in the pane, under the keys. The bands name every
 // key out of its registration, and this text says what no key says: the
 // columns, the colours, the floor, the details and how the filter reads.
-// [[spec/design_output/tui#the-help]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 
 package main
 
@@ -47,21 +47,7 @@ THE FILTER
 The filter is the open tab's own, and the funnel in the footer stands red
 while one holds. Clear the line and every row comes back.`
 
-const FilterHelp = `THE FILTER
-
-Type above. The list narrows with every key, and enter, esc or alt+f close
-this pane with the filter still holding. Clear the line to drop it.
-
-SHORTCUTS
-
-  alt+q                keep the prompts and the replies: the talk
-  alt+shift+f          keep every line of the selected line's kind
-
-A tool line's kind is its tool, as Read or Bash. A shortcut writes the
-filter into the line above, so it reads and edits like one typed. The same
-shortcut again clears the filter. Each works with this pane shut too.
-
-The language is KQL, the one Kibana uses.
+const FilterHelp = `THE LANGUAGE
 
   word                 every column, and every field
   name: value          that column
@@ -84,16 +70,4 @@ MATCHING
   /pattern/            a regular expression, as Lucene writes it
   name: /pattern/      the same, in one column
 
-Matching ignores case everywhere.
-
-COLUMNS
-
-  time  level  kind  tool  said  text  details
-
-Any field a writer adds answers by its name too, as file: or branch:. A name
-no line carries matches nothing.
-
-WHILE TYPING
-
-A half-typed filter keeps the last one that worked, and the line under the
-filter says still typing.`
+Matching ignores case everywhere.`

@@ -27,10 +27,12 @@ type Column struct {
 
 // [[spec/design_output/tree-view#the-view-draws-a-tree]]
 type Tree struct {
-	Cols    []Column
-	Items   []Item
-	Nests   bool
-	Schema  Schema
+	Cols   []Column
+	Items  []Item
+	Nests  bool
+	Schema Schema
+	// The address a row's name links to, and nil where the names link nowhere. [[spec/design_output/tree-view#a-value-carries-a-link]]
+	LinkOf  func(Item) string
 	filter  Filter
 	sorts   []Sort
 	presets []Preset
@@ -43,6 +45,8 @@ type Tree struct {
 	flat    []twig
 	sel     int
 	top     int
+	cur     int
+	wrote   []string
 }
 
 type twig struct {
@@ -57,6 +61,38 @@ func NewTree(cols []Column, items []Item, nests bool) *Tree {
 	t := &Tree{Cols: cols, Items: items, Nests: nests, shut: map[string]bool{}}
 	t.rebuild()
 	return t
+}
+
+// The items standing beside one at its own level: the roots, or its parent's kids, and nothing for a name the tree holds nowhere. [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
+func (t Tree) Siblings(name string) []Item {
+	return siblingsIn(t.Items, name)
+}
+
+func siblingsIn(items []Item, name string) []Item {
+	for _, one := range items {
+		if one.Name == name {
+			return items
+		}
+	}
+	for _, one := range items {
+		if held := siblingsIn(one.Kids, name); held != nil {
+			return held
+		}
+	}
+	return nil
+}
+
+// A change laid over every item, at every depth, after which the rows read again. [[spec/design_output/tree-view#an-item-carries-its-keys]]
+func (t *Tree) Amend(change func(*Item)) {
+	amend(t.Items, change)
+	t.rebuild()
+}
+
+func amend(items []Item, change func(*Item)) {
+	for at := range items {
+		change(&items[at])
+		amend(items[at].Kids, change)
+	}
 }
 
 // [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
@@ -161,6 +197,29 @@ func (t *Tree) shutAll(items []Item, above string) {
 			t.shutAll(one.Kids, here)
 		}
 	}
+}
+
+// The column the cursor stands on, which an edit opens. [[spec/design_output/tui#the-work-tab-takes-edits]]
+func (t Tree) Cursor() int { return t.cur }
+
+// [[spec/design_output/tui#the-work-tab-takes-edits]]
+func (t *Tree) MoveCursor(step int) {
+	t.cur = max(0, min(t.cur+step, len(t.Cols)-1))
+}
+
+// A tree handed over again keeps the place a person stands at, so a redraw moves nothing under them. [[spec/design_output/tui#the-work-tab]]
+func (t *Tree) Carry(from *Tree) {
+	if from == nil {
+		return
+	}
+	t.cur = min(from.cur, len(t.Cols)-1)
+	t.Schema = from.Schema
+	for at := range from.shut {
+		t.shut[at] = true
+	}
+	t.rebuild()
+	t.sel = max(0, min(from.sel, len(t.flat)-1))
+	t.top = from.top
 }
 
 // [[spec/design_output/tree-view#the-view-draws-a-tree]]

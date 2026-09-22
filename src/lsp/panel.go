@@ -13,8 +13,9 @@ import (
 )
 
 const (
-	opens = "textDocument/didOpen"
-	saves = "textDocument/didSave"
+	opens   = "textDocument/didOpen"
+	changes = "textDocument/didChange"
+	saves   = "textDocument/didSave"
 )
 
 type panel struct {
@@ -22,14 +23,21 @@ type panel struct {
 	extra map[string][]Finding
 	open  map[string]bool
 	shown map[string]bool
+	// The open files changed since the bridge last read them, which the next ask carries together. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+	pending map[string]bool
+	// The files the bridge owes an answer for, asked again until one answers, and whether an ask runs now. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+	owed     map[string]bool
+	draining bool
 }
 
 func newPanel() *panel {
 	return &panel{
-		own:   map[string][]Finding{},
-		extra: map[string][]Finding{},
-		open:  map[string]bool{},
-		shown: map[string]bool{},
+		own:     map[string][]Finding{},
+		extra:   map[string][]Finding{},
+		open:    map[string]bool{},
+		shown:   map[string]bool{},
+		pending: map[string]bool{},
+		owed:    map[string]bool{},
 	}
 }
 
@@ -83,7 +91,7 @@ func (one *server) asksBridge(paths []string) bool {
 	return true
 }
 
-// An open, a change or a save redraws that file, and a save asks the bridge again for it. [[spec/design_output/lsp]]
+// An open, a change or a save redraws that file. A save asks the bridge again for it off the disk, and a change asks after the quiet span, off the buffer. [[spec/design_output/lsp]]
 func (one *server) draws(where, text, method string) {
 	if where == "" {
 		return
@@ -100,13 +108,105 @@ func (one *server) draws(where, text, method string) {
 	if method == opens {
 		one.panel.open[at] = true
 	}
+	// A save changes the file, so the rows the bridge drew for it go, and the bridge draws them again. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+	if method == saves {
+		delete(one.panel.extra, at)
+	}
 	for path, said := range got {
 		one.panel.own[path] = said
 		one.shows(tree, path)
 	}
 	one.guard.Unlock()
 	if method == saves {
-		go one.asksBridge([]string{at})
+		go one.owes([]string{at})
+	}
+	if method == changes {
+		one.asksSoon(at)
+	}
+}
+
+// The bridge owes an answer for these paths. One ask runs at a time, and it asks again after the pause until the bridge answers, so a file changed while no bridge stands draws its rows once one does. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+func (one *server) owes(paths []string) {
+	one.guard.Lock()
+	for _, at := range paths {
+		one.panel.owed[at] = true
+	}
+	if one.panel.draining {
+		one.guard.Unlock()
+		return
+	}
+	one.panel.draining = true
+	one.guard.Unlock()
+	for {
+		one.guard.Lock()
+		asked := []string{}
+		for at := range one.panel.owed {
+			asked = append(asked, at)
+		}
+		if len(asked) == 0 {
+			one.panel.draining = false
+			one.guard.Unlock()
+			return
+		}
+		one.guard.Unlock()
+		if one.asksBridge(asked) {
+			one.guard.Lock()
+			for _, at := range asked {
+				delete(one.panel.owed, at)
+			}
+			one.guard.Unlock()
+			continue
+		}
+		time.Sleep(bridgeRetry)
+	}
+}
+
+// A change waits the quiet span, and every change inside it joins one ask. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+func (one *server) asksSoon(at string) {
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	one.panel.pending[at] = true
+	if one.timer != nil {
+		one.timer.Stop()
+	}
+	one.timer = time.AfterFunc(one.quiet, one.asksHeld)
+}
+
+// The bridge reads every pending buffer as it stands, and each file redraws with the answer. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+func (one *server) asksHeld() {
+	tree := one.checker.Tree()
+	one.guard.Lock()
+	held := map[string]string{}
+	for at := range one.panel.pending {
+		if one.panel.open[at] {
+			held[at] = tree.Read(at)
+		}
+	}
+	one.panel.pending = map[string]bool{}
+	one.guard.Unlock()
+	if len(held) == 0 {
+		return
+	}
+	found, ok := bridgeHeld(tree.Root, held)
+	if !ok {
+		// No bridge answers, so the rows it drew before go, because they read a text the buffer no longer holds, and the disk's rows come once a bridge stands. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+		paths := []string{}
+		one.guard.Lock()
+		for at := range held {
+			delete(one.panel.extra, at)
+			one.shows(tree, at)
+			paths = append(paths, at)
+		}
+		one.guard.Unlock()
+		go one.owes(paths)
+		return
+	}
+	got := grouped(found)
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	for at := range held {
+		one.panel.extra[at] = got[at]
+		one.shows(tree, at)
 	}
 }
 
@@ -128,19 +228,24 @@ func (one *server) closes(where string) {
 }
 
 func (one *server) showsAll(tree *Tree) {
-	paths := map[string]bool{}
-	for path := range one.panel.own {
-		paths[path] = true
-	}
-	for path := range one.panel.extra {
-		paths[path] = true
-	}
-	for path := range one.panel.shown {
-		paths[path] = true
-	}
-	for path := range paths {
+	for path := range one.panel.paths() {
 		one.shows(tree, path)
 	}
+}
+
+// Every path a list names or a row draws. [[spec/design_output/lsp]]
+func (one *panel) paths() map[string]bool {
+	out := map[string]bool{}
+	for path := range one.own {
+		out[path] = true
+	}
+	for path := range one.extra {
+		out[path] = true
+	}
+	for path := range one.shown {
+		out[path] = true
+	}
+	return out
 }
 
 // An open file leaves Biome to its own server, which draws it as it is typed. Vale stays here, because the battery's list carries the tense reader's veto. [[spec/design_output/lsp]]

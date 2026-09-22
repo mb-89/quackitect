@@ -14,8 +14,8 @@ each wait for a ticket of their own.
 
 # The view draws a tree
 
-A view carries three things: the columns, the items and whether it nests.
-`NewTree` takes the three and flattens the items into the rows it draws.
+A view carries the columns, the items and whether it nests.
+`NewTree` takes them and flattens the items into the rows it draws.
 
 | what | what it holds |
 |---|---|
@@ -25,6 +25,11 @@ A view carries three things: the columns, the items and whether it nests.
 
 The view keeps the items as they stand. What a person collapses lives in the
 view, and the flattening reads it, so the data stays as it is.
+
+A gutter stands before every row, the way the log's does. The selected row
+wears the bar in the gutter and the background under every cell. So a person
+reads where they stand the same way in every view, and the mouse reads a
+column past the gutter.
 
 ## An item carries its keys
 
@@ -56,9 +61,16 @@ draws its own names the same way. [[spec/design_output/tui#the-columns-stand-sti
 ## The name column nests
 
 The first column draws the mark, the nesting and the name, whatever key it
-reads. A row stands two columns in for each step of depth. The mark reads `▾`
+reads. A row stands a pair of columns in for each step of depth. The mark reads `▾`
 while the item stands open, `▸` while it stands collapsed, and blank on an item
-with nothing under it.
+with nothing under it. So the mark says which row is a group, and no column
+says it again.
+
+The key under `nest` in the base file says how a child finds its parent. A row
+whose value under that key names another row's name stands under it, at any
+depth. A row naming a parent nobody holds stands at the left. `workitems.go`
+builds that tree off the rows the index answers, and a branch informs a row's
+standing and nothing more.
 
 # A parent expands and collapses
 
@@ -85,7 +97,7 @@ The view filters in the language the log filter reads, so a person learns one
 language and types it in every tab.
 [[spec/design_output/tui#the-filter-language]]
 
-An item answers the three questions the language asks of a row:
+An item answers the questions the language asks of a row:
 
 | the question | what an item answers |
 |---|---|
@@ -124,7 +136,7 @@ nesting survives every order a person picks.
 | presses it a third time | drops that key, and the ones beside it stand |
 | presses another head | adds that key under the first |
 
-A later key breaks the ties an earlier one leaves. Two values reading as
+A later key breaks the ties an earlier one leaves. Values reading as
 numbers compare as numbers, and a row carrying no value for a key stands after
 the rows that carry one.
 
@@ -133,41 +145,75 @@ opens on the rows a person owns, then the place the queue gives.
 
 # A flag draws a letter
 
-A row carries one boolean key a flag, and one column draws them as letters. A
-letter stands lit where its key reads true, and dim where it reads false:
+A row carries one boolean key a flag, and one column draws them as letters.
+Every letter stands upper in its fixed place, lit or not, the way the funnel
+in the footer stands. A letter wears a colour where its key reads true, and
+grey where it reads false. The first place draws the state's own first
+letter, so a row reads `O` for open, `D` for draft and `C` for closed before
+its marks:
 
-| the letter | the key it reads |
-|---|---|
-| U | the ticket carries the urgent mark |
-| Y | a person owns the step it stands on |
-| W | a hand holds it |
-| B | it waits on a ticket still open |
-| T | a hand parks it for the next pull |
+| the letter | the key it reads | its tone |
+|---|---|---|
+| the state's first | the state, as its value | good on `open`, bad on `draft`, and `held` and `closed` each its own |
+| the route's first | the route, as its value: N for a note, T trivial, S standard, G group | the route's own, off the `flags` map |
+| U | the ticket carries the urgent mark | bad |
+| C | the group holds a branch on the cloud, and its tickets inherit it | plain, because the cloud is neither good nor bad |
+| T | a todo forces its place, which [[spec/design_output/pull#a-todo-forces-a-place]] reads | bad |
 
 The letters hold fixed places, so nothing shifts as one lights. The keys stay
 ordinary keys, so a person filters on `urgent: true`, and `not urgent: true`
-keeps the rest.
+keeps the rest. A letter, its key and its tone stand under `flags` in the base
+file. A flag marked `value` draws its value's first letter in place of one. It
+names a tone a value under `tones`. Each value of a flag wears a colour of its
+own, because a reader tells a state by its colour before its letter.
 
-A letter and its key stand under `flags` in the base file. So a new flag costs
-one line there, because the key already stands.
+A new flag costs one line there, because the key already stands. The `flags` map of
+[[spec/design_output/tui#colours]] holds the colours. A good tone wears the
+green, a bad one the red, and no tone the plain colour.
+
+The details draw every flag in the column's order, one a line, with its key
+and its value. Each wears the colour the column gives it.
 
 # A preset carries its sort
 
 A preset is a filter a person writes down, and it carries a sort beside it. A
-press puts both in, and the person changing either one keeps that change.
+press writes the filter into the line the pane holds. So it reads and clears
+like one a person types, and the sort takes hold with it.
 
 | what a press does | what stands after it |
 |---|---|
-| a press on a preset | its filter joins what already stands, and its sort goes in |
-| a press on another | both filters stand, so the rows narrow twice |
-| a press on one standing in | its filter goes, and the sort stays |
-| a line a person types | it joins the presses, and narrows with them |
+| a press on a preset | its filter stands in the line, and its sort goes in |
+| the same press again | the line clears, and the sort stays |
+| a line a person types | it is the whole filter, and a preset is one way to write it |
 
 A preset stands under `groups` in the base file, with its `filters` and its
-`sort`. One the file marks `pressed` stands in when the view opens.
+`sort`. One the file marks `pressed` opens the line when the view opens. So a
+person reads the filter that narrows the rows, and clears it in the pane. A
+preset carrying a sort and no filter keeps every row, so an empty line is
+that view. The pane and its presets are the window's, and every tab offers
+its own rows. [[spec/design_output/tui#the-filter-pane-takes-letters]]
+
+A sort reads any key an item carries, in a column or not. So a preset orders
+the rows by a time the table hides, and the newest done ticket stands first.
 
 A slice is the same thing over the values one column carries. A column answers
 the buttons, so a slice costs no line in the file and moves as the data does.
+
+# A value carries a link
+
+A value this tree resolves draws as a link, and a click opens what it names.
+The terminal takes the link as the escape every terminal reads, and the
+editor's own terminal opens a file address in the editor. `link.go` writes the
+escape.
+
+| the value | what the link opens |
+|---|---|
+| the name of a row, in the table | the note the row's path names |
+| a group, in the details | that group's ticket |
+| a note link in the ask | the note it names, a ticket by its bare name |
+
+A value resolving to nothing draws as text. The tree holds the address of a
+name under `LinkOf`, and a tree naming none draws the names as text.
 
 # A base file says it
 
@@ -271,5 +317,7 @@ matches, and it ignores case.
 A caller builds the `Schema` out of the schemas this tree already holds, and a
 view with none reads its own data. [[spec/design_output/schema]]
 
-The editor reading the type its schema names, and a mark carrying its editor
-open, each wait for the ticket that draws a tab.
+The work tab is the first to wire the edit, and a key there flips a mark in
+place of an editor standing open. For details, see
+[[spec/design_output/tui#the-work-tab-takes-edits]]. The editor reading the
+type its schema names still waits.

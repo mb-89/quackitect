@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+group: the-bridgehead-carries-its-closure
 steps:
   - name: do
     does: makes the change, with the test that covers it

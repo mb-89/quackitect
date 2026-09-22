@@ -5,6 +5,7 @@ package main
 
 import (
 	"path/filepath"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -108,4 +109,53 @@ func TestADoorFromAnotherBuildStandsAside(t *testing.T) {
 	if stampHere() == "" {
 		t.Fatal("a build with no stamp leaves every door looking stale")
 	}
+}
+
+// [[spec/design_output/index#the-index-fires-on-change]]
+func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
+	root := tree(t)
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	first, err := posts(standing, []string{"changes", "0"})
+	if err != nil || first.Error != "" {
+		t.Fatalf("a changes call from nothing answers the tick now, and answered %v %q", err, first.Error)
+	}
+	tick := tickOf(t, first)
+	if tick < 1 {
+		t.Fatalf("the walk on the way up counts one, and the tick reads %d", tick)
+	}
+
+	write(t, root, "spec/tickets/late.md", "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nA ticket written while the door stands.\n")
+	started := time.Now()
+	next, err := posts(standing, []string{"changes", strconv.FormatInt(tick, decimalBase)})
+	if err != nil || next.Error != "" {
+		t.Fatalf("a changes call past the tick answers, and answered %v %q", err, next.Error)
+	}
+	if tickOf(t, next) <= tick {
+		t.Fatalf("a sweep past a write counts one more, and the tick stayed at %d", tick)
+	}
+	if time.Since(started) > time.Second {
+		t.Fatalf("the call fires within a second of the write, and took %v", time.Since(started))
+	}
+}
+
+func tickOf(t *testing.T, said answer) int64 {
+	t.Helper()
+	held, ok := said.Result.(map[string]any)
+	if !ok {
+		t.Fatalf("a changes call answers a tick, and answered %#v", said.Result)
+	}
+	tick, ok := held["tick"].(float64)
+	if !ok {
+		t.Fatalf("the tick reads as a number, and reads %#v", held["tick"])
+	}
+	return int64(tick)
 }

@@ -40,6 +40,19 @@ func sameNames(t *testing.T, said, want []string) {
 	}
 }
 
+// An outline place reads segment by segment, so a person's negative place stands first and a tenth child after the second. [[spec/design_output/pull#the-queue-is-an-outline]]
+func TestAnOutlinePlaceReadsSegmentBySegment(t *testing.T) {
+	t.Parallel()
+	for _, pair := range [][2]string{{"-2", "-1"}, {"-1", "1"}, {"1", "1.1"}, {"1.2", "1.10"}, {"1.10", "2"}, {"2", "10"}} {
+		if !under(pair[0], pair[1]) || under(pair[1], pair[0]) {
+			t.Fatalf("%s stands under %s", pair[0], pair[1])
+		}
+	}
+	if under("1", "1") || !under("alpha", "beta") {
+		t.Fatal("equal places stand level, and words read as words")
+	}
+}
+
 // [[spec/design_output/tree-view#a-sort-holds-several-keys]]
 func TestASortOrdersTheRowsAndANumberReadsAsANumber(t *testing.T) {
 	t.Parallel()
@@ -113,10 +126,14 @@ func TestTheNestingSurvivesTheOrderAndTheItemsStayAsTheyStand(t *testing.T) {
 func TestAPressOnAColumnHeadNamesTheKeyUnderIt(t *testing.T) {
 	t.Parallel()
 	tree := NewTree(sortCols(), sortItems(), false)
-	if said := tree.ColumnAt(0, 40); said != "name" {
+	// The gutter stands before the first column, and a press on it names none. [[spec/design_output/tree-view#the-view-draws-a-tree]]
+	if said := tree.ColumnAt(0, 40); said != "" {
+		t.Fatalf("the gutter names no column, and it reads %q", said)
+	}
+	if said := tree.ColumnAt(gutterWide, 40); said != "name" {
 		t.Fatalf("the first column reads name, and it reads %q", said)
 	}
-	if said := tree.ColumnAt(11, 40); said != "state" {
+	if said := tree.ColumnAt(gutterWide+11, 40); said != "state" {
 		t.Fatalf("the second column reads state, and it reads %q", said)
 	}
 	if said := tree.ColumnAt(400, 40); said != "" {

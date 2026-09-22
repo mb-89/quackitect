@@ -542,7 +542,7 @@ test("the extension imports the editor, its own folder, and what it declares", (
   }
 });
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 test("every package the extension declares carries an exact version", () => {
   const declared = read("src/extension/package.json").dependencies ?? {};
   for (const [name, said] of Object.entries(declared)) {

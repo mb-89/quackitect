@@ -1,0 +1,45 @@
+extends: script
+message: "A marked rule names the failure it prevents, in a second sentence beside it."
+link: spec/guidance/guidance.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  lines := text.split(scope, "\n")
+  matches := []
+
+  chapter := false
+  offset := 0
+
+  sentences := func(said) {
+    bare := text.re_replace("`[^`]*`", said, " ")
+    bare = text.re_replace(`\[\[[^\]]*\]\]`, bare, " ")
+    n := 0
+    for part in text.re_split(`[.!?]+(?:\s|$)`, bare, -1) {
+      if len(text.trim_space(part)) > 0 { n = n + 1 }
+    }
+    return n
+  }
+
+  for i := 0; i < len(lines); i++ {
+    line := lines[i]
+    here := offset
+    offset += len(line) + 1
+    trimmed := text.trim_space(line)
+
+    if text.re_match(`^#+\s+Actionables\s*$`, trimmed) {
+      chapter = true
+      continue
+    }
+    if !chapter { continue }
+    if text.re_match(`^#+\s`, trimmed) { chapter = false; continue }
+    if !text.re_match(`^[0-9]+\.\s+\S`, trimmed) { continue }
+    if !text.re_match(`\*\s*$`, trimmed) { continue }
+
+    body := text.re_replace(`^[0-9]+\.\s+`, trimmed, "")
+    body = text.re_replace(`\s*\*\s*$`, body, "")
+    if sentences(body) < 2 {
+      matches = append(matches, {begin: here, end: here + len(line)})
+    }
+  }

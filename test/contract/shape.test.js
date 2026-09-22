@@ -145,3 +145,40 @@ ifVale(
     },
   ),
 );
+
+// A reader holding half a rule still holds what it guards, so a marked rule names the failure in a second sentence. [[spec/guidance/guidance]]
+const marked = (rules) => `${front("")}# Actionables\n\n${rules.join("\n")}\n`;
+const MARKED_RULE = "VoiceShape.MarkedRuleNamesFailure";
+
+ifVale(
+  "a marked rule standing as one sentence is refused, and two sentences pass",
+  proves(
+    {
+      one: note(marked(["1. Run the check before you hand the branch back. *"])),
+      two: note(
+        marked([
+          "1. Run the check before you hand the branch back. A red branch costs the reader a round. *",
+          "2. Read `spec/guidance/voice.md` first, because it holds the register. *",
+        ]),
+      ),
+    },
+    (said) => {
+      refuses(said, MARKED_RULE, "one");
+      assert.equal(
+        said.rules("two").filter((rule) => rule === MARKED_RULE).length,
+        1,
+        "the clause opened by because is one sentence, and the two sentences pass",
+      );
+    },
+  ),
+);
+
+ifVale(
+  "an unmarked rule standing as one sentence passes the marked rule check",
+  proves(
+    { bare: note(marked(["1. Run the check before you hand the branch back."])) },
+    (said) => {
+      passes(said, MARKED_RULE, "bare");
+    },
+  ),
+);

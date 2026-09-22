@@ -6,7 +6,13 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { dropsHold, onStop, sawPrompt } from "../../src/bridge/stop.js";
+import {
+  dropsHold,
+  onStop,
+  reportStands,
+  sawCall,
+  sawPrompt,
+} from "../../src/bridge/stop.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -14,12 +20,19 @@ const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
 
 const RULES = `
+- id: the-owner-asks-to-talk
+  side: stop
+  priority: 100
+  decides: claimed
+  runs: a-report-stands
+  asks: Does the last thing the owner said open a discussion, and does this message carry the report?
+  says: The owner opens a discussion, and the report stands, so this turn ends and waits.
+
 - id: the-queue-holds-work
   side: continue
   priority: 80
   decides: mechanical
   runs: queue-waits
-  firm: true
   says: The queue holds work for this box, so run ./RUNME.sh ticket pull and carry on.
 
 - id: the-last-line-names-no-stop
@@ -34,7 +47,8 @@ const RULES = `
   priority: 45
   decides: claimed
   yields: true
-  asks: Does the work stand complete?
+  runs: the-plan-is-empty
+  asks: Does the work stand complete, with no todo open in the plan and nothing in hand there?
   says: The work stands complete, so this turn ends.
 
 - id: warnings-stand-past-the-number
@@ -53,7 +67,13 @@ const RULES = `
 `;
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
-const REFACTOR = { parallel: true, mostWarnings: 2, mostAtOnce: 1, untouchedFor: "7d" };
+const REFACTOR = {
+  parallel: true,
+  mostWarnings: 2,
+  mostAtOnce: 1,
+  untouchedFor: "7d",
+  grace: 1,
+};
 
 const NOW = 1_800_000_000;
 const WEEK = 604_800;
@@ -87,8 +107,13 @@ function box(files = {}, refactor = REFACTOR) {
   };
 }
 
-// The stamp the check leaves, which the refactoring rule reads. [[spec/tickets/the-spawn-reaches-its-guidance]]
+// The stamp the check leaves, and the list beside it, which the refactoring rule reads. [[spec/design_output/stop#the-grace]]
 function stamped(warnings, names) {
+  const list = Array.from({ length: warnings }, (_, at) => ({
+    file: names[at % names.length],
+    rule: "VoiceParagraph.Sentence",
+    line: at + 1,
+  }));
   return {
     [at(".se/.runtime/check.json")]: JSON.stringify({
       sha: "a1",
@@ -98,6 +123,7 @@ function stamped(warnings, names) {
       warnings,
       files: names,
     }),
+    [at(".se/.runtime/refactor.json")]: JSON.stringify(list),
   };
 }
 
@@ -122,11 +148,32 @@ test("the queue rule reads the cloud off the box's own environment", () => {
   const was = process.env.CLAUDE_CODE_REMOTE;
   process.env.CLAUDE_CODE_REMOTE = "true";
   try {
-    assert.match(onStop(done, bare.box).result.block, /The queue holds work for this box/);
+    assert.match(
+      onStop(done, bare.box).result.block,
+      /The queue holds work for this box/,
+    );
   } finally {
     if (was === undefined) delete process.env.CLAUDE_CODE_REMOTE;
     else process.env.CLAUDE_CODE_REMOTE = was;
   }
+});
+
+// The cap ends a turn over the queue rule too, so a session refusing the stop line over work it leaves untaken ends at the number the config names. [[spec/tickets/the-stop-line-loops-forever]]
+test("four stop lines over a queue holding work: three hold, the fourth ends, and the log names the runaway", () => {
+  const free =
+    "---\nkind: [[ticket]]\nstate: open\nurgency: soon\nsteps:\n  - name: do\n---\n\n# Ask\n\nA thing.\n";
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+  const it = box({ [at("spec/tickets/a-free.md")]: free });
+  const carried = [];
+  for (let turn = 0; turn < 4; turn++) carried.push(onStop(done, it.box));
+  assert.deepEqual(
+    carried.map((one) => one.pass === true),
+    [false, false, false, true],
+  );
+  assert.match(carried[0].result.block, /The queue holds work for this box/);
+  const last = it.said.filter((row) => row[1] === "stop").at(-1);
+  assert.equal(last[0], "warn", "the runaway writes at warn");
+  assert.match(last[2], /the turn ends: the tooth lets go after 3 holds in a row/);
 });
 
 test("a standing stop line ends the turn, and nothing prompts after it", () => {
@@ -142,6 +189,56 @@ test("a standing stop line ends the turn, and nothing prompts after it", () => {
     "one stop line in the log",
   );
   assert.match(it.said[0][2], /the turn ends/);
+});
+
+// A talk stop with no report in the same message holds the turn, and one under the needs table ends it. [[spec/design_output/stop#a-talk-follows-a-report]]
+test("a talk stop ends the turn only where the same message carries the report", () => {
+  const bare = onStop(
+    { last_assistant_message: "stop: the-owner-asks-to-talk" },
+    box().box,
+  );
+  assert.match(bare.result.block, /the-owner-asks-to-talk: .*carry the report/);
+  const report = [
+    "The work stands here.",
+    "",
+    "# What the agent needs",
+    "",
+    "| No. | question | proposed answer |",
+    "|---|---|---|",
+    "| 1 | which road | the short one |",
+    "",
+    "stop: the-owner-asks-to-talk",
+  ].join("\n");
+  const it = box();
+  assert.deepEqual(onStop({ last_assistant_message: report }, it.box), { pass: true });
+  assert.match(it.said[0][2], /the turn ends/);
+  assert.equal(
+    reportStands("# What the agent needs\n\nnothing under it"),
+    false,
+    "a heading with no row is no report",
+  );
+});
+
+// A claim of done meets the plan: a todo open or a thing in hand holds the turn, and an empty plan lets it end. [[spec/design_output/stop#the-plan]]
+test("a claim of done holds while the plan holds a todo or a thing in hand", () => {
+  const done = {
+    last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete",
+  };
+  const busy = box({
+    [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "the door", todos: [] }),
+  });
+  assert.match(onStop(done, busy.box).result.block, /nothing in hand/);
+  const parked = box({
+    [at(".se/.runtime/plan.json")]: JSON.stringify({
+      working: "",
+      todos: [{ title: "one" }],
+    }),
+  });
+  assert.match(onStop(done, parked.box).result.block, /no todo open/);
+  const empty = box({
+    [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [] }),
+  });
+  assert.deepEqual(onStop(done, empty.box), { pass: true });
 });
 
 test("a helper's turn end passes untouched, so a refused helper answer reaches no owner turn", () => {
@@ -160,7 +257,7 @@ test("a turn with no stop line holds, and the block names the reasons", () => {
   assert.match(said.result.block, /names no stop reason/);
   assert.match(
     said.result.block,
-    /the-work-stands-complete: Does the work stand complete\?/,
+    /the-work-stands-complete: Does the work stand complete/,
   );
   assert.match(it.said[0][2], /the turn holds/);
   assert.match(
@@ -185,7 +282,11 @@ ${RULES}`;
     { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" },
     it.box,
   );
-  assert.deepEqual(said, { pass: true }, "the stop stands, and the strange rule fires nothing");
+  assert.deepEqual(
+    said,
+    { pass: true },
+    "the stop stands, and the strange rule fires nothing",
+  );
 });
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
@@ -198,6 +299,20 @@ test("the door answers the vote and the hand together, and the hand takes the fi
   assert.equal(said.spawn.file, "old.md");
   assert.match(said.spawn.prompt, /old\.md/);
   assert.equal(said.back.event, "refactor.answered");
+});
+
+// The list past the number with a file at rest asks for the turn over the grace, and the turn's end answers it. [[spec/design_output/stop#the-grace]]
+test("a call under a long list opens the grace, and the turn's end clears it", () => {
+  const it = box(stamped(9, ["old.md"]));
+  sawCall({ tool: "Read" }, it.box);
+  assert.equal(it.box.grace?.id, "refactor", "the call opens the ask");
+  assert.match(it.box.grace.why, /9 warnings stand/);
+  const said = onStop({ last_assistant_message: "Some text and no stop." }, it.box);
+  assert.equal(it.box.grace, null, "the turn's end is the reaction");
+  assert.equal(said.spawn.file, "old.md");
+  const fresh = box(stamped(9, ["new.md"]));
+  sawCall({ tool: "Read" }, fresh.box);
+  assert.equal(fresh.box.grace, undefined, "a list over files still warm asks nothing");
 });
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]

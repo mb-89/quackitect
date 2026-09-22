@@ -37,6 +37,10 @@ func (stubTab) Selection(m *model) band {
 	}}
 }
 
+func (stubTab) Presets(m *model) []preset {
+	return []preset{{Name: "not done", Filter: "not state: closed", Key: "alt+1"}}
+}
+
 // [[spec/design_output/tui#the-header-holds-the-tabs]]
 func TestTheStripNamesEveryTabAndTheHelpKeyAboveARule(t *testing.T) {
 	t.Parallel()
@@ -96,7 +100,7 @@ func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 	m := window(3)
 	m.tabs = []tab{logTab{}, stubTab{}}
 	drawn := renderParts(m.helpParts(60), 60)
-	for _, want := range []string{"GLOBAL", "1…9", "open the tab at that place", "THE LOG", "alt+shift+f", "THE ROW"} {
+	for _, want := range []string{"GLOBAL", "1…9", "open the tab at that place", "THE LOG"} {
 		if !strings.Contains(drawn, want) {
 			t.Fatalf("the help names %q, and reads:\n%s", want, drawn)
 		}
@@ -104,8 +108,9 @@ func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 	if strings.Index(drawn, "GLOBAL") > strings.Index(drawn, "THE LOG") {
 		t.Fatalf("the global band stands first, and the help reads:\n%s", drawn)
 	}
-	if strings.Index(drawn, "THE LOG") > strings.Index(drawn, "THE ROW") {
-		t.Fatalf("the tab band stands over the selection band, and the help reads:\n%s", drawn)
+	// The presets stand in the filter pane alone. [[spec/design_output/tui#one-key-filters-the-line]]
+	if strings.Contains(drawn, "PRESETS") || strings.Contains(drawn, "prompts and replies") {
+		t.Fatalf("the help names no preset, and reads:\n%s", drawn)
 	}
 	work := press(m, "2")
 	drawn = renderParts(work.helpParts(60), 60)
@@ -123,14 +128,15 @@ func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 func TestTheSelectionBandGoesWhileNothingStandsSelected(t *testing.T) {
 	t.Parallel()
 	m := window(0)
-	drawn := renderParts(m.helpParts(60), 60)
-	if strings.Contains(drawn, "THE ROW") {
-		t.Fatalf("an empty log selects nothing and names no row band, and the help reads:\n%s", drawn)
+	// The row's preset stands in the filter pane, and an empty log offers none. [[spec/design_output/tui#one-key-filters-the-line]]
+	drawn := renderParts(m.presetParts(), 60)
+	if strings.Contains(drawn, "this row's kind") {
+		t.Fatalf("an empty log selects nothing and offers no row preset, and the pane reads:\n%s", drawn)
 	}
 	m = arrive(m, row(1, "tool", "line 1"))
-	drawn = renderParts(m.helpParts(60), 60)
-	if !strings.Contains(drawn, "THE ROW") {
-		t.Fatalf("a selected row names its band, and the help reads:\n%s", drawn)
+	drawn = renderParts(m.presetParts(), 60)
+	if !strings.Contains(drawn, "this row's kind") {
+		t.Fatalf("a selected row offers its kind as a preset, and the pane reads:\n%s", drawn)
 	}
 }
 

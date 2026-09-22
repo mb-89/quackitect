@@ -13,9 +13,10 @@ One place answers every number and every switch this tree holds. Code asks for
 a key and takes what comes back, and the way the value arrives stays the
 resolver's business.
 
-Two readers open `spec/config/level0.json` without it: the hooks module at
-`session.start`, and the command line at module load. Each one keeps what it
-reads for the life of its process, so one number stands in three places.
+The hooks module, at `session.start`, and the command line, at module load,
+each open `spec/config/level0.json` without it. Each one keeps what it reads
+for the life of its process, so one number stands cached wherever a reader
+keeps it.
 
 # The three layers
 
@@ -28,7 +29,7 @@ reads for the life of its process, so one number stands in three places.
 A later layer beats an earlier one, so the per-box file beats the environment
 and the environment beats the tracked file.
 
-Two things follow:
+These things follow:
 
 - The tracked file is the defaults, so no default stands in code. A key the
   code reads and that file lacks is a fault, and the schema catches it.
@@ -158,9 +159,9 @@ carries it beside `quackitect/yaml`.
     stop.mostInARow        3         spec/config/level0.json
     log.level              warn      SE_LOG_LEVEL
 
-`git config --show-origin` is the shape this copies. Three layers with no way
-to ask which one answers leave a person guessing in three places. Naming one
-key prints that row alone.
+`git config --show-origin` is the shape this copies. The layers above leave a
+person guessing which one answers, since nothing points it out directly.
+Naming one key prints that row alone.
 
 ## The verb writes one layer
 
@@ -183,12 +184,12 @@ here.
 |---|---|---|
 | `queue` | the queue hands out the next leaf, and hands another the moment one closes | a stop while the ticket stands open, and a stop while the queue holds anything at all |
 | `unbound` | a person names the ticket, and the pull hands out nothing on its own | a stop while the ticket stands open |
-| `god` | a person, and the engine stands aside | nothing |
+| `god` | a person, and the engine stands aside | nothing, and the refactoring hand still drains the warnings |
 
 **`queue` is an endless loop.** A cloud box runs here, because it works with
 nobody beside it. It pulls until the queue holds nothing for it, and a finished
-ticket brings the next one. The stop hook refuses a stop on two grounds: the
-ticket stands open, or the queue holds more work.
+ticket brings the next one. The stop hook refuses a stop where the ticket
+stands open, or where the queue holds more work.
 
 **`unbound` is the mode a person talks in.** A session here takes the one ticket
 a person names, and skips the chain behind it. The stop hook still refuses a

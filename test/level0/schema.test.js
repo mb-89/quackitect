@@ -5,23 +5,24 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import {
-  checkNote,
-  itemsIn,
-  kindOf,
-  mintNote,
-  readNote,
-  readYaml,
-  SEVERITY,
-} from "../../.claude/skills/level0/lib/schema.js";
-import { found, good, messages, NOTE, rules, SCHEMA, swap } from "./schema-notes.js";
+import { checkNote, readYaml } from "../../.claude/skills/level0/lib/schema.js";
+import { itemsIn } from "../../.claude/skills/level0/lib/schema-body.js";
+import { SEVERITY } from "../../.claude/skills/level0/lib/schema-fault.js";
+import { mintNote } from "../../.claude/skills/level0/lib/schema-mint.js";
+import { kindOf, readNote } from "../../.claude/skills/level0/lib/schema-read.js";
+import { cellsOf, rowsIn } from "../../.claude/skills/level0/lib/schema-table.js";
+import { found, good, messages, NOTE, rules, SCHEMA, shown, swap } from "./schema-notes.js";
+
+const withTable = (table = shown) =>
+  good.replace("# What stands open", `${table}# What stands open`);
+const lineOf = (text, line) => text.split(/\n/)[line - 1];
 
 test("the schema reads as a map, a list, a flow list and a link", () => {
   assert.equal(SCHEMA.kind, "note");
   assert.deepEqual(SCHEMA.frontmatter.required, ["kind", "status"]);
   assert.deepEqual(SCHEMA.frontmatter.properties.status.enum, ["todo", "held", "done"]);
   assert.equal(SCHEMA.frontmatter.properties.kind["x-link"], true);
-  assert.equal(SCHEMA.body.sections.length, 3);
+  assert.equal(SCHEMA.body.sections.length, 4);
   assert.equal(SCHEMA.body.sections[1].maxItems, 2);
   assert.equal(SCHEMA.body.sections[1].subsections.numbered, true);
   assert.equal(readYaml("kind: [[guidance]]\n").kind, "[[guidance]]");
@@ -164,6 +165,51 @@ test("a chapter under a numbered one, opening with no number, is refused", () =>
 test("numbered chapters running back down are refused", () => {
   const bad = swap("## 1. The first", "## 4. The fourth");
   assert.match(messages(bad).join(" "), /the numbers run up/);
+});
+
+// [[spec/design_output/schema#a-chapter-holds-a-table]]
+test("a chapter holding the table its schema names, one row per item, passes", () => {
+  assert.deepEqual(found(withTable()), []);
+  assert.deepEqual(rowsIn(shown.split("\n")).map((one) => one.line), [3, 5, 6]);
+  assert.deepEqual(cellsOf("| 1 | do | do not |"), ["1", "do", "do not"]);
+});
+
+test("a chapter holding no table, where the schema names one, is refused", () => {
+  const bad = withTable("# Examples\n\nTwo rows, said as prose.\n\n");
+  assert.ok(rules(bad).includes("Schema.Examples"));
+  assert.match(messages(bad).join(" "), /holds a table headed the rule, do, do not/);
+});
+
+test("a table opening with other heads is refused, at the head row", () => {
+  const bad = withTable(shown.replace("| the rule | do | do not |", "| rule | yes | no |"));
+  const one = found(bad).find((said) => /opens with the heads/.test(said.message));
+  assert.ok(one, "the heads answer the schema");
+  assert.equal(lineOf(bad, one.line), "| rule | yes | no |");
+});
+
+test("a table takes several rows for one item and none for another", () => {
+  const twice = withTable(shown.replace("| 2 | do the second", "| 1 | do the second"));
+  assert.deepEqual(found(twice), []);
+  const one = withTable(shown.replace("| 2 | do the second thing | leave it |\n", ""));
+  assert.deepEqual(found(one), []);
+});
+
+test("a row naming no item of the list is refused, and rows running back down too", () => {
+  const off = withTable(shown.replace("| 2 | do the second", "| 3 | do the second"));
+  const one = found(off).find((said) =>
+    /opens with the number of an item of Actionables/.test(said.message),
+  );
+  assert.ok(one, "the row names its item");
+  assert.match(one.message, /opens with 3\./);
+  assert.equal(lineOf(off, one.line), "| 3 | do the second thing | leave it |");
+  const bare = withTable(shown.replace("| 2 | do the second", "| | do the second"));
+  assert.match(messages(bare).join(" "), /opens with nothing\./);
+  const back = withTable(
+    shown
+      .replace("| 1 | do the first", "| 2 | do the first")
+      .replace("| 2 | do the second", "| 1 | do the second"),
+  );
+  assert.match(messages(back).join(" "), /for item 1 stands after one for item 2/);
 });
 
 test("a comment and a fenced block count toward no bound", () => {

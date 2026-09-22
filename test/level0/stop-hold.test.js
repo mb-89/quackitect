@@ -53,7 +53,6 @@ const RULES = `
   priority: 80
   decides: mechanical
   runs: work-waiting
-  firm: true
   says: The queue holds work for this box, so carry on.
 
 - id: the-tooth-is-out

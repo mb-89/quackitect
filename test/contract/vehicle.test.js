@@ -57,12 +57,16 @@ test("a vehicle carries the method, its run bits, and no private material", () =
 });
 
 test("a vehicle makes an identity of its own", () => {
-  const mine = identityHere(files, clock(), root);
-  const other = identityHere(files, clock(), dest);
+  const mine = identityHere(files, clock(), root, process.pid);
+  const other = identityHere(files, clock(), dest, process.pid);
 
   assert.ok(other, "the vehicle answers an identity");
-  assert.notEqual(other, mine, "a vehicle holds its own, and never the one it came from");
-  assert.equal(identityHere(files, clock(), dest), other, "and keeps it");
+  assert.notEqual(
+    other,
+    mine,
+    "a vehicle holds its own, and never the one it came from",
+  );
+  assert.equal(identityHere(files, clock(), dest, process.pid), other, "and keeps it");
 });
 
 // The vehicle borrows the method's modules through a link and the survey this box wrote, so its install fetches nothing and probes nothing. [[spec/design_output/vehicle#a-vehicle-stands-alone]]

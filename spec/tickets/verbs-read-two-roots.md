@@ -168,7 +168,7 @@ The command line hands every verb both roots, and each read names the root it be
 | the read | the root |
 |---|---|
 | a ticket, a private note, a hold, the box id, the brief | the work root |
-| a schema, a process, the Vale config, the styles, the copy id | the method root |
+| a schema, a process, the Vale config, the styles, the vehicle id | the method root |
 | a guidance note | the work root's file where it stands, else the method's |
 | a link a field names | the work root first, then the method root |
 | a projection's target | the work root |

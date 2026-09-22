@@ -114,7 +114,7 @@ func TestTheFirstColumnCarriesTheNestingAndTheName(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/tree-view#the-last-column-takes-what-is-left]]
+// [[spec/design_output/tree-view#the-columns-read-the-item]]
 func TestTheLastColumnTakesTheRoomAndCutsItsText(t *testing.T) {
 	t.Parallel()
 	view := NewTree(columns(), []Item{
@@ -143,7 +143,8 @@ func TestADeclarationSayingFlatNestsNothing(t *testing.T) {
 		t.Fatalf("a flat view draws every item as a row, and drew %d", view.Len())
 	}
 	lines := strings.Split(view.Rows(60, 2), "\n")
-	if strings.HasPrefix(lines[1], " ") {
+	// The gutter stands before every row, so the name starts right past it. [[spec/design_output/tree-view#the-view-draws-a-tree]]
+	if strings.HasPrefix(lines[1][gutterWide:], " ") {
 		t.Fatalf("a flat view nests nothing, and the second row reads %q", lines[1])
 	}
 	view.Toggle()

@@ -8,8 +8,8 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  brandOf,
   brandedJson,
+  brandOf,
   emptyBrand,
 } from "../../.claude/skills/level0/lib/vehicle.js";
 import { disk } from "../doors/disk.js";
@@ -20,6 +20,28 @@ export const PLUGIN = ".claude/skills/level0/.claude-plugin/plugin.json";
 export const ICON_SOURCE = `${BRAND}/icon.svg`;
 export const ICON_TARGET = "src/extension/icon.svg";
 
+// The shape a manifest takes where the brand folder carries no source for it, so a clone holding neither still gets both. The brand lands through brandedJson, and the plugin's version reads off package.json. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+const SHAPES = {
+  [MARKETPLACE]: {
+    name: "",
+    owner: { name: "" },
+    plugins: [
+      {
+        name: "level0",
+        description:
+          "Level zero, run from the vehicle's own folder. A stub names this folder as a marketplace and enables the plugin, and carries no copy.",
+        source: "./.claude/skills/level0",
+      },
+    ],
+  },
+  [PLUGIN]: {
+    name: "level0",
+    description:
+      "Level zero: the rules that shape what the agent writes, taken inside the harness process, and the pull as a tool with the judge behind it. The voice rules hold at the write door on turn one of a clone that has never been built.",
+    author: { name: "" },
+  },
+};
+
 // Each target reads its source in the brand folder, so a clone carrying no target gets one. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 export function stamps(files, root, brand) {
   const done = [];
@@ -29,16 +51,33 @@ export function stamps(files, root, brand) {
     [ICON_TARGET, ICON_SOURCE, (text) => text],
   ];
   for (const [rel, source, branded] of targets) {
-    const held = readIf(files, join(root, ...source.split("/")));
-    if (held === null) continue;
     const to = join(root, ...rel.split("/"));
+    const was = readIf(files, to);
+    // The source stands where the brand folder carries it, and the shape below answers a clone holding neither. A target standing already reads as its own source. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+    const held =
+      readIf(files, join(root, ...source.split("/"))) ??
+      (was === null ? shapeOf(files, root, rel) : null);
+    if (held === null) continue;
     const made = branded(held);
-    if (made === readIf(files, to)) continue;
+    if (made === was) continue;
     files.makeDir(dirname(to));
     files.write(to, made);
     done.push(rel);
   }
   return done;
+}
+
+// The shape a missing source falls back on, and the plugin's version is the tree's own, read off package.json. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+function shapeOf(files, root, rel) {
+  const shape = SHAPES[rel];
+  if (!shape) return null;
+  if (rel !== PLUGIN) return JSON.stringify(shape);
+  try {
+    const { version } = JSON.parse(readIf(files, join(root, "package.json")));
+    return JSON.stringify(version ? { ...shape, version } : shape);
+  } catch {
+    return JSON.stringify(shape);
+  }
 }
 
 function readIf(files, at) {

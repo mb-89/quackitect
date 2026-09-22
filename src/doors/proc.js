@@ -3,6 +3,7 @@
 
 import { spawn, spawnSync } from "node:child_process";
 import { disk } from "./disk.js";
+import { closeSync, openSync } from "node:fs";
 
 const KIB = 1024;
 const MIB = KIB * KIB;
@@ -60,6 +61,34 @@ export function proc() {
         child.on("error", fail);
         child.on("close", (code) => done({ exitCode: code ?? 1, stdout, stderr }));
         child.stdin.end(init.stdin ?? "");
+      });
+    },
+    // A start outliving this process, watched for a window. The child's output lands in the file init.out names, because a pipe dies with this process and the child writes on. A child ending inside the window answers its exit, and one standing past it answers no fall. [[spec/design_output/level0#a-restart-watches-its-child]]
+    respawn(argv, init = {}) {
+      return new Promise((done) => {
+        const out = init.out ? openSync(init.out, "a") : "ignore";
+        const child = spawn(argv[0], argv.slice(1), {
+          cwd: init.cwd,
+          env: init.env ? { ...process.env, ...init.env } : undefined,
+          detached: true,
+          stdio: ["ignore", out, out],
+          shell: false,
+          windowsHide: true,
+        });
+        if (out !== "ignore") closeSync(out);
+        let settled = false;
+        const settle = (said) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          done(said);
+        };
+        const timer = setTimeout(() => {
+          child.unref();
+          settle({ fell: false, exitCode: null });
+        }, init.waitMs ?? 0);
+        child.on("error", () => settle({ fell: true, exitCode: 1 }));
+        child.on("exit", (code) => settle({ fell: true, exitCode: code ?? 1 }));
       });
     },
   };

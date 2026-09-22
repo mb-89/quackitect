@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
+group: misc
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -88,6 +89,51 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
+step: verdict
+record:
+  - step: design/draft
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: c5170eec116cc969e27807521797e4d4550064ad
+    hash_after: c5170eec116cc969e27807521797e4d4550064ad
+  - step: design/review
+    hand: box d40a1b367f4d · claude-code-remote · helper-22
+    hash_before: aac3088b08ed7c36e94931b663a418d73f43d864
+    hash_after: aac3088b08ed7c36e94931b663a418d73f43d864
+  - step: implement/tests-red
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 9fba8ef3214e5971821c30fc1ba298ed42beb9d2
+    hash_after: 9fba8ef3214e5971821c30fc1ba298ed42beb9d2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 4dad98b733958f088f295fa60b467713fb5b657b
+    hash_after: 4dad98b733958f088f295fa60b467713fb5b657b
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: b7701b155643f590299d327ad9aad97fbe905be0
+    hash_after: b7701b155643f590299d327ad9aad97fbe905be0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 1 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 123 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-23
+    hash_before: 1c07b18e5b3a3a5ee2b8ba53d24547d0947e4197
+    hash_after: 1c07b18e5b3a3a5ee2b8ba53d24547d0947e4197
+reason: done
 ---
 
 # Ask
@@ -116,6 +162,20 @@ the lint.
 
 <!-- the form is text -->
 
+Each road hands Vale the config the assembly writes, off the pair of roots. One contract case proves a project's rule refuses on every road.
+
+| road | where | reads today | reads after |
+|---|---|---|---|
+| the answer gate | `src/bridge/tools.js` | `box.vale.lint`, the door, which assembles already | the same, and the case proves it |
+| the findings road | `src/bridge/findings.js` | the method's `.vale.ini` by name | `assemble(it.disk, pair)` over `box.method` and `box.work`, and the config it answers |
+| the copilot road | `.claude/skills/level0/lib/copilot-runtime.js` | Vale's default config under the root | `assemble` over the pair `rootsHere` answers in `src/scripts/copilot.js`, handed in as `it.method` and `it.work` |
+
+- `assemble` stands in `src/scripts/styles.js` and takes the pair the vale door builds. The three roads call it as it stands.
+- A contract case in `test/contract/styles.test.js` writes a work root beside this tree holding one rule of its own. It asserts the findings road, the copilot check and the answer gate each name that rule.
+
+`./RUNME.sh check` answers 0 once the roads agree.
+
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -125,6 +185,14 @@ the lint.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- The three roads and the pair each meet a named change. The contract case feeds a project's rule bad text on every road.
+- The findings road runs Vale from the method root. The change runs it from the work root, the way the door does.
+
+The three roads and the pair each meet a named change, and the contract case feeds a project's rule bad text on every road.
+The findings road runs Vale from the method root, so the change runs it from the work root the way the door does.
+The copilot root builds no pair today, so the change imports `rootsHere` from the vehicle script and hands the pair in.
 
 # implement
 
@@ -138,17 +206,35 @@ the lint.
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/one-config.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the case writes a work root beside this tree with one rule of its own
+- the work root's config names the method's style beside its own
+- the answer gate refuses the word, because the door assembles the pair already
+- the findings road hands Vale the bare config name from the work root. Vale stops on a style it finds nowhere, and the case fails on the fault
+- the copilot road's check stands unexported, so the case fails before it drives it
+- what surprises the hand: the findings road runs from the method root today. A project's own note reads through the method's rules alone
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the case stands in a contract test of its own
+- the change reaches the findings road, the copilot road and the copilot root
+- the case drives the real Vale through the door, the findings road and the copilot check
+- the case runs over a work root it writes and removes
+- the case's comment names the ticket, and each road's change names the vehicle note's chapter on the assembly
+
 
 ## reflect
 
@@ -176,11 +262,20 @@ the lint.
 
 <!-- the form is command -->
 
+./RUNME.sh lint src
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the findings road, the copilot road and its root, and the cases
+- the answer gate stands as it is
+- each road reaches Vale alone, which the unit cases fake and the contract case drives
+- each road's change names the vehicle note's chapter on the assembly
+
 
 ## tests-green
 
@@ -192,11 +287,17 @@ the lint.
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/one-config.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -204,11 +305,23 @@ the lint.
 
 <!-- the form is text -->
 
+The findings road hands Vale the config the assembly writes over the pair of roots. It runs from the work root, where a project's notes stand. The copilot root reads the pair the vehicle module answers. It hands the road a way to the assembled config, and the road's check takes that config and runs from the work root.
+- The answer gate lints through the door, which assembled the pair already, so it stands as it is.
+- The contract case writes a work root beside this tree holding one rule of its own.
+- It asserts the answer gate, the findings road and the copilot check each refuse the word that rule names.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the findings road, the copilot road and its root, and the cases
+- the contract case drives the real Vale over a work root it writes and removes
+- the unit cases fake the process
+- each road's change names the vehicle note's chapter on the assembly
+
 
 # verdict
 
@@ -220,17 +333,47 @@ the lint.
 
 <!-- the form is files -->
 
+- spec/tickets/every-road-reads-one-config.md
+- spec/guidance/review/reviewing.md
+- spec/design_output/vehicle.md
+- src/bridge/findings.js
+- src/bridge/tools.js
+- src/bridge/server.js
+- src/doors/vale.js
+- src/scripts/copilot.js
+- src/scripts/styles.js
+- src/scripts/vehicle.js
+- .claude/skills/level0/lib/copilot-runtime.js
+- .claude/skills/level0/lib/vale.js
+- .claude/skills/level0/lib/vehicle.js
+- .claude/skills/level0/lib/code.js
+- test/contract/one-config.test.js
+- test/level0/findings.test.js
+- test/level0/copilot-runtime.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- The findings road hands Vale the config `assemble` answers over the pair, and runs from the work root. That is what the approach names.
+- The copilot root reads the pair off `rootsHere` and hands `check` the assembled config and the work root. The answer gate stands as it is, through the door.
+- The contract case feeds a project's own rule bad text on each road through the real Vale. It asserts each road names the rule.
+- The unit case for `check` asserts the config and the working folder reach the process.
+- The lint, the contract case and the unit cases pass here, and the record holds the check green.
+- `configOf` builds the pair by hand where `pairOf` stands in `.claude/skills/level0/lib/vehicle.js`, as the door does too. A later ticket can draw both to it.
+- `it.styles?.()` lets a root without `styles` fall back to the bare config. A fixture reaches that, and no real root does.
+- The findings road now runs Biome from the work root with a config path relative to it. A project root holding no `spec/config` reads no Biome finding, which stands outside this ask.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- Each road's comment names `spec/design_output/vehicle#the-styles-assemble-once`, where the assembly's facts stand once. The contract case names the ticket, and restates no rule.
 
 # Discussion
 

@@ -29,10 +29,14 @@ type View struct {
 	Flags     []Flag
 }
 
-// A boolean key and the letter standing for it in the flags column. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+// A boolean key and the letter standing for it in the flags column, or a key whose value's first letter stands there. The tone says whether a lit letter reads as good or bad. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 type Flag struct {
 	Letter string
 	Key    string
+	Value  bool
+	Tone   string
+	// A value flag names a tone a value, so open and closed wear two colours. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+	Tones map[string]string
 }
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]
@@ -104,10 +108,17 @@ func flagsIn(said, whole *yaml.Doc) []Flag {
 			}
 			letter := yaml.AsString(one.Get("letter"))
 			key := yaml.AsString(one.Get("key"))
-			if letter == "" || key == "" {
+			value := yaml.AsBool(one.Get("value"))
+			if key == "" || (letter == "" && !value) {
 				continue
 			}
-			out = append(out, Flag{Letter: letter, Key: key})
+			out = append(out, Flag{
+				Letter: letter,
+				Key:    key,
+				Value:  value,
+				Tone:   yaml.AsString(one.Get("tone")),
+				Tones:  tonesOf(yaml.AsDoc(one.Get("tones"))),
+			})
 		}
 		// A view naming none falls through to the file, which names them once. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 		if len(out) > 0 {
@@ -115,6 +126,18 @@ func flagsIn(said, whole *yaml.Doc) []Flag {
 		}
 	}
 	return nil
+}
+
+// The tone a value wears, by value, off the `tones` map a value flag carries. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+func tonesOf(said *yaml.Doc) map[string]string {
+	if said == nil {
+		return nil
+	}
+	out := map[string]string{}
+	for _, key := range said.Keys() {
+		out[key] = yaml.AsString(said.Get(key))
+	}
+	return out
 }
 
 // A preset a file writes down stands under `groups`, with its filter and its sort. [[spec/design_output/tree-view#a-preset-carries-its-sort]]

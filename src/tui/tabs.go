@@ -1,13 +1,14 @@
 // The tabs the window holds, and the strip naming them. The frame is the
 // window's: the strip, the split, the pane and the footer. A tab draws the left
-// side, says what the details hold, and says whether a filter holds in it. The
-// log is the first, and it draws its rows under a line of column names.
+// side, says what the details hold, holds a filter line of its own, and names
+// the presets its filter pane offers. The log is the first tab.
 // [[spec/design_output/tui#the-window-is-a-split]]
 
 package main
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -27,6 +28,15 @@ type tab interface {
 	Narrowed(m *model) bool
 	Keys(m *model) band
 	Selection(m *model) band
+	Presets(m *model) []preset
+}
+
+// A preset a tab offers: its name, the filter it writes into the line, the key pressing it, and the sort it carries. [[spec/design_output/tui#the-filter-pane-takes-letters]]
+type preset struct {
+	Name   string
+	Filter string
+	Key    string
+	Sorts  []Sort
 }
 
 // [[spec/design_output/tui#the-columns-stand-still]]
@@ -61,31 +71,32 @@ func (logTab) Keys(m *model) band {
 			m.raiseFloor()
 			return nil
 		}},
-		{bind("alt+q", "keep the prompts and the replies: the talk", "alt+q"), quicken},
 	}}
 }
 
-// [[spec/design_output/tui#the-help-reads-the-cursor]]
-func (logTab) Selection(m *model) band {
-	if m.sel < 0 || m.sel >= len(m.all) {
-		return band{}
+func (logTab) Selection(_ *model) band { return band{} }
+
+// The log's presets: the prompts and the replies, and the kind of the selected row. [[spec/design_output/tui#one-key-filters-the-line]]
+func (logTab) Presets(m *model) []preset {
+	out := []preset{{Name: "prompts and replies", Filter: promptsFilter, Key: "alt+q"}}
+	if m.sel >= 0 && m.sel < len(m.all) {
+		r := m.all[m.sel]
+		said := fmt.Sprintf("kind: /^%s$/", regexp.QuoteMeta(r.Kind))
+		if r.Label() != r.Kind {
+			said = fmt.Sprintf("tool: /^%s$/", regexp.QuoteMeta(r.Label()))
+		}
+		out = append(out, preset{Name: "this row's kind", Filter: said, Key: "alt+F"})
 	}
-	return band{name: "THE ROW", acts: []act{
-		{bind("alt+shift+f", "keep every row of this row's kind", "alt+F"), quicken},
-	}}
+	return out
 }
 
-func quicken(m *model, name string) tea.Cmd {
-	m.quick(name)
-	return nil
-}
-
-// [[spec/design_output/tui#a-number-opens-a-tab]]
+// A tab switch keeps the pane, which draws off the new tab, and the line takes that tab's filter. [[spec/design_output/tui#a-number-opens-a-tab]]
 func (m *model) openTab(n int) {
 	if n < 1 || n > len(m.tabs) || n > mostTabs {
 		return
 	}
 	m.open = n - 1
+	m.input.SetValue(m.sourceOf(m.open))
 	m.resize()
 	m.box.GotoTop()
 }
@@ -94,7 +105,7 @@ func (m *model) openTab(n int) {
 func (m model) renderStrip() string {
 	names := make([]string, 0, len(m.tabs))
 	for at, one := range m.tabs {
-		name := tabName(at, one)
+		name := m.tabName(at, one)
 		style := dimStyle
 		if at == m.open {
 			style = openStyle
@@ -113,7 +124,10 @@ func (m model) renderStrip() string {
 	return strip + strings.Repeat(" ", gap) + key
 }
 
-// The text one tab takes in the strip, which the strip draws and a press measures. [[spec/design_output/tui#the-header-holds-the-tabs]]
-func tabName(at int, one tab) string {
+// The text one tab takes in the strip, which the strip draws and a press measures. The work tab counts the rows this box takes behind its name. [[spec/design_output/tui#the-work-tab]]
+func (m model) tabName(at int, one tab) string {
+	if one.Name() == "work" && m.places != nil {
+		return fmt.Sprintf(" %d %s (%d) ", at+1, one.Name(), m.places.takeable)
+	}
 	return fmt.Sprintf(" %d %s ", at+1, one.Name())
 }

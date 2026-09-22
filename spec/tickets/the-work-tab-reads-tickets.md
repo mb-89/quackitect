@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -74,7 +74,45 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: retro/cloud
+record:
+  - step: sync
+    hand: box 51c5005e133c · claude-code-remote
+    hash_before: ee9509dd2d41a15d8434a5fcfdf14695ee1b2509
+    hash_after: db9e203e338b7045402dec7da3a9081d798e2a88
+  - step: sync
+    hand: box 51c5005e133c · claude-code-remote
+    hash_before: c35f0536f104e7ac62fb9bf7ef80c41b6f685221
+    hash_after: 7466e24e17194c2092558f24dee3424dbda29602
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-work-tab-reads-tickets already carries every commit on main.
+  - step: split
+    hand: box 51c5005e133c · claude-code-remote
+    hash_before: c95648a1710b977ea275d2f4f440aebe8fbb1e87
+    hash_after: c95648a1710b977ea275d2f4f440aebe8fbb1e87
+  - step: children
+    hand: the engine
+    hash_before: b5e18fa5eefa644975dca691b3d838aba316ddc1
+    hash_after: b5e18fa5eefa644975dca691b3d838aba316ddc1
+  - step: retro/notes
+    hand: box 51c5005e133c · claude-code-remote
+    hash_before: 3bfef58746c0179ff289ec41cf95c73506870b1f
+    hash_after: 3bfef58746c0179ff289ec41cf95c73506870b1f
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box 51c5005e133c · claude-code-remote
+    hash_before: 3bcecebc2b2a2ce42eea31a88323c5ae80a6594c
+    hash_after: 3bcecebc2b2a2ce42eea31a88323c5ae80a6594c
+  - step: retro/cloud
+    hand: box 51c5005e133c · claude-code-remote
+    hash_before: 8e41764c538aa130133d112561b2b6ceede538ee
+    hash_after: 7591ab80313ddd9a8e5d40c0f63220fefc0066ff
+reason: done
 ---
 
 # Ask
@@ -90,7 +128,7 @@ The work tab is a ticket editor. It queries the index for tickets, and a branch 
 
 <!-- branch sync, so the branch carries trunk -->
 
-<!-- the form is command -->
+    ./RUNME.sh branch sync
 
 # split
 
@@ -100,13 +138,18 @@ The work tab is a ticket editor. It queries the index for tickets, and a branch 
 
 <!-- every child as a link, one a line, with its process -->
 
-<!-- the form is list -->
+- [[spec/tickets/the-index-answers-tickets]], trivial
+- [[spec/tickets/the-index-fires-on-change]], trivial
+- [[spec/tickets/the-work-tab-asks-index]], trivial
+- [[spec/tickets/the-work-tab-takes-edits]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-<!-- the form is checklist -->
+- every child is small enough to review whole: each lands as one commit of one module and its note
+- the children add up to the goal: the query, the callback, the tab reading both, and the edit
+- a child that waits on another names it: none names one, and the pull hands them out in order
 
 # children
 
@@ -120,7 +163,7 @@ The work tab is a ticket editor. It queries the index for tickets, and a branch 
 
 <!-- retro notes, which passes when the private folder is empty -->
 
-<!-- the form is command -->
+    ./RUNME.sh retro notes
 
 ## write
 
@@ -130,37 +173,64 @@ The work tab is a ticket editor. It queries the index for tickets, and a branch 
 
 <!-- what was done, one line a ticket or a thing -->
 
-<!-- the form is list -->
+- [[spec/tickets/the-index-answers-tickets]]: the index answers `tickets`, with the standing off the group's record
+- [[spec/tickets/the-index-fires-on-change]]: the door holds a `changes` call until a sweep, and answers the tick
+- [[spec/tickets/the-work-tab-asks-index]]: the tab asks the door, redraws on the tick, and the answer file goes
+- [[spec/tickets/the-work-tab-takes-edits]]: a cursor, a cell edit and two mark keys write the ticket's front
+- the plugin manifests: the brand stamp writes both where a clone holds none, so three contract cases stand green
+- the door over a fresh tree: `serves` makes the runtime folder first
+- the sync: trunk came in with one conflict in the installer, resolved by keeping both sides
+- twelve lines of three notes: reworded past the tense reader, so the push door opens
 
 ### well
 
 <!-- what went well, and what made it go well -->
 
-<!-- the form is list -->
+- the pull carried each ticket to its commit and push, so the box took the next leaf each time
+- the door's JSON shape took `tickets` and `changes` as two cases and no new transport
+- a fake door on a port the standing file names let every tab case run with no binary
+- the schema file already said which field the verbs own, so the tab reads it and holds no list
 
 ### badly
 
 <!-- what did not, each with its moment in the log or the transcript -->
 
-<!-- the form is list -->
+- the first hand-back of the first ticket met three red contract cases the clone brought, at the first check
+- the node fixture case stood under `test/level0` until the check named the rule, one hand-back later
+- the process call stood in the wrong Go file until the lint named `door.go`, at the third ticket's lint
+- a python slice on the group ticket cut a heading short, at the split, and cost one refused hand-back
+- the push door refused twelve tense findings in notes off trunk, at the sync hand-back
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
-<!-- the form is list -->
+- the manifests: `stamps` in `src/scripts/brand.js` writes them now, so no clone meets that red again
+- the test folder: `spec/guidance/code/testing` names the contract folder for a real binary, so a hand reads it first
+- the process call: `spec/design_output/doors` says the Go import runs in `door.go`, and a hand reads it before writing a client
+- the slice: a heading match reads the whole line, which `mcp__level0__patch` does and a substring does not
+- the tense reader: `spec/config/styles/VoiceParagraph/PastTense.yml` flags nouns as verbs, and a person weighs its words
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 
-<!-- the form is text -->
+The ask said a branch informs a ticket's standing and nothing more, and the
+record on the group ticket already carried that standing. So the index reads
+no git, and the answer file the verbs wrote had nothing left to say. The
+queue place and the progress went with it, because the tab draws what the
+index answers and the index answers what the notes hold. A person moving work
+between groups wants the `group` column, so the base file gained it. The
+mark keys stand in for the editor a mark carries open, which the tree view
+note still names as waiting.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-<!-- the form is checklist -->
+- every fact stands once: the rows, the road and the door rule each stand in their own note
+- every number carries a name: the waits stand as named constants in `door.go` and `workindex.go`
+- every header says what its file is for: each new Go file opens on what it holds, and counts nothing
 
 ## cloud
 
@@ -170,20 +240,30 @@ The work tab is a ticket editor. It queries the index for tickets, and a branch 
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
 
-<!-- the form is list -->
+- nothing: every tool stood, the proxy refused no host, and the build of the index ran on this box
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
-<!-- the form is list -->
+- a conflict at sync: the installer's list of moved files, where trunk and this branch each changed a name
+- a test that fails on the box alone: three contract cases over the plugin manifests, red on every fresh clone
+- the commit hook: a code change with no test beside it, answered with two cases over the usage rows
+- the push hook: twelve tense findings in three notes, and a list item over its words, each reworded
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
-<!-- the form is list -->
+- no person step stands parked, and no ticket stands minted with no group
+- the tree view note still names the editor reading a field's type as waiting, and no ticket carries it
+- the handover says the branch stands done at its tip, and a person reads the merge
 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The Vale paths case read a raw finding off the level zero note. The push door
+asks for that note to stand clean, so the two pulled against each other. The
+case now feeds Vale a flagged line on stdin, and no tracked note carries a
+warning for it.

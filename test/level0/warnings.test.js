@@ -7,10 +7,13 @@ import { test } from "node:test";
 import {
   drains,
   filesOn,
+  mergedWarnings,
   refusedWarnings,
+  rowOf,
   standsPast,
   takesFile,
   WARNING,
+  warnedNote,
   warningsOn,
 } from "../../.claude/skills/level0/lib/warnings.js";
 import { holds, refsIn } from "../../src/scripts/prepush.js";
@@ -68,15 +71,12 @@ test("the refusal names each file, each rule and the command that reads them", (
   assert.match(said, /RUNME\.sh lint/);
 });
 
-// [[spec/tickets/one-list-holds-the-warnings]]
-test("a push carrying a file at warning is refused, and one carrying none passes", () => {
+// A warning holds no push, because the refactoring hand drains it on the box, so the door reads no lint. [[spec/design_output/config#the-engine-controls]]
+test("a push carrying a file at warning lands, and the door reads no lint", () => {
   const carried = () => [{ name: "a.md", text: "" }];
   const warned = () => [found("a.md", "warning")];
-  const clean = () => [found("a.md", "error")];
 
-  assert.equal(holds(refsIn(toWork), "", carried, warned).code, 1);
-  assert.match(holds(refsIn(toWork), "", carried, warned).said, /a\.md/);
-  assert.deepEqual(holds(refsIn(toWork), "", carried, clean), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toWork), "", carried, warned), { code: 0, said: "" });
   assert.deepEqual(holds(refsIn(toWork), "", carried), { code: 0, said: "" });
 });
 
@@ -117,4 +117,30 @@ test("a warning on a file the push leaves alone holds no push", () => {
     code: 0,
     said: "",
   });
+});
+
+// [[spec/design_output/level0#a-warning-feeds-the-list]]
+test("a write's warnings replace the file's rows on the list, and leave the other files' rows", () => {
+  const list = [found("a.md", "warning"), found("b.md", "warning")];
+  const merged = mergedWarnings(list, "a.md", [
+    found("a.md", "warning", "Sentence"),
+    found("a.md", "error"),
+  ]);
+  assert.deepEqual(
+    merged.map((one) => `${one.file} ${one.rule}`),
+    ["b.md Hedge", "a.md Sentence"],
+    "the file's old row goes, the error stays off the list, and the other file stands",
+  );
+  assert.equal(merged[1].source, "door");
+  assert.deepEqual(mergedWarnings(list, "a.md", []), [found("b.md", "warning")]);
+});
+
+// [[spec/design_output/level0#a-warning-feeds-the-list]]
+test("the note after a write names each row, and says the work goes on", () => {
+  const said = warnedNote("a.md", [found("a.md", "warning")], 3);
+  assert.match(said, /1 line\(s\) of a\.md stand at warning, and the write lands/);
+  assert.match(said, /carry on/);
+  assert.match(said, /a\.md:3 Hedge: Cut the hedge\./);
+  assert.match(said, /3 row\(s\) now/);
+  assert.equal(rowOf(found("a.md", "warning")), "a.md:3 Hedge: Cut the hedge.");
 });

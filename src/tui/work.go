@@ -1,15 +1,15 @@
 // The work tab. It draws every ticket this tree holds, nested under its group,
-// off the one answer the work verb writes. A write to that answer redraws the
-// tab with no key pressed, and nothing here writes a ticket.
+// off the rows the index answers. A change under the tree wakes the index,
+// and the index wakes this tab, so it redraws with no key pressed and polls
+// nothing. The details draw one row whole, with its links.
 // [[spec/design_output/tui#the-work-tab]]
 
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -17,11 +17,11 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// The work answer of [[spec/design_output/work#one-verb-answers-git]], owned by .claude/skills/level0/lib/folders.js and spelled again here because a Go module imports no JavaScript.
-const workAnswerAt = ".se/.runtime/work.json"
-
 // [[spec/design_output/tree-view#a-base-file-says-it]]
 const workBaseAt = "spec/views/work.base"
+
+// The keys the details draw as fields, in this order, and the rest they leave to the flags and the text. [[spec/design_output/tui#the-work-tab]]
+var detailKeys = []string{"step", "group", "standing", "route", queueKey}
 
 // [[spec/design_output/tui#the-work-tab]]
 type workTab struct{}
@@ -34,22 +34,9 @@ func workRoot(path string) string {
 }
 
 // [[spec/design_output/tui#the-work-tab]]
-func workAt(path string) string {
-	return filepath.Join(workRoot(path), filepath.FromSlash(workAnswerAt))
-}
-
-// The time the answer carries, which says whether a reader reads it again. [[spec/design_output/tui#the-work-tab]]
-func workStamp(path string) time.Time {
-	info, err := os.Stat(workAt(path))
-	if err != nil {
-		return time.Time{}
-	}
-	return info.ModTime()
-}
-
-// [[spec/design_output/tui#the-work-tab]]
 func loadWork(path string) (*Tree, error) {
-	base, err := os.ReadFile(filepath.Join(workRoot(path), filepath.FromSlash(workBaseAt)))
+	root := workRoot(path)
+	base, err := readFile(filepath.Join(root, filepath.FromSlash(workBaseAt)))
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +44,7 @@ func loadWork(path string) (*Tree, error) {
 	if err != nil {
 		return nil, err
 	}
-	said, err := os.ReadFile(workAt(path))
+	said, err := askIndex(root, "tickets", map[string]any{})
 	if err != nil {
 		return nil, err
 	}
@@ -70,67 +57,68 @@ func loadWork(path string) (*Tree, error) {
 	tree.Sorted(one.Sorts)
 	// [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 	tree.Flagged(one.Flags)
-	// A preset pressed in the file stands pressed when the tab opens. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
 	tree.Presets(one.Presets)
+	// A name in the table links to its note, so the details carry no path. [[spec/design_output/tree-view#a-value-carries-a-link]]
+	tree.LinkOf = func(item Item) string {
+		// A sentence todo is no note, so its name links nowhere. [[spec/design_output/stop#the-plan]]
+		if item.Keys["kind"] == kindTodo {
+			return ""
+		}
+		return fileAddress(root, pathOf(item))
+	}
 	return tree, nil
 }
 
-// The buttons the filter panel draws, each with the key that presses it. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-func workPresets(m *model) []part {
+// The presets the base file names, each under a number with alt. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func (workTab) Presets(m *model) []preset {
 	if m.work == nil {
 		return nil
 	}
 	said := m.work.PresetList()
-	if len(said) == 0 {
-		return nil
-	}
-	names := make([]string, 0, len(said))
+	out := make([]preset, 0, len(said))
 	for at, one := range said {
-		name := fmt.Sprintf("alt+%d %s", at+1, one.Name)
-		if one.Pressed {
-			names = append(names, openStyle.Render("["+name+"]"))
-			continue
-		}
-		names = append(names, dimStyle.Render(" "+name+" "))
+		out = append(out, preset{
+			Name:   one.Name,
+			Filter: one.Filters,
+			Key:    fmt.Sprintf("alt+%d", at+1),
+			Sorts:  one.Sorts,
+		})
 	}
-	return []part{{}, {text: strings.Join(names, " "), drawn: true}}
-}
-
-// A number under alt presses the preset standing at that place. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-func pressPreset(m *model, name string) bool {
-	if m.work == nil || !strings.HasPrefix(name, "alt+") {
-		return false
-	}
-	at, err := strconv.Atoi(strings.TrimPrefix(name, "alt+"))
-	said := m.work.PresetList()
-	if err != nil || at < 1 || at > len(said) {
-		return false
-	}
-	m.work.Press(said[at-1].Name)
-	return true
+	return out
 }
 
 // [[spec/design_output/tui#the-work-tab]]
 type workMsg struct {
 	tree *Tree
 	why  string
-	at   time.Time
+	tick int64
 	same bool
 }
 
-// A poll answers the answer's own time, so a write redraws with no key pressed. [[spec/design_output/tui#the-work-tab]]
-func workCmd(path string, was time.Time) tea.Cmd {
+// The index holds the call until a sweep past the tick, and the tab reads the rows again then. [[spec/design_output/index#the-index-fires-on-change]]
+func workCmd(path string, was int64) tea.Cmd {
 	return func() tea.Msg {
-		time.Sleep(poll)
-		at := workStamp(path)
-		if at.Equal(was) {
-			return workMsg{at: at, same: true}
+		root := workRoot(path)
+		said, err := askIndex(root, "changes", map[string]any{"since": was})
+		if err != nil {
+			// A door answering nowhere costs a pause before the next ask, so a dead index spins nothing. [[spec/design_output/tui#the-work-tab]]
+			time.Sleep(poll)
+			return workMsg{why: err.Error(), tick: was}
+		}
+		var at struct {
+			Tick int64 `json:"tick"`
+		}
+		if err := json.Unmarshal(said, &at); err != nil {
+			return workMsg{why: err.Error(), tick: was}
+		}
+		if at.Tick == was {
+			return workMsg{tick: at.Tick, same: true}
 		}
 		tree, err := loadWork(path)
 		if err != nil {
-			return workMsg{why: err.Error(), at: at}
+			return workMsg{why: err.Error(), tick: at.Tick}
 		}
-		return workMsg{tree: tree, at: at}
+		return workMsg{tree: tree, tick: at.Tick}
 	}
 }
 
@@ -139,13 +127,18 @@ func (workTab) Left(m *model, w, rows int) string {
 	if m.work == nil {
 		return lipgloss.NewStyle().Width(w).Render(strings.Join(workWaits(m, w, rows), "\n"))
 	}
+	// A notice takes the last line while one stands, so a refusal reads where the edit was. [[spec/design_output/tui#the-work-tab-takes-edits]]
+	if m.workNotice != "" {
+		m.work.Scroll(rows - 1)
+		return m.work.Header(w) + "\n" + m.work.Rows(w, rows-1) + "\n" + levelStyle("warn").Render(cut(m.workNotice, w))
+	}
 	m.work.Scroll(rows)
 	return m.work.Header(w) + "\n" + m.work.Rows(w, rows)
 }
 
 // [[spec/design_output/tui#the-work-tab]]
 func workWaits(m *model, w, rows int) []string {
-	said := "Run ./RUNME.sh branch answer, and this tab draws what it writes."
+	said := "The index answers this tab, and it draws the moment a door stands."
 	if m.workWhy != "" {
 		said = m.workWhy
 	}
@@ -160,7 +153,7 @@ func workWaits(m *model, w, rows int) []string {
 	return lines
 }
 
-// [[spec/design_output/tui#the-work-tab]]
+// The details of one row, in three parts: every flag in the column's order, the rest of the front, then the whole ask. [[spec/design_output/tui#the-work-tab]]
 func (workTab) Detail(m *model, w int) []part {
 	if m.work == nil {
 		return []part{{text: cut("A row of the work browser shows its note here.", w)}}
@@ -169,22 +162,65 @@ func (workTab) Detail(m *model, w int) []part {
 	if one == nil {
 		return []part{{text: cut("No row stands under the cursor.", w)}}
 	}
-	out := make([]part, 0, len(one.Keys)+1)
-	for _, line := range strings.Split(one.Detail(), "\n") {
-		out = append(out, part{text: cut(line, w)})
+	root := workRoot(m.path)
+	// The name heads the details as text, because the table's own name carries the link. [[spec/design_output/tree-view#a-value-carries-a-link]]
+	out := []part{{text: headStyle.Bold(true).Render(one.Name), drawn: true}, {}}
+	for _, held := range m.work.States(*one) {
+		out = append(out, part{text: flagStyle(held).Render(fmt.Sprintf("%s  %-8s %s", held.Letter, held.Key, held.Value)), drawn: true})
+	}
+	if fields := workFields(root, *one); len(fields) > 0 {
+		out = append(out, part{})
+		out = append(out, fields...)
+	}
+	says := strings.TrimSpace(one.Keys["says"])
+	if says == "" {
+		return out
+	}
+	out = append(out, part{})
+	for _, line := range strings.Split(Wrap(says, w), "\n") {
+		out = append(out, part{text: withLinks(root, line), drawn: true})
 	}
 	return out
 }
 
-func (workTab) Narrowed(m *model) bool { return m.work != nil && m.work.Narrowed() }
+// The path a row names, or the ticket's own place under the tickets folder. [[spec/design_output/tree-view#a-value-carries-a-link]]
+func pathOf(one Item) string {
+	if said := strings.TrimSpace(one.Keys["path"]); said != "" {
+		return said
+	}
+	return ticketPath(one.Name)
+}
+
+// The fields a row carries, one a line, each value a link where the tree resolves it. [[spec/design_output/tree-view#a-value-carries-a-link]]
+func workFields(root string, one Item) []part {
+	wide := 0
+	for _, key := range detailKeys {
+		if strings.TrimSpace(one.Keys[key]) != "" {
+			wide = max(wide, len(key))
+		}
+	}
+	out := []part{}
+	for _, key := range detailKeys {
+		value := strings.TrimSpace(one.Keys[key])
+		if value == "" {
+			continue
+		}
+		if key == "group" {
+			value = linked(value, fileAddress(root, ticketPath(value)))
+		}
+		out = append(out, part{text: dimStyle.Render(fmt.Sprintf("%-*s  ", wide, key)) + value, drawn: true})
+	}
+	return out
+}
+
+// A pressed preset narrows the tab, the queue among them, so the funnel stands red while one holds. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func (workTab) Narrowed(m *model) bool {
+	return m.work != nil && (m.work.Narrowed() || m.pressed() != nil)
+}
 
 // [[spec/design_output/tui#the-help-reads-the-cursor]]
 func (workTab) Keys(m *model) band {
 	return band{name: "THE WORK", acts: []act{
-		{bind("1 2", "the log, and the work", "1", "2"), func(m *model, name string) tea.Cmd {
-			m.openTab(int(name[0] - '0'))
-			return nil
-		}},
 		{bind("w s", "one row up, one row down", "w", "s", "W", "S"), func(m *model, name string) tea.Cmd {
 			step := 1
 			if strings.EqualFold(name, "w") {
@@ -192,6 +228,7 @@ func (workTab) Keys(m *model) band {
 			}
 			if m.work != nil {
 				m.work.Move(step)
+				m.loadPane()
 			}
 			return nil
 		}},
@@ -201,16 +238,24 @@ func (workTab) Keys(m *model) band {
 			}
 			return nil
 		}},
-		// [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
-		{bind("m M", "mark a row, and M the run from the last mark", "m", "M"), func(m *model, name string) tea.Cmd {
+		{bind("+ -", "open every group, and close every one", "+", "-"), func(m *model, name string) tea.Cmd {
 			if m.work == nil {
 				return nil
 			}
-			if name == "M" {
-				m.work.MarkRun()
+			if name == "+" {
+				m.work.Expand(true)
 				return nil
 			}
-			m.work.Mark()
+			m.work.Collapse(true)
+			return nil
+		}},
+		// A place is the todo, and the same digit again takes it off. No cell opens here, because every field a person sets has a key of its own. [[spec/design_output/pull#the-queue-is-an-outline]]
+		{bind("p 1…9", "place the row in the queue: p, then the place, and the same place again clears it", placeKey), func(m *model, _ string) tea.Cmd {
+			m.openPlace()
+			return nil
+		}},
+		{bind("u", "flip the urgent mark", "u"), func(m *model, _ string) tea.Cmd {
+			m.flip(urgentKey)
 			return nil
 		}},
 	}}

@@ -10,6 +10,9 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { at, configSections, ruleAt, rulesIn } from "./ruled.js";
+import { proc } from "../../src/doors/proc.js";
+import { readTools, whereIs } from "../../src/engine/tools.js";
+import { it } from "../../src/scripts/cli-doors.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -106,4 +109,48 @@ test("the rule stands in a file of its own, and one section a path names it", ()
     [],
     "one section names it once",
   );
+});
+
+// A Go package names the outside in its door.go, so an import of os anywhere else is a module reading the box in place. [[spec/tickets/a-door-holds-file-calls]]
+const OS = 'import (\n\t"fmt"\n\t"os"\n)\n';
+const OS_SIGNAL = 'import "os/signal"\n';
+
+// A module reading the pid, the node version or the exec path in place takes the box into every case of it. [[spec/design_output/doors#a-door-reads-the-outside]]
+const PID = "const owner = String(process.pid);\n";
+const VERSION = 'const node = process.version.replace(/^v/, "");\n';
+const EXEC = "const argv = [process.execPath, script];\n";
+
+ifVale(
+  "the rule refuses a Go import of os outside the package's door, and a module past a root reading the pid, the version or the exec path",
+  proves(
+    {
+      os: at(OS, "src/lsp/tree.go"),
+      signal: at(OS_SIGNAL, "src/index/main.go"),
+      swap: at(OS, "src/engine/swap/swap.go"),
+      pid: at(PID, "src/scripts/vehicle.js"),
+      version: at(VERSION, "src/bridge/review.js"),
+      exec: at(EXEC, "src/bridge/review.js"),
+    },
+    (said) => {
+      for (const key of ["os", "signal", "swap", "pid", "version", "exec"])
+        assert.ok(said.rules(key).includes(RULE), key);
+    },
+  ),
+);
+
+test("the config stands the rule off every Go door, a Go case, and every door reading the pid, the version or the exec path", () => {
+  for (const where of [
+    "src/engine/swap/door.go",
+    "src/lsp/tree_test.go",
+    "src/doors/session.js",
+  ]) {
+    assert.ok(off(where), where);
+  }
+});
+
+// The hand the command root builds carries the pid and the node path, so a module past it reads neither in place. [[spec/design_output/doors#a-door-reads-the-outside]]
+test("the hand a root builds carries the pid and the node path", () => {
+  assert.equal(typeof it.pid, "number");
+  assert.equal(typeof it.node, "string");
+  assert.ok(it.node.length > 0);
 });

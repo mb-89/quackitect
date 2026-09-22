@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+group: the-notes-point-true
 steps:
   - name: design
     reads: [[spec/guidance/voice]]

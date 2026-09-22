@@ -49,7 +49,7 @@ The probe under test/fixtures/bridgehead lands with its tests and its chapter. A
 
 - `node --test test/level0/bridgehead.test.js` answers green, so the bridgehead forwards session.start, tool.call and turn.complete
 - `SE_SLOW=1 node --test test/contract/bridgehead.test.js` answers green: the client passes the probe, and a headless turn answers the canary
-- spec/design_output/level0.md carries the chapter A bridgehead imports a copy, naming the shape that holds and the three that fail
+- spec/design_output/level0.md carries the chapter A stub names its vehicle, which tables the roads a stub's plugin takes
 
 # do
 
@@ -74,7 +74,7 @@ The probe under test/fixtures/bridgehead lands with its tests and its chapter. A
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-The probe plugin stands under test/fixtures/bridgehead, with a fake vehicle beside it. Its module reads the vehicle file at session start and imports the module it names. Then it hands every event to the vehicle through a mirror of the harness hand. Four import shapes go through the client. The chapter A bridgehead imports a copy names the one that holds: a relative path to a copy inside the plugin folder.
+The probe plugin stands under test/fixtures/bridgehead, with a fake vehicle beside it. Its module reads the vehicle file at session start and imports the module it names. Then it hands every event to the vehicle through a mirror of the harness hand. Four import shapes go through the client. [[spec/design_output/level0#a-stub-names-its-vehicle]] tables the roads a stub's own plugin takes and what stops each. The road standing today runs the vehicle's plugin off its own folder.
 
 Three things land with it:
 

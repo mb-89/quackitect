@@ -13,6 +13,7 @@ import {
   URGENT,
   urgent,
 } from "../engine/group.js";
+import { CLOUD_PLACE, compareOutline } from "./pull-outline.js";
 import { staleClaim } from "./work-free.js";
 import { answerOf } from "./work-answer.js";
 import {
@@ -32,6 +33,11 @@ export function list(it, _name, argv) {
   if (said.includes("--fetch")) it.git.fetch();
   // [[spec/design_output/pull#the-queue-is-a-score]]
   if (said.includes("--queue")) return queueOnly(it);
+  // The one answer as JSON, which the work tab reads for the places and the branches. [[spec/design_output/work#one-reading-answers-git]]
+  if (said.includes("--json")) {
+    console.log(JSON.stringify(answerOf(it, true)));
+    return 0;
+  }
   const read = readWork(it, true);
   const stand = read.stand;
   const standing = standingAll(stand);
@@ -100,7 +106,7 @@ function stateOf(text) {
   return fieldOf(text, "state") || OPEN;
 }
 
-// The order the pull hands out, off the one answer a board reads too. [[spec/design_output/work#one-verb-answers-git]]
+// The order the pull hands out, off the one answer a board reads too. [[spec/design_output/work#one-reading-answers-git]]
 function queueOnly(it) {
   const said = answerOf(it, true);
   const held = new Map();
@@ -109,9 +115,12 @@ function queueOnly(it) {
     ...said.branches.flatMap((row) => row.tickets),
     ...said.loose,
   ]) {
-    if (typeof one.queue === "number" && !held.has(one.name)) held.set(one.name, one);
+    // The listing is this box's order, so a row the cloud holds stays off it. [[spec/design_output/pull#the-queue-is-an-outline]]
+    if (one.queue !== undefined && one.queue !== CLOUD_PLACE && !held.has(one.name)) {
+      held.set(one.name, one);
+    }
   }
-  const rows = [...held.values()].sort((a, b) => a.queue - b.queue);
+  const rows = [...held.values()].sort((a, b) => compareOutline(a.queue, b.queue));
   if (!rows.length) {
     console.log("No ticket stands in the queue.");
     return 0;

@@ -4,7 +4,7 @@
 // [[spec/design_output/projection#what-goes-where-is-data]]
 
 import { flatten, keysOf, LOCAL, TRACKED } from "./config.js";
-import { actionables, styled } from "./guidance.js";
+import { actionables, rulesOf, styled } from "./guidance.js";
 import { faultsOf, grouped, PARAGRAPH, RULES, rulesFrom } from "./paragraph.js";
 
 export { ownerOf } from "./projection-owner.js";
@@ -173,7 +173,7 @@ function styleFrom(entry, texts) {
   for (const note of notes) {
     body.push(`## ${note.name.replace(/[.]md$/, "").replace(/[-_]/g, " ")}`);
     body.push("");
-    body.push(...actionables(note.text).map((one, i) => `${i + 1}. ${one}`));
+    body.push(...rulesOf(note.text));
     body.push("");
   }
   const text = [

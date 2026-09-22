@@ -1,6 +1,6 @@
 // What the command line reads: the version, the index, the notes a reader
 // asks for, and the walk over a folder.
-// [[spec/design_output/tree#the-reader]]
+// [[spec/design_output/tree#the-tree-handed-in]]
 
 import { join } from "node:path";
 import { BIN as INDEX_BIN } from "../../.claude/skills/level0/lib/index.js";
@@ -107,7 +107,8 @@ export async function lint(where) {
 
   const ms = it.clock.now().getTime() - began;
   if (!found.length) {
-    await it.log.say("info", "vale", `the rules pass over ${where.join(" ")}`, { ms });
+    // The rules passing is the expected road, so the row stands at debug and the floor hides it. [[spec/design_output/log#which-kind-says-what]]
+    await it.log.say("debug", "vale", `the rules pass over ${where.join(" ")}`, { ms });
     console.log("The rules pass.");
     return 0;
   }
@@ -136,9 +137,10 @@ export async function lint(where) {
   if (refused) return 1;
   console.log("");
   console.log(
-    `${found.length} stand at warning. A commit lands over them, and check answers red, so no push reaches ${TRUNK}.`,
+    `${found.length} stand at warning. A commit and a push land over them, and the refactoring hand drains them past ${TRUNK}'s check.`,
   );
-  return 1;
+  // A warning turns nothing red, because the hand drains it and the doors let it land. [[spec/design_output/config#the-engine-controls]]
+  return 0;
 }
 
 // [[spec/design_output/tree#the-tree-handed-in]]

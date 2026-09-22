@@ -129,7 +129,7 @@ async function settled(context, work) {
       await import(vscode.Uri.file(join(home, "src", "doors", "clock.js")).toString())
     ).clock();
     const windows = process.platform === "win32";
-    return bridge.settles(disk, process.env, clock, work, home, windows);
+    return bridge.settles(disk, process.env, clock, work, home, process.pid, windows);
   } catch (error) {
     vscode.window.showWarningMessage(
       `the hook finds no vehicle: ${error?.message ?? error}`,

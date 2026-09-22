@@ -5,6 +5,8 @@
 export const CONFIG = ".vale.ini";
 
 export const PROSE = /\.(md|markdown|txt)$/i;
+// The rule an exemption with no reason draws, named once so the panel labels its source. [[spec/design_output/level0#where-a-rule-lives]]
+export const UNREASONED = "ExemptionCarriesAReason";
 
 const STYLES_PATH = /^[ \t]*StylesPath[ \t]*=.*$/m;
 
@@ -109,7 +111,7 @@ export function unreasoned(text) {
     const above = i > 0 ? lines[i - 1] : "";
     if (REASON.test(lines[i]) || REASON.test(above)) continue;
     out.push({
-      rule: "ExemptionCarriesAReason",
+      rule: UNREASONED,
       line: i + 1,
       column: 1,
       said: found[0],

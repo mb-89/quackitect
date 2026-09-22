@@ -76,6 +76,19 @@ test("the refusal names the way out", () => {
   assert.match(holds(refsIn(toTrunk), "").said, /Run `\.\/RUNME\.sh check` last/);
 });
 
+// [[spec/design_output/work#the-battery-answers-first]]
+test("a push to trunk over a stamp counting warnings refuses, and names the lint", () => {
+  const said = holds(
+    refsIn(toTrunk),
+    stamp({ warnings: 2, files: ["spec/a.md", "spec/b.md"] }),
+  );
+  assert.equal(said.code, 1);
+  assert.match(said.said, /2 warning\(s\) stand in 2 file\(s\)/);
+  assert.match(said.said, /RUNME\.sh lint/);
+  assert.deepEqual(holds(refsIn(toWork), stamp({ warnings: 2 })), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toTrunk), stamp({ warnings: 0 })), { code: 0, said: "" });
+});
+
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
 test("a push whose delta carries a tagged note refuses, and names the file", () => {
   const carried = () => [
@@ -92,6 +105,8 @@ test("a push whose delta carries a tagged note refuses, and names the file", () 
 test("a push whose delta carries an untagged note lands", () => {
   const carried = () => [{ name: "spec/tickets/slow-lint.md", text: FREE }];
   assert.deepEqual(holds(refsIn(toWork), "", carried), { code: 0, said: "" });
+  // A warning holds no push, so the door takes no lint. [[spec/design_output/config#the-engine-controls]]
+  assert.equal(holds.length, 2, "the door reads the refs and the stamp, then the delta, and no warnings");
 });
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
@@ -115,30 +130,39 @@ test("carriedBy reads every note the range names, and passes a file git lost", (
   assert.deepEqual(repo.runs[0], ["log", "--format=", "--name-only", `${WAS}..${SHA}`]);
 });
 
-// The door reads what the check reads, so a word the tense reader clears holds no push. [[spec/tickets/one-list-holds-the-warnings]]
-test("the lint over the pushed files drops a false past tense, and keeps a real one", () => {
+// The terminal door reads through the tense reader, so a word Vale takes for the past and the check lets stand holds no push. [[spec/design_output/level0#the-tense-reader]]
+test("a false past the check lets stand holds no push, and a true past does", () => {
   const root = "/tree";
-  const files = fakeDisk({
-    [join(root, "notes.md")]: "Somebody wrote the note.\nThe verb buys one place.\n",
-  });
-  const row = (line, said) => ({
+  const past = (line, span, said) => ({
     Check: "VoiceParagraph.PastTense",
     Line: line,
-    Span: [1, 5],
+    Span: span,
     Match: said,
-    Message: `Write the present tense: '${said}'.`,
+    Message: "past",
     Severity: "warning",
   });
-  const vale = "/tree/.se/.runtime/bin/vale";
-  const outside = fakeProc({
-    [`${vale} --config=.vale.ini --output=JSON --no-exit notes.md`]: {
-      stdout: JSON.stringify({ "notes.md": [row(1, "wrote"), row(2, "buys")] }),
-    },
+  const vale = JSON.stringify({
+    "notes.md": [past(1, [12, 15], "read"), past(2, [10, 15], "walked")],
   });
-  const found = lintedBy(files, outside, root, vale)(["notes.md", "a.js"]);
+  const files = fakeDisk({
+    [join(root, "notes.md")]: "The reader read the note.\nThe hand walked away.\n",
+  });
+
+  const found = lintedBy(
+    fakeProc({ vale: { stdout: vale } }),
+    root,
+    "vale",
+    files,
+  )(["notes.md", "a.js"]);
+
   assert.deepEqual(
-    found.map((one) => [one.file, one.line, one.rule, one.severity]),
-    [["notes.md", 1, "PastTense", "warning"]],
+    found.map((one) => one.said),
+    ["walked"],
   );
-  assert.deepEqual(lintedBy(files, outside, root, "")(["notes.md"]), []);
+});
+
+test("a push carrying no prose asks Vale nothing", () => {
+  const outside = fakeProc();
+  assert.deepEqual(lintedBy(outside, "/tree", "vale", fakeDisk())(["a.js"]), []);
+  assert.deepEqual(outside.ran, []);
 });

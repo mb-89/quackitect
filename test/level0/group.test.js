@@ -14,6 +14,7 @@ import {
   recordIn,
   spanOf,
   stepOf,
+  todoOf,
   ticketAt,
   withEntry,
   withField,
@@ -214,4 +215,15 @@ test("a span reads minutes, hours and days, and an age says the coarsest of them
   assert.equal(aged(600), "10m");
   assert.equal(aged(7200), "2h");
   assert.equal(aged(259200), "3d");
+});
+
+// A todo reads as nothing, as first for a bare tag, or as the row the ticket stands before. [[spec/design_output/pull#the-queue-is-an-outline]]
+test("a todo reads as nothing, first, or the row it names", () => {
+  assert.equal(todoOf({}), "");
+  assert.equal(todoOf({ todo: false }), "");
+  assert.equal(todoOf({ todo: "false" }), "");
+  assert.equal(todoOf({ todo: true }), "first");
+  assert.equal(todoOf({ todo: "true" }), "first");
+  assert.equal(todoOf({ todo: "a-loose-one" }), "a-loose-one");
+  assert.equal(todoOf({ todo: " last " }), "last");
 });

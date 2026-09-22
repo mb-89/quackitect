@@ -25,11 +25,23 @@
     "rule": 6
   },
   "refactor": {
-    "comment": "The hand the stop door starts while the warnings stand past the number. spec/guidance/code/refactoring.md says what that hand does.",
+    "comment": "The hand the stop door starts while the list stands past the number and a file rests past the window. The grace is the calls the engine lets pass before it refuses them. spec/guidance/code/refactoring.md says what that hand does.",
     "parallel": true,
-    "mostWarnings": 25,
+    "mostWarnings": 10,
     "mostAtOnce": 1,
-    "untouchedFor": "7d"
+    "untouchedFor": "5m",
+    "grace": 3
+  },
+  "grace": {
+    "comment": "The calls the engine lets pass before an ask refuses them: the owner's ask for an update, and the finish hold before it stops hard. spec/design_output/stop.md, chapter The grace, says the rest.",
+    "update": 5,
+    "finish": 10
+  },
+  "plan": {
+    "comment": "The engine's three questions every so many calls: what you work on, which todos you finished, which you add. The third stays away past mostOpen. spec/design_output/stop.md, chapter The plan, says the rest.",
+    "everyCalls": 10,
+    "mostOpen": 5,
+    "grace": 6
   },
   "engine": {
     "comment": "The engine level one brings. spec/design_output/config.md, chapter The engine controls, says what each value means.",

@@ -3,10 +3,9 @@
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { BINDING, GOD } from "../../.claude/skills/level0/lib/config.js";
-import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
+import { FOLDER as LOG_FOLDER, SERVE } from "../../.claude/skills/level0/lib/log.js";
+import { relativeTo, runsHere } from "../../.claude/skills/level0/lib/paths.js";
 import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { awake } from "../doors/awake.js";
 import { biome } from "../doors/biome.js";
@@ -17,6 +16,7 @@ import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
 import { wire } from "../doors/wire.js";
+import { projectionsHere, sourcesOf } from "../engine/projection.js";
 import {
   holdsForAnswer,
   onAgentSpoke,
@@ -29,7 +29,8 @@ import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
 import { asks } from "./config.js";
-import { FINDINGS, findingsFor } from "./findings.js";
+import { FINDINGS, findingsFor, heldFor } from "./findings.js";
+import { holdsGrace } from "./grace.js";
 import {
   onAgentSpawn,
   onPromptContext,
@@ -40,10 +41,17 @@ import {
   owesCanary,
   surveyHere,
 } from "./guidance.js";
-import { projectionsHere, sourcesOf } from "../engine/projection.js";
+import {
+  asksForPlan,
+  PLAN,
+  PLAN_CALL,
+  planField,
+  SPECS as planSpecs,
+  TOOLS as planTools,
+} from "./plan.js";
 import { freshens } from "./projection.js";
-import { movedCode } from "./reload.js";
 import { SPECS as proseSpecs, TOOLS as proseTools } from "./prose.js";
+import { movedCode } from "./reload.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import {
   ANSWERED,
@@ -54,6 +62,7 @@ import {
 import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.js";
 import {
   dropsHold,
+  ENDS_TURN,
   holdsCall,
   onRefactorAnswered,
   onStop,
@@ -73,6 +82,8 @@ const SOON = 20;
 const TAKEOVER_PROBE = 2000;
 const TAKEOVER_PAUSE = 100;
 const TAKEOVER_TRIES = 50;
+// The window the old server watches the new one for, past the takeover and the listen. [[spec/design_output/level0#a-restart-watches-its-child]]
+const RESPAWN_WAIT = 3000;
 const PASS = { pass: true };
 
 const DOORS = {
@@ -106,6 +117,7 @@ const TOOLS = {
   ...reviewTools,
   ...stopTools,
   ...reportTools,
+  ...planTools,
   ...proseTools,
 };
 
@@ -135,8 +147,32 @@ function specsOf(box) {
     ...reviewSpecs(),
     ...stopSpecs(box),
     ...reportSpecs(),
+    ...planSpecs(),
     ...proseSpecs(),
-  ];
+  ].map(withPlanField);
+}
+
+// Every level zero call takes the plan's answer as a field, so it rides a call the agent makes anyway. [[spec/design_output/stop#the-plan]]
+function withPlanField(spec) {
+  if (spec.name === PLAN) return spec;
+  const properties = { ...(spec.inputSchema?.properties ?? {}), plan: planField() };
+  return {
+    ...spec,
+    inputSchema: { ...(spec.inputSchema ?? { type: "object" }), properties },
+  };
+}
+
+// The field on a level zero call answers the ask the way the plan call does. [[spec/design_output/stop#the-plan]]
+function planRides(e, box) {
+  const tool = String(e?.tool ?? "");
+  if (
+    !e?.plan ||
+    typeof e.plan !== "object" ||
+    !tool.startsWith("mcp__level0__") ||
+    tool === PLAN_CALL
+  )
+    return;
+  planTools[PLAN_CALL](e.plan, box);
 }
 
 function pass() {
@@ -197,7 +233,18 @@ function submitsPrompt(e, box) {
 async function onToolCall(e, box) {
   sawCall(e, box);
   asksForUpdate(e, box);
-  const held = letsThrough(holdsCall(e, box) ?? holdsForAnswer(e, box), { e }, box);
+  // The engine's three questions come round every so many of the agent's own calls. [[spec/design_output/stop#the-plan]]
+  if (!e?.agentId) {
+    planRides(e, box);
+    box.calls = (box.calls ?? 0) + 1;
+    asksForPlan(box, box.calls);
+  }
+  // The engine's own ask meets the call after the owner's hold and before the answer door. [[spec/design_output/stop#the-grace]]
+  const held = letsThrough(
+    holdsCall(e, box) ?? holdsGrace(e, box, ENDS_TURN) ?? holdsForAnswer(e, box),
+    { e },
+    box,
+  );
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (!passes(said)) return said;
@@ -224,6 +271,8 @@ export function boxOf(method, work = method, doors = {}) {
     root: work,
     // The root builds the box, so the modules past it read the environment here. [[spec/design_output/doors#a-door-reads-the-outside]]
     env: doors.env ?? process.env,
+    node: doors.node ?? process.execPath,
+    pid: doors.pid ?? process.pid,
     disk: files,
     clock: time,
     proc: outside,
@@ -261,10 +310,7 @@ export function serve(method, port = PORT_BASE, say = console.log) {
   const restart = () => {
     held.release();
     own.log.say("info", "bridge", `the server restarts at ${where}`);
-    server.close(() => {
-      wire().respawn(process.argv.slice(1));
-      process.exit(0);
-    });
+    server.close(() => respawned(own, [process.execPath, ...process.argv.slice(1)]));
   };
 
   const onRequest = (request, response) => {
@@ -278,6 +324,21 @@ export function serve(method, port = PORT_BASE, say = console.log) {
             found: [],
             fault: String(error?.message ?? error),
           }),
+      );
+      return;
+    }
+    // A buffer the editor holds reads here as typed, so no source waits for a save. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+    if (request.method === "POST" && request.url === FINDINGS) {
+      readBody(request, (body) =>
+        heldFor(own, body).then(
+          (said) => answer(response, OK, said),
+          (error) =>
+            answer(response, OK, {
+              ok: false,
+              found: [],
+              fault: String(error?.message ?? error),
+            }),
+        ),
       );
       return;
     }
@@ -333,6 +394,39 @@ export function serve(method, port = PORT_BASE, say = console.log) {
   return server;
 }
 
+// The old server watches the new one for a window, so a respawn that falls writes why to the log, and no silent port stays behind. [[spec/design_output/level0#a-restart-watches-its-child]]
+export async function respawned(own, argv, exit = process.exit, wait = RESPAWN_WAIT) {
+  const out = join(own.work, ...SERVE.split("/"));
+  own.disk.makeDir(join(own.work, ...LOG_FOLDER.split("/")));
+  const was = own.disk.exists(out) ? String(own.disk.read(out)) : "";
+  const born = await own.proc.respawn(argv, { out, waitMs: wait });
+  if (!born.fell) return exit(0);
+  const now = own.disk.exists(out) ? String(own.disk.read(out)) : "";
+  const wrote = (now.startsWith(was) ? now.slice(was.length) : now).trim();
+  try {
+    await own.log.say(
+      "fatal",
+      "bridge",
+      `the respawn falls with exit ${born.exitCode}: ${reasonIn(wrote)}`,
+      { said: wrote },
+    );
+  } catch {}
+  exit(1);
+}
+
+// The line naming the fault, out of what the child wrote: the first naming an error, else the last. [[spec/design_output/level0#a-restart-watches-its-child]]
+function reasonIn(wrote) {
+  const lines = wrote
+    .split("\n")
+    .map((one) => one.trim())
+    .filter(Boolean);
+  return (
+    lines.find((one) => /error/i.test(one)) ??
+    lines.at(-1) ??
+    `it wrote nothing to ${SERVE}`
+  );
+}
+
 // A crash writes its error last, so the log says why the server falls. [[spec/design_output/level0#a-crash-writes-its-error]]
 export async function crashed(own, where, error, exit = process.exit) {
   try {
@@ -369,7 +463,7 @@ function answer(response, status, said) {
   response.end(JSON.stringify(said));
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (runsHere(import.meta.url, process.argv)) {
   const args = process.argv.slice(2);
   const at = args.indexOf("--port");
   const method =
@@ -378,7 +472,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     ) ?? process.cwd();
   const port =
     Number(at >= 0 ? args[at + 1] : process.env.SE_BRIDGE_PORT) ||
-    registeredPort(disk(), process.env, clock(), method, process.platform === "win32");
+    registeredPort(disk(), process.env, clock(), method, process.pid, process.platform === "win32");
   await takesOver(port);
   serve(method, port);
 }

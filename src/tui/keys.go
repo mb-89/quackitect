@@ -114,6 +114,10 @@ func (m model) bands() []band {
 
 // [[spec/design_output/tui#the-help-reads-the-cursor]]
 func (m model) key(name string) (tea.Model, tea.Cmd) {
+	// A preset's key stands before the bands, so the same key presses it over the tab and under the pane. [[spec/design_output/tui#one-key-filters-the-line]]
+	if m.pressKey(name) {
+		return m, nil
+	}
 	for _, held := range m.bands() {
 		for _, one := range held.acts {
 			if matches(name, one.key) {
@@ -132,7 +136,19 @@ func (m model) helpParts(w int) []part {
 		parts = append(parts, held.lines()...)
 		parts = append(parts, part{})
 	}
+	// The presets stand in the filter pane alone, so the help names none. [[spec/design_output/tui#one-key-filters-the-line]]
 	return append(parts, part{text: strings.TrimSpace(HelpText)})
+}
+
+// The sign the help draws for shift, so a chord stays short. [[spec/design_output/tui#the-help-reads-the-cursor]]
+const shiftSign = "⇧"
+
+// A key reads as a person presses it, so a capital under alt reads as alt, the shift sign and the letter. [[spec/design_output/tui#the-help-reads-the-cursor]]
+func keyShown(name string) string {
+	if strings.HasPrefix(name, "alt+") && len(name) == len("alt+")+1 && name[len(name)-1] >= 'A' && name[len(name)-1] <= 'Z' {
+		return "alt+" + shiftSign + strings.ToLower(name[len(name)-1:])
+	}
+	return name
 }
 
 // [[spec/design_output/tui#the-help-reads-the-cursor]]

@@ -97,19 +97,19 @@ func TestTheWheelMovesTheLogOverTheListAndScrollsThePaneOverThePane(t *testing.T
 	}
 }
 
-func TestThePressAndTheWheelReachNothingWhileTheFilterTakesLetters(t *testing.T) {
+// The mouse reaches the rows under the filter pane, the way it does under the details. [[spec/design_output/tui#the-mouse-reaches-the-window]]
+func TestThePressAndTheWheelReachTheRowsWhileTheFilterTakesLetters(t *testing.T) {
 	t.Parallel()
 	m := alt(window(5), 'f')
 	if m.pane != paneFilter {
 		t.Fatalf("alt+f opens the filter, and the pane reads %d", m.pane)
 	}
-	was := m.at()
 	m = click(m, 10, firstRow())
-	if m.at() != was || m.pane != paneFilter {
-		t.Fatalf("a press reaches nothing while the filter takes letters, and the cursor stands at %d", m.at())
+	if m.at() != 0 || m.pane != paneFilter {
+		t.Fatalf("a press selects the first row under the pane, and the cursor stands at %d", m.at())
 	}
 	m = wheel(m, 10, false)
-	if m.at() != was {
-		t.Fatalf("the wheel reaches nothing while the filter takes letters, and the cursor stands at %d", m.at())
+	if m.at() != wheelStep {
+		t.Fatalf("the wheel moves the log under the pane, and the cursor stands at %d", m.at())
 	}
 }

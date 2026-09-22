@@ -2,6 +2,7 @@
 // over a command line runs here before the command does.
 // [[spec/design_output/bash#what-the-door-reads]]
 
+import { join } from "node:path";
 import {
   commitIn,
   findings,
@@ -30,14 +31,10 @@ import {
   touchesGit,
   versionRefs,
 } from "../../.claude/skills/level0/lib/trunk.js";
-import { PROSE } from "../../.claude/skills/level0/lib/vale.js";
-import {
-  refusedWarnings,
-  warningsOn,
-} from "../../.claude/skills/level0/lib/warnings.js";
 import { WORK_BRANCH } from "../engine/group.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
+import { errorsIn } from "./write.js";
 
 const COMMIT = "level0-commit.md";
 const PASS = { pass: true };
@@ -50,7 +47,6 @@ export async function onBash(e, box) {
     privateDelta,
     testedDelta,
     todoOnPush,
-    warningsOnPush,
     trunkGuard,
     versionGuard,
   ];
@@ -67,11 +63,16 @@ export function onDescribe(e) {
   return { after: { description: verbLine() } };
 }
 
+// The box carries no join, so the door hands the reading the work root and the join of the path module. [[spec/tickets/one-door-joins-a-path]]
+function reader(box) {
+  return { disk: box.disk, root: box.work, join };
+}
+
 // [[spec/design_output/bash#a-shell-writes-nothing]]
 async function commandRules(command, _e, box) {
   const found = findings(command, asks(box, "names.words"), {
     cloud: onACloud(box),
-    script: (path) => fileText(box.disk, box.work, path),
+    script: (path) => fileText(reader(box), path),
   });
   found.push(...(await commitVoice(command, box)));
   if (!onACloud(box) && skipsTheHook(command)) {
@@ -89,13 +90,13 @@ async function commandRules(command, _e, box) {
   return refusedCommand(command, found);
 }
 
-// [[spec/design_output/bash#a-commit-message-meets-voice]]
+// A message meets the voice rules, and a break of form lands the way a write does. [[spec/rationales/voice#11-form-and-substance]]
 export async function messageFaults(message, box) {
   if (!box.vale.stands()) return [];
   const text = withoutTrailers(String(message ?? ""));
   if (!text.trim()) return [];
   const ran = await box.vale.lint(text, COMMIT);
-  return ran.ran ? readsProse(box, text, ran.found) : [];
+  return ran.ran ? errorsIn(readsProse(box, text, ran.found)) : [];
 }
 
 // [[spec/design_output/bash#a-commit-message-meets-voice]]
@@ -136,7 +137,7 @@ async function testedDelta(command, _e, box) {
   const merging = Boolean(await git(box, ["rev-parse", "-q", "--verify", "MERGE_HEAD"]));
   const found = untestedIn(
     await git(box, ["diff", "--cached", "--unified=0"]),
-    (path) => fileText(box.disk, box.work, path),
+    (path) => fileText(reader(box), path),
     merging,
   );
   if (!found.length) return "";
@@ -174,50 +175,7 @@ function todoOnPush(command, _e, box) {
   return refusedTodo(found);
 }
 
-// [[spec/tickets/one-list-holds-the-warnings]]
-async function warningsOnPush(command, _e, box) {
-  if (!touchesGit(command).pushes) return "";
-  const names = [
-    ...new Set(
-      git(box, ["log", "--format=", "--name-only", "HEAD", "--not", "--remotes"])
-        .split("\n")
-        .map((row) => row.trim())
-        .filter(Boolean),
-    ),
-  ];
-  const found = warningsOn(await lintedHere(box, names), names);
-  if (!found.length) return "";
-  box.log.say("warn", "bash", `refused a push over ${found[0].rule}`, {
-    tool: "Bash",
-    file: found[0].file,
-  });
-  return refusedWarnings(found);
-}
-
-// [[spec/tickets/one-list-holds-the-warnings]]
-async function lintedHere(box, names) {
-  const read = names.filter((one) => PROSE.test(one));
-  if (!read.length || !box.vale?.stands()) return [];
-  const found = [];
-  for (const name of read) {
-    const whole = textAt(box, name);
-    if (!whole) continue;
-    const said = await box.vale.lint(whole, name);
-    if (said.ran)
-      found.push(
-        ...readsProse(box, whole, said.found).map((one) => ({ ...one, file: name })),
-      );
-  }
-  return found;
-}
-
-function textAt(box, name) {
-  try {
-    return String(box.disk.read(`${box.work}/${name}`));
-  } catch {
-    return "";
-  }
-}
+// A warning reads red in the battery, so the trunk guard below holds a push over one without a rule of its own. [[spec/design_output/work#the-battery-answers-first]]
 
 // [[spec/design_output/work#a-version-branch-stands]]
 function versionGuard(command, _e, box) {
@@ -230,7 +188,7 @@ function versionGuard(command, _e, box) {
   return refusedVersion(found);
 }
 
-// [[spec/design_output/work#a-red-battery-pushes-nothing]]
+// [[spec/design_output/work#the-battery-answers-first]]
 function trunkGuard(command, _e, box) {
   const how = landsOnTrunk(
     command,
@@ -271,7 +229,7 @@ function trunkGuard(command, _e, box) {
   ].join("\n");
 }
 
-// A CLOUD BOX HOLDING A WORK BRANCH HANDS IT BACK, AND EVERY OTHER CLOUD SESSION LANDS ITS OWN WORK. The queue owns a work branch, so a cloud box taking one carries it to the hand-back and moves trunk nowhere. A session outside that flow answers to the owner alone, and the green battery is the door it meets. [[spec/design_output/work#a-red-battery-pushes-nothing]]
+// A CLOUD BOX HOLDING A WORK BRANCH HANDS IT BACK, AND EVERY OTHER CLOUD SESSION LANDS ITS OWN WORK. The queue owns a work branch, so a cloud box taking one carries it to the hand-back and moves trunk nowhere. A session outside that flow answers to the owner alone, and the green battery is the door it meets. [[spec/design_output/work#the-battery-answers-first]]
 function takesABranch(box) {
   return git(box, ["rev-parse", "--abbrev-ref", "HEAD"]).startsWith(WORK_BRANCH);
 }

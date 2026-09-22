@@ -142,7 +142,7 @@ reason: done
 A bare folder becomes a project the method drives, with nothing copied in, in one command.
 
 <!-- breaks, as text: what breaks if it is never done -->
-The button has nothing to run, and a project starts by hand from a copy of this tree.
+The button has nothing to run, and a project starts by hand from a clone of this tree.
 
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 - `./RUNME.sh stub into <folder>` writes the project folders, the record, the shim, the settings and the bridgehead
@@ -190,7 +190,7 @@ Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub
 pass
 - the approach covers every row of the ask: the verb, the record, the contract test and the chapter
 - the ask says brand and the approach says name, and the chapter binds the two, so `name` stands
-- the ask reads the identity off the register and the chapter off `.se/copy.json`, so implement settles the source
+- the ask reads the identity off the register and the chapter off `.se/.runtime/identity.json`, so implement settles the source
 - the record carries `version` and `made` past what the ask names, so the contract test reads both back
 - the chapter names `test/contract/stub.test.js`, so the tests-red step writes the test there
 - the chapter hands the register road to the next group, so the shim stops at its two roads
@@ -333,7 +333,7 @@ A new verb, `stub into`, writes a bare project the vehicle drives from outside. 
 
 pass
 - the branch does every line of the ask: the verb, the record, the refusal, the contract test and the chapter
-- the record reads the identity off `.se/copy.json`, and the chapter says so, which settles the source
+- the record reads the identity off `.se/.runtime/identity.json`, and the chapter says so, which settles the source
 - `./RUNME.sh check` answers exit 0 on the tip, with one test skipped and none failing
 - the diff reaches two tickets past the brief, and each hunk is a trivial fix or a verb's mark
 - the refusal on no remote has a unit test and a contract test, each with a repo lacking origin

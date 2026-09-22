@@ -47,13 +47,10 @@ test("a binding the config leaves unsaid hands work out", () => {
 // [[spec/design_output/config#the-engine-controls]]
 test("the checks reading the engine's own work stand down at god", () => {
   assert.equal(typeof standsDown, "function", "stop.js answers standsDown");
-  const wanted = [
-    "ticket-in-hand",
-    "group-in-hand",
-    "work-waiting",
-    "warnings-standing",
-  ];
+  const wanted = ["ticket-in-hand", "group-in-hand", "work-waiting"];
   for (const name of wanted) assert.equal(standsDown(name, "god"), true, name);
+  // A warning lands under every binding, and the hand drains it, so the check stands at god too. [[spec/design_output/config#the-engine-controls]]
+  assert.equal(standsDown("warnings-standing", "god"), false);
 });
 
 test("those same checks hold at the queue and at unbound", () => {
@@ -72,11 +69,10 @@ test("every other check holds at god, because it reads something else", () => {
   }
 });
 
-test("the list names the four, and the stop rules name each of them", () => {
+test("the list names the three, and the stop rules name each of them", () => {
   assert.deepEqual([...(ENGINE_CHECKS ?? [])].sort(), [
     "group-in-hand",
     "ticket-in-hand",
-    "warnings-standing",
     "work-waiting",
   ]);
   for (const name of ENGINE_CHECKS ?? []) assert.ok(EVERY.includes(name), name);

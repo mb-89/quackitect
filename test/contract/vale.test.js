@@ -310,3 +310,57 @@ ifVale(
     },
   ),
 );
+
+// A count spelled in words before the things it counts meets the digit rule, and a word counting nothing passes. [[spec/guidance/voice]]
+ifVale(
+  "a count in words before a plural meets the digit rule, and a count word alone passes",
+  proves(
+    {
+      counted: at(
+        "Three verbs answer what their asks name, and the list has four rows.\n",
+        "spec/design_output/probe.md",
+      ),
+      quiet: at(
+        "The verbs answer what their asks name, and two of them read the queue.\n",
+        "spec/design_output/probe.md",
+      ),
+    },
+    (said) => {
+      assert.equal(
+        said.rules("counted").filter((one) => one === "DigitInProse").length,
+        2,
+      );
+      assert.deepEqual(
+        said.rules("quiet").filter((one) => one === "DigitInProse"),
+        [],
+      );
+    },
+  ),
+);
+
+// A span inside one line pairs first, so a lone mark takes no opening mark off the line under it, and every fault names the item's line. [[spec/tickets/a-lone-mark-pairs-wrong]]
+ifVale(
+  "a lone mark on a list item pairs with no span under it",
+  proves(
+    {
+      apart: at(
+        "- the mark ` opens a span, and the door reads it\n\nThe door reads `x` on this line, and the rule leaves it alone.\n",
+        "notes.md",
+      ),
+      together: at(
+        "- the mark ` opens a span, and the door reads it\n- the door reads `x` on this item, and the rule leaves it alone\n",
+        "notes.md",
+      ),
+    },
+    (said) => {
+      for (const key of ["apart", "together"]) {
+        const lines = said.found(key).map((one) => one.line);
+        assert.ok(lines.includes(1), `no fault names the item's line on ${key}`);
+        assert.ok(
+          lines.every((one) => one === 1),
+          `a fault stands off the item's line on ${key}`,
+        );
+      }
+    },
+  ),
+);

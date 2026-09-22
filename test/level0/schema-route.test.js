@@ -4,11 +4,9 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import {
-  mintNote,
-  placeholderFaults,
-  readNote,
-} from "../../.claude/skills/level0/lib/schema.js";
+import { placeholderFaults } from "../../.claude/skills/level0/lib/schema-body.js";
+import { mintNote } from "../../.claude/skills/level0/lib/schema-mint.js";
+import { readNote } from "../../.claude/skills/level0/lib/schema-read.js";
 import { ROUTE, ROUTED, routed } from "./schema-notes.js";
 
 const route = `---
@@ -90,7 +88,7 @@ test("an evidence field off its enum is refused two lists deep", () => {
   assert.match(one.message, /text, command/);
 });
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 test("a value naming no step is refused, and the refusal names every step", () => {
   const one = routed(route.replace("on_fail: draft", "on_fail: nowhere"))[0];
   assert.equal(one.rule, "Schema.OnFail");
@@ -98,14 +96,14 @@ test("a value naming no step is refused, and the refusal names every step", () =
   assert.match(one.message, /design\/draft/);
 });
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 test("a value naming a step at or after its own is refused", () => {
   const one = routed(route.replace("on_fail: draft", "on_fail: ship"))[0];
   assert.equal(one.rule, "Schema.OnFail");
   assert.match(one.message, /standing before design\/review/);
 });
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 test("a name reads a sibling first, and a path with a slash says exactly", () => {
   assert.deepEqual(
     routed(route.replace("on_fail: draft", "on_fail: design/draft")),
@@ -117,20 +115,20 @@ test("a name reads a sibling first, and a path with a slash says exactly", () =>
   );
 });
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 test("a step naming a phase where the schema names a leaf is refused", () => {
   const one = routed(route.replace("step: design/review", "step: design"))[0];
   assert.equal(one.rule, "Schema.step");
   assert.match(one.message, /names a leaf, and design holds steps/);
 });
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 test("a word the rule passes over stands, and a prefix names the step after it", () => {
   assert.deepEqual(routed(route.replace("by: not draft", "by: anyone")), []);
   assert.ok(routed(route.replace("by: not draft", "by: not nowhere")).length);
 });
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 test("a chapter missing for a step is refused, and a chapter naming none too", () => {
   const gone = routed(route.replace("## review\n", ""));
   assert.deepEqual(

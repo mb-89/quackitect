@@ -34,7 +34,7 @@ mkdir -p "$run"
 # folders.js owns these names as MOVED.
 for one in bin hold review undo measure copilot box.json session.json \
   tools.json hold.json check.json index.db index.json lsp.json copilot-cloud \
-  show-panel config.json identity.json project.json work.json vehicle.json; do
+  show-panel config.json identity.json project.json vehicle.json; do
   old="$root/.se/$one"
   new="$run/$one"
   [ -d "$old" ] || [ -f "$old" ] || continue
@@ -266,7 +266,7 @@ compiler_here() {
 # THE SERVER IS PURE GO, SO IT NEEDS NO COMPILER AND NO NETWORK. It shares no
 # step with the index above: that one is C and waits on a toolchain, and this
 # one builds beside it in under a second on every box.
-# [[spec/design_output/lsp#the-build-beside-the-index]]
+# [[spec/design_output/index#the-compiler-it-needs]]
 # A binary older than its own source lints against rules the tree no longer
 # carries, so a source newer than the binary asks for the build again.
 lsp_here() {
@@ -352,7 +352,7 @@ get_index() {
 # THE LANGUAGE CLIENT IS THE EXTENSION'S ONE DEPENDENCY, PINNED IN ITS MANIFEST.
 # The link points at the tree, so the modules land beside the extension and no
 # copy travels. A box with no registry keeps the sidebar and loses the server.
-# [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+# [[spec/design_output/lsp#one-checker-every-front-asks]]
 client_folder="$root/src/extension/node_modules/vscode-languageclient"
 
 get_client() {

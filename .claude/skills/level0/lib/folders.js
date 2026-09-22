@@ -29,7 +29,6 @@ export const MOVED = [
   "tools.json",
   "undo",
   "vehicle.json",
-  "work.json",
 ];
 
 // The older names of the runtime folder, which the installer renames before anything else. [[spec/design_input/the-runtime-files-stand-apart]]
@@ -52,8 +51,6 @@ export const HOLD = `${RUN}/hold.json`;
 export const LOG = `${PRIVATE}/.log`;
 export const NOTES = `${PRIVATE}/notes`;
 export const TICKETS = `${PRIVATE}/tickets`;
-// The work answer is regenerated state, so it stands in the runtime folder. [[spec/design_output/work#one-verb-answers-git]]
-export const ANSWER = `${RUN}/work.json`;
 
 // [[spec/design_input/the-runtime-files-stand-apart]]
 export function inRetro(name) {

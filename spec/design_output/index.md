@@ -18,12 +18,12 @@ header of each file under `src/index` says which piece it holds.
 It lives at `.se/.runtime/index.db`, which stays on the box it stands on. The version
 and the root ride in a `meta` row, and either one disagreeing drops the file
 whole. The tree fills it again in seconds, and a half-migrated index answers
-out of a shape two writers disagree about.
+out of a shape differing writers disagree about.
 
 ## The rows the walk writes
 
-One walk fills four tables and two full-text ones. It writes them in a single
-transaction, so a reader meets the whole answer or the one before it.
+One walk fills every table below in a single transaction, so a reader
+meets the whole answer or the one before it.
 
 | table | what it holds |
 |---|---|
@@ -92,6 +92,24 @@ sweep carries what it holds.
 A box where no watch stands still answers, out of the walk the door makes on
 the way up.
 
+## The index fires on change
+
+A reader wanting to redraw on a change asks `changes` and names the tick it
+holds. The call holds until a sweep moves the rows past that tick, and answers
+the tick then. So a reader calls again with the tick it takes, and each answer is a
+change. A reader holding no tick names zero, and the walk on the way up counts
+one.
+
+| what the reader meets | what the call answers |
+|---|---|
+| a sweep past the tick it names | the tick now, the moment the sweep lands |
+| no sweep inside the wait | the tick it holds, so the reader asks again |
+| the door going down | the call fails, and the reader starts a door the way every caller does |
+
+The wait holds no guard, so every other call answers past a waiting one. The
+sweep settles a burst first, so a change reaches the reader inside a second of
+the write. `awaits` in `door.go` holds the call, and a contract case times it.
+
 ## The questions it answers
 
 Each one is a walk the tree takes in one call:
@@ -105,13 +123,36 @@ Each one is a walk the tree takes in one call:
 | `links` | what reaches a note, which is what a person asks before moving one |
 | `dangling` | every link naming nothing this tree holds |
 | `same` | every file carrying the size and hash of another |
+| `tickets` | every ticket with its fields, and the standing its group's branch gives it |
+| `changes` | the tick past the one a caller names, once a sweep moves the rows |
 | `reindex` | the walk again, now |
 | `standing` | the root the door holds, and how many files it counts |
+
+## The index answers the tickets
+
+`tickets` answers every note of kind `ticket`, one row a ticket, and a reader
+opens no file and no git for it. `ticket.go` holds it, and
+`./RUNME.sh index tickets` prints the rows.
+
+| the key | what it carries |
+|---|---|
+| `name`, `path` | the note's id, and where it stands |
+| `state`, `step`, `group`, `urgent`, `todo` | the fields off the top of the front |
+| `route` | the process the ticket rides, as its own name, so `group` marks a group |
+| `standing` | what the branch gives it, as the words below |
+| `says` | the whole Ask chapter, past the mint's comments, which the tab's details draw |
+| `changed` | the time of the file's last change, off the `file` table, so a view sorts the newest done ticket first |
+
+A key nested under `record` or `steps` shadows no field, because the reader
+takes the top of the front alone. A branch informs a ticket's standing and
+nothing more. A group's standing derives from its own record. For details, see
+[[spec/design_output/work#held-derives-from-the-record]]. A ticket naming a
+group answers its group's standing, and a ticket in no group carries none.
 
 ## A rename reaches a name
 
 `./RUNME.sh rename <from> <to>` moves a name and carries every reach with it.
-`src/scripts/rename.js` holds it, and it works in three moves:
+`src/scripts/rename.js` holds it, and it works in the moves below:
 
 | the move | what it asks | what it catches |
 |---|---|---|
@@ -119,7 +160,7 @@ Each one is a walk the tree takes in one call:
 | write | the folder's move, then a rewrite of each reach | every pointer the read names |
 | prove | the rows `links` answers, then `./RUNME.sh check` | a row naming the old name, then every other rule |
 
-The read asks two readers, because each answers half: `linksIn` in
+The read asks separate readers, because each answers half: `linksIn` in
 `src/index/front.go` records a note link alone, and the walk finds the rest.
 
 A reach stands on a word edge, so `renamedText` leaves a longer word alone. The
@@ -133,8 +174,8 @@ the score back, so a caller sees how far the first answer stands above the
 second.
 
 `notes` weights the columns: a note whose name carries the word scores ten
-times what a body mention scores. So asking for `index` answers the two notes
-about the index, ahead of every note that mentions one.
+times what a body mention scores. So asking for `index` answers the notes
+named for it first, ahead of every note that only mentions one.
 
 `find` reads `line_text`, whose one indexed column leaves nothing to weight.
 It ranks by how rare the words are and how short the line is.
@@ -152,7 +193,7 @@ the ones the caller asks for around them.
 | `grep` | every line one pattern matches, with its neighbours |
 | `glob` | every path one glob names, the newest first |
 
-The write door hands these two answers back to the agent in place of the tools
+The write door hands these answers back to the agent in place of the tools
 that walk a disk. Where a search asks for something these rows hold no answer
 for, the door says so and the disk answers instead.
 
@@ -237,16 +278,16 @@ answers for the same pattern.
 
 ## A note and its links
 
-A note is a markdown file carrying frontmatter between two rulers. Its keys
+A note is a markdown file carrying frontmatter fenced by rulers. Its keys
 land in `note`, its body lands in the full-text table, and every bracketed name
 in the frontmatter or the body lands in `link`.
 
-A link resolves against four things, in this order. The file at that exact
+A link resolves against the things below, in this order. The file at that exact
 path comes first, then the same path with `.md` on the end. Then the note whose
 `id` matches, and last the folder of that name. An anchor after a `#` drops
 before any of it.
 
-Two kinds of bracket stay out of `link`. The `kind` key names a taxonomy and no
+Some kinds of bracket stay out of `link`. The `kind` key names a taxonomy and no
 file, and a target carrying `<` or `>` is a shape a document spells out. Both
 read as broken links forever, which costs `dangling` its meaning.
 

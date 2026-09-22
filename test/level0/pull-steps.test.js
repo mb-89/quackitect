@@ -480,7 +480,7 @@ kind: [[ticket]]
 state: open
 urgency: whenever
 process: [[${process}]]
-${todo ? "todo: true\n" : ""}steps:
+${todo ? `todo: ${todo}\n` : ""}steps:
   - name: decide
     does: says what the note becomes
     by: ${process === "note" ? "retro" : "anyone"}
@@ -501,7 +501,8 @@ A thing to look at.
 # Discussion
 `;
   const first = doors(
-    standing(CHILD(), GROUP_NOTE, { [at(".se/tickets/parked.md")]: note(true) }),
+    // A todo naming a row tags the note the way a bare true does. [[spec/design_output/pull#a-todo-forces-a-place]]
+    standing(CHILD(), GROUP_NOTE, { [at(".se/tickets/parked.md")]: note("a-child") }),
   );
   const tagged = heard(() => pulling(ROOT, ["pull"], first.it));
   assert.match(tagged.said, /^work {2}parked at decide/);

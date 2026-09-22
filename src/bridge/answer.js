@@ -24,8 +24,9 @@ export const SAYS = (why) =>
     "Then work.",
   ].join(" ");
 
-export function demands(box, why, block = "", onPaid = null) {
-  box.demand = { why, seen: box.spoken ?? "", skips: 1, block, onPaid };
+// The skips are the grace: the block rides that many calls, and the next one asks for the reply. [[spec/design_output/stop#the-grace]]
+export function demands(box, why, block = "", onPaid = null, skips = 1) {
+  box.demand = { why, seen: box.spoken ?? "", skips: Math.max(1, Number(skips) || 1), block, onPaid };
 }
 
 // [[spec/design_output/level0#which-prompt-opens-a-turn]]

@@ -8,7 +8,6 @@ import (
 	"quackitect/yaml"
 
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -24,7 +23,9 @@ type Box struct {
 }
 
 type Tree struct {
-	Root  string
+	Root string
+	// The disk the tree reads through, so a case hands it a memory one. [[spec/tickets/a-door-holds-file-calls]]
+	disk  Disk
 	Words int
 	Node  string
 	Box   Box
@@ -52,10 +53,15 @@ func (one *Tree) Restated(pass func() []Finding) []Finding {
 }
 
 func treeAt(root string) *Tree {
-	return &Tree{Root: root, overlay: map[string]string{}}
+	return treeOver(root, realDisk{})
 }
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/tickets/a-door-holds-file-calls]]
+func treeOver(root string, disk Disk) *Tree {
+	return &Tree{Root: root, disk: disk, overlay: map[string]string{}}
+}
+
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 func (one *Tree) Holds(path, text string) {
 	one.guard.Lock()
 	defer one.guard.Unlock()
@@ -70,7 +76,7 @@ func (one *Tree) Drops(path string) {
 	one.held, one.restated, one.passed = nil, nil, false
 }
 
-// Whether an editor holds the file's text, which stands in for the disk. [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// Whether an editor holds the file's text, which stands in for the disk. [[spec/design_output/lsp#one-checker-every-front-asks]]
 func (one *Tree) Held(path string) bool {
 	one.guard.Lock()
 	defer one.guard.Unlock()
@@ -86,7 +92,7 @@ func (one *Tree) Read(path string) string {
 	if open {
 		return text
 	}
-	read, err := os.ReadFile(filepath.Join(one.Root, filepath.FromSlash(said)))
+	read, err := one.disk.ReadFile(filepath.Join(one.Root, filepath.FromSlash(said)))
 	if err != nil {
 		return ""
 	}
@@ -94,12 +100,12 @@ func (one *Tree) Read(path string) string {
 }
 
 func (one *Tree) Exists(path string) bool {
-	_, err := os.Stat(filepath.Join(one.Root, filepath.FromSlash(path)))
+	_, err := one.disk.Stat(filepath.Join(one.Root, filepath.FromSlash(path)))
 	return err == nil
 }
 
 func (one *Tree) Names(folder, end string) []string {
-	found, err := os.ReadDir(filepath.Join(one.Root, filepath.FromSlash(folder)))
+	found, err := one.disk.ReadDir(filepath.Join(one.Root, filepath.FromSlash(folder)))
 	if err != nil {
 		return nil
 	}
@@ -123,50 +129,9 @@ func (one *Tree) Paths() []string {
 
 	out := gitHolds(one.Root)
 	if out == nil {
-		out = diskHolds(one.Root)
+		out = diskHolds(one.disk, one.Root)
 	}
 	one.held = out
-	return out
-}
-
-// [[spec/design_output/tree#the-tree-handed-in]]
-func gitHolds(root string) []string {
-	read, err := gitFiles(root)
-	if err != nil {
-		return nil
-	}
-	out := []string{}
-	for _, line := range yaml.SplitLines(string(read)) {
-		path := strings.TrimSpace(line)
-		if path != "" && !isDraft(path) {
-			out = append(out, path)
-		}
-	}
-	return out
-}
-
-// [[spec/design_output/tree#the-tree-handed-in]]
-func diskHolds(root string) []string {
-	out := []string{}
-	filepath.WalkDir(root, func(where string, entry os.DirEntry, err error) error {
-		if err != nil {
-			return nil
-		}
-		name := entry.Name()
-		if entry.IsDir() {
-			if where != root && (name == ".git" || name == ".se" || name == "node_modules") {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		said, err := filepath.Rel(root, where)
-		if err != nil || isDraft(said) {
-			return nil
-		}
-		out = append(out, slashed(said))
-		return nil
-	})
-	sort.Strings(out)
 	return out
 }
 

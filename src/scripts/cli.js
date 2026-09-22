@@ -1,18 +1,19 @@
 // The command line. One verb a row, each one naming what it does and the
 // function behind it, and the dispatch at the foot of the table.
-// [[spec/design_output/level0#one-command-does-it]]
+// [[spec/design_output/level0#what-level-zero-is]]
 
 import { dirname, join } from "node:path";
+import { RUN } from "../../.claude/skills/level0/lib/folders.js";
+import { runsHere } from "../../.claude/skills/level0/lib/paths.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
-import {
-  fieldsIn,
-  mintedNote,
-  SCHEMAS,
-  schemasIn,
-} from "../../.claude/skills/level0/lib/schema.js";
+import { SCHEMAS, schemasIn } from "../../.claude/skills/level0/lib/schema.js";
+import { fieldsIn, mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { attachTo } from "../bridge/vehicle.js";
 import { git } from "../doors/git.js";
+import { whereIs } from "../engine/tools.js";
+import { batteryOf, spawnsIn } from "./battery.js";
 import {
+  commitDoors,
   doctor,
   doorsHold,
   fix,
@@ -23,11 +24,10 @@ import {
   projectionsHold,
   readConfig,
   serverHolds,
+  splitDoors,
   standing,
   tools,
   treeHere,
-  commitDoors,
-  splitDoors,
   tuiDoors,
   under,
 } from "./cli-check.js";
@@ -43,9 +43,7 @@ import {
   root,
   TESTS,
 } from "./cli-doors.js";
-import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { asksIndex, lint, version } from "./cli-read.js";
-import { batteryOf, spawnsIn } from "./battery.js";
 import { batteryRun, stamped } from "./cli-stamp.js";
 import { graphIn } from "./graph.js";
 import { probe } from "./probe.js";
@@ -55,7 +53,6 @@ import { renaming, renamingText } from "./rename.js";
 import { retro } from "./retro.js";
 import { stubInto } from "./stub.js";
 import { ticket } from "./ticket.js";
-import { whereIs } from "../engine/tools.js";
 import {
   detach,
   entryFor,
@@ -215,22 +212,25 @@ export const verb = argv.find((a) => !a.startsWith("-")) ?? "help";
 export const where = argv.filter((a) => !a.startsWith("-") && a !== verb);
 export const rest = argv.slice(argv.indexOf(verb) + 1);
 
-if (verb === "help" || !verbs[verb]) {
-  if (verb !== "help") console.error(`se: there is no verb called ${verb}\n`);
-  console.log("Usage: ./RUNME.sh <verb> [path ...]\n");
-  for (const [name, one] of Object.entries(verbs)) {
-    console.log(`  ${name.padEnd(COL.verb)} ${one.says}`);
+// [[spec/design_output/doors#a-script-guards-its-main]]
+if (runsHere(import.meta.url, process.argv)) {
+  if (verb === "help" || !verbs[verb]) {
+    if (verb !== "help") console.error(`se: there is no verb called ${verb}\n`);
+    console.log("Usage: ./RUNME.sh <verb> [path ...]\n");
+    for (const [name, one] of Object.entries(verbs)) {
+      console.log(`  ${name.padEnd(COL.verb)} ${one.says}`);
+    }
+    process.exit(verb === "help" ? 0 : 2);
   }
-  process.exit(verb === "help" ? 0 : 2);
+  process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
 }
-process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
 
 // [[spec/design_output/vehicle#three-things-a-vehicle-needs]]
 export function theVehicle(argv) {
   const env = process.env;
   const said = argv[0] ?? "here";
   const pair = rootsHere(files, env, root);
-  const made = entryFor(files, it.clock, env, pair.method, version());
+  const made = entryFor(files, it.clock, env, pair.method, version(), it.pid);
 
   if (said === "produce" || said === "into") {
     const dest = argv[1];
@@ -248,7 +248,7 @@ export function theVehicle(argv) {
     return 0;
   }
   if (said === "attach") {
-    const settled = attachTo(files, env, it.clock, pair.work, pair.method, WINDOWS);
+    const settled = attachTo(files, env, it.clock, pair.work, pair.method, it.pid, WINDOWS);
     console.log(
       `${pair.work} names ${made.id} as the vehicle driving it, at port ${settled.port}.`,
     );
@@ -280,7 +280,9 @@ export function theVehicle(argv) {
 export function renameHere(argv) {
   const [from, to] = argv.filter((one) => !one.startsWith("-"));
   if (!from || !to) {
-    console.error("se rename <from> <to>: say the name that moves and the one it takes.");
+    console.error(
+      "se rename <from> <to>: say the name that moves and the one it takes.",
+    );
     return 2;
   }
   const it = { disk: files, join, root, git: git(outside, root) };
@@ -296,7 +298,9 @@ export function renameHere(argv) {
   for (const one of said.wrote) console.log(`  ${one}`);
   // A rule that skips says what it skips, so a hand reads what the run left out. [[spec/design_output/index#a-rename-reaches-a-name]]
   for (const one of said.skipped ?? []) {
-    console.log(`  the reader reads ${one} as a picture, so the rewrite leaves it alone`);
+    console.log(
+      `  the reader reads ${one} as a picture, so the rewrite leaves it alone`,
+    );
   }
   console.log("Run ./RUNME.sh links, then ./RUNME.sh check.");
   return 0;
@@ -322,6 +326,7 @@ export function theStub(argv) {
     it.clock,
     pair.method,
     atRoot(dest),
+    it.pid,
     {
       upstream,
     },

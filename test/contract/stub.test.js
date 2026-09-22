@@ -49,7 +49,7 @@ test("a stub holds its files, reads every one back, and no file of the method", 
   const where = files.tempDir("stub-");
   const dest = join(where, "stub");
   try {
-    const said = stubInto(files, git(outside, root), clock(), root, dest);
+    const said = stubInto(files, git(outside, root), clock(), root, dest, process.pid);
     assert.equal(said.ok, true, said.why);
     assert.ok(files.exists(dest), "the stub stands");
     assert.deepEqual(
@@ -75,7 +75,7 @@ test("a stub holds its files, reads every one back, and no file of the method", 
     const record = JSON.parse(files.read(join(dest, "vehicle.json")));
     assert.equal(
       record.vehicle,
-      identityHere(files, clock(), root),
+      identityHere(files, clock(), root, process.pid),
       "the identity is this vehicle's",
     );
     assert.equal(record.name, basename(root), "the name is this folder's");
@@ -98,7 +98,7 @@ test("a stub's plugin carries the name its settings allow, so a tool answers to 
   const where = files.tempDir("stub-");
   const dest = join(where, "stub");
   try {
-    const said = stubInto(files, git(outside, root), clock(), root, dest);
+    const said = stubInto(files, git(outside, root), clock(), root, dest, process.pid);
     assert.equal(said.ok, true, said.why);
     const name = basename(PLUGIN);
     assert.equal(
@@ -124,7 +124,7 @@ test("the shim hands a verb to the vehicle it names", () => {
   const where = files.tempDir("stub-");
   const dest = join(where, "stub");
   try {
-    const said = stubInto(files, git(outside, root), clock(), root, dest);
+    const said = stubInto(files, git(outside, root), clock(), root, dest, process.pid);
     assert.equal(said.ok, true, said.why);
     const vehicle = fakeVehicle(where);
     const ran = outside.run(["sh", "RUNME.sh", "vehicle"], {
@@ -221,12 +221,12 @@ test("a vehicle with no remote refuses, and the folder stands as it was", () => 
   files.makeDir(repo);
   try {
     assert.equal(outside.run(["git", "init", "-q"], { cwd: repo }).exitCode, 0);
-    const refused = stubInto(files, git(outside, repo), clock(), root, dest);
+    const refused = stubInto(files, git(outside, repo), clock(), root, dest, process.pid);
     assert.equal(refused.ok, false);
     assert.match(refused.why, /--upstream/);
     assert.equal(files.exists(dest), false, "a refusal writes nothing");
 
-    const named = stubInto(files, git(outside, repo), clock(), root, dest, {
+    const named = stubInto(files, git(outside, repo), clock(), root, dest, process.pid, {
       upstream: "https://host/c/d.git",
     });
     assert.equal(named.ok, true, named.why);
@@ -280,7 +280,7 @@ slow(
     const dest = join(where, "stub");
     files.makeDir(home);
     try {
-      const said = stubInto(files, git(outside, root), clock(), root, dest, {
+      const said = stubInto(files, git(outside, root), clock(), root, dest, process.pid, {
         upstream: root,
       });
       assert.equal(said.ok, true, said.why);
@@ -320,7 +320,7 @@ slow(
       const driver = JSON.parse(files.read(join(dest, ".se", "project.json"))).driver;
       assert.equal(
         driver,
-        identityHere(files, clock(), cloned),
+        identityHere(files, clock(), cloned, process.pid),
         "the driver is the clone's identity",
       );
       const pointer = JSON.parse(
