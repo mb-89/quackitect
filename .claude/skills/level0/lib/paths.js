@@ -2,6 +2,9 @@
 // Vale and the judge both read the path the repo root holds.
 // [[spec/design_output/level0#the-path-a-rule-reads]]
 
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
 export function relativeTo(root, path) {
   const said = slashed(path);
   const at = slashed(root).replace(/\/+$/, "");
@@ -15,6 +18,11 @@ export function relativeTo(root, path) {
 
 export function matches(glob, path) {
   return globOf(glob).test(slashed(path));
+}
+
+// A script runs its main where node runs that file, so a test importing it registers its cases and meets no exit. [[spec/design_output/doors#a-script-guards-its-main]]
+export function runsHere(url, argv) {
+  return Boolean(argv[1]) && resolve(argv[1]) === fileURLToPath(url);
 }
 
 // [[spec/design_output/schema#the-underscore-parks-a-draft]]

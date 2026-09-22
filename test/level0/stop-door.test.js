@@ -6,7 +6,13 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { dropsHold, onStop, reportStands, sawCall, sawPrompt } from "../../src/bridge/stop.js";
+import {
+  dropsHold,
+  onStop,
+  reportStands,
+  sawCall,
+  sawPrompt,
+} from "../../src/bridge/stop.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -27,7 +33,6 @@ const RULES = `
   priority: 80
   decides: mechanical
   runs: queue-waits
-  firm: true
   says: The queue holds work for this box, so run ./RUNME.sh ticket pull and carry on.
 
 - id: the-last-line-names-no-stop
@@ -62,7 +67,13 @@ const RULES = `
 `;
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
-const REFACTOR = { parallel: true, mostWarnings: 2, mostAtOnce: 1, untouchedFor: "7d", grace: 1 };
+const REFACTOR = {
+  parallel: true,
+  mostWarnings: 2,
+  mostAtOnce: 1,
+  untouchedFor: "7d",
+  grace: 1,
+};
 
 const NOW = 1_800_000_000;
 const WEEK = 604_800;
@@ -137,11 +148,32 @@ test("the queue rule reads the cloud off the box's own environment", () => {
   const was = process.env.CLAUDE_CODE_REMOTE;
   process.env.CLAUDE_CODE_REMOTE = "true";
   try {
-    assert.match(onStop(done, bare.box).result.block, /The queue holds work for this box/);
+    assert.match(
+      onStop(done, bare.box).result.block,
+      /The queue holds work for this box/,
+    );
   } finally {
     if (was === undefined) delete process.env.CLAUDE_CODE_REMOTE;
     else process.env.CLAUDE_CODE_REMOTE = was;
   }
+});
+
+// The cap ends a turn over the queue rule too, so a session refusing the stop line over work it leaves untaken ends at the number the config names. [[spec/tickets/the-stop-line-loops-forever]]
+test("four stop lines over a queue holding work: three hold, the fourth ends, and the log names the runaway", () => {
+  const free =
+    "---\nkind: [[ticket]]\nstate: open\nurgency: soon\nsteps:\n  - name: do\n---\n\n# Ask\n\nA thing.\n";
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+  const it = box({ [at("spec/tickets/a-free.md")]: free });
+  const carried = [];
+  for (let turn = 0; turn < 4; turn++) carried.push(onStop(done, it.box));
+  assert.deepEqual(
+    carried.map((one) => one.pass === true),
+    [false, false, false, true],
+  );
+  assert.match(carried[0].result.block, /The queue holds work for this box/);
+  const last = it.said.filter((row) => row[1] === "stop").at(-1);
+  assert.equal(last[0], "warn", "the runaway writes at warn");
+  assert.match(last[2], /the turn ends: the tooth lets go after 3 holds in a row/);
 });
 
 test("a standing stop line ends the turn, and nothing prompts after it", () => {
@@ -161,7 +193,10 @@ test("a standing stop line ends the turn, and nothing prompts after it", () => {
 
 // A talk stop with no report in the same message holds the turn, and one under the needs table ends it. [[spec/design_output/stop#a-talk-follows-a-report]]
 test("a talk stop ends the turn only where the same message carries the report", () => {
-  const bare = onStop({ last_assistant_message: "stop: the-owner-asks-to-talk" }, box().box);
+  const bare = onStop(
+    { last_assistant_message: "stop: the-owner-asks-to-talk" },
+    box().box,
+  );
   assert.match(bare.result.block, /the-owner-asks-to-talk: .*carry the report/);
   const report = [
     "The work stands here.",
@@ -177,17 +212,32 @@ test("a talk stop ends the turn only where the same message carries the report",
   const it = box();
   assert.deepEqual(onStop({ last_assistant_message: report }, it.box), { pass: true });
   assert.match(it.said[0][2], /the turn ends/);
-  assert.equal(reportStands("# What the agent needs\n\nnothing under it"), false, "a heading with no row is no report");
+  assert.equal(
+    reportStands("# What the agent needs\n\nnothing under it"),
+    false,
+    "a heading with no row is no report",
+  );
 });
 
 // A claim of done meets the plan: a todo open or a thing in hand holds the turn, and an empty plan lets it end. [[spec/design_output/stop#the-plan]]
 test("a claim of done holds while the plan holds a todo or a thing in hand", () => {
-  const done = { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" };
-  const busy = box({ [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "the door", todos: [] }) });
+  const done = {
+    last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete",
+  };
+  const busy = box({
+    [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "the door", todos: [] }),
+  });
   assert.match(onStop(done, busy.box).result.block, /nothing in hand/);
-  const parked = box({ [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [{ title: "one" }] }) });
+  const parked = box({
+    [at(".se/.runtime/plan.json")]: JSON.stringify({
+      working: "",
+      todos: [{ title: "one" }],
+    }),
+  });
   assert.match(onStop(done, parked.box).result.block, /no todo open/);
-  const empty = box({ [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [] }) });
+  const empty = box({
+    [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [] }),
+  });
   assert.deepEqual(onStop(done, empty.box), { pass: true });
 });
 
@@ -232,7 +282,11 @@ ${RULES}`;
     { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" },
     it.box,
   );
-  assert.deepEqual(said, { pass: true }, "the stop stands, and the strange rule fires nothing");
+  assert.deepEqual(
+    said,
+    { pass: true },
+    "the stop stands, and the strange rule fires nothing",
+  );
 });
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]

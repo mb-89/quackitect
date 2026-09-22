@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: findings
 steps:
   - name: do
@@ -27,6 +27,19 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box a05106ef44c2 · claude-code-remote
+    hash_before: 59867fba24a4bd2b1a35c4b19a22692cbda61603
+    hash_after: 59867fba24a4bd2b1a35c4b19a22692cbda61603
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 18 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -39,27 +52,21 @@ The command line's main stands behind a guard, so a test importing src/scripts/c
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+./RUNME.sh branch test test/level0/outside-hand.test.js test/level0/paths.test.js test/level0/server-crash.test.js
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
-
-<!-- the form is text -->
+The command line dispatches its verb behind a guard, so a test importing it registers its cases and meets no exit. The guard stands as `runsHere` in the paths library, and the server reads it there too. The register case the empty pass hid names the file the reader reads, and writes the marker the reader wants. So it passes on the reader's own terms.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask: the file reports its cases, and a failing case turns the run red
+- the cleanup is in the change: the server reads the one guard, and the register case names its file
+- every fact stands in one place: the doors note holds the guard, and the code points at it
 
 # Discussion
 

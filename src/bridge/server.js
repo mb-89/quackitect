@@ -3,10 +3,9 @@
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { BINDING, GOD } from "../../.claude/skills/level0/lib/config.js";
-import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
-import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
+import { FOLDER as LOG_FOLDER, SERVE } from "../../.claude/skills/level0/lib/log.js";
+import { relativeTo, runsHere } from "../../.claude/skills/level0/lib/paths.js";
 import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { awake } from "../doors/awake.js";
 import { biome } from "../doors/biome.js";
@@ -26,20 +25,12 @@ import {
   onTurnEnd,
   SPOKE,
 } from "./answer.js";
-import { holdsGrace } from "./grace.js";
-import {
-  asksForPlan,
-  PLAN,
-  PLAN_CALL,
-  planField,
-  SPECS as planSpecs,
-  TOOLS as planTools,
-} from "./plan.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
 import { asks } from "./config.js";
 import { FINDINGS, findingsFor, heldFor } from "./findings.js";
+import { holdsGrace } from "./grace.js";
 import {
   onAgentSpawn,
   onPromptContext,
@@ -50,6 +41,14 @@ import {
   owesCanary,
   surveyHere,
 } from "./guidance.js";
+import {
+  asksForPlan,
+  PLAN,
+  PLAN_CALL,
+  planField,
+  SPECS as planSpecs,
+  TOOLS as planTools,
+} from "./plan.js";
 import { freshens } from "./projection.js";
 import { SPECS as proseSpecs, TOOLS as proseTools } from "./prose.js";
 import { movedCode } from "./reload.js";
@@ -83,6 +82,8 @@ const SOON = 20;
 const TAKEOVER_PROBE = 2000;
 const TAKEOVER_PAUSE = 100;
 const TAKEOVER_TRIES = 50;
+// The window the old server watches the new one for, past the takeover and the listen. [[spec/design_output/level0#a-restart-watches-its-child]]
+const RESPAWN_WAIT = 3000;
 const PASS = { pass: true };
 
 const DOORS = {
@@ -155,13 +156,22 @@ function specsOf(box) {
 function withPlanField(spec) {
   if (spec.name === PLAN) return spec;
   const properties = { ...(spec.inputSchema?.properties ?? {}), plan: planField() };
-  return { ...spec, inputSchema: { ...(spec.inputSchema ?? { type: "object" }), properties } };
+  return {
+    ...spec,
+    inputSchema: { ...(spec.inputSchema ?? { type: "object" }), properties },
+  };
 }
 
 // The field on a level zero call answers the ask the way the plan call does. [[spec/design_output/stop#the-plan]]
 function planRides(e, box) {
   const tool = String(e?.tool ?? "");
-  if (!e?.plan || typeof e.plan !== "object" || !tool.startsWith("mcp__level0__") || tool === PLAN_CALL) return;
+  if (
+    !e?.plan ||
+    typeof e.plan !== "object" ||
+    !tool.startsWith("mcp__level0__") ||
+    tool === PLAN_CALL
+  )
+    return;
   planTools[PLAN_CALL](e.plan, box);
 }
 
@@ -298,10 +308,7 @@ export function serve(method, port = PORT_BASE, say = console.log) {
   const restart = () => {
     held.release();
     own.log.say("info", "bridge", `the server restarts at ${where}`);
-    server.close(() => {
-      wire().respawn(process.argv.slice(1));
-      process.exit(0);
-    });
+    server.close(() => respawned(own, [process.execPath, ...process.argv.slice(1)]));
   };
 
   const onRequest = (request, response) => {
@@ -385,6 +392,39 @@ export function serve(method, port = PORT_BASE, say = console.log) {
   return server;
 }
 
+// The old server watches the new one for a window, so a respawn that falls writes why to the log, and no silent port stays behind. [[spec/design_output/level0#a-restart-watches-its-child]]
+export async function respawned(own, argv, exit = process.exit, wait = RESPAWN_WAIT) {
+  const out = join(own.work, ...SERVE.split("/"));
+  own.disk.makeDir(join(own.work, ...LOG_FOLDER.split("/")));
+  const was = own.disk.exists(out) ? String(own.disk.read(out)) : "";
+  const born = await own.proc.respawn(argv, { out, waitMs: wait });
+  if (!born.fell) return exit(0);
+  const now = own.disk.exists(out) ? String(own.disk.read(out)) : "";
+  const wrote = (now.startsWith(was) ? now.slice(was.length) : now).trim();
+  try {
+    await own.log.say(
+      "fatal",
+      "bridge",
+      `the respawn falls with exit ${born.exitCode}: ${reasonIn(wrote)}`,
+      { said: wrote },
+    );
+  } catch {}
+  exit(1);
+}
+
+// The line naming the fault, out of what the child wrote: the first naming an error, else the last. [[spec/design_output/level0#a-restart-watches-its-child]]
+function reasonIn(wrote) {
+  const lines = wrote
+    .split("\n")
+    .map((one) => one.trim())
+    .filter(Boolean);
+  return (
+    lines.find((one) => /error/i.test(one)) ??
+    lines.at(-1) ??
+    `it wrote nothing to ${SERVE}`
+  );
+}
+
 // A crash writes its error last, so the log says why the server falls. [[spec/design_output/level0#a-crash-writes-its-error]]
 export async function crashed(own, where, error, exit = process.exit) {
   try {
@@ -421,7 +461,7 @@ function answer(response, status, said) {
   response.end(JSON.stringify(said));
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (runsHere(import.meta.url, process.argv)) {
   const args = process.argv.slice(2);
   const at = args.indexOf("--port");
   const method =

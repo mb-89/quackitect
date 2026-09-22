@@ -105,6 +105,16 @@ and no port. For details, see
 `FakeDoorsInTest` refuses a real door inside `test/level0`, so a test
 landing in the wrong folder says so at once.
 
+# A script guards its main
+
+A script that dispatches at import runs its main under the test importing it,
+and the exit there ends the run. The runner then reports the file as one
+passing case holding none, so the test-first door reads a pass that proves
+nothing. So a script with a main runs it behind `runsHere` in
+`lib/paths.js`, which answers true where node runs that file itself. The
+command line and the server read it there. A test importing the command
+line's verbs registers its cases, and a failing case turns the run red.
+
 # One contract test per door
 
 A fake with nothing behind it drifts from the thing it stands for. So each door
