@@ -130,12 +130,35 @@ function batteryOf(battery) {
     if (!items?.length) return [];
     return ["", `${title}:`, "", ...items.map((one) => `- ${cell(one)}`)];
   };
+  const named = (one) => (one.file ? `${one.file} · ${one.name}` : one.name);
   out.push(
-    ...rows("New among the slowest", battery.fresh, (one) => `${one.name} (${one.ms} ms)`),
-    ...rows("Grown", battery.grown, (one) => `${one.name} (${one.before} to ${one.ms} ms)`),
-    ...rows("Gone from the slowest", battery.gone, (one) => `${one.name} (${one.ms} ms)`),
+    ...rows("New among the slowest", battery.fresh, (one) => `${named(one)} (${one.ms} ms)`),
+    ...rows("Grown", battery.grown, (one) => `${named(one)} (${one.before} to ${one.ms} ms)`),
+    ...rows("Gone from the slowest", battery.gone, (one) => `${named(one)} (${one.ms} ms)`),
+    ...spawnsOf(battery.spawns),
+    ...filesOf(battery.files),
+    ...rows("Parts left unrun", battery.unrun, (one) => one),
+    ...rows("Red, in the case's own words", battery.red, (one) => `${named(one)}: ${one.said}`),
   );
   return [...out, ""];
+}
+
+// The spawns a run made, and how many of them are Vale, beside the last retro's. [[spec/guidance/retro/effect]]
+function spawnsOf(spawns) {
+  const said = (one) => (one ? `${one.all} spawns, ${one.vale} of them Vale` : "no tally");
+  if (!spawns) return [];
+  return ["", `Spawns: ${said(spawns.now)}, against ${said(spawns.before)} at the last retro.`];
+}
+
+// A time a test file, the slowest first, beside the last retro's. [[spec/guidance/retro/effect]]
+function filesOf(files) {
+  if (!files?.length) return [];
+  return [
+    "",
+    "| file | before | now |",
+    "|---|---|---|",
+    ...files.map((one) => `| ${one.name} | ${one.before} | ${one.now} |`),
+  ];
 }
 
 // The table of references: a row per question and improvement, a column per chapter. [[spec/guidance/retro/read]]

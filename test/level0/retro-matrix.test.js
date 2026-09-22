@@ -179,17 +179,25 @@ test("the report draws the battery beside the effect, part by part, with the cas
     battery: {
       total: { before: 1300, now: 1820 },
       parts: [{ part: "tests", before: 1000, now: 1500, delta: 500 }],
-      fresh: [{ name: "arrives", ms: 80 }],
+      fresh: [{ name: "arrives", ms: 80, file: "b.js" }],
       grown: [{ name: "grows", before: 100, ms: 200 }],
       gone: [{ name: "leaves", ms: 50 }],
+      files: [{ name: "a.js", before: 300, now: 400 }],
+      unrun: ["rules"],
+      red: [{ file: "a.js", name: "grows", said: "too slow" }],
+      spawns: { before: { all: 200, vale: 150 }, now: { all: 20, vale: 8 } },
     },
   };
   const report = reportOf(RETRO, [], { effect });
   assert.match(report, /### The battery/);
   assert.match(report, /1300 ms at the last retro, 1820 ms at this one\./);
   assert.match(report, /\| tests \| 1000 \| 1500 \| 500 \|/);
-  assert.match(report, /- arrives \(80 ms\)/);
+  assert.match(report, /- b\.js · arrives \(80 ms\)/);
   assert.match(report, /- grows \(100 to 200 ms\)/);
   assert.match(report, /- leaves \(50 ms\)/);
+  assert.match(report, /Spawns: 20 spawns, 8 of them Vale, against 200 spawns, 150 of them Vale at the last retro\./);
+  assert.match(report, /\| a\.js \| 300 \| 400 \|/);
+  assert.match(report, /Parts left unrun:\n\n- rules/);
+  assert.match(report, /- a\.js · grows: too slow/);
   assert.doesNotMatch(reportOf(RETRO, [], { effect: { classes: [] } }), /The battery/);
 });

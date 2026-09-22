@@ -24,7 +24,7 @@ test("the battery runs its parts in order, times each, and stops at the first re
   ];
 
   const green = await batteryRun([step("tests", 0), step("rules", undefined)], clock);
-  assert.deepEqual(green, { code: 0, parts: { tests: 100, rules: 100 } });
+  assert.deepEqual(green, { code: 0, parts: { tests: 100, rules: 100 }, unrun: [] });
 
   ran.length = 0;
   const red = await batteryRun(
@@ -34,6 +34,7 @@ test("the battery runs its parts in order, times each, and stops at the first re
   assert.equal(red.code, 1);
   assert.deepEqual(ran, ["tests", "go"], "a red part stops the run");
   assert.deepEqual(Object.keys(red.parts), ["tests", "go"]);
+  assert.deepEqual(red.unrun, ["rules"], "the stamp names what the red left unrun");
 });
 
 test("a green run stamps ok with no warning, and a red run stamps the code", () => {

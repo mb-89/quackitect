@@ -9,15 +9,19 @@ import { partsTimed } from "./battery.js";
 import { files, it, root } from "./cli-doors.js";
 import { warningsStood } from "./cli-read.js";
 
-// The battery in order, each part timed under its name, stopping at the first red. [[spec/guidance/retro/effect]]
+// The battery in order, each part timed under its name, stopping at the first red and naming the parts it leaves unrun. [[spec/guidance/retro/effect]]
 export async function batteryRun(steps, clock) {
   const { parts, timed } = partsTimed(clock);
   let code = 0;
+  const unrun = [];
   for (const [name, part] of steps) {
+    if (code) {
+      unrun.push(name);
+      continue;
+    }
     code = (await timed(name, part)) ?? 0;
-    if (code) break;
   }
-  return { code, parts };
+  return { code, parts, unrun };
 }
 
 // [[spec/design_output/work#the-battery-answers-first]]

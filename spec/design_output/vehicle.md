@@ -116,6 +116,14 @@ Proven against a real vehicle, in `test/contract/vehicle.test.js`:
 A fresh vehicle takes the steps any fresh clone takes: `git init`, and one
 run of `RUNME`, which surveys the tools and builds what it needs.
 
+The case runs that `RUNME` over a fake install, so it proves the verbs and
+waits for no fetch. `test/contract/fetching.js` names the wants that reach
+past the box, and the case skips every one through `SE_INSTALL_SKIP`. The
+vehicle borrows the method's modules through a link, and the survey this box
+holds. Its home is a folder the case makes. The stub's cases point the shim at
+a vehicle of one script the file writes. So a shim case proves the hand-over,
+and runs no install.
+
 The run bit travels with the scripts. A vehicle whose `RUNME.sh` arrives
 a file nobody can run answers `Permission denied`, and the vehicle stands there unable to
 take its own first step.
@@ -226,14 +234,19 @@ a marketplace, so its `name` and its owner's name take the brand. A file
 carrying an `author` is a plugin, so its author takes the brand and its own
 name stands. A file carrying neither comes back as it stands.
 
-Git holds neither file. Where one stands nowhere, as on a fresh clone, the stamp
-writes it from the shape `src/scripts/brand.js` holds, and the plugin's version
-reads off `package.json`. So every box carries both, and no box commits them.
+Every target reads a source in the brand folder, `spec/config/brand`, and git
+ignores the targets alone:
 
-The extension's icon reads the brand folder. `spec/config/brand/icon.svg` is
-the mark a vehicle draws, and the install script writes it to the path
-`src/extension/package.json` names. Git ignores that target, so one icon
-stands. Each vehicle wears its own mark, and nothing keeps multiple marks in step.
+| source | target |
+|---|---|
+| `marketplace.json` | `.claude-plugin/marketplace.json` |
+| `plugin.json` | `.claude/skills/level0/.claude-plugin/plugin.json` |
+| `icon.svg` | the path `src/extension/package.json` names |
+
+So a fresh clone carries no target, and the stamp writes each one on the first
+run. A target reading the brand already stays as it is. The icon is the mark a
+vehicle draws, and two vehicles wear two marks, and nothing holds those two in
+step.
 
 ## Two roads to the vehicle
 

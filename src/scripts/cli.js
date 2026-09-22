@@ -11,7 +11,7 @@ import { fieldsIn, mintedNote } from "../../.claude/skills/level0/lib/schema-min
 import { attachTo } from "../bridge/vehicle.js";
 import { git } from "../doors/git.js";
 import { whereIs } from "../engine/tools.js";
-import { batteryOf } from "./battery.js";
+import { batteryOf, spawnsIn } from "./battery.js";
 import {
   commitDoors,
   doctor,
@@ -66,15 +66,18 @@ import { cloud, pulling, work } from "./work.js";
 
 // The root reads the platform once, and the register road takes it off the hand. [[spec/design_output/doors#a-door-reads-the-outside]]
 const WINDOWS = process.platform === "win32";
-// The runner writes its TAP beside the stamp, so the battery's report names the slowest cases. [[spec/guidance/retro/effect]]
-const TAP = `${RUN}/tests.tap`;
+// The runner's own reporter writes a line a case beside the stamp, so the battery's report names the slowest cases and their files. [[spec/design_output/work#the-battery-answers-first]]
+const TIMES = `${RUN}/tests.jsonl`;
+const REPORTER = "src/scripts/battery-reporter.js";
+// The process door writes one line a spawn here while the tests run, so the stamp counts them. [[spec/design_output/work#the-battery-answers-first]]
+const SPAWNS = `${RUN}/spawns.txt`;
 
 export const verbs = {
   check: {
     says: "the tests, the doors, the server, then the rules over the tree",
     // Each part runs timed, so the stamp carries the battery's report and a retro reads it. [[spec/guidance/retro/effect]]
     run: async (w) => {
-      const { code, parts } = await batteryRun(
+      const { code, parts, unrun } = await batteryRun(
         [
           ["tests", () => test()],
           ["go", () => goHolds()],
@@ -86,7 +89,7 @@ export const verbs = {
         ],
         it.clock,
       );
-      return stamped(code, batteryOf(parts, tapHere()));
+      return stamped(code, batteryOf(parts, timesHere(), { unrun, spawns: spawnsHere() }));
     },
   },
   lint: { says: "the rules over the tree, or over what you name", run: lint },
@@ -353,26 +356,34 @@ export function serveBridge(argv) {
 
 export function test() {
   files.makeDir(join(root, ...RUN.split("/")));
+  const tally = join(root, ...SPAWNS.split("/"));
+  files.write(tally, "");
   const ran = outside.run(
     [
       process.execPath,
       "--test",
       "--test-reporter=spec",
       "--test-reporter-destination=stdout",
-      "--test-reporter=tap",
-      `--test-reporter-destination=${join(root, ...TAP.split("/"))}`,
+      `--test-reporter=${join(root, ...REPORTER.split("/"))}`,
+      `--test-reporter-destination=${join(root, ...TIMES.split("/"))}`,
       TESTS,
       CONTRACT_TESTS,
     ],
-    { cwd: root, inherit: true },
+    { cwd: root, inherit: true, env: { SE_SPAWNS: tally } },
   );
   return ran.exitCode;
 }
 
 // [[spec/guidance/retro/effect]]
-function tapHere() {
-  const at = join(root, ...TAP.split("/"));
+function timesHere() {
+  const at = join(root, ...TIMES.split("/"));
   return files.exists(at) ? files.read(at) : "";
+}
+
+// The spawns the last test run tallied, or nothing where no run wrote one. [[spec/guidance/retro/effect]]
+function spawnsHere() {
+  const at = join(root, ...SPAWNS.split("/"));
+  return files.exists(at) ? spawnsIn(files.read(at)) : null;
 }
 
 // [[spec/design_output/projection#what-goes-where-is-data]]

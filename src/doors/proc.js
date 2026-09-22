@@ -2,6 +2,7 @@
 // [[spec/design_output/doors#one-door-per-outside-thing]]
 
 import { spawn, spawnSync } from "node:child_process";
+import { disk } from "./disk.js";
 import { closeSync, openSync } from "node:fs";
 
 const KIB = 1024;
@@ -10,8 +11,14 @@ const BUFFER_MIB = 64;
 const BUFFER = BUFFER_MIB * MIB;
 
 export function proc() {
+  // The tally the check names, one line a spawn, so the battery counts what a run reaches. [[spec/design_output/work#the-battery-answers-first]]
+  const tally = process.env.SE_SPAWNS;
+  const noted = (argv) => {
+    if (tally) disk().append(tally, `${argv[0]}\n`);
+  };
   return {
     run(argv, init = {}) {
+      noted(argv);
       const ran = spawnSync(argv[0], argv.slice(1), {
         cwd: init.cwd,
         env: init.env ? { ...process.env, ...init.env } : undefined,
@@ -33,6 +40,7 @@ export function proc() {
     },
     // A run the caller waits on with the event loop free, so a server answers others meanwhile. [[spec/design_output/lsp]]
     start(argv, init = {}) {
+      noted(argv);
       return new Promise((done, fail) => {
         const child = spawn(argv[0], argv.slice(1), {
           cwd: init.cwd,

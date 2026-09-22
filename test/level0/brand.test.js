@@ -10,6 +10,7 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import {
+  BRAND,
   ICON_SOURCE,
   ICON_TARGET,
   MARKETPLACE,
@@ -122,22 +123,20 @@ test("a vehicle whose folder slugs to nothing refuses the stub, and writes nothi
   assert.equal(files.exists("/stub"), false);
 });
 
+// The sources the brand folder holds, as the tree tracks them. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+const sources = {
+  [join("/v", BRAND, "marketplace.json")]: JSON.stringify({ name: "tree", owner: { name: "tree" } }),
+  [join("/v", BRAND, "plugin.json")]: JSON.stringify({ name: "level0", author: { name: "tree" } }),
+  [join("/v", ICON_SOURCE)]: "<svg/>",
+};
+
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
-test("the stamp writes the brand into the marketplace, the plugin and the icon", () => {
-  const files = fakeDisk({
-    [join("/v", MARKETPLACE)]: JSON.stringify({
-      name: "old",
-      owner: { name: "old" },
-    }),
-    [join("/v", PLUGIN)]: JSON.stringify({
-      name: "level0",
-      author: { name: "old" },
-    }),
-    [join("/v", ICON_SOURCE)]: "<svg/>",
-  });
+test("the stamp writes the brand into the marketplace, the plugin and the icon, off a clone holding none", () => {
+  const files = fakeDisk(sources);
   const done = stamps(files, "/v", "acme");
   assert.deepEqual(done, [MARKETPLACE, PLUGIN, ICON_TARGET]);
   assert.equal(JSON.parse(files.read(join("/v", MARKETPLACE))).owner.name, "acme");
+  assert.equal(JSON.parse(files.read(join("/v", MARKETPLACE))).name, "acme");
   assert.equal(JSON.parse(files.read(join("/v", PLUGIN))).name, "level0");
   assert.equal(JSON.parse(files.read(join("/v", PLUGIN))).author.name, "acme");
   assert.equal(files.read(join("/v", ICON_TARGET)), "<svg/>");
@@ -151,12 +150,16 @@ const BRANDED = {
 };
 
 test("a stamp over a tree already reading the brand writes nothing", () => {
-  const files = fakeDisk({
-    ...BRANDED,
-    [join("/v", ICON_SOURCE)]: "<svg/>",
-    [join("/v", ICON_TARGET)]: "<svg/>",
-  });
+  const files = fakeDisk(sources);
+  stamps(files, "/v", "acme");
   assert.deepEqual(stamps(files, "/v", "acme"), []);
+});
+
+test("a stamp over a tree reading another brand writes both manifests again", () => {
+  const files = fakeDisk(sources);
+  stamps(files, "/v", "old");
+  assert.deepEqual(stamps(files, "/v", "acme"), [MARKETPLACE, PLUGIN]);
+  assert.equal(JSON.parse(files.read(join("/v", PLUGIN))).author.name, "acme");
 });
 
 test("a tree carrying no brand icon leaves the extension's own alone", () => {

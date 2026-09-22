@@ -457,6 +457,29 @@ So `done` stops meaning "the session believes this passes". It comes to mean
 reading, `saysGreen` in `lib/runs.js`, answers `done`, the pre-push hook and
 the Bash door alike, so a warning holds every road off the box.
 
+The battery's report rides the stamp under `battery`, and a retro keeps one a
+retro. For what a retro reads off it, see [[spec/guidance/retro/effect]].
+
+| field | holds |
+|---|---|
+| `parts` | a time a part, in the order the check runs them |
+| `total` | their sum |
+| `slowest` | the slowest cases, each with its file |
+| `files` | a time a test file, the slowest first |
+| `unrun` | the parts a red run leaves unrun |
+| `red` | each red case, with the error line the runner writes under it |
+| `spawns` | the spawns the tests make, and how many of them are Vale |
+
+Two writers feed the report while the tests run:
+
+| writer | writes |
+|---|---|
+| `src/scripts/battery-reporter.js`, the runner's reporter the check names beside the spec one | a line a case: its file, its time, and the error's first line where it is red |
+| the process door, where `SE_SPAWNS` names the tally file | a line a spawn, the program's name, in every process the run starts |
+
+So a shell a test starts counts its spawns too, where that shell runs this
+tree's own command line.
+
 The stamp lives under `.se`, which git ignores, so it travels nowhere. A
 different box reads its own answer, and `.github/workflows/check.yml` answers
 for a machine with no stake in it.

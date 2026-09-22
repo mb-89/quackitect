@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // The brand a vehicle stamps on itself. The install script runs this ahead of
-// every verb, so the marketplace name, its owner and the plugin's author each
-// answer the folder the tree stands in.
+// every verb, so both manifests and the icon come out of the brand folder with
+// the marketplace name, its owner and the plugin's author answering the folder
+// the tree stands in.
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 
 import { dirname, join } from "node:path";
@@ -13,12 +14,13 @@ import {
 } from "../../.claude/skills/level0/lib/vehicle.js";
 import { disk } from "../doors/disk.js";
 
+export const BRAND = "spec/config/brand";
 export const MARKETPLACE = ".claude-plugin/marketplace.json";
 export const PLUGIN = ".claude/skills/level0/.claude-plugin/plugin.json";
-export const ICON_SOURCE = "spec/config/brand/icon.svg";
+export const ICON_SOURCE = `${BRAND}/icon.svg`;
 export const ICON_TARGET = "src/extension/icon.svg";
 
-// The shape each manifest takes where none stands, so a fresh clone carries both and git holds neither. The brand lands through brandedJson. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+// The shape a manifest takes where the brand folder carries no source for it, so a clone holding neither still gets both. The brand lands through brandedJson, and the plugin's version reads off package.json. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 const SHAPES = {
   [MARKETPLACE]: {
     name: "",
@@ -40,38 +42,41 @@ const SHAPES = {
   },
 };
 
-// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+// Each target reads its source in the brand folder, so a clone carrying no target gets one. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 export function stamps(files, root, brand) {
   const done = [];
-  for (const rel of [MARKETPLACE, PLUGIN]) {
-    const at = join(root, ...rel.split("/"));
-    const was = readIf(files, at) ?? JSON.stringify(shapeOf(files, root, rel));
-    const made = brandedJson(was, brand);
+  const targets = [
+    [MARKETPLACE, `${BRAND}/marketplace.json`, (text) => brandedJson(text, brand)],
+    [PLUGIN, `${BRAND}/plugin.json`, (text) => brandedJson(text, brand)],
+    [ICON_TARGET, ICON_SOURCE, (text) => text],
+  ];
+  for (const [rel, source, branded] of targets) {
+    const to = join(root, ...rel.split("/"));
+    const was = readIf(files, to);
+    // The source stands where the brand folder carries it, and the shape below answers a clone holding neither. A target standing already reads as its own source. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+    const held =
+      readIf(files, join(root, ...source.split("/"))) ??
+      (was === null ? shapeOf(files, root, rel) : null);
+    if (held === null) continue;
+    const made = branded(held);
     if (made === was) continue;
-    files.makeDir(dirname(at));
-    files.write(at, made);
-    done.push(rel);
-  }
-  const from = join(root, ...ICON_SOURCE.split("/"));
-  const to = join(root, ...ICON_TARGET.split("/"));
-  const icon = readIf(files, from);
-  if (icon !== null && icon !== readIf(files, to)) {
     files.makeDir(dirname(to));
-    files.write(to, icon);
-    done.push(ICON_TARGET);
+    files.write(to, made);
+    done.push(rel);
   }
   return done;
 }
 
-// The plugin's version is the tree's own, read off package.json. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+// The shape a missing source falls back on, and the plugin's version is the tree's own, read off package.json. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 function shapeOf(files, root, rel) {
   const shape = SHAPES[rel];
-  if (rel !== PLUGIN) return shape;
+  if (!shape) return null;
+  if (rel !== PLUGIN) return JSON.stringify(shape);
   try {
     const { version } = JSON.parse(readIf(files, join(root, "package.json")));
-    return version ? { ...shape, version } : shape;
+    return JSON.stringify(version ? { ...shape, version } : shape);
   } catch {
-    return shape;
+    return JSON.stringify(shape);
   }
 }
 

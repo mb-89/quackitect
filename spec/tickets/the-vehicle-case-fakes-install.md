@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-battery-earns-its-time
 step: do
+record:
+  - step: do
+    hand: box 14d41de46d55 · claude-code-remote
+    hash_before: c9826f9143076e854bc4ed5ed00892568447e092
+    hash_after: c9826f9143076e854bc4ed5ed00892568447e092
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -49,28 +62,31 @@ The case runs the vehicle's real install. That install fetches binaries, links t
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/contract/vehicle.test.js test/contract/stub.test.js
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+`test/contract/fetching.js` names the wants of the install that reach past the box. Both files skip every one through `SE_INSTALL_SKIP`. The copy case borrows the method's modules through a link and the survey this box holds. Its home is a folder the case makes, and one copy serves the file's cases. So its `RUNME` runs the install's own checks and its verb, and fetches nothing. The chapter A vehicle stands alone, under `spec/design_output/vehicle.md`, says so.
 
-<!-- the form is text -->
+The stub's shim cases point at a vehicle of one script the file writes, which prints what reaches it. The shim's two roads take one case each, and the shim finding no vehicle takes a case of its own. The command line case writes one stub under the upstream it names. So each case spawns once, and the count of `outside.run` in the stub file answers the cases it holds.
+
+| case | on this box, under the whole battery | place in the ten |
+|---|---|---|
+| a copy answers its own verbs | 422 ms | seventh |
+| the command line writes a stub where it says | 249 ms | tenth |
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask on three lines, and the discussion says why the fourth departs
+- the cleanup it reveals is in the change: one skip list, and the lost road as a case
+- the vehicle note holds the fake install, and both files point at it
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The last line asks that neither file stands in the slowest ten, and one case of each file stands there still. What remains in each is one start of this tree's command line, under a shell for the copy. That start costs what the tenth place costs on this box. Producing a copy writes every file of the method through the disk door, one by one, and the method holds over a thousand. A folder copy in the disk door is a change to a door. So the private note a-copy-writes-each-file carries it to the retro.
+
+The shim's real road stands in the slow case alone, where the vehicle's own library writes the stub's settings. A vehicle of one script carries no library.
