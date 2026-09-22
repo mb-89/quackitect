@@ -5,7 +5,7 @@
 package swap
 
 import (
-	"os"
+	"io/fs"
 	"time"
 )
 
@@ -14,11 +14,11 @@ const look = 5 * time.Second
 
 // Watches calls gone once another file stands at the path this binary starts from. [[spec/design_output/lsp]]
 func Watches(gone func()) {
-	path, err := os.Executable()
+	path, err := executableOf()
 	if err != nil {
 		return
 	}
-	first, err := os.Stat(path)
+	first, err := statOf(path)
 	if err != nil {
 		return
 	}
@@ -33,8 +33,8 @@ func Watches(gone func()) {
 }
 
 // Swapped answers whether the file at the path differs from the one the server started from. [[spec/design_output/lsp]]
-func Swapped(first os.FileInfo, path string) bool {
-	now, err := os.Stat(path)
+func Swapped(first fs.FileInfo, path string) bool {
+	now, err := statOf(path)
 	if err != nil {
 		return false
 	}

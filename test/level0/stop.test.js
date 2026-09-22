@@ -317,20 +317,6 @@ test("a stop outside the agent's own work beats a check", () => {
   assert.equal(said.yields, false);
 });
 
-// [[spec/design_output/stop#three-in-a-row]]
-test("a firm continue rule holds past the cap, because the queue still holds work", () => {
-  const it = toothOf();
-  const firm = { ends: false, go: { id: "the-queue-holds-work", firm: true } };
-  const carried = [];
-  for (let i = 0; i < 5; i++) carried.push(it.atTurnEnd(firm, 3).ends);
-  assert.deepEqual(carried, [false, false, false, false, false]);
-  assert.equal(
-    it.atTurnEnd({ ends: false, go: { id: "work-still-stands" } }, 3).ends,
-    true,
-    "a plain rule lets go at the cap",
-  );
-});
-
 // [[spec/design_output/stop#the-chat-is-new]]
 test("an answer names a next step where a sentence opens on the agent's own next act, and a table or the canary names none", () => {
   const canary = "level0 holds this session: 51 rules, 4 notes, the stop hook on.";

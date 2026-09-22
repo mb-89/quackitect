@@ -73,6 +73,7 @@ export async function doorsHere() {
     binding: await said.ask("engine.binding"),
     ...handDoors(process.env),
     node: process.execPath,
+    pid: process.pid,
     // The retro's collect reads the transcripts and the memory under home, and the scratchpads under temp. [[spec/guidance/retro/collect]]
     home: homeIn(process.env),
     temp: process.env.TEMP || process.env.TMP || process.env.TMPDIR || "",

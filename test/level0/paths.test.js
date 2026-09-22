@@ -4,7 +4,13 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { isDraft, matches, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
+import { fileURLToPath } from "node:url";
+import {
+  isDraft,
+  matches,
+  relativeTo,
+  runsHere,
+} from "../../.claude/skills/level0/lib/paths.js";
 
 const ROOT = "C:/Users/one/Desktop/ai/quackitect-v5";
 
@@ -65,4 +71,12 @@ test("a glob reads one folder deep, and a double star reads past it", () => {
   assert.equal(matches("spec/**/*.md", "spec/deep/down/a.md"), true);
   assert.equal(matches("spec/**/*.md", "other/a.md"), false);
   assert.equal(matches("*answer.md", "level0-answer.md"), true);
+});
+
+// [[spec/design_output/doors#a-script-guards-its-main]]
+test("a script runs its main where node runs that file, and not under an import", () => {
+  const here = fileURLToPath(import.meta.url);
+  assert.equal(runsHere(import.meta.url, ["node", here]), true);
+  assert.equal(runsHere(import.meta.url, ["node", `${here}.other`]), false);
+  assert.equal(runsHere(import.meta.url, ["node"]), false);
 });

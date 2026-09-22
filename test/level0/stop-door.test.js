@@ -33,7 +33,6 @@ const RULES = `
   priority: 80
   decides: mechanical
   runs: queue-waits
-  firm: true
   says: The queue holds work for this box, so run ./RUNME.sh ticket pull and carry on.
 
 - id: the-last-line-names-no-stop
@@ -159,6 +158,24 @@ test("the queue rule reads the cloud off the box's own environment", () => {
   }
 });
 
+// The cap ends a turn over the queue rule too, so a session refusing the stop line over work it leaves untaken ends at the number the config names. [[spec/tickets/the-stop-line-loops-forever]]
+test("four stop lines over a queue holding work: three hold, the fourth ends, and the log names the runaway", () => {
+  const free =
+    "---\nkind: [[ticket]]\nstate: open\nurgency: soon\nsteps:\n  - name: do\n---\n\n# Ask\n\nA thing.\n";
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+  const it = box({ [at("spec/tickets/a-free.md")]: free });
+  const carried = [];
+  for (let turn = 0; turn < 4; turn++) carried.push(onStop(done, it.box));
+  assert.deepEqual(
+    carried.map((one) => one.pass === true),
+    [false, false, false, true],
+  );
+  assert.match(carried[0].result.block, /The queue holds work for this box/);
+  const last = it.said.filter((row) => row[1] === "stop").at(-1);
+  assert.equal(last[0], "warn", "the runaway writes at warn");
+  assert.match(last[2], /the turn ends: the tooth lets go after 3 holds in a row/);
+});
+
 test("a standing stop line ends the turn, and nothing prompts after it", () => {
   const it = box();
   const said = onStop(
@@ -204,12 +221,23 @@ test("a talk stop ends the turn only where the same message carries the report",
 
 // A claim of done meets the plan: a todo open or a thing in hand holds the turn, and an empty plan lets it end. [[spec/design_output/stop#the-plan]]
 test("a claim of done holds while the plan holds a todo or a thing in hand", () => {
-  const done = { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" };
-  const busy = box({ [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "the door", todos: [] }) });
+  const done = {
+    last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete",
+  };
+  const busy = box({
+    [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "the door", todos: [] }),
+  });
   assert.match(onStop(done, busy.box).result.block, /nothing in hand/);
-  const parked = box({ [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [{ title: "one" }] }) });
+  const parked = box({
+    [at(".se/.runtime/plan.json")]: JSON.stringify({
+      working: "",
+      todos: [{ title: "one" }],
+    }),
+  });
   assert.match(onStop(done, parked.box).result.block, /no todo open/);
-  const empty = box({ [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [] }) });
+  const empty = box({
+    [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [] }),
+  });
   assert.deepEqual(onStop(done, empty.box), { pass: true });
 });
 

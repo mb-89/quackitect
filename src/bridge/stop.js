@@ -5,6 +5,7 @@
 import { join } from "node:path";
 import { CHECK, NEEDS_HEADING } from "../../.claude/skills/level0/lib/answer.js";
 import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
+import { BINDING, GOD, QUEUE } from "../../.claude/skills/level0/lib/config.js";
 import {
   controlBlock,
   FINISH,
@@ -13,7 +14,6 @@ import {
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
 import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
-import { BINDING, GOD, QUEUE } from "../../.claude/skills/level0/lib/config.js";
 import { MS, rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
@@ -213,10 +213,16 @@ export function onStop(e, box) {
   const said = toothOf_(box).atTurnEnd(decision, Number(asks(box, MOST) ?? 0));
   const why = said.ends ? endsWhy(said) : (said.go?.says ?? "");
   const prompts = said.ends ? "" : asksForStop(rules, why);
-  box.log.say("info", "stop", `the turn ${said.ends ? "ends" : "holds"}: ${why}`, {
-    detail: `claimed=${claimed || "none"} ${detail(said, said.inARow)}`,
-    prompts: prompts.split("\n")[0],
-  });
+  // The runaway writes at warn, so a reader of the log finds the turn the cap ended. [[spec/design_output/stop#three-in-a-row]]
+  box.log.say(
+    said.runaway ? "warn" : "info",
+    "stop",
+    `the turn ${said.ends ? "ends" : "holds"}: ${why}`,
+    {
+      detail: `claimed=${claimed || "none"} ${detail(said, said.inARow)}`,
+      prompts: prompts.split("\n")[0],
+    },
+  );
   // The owner reads a stop under the debugger, so the server started with the break flag pauses here with the reason and what prompts after. [[spec/design_output/stop#a-standing-stop-ends-it]]
   if (box.env?.[BREAK]) {
     const paused = { why, prompts, claimed, decision: detail(said, said.inARow) };

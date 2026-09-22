@@ -54,6 +54,8 @@ func (one *Checker) Over(path string) []Finding {
 	out = append(out, syntaxFaults(one.tree, where)...)
 	// A pointer this file writes lands where it says, so the editor draws a dead one under the line. [[spec/design_output/lsp#every-pointer-resolves]]
 	out = append(out, pointerFaultsIn(one.tree, placesIn(one.tree), where)...)
+	// And the anchor it names stands as a heading of the note it points at. [[spec/design_output/lsp#a-pointer-reaches-a-heading]]
+	out = append(out, anchorFaults(one.tree, where)...)
 	// A note says again what another holds, so the rule reads the pair. [[spec/design_output/lsp#a-second-copy-draws]]
 	if strings.HasSuffix(where, ".md") {
 		out = append(out, restatedOver(one, where)...)
@@ -107,6 +109,7 @@ func (one *Checker) Sweep() []Finding {
 	one.tree.Forgets()
 	out := append(treeFaults(one.tree), schemaFaults(one.tree)...)
 	out = append(out, syntaxSweep(one.tree)...)
+	out = append(out, anchorSweep(one.tree)...)
 	out = append(out, one.restatedAll()...)
 	return sorted(out)
 }

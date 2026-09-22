@@ -36,7 +36,11 @@ nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
 |---|---|
 | `process.env` and `process.argv` | `it.env` or `box.env`, off the hand a root builds |
 | `process.platform` | a `windows` argument the root reads once |
+| `process.pid` | `it.pid`, off the hand a root builds, so an identity replays |
+| `process.version` | the root alone reads it, for the survey |
+| `process.execPath` | `it.node` or `box.node`, off the root |
 | the Go import running a command | a call into the package's `door.go` |
+| the Go import of `os`, or a package under it | a call into the package's `door.go`, which names each read once, and the tree in `src/lsp` reads through a disk a case fakes |
 
 A root stands off the rule, because it builds the hand every module past it
 reads. `.vale.ini` names each one in a section, beside the doors and their
@@ -104,6 +108,16 @@ and no port. For details, see
 
 `FakeDoorsInTest` refuses a real door inside `test/level0`, so a test
 landing in the wrong folder says so at once.
+
+# A script guards its main
+
+A script that dispatches at import runs its main under the test importing it,
+and the exit there ends the run. The runner then reports the file as one
+passing case holding none, so the test-first door reads a pass that proves
+nothing. So a script with a main runs it behind `runsHere` in
+`lib/paths.js`, which answers true where node runs that file itself. The
+command line and the server read it there. A test importing the command
+line's verbs registers its cases, and a failing case turns the run red.
 
 # One contract test per door
 

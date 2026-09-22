@@ -184,6 +184,22 @@ at `fatal`. So the log names why the server falls, and the next start reads
 as a fresh one. A kill from outside the process writes nothing, so a log
 ending on no `fatal` line names a kill.
 
+## A restart watches its child
+
+A restart closes the port and starts the server again from the same
+arguments. A fault in a moved file ends the new server before the crash
+handler above stands. So a detached start with its output going nowhere
+leaves a silent port, and the desk starts one by hand.
+
+The old server hands the start to the process door, with a window and the
+serve log as the child's output. A child ending inside the window is a fall.
+Then the old server writes
+one `fatal` line naming the exit and the line the child writes, and exits
+with one. A child standing past the window is the server, and the old one
+exits clean. `RESPAWN_WAIT` in `src/bridge/server.js` holds the window, and
+`SERVE` in `lib/log.js` names the file. `respawned` takes the exit as an
+argument, so a case drives the fall through the fake process door.
+
 ## The server holds off sleep
 
 A box asleep answers no hook, so a session under agent control dies with the
@@ -450,7 +466,8 @@ Measured against client 2.1.267, in a session past `4096` messages: at `tool.cal
 also answers its newest `4096` alone, so a position in it shifts.
 
 So the answer gate reads the step first and the transcript second, and lets the
-calls of a response in flight pass.
+calls of a response in flight pass. For details, see
+[[spec/design_output/level0#what-the-door-reads]].
 
 ## Arguments arrive on the event
 

@@ -15,7 +15,6 @@ import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { SIZED } from "../../.claude/skills/level0/lib/size.js";
 import { stopFolderIsData, treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import {
-  CONFIG,
   faultIn,
   fromJson,
   UNREASONED,
@@ -29,6 +28,7 @@ import {
   lineOf,
 } from "../extension/lib/grid.js";
 import { asks } from "./config.js";
+import { assemble } from "../scripts/styles.js";
 
 // The folders no rule reads: the private folder, the packages, git, and a draft under an underscore. [[spec/design_output/tree#the-tree-handed-in]]
 export const PARKED = [
@@ -53,7 +53,7 @@ export async function findingsOver(it, asked) {
   );
   if (!where.length) return { found: [], fault: "" };
   const ran = await it.proc.start(
-    [it.vale, `--config=${CONFIG}`, "--output=JSON", "--no-exit", OURS, ...where],
+    [it.vale, `--config=${configOf(it)}`, "--output=JSON", "--no-exit", OURS, ...where],
     { cwd: it.root },
   );
   const fault =
@@ -100,7 +100,10 @@ export async function findingsFor(box, url) {
       disk: box.disk,
       proc: box.proc,
       join,
-      root: box.method,
+      // The findings read the work root, where a project's notes stand, through the pair the door reads. [[spec/design_output/vehicle#the-styles-assemble-once]]
+      root: box.work,
+      method: box.method,
+      work: box.work,
       vale: whereIs(box.disk, box.method, "vale", known),
       biome: biomeFor(box.disk, box.method, known),
       ceilings: ceilingsOf(box),
@@ -108,6 +111,13 @@ export async function findingsFor(box, url) {
     asked.length ? asked : [WHOLE],
   );
   return { ok: !got.fault, found: got.found, fault: got.fault };
+}
+
+// Every road hands Vale the config the assembly writes over the pair of roots, so a project's own rule reads here as it does at the door. [[spec/design_output/vehicle#the-styles-assemble-once]]
+function configOf(it) {
+  const method = it.method ?? it.root;
+  const work = it.work ?? it.root;
+  return assemble(it.disk, { method, work, itself: method === work }).config;
 }
 
 // The ceilings the code faults read, off the config. [[spec/design_output/level0#the-size-ceiling]]

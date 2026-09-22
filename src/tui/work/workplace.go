@@ -9,7 +9,6 @@ package work
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -80,7 +79,7 @@ const PlanAt = ".se/.runtime/plan.json"
 func writePlace(root, name, value string) error {
 	file := filepath.Join(root, filepath.FromSlash(PlanAt))
 	plan := map[string]any{}
-	if text, err := os.ReadFile(file); err == nil {
+	if text, err := readFile(file); err == nil {
 		_ = json.Unmarshal(text, &plan)
 	}
 	places, _ := plan["places"].(map[string]any)
@@ -97,10 +96,10 @@ func writePlace(root, name, value string) error {
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(filepath.Dir(file), 0o755); err != nil {
+	if err := makeDir(filepath.Dir(file), 0o755); err != nil {
 		return err
 	}
-	return os.WriteFile(file, append(said, '\n'), 0o644)
+	return writeFile(file, append(said, '\n'), 0o644)
 }
 
 // The place a row holds at its own level: the last segment of its queue number, and zero where it holds none or stands ahead of one. [[spec/design_output/pull#a-todo-forces-a-place]]

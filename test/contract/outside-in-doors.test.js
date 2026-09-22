@@ -11,6 +11,7 @@ import { lintText } from "../../.claude/skills/level0/lib/vale.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 import { readTools, whereIs } from "../../src/engine/tools.js";
+import { it } from "../../src/scripts/cli-doors.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -118,4 +119,48 @@ test("the rule stands in a file of its own, and one section a path names it", ()
     [],
     "one section names it once",
   );
+});
+
+// A Go package names the outside in its door.go, so an import of os anywhere else is a module reading the box in place. [[spec/tickets/a-door-holds-file-calls]]
+const OS = 'import (\n\t"fmt"\n\t"os"\n)\n';
+const OS_SIGNAL = 'import "os/signal"\n';
+
+ifVale("the rule refuses a Go import of os outside the package's door", async () => {
+  assert.ok((await ruledAt(OS, "src/lsp/tree.go")).includes(RULE));
+  assert.ok((await ruledAt(OS_SIGNAL, "src/index/main.go")).includes(RULE));
+  assert.ok((await ruledAt(OS, "src/engine/swap/swap.go")).includes(RULE));
+});
+
+ifVale("the rule passes the door of every Go package, and a Go case", async () => {
+  for (const where of ["src/lsp/door.go", "src/index/door.go", "src/engine/swap/door.go"]) {
+    assert.ok(!(await ruledAt(OS, where)).includes(RULE), where);
+    assert.ok(!(await ruledAt(SPAWN, where)).includes(RULE), where);
+  }
+  assert.ok(!(await ruledAt(OS, "src/lsp/tree_test.go")).includes(RULE));
+});
+
+// A module reading the pid, the node version or the exec path in place takes the box into every case of it. [[spec/design_output/doors#a-door-reads-the-outside]]
+const PID = "const owner = String(process.pid);\n";
+const VERSION = 'const node = process.version.replace(/^v/, "");\n';
+const EXEC = "const argv = [process.execPath, script];\n";
+
+ifVale("the rule refuses a module past a root reading the pid, the version or the exec path", async () => {
+  assert.ok((await ruledAt(PID, "src/scripts/vehicle.js")).includes(RULE));
+  assert.ok((await ruledAt(VERSION, "src/bridge/review.js")).includes(RULE));
+  assert.ok((await ruledAt(EXEC, "src/bridge/review.js")).includes(RULE));
+});
+
+ifVale("the rule passes every root and every door reading the three", async () => {
+  for (const where of [...ROOTS, "src/doors/session.js", "src/doors/fake/proc.js"]) {
+    assert.ok(!(await ruledAt(PID, where)).includes(RULE), where);
+    assert.ok(!(await ruledAt(VERSION, where)).includes(RULE), where);
+    assert.ok(!(await ruledAt(EXEC, where)).includes(RULE), where);
+  }
+});
+
+// The hand the command root builds carries the pid and the node path, so a module past it reads neither in place. [[spec/design_output/doors#a-door-reads-the-outside]]
+test("the hand a root builds carries the pid and the node path", () => {
+  assert.equal(typeof it.pid, "number");
+  assert.equal(typeof it.node, "string");
+  assert.ok(it.node.length > 0);
 });

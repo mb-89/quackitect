@@ -6,7 +6,6 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 )
@@ -30,7 +29,7 @@ func Value(root, key string) (any, bool) {
 	if said, found := valueIn(read(root, Tracked), key); found {
 		out, held = said, true
 	}
-	if said := strings.TrimSpace(os.Getenv(EnvOf(key))); said != "" {
+	if said := strings.TrimSpace(envOf(EnvOf(key))); said != "" {
 		out, held = said, true
 	}
 	if said, found := valueIn(read(root, Local), key); found {
@@ -81,7 +80,7 @@ func stringOf(one any) string {
 }
 
 func read(root, path string) map[string]any {
-	held, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+	held, err := readFile(filepath.Join(root, filepath.FromSlash(path)))
 	if err != nil {
 		return nil
 	}

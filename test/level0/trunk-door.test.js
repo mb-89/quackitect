@@ -80,3 +80,4 @@ test("a script standing nowhere leaves the command alone", async () => {
 
   assert.equal(denied(said), "", "the door says nothing");
 });
+

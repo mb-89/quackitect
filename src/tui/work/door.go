@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -37,3 +38,11 @@ func startIndex(root string) error {
 	}
 	return nil
 }
+
+// The outside every other file of this package reads through. [[spec/design_output/doors#a-door-reads-the-outside]]
+func readFile(path string) ([]byte, error) { return os.ReadFile(path) }
+func writeFile(path string, data []byte, mode fs.FileMode) error {
+	return os.WriteFile(path, data, mode)
+}
+func statOf(path string) (fs.FileInfo, error)     { return os.Stat(path) }
+func makeDir(path string, mode fs.FileMode) error { return os.MkdirAll(path, mode) }

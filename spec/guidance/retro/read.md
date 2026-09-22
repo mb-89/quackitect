@@ -6,13 +6,13 @@ rationale: [[spec/rationales/reading]]
 
 # Actionables
 
-1. Read your chapter's lines, the ones `chapters/<id>.json` names, and nothing past them. *
-2. Answer the five starfish questions: start, stop, keep, more, less. *
-3. Answer the five improvements: mechanize, guidance, process, code, tools. *
+1. Read your chapter's lines, the ones `chapters/<id>.json` names, and nothing past them. A reader past its chapter reports what another reader reports, and the count doubles. *
+2. Answer the five starfish questions: start, stop, keep, more, less. A reading that skips one leaves that side of the work unjudged. *
+3. Answer the five improvements: mechanize, guidance, process, code, tools. A finding with no home under one of them goes unbuilt. *
 4. Write `findings/<id>.md` with one section per question and per improvement, and leave a section empty where nothing stands.
 5. Name the evidence of every finding as a file and a line.
-6. Point an improvement at the question it answers by its id, and a question at its improvement the same way. *
-7. Read every script a hand writes, and say whether the engine takes it or the guidance makes it needless. *
+6. Point an improvement at the question it answers by its id, and a question at its improvement the same way. An improvement pointing at nothing answers no question anybody asks. *
+7. Read every script a hand writes, and say whether the engine takes it or the guidance makes it needless. A script nobody reads gets written again next session. *
 8. Run `./RUNME.sh retro matrix <retro>` once every column stands, and read the table it draws.
 
 # Examples

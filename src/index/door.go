@@ -6,15 +6,19 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"io"
+	"io/fs"
 	"net"
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -319,4 +323,35 @@ func (one errorOf) Error() string { return string(one) }
 func writes(w http.ResponseWriter, said answer) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(said)
+}
+
+// The outside every other file of this package reads through. [[spec/design_output/doors#a-door-reads-the-outside]]
+var stderr io.Writer = os.Stderr
+
+func argsOf() []string                     { return os.Args }
+func exits(code int)                       { os.Exit(code) }
+func envOf(key string) string              { return os.Getenv(key) }
+func environOf() []string                  { return os.Environ() }
+func pidOf() int                           { return os.Getpid() }
+func workDirOf() (string, error)           { return os.Getwd() }
+func executableOf() (string, error)        { return os.Executable() }
+func readFile(path string) ([]byte, error) { return os.ReadFile(path) }
+func writeFile(path string, data []byte, mode fs.FileMode) error {
+	return os.WriteFile(path, data, mode)
+}
+func statOf(path string) (fs.FileInfo, error)     { return os.Stat(path) }
+func makeDir(path string, mode fs.FileMode) error { return os.MkdirAll(path, mode) }
+func removeFile(path string) error                { return os.Remove(path) }
+
+// The stop a person or a swapped binary sends, so main waits on one channel and names no signal. [[spec/design_output/doors#a-door-reads-the-outside]]
+func stops(swapped func(gone func())) <-chan struct{} {
+	said := make(chan os.Signal, 1)
+	signal.Notify(said, os.Interrupt, syscall.SIGTERM)
+	swapped(func() { said <- os.Interrupt })
+	out := make(chan struct{})
+	go func() {
+		<-said
+		close(out)
+	}()
+	return out
 }

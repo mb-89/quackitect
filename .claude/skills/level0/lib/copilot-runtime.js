@@ -179,6 +179,8 @@ export async function handle(event, it) {
             vale,
             biome,
             run: checker,
+            config: it.styles?.(),
+            cwd: it.work,
           });
           if (failure) return { deny: failure };
         }
@@ -211,7 +213,13 @@ export async function handle(event, it) {
           text = formatted.text;
           if (text !== read(path)) it.disk.write(it.session.path(path), text);
         }
-        const failure = await check(text, path, { vale, biome, run: checker });
+        const failure = await check(text, path, {
+          vale,
+          biome,
+          run: checker,
+          config: it.styles?.(),
+          cwd: it.work,
+        });
         if (failure) issues.push(failure);
         else state.checked = { ...state.checked, [path]: text };
       }
@@ -273,7 +281,8 @@ export async function handle(event, it) {
   });
 }
 
-async function check(text, path, { vale, biome, run }) {
+// The config comes off the root, which assembles the pair of roots, so this road reads the rule set the door reads. [[spec/design_output/vehicle#the-styles-assemble-once]]
+export async function check(text, path, { vale, biome, run, config, cwd }) {
   if (!PROSE.test(path) && !CODE.test(path)) return "";
   const checkedRun = async (argv, init) => {
     const reply = await run(argv, init);
@@ -293,7 +302,7 @@ async function check(text, path, { vale, biome, run }) {
     return reply;
   };
   const result = PROSE.test(path)
-    ? await lintText(text, path, { bin: vale, run: checkedRun })
+    ? await lintText(text, path, { bin: vale, run: checkedRun, config, cwd })
     : await lintCode(text, path, { bin: biome, run: checkedRun });
   if (!result.ran)
     return `The checker cannot run for ${path}. Repair setup before writing.`;

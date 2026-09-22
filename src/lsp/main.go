@@ -9,11 +9,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
-	"os/signal"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"time"
 
 	"quackitect/swap"
@@ -29,10 +26,10 @@ const (
 )
 
 func main() {
-	argv := os.Args[1:]
+	argv := argsOf()[1:]
 	if len(argv) == 0 {
-		fmt.Fprintln(os.Stderr, usage)
-		os.Exit(misuse)
+		fmt.Fprintln(stderr, usage)
+		exits(misuse)
 	}
 
 	if argv[0] == "version" || argv[0] == "--version" || argv[0] == "-v" {
@@ -42,28 +39,28 @@ func main() {
 
 	root, err := rootHere()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		fmt.Fprintln(stderr, err)
+		exits(1)
 	}
 
 	switch argv[0] {
 	case "lsp":
-		os.Exit(speaks(root))
+		exits(speaks(root))
 	case "serve":
-		os.Exit(serves(root))
+		exits(serves(root))
 	case "check":
-		os.Exit(checks(root, argv[1:]))
+		exits(checks(root, argv[1:]))
 	case "standing", "stop", "sweep":
-		os.Exit(asks(root, argv[0]))
+		exits(asks(root, argv[0]))
 	}
-	fmt.Fprintln(os.Stderr, usage)
-	os.Exit(misuse)
+	fmt.Fprintln(stderr, usage)
+	exits(misuse)
 }
 
 func rootHere() (string, error) {
-	said := os.Getenv("QUACKITECT_ROOT")
+	said := envOf("QUACKITECT_ROOT")
 	if said == "" {
-		here, err := os.Getwd()
+		here, err := workDirOf()
 		if err != nil {
 			return "", err
 		}
@@ -72,17 +69,17 @@ func rootHere() (string, error) {
 	return filepath.Abs(said)
 }
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 func speaks(root string) int {
-	out := bufio.NewWriter(os.Stdout)
+	out := bufio.NewWriter(stdout)
 	defer out.Flush()
 	// The editor starts the server again once it ends, so a swapped binary ends it. [[spec/design_output/lsp]]
 	swap.Watches(func() {
 		out.Flush()
-		os.Exit(0)
+		exits(0)
 	})
-	if err := Speaks(checkerAt(root), os.Stdin, out); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+	if err := Speaks(checkerAt(root), stdin, out); err != nil {
+		fmt.Fprintln(stderr, err)
 		return 1
 	}
 	return 0
@@ -91,15 +88,12 @@ func speaks(root string) int {
 func serves(root string) int {
 	server, _, err := Serve(root)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "the server did not stand:", err)
+		fmt.Fprintln(stderr, "the server did not stand:", err)
 		return 1
 	}
-	defer os.Remove(standingPath(root))
+	defer removeFile(standingPath(root))
 
-	said := make(chan os.Signal, 1)
-	signal.Notify(said, os.Interrupt, syscall.SIGTERM)
-	swap.Watches(func() { said <- os.Interrupt })
-	<-said
+	<-stops(swap.Watches)
 	server.Close()
 	return 0
 }
@@ -125,7 +119,7 @@ func pathsUnder(tree *Tree, where []string) []string {
 }
 
 func isFolder(root, path string) bool {
-	said, err := os.Stat(filepath.Join(root, filepath.FromSlash(path)))
+	said, err := statOf(filepath.Join(root, filepath.FromSlash(path)))
 	return err == nil && said.IsDir()
 }
 
@@ -143,7 +137,7 @@ func checks(root string, where []string) int {
 
 	out, err := json.MarshalIndent(found, "", "  ")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(stderr, err)
 		return 1
 	}
 	fmt.Println(string(out))
@@ -153,16 +147,16 @@ func checks(root string, where []string) int {
 func asks(root, method string) int {
 	said, err := reaches(root, method)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(stderr, err)
 		return 1
 	}
 	if said.Error != "" {
-		fmt.Fprintln(os.Stderr, said.Error)
+		fmt.Fprintln(stderr, said.Error)
 		return 1
 	}
 	out, err := json.MarshalIndent(said.Result, "", "  ")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(stderr, err)
 		return 1
 	}
 	fmt.Println(string(out))
@@ -185,7 +179,7 @@ func reaches(root, method string) (answer, error) {
 		if method == "stop" {
 			return answer{Result: map[string]string{"standing": "none"}}, nil
 		}
-		os.Remove(standingPath(root))
+		removeFile(standingPath(root))
 		if err := starts(root); err != nil {
 			return answer{}, err
 		}
@@ -203,7 +197,7 @@ func current(said Standing, root string) bool {
 
 func standingOf(root string) (Standing, error) {
 	var standing Standing
-	said, err := os.ReadFile(standingPath(root))
+	said, err := readFile(standingPath(root))
 	if err != nil {
 		return standing, err
 	}

@@ -103,8 +103,8 @@ The agent judges where that point stands at `finish`, because the work in
 hand decides it. At `stop` the door decides, and the calls above are
 what it leaves.
 
-Each stands over every continue rule but the owner's own word, the queue's
-firm rule among them. So a held turn ends with work still waiting.
+Each stands over every continue rule but the owner's own word. So a held turn
+ends with work still waiting.
 
 So a hold is one turn long. It ends the turn it lands in, the turn's end puts
 it back to `off`, and it reaches no later turn. A prompt writes no hold,
@@ -419,8 +419,9 @@ The hook counts the turns it carries one after another.
 - Past `mostInARow`, it writes a `warn` line and lets the turn end.
 - A prompt from outside the plugin resets the count, because that is the owner
   taking the session back.
-- A continue rule carrying `firm` holds past the cap, because the cap frees a
-  stuck session alone. The queue rule in `level1.yml` carries it.
+- The cap holds over every continue rule, the queue's among them. A session
+  refusing the stop line over work it leaves untaken is the stuck session the
+  cap frees. The queue stands for the next prompt.
 
 The hook asks the resolver for `stop.mostInARow` and `stop.enabled` at each
 turn end, and `atTurnEnd` takes the cap as an argument. So the tooth carries no

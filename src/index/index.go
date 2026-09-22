@@ -7,7 +7,8 @@ import (
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
-	"os"
+	"errors"
+	"io/fs"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -64,7 +65,7 @@ const Retro = ".se/.retro"
 // The log grows a line a door call, so a watch on it sweeps the tree for nothing. [[spec/design_output/index#the-watcher-keeps-it-warm]]
 const Log = ".se/.log"
 
-func skips(root, abs string, info os.FileInfo) bool {
+func skips(root, abs string, info fs.FileInfo) bool {
 	if skipped[info.Name()] {
 		return true
 	}
@@ -91,7 +92,7 @@ func Open(root, at string) (*sql.DB, error) {
 	}
 
 	db.Close()
-	if err := os.Remove(at); err != nil && !os.IsNotExist(err) {
+	if err := removeFile(at); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return nil, err
 	}
 	db, err = sql.Open("sqlite3", dsn(at))
@@ -151,7 +152,7 @@ func Reindex(db *sql.DB, root string) (int, error) {
 	}
 
 	count := 0
-	err = filepath.Walk(root, func(abs string, info os.FileInfo, err error) error {
+	err = filepath.Walk(root, func(abs string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return nil // a file that went while the walk ran is no fault of the walk
 		}
@@ -188,8 +189,8 @@ func relOf(root, abs string) (string, bool) {
 	return filepath.ToSlash(rel), true
 }
 
-func one(tx *sql.Tx, abs, rel string, info os.FileInfo) error {
-	body, err := os.ReadFile(abs)
+func one(tx *sql.Tx, abs, rel string, info fs.FileInfo) error {
+	body, err := readFile(abs)
 	if err != nil {
 		return nil // unreadable here is absent, and the next walk answers again
 	}

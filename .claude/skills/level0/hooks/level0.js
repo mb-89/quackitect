@@ -5,7 +5,7 @@
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 import { patchSpec, replaceSpec } from "../lib/apply.js";
-import { SESSION } from "../lib/log.js";
+import { SERVE, SESSION } from "../lib/log.js";
 import { findSpec } from "../lib/search.js";
 import { undoSpec } from "../lib/undo.js";
 import { POINTER, PORT_BASE as PORT } from "../lib/vehicle.js";
@@ -45,7 +45,7 @@ export const START = [
   "if (!process.env.CLAUDE_CODE_REMOTE && !process.env.SE_CLOUD) process.exit(3);",
   "if (!existsSync(method)) process.exit(4);",
   "mkdirSync(here + '/.se/.log', { recursive: true });",
-  "const out = openSync(here + '/.se/.log/serve.log', 'a');",
+  `const out = openSync(here + '/${SERVE}', 'a');`,
   "const brought = !existsSync(method + '/node_modules');",
   // The one shell this road reaches, and it stands past the cloud guard, because the installer is a shell script and a cloud box carries sh. Every guard above runs in node. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
   "if (brought) {",
@@ -66,7 +66,10 @@ const REASONS = {
   4: ["warn", "the method root is absent, so no server starts"],
   5: ["warn", "this box carries no node, so no server starts"],
   6: ["warn", "the install brings no modules, so no server starts"],
-  7: ["info", "the modules stand nowhere, so the bridgehead installs them and starts one"],
+  7: [
+    "info",
+    "the modules stand nowhere, so the bridgehead installs them and starts one",
+  ],
 };
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
@@ -288,15 +291,25 @@ async function registers($, specs) {
 
 // A read tool called before the server stands brings it up, and answers on the far side. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 async function reads($, called, e, next) {
-  const first = await ask($, "tool.call", { ...e, tool: called }, { event: "tool.call" });
+  const first = await ask(
+    $,
+    "tool.call",
+    { ...e, tool: called },
+    { event: "tool.call" },
+  );
   if (first?.result !== undefined) return { result: first.result };
   await starts($);
   if (!(await healthy($))) {
     return {
-      result: `no server answers at ${url()}, so ${called} reads nothing. Run ./RUNME.sh serve, and read .se/.log/serve.log for what it says.`,
+      result: `no server answers at ${url()}, so ${called} reads nothing. Run ./RUNME.sh serve, and read ${SERVE} for what it says.`,
     };
   }
-  const said = await ask($, "tool.call", { ...e, tool: called }, { event: "tool.call" });
+  const said = await ask(
+    $,
+    "tool.call",
+    { ...e, tool: called },
+    { event: "tool.call" },
+  );
   if (said?.result !== undefined) return { result: said.result };
   return next(e);
 }

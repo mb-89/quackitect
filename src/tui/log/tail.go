@@ -7,7 +7,8 @@ package log
 
 import (
 	"bytes"
-	"os"
+	"errors"
+	"io/fs"
 	"path/filepath"
 	"strings"
 	"time"
@@ -58,8 +59,8 @@ func newTailer(path string) *tailer {
 
 // [[spec/design_output/tui#a-rotation-starts-it-again]]
 func (t *tailer) Read() ([]Record, bool, error) {
-	body, err := os.ReadFile(t.path)
-	if os.IsNotExist(err) {
+	body, err := readFile(t.path)
+	if errors.Is(err, fs.ErrNotExist) {
 		return nil, false, nil
 	}
 	if err != nil {

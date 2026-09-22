@@ -115,7 +115,7 @@ test("settings the disk holds in no readable shape answer a fresh pair", () => {
 test("a vehicle whose folder slugs to nothing refuses the stub, and writes nothing", () => {
   const files = nameless("/...");
   const git = fakeGit({ [REMOTE]: { stdout: "git@host:a/b.git\n" } }, "/...");
-  const said = stubInto(files, git, fakeClock(), "/...", "/stub");
+  const said = stubInto(files, git, fakeClock(), "/...", "/stub", 7);
   assert.equal(said.ok, false);
   assert.match(said.why, /empty brand/);
   assert.match(said.why, /Rename the folder/);

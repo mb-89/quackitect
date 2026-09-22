@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: misc
 steps:
   - name: design
@@ -89,7 +89,51 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 856c3db4bcf415a2eb6fbe66249dca4f406c5cb7
+    hash_after: 856c3db4bcf415a2eb6fbe66249dca4f406c5cb7
+  - step: design/review
+    hand: box d40a1b367f4d · claude-code-remote · helper-20
+    hash_before: 141fc89d9930393cb80db588ade508ce3a7c940f
+    hash_after: 141fc89d9930393cb80db588ade508ce3a7c940f
+  - step: implement/tests-red
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: c1438220558299ffdcca63692890cdc72560a748
+    hash_after: c1438220558299ffdcca63692890cdc72560a748
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 2d52b1412f3c3303a66b62824b1c271e1bb40133
+    hash_after: 2d52b1412f3c3303a66b62824b1c271e1bb40133
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 3f8eedb3c30f9acb218b018dbc3fc8248d54ec28
+    hash_after: 3f8eedb3c30f9acb218b018dbc3fc8248d54ec28
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 108 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-21
+    hash_before: 156d83f601b532177749fa77a0fd7b773914d207
+    hash_after: 156d83f601b532177749fa77a0fd7b773914d207
+reason: done
 ---
 
 # Ask
@@ -117,6 +161,20 @@ reader then applies it where it costs and skips it where it bites.
 
 <!-- the form is text -->
 
+A shape rule refuses a marked rule standing as one sentence. Every marked rule under `spec/guidance` takes the failure as its second sentence. The guidance note says so in a rule of its own.
+
+| piece | where | what changes |
+|---|---|---|
+| the check | `spec/config/styles/VoiceShape/MarkedRuleNamesFailure.yml` | a script rule over the Actionables chapter. A numbered line ending in the mark counts its sentences with code spans and links blanked. One sentence refuses with the line |
+| the sections | `.vale.ini` | none: both guidance sections read `VoiceShape` already |
+| the rules | every note under `spec/guidance` | each marked rule standing as one sentence takes a second: the failure it prevents, or the cost a reader pays otherwise. A clause opened by `because` splits into that second sentence |
+| the rule | `spec/guidance/guidance.md` | a new rule: write a marked rule as the instruction and then the failure it prevents, marked itself |
+| the argument | `spec/rationales/guidance.md` | the chapter that rule wants, saying why half a rule holds what it guards |
+| the case | `test/contract/shape.test.js` | a marked rule of one sentence at a guidance path refuses, a marked rule of two passes, and an unmarked rule of one passes |
+
+`./RUNME.sh lint spec/guidance` answers 0 once every note carries the second sentence.
+
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -126,6 +184,14 @@ reader then applies it where it costs and skips it where it bites.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+The check reads the Actionables chapter the way the cap rule does, and both guidance sections of the vale config read VoiceShape already.
+The rewrite reaches eighty-three of the one hundred twenty-six marked rules, across twenty notes.
+The shared chapter fixture in the shape test writes one-sentence marked rules, so the new case writes a fixture of its own.
+The guidance note holds twelve rules, so the new rule stands under the cap.
+The rationale numbers its chapters by rule, so the new chapter takes the new rule's number.
+A second sentence stays under the list item cap of twenty words, or the lint refuses the note.
 
 # implement
 
@@ -139,17 +205,31 @@ reader then applies it where it costs and skips it where it bites.
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/shape.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the case feeds Vale a guidance note with a marked rule of one sentence, and no rule refuses it. The shape folder holds no such rule yet
+- the case with two sentences and the case with an unmarked rule pass already
+- what surprises the hand: the shared chapter fixture in this test writes one-sentence marked rules. So the case writes a fixture of its own
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases stand in the shape contract test
+- the change reaches the rule file, the guidance notes, the guidance rule and its rationale chapter
+- the cases drive the real Vale, and the rule reaches no door past it
+- each case's comment names the guidance note, and the rule file links it
+
 
 ## reflect
 
@@ -177,11 +257,21 @@ reader then applies it where it costs and skips it where it bites.
 
 <!-- the form is command -->
 
+./RUNME.sh lint spec/guidance
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the rule file, the guidance notes holding a marked rule of one sentence, and the guidance rule
+- the change touches the rationale chapter
+- the change touches the projections off the guidance, and the cases
+- the rule reaches Vale alone, and the cases drive the real one
+- the rule file links the guidance note, and the new rule names the rule file
+
 
 ## tests-green
 
@@ -193,11 +283,17 @@ reader then applies it where it costs and skips it where it bites.
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/shape.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -205,11 +301,19 @@ reader then applies it where it costs and skips it where it bites.
 
 <!-- the form is text -->
 
+A shape rule reads the Actionables chapter of a guidance note and counts the sentences of each marked rule, with code spans and links blanked. A marked rule of one sentence refuses at error, so the lint over the guidance goes red until the rule names the failure it prevents. Every marked rule under the guidance folder that stood as one sentence now carries a second: the failure, or the cost a reader pays otherwise. A clause opened by because became that second sentence. The guidance note takes a rule saying so, marked itself, and the rationale takes the chapter arguing it. The projections off the guidance carry the new wording.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the rule file, the guidance notes, the guidance rule, its rationale chapter, the projections and the cases
+- the cases drive the real Vale over a note of their own, and the lint drives it over the guidance
+- the rule file links the guidance note, and the new rule names the rule file
+
 
 # verdict
 
@@ -221,17 +325,56 @@ reader then applies it where it costs and skips it where it bites.
 
 <!-- the form is files -->
 
+- spec/tickets/a-rule-names-its-failure.md
+- spec/guidance/review/reviewing.md
+- spec/guidance/guidance.md
+- spec/rationales/guidance.md
+- spec/config/styles/VoiceShape/MarkedRuleNamesFailure.yml
+- spec/config/styles/VoiceShape/GuidanceCap.yml
+- test/contract/shape.test.js
+- .vale.ini
+- .claude/output-styles/level0.md
+- spec/guidance/arguing.md
+- spec/guidance/code/code.md
+- spec/guidance/code/testing.md
+- spec/guidance/retro/audit.md
+- spec/guidance/retro/chapter.md
+- spec/guidance/retro/classify.md
+- spec/guidance/retro/collect.md
+- spec/guidance/retro/effect.md
+- spec/guidance/retro/feedback.md
+- spec/guidance/retro/read.md
+- spec/guidance/retro/signals.md
+- spec/guidance/retro/verify.md
+- spec/guidance/tickets.md
+- spec/guidance/voice-checks.md
+- spec/guidance/voice.md
+- spec/guidance/working.md
+- spec/tickets/every-road-reads-one-config.md
+
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+The rule reads the Actionables chapter the way the cap rule does, and the lint over the guidance answers green.
+The case feeds the rule a marked rule of one sentence and a clause opened by because, and asserts it refuses each.
+Every marked rule under the guidance names its failure in a second sentence, and the projection carries the same lines.
+The second sentence of the fourth signals rule says the machinery let the agent down, and that reads as the past tense.
+The diff touches no file past the ask, and the project verb writes the projection off the guidance.
+
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The check stands in the rule file alone, and the argument in the rationale chapter alone. The guidance rule names the check, the test comment links the note, and the projection copies the guidance by design.
+
 
 # Discussion
 

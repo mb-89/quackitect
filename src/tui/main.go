@@ -7,7 +7,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -35,8 +34,8 @@ func main() {
 	tab := flag.String("tab", "", "the tab the window opens on, as log or work")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		fmt.Fprintln(os.Stderr, "usage: logview [--frame --size WxH --pane details|help|filter --filter text] [--mouse=false --tab log|work] <session.jsonl>")
-		os.Exit(2)
+		fmt.Fprintln(stderr, "usage: logview [--frame --size WxH --pane details|help|filter --filter text] [--mouse=false --tab log|work] <session.jsonl>")
+		exits(2)
 	}
 	path := flag.Arg(0)
 	// The colours stand in the config, and the window reads them once. [[spec/design_output/tui#colours]]
@@ -45,21 +44,21 @@ func main() {
 	if *frame {
 		w, h, err := ParseSize(*size)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(2)
+			fmt.Fprintln(stderr, err)
+			exits(2)
 		}
 		out, err := Frame(path, w, h, *opened, *narrow, *floor, time.Local)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			fmt.Fprintln(stderr, err)
+			exits(1)
 		}
 		fmt.Println(out)
 		return
 	}
 
 	if err := runWindow(path, *tab, *mouse); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		fmt.Fprintln(stderr, err)
+		exits(1)
 	}
 }
 
@@ -74,10 +73,10 @@ func runWindow(path, tab string, mouse bool) error {
 	door, err := frame.OpenDoor(frame.WindowPort, func(msg any) { program.Send(msg) })
 	if err != nil {
 		if frame.TellPort(frame.WindowPort, tab) {
-			fmt.Fprintln(os.Stderr, "A window already stands, and it takes the tab.")
+			fmt.Fprintln(stderr, "A window already stands, and it takes the tab.")
 			return nil
 		}
-		fmt.Fprintf(os.Stderr, "the window's door stays shut: %v\n", err)
+		fmt.Fprintf(stderr, "the window's door stays shut: %v\n", err)
 	}
 	if door != nil {
 		defer func() { _ = door.Close() }()
