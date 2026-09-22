@@ -21,9 +21,10 @@ async function reviewsBranch(e, box) {
   const name = String(e?.branch ?? "").trim();
   if (!name) return { result: { result: "review_branch takes one branch name." } };
 
+  // The node path comes off the box the server root builds. [[spec/design_output/doors#a-door-reads-the-outside]]
   const ran = box.proc.run(
     [
-      process.execPath,
+      box.node,
       `${box.method}/src/scripts/cli.js`,
       "branch",
       "review",

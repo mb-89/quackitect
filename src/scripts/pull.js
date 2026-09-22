@@ -137,13 +137,13 @@ export function pull(it, argv) {
   return handOut(it, who);
 }
 
-// [[spec/design_output/pull#a-closed-group-takes-no-more-work]]
+// [[spec/design_output/pull#a-closed-group-hands-nothing]]
 function closedGroup(it, group) {
   const one = ticketsHere(it).find((held) => !held.private && held.name === group);
   return Boolean(one) && fieldOf(one.text, "state") === CLOSED;
 }
 
-// [[spec/design_output/pull#a-closed-group-takes-no-more-work]]
+// [[spec/design_output/pull#a-closed-group-hands-nothing]]
 function groupDone(group) {
   say(DONE, [
     `${group} stands closed, so work/${group} takes no more work.`,

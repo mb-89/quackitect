@@ -7,7 +7,6 @@ package main
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -167,7 +166,7 @@ func placesCmd(root string) tea.Cmd {
 
 // A root holding no verb answers its error at once, so a case's tree spawns nothing. [[spec/design_output/work#one-reading-answers-git]]
 func runPlaces(root string) ([]byte, error) {
-	if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(placesVerb[0]))); err != nil {
+	if _, err := statOf(filepath.Join(root, filepath.FromSlash(placesVerb[0]))); err != nil {
 		return nil, err
 	}
 	return runVerb(root, nodeAt(root), placesVerb, placesWait)
@@ -175,7 +174,7 @@ func runPlaces(root string) ([]byte, error) {
 
 // The node the survey names, and the one on the path where the survey stands nowhere. [[spec/design_output/tools#what-the-survey-writes]]
 func nodeAt(root string) string {
-	text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(toolsAt)))
+	text, err := readFile(filepath.Join(root, filepath.FromSlash(toolsAt)))
 	if err != nil {
 		return "node"
 	}

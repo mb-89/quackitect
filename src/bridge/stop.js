@@ -328,7 +328,7 @@ function endsWhy(said) {
   return said.stop?.says ?? "the turn ends";
 }
 
-// [[spec/design_output/stop#a-turn-with-no-call]]
+// [[spec/design_output/stop#a-turn-with-no-line]]
 function asksForStop(rules, why) {
   return [
     `${why} This turn holds open. Carry on, or end the turn with one last line, alone: stop: <reason>, with one of these reasons:`.trim(),

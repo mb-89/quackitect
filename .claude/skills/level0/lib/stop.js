@@ -8,7 +8,7 @@ import { readEntries } from "./rulefile.js";
 export const RULES = "spec/config/stop";
 export const OFF = "stop-hook-off";
 
-// [[spec/design_output/stop#the-stop-is-one-call]]
+// [[spec/design_output/stop#the-stop-is-one-line]]
 export const STOP_TOOL = "stop";
 export const STOP_CALL = `mcp__level0__${STOP_TOOL}`;
 
@@ -111,7 +111,7 @@ export function stopReasons(rules) {
   return (rules ?? []).filter(asks);
 }
 
-// [[spec/design_output/stop#the-stop-is-one-call]]
+// [[spec/design_output/stop#the-stop-is-one-line]]
 export function stopSpec(rules) {
   const reasons = stopReasons(rules);
   const reason = {
@@ -185,7 +185,7 @@ export function reprompt(decision) {
   ].join("\n");
 }
 
-// [[spec/design_output/stop#a-turn-with-no-call]]
+// [[spec/design_output/stop#a-turn-with-no-line]]
 export function askForStop(rules) {
   return [
     `This turn ends with no stop, so it holds open. Carry on, or call ${STOP_CALL} last, with one reason:`,

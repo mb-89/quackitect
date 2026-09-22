@@ -52,7 +52,7 @@ async function activate(context, given) {
   });
 }
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 async function startsServer(door) {
   if (!door.startsServer) return "";
   const ask = serverAsk(door.root(), process.platform);

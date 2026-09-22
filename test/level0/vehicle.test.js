@@ -77,13 +77,14 @@ test("a vehicle keeps the identity it holds, and makes one where it holds none",
 
 test("the identity lives in the method tree", () => {
   const files = tree();
-  assert.equal(identityHere(files, fakeClock(), "/tools"), "abc123");
+  assert.equal(identityHere(files, fakeClock(), "/tools", 7), "abc123");
 
   const bare = tree({ "/tools/.se/.runtime/identity.json": undefined });
   bare.remove("/tools/.se/.runtime/identity.json");
-  const made = identityHere(bare, fakeClock(), "/tools");
+  const made = identityHere(bare, fakeClock(), "/tools", 7);
   assert.ok(made);
-  assert.equal(identityHere(bare, fakeClock(), "/tools"), made);
+  assert.equal(identityHere(bare, fakeClock(), "/tools", 7), made);
+  assert.ok(made.endsWith("7"), "the pid the hand gives ends the identity, so a case replays it");
 });
 
 test("a root is found by the marker it carries", () => {
@@ -219,7 +220,7 @@ test("attach writes the driver, the register entry with its port, the pointer an
       ]),
     ),
   });
-  const said = attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools");
+  const said = attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools", 7);
   assert.equal(said.method, "/tools");
   assert.equal(said.port, 6510);
   assert.equal(
@@ -261,6 +262,7 @@ test("attach writes the driver, the register entry with its port, the pointer an
     fakeClock(),
     "/stub",
     "/tools",
+    7,
   );
   assert.equal(again.port, 6510, "a second attach keeps the port");
 });

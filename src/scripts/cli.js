@@ -1,6 +1,6 @@
 // The command line. One verb a row, each one naming what it does and the
 // function behind it, and the dispatch at the foot of the table.
-// [[spec/design_output/level0#one-command-does-it]]
+// [[spec/design_output/level0#what-level-zero-is]]
 
 import { dirname, join } from "node:path";
 import { RUN } from "../../.claude/skills/level0/lib/folders.js";
@@ -227,7 +227,7 @@ export function theVehicle(argv) {
   const env = process.env;
   const said = argv[0] ?? "here";
   const pair = rootsHere(files, env, root);
-  const made = entryFor(files, it.clock, env, pair.method, version());
+  const made = entryFor(files, it.clock, env, pair.method, version(), it.pid);
 
   if (said === "produce" || said === "into") {
     const dest = argv[1];
@@ -245,7 +245,7 @@ export function theVehicle(argv) {
     return 0;
   }
   if (said === "attach") {
-    const settled = attachTo(files, env, it.clock, pair.work, pair.method, WINDOWS);
+    const settled = attachTo(files, env, it.clock, pair.work, pair.method, it.pid, WINDOWS);
     console.log(
       `${pair.work} names ${made.id} as the vehicle driving it, at port ${settled.port}.`,
     );
@@ -323,6 +323,7 @@ export function theStub(argv) {
     it.clock,
     pair.method,
     atRoot(dest),
+    it.pid,
     {
       upstream,
     },

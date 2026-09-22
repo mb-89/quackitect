@@ -114,7 +114,7 @@ func TestTheFirstColumnCarriesTheNestingAndTheName(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/tree-view#the-last-column-takes-what-is-left]]
+// [[spec/design_output/tree-view#the-columns-read-the-item]]
 func TestTheLastColumnTakesTheRoomAndCutsItsText(t *testing.T) {
 	t.Parallel()
 	view := NewTree(columns(), []Item{

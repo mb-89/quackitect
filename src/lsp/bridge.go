@@ -10,7 +10,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os"
 	"path/filepath"
 	"strconv"
 	"time"
@@ -91,7 +90,7 @@ func decoded(body io.Reader) ([]Finding, bool) {
 }
 
 func portOf(root string) int {
-	text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(pointerAt)))
+	text, err := readFile(filepath.Join(root, filepath.FromSlash(pointerAt)))
 	if err != nil {
 		return portBase
 	}

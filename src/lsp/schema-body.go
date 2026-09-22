@@ -75,7 +75,7 @@ func bodyFaults(note Note, spec *yaml.Doc, kind, where string) []Finding {
 	return out
 }
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 func chaptersWanted(sections []any, front *yaml.Doc) []any {
 	out := []any{}
 	for _, one := range sections {

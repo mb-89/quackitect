@@ -4,7 +4,6 @@
 package main
 
 import (
-	"os"
 	"regexp"
 	"strings"
 )
@@ -52,7 +51,7 @@ func homeNames(home string) bool {
 func boxHere(root string) Box {
 	first := func(names ...string) string {
 		for _, one := range names {
-			if said := os.Getenv(one); said != "" {
+			if said := envOf(one); said != "" {
 				return said
 			}
 		}

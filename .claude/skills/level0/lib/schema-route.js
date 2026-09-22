@@ -1,12 +1,12 @@
 // The route checks: the three keywords naming a step, the slots a route
 // feeds, and the hash the drawing carries.
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 
 import { hashText } from "./hash.js";
 import { fault, show } from "./schema-fault.js";
 import { readYaml } from "./schema-yaml.js";
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 export function refersFaults(key, value, rule, held, at, line) {
   const earlier = rule["x-earlier"];
   const list = rule["x-names"] ?? earlier;
@@ -57,7 +57,7 @@ export function refersFaults(key, value, rule, held, at, line) {
   return out;
 }
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 function fieldBefore(walk, holder, said, rule) {
   const list = rule["x-fields"];
   if (!list || !holder) return false;
@@ -69,7 +69,7 @@ function fieldBefore(walk, holder, said, rule) {
   );
 }
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 export function wanted(said, rule) {
   if (!said) return null;
   if ([rule["x-words"] ?? []].flat().includes(said)) return null;
@@ -78,7 +78,7 @@ export function wanted(said, rule) {
   return said.startsWith(`${prefix} `) ? said.slice(prefix.length + 1).trim() : said;
 }
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 export function entriesIn(list, base, parent = "", out = []) {
   const held = [list ?? []].flat();
   for (let i = 0; i < held.length; i++) {
@@ -94,7 +94,7 @@ export function entriesIn(list, base, parent = "", out = []) {
   return out;
 }
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 function holderOf(walk, at) {
   let out = null;
   for (const one of walk) {
@@ -104,7 +104,7 @@ function holderOf(walk, at) {
   return out;
 }
 
-// [[spec/design_output/schema#three-keywords-name-a-step]]
+// [[spec/design_output/schema#keywords-that-name-a-step]]
 export function entryNamed(walk, said, holder) {
   const want = String(said ?? "").trim();
   if (!want) return null;

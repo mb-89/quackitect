@@ -1,6 +1,6 @@
 // The doors the command line runs behind, and where each tool stands. Every
 // other cli file reads this one, and this one reads none of them.
-// [[spec/design_output/doors#the-doors-stand-once]]
+// [[spec/design_output/doors#one-door-per-outside-thing]]
 
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -73,6 +73,7 @@ export async function doorsHere() {
     binding: await said.ask("engine.binding"),
     ...handDoors(process.env),
     node: process.execPath,
+    pid: process.pid,
     // The retro's collect reads the transcripts and the memory under home, and the scratchpads under temp. [[spec/guidance/retro/collect]]
     home: homeIn(process.env),
     temp: process.env.TEMP || process.env.TMP || process.env.TMPDIR || "",

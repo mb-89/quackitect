@@ -1,7 +1,7 @@
 // What alt+? and alt+f open in the pane, under the keys. The bands name every
 // key out of its registration, and this text says what no key says: the
 // columns, the colours, the floor, the details and how the filter reads.
-// [[spec/design_output/tui#the-help]]
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
 
 package main
 

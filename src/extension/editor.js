@@ -32,7 +32,7 @@ function editorDoor(context) {
     holds: () => Boolean(folder),
     root: () => folder?.uri?.fsPath ?? "",
 
-    // [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+    // [[spec/design_output/lsp#one-checker-every-front-asks]]
     startsServer(ask) {
       let node;
       try {
