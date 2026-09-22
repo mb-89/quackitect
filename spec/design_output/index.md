@@ -18,12 +18,12 @@ header of each file under `src/index` says which piece it holds.
 It lives at `.se/.runtime/index.db`, which stays on the box it stands on. The version
 and the root ride in a `meta` row, and either one disagreeing drops the file
 whole. The tree fills it again in seconds, and a half-migrated index answers
-out of a shape two writers disagree about.
+out of a shape differing writers disagree about.
 
 ## The rows the walk writes
 
-One walk fills four tables and two full-text ones. It writes them in a single
-transaction, so a reader meets the whole answer or the one before it.
+One walk fills every table below in a single transaction, so a reader
+meets the whole answer or the one before it.
 
 | table | what it holds |
 |---|---|
@@ -152,7 +152,7 @@ group answers its group's standing, and a ticket in no group carries none.
 ## A rename reaches a name
 
 `./RUNME.sh rename <from> <to>` moves a name and carries every reach with it.
-`src/scripts/rename.js` holds it, and it works in three moves:
+`src/scripts/rename.js` holds it, and it works in the moves below:
 
 | the move | what it asks | what it catches |
 |---|---|---|
@@ -160,7 +160,7 @@ group answers its group's standing, and a ticket in no group carries none.
 | write | the folder's move, then a rewrite of each reach | every pointer the read names |
 | prove | the rows `links` answers, then `./RUNME.sh check` | a row naming the old name, then every other rule |
 
-The read asks two readers, because each answers half: `linksIn` in
+The read asks separate readers, because each answers half: `linksIn` in
 `src/index/front.go` records a note link alone, and the walk finds the rest.
 
 A reach stands on a word edge, so `renamedText` leaves a longer word alone. The
@@ -174,8 +174,8 @@ the score back, so a caller sees how far the first answer stands above the
 second.
 
 `notes` weights the columns: a note whose name carries the word scores ten
-times what a body mention scores. So asking for `index` answers the two notes
-about the index, ahead of every note that mentions one.
+times what a body mention scores. So asking for `index` answers the notes
+named for it first, ahead of every note that only mentions one.
 
 `find` reads `line_text`, whose one indexed column leaves nothing to weight.
 It ranks by how rare the words are and how short the line is.
@@ -193,7 +193,7 @@ the ones the caller asks for around them.
 | `grep` | every line one pattern matches, with its neighbours |
 | `glob` | every path one glob names, the newest first |
 
-The write door hands these two answers back to the agent in place of the tools
+The write door hands these answers back to the agent in place of the tools
 that walk a disk. Where a search asks for something these rows hold no answer
 for, the door says so and the disk answers instead.
 
@@ -278,16 +278,16 @@ answers for the same pattern.
 
 ## A note and its links
 
-A note is a markdown file carrying frontmatter between two rulers. Its keys
+A note is a markdown file carrying frontmatter fenced by rulers. Its keys
 land in `note`, its body lands in the full-text table, and every bracketed name
 in the frontmatter or the body lands in `link`.
 
-A link resolves against four things, in this order. The file at that exact
+A link resolves against the things below, in this order. The file at that exact
 path comes first, then the same path with `.md` on the end. Then the note whose
 `id` matches, and last the folder of that name. An anchor after a `#` drops
 before any of it.
 
-Two kinds of bracket stay out of `link`. The `kind` key names a taxonomy and no
+Some kinds of bracket stay out of `link`. The `kind` key names a taxonomy and no
 file, and a target carrying `<` or `>` is a shape a document spells out. Both
 read as broken links forever, which costs `dangling` its meaning.
 

@@ -76,6 +76,19 @@ test("the refusal names the way out", () => {
   assert.match(holds(refsIn(toTrunk), "").said, /Run `\.\/RUNME\.sh check` last/);
 });
 
+// [[spec/design_output/work#the-battery-answers-first]]
+test("a push to trunk over a stamp counting warnings refuses, and names the lint", () => {
+  const said = holds(
+    refsIn(toTrunk),
+    stamp({ warnings: 2, files: ["spec/a.md", "spec/b.md"] }),
+  );
+  assert.equal(said.code, 1);
+  assert.match(said.said, /2 warning\(s\) stand in 2 file\(s\)/);
+  assert.match(said.said, /RUNME\.sh lint/);
+  assert.deepEqual(holds(refsIn(toWork), stamp({ warnings: 2 })), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toTrunk), stamp({ warnings: 0 })), { code: 0, said: "" });
+});
+
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
 test("a push whose delta carries a tagged note refuses, and names the file", () => {
   const carried = () => [

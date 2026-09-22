@@ -192,6 +192,21 @@ test("ticket note writes a private ticket off the note process, and says so", ()
   assert.match(ran.said, /waits for a retro to decide it/);
 });
 
+// A note asking for a discussion waits for a person, so the pull hands it to no agent at a desk. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+test("ticket note --talk marks the decide step a person's, and the line loses the flag", () => {
+  const said = treeWithProcesses();
+  const ran = heard(() =>
+    ticket(ROOT, ["note", "slow-lint", "--talk", "The", "lint", "drags."], said.it),
+  );
+
+  assert.equal(ran.code, 0);
+  const text = said.disk.read(at(`${NOTES}/slow-lint.md`));
+  assert.match(text, /^ {4}by: person$/m);
+  assert.match(text, /The lint drags\.$/m);
+  assert.doesNotMatch(text, /--talk/);
+  assert.match(ran.said, /waits for a person to decide it/);
+});
+
 test("ticket note writes a note row, so the answer door reads it off the log", () => {
   const rows = [];
   const said = treeWithProcesses();

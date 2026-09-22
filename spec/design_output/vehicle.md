@@ -12,7 +12,7 @@ argument, see [[spec/rationales/vehicle]].
 # A vehicle and its project
 
 This tooling exists to work on projects that are other than itself. That needs
-two roots, and a vehicle that knows which project it drives.
+the roots below, and a vehicle that knows which project it drives.
 
 | root | what it is |
 |---|---|
@@ -113,7 +113,7 @@ Proven against a real vehicle, in `test/contract/vehicle.test.js`:
 | its contract tests | every one green, out of its own folder |
 | its answer to `vehicle` | no path naming its origin |
 
-A fresh vehicle takes two steps that any fresh clone takes: `git init`, and one
+A fresh vehicle takes the steps any fresh clone takes: `git init`, and one
 run of `RUNME`, which surveys the tools and builds what it needs.
 
 The run bit travels with the scripts. A vehicle whose `RUNME.sh` arrives
@@ -138,8 +138,8 @@ private folder meets the move in `src/scripts/install.sh`.
 
 One vehicle, one port. The register's entry for a vehicle carries the port
 it blocks. A vehicle with none takes the lowest free one from `PORT_BASE` in
-`lib/vehicle.js` up on its first start. So two vehicles on one box stand on two ports, and a project
-reaches the right one.
+`lib/vehicle.js` up on its first start. So each vehicle on a box stands on its
+own port, and a project reaches the right one.
 
 A project points at its vehicle in `.se/.runtime/vehicle.json`: the method root and
 the port. A folder with no pointer that carries the marker and the server is
@@ -152,11 +152,11 @@ the pointer back from the same press.
 ## One vehicle is no question
 
 A project naming no driver, on a machine holding exactly one vehicle, takes that
-vehicle. Two vehicles make a question, and the project answers it with `attach`.
+vehicle. More than one vehicle makes a question, and the project answers it with `attach`.
 
 ## What travels into a vehicle
 
-`produce` walks the method tree and leaves four things behind:
+`produce` walks the method tree and leaves the items below behind:
 
 | left behind | why |
 |---|---|
@@ -212,7 +212,7 @@ outside `a-z0-9` into a hyphen, and cuts a hyphen off each end.
 | `.hidden` | `hidden` |
 | `...` | the empty brand, which the stamp refuses |
 
-The brand reaches three names. The plugin name stands at `level0`, so every
+The brand reaches the names below. The plugin name stands at `level0`, so every
 `mcp__level0` tool keeps the name it carries:
 
 | what reads the brand | who writes it |
@@ -221,7 +221,7 @@ The brand reaches three names. The plugin name stands at `level0`, so every
 | the plugin's author | the same |
 | the stub's enabled id, `level0@<brand>` | the shim |
 
-`brandedJson` carries the rule for the two files. A file carrying an `owner` is
+`brandedJson` carries the rule for both files. A file carrying an `owner` is
 a marketplace, so its `name` and its owner's name take the brand. A file
 carrying an `author` is a plugin, so its author takes the brand and its own
 name stands. A file carrying neither comes back as it stands.
@@ -233,12 +233,12 @@ reads off `package.json`. So every box carries both, and no box commits them.
 The extension's icon reads the brand folder. `spec/config/brand/icon.svg` is
 the mark a vehicle draws, and the install script writes it to the path
 `src/extension/package.json` names. Git ignores that target, so one icon
-stands. Two vehicles wear two marks, and nothing holds those two in step.
+stands. Each vehicle wears its own mark, and nothing keeps multiple marks in step.
 
 ## Two roads to the vehicle
 
 The shim and the bridgehead both read `vehicle.json` beside them. The shim
-takes three roads in this order, and the bridgehead the first and the last:
+takes the roads below in this order, and the bridgehead the first and the last:
 
 | road | answers | who takes it |
 |---|---|---|
@@ -247,7 +247,7 @@ takes three roads in this order, and the bridgehead the first and the last:
 | `~/.se/vehicles/<name>` | the folder a cloud box clones the upstream into | the shim, the bridgehead |
 
 The shim stays POSIX sh, because a stub holds no node before it finds the
-vehicle. So it reads its two records the plain way:
+vehicle. So it reads both records the plain way:
 
 - the register stands in every folder `SE_REGISTRY` names, with `;` between them, and in `~/.se` where it names none
 - sed reads a field out of `vehicle.json` and out of the register, one key a line
@@ -262,7 +262,7 @@ line naming the vehicle, its upstream and the cloned road, and exits one.
 `test/contract/stub.test.js` drives the shim over a fixture: a fake vehicle
 whose `RUNME.sh` echoes its argv and its work root, a register naming it, and
 a stub. It reads both, then empties the register and reads the refusal line.
-The bridgehead takes the same three roads and attaches through the vehicle's
+The bridgehead takes the same roads and attaches through the vehicle's
 own verb. The next section says how.
 
 ## The bridgehead installs the upstream
@@ -298,7 +298,7 @@ folder whose imports run three deep.
 
 So the bridgehead rewrites the plugin folder beside its own. The client loads
 that hook at the next start, because it scans plugins once. The road then
-ends in three steps:
+ends with the steps below:
 
 | step | what happens |
 |---|---|
@@ -316,7 +316,7 @@ upstream into a temp home under `SE_SLOW`. It reads the register, the
 pointer, the driver and the hook back.
 
 One routine run against a stub repo proves the road on a cloud box, read off
-the run's log. It takes three things:
+the run's log. It takes the following:
 
 - a stub repo
 - an environment carrying the trust that the level zero chapter names

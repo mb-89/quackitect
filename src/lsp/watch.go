@@ -6,7 +6,7 @@ package main
 
 import (
 	"encoding/json"
-	"os"
+	"io/fs"
 	"path/filepath"
 	"strings"
 )
@@ -116,12 +116,16 @@ func (one *server) refreshes(params json.RawMessage) {
 		}
 	}
 	one.guard.Lock()
+	// The rows the bridge drew for a changed file read the text it held before, so they go now, and the bridge draws them again once it answers. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+	for _, at := range paths {
+		delete(one.panel.extra, at)
+	}
 	for path, said := range got {
 		one.panel.own[path] = said
 		one.shows(tree, path)
 	}
 	one.guard.Unlock()
-	go one.asksBridge(paths)
+	go one.owes(paths)
 }
 
 // The paths no editor holds open, under the guard. [[spec/design_output/lsp#the-panel-follows-the-disk]]
@@ -149,11 +153,11 @@ func (one *panel) under(at string) []string {
 // The files a path names: itself, or every file under it where it names a folder, past the folders no rule reads. [[spec/design_output/lsp#the-panel-follows-the-disk]]
 func filesUnder(tree *Tree, at string) []string {
 	whole := filepath.Join(tree.Root, filepath.FromSlash(at))
-	if stat, err := os.Stat(whole); err != nil || !stat.IsDir() {
+	if stat, err := statOf(whole); err != nil || !stat.IsDir() {
 		return []string{at}
 	}
 	out := []string{}
-	filepath.WalkDir(whole, func(where string, entry os.DirEntry, err error) error {
+	filepath.WalkDir(whole, func(where string, entry fs.DirEntry, err error) error {
 		if err != nil || entry.IsDir() {
 			return nil
 		}

@@ -79,13 +79,14 @@ test("a vehicle keeps the identity it holds, and makes one where it holds none",
 
 test("the identity lives in the method tree", () => {
   const files = tree();
-  assert.equal(identityHere(files, fakeClock(), "/tools"), "abc123");
+  assert.equal(identityHere(files, fakeClock(), "/tools", 7), "abc123");
 
   const bare = tree({ "/tools/.se/.runtime/identity.json": undefined });
   bare.remove("/tools/.se/.runtime/identity.json");
-  const made = identityHere(bare, fakeClock(), "/tools");
+  const made = identityHere(bare, fakeClock(), "/tools", 7);
   assert.ok(made);
-  assert.equal(identityHere(bare, fakeClock(), "/tools"), made);
+  assert.equal(identityHere(bare, fakeClock(), "/tools", 7), made);
+  assert.ok(made.endsWith("7"), "the pid the hand gives ends the identity, so a case replays it");
 });
 
 test("a root is found by the marker it carries", () => {
@@ -279,7 +280,7 @@ test("the copy takes the two manifests and the closure of the modules' imports, 
 
 test("a hook taking a new import hands the copy that file", () => {
   const files = tree(plugin());
-  attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools");
+  attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools", 7);
   assert.equal(
     files.exists("/stub/.claude/skills/level0/lib/log.js"),
     false,
@@ -291,7 +292,7 @@ test("a hook taking a new import hands the copy that file", () => {
       'import { a } from "../lib/apply.js";\nimport { SESSION } from "../lib/log.js";\n',
     ),
   );
-  attachTo(grown, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools");
+  attachTo(grown, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools", 7);
   assert.equal(
     grown.read("/stub/.claude/skills/level0/lib/log.js"),
     "the log lib",
@@ -301,7 +302,7 @@ test("a hook taking a new import hands the copy that file", () => {
 
 test("attach writes the driver, the register entry with its port, the pointer and the hook's closure", () => {
   const files = tree(plugin());
-  const said = attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools");
+  const said = attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools", 7);
   assert.equal(said.method, "/tools");
   assert.equal(said.port, 6510);
   assert.equal(
@@ -355,6 +356,7 @@ test("attach writes the driver, the register entry with its port, the pointer an
     fakeClock(),
     "/stub",
     "/tools",
+    7,
   );
   assert.equal(again.port, 6510, "a second attach keeps the port");
 });

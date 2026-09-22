@@ -41,7 +41,7 @@ mechanical answers in front of them while they do.
 | the whole diff | `git diff main...<ref>` |
 | the check | `./RUNME.sh check` on that branch |
 
-The ask and the handback are one file at two commits. `branch open` cuts the
+The ask and the handback are one file at separate commits. `branch open` cuts the
 branch off trunk's tree, so `git rev-list --reverse main..<ref>` names the
 commit the ask stands in, and the tip carries the handback.
 
@@ -58,13 +58,13 @@ the verb with a line saying so.
 
 ## Three dots, not two
 
-Three dots read the diff from where the branch leaves trunk. Two dots read it
+`...` reads the diff from where the branch leaves trunk. `..` reads it
 from trunk's tip, so a branch standing behind trunk shows every commit trunk
 holds since as a removal.
 
 One real review pays that price here. A branch far behind trunk answers
 "two entire subsystems, deleted and undisclosed", over code the branch leaves
-alone. `rev-list` keeps two dots, because it counts the branch's own commits.
+alone. `rev-list` keeps `..`, because it counts the branch's own commits.
 
 # A worktree runs the check
 
@@ -72,7 +72,7 @@ alone. `rev-list` keeps two dots, because it counts the branch's own commits.
 tree the caller stands in. So a review costs the caller no checkout, and it
 reads a branch a person already checks out somewhere else.
 
-Three things follow from where that worktree lands:
+The things below follow from where that worktree lands:
 
 | the thing | what the verb does |
 |---|---|
@@ -107,9 +107,9 @@ The reader answers one JSON object, and `readerSays` reads it back:
 lands in the report under `reader`, whole, and counts as one thing to fix. So a
 reader that wanders still hands its reading over.
 
-`report` takes the gathering and this answer as two arguments, because both
+`report` takes the gathering and this answer as its arguments, because both
 carry a key called `ask`. The verb passes the first alone, so a report with no
-reader behind it prints the two rows the verb owns and no ask.
+reader behind it prints the `check` and `retro` rows the verb owns and no ask.
 
 # What the report looks like
 
@@ -137,7 +137,7 @@ report with nothing to fix fits on one line:
 
 A work branch standing done waits for a review and a merge, and that wait is
 the desk's work. So a desk's pull on trunk reads the branches before the free
-tickets. It hands out the first done one as three steps: the review, and the
+tickets. It hands out the first done one as its steps: the review, and the
 fixes it names, the merge from trunk, and the close. `readyToMerge` in the
 review verb prints them, and the pull hands out no ticket beside them. The
 merge is the hand-back, and the close takes the branch out of the queue. A
@@ -153,7 +153,7 @@ report.
 So the session asking for a review spends one tool call and reads a short list.
 The diff reaches the reader's context alone.
 
-Two things about that call, both measured on client 2.1.267:
+The table below covers that call, both measured on client 2.1.267:
 
 | the thing | what the hook does |
 |---|---|

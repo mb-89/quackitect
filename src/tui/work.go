@@ -9,7 +9,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -37,7 +36,7 @@ func workRoot(path string) string {
 // [[spec/design_output/tui#the-work-tab]]
 func loadWork(path string) (*Tree, error) {
 	root := workRoot(path)
-	base, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(workBaseAt)))
+	base, err := readFile(filepath.Join(root, filepath.FromSlash(workBaseAt)))
 	if err != nil {
 		return nil, err
 	}

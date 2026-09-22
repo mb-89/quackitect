@@ -175,7 +175,7 @@ test("the re-prompt says why it carries on, then asks every unclaimed stop, in f
   assert.ok(said.split("\n").length <= 5, "five lines at most");
 });
 
-// [[spec/design_output/stop#the-stop-is-one-call]]
+// [[spec/design_output/stop#the-stop-is-one-line]]
 test("the tool takes one reason out of the rules, and names each one", () => {
   const spec = stopSpec(TABLE);
   assert.equal(spec.name, "stop");
@@ -210,7 +210,7 @@ test("a sound reason stands, a fact over it falls, and an unknown id says so", (
   );
 });
 
-// [[spec/design_output/stop#a-turn-with-no-call]]
+// [[spec/design_output/stop#a-turn-with-no-line]]
 test("the ask for a stop names the call and every id, in five lines", () => {
   const said = askForStop(TABLE);
   assert.match(said, /^This turn ends with no stop, so it holds open\./);
@@ -315,20 +315,6 @@ test("a stop outside the agent's own work beats a check", () => {
   const said = yielded(["work-waiting"], "owner-spoke");
   assert.equal(said.ends, true, "the owner speaking ends the turn");
   assert.equal(said.yields, false);
-});
-
-// [[spec/design_output/stop#three-in-a-row]]
-test("a firm continue rule holds past the cap, because the queue still holds work", () => {
-  const it = toothOf();
-  const firm = { ends: false, go: { id: "the-queue-holds-work", firm: true } };
-  const carried = [];
-  for (let i = 0; i < 5; i++) carried.push(it.atTurnEnd(firm, 3).ends);
-  assert.deepEqual(carried, [false, false, false, false, false]);
-  assert.equal(
-    it.atTurnEnd({ ends: false, go: { id: "work-still-stands" } }, 3).ends,
-    true,
-    "a plain rule lets go at the cap",
-  );
 });
 
 // [[spec/design_output/stop#the-chat-is-new]]

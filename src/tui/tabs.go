@@ -105,7 +105,7 @@ func (m *model) openTab(n int) {
 func (m model) renderStrip() string {
 	names := make([]string, 0, len(m.tabs))
 	for at, one := range m.tabs {
-		name := tabName(at, one)
+		name := m.tabName(at, one)
 		style := dimStyle
 		if at == m.open {
 			style = openStyle
@@ -124,7 +124,10 @@ func (m model) renderStrip() string {
 	return strip + strings.Repeat(" ", gap) + key
 }
 
-// The text one tab takes in the strip, which the strip draws and a press measures. [[spec/design_output/tui#the-header-holds-the-tabs]]
-func tabName(at int, one tab) string {
+// The text one tab takes in the strip, which the strip draws and a press measures. The work tab counts the rows this box takes behind its name. [[spec/design_output/tui#the-work-tab]]
+func (m model) tabName(at int, one tab) string {
+	if one.Name() == "work" && m.places != nil {
+		return fmt.Sprintf(" %d %s (%d) ", at+1, one.Name(), m.places.takeable)
+	}
 	return fmt.Sprintf(" %d %s ", at+1, one.Name())
 }

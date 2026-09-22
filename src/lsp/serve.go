@@ -1,14 +1,13 @@
 // The resident server on a loopback port. It writes where it stands into
 // the standing file, the way the index door writes its own, so a second
 // caller finds the first server and a stale file gives way.
-// [[spec/design_output/lsp#the-port-and-the-standing-file]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 package main
 
 import (
 	"encoding/json"
 	"net"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -54,7 +53,7 @@ func standingPath(root string) string {
 	return filepath.Join(root, ".se", ".runtime", "lsp.json")
 }
 
-// [[spec/design_output/lsp#the-port-and-the-standing-file]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 func Serve(root string) (*http.Server, net.Listener, error) {
 	one := &door{checker: checkerAt(root)}
 	listen, err := net.Listen("tcp", "127.0.0.1:0")
@@ -71,19 +70,19 @@ func Serve(root string) (*http.Server, net.Listener, error) {
 }
 
 func stands(root string, listen net.Listener) error {
-	if err := os.MkdirAll(filepath.Dir(standingPath(root)), folderMode); err != nil {
+	if err := makeDir(filepath.Dir(standingPath(root)), folderMode); err != nil {
 		return err
 	}
 	said, err := json.Marshal(Standing{
 		Port:  listen.Addr().(*net.TCPAddr).Port,
-		Pid:   os.Getpid(),
+		Pid:   pidOf(),
 		Root:  root,
 		Stamp: stampHere(),
 	})
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(standingPath(root), append(said, '\n'), fileMode)
+	return writeFile(standingPath(root), append(said, '\n'), fileMode)
 }
 
 func (one *door) took(w http.ResponseWriter, r *http.Request) {
@@ -133,13 +132,13 @@ func (one *door) answers(said call) (any, error) {
 	return nil, errorOf("no method called " + said.Method)
 }
 
-// [[spec/design_output/lsp#the-port-and-the-standing-file]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 func stampHere() string {
-	self, err := os.Executable()
+	self, err := executableOf()
 	if err != nil {
 		return ""
 	}
-	said, err := os.Stat(self)
+	said, err := statOf(self)
 	if err != nil {
 		return ""
 	}
@@ -148,8 +147,8 @@ func stampHere() string {
 
 func stopsSoon(root string) {
 	time.Sleep(stopDelay)
-	os.Remove(standingPath(root))
-	os.Exit(0)
+	removeFile(standingPath(root))
+	exits(0)
 }
 
 func writes(w http.ResponseWriter, said answer) {

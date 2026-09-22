@@ -10,6 +10,9 @@ import { fieldOf, GROUP, todoOf } from "../engine/group.js";
 export const FIRST = "first";
 export const LAST = "last";
 
+// The place of a row a cloud branch holds: this box cannot take it, so it stands past every number. [[spec/design_output/pull#the-queue-is-an-outline]]
+export const CLOUD_PLACE = "∞";
+
 // The outline, a place a name. The person's list comes first and counts down, the others count up, and a ticket in no list takes no place. [[spec/design_output/pull#the-queue-is-an-outline]]
 export function outlineIn(persons, held, rest, all, places = {}) {
   const ordinal = new Map();

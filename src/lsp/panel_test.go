@@ -61,6 +61,8 @@ func bridgeFor(t *testing.T, tree *Tree) *fakeBridge {
 			paths = append(paths, each.Path)
 			found = append(found, Finding{File: each.Path, Rule: "Sentence", Line: 1, Column: 1, Severity: SeverityWarning, Source: fromVale})
 		}
+		// An ask over the disk names its paths in the query, and answers no finding, so a file the disk mends draws none. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+		paths = append(paths, r.URL.Query()["path"]...)
 		sort.Strings(paths)
 		one.guard.Lock()
 		one.asks = append(one.asks, paths)

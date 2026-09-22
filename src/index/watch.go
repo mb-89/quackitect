@@ -4,7 +4,7 @@
 package main
 
 import (
-	"os"
+	"io/fs"
 	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
@@ -29,7 +29,7 @@ func watches(root string, one *door) (*fsnotify.Watcher, error) {
 					return
 				}
 				if said.Op&fsnotify.Create != 0 {
-					if info, err := os.Stat(said.Name); err == nil && info.IsDir() {
+					if info, err := statOf(said.Name); err == nil && info.IsDir() {
 						folders(root, said.Name, eyes)
 					}
 				}
@@ -45,7 +45,7 @@ func watches(root string, one *door) (*fsnotify.Watcher, error) {
 }
 
 func folders(root, from string, eyes *fsnotify.Watcher) error {
-	return filepath.Walk(from, func(abs string, info os.FileInfo, err error) error {
+	return filepath.Walk(from, func(abs string, info fs.FileInfo, err error) error {
 		if err != nil || !info.IsDir() {
 			return nil
 		}

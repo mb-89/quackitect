@@ -18,6 +18,8 @@ terms:
   - {word: binding, defines: "[[spec/design_output/level0#the-owner-binds-god]]"}
   - {word: biome, defines: "[[spec/design_output/config]]"}
   - {word: bottom line, defines: "[[spec/guidance/voice]]"}
+  - {word: single point of truth, defines: "[[spec/guidance/voice]]"}
+  - {word: self-evident, defines: "[[spec/guidance/voice]]"}
   - {word: box, defines: "[[spec/design_output/vehicle]]"}
   - {word: branch, defines: "[[spec/design_output/work#what-a-work-branch-is]]"}
   - {word: cage, defines: "[[spec/design_output/level0#the-write-door]]"}

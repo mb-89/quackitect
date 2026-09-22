@@ -8,7 +8,7 @@ import { readEntries } from "./rulefile.js";
 export const RULES = "spec/config/stop";
 export const OFF = "stop-hook-off";
 
-// [[spec/design_output/stop#the-stop-is-one-call]]
+// [[spec/design_output/stop#the-stop-is-one-line]]
 export const STOP_TOOL = "stop";
 export const STOP_CALL = `mcp__level0__${STOP_TOOL}`;
 
@@ -111,7 +111,7 @@ export function stopReasons(rules) {
   return (rules ?? []).filter(asks);
 }
 
-// [[spec/design_output/stop#the-stop-is-one-call]]
+// [[spec/design_output/stop#the-stop-is-one-line]]
 export function stopSpec(rules) {
   const reasons = stopReasons(rules);
   const reason = {
@@ -185,7 +185,7 @@ export function reprompt(decision) {
   ].join("\n");
 }
 
-// [[spec/design_output/stop#a-turn-with-no-call]]
+// [[spec/design_output/stop#a-turn-with-no-line]]
 export function askForStop(rules) {
   return [
     `This turn ends with no stop, so it holds open. Carry on, or call ${STOP_CALL} last, with one reason:`,
@@ -222,16 +222,17 @@ export function toothOf() {
 
     // [[spec/design_output/config#a-caller-hands-it-in]]
     atTurnEnd(decision, mostInARow) {
-      // A firm rule holds past the cap, because the cap frees a stuck session alone. [[spec/design_output/stop#three-in-a-row]]
-      const firm = Boolean(decision.go?.firm);
-      const runaway = !decision.ends && !firm && mostInARow > 0 && inARow >= mostInARow;
+      // The cap holds over every continue rule, because a session refusing the stop line over work it leaves untaken is the stuck session the cap frees. [[spec/design_output/stop#three-in-a-row]]
+      const runaway = !decision.ends && mostInARow > 0 && inARow >= mostInARow;
       const ends = decision.ends || runaway;
+      // The decision carries the holds the cap read, so the log line names them where the tooth lets go. [[spec/design_output/stop#three-in-a-row]]
+      const held = inARow;
       if (ends) {
         inARow = 0;
       } else {
         inARow += 1;
       }
-      return { ...decision, ends, runaway, inARow };
+      return { ...decision, ends, runaway, inARow: ends ? held : inARow };
     },
   };
 }

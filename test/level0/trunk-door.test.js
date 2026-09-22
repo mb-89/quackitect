@@ -17,7 +17,7 @@ const PUSH = "git push origin main";
 const CLOUD = { CLAUDE_CODE_REMOTE: "true" };
 
 // The box carries the environment, so a case sets one on it and touches nothing outside. [[spec/design_output/doors#a-door-reads-the-outside]]
-function box(branch, green = true, env = CLOUD) {
+function box(branch, green = true, env = CLOUD, warnings = 0) {
   return {
     env,
     disk: fakeDisk({
@@ -26,6 +26,8 @@ function box(branch, green = true, env = CLOUD) {
         ok: true,
         clean: true,
         at: "now",
+        warnings,
+        files: warnings ? ["spec/a.md"] : [],
       }),
     }),
     proc: fakeProc({
@@ -55,6 +57,13 @@ test("a red battery refuses the push on any branch", async () => {
   assert.match(denied(said), /green battery/);
 });
 
+// A warning standing in the tree reads red, so the same door holds the push and names the lint. [[spec/design_output/work#the-battery-answers-first]]
+test("a warning standing in the tree refuses the push, and names the lint", async () => {
+  const said = await onBash({ command: PUSH }, box("claude/a-thing", true, CLOUD, 3));
+  assert.match(denied(said), /3 warning\(s\) stand in 1 file\(s\)/);
+  assert.match(denied(said), /RUNME\.sh lint/);
+});
+
 // The door reads the script a command runs, off the disk it holds. [[spec/design_output/bash#a-shell-writes-nothing]]
 test("the door reads a script off the disk, and refuses the write inside it", async () => {
   const it = box("claude/a-thing");
@@ -71,3 +80,4 @@ test("a script standing nowhere leaves the command alone", async () => {
 
   assert.equal(denied(said), "", "the door says nothing");
 });
+

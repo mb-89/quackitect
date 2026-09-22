@@ -80,7 +80,7 @@ export function readsOf(it, paths) {
   }));
 }
 
-// [[spec/design_output/log#which-door-says-what]]
+// [[spec/design_output/log#which-kind-says-what]]
 export function noteRows(it, step, reads) {
   if (!it.log) return;
   for (const one of reads) {

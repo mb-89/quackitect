@@ -7,7 +7,6 @@ package main
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -28,12 +27,23 @@ type workPlaces struct {
 	queue map[string]string
 	cloud map[string]bool
 	todo  map[string]bool
+	// The rows this box takes: every placed row past the cloud's, which the strip counts behind the tab's name. [[spec/design_output/tui#the-work-tab]]
+	takeable int
 	// The plan's own todos, which the index holds nowhere, so the tab adds them as rows. [[spec/design_output/stop#the-plan]]
 	rows []answerRow
 }
 
 // The kind a sentence todo carries, which draws with no link. [[spec/design_output/stop#the-plan]]
 const kindTodo = "todo"
+
+// The place of a row the cloud holds, which src/scripts/pull-outline.js owns and a Go module spells again. [[spec/design_output/pull#the-queue-is-an-outline]]
+const cloudPlace = "∞"
+
+// The place of the work in hand and the state it reads, which src/scripts/work-answer.js owns and a Go module spells again. [[spec/design_output/pull#the-queue-is-an-outline]]
+const (
+	heldPlace = "0"
+	heldState = "held"
+)
 
 type placesMsg struct {
 	places workPlaces
@@ -63,12 +73,16 @@ func placesIn(said []byte) (workPlaces, error) {
 	out := workPlaces{queue: map[string]string{}, cloud: map[string]bool{}, todo: map[string]bool{}}
 	for _, one := range answer.Branches {
 		// A branch row stands for its group, and a merged one stands for a group off the cloud. [[spec/design_output/work#a-row-per-group]]
+		// A group's tickets inherit its cloud, because the branch carries them all. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 		if !one.Merged {
 			out.cloud[one.Name] = true
 		}
 		out.place(one)
 		for _, child := range one.Tickets {
 			out.place(child)
+			if !one.Merged {
+				out.cloud[child.Name] = true
+			}
 		}
 	}
 	for _, one := range answer.Loose {
@@ -77,6 +91,7 @@ func placesIn(said []byte) (workPlaces, error) {
 			out.rows = append(out.rows, one)
 		}
 	}
+	out.takeable = out.countTakeable()
 	return out, nil
 }
 
@@ -88,11 +103,26 @@ func (p workPlaces) place(one answerRow) {
 	p.todo[one.Name] = one.Todo
 }
 
+// The rows this box takes: placed, and off the cloud. [[spec/design_output/tui#the-work-tab]]
+func (p workPlaces) countTakeable() int {
+	n := 0
+	for _, place := range p.queue {
+		if place != cloudPlace {
+			n++
+		}
+	}
+	return n
+}
+
 // The places laid over the tree's items, so the queue column and the cloud letter read them. [[spec/design_output/tui#the-work-tab]]
 func (t *Tree) Placed(p workPlaces) {
 	t.Amend(func(one *Item) {
 		one.Keys[queueKey] = p.queue[one.Name]
 		one.Keys[cloudKey] = flagOf(p.cloud[one.Name])
+		// A row at zero stands in hand, so its state reads held whatever the index says. [[spec/design_output/pull#the-queue-is-an-outline]]
+		if p.queue[one.Name] == heldPlace {
+			one.Keys["state"] = heldState
+		}
 		// The todo letter reads the verb's answer, which folds the override on this box into the front's tag. [[spec/design_output/pull#a-todo-forces-a-place]]
 		if said, held := p.todo[one.Name]; held {
 			one.Keys[todoKey] = flagOf(said)
@@ -107,8 +137,12 @@ func (t *Tree) Placed(p workPlaces) {
 		if standing[row.Name] {
 			continue
 		}
+		state := "open"
+		if row.Queue == heldPlace {
+			state = heldState
+		}
 		t.Items = append(t.Items, Item{Name: row.Name, Keys: map[string]string{
-			"kind": kindTodo, "state": "open", queueKey: row.Queue, todoKey: flagOf(true),
+			"kind": kindTodo, "state": state, queueKey: row.Queue, todoKey: flagOf(row.Todo),
 			cloudKey: flagOf(false), "urgent": flagOf(false), "says": row.Says,
 		}})
 	}
@@ -132,7 +166,7 @@ func placesCmd(root string) tea.Cmd {
 
 // A root holding no verb answers its error at once, so a case's tree spawns nothing. [[spec/design_output/work#one-reading-answers-git]]
 func runPlaces(root string) ([]byte, error) {
-	if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(placesVerb[0]))); err != nil {
+	if _, err := statOf(filepath.Join(root, filepath.FromSlash(placesVerb[0]))); err != nil {
 		return nil, err
 	}
 	return runVerb(root, nodeAt(root), placesVerb, placesWait)
@@ -140,7 +174,7 @@ func runPlaces(root string) ([]byte, error) {
 
 // The node the survey names, and the one on the path where the survey stands nowhere. [[spec/design_output/tools#what-the-survey-writes]]
 func nodeAt(root string) string {
-	text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(toolsAt)))
+	text, err := readFile(filepath.Join(root, filepath.FromSlash(toolsAt)))
 	if err != nil {
 		return "node"
 	}

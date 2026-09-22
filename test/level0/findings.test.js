@@ -23,6 +23,8 @@ function doors(answers = {}) {
     proc: fakeProc({ vale: { stdout: "{}" }, biome: { stdout: "{}" }, ...answers }),
     join,
     root: ROOT,
+    method: ROOT,
+    work: ROOT,
     vale: "vale",
     biome: "biome",
     ceilings: { function: 150, file: 600 },

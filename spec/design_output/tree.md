@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`.claude/skills/level0/lib/tree.js` holds the rules weighing two files at once.
+`.claude/skills/level0/lib/tree.js` holds the rules weighing one file against another.
 This note covers those rules, what each one answers, and the sweep running them.
 
 # The rules over two files

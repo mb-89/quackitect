@@ -21,14 +21,14 @@ const doorOf = (held) => {
   };
 };
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 test("the binary wears an ending on windows and none anywhere else", () => {
   assert.equal(binaryOf("win32"), `${NAME}.exe`);
   assert.equal(binaryOf("linux"), NAME);
   assert.equal(binaryOf("darwin"), NAME);
 });
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 test("the ask names the built binary, the lsp verb and the tree", () => {
   const ask = serverAsk("/at/root", "linux");
   assert.equal(ask.at, `${BIN}/${NAME}`);
@@ -52,7 +52,7 @@ test("the client watches markdown and every file a two-file rule reads", () => {
   }
 });
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 test("a built server starts, and an unbuilt one starts nothing", async () => {
   const built = doorOf({ [BIN]: [binaryOf(process.platform), "vale"] });
   assert.equal(
@@ -66,7 +66,7 @@ test("a built server starts, and an unbuilt one starts nothing", async () => {
   assert.equal(bare.asked.length, 0);
 });
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 test("a door with no start at all leaves the extension standing", async () => {
   assert.equal(
     await startsServer({ root: () => "/at/root", list: async () => [] }),

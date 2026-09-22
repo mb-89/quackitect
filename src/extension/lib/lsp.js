@@ -1,14 +1,14 @@
 // What the editor hands the language client, worked out with no editor here.
 // The command, the arguments and the documents it watches are data, so a test
 // reads them on every platform and the door alone touches vscode.
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 
 // The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because the extension bundles alone.
 const BIN = ".se/.runtime/bin";
 const NAME = "se-lsp";
 const ID = "quackitect";
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 function binaryOf(platform) {
   return platform === "win32" ? `${NAME}.exe` : NAME;
 }
@@ -22,7 +22,7 @@ const WATCHES = [
   { scheme: "file", pattern: "**/.vale.ini" },
 ];
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 function serverAsk(root, platform) {
   const name = binaryOf(platform);
   const at = `${BIN}/${name}`;

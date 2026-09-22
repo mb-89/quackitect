@@ -57,7 +57,9 @@ test("the queue listing prints the placed rows in outline order and leaves the u
   const { said } = listed(["--queue"]);
   const rows = said.split("\n").filter(Boolean);
   const places = new Map(rows.map((row) => row.trim().split(/\s+/)).map(([place, name]) => [name, place]));
-  assert.equal(places.get("a-child"), `${places.get("one-group")}.1`, "the ticket stands under its group's number");
+  // The group stands on a cloud branch, so it and its ticket stay off this box's listing. [[spec/design_output/pull#the-queue-is-an-outline]]
+  assert.equal(places.has("one-group"), false, "a group the cloud holds stands off the listing");
+  assert.equal(places.has("a-child"), false, "and its ticket with it");
   assert.match(places.get("a-loose-one"), /^\d+$/, "the loose one takes a number of its own");
   assert.equal(places.has("a-done-child"), false, "a closed ticket stands off the listing");
   assert.equal(places.has("landed"), false, "a merged group stands off the listing");

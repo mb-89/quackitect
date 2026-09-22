@@ -116,6 +116,8 @@ function plans(e, box) {
   }
   const working = String(e?.working ?? "").trim();
   if (working) plan.working = working;
+  // Finishing the thing in hand names it done, and the hand stands empty. [[spec/design_output/stop#the-plan]]
+  if (done.has(plan.working)) plan.working = "";
   writes(box, plan);
   reacted(box, PLAN);
   // The count starts over at an answer, so the next ask stands the full span away. [[spec/design_output/stop#the-plan]]
@@ -145,10 +147,10 @@ function placeWord(place, todos) {
   return todos[place - 1].title;
 }
 
-// Every so many calls the engine asks, over the grace, and the third question stays away past the number. [[spec/design_output/stop#the-plan]]
+// Once the count reaches the number the ask stands due, and it lands on the first call no other ask holds, because the count starts over at the answer alone. The third question stays away past the number. [[spec/design_output/stop#the-plan]]
 export function asksForPlan(box, calls) {
   const every = Number(asks(box, EVERY) ?? 0);
-  if (every <= 0 || calls <= 0 || calls % every !== 0) return false;
+  if (every <= 0 || calls < every) return false;
   const plan = plansHere(box);
   const most = Number(asks(box, MOST_OPEN) ?? 0);
   const questions = [
@@ -157,9 +159,11 @@ export function asksForPlan(box, calls) {
   ];
   if (!(most > 0 && plan.todos.length >= most))
     questions.push("which todos do you add, each with its place");
+  // The ask names the work in hand first, so it reminds as it asks. [[spec/design_output/stop#the-plan]]
+  const held = plan.working ? `You work on ${plan.working}. ` : "";
   return wants(box, {
     id: PLAN,
-    why: `The engine asks: ${questions.join("; ")}.`,
+    why: `${held}The engine asks: ${questions.join("; ")}.`,
     react: `call ${PLAN_CALL} with the answers`,
     calls: asks(box, GRACE),
     tool: PLAN_CALL,

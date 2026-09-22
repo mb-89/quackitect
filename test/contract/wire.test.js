@@ -1,6 +1,5 @@
-// The wire door, against a real socket and a real child process. It listens
-// where it is told, hands each request to the handler, and starts a detached
-// child that outlives the call.
+// The wire door, against a real socket. It listens where it is told, and hands
+// each request to the handler.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 import assert from "node:assert/strict";
@@ -31,9 +30,4 @@ test("the door listens on a port, hands a request over, and closes", async () =>
   const answer = await fetch(`http://127.0.0.1:${port}/health`);
   assert.deepEqual(await answer.json(), { ok: true, url: "/health" });
   await new Promise((resolve) => server.close(resolve));
-});
-
-test("the door starts a detached child, and the call returns at once", () => {
-  const it = wire();
-  assert.doesNotThrow(() => it.respawn(["-e", "process.exit(0)"]));
 });

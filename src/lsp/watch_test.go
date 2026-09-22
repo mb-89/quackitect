@@ -67,6 +67,33 @@ func TestAFileTheDiskMendsLeavesThePanel(t *testing.T) {
 	}
 }
 
+// The rows the bridge drew for a file read the text it held before the disk changed, so they go with the change, whether or not a bridge answers. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+func TestAFileTheDiskChangesDropsTheBridgesOldRows(t *testing.T) {
+	tree := sweptTree(t, nil)
+	bridge := bridgeFor(t, tree)
+	out := &guardedBuffer{}
+	one := &server{checker: &Checker{tree: tree}, out: out, panel: newPanel()}
+	uri := uriOf(filepath.Join(tree.Root, "HANDOVER.md"))
+	one.panel.extra["HANDOVER.md"] = []Finding{{File: "HANDOVER.md", Rule: "VoiceParagraph.Sentence", Line: 40, Column: 1, Severity: SeverityWarning, Source: fromVale}}
+	one.shows(tree, "HANDOVER.md")
+	if said := urisDrawn(spoken(t, out.String()))[uri]; said != 1 {
+		t.Fatalf("the fixture draws %d row(s) before the change, and it draws its one", said)
+	}
+
+	if err := os.WriteFile(filepath.Join(tree.Root, "HANDOVER.md"), []byte(standing), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	one.refreshes(changeFrame(uri))
+
+	if said, drew := urisDrawn(spoken(t, out.String()))[uri]; !drew || said != 0 {
+		t.Fatalf("the changed file still draws %d row(s) off the bridge, drawn %v", said, drew)
+	}
+	bridge.waits(t, lintQuiet, 1)
+	if asks := bridge.asked(); fmt.Sprint(asks[0]) != "[HANDOVER.md]" {
+		t.Fatalf("the ask after the change names %v", asks[0])
+	}
+}
+
 func TestAChangeUnderTheFoldersNoRuleReadsRedrawsNothing(t *testing.T) {
 	root := t.TempDir()
 	got, gone := changedIn(root, changeFrame(

@@ -32,9 +32,10 @@ export function scriptWrites(command, read) {
   return out;
 }
 
-// Both commit doors read a file the same way, so the reading stands here once. [[spec/design_output/bash#a-shell-writes-nothing]]
-export function fileText(disk, root, path) {
-  const at = path.startsWith("/") ? path : `${root}/${path}`;
+// Both commit doors read a file the same way, so the reading stands here once, and the hand's join is the one place a path joins. [[spec/tickets/one-door-joins-a-path]]
+export function fileText(it, path) {
+  const at = path.startsWith("/") ? path : it.join(it.root, path);
+  const disk = it.disk;
   try {
     return disk.exists(at) ? String(disk.read(at)) : "";
   } catch {

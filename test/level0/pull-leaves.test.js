@@ -54,7 +54,7 @@ test("became closes the ticket with its successor, reads no field of the leaf, a
   assert.equal(fieldOf(now, "successors"), "a-successor");
 });
 
-// [[spec/design_output/pull#a-leaf-inherits]]
+// [[spec/design_output/pull#the-work-answer]]
 test("a leaf inherits by, on_fail and the checklist from its phases, and reads add up", () => {
   const front = {
     steps: [

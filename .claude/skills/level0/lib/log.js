@@ -7,6 +7,8 @@ import { LOG } from "./folders.js";
 
 export const FOLDER = LOG;
 export const SESSION = `${FOLDER}/session.jsonl`;
+// The file the server writes its own output to, on the start road and on a restart alike. [[spec/design_output/level0#a-restart-watches-its-child]]
+export const SERVE = `${FOLDER}/serve.log`;
 export const OLD = `${FOLDER}/old`;
 export const LOG_TOOL = "log";
 // A stamp answers milliseconds, and a span answers seconds, so a reader crossing the two multiplies by this. [[spec/design_output/log#one-verb-reads-the-log]]

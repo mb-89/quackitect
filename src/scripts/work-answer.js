@@ -22,18 +22,24 @@ import { PLANS } from "../../.claude/skills/level0/lib/runs.js";
 import { takeable } from "./pull.js";
 import { ticketsHere } from "./pull-hand.js";
 import { leafOf, leavesOf } from "./pull-route.js";
-import { outlineIn } from "./pull-outline.js";
+import { CLOUD_PLACE, outlineIn } from "./pull-outline.js";
+
+// The place of the work in hand, and the state a row there reads. [[spec/design_output/pull#the-queue-is-an-outline]]
+const HELD_PLACE = "0";
+const HELD = "held";
 import { queued, stoodHere } from "./pull-queue.js";
 import { staleClaim } from "./work-free.js";
 import { readWork, standingAll } from "./work-stands.js";
 
 // [[spec/design_output/work#one-reading-answers-git]]
 export function rowOfTicket(one, places, stood = new Map(), open = new Set(), overrides = {}) {
+  const place = places.get(one.name);
   const said = {
     name: one.name,
     // A ticket is a ticket or a group, and the tab draws which. [[spec/design_output/tree-view#the-columns-read-the-item]]
     kind: isGroup(one.text) ? GROUP : "ticket",
-    state: fieldOf(one.text, "state") || OPEN,
+    // A row at zero stands in hand, so its state reads held whatever its front says. [[spec/design_output/pull#the-queue-is-an-outline]]
+    state: place === HELD_PLACE ? HELD : fieldOf(one.text, "state") || OPEN,
     step: stepOf(one.text),
     progress: progressOf(one.text),
     group: fieldOf(one.text, GROUP),
@@ -49,7 +55,6 @@ export function rowOfTicket(one, places, stood = new Map(), open = new Set(), ov
   // The time a ticket came in orders the oldest first. [[spec/design_output/pull#the-queue-is-a-score]]
   const came = stood.get(one.path);
   if (came) said.stood = came;
-  const place = places.get(one.name);
   return place === undefined ? said : { ...said, queue: place };
 }
 
@@ -106,7 +111,11 @@ export function placesIn(it, read, stood) {
   const plan = planHere(it);
   // A sentence todo stands in the queue as a row of its own, placed by its anchor and held by nobody. [[spec/design_output/stop#the-plan]]
   const all = [...ticketsIn(read), ...todoRows(plan)];
-  const open = all.filter((one) => fieldOf(one.text, "state") !== CLOSED);
+  // A row a standing branch holds belongs to the cloud, so it leaves this box's lists and stands at infinity. [[spec/design_output/pull#the-queue-is-an-outline]]
+  const onCloud = new Set(
+    read.stand.filter((held) => !held.merged).flatMap((held) => [held.name, ...ownTickets(held).map((one) => one.name)]),
+  );
+  const open = all.filter((one) => fieldOf(one.text, "state") !== CLOSED && !onCloud.has(one.name));
   const at = { clock: it.clock, weights: it.weights, stood };
   // A person's step and a draft wait on a person. The agent's takeable steps count next, and every other open ticket after them. [[spec/design_output/pull#the-queue-is-an-outline]]
   // A ticket a hand holds, or the one the plan names, stands at zero. [[spec/design_output/pull#the-queue-is-an-outline]]
@@ -123,7 +132,11 @@ export function placesIn(it, read, stood) {
     all,
     at,
   );
-  return outlineIn(persons, inHand, [...agents, ...back], all, plan.places);
+  const out = outlineIn(persons, inHand, [...agents, ...back], all, plan.places);
+  for (const one of all) {
+    if (onCloud.has(one.name) && fieldOf(one.text, "state") !== CLOSED) out.set(one.name, CLOUD_PLACE);
+  }
+  return out;
 }
 
 // The plan this box holds: the work in hand, and the overrides a place writes, off the plan file. [[spec/design_output/stop#the-plan]]
@@ -167,6 +180,28 @@ function planRows(plan, places) {
     });
 }
 
+// The work the plan names stands at zero as a row of its own where no ticket and no todo carries its name, with no file behind it. [[spec/design_output/stop#the-plan]]
+function heldRow(plan, names) {
+  if (!plan.working || names.includes(plan.working)) return [];
+  return [
+    {
+      name: plan.working,
+      kind: "todo",
+      state: HELD,
+      step: "",
+      progress: "",
+      group: "",
+      urgent: false,
+      person: false,
+      held: true,
+      waits: false,
+      todo: false,
+      says: "",
+      queue: HELD_PLACE,
+    },
+  ];
+}
+
 // [[spec/design_output/pull#the-queue-is-an-outline]]
 function waitsOnPerson(one) {
   return personStep(one.text) || fieldOf(one.text, "state") === DRAFT;
@@ -184,7 +219,7 @@ export function answerOf(it, queue = true) {
   const places = queue ? placesIn(it, read, stood) : new Map();
   // The overrides light the todo letter, so a person reads which rows a place moves. [[spec/design_output/pull#a-todo-forces-a-place]]
   const overrides = planHere(it).places;
-  // A branch row stands for its group, so a trunk ticket under that group rides the branch and no other row. [[spec/design_output/work#one-verb-answers-git]]
+  // A branch row stands for its group, so a trunk ticket under that group rides the branch and no other row. [[spec/design_output/work#one-reading-answers-git]]
   const branched = new Set(read.stand.map((one) => one.name));
   // A ticket waiting on one still open carries the flag saying so. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
   const open = new Set(
@@ -225,6 +260,7 @@ export function answerOf(it, queue = true) {
         .filter((one) => !branched.has(one.name) && !branched.has(fieldOf(one.text, GROUP)))
         .map((one) => rowOfTicket(one, places, stood, open, overrides)),
       ...planRows(planHere(it), places),
+      ...heldRow(planHere(it), [...ticketsIn(read).map((one) => one.name), ...planHere(it).todos.map((one) => String(one?.title ?? ""))]),
     ],
   };
 }

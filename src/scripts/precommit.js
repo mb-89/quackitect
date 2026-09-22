@@ -28,7 +28,7 @@ export async function holds(it, delta) {
   });
   if (found.length) return { code: 1, said: refusedDelta(found) };
 
-  const missing = untestedIn(delta, (path) => fileText(it.disk, it.root, path), merging(it));
+  const missing = untestedIn(delta, (path) => fileText(it, path), merging(it));
   if (missing.length) return { code: 1, said: refusedTest(missing) };
   return { code: 0, said: "" };
 }

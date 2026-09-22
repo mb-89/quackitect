@@ -1,7 +1,7 @@
 // The stdio front. An editor speaks the language server protocol down this
 // pipe, and every finding goes back as a diagnostic: the rule is the code and
 // the message is the text.
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 package main
 
 import (
@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"io"
 	"net/url"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -68,7 +67,7 @@ type server struct {
 	timer *time.Timer
 }
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 func Speaks(checker *Checker, in io.Reader, out io.Writer) error {
 	one := &server{checker: checker, out: out, panel: newPanel(), quiet: lintQuiet}
 	reader := bufio.NewReader(in)
@@ -114,7 +113,7 @@ func reads(reader *bufio.Reader) (message, error) {
 	return said, json.Unmarshal(body, &said)
 }
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 func (one *server) took(said message) bool {
 	switch said.Method {
 	case "initialize":
@@ -147,7 +146,7 @@ func (one *server) took(said message) bool {
 	return false
 }
 
-// [[spec/design_output/lsp#a-finding-draws-as-a-diagnostic]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 func drawsAs(said Finding, rows []string) diagnostic {
 	line := said.Line - 1
 	if line < 0 {
@@ -228,7 +227,7 @@ func opened(params json.RawMessage) (string, string) {
 	return pathOf(said.TextDocument.URI), text
 }
 
-// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 func pathOf(uri string) string {
 	if uri == "" {
 		return ""
@@ -255,7 +254,7 @@ func uriOf(path string) string {
 	return "file://" + (&url.URL{Path: said}).EscapedPath()
 }
 
-var _ = os.Stdout
+var _ = stdout
 
 type errorOf string
 

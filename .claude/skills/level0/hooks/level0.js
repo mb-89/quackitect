@@ -5,7 +5,7 @@
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 import { patchSpec, replaceSpec } from "../lib/apply.js";
-import { SESSION } from "../lib/log.js";
+import { SERVE, SESSION } from "../lib/log.js";
 import { findSpec } from "../lib/search.js";
 import { undoSpec } from "../lib/undo.js";
 import { POINTER, PORT_BASE as PORT } from "../lib/vehicle.js";
@@ -45,7 +45,7 @@ export const START = [
   "if (!process.env.CLAUDE_CODE_REMOTE && !process.env.SE_CLOUD) process.exit(3);",
   "if (!existsSync(method)) process.exit(4);",
   "mkdirSync(here + '/.se/.log', { recursive: true });",
-  "const out = openSync(here + '/.se/.log/serve.log', 'a');",
+  `const out = openSync(here + '/${SERVE}', 'a');`,
   "const brought = !existsSync(method + '/node_modules');",
   // The one shell this road reaches, and it stands past the cloud guard, because the installer is a shell script and a cloud box carries sh. Every guard above runs in node. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
   "if (brought) {",
@@ -301,7 +301,7 @@ async function reads($, event, e, next) {
   if (!(await healthy($))) {
     return {
       result: {
-        result: `no server answers at ${url()}, so ${String(e?.tool ?? "")} reads nothing. Run ./RUNME.sh serve, and read .se/.log/serve.log for what it says.`,
+        result: `no server answers at ${url()}, so ${String(e?.tool ?? "")} reads nothing. Run ./RUNME.sh serve, and read ${SERVE} for what it says.`,
       },
     };
   }

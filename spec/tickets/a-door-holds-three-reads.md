@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
+group: misc
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -88,6 +89,80 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
+step: verdict
+record:
+  - step: design/draft
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: b00b3c099e8bc72da1316dd0274ad8f51d935506
+    hash_after: b00b3c099e8bc72da1316dd0274ad8f51d935506
+  - step: design/review
+    hand: box d40a1b367f4d · claude-code-remote · helper-15
+    hash_before: afa7b4ea74759bc13095e252ff5c007e4e5bdf3c
+    hash_after: afa7b4ea74759bc13095e252ff5c007e4e5bdf3c
+  - step: implement/tests-red
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: f10c071997dd7e05fca4b92294ef2a38e04adc90
+    hash_after: f10c071997dd7e05fca4b92294ef2a38e04adc90
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 77d37a4d517dc74d99a711bbf96163466cf9a6fa
+    hash_after: 77d37a4d517dc74d99a711bbf96163466cf9a6fa
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: e8e44316a0f5c45f5971847d0c68c8892b994a20
+    hash_after: e8e44316a0f5c45f5971847d0c68c8892b994a20
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 14 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 74 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-16
+    hash_before: af00125074df14589fea31ee461d612c6cff0491
+    hash_after: af00125074df14589fea31ee461d612c6cff0491
+    returns: 1
+    why: "`src/bridge/vehicle.js` calls `identityHere` with no pid at both of its calls, so an identity made through the port road ends in `NaN`.; The server root reads the pid nowhere and its box carries none, so the bridge module has nothing to take off the hand.; The rule grows the three reads, and the contract case feeds each at a module's path and asserts the refusal, then at every root and door and asserts a pass.; The review takes the node path off the box, and a case names its own node and asserts the spawn runs on it.; Every remaining read of the three stands under a section `.vale.ini` holds off the rule, and the lint exits at zero.; The note's table grows one row a read, and each changed read carries a comment naming the note.; The fix is craft: hand the pid into the bridge module's calls off the root that reaches it, and a case asserts the identity it makes ends in the pid."
+  - step: implement/reflect
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 7bcf87db7bbe8963ab450e68febd681ad213a3ef
+    hash_after: 7bcf87db7bbe8963ab450e68febd681ad213a3ef
+  - step: implement/change
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: 1be67e2daa0d17de4219ed459f64e5444295e6d6
+    hash_after: 1be67e2daa0d17de4219ed459f64e5444295e6d6
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box d40a1b367f4d · claude-code-remote
+    hash_before: a352247757ff225887a2c0f44aad6e948d476f3c
+    hash_after: a352247757ff225887a2c0f44aad6e948d476f3c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 14 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 78 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box d40a1b367f4d · claude-code-remote · helper-17
+    hash_before: 53a36df808c4f173c411ae4b3c10570149ec7acf
+    hash_after: 53a36df808c4f173c411ae4b3c10570149ec7acf
+reason: done
 ---
 
 # Ask
@@ -115,6 +190,20 @@ box it runs on into every case of it.
 
 <!-- the form is text -->
 
+The door rule grows the three reads, and the two modules past a root that hold one take the value off the hand.
+
+| piece | where | what changes |
+|---|---|---|
+| the rule | `spec/config/styles/VoiceVale/OutsideInDoors.yml` | the list of reads grows `process.pid`, `process.version` and `process.execPath` |
+| the roots | `.vale.ini` | none: every section standing off the rule keeps its read, and the contract test's pass list says which they are |
+| the identity | `src/scripts/vehicle.js` | `identityHere` takes the pid as an argument, and the root behind each verb hands it `process.pid` off the hand it builds. A case hands a pid of its own, so an identity replays |
+| the review | `src/bridge/review.js` | the helper's spawn takes the node path off the box, which the server root puts there as `node`, the way the command root already does |
+| the doors | `src/doors/awake.js`, `src/doors/session.js`, `src/doors/wire.js` | none: a door reads the outside, and the sections say so already |
+| the case | `test/contract/outside-in-doors.test.js` | feeds each of the three reads at a module's path and asserts the rule refuses it. Then it feeds each at every root of the pass list and asserts it passes |
+
+The table at [[spec/design_output/doors#a-door-reads-the-outside]] takes three rows, one a read. The rule and the note say the same list.
+
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -124,6 +213,15 @@ box it runs on into every case of it.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- The rule file holds the list of reads the draft grows, so the first bullet takes a concrete change.
+The pid read in `src/scripts/vehicle.js` and the exec path read in `src/bridge/review.js` are the only reads of the three past a root, and the draft moves both.
+The command root builds `node` off the exec path, and `boxOf` in `src/bridge/server.js` reads the environment in one place, so the review's change lands beside it.
+`identityHere` calls `idOf` in `src/scripts/vehicle.js`, and each caller reaches back to a root that builds a hand.
+Every other read of the three stands under a section the pass list holds, so the lint bullet follows from the two moves.
+- The contract case feeds each read at a module's path and asserts a refusal. Then it feeds each at every root of the pass list and asserts a pass. So the rule carries a test that fires.
+The doors and their fakes keep their reads under the sections standing, and the note's table grows one row a read.
 
 # implement
 
@@ -137,17 +235,30 @@ box it runs on into every case of it.
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/outside-in-doors.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the case feeds the rule each of the three reads at a module's path, and the rule passes all three. Its list names the environment, the arguments and the platform alone
+- the case over every root and every door passes already
+- what surprises the hand: nothing, because the rule reads a fixed list and the three stand outside it
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases stand in the Vale contract test alone, and the change reaches the rule and the two modules
+- the cases drive the real Vale, and the two modules take the value off the hand, which a case fakes
+- each case's comment names the door note, and the two modules' comments name the same
+
 
 ## reflect
 
@@ -159,11 +270,19 @@ box it runs on into every case of it.
 
 <!-- the form is text -->
 
+The class: a signature changed at its definition and at the callers one search found, while a second road held callers of its own. The identity took a pid, and the command root handed it in. The bridge's vehicle module still called the old shape, so an identity made through the port road ended in no number. The fix for the class: search for every caller of a changed name before the change closes. Give the case a tree with no identity, because a tree holding one skips the road that makes it.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fix touches the bridge's vehicle module, its two roots and the cases, and nothing the ask leaves out
+- the bridge takes the pid off the box or the hand, which every case fakes
+- the changed calls carry the comment naming the door note
+
 
 ## change
 
@@ -175,11 +294,20 @@ box it runs on into every case of it.
 
 <!-- the form is command -->
 
+./RUNME.sh lint src
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the rule, the identity's callers on every road, and the roots that hand the pid in
+- the change touches the note's table and the cases
+- the bridge and the identity take the pid off the box or the hand, which every case fakes
+- each changed read carries a comment naming the door note
+
 
 ## tests-green
 
@@ -191,11 +319,17 @@ box it runs on into every case of it.
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/contract/outside-in-doors.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -203,11 +337,23 @@ box it runs on into every case of it.
 
 <!-- the form is text -->
 
+The door rule's list grows the pid, the node version and the exec path. The identity takes the pid as an argument on every road. The command root hands it off the hand. The server root puts it on the box and hands it to the port road, and the editor's process file hands its own.
+- A case gives the port road a tree with no identity. It asserts the identity it makes ends in the pid.
+- The review door takes the node path off the box.
+- The note's table names each of the three reads beside what a module takes instead.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the rule, the identity's callers on every road, the roots, the note's table and the cases
+- the port road's case hands a pid of its own over a fake disk
+- the Vale case drives the real binary
+- each changed read carries a comment naming the door note
+
 
 # verdict
 
@@ -219,17 +365,51 @@ box it runs on into every case of it.
 
 <!-- the form is files -->
 
+- spec/tickets/a-door-holds-three-reads.md
+- spec/guidance/review/reviewing.md
+- .vale.ini
+- spec/config/styles/VoiceVale/OutsideInDoors.yml
+- spec/design_output/doors.md
+- src/bridge/review.js
+- src/bridge/server.js
+- src/bridge/vehicle.js
+- src/extension/editor-process.js
+- src/scripts/cli-doors.js
+- src/scripts/cli.js
+- src/scripts/stub.js
+- src/scripts/vehicle.js
+- test/contract/outside-in-doors.test.js
+- test/contract/stub.test.js
+- test/contract/vehicle.test.js
+- test/level0/brand.test.js
+- test/level0/outside-hand.test.js
+- test/level0/review-door.test.js
+- test/level0/stub.test.js
+- test/level0/vehicle.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- The rule's list grows the three reads. The contract case feeds each at a module's path and asserts the refusal. Then it feeds each at every root and door and asserts a pass.
+- A case gives the port road a tree with no identity. It asserts the identity it makes ends in the pid the case hands.
+The review takes the node path off the box, and a case names its own node and asserts the spawn runs on it.
+Every remaining read of the three stands under a section `.vale.ini` holds off, and the lint exits at zero.
+The branch test runs the Vale cases green, and the vehicle, stub, review and hand cases pass under node.
+- The box carries a `pid` no module reads yet. The server root hands its own pid to the port road, and that is craft.
+The refusing case in `test/level0/stub.test.js` calls `stubInto` with no pid, and passes because the refusal returns before the identity, so it is craft too.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the list of reads stands in the rule file alone. The pid and the node path each come off one root hand. The note's table and each changed read's comment link the door note
 
 # Discussion
 

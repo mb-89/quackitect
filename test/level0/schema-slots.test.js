@@ -8,12 +8,11 @@ import {
   checkData,
   isDataSchema,
   isNoteSchema,
-  processHash,
   readYaml,
-  reRouted,
   schemaFaults,
-  slotFaults,
 } from "../../.claude/skills/level0/lib/schema.js";
+import { reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
+import { processHash, slotFaults } from "../../.claude/skills/level0/lib/schema-route.js";
 import { GOVERNED, ROUTED, routed, treeWith } from "./schema-notes.js";
 
 const PROCESS = readYaml(`
