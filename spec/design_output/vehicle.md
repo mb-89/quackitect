@@ -289,7 +289,12 @@ settles the stub the way the sidebar's hook button does:
 |---|---|
 | the register entry with its port | `~/.se/.runtime/registry.json` |
 | the pointer | `.se/.runtime/vehicle.json` in the stub |
-| the vehicle's hook, its two manifests and the lib files the hook imports | `.claude/skills/level0` in the stub |
+| the plugin's two manifests, the modules the hooks manifest names, and the closure of their imports, read off the source | `.claude/skills/level0` in the stub |
+
+`filesOf` in `src/bridge/vehicle.js` reads that closure at each attach. So a
+hook taking a new import hands the copy that file, and no list of the files
+stands to go stale. `test/level0/vehicle.test.js` drives it over a fake plugin
+folder whose imports run three deep.
 
 So the bridgehead rewrites the plugin folder beside its own. The client loads
 that hook at the next start, because it scans plugins once. The road then

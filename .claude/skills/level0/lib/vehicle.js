@@ -8,7 +8,10 @@ import { RUN } from "./folders.js";
 export const IDENTITY = `${RUN}/identity.json`;
 export const PROJECT = `${RUN}/project.json`;
 export const REGISTER = "registry.json";
-export const MARKER = ".claude/skills/level0/.claude-plugin/plugin.json";
+// The plugin folder a stub carries, and the manifest inside it that marks a vehicle's root. [[spec/design_output/vehicle#a-marker-names-the-root]]
+export const PLUGIN_FOLDER = ".claude/skills/level0";
+const MANIFEST = ".claude-plugin/plugin.json";
+export const MARKER = `${PLUGIN_FOLDER}/${MANIFEST}`;
 
 // [[spec/design_output/vehicle#what-travels-into-a-vehicle]]
 export const LEFT = [".git", ".se", "node_modules", "_to_delete"];
@@ -98,6 +101,26 @@ export function onlyVehicle(list) {
       roots.push(one.method_root);
   }
   return roots.length === 1 ? roots[0] : "";
+}
+
+// The manifest naming the modules the client loads, and the two manifests a stub takes beside them. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+export const HOOKS = "hooks/hooks.json";
+export const MANIFESTS = [HOOKS, MANIFEST];
+const RELATIVE =
+  /^\s*(?:import|export)\b[^;'"]*?(?:\bfrom\s*)?["'](\.{1,2}\/[^"']+)["']/gm;
+
+// The relative imports a module names, read off its source, so a copy of the plugin folder closes under them. A package import stays out, because it stands nowhere in the folder. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+export function importsOf(source) {
+  const out = [];
+  for (const hit of String(source ?? "").matchAll(RELATIVE)) out.push(hit[1]);
+  return out;
+}
+
+// The modules the hooks manifest names, each placed under the hooks folder. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+export function modulesOf(read) {
+  const held = parsed(read);
+  if (!Array.isArray(held?.modules)) return [];
+  return held.modules.map((one) => `hooks/${String(one).replace(/^\.\//, "")}`);
 }
 
 // [[spec/design_output/vehicle#what-travels-into-a-vehicle]]
@@ -196,7 +219,8 @@ export function brandedJson(text, brand) {
 // [[spec/design_output/level0#a-stub-names-its-vehicle]]
 export function shimSettings(text, vehicle, brand) {
   const held = parsed(text);
-  const out = held && typeof held === "object" && !Array.isArray(held) ? { ...held } : {};
+  const out =
+    held && typeof held === "object" && !Array.isArray(held) ? { ...held } : {};
   out.extraKnownMarketplaces = {
     ...(out.extraKnownMarketplaces ?? {}),
     [brand]: { source: { source: "directory", path: vehicle } },
