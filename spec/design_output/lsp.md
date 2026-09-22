@@ -7,7 +7,7 @@ refines: ["[[spec/design_input/one-server-holds-the-shape]]"]
 
 `src/lsp` holds a language server of this tree's own. It stands beside Biome,
 and draws every finding the battery reads. This note covers the shape a
-finding takes, the checker under every front, the two fronts, the port, and
+finding takes, the checker under every front, the fronts, the port, and
 the build.
 
 For the ask, see [[spec/design_input/one-server-holds-the-shape]].
@@ -27,7 +27,7 @@ editor the way it reaches the check:
 The Vale extension runs raw Vale, which knows no tense reader. So the
 workspace settings hand it a filter no rule passes, and it draws nothing.
 
-A file redraws on four roads:
+A file redraws on the roads below:
 
 | road | what redraws |
 |---|---|
@@ -39,7 +39,7 @@ A file redraws on four roads:
 
 ## One checker every front asks
 
-Three fronts ask for a reading, and each reaches one rule set:
+The fronts below ask for a reading, and each reaches one rule set:
 
 | the front | what it asks |
 |---|---|
@@ -54,7 +54,7 @@ carrying no server.
 
 One guard names each tool for both fronts. `biomeFor` in the bridge hands the
 empty string where no binary stands, so a box carrying no Biome reads one list.
-`test/contract/one-reading.test.js` holds the two fronts against each other
+`test/contract/one-reading.test.js` holds the fronts against each other
 over the whole tree.
 
 # The panel follows the disk
@@ -65,7 +65,7 @@ agent, git, or a script. The server reads the type each change carries.
 
 | the change | what the panel does |
 |---|---|
-| a new or a changed file | redraws it off the disk, and the bridge answers for it again |
+| a new or a changed file | redraws it off the disk, drops the bridge's rows on it, and asks the bridge again until one answers |
 | a deleted file | takes its row with it, and no rule reads it |
 | a folder, on either side | stands for every file under it |
 
@@ -99,8 +99,8 @@ editor hands it an absolute one. So every section naming a folder opens on
 
 # A second copy draws
 
-`src/lsp/restated.go` holds two rules over a second copy of a fact. One measure
-answers both: the longest run of words two places share.
+`src/lsp/restated.go` holds the rules below over a second copy of a fact. One
+measure answers both: the longest run of words the places share.
 
 | the rule | what it weighs | the bound it reads |
 |---|---|---|
@@ -118,11 +118,30 @@ once. A buffer the editor changes drops them, and the next ask pays again.
 Vale carries the third rule of the set, over a line beside a table. For how it
 lands, see [[spec/design_output/projection#a-layer-writes-two-files]].
 
+# A pointer reaches a heading
+
+A pointer names a note and a chapter, as `[[note#anchor]]`. `anchorFaults` in
+`src/lsp/anchor.go` reads every pointer a tracked file carries. It resolves the
+note the way the restated rule does, and reads the anchor against the note's
+headings through `headingNamed`. A note that stands and holds no such heading
+draws `DeadAnchor` on the pointer's line, and the message names the anchor.
+
+| the pointer | what draws |
+|---|---|
+| a note the tree lacks | nothing here, because the link check owns it |
+| a heading the note holds | nothing |
+| a heading the note lacks | `DeadAnchor`, with the file, the line and the anchor |
+
+`Over` reads the one file the front names, and `Sweep` reads every tracked
+file, so the panel and `./RUNME.sh lint` draw the same finding. A heading
+renamed takes every pointer at the old name down at once, and the sweep names
+each one.
+
 # A marked rule wants argument
 
 A guidance note marks the rules wanting an argument, and the rationale beside it
 carries a chapter for each. `src/lsp/marked.go` reads the pair, off the schema
-key `matches`. [[spec/design_output/schema#what-each-keyword-draws]]
+key `matches`. [[spec/design_output/schema#keywords-that-name-a-step]]
 
 | what it reads | where it comes from |
 |---|---|
@@ -135,7 +154,8 @@ A marked item with no chapter of its number draws, at the chapter holding them.
 A chapter past the marked items stands, because a note arguing more than it must
 costs a reader nothing.
 
-The reading takes two notes, so it stands where the tree stands. `checkNoteIn`
+The reading takes the note and its rationale, so it stands where the tree
+stands. `checkNoteIn`
 takes the tree and `checkNote` reads the one buffer beside it, which is what the
 write door hands in.
 

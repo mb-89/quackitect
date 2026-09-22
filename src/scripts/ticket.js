@@ -14,21 +14,22 @@ import {
 import { overLong } from "../../.claude/skills/level0/lib/names.js";
 import {
   entriesIn,
-  mintedNote,
   readNote,
-  reRouted,
   schemasFrom,
 } from "../../.claude/skills/level0/lib/schema.js";
+import { mintedNote, reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { TODO } from "../../.claude/skills/level0/lib/todo.js";
-import { askFaults, askRefusal } from "./ticket-ask-lint.js";
 import { fieldOf, GROUP, withField, withoutField } from "../engine/group.js";
 import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
+import { askFaults, askRefusal } from "./ticket-ask-lint.js";
 
 export const NOTES = TICKETS;
 export const HOLDS = OWNED_HOLDS;
 export const HOLD = OWNED_HOLD;
 export const NOTE = "note";
+// The flag on a note that waits for a person. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+const TALK = "talk";
 const TRAVELS = "spec/tickets";
 const SCHEMAS = "spec/schemas";
 
@@ -54,6 +55,9 @@ export function ticket(root, argv, doors) {
     console.log(
       "  todo <ticket>       park it for the next pull, and --off takes the tag away",
     );
+    console.log(
+      `                      note takes --${TALK} where a person decides it, and --${TODO} to park it`,
+    );
     return what ? 2 : 0;
   }
   return doing[what](it, name, argv);
@@ -63,8 +67,9 @@ export function ticket(root, argv, doors) {
 function note(it, name, argv) {
   const rest = (argv ?? []).slice(2);
   const parks = rest.includes(`--${TODO}`);
+  const talks = rest.includes(`--${TALK}`);
   const line = rest
-    .filter((one) => one !== `--${TODO}`)
+    .filter((one) => one !== `--${TODO}` && one !== `--${TALK}`)
     .join(" ")
     .trim();
   if (!name || !line) {
@@ -99,7 +104,9 @@ function note(it, name, argv) {
       ...(parks ? { [TODO]: true } : {}),
       process: held.link,
       process_hash: held.hash,
-      steps: fromHold(held.route, holdOf(it)),
+      steps: talks
+        ? personDecides(fromHold(held.route, holdOf(it)))
+        : fromHold(held.route, holdOf(it)),
       step: firstLeafOf(held.route),
       Ask: [askRows(held.ask), "", line].join("\n").trim(),
     },
@@ -114,9 +121,18 @@ function note(it, name, argv) {
   console.log(
     parks
       ? `${path} stands at ${TODO}, and the next pull hands it back first.`
-      : `${path} stands, and it waits for a retro to decide it.`,
+      : talks
+        ? `${path} stands, and it waits for a person to decide it.`
+        : `${path} stands, and it waits for a retro to decide it.`,
   );
   return said(it, NOTE, line, { ticket: name });
+}
+
+// A note asking for a discussion waits for a person, so the pull hands it to no agent at a desk. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+function personDecides(steps) {
+  return [steps ?? []]
+    .flat()
+    .map((one) => (one?.name ? { ...one, by: "person" } : one));
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]

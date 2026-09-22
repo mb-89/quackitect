@@ -90,7 +90,7 @@ test("answered closes the ticket, the record names the ticket answering it, and 
   assert.equal(entry.why, "an-answerer answers this ask");
 });
 
-// [[spec/design_output/pull#a-leaf-inherits]]
+// [[spec/design_output/pull#the-work-answer]]
 test("a leaf inherits by, on_fail and the checklist from its phases, and reads add up", () => {
   const front = {
     steps: [

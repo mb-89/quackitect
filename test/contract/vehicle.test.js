@@ -59,8 +59,8 @@ test("a vehicle makes an identity of its own", () => {
   const dest = join(where, "vehicle");
   try {
     produce(files, root, dest);
-    const mine = identityHere(files, clock(), root);
-    const other = identityHere(files, clock(), dest);
+    const mine = identityHere(files, clock(), root, process.pid);
+    const other = identityHere(files, clock(), dest, process.pid);
 
     assert.ok(other, "the vehicle answers an identity");
     assert.notEqual(
@@ -68,7 +68,7 @@ test("a vehicle makes an identity of its own", () => {
       mine,
       "a vehicle holds its own, and never the one it came from",
     );
-    assert.equal(identityHere(files, clock(), dest), other, "and keeps it");
+    assert.equal(identityHere(files, clock(), dest, process.pid), other, "and keeps it");
   } finally {
     files.remove(where);
   }

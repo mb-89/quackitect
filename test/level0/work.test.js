@@ -102,7 +102,8 @@ test("done says one line to the log, naming the branch and the code", async () =
     [on("one-group")]: withField(took, "state", CLOSED),
     ...green,
   });
-  it.log = fakeLog(fakeClock(), { folder: "/log", id: "a6f8c43b" });
+  // A verb answering zero writes at debug, so the row shows on a box writing that floor and on no other. [[spec/design_output/log#which-kind-says-what]]
+  it.log = fakeLog(fakeClock(), { folder: "/log", id: "a6f8c43b", level: "debug" });
 
   const code = await heard(() => work(ROOT, ["done"], it)).code;
 
@@ -111,7 +112,7 @@ test("done says one line to the log, naming the branch and the code", async () =
   assert.deepEqual(it.log.lines(), [
     {
       at: "2026-01-01T00:00:00.000Z",
-      level: "info",
+      level: "debug",
       kind: "work",
       said: "done answered 0",
       branch: "work/one-group",

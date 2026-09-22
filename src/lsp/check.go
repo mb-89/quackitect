@@ -52,6 +52,7 @@ func (one *Checker) Over(path string) []Finding {
 		out = append(out, rule(one.tree)...)
 	}
 	out = append(out, syntaxFaults(one.tree, where)...)
+	out = append(out, anchorFaults(one.tree, where)...)
 	// A note says again what another holds, so the rule reads the pair. [[spec/design_output/lsp#a-second-copy-draws]]
 	if strings.HasSuffix(where, ".md") {
 		out = append(out, restatedOver(one, where)...)
@@ -82,6 +83,7 @@ func (one *Checker) Sweep() []Finding {
 	one.tree.Forgets()
 	out := append(treeFaults(one.tree), schemaFaults(one.tree)...)
 	out = append(out, syntaxSweep(one.tree)...)
+	out = append(out, anchorSweep(one.tree)...)
 	out = append(out, one.restatedAll()...)
 	return sorted(out)
 }

@@ -375,3 +375,19 @@ test("a group named as a branch is refused, and the bare name passes", () => {
 
   assert.deepEqual(weighed(naming("one-group"), naming("one-group")), []);
 });
+
+// A group's children stand under it already, so an ask naming one is refused, and the same name in the discussion passes. [[spec/design_output/work#a-group-is-a-ticket]]
+test("an ask naming a child of the group is refused, and the discussion may name it", () => {
+  const kids = ["the-flag-parks-work", "the-door-reads-marks"];
+  const asking = open.replace("What it asks for.", "What it asks for, with the-door-reads-marks.");
+  const found = ticketFaults(open, asking, SCHEMA, WHERE, kids);
+  assert.deepEqual(
+    found.map((one) => one.rule),
+    ["Ticket.restated"],
+  );
+  assert.match(found[0].message, /names the-door-reads-marks/);
+
+  const talking = open.replace("Nothing yet.", "See the-door-reads-marks.");
+  assert.deepEqual(ticketFaults(open, talking, SCHEMA, WHERE, kids), []);
+  assert.deepEqual(ticketFaults(open, asking, SCHEMA, WHERE), [], "a ticket with no children names nothing");
+});

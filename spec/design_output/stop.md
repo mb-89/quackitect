@@ -84,7 +84,7 @@ at every call and at the turn's end:
 | `finish` | the block rides: put the work down, start nothing new | the tooth votes |
 | `stop` | every call but the three below meets a refusal | the turn ends over the standing work |
 
-Three calls pass the hold at `stop`, because a turn ends through them: the
+The calls below pass the hold at `stop`, because a turn ends through them: the
 report, the stop claim and the answer check. Each carries the block, so the
 line stands in the answer to every call a held session makes. The hold at
 `stop` fires the rule `the-owner-holds-this-session` on the stop side, over
@@ -92,7 +92,7 @@ every continue rule but the owner's own word. A `hold` line at `debug` says
 what the door does.
 
 The hold is the stop hook's opposite. The hook holds a turn open, and the hold
-ends it, at two strengths:
+ends it, at the strengths below:
 
 | strength | what the owner asks for | which rule ends it |
 |---|---|---|
@@ -100,11 +100,11 @@ ends it, at two strengths:
 | `stop` | end this turn now | `the-owner-holds-this-session`, at 85 |
 
 The agent judges where that point stands at `finish`, because the work in
-hand decides it. At `stop` the door decides, and the three calls above are
+hand decides it. At `stop` the door decides, and the calls above are
 what it leaves.
 
-Each stands over every continue rule but the owner's own word, the queue's
-firm rule among them. So a held turn ends with work still waiting.
+Each stands over every continue rule but the owner's own word. So a held turn
+ends with work still waiting.
 
 So a hold is one turn long. It ends the turn it lands in, the turn's end puts
 it back to `off`, and it reaches no later turn. A prompt writes no hold,
@@ -112,14 +112,14 @@ because the press is the owner's word and the prompt carries its own.
 
 ## The hold outlives its drop
 
-Two events end a turn, and they arrive in either order:
+The events below end a turn, and they arrive in either order:
 
 | the event | the door | what it does with the hold |
 |---|---|---|
 | `turn.complete` | `dropsHold` | writes it back to `off` |
 | `classic.Stop` | `onStop` | reads it, and the vote runs |
 
-A drop landing first leaves the vote reading `off`. The two rules ending a turn
+A drop landing first leaves the vote reading `off`. The rules ending a turn
 for the owner lose there, a continue rule wins, and the turn reopens over work
 the owner puts down.
 
@@ -193,6 +193,12 @@ holds the door.
 | which todos you finish | they leave the queue |
 | which todos you add, each at its place | they land, up to `plan.mostOpen` open ones |
 
+The count of calls reaches the number, and the ask stands due. It lands on the
+first call no other ask holds, and the count starts over at the answer alone.
+So a standing update or refactor ask delays it, and the ask lands once the
+agent answers that one. A hand answering nothing spends the grace and meets the
+refusal.
+
 The ask rides the grace. The answer rides a channel off the chat: a `plan`
 field on any level zero call, or the `plan` call where none is due. A
 built-in tool refuses a field its schema names nowhere, so the answer rides
@@ -212,7 +218,7 @@ nothing fires over ends, because the stop side stands at a floor of zero. So a
 continue rule wins by standing above that floor, and a tie goes to the stop
 side.
 
-Four bands hold the numbers, so a later level lands without renumbering:
+The bands below hold the numbers, so a later level lands without renumbering:
 
 | band | who writes there |
 |---|---|
@@ -221,7 +227,7 @@ Four bands hold the numbers, so a later level lands without renumbering:
 | 1 to 49 | a preference |
 | 0 | the off switch |
 
-Three numbers carry an argument, and they stay where they stand:
+The priorities below carry an argument, and they stay where they stand:
 
 | priority | stands | so |
 |---|---|---|
@@ -253,6 +259,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` |
 | `chat-is-new` | the session log holds one prompt row at most, the box is no cloud box, and the answer names no next step |
 | `a-report-stands` | the message ending the turn carries the heading What the agent needs with a numbered row under it |
+| `the-plan-is-empty` | the plan holds no todo and nothing in hand, so a claim of done stands on an empty plan |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
 | `never` | nothing, which is what an unbuilt rule takes |
 
@@ -316,7 +323,7 @@ turn on a question it owns.
 
 `the-chat-is-new` is the opening turn's reason. A person opens a chat, nobody
 names the work yet, and the agent answers with what it sees and asks. The check
-reads two things:
+reads the following:
 
 | what it reads | it stands where |
 |---|---|
@@ -351,12 +358,12 @@ The second vote reads the same facts, so the first answer stands.
 
 The other road is a line last in the answer, which the tooth reads back. It
 costs a challenge, and the challenge costs a second answer for every stop, so
-the owner reads two endings. The call costs one line in the transcript, and
+the owner reads both endings. The call costs one line in the transcript, and
 its absence holds the turn open.
 
 # The tooth holds its state
 
-`toothOf` holds three counts in module state, and the hook holds the claim
+`toothOf` holds the counts below in module state, and the hook holds the claim
 beside it:
 
 | count | what it stands for |
@@ -389,7 +396,7 @@ Vale writes its own.
 
 # What the re-prompt says
 
-The re-prompt carries three things, and the ids stand one to a line:
+The re-prompt carries the following, and the ids stand one to a line:
 
 - the `says` of the winning continue rule, and the call to make
 - the `asks` of every stop rule with no claim on it
@@ -412,8 +419,9 @@ The hook counts the turns it carries one after another.
 - Past `mostInARow`, it writes a `warn` line and lets the turn end.
 - A prompt from outside the plugin resets the count, because that is the owner
   taking the session back.
-- A continue rule carrying `firm` holds past the cap, because the cap frees a
-  stuck session alone. The queue rule in `level1.yml` carries it.
+- The cap holds over every continue rule, the queue's among them. A session
+  refusing the stop line over work it leaves untaken is the stuck session the
+  cap frees. The queue stands for the next prompt.
 
 The hook asks the resolver for `stop.mostInARow` and `stop.enabled` at each
 turn end, and `atTurnEnd` takes the cap as an argument. So the tooth carries no

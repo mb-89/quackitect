@@ -86,3 +86,38 @@ session writes a new one, under the same name:
 A session that finishes without writing one leaves the next session with
 nothing, and the branch says `held` for ever.
 
+## 12. The example beside a rule
+
+A rule reaches the head, and a model acts from the hand. A model matches
+shapes, so a rule alone tells it what to want and shows it nothing to copy.
+
+An example is what to do and what not to do, in the tree's own words. The pair
+stands side by side in one row, so the reader sees the edge between them. The
+row stays short, because a long example reads as a second rule and drifts
+from the first.
+
+A row costs the attention every rule wants, so the rows go where the failures
+are:
+
+| the rule | its rows |
+|---|---|
+| reads clearly and holds | none |
+| fails once in the tree's record | one |
+| fails in every session | several, each showing a failure the tree met |
+
+The rows stand in a chapter of their own, so each rule stays one line the
+judge reads. The projection carries the table under the rules, so the shape
+reaches the agent with the rule.
+
+## 13. The failure beside the rule
+
+A rule standing as one instruction leaves a reader guessing what breaks
+without it. The reader then applies it where it costs and skips it where it
+bites. The instruction alone says nothing about which case is which.
+A second sentence naming the failure hands the reader the reason with the
+rule. A reader holding half of it then still holds what it guards.
+
+The check counts sentences on a marked rule alone. An unmarked rule holds no
+argument, so it takes no second sentence. The ticket
+[[spec/tickets/a-rule-names-its-failure]] carries the change that wrote every
+marked rule under `spec/guidance` in two sentences.

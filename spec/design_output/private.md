@@ -59,13 +59,13 @@ goes, and the version stays.
 
 ## The handover stands outside
 
-Git ignores `.se/HANDOVER.md`, so the two checks at the door pass it on. It
+Git ignores `.se/HANDOVER.md`, so the checks at the door pass it on. It
 reaches one reader once, and level zero deletes the copy it reads.
 
 # The run and the token
 
-`.claude/skills/level0/lib/private.js` holds the two functions, v3's guard over
-strings. Both read strings alone, so a caller hands the two texts in and a
+`.claude/skills/level0/lib/private.js` holds the functions, v3's guard over
+strings. Both read strings alone, so a caller hands the texts in and a
 test touches memory.
 
 | what it answers | the function |
@@ -75,17 +75,17 @@ test touches memory.
 | the first note a write carries something from | `carriedFrom` |
 | what the door says back | `refusedPrivate` |
 
-A run of six words shared with a note is a copy. Shorter, and an honest
-rewrite of a one-line note trips it, because the two texts are about the same
+A run of `COPY_RUN` words shared with a note is a copy. Shorter, and an honest
+rewrite of a one-line note trips it, because the texts are about the same
 thing and share their nouns. Longer, and a pasted fragment walks through.
 
 `COPY_RUN` in `private.js` holds that six, in the open, so the first run of
 real data moves it without archaeology.
 
-The commit door reads the same two checks over the lines a file adds. One word
+The commit door reads the same checks over the lines a file adds. One word
 list covers every line of the file, and each word carries the line it stands
-on. So a run crossing two lines refuses, and the refusal points at the line it
-opens on.
+on. So a run crossing more than one line refuses, and the refusal points at the
+line it opens on.
 
 ## The flatten
 
@@ -102,7 +102,7 @@ on. `wordsOf` reads the flat half of it, and one flatten serves every door.
 
 ## What a secret looks like
 
-One word is enough to leak, and a run of six words reaches past it. A token
+One word is enough to leak, and a run of `COPY_RUN` words reaches past it. A token
 counts as an identifier where it carries a separator inside it:
 
 | the mark | an example |
@@ -112,7 +112,7 @@ counts as an identifier where it carries a separator inside it:
 | a dot between letters | `example.com` |
 | twelve characters with no separator at all | a key, a hash, a password |
 
-A token shorter than eight characters passes, because a short word matches by
+A token shorter than `SHORTEST` characters passes, because a short word matches by
 chance and a check refusing honest writing is a check nobody keeps.
 
 ## A bare name passes
@@ -131,7 +131,7 @@ The write door reads every note under `.se/notes` at each tracked Write and
 Edit, and weighs the text the write lands:
 
 1. Refuse a shared identifier, naming the token and the note.
-2. Refuse a shared run of six words or more, quoting the run.
+2. Refuse a shared run of `COPY_RUN` words or more, quoting the run.
 3. Pass a write reaching neither.
 
 The token answers first, because one word is the smaller ask of an author. A
@@ -171,7 +171,7 @@ it adds. So a refusal points at the line the person or the session sees.
 
 A removed line passing is the load-bearing half: taking a leak out of the tree
 is the one commit that lands always. `addedIn` in `lib/private.js` is the
-reader, and the three checks below read the lines it answers.
+reader, and the checks below read the lines it answers.
 
 ## The three checks
 
@@ -196,8 +196,8 @@ timestamp in a fixture or a log line carries a build, and a date in a tracked
 note carries when somebody looks.
 
 `BoxNameStaysHome` reads the box at commit time, the way `NothingPrivateTravels`
-reads it at lint time. `namesAPerson` decides for both which of the four names
-count. It matches a whole word, and the case the box answers, so a git name of
+reads it at lint time. `namesAPerson` decides for both which names count. It
+matches a whole word, and the case the box answers, so a git name of
 `Duck` holds the word `Duck` home and lets `.duckdb` pass. So the same tree
 commits clean on a cloud box and names the owner on the owner's desk, which is
 where the leak starts.
@@ -212,7 +212,7 @@ where the leak starts.
 Both call `privateNow` over the same delta, so the two refuse the same thing in
 the same words, and `refusedDelta` in `lib/refuse.js` writes those words once.
 
-`privateNow` takes a reach answering three things, and each caller builds its
+`privateNow` takes a reach the table below names, and each caller builds its
 own:
 
 | the caller | its reach |
@@ -249,7 +249,7 @@ So each test assembles the shape out of parts at runtime:
 
     const ADDRESS = ["duck", "quacks.org"].join("@");
 
-The tracked line carries two words and a join, and the case carries the whole
+The tracked line carries the words and a join, and the case carries the whole
 shape. So the door reads the delta clean. The contract tests over the lint rule
 and the Vale shapes assemble theirs the same way. So the door reads its own
 proof clean, at every door.
@@ -262,7 +262,7 @@ way only where somebody writes the join on purpose.
 
 Every rule here reads strings, so every case hands one in.
 
-- `test/level0/private.test.js` drives the two functions, the reader and the three checks over strings and a fixture diff.
+- `test/level0/private.test.js` drives the functions, the reader and the checks over strings and a fixture diff.
 - `test/level0/precommit.test.js` drives the hook script over a fake disk and a fake git.
 - `test/level0/hooks.test.js` drives the write door over a fake note, and the Bash door over a staged diff.
 - `test/level0/bash.test.js` drives the escape and the second door over the command line alone.
@@ -275,9 +275,9 @@ words of each note. That part alone grows with the size of both.
 
 `.se/notes` stands empty today, so the run check answers on an empty list and
 the whole cost is the delta walk. `node --test test/level0/private.test.js`
-answers in milliseconds, and ten notes of five thousand words over a delta of
-a hundred files cost twelve seconds. Two roads out stand open: cap what the
-run check reads, or index the note words once per commit.
+answers in milliseconds, and a heavy note set over a full delta costs whole
+seconds instead. Roads out stand open: cap what the run check reads, or index
+the note words once per commit.
 
 # The shapes
 
@@ -338,5 +338,5 @@ on the tracked notes alone: does this text name a role, or one person?
 answer before the refusal.
 
 The rule reads `*.md` at the root and every note under `spec`, and it ignores
-`.se`. A raw note costs no model call, because the two checks at the door
+`.se`. A raw note costs no model call, because the checks at the door
 already stand between it and what git carries.

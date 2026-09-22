@@ -17,7 +17,7 @@ its first session with nothing typed.
 
 # The bridgehead and the server
 
-Level zero is two pieces. The bridgehead, `hooks/level0.js`, is the module the
+Level zero holds the bridgehead and the server. The bridgehead, `hooks/level0.js`, is the module the
 client loads, and the one hook a project carries: one door for every event,
 `*`, and one function behind it. It posts each event to the server at the
 port, with the root the session works in, and does what the answer says. It
@@ -66,7 +66,7 @@ the agent runs.
 A server killed and running again takes the next event as its own, because
 the bridgehead holds no state and no connection. So the session goes on across
 every restart of the server, and the client reloads the bridgehead for no
-change of a door. Three headless turns say so, against client 2.1.269:
+change of a door. Headless turns say so, against client 2.1.269:
 
 | turn | what it shows |
 |---|---|
@@ -80,7 +80,7 @@ Nobody presses the hook button on a cloud box. So the pull that takes a
 branch there ends on the server, through `src/scripts/serve.js`. It probes
 the health answer at the port the pointer names. Where nothing answers, it
 starts the server on its own, the way the stub's bridgehead does. The pull's
-last line says which of the three stands:
+last line says which of these stands:
 
 | what stands | the line says |
 |---|---|
@@ -141,11 +141,11 @@ box whose first event finds no server alone.
 
 ### The first call pays
 
-`READ_TOOLS` in the hook names the four tools a hand reads with, and the hook
+`READ_TOOLS` in the hook names the tools a hand reads with, and the hook
 registers each at the session's start. That registration reaches no server, so
 a box whose server answers nothing carries the tools anyway.
 
-A call landing before the server stands takes three steps:
+A call landing before the server stands takes these steps:
 
 - it asks the server once, and answers where one stands
 - it runs the start above, then reads `/health` every fifth of a second
@@ -184,6 +184,22 @@ at `fatal`. So the log names why the server falls, and the next start reads
 as a fresh one. A kill from outside the process writes nothing, so a log
 ending on no `fatal` line names a kill.
 
+## A restart watches its child
+
+A restart closes the port and starts the server again from the same
+arguments. A fault in a moved file ends the new server before the crash
+handler above stands. So a detached start with its output going nowhere
+leaves a silent port, and the desk starts one by hand.
+
+The old server hands the start to the process door, with a window and the
+serve log as the child's output. A child ending inside the window is a fall.
+Then the old server writes
+one `fatal` line naming the exit and the line the child writes, and exits
+with one. A child standing past the window is the server, and the old one
+exits clean. `RESPAWN_WAIT` in `src/bridge/server.js` holds the window, and
+`SERVE` in `lib/log.js` names the file. `respawned` takes the exit as an
+argument, so a case drives the fall through the fake process door.
+
 ## The server holds off sleep
 
 A box asleep answers no hook, so a session under agent control dies with the
@@ -216,7 +232,7 @@ later. So the bridgehead says it where a person stands.
 | drops both marks | the server answers again |
 
 The route both name is the one the bridgehead posts to, which `url()` answers.
-The line names it, what the wire says, and the two commands a person runs:
+The line names it, what the wire says, and the commands a person runs:
 `./RUNME.sh serve`, and `./RUNME.sh doctor` where that fails.
 
 The session start says nothing to the person. `seen` posts every event to the
@@ -229,7 +245,7 @@ there reads false on every healthy cloud start.
 | the row's mark | one row a fall |
 | the chat's mark | one line a fall, standing apart so a session start keeps the line unsaid |
 
-The two marks stand apart, because a session start writes the row and leaves
+The marks stand apart, because a session start writes the row and leaves
 the line. A harness offering no `$.ui` leaves the row alone, and nothing
 throws. `./RUNME.sh doctor` names the server under `server`, where a person
 asks after it later.
@@ -253,8 +269,8 @@ carries one block, `level0-cage`:
 
 `cageText` in `hooks/level0.js` builds the block. The hook holds that code until
 a server answers. The block asks the agent to open its first answer with one
-line saying level zero stands down. A person then tells two sessions apart at a
-glance.
+line saying level zero stands down. A person then tells a caged session from
+an uncaged one at a glance.
 
 A box whose server stands reaches none of this. The answer of the server clears
 what the road holds, so a session reading the rules reads the canary alone.
@@ -325,7 +341,7 @@ every string under `hooks`. It keeps the ones a URL parses as `http:` or
 
 A command hook holds a path, and `new URL` takes a Windows path as a URL. So
 the reader holds those schemes alone, and a command hook stands outside the
-list. Two files naming one address stand as one row, off the file naming it
+list. Files naming one address stand as one row, off the file naming it
 first.
 
 | what the probe meets | the row under the address |
@@ -451,7 +467,7 @@ also answers its newest `4096` alone, so a position in it shifts.
 
 So the answer gate reads the step first and the transcript second, and lets the
 calls of a response in flight pass. For details, see
-[[spec/design_output/level0#a-step-carries-the-answer]].
+[[spec/design_output/level0#what-the-door-reads]].
 
 ## Arguments arrive on the event
 
@@ -783,9 +799,20 @@ The private half answers first, so a note's own words stop at the door. The
 refusal closes by asking the writer to hold that rule for the rest of the turn.
 A refusal teaching one line costs a round trip on every line.
 
+## A warning feeds the list
+
+A rule at warning is a break of form, and the write lands over it. The door
+puts the file's rows on the refactoring hand's list, in place of the rows the
+file held there. It writes each row to the log under the warning. The context
+after the call tells the agent that the rows stand and the work goes on.
+
+So the list fills as the tree changes, and the hand fires off it during a
+session. The check's lint writes the whole list again, so the two meet.
+[[spec/design_output/stop#the-grace]] says when the hand wants the turn.
+
 ## A write meets its mark
 
-Two hands on one tree drop each other's work. One reads a file, the other
+Separate hands on one tree drop each other's work. One reads a file, the other
 writes it, and the first write lands over text the other leaves. So the door
 keeps a mark against each path, and a write meets it.
 
@@ -804,7 +831,7 @@ mark comes off the read reaching the agent.
 The hand carries nothing. `lib/marks.js` holds the hash and the refusal, and
 the box holds the marks against the tree it serves. This door writes a refusal
 of its own, because the voice refusal opens on the prose rules and says the
-wrong thing here. It names the file, says which of the two cases stands, and
+wrong thing here. It names the file, says which case stands, and
 asks for a read.
 
 The door answers ahead of the write, so a write the engine drops leaves the
@@ -899,9 +926,9 @@ answers nothing.
 
 ## A rule refuses a list
 
-Give `refuses` one label, or a list of them. `ShapeFits` names three labels and
-refuses two, so the model picks the shape and the rule refuses every shape that
-is not prose.
+Give `refuses` one label, or a list of them. `ShapeFits` names each shape and
+refuses all but prose, so the model picks the shape and the rule refuses every
+shape that is not prose.
 
 # The standing layer
 
@@ -911,6 +938,15 @@ handover and the canary arrive.
 
 The system prompt's sections stay free for guidance that depends on where the
 work stands.
+
+## The examples ride the rules
+
+A guidance note's `Examples` table follows its rules into every block the
+rules reach. That is the standing layer, a helper's prompt, a kind's layer and
+the output style. `rulesOf` in `lib/guidance.js` writes the numbered rules and
+the table under them, so every reader carries one shape. The canary counts the
+rules alone, because a row shows a rule and adds none.
+[[spec/guidance/guidance]]
 
 ## The style carries a note
 
@@ -928,7 +964,7 @@ projection writes `.claude/output-styles/level0.md` from every such note.
 The style sits in the cached prefix, so the same text costs full price once a
 session. A line injected into a user turn sits behind the cache line, and it
 costs full price every turn. So the style carries the rules, and no hook does.
-`guidanceHere` in `src/bridge/guidance.js` splits the two standings, and
+`guidanceHere` in `src/bridge/guidance.js` splits the standings, and
 `styled` in `lib/guidance.js` reads the flag.
 
 ## The canary
@@ -961,7 +997,7 @@ because `canary` builds it in `lib/guidance.js` and both callers read it there.
 
 The line stands first in the answer, and the stop line stands last. A line
 quoted further down proves nothing, because an agent repeats the words of an
-older answer anywhere. The two ends keep the two doors apart. The canary says
+older answer anywhere. The start and the end keep the doors apart. The canary says
 level zero holds this session, and the stop line says a reason to end the turn
 stands. One line stands for the other nowhere. For details, see
 [[spec/design_output/stop#the-two-lines-stand-apart]].
@@ -978,7 +1014,7 @@ or `none`. The first one alone pays. A line with other counts comes out of a
 block the session lacks, so it owes what silence owes.
 
 While the debt stands, `tool.call` behaves the way the owner's prompt door
-behaves. For details, see [[spec/design_output/level0#one-warning-then-a-refusal]].
+behaves. For details, see [[spec/design_output/level0#the-first-call-is-free]].
 
 | the call | what it meets | the `gate` line |
 |---|---|---|
@@ -1066,7 +1102,7 @@ session remembers them. So a door holds them instead.
 ## What the door reads
 
 The door opens a demand for what a person waits for. It holds every
-`tool.call` after the first while nothing pays it. Three things pay it:
+`tool.call` after the first while nothing pays it. What pays it:
 
 | what pays | when |
 |---|---|
@@ -1075,13 +1111,13 @@ The door opens a demand for what a person waits for. It holds every
 | the turn's last text | at `turn.complete`, where the demand still stands |
 
 The client posts `classic.MessageDisplay` for every text it shows, a text
-between two calls among them. Each event carries that text under `delta`, and
+between calls among them. Each event carries that text under `delta`, and
 `onMessageDisplay` pays the demand with it. So a chat answer pays the door on
 its own, and the call under it passes.
 
 The other roads stay. The transcript behind `$.session.messages()` flushes
 late, sometimes a turn late. The step's stream carries text for the first step
-alone. The bridgehead still posts the last four texts of the transcript on a
+alone. The bridgehead still posts the last texts of the transcript on a
 hold. The door pays on any text since the demand that fits, so a flush landing
 late pays too.
 
@@ -1218,7 +1254,7 @@ copy honest. A copy nobody can edit needs no guard.
 # The gate reads the answer
 
 The turn's end runs the answer through Vale under the `*answer.md` section of
-`.vale.ini`, and the score of what comes back cuts into three bands. The reply
+`.vale.ini`, and the score of what comes back cuts into bands. The reply
 already stands on screen when `turn.complete` fires, so the gate refuses
 nothing. It re-prompts, it carries a line into the next prompt, or it does
 nothing at all.
@@ -1233,13 +1269,13 @@ outside every fence. A fence belongs to the formatter and the compiler, so it
 counts for nothing on either side of that division.
 
 A short answer scores high on one finding. Twenty words and one finding read as
-fifty, which stands over the ceiling. So the owner tunes the two values against
+fifty, which stands over the ceiling. So the owner tunes the values against
 the answers a session writes.
 
 ## The three bands
 
 `answer.warnAt` and `answer.ceiling` in `spec/config/level0.json` hold the two
-edges, and the score falls in one of three bands:
+edges, and the score falls into one of the bands below:
 
 | the score | what happens |
 |---|---|
@@ -1368,7 +1404,7 @@ finding in a long answer pass, and a shape finding holds no rate.
 
 # The rules past one buffer
 
-Vale hands a rule one buffer, so a rule weighing two files stands outside it.
+Vale hands a rule one buffer, so a rule weighing more than one file stands outside it.
 Vale reads a shell script once `[formats]` names the ending, and the leading dot
 carries that mapping: `.ps1 = md` reads the file, and a bare `ps1 = md` answers
 `unsupported extension`.
@@ -1434,7 +1470,7 @@ words they refuse.
 `./RUNME.sh fix` runs a round at a time until the tree stops moving. Each round
 calms every shout this tree finds, then hands the file to `vale fix --apply`.
 
-Vale carries five actions, and none of them folds case:
+Vale carries the actions below, and none of them folds case:
 
 | action | what it does |
 |---|---|
@@ -1480,8 +1516,8 @@ stands behind Vale's finding with one general veto:
 | another form, `wrote`, `did`, `failed` | past, and the finding stands |
 
 `src/engine/tense.js` reads the line the finding stands in through wink-nlp,
-which hands a lemma a token. Two more vetoes ride the same reader, in
-`src/bridge/prose.js`. The three doors reading prose call that one entry: the
+which hands a lemma a token. More vetoes ride the same reader, in
+`src/bridge/prose.js`. The doors reading prose call that one entry: the
 write door, the draft check and the commit message. The check and the terminal
 push door take the tense veto alone, through `readThrough` in
 `src/bridge/findings.js`, so a push carries the list the check reads. A `vale`
@@ -1514,7 +1550,7 @@ write door skips the lint inside `if (bin)`, and the call passes. The tree reads
 green throughout, because `./RUNME.sh check` carries its own Vale and asks the
 plugin nothing.
 
-So the load stands in `loadCage`, and it answers two questions in place of one:
+So the load stands in `loadCage`, and it answers more than one question in place of one:
 
 | the load meets | the cage answers |
 |---|---|

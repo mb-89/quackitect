@@ -77,6 +77,25 @@ test("a note carrying no actionables answers none", () => {
   assert.deepEqual(actionables("# Motivation\n\nNothing else.\n"), []);
 });
 
+// [[spec/design_output/level0#the-examples-ride-the-rules]]
+test("the standing layer carries a note's Examples table under its rules", () => {
+  const shown = `${note}\n# Examples\n\n| the rule | do | do not |\n|---|---|---|\n| 1 | apply it | skip it |\n| 2 | argue it | assert it |\n`;
+  assert.deepEqual(lib.examples(shown), [
+    "| the rule | do | do not |",
+    "|---|---|---|",
+    "| 1 | apply it | skip it |",
+    "| 2 | argue it | assert it |",
+  ]);
+  assert.deepEqual(lib.examples(note), [], "a note without the chapter shows none");
+  const said = standingLayer([{ name: "voice.md", text: shown }]);
+  assert.match(
+    said,
+    /2\. The second rule, which needs an argument\.\n\n\| the rule \| do \| do not \|\n\|---\|---\|---\|\n\| 1 \| apply it \| skip it \|/,
+  );
+  assert.doesNotMatch(said, /Because of a thing that happened/);
+  assert.equal(countsOf([{ name: "a.md", text: shown }]).rules, 2, "a row is no rule");
+});
+
 test("the standing layer carries every note under its own title", () => {
   const said = standingLayer([
     { name: "voice.md", text: note },

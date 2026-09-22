@@ -173,3 +173,26 @@ func TestNoSurveyAtAllRefuses(t *testing.T) {
 		t.Errorf("the message reads %q", one.Message)
 	}
 }
+
+// A case drives the tree over the memory disk the package holds, so it touches no folder on the box. [[spec/tickets/a-door-holds-file-calls]]
+func TestTheTreeReadsThroughTheDiskACaseHandsIt(t *testing.T) {
+	t.Parallel()
+	tree := fakeTree(map[string]string{
+		"spec/one.md":   "# One\n",
+		"spec/two.md":   "# Two\n",
+		"spec/data.yml": "kind: data\n",
+	})
+
+	if tree.Read("spec/one.md") != "# One\n" {
+		t.Fatalf("the tree reads %q, and the fake holds the note", tree.Read("spec/one.md"))
+	}
+	if !tree.Exists("spec/two.md") || tree.Exists("spec/three.md") {
+		t.Fatal("the tree answers a note the fake lacks, or misses one it holds")
+	}
+	if got := strings.Join(tree.Names("spec", ".md"), " "); got != "one.md two.md" {
+		t.Fatalf("the names read %q, and the fake holds two notes", got)
+	}
+	if got := strings.Join(tree.Paths(), " "); got != "spec/data.yml spec/one.md spec/two.md" {
+		t.Fatalf("the paths read %q, and the fake holds three files", got)
+	}
+}

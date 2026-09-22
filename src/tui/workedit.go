@@ -9,7 +9,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -51,7 +50,7 @@ func (s ticketSchema) Owned(key string) bool { return s.owned[key] }
 
 // [[spec/design_output/schema#the-verbs-own-their-fields]]
 func readTicketSchema(root string) (ticketSchema, error) {
-	text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(ticketSchemaAt)))
+	text, err := readFile(filepath.Join(root, filepath.FromSlash(ticketSchemaAt)))
 	if err != nil {
 		return ticketSchema{}, err
 	}
@@ -197,7 +196,7 @@ func writeTicket(root string, one Item) error {
 		return nil
 	}
 	file := filepath.Join(root, filepath.FromSlash(at))
-	text, err := os.ReadFile(file)
+	text, err := readFile(file)
 	if err != nil {
 		return err
 	}
@@ -205,7 +204,7 @@ func writeTicket(root string, one Item) error {
 	if !ok {
 		return errors.New(at + " carries no front, so the write reaches no field")
 	}
-	return os.WriteFile(file, []byte(said), 0o644)
+	return writeFile(file, []byte(said), 0o644)
 }
 
 // The front with one top-level field set, or dropped where the value is empty or a flag standing off. [[spec/design_output/tui#the-work-tab-takes-edits]]

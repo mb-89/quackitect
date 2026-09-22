@@ -48,7 +48,7 @@ Two more kinds come out of the gate:
 - `gate` carries a call the gate warns or refuses, at `warn`.
 - `god` carries a refusal god mode passes, at `warn`.
 
-For details, see [[spec/design_output/level0#a-step-carries-the-answer]].
+For details, see [[spec/design_output/level0#what-the-door-reads]].
 
 # Which kind says what
 
@@ -71,7 +71,7 @@ A line the `log` tool writes carries the kind the agent names.
 
 # A setting writes a line
 
-A key moves in two ways, and each writes a line naming the key and its value:
+A key moves in the ways listed below, and each writes a line naming the key and its value:
 
 - The `sidebar` kind carries a press, a run or an edit in the sidebar.
 - The `config` kind carries `./RUNME.sh config <key> <value>`, which every slash command runs.
@@ -123,8 +123,8 @@ what the disk carries. For details, see
 
 # Where the writer stands
 
-`.claude/skills/level0/lib/log.js` shapes a line and reaches nothing. Three
-writers read it, because three runtimes write:
+`.claude/skills/level0/lib/log.js` shapes a line and reaches nothing. The
+writers below read it, one for each runtime:
 
 - `logHere` in `hooks/level0.js`, through `$.fs`
 - `src/doors/log.js`, through the disk door, for the command line
@@ -162,7 +162,7 @@ current one alone.
 
 # One verb reads the log
 
-`./RUNME.sh log` answers the rows the log holds, narrowed by four flags:
+`./RUNME.sh log` answers the rows the log holds, narrowed by the flags below:
 
 | the flag | what it reads | the owner it calls |
 |---|---|---|

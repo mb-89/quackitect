@@ -15,13 +15,13 @@ import {
   isNoteSchema,
   kindOf,
   LEFT,
-  mintNote,
   processHash,
   readYaml,
   SEVERITY,
   schemaFaults,
   schemasIn,
 } from "../../.claude/skills/level0/lib/schema.js";
+import { mintNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { lintText } from "../../.claude/skills/level0/lib/vale.js";
 import { disk } from "../../src/doors/disk.js";

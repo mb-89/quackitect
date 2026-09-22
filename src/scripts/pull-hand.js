@@ -3,7 +3,8 @@
 // [[spec/design_output/pull#the-hand-out]]
 
 import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
-import { entryNamed, reRouted } from "../../.claude/skills/level0/lib/schema.js";
+import { entryNamed } from "../../.claude/skills/level0/lib/schema.js";
+import { reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 
@@ -20,15 +21,16 @@ import {
   OPEN,
   TICKETS,
   ticketNamed,
+  todoOf,
   urgent,
   withEntry,
   withField,
-  todoOf,
 } from "../engine/group.js";
 import { noteRows, readsOf, writeHold } from "./guidance-hand.js";
+import { workAnswer } from "./pull-chapter.js";
 import { roleOf } from "./pull-hand-of.js";
 import { landed } from "./pull-landed.js";
-import { workAnswer } from "./pull-chapter.js";
+import { queued, stoodHere } from "./pull-queue.js";
 import {
   DONE,
   ENGINE,
@@ -40,9 +42,8 @@ import {
   WAIT,
   walkOf,
 } from "./pull-route.js";
-import { entriesOf, pushed, returnsOf, shut, target, tipOf } from "./pull-writes.js";
-import { queued, stoodHere } from "./pull-queue.js";
 import { HELPER, SPAWN, spawnPrompt, unblockPrompt } from "./pull-spawn.js";
+import { entriesOf, pushed, returnsOf, shut, target, tipOf } from "./pull-writes.js";
 import { NOTES, schemasHere } from "./ticket.js";
 
 export function ticketsHere(it) {
@@ -104,9 +105,7 @@ export function handOut(it, who) {
   const groupTicket = all.find((one) => !one.private && one.name === who.group);
   // The tag says the next pull hands it first, on a note and on a ticket alike. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
   const tagged = all.filter((one) => todoOf(one.front) !== "");
-  const privates = all.filter(
-    (one) => one.private && todoOf(one.front) === "",
-  );
+  const privates = all.filter((one) => one.private && todoOf(one.front) === "");
   const at = weighing(it, all);
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
   const pools = who.group

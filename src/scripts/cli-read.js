@@ -1,6 +1,6 @@
 // What the command line reads: the version, the index, the notes a reader
 // asks for, and the walk over a folder.
-// [[spec/design_output/tree#the-reader]]
+// [[spec/design_output/tree#the-tree-handed-in]]
 
 import { join } from "node:path";
 import { BIN as INDEX_BIN } from "../../.claude/skills/level0/lib/index.js";
@@ -106,7 +106,8 @@ export async function lint(where) {
 
   const ms = it.clock.now().getTime() - began;
   if (!found.length) {
-    await it.log.say("info", "vale", `the rules pass over ${where.join(" ")}`, { ms });
+    // The rules passing is the expected road, so the row stands at debug and the floor hides it. [[spec/design_output/log#which-kind-says-what]]
+    await it.log.say("debug", "vale", `the rules pass over ${where.join(" ")}`, { ms });
     console.log("The rules pass.");
     return 0;
   }

@@ -138,6 +138,7 @@ test("a stub holds every file the list names, and nothing else", () => {
     fakeClock(),
     "/tools",
     "/stub",
+    7,
   );
   assert.equal(said.ok, true, said.why);
   assert.deepEqual(walk(files, "/stub"), [...said.files].sort());
@@ -169,6 +170,7 @@ test("the record reads off the register and the remote", () => {
     fakeClock(),
     "/tools",
     "/stub",
+    7,
   );
   assert.equal(said.ok, true, said.why);
   const record = JSON.parse(files.read("/stub/vehicle.json"));
@@ -191,7 +193,7 @@ test("a vehicle with no remote refuses, and writes nothing", () => {
 
 test("--upstream goes past the refusal, and the record carries it", () => {
   const files = vehicle();
-  const said = stubInto(files, origin(""), fakeClock(), "/tools", "/stub", {
+  const said = stubInto(files, origin(""), fakeClock(), "/tools", "/stub", 7, {
     upstream: "https://host/c/d.git",
   });
   assert.equal(said.ok, true, said.why);

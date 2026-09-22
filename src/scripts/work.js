@@ -180,12 +180,13 @@ function markOff(it, branch) {
   return said.ok ? said.out.trim() : "";
 }
 
-// [[spec/design_output/log#which-door-says-what]]
+// [[spec/design_output/log#which-kind-says-what]]
 function tell(it, what, code) {
   if (!it.log) return code;
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  // A verb answering zero is the expected road, so it stands at debug and the floor hides it. [[spec/design_output/log#which-kind-says-what]]
   return it.log
-    .say(code === 0 ? "info" : "warn", "work", `${what} answered ${code}`, { branch })
+    .say(code === 0 ? "debug" : "warn", "work", `${what} answered ${code}`, { branch })
     .then(() => code);
 }
 

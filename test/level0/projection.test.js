@@ -113,7 +113,7 @@ test("a small set of options takes one file each, and a number takes an argument
   );
 });
 
-// [[spec/design_output/projection#a-name-carries-the-key]]
+// [[spec/design_output/projection#a-name-carries-the-path]]
 test("a name carries the path it sits on, and the leaf keeps its case", () => {
   assert.equal(nameOf(configPath("judge.model").stem), "se-config-judge-model.md");
   assert.equal(
@@ -427,6 +427,13 @@ style: true
 
 1. Put the bottom line first.
 2. Say a thing once. *
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 1 | the answer first | the road to it first |
+| 2 | one owner and a link | a second wording |
 `;
 
 const plain = `---
@@ -454,6 +461,12 @@ test("the style shape writes one file, from the flagged notes alone", () => {
   assert.match(
     said,
     /## voice\n\n1\. Put the bottom line first\.\n2\. Say a thing once\.\n/,
+  );
+  // [[spec/design_output/level0#the-examples-ride-the-rules]]
+  assert.match(
+    said,
+    /2\. Say a thing once\.\n\n\| the rule \| do \| do not \|\n\|---\|---\|---\|\n\| 1 \| the answer first \| the road to it first \|\n\| 2 \| one owner and a link \| a second wording \|\n/,
+    "the Examples table rides under the rules",
   );
   assert.ok(!said.includes("Work one ticket"), "an unflagged note stays out");
   assert.ok(

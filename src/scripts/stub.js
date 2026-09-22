@@ -20,7 +20,7 @@ import {
 import { identityHere } from "./vehicle.js";
 
 // [[spec/design_output/vehicle#the-record-names-the-vehicle]]
-export function stubInto(files, git, time, method, dest, said = {}) {
+export function stubInto(files, git, time, method, dest, pid, said = {}) {
   if (same(dest, method))
     return { ok: false, why: "a stub lands beside its vehicle, elsewhere" };
 
@@ -39,7 +39,7 @@ export function stubInto(files, git, time, method, dest, said = {}) {
 
   const template = walk(files, join(method, TEMPLATE));
   const record = linkOf(
-    identityHere(files, time, method),
+    identityHere(files, time, method, pid),
     brand,
     upstream,
     versionOf(files, method),

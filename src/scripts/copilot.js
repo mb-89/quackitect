@@ -19,6 +19,8 @@ import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { session } from "../doors/session.js";
+import { assemble } from "./styles.js";
+import { rootsHere } from "./vehicle.js";
 
 const DEADLINE = 20000;
 const LEAST_LEFT = 100;
@@ -33,9 +35,13 @@ const cloud =
   files.exists(join(root, inRun("copilot-cloud"))) ||
   Boolean(process.env.GITHUB_COPILOT_GIT_TOKEN && process.env.COPILOT_AGENT_PROMPT);
 const surface = cloud ? "cloud" : "vscode";
+// The pair of roots the door reads, so the copilot road assembles the same rule set. [[spec/design_output/vehicle#the-styles-assemble-once]]
+const roots = rootsHere(files, process.env, root);
 let currentEvent = { surface, event: name, retry: false };
 const it = {
   root,
+  work: roots.work,
+  styles: () => assemble(files, roots).config,
   disk: files,
   proc: outside,
   git: git(outside, root),

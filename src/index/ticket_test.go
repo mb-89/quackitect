@@ -4,6 +4,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -148,7 +149,19 @@ func TestAStandingReadsOffTheGroupsRecordThroughTheTicket(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/work#held-derives-from-the-record]]
+// A note keeps its state, and its route says what it is, which the tab draws as a letter. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+func TestANoteKeepsItsStateAndNamesItsRoute(t *testing.T) {
+	t.Parallel()
+	note := "---\nkind: [[ticket]]\nstate: open\nprocess: [[note]]\n---\n\n# Ask\n\nA thought.\n"
+	said := ticketOf(".se/tickets/parked.md", "parked", note, 1)
+	if said.State != openState || said.Route != "note" {
+		t.Fatalf("a note reads open on the route note, and reads %+v", said)
+	}
+	if strings.Contains(said.Route, "/") {
+		t.Fatal("the route reads as its bare name")
+	}
+}
+
 // A todo names the row the ticket stands before, or reads true, and either lights the flag. [[spec/design_output/pull#the-queue-is-an-outline]]
 func TestATodoNamingARowLightsTheFlag(t *testing.T) {
 	t.Parallel()
