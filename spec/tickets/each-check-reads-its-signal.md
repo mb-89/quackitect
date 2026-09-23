@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -105,6 +105,10 @@ record:
     hand: box dcd73916add7 · claude-code-remote
     hash_before: ac029435a0cdf34ed28517ecc6c4a9001a93b4c3
     hash_after: ac029435a0cdf34ed28517ecc6c4a9001a93b4c3
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-4
+    hash_before: 9b58a423e46b84729aa91740ec3f498abe48de9b
+    hash_after: 9b58a423e46b84729aa91740ec3f498abe48de9b
 ---
 
 # Ask
@@ -192,18 +196,14 @@ The cost: the stamp grows by the kept runs.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- design: the unresolved rule refuses `$TMPDIR/msg.md`, and the design output keeps a temp variable free. Test `FREE` before the unresolved rule, and drop that cost.
-- craft: `echo x > $HOME/y.md` refuses today already, so that case starts green. Use `echo x > $out/y.md` for the unresolved case.
-- craft: `writesIn` reads one segment, so the `NAME=value` state lives in `writesAPath` across segments.
-- craft: `precommit.js` runs with no hand, so name how it finds the hold. `holdsAnywhere` answers for every hand on the box.
-- craft: the carried paths take `test/` alone, so a Go tests-red leaf carries nothing. Take `_test.go` paths too.
-- craft: `SOURCE` takes `src/**/*.go`, so keep `_test.go` out of it.
-- craft: the awake release ends the child and hides it. The exit wait needs a change in `src/doors/awake.js` and its fake.
-- craft: `retro-collect.js` writes the median, so name it in the table.
-- craft: the median reads a part only from the runs that ran it, because a red run leaves parts unrun.
-- craft: `filesUnder` reads an empty list as a file. Read the file in the catch, and read an empty folder as empty.
+- craft: `echo x > $out/y.md` refuses today too, because the `.md` suffix reaches. Use `echo x > $f` for the unresolved case.
+- craft: `out=/tmp; echo x > $out/y.md` refuses today and passes once resolved. Add it as the resolved free case.
+- craft: `holdsAnywhere` answers the first hold, and several hands hold on one box. Take the carried tests of every hold.
+- craft: every `release` answers a promise, the no-hold branches and the fake included. Listen for `exit` at the spawn.
+- craft: the median covers `parts`, and `slowest` and `files` stay from one run. Name that in the table.
+- craft: the kept runs span commits. Keep only runs at the stamp's `sha`, or name why a mix holds.
 
 # implement
 
