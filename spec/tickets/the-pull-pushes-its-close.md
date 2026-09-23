@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -129,6 +129,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-7
+    hash_before: 7e54fe8518c2351cd47cfec13ec90f42e5d35a79
+    hash_after: 7e54fe8518c2351cd47cfec13ec90f42e5d35a79
+reason: done
 ---
 
 # Ask
@@ -339,17 +344,45 @@ A hand-back on trunk now runs the check over its close and lands pushed.
 
 <!-- the form is files -->
 
+- spec/tickets/the-pull-pushes-its-close.md
+- spec/guidance/review/reviewing.md
+- spec/design_output/pull.md
+- src/scripts/pull-push.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
+- src/scripts/pull-hand.js
+- src/scripts/commit-verb.js
+- src/scripts/cli-check.js
+- test/level0/pull-push.test.js
+- test/level0/pull-escalate.test.js
+- test/level0/pull-steps.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- design: the pull runs the check after it commits the close, and pushes on a pass.
+- design: a refused push answers the push door's own lines, and a rebase runs on a moved branch alone.
+- design: on trunk a tests-red close stands on this box, and the answer says so.
+- design: `pull-push.test.js` holds a case for each line of the ask, and each case asserts an order or a refusal.
+- design: `./RUNME.sh check` exits 0, and it takes about 36 seconds.
+- craft: on trunk the change leaf can meet red tests, so a close that lands answers refused.
+- craft: `repairPersonSteps` runs one full check for each ticket it repairs, and it reads no answer.
+- craft: the take-back and the escalate each run a full check on trunk, and the push door asks for it.
+- craft: the headers of `pull-push.js` and `pull-push.test.js` repeat the table in `pull.md`.
+- craft: no retro stands in the hand-back.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the facts stand in the table under the rejected push in `pull.md`, and each comment points there, save two headers.
 
 # Discussion
 
