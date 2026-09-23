@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: ff09de9e02abf0050bbf75d137e1f31d1bdaa235
     returns: 2
     why: "design: the rule refuses a `;` before a pull with a flag, and the Ask names every `ticket pull`.; craft: `open` hands its text to `landedAlone`, which writes the file, so the open drops its own write.; design: fix it by counting every `ticket pull` as a landing, as the Ask line says.; craft: the rule walks the tokens of the text `withoutHeredocs` leaves, so a heredoc body raises no `;`.; craft: a `&` runs the landing beside its gate, so the rule refuses it beside `;` and `||`.; craft: `open` hands its text to `landedAlone`, which writes the file itself, so the open drops its own write.; craft: the earlier findings all stand answered, from the stamp order to the verdict leaf."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: e18b19cf15681e7789052300cdfcde1a6ce24131
+    hash_after: e18b19cf15681e7789052300cdfcde1a6ce24131
 ---
 
 # Ask
@@ -143,13 +147,13 @@ Each landing waits on its gate, in four places.
 | part | what changes |
 |---|---|
 | the `;` rule | `findings` in `.claude/skills/level0/lib/bash.js` names `LandingFollowsItsGate` |
-| the walk | the rule walks `tokensOf`, because `partsOf` drops the operator between segments |
-| what it refuses | a `;`, a newline or a `\|\|` whose next segment lands |
-| a landing | `ticket pull` with a flag, `ticket open`, `git commit`, or the commit verb |
+| the walk | the rule walks `tokensOf` over the text `withoutHeredocs` leaves, because `partsOf` drops the operator between segments |
+| what it refuses | a `;`, a newline, a `\|\|` or a `&` whose next segment lands |
+| a landing | any `ticket pull`, `ticket open`, `git commit`, or the commit verb |
 | what passes | `&&`, which runs the landing on a green gate alone |
 | the bare pull | `pull` in `src/scripts/pull.js` shows the leaf in hand where a name comes with no flag |
 | the verdict leaf | a leaf holding a verdict field still hands back on the bare name, because the field is its flag |
-| the open | `open` in `src/scripts/ticket.js` lands the ticket through `landedAlone` in `pull-landed.js` |
+| the open | `open` in `src/scripts/ticket.js` hands its text to `landedAlone` in `pull-landed.js`, which writes it and commits |
 | the open's refusal | a commit the hook refuses puts the draft back, and the verb exits 1 |
 | the commit verb | `landsAndPushes` in `commit-verb.js` runs `./RUNME.sh test` before `git add` |
 | a red test | the verb exits 1 with the run's output, and stages nothing |
@@ -160,7 +164,8 @@ The assumption: the verdict leaf keeps its bare hand-back, because the pull refu
 
 The cases:
 
-- `bash.test.js`: a `;` before each of the four landings refuses, a newline and a `\|\|` refuse, and `&&` passes
+- `bash.test.js`: a `;` before each landing refuses, a bare `ticket pull` among them
+- `bash.test.js`: a newline, a `\|\|` and a `&` refuse, a heredoc's newline passes, and `&&` passes
 - `pull.test.js`: a bare name on a plain leaf prints the chapter, and the git log stays put
 - `ask-lint.test.js`: `ticket open` runs one commit naming the ticket
 - `commit-verb.test.js`: a red test run leaves `git add` and `git commit` unrun
@@ -180,6 +185,13 @@ The answers to the earlier review:
 - the four landings: each takes a case
 - the open's case: it stands beside `ask-lint.test.js`
 - `pull.md`: it names the bare pull
+
+The answers to the second review:
+
+- a bare pull on a verdict leaf lands: every `ticket pull` counts as a landing
+- a heredoc's newline: the walk reads the text with the heredocs taken out
+- the `&`: it refuses beside `;`
+- the open's write: `landedAlone` writes the ticket, and `open` drops its own write
 
 The cost: the commit verb runs the tests twice, once as its gate and once inside the check.
 
