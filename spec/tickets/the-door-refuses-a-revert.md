@@ -89,7 +89,12 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 04b0535e1d9a768a5831862e65d35e821a1e63c7
+    hash_after: 04b0535e1d9a768a5831862e65d35e821a1e63c7
 ---
 
 # Ask
@@ -115,6 +120,35 @@ The hand runs `git revert` or `git reset --hard` over a pull commit to get `step
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+A new row in the Bash door reads the commits a `git revert` or a `git reset`
+takes back, and refuses where one of them is a pull commit.
+
+| part | the file | what changes |
+|---|---|---|
+| the parse | `.claude/skills/level0/lib/bash.js` | `undoesIn(command)` answers the revisions each `git revert` names, and the range each `git reset` drops |
+| the reset range | the same | `git reset <rev>` drops `<rev>..HEAD`, and a bare `git reset` or one over paths drops nothing |
+| the subjects | `src/bridge/bash.js` | `findings` takes `it.subjects(revs)`, which runs `git log --format=%s` over them, the way `it.script` reads a file |
+| the pull commit | `lib/bash.js` | a subject opening on `<name>:` where `<name>` names a ticket under `spec/tickets` or `.se/tickets` |
+| the refusal | the same | `PullCommitStands` names `./RUNME.sh ticket pull <name> --back <leaf>`, the leaf read off the subject |
+| the leaf | the same | `passes <leaf>` and `fails <leaf>` name it, and a subject naming none says `<leaf>` bare |
+| what passes | the same | a `git revert` or a `git reset` whose commits carry no ticket subject |
+| the design | `spec/design_output/bash.md` | a row in the parse table names the rule and its refusal |
+
+The field half stays with [[spec/tickets/the-engine-restores-its-fields]].
+
+The cases, in `bash.test.js`:
+
+- `git revert <sha>` over a subject `a-child: passes design/draft` refuses, and names `--back design/draft`
+- `git reset --hard HEAD~2` over the same commit in range refuses
+- `git revert <sha>` over `fix the lint` passes, and a bare `git reset` passes
+
+The callers:
+
+- `commandRules` in `src/bridge/bash.js` runs `findings` for every Bash call, so it hands `subjects` in
+- the CLI makes its own commits off this door, so the pull and the merge meet no row
+
+The cost: each `git revert` and `git reset` runs one `git log` at the door.
 
 ## review
 
