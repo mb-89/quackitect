@@ -88,7 +88,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 6388bfc8c7744c1601fc2c8c2903b7c987b3f8a1
+    hash_after: 6388bfc8c7744c1601fc2c8c2903b7c987b3f8a1
 ---
 
 # Ask
@@ -118,6 +123,20 @@ reader over it costs less than two readers disagreeing. For details, see
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+`voiceFaults` in `src/scripts/pull-chapter.js` runs raw Vale over the leaf's
+prose and keeps the errors alone. The lint reads a buffer through `heldOver` in
+`src/bridge/findings.js`, which runs Vale through the tense reader and the code
+faults, and names every warning.
+
+| part | what changes |
+|---|---|
+| the reader | `voiceFaults` hands the chapter text to `heldOver` at the ticket's own path, through the Vale door's `lint` |
+| the level | a finding at error or at warning refuses the hand-back, and names its rule and its line |
+| the case | a verdict carrying a semicolon comes back refused, and the same text passes the lint once mended |
+| the note | the chapter in `spec/design_output/pull.md` names the one reader and the level |
+
+So the push door meets no warning a hand-back wrote, and one reader holds both.
 
 ## review
 
