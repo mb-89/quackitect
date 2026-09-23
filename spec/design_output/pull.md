@@ -274,7 +274,7 @@ stands before, or one of the words below:
 |---|---|
 | the name of a row | right before that row, and before that row's group where the row nests |
 | `true` | first at its level |
-| `last` | last at its level |
+| `last` | after every other todo at its level, and before the first row no todo places |
 | a name standing nowhere | first at its level, because the row it names stands off the queue |
 
 The place moves as the queue drains, because the todo holds the order and

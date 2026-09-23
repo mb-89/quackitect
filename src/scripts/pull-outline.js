@@ -34,7 +34,9 @@ export function outlineIn(persons, held, rest, all, places = {}) {
   });
   // A ticket in hand stands at zero, so the queue shows what a hand holds and no letter says it. [[spec/design_output/pull#the-queue-is-an-outline]]
   const inHand = persons.length + held.length;
-  for (const name of ordered.filter((name) => best.get(name) >= persons.length && best.get(name) < inHand)) {
+  for (const name of ordered.filter(
+    (name) => best.get(name) >= persons.length && best.get(name) < inHand,
+  )) {
     numberUnder(name, "0", kids, best, out);
   }
   ordered
@@ -81,15 +83,17 @@ function bestUnder(name, kids, ordinal, best, seen = new Set()) {
 function anchored(names, kids, best) {
   const order = [...names].sort((a, b) => best.get(a) - best.get(b));
   const moved = order.filter((name) => kids.todo.get(name)).sort();
-  for (const name of moved) {
+  const last = moved.filter((name) => kids.todo.get(name) === LAST);
+  for (const name of moved.filter((one) => kids.todo.get(one) !== LAST)) {
     order.splice(order.indexOf(name), 1);
-    const said = kids.todo.get(name);
-    if (said === LAST) {
-      order.push(name);
-      continue;
-    }
-    const at = order.indexOf(levelOf(said, names, kids));
+    const at = order.indexOf(levelOf(kids.todo.get(name), names, kids));
     order.splice(at < 0 ? 0 : at, 0, name);
+  }
+  // A todo stands before every row no todo places, so the last of them lands after the others and before the first untagged row. [[spec/design_output/pull#a-todo-forces-a-place]]
+  for (const name of last) {
+    order.splice(order.indexOf(name), 1);
+    const at = order.findIndex((one) => !kids.todo.get(one));
+    order.splice(at < 0 ? order.length : at, 0, name);
   }
   return order;
 }
