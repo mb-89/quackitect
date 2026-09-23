@@ -89,12 +89,18 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
     hash_before: 95724fc23e4ca789bf744dccd9d28f956e95966a
     hash_after: 95724fc23e4ca789bf744dccd9d28f956e95966a
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 168f447477bd2282f632ec77632e6d6cb7f70d45
+    hash_after: 168f447477bd2282f632ec77632e6d6cb7f70d45
+    returns: 1
+    why: "Design: `hunksIn` keeps the added lines alone, so a hunk trading a code line for a comment passes.; That hunk holds a line of code, and the ask says it meets the door as before.; Fix: read the removed lines too, and let a removed line of code ask for a test.; A pointer fix trades a comment for a comment, so it still passes.; Add that trade to the mixed case: one code line out, one comment in, and the door refuses.; The rest stands: the added reading, the comment-only case, and the note in `tree.md`."
 ---
 
 # Ask
@@ -144,6 +150,15 @@ The door holds the rule already. `untestedIn` in
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- Design: `hunksIn` keeps the added lines alone, so a hunk trading a code line for a comment passes.
+- That hunk holds a line of code, and the ask says it meets the door as before.
+- Fix: read the removed lines too, and let a removed line of code ask for a test.
+- A pointer fix trades a comment for a comment, so it still passes.
+- Add that trade to the mixed case: one code line out, one comment in, and the door refuses.
+- The rest stands: the added reading, the comment-only case, and the note in `tree.md`.
 
 # implement
 
