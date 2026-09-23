@@ -157,6 +157,26 @@ answers every path under `.se` a `git add` names, with `-f` or without.
 `PrivateStaysHome` is the finding, and the refusal names the folder and the
 road back. For details, see [[spec/design_output/private#the-second-door]].
 
+# A landing follows its gate
+
+A landing waits on the command before it. `LandingFollowsItsGate` in
+`lib/bash.js` refuses a landing whose gate runs it whatever the gate answers.
+
+| the landing | what it lands |
+|---|---|
+| `ticket pull`, with a name or bare | a hand-back or a take |
+| `ticket open` | the open's commit |
+| `git commit` and the commit verb | a commit |
+
+| the operator before it | the door |
+|---|---|
+| `&&` | passes, because the landing runs on a green gate alone |
+| `;` and a newline | refuses |
+| a double bar, and a lone `&` | refuses |
+
+The rule reads the command with its heredocs taken out, so a body's newline
+reads as no gate.
+
 # The description names verbs
 
 `tool.describe` rewrites what the model reads before it reaches for a tool. It

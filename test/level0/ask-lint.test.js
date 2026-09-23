@@ -8,7 +8,6 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { fakeProc } from "../../src/doors/fake/proc.js";
 import { askFaults } from "../../src/scripts/ticket-ask-lint.js";
 import { askLines, ticket } from "../../src/scripts/ticket.js";
 
@@ -90,8 +89,9 @@ function box(said) {
     [at("spec/schemas/ticket.schema.yaml")]: SCHEMA,
     [at(AT)]: DRAFT,
   });
-  const proc = fakeProc({ [line]: { stdout: said } });
-  return { it: { disk, proc, root: ROOT, join, words: 5, vale: VALE }, disk, proc };
+  const git = fakeGit({ [line]: { stdout: said } }, ROOT);
+  const proc = git.proc;
+  return { it: { disk, proc, git, root: ROOT, join, words: 5, vale: VALE }, disk, proc };
 }
 
 function heard(what) {

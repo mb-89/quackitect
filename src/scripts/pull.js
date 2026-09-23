@@ -31,6 +31,7 @@ import {
   verdictIn,
   voiceFaults,
   withPayload,
+  workAnswer,
 } from "./pull-chapter.js";
 import {
   handOut,
@@ -492,6 +493,11 @@ export function handBack(it, who, name, verdict) {
   if (!leaf) {
     say(REFUSED, [`${held.step} names no leaf of ${held.ticket}.`]);
     return 1;
+  }
+  // A bare name on a leaf the verdict field decides nowhere shows the leaf, and lands nothing. [[spec/design_output/pull#bare-pulls-show-the-leaf]]
+  if (!verdict.said && !leaf.evidence.some((field) => field.form === "verdict")) {
+    console.log(workAnswer(it, one, leaf));
+    return 0;
   }
 
   // A payload rides the hold until the checks pass, so a refused word reaches no disk. [[spec/design_output/pull#the-fields-ride-the-payload]]

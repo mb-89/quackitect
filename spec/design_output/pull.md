@@ -335,6 +335,12 @@ helper read apart in the prompt and in the record.
 
 # The hand-back
 
+## Bare pulls show the leaf
+
+A name with no flag on a leaf in hand shows that leaf again, and lands nothing.
+A leaf holding a verdict field hands back on the bare name, because the field
+is its flag.
+
 ## The hand-back matches the hold
 
 The hold names the ticket, the step and the take hash, so a hand-back is
@@ -632,6 +638,10 @@ ticket door refuses every later hand there. A rule broken past the open
 stands in the lint over the tree until a person reaches for the door.
 `src/scripts/ticket-ask-lint.js` holds the run, and a box with no Vale opens as it
 stands.
+
+The open lands in one commit naming the ticket, through `landedAlone` in
+`pull-landed.js`. A commit the hook refuses puts the draft back, and the verb
+exits with a fault.
 
 ## The blank lines stand
 

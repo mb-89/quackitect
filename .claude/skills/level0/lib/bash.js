@@ -16,6 +16,9 @@ export const VERBS = ["check", "branch", "tui", "doctor"];
 const HOME = NOTES.split("/")[0];
 
 const REDIRECTS = new Set([">", ">>", "&>"]);
+// The operators that run the next segment whatever the one before answers, and the scripts a verb runs through. [[spec/design_output/bash#a-landing-follows-its-gate]]
+const GATES = new Set([";", "||", "&"]);
+const VERB_ROOTS = new Set(["RUNME.sh", "RUNME.ps1", "cli.js"]);
 
 // The paths no rule reads, which is where a hand writes a script. [[spec/design_output/bash#a-shell-writes-nothing]]
 export const FREE = [
@@ -244,6 +247,16 @@ export function findings(command, most, it = {}) {
     );
   }
 
+  for (const one of landingsAfterGates(said)) {
+    out.push(
+      row(said, "LandingFollowsItsGate", one, [
+        `${one} runs whatever the command before it answers, so it lands over a`,
+        "failing gate. Join the two with &&, or run the landing alone once the gate",
+        "answers green.",
+      ]),
+    );
+  }
+
   const commit = commitIn(said);
   if (commit?.form === "none") {
     out.push(
@@ -410,6 +423,41 @@ function partsOf(command) {
     segments[segments.length - 1].push(one);
   }
   return { segments: segments.filter((one) => one.length), bodies };
+}
+
+// A landing after a gate that runs it whatever the gate answers: a semicolon, a newline, a double bar or an ampersand. The heredocs come out first, so a body's newline reads as no gate. [[spec/design_output/bash#a-landing-follows-its-gate]]
+function landingsAfterGates(command) {
+  const { text } = withoutHeredocs(String(command ?? ""));
+  const out = [];
+  let segment = [];
+  let gate = "";
+  const settle = () => {
+    const landing = landingOf(segment);
+    if (gate && landing) out.push(landing);
+  };
+  for (const one of tokensOf(text)) {
+    if (!(one.op && BREAKS.has(one.text))) {
+      segment.push(one);
+      continue;
+    }
+    settle();
+    if (segment.length) gate = GATES.has(one.text) ? one.text : "";
+    segment = [];
+  }
+  settle();
+  return out;
+}
+
+// What a segment lands, where it lands at all: a ticket pull, a ticket open, a git commit or the commit verb. [[spec/design_output/bash#a-landing-follows-its-gate]]
+function landingOf(segment) {
+  const words = wordsIn(segment);
+  if (baseName(words[0]) === "git") return afterGit(words)[0] === "commit" ? "git commit" : "";
+  const at = words.findIndex((one) => VERB_ROOTS.has(baseName(one)));
+  if (at < 0) return "";
+  const [verb, sub] = words.slice(at + 1);
+  if (verb === "commit") return "./RUNME.sh commit";
+  if (verb === "ticket" && (sub === "pull" || sub === "open")) return `./RUNME.sh ticket ${sub}`;
+  return "";
 }
 
 function withoutHeredocs(text) {

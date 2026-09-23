@@ -162,3 +162,19 @@ test("a red test run commits nothing, and names what the run says", async () => 
   assert.ok(!ran.includes("git add -A"), "nothing stages");
   assert.ok(!ran.some((one) => one.startsWith("git commit")), "nothing commits");
 });
+
+// The tests run before anything stages, and the check runs after the commit, so the stamp names the commit that lands. [[spec/design_output/work#one-verb-feeds-that-stamp]]
+test("the tests run before the staging, and the check after the commit", async () => {
+  const { it, git } = doors();
+
+  await heard(() => commitVerb(it, [CLEAN]));
+
+  const ran = git.ran.map((one) => one.argv.join(" "));
+  const cli = join(ROOT, "src", "scripts", "cli.js");
+  const tests = ran.indexOf(`node ${cli} test`);
+  const staged = ran.indexOf("git add -A");
+  const committed = ran.indexOf(`git commit -m ${CLEAN}`);
+  const checked = ran.indexOf(`node ${cli} check`);
+  assert.ok(tests >= 0 && tests < staged, "the tests run first");
+  assert.ok(committed < checked, "the check stamps the commit");
+});

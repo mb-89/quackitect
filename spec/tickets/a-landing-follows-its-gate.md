@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -130,6 +130,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 59b2788fe85192cc3a7b8b9bb5637ef4605da0c1
+    hash_after: 59b2788fe85192cc3a7b8b9bb5637ef4605da0c1
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -295,11 +303,19 @@ the bare pull and the open's commit.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/bash.js src/scripts/pull.js src/scripts/ticket.js src/scripts/commit-verb.js spec/design_output/bash.md spec/design_output/pull.md spec/design_output/work.md
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the Bash rule, the pull, the open, the commit verb and the chapters each names
+- every door the change reaches has a fake: git, the process and the disk
+- a comment names the approach on each changed function, through its chapter's pointer
+
 
 ## tests-green
 

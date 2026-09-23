@@ -27,6 +27,15 @@ export async function commitVerb(it, argv) {
 
 // Nothing stages before the message reads clean, so a refused message leaves the tree standing. [[spec/design_output/work#the-battery-answers-first]]
 function landsAndPushes(it, argv, message) {
+  // The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
+  const tested = it.proc.run([it.node, it.join(it.root, "src", "scripts", "cli.js"), "test"], {
+    cwd: it.root,
+  });
+  if (tested.exitCode !== 0) {
+    console.error("The tests answer red, so nothing stages and nothing lands:");
+    console.error(saidBy(tested) || "the test run answers nothing");
+    return 1;
+  }
   const staged = it.git.run(["add", "-A"], true);
   if (!staged.ok) {
     console.error("The staging comes back refused, so the commit stands undone:");

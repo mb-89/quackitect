@@ -505,6 +505,7 @@ reads, in the steps below:
 | the step | what it runs | what it answers on red |
 |---|---|---|
 | the message | `messageFaults`, exported from `src/bridge/bash.js` | every finding at once, and no commit |
+| the tests | `./RUNME.sh test`, before anything stages | what the run says, and no commit |
 | the commit | `git add -A` and `git commit`, in the verb | what git says, with the staging back |
 | the check | `./RUNME.sh check`, which writes the stamp | what the check says, and no push |
 | the push | `git push origin`, which the pre-push door reads | what that door says |
