@@ -89,12 +89,18 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
     hash_before: d83d8224fbde532d08b9bbb3416d58c2ed94204b
     hash_after: d83d8224fbde532d08b9bbb3416d58c2ed94204b
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: 60feab72a4ff04e848f4df6c3b0e884899c6b611
+    hash_after: 60feab72a4ff04e848f4df6c3b0e884899c6b611
+    returns: 1
+    why: "design: the unresolved rule refuses `$TMPDIR/msg.md`, and the design output keeps a temp variable free. Test `FREE` before the unresolved rule, and drop that cost.; craft: `echo x > $HOME/y.md` refuses today already, so that case starts green. Use `echo x > $out/y.md` for the unresolved case.; craft: `writesIn` reads one segment, so the `NAME=value` state lives in `writesAPath` across segments.; craft: `precommit.js` runs with no hand, so name how it finds the hold. `holdsAnywhere` answers for every hand on the box.; craft: the carried paths take `test/` alone, so a Go tests-red leaf carries nothing. Take `_test.go` paths too.; craft: `SOURCE` takes `src/**/*.go`, so keep `_test.go` out of it.; craft: the awake release ends the child and hides it. The exit wait needs a change in `src/doors/awake.js` and its fake.; craft: `retro-collect.js` writes the median, so name it in the table.; craft: the median reads a part only from the runs that ran it, because a red run leaves parts unrun.; craft: `filesUnder` reads an empty list as a file. Read the file in the catch, and read an empty folder as empty."
 ---
 
 # Ask
@@ -168,6 +174,19 @@ The costs:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- design: the unresolved rule refuses `$TMPDIR/msg.md`, and the design output keeps a temp variable free. Test `FREE` before the unresolved rule, and drop that cost.
+- craft: `echo x > $HOME/y.md` refuses today already, so that case starts green. Use `echo x > $out/y.md` for the unresolved case.
+- craft: `writesIn` reads one segment, so the `NAME=value` state lives in `writesAPath` across segments.
+- craft: `precommit.js` runs with no hand, so name how it finds the hold. `holdsAnywhere` answers for every hand on the box.
+- craft: the carried paths take `test/` alone, so a Go tests-red leaf carries nothing. Take `_test.go` paths too.
+- craft: `SOURCE` takes `src/**/*.go`, so keep `_test.go` out of it.
+- craft: the awake release ends the child and hides it. The exit wait needs a change in `src/doors/awake.js` and its fake.
+- craft: `retro-collect.js` writes the median, so name it in the table.
+- craft: the median reads a part only from the runs that ran it, because a red run leaves parts unrun.
+- craft: `filesUnder` reads an empty list as a file. Read the file in the catch, and read an empty folder as empty.
 
 # implement
 
