@@ -118,9 +118,15 @@ func (one *server) took(said message) bool {
 	switch said.Method {
 	case "initialize":
 		one.answers(said.ID, map[string]any{
-			"capabilities": map[string]any{"textDocumentSync": 1},
-			"serverInfo":   map[string]any{"name": "se-lsp", "version": Version},
+			"capabilities": map[string]any{
+				"textDocumentSync": 1,
+				// A pointer opens its target on a click. [[spec/design_output/lsp#a-pointer-opens-its-target]]
+				"documentLinkProvider": map[string]any{"resolveProvider": false},
+			},
+			"serverInfo": map[string]any{"name": "se-lsp", "version": Version},
 		})
+	case "textDocument/documentLink":
+		one.answers(said.ID, one.links(said.Params))
 	case "initialized":
 		one.sweeps()
 		one.watches()

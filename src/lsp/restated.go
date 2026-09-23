@@ -170,6 +170,12 @@ func endOf(one Section, every []Section, rows int) int {
 
 // The slug turns a heading into the anchor a pointer names. [[spec/design_output/vocabulary#the-slug-reads-one-source]]
 func headingNamed(tree *Tree, path, anchor string) string {
+	found, _ := chapterOf(tree, path, anchor)
+	return found.Header
+}
+
+// The chapter an anchor names, with the line its heading stands on, and whether one stands. [[spec/design_output/lsp#a-pointer-opens-its-target]]
+func chapterOf(tree *Tree, path, anchor string) (Section, bool) {
 	for _, end := range []string{"", ".md"} {
 		where := path + end
 		if !tree.Exists(where) {
@@ -177,11 +183,11 @@ func headingNamed(tree *Tree, path, anchor string) string {
 		}
 		for _, one := range sectionsOf(yaml.SplitLines(tree.Read(where))) {
 			if slugOf(one.Header) == anchor {
-				return one.Header
+				return one, true
 			}
 		}
 	}
-	return ""
+	return Section{}, false
 }
 
 // [[spec/design_output/vocabulary#the-slug-reads-one-source]]

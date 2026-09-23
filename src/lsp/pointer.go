@@ -98,9 +98,18 @@ func pointerFaultsIn(tree *Tree, held places, path string) []Finding {
 	return out
 }
 
+// A pointer, its line, and the byte span of its brackets in that line, so a link covers what a reader clicks. [[spec/design_output/lsp#a-pointer-opens-its-target]]
 type pointerAtLine struct {
-	target string
-	line   int
+	target     string
+	line       int
+	start, end int
+}
+
+// A code span blanked to spaces, so a bracket past it keeps its column. [[spec/design_output/lsp#a-pointer-opens-its-target]]
+func spansBlanked(row string) string {
+	return spanAt.ReplaceAllStringFunc(row, func(span string) string {
+		return strings.Repeat(" ", len(span))
+	})
 }
 
 // The pointers a file writes as pointers: a note's frontmatter past its kind, its body outside a quoted shape, a yaml file whole, and the comments of any other file. [[spec/design_output/lsp#every-pointer-resolves]]
@@ -111,7 +120,7 @@ func pointersIn(path string, rows []string) []pointerAtLine {
 	front := note && len(rows) > 0 && strings.TrimSpace(rows[0]) == "---"
 	fenced := false
 	for i, row := range rows {
-		said := row
+		said, base := row, 0
 		switch {
 		case front && i == 0:
 			continue
@@ -123,29 +132,27 @@ func pointersIn(path string, rows []string) []pointerAtLine {
 			if strings.HasPrefix(strings.TrimSpace(row), "kind:") {
 				continue
 			}
-			said = spanAt.ReplaceAllString(row, "")
+			said = spansBlanked(row)
 		case note && fenceAt.MatchString(row):
 			fenced = !fenced
 			continue
 		case note && (fenced || indentAt.MatchString(row)):
 			continue
-		case note:
-			said = spanAt.ReplaceAllString(row, "")
-		case data:
-			said = spanAt.ReplaceAllString(row, "")
+		case note, data:
+			said = spansBlanked(row)
 		default:
 			at := commentAt.FindStringIndex(row)
 			if at == nil {
 				continue
 			}
-			said = row[at[0]:]
+			said, base = row[at[0]:], at[0]
 		}
-		for _, found := range bracketsAt.FindAllStringSubmatch(said, -1) {
-			target := strings.TrimSpace(found[1])
+		for _, found := range bracketsAt.FindAllStringSubmatchIndex(said, -1) {
+			target := strings.TrimSpace(said[found[2]:found[3]])
 			if target == "" || guarded.MatchString(target) {
 				continue
 			}
-			out = append(out, pointerAtLine{target: target, line: i + 1})
+			out = append(out, pointerAtLine{target: target, line: i + 1, start: base + found[0], end: base + found[1]})
 		}
 	}
 	return out

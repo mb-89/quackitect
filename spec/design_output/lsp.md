@@ -246,3 +246,21 @@ In a code file the rule reads a comment alone. A pointer in a string is a
 fixture a test writes, and this tree holds such fixtures. `./RUNME.sh links`
 reads the notes off the index and answers what reaches nothing. This rule reads
 every file, and reaches into the chapter.
+
+# A pointer opens its target
+
+The server answers `textDocument/documentLink`, so an editor draws every
+pointer a file writes as a link, and a click opens what it names. `linksIn` in
+`src/lsp/links.go` reads the pointers `pointersIn` reads, and resolves each one
+the way the resolve rule does. For the order, see
+[[spec/design_output/lsp#every-pointer-resolves]].
+
+| the pointer | where the click lands |
+|---|---|
+| a file, a path without its ending, or a note's id | the file |
+| a chapter after `#` | the heading of that chapter, on its line |
+| a folder | nowhere, because an editor opens no folder from a link |
+| a target landing nowhere | nowhere, and the resolve rule draws it |
+
+The link spans the brackets whole, so the text a reader clicks is the text the
+rule names. A column counts UTF-16 units, the unit the protocol reads by default.
