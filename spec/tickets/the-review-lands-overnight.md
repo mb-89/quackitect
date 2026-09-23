@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box dcd73916add7 · claude-code-remote
     hash_before: ad8bc2d01456fc08d074ff89d2f143a27072b53e
+  - step: sync
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 4202ecb12b70abfb5d6d5913a0140555e4c3ef2c
+    hash_after: 4202ecb12b70abfb5d6d5913a0140555e4c3ef2c
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-review-lands-overnight already carries every commit on main.
 ---
 
 # Ask
@@ -100,6 +108,8 @@ fields, and no refusal a person has to clear by hand.
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
