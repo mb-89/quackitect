@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -129,6 +129,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-7
+    hash_before: 62328c22d832d481519287ffc4b13c03c367fa09
+    hash_after: 62328c22d832d481519287ffc4b13c03c367fa09
+reason: done
 ---
 
 # Ask
@@ -341,17 +346,93 @@ Each copied fact the ask names now meets a check, or reads its owner.
 
 <!-- the form is files -->
 
+- spec/tickets/a-count-meets-the-lint.md
+- spec/config/styles/VoiceVale/CountedList.yml
+- spec/config/styles/VoiceVale/CodeHeader.yml
+- spec/config/styles/VoiceVale/CodeComment.yml
+- .vale.ini
+- .claude/skills/level0/hooks/level0.js
+- .claude/skills/level0/lib/vehicle.js
+- .claude/skills/level0/lib/paragraph-rules.js
+- .claude/skills/level0/lib/schema-route.js
+- .claude/skills/level0/lib/tested.js
+- .claude/skills/level0/lib/tree.js
+- src/bridge/reload.js
+- src/bridge/plan.js
+- src/doors/vale.js
+- src/extension/lib/lens.js
+- src/lsp/columns.go
+- src/lsp/restated.go
+- src/lsp/syntax.go
+- src/scripts/log-verb.js
+- src/scripts/probe.js
+- src/scripts/styles.js
+- src/scripts/work-review.js
+- src/stub/.claude/skills/level0/hooks/bridgehead.js
+- src/tui/frame/keys.go
+- src/tui/frame_test.go
+- src/tui/tree/treefilter.go
+- src/tui/window_test.go
+- src/tui/workdetail_test.go
+- spec/funnel/a-paragraph-has-a-schema.md
+- spec/funnel/a-process-is-data.md
+- spec/funnel/level-zero-closes.md
+- spec/funnel/the-table-holds-every-rule.md
+- spec/funnel/work-lands-through-pull-requests.md
+- test/contract/vale.test.js
+- test/contract/compact.test.js
+- test/contract/question-grades.test.js
+- test/contract/schema.test.js
+- test/contract/ticket.test.js
+- test/contract/tree.test.js
+- test/level0/route-fixture.test.js
+- test/level0/start-constants.test.js
+- test/level0/lens.test.js
+- test/level0/reload.test.js
+- test/level0/clicks.test.js
+- test/level0/config.test.js
+- test/level0/controls.test.js
+- test/level0/editor.test.js
+- test/level0/fixtures.js
+- test/level0/group.test.js
+- test/level0/layer.test.js
+- test/level0/log-verb.test.js
+- test/level0/plan-queue.test.js
+- test/level0/retro-collect.test.js
+- test/level0/roots.test.js
+- test/level0/styles.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- design: each line of the Ask lands, and `./RUNME.sh check` exits 0 on the branch.
+- design: `CountedList` warns over notes and stands off code, tickets, inputs and rationales.
+- design: `CodeHeader` refuses a sixth header line or a count, and a contract case proves both refusals.
+- design: `START` spells the flag and the span from `vehicle.js`, and a test holds it there.
+- design: the fixture test runs `stepsIn` and `leavesOf` over the same routes, a nested one among them.
+- craft: `frame_test.go` now reads "the the bands" across its first header lines.
+- craft: `treefilter.go` now reads "answers the the questions" across its first header lines.
+- craft: `tree.js`, `tested.js` and `tree.test.js` drop "two files", yet the point is a pair of files.
+- craft: `restated.go` says "the places share", and the measure still compares two places.
+- craft: `plan-queue.test.js` now says "a ticket at each of its first places", which reads unclear.
+- craft: the funnel line "The loop's parts, and which of them stand already" has no verb.
+- craft: the count pattern stands in both new rule files, and no test holds the copies equal.
+- craft: `CodeHeader` spells the five-line cap in its message and its script both.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the count pattern stands copied in both rule files, and a finding names it as craft.
+- the constants stand in `vehicle.js` alone, and `reload.js` imports them there.
+- the notes the rewrites touch name their structure, and no line repeats a count.
 
 # Discussion
 
