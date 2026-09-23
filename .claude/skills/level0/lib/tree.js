@@ -1,5 +1,5 @@
 // Every rule weighing one file against another. Vale hands a rule one buffer,
-// so a rule reading two files lives here, and the command line runs it over the
+// so a rule reading the files lives here, and the command line runs it over the
 // whole tree into the problems panel.
 // [[spec/design_output/tree#the-rules-over-two-files]]
 

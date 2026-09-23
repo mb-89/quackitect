@@ -6,13 +6,11 @@ scope: raw
 script: |
   text := import("text")
 
-  headerLines := 5
   lines := text.split(scope, "\n")
   matches := []
 
   offset := 0
   seenCode := false
-  headerUsed := 0
   inBlock := false
 
   isAllowed := func(t) {
@@ -50,10 +48,8 @@ script: |
 
     if isAllowed(t) { continue }
 
-    if !seenCode && headerUsed < headerLines {
-      headerUsed++
-      continue
-    }
+    // The header's length is CodeHeader's to refuse, so every leading comment passes here. [[spec/tickets/a-count-meets-the-lint]]
+    if !seenCode { continue }
 
     matches = append(matches, {begin: at, end: at + len(line)})
   }

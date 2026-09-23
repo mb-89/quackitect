@@ -1,4 +1,4 @@
-// The styles two roots hold, assembled into the one folder the vale door reads.
+// The styles the roots hold, assembled into the one folder the vale door reads.
 // Every case drives the assembly over a fake disk, so none of it reaches a tree.
 // [[spec/design_output/vehicle#the-styles-assemble-once]]
 

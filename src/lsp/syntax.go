@@ -1,6 +1,6 @@
 // A file that reads as no Go or no JSON, drawn in the problems panel before a
 // build or a test finds it. Biome draws the same for JavaScript, so this stands
-// beside it for the two kinds nothing else in the editor parses.
+// beside it for the kinds nothing else in the editor parses.
 // [[spec/design_output/lsp]]
 package main
 

@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 3b6ef260735564fee054f2c1eb78a5a3b53ba350
+    hash_after: 3b6ef260735564fee054f2c1eb78a5a3b53ba350
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -250,11 +258,19 @@ start constants, and one route shape.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the rules, their sections, the constants, the route reader, and each line the rules name
+- the Vale rules meet the real binary in a contract case, and the rest read strings or fakes
+- each new rule file and each changed function names the approach through its pointer
+
 
 ## tests-green
 

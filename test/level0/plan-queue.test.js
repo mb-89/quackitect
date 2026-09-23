@@ -1,6 +1,6 @@
 // The plan door over a queue: a place digit reads the queue order, and the
 // answer names the place each new todo takes. Git answers from a table, so the
-// queue stands three tickets deep.
+// queue holds a ticket at each of its first places.
 // [[spec/design_output/stop#the-plan]]
 
 import assert from "node:assert/strict";

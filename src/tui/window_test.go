@@ -1,4 +1,4 @@
-// The two tabs the window holds, reached off the model the way the window
+// The tabs the window holds, reached off the model the way the window
 // tests read them.
 // [[spec/design_output/tui#the-packages-the-window-holds]]
 

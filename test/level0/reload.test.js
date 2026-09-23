@@ -5,9 +5,11 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { TESTING } from "../../.claude/skills/level0/lib/vehicle.js";
 import {
   codeOf,
   faultIn,
+  loadsCode,
   movedCode,
   movedIn,
   provesCode,
@@ -129,4 +131,23 @@ test("the box reads its code once, and a change shows after a tool run alone", (
   disk.write(at("src/bridge/stop.js"), "export const a = 3;\n");
   assert.equal(movedCode(box, "tool.call"), "", "a call before the run moves nothing");
   assert.equal(movedCode(box, "classic.PostToolUse"), "src/bridge/stop.js");
+});
+
+// The child runs with the flag and the span the start road reads too, off lib/vehicle.js. [[spec/design_output/level0#new-code-proves-it-loads]]
+test("the self-test child takes the flag and the span lib/vehicle.js names", () => {
+  const ran = [];
+  const box = {
+    method: ROOT,
+    node: "/usr/bin/node",
+    proc: {
+      run: (argv, init) => {
+        ran.push({ argv, init });
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+    },
+  };
+
+  assert.deepEqual(loadsCode(box), { ok: true, why: "" });
+  assert.ok(ran[0].argv.includes(SELF_TEST), "the flag rides the child");
+  assert.equal(ran[0].init.timeoutMs, TESTING, "the span bounds the child");
 });

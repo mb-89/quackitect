@@ -4,7 +4,7 @@
 // [[spec/design_output/level0#a-fix-reaches-the-session]]
 
 import { join, posix } from "node:path";
-import { importsOf } from "../../.claude/skills/level0/lib/vehicle.js";
+import { importsOf, SELF_TEST, TESTING } from "../../.claude/skills/level0/lib/vehicle.js";
 
 export const CODE_ROOTS = [
   "src/bridge",
@@ -95,9 +95,8 @@ export function movedCode(box, event = "") {
   return movedIn(box.code, now);
 }
 
-// The flag the server takes to load its code, drive one of each event, and exit. [[spec/design_output/level0#new-code-proves-it-loads]]
-export const SELF_TEST = "--selftest";
-const TESTING = 60000;
+// The flag and its span stand in lib/vehicle.js, which the start road reads too. [[spec/design_output/level0#new-code-proves-it-loads]]
+export { SELF_TEST };
 
 // A child loads the code on the disk and drives it, so a fault shows before the running server steps down. [[spec/design_output/level0#new-code-proves-it-loads]]
 export function loadsCode(box, timeoutMs = TESTING) {

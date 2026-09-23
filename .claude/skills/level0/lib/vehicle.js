@@ -61,6 +61,9 @@ export function resolves(list, driver) {
 
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
 export const PORT_BASE = 6510;
+// The flag the server takes to load its code, drive one of each event, and exit, and the span a run of it gets. The bridgehead imports its own folder alone, so the pair the server and the start road share stands here, beside the port they share too. [[spec/design_output/level0#new-code-proves-it-loads]]
+export const SELF_TEST = "--selftest";
+export const TESTING = 60000;
 // The runtime folder folders.js owns, spelled again here because that module stands beside this one. [[spec/design_input/the-runtime-files-stand-apart]]
 export const POINTER = ".se/.runtime/vehicle.json";
 

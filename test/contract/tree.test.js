@@ -1,4 +1,4 @@
-// The rules over two files, and the tracked files they read. Each case breaks
+// The rules over the files, and the tracked files they read. Each case breaks
 // one rule on a fake tree and asserts the finding, then hands the rule this
 // tree and asserts none. A rule reaching lint reaches the problems panel.
 // [[spec/design_output/tree#what-a-rule-answers]]

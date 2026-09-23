@@ -1,4 +1,4 @@
-// The verbs over two roots. A stub keeps its tickets, its notes and its holds
+// The verbs over the roots. A stub keeps its tickets, its notes and its holds
 // under the work root, and reads the schema, the route and the guidance off
 // the method root, the work root's note winning where it names one again.
 // [[spec/design_output/vehicle#the-work-root-inherits]]

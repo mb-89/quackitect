@@ -1,4 +1,4 @@
-// The two schemas level one ships, read off disk and driven through the real
+// The schemas level one ships, read off disk and driven through the real
 // checker. One fixture per refusal, so a nested fault, a bad path and an orphan
 // field each come back with the line they stand on.
 // [[spec/design_output/schema#keywords-that-name-a-step]]

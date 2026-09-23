@@ -79,7 +79,7 @@ Both stand together: the step is a form, and the run is a graph.
 
 # v4 designs the canvas
 
-`.se/dev_guide/design-doc-executable-workflows.md` holds 286 lines of it:
+`.se/dev_guide/design-doc-executable-workflows.md` holds the long form of it:
 
 | piece | what v4 picks | licence |
 |---|---|---|

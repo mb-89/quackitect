@@ -1,5 +1,5 @@
-// The verb behind `./RUNME.sh log`: the rows the log holds, narrowed by the
-// four flags, printed the way the window prints them.
+// The verb behind `./RUNME.sh log`: the rows the log holds, narrowed by its
+// flags, printed the way the window prints them.
 // [[spec/design_output/log#one-verb-reads-the-log]]
 
 import {

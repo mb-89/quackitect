@@ -1,4 +1,4 @@
-// The fixtures the tests over two roots share: the ticket schema and two routes, as text. Nothing writes them.
+// The fixtures the tests over the roots share: the ticket schema and the routes, as text. Nothing writes them.
 // [[spec/guidance/code/testing]]
 
 export const TICKET_SCHEMA = `kind: ticket

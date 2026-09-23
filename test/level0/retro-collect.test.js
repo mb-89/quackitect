@@ -1,6 +1,6 @@
 // The retro's collect, driven through fake doors. It moves the private folder
 // past its dot folders into the retro's input folder, copies the transcripts,
-// the memory and the scratchpads beside it, and leaves two folders behind.
+// the memory and the scratchpads beside it, and leaves the folders behind.
 // [[spec/guidance/retro/collect]]
 
 import assert from "node:assert/strict";

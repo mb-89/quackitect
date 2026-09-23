@@ -1,4 +1,4 @@
-// The browser side, driven with no browser. A fake page answers the four calls
+// The browser side, driven with no browser. A fake page answers the calls
 // the script makes, so a click becomes a message here exactly as it does in the
 // webview.
 // [[spec/guidance/code/testing]]

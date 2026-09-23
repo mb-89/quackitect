@@ -1,0 +1,62 @@
+# The header a file opens on says what the file is for, in a few lines, and
+# counts nothing. A pointer line and a lint directive stand outside the cap,
+# the way CodeComment lets them stand anywhere.
+# [[spec/guidance/code/code]]
+extends: script
+message: "The header runs past five lines, or '%s' counts a thing. Say what the file is for, and let a command count."
+link: spec/guidance/code/code.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  headerLines := 5
+  count := `(?:^|[^\w-])((?:\d+|[Tt]wo|[Tt]hree|[Ff]our|[Ff]ive|[Ss]ix|[Ss]even|[Ee]ight|[Nn]ine|[Tt]en|[Ee]leven|[Tt]welve) [a-z]+s)\b`
+
+  isAllowed := func(t) {
+    if text.contains(t, "[[") && text.contains(t, "]]") { return true }
+    if text.contains(t, "level0:") { return true }
+    if text.re_match(`^//\s*(go|ts|eslint|biome|nolint|lint):`, t) { return true }
+    return false
+  }
+
+  lines := text.split(scope, "\n")
+  matches := []
+  offset := 0
+  used := 0
+  inBlock := false
+
+  for i := 0; i < len(lines); i++ {
+    line := lines[i]
+    at := offset
+    offset += len(line) + 1
+    t := text.trim_space(line)
+    if len(t) == 0 { continue }
+    if i == 0 && text.has_prefix(t, "#!") { continue }
+
+    isComment := false
+    if inBlock {
+      isComment = true
+      if text.contains(t, "*/") { inBlock = false }
+    } else if text.has_prefix(t, "//") {
+      isComment = true
+    } else if text.has_prefix(t, "/*") {
+      isComment = true
+      if !text.contains(t, "*/") { inBlock = true }
+    }
+    if !isComment { break }
+    if isAllowed(t) { continue }
+
+    used++
+    found := text.re_find(count, line, -1)
+    if !is_error(found) && found != undefined {
+      for hit in found {
+        span := hit[1]
+        matches = append(matches, {begin: at + span.begin, end: at + span.end})
+      }
+      continue
+    }
+    if used > headerLines {
+      matches = append(matches, {begin: at, end: at + len(line)})
+    }
+  }

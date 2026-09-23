@@ -1,4 +1,4 @@
-// The log verb, driven through fake doors: the four filters over rows in
+// The log verb, driven through fake doors: the filters over rows in
 // memory, and the files a span opens.
 // [[spec/design_output/log#one-verb-reads-the-log]]
 

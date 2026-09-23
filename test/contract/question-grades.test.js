@@ -1,4 +1,4 @@
-// The two rules grading a question, read off the notes that ship.
+// The rules grading a question, read off the notes that ship.
 // [[spec/design_output/pull#a-person-step-goes-in]]
 
 import assert from "node:assert/strict";

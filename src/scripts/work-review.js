@@ -1,5 +1,5 @@
 // The verb behind `./RUNME.sh branch review <name>`. It gathers what a reader
-// needs, answers the two questions a program owns, and prints the report. No
+// needs, answers the questions a program owns, and prints the report. No
 // model runs here.
 // [[spec/design_output/review#what-the-verb-gathers]]
 

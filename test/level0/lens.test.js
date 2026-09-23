@@ -260,3 +260,21 @@ test("a fail with no reason runs nothing, and a take saves nothing", async () =>
   assert.deepEqual(took.said.saved, []);
   assert.deepEqual(took.said.ran, [["ticket", "pull", "one"]]);
 });
+
+// A route item opening on a key other than its name still reads as a step, and carries its hand. [[spec/tickets/a-count-meets-the-lint]]
+test("a step whose item opens on by names its leaf and its hand", () => {
+  const text = [
+    "---",
+    "kind: [[ticket]]",
+    "state: open",
+    "steps:",
+    "  - by: person",
+    "    name: decide",
+    "---",
+    "",
+  ].join("\n");
+  assert.deepEqual(
+    stepsIn(text).map((one) => `${one.path}:${one.by}:${one.leaf}`),
+    ["decide:person:true"],
+  );
+});

@@ -1,4 +1,4 @@
-// The work tab's details and its table: the three parts of the details, the
+// The work tab's details and its table: the parts of the details, the
 // link on a name, the press on a mark, and a sort over a key the table hides.
 // [[spec/design_output/tui#the-work-tab]]
 

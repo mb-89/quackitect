@@ -1,4 +1,4 @@
-// A group read off its ticket, and the three writes the verbs make to it. Every
+// A group read off its ticket, and the writes the verbs make to it. Every
 // case here is text in and text out, so a branch reaches none of it.
 // [[spec/design_output/work#a-group-is-a-ticket]]
 

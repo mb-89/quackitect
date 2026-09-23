@@ -1,5 +1,5 @@
 // The filter of the log, read over an item of the tree. An item answers the
-// three questions the language asks of a row, so a person types one language
+// the questions the language asks of a row, so a person types one language
 // in every tab. A node stands while it matches, or while a child of it does.
 // [[spec/design_output/tree-view#the-filter-reads-an-item]]
 

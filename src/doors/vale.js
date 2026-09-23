@@ -1,5 +1,5 @@
 // Vale. The one place this tree runs the voice rules over a text. A box with
-// no Vale reads no rule, and says so. Two roots hand it the styles they hold
+// no Vale reads no rule, and says so. The roots hand it the styles they hold
 // together, assembled into the work root.
 // [[spec/design_output/level0#the-write-door]]
 

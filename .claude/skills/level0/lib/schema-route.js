@@ -1,4 +1,4 @@
-// The route checks: the three keywords naming a step, the slots a route
+// The route checks: the keywords naming a step, the slots a route
 // feeds, and the hash the drawing carries.
 // [[spec/design_output/schema#keywords-that-name-a-step]]
 
