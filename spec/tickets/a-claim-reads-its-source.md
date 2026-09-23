@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -126,6 +126,17 @@ record:
     hash_after: 8dec657b1cbd8d07132b9fa808704052e91f948f
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: ac2f680bc28d7af054da77f4d8661bd8ca35aa3c
+    hash_after: ac2f680bc28d7af054da77f4d8661bd8ca35aa3c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -316,11 +327,17 @@ todos today, so a digit of two names no ticket. The answer names no place.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/plan-queue.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
+
 
 ### says
 
@@ -328,11 +345,26 @@ todos today, so a digit of two names no ticket. The answer names no place.
 
 <!-- the form is text -->
 
+A place digit reads the queue now, and the answer names the place each new
+todo takes.
+
+- `plans` in `src/bridge/plan.js` builds a read door on the box, and asks `answerOf` for the rows
+- a digit names the row at that place, and a digit past the last row writes `end`
+- `anchored` in `pull-outline.js` places an `end` todo after every row
+- todos tied on every score keep the plan's order
+- the field on another call changes the plan alone
+- the standard route's draft leaf asks for the callers and the answers to an earlier review
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the plan door, the outline, the queue's tie, the route and the two chapters named
+- the queue read runs on the box's process door, and the case fakes it with the fake git
+- a comment names the approach on each changed function, through its chapter's pointer
+
 
 # verdict
 
