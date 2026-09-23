@@ -327,7 +327,9 @@ export function judgeMaterial(it, held, name) {
 export function verdictFlag(rest) {
   const said = rest.find((one) => /^--(pass|fail|became|answered|back)(=|$)/.test(one));
   if (!said) return { said: "" };
-  const [, word, eq, inline] = /^--(pass|fail|became|answered|back)(=)?(.*)$/.exec(said);
+  const [, word, eq, inline] = /^--(pass|fail|became|answered|back)(=)?(.*)$/.exec(
+    said,
+  );
   const after = eq ? inline : (rest[rest.indexOf(said) + 1] ?? "");
   if (word === "pass") return { said: "pass" };
   if (!after || after.startsWith("--")) {
@@ -525,7 +527,7 @@ export function handBack(it, who, name, verdict) {
   const becomes = verdict.said === "became" || verdict.said === "answered";
   if (!becomes) {
     found.push(...formFaults(it, one, leaf, chapter, held));
-    if (!found.length) found.push(...voiceFaults(it, one, leaf, chapter));
+    if (!found.length) found.push(...voiceFaults(it, one, leaf));
   }
   // A fail runs its commands for the record, and none of them refuses it. [[spec/design_output/pull#the-fail]]
   const fails = verdict.said === "fail";

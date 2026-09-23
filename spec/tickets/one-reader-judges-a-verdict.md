@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -149,6 +149,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: c73124fb3c3b4734cbe93b97542d61080513749e
+    hash_after: c73124fb3c3b4734cbe93b97542d61080513749e
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -285,11 +293,17 @@ semicolon, and hands Vale the chapter alone. It runs Vale on the method's
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/bridge/findings.js src/scripts/pull-chapter.js src/scripts/pull.js spec/design_output/pull.md
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the two readers the ask names, their one caller, and the chapter
+- every door the change reaches has a fake: the disk, the process and the Vale run
+- a comment names the approach on each changed function, through its pointer
 
 ## tests-green
 

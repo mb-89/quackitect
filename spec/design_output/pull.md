@@ -437,9 +437,17 @@ chain carries a checklist, and the ticket door lets the hand write it.
 
 ## The voice reads the evidence
 
-The hand-back runs the voice rules over the leaf's chapter where vale stands
-on the box, the way the write door does. An error is a finding, so the sweep
-names nothing later that the hand-back let through.
+The hand-back reads its ticket the way `./RUNME.sh lint` reads a file, where
+vale stands on the box. `voiceFaults` in `src/scripts/pull-chapter.js` hands
+Vale the whole ticket on stdin, with the payload's fields under their headings. The call opens on
+`valeArgvOf`, and `readsText` reads the answer. `findingsOver` in
+`src/bridge/findings.js` calls both over each file the lint reads.
+
+| part | what the pull does |
+|---|---|
+| the text | blanks a field in no prose form and an `answered` row, so every row keeps its file line and a Vale marker holds |
+| the lines | keeps a finding on the leaf's chapter, and names it at its line in the ticket |
+| the level | refuses on an error and on a warning, so the lint names nothing later that the hand-back lets through |
 
 ## The commands answer
 

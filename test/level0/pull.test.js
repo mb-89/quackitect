@@ -203,33 +203,42 @@ test("a hand-back with a field empty answers refused, keeps the hold, and counts
 // [[spec/design_output/pull#the-pass]]
 test("the voice rules read the evidence at the hand-back, and an error refuses it", () => {
   const vale = "/tree/.se/.runtime/bin/vale";
-  const long = JSON.stringify({
-    "stdin.md": [
-      {
-        Check: "VoiceParagraph.Sentence",
-        Line: 2,
-        Span: [1, 3],
-        Message: "A sentence holds 25 words.",
-        Severity: "error",
-      },
-    ],
-  });
+  const TICKET = "spec/tickets/a-child.md";
+  const lineIn = (text) => text.split("\n").indexOf("A long approach.") + 1;
+  const long = (text) =>
+    JSON.stringify({
+      [TICKET]: [
+        {
+          Check: "VoiceParagraph.Sentence",
+          Line: lineIn(text),
+          Span: [1, 3],
+          Message: "A sentence holds 25 words.",
+          Severity: "error",
+        },
+      ],
+    });
   const { it, disk } = doors(
     standing(filled(CHILD(), "### approach", "A long approach.")),
     {
-      [`${vale} --config=${at(".vale.ini")} --path=spec/tickets/a-child.md --output=JSON --no-exit`]:
-        { stdout: long },
+      [`${vale} --config=.vale.ini --output=JSON --no-exit --path=${TICKET}`]: (
+        _argv,
+        init,
+      ) => ({ stdout: long(init.stdin) }),
     },
   );
   it.vale = vale;
   heard(() => pulling(ROOT, ["pull"], it));
+  const line = lineIn(disk.read(at(TICKET)));
 
   const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], it));
 
   assert.equal(code, 1);
+  assert.ok(line > 0, "the approach stands in the ticket");
   assert.match(
     said,
-    /design\/draft breaks Sentence at line 2 of its chapter: A sentence holds 25 words\./,
+    new RegExp(
+      `design/draft breaks Sentence at line ${line} of ${TICKET}: A sentence holds 25 words\\.`,
+    ),
   );
   assert.equal(disk.exists(HOLD), true);
 });

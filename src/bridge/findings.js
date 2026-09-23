@@ -52,23 +52,29 @@ export async function findingsOver(it, asked) {
     (one) => one === WHOLE || it.disk.exists(it.join(it.root, one)),
   );
   if (!where.length) return { found: [], fault: "" };
-  const ran = await it.proc.start(
-    [it.vale, `--config=${configOf(it)}`, "--output=JSON", "--no-exit", OURS, ...where],
-    { cwd: it.root },
-  );
+  const ran = await it.proc.start([...valeArgvOf(it), OURS, ...where], {
+    cwd: it.root,
+  });
   const fault =
     faultIn(ran.stdout) ||
     (ran.exitCode !== 0 && !ran.stdout ? String(ran.stderr ?? "").trim() : "");
   if (fault) return { found: [], fault };
 
-  const found = readThrough(it, fromJson(ran.stdout)).map((one) =>
-    from(one, FROM.vale),
-  );
-  for (const file of walkOver(it, where)) {
-    for (const one of unreasoned(it.disk.read(file))) {
-      found.push(from({ ...one, file: showOf(it, file) }, FROM.tree));
-    }
+  const rows = new Map();
+  for (const one of fromJson(ran.stdout)) {
+    const file = showOf(it, one.file);
+    rows.set(file, [...(rows.get(file) ?? []), one]);
   }
+  const found = [];
+  // The pull reads its ticket through readsText too, so both name one list. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+  for (const file of walkOver(it, where)) {
+    const shown = showOf(it, file);
+    found.push(...readsText(it, shown, it.disk.read(file), rows.get(shown) ?? []));
+    rows.delete(shown);
+  }
+  // Vale reads a file the walk passes, and the tense reader alone reads its rows. [[spec/design_output/level0#the-tense-reader]]
+  const rest = readThrough(it, [...rows.values()].flat());
+  found.push(...rest.map((one) => from(one, FROM.vale)));
   // The check names what stands past a ceiling as a warning, and the write door refuses the growth. [[spec/design_output/level0#the-size-ceiling]]
   for (const file of walkOver(it, where, SIZED)) {
     for (const one of codeFaults(it.disk.read(file), showOf(it, file), it.ceilings)) {
@@ -111,6 +117,21 @@ export async function findingsFor(box, url) {
     asked.length ? asked : [WHOLE],
   );
   return { ok: !got.fault, found: got.found, fault: got.fault };
+}
+
+// The Vale call the lint and the pull share, on the config the assembly writes. A caller adds the paths or the stdin path. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+export function valeArgvOf(it) {
+  return [it.vale, `--config=${configOf(it)}`, "--output=JSON", "--no-exit"];
+}
+
+// One file's reading past Vale: the tense reader over Vale's rows, then every marker naming no reason. The lint and the pull both read a file here. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+export function readsText(it, file, text, rows) {
+  return [
+    ...withoutFalsePast(text, rows).map((one) => from(one, FROM.vale)),
+    ...unreasoned(text).map((one) =>
+      from({ ...one, file: showOf(it, file) }, FROM.tree),
+    ),
+  ];
 }
 
 // Every road hands Vale the config the assembly writes over the pair of roots, so a project's own rule reads here as it does at the door. [[spec/design_output/vehicle#the-styles-assemble-once]]

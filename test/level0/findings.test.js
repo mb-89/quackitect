@@ -127,3 +127,29 @@ test("POST /findings reads the held buffers through the Vale door of the box the
   assert.deepEqual(asked, [{ text: "# One\n", where: "notes.md" }]);
   assert.equal((await heldFor(box, "not json")).ok, true);
 });
+
+// The lint and the pull open Vale on one argument list, and read one file's text one way. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+test("valeArgvOf opens Vale on the assembled config, and readsText names a marker carrying no reason", async () => {
+  const { valeArgvOf, readsText } = await import("../../src/bridge/findings.js");
+  const it = {
+    vale: "vale",
+    disk: fakeDisk({}),
+    root: ROOT,
+    method: ROOT,
+    work: ROOT,
+    join,
+  };
+  const argv = valeArgvOf(it);
+  assert.equal(argv[0], "vale");
+  assert.ok(
+    argv.some((one) => one.startsWith("--config=")),
+    "the config the assembly writes",
+  );
+  assert.ok(argv.includes("--output=JSON") && argv.includes("--no-exit"));
+  const text = "# One\n\n<!-- vale VoiceParagraph.Characters = NO -->\n\nA line.\n";
+  const found = readsText(it, "notes/one.md", text, []);
+  assert.ok(
+    found.some((one) => /Exemption/.test(String(one.rule))),
+    "the marker with no reason stands named",
+  );
+});

@@ -92,7 +92,7 @@ test("the payload spans a fence, a porcelain row reads whole, and a files field 
     "git status --porcelain -uall": {
       stdout: "M spec/tickets/a-child.md\n?? .vale.ini",
     },
-    [`${vale} --config=${at(".vale.ini")} --path=spec/tickets/a-child.md --output=JSON --no-exit`]:
+    [`${vale} --config=.vale.ini --output=JSON --no-exit --path=spec/tickets/a-child.md`]:
       (_argv, init) => {
         ranVale.push(init.stdin);
         return { stdout: "{}" };

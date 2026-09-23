@@ -5,11 +5,8 @@
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
-import {
-  faultIn,
-  fromJson,
-  CONFIG as VALE_CONFIG,
-} from "../../.claude/skills/level0/lib/vale.js";
+import { faultIn, fromJson } from "../../.claude/skills/level0/lib/vale.js";
+import { readsText, valeArgvOf } from "../bridge/findings.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
@@ -176,20 +173,13 @@ export function chapterOf(text, path) {
   const level = parts.length;
   const own = lines(sections[found].own);
   const fields = new Map();
-  const rawOwn = prose(sections[found].own);
-  const rawFields = new Map();
   for (let i = found + 1; i < sections.length; i++) {
     if (sections[i].level <= level) break;
     if (sections[i].level === level + 1) {
       fields.set(sections[i].header, lines(sections[i].own));
-      rawFields.set(sections[i].header, prose(sections[i].own));
     }
   }
-  return { stands: true, own, fields, rawOwn, rawFields };
-}
-
-export function prose(own) {
-  return (own ?? []).filter((row) => !COMMENT.test(row) && !ANSWERED.test(row));
+  return { stands: true, own, fields };
 }
 
 export function lines(own) {
@@ -294,43 +284,66 @@ export function verdictIn(rows) {
   return { said: word, reason: rest.join("; ") };
 }
 
-// [[spec/design_output/pull#the-voice-reads-the-evidence]]
-export function voiceFaults(it, one, leaf, chapter) {
+// The levels that refuse a hand-back, the ones the lint names. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+const REFUSES = new Set(["error", "warning"]);
+const FORMS_READ = ["text", "list", "checklist", "verdict"];
+const HEADING = /^#{1,6}\s/;
+
+// The pull reads the ticket the way the lint reads it: the lint's Vale call and its per-file reading, over the whole ticket with the fields laid in. It keeps what lands on the leaf's chapter. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+export function voiceFaults(it, one, leaf) {
   if (!it.vale) return [];
-  const prose = new Set([CHECKED]);
-  for (const field of leaf.evidence) {
-    if (["text", "list", "checklist", "verdict"].includes(String(field.form))) {
-      prose.add(String(field.name));
-    }
-  }
-  const rows = [...(chapter.rawOwn ?? [])];
-  for (const [name, held] of chapter.rawFields ?? []) {
-    if (prose.has(name)) rows.push("", ...held);
-  }
-  const text = rows.join("\n");
-  if (!text.trim()) return [];
+  const read = voiceText(one.text, leaf);
+  if (!read) return [];
   let ran;
   try {
-    ran = it.proc.run(
-      [
-        it.vale,
-        `--config=${it.join(it.method ?? it.root, VALE_CONFIG)}`,
-        `--path=${one.path}`,
-        "--output=JSON",
-        "--no-exit",
-      ],
-      { stdin: text, cwd: it.root },
-    );
+    ran = it.proc.run([...valeArgvOf(it), `--path=${one.path}`], {
+      stdin: read.text,
+      cwd: it.root,
+    });
   } catch {
     return [];
   }
   if (faultIn(ran.stdout)) return [];
-  return fromJson(ran.stdout)
-    .filter((fault) => fault.severity === "error")
+  return readsText(it, one.path, read.text, fromJson(ran.stdout))
+    .filter(
+      (fault) =>
+        REFUSES.has(fault.severity) &&
+        fault.line >= read.first &&
+        fault.line <= read.last,
+    )
     .map(
       (fault) =>
-        `${leaf.path} breaks ${fault.rule} at line ${fault.line} of its chapter: ${fault.message}`,
+        `${leaf.path} breaks ${fault.rule} at line ${fault.line} of ${one.path}: ${fault.message}`,
     );
+}
+
+// The ticket with the rows the voice passes blanked in place, so every row keeps its file line: a field in no prose form, and an answered row. A comment stays, so a Vale marker holds as it does in the lint. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+function voiceText(text, leaf) {
+  const sections = readNote(text).sections;
+  const at = sectionAt(sections, leaf.path);
+  if (at < 0) return null;
+  const rows = String(text).split(/\r?\n/);
+  const level = leaf.path.split("/").length;
+  const first = sections[at].line;
+  const last = chapterEnd(sections, at, level, rows.length);
+  const read = new Set([CHECKED]);
+  for (const field of leaf.evidence) {
+    if (FORMS_READ.includes(String(field.form))) read.add(String(field.name));
+  }
+  for (let i = at + 1; i < sections.length && sections[i].level > level; i++) {
+    if (sections[i].level !== level + 1 || read.has(sections[i].header)) continue;
+    const end = chapterEnd(sections, i, level + 1, rows.length);
+    for (let row = sections[i].line; row < end; row++) {
+      if (!COMMENT.test(rows[row])) rows[row] = "";
+    }
+  }
+  let holds = false;
+  for (let row = first - 1; row < last; row++) {
+    if (ANSWERED.test(rows[row])) rows[row] = "";
+    const bare = rows[row].trim();
+    if (bare && !COMMENT.test(bare) && !HEADING.test(bare)) holds = true;
+  }
+  return holds ? { text: rows.join("\n"), first, last } : null;
 }
 
 // [[spec/design_output/pull#the-commands-answer]]
