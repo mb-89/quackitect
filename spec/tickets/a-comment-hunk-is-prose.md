@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -115,6 +115,12 @@ record:
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 03e9d1042d535e828ddc3a285d98a4b278a3013f
     hash_after: 03e9d1042d535e828ddc3a285d98a4b278a3013f
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-6
+    hash_before: eaf13f7b84341b014b6f36e6c2e4be4a6754f19c
+    hash_after: eaf13f7b84341b014b6f36e6c2e4be4a6754f19c
+    returns: 3
+    why: "Design: `hunksIn` keeps the last `+++ b/` file through a deleted file's hunk.; A deleted file ends its header with `+++ /dev/null`, and that line sets no file.; Its removed code then lands under the file above it, and that file asks a test.; A comment fix beside a deleted module then refuses, and the ask says it passes.; Fix: name in the `hunksIn` row that each `diff --git` line resets the file.; Fix: add a case with a comment fix and a deleted module, and assert the fix passes.; Craft: skip `--- a/` and `--- /dev/null` alone, so a removed `--x` line still reads.; The earlier findings stand answered: the removed lines, the trade case and the `---` header.; The rest stands: the callers, the note, and `names` over the added lines."
 ---
 
 # Ask
@@ -176,13 +182,15 @@ The callers of `untestedIn` read its list of files alone, so they change nothing
 
 fail
 
-- Design: `hunksIn` reads each `--- a/` header as a removed line of the file above it.
-- Both doors pipe `git diff --cached --unified=0`, so that header comes before each next `+++ b/`.
-- The header reads as code, so each file but the last asks a test.
-- A comment-only fix across seven modules then refuses, and the ask says it passes.
-- Fix: name in the `hunksIn` row that it skips a `---` header, as it skips `+++`.
-- Fix: add a comment-only case with two files, and assert it passes.
-- The rest stands: the removed lines, the trade case, the callers and the note.
+- Design: `hunksIn` keeps the last `+++ b/` file through a deleted file's hunk.
+- A deleted file ends its header with `+++ /dev/null`, and that line sets no file.
+- Its removed code then lands under the file above it, and that file asks a test.
+- A comment fix beside a deleted module then refuses, and the ask says it passes.
+- Fix: name in the `hunksIn` row that each `diff --git` line resets the file.
+- Fix: add a case with a comment fix and a deleted module, and assert the fix passes.
+- Craft: skip `--- a/` and `--- /dev/null` alone, so a removed `--x` line still reads.
+- The earlier findings stand answered: the removed lines, the trade case and the `---` header.
+- The rest stands: the callers, the note, and `names` over the added lines.
 
 # implement
 
