@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -109,6 +109,17 @@ record:
     hand: box dcd73916add7 · claude-code-remote · helper-4
     hash_before: ea30c2fcfe241f9edabd5e4d73ab2fbf936e1745
     hash_after: ea30c2fcfe241f9edabd5e4d73ab2fbf936e1745
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 8cef1ea7f5f62b0792d7b74586b163194a963b28
+    hash_after: 8cef1ea7f5f62b0792d7b74586b163194a963b28
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 10 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -207,17 +218,30 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/pulled.test.js test/contract/pulled.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Ten cases fail on their own assertion, and each names the line it proves.
+
+- `test/level0/pulled.test.js` hands `findings` a table of subjects and reads every ask it makes.
+- The door cases teach a fake proc to answer `--no-walk` apart from a full walk.
+- `test/contract/pulled.test.js` builds a scratch history and runs the real git read.
+- `lib/bash.js` stands at 595 lines, so the parse takes a module of its own in `lib/pulled.js`.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The cases stand in two new test files, and no other file moves.
+- The proc door takes `fakeProc` in level0, and the real git runs in `test/contract` alone.
+- Each test file opens with a pointer at the design section the change writes.
 
 ## reflect
 
