@@ -25,7 +25,7 @@ type panel struct {
 	shown map[string]bool
 	// The open files changed since the bridge last read them, which the next ask carries together. [[spec/design_output/lsp#the-panel-lints-as-typed]]
 	pending map[string]bool
-	// The files the bridge owes an answer for, asked again until one answers, and whether an ask runs now. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+	// The files the bridge owes an answer for, asked again until one answers, and whether an ask runs now. [[spec/design_output/lsp#the-panel-follows-the-index]]
 	owed     map[string]bool
 	draining bool
 }
@@ -108,7 +108,7 @@ func (one *server) draws(where, text, method string) {
 	if method == opens {
 		one.panel.open[at] = true
 	}
-	// A save changes the file, so the rows the bridge drew for it go, and the bridge draws them again. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+	// A save changes the file, so the rows the bridge drew for it go, and the bridge draws them again. [[spec/design_output/lsp#the-panel-follows-the-index]]
 	if method == saves {
 		delete(one.panel.extra, at)
 	}
@@ -125,7 +125,7 @@ func (one *server) draws(where, text, method string) {
 	}
 }
 
-// The bridge owes an answer for these paths. One ask runs at a time, and it asks again after the pause until the bridge answers, so a file changed while no bridge stands draws its rows once one does. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+// The bridge owes an answer for these paths. One ask runs at a time, and it asks again after the pause until the bridge answers, so a file changed while no bridge stands draws its rows once one does. [[spec/design_output/lsp#the-panel-follows-the-index]]
 func (one *server) owes(paths []string) {
 	one.guard.Lock()
 	for _, at := range paths {
@@ -189,7 +189,7 @@ func (one *server) asksHeld() {
 	}
 	found, ok := bridgeHeld(tree.Root, held)
 	if !ok {
-		// No bridge answers, so the rows it drew before go, because they read a text the buffer no longer holds, and the disk's rows come once a bridge stands. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+		// No bridge answers, so the rows it drew before go, because they read a text the buffer no longer holds, and the disk's rows come once a bridge stands. [[spec/design_output/lsp#the-panel-follows-the-index]]
 		paths := []string{}
 		one.guard.Lock()
 		for at := range held {
@@ -250,7 +250,7 @@ func (one *panel) paths() map[string]bool {
 
 // An open file leaves Biome to its own server, which draws it as it is typed. Vale stays here, because the battery's list carries the tense reader's veto. [[spec/design_output/lsp]]
 func (one *server) shows(tree *Tree, path string) {
-	// A file the disk no longer holds draws nothing, whoever last found something in it, so a move or a delete clears its row. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+	// A file the disk no longer holds draws nothing, whoever last found something in it, so a move or a delete clears its row. [[spec/design_output/lsp#the-panel-follows-the-index]]
 	if !tree.Held(path) && !tree.Exists(path) {
 		delete(one.panel.own, path)
 		delete(one.panel.extra, path)

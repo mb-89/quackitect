@@ -35,7 +35,7 @@ A file redraws on the roads below:
 | the editor opens a file | that file, off the buffer |
 | a person types in a file | that file off the buffer, and the bridge again after the quiet span |
 | the editor saves or closes a file | that file, and a save asks the bridge again |
-| anything changes a file on disk | that file, off the disk and the bridge |
+| anything changes a file on disk | that file, off the index once it sweeps, and the bridge |
 
 ## One checker every front asks
 
@@ -57,21 +57,44 @@ empty string where no binary stands, so a box carrying no Biome reads one list.
 `test/contract/one-reading.test.js` holds the fronts against each other
 over the whole tree.
 
-# The panel follows the disk
+# The server reads the index
 
-At its start the server asks the editor to watch every file under the root.
-The editor then names each file that changes on disk, whoever changes it: an
-agent, git, or a script. The server reads the type each change carries.
+Every front reads the tree off the index door, and no file of the tree off the
+disk. `indexDisk` in `src/lsp/indexed.go` holds what it pulls: each path, its
+hash, whether git tracks it, and its text. For the verbs it asks, see
+[[spec/design_output/index#a-reader-takes-the-tree]].
 
-| the change | what the panel does |
+| the front | when it pulls |
 |---|---|
-| a new or a changed file | redraws it off the disk, drops the bridge's rows on it, and asks the bridge again until one answers |
-| a deleted file | takes its row with it, and no rule reads it |
-| a folder, on either side | stands for every file under it |
+| the editor's panel | once at its start, then on every tick the door's `changes` answers |
+| `se-lsp check` | once, after the door walks the tree again, so the check reads the disk as it stands |
+| the loopback door | before every answer |
 
-So a finding leaves once its file passes, and a moved folder leaves no row
-behind. An open file follows the editor's buffer, and a change under a folder
-the battery skips redraws nothing.
+A door standing nowhere gets started through its binary, the way every caller
+starts one. A door that answers nothing stops the server, and the error names
+`./RUNME.sh`, which builds the index. The tree has no second road.
+
+`Tree.Paths` answers the paths git tracks, off the index. The cases read a
+folder they write, through a disk standing in the cases alone.
+`TestTheBinaryReadsTheTreeThroughTheIndexAlone` holds the binary to one reader.
+
+The config layers stand partly outside the tree, so the server reads them once
+at its start, through the config reader. [[spec/design_output/config#the-go-reader]]
+
+# The panel follows the index
+
+The server holds no watch of its own. It asks the door's `changes`, which
+answers once a sweep lands, and pulls again. So a file redraws whoever writes
+it: an agent, git, or a script.
+
+| what the pull names | what the panel does |
+|---|---|
+| a tracked file whose hash moves | redraws it off the index, drops the bridge's rows on it, and asks the bridge again until one answers |
+| a tracked file the index drops | takes its row with it, and no rule reads it |
+| a file git tracks nowhere | nothing, because no rule reads it |
+
+An open file follows the editor's buffer. A write on disk reaches the panel
+once the index sweeps it, and the sweep walks the whole tree.
 
 # The panel lints as typed
 

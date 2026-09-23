@@ -1,52 +1,22 @@
-// The panel follows the disk. A file something else changes redraws off the
-// disk, so a finding leaves once the file mends, with no editor event on it.
-// [[spec/design_output/lsp#the-panel-follows-the-disk]]
+// The panel follows the index. A file something else changes redraws once a
+// pull names it, so a finding leaves once the file mends, with no editor
+// event on it.
+// [[spec/design_output/lsp#the-panel-follows-the-index]]
 package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 )
-
-func changeOf(uri string, kind int) map[string]any {
-	return map[string]any{"uri": uri, "type": kind}
-}
-
-func frameOf(changes ...map[string]any) json.RawMessage {
-	said, _ := json.Marshal(map[string]any{"changes": changes})
-	return said
-}
-
-func changeFrame(uris ...string) json.RawMessage {
-	changes := []map[string]any{}
-	for _, uri := range uris {
-		changes = append(changes, changeOf(uri, changed))
-	}
-	return frameOf(changes...)
-}
 
 // A name past the word cap draws on any path, so a moved file carries a finding wherever it lands. [[spec/tickets/a-move-redraws-both-files]]
 const longName = "one-two-three-four-five-six.md"
 
-func TestInitializedAsksTheEditorToWatchEveryFile(t *testing.T) {
-	tree := sweptTree(t, nil)
-	out := &bytes.Buffer{}
-	if err := Speaks(&Checker{tree: tree}, framed(initialized), out); err != nil {
-		t.Fatal(err)
-	}
-	for _, one := range spoken(t, out.String()) {
-		if one.Method == registering && bytes.Contains(one.Params, []byte(watched)) {
-			return
-		}
-	}
-	t.Fatal("the server asks the editor to watch nothing")
-}
-
-func TestAFileTheDiskMendsLeavesThePanel(t *testing.T) {
+func TestAFileTheIndexMendsLeavesThePanel(t *testing.T) {
 	tree := sweptTree(t, nil)
 	out := &bytes.Buffer{}
 	one := &server{checker: &Checker{tree: tree}, out: out, panel: newPanel()}
@@ -60,15 +30,15 @@ func TestAFileTheDiskMendsLeavesThePanel(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(tree.Root, "HANDOVER.md"), []byte(standing), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	one.refreshes(changeFrame(uri))
+	one.redraws([]string{"HANDOVER.md"}, nil)
 
 	if said, drew := urisDrawn(spoken(t, out.String()))[uri]; !drew || said != 0 {
 		t.Fatalf("the mended file draws %d finding(s), drawn %v", said, drew)
 	}
 }
 
-// The rows the bridge drew for a file read the text it held before the disk changed, so they go with the change, whether or not a bridge answers. [[spec/design_output/lsp#the-panel-follows-the-disk]]
-func TestAFileTheDiskChangesDropsTheBridgesOldRows(t *testing.T) {
+// The rows the bridge drew for a file read the text it held before it moved, so they go with the move, whether or not a bridge answers. [[spec/design_output/lsp#the-panel-follows-the-index]]
+func TestAFileTheIndexMovesDropsTheBridgesOldRows(t *testing.T) {
 	tree := sweptTree(t, nil)
 	bridge := bridgeFor(t, tree)
 	out := &guardedBuffer{}
@@ -83,45 +53,18 @@ func TestAFileTheDiskChangesDropsTheBridgesOldRows(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(tree.Root, "HANDOVER.md"), []byte(standing), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	one.refreshes(changeFrame(uri))
+	one.redraws([]string{"HANDOVER.md"}, nil)
 
 	if said, drew := urisDrawn(spoken(t, out.String()))[uri]; !drew || said != 0 {
-		t.Fatalf("the changed file still draws %d row(s) off the bridge, drawn %v", said, drew)
+		t.Fatalf("the moved file still draws %d row(s) off the bridge, drawn %v", said, drew)
 	}
 	bridge.waits(t, lintQuiet, 1)
 	if asks := bridge.asked(); fmt.Sprint(asks[0]) != "[HANDOVER.md]" {
-		t.Fatalf("the ask after the change names %v", asks[0])
+		t.Fatalf("the ask after the move names %v", asks[0])
 	}
 }
 
-func TestAChangeUnderTheFoldersNoRuleReadsRedrawsNothing(t *testing.T) {
-	root := t.TempDir()
-	got, gone := changedIn(root, changeFrame(
-		uriOf(filepath.Join(root, ".se", ".log", "session.jsonl")),
-		uriOf(filepath.Join(root, "node_modules", "x", "a.js")),
-		uriOf(filepath.Join(root, "src", "a.js")),
-		uriOf(filepath.Join(root, "src", "a.js")),
-	))
-	if fmt.Sprint(got) != "[src/a.js]" || len(gone) != 0 {
-		t.Fatalf("the change reads %v, and drops %v", got, gone)
-	}
-}
-
-// The watcher's own types say which path redraws and which path goes, and a path named twice reads its last type. [[spec/tickets/a-move-redraws-both-files]]
-func TestADeleteAndACreateEachNameTheirPath(t *testing.T) {
-	root := t.TempDir()
-	got, gone := changedIn(root, frameOf(
-		changeOf(uriOf(filepath.Join(root, "src", "old.go")), deleted),
-		changeOf(uriOf(filepath.Join(root, "src", "new.go")), created),
-		changeOf(uriOf(filepath.Join(root, "src", "back.go")), deleted),
-		changeOf(uriOf(filepath.Join(root, "src", "back.go")), created),
-	))
-	if fmt.Sprint(got) != "[src/new.go src/back.go]" || fmt.Sprint(gone) != "[src/old.go]" {
-		t.Fatalf("the change redraws %v, and drops %v", got, gone)
-	}
-}
-
-func TestARenameOnDiskClearsTheOldRowAndDrawsTheNew(t *testing.T) {
+func TestARenameClearsTheOldRowAndDrawsTheNew(t *testing.T) {
 	tree := sweptTree(t, nil)
 	out := &bytes.Buffer{}
 	one := &server{checker: &Checker{tree: tree}, out: out, panel: newPanel()}
@@ -133,7 +76,7 @@ func TestARenameOnDiskClearsTheOldRowAndDrawsTheNew(t *testing.T) {
 	if err := os.Rename(filepath.Join(tree.Root, "HANDOVER.md"), filepath.Join(tree.Root, longName)); err != nil {
 		t.Fatal(err)
 	}
-	one.refreshes(frameOf(changeOf(old, deleted), changeOf(moved, created)))
+	one.redraws([]string{longName}, []string{"HANDOVER.md"})
 
 	drawn := urisDrawn(spoken(t, out.String()))
 	if drawn[old] != 0 {
@@ -147,7 +90,7 @@ func TestARenameOnDiskClearsTheOldRowAndDrawsTheNew(t *testing.T) {
 	}
 }
 
-func TestADeletedFolderTakesEveryRowUnderIt(t *testing.T) {
+func TestADroppedFolderTakesEveryRowUnderIt(t *testing.T) {
 	tree := sweptTree(t, nil)
 	out := &bytes.Buffer{}
 	one := &server{checker: &Checker{tree: tree}, out: out, panel: newPanel()}
@@ -157,7 +100,7 @@ func TestADeletedFolderTakesEveryRowUnderIt(t *testing.T) {
 		one.panel.shown[path] = true
 	}
 
-	one.refreshes(frameOf(changeOf(uriOf(filepath.Join(tree.Root, "src", "viewer")), deleted)))
+	one.redraws(nil, []string{"src/viewer"})
 
 	drawn := urisDrawn(spoken(t, out.String()))
 	for _, path := range rows {
@@ -168,27 +111,39 @@ func TestADeletedFolderTakesEveryRowUnderIt(t *testing.T) {
 	}
 }
 
-func TestACreatedFolderDrawsEveryFileUnderIt(t *testing.T) {
-	tree := sweptTree(t, map[string]string{"moved/" + longName: standing})
-	out := &bytes.Buffer{}
-	one := &server{checker: &Checker{tree: tree}, out: out, panel: newPanel()}
-
-	one.refreshes(frameOf(changeOf(uriOf(filepath.Join(tree.Root, "moved")), created)))
-
-	if drawn := urisDrawn(spoken(t, out.String())); drawn[uriOf(filepath.Join(tree.Root, "moved", longName))] == 0 {
-		t.Fatal("the file under the new folder draws nothing")
-	}
-}
-
-func TestAnOpenFileFollowsTheEditorAndNotTheDisk(t *testing.T) {
+func TestAnOpenFileFollowsTheEditorAndNotTheIndex(t *testing.T) {
 	tree := sweptTree(t, nil)
 	out := &bytes.Buffer{}
 	one := &server{checker: &Checker{tree: tree}, out: out, panel: newPanel()}
 	one.panel.open["HANDOVER.md"] = true
 
-	one.refreshes(changeFrame(uriOf(filepath.Join(tree.Root, "HANDOVER.md"))))
+	one.redraws([]string{"HANDOVER.md"}, nil)
 
 	if out.Len() != 0 {
-		t.Fatalf("an open file redraws off the disk: %s", out.String())
+		t.Fatalf("an open file redraws off the index: %s", out.String())
 	}
+}
+
+// The whole road: the door's tick lands, the server pulls, and the file the sweep moved redraws with no editor event. [[spec/design_output/lsp#the-panel-follows-the-index]]
+func TestASweepTheDoorLandsRedrawsTheFileItMoved(t *testing.T) {
+	door := newFakeIndex(map[string]string{"spec/one.md": "# A heading\n\nA line.\n"})
+	disk, err := overIndex("/tree", door.ask, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tree := treeOver("/tree", disk)
+	tree.Words = 1
+	out := &guardedBuffer{}
+	one := &server{checker: &Checker{tree: tree}, out: out, panel: newPanel()}
+	go one.follows()
+
+	door.writes("spec/one.md", "# A heading\n\nA line naming [[nobody-wrote-this]].\n")
+	uri := uriOf(filepath.Join("/tree", "spec/one.md"))
+	for waited := 0; waited < 100; waited++ {
+		if urisDrawn(spoken(t, out.String()))[uri] > 0 {
+			return
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
+	t.Fatalf("the file the sweep moved draws nothing: %s", out.String())
 }

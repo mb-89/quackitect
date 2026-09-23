@@ -14,13 +14,18 @@ type Checker struct {
 	rule    int
 }
 
-func checkerAt(root string) *Checker {
-	tree := treeAt(root)
+// The checker over the index. A fresh one walks the index again first, which the check asks for and the editor does not. [[spec/design_output/lsp#the-server-reads-the-index]]
+func checkerAt(root string, fresh bool) (*Checker, error) {
+	tree, err := treeAt(root, fresh)
+	if err != nil {
+		return nil, err
+	}
 	tree.Words = wordsHere(root)
 	tree.Node = nodeHere()
+	tree.Survey = surveyHere(root)
 	tree.Box = boxHere(root)
 	pointer, rule := restatedHere(root)
-	return &Checker{tree: tree, pointer: pointer, rule: rule}
+	return &Checker{tree: tree, pointer: pointer, rule: rule}, nil
 }
 
 // [[spec/design_output/tree#the-rules-over-two-files]]

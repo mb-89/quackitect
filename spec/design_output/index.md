@@ -11,8 +11,9 @@ watcher keeping it warm, and the questions it answers. For the argument, see
 # The index is warm
 
 `src/index` is a Go program holding a SQLite database over this tree. The files
-stay the truth, and the walk builds every row out of them. A reader meeting a
-stale index or none reads the files, which is what every reader here does. The
+stay the truth, and the walk builds every row out of them. A reader meeting no
+door starts one, and reads the tree off it. The tool door is the one reader
+standing aside, and the chapter Where the disk still answers says where. The
 header of each file under `src/index` says which piece it holds.
 
 It lives at `.se/.runtime/index.db`, which stays on the box it stands on. The version
@@ -28,18 +29,35 @@ meets the whole answer or the one before it.
 | table | what it holds |
 |---|---|
 | `meta` | the version and the root, which decide whether the file lives |
-| `file` | every path, its size, its time, its hash, and its text |
+| `file` | every path, its size, its time, its hash, its text, and whether git tracks it |
 | `note` | every markdown file carrying frontmatter |
 | `link` | every `[[name]]`, and the path it resolves to |
 | `note_text` | the bodies, for ranking |
 | `line_text` | every line, for the word question |
 
 `index.go` names the folders standing outside the walk. Each holds the
-machinery, or what a tool writes on its own.
+machinery, or what a tool writes on its own. A plugin folder stands inside,
+because it holds a tracked manifest.
+
+The walk asks git for its list once, and marks each row git tracks. A root git
+holds nowhere tracks every file the walk reads.
 
 The file opens in WAL mode with a busy timeout, so a reader waits on no
 writer. The door writes while a verb reads, and the two meet on one file
 without either one blocking.
+
+## A reader takes the tree
+
+A reader holding the whole tree asks the verbs below, and keeps what they answer:
+
+| verb | answers |
+|---|---|
+| `files` | every path, with its hash and whether git tracks it |
+| `texts` | the text of each path it names, or of every path where it names none |
+
+So a reader asks every text once, then the list on each tick `changes` answers,
+and the texts of the paths whose hash moves. The language server reads the tree
+this way. For how, see [[spec/design_output/lsp#the-server-reads-the-index]].
 
 ## The door owns the database
 
@@ -125,6 +143,8 @@ Each one is a walk the tree takes in one call:
 | `same` | every file carrying the size and hash of another |
 | `tickets` | every ticket with its fields, and the standing its group's branch gives it |
 | `changes` | the tick past the one a caller names, once a sweep moves the rows |
+| `files` | every path, its hash, and whether git tracks it |
+| `texts` | the text of the paths a reader names |
 | `reindex` | the walk again, now |
 | `standing` | the root the door holds, and how many files it counts |
 

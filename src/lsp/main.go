@@ -78,7 +78,12 @@ func speaks(root string) int {
 		out.Flush()
 		exits(0)
 	})
-	if err := Speaks(checkerAt(root), stdin, out); err != nil {
+	checker, err := checkerAt(root, false)
+	if err != nil {
+		fmt.Fprintln(stderr, err)
+		return 1
+	}
+	if err := Speaks(checker, stdin, out); err != nil {
 		fmt.Fprintln(stderr, err)
 		return 1
 	}
@@ -104,7 +109,7 @@ func pathsUnder(tree *Tree, where []string) []string {
 	out := []string{}
 	for _, one := range where {
 		said := relativeTo(tree.Root, one)
-		if !isFolder(tree.Root, said) {
+		if !tree.Folder(said) {
 			out = append(out, one)
 			continue
 		}
@@ -118,13 +123,13 @@ func pathsUnder(tree *Tree, where []string) []string {
 	return out
 }
 
-func isFolder(root, path string) bool {
-	said, err := statOf(filepath.Join(root, filepath.FromSlash(path)))
-	return err == nil && said.IsDir()
-}
-
 func checks(root string, where []string) int {
-	checker := checkerAt(root)
+	// The check reads the disk as it stands now, so the index walks again before it answers. [[spec/design_output/lsp#the-server-reads-the-index]]
+	checker, err := checkerAt(root, true)
+	if err != nil {
+		fmt.Fprintln(stderr, err)
+		return 1
+	}
 	found := []Finding{}
 	if len(where) == 0 || (len(where) == 1 && where[0] == ".") {
 		found = checker.Sweep()

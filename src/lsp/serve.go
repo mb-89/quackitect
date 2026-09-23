@@ -55,7 +55,16 @@ func standingPath(root string) string {
 
 // [[spec/design_output/lsp#the-standing-file]]
 func Serve(root string) (*http.Server, net.Listener, error) {
-	one := &door{checker: checkerAt(root)}
+	checker, err := checkerAt(root, false)
+	if err != nil {
+		return nil, nil, err
+	}
+	return serveOver(root, checker)
+}
+
+// The door over a checker a case hands in, or the index's. [[spec/design_output/lsp#the-standing-file]]
+func serveOver(root string, checker *Checker) (*http.Server, net.Listener, error) {
+	one := &door{checker: checker}
 	listen, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return nil, nil, err
@@ -113,11 +122,18 @@ func (one *door) answers(said call) (any, error) {
 
 	switch strings.ToLower(said.Method) {
 	case "check":
+		// The door answers off the index as it stands now. [[spec/design_output/lsp#the-server-reads-the-index]]
+		if _, _, err := one.checker.Tree().Pulls(); err != nil {
+			return nil, err
+		}
 		if asked.Path == "" {
 			return one.checker.Sweep(), nil
 		}
 		return one.checker.Over(asked.Path), nil
 	case "sweep":
+		if _, _, err := one.checker.Tree().Pulls(); err != nil {
+			return nil, err
+		}
 		return one.checker.Sweep(), nil
 	case "standing":
 		return map[string]any{

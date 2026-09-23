@@ -89,7 +89,7 @@ Before this change the watcher reads every change alike. A deleted path goes thr
 | a deleted folder | clears every row under it, off `panel.under` |
 | a new folder | redraws every file under it, off `filesUnder` |
 
-`panel.paths` holds the union of rows `showsAll` gathers inline before, so both callers read one place. The chapter the code points at carries the table. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+`panel.paths` holds the union of rows `showsAll` gathers inline before, so both callers read one place. The chapter the code points at carries the table. [[spec/design_output/lsp#the-panel-follows-the-index]]
 
 The check trips on the stub and the vehicle contract tests, outside this ask. The commit ahead of this branch takes both plugin manifests out of git, and the stamp in `src/scripts/brand.js` writes a manifest only where one stands. So a fresh clone carries neither, and the marker every vehicle reads stands nowhere. The stamp now mints a missing manifest from the shape it holds, and the plugin's version reads off `package.json`. The chapter on the brand says so. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 

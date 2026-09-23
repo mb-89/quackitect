@@ -1,32 +1,13 @@
-// The paths a tree holds: git's list where a repository stands, and a walk over
-// the disk where none does.
+// The paths a tree holds, where its disk names no tracked list: a walk over the
+// folder a case writes. The binary's tree takes git's list off the index.
 // [[spec/design_output/tree#the-tree-handed-in]]
 package main
 
 import (
-	"quackitect/yaml"
-
 	"io/fs"
 	"path/filepath"
 	"sort"
-	"strings"
 )
-
-// [[spec/design_output/tree#the-tree-handed-in]]
-func gitHolds(root string) []string {
-	read, err := gitFiles(root)
-	if err != nil {
-		return nil
-	}
-	out := []string{}
-	for _, line := range yaml.SplitLines(string(read)) {
-		path := strings.TrimSpace(line)
-		if path != "" && !isDraft(path) {
-			out = append(out, path)
-		}
-	}
-	return out
-}
 
 // [[spec/design_output/tree#the-tree-handed-in]]
 func diskHolds(disk Disk, root string) []string {

@@ -34,12 +34,14 @@ func gitSays(root, key string) string {
 	return strings.TrimSpace(string(read))
 }
 
-// [[spec/design_output/tree#the-tree-handed-in]]
-func gitFiles(root string) (string, error) {
-	said := exec.Command("git", "ls-files")
-	said.Dir = root
-	read, err := said.Output()
-	return string(read), err
+// The index door comes up through its own binary, which walks the tree and stands before it answers. [[spec/design_output/index#a-door-comes-back]]
+func startsIndex(root, binary string) error {
+	one := exec.Command(filepath.Join(root, filepath.FromSlash(binary)), "standing")
+	one.Dir = root
+	if said, err := one.CombinedOutput(); err != nil {
+		return fmt.Errorf("%v: %s", err, strings.TrimSpace(string(said)))
+	}
+	return nil
 }
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
@@ -87,7 +89,6 @@ func writeFile(path string, data []byte, mode fs.FileMode) error {
 func statOf(path string) (fs.FileInfo, error)     { return os.Stat(path) }
 func makeDir(path string, mode fs.FileMode) error { return os.MkdirAll(path, mode) }
 func removeFile(path string) error                { return os.Remove(path) }
-func readDir(path string) ([]fs.DirEntry, error)  { return os.ReadDir(path) }
 
 // The stop a person or a swapped binary sends, so main waits on one channel and names no signal. [[spec/design_output/doors#a-door-reads-the-outside]]
 func stops(swapped func(gone func())) <-chan struct{} {
@@ -102,19 +103,10 @@ func stops(swapped func(gone func())) <-chan struct{} {
 	return out
 }
 
-// The disk the tree reads through: the real one here, and a memory one in the cases. [[spec/tickets/a-door-holds-file-calls]]
+// The disk the tree reads through: the index in the binary, and a folder a case writes in the cases. So the binary reads no file of the tree past the index. [[spec/design_output/lsp#the-server-reads-the-index]]
 type Disk interface {
 	ReadFile(path string) ([]byte, error)
 	Stat(path string) (fs.FileInfo, error)
 	ReadDir(path string) ([]fs.DirEntry, error)
 	WalkDir(root string, fn fs.WalkDirFunc) error
-}
-
-type realDisk struct{}
-
-func (realDisk) ReadFile(path string) ([]byte, error)       { return readFile(path) }
-func (realDisk) Stat(path string) (fs.FileInfo, error)      { return statOf(path) }
-func (realDisk) ReadDir(path string) ([]fs.DirEntry, error) { return readDir(path) }
-func (realDisk) WalkDir(root string, fn fs.WalkDirFunc) error {
-	return filepath.WalkDir(root, fn)
 }

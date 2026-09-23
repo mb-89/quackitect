@@ -29,6 +29,8 @@ type Tree struct {
 	Words int
 	Node  string
 	Box   Box
+	// The tool survey, a runtime file the index walks past, read once at the start the way the node is. [[spec/design_output/lsp#the-server-reads-the-index]]
+	Survey string
 
 	guard    sync.Mutex
 	overlay  map[string]string
@@ -56,8 +58,13 @@ func (one *Tree) Restated(pass func() []Finding) []Finding {
 	return found
 }
 
-func treeAt(root string) *Tree {
-	return treeOver(root, realDisk{})
+// The binary's tree, over the index. A fresh tree walks the index again first, so the check reads the disk as it stands. [[spec/design_output/lsp#the-server-reads-the-index]]
+func treeAt(root string, fresh bool) (*Tree, error) {
+	disk, err := overIndex(root, indexAt(root), fresh)
+	if err != nil {
+		return nil, err
+	}
+	return treeOver(root, disk), nil
 }
 
 // [[spec/tickets/a-door-holds-file-calls]]
@@ -70,7 +77,7 @@ func (one *Tree) Holds(path, text string) {
 	one.guard.Lock()
 	defer one.guard.Unlock()
 	one.overlay[slashed(path)] = text
-	// Typing into a file the list holds adds no path, so the list stands and git runs no second time. [[spec/design_output/lsp#a-change-reads-one-note]]
+	// Typing into a file the list holds adds no path, so the list stands. [[spec/design_output/lsp#a-change-reads-one-note]]
 	if !listed(one.held, slashed(path)) {
 		one.held = nil
 	}
@@ -135,12 +142,24 @@ func (one *Tree) Paths() []string {
 		return one.held
 	}
 
-	out := gitHolds(one.Root)
-	if out == nil {
+	out := []string{}
+	if list, ok := one.disk.(interface{ tracked() []string }); ok {
+		for _, path := range list.tracked() {
+			if !isDraft(path) {
+				out = append(out, path)
+			}
+		}
+	} else {
 		out = diskHolds(one.disk, one.Root)
 	}
 	one.held = out
 	return out
+}
+
+// Whether a path names a folder of the tree. [[spec/design_output/lsp#one-checker-every-front-asks]]
+func (one *Tree) Folder(path string) bool {
+	said, err := one.disk.Stat(filepath.Join(one.Root, filepath.FromSlash(path)))
+	return err == nil && said.IsDir()
 }
 
 // [[spec/design_output/tree#the-tree-handed-in]]
@@ -460,7 +479,7 @@ func surveyNamesInstalls(tree *Tree) []Finding {
 // [[spec/design_output/tools#what-the-survey-writes]]
 func surveyFindsNode(tree *Tree) []Finding {
 	rule := "SurveyFindsNode"
-	text := tree.Read(ToolsAt)
+	text := tree.Survey
 	if text == "" {
 		return []Finding{fault(rule, Install, 1,
 			ToolsAt+" stands nowhere, so every caller guesses a path. Run ./RUNME.sh tools.")}

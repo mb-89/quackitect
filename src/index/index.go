@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS file (
   size  INTEGER NOT NULL,
   mtime INTEGER NOT NULL,
   hash  TEXT NOT NULL,
-  text  TEXT NOT NULL
+  text  TEXT NOT NULL,
+  tracked INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS file_size_hash ON file (size, hash);
 CREATE TABLE IF NOT EXISTS note (
@@ -48,12 +49,13 @@ CREATE VIRTUAL TABLE IF NOT EXISTS note_text USING fts5 (path UNINDEXED, id, bod
 CREATE VIRTUAL TABLE IF NOT EXISTS line_text USING fts5 (path UNINDEXED, n UNINDEXED, text);
 `
 
-const version = "2"
+const version = "3"
 
 const textSniffBytes = 8000
 
+// A plugin folder holds a tracked manifest, so the walk reads it like any other. [[spec/design_output/index#the-rows-the-walk-writes]]
 var skipped = map[string]bool{
-	".git": true, "node_modules": true, ".claude-plugin": true,
+	".git": true, "node_modules": true,
 }
 
 // The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
@@ -151,6 +153,8 @@ func Reindex(db *sql.DB, root string) (int, error) {
 		}
 	}
 
+	// Git's list, read once a walk, marks the rows a reader of the tracked tree takes. [[spec/design_output/index#the-rows-the-walk-writes]]
+	tracked := trackedIn(root)
 	count := 0
 	err = filepath.Walk(root, func(abs string, info fs.FileInfo, err error) error {
 		if err != nil {
@@ -166,7 +170,7 @@ func Reindex(db *sql.DB, root string) (int, error) {
 		if !ok {
 			return nil
 		}
-		if err := one(tx, abs, rel, info); err != nil {
+		if err := one(tx, abs, rel, info, tracked(rel)); err != nil {
 			return err
 		}
 		count++
@@ -189,7 +193,7 @@ func relOf(root, abs string) (string, bool) {
 	return filepath.ToSlash(rel), true
 }
 
-func one(tx *sql.Tx, abs, rel string, info fs.FileInfo) error {
+func one(tx *sql.Tx, abs, rel string, info fs.FileInfo, tracked bool) error {
 	body, err := readFile(abs)
 	if err != nil {
 		return nil // unreadable here is absent, and the next walk answers again
@@ -201,10 +205,10 @@ func one(tx *sql.Tx, abs, rel string, info fs.FileInfo) error {
 		text = string(body)
 	}
 	if _, err := tx.Exec(
-		`INSERT INTO file (path, size, mtime, hash, text) VALUES (?, ?, ?, ?, ?)
+		`INSERT INTO file (path, size, mtime, hash, text, tracked) VALUES (?, ?, ?, ?, ?, ?)
 		 ON CONFLICT (path) DO UPDATE SET size = excluded.size,
-		   mtime = excluded.mtime, hash = excluded.hash, text = excluded.text`,
-		rel, info.Size(), info.ModTime().UnixNano(), hex.EncodeToString(sum[:]), text); err != nil {
+		   mtime = excluded.mtime, hash = excluded.hash, text = excluded.text, tracked = excluded.tracked`,
+		rel, info.Size(), info.ModTime().UnixNano(), hex.EncodeToString(sum[:]), text, tracked); err != nil {
 		return err
 	}
 

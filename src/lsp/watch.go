@@ -1,106 +1,55 @@
-// The disk as the panel watches it. The editor names every file that changes
-// under the root, whoever changes it, and the panel redraws each one off the
-// disk and asks the bridge again. So a finding leaves when its file mends.
-// [[spec/design_output/lsp#the-panel-follows-the-disk]]
+// The panel follows the index. The door's changes call answers once a sweep
+// lands, a pull names the files whose hash moved and the ones that went, and
+// each redraws. So a finding leaves when its file mends, whoever mends it.
+// [[spec/design_output/lsp#the-panel-follows-the-index]]
 package main
 
 import (
-	"encoding/json"
-	"io/fs"
-	"path/filepath"
+	"errors"
 	"strings"
+	"time"
 )
 
-const (
-	watched     = "workspace/didChangeWatchedFiles"
-	registering = "client/registerCapability"
-	everyFile   = "**/*"
-)
-
-// The change types the editor names, off the protocol's FileChangeType. [[spec/design_output/lsp#the-panel-follows-the-disk]]
-const (
-	created = 1
-	changed = 2
-	deleted = 3
-)
-
-// The folders no rule reads, the ones the battery skips too. [[spec/design_output/lsp#the-panel-follows-the-disk]]
-var unwatched = []string{".se/", ".git/", "node_modules/", ".claude/types/", ".claude/worktrees/"}
-
-// [[spec/design_output/lsp#the-panel-follows-the-disk]]
-func (one *server) watches() {
-	params, err := json.Marshal(map[string]any{
-		"registrations": []map[string]any{{
-			"id":     "se-lsp-disk",
-			"method": watched,
-			"registerOptions": map[string]any{
-				"watchers": []map[string]any{{"globPattern": everyFile}},
-			},
-		}},
-	})
-	if err != nil {
-		return
-	}
-	one.writes(message{JSONRPC: "2.0", ID: json.RawMessage(`"se-lsp-disk"`), Method: registering, Params: params})
-}
-
-// The paths a change names, relative to the root, past the folders no rule reads: the ones to redraw off the disk, and the ones the disk drops. A path named twice reads its last type. [[spec/design_output/lsp#the-panel-follows-the-disk]]
-func changedIn(root string, params json.RawMessage) (redrawn, gone []string) {
-	var said struct {
-		Changes []struct {
-			URI  string `json:"uri"`
-			Type int    `json:"type"`
-		} `json:"changes"`
-	}
-	if err := json.Unmarshal(params, &said); err != nil {
-		return nil, nil
-	}
-	order := []string{}
-	last := map[string]int{}
-	for _, change := range said.Changes {
-		at := relativeTo(root, pathOf(change.URI))
-		if at == "" || isUnwatched(at) {
+// [[spec/design_output/lsp#the-panel-follows-the-index]]
+func (one *server) follows() {
+	tree := one.checker.Tree()
+	since := int64(0)
+	for {
+		tick, err := tree.Changes(since)
+		if errors.Is(err, errNoIndex) {
+			return
+		}
+		if err != nil {
+			time.Sleep(bridgeRetry)
 			continue
 		}
-		if _, seen := last[at]; !seen {
-			order = append(order, at)
+		if tick == since {
+			continue
 		}
-		last[at] = change.Type
+		since = tick
+		one.syncs()
 	}
-	redrawn, gone = []string{}, []string{}
-	for _, at := range order {
-		if last[at] == deleted {
-			gone = append(gone, at)
-		} else {
-			redrawn = append(redrawn, at)
-		}
-	}
-	return redrawn, gone
 }
 
-func isUnwatched(path string) bool {
-	for _, folder := range unwatched {
-		if strings.HasPrefix(path, folder) {
-			return true
-		}
+// One pull off the index, and a redraw of what it moved. [[spec/design_output/lsp#the-panel-follows-the-index]]
+func (one *server) syncs() {
+	moved, gone, err := one.checker.Tree().Pulls()
+	if err != nil || len(moved)+len(gone) == 0 {
+		return
 	}
-	return false
+	one.redraws(moved, gone)
 }
 
-// A file the disk changes redraws off the disk, and the bridge answers for it again. A file the disk drops takes its row with it, and a folder every row under it. An open file follows the editor instead. [[spec/design_output/lsp#the-panel-follows-the-disk]]
-func (one *server) refreshes(params json.RawMessage) {
+// A file the index moves redraws, and the bridge answers for it again. A file the index drops takes its row with it. An open file follows the editor instead. [[spec/design_output/lsp#the-panel-follows-the-index]]
+func (one *server) redraws(moved, gone []string) {
 	tree := one.checker.Tree()
-	redrawn, gone := changedIn(tree.Root, params)
 	one.guard.Lock()
 	for _, at := range one.closed(gone) {
 		for _, path := range one.panel.under(at) {
 			one.shows(tree, path)
 		}
 	}
-	paths := []string{}
-	for _, at := range one.closed(redrawn) {
-		paths = append(paths, filesUnder(tree, at)...)
-	}
+	paths := one.closed(moved)
 	one.guard.Unlock()
 	if len(paths) == 0 {
 		return
@@ -116,7 +65,7 @@ func (one *server) refreshes(params json.RawMessage) {
 		}
 	}
 	one.guard.Lock()
-	// The rows the bridge drew for a changed file read the text it held before, so they go now, and the bridge draws them again once it answers. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+	// The rows the bridge drew for a moved file read the text it held before, so they go now, and the bridge draws them again once it answers. [[spec/design_output/lsp#the-panel-follows-the-index]]
 	for _, at := range paths {
 		delete(one.panel.extra, at)
 	}
@@ -128,7 +77,7 @@ func (one *server) refreshes(params json.RawMessage) {
 	go one.owes(paths)
 }
 
-// The paths no editor holds open, under the guard. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+// The paths no editor holds open, under the guard. [[spec/design_output/lsp#the-panel-follows-the-index]]
 func (one *server) closed(paths []string) []string {
 	out := []string{}
 	for _, at := range paths {
@@ -139,7 +88,7 @@ func (one *server) closed(paths []string) []string {
 	return out
 }
 
-// The rows a path holds: its own, and every one under it where it names a folder. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+// The rows a path holds: its own, and every one under it where it names a folder. [[spec/design_output/lsp#the-panel-follows-the-index]]
 func (one *panel) under(at string) []string {
 	out := []string{}
 	for path := range one.paths() {
@@ -147,28 +96,5 @@ func (one *panel) under(at string) []string {
 			out = append(out, path)
 		}
 	}
-	return out
-}
-
-// The files a path names: itself, or every file under it where it names a folder, past the folders no rule reads. [[spec/design_output/lsp#the-panel-follows-the-disk]]
-func filesUnder(tree *Tree, at string) []string {
-	whole := filepath.Join(tree.Root, filepath.FromSlash(at))
-	if stat, err := statOf(whole); err != nil || !stat.IsDir() {
-		return []string{at}
-	}
-	out := []string{}
-	filepath.WalkDir(whole, func(where string, entry fs.DirEntry, err error) error {
-		if err != nil || entry.IsDir() {
-			return nil
-		}
-		rel, err := filepath.Rel(tree.Root, where)
-		if err != nil {
-			return nil
-		}
-		if path := slashed(rel); !isUnwatched(path) {
-			out = append(out, path)
-		}
-		return nil
-	})
 	return out
 }

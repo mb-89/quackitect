@@ -61,7 +61,7 @@ func bridgeFor(t *testing.T, tree *Tree) *fakeBridge {
 			paths = append(paths, each.Path)
 			found = append(found, Finding{File: each.Path, Rule: "Sentence", Line: 1, Column: 1, Severity: SeverityWarning, Source: fromVale})
 		}
-		// An ask over the disk names its paths in the query, and answers no finding, so a file the disk mends draws none. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+		// An ask over the disk names its paths in the query, and answers no finding, so a file the disk mends draws none. [[spec/design_output/lsp#the-panel-follows-the-index]]
 		paths = append(paths, r.URL.Query()["path"]...)
 		sort.Strings(paths)
 		one.guard.Lock()
@@ -131,7 +131,7 @@ func TestAPathTheBridgeSpellsWithBackslashesMeetsTheSamePath(t *testing.T) {
 	}
 }
 
-// A move or a delete leaves the file's findings behind in both lists, and the row must go with the file. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+// A move or a delete leaves the file's findings behind in both lists, and the row must go with the file. [[spec/design_output/lsp#the-panel-follows-the-index]]
 func TestAFileTheDiskNoLongerHoldsDrawsNothingAndDropsItsLists(t *testing.T) {
 	tree := sweptTree(t, nil)
 	out := &bytes.Buffer{}

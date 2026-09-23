@@ -4,6 +4,7 @@
 package main
 
 import (
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -49,6 +50,15 @@ func countAt(root, key string) int {
 }
 
 // [[spec/design_output/tools#what-the-survey-writes]]
+// The tool survey as it stands under the runtime folder, or the empty text where none stands. [[spec/design_output/tools#what-the-survey-writes]]
+func surveyHere(root string) string {
+	said, err := readFile(filepath.Join(root, filepath.FromSlash(ToolsAt)))
+	if err != nil {
+		return ""
+	}
+	return string(said)
+}
+
 func nodeHere() string {
 	said, err := runs("node", "--version")
 	if err != nil {

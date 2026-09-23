@@ -41,6 +41,7 @@ func wholeTree(t *testing.T, over map[string]string) *Tree {
 	}
 	tree := fixture(t, files)
 	tree.Node = "1.2.3"
+	tree.Survey = files[ToolsAt]
 	return tree
 }
 

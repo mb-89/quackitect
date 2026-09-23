@@ -129,9 +129,7 @@ func (one *server) took(said message) bool {
 		one.answers(said.ID, one.links(said.Params))
 	case "initialized":
 		one.sweeps()
-		one.watches()
-	case watched:
-		one.refreshes(said.Params)
+		go one.follows()
 	case "shutdown":
 		one.answers(said.ID, nil)
 	case "exit":
@@ -143,7 +141,7 @@ func (one *server) took(said message) bool {
 		where, _ := opened(said.Params)
 		one.closes(where)
 	case "":
-		// The editor's answer to a request of this server's own, which asks nothing back. [[spec/design_output/lsp#the-panel-follows-the-disk]]
+		// The editor's answer to a request of this server's own, which asks nothing back. [[spec/design_output/lsp#the-panel-follows-the-index]]
 	default:
 		if len(said.ID) > 0 {
 			one.fails(said.ID, "no method called "+said.Method)

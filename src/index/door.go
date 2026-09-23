@@ -101,6 +101,23 @@ func starts(root string) error {
 	return errorOf("the door took longer than thirty seconds to stand")
 }
 
+// The paths git tracks under the root. A root git holds nowhere tracks every file the walk reads, the way a reader of a bare folder reads it whole. [[spec/design_output/index#the-rows-the-walk-writes]]
+func trackedIn(root string) func(rel string) bool {
+	list := exec.Command("git", "ls-files", "-z")
+	list.Dir = root
+	said, err := list.Output()
+	if err != nil {
+		return func(string) bool { return true }
+	}
+	held := map[string]bool{}
+	for _, path := range strings.Split(string(said), "\x00") {
+		if path != "" {
+			held[path] = true
+		}
+	}
+	return func(rel string) bool { return held[rel] }
+}
+
 func Serve(root, at string) (func(), net.Listener, error) {
 	db, err := Open(root, at)
 	if err != nil {
@@ -248,16 +265,21 @@ func (one *door) took(w http.ResponseWriter, r *http.Request) {
 
 func (one *door) answers(said call) (any, error) {
 	var asked struct {
-		Words  string `json:"words"`
-		Target string `json:"target"`
-		Path   string `json:"path"`
-		Limit  int    `json:"limit"`
+		Words  string   `json:"words"`
+		Target string   `json:"target"`
+		Path   string   `json:"path"`
+		Paths  []string `json:"paths"`
+		Limit  int      `json:"limit"`
 	}
 	if len(said.Params) > 0 {
 		json.Unmarshal(said.Params, &asked)
 	}
 
 	switch strings.ToLower(said.Method) {
+	case "files":
+		return Files(one.db)
+	case "texts":
+		return Texts(one.db, asked.Paths)
 	case "grep":
 		var ask GrepAsk
 		if err := json.Unmarshal(said.Params, &ask); err != nil {

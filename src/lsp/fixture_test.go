@@ -1,10 +1,21 @@
 package main
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
 )
+
+// The folder a case writes, read straight off the disk. It stands in the cases alone, so the binary reads the tree off the index and nowhere else. [[spec/design_output/lsp#the-server-reads-the-index]]
+type realDisk struct{}
+
+func (realDisk) ReadFile(path string) ([]byte, error)       { return os.ReadFile(path) }
+func (realDisk) Stat(path string) (fs.FileInfo, error)      { return os.Stat(path) }
+func (realDisk) ReadDir(path string) ([]fs.DirEntry, error) { return os.ReadDir(path) }
+func (realDisk) WalkDir(root string, fn fs.WalkDirFunc) error {
+	return filepath.WalkDir(root, fn)
+}
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 func fixture(t *testing.T, files map[string]string) *Tree {
@@ -19,7 +30,7 @@ func fixture(t *testing.T, files map[string]string) *Tree {
 			t.Fatal(err)
 		}
 	}
-	tree := treeAt(root)
+	tree := treeOver(root, realDisk{})
 	tree.Words = 5
 	return tree
 }

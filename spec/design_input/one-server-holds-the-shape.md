@@ -44,8 +44,9 @@ projection into Vale, and the code stays with Biome.
 # Its own process
 
 The server is a Go program under `src`, in a module of its own, with no cgo.
-It builds in seconds, in parallel with the index, and a box with no C compiler
-still gets it. It answers over stdio for the editor and over a loopback port
+It builds in seconds, in parallel with the index. It reads the tree off the
+index, and `./RUNME.sh` installs the compiler the index takes, so a box holds
+both. It answers over stdio for the editor and over a loopback port
 for a door. It writes where it stands into `.se`, the way the index does.
 
 The index and the server stay two programs. An engine, when one comes, asks

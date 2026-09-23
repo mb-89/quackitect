@@ -2,13 +2,21 @@ package main
 
 import (
 	"encoding/json"
+	"net/http"
 	"os"
 	"testing"
 )
 
+// A door over a case's own folder, so the case starts no index. [[spec/design_output/lsp#the-standing-file]]
+func servedAt(t *testing.T, root string) (*http.Server, error) {
+	t.Helper()
+	server, _, err := serveOver(root, &Checker{tree: treeOver(root, realDisk{})})
+	return server, err
+}
+
 func TestTheServerWritesWhereItStands(t *testing.T) {
 	root := t.TempDir()
-	server, _, err := Serve(root)
+	server, err := servedAt(t, root)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -37,7 +45,7 @@ func TestTheServerWritesWhereItStands(t *testing.T) {
 
 func TestASecondCallerFindsTheFirstServer(t *testing.T) {
 	root := t.TempDir()
-	server, _, err := Serve(root)
+	server, err := servedAt(t, root)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +77,7 @@ func TestAStaleFileGivesWay(t *testing.T) {
 }
 
 func TestTheServerNamesNoStrangerMethod(t *testing.T) {
-	one := &door{checker: &Checker{tree: treeAt(t.TempDir())}}
+	one := &door{checker: &Checker{tree: treeOver(t.TempDir(), realDisk{})}}
 	if _, err := one.answers(call{Method: "stranger"}); err == nil {
 		t.Fatal("a method nobody named answers fine")
 	}
