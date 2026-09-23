@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -124,6 +124,12 @@ record:
     hand: box d6f05e3a585030 · claude-code
     hash_before: d249c7ad3c9e636993efcbf6a332fc35f94524b9
     hash_after: d249c7ad3c9e636993efcbf6a332fc35f94524b9
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-8
+    hash_before: d7f0f03da88d7e7a7c5d60d27640541cd4451032
+    hash_after: d7f0f03da88d7e7a7c5d60d27640541cd4451032
+    returns: 4
+    why: "Design: `./RUNME.sh lint` reads through `findingsOver` in `cli-read.js`, and `lintText` serves the write door and the panel.; So the pull matches the door's reading, and the lint keeps a reader of its own.; Fix the opening line, and name `findingsOver` as the reading the pull matches.; Hand `valeArgv` the config `assemble` writes, as `configOf` in `findings.js` does.; Hold the marker case with `linesNamed`: the pull's list against `findingsOver` over the same ticket.; The rest stands answered: the split, the whole file, the chapter's lines, the markers, the level and the panel."
 ---
 
 # Ask
@@ -188,14 +194,12 @@ road: the pull reads the whole ticket the way the lint reads it.
 
 fail
 
-- Craft: `voiceFaults` drops comment rows, `answered:` rows and headings, so one offset names the wrong line.
-- Craft: `prose()` drops a Vale off marker, so the pull runs a rule the lint turns off.
-- The pull's `unreasoned` reads text stripped of that marker, so a marker with no reason passes.
-- Fix both: keep each row at its file line with its comments, and blank the rows the pull skips.
-- Add a case where a field carries a Vale off marker, and the pull and the lint agree.
-- Craft: the Vale door's `lint` appends `unreasoned` already, so `heldOver` through `proseFound` names it twice.
-- Let the panel's road skip `unreasoned` in `proseFound`, because the door's rows carry it.
-- The earlier findings stand answered: the one road, `findingsOver`, the name, the config and the level.
+- Design: `./RUNME.sh lint` reads through `findingsOver` in `cli-read.js`, and `lintText` serves the write door and the panel.
+- So the pull matches the door's reading, and the lint keeps a reader of its own.
+- Fix the opening line, and name `findingsOver` as the reading the pull matches.
+- Hand `valeArgv` the config `assemble` writes, as `configOf` in `findings.js` does.
+- Hold the marker case with `linesNamed`: the pull's list against `findingsOver` over the same ticket.
+- The rest stands answered: the split, the whole file, the chapter's lines, the markers, the level and the panel.
 
 # implement
 
