@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -139,6 +139,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-9
+    hash_before: b52be05ea814a52cfdcb34af88dbcc6478760799
+    hash_after: b52be05ea814a52cfdcb34af88dbcc6478760799
+reason: done
 ---
 
 # Ask
@@ -354,17 +359,41 @@ The Bash door now refuses a `git revert` or a `git reset` over a pull commit, an
 
 <!-- the form is files -->
 
+- spec/tickets/the-door-refuses-a-revert.md
+- .claude/skills/level0/lib/bash.js
+- .claude/skills/level0/lib/pulled.js
+- .claude/skills/level0/lib/folders.js
+- src/bridge/bash.js
+- src/engine/group.js
+- spec/design_output/bash.md
+- test/level0/pulled.test.js
+- test/contract/pulled.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- The row refuses a `git revert` or a `git reset` over a pull commit, and names the take-back verb.
+- A plain commit, a bare reset and a reset over paths pass the row.
+- The level0 cases and one contract case cover each line of the ask.
+- `./RUNME.sh check` exits 0.
+- The cycle between `lib/pulled.js` and `lib/bash.js` holds, since neither module calls the other at load.
+- Both load orders import clean, and `findings` answers `PullCommitStands`.
+- craft: the approach puts the parse in `lib/bash.js`, and the change moves it to `lib/pulled.js`.
+- craft: four helpers in `lib/bash.js` turn public for the new module alone.
+- craft: no retro stands in the handback.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The rule stands in `spec/design_output/bash.md`, and each new function points at that section.
+- The leaf forms stand in the design note and in `LEAVES`, and the code comment points at the note.
 
 # Discussion
 
