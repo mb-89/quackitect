@@ -89,12 +89,16 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 614c1aa4b8e9220e93e59a8afa6bbbf3016a1391
     hash_after: 614c1aa4b8e9220e93e59a8afa6bbbf3016a1391
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: 09245012fb0b240a8abcabdad6f399dccd5597ff
+    hash_after: 09245012fb0b240a8abcabdad6f399dccd5597ff
 ---
 
 # Ask
@@ -160,6 +164,22 @@ The cost: a warning in a route's own text now fails the contract case, and the c
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- The road, the level, the routes case and the callers match the ask and the code.
+- Craft: a `readsDraft` stands in `prose.js` already, as the handler of `check_prose`.
+- Give the shared reading a name apart from it, so one name reads one thing.
+- Craft: the ask names `readsProse`, and the approach reads through `readsText`.
+- Say why in the approach: `readsProse` drops findings the lint keeps.
+- Craft: `test/level0/ticket.test.js` holds the door's cases, and the verbs have no case there.
+- Put the open case in `ask-lint.test.js`, and the note case in `ticket-verb.test.js`.
+- Craft: a case in `ask-lint.test.js` says a warning leaves the open alone.
+- The change turns that case around, so name it beside the cases.
+- Craft: `askFaults` takes the rows `askLines` keeps, and those rows drop the comment rows.
+- Hand `askFaults` the whole ticket and the Ask's first and last line, so a finding names its file line.
+- Craft: the stated cost leaves out a draft whose Ask carries a warning today.
+- That draft stops opening until a hand rewrites its Ask.
+- Craft: `retro-new.js` puts its `--why` line in the Ask, and no reading covers it.
 
 # implement
 
