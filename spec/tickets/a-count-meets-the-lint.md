@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -116,6 +116,17 @@ record:
     hash_after: 3b6ef260735564fee054f2c1eb78a5a3b53ba350
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 1ca67950abbca14d98550973f4e72524e461ec97
+    hash_after: 1ca67950abbca14d98550973f4e72524e461ec97
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 27 test(s) pass in 3 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -282,11 +293,17 @@ start constants, and one route shape.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/route-fixture.test.js test/level0/start-constants.test.js test/contract/vale.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
+
 
 ### says
 
@@ -294,11 +311,25 @@ start constants, and one route shape.
 
 <!-- the form is text -->
 
+Each copied fact the ask names now meets a check, or reads its owner.
+
+- `VoiceVale.CountedList` warns on a line counting the list or table under it, in notes, off code, tickets, inputs and rationales
+- `VoiceVale.CodeHeader` refuses a header past five lines or one carrying a count, and `CodeComment` keeps the stray comment
+- `SELF_TEST` and `TESTING` stand in `lib/vehicle.js`, and the start road and the server read them there
+- `stepsIn` reads a route item as a step whatever key opens it, and a fixture holds it to `leavesOf`
+- every header and lead line the rules named lands fixed, so the lint reads clean
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the rules, their sections, the constants, the route reader, and each line the rules name
+- the Vale rules meet the real binary in a contract case, and the rest read strings or fakes
+- each new rule file and each changed function names the approach through its pointer
+
 
 # verdict
 
