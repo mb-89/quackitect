@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -110,6 +110,10 @@ record:
     hash_after: 53ec88cd6ece1657a8e62a431d1719dbd2880035
     returns: 2
     why: "Design: `./RUNME.sh lint` runs `findingsOver` through `cli-read.js`, and `heldOver` serves the editor panel alone.; `findingsOver` reads through `readThrough`, so the lint keeps a reader of its own on this road.; Name `findingsOver` as a caller of the shared reading, beside `heldOver` and `voiceFaults`.; Design: a `readsProse(box, text, found)` stands in `prose.js` already, and the write door calls it.; That reader holds vetoes the lint lacks: the sentence length and the word outside the vocabulary.; Give the shared reading a name apart from `readsProse`, so one name reads one thing.; Craft: `voiceFaults` counts a line from its chapter, and the lint counts it from the file.; Add the chapter's offset in the case, so the pull and the lint name the same line.; The road, its cost, the level and the case match the ask."
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: c8fa599fb6c6adb54cde39041f9065aaeb3a5fd3
+    hash_after: c8fa599fb6c6adb54cde39041f9065aaeb3a5fd3
 ---
 
 # Ask
@@ -148,11 +152,14 @@ nothing. The road: one reading both sides call, and each runs Vale its own way.
 
 | part | what changes |
 |---|---|
-| the reading | `readsProse(body, at, found)` in `findings.js` takes Vale's rows, runs `withoutFalsePast` and marks `unreasoned`, and answers the findings |
-| the lint | `heldOver` awaits `lint`, then calls `readsProse` |
-| the pull | `voiceFaults` runs Vale at once, on the config `assemble` writes, then calls `readsProse` |
+| the reading | `proseFound(body, at, found)` in `findings.js` takes Vale's rows, runs `withoutFalsePast` and marks `unreasoned`, and answers the findings |
+| the lint | `findingsOver`, which `./RUNME.sh lint` runs, calls `proseFound` over each file |
+| the panel | `heldOver` awaits `lint`, then calls `proseFound` over the buffer |
+| the pull | `voiceFaults` runs Vale at once, on the config `assemble` writes, then calls `proseFound` |
+| the line | `voiceFaults` adds its chapter's first line in the file, so the pull names the line the lint names |
 | the level | a finding at error or at warning refuses the hand-back, and names its rule and its line |
-| the case | a verdict carrying a semicolon comes back refused, and the lint names the same line |
+| the case | a verdict carrying a semicolon comes back refused, and the lint names the same line of the file |
+| the name | `readsProse` in `src/bridge/prose.js` stays the write door's own, which reads a narrower set |
 
 - the cost: two runners of Vale stand, one for the server and one for the command line
 - what stays one: the rules, the config and the reading, which is what the ask names
