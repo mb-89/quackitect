@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -105,6 +105,10 @@ record:
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 4caa6dda863464c6c21eaf97492e0c545c455c85
     hash_after: 4caa6dda863464c6c21eaf97492e0c545c455c85
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-4
+    hash_before: a927c492425955067b1b02bf23344e563a44a43b
+    hash_after: a927c492425955067b1b02bf23344e563a44a43b
 ---
 
 # Ask
@@ -188,14 +192,14 @@ The cost: a hand working past the span loses the hold, and another hand may then
 
 <!-- the form is verdict -->
 
-fail
-- design: the stated cost misreads both halves. The hold file under `.se/.runtime` survives a server restart.
-- design: `spawns` in the bridgehead fires `refactor.answered` on a failed spawn too, so that path already releases.
-- design: a hold lost with a dying bridgehead then refuses every hand for good. The approach needs a release for that case.
-- design: `checked` in `src/bridge/apply.js` calls `onWrite` without the `agentId`. The owning hand's patch then refuses.
-- craft: `landsOnTrunk` reads a bare `git push` on `main` as a pass. The row needs that case too.
-- craft: the spawn event carries a kind and an empty `agentId`, so a parallel helper writing first owns the file.
-- craft: the row, the guidance line and the cases otherwise answer the Ask.
+pass
+- design: the row, the hold, the write door, the guidance line and the cases answer the Ask.
+- design: each earlier finding stands answered. The age, the session start and the failed spawn release the hold.
+- design: the patch road and the mint road carry the `agentId` into `onWrite`.
+- craft: `touchesGit` reads the whole command. A commit verb message naming `git commit` then refuses. Test that case.
+- craft: a push naming `main` from a cloud work branch keeps the hand-back text. The commit verb there pushes the work branch.
+- craft: the first writer still owns the held file. The approach names this cost, so the reader sees it.
+- craft: a Bash write such as `sed -i` meets no write door. The hold covers Write, Edit, the patch and the mint.
 
 # implement
 
