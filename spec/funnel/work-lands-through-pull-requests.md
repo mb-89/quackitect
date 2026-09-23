@@ -104,11 +104,24 @@ no person in it. So the report carries a verdict, and no verdict reopens work:
 |---|---|---|
 | as is | the branch does what its ask says | the owner merges |
 | passed with findings | the branch does its ask, and leaves findings worth a later hand | each finding stands as a ticket on the branch, and the owner merges |
-| refused | the branch breaks its ask, or breaks trunk | the owner decides: close the pull request, or open a new group |
+| refused | the branch breaks its ask, or breaks trunk | the owner closes the pull request unmerged, and opens a new group where the ask still stands |
 
 A finding lands as a ticket the review mints and commits onto the branch, so it
 reaches trunk with the merge and waits there free. The review adds no commit
 past that ticket, so the owner reads the branch the box hands back.
+
+# Closing keeps every commit
+
+A pull request closes with or without a merge, and neither loses a commit:
+
+| the step | what stays |
+|---|---|
+| the owner closes a refused pull request | the branch, since GitHub deletes a head at a merge alone |
+| a person deletes that branch later | `refs/pull/<n>/head` on origin, which holds the pull request's last commit |
+| the group's tickets | trunk, since the refused branch frees nothing there |
+
+So a new group reads the refused branch through its pull request, and takes the
+same tickets from trunk.
 
 # Findings earn no points
 
@@ -191,6 +204,4 @@ for it. So the scheduled workflow, and no setting, clears those.
 - Whether GitHub opens a pull request over a commit changing no file. Where `branch open` commits the ticket hangs on it.
 - Whether trunk takes protection, and whether the owner keeps a bypass. A desk's small fix hangs on it.
 - Whether the daily clock stays once the events run. The wait for a stranded branch hangs on it.
-- Whether a refused branch closes, or a box reworks it at the owner's word. The road for a refused branch hangs on it.
-- Whether a routine session commits a ticket onto a branch the box hands back. The findings as tickets hang on it.
 - Whether `branch merge` stays for a merge with no network. Two roads onto trunk hang on it.
