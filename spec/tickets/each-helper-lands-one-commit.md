@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -126,6 +126,17 @@ record:
     hash_after: f5a0cbd8ef7ea7a932e41e09ae2b9c6732d5e3ad
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: adb66ef415f73e9cdcd12727834bba41ac391331
+    hash_after: adb66ef415f73e9cdcd12727834bba41ac391331
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 39 test(s) pass in 6 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -307,11 +318,15 @@ Eleven cases fail on their own assertion, and each names the row or the hold it 
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/trunk.test.js test/level0/trunk-door.test.js test/level0/refactor-hold.test.js test/level0/hold-roads.test.js test/level0/apply-door.test.js test/level0/hand-tools.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -319,11 +334,26 @@ Eleven cases fail on their own assertion, and each names the row or the hold it 
 
 <!-- the form is text -->
 
+A raw landing on `main` now meets the commit verb, and the refactoring hand holds the file it drains.
+
+- `trunkGuard` refuses a raw commit or push landing on `main`, and names `./RUNME.sh commit "<message>"`
+- a bare push standing on `main` counts as a landing there
+- a cloud box holding a work branch keeps its hand-back text
+- `touchesGit` reads past the words a verb of this tree takes, so a message naming `git commit` passes
+- `refactor-hold.js` keeps the hold from the spawn to the answer, and a session start drops it
+- the write door refuses the held file to every other hand, over Write, Edit, the patch and the mint
+- `refactor.holdFor` ages a lost hold, and 0 switches the hold off
+- `working.md` rule 4 lands each helper's work through the commit verb
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, plus the hold module and its projected command
+- the hold reaches disk and clock through the box, and every case hands it fakes
+- `stop#the-hand-holds-its-file` and `work#a-landing-takes-the-verb` name the approach, and the code points at both
 
 # verdict
 

@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { holdHere, holdsFile } from "../../src/bridge/refactor-hold.js";
 import { onRefactorAnswered, onStop } from "../../src/bridge/stop.js";
 import { onWrite } from "../../src/bridge/write.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -129,4 +130,17 @@ test("another hand's write to a held file refuses, and the owning hand's lands",
 test("a hold past its span reads as none, and the session's write lands", async () => {
   const it = box(held("a1", NOW - HOUR));
   assert.equal(denied(await onWrite(write(""), it)), "", "the aged hold stands for nothing");
+});
+
+// A span of 0 switches the hold off, so the spawn writes none and a standing one reads as none. [[spec/design_output/stop#the-hand-holds-its-file]]
+test("a hold span of 0 switches the hold off", () => {
+  const it = box(held("a1"));
+  it.disk.write(
+    at("spec/config/level0.json"),
+    JSON.stringify({ refactor: { ...REFACTOR, holdFor: "0" } }),
+  );
+  assert.equal(holdHere(it), null, "a standing hold reads as none");
+  it.disk.remove(HOLD);
+  holdsFile(it, "old.md");
+  assert.equal(it.disk.exists(HOLD), false, "the spawn writes none");
 });
