@@ -273,6 +273,20 @@ it fires. The agent claims the reason, the check says the moment stands, and a
 claim outside that moment fires nothing. `fires` in `lib/stop.js` holds it, and
 a claimed rule naming no check fires on the claim alone.
 
+## A refusal names its check
+
+Every refusal of a claim says which check falls, and what the check sees.
+`claimFalls` in `src/bridge/stop.js` writes the sentence, and both doors read it:
+
+| door | what it answers where the claim falls |
+|---|---|
+| the stop call | `The claim falls.`, then the check and what it sees, and it keeps no claim |
+| the turn's end | the same sentence, in place of the rule saying the line names no reason |
+
+`FALLS` carries what a check sees, one entry a check. The plan check names every
+todo and the thing in hand, and says to name each under `done`. The stop call
+skips the checks reading the answer's text, since no answer stands yet.
+
 ## A check beats a claim
 
 A rule carrying `yields` loses to any mechanical continue that fires, whatever
