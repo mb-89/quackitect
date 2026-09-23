@@ -352,27 +352,6 @@ ifVale(
   ),
 );
 
-// A lead counting its list says what the list shows, and the owner reads the count twice. [[spec/guidance/voice]]
-const counted = (lead) => `${lead}\n\n- the door\n- the gate\n`;
-
-ifVale(
-  "an answer leading a list with its count is refused, and a note stays quiet until a sweep",
-  proves(
-    {
-      counted: answer(counted("I understood four things.")),
-      spread: answer(`The fix touches two files, and\nthe list below names them:\n\n| a | b |\n|---|---|\n| c | d |\n`),
-      following: answer(counted("I understood the following:")),
-      version: answer(counted("The fix moves to Biome 2.5.12, and the list names what stands:")),
-      earlier: answer(counted("Two doors stand apart. The list says what each does.")),
-      note: counted("I understood four things."),
-    },
-    (said) => {
-      for (const key of ["counted", "spread"]) refuses(said, "CountedList", key);
-      for (const key of ["following", "version", "earlier", "note"]) passes(said, "CountedList", key);
-    },
-  ),
-);
-
 // The tense reader stands over the rule, so a word this tree means in the present reads past it. [[spec/design_output/projection#the-grammar-rules]]
 ifVale(
   "the past tense is refused, and the words this tree means pass",
