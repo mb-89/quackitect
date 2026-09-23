@@ -91,6 +91,19 @@ So a Vale finding leaves as a person fixes the line, and no source waits for a
 save. A file the editor closes inside the span asks nothing, because its buffer stands no
 more.
 
+## A change reads one note
+
+A change to a buffer re-parses the note it changes, and reads every other note
+from what the tree holds. `parsed` in `src/lsp/parsed.go` keeps each note's
+headings, their slugs and a guidance note's rule lines, keyed by the text they
+come from:
+
+| what the tree holds | made again when |
+|---|---|
+| a note's parse | its text differs from the one the parse reads |
+| the pairs of guidance rules | a guidance note's text changes |
+| the list of paths | a buffer names a path the list lacks |
+
 # The config reads absolute paths
 
 Vale matches a section of `.vale.ini` against the path it receives, and an

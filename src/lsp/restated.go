@@ -7,6 +7,7 @@ import (
 	"quackitect/yaml"
 
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -25,6 +26,8 @@ var (
 	anchorAt  = regexp.MustCompile(`\[\[([^\]#]+)#([^\]]+)\]\]`)
 	wordAt    = regexp.MustCompile(`[A-Za-z0-9]+`)
 	quotesOut = regexp.MustCompile("[`']")
+	// The run a slug turns into one hyphen, compiled once, because every anchor reads it. [[spec/design_output/lsp#a-change-reads-one-note]]
+	slugGap = regexp.MustCompile(`[^a-z0-9]+`)
 )
 
 // [[spec/design_output/lsp#a-second-copy-draws]]
@@ -44,9 +47,10 @@ func restatedFaults(tree *Tree, pointer, rule int) []Finding {
 // A note names a chapter of another note, and its own heading says the same thing twice. [[spec/design_output/lsp#a-second-copy-draws]]
 func pointerFaults(tree *Tree, path string, most int) []Finding {
 	out := []Finding{}
-	rows := yaml.SplitLines(tree.Read(path))
-	for _, one := range sectionsOf(rows) {
-		for _, said := range pointersUnder(rows, one, sectionsOf(rows)) {
+	note := tree.parsed(path)
+	rows := yaml.SplitLines(note.text)
+	for _, one := range note.sections {
+		for _, said := range pointersUnder(rows, one, note.sections) {
 			there := headingNamed(tree, said.path, said.anchor)
 			if there == "" || sharedRun(one.Header, there) < most {
 				continue
@@ -60,34 +64,43 @@ func pointerFaults(tree *Tree, path string, most int) []Finding {
 
 // One rule standing in two guidance notes drifts, because a hand rewords one of them. [[spec/design_output/lsp#a-second-copy-draws]]
 func ruleFaults(tree *Tree, most int) []Finding {
-	out := []Finding{}
 	held := map[string][]ruleAt{}
+	// The pairs compare again where a guidance text changes, so a keystroke in any other note pays nothing here. [[spec/design_output/lsp#a-change-reads-one-note]]
+	key := strings.Builder{}
+	key.WriteString(strconv.Itoa(most))
 	for _, path := range notesIn(tree) {
 		if strings.HasPrefix(path, guidanceIn) {
-			held[path] = rulesIn(tree.Read(path))
+			note := tree.parsed(path)
+			held[path] = note.rules
+			key.WriteString("\x00" + path + "\x00" + note.text)
 		}
 	}
-	for path, mine := range held {
-		for other, theirs := range held {
-			if other >= path {
-				continue
+	return tree.rulesOnce(key.String(), func() []Finding {
+		out := []Finding{}
+		for path, mine := range held {
+			for other, theirs := range held {
+				if other >= path {
+					continue
+				}
+				out = append(out, sameRules(path, mine, other, theirs, most)...)
 			}
-			out = append(out, sameRules(path, mine, other, theirs, most)...)
 		}
-	}
-	return out
+		return out
+	})
 }
 
+// A rule line, and its words read once, because every pair of rules compares them. [[spec/design_output/lsp#a-change-reads-one-note]]
 type ruleAt struct {
-	said string
-	line int
+	said  string
+	line  int
+	words []string
 }
 
 func sameRules(path string, mine []ruleAt, other string, theirs []ruleAt, most int) []Finding {
 	out := []Finding{}
 	for _, one := range mine {
 		for _, two := range theirs {
-			if sharedRun(one.said, two.said) < most {
+			if runOf(one.words, two.words) < most {
 				continue
 			}
 			out = append(out, warn(RestatedRule, path, one.line,
@@ -99,8 +112,11 @@ func sameRules(path string, mine []ruleAt, other string, theirs []ruleAt, most i
 
 // The longest run of words two texts share, with a code span and a link blanked out. [[spec/design_output/lsp#a-second-copy-draws]]
 func sharedRun(one, other string) int {
-	mine := wordsOf(one)
-	theirs := wordsOf(other)
+	return runOf(wordsOf(one), wordsOf(other))
+}
+
+// The longest run two word lists share. [[spec/design_output/lsp#a-second-copy-draws]]
+func runOf(mine, theirs []string) int {
 	most := 0
 	for at := range mine {
 		for from := range theirs {
@@ -138,7 +154,7 @@ func rulesIn(text string) []ruleAt {
 			continue
 		}
 		if found := ruleLine.FindStringSubmatch(line); found != nil {
-			out = append(out, ruleAt{said: found[1], line: i + 1})
+			out = append(out, ruleAt{said: found[1], line: i + 1, words: wordsOf(found[1])})
 		}
 	}
 	return out
@@ -181,8 +197,9 @@ func chapterOf(tree *Tree, path, anchor string) (Section, bool) {
 		if !tree.Exists(where) {
 			continue
 		}
-		for _, one := range sectionsOf(yaml.SplitLines(tree.Read(where))) {
-			if slugOf(one.Header) == anchor {
+		note := tree.parsed(where)
+		for i, one := range note.sections {
+			if note.slugs[i] == anchor {
 				return one, true
 			}
 		}
@@ -193,7 +210,7 @@ func chapterOf(tree *Tree, path, anchor string) (Section, bool) {
 // [[spec/design_output/vocabulary#the-slug-reads-one-source]]
 func slugOf(said string) string {
 	out := quotesOut.ReplaceAllString(strings.ToLower(said), "")
-	out = regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(out, "-")
+	out = slugGap.ReplaceAllString(out, "-")
 	return strings.Trim(out, "-")
 }
 

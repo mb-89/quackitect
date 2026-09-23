@@ -35,6 +35,10 @@ type Tree struct {
 	held     []string
 	restated []Finding
 	passed   bool
+	// Each note's parse by its text, and the guidance pairs by the guidance texts. [[spec/design_output/lsp#a-change-reads-one-note]]
+	parses    map[string]parse
+	ruleKey   string
+	ruleFound []Finding
 }
 
 // The restated rules read every note, so the tree holds the one pass and each front pays it once. [[spec/design_output/lsp#a-second-copy-draws]]
@@ -58,7 +62,7 @@ func treeAt(root string) *Tree {
 
 // [[spec/tickets/a-door-holds-file-calls]]
 func treeOver(root string, disk Disk) *Tree {
-	return &Tree{Root: root, disk: disk, overlay: map[string]string{}}
+	return &Tree{Root: root, disk: disk, overlay: map[string]string{}, parses: map[string]parse{}}
 }
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
@@ -66,7 +70,11 @@ func (one *Tree) Holds(path, text string) {
 	one.guard.Lock()
 	defer one.guard.Unlock()
 	one.overlay[slashed(path)] = text
-	one.held, one.restated, one.passed = nil, nil, false
+	// Typing into a file the list holds adds no path, so the list stands and git runs no second time. [[spec/design_output/lsp#a-change-reads-one-note]]
+	if !listed(one.held, slashed(path)) {
+		one.held = nil
+	}
+	one.restated, one.passed = nil, false
 }
 
 func (one *Tree) Drops(path string) {
@@ -540,4 +548,13 @@ func lineOf(text, needle string) int {
 		}
 	}
 	return 1
+}
+
+func listed(paths []string, path string) bool {
+	for _, one := range paths {
+		if one == path {
+			return true
+		}
+	}
+	return false
 }
