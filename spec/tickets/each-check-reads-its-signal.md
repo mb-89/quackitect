@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 60feab72a4ff04e848f4df6c3b0e884899c6b611
     returns: 1
     why: "design: the unresolved rule refuses `$TMPDIR/msg.md`, and the design output keeps a temp variable free. Test `FREE` before the unresolved rule, and drop that cost.; craft: `echo x > $HOME/y.md` refuses today already, so that case starts green. Use `echo x > $out/y.md` for the unresolved case.; craft: `writesIn` reads one segment, so the `NAME=value` state lives in `writesAPath` across segments.; craft: `precommit.js` runs with no hand, so name how it finds the hold. `holdsAnywhere` answers for every hand on the box.; craft: the carried paths take `test/` alone, so a Go tests-red leaf carries nothing. Take `_test.go` paths too.; craft: `SOURCE` takes `src/**/*.go`, so keep `_test.go` out of it.; craft: the awake release ends the child and hides it. The exit wait needs a change in `src/doors/awake.js` and its fake.; craft: `retro-collect.js` writes the median, so name it in the table.; craft: the median reads a part only from the runs that ran it, because a red run leaves parts unrun.; craft: `filesUnder` reads an empty list as a file. Read the file in the catch, and read an empty folder as empty."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: ac029435a0cdf34ed28517ecc6c4a9001a93b4c3
+    hash_after: ac029435a0cdf34ed28517ecc6c4a9001a93b4c3
 ---
 
 # Ask
@@ -134,36 +138,49 @@ with [[spec/tickets/a-comment-hunk-is-prose]].
 
 | part | the file | what changes |
 |---|---|---|
-| the sources | `.claude/skills/level0/lib/tested.js` | `SOURCE` takes `src/**/*.go`, `lib/*.js` and `hooks/*.js` under `.claude/skills/level0` |
+| the sources | `.claude/skills/level0/lib/tested.js` | `SOURCE` takes `src/**/*.go` past `_test.go`, and `lib/*.js` and `hooks/*.js` under `.claude/skills/level0` |
 | the Go test | the same | `TEST` takes `_test.go`, and a Go test names every file of its own folder |
 | the carried test | the same | `untestedIn` takes the test paths the held ticket's command fields name, beside the staged ones |
-| who hands them | `precommit.js` and `src/bridge/bash.js` | each reads the hold, and passes the paths under `test/` its ticket's command fields carry |
-| the variable | `.claude/skills/level0/lib/bash.js` | `writesIn` reads `NAME=value` segments in order, and a `$NAME` target resolves to its value |
+| what it carries | the same | a path under `test/`, or a `_test.go` path, in a command field |
+| the hold | `precommit.js` and `src/bridge/bash.js` | each finds the hold through `holdsAnywhere` in `guidance-hand.js`, and reads its ticket |
+| the variable | `.claude/skills/level0/lib/bash.js` | `writesAPath` keeps the `NAME=value` segments across the command, and `writesIn` resolves a `$NAME` target off them |
 | the unresolved | the same | a target holding `$` with no value in the command refuses under `ShellWritesNothing` |
+| the free paths | the same | `FREE` reads first, so a temp variable's path stays free as `bash.md` says |
 | the baseline | `src/engine/retro/effect.js` | a retro with no last one writes its battery with `baseline: true`, and the report names it |
-| the median | `src/scripts/cli-stamp.js` and `battery.js` | the stamp keeps the last runs, and collect writes each part's median |
-| the awake case | `test/contract/awake.test.js` | the release awaits the child's `exit` event, with a timeout, in place of the fixed wait |
+| the runs | `src/scripts/cli-stamp.js` | the stamp keeps the last runs' parts, up to the count the config names |
+| the median | `src/scripts/retro-collect.js` | collect writes each part's median, over the runs that reached that part |
+| the count | `spec/config/level0.json` | `battery.runs`, beside the weights |
+| the awake door | `src/doors/awake.js` and its fake | `release` answers a promise that settles on the child's `exit`, or at a timeout |
+| the awake case | `test/contract/awake.test.js` | the case awaits that promise, in place of the fixed wait |
 | the fake disk | `src/doors/fake/disk.js` | `list` on a file path throws `ENOTDIR`, the way the real disk does |
-
-The run count the median reads stands in `spec/config/level0.json`, beside the weights.
 
 The cases:
 
 - `tested.test.js`: a Go, a lib and a hook file each ask a test, and a carried test answers it
-- `bash.test.js`: `f=README.md; echo x > $f` refuses, and `echo x > $HOME/y.md` refuses as unresolved
+- `bash.test.js`: `f=README.md; echo x > $f` refuses, and `echo x > $out/y.md` refuses as unresolved
+- `bash.test.js`: `echo x > $TMPDIR/msg.md` passes, as the free list says
 - `retro-effect.test.js` and `battery.test.js`: a first retro writes the baseline, and three runs keep a median
 - `test/contract/disk.test.js`: the fake and the real disk both throw on a list of a file
 
 The callers:
 
-- `one-reader.test.js` walks a path with `list`, and its `filesUnder` catches the throw
+- `filesUnder` in `one-reader.test.js` reads the file in its catch, and an empty list reads as an empty folder
 - every other `list` caller hands a folder, and the check names any that breaks
 - `onBash` and `precommit.js` call `untestedIn`, and both gain the carried paths
+- the retro's report reads the median where it read the one run
 
-The costs:
+The answers to the earlier review:
 
-- a write through `$TMPDIR` into a tracked kind now refuses, and a hand names the path
-- the stamp grows by the kept runs
+- the temp path: `FREE` reads before the unresolved rule
+- the case starting green: the unresolved case writes `$out`
+- the variable state: it lives in `writesAPath`, across segments
+- the hold in the git hook: `holdsAnywhere` finds it
+- the Go tests: a `_test.go` path carries, and `SOURCE` leaves `_test.go` out
+- the awake door: the door and its fake change, beside the case
+- the median: `retro-collect.js` writes it, over the runs that reached a part
+- `filesUnder`: it reads the file in its catch
+
+The cost: the stamp grows by the kept runs.
 
 ## review
 
