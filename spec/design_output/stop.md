@@ -344,12 +344,9 @@ work goes on at the answer.
 hold, because a session waiting on its helpers keeps both. It carries no
 `yields`, because the check reads the harness, and no hand's opinion.
 
-| the binding | a stop while a helper runs |
-|---|---|
-| `queue` | refused, so the queue hands the next leaf |
-| `unbound`, `god` | stands |
-
-For what each binding means, see [[spec/design_output/config#the-engine-controls]].
+The claim stands under every binding, `queue` too. A session waiting on its own
+helpers ends the turn on the wait, and the helper's answer wakes it. For what
+each binding means, see [[spec/design_output/config#the-engine-controls]].
 
 ## A refusal names its check
 
@@ -364,6 +361,18 @@ Every refusal of a claim says which check falls, and what the check sees.
 `FALLS` carries what a check sees, one entry a check. The plan check names every
 todo and the thing in hand, and says to name each under `done`. The stop call
 skips the checks reading the answer's text, since no answer stands yet.
+
+## A refusal names the binding
+
+The last line of every refusal names the binding, the file that sets it, and a
+moment. `bindingLine` in `src/bridge/binding.js` writes it.
+
+- `whereFrom` in `src/bridge/config.js` reads the local file, then the tracked file.
+- `asks` reads those same layers, so the line names no layer the hook skips.
+- The environment stays out of both, because the hook reads none of it.
+- The moment is when the server first reads the binding after a change.
+- The box keeps it in memory, so a restart of the server loses it.
+- Each change writes a line in the log under `binding`.
 
 ## A check beats a claim
 

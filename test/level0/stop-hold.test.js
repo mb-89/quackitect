@@ -16,6 +16,7 @@ import {
   sawCall,
   sawPrompt,
 } from "../../src/bridge/stop.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const ROOT = "/tree";
@@ -29,6 +30,7 @@ function box(hold) {
     disk: fakeDisk({ [AT]: JSON.stringify({ stop: { enabled: true, hold } }) }),
     work: ROOT,
     method: ROOT,
+    clock: fakeClock(),
     log: { say: (...row) => said.push(row) },
   };
 }

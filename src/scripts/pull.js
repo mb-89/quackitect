@@ -108,7 +108,8 @@ export function pull(it, argv) {
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
   // A name with a leaf in hand hands that leaf back. A name with none asks for that ticket. [[spec/design_output/pull#the-hand-out]]
   const asking = Boolean(name) && !named && !verdict.said && !held;
-  if (asking && it.binding === QUEUE) {
+  // A ticket a verb mints for this session passes the queue. [[spec/design_output/config#the-engine-controls]]
+  if (asking && it.binding === QUEUE && name !== it.minted) {
     console.error(`${name} stands behind the queue, because this session binds to it.`);
     console.error(
       "Run ./RUNME.sh ticket pull with no name, and take what it hands you.",

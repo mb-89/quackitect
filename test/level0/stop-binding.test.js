@@ -1,10 +1,11 @@
 // The binding a stop refusal names, over a fake box: the value, the layer that
 // sets it, and the moment the server first read it after a change.
-// [[spec/design_output/stop#a-refusal-names-its-check]]
+// [[spec/design_output/stop#a-refusal-names-the-binding]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { bindingLine } from "../../src/bridge/binding.js";
 import * as config from "../../src/bridge/config.js";
 import { onStop } from "../../src/bridge/stop.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
@@ -32,7 +33,7 @@ const RULES = `
   asks: Is the work complete?
 `;
 
-// A box whose tracked file says unbound, and whose local file says the binding given. [[spec/design_output/stop#a-refusal-names-its-check]]
+// A box whose tracked file says unbound, and whose local file says the binding given. [[spec/design_output/stop#a-refusal-names-the-binding]]
 function boundBox(local, env = {}) {
   const rows = [];
   const files = {
@@ -63,7 +64,7 @@ const whereFrom = (box, key) => {
 const NO_LINE = { last_assistant_message: "Some work stands done." };
 const lastLine = (said) => said.result.block.split("\n").at(-1);
 
-// [[spec/design_output/stop#a-refusal-names-its-check]]
+// [[spec/design_output/stop#a-refusal-names-the-binding]]
 test("whereFrom answers the value and the file that sets it, local over tracked", () => {
   assert.deepEqual(whereFrom(boundBox("queue"), "engine.binding"), {
     value: "queue",
@@ -75,7 +76,7 @@ test("whereFrom answers the value and the file that sets it, local over tracked"
   });
 });
 
-// The hook's asks reads no environment, so whereFrom reads none either. [[spec/design_output/stop#a-refusal-names-its-check]]
+// The hook's asks reads no environment, so whereFrom reads none either. [[spec/design_output/stop#a-refusal-names-the-binding]]
 test("whereFrom reads the same layers the hook reads, and skips the environment", () => {
   const box = boundBox("", { SE_ENGINE_BINDING: "god" });
   assert.deepEqual(whereFrom(box, "engine.binding"), {
@@ -84,7 +85,7 @@ test("whereFrom reads the same layers the hook reads, and skips the environment"
   });
 });
 
-// [[spec/design_output/stop#a-refusal-names-its-check]]
+// [[spec/design_output/stop#a-refusal-names-the-binding]]
 test("a refusal under queue from the local file names queue, the local file and the moment", () => {
   const box = boundBox("queue");
   const said = onStop(NO_LINE, box);
@@ -94,7 +95,7 @@ test("a refusal under queue from the local file names queue, the local file and 
   assert.ok(line.includes(FROM), line);
 });
 
-// [[spec/design_output/stop#a-refusal-names-its-check]]
+// [[spec/design_output/stop#a-refusal-names-the-binding]]
 test("the moment stays while the binding stands, and moves when it changes, and the log says the change", () => {
   const box = boundBox("queue");
   onStop(NO_LINE, box);
@@ -109,5 +110,15 @@ test("the moment stays while the binding stands, and moves when it changes, and 
   assert.ok(
     box.rows.some((one) => one.area === "binding" && /god/.test(one.line)),
     "the log says the change",
+  );
+});
+
+// [[spec/design_output/stop#a-refusal-names-the-binding]]
+test("bindingLine says no file sets the binding where neither file names it", () => {
+  const box = boundBox("");
+  box.disk.write(at(TRACKED), JSON.stringify({ stop: { enabled: true } }));
+  assert.equal(
+    bindingLine(box),
+    `No file sets engine.binding for this session, read so at ${FROM}.`,
   );
 });

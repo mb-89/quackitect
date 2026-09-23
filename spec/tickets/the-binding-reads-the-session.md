@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 80ff34d908a17529b8205be3ac769293bb708dbb
+    hash_after: 80ff34d908a17529b8205be3ac769293bb708dbb
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -250,11 +258,17 @@ Seven cases fail on their own assertion, and each names what it waits for.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/bridge/config.js src/bridge/binding.js src/bridge/stop.js src/scripts/pull.js src/scripts/retro-new.js spec/config/stop/level0.yml spec/design_output/stop.md spec/design_output/config.md test/level0/stop-binding.test.js test/level0/stop-hold.test.js test/level0/stop-door.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: `binding.js` holds the moment, because `stop.js` stands near 600 lines.
+- every door the change reaches has a fake: the stop hold cases now carry the fake clock the moment reads.
+- a comment names the approach the change implements: each new line points at a design note heading.
 
 ## tests-green
 

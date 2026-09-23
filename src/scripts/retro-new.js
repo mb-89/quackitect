@@ -56,7 +56,8 @@ export function newRetro(it, argv) {
   it.disk.makeDir(it.join(it.root, ...TICKETS.split("/")));
   it.disk.write(at, made.text);
   // The pull says what a hand reads next, and this verb writes none of those words again. [[spec/guidance/working]]
-  return pull(it, ["pull", name]);
+  // The verb mints the retro for this session, so the queue lets its pull through. [[spec/design_output/config#the-engine-controls]]
+  return pull({ ...it, minted: name }, ["pull", name]);
 }
 
 function flagOf(rest, flag) {
