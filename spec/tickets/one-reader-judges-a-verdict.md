@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -155,6 +155,17 @@ record:
     hash_after: c73124fb3c3b4734cbe93b97542d61080513749e
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: dd6175bdfc702c29f62e2726960d3831bcd6df26
+    hash_after: d1d33433cfc66bf6d1b45dd9b72616446ab9f487
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -315,11 +326,15 @@ semicolon, and hands Vale the chapter alone. It runs Vale on the method's
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/one-reader.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -327,11 +342,22 @@ semicolon, and hands Vale the chapter alone. It runs Vale on the method's
 
 <!-- the form is text -->
 
+The pull and the lint read a hand-back's prose one way. `valeArgvOf` opens
+Vale on the config the assembly writes, and `readsText` reads one file's text
+through the tense reader and the marker rule. `findingsOver` calls both for the
+lint. `voiceFaults` hands Vale the whole ticket, with the fields laid in and the
+rows it skips blanked, and keeps the findings on its chapter's lines. A warning
+now refuses the hand-back, where an error alone did before.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the two readers the ask names, their one caller, and the chapter
+- every door the change reaches has a fake: the disk, the process and the Vale run
+- a comment names the approach on each changed function, through its pointer
 
 # verdict
 
