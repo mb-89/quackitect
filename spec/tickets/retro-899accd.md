@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: check
 steps:
   - name: feedback
@@ -163,6 +163,15 @@ record:
       - name: classes
         exit: 0
         said: 4 active hour(s), and every finding, note and memory carries a disposition.
+  - step: check
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 05090567a274d1f5daf13c75fd953d739b596e69
+    hash_after: 05090567a274d1f5daf13c75fd953d739b596e69
+    answered:
+      - name: minted
+        exit: 0
+        said: 0 ticket(s) mint, and 0 class(es) stand closed already.
+reason: done
 ---
 
 # Ask
@@ -300,6 +309,8 @@ the owner asks for it
 <!-- retro mint, which refuses a class carrying no status and mints the rest -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh retro mint retro-899accd
 
 # Discussion
 
