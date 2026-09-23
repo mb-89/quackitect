@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 94c8ec812cc823699d2cd411dd261ab9494a09f4
     returns: 1
     why: "design: The bridge box carries no `join`, so `planHere` throws and the queue read drops every todo row.; design: The bridge box carries no `agent`, so `takeable` orders rows apart from `branch list --queue` in a harness.; design: The fix builds the read door off `handDoors(box.env)`, `join`, a git door, `weights` and `stale`, and names each.; design: A digit past the last row lands `last`, which stands before the first untagged row.; craft: `planRides` drops the tool's answer, so a plan riding another call reads git twice for nothing.; craft: `answerOf` lives in `src/scripts/work-answer.js`, and the callers list names `work-list.js`.; craft: Two todos with one digit in one call anchor on one row, so a case pins their order."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 8fd5f56521d9ea8db947a6b716ff9f4f0ba5f6c1
+    hash_after: 8fd5f56521d9ea8db947a6b716ff9f4f0ba5f6c1
 ---
 
 # Ask
@@ -135,29 +139,51 @@ Two changes, one each for the draft and the todo.
 | `callers` | every caller of what the approach changes, one a line, as a file and a function |
 | `answers` | every finding an earlier review names, one a line, with the answer the approach gives it, or `first` on a first draft |
 | the queue read | `plans` in `src/bridge/plan.js` reads the queue through `answerOf` in `src/scripts/work-answer.js` |
-| the doors | the read runs on `box.disk`, a git door built on `box.proc` at `box.work`, and the weights `asks` reads |
+| the read door | `readDoorOf(box)` in `plan.js` builds what `answerOf` reads, one row below each |
 | the digit | `placeWord` takes the rows at a whole place from `1` up, and a digit names the row standing at that place |
-| the ends | a digit of `1` stays `true`, and a digit past the last row stays `last` |
+| the front | a digit of `1` stays `true` |
+| the end | a digit past the last row takes a new word, `end`, which stands after every row at its level |
+| the anchor | `anchored` in `src/scripts/pull-outline.js` places `end` rows last, in the order the queue gives them |
 | the answer | the door reads the queue again once the plan stands, and names each new todo with its place |
-| the design | `spec/design_output/stop.md#the-plan` names the digit and the answer, and points at the anchor in `pull.md` |
+| the design | `stop.md#the-plan` names the digit and the answer, and `pull.md#a-todo-forces-a-place` names `end` |
 | the cases | `test/level0/plan.test.js` teaches a fake process a queue of three tickets |
 
-The cases hold two claims:
+The read door carries these, each off the box:
+
+- `disk`, `clock` and `root`, which `box.work` gives
+- `join`, from `node:path`, because `planHere` joins the plan path
+- `git`, the door `src/doors/git.js` builds on `box.proc` at `box.work`
+- `weights` and `stale`, read through `asks` off the keys `cli-doors.js` reads
+- `handDoors(box.env)`, so `takeable` reads the agent the listing reads
+
+The cases hold four claims:
 
 - a digit of `2` anchors the todo before the ticket at place `2`, whatever the plan's todo order
+- a digit past the last row lands after it, at the end
+- two todos at one digit in one call stand in the order the call gives
 - the answer names each new todo with the place `branch list --queue` prints for it
 
-The callers the change reaches:
+The callers:
 
 - `TOOLS[PLAN_CALL]` in `src/bridge/server.js`, and `planRides` there, which call `plans`
 - `placeWord` in `src/bridge/plan.js`, which `plans` alone calls
-- `answerOf` in `work-list.js`, behind `list --json` and `queueOnly`, which read the same answer and change nothing
+- `answerOf` in `src/scripts/work-answer.js`, which `list --json` and `queueOnly` call
+- `anchored` in `pull-outline.js`, which every reading of the outline calls
 - no code names `design/draft`, so the new fields reach a hand through the route the pull copies
+
+The answers to the earlier review:
+
+- the bridge box holds no `join`: the read door carries it
+- the bridge box holds no `agent`: the read door carries `handDoors(box.env)`
+- the read door names each of its fields
+- a digit past the rows landed near the top: `end` places it last
+- `planRides` reads git twice for no answer: the field road skips the answer's read, and the tool road keeps it
+- the callers line misnamed the file of `answerOf`: it names `work-answer.js`
+- two todos at one digit: a case pins their order
 
 The costs:
 
-- each plan answer reads git twice, once for the digit and once for the answer
-- a box carrying no process door reads no queue, so a digit past `1` lands `last`
+- each plan call reads git once for the digit, and the tool road reads once more for the answer
 - an open ticket keeps its copy of the old route, and `./RUNME.sh ticket update` copies the new leaf onto it
 
 ## review
