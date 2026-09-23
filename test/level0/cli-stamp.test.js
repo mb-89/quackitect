@@ -68,3 +68,20 @@ test("the battery's report rides the stamp where one stands, and no field stands
     false,
   );
 });
+
+// The stamp keeps the last runs at its own commit, so a retro reads a median over one tree. [[spec/guidance/retro/effect]]
+test("the stamp keeps the last runs' parts at its commit, up to the count, and drops another commit's", () => {
+  const battery = { parts: { tests: 30 }, total: 30, slowest: [] };
+  const before = { sha: "abc", runs: [{ tests: 20 }, { tests: 10 }] };
+
+  const kept = stampFor({ code: 0, sha: "abc", clean: true, at: AT, battery, before, keep: 3 });
+  assert.deepEqual(kept.runs, [{ tests: 30 }, { tests: 20 }, { tests: 10 }]);
+
+  const capped = stampFor({ code: 0, sha: "abc", clean: true, at: AT, battery, before, keep: 2 });
+  assert.deepEqual(capped.runs, [{ tests: 30 }, { tests: 20 }], "the count caps the runs");
+
+  const moved = stampFor({ code: 0, sha: "def", clean: true, at: AT, battery, before, keep: 3 });
+  assert.deepEqual(moved.runs, [{ tests: 30 }], "a run of another commit drops");
+
+  assert.equal("runs" in stampFor({ code: 0, sha: "abc", clean: true, at: AT, before }), false);
+});

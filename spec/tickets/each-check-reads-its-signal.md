@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -109,6 +109,17 @@ record:
     hand: box dcd73916add7 · claude-code-remote · helper-4
     hash_before: 9b58a423e46b84729aa91740ec3f498abe48de9b
     hash_after: 9b58a423e46b84729aa91740ec3f498abe48de9b
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: e0a40d3143d5f5073c8b0d7fc71ede80016d703f
+    hash_after: e0a40d3143d5f5073c8b0d7fc71ede80016d703f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 13 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -217,17 +228,35 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/tested.test.js test/level0/precommit.test.js test/level0/bash-commit.test.js test/level0/bash.test.js test/level0/retro-effect.test.js test/level0/battery.test.js test/level0/cli-stamp.test.js test/contract/awake.test.js test/contract/disk.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Thirteen cases fail on their own assertion, and each reads the part the approach names.
+
+- `untestedIn` passes a Go file, a lib file and a hook file with no test.
+- A test the held ticket carries answers nothing yet, at the hook and at the shell door alike.
+- `f=README.md; echo x > $f` and `echo x > $f` both pass today.
+- `out=/tmp; echo x > $out/y.md` refuses today, because the door reads no value.
+- A first retro writes its battery with no baseline mark.
+- The stamp keeps one run, and `battery.js` holds no median.
+- The awake release answers nothing, and the child still stands after the call.
+- The fake disk lists a file as an empty folder, where the real disk throws `ENOTDIR`.
+- The surprise: this box holds `systemd-inhibit`, so the real awake case runs here and does not skip.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The tests touch only the files the approach names, beside the two door tests the carried test reaches.
+- The disk and awake cases hold the fake to the real door, and every other case takes a fake.
+- Each new case carries a pointer to the design chapter its approach row names.
 
 ## reflect
 

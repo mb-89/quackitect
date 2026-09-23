@@ -6,14 +6,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
-import {
-  everyModuleTested,
-  untestedIn,
-} from "../../.claude/skills/level0/lib/tested.js";
+import * as tested from "../../.claude/skills/level0/lib/tested.js";
 import { behaves } from "../../src/doors/fake/behaves.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
+
+const { everyModuleTested, untestedIn } = tested;
 
 const FAKE = "/fake";
 
@@ -239,4 +238,69 @@ test("a comment fix beside a deleted module asks nothing, and a rename with no h
     "",
   ].join("\n");
   assert.deepEqual(untestedIn(renamed), []);
+});
+
+// Go, the level0 lib and its hooks are code the door reads, and a Go test answers for every file of its folder. [[spec/design_output/tree#the-rules-over-two-files]]
+test("a Go file, a lib file and a hook file each ask a test, and a Go test of the folder answers", () => {
+  assert.deepEqual(untestedIn(delta("src/engine/queue/pick.go")), ["src/engine/queue/pick.go"]);
+  assert.deepEqual(untestedIn(delta(".claude/skills/level0/lib/one.js")), [
+    ".claude/skills/level0/lib/one.js",
+  ]);
+  assert.deepEqual(untestedIn(delta(".claude/skills/level0/hooks/two.js")), [
+    ".claude/skills/level0/hooks/two.js",
+  ]);
+  assert.deepEqual(
+    untestedIn(delta("src/engine/queue/pick.go", "src/engine/queue/order_test.go")),
+    [],
+    "a Go test names every file of its own folder",
+  );
+  assert.deepEqual(
+    untestedIn(delta("src/engine/queue/pick.go", "src/engine/other/order_test.go")),
+    ["src/engine/queue/pick.go"],
+    "a Go test of another folder names none",
+  );
+  assert.deepEqual(untestedIn(delta("src/engine/queue/order_test.go")), [], "a Go test is no source");
+});
+
+// The tests-red leaf lands the test, and the change leaf carries it. [[spec/design_output/tree#the-rules-over-two-files]]
+test("a test the held ticket carries answers the change, and a stray one carries none", () => {
+  const code = delta("src/bridge/one.js");
+  assert.deepEqual(untestedIn(code, undefined, false, ["test/level0/one.test.js"]), []);
+  assert.deepEqual(untestedIn(code, undefined, false, ["test/level0/other.test.js"]), [
+    "src/bridge/one.js",
+  ]);
+  const read = (path) =>
+    path === "test/level0/other.test.js" ? "import { one } from '../../src/bridge/one.js';\n" : "";
+  assert.deepEqual(untestedIn(code, read, false, ["test/level0/other.test.js"]), []);
+  assert.deepEqual(
+    untestedIn(delta("src/engine/queue/pick.go"), undefined, false, ["src/engine/queue/pick_test.go"]),
+    [],
+  );
+});
+
+// A command field holds one line indented four spaces, and a test path or a Go test path in it carries. [[spec/design_output/tree#the-rules-over-two-files]]
+test("the carried tests are the test paths the ticket's command lines name, and prose names none", () => {
+  assert.equal(typeof tested.carriedIn, "function", "tested.js answers the carried tests");
+  const ticket = [
+    "---",
+    "kind: [[ticket]]",
+    "---",
+    "",
+    "The prose names test/level0/prose.test.js and carries nothing.",
+    "",
+    "### tests",
+    "",
+    "    ./RUNME.sh branch test test/level0/one.test.js test/contract/disk.test.js",
+    "",
+    "### check",
+    "",
+    "    ./RUNME.sh branch test src/engine/queue/pick_test.go",
+    "",
+  ].join("\n");
+  assert.deepEqual(tested.carriedIn(ticket), [
+    "test/level0/one.test.js",
+    "test/contract/disk.test.js",
+    "src/engine/queue/pick_test.go",
+  ]);
+  assert.deepEqual(tested.carriedIn(""), []);
 });

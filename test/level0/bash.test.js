@@ -450,3 +450,21 @@ test("a landing after a semicolon, a newline, a double bar or an ampersand refus
     assert.ok(!rules(command).includes("LandingFollowsItsGate"), command);
   }
 });
+
+// A target behind a variable reads through the value the command gives it, and one the command gives none refuses. [[spec/design_output/bash#a-shell-writes-nothing]]
+test("a variable target resolves off the command, and one with no value refuses as unresolved", () => {
+  assert.deepEqual(paths("f=README.md; echo x > $f"), ["README.md"]);
+  assert.deepEqual(rules("f=README.md; echo x > $f"), ["ShellWritesNothing"]);
+  assert.deepEqual(paths('f=README.md && echo x > "$f"'), ["README.md"]);
+  assert.deepEqual(paths("echo x > $f"), ["$f"], "a target the command gives no value refuses");
+  assert.deepEqual(rules("echo x > $f"), ["ShellWritesNothing"]);
+});
+
+// A value naming a free path stays free, and a temp variable reads free before the unresolved rule. [[spec/design_output/bash#a-shell-writes-nothing]]
+test("a variable resolving to a free path passes, and a temp variable passes unresolved", () => {
+  assert.deepEqual(paths("out=/tmp; echo x > $out/y.md"), [], "the value lands under /tmp");
+  assert.deepEqual(rules("out=/tmp; echo x > $out/y.md"), []);
+  assert.deepEqual(paths("echo x > $TMPDIR/msg.md"), []);
+  assert.deepEqual(paths("echo x > ${TMPDIR}/msg.md"), []);
+  assert.deepEqual(paths("out=spec; echo x > $out/y.md"), ["spec/y.md"]);
+});
