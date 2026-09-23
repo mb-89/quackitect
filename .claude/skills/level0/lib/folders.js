@@ -51,6 +51,8 @@ export const HOLD = `${RUN}/hold.json`;
 export const LOG = `${PRIVATE}/.log`;
 export const NOTES = `${PRIVATE}/notes`;
 export const TICKETS = `${PRIVATE}/tickets`;
+// The handover one session leaves the next on this box, which the first read deletes. [[spec/design_output/work#one-handover-stands]]
+export const HANDOVER = `${PRIVATE}/HANDOVER.md`;
 
 // [[spec/design_input/the-runtime-files-stand-apart]]
 export function inRetro(name) {

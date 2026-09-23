@@ -19,6 +19,7 @@ import {
   standingLayer,
   styled,
 } from "../../.claude/skills/level0/lib/guidance.js";
+import { HANDOVER } from "../../.claude/skills/level0/lib/folders.js";
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
@@ -35,6 +36,7 @@ const COMPACT = "compact";
 // The kind the paid line stands under, which onTurnSaid writes. [[spec/design_output/level0#the-debt-survives-a-restart]]
 const DOOR = "level0";
 export const TOOLS_BLOCK = "level0-tools";
+export const HANDOVER_BLOCK = "level0-handover";
 const TOOLS_HEADING = "# What this box has";
 
 // The notes come off both roots, file by file, the work root's winning. [[spec/design_output/vehicle#the-work-root-inherits]]
@@ -158,6 +160,8 @@ export function onPromptContext(_e, box) {
   const session = sessionHere(box);
   session.reads += 1;
   const blocks = blocksOf(held, box.index.dead(), toolsText(box));
+  const handover = handoverHere(box);
+  if (handover) blocks.push({ name: HANDOVER_BLOCK, text: handoverText(handover) });
   box.log.say("info", "context", `${blocks.length} block(s) reach the session`, {
     detail: blocks.map((one) => one.name).join(" "),
     reason: session.reads === 1 ? "first" : "re-read",
@@ -175,15 +179,43 @@ function blocksOf(held, dead, tools) {
   return blocks;
 }
 
+// The handover reaches one read, so the read deletes it. Every read of the context takes it, so a clear and a compaction hand over the one written before them. [[spec/design_output/work#one-handover-stands]]
+function handoverHere(box) {
+  const at = join(box.work, ...HANDOVER.split("/"));
+  try {
+    if (!box.disk.exists(at)) return "";
+    const text = String(box.disk.read(at)).trim();
+    box.disk.remove(at);
+    if (!text) return "";
+    box.log.say(
+      "info",
+      "handover",
+      `${HANDOVER} reaches the session, and the read deletes it`,
+      {
+        detail: text.split("\n")[0],
+      },
+    );
+    return text;
+  } catch {
+    return "";
+  }
+}
+
+function handoverText(text) {
+  return [
+    `# The handover the last session left`,
+    "",
+    text,
+    "",
+    `Level zero deleted ${HANDOVER} as it read it. Write a new one before you finish.`,
+  ].join("\n");
+}
+
 // [[spec/design_output/tools#the-session-reads-the-survey]]
 export function surveyHere(box) {
   const found = readTools(box.disk, box.work);
   if (Object.keys(found).length) return found;
-  return writeSurvey(
-    { disk: box.disk, proc: box.proc },
-    box.work,
-    box.env ?? {},
-  );
+  return writeSurvey({ disk: box.disk, proc: box.proc }, box.work, box.env ?? {});
 }
 
 function toolsText(box) {

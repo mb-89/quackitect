@@ -283,9 +283,13 @@ the verb refuses it. So a desk mints the successor off this route:
 # One handover stands
 
 `.se/HANDOVER.md` is untracked, stands on one box, and carries what the next
-session on that box reads. Level zero reads it at `session.start`, hands it to
-the agent as a context block, and deletes it. So it stays fresh, and nobody
-keeps a rule about clearing it.
+session on that box reads. Level zero reads it at `prompt.context`, hands it to
+the agent as the block `level0-handover` after the rules, and deletes it. So it
+stays fresh, and nobody keeps a rule about clearing it.
+
+`prompt.context` fires at a session's first prompt and again after a
+compaction and a `/clear`. A `/clear` fires no `session.start`, so a handover
+written before a clear reaches the conversation after it.
 
 # What the standing says
 

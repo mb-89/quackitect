@@ -7,6 +7,7 @@ import { heldReadsIn } from "../../../../src/scripts/guidance-hand.js";
 import { groupStanding } from "../../../../src/scripts/work.js";
 import { candidateRun } from "./candidate-check.js";
 import { CODE, formatText, lintText as lintCode } from "./code.js";
+import { HANDOVER } from "./folders.js";
 import { bindsHere, carried, countsOf, standingLayer } from "./guidance.js";
 import { mutations } from "./mutations.js";
 import { refusal } from "./refuse.js";
@@ -14,7 +15,6 @@ import { landsOnTrunk } from "./trunk.js";
 import { lintText } from "./vale.js";
 
 export const TOOL_WAIT = 4000;
-const SESSION_HANDOVER = ".se/HANDOVER.md";
 const FILES_A_CALL = 8;
 const BATCH = 4;
 const RETRIES = 3;
@@ -99,7 +99,7 @@ export async function handle(event, it) {
         state.started = true;
         save();
       }
-      takeHandover(SESSION_HANDOVER);
+      takeHandover(HANDOVER);
       const env = cloud ? { ...it.env, SE_CLOUD: "1" } : it.env;
       const notes = it.disk
         .list(it.join(it.root, "spec/guidance"))
