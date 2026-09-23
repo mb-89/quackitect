@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: chapter
+step: read
 steps:
   - name: feedback
     does: takes the owner's field feedback one point at a time, and writes each confirmed point as a private note
@@ -139,6 +139,14 @@ record:
       - name: trials
         exit: 0
         said: Every experiment stands decided, so the retro closes.
+  - step: chapter
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 03b2a46a7c8edf4dfb6e79c5952a2d716bd5d3e5
+    hash_after: 03b2a46a7c8edf4dfb6e79c5952a2d716bd5d3e5
+    answered:
+      - name: chapters
+        exit: 0
+        said: "c2  2026-09-23T17:40:00.000Z to 2026-09-23T23:59:59.000Z  2529 line(s)  the landing on main, the queue tickets, and the "
 ---
 
 # Ask
@@ -240,6 +248,8 @@ the owner asks for it
 <!-- retro chapters, which refuses a gap or an overlap between two chapters -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh retro chapters retro-899accd
 
 # read
 
