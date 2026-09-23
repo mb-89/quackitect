@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: read
+step: classify
 steps:
   - name: feedback
     does: takes the owner's field feedback one point at a time, and writes each confirmed point as a private note
@@ -147,6 +147,14 @@ record:
       - name: chapters
         exit: 0
         said: "c2  2026-09-23T17:40:00.000Z to 2026-09-23T23:59:59.000Z  2529 line(s)  the landing on main, the queue tickets, and the "
+  - step: read
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: c1b3b33e8036353b2290c3ea8c858109f599e843
+    hash_after: a5f84d59b5dc4bed595e2f0f5ab7d8879161fdd1
+    answered:
+      - name: matrix
+        exit: 0
+        said: The report of retro-899accd draws 5 column(s), bottom line first, in its retro folder.
 ---
 
 # Ask
@@ -260,6 +268,8 @@ the owner asks for it
 <!-- retro matrix, which refuses a chapter standing without its findings -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh retro matrix retro-899accd
 
 # classify
 

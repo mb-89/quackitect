@@ -36,7 +36,8 @@ export function matrix(it, name) {
   };
   it.disk.write(it.join(home, REPORT), reportOf(name, columns, later));
   console.log(
-    `${it.join(home, REPORT)} draws ${columns.length} column(s), bottom line first.`,
+    // A command field records this line, so it names the retro and no path a box's home spells. [[spec/design_output/private#the-box-names-the-owner]]
+    `The report of ${name} draws ${columns.length} column(s), bottom line first, in its retro folder.`,
   );
   return 0;
 }

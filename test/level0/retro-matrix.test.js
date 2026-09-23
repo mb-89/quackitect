@@ -235,3 +235,19 @@ test("a class the check step leaves open reads so in the report", async () => {
     /\| the check step stands open \|/,
   );
 });
+
+// A hand-back records the verb's last line, so the line carries no path of the box. [[spec/design_output/private#the-box-names-the-owner]]
+test("the matrix answers with the retro's name and no path of the box", async () => {
+  const { matrix } = await import("../../src/engine/retro/matrix.js");
+  const it = doors({
+    ...INPUT,
+    [at("chapters.json")]: CUTS,
+    [at("findings/c1.md")]: findings({ stop: ["one"] }),
+    [at("findings/c2.md")]: findings({ keep: ["the tests"] }),
+  });
+  it.root = ROOT;
+  it.work = ROOT;
+  const { said } = heard(() => matrix(it, RETRO));
+  assert.match(said, new RegExp(`The report of ${RETRO} draws`));
+  assert.doesNotMatch(said, /[A-Za-z]:[\\/]|\/tree\//);
+});
