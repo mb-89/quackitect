@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -116,6 +116,17 @@ record:
     hash_after: 31f4eb1d08844b9fdeecdb6a3f6d1b2667b94010
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 7055d603b289644597dcd8fe375d1a6d46bbddaa
+    hash_after: 7055d603b289644597dcd8fe375d1a6d46bbddaa
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 37 test(s) pass in 4 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -290,11 +301,15 @@ The shared reading stands as a stub named `voiceOver` in `src/bridge/findings.js
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/ask-lint.test.js test/level0/ticket-verb.test.js test/level0/retro-new.test.js test/contract/process.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -302,11 +317,26 @@ The shared reading stands as a stub named `voiceOver` in `src/bridge/findings.js
 
 <!-- the form is text -->
 
+Every verb taking a hand's prose into a ticket reads it the way the lint reads the file.
+
+- `voiceOver` in `src/bridge/findings.js` runs Vale on `valeArgvOf` with the text on stdin, then `readsText`.
+- It keeps the findings at error and at warning on the lines the caller names.
+- The pull's `voiceFaults` calls it over the leaf's chapter, and `REFUSES` stands beside it.
+- `askFaults` hands it the whole ticket and keeps the Ask's lines, so a line number names the file's line.
+- `ticket open` now refuses an Ask carrying a warning, and a draft like that waits for a rewrite.
+- `ticket note` and `retro new` read the Ask they mint, and a refusal writes no file.
+- A contract case mints a ticket off every route, and real Vale finds nothing on it.
+- The road reads through `readsText`, because `readsProse` drops findings the lint keeps.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change touches the files the ask and the review name, and no other.
+- Vale stays behind the process door, and the fake process answers it in every level0 case.
+- Each new function carries a pointer to `spec/design_output/pull.md`, and the chapter names the road.
 
 # verdict
 
