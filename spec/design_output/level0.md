@@ -276,6 +276,13 @@ the light.
 | Linux | `systemd-inhibit` over `cat`, which ends with its input |
 | any other | no child, and the door says so once in the log |
 
+### A release awaits the end
+
+Every release answers a promise, the unheld road and the fake alike. The door
+listens for the child's `exit` from the spawn on, so a child that ends early
+still settles it. A child that outlives the wait lets the promise settle at a
+timeout, so a caller awaiting the release gets its answer on every box.
+
 ## The bridge says it falls
 
 A server falling under a running session leaves the doors passing quietly. The

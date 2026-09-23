@@ -88,6 +88,24 @@ a formatter reflows a file between a read and an edit, and a string replacement
 then fails silently. So the refusal names the road: read the file again, then
 change it with Edit.
 
+# A target behind a variable
+
+A redirection lands where its variable points, so the door reads the value the
+command gives the name. A segment of assignments alone, bare or behind
+`export`, sets each value, and a later segment reads it.
+
+| the command | the door reads |
+|---|---|
+| `f=README.md; echo x > $f` | `README.md`, which it refuses |
+| `out=/tmp; echo x > $out/y.md` | `/tmp/y.md`, which stays free |
+| `echo x > $f` | a name with no value, which it refuses |
+| `echo x > $TMPDIR/msg.md` | a temp variable, which stays free |
+
+The free paths read first, so a temp variable stays free with no value. A
+target still holding a name past that refuses, because the door cannot say
+where it lands. The door resolves a redirection's target, and `tee`, `cp` and
+`mv` read their words as written.
+
 # A commit message meets voice
 
 Every other prose rule in this tree reads a file. `git commit -m "..."` is

@@ -11,7 +11,7 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
-import { heldReads } from "../../src/scripts/guidance-hand.js";
+import { everyHold, heldReads, heldTests } from "../../src/scripts/guidance-hand.js";
 import { pulling, work } from "../../src/scripts/work.js";
 import { SCHEMA } from "./pull-schema.js";
 
@@ -298,4 +298,24 @@ test("the standing verb drops the note the hand --as names already reads", async
 
   assert.ok(!/Say what is\./.test(said), "the held step's note leaves the layer");
   assert.match(said, /Answer the owner first\./);
+});
+
+// Several hands hold on one box, and the commit door reads the tests every held ticket carries. [[spec/design_output/tree#the-rules-over-two-files]]
+test("every hold on the box answers, and the tests each held ticket carries come back once", () => {
+  const ticket = (line) => `# Ask\n\nThe prose names test/level0/prose.test.js.\n\n### tests\n\n    ${line}\n`;
+  const it = {
+    root: ROOT,
+    join,
+    disk: fakeDisk({
+      [at(".se/.runtime/hold/a-hand.json")]: JSON.stringify({ ticket: "one", path: "spec/tickets/one.md" }),
+      [at(".se/.runtime/hold/b-hand.json")]: JSON.stringify({ ticket: "two", path: "spec/tickets/two.md" }),
+      [at(".se/.runtime/hold/c-hand.json")]: JSON.stringify({ ticket: "gone", path: "spec/tickets/gone.md" }),
+      [at("spec/tickets/one.md")]: ticket("./RUNME.sh branch test test/level0/one.test.js"),
+      [at("spec/tickets/two.md")]: ticket("./RUNME.sh branch test test/level0/one.test.js src/engine/queue/pick_test.go"),
+    }),
+  };
+
+  assert.equal(everyHold(it).length, 3);
+  assert.deepEqual(heldTests(it), ["test/level0/one.test.js", "src/engine/queue/pick_test.go"]);
+  assert.deepEqual(heldTests({ ...it, disk: fakeDisk({}) }), []);
 });

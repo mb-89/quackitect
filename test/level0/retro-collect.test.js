@@ -294,7 +294,8 @@ test("collect keeps the battery's report beside the record, one a retro", () => 
 
   assert.deepEqual(
     JSON.parse(it.disk.read(at(`.se/.retro/${RETRO}/battery.json`))),
-    battery,
+    { ...battery, runs: 1 },
+    "a stamp from before the runs reads as one run",
   );
 
   const bare = doors();

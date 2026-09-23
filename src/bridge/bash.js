@@ -32,6 +32,7 @@ import {
   versionRefs,
 } from "../../.claude/skills/level0/lib/trunk.js";
 import { WORK_BRANCH } from "../engine/group.js";
+import { heldTests } from "../scripts/guidance-hand.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
 import { errorsIn } from "./write.js";
@@ -139,6 +140,7 @@ async function testedDelta(command, _e, box) {
     await git(box, ["diff", "--cached", "--unified=0"]),
     (path) => fileText(reader(box), path),
     merging,
+    heldTests(reader(box)),
   );
   if (!found.length) return "";
   box.log.say("warn", "tested", `refused ${found.length} file(s) with no test`, {

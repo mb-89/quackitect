@@ -6,6 +6,7 @@ import { CODE } from "./code.js";
 import { overLong } from "./names.js";
 import { NOTES } from "./private.js";
 import { scriptWrites } from "./scripted.js";
+import { assigned, holdsAName, resolved } from "./shell-values.js";
 import { baseName, BREAKS, clean, READERS, SHELLS, tokensOf } from "./tokens.js";
 import { PROSE } from "./vale.js";
 
@@ -66,11 +67,25 @@ export function reaches(path) {
 }
 
 // [[spec/design_output/bash#a-shell-writes-nothing]]
+// The values a command gives its names live here, across segments, so a later target reads them. [[spec/design_output/bash#a-target-behind-a-variable]]
 export function writesAPath(command) {
   const { segments, bodies } = partsOf(command);
+  const values = new Map();
   const out = [];
-  for (const one of segments) out.push(...writesIn(one, bodies));
+  for (const one of segments) {
+    out.push(...writesIn(one, bodies, values));
+    assigned(one.filter((word) => !word.op).map((word) => word.text), values);
+  }
   return out;
+}
+
+// A free path reads first, so a temp variable stays free. A target still holding a name refuses, and a resolved one meets the rules. [[spec/design_output/bash#a-target-behind-a-variable]]
+function landing(text, values) {
+  const said = clean(text);
+  if (FREE.some((one) => one.test(said))) return "";
+  const path = clean(resolved(said, values));
+  if (holdsAName(path)) return path;
+  return reaches(path) ? path : "";
 }
 
 // [[spec/design_output/bash#a-commit-message-meets-voice]]
@@ -282,7 +297,7 @@ export function verbLine() {
   ].join(" ");
 }
 
-function writesIn(segment, bodies) {
+function writesIn(segment, bodies, values = new Map()) {
   const out = [];
   const words = wordsIn(segment);
   const name = baseName(words[0]);
@@ -291,11 +306,10 @@ function writesIn(segment, bodies) {
     const one = segment[i];
     if (!one.op || !REDIRECTS.has(one.text)) continue;
     const target = segment[i + 1];
-    if (!target || target.op || !reaches(target.text)) continue;
-    out.push({
-      path: clean(target.text),
-      how: one.text === ">>" ? "an append" : "a redirection",
-    });
+    if (!target || target.op) continue;
+    const path = landing(target.text, values);
+    if (!path) continue;
+    out.push({ path, how: one.text === ">>" ? "an append" : "a redirection" });
   }
 
   for (const run of runsIn(words)) out.push(...landsFrom(run));

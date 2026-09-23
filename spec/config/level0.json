@@ -71,6 +71,10 @@
     "functionLines": 150,
     "fileLines": 600
   },
+  "battery": {
+    "comment": "The check's runs the stamp keeps at one commit, and a retro reads each part's median over them. spec/guidance/retro/effect.md says the rest.",
+    "runs": 5
+  },
   "names": {
     "comment": "The words a file, a folder and a branch name each hold at most. Vale counts a heading, and lib/names.js counts a path.",
     "words": 5

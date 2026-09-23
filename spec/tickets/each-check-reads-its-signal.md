@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -120,6 +120,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: e6486496538198c175240daa05955b227a6947e7
+    hash_after: e6486496538198c175240daa05955b227a6947e7
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -284,11 +292,17 @@ Thirteen cases fail on their own assertion, and each reads the part the approach
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/bash.js .claude/skills/level0/lib/tested.js spec/config/level0.json spec/config/level0.schema.json spec/design_output/bash.md spec/design_output/doors.md spec/design_output/level0.md spec/design_output/tree.md spec/design_output/work.md src/bridge/bash.js src/doors/awake.js src/doors/fake/awake.js src/doors/fake/disk.js src/engine/retro/effect.js src/scripts/battery.js src/scripts/cli-stamp.js src/scripts/guidance-hand.js src/scripts/precommit.js src/scripts/retro-collect.js test/level0/guidance-hand.test.js test/level0/one-reader.test.js test/level0/retro-collect.test.js .claude/skills/level0/lib/shell-values.js test/level0/retro-collect-median.test.js test/level0/shell-values.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change touches the files the approach names, beside `shell-values.js`, which keeps `bash.js` under its ceiling.
+- The disk and awake doors change with their fakes, and each contract case holds the fake to the real door.
+- Each changed module carries a pointer to the design chapter that states the approach.
 
 ## tests-green
 

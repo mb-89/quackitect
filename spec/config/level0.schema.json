@@ -209,6 +209,19 @@
         }
       }
     },
+    "battery": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "runs": {
+          "type": "number",
+          "unit": "runs",
+          "help": "The check's runs the stamp keeps at one commit. A retro reads each part's median over them."
+        }
+      }
+    },
     "names": {
       "type": "object",
       "required": [

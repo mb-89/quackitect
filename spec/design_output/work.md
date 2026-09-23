@@ -476,6 +476,18 @@ retro. For what a retro reads off it, see [[spec/guidance/retro/effect]].
 | `red` | each red case, with the error line the runner writes under it |
 | `spawns` | the spawns the tests make, and how many of them are Vale |
 
+The stamp keeps each run's `parts` under `runs`, newest first, up to the count
+`battery.runs` names in `spec/config/level0.json`. It keeps a run of the
+stamp's own `sha` alone, so a median reads one tree and no change of code
+reads as noise. Collect writes each part's median into the retro's report.
+It reads a part over the runs that reach it, because a red run leaves the parts
+past it unrun. The median covers `parts` and their `total` alone. The `slowest`
+cases and the `files` stay off the last run.
+
+A first retro reads against nothing, so the effect step writes its battery
+with `baseline: true` and names the baseline's total. The next retro reads
+against it.
+
 The report fills while the tests run:
 
 | writer | writes |

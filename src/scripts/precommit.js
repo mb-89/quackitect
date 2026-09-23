@@ -16,6 +16,7 @@ import { refusedTest, untestedIn } from "../../.claude/skills/level0/lib/tested.
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
+import { heldTests } from "./guidance-hand.js";
 
 export const STDIN = 0;
 export const HOOKS = ".githooks";
@@ -28,7 +29,12 @@ export async function holds(it, delta) {
   });
   if (found.length) return { code: 1, said: refusedDelta(found) };
 
-  const missing = untestedIn(delta, (path) => fileText(it, path), merging(it));
+  const missing = untestedIn(
+    delta,
+    (path) => fileText(it, path),
+    merging(it),
+    heldTests(it),
+  );
   if (missing.length) return { code: 1, said: refusedTest(missing) };
   return { code: 0, said: "" };
 }

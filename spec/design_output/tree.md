@@ -46,6 +46,21 @@ hunk both ways, the lines it adds and the lines it takes away:
 
 A line counts past its file's `@@` line alone, so no header reads as content.
 
+The source the door reads:
+
+- the JavaScript under `src`
+- the Go under `src`, past its `_test.go` files
+- the JavaScript in `lib` and `hooks` under `.claude/skills/level0`
+
+A Go test answers for every Go file of its own folder, because Go reads a
+folder as one package.
+
+A test the held ticket carries answers beside the staged ones. The tests-red
+leaf lands the test, and the change leaf stages code alone. So the door reads
+the test paths each held ticket's command lines name. A path under `test/` and
+a `_test.go` path carry. The git hook runs with no hand, and several hands hold
+on one box, so the door reads every hold under `.se/.runtime/hold`.
+
 # Why lint prints them
 
 `./RUNME.sh lint` prints every finding in one shape, whoever holds the rule:

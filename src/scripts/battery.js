@@ -96,6 +96,23 @@ export function batteryOf(parts, lines, { most = SLOWEST, unrun = [], spawns = n
   };
 }
 
+// Each part's median over the runs that reached it, because a red run leaves the parts past it unrun. [[spec/guidance/retro/effect]]
+export function medianParts(runs) {
+  const held = new Map();
+  for (const run of runs ?? []) {
+    for (const [name, ms] of Object.entries(run ?? {})) {
+      held.set(name, [...(held.get(name) ?? []), Number(ms) || 0]);
+    }
+  }
+  return Object.fromEntries([...held].map(([name, all]) => [name, medianOf(all)]));
+}
+
+function medianOf(all) {
+  const sorted = [...all].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
+}
+
 // A case keys on its file and its name, because two files share a name. [[spec/guidance/retro/effect]]
 export function keyOf(one) {
   return one?.file ? `${one.file} ${one.name}` : String(one?.name ?? "");
