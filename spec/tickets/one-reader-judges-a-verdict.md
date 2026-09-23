@@ -88,12 +88,18 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
     hash_before: 6388bfc8c7744c1601fc2c8c2903b7c987b3f8a1
     hash_after: 6388bfc8c7744c1601fc2c8c2903b7c987b3f8a1
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-2
+    hash_before: f8399f297b77c05f6b11b20af2cb5cc81d57a959
+    hash_after: f8399f297b77c05f6b11b20af2cb5cc81d57a959
+    returns: 1
+    why: "Design: `pull` returns its exit at once, and `heldOver` waits on the Vale door's `lint`. The approach names no bridge.; Name one road in the approach, and its cost.; The first road makes `pull` wait, and `work.js`, `retro-new.js` and the pull tests wait on it.; The second road keeps `voiceFaults` returning at once, and calls the pieces `heldOver` puts together.; Those pieces are the config `assemble` writes, `withoutFalsePast` and `unreasoned`.; The level and the case match the ask. The semicolon rule `Characters` stands at warning.; Outside the ask, `askFaults` in `ticket-ask-lint.js` keeps the same error filter. Park it on a ticket of its own."
 ---
 
 # Ask
@@ -147,6 +153,16 @@ So the push door meets no warning a hand-back wrote, and one reader holds both.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- Design: `pull` returns its exit at once, and `heldOver` waits on the Vale door's `lint`. The approach names no bridge.
+- Name one road in the approach, and its cost.
+- The first road makes `pull` wait, and `work.js`, `retro-new.js` and the pull tests wait on it.
+- The second road keeps `voiceFaults` returning at once, and calls the pieces `heldOver` puts together.
+- Those pieces are the config `assemble` writes, `withoutFalsePast` and `unreasoned`.
+- The level and the case match the ask. The semicolon rule `Characters` stands at warning.
+- Outside the ask, `askFaults` in `ticket-ask-lint.js` keeps the same error filter. Park it on a ticket of its own.
 
 # implement
 
