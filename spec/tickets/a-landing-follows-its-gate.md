@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: d2eb7633360734ae2c151f87f74b0c472634f1e2
     returns: 1
     why: "design: a check before `git add` stamps the parent commit over an unclean tree.; design: `saysGreen` then refuses that stamp, so the verb's push to trunk and `branch done` both stop.; design: fix it by running the check first, then stamping the new commit once it lands.; craft: `partsOf` drops each operator, so the rule walks `tokensOf` to read the `;` itself.; craft: `tokensOf` reads a newline as `;`, so the design note names the two-line command too.; craft: `||` runs the landing on a red gate, so the rule refuses it beside `;`.; craft: `bash.test.js` covers `ticket open`, `git commit` and the commit verb after a `;` as well.; craft: `ticket.test.js` reads the schema alone, so the open case sits beside `ask-lint.test.js`.; craft: `spec/design_output/pull.md` names the hand-back, so it takes the bare pull line too.; craft: the verdict leaf keeps its bare hand-back, because the pull refuses a flag there. This reading of the Ask holds."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: a198b38e23a010219c3ab5b642c006e4f583fe39
+    hash_after: a198b38e23a010219c3ab5b642c006e4f583fe39
 ---
 
 # Ask
@@ -133,30 +137,45 @@ Each landing waits on its gate, in four places.
 | part | what changes |
 |---|---|
 | the `;` rule | `findings` in `.claude/skills/level0/lib/bash.js` names `LandingFollowsItsGate` |
-| what it refuses | a `;` whose next segment runs `ticket pull`, `ticket open`, `git commit` or the commit verb |
+| the walk | the rule walks `tokensOf`, because `partsOf` drops the operator between segments |
+| what it refuses | a `;`, a newline or a `\|\|` whose next segment lands |
+| a landing | `ticket pull` with a flag, `ticket open`, `git commit`, or the commit verb |
 | what passes | `&&`, which runs the landing on a green gate alone |
 | the bare pull | `pull` in `src/scripts/pull.js` shows the leaf in hand where a name comes with no flag |
 | the verdict leaf | a leaf holding a verdict field still hands back on the bare name, because the field is its flag |
 | the open | `open` in `src/scripts/ticket.js` lands the ticket through `landedAlone` in `pull-landed.js` |
 | the open's refusal | a commit the hook refuses puts the draft back, and the verb exits 1 |
-| the commit verb | `landsAndPushes` in `commit-verb.js` runs the check before `git add` |
-| a red check | the verb exits 1 with the check's output, and stages nothing |
-| the design | `spec/design_output/bash.md` names the rule, and `work.md#the-battery-answers-first` names the order |
+| the commit verb | `landsAndPushes` in `commit-verb.js` runs `./RUNME.sh test` before `git add` |
+| a red test | the verb exits 1 with the run's output, and stages nothing |
+| the stamp | the check runs after the commit as it does, so the stamp names the landed commit |
+| the design | `bash.md` names the rule, `work.md#the-battery-answers-first` the order, and `pull.md` the bare pull |
 
-The assumption: the verdict leaf keeps its bare hand-back, because the ask's help text names that road.
+The assumption: the verdict leaf keeps its bare hand-back, because the pull refuses a verdict flag there.
 
-The cases, one file each under `test/level0`:
+The cases:
 
-- `bash.test.js`: `true; ./RUNME.sh ticket pull a --pass` refuses, and the `&&` form passes
+- `bash.test.js`: a `;` before each of the four landings refuses, a newline and a `\|\|` refuse, and `&&` passes
 - `pull.test.js`: a bare name on a plain leaf prints the chapter, and the git log stays put
-- `ticket.test.js`: `ticket open` runs one commit naming the ticket
-- `commit-verb.test.js`: a red check leaves `git add` and `git commit` unrun
+- `ask-lint.test.js`: `ticket open` runs one commit naming the ticket
+- `commit-verb.test.js`: a red test run leaves `git add` and `git commit` unrun
 
 The callers:
 
 - `onBash` in `src/bridge/bash.js` runs `findings`, so the rule reaches every Bash call
 - `pull-spawn.js` prints `ticket open`, and its text stands
 - `pull-chapter.js` prints the bare hand-back line on a verdict leaf, and its text stands
+
+The answers to the earlier review:
+
+- the check before the commit stamped the parent: the tests run first, and the check stamps the commit after
+- the operators: the rule walks `tokensOf`
+- the newline: it refuses as a `;` does, and `bash.md` says so
+- the `\|\|`: it refuses beside `;`
+- the four landings: each takes a case
+- the open's case: it stands beside `ask-lint.test.js`
+- `pull.md`: it names the bare pull
+
+The cost: the commit verb runs the tests twice, once as its gate and once inside the check.
 
 ## review
 
