@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -126,6 +126,17 @@ record:
     hash_after: afb861175e497e1ca7cc8dc783ec6613ea8746b6
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 3b36b26e31f979d9ff4f8a7c951cf0f710cde993
+    hash_after: 3b36b26e31f979d9ff4f8a7c951cf0f710cde993
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 83 test(s) pass in 4 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -312,11 +323,15 @@ Seven cases fail on their own assertion, and each names a line of the ask.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/write.test.js test/level0/bash.test.js test/level0/apply.test.js test/level0/bridgehead.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -324,11 +339,25 @@ Seven cases fail on their own assertion, and each names a line of the ask.
 
 <!-- the form is text -->
 
+The write door keeps its marks on disk and over line spans, and `patch` says what it wrote.
+
+- the marks load off `.se/.runtime/marks.json`, and `decide` writes them once a call where a mark moves
+- a Read with `offset` or `limit` marks a span, and an Edit inside a span that agrees lands
+- a lone `cat`, `head -n`, `tail -n` or `sed -n` read marks the lines it prints
+- a `create` makes its folder, and a failed first write answers `nothing written`
+- the failed journal stays with `landed: false`, and `undo` answers that nothing waits
+- a batch call writing nothing puts back the marks it meets
+- a level zero tool on a dead bridge answers the `no server answers` line
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, the two design notes, and the tests
+- the disk, the clock and the harness each stand as a fake in the cases
+- each new function carries a pointer to the design note section it implements
 
 # verdict
 
