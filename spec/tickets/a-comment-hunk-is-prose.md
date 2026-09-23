@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -159,6 +159,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-13
+    hash_before: 88bf0de2b89add9dc13b81a1ec5cecbfcb4e8031
+    hash_after: 88bf0de2b89add9dc13b81a1ec5cecbfcb4e8031
+reason: done
 ---
 
 # Ask
@@ -369,17 +374,39 @@ traded for a comment asks a test, as the ask names.
 
 <!-- the form is files -->
 
+- spec/tickets/a-comment-hunk-is-prose.md
+- .claude/skills/level0/lib/tested.js
+- test/level0/tested.test.js
+- spec/design_output/tree.md
+- src/scripts/precommit.js
+- src/bridge/bash.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- A comment traded for a comment over two files passes, so a pointer fix lands.
+- A code line added beside a comment refuses, and so does a code line traded away.
+- `hunksIn` opens a file at each `diff --git` line and drops a deleted file.
+- A line counts past its `@@` line alone, and the `--x` case proves it.
+- The cases write the full header git writes, so each header line meets the reading.
+- The real diff of this branch reads the same line counts `git show --stat` prints.
+- Both callers read a list of files alone, so they change nothing.
+- `./RUNME.sh check` exits 0.
+- Craft: the comment on `COMMENT` still says "a hunk adding these alone", and the removed lines count now.
+- Craft: the `hunksIn` comment repeats the `@@` line from `tree.md`, where the pointer alone would do.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The reading stands in the `tree.md` table, and the code comments point at it with a short restatement.
 
 # Discussion
 
