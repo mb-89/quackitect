@@ -202,6 +202,10 @@ pull refuses a second hand-out while a hold stands, and `ticket pull --drop`
 drops the hold with the leaf where it stands. The stop hook reads the
 folder, so a turn ending with a hold standing carries on.
 
+A clear and a compaction each empty `reads` in every hold on the box, and the
+ticket and the step stay. So the next pull hands the notes again. For details,
+see [[spec/design_output/stop#the-context-hands-over]].
+
 ## The work answer
 
 The answer says `does` first, then the ask, then one line per field with its

@@ -149,7 +149,7 @@ async function seen($, e, next) {
   if (event === "session.start") await opens($, e);
   const answer = reading(event, e)
     ? await reads($, event, e, next)
-    : await ask($, event, e, next);
+    : await ask($, event, e, next, await fillOf($, event, e));
   if (!answer) {
     if (event === "session.start") await starts($);
     // The server answers nothing, so the bridgehead says the cage stands down where a reader stands. [[spec/design_output/level0#a-session-says-its-cage]]
@@ -161,6 +161,7 @@ async function seen($, e, next) {
     return next(e);
   }
   if (Array.isArray(answer.register)) await registers($, answer.register);
+  if (answer.clear) return clears($, answer, e, next);
   if (answer.needs === "reply") return spoke($, e, next);
   if (answer.spawn !== undefined && (answer.result !== undefined || answer.pass)) {
     return besides($, answer, e, next);
@@ -206,15 +207,27 @@ async function opens($, e) {
   }
 }
 
-async function ask($, event, e, next) {
+async function ask($, event, e, next, extra = {}) {
   let body = "";
   try {
-    body = JSON.stringify({ event, e: e ?? null, origin: next?.origin ?? null, root });
+    body = JSON.stringify({
+      event,
+      e: e ?? null,
+      origin: next?.origin ?? null,
+      root,
+      ...extra,
+    });
   } catch {
     body = JSON.stringify({ event, e: String(e), root });
   }
   if (event === COMPACT || body.length > LIMIT)
-    body = JSON.stringify({ event, e: slim(e), origin: next?.origin ?? null, root });
+    body = JSON.stringify({
+      event,
+      e: slim(e),
+      origin: next?.origin ?? null,
+      root,
+      ...extra,
+    });
   try {
     return await posted($, body);
   } catch (error) {
@@ -230,6 +243,37 @@ async function ask($, event, e, next) {
     await down($, event, error);
     return null;
   }
+}
+
+// The events the fill rides: every call of the agent's own, and the turn's end, which the harness measures only after the vote. [[spec/design_output/stop#the-context-hands-over]]
+const FILLED = new Set(["tool.call", "classic.Stop"]);
+
+// The fill of the context rides every call of the agent's own and the turn's end, because the harness measures it once a turn and a turn runs long. The plain call costs nothing. [[spec/design_output/stop#the-context-hands-over]]
+async function fillOf($, event, e) {
+  if (!FILLED.has(event) || e?.agentId) return {};
+  try {
+    const tokens = (await $.session.usage())?.context?.tokens;
+    return Number.isFinite(tokens) ? { fill: tokens } : {};
+  } catch {
+    return {};
+  }
+}
+
+// The turn the handover ends: the turn completes, the conversation clears, and the prompt opens the next one, which reads the handover. [[spec/design_output/stop#the-context-hands-over]]
+async function clears($, answer, e, next) {
+  const out = await next(e);
+  try {
+    await $.command.run({ command: "clear" });
+    await $.prompt.submit({ text: String(answer.clear?.prompt ?? "") });
+  } catch (error) {
+    await wrote($, {
+      level: "warn",
+      said: "the clear the handover asks for fails",
+      event: "turn.complete",
+      detail: String(error?.message ?? error),
+    });
+  }
+  return out;
 }
 
 async function posted($, body) {

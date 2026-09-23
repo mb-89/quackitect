@@ -33,9 +33,17 @@ import { asks, asksText } from "./config.js";
 import { FINDINGS, findingsFor, heldFor } from "./findings.js";
 import { holdsGrace } from "./grace.js";
 import {
+  clearsAfter,
+  holdsForHandover,
+  measures,
+  onSessionMeasure,
+  ridesCall,
+} from "./handover.js";
+import {
   onAgentSpawn,
   onPromptContext,
   onSessionCompact,
+  onSessionEnd,
   onSessionStart,
   onTurnComplete,
   onTurnSaid,
@@ -98,9 +106,12 @@ const DOORS = {
   "classic.MessageDisplay": onMessageDisplay,
   [SPOKE]: onAgentSpoke,
   "session.compact": onSessionCompact,
+  "session.end": onSessionEnd,
+  "session.measure": onSessionMeasure,
   "turn.said": onTurnSaid,
   "turn.complete": endsTurn,
-  "classic.Stop": onStop,
+  // A session due holds its turn for the handover ahead of the tooth. [[spec/design_output/stop#the-context-hands-over]]
+  "classic.Stop": (e, box) => holdsForHandover(e, box) ?? onStop(e, box),
   "agent.spawn": onAgentSpawn,
   "tool.describe": onDescribe,
   "tool.call": onToolCall,
@@ -132,6 +143,8 @@ export async function decide(said, box) {
   if (box.logLevel !== undefined) box.logLevel = asksText(box, LOG_LEVEL) ?? "";
   freshens(box, String(said?.event ?? ""));
   dropsMoved(box, String(said?.event ?? ""));
+  // The bridgehead reads the fill at every call of the agent's own, so a long turn reaches the key before it ends. [[spec/design_output/stop#the-context-hands-over]]
+  if (said?.fill !== undefined) measures(box, said.fill);
   const door = DOORS[String(said?.event ?? "")] ?? pass;
   const answer = letsThrough((await door(said?.e ?? {}, box)) ?? PASS, said, box);
   if (box.registered || String(said?.event ?? "") === "engine.create") return answer;
@@ -261,7 +274,7 @@ async function onToolCall(e, box) {
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (!passes(said)) return said;
-  return held ?? owesCanary(e, box) ?? PASS;
+  return held ?? ridesCall(e, box, owesCanary(e, box)) ?? PASS;
 }
 
 function passes(said) {
@@ -271,7 +284,7 @@ function passes(said) {
 function endsTurn(e, box) {
   onTurnEnd(e, box);
   dropsHold(e, box);
-  return onTurnComplete(e, box);
+  return clearsAfter(e, box, onTurnComplete(e, box));
 }
 
 export function boxOf(method, work = method, doors = {}) {

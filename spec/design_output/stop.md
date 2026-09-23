@@ -206,6 +206,35 @@ no such call. The log shows each change, and the queue shows the rest: the
 row at zero, a new row, a row gone. The count starts over at
 an answer, and the grace stands past a batch of calls sent at once.
 
+## The context hands over
+
+A long context answers worse than a short one, and a compaction rewrites the
+old prompts into a summary. So a session past `context.handoverAt` hands over
+to a fresh conversation of its own, and a clear takes the place of the
+compaction. `src/bridge/handover.js` holds the door, and the key at zero
+switches it off.
+
+| step | what happens | who does it |
+|---|---|---|
+| measure | the fill rides every call of the agent's own and the turn's end, and `session.measure` after each turn | the bridgehead reads `$.session.usage()` |
+| finish | a fill past the key marks the session due, and the block rides every call: put the work down, start nothing new, write the handover | the context door |
+| handover | the turn's end holds, ahead of the tooth, until `.se/HANDOVER.md` stands, and then ends whatever the tooth votes | the context door |
+| clear | the turn completes, the bridgehead runs `/clear`, and it submits the prompt that opens the next conversation | the bridgehead |
+| forget | `session.end` with reason `clear` opens the canary debt and empties `reads` in every hold on the box | the guidance door |
+| re-read | `prompt.context` fires again: the system prompt, then the rules and the canary, then the handover | the harness and the guidance door |
+| resume | the prompt says to read the handover and pull, so the step hands its notes again | the agent |
+
+A session writing no handover lets go past `stop.mostInARow` asks, and the log
+says so at `warn`. A turn the person breaks off asks for no clear.
+
+The first reading after a clear is what the next conversation opens on. A
+reading past the key there stands the door down for the session, because
+every conversation after it opens past the key too. The log says so at
+`warn`.
+
+A clear the owner types takes the same forget step, so the next pull hands the
+step's notes again. A compaction empties the reads too.
+
 # The vote
 
 Every rule carries a side, a priority and a way of firing. The turn ends where

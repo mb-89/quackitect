@@ -45,6 +45,19 @@
         }
       }
     },
+    "context": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "handoverAt": {
+          "type": "number",
+          "unit": "tokens",
+          "help": "The context a session carries before it finishes, writes the handover and clears. 0 switches it off."
+        }
+      }
+    },
     "stop": {
       "type": "object",
       "required": [

@@ -25,6 +25,7 @@ import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { toolLines, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { heldReadsIn } from "../scripts/guidance-hand.js";
+import { forgetsReads } from "./handover.js";
 import { readTools, writeSurvey } from "../engine/tools.js";
 import { asks } from "./config.js";
 import { deadIndexLine } from "./search.js";
@@ -33,6 +34,8 @@ const GUIDANCE = "spec/guidance";
 const TOOTH = "stop.enabled";
 // The kind onSessionCompact writes its line under, which the read-back looks for. [[spec/design_output/level0#the-debt-survives-a-restart]]
 const COMPACT = "compact";
+// The kind onSessionEnd writes its line under at a clear, which opens the debt the way a compaction does. [[spec/design_output/stop#the-context-hands-over]]
+const CLEARED = "clear";
 // The kind the paid line stands under, which onTurnSaid writes. [[spec/design_output/level0#the-debt-survives-a-restart]]
 const DOOR = "level0";
 export const TOOLS_BLOCK = "level0-tools";
@@ -139,7 +142,7 @@ function pays(row) {
 }
 
 function opens(row) {
-  return row?.kind === COMPACT;
+  return row?.kind === COMPACT || row?.kind === CLEARED;
 }
 
 export function guidanceOf(box) {
@@ -151,6 +154,10 @@ export function onSessionStart(_e, box) {
   box.guidance = readsGuidance(box);
   box.tools = surveyHere(box);
   box.session = { reads: 0, firstTurn: true };
+  // A new session opens a conversation, so the context door stands ready again. [[spec/design_output/stop#the-context-hands-over]]
+  box.handover = null;
+  box.cleared = false;
+  box.standsDown = false;
   return { pass: true };
 }
 
@@ -294,6 +301,23 @@ export function onSessionCompact(e, box) {
   box.log.say("info", "compact", "a compaction runs, and the guidance reads again", {
     trigger: String(e?.trigger ?? "unknown"),
     messages: Array.isArray(e?.messages) ? e.messages.length : 0,
+    forgot: forgetsReads(box),
+    detail: box.guidance.sentence,
+  });
+  return { pass: true };
+}
+
+// A clear ends the conversation and fires no session start, so the debt opens here, the hold forgets what it handed, and the context read after it hands the layer and the handover over. [[spec/design_output/stop#the-context-hands-over]]
+export function onSessionEnd(e, box) {
+  if (e?.reason !== CLEARED) return { pass: true };
+  box.guidance = readsGuidance(box);
+  const session = sessionHere(box);
+  session.owes = true;
+  session.paid = false;
+  box.handover = null;
+  box.cleared = true;
+  box.log.say("info", CLEARED, "a clear runs, and the guidance reads again", {
+    forgot: forgetsReads(box),
     detail: box.guidance.sentence,
   });
   return { pass: true };
