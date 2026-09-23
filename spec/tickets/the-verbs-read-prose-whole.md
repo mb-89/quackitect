@@ -89,7 +89,12 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 614c1aa4b8e9220e93e59a8afa6bbbf3016a1391
+    hash_after: 614c1aa4b8e9220e93e59a8afa6bbbf3016a1391
 ---
 
 # Ask
@@ -115,6 +120,36 @@ step: design/draft
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+One reading over a ticket's text in memory, shared by the pull, the open and
+the note. The pull's half landed it inside `voiceFaults`, so this change lifts
+it out.
+
+| part | the file | what changes |
+|---|---|---|
+| the reading | `src/bridge/findings.js` | `readsDraft(it, path, text, lines)` runs Vale on `valeArgvOf` with the text on stdin, then `readsText` |
+| what it keeps | the same | the findings at error and at warning on the lines the caller names |
+| the pull | `src/scripts/pull-chapter.js` | `voiceFaults` calls `readsDraft` over its chapter's lines, and `REFUSES` moves beside the reading |
+| the open | `src/scripts/ticket-ask-lint.js` | `askFaults` calls `readsDraft` over the whole ticket, and keeps the Ask's lines |
+| the note | `src/scripts/ticket.js` | `note` reads the minted text through `readsDraft` before it writes, and keeps the Ask's lines |
+| its refusal | the same | the note writes nothing, prints each finding at its line, and exits 1 |
+| the routes | `test/contract/process.test.js` | a case mints a ticket off every route under `spec/processes`, and real Vale reads it |
+| what it holds | the same | no finding stands on a line the route writes: a heading, a `does` comment or a `says` comment |
+| the design | `spec/design_output/pull.md#the-voice-reads-the-evidence` | the chapter names the open and the note beside the pull |
+
+The cases:
+
+- `ticket.test.js`: `ticket open` over an Ask carrying a semicolon refuses, naming `Characters`
+- `ticket.test.js`: `ticket note a-name "one; two"` refuses, and writes no file
+- `one-reader.test.js` keeps passing, because the pull reads through the same function
+
+The callers:
+
+- `handBack` in `pull.js` calls `voiceFaults`
+- `open` in `ticket.js` calls `askFaults`
+- `retro-new.js` mints through `mintedNote`, and the route case covers what it renders
+
+The cost: a warning in a route's own text now fails the contract case, and the change fixes each one it finds.
 
 ## review
 
