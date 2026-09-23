@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -104,6 +104,12 @@ record:
     hand: box d6f05e3a585030 · claude-code
     hash_before: 082f659ecaa2e66253b7ccc773a15bfc7607d4fa
     hash_after: 082f659ecaa2e66253b7ccc773a15bfc7607d4fa
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-4
+    hash_before: 53ec88cd6ece1657a8e62a431d1719dbd2880035
+    hash_after: 53ec88cd6ece1657a8e62a431d1719dbd2880035
+    returns: 2
+    why: "Design: `./RUNME.sh lint` runs `findingsOver` through `cli-read.js`, and `heldOver` serves the editor panel alone.; `findingsOver` reads through `readThrough`, so the lint keeps a reader of its own on this road.; Name `findingsOver` as a caller of the shared reading, beside `heldOver` and `voiceFaults`.; Design: a `readsProse(box, text, found)` stands in `prose.js` already, and the write door calls it.; That reader holds vetoes the lint lacks: the sentence length and the word outside the vocabulary.; Give the shared reading a name apart from `readsProse`, so one name reads one thing.; Craft: `voiceFaults` counts a line from its chapter, and the lint counts it from the file.; Add the chapter's offset in the case, so the pull and the lint name the same line.; The road, its cost, the level and the case match the ask."
 ---
 
 # Ask
@@ -165,13 +171,15 @@ nothing. The road: one reading both sides call, and each runs Vale its own way.
 
 fail
 
-- Design: `pull` returns its exit at once, and `heldOver` waits on the Vale door's `lint`. The approach names no bridge.
-- Name one road in the approach, and its cost.
-- The first road makes `pull` wait, and `work.js`, `retro-new.js` and the pull tests wait on it.
-- The second road keeps `voiceFaults` returning at once, and calls the pieces `heldOver` puts together.
-- Those pieces are the config `assemble` writes, `withoutFalsePast` and `unreasoned`.
-- The level and the case match the ask. The semicolon rule `Characters` stands at warning.
-- Outside the ask, `askFaults` in `ticket-ask-lint.js` keeps the same error filter. Park it on a ticket of its own.
+- Design: `./RUNME.sh lint` runs `findingsOver` through `cli-read.js`, and `heldOver` serves the editor panel alone.
+- `findingsOver` reads through `readThrough`, so the lint keeps a reader of its own on this road.
+- Name `findingsOver` as a caller of the shared reading, beside `heldOver` and `voiceFaults`.
+- Design: a `readsProse(box, text, found)` stands in `prose.js` already, and the write door calls it.
+- That reader holds vetoes the lint lacks: the sentence length and the word outside the vocabulary.
+- Give the shared reading a name apart from `readsProse`, so one name reads one thing.
+- Craft: `voiceFaults` counts a line from its chapter, and the lint counts it from the file.
+- Add the chapter's offset in the case, so the pull and the lint name the same line.
+- The road, its cost, the level and the case match the ask.
 
 # implement
 
