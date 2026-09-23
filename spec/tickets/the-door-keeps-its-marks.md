@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -139,6 +139,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-9
+    hash_before: 883d499f014e8a3cf43084e7e39cadd7b1b53eb3
+    hash_after: 883d499f014e8a3cf43084e7e39cadd7b1b53eb3
+reason: done
 ---
 
 # Ask
@@ -369,17 +374,43 @@ The write door keeps its marks on disk and over line spans, and `patch` says wha
 
 <!-- the form is files -->
 
+- spec/tickets/the-door-keeps-its-marks.md
+- .claude/skills/level0/hooks/level0.js
+- .claude/skills/level0/lib/marks.js
+- .claude/skills/level0/lib/runs.js
+- spec/design_output/apply.md
+- spec/design_output/level0.md
+- src/bridge/apply.js
+- src/bridge/bash.js
+- src/bridge/server.js
+- src/bridge/write.js
+- test/level0/apply.test.js
+- test/level0/bash.test.js
+- test/level0/bridgehead.test.js
+- test/level0/mark-doors.js
+- test/level0/write.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- design: each line of the ask lands, and a case under `test/level0` covers each one.
+- design: `./RUNME.sh check` exits 0 on this tree.
+- design: no retro stands in the handback yet.
+- craft: the change commit drops the disk assertion from the restart case, so the case proves less.
+- craft: partial reads add spans without a cap, so a file read in many slices grows its mark.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the dead bridge line stands once in `deadLine`, and the design notes point at the code.
 
 # Discussion
 
