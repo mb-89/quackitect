@@ -89,12 +89,18 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 9fbbfec925f5c7700bf6e42d34103fa4de036855
     hash_after: 9fbbfec925f5c7700bf6e42d34103fa4de036855
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: d2eb7633360734ae2c151f87f74b0c472634f1e2
+    hash_after: d2eb7633360734ae2c151f87f74b0c472634f1e2
+    returns: 1
+    why: "design: a check before `git add` stamps the parent commit over an unclean tree.; design: `saysGreen` then refuses that stamp, so the verb's push to trunk and `branch done` both stop.; design: fix it by running the check first, then stamping the new commit once it lands.; craft: `partsOf` drops each operator, so the rule walks `tokensOf` to read the `;` itself.; craft: `tokensOf` reads a newline as `;`, so the design note names the two-line command too.; craft: `||` runs the landing on a red gate, so the rule refuses it beside `;`.; craft: `bash.test.js` covers `ticket open`, `git commit` and the commit verb after a `;` as well.; craft: `ticket.test.js` reads the schema alone, so the open case sits beside `ask-lint.test.js`.; craft: `spec/design_output/pull.md` names the hand-back, so it takes the bare pull line too.; craft: the verdict leaf keeps its bare hand-back, because the pull refuses a flag there. This reading of the Ask holds."
 ---
 
 # Ask
@@ -161,6 +167,18 @@ The callers:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+- design: a check before `git add` stamps the parent commit over an unclean tree.
+- design: `saysGreen` then refuses that stamp, so the verb's push to trunk and `branch done` both stop.
+- design: fix it by running the check first, then stamping the new commit once it lands.
+- craft: `partsOf` drops each operator, so the rule walks `tokensOf` to read the `;` itself.
+- craft: `tokensOf` reads a newline as `;`, so the design note names the two-line command too.
+- craft: `||` runs the landing on a red gate, so the rule refuses it beside `;`.
+- craft: `bash.test.js` covers `ticket open`, `git commit` and the commit verb after a `;` as well.
+- craft: `ticket.test.js` reads the schema alone, so the open case sits beside `ask-lint.test.js`.
+- craft: `spec/design_output/pull.md` names the hand-back, so it takes the bare pull line too.
+- craft: the verdict leaf keeps its bare hand-back, because the pull refuses a flag there. This reading of the Ask holds.
 
 # implement
 
