@@ -1539,6 +1539,27 @@ The comments in `.vale.ini` say why each section stands.
 The prose rules stay away from a rule file, because such a file lists the
 words they refuse.
 
+## Script runs meet a bound
+
+Vale bounds each run of a script rule by a fixed span of wall time, and no
+setting moves it. A run waiting for the processor spends that span as well. So
+a script reading a whole large file in one run meets the bound first, once the
+rest of a lint crowds the processor.
+
+`VocabularyEntry` reads each list under `spec/vocabulary` in one run, and
+`core.yml` holds the whole core. The lint over the tree runs every file beside
+it:
+
+| the run over `core.yml` | with a pattern compiled per entry | with each pattern compiled once |
+|---|---|---|
+| on a box standing still | 650 ms | 160 ms |
+| beside a second lint of the tree | past the bound, in every round | inside it, in every round |
+| beside four loops holding the processor | past the bound, in every round | inside it, in every round |
+
+`text.re_match` compiles its pattern on every call. So a script compiles each
+pattern once, at its top, with `text.re_compile`, and matches through what that
+answers.
+
 # The fixer calms a shout
 
 `./RUNME.sh fix` runs a round at a time until the tree stops moving. Each round

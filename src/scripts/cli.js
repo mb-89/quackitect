@@ -181,8 +181,15 @@ export const verbs = {
     run: async () => serveBridge(rest),
   },
   find: {
-    says: "every line carrying the words, out of the index",
-    run: async () => asksIndex(["find", ...rest]),
+    says: "every line carrying the words, out of the index, or out of the session log with --log",
+    // The index walks no log, so a search of the log reads the file through the log verb. [[spec/design_output/log#one-verb-reads-the-log]]
+    run: async () =>
+      rest.includes("--log")
+        ? (await import("./log-verb.js")).logVerb(tuiDoors(), [
+            "--words",
+            rest.filter((one) => one !== "--log").join(" "),
+          ])
+        : asksIndex(["find", ...rest]),
   },
   vehicle: {
     says: "this vehicle, the project it drives, and a vehicle made elsewhere",

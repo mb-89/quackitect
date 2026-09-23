@@ -9,6 +9,7 @@ import { OLD, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import {
   atLevel,
+  carrying,
   filesFor,
   lastOf,
   ofKind,
@@ -133,4 +134,15 @@ test("the rows read out of every file the span opens, in the order they stand", 
     "the door reads a write",
     "take answered 0",
   ]);
+});
+
+// A search of the log reads the file, because the index walks no log. [[spec/design_output/log#one-verb-reads-the-log]]
+test("words keep the rows carrying every one of them, in any case, and no words keep them all", () => {
+  assert.deepEqual(said(carrying(rows, "door WRITE")), [
+    "the door reads a write",
+    "the door refuses a write",
+  ]);
+  assert.deepEqual(said(carrying(rows, "vale")), ["two lines come back"], "a word in the kind counts");
+  assert.deepEqual(said(carrying(rows, "door nothing")), []);
+  assert.deepEqual(said(carrying(rows, "")).length, 4);
 });

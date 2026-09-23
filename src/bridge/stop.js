@@ -178,6 +178,21 @@ function claims(e, box) {
       result: { result: `${reason} names no reason this tree holds. The ids: ${ids}.` },
     };
   }
+  // The call runs the claim's own check, so a claim the turn's end refuses falls here first, and says why. [[spec/design_output/stop#a-refusal-names-its-check]]
+  const rule = stopReasons(rulesOf(box)).find((one) => one.id === reason);
+  const falls = READS_TEXT.has(rule.runs)
+    ? ""
+    : claimFalls({
+        box,
+        claimed: reason,
+        off: asks(box, ENABLED) === false,
+        hold: holdHere(box),
+        text: "",
+      });
+  if (falls) {
+    box.log.say("warn", "stop", `the claim of ${reason} falls`, { detail: falls });
+    return { result: { result: `The claim falls. ${falls}` } };
+  }
   box.claim = reason;
   box.log.say("info", "stop", `the agent claims ${reason}`, {
     detail: String(e?.next ?? ""),
@@ -210,10 +225,16 @@ export function onStop(e, box) {
   warnsUnknown(rules, box);
   const decision = decide(rules, {
     claimed,
-    ran: (name) => ranHere(name, { off, hold, box, claimed, text, tasks: e?.background_tasks }),
+    ran: (name) =>
+      ranHere(name, { off, hold, box, claimed, text, tasks: e?.background_tasks }),
   });
   const said = toothOf_(box).atTurnEnd(decision, Number(asks(box, MOST) ?? 0));
-  const why = said.ends ? endsWhy(said) : (said.go?.says ?? "");
+  // A line naming a reason whose check falls hears which check, and what it sees. [[spec/design_output/stop#a-refusal-names-its-check]]
+  const falls =
+    said.go?.runs === "no-stop-line"
+      ? claimFalls({ off, hold, box, claimed, text })
+      : "";
+  const why = said.ends ? endsWhy(said) : falls || (said.go?.says ?? "");
   const prompts = said.ends ? "" : asksForStop(rules, why);
   // The runaway writes at warn, so a reader of the log finds the turn the cap ended. [[spec/design_output/stop#three-in-a-row]]
   box.log.say(
@@ -377,7 +398,8 @@ const CHECKS = {
   "ticket-in-hand": (held) => holdStands(held.box) || privateStands(held.box),
   "queue-waits": (held) => queueWaits(held.box),
   // [[spec/design_output/stop#a-helper-still-runs]]
-  "helpers-running": (held) => asks(held.box, BINDING) !== QUEUE && helpersRun(held.tasks),
+  "helpers-running": (held) =>
+    asks(held.box, BINDING) !== QUEUE && helpersRun(held.tasks),
   // A claim a fact denies reads as no stop line, so the turn holds and the fact re-prompts. [[spec/design_output/stop#a-talk-follows-a-report]]
   "no-stop-line": (held) => !claimStands(held),
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
@@ -419,11 +441,38 @@ function ranHere(name, held) {
 
 // A claim stands where its reason is one this tree holds, and the check its rule names answers true. [[spec/design_output/stop#a-talk-follows-a-report]]
 function claimStands(held) {
-  const rule = stopReasons(rulesOf(held.box)).find((one) => one.id === held.claimed);
-  if (!rule) return false;
-  if (!rule.runs) return true;
-  return Boolean(ranHere(rule.runs, held));
+  return Boolean(held.claimed) && !claimFalls(held);
 }
+
+// Why a claim falls, or nothing where it stands or where no claim stands, so every refusal names its check. [[spec/design_output/stop#a-refusal-names-its-check]]
+export function claimFalls(held) {
+  if (!held.claimed) return "";
+  const rule = stopReasons(rulesOf(held.box)).find((one) => one.id === held.claimed);
+  if (!rule)
+    return `The line claims ${held.claimed}, which names no reason this tree holds.`;
+  if (!rule.runs || ranHere(rule.runs, held)) return "";
+  const why = FALLS[rule.runs]?.(held.box);
+  return `The line claims ${rule.id}, and its check ${rule.runs} answers false${why ? `: ${why}` : "."}`;
+}
+
+// What a check sees where it answers false. [[spec/design_output/stop#a-refusal-names-its-check]]
+const FALLS = {
+  "the-plan-is-empty": (box) => {
+    const plan = plansHere(box);
+    const held = [
+      ...new Set([...plan.todos.map((one) => one.title), plan.working].filter(Boolean)),
+    ];
+    return `the plan still holds ${held.map((one) => `"${one}"`).join(", ")}. Name each under done in mcp__level0__plan, then claim again.`;
+  },
+  // [[spec/design_output/stop#a-helper-still-runs]]
+  "helpers-running": (box) =>
+    asks(box, BINDING) === QUEUE
+      ? "the queue binding holds the turn while a helper runs, so take the next leaf or wait inside a call."
+      : "the harness names no helper running at this turn's end, so its answer wakes nothing.",
+};
+
+// The checks reading the answer's text, which the stop call runs before any answer stands. [[spec/design_output/stop#a-refusal-names-its-check]]
+const READS_TEXT = new Set(["a-report-stands", "no-stop-line"]);
 
 // A rule naming a check this door holds nowhere says so in the log, once a turn, so the hand that wrote it reads its own mistake. The vote skips a claimed rule the agent claims nowhere, so the door reads every rule itself. [[spec/design_output/stop#the-mechanical-checks]]
 function warnsUnknown(rules, box) {

@@ -12,7 +12,9 @@ import {
   reportStands,
   sawCall,
   sawPrompt,
+  TOOLS,
 } from "../../src/bridge/stop.js";
+import { STOP_CALL } from "../../.claude/skills/level0/lib/stop.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -243,6 +245,37 @@ test("a claim of done holds while the plan holds a todo or a thing in hand", () 
     [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [] }),
   });
   assert.deepEqual(onStop(done, empty.box), { pass: true });
+});
+
+// A refusal names the check that falls and what it sees, so a stop line standing whole hears no claim of a missing reason. [[spec/design_output/stop#a-refusal-names-its-check]]
+test("a claim of done over a thing in hand hears the check and the thing, at the call and at the turn's end", () => {
+  const plan = { [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "the door", todos: [] }) };
+  const busy = box(plan);
+  const block = onStop(
+    { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" },
+    busy.box,
+  ).result.block;
+  assert.match(block, /check the-plan-is-empty answers false: the plan still holds "the door"/);
+  assert.doesNotMatch(block, /names no stop reason/);
+
+  const called = box(plan);
+  const refused = TOOLS[STOP_CALL]({ reason: "the-work-stands-complete" }, called.box);
+  assert.match(refused.result.result, /^The claim falls\. .*"the door".*under done/);
+  assert.equal(called.box.claim, undefined, "a claim that falls stands nowhere for the turn's end");
+
+  const clear = box({ [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [] }) });
+  assert.match(
+    TOOLS[STOP_CALL]({ reason: "the-work-stands-complete" }, clear.box).result.result,
+    /^The claim stands/,
+  );
+});
+
+test("a line naming a reason nobody holds hears that, and a turn with no line hears the plain rule", () => {
+  const block = onStop({ last_assistant_message: "Done.\n\nstop: the-moon-is-full" }, box().box).result
+    .block;
+  assert.match(block, /claims the-moon-is-full, which names no reason this tree holds/);
+  const bare = onStop({ last_assistant_message: "Done." }, box().box).result.block;
+  assert.match(bare, /^The last line names no stop reason/);
 });
 
 test("a helper's turn end passes untouched, so a refused helper answer reaches no owner turn", () => {
