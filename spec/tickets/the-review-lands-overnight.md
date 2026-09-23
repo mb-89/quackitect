@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box dcd73916add7 · claude-code-remote
@@ -87,6 +87,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-review-lands-overnight already carries every commit on main.
+  - step: split
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: f8428866ac2040495370aa7363cd567a3bc350dc
+    hash_after: f8428866ac2040495370aa7363cd567a3bc350dc
 ---
 
 # Ask
@@ -121,11 +125,32 @@ fields, and no refusal a person has to clear by hand.
 
 <!-- the form is list -->
 
+- [[spec/tickets/a-claim-reads-its-source]], on the standard route
+- [[spec/tickets/a-comment-hunk-is-prose]], on the standard route
+- [[spec/tickets/a-count-meets-the-lint]], on the standard route
+- [[spec/tickets/a-landing-follows-its-gate]], on the standard route
+- [[spec/tickets/each-check-reads-its-signal]], on the standard route
+- [[spec/tickets/each-helper-lands-one-commit]], on the standard route
+- [[spec/tickets/one-reader-judges-a-verdict]], on the standard route
+- [[spec/tickets/the-binding-reads-the-session]], on the standard route
+- [[spec/tickets/the-config-folds-at-once]], on the trivial route
+- [[spec/tickets/the-door-keeps-its-marks]], on the standard route
+- [[spec/tickets/the-door-refuses-a-revert]], on the standard route
+- [[spec/tickets/the-engine-restores-its-fields]], on the trivial route
+- [[spec/tickets/the-owner-hears-first]], on the standard route
+- [[spec/tickets/the-pull-pushes-its-close]], on the standard route
+- [[spec/tickets/the-verbs-reach-the-question]], on the standard route
+- [[spec/tickets/the-verbs-read-prose-whole]], on the standard route
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each child took one design review and one verdict over its own diff
+- the children cover the one reader, the fields the engine owns, the comment hunk and the sidebar's folds
+- the children depend on none of the others, so none names a `depends_on`
 
 # children
 
