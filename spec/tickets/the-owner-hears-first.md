@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -126,6 +126,17 @@ record:
     hash_after: c1b755eac29ca4cde7ee6c1d49764a8cc76d1ee4
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: a731762ec556920120cbe555ce19864becb46dcd
+    hash_after: a731762ec556920120cbe555ce19864becb46dcd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 56 test(s) pass in 5 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -300,11 +311,15 @@ Seven cases fail on their own assertion. The case on the ask floor passes today,
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/answer.test.js test/level0/answer-door.test.js test/level0/note-answer.test.js test/level0/grace-asks.test.js test/level0/agent.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -312,11 +327,24 @@ Seven cases fail on their own assertion. The case on the ask floor passes today,
 
 <!-- the form is text -->
 
+The owner's prompt now meets the next call, and a helper the turn waits on meets a refusal.
+
+- `demands` reads a grace with a floor of zero, and a prompt opens its demand with none.
+- The first call after a prompt asks the bridgehead for the reply.
+- `ask.js` keeps the update grace at one at least, and waits behind an unpaid prompt.
+- `onAgent` in `src/bridge/agent.js` refuses `run_in_background: false`, and a helper's call meets it too.
+- `spec/guidance/working.md` asks a row for each owner question, and a log line for each finished piece.
+- `spec/design_output/level0.md` holds the chapters "The first call asks" and "An Agent call runs behind".
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The diff touches the answer door, the ask door, the Agent door, the server wiring and two notes.
+- The cases read fake boxes, and the server case reads the fake disk, clock, log and process.
+- Each door points at its chapter in `spec/design_output/level0.md`.
 
 # verdict
 
