@@ -1,6 +1,6 @@
 // The wait tool, on a fake clock: a helper's report, an output's end and a
 // quiet file set each return it, and the cap returns it where none comes.
-// [[spec/design_output/level0#the-wait-returns-on-a-signal]]
+// [[spec/design_output/level0#the-wait-returns-on-signals]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
@@ -36,7 +36,7 @@ function served() {
   });
 }
 
-// A pause that moves the fake clock, and runs what a case asks at a tick. [[spec/design_output/level0#the-wait-returns-on-a-signal]]
+// A pause that moves the fake clock, and runs what a case asks at a tick. [[spec/design_output/level0#the-wait-returns-on-signals]]
 function pausing(box, at = {}) {
   let ticks = 0;
   return async (ms) => {
@@ -53,10 +53,15 @@ test("the spec names the wait and the three signals it takes", () => {
   const [spec] = SPECS();
   assert.equal(spec.name, WAIT);
   assert.equal(WAIT_CALL, "mcp__level0__wait");
-  assert.deepEqual(Object.keys(spec.inputSchema.properties), ["agent", "output", "pid", "files"]);
+  assert.deepEqual(Object.keys(spec.inputSchema.properties), [
+    "agent",
+    "output",
+    "pid",
+    "files",
+  ]);
 });
 
-// [[spec/design_output/level0#the-wait-returns-on-a-signal]]
+// [[spec/design_output/level0#the-wait-returns-on-signals]]
 test("a helper's report returns the wait, and writes a report row to the log", async () => {
   const box = served();
   const pause = pausing(box, { 3: () => helperReports({ agentId: "a1" }, box) });
@@ -69,7 +74,7 @@ test("a helper's report returns the wait, and writes a report row to the log", a
   assert.equal(rows[0].agentId, "a1");
 });
 
-// [[spec/design_output/level0#the-wait-returns-on-a-signal]]
+// [[spec/design_output/level0#the-wait-returns-on-signals]]
 test("an output's process ending returns the wait", async () => {
   const box = served();
   box.proc.lives.add(42);
@@ -80,10 +85,13 @@ test("an output's process ending returns the wait", async () => {
 
   const answer = await waits({ output: OUT, pid: 42 }, box, pause);
 
-  assert.match(said(answer), /^The output out\/run\.txt ends, because its process exits\./);
+  assert.match(
+    said(answer),
+    /^The output out\/run\.txt ends, because its process exits\./,
+  );
 });
 
-// [[spec/design_output/level0#the-wait-returns-on-a-signal]]
+// [[spec/design_output/level0#the-wait-returns-on-signals]]
 test("an output growing holds the wait, and one standing quiet past the span returns it", async () => {
   const box = served();
   const from = box.clock.now().getTime();
@@ -96,7 +104,7 @@ test("an output growing holds the wait, and one standing quiet past the span ret
   assert.equal(spent(box, from), 3 + 5, "the quiet span counts from the last growth");
 });
 
-// [[spec/design_output/level0#the-wait-returns-on-a-signal]]
+// [[spec/design_output/level0#the-wait-returns-on-signals]]
 test("a file set standing quiet past the span returns the wait, and a write to one holds it", async () => {
   const box = served();
   const from = box.clock.now().getTime();
@@ -108,7 +116,7 @@ test("a file set standing quiet past the span returns the wait, and a write to o
   assert.equal(spent(box, from), 2 + 5);
 });
 
-// [[spec/design_output/level0#the-wait-returns-on-a-signal]]
+// [[spec/design_output/level0#the-wait-returns-on-signals]]
 test("the cap returns the wait where no signal comes", async () => {
   const box = served();
   const from = box.clock.now().getTime();
@@ -119,20 +127,29 @@ test("the cap returns the wait where no signal comes", async () => {
   assert.equal(spent(box, from), 60);
 });
 
-// [[spec/design_output/level0#the-wait-returns-on-a-signal]]
+// [[spec/design_output/level0#the-wait-returns-on-signals]]
 test("a wait naming no signal answers what it takes", async () => {
   const box = served();
-  assert.match(said(await waits({}, box, pausing(box))), /takes an agent, an output or files/);
+  assert.match(
+    said(await waits({}, box, pausing(box))),
+    /takes an agent, an output or files/,
+  );
 });
 
-// The server registers the wait, and a helper's stop reaches it as a report. [[spec/design_output/level0#the-wait-returns-on-a-signal]]
+// The server registers the wait, and a helper's stop reaches it as a report. [[spec/design_output/level0#the-wait-returns-on-signals]]
 test("the server registers the wait, and a helper's stop writes its report", async () => {
   const box = served();
   const first = await decide({ event: "tool.call", e: { tool: "Read" } }, box);
-  assert.ok((first.register ?? []).some((one) => one.name === WAIT), "the wait registers");
+  assert.ok(
+    (first.register ?? []).some((one) => one.name === WAIT),
+    "the wait registers",
+  );
 
   const stopped = await decide({ event: "classic.Stop", e: { agentId: "a2" } }, box);
   assert.deepEqual(stopped, { pass: true });
   const rows = box.log.lines().filter((one) => one.kind === "report");
-  assert.deepEqual(rows.map((one) => one.agentId), ["a2"]);
+  assert.deepEqual(
+    rows.map((one) => one.agentId),
+    ["a2"],
+  );
 });

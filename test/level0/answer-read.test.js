@@ -9,6 +9,7 @@ import { test } from "node:test";
 import { TOOLS as SURVEY } from "../../.claude/skills/level0/lib/tools.js";
 import { readsAnswer } from "../../src/bridge/answer-read.js";
 import { boxOf, decide } from "../../src/bridge/server.js";
+import { TOOLS as HAND_TOOLS } from "../../src/bridge/tools.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
@@ -87,7 +88,11 @@ test("the gate holds as many turns in a row as stop.mostInARow names, and lets t
 
   assert.match(blockOf(await stops(box)), REFUSES);
   assert.match(blockOf(await stops(box)), REFUSES);
-  assert.doesNotMatch(blockOf(await stops(box)), REFUSES, "the third stop goes past the gate");
+  assert.doesNotMatch(
+    blockOf(await stops(box)),
+    REFUSES,
+    "the third stop goes past the gate",
+  );
   assert.match(blockOf(await stops(box)), REFUSES, "the count starts again");
 });
 
@@ -106,10 +111,28 @@ test("a helper's stop passes ahead of the gate, and Vale reads nothing", async (
 test("the reading answers the band, the score and the findings of a draft", async () => {
   const { box } = served(FOUND);
 
-  const read = await readsAnswer(box, TEXT, true);
+  const read = await readsAnswer(box, TEXT, false);
 
   assert.equal(read.band, "rewrite");
   assert.equal(read.found.length, 1);
   assert.equal(read.found[0].rule, "VoiceVale.Jargon");
   assert.ok(read.score > CONFIG.answer.ceiling);
+  const stopping = await readsAnswer(box, TEXT, true);
+  assert.equal(stopping.found.length, 2, "a stop for the owner asks for the needs table too");
+});
+
+// `checksAnswer` in the hand tools answers the same reading in the gate's wording. [[spec/design_output/level0#the-tool-reads-a-draft]]
+test("the draft tool answers the reading's findings, and a box with no Vale reads nothing", async () => {
+  const checks = HAND_TOOLS.mcp__level0__check_answer;
+  const { box } = served(FOUND);
+
+  const said = String((await checks({ text: TEXT }, box)).result.result);
+  assert.match(said, REFUSES);
+  assert.match(said, /level0-answer\.md:1:10 {2}VoiceVale\.Jargon/);
+
+  box.vale = { stands: () => false };
+  assert.match(
+    String((await checks({ text: TEXT }, box)).result.result),
+    /No vale stands here/,
+  );
 });

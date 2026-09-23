@@ -16,9 +16,9 @@ import {
   showOf,
   walkOver,
 } from "../bridge/findings.js";
+import { readTools } from "../engine/tools.js";
 import { serverFaults, treeHere } from "./cli-check.js";
 import { bin, COL, files, it, outside, root, SHOWN } from "./cli-doors.js";
-import { readTools } from "../engine/tools.js";
 
 // What the last lint left standing at warning. The stamp takes it, and the stop door reads the stamp. [[spec/tickets/the-spawn-reaches-its-guidance]]
 let stood = [];
@@ -120,32 +120,39 @@ export async function lint(where) {
       .join(", "),
   });
 
-  const perRule = new Map();
-  for (const one of found) {
-    perRule.set(one.rule, (perRule.get(one.rule) ?? 0) + 1);
-    console.log(asLine(one, show(one.file ?? where[0])));
-  }
-  console.log("");
-  for (const [rule, count] of [...perRule].sort((a, b) => b[1] - a[1])) {
-    console.log(`${String(count).padStart(COL.count)}  ${rule}`);
-  }
-  console.log(`${String(found.length).padStart(COL.count)}  in all`);
-
   // [[spec/design_output/schema#warning-now-and-error-later]]
   stood = found.filter((one) => one.severity === WARNING);
   const refused = found.length - stood.length;
+  const note = refused
+    ? []
+    : [
+        "",
+        `${found.length} stand at warning. A commit and a push land over them, and the refactoring hand drains them past ${TRUNK}'s check.`,
+      ];
+  for (const row of lintRows(
+    found,
+    (one) => asLine(one, show(one.file ?? where[0])),
+    note,
+  ))
+    console.log(row);
   if (refused) return 1;
-  console.log("");
-  console.log(
-    `${found.length} stand at warning. A commit and a push land over them, and the refactoring hand drains them past ${TRUNK}'s check.`,
-  );
   // A warning turns nothing red, because the hand drains it and the doors let it land. [[spec/design_output/config#the-engine-controls]]
   return 0;
 }
 
-// [[spec/design_output/lsp#one-checker-every-front-asks]]
+// The count reads first, and the finding lines stand last, where the reader's eye lands. [[spec/design_output/lsp#the-lint-ends-on-findings]]
 export function lintRows(found, lineOf, note = []) {
-  return [];
+  const perRule = new Map();
+  for (const one of found) perRule.set(one.rule, (perRule.get(one.rule) ?? 0) + 1);
+  return [
+    ...[...perRule]
+      .sort((a, b) => b[1] - a[1])
+      .map(([rule, count]) => `${String(count).padStart(COL.count)}  ${rule}`),
+    `${String(found.length).padStart(COL.count)}  in all`,
+    ...note,
+    "",
+    ...found.map(lineOf),
+  ];
 }
 
 // [[spec/design_output/tree#the-tree-handed-in]]

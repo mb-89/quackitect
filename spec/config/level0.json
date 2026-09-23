@@ -63,6 +63,11 @@
     "ceiling": 15,
     "words": 150
   },
+  "wait": {
+    "comment": "The wait tool's spans, in seconds: its cap, and the span a file stands unchanged before it reads as quiet. spec/design_output/level0.md, chapter The wait returns on a signal, says the rest.",
+    "most": 600,
+    "quiet": 30
+  },
   "log": {
     "comment": "The level this box writes at, on the ladder debug, info, warn, error, fatal. info writes every line a door says, debug writes what the hooks see too, warn writes a refusal and a fault, error writes a fault, fatal writes what ends a session.",
     "level": "info"

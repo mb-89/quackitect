@@ -8,11 +8,18 @@ export function findSpec() {
   return {
     name: FIND,
     description:
-      "Finds the lines in this tree carrying the words, ranked by the index. Ask it before a Grep over the tree, because it reads the rows and not the disk.",
+      "Finds the lines in this tree carrying the words, ranked by the index. Ask it before a Grep over the tree, because it reads the rows and not the disk. A function name answers that function's body.",
     inputSchema: {
       type: "object",
-      properties: { words: { type: "string", description: "The words to look for." } },
-      required: ["words"],
+      properties: {
+        words: { type: "string", description: "The words to look for." },
+        function: {
+          type: "string",
+          description:
+            "A function's name, which answers its body from the line defining it to its close.",
+        },
+      },
+      required: [],
     },
   };
 }

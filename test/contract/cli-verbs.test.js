@@ -53,8 +53,14 @@ test("the test verb runs the file you name, and answers one word on it", () => {
   const row = /^ {2}test: \{[\s\S]*?^ {2}\},/m.exec(source)?.[0] ?? "";
   assert.match(row, /rest/, "the row hands what you name through");
   const ran = proc().run(
-    [process.execPath, join(root, "src", "scripts", "cli.js"), "test", "test/level0/go-modules.test.js"],
-    { cwd: root },
+    [
+      process.execPath,
+      join(root, "src", "scripts", "cli.js"),
+      "test",
+      "test/level0/go-modules.test.js",
+    ],
+    // The runner marks its own children, and a child so marked writes no report to its output. [[spec/design_output/pull#the-test-verb]]
+    { cwd: root, env: { NODE_TEST_CONTEXT: undefined } },
   );
   assert.equal(ran.exitCode, 0, ran.stdout + ran.stderr);
   assert.match(ran.stdout, /^green, \d+ test\(s\) pass in 1 file\(s\)/m);

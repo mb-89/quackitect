@@ -3,23 +3,12 @@
 // [[spec/design_output/level0#the-tool-reads-a-draft]]
 
 import { join } from "node:path";
-import {
-  bandOf,
-  CHECK,
-  checkSpec,
-  lengthFaults,
-  needsFaults,
-  scoreOf,
-  tableFaults,
-} from "../../.claude/skills/level0/lib/answer.js";
+import { CHECK, checkSpec } from "../../.claude/skills/level0/lib/answer.js";
 import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
 import { MINT_TOOL } from "../../.claude/skills/level0/lib/schema.js";
 import { mintedNote, mintSpec } from "../../.claude/skills/level0/lib/schema-mint.js";
-import { asks } from "./config.js";
-import { readsProse } from "./prose.js";
+import { ANSWER, readsAnswer } from "./answer-read.js";
 import { onWrite } from "./write.js";
-
-const ANSWER = "level0-answer.md";
 
 export const SPECS = (box) => [checkSpec(), mintSpec(box.schemas)];
 export const TOOLS = {
@@ -32,26 +21,9 @@ async function checksAnswer(e, box) {
   const text = String(e?.text ?? "");
   if (!text.trim())
     return { result: { result: `${CHECK} takes the text of one draft.` } };
-  if (!box.vale.stands())
-    return { result: { result: "No vale stands here, so the draft goes unread." } };
-  const ran = await box.vale.lint(text, ANSWER);
-  if (!ran.ran) return { result: { result: `Vale read nothing: ${ran.why}` } };
-  const found = [
-    ...tableFaults(text, box.asks ?? 0),
-    ...needsFaults(text, Boolean(e?.stop)),
-    ...lengthFaults(text, asks(box, "answer.words")),
-    ...readsProse(box, text, ran.found),
-  ];
-  const score = scoreOf(text, found);
-  const bands = {
-    warnAt: asks(box, "answer.warnAt"),
-    ceiling: asks(box, "answer.ceiling"),
-  };
-  const band = found.length ? bandOf(score, bands, found) : "clean";
-  box.log.say("info", "answer", `a draft reads ${band}`, {
-    detail: `score=${score} findings=${found.length}`,
-  });
-  return { result: { result: answerFindings(ANSWER, { found, score, band }) } };
+  const read = await readsAnswer(box, text, e?.stop);
+  if (read.why) return { result: { result: read.why } };
+  return { result: { result: answerFindings(ANSWER, read) } };
 }
 
 // [[spec/design_output/schema#the-tool-writes-the-note]]

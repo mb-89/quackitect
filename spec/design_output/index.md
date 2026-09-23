@@ -263,6 +263,21 @@ in `.se/.runtime/bin`. A generic `call` verb carries the question as JSON, so th
 holds no second copy of the protocol. The session's start puts the door up
 without waiting, which leaves the first question warm.
 
+## Find reads a body
+
+`mcp__level0__find` takes `function` beside `words`. The name goes to the
+index, and `runsFind` in `src/bridge/search.js` keeps the first row whose line
+defines it:
+
+- a `function` or a `const`, `let` or `var` holding one
+- a method, its name opening the line
+- a Go `func`, bare or on a receiver
+
+The disk hands the body from that line to the close balancing its first
+brace. A brace inside a string or a comment counts for nothing. The answer
+names the path and the line, then the body. A name no row defines answers
+that nothing in the index defines it.
+
 ## Where the disk still answers
 
 The index answers where it answers faithfully, and stands aside everywhere

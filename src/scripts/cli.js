@@ -64,6 +64,7 @@ import {
 } from "./vehicle.js";
 import { voice } from "./voice.js";
 import { cloud, pulling, work } from "./work.js";
+import { testVerb } from "./work-test.js";
 
 // The root reads the platform once, and the register road takes it off the hand. [[spec/design_output/doors#a-door-reads-the-outside]]
 const WINDOWS = process.platform === "win32";
@@ -98,7 +99,10 @@ export const verbs = {
   },
   lint: { says: "the rules over the tree, or over what you name", run: lint },
   fix: { says: "the fixes a program can make", run: fix },
-  test: { says: "the tests alone", run: async () => test() },
+  test: {
+    says: "the tests alone, or the test files and Go folders you name",
+    run: async () => (rest.length ? namedTests(rest) : test()),
+  },
   rules: { says: "the mechanical rules Vale holds", run: async () => listRules() },
   standing: {
     says: "what level zero hands the agent every session",
@@ -388,15 +392,25 @@ export function testArgv(at) {
 }
 
 export function test() {
-  files.makeDir(join(root, ...RUN.split("/")));
-  const tally = join(root, ...SPAWNS.split("/"));
-  files.write(tally, "");
+  const tally = freshTally();
   const ran = outside.run([process.execPath, ...testArgv(root)], {
     cwd: root,
     inherit: true,
     env: { SE_SPAWNS: tally },
   });
   return ran.exitCode;
+}
+
+// The named run goes through the branch's runner, under the check's own tally. [[spec/design_output/pull#the-test-verb]]
+export function namedTests(names) {
+  return testVerb({ ...it, root }, ["test", ...names], { SE_SPAWNS: freshTally() });
+}
+
+function freshTally() {
+  files.makeDir(join(root, ...RUN.split("/")));
+  const tally = join(root, ...SPAWNS.split("/"));
+  files.write(tally, "");
+  return tally;
 }
 
 // [[spec/guidance/retro/effect]]

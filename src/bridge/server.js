@@ -26,6 +26,7 @@ import {
   SPOKE,
 } from "./answer.js";
 import { onAgent } from "./agent.js";
+import { gatesAnswer } from "./answer-read.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
@@ -87,6 +88,7 @@ import {
 } from "./stop.js";
 import { TOOLS as handTools, SPECS as toolSpecs } from "./tools.js";
 import { registeredPort } from "./vehicle.js";
+import { helperReports, SPECS as waitSpecs, TOOLS as waitTools } from "./wait.js";
 import { marksKept, onRead, onWrite, schemasHere } from "./write.js";
 
 const OK = 200;
@@ -113,8 +115,12 @@ const DOORS = {
   "session.measure": onSessionMeasure,
   "turn.said": onTurnSaid,
   "turn.complete": endsTurn,
-  // A session due holds its turn for the handover ahead of the tooth. [[spec/design_output/stop#the-context-hands-over]]
-  "classic.Stop": (e, box) => holdsForHandover(e, box) ?? onStop(e, box),
+  // A helper's stop reports, a session due holds for the handover, and the answer gate holds ahead of the tooth. [[spec/design_output/stop#the-context-hands-over]] [[spec/design_output/level0#the-gate-reads-the-answer]]
+  "classic.Stop": async (e, box) =>
+    helperReports(e, box) ??
+    holdsForHandover(e, box) ??
+    (await gatesAnswer(e, box)) ??
+    onStop(e, box),
   "agent.spawn": onAgentSpawn,
   "tool.describe": onDescribe,
   "tool.call": onToolCall,
@@ -140,6 +146,7 @@ const TOOLS = {
   ...planTools,
   ...proseTools,
   ...logTools,
+  ...waitTools,
 };
 
 export async function decide(said, box) {
@@ -177,6 +184,7 @@ function specsOf(box) {
     ...planSpecs(),
     ...proseSpecs(),
     ...logSpecs(),
+    ...waitSpecs(),
   ].map(withPlanField);
 }
 

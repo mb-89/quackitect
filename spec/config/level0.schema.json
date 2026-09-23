@@ -238,6 +238,24 @@
         }
       }
     },
+    "wait": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "most": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The span the wait tool holds at most before it returns with no signal."
+        },
+        "quiet": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The span a file stands unchanged before the wait reads it as quiet."
+        }
+      }
+    },
     "work": {
       "comment": "Level one. The knobs the work verbs read over a group and its tickets.",
       "type": "object",

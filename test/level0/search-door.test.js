@@ -47,7 +47,9 @@ function doorAnswering(stderr) {
 
 // A pattern Go reads as no regexp exits 1, and the door stands. [[spec/design_output/index#a-dead-index-speaks]]
 test("a question the index refuses alone reads the disk, and leaves the index standing", () => {
-  const door = doorAnswering("error parsing regexp: invalid or unsupported Perl syntax\n");
+  const door = doorAnswering(
+    "error parsing regexp: invalid or unsupported Perl syntax\n",
+  );
   const warmed = [];
   const box = {
     index: { ...door, warm: () => warmed.push(1) && { warmed: false } },
@@ -63,7 +65,9 @@ test("a question the index refuses alone reads the disk, and leaves the index st
 
 // [[spec/design_output/index#a-dead-index-speaks]]
 test("a door that fails to answer reads as dead", () => {
-  const door = doorAnswering("the index door does not answer, and one would not start\n");
+  const door = doorAnswering(
+    "the index door does not answer, and one would not start\n",
+  );
   assert.equal(door.ask("grep", { pattern: "a" }), null);
   assert.match(door.dead(), /answers 1/);
   assert.equal(door.fault(), "");
@@ -73,7 +77,7 @@ const SOURCE = [
   "// A head.",
   "export function walks(x) {",
   "  if (x) {",
-  "    return \"}\";",
+  '    return "}";',
   "  }",
   "  return 0;",
   "}",
@@ -97,7 +101,9 @@ function finding(rows) {
   return { box, asked };
 }
 
-const GO = ["package b", "", "func (r *Row) walks() int {", "\treturn 1", "}", ""].join("\n");
+const GO = ["package b", "", "func (r *Row) walks() int {", "\treturn 1", "}", ""].join(
+  "\n",
+);
 
 // The index finds the line, and the disk hands the body to its close. [[spec/design_output/index#find-reads-a-body]]
 test("find answers a function by name with its body, read off the disk to its close", () => {
@@ -125,7 +131,9 @@ test("find answers a function by name with its body, read off the disk to its cl
 
 // [[spec/design_output/index#find-reads-a-body]]
 test("find reads a Go method's body the way it reads a function's", () => {
-  const { box } = finding([{ path: "src/b.go", line: 3, text: "func (r *Row) walks() int {" }]);
+  const { box } = finding([
+    { path: "src/b.go", line: 3, text: "func (r *Row) walks() int {" },
+  ]);
 
   assert.equal(
     runsFind({ function: "walks" }, box).result.result,
@@ -135,7 +143,9 @@ test("find reads a Go method's body the way it reads a function's", () => {
 
 // [[spec/design_output/index#find-reads-a-body]]
 test("a name no definition carries answers that nothing defines it", () => {
-  const { box } = finding([{ path: "src/a.js", line: 9, text: "const other = walks(1);" }]);
+  const { box } = finding([
+    { path: "src/a.js", line: 9, text: "const other = walks(1);" },
+  ]);
 
   assert.equal(
     runsFind({ function: "walks" }, box).result.result,

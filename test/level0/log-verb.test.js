@@ -151,6 +151,9 @@ test("words keep the rows carrying every one of them, in any case, and no words 
 // A count mode reads the rows the filters keep, one row a kind, the most first. [[spec/design_output/log#one-verb-reads-the-log]]
 test("a count prints one row a kind, over the rows the filters keep", () => {
   assert.deepEqual(countsOf(rows), ["2  hook", "1  vale", "1  work"]);
-  assert.deepEqual(countsOf(narrowed(rows, ["--level", "warn"], NOW)), ["1  hook", "1  vale"]);
+  assert.deepEqual(countsOf(narrowed(rows, ["--level", "warn"], NOW)), [
+    "1  hook",
+    "1  vale",
+  ]);
   assert.deepEqual(countsOf([]), []);
 });

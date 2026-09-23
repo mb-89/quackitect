@@ -695,3 +695,12 @@ The tests stand in Node and Go, and the verb runs both. A changed `*.test.js`
 joins the node run, and a changed `*_test.go` names the module under `src` that
 holds it, which the verb runs with `go test`. The answer reads green where
 every run does, and it names the first that does not.
+
+## The test verb takes names
+
+`./RUNME.sh test` with names runs this same verb over them:
+
+- a bare `./RUNME.sh test` runs the whole suite, as the check does
+- a named folder under `src` names the module at or above it
+- a named run reads no branch point
+- a named run takes the check's spawn tally, and a Go run takes `goEnvOf` too

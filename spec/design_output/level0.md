@@ -1402,9 +1402,10 @@ copy honest. A copy nobody can edit needs no guard.
 
 The turn's end runs the answer through Vale under the `*answer.md` section of
 `.vale.ini`, and the score of what comes back cuts into bands. The reply
-already stands on screen when `turn.complete` fires, so the gate refuses
+already stands on screen when `turn.complete` fires, so that gate refuses
 nothing. It re-prompts, it carries a line into the next prompt, or it does
-nothing at all.
+nothing at all. The stop door reads the same answer before the turn ends,
+and it holds a rewrite.
 
 The measurement behind the bands stands in
 [[spec/funnel/a-paragraph-has-a-schema]].
@@ -1428,6 +1429,7 @@ edges, and the score falls into one of the bands below:
 |---|---|
 | under `warnAt` | nothing |
 | from `warnAt` up | the `answer` line at `warn`, and the findings ride the next tool call |
+| from `ceiling` up | the stop door holds the turn with the findings |
 
 An answer carrying no finding reads clean, whatever its length. Every band
 writes one `answer` line naming the score and the findings. The ceiling names
@@ -1465,6 +1467,25 @@ refusing nothing leaves open.
 
 The tool registers at the session's start, and `spec/guidance/working.md`
 carries the line that sends a session to it.
+
+`readsAnswer` in `src/bridge/answer-read.js` holds the reading, and the tool
+and the stop door both call it.
+
+## The stop holds a rewrite
+
+The server's `classic.Stop` door runs `gatesAnswer` over the turn's last text,
+after the handover and before the tooth. A draft in the `rewrite` band holds
+the turn, and the block carries the findings in the wording above. Any other
+band passes on to the tooth.
+
+- A helper's stop passes ahead of the gate, so Vale reads no helper's answer.
+- The turn's end asks for no needs table, which a stop for the owner carries alone.
+- `answer.enabled` at false takes the gate out.
+- The gate counts its holds in a row, and past `stop.mostInARow` it lets the turn go.
+- A clean read or a let-go turn starts the count again.
+
+The limit is the tooth's own, so the gate holds no turn without end. Each stop
+of the session's own runs Vale over the answer once.
 
 ## A note reads clean first
 
@@ -1763,3 +1784,23 @@ still stand. What falls is the check on the agent. The line reads `god mode
 lets the refusal of Write through`, and names the reason it lets through. A
 demand paid by nothing stands until the turn's end, which pays it as ever.
 
+# The wait returns on signals
+
+`mcp__level0__wait` returns on the first signal the table below names, and at
+its cap where none comes. A hand asks it where it writes a loop of sleeps today.
+
+| the field | the signal |
+|---|---|
+| `agent` | the helper's report stands on the box |
+| `output` | the file stands quiet past `wait.quiet`, or the process `pid` names exits |
+| `files` | every named file stands quiet past `wait.quiet` |
+
+A helper's stop is its report. `helperReports` in `src/bridge/wait.js` writes
+a `report` row to the log with the helper's `agentId`, and keeps the id on the
+box for the wait. A file stands quiet while its size and its stamp hold, and
+the span counts from the last change the wait sees. The process door's
+`alive` reads a process's end off its number.
+
+`wait.most` in `spec/config/level0.json` caps the wait in seconds. The wait
+looks at its signals once a second, and the clock decides the rest, so a case
+drives it on the fake clock.

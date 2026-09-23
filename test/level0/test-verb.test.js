@@ -64,7 +64,11 @@ test("a named test file runs under the check's spawn tally, and a named Go folde
   const [node, go] = it.proc.ran;
   assert.equal(node.init.env?.SE_SPAWNS, TALLY, "the file run takes the tally");
   assert.deepEqual(go.argv, ["go", "-C", "src/index", "test", "./..."]);
-  assert.match(String(go.init.env?.GOFLAGS), /sqlite_fts5/, "the Go run takes the Go env");
+  assert.match(
+    String(go.init.env?.GOFLAGS),
+    /sqlite_fts5/,
+    "the Go run takes the Go env",
+  );
 });
 
 // [[spec/design_output/pull#the-test-verb]]

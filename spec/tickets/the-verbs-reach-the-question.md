@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -120,6 +120,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: ed42b5cb63e88ea172fa50729a56a375747762b1
+    hash_after: ed42b5cb63e88ea172fa50729a56a375747762b1
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -288,11 +296,17 @@ A second surprise: `runsFind` stands with no case in `search-door.test.js`, so t
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/search.js spec/config/level0.json spec/config/level0.schema.json src/bridge/answer-read.js src/bridge/search.js src/bridge/server.js src/bridge/tools.js src/bridge/wait.js src/doors/proc.js src/doors/fake/proc.js src/scripts/cli-read.js src/scripts/cli.js src/scripts/log-verb.js src/scripts/work-test.js test/contract/cli-verbs.test.js test/contract/proc.test.js test/level0/answer-read.test.js test/level0/log-verb.test.js test/level0/search-door.test.js test/level0/test-verb.test.js test/level0/wait.test.js test/level0/cli-read.test.js spec/design_output/level0.md spec/design_output/index.md spec/design_output/lsp.md spec/design_output/pull.md spec/design_output/log.md .claude/commands/se-config-wait-most.md .claude/commands/se-config-wait-quiet.md
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, the process door for `alive`, the config pair and the design notes.
+- the process door takes `alive`, and its fake answers off a set of numbers a case fills.
+- each new function points at a section of `spec/design_output`, and each section names the approach.
 
 ## tests-green
 

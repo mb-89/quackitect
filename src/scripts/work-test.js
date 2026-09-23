@@ -4,17 +4,16 @@
 
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
-import { goEnvOf } from "./cli-go.js";
 import { recordIn } from "../engine/group.js";
+import { goEnvOf } from "./cli-go.js";
 import { changedFiles, handOf, holdOf } from "./pull.js";
 
 const CUT_ERROR = 160;
 
-export function testVerb(it, argv) {
+// The env is the check's own, so a named run tallies its spawns the way the battery does. [[spec/design_output/pull#the-test-verb]]
+export function testVerb(it, argv, env = {}) {
   const named = (argv ?? []).slice(1).filter((one) => !one.startsWith("--"));
-  const hand = handOf(it);
-  const held = holdOf(it, hand);
-  const since = sinceOf(it, held);
+  const since = named.length ? "" : sinceOf(it, holdOf(it, handOf(it)));
   const changed = named.length ? named : changedFiles(it, since);
   const files = changed.filter((path) => /\.test\.js$/.test(path));
   // A branch changing a Go test names its module, and the verb runs that too. [[spec/design_output/pull#the-test-verb]]
@@ -31,7 +30,7 @@ export function testVerb(it, argv) {
   if (files.length) {
     const ran = it.proc.run(
       [it.node ?? "node", "--test", "--test-reporter=tap", ...files],
-      { cwd: it.root },
+      { cwd: it.root, env },
     );
     said.push(testSays(ran, files));
   }
@@ -40,7 +39,7 @@ export function testVerb(it, argv) {
       goSays(
         it.proc.run(["go", "-C", one, "test", "./..."], {
           cwd: it.root,
-          env: goEnvOf(it),
+          env: { ...env, ...goEnvOf(it) },
         }),
         one,
       ),
@@ -52,16 +51,22 @@ export function testVerb(it, argv) {
   return bad ? 1 : 0;
 }
 
-// A changed test names the module holding it, which is the nearest folder above it carrying a go.mod. A handle reads that folder, because a module stands any depth under src. [[spec/design_output/pull#the-test-verb]]
+// A changed test names the module holding it, which is the nearest folder above it carrying a go.mod. A handle reads that folder, because a module stands any depth under src. A named folder names the module at or above it. [[spec/design_output/pull#the-test-verb]]
 export function goModulesOf(paths, it) {
   const out = new Set();
   for (const path of paths ?? []) {
-    const said = String(path);
-    if (!/^src\/.*_test\.go$/.test(said)) continue;
-    const found = moduleOver(said, it);
+    const said = String(path).replace(/\/+$/, "");
+    const test = /^src\/.*_test\.go$/.test(said);
+    if (!test && !isFolder(said)) continue;
+    const found = moduleOver(test ? said : `${said}/`, it);
     if (found) out.add(found);
   }
   return [...out];
+}
+
+// A folder under src carries no extension on its last name. [[spec/design_output/pull#the-test-verb]]
+function isFolder(path) {
+  return /^src\/[^.]*$/.test(path);
 }
 
 // The folders above a path, nearest first, down to the one under src. [[spec/tickets/an-engine-takes-bridge-work]]
@@ -69,7 +74,8 @@ function moduleOver(path, it) {
   const parts = path.split("/").slice(0, -1);
   while (parts.length > 1) {
     const folder = parts.join("/");
-    if (!it?.disk || it.disk.exists(it.join(it.root, ...parts, "go.mod"))) return folder;
+    if (!it?.disk || it.disk.exists(it.join(it.root, ...parts, "go.mod")))
+      return folder;
     parts.pop();
   }
   return "";
