@@ -169,9 +169,11 @@ current one alone.
 | `--since <span>` | the rows whose stamp falls inside the span | `spanOf`, under `src/scripts/group.js` |
 | `--level <name>` | the rows at that level and above | `writes` and `rank` |
 | `--kind <name>` | the rows of that kind | the row's own field |
+| `--words <text>` | the rows carrying every word, in any case | `carrying` |
 | `--last <count>` | the last rows, after every filter above | the verb itself |
 
-`src/scripts/log-read.js` owns the read over the session file and the rotated
+`./RUNME.sh find --log <words>` hands its words to this verb, because the index
+walks no log. `src/scripts/log-read.js` owns the read over the session file and the rotated
 ones, and `tui --plain` calls the same one. The verb narrows what that read
 answers, and prints each row through `asRow`.
 

@@ -54,7 +54,7 @@ func folders(root, from string, eyes *fsnotify.Watcher) error {
 			return nil
 		}
 		// The walk still reads the log, and the next sweep carries what it holds. [[spec/design_output/index#the-watcher-keeps-it-warm]]
-		if skips(root, abs, info) || logs(root, abs) {
+		if skips(root, abs, info) {
 			return filepath.SkipDir
 		}
 		return eyes.Add(abs)

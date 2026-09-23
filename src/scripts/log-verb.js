@@ -5,6 +5,7 @@
 import {
   asRow,
   atLevel,
+  carrying,
   filesFor,
   lastOf,
   NO_LOG,
@@ -18,6 +19,7 @@ const USAGE = [
   "  --since <span>  the rows stamped inside the span, as 10m, 2h or 3d",
   "  --level <name>  the rows at that level and above",
   "  --kind <name>   the rows of that kind",
+  "  --words <text>  the rows carrying every word, in any case",
   "  --last <count>  the last rows, after every filter above",
 ];
 
@@ -44,9 +46,12 @@ export function logVerb(it, argv) {
 export function narrowed(rows, argv, now) {
   const said = argv ?? [];
   return lastOf(
-    ofKind(
-      atLevel(within(rows, flagOf(said, "--since"), now), flagOf(said, "--level")),
-      flagOf(said, "--kind"),
+    carrying(
+      ofKind(
+        atLevel(within(rows, flagOf(said, "--since"), now), flagOf(said, "--level")),
+        flagOf(said, "--kind"),
+      ),
+      flagOf(said, "--words"),
     ),
     flagOf(said, "--last"),
   );

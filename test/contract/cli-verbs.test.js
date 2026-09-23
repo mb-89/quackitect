@@ -37,3 +37,12 @@ test("every verb in the table says what it does", () => {
     assert.ok(saysOf(verb).length > 0, `${verb} says something`);
   }
 });
+
+// The index walks no log, so the find verb hands a log search to the log verb and every other search to the index. [[spec/design_output/log#one-verb-reads-the-log]]
+test("the find verb reads the log through the log verb, and the tree through the index", () => {
+  const row = /^ {2}find: \{[\s\S]*?^ {2}\},/m.exec(source)?.[0] ?? "";
+  assert.match(saysOf("find"), /--log/);
+  assert.match(row, /rest\.includes\("--log"\)/);
+  assert.match(row, /logVerb\(tuiDoors\(\), \[\s*"--words"/);
+  assert.match(row, /asksIndex\(\["find", \.\.\.rest\]\)/);
+});

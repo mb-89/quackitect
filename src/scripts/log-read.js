@@ -39,6 +39,19 @@ export function ofKind(rows, kind) {
   return rows.filter((one) => String(one.kind) === String(kind));
 }
 
+// The rows carrying every word, in any case, anywhere in a row, which `find --log` asks for. [[spec/design_output/log#one-verb-reads-the-log]]
+export function carrying(rows, words) {
+  const wanted = String(words ?? "")
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!wanted.length) return rows;
+  return rows.filter((one) => {
+    const text = JSON.stringify(one).toLowerCase();
+    return wanted.every((word) => text.includes(word));
+  });
+}
+
 // [[spec/design_output/log#one-verb-reads-the-log]]
 export function lastOf(rows, count) {
   const many = Number(count);

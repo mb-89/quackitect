@@ -5,6 +5,7 @@ package main
 
 import (
 	"database/sql"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
@@ -74,25 +75,35 @@ func TestTheWalkSkipsTheRuntimeHalfAndNothingElseUnderThePrivateFolder(t *testin
 	}
 }
 
-// The log grows a line a door call, so no watch stands on it. [[spec/design_output/index#the-watcher-keeps-it-warm]]
-func TestTheWatchStandsOffTheLogAndTheWalkStillReadsIt(t *testing.T) {
+// The log holds no part of the tree, so the walk, the watch and a change all stand off it. [[spec/design_output/index#the-rows-the-walk-writes]]
+func TestTheWalkAndTheWatchStandOffTheLog(t *testing.T) {
 	root := tree(t)
 	write(t, root, ".se/.log/session.jsonl", "{\"said\":\"a line a door call\"}\n")
 	db := opened(t, root)
 
-	if !logs(root, filepath.Join(root, ".se", ".log")) {
-		t.Fatal("the watch stands on the log, so every line sweeps the tree")
+	folder := func(rel string) fs.FileInfo {
+		info, err := os.Stat(filepath.Join(root, filepath.FromSlash(rel)))
+		if err != nil {
+			t.Fatal(err)
+		}
+		return info
 	}
-	if logs(root, filepath.Join(root, ".se", "tickets")) {
-		t.Fatal("the watch stands off the tickets, so a write there reaches nobody")
+	if !skips(root, filepath.Join(root, ".se", ".log"), folder(".se/.log")) {
+		t.Fatal("the walk stands on the log")
+	}
+	if skips(root, filepath.Join(root, ".se", "tickets"), folder(".se/tickets")) {
+		t.Fatal("the walk stands off the tickets, so a private note reaches no find")
+	}
+	if !outside(".se/.log/session.jsonl") {
+		t.Fatal("a change naming the log moves rows")
 	}
 
 	var count int
 	if err := db.QueryRow(
-		`SELECT count(*) FROM file WHERE path = '.se/.log/session.jsonl'`).Scan(&count); err != nil {
+		`SELECT count(*) FROM file WHERE path LIKE '.se/.log/%'`).Scan(&count); err != nil {
 		t.Fatal(err)
 	}
-	if count != 1 {
+	if count != 0 {
 		t.Fatalf("the walk answers %d row(s) for the log", count)
 	}
 }

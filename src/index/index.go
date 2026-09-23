@@ -64,7 +64,7 @@ const Runtime = ".se/.runtime"
 // The retro half holds each retro's input, an archive of transcripts a walk reads for nothing. folders.js owns the name, spelled again here because a Go module imports no JavaScript. [[spec/guidance/retro/collect]]
 const Retro = ".se/.retro"
 
-// The log grows a line a door call, so a watch on it sweeps the tree for nothing. [[spec/design_output/index#the-watcher-keeps-it-warm]]
+// The log grows a line a door call and holds no part of the tree, so the walk and the watch both stand off it, and `find --log` reads the file. [[spec/design_output/index#the-rows-the-walk-writes]]
 const Log = ".se/.log"
 
 func skips(root, abs string, info fs.FileInfo) bool {
@@ -72,13 +72,7 @@ func skips(root, abs string, info fs.FileInfo) bool {
 		return true
 	}
 	rel, ok := relOf(root, abs)
-	return ok && (rel == Runtime || rel == Retro)
-}
-
-// [[spec/design_output/index#the-watcher-keeps-it-warm]]
-func logs(root, abs string) bool {
-	rel, ok := relOf(root, abs)
-	return ok && rel == Log
+	return ok && (rel == Runtime || rel == Retro || rel == Log)
 }
 
 func Open(root, at string) (*sql.DB, error) {

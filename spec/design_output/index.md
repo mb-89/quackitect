@@ -103,9 +103,9 @@ The watch is what holds the rows level with the tree. It watches every folder
 the walk covers, and names each path a write reaches. For what the door does
 with a path, see [[spec/design_output/index#a-change-moves-its-rows]].
 
-The log is the one folder the watch stands off. It grows a line a door call, so
-a watch on it moves rows for nothing. The sweep still reads it, and carries what
-it holds.
+The log holds no part of the tree, and grows a line a door call. So the walk
+and the watch both stand off it, and a search of the log reads the file. For
+how, see [[spec/design_output/log#one-verb-reads-the-log]].
 
 A box where no watch stands still answers, out of the sweep the door makes on
 the way up and on its clock.

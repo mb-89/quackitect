@@ -244,7 +244,7 @@ func outside(rel string) bool {
 			return true
 		}
 	}
-	for _, folder := range []string{Runtime, Retro} {
+	for _, folder := range []string{Runtime, Retro, Log} {
 		if rel == folder || strings.HasPrefix(rel, folder+"/") {
 			return true
 		}
