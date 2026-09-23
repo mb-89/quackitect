@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -121,6 +121,10 @@ record:
     hash_after: eaf13f7b84341b014b6f36e6c2e4be4a6754f19c
     returns: 3
     why: "Design: `hunksIn` keeps the last `+++ b/` file through a deleted file's hunk.; A deleted file ends its header with `+++ /dev/null`, and that line sets no file.; Its removed code then lands under the file above it, and that file asks a test.; A comment fix beside a deleted module then refuses, and the ask says it passes.; Fix: name in the `hunksIn` row that each `diff --git` line resets the file.; Fix: add a case with a comment fix and a deleted module, and assert the fix passes.; Craft: skip `--- a/` and `--- /dev/null` alone, so a removed `--x` line still reads.; The earlier findings stand answered: the removed lines, the trade case and the `---` header.; The rest stands: the callers, the note, and `names` over the added lines."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: e2529c35c999debb19ef048793fd6e168f951879
+    hash_after: e2529c35c999debb19ef048793fd6e168f951879
 ---
 
 # Ask
@@ -157,12 +161,16 @@ the removed lines too.
 
 | part | what changes |
 |---|---|
-| `hunksIn` | keeps each file's removed lines beside its added ones, as `{ added, removed }`, and skips a `---` header the way it skips `+++` |
+| `hunksIn` | keeps each file's removed lines beside its added ones, as `{ added, removed }` |
+| the file | each `diff --git a/<x> b/<y>` line opens a file, named `<y>`, or `<x>` where the header says `deleted file` |
+| the content | a `+` or `-` line counts only past an `@@` line of that file, so no header line reads as content |
 | `codeIn` | a hunk asks for a test where a line either side is code, or where it adds nothing and takes code away |
 | `names` | reads the added lines of a test, as before |
 | the comment-only case | a comment traded for a comment passes, the way a pointer fix trades one |
 | the mixed cases | a code line added beside a comment refuses, and a code line traded for a comment refuses |
 | the header case | a comment-only delta over two files passes, so the second file's `--- a/` line reads for neither |
+| the deleted case | a comment-only fix staged beside a deleted module asks a test for the module alone |
+| the content case | a removed line reading `--x` inside a hunk counts as code |
 | the note | `spec/design_output/tree#the-rules-over-two-files` names the removed lines beside the added |
 
 The callers of `untestedIn` read its list of files alone, so they change nothing:
