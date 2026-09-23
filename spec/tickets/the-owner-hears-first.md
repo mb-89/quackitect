@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -105,6 +105,10 @@ record:
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 2db4e444b176510a03e2ee752d1e9832e917a0cc
     hash_after: 2db4e444b176510a03e2ee752d1e9832e917a0cc
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-4
+    hash_before: a99c8debed32dbef9e0ee6f1792518ba9d6caeab
+    hash_after: a99c8debed32dbef9e0ee6f1792518ba9d6caeab
 ---
 
 # Ask
@@ -181,16 +185,14 @@ The cost: a hand calling a tool before it writes the reply meets a refusal, writ
 
 <!-- the form is verdict -->
 
-fail
-- design: two new actionables lift `spec/guidance/working.md` to seventeen rules, past the cap of fifteen.
-- design: `VoiceShape.GuidanceCap` then refuses the note, and `./RUNME.sh check` fails.
-- design: fold the question row into rule 6 and the log line into rule 4, and the cap holds.
-- craft: `Number(skips) || 1` turns 0 into 1, so `demands` needs more than a lower floor.
-- craft: `answer-door.test.js` and `note-answer.test.js` assert the first call passes, and the approach leaves both out.
-- craft: the chapter "The first call is free" in `spec/design_output/level0.md` needs a rewrite too.
-- craft: the stated cost misses the refusal, since a hand calling a tool first sees that call refused.
-- craft: the ask door keeps its grace, because `grace.update` stands at 5.
-- craft: `onAgent` also meets a helper's own Agent call, so the approach says what a helper gets.
+pass
+- design: rules 2 and 4 take the two lines, so the note keeps fifteen rules and the cap holds.
+- design: the prompt demand opens with no skip, so the first call asks the bridgehead for the reply.
+- design: `onAgent` in `TOOLS` meets the call after `holdsForAnswer`, so both gates stand.
+- craft: `ask.js` passes the raw config read, so the approach names where the floor of 1 stands.
+- craft: `asksForUpdate` runs first and can replace an open prompt demand with the grace of 5.
+- craft: the chapter "A helper ends no turn" says a helper gets no gate, and the Agent gate changes that.
+- craft: the approach names the field `onAgent` reads, and a flat `e?.run_in_background` fits `bash.js`.
 
 # implement
 
