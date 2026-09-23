@@ -4,8 +4,9 @@
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
 
 const FOLDERS = ["spec/tickets", ".se/tickets"];
-// The hold folder of [[spec/design_output/pull#the-hand-and-the-hold]], spelled again here because the extension bundles alone.
+// The hold folder of [[spec/design_output/pull#the-hand-and-the-hold]], owned by .claude/skills/level0/lib/folders.js and spelled again here because the extension bundles alone.
 const HOLDS = ".se/.runtime/hold";
+// The one-hand hold file, which folders.js owns beside the hold folder. [[spec/design_output/pull#the-hand-and-the-hold]]
 const HOLD = ".se/.runtime/hold.json";
 const CLI = "src/scripts/cli.js";
 const COMMAND = "quackitect.ticket";

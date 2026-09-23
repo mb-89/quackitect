@@ -249,21 +249,32 @@ test("a claim of done holds while the plan holds a todo or a thing in hand", () 
 
 // A refusal names the check that falls and what it sees, so a stop line standing whole hears no claim of a missing reason. [[spec/design_output/stop#a-refusal-names-its-check]]
 test("a claim of done over a thing in hand hears the check and the thing, at the call and at the turn's end", () => {
-  const plan = { [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "the door", todos: [] }) };
+  const plan = {
+    [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "the door", todos: [] }),
+  };
   const busy = box(plan);
   const block = onStop(
     { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" },
     busy.box,
   ).result.block;
-  assert.match(block, /check the-plan-is-empty answers false: the plan still holds "the door"/);
+  assert.match(
+    block,
+    /check the-plan-is-empty answers false: the plan still holds "the door"/,
+  );
   assert.doesNotMatch(block, /names no stop reason/);
 
   const called = box(plan);
   const refused = TOOLS[STOP_CALL]({ reason: "the-work-stands-complete" }, called.box);
   assert.match(refused.result.result, /^The claim falls\. .*"the door".*under done/);
-  assert.equal(called.box.claim, undefined, "a claim that falls stands nowhere for the turn's end");
+  assert.equal(
+    called.box.claim,
+    undefined,
+    "a claim that falls stands nowhere for the turn's end",
+  );
 
-  const clear = box({ [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [] }) });
+  const clear = box({
+    [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [] }),
+  });
   assert.match(
     TOOLS[STOP_CALL]({ reason: "the-work-stands-complete" }, clear.box).result.result,
     /^The claim stands/,
@@ -271,8 +282,10 @@ test("a claim of done over a thing in hand hears the check and the thing, at the
 });
 
 test("a line naming a reason nobody holds hears that, and a turn with no line hears the plain rule", () => {
-  const block = onStop({ last_assistant_message: "Done.\n\nstop: the-moon-is-full" }, box().box).result
-    .block;
+  const block = onStop(
+    { last_assistant_message: "Done.\n\nstop: the-moon-is-full" },
+    box().box,
+  ).result.block;
   assert.match(block, /claims the-moon-is-full, which names no reason this tree holds/);
   const bare = onStop({ last_assistant_message: "Done." }, box().box).result.block;
   assert.match(bare, /^The last line names no stop reason/);
@@ -586,5 +599,8 @@ test("a session bound to the queue holds its turn while a helper runs, and takes
 test("the claim holds nothing once every helper has answered", () => {
   const it = helperBox("unbound");
   const said = onStop(waiting("completed"), it.box);
-  assert.match(said.result.block, /names no stop reason/);
+  assert.match(
+    said.result.block,
+    /helpers-running answers false: the harness names no helper running/,
+  );
 });
