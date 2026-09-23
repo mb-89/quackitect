@@ -72,7 +72,11 @@ func sweep(db *sql.DB, root string, tracked func(rel string) bool) (int, int, er
 			moved++
 		}
 	}
-	return count, moved, closes(tx, moved)
+	// A whole sweep resolves every link, so a resolver that learns an ending reaches the rows no file moved. [[spec/design_output/index#a-change-moves-its-rows]]
+	if err := resolve(tx); err != nil {
+		return 0, 0, err
+	}
+	return count, moved, tx.Commit()
 }
 
 // The rows of the paths a change names: a file writes again, a path standing nowhere takes every row under it along, and a new folder walks. It answers the paths whose rows moved. [[spec/design_output/index#a-change-moves-its-rows]]

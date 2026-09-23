@@ -8,11 +8,14 @@ go 1.24
 
 require (
 	quackitect/config v0.0.0
+	quackitect/pointer v0.0.0
 	quackitect/swap v0.0.0
 	quackitect/yaml v0.0.0
 )
 
 replace quackitect/config => ../config
+
+replace quackitect/pointer => ../pointer
 
 replace quackitect/swap => ../engine/swap
 

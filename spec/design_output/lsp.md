@@ -282,10 +282,8 @@ A target carrying `<` or `>` is a shape a document spells out, and one carrying
 a quote or a bracket is a script guarding the shape. Neither reads as a pointer.
 
 A pointer resolves the way the index resolves a link, and then one step
-further. The file is the exact path, the path with `.md`, `.yaml` or `.yml` on
-the end, a note's id, or a folder, in that order. The index tries `.md`
-alone, and a ticket names its process with the ending off, so this rule tries
-the two a process file wears. A chapter after `#` names a
+further. For the order, see [[spec/design_output/index#a-note-and-its-links]].
+A chapter after `#` names a
 heading of that note by its slug. A chapter of a file holding no headings
 resolves nowhere. For the slug, see [[spec/design_output/vocabulary#the-slug-reads-one-source]].
 

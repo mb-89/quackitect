@@ -333,10 +333,12 @@ A note is a markdown file carrying frontmatter fenced by rulers. Its keys
 land in `note`, its body lands in the full-text table, and every bracketed name
 in the frontmatter or the body lands in `link`.
 
-A link resolves against the things below, in this order. The file at that exact
-path comes first, then the same path with `.md` on the end. Then the note whose
-`id` matches, and last the folder of that name. An anchor after a `#` drops
-before any of it.
+A link resolves against the things below, in this order. The file comes first,
+at the path as written or with an ending `Endings` in `src/pointer` names on
+the end: `.md`, then `.yaml`, then `.yml`. Then the note whose `id` matches,
+and last the folder of that name. An anchor after a `#` drops before any of it.
+A ticket names its process with the ending off, and the language server reads
+the same list, so both read one pointer the same way.
 
 Some kinds of bracket stay out of `link`. The `kind` key names a taxonomy and no
 file, and a target carrying `<` or `>` is a shape a document spells out. Both

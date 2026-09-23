@@ -16,3 +16,7 @@ require golang.org/x/sys v0.13.0 // indirect
 require quackitect/swap v0.0.0
 
 replace quackitect/swap => ../engine/swap
+
+require quackitect/pointer v0.0.0
+
+replace quackitect/pointer => ../pointer

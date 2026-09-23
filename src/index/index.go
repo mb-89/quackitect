@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3" // the real SQLite, through cgo, so FTS5 answers
+	"quackitect/pointer"
 )
 
 const shape = `
@@ -281,8 +282,9 @@ func pointsAt(target string, ids, paths, folders map[string]string) string {
 		return ""
 	}
 
-	for _, said := range []string{name, name + ".md"} {
-		if at, ok := paths[said]; ok {
+	// A ticket names its process with the ending off, so the resolver tries the endings the language server tries. [[spec/design_output/index#a-note-and-its-links]]
+	for _, ending := range pointer.Endings {
+		if at, ok := paths[name+ending]; ok {
 			return at
 		}
 	}

@@ -211,6 +211,32 @@ func TestALinkNamesTheNoteItReaches(t *testing.T) {
 	}
 }
 
+// A ticket names its process with the ending off, and the link reaches the yaml file. [[spec/design_output/index#a-note-and-its-links]]
+func TestAPointerWithTheEndingOffReachesAProcessFile(t *testing.T) {
+	root := tree(t)
+	write(t, root, "spec/processes/trivial.yaml", "kind: process\nsteps: []\n")
+	write(t, root, "spec/tickets/one.md", "---\nkind: ticket\nprocess: [[spec/processes/trivial]]\n---\n\n# Ask\n")
+	db := opened(t, root)
+
+	var to string
+	if err := db.QueryRow(
+		`SELECT to_path FROM link WHERE from_path = 'spec/tickets/one.md' AND target = 'spec/processes/trivial'`).Scan(&to); err != nil {
+		t.Fatal(err)
+	}
+	if to != "spec/processes/trivial.yaml" {
+		t.Fatalf("the process pointer reaches %q", to)
+	}
+	rows, err := Dangling(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, one := range rows {
+		if one.Target == "spec/processes/trivial" {
+			t.Fatal("the links verb names the process pointer dead")
+		}
+	}
+}
+
 func TestALinkNamingNothingDangles(t *testing.T) {
 	root := tree(t)
 	db := opened(t, root)

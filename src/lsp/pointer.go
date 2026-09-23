@@ -5,6 +5,7 @@
 package main
 
 import (
+	"quackitect/pointer"
 	"quackitect/yaml"
 
 	"regexp"
@@ -24,7 +25,7 @@ var (
 )
 
 // The endings a pointer leaves off, in the order the index tries them. [[spec/design_output/index#a-note-and-its-links]]
-var pointerEndings = []string{"", ".md", ".yaml", ".yml"}
+var pointerEndings = pointer.Endings
 
 const sniffBytes = 8000
 

@@ -56,11 +56,15 @@ both. For details, see [[spec/design_output/index#a-note-and-its-links]] and
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test src/index/index_test.go src/pointer/pointer_test.go
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -68,11 +72,22 @@ both. For details, see [[spec/design_output/index#a-note-and-its-links]] and
 
 <!-- the form is text -->
 
+A new module, `src/pointer`, holds `Endings`: the path as written, then `.md`,
+`.yaml` and `.yml`. The index's `pointsAt` and the language server's pointer
+rule both import it, so one list answers both. A whole sweep of the index now
+resolves every link, so a resolver that learns an ending reaches the rows no
+file moved. `./RUNME.sh links` names no process pointer after a reindex, where
+it named every one.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask, with the shared module its last sentence names
+- the cleanup: a whole sweep resolves every link, so a stale dead link leaves
+- one place: `Endings` in `src/pointer` holds the list, and both notes point at the index chapter
 
 # Discussion
 
