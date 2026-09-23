@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -100,6 +100,10 @@ record:
     hash_after: f8399f297b77c05f6b11b20af2cb5cc81d57a959
     returns: 1
     why: "Design: `pull` returns its exit at once, and `heldOver` waits on the Vale door's `lint`. The approach names no bridge.; Name one road in the approach, and its cost.; The first road makes `pull` wait, and `work.js`, `retro-new.js` and the pull tests wait on it.; The second road keeps `voiceFaults` returning at once, and calls the pieces `heldOver` puts together.; Those pieces are the config `assemble` writes, `withoutFalsePast` and `unreasoned`.; The level and the case match the ask. The semicolon rule `Characters` stands at warning.; Outside the ask, `askFaults` in `ticket-ask-lint.js` keeps the same error filter. Park it on a ticket of its own."
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 082f659ecaa2e66253b7ccc773a15bfc7607d4fa
+    hash_after: 082f659ecaa2e66253b7ccc773a15bfc7607d4fa
 ---
 
 # Ask
@@ -132,17 +136,22 @@ reader over it costs less than two readers disagreeing. For details, see
 
 `voiceFaults` in `src/scripts/pull-chapter.js` runs raw Vale over the leaf's
 prose and keeps the errors alone. The lint reads a buffer through `heldOver` in
-`src/bridge/findings.js`, which runs Vale through the tense reader and the code
-faults, and names every warning.
+`src/bridge/findings.js`, which awaits the Vale door's `lint`, then runs the
+tense reader and names every warning. The pull answers at once, so it awaits
+nothing. The road: one reading both sides call, and each runs Vale its own way.
 
 | part | what changes |
 |---|---|
-| the reader | `voiceFaults` hands the chapter text to `heldOver` at the ticket's own path, through the Vale door's `lint` |
+| the reading | `readsProse(body, at, found)` in `findings.js` takes Vale's rows, runs `withoutFalsePast` and marks `unreasoned`, and answers the findings |
+| the lint | `heldOver` awaits `lint`, then calls `readsProse` |
+| the pull | `voiceFaults` runs Vale at once, on the config `assemble` writes, then calls `readsProse` |
 | the level | a finding at error or at warning refuses the hand-back, and names its rule and its line |
-| the case | a verdict carrying a semicolon comes back refused, and the same text passes the lint once mended |
-| the note | the chapter in `spec/design_output/pull.md` names the one reader and the level |
+| the case | a verdict carrying a semicolon comes back refused, and the lint names the same line |
 
-So the push door meets no warning a hand-back wrote, and one reader holds both.
+- the cost: two runners of Vale stand, one for the server and one for the command line
+- what stays one: the rules, the config and the reading, which is what the ask names
+- the road left: a `pull` that awaits changes `work.js`, `retro-new.js` and every pull test
+- outside the ask: `askFaults` keeps the same error filter, and a note of its own carries it
 
 ## review
 
