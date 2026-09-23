@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -116,6 +116,17 @@ record:
     hash_after: 80ff34d908a17529b8205be3ac769293bb708dbb
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: f39ee869ec154ebccbecaf6b2e97a0a0fff8b4a4
+    hash_after: f39ee869ec154ebccbecaf6b2e97a0a0fff8b4a4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 30 test(s) pass in 4 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -280,11 +291,15 @@ Seven cases fail on their own assertion, and each names what it waits for.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/stop-binding.test.js test/level0/stop-helper.test.js test/level0/pull-leaves.test.js test/level0/retro-new.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -292,11 +307,24 @@ Seven cases fail on their own assertion, and each names what it waits for.
 
 <!-- the form is text -->
 
+A stop refusal now says the binding, and the queue stops pulling against the session's own work.
+
+- A refusal ends on a line naming the binding, the file that sets it, and a moment.
+- `whereFrom` reads the local file, then the tracked file, the same layers `asks` reads.
+- The moment lives in the box, so a restart of the server loses it.
+- A named pull under `queue` passes where the name equals `it.minted`.
+- `retro new` sets `minted` to its retro, so it takes the retro under `queue`.
+- A running helper ends the turn under every binding, and its answer wakes the session.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the diff holds the named files, `binding.js`, and their cases.
+- every door the change reaches has a fake: the cases drive the fake disk, clock, proc and git.
+- a comment names the approach the change implements: each new line points at a design note heading.
 
 # verdict
 
