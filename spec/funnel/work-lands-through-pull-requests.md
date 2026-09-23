@@ -81,8 +81,8 @@ The events carry the work, and a clock catches a branch no event reaches again:
 
 Each firing of the clock starts a session and counts against the daily cap,
 with or without a branch to take. So the clock fires once a day once the events
-carry the load, and a stranded branch waits a day at most. Whether the clock
-earns even that stands open, and the log of the first weeks answers it.
+carry the load, and a stranded branch waits a day at most. The clock stays on,
+and most days it finds nothing to take.
 
 # Review runs in the cloud
 
@@ -98,13 +98,29 @@ unchecked. The label is the event the platform names, so the label carries it.
 
 The review answers once, and hands the branch to the owner. A review asking a
 box for changes starts a box, the box starts a review, and that loop runs with
-no person in it. So the report carries a verdict, and no verdict reopens work:
+no person in it. So the report carries a verdict, and two of the three reopen
+no work:
 
 | verdict | what it says | what follows |
 |---|---|---|
 | as is | the branch does what its ask says | the owner merges |
 | passed with findings | the branch does its ask, and leaves findings worth a later hand | each finding stands as a ticket on the branch, and the owner merges |
-| refused | the branch breaks its ask, or breaks trunk | the owner closes the pull request unmerged, and opens a new group where the ask still stands |
+| refused | the branch breaks its ask, or breaks trunk | the branch goes back to a box once, as the next chapter says |
+
+# A refusal goes back once
+
+A refused branch stays open, and a box tries it again. This stays rare, since a
+box hands back a branch on a green check.
+
+| step | what happens |
+|---|---|
+| the review refuses | the report names what breaks, and the pull request turns back to a draft |
+| a box takes the branch | it reads the refusal beside the ask, and works on the same branch |
+| the box hands back | the label fires a second review |
+| the second review refuses too | the owner closes the pull request unmerged, and the branch goes back to no box |
+
+A branch goes back once, so the loop ends at the second refusal. The owner
+then opens a new group where the ask still stands.
 
 A finding lands as a ticket the review mints and commits onto the branch, so it
 reaches trunk with the merge and waits there free. The review adds no commit
@@ -116,7 +132,7 @@ A pull request closes with or without a merge, and neither loses a commit:
 
 | the step | what stays |
 |---|---|
-| the owner closes a refused pull request | the branch, since GitHub deletes a head at a merge alone |
+| the owner closes a pull request refused twice | the branch, since GitHub deletes a head at a merge alone |
 | a person deletes that branch later | `refs/pull/<n>/head` on origin, which holds the pull request's last commit |
 | the group's tickets | trunk, since the refused branch frees nothing there |
 
@@ -203,5 +219,5 @@ for it. So the scheduled workflow, and no setting, clears those.
 
 - Whether GitHub opens a pull request over a commit changing no file. Where `branch open` commits the ticket hangs on it.
 - Whether trunk takes protection, and whether the owner keeps a bypass. A desk's small fix hangs on it.
-- Whether the daily clock stays once the events run. The wait for a stranded branch hangs on it.
+- Whether a refused branch goes back to a box, or closes at the first refusal. The owner weighs it, and the chapter on a refusal hangs on it.
 - Whether `branch merge` stays for a merge with no network. Two roads onto trunk hang on it.
