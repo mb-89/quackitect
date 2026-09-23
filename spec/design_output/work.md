@@ -72,7 +72,9 @@ naming one of them. The ask says what the group adds up to.
 `step` is the leaf the group stands on, `hand` names the box out of
 `.se/.runtime/identity.json`, and `hash_before` is the branch tip at the claim. The push decides:
 boxes reaching for one group mean one of them meets a rejected push and
-takes the next.
+takes the next. That box resets the branch to its remote, so its claim leaves
+the box and the next take meets no commit origin lacks. A claim the commit
+refuses leaves the ticket as the take finds it, and the take stops.
 
 The take reads the group before it writes that entry, through the same line
 `branch done` reads. A group whose open children hold no step a hand can take

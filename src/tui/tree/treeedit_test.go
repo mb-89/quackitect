@@ -4,6 +4,7 @@
 package tree
 
 import (
+	"slices"
 	"strings"
 	"testing"
 
@@ -19,6 +20,13 @@ func (s states) Takes(key string) []string {
 		return s.allowed
 	}
 	return nil
+}
+
+func (s states) Weighs(key, said string) string {
+	if key != "state" || len(s.allowed) == 0 || slices.Contains(s.allowed, said) {
+		return ""
+	}
+	return "state takes " + strings.Join(s.allowed, ", ")
 }
 
 func typeInto(view *Tree, said string) {
@@ -130,6 +138,35 @@ func TestARowWhoseSchemaRefusesTheValueKeepsTheOneItCarries(t *testing.T) {
 	}
 	if got := view.Items[0].Kids[0].Keys["state"]; got != "closed" {
 		t.Fatalf("the row keeps the value it carries, and holds %q", got)
+	}
+	if view.Refused() != "state takes open, closed" {
+		t.Fatalf("the view keeps the schema's reason, and reads %q", view.Refused())
+	}
+	view.Open(1)
+	clear(view)
+	typeInto(view, "open")
+	if left := view.Take(); len(left) != 0 || view.Refused() != "" {
+		t.Fatalf("a value the schema takes leaves no row and no reason, and leaves %v, %q", left, view.Refused())
+	}
+}
+
+// [[spec/design_output/tree-view#the-completion-knows-the-field]]
+func TestTabTakesTheFirstValueTheCompletionOffers(t *testing.T) {
+	t.Parallel()
+	view := tickets()
+	view.Schema = states{allowed: []string{"open", "closed", "dropped"}}
+	view.Open(1)
+	clear(view)
+	typeInto(view, "cl")
+	view.Complete()
+	if view.Typed() != "closed" {
+		t.Fatalf("the completion takes the line, and it holds %q", view.Typed())
+	}
+	clear(view)
+	typeInto(view, "zzz")
+	view.Complete()
+	if view.Typed() != "zzz" {
+		t.Fatalf("an empty offer leaves the line as typed, and it holds %q", view.Typed())
 	}
 }
 

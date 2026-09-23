@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { activate } from "../../src/extension/extension.js";
+import { COMMAND } from "../../src/extension/lib/lens.js";
 import { KEY } from "../../src/extension/lib/session.js";
 import { LOCAL, TRACKED } from "../../src/extension/lib/widgets.js";
 import { sidebarOf } from "../../src/extension/sidebar.js";
@@ -363,6 +364,18 @@ test("god mode stands in the status bar from the start, and a new hold toasts", 
 
   await door.said.commands.get("quackitect.rest")("stop.hold", "off");
   assert.equal(local(door).stop.hold, "off");
+});
+
+// [[spec/design_output/extension#a-ticket-carries-its-buttons]]
+test("a start registers the ticket command, and hands the editor the lens its click runs", async () => {
+  const door = doorOf();
+  const handed = [];
+  door.lenses = (one) => handed.push(one);
+  await activate({}, door);
+
+  assert.equal(handed.length, 1);
+  assert.equal(typeof handed[0].lenses, "function");
+  assert.equal(door.said.commands.get(COMMAND), handed[0].took);
 });
 
 // [[spec/design_output/extension#runme-opens-the-panel]]

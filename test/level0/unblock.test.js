@@ -14,6 +14,7 @@ import { fieldOf } from "../../src/engine/group.js";
 import { withRoute } from "../../src/scripts/process.js";
 import { takeable } from "../../src/scripts/pull.js";
 import { work } from "../../src/scripts/work.js";
+import { unblock } from "../../src/scripts/work-unblock.js";
 import { TICKET_SCHEMA } from "./fixtures.js";
 
 const ROOT = "/tree",
@@ -201,6 +202,25 @@ test("unblock closes a child waiting on a person, and names its successor", () =
   assert.equal(fieldOf(now, "reason"), "became", "it closes as became");
   assert.match(now, /successors: \[a-successor\]/, "it names its successor");
   assert.match(said, /a-child closes became a-successor/);
+});
+
+// A tree carrying other work lands the two tickets alone, so the commit sweeps nothing else in. [[spec/design_output/work#a-person-step-leaves]]
+test("unblock stages the child and its successor by path, and stages nothing else", () => {
+  const { it } = doors(standing());
+
+  const { code, said } = heard(() =>
+    unblock({ ...it, root: ROOT }, "a-child", ["unblock", "a-child", "a-successor"]),
+  );
+
+  assert.equal(code, 0, said);
+  const ran = it.git.ran.map((one) => one.argv.join(" "));
+  const both = `-- ${at("spec/tickets/a-child.md")} ${at("spec/tickets/a-successor.md")}`;
+  assert.ok(ran.includes(`git add ${both}`), ran.join("\n"));
+  assert.ok(
+    ran.some((one) => one.startsWith("git commit") && one.endsWith(both)),
+    "the commit names the same two paths",
+  );
+  assert.equal(ran.includes("git add -A"), false);
 });
 
 // [[spec/design_output/work#a-person-step-leaves]]

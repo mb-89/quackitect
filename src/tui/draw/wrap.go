@@ -14,7 +14,8 @@ const (
 func Wrap(said string, width int) string {
 	width = max(width, leastWrapWidth)
 	var out []string
-	for _, line := range strings.Split(said, "\n") {
+	// A table draws as a grid first, so its rows reach the wrap whole. [[spec/design_output/tui#a-table-draws-a-grid]]
+	for _, line := range tabled(strings.Split(said, "\n"), width) {
 		out = append(out, wrapLine(line, width, hang(line))...)
 	}
 	return strings.Join(out, "\n")

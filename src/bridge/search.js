@@ -15,7 +15,14 @@ export function answersFromIndex(e, box) {
   if (!ask || /^([A-Za-z]:)?[\\/]/.test(String(e.path ?? ""))) return PASS;
   const answer = box.index.ask(ask.method, ask.params);
   if (!answer) {
-    warmIndex(box);
+    // A question the index refuses alone reads the disk, and the index stands warm. [[spec/design_output/index#a-dead-index-speaks]]
+    const fault = box.index.fault?.() ?? "";
+    if (fault)
+      box.log.say("info", "index", `${ask.method} reads the disk, past a question the index refuses`, {
+        tool: String(e.tool),
+        detail: fault,
+      });
+    else warmIndex(box);
     return PASS;
   }
   box.log.say("info", "index", `${ask.method} reads the rows`, {

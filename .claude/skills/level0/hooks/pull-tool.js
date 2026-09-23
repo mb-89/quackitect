@@ -17,7 +17,9 @@ import {
   spawnPromptIn,
 } from "../lib/pull.js";
 
-const CLI = ["node", "src/scripts/cli.js"];
+const CLI_SCRIPT = "src/scripts/cli.js";
+// The script stands under the method root, which a project root holds nowhere, so the call names it whole. [[spec/design_output/vehicle#the-work-root-inherits]]
+let cli = ["node", CLI_SCRIPT];
 // The verb and the flag src/scripts/pull-tool.js reads, fixed while the argv behind them moves. [[spec/design_output/pull#the-hand-out]]
 const PULL = ["ticket", "pull"];
 const TOOL = "--tool";
@@ -27,6 +29,8 @@ const JUDGE = "--judge";
 const SPAWNS = 3;
 
 export function register(on, options) {
+  const method = String(options?.method ?? "").replace(/[\\/]+$/, "");
+  cli = ["node", method ? `${method}/${CLI_SCRIPT}` : CLI_SCRIPT];
   // The engine takes one session start a module, so the bridgehead registers none and this one registers its read tools beside the pull. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
   bridgehead(on, options);
   on("session.start", async ($, e, next) => {
@@ -80,7 +84,7 @@ function says($, line) {
 
 // The hook hands the raw input over, and the CLI reads it into an argv, so the hook holds no verb that goes stale. [[spec/design_output/pull#the-hand-out]]
 function toolCall(e) {
-  return [...CLI, ...PULL, TOOL, JSON.stringify(e ?? {})];
+  return [...cli, ...PULL, TOOL, JSON.stringify(e ?? {})];
 }
 
 async function pulled($, e) {

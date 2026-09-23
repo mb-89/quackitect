@@ -65,6 +65,8 @@ type server struct {
 	// The quiet span a change waits before the bridge reads the buffer, and the timer counting it. [[spec/design_output/lsp#the-panel-lints-as-typed]]
 	quiet time.Duration
 	timer *time.Timer
+	// The panel's goroutines and the answers share one pipe, so a frame goes out whole under this lock. [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+	speaking sync.Mutex
 }
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
@@ -122,11 +124,15 @@ func (one *server) took(said message) bool {
 				"textDocumentSync": 1,
 				// A pointer opens its target on a click. [[spec/design_output/lsp#a-pointer-opens-its-target]]
 				"documentLinkProvider": map[string]any{"resolveProvider": false},
+				// The schema offers what a note carries at the cursor. [[spec/design_output/lsp#the-completion-reads-the-schema]]
+				"completionProvider": map[string]any{"triggerCharacters": triggers},
 			},
 			"serverInfo": map[string]any{"name": "se-lsp", "version": Version},
 		})
 	case "textDocument/documentLink":
 		one.answers(said.ID, one.links(said.Params))
+	case "textDocument/completion":
+		one.answers(said.ID, one.completes(said.Params))
 	case "initialized":
 		one.sweeps()
 		go one.follows()
@@ -160,9 +166,13 @@ func drawsAs(said Finding, rows []string) diagnostic {
 	if column < 0 {
 		column = 0
 	}
-	end := column + 1
-	if line < len(rows) && len(rows[line]) > column {
-		end = len(rows[line])
+	// A finding counts bytes, and the editor counts UTF-16 units. [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
+	start, end := column, column+1
+	if line < len(rows) {
+		start, end = unitsTo(rows[line], column), units(rows[line])
+		if end <= start {
+			end = start + 1
+		}
 	}
 
 	severity := severityError
@@ -170,7 +180,7 @@ func drawsAs(said Finding, rows []string) diagnostic {
 		severity = severityWarning
 	}
 	return diagnostic{
-		Range:    span{Start: position{Line: line, Character: column}, End: position{Line: line, Character: end}},
+		Range:    span{Start: position{Line: line, Character: start}, End: position{Line: line, Character: end}},
 		Severity: severity,
 		Code:     said.Rule,
 		Source:   sourceOf(said),
@@ -199,8 +209,10 @@ func (one *server) writes(said message) {
 	if err != nil {
 		return
 	}
-	fmt.Fprintf(one.out, "Content-Length: %d\r\n\r\n", len(body))
-	one.out.Write(body)
+	frame := append([]byte(fmt.Sprintf("Content-Length: %d\r\n\r\n", len(body))), body...)
+	one.speaking.Lock()
+	defer one.speaking.Unlock()
+	one.out.Write(frame)
 	if flushes, held := one.out.(interface{ Flush() error }); held {
 		flushes.Flush()
 	}

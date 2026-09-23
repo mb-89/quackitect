@@ -9,5 +9,5 @@ import { fakeDisk } from "./disk.js";
 
 export function fakeLog(clock = fakeClock(), init = {}) {
   const files = fakeDisk();
-  return behaves({ ...log(files, clock, init), files, clock }, "log");
+  return behaves({ ...log(files, clock, { keep: true, ...init }), files, clock }, "log");
 }

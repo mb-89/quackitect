@@ -7,7 +7,10 @@ import (
 	"database/sql"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 func tree(t *testing.T) string {
@@ -74,26 +77,81 @@ func TestTheWalkSkipsTheRuntimeHalfAndNothingElseUnderThePrivateFolder(t *testin
 	}
 }
 
-// The log grows a line a door call, so no watch stands on it. [[spec/design_output/index#the-watcher-keeps-it-warm]]
-func TestTheWatchStandsOffTheLogAndTheWalkStillReadsIt(t *testing.T) {
+// A dot folder under the private one stands outside the walk, the change and the watch, and every other folder there stands inside. [[spec/design_output/index#the-rows-the-walk-writes]]
+func TestADotFolderUnderThePrivateFolderStandsOutsideTheWalkAndTheWatch(t *testing.T) {
 	root := tree(t)
 	write(t, root, ".se/.log/session.jsonl", "{\"said\":\"a line a door call\"}\n")
+	write(t, root, ".se/notes/kept.md", "A note git ignores, and the walk reads all the same.\n")
 	db := opened(t, root)
 
-	if !logs(root, filepath.Join(root, ".se", ".log")) {
-		t.Fatal("the watch stands on the log, so every line sweeps the tree")
+	if n := counted(t, db, `SELECT count(*) FROM file WHERE path LIKE '.se/.%'`); n != 0 {
+		t.Fatalf("the walk reads %d file(s) under a dot folder of the private one", n)
 	}
-	if logs(root, filepath.Join(root, ".se", "tickets")) {
-		t.Fatal("the watch stands off the tickets, so a write there reaches nobody")
+	if n := counted(t, db, `SELECT count(*) FROM file WHERE path IN ('.se/tickets/parked.md', '.se/notes/kept.md')`); n != 2 {
+		t.Fatalf("the walk reads %d of the two private notes", n)
+	}
+	for _, rel := range []string{".se/.log", ".se/.log/session.jsonl", ".se/.runtime/index.db", ".se/.retro/one/input"} {
+		if !outside(rel) {
+			t.Fatalf("a change naming %s moves rows", rel)
+		}
+	}
+	if outside(".se/tickets/parked.md") || outside(".se/notes") {
+		t.Fatal("a change under a plain folder of the private one moves nothing")
 	}
 
-	var count int
-	if err := db.QueryRow(
-		`SELECT count(*) FROM file WHERE path = '.se/.log/session.jsonl'`).Scan(&count); err != nil {
+	eyes, err := fsnotify.NewWatcher()
+	if err != nil {
 		t.Fatal(err)
 	}
-	if count != 1 {
-		t.Fatalf("the walk answers %d row(s) for the log", count)
+	defer eyes.Close()
+	if err := folders(root, root, eyes); err != nil {
+		t.Fatal(err)
+	}
+	watched := map[string]bool{}
+	for _, abs := range eyes.WatchList() {
+		if rel, ok := relOf(root, abs); ok {
+			watched[rel] = true
+		}
+	}
+	if watched[".se/.log"] || watched[".se/.runtime"] || !watched[".se/tickets"] || !watched[".se/notes"] {
+		t.Fatalf("the watch stands on %v", watched)
+	}
+}
+
+// A hook hands the drive letter lower case and a shell upper case, and both name one tree. [[spec/design_output/index#a-door-comes-back]]
+func TestTwoRootsDifferingInTheDriveLettersCaseReadAsOneTree(t *testing.T) {
+	root := tree(t)
+	if rooted(root+string(filepath.Separator)) != rooted(root) {
+		t.Fatal("a trailing separator reads as another tree")
+	}
+	volume := filepath.VolumeName(root)
+	if len(volume) != 2 || volume[1] != ':' {
+		t.Skip("a drive letter stands on Windows alone")
+	}
+	other := strings.ToLower(volume) + root[2:]
+	if other == root {
+		other = strings.ToUpper(volume) + root[2:]
+	}
+
+	if !stands(Standing{Root: other, Stamp: stampHere()}, root) {
+		t.Fatal("the door stands aside for its own tree under the other drive case")
+	}
+	at := filepath.Join(t.TempDir(), "index.db")
+	db, err := Open(other, at)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := Sweep(db, other); err != nil {
+		t.Fatal(err)
+	}
+	db.Close()
+	db, err = Open(root, at)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	if n := counted(t, db, `SELECT count(*) FROM file`); n == 0 {
+		t.Fatal("the other drive case dropped the index")
 	}
 }
 

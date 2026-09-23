@@ -164,3 +164,38 @@ export function asRow(one) {
     ? `${said}\n${" ".repeat(INDENT)}${rest.map(([key, value]) => `${key}=${value}`).join(" ")}`
     : said;
 }
+
+// The rows a growing log gained past the offset a reader reached, folded into what the reader holds. A fresh hold reads the file from the start, and a file shorter than the offset starts again, because a session start rotates it. [[spec/design_output/log#a-reader-reads-new-rows]]
+export function tallied(disk, path, held, fold, start) {
+  let size = 0;
+  try {
+    size = Number(
+      typeof disk.size === "function"
+        ? disk.size(path)
+        : new TextEncoder().encode(String(disk.read(path))).length,
+    );
+  } catch {
+    return { at: 0, value: start() };
+  }
+  const was = held && held.at <= size ? held : { at: 0, value: start() };
+  if (size === was.at) return was;
+  let text = "";
+  try {
+    text = String(
+      typeof disk.readFrom === "function"
+        ? disk.readFrom(path, was.at)
+        : bytesPast(disk.read(path), was.at),
+    );
+  } catch {
+    return was;
+  }
+  // A row a writer lands halfway waits for its newline. [[spec/design_output/log#every-writer-appends]]
+  const whole = text.slice(0, text.lastIndexOf("\n") + 1);
+  let value = was.value;
+  for (const row of rowsIn(whole)) value = fold(value, row);
+  return { at: was.at + new TextEncoder().encode(whole).length, value };
+}
+
+function bytesPast(text, at) {
+  return new TextDecoder().decode(new TextEncoder().encode(String(text)).subarray(at));
+}

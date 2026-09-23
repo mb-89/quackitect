@@ -241,7 +241,8 @@ export function escalate(it, argv) {
     hand,
     plainHand: hand,
     branch,
-    group: branch.replace(/^work\//, ""),
+    // Trunk names no group, as the pull reads it. [[spec/design_output/pull#the-engine-takes-the-branch]]
+    group: branch === TRUNK ? "" : branch.replace(/^work\//, ""),
     held: null,
   };
   return onward(it, who, [

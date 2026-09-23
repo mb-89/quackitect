@@ -71,7 +71,7 @@ func rootHere() (string, error) {
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 func speaks(root string) int {
-	out := bufio.NewWriter(stdout)
+	out := &wire{out: bufio.NewWriter(stdout)}
 	defer out.Flush()
 	// The editor starts the server again once it ends, so a swapped binary ends it. [[spec/design_output/lsp]]
 	swap.Watches(func() {

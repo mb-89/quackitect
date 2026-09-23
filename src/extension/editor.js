@@ -1,13 +1,15 @@
 // The editor door: the marks, the commands, the status bar and the webview.
-// The server behind the hook button stands in editor-process.js, and the files
-// in editor-files.js. Every other file in this folder answers a test with no
-// editor running, because the three of these hold every call into vscode.
+// The server behind the hook button stands in editor-process.js, the files in
+// editor-files.js, and the ticket buttons in editor-lens.js. Every other file
+// in this folder answers a test with no editor running, because the four of
+// these hold every call into vscode.
 // [[spec/design_output/extension#the-editor-is-a-door]]
 
 const vscode = require("vscode");
 
 const { processDoor } = require("./editor-process.js");
 const { fileDoor } = require("./editor-files.js");
+const { lensDoor } = require("./editor-lens.js");
 
 const NAME = "quackitect";
 const FAR_LEFT = Number.MAX_SAFE_INTEGER;
@@ -28,6 +30,7 @@ function editorDoor(context) {
   return {
     ...processDoor(context, folder),
     ...fileDoor(context, folder, uriOf),
+    ...lensDoor(context, folder),
 
     holds: () => Boolean(folder),
     root: () => folder?.uri?.fsPath ?? "",

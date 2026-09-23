@@ -111,21 +111,13 @@ export function renaming(it, from, to) {
     return { moved: [], wrote: [], why: `${to} stands already, so the move stops.` };
   }
 
-  const moved = [];
   const held = filesUnder(it, source);
-  if (held.length) {
-    for (const file of held) {
-      const rest = file.slice(source.length + 1);
-      const landing = it.join(target, ...rest.split("/"));
-      it.disk.makeDir(landing.slice(0, landing.lastIndexOf("/")));
-      it.disk.write(landing, it.disk.read(file));
-      moved.push(slashed(rest));
-    }
-  } else {
-    it.disk.write(target, it.disk.read(source));
-    moved.push(String(to));
-  }
-  it.disk.remove(source);
+  const moved = held.length
+    ? held.map((file) => slashed(file.slice(source.length + 1)))
+    : [String(to)];
+  // The folder moves whole, so a folder the walk skips and a picture's bytes move with it. [[spec/design_output/index#a-rename-reaches-a-name]]
+  it.disk.makeDir(it.join(target, ".."));
+  it.disk.move(source, target);
   // Every reader of the tree asks git for its file list, so the move reaches git too. [[spec/design_output/index#a-rename-reaches-a-name]]
   it.git?.run(["add", "-A", String(from), String(to)], true);
 

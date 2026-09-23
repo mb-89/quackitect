@@ -99,8 +99,12 @@ function box(files = {}, refactor = REFACTOR) {
       clock: { now: () => new Date(NOW * 1000) },
       proc: fakeProc({
         "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
-        "git log -1 --format=%ct -- old.md": { stdout: `${NOW - WEEK * 2}\n` },
-        "git log -1 --format=%ct -- new.md": { stdout: `${NOW - 60}\n` },
+        // One log answers the whole list, newest first, whatever order the list names the files in. [[spec/tickets/the-spawn-reaches-its-guidance]]
+        git: (argv) => ({
+          stdout: argv.includes("--name-only")
+            ? `${NOW - 60}\n\nnew.md\n${NOW - WEEK * 2}\n\nold.md\n${NOW - WEEK * 3}\n\nnew.md\nold.md\n`
+            : "",
+        }),
       }),
       log: { say: (...row) => said.push(row) },
     },
@@ -369,6 +373,16 @@ test("a call under a long list opens the grace, and the turn's end clears it", (
   assert.equal(fresh.box.grace, undefined, "a list over files still warm asks nothing");
 });
 
+// One ask stands at a time, so a call under a standing grace asks git nothing. [[spec/design_output/stop#the-grace]]
+test("a call under a standing grace reads no list and asks git nothing, and one log answers the whole list", () => {
+  const it = box(stamped(9, ["old.md", "new.md"]));
+  sawCall({ tool: "Read" }, it.box);
+  const logs = () => it.box.proc.ran.filter((one) => one.argv[1] === "log");
+  assert.equal(logs().length, 1, "one log over the whole list");
+  sawCall({ tool: "Read" }, it.box);
+  assert.equal(logs().length, 1, "the standing grace reads nothing more");
+});
+
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
 test("the hand goes once a session, and the flag off starts none", () => {
   const it = box(stamped(9, ["old.md"]));
@@ -486,4 +500,58 @@ test("a prompt opens a turn, so the hold of the turn before ends nothing", () =>
     /names no stop reason/,
     "the next turn holds open on its own reasons",
   );
+});
+
+// The rule a session waiting on its helpers claims, which the fixture above leaves out. [[spec/design_output/stop#a-helper-still-runs]]
+const HELPER_RULES = `
+- id: your-helpers-still-run
+  side: stop
+  priority: 83
+  decides: claimed
+  runs: helpers-running
+  asks: Does a helper you started still run, so its answer wakes this session?
+  says: A helper still runs and its answer wakes this session, so this turn ends and waits.
+${RULES}`;
+
+// A box at a binding, over the helper rule, with a free ticket the queue hands out. [[spec/design_output/stop#a-helper-still-runs]]
+function helperBox(binding) {
+  const free =
+    "---\nkind: [[ticket]]\nstate: open\nurgency: soon\nsteps:\n  - name: do\n---\n\n# Ask\n\nA thing.\n";
+  return box({
+    [at("spec/config/level0.json")]: JSON.stringify({
+      stop: { enabled: true, mostInARow: 3, hold: "off" },
+      engine: { binding },
+      refactor: REFACTOR,
+    }),
+    [at("spec/config/stop/level0.yml")]: HELPER_RULES,
+    [at("spec/tickets/a-free.md")]: free,
+  });
+}
+
+// The turn's end the harness sends, naming one helper at the status given. [[spec/design_output/stop#a-helper-still-runs]]
+function waiting(status) {
+  return {
+    last_assistant_message: "The review runs.\n\nstop: your-helpers-still-run",
+    background_tasks: [{ id: "a1", type: "subagent", status, description: "review" }],
+  };
+}
+
+// [[spec/design_output/stop#a-helper-still-runs]]
+test("an unbound session ends its turn while a helper runs", () => {
+  const it = helperBox("unbound");
+  assert.deepEqual(onStop(waiting("running"), it.box), { pass: true });
+});
+
+// [[spec/design_output/stop#a-helper-still-runs]]
+test("a session bound to the queue holds its turn while a helper runs, and takes the next leaf", () => {
+  const it = helperBox("queue");
+  const said = onStop(waiting("running"), it.box);
+  assert.match(said.result.block, /The queue holds work for this box/);
+});
+
+// [[spec/design_output/stop#a-helper-still-runs]]
+test("the claim holds nothing once every helper has answered", () => {
+  const it = helperBox("unbound");
+  const said = onStop(waiting("completed"), it.box);
+  assert.match(said.result.block, /names no stop reason/);
 });

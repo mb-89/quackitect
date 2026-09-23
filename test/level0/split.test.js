@@ -5,10 +5,8 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { FOLDER as UNDONE } from "../../.claude/skills/level0/lib/undo.js";
-import { noteFor, splitTicket } from "../../src/bridge/split-ticket.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeProc } from "../../src/doors/fake/proc.js";
 import { cutsIn, splitText } from "../../src/scripts/split-cut.js";
 import { sourceOf, splitVerb } from "../../src/scripts/split-verb.js";
 
@@ -167,6 +165,29 @@ test("a source naming itself as a target comes back refused, and nothing writes"
   assert.equal(it.disk.read(join(ROOT, SOURCE)), `${TEXT}\n`);
 });
 
+// [[spec/design_output/level0#a-verb-cuts-the-file]]
+test("two cuts into one target come back refused, and nothing writes", () => {
+  const it = doors();
+
+  const { code, said } = heard(() =>
+    splitVerb(it, [
+      SOURCE,
+      "--to",
+      "src/a.js",
+      "--lines",
+      "1-2",
+      "--to",
+      "./src/a.js",
+      "--lines",
+      "4-5",
+    ]),
+  );
+  assert.equal(code, 2);
+  assert.match(said, /takes two cuts/);
+  assert.equal(it.disk.exists(join(ROOT, "src/a.js")), false);
+  assert.equal(it.disk.read(join(ROOT, SOURCE)), `${TEXT}\n`);
+});
+
 // A target names a folder nothing holds yet, and a throw there answers a stack. [[spec/design_output/apply#the-journal-holds-both-halves]]
 test("a target under a folder nothing holds makes that folder, and writes", () => {
   const it = doors();
@@ -209,52 +230,4 @@ test("the dry flag names the cuts and writes nothing", () => {
   assert.match(said, /src\/a\.js takes 2 line\(s\)/);
   assert.equal(it.disk.exists(join(ROOT, "src/a.js")), false);
   assert.equal(it.disk.read(join(ROOT, SOURCE)), `${TEXT}\n`);
-});
-
-const parking = (answers) => {
-  const ran = [];
-  const box = {
-    root: ROOT,
-    node: "node",
-    disk: fakeDisk({}),
-    proc: fakeProc({
-      node: (argv) => {
-        ran.push(argv);
-        return answers;
-      },
-    }),
-  };
-  return { box, ran };
-};
-
-// A basename stands twice across this tree, so the note carries a folder word. [[spec/design_output/level0#the-refusal-parks-the-work]]
-test("two files of one name park two notes, because the folder joins the name", () => {
-  assert.notEqual(noteFor("src/bridge/code.js"), noteFor("src/doors/code.js"));
-  assert.match(noteFor("src/bridge/code.js"), /split-bridge-code\.md$/);
-  assert.match(noteFor("src/doors/code.js"), /split-doors-code\.md$/);
-  assert.match(noteFor("a.js"), /split-a\.md$/, "a bare name carries no folder");
-});
-
-// [[spec/design_output/level0#the-refusal-parks-the-work]]
-test("the note parks once a file, and a note standing stops the second", () => {
-  const at = noteFor(SOURCE);
-  const { box, ran } = parking({ exitCode: 0 });
-
-  const first = splitTicket(box, SOURCE);
-  assert.match(first, /parks this cut/);
-  assert.equal(ran.length, 1, "the verb runs once");
-  assert.deepEqual(ran[0].slice(2, 5), ["ticket", "note", "split-src-long"]);
-
-  box.disk.write(join(ROOT, at), "---\nkind: [[ticket]]\n---\n");
-  const again = splitTicket(box, SOURCE);
-  assert.match(again, /names this cut already/);
-  assert.equal(ran.length, 1, "the second refusal writes nothing");
-});
-
-// [[spec/design_output/level0#the-refusal-parks-the-work]]
-test("a refused note answers the line the verb says, so no refusal goes quiet", () => {
-  const { box } = parking({ exitCode: 2, stderr: "a name nothing holds yet" });
-
-  assert.match(splitTicket(box, SOURCE), /stands unwritten: a name nothing holds yet/);
-  assert.equal(splitTicket({ disk: box.disk, root: ROOT }, SOURCE), "");
 });

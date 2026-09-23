@@ -198,3 +198,35 @@ test("a warning lets the write land, and an error refuses it", () => {
   );
   assert.deepEqual(errorsIn(undefined), []);
 });
+
+// [[spec/design_output/level0#a-broken-rule-says-so]]
+test("a lint that ran nowhere refuses a prose write and names the fault, and a write outside prose lands", async () => {
+  const broken = {
+    ...box(),
+    vale: {
+      stands: () => true,
+      lint: async () => ({ ran: false, why: "E201 Invalid rule", found: [] }),
+    },
+  };
+  const said = await onWrite(write(join(WORK, "spec", "notes.md"), "# Notes\n"), broken);
+  assert.match(String(said?.result?.deny ?? ""), /E201 Invalid rule/);
+  assert.equal(
+    broken.log.lines().some((one) => one.level === "warn" && one.kind === "vale"),
+    true,
+    "the log carries the fault at warn",
+  );
+
+  const rule = await onWrite(write(join(WORK, "spec", "rule.yml"), "a: b\n"), broken);
+  assert.equal(rule?.result?.deny, undefined, "the hand mending a rule file writes it");
+});
+
+// [[spec/design_output/level0#a-broken-rule-says-so]]
+test("a box with no vale lets the write land, and says so in the log once", async () => {
+  const bare = box();
+  await onWrite(write(join(WORK, "spec", "one.md"), "# One\n"), bare);
+  await onWrite(write(join(WORK, "spec", "two.md"), "# Two\n"), bare);
+  assert.equal(
+    bare.log.lines().filter((one) => one.kind === "vale" && one.level === "warn").length,
+    1,
+  );
+});

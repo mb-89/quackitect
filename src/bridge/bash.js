@@ -190,6 +190,9 @@ function versionGuard(command, _e, box) {
 
 // [[spec/design_output/work#a-box-writes-its-branch]]
 function trunkGuard(command, _e, box) {
+  // A command making no commit and no push lands nowhere, so git answers nothing for it. [[spec/design_output/work#a-box-writes-its-branch]]
+  const touched = touchesGit(command);
+  if (!touched.commits && !touched.pushes) return "";
   const how = landsOnTrunk(
     command,
     git(box, ["rev-parse", "--abbrev-ref", "HEAD"]),

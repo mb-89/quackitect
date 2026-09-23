@@ -9,7 +9,7 @@ import { faultsOf, grouped, PARAGRAPH, RULES, rulesFrom } from "./paragraph.js";
 
 export { ownerOf } from "./projection-owner.js";
 
-import { folderOf, shown } from "./projection-owner.js";
+import { folderOf, ownerOf as ownsPath, shown } from "./projection-owner.js";
 import { readYaml } from "./schema.js";
 import { pathsOf } from "./vocabulary.js";
 
@@ -349,7 +349,10 @@ export function readAll(entries, sources, targets = sources) {
     if (!targets.exists(folder)) continue;
     for (const one of targets.list(folder)) {
       if (one.kind !== "file" || !one.name.endsWith(end)) continue;
-      standing.set(`${folder}/${one.name}`, targets.read(`${folder}/${one.name}`));
+      // A file stands for the entry owning it, the way the write door reads it, so a file the owner keeps beside the targets stays. [[spec/design_output/projection#the-write-door-refuses-one]]
+      const path = `${folder}/${one.name}`;
+      if (ownsPath(entries, path) !== entry) continue;
+      standing.set(path, targets.read(path));
     }
   }
   return { wanted, standing, faults };

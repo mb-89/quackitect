@@ -7,7 +7,13 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
-import { CLOSED, recordIn, urgent, withEntry, withField } from "../../src/engine/group.js";
+import {
+  CLOSED,
+  recordIn,
+  urgent,
+  withEntry,
+  withField,
+} from "../../src/engine/group.js";
 import {
   changedIn,
   DONE,
@@ -144,14 +150,14 @@ test("done with no group on the tree refuses, because the group is what comes ba
 
 test("take stops on a tree carrying uncommitted work", () => {
   const { it, outside } = doorsSaying({
-    "git status --porcelain": { stdout: " M a.md" },
+    "git status --porcelain -uall": { stdout: " M a.md" },
   });
 
   const { code, said } = heard(() => work(ROOT, ["take"], it));
 
   assert.equal(code, 2);
   assert.match(said, /uncommitted changes/);
-  assert.deepEqual(ranGit(outside), ["git status --porcelain"]);
+  assert.deepEqual(ranGit(outside), ["git status --porcelain -uall"]);
 });
 
 // [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
@@ -171,7 +177,7 @@ test("a porcelain row names its file, with the status gone and a rename at its e
 test("the uncommitted check looks past a tagged ticket, and take carries on", () => {
   const { it, outside } = doorsSaying(
     {
-      "git status --porcelain": { stdout: " M spec/tickets/slow-lint.md" },
+      "git status --porcelain -uall": { stdout: " M spec/tickets/slow-lint.md" },
       ...groupRemote(),
     },
     { [on("one-group")]: GROUP_NOTE, [PARKED_AT]: parked, ...HAND },
@@ -188,7 +194,7 @@ test("the uncommitted check looks past a tagged ticket, and take carries on", ()
 test("take puts every tagged file back, so the reset leaves the tag standing", () => {
   const { it, outside, disk } = doorsSaying(
     {
-      "git status --porcelain": { stdout: " M spec/tickets/slow-lint.md" },
+      "git status --porcelain -uall": { stdout: " M spec/tickets/slow-lint.md" },
       ...groupRemote(),
     },
     { [on("one-group")]: GROUP_NOTE, [PARKED_AT]: parked, ...HAND },
@@ -210,7 +216,7 @@ test("take puts every tagged file back, so the reset leaves the tag standing", (
 test("an untagged change still stops a take, and the tagged one beside it changes nothing", () => {
   const { it, outside } = doorsSaying(
     {
-      "git status --porcelain": {
+      "git status --porcelain -uall": {
         stdout: " M spec/tickets/slow-lint.md\n M src/scripts/work.js",
       },
     },
@@ -221,7 +227,7 @@ test("an untagged change still stops a take, and the tagged one beside it change
 
   assert.equal(code, 2);
   assert.match(said, /uncommitted changes/);
-  assert.deepEqual(ranGit(outside), ["git status --porcelain"]);
+  assert.deepEqual(ranGit(outside), ["git status --porcelain -uall"]);
 });
 
 // A branch move resets onto origin, so a commit origin lacks dies under it. [[spec/design_output/work#a-branch-moves-clean]]

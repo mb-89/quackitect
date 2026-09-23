@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { LOCAL } from "../../.claude/skills/level0/lib/config.js";
 import { MINT_TOOL } from "../../.claude/skills/level0/lib/schema.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { TOOLS_BLOCK } from "../../src/bridge/guidance.js";
@@ -133,4 +134,27 @@ test("the block naming what this box has reaches a session off a fresh box", asy
   assert.ok(block, "the tools block stands");
   assert.match(block.text, /`node` 22\.0\.0/, "it names the survey");
   assert.match(block.text, new RegExp(MINT_TOOL), "and the mint beside it");
+});
+
+// [[spec/design_output/log#what-a-box-writes]]
+test("a box building its own log writes at the level the config names, and follows a change to it", async () => {
+  const disk = fakeDisk({
+    [at("spec/config/level0.json")]: JSON.stringify({ log: { level: "info" } }),
+    [at(TOOLS)]: SURVEY,
+  });
+  const box = boxOf(ROOT, ROOT, {
+    disk,
+    clock: fakeClock(),
+    proc: fakeProc({}),
+    index: coldIndex(),
+  });
+  const said = { event: "tool.call", e: { tool: "Read" } };
+  await box.log.event(said, await decide(said, box));
+  const kinds = () => (disk.exists(box.log.path) ? String(disk.read(box.log.path)) : "");
+  assert.doesNotMatch(kinds(), /"kind":"hook"/, "a hook event stays off an info box's disk");
+
+  disk.write(at(LOCAL), JSON.stringify({ log: { level: "debug" } }));
+  await box.log.event(said, await decide(said, box));
+  assert.match(kinds(), /"kind":"hook"/, "a debug box writes it");
+  assert.deepEqual(box.log.lines(), [], "the server's door keeps no row in memory");
 });

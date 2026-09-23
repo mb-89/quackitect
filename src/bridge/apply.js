@@ -77,6 +77,8 @@ async function checked(took, box) {
     );
     if (said?.result?.deny)
       return `${one.file} refuses the batch, and nothing is written.\n\n${said.result.deny}`;
+    // The door formats code and marks the text it answers, so the disk takes that text and the next edit meets its mark. [[spec/design_output/level0#the-formatter-applies-itself]]
+    if (typeof said?.event?.content === "string") one.made = said.event.content;
   }
   return "";
 }
@@ -188,10 +190,14 @@ function sweeps(e, box) {
     return { why: `the pattern compiles to nothing: ${bad?.message ?? bad}` };
   }
   const answer = box.index.ask("grep", { pattern, glob, limit: 0 });
-  if (!answer)
+  if (!answer) {
+    const fault = box.index.fault?.() ?? "";
     return {
-      why: "the index is dead, so the sweep has no list. Run ./RUNME.sh, then try again",
+      why: fault
+        ? `the index reads the pattern as no search, so the sweep has no list: ${fault}`
+        : "the index is dead, so the sweep has no list. Run ./RUNME.sh, then try again",
     };
+  }
   const paths = (answer.files ?? []).map((one) => one.path);
   if (!paths.length) return { why: "the pattern matches nothing under that glob" };
   const held = readsFiles(box, paths);

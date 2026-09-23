@@ -61,24 +61,21 @@ var skipped = map[string]bool{
 // The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
 const Runtime = ".se/.runtime"
 
-// The retro half holds each retro's input, an archive of transcripts a walk reads for nothing. folders.js owns the name, spelled again here because a Go module imports no JavaScript. [[spec/guidance/retro/collect]]
-const Retro = ".se/.retro"
-
-// The log grows a line a door call, so a watch on it sweeps the tree for nothing. [[spec/design_output/index#the-watcher-keeps-it-warm]]
-const Log = ".se/.log"
+// The private folder folders.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_output/index#the-rows-the-walk-writes]]
+const Private = ".se"
 
 func skips(root, abs string, info fs.FileInfo) bool {
 	if skipped[info.Name()] {
 		return true
 	}
 	rel, ok := relOf(root, abs)
-	return ok && (rel == Runtime || rel == Retro)
+	return ok && machinery(rel)
 }
 
-// [[spec/design_output/index#the-watcher-keeps-it-warm]]
-func logs(root, abs string) bool {
-	rel, ok := relOf(root, abs)
-	return ok && rel == Log
+// A dot folder under the private one holds what a tool writes: the runtime, the retro, the log. The walk and the watch stand off it, and read every other folder there. [[spec/design_output/index#the-rows-the-walk-writes]]
+func machinery(rel string) bool {
+	under, ok := strings.CutPrefix(rel, Private+"/")
+	return ok && strings.HasPrefix(under, ".")
 }
 
 func Open(root, at string) (*sql.DB, error) {
@@ -123,11 +120,11 @@ func fresh(db *sql.DB, root string) bool {
 	if err := db.QueryRow(`SELECT value FROM meta WHERE key = 'root'`).Scan(&where); err != nil {
 		return false
 	}
-	return where == root
+	return rooted(where) == rooted(root)
 }
 
 func setMeta(db *sql.DB, root string) error {
-	for key, value := range map[string]string{"version": version, "root": root} {
+	for key, value := range map[string]string{"version": version, "root": rooted(root)} {
 		if _, err := db.Exec(
 			`INSERT INTO meta (key, value) VALUES (?, ?)
 			 ON CONFLICT (key) DO UPDATE SET value = excluded.value`, key, value); err != nil {

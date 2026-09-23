@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -25,6 +25,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
+step: do
 ---
 
 # Ask
@@ -49,11 +50,15 @@ The Go part of the first check on a fresh box downloads its modules, and that do
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/install.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -61,11 +66,24 @@ The Go part of the first check on a fresh box downloads its modules, and that do
 
 <!-- the form is text -->
 
+`src/scripts/install.sh` carries the want `go-modules`, between `go` and the
+builds. It runs `go mod download` in every folder holding a tracked `go.mod`,
+and writes the checksum of every `go.sum` to `.se/.runtime/go-modules`. The
+want stands while that stamp matches, so a warm tree asks no network, and a
+changed dependency fetches again. A box with no Go reads the want as met.
+`SE_INSTALL_SKIP` skips it through the loop every want passes, so it needs no
+line of its own. A case in `test/contract/install.test.js` holds its place in
+the list and its fetch.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: a want fetches the modules, and the skip list reaches it
+- the cleanup: none stands, because the want reuses the loop and the stamp folder the install holds
+- one place: the stamp and the module list live in `install.sh` alone, and the ask's second line reads off `check.json`
 
 # Discussion
 

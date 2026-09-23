@@ -81,3 +81,14 @@ test("a script standing nowhere leaves the command alone", async () => {
   assert.equal(denied(said), "", "the door says nothing");
 });
 
+// [[spec/design_output/work#a-box-writes-its-branch]]
+test("a command making no commit and no push asks git nothing", async () => {
+  const it = box("main");
+  await onBash({ command: "ls src" }, it);
+  assert.deepEqual(
+    it.proc.ran.map((one) => one.argv.join(" ")),
+    [],
+    "no git runs for a command that lands nowhere",
+  );
+});
+

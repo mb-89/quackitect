@@ -312,8 +312,18 @@ function claimGroup(it, one) {
     withEntry(was, { step: stepOf(was), hand: role, hash_before: before }),
   );
   it.git.run(["add", at], true);
-  it.git.run(["commit", "-m", `${one.branch}: ${role} takes it`], true);
+  const committed = it.git.run(["commit", "-m", `${one.branch}: ${role} takes it`], true);
+  // A refused commit puts the ticket back as it stood, so the next move carries a clean tree. [[spec/design_output/work#the-take-writes-the-record]]
+  if (!committed.ok) {
+    it.git.run(["reset", "--", at], true);
+    it.disk.write(path, was);
+    console.error(`The claim on ${one.branch} would not commit, so the take stands undone.`);
+    console.error(committed.err || committed.out);
+    return 1;
+  }
   if (!it.git.run(["push", "origin", one.branch]).ok) {
+    // The claim origin refuses stays off this box, so the next take meets no commit origin lacks. Keep holds the parked files onBranch wrote back. [[spec/design_output/work#the-take-writes-the-record]]
+    it.git.run(["reset", "--keep", `origin/${one.branch}`], true);
     console.error(refusedPush(one.branch));
     return 1;
   }

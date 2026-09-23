@@ -6,9 +6,39 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { SERVE } from "../../.claude/skills/level0/lib/log.js";
-import { crashed, respawned, takesOver } from "../../src/bridge/server.js";
+import { answersEvent, crashed, respawned, takesOver } from "../../src/bridge/server.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeLog } from "../../src/doors/fake/log.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
+
+// [[spec/design_output/level0#a-door-that-throws-passes]]
+test("a door that throws answers pass and writes one error line, and the server stands", async () => {
+  const own = { log: fakeLog() };
+  const box = {
+    log: fakeLog(),
+    get disk() {
+      throw new ReferenceError("dropsMoved is not defined");
+    },
+  };
+  const said = await answersEvent(
+    JSON.stringify({ event: "tool.call", e: { tool: "Read" } }),
+    false,
+    () => box,
+    own,
+  );
+  assert.deepEqual(said, { pass: true });
+  const faults = box.log.lines().filter((one) => one.level === "error");
+  assert.equal(faults.length, 1);
+  assert.match(faults[0].said, /tool\.call throws in a door, and passes/);
+  assert.match(faults[0].stack, /ReferenceError/);
+});
+
+// [[spec/design_output/level0#a-door-that-throws-passes]]
+test("an event past the cap passes unread", async () => {
+  const own = { log: fakeLog() };
+  assert.deepEqual(await answersEvent("", true, () => own, own), { pass: true });
+  assert.equal(own.log.lines()[0].level, "warn");
+});
 
 const ROOT = "/tree";
 const START = ["/usr/bin/node", "/tree/src/bridge/server.js", ROOT];

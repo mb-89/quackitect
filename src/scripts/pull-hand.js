@@ -29,7 +29,7 @@ import {
 import { noteRows, readsOf, writeHold } from "./guidance-hand.js";
 import { workAnswer } from "./pull-chapter.js";
 import { roleOf } from "./pull-hand-of.js";
-import { landed } from "./pull-landed.js";
+import { landedAlone } from "./pull-landed.js";
 import { queued, stoodHere } from "./pull-queue.js";
 import {
   DONE,
@@ -308,7 +308,7 @@ export function advanced(it, one, all) {
         text = withField(text, "step", path);
         one.text = text;
         one.front = frontOf(text);
-        landed(it, one, changes);
+        landedAlone(it, one, changes);
       }
       return { leaf };
     }
@@ -320,7 +320,7 @@ export function advanced(it, one, all) {
       text = shut(text, front, DONE);
       one.text = text;
       one.front = frontOf(text);
-      landed(it, one, changes.concat(`closes ${DONE}`));
+      landedAlone(it, one, changes.concat(`closes ${DONE}`));
       return {};
     }
     path = next.path;
@@ -449,7 +449,7 @@ export function repairPersonSteps(it, who) {
     const put = withEngineReader(it, one);
     if (!put) continue;
     one.text = put;
-    landed(it, one, ["a person step names the engine as its reader"]);
+    landedAlone(it, one, ["a person step names the engine as its reader"]);
     if (!one.private) pushed(it, who.branch);
   }
 }

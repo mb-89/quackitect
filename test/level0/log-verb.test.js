@@ -83,6 +83,7 @@ test("a span opens the session file and every rotated file it reaches", () => {
       [join(ROOT, SESSION)]: "",
       [join(old, "2026-01-01T11-00-00-aaa.jsonl")]: "",
       [join(old, "2025-12-30T08-00-00-bbb.jsonl")]: "",
+      [join(old, "2025-12-20T08-00-00-ccc.jsonl")]: "",
     }),
     names: (at, end) =>
       it.disk
@@ -92,14 +93,31 @@ test("a span opens the session file and every rotated file it reaches", () => {
   };
 
   const near = filesFor(it, "2h", NOW);
-  assert.deepEqual(near, [
-    join(old, "2026-01-01T11-00-00-aaa.jsonl"),
-    join(ROOT, SESSION),
-  ]);
+  assert.deepEqual(
+    near,
+    [
+      join(old, "2025-12-30T08-00-00-bbb.jsonl"),
+      join(old, "2026-01-01T11-00-00-aaa.jsonl"),
+      join(ROOT, SESSION),
+    ],
+    "the newest file opening before the span runs on into it, and an older one stays shut",
+  );
 
-  const far = filesFor(it, "10d", NOW);
-  assert.equal(far.length, 3, "a wider span reaches the older file too");
+  const far = filesFor(it, "20d", NOW);
+  assert.equal(far.length, 4, "a wider span reaches the older files too");
   assert.equal(far.at(-1), join(ROOT, SESSION), "the session file reads last");
+});
+
+// Two writers appending at once tear one line. [[spec/design_output/log#every-writer-appends]]
+test("a torn line drops alone, and the rows around it read", () => {
+  const at = join(ROOT, SESSION);
+  const it = {
+    disk: fakeDisk({
+      [at]: `${JSON.stringify(rows[0])}\n{"at":"2026-01\n${JSON.stringify(rows[1])}\n`,
+    }),
+  };
+
+  assert.deepEqual(said(rowsIn(it, [at])), ["the door reads a write", "take answered 0"]);
 });
 
 // [[spec/design_output/log#one-verb-reads-the-log]]

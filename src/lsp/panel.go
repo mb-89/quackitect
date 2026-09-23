@@ -98,7 +98,8 @@ func (one *server) draws(where, text, method string) {
 	}
 	tree := one.checker.Tree()
 	at := relativeTo(tree.Root, where)
-	if text != "" {
+	// An open and a change carry the whole buffer, an empty one too, and a save carries none. [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+	if method == opens || method == changes {
 		tree.Holds(at, text)
 	}
 	got := grouped(one.checker.Over(at))

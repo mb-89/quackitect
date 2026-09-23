@@ -63,6 +63,12 @@ test("the box file alone off a harness names the git author, and the record take
   assert.equal(handOf(bare), "person", "a box naming no author reads the role alone");
 });
 
+// The session file outlives the session that wrote it, so a person at a terminal reads as a person. [[spec/design_output/pull#the-hand-and-the-hold]]
+test("a session file standing off a harness leaves the hand a person", () => {
+  const it = box(session({ id: "s7", harness: "claude-code" }), { agent: false, env: {} });
+  assert.equal(handOf(it), "person Ada");
+});
+
 test("a helper's hold takes a file name of its own, beside the session's", () => {
   const it = box();
   const hand = `box ${ID}`;

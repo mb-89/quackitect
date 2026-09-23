@@ -182,12 +182,13 @@ A hand is the box, the session on it, and the agent inside it where the
 harness names one. `.se/.runtime/box.json` carries the box id, and the engine mints one
 where none stands. It takes the random source as an argument, so a test
 replays. `.se/.runtime/session.json` carries the session id and the harness name, and
-the plugin wrapper writes it at `session.start`. The pull reads both files
-into one hand.
+the plugin wrapper writes it at `session.start`. On a harness the pull reads
+both files into one hand. Every session on the box shares the session file,
+and it outlives them, so a hand off a harness reads it nowhere.
 
 | the pull reads | the hand |
 |---|---|
-| the box file and the session file | `box <id> · session <id> · <agent>` |
+| the box file and the session file, on a harness | `box <id> · session <id> · <agent>` |
 | the box file alone, on a harness | `box <id> · <agent>`, with the agent off the environment |
 | the box file alone, off a harness | `person <git author name>` |
 
@@ -484,6 +485,11 @@ what the hand writes, the index empties, and the hold stays. The pull answers
 `refused` with the hook's finding, so the hand fixes the line and hands back
 again. So a record's `hash_after` names a commit the branch holds, and a
 refused commit writes no record. `src/scripts/pull-landed.js` holds the landing.
+
+A hand-back stages the whole tree, because the hand's work lands with it. The
+engine lands a skip, a close, a repair or an unblock on the side. Such a
+landing stages and commits the ticket files it writes alone. So a hand's edits
+stay out of a commit naming another ticket.
 
 # The fail
 

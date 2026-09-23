@@ -10,7 +10,18 @@ export const TICKETS = "spec/tickets";
 export const CLOSED = ["fixed:", "past:"];
 const OPEN = "open";
 const ROUTE = "standard";
-const CLI = ["node", "src/scripts/cli.js"];
+
+// The command line stands under the method root, and a stub's work root holds none, so the call names it there and hands the child the work root. [[spec/design_output/vehicle#the-work-root-inherits]]
+function cliOf(it) {
+  return [it.node ?? "node", it.join(it.method ?? it.root, "src", "scripts", "cli.js")];
+}
+
+function runIn(it, argv) {
+  return it.proc.run([...cliOf(it), ...argv], {
+    cwd: it.root,
+    env: { SE_WORK_ROOT: it.root },
+  });
+}
 
 // The ask a class hands its ticket, as the chapter the mint leaves empty. [[spec/guidance/retro/verify]]
 export function askOf(ticket) {
@@ -78,18 +89,14 @@ export function mint(it, name) {
   for (const one of record.classes) {
     if (one.status !== OPEN || one.tickets?.length) continue;
     const path = `${TICKETS}/${one.ticket.name}.md`;
-    const ran = it.proc.run([...CLI, "mint", "ticket", path, `--process=${ROUTE}`], {
-      cwd: it.root,
-    });
+    const ran = runIn(it, ["mint", "ticket", path, `--process=${ROUTE}`]);
     if (ran.exitCode !== 0) {
       console.error(`${one.id} mints no ticket: ${String(ran.stderr ?? "").trim()}`);
       return 1;
     }
     const file = it.join(it.root, ...path.split("/"));
     it.disk.write(file, withAsk(it.disk.read(file), askOf(one.ticket)));
-    const opened = it.proc.run([...CLI, "ticket", "open", one.ticket.name], {
-      cwd: it.root,
-    });
+    const opened = runIn(it, ["ticket", "open", one.ticket.name]);
     if (opened.exitCode !== 0) {
       console.error(
         `${one.ticket.name} opens not: ${String(opened.stdout ?? "").trim()} ${String(opened.stderr ?? "").trim()}`,

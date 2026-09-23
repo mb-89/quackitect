@@ -36,8 +36,15 @@ whole answer or the one before it.
 | `line_text` | every line, for the word question |
 
 `index.go` names the folders standing outside the walk. Each holds the
-machinery, or what a tool writes on its own. A plugin folder stands inside,
-because it holds a tracked manifest.
+machinery, or what a tool writes on its own. `machinery` there holds the rule
+under `.se`, and the walk, a change and the watch all ask it:
+
+| folder | the walk and the watch |
+|---|---|
+| a dot folder under `.se`, as `.se/.runtime`, `.se/.retro`, `.se/.log` | stand outside |
+| any other folder under `.se`, as `.se/tickets`, `.se/notes` | stand inside, though git ignores it |
+| `.git`, `node_modules` | stand outside |
+| a plugin folder | stands inside, because it holds a tracked manifest |
 
 The walk asks git for its list once, and marks each row git tracks. A root git
 holds nowhere tracks every file the walk reads.
@@ -93,6 +100,12 @@ The standing file carries a stamp: the build's own time and size. A caller
 whose stamp disagrees asks that door to stop, drops the file, and starts one of
 its own. So fixing a bug in the index costs a rebuild and the next question.
 
+A root takes one spelling where it enters: cleaned, with the drive letter upper
+case. A hook hands `c:\` and a shell hands `C:\`, and both name one tree. So
+`rooted` in `main.go` answers every compare of one root against another: the
+standing file, the `meta` row and the door's own. A caller passing either case
+meets the warm door and keeps the file.
+
 A cold build of the index takes about seventy seconds, because cgo compiles
 SQLite. It runs as a want. So a session starts with the disk answering, and
 picks the index up on the first question after the build lands.
@@ -103,9 +116,8 @@ The watch is what holds the rows level with the tree. It watches every folder
 the walk covers, and names each path a write reaches. For what the door does
 with a path, see [[spec/design_output/index#a-change-moves-its-rows]].
 
-The log is the one folder the watch stands off. It grows a line a door call, so
-a watch on it moves rows for nothing. The sweep still reads it, and carries what
-it holds.
+The watch stands off every folder the walk stands off, the log among them. The
+log grows a line a door call, so a watch on it moves rows for nothing.
 
 A box where no watch stands still answers, out of the sweep the door makes on
 the way up and on its clock.
@@ -269,7 +281,7 @@ Everything else the tools take reaches the rows:
 |---|---|
 | a match spanning lines | the whole body, in one question |
 | a `type` filter | the glob that type names |
-| the match alone, an offset, a limit | the same rows |
+| the match alone, an offset, a limit, and 250 where the call names none, as `Grep` does | the same rows |
 | the lines around a hit, a case-blind read | the same rows |
 
 A single-file `Read` goes to the disk always. A search reading a file a moment
@@ -361,3 +373,6 @@ silent, the way a box carrying no Go leaves the tests unrun.
 - Log: a missing binary or a failing `standing` writes one `index` line at `warn`.
 - Block: every read of the context carries `level0-index`, naming the cause and `./RUNME.sh`.
 - Sweep: `replace` refuses on a dead index, and names the same fix.
+- Fault: a question the door refuses alone, such as a pattern Go reads as no
+  regexp, leaves the index standing. The search reads the disk, and `replace`
+  names the fault the door prints.

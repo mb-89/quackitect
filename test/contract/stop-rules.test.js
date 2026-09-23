@@ -33,6 +33,15 @@ test("a stop the owner drives stands over a check", () => {
   assert.equal(by("the-chat-is-new")?.yields, undefined);
 });
 
+// A running helper is the harness's fact, so the claim stands over the plan and yields to nothing. [[spec/design_output/stop#a-helper-still-runs]]
+test("the helper stop stands over the plan, and yields to no check", () => {
+  const said = by("your-helpers-still-run");
+  assert.equal(said?.decides, "claimed");
+  assert.equal(said?.runs, "helpers-running");
+  assert.equal(said?.yields, undefined);
+  assert.ok(said.priority > by("work-still-stands").priority, "the plan holds no wait");
+});
+
 // [[spec/design_output/stop#the-blast-radius-decides]]
 test("the stop rule asks the blast radius, and the person test goes", () => {
   assert.equal(by("a-person-holds-the-answer"), undefined, "the person test goes");

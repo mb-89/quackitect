@@ -28,7 +28,8 @@ import {
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
-import { asks } from "./config.js";
+import { dropsAll, dropsMoved } from "./caches.js";
+import { asks, asksText } from "./config.js";
 import { FINDINGS, findingsFor, heldFor } from "./findings.js";
 import { holdsGrace } from "./grace.js";
 import {
@@ -49,9 +50,10 @@ import {
   SPECS as planSpecs,
   TOOLS as planTools,
 } from "./plan.js";
+import { SPECS as logSpecs, TOOLS as logTools } from "./logline.js";
 import { freshens } from "./projection.js";
 import { SPECS as proseSpecs, TOOLS as proseTools } from "./prose.js";
-import { movedCode } from "./reload.js";
+import { movedCode, provesCode, SELF_TEST } from "./reload.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import {
   ANSWERED,
@@ -85,6 +87,9 @@ const TAKEOVER_TRIES = 50;
 // The window the old server watches the new one for, past the takeover and the listen. [[spec/design_output/level0#a-restart-watches-its-child]]
 const RESPAWN_WAIT = 3000;
 const PASS = { pass: true };
+const LOG_LEVEL = "log.level";
+// The characters one event carries at most, twice what the bridgehead sends before it slims one. [[spec/design_output/level0#a-door-that-throws-passes]]
+const BODY_CAP = 8_000_000;
 
 const DOORS = {
   "session.start": opensSession,
@@ -119,11 +124,14 @@ const TOOLS = {
   ...reportTools,
   ...planTools,
   ...proseTools,
+  ...logTools,
 };
 
 export async function decide(said, box) {
   fillsBox(box);
+  if (box.logLevel !== undefined) box.logLevel = asksText(box, LOG_LEVEL) ?? "";
   freshens(box, String(said?.event ?? ""));
+  dropsMoved(box, String(said?.event ?? ""));
   const door = DOORS[String(said?.event ?? "")] ?? pass;
   const answer = letsThrough((await door(said?.e ?? {}, box)) ?? PASS, said, box);
   if (box.registered || String(said?.event ?? "") === "engine.create") return answer;
@@ -149,6 +157,7 @@ function specsOf(box) {
     ...reportSpecs(),
     ...planSpecs(),
     ...proseSpecs(),
+    ...logSpecs(),
   ].map(withPlanField);
 }
 
@@ -216,6 +225,10 @@ function letsThrough(answer, said, box) {
 }
 
 function opensSession(e, box) {
+  // A session start rotates the log, so a reader of it starts again from the top. [[spec/design_output/log#a-reader-reads-new-rows]]
+  box.tallies = {};
+  // [[spec/design_output/level0#a-cache-follows-its-file]]
+  dropsAll(box);
   onSessionStart(e, box);
   box.projections = projectionsHere(box.disk, box.method);
   box.sources = sourcesOf(box.projections, box.disk, box.method, box.work);
@@ -265,7 +278,7 @@ export function boxOf(method, work = method, doors = {}) {
   const files = doors.disk ?? disk();
   const time = doors.clock ?? clock();
   const outside = doors.proc ?? proc();
-  return {
+  const box = {
     method,
     work,
     root: work,
@@ -280,9 +293,16 @@ export function boxOf(method, work = method, doors = {}) {
     vale: doors.vale ?? vale(files, outside, method, work),
     biome: doors.biome ?? biome(files, outside, method),
     awake: doors.awake ?? awake(),
-    log:
-      doors.log ?? log(files, time, { folder: join(work, LOG_FOLDER), level: "debug" }),
+    log: doors.log,
   };
+  if (box.log) return box;
+  // The box writes at the level its config names, read again at each event, so a change reaches the next line. [[spec/design_output/log#what-a-box-writes]]
+  box.logLevel = asksText(box, LOG_LEVEL) ?? "";
+  box.log = log(files, time, {
+    folder: join(work, LOG_FOLDER),
+    level: () => box.logLevel,
+  });
+  return box;
 }
 
 export function boxesOf(method, doors = {}) {
@@ -347,9 +367,12 @@ export function serve(method, port = PORT_BASE, say = console.log) {
       setTimeout(stop, SOON);
       return;
     }
+    // An asked restart meets the self-test too, so the server steps down for code that loads alone. [[spec/design_output/level0#new-code-proves-it-loads]]
     if (request.method === "POST" && request.url === "/restart") {
       answer(response, OK, { ok: true });
-      setTimeout(restart, SOON);
+      setTimeout(async () => {
+        if (await provesCode(own, "")) restart();
+      }, SOON);
       return;
     }
     if (request.method !== "POST" || request.url !== "/event") {
@@ -362,19 +385,22 @@ export function serve(method, port = PORT_BASE, say = console.log) {
       });
       return;
     }
-    readBody(request, async (body) => {
-      const said = parsed(body);
-      const box = boxes(said.root);
-      const decided = await decide(said, box);
-      await box.log.event(said, decided);
-      answer(response, OK, decided);
-      // [[spec/design_output/level0#a-fix-reaches-the-session]]
-      const moved = movedCode(own, String(said?.event ?? ""));
-      if (moved) {
+    readBody(request, async (body, over) => {
+      answer(response, OK, await answersEvent(body, over, boxes, own));
+      try {
+        // The new code proves it loads before the server steps down for it. [[spec/design_output/level0#new-code-proves-it-loads]]
+        const moved = movedCode(own, String(parsed(body)?.event ?? ""));
+        if (!moved || !(await provesCode(own, moved))) return;
         await own.log.say("info", "bridge", `${moved} moved, so the server restarts`, {
           file: moved,
         });
         setTimeout(restart, SOON);
+      } catch (error) {
+        await own.log.say(
+          "error",
+          "bridge",
+          `the code read throws: ${error?.message ?? error}`,
+        );
       }
     });
   };
@@ -442,12 +468,49 @@ export async function crashed(own, where, error, exit = process.exit) {
   exit(1);
 }
 
+// A body past the cap stops growing, and the event passes unread. [[spec/design_output/level0#a-door-that-throws-passes]]
 function readBody(request, then) {
   let body = "";
+  let over = false;
   request.on("data", (chunk) => {
+    if (over) return;
     body += chunk;
+    if (body.length > BODY_CAP) {
+      over = true;
+      body = "";
+    }
   });
-  request.on("end", () => then(body));
+  request.on("end", () => then(body, over));
+}
+
+// One event through its door. A throw inside a door answers pass and writes a fault line, so one broken door drops no box and ends no server. [[spec/design_output/level0#a-door-that-throws-passes]]
+export async function answersEvent(body, over, boxes, own) {
+  if (over) {
+    await own.log.say(
+      "warn",
+      "bridge",
+      `an event past ${BODY_CAP} characters passes unread`,
+    );
+    return PASS;
+  }
+  const said = parsed(body);
+  let box = own;
+  try {
+    box = boxes(said.root);
+    const decided = await decide(said, box);
+    await box.log.event(said, decided);
+    return decided;
+  } catch (error) {
+    try {
+      await box.log.say(
+        "error",
+        "bridge",
+        `${said?.event ?? "an event"} throws in a door, and passes: ${error?.message ?? error}`,
+        { tool: String(said?.e?.tool ?? ""), stack: String(error?.stack ?? "") },
+      );
+    } catch {}
+    return PASS;
+  }
 }
 
 function parsed(body) {
@@ -470,9 +533,21 @@ if (runsHere(import.meta.url, process.argv)) {
     args.find(
       (one) => !one.startsWith("--") && args[args.indexOf(one) - 1] !== "--port",
     ) ?? process.cwd();
+  // The self-test loads every module, drives one of each event, and exits before any port. [[spec/design_output/level0#new-code-proves-it-loads]]
+  if (args.includes(SELF_TEST)) {
+    const { selfTests } = await import("./selftest.js");
+    process.exit(await selfTests(method, { boxOf, decide }));
+  }
   const port =
     Number(at >= 0 ? args[at + 1] : process.env.SE_BRIDGE_PORT) ||
-    registeredPort(disk(), process.env, clock(), method, process.pid, process.platform === "win32");
+    registeredPort(
+      disk(),
+      process.env,
+      clock(),
+      method,
+      process.pid,
+      process.platform === "win32",
+    );
   await takesOver(port);
   serve(method, port);
 }

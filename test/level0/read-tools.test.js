@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { READ_TOOLS } from "../../.claude/skills/level0/hooks/level0.js";
+import { POINTER } from "../../.claude/skills/level0/lib/vehicle.js";
 // The plugin loads the pull module, which holds the one session start and calls the bridgehead's register. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 import { register } from "../../.claude/skills/level0/hooks/pull-tool.js";
 
@@ -31,7 +32,7 @@ function engine(answers = {}) {
         throw new Error("the server answers nothing");
       },
     },
-    fs: { read: async () => "", write: async () => {} },
+    fs: { read: async (path) => answers.read?.(path) ?? "", write: async () => {} },
     ui: { log: () => {} },
   };
   return { on, $, held, registered, ran, asked, waiting: answers.waiting };
@@ -139,5 +140,65 @@ for (const spec of READ_TOOLS) {
     assert.equal(posts(it), 1, "a dead server takes one post before the start");
     assert.match(String(said.result), /6510/, "the line names the port");
     assert.match(String(said.result), /serve\.log/, "the line names the log");
+  });
+}
+
+const healths = (it) => it.asked.filter((one) => one.where.endsWith("/health")).length;
+
+// [[spec/design_output/level0#the-first-call-pays]]
+test("a call after the wait runs out answers at once, and reads no health", async () => {
+  const it = opened({ fetch: () => null, waiting: 20 });
+  await calls(it, "mcp__level0__find");
+  const waited = healths(it);
+  assert.ok(waited > 0, "the first call waits on the server the road starts");
+
+  const said = await calls(it, "mcp__level0__find");
+  assert.equal(healths(it), waited, "the second call waits on nothing");
+  assert.match(String(said.result), /no server answers/);
+});
+
+// [[spec/design_output/level0#the-first-call-pays]]
+test("a start road starting no server leaves the call nothing to wait on", async () => {
+  const it = opened({ fetch: () => null, start: { exitCode: 3 } });
+  const said = await calls(it, "mcp__level0__find");
+  assert.equal(healths(it), 0, "a person starts the server here, so nobody waits");
+  assert.match(String(said.result), /no server answers/);
+});
+
+// [[spec/design_output/level0#the-bridge-says-it-falls]]
+test("a post nobody takes reads the pointer again, and lands on the port it names", async () => {
+  const it = opened({
+    waiting: 20,
+    read: (path) => (path === POINTER ? '{"port":7001}' : ""),
+    fetch: (where) =>
+      where.startsWith("http://127.0.0.1:7001/event")
+        ? { ok: true, status: 200, text: SAID }
+        : null,
+  });
+  const said = await calls(it, "mcp__level0__find");
+  assert.equal(said.result, "a line", "the moved server answers");
+  assert.equal(it.ran.length, 0, "no start runs where the server moved");
+});
+
+// A tool the hook registers answers nowhere past it, so a reply paid on the call posts the call again. [[spec/design_output/level0#the-first-call-pays]]
+for (const tool of ["patch", "replace"]) {
+  test(`a ${tool} call meeting an owed reply runs the tool once the reply pays`, async () => {
+    const events = [];
+    const it = opened({
+      fetch: (where, _count) => {
+        if (!where.endsWith("/event")) return null;
+        const event = JSON.parse(it.asked.at(-1).init.body).event;
+        events.push(event);
+        const tools = events.filter((one) => one === "tool.call").length;
+        if (event === "agent.spoke") return { ok: true, status: 200, text: '{"pass":true}' };
+        return tools === 1
+          ? { ok: true, status: 200, text: '{"needs":"reply"}' }
+          : { ok: true, status: 200, text: SAID };
+      },
+    });
+    it.$.session = { messages: async () => [] };
+    const said = await calls(it, `mcp__level0__${tool}`);
+    assert.equal(said.result, "a line", "the tool answers, and no call falls through");
+    assert.deepEqual(events, ["tool.call", "agent.spoke", "tool.call"]);
   });
 }

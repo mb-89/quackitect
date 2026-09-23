@@ -265,7 +265,8 @@ function unpushed(it, branch) {
 
 // [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
 export function standingIn(it) {
-  const said = it.git.run(["status", "--porcelain"], true).out;
+  // An untracked folder names each file under it, so a tagged note inside one reads as parked. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+  const said = it.git.run(["status", "--porcelain", "-uall"], true).out;
   return said
     .split("\n")
     .filter(Boolean)

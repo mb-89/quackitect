@@ -13,7 +13,7 @@ import {
   ticketAt,
   withField,
 } from "../engine/group.js";
-import { landed } from "./pull-landed.js";
+import { landedAlone } from "./pull-landed.js";
 import { leafOf, stepPathOf } from "./pull.js";
 
 const DISCUSSION = "# Discussion";
@@ -73,7 +73,7 @@ export function unblock(it, name, argv) {
     "successors",
     `[${nextName}]`,
   );
-  const finding = landed(it, child, [`closes became ${nextName}`]);
+  const finding = landedAlone(it, child, [`closes became ${nextName}`], [successor.at]);
   if (finding) {
     console.error("the hook refuses the commit, so nothing lands:");
     console.error(finding);

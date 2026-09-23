@@ -312,6 +312,19 @@ A note stands with the prompt holding it:
 A long line wraps at the pane's width. A field's value wraps under itself, and a
 word wider than the pane breaks where it stands.
 
+## A table draws a grid
+
+A block of lines opening on a pipe, with a rule of dashes as its second line,
+reads as a markdown table. `tabled` in `src/tui/draw/table.go` draws it before
+the wrap reads a line:
+
+| the table | how it draws |
+|---|---|
+| fits the pane | a grid: each cell padded to its column, a bar between two, a rule under the header |
+| wider than the pane | a card per row: each cell after its header's name, so a long value wraps under itself |
+
+Any other line reaches the wrap as it stands.
+
 # The pane holds still
 
 The details load again when the selection moves, and open at the top. A row
@@ -438,36 +451,57 @@ restart.
 
 # The work tab takes edits
 
-A person edits a ticket where they read it, and each field a person sets has
-a key of its own. The write lands in the ticket's front. The index sees it
-and hands the tab its tree again, so the row reads what the note now says.
-`src/tui/work/workedit.go` and `src/tui/work/workplace.go` hold it.
+A person edits a ticket where they read it. The write lands in the ticket's
+front. The index sees it and hands the tab its tree again, so the row reads
+what the note now says. `src/tui/work/workedit.go` and
+`src/tui/work/workplace.go` hold it.
 
 | key | what it does |
 |---|---|
+| `a`, `d`, and the arrows beside them | move the column cursor, which the header lights |
+| `e` | open the cell under the cursor, on the selected row |
+| Enter | write the open cell's value into the row's ticket |
+| Esc | drop the open cell, and write nothing |
+| Tab | take the first value the completion offers |
+| `alt+enter` | write the open cell's value into every row the view holds, or the marked rows. Shift with Enter does the same where the terminal tells it apart |
 | `u` | flip the urgent mark on the row |
 | `p`, then a digit | place the row in the queue at that digit, which writes its todo, and the same digit again takes the todo off. For the rule, see [[spec/design_output/pull#a-todo-forces-a-place]] |
 
-The tree view holds a cell edit too, with a column cursor, a key opening the
-cell, Enter writing and Esc dropping. The work tab binds no key to it, because
-its fields take the keys above and the name is the ticket's own.
+The cell edit is the tree view's own. For the edit, see
+[[spec/design_output/tree-view#a-cell-takes-an-edit]].
 
 The write meets the door the way an agent's write does. The tab reads
-`spec/schemas/ticket.schema.yaml` for what a field takes and which field the
-verbs own, and it holds no list of its own. For the rule, see
-[[spec/design_output/schema#the-verbs-own-their-fields]].
+`spec/schemas/ticket.schema.yaml` through `src/yaml` for what a field takes
+and which field the verbs own, and it holds no list of its own. For the rule,
+see [[spec/design_output/schema#the-verbs-own-their-fields]].
 
 | the column | what an edit meets |
 |---|---|
-| a field the verbs own, as `state` or `step` | a refusal naming the field, and nothing opens |
+| a field marked `x-engine`: `state`, `step`, `steps`, `record` | a refusal naming the field and the verbs, and no cell opens |
 | a column the index derives, as `standing` or `says` | a refusal saying the front holds no such field |
-| a field a person writes, as `group` | the cell opens, and the completion offers what the schema names |
+| a field naming values, as `reason` or `kind` | the completion offers its `enum` or `const`, and the field takes no other value |
+| a boolean field, as `urgent` | the completion offers `true` and `false` |
+| a free field, as `group` | the completion offers the values standing in the data, and a new value passes |
 
-A refusal draws on the tab's last line, and the next key clears it. An edit
-reaches the ticket through the `path` its row carries, and sets the one
-top-level field. A value that is empty, or a mark standing off, drops the
-field. A value a YAML reader trips on stands quoted, the way the record quotes
-its own.
+The shipped view draws the name, the flags and the queue, and no front field a
+person writes. So `e` refuses on each of the three until `spec/views/work.base`
+draws a field such as `group` or `reason`.
+
+An edit reaches the ticket through the `path` its row carries, and sets the
+one top-level field:
+
+| what the edit carries | what the front takes |
+|---|---|
+| a value the schema refuses | no write, and the last line names the schema's reason and the rows keeping their value |
+| an empty value, or a mark standing off | the field drops, and a field the schema requires refuses the empty value |
+| a value a YAML reader trips on | the value in quotes, the way the record quotes its own |
+| a field holding a block value | the new line, in place of the key and the block lines under it |
+| a front fenced with CRLF lines | the write, in the front's own line ends |
+
+A refusal draws on the tab's last line, and the next key clears it. While a
+cell stands open, the last line shows the offer, or the keys where no value
+matches. For the rule, see
+[[spec/design_output/tree-view#a-schema-refuses-a-value]].
 
 A tree handed over again carries the cursor, the selection and the open groups
 across, so a redraw moves nothing under a person's hands.

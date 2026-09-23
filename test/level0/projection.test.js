@@ -576,3 +576,16 @@ test("the server's projection lands every target under the work root, off the me
     "the source stays a path the write door marks stale",
   );
 });
+
+// [[spec/design_output/projection#the-write-door-refuses-one]]
+test("a file the owner keeps beside the targets stands for no entry, so a freshen leaves it", () => {
+  const entries = [{ ...ENTRY, writes: ["se-config-*.md"] }];
+  const disk = fakeDisk({ [SOURCE]: CONFIG, [SCHEMA]: SAID });
+  disk.makeDir(".claude/commands");
+  for (const [path, text] of readAll(entries, disk).wanted) disk.write(path, text);
+  disk.write(".claude/commands/deploy.md", "the owner's own command\n");
+
+  const said = readAll(entries, disk);
+  assert.equal(said.standing.has(".claude/commands/deploy.md"), false);
+  assert.deepEqual(staleIn(said.wanted, said.standing), [], "check names no extra");
+});

@@ -3,7 +3,7 @@
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
 
 import { HEARD, PROBE } from "../../.claude/skills/level0/lib/guidance.js";
-import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 
 export const SURVIVES = "survives";
 export const DROPS = "drops";
@@ -88,9 +88,10 @@ function compaction(root, it, client) {
   return read.answer === SURVIVES ? 0 : 1;
 }
 
-function logRows(files, at) {
+// A torn line drops alone, so the two lines the probe reads still count. [[spec/design_output/log#every-writer-appends]]
+export function logRows(files, at) {
   try {
-    return rowsOf(files.read(at));
+    return rowsIn(files.read(at));
   } catch {
     return [];
   }

@@ -5,9 +5,19 @@
 import model from "wink-eng-lite-web-model";
 import winkNLP from "wink-nlp";
 
-const nlp = winkNLP(model);
-const its = nlp.its;
 const PAST = "PastTense";
+let reader = null;
+
+// The build costs half the load, so the first read pays it and a verb reading no prose skips it. [[spec/design_output/level0#the-tense-reader]]
+function nlpOf() {
+  if (!reader) reader = winkNLP(model);
+  return reader;
+}
+
+// [[spec/design_output/level0#the-tense-reader]]
+export function built() {
+  return reader !== null;
+}
 
 export function withoutFalsePast(text, found) {
   const lines = String(text ?? "").split("\n");
@@ -22,6 +32,8 @@ export function readsAsPast(line, word) {
   const wanted = word.trim().toLowerCase();
   if (!wanted) return true;
   let past = true;
+  const nlp = nlpOf();
+  const its = nlp.its;
   nlp
     .readDoc(line)
     .tokens()

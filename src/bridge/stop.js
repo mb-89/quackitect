@@ -14,7 +14,7 @@ import {
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
 import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
-import { MS, rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { MS, SESSION, tallied } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
 import {
@@ -148,6 +148,8 @@ export function sawCall(e, box) {
 
 // The list past the number with a file at rest asks the agent for the turn, over the grace. [[spec/design_output/stop#the-grace]]
 function asksForHand(box) {
+  // One ask stands at a time, so a standing grace leaves the list and git unread. [[spec/design_output/stop#the-grace]]
+  if (box.grace) return;
   if (!handWanted(box) || !restingFile(box)) return;
   wants(box, {
     id: KIND,
@@ -208,7 +210,7 @@ export function onStop(e, box) {
   warnsUnknown(rules, box);
   const decision = decide(rules, {
     claimed,
-    ran: (name) => ranHere(name, { off, hold, box, claimed, text }),
+    ran: (name) => ranHere(name, { off, hold, box, claimed, text, tasks: e?.background_tasks }),
   });
   const said = toothOf_(box).atTurnEnd(decision, Number(asks(box, MOST) ?? 0));
   const why = said.ends ? endsWhy(said) : (said.go?.says ?? "");
@@ -286,18 +288,27 @@ export function onRefactorAnswered(e, box) {
   return { result: { result: "the refactoring hand answered" } };
 }
 
-// The git door answers a file's last write, in the seconds the window reads. [[spec/tickets/the-spawn-reaches-its-guidance]]
+// The git door answers each file's last write, in the seconds the window reads. One log over the whole list answers every file, newest first, so the first stamp above a name is its last write. [[spec/tickets/the-spawn-reaches-its-guidance]]
 function wroteIn(box, names) {
-  const out = {};
-  for (const name of names ?? []) {
-    try {
-      const said = box.proc.run(["git", "log", "-1", "--format=%ct", "--", name], {
-        cwd: box.work,
-      });
-      out[name] = Number(String(said.stdout ?? "").trim()) || 0;
-    } catch {
-      out[name] = 0;
-    }
+  const wanted = new Set(names ?? []);
+  const out = Object.fromEntries([...wanted].map((name) => [name, 0]));
+  if (!wanted.size) return out;
+  let said = "";
+  try {
+    said = String(
+      box.proc.run(
+        ["git", "log", "--format=%ct", "--name-only", "--relative", "--", ...wanted],
+        { cwd: box.work },
+      ).stdout ?? "",
+    );
+  } catch {
+    return out;
+  }
+  let at = 0;
+  for (const line of said.split("\n")) {
+    const row = line.trim();
+    if (/^\d+$/.test(row)) at = Number(row);
+    else if (wanted.has(row) && !out[row]) out[row] = at;
   }
   return out;
 }
@@ -365,6 +376,8 @@ const CHECKS = {
   "group-in-hand": (held) => groupInHand(held.box),
   "ticket-in-hand": (held) => holdStands(held.box) || privateStands(held.box),
   "queue-waits": (held) => queueWaits(held.box),
+  // [[spec/design_output/stop#a-helper-still-runs]]
+  "helpers-running": (held) => asks(held.box, BINDING) !== QUEUE && helpersRun(held.tasks),
   // A claim a fact denies reads as no stop line, so the turn holds and the fact re-prompts. [[spec/design_output/stop#a-talk-follows-a-report]]
   "no-stop-line": (held) => !claimStands(held),
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
@@ -378,6 +391,13 @@ const CHECKS = {
   // A claim of done stands on an empty plan: no todo open, and nothing in hand. [[spec/design_output/stop#the-plan]]
   "the-plan-is-empty": (held) => planEmpty(held.box),
 };
+
+// The harness names every task it runs in the background at the turn's end, so a running helper reads off that list. [[spec/design_output/stop#a-helper-still-runs]]
+export function helpersRun(tasks) {
+  return (Array.isArray(tasks) ? tasks : []).some(
+    (one) => one?.type === "subagent" && one?.status === "running",
+  );
+}
 
 // [[spec/design_output/stop#the-plan]]
 export function planEmpty(box) {
@@ -459,14 +479,17 @@ function chatIsNew(box) {
   return promptsIn(box) <= 1;
 }
 
+// The count reads the rows past the offset the box last reached. [[spec/design_output/log#a-reader-reads-new-rows]]
 function promptsIn(box) {
-  try {
-    return rowsIn(String(box.disk.read(join(box.work, SESSION)))).filter(
-      (one) => one.kind === "prompt",
-    ).length;
-  } catch {
-    return 0;
-  }
+  box.tallies = box.tallies ?? {};
+  box.tallies.prompts = tallied(
+    box.disk,
+    join(box.work, SESSION),
+    box.tallies.prompts,
+    (count, one) => (one?.kind === "prompt" ? count + 1 : count),
+    () => 0,
+  );
+  return box.tallies.prompts.value;
 }
 
 // A desk bound to the queue on trunk has work while a free ticket stands, so a stop on completion waits. [[spec/design_output/stop#the-mechanical-checks]]

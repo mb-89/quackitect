@@ -22,6 +22,7 @@ import {
   HOLD,
   heard,
   ROOT,
+  ranGit,
   standing,
 } from "./pull-doors.js";
 
@@ -227,7 +228,7 @@ test("the test verb answers green, assertion, build or missing over the tests th
 
   const none = doors(standing(), {
     "git merge-base origin/main HEAD": { stdout: "base111\n" },
-    "git diff --name-only base111..HEAD": { stdout: "src/x.js\n" },
+    "git diff --name-only --diff-filter=d base111..HEAD": { stdout: "src/x.js\n" },
   });
   const missing = heard(() => work(ROOT, ["test"], none.it));
   assert.equal(missing.code, 1);
@@ -238,7 +239,7 @@ test("the test verb answers green, assertion, build or missing over the tests th
 
   const some = doors(standing(), {
     "git merge-base origin/main HEAD": { stdout: "base111\n" },
-    "git diff --name-only base111..HEAD": {
+    "git diff --name-only --diff-filter=d base111..HEAD": {
       stdout: "test/level0/x.test.js\nsrc/x.js\n",
     },
     "node --test --test-reporter=tap test/level0/x.test.js": pass,
@@ -246,6 +247,26 @@ test("the test verb answers green, assertion, build or missing over the tests th
   const green = heard(() => work(ROOT, ["test"], some.it));
   assert.equal(green.code, 0);
   assert.match(green.said, /^green/);
+});
+
+// A deleted test runs nowhere, and an untracked folder names each test under it. [[spec/design_output/pull#the-test-verb]]
+test("the test verb leaves a deleted test out, and reads each file of an untracked folder", () => {
+  const pass = { exitCode: 0, stdout: "# tests 1\n# pass 1\n# fail 0\n" };
+  const { it, outside } = doors(standing(), {
+    "git merge-base origin/main HEAD": { stdout: "base111\n" },
+    "git status --porcelain -uall": {
+      stdout: " D test/level0/gone.test.js\n?? test/level0/fresh/new.test.js\n",
+    },
+    "node --test --test-reporter=tap test/level0/fresh/new.test.js": pass,
+  });
+
+  const { code, said } = heard(() => work(ROOT, ["test"], it));
+
+  assert.equal(code, 0, said);
+  assert.ok(
+    ranGit(outside).includes("git diff --name-only --diff-filter=d base111..HEAD"),
+    "the branch's diff leaves deleted files out",
+  );
 });
 
 // [[spec/design_output/pull#a-draft-opens]]

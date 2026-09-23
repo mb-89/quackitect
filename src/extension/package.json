@@ -23,6 +23,20 @@
     "package": "npx --yes @vscode/vsce package --allow-missing-repository"
   },
   "contributes": {
+    "commands": [
+      {
+        "command": "quackitect.ticket",
+        "title": "quackitect: a ticket button"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "quackitect.ticket",
+          "when": "false"
+        }
+      ]
+    },
     "viewsContainers": {
       "activitybar": [
         {

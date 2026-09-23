@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"quackitect/swap"
@@ -51,7 +52,17 @@ func rootHere() (string, error) {
 		}
 		said = here
 	}
-	return filepath.Abs(said)
+	abs, err := filepath.Abs(said)
+	return rooted(abs), err
+}
+
+// The one spelling of a root: a hook hands the drive letter lower case, and a shell upper case, and both name one tree. Every compare of two roots reads this. [[spec/design_output/index#a-door-comes-back]]
+func rooted(path string) string {
+	path = filepath.Clean(path)
+	if volume := filepath.VolumeName(path); len(volume) == 2 && volume[1] == ':' {
+		return strings.ToUpper(volume) + path[len(volume):]
+	}
+	return path
 }
 
 func serves(root string) int {
@@ -115,7 +126,7 @@ func reaches(root string, argv []string) (answer, error) {
 
 // [[spec/design_output/index#a-door-comes-back]]
 func stands(said Standing, root string) bool {
-	if said.Root != "" && said.Root != root {
+	if said.Root != "" && rooted(said.Root) != rooted(root) {
 		return false
 	}
 	return said.Stamp == stampHere()

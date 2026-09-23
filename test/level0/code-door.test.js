@@ -6,10 +6,11 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { TICKETS as NOTES } from "../../.claude/skills/level0/lib/folders.js";
+import { REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
+import { FILE_RULE } from "../../.claude/skills/level0/lib/size.js";
 import { codeDoor } from "../../src/bridge/code.js";
-import { noteFor } from "../../src/bridge/split-ticket.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeProc } from "../../src/doors/fake/proc.js";
 
 const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
@@ -87,18 +88,24 @@ test("a write under every ceiling passes, and a cut to a file past its ceiling p
   assert.match(grown.result.deny, /FileCeiling/);
 });
 
-// [[spec/design_output/level0#the-refusal-parks-the-work]]
-test("a file ceiling parks the cut, and the refusal names where it stands", async () => {
+const listOf = (it) => {
+  try {
+    return JSON.parse(it.disk.read(at(REFACTORS)));
+  } catch {
+    return [];
+  }
+};
+
+// [[spec/design_output/level0#the-ceiling-feeds-the-list]]
+test("a file ceiling puts one row on the warnings list, twice refused or once, and mints no note", async () => {
   const it = box();
-  const ran = [];
-  it.box.root = ROOT;
-  it.box.node = "node";
-  it.box.proc = fakeProc({
-    node: (argv) => {
-      ran.push(argv);
-      return { exitCode: 0 };
-    },
-  });
+  it.disk.write(
+    at(REFACTORS),
+    JSON.stringify([
+      { file: "src/a.js", rule: "MagicNumber", line: 3, severity: "warning" },
+      { file: "src/b.js", rule: FILE_RULE, line: 1, severity: "warning" },
+    ]),
+  );
 
   const tall = new Array(7).fill("const one = 1;").join("\n");
   const path = at("src/a.js");
@@ -106,21 +113,31 @@ test("a file ceiling parks the cut, and the refusal names where it stands", asyn
 
   const said = await codeDoor(...ask);
   assert.match(said.result.deny, /FileCeiling/);
-  assert.match(said.result.deny, /parks this cut/, "the refusal names the note");
-  assert.equal(ran.length, 1, "the door runs the ticket verb once");
+  assert.match(said.result.deny, /stands on the warnings list/);
+  assert.match(said.result.deny, /RUNME\.sh split src\/a\.js --to/);
 
-  it.disk.write(at(noteFor("src/a.js")), "---\nkind: [[ticket]]\n---\n");
-  const again = await codeDoor(...ask);
-  assert.match(again.result.deny, /names this cut already/);
-  assert.equal(ran.length, 1, "a second refusal writes no second note");
+  await codeDoor(...ask);
+  const list = listOf(it);
+  const ceiling = list.filter(
+    (one) => one.file === "src/a.js" && one.rule === FILE_RULE,
+  );
+  assert.equal(ceiling.length, 1, "a second refusal keeps one row");
+  assert.deepEqual(
+    [ceiling[0].line, ceiling[0].severity, ceiling[0].source],
+    [1, "warning", "door"],
+  );
+  assert.match(ceiling[0].message, /A file holds 6 lines, and the file holds 7/);
+  assert.equal(list.length, 3, "the file's other rule and the other file stand");
+  assert.equal(
+    it.disk.exists(at(NOTES)),
+    false,
+    "no note lands under the private tickets",
+  );
 });
 
 // [[spec/design_output/level0#the-size-ceiling]]
-test("a function ceiling alone parks nothing, because no file waits on a cut", async () => {
+test("a function ceiling alone puts nothing on the list", async () => {
   const it = box();
-  it.box.root = ROOT;
-  it.box.proc = fakeProc({ node: () => ({ exitCode: 0 }) });
-
   const long = [
     "function s() {",
     "  const a = 1;",
@@ -139,5 +156,6 @@ test("a function ceiling alone parks nothing, because no file waits on a cut", a
   );
 
   assert.match(said.result.deny, /FunctionCeiling/);
-  assert.doesNotMatch(said.result.deny, /parks this cut/);
+  assert.doesNotMatch(said.result.deny, /warnings list/);
+  assert.deepEqual(listOf(it), []);
 });

@@ -124,26 +124,9 @@ export function produce(files, method, dest, into) {
   if (dest === method)
     return { ok: false, why: "a vehicle lands beside its method, elsewhere" };
 
-  let count = 0;
-  const walk = (rel) => {
-    for (const one of files.list(rel ? join(method, rel) : method)) {
-      const next = rel ? `${rel}/${one.name}` : one.name;
-      if (!travels(next)) continue;
-      if (one.kind === "dir") {
-        files.makeDir(join(dest, next));
-        walk(next);
-        continue;
-      }
-      const at = join(dest, next);
-      files.write(at, files.read(join(method, next)));
-      if (next.endsWith(".sh")) files.runnable(at);
-      count++;
-    }
-  };
-
+  // One copy carries the method, its bytes and its run bits, and `travels` leaves the private folders behind. [[spec/tickets/disk-door-copies-a-folder]]
   files.makeDir(dest);
-  walk("");
-  return { ok: true, count };
+  return { ok: true, count: files.copyFolder(method, dest, travels) };
 }
 
 export function entryFor(files, time, env, method, version, pid) {

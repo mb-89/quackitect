@@ -264,11 +264,14 @@ tab full of states is a tab where the states change, one key a change.
 | open | the cell takes a line to type into, holding the value it carries |
 | Enter | the view writes the value, and the cell stands as it reads |
 | Escape | the view puts the old value back |
-| Enter with shift | the view writes the value into every row it holds |
+| Tab | the line takes the first value the completion offers |
+| Enter with alt, or with shift | the view writes the value into every row it holds |
 
 `Open` takes the column, and answers whether a cell stands under the cursor.
-`Take`, `Fill` and `Drop` each close the edit. The edit draws in the cell
-holding it, so a person reads the row while typing into it.
+`Take`, `Fill` and `Drop` each close the edit, and `Complete` takes the offer.
+The edit draws in the cell holding it, so a person reads the row while typing
+into it. Most terminals send shift with Enter as a plain Enter. So alt carries
+the fill, and shift reaches it where a terminal tells them apart.
 
 An edit reaches the item through its address, so the row the view draws and the
 item the tree holds stay one thing.
@@ -297,18 +300,20 @@ them all. This is how a person moves work between groups: mark the rows, write
 
 ## A schema refuses a value
 
-`Take` and `Fill` each answer the rows that keep the value they carry. So the
-view says which rows stay behind, and a person reads why the fill reaches fewer
-rows than the view draws. Nothing else marks them yet, and how the view draws
-the answer waits for the tab.
+`Take` and `Fill` each answer the rows that keep the value they carry, and
+`Refused` answers the schema's reason. So the view says which rows stay behind
+and why, and a person reads why the fill reaches fewer rows than the view
+draws. A tab draws the two on its last line, the way the work tab does.
 
 # The completion knows the field
 
-A `Schema` says what values a field takes, and a view takes one or takes none:
+A `Schema` answers for a field: `Takes` names the values the completion
+offers, and `Weighs` says why the field refuses a value. A view takes one or
+takes none:
 
 | what the field carries | what the completion offers |
 |---|---|
-| a schema naming values | those values, and the field takes nothing else |
+| a schema naming values | those values, and `Weighs` refuses any other |
 | no schema, or one naming none | every value standing in the data, and a new one a person types |
 
 The offer keeps every value holding what a person types, the way the filter
@@ -317,7 +322,16 @@ matches, and it ignores case.
 A caller builds the `Schema` out of the schemas this tree already holds, and a
 view with none reads its own data. [[spec/design_output/schema]]
 
-The work tab is the first to wire the edit, and a key there flips a mark in
-place of an editor standing open. For details, see
-[[spec/design_output/tui#the-work-tab-takes-edits]]. The editor reading the
-type its schema names still waits.
+The work tab builds it from `spec/schemas/ticket.schema.yaml`, and reads the
+type the schema names:
+
+| what the field's schema says | what `Takes` offers | what `Weighs` refuses |
+|---|---|---|
+| `enum` or `const` | those values | any other value |
+| `type: boolean` | `true` and `false` | any other value |
+| `type: integer` or `number` | nothing, so the data's values | a value no number reads |
+| `type: string`, or a list naming it | nothing, so the data's values | no value |
+| `x-engine` | nothing | every value, since the verbs write the field |
+| `required` | as above | the empty value, which drops the field |
+
+For the keys, see [[spec/design_output/tui#the-work-tab-takes-edits]].
