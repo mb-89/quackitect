@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -126,6 +126,17 @@ record:
     hash_after: e6486496538198c175240daa05955b227a6947e7
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 9e6e78bd10788f0a86d5df0b1dc38e4ecf0001a0
+    hash_after: 9e6e78bd10788f0a86d5df0b1dc38e4ecf0001a0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 100 test(s) pass in 9 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -314,11 +325,15 @@ Thirteen cases fail on their own assertion, and each reads the part the approach
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/tested.test.js test/level0/precommit.test.js test/level0/bash-commit.test.js test/level0/bash.test.js test/level0/retro-effect.test.js test/level0/battery.test.js test/level0/cli-stamp.test.js test/contract/awake.test.js test/contract/disk.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -326,11 +341,28 @@ Thirteen cases fail on their own assertion, and each reads the part the approach
 
 <!-- the form is text -->
 
+Each door and measure now reads the thing it claims.
+
+- The test door reads Go under `src` and the level0 lib and hooks as source.
+- A Go test answers for every Go file of its own folder.
+- The door counts the tests every held ticket's command lines carry, beside the staged ones.
+- The shell door resolves a target behind a variable, and refuses a name with no value.
+- A temp variable reads free before that rule, so `$TMPDIR` stays free.
+- A first retro writes its battery as the baseline and names its total.
+- The stamp keeps the runs at its own commit, up to `battery.runs`.
+- Collect writes each part's median, and the slowest cases stay off the last run.
+- Every awake release answers a promise that settles on the child's exit or a timeout.
+- The fake disk throws `ENOTDIR` on a list of a file, as the real disk does.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The green run touches the approach's files, beside the projection `battery.runs` writes under `.claude/commands`.
+- The awake and disk doors each pass their contract case against the real box and the fake.
+- The pointers in each changed module name the chapter holding its approach, and the check resolves them.
 
 # verdict
 

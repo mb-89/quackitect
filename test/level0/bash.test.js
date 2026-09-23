@@ -465,6 +465,6 @@ test("a variable resolving to a free path passes, and a temp variable passes unr
   assert.deepEqual(paths("out=/tmp; echo x > $out/y.md"), [], "the value lands under /tmp");
   assert.deepEqual(rules("out=/tmp; echo x > $out/y.md"), []);
   assert.deepEqual(paths("echo x > $TMPDIR/msg.md"), []);
-  assert.deepEqual(paths("echo x > ${TMPDIR}/msg.md"), []);
+  assert.deepEqual(paths(`echo x > $${"{TMPDIR}"}/msg.md`), []);
   assert.deepEqual(paths("out=spec; echo x > $out/y.md"), ["spec/y.md"]);
 });
