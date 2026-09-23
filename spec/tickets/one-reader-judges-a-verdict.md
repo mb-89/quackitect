@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -100,10 +100,6 @@ record:
     hash_after: f8399f297b77c05f6b11b20af2cb5cc81d57a959
     returns: 1
     why: "Design: `pull` returns its exit at once, and `heldOver` waits on the Vale door's `lint`. The approach names no bridge.; Name one road in the approach, and its cost.; The first road makes `pull` wait, and `work.js`, `retro-new.js` and the pull tests wait on it.; The second road keeps `voiceFaults` returning at once, and calls the pieces `heldOver` puts together.; Those pieces are the config `assemble` writes, `withoutFalsePast` and `unreasoned`.; The level and the case match the ask. The semicolon rule `Characters` stands at warning.; Outside the ask, `askFaults` in `ticket-ask-lint.js` keeps the same error filter. Park it on a ticket of its own."
-  - step: design/draft
-    hand: box d6f05e3a585030 · claude-code
-    hash_before: 442b13770bac70683b44dfacf2b669e1a7c51bb7
-    hash_after: 442b13770bac70683b44dfacf2b669e1a7c51bb7
 ---
 
 # Ask
