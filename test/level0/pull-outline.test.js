@@ -55,3 +55,13 @@ test("a level holding todos alone takes the one placed last at its end", () => {
   assert.equal(out.get("one"), "1");
   assert.equal(out.get("two"), "2");
 });
+
+// A place digit past the queue writes end, and the todo stands after every row. [[spec/design_output/pull#a-todo-forces-a-place]]
+test("a todo at the end stands after every row, tagged or not", () => {
+  const all = [row("tidy up", "end"), row("a"), row("b"), row("front", "true")];
+  const out = outlineIn([], [], all, all);
+  const order = [...out]
+    .sort((x, y) => Number(x[1]) - Number(y[1]))
+    .map(([name]) => name);
+  assert.deepEqual(order, ["front", "a", "b", "tidy up"]);
+});

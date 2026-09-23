@@ -100,3 +100,13 @@ test("two todos at one digit in one call stand in the order the call gives", () 
   assert.match(said.result.result, /zeta todo stands at 2\b/);
   assert.match(said.result.result, /alpha todo stands at 3\b/);
 });
+
+// A box carrying no process door reads no queue, so a digit past the front lands at the end. [[spec/design_output/stop#the-plan]]
+test("a box with no process door reads no queue, and a digit past one lands at the end", () => {
+  const it = { ...box(), proc: undefined };
+
+  const said = plan({ add: [{ title: "read the note", place: 2 }] }, it);
+
+  assert.equal(todoOf(it, "read the note"), "end");
+  assert.doesNotMatch(said.result.result, /stands at/, "no queue, no place named");
+});

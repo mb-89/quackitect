@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -120,6 +120,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 8dec657b1cbd8d07132b9fa808704052e91f948f
+    hash_after: 8dec657b1cbd8d07132b9fa808704052e91f948f
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -284,11 +292,19 @@ todos today, so a digit of two names no ticket. The answer names no place.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/bridge/plan.js src/bridge/server.js src/scripts/pull-outline.js src/scripts/pull-queue.js src/scripts/work-answer.js spec/processes/standard.yaml spec/design_output/stop.md spec/design_output/pull.md
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the plan door, the outline, the queue's tie, the route and the two chapters named
+- the queue read runs on the box's process door, and the case fakes it with the fake git
+- a comment names the approach on each changed function, through its chapter's pointer
+
 
 ## tests-green
 

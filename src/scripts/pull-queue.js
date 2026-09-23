@@ -62,9 +62,13 @@ export function queued(list, all, it = {}) {
     mark: urgent(one.text) ? 1 : 0,
     score: scoreOf(one, waits, it.stood, it.weights, now),
   }));
+  // A tie between the plan's todos keeps the order the plan writes them in, and every other tie reads the name. [[spec/design_output/pull#a-todo-forces-a-place]]
   scored.sort(
     (a, b) =>
-      b.mark - a.mark || b.score - a.score || a.one.name.localeCompare(b.one.name),
+      b.mark - a.mark ||
+      b.score - a.score ||
+      (a.one.order ?? 0) - (b.one.order ?? 0) ||
+      a.one.name.localeCompare(b.one.name),
   );
   return scored.map((held) => held.one);
 }

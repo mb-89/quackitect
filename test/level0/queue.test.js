@@ -102,3 +102,13 @@ test("the record counts the hand-backs that came back, and the log names the age
   assert.equal(stood.get("spec/tickets/three.md"), 1767139200);
   assert.equal(stood.size, 3);
 });
+
+// A tie between the plan's todos keeps the order the plan writes them in. [[spec/design_output/pull#a-todo-forces-a-place]]
+test("todos of the plan tied on every score keep the plan's order, whatever their names sort to", () => {
+  const todo = (name, order) => ({ name, path: "", text: "", front: {}, plan: true, order });
+  const tied = queued([todo("zeta", 0), todo("alpha", 1)], [], { weights: WEIGHTS });
+  assert.deepEqual(
+    tied.map((one) => one.name),
+    ["zeta", "alpha"],
+  );
+});

@@ -279,10 +279,12 @@ stands before, or one of the words below:
 | the name of a row | right before that row, and before that row's group where the row nests |
 | `true` | first at its level |
 | `last` | after every other todo at its level, and before the first row no todo places |
+| `end` | after every row at its level, which a place digit past the queue writes |
 | a name standing nowhere | first at its level, because the row it names stands off the queue |
 
 The place moves as the queue drains, because the todo holds the order and
-no number. The work tab writes it under `p` and a digit, the pull hands a
+no number. Todos of the plan tied on every score keep the order the plan
+writes them in. The work tab writes it under `p` and a digit, the pull hands a
 tagged ticket out first, and the `T` letter lights on every tagged row.
 
 The tab draws the place it reads and holds no rule of its own. A place

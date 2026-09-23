@@ -191,7 +191,14 @@ holds the door.
 |---|---|
 | what you work on now, by title or ticket name | the plan names it, and the queue draws it held |
 | which todos you finish | they leave the queue |
-| which todos you add, each at its place | they land, up to `plan.mostOpen` open ones |
+| which todos you add, each at its place | they land, up to `plan.mostOpen` open ones, and the answer names the place each takes |
+
+A place digit reads the queue as it stands. The todo lands before the row at
+that place, and a digit past the last row writes `end`. `plans` in `plan.js`
+reads the queue through `answerOf`, off a read door it builds on the box. The
+field on another call changes the plan alone, so it reads the queue for the
+digit and no more. For the words a place writes, see
+[[spec/design_output/pull#a-todo-forces-a-place]].
 
 The count of calls reaches the number, and the ask stands due. It lands on the
 first call no other ask holds, and the count starts over at the answer alone.

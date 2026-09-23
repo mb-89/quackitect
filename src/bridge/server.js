@@ -55,6 +55,7 @@ import {
   PLAN,
   PLAN_CALL,
   planField,
+  planned,
   SPECS as planSpecs,
   TOOLS as planTools,
 } from "./plan.js";
@@ -194,7 +195,8 @@ function planRides(e, box) {
     tool === PLAN_CALL
   )
     return;
-  planTools[PLAN_CALL](e.plan, box);
+  // The field changes the plan alone, and the answer rides no reply, so this road reads the queue no second time. [[spec/design_output/stop#the-plan]]
+  planned(e.plan, box);
 }
 
 function pass() {

@@ -62,6 +62,9 @@ test("a plan field on a level zero call answers the ask, and every such call tak
   assert.ok(specNamed(said.register, "report").inputSchema.properties.plan, "the report call takes the field");
   await decide({ event: "tool.call", e: { tool: "mcp__level0__report", text: "hi", plan: { working: "the door" } } }, box);
   assert.equal(plansHere(box).working, "the door");
+  // The field changes the plan alone, so a todo at the front lands with no queue read. [[spec/design_output/stop#the-plan]]
+  await decide({ event: "tool.call", e: { tool: "mcp__level0__report", text: "hi", plan: { add: [{ title: "a todo", place: 1 }] } } }, box);
+  assert.deepEqual(plansHere(box).todos.map((one) => `${one.title}:${one.todo}`), ["a todo:true"]);
 });
 
 // The server counts the agent's own calls, so the plan's ask comes round on them and on no helper's. [[spec/design_output/stop#the-plan]]
