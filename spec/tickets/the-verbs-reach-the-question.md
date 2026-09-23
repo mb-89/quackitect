@@ -89,12 +89,18 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
     hash_before: b8d9fe4e8bb28f1a355f07fd1a3b2cb48993a853
     hash_after: b8d9fe4e8bb28f1a355f07fd1a3b2cb48993a853
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: e30b60728e00f16ed6c5eed2eb82c8448cdb7d3a
+    hash_after: e30b60728e00f16ed6c5eed2eb82c8448cdb7d3a
+    returns: 1
+    why: "design: `onStop` in `src/bridge/stop.js` returns at once, and `checksAnswer` awaits Vale.; design: five test files read the `onStop` answer at once, so an awaiting gate breaks them.; design: `stop.js` holds 594 lines, and the write door refuses a file past 600.; design: the gate moves into the awaited `classic.Stop` door or a neighbour file, and the approach names those tests.; craft: `runsFind` lives in `src/bridge/search.js`, and `search-door.test.js` tests it.; craft: `runsFind` takes `words` over the index, so a body read needs a new field and a file read.; craft: the `test` row in the verb table calls `test()` bare, so it passes `rest` through.; craft: `testSays` reads tap counts, so a file run takes the tap reporter.; craft: `testSays` and `goSays` stand exported already.; craft: the wait tool registers in `server.js`, and the table leaves that file out.; craft: a helper's stop passes ahead of the gate, and a held turn runs Vale again.; craft: the log count, the lint order and the Go env match the code they name."
 ---
 
 # Ask
@@ -168,6 +174,20 @@ The cost: every stop runs Vale over the answer once.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+- design: `onStop` in `src/bridge/stop.js` returns at once, and `checksAnswer` awaits Vale.
+- design: five test files read the `onStop` answer at once, so an awaiting gate breaks them.
+- design: `stop.js` holds 594 lines, and the write door refuses a file past 600.
+- design: the gate moves into the awaited `classic.Stop` door or a neighbour file, and the approach names those tests.
+- craft: `runsFind` lives in `src/bridge/search.js`, and `search-door.test.js` tests it.
+- craft: `runsFind` takes `words` over the index, so a body read needs a new field and a file read.
+- craft: the `test` row in the verb table calls `test()` bare, so it passes `rest` through.
+- craft: `testSays` reads tap counts, so a file run takes the tap reporter.
+- craft: `testSays` and `goSays` stand exported already.
+- craft: the wait tool registers in `server.js`, and the table leaves that file out.
+- craft: a helper's stop passes ahead of the gate, and a held turn runs Vale again.
+- craft: the log count, the lint order and the Go env match the code they name.
 
 # implement
 
