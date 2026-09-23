@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 714c9943736ffc1a60218acef5732ddb2fbb0624
     returns: 1
     why: "design: two new actionables lift `spec/guidance/working.md` to seventeen rules, past the cap of fifteen.; design: `VoiceShape.GuidanceCap` then refuses the note, and `./RUNME.sh check` fails.; design: fold the question row into rule 6 and the log line into rule 4, and the cap holds.; craft: `Number(skips) || 1` turns 0 into 1, so `demands` needs more than a lower floor.; craft: `answer-door.test.js` and `note-answer.test.js` assert the first call passes, and the approach leaves both out.; craft: the chapter \"The first call is free\" in `spec/design_output/level0.md` needs a rewrite too.; craft: the stated cost misses the refusal, since a hand calling a tool first sees that call refused.; craft: the ask door keeps its grace, because `grace.update` stands at 5.; craft: `onAgent` also meets a helper's own Agent call, so the approach says what a helper gets."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 2db4e444b176510a03e2ee752d1e9832e917a0cc
+    hash_after: 2db4e444b176510a03e2ee752d1e9832e917a0cc
 ---
 
 # Ask
@@ -133,16 +137,21 @@ Two gates in the server, and two actionables in the working guidance.
 | part | the file | what changes |
 |---|---|---|
 | the prompt gate | `src/bridge/answer.js` | `onPromptSubmit` opens its demand with no skip, so the first call after a prompt asks for the reply |
-| the skip floor | the same | `demands` takes `0` skips, and the ask door keeps its grace through `asks(box, GRACE_UPDATE)` |
+| the skip floor | the same | `demands` reads `skips` as a number with a floor of `0`, so a `0` stays `0` |
+| the ask door | `src/bridge/ask.js` | keeps its grace through `asks(box, GRACE_UPDATE)`, which reads `1` at least |
 | the Agent gate | a new `src/bridge/agent.js` | `onAgent` refuses an `Agent` call carrying `run_in_background: false`, and names the background road |
+| a helper's call | the same | a call carrying an `agentId` meets the same gate, because a helper waiting on its own helper blocks the same way |
 | its wiring | `src/bridge/server.js` | `TOOLS.Agent` names `onAgent`, beside `Read` and `Bash` |
-| the question row | `spec/guidance/working.md` | an actionable: each owner question keeps its own row in the answer's opening table until it closes |
-| the log line | the same | an actionable: each finished piece takes one `mcp__level0__report` line |
-| the design | `spec/design_output/level0.md#the-owners-prompt-comes-first` | the first call meets the gate, and the Agent row stands there |
+| the question row | `spec/guidance/working.md` | rule 2 gains a sentence: each owner question keeps its own row in the opening table until it closes |
+| the log line | the same | rule 4 gains a sentence: each finished piece takes one `mcp__level0__report` line |
+| the cap | the same | the note stays at the rules `VoiceShape.GuidanceCap` admits |
+| the design | `spec/design_output/level0.md#the-owners-prompt-comes-first` | the Agent row stands there |
+| the free call | `level0.md`, the chapter on the first call | says the first call meets the gate |
 
 The cases:
 
 - `answer.test.js`: after an owner prompt, the first `Bash` call answers `needs: reply`, and a helper's call passes
+- `answer-door.test.js` and `note-answer.test.js`: the cases that read the first call as free now read the gate
 - a new `agent.test.js`: `run_in_background: false` refuses, and an Agent call without it passes
 
 The callers:
@@ -151,7 +160,16 @@ The callers:
 - `ask.js` calls `demands` with its grace, and keeps it
 - `onAgentSpawn` in `guidance.js` reads the spawn after the gate, and keeps its road
 
-The cost: a hand answering a prompt with a tool call first pays one round trip for the reply.
+The answers to the earlier review:
+
+- the cap on the guidance: both lines fold into rules 2 and 4
+- `Number(skips) || 1`: the read keeps a `0`
+- the cases reading the first call as free: they change with the gate
+- the chapter on the free call: it changes
+- the ask door at a grace of `0`: its floor stays `1`
+- a helper's Agent call: it meets the gate
+
+The cost: a hand calling a tool before it writes the reply meets a refusal, writes the reply, and calls again.
 
 ## review
 
