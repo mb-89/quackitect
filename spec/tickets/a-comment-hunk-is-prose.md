@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -105,6 +105,12 @@ record:
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 6e737488edfb394f3e27868180fd5d8ec135d80c
     hash_after: 6e737488edfb394f3e27868180fd5d8ec135d80c
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-4
+    hash_before: 6ab3a6675a50a6beb5c06c2abb1320a3d0ae3d20
+    hash_after: 6ab3a6675a50a6beb5c06c2abb1320a3d0ae3d20
+    returns: 2
+    why: "Design: `hunksIn` reads each `--- a/` header as a removed line of the file above it.; Both doors pipe `git diff --cached --unified=0`, so that header comes before each next `+++ b/`.; The header reads as code, so each file but the last asks a test.; A comment-only fix across seven modules then refuses, and the ask says it passes.; Fix: name in the `hunksIn` row that it skips a `---` header, as it skips `+++`.; Fix: add a comment-only case with two files, and assert it passes.; The rest stands: the removed lines, the trade case, the callers and the note."
 ---
 
 # Ask
@@ -165,12 +171,13 @@ The callers of `untestedIn` read its list of files alone, so they change nothing
 
 fail
 
-- Design: `hunksIn` keeps the added lines alone, so a hunk trading a code line for a comment passes.
-- That hunk holds a line of code, and the ask says it meets the door as before.
-- Fix: read the removed lines too, and let a removed line of code ask for a test.
-- A pointer fix trades a comment for a comment, so it still passes.
-- Add that trade to the mixed case: one code line out, one comment in, and the door refuses.
-- The rest stands: the added reading, the comment-only case, and the note in `tree.md`.
+- Design: `hunksIn` reads each `--- a/` header as a removed line of the file above it.
+- Both doors pipe `git diff --cached --unified=0`, so that header comes before each next `+++ b/`.
+- The header reads as code, so each file but the last asks a test.
+- A comment-only fix across seven modules then refuses, and the ask says it passes.
+- Fix: name in the `hunksIn` row that it skips a `---` header, as it skips `+++`.
+- Fix: add a comment-only case with two files, and assert it passes.
+- The rest stands: the removed lines, the trade case, the callers and the note.
 
 # implement
 
