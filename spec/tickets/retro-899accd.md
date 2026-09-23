@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: collect
+step: effect
 steps:
   - name: feedback
     does: takes the owner's field feedback one point at a time, and writes each confirmed point as a private note
@@ -115,6 +115,14 @@ record:
     hand: box d6f05e3a585030 · claude-code · the owner says so
     hash_before: 8cdb9d352f6632a63a2318386323b0474ac99af0
     hash_after: 8cdb9d352f6632a63a2318386323b0474ac99af0
+  - step: collect
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 4e4c65bf1b488dcc601a5bd562b35898c2999e21
+    hash_after: 4e4c65bf1b488dcc601a5bd562b35898c2999e21
+    answered:
+      - name: run
+        exit: 0
+        said: .se/.retro/retro-899accd/input holds a whole run already, and this one changes nothing.
 ---
 
 # Ask
@@ -150,6 +158,8 @@ the owner asks for it
 <!-- retro collect, which leaves the private folder holding .runtime and .retro alone -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh retro collect retro-899accd
 
 # effect
 
