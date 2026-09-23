@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -139,6 +139,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-9
+    hash_before: 1b348805d8701c334fda4bda20b06efde5bd67a8
+    hash_after: 1b348805d8701c334fda4bda20b06efde5bd67a8
+reason: done
 ---
 
 # Ask
@@ -376,17 +381,50 @@ todo takes.
 
 <!-- the form is files -->
 
+- spec/tickets/a-claim-reads-its-source.md
+- spec/guidance/review/reviewing.md
+- spec/processes/standard.yaml
+- spec/design_output/stop.md
+- spec/design_output/pull.md
+- src/bridge/plan.js
+- src/bridge/server.js
+- src/scripts/pull-outline.js
+- src/scripts/pull-queue.js
+- src/scripts/work-answer.js
+- src/scripts/pull-hand-of.js
+- src/scripts/cli-doors.js
+- test/level0/plan-queue.test.js
+- test/level0/pull-outline.test.js
+- test/level0/queue.test.js
+- test/level0/restart-box.test.js
+- test/level0/work-answer.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- The draft leaf in `standard.yaml` carries `callers` and `answers` beside `approach`.
+- A place digit reads the queue through `answerOf`, and names the row at that place.
+- A digit past the last row writes `end`, and `anchored` places it after every row.
+- The plan door answers the place each new todo takes, off one read after the plan stands.
+- The field road calls `planned` alone, so it skips the answer's read as the approach says.
+- The cases in `plan-queue.test.js` cover the digit, the end, the tie and the answer.
+- `./RUNME.sh check` exits 0 on the branch.
+- No retro stands in the hand-back yet.
+- craft: `readDoorOf` repeats the weight keys `cli-doors.js` already maps, so one list serves both.
+- craft: The tool's place description restates the rule `stop.md` holds.
+- craft: The restart case covers a front todo on the field road, and no digit past one.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `end` stands in `pull.md`, and `stop.md` points at it, but the weight keys stand in two files
 
 # Discussion
 
