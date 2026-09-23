@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -116,6 +116,17 @@ record:
     hash_after: 5dd7502fc2525df1a7af3a9be9abcef913edffe4
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 9f90add824344e8c3c4a616a2693b1a34f3c15d2
+    hash_after: 9f90add824344e8c3c4a616a2693b1a34f3c15d2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 7 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -281,11 +292,15 @@ The surprise: `saidBy` in `commit-verb.js` reads both streams, so the case impor
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/pull-push.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -293,11 +308,26 @@ The surprise: `saidBy` in `commit-verb.js` reads both streams, so the case impor
 
 <!-- the form is text -->
 
+A hand-back on trunk now runs the check over its close and lands pushed.
+
+- `pushed` moves into `src/scripts/pull-push.js` and answers `{ ok, local, why }`.
+- On trunk it runs `./RUNME.sh check` over the commit, so the stamp names the commit it pushes.
+- A red check pushes nothing, and the answer names the check's own lines.
+- A tests-red leaf on trunk stands on this box, and the next green push carries it.
+- A rebase runs on a moved branch alone, and on trunk the check runs again after it.
+- Any other refusal answers the push door's own lines.
+- The callers print `why`, so no false moved-branch sentence stands.
+- At tests-green the `check` field and `pushed` each run the check, and the design note says so.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the pull modules, `commit-verb.js`, the pull tests and the design note, each named in the approach.
+- git and the check both run through the fake process door, so every door has a fake.
+- `pull-push.js` points at `spec/design_output/pull#the-rejected-push`, which names the approach.
 
 # verdict
 
