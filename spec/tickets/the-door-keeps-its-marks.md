@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 428a36c5317b4307b96b3bd59e38e3fceebbf9b6
     returns: 1
     why: "design: a failed first write removes its journal, so an older apply of the same name stands newest.; design: `undo` then takes that older apply back, and the ask wants it to say nothing waits.; design: the journal stays with a word that nothing landed, and `undo` answers nothing waits and drops it.; craft: the named cases leave out `undo` after a failed first write, and the ask wants a case a line.; craft: the stated cost runs low, because a `replace` sweep writes the marks file once a matched file.; craft: a preview puts the old marks back in memory, and the marks file keeps the preview's marks.; craft: `reads` in `level0.js` posts no fill, so each level zero call drops the context measure.; craft: a partial Read over a file with a whole mark keeps the whole mark beside the spans."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: afc48bde4dff0c40fc77445874e7f13ede1f9350
+    hash_after: afc48bde4dff0c40fc77445874e7f13ede1f9350
 ---
 
 # Ask
@@ -134,17 +138,22 @@ what it wrote, and every level zero tool names a dead bridge.
 
 | part | the file | what changes |
 |---|---|---|
-| the store | `src/bridge/write.js` | `marksOf` loads the marks from a runtime file on the first ask, and `marksSeen` writes it back |
+| the store | `src/bridge/write.js` | `marksOf` loads the marks from a runtime file on the first ask |
+| the write-back | the same | `marksSeen` marks in memory, and one `marksKept(box)` writes the file once a call |
+| the call's end | `decide` in `src/bridge/server.js` | runs `marksKept` after the door answers, so a sweep writes the file once |
+| the preview | `lands` in `src/bridge/apply.js` | puts the held marks back before `marksKept` runs, so the file keeps the old marks |
 | the path | `.claude/skills/level0/lib/runs.js` | the marks file's name stands beside `REFACTORS` |
-| the span | `.claude/skills/level0/lib/marks.js` | a mark holds the whole hash, or a list of `{ from, to, hash }` over line spans |
+| the span | `.claude/skills/level0/lib/marks.js` | a mark holds the whole hash, and a list of `{ from, to, hash }` over line spans |
+| the join | the same | a whole read replaces the spans, and a partial read adds a span beside the whole hash |
 | the partial Read | `onRead` in `src/bridge/server.js` | a Read with `offset` or `limit` marks the lines it hands back |
 | the shell read | `src/bridge/bash.js` | `cat`, `head -n`, `tail -n` and `sed -n 'a,bp'` over a tracked file mark what they print |
-| the meeting | `staleFault` in `marks.js` | a write passes where the lines it changes lie inside a span whose lines still hash the same |
-| the whole write | the same | a Write replacing the file still asks for the whole mark |
+| the meeting | `staleFault` in `marks.js` | a write passes where the whole hash agrees, or where the lines it changes lie inside a span that still agrees |
+| the whole write | the same | a Write replacing the file asks for the whole mark |
 | the folder | `writes` in `src/bridge/apply.js` | a `create` makes its file's folder before the write |
-| the first fault | the same | a first file refusing the write removes the journal, and the answer opens on `nothing written` |
-| the undo | `undoes` | reads no journal, so it answers `nothing to undo` as it stands |
-| the dead bridge | `.claude/skills/level0/hooks/level0.js` | `reading` takes every `mcp__level0__` tool, so each one answers the `no server answers` line |
+| the first fault | the same | a first file refusing the write keeps the journal, marked `landed: false`, and the answer opens on `nothing written` |
+| the undo | `undoes` | a newest journal marked `landed: false` answers `nothing waits to undo`, and goes |
+| the dead bridge | `.claude/skills/level0/hooks/level0.js` | a `mcp__level0__` tool outside `READ_TOOLS` meeting no server answers the `no server answers` line |
+| the fill | the same | those tools keep the road they ride today while a server answers, so the context measure reads them |
 
 The lines a write changes come off the common head and tail of the disk text and the new text.
 
@@ -154,15 +163,26 @@ The cases:
 - `write.test.js`: a Read of lines 10 to 20 lets an Edit inside them land, and refuses one at line 30
 - `bash.test.js`: `sed -n '1,5p' README.md` marks lines 1 to 5
 - `apply.test.js`: a `create` into a new folder lands, and a failed first write answers `nothing written`
+- `apply.test.js`: an undo after that failed write answers `nothing waits to undo`, and an earlier apply stands
 - `bridgehead.test.js`: a `mcp__level0__plan` call with no server answers the line
 
 The callers:
 
 - `onWrite` and `lands` in `apply.js` call `staleFault` through the write door
-- the bridgehead answers for the server's own tools too, beside the four `READ_TOOLS` it registers
-- the server's tools behind the bridgehead are `find`, `patch`, `replace`, `undo` and the server's own
+- `marksSeen` stands in `onRead`, `onWrite` and `undoes`, and each keeps its call
+- `readsFiles` in `apply.js` marks each file a sweep matches
+- the bridgehead answers for the server's own tools too, beside the `READ_TOOLS` it registers
 
-The cost: each mark writes the runtime file once, and a whole mark still asks for a whole read.
+The answers to the earlier review:
+
+- the undo after a failed first write: the journal stays, marked, and the undo answers nothing waits
+- a case for that undo: it stands in `apply.test.js`
+- a sweep writing the file per match: the file writes once a call
+- the preview: the held marks go back before the write
+- the context fill: the other tools keep their road while a server answers
+- a partial read over a whole mark: the table names the join
+
+The cost: each call that marks writes the runtime file once, and a whole write still asks for a whole read.
 
 ## review
 
