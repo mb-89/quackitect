@@ -25,6 +25,7 @@ import {
   onTurnEnd,
   SPOKE,
 } from "./answer.js";
+import { onAgent } from "./agent.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
@@ -129,6 +130,7 @@ const TOOLS = {
   Edit: onWrite,
   MultiEdit: onWrite,
   Bash: onBash,
+  Agent: onAgent,
   [`mcp__level0__${FIND}`]: runsFind,
   ...applyTools,
   ...handTools,

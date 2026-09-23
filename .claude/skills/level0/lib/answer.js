@@ -28,7 +28,7 @@ export const SAYS = [
   "The log takes the answer from the chat, so the log tool answers nothing.",
 ].join("\n");
 
-// [[spec/design_output/level0#the-first-call-is-free]]
+// [[spec/design_output/level0#the-first-call-asks]]
 export function warns(why) {
   return [
     `${why}, and nothing has answered it yet. Write the answer in the chat, as`,

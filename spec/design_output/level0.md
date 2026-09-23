@@ -488,7 +488,8 @@ So the write door already holds over a helper, and the guidance is the gap.
 
 - Outcome: a helper's `turn.step` and `turn.complete` reach the session's hooks, and both return at once under an `agentId`.
 - Cause: the gate reads a helper's answer at its turn end and prompts the session after a standing stop.
-- Door: a helper gets no reply line, no canary, no stop vote and no gate. So nothing from level zero prompts after a standing stop.
+- Door: a helper gets no reply line, no canary, no stop vote and no answer gate. So nothing from level zero prompts after a standing stop.
+- Agent: a helper's own `Agent` call meets the Agent gate. A helper waiting on its helper holds the turn the same way. For details, see [[spec/design_output/level0#an-agent-call-runs-behind]].
 - Demand: a helper's step text answers no demand of the owner's, so the session's own text has to.
 
 ## The spawn carries a rewrite
@@ -1136,8 +1137,9 @@ opens no line of. `canaryIn` reads the first line and answers `same`, `other`
 or `none`. The first one alone pays. A line with other counts comes out of a
 block the session lacks, so it owes what silence owes.
 
-While the debt stands, `tool.call` behaves the way the owner's prompt door
-behaves. For details, see [[spec/design_output/level0#the-first-call-is-free]].
+While the debt stands, `tool.call` warns once and then refuses, the way a
+demand with a grace of one does. For details, see
+[[spec/design_output/stop#the-grace]].
 
 | the call | what it meets | the `gate` line |
 |---|---|---|
@@ -1225,7 +1227,7 @@ session remembers them. So a door holds them instead.
 ## What the door reads
 
 The door opens a demand for what a person waits for. It holds every
-`tool.call` after the first while nothing pays it. What pays it:
+`tool.call` past the demand's grace while nothing pays it. What pays it:
 
 | what pays | when |
 |---|---|
@@ -1251,7 +1253,8 @@ late pays too.
   ask pays on a text in the shape of `spec/config/status.yaml` alone.
 
 The door reads the key at every `tool.call`, so a button pressed mid-turn
-reaches the next call. The latest demand replaces the one before it. The hold
+reaches the next call. The latest demand replaces the one before it, and an
+unpaid prompt stands ahead of an ask. The hold
 is no demand: it stands in the stop door. For details, see
 [[spec/design_output/stop#the-hold]].
 
@@ -1273,14 +1276,22 @@ carries.
 | one asking for a note | a note row, or a text answer |
 | every other prompt | a text answer alone |
 
-## The first call is free
+## The first call asks
 
-The response in flight when a demand lands can carry the answer as its first
-text. So the first call after the demand passes, with the demand as context.
-Every call after it asks the bridgehead for the texts. A call with nothing new
-comes back refused. The refusal quotes the last text seen and its length, so a
-stale read and a wrong reply read apart. `AskUserQuestion` and the report tool
-pass the hold.
+A prompt opens its demand with no grace, so the first call after it asks the
+bridgehead for the texts. A mid-turn prompt otherwise waits behind the calls in
+flight, and the owner asks twice. The cost: a hand calling a tool before it
+writes the reply meets a refusal, writes the reply, and calls again.
+
+| the demand | the calls it lets pass |
+|---|---|
+| the owner's prompt | none |
+| the owner's ask for an update | `grace.update`, one at least |
+
+An ask pressed while a prompt stands unpaid waits for the pay, so the first
+call still meets the gate. A call with nothing new comes back refused. The
+refusal quotes the last text seen and its length, so a stale read and a wrong
+reply read apart. `AskUserQuestion` and the report tool pass the hold.
 
 Each refusal writes a `gate` line at `debug`, because the agent reads the
 refusal itself.
@@ -1320,6 +1331,19 @@ tooth submits prompts under `plugin`, and a session owes no readback to itself.
 
 `unclassified` stays out. The engine hands it both a person's socket and its own
 delivery receipts, so a door reading it bites the wrong turn.
+
+## An Agent call runs behind
+
+A helper the turn waits on holds every prompt behind it. So `onAgent` in
+`src/bridge/agent.js` refuses an `Agent` call carrying `run_in_background:
+false`, and names the background road. The door reads the flat field, the way
+the command door reads `command`.
+
+| the call | what it meets |
+|---|---|
+| `run_in_background: false` | a refusal naming `run_in_background: true` |
+| the field absent, or `true` | a pass |
+| a helper's own call | the same door |
 
 ## What the refusal says
 

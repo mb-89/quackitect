@@ -10,12 +10,15 @@ import { statusAsks, statusLacks, statusShape } from "../engine/status.js";
 const FULL = "full";
 // The calls the ask rides before it blocks, off the config. [[spec/design_output/stop#the-grace]]
 const GRACE_UPDATE = "grace.update";
+// The ask rides one call at least, whatever the config reads. [[spec/design_output/stop#the-grace]]
+const LEAST_GRACE = 1;
 
 // [[spec/design_output/extension#the-ask-is-a-line]]
 export function asksForUpdate(e, box) {
   if (e?.agentId) return;
   const wanted = String(asks(box, ASK) ?? QUIET);
-  if (wanted === QUIET || (box.asked === wanted && box.demand)) return;
+  // An unpaid prompt stands ahead of the ask. [[spec/design_output/level0#the-first-call-asks]]
+  if (wanted === QUIET || box.demand?.prompt || (box.asked === wanted && box.demand)) return;
   box.asked = wanted;
   box.log.say("debug", "ask", `the owner asks for a ${wanted} update`, {
     tool: String(e?.tool ?? ""),
@@ -24,7 +27,8 @@ export function asksForUpdate(e, box) {
   const block = [controlBlock({ wanted }), chapters.length ? statusAsks(chapters) : ""]
     .filter(Boolean)
     .join("\n\n");
-  demands(box, `The owner asks for a ${wanted} update`, block, () => dropsAsk(box, wanted), asks(box, GRACE_UPDATE));
+  const grace = Math.max(LEAST_GRACE, Number(asks(box, GRACE_UPDATE)) || LEAST_GRACE);
+  demands(box, `The owner asks for a ${wanted} update`, block, () => dropsAsk(box, wanted), grace);
   if (chapters.length) box.demand.fits = (text) => statusLacks(text, chapters);
 }
 

@@ -19,7 +19,7 @@ function box() {
   return { said, log: { say: (...row) => said.push(row) } };
 }
 
-// [[spec/design_output/level0#the-first-call-meets-the-gate]]
+// [[spec/design_output/level0#the-first-call-asks]]
 test("a report pays the demand, and no call after it meets the door", () => {
   const it = box();
   demands(it, "The owner sent a prompt");

@@ -353,7 +353,7 @@ test("a shape finding asks for a rewrite whatever the score", () => {
   assert.equal(bandOf(0.1, bands, [{ rule: "Passive" }]), "clean");
 });
 
-// [[spec/design_output/level0#the-first-call-meets-the-gate]]
+// [[spec/design_output/level0#the-first-call-asks]]
 test("after an owner prompt the first Bash call asks for the reply, and a helper's call passes", () => {
   const box = { log: { say: () => {} } };
   onPromptSubmit({ text: "get to work", origin: { kind: "composer" } }, box);

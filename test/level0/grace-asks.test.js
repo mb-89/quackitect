@@ -37,7 +37,7 @@ test("the update ask rides one call at a grace of zero", () => {
   assert.equal(it.demand.skips, 1, "the ask keeps a floor of one");
 });
 
-// [[spec/design_output/level0#the-first-call-meets-the-gate]]
+// [[spec/design_output/level0#the-first-call-asks]]
 test("an update ask leaves an unpaid prompt demand standing, so the first call asks for the reply", () => {
   const it = box({ ask: { wanted: "short" }, grace: { update: 5 } });
   onPromptSubmit({ text: "get to work", origin: { kind: "composer" } }, it);

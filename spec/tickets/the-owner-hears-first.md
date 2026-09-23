@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -120,6 +120,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: c1b755eac29ca4cde7ee6c1d49764a8cc76d1ee4
+    hash_after: c1b755eac29ca4cde7ee6c1d49764a8cc76d1ee4
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -270,11 +278,17 @@ Seven cases fail on their own assertion. The case on the ask floor passes today,
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/bridge/answer.js src/bridge/ask.js src/bridge/agent.js src/bridge/server.js spec/guidance/working.md spec/design_output/level0.md .claude/skills/level0/lib/answer.js test/level0/agent.test.js test/level0/grace-asks.test.js test/level0/answer.test.js test/level0/answer-door.test.js test/level0/note-answer.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change touches three doors, the server wiring, the working note and the design note, and the ask names each.
+- The Agent door reads the event and the log, and each case hands it a fake log.
+- Each door carries a pointer to its chapter in `spec/design_output/level0.md`.
 
 ## tests-green
 

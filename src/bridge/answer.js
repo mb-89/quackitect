@@ -1,5 +1,5 @@
-// The answer door. A prompt or an ask opens a demand for a reply, the first
-// call after it passes, and every call after asks the bridgehead for the
+// The answer door. A prompt or an ask opens a demand for a reply, a call
+// inside its grace passes, and every call after asks the bridgehead for the
 // texts until one pays. A helper is untouched.
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 
@@ -25,8 +25,8 @@ export const SAYS = (why) =>
   ].join(" ");
 
 // The skips are the grace: the block rides that many calls, and the next one asks for the reply. [[spec/design_output/stop#the-grace]]
-export function demands(box, why, block = "", onPaid = null, skips = 1) {
-  box.demand = { why, seen: box.spoken ?? "", skips: Math.max(1, Number(skips) || 1), block, onPaid };
+export function demands(box, why, block = "", onPaid = null, skips = 0) {
+  box.demand = { why, seen: box.spoken ?? "", skips: Math.max(0, Number(skips) || 0), block, onPaid };
 }
 
 // [[spec/design_output/level0#which-prompt-opens-a-turn]]
@@ -39,7 +39,9 @@ export function onPromptSubmit(e, box) {
     text: String(e?.text ?? ""),
   });
   if (!OWNER.has(from)) return { pass: true };
+  // [[spec/design_output/level0#the-first-call-asks]]
   demands(box, "The owner sent a prompt");
+  box.demand.prompt = true;
   // A prompt asking for a note takes a parked note as its answer. [[spec/design_output/level0#a-note-answers-its-prompt]]
   if (namesNote(String(e?.text ?? ""))) box.demand.notes = notesIn(box);
   box.asks = questionsIn(String(e?.text ?? ""));
