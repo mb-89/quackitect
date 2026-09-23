@@ -46,6 +46,7 @@ import {
 import { codeDoor } from "./code.js";
 import { marksStale, ownerDoor } from "./projection.js";
 import { readsProse } from "./prose.js";
+import { holdDoor } from "./refactor-hold.js";
 
 const PASS = { pass: true };
 const UNRAN = "VoiceRulesRan";
@@ -62,6 +63,8 @@ export async function onWrite(asked, box) {
   if (!writing) return PASS;
   const where = relativeTo(box.root, writing.path);
   if (/^([A-Za-z]:)?[\\/]/.test(where) || isDraft(where)) return PASS;
+  const holder = holdDoor(e, where, box);
+  if (holder) return { result: { deny: holder } };
   // The engine's fields come back first, so every door reads the write that lands. [[spec/design_output/schema#the-verbs-own-their-fields]]
   const restored = engineRestores(e, writing, where, box);
   if (restored?.deny) return { result: { deny: restored.deny } };

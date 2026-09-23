@@ -66,7 +66,11 @@ async function mintsNote(e, box) {
       `${made.path} stands already. Name a path nothing holds yet.`,
       e,
     );
-  const door = await onWrite({ tool: "Write", file_path: at, content: made.text }, box);
+  // The write carries the call's hand, so the hand holding a file mints it. [[spec/design_output/stop#the-hand-holds-its-file]]
+  const door = await onWrite(
+    { tool: "Write", file_path: at, content: made.text, agentId: e?.agentId },
+    box,
+  );
   if (door?.result?.deny) return said(box, false, door.result.deny, e);
   try {
     box.disk.makeDir(join(at, ".."));

@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -120,6 +120,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: f5a0cbd8ef7ea7a932e41e09ae2b9c6732d5e3ad
+    hash_after: f5a0cbd8ef7ea7a932e41e09ae2b9c6732d5e3ad
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -277,11 +285,17 @@ Eleven cases fail on their own assertion, and each names the row or the hold it 
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/runs.js .claude/skills/level0/lib/trunk.js spec/config/level0.json spec/config/level0.schema.json spec/design_output/level0.md spec/design_output/stop.md spec/design_output/work.md spec/guidance/working.md src/bridge/apply.js src/bridge/bash.js src/bridge/server.js src/bridge/stop.js src/bridge/tools.js src/bridge/write.js .claude/commands/se-config-refactor-holdFor.md src/bridge/refactor-hold.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and `refactor-hold.js` holds the hold beside `stop.js`
+- the hold reaches disk and clock through the box, and the tests hand it fakes
+- each changed function carries a pointer to `work#a-landing-takes-the-verb` or `stop#the-hand-holds-its-file`
 
 ## tests-green
 

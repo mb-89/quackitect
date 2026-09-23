@@ -25,12 +25,13 @@
     "rule": 6
   },
   "refactor": {
-    "comment": "The hand the stop door starts while the list stands past the number and a file rests past the window. The grace is the calls the engine lets pass before it refuses them. spec/guidance/code/refactoring.md says what that hand does.",
+    "comment": "The hand the stop door starts while the list stands past the number and a file rests past the window. The grace is the calls the engine lets pass before it refuses them. The hold keeps the hand's file its own for the span, and 0 switches it off. spec/guidance/code/refactoring.md says what that hand does.",
     "parallel": true,
     "mostWarnings": 10,
     "mostAtOnce": 1,
     "untouchedFor": "5m",
-    "grace": 3
+    "grace": 3,
+    "holdFor": "30m"
   },
   "grace": {
     "comment": "The calls the engine lets pass before an ask refuses them: the owner's ask for an update, and the finish hold before it stops hard. spec/design_output/stop.md, chapter The grace, says the rest.",

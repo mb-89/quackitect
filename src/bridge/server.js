@@ -62,6 +62,7 @@ import {
 import { SPECS as logSpecs, TOOLS as logTools } from "./logline.js";
 import { freshens } from "./projection.js";
 import { SPECS as proseSpecs, TOOLS as proseTools } from "./prose.js";
+import { releasesHold } from "./refactor-hold.js";
 import { movedCode, provesCode, SELF_TEST } from "./reload.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import {
@@ -199,9 +200,7 @@ function planRides(e, box) {
   planned(e.plan, box);
 }
 
-function pass() {
-  return PASS;
-}
+const pass = () => PASS;
 
 // A read hands the agent the text, so the mark comes off it. [[spec/design_output/level0#a-write-meets-its-mark]]
 function onRead(e, box) {
@@ -244,6 +243,7 @@ function opensSession(e, box) {
   box.tallies = {};
   // [[spec/design_output/level0#a-cache-follows-its-file]]
   dropsAll(box);
+  releasesHold(box);
   onSessionStart(e, box);
   box.projections = projectionsHere(box.disk, box.method);
   box.sources = sourcesOf(box.projections, box.disk, box.method, box.work);

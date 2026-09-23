@@ -216,12 +216,11 @@ function trunkGuard(command, _e, box) {
       ].join("\n");
     }
   }
-  if (!onACloud(box)) return "";
-  if (!takesABranch(box)) return "";
   box.log.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, {
     tool: "Bash",
     detail: command,
   });
+  if (!onACloud(box) || !takesABranch(box)) return throughTheVerb(how);
   return [
     `A cloud box holding a work branch hands it back, and ${TRUNK} stays shut here.`,
     "",
@@ -231,6 +230,17 @@ function trunkGuard(command, _e, box) {
     "",
     "Run `./RUNME.sh ticket pull`, which takes a branch for a cloud box and moves you onto it.",
     "Push that branch, run `branch done`, and a box off the cloud takes it into trunk.",
+  ].join("\n");
+}
+
+// Each commit carries one helper's work, and the verb's check gates every landing on trunk. [[spec/design_output/work#a-landing-takes-the-verb]]
+function throughTheVerb(how) {
+  return [
+    `This ${how} lands on ${TRUNK} past the commit verb.`,
+    "",
+    'Run `./RUNME.sh commit "<message>"`, which reads the message, runs the tests,',
+    "commits, runs the check and pushes the branch you stand on. One helper's work",
+    "rides one commit, so one review reads it and one undo takes it back.",
   ].join("\n");
 }
 

@@ -60,7 +60,7 @@ async function lands(e, took, box) {
   if (!took.ok) return { result: { result: took.why } };
   // A preview moves no disk, so the marks it meets stand as they stood. [[spec/design_output/level0#a-write-meets-its-mark]]
   const held = e.preview === true ? new Map(marksOf(box)) : null;
-  const refused = await checked(took, box);
+  const refused = await checked(took, box, e.agentId);
   if (refused) return { result: { result: refused } };
   if (e.preview === true) {
     box.marks = held;
@@ -69,10 +69,11 @@ async function lands(e, took, box) {
   return { result: { result: writes(took, String(e.on ?? ""), box) } };
 }
 
-async function checked(took, box) {
+// The write carries the call's hand, so the hand holding a file patches it. [[spec/design_output/stop#the-hand-holds-its-file]]
+async function checked(took, box, agentId) {
   for (const one of took.files) {
     const said = await onWrite(
-      { tool: "Write", file_path: one.file, content: one.made },
+      { tool: "Write", file_path: one.file, content: one.made, agentId },
       box,
     );
     if (said?.result?.deny)

@@ -401,14 +401,24 @@ Level zero refuses, on a cloud box holding a work branch:
 - a `git commit` made while standing on `main`
 - a `git push` naming `main`, from any branch
 
-The refusal names `./RUNME.sh branch take` as the way out. A desk box meets none
-of it, because a box off the cloud merges by choice.
+The refusal names `./RUNME.sh branch take` as the way out. The branch in hand
+is the whole of the reason. A cloud box takes a work branch out of the queue
+and hands it back the same road. So trunk reaches that work through the
+hand-back alone. The branch it stands on says which session it is.
 
-The branch in hand is the whole of the reason. A cloud box takes a work branch
-out of the queue and hands it back the same road. So trunk reaches that work
-through the hand-back alone. A cloud session outside that flow answers to the
-owner, and the green battery is the door it meets. The branch it stands on says
-which session it is.
+## A landing takes the verb
+
+Every other box lands on `main` through `./RUNME.sh commit "<message>"`. The
+Bash door refuses a raw landing there and names the verb:
+
+- a `git commit` made while standing on `main`
+- a `git push` naming `main`
+- a `git push` naming no branch, or `HEAD`, while standing on `main`
+
+A red battery answers first, and the verb refusal follows it on a green one. So
+each commit carries one helper's work, and the verb's check gates each one. One
+review reads it, and one undo takes it back. The verb takes its message whole,
+so a message naming `git commit` lands nowhere.
 
 `branch take` and `branch done` reach git inside the command line, so the door sees
 the verb and leaves the plumbing alone.

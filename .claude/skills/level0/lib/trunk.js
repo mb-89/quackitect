@@ -4,23 +4,35 @@
 
 export const TRUNK = "main";
 
-export function touchesGit(command) {
-  const said = String(command ?? "");
-  return {
-    commits: /\bgit\s+(?:-\S+(?:\s+\S+)?\s+)*commit\b/.test(said),
-    pushes: /\bgit\s+(?:-\S+(?:\s+\S+)?\s+)*push\b/.test(said),
-  };
+// A verb of this tree's own takes its words whole, up to the next operator, so git named in them lands nowhere. [[spec/design_output/work#a-box-writes-its-branch]]
+const VERB_WORDS = /(RUNME\.(?:sh|ps1)\b)(?:[^&|;\n"']|"[^"]*"|'[^']*')*/g;
+const GIT_VERB = (verb) => new RegExp(`\\bgit\\s+(?:-\\S+(?:\\s+\\S+)?\\s+)*${verb}\\b`);
+
+function gitSaid(command) {
+  return String(command ?? "").replace(VERB_WORDS, "$1");
 }
 
+export function touchesGit(command) {
+  const said = gitSaid(command);
+  return { commits: GIT_VERB("commit").test(said), pushes: GIT_VERB("push").test(said) };
+}
+
+// A push naming no branch, or naming `HEAD`, pushes the branch the box stands on. [[spec/design_output/work#a-box-writes-its-branch]]
 export function landsOnTrunk(command, branch, trunk = TRUNK) {
   const { commits, pushes } = touchesGit(command);
   if (!commits && !pushes) return "";
-
-  if (pushes && new RegExp(`\\bpush\\b[^&|;]*\\b${trunk}\\b`).test(String(command))) {
-    return "push";
-  }
-  if (branch === trunk) return "commit";
+  const said = gitSaid(command);
+  if (pushes && new RegExp(`\\bpush\\b[^&|;]*\\b${trunk}\\b`).test(said)) return "push";
+  if (pushes && branch === trunk && !namesABranch(said)) return "push";
+  if (commits && branch === trunk) return "commit";
   return "";
+}
+
+function namesABranch(command) {
+  const at = /\bpush\b([^&|;\n]*)/.exec(command);
+  const words = (at?.[1] ?? "").trim().split(/\s+/).filter(Boolean);
+  const refs = words.filter((one) => !one.startsWith("-")).slice(1);
+  return refs.some((one) => one !== "HEAD");
 }
 
 // [[spec/design_output/work#a-version-branch-stands]]

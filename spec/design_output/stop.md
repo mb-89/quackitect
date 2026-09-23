@@ -179,6 +179,28 @@ a time, and the calls ending a turn pass whatever stands.
 The list stands in `.se/.runtime/refactor.json`, one entry a warning, which
 the lint writes at each check. `refactor.grace` names the calls that pass.
 
+## The hand holds its file
+
+Hands writing one file drop each other's work. So the refactoring hand
+holds the file it drains, and `refactor-hold.js` keeps the hold in
+`.se/.runtime/refactor-hold.json`.
+
+| when | what the hold does |
+|---|---|
+| the stop door spawns the hand | it names the file, no hand yet, and the time |
+| the first helper writes that file | its `agentId` fills the hand |
+| the hand answers, or its spawn fails | `refactor.answered` takes the hold off |
+| the hold stands past `refactor.holdFor` | it reads as none, and the next hand takes the file |
+| a session starts | the hold comes off, because no hand of the last session answers here |
+
+The write door refuses the held file to every other hand, the session's own
+too. Write, Edit, the patch and the mint all carry the call's `agentId` there.
+
+The door tells hands apart by `agentId` alone. So the first helper to write the
+file owns it, whatever its spawn asks of it. A Bash write, as `sed -i`, meets no
+write door, so the hold covers it nowhere. A hand working past the span loses
+the hold, and the next hand to write its file takes it.
+
 ## The plan
 
 Where a model keeps a private todo list, this tree keeps it in the queue. A

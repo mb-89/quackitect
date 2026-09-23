@@ -340,6 +340,11 @@
           "type": "string",
           "unit": "span, as 30m, 12h or 7d",
           "help": "The span a file stands untouched before a hand takes it."
+        },
+        "holdFor": {
+          "type": "string",
+          "unit": "span, as 30m, 12h or 7d",
+          "help": "The span the hand holds its file against every other write. 0 switches the hold off."
         }
       }
     },

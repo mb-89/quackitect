@@ -45,6 +45,7 @@ import { holdsTurn } from "./answer.js";
 import { asks, writes } from "./config.js";
 import { reacted, wants } from "./grace.js";
 import { plansHere } from "./plan.js";
+import { holdsFile, releasesHold } from "./refactor-hold.js";
 import { REPORT_CALL } from "./report.js";
 
 const ENABLED = "stop.enabled";
@@ -280,6 +281,7 @@ export function refactorHand(box) {
   const file = restingFile(box);
   if (!file) return null;
   box.refactors = (box.refactors ?? 0) + 1;
+  holdsFile(box, file);
   box.log.say(
     "info",
     "refactor",
@@ -297,6 +299,7 @@ export function refactorHand(box) {
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
 export function onRefactorAnswered(e, box) {
+  releasesHold(box);
   const said = String(e?.deny ?? "") || (e?.isError ? String(e?.text ?? "") : "");
   box.log.say(
     said ? "warn" : "info",

@@ -862,6 +862,7 @@ naming the rule, the line and the phrase.
 | prose | Vale, then the prose reader |
 | code | Biome |
 | a shell command landing a file | [[spec/design_output/bash]] |
+| a write to the file the refactoring hand holds | [[spec/design_output/stop#the-hand-holds-its-file]] |
 
 The private half answers first, so a note's own words stop at the door. The
 refusal closes by asking the writer to hold that rule for the rest of the turn.
