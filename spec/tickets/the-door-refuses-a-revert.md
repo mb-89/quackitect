@@ -89,12 +89,18 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 04b0535e1d9a768a5831862e65d35e821a1e63c7
     hash_after: 04b0535e1d9a768a5831862e65d35e821a1e63c7
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: 5869f2e24660655a8b45f2b1b84438ce63480036
+    hash_after: 5869f2e24660655a8b45f2b1b84438ce63480036
+    returns: 1
+    why: "design: `git log --format=%s <sha>` walks every commit under the sha. So `git revert` of any commit reads old pull subjects, and refuses.; design: that breaks the third ask line, and the cases feed a fake `subjects`, so no case shows it.; design fix: read each `git revert` revision with `--no-walk`, and `<rev>..HEAD` for a reset. Add a case running the real git read.; craft: `git revert -m 1 <sha>` hands `1` to the parse as a revision, so `-m` takes its value.; craft: `pull-hand.js` writes `<leaf> fails back to <back>`, and the leaf parse reads that form too.; craft: a take-back subject reads `<hand> takes <leaf> back`, and the parse reads that leaf as well.; craft: `verbLine` names what level zero refuses, and the new row belongs in it.; craft: the stated cost holds once the read walks one commit a revision, plus one read of the ticket folders.; the parse holds on `git log --oneline -30`: each ticket subject names a ticket under `spec/tickets`.; a subject like `the funnel note:` or `work/<group>:` names no ticket, so it passes.; `commandRules` is the one caller of `findings`, and the CLI resets through `it.git.run` off the door."
 ---
 
 # Ask
@@ -159,6 +165,19 @@ The cost: each `git revert` and `git reset` runs one `git log` at the door.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+- design: `git log --format=%s <sha>` walks every commit under the sha. So `git revert` of any commit reads old pull subjects, and refuses.
+- design: that breaks the third ask line, and the cases feed a fake `subjects`, so no case shows it.
+- design fix: read each `git revert` revision with `--no-walk`, and `<rev>..HEAD` for a reset. Add a case running the real git read.
+- craft: `git revert -m 1 <sha>` hands `1` to the parse as a revision, so `-m` takes its value.
+- craft: `pull-hand.js` writes `<leaf> fails back to <back>`, and the leaf parse reads that form too.
+- craft: a take-back subject reads `<hand> takes <leaf> back`, and the parse reads that leaf as well.
+- craft: `verbLine` names what level zero refuses, and the new row belongs in it.
+- craft: the stated cost holds once the read walks one commit a revision, plus one read of the ticket folders.
+- the parse holds on `git log --oneline -30`: each ticket subject names a ticket under `spec/tickets`.
+- a subject like `the funnel note:` or `work/<group>:` names no ticket, so it passes.
+- `commandRules` is the one caller of `findings`, and the CLI resets through `it.git.run` off the door.
 
 # implement
 
