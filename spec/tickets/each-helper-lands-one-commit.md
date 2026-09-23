@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -139,6 +139,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-9
+    hash_before: f610c684bc85045ed703e2aa9430ff5c760775bd
+    hash_after: f610c684bc85045ed703e2aa9430ff5c760775bd
+reason: done
 ---
 
 # Ask
@@ -365,17 +370,51 @@ A raw landing on `main` now meets the commit verb, and the refactoring hand hold
 
 <!-- the form is files -->
 
+- spec/tickets/each-helper-lands-one-commit.md
+- .claude/commands/se-config-refactor-holdFor.md
+- .claude/skills/level0/lib/runs.js
+- .claude/skills/level0/lib/trunk.js
+- spec/config/level0.json
+- spec/config/level0.schema.json
+- spec/design_output/level0.md
+- spec/design_output/stop.md
+- spec/design_output/work.md
+- spec/guidance/working.md
+- src/bridge/apply.js
+- src/bridge/bash.js
+- src/bridge/refactor-hold.js
+- src/bridge/server.js
+- src/bridge/stop.js
+- src/bridge/tools.js
+- src/bridge/write.js
+- src/scripts/commit-verb.js
+- test/level0/hold-roads.test.js
+- test/level0/refactor-hold.test.js
+- test/level0/trunk-door.test.js
+- test/level0/trunk.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- design: the row, the hold, the write door, the guidance line and the cases answer the Ask.
+- design: `./RUNME.sh check` exits 0 on the branch.
+- design: the Ask gates every landing on main through the verb. So the edited trunk-door case stands inside it.
+- craft: the refusal off main says the verb pushes the branch you stand on. That push lands nowhere on main.
+- craft: the comment over `takesABranch` still says every other cloud session lands its own work. It now reads stale.
+- craft: `pass` in `server.js` changes shape past the Ask. The fix is trivial.
+- craft: no retro stands in the handback yet.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the hold stands in `stop.md` and the landing in `work.md`, and the code points at both
 
 # Discussion
 
