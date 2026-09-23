@@ -89,7 +89,12 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: a10a58d8cff4f43bb26befd7589b774fe759b265
+    hash_after: a10a58d8cff4f43bb26befd7589b774fe759b265
 ---
 
 # Ask
@@ -115,6 +120,36 @@ Every hand-back on main comes back refused under a false cause, a moved main. Th
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+`pushed` in `src/scripts/pull-writes.js` owns the landing on origin, so the
+change stands there, and its callers read what it answers.
+
+| part | what changes |
+|---|---|
+| the answer | `pushed(it, branch, { red })` answers `{ ok, local, why }` in place of a bare flag |
+| the check | on trunk, `pushed` runs `./RUNME.sh check` over the commit first, the way `landsAndPushes` in `commit-verb.js` runs it |
+| a pass | the stamp names the commit, and the push goes |
+| the cause | a refused push answers the push door's own lines, read off the error stream |
+| the rebase | runs where git names a moved branch alone, and the refusal says so where it falls short |
+| the red close | a leaf whose command expects `assertion` passes `red: true`, and on trunk the commit stays local |
+| what it says | the close stands on this box, and the next green push carries it |
+| off trunk | a work branch pushes as it does, because its push meets no battery |
+| the callers | each of the eight sites prints `why` in place of the moved-branch sentence |
+| the design | `spec/design_output/pull.md#the-rejected-push` names the check, the cause and the local close |
+
+The cases, in `pull.test.js`:
+
+- on trunk a pass runs the check, then the push, in that order
+- a push the door refuses prints the door's own line, and no rebase runs
+- a tests-red close on trunk runs no push, and the answer says it stands local
+
+The callers:
+
+- `pull.js`, at the person step, the take-back and the verdict
+- `pull-writes.js`, at the pass, the fail, the became and the answered
+- `pull-hand.js`, at the hand-out
+
+The cost: a pass on trunk runs one full check, and the hand runs none of its own.
 
 ## review
 
