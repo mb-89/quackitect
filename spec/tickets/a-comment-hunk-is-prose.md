@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -146,6 +146,17 @@ record:
     hash_after: e5e7d8c6541d9edec0111066dc69e640258b029e
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 55df9c73dfc66f773ebd69fbe15669f25fd10567
+    hash_after: 55df9c73dfc66f773ebd69fbe15669f25fd10567
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 16 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -312,11 +323,17 @@ the door today. The rest pass today and hold the new reading in place.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/tested.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
+
 
 ### says
 
@@ -324,11 +341,23 @@ the door today. The rest pass today and hold the new reading in place.
 
 <!-- the form is text -->
 
+The commit door reads each file's hunk both ways. `hunksIn` opens a file at
+each `diff --git` line, drops a deleted file, and counts a line past its `@@`
+line alone. `codeIn` asks a test where a line either side is code, or where a
+hunk takes lines away and adds none. So a pointer fix passes, and a code line
+traded for a comment asks a test, as the ask names.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `tested.js`, its test and the chapter the rule owns
+- the door reads a delta as text, so it reaches no door
+- a comment on `hunksIn` and `codeIn` names the reading, through the chapter's pointer
+
 
 # verdict
 
