@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -149,6 +149,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-11
+    hash_before: 3c52e5194d3528bb2c9d5e185ccb19e608bf120d
+    hash_after: 3c52e5194d3528bb2c9d5e185ccb19e608bf120d
+reason: done
 ---
 
 # Ask
@@ -386,17 +391,47 @@ Each landing now waits on its gate.
 
 <!-- the form is files -->
 
+- spec/tickets/a-landing-follows-its-gate.md
+- .claude/skills/level0/lib/bash.js
+- spec/design_output/bash.md
+- spec/design_output/pull.md
+- spec/design_output/work.md
+- src/scripts/commit-verb.js
+- src/scripts/pull.js
+- src/scripts/pull-landed.js
+- src/scripts/ticket.js
+- src/scripts/cli.js
+- src/tui/frame_test.go
+- src/tui/tree/treefilter.go
+- test/level0/ask-lint.test.js
+- test/level0/bash.test.js
+- test/level0/commit-verb.test.js
+- test/level0/pull.test.js
+- test/level0/pull-bare.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- craft: `./RUNME.sh check` exits 0 on this branch.
+- craft: each Ask line lands, and a case under `test/level0` covers it.
+- craft: the handback holds no retro field, so none stands there.
+- craft: a bare pull with `--fields` on a plain leaf shows the leaf and drops the payload silently.
+- craft: `landingOf` matches `RUNME.sh` anywhere in a segment, so an `echo` of a landing refuses too.
+- craft: `verbLine` still leaves the new refusal unnamed, as the design review asks.
+- craft: the tests-green command names `pull-bare.test.js`, where tests-red named `pull.test.js`.
+- craft: two Go comments lose a doubled word outside the Ask, and the fix is trivial.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each fact stands once in its chapter, and every code comment points at that chapter.
 
 # Discussion
 
