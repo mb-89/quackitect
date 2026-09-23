@@ -89,12 +89,18 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 952caab3791e7cd0658ee91ec1c163b27251778c
     hash_after: 952caab3791e7cd0658ee91ec1c163b27251778c
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: 714c9943736ffc1a60218acef5732ddb2fbb0624
+    hash_after: 714c9943736ffc1a60218acef5732ddb2fbb0624
+    returns: 1
+    why: "design: two new actionables lift `spec/guidance/working.md` to seventeen rules, past the cap of fifteen.; design: `VoiceShape.GuidanceCap` then refuses the note, and `./RUNME.sh check` fails.; design: fold the question row into rule 6 and the log line into rule 4, and the cap holds.; craft: `Number(skips) || 1` turns 0 into 1, so `demands` needs more than a lower floor.; craft: `answer-door.test.js` and `note-answer.test.js` assert the first call passes, and the approach leaves both out.; craft: the chapter \"The first call is free\" in `spec/design_output/level0.md` needs a rewrite too.; craft: the stated cost misses the refusal, since a hand calling a tool first sees that call refused.; craft: the ask door keeps its grace, because `grace.update` stands at 5.; craft: `onAgent` also meets a helper's own Agent call, so the approach says what a helper gets."
 ---
 
 # Ask
@@ -156,6 +162,17 @@ The cost: a hand answering a prompt with a tool call first pays one round trip f
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+- design: two new actionables lift `spec/guidance/working.md` to seventeen rules, past the cap of fifteen.
+- design: `VoiceShape.GuidanceCap` then refuses the note, and `./RUNME.sh check` fails.
+- design: fold the question row into rule 6 and the log line into rule 4, and the cap holds.
+- craft: `Number(skips) || 1` turns 0 into 1, so `demands` needs more than a lower floor.
+- craft: `answer-door.test.js` and `note-answer.test.js` assert the first call passes, and the approach leaves both out.
+- craft: the chapter "The first call is free" in `spec/design_output/level0.md` needs a rewrite too.
+- craft: the stated cost misses the refusal, since a hand calling a tool first sees that call refused.
+- craft: the ask door keeps its grace, because `grace.update` stands at 5.
+- craft: `onAgent` also meets a helper's own Agent call, so the approach says what a helper gets.
 
 # implement
 
