@@ -89,7 +89,12 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: f4ff6950c4c706386b4cf5044908723cc3ff9d07
+    hash_after: f4ff6950c4c706386b4cf5044908723cc3ff9d07
 ---
 
 # Ask
@@ -117,6 +122,41 @@ The write door refuses a write over a real read after a restart, a partial Read 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The marks move to disk and learn spans, `patch` makes its folders and says
+what it wrote, and every level zero tool names a dead bridge.
+
+| part | the file | what changes |
+|---|---|---|
+| the store | `src/bridge/write.js` | `marksOf` loads the marks from a runtime file on the first ask, and `marksSeen` writes it back |
+| the path | `.claude/skills/level0/lib/runs.js` | the marks file's name stands beside `REFACTORS` |
+| the span | `.claude/skills/level0/lib/marks.js` | a mark holds the whole hash, or a list of `{ from, to, hash }` over line spans |
+| the partial Read | `onRead` in `src/bridge/server.js` | a Read with `offset` or `limit` marks the lines it hands back |
+| the shell read | `src/bridge/bash.js` | `cat`, `head -n`, `tail -n` and `sed -n 'a,bp'` over a tracked file mark what they print |
+| the meeting | `staleFault` in `marks.js` | a write passes where the lines it changes lie inside a span whose lines still hash the same |
+| the whole write | the same | a Write replacing the file still asks for the whole mark |
+| the folder | `writes` in `src/bridge/apply.js` | a `create` makes its file's folder before the write |
+| the first fault | the same | a first file refusing the write removes the journal, and the answer opens on `nothing written` |
+| the undo | `undoes` | reads no journal, so it answers `nothing to undo` as it stands |
+| the dead bridge | `.claude/skills/level0/hooks/level0.js` | `reading` takes every `mcp__level0__` tool, so each one answers the `no server answers` line |
+
+The lines a write changes come off the common head and tail of the disk text and the new text.
+
+The cases:
+
+- `write.test.js`: a mark written on one box reads on a fresh box over the same disk
+- `write.test.js`: a Read of lines 10 to 20 lets an Edit inside them land, and refuses one at line 30
+- `bash.test.js`: `sed -n '1,5p' README.md` marks lines 1 to 5
+- `apply.test.js`: a `create` into a new folder lands, and a failed first write answers `nothing written`
+- `bridgehead.test.js`: a `mcp__level0__plan` call with no server answers the line
+
+The callers:
+
+- `onWrite` and `lands` in `apply.js` call `staleFault` through the write door
+- the bridgehead answers for the server's own tools too, beside the four `READ_TOOLS` it registers
+- the server's tools behind the bridgehead are `find`, `patch`, `replace`, `undo` and the server's own
+
+The cost: each mark writes the runtime file once, and a whole mark still asks for a whole read.
 
 ## review
 
