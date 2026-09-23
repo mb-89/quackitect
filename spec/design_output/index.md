@@ -23,8 +23,8 @@ out of a shape differing writers disagree about.
 
 ## The rows the walk writes
 
-One walk fills every table below in a single transaction, so a reader
-meets the whole answer or the one before it.
+Every move of the rows lands in a single transaction, so a reader meets the
+whole answer or the one before it.
 
 | table | what it holds |
 |---|---|
@@ -100,22 +100,39 @@ picks the index up on the first question after the build lands.
 ## The watcher keeps it warm
 
 The watch is what holds the rows level with the tree. It watches every folder
-the walk covers, and a write anywhere marks the rows dirty. One sweep answers a
-burst, so a build touching a thousand files costs one walk.
+the walk covers, and names each path a write reaches. For what the door does
+with a path, see [[spec/design_output/index#a-change-moves-its-rows]].
 
 The log is the one folder the watch stands off. It grows a line a door call, so
-a watch on it sweeps the tree for nothing. The walk still reads it, and the next
-sweep carries what it holds.
+a watch on it moves rows for nothing. The sweep still reads it, and carries what
+it holds.
 
-A box where no watch stands still answers, out of the walk the door makes on
-the way up.
+A box where no watch stands still answers, out of the sweep the door makes on
+the way up and on its clock.
+
+## A change moves its rows
+
+Nothing clears the rows. A version or a root disagreeing drops the file whole,
+and every other road moves the rows of the paths a change names:
+
+| what moves the rows | what it rewrites |
+|---|---|
+| a path the watch names, once a burst settles | that file, every row under it where it names a folder, or its rows gone where it stands nowhere |
+| git's own index, which the watch names apart | the tracked flag on each row git's list turns |
+| the sweep, on the way up, on a clock, and at `reindex` | each file whose size or time differs from its row, and each row whose file stands nowhere |
+
+`sweepEvery` in `src/index/door.go` names the clock. The sweep catches a change
+the watch misses, and a still tree costs it a stat a file.
+
+A file that moves drops the rows it holds and writes them again. The links
+resolve again after any move, and a link whose target goes reaches nothing.
 
 ## The index fires on change
 
 A reader wanting to redraw on a change asks `changes` and names the tick it
-holds. The call holds until a sweep moves the rows past that tick, and answers
+holds. The call holds until a move of the rows passes that tick, and answers
 the tick then. So a reader calls again with the tick it takes, and each answer is a
-change. A reader holding no tick names zero, and the walk on the way up counts
+change. A reader holding no tick names zero, and the sweep on the way up counts
 one.
 
 | what the reader meets | what the call answers |
@@ -145,7 +162,7 @@ Each one is a walk the tree takes in one call:
 | `changes` | the tick past the one a caller names, once a sweep moves the rows |
 | `files` | every path, its hash, and whether git tracks it |
 | `texts` | the text of the paths a reader names |
-| `reindex` | the walk again, now |
+| `reindex` | the sweep, now, so a reader reads the disk as it stands |
 | `standing` | the root the door holds, and how many files it counts |
 
 ## The index answers the tickets

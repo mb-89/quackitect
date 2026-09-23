@@ -1,5 +1,5 @@
-// The watch that holds the rows level with the tree. One sweep answers a
-// burst, so a build touching a thousand files costs one walk.
+// The watch that holds the rows level with the tree. It names each path it
+// hears, and the door moves those rows alone once a burst settles.
 // [[spec/design_output/index#the-watcher-keeps-it-warm]]
 package main
 
@@ -20,6 +20,8 @@ func watches(root string, one *door) (*fsnotify.Watcher, error) {
 		eyes.Close()
 		return nil, err
 	}
+	// Git's own folder alone, with no folder under it, so a change to the tracked list reaches the flags. [[spec/design_output/index#a-change-moves-its-rows]]
+	eyes.Add(filepath.Join(root, ".git"))
 
 	go func() {
 		for {
@@ -33,7 +35,9 @@ func watches(root string, one *door) (*fsnotify.Watcher, error) {
 						folders(root, said.Name, eyes)
 					}
 				}
-				one.Touched()
+				if rel, ok := relOf(root, said.Name); ok {
+					one.Touched(rel)
+				}
 			case _, open := <-eyes.Errors:
 				if !open {
 					return

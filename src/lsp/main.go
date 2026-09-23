@@ -124,7 +124,7 @@ func pathsUnder(tree *Tree, where []string) []string {
 }
 
 func checks(root string, where []string) int {
-	// The check reads the disk as it stands now, so the index walks again before it answers. [[spec/design_output/lsp#the-server-reads-the-index]]
+	// The check reads the disk as it stands now, so the index sweeps before it answers. [[spec/design_output/lsp#the-server-reads-the-index]]
 	checker, err := checkerAt(root, true)
 	if err != nil {
 		fmt.Fprintln(stderr, err)

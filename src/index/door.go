@@ -27,8 +27,12 @@ import (
 const (
 	headerReadTimeout = 5 * time.Second
 	burstSettleDelay  = 200 * time.Millisecond
-	decimalBase       = 10
-	stopGraceDelay    = 100 * time.Millisecond
+	// The span between two sweeps on the clock. [[spec/design_output/index#a-change-moves-its-rows]]
+	sweepEvery = 10 * time.Minute
+	// Git's own index, which a watch on its folder names when the tracked list turns. [[spec/design_output/index#a-change-moves-its-rows]]
+	gitIndex       = ".git/index"
+	decimalBase    = 10
+	stopGraceDelay = 100 * time.Millisecond
 	// A changes call waits this long for a sweep, under the wait a caller gives a post. [[spec/design_output/index#the-index-fires-on-change]]
 	changesWait = 25 * time.Second
 )
@@ -60,6 +64,10 @@ type door struct {
 	eyes  *fsnotify.Watcher
 
 	pending atomic.Bool
+	// The paths the watch names since the last settle, and whether git's own index moved. [[spec/design_output/index#a-change-moves-its-rows]]
+	heard   sync.Mutex
+	touched map[string]bool
+	retrack bool
 
 	// The count of sweeps so far, and the channel a sweep closes to wake every waiting changes call. [[spec/design_output/index#the-index-fires-on-change]]
 	tick     atomic.Int64
@@ -123,11 +131,12 @@ func Serve(root, at string) (func(), net.Listener, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	if _, err := Reindex(db, root); err != nil {
+	// The door comes up on a sweep against the rows it finds, so a restart rewrites what moved while it stood down. [[spec/design_output/index#a-change-moves-its-rows]]
+	if _, _, err := Sweep(db, root); err != nil {
 		return nil, nil, err
 	}
 
-	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{})}
+	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}}
 	one.tick.Store(1)
 	listen, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -139,6 +148,7 @@ func Serve(root, at string) (func(), net.Listener, error) {
 	server := &http.Server{Handler: mux, ReadHeaderTimeout: headerReadTimeout}
 
 	go one.sweeps()
+	go one.guards()
 	go server.Serve(listen)
 
 	eyes, err := watches(root, one)
@@ -172,7 +182,18 @@ func (one *door) stands(listen net.Listener) error {
 	return os.WriteFile(standingPath(one.root), append(said, '\n'), 0o644)
 }
 
-func (one *door) Touched() {
+// A path the watch names. Git's own index turns the tracked flags, and every other path under .git moves no row. [[spec/design_output/index#a-change-moves-its-rows]]
+func (one *door) Touched(rel string) {
+	if strings.HasPrefix(rel, ".git/") && rel != gitIndex {
+		return
+	}
+	one.heard.Lock()
+	if rel == gitIndex {
+		one.retrack = true
+	} else {
+		one.touched[rel] = true
+	}
+	one.heard.Unlock()
 	one.pending.Store(true)
 	select {
 	case one.dirty <- struct{}{}:
@@ -189,10 +210,39 @@ func (one *door) sweeps() {
 	}
 }
 
+// The rows of the paths heard since the last settle move, and the tick counts one where any did. [[spec/design_output/index#a-change-moves-its-rows]]
 func (one *door) settles() {
-	if one.pending.Swap(false) {
-		Reindex(one.db, one.root)
+	if !one.pending.Swap(false) {
+		return
+	}
+	one.heard.Lock()
+	paths, retrack := named(one.touched), one.retrack
+	one.touched, one.retrack = map[string]bool{}, false
+	one.heard.Unlock()
+	moved := 0
+	if len(paths) > 0 {
+		if rows, err := Touches(one.db, one.root, paths); err == nil {
+			moved += rows
+		}
+	}
+	if retrack {
+		if rows, err := Retracks(one.db, one.root); err == nil {
+			moved += rows
+		}
+	}
+	if moved > 0 {
 		one.moved()
+	}
+}
+
+// The sweep on a clock, which catches a change the watch misses and clears nothing. [[spec/design_output/index#a-change-moves-its-rows]]
+func (one *door) guards() {
+	for range time.Tick(sweepEvery) {
+		one.guard.Lock()
+		if _, moved, err := Sweep(one.db, one.root); err == nil && moved > 0 {
+			one.moved()
+		}
+		one.guard.Unlock()
 	}
 }
 
@@ -305,7 +355,11 @@ func (one *door) answers(said call) (any, error) {
 	case "same":
 		return Same(one.db, asked.Path)
 	case "reindex":
-		count, err := Reindex(one.db, one.root)
+		// The verb sweeps now, so a reader asking it reads the disk as it stands, and nothing clears. [[spec/design_output/index#a-change-moves-its-rows]]
+		count, moved, err := Sweep(one.db, one.root)
+		if err == nil && moved > 0 {
+			one.moved()
+		}
 		return map[string]int{"files": count}, err
 	case "stop":
 		go stopsSoon(one.root)

@@ -67,7 +67,7 @@ hash, whether git tracks it, and its text. For the verbs it asks, see
 | the front | when it pulls |
 |---|---|
 | the editor's panel | once at its start, then on every tick the door's `changes` answers |
-| `se-lsp check` | once, after the door walks the tree again, so the check reads the disk as it stands |
+| `se-lsp check` | once, after the door sweeps, so the check reads the disk as it stands |
 | the loopback door | before every answer |
 
 A door standing nowhere gets started through its binary, the way every caller
@@ -94,7 +94,7 @@ it: an agent, git, or a script.
 | a file git tracks nowhere | nothing, because no rule reads it |
 
 An open file follows the editor's buffer. A write on disk reaches the panel
-once the index sweeps it, and the sweep walks the whole tree.
+once the index moves the rows the write names.
 
 # The panel lints as typed
 

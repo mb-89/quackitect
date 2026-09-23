@@ -39,7 +39,7 @@ func opened(t *testing.T, root string) *sql.DB {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { db.Close() })
-	if _, err := Reindex(db, root); err != nil {
+	if _, _, err := Sweep(db, root); err != nil {
 		t.Fatal(err)
 	}
 	return db
@@ -187,7 +187,7 @@ func TestAnIndexUnderAnotherRootIsDropped(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := Reindex(db, root); err != nil {
+	if _, _, err := Sweep(db, root); err != nil {
 		t.Fatal(err)
 	}
 	db.Close()

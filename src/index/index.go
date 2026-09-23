@@ -137,54 +137,6 @@ func setMeta(db *sql.DB, root string) error {
 	return nil
 }
 
-func Reindex(db *sql.DB, root string) (int, error) {
-	tx, err := db.Begin()
-	if err != nil {
-		return 0, err
-	}
-	defer tx.Rollback()
-
-	for _, one := range []string{
-		`DELETE FROM file`, `DELETE FROM note`, `DELETE FROM link`,
-		`DELETE FROM note_text`, `DELETE FROM line_text`,
-	} {
-		if _, err := tx.Exec(one); err != nil {
-			return 0, err
-		}
-	}
-
-	// Git's list, read once a walk, marks the rows a reader of the tracked tree takes. [[spec/design_output/index#the-rows-the-walk-writes]]
-	tracked := trackedIn(root)
-	count := 0
-	err = filepath.Walk(root, func(abs string, info fs.FileInfo, err error) error {
-		if err != nil {
-			return nil // a file that went while the walk ran is no fault of the walk
-		}
-		if info.IsDir() {
-			if skips(root, abs, info) {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		rel, ok := relOf(root, abs)
-		if !ok {
-			return nil
-		}
-		if err := one(tx, abs, rel, info, tracked(rel)); err != nil {
-			return err
-		}
-		count++
-		return nil
-	})
-	if err != nil {
-		return 0, err
-	}
-	if err := resolve(tx); err != nil {
-		return 0, err
-	}
-	return count, tx.Commit()
-}
-
 func relOf(root, abs string) (string, bool) {
 	rel, err := filepath.Rel(root, abs)
 	if err != nil || strings.HasPrefix(rel, "..") {
@@ -281,26 +233,27 @@ func note(tx *sql.Tx, rel, text string) error {
 	return nil
 }
 
+// Every link against the path it reaches now. A row whose target turns writes again, so a link to a file gone reaches nothing, and the rest stand. [[spec/design_output/index#a-change-moves-its-rows]]
 func resolve(tx *sql.Tx) error {
 	ids, paths, folders, err := known(tx)
 	if err != nil {
 		return err
 	}
 
-	rows, err := tx.Query(`SELECT rowid, target FROM link`)
+	rows, err := tx.Query(`SELECT rowid, target, coalesce(to_path, '') FROM link`)
 	if err != nil {
 		return err
 	}
-	found := map[int64]string{}
+	turned := map[int64]string{}
 	for rows.Next() {
 		var id int64
-		var target string
-		if err := rows.Scan(&id, &target); err != nil {
+		var target, held string
+		if err := rows.Scan(&id, &target, &held); err != nil {
 			rows.Close()
 			return err
 		}
-		if at := pointsAt(target, ids, paths, folders); at != "" {
-			found[id] = at
+		if at := pointsAt(target, ids, paths, folders); at != held {
+			turned[id] = at
 		}
 	}
 	rows.Close()
@@ -308,8 +261,12 @@ func resolve(tx *sql.Tx) error {
 		return err
 	}
 
-	for id, at := range found {
-		if _, err := tx.Exec(`UPDATE link SET to_path = ? WHERE rowid = ?`, at, id); err != nil {
+	for id, at := range turned {
+		var to any = at
+		if at == "" {
+			to = nil
+		}
+		if _, err := tx.Exec(`UPDATE link SET to_path = ? WHERE rowid = ?`, to, id); err != nil {
 			return err
 		}
 	}
