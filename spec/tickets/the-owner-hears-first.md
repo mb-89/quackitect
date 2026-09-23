@@ -89,7 +89,12 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 952caab3791e7cd0658ee91ec1c163b27251778c
+    hash_after: 952caab3791e7cd0658ee91ec1c163b27251778c
 ---
 
 # Ask
@@ -116,6 +121,31 @@ A mid-turn prompt waits behind tool calls or a helper the turn waits on, and the
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+Two gates in the server, and two actionables in the working guidance.
+
+| part | the file | what changes |
+|---|---|---|
+| the prompt gate | `src/bridge/answer.js` | `onPromptSubmit` opens its demand with no skip, so the first call after a prompt asks for the reply |
+| the skip floor | the same | `demands` takes `0` skips, and the ask door keeps its grace through `asks(box, GRACE_UPDATE)` |
+| the Agent gate | a new `src/bridge/agent.js` | `onAgent` refuses an `Agent` call carrying `run_in_background: false`, and names the background road |
+| its wiring | `src/bridge/server.js` | `TOOLS.Agent` names `onAgent`, beside `Read` and `Bash` |
+| the question row | `spec/guidance/working.md` | an actionable: each owner question keeps its own row in the answer's opening table until it closes |
+| the log line | the same | an actionable: each finished piece takes one `mcp__level0__report` line |
+| the design | `spec/design_output/level0.md#the-owners-prompt-comes-first` | the first call meets the gate, and the Agent row stands there |
+
+The cases:
+
+- `answer.test.js`: after an owner prompt, the first `Bash` call answers `needs: reply`, and a helper's call passes
+- a new `agent.test.js`: `run_in_background: false` refuses, and an Agent call without it passes
+
+The callers:
+
+- `onToolCall` runs `holdsForAnswer` before the tool's door, so the gate meets every call of the session's own
+- `ask.js` calls `demands` with its grace, and keeps it
+- `onAgentSpawn` in `guidance.js` reads the spawn after the gate, and keeps its road
+
+The cost: a hand answering a prompt with a tool call first pays one round trip for the reply.
 
 ## review
 
