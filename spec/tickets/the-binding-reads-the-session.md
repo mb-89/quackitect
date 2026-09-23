@@ -89,12 +89,16 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 1e40e441ab60cc0a3dc2104d2bf538dc94877f55
     hash_after: 1e40e441ab60cc0a3dc2104d2bf538dc94877f55
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: 28fe29d78c6f3214fe9bcdf25d3423cb2da9905a
+    hash_after: 28fe29d78c6f3214fe9bcdf25d3423cb2da9905a
 ---
 
 # Ask
@@ -161,6 +165,15 @@ The cost: a helper running beside a ticket in hand ends the turn under `queue`, 
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- design: each part answers an Ask line, and the cost holds. `your-helpers-still-run` at 83 beats the level1 rules.
+- craft: the cost names a ticket in hand. The same claim also ends a turn over a group in hand and a waiting queue.
+- craft: `asks` reads the local file and the tracked file alone. So `whereFrom` must read the same layers the hook reads.
+- craft: the moment is the first read after a change, and the box loses it when the server starts again.
+- craft: `retro-new.test.js` stands already, so the new case joins that file.
+- craft: `stop-helper.test.js` holds a case where the queue holds the turn beside a helper. The change flips that case.
 
 # implement
 
