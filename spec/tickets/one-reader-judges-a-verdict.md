@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -134,6 +134,10 @@ record:
     hand: box d6f05e3a585030 · claude-code
     hash_before: 0837bf964c36de8122ba7944723ed7dcf64d4726
     hash_after: 0837bf964c36de8122ba7944723ed7dcf64d4726
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-10
+    hash_before: 68fe23a594f6f1c4fe8c5c29e65bfe2ca67a2f2d
+    hash_after: 68fe23a594f6f1c4fe8c5c29e65bfe2ca67a2f2d
 ---
 
 # Ask
@@ -197,14 +201,14 @@ config `configOf` has `assemble` write, then runs `readThrough` and
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- Design: `./RUNME.sh lint` reads through `findingsOver` in `cli-read.js`, and `lintText` serves the write door and the panel.
-- So the pull matches the door's reading, and the lint keeps a reader of its own.
-- Fix the opening line, and name `findingsOver` as the reading the pull matches.
-- Hand `valeArgv` the config `assemble` writes, as `configOf` in `findings.js` does.
-- Hold the marker case with `linesNamed`: the pull's list against `findingsOver` over the same ticket.
-- The rest stands answered: the split, the whole file, the chapter's lines, the markers, the level and the panel.
+- The opening line names `findingsOver` through `readingFor` as the reading the pull matches.
+- `valeArgvOf` hands the pull and the lint one config, the one `configOf` has `assemble` write.
+- `readsText` gives the pull and `findingsOver` one reading over a file's text.
+- The case holds the pull's list against `findingsOver` with `linesNamed`, a marker included.
+- The level covers every rule the tree holds, because no rule stands at suggestion.
+- The cost stands named: two runners over one argument list.
 
 # implement
 
