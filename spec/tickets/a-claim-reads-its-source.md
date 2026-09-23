@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -109,6 +109,17 @@ record:
     hand: box dcd73916add7 · claude-code-remote · helper-4
     hash_before: e2055d951f6404f5b4ca642e2f0a17917afa0fa2
     hash_after: e2055d951f6404f5b4ca642e2f0a17917afa0fa2
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 9a8b1347c52e9b7f7ae415756662f68093b73766
+    hash_after: 9a8b1347c52e9b7f7ae415756662f68093b73766
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -220,17 +231,32 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/plan-queue.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Four cases fail, each on its own assertion. The digit reads the plan's own
+todos today, so a digit of two names no ticket. The answer names no place.
+
+- the queue answers off a fake git, so the bridge box reads it through its process door
+- the tie case pins call order, because the score breaks a tie by name
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch one new file, which the ask names through its case
+- the git read runs on the fake git `work-doors.js` builds, and the disk and clock are fakes
+- a comment above each case points at the chapter the approach names
+
 
 ## reflect
 
