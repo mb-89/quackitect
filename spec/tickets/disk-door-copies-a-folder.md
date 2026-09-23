@@ -94,11 +94,11 @@ place of a walk reading and writing each file as text.
 <!-- the form is checklist -->
 
 - the change follows the first two lines of the ask, and the discussion says why the third departs
-- the cleanup: the text copy corrupting a binary goes with the walk, so a vehicle carries an image byte for byte
+- the cleanup: the text copy goes with the walk, so a vehicle carries an image byte for byte
 - one place: the filter stays `travels` in `lib/vehicle.js`, and the door takes it as an argument
 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
 
-- The produce case stands seventh of the slowest ten, at about a second and a half. One call still writes every file of the method, and the disk pays per file. The case above it, a vehicle answering its own verbs, runs the install and leaves this change untouched. A vehicle carrying fewer files, or a case producing it once for the whole battery, takes the case out of the ten.
+- The produce case stands seventh of the slowest ten, at about a second and a half. One call still writes every file of the method, and the disk pays per file. The case above it runs the install, and this change leaves it alone. A vehicle carrying fewer files takes the case out of the ten. So does one vehicle the whole battery shares.
