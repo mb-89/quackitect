@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 31f4eb1d08844b9fdeecdb6a3f6d1b2667b94010
+    hash_after: 31f4eb1d08844b9fdeecdb6a3f6d1b2667b94010
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -260,11 +268,17 @@ The shared reading stands as a stub named `voiceOver` in `src/bridge/findings.js
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint spec/design_output/pull.md src/bridge/findings.js src/scripts/pull-chapter.js src/scripts/ticket-ask-lint.js src/scripts/ticket.js src/scripts/retro-new.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change touches the files the ask and the review name, and no other.
+- Vale stays behind the process door, and the fake process answers it in every level0 case.
+- Each new function carries a pointer to `spec/design_output/pull.md`, and the chapter names the road.
 
 ## tests-green
 

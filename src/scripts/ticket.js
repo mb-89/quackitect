@@ -23,7 +23,7 @@ import { fieldOf, GROUP, withField, withoutField } from "../engine/group.js";
 import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
 import { landedAlone } from "./pull-landed.js";
-import { askFaults, askRefusal } from "./ticket-ask-lint.js";
+import { askFaults, askRefusal, lineRefusal } from "./ticket-ask-lint.js";
 
 export const NOTES = TICKETS;
 export const HOLDS = OWNED_HOLDS;
@@ -114,6 +114,12 @@ function note(it, name, argv) {
   });
   if (made.why) {
     console.error(made.why);
+    return 1;
+  }
+  // The note reads its Ask through the lint's road before it writes. [[spec/design_output/pull#a-draft-opens]]
+  const found = askFaults(it, path, made.text);
+  if (found.length) {
+    console.error(lineRefusal(path, found));
     return 1;
   }
 
@@ -222,7 +228,7 @@ function open(it, name) {
   const found = askFaults(
     it,
     at.path.split("\\").join("/").replace(`${it.root}/`, ""),
-    rows,
+    text,
   );
   if (found.length) {
     console.error(askRefusal(at.said, found));

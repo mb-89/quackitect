@@ -119,9 +119,27 @@ export async function findingsFor(box, url) {
   return { ok: !got.fault, found: got.found, fault: got.fault };
 }
 
-// A ticket's text held in memory, read the way the lint reads its file, keeping what refuses on the lines the caller names. [[spec/design_output/pull#the-voice-reads-the-evidence]]
-export function voiceOver(_it, _path, _text, _span) {
-  return [];
+// The levels that refuse a write, the ones the lint names. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+export const REFUSES = new Set(["error", "warning"]);
+
+// A ticket's text held in memory, read the way the lint reads its file: the lint's Vale call with the text on stdin, then readsText. It keeps what refuses on the lines the caller names. The pull, the open, the note and the retro's mint read here. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+export function voiceOver(it, path, text, span = {}) {
+  if (!it.vale || !String(text ?? "").trim()) return [];
+  let ran;
+  try {
+    ran = it.proc.run([...valeArgvOf(it), `--path=${path}`], {
+      stdin: text,
+      cwd: it.root,
+    });
+  } catch {
+    return [];
+  }
+  if (faultIn(ran.stdout)) return [];
+  const first = span.first ?? 1;
+  const last = span.last ?? Number.POSITIVE_INFINITY;
+  return readsText(it, path, text, fromJson(ran.stdout)).filter(
+    (fault) => REFUSES.has(fault.severity) && fault.line >= first && fault.line <= last,
+  );
 }
 
 // The Vale call the lint and the pull share, on the config the assembly writes. A caller adds the paths or the stdin path. [[spec/design_output/pull#the-voice-reads-the-evidence]]

@@ -450,16 +450,38 @@ chain carries a checklist, and the ticket door lets the hand write it.
 ## The voice reads the evidence
 
 The hand-back reads its ticket the way `./RUNME.sh lint` reads a file, where
-vale stands on the box. `voiceFaults` in `src/scripts/pull-chapter.js` hands
-Vale the whole ticket on stdin, with the payload's fields under their headings. The call opens on
-`valeArgvOf`, and `readsText` reads the answer. `findingsOver` in
-`src/bridge/findings.js` calls both over each file the lint reads.
+vale stands on the box. `voiceOver` in `src/bridge/findings.js` hands Vale a
+ticket's text on stdin through `valeArgvOf`, and `readsText` reads the answer.
+`findingsOver` calls both over each file the lint reads. `voiceFaults` in
+`src/scripts/pull-chapter.js` hands `voiceOver` the whole ticket, with the
+payload's fields under their headings.
 
 | part | what the pull does |
 |---|---|
 | the text | blanks a field in no prose form and an `answered` row, so every row keeps its file line and a Vale marker holds |
 | the lines | keeps a finding on the leaf's chapter, and names it at its line in the ticket |
 | the level | refuses on an error and on a warning, so the lint names nothing later that the hand-back lets through |
+
+Every verb taking a hand's prose into a ticket reads it through `voiceOver`,
+so no fix commit follows a landing.
+
+| the verb | what it reads |
+|---|---|
+| the pull | the leaf's chapter, with the fields laid in |
+| `ticket open` | the Ask, over the whole ticket, as [[spec/design_output/pull#a-draft-opens]] says |
+| `ticket note` | the Ask it mints, before it writes |
+| `retro new` | the Ask carrying the `--why` line, before it writes |
+
+The road reads through `readsText`, the lint's own reading. `readsProse` in
+`src/bridge/prose.js` serves the write door, and it drops a long sentence and a
+word outside the vocabulary where it judges the finding false. The lint keeps
+those findings, so a verb reading through `readsProse` lets a line through that
+the lint names later.
+
+A contract case in `test/contract/process.test.js` mints a ticket off every
+route under `spec/processes`, and real Vale reads it. A line a route writes
+carries no finding there, so a verb minting off a route meets no refusal over
+the route's own words.
 
 ## The commands answer
 
@@ -651,11 +673,21 @@ refuses while the ask stands empty. So the pull hands out what a person
 writes, and nothing else.
 
 The verb reads the voice rules over the Ask too, and refuses one that breaks
-a rule at the error level. The Ask is the engine's from the open on, so the
-ticket door refuses every later hand there. A rule broken past the open
-stands in the lint over the tree until a person reaches for the door.
-`src/scripts/ticket-ask-lint.js` holds the run, and a box with no Vale opens as it
-stands.
+a rule at the error or the warning level. `askFaults` in
+`src/scripts/ticket-ask-lint.js` hands `voiceOver` the whole ticket, and keeps
+the findings on the Ask's lines, so a line number names the file's line. The
+Ask is the engine's from the open on, so the ticket door refuses every later
+hand there. A box with no Vale opens as it stands.
+
+`ticket note` and `retro new` write an Ask from a hand's line, and read it
+through `askFaults` before they write. Their refusal reads as the open's does.
+
+- It writes no file.
+- It names each finding at its line.
+- It exits with a fault, so a script stops there.
+
+The cost: a draft whose Ask carries a warning stops opening until a hand
+rewrites its Ask. The refusal names each line, so the rewrite takes minutes.
 
 The open lands in one commit naming the ticket, through `landedAlone` in
 `pull-landed.js`. A commit the hook refuses puts the draft back, and the verb
@@ -663,9 +695,10 @@ exits with a fault.
 
 ## The blank lines stand
 
-`askLines` hands Vale the Ask with every blank line in it, and drops the
-placeholder comments alone. A blank line is what parts a paragraph from a
-table, so Vale reads the parts the writer means.
+`askFaults` hands Vale the whole ticket, so every blank line and every table
+stand as the file holds them. A blank line is what parts a paragraph from a
+table, so Vale reads the parts the writer means. `askLines` keeps the Ask's
+rows for the test on an empty Ask alone.
 
 Rows that drop the blanks run a table into the prose around it. Vale then reads
 the run as one paragraph, and the sentence rule counts the whole of it as one
