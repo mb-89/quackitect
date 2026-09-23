@@ -89,7 +89,12 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 054a9a4d91fe4d68be64397e96b000824bd09256
+    hash_after: 054a9a4d91fe4d68be64397e96b000824bd09256
 ---
 
 # Ask
@@ -115,6 +120,30 @@ Notes count their tables and test runs, and a header counts its files. `level0.j
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+Four owners, and a check holds each copy to its owner.
+
+| part | what changes |
+|---|---|
+| the list count | a new script rule `spec/config/styles/VoiceVale/CountedList.yml` at warning |
+| what it reads | a line holding a count word, right above a list or a table |
+| where it reads | every note, and the code section of `.vale.ini` sets it `NO` |
+| the header | a new script rule `VoiceVale/CodeHeader.yml` at error, over the leading comment |
+| what it refuses | a sixth header line, and a header line holding a count word |
+| `CodeComment` | keeps the stray comment at warning, and hands the header length to `CodeHeader` |
+| the constants | `SELF_TEST` and `TESTING` move into `.claude/skills/level0/lib/vehicle.js` |
+| their readers | `reload.js` and `server.js` import both, and `START` in `level0.js` spells them through a template |
+| the route | `test/level0/route-fixture.test.js` runs `stepsIn` and `leavesOf` over the same tickets |
+| what it holds | both name the same leaf paths, a nested route and a leaf with evidence among them |
+| the fixes | every header and list the new rules name lands fixed in the same change |
+
+A count word is a digit or a number word from `two` up, before a plural noun.
+
+- the cost: a Vale rule holds one level, so the header takes a rule of its own beside `CodeComment`
+- the cost: the bridgehead imports its own folder alone, so the constants move there and the server reads them
+- the case: a note with a counted list warns, and a header with a count refuses
+- the case: `START` carries the flag and the timeout `vehicle.js` exports
+- `./RUNME.sh check` answers 0 once the fixes land
 
 ## review
 
