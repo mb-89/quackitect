@@ -89,12 +89,18 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
     hash_before: f4ff6950c4c706386b4cf5044908723cc3ff9d07
     hash_after: f4ff6950c4c706386b4cf5044908723cc3ff9d07
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: 428a36c5317b4307b96b3bd59e38e3fceebbf9b6
+    hash_after: 428a36c5317b4307b96b3bd59e38e3fceebbf9b6
+    returns: 1
+    why: "design: a failed first write removes its journal, so an older apply of the same name stands newest.; design: `undo` then takes that older apply back, and the ask wants it to say nothing waits.; design: the journal stays with a word that nothing landed, and `undo` answers nothing waits and drops it.; craft: the named cases leave out `undo` after a failed first write, and the ask wants a case a line.; craft: the stated cost runs low, because a `replace` sweep writes the marks file once a matched file.; craft: a preview puts the old marks back in memory, and the marks file keeps the preview's marks.; craft: `reads` in `level0.js` posts no fill, so each level zero call drops the context measure.; craft: a partial Read over a file with a whole mark keeps the whole mark beside the spans."
 ---
 
 # Ask
@@ -167,6 +173,17 @@ The cost: each mark writes the runtime file once, and a whole mark still asks fo
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- design: a failed first write removes its journal, so an older apply of the same name stands newest.
+- design: `undo` then takes that older apply back, and the ask wants it to say nothing waits.
+- design: the journal stays with a word that nothing landed, and `undo` answers nothing waits and drops it.
+- craft: the named cases leave out `undo` after a failed first write, and the ask wants a case a line.
+- craft: the stated cost runs low, because a `replace` sweep writes the marks file once a matched file.
+- craft: a preview puts the old marks back in memory, and the marks file keeps the preview's marks.
+- craft: `reads` in `level0.js` posts no fill, so each level zero call drops the context measure.
+- craft: a partial Read over a file with a whole mark keeps the whole mark beside the spans.
 
 # implement
 
