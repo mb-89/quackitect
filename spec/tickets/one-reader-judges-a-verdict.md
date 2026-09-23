@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -130,6 +130,10 @@ record:
     hash_after: d7f0f03da88d7e7a7c5d60d27640541cd4451032
     returns: 4
     why: "Design: `./RUNME.sh lint` reads through `findingsOver` in `cli-read.js`, and `lintText` serves the write door and the panel.; So the pull matches the door's reading, and the lint keeps a reader of its own.; Fix the opening line, and name `findingsOver` as the reading the pull matches.; Hand `valeArgv` the config `assemble` writes, as `configOf` in `findings.js` does.; Hold the marker case with `linesNamed`: the pull's list against `findingsOver` over the same ticket.; The rest stands answered: the split, the whole file, the chapter's lines, the markers, the level and the panel."
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 0837bf964c36de8122ba7944723ed7dcf64d4726
+    hash_after: 0837bf964c36de8122ba7944723ed7dcf64d4726
 ---
 
 # Ask
@@ -161,25 +165,26 @@ reader over it costs less than two readers disagreeing. For details, see
 <!-- the form is text -->
 
 `voiceFaults` in `src/scripts/pull-chapter.js` runs raw Vale over a copy of the
-leaf's chapter, which drops comments, headings and Vale markers, and keeps the
-errors alone. The lint reads the whole file through `lintText` in
-`.claude/skills/level0/lib/vale.js`, which appends `unreasoned`, then runs
-`withoutFalsePast`. The pull answers at once, and `lintText` awaits its run. The
-road: the pull reads the whole ticket the way the lint reads it.
+leaf's chapter, on the method's `.vale.ini`, and keeps the errors alone.
+`./RUNME.sh lint` runs `findingsOver` in `src/bridge/findings.js`, through
+`readingFor` in `src/scripts/cli-read.js`. That reads the files on disk, on the
+config `configOf` has `assemble` write, then runs `readThrough` and
+`unreasoned`. The road: the pull reads its ticket through the parts of
+`findingsOver`, and hands them its text in memory.
 
 | part | what changes |
 |---|---|
-| the call | `lintText` splits into `valeArgv` and `valeAnswer`, both at once, and awaits its run between them |
-| the text | the pull lays its fields into the ticket text in memory, the whole file |
-| the pull | `voiceFaults` runs `valeArgv` through its own process door, then `valeAnswer` and `withoutFalsePast` |
-| the lines | the pull keeps the findings on its chapter's lines, so it names the lint's line |
-| the markers | a Vale off marker reads in both, because both read the file as written |
+| the call | `valeArgvOf(it)` in `findings.js` builds Vale's argument list on `configOf`, and `findingsOver` takes it |
+| the reading | `readsText(it, file, text, rows)` runs `withoutFalsePast` and `unreasoned` over one file's text, and `findingsOver` calls it per file |
+| the pull | `voiceFaults` runs `valeArgvOf` with the whole ticket on stdin and `--path` naming it, then `readsText` |
+| the text | the pull lays its fields into the ticket text in memory, so lines and Vale markers read as the lint reads them |
+| the lines | the pull keeps the findings on its chapter's lines |
 | the level | a finding at error or at warning refuses the hand-back |
-| the cases | a verdict carrying a semicolon comes back refused, and a marker holds a rule off in both |
+| the cases | a semicolon refuses, and `linesNamed` holds the pull's list against `findingsOver` over the same ticket, a marker included |
 
-- the cost: two runners of Vale stand, one for the server and one for the command line
-- what stays one: the argument list, the answer's reading, the config and the lines
-- the panel: `heldOver` keeps its road, so `unreasoned` lands once there too
+- the cost: `findingsOver` awaits its run, and the pull runs Vale at once, so two runners stand
+- what stays one: the argument list, the config, the per-file reading and the lines
+- the panel: `heldOver` keeps its road
 - outside the ask: `askFaults` keeps the same error filter, and a note of its own carries it
 
 ## review
