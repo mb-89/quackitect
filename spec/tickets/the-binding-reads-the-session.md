@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -129,6 +129,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-7
+    hash_before: 118b5ac4700ea196c35c6afc1d6ab334f751fc63
+    hash_after: 118b5ac4700ea196c35c6afc1d6ab334f751fc63
+reason: done
 ---
 
 # Ask
@@ -336,17 +341,45 @@ A stop refusal now says the binding, and the queue stops pulling against the ses
 
 <!-- the form is files -->
 
+- spec/tickets/the-binding-reads-the-session.md
+- spec/config/stop/level0.yml
+- spec/design_output/config.md
+- spec/design_output/stop.md
+- src/bridge/binding.js
+- src/bridge/config.js
+- src/bridge/stop.js
+- src/scripts/pull.js
+- src/scripts/retro-new.js
+- test/level0/pull-leaves.test.js
+- test/level0/retro-new.test.js
+- test/level0/stop-binding.test.js
+- test/level0/stop-door.test.js
+- test/level0/stop-helper.test.js
+- test/level0/stop-hold.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- design: each Ask line has a hunk and a case under `test/level0`.
+- design: `./RUNME.sh check` exits 0 on the branch.
+- design: the refusal ends on a line naming the binding, its file and the moment.
+- design: `retro new` sets `minted`, and the named pull lets that name through.
+- design: `helpers-running` reads `helpersRun` alone, so the wait ends the turn under `queue`.
+- craft: the comment on `whereFrom` points at the config note, but the design lives in the stop note.
+- craft: the helper's wait under `queue` stands in both design notes. The config note can point at the stop note instead.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- one place a fact: the refusal facts stand in the stop note, and the config note points there.
 
 # Discussion
 
