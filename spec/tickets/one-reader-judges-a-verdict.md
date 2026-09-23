@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -138,6 +138,17 @@ record:
     hand: box d6f05e3a585030 · claude-code · helper-10
     hash_before: 68fe23a594f6f1c4fe8c5c29e65bfe2ca67a2f2d
     hash_after: 68fe23a594f6f1c4fe8c5c29e65bfe2ca67a2f2d
+  - step: implement/tests-red
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: a2854316e3e489f43a376e674999ce1a43a69e2e
+    hash_after: a2854316e3e489f43a376e674999ce1a43a69e2e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 6 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -222,17 +233,31 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/one-reader.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Six cases fail, each on its own assertion. The pull passes a verdict carrying a
+semicolon, and hands Vale the chapter alone. It runs Vale on the method's
+`.vale.ini`, where the lint runs it on `.vale.ini` under its root.
+
+- the fake disk lists nothing for a file path, where the real disk throws, and a note carries it
+- `pull-fields.test.js` holds the voice off the `files` field, so the change blanks the rows the pull skips
+- a Vale marker with no reason refuses the hand-back through `ExemptionCarriesAReason`, beside the warning level
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch one new file, which the ask names through its case
+- every door the cases reach has a fake: the disk, the process and the Vale run
+- a comment above each case names the approach through its pointer
 
 ## reflect
 
