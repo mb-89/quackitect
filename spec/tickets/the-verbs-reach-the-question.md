@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -126,6 +126,17 @@ record:
     hash_after: ed42b5cb63e88ea172fa50729a56a375747762b1
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 02e479b2a271b633a0f9161ef9c4217cb32ec32f
+    hash_after: 02e479b2a271b633a0f9161ef9c4217cb32ec32f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 52 test(s) pass in 8 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -318,11 +329,15 @@ A second surprise: `runsFind` stands with no case in `search-door.test.js`, so t
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/answer-read.test.js test/level0/wait.test.js test/level0/search-door.test.js test/level0/test-verb.test.js test/level0/cli-read.test.js test/level0/log-verb.test.js test/contract/cli-verbs.test.js test/contract/proc.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -330,11 +345,29 @@ A second surprise: `runsFind` stands with no case in `search-door.test.js`, so t
 
 <!-- the form is text -->
 
+The shell habits the ask names each take a verb or a tool, with cases of its own.
+
+- `./RUNME.sh test` hands the names to `testVerb`, with the check's spawn tally.
+- A named Go folder names its module through `goModulesOf`, and the Go run takes `goEnvOf`.
+- `./RUNME.sh log --count` prints one row a kind, over the rows the filters keep.
+- `./RUNME.sh lint` prints the count first, and ends on the finding lines.
+- `mcp__level0__wait` returns on a helper's report, an output's end or quiet files, and at its cap.
+- A helper's stop writes a `report` row, and the process door takes `alive` for an exit.
+- `mcp__level0__find` takes `function`, and answers the body from the index row to its close.
+- `readsAnswer` in `answer-read.js` holds the reading, and `checksAnswer` calls it.
+- The stop door holds a draft in the `rewrite` band, ahead of the tooth.
+- The gate counts its holds, and past `stop.mostInARow` it lets the turn go.
+- `wait.most` and `wait.quiet` join the config, and the design notes carry each fact.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, the process door for `alive`, the config pair and the design notes.
+- the process door takes `alive`, and its fake answers off a set of numbers a case fills.
+- each new function points at a section of `spec/design_output`, and each section names the approach.
 
 # verdict
 
