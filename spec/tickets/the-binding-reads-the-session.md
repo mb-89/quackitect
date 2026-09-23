@@ -89,7 +89,12 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 1e40e441ab60cc0a3dc2104d2bf538dc94877f55
+    hash_after: 1e40e441ab60cc0a3dc2104d2bf538dc94877f55
 ---
 
 # Ask
@@ -116,6 +121,36 @@ Under queue the stop hook pushes `ticket pull` and filler turns against the owne
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The refusal says the binding, a minted ticket passes it, and a helper's wait
+ends the turn under every binding.
+
+| part | the file | what changes |
+|---|---|---|
+| the layer | `src/bridge/config.js` | `whereFrom(box, key)` answers the value and its layer: the local file, the environment or the tracked file |
+| the moment | `src/bridge/stop.js` | the box keeps the binding it last read and the clock at the change, and the log says each change |
+| the refusal | the same | `asksForStop` closes with one line naming the binding, its layer and that moment |
+| the minted ticket | `src/scripts/pull.js` | the queue refusal of a named pull skips a name equal to `it.minted` |
+| who mints | `src/scripts/retro-new.js` | the verb sets `it.minted` to the retro it writes, then pulls it |
+| the helpers | `src/bridge/stop.js` | `helpers-running` reads `helpersRun` alone, under every binding |
+| the rule text | `spec/config/stop/level0.yml` | `your-helpers-still-run` drops the sentence saying the queue refuses it |
+| the falls text | `stop.js` | `FALLS["helpers-running"]` keeps the second sentence alone |
+| the design | `spec/design_output/config.md#the-engine-controls` | the table's queue row names the helper's wait as a stop the hook takes |
+
+The cases:
+
+- `stop.test.js`: a refusal under `queue` from the local file names `queue`, the local file and the moment
+- `pull.test.js`: under `queue` a named pull refuses, and the same name as `it.minted` passes
+- a new `retro-new.test.js`: the verb takes its retro under `queue`
+- `stop-helper.test.js`: under `queue` with a running helper, the turn ends on the wait
+
+The callers:
+
+- `onStop` runs `asksForStop` and the checks
+- `claimFalls` reads `FALLS`
+- only `retro-new.js` mints and pulls in one verb today, so one verb sets `it.minted`
+
+The cost: a helper running beside a ticket in hand ends the turn under `queue`, and its answer wakes the session.
 
 ## review
 
