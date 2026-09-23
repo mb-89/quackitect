@@ -51,6 +51,11 @@ export function picked(root, picks) {
   }
 }
 
+// One press opens or shuts every group the config tree holds. [[spec/design_output/extension#the-folds-press-at-once]]
+export function folded(root, open) {
+  for (const node of root.querySelectorAll("details.file, details.keys")) node.open = open;
+}
+
 // [[spec/design_output/extension#a-click-becomes-a-message]]
 export function wire(root, post, view) {
   const said = view.get() ?? {};
@@ -60,6 +65,12 @@ export function wire(root, post, view) {
     if (gear) {
       const box = root.querySelector(".chooser");
       if (box) box.hidden = !box.hidden;
+      return;
+    }
+
+    const fold = event.target?.closest?.(".fold");
+    if (fold) {
+      folded(root, fold.dataset?.fold === "open");
       return;
     }
 
