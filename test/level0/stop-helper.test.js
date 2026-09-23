@@ -1,6 +1,6 @@
-// The stop a session claims while its helpers run, over a fake box: unbound it
-// ends the turn, bound to the queue it holds, and a finished helper holds
-// nothing up.
+// The stop a session claims while its helpers run, over a fake box: the turn
+// ends on the wait under every binding, the queue too, and a finished helper
+// holds nothing up.
 // [[spec/design_output/stop#a-helper-still-runs]]
 
 import assert from "node:assert/strict";
@@ -76,9 +76,8 @@ test("an unbound session ends its turn while a helper runs", () => {
 });
 
 // [[spec/design_output/stop#a-helper-still-runs]]
-test("a session bound to the queue holds its turn while a helper runs, and takes the next leaf", () => {
-  const said = onStop(waiting("running"), helperBox("queue"));
-  assert.match(said.result.block, /The queue holds work for this box/);
+test("a session bound to the queue ends its turn on the wait while a helper runs, over work the queue holds", () => {
+  assert.deepEqual(onStop(waiting("running"), helperBox("queue")), { pass: true });
 });
 
 // [[spec/design_output/stop#a-helper-still-runs]]

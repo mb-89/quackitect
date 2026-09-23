@@ -391,6 +391,20 @@ test("a name with nothing in hand asks for that ticket, and a name nobody writes
   assert.match(shut.said, /a-child stands behind the queue/);
 });
 
+// A verb that mints a ticket for this session pulls it by name, and the queue lets that one name through. [[spec/design_output/config#the-engine-controls]]
+test("under queue a named pull refuses, and the name this session minted passes", () => {
+  const shut = heard(() =>
+    pulling(ROOT, ["pull", "a-child"], doors(standing(), {}, { binding: "queue" }).it),
+  );
+  assert.equal(shut.code, 2);
+  assert.match(shut.said, /a-child stands behind the queue/);
+
+  const minted = doors(standing(), {}, { binding: "queue", minted: "a-child" });
+  const took = heard(() => pulling(ROOT, ["pull", "a-child"], minted.it));
+  assert.doesNotMatch(took.said, /behind the queue/);
+  assert.match(took.said, /a-child at design\/draft/, "the minted name hands that ticket out");
+});
+
 // [[spec/design_output/pull#done-leaves-no-takeable-step]]
 test("takeable waits on an open dependency, so the pull and branch done name the same step", () => {
   const waits = CHILD("open", "design/draft", "depends_on: [a-first]\n");

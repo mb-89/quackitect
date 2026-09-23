@@ -129,3 +129,14 @@ test("retro new refuses a name a ticket holds already, and writes nothing over i
     "---\nkind: [[ticket]]\n---\n",
   );
 });
+
+// The verb mints the retro for this session, so the queue lets its own pull through. [[spec/design_output/config#the-engine-controls]]
+test("retro new takes its retro under queue", () => {
+  const it = doors({}, { binding: "queue" });
+
+  const { code, said } = heard(() => retro(ROOT, ["new", "--name", "retro-one"], it));
+
+  assert.doesNotMatch(said, /behind the queue/);
+  assert.equal(code, 0, said);
+  assert.match(said, /retro-one at collect/, "the pull hands out the retro's first leaf");
+});

@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -99,6 +99,17 @@ record:
     hand: box dcd73916add7 · claude-code-remote · helper-2
     hash_before: 28fe29d78c6f3214fe9bcdf25d3423cb2da9905a
     hash_after: 28fe29d78c6f3214fe9bcdf25d3423cb2da9905a
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 5f80e387cc6c45c18665f520ef84e447b44f768b
+    hash_after: 5f80e387cc6c45c18665f520ef84e447b44f768b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 7 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -187,17 +198,31 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/stop-binding.test.js test/level0/stop-helper.test.js test/level0/pull-leaves.test.js test/level0/retro-new.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Seven cases fail on their own assertion, and each names what it waits for.
+
+- `stop-binding.test.js` is new, because `stop.test.js` reads the rules alone and holds no box.
+- The pull case joins `pull-leaves.test.js` beside the named pull, because `pull.test.js` stands at 588 lines.
+- The retro case joins the `retro-new.test.js` that stands.
+- The helper case in `stop-helper.test.js` now ends the turn under `queue`.
+- `src/bridge/stop.js` stands at 595 lines, so the change moves the moment into a module of its own.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the cases touch the named test files and one new file.
+- every door the change reaches has a fake: the cases drive the fake disk, clock, proc and git.
+- a comment names the approach the change implements: each case points at the design note it holds.
 
 ## reflect
 
