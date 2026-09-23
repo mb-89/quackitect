@@ -174,3 +174,69 @@ test("the import counts off the test's own hunk, and off no other file's", () =>
 
   assert.deepEqual(untestedIn(said), ["src/bridge/one.js"]);
 });
+
+// A delta the way `git diff --cached --unified=0` writes it, one file a block, headers and all. [[spec/tickets/a-comment-hunk-is-prose]]
+function staged(...files) {
+  return [
+    ...files.flatMap(({ path, gone = false, rows = [] }) => [
+      `diff --git a/${path} b/${path}`,
+      ...(gone ? ["deleted file mode 100644"] : []),
+      "index 1111111..2222222 100644",
+      `--- a/${path}`,
+      gone ? "+++ /dev/null" : `+++ b/${path}`,
+      ...(rows.length ? ["@@ -3,1 +3,1 @@", ...rows] : []),
+    ]),
+    "",
+  ].join("\n");
+}
+
+const POINTER_WAS = "-// [[spec/design_output/tree#the-old-name]]";
+const POINTER_NOW = "+// [[spec/design_output/tree#the-rules-over-two-files]]";
+
+// A pointer fix trades a comment for a comment in every module it reaches, and the door asks nothing. [[spec/tickets/a-comment-hunk-is-prose]]
+test("a comment traded for a comment over two files asks no test, headers and all", () => {
+  const said = staged(
+    { path: "src/bridge/one.js", rows: [POINTER_WAS, POINTER_NOW] },
+    { path: "src/bridge/two.js", rows: [POINTER_WAS, POINTER_NOW] },
+  );
+  assert.deepEqual(untestedIn(said), []);
+});
+
+// [[spec/tickets/a-comment-hunk-is-prose]]
+test("a line of code beside a comment asks a test, added or traded away", () => {
+  const added = staged({
+    path: "src/bridge/one.js",
+    rows: [POINTER_NOW, "+export const one = 1;"],
+  });
+  assert.deepEqual(untestedIn(added), ["src/bridge/one.js"]);
+
+  const traded = staged({
+    path: "src/bridge/one.js",
+    rows: ["-export const one = 1;", POINTER_NOW],
+  });
+  assert.deepEqual(untestedIn(traded), ["src/bridge/one.js"], "code traded for a comment");
+
+  const dashed = staged({
+    path: "src/bridge/one.js",
+    rows: ["---x;", POINTER_NOW],
+  });
+  assert.deepEqual(untestedIn(dashed), ["src/bridge/one.js"], "a removed line reading --x is code");
+});
+
+// [[spec/tickets/a-comment-hunk-is-prose]]
+test("a comment fix beside a deleted module asks nothing, and a rename with no hunk asks nothing", () => {
+  const said = staged(
+    { path: "src/bridge/one.js", rows: [POINTER_WAS, POINTER_NOW] },
+    { path: "src/bridge/two.js", gone: true, rows: ["-export const two = 2;"] },
+  );
+  assert.deepEqual(untestedIn(said), []);
+
+  const renamed = [
+    "diff --git a/src/bridge/one.js b/src/bridge/uno.js",
+    "similarity index 100%",
+    "rename from src/bridge/one.js",
+    "rename to src/bridge/uno.js",
+    "",
+  ].join("\n");
+  assert.deepEqual(untestedIn(renamed), []);
+});

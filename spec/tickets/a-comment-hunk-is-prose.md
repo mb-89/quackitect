@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -129,6 +129,17 @@ record:
     hand: box dcd73916add7 · claude-code-remote · helper-8
     hash_before: afc0a586e64139ae7a13349e0e49ef1eeafb5c09
     hash_after: afc0a586e64139ae7a13349e0e49ef1eeafb5c09
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: cc000c7182270b021ce0e247bf68f02f5e464ea5
+    hash_after: cc000c7182270b021ce0e247bf68f02f5e464ea5
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -215,17 +226,33 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/tested.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+One case fails on its own assertion: a code line traded for a comment passes
+the door today. The rest pass today and hold the new reading in place.
+
+- the rename case guards the empty file the new reading opens, so no hunk asks nothing
+- the deleted case passes today, because `+++ /dev/null` opens no file
+- the cases write the full header block git writes, so a header line meets the reading
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch `test/level0/tested.test.js` alone, the file the ask names through its case
+- the door reads a delta as text, so the cases hand it text and no door
+- a comment above each case points at this ticket
+
 
 ## reflect
 
