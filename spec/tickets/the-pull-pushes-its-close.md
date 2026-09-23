@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -99,6 +99,17 @@ record:
     hand: box dcd73916add7 · claude-code-remote · helper-2
     hash_before: d8c480105c2af77191a1b733c374f10b9a16cdd0
     hash_after: d8c480105c2af77191a1b733c374f10b9a16cdd0
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: eae7043ec77237e6b1e1d5c0acdbbd4217b36fdf
+    hash_after: eae7043ec77237e6b1e1d5c0acdbbd4217b36fdf
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 7 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -186,17 +197,33 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/pull-push.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The seven cases stand in `test/level0/pull-push.test.js`, and each fails on its own assertion.
+
+- `pushed` answers a bare flag today, so the shape case fails.
+- On trunk no check runs, so the order case fails.
+- A door refusal runs a rebase today, so that case fails.
+- A tests-red close pushes today, so the local case fails.
+- The re-push of a recorded hand-back says a moved branch, so its case fails.
+
+The surprise: `saidBy` in `commit-verb.js` reads both streams, so the case imports it, and it takes an export.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases touch `pull-push.test.js` and one export in `commit-verb.js`, both named in the approach.
+- git and the check both run through the fake process door, so every door has a fake.
+- the file header points at `spec/design_output/pull#the-rejected-push`, the approach's own section.
 
 ## reflect
 

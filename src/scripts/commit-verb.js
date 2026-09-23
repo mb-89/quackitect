@@ -73,7 +73,7 @@ function landsAndPushes(it, argv, message) {
 }
 
 // A run answers on two streams, and a read of one alone names the wrong line. [[spec/design_output/work#one-verb-feeds-that-stamp]]
-function saidBy(ran) {
+export function saidBy(ran) {
   return [ran?.err, ran?.stderr, ran?.out, ran?.stdout]
     .map((one) => String(one ?? "").trim())
     .filter(Boolean)
