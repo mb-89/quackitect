@@ -36,6 +36,19 @@ of a prompt show its reply, and the details of a reply show its prompt.
 
 A reply stands at the turn's end, and the answer stands right under its prompt.
 
+## A prompt is the owner's
+
+`onPromptSubmit` in `src/bridge/answer.js` reads where a prompt comes from:
+
+| the origin | the row | a reply owed |
+|---|---|---|
+| `composer`, `sdk` | `prompt` | yes |
+| any other, a helper's hand-back and a task's notice among them | `agent` | no |
+
+A helper's own turn carries `agentId`, and it answers the agent that starts it.
+So its end and its text write no `reply` row, and the owner reads their own
+prompts beside the session's replies to them.
+
 # The answer under its prompt
 
 The hook writes an `answer` line at `info` the moment it finds the session's
@@ -56,7 +69,8 @@ For details, see [[spec/design_output/level0#a-step-arrives-late]].
 |---|---|---|
 | `level0` | the session starts, and the canary comes back | `session.start`, `turn.complete` |
 | `tool` | every call a tool takes | `tool.call` |
-| `prompt` | every prompt, as submitted | `prompt.submit` |
+| `prompt` | every prompt the owner submits | `prompt.submit` |
+| `agent` | a helper's hand-back, a task's notice, and a helper's layer | `prompt.submit`, `agent.spawn` |
 | `stop` | a turn ends, or goes on | `turn.complete` |
 | `reply` | every answer ending a turn | `turn.complete` |
 | `answer` | the session's answer to a demand | `turn.step`, `tool.call` |
@@ -117,8 +131,11 @@ what each level writes.
 A level the reader does not know reads as `info`, and a missing object reads as
 `info`. So a box configuring nothing writes every line a door says, and a debug
 line stays off its disk until it asks for it. `writes` decides, and every
-writer asks it before the line lands. The viewer holds a floor of its own over
-what the disk carries. For details, see
+writer asks it before the line lands.
+
+The server reads the level at each event, through the local file, the
+environment and the tracked file. So a change to the key reaches the next line.
+The viewer holds a floor of its own over what the disk carries. For details, see
 [[spec/design_output/tui#alt-l-raises-the-floor]].
 
 # Where the writer stands
@@ -131,8 +148,9 @@ writers below read it, one for each runtime:
 - `src/extension/lib/logbook.js`, through the editor door, for the sidebar
 
 The door takes the disk and the clock as arguments, the way the git door takes
-the process door. `src/doors/fake/log.js` pairs it with the fake disk, so a test
-reads back what a door says and touches nothing.
+the process door. The door writes a row and forgets it. `src/doors/fake/log.js`
+pairs it with the fake disk and asks it to keep its rows, so a test reads back
+what a door says and touches nothing.
 
 # Every writer appends
 
@@ -148,6 +166,15 @@ one file, in the order they happen.
 The hook and the sidebar each queue their lines, so one of them writes one line
 at a time. `$.fs` refuses a read or a write over 4 MiB, and one session stays
 under that.
+
+# A reader reads new rows
+
+A door counting rows of a kind reads the session file past the offset it holds,
+through the disk door's `readFrom`. It folds the new whole rows into what it
+holds on the box. `tallied` in `.claude/skills/level0/lib/log.js` does
+the reading. A fresh box reads the file once from the start, and a file shorter
+than the offset reads as a new session. Other writers land rows in the same
+file, so the door reads the file and counts no row in memory.
 
 # A session rotates its file
 
@@ -172,8 +199,10 @@ current one alone.
 | `--last <count>` | the last rows, after every filter above | the verb itself |
 
 `src/scripts/log-read.js` owns the read over the session file and the rotated
-ones, and `tui --plain` calls the same one. The verb narrows what that read
-answers, and prints each row through `asRow`.
+ones, and `tui --plain` calls the same one. A span opens every rotated file
+named inside it, and the newest one named before it, whose later rows run
+into the span. The read drops a torn line alone. The verb narrows what that
+read answers, and prints each row through `asRow`.
 
 A span answers seconds, and a row's stamp answers milliseconds. `MS` beside
 `timeOf` in `lib/log.js` crosses the two, and every reader takes it from there.
