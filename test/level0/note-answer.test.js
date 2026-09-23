@@ -50,11 +50,10 @@ test("the door counts the note rows a log holds, and reads a missing log as none
 test("a note parked after the prompt pays the demand that asks for one", () => {
   const it = box(rowOf("prompt", "make a note of this"));
   onPromptSubmit(prompt("The stop hook fired twice. Make a note of this."), it);
-  assert.deepEqual(holdsForAnswer({ tool: "Read" }, it), null, "the first call passes");
   assert.deepEqual(
     holdsForAnswer({ tool: "Read" }, it),
     { needs: "reply" },
-    "the second asks, because no note stands yet",
+    "the first call asks, because no note stands yet",
   );
 
   it.disk.append(AT, rowOf("note", "the stop hook fires twice"));

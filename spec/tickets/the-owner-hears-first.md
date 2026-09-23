@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -109,6 +109,17 @@ record:
     hand: box dcd73916add7 · claude-code-remote · helper-4
     hash_before: a99c8debed32dbef9e0ee6f1792518ba9d6caeab
     hash_after: a99c8debed32dbef9e0ee6f1792518ba9d6caeab
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 4b7f7070cf930edbe5367475513626fc207d6546
+    hash_after: 4b7f7070cf930edbe5367475513626fc207d6546
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 7 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -206,17 +217,32 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/answer.test.js test/level0/answer-door.test.js test/level0/note-answer.test.js test/level0/grace-asks.test.js test/level0/agent.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Seven cases fail on their own assertion. The case on the ask floor passes today, and it guards the floor once `demands` reads a zero.
+
+- `answer.test.js`: the first `Bash` call after a prompt passes today, and the case asks for the reply.
+- `answer-door.test.js` and `note-answer.test.js`: the first call reads the gate now.
+- `grace-asks.test.js`: `demands` reads a zero as one today.
+- `grace-asks.test.js`: an update ask replaces the open prompt demand, and the first call passes.
+- `agent.test.js`: a stub `onAgent` passes every call, so both refusal cases fail.
+- The stub stands so the case loads, since a missing module reads as a build failure.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The cases touch the answer door, the ask door and a new Agent door, and the ask names each.
+- Each case reads a fake box, and the ask door reads a fake disk.
+- Each case carries a pointer to the design chapter it holds.
 
 ## reflect
 

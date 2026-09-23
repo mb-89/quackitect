@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { demands } from "../../src/bridge/answer.js";
+import { demands, holdsForAnswer, onPromptSubmit } from "../../src/bridge/answer.js";
 import { asksForUpdate } from "../../src/bridge/ask.js";
 import { dropsHold, holdsCall } from "../../src/bridge/stop.js";
 
@@ -17,15 +17,33 @@ function box(config) {
   return { disk, work: ROOT, method: ROOT, env: {}, log: { say: () => {} } };
 }
 
-// A demand takes its grace as the calls it skips, and one call where the caller names none. [[spec/design_output/stop#the-grace]]
-test("a demand skips the calls its grace names, and one call by default", () => {
+// A demand takes its grace as the calls it skips, and none where the caller names none. [[spec/design_output/stop#the-grace]]
+test("a demand skips the calls its grace names, and no call by default", () => {
   const it = box({});
   demands(it, "The owner asks");
-  assert.equal(it.demand.skips, 1);
+  assert.equal(it.demand.skips, 0);
   demands(it, "The owner asks", "", null, 3);
   assert.equal(it.demand.skips, 3);
   demands(it, "The owner asks", "", null, 0);
-  assert.equal(it.demand.skips, 1, "a grace under one reads as one");
+  assert.equal(it.demand.skips, 0, "a grace of zero stays zero");
+  demands(it, "The owner asks", "", null, -2);
+  assert.equal(it.demand.skips, 0, "a grace under zero reads as zero");
+});
+
+// [[spec/design_output/stop#the-grace]]
+test("the update ask rides one call at a grace of zero", () => {
+  const it = box({ ask: { wanted: "short" }, grace: { update: 0 } });
+  asksForUpdate({ tool: "Read" }, it);
+  assert.equal(it.demand.skips, 1, "the ask keeps a floor of one");
+});
+
+// [[spec/design_output/level0#the-first-call-meets-the-gate]]
+test("an update ask leaves an unpaid prompt demand standing, so the first call asks for the reply", () => {
+  const it = box({ ask: { wanted: "short" }, grace: { update: 5 } });
+  onPromptSubmit({ text: "get to work", origin: { kind: "composer" } }, it);
+  asksForUpdate({ tool: "Read" }, it);
+  assert.equal(it.demand.why, "The owner sent a prompt", "the prompt demand stands");
+  assert.deepEqual(holdsForAnswer({ tool: "Read" }, it), { needs: "reply" });
 });
 
 // [[spec/design_output/stop#the-grace]]
