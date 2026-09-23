@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -105,6 +105,10 @@ record:
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 8fd5f56521d9ea8db947a6b716ff9f4f0ba5f6c1
     hash_after: 8fd5f56521d9ea8db947a6b716ff9f4f0ba5f6c1
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-4
+    hash_before: e2055d951f6404f5b4ca642e2f0a17917afa0fa2
+    hash_after: e2055d951f6404f5b4ca642e2f0a17917afa0fa2
 ---
 
 # Ask
@@ -196,14 +200,13 @@ The costs:
 
 <!-- the form is verdict -->
 
-fail
-- design: The bridge box carries no `join`, so `planHere` throws and the queue read drops every todo row.
-- design: The bridge box carries no `agent`, so `takeable` orders rows apart from `branch list --queue` in a harness.
-- design: The fix builds the read door off `handDoors(box.env)`, `join`, a git door, `weights` and `stale`, and names each.
-- design: A digit past the last row lands `last`, which stands before the first untagged row.
-- craft: `planRides` drops the tool's answer, so a plan riding another call reads git twice for nothing.
-- craft: `answerOf` lives in `src/scripts/work-answer.js`, and the callers list names `work-list.js`.
-- craft: Two todos with one digit in one call anchor on one row, so a case pins their order.
+pass
+- The approach answers each of the seven earlier findings, and each answer holds against the code.
+- The read door covers every field `answerOf` and `takeable` read, the hand fields among them.
+- The callers list matches the code, and `answerOf` stands in `work-answer.js`.
+- craft: `queued` breaks a score tie on the name, so two todos at one digit stand in title order.
+- craft: The case for call order fails unless the change names a tie-break, such as the plan file order.
+- craft: The approach names no word for a digit past nine, and `placeWord` gives `last` there today.
 
 # implement
 
