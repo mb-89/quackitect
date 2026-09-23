@@ -89,12 +89,18 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
     hash_before: edbf8035f331c6b5a82210bf4f13c0ce8ef1c778
     hash_after: edbf8035f331c6b5a82210bf4f13c0ce8ef1c778
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: c46a382e999e12a5f47ead2b901f7fd292bce616
+    hash_after: c46a382e999e12a5f47ead2b901f7fd292bce616
+    returns: 1
+    why: "design: the stated cost misreads both halves. The hold file under `.se/.runtime` survives a server restart.; design: `spawns` in the bridgehead fires `refactor.answered` on a failed spawn too, so that path already releases.; design: a hold lost with a dying bridgehead then refuses every hand for good. The approach needs a release for that case.; design: `checked` in `src/bridge/apply.js` calls `onWrite` without the `agentId`. The owning hand's patch then refuses.; craft: `landsOnTrunk` reads a bare `git push` on `main` as a pass. The row needs that case too.; craft: the spawn event carries a kind and an empty `agentId`, so a parallel helper writing first owns the file.; craft: the row, the guidance line and the cases otherwise answer the Ask."
 ---
 
 # Ask
@@ -161,6 +167,15 @@ The cost: a hand dying before its answer leaves the hold, and a restart of the s
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+- design: the stated cost misreads both halves. The hold file under `.se/.runtime` survives a server restart.
+- design: `spawns` in the bridgehead fires `refactor.answered` on a failed spawn too, so that path already releases.
+- design: a hold lost with a dying bridgehead then refuses every hand for good. The approach needs a release for that case.
+- design: `checked` in `src/bridge/apply.js` calls `onWrite` without the `agentId`. The owning hand's patch then refuses.
+- craft: `landsOnTrunk` reads a bare `git push` on `main` as a pass. The row needs that case too.
+- craft: the spawn event carries a kind and an empty `agentId`, so a parallel helper writing first owns the file.
+- craft: the row, the guidance line and the cases otherwise answer the Ask.
 
 # implement
 
