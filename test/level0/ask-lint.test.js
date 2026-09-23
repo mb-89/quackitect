@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeGit } from "../../src/doors/fake/git.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { askFaults } from "../../src/scripts/ticket-ask-lint.js";
 import { askLines, ticket } from "../../src/scripts/ticket.js";
@@ -172,4 +173,23 @@ test("an ask of blanks alone holds nothing, and one line makes it hold", () => {
   assert.equal(holds(["", "  ", ""]), false);
   assert.equal(holds(["", "<!-- gain -->", ""]), false);
   assert.equal(holds(["", "A thing.", ""]), true);
+});
+
+// The open lands the ticket it opens in one commit, so the open reaches the queue with the push. [[spec/design_output/pull#a-draft-opens]]
+test("an open commits the ticket it opens, and names it", () => {
+  const git = fakeGit({}, ROOT);
+  const disk = fakeDisk({
+    [at("spec/schemas/ticket.schema.yaml")]: SCHEMA,
+    [at(AT)]: DRAFT.replace("<upstream>", "the upstream"),
+  });
+  const it = { disk, proc: git.proc, git, root: ROOT, join, words: 5, vale: "" };
+
+  const ran = heard(() => ticket(ROOT, ["open", "a-thing"], it));
+
+  assert.equal(ran.code, 0, ran.said);
+  const commits = git.ran
+    .map((one) => one.argv.join(" "))
+    .filter((one) => one.startsWith("git commit"));
+  assert.equal(commits.length, 1, "one commit lands");
+  assert.match(commits[0], /a-thing/, "the commit names the ticket");
 });

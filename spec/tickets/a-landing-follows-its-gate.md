@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -119,6 +119,17 @@ record:
     hand: box dcd73916add7 · claude-code-remote · helper-6
     hash_before: 01b11a7206a981833a7cbd5dde3d1cc4730f1a7e
     hash_after: 01b11a7206a981833a7cbd5dde3d1cc4730f1a7e
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 4ace689deb6548c8bec394c0ce7efda4fcd6bf7d
+    hash_after: 4ace689deb6548c8bec394c0ce7efda4fcd6bf7d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -230,17 +241,33 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/bash.test.js test/level0/commit-verb.test.js test/level0/pull.test.js test/level0/ask-lint.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Four cases fail, each on its own assertion: the chain rule, the red test run,
+the bare pull and the open's commit.
+
+- the commit verb case teaches the fake a green `test` run, so the cases already green keep their road
+- the open case builds a fake git beside the fake Vale, because `ask-lint.test.js` carried none
+- the chain case holds a heredoc and a `2>&1` among the passing commands
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch the four files the approach names
+- every door the cases reach has a fake: git, the process and the disk
+- a comment above each case points at the chapter the approach names
+
 
 ## reflect
 

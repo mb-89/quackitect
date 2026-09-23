@@ -424,3 +424,29 @@ test("the description names the verbs, and answers the same string twice", () =>
   assert.equal(said, verbLine());
   for (const verb of VERBS) assert.match(said, new RegExp(`./RUNME.sh ${verb}`));
 });
+
+// A landing waits on its gate, so a chain running it whatever the gate answers comes back refused. [[spec/design_output/bash#a-landing-follows-its-gate]]
+test("a landing after a semicolon, a newline, a double bar or an ampersand refuses, and a double ampersand passes", () => {
+  for (const command of [
+    "true; ./RUNME.sh ticket pull a-child --pass",
+    "true; ./RUNME.sh ticket pull a-child",
+    "true; ./RUNME.sh ticket pull",
+    "true; ./RUNME.sh ticket open a-child",
+    "true; git commit -m 'x'",
+    'true; ./RUNME.sh commit "x"',
+    "true\n./RUNME.sh ticket pull a-child --pass",
+    "false || git commit -m 'x'",
+    "sleep 1 & git commit -m 'x'",
+  ]) {
+    assert.ok(rules(command).includes("LandingFollowsItsGate"), command);
+  }
+  for (const command of [
+    "true && ./RUNME.sh ticket pull a-child --pass",
+    "./RUNME.sh ticket pull a-child --pass",
+    "./RUNME.sh check 2>&1 && git commit -m 'x'",
+    "git commit -F - <<'EOF'\nthe first line\nthe second line\nEOF",
+    "true; ls spec",
+  ]) {
+    assert.ok(!rules(command).includes("LandingFollowsItsGate"), command);
+  }
+});
