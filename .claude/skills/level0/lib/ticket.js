@@ -189,6 +189,54 @@ function engineFaults(note, schema, where) {
   return out;
 }
 
+// A field the engine owns comes back to the value the disk holds, and the rest of the write lands. The answer names each field put back. [[spec/design_output/schema#the-verbs-own-their-fields]]
+export function restoredFields(was, now, schema) {
+  const old = readNote(was);
+  const note = readNote(now);
+  if (!old.front.stands || !note.front.stands) return { text: now, keys: [] };
+  const keys = Object.entries(schema?.frontmatter?.properties ?? {})
+    .filter(([, rule]) => rule?.["x-engine"])
+    .filter(([key]) => !same(old.front.said?.[key], note.front.said?.[key]))
+    .map(([key]) => key);
+  if (!keys.length) return { text: now, keys };
+  const held = frontBlocks(String(was).split("\n"));
+  let rows = String(now).split("\n");
+  for (const key of keys) rows = withBlock(rows, key, held.blocks.get(key) ?? []);
+  return { text: rows.join("\n"), keys };
+}
+
+const TOP_KEY = /^([A-Za-z_][\w-]*):/;
+const FENCE = "---";
+
+// Each top-level key of the frontmatter with its rows, the indented ones under it included. [[spec/design_output/schema#the-verbs-own-their-fields]]
+function frontBlocks(rows) {
+  const blocks = new Map();
+  const at = new Map();
+  if (rows[0]?.trimEnd() !== FENCE) return { blocks, at, close: -1 };
+  const close = rows.findIndex((row, i) => i > 0 && row.trimEnd() === FENCE);
+  let key = "";
+  for (let i = 1; i < close; i++) {
+    const found = TOP_KEY.exec(rows[i]);
+    if (found) {
+      key = found[1];
+      blocks.set(key, []);
+      at.set(key, i);
+    }
+    if (key) blocks.get(key).push(rows[i]);
+  }
+  return { blocks, at, close };
+}
+
+// The rows with one key's block swapped for the disk's, taken out where the disk holds none, and put back before the fence where the write took it out. [[spec/design_output/schema#the-verbs-own-their-fields]]
+function withBlock(rows, key, block) {
+  const now = frontBlocks(rows);
+  if (now.close < 0) return rows;
+  const out = [...rows];
+  if (now.at.has(key)) out.splice(now.at.get(key), now.blocks.get(key).length, ...block);
+  else out.splice(now.close, 0, ...block);
+  return out;
+}
+
 // [[spec/design_output/schema#the-verbs-own-their-fields]]
 function verbFaults(old, note, schema, where) {
   const props = schema?.frontmatter?.properties ?? {};

@@ -168,6 +168,9 @@ async function seen($, e, next) {
   }
   if (answer.spawn !== undefined) return spawns($, answer, next);
   if (answer.result !== undefined) return answer.result;
+  // A door rewriting the event names what it puts back, and the note rides the answer the call gives. [[spec/design_output/schema#the-verbs-own-their-fields]]
+  if (answer.event !== undefined && answer.after !== undefined)
+    return merged(await next(answer.event), answer.after);
   if (answer.event !== undefined) return next(answer.event);
   if (answer.after !== undefined) return merged(await next(e), answer.after);
   return next(e);

@@ -230,3 +230,61 @@ test("a box with no vale lets the write land, and says so in the log once", asyn
     1,
   );
 });
+
+// A field the engine owns comes back to its value on the disk, and the prose beside it lands. [[spec/design_output/schema#the-verbs-own-their-fields]]
+test("a Write carrying state and a prose field lands the prose, puts state back, and names it", async () => {
+  const at = join(WORK, "spec", "tickets", "good.md");
+  const it = box({ [at]: GOOD });
+  marksSeen(it, relativeTo(it.root, at), GOOD);
+  const wrote = GOOD.replace("state: open", "state: closed").replace(
+    "## change\n",
+    "## change\n\nThe door puts the field back.\n",
+  );
+
+  const said = await onWrite(write(at, wrote), it);
+
+  assert.equal(said?.result?.deny, undefined, "the write lands");
+  assert.match(said.event.content, /^state: open$/m, "state stands at its disk value");
+  assert.match(said.event.content, /The door puts the field back\./, "the prose lands");
+  assert.match(said.after.context.join("\n"), /state/, "the answer names the field");
+});
+
+// [[spec/design_output/schema#the-verbs-own-their-fields]]
+test("an Edit over state, a route line and a prose field lands the prose and puts the rest back", async () => {
+  const at = join(WORK, "spec", "tickets", "good.md");
+  const it = box({ [at]: GOOD });
+  marksSeen(it, relativeTo(it.root, at), GOOD);
+  const old_string = GOOD.slice(GOOD.indexOf("state: open"), GOOD.indexOf("## change\n") + "## change\n".length);
+  const new_string = old_string
+    .replace("state: open", "state: closed")
+    .replace("makes the change the ask names", "makes it")
+    .replace("## change\n", "## change\n\nThe door puts the route back.\n");
+
+  const said = await onWrite(
+    { tool: "Edit", file_path: at, old_string, new_string },
+    it,
+  );
+
+  assert.equal(said?.result?.deny, undefined, "the edit lands");
+  assert.equal(
+    said.event.new_string,
+    old_string.replace("## change\n", "## change\n\nThe door puts the route back.\n"),
+    "state and the route stand as the disk holds them, and the prose lands",
+  );
+  assert.match(said.after.context.join("\n"), /state/);
+  assert.match(said.after.context.join("\n"), /steps/);
+});
+
+// [[spec/design_output/schema#the-verbs-own-their-fields]]
+test("an Edit changing engine fields alone comes back refused, naming them, because nothing of it lands", async () => {
+  const at = join(WORK, "spec", "tickets", "good.md");
+  const it = box({ [at]: GOOD });
+  marksSeen(it, relativeTo(it.root, at), GOOD);
+
+  const said = await onWrite(
+    { tool: "Edit", file_path: at, old_string: "state: open", new_string: "state: closed" },
+    it,
+  );
+
+  assert.match(said?.result?.deny ?? "", /state/);
+});
