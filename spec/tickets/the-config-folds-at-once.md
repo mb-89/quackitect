@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: draft
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -25,24 +25,13 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
-step: do
 ---
 
 # Ask
 
 <!-- gain, as text: what is gained by doing it, and not only what it does -->
-A person opens or shuts every group of the config section in one press. So a
-search through the keys starts with the whole tree in view, and a person closes
-it again the same way.
-
 <!-- breaks, as text: what breaks if it is never done -->
-The config section folds one group at a time. A person looking for one key
-opens each group by hand, and shuts each again after.
-
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
-- the config section carries an expand-all button and a collapse-all button beside its filter, drawn in `src/extension/lib/panel.js`
-- a case under `test/level0` presses each one, and every group of the section opens, then shuts
-- `./RUNME.sh check` exits 0
 
 # do
 

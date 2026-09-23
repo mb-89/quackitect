@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: draft
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -25,25 +25,13 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
-step: do
 ---
 
 # Ask
 
 <!-- gain, as text: what is gained by doing it, and not only what it does -->
-A hand writing a field the engine owns loses nothing and blocks nothing. The
-engine puts the field back to the value it holds, lets the rest of the write
-land, and says which field it restored.
-
 <!-- breaks, as text: what breaks if it is never done -->
-The ticket door refuses the whole write over one engine field. A field the
-hand-back hands to the engine then carries whatever the hand wrote. Where that
-text breaks a rule, no hand may fix it, and the push door refuses the ticket.
-
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
-- a write to a field the ticket schema marks `x-engine` lands with that field back at the value on disk, and the answer names the field
-- a case under `test/level0` writes `state` and a prose field in one write, and the prose lands while `state` stays
-- `./RUNME.sh check` exits 0
 
 # do
 
