@@ -460,7 +460,11 @@ async function wrote($, said) {
       held = String(await $.fs.read(SESSION));
     } catch (err) {
       // A read that fails on a file standing keeps the file, so the session's rows stay whole. [[spec/design_output/log#every-writer-appends]]
-      if (!/ENOENT|no such|not found/i.test(String(err?.code ?? err?.message ?? err)))
+      if (
+        !/ENOENT|no such|not found|no file/i.test(
+          String(err?.code ?? err?.message ?? err),
+        )
+      )
         return false;
     }
     if (held && !held.endsWith("\n")) held += "\n";
