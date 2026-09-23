@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -120,6 +120,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: afb861175e497e1ca7cc8dc783ec6613ea8746b6
+    hash_after: afb861175e497e1ca7cc8dc783ec6613ea8746b6
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -282,11 +290,17 @@ Seven cases fail on their own assertion, and each names a line of the ask.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/bridge/write.js src/bridge/apply.js src/bridge/bash.js src/bridge/server.js .claude/skills/level0/lib/marks.js .claude/skills/level0/lib/runs.js .claude/skills/level0/hooks/level0.js spec/design_output/level0.md spec/design_output/apply.md test/level0/mark-doors.js test/level0/write.test.js test/level0/bash.test.js test/level0/apply.test.js test/level0/bridgehead.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, the two design notes, and the tests
+- the disk, the clock and the harness each stand as a fake, and `mark-doors.js` wraps the disk
+- each new function carries a pointer to the design note section it implements
 
 ## tests-green
 

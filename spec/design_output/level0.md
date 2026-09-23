@@ -294,6 +294,7 @@ later. So the bridgehead says it where a person stands.
 | writes one `warn` row naming the event route | the first event the server answers nothing for |
 | says one line in the chat, through `$.ui.log` | the first such event past the session start |
 | drops both marks | the server answers again |
+| answers the `no server answers` line to a level zero tool | a tool call the server answers nothing for, since its hook finds nothing past it |
 
 A post nobody takes reads the port pointer first, because a server restarting
 on another port writes it again. Where the pointer names another port, the
@@ -899,8 +900,9 @@ The reading that sets the mark is the whole of the mechanism. The door reads the
 for itself on every edit, so a mark off that read compares against itself. The
 mark comes off the read reaching the agent.
 
-The hand carries nothing. `lib/marks.js` holds the hash and the refusal, and
-the box holds the marks against the tree it serves. This door writes a refusal
+The hand carries nothing. `lib/marks.js` holds the hash, the spans and the
+refusal. The box holds the marks against the tree it serves, and the runtime
+file keeps them. This door writes a refusal
 of its own, because the voice refusal opens on the prose rules and says the
 wrong thing here. It names the file, says which case stands, and
 asks for a read.
@@ -909,6 +911,50 @@ The door answers ahead of the write, so a write the engine drops leaves the
 mark ahead of the disk. The next write refuses and asks for a read, which costs
 a read and keeps the tree whole. The batch lane reads every file inside the
 call that writes it. That read is the agent's own, so the lane takes no token.
+A batch call writing nothing puts back the marks it meets:
+
+- a preview
+- a refusal at the door
+- a first file refusing the write
+
+### The marks survive a restart
+
+The box loads the marks off `.se/.runtime/marks.json` on the first ask, and
+`runs.js` names the file. `decide` runs `marksKept` once a call, after the door
+answers. So a sweep writing many marks writes the file once.
+
+`marksKept` writes the file only where a mark moves. A read handing back the
+text the mark holds writes nothing.
+
+### The mark holds line spans
+
+A mark holds the whole hash and a list of line spans, each with its own hash.
+
+| the read | what it marks |
+|---|---|
+| a whole Read | the whole hash, and it drops the spans |
+| a Read with `offset` or `limit` | a span over the lines it hands back, beside the whole hash |
+| a Write landing | the whole hash |
+
+A write passes where the whole hash agrees with the disk. An Edit passes too
+where the lines it changes lie inside a span that still agrees. The lines it
+changes come off the common head and tail of the disk text and the new text.
+A Write replacing the file asks for the whole hash.
+
+### A lone shell read marks
+
+A shell read standing alone hands the agent the lines it prints, so it marks
+them.
+
+| the command | what it marks |
+|---|---|
+| `cat <file>` | the whole hash |
+| `head -n <n> <file>` | lines 1 to n |
+| `tail -n <n> <file>` | the last n lines |
+| `sed -n 'a,bp' <file>` | lines a to b |
+
+A pipe, a chain or a redirection sets no mark. `cat` at the head of a pipe
+hands the agent a part of the file, and the door cannot tell which part.
 
 ## The door reaches a helper
 

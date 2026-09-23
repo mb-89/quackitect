@@ -5,7 +5,7 @@
 import { join } from "node:path";
 import { BINDING, GOD } from "../../.claude/skills/level0/lib/config.js";
 import { FOLDER as LOG_FOLDER, SERVE } from "../../.claude/skills/level0/lib/log.js";
-import { relativeTo, runsHere } from "../../.claude/skills/level0/lib/paths.js";
+import { runsHere } from "../../.claude/skills/level0/lib/paths.js";
 import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { awake } from "../doors/awake.js";
 import { biome } from "../doors/biome.js";
@@ -86,7 +86,7 @@ import {
 } from "./stop.js";
 import { TOOLS as handTools, SPECS as toolSpecs } from "./tools.js";
 import { registeredPort } from "./vehicle.js";
-import { marksSeen, onWrite, schemasHere } from "./write.js";
+import { marksKept, onRead, onWrite, schemasHere } from "./write.js";
 
 const OK = 200;
 const NOT_FOUND = 404;
@@ -149,6 +149,8 @@ export async function decide(said, box) {
   if (said?.fill !== undefined) measures(box, said.fill);
   const door = DOORS[String(said?.event ?? "")] ?? pass;
   const answer = letsThrough((await door(said?.e ?? {}, box)) ?? PASS, said, box);
+  // The call's marks reach the file once, after the door answers. [[spec/design_output/level0#the-marks-survive-a-restart]]
+  marksKept(box);
   if (box.registered || String(said?.event ?? "") === "engine.create") return answer;
   box.registered = true;
   return { ...answer, register: answer.register ?? box.specs };
@@ -201,18 +203,6 @@ function planRides(e, box) {
 }
 
 const pass = () => PASS;
-
-// A read hands the agent the text, so the mark comes off it. [[spec/design_output/level0#a-write-meets-its-mark]]
-function onRead(e, box) {
-  const path = String(e?.file_path ?? "");
-  if (!path) return PASS;
-  try {
-    marksSeen(box, relativeTo(box.root, path), String(box.disk.read(path)));
-  } catch {
-    // [[spec/design_output/level0#a-write-meets-its-mark]]
-  }
-  return PASS;
-}
 
 // [[spec/design_output/level0#god-mode]]
 function letsThrough(answer, said, box) {

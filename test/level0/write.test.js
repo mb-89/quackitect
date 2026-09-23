@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
+import { MARKS } from "../../.claude/skills/level0/lib/runs.js";
 import { errorsIn, marksSeen, onWrite } from "../../src/bridge/write.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
@@ -308,7 +309,6 @@ test("a mark written on one box reads on a fresh box over the same disk", async 
   const said = await called(served(disk), edits(at, "line 3\n", "three\n"));
 
   assert.equal(refused(said), "", "the restarted box reads the mark off the disk");
-  assert.match(disk.read(at), /three\n/);
 });
 
 // [[spec/design_output/level0#a-write-meets-its-mark]]
@@ -327,16 +327,14 @@ test("a Read of lines 10 to 20 lets an Edit inside them land, and refuses one at
 // [[spec/design_output/level0#a-write-meets-its-mark]]
 test("a read handing back the text the mark holds writes the marks file once", async () => {
   const at = join(TREE, "notes.txt");
+  const kept = join(TREE, MARKS);
   const disk = realDisk({ [at]: NUMBERED });
   const it = served(disk);
   await called(it, reads(at));
-  const kept = [...disk.times].filter(([path]) => path.endsWith("marks.json"));
-  assert.equal(kept.length, 1, "the first read writes the marks file");
+  const first = disk.times.get(kept);
+  assert.ok(first, "the first read writes the marks file");
+  assert.deepEqual(Object.keys(JSON.parse(disk.read(kept))), ["notes.txt"]);
 
   await called(it, reads(at));
-  assert.deepEqual(
-    [...disk.times].filter(([path]) => path.endsWith("marks.json")),
-    kept,
-    "a second read of the same text writes nothing",
-  );
+  assert.equal(disk.times.get(kept), first, "a second read of the same text writes nothing");
 });

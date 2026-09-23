@@ -2,7 +2,7 @@
 // over a command line runs here before the command does.
 // [[spec/design_output/bash#what-the-door-reads]]
 
-import { join } from "node:path";
+import { isAbsolute, join } from "node:path";
 import {
   commitIn,
   findings,
@@ -11,6 +11,8 @@ import {
   withoutTrailers,
 } from "../../.claude/skills/level0/lib/bash.js";
 import { bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
+import { linesIn } from "../../.claude/skills/level0/lib/marks.js";
+import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import { NOTES, privateNow } from "../../.claude/skills/level0/lib/private.js";
 import {
   refusedCommand,
@@ -35,7 +37,7 @@ import { WORK_BRANCH } from "../engine/group.js";
 import { heldTests } from "../scripts/guidance-hand.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
-import { errorsIn } from "./write.js";
+import { errorsIn, marksSeen } from "./write.js";
 
 const COMMIT = "level0-commit.md";
 const PASS = { pass: true };
@@ -55,7 +57,45 @@ export async function onBash(e, box) {
     const found = await check(command, e, box);
     if (found) return { result: { deny: found } };
   }
+  marksShown(command, box);
   return PASS;
+}
+
+// The shell reads that hand the agent a file's lines, each a shape and the span it prints. [[spec/design_output/level0#a-lone-shell-read-marks]]
+const SHOWS = [
+  { shape: /^cat\s+(\S+)$/, span: () => null },
+  { shape: /^head\s+-n\s*(\d+)\s+(\S+)$/, span: (n) => ({ from: 1, to: Number(n) }) },
+  {
+    shape: /^tail\s+-n\s*(\d+)\s+(\S+)$/,
+    span: (n, text) => ({ from: linesIn(text) - Number(n) + 1, to: linesIn(text) }),
+  },
+  {
+    shape: /^sed\s+-n\s+(['"]?)(\d+),(\d+)p\1\s+(\S+)$/,
+    span: (_q, from, to) => ({ from: Number(from), to: Number(to) }),
+  },
+];
+// A pipe, a chain or a redirection hands the agent something else than the file. [[spec/design_output/level0#a-lone-shell-read-marks]]
+const JOINS = /[|;&<>`$()\n]/;
+
+// A lone shell read hands the agent what it prints, so the mark comes off it. [[spec/design_output/level0#a-lone-shell-read-marks]]
+function marksShown(command, box) {
+  const line = command.trim();
+  if (JOINS.test(line)) return;
+  for (const one of SHOWS) {
+    const found = line.match(one.shape);
+    if (!found) continue;
+    const named = found.at(-1).replace(/^['"]|['"]$/g, "");
+    const path = isAbsolute(named) ? named : join(box.root, named);
+    const where = relativeTo(box.root, path);
+    if (!where || where.startsWith("..") || isAbsolute(where)) return;
+    try {
+      const text = String(box.disk.read(path));
+      marksSeen(box, where, text, one.span(...found.slice(1, -1), text));
+    } catch {
+      // [[spec/design_output/level0#a-lone-shell-read-marks]]
+    }
+    return;
+  }
 }
 
 // [[spec/design_output/bash#the-description-names-verbs]]

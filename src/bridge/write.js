@@ -2,9 +2,15 @@
 // design note names, and the code door follows.
 // [[spec/design_output/level0#the-write-door]]
 
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { CODE } from "../../.claude/skills/level0/lib/code.js";
-import { marked, staleFault } from "../../.claude/skills/level0/lib/marks.js";
+import {
+  marked,
+  marksFrom,
+  marksText,
+  spanned,
+  staleFault,
+} from "../../.claude/skills/level0/lib/marks.js";
 import { isDraft, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import {
   carriedFrom,
@@ -12,7 +18,7 @@ import {
   refusedPrivate,
 } from "../../.claude/skills/level0/lib/private.js";
 import { refusal } from "../../.claude/skills/level0/lib/refuse.js";
-import { REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
+import { MARKS, REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
 import { PROSE } from "../../.claude/skills/level0/lib/vale.js";
 import {
   checkNote,
@@ -51,6 +57,8 @@ import { holdDoor } from "./refactor-hold.js";
 const PASS = { pass: true };
 const UNRAN = "VoiceRulesRan";
 const TICKET_KIND = "ticket";
+// The lines a Read hands back where it names no limit. [[spec/design_output/level0#the-mark-holds-line-spans]]
+const READ_LINES = 2000;
 
 // [[spec/design_output/schema#the-door-refuses-a-departure]]
 export function schemasHere(disk, root) {
@@ -133,20 +141,63 @@ function engineRestores(e, writing, where, box) {
   return { e: { ...e, new_string: text }, keys: put.keys };
 }
 
-// [[spec/design_output/level0#a-write-meets-its-mark]]
+// The box loads the marks off the runtime file on the first ask. [[spec/design_output/level0#the-marks-survive-a-restart]]
 export function marksOf(box) {
-  if (!box.marks) box.marks = new Map();
+  if (box.marks) return box.marks;
+  box.marks = marksFrom(textAt(box.disk, marksAt(box)));
+  box.marksKeptAs = marksText(box.marks);
   return box.marks;
 }
 
-// [[spec/design_output/level0#a-write-meets-its-mark]]
-export function marksSeen(box, where, text) {
-  marked(marksOf(box), where, text);
+// A span of `{ from, to }` marks the lines a partial read hands back. [[spec/design_output/level0#the-mark-holds-line-spans]]
+export function marksSeen(box, where, text, span = null) {
+  if (span) spanned(marksOf(box), where, text, span.from, span.to);
+  else marked(marksOf(box), where, text);
 }
 
-// [[spec/design_output/level0#a-write-meets-its-mark]]
+// The file takes the marks once a call, and only where a mark moves. [[spec/design_output/level0#the-marks-survive-a-restart]]
+export function marksKept(box) {
+  if (!box.marks) return;
+  const text = marksText(box.marks);
+  const at = marksAt(box);
+  if (!at || text === box.marksKeptAs) return;
+  try {
+    box.disk.makeDir(dirname(at));
+    box.disk.write(at, text);
+    box.marksKeptAs = text;
+  } catch {
+    // [[spec/design_output/level0#the-marks-survive-a-restart]]
+  }
+}
+
+function marksAt(box) {
+  const work = String(box.work ?? box.root ?? "");
+  return work ? join(work, ...MARKS.split("/")) : "";
+}
+
+// A read hands the agent the text, so the mark comes off it. [[spec/design_output/level0#a-write-meets-its-mark]]
+export function onRead(e, box) {
+  const path = String(e?.file_path ?? "");
+  if (!path) return PASS;
+  try {
+    marksSeen(box, relativeTo(box.root, path), String(box.disk.read(path)), linesRead(e));
+  } catch {
+    // [[spec/design_output/level0#a-write-meets-its-mark]]
+  }
+  return PASS;
+}
+
+// [[spec/design_output/level0#the-mark-holds-line-spans]]
+function linesRead(e) {
+  if (e?.offset === undefined && e?.limit === undefined) return null;
+  const from = Math.max(1, Number(e.offset) || 1);
+  return { from, to: from + (Number(e.limit) || READ_LINES) - 1 };
+}
+
+// A Write replacing the file asks for the whole mark. [[spec/design_output/level0#the-mark-holds-line-spans]]
 function markDoor(e, writing, where, box) {
-  const found = staleFault(marksOf(box), where, textAt(box.disk, writing.path));
+  const after = e.tool === "Write" ? null : wholeAfter(e, writing, box.disk);
+  const found = staleFault(marksOf(box), where, textAt(box.disk, writing.path), after);
   if (!found) return "";
   box.log.say("warn", "mark", `refused a write over a stale read of ${where}`, {
     file: where,

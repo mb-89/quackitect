@@ -114,7 +114,8 @@ export function spawnTagOf(held) {
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const READ_TOOLS = [findSpec(), patchSpec(), replaceSpec(), undoSpec()];
-const CALLED = READ_TOOLS.map((one) => `mcp__level0__${one.name}`);
+const SERVED = "mcp__level0__";
+const CALLED = READ_TOOLS.map((one) => `${SERVED}${one.name}`);
 const HEALTH = 200;
 
 // The engine takes one session start a module and counts them in the source, so this registers none: the module wrapping this one holds the start and calls startsSession from it. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
@@ -152,6 +153,10 @@ async function seen($, e, next) {
     : await ask($, event, e, next, await fillOf($, event, e));
   if (!answer) {
     if (event === "session.start") await starts($);
+    // A tool the server registered answers nowhere past this hook, so a dead bridge says so. [[spec/design_output/level0#the-bridge-says-it-falls]]
+    if (event === "tool.call" && String(e?.tool ?? "").startsWith(SERVED)) {
+      return { result: deadLine(e) };
+    }
     // The server answers nothing, so the bridgehead says the cage stands down where a reader stands. [[spec/design_output/level0#a-session-says-its-cage]]
     if (event === "prompt.context" && cage) {
       return merged(await next(e), {
@@ -395,13 +400,14 @@ async function reads($, event, e, next) {
   const coming = launched;
   launched = false;
   if (!coming || !(await healthy($))) {
-    return {
-      result: {
-        result: `no server answers at ${url()}, so ${String(e?.tool ?? "")} reads nothing. Run ./RUNME.sh serve, and read ${SERVE} for what it says.`,
-      },
-    };
+    return { result: { result: deadLine(e) } };
   }
   return ask($, event, e, next);
+}
+
+// The one line a level zero tool answers where no server answers. [[spec/design_output/level0#the-bridge-says-it-falls]]
+function deadLine(e) {
+  return `no server answers at ${url()}, so ${String(e?.tool ?? "")} answers nothing. Run ./RUNME.sh serve, and read ${SERVE} for what it says.`;
 }
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]

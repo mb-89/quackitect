@@ -7,6 +7,8 @@ import { inRun } from "./folders.js";
 export const STAMP = inRun("check.json");
 // The list the lint leaves for the refactoring hand, one entry a warning. [[spec/design_output/stop#the-grace]]
 export const REFACTORS = inRun("refactor.json");
+// The read marks the write door keeps, so a restart keeps them. [[spec/design_output/level0#the-marks-survive-a-restart]]
+export const MARKS = inRun("marks.json");
 // The file the refactoring hand holds, and the hand holding it. [[spec/design_output/stop#the-hand-holds-its-file]]
 export const REFACTOR_HOLD = inRun("refactor-hold.json");
 // The plan this box holds: the todos and the work in hand. [[spec/design_output/stop#the-plan]]
