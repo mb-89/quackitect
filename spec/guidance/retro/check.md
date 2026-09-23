@@ -1,6 +1,6 @@
 ---
 kind: [[guidance]]
-scope: ["whoever runs the verify step of a retro"]
+scope: ["whoever runs the check step of a retro"]
 rationale: [[spec/rationales/verifying]]
 ---
 

@@ -32,7 +32,7 @@ export function retro(root, argv, doors) {
   if (what === "effect") return effect(it, argv[1]);
   // [[spec/guidance/retro/classify]]
   if (what === "classes") return classes(it, argv[1]);
-  // [[spec/guidance/retro/verify]]
+  // [[spec/guidance/retro/check]]
   if (what === "mint") return mint(it, argv[1]);
   // [[spec/design_input/the-agent-pulls-tickets]]
   if (what === "new") return newRetro(it, argv);

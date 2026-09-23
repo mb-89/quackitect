@@ -345,7 +345,7 @@ A shape rule reads the Actionables chapter of a guidance note and counts the sen
 - spec/guidance/retro/feedback.md
 - spec/guidance/retro/read.md
 - spec/guidance/retro/signals.md
-- spec/guidance/retro/verify.md
+- spec/guidance/retro/check.md
 - spec/guidance/tickets.md
 - spec/guidance/voice-checks.md
 - spec/guidance/voice.md

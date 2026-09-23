@@ -1,6 +1,6 @@
 ---
 kind: [[rationale]]
-explains: [[spec/guidance/retro/verify]]
+explains: [[spec/guidance/retro/check]]
 ---
 
 # Why

@@ -1,6 +1,6 @@
-// The retro's minting: a class the verify step leaves open gets one ticket,
+// The retro's minting: a class the check step leaves open gets one ticket,
 // a class the tree answers already gets none.
-// [[spec/guidance/retro/verify]]
+// [[spec/guidance/retro/check]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
@@ -107,7 +107,7 @@ test("an open class mints one ticket with its ask, and a fixed class mints none"
   );
 });
 
-// [[spec/guidance/retro/verify]]
+// [[spec/guidance/retro/check]]
 test("a ticket that mints keeps its name where a later one refuses", () => {
   const second = {
     ...CLASS,

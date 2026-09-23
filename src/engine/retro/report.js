@@ -80,7 +80,7 @@ function bottomLine(record, rates) {
     );
     for (const one of mine) {
       const tickets = (one.tickets ?? []).join(", ") || NONE;
-      const status = String(one.status ?? "").trim() || "the verify step stands open";
+      const status = String(one.status ?? "").trim() || "the check step stands open";
       out.push(
         `| ${one.id} · ${one.class} | ${one.defect} | ${one.fix} | ${rates.classes[one.id].rate} | ${status} | ${tickets} | ${held(one.id)} |`,
       );
@@ -98,7 +98,12 @@ function bottomLine(record, rates) {
 function effectOf(effect) {
   const out = ["## Effect of the last retro", ""];
   if (!effect?.classes?.length)
-    return [...out, "No earlier retro holds class fixes.", "", ...batteryOf(effect?.battery)];
+    return [
+      ...out,
+      "No earlier retro holds class fixes.",
+      "",
+      ...batteryOf(effect?.battery),
+    ];
   out.push(
     `Measured against ${effect.last}.`,
     "",
@@ -132,22 +137,42 @@ function batteryOf(battery) {
   };
   const named = (one) => (one.file ? `${one.file} · ${one.name}` : one.name);
   out.push(
-    ...rows("New among the slowest", battery.fresh, (one) => `${named(one)} (${one.ms} ms)`),
-    ...rows("Grown", battery.grown, (one) => `${named(one)} (${one.before} to ${one.ms} ms)`),
-    ...rows("Gone from the slowest", battery.gone, (one) => `${named(one)} (${one.ms} ms)`),
+    ...rows(
+      "New among the slowest",
+      battery.fresh,
+      (one) => `${named(one)} (${one.ms} ms)`,
+    ),
+    ...rows(
+      "Grown",
+      battery.grown,
+      (one) => `${named(one)} (${one.before} to ${one.ms} ms)`,
+    ),
+    ...rows(
+      "Gone from the slowest",
+      battery.gone,
+      (one) => `${named(one)} (${one.ms} ms)`,
+    ),
     ...spawnsOf(battery.spawns),
     ...filesOf(battery.files),
     ...rows("Parts left unrun", battery.unrun, (one) => one),
-    ...rows("Red, in the case's own words", battery.red, (one) => `${named(one)}: ${one.said}`),
+    ...rows(
+      "Red, in the case's own words",
+      battery.red,
+      (one) => `${named(one)}: ${one.said}`,
+    ),
   );
   return [...out, ""];
 }
 
 // The spawns a run made, and how many of them are Vale, beside the last retro's. [[spec/guidance/retro/effect]]
 function spawnsOf(spawns) {
-  const said = (one) => (one ? `${one.all} spawns, ${one.vale} of them Vale` : "no tally");
+  const said = (one) =>
+    one ? `${one.all} spawns, ${one.vale} of them Vale` : "no tally";
   if (!spawns) return [];
-  return ["", `Spawns: ${said(spawns.now)}, against ${said(spawns.before)} at the last retro.`];
+  return [
+    "",
+    `Spawns: ${said(spawns.now)}, against ${said(spawns.before)} at the last retro.`,
+  ];
 }
 
 // A time a test file, the slowest first, beside the last retro's. [[spec/guidance/retro/effect]]

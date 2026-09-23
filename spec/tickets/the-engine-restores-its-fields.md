@@ -23,6 +23,7 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
+group: the-review-lands-overnight
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do

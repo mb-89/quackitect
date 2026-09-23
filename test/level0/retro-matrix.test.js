@@ -138,7 +138,9 @@ test("a findings file reads a section per row, and a missing section reads null"
 
 // A file a Windows editor writes ends each line on a carriage return too. [[spec/guidance/retro/read]]
 test("a findings file with carriage returns reads the same items", () => {
-  const read = findingsOf("## stop\r\n\r\n- the panel waits for a file\r\n\r\n## keep\r\n");
+  const read = findingsOf(
+    "## stop\r\n\r\n- the panel waits for a file\r\n\r\n## keep\r\n",
+  );
   assert.deepEqual(read.stop, ["the panel waits for a file"]);
   assert.deepEqual(read.keep, []);
 });
@@ -202,9 +204,34 @@ test("the report draws the battery beside the effect, part by part, with the cas
   assert.match(report, /- b\.js · arrives \(80 ms\)/);
   assert.match(report, /- grows \(100 to 200 ms\)/);
   assert.match(report, /- leaves \(50 ms\)/);
-  assert.match(report, /Spawns: 20 spawns, 8 of them Vale, against 200 spawns, 150 of them Vale at the last retro\./);
+  assert.match(
+    report,
+    /Spawns: 20 spawns, 8 of them Vale, against 200 spawns, 150 of them Vale at the last retro\./,
+  );
   assert.match(report, /\| a\.js \| 300 \| 400 \|/);
   assert.match(report, /Parts left unrun:\n\n- rules/);
   assert.match(report, /- a\.js · grows: too slow/);
   assert.doesNotMatch(reportOf(RETRO, [], { effect: { classes: [] } }), /The battery/);
+});
+
+// A class with no status stands open at the retro's check step, and the report names that step. [[spec/guidance/retro/check]]
+test("a class the check step leaves open reads so in the report", async () => {
+  const { CATEGORIES } = await import("../../src/engine/retro/findings.js");
+  const record = {
+    classes: [
+      {
+        id: "k1",
+        class: "one class",
+        category: CATEGORIES[0],
+        defect: "a defect",
+        fix: "a fix",
+      },
+    ],
+    dispositions: {},
+  };
+  const rates = { hours: 1, classes: { k1: { count: 1, rate: 1 } } };
+  assert.match(
+    reportOf(RETRO, [], { record, rates }),
+    /\| the check step stands open \|/,
+  );
 });

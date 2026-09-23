@@ -1,12 +1,12 @@
-// The retro's tickets: one a class the verify step leaves open, minted off
+// The retro's tickets: one a class the check step leaves open, minted off
 // the standard route, its ask written and the draft opened.
-// [[spec/guidance/retro/verify]]
+// [[spec/guidance/retro/check]]
 
 import { CLASSES, recordOf } from "./classes.js";
 import { homeOf } from "./timeline.js";
 
 export const TICKETS = "spec/tickets";
-// A class the verify step closes opens on one of these, and where or why follows. [[spec/guidance/retro/verify]]
+// A class the check step closes opens on one of these, and where or why follows. [[spec/guidance/retro/check]]
 export const CLOSED = ["fixed:", "past:"];
 const OPEN = "open";
 const ROUTE = "standard";
@@ -23,7 +23,7 @@ function runIn(it, argv) {
   });
 }
 
-// The ask a class hands its ticket, as the chapter the mint leaves empty. [[spec/guidance/retro/verify]]
+// The ask a class hands its ticket, as the chapter the mint leaves empty. [[spec/guidance/retro/check]]
 export function askOf(ticket) {
   const lines = [
     String(ticket.gain ?? "").trim(),
@@ -35,7 +35,7 @@ export function askOf(ticket) {
   return `${lines.join("\n")}\n`;
 }
 
-// The ask chapter, written where the mint leaves its placeholders. [[spec/guidance/retro/verify]]
+// The ask chapter, written where the mint leaves its placeholders. [[spec/guidance/retro/check]]
 export function withAsk(text, ask) {
   const rows = text.split("\n");
   const head = rows.findIndex((one) => one.trim() === "# Ask");
@@ -45,7 +45,7 @@ export function withAsk(text, ask) {
   return [...rows.slice(0, head + 1), "", ask, ...rows.slice(end)].join("\n");
 }
 
-// Every fault standing between the classes and their tickets. [[spec/guidance/retro/verify]]
+// Every fault standing between the classes and their tickets. [[spec/guidance/retro/check]]
 export function mintFaults(record) {
   const faults = [];
   for (const one of record.classes) {
@@ -70,7 +70,7 @@ export function mintFaults(record) {
   return faults;
 }
 
-// The verb: mints one ticket a class standing open, writes its ask and opens the draft. [[spec/guidance/retro/verify]]
+// The verb: mints one ticket a class standing open, writes its ask and opens the draft. [[spec/guidance/retro/check]]
 export function mint(it, name) {
   const home = name ? homeOf(it, name) : "";
   const at = home ? it.join(home, CLASSES) : "";
@@ -105,7 +105,7 @@ export function mint(it, name) {
     }
     one.tickets = [one.ticket.name];
     made += 1;
-    // The record lands after each ticket, so a refusal past here leaves the tickets it made named. [[spec/guidance/retro/verify]]
+    // The record lands after each ticket, so a refusal past here leaves the tickets it made named. [[spec/guidance/retro/check]]
     it.disk.write(at, `${JSON.stringify(record, null, 2)}\n`);
     console.log(`${one.id}  ${path}`);
   }
