@@ -89,7 +89,12 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: d83d8224fbde532d08b9bbb3416d58c2ed94204b
+    hash_after: d83d8224fbde532d08b9bbb3416d58c2ed94204b
 ---
 
 # Ask
@@ -117,6 +122,42 @@ The test door misses Go and the level0 lib and hooks, and asks a test the ticket
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+Six readers, each changed to read the thing it claims. The comment hunk stays
+with [[spec/tickets/a-comment-hunk-is-prose]].
+
+| part | the file | what changes |
+|---|---|---|
+| the sources | `.claude/skills/level0/lib/tested.js` | `SOURCE` takes `src/**/*.go`, `lib/*.js` and `hooks/*.js` under `.claude/skills/level0` |
+| the Go test | the same | `TEST` takes `_test.go`, and a Go test names every file of its own folder |
+| the carried test | the same | `untestedIn` takes the test paths the held ticket's command fields name, beside the staged ones |
+| who hands them | `precommit.js` and `src/bridge/bash.js` | each reads the hold, and passes the paths under `test/` its ticket's command fields carry |
+| the variable | `.claude/skills/level0/lib/bash.js` | `writesIn` reads `NAME=value` segments in order, and a `$NAME` target resolves to its value |
+| the unresolved | the same | a target holding `$` with no value in the command refuses under `ShellWritesNothing` |
+| the baseline | `src/engine/retro/effect.js` | a retro with no last one writes its battery with `baseline: true`, and the report names it |
+| the median | `src/scripts/cli-stamp.js` and `battery.js` | the stamp keeps the last runs, and collect writes each part's median |
+| the awake case | `test/contract/awake.test.js` | the release awaits the child's `exit` event, with a timeout, in place of the fixed wait |
+| the fake disk | `src/doors/fake/disk.js` | `list` on a file path throws `ENOTDIR`, the way the real disk does |
+
+The run count the median reads stands in `spec/config/level0.json`, beside the weights.
+
+The cases:
+
+- `tested.test.js`: a Go, a lib and a hook file each ask a test, and a carried test answers it
+- `bash.test.js`: `f=README.md; echo x > $f` refuses, and `echo x > $HOME/y.md` refuses as unresolved
+- `retro-effect.test.js` and `battery.test.js`: a first retro writes the baseline, and three runs keep a median
+- `test/contract/disk.test.js`: the fake and the real disk both throw on a list of a file
+
+The callers:
+
+- `one-reader.test.js` walks a path with `list`, and its `filesUnder` catches the throw
+- every other `list` caller hands a folder, and the check names any that breaks
+- `onBash` and `precommit.js` call `untestedIn`, and both gain the carried paths
+
+The costs:
+
+- a write through `$TMPDIR` into a tracked kind now refuses, and a hand names the path
+- the stamp grows by the kept runs
 
 ## review
 
