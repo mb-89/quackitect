@@ -248,6 +248,20 @@ run. A target reading the brand already stays as it is. The icon is the mark a
 vehicle draws. Each vehicle wears its own mark, and nothing holds the marks in
 step.
 
+## One file holds the version
+
+The tree's version stands in the root `package.json`, and in no other file git
+holds. Raise it there, and each manifest below takes it through `versionedJson`:
+
+| the manifest | who writes the version |
+|---|---|
+| the plugin's, off the brand folder | the stamp, ahead of every verb |
+| the extension's, `src/extension/package.json` | the same, over the file git holds, because the editor refuses a manifest naming no version |
+| the stub's, under `src/stub` | the stub verb, as it copies the template |
+
+The extension's manifest is the one copy git holds, and the stamp owns it. A hand
+editing the version there loses the edit on the next run.
+
 ## Two roads to the vehicle
 
 The shim and the bridgehead both read `vehicle.json` beside them. The shim

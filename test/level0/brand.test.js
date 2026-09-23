@@ -11,6 +11,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import {
   BRAND,
+  EXTENSION,
   ICON_SOURCE,
   ICON_TARGET,
   MARKETPLACE,
@@ -185,4 +186,19 @@ test("a fresh clone gets both manifests off the stamp, reading the brand and the
   assert.equal(plugin.author.name, "acme");
   assert.equal(plugin.version, "0.1.0");
   assert.deepEqual(stamps(files, "/v", "acme"), []);
+});
+
+// The version stands in package.json alone, and a raise there reaches the plugin and the extension on the next stamp. [[spec/design_output/vehicle#one-file-holds-the-version]]
+test("a raised version in package.json reaches the plugin and the extension, and nothing else holds one", () => {
+  const files = fakeDisk({
+    ...sources,
+    [join("/v", "package.json")]: '{"version":"0.2.0"}',
+    [join("/v", EXTENSION)]: JSON.stringify({ name: "level0", version: "0.1.0" }),
+  });
+  const done = stamps(files, "/v", "acme");
+  assert.ok(done.includes(PLUGIN) && done.includes(EXTENSION), `the stamp writes both, and it says ${done}`);
+  assert.equal(JSON.parse(files.read(join("/v", PLUGIN))).version, "0.2.0");
+  assert.equal(JSON.parse(files.read(join("/v", EXTENSION))).version, "0.2.0");
+  assert.equal(JSON.parse(files.read(join("/v", MARKETPLACE))).version, undefined, "the marketplace names no version");
+  assert.deepEqual(stamps(files, "/v", "acme"), [], "a second stamp writes nothing");
 });

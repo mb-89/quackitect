@@ -143,10 +143,14 @@ test("a stub holds every file the list names, and nothing else", () => {
   assert.equal(said.ok, true, said.why);
   assert.deepEqual(walk(files, "/stub"), [...said.files].sort());
   for (const one of said.files) assert.ok(files.exists(`/stub/${one}`), one);
-  assert.equal(
-    files.read(`/stub/${MARKER}`),
-    files.read(`/tools/src/stub/${MARKER}`),
-    "the plugin is the template's",
+  // The template carries no version, so the copy writes the tree's own. [[spec/design_output/vehicle#one-file-holds-the-version]]
+  assert.deepEqual(
+    JSON.parse(files.read(`/stub/${MARKER}`)),
+    {
+      ...JSON.parse(files.read(`/tools/src/stub/${MARKER}`)),
+      version: JSON.parse(files.read("/tools/package.json")).version,
+    },
+    "the plugin is the template's, wearing the tree's version",
   );
   assert.notEqual(
     files.read(`/stub/${MARKER}`),

@@ -1,5 +1,4 @@
 {
   "name": "level0",
-  "description": "The bridgehead: the one plugin a stub carries, under the name level zero answers to. It reads vehicle.json at load, finds the vehicle, and hands every hook to the vehicle's own modules. The attach writes level zero itself over this folder, so a tool keeps its name from the first session to the next.",
-  "version": "0.1.0"
+  "description": "The bridgehead: the one plugin a stub carries, under the name level zero answers to. It reads vehicle.json at load, finds the vehicle, and hands every hook to the vehicle's own modules. The attach writes level zero itself over this folder, so a tool keeps its name from the first session to the next."
 }

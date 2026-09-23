@@ -61,10 +61,14 @@ test("a stub holds its files, reads every one back, and no file of the method", 
       assert.ok(files.read(join(dest, one)) !== undefined, one);
     for (const one of METHOD)
       assert.equal(files.exists(join(dest, one)), false, `${one} stays behind`);
-    assert.equal(
-      files.read(join(dest, MARKER)),
-      files.read(join(root, "src", "stub", MARKER)),
-      "the plugin is the template's",
+    // The template carries no version, so the copy writes the tree's own. [[spec/design_output/vehicle#one-file-holds-the-version]]
+    assert.deepEqual(
+      JSON.parse(files.read(join(dest, MARKER))),
+      {
+        ...JSON.parse(files.read(join(root, "src", "stub", MARKER))),
+        version: JSON.parse(files.read(join(root, "package.json"))).version,
+      },
+      "the plugin is the template's, wearing the tree's version",
     );
     assert.notEqual(
       files.read(join(dest, MARKER)),

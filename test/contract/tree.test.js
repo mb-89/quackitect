@@ -550,6 +550,17 @@ test("every package the extension declares carries an exact version", () => {
   }
 });
 
+// The brand folder and the stub's template carry no version, so no second copy drifts from package.json. [[spec/design_output/vehicle#one-file-holds-the-version]]
+test("no manifest source git holds names a version of its own", () => {
+  for (const one of [
+    "spec/config/brand/plugin.json",
+    "spec/config/brand/marketplace.json",
+    "src/stub/.claude/skills/level0/.claude-plugin/plugin.json",
+  ]) {
+    assert.equal(read(one).version, undefined, one);
+  }
+});
+
 // [[spec/design_output/stop#the-mechanical-checks]]
 test("every mechanical check the stop table names stands in the stop door", () => {
   const hook = files.read(join(root, "src", "bridge", "stop.js"));

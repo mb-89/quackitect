@@ -216,6 +216,14 @@ export function brandedJson(text, brand) {
   return `${JSON.stringify(out, null, 2)}\n`;
 }
 
+// A manifest wearing the tree's version, which package.json alone holds. An empty version leaves the text as it stands. [[spec/design_output/vehicle#one-file-holds-the-version]]
+export function versionedJson(text, version) {
+  const held = parsed(text);
+  if (!version || !held || typeof held !== "object" || Array.isArray(held))
+    return String(text);
+  return `${JSON.stringify({ ...held, version }, null, 2)}\n`;
+}
+
 // [[spec/design_output/level0#a-stub-names-its-vehicle]]
 export function shimSettings(text, vehicle, brand) {
   const held = parsed(text);

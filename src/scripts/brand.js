@@ -11,6 +11,7 @@ import {
   brandedJson,
   brandOf,
   emptyBrand,
+  versionedJson,
 } from "../../.claude/skills/level0/lib/vehicle.js";
 import { disk } from "../doors/disk.js";
 
@@ -19,8 +20,9 @@ export const MARKETPLACE = ".claude-plugin/marketplace.json";
 export const PLUGIN = ".claude/skills/level0/.claude-plugin/plugin.json";
 export const ICON_SOURCE = `${BRAND}/icon.svg`;
 export const ICON_TARGET = "src/extension/icon.svg";
+export const EXTENSION = "src/extension/package.json";
 
-// The shape a manifest takes where the brand folder carries no source for it, so a clone holding neither still gets both. The brand lands through brandedJson, and the plugin's version reads off package.json. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+// The shape a manifest takes where the brand folder carries no source for it, so a clone holding neither still gets both. The brand lands through brandedJson, and the version through versionedJson. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 const SHAPES = {
   [MARKETPLACE]: {
     name: "",
@@ -42,12 +44,18 @@ const SHAPES = {
   },
 };
 
-// Each target reads its source in the brand folder, so a clone carrying no target gets one. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+// Each target reads its source in the brand folder, so a clone carrying no target gets one. The extension's manifest is its own source, because the editor reads it where git holds it. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 export function stamps(files, root, brand) {
   const done = [];
+  const version = versionIn(files, root);
   const targets = [
     [MARKETPLACE, `${BRAND}/marketplace.json`, (text) => brandedJson(text, brand)],
-    [PLUGIN, `${BRAND}/plugin.json`, (text) => brandedJson(text, brand)],
+    [
+      PLUGIN,
+      `${BRAND}/plugin.json`,
+      (text) => versionedJson(brandedJson(text, brand), version),
+    ],
+    [EXTENSION, EXTENSION, (text) => versionedJson(text, version)],
     [ICON_TARGET, ICON_SOURCE, (text) => text],
   ];
   for (const [rel, source, branded] of targets) {
@@ -56,7 +64,7 @@ export function stamps(files, root, brand) {
     // The source stands where the brand folder carries it, and the shape below answers a clone holding neither. A target standing already reads as its own source. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
     const held =
       readIf(files, join(root, ...source.split("/"))) ??
-      (was === null ? shapeOf(files, root, rel) : null);
+      (was === null ? shapeOf(rel) : null);
     if (held === null) continue;
     const made = branded(held);
     if (made === was) continue;
@@ -67,16 +75,18 @@ export function stamps(files, root, brand) {
   return done;
 }
 
-// The shape a missing source falls back on, and the plugin's version is the tree's own, read off package.json. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
-function shapeOf(files, root, rel) {
+// The shape a missing source falls back on. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+function shapeOf(rel) {
   const shape = SHAPES[rel];
-  if (!shape) return null;
-  if (rel !== PLUGIN) return JSON.stringify(shape);
+  return shape ? JSON.stringify(shape) : null;
+}
+
+// The tree's version, which package.json alone holds, and the empty string where it names none. [[spec/design_output/vehicle#one-file-holds-the-version]]
+export function versionIn(files, root) {
   try {
-    const { version } = JSON.parse(readIf(files, join(root, "package.json")));
-    return JSON.stringify(version ? { ...shape, version } : shape);
+    return String(JSON.parse(readIf(files, join(root, "package.json"))).version ?? "");
   } catch {
-    return JSON.stringify(shape);
+    return "";
   }
 }
 

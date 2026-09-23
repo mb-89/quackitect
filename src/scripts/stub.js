@@ -16,8 +16,11 @@ import {
   stubFolders,
   TEMPLATE,
   upstreamOf,
+  versionedJson,
 } from "../../.claude/skills/level0/lib/vehicle.js";
 import { identityHere } from "./vehicle.js";
+
+const MANIFEST = ".claude-plugin/plugin.json";
 
 // [[spec/design_output/vehicle#the-record-names-the-vehicle]]
 export function stubInto(files, git, time, method, dest, pid, said = {}) {
@@ -38,11 +41,12 @@ export function stubInto(files, git, time, method, dest, pid, said = {}) {
   if (!brand) return { ok: false, why: emptyBrand(method) };
 
   const template = walk(files, join(method, TEMPLATE));
+  const version = versionOf(files, method);
   const record = linkOf(
     identityHere(files, time, method, pid),
     brand,
     upstream,
-    versionOf(files, method),
+    version,
     time.stamp(),
   );
 
@@ -61,7 +65,9 @@ export function stubInto(files, git, time, method, dest, pid, said = {}) {
   for (const rel of template) {
     const at = join(dest, rel);
     files.makeDir(dirname(at));
-    files.write(at, files.read(join(method, TEMPLATE, rel)));
+    const text = files.read(join(method, TEMPLATE, rel));
+    // The template's manifest carries no version, so the copy writes the tree's own. [[spec/design_output/vehicle#one-file-holds-the-version]]
+    files.write(at, rel.endsWith(MANIFEST) ? versionedJson(text, version) : text);
     if (rel.endsWith(".sh")) files.runnable(at);
   }
   return { ok: true, files: stubFiles(template, dest) };
