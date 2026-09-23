@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -105,6 +105,10 @@ record:
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 481e82a6978bfdd716d307607dcf7a6cec661644
     hash_after: 481e82a6978bfdd716d307607dcf7a6cec661644
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-4
+    hash_before: ea30c2fcfe241f9edabd5e4d73ab2fbf936e1745
+    hash_after: ea30c2fcfe241f9edabd5e4d73ab2fbf936e1745
 ---
 
 # Ask
@@ -183,18 +187,13 @@ The cost: each `git revert` and `git reset` runs one `git log` at the door, besi
 
 <!-- the form is verdict -->
 
-fail
-- design: `git log --format=%s <sha>` walks every commit under the sha. So `git revert` of any commit reads old pull subjects, and refuses.
-- design: that breaks the third ask line, and the cases feed a fake `subjects`, so no case shows it.
-- design fix: read each `git revert` revision with `--no-walk`, and `<rev>..HEAD` for a reset. Add a case running the real git read.
-- craft: `git revert -m 1 <sha>` hands `1` to the parse as a revision, so `-m` takes its value.
-- craft: `pull-hand.js` writes `<leaf> fails back to <back>`, and the leaf parse reads that form too.
-- craft: a take-back subject reads `<hand> takes <leaf> back`, and the parse reads that leaf as well.
-- craft: `verbLine` names what level zero refuses, and the new row belongs in it.
-- craft: the stated cost holds once the read walks one commit a revision, plus one read of the ticket folders.
-- the parse holds on `git log --oneline -30`: each ticket subject names a ticket under `spec/tickets`.
-- a subject like `the funnel note:` or `work/<group>:` names no ticket, so it passes.
-- `commandRules` is the one caller of `findings`, and the CLI resets through `it.git.run` off the door.
+pass
+- The approach answers each finding of the earlier review.
+- `--no-walk` reads each `git revert` revision alone, and `<rev>..HEAD` reads a reset range.
+- `box.proc.run` answers at once, so `findings` takes `it.subjects` the way it takes `it.script`.
+- craft: `bash-commit.test.js` drives a fake proc. A case driving real git belongs in `test/contract`.
+- craft: a fake proc answering `--no-walk` apart from a walk keeps the level0 case honest.
+- craft: `folders.js` names the private folder as `TICKETS`, and the parse reads that name.
 
 # implement
 
