@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -139,6 +139,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-9
+    hash_before: 06c24d5c469607e09b0552ed45ee53884c66f946
+    hash_after: 06c24d5c469607e09b0552ed45ee53884c66f946
+reason: done
 ---
 
 # Ask
@@ -374,17 +379,68 @@ Each door and measure now reads the thing it claims.
 
 <!-- the form is files -->
 
+- spec/tickets/each-check-reads-its-signal.md
+- .claude/commands/se-config-battery-runs.md
+- .claude/skills/level0/lib/bash.js
+- .claude/skills/level0/lib/shell-values.js
+- .claude/skills/level0/lib/tested.js
+- spec/config/level0.json
+- spec/config/level0.schema.json
+- spec/design_output/bash.md
+- spec/design_output/doors.md
+- spec/design_output/level0.md
+- spec/design_output/tree.md
+- spec/design_output/work.md
+- src/bridge/bash.js
+- src/doors/awake.js
+- src/doors/fake/awake.js
+- src/doors/fake/disk.js
+- src/engine/retro/effect.js
+- src/scripts/battery.js
+- src/scripts/cli-stamp.js
+- src/scripts/cli.js
+- src/scripts/guidance-hand.js
+- src/scripts/precommit.js
+- src/scripts/retro-collect.js
+- test/contract/awake.test.js
+- test/contract/disk.test.js
+- test/level0/bash-commit.test.js
+- test/level0/bash.test.js
+- test/level0/battery.test.js
+- test/level0/cli-stamp.test.js
+- test/level0/guidance-hand.test.js
+- test/level0/one-reader.test.js
+- test/level0/precommit.test.js
+- test/level0/retro-collect-median.test.js
+- test/level0/retro-collect.test.js
+- test/level0/retro-effect.test.js
+- test/level0/shell-values.test.js
+- test/level0/tested.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- Every item of the Ask lands, and each carries a case that fails before the change.
+- `./RUNME.sh check` exits 0 on this branch.
+- No retro stands on the ticket yet, and the next step writes one.
+- craft: `landing` tests `FREE` on the raw word alone, so `out=$TMPDIR; echo x > $out/a.md` refuses.
+- craft: `server.js` calls `release()` twice and awaits neither, so the server still ends before the child.
+- craft: `battery.test.js` reads the namespace one line above its import. Move the import up.
+- craft: the schema `help` for `battery.runs` repeats the config comment word for word.
+- craft: a carried test of another hand's ticket answers this hand's commit too.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The config comment points at the retro guidance, and the design tables hold each rule once.
 
 # Discussion
 
