@@ -138,10 +138,15 @@ The file carries the run in its body and names the verb in `allowed-tools`:
     ---
     description: "config / log / level: sets log.level to info."
     allowed-tools: Bash(./RUNME.sh config:*)
+    disable-model-invocation: true
     generated: "GENERATED. ... Source: spec/config/level0.json"
     ---
 
     !`./RUNME.sh config log.level info`
+
+The command is the owner's button, and a cloud session reaches it as a slash
+command alone. `disable-model-invocation` keeps it off the skill listing the
+model reads, so a person types it and the agent reads nothing of it.
 
 A file taking an argument carries `$ARGUMENTS` where the value stands, and an
 `argument-hint` of `<value>`. The client puts what a person types there.

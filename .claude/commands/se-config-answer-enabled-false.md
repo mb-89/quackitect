@@ -1,6 +1,7 @@
 ---
 description: "config / answer / enabled: sets answer.enabled to false. The door holding the owner's prompt first. false takes it out."
 allowed-tools: Bash(./RUNME.sh config:*)
+disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 

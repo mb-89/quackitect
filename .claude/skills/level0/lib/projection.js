@@ -130,6 +130,9 @@ export function writesOf(entry, texts) {
   return out;
 }
 
+// A command is the owner's button, and a cloud session reaches it as a slash command alone. The line keeps it off the model's skill listing, which carries every command otherwise. [[spec/design_output/projection#how-a-command-sets-it]]
+const HIDDEN = "disable-model-invocation: true";
+
 // One command mints a retro, because the route it mints from stands in one file. [[spec/design_input/the-agent-pulls-tickets]]
 function retroFrom(entry) {
   const body = [
@@ -149,6 +152,7 @@ function retroFrom(entry) {
           "---",
           `description: ${JSON.stringify("retro: mints a retro off its route, opens it, and hands out its first leaf.")}`,
           "allowed-tools: Bash(./RUNME.sh retro:*)",
+          HIDDEN,
           `generated: ${JSON.stringify(saysGenerated(entry.from))}`,
           "---",
           "",
@@ -318,6 +322,7 @@ function fileFor(entry, key, said, sentence, shown) {
     `description: ${JSON.stringify(shown.description)}`,
     ...(shown.hint ? [`argument-hint: ${JSON.stringify(shown.hint)}`] : []),
     "allowed-tools: Bash(./RUNME.sh config:*)",
+    HIDDEN,
     `generated: ${JSON.stringify(saysGenerated(entry.from))}`,
     "---",
     "",

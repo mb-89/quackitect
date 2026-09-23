@@ -203,6 +203,11 @@ test("every file says it is generated, and names the source to edit", () => {
     assert.ok(text.includes(mark), `${path} carries the mark`);
     assert.match(text, /^---\n/, `${path} opens frontmatter`);
     assert.match(text, /allowed-tools: Bash\(\.\/RUNME\.sh config:\*\)/, path);
+    assert.match(
+      text,
+      /^disable-model-invocation: true$/m,
+      `${path} stays off the model's listing`,
+    );
     for (const row of text.split("\n")) {
       assert.ok(row.length <= 200, `${path} holds no runaway line`);
     }

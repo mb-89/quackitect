@@ -1,6 +1,7 @@
 ---
 description: "retro: mints a retro off its route, opens it, and hands out its first leaf."
 allowed-tools: Bash(./RUNME.sh retro:*)
+disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/processes/retro.yaml"
 ---
 

@@ -2,6 +2,7 @@
 description: "config / names / words: sets names.words to what you type. The words a file, a folder and a branch name each hold at most."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
+disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 

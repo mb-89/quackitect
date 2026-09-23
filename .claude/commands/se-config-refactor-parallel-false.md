@@ -1,6 +1,7 @@
 ---
 description: "config / refactor / parallel: sets refactor.parallel to false. true starts the hand beside the work. false leaves the list to the session itself."
 allowed-tools: Bash(./RUNME.sh config:*)
+disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 

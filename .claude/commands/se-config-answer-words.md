@@ -2,6 +2,7 @@
 description: "config / answer / words: sets answer.words to what you type. The words an answer holds outside its code and tables."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
+disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 

@@ -2,6 +2,7 @@
 description: "config / work / retroReaders: sets work.retroReaders to what you type. The hands a retro's collect spawns, each taking the next chapter until none stands."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
+disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 

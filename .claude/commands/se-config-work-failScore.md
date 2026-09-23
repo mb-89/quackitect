@@ -2,6 +2,7 @@
 description: "config / work / failScore: sets work.failScore to what you type. The score a ticket takes for each hand-back that comes back refused."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
+disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 

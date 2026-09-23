@@ -2,6 +2,7 @@
 description: "config / work / staleAfter: sets work.staleAfter to what you type. The age of a held group's tip that puts it under yours."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
+disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 

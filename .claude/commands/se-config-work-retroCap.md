@@ -2,6 +2,7 @@
 description: "config / work / retroCap: sets work.retroCap to what you type. The tickets a retro's improve step mints, so the list holds what gets done."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
+disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 

@@ -1,6 +1,7 @@
 ---
 description: "config / ask / wanted: sets ask.wanted to quiet. What the owner wants said at the end of this turn."
 allowed-tools: Bash(./RUNME.sh config:*)
+disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 
