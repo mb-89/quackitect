@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,19 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: feb5627e3a4028b7ca70c19e8bb7490052e04a3c
+    hash_after: feb5627e3a4028b7ca70c19e8bb7490052e04a3c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 30 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: 2 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+reason: done
 ---
 
 # Ask
@@ -51,11 +64,15 @@ Producing a vehicle writes every file of the method through the door one by one,
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/disk.test.js test/level0/vehicle.test.js test/contract/vehicle.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -63,12 +80,25 @@ Producing a vehicle writes every file of the method through the door one by one,
 
 <!-- the form is text -->
 
+`copyFolder` in `src/doors/disk.js` lands a folder in one `cpSync`. Its filter
+reads each path relative to the folder, and a folder it refuses carries nothing
+under it along. The bytes and the run bits travel whole, so a binary stays a
+binary. The fake answers the same, and a contract case holds the pair.
+`produce` in `src/scripts/vehicle.js` takes it with `travels` as the filter, in
+place of a walk reading and writing each file as text.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change follows the first two lines of the ask, and the discussion says why the third departs
+- the cleanup: the text copy corrupting a binary goes with the walk, so a vehicle carries an image byte for byte
+- one place: the filter stays `travels` in `lib/vehicle.js`, and the door takes it as an argument
+
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The produce case stands seventh of the slowest ten, at about a second and a half. One call still writes every file of the method, and the disk pays per file. The case above it, a vehicle answering its own verbs, runs the install and leaves this change untouched. A vehicle carrying fewer files, or a case producing it once for the whole battery, takes the case out of the ten.
