@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -111,6 +111,10 @@ record:
     hash_after: 6ab3a6675a50a6beb5c06c2abb1320a3d0ae3d20
     returns: 2
     why: "Design: `hunksIn` reads each `--- a/` header as a removed line of the file above it.; Both doors pipe `git diff --cached --unified=0`, so that header comes before each next `+++ b/`.; The header reads as code, so each file but the last asks a test.; A comment-only fix across seven modules then refuses, and the ask says it passes.; Fix: name in the `hunksIn` row that it skips a `---` header, as it skips `+++`.; Fix: add a comment-only case with two files, and assert it passes.; The rest stands: the removed lines, the trade case, the callers and the note."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 03e9d1042d535e828ddc3a285d98a4b278a3013f
+    hash_after: 03e9d1042d535e828ddc3a285d98a4b278a3013f
 ---
 
 # Ask
@@ -147,11 +151,12 @@ the removed lines too.
 
 | part | what changes |
 |---|---|
-| `hunksIn` | keeps each file's removed lines beside its added ones, as `{ added, removed }` |
+| `hunksIn` | keeps each file's removed lines beside its added ones, as `{ added, removed }`, and skips a `---` header the way it skips `+++` |
 | `codeIn` | a hunk asks for a test where a line either side is code, or where it adds nothing and takes code away |
 | `names` | reads the added lines of a test, as before |
 | the comment-only case | a comment traded for a comment passes, the way a pointer fix trades one |
 | the mixed cases | a code line added beside a comment refuses, and a code line traded for a comment refuses |
+| the header case | a comment-only delta over two files passes, so the second file's `--- a/` line reads for neither |
 | the note | `spec/design_output/tree#the-rules-over-two-files` names the removed lines beside the added |
 
 The callers of `untestedIn` read its list of files alone, so they change nothing:
