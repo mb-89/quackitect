@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,19 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 69810a7334f33437689429a021a301c8c772b3bf
+    hash_after: b4f0dd2cf0fc8aab6e51b0241d25603d1ba79e84
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/pointer passes
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
