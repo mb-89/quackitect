@@ -25,6 +25,30 @@ test("a todo placed last stands after the other todos and before every untagged 
 });
 
 // [[spec/design_output/pull#a-todo-forces-a-place]]
+test("a todo naming another todo stands right before it, whatever their names sort to", () => {
+  const all = [
+    row("a"),
+    row("b"),
+    row("z first", "true"),
+    row("y second", "z first"),
+    row("m third", "last"),
+    row("a small retro", "m third"),
+  ];
+  const out = outlineIn([], [], all, all);
+  const order = [...out]
+    .sort((x, y) => Number(x[1]) - Number(y[1]))
+    .map(([name]) => name);
+  assert.deepEqual(order, [
+    "y second",
+    "z first",
+    "a small retro",
+    "m third",
+    "a",
+    "b",
+  ]);
+});
+
+// [[spec/design_output/pull#a-todo-forces-a-place]]
 test("a level holding todos alone takes the one placed last at its end", () => {
   const all = [row("one", "true"), row("two", "last")];
   const out = outlineIn([], [], all, all);

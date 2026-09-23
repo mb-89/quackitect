@@ -82,18 +82,30 @@ function bestUnder(name, kids, ordinal, best, seen = new Set()) {
 // One level in order: by the best ordinal, then each todo moved before the row it names, or to the front where it names none standing here. [[spec/design_output/pull#the-queue-is-an-outline]]
 function anchored(names, kids, best) {
   const order = [...names].sort((a, b) => best.get(a) - best.get(b));
-  const moved = order.filter((name) => kids.todo.get(name)).sort();
+  const moved = order.filter((name) => kids.todo.get(name));
   const last = moved.filter((name) => kids.todo.get(name) === LAST);
-  for (const name of moved.filter((one) => kids.todo.get(one) !== LAST)) {
-    order.splice(order.indexOf(name), 1);
-    const at = order.indexOf(levelOf(kids.todo.get(name), names, kids));
-    order.splice(at < 0 ? 0 : at, 0, name);
-  }
-  // A todo stands before every row no todo places, so the last of them lands after the others and before the first untagged row. [[spec/design_output/pull#a-todo-forces-a-place]]
+  const named = (name) => levelOf(kids.todo.get(name), names, kids);
+  // A todo naming no row here stands at the front, in the order the queue gives it. [[spec/design_output/pull#a-todo-forces-a-place]]
+  const fronts = moved.filter(
+    (name) => !last.includes(name) && !names.includes(named(name)),
+  );
+  for (const name of fronts) order.splice(order.indexOf(name), 1);
+  order.splice(0, 0, ...fronts);
+  // A todo stands before every row no todo places, so the last of them lands after the fronts and before the first untagged row. [[spec/design_output/pull#a-todo-forces-a-place]]
   for (const name of last) {
     order.splice(order.indexOf(name), 1);
     const at = order.findIndex((one) => !kids.todo.get(one));
     order.splice(at < 0 ? order.length : at, 0, name);
+  }
+  // A todo naming a row moves after that row settles, so one naming a todo lands right before it. [[spec/design_output/pull#a-todo-forces-a-place]]
+  let pending = moved.filter((name) => !last.includes(name) && !fronts.includes(name));
+  while (pending.length) {
+    const ready = pending.filter((name) => !pending.includes(named(name)));
+    for (const name of ready.length ? ready : pending) {
+      order.splice(order.indexOf(name), 1);
+      order.splice(order.indexOf(named(name)), 0, name);
+    }
+    pending = ready.length ? pending.filter((name) => !ready.includes(name)) : [];
   }
   return order;
 }
