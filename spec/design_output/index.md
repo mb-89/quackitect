@@ -117,8 +117,8 @@ the walk covers, and names each path a write reaches. For what the door does
 with a path, see [[spec/design_output/index#a-change-moves-its-rows]].
 
 The watch stands off every folder the walk stands off, the log among them. The
-log grows a line a door call, so a watch on it moves rows for nothing, and a
-search of the log reads the file. For how, see
+log grows a line a door call, so a watch on it moves rows for nothing. A search
+of the log reads the file. For how, see
 [[spec/design_output/log#one-verb-reads-the-log]].
 
 A box where no watch stands still answers, out of the sweep the door makes on
