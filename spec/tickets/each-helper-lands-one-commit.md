@@ -89,7 +89,12 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: edbf8035f331c6b5a82210bf4f13c0ce8ef1c778
+    hash_after: edbf8035f331c6b5a82210bf4f13c0ce8ef1c778
 ---
 
 # Ask
@@ -116,6 +121,36 @@ A batch commit carries many topics past the commit verb, and two hands write one
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+One commit a helper, through the commit verb, and one hand a held file.
+
+| part | the file | what changes |
+|---|---|---|
+| the row | `src/bridge/bash.js` | `trunkGuard` refuses a raw `git commit` or `git push` on `main`, on a desk too |
+| what it says | the same | the refusal names `./RUNME.sh commit "<message>"`, which lints, checks and pushes |
+| what passes | the same | a commit the CLI makes, because the pull and the merge run git off the Bash door |
+| the hold | `src/bridge/stop.js` | `refactorHand` writes `{ file, hand }` into a hold file under `.se/.runtime` |
+| the hand | the same | the first helper write to that file fills `hand` with its `agentId` |
+| the release | the same | `onRefactorAnswered` removes the hold, and nothing else does |
+| the refusal | `src/bridge/write.js` | `onWrite` refuses a write to the held file from any other `agentId`, the session's own included |
+| the path | `.claude/skills/level0/lib/runs.js` | the hold file's name stands beside `REFACTORS` |
+| the guidance | `spec/guidance/working.md` | one actionable: land each helper's work through `./RUNME.sh commit` once its report and tests pass |
+
+The assumption: the door tells hands apart by `agentId` alone, so the first helper to write the file owns it.
+
+The cases:
+
+- `bash.test.js`: `git commit -m x` on `main` refuses and names the verb, and on a work branch it passes
+- `stop.test.js` or its neighbour: the hold stands from the spawn to the answer
+- `write.test.js`: the session's write to the held file refuses, and the owning hand's write lands
+
+The callers:
+
+- `onBash` runs `trunkGuard` on every Bash call
+- `onStop` in `stop.js` calls `refactorHand`, and the bridgehead fires `refactor.answered`
+- `onWrite` serves Write, Edit and the patch tools
+
+The cost: a hand dying before its answer leaves the hold, and a restart of the server clears it.
 
 ## review
 
