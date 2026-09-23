@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -139,6 +139,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-9
+    hash_before: 0d19aefd0840f557a33f06362dbceaac426f6a07
+    hash_after: 0d19aefd0840f557a33f06362dbceaac426f6a07
+reason: done
 ---
 
 # Ask
@@ -356,17 +361,45 @@ The owner's prompt now meets the next call, and a helper the turn waits on meets
 
 <!-- the form is files -->
 
+- spec/tickets/the-owner-hears-first.md
+- .claude/skills/level0/lib/answer.js
+- spec/design_output/level0.md
+- spec/design_output/stop.md
+- spec/guidance/working.md
+- src/bridge/agent.js
+- src/bridge/answer.js
+- src/bridge/ask.js
+- src/bridge/server.js
+- src/bridge/guidance.js
+- test/level0/agent.test.js
+- test/level0/answer-door.test.js
+- test/level0/answer.test.js
+- test/level0/grace-asks.test.js
+- test/level0/note-answer.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- The prompt demand opens with a grace of zero, so the first call asks for the reply.
+- `onAgent` refuses `run_in_background: false`, and `TOOLS.Agent` wires it after the answer gate.
+- Rule 2 gives each owner question a row, and rule 4 asks a report line a piece.
+- `agent.test.js` and `answer.test.js` cover both gates, and each feeds a bad call.
+- `./RUNME.sh check` exits 0.
+- The handback carries no retro.
+- craft: the canary chapter now points at `stop#the-grace`, and that chapter says nothing of a warning.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `level0.md` holds the Agent door in one chapter, and the helper chapter points at it.
+- The floor of the update grace stands in the chapter "The first call asks" alone.
 
 # Discussion
 
