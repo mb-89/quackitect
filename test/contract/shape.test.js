@@ -182,3 +182,26 @@ ifVale(
     },
   ),
 );
+
+// The vocabulary rule compiles its patterns once a run, and still refuses a word off its shape, a core entry naming no source, and a term naming no note. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+const VOCABULARY = "spec/vocabulary/probe.yml";
+const ENTRY = "VoiceShape.VocabularyEntry";
+
+ifVale(
+  "a vocabulary entry off its shape is refused, and one in shape passes",
+  proves(
+    {
+      good: at(
+        "words:\n  - {word: door, from: ste}\nterms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\"}\nswaps:\n  - {word: utilize, write: use}\n",
+        VOCABULARY,
+      ),
+      shapeless: at("words:\n  - {word: Door, from: ste}\n", VOCABULARY),
+      sourceless: at("words:\n  - {word: door, from: nowhere}\n", VOCABULARY),
+      noteless: at("terms:\n  - {word: shim, defines: somewhere}\n", VOCABULARY),
+    },
+    (said) => {
+      passes(said, ENTRY, "good");
+      for (const key of ["shapeless", "sourceless", "noteless"]) refuses(said, ENTRY, key);
+    },
+  ),
+);

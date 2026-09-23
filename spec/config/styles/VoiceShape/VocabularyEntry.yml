@@ -6,6 +6,11 @@ scope: raw
 script: |
   text := import("text")
 
+  // The patterns compile once a run, because the core list holds tens of thousands of entries and one run carries them all.
+  wordShape := text.re_compile(`^[a-z][a-z-]*( [a-z][a-z-]*)*$`)
+  fromShape := text.re_compile(`^(ste|openste|common|pronoun)$`)
+  definesShape := text.re_compile(`^"?\[\[[^\]\s]+\]\]"?$`)
+
   lines := text.split(scope, "\n")
   matches := []
 
@@ -47,7 +52,7 @@ script: |
       })
       continue
     }
-    if !text.re_match(`^[a-z][a-z-]*( [a-z][a-z-]*)*$`, held.word) {
+    if !wordShape.match(held.word) {
       matches = append(matches, {
         begin: at,
         end: at + len(line),
@@ -57,7 +62,7 @@ script: |
     }
 
     if kind == "core" {
-      if held.from == undefined || !text.re_match(`^(ste|openste|common|pronoun)$`, held.from) {
+      if held.from == undefined || !fromShape.match(held.from) {
         matches = append(matches, {
           begin: at,
           end: at + len(line),
@@ -67,7 +72,7 @@ script: |
       continue
     }
     if kind == "term" {
-      if held.defines == undefined || !text.re_match(`^"?\[\[[^\]\s]+\]\]"?$`, held.defines) {
+      if held.defines == undefined || !definesShape.match(held.defines) {
         matches = append(matches, {
           begin: at,
           end: at + len(line),
