@@ -89,7 +89,12 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 3a2d46149d34a67f1d8ba04e2e2d827287381fcd
+    hash_after: 3a2d46149d34a67f1d8ba04e2e2d827287381fcd
 ---
 
 # Ask
@@ -115,6 +120,39 @@ A draft misses callers an earlier review names, and fails review again. The hand
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+Two changes, one each for the draft and the todo.
+
+| part | what changes |
+|---|---|
+| the draft leaf | `spec/processes/standard.yaml` gives `design/draft` two list fields beside `approach` |
+| `callers` | every caller of what the approach changes, one a line, as a file and a function |
+| `answers` | every finding an earlier review names, one a line, with the answer the approach gives it, or `first` on a first draft |
+| the queue read | `plans` in `src/bridge/plan.js` reads the queue through `answerOf` in `src/scripts/work-answer.js` |
+| the doors | the read runs on `box.disk`, a git door built on `box.proc` at `box.work`, and the weights `asks` reads |
+| the digit | `placeWord` takes the rows at a whole place from `1` up, and a digit names the row standing at that place |
+| the ends | a digit of `1` stays `true`, and a digit past the last row stays `last` |
+| the answer | the door reads the queue again once the plan stands, and names each new todo with its place |
+| the design | `spec/design_output/stop.md#the-plan` names the digit and the answer, and points at the anchor in `pull.md` |
+| the cases | `test/level0/plan.test.js` teaches a fake process a queue of three tickets |
+
+The cases hold two claims:
+
+- a digit of `2` anchors the todo before the ticket at place `2`, whatever the plan's todo order
+- the answer names each new todo with the place `branch list --queue` prints for it
+
+The callers the change reaches:
+
+- `TOOLS[PLAN_CALL]` in `src/bridge/server.js`, and `planRides` there, which call `plans`
+- `placeWord` in `src/bridge/plan.js`, which `plans` alone calls
+- `answerOf` in `work-list.js`, behind `list --json` and `queueOnly`, which read the same answer and change nothing
+- no code names `design/draft`, so the new fields reach a hand through the route the pull copies
+
+The costs:
+
+- each plan answer reads git twice, once for the digit and once for the answer
+- a box carrying no process door reads no queue, so a digit past `1` lands `last`
+- an open ticket keeps its copy of the old route, and `./RUNME.sh ticket update` copies the new leaf onto it
 
 ## review
 
