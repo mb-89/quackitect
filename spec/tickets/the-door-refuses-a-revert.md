@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -126,6 +126,17 @@ record:
     hash_after: 1b076e4d0aac44b073d56b2538bd0a1c360c3255
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 149431a5bed66689e96958bcee996e3beaac84ce
+    hash_after: 149431a5bed66689e96958bcee996e3beaac84ce
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -299,11 +310,15 @@ Ten cases fail on their own assertion, and each names the line it proves.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/pulled.test.js test/contract/pulled.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -311,11 +326,23 @@ Ten cases fail on their own assertion, and each names the line it proves.
 
 <!-- the form is text -->
 
+The Bash door now refuses a `git revert` or a `git reset` over a pull commit, and names the take-back verb.
+
+- `lib/pulled.js` reads the revisions each `git revert` names and the range each `git reset` drops.
+- The bridge reads each subject through `git log`, with `--no-walk` for a named commit.
+- A subject opening on a ticket name makes a pull commit, and the refusal names its leaf.
+- A plain commit, a bare reset and a reset over paths pass the row.
+- `spec/design_output/bash.md` holds the rule under its own section.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change stays inside the files the approach names, plus the parse module `lib/pulled.js`.
+- The level0 cases take `fakeProc`, and one contract case drives the real git.
+- Each new function points at `spec/design_output/bash#a-pull-commit-stands`.
 
 # verdict
 
