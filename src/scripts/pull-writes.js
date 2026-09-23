@@ -13,6 +13,9 @@ import { landed, unlandedRows } from "./pull-landed.js";
 import { childrenSay, handOut, holdsHere, ticketsHere } from "./pull-hand.js";
 import { DONE, REFUSED, say, WAIT, WORK, walkOf } from "./pull-route.js";
 import { changedIn } from "./work.js";
+import { pushed, sentOut } from "./pull-push.js";
+
+export { pushed, sentOut };
 
 export function passed(it, who, one, leaf, held, answered) {
   const tip = one.private ? "" : tipOf(it);
@@ -51,13 +54,9 @@ export function passed(it, who, one, leaf, held, answered) {
   const finding = landed(it, one, changes);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
-  if (!one.private && !pushed(it, who.branch)) {
-    say(REFUSED, [
-      `${who.branch} moves under this hand-back, and one rebase fell short. The hand-back stands here, so push ${who.branch} and pull again.`,
-    ]);
-    return 1;
-  }
-  return onward(it, who, [`${one.name} ${changes.join(", ")}.`]);
+  const sent = sentOut(it, one, who.branch, leaf);
+  if (!sent.ok) return refusedPush(sent);
+  return onward(it, who, [`${one.name} ${changes.join(", ")}.`, ...sent.why]);
 }
 
 // [[spec/design_output/pull#children-before-their-group]]
@@ -88,22 +87,19 @@ export function failed(it, who, one, leaf, held, reason, answered) {
   const finding = landed(it, one, changes);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
-  if (!one.private && !pushed(it, who.branch)) {
-    say(REFUSED, [
-      `${who.branch} moves under this hand-back, and one rebase fell short. The hand-back stands here, so push ${who.branch} and pull again.`,
-    ]);
-    return 1;
-  }
+  const sent = sentOut(it, one, who.branch, leaf);
+  if (!sent.ok) return refusedPush(sent);
   // Past the cap the hold drops and the answer waits, because a leaf going round writes a step a box inserts and nobody answers. [[spec/design_output/pull#the-fail]]
   const most = Number(it.fails);
   if (most > 0 && returns >= most) {
     say(WAIT, [
       `${one.name} ${changes.join(", ")}, and ${leaf.path} fails back ${returns} times.`,
       `The hold drops here, so ${back} stands open for the hand that takes it next.`,
+      ...sent.why,
     ]);
     return 0;
   }
-  return onward(it, who, [`${one.name} ${changes.join(", ")}.`]);
+  return onward(it, who, [`${one.name} ${changes.join(", ")}.`, ...sent.why]);
 }
 
 // [[spec/design_output/pull#the-fail]]
@@ -152,13 +148,9 @@ export function became(it, who, one, leaf, held, successor, answered) {
   const finding = landed(it, one, [`closes became ${successor}`]);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
-  if (!one.private && !pushed(it, who.branch)) {
-    say(REFUSED, [
-      `${who.branch} moves under this hand-back, and one rebase fell short. The hand-back stands here, so push ${who.branch} and pull again.`,
-    ]);
-    return 1;
-  }
-  return onward(it, who, [`${one.name} closes became ${successor}.`]);
+  const sent = sentOut(it, one, who.branch, leaf);
+  if (!sent.ok) return refusedPush(sent);
+  return onward(it, who, [`${one.name} closes became ${successor}.`, ...sent.why]);
 }
 
 // [[spec/design_output/pull#answered]]
@@ -185,13 +177,9 @@ export function answeredBy(it, who, one, leaf, held, answerer, answered) {
   const finding = landed(it, one, [`closes answered by ${answerer}`]);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
-  if (!one.private && !pushed(it, who.branch)) {
-    say(REFUSED, [
-      `${who.branch} moves under this hand-back, and one rebase fell short. The hand-back stands here, so push ${who.branch} and pull again.`,
-    ]);
-    return 1;
-  }
-  return onward(it, who, [`${one.name} closes answered by ${answerer}.`]);
+  const sent = sentOut(it, one, who.branch, leaf);
+  if (!sent.ok) return refusedPush(sent);
+  return onward(it, who, [`${one.name} closes answered by ${answerer}.`, ...sent.why]);
 }
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
@@ -220,14 +208,9 @@ export function unlanded(one, leaf, finding) {
 }
 
 // [[spec/design_output/pull#the-rejected-push]]
-export function pushed(it, branch) {
-  if (it.git.run(["push", "origin", branch]).ok) return true;
-  it.git.run(["fetch", "origin", branch], true);
-  if (!it.git.run(["rebase", `origin/${branch}`], true).ok) {
-    it.git.run(["rebase", "--abort"], true);
-    return false;
-  }
-  return it.git.run(["push", "origin", branch]).ok;
+export function refusedPush(said) {
+  say(REFUSED, ["The hand-back stands on this box, and its push reaches no origin.", ...said.why]);
+  return 1;
 }
 
 export function tipOf(it) {

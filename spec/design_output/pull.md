@@ -488,14 +488,32 @@ one level deeper, which is how `answered` lands.
 
 ## The rejected push
 
-A push origin refuses fetches the branch, rebases once, and pushes again. A
-rebase that fails stops and puts the tree back, and the pull answers
-`refused` with the branch moving. The hand-back stands by then. The record
-carries its answer, the ticket stands at its next leaf or closed, and the
-commit stands on the box. So the hold drops before the push, and the refusal
-says to push the branch and pull again. A hold past that point stands on a
-closed ticket, and the stop hook holds the turn open for a hand-back nobody
-owes.
+`pushed` in `src/scripts/pull-push.js` lands a hand-back on origin, and it
+answers `{ ok, local, why }`. Each caller prints `why`, so the hand reads the
+real cause. The hold drops before the push, because the hand-back stands by
+then. A hold past that point stands on a closed ticket, and the stop hook holds
+the turn open for a hand-back nobody owes.
+
+| the road | what `pushed` does |
+|---|---|
+| trunk | runs `./RUNME.sh check` over the commit first, so the stamp names the commit the push carries |
+| a red check | pushes nothing, and the answer names the check's own lines |
+| a tests-red leaf | stands on this box on trunk, and the next green push carries it |
+| a moved branch | fetches, rebases once, and pushes again |
+| a rebase on trunk | runs the check again, because the rebase moves the commit off the stamp |
+| any other refusal | answers the push door's own lines, and runs no rebase |
+| a work branch | pushes with no check, because its push meets no battery |
+
+Git names a moved branch with `fetch first` or `non-fast-forward`, and the
+rebase runs on those words alone. A rebase that fails puts the tree back, and
+the answer says to push the branch and pull again.
+
+The cost: a pass on trunk runs one full check, and the hand runs none of its
+own. At tests-green the `check` field runs the check, and `pushed` runs it again.
+
+The re-push of a hand-back the record holds already answers the same way.
+`repairPersonSteps` in `src/scripts/pull-hand.js` lands the engine's own repair,
+and it reads no answer, so it stays quiet.
 
 ## The refused commit
 

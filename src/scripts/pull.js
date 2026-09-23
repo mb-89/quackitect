@@ -61,6 +61,7 @@ import {
   passed,
   pushed,
   returnsOf,
+  sentOut,
   tipOf,
 } from "./pull-writes.js";
 import { NOTES, schemasHere } from "./ticket.js";
@@ -232,11 +233,9 @@ export function escalate(it, argv) {
   }
   dropHold(it, hand);
   // The step stands in the record by now, so the branch is what a hand pushes. [[spec/design_output/pull#the-rejected-push]]
-  if (!one.private && !pushed(it, branch)) {
-    say(REFUSED, [
-      `${put.path} stands on this box, and ${branch} moves under it.`,
-      `Push ${branch}, then run ./RUNME.sh ticket pull.`,
-    ]);
+  const sent = one.private ? { ok: true } : pushed(it, branch);
+  if (!sent.ok) {
+    say(REFUSED, [`${put.path} stands on this box, and its push reaches no origin.`, ...sent.why]);
     return 1;
   }
   const who = {
@@ -410,10 +409,9 @@ export function takeBack(it, who, name, path) {
   });
   one.text = withField(withField(text, "step", path), "state", OPEN);
   landed(it, one, [`${role} takes ${path} back`]);
-  if (!one.private && !pushed(it, who.branch)) {
-    say(REFUSED, [
-      `${who.branch} moves under this take-back, and one rebase fell short. Pull again.`,
-    ]);
+  const sent = one.private ? { ok: true } : pushed(it, who.branch);
+  if (!sent.ok) {
+    say(REFUSED, ["The take-back stands on this box, and its push reaches no origin.", ...sent.why]);
     return 1;
   }
   say(WORK, [`${name} stands at ${path} again, and the next pull hands it out.`]);
@@ -461,14 +459,18 @@ export function handBack(it, who, name, verdict) {
       String(entry.hash_before ?? "") === held.hash,
   );
   if (done) {
-    if (!one.private && !pushed(it, who.branch)) {
+    // The record holds this hand-back already, so the pull pushes it again. [[spec/design_output/pull#the-rejected-push]]
+    const sent = sentOut(it, one, who.branch, leafOf(one.front, held.step));
+    if (!sent.ok) {
       say(REFUSED, [
-        `${who.branch} moves under this hand-back. Pull again to push it.`,
+        `${held.ticket} at ${held.step} answered, and the record holds this hand-back already. Its push reaches no origin.`,
+        ...sent.why,
       ]);
       return 1;
     }
     return onward(it, who, [
       `${held.ticket} at ${held.step} answered already, and the record holds it.`,
+      ...sent.why,
     ]);
   }
   if ((fieldOf(one.text, "step") || leavesOf(one.front)[0]?.path) !== held.step) {

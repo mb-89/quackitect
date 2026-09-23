@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 5dd7502fc2525df1a7af3a9be9abcef913edffe4
+    hash_after: 5dd7502fc2525df1a7af3a9be9abcef913edffe4
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -251,11 +259,17 @@ The surprise: `saidBy` in `commit-verb.js` reads both streams, so the case impor
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/scripts/pull-push.js src/scripts/pull-writes.js src/scripts/pull.js src/scripts/commit-verb.js spec/design_output/pull.md test/level0/pull-push.test.js test/level0/pull-steps.test.js test/level0/pull-escalate.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the pull modules, `commit-verb.js`, the pull tests and the design note, each named in the approach.
+- git and the check both run through the fake process door, so every door has a fake.
+- `pull-push.js` points at `spec/design_output/pull#the-rejected-push`, which names the approach.
 
 ## tests-green
 
