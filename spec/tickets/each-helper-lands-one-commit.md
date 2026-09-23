@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: c46a382e999e12a5f47ead2b901f7fd292bce616
     returns: 1
     why: "design: the stated cost misreads both halves. The hold file under `.se/.runtime` survives a server restart.; design: `spawns` in the bridgehead fires `refactor.answered` on a failed spawn too, so that path already releases.; design: a hold lost with a dying bridgehead then refuses every hand for good. The approach needs a release for that case.; design: `checked` in `src/bridge/apply.js` calls `onWrite` without the `agentId`. The owning hand's patch then refuses.; craft: `landsOnTrunk` reads a bare `git push` on `main` as a pass. The row needs that case too.; craft: the spawn event carries a kind and an empty `agentId`, so a parallel helper writing first owns the file.; craft: the row, the guidance line and the cases otherwise answer the Ask."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 4caa6dda863464c6c21eaf97492e0c545c455c85
+    hash_after: 4caa6dda863464c6c21eaf97492e0c545c455c85
 ---
 
 # Ask
@@ -132,14 +136,20 @@ One commit a helper, through the commit verb, and one hand a held file.
 
 | part | the file | what changes |
 |---|---|---|
-| the row | `src/bridge/bash.js` | `trunkGuard` refuses a raw `git commit` or `git push` on `main`, on a desk too |
+| the row | `src/bridge/bash.js` | `trunkGuard` refuses a raw `git commit` or `git push` landing on `main`, on a desk too |
+| a bare push | the same | a `git push` naming no branch lands on `main` where the box stands on it, so it refuses too |
 | what it says | the same | the refusal names `./RUNME.sh commit "<message>"`, which lints, checks and pushes |
 | what passes | the same | a commit the CLI makes, because the pull and the merge run git off the Bash door |
-| the hold | `src/bridge/stop.js` | `refactorHand` writes `{ file, hand }` into a hold file under `.se/.runtime` |
+| the hold | `src/bridge/stop.js` | `refactorHand` writes `{ file, hand, since }` into a hold file under `.se/.runtime` |
 | the hand | the same | the first helper write to that file fills `hand` with its `agentId` |
-| the release | the same | `onRefactorAnswered` removes the hold, and nothing else does |
+| the release | the same | `onRefactorAnswered` removes the hold, and a failed spawn fires it too |
+| the age | the same | a hold older than `refactor.holdFor` reads as none, and the next hand takes the file |
+| the start | `opensSession` in `src/bridge/server.js` | a session start drops the hold, because no hand of the last session answers into this one |
 | the refusal | `src/bridge/write.js` | `onWrite` refuses a write to the held file from any other `agentId`, the session's own included |
+| the patch road | `checked` in `src/bridge/apply.js` | the write it hands the door carries the call's `agentId` |
+| the mint road | `src/bridge/tools.js` | the same, for the note the mint writes |
 | the path | `.claude/skills/level0/lib/runs.js` | the hold file's name stands beside `REFACTORS` |
+| the span | `spec/config/level0.json` | `refactor.holdFor`, beside `refactor.grace` |
 | the guidance | `spec/guidance/working.md` | one actionable: land each helper's work through `./RUNME.sh commit` once its report and tests pass |
 
 The assumption: the door tells hands apart by `agentId` alone, so the first helper to write the file owns it.
@@ -147,16 +157,26 @@ The assumption: the door tells hands apart by `agentId` alone, so the first help
 The cases:
 
 - `bash.test.js`: `git commit -m x` on `main` refuses and names the verb, and on a work branch it passes
-- `stop.test.js` or its neighbour: the hold stands from the spawn to the answer
+- `bash.test.js`: a bare `git push` standing on `main` refuses
+- `stop-hold.test.js` or its neighbour: the hold stands from the spawn to the answer, and reads as none past the span
 - `write.test.js`: the session's write to the held file refuses, and the owning hand's write lands
+- `apply.test.js`: the owning hand's patch lands on the held file
 
 The callers:
 
 - `onBash` runs `trunkGuard` on every Bash call
 - `onStop` in `stop.js` calls `refactorHand`, and the bridgehead fires `refactor.answered`
-- `onWrite` serves Write, Edit and the patch tools
+- `onWrite` serves Write, Edit, the patch tools and the mint
 
-The cost: a hand dying before its answer leaves the hold, and a restart of the server clears it.
+The answers to the earlier review:
+
+- the cost read wrong: the age and the session start release a stale hold
+- a failed spawn: it fires the answer, so it releases the hold
+- a bridgehead dying mid-hand: the age releases it
+- the patch and mint roads: both carry `agentId`
+- the bare push: it refuses where the box stands on `main`
+
+The cost: a hand working past the span loses the hold, and another hand may then write its file.
 
 ## review
 
