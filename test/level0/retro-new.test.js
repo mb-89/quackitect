@@ -10,6 +10,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { retro } from "../../src/scripts/retro.js";
 import { SCHEMA } from "./pull-schema.js";
+import { semicolonVale } from "./semicolon-vale.js";
 
 const ROOT = "/tree";
 const TIP = "a1b2c3d4e5f6a7b8";
@@ -98,7 +99,11 @@ test("retro new opens the ticket, so a hand pulls it without a second command", 
   const said = it.disk.read(at(`spec/tickets/retro-${TIP.slice(0, 7)}.md`));
   assert.match(said, /^state: open$/m, "the mint opens it");
   assert.match(said, /^step: collect$/m, "it stands at the route's first leaf");
-  assert.doesNotMatch(said, /^urgent:/m, "a retro waits its turn, so the mint sets no mark");
+  assert.doesNotMatch(
+    said,
+    /^urgent:/m,
+    "a retro waits its turn, so the mint sets no mark",
+  );
 });
 
 // The owner says why, and the ask carries those words. [[spec/design_input/the-agent-pulls-tickets]]
@@ -138,5 +143,28 @@ test("retro new takes its retro under queue", () => {
 
   assert.doesNotMatch(said, /behind the queue/);
   assert.equal(code, 0, said);
-  assert.match(said, /retro-one at collect/, "the pull hands out the retro's first leaf");
+  assert.match(
+    said,
+    /retro-one at collect/,
+    "the pull hands out the retro's first leaf",
+  );
+});
+
+// The --why line lands in the Ask, so the mint reads it through the lint's road before it writes. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+test("retro new refuses a --why line the lint warns on, names Characters, and writes no ticket", () => {
+  const VALE = "/tree/.se/.runtime/bin/vale";
+  const it = doors({}, { vale: VALE });
+  it.proc.teach([VALE], semicolonVale());
+
+  const { code, said } = heard(() =>
+    retro(ROOT, ["new", "--why", "one; two", "--name", "retro-one"], it),
+  );
+
+  assert.equal(code, 1, said);
+  assert.match(said, /breaks Characters/);
+  assert.equal(
+    it.disk.exists(at("spec/tickets/retro-one.md")),
+    false,
+    "no ticket stands",
+  );
 });

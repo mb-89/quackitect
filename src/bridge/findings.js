@@ -119,6 +119,11 @@ export async function findingsFor(box, url) {
   return { ok: !got.fault, found: got.found, fault: got.fault };
 }
 
+// A ticket's text held in memory, read the way the lint reads its file, keeping what refuses on the lines the caller names. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+export function voiceOver(_it, _path, _text, _span) {
+  return [];
+}
+
 // The Vale call the lint and the pull share, on the config the assembly writes. A caller adds the paths or the stdin path. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 export function valeArgvOf(it) {
   return [it.vale, `--config=${configOf(it)}`, "--output=JSON", "--no-exit"];

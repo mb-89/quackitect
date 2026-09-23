@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -99,6 +99,17 @@ record:
     hand: box dcd73916add7 · claude-code-remote · helper-2
     hash_before: 09245012fb0b240a8abcabdad6f399dccd5597ff
     hash_after: 09245012fb0b240a8abcabdad6f399dccd5597ff
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: b2e6ff24a06f4b7d1561e2042d9ac5157a966350
+    hash_after: b2e6ff24a06f4b7d1561e2042d9ac5157a966350
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -193,17 +204,35 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/ask-lint.test.js test/level0/ticket-verb.test.js test/level0/retro-new.test.js test/contract/process.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Five cases fail on their own assertion, and the route case passes already. Real Vale finds no line a route writes today, so that case holds the routes from here on.
+
+- `ask-lint.test.js`: an error on the Ask names the file's line 10, and the fake Vale reads the lint's argv.
+- `ask-lint.test.js`: a warning on the Ask refuses the open, and a warning past the Ask opens it.
+- `ask-lint.test.js`: an Ask carrying a semicolon refuses, naming `Characters` at line 10.
+- `ticket-verb.test.js`: `ticket note a-name "one; two"` refuses and writes no file.
+- `retro-new.test.js`: a `--why` line carrying a semicolon refuses and writes no ticket.
+- `process.test.js`: a ticket minted off every route draws no finding from real Vale.
+- `semicolon-vale.js`: a fake Vale that names each semicolon on the line the text holds it.
+
+The shared reading stands as a stub named `voiceOver` in `src/bridge/findings.js`, so the route case builds. No ticket under `spec/tickets` stands a draft today.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The tests touch the three verbs, the shared reading and the routes, and the ask names each one.
+- Vale reaches the cases through the fake process door, and the route case drives the real Vale.
+- Each new case carries a pointer to the design chapter it holds.
 
 ## reflect
 
