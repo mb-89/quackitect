@@ -190,7 +190,7 @@ function staged(...files) {
   ].join("\n");
 }
 
-const POINTER_WAS = "-// [[spec/design_output/tree#the-old-name]]";
+const POINTER_WAS = "-// [[spec/design_output/tree]]";
 const POINTER_NOW = "+// [[spec/design_output/tree#the-rules-over-two-files]]";
 
 // A pointer fix trades a comment for a comment in every module it reaches, and the door asks nothing. [[spec/tickets/a-comment-hunk-is-prose]]

@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -140,6 +140,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: e5e7d8c6541d9edec0111066dc69e640258b029e
+    hash_after: e5e7d8c6541d9edec0111066dc69e640258b029e
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -280,11 +288,19 @@ the door today. The rest pass today and hold the new reading in place.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/tested.js spec/design_output/tree.md test/level0/tested.test.js
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `tested.js`, its test and the chapter the rule owns
+- the door reads a delta as text, so it reaches no door
+- a comment on `hunksIn` and `codeIn` names the reading, through the chapter's pointer
+
 
 ## tests-green
 

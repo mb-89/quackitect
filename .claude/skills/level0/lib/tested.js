@@ -2,7 +2,10 @@
 // no test beside them, and the modules of the server no test imports.
 // [[spec/design_output/tree#the-rules-over-two-files]]
 
-const AT = "+++ b/";
+// The lines `git diff` opens a file, a deleted file and a hunk with. [[spec/design_output/tree#the-rules-over-two-files]]
+const GIT_FILE = /^diff --git a\/.* b\/(.+)$/;
+const GONE = "deleted file mode";
+const HUNK = "@@";
 const SOURCE = /^src\/.*\.js$/;
 // A fake, the stub's template and the editor files each take no case of their own. [[spec/design_output/tree#the-rules-over-two-files]]
 const COPIED = [/^src\/doors\/fake\//, /^src\/stub\//, /^src\/extension\/editor/];
@@ -11,18 +14,32 @@ const SERVER = /^src\/bridge\/[^/]+\.js$/;
 // A line that is a comment or blank, so a hunk adding these alone changes no code. [[spec/design_output/tree#the-rules-over-two-files]]
 const COMMENT = /^\s*(\/\/|\/\*|\*|$)/;
 
-// Each file answers off its own hunk, so one file's line reads for no other. [[spec/design_output/tree#the-rules-over-two-files]]
+// Each file answers off its own hunk, so one file's line reads for no other. A `diff --git` line opens a file, a deleted file opens none, and a line counts past an `@@` alone, so no header reads as content. [[spec/design_output/tree#the-rules-over-two-files]]
 export function hunksIn(delta) {
   const out = new Map();
   let file = "";
+  let inHunk = false;
   for (const line of String(delta ?? "").split(/\r?\n/)) {
-    if (line.startsWith(AT)) {
-      file = line.slice(AT.length).trim();
-      if (file && file !== "/dev/null" && !out.has(file)) out.set(file, []);
+    const opened = GIT_FILE.exec(line);
+    if (opened) {
+      file = opened[1];
+      inHunk = false;
+      if (!out.has(file)) out.set(file, { added: [], removed: [] });
       continue;
     }
-    if (!file || !line.startsWith("+") || line.startsWith("+++")) continue;
-    out.get(file)?.push(line.slice(1));
+    if (!file) continue;
+    if (line.startsWith(GONE)) {
+      out.delete(file);
+      file = "";
+      continue;
+    }
+    if (line.startsWith(HUNK)) {
+      inHunk = true;
+      continue;
+    }
+    if (!inHunk) continue;
+    if (line.startsWith("+")) out.get(file).added.push(line.slice(1));
+    else if (line.startsWith("-")) out.get(file).removed.push(line.slice(1));
   }
   return out;
 }
@@ -35,15 +52,18 @@ export function untestedIn(delta, read, merging = false) {
   const tests = files.filter((one) => TEST.test(one));
   return files
     .filter((one) => SOURCE.test(one) && !COPIED.some((said) => said.test(one)))
-    .filter((one) => codeIn(hunks.get(one) ?? []))
+    .filter((one) => codeIn(hunks.get(one)))
     .filter(
-      (one) => !tests.some((test) => names(test, one, hunks.get(test) ?? [], read)),
+      (one) => !tests.some((test) => names(test, one, hunks.get(test)?.added ?? [], read)),
     );
 }
 
-// A hunk adding comment lines alone changes no code, so it asks for no test. A hunk adding nothing took code away, and that still asks. [[spec/design_output/tree#the-rules-over-two-files]]
-function codeIn(added) {
-  return added.length === 0 || added.some((line) => !COMMENT.test(line));
+// A hunk whose lines either side are comments changes no code, so it asks for no test. A line of code added or taken away asks, and so does a hunk taking lines away and adding none. [[spec/design_output/tree#the-rules-over-two-files]]
+function codeIn(hunk) {
+  const added = hunk?.added ?? [];
+  const removed = hunk?.removed ?? [];
+  if (!added.length && removed.length) return true;
+  return [...added, ...removed].some((line) => !COMMENT.test(line));
 }
 
 // A test names the file it drives by its import, or by the name it carries. [[spec/design_output/tree#the-rules-over-two-files]]
