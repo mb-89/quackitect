@@ -16,6 +16,7 @@ import {
   rowsIn,
   within,
 } from "../../src/scripts/log-read.js";
+import { countsOf, narrowed } from "../../src/scripts/log-verb.js";
 
 const ROOT = "/tree";
 const NOW = Date.parse("2026-01-01T12:00:00.000Z");
@@ -145,4 +146,11 @@ test("words keep the rows carrying every one of them, in any case, and no words 
   assert.deepEqual(said(carrying(rows, "vale")), ["two lines come back"], "a word in the kind counts");
   assert.deepEqual(said(carrying(rows, "door nothing")), []);
   assert.deepEqual(said(carrying(rows, "")).length, 4);
+});
+
+// A count mode reads the rows the filters keep, one row a kind, the most first. [[spec/design_output/log#one-verb-reads-the-log]]
+test("a count prints one row a kind, over the rows the filters keep", () => {
+  assert.deepEqual(countsOf(rows), ["2  hook", "1  vale", "1  work"]);
+  assert.deepEqual(countsOf(narrowed(rows, ["--level", "warn"], NOW)), ["1  hook", "1  vale"]);
+  assert.deepEqual(countsOf([]), []);
 });

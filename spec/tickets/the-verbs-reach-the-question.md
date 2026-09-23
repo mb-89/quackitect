@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -109,6 +109,17 @@ record:
     hand: box dcd73916add7 · claude-code-remote · helper-4
     hash_before: 653971f3f8272c25bb182f403ab9ccba5c80595e
     hash_after: 653971f3f8272c25bb182f403ab9ccba5c80595e
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: cfab9a80dc02cab14797d458eff3b71145051065
+    hash_after: cfab9a80dc02cab14797d458eff3b71145051065
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 23 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -219,17 +230,37 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/answer-read.test.js test/level0/wait.test.js test/level0/search-door.test.js test/level0/test-verb.test.js test/level0/cli-read.test.js test/level0/log-verb.test.js test/contract/cli-verbs.test.js test/contract/proc.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The cases stand in eight files, and each fails on its own assertion.
+
+- `answer-read.test.js` drives the stop door through `decide` with a Vale fake, and no gate holds yet.
+- `wait.test.js` drives each signal on a fake clock, and the stub answers nothing.
+- `search-door.test.js` asks `runsFind` for a function, and it takes words alone today.
+- `test-verb.test.js` names a file and a Go folder, and `testVerb` reads the branch today.
+- `log-verb.test.js` and `cli-read.test.js` read `countsOf` and `lintRows`, which answer nothing yet.
+- `cli-verbs.test.js` runs the real verb over one file, and the row hands nothing through.
+- `proc.test.js` reads `alive` on the real door, and the stub answers false.
+
+The surprise: an output's end needs a process's life, and no door reads it. The process door takes `alive`, and its fake takes a set of numbers.
+
+A second surprise: `runsFind` stands with no case in `search-door.test.js`, so these cases are its first.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases touch the files the approach names, and the process door takes `alive` for the output's end.
+- the clock, the disk, the process, the log and Vale each run through a fake.
+- each new file points at a section of `spec/design_output`, and the approach names each one.
 
 ## reflect
 

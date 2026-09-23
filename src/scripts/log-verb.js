@@ -57,6 +57,11 @@ export function narrowed(rows, argv, now) {
   );
 }
 
+// [[spec/design_output/log#one-verb-reads-the-log]]
+export function countsOf(rows) {
+  return [];
+}
+
 function flagOf(argv, name) {
   const at = argv.indexOf(name);
   return at >= 0 ? String(argv[at + 1] ?? "") : "";

@@ -143,6 +143,11 @@ export async function lint(where) {
   return 0;
 }
 
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
+export function lintRows(found, lineOf, note = []) {
+  return [];
+}
+
 // [[spec/design_output/tree#the-tree-handed-in]]
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 

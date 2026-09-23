@@ -17,6 +17,7 @@ export function proc() {
     if (tally) disk().append(tally, `${argv[0]}\n`);
   };
   return {
+    alive: (pid) => false,
     run(argv, init = {}) {
       noted(argv);
       const ran = spawnSync(argv[0], argv.slice(1), {

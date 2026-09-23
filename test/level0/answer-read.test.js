@@ -1,0 +1,115 @@
+// The answer gate at the server's stop door: a draft past the ceiling holds the
+// turn with its findings, a clean one ends, and the holds in a row stop at the
+// tooth's own limit.
+// [[spec/design_output/level0#the-gate-reads-the-answer]]
+
+import assert from "node:assert/strict";
+import { join } from "node:path";
+import { test } from "node:test";
+import { TOOLS as SURVEY } from "../../.claude/skills/level0/lib/tools.js";
+import { readsAnswer } from "../../src/bridge/answer-read.js";
+import { boxOf, decide } from "../../src/bridge/server.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeLog } from "../../src/doors/fake/log.js";
+import { fakeProc } from "../../src/doors/fake/proc.js";
+
+const ROOT = "/tree";
+const at = (path) => join(ROOT, ...path.split("/"));
+const CONFIG = {
+  stop: { enabled: true, mostInARow: 2, hold: "off" },
+  answer: { enabled: true, warnAt: 5, ceiling: 15, words: 150 },
+};
+const TEXT = "The door leverages the synergy.";
+const FOUND = [
+  {
+    rule: "VoiceVale.Jargon",
+    line: 1,
+    column: 10,
+    severity: "error",
+    message: "Name the thing.",
+    said: "leverages",
+  },
+];
+const REFUSES = /The voice rules refuse this answer/;
+
+// A Vale that answers what the case hands it, and counts its reads. [[spec/design_output/doors#a-fake-behaves]]
+function served(found) {
+  const reads = [];
+  const box = boxOf(ROOT, ROOT, {
+    disk: fakeDisk({
+      [at("spec/config/level0.json")]: JSON.stringify(CONFIG),
+      [at(SURVEY)]: "{}",
+    }),
+    clock: fakeClock(),
+    proc: fakeProc({}),
+    log: fakeLog(),
+    index: { warm: () => ({ warmed: false }), dead: () => "" },
+    vale: {
+      stands: () => true,
+      lint: async (text) => {
+        reads.push(text);
+        return { ran: true, found };
+      },
+    },
+  });
+  return { box, reads };
+}
+
+const stops = (box, e = { last_assistant_message: TEXT }) =>
+  decide({ event: "classic.Stop", e }, box);
+const blockOf = (said) => String(said?.result?.block ?? "");
+
+// [[spec/design_output/level0#the-gate-reads-the-answer]]
+test("a draft past the ceiling holds the turn at the stop door, with its findings", async () => {
+  const { box, reads } = served(FOUND);
+
+  const said = await stops(box);
+
+  assert.deepEqual(reads, [TEXT], "the gate reads the turn's last text");
+  assert.match(blockOf(said), REFUSES);
+  assert.match(blockOf(said), /Jargon/);
+});
+
+// [[spec/design_output/level0#the-gate-reads-the-answer]]
+test("a clean draft passes the gate to the tooth", async () => {
+  const { box, reads } = served([]);
+
+  const said = await stops(box);
+
+  assert.equal(reads.length, 1);
+  assert.doesNotMatch(blockOf(said), REFUSES);
+});
+
+// The gate holds ahead of the tooth, so the same limit bounds it. [[spec/design_output/level0#the-gate-reads-the-answer]]
+test("the gate holds as many turns in a row as stop.mostInARow names, and lets the next one go", async () => {
+  const { box } = served(FOUND);
+
+  assert.match(blockOf(await stops(box)), REFUSES);
+  assert.match(blockOf(await stops(box)), REFUSES);
+  assert.doesNotMatch(blockOf(await stops(box)), REFUSES, "the third stop goes past the gate");
+  assert.match(blockOf(await stops(box)), REFUSES, "the count starts again");
+});
+
+// [[spec/design_output/level0#the-gate-reads-the-answer]]
+test("a helper's stop passes ahead of the gate, and Vale reads nothing", async () => {
+  const { box, reads } = served(FOUND);
+
+  const said = await stops(box, { agentId: "a1", last_assistant_message: TEXT });
+
+  assert.equal(said.pass, true);
+  assert.equal(blockOf(said), "");
+  assert.deepEqual(reads, []);
+});
+
+// The draft tool and the gate read one reading. [[spec/design_output/level0#the-tool-reads-a-draft]]
+test("the reading answers the band, the score and the findings of a draft", async () => {
+  const { box } = served(FOUND);
+
+  const read = await readsAnswer(box, TEXT, true);
+
+  assert.equal(read.band, "rewrite");
+  assert.equal(read.found.length, 1);
+  assert.equal(read.found[0].rule, "VoiceVale.Jargon");
+  assert.ok(read.score > CONFIG.answer.ceiling);
+});

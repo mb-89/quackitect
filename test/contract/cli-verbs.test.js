@@ -7,6 +7,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
+import { proc } from "../../src/doors/proc.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const source = disk().read(join(root, "src", "scripts", "cli.js"));
@@ -45,4 +46,16 @@ test("the find verb reads the log through the log verb, and the tree through the
   assert.match(row, /rest\.includes\("--log"\)/);
   assert.match(row, /logVerb\(tuiDoors\(\), \[\s*"--words"/);
   assert.match(row, /asksIndex\(\["find", \.\.\.rest\]\)/);
+});
+
+// The verb over one named file runs the real runner, and answers the branch runner's word. [[spec/design_output/pull#the-test-verb]]
+test("the test verb runs the file you name, and answers one word on it", () => {
+  const row = /^ {2}test: \{[\s\S]*?^ {2}\},/m.exec(source)?.[0] ?? "";
+  assert.match(row, /rest/, "the row hands what you name through");
+  const ran = proc().run(
+    [process.execPath, join(root, "src", "scripts", "cli.js"), "test", "test/level0/go-modules.test.js"],
+    { cwd: root },
+  );
+  assert.equal(ran.exitCode, 0, ran.stdout + ran.stderr);
+  assert.match(ran.stdout, /^green, \d+ test\(s\) pass in 1 file\(s\)/m);
 });
