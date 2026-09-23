@@ -89,12 +89,16 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
     hash_before: a10a58d8cff4f43bb26befd7589b774fe759b265
     hash_after: a10a58d8cff4f43bb26befd7589b774fe759b265
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: d8c480105c2af77191a1b733c374f10b9a16cdd0
+    hash_after: d8c480105c2af77191a1b733c374f10b9a16cdd0
 ---
 
 # Ask
@@ -160,6 +164,15 @@ The cost: a pass on trunk runs one full check, and the hand runs none of its own
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- design: a rebase on trunk moves the commit off the stamp, so `pushed` checks again before pushing.
+- craft: at tests-green the `check` field and `pushed` each run the check, so the cost line names that leaf.
+- craft: `pull.test.js` stands at 588 lines, so the three cases go in a new file beside it.
+- craft: the table adds a row for a red check on trunk, where the close stays local.
+- craft: the caller the list calls the verdict is the re-push of a hand-back the record holds already.
+- craft: `repairPersonSteps` in `pull-hand.js` prints nothing today, so the callers row holds for seven sites.
 
 # implement
 
