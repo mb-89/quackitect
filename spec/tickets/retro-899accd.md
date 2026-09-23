@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: effect
+step: audit
 steps:
   - name: feedback
     does: takes the owner's field feedback one point at a time, and writes each confirmed point as a private note
@@ -123,6 +123,14 @@ record:
       - name: run
         exit: 0
         said: .se/.retro/retro-899accd/input holds a whole run already, and this one changes nothing.
+  - step: effect
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 368cc05fa7132de765f72ab8b8f05f81a7db89cb
+    hash_after: 368cc05fa7132de765f72ab8b8f05f81a7db89cb
+    answered:
+      - name: effect
+        exit: 0
+        said: No earlier retro holds class fixes, so nothing stands to measure.
 ---
 
 # Ask
@@ -170,6 +178,8 @@ the owner asks for it
 <!-- retro effect, which answers each earlier class with its rate before and now -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh retro effect retro-899accd
 
 # audit
 
