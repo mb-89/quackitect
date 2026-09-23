@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: classify
+step: check
 steps:
   - name: feedback
     does: takes the owner's field feedback one point at a time, and writes each confirmed point as a private note
@@ -155,6 +155,14 @@ record:
       - name: matrix
         exit: 0
         said: The report of retro-899accd draws 5 column(s), bottom line first, in its retro folder.
+  - step: classify
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 92c0df8d33a1e4624a8b57c41b7bad05cf4da5e1
+    hash_after: 92c0df8d33a1e4624a8b57c41b7bad05cf4da5e1
+    answered:
+      - name: classes
+        exit: 0
+        said: 4 active hour(s), and every finding, note and memory carries a disposition.
 ---
 
 # Ask
@@ -280,6 +288,8 @@ the owner asks for it
 <!-- retro classes, which counts each rate and refuses a finding with no disposition -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh retro classes retro-899accd
 
 # check
 
