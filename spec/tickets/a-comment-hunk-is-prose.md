@@ -88,7 +88,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 95724fc23e4ca789bf744dccd9d28f956e95966a
+    hash_after: 95724fc23e4ca789bf744dccd9d28f956e95966a
 ---
 
 # Ask
@@ -117,6 +122,17 @@ hand.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The door holds the rule already. `untestedIn` in
+`.claude/skills/level0/lib/tested.js` reads each file's own hunk through
+`codeIn`, which passes a hunk adding comment lines and blank lines alone, and
+`test/level0/tested.test.js` holds the comment-only half.
+
+| part | what the work adds |
+|---|---|
+| the mixed case | a hunk adding one line of code beside a comment, which the door refuses |
+| the code | nothing, because the reading stands |
+| the note | `spec/design_output/tree#the-rules-over-two-files` already names the comment rule |
 
 ## review
 
