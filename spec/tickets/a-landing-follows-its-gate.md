@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -136,6 +136,17 @@ record:
     hash_after: 59b2788fe85192cc3a7b8b9bb5637ef4605da0c1
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 4e929c5b05159b6d9f446293245aa08067b3364a
+    hash_after: 4e929c5b05159b6d9f446293245aa08067b3364a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 47 test(s) pass in 4 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -327,11 +338,17 @@ the bare pull and the open's commit.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/bash.test.js test/level0/commit-verb.test.js test/level0/pull-bare.test.js test/level0/ask-lint.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
+
 
 ### says
 
@@ -339,11 +356,25 @@ the bare pull and the open's commit.
 
 <!-- the form is text -->
 
+Each landing now waits on its gate.
+
+- `LandingFollowsItsGate` in `lib/bash.js` refuses a landing after a `;`, a newline, a double bar or a `&`
+- a bare name on a plain leaf shows the leaf, and a verdict leaf still hands back on it
+- `ticket open` lands the ticket in one commit through `landedAlone`
+- the commit verb runs the tests before it stages, and the check after the commit stamps it
+- the bare pull's case moves to `pull-bare.test.js`, so `pull.test.js` stays under the file ceiling
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the Bash rule, the pull, the open, the commit verb and the chapters each names
+- every door the change reaches has a fake: git, the process and the disk
+- a comment names the approach on each changed function, through its chapter's pointer
+
 
 # verdict
 
