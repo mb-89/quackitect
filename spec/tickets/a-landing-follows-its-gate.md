@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -115,6 +115,10 @@ record:
     hand: box dcd73916add7 · claude-code-remote
     hash_before: e18b19cf15681e7789052300cdfcde1a6ce24131
     hash_after: e18b19cf15681e7789052300cdfcde1a6ce24131
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-6
+    hash_before: 01b11a7206a981833a7cbd5dde3d1cc4730f1a7e
+    hash_after: 01b11a7206a981833a7cbd5dde3d1cc4730f1a7e
 ---
 
 # Ask
@@ -205,14 +209,14 @@ The cost: the commit verb runs the tests twice, once as its gate and once inside
 
 <!-- the form is verdict -->
 
-fail
-- design: the rule refuses a `;` before a pull with a flag, and the Ask names every `ticket pull`.
-- craft: `open` hands its text to `landedAlone`, which writes the file, so the open drops its own write.
-- design: fix it by counting every `ticket pull` as a landing, as the Ask line says.
-- craft: the rule walks the tokens of the text `withoutHeredocs` leaves, so a heredoc body raises no `;`.
-- craft: a `&` runs the landing beside its gate, so the rule refuses it beside `;` and `||`.
-- craft: `open` hands its text to `landedAlone`, which writes the file itself, so the open drops its own write.
-- craft: the earlier findings all stand answered, from the stamp order to the verdict leaf.
+pass
+- craft: the second review's findings all stand answered, from every `ticket pull` to the open's write.
+- craft: `tokensOf` reads `2>&1` as `>&`, so the `&` refusal leaves a redirect alone. Add a case for it.
+- craft: a `|` still runs the landing whatever the gate answers. Refuse it beside `&`, or name it in `bash.md`.
+- craft: `verbLine` lists what level zero refuses, so it names the new refusal too.
+- craft: a bare pull with `--fields` on a plain leaf shows the leaf. Say whether the payload drops or rides the hold.
+- craft: the rule reads the commit verb as `RUNME.sh commit`. Name the forms it matches, `cli.js commit` among them.
+- craft: the verdict leaf keeps its bare hand-back, because `handBack` refuses a flag there, and the rule gates that pull.
 
 # implement
 
