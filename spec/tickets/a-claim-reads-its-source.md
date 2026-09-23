@@ -89,12 +89,18 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 3a2d46149d34a67f1d8ba04e2e2d827287381fcd
     hash_after: 3a2d46149d34a67f1d8ba04e2e2d827287381fcd
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: 94c8ec812cc823699d2cd411dd261ab9494a09f4
+    hash_after: 94c8ec812cc823699d2cd411dd261ab9494a09f4
+    returns: 1
+    why: "design: The bridge box carries no `join`, so `planHere` throws and the queue read drops every todo row.; design: The bridge box carries no `agent`, so `takeable` orders rows apart from `branch list --queue` in a harness.; design: The fix builds the read door off `handDoors(box.env)`, `join`, a git door, `weights` and `stale`, and names each.; design: A digit past the last row lands `last`, which stands before the first untagged row.; craft: `planRides` drops the tool's answer, so a plan riding another call reads git twice for nothing.; craft: `answerOf` lives in `src/scripts/work-answer.js`, and the callers list names `work-list.js`.; craft: Two todos with one digit in one call anchor on one row, so a case pins their order."
 ---
 
 # Ask
@@ -163,6 +169,15 @@ The costs:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+- design: The bridge box carries no `join`, so `planHere` throws and the queue read drops every todo row.
+- design: The bridge box carries no `agent`, so `takeable` orders rows apart from `branch list --queue` in a harness.
+- design: The fix builds the read door off `handDoors(box.env)`, `join`, a git door, `weights` and `stale`, and names each.
+- design: A digit past the last row lands `last`, which stands before the first untagged row.
+- craft: `planRides` drops the tool's answer, so a plan riding another call reads git twice for nothing.
+- craft: `answerOf` lives in `src/scripts/work-answer.js`, and the callers list names `work-list.js`.
+- craft: Two todos with one digit in one call anchor on one row, so a case pins their order.
 
 # implement
 
