@@ -89,7 +89,12 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: b8d9fe4e8bb28f1a355f07fd1a3b2cb48993a853
+    hash_after: b8d9fe4e8bb28f1a355f07fd1a3b2cb48993a853
 ---
 
 # Ask
@@ -117,6 +122,42 @@ The hand retypes `node -e` log readers, `sed -n` function reads, the Go test env
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+Each shell habit the ask names takes a verb or a tool of its own, built on the
+reader that stands already.
+
+| part | the file | what changes |
+|---|---|---|
+| the test verb | `src/scripts/cli.js` | `test(argv)` runs the named `.test.js` files, or the Go package a folder names |
+| its env | the same | a file run takes the spawn tally, and a Go run takes `goEnvOf` from `cli-go.js` |
+| its answer | `src/scripts/work-test.js` | the verb reads the run through `testSays` and `goSays`, which it exports |
+| the count | `src/scripts/log-verb.js` | `--count` prints one row a kind, with the rows the filters keep |
+| the lint | `src/scripts/cli-read.js` | the lint prints the count table first, and the finding lines under it last |
+| the wait | a new `src/bridge/wait.js` | `mcp__level0__wait` returns on the first of three signals, or at its cap |
+| a helper report | the same | a new `report` row in the log from a helper's `agentId` |
+| an output's end | the same | the named output file stands unchanged past the quiet span, or its process exits |
+| a quiet file set | the same | every named file stands unchanged past the quiet span |
+| the cap | `spec/config/level0.json` | `wait.most` and `wait.quiet`, beside the other spans |
+| the body | `src/bridge/find.js` or its neighbour | `find` takes `function`, and answers the definition line and its body up to the matching close |
+| the stop gate | `src/bridge/stop.js` | `onStop` runs the reading `checksAnswer` in `tools.js` holds over the turn's last text |
+| a refusal | the same | a draft reading past the ceiling holds the turn, and the findings ride the block |
+| the shared read | `src/bridge/tools.js` | `checksAnswer` splits into the reading and the tool, so the gate and the tool call one reading |
+
+The cases:
+
+- `cli-verbs.test.js` under `test/contract`: `./RUNME.sh test` over one file and one Go folder
+- `log-verb.test.js`: `--count` prints one row a kind
+- a new `wait.test.js`: each signal returns the wait, and the cap returns it too
+- `find.test.js`: a function name answers its body
+- `stop.test.js`: an answer past the ceiling holds the turn, and a clean one ends it
+
+The callers:
+
+- `check` calls `test()` bare, and a bare call runs the whole suite as before
+- `findingsOver` feeds the lint, and its order changes the print alone
+- `ENDS_TURN` names `check_answer`, and the gate reads the same reading
+
+The cost: every stop runs Vale over the answer once.
 
 ## review
 
