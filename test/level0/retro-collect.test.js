@@ -39,6 +39,11 @@ const FILES = {
     '{"type":"assistant"}\n',
   [home(`.claude/projects/${SLUG}/memory/MEMORY.md`)]: "- one entry\n",
   [home(`.claude/projects/${SLUG}-scratchpad-stub/stub.jsonl`)]: '{"type":"user"}\n',
+  [at("scratchpad/stub/.keep")]: "",
+  // A sibling tree, as tree-old beside tree, names a folder this tree holds nowhere. [[spec/guidance/retro/collect]]
+  [home(`.claude/projects/${SLUG}-old/theirs.jsonl`)]: '{"type":"user"}\n',
+  [home(`.claude/projects/${SLUG}--claude-worktrees-one/work.jsonl`)]:
+    '{"type":"user"}\n',
   [home(".claude/projects/another-tree/theirs.jsonl")]: '{"type":"user"}\n',
   [temp(`claude/${SLUG}/session/scratchpad/probe.mjs`)]: "// a probe\n",
   [temp(`claude/${SLUG}/session/scratchpad/stub/.git/objects/ab/cd`)]: "an object",
@@ -188,6 +193,12 @@ test("collect copies the transcripts, the memory and the scratchpads of this tre
     true,
   );
   assert.equal(it.disk.exists(input("transcripts/another-tree/theirs.jsonl")), false);
+  assert.equal(it.disk.exists(input(`transcripts/${SLUG}-old/theirs.jsonl`)), false);
+  assert.equal(
+    it.disk.exists(input(`transcripts/${SLUG}--claude-worktrees-one/work.jsonl`)),
+    true,
+    "a worktree under the tree's dot folder belongs",
+  );
   assert.equal(
     it.disk.exists(input(`scratch/${SLUG}/session/scratchpad/stub/.git`)),
     false,
@@ -219,6 +230,30 @@ test("a folder belongs to the tree by its name, whatever the case of the drive l
     belongs("c--work-tree-quackitect-v4", "c--work-tree-quackitect-v5"),
     false,
   );
+  assert.equal(
+    belongs("c--work-tree-quackitect-v5-old", "c--work-tree-quackitect-v5", ["src"]),
+    false,
+    "a sibling tree names a folder the tree holds nowhere",
+  );
+  assert.equal(
+    belongs("c--work-tree-quackitect-v5-src-bridge", "c--work-tree-quackitect-v5", [
+      "src",
+    ]),
+    true,
+    "a session run from a folder inside the tree belongs",
+  );
+  assert.equal(
+    belongs(
+      "c--work-tree-quackitect-v5--claude-worktrees-a",
+      "c--work-tree-quackitect-v5",
+    ),
+    true,
+    "a worktree under a dot folder belongs",
+  );
+  assert.equal(
+    belongs("c--other-c--work-tree-quackitect-v5x", "c--work-tree-quackitect-v5"),
+    false,
+  );
 });
 
 // The count by source, because a short answer reads like a whole one. [[spec/guidance/retro/collect]]
@@ -236,7 +271,7 @@ test("the manifest names every file with its size and source, and the verb print
     "memory",
   );
   assert.match(said, /with no retro before it, so everything/);
-  assert.match(said, /transcripts\s+3 file\(s\)/);
+  assert.match(said, /transcripts\s+4 file\(s\)/);
   const record = JSON.parse(it.disk.read(at(`.se/.retro/${RETRO}/collected.json`)));
   assert.equal(record.at, "2026-09-19T12:00:00.000Z");
   assert.equal(record.counts, undefined, "a count derives off the manifest");
@@ -244,13 +279,23 @@ test("the manifest names every file with its size and source, and the verb print
 
 // [[spec/guidance/retro/effect]]
 test("collect keeps the battery's report beside the record, one a retro", () => {
-  const battery = { parts: { tests: 12 }, total: 12, slowest: [{ name: "a case", ms: 9 }] };
+  const battery = {
+    parts: { tests: 12 },
+    total: 12,
+    slowest: [{ name: "a case", ms: 9 }],
+  };
   const stamp = { sha: "abc123", ok: true, clean: true, warnings: 0, battery };
-  const it = doors({ ...FILES, [at(".se/.runtime/check.json")]: JSON.stringify(stamp) });
+  const it = doors({
+    ...FILES,
+    [at(".se/.runtime/check.json")]: JSON.stringify(stamp),
+  });
 
   heard(() => retro(ROOT, ["collect", RETRO], it));
 
-  assert.deepEqual(JSON.parse(it.disk.read(at(`.se/.retro/${RETRO}/battery.json`))), battery);
+  assert.deepEqual(
+    JSON.parse(it.disk.read(at(`.se/.retro/${RETRO}/battery.json`))),
+    battery,
+  );
 
   const bare = doors();
   heard(() => retro(ROOT, ["collect", RETRO], bare));

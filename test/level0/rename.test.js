@@ -4,7 +4,7 @@
 // [[spec/design_output/index#a-rename-reaches-a-name]]
 
 import assert from "node:assert/strict";
-import { join } from "node:path";
+import { join, win32 } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 // The whole module, so a name the verb answers nowhere yet fails an assertion. [[spec/tickets/a-rename-reaches-every-note]]
@@ -143,6 +143,33 @@ test("the move carries the folder and rewrites every file reaching it", () => {
     /\[\[spec\/design_output\/gadget#the-details\]\]/,
     "a note link naming another path stands as it stands",
   );
+});
+
+// A folder the walk skips moves with the rest, on a box spelling its paths with a backslash. [[spec/design_output/index#a-rename-reaches-a-name]]
+test("the move carries a skipped folder too, on a windows path", () => {
+  const WIN = "C:\\tree";
+  const here = (path) => win32.join(WIN, ...path.split("/"));
+  const disk = fakeDisk({
+    [here(`src/${OLD}/main.go`)]: "package main\n",
+    [here(`src/${OLD}/node_modules/dep/index.js`)]: "export {};\n",
+    [here(`src/${OLD}/bin/tool.exe`)]: "MZ\u0000\u0001",
+    [here("src/scripts/one.js")]: `export const SOURCE = "src/${OLD}";\n`,
+  });
+  const it = { disk, join: win32.join, root: WIN };
+
+  const said = rename.renaming(it, `src/${OLD}`, `src/${NEW}/deep`);
+
+  assert.equal(said.why, "");
+  assert.equal(disk.exists(here(`src/${NEW}/deep/main.go`)), true);
+  assert.equal(
+    disk.read(here(`src/${NEW}/deep/node_modules/dep/index.js`)),
+    "export {};\n",
+    "a folder the walk skips moves, and nothing of it drops",
+  );
+  assert.equal(disk.read(here(`src/${NEW}/deep/bin/tool.exe`)), "MZ\u0000\u0001");
+  assert.equal(disk.exists(here(`src/${OLD}`)), false, "the old folder stands nowhere");
+  assert.deepEqual(said.moved, ["main.go"]);
+  assert.match(disk.read(here("src/scripts/one.js")), /src\/widget\/deep/);
 });
 
 // A note is one file, and a reader reaches it with its ending and without. [[spec/tickets/a-rename-reaches-every-note]]

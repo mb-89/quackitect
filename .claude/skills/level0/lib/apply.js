@@ -189,7 +189,8 @@ function byText(one, text, made, at) {
   }
   if (one.replace_all === true)
     return { text: text.split(old).join(made), hits: found };
-  return { text: text.replace(old, made), hits: 1 };
+  // An exact edit writes its text as given, so a dollar sign in it stays a dollar sign. [[spec/design_output/apply#bytes-in-bytes-out]]
+  return { text: text.replace(old, () => made), hits: 1 };
 }
 
 // [[spec/design_output/apply#a-pattern-matching-nothing]]

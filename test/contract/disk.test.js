@@ -19,6 +19,8 @@ function through(door) {
   door.append(join(at, "fresh.md"), "one\n");
   door.makeDir(under);
   door.write(join(under, "more.md"), "more\n");
+  // An offset counts bytes on both doors, so a reader of a growing log reads the rows past it. [[spec/design_output/log#a-reader-reads-new-rows]]
+  door.write(join(under, "wide.md"), "ä\nzwei\n");
   // A copy carries bytes, and the size it answers is what a manifest names. [[spec/design_output/doors#a-fake-behaves]]
   door.copy(file, join(at, "copy.md"));
   // A move carries a folder whole and leaves nothing where it stood. [[spec/guidance/retro/collect]]
@@ -34,6 +36,9 @@ function through(door) {
     missing: door.exists(join(at, "nothing.md")),
     copied: door.read(join(at, "copy.md")),
     size: door.size(file),
+    wide: door.size(join(under, "wide.md")),
+    tail: door.readFrom(join(under, "wide.md"), 3),
+    past: door.readFrom(file, 99),
     moved: door.read(join(under, "box", "one.md")),
     left: door.exists(join(at, "box")),
     newer: door.modified(join(at, "fresh.md")) >= door.modified(file),
@@ -57,6 +62,9 @@ test("the real door writes, reads back, lists and removes", () => {
   assert.equal(said.missing, false);
   assert.equal(said.copied, "# Notes\nmore\n", "a copy reads what the file reads");
   assert.equal(said.size, said.read.length);
+  assert.equal(said.wide, 8, "a size counts bytes");
+  assert.equal(said.tail, "zwei\n", "a read from an offset answers the bytes past it");
+  assert.equal(said.past, "", "an offset past the end answers nothing");
   assert.equal(said.moved, "one\n", "a moved folder reads what it held");
   assert.equal(said.left, false, "a move leaves nothing where it stood");
   assert.equal(said.newer, true, "a later write reads as no older");
@@ -130,6 +138,41 @@ test("a link reads as a link to its target, and removing it keeps the target", (
 
 test("the fake links the way the real door links", () => {
   assert.deepEqual(linking(fakeDisk()), linking(disk()));
+});
+
+// A folder lands in one call, and a folder the filter refuses carries nothing under it along. [[spec/tickets/disk-door-copies-a-folder]]
+function copying(door) {
+  const at = door.tempDir("level0-copy-");
+  const from = join(at, "from");
+  door.makeDir(join(from, "deep"));
+  door.makeDir(join(from, "private", "inner"));
+  door.write(join(from, "top.md"), "top\n");
+  door.write(join(from, "deep", "one.md"), "one\n");
+  door.write(join(from, "private", "inner", "kept.md"), "no\n");
+  const count = door.copyFolder(from, join(at, "to"), (rel) => rel !== "private");
+  const said = {
+    count,
+    top: door.read(join(at, "to", "top.md")),
+    deep: door.read(join(at, "to", "deep", "one.md")),
+    private: door.exists(join(at, "to", "private")),
+    source: door.exists(join(from, "private", "inner", "kept.md")),
+  };
+  door.remove(at);
+  return said;
+}
+
+test("a folder copies in one call, and the filter prunes a folder whole", () => {
+  assert.deepEqual(copying(disk()), {
+    count: 2,
+    top: "top\n",
+    deep: "one\n",
+    private: false,
+    source: true,
+  });
+});
+
+test("the fake copies a folder the way the real door copies it", () => {
+  assert.deepEqual(copying(fakeDisk()), copying(disk()));
 });
 
 test("both doors refuse a file nobody wrote", () => {

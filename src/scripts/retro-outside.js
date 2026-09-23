@@ -18,23 +18,41 @@ export function slugOf(root) {
   return String(root).replace(/[^A-Za-z0-9]/g, "-");
 }
 
-// A folder belongs to this tree where it carries the tree's own name, or a name opening with it. [[spec/guidance/retro/collect]]
-export function belongs(name, slug) {
+// A folder belongs to this tree where it carries the tree's own name, a folder inside it, or a scratch folder named off it. A sibling tree, as `quackitect-old` beside `quackitect`, names a folder the tree holds nowhere, so it stays out. [[spec/guidance/retro/collect]]
+export function belongs(name, slug, inside = []) {
   const said = String(name).toLowerCase();
   const own = String(slug).toLowerCase();
-  return said === own || said.includes(`${own}-`);
+  if (!own) return false;
+  for (let at = said.indexOf(own); at >= 0; at = said.indexOf(own, at + 1)) {
+    if (at > 0 && said[at - 1] !== "-") continue;
+    const rest = said.slice(at + own.length);
+    if (!rest || rest.startsWith("--")) return true;
+    if (!rest.startsWith("-")) continue;
+    if (at > 0) return true;
+    const next = rest.slice(1);
+    if (inside.some((one) => next === one || next.startsWith(`${one}-`))) return true;
+  }
+  return false;
+}
+
+// The folders standing at the tree's top, named the way the harness names them. [[spec/guidance/retro/collect]]
+function insideOf(it) {
+  return listed(it, it.root)
+    .filter((one) => one.kind === "dir")
+    .map((one) => slugOf(one.name).toLowerCase());
 }
 
 // Copies every source into the input folder, and answers the lines it takes and the files it refuses. [[spec/guidance/retro/collect]]
 export function outsideInto(it, into, since) {
   const out = { taken: [], refused: [], folders: [] };
   const slug = slugOf(it.root);
+  const inside = insideOf(it);
   for (const source of SOURCES) {
     const base = it[source.base];
     if (!base) continue;
     const at = it.join(base, ...source.under);
     for (const one of listed(it, at)) {
-      if (one.kind !== "dir" || !belongs(one.name, slug)) continue;
+      if (one.kind !== "dir" || !belongs(one.name, slug, inside)) continue;
       out.folders.push(`${source.kind}/${one.name}`);
       const from = it.join(at, one.name);
       if (source.kind === "transcripts") {

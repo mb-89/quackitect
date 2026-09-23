@@ -213,11 +213,18 @@ runs, and `Speaks` in `src/lsp/lsp.go` answers it:
 
 | the editor sends | the server does |
 |---|---|
-| `initialize` | names itself, and asks for the whole text on every change |
-| `initialized` | sweeps the tree, and watches the files the tree rules read |
-| a document opens, changes or saves | holds that buffer in the tree in place of the disk, and draws it |
+| `initialize` | names itself, asks for the whole text on every change, and offers completion on `:`, a space, `#` and `[` |
+| `initialized` | sweeps the tree, and follows the index |
+| a document opens or changes | holds that buffer in the tree in place of the disk, an empty one too, and draws it |
+| a document saves | draws the buffer the tree holds |
+| `textDocument/documentLink` | answers every pointer as a link |
+| `textDocument/completion` | answers what the schema allows at the cursor |
 | a document closes | drops the buffer, so the disk answers again |
 | `shutdown`, then `exit` | answers, and ends |
+
+The answers and the panel share one pipe. `writes` holds a lock for each
+frame, and `wire` in `src/lsp/wire.go` holds the buffer under the pipe, so the
+swap watcher's flush lands between frames.
 
 The language client is the extension's one dependency, pinned in its manifest.
 The installer links it beside the extension, so no copy travels.
@@ -225,9 +232,13 @@ The installer links it beside the extension, so no copy travels.
 ## A finding is a diagnostic
 
 `drawsAs` turns one finding into one diagnostic. The rule is the code, the
-message is the text. The range runs from the column to the end of the line. A
-finding counts its line and column from one and the editor from zero, so the
-draw takes one off each.
+message is the text, and a warning draws as a warning. The range runs from the
+column to the end of the line. A finding counts its line and column from one
+and the editor from zero, so the draw takes one off each.
+
+A finding counts its column in bytes, and the editor in UTF-16 units. So
+`unitsTo` in `src/lsp/columns.go` turns the column, and a line carrying `ä` or
+an emoji draws under the right characters.
 
 # The standing file
 
@@ -300,3 +311,41 @@ the way the resolve rule does. For the order, see
 
 The link spans the brackets whole, so the text a reader clicks is the text the
 rule names. A column counts UTF-16 units, the unit the protocol reads by default.
+
+# The completion reads the schema
+
+`offers` in `src/lsp/complete.go` reads the line up to the cursor, off the
+buffer the tree holds. It reads the schema through the readers the checker
+reads, so the offer and the check name one shape:
+
+| the cursor stands | the server offers |
+|---|---|
+| on a frontmatter key | each property the schema names and the note lacks, with its description |
+| after `key:` | the `const` and the `enum` of that property, in brackets where it names a link, or `true` and `false` |
+| on a note naming no kind | `kind: [[x]]`, for the schema governing the path, or else every kind |
+| on a heading at the schema's level | each chapter the schema wants and the note lacks, a step's chapter too |
+| after `[[` | every path the tree tracks, a note without its ending |
+| after `[[note#` | the slug of every heading that note holds |
+
+The editor counts the cursor in UTF-16 units, so `byteAt` in
+`src/lsp/columns.go` turns it into a byte first. Every item replaces what the
+line holds from the colon, the hashes or the brackets up to the cursor. A
+pointer closes its brackets where the line holds none.
+
+# An engine field warns
+
+A property carrying `x-engine: true` belongs to the verbs. For who writes each
+one, see [[spec/design_output/schema#the-verbs-own-their-fields]].
+
+`engineFaults` in `src/lsp/owned.go` reads an open buffer against the file the
+index holds. Where the value of such a key differs, it draws
+`EngineOwnsField` at warning, on the line of that key:
+
+| the buffer | what draws |
+|---|---|
+| an engine key standing as the file holds it | nothing |
+| an engine key the buffer changes | a warning naming the verbs, because the next pull writes over the edit |
+| an engine key the buffer drops | a warning, on the frontmatter's first line |
+| a file no editor holds | nothing, so the sweep and the check draw nothing |
+
+A person edits what they like, so the warning refuses nothing.

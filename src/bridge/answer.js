@@ -32,7 +32,9 @@ export function demands(box, why, block = "", onPaid = null, skips = 1) {
 // [[spec/design_output/level0#which-prompt-opens-a-turn]]
 export function onPromptSubmit(e, box) {
   const from = String(e?.origin?.kind ?? "");
-  box.log.say("info", "prompt", String(e?.text ?? ""), {
+  // A helper's hand-back and a task's notice reach the session as a prompt, and the owner typed neither, so each writes an agent row and asks for no reply. [[spec/design_output/log#a-prompt-is-the-owners]]
+  const kind = OWNER.has(from) ? "prompt" : "agent";
+  box.log.say("info", kind, String(e?.text ?? ""), {
     detail: from,
     text: String(e?.text ?? ""),
   });
@@ -45,6 +47,8 @@ export function onPromptSubmit(e, box) {
 }
 
 export function onMessageDisplay(e, box) {
+  // A helper's text reaches the agent that started it, and the owner reads none of it. [[spec/design_output/log#a-prompt-is-the-owners]]
+  if (e?.agentId || e?.agent_id) return { pass: true };
   const text = String(e?.delta ?? "").trim();
   if (text) box.spoken = text;
   if (!box.demand || !text || box.demand.fits?.(text)) return { pass: true };
@@ -123,6 +127,8 @@ function paid(box, text) {
 }
 
 export function onTurnEnd(e, box) {
+  // A helper's last word answers the agent that started it, so it writes no reply row. [[spec/design_output/log#a-prompt-is-the-owners]]
+  if (e?.agentId) return { pass: true };
   const text = String(e?.answer ?? "").trim();
   const demand = box.demand;
   const answered = e?.reason === "answer" && text;

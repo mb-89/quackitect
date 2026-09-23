@@ -13,10 +13,12 @@ import {
   nameOf,
   rowOf,
   rowsOf,
+  tallied,
   timeOf,
   writes,
 } from "../../.claude/skills/level0/lib/log.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 
 const AT = "2026-09-08T14:22:51.000Z";
@@ -188,4 +190,52 @@ test("a tool line names the field the call aims at", () => {
     "https://lnav.org",
   );
   assert.equal(aimOf({ tool: "TaskList" }), "TaskList");
+});
+
+// [[spec/design_output/log#what-a-box-writes]]
+test("a level read through a function meets each line, so a change to the config reaches the next one", async () => {
+  let level = "info";
+  const it = fakeLog(fakeClock(AT), { folder: FOLDER, level: () => level });
+  await it.say("debug", "hook", "a hook event at info");
+  level = "debug";
+  await it.say("debug", "hook", "a hook event at debug");
+  assert.deepEqual(
+    rowsOf(it.files.read(it.path)).map((one) => one.said),
+    ["a hook event at debug"],
+  );
+});
+
+// [[spec/design_output/log#what-a-box-writes]]
+test("the door writes a row and forgets it, unless the one building it asks to keep them", async () => {
+  const it = fakeLog(fakeClock(AT), { folder: FOLDER, keep: false });
+  await it.say("info", "work", "pushed");
+  assert.deepEqual(it.lines(), [], "a server holds no row in memory");
+  assert.equal(rowsOf(it.files.read(it.path)).length, 1, "the disk holds the row");
+});
+
+// [[spec/design_output/log#a-reader-reads-new-rows]]
+test("a reader folds the rows past its offset, waits on a torn row, and starts again on a shorter file", () => {
+  const files = fakeDisk();
+  const path = `${FOLDER}/session.jsonl`;
+  const row = (kind, said) => `${JSON.stringify({ at: AT, level: "info", kind, said })}\n`;
+  const count = (held) =>
+    tallied(files, path, held, (n, one) => (one.kind === "prompt" ? n + 1 : n), () => 0);
+
+  let held = count(undefined);
+  assert.equal(held.value, 0, "no file, no row");
+  files.write(path, `${row("prompt", "über")}${row("tool", "a call")}`);
+  held = count(held);
+  assert.equal(held.value, 1);
+  files.append(path, `${row("prompt", "two")}{"kind":"prom`);
+  held = count(held);
+  assert.equal(held.value, 2, "the torn row waits");
+  files.append(path, `pt"}\n`);
+  held = count(held);
+  assert.equal(held.value, 3, "and counts once its newline lands");
+  const reads = [];
+  const watched = { ...files, readFrom: (_at, from) => reads.push(from) && "" };
+  assert.equal(tallied(watched, path, held, () => 99, () => 0).value, 3, "a file the reader has seen whole reads nothing");
+  assert.deepEqual(reads, []);
+  files.write(path, row("prompt", "a new session"));
+  assert.equal(count(held).value, 1, "a rotated file counts from the top");
 });

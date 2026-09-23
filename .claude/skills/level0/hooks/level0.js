@@ -22,7 +22,11 @@ const STARTING = 180_000;
 const INSTALL_SKIP = "editor-link editor-extensions editor-client go index se-lsp";
 // The code REASONS reads for a box carrying no node, which a refused spawn means. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 const NO_NODE = 5;
+// The code REASONS reads for a road that installs the modules and then starts the server. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+const INSTALLED = 7;
 let port = PORT;
+// Whether the start road launched a server nobody has waited on yet. [[spec/design_output/level0#the-first-call-pays]]
+let launched = false;
 let root = "";
 let method = "";
 let saidDown = false;
@@ -53,6 +57,12 @@ export const START = [
   "  spawnSync('sh', [method + '/src/scripts/install.sh'], { cwd: method, env, stdio: ['ignore', out, out] });",
   "}",
   "if (!existsSync(method + '/node_modules')) process.exit(6);",
+  // The code proves it loads before a server starts on it, so a broken tree writes one line and loops nowhere. [[spec/design_output/level0#new-code-proves-it-loads]]
+  "const tested = spawnSync(process.execPath, [method + '/src/bridge/server.js', '--selftest', method], { cwd: method, encoding: 'utf8', timeout: 60000, windowsHide: true });",
+  "if (tested.status !== 0) {",
+  "  process.stderr.write(String(tested.stderr || tested.error || 'the self-test answers nothing').trim().split('\\n').slice(0, 4).join(' '));",
+  "  process.exit(8);",
+  "}",
   "const argv = [method + '/src/bridge/server.js', method];",
   "const born = spawn(process.execPath, argv, { cwd: method, detached: true, stdio: ['ignore', out, out], windowsHide: true });",
   "born.unref();",
@@ -70,6 +80,7 @@ const REASONS = {
     "info",
     "the modules stand nowhere, so the bridgehead installs them and starts one",
   ],
+  8: ["warn", "the bridge code fails its self-test, so no server starts"],
 };
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
@@ -112,6 +123,7 @@ export function register(on, options) {
   // A caller hands the wait in, so a case reads the running out without burning the span. [[spec/design_output/level0#the-first-call-pays]]
   waiting = Number(options?.waiting) || STARTING;
   started = false;
+  launched = false;
   on("*", ($, e, next) => seen($, e, next));
   on("turn.step", streams);
   // [[spec/design_output/pull#a-hand-of-its-own]]
@@ -204,20 +216,46 @@ async function ask($, event, e, next) {
   if (event === COMPACT || body.length > LIMIT)
     body = JSON.stringify({ event, e: slim(e), origin: next?.origin ?? null, root });
   try {
-    const said = await $.http.fetch(url(), {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body,
-    });
-    if (!said.ok) throw new Error(`status ${said.status}`);
-    saidDown = false;
-    toldDown = false;
-    // The server answers, so the cage stands and no block says it is missing. [[spec/design_output/level0#a-session-says-its-cage]]
-    cage = null;
-    return JSON.parse(said.text || "{}");
+    return await posted($, body);
   } catch (error) {
+    // A server restarting on another port writes the pointer again, so a post nobody took reads it before the server reads as down. [[spec/design_output/level0#the-bridge-says-it-falls]]
+    if (!error?.status && (await repoints($))) {
+      try {
+        return await posted($, body);
+      } catch (again) {
+        await down($, event, again);
+        return null;
+      }
+    }
     await down($, event, error);
     return null;
+  }
+}
+
+async function posted($, body) {
+  const said = await $.http.fetch(url(), {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body,
+  });
+  if (!said.ok)
+    throw Object.assign(new Error(`status ${said.status}`), { status: said.status });
+  saidDown = false;
+  toldDown = false;
+  // The server answers, so the cage stands and no block says it is missing. [[spec/design_output/level0#a-session-says-its-cage]]
+  cage = null;
+  return JSON.parse(said.text || "{}");
+}
+
+// Whether the pointer names a port other than the one the hook posts to, and the hook takes it. [[spec/design_output/level0#the-bridge-says-it-falls]]
+async function repoints($) {
+  try {
+    const named = Number(JSON.parse(String(await $.fs.read(POINTER)))?.port);
+    if (!named || named === port) return false;
+    port = named;
+    return true;
+  } catch {
+    return false;
   }
 }
 
@@ -266,9 +304,17 @@ async function spoke($, e, next) {
   );
   if (!answer) return next(e);
   if (answer.result !== undefined) return answer.result;
+  // A tool this hook registers answers nowhere past it, so a paid reply posts the call once more and the server runs the tool. [[spec/design_output/level0#the-first-call-pays]]
+  if (reading("tool.call", e) && !again.has(e)) {
+    again.add(e);
+    return seen($, e, next);
+  }
   if (answer.after !== undefined) return merged(await next(e), answer.after);
   return next(e);
 }
+
+// The calls posted once more after a paid reply, so a second demand hands the call on and loops nowhere. [[spec/design_output/level0#the-first-call-pays]]
+const again = new WeakSet();
 
 function slim(e) {
   if (!e || typeof e !== "object") return e ?? null;
@@ -298,7 +344,10 @@ async function reads($, event, e, next) {
   const first = await ask($, event, e, next);
   if (first) return first;
   await starts($);
-  if (!(await healthy($))) {
+  // The wait runs where the start road launched a server, and once, so a later call on a dead server answers at once. [[spec/design_output/level0#the-first-call-pays]]
+  const coming = launched;
+  launched = false;
+  if (!coming || !(await healthy($))) {
     return {
       result: {
         result: `no server answers at ${url()}, so ${String(e?.tool ?? "")} reads nothing. Run ./RUNME.sh serve, and read ${SERVE} for what it says.`,
@@ -393,6 +442,7 @@ async function starts($) {
     return;
   }
   const code = Number(ran?.exitCode ?? 1);
+  launched = code === 0 || code === INSTALLED;
   const [level, said] = reasonOf(code);
   if (!level) return;
   const detail = String(ran?.stderr ?? "").trim() || `exit ${code}`;
@@ -408,7 +458,15 @@ async function wrote($, said) {
     let held = "";
     try {
       held = String(await $.fs.read(SESSION));
-    } catch {}
+    } catch (err) {
+      // A read that fails on a file standing keeps the file, so the session's rows stay whole. [[spec/design_output/log#every-writer-appends]]
+      if (
+        !/ENOENT|no such|not found|no file/i.test(
+          String(err?.code ?? err?.message ?? err),
+        )
+      )
+        return false;
+    }
     if (held && !held.endsWith("\n")) held += "\n";
     await $.fs.write(SESSION, `${held}${JSON.stringify(row)}\n`);
     return true;

@@ -58,7 +58,7 @@ function doors(answers = {}, tip = TIP) {
   const said = fakeGit(
     {
       "git rev-parse HEAD": { stdout: `${tip}\n` },
-      "git status --porcelain": { stdout: "" },
+      "git status --porcelain -uall": { stdout: "" },
       ...answers,
     },
     ROOT,
@@ -150,7 +150,7 @@ test("the span takes the files under this ticket's commits, and leaves a sibling
     ]),
     [`git show --format= --name-only ${MINE}`]: { stdout: "src/mine.js\n" },
     [`git show --format= --name-only ${THEIRS}`]: { stdout: "src/theirs.js\n" },
-    "git status --porcelain": { stdout: " M src/tree.js\n" },
+    "git status --porcelain -uall": { stdout: " M src/tree.js\n" },
   });
 
   assert.deepEqual(changedSince(it, one, { hash: HOLD }), ["src/mine.js"]);
@@ -162,7 +162,7 @@ test("the span takes the working tree where the tip stands where the hold left i
     {
       ...log(HOLD, [`${MINE}\x00${NAME}: passes design/draft`]),
       [`git show --format= --name-only ${MINE}`]: { stdout: "src/mine.js\n" },
-      "git status --porcelain": { stdout: " M src/tree.js\n" },
+      "git status --porcelain -uall": { stdout: " M src/tree.js\n" },
     },
     HOLD,
   );

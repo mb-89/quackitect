@@ -29,6 +29,8 @@ test("a work root holding no box file takes the identity under the method root",
     }),
     git: fakeGit({}, WORK),
     clock: fakeClock(),
+    // The session file reads on a harness alone. [[spec/design_output/pull#the-hand-and-the-hold]]
+    env: { CLAUDECODE: "1" },
   };
   assert.equal(
     IDENTITY,

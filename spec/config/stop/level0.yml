@@ -58,6 +58,14 @@
   runs: owner-finishes
   says: The owner holds this session at finish, so this turn ends with the piece in hand.
 
+- id: your-helpers-still-run
+  side: stop
+  priority: 83
+  decides: claimed
+  runs: helpers-running
+  asks: Does a helper you started still run, so its answer wakes this session? The queue binding refuses it.
+  says: A helper still runs and its answer wakes this session, so this turn ends and waits.
+
 - id: work-still-stands
   side: continue
   priority: 80

@@ -258,6 +258,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `group-in-hand` | this branch's group carries a take with no hand-back |
 | `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` |
 | `chat-is-new` | the session log holds one prompt row at most, the box is no cloud box, and the answer names no next step |
+| `helpers-running` | the binding reads other than `queue`, and the turn's end names a helper the harness still runs |
 | `a-report-stands` | the message ending the turn carries the heading What the agent needs with a numbered row under it |
 | `the-plan-is-empty` | the plan holds no todo and nothing in hand, so a claim of done stands on an empty plan |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
@@ -272,6 +273,25 @@ A rule deciding `claimed` names a check too, and then both halves answer before
 it fires. The agent claims the reason, the check says the moment stands, and a
 claim outside that moment fires nothing. `fires` in `lib/stop.js` holds it, and
 a claimed rule naming no check fires on the claim alone.
+
+## A helper still runs
+
+A session hands work to a helper in the background, and the helper's answer
+wakes the session. So a turn ending while a helper runs ends on a wait, and the
+work goes on at the answer.
+
+`classic.Stop` carries `background_tasks`, the harness's own list, and
+`helpersRun` reads it: a `subagent` entry at `running` stands. The rule
+`your-helpers-still-run` takes the claim at priority `83`, over the plan and the
+hold, because a session waiting on its helpers keeps both. It carries no
+`yields`, because the check reads the harness, and no hand's opinion.
+
+| the binding | a stop while a helper runs |
+|---|---|
+| `queue` | refused, so the queue hands the next leaf |
+| `unbound`, `god` | stands |
+
+For what each binding means, see [[spec/design_output/config#the-engine-controls]].
 
 ## A refusal names its check
 

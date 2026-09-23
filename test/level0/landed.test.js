@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { landed, unlandedRows } from "../../src/scripts/pull-landed.js";
+import { landed, landedAlone, unlandedRows } from "../../src/scripts/pull-landed.js";
 
 const AT = "/tree/spec/tickets/a-child.md";
 const WROTE = "---\nstate: open\n---\n\n# Ask\n\nA thing.\n";
@@ -45,6 +45,33 @@ test("a commit that stands answers nothing, and the record stays on disk", () =>
   assert.equal(disk.read(AT), RECORDED);
   assert.ok(ran().includes("git add -A"));
   assert.ok(!ran().includes("git reset -q"));
+});
+
+// A skip, a close, a repair or an unblock names another ticket, so a hand's edits stay out of its commit. [[spec/design_output/pull#the-refused-commit]]
+test("a side landing stages and commits the ticket files it writes, and nothing else", () => {
+  const OTHER = "/tree/spec/tickets/a-successor.md";
+  const git = fakeGit(
+    {
+      [`git commit -m a-child: skips design/draft -- ${AT} ${OTHER}`]: {
+        exitCode: 1,
+        stderr: "refused",
+      },
+    },
+    "/tree",
+  );
+  const disk = fakeDisk({ [AT]: WROTE });
+  const ran = () => git.ran.map((it) => it.argv.join(" "));
+
+  const finding = landedAlone({ disk, git }, one, ["skips design/draft"], [OTHER]);
+
+  assert.equal(finding, "refused");
+  assert.ok(ran().includes(`git add -- ${AT} ${OTHER}`), "the two ticket files stage");
+  assert.ok(!ran().includes("git add -A"), "and the rest of the tree stays out");
+  assert.ok(
+    ran().includes(`git reset -q -- ${AT} ${OTHER}`),
+    "a refusal unstages those alone",
+  );
+  assert.equal(disk.read(AT), WROTE);
 });
 
 test("a private note lands on disk alone", () => {

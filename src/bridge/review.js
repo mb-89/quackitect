@@ -9,6 +9,7 @@ import {
   report,
   reviewSpec,
 } from "../../.claude/skills/level0/lib/review.js";
+import { guidanceOf } from "./guidance.js";
 
 const GATHERING = 300000;
 const HEX = 16;
@@ -50,7 +51,8 @@ async function reviewsBranch(e, box) {
   box.reviews.set(token, material);
   return {
     spawn: {
-      prompt: readerAsks(material, box.guidance?.standing ?? ""),
+      // A restart hands the box over bare, so the accessor reads the guidance again. [[spec/design_output/level0#a-restart-fills-the-box]]
+      prompt: readerAsks(material, guidanceOf(box)?.standing ?? ""),
       description: `read ${material.branch}`,
       subagentType: "general-purpose",
     },

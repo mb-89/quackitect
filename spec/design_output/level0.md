@@ -57,8 +57,8 @@ and the switch in `decide`. The server holds every door of this note, and the
 module before the bridgehead stands nowhere.
 
 The log, the index and Vale stand behind doors under `src/doors`. The server
-logs every event at `debug`, whole, and holds the state in one box a work
-root. `./RUNME.sh serve` starts it, and `--inspect` on that verb opens it to
+logs every event at `debug`, whole, so a box set to `debug` carries it, and
+holds the state in one box a work root. `./RUNME.sh serve` starts it, and `--inspect` on that verb opens it to
 the debugger. The launch config `the server` starts it under the editor's
 debugger, so a break in `decide` binds, pauses, and takes new breaks while
 the agent runs.
@@ -113,6 +113,7 @@ folder reaches no shell. The shell reads the environment itself and answers a co
 | 5 | the box carries no node | one `warn` line |
 | 6 | the install brings no modules | one `warn` line |
 | 7 | the road installs the modules, then starts the server | one `info` line |
+| 8 | the bridge code fails its self-test, so no server starts | one `warn` line naming the fault |
 | 0 | the server starts behind the session | one `info` line |
 
 `CLAUDE_CODE_REMOTE` and `SE_CLOUD` say a box is a cloud box, the same pair the
@@ -151,10 +152,12 @@ way every other answer does, its `register` list among it. A call landing
 before the server stands takes the steps below:
 
 - it posts once, and answers where a server stands
-- it runs the start above, then reads `/health` every fifth of a second
+- it runs the start above, then reads `/health` every fifth of a second, where the start brings a server up
 - `STARTING` caps that wait, and the wait running out answers the port and the log
 
-A dead server costs that one post before the start and one after it.
+The wait runs once for each server the road starts. A later call on a dead
+server answers the port and the log at once. A dead server costs that one post
+before the start and one after it.
 `test/level0/read-tools.test.js` counts both over each read tool.
 
 So a hand calls `find` on its first turn, and that call pays for the server.
@@ -162,11 +165,59 @@ So a hand calls `find` on its first turn, and that call pays for the server.
 ## A fix reaches the session
 
 The server imports its doors and its libs once, so a fix to one reaches no
-running session by itself. So the server reads its own code at the first
-event, under the roots `src/bridge/reload.js` names, and reads it again after
-every tool run. A file that differs restarts the server through the road the
-`/restart` request takes, and the log names the file. The next event lands on
+running session by itself. So the server notes its own code at the first
+event: every script under the roots `src/bridge/reload.js` names, and every
+module `src/bridge/server.js` imports, at any depth. After every tool run it
+reads the time and the size of each again, and reads no script whole. A file
+that differs restarts the server through the road the `/restart` request
+takes, and the log names the file. The next event lands on
 the new code, and the session goes on as above.
+
+## New code proves it loads
+
+A moved file restarts the server only where the new code passes a self-test
+first. The server runs `node src/bridge/server.js --selftest <method>`, and
+that child does what the table says:
+
+| step | what the child does |
+|---|---|
+| load | imports every module the server imports, so a name a module lacks fails here |
+| drive | runs one of each event through `decide`, on a box whose doors stand in memory |
+| answer | exits 0, or exits 1 with the fault on standard error |
+
+`src/bridge/selftest.js` holds the events and the doors. On a clean exit the
+server steps down, as above. On a fault it runs on over the old code, and writes one
+`error` line naming the file, the line and the error. The same fault writes no
+second line, and code unmoved since the fault asks for no second test. An asked
+`/restart` meets the same test.
+
+The start road of the bridgehead runs the same flag before it starts a server,
+and answers `8` where the test fails. So a broken tree writes one line, and no
+road starts a server that falls on its first event.
+`test/contract/server-loads.test.js` runs the test over this tree, so
+`./RUNME.sh check` refuses a bridge that fails it.
+
+## A door that throws passes
+
+A throw inside a door answers `pass`, and the box writes one `error` line
+naming the event and the stack. So one broken door costs that event its rules,
+and the server and every box stand. An event past `BODY_CAP` characters passes
+unread, and the box writes one `warn` line.
+
+## A cache follows its file
+
+The box holds a few files it reads once, and each drops where a tool run
+moves the file it stands on. `src/bridge/caches.js` names them:
+
+| the cache | the files it stands on |
+|---|---|
+| the paragraph schema | `spec/schemas/paragraph.schema.yaml` |
+| the words | the paragraph schema, and the three lists it names |
+| the stop rules | `spec/config/stop` |
+| the note schemas | `spec/schemas` |
+
+A tool run reads the time and the size of each file, as the code above does. A
+session start drops every cache, and the next read fills it again.
 
 ## A start takes the port
 
@@ -236,6 +287,10 @@ later. So the bridgehead says it where a person stands.
 | writes one `warn` row naming the event route | the first event the server answers nothing for |
 | says one line in the chat, through `$.ui.log` | the first such event past the session start |
 | drops both marks | the server answers again |
+
+A post nobody takes reads the port pointer first, because a server restarting
+on another port writes it again. Where the pointer names another port, the
+bridgehead posts there once more before the server reads as down.
 
 The route both name is the one the bridgehead posts to, which `url()` answers.
 The line names it, what the wire says, and the commands a person runs:
@@ -813,7 +868,9 @@ file held there. It writes each row to the log under the warning. The context
 after the call tells the agent that the rows stand and the work goes on.
 
 So the list fills as the tree changes, and the hand fires off it during a
-session. The check's lint writes the whole list again, so the two meet.
+session. The check's lint writes the whole list again, so the two meet. A
+refused write feeds the list too, where the file ceiling refuses it. For
+details, see [[spec/design_output/level0#the-ceiling-feeds-the-list]].
 [[spec/design_output/stop#the-grace]] says when the hand wants the turn.
 
 ## A write meets its mark
@@ -876,7 +933,7 @@ comment counts none.
 | who reads it | what it does |
 |---|---|
 | the code door | refuses a write that grows past a ceiling, and names the function or the file and its lines |
-| `./RUNME.sh check` | names what stands past a ceiling as a warning, so the panel draws it and the check fails |
+| `./RUNME.sh check` | names what stands past a ceiling as a warning, so the panel draws it, the check fails and the warnings list holds it |
 
 The door reads the text before and after the write. A file already past its
 ceiling takes a cut and refuses a growth. So the tree's debt shrinks with every
@@ -895,24 +952,30 @@ its target, leaving the rest in the source:
 
 The source is the first word standing outside a flag and its value. A call
 naming none comes back refused, and so does a source that is a target too,
-because that cut writes over what it reads.
+because that cut writes over what it reads. A target named twice comes back
+refused too, because the second cut writes over the first.
 
 `src/scripts/split-cut.js` owns the ranges and the cut over text, and
 `src/scripts/split-verb.js` writes them. One journal entry under `by: split`
 holds every target and the rest, so `mcp__level0__undo` takes the whole cut
 back. For details, see [[spec/design_output/apply#the-journal-holds-both-halves]].
 
-### The refusal parks the work
+### The ceiling feeds the list
 
-A refusal naming the file ceiling parks a private ticket through
-`./RUNME.sh ticket note`, and the refusal names where it stands. The note lands
-under the private tickets folder, off git, and the retro decides it. A tracked
-ticket takes that road instead, because a door filling no ask leaves
-placeholders the lint names.
+A refusal naming the file ceiling puts on the warnings list the `FileCeiling`
+row the check names for that file, at warning, from the door. The write stays
+refused. The refusal says the file stands on the list, and names
+`./RUNME.sh split <file>` for a hand cutting it now. A function ceiling alone
+puts nothing on the list.
 
-`src/bridge/split-ticket.js` holds the call, and the code door makes it. A
-second refusal on the same file names the note that stands, and writes none. A
-refused run answers the line the verb says, so no refusal goes quiet.
+| where | what it does |
+|---|---|
+| `src/bridge/code.js` | refuses the growth, and hands the row on |
+| `listsWarning` in `lib/warnings.js` | writes the row in place of the row the file's rule holds, and keeps the file's other rows |
+| `drains` in `lib/warnings.js` | tells the refactoring hand to cut a file past the ceiling before it drains the rest |
+
+A second refusal of the same file keeps one row. The refactoring hand takes
+the file off the list. For details, see [[spec/design_output/stop#the-grace]].
 
 ## The path a rule reads
 
@@ -1451,12 +1514,17 @@ For details, see [[spec/design_output/config#a-caller-hands-it-in]].
 
 Vale answers a broken rule file with an `E201`. It writes that to standard
 error and leaves standard output empty, so a reader parsing JSON alone finds no
-breach.
-
-So one broken rule turns every rule in the tree off, and the tree
+breach. So one broken rule turns every rule in the tree off, and the tree
 answers that the rules pass.
 
 `faultIn` in `lib/vale.js` reads that answer, and `./RUNME.sh lint` stops on it.
+The write door reads a lint that runs nowhere the same way, whatever the fault:
+
+| what stands | what the door does |
+|---|---|
+| a broken rule, an answer other than JSON, a spawn that falls, a timeout | refuses a prose write, names the fault, and writes it to the log at `warn` |
+| the same fault over a write outside prose | lets it land, so the hand mending a rule file writes it |
+| no Vale on the box | lets the write land, and says so in the log once |
 
 # Where a rule lives
 
@@ -1548,7 +1616,9 @@ which hands a lemma a token. More vetoes ride the same reader, in
 write door, the draft check and the commit message. The check and the terminal
 push door take the tense veto alone, through `readThrough` in
 `src/bridge/findings.js`, so a push carries the list the check reads. A `vale`
-line at debug counts what the reader lets stand.
+line at debug counts what the reader lets stand. The model's build costs half
+the load, so the first read builds it, and a verb reading no prose skips the
+build.
 
 | Vale finds | the reader says |
 |---|---|

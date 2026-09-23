@@ -18,16 +18,18 @@ const GLANCE = [
   "trigger",
 ];
 
+// The level is a name or a function answering one, so a box reads the config as it runs. The door keeps a row in memory only where `keep` asks, as the fake does, so a server writes a row and forgets it. [[spec/design_output/log#what-a-box-writes]]
 export function log(disk, clock, init = {}) {
   const folder = init.folder ?? SESSION.slice(0, SESSION.lastIndexOf("/"));
   const path = `${folder}/${SESSION.slice(SESSION.lastIndexOf("/") + 1)}`;
   const rows = [];
+  const levelOf = typeof init.level === "function" ? init.level : () => init.level;
   let made = false;
 
   const say = async (level, kind, said, more) => {
     const row = rowOf(clock.stamp(), level, kind, said, more);
-    if (!writes(init.level, row.level)) return row;
-    rows.push(row);
+    if (!writes(levelOf(), row.level)) return row;
+    if (init.keep) rows.push(row);
     if (!made) {
       await disk.makeDir(folder);
       made = true;

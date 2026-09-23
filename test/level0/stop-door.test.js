@@ -101,8 +101,12 @@ function box(files = {}, refactor = REFACTOR) {
       clock: { now: () => new Date(NOW * 1000) },
       proc: fakeProc({
         "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
-        "git log -1 --format=%ct -- old.md": { stdout: `${NOW - WEEK * 2}\n` },
-        "git log -1 --format=%ct -- new.md": { stdout: `${NOW - 60}\n` },
+        // One log answers the whole list, newest first, whatever order the list names the files in. [[spec/tickets/the-spawn-reaches-its-guidance]]
+        git: (argv) => ({
+          stdout: argv.includes("--name-only")
+            ? `${NOW - 60}\n\nnew.md\n${NOW - WEEK * 2}\n\nold.md\n${NOW - WEEK * 3}\n\nnew.md\nold.md\n`
+            : "",
+        }),
       }),
       log: { say: (...row) => said.push(row) },
     },
@@ -245,21 +249,32 @@ test("a claim of done holds while the plan holds a todo or a thing in hand", () 
 
 // A refusal names the check that falls and what it sees, so a stop line standing whole hears no claim of a missing reason. [[spec/design_output/stop#a-refusal-names-its-check]]
 test("a claim of done over a thing in hand hears the check and the thing, at the call and at the turn's end", () => {
-  const plan = { [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "the door", todos: [] }) };
+  const plan = {
+    [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "the door", todos: [] }),
+  };
   const busy = box(plan);
   const block = onStop(
     { last_assistant_message: "The work stands.\n\nstop: the-work-stands-complete" },
     busy.box,
   ).result.block;
-  assert.match(block, /check the-plan-is-empty answers false: the plan still holds "the door"/);
+  assert.match(
+    block,
+    /check the-plan-is-empty answers false: the plan still holds "the door"/,
+  );
   assert.doesNotMatch(block, /names no stop reason/);
 
   const called = box(plan);
   const refused = TOOLS[STOP_CALL]({ reason: "the-work-stands-complete" }, called.box);
   assert.match(refused.result.result, /^The claim falls\. .*"the door".*under done/);
-  assert.equal(called.box.claim, undefined, "a claim that falls stands nowhere for the turn's end");
+  assert.equal(
+    called.box.claim,
+    undefined,
+    "a claim that falls stands nowhere for the turn's end",
+  );
 
-  const clear = box({ [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [] }) });
+  const clear = box({
+    [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [] }),
+  });
   assert.match(
     TOOLS[STOP_CALL]({ reason: "the-work-stands-complete" }, clear.box).result.result,
     /^The claim stands/,
@@ -267,8 +282,10 @@ test("a claim of done over a thing in hand hears the check and the thing, at the
 });
 
 test("a line naming a reason nobody holds hears that, and a turn with no line hears the plain rule", () => {
-  const block = onStop({ last_assistant_message: "Done.\n\nstop: the-moon-is-full" }, box().box).result
-    .block;
+  const block = onStop(
+    { last_assistant_message: "Done.\n\nstop: the-moon-is-full" },
+    box().box,
+  ).result.block;
   assert.match(block, /claims the-moon-is-full, which names no reason this tree holds/);
   const bare = onStop({ last_assistant_message: "Done." }, box().box).result.block;
   assert.match(bare, /^The last line names no stop reason/);
@@ -400,6 +417,16 @@ test("a call under a long list opens the grace, and the turn's end clears it", (
   const fresh = box(stamped(9, ["new.md"]));
   sawCall({ tool: "Read" }, fresh.box);
   assert.equal(fresh.box.grace, undefined, "a list over files still warm asks nothing");
+});
+
+// One ask stands at a time, so a call under a standing grace asks git nothing. [[spec/design_output/stop#the-grace]]
+test("a call under a standing grace reads no list and asks git nothing, and one log answers the whole list", () => {
+  const it = box(stamped(9, ["old.md", "new.md"]));
+  sawCall({ tool: "Read" }, it.box);
+  const logs = () => it.box.proc.ran.filter((one) => one.argv[1] === "log");
+  assert.equal(logs().length, 1, "one log over the whole list");
+  sawCall({ tool: "Read" }, it.box);
+  assert.equal(logs().length, 1, "the standing grace reads nothing more");
 });
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]

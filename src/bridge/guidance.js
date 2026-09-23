@@ -140,7 +140,7 @@ function opens(row) {
   return row?.kind === COMPACT;
 }
 
-function guidanceOf(box) {
+export function guidanceOf(box) {
   if (!box.guidance) box.guidance = readsGuidance(box);
   return box.guidance;
 }
@@ -270,7 +270,8 @@ export function onSessionCompact(e, box) {
 // [[spec/design_output/level0#the-helper-takes-the-guidance]]
 export function onAgentSpawn(e, box) {
   const kind = String(e?.kind ?? "");
-  const standing = layerHere(box.guidance, kind);
+  // A restart hands the box over bare, so the accessor reads the guidance again. [[spec/design_output/level0#a-restart-fills-the-box]]
+  const standing = layerHere(guidanceOf(box), kind);
   if (!standing) return { pass: true };
   box.log.say(
     "info",

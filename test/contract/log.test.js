@@ -25,7 +25,7 @@ async function through(door, files, folder) {
 function real() {
   const files = disk();
   const folder = `${files.tempDir("level0-log-").split("\\").join("/")}/log`;
-  const door = log(files, fakeClock(AT), { folder });
+  const door = log(files, fakeClock(AT), { folder, keep: true });
   return { door, files, folder };
 }
 

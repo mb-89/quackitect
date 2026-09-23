@@ -144,6 +144,10 @@ func (t *Tab) takes(m *frame.Model, msg Msg) tea.Cmd {
 		}
 		t.Tree, t.Why = msg.Tree, msg.Why
 		if t.Tree != nil {
+			// The schema stands on the tree from the first answer, so the header lights the column an edit opens on. [[spec/design_output/tui#the-work-tab-takes-edits]]
+			if t.Tree.Schema == nil {
+				t.Tree.Schema = t.TicketRules()
+			}
 			// The first answer opens the line on the preset the file presses, and a later one keeps what stands. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
 			at := m.TabNamed("work") - 1
 			if !m.Opened && at >= 0 {
@@ -224,10 +228,10 @@ func (t *Tab) Left(m *frame.Model, w, rows int) string {
 	if t.Tree == nil {
 		return lipgloss.NewStyle().Width(w).Render(strings.Join(t.waits(w, rows), "\n"))
 	}
-	// A notice takes the last line while one stands, so a refusal reads where the edit was. [[spec/design_output/tui#the-work-tab-takes-edits]]
-	if t.Notice != "" {
+	// A notice or an open edit takes the last line, so a refusal reads where the edit was and the offer reads under it. [[spec/design_output/tui#the-work-tab-takes-edits]]
+	if foot := t.footLine(w); foot != "" {
 		t.Tree.Scroll(rows - 1)
-		return t.Tree.Header(w) + "\n" + t.Tree.Rows(w, rows-1) + "\n" + draw.LevelStyle("warn").Render(draw.Cut(t.Notice, w))
+		return t.Tree.Header(w) + "\n" + t.Tree.Rows(w, rows-1) + "\n" + foot
 	}
 	t.Tree.Scroll(rows)
 	return t.Tree.Header(w) + "\n" + t.Tree.Rows(w, rows)
@@ -351,7 +355,17 @@ func (t *Tab) Keys(_ *frame.Model) frame.Band {
 			t.Tree.Collapse(true)
 			return nil
 		}},
-		// A place is the todo, and the same digit again takes it off. No cell opens here, because every field a person sets has a key of its own. [[spec/design_output/pull#the-queue-is-an-outline]]
+		// The column cursor says where the edit opens. [[spec/design_output/tui#the-work-tab-takes-edits]]
+		{Key: frame.Bind("a d", "one column left, one column right, where the edit opens", "a", "d", "left", "right"), Do: func(_ *frame.Model, name string) tea.Cmd {
+			t.MoveColumn(name)
+			return nil
+		}},
+		// [[spec/design_output/tui#the-work-tab-takes-edits]]
+		{Key: frame.Bind("e", "edit the cell under the cursor: enter writes, esc drops, tab completes, alt+enter fills every row", "e"), Do: func(_ *frame.Model, _ string) tea.Cmd {
+			t.OpenEdit()
+			return nil
+		}},
+		// A place is the todo, and the same digit again takes it off. [[spec/design_output/pull#the-queue-is-an-outline]]
 		{Key: frame.Bind("p 1…9", "place the row in the queue: p, then the place, and the same place again clears it", placeKey), Do: func(_ *frame.Model, _ string) tea.Cmd {
 			t.openPlace()
 			return nil

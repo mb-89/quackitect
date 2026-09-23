@@ -53,7 +53,7 @@ func folders(root, from string, eyes *fsnotify.Watcher) error {
 		if err != nil || !info.IsDir() {
 			return nil
 		}
-		// The walk still reads the log, and the next sweep carries what it holds. [[spec/design_output/index#the-watcher-keeps-it-warm]]
+		// The watch stands off every folder the walk stands off, so a log line moves nothing. [[spec/design_output/index#the-watcher-keeps-it-warm]]
 		if skips(root, abs, info) {
 			return filepath.SkipDir
 		}

@@ -181,7 +181,7 @@ test("branch take with a name takes that branch alone, and refuses a name nobody
 
 // [[spec/design_output/work#the-take-writes-the-record]]
 test("a take meeting a rejected push names both roads, and claims no race", () => {
-  const { it } = doorsSaying(
+  const { it, outside } = doorsSaying(
     { ...groupRemote(), "git push origin work/one-group": { exitCode: 1 } },
     { [on("one-group")]: GROUP_NOTE, ...HAND },
   );
@@ -192,6 +192,33 @@ test("a take meeting a rejected push names both roads, and claims no race", () =
   assert.match(said, /The push of work\/one-group came back refused/);
   assert.match(said, /Somebody taking it first is one road/);
   assert.match(said, /a push door turning it away is another/);
+  const ran = ranGit(outside);
+  assert.ok(
+    ran.lastIndexOf("git reset --keep origin/work/one-group") >
+      ran.indexOf("git push origin work/one-group"),
+    "the refused claim leaves the branch, keeps the parked files, and the next take meets no commit origin lacks",
+  );
+});
+
+// [[spec/design_output/work#the-take-writes-the-record]]
+test("a take whose claim will not commit stops, and puts the ticket back", () => {
+  const { it, outside } = doorsSaying(
+    {
+      ...groupRemote(),
+      "git commit -m work/one-group: person takes it": {
+        exitCode: 1,
+        stderr: "the hook refuses",
+      },
+    },
+    { [on("one-group")]: GROUP_NOTE, ...HAND },
+  );
+
+  const { code, said } = heard(() => work(ROOT, ["take"], it));
+
+  assert.equal(code, 1, said);
+  assert.match(said, /would not commit, so the take stands undone/);
+  assert.equal(it.disk.read(on("one-group")), GROUP_NOTE, "the ticket stands as it stood");
+  assert.ok(!ranGit(outside).includes("git push origin work/one-group"), "and nothing pushes");
 });
 
 // [[spec/design_output/work#held-derives-from-the-record]]

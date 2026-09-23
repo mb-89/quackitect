@@ -19,7 +19,8 @@ export const ROWS = [...QUESTIONS, ...CATEGORIES];
 export function findingsOf(text) {
   const out = Object.fromEntries(ROWS.map((row) => [row, null]));
   let row = "";
-  for (const line of String(text ?? "").split("\n")) {
+  // A file a Windows editor writes ends each line on a carriage return too. [[spec/guidance/retro/read]]
+  for (const line of String(text ?? "").split(/\r?\n/)) {
     const head = /^##\s+(\w+)/.exec(line);
     if (head) {
       row = ROWS.includes(head[1].toLowerCase()) ? head[1].toLowerCase() : "";

@@ -305,3 +305,74 @@ The approach stands here.
   assert.match(now, /<!-- ships it -->/);
   assert.deepEqual(routed(now), []);
 });
+
+// [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+test("a reroute keeps two leaves of one name apart, each with its own text", () => {
+  const route = [
+    { name: "red", steps: [{ name: "tests", does: "writes the failing tests" }] },
+    { name: "green", steps: [{ name: "tests", does: "runs the tests green" }] },
+  ];
+  const was = `---
+kind: [[routed]]
+step: green/tests
+steps:
+  - name: red
+    steps:
+      - name: tests
+        does: writes the failing tests
+  - name: green
+    steps:
+      - name: tests
+        does: runs the tests green
+---
+
+# Ask
+
+What it asks for.
+
+# red
+
+## tests
+
+The red evidence.
+
+# green
+
+## tests
+
+The green evidence.
+`;
+  const now = reRouted(was, ROUTED, [...route, { name: "ship", does: "ships it" }]);
+  const red = now.indexOf("The red evidence.");
+  const green = now.indexOf("The green evidence.");
+  assert.ok(red > now.indexOf("# red") && red < now.indexOf("# green"));
+  assert.ok(green > now.indexOf("# green") && green < now.indexOf("# ship"));
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+test("a reroute carries a leaf the new route moves under another parent", () => {
+  const was = `---
+kind: [[routed]]
+step: design/draft
+steps:
+  - name: design
+    steps:
+      - name: draft
+        does: writes the design
+---
+
+# Ask
+
+What it asks for.
+
+# design
+
+## draft
+
+The approach stands here.
+`;
+  const now = reRouted(was, ROUTED, [
+    { name: "plan", steps: [{ name: "draft", does: "writes the design" }] },
+  ]);
+  assert.match(now, /The approach stands here\./);
+});

@@ -43,14 +43,18 @@ export function handDoors(env) {
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 export function handOf(it) {
+  // The session file stands for every session on the box and outlives them, so a hand off a harness reads it nowhere. [[spec/design_output/pull#the-hand-and-the-hold]]
+  const harnessed = Boolean(it.agent) || Boolean(agentOf(it.env));
+  // The hold git ignores carries who, and the record carries the role. [[spec/design_output/pull#the-hand-rule]]
+  if (!harnessed) {
+    boxOf(it);
+    return named(PERSON, it.git?.authorName?.() ?? "");
+  }
   const held = parsed(readIf(it, it.root, SESSION)) ?? {};
   const agent = String(held.harness ?? "").trim() || agentOf(it.env);
   const parts = [`box ${boxOf(it)}`];
   if (held.id) parts.push(`session ${held.id}`);
   if (agent) parts.push(agent);
-  // The hold git ignores carries who, and the record carries the role. [[spec/design_output/pull#the-hand-rule]]
-  if (parts.length === 1 && !it.agent)
-    return named(PERSON, it.git?.authorName?.() ?? "");
   return parts.join(" · ");
 }
 

@@ -6,7 +6,13 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { rowOf } from "../../.claude/skills/level0/lib/log.js";
-import { DROPS, readsCompaction, SURVIVES, UNPROVEN } from "../../src/scripts/probe.js";
+import {
+  DROPS,
+  logRows,
+  readsCompaction,
+  SURVIVES,
+  UNPROVEN,
+} from "../../src/scripts/probe.js";
 
 const AT = "2026-09-12T08:00:00.000Z";
 
@@ -88,4 +94,14 @@ test("an empty log leaves the road unproven, and names no read", () => {
 
   assert.equal(read.answer, UNPROVEN);
   assert.equal(read.reads, 0);
+});
+
+// Two writers appending at once tear one line, and the probe reads the rest. [[spec/design_output/log#every-writer-appends]]
+test("a torn line in the log drops alone, and the rows around it read", () => {
+  const files = { read: () => `${JSON.stringify(context("first"))}\n{"at":"2026\n${JSON.stringify(compaction())}\n` };
+
+  assert.deepEqual(
+    logRows(files, "log").map((one) => one.kind),
+    ["context", "compact"],
+  );
 });

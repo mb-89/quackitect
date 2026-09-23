@@ -49,6 +49,7 @@ type Tree struct {
 	top     int
 	cur     int
 	wrote   []string
+	refused string
 }
 
 type twig struct {

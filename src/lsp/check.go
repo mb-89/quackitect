@@ -48,6 +48,8 @@ func (one *Checker) Over(path string) []Finding {
 	out := []Finding{}
 	if strings.HasSuffix(where, ".md") {
 		out = append(out, noteFaults(one.tree, schemasIn(one.tree), where, one.tree.Read(where))...)
+		// An open buffer writing a field the verbs own warns, and a file no editor holds draws nothing here. [[spec/design_output/lsp#an-engine-field-warns]]
+		out = append(out, engineFaults(one.tree, where)...)
 	}
 	if part := overLong(where, one.tree.Words); part != "" {
 		out = append(out, fault("NameHoldsTheWords", where, 1,

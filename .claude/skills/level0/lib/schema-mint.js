@@ -86,15 +86,14 @@ export function reRouted(text, schema, route, hash) {
   if (hash) front.process_hash = hash;
 
   const level = schema?.body?.headingLevel ?? 1;
-  const held = new Map(
-    note.sections.map((one) => [`${one.level} ${one.header}`, one.own]),
-  );
+  const wanted = chaptersWanted(schema?.body?.sections ?? [], front, level);
+  const owns = heldOwns(note.sections, wanted, level);
   const rows = ["---", ...frontRowsHeld(front, schema), "---", ""];
 
-  for (const one of chaptersWanted(schema?.body?.sections ?? [], front, level)) {
+  for (const [i, one] of wanted.entries()) {
     const deep = one.level ?? level;
     rows.push(`${"#".repeat(deep)} ${one.header}`, "");
-    const own = trimmed(held.get(`${deep} ${one.header}`));
+    const own = trimmed(owns[i]);
     if (own.length) {
       rows.push(...own, "");
       continue;
@@ -103,6 +102,45 @@ export function reRouted(text, schema, route, hash) {
     if (one.form) rows.push(`<!-- the form is ${one.form} -->`, "");
   }
   return `${rows.join("\n").trimEnd()}\n`;
+}
+
+// Two leaves share a field name at one depth, so a chapter keys by its chain of headings, and a moved one falls back to its depth and header where it stands alone. [[spec/design_output/schema#the-render-follows-the-tree]]
+function heldOwns(sections, wanted, level) {
+  const held = sections.filter((one) => one.level >= level);
+  const heldKeys = chainKeys(held);
+  const byChain = new Map(heldKeys.map((key, i) => [key, i]));
+  const byName = new Map();
+  for (const one of held) {
+    const key = `${one.level} ${one.header}`;
+    byName.set(key, byName.has(key) ? -1 : held.indexOf(one));
+  }
+  const taken = new Set();
+  const out = chainKeys(wanted, level).map((key) => {
+    const at = byChain.get(key);
+    if (at === undefined) return undefined;
+    taken.add(at);
+    return at;
+  });
+  return out.map((at, i) => {
+    if (at === undefined) {
+      const one = wanted[i];
+      const alone = byName.get(`${one.level ?? level} ${one.header}`);
+      if (alone === undefined || alone < 0 || taken.has(alone)) return [];
+      taken.add(alone);
+      return held[alone].own;
+    }
+    return held[at].own;
+  });
+}
+
+function chainKeys(list, level = 1) {
+  const chain = [];
+  return list.map((one) => {
+    const deep = one.level ?? level;
+    while (chain.length && chain[chain.length - 1].deep >= deep) chain.pop();
+    chain.push({ deep, header: one.header });
+    return chain.map((it) => `${it.deep} ${it.header}`).join("\n");
+  });
 }
 
 // [[spec/design_output/schema#the-render-follows-the-tree]]

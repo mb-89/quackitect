@@ -50,6 +50,14 @@ export function splitVerb(it, argv) {
     );
     return 2;
   }
+  // A second cut into one target writes over the first, and both ranges leave the source. [[spec/design_output/level0#a-verb-cuts-the-file]]
+  const twice = repeated(read.cuts.map((one) => one.path));
+  if (twice) {
+    console.error(
+      `${twice} takes two cuts, and the second writes over the first. Name one --to a target.`,
+    );
+    return 2;
+  }
 
   const cut = splitText(it.disk.read(at), read.cuts);
   if (cut.why) {
@@ -120,6 +128,16 @@ export function sourceOf(argv) {
       continue;
     }
     if (!said[at].startsWith("--")) return said[at];
+  }
+  return "";
+}
+
+function repeated(paths) {
+  const seen = new Set();
+  for (const one of paths) {
+    const key = String(one).replaceAll("\\", "/").replace(/^\.\//, "");
+    if (seen.has(key)) return one;
+    seen.add(key);
   }
   return "";
 }

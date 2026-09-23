@@ -283,19 +283,26 @@ function filesOf(it, sha) {
 }
 
 // [[spec/design_output/pull#the-test-verb]]
+// A deleted file runs no test, and an untracked folder names each file under it. [[spec/design_output/pull#the-test-verb]]
 function treeFiles(it) {
   const out = [];
-  for (const row of it.git.run(["status", "--porcelain"], true).out.split("\n")) {
-    if (row.trim()) out.push(changedIn(row));
+  const rows = it.git.run(["status", "--porcelain", "-uall"], true).out.split("\n");
+  for (const row of rows) {
+    if (!row.trim() || deletedIn(row)) continue;
+    out.push(changedIn(row));
   }
   return out;
+}
+
+function deletedIn(row) {
+  return (/^\s*(\S{1,2})\s/.exec(String(row))?.[1] ?? "").includes("D");
 }
 
 export function changedFiles(it, since) {
   const out = new Set();
   if (since) {
     for (const path of it.git
-      .run(["diff", "--name-only", `${since}..HEAD`], true)
+      .run(["diff", "--name-only", "--diff-filter=d", `${since}..HEAD`], true)
       .out.split("\n")) {
       if (path.trim()) out.add(path.trim());
     }

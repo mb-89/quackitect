@@ -10,6 +10,7 @@ import {
   mergedWarnings,
   refusedWarnings,
   rowOf,
+  ruledWarnings,
   standsPast,
   takesFile,
   WARNING,
@@ -106,6 +107,18 @@ test("the prompt the hand reads names one file and the verbs over it", () => {
   assert.match(said, /spec\/guidance\/voice\.md/);
   assert.match(said, /RUNME\.sh lint/);
   assert.match(said, /RUNME\.sh fix/);
+  assert.match(said, /FileCeiling, cut the file first/);
+  assert.match(said, /RUNME\.sh split spec\/guidance\/voice\.md --to <path> --lines/);
+});
+
+// [[spec/design_output/level0#the-ceiling-feeds-the-list]]
+test("a refused file's row stands in place of its rule's row, and the file's other rows stay", () => {
+  const list = [found("a.md", "warning"), found("a.md", "warning", "FileCeiling")];
+  const ruled = ruledWarnings(list, "a.md", [found("a.md", "error", "FileCeiling")]);
+  assert.deepEqual(
+    ruled.map((one) => `${one.rule} ${one.severity} ${one.source ?? ""}`),
+    ["Hedge warning ", "FileCeiling warning door"],
+  );
 });
 
 // A warning outside the files a push carries holds no push. [[spec/tickets/one-list-holds-the-warnings]]

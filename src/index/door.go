@@ -6,6 +6,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/fs"
 	"net"
@@ -68,6 +69,8 @@ type door struct {
 	heard   sync.Mutex
 	touched map[string]bool
 	retrack bool
+	// Git's list as the last sweep or retrack read it, so a change reads it and spawns no git. [[spec/design_output/index#a-change-moves-its-rows]]
+	tracked func(rel string) bool
 
 	// The count of sweeps so far, and the channel a sweep closes to wake every waiting changes call. [[spec/design_output/index#the-index-fires-on-change]]
 	tick     atomic.Int64
@@ -132,11 +135,12 @@ func Serve(root, at string) (func(), net.Listener, error) {
 		return nil, nil, err
 	}
 	// The door comes up on a sweep against the rows it finds, so a restart rewrites what moved while it stood down. [[spec/design_output/index#a-change-moves-its-rows]]
-	if _, _, err := Sweep(db, root); err != nil {
+	tracked := trackedIn(root)
+	if _, _, err := sweep(db, root, tracked); err != nil {
 		return nil, nil, err
 	}
 
-	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}}
+	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
 	listen, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -182,9 +186,9 @@ func (one *door) stands(listen net.Listener) error {
 	return os.WriteFile(standingPath(one.root), append(said, '\n'), 0o644)
 }
 
-// A path the watch names. Git's own index turns the tracked flags, and every other path under .git moves no row. [[spec/design_output/index#a-change-moves-its-rows]]
+// A path the watch names. Git's own index turns the tracked flags, and every other path the walk stands off moves no row. [[spec/design_output/index#a-change-moves-its-rows]]
 func (one *door) Touched(rel string) {
-	if strings.HasPrefix(rel, ".git/") && rel != gitIndex {
+	if rel != gitIndex && outside(rel) {
 		return
 	}
 	one.heard.Lock()
@@ -219,15 +223,22 @@ func (one *door) settles() {
 	paths, retrack := named(one.touched), one.retrack
 	one.touched, one.retrack = map[string]bool{}, false
 	one.heard.Unlock()
+	if retrack {
+		one.tracked = trackedIn(one.root)
+	}
 	moved := 0
 	if len(paths) > 0 {
-		if rows, err := Touches(one.db, one.root, paths); err == nil {
+		if rows, err := touches(one.db, one.root, paths, one.tracked); err == nil {
 			moved += rows
+		} else {
+			one.keeps(paths, false, err)
 		}
 	}
 	if retrack {
-		if rows, err := Retracks(one.db, one.root); err == nil {
+		if rows, err := retracks(one.db, one.tracked); err == nil {
 			moved += rows
+		} else {
+			one.keeps(nil, true, err)
 		}
 	}
 	if moved > 0 {
@@ -235,11 +246,29 @@ func (one *door) settles() {
 	}
 }
 
+// A settle that fails hands back what it heard, so the next question settles it again and the clock waits for nothing. [[spec/design_output/index#a-change-moves-its-rows]]
+func (one *door) keeps(paths []string, retrack bool, err error) {
+	fmt.Fprintln(stderr, "the index did not settle, and tries again on the next question:", err)
+	one.heard.Lock()
+	for _, path := range paths {
+		one.touched[path] = true
+	}
+	one.retrack = one.retrack || retrack
+	one.heard.Unlock()
+	one.pending.Store(true)
+}
+
+// A sweep reads git's list again, and the door holds what it reads. [[spec/design_output/index#a-change-moves-its-rows]]
+func (one *door) walks() (int, int, error) {
+	one.tracked = trackedIn(one.root)
+	return sweep(one.db, one.root, one.tracked)
+}
+
 // The sweep on a clock, which catches a change the watch misses and clears nothing. [[spec/design_output/index#a-change-moves-its-rows]]
 func (one *door) guards() {
 	for range time.Tick(sweepEvery) {
 		one.guard.Lock()
-		if _, moved, err := Sweep(one.db, one.root); err == nil && moved > 0 {
+		if _, moved, err := one.walks(); err == nil && moved > 0 {
 			one.moved()
 		}
 		one.guard.Unlock()
@@ -356,7 +385,7 @@ func (one *door) answers(said call) (any, error) {
 		return Same(one.db, asked.Path)
 	case "reindex":
 		// The verb sweeps now, so a reader asking it reads the disk as it stands, and nothing clears. [[spec/design_output/index#a-change-moves-its-rows]]
-		count, moved, err := Sweep(one.db, one.root)
+		count, moved, err := one.walks()
 		if err == nil && moved > 0 {
 			one.moved()
 		}

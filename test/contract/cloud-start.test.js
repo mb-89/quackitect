@@ -14,8 +14,11 @@ const files = disk();
 const MARKER = "started.txt";
 const LOCAL = { CLAUDE_CODE_REMOTE: "", SE_CLOUD: "" };
 const CLOUD = { CLAUDE_CODE_REMOTE: "true", SE_CLOUD: "" };
+// The stub answers the self-test the road runs first, and starts on the plain call. [[spec/design_output/level0#new-code-proves-it-loads]]
 const SERVER =
-  "require('fs').writeFileSync(process.argv[2] + '/started.txt', 'up')\n";
+  "if (process.argv.includes('--selftest')) process.exit(0);\nrequire('fs').writeFileSync(process.argv[2] + '/started.txt', 'up')\n";
+const BROKEN =
+  "if (process.argv.includes('--selftest')) { console.error('ReferenceError: dropsMoved is not defined'); process.exit(1); }\nrequire('fs').writeFileSync(process.argv[2] + '/started.txt', 'up')\n";
 // An install standing in for the real one: it brings the folder the road looks for, in the method root the road runs it from. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 const INSTALL = "mkdir -p node_modules\n";
 const SKIP = "index se-lsp";
@@ -130,6 +133,23 @@ test("a cloud box starts the server, and the call comes back before it stands", 
       true,
       "the log folder stands for the server to write into",
     );
+  } finally {
+    gone(where);
+  }
+});
+
+// A tree whose bridge fails its self-test starts no server, and the road says why once. [[spec/design_output/level0#new-code-proves-it-loads]]
+test("a cloud box whose bridge fails its self-test starts nothing, and names the fault", {
+  skip: nodeHere() ? false : "this box carries no node on the PATH",
+}, () => {
+  const where = tree(true);
+  files.write(join(where, "src", "bridge", "server.js"), BROKEN);
+  try {
+    const said = runs(where, CLOUD);
+    assert.equal(said.exitCode, 8);
+    assert.equal(reasonOf(said.exitCode)[0], "warn");
+    assert.match(said.stderr, /dropsMoved is not defined/);
+    assert.equal(files.exists(join(where, MARKER)), false, "no server stands");
   } finally {
     gone(where);
   }

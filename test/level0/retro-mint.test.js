@@ -11,6 +11,10 @@ import { askOf, withAsk } from "../../src/engine/retro/mint.js";
 import { retro } from "../../src/scripts/retro.js";
 
 const ROOT = "/tree";
+// The command line stands under the method root, apart from the work root, as in a stub. [[spec/design_output/vehicle#the-work-root-inherits]]
+const METHOD = "/method";
+const NODE = "/bin/node";
+const CLI = `${NODE} ${join(METHOD, "src", "scripts", "cli.js")}`;
 const RETRO = "retro-a1b2c3";
 const at = (path) => join(ROOT, ".se", ".retro", RETRO, ...path.split("/"));
 const TICKET = join(ROOT, "spec", "tickets", "the-land-verb-lands.md");
@@ -46,19 +50,18 @@ function doors(classes) {
     [at("classes.json")]: JSON.stringify({ classes, dispositions: {} }),
   });
   const proc = fakeProc({
-    "node src/scripts/cli.js mint ticket spec/tickets/the-land-verb-lands.md --process=standard":
+    [`${CLI} mint ticket spec/tickets/the-land-verb-lands.md --process=standard`]:
       () => {
         disk.write(TICKET, DRAFT);
         return { exitCode: 0 };
       },
-    "node src/scripts/cli.js ticket open the-land-verb-lands": { exitCode: 0 },
-    "node src/scripts/cli.js mint ticket spec/tickets/a-second-ticket.md --process=standard":
-      {
-        exitCode: 2,
-        stderr: "the ask names a word outside the vocabulary",
-      },
+    [`${CLI} ticket open the-land-verb-lands`]: { exitCode: 0 },
+    [`${CLI} mint ticket spec/tickets/a-second-ticket.md --process=standard`]: {
+      exitCode: 2,
+      stderr: "the ask names a word outside the vocabulary",
+    },
   });
-  return { disk, proc, join, root: ROOT };
+  return { disk, proc, join, root: ROOT, method: METHOD, node: NODE };
 }
 
 function heard(run) {
@@ -96,6 +99,12 @@ test("an open class mints one ticket with its ask, and a fixed class mints none"
   assert.deepEqual(JSON.parse(it.disk.read(at("classes.json"))).classes[0].tickets, [
     "the-land-verb-lands",
   ]);
+  assert.ok(
+    it.proc.ran.every(
+      (one) => one.init.env.SE_WORK_ROOT === ROOT && one.init.cwd === ROOT,
+    ),
+    "the child works on the work root",
+  );
 });
 
 // [[spec/guidance/retro/verify]]

@@ -136,6 +136,13 @@ test("a findings file reads a section per row, and a missing section reads null"
   assert.equal(read.more, null);
 });
 
+// A file a Windows editor writes ends each line on a carriage return too. [[spec/guidance/retro/read]]
+test("a findings file with carriage returns reads the same items", () => {
+  const read = findingsOf("## stop\r\n\r\n- the panel waits for a file\r\n\r\n## keep\r\n");
+  assert.deepEqual(read.stop, ["the panel waits for a file"]);
+  assert.deepEqual(read.keep, []);
+});
+
 test("the matrix refuses a chapter without findings, and draws references with the details under them", () => {
   const files = {
     ...INPUT,

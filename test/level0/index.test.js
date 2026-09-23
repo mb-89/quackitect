@@ -20,6 +20,13 @@ test("a search becomes a question the door answers", () => {
   assert.equal(ask.params.after, 2);
 });
 
+// [[spec/design_output/index#the-door-answers-the-tools]]
+test("a search naming no limit stops where Grep stops, and a zero lifts it", () => {
+  assert.equal(asked({ tool: "Grep", pattern: "one" }).params.limit, 250);
+  assert.equal(asked({ tool: "Grep", pattern: "one", head_limit: 0 }).params.limit, 0);
+  assert.equal(asked({ tool: "Grep", pattern: "one", head_limit: 10 }).params.limit, 10);
+});
+
 test("a shape the rows hold no answer for goes back to the tool", () => {
   assert.equal(asked({ tool: "Grep", pattern: "" }), null);
   assert.equal(asked({ tool: "Read", file_path: "one.js" }), null);

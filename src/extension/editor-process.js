@@ -17,14 +17,39 @@ const WIRE_WAIT = 500;
 const KILL_AFTER = 300;
 const LAUNCH = "the server";
 const PAUSES = "decide";
+// The file every server start writes a line to, a respawn and a start by hand alike. [[spec/design_output/extension#the-light-follows-the-server]]
+const SERVE_LOG = ".se/.log/serve.log";
+// The span a respawn takes to stand on the port, before the light asks again. [[spec/design_output/extension#the-light-follows-the-server]]
+const RESPAWN_GRACE = 1500;
 
 // [[spec/design_output/extension#the-hook-button]]
 function processDoor(context, folder) {
   const processes = new Map();
   const watchers = [];
+  const followed = new Set();
   const changed = () => {
     for (const one of watchers) Promise.resolve(one()).catch(() => {});
   };
+  // A server standing takes the light, and an adopted one gone gives it back, whoever starts or stops it. [[spec/design_output/extension#the-light-follows-the-server]]
+  const rechecks = async () => {
+    for (const key of followed) {
+      const held = processes.get(key);
+      if (held?.session !== undefined || held?.child) continue;
+      const port = held?.port ?? (await settled(context, folder.uri.fsPath))?.port;
+      if (!port) continue;
+      const alive = await healthOverTheWire(port).catch(() => false);
+      if (alive && !held) processes.set(key, { how: "on", adopted: true, port });
+      else if (!alive && held?.adopted) processes.delete(key);
+      else continue;
+      changed();
+    }
+  };
+  const log = vscode.workspace.createFileSystemWatcher(
+    new vscode.RelativePattern(folder, SERVE_LOG),
+  );
+  log.onDidChange(rechecks);
+  log.onDidCreate(rechecks);
+  context.subscriptions.push(log);
   context.subscriptions.push(
     vscode.debug.onDidTerminateDebugSession((session) => {
       for (const [key, held] of processes) {
@@ -42,6 +67,7 @@ function processDoor(context, folder) {
     onProcess: (said) => watchers.push(said),
 
     async adoptsProcess(key, port) {
+      followed.add(key);
       if (processes.has(key)) return true;
       const at = port ?? (await settled(context, folder.uri.fsPath))?.port;
       if (!at) return false;
@@ -54,6 +80,7 @@ function processDoor(context, folder) {
 
     async startProcess(key, how) {
       if (processes.has(key)) return;
+      followed.add(key);
       const vehicle = await settled(context, folder.uri.fsPath);
       if (!vehicle) return;
       if (how !== "debug" && (await this.adoptsProcess(key, vehicle.port))) return;
@@ -94,6 +121,8 @@ function processDoor(context, folder) {
         if (processes.get(key)?.child === child) {
           processes.delete(key);
           changed();
+          // A restart ends this child and stands a new server on the port, so the light asks again. [[spec/design_output/extension#the-light-follows-the-server]]
+          setTimeout(() => rechecks().catch(() => {}), RESPAWN_GRACE);
         }
       });
       context.subscriptions.push({ dispose: () => child.kill() });

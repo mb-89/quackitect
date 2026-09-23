@@ -130,7 +130,7 @@ test("the tool's input reads into the same words a person types", () => {
     "--pass",
   ]);
   assert.deepEqual(pullArgvOf(["pull", "--tool", "not json"]), ["pull"]);
-  assert.equal(PULL_CALL, "mcp__level1__pull");
+  assert.equal(PULL_CALL, "mcp__level0__pull");
   assert.equal(pullSpec().name, "pull");
   assert.deepEqual(pullSpec().inputSchema.properties.verdict.enum, [
     "pass",
@@ -210,4 +210,27 @@ test("an event naming no session writes nothing, and says the hand stands at the
   await held["session.start"](box.$, {}, async (said) => said);
   assert.equal(box.wrote.size, 0, "the fake holds no write");
   assert.match(box.lines.join("\n"), /the hand stands at the box/);
+});
+
+// The hook matches the name the plugin registers, and runs the script under the method root. [[spec/design_output/pull#the-checks]]
+test("the pull hook matches the level zero call, and runs the script the method root holds", async () => {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const calls = [];
+  register((event, ...rest) => {
+    if (event === "tool.call" && rest.length > 1) calls.push(rest);
+  }, { method: "/vehicle/" });
+  const [filter, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
+  assert.equal(filter?.tool, "mcp__level0__pull");
+
+  const ran = [];
+  const $ = {
+    process: {
+      run: async (argv) => {
+        ran.push(argv);
+        return { stdout: "wait", stderr: "", exitCode: 0 };
+      },
+    },
+  };
+  assert.deepEqual(await handler($, {}, async () => null), { result: "wait" });
+  assert.deepEqual(ran[0].slice(0, 2), ["node", "/vehicle/src/scripts/cli.js"]);
 });

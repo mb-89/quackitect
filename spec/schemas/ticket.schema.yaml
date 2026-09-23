@@ -50,7 +50,7 @@ frontmatter:
 
     todo:
       type: [boolean, string]
-      description: a place in the queue a hand forces, as true for the front or the name of the row this one stands before, and a note lacking it reads false
+      description: a place in the queue a hand forces, as true for the front or the name of the row this one stands before, and a note lacking it reads false. A hand parking a private note tags it here, so the pull hands it out first on this box
 
     step:
       type: string
@@ -261,10 +261,6 @@ frontmatter:
     successors:
       type: [array, string]
       description: the tickets this one became, on reason became
-
-    todo:
-      type: [boolean, string]
-      description: the tag a hand puts on a note it parks, which the pull hands out first on this box, or the name of the row it stands before
 
 body:
   headingLevel: 1

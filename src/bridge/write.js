@@ -13,6 +13,7 @@ import {
 } from "../../.claude/skills/level0/lib/private.js";
 import { refusal } from "../../.claude/skills/level0/lib/refuse.js";
 import { REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
+import { PROSE } from "../../.claude/skills/level0/lib/vale.js";
 import {
   checkNote,
   END,
@@ -43,6 +44,7 @@ import { marksStale, ownerDoor } from "./projection.js";
 import { readsProse } from "./prose.js";
 
 const PASS = { pass: true };
+const UNRAN = "VoiceRulesRan";
 
 // [[spec/design_output/schema#the-door-refuses-a-departure]]
 export function schemasHere(disk, root) {
@@ -163,10 +165,39 @@ function schemaDoor(e, writing, where, box) {
 
 // [[spec/design_output/level0#a-note-reads-clean-first]]
 export async function proseFaults(text, where, box) {
-  if (CODE.test(where) || !box.vale.stands()) return [];
+  if (CODE.test(where)) return [];
+  if (!box.vale.stands()) return missesVale(box);
   const said = await box.vale.lint(text, where);
-  if (!said.ran) return [];
+  if (!said.ran) return unran(where, String(said.why ?? ""), box);
   return readsProse(box, text, said.found);
+}
+
+// A box with no Vale writes on, and the log says so once. [[spec/design_output/level0#a-broken-rule-says-so]]
+function missesVale(box) {
+  if (box.valeMissed) return [];
+  box.valeMissed = true;
+  box.log.say("warn", "vale", "no vale stands here, so the voice rules read no write");
+  return [];
+}
+
+// A lint that ran nowhere refuses a prose write and names the fault, so a broken rule turns no rule off. A write outside prose lands, so the hand mending the rule file writes it. [[spec/design_output/level0#a-broken-rule-says-so]]
+function unran(where, why, box) {
+  box.log.say("warn", "vale", `the voice rules did not run over ${where}`, {
+    file: where,
+    detail: why,
+  });
+  if (!PROSE.test(where)) return [];
+  return [
+    {
+      rule: UNRAN,
+      line: 1,
+      column: 1,
+      said: "",
+      message: `The voice rules did not run over this file: ${why || "vale answered nothing"}. Mend the rule or the setup it names, and write again.`,
+      severity: "error",
+      fixable: false,
+    },
+  ];
 }
 
 // A rule reading warning is a break of form, and the write lands with it standing for the refactoring hand. [[spec/rationales/voice#11-form-and-substance]]

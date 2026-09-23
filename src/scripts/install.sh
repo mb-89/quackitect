@@ -295,6 +295,30 @@ get_lsp() {
   lsp_here
 }
 
+# THE MODULES LAND AT THE INSTALL, SO THE FIRST CHECK FETCHES NOTHING. A stamp
+# holds the checksum of every go.sum, so a changed dependency fetches again and
+# a still tree asks no network. A box with no Go wants no modules.
+# [[spec/tickets/the-install-fetches-go-modules]]
+go_stamp="$run/go-modules"
+
+go_sums() {
+  (cd "$root" && git ls-files -z '*go.sum' | xargs -0 cat | cksum) 2>/dev/null
+}
+
+modules_here() {
+  have go || return 0
+  [ -f "$go_stamp" ] && [ "$(cat "$go_stamp")" = "$(go_sums)" ]
+}
+
+get_modules() {
+  say "  fetching the modules every Go module names"
+  for mod in $(cd "$root" && git ls-files '*go.mod'); do
+    (cd "$root/$(dirname "$mod")" && go mod download) || return 1
+  done
+  mkdir -p "$run"
+  go_sums > "$go_stamp"
+}
+
 # A binary older than its own source walks by rules the tree no longer carries,
 # so a source newer than the binary asks for the build again.
 index_here() {
@@ -420,7 +444,7 @@ set_hooks() {
 
 # A want, rather than a need: the tree still lints and tests without it.
 wanted() {
-  [ "$1" = "vale-ls" ] || [ "$1" = "go" ] || [ "$1" = "git-hooks" ] ||
+  [ "$1" = "vale-ls" ] || [ "$1" = "go" ] || [ "$1" = "go-modules" ] || [ "$1" = "git-hooks" ] ||
     [ "$1" = "editor-link" ] || [ "$1" = "editor-extensions" ] ||
     [ "$1" = "index" ] || [ "$1" = "se-lsp" ] || [ "$1" = "editor-client" ]
 }
@@ -429,6 +453,7 @@ missed() {
   case $1 in
     vale-ls) say "  vale-ls stays missing, so the editor manages its own copy." >&2 ;;
     go)      say "  go stays missing, so ./RUNME.sh tui prints plain rows." >&2 ;;
+    go-modules) say "  the Go modules stay unfetched, so the first check downloads them." >&2 ;;
     index) say "  the index stays unbuilt, so find and links read the files." >&2 ;;
     se-lsp) say "  the language server stays unbuilt, so lint reads the node rules." >&2 ;;
     editor-client) say "  no language client here, so the editor draws no server line." >&2 ;;
@@ -446,6 +471,7 @@ here() {
     biome)   [ -x "$bin/biome${exe}" ] ;;
     vale-ls) [ -x "$bin/vale-ls${exe}" ] ;;
     go)      have go ;;
+    go-modules) modules_here ;;
     index) index_here ;;
     se-lsp) lsp_here || ! have go ;;
     editor-client) [ -d "$client_folder" ] ;;
@@ -463,6 +489,7 @@ why() {
     biome) say "biome: Biome formats and lints the JavaScript in this tree" ;;
     vale-ls) say "vale-ls: the Vale language server, so an editor draws the same rules" ;;
     go) say "go: it builds the viewer ./RUNME.sh tui opens the door log in, and the index" ;;
+    go-modules) say "go-modules: the modules every Go module names, so the first check fetches nothing" ;;
     index) say "index: the warm model of this tree, which find and links ask" ;;
     se-lsp) say "se-lsp: this tree's own language server, which draws the note shape and the names" ;;
     editor-client) say "editor-client: the language client the extension starts the server through" ;;
@@ -480,6 +507,7 @@ get() {
     biome) get_biome ;;
     vale-ls) get_vale_ls ;;
     go) get_go ;;
+    go-modules) get_modules ;;
     index) get_index ;;
     se-lsp) get_lsp ;;
     editor-client) get_client ;;
@@ -492,7 +520,7 @@ get() {
 # SE_INSTALL_SKIP names the wants a caller leaves out, so a test vehicle builds
 # no index and links no editor while it proves the vehicle stands alone.
 missing=""
-for one in node modules vale biome vale-ls go index se-lsp editor-client editor-link \
+for one in node modules vale biome vale-ls go go-modules index se-lsp editor-client editor-link \
   editor-extensions git-hooks; do
   case " ${SE_INSTALL_SKIP:-} " in *" $one "*) continue ;; esac
   here "$one" || missing="$missing $one"
@@ -522,7 +550,10 @@ if [ -n "$missing" ] || [ ! -f "$run/tools.json" ]; then
     say "  the survey wrote no tools.json under $run, so every caller guesses again." >&2
 fi
 
-node "$root/src/scripts/copilot.js" setup auto
+# A setup refusing a file the owner keeps says so, and the install goes on,
+# because every verb runs through here. [[spec/design_output/copilot#setup-and-discovery]]
+node "$root/src/scripts/copilot.js" setup auto ||
+  say "  the copilot setup stopped, so the files it writes stand as they stood." >&2
 
 # The brand this folder carries reaches the marketplace, the plugin's author
 # and the extension's icon. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]

@@ -196,6 +196,24 @@ test("the vehicle carries the method and nothing private", () => {
   assert.equal(travels("src/parts/one.js"), true);
 });
 
+// One folder copy carries the method, so a nested file lands byte-exact and the count names every file copied. [[spec/tickets/disk-door-copies-a-folder]]
+test("a produced vehicle copies a nested file byte-exact, leaves the private folders behind, and counts what it copied", () => {
+  const bytes = "line one\r\nline two\n\ttabbed ünïcode\n";
+  const files = tree({ "/tools/src/parts/deep/one.js": bytes });
+  files.runnable("/tools/RUNME.sh");
+
+  const put = produce(files, "/tools", "/vehicle");
+
+  assert.equal(files.read("/vehicle/src/parts/deep/one.js"), bytes);
+  assert.equal(files.runs.has("/vehicle/RUNME.sh"), true);
+  const copied = [...files.files.keys()].filter((one) => one.startsWith("/vehicle/"));
+  assert.equal(
+    copied.some((one) => one.includes("/.git/") || one.includes("/.se/")),
+    false,
+  );
+  assert.equal(put.count, copied.length);
+});
+
 test("a vehicle lands in a new place, and never over its own method", () => {
   const files = tree();
   files.makeDir("/taken");

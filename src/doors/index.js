@@ -10,9 +10,12 @@ const REWARM = 60000;
 const ASKING = 20000;
 const WARMING = 60000;
 const NO_BINARY = 127;
+// What se-index prints where the door stands and answers the question with its own fault: a pattern Go reads as no regexp, a search with no pattern, a method it holds nowhere. [[spec/design_output/index#a-dead-index-speaks]]
+const QUERY_FAULT = /error parsing regexp|a search takes a pattern|no method called|the call reads as no JSON/i;
 
 export function index(disk, proc, clock, method, work = method) {
   let dead = "";
+  let fault = "";
   let warmedAt = 0;
 
   const at = () => {
@@ -48,9 +51,15 @@ export function index(disk, proc, clock, method, work = method) {
   return {
     stands: () => Boolean(at()),
     dead: () => dead,
+    // The fault of the last question, where the index stood and refused the question alone. [[spec/design_output/index#a-dead-index-speaks]]
+    fault: () => fault,
     ask: (method, params) => {
       const ran = run(["call", method, JSON.stringify(params)], ASKING);
-      return ran.exitCode === 0 ? readsAnswer(ran.stdout) : failed(ran, "call");
+      fault = "";
+      if (ran.exitCode === 0) return readsAnswer(ran.stdout);
+      if (!QUERY_FAULT.test(String(ran.stderr ?? ""))) return failed(ran, "call");
+      fault = String(ran.stderr).trim();
+      return null;
     },
     find: (words) => {
       const ran = run(["find", words], ASKING);

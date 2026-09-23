@@ -4,7 +4,8 @@
 // [[spec/design_output/pull#the-checks]]
 
 export const PULL_TOOL = "pull";
-export const PULL_CALL = `mcp__level1__${PULL_TOOL}`;
+// The plugin registers the tool, so the call carries the prefix every level zero tool carries. [[spec/design_output/pull#the-checks]]
+export const PULL_CALL = `mcp__level0__${PULL_TOOL}`;
 export const FOLLOWS = "follows";
 // The hand's session file, which the hook beside this library writes. folders.js owns the name, and a plugin imports nothing past its own folder, so level one spells it here and the hook imports it. [[spec/design_output/pull#the-hand-and-the-hold]]
 export const SESSION = ".se/.runtime/session.json";

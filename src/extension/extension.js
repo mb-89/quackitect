@@ -4,6 +4,7 @@
 // [[spec/design_output/extension#it-starts-silent]]
 
 const { SCHEMA, sidebarOf } = require("./sidebar.js");
+const { COMMAND, ticketLensOf } = require("./lib/lens.js");
 const { serverAsk } = require("./lib/lsp.js");
 const { toastsOf } = require("./lib/states.js");
 
@@ -31,6 +32,11 @@ async function activate(context, given) {
     for (const one of toastsOf(shown, now)) door.toasts(one, REST);
     shown = now;
   });
+
+  // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
+  const tickets = ticketLensOf(door);
+  door.registers(COMMAND, tickets.took);
+  door.lenses?.(tickets);
 
   // [[spec/design_output/extension#runme-opens-the-panel]]
   if ((await door.read(SHOW)).trim()) {

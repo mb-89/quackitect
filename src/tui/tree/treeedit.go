@@ -18,9 +18,10 @@ import (
 
 const leastEditWidth = 4
 
-// [[spec/design_output/tree-view#the-completion-knows-the-field]]
+// What a field offers, and why it refuses a value, with nothing where it takes it. [[spec/design_output/tree-view#the-completion-knows-the-field]]
 type Schema interface {
 	Takes(key string) []string
+	Weighs(key, said string) string
 }
 
 // [[spec/design_output/tree-view#a-cell-takes-an-edit]]
@@ -116,13 +117,16 @@ func (t *Tree) Fill() []string {
 func (t *Tree) write(where []string, key, said string) []string {
 	var left []string
 	t.wrote = t.wrote[:0]
+	why := t.weighs(key, said)
+	t.refused = ""
 	for _, at := range where {
 		one := t.itemAt(at)
 		if one == nil {
 			continue
 		}
-		if !t.takes(key, said) {
+		if why != "" {
 			left = append(left, one.Name)
+			t.refused = why
 			continue
 		}
 		SetValue(one, key, said)
@@ -143,21 +147,25 @@ func (t Tree) Written() []Item {
 	return out
 }
 
-// [[spec/design_output/tree-view#the-completion-knows-the-field]]
-func (t Tree) takes(key, said string) bool {
+// The reason the last take or fill left rows behind, and nothing where every row took the value. [[spec/design_output/tree-view#a-schema-refuses-a-value]]
+func (t Tree) Refused() string { return t.refused }
+
+// [[spec/design_output/tree-view#a-schema-refuses-a-value]]
+func (t Tree) weighs(key, said string) string {
 	if t.Schema == nil {
-		return true
+		return ""
 	}
-	allowed := t.Schema.Takes(key)
-	if len(allowed) == 0 {
-		return true
+	return t.Schema.Weighs(key, said)
+}
+
+// The first value the completion offers takes the line, so a person writes a named value with one key. [[spec/design_output/tree-view#the-completion-knows-the-field]]
+func (t *Tree) Complete() {
+	if t.edit == nil || len(t.edit.offer) == 0 {
+		return
 	}
-	for _, one := range allowed {
-		if one == said {
-			return true
-		}
-	}
-	return false
+	t.edit.input.SetValue(t.edit.offer[0])
+	t.edit.input.CursorEnd()
+	t.edit.offer = t.offers(t.edit.key, t.edit.input.Value())
 }
 
 // [[spec/design_output/tree-view#the-completion-knows-the-field]]

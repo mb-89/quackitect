@@ -4,6 +4,7 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"os"
 	"os/exec"
@@ -101,6 +102,53 @@ func TestAGoneFolderTakesItsRowsAndItsLinksTurnDead(t *testing.T) {
 	}
 	if counted(t, db, `SELECT count(*) FROM link WHERE from_path = 'notes/pointer.md' AND to_path IS NULL`) != 1 {
 		t.Fatal("a link to a gone note still reaches it")
+	}
+}
+
+func doorOver(t *testing.T, root string, db *sql.DB) *door {
+	t.Helper()
+	return &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}),
+		touched: map[string]bool{}, tracked: func(string) bool { return true }}
+}
+
+// A change reads git's list off the door, so a saved file spawns no git. [[spec/design_output/index#a-change-moves-its-rows]]
+func TestAChangeReadsTheListTheDoorHolds(t *testing.T) {
+	root := tree(t)
+	made := exec.Command("git", "init", "-q")
+	made.Dir = root
+	if said, err := made.CombinedOutput(); err != nil {
+		t.Fatalf("git init: %s", said)
+	}
+	db := opened(t, root)
+	one := doorOver(t, root, db)
+
+	write(t, root, "spec/one.md", "---\nkind: note\nid: one\n---\n\nThe first note moves.\n")
+	one.Touched("spec/one.md")
+	one.settles()
+	if counted(t, db, `SELECT count(*) FROM file WHERE path = 'spec/one.md' AND tracked = 1`) != 1 {
+		t.Fatal("the change read git in place of the list the door holds")
+	}
+}
+
+// A settle that fails keeps what it heard, and says so. [[spec/design_output/index#a-change-moves-its-rows]]
+func TestAFailedSettleKeepsThePathsItHeard(t *testing.T) {
+	root := tree(t)
+	db := opened(t, root)
+	db.Close()
+	one := doorOver(t, root, db)
+	said := &bytes.Buffer{}
+	was := stderr
+	stderr = said
+	defer func() { stderr = was }()
+
+	one.Touched("spec/one.md")
+	one.Touched(gitIndex)
+	one.settles()
+	if !one.touched["spec/one.md"] || !one.retrack || !one.pending.Load() {
+		t.Fatalf("a failed settle drops what it heard: %v, retrack %v", one.touched, one.retrack)
+	}
+	if said.Len() == 0 {
+		t.Fatal("a failed settle says nothing")
 	}
 }
 

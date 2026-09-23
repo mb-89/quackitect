@@ -14,7 +14,7 @@ import {
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
 import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
-import { MS, rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { MS, SESSION, tallied } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
 import {
@@ -148,6 +148,8 @@ export function sawCall(e, box) {
 
 // The list past the number with a file at rest asks the agent for the turn, over the grace. [[spec/design_output/stop#the-grace]]
 function asksForHand(box) {
+  // One ask stands at a time, so a standing grace leaves the list and git unread. [[spec/design_output/stop#the-grace]]
+  if (box.grace) return;
   if (!handWanted(box) || !restingFile(box)) return;
   wants(box, {
     id: KIND,
@@ -180,7 +182,13 @@ function claims(e, box) {
   const rule = stopReasons(rulesOf(box)).find((one) => one.id === reason);
   const falls = READS_TEXT.has(rule.runs)
     ? ""
-    : claimFalls({ box, claimed: reason, off: asks(box, ENABLED) === false, hold: holdHere(box), text: "" });
+    : claimFalls({
+        box,
+        claimed: reason,
+        off: asks(box, ENABLED) === false,
+        hold: holdHere(box),
+        text: "",
+      });
   if (falls) {
     box.log.say("warn", "stop", `the claim of ${reason} falls`, { detail: falls });
     return { result: { result: `The claim falls. ${falls}` } };
@@ -217,11 +225,15 @@ export function onStop(e, box) {
   warnsUnknown(rules, box);
   const decision = decide(rules, {
     claimed,
-    ran: (name) => ranHere(name, { off, hold, box, claimed, text }),
+    ran: (name) =>
+      ranHere(name, { off, hold, box, claimed, text, tasks: e?.background_tasks }),
   });
   const said = toothOf_(box).atTurnEnd(decision, Number(asks(box, MOST) ?? 0));
   // A line naming a reason whose check falls hears which check, and what it sees. [[spec/design_output/stop#a-refusal-names-its-check]]
-  const falls = said.go?.runs === "no-stop-line" ? claimFalls({ off, hold, box, claimed, text }) : "";
+  const falls =
+    said.go?.runs === "no-stop-line"
+      ? claimFalls({ off, hold, box, claimed, text })
+      : "";
   const why = said.ends ? endsWhy(said) : falls || (said.go?.says ?? "");
   const prompts = said.ends ? "" : asksForStop(rules, why);
   // The runaway writes at warn, so a reader of the log finds the turn the cap ended. [[spec/design_output/stop#three-in-a-row]]
@@ -297,18 +309,27 @@ export function onRefactorAnswered(e, box) {
   return { result: { result: "the refactoring hand answered" } };
 }
 
-// The git door answers a file's last write, in the seconds the window reads. [[spec/tickets/the-spawn-reaches-its-guidance]]
+// The git door answers each file's last write, in the seconds the window reads. One log over the whole list answers every file, newest first, so the first stamp above a name is its last write. [[spec/tickets/the-spawn-reaches-its-guidance]]
 function wroteIn(box, names) {
-  const out = {};
-  for (const name of names ?? []) {
-    try {
-      const said = box.proc.run(["git", "log", "-1", "--format=%ct", "--", name], {
-        cwd: box.work,
-      });
-      out[name] = Number(String(said.stdout ?? "").trim()) || 0;
-    } catch {
-      out[name] = 0;
-    }
+  const wanted = new Set(names ?? []);
+  const out = Object.fromEntries([...wanted].map((name) => [name, 0]));
+  if (!wanted.size) return out;
+  let said = "";
+  try {
+    said = String(
+      box.proc.run(
+        ["git", "log", "--format=%ct", "--name-only", "--relative", "--", ...wanted],
+        { cwd: box.work },
+      ).stdout ?? "",
+    );
+  } catch {
+    return out;
+  }
+  let at = 0;
+  for (const line of said.split("\n")) {
+    const row = line.trim();
+    if (/^\d+$/.test(row)) at = Number(row);
+    else if (wanted.has(row) && !out[row]) out[row] = at;
   }
   return out;
 }
@@ -376,6 +397,9 @@ const CHECKS = {
   "group-in-hand": (held) => groupInHand(held.box),
   "ticket-in-hand": (held) => holdStands(held.box) || privateStands(held.box),
   "queue-waits": (held) => queueWaits(held.box),
+  // [[spec/design_output/stop#a-helper-still-runs]]
+  "helpers-running": (held) =>
+    asks(held.box, BINDING) !== QUEUE && helpersRun(held.tasks),
   // A claim a fact denies reads as no stop line, so the turn holds and the fact re-prompts. [[spec/design_output/stop#a-talk-follows-a-report]]
   "no-stop-line": (held) => !claimStands(held),
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
@@ -389,6 +413,13 @@ const CHECKS = {
   // A claim of done stands on an empty plan: no todo open, and nothing in hand. [[spec/design_output/stop#the-plan]]
   "the-plan-is-empty": (held) => planEmpty(held.box),
 };
+
+// The harness names every task it runs in the background at the turn's end, so a running helper reads off that list. [[spec/design_output/stop#a-helper-still-runs]]
+export function helpersRun(tasks) {
+  return (Array.isArray(tasks) ? tasks : []).some(
+    (one) => one?.type === "subagent" && one?.status === "running",
+  );
+}
 
 // [[spec/design_output/stop#the-plan]]
 export function planEmpty(box) {
@@ -417,7 +448,8 @@ function claimStands(held) {
 export function claimFalls(held) {
   if (!held.claimed) return "";
   const rule = stopReasons(rulesOf(held.box)).find((one) => one.id === held.claimed);
-  if (!rule) return `The line claims ${held.claimed}, which names no reason this tree holds.`;
+  if (!rule)
+    return `The line claims ${held.claimed}, which names no reason this tree holds.`;
   if (!rule.runs || ranHere(rule.runs, held)) return "";
   const why = FALLS[rule.runs]?.(held.box);
   return `The line claims ${rule.id}, and its check ${rule.runs} answers false${why ? `: ${why}` : "."}`;
@@ -427,9 +459,16 @@ export function claimFalls(held) {
 const FALLS = {
   "the-plan-is-empty": (box) => {
     const plan = plansHere(box);
-    const held = [...new Set([...plan.todos.map((one) => one.title), plan.working].filter(Boolean))];
+    const held = [
+      ...new Set([...plan.todos.map((one) => one.title), plan.working].filter(Boolean)),
+    ];
     return `the plan still holds ${held.map((one) => `"${one}"`).join(", ")}. Name each under done in mcp__level0__plan, then claim again.`;
   },
+  // [[spec/design_output/stop#a-helper-still-runs]]
+  "helpers-running": (box) =>
+    asks(box, BINDING) === QUEUE
+      ? "the queue binding holds the turn while a helper runs, so take the next leaf or wait inside a call."
+      : "the harness names no helper running at this turn's end, so its answer wakes nothing.",
 };
 
 // The checks reading the answer's text, which the stop call runs before any answer stands. [[spec/design_output/stop#a-refusal-names-its-check]]
@@ -489,14 +528,17 @@ function chatIsNew(box) {
   return promptsIn(box) <= 1;
 }
 
+// The count reads the rows past the offset the box last reached. [[spec/design_output/log#a-reader-reads-new-rows]]
 function promptsIn(box) {
-  try {
-    return rowsIn(String(box.disk.read(join(box.work, SESSION)))).filter(
-      (one) => one.kind === "prompt",
-    ).length;
-  } catch {
-    return 0;
-  }
+  box.tallies = box.tallies ?? {};
+  box.tallies.prompts = tallied(
+    box.disk,
+    join(box.work, SESSION),
+    box.tallies.prompts,
+    (count, one) => (one?.kind === "prompt" ? count + 1 : count),
+    () => 0,
+  );
+  return box.tallies.prompts.value;
 }
 
 // A desk bound to the queue on trunk has work while a free ticket stands, so a stop on completion waits. [[spec/design_output/stop#the-mechanical-checks]]

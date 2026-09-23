@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { guidanceHere, layerHere } from "../../src/bridge/guidance.js";
+import { guidanceHere, layerHere, onAgentSpawn } from "../../src/bridge/guidance.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { heldReadsIn } from "../../src/scripts/guidance-hand.js";
 
@@ -138,6 +138,20 @@ test("a spawn names its kind, and the layer of that kind reaches that hand alone
   assert.equal(layerHere(guidance, ""), "a helper");
   assert.equal(layerHere(guidance, "nobody"), "a helper");
   assert.equal(layerHere({ standing: "the session" }, "refactor"), "the session");
+});
+
+// A restart hands the box over bare, and the spawn still hands the layer. [[spec/design_output/level0#a-restart-fills-the-box]]
+test("a spawn on a box a restart hands over bare reads the guidance, and hands the layer", () => {
+  const box = {
+    disk: boxed(disks()),
+    method: METHOD,
+    work: WORK,
+    env: ENV,
+    log: { say() {} },
+  };
+  const said = onAgentSpawn({ prompt: "Work.", subagentType: "general-purpose" }, box);
+  assert.match(String(said?.event?.prompt ?? ""), /Say what is\./);
+  assert.ok(box.guidance, "the accessor fills the box");
 });
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]

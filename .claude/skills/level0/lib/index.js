@@ -40,6 +40,8 @@ export function asked(e) {
   return null;
 }
 
+const HEAD_LIMIT = 250;
+
 function grepAsked(e) {
   const pattern = String(e.pattern ?? "");
   if (!pattern) return null;
@@ -59,7 +61,8 @@ function grepAsked(e) {
       only: Boolean(e["-o"]),
       before: Number(e["-B"] ?? around) || 0,
       after: Number(e["-A"] ?? around) || 0,
-      limit: Number(e.head_limit ?? 0) || 0,
+      // Grep stops at 250 where the call names no limit, and 0 lifts it. [[spec/design_output/index#the-door-answers-the-tools]]
+      limit: e.head_limit === undefined || e.head_limit === null ? HEAD_LIMIT : Number(e.head_limit) || 0,
       offset: Number(e.offset ?? 0) || 0,
     },
   };

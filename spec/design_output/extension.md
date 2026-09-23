@@ -301,10 +301,12 @@ argument, and a fake door drives the whole path.
 | `registerView` | the webview view a person opens |
 | `nonce` | the random source, once per draw |
 | `pid` | the id of the main process |
+| `lenses` | the buttons over a ticket, and a watcher over the holds |
+| `runsVerb` | a child process running the pull |
 
-The extension imports nothing from `node:`. So the `DoorsOnly` rule reads the
-folder and finds nothing to refuse: the rule names `node:` imports, and
-`vscode` stands outside its list.
+Outside the editor files, the extension imports nothing from `node:`. So the
+`DoorsOnly` rule reads the rest of the folder and finds nothing to refuse: the
+rule names `node:` imports, and `vscode` stands outside its list.
 
 ## The watcher draws it again
 
@@ -343,6 +345,21 @@ dark. The bridgehead says so once in the chat, and the log takes a row beside
 it. The sidebar writes the start and the stop at `info`, and so does the
 server. For details, see
 [[spec/design_output/level0#the-bridge-says-it-falls]].
+
+## The light follows the server
+
+A server restarts itself when its code moves, and the child the button starts
+ends there. A person or an agent starts one by hand too. So the light reads the
+server, and no child alone:
+
+| what happens | what the light does |
+|---|---|
+| a line lands in `.se/.log/serve.log`, which every start writes | asks `/health`, takes a server that answers, and drops an adopted one that answers nothing |
+| the button's own child ends | goes dark, and asks again after the respawn's grace |
+| a debug session ends | goes dark, the way the debugger says |
+
+`rechecks` in `src/extension/editor-process.js` holds it, and one watch on the
+file drives it, so nothing polls.
 
 ## Two buttons make both
 
@@ -583,6 +600,53 @@ A terminal opens on the shell the box prefers, which is PowerShell there, and
 that shell reads no `./RUNME.sh`. So the door hands it `.\RUNME.ps1` instead,
 which is the entry a person there already takes.
 
+# A ticket carries its buttons
+
+A person at a desk takes a ticket and hands it back with no terminal. A
+ticket under `spec/tickets` or `.se/tickets` carries buttons over its first
+line, and `lib/lens.js` decides which:
+
+| what stands | the buttons |
+|---|---|
+| no hold names the ticket, it stands `open`, and its step admits a person | `Take this ticket at <step>` |
+| the same, and its step names another hand | a line naming that hand, and no button |
+| a person's hold names it | `Hand back <step>: pass`, `Hand back: fail…` and `Drop` |
+| a person's hold names it, and the leaf holds a `verdict` field | `Hand back <step>: the verdict decides` and `Drop` |
+| another hand's hold names it | a line naming the hand and the step, and no button |
+| the ticket stands `draft` or `closed` | nothing |
+
+A hold whose hand reads `person` is this desk's own. A step admits a person
+where its `by` reads `person` or `anyone`. The nearest `by` up the route
+counts, the way [[spec/design_output/pull#the-hand-rule]] reads it.
+
+## A button runs the pull
+
+Each button runs `ticket pull` through `src/scripts/cli.js` of the method, as a
+child of the extension:
+
+| the button | the line |
+|---|---|
+| take | `ticket pull <ticket>` |
+| pass | `ticket pull <ticket> --pass` |
+| fail | `ticket pull <ticket> --fail "<reason>"`, with the reason a box asks for |
+| the verdict decides | `ticket pull <ticket>`, because the pull refuses a verdict flag there |
+| drop | `ticket pull --drop` |
+
+A hand-back saves the ticket first, because the pull reads the evidence off
+the disk. An empty reason ends a fail, and nothing runs. The first answer word
+of [[spec/design_output/pull#the-answers]] stands in a notification, and a
+refusal takes the warning colour. The whole answer stands in the output
+channel `quackitect`. Then the buttons draw again, and a change under
+`.se/.runtime/hold` draws them too.
+
+## The child names no harness
+
+The pull tells an agent from a person by the environment. An editor a Claude
+session opens hands those names down to the extension. So the child runs
+without `CLAUDECODE`, `CLAUDE_CODE_REMOTE` and `SE_CLOUD`, and
+the pull reads a person. `SE_WORK_ROOT` names the open folder, so a vehicle's
+own tickets answer.
+
 # What stands open
 
 - The extension holds its own reader of a key, because `lib/config.js` in the
@@ -591,4 +655,7 @@ which is the entry a person there already takes.
 - The sidebar reads both files and leaves the environment layer to
   `./RUNME.sh config`, which names the layer answering each key.
 - A projection writing `src/extension/package.json` from the declaration waits,
-  because no widget here contributes a command.
+  because no widget here contributes a command. The one command there,
+  `quackitect.ticket`, belongs to the ticket buttons.
+- A take under the binding `queue` meets a refusal, because a name asks past
+  the queue. The refusal names the road, and the button stands.

@@ -46,7 +46,9 @@ so adding one is an edit to data and no program changes:
 
 Entries share the command folder, so each one names what it writes. The
 owner lookup prefers the entry whose globs match the path, and an entry naming
-no `writes` owns whatever no neighbour claims.
+no `writes` owns whatever no neighbour claims. The compare and the session
+start read the same lookup. So a command the owner keeps beside the targets
+stands for no entry, and stays.
 
 ## What comes from v4
 

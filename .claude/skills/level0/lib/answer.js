@@ -3,7 +3,7 @@
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 // [[spec/design_output/level0#the-gate-reads-the-answer]]
 
-import { SESSION } from "./log.js";
+import { SESSION, tallied } from "./log.js";
 import { scoreOf as score } from "./voice.js";
 
 // [[spec/design_output/level0#which-prompt-opens-a-turn]]
@@ -100,31 +100,26 @@ export function namesNote(text) {
 
 // [[spec/design_output/level0#a-note-answers-its-prompt]]
 export function notesIn(box) {
-  return noteRows(box).length;
+  return notesHeld(box).count;
 }
 
 export function newestNote(box) {
-  return noteRows(box).at(-1) ?? "";
+  return notesHeld(box).newest;
 }
 
-// [[spec/design_output/level0#a-note-answers-its-prompt]]
-function noteRows(box) {
-  let text = "";
-  try {
-    text = String(box.disk.read(joinIn(box)));
-  } catch {
-    return [];
-  }
-  const out = [];
-  for (const line of text.split(/\r?\n/)) {
-    if (!line.trim()) continue;
-    try {
-      const row = JSON.parse(line);
-      if (String(row?.kind ?? "") === "note")
-        out.push(String(row.text ?? row.said ?? ""));
-    } catch {}
-  }
-  return out;
+// The note rows the log holds, read past the offset the box last reached, so a call reads the rows it has yet to see. [[spec/design_output/log#a-reader-reads-new-rows]]
+function notesHeld(box) {
+  box.tallies = box.tallies ?? {};
+  box.tallies.notes = tallied(box.disk, joinIn(box), box.tallies.notes, foldsNote, () => ({
+    count: 0,
+    newest: "",
+  }));
+  return box.tallies.notes.value;
+}
+
+function foldsNote(held, row) {
+  if (String(row?.kind ?? "") !== "note") return held;
+  return { count: held.count + 1, newest: String(row.text ?? row.said ?? "") };
 }
 
 // A log door built on a root answers the whole path already, and one built on none answers the path under it. [[spec/design_output/level0#a-note-answers-its-prompt]]

@@ -21,6 +21,11 @@ type stamped struct {
 
 // Every file the walk finds against its row: a file whose size or time moved writes again, and a row whose file stands nowhere goes. It answers the files it counts, and the paths whose rows moved. [[spec/design_output/index#a-change-moves-its-rows]]
 func Sweep(db *sql.DB, root string) (int, int, error) {
+	return sweep(db, root, trackedIn(root))
+}
+
+// The sweep against git's list a caller holds, which marks the rows a reader of the tracked tree takes. [[spec/design_output/index#the-rows-the-walk-writes]]
+func sweep(db *sql.DB, root string, tracked func(rel string) bool) (int, int, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return 0, 0, err
@@ -31,8 +36,6 @@ func Sweep(db *sql.DB, root string) (int, int, error) {
 	if err != nil {
 		return 0, 0, err
 	}
-	// Git's list, read once a walk, marks the rows a reader of the tracked tree takes. [[spec/design_output/index#the-rows-the-walk-writes]]
-	tracked := trackedIn(root)
 	seen := map[string]bool{}
 	count, moved := 0, 0
 	err = filepath.Walk(root, func(abs string, info fs.FileInfo, err error) error {
@@ -74,13 +77,17 @@ func Sweep(db *sql.DB, root string) (int, int, error) {
 
 // The rows of the paths a change names: a file writes again, a path standing nowhere takes every row under it along, and a new folder walks. It answers the paths whose rows moved. [[spec/design_output/index#a-change-moves-its-rows]]
 func Touches(db *sql.DB, root string, paths []string) (int, error) {
+	return touches(db, root, paths, trackedIn(root))
+}
+
+// The change against git's list the door holds, so a saved file spawns no git. [[spec/design_output/index#a-change-moves-its-rows]]
+func touches(db *sql.DB, root string, paths []string, tracked func(rel string) bool) (int, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return 0, err
 	}
 	defer tx.Rollback()
 
-	tracked := trackedIn(root)
 	moved := 0
 	for _, rel := range paths {
 		if outside(rel) {
@@ -128,6 +135,11 @@ func Touches(db *sql.DB, root string, paths []string) (int, error) {
 
 // Git's list again, and the flag on every row it turns. The index git keeps changes with no file of the tree changing, so the watch names it apart. [[spec/design_output/index#a-change-moves-its-rows]]
 func Retracks(db *sql.DB, root string) (int, error) {
+	return retracks(db, trackedIn(root))
+}
+
+// The flags against a list git answers once, which the door then holds for every change. [[spec/design_output/index#a-change-moves-its-rows]]
+func retracks(db *sql.DB, tracked func(rel string) bool) (int, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		return 0, err
@@ -138,7 +150,6 @@ func Retracks(db *sql.DB, root string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	tracked := trackedIn(root)
 	moved := 0
 	for path, was := range held {
 		if now := tracked(path); now != was.tracked {
@@ -244,12 +255,7 @@ func outside(rel string) bool {
 			return true
 		}
 	}
-	for _, folder := range []string{Runtime, Retro, Log} {
-		if rel == folder || strings.HasPrefix(rel, folder+"/") {
-			return true
-		}
-	}
-	return false
+	return machinery(rel)
 }
 
 // The links resolve again where a row moved, because a path coming or going turns what a link reaches, and the whole answer lands at once. [[spec/design_output/index#a-change-moves-its-rows]]

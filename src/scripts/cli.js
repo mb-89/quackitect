@@ -3,6 +3,7 @@
 // [[spec/design_output/editor#one-command-opens-the-editor]]
 
 import { dirname, join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { runsHere } from "../../.claude/skills/level0/lib/paths.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
@@ -89,7 +90,10 @@ export const verbs = {
         ],
         it.clock,
       );
-      return stamped(code, batteryOf(parts, timesHere(), { unrun, spawns: spawnsHere() }));
+      return stamped(
+        code,
+        batteryOf(parts, timesHere(), { unrun, spawns: spawnsHere() }),
+      );
     },
   },
   lint: { says: "the rules over the tree, or over what you name", run: lint },
@@ -255,7 +259,15 @@ export function theVehicle(argv) {
     return 0;
   }
   if (said === "attach") {
-    const settled = attachTo(files, env, it.clock, pair.work, pair.method, it.pid, WINDOWS);
+    const settled = attachTo(
+      files,
+      env,
+      it.clock,
+      pair.work,
+      pair.method,
+      it.pid,
+      WINDOWS,
+    );
     console.log(
       `${pair.work} names ${made.id} as the vehicle driving it, at port ${settled.port}.`,
     );
@@ -361,23 +373,29 @@ export function serveBridge(argv) {
 
 // [[spec/design_output/tui#the-verb-builds-it]]
 
+// The runner's flags after the node path: the spec report to the screen, and the battery's reporter to its file. [[spec/design_output/work#the-battery-answers-first]]
+export function testArgv(at) {
+  return [
+    "--test",
+    "--test-reporter=spec",
+    "--test-reporter-destination=stdout",
+    // A reporter loads as a module, and a drive letter reads as a URL scheme, so the path goes as a file URL. [[spec/design_output/work#the-battery-answers-first]]
+    `--test-reporter=${pathToFileURL(join(at, ...REPORTER.split("/"))).href}`,
+    `--test-reporter-destination=${join(at, ...TIMES.split("/"))}`,
+    TESTS,
+    CONTRACT_TESTS,
+  ];
+}
+
 export function test() {
   files.makeDir(join(root, ...RUN.split("/")));
   const tally = join(root, ...SPAWNS.split("/"));
   files.write(tally, "");
-  const ran = outside.run(
-    [
-      process.execPath,
-      "--test",
-      "--test-reporter=spec",
-      "--test-reporter-destination=stdout",
-      `--test-reporter=${join(root, ...REPORTER.split("/"))}`,
-      `--test-reporter-destination=${join(root, ...TIMES.split("/"))}`,
-      TESTS,
-      CONTRACT_TESTS,
-    ],
-    { cwd: root, inherit: true, env: { SE_SPAWNS: tally } },
-  );
+  const ran = outside.run([process.execPath, ...testArgv(root)], {
+    cwd: root,
+    inherit: true,
+    env: { SE_SPAWNS: tally },
+  });
   return ran.exitCode;
 }
 
