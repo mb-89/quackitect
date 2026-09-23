@@ -89,7 +89,12 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 9fbbfec925f5c7700bf6e42d34103fa4de036855
+    hash_after: 9fbbfec925f5c7700bf6e42d34103fa4de036855
 ---
 
 # Ask
@@ -116,6 +121,36 @@ A `;` chain lands a hand-back over a refused write, and a commit over a failing 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+Each landing waits on its gate, in four places.
+
+| part | what changes |
+|---|---|
+| the `;` rule | `findings` in `.claude/skills/level0/lib/bash.js` names `LandingFollowsItsGate` |
+| what it refuses | a `;` whose next segment runs `ticket pull`, `ticket open`, `git commit` or the commit verb |
+| what passes | `&&`, which runs the landing on a green gate alone |
+| the bare pull | `pull` in `src/scripts/pull.js` shows the leaf in hand where a name comes with no flag |
+| the verdict leaf | a leaf holding a verdict field still hands back on the bare name, because the field is its flag |
+| the open | `open` in `src/scripts/ticket.js` lands the ticket through `landedAlone` in `pull-landed.js` |
+| the open's refusal | a commit the hook refuses puts the draft back, and the verb exits 1 |
+| the commit verb | `landsAndPushes` in `commit-verb.js` runs the check before `git add` |
+| a red check | the verb exits 1 with the check's output, and stages nothing |
+| the design | `spec/design_output/bash.md` names the rule, and `work.md#the-battery-answers-first` names the order |
+
+The assumption: the verdict leaf keeps its bare hand-back, because the ask's help text names that road.
+
+The cases, one file each under `test/level0`:
+
+- `bash.test.js`: `true; ./RUNME.sh ticket pull a --pass` refuses, and the `&&` form passes
+- `pull.test.js`: a bare name on a plain leaf prints the chapter, and the git log stays put
+- `ticket.test.js`: `ticket open` runs one commit naming the ticket
+- `commit-verb.test.js`: a red check leaves `git add` and `git commit` unrun
+
+The callers:
+
+- `onBash` in `src/bridge/bash.js` runs `findings`, so the rule reaches every Bash call
+- `pull-spawn.js` prints `ticket open`, and its text stands
+- `pull-chapter.js` prints the bare hand-back line on a verdict leaf, and its text stands
 
 ## review
 
