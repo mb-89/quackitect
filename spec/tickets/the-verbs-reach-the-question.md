@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -139,6 +139,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-9
+    hash_before: d18c1e307f644e040079513ce3117dd56a7a1ba7
+    hash_after: d18c1e307f644e040079513ce3117dd56a7a1ba7
+reason: done
 ---
 
 # Ask
@@ -379,17 +384,64 @@ The shell habits the ask names each take a verb or a tool, with cases of its own
 
 <!-- the form is files -->
 
+- spec/tickets/the-verbs-reach-the-question.md
+- .claude/commands/se-config-wait-most.md
+- .claude/commands/se-config-wait-quiet.md
+- .claude/skills/level0/lib/search.js
+- spec/config/level0.json
+- spec/config/level0.schema.json
+- spec/design_output/index.md
+- spec/design_output/level0.md
+- spec/design_output/log.md
+- spec/design_output/lsp.md
+- spec/design_output/pull.md
+- src/bridge/answer-read.js
+- src/bridge/search.js
+- src/bridge/server.js
+- src/bridge/stop.js
+- src/bridge/tools.js
+- src/bridge/wait.js
+- src/doors/fake/proc.js
+- src/doors/proc.js
+- src/scripts/cli-read.js
+- src/scripts/cli.js
+- src/scripts/log-verb.js
+- src/scripts/work-test.js
+- src/stub/.claude/skills/level0/hooks/bridgehead.js
+- test/contract/cli-verbs.test.js
+- test/contract/proc.test.js
+- test/level0/answer-read.test.js
+- test/level0/cli-read.test.js
+- test/level0/log-verb.test.js
+- test/level0/search-door.test.js
+- test/level0/test-verb.test.js
+- test/level0/wait.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- design: each of the seven ask lines lands, with a case of its own.
+- design: `./RUNME.sh check` exits 0 on the branch.
+- design: `alive` stands justified, because an output's end needs a process's life.
+- design: `alive` lives in the one door reaching a process, and its fake and contract case hold it.
+- design: the gate calls `readsAnswer`, which `check_answer` calls too, so one reading serves both.
+- design: a helper's stop still passes, as `onStop` answers it today.
+- craft: `bodyFound` reads the ranked rows alone, so a common name can miss its definition row.
+- craft: the gate and the tooth each count up to `stop.mostInARow`, so a turn holds up to twice that.
+- craft: `box.reports` grows for the box's whole life, and nothing drops an id once read.
+- craft: the wait holds one server call up to 600s, and no case covers a client's own timeout.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each new fact stands in one design section, and the config comment and each code comment point at it.
 
 # Discussion
 
