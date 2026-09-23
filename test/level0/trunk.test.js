@@ -49,6 +49,22 @@ test("the verbs the command line runs reach git inside node, so they pass here",
   }
 });
 
+// The commit verb takes its message whole, so git named inside that message lands nowhere. [[spec/design_output/work#a-box-writes-its-branch]]
+test("a commit verb whose message names git commit touches no git", () => {
+  const said = './RUNME.sh commit "the row reads git commit; and git push origin main"';
+  assert.deepEqual(touchesGit(said), { commits: false, pushes: false });
+  assert.equal(landsOnTrunk(said, "main"), "");
+  assert.equal(landsOnTrunk(`${said} && git push origin main`, "work/x"), "push");
+});
+
+// A push naming no branch pushes the one the box stands on. [[spec/design_output/work#a-box-writes-its-branch]]
+test("a bare push standing on trunk lands there, and a push naming another branch passes", () => {
+  assert.equal(landsOnTrunk("git push", "main"), "push");
+  assert.equal(landsOnTrunk("git push origin", "main"), "push");
+  assert.equal(landsOnTrunk("git push -u origin HEAD", "main"), "push");
+  assert.equal(landsOnTrunk("git push origin work/fix-lsp", "main"), "");
+});
+
 test("a command deleting a version branch is refused, however it is written", () => {
   const said = [
     "git push origin --delete v4",

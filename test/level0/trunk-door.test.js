@@ -37,6 +37,7 @@ function box(branch, green = true, env = CLOUD, warnings = 0) {
     work: ROOT,
     method: ROOT,
     log: { say: () => {} },
+    vale: { stands: () => false },
   };
 }
 
@@ -47,8 +48,34 @@ test("a work branch in hand hands the work back, and trunk stays shut", async ()
   assert.match(denied(said), /hands it back/);
 });
 
-test("a session outside the queue lands its own work on trunk", async () => {
+// A raw landing on trunk meets the commit verb, which lints, checks and pushes. [[spec/design_output/work#a-box-writes-its-branch]]
+test("a session outside the queue lands on trunk through the commit verb alone", async () => {
   const said = await onBash({ command: PUSH }, box("claude/a-thing"));
+  assert.match(denied(said), /\.\/RUNME\.sh commit "<message>"/);
+});
+
+test("a work branch pushing trunk keeps the hand-back, and names no commit verb", async () => {
+  const said = await onBash({ command: PUSH }, box("work/a-thing"));
+  assert.doesNotMatch(denied(said), /RUNME\.sh commit/);
+});
+
+test("a desk commit standing on trunk refuses and names the verb, and one on a branch lands", async () => {
+  const said = await onBash({ command: "git commit -m x" }, box("main", true, {}));
+  assert.match(denied(said), /\.\/RUNME\.sh commit "<message>"/);
+  const off = await onBash({ command: "git commit -m x" }, box("work/a-thing", true, {}));
+  assert.equal(denied(off), "", "the door says nothing");
+});
+
+test("a bare push standing on trunk refuses on a desk", async () => {
+  const said = await onBash({ command: "git push" }, box("main", true, {}));
+  assert.match(denied(said), /\.\/RUNME\.sh commit "<message>"/);
+});
+
+test("the commit verb standing on trunk passes, though its message names git commit", async () => {
+  const said = await onBash(
+    { command: './RUNME.sh commit "the row answers a raw git commit"' },
+    box("main", true, {}),
+  );
   assert.equal(denied(said), "", "the door says nothing");
 });
 
