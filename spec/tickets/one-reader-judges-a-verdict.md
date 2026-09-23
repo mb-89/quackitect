@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -114,6 +114,12 @@ record:
     hand: box d6f05e3a585030 · claude-code
     hash_before: c8fa599fb6c6adb54cde39041f9065aaeb3a5fd3
     hash_after: c8fa599fb6c6adb54cde39041f9065aaeb3a5fd3
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-6
+    hash_before: bbec4828850a918d39ea6f10e5a74b681e1c204c
+    hash_after: bbec4828850a918d39ea6f10e5a74b681e1c204c
+    returns: 3
+    why: "Craft: `voiceFaults` drops comment rows, `answered:` rows and headings, so one offset names the wrong line.; Craft: `prose()` drops a Vale off marker, so the pull runs a rule the lint turns off.; The pull's `unreasoned` reads text stripped of that marker, so a marker with no reason passes.; Fix both: keep each row at its file line with its comments, and blank the rows the pull skips.; Add a case where a field carries a Vale off marker, and the pull and the lint agree.; Craft: the Vale door's `lint` appends `unreasoned` already, so `heldOver` through `proseFound` names it twice.; Let the panel's road skip `unreasoned` in `proseFound`, because the door's rows carry it.; The earlier findings stand answered: the one road, `findingsOver`, the name, the config and the level."
 ---
 
 # Ask
@@ -178,15 +184,14 @@ nothing. The road: one reading both sides call, and each runs Vale its own way.
 
 fail
 
-- Design: `./RUNME.sh lint` runs `findingsOver` through `cli-read.js`, and `heldOver` serves the editor panel alone.
-- `findingsOver` reads through `readThrough`, so the lint keeps a reader of its own on this road.
-- Name `findingsOver` as a caller of the shared reading, beside `heldOver` and `voiceFaults`.
-- Design: a `readsProse(box, text, found)` stands in `prose.js` already, and the write door calls it.
-- That reader holds vetoes the lint lacks: the sentence length and the word outside the vocabulary.
-- Give the shared reading a name apart from `readsProse`, so one name reads one thing.
-- Craft: `voiceFaults` counts a line from its chapter, and the lint counts it from the file.
-- Add the chapter's offset in the case, so the pull and the lint name the same line.
-- The road, its cost, the level and the case match the ask.
+- Craft: `voiceFaults` drops comment rows, `answered:` rows and headings, so one offset names the wrong line.
+- Craft: `prose()` drops a Vale off marker, so the pull runs a rule the lint turns off.
+- The pull's `unreasoned` reads text stripped of that marker, so a marker with no reason passes.
+- Fix both: keep each row at its file line with its comments, and blank the rows the pull skips.
+- Add a case where a field carries a Vale off marker, and the pull and the lint agree.
+- Craft: the Vale door's `lint` appends `unreasoned` already, so `heldOver` through `proseFound` names it twice.
+- Let the panel's road skip `unreasoned` in `proseFound`, because the door's rows carry it.
+- The earlier findings stand answered: the one road, `findingsOver`, the name, the config and the level.
 
 # implement
 
