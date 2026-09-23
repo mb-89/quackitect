@@ -89,12 +89,16 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 054a9a4d91fe4d68be64397e96b000824bd09256
     hash_after: 054a9a4d91fe4d68be64397e96b000824bd09256
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: 1de3fec1fddee01385d0e099e711e60ba236630b
+    hash_after: 1de3fec1fddee01385d0e099e711e60ba236630b
 ---
 
 # Ask
@@ -154,6 +158,20 @@ A count word is a digit or a number word from `two` up, before a plural noun.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- design: the approach answers every line of the Ask, and `./RUNME.sh check` answers 0 on the base.
+- design: `CodeHeader` refuses in place of `CodeComment`, against the Ask's wording.
+- design: that deviation stands argued, because a Vale rule carries one level and `CodeComment` warns on a stray comment.
+- design: `level0.js` imports `vehicle.js` already, so the constants reach `START` with no new import road.
+- design: `reload.js` owns both constants today, and `server.js` reads the flag from it.
+- design: the extension bundles alone, so a shared fixture test is the right hold on `stepsIn`.
+- craft: `CodeComment` skips a line holding a link, so name whether `CodeHeader` counts that line.
+- craft: `CountedList` reads the line above a list or a table alone, so a counted test run slips past.
+- craft: name the ticket and answer sections, since the prose glob reaches them and the Ask says notes.
+- craft: `vehicle.js` owns vehicles, so a comment names why the self-test constants stand there.
+- craft: line 21 of `level0.js` says the hook imports nothing, so correct it in the same change.
 
 # implement
 
