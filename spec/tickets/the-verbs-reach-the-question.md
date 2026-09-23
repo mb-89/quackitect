@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -105,6 +105,10 @@ record:
     hand: box dcd73916add7 · claude-code-remote
     hash_before: 6f6b6bc907394789601ac347db01903c617acd76
     hash_after: 6f6b6bc907394789601ac347db01903c617acd76
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-4
+    hash_before: 653971f3f8272c25bb182f403ab9ccba5c80595e
+    hash_after: 653971f3f8272c25bb182f403ab9ccba5c80595e
 ---
 
 # Ask
@@ -192,19 +196,16 @@ The cost: each stop of the session's own runs Vale over the answer once.
 
 <!-- the form is verdict -->
 
-fail
-- design: `onStop` in `src/bridge/stop.js` returns at once, and `checksAnswer` awaits Vale.
-- design: five test files read the `onStop` answer at once, so an awaiting gate breaks them.
-- design: `stop.js` holds 594 lines, and the write door refuses a file past 600.
-- design: the gate moves into the awaited `classic.Stop` door or a neighbour file, and the approach names those tests.
-- craft: `runsFind` lives in `src/bridge/search.js`, and `search-door.test.js` tests it.
-- craft: `runsFind` takes `words` over the index, so a body read needs a new field and a file read.
-- craft: the `test` row in the verb table calls `test()` bare, so it passes `rest` through.
-- craft: `testSays` reads tap counts, so a file run takes the tap reporter.
-- craft: `testSays` and `goSays` stand exported already.
-- craft: the wait tool registers in `server.js`, and the table leaves that file out.
-- craft: a helper's stop passes ahead of the gate, and a held turn runs Vale again.
-- craft: the log count, the lint order and the Go env match the code they name.
+pass
+- design: every earlier finding stands answered, and the gate moves into the awaited stop door.
+- craft: `checksAnswer` lives in `src/bridge/tools.js`, and the table leaves that file out.
+- craft: the `function` field enters `findSpec` in `.claude/skills/level0/lib/search.js`, so the table names it.
+- craft: `testVerb` in `work-test.js` runs named files and Go modules, so the `test` row reuses it.
+- craft: the named run takes the spawn tally, because the ask names the check's env.
+- craft: a Go run names a folder, and `goModulesOf` reads only `_test.go` paths.
+- craft: `server.js` holds 591 lines, so the gate body lives in `answer-read.js`.
+- craft: the wait's spec joins `specsOf` in `server.js` beside its tool.
+- craft: the gate holds ahead of the tooth, so a cap bounds its holds in a row.
 
 # implement
 
