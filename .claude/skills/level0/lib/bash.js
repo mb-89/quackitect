@@ -5,6 +5,7 @@
 import { CODE } from "./code.js";
 import { overLong } from "./names.js";
 import { NOTES } from "./private.js";
+import { pullCommitsIn } from "./pulled.js";
 import { scriptWrites } from "./scripted.js";
 import { assigned, holdsAName, resolved } from "./shell-values.js";
 import { baseName, BREAKS, clean, READERS, SHELLS, tokensOf } from "./tokens.js";
@@ -272,6 +273,8 @@ export function findings(command, most, it = {}) {
     );
   }
 
+  out.push(...pullCommitsIn(said, it));
+
   const commit = commitIn(said);
   if (commit?.form === "none") {
     out.push(
@@ -292,8 +295,8 @@ export function verbLine() {
     `This tree owns its own verbs, and each one runs the checks that belong to it: ${verbs}.`,
     "Reach for the verb before the raw command.",
     "Level zero refuses a shell write to a file the rules reach, a commit carrying",
-    "no message, a branch name past five words, a test run naming no file, and a",
-    "commit whose delta carries something private.",
+    "no message, a branch name past five words, a test run naming no file, a commit",
+    "whose delta carries something private, and a revert or a reset over a pull commit.",
   ].join(" ");
 }
 
@@ -426,7 +429,7 @@ function pathsIn(line) {
   return out;
 }
 
-function partsOf(command) {
+export function partsOf(command) {
   const { text, bodies } = withoutHeredocs(String(command ?? ""));
   const segments = [[]];
   for (const one of tokensOf(text)) {
@@ -499,7 +502,7 @@ function withoutHeredocs(text) {
   return { text: kept.join("\n"), bodies };
 }
 
-function wordsIn(segment) {
+export function wordsIn(segment) {
   const said = segment.filter((one) => !one.op).map((one) => one.text);
   let at = 0;
   while (
@@ -511,7 +514,7 @@ function wordsIn(segment) {
   return said.slice(at);
 }
 
-function afterGit(words) {
+export function afterGit(words) {
   const out = [];
   for (let i = 1; i < words.length; i++) {
     const one = words[i];
@@ -575,7 +578,7 @@ function wholeSuite(args) {
   };
 }
 
-function row(command, rule, said, message) {
+export function row(command, rule, said, message) {
   return {
     rule,
     line: lineOf(command, said),

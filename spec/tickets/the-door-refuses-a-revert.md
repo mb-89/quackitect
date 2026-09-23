@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -120,6 +120,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 1b076e4d0aac44b073d56b2538bd0a1c360c3255
+    hash_after: 1b076e4d0aac44b073d56b2538bd0a1c360c3255
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -269,11 +277,17 @@ Ten cases fail on their own assertion, and each names the line it proves.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/pulled.js .claude/skills/level0/lib/bash.js src/bridge/bash.js spec/design_output/bash.md test/level0/pulled.test.js test/contract/pulled.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change touches the parse, the bridge and the design note the approach names, plus `lib/pulled.js`.
+- The git read goes through `box.proc`, which `fakeProc` stands in for at level0.
+- Each new function carries a pointer at `spec/design_output/bash#a-pull-commit-stands`.
 
 ## tests-green
 

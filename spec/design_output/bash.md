@@ -20,6 +20,7 @@ over. One parse splits it, and the rules below read that one parse.
 | the name a checkout cuts | a branch name meets the cap |
 | a test run naming no file | a test run points somewhere |
 | a commit stepping past the hook | the escape, in [[spec/design_output/private]] |
+| the commits a `git revert` or a `git reset` takes back | a pull commit stands |
 
 The parse reads quotes, backslashes, operators and heredoc bodies. A word
 inside quotes carries no operator, so `git commit -m "a > b"` writes nothing.
@@ -194,6 +195,32 @@ A landing waits on the command before it. `LandingFollowsItsGate` in
 
 The rule reads the command with its heredocs taken out, so a body's newline
 reads as no gate.
+
+# A pull commit stands
+
+A pull commit moves a ticket's `step`, `state` and evidence, and the take-back
+verb restores all three. `PullCommitStands` in `lib/pulled.js` refuses a shell
+undo over one, and names `./RUNME.sh ticket pull <name> --back <leaf>`.
+
+| the undo | what the door reads |
+|---|---|
+| `git revert <rev>` | `git log --no-walk --format=%s <rev>`, the named commits alone |
+| `git reset <rev>` | `git log --format=%s <rev>..HEAD`, the range the reset drops |
+| a bare `git reset`, or one over paths | nothing, because HEAD stays |
+
+A flag taking a value keeps that value out of the revisions, so `-m 1` names no
+commit. A subject opening on `<name>:` reads as a pull commit where
+`spec/tickets/<name>.md` or the same file in the private tickets folder stands.
+
+The leaf comes off the subject each pull writes:
+
+- `passes <leaf>` and `fails <leaf> back to <back>`
+- `<leaf> fails back to <back>`
+- `<hand> takes <leaf> back`
+
+A subject naming none leaves `<leaf>` in the refusal. The bridge hands the rule
+its `subjects` read, the way it hands `script`, so a case feeds a fake process.
+The command line lands its own commits past this door, so a pull meets no row.
 
 # The description names verbs
 

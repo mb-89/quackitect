@@ -114,6 +114,7 @@ async function commandRules(command, _e, box) {
   const found = findings(command, asks(box, "names.words"), {
     cloud: onACloud(box),
     script: (path) => fileText(reader(box), path),
+    subjects: (undo) => subjectsOf(box, undo),
   });
   found.push(...(await commitVoice(command, box)));
   if (!onACloud(box) && skipsTheHook(command)) {
@@ -129,6 +130,14 @@ async function commandRules(command, _e, box) {
     detail: command,
   });
   return refusedCommand(command, found);
+}
+
+// A revert reads each revision alone, and a reset walks the range it drops. [[spec/design_output/bash#a-pull-commit-stands]]
+function subjectsOf(box, undo) {
+  const walk = undo.walks ? [] : ["--no-walk"];
+  return git(box, ["log", ...walk, "--format=%s", ...undo.revs])
+    .split("\n")
+    .filter(Boolean);
 }
 
 // A message meets the voice rules, and a break of form lands the way a write does. [[spec/rationales/voice#11-form-and-substance]]
