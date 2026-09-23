@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -109,6 +109,17 @@ record:
     hand: box dcd73916add7 · claude-code-remote · helper-4
     hash_before: f5079134723def2bdfbc0f1b649bc1bf62d26586
     hash_after: f5079134723def2bdfbc0f1b649bc1bf62d26586
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 27efb9c3c60a04119238e9fbc12864cf6ce40431
+    hash_after: 27efb9c3c60a04119238e9fbc12864cf6ce40431
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 7 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -218,17 +229,32 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/write.test.js test/level0/bash.test.js test/level0/apply.test.js test/level0/bridgehead.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Seven cases fail on their own assertion, and each names a line of the ask.
+
+- a fresh box over the same disk refuses the Edit, because the marks live in memory
+- a Read of lines 10 to 20 marks the whole file, so the Edit at line 30 lands
+- a `sed -n` read sets no mark, so the Edit inside its lines comes back refused
+- a failed first write answers `would not write`, and `undo` takes the failed journal
+- a `plan` call on a dead bridge passes on to the harness
+- the fake disk writes into any folder, so `mark-doors.js` wraps it with the refusals the real disk gives
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch the four test files the approach names, and one helper beside them
+- the disk, the clock, the log and the harness each stand as a fake in these cases
+- each case carries a pointer to the design note the approach updates
 
 ## reflect
 

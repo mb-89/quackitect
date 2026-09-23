@@ -11,6 +11,16 @@ import { errorsIn, marksSeen, onWrite } from "../../src/bridge/write.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
+import {
+  called,
+  edits,
+  NUMBERED,
+  reads,
+  realDisk,
+  refused,
+  served,
+  TREE,
+} from "./mark-doors.js";
 
 const METHOD = "/tools";
 const WORK = "/stub";
@@ -287,4 +297,46 @@ test("an Edit changing engine fields alone comes back refused, naming them, beca
   );
 
   assert.match(said?.result?.deny ?? "", /state/);
+});
+
+// [[spec/design_output/level0#a-write-meets-its-mark]]
+test("a mark written on one box reads on a fresh box over the same disk", async () => {
+  const at = join(TREE, "notes.txt");
+  const disk = realDisk({ [at]: NUMBERED });
+  await called(served(disk), reads(at));
+
+  const said = await called(served(disk), edits(at, "line 3\n", "three\n"));
+
+  assert.equal(refused(said), "", "the restarted box reads the mark off the disk");
+  assert.match(disk.read(at), /three\n/);
+});
+
+// [[spec/design_output/level0#a-write-meets-its-mark]]
+test("a Read of lines 10 to 20 lets an Edit inside them land, and refuses one at line 30", async () => {
+  const at = join(TREE, "notes.txt");
+  const it = served(realDisk({ [at]: NUMBERED }));
+  await called(it, reads(at, { offset: 10, limit: 11 }));
+
+  const outside = await called(it, edits(at, "line 30\n", "thirty\n"));
+  assert.match(refused(outside), /moved on the disk after you read it/);
+
+  const inside = await called(it, edits(at, "line 15\n", "fifteen\n"));
+  assert.equal(refused(inside), "", "an edit inside the span lands");
+});
+
+// [[spec/design_output/level0#a-write-meets-its-mark]]
+test("a read handing back the text the mark holds writes the marks file once", async () => {
+  const at = join(TREE, "notes.txt");
+  const disk = realDisk({ [at]: NUMBERED });
+  const it = served(disk);
+  await called(it, reads(at));
+  const kept = [...disk.times].filter(([path]) => path.endsWith("marks.json"));
+  assert.equal(kept.length, 1, "the first read writes the marks file");
+
+  await called(it, reads(at));
+  assert.deepEqual(
+    [...disk.times].filter(([path]) => path.endsWith("marks.json")),
+    kept,
+    "a second read of the same text writes nothing",
+  );
 });
