@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -105,6 +105,10 @@ record:
     hand: box dcd73916add7 · claude-code-remote
     hash_before: afc48bde4dff0c40fc77445874e7f13ede1f9350
     hash_after: afc48bde4dff0c40fc77445874e7f13ede1f9350
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-4
+    hash_before: f5079134723def2bdfbc0f1b649bc1bf62d26586
+    hash_after: f5079134723def2bdfbc0f1b649bc1bf62d26586
 ---
 
 # Ask
@@ -194,16 +198,13 @@ The cost: each call that marks writes the runtime file once, and a whole write s
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- design: a failed first write removes its journal, so an older apply of the same name stands newest.
-- design: `undo` then takes that older apply back, and the ask wants it to say nothing waits.
-- design: the journal stays with a word that nothing landed, and `undo` answers nothing waits and drops it.
-- craft: the named cases leave out `undo` after a failed first write, and the ask wants a case a line.
-- craft: the stated cost runs low, because a `replace` sweep writes the marks file once a matched file.
-- craft: a preview puts the old marks back in memory, and the marks file keeps the preview's marks.
-- craft: `reads` in `level0.js` posts no fill, so each level zero call drops the context measure.
-- craft: a partial Read over a file with a whole mark keeps the whole mark beside the spans.
+- design: each earlier finding stands answered in the table, the cases and the answers list.
+- craft: a failed first write keeps the made text as each mark, so put the held marks back.
+- craft: `spec/design_output/level0.md` says the box holds the marks, so the change updates that note.
+- craft: `cat` at a pipe's head prints part of the file, so mark a lone shell read.
+- craft: `marksKept` writes the file where a mark moves, so the store row names that guard.
 
 # implement
 
