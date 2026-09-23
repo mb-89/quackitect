@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -101,6 +101,10 @@ record:
     hash_after: 168f447477bd2282f632ec77632e6d6cb7f70d45
     returns: 1
     why: "Design: `hunksIn` keeps the added lines alone, so a hunk trading a code line for a comment passes.; That hunk holds a line of code, and the ask says it meets the door as before.; Fix: read the removed lines too, and let a removed line of code ask for a test.; A pointer fix trades a comment for a comment, so it still passes.; Add that trade to the mixed case: one code line out, one comment in, and the door refuses.; The rest stands: the added reading, the comment-only case, and the note in `tree.md`."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 6e737488edfb394f3e27868180fd5d8ec135d80c
+    hash_after: 6e737488edfb394f3e27868180fd5d8ec135d80c
 ---
 
 # Ask
@@ -130,16 +134,24 @@ hand.
 
 <!-- the form is text -->
 
-The door holds the rule already. `untestedIn` in
-`.claude/skills/level0/lib/tested.js` reads each file's own hunk through
-`codeIn`, which passes a hunk adding comment lines and blank lines alone, and
-`test/level0/tested.test.js` holds the comment-only half.
+The door reads each file's hunk through `codeIn` in
+`.claude/skills/level0/lib/tested.js`, and today it reads the added lines
+alone. So a hunk trading a line of code for a comment passes. The change reads
+the removed lines too.
 
-| part | what the work adds |
+| part | what changes |
 |---|---|
-| the mixed case | a hunk adding one line of code beside a comment, which the door refuses |
-| the code | nothing, because the reading stands |
-| the note | `spec/design_output/tree#the-rules-over-two-files` already names the comment rule |
+| `hunksIn` | keeps each file's removed lines beside its added ones, as `{ added, removed }` |
+| `codeIn` | a hunk asks for a test where a line either side is code, or where it adds nothing and takes code away |
+| `names` | reads the added lines of a test, as before |
+| the comment-only case | a comment traded for a comment passes, the way a pointer fix trades one |
+| the mixed cases | a code line added beside a comment refuses, and a code line traded for a comment refuses |
+| the note | `spec/design_output/tree#the-rules-over-two-files` names the removed lines beside the added |
+
+The callers of `untestedIn` read its list of files alone, so they change nothing:
+
+- `src/scripts/precommit.js`, the commit door
+- `src/bridge/bash.js`, the door over a commit the agent runs
 
 ## review
 
