@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: audit
+step: chapter
 steps:
   - name: feedback
     does: takes the owner's field feedback one point at a time, and writes each confirmed point as a private note
@@ -109,7 +109,7 @@ steps:
         expects: 0
         says: retro mint, which refuses a class carrying no status and mints the rest
 process: [[spec/processes/retro]]
-process_hash: f713807a1ec22a1f
+process_hash: 7290e656e7ca2777
 record:
   - step: feedback
     hand: box d6f05e3a585030 · claude-code · the owner says so
@@ -131,6 +131,14 @@ record:
       - name: effect
         exit: 0
         said: No earlier retro holds class fixes, so nothing stands to measure.
+  - step: audit
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: dec3dd42cad10ff8848d3628f19eb5ec3f675188
+    hash_after: dec3dd42cad10ff8848d3628f19eb5ec3f675188
+    answered:
+      - name: trials
+        exit: 0
+        said: Every experiment stands decided, so the retro closes.
 ---
 
 # Ask
@@ -191,17 +199,37 @@ the owner asks for it
 
 <!-- the form is list -->
 
+- findings/audit-code.md
+- findings/audit-conduct.md
+- findings/audit-notes.md
+
 ## trials
 
 <!-- retro audit, which answers 0 once every experiment stands decided -->
 
 <!-- the form is command -->
 
+    ./RUNME.sh retro audit retro-899accd
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the code: broken, a spelled copy of the self-test flag and comments carrying prose past their pointer
+- the tests: broken, two commits land code with no test, and the door reads JavaScript alone
+- the notes: broken twice, a list item and two ask lines land past the caps
+- the turn: broken, mid-turn prompts wait behind calls until the answer gate refuses
+- one place: broken, the lens reads the route again where `pull-route.js` owns it
+- the running system: held, the bridge reloads and the language server rebuilds
+- the claims: broken, the todo order reads fixed off unit tests before the owner sees it
+- the verbs: broken, raw commits and a hand check before each push stand in for the commit verb
+- the owner's place: broken, a commit carries work of another topic
+- the counts: broken, a funnel note and a ticket count the structure beside them
+- the experiments: held, the audit verb answers every one decided
+- the refusals: broken, chained hand-backs land unwanted commits
+- the battery: untested, no earlier retro stands to read beside
 
 # chapter
 
