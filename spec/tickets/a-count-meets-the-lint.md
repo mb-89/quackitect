@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -99,6 +99,17 @@ record:
     hand: box dcd73916add7 · claude-code-remote · helper-2
     hash_before: 1de3fec1fddee01385d0e099e711e60ba236630b
     hash_after: 1de3fec1fddee01385d0e099e711e60ba236630b
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: c01ff0cccc81d90158aa56d6b8d8d6ed6f7f1214
+    hash_after: c01ff0cccc81d90158aa56d6b8d8d6ed6f7f1214
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -185,17 +196,33 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/route-fixture.test.js test/level0/start-constants.test.js test/contract/vale.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Four cases fail, each on its own assertion: the counted list, the header, the
+start constants, and one route shape.
+
+- the route and start cases read strings, and the Vale case runs the real binary
+- the other route shapes agree today, and the fixture holds them there
+- the Vale cases run the real binary through `ruled.js`, as every rule case does
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch two new files and the Vale case file, each named through the ask's lines
+- the route and start cases read strings alone, and the Vale case is a contract case over the real binary
+- a comment above each case points at this ticket
+
 
 ## reflect
 
