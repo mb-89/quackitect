@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -129,6 +129,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-7
+    hash_before: ec7f3db69ac16d4dfd14f29fe41397fa09d275aa
+    hash_after: ec7f3db69ac16d4dfd14f29fe41397fa09d275aa
+reason: done
 ---
 
 # Ask
@@ -348,17 +353,46 @@ Every verb taking a hand's prose into a ticket reads it the way the lint reads t
 
 <!-- the form is files -->
 
+- spec/tickets/the-verbs-read-prose-whole.md
+- spec/design_output/pull.md
+- src/bridge/findings.js
+- src/scripts/pull-chapter.js
+- src/scripts/retro-new.js
+- src/scripts/ticket-ask-lint.js
+- src/scripts/ticket.js
+- test/contract/process.test.js
+- test/level0/ask-lint.test.js
+- test/level0/pull-chapter.test.js
+- test/level0/retro-new.test.js
+- test/level0/semicolon-vale.js
+- test/level0/ticket-verb.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- The open, the note and the retro's mint read the whole ticket through `voiceOver` at the lint's level.
+- The pull reads through the same function, and `REFUSES` stands once in `findings.js`.
+- The route case runs on real Vale in the check, and it passes.
+- Each verb has a level0 case with a semicolon, and each case refuses and writes no file.
+- `./RUNME.sh check` exits 0 on ec7f3db6.
+- Craft: the Ask names `readsProse`, and the road reads through `readsText`.
+- The design chapter gives the reason, so the Ask's word lags the approach.
+- Craft: `ticket-ask-lint.js` now takes `chapterEnd` from `pull-chapter.js`, a large file for one helper.
+- Craft: `ask-lint.test.js` and `retro-new.test.js` reflow lines the change leaves alone.
+- Craft: `pull.md` names the note and the retro's mint in two chapters.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `REFUSES` and the Vale call stand in `findings.js` alone, and each caller points there.
+- The note and the retro's mint stand twice in `pull.md`, a craft point under the pass.
 
 # Discussion
 
