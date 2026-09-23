@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -107,6 +107,11 @@ record:
     hand: box dcd73916add7 · claude-code-remote
     hash_before: e22e739ef57cc1cbf77ed43047ee5e5f53eba467
     hash_after: e22e739ef57cc1cbf77ed43047ee5e5f53eba467
+  - step: retro/cloud
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: cdcef4dd535ae6258a6d2ee19d71370542bfd086
+    hash_after: cdcef4dd535ae6258a6d2ee19d71370542bfd086
+reason: done
 ---
 
 # Ask
@@ -277,17 +282,27 @@ The reviews earned their rounds, where a draft claimed a road the code lacks.
 
 <!-- the form is list -->
 
+- no tool, host or right fell short: the install, git and the proxy answered through the run
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the commit door's test rule, on the change leaves of several tickets
+- the file ceiling, on the stop door, the server, the pull, the Bash rules and the pull's cases
+- no conflict at sync, because the branch carried every commit on main
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- no person step stands parked, and every child closes done
+- no ticket stands minted outside a group
+- the fix verb's unread flag and the files near the ceiling stand as findings in the retro above
 
 # Discussion
 
