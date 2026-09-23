@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -120,6 +120,10 @@ record:
     hash_after: bbec4828850a918d39ea6f10e5a74b681e1c204c
     returns: 3
     why: "Craft: `voiceFaults` drops comment rows, `answered:` rows and headings, so one offset names the wrong line.; Craft: `prose()` drops a Vale off marker, so the pull runs a rule the lint turns off.; The pull's `unreasoned` reads text stripped of that marker, so a marker with no reason passes.; Fix both: keep each row at its file line with its comments, and blank the rows the pull skips.; Add a case where a field carries a Vale off marker, and the pull and the lint agree.; Craft: the Vale door's `lint` appends `unreasoned` already, so `heldOver` through `proseFound` names it twice.; Let the panel's road skip `unreasoned` in `proseFound`, because the door's rows carry it.; The earlier findings stand answered: the one road, `findingsOver`, the name, the config and the level."
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: d249c7ad3c9e636993efcbf6a332fc35f94524b9
+    hash_after: d249c7ad3c9e636993efcbf6a332fc35f94524b9
 ---
 
 # Ask
@@ -150,26 +154,26 @@ reader over it costs less than two readers disagreeing. For details, see
 
 <!-- the form is text -->
 
-`voiceFaults` in `src/scripts/pull-chapter.js` runs raw Vale over the leaf's
-prose and keeps the errors alone. The lint reads a buffer through `heldOver` in
-`src/bridge/findings.js`, which awaits the Vale door's `lint`, then runs the
-tense reader and names every warning. The pull answers at once, so it awaits
-nothing. The road: one reading both sides call, and each runs Vale its own way.
+`voiceFaults` in `src/scripts/pull-chapter.js` runs raw Vale over a copy of the
+leaf's chapter, which drops comments, headings and Vale markers, and keeps the
+errors alone. The lint reads the whole file through `lintText` in
+`.claude/skills/level0/lib/vale.js`, which appends `unreasoned`, then runs
+`withoutFalsePast`. The pull answers at once, and `lintText` awaits its run. The
+road: the pull reads the whole ticket the way the lint reads it.
 
 | part | what changes |
 |---|---|
-| the reading | `proseFound(body, at, found)` in `findings.js` takes Vale's rows, runs `withoutFalsePast` and marks `unreasoned`, and answers the findings |
-| the lint | `findingsOver`, which `./RUNME.sh lint` runs, calls `proseFound` over each file |
-| the panel | `heldOver` awaits `lint`, then calls `proseFound` over the buffer |
-| the pull | `voiceFaults` runs Vale at once, on the config `assemble` writes, then calls `proseFound` |
-| the line | `voiceFaults` adds its chapter's first line in the file, so the pull names the line the lint names |
-| the level | a finding at error or at warning refuses the hand-back, and names its rule and its line |
-| the case | a verdict carrying a semicolon comes back refused, and the lint names the same line of the file |
-| the name | `readsProse` in `src/bridge/prose.js` stays the write door's own, which reads a narrower set |
+| the call | `lintText` splits into `valeArgv` and `valeAnswer`, both at once, and awaits its run between them |
+| the text | the pull lays its fields into the ticket text in memory, the whole file |
+| the pull | `voiceFaults` runs `valeArgv` through its own process door, then `valeAnswer` and `withoutFalsePast` |
+| the lines | the pull keeps the findings on its chapter's lines, so it names the lint's line |
+| the markers | a Vale off marker reads in both, because both read the file as written |
+| the level | a finding at error or at warning refuses the hand-back |
+| the cases | a verdict carrying a semicolon comes back refused, and a marker holds a rule off in both |
 
 - the cost: two runners of Vale stand, one for the server and one for the command line
-- what stays one: the rules, the config and the reading, which is what the ask names
-- the road left: a `pull` that awaits changes `work.js`, `retro-new.js` and every pull test
+- what stays one: the argument list, the answer's reading, the config and the lines
+- the panel: `heldOver` keeps its road, so `unreasoned` lands once there too
 - outside the ask: `askFaults` keeps the same error filter, and a note of its own carries it
 
 ## review
