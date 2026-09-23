@@ -34,6 +34,5 @@ style: true
 | 7 | | a rule restated in a design note beside its link |
 | 8 | the lint verb counts the warnings | the tree holds forty warnings |
 | 9 | the list stands, and the sentence above it says what the reader does with it | a sentence before a list saying how many items the list holds |
-| 9 | I read the ask as the following, then the list | I read the ask as four things, then the list |
 | 9 | the group's ask says what the group adds up to | a group's ask naming its members or their count |
 | 9 | | a sentence saying two notes link where the link stands |
