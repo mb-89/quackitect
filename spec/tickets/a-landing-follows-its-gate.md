@@ -89,7 +89,7 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dcd73916add7 · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box dcd73916add7 · claude-code-remote
     hash_before: a198b38e23a010219c3ab5b642c006e4f583fe39
     hash_after: a198b38e23a010219c3ab5b642c006e4f583fe39
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-4
+    hash_before: ff09de9e02abf0050bbf75d137e1f31d1bdaa235
+    hash_after: ff09de9e02abf0050bbf75d137e1f31d1bdaa235
+    returns: 2
+    why: "design: the rule refuses a `;` before a pull with a flag, and the Ask names every `ticket pull`.; craft: `open` hands its text to `landedAlone`, which writes the file, so the open drops its own write.; design: fix it by counting every `ticket pull` as a landing, as the Ask line says.; craft: the rule walks the tokens of the text `withoutHeredocs` leaves, so a heredoc body raises no `;`.; craft: a `&` runs the landing beside its gate, so the rule refuses it beside `;` and `||`.; craft: `open` hands its text to `landedAlone`, which writes the file itself, so the open drops its own write.; craft: the earlier findings all stand answered, from the stamp order to the verdict leaf."
 ---
 
 # Ask
@@ -188,16 +194,13 @@ The cost: the commit verb runs the tests twice, once as its gate and once inside
 <!-- the form is verdict -->
 
 fail
-- design: a check before `git add` stamps the parent commit over an unclean tree.
-- design: `saysGreen` then refuses that stamp, so the verb's push to trunk and `branch done` both stop.
-- design: fix it by running the check first, then stamping the new commit once it lands.
-- craft: `partsOf` drops each operator, so the rule walks `tokensOf` to read the `;` itself.
-- craft: `tokensOf` reads a newline as `;`, so the design note names the two-line command too.
-- craft: `||` runs the landing on a red gate, so the rule refuses it beside `;`.
-- craft: `bash.test.js` covers `ticket open`, `git commit` and the commit verb after a `;` as well.
-- craft: `ticket.test.js` reads the schema alone, so the open case sits beside `ask-lint.test.js`.
-- craft: `spec/design_output/pull.md` names the hand-back, so it takes the bare pull line too.
-- craft: the verdict leaf keeps its bare hand-back, because the pull refuses a flag there. This reading of the Ask holds.
+- design: the rule refuses a `;` before a pull with a flag, and the Ask names every `ticket pull`.
+- craft: `open` hands its text to `landedAlone`, which writes the file, so the open drops its own write.
+- design: fix it by counting every `ticket pull` as a landing, as the Ask line says.
+- craft: the rule walks the tokens of the text `withoutHeredocs` leaves, so a heredoc body raises no `;`.
+- craft: a `&` runs the landing beside its gate, so the rule refuses it beside `;` and `||`.
+- craft: `open` hands its text to `landedAlone`, which writes the file itself, so the open drops its own write.
+- craft: the earlier findings all stand answered, from the stamp order to the verdict leaf.
 
 # implement
 
