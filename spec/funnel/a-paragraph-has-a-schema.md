@@ -18,7 +18,7 @@ and the unbound sessions score within noise of each other. So the standing
 guidance moves the chat by nothing a linter sees, and the doors move files by
 everything.
 
-Two pieces the schema declares reach no code:
+These pieces the schema declares reach no code:
 
 | the piece | where it stands |
 |---|---|

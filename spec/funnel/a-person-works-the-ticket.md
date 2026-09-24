@@ -52,7 +52,7 @@ drawing reads the graph the emitter answers, which
 
 VS Code draws a webview between the lines of a text editor through an inset,
 `createWebviewTextEditorInset`. That call stands among the proposed APIs on
-the main line of VS Code, so it carries three costs:
+the main line of VS Code, so it carries these costs:
 
 | the cost | what it asks |
 |---|---|
@@ -105,7 +105,7 @@ all, or edits the process and runs `./RUNME.sh ticket update`.
 
 # The work group
 
-The group holds three buttons and no switch:
+The group holds these buttons and no switch:
 
 | the button | what a press does |
 |---|---|
@@ -146,7 +146,7 @@ process goes to `./RUNME.sh ticket update`, which a person runs.
 # A report takes a template
 
 A report is work output, and it stands apart from any process. The tree holds
-two kinds today:
+these kinds today:
 
 | the kind | where it stands | its shape |
 |---|---|---|
