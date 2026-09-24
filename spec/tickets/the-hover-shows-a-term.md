@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -136,6 +136,17 @@ record:
     hand: box a0ae5042621d · claude-code-remote · helper-8
     hash_before: 754d7afc61e13a2fe30603b7de28d8630adbad1f
     hash_after: 754d7afc61e13a2fe30603b7de28d8630adbad1f
+  - step: implement/tests-red
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 2db33b2d0cc2e65bf51dd4c02904ab9f1be9d90b
+    hash_after: 2db33b2d0cc2e65bf51dd4c02904ab9f1be9d90b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -291,17 +302,34 @@ The implement step settles these details:
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/vocabulary.test.js test/contract/vocabulary.test.js src/lsp
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+| test | stands |
+|---|---|
+| the layer test | red, because `stemsOf` answers the table in the code and leaves the fixture table alone |
+| the contract test | green, because the table in the code reaches every case the file names |
+| the hover tests | red, because the stub answers no hover |
+| the Go cases | red, because the stub reads no case |
+
+The surprise is the Go reader of YAML. It reads no entry in braces, so the
+hover reads each line of `terms.yml` with a small reader of its own. The shape
+rule keeps a comma out of `means` and `source`, so a split on the comma holds.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch the table, the reader, the server and the lists, and the approach names each
+- the hover tests read a fake tree, and the one real read stands in the Go cases
+- each test carries a comment naming the design output
 
 ## reflect
 

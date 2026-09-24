@@ -16,10 +16,10 @@ import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import {
   CORE,
   coreOf,
-  ENDINGS,
   knownIn,
   looseMeanings,
   pathsOf,
+  stemsOf,
   SWAPS,
   swapsOf,
   TERMS,
@@ -47,6 +47,18 @@ terms:
   - {word: write, means: "a door with no refusal", source: "https://example.org/write"}
   - {word: level zero}
   - {word: jargon}
+`;
+
+const STEMS_TEXT = `
+endings:
+  - end: s
+    to: [none]
+  - end: ed
+    to: [none, e, drop]
+  - end: zz
+    to: [y]
+    long: true
+prefixes: [un]
 `;
 
 const SWAPS_TEXT = `
@@ -101,6 +113,7 @@ const lists = () => ({
   core: readYaml(CORE_TEXT),
   terms: readYaml(TERMS_TEXT),
   swaps: readYaml(SWAPS_TEXT),
+  stems: readYaml(STEMS_TEXT),
 });
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
@@ -151,15 +164,16 @@ test("a means line answers every word the lists leave out, and a stem stands", (
   ]);
 });
 
-// The rule and the check read one table of endings. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+// The rule and the check read one table of endings, and the lists hand it in. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
 test("the table of endings stands a stem, a prefix, and nothing past them", () => {
-  const known = knownIn(new Set(["read", "refuse", "city", "leaf", "wide"]));
-  for (const w of ["reads", "refused", "refusing", "cities", "leaves", "widely", "unread", "rereads"]) {
-    assert.ok(known(w), w);
-  }
-  for (const w of ["ready", "gate", "unready"]) assert.ok(!known(w), w);
+  const stems = stemsOf(readYaml(STEMS_TEXT));
+  const known = knownIn(new Set(["read", "refuse", "stop", "cay"]), stems);
+  for (const w of ["reads", "refused", "stopped", "cazz", "unread"]) assert.ok(known(w), w);
+  for (const w of ["reader", "reading", "cities", "reread", "azz"]) assert.ok(!known(w), w);
   const rule = rulesFrom(readYaml(SCHEMA), "", lists()).get("Vocabulary.yml") ?? "";
-  for (const { end } of ENDINGS) assert.match(rule, new RegExp(`has_suffix\\(w, "${end}"\\)`));
+  assert.match(rule, /has_suffix\(w, "zz"\)/);
+  assert.doesNotMatch(rule, /has_suffix\(w, "ing"\)/);
+  assert.match(rule, /for pre in \["un"\]/);
 });
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]

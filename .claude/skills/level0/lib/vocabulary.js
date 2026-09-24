@@ -8,6 +8,7 @@ import { grouped, left, pattern, prelude, quoted, scripted } from "./snippets.js
 export const CORE = "spec/vocabulary/core.yml";
 export const TERMS = "spec/vocabulary/terms.yml";
 export const SWAPS = "spec/vocabulary/swaps.yml";
+export const STEMS = "spec/config/stems.yaml";
 
 const WORD = /^[a-z][a-z-]*( [a-z][a-z-]*)*$/;
 // A part shorter than this stands, in the check and in the rule alike. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
@@ -113,7 +114,11 @@ function addOf(to) {
 export const PREFIXES = ["un", "re", "mis", "out", "over", "non", "pre", "sub"];
 
 // The table read in JavaScript, for a check outside the rule. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-export function knownIn(held) {
+export function stemsOf(said) {
+  return { endings: ENDINGS, prefixes: PREFIXES };
+}
+
+export function knownIn(held, stems = stemsOf()) {
   const listed = (w) =>
     held.has(w) ||
     ENDINGS.some(

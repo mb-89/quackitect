@@ -11,7 +11,10 @@ import { CASES, slugOf } from "../../.claude/skills/level0/lib/slug.js";
 import {
   CORE,
   coreOf,
+  knownIn,
   looseMeanings,
+  STEMS,
+  stemsOf,
   SWAPS,
   swapsOf,
   TERMS,
@@ -45,7 +48,7 @@ test("no term points at a note in the tree", () => {
 
 // A term says what it means in words a reader holds. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 test("every term says what it means, in core words and other terms", () => {
-  const lists = { core: read(CORE), terms: read(TERMS), swaps: read(SWAPS) };
+  const lists = { core: read(CORE), terms: read(TERMS), swaps: read(SWAPS), stems: read(STEMS) };
   assert.deepEqual(
     termsOf(lists.terms)
       .filter((one) => !one.means)
@@ -53,6 +56,15 @@ test("every term says what it means, in core words and other terms", () => {
     [],
   );
   assert.deepEqual(looseMeanings(lists), []);
+});
+
+// The table stands in one place, and this file drives the cases it names. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+test("the table of endings reaches every case it names", () => {
+  const said = read(STEMS);
+  assert.ok(said.cases?.length, `${STEMS} holds no case`);
+  const stems = stemsOf(said);
+  const missed = said.cases.filter((one) => !knownIn(new Set([one.reaches]), stems)(one.word));
+  assert.deepEqual(missed, []);
 });
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
