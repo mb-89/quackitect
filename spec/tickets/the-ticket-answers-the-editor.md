@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box 2bc65ec92430 · claude-code-remote
@@ -87,6 +87,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-ticket-answers-the-editor already carries every commit on main.
+  - step: split
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 09b07b20429b2cdf99acd80ebda6d373c3287c8c
+    hash_after: fcebf8361134d3902f21d06eb6690eceef07ff1e
 ---
 
 # Ask
@@ -116,11 +120,23 @@ The engine answers every question the editor asks as a verb writing JSON. The ve
 
 <!-- the form is list -->
 
+- [[spec/tickets/each-node-names-its-place]], standard
+- [[spec/tickets/the-route-edits-ahead]], standard
+- [[spec/tickets/the-fill-answers-on-stdout]], standard
+- [[spec/tickets/yours-counts-the-waiting]], standard
+- [[spec/tickets/the-config-declares-work]], standard
+- [[spec/tickets/the-server-helps-pick-a-process]], standard
+- [[spec/tickets/an-update-keeps-a-route]], standard
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every child is small enough to review whole, or is a group itself. Each child adds one verb, one schema change or one server feature.
+- the children add up to the goal, and nothing of the goal stands outside them. Each row of the plan's table maps to one child.
+- a child that waits on another names it under depends_on. The update child waits on the route child. The config child waits on the yours child, whose verbs its buttons run.
 
 # children
 
