@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -107,6 +107,11 @@ record:
     hand: box a0ae5042621d · claude-code-remote
     hash_before: 335fc616032ccab181fb8e7cfb63c39319762ba0
     hash_after: 335fc616032ccab181fb8e7cfb63c39319762ba0
+  - step: retro/cloud
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 3c3a9a601001ec8e7ad3ed6550d1d8831b280190
+    hash_after: 3c3a9a601001ec8e7ad3ed6550d1d8831b280190
+reason: done
 ---
 
 # Ask
@@ -250,17 +255,26 @@ file.
 
 <!-- the form is list -->
 
+- nothing: the install at the take fetched every tool, and no host or right met a refusal
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the commit hook refused the hover change, which staged no test beside the server, and a protocol test answered it
+- the pull refused a hand-back twice, because a helper's commit met code of mine in the working tree
+- the sync met no conflict, and no test failed on the box alone
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- no person step stands parked, and every ticket minted names this group
+- the handover says the group stands at done, and a person reads the branch and merges it
 
 # Discussion
 
