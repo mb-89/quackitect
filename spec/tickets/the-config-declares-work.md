@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [yours-counts-the-waiting]
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -135,6 +135,17 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 2243435bfaae091794910b60c2810c452481fcc8
+    hash_after: 2243435bfaae091794910b60c2810c452481fcc8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 79 test(s) pass in 5 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-config-declares-work.md:309:3: Sentence: A sentence holds 25 words. Cut this one in two."
 ---
 
 # Ask
