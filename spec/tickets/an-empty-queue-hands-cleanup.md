@@ -94,7 +94,13 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/draft
+group: the-editor-holds-the-drawing
+step: design/review
+record:
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: dffed25933787f0bf1f0f49c35246aaa0fd28d3a
+    hash_after: dffed25933787f0bf1f0f49c35246aaa0fd28d3a
 ---
 
 # Ask
@@ -118,17 +124,34 @@ Without it a session with an empty queue waits, while warnings and failed checks
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
+The pull answers a new word, `cleanup`, where `handOut` meets no leaf to hand, no spawn and no name asked, on a desk alone. A cleanup ticket carries no file and no hold, so each pull reads the list again. The answer names the work and the verbs, in this order:
+
+| order | applies where | the answer hands |
+|---|---|---|
+| merge | a done cloud branch stands | nothing new: the desk pull on trunk hands it ahead of the queue already, through `it.ready` |
+| refactor | the refactor list holds a warning on a file the refactoring hand holds no hold on | the oldest such file by its last commit, with `drains(file)` |
+| check | the list stands empty, and the check stamp reads failed or names a commit other than `HEAD` | `./RUNME.sh check`, and the fixes it names |
+
+The merge keeps its place ahead of the free tickets, because a closed ticket rules it there. A done branch holds the cloud's work off trunk.
+
+`src/scripts/pull-cleanup.js` holds the reading, because `pull-hand.js` stands near its ceiling. `spec/design_output/pull.md` takes the answer row and a chapter.
+
 <!-- the form is text -->
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
+- `src/scripts/pull-hand.js` `handOut`, at its wait
+- `src/scripts/pull.js` `pull`, which returns what `handOut` answers
+
 <!-- the form is list -->
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+
+- first
 
 <!-- the form is list -->
 
