@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -96,6 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor]
+step: design/draft
 ---
 
 # Ask
@@ -108,7 +109,7 @@ A person picks a process, writes the ask and saves, and the file fills with its 
 
 Without it a person minting a ticket leaves the editor for the terminal, and level one stays open.
 
-- a save over a ticket with a process and an empty route writes the route and the chapters, and a test drives it
+- a save over a picked process and an empty route writes the route and chapters, and a test drives it
 - a save over a ticket whose route stands writes nothing, and a test drives it
 - a save over a ticket with an empty `process` writes nothing, and a test drives it
 - `./RUNME.sh check` passes
