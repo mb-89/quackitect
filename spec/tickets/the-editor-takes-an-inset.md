@@ -26,7 +26,12 @@ steps:
 process: [[spec/processes/experiment]]
 process_hash: d68c3df9079c6d4a
 group: the-editor-holds-the-drawing
-step: run
+step: decide
+record:
+  - step: run
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 594647e5546be4e0c4d697dad8bb6abb0bf528ab
+    hash_after: 4766e199c7276f308c991d6848d58443b7b1beb0
 ---
 
 # Ask
