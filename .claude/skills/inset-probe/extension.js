@@ -11,6 +11,12 @@ const FOUND = ".se/probe/inset.json";
 // The first inset stands short, so the grow has something to answer.
 const SHORT = 4;
 const WAIT = 10000;
+const CLOSE_AFTER = 3000;
+// The editor's own defaults: its font size, the least height it reads as
+// pixels, and the ratio it derives a line from a font size by.
+const FONT_SIZE = 14;
+const LEAST_PX = 8;
+const LINE_RATIO = 1.35;
 
 // The editor opens a folder in one window alone, so the probe's window holds
 // none where the owner's window holds the tree. The probe finds the tree from
@@ -27,10 +33,10 @@ async function activate(context) {
     found.fault = String(err?.message ?? err);
   }
   await writes(root, found);
-  if (!process.env.QUACKITECT_PROBE_STAY) {
+  if (!stays()) {
     setTimeout(
       () => vscode.commands.executeCommand("workbench.action.closeWindow"),
-      3000,
+      CLOSE_AFTER,
     );
   }
 }
@@ -63,8 +69,7 @@ function drawn(editor, lines) {
     const late = setTimeout(() => resolve({ drawn: false, height: 0 }), WAIT);
     inset.webview.onDidReceiveMessage((said) => {
       clearTimeout(late);
-      if (process.env.QUACKITECT_PROBE_STAY)
-        resolve({ drawn: !!said?.drawn, height: said?.height ?? 0 });
+      if (stays()) resolve({ drawn: !!said?.drawn, height: said?.height ?? 0 });
       else {
         inset.dispose();
         resolve({ drawn: !!said?.drawn, height: said?.height ?? 0 });
@@ -79,10 +84,15 @@ function drawn(editor, lines) {
 function lineHeight() {
   const said = vscode.workspace.getConfiguration("editor");
   const height = Number(said.get("lineHeight"));
-  const size = Number(said.get("fontSize")) || 14;
-  if (height >= 8) return height;
+  const size = Number(said.get("fontSize")) || FONT_SIZE;
+  if (height >= LEAST_PX) return height;
   if (height > 0) return Math.round(height * size);
-  return Math.round(size * 1.35);
+  return Math.round(size * LINE_RATIO);
+}
+
+// Whether the owner asks the window to stay open for a look.
+function stays() {
+  return !!process.env.QUACKITECT_PROBE_STAY;
 }
 
 async function writes(root, found) {

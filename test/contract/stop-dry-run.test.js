@@ -1,15 +1,15 @@
 // A dry run of the server's stop door: one answer passes the answer gate and
-// then the vote, over the rules this tree ships, so two gates asking for two
+// then the vote, over the rules this tree ships, so gates asking for clashing
 // shapes of one answer fail here before a turn loops between them.
 // [[spec/design_output/stop#the-stop-is-one-line]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { TOOLS as SURVEY } from "../../.claude/skills/level0/lib/tools.js";
 import { boxOf, decide } from "../../src/bridge/server.js";
+import { disk } from "../../src/doors/disk.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
@@ -73,7 +73,7 @@ function served(plan = { working: "", todos: [], places: {} }) {
   return boxOf(ROOT, ROOT, {
     disk: fakeDisk({
       [at("spec/config/level0.json")]: JSON.stringify(CONFIG),
-      [at(RULES)]: readFileSync(join(TREE, RULES), "utf8"),
+      [at(RULES)]: disk().read(join(TREE, RULES)),
       [at(SURVEY)]: "{}",
       [at(".se/.runtime/refactor.json")]: JSON.stringify(WARNINGS),
       [at(".se/.runtime/plan.json")]: JSON.stringify(plan),

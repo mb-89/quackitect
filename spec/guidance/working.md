@@ -32,6 +32,6 @@ rationale: [[spec/rationales/working]]
 | 5 | a stop where a discussion opens | a stop to ask whether to run the tests |
 | 7 | the assumption named, then the work goes on | a design built with no read of the design input |
 | 10 | the write lands at warning, and the next step of the ask runs | a second write of the same file to clear its warning |
+| 11 | a commit, and the report naming it | a push, or a row asking whether to push |
 | 14 | a pointer at the note owning the number | the number copied into a second note |
 | 15 | a pointer at the note owning the mechanism | an aside explaining a door you leave untouched |
-| 11 | a commit, and the report naming it | a push, or a row asking whether to push |

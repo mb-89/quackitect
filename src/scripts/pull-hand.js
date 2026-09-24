@@ -150,7 +150,7 @@ export function handOut(it, who) {
   }
 
   // [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
-  const cleanup = who.wanted ? null : cleanupOf(it);
+  const cleanup = who.wanted || why.length || person ? null : cleanupOf(it);
   if (cleanup) say(cleanup.word, cleanup.rows);
   else say(WAIT, why.length ? why : [nothingFor(who)]);
   // A person's question leaves the branch, so the group lands. [[spec/design_output/work#a-person-step-leaves]]

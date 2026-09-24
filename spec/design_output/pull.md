@@ -57,8 +57,9 @@ is what tells the two apart.
 
 ## An empty queue hands cleanup
 
-A desk pull meeting no leaf, no spawn and no name answers `cleanup` in place of
-`wait`, and hands the first row that applies:
+A desk pull meeting no ticket, no spawn and no name answers `cleanup` in place
+of `wait`, and hands the first row that applies. A ticket the pull skips, or a
+person's step, keeps the `wait` and its reasons.
 
 | order | applies where | the answer hands |
 |---|---|---|
