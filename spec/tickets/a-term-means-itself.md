@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -116,6 +116,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 02d13319745389078ad2433d184e0814cc6f8406
+    hash_after: 02d13319745389078ad2433d184e0814cc6f8406
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -280,11 +288,17 @@ comma splits in two, so a `means` line holds no comma.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the reader, both rules, the list and their tests, and the ask names each
+- the change reaches the disk door alone, through the tests, and the fake disk stands for it
+- the table, the check and the shape rule each carry a comment naming the design output
 
 ## tests-green
 

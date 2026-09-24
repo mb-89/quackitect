@@ -4,248 +4,248 @@
 # [[spec/schemas/paragraph.schema.yaml]]
 
 terms:
-  - {word: splice, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
-  - {word: bridgehead, defines: "[[spec/design_output/vehicle#two-roads-to-the-vehicle]]"}
-  - {word: shim, defines: "[[spec/design_output/vehicle#two-roads-to-the-vehicle]]"}
-  - {word: stub, defines: "[[spec/design_output/vehicle#a-stub-takes-its-vehicle]]"}
-  - {word: agent, defines: "[[spec/guidance/voice]]"}
-  - {word: answer, defines: "[[spec/design_output/level0#the-gate-reads-the-answer]]"}
-  - {word: apply, defines: "[[spec/design_output/apply]]"}
-  - {word: artifact, defines: "[[spec/design_output/extension]]"}
-  - {word: assertion, defines: "[[spec/guidance/code/testing]]"}
-  - {word: battery, defines: "[[spec/design_output/work#the-battery-answers-first]]"}
-  - {word: binary, defines: "[[spec/design_output/index#the-compiler-it-needs]]"}
-  - {word: binding, defines: "[[spec/design_output/level0#the-owner-binds-god]]"}
-  - {word: biome, defines: "[[spec/design_output/config]]"}
-  - {word: bottom line, defines: "[[spec/guidance/voice]]"}
-  - {word: single point of truth, defines: "[[spec/guidance/voice]]"}
-  - {word: self-evident, defines: "[[spec/guidance/voice]]"}
-  - {word: box, defines: "[[spec/design_output/vehicle]]"}
-  - {word: branch, defines: "[[spec/design_output/work#what-a-work-branch-is]]"}
-  - {word: cage, defines: "[[spec/design_output/level0#the-write-door]]"}
-  - {word: canary, defines: "[[spec/design_output/level0#the-canary]]"}
-  - {word: inset, defines: "[[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]]"}
-  - {word: canvas, defines: "[[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]"}
-  - {word: cap, defines: "[[spec/design_output/level0#the-cap-counts-the-prose]]"}
-  - {word: chapter, defines: "[[spec/design_output/schema]]"}
-  - {word: checker, defines: "[[spec/design_output/schema#the-reader-and-the-checker]]"}
-  - {word: checklist, defines: "[[spec/design_output/schema]]"}
-  - {word: claim, defines: "[[spec/design_output/stop#the-claim-rides-the-call]]"}
-  - {word: client, defines: "[[spec/design_output/lsp]]"}
-  - {word: clone, defines: "[[spec/design_output/level0#what-level-zero-is]]"}
-  - {word: cloud, defines: "[[spec/guidance/cloud]]"}
-  - {word: commit, defines: "[[spec/design_output/bash]]"}
-  - {word: compaction, defines: "[[spec/design_output/level0#the-layer-after-a-compaction]]"}
-  - {word: compiler, defines: "[[spec/design_output/index#the-compiler-it-needs]]"}
-  - {word: config, defines: "[[spec/design_output/config]]"}
-  - {word: contract, defines: "[[spec/design_output/doors]]"}
-  - {word: copilot, defines: "[[spec/design_output/copilot]]"}
-  - {word: desk, defines: "[[spec/design_output/work#a-box-off-a-branch]]"}
-  - {word: dispatch, defines: "[[spec/design_output/copilot]]"}
-  - {word: door, defines: "[[spec/design_output/doors]]"}
-  - {word: draft, defines: "[[spec/design_output/level0#the-tool-reads-a-draft]]"}
-  - {word: editor, defines: "[[spec/design_output/editor]]"}
-  - {word: engine, defines: "[[spec/design_input/the-agent-pulls-tickets#three-rules-hold-level-one]]"}
-  - {word: escalate, defines: "[[spec/design_output/pull#a-person-step-goes-in]]"}
-  - {word: evidence, defines: "[[spec/schemas/ticket.schema]]"}
-  - {word: extension, defines: "[[spec/design_output/extension]]"}
-  - {word: fake, defines: "[[spec/design_output/doors]]"}
-  - {word: fault, defines: "[[spec/design_output/schema]]"}
-  - {word: fence, defines: "[[spec/schemas/paragraph.schema]]"}
-  - {word: field, defines: "[[spec/schemas/ticket.schema]]"}
-  - {word: finding, defines: "[[spec/design_output/level0#the-write-door]]"}
-  - {word: fixture, defines: "[[spec/guidance/code/testing]]"}
-  - {word: formatter, defines: "[[spec/design_output/level0#the-formatter-applies-itself]]"}
-  - {word: frontmatter, defines: "[[spec/design_output/schema]]"}
-  - {word: funnel, defines: "[[spec/funnel]]"}
-  - {word: gate, defines: "[[spec/design_output/level0#the-gate-reads-the-answer]]"}
-  - {word: git, defines: "[[spec/design_output/bash]]"}
-  - {word: glob, defines: "[[spec/design_output/index#a-type-is-a-glob]]"}
-  - {word: god mode, defines: "[[spec/design_output/level0#the-owner-binds-god]]"}
-  - {word: grammar, defines: "[[spec/schemas/paragraph.schema]]"}
-  - {word: graph, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
-  - {word: group, defines: "[[spec/design_output/work#a-group-is-a-ticket]]"}
-  - {word: guidance, defines: "[[spec/guidance/guidance]]"}
-  - {word: hand, defines: "[[spec/design_output/work#the-take-writes-the-record]]"}
-  - {word: handback, defines: "[[spec/design_output/review]]"}
-  - {word: handover, defines: "[[spec/design_output/work#one-handover-stands]]"}
-  - {word: harness, defines: "[[spec/design_output/level0#the-harness-surface]]"}
-  - {word: hash, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
-  - {word: helper, defines: "[[spec/design_output/level0#the-helper-takes-the-guidance]]"}
-  - {word: heredoc, defines: "[[spec/design_output/bash]]"}
-  - {word: hook, defines: "[[spec/design_output/level0#what-level-zero-is]]"}
-  - {word: index, defines: "[[spec/design_output/index]]"}
-  - {word: installer, defines: "[[spec/design_output/index#the-compiler-it-needs]]"}
-  - {word: leaf, defines: "[[spec/schemas/ticket.schema]]"}
-  - {word: level zero, defines: "[[spec/design_output/level0#what-level-zero-is]]"}
-  - {word: level one, defines: "[[spec/design_input/the-agent-pulls-tickets#three-rules-hold-level-one]]"}
-  - {word: lint, defines: "[[spec/design_output/bash]]"}
-  - {word: linter, defines: "[[spec/design_output/bash]]"}
-  - {word: log, defines: "[[spec/design_output/log]]"}
-  - {word: manifest, defines: "[[spec/design_output/apply]]"}
-  - {word: markdown, defines: "[[spec/schemas/paragraph.schema]]"}
-  - {word: merge, defines: "[[spec/design_output/work#a-merged-branch-goes]]"}
-  - {word: mint, defines: "[[spec/design_output/schema#the-tool-writes-the-note]]"}
-  - {word: modal, defines: "[[spec/schemas/paragraph.schema]]"}
-  - {word: module, defines: "[[spec/design_output/level0#a-module-imports-a-sibling]]"}
-  - {word: node, defines: "[[spec/design_output/config]]"}
-  - {word: note, defines: "[[spec/design_output/schema]]"}
-  - {word: orphan, defines: "[[spec/design_output/work]]"}
-  - {word: owner, defines: "[[spec/guidance/voice]]"}
-  - {word: pane, defines: "[[spec/design_output/tui]]"}
-  - {word: panel, defines: "[[spec/design_output/extension]]"}
-  - {word: paragraph, defines: "[[spec/schemas/paragraph.schema]]"}
-  - {word: parse, defines: "[[spec/design_output/schema#the-reader-and-the-checker]]"}
-  - {word: plugin, defines: "[[spec/design_output/level0#what-level-zero-is]]"}
-  - {word: probe, defines: "[[spec/design_output/level0#what-the-probe-does]]"}
-  - {word: process, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
-  - {word: projection, defines: "[[spec/design_output/projection]]"}
-  - {word: projector, defines: "[[spec/design_output/projection]]"}
-  - {word: prompt, defines: "[[spec/design_output/level0#the-owners-prompt-comes-first]]"}
-  - {word: prose, defines: "[[spec/schemas/paragraph.schema]]"}
-  - {word: pull, defines: "[[spec/design_input/the-agent-pulls-tickets#three-rules-hold-level-one]]"}
-  - {word: queue, defines: "[[spec/design_output/level0#the-owner-binds-god]]"}
-  - {word: rationale, defines: "[[spec/guidance/guidance]]"}
-  - {word: readback, defines: "[[spec/design_output/level0#the-owners-prompt-comes-first]]"}
-  - {word: record, defines: "[[spec/design_output/work#the-take-writes-the-record]]"}
-  - {word: refactor, defines: "[[spec/design_input/the-warnings-feed-a-refactorer]]"}
-  - {word: refactorer, defines: "[[spec/design_input/the-warnings-feed-a-refactorer]]"}
-  - {word: refactoring, defines: "[[spec/design_input/the-warnings-feed-a-refactorer]]"}
-  - {word: refusal, defines: "[[spec/design_output/level0#the-write-door]]"}
-  - {word: refuse, defines: "[[spec/design_output/level0#the-write-door]]"}
-  - {word: register, defines: "[[spec/schemas/paragraph.schema]]"}
-  - {word: render, defines: "[[spec/design_output/schema#the-record-draws-itself]]"}
-  - {word: repo, defines: "[[spec/design_output/bash]]"}
-  - {word: retro, defines: "[[spec/processes/retro]]"}
-  - {word: reviewer, defines: "[[spec/guidance/review/reviewing]]"}
-  - {word: root, defines: "[[spec/design_output/vehicle]]"}
-  - {word: route, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
-  - {word: routine, defines: "[[spec/design_output/work#the-routine-a-verb-names]]"}
-  - {word: runtime, defines: "[[spec/design_output/copilot]]"}
-  - {word: sandbox, defines: "[[spec/design_output/copilot]]"}
-  - {word: schema, defines: "[[spec/design_output/schema]]"}
-  - {word: scope, defines: "[[spec/guidance/guidance]]"}
-  - {word: session, defines: "[[spec/design_output/level0#what-level-zero-is]]"}
-  - {word: shell, defines: "[[spec/design_output/bash]]"}
-  - {word: sidebar, defines: "[[spec/design_output/extension]]"}
-  - {word: slash command, defines: "[[spec/design_output/config]]"}
-  - {word: spawn, defines: "[[spec/design_output/level0#the-spawn-carries-a-rewrite]]"}
-  - {word: stale, defines: "[[spec/design_output/work#a-stale-group-is-yours]]"}
-  - {word: stamp, defines: "[[spec/design_output/work#the-battery-answers-first]]"}
-  - {word: standing layer, defines: "[[spec/design_output/level0#the-standing-layer]]"}
-  - {word: stop, defines: "[[spec/design_output/stop]]"}
-  - {word: subagent, defines: "[[spec/design_output/level0#a-subagent-brings-no-session]]"}
-  - {word: sweep, defines: "[[spec/design_output/apply]]"}
-  - {word: swap, defines: "[[spec/vocabulary/swaps]]"}
-  - {word: tagger, defines: "[[spec/schemas/paragraph.schema]]"}
-  - {word: take, defines: "[[spec/design_output/work#the-take-writes-the-record]]"}
-  - {word: term, defines: "[[spec/vocabulary/terms]]"}
-  - {word: terminal, defines: "[[spec/design_output/tui]]"}
-  - {word: ticket, defines: "[[spec/schemas/ticket.schema]]"}
-  - {word: token, defines: "[[spec/design_output/level0#the-score-is-a-rate]]"}
-  - {word: tooth, defines: "[[spec/design_output/stop#what-the-tooth-is]]"}
-  - {word: transcript, defines: "[[spec/design_output/level0#what-the-door-reads]]"}
-  - {word: tree, defines: "[[spec/design_output/vehicle]]"}
-  - {word: trunk, defines: "[[spec/design_output/work#trunk-comes-in-first]]"}
-  - {word: tui, defines: "[[spec/design_output/tui#the-verb-builds-it]]"}
-  - {word: urgent, defines: "[[spec/design_output/work#the-mark-and-what-waits]]"}
-  - {word: vale, defines: "[[spec/design_output/level0#the-write-door]]"}
-  - {word: ini, defines: "[[spec/design_output/projection#a-layer-writes-two-files]]"}
-  - {word: vehicle, defines: "[[spec/design_output/vehicle]]"}
-  - {word: verb, defines: "[[spec/design_output/work]]"}
-  - {word: verdict, defines: "[[spec/design_output/review]]"}
-  - {word: viewer, defines: "[[spec/design_output/tui]]"}
-  - {word: vocabulary, defines: "[[spec/vocabulary/core]]"}
-  - {word: watcher, defines: "[[spec/design_output/index#the-watcher-keeps-it-warm]]"}
-  - {word: webview, defines: "[[spec/design_output/extension]]"}
-  - {word: widget, defines: "[[spec/design_output/extension]]"}
-  - {word: worker, defines: "[[spec/design_output/copilot]]"}
-  - {word: workspace, defines: "[[spec/design_output/editor]]"}
-  - {word: worktree, defines: "[[spec/design_output/review]]"}
-  - {word: actionable, defines: "[[spec/guidance/guidance]]"}
-  - {word: applier, defines: "[[spec/design_output/apply]]"}
-  - {word: backlog, defines: "[[spec/design_output/work#a-row-per-group]]"}
-  - {word: backslash, defines: "[[spec/design_output/bash]]"}
-  - {word: blacklist, defines: "[[spec/design_output/projection#the-second-target]]"}
-  - {word: bundler, defines: "[[spec/design_output/extension]]"}
-  - {word: caller, defines: "[[spec/design_output/apply]]"}
-  - {word: cgo, defines: "[[spec/design_output/index#the-compiler-it-needs]]"}
-  - {word: dispatcher, defines: "[[spec/design_output/copilot]]"}
-  - {word: emitter, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
-  - {word: emoji, defines: "[[spec/design_output/projection#the-second-target]]"}
-  - {word: enabler, defines: "[[spec/design_input/the-agent-pulls-tickets#the-route]]"}
-  - {word: ellipsis, defines: "[[spec/design_output/projection#the-second-target]]"}
-  - {word: fixer, defines: "[[spec/design_output/bash]]"}
-  - {word: headless, defines: "[[spec/design_output/level0#what-the-probe-does]]"}
-  - {word: hover, defines: "[[spec/design_output/extension]]"}
-  - {word: hyphen, defines: "[[spec/design_output/projection#the-second-target]]"}
-  - {word: idempotent, defines: "[[spec/design_output/pull#the-hand-back-matches-the-hold]]"}
-  - {word: indent, defines: "[[spec/design_output/schema]]"}
-  - {word: kebab, defines: "[[spec/design_output/config]]"}
-  - {word: lexer, defines: "[[spec/design_output/bash]]"}
-  - {word: lookahead, defines: "[[spec/design_output/bash]]"}
-  - {word: millisecond, defines: "[[spec/design_output/log]]"}
-  - {word: minter, defines: "[[spec/design_output/schema#the-tool-writes-the-note]]"}
-  - {word: newline, defines: "[[spec/design_output/bash]]"}
-  - {word: nonce, defines: "[[spec/design_output/extension]]"}
-  - {word: openste, defines: "[[spec/vocabulary/core]]"}
-  - {word: participle, defines: "[[spec/design_output/projection#the-second-target]]"}
-  - {word: placeholder, defines: "[[spec/design_output/schema#a-placeholder-stands-at-warning]]"}
-  - {word: quackitect, defines: "[[README]]"}
-  - {word: redraw, defines: "[[spec/design_output/extension]]"}
-  - {word: regex, defines: "[[spec/design_output/apply]]"}
-  - {word: renderer, defines: "[[spec/design_output/schema#the-record-draws-itself]]"}
-  - {word: resolver, defines: "[[spec/design_output/config]]"}
-  - {word: retry, defines: "[[spec/design_output/copilot]]"}
-  - {word: ripgrep, defines: "[[spec/design_output/index]]"}
-  - {word: runme, defines: "[[README]]"}
-  - {word: scratchpad, defines: "[[spec/guidance/working]]"}
-  - {word: semicolon, defines: "[[spec/design_output/projection#the-second-target]]"}
-  - {word: serialize, defines: "[[spec/design_output/apply]]"}
-  - {word: shebang, defines: "[[spec/design_output/bash]]"}
-  - {word: sipoc, defines: "[[spec/design_input/the-agent-pulls-tickets#the-route]]"}
-  - {word: stdin, defines: "[[spec/design_output/bash]]"}
-  - {word: stdio, defines: "[[spec/design_output/lsp]]"}
-  - {word: subcommand, defines: "[[spec/design_output/work]]"}
-  - {word: throwaway, defines: "[[spec/design_output/review]]"}
-  - {word: underscore, defines: "[[spec/design_output/level0#the-path-a-rule-reads]]"}
-  - {word: validator, defines: "[[spec/design_output/config]]"}
-  - {word: whitelist, defines: "[[spec/design_output/projection#the-second-target]]"}
-  - {word: whitespace, defines: "[[spec/design_output/bash]]"}
-  - {word: wildcard, defines: "[[spec/design_output/index#a-type-is-a-glob]]"}
-  - {word: yaml, defines: "[[spec/design_output/schema]]"}
-  - {word: json, defines: "[[spec/design_output/vehicle#the-record-names-the-vehicle]]"}
-  - {word: animate, defines: "[[spec/design_output/extension]]"}
-  - {word: authenticate, defines: "[[spec/design_output/copilot]]"}
-  - {word: backspace, defines: "[[spec/design_output/projection]]"}
-  - {word: coerce, defines: "[[spec/design_output/config]]"}
-  - {word: collapsible, defines: "[[spec/design_output/extension]]"}
-  - {word: deterministic, defines: "[[spec/design_output/projection]]"}
-  - {word: egress, defines: "[[spec/design_output/copilot]]"}
-  - {word: enumerate, defines: "[[spec/design_output/schema]]"}
-  - {word: ephemeral, defines: "[[spec/design_output/copilot]]"}
-  - {word: escalation, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
-  - {word: flatten, defines: "[[spec/design_output/private]]"}
-  - {word: guardrail, defines: "[[spec/design_output/level0#the-write-door]]"}
-  - {word: gutter, defines: "[[spec/design_output/tui]]"}
-  - {word: ideation, defines: "[[spec/design_output/extension]]"}
-  - {word: inherit, defines: "[[spec/design_output/vehicle#the-work-root-inherits]]"}
-  - {word: inject, defines: "[[spec/design_output/copilot]]"}
-  - {word: interpolate, defines: "[[spec/design_output/level0#the-rules-past-one-buffer]]"}
-  - {word: loopback, defines: "[[spec/design_output/index]]"}
-  - {word: modifier, defines: "[[spec/design_output/schema]]"}
-  - {word: msvc, defines: "[[spec/design_output/editor]]"}
-  - {word: mutate, defines: "[[spec/design_output/copilot]]"}
-  - {word: orchestration, defines: "[[spec/design_output/copilot]]"}
-  - {word: powershell, defines: "[[spec/design_output/editor]]"}
-  - {word: prepend, defines: "[[spec/design_output/level0#the-spawn-carries-a-rewrite]]"}
-  - {word: provenance, defines: "[[spec/rationales/voice]]"}
-  - {word: recursion, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
-  - {word: regexp, defines: "[[spec/design_output/index]]"}
-  - {word: ruleset, defines: "[[spec/design_output/copilot]]"}
-  - {word: truncate, defines: "[[spec/design_output/level0]]"}
-  - {word: vscode, defines: "[[spec/design_output/extension]]"}
-  - {word: wink-nlp, defines: "[[spec/design_output/level0#the-tense-reader]]"}
-  - {word: adjective, defines: "[[spec/design_output/level0#the-tense-reader]]"}
-  - {word: starfish, defines: "[[spec/guidance/retro/read]]"}
-  - {word: mechanize, defines: "[[spec/guidance/retro/read]]"}
+  - {word: splice, defines: "[[spec/design_input/the-agent-pulls-tickets]]", means: "to insert rows or steps into a list at a given place and push the rest along"}
+  - {word: bridgehead, defines: "[[spec/design_output/vehicle#two-roads-to-the-vehicle]]", means: "the one hook module a project carries which posts every event to the server and finds the vehicle"}
+  - {word: shim, defines: "[[spec/design_output/vehicle#two-roads-to-the-vehicle]]", means: "the small shell run script in a stub that finds the vehicle and hands it every argument"}
+  - {word: stub, defines: "[[spec/design_output/vehicle#a-stub-takes-its-vehicle]]", means: "a bare project the method drives from outside which the vehicle writes out without copying itself"}
+  - {word: agent, defines: "[[spec/guidance/voice]]", means: "the model that works the tree in a session and meets every door a person meets"}
+  - {word: answer, defines: "[[spec/design_output/level0#the-gate-reads-the-answer]]", means: "the reply a session writes at the end of a turn which the gate reads and scores"}
+  - {word: apply, defines: "[[spec/design_output/apply]]", means: "to write a checked set of file edits at once where one failure refuses the whole set"}
+  - {word: artifact, defines: "[[spec/design_output/extension]]", means: "a file a build or a run produces and keeps such as a bundled script or a report"}
+  - {word: assertion, defines: "[[spec/guidance/code/testing]]", means: "a check inside a test that states what must hold and fails the test when it does not"}
+  - {word: battery, defines: "[[spec/design_output/work#the-battery-answers-first]]", means: "the full set of tests and checks the check verb runs whose result every push must pass"}
+  - {word: binary, defines: "[[spec/design_output/index#the-compiler-it-needs]]", means: "a built program file that runs on its own such as the index server"}
+  - {word: binding, defines: "[[spec/design_output/level0#the-owner-binds-god]]", means: "the setting that says how hard the doors hold where god lets every refusal through"}
+  - {word: biome, defines: "[[spec/design_output/config]]", means: "the formatter and linter that reads and rewrites javascript and json in this tree", source: "https://biomejs.dev"}
+  - {word: bottom line, defines: "[[spec/guidance/voice]]", means: "the main point a reader acts on which goes first with the detail under it"}
+  - {word: single point of truth, defines: "[[spec/guidance/voice]]", means: "the rule to state a thing in one place and link to it everywhere else"}
+  - {word: self-evident, defines: "[[spec/guidance/voice]]", means: "plain from the structure beside it so a sentence saying it adds nothing"}
+  - {word: box, defines: "[[spec/design_output/vehicle]]", means: "the machine a session runs on such as a cloud container or a laptop at a desk"}
+  - {word: branch, defines: "[[spec/design_output/work#what-a-work-branch-is]]", means: "a git line of work that holds one piece of work and carries its group ticket"}
+  - {word: cage, defines: "[[spec/design_output/level0#the-write-door]]", means: "the set of level zero doors that hold a session and refuse writes breaking a rule"}
+  - {word: canary, defines: "[[spec/design_output/level0#the-canary]]", means: "the opening line of an answer saying level zero holds the session with its rule counts"}
+  - {word: inset, defines: "[[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]]", means: "a web view the editor draws between the lines of a text file to show the ticket drawing"}
+  - {word: canvas, defines: "[[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]", means: "the drawing surface in the editor where a route shows as blocks and wires a person can edit"}
+  - {word: cap, defines: "[[spec/design_output/level0#the-cap-counts-the-prose]]", means: "the most words an answer may hold outside fences and tables before it meets a rewrite"}
+  - {word: chapter, defines: "[[spec/design_output/schema]]", means: "a section of a note under a top level heading that its schema names"}
+  - {word: checker, defines: "[[spec/design_output/schema#the-reader-and-the-checker]]", means: "the program part that weighs a note against its schema and answers one finding per departure"}
+  - {word: checklist, defines: "[[spec/design_output/schema]]", means: "a list of items a step carries which the hand checks off one line each in its evidence"}
+  - {word: claim, defines: "[[spec/design_output/stop#the-claim-rides-the-call]]", means: "the reason an agent gives through the stop tool to end a turn which the tooth confirms"}
+  - {word: client, defines: "[[spec/design_output/lsp]]", means: "a program that asks a server for work such as the agent harness or the editor extension"}
+  - {word: clone, defines: "[[spec/design_output/level0#what-level-zero-is]]", means: "a full copy of the repository on a box made with git"}
+  - {word: cloud, defines: "[[spec/guidance/cloud]]", means: "a remote box where a session runs alone with nobody beside it to answer"}
+  - {word: commit, defines: "[[spec/design_output/bash]]", means: "a saved snapshot of changes in git with a message that the door checks for voice"}
+  - {word: compaction, defines: "[[spec/design_output/level0#the-layer-after-a-compaction]]", means: "the harness shrinking a long conversation into a summary so the session keeps going"}
+  - {word: compiler, defines: "[[spec/design_output/index#the-compiler-it-needs]]", means: "a program that turns source code into a binary such as the c compiler the index build needs"}
+  - {word: config, defines: "[[spec/design_output/config]]", means: "the numbers and switches this tree holds which one resolver reads from layered files and the environment"}
+  - {word: contract, defines: "[[spec/design_output/doors]]", means: "a test that drives the real thing behind a door and checks its fake answers the same"}
+  - {word: copilot, defines: "[[spec/design_output/copilot]]", means: "the coding agent of a hosted git service that runs as a second surface under the same level zero doors", source: "https://github.com/features/copilot"}
+  - {word: desk, defines: "[[spec/design_output/work#a-box-off-a-branch]]", means: "a session a person runs by hand outside a cloud box which hands person steps out"}
+  - {word: dispatch, defines: "[[spec/design_output/copilot]]", means: "to send a work branch to a copilot worker as a draft pull request"}
+  - {word: door, defines: "[[spec/design_output/doors]]", means: "the one place the tree reaches or guards an outside thing and refuses what breaks a rule"}
+  - {word: draft, defines: "[[spec/design_output/level0#the-tool-reads-a-draft]]", means: "an answer written before it goes out which a tool checks against the voice rules"}
+  - {word: editor, defines: "[[spec/design_output/editor]]", means: "the code editor a person works in which draws findings and the ticket drawing as they type"}
+  - {word: engine, defines: "[[spec/design_input/the-agent-pulls-tickets#three-rules-hold-level-one]]", means: "the part that hands out the next ticket by rules and checks every hand back"}
+  - {word: escalate, defines: "[[spec/design_output/pull#a-person-step-goes-in]]", means: "to hand a question the agent cannot settle to the owner by inserting a person step"}
+  - {word: evidence, defines: "[[spec/schemas/ticket.schema]]", means: "the fields a hand fills at a step in set forms which the engine checks"}
+  - {word: extension, defines: "[[spec/design_output/extension]]", means: "the editor add on that draws the tree sidebar and the ticket drawing"}
+  - {word: fake, defines: "[[spec/design_output/doors]]", means: "a stand in for a door that works in memory so a test touches nothing outside"}
+  - {word: fault, defines: "[[spec/design_output/schema]]", means: "a departure a check finds such as a missing key or a value of the wrong shape"}
+  - {word: fence, defines: "[[spec/schemas/paragraph.schema]]", means: "a block of code set off from the prose which the voice rules skip"}
+  - {word: field, defines: "[[spec/schemas/ticket.schema]]", means: "a named slot in a ticket that holds one value or one piece of evidence"}
+  - {word: finding, defines: "[[spec/design_output/level0#the-write-door]]", means: "one rule break a check reports naming the rule and the file and the line"}
+  - {word: fixture, defines: "[[spec/guidance/code/testing]]", means: "shared test data or setup that tests read and never write"}
+  - {word: formatter, defines: "[[spec/design_output/level0#the-formatter-applies-itself]]", means: "a tool that rewrites code into one standard layout without asking such as biome"}
+  - {word: frontmatter, defines: "[[spec/design_output/schema]]", means: "the block of yaml keys at the top of a note before its body"}
+  - {word: funnel, defines: "[[spec/funnel]]", means: "a note that holds an open question the owner weighs with the options and what each costs"}
+  - {word: gate, defines: "[[spec/design_output/level0#the-gate-reads-the-answer]]", means: "the end of turn check that scores an answer and asks for a rewrite past a limit"}
+  - {word: git, defines: "[[spec/design_output/bash]]", means: "the version control program that records commits and branches of this tree", source: "https://git-scm.com"}
+  - {word: glob, defines: "[[spec/design_output/index#a-type-is-a-glob]]", means: "a file name pattern with wildcards that names a family of files"}
+  - {word: god mode, defines: "[[spec/design_output/level0#the-owner-binds-god]]", means: "the binding that lets every refusal and hold through and leaves only a debug line"}
+  - {word: grammar, defines: "[[spec/schemas/paragraph.schema]]", means: "the rules for how a sentence may be built such as which tenses and modals it may use"}
+  - {word: graph, defines: "[[spec/design_input/the-agent-pulls-tickets]]", means: "the nodes and edges an emitter reads out of a route which the editor draws"}
+  - {word: group, defines: "[[spec/design_output/work#a-group-is-a-ticket]]", means: "a ticket whose work is other tickets and which rides its own work branch"}
+  - {word: guidance, defines: "[[spec/guidance/guidance]]", means: "a note of numbered rules that tells the reader what to do next"}
+  - {word: hand, defines: "[[spec/design_output/work#the-take-writes-the-record]]", means: "the agent or person or box that does the work at a step and signs the record"}
+  - {word: handback, defines: "[[spec/design_output/review]]", means: "the ticket as a branch carries it at done with the evidence each step fills"}
+  - {word: handover, defines: "[[spec/design_output/work#one-handover-stands]]", means: "a private file a session leaves for the next session on the box which reads it once"}
+  - {word: harness, defines: "[[spec/design_output/level0#the-harness-surface]]", means: "the agent client that runs a session and fires the hooks level zero listens to"}
+  - {word: hash, defines: "[[spec/design_input/the-agent-pulls-tickets]]", means: "a short fingerprint of a file or commit that changes whenever its content changes"}
+  - {word: helper, defines: "[[spec/design_output/level0#the-helper-takes-the-guidance]]", means: "a subagent a session spawns which gets the session guidance and meets the same doors"}
+  - {word: heredoc, defines: "[[spec/design_output/bash]]", means: "a block of text written inline in a shell command and fed to that command as input"}
+  - {word: hook, defines: "[[spec/design_output/level0#what-level-zero-is]]", means: "a function the harness calls at an event such as a tool call or a turn end"}
+  - {word: index, defines: "[[spec/design_output/index]]", means: "the database over this tree that a watcher keeps warm and that answers searches fast"}
+  - {word: installer, defines: "[[spec/design_output/index#the-compiler-it-needs]]", means: "the script that sets up the tools a build needs and downloads a missing compiler"}
+  - {word: leaf, defines: "[[spec/schemas/ticket.schema]]", means: "a step with no steps under it and the only thing a pull hands out"}
+  - {word: level zero, defines: "[[spec/design_output/level0#what-level-zero-is]]", means: "the plugin holding every door that guards the agent from the first turn of a clone"}
+  - {word: level one, defines: "[[spec/design_input/the-agent-pulls-tickets#three-rules-hold-level-one]]", means: "the ticket system where the agent pulls a ticket and works it and hands it back"}
+  - {word: lint, defines: "[[spec/design_output/bash]]", means: "to check a file or message against the style rules and report each break"}
+  - {word: linter, defines: "[[spec/design_output/bash]]", means: "a program that checks text or code against style rules and names each break"}
+  - {word: log, defines: "[[spec/design_output/log]]", means: "the file of lines each door writes per session which the viewer shows and a retro reads"}
+  - {word: manifest, defines: "[[spec/design_output/apply]]", means: "the full list of edit steps one patch call carries which lands whole or not at all"}
+  - {word: markdown, defines: "[[spec/schemas/paragraph.schema]]", means: "the plain text format every note uses with marks for headings and lists and links", source: "https://daringfireball.net/projects/markdown/"}
+  - {word: merge, defines: "[[spec/design_output/work#a-merged-branch-goes]]", means: "to join a finished work branch into main once its tickets agree and the check passes"}
+  - {word: mint, defines: "[[spec/design_output/schema#the-tool-writes-the-note]]", means: "to write a new note from the schema of its kind so the checker passes it"}
+  - {word: modal, defines: "[[spec/schemas/paragraph.schema]]", means: "a helping verb such as can or must or will that a paragraph may use"}
+  - {word: module, defines: "[[spec/design_output/level0#a-module-imports-a-sibling]]", means: "a single code file that other code loads and that holds one piece of the logic"}
+  - {word: node, defines: "[[spec/design_output/config]]", means: "the program that runs the javascript of this tree outside a browser", source: "https://nodejs.org"}
+  - {word: note, defines: "[[spec/design_output/schema]]", means: "a markdown file of one kind that its schema governs"}
+  - {word: orphan, defines: "[[spec/design_output/work]]", means: "a branch that shares no history with main so no sync or merge reaches it"}
+  - {word: owner, defines: "[[spec/guidance/voice]]", means: "the person the tree works for who gives the asks and makes the rulings"}
+  - {word: pane, defines: "[[spec/design_output/tui]]", means: "the right half of the viewer window that shows the help or the filter"}
+  - {word: panel, defines: "[[spec/design_output/extension]]", means: "an editor area that draws one view such as the sidebar page or the problems list"}
+  - {word: paragraph, defines: "[[spec/schemas/paragraph.schema]]", means: "a run of sentences in prose that the voice rules cap and shape"}
+  - {word: parse, defines: "[[spec/design_output/schema#the-reader-and-the-checker]]", means: "to split text into its parts so a program can read each part"}
+  - {word: plugin, defines: "[[spec/design_output/level0#what-level-zero-is]]", means: "a package the harness loads that adds hooks and tools to a session"}
+  - {word: probe, defines: "[[spec/design_output/level0#what-the-probe-does]]", means: "a verb that runs the client headless to prove the guidance survives a compaction"}
+  - {word: process, defines: "[[spec/design_input/the-agent-pulls-tickets]]", means: "a route template the mint copies onto a new ticket"}
+  - {word: projection, defines: "[[spec/design_output/projection]]", means: "a target file the engine writes from one source so nobody copies by hand"}
+  - {word: projector, defines: "[[spec/design_output/projection]]", means: "the part of the engine that writes each source into every target it names"}
+  - {word: prompt, defines: "[[spec/design_output/level0#the-owners-prompt-comes-first]]", means: "a message a person sends that opens a turn and that the session owes an answer"}
+  - {word: prose, defines: "[[spec/schemas/paragraph.schema]]", means: "plain running text in sentences as opposed to code or tables"}
+  - {word: pull, defines: "[[spec/design_input/the-agent-pulls-tickets#three-rules-hold-level-one]]", means: "the verb that hands the agent a ticket at a step and takes it back with a verdict"}
+  - {word: queue, defines: "[[spec/design_output/level0#the-owner-binds-god]]", means: "the ordered list of tickets and todos waiting for a hand to take them"}
+  - {word: rationale, defines: "[[spec/guidance/guidance]]", means: "a note holding the argument behind a guidance note so the rule itself stays short"}
+  - {word: readback, defines: "[[spec/design_output/level0#the-owners-prompt-comes-first]]", means: "the answer a session owes the owner for a prompt before it goes on working"}
+  - {word: record, defines: "[[spec/design_output/work#the-take-writes-the-record]]", means: "the list in a ticket that holds one entry per step a hand takes"}
+  - {word: refactor, defines: "[[spec/design_input/the-warnings-feed-a-refactorer]]", means: "to change how a thing reads or is shaped while its meaning and behavior stay the same"}
+  - {word: refactorer, defines: "[[spec/design_input/the-warnings-feed-a-refactorer]]", means: "a hand spawned beside the session that drains warnings and changes no meaning"}
+  - {word: refactoring, defines: "[[spec/design_input/the-warnings-feed-a-refactorer]]", means: "work that reshapes code or prose to cost a reader less and keeps its meaning"}
+  - {word: refusal, defines: "[[spec/design_output/level0#the-write-door]]", means: "the answer a door gives when it denies a write and names the rule and line"}
+  - {word: refuse, defines: "[[spec/design_output/level0#the-write-door]]", means: "to deny a write or command and name the rule it breaks"}
+  - {word: register, defines: "[[spec/schemas/paragraph.schema]]", means: "a set of voice rules that overrides the defaults for the files it names"}
+  - {word: render, defines: "[[spec/design_output/schema#the-record-draws-itself]]", means: "to draw a note or its record as lines a person reads"}
+  - {word: repo, defines: "[[spec/design_output/bash]]", means: "the git repository that holds this tree and its history"}
+  - {word: retro, defines: "[[spec/processes/retro]]", means: "the process that reads a window of the record and earns changes to the machinery"}
+  - {word: reviewer, defines: "[[spec/guidance/review/reviewing]]", means: "the role that reads a branch at done against its ask and hands back a list of fixes"}
+  - {word: root, defines: "[[spec/design_output/vehicle]]", means: "a top folder a vehicle knows such as the method root or the work root"}
+  - {word: route, defines: "[[spec/design_input/the-agent-pulls-tickets]]", means: "the tree of steps a ticket carries which the pull walks leaf by leaf"}
+  - {word: routine, defines: "[[spec/design_output/work#the-routine-a-verb-names]]", means: "a saved trigger that starts a cloud session with one fixed prompt"}
+  - {word: runtime, defines: "[[spec/design_output/copilot]]", means: "the program that runs the level zero doors for another agent surface"}
+  - {word: sandbox, defines: "[[spec/design_output/copilot]]", means: "a closed space where a worker runs with limited access to the rest of the system"}
+  - {word: schema, defines: "[[spec/design_output/schema]]", means: "a file that says which fields and chapters a note of one kind holds"}
+  - {word: scope, defines: "[[spec/guidance/guidance]]", means: "the field that names which files or readers a guidance note covers"}
+  - {word: session, defines: "[[spec/design_output/level0#what-level-zero-is]]", means: "one run of the agent in the harness from its first prompt to its end"}
+  - {word: shell, defines: "[[spec/design_output/bash]]", means: "the command line program that runs the commands the agent types", source: "https://www.gnu.org/software/bash/"}
+  - {word: sidebar, defines: "[[spec/design_output/extension]]", means: "the view the editor extension draws beside the files to show and set the tree values"}
+  - {word: slash command, defines: "[[spec/design_output/config]]", means: "a command a person types in the chat after a forward slash to run a stored prompt"}
+  - {word: spawn, defines: "[[spec/design_output/level0#the-spawn-carries-a-rewrite]]", means: "the moment a session starts a subagent which a hook can catch to rewrite its prompt"}
+  - {word: stale, defines: "[[spec/design_output/work#a-stale-group-is-yours]]", means: "said of a held branch whose tip is past the set age so a person must decide"}
+  - {word: stamp, defines: "[[spec/design_output/work#the-battery-answers-first]]", means: "the record the check writes on each run naming the commit and whether it passes"}
+  - {word: standing layer, defines: "[[spec/design_output/level0#the-standing-layer]]", means: "the blocks of guidance and handover that the first message of each conversation carries"}
+  - {word: stop, defines: "[[spec/design_output/stop]]", means: "the end of a turn when the model stops writing and the hook decides whether work goes on"}
+  - {word: subagent, defines: "[[spec/design_output/level0#a-subagent-brings-no-session]]", means: "a helper agent a session starts for one job which fires no session start of its own"}
+  - {word: sweep, defines: "[[spec/design_output/apply]]", means: "one pattern replaced across every file a glob reaches in a single pass"}
+  - {word: swap, defines: "[[spec/vocabulary/swaps]]", means: "a word the core leaves out paired with the core word to write in its place"}
+  - {word: tagger, defines: "[[spec/schemas/paragraph.schema]]", means: "the program that marks each word with its part of speech so a rule can read tense"}
+  - {word: take, defines: "[[spec/design_output/work#the-take-writes-the-record]]", means: "to claim a group of work by writing the box and branch tip into its record"}
+  - {word: term, defines: "[[spec/vocabulary/terms]]", means: "a word this tree uses beyond the core with one line that says what it means"}
+  - {word: terminal, defines: "[[spec/design_output/tui]]", means: "the text window where a person runs commands and where the viewer draws"}
+  - {word: ticket, defines: "[[spec/schemas/ticket.schema]]", means: "a file that holds one piece of work with its route of steps and its record"}
+  - {word: token, defines: "[[spec/design_output/level0#the-score-is-a-rate]]", means: "a small unit of text such as a word or part of one that a rule reads"}
+  - {word: tooth, defines: "[[spec/design_output/stop#what-the-tooth-is]]", means: "the check that reads the end of a turn and decides whether the session goes on"}
+  - {word: transcript, defines: "[[spec/design_output/level0#what-the-door-reads]]", means: "the full written record of the messages and calls in a session"}
+  - {word: tree, defines: "[[spec/design_output/vehicle]]", means: "a folder with all the files under it such as the method tree or the work tree"}
+  - {word: trunk, defines: "[[spec/design_output/work#trunk-comes-in-first]]", means: "the main branch that every work branch starts from and merges back into"}
+  - {word: tui, defines: "[[spec/design_output/tui#the-verb-builds-it]]", means: "a text user interface that draws a window of rows inside a terminal"}
+  - {word: urgent, defines: "[[spec/design_output/work#the-mark-and-what-waits]]", means: "a mark on a ticket that puts its branch first when the next work is taken"}
+  - {word: vale, defines: "[[spec/design_output/level0#the-write-door]]", means: "a prose linter that checks text against style rules and which the write door runs first", source: "https://vale.sh"}
+  - {word: ini, defines: "[[spec/design_output/projection#a-layer-writes-two-files]]", means: "a plain settings file made of sections and key value lines such as the vale settings file"}
+  - {word: vehicle, defines: "[[spec/design_output/vehicle]]", means: "the copy of this tooling that another project carries and that drives the work there"}
+  - {word: verb, defines: "[[spec/design_output/work]]", means: "a named command the tool runs such as a command that acts on a work branch"}
+  - {word: verdict, defines: "[[spec/design_output/review]]", means: "a pass or fail answer that a review step gives with its findings"}
+  - {word: viewer, defines: "[[spec/design_output/tui]]", means: "the program that shows the session log as rows in a terminal window"}
+  - {word: vocabulary, defines: "[[spec/vocabulary/core]]", means: "the full set of words this tree lets a writer use made of the core and the terms"}
+  - {word: watcher, defines: "[[spec/design_output/index#the-watcher-keeps-it-warm]]", means: "the part that watches the folders for writes and keeps the index rows level with the files"}
+  - {word: webview, defines: "[[spec/design_output/extension]]", means: "a panel inside the editor that shows a web page drawn by the extension"}
+  - {word: widget, defines: "[[spec/design_output/extension]]", means: "one control on the settings page such as a toggle or a text box that draws a value"}
+  - {word: worker, defines: "[[spec/design_output/copilot]]", means: "the remote agent that does the work on one branch inside its own sandbox"}
+  - {word: workspace, defines: "[[spec/design_output/editor]]", means: "the folder the editor opens as a project and which relative paths start from"}
+  - {word: worktree, defines: "[[spec/design_output/review]]", means: "a second checkout of a branch in its own folder beside the main one", source: "https://git-scm.com/docs/git-worktree"}
+  - {word: actionable, defines: "[[spec/guidance/guidance]]", means: "said of a line that tells the reader what to do next"}
+  - {word: applier, defines: "[[spec/design_output/apply]]", means: "the part that makes an edit or replace land in the files and records how to undo it"}
+  - {word: backlog, defines: "[[spec/design_output/work#a-row-per-group]]", means: "the loose tickets on trunk that name no group and wait for a person to sort them"}
+  - {word: backslash, defines: "[[spec/design_output/bash]]", means: "the character that escapes the next character in a shell command"}
+  - {word: blacklist, defines: "[[spec/design_output/projection#the-second-target]]", means: "a list of forms a rule refuses inside a larger list of allowed words"}
+  - {word: bundler, defines: "[[spec/design_output/extension]]", means: "a tool that joins the extension source files into one file the editor loads"}
+  - {word: caller, defines: "[[spec/design_output/apply]]", means: "the code or agent that calls a tool and states what it expects back"}
+  - {word: cgo, defines: "[[spec/design_output/index#the-compiler-it-needs]]", means: "the go feature that lets go code call c code and so needs a c compiler to build", source: "https://pkg.go.dev/cmd/cgo"}
+  - {word: dispatcher, defines: "[[spec/design_output/copilot]]", means: "the side that hands work to a worker and holds the credentials the worker must not get"}
+  - {word: emitter, defines: "[[spec/design_input/the-agent-pulls-tickets]]", means: "the one module that reads a process file and writes the drawing the editor shows"}
+  - {word: emoji, defines: "[[spec/design_output/projection#the-second-target]]", means: "a small picture character that the paragraph rules refuse in prose"}
+  - {word: enabler, defines: "[[spec/design_input/the-agent-pulls-tickets#the-route]]", means: "what a step must have to run such as the notes it reads and the tools it needs"}
+  - {word: ellipsis, defines: "[[spec/design_output/projection#the-second-target]]", means: "three dots that mark words left out which the paragraph rules refuse"}
+  - {word: fixer, defines: "[[spec/design_output/bash]]", means: "the part that rewrites a refused shell command into a form the door lets through"}
+  - {word: headless, defines: "[[spec/design_output/level0#what-the-probe-does]]", means: "run with no window or person at the keys so a script drives the client"}
+  - {word: hover, defines: "[[spec/design_output/extension]]", means: "to rest the pointer over an item so the editor shows its help sentence"}
+  - {word: hyphen, defines: "[[spec/design_output/projection#the-second-target]]", means: "the short dash that joins two words into one which a rule counts as a single word"}
+  - {word: idempotent, defines: "[[spec/design_output/pull#the-hand-back-matches-the-hold]]", means: "said of an action that gives the same result when sent once or many times"}
+  - {word: indent, defines: "[[spec/design_output/schema]]", means: "the spaces at the start of a line that show which map or list it belongs to"}
+  - {word: kebab, defines: "[[spec/design_output/config]]", means: "a way to write names in lower case with a dash between the words"}
+  - {word: lexer, defines: "[[spec/design_output/bash]]", means: "the part that cuts a shell command into words quotes and operators before the rules read it"}
+  - {word: lookahead, defines: "[[spec/design_output/bash]]", means: "reading the next token before deciding what the current token means"}
+  - {word: millisecond, defines: "[[spec/design_output/log]]", means: "one part in a thousand of a second which each log row stamp counts to"}
+  - {word: minter, defines: "[[spec/design_output/schema#the-tool-writes-the-note]]", means: "the tool that writes a new note from its schema and checks it before it lands"}
+  - {word: newline, defines: "[[spec/design_output/bash]]", means: "the character that ends a line and which cuts a shell command into separate segments"}
+  - {word: nonce, defines: "[[spec/design_output/extension]]", means: "a random value made once per page load that lets only the named script run in the webview"}
+  - {word: openste, defines: "[[spec/vocabulary/core]]", means: "an open seed list of simple technical english words that the core word list builds on"}
+  - {word: participle, defines: "[[spec/design_output/projection#the-second-target]]", means: "the verb form ending in ed or ing that the grammar rules read to find tense"}
+  - {word: placeholder, defines: "[[spec/design_output/schema#a-placeholder-stands-at-warning]]", means: "the stand-in text mint writes for a field left out which the checker names until someone fills it"}
+  - {word: quackitect, defines: "[[README]]", means: "this tree as a whole which holds the method and the tools that check and draw it"}
+  - {word: redraw, defines: "[[spec/design_output/extension]]", means: "to draw the whole panel again from the state after a click or a change on disk"}
+  - {word: regex, defines: "[[spec/design_output/apply]]", means: "a text pattern that finds and replaces matching words across the files a glob reaches"}
+  - {word: renderer, defines: "[[spec/design_output/schema#the-record-draws-itself]]", means: "the code that turns a record or a state into the lines a person sees"}
+  - {word: resolver, defines: "[[spec/design_output/config]]", means: "the code that answers the value of a setting by reading the schema and the per box file"}
+  - {word: retry, defines: "[[spec/design_output/copilot]]", means: "to try a failed step again while keeping the same identity so no duplicate lands"}
+  - {word: ripgrep, defines: "[[spec/design_output/index]]", means: "a fast search program whose regexp engine and glob habits the index copies", source: "https://github.com/BurntSushi/ripgrep"}
+  - {word: runme, defines: "[[README]]", means: "the installer script a person runs once to link the tools and the editor panel into a box"}
+  - {word: scratchpad, defines: "[[spec/guidance/working]]", means: "a private folder for temporary files that belong to one session and not to the tree"}
+  - {word: semicolon, defines: "[[spec/design_output/projection#the-second-target]]", means: "a punctuation mark that the paragraph rules count and limit in prose"}
+  - {word: serialize, defines: "[[spec/design_output/apply]]", means: "to turn a value held in memory into text that can be written to a file"}
+  - {word: shebang, defines: "[[spec/design_output/bash]]", means: "the first line of a script that names the program which runs it"}
+  - {word: sipoc, defines: "[[spec/design_input/the-agent-pulls-tickets#the-route]]", means: "the form a route step fills naming its supplier and input and process and output and customer"}
+  - {word: stdin, defines: "[[spec/design_output/bash]]", means: "the input stream a program reads when text is piped into it"}
+  - {word: stdio, defines: "[[spec/design_output/lsp]]", means: "the plain input and output streams the editor and the language server talk over"}
+  - {word: subcommand, defines: "[[spec/design_output/work]]", means: "a second word after a command name that picks which action the command takes"}
+  - {word: throwaway, defines: "[[spec/design_output/review]]", means: "made for one use and then deleted without being kept in the tree"}
+  - {word: underscore, defines: "[[spec/design_output/level0#the-path-a-rule-reads]]", means: "the low line mark used to join words in a name where a space cannot stand"}
+  - {word: validator, defines: "[[spec/design_output/config]]", means: "the code that checks a value against the schema and refuses one of the wrong type"}
+  - {word: whitelist, defines: "[[spec/design_output/projection#the-second-target]]", means: "a list of the only things allowed where anything missing from it is refused"}
+  - {word: whitespace, defines: "[[spec/design_output/bash]]", means: "spaces and tabs and line breaks that separate words and carry no text of their own"}
+  - {word: wildcard, defines: "[[spec/design_output/index#a-type-is-a-glob]]", means: "a mark in a glob such as a star that stands for any run of characters"}
+  - {word: yaml, defines: "[[spec/design_output/schema]]", means: "a plain text format for nested data which schemas and notes in this tree use", source: "https://yaml.org"}
+  - {word: json, defines: "[[spec/design_output/vehicle#the-record-names-the-vehicle]]", means: "a plain text format for data in braces that runtime and config files use", source: "https://www.json.org"}
+  - {word: animate, defines: "[[spec/design_output/extension]]", means: "to move part of the panel smoothly over a short time instead of at once"}
+  - {word: authenticate, defines: "[[spec/design_output/copilot]]", means: "to prove to a service who you are so it accepts your requests"}
+  - {word: backspace, defines: "[[spec/design_output/projection]]", means: "the control character that a double quoted string reads from a backslash and the letter b"}
+  - {word: coerce, defines: "[[spec/design_output/config]]", means: "to turn a typed value into the type the schema names such as text into a number"}
+  - {word: collapsible, defines: "[[spec/design_output/extension]]", means: "able to fold shut and open again so a panel section hides or shows its rows"}
+  - {word: deterministic, defines: "[[spec/design_output/projection]]", means: "giving the same output every time from the same input with no chance involved"}
+  - {word: egress, defines: "[[spec/design_output/copilot]]", means: "network traffic leaving a sandbox or box toward the outside world"}
+  - {word: enumerate, defines: "[[spec/design_output/schema]]", means: "to list every allowed value of a field one by one"}
+  - {word: ephemeral, defines: "[[spec/design_output/copilot]]", means: "short lived and thrown away when the job ends so nothing on it lasts"}
+  - {word: escalation, defines: "[[spec/design_input/the-agent-pulls-tickets]]", means: "a route step that hands a question the agent cannot settle up to a person"}
+  - {word: flatten, defines: "[[spec/design_output/private]]", means: "to turn raw text into plain lower case words so every door compares the same form"}
+  - {word: guardrail, defines: "[[spec/design_output/level0#the-write-door]]", means: "a check at the write door that refuses a write breaking a rule before it lands"}
+  - {word: gutter, defines: "[[spec/design_output/tui]]", means: "the narrow strip at the left edge of a row where the selection bar is drawn"}
+  - {word: ideation, defines: "[[spec/design_output/extension]]", means: "the early stage of coming up with and weighing ideas before any design is fixed"}
+  - {word: inherit, defines: "[[spec/design_output/vehicle#the-work-root-inherits]]", means: "to take on the guidance and settings of the method tree without copying them"}
+  - {word: inject, defines: "[[spec/design_output/copilot]]", means: "to put extra text or values into a prompt or a process from outside it"}
+  - {word: interpolate, defines: "[[spec/design_output/level0#the-rules-past-one-buffer]]", means: "to insert the value of a variable into a string or a command line"}
+  - {word: loopback, defines: "[[spec/design_output/index]]", means: "the network address that reaches only the same machine so no outside box can connect"}
+  - {word: modifier, defines: "[[spec/design_output/schema]]", means: "a schema keyword that rides on a field and changes how the checker treats it"}
+  - {word: msvc, defines: "[[spec/design_output/editor]]", means: "the microsoft compiler and its tools that one windows build target of the editor tools is made with"}
+  - {word: mutate, defines: "[[spec/design_output/copilot]]", means: "to change a thing in place rather than making a new copy"}
+  - {word: orchestration, defines: "[[spec/design_output/copilot]]", means: "the code that calls the doors in order and passes results between them"}
+  - {word: powershell, defines: "[[spec/design_output/editor]]", means: "the microsoft command shell a windows person types into to run the installer", source: "https://learn.microsoft.com/powershell/"}
+  - {word: prepend, defines: "[[spec/design_output/level0#the-spawn-carries-a-rewrite]]", means: "to add text at the front of something such as the standing text before a spawn prompt"}
+  - {word: provenance, defines: "[[spec/rationales/voice]]", means: "where a claim or a piece of text comes from and who stands behind it"}
+  - {word: recursion, defines: "[[spec/design_input/the-agent-pulls-tickets]]", means: "a check that calls itself on each nested part until every level is read"}
+  - {word: regexp, defines: "[[spec/design_output/index]]", means: "a regular expression which is a text pattern the index turns a glob into for matching"}
+  - {word: ruleset, defines: "[[spec/design_output/copilot]]", means: "the repository settings that name the checks and approvals a change needs before it merges"}
+  - {word: truncate, defines: "[[spec/design_output/level0]]", means: "to cut text or a file short at a set length and drop the rest"}
+  - {word: vscode, defines: "[[spec/design_output/extension]]", means: "the code editor whose sidebar panel draws this tree", source: "https://code.visualstudio.com"}
+  - {word: wink-nlp, defines: "[[spec/design_output/level0#the-tense-reader]]", means: "a language library the tense reader uses to find the base form of each word", source: "https://github.com/winkjs/wink-nlp"}
+  - {word: adjective, defines: "[[spec/design_output/level0#the-tense-reader]]", means: "a word that describes a noun which the tense reader must not mistake for a past verb"}
+  - {word: starfish, defines: "[[spec/guidance/retro/read]]", means: "the retro form that asks what to start and stop and keep and do more and less"}
+  - {word: mechanize, defines: "[[spec/guidance/retro/read]]", means: "to turn a lesson into a check or a tool so it holds without anyone remembering it"}

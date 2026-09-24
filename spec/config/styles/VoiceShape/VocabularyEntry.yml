@@ -1,5 +1,5 @@
 extends: script
-message: "A core entry carries word and from, a term carries word and the note that defines it, and a swap carries word and write."
+message: "A core entry carries word and from, a term carries word, the note that defines it and what it means, and a swap carries word and write."
 link: spec/design_output/vocabulary.md
 level: error
 scope: raw
@@ -10,6 +10,9 @@ script: |
   wordShape := text.re_compile(`^[a-z][a-z-]*( [a-z][a-z-]*)*$`)
   fromShape := text.re_compile(`^(ste|openste|common|pronoun)$`)
   definesShape := text.re_compile(`^"?\[\[[^\]\s]+\]\]"?$`)
+  // The entry splits on the comma and the colon, so a means line holds neither, and no bracket either.
+  meansShape := text.re_compile(`, means: "[^",:\[\]{}]+"(,|\}$)`)
+  sourceShape := text.re_compile(`^"?https?://[^\s",]+"?$`)
 
   lines := text.split(scope, "\n")
   matches := []
@@ -77,6 +80,20 @@ script: |
           begin: at,
           end: at + len(line),
           message: held.word + " names no defining note. Write defines: \"[[<the note>]]\", because a term with no note is jargon."
+        })
+      }
+      if !meansShape.match(trimmed) {
+        matches = append(matches, {
+          begin: at,
+          end: at + len(line),
+          message: held.word + " says nothing of what it means. Write means: \"<one line>\" in core words and other terms, with no comma, colon or bracket."
+        })
+      }
+      if held.source != undefined && !sourceShape.match(held.source) {
+        matches = append(matches, {
+          begin: at,
+          end: at + len(line),
+          message: held.word + " cites a source that is no web address. Write source: \"https://<the address>\"."
         })
       }
       continue

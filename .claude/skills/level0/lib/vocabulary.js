@@ -11,6 +11,8 @@ export const SWAPS = "spec/vocabulary/swaps.yml";
 
 const WORD = /^[a-z][a-z-]*( [a-z][a-z-]*)*$/;
 const LINK = /^\[\[[^\]\s]+\]\]$/;
+// A part shorter than this stands, in the check and in the rule alike. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+const SHORTEST = 3;
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 export function pathsOf(said) {
@@ -148,9 +150,6 @@ function endingLines() {
   }
   return out;
 }
-
-// A part shorter than this stands, in the check and in the rule alike. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-const SHORTEST = 3;
 
 // Every word of a means line the lists leave out, one row a term. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 export function looseMeanings(lists) {
