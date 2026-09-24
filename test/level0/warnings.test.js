@@ -13,7 +13,9 @@ import {
   ruledWarnings,
   standsPast,
   takesFile,
+  WALK_TOOL,
   WARNING,
+  walksList,
   warnedNote,
   warningsOn,
 } from "../../.claude/skills/level0/lib/warnings.js";
@@ -109,6 +111,19 @@ test("the prompt the hand reads names one file and the verbs over it", () => {
   assert.match(said, /RUNME\.sh fix/);
   assert.match(said, /FileCeiling, cut the file first/);
   assert.match(said, /RUNME\.sh split spec\/guidance\/voice\.md --to <path> --lines/);
+});
+
+// The session lands what the hand leaves, so the hand's prompt names no git step. [[spec/design_output/stop#the-hand-walks-the-list]]
+test("the hand's prompts name the walk and no git step", () => {
+  const spawn = walksList("old.md");
+  const next = drains("new.md");
+
+  assert.match(spawn, /old\.md/);
+  assert.match(spawn, new RegExp(`mcp__level0__${WALK_TOOL}`));
+  assert.match(spawn, /no file waits/);
+  for (const said of [spawn, next]) {
+    assert.doesNotMatch(said, /commit|\bgit\b/i);
+  }
 });
 
 // [[spec/design_output/level0#the-ceiling-feeds-the-list]]

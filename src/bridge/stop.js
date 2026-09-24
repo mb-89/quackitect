@@ -40,6 +40,8 @@ import {
   filesOn,
   standsPast,
   takesFile,
+  WALK_TOOL,
+  walksList,
 } from "../../.claude/skills/level0/lib/warnings.js";
 import { spanOf, ticketAt, WORK_BRANCH } from "../engine/group.js";
 import { holdsTurn } from "./answer.js";
@@ -61,6 +63,7 @@ const REFACTOR = {
   atOnce: "refactor.mostAtOnce",
   untouched: "refactor.untouchedFor",
   grace: "refactor.grace",
+  files: "refactor.mostFiles",
 };
 export const KIND = "refactor";
 export const REFACTOR_ANSWERED = "refactor.answered";
@@ -69,14 +72,28 @@ const HELPER = "general-purpose";
 const SAID = 200;
 const PASS = { pass: true };
 
-export const TOOLS = { [STOP_CALL]: claims };
+export const WALK_CALL = `mcp__level0__${WALK_TOOL}`;
+
+export const TOOLS = { [STOP_CALL]: claims, [WALK_CALL]: walks };
 
 export function rulesHere(disk, method) {
   return pool(readFolder(disk, join(method, RULES), ".yml")).rules;
 }
 
 export function SPECS(box) {
-  return [stopSpec(rulesOf(box))];
+  return [stopSpec(rulesOf(box)), walkSpec()];
+}
+
+// [[spec/design_output/stop#the-hand-walks-the-list]]
+function walkSpec() {
+  return {
+    name: WALK_TOOL,
+    description: [
+      "Hands the refactoring hand its next file, and moves the hold to it.",
+      "The refactoring hand alone calls it, once the file in hand stands clean or it leaves that file.",
+    ].join(" "),
+    inputSchema: { type: "object", properties: {} },
+  };
 }
 
 // The three calls a turn ends with, which the hold at stop lets through. [[spec/design_output/stop#the-hold]]
@@ -276,40 +293,68 @@ export function handWanted(box) {
   return !(most > 0 && (box.refactors ?? 0) >= most);
 }
 
-// The hand the rule starts: the file it takes, and the count it spends. [[spec/tickets/the-spawn-reaches-its-guidance]]
+// The hand the rule starts: its first file, and the count it spends. It walks the rest itself. [[spec/design_output/stop#the-hand-walks-the-list]]
 export function refactorHand(box) {
   if (!handWanted(box)) return null;
   const file = restingFile(box);
   if (!file) return null;
   box.refactors = (box.refactors ?? 0) + 1;
-  holdsFile(box, file);
+  box.walk = { hand: "", taken: [] };
   box.log.say(
     "info",
     "refactor",
-    `a hand takes ${file}, of ${listHere(box).length} standing`,
-    { file },
+    `the refactoring hand spawns, ${listHere(box).length} warnings standing`,
   );
+  takes(box, file, "");
   return {
-    prompt: drains(file),
-    description: `drain the warnings in ${file}`,
+    prompt: walksList(file),
+    description: "drain the warnings, file by file",
     subagentType: HELPER,
     kind: KIND,
     file,
   };
 }
 
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
+// The hand asks for its next file here, so one hand walks the list and holds the file it writes alone. [[spec/design_output/stop#the-hand-walks-the-list]]
+export function walks(e, box) {
+  const hand = String(e?.agentId ?? "");
+  const walk = box.walk;
+  if (!walk || !hand || (walk.hand && walk.hand !== hand)) {
+    return { result: { deny: "No refactoring walk stands for this hand, so no file waits here." } };
+  }
+  walk.hand = hand;
+  releasesHold(box);
+  const most = Number(asks(box, REFACTOR.files) ?? 0);
+  const file = most > 0 && walk.taken.length >= most ? "" : restingFile(box, walk.taken);
+  if (!file) {
+    return { result: { result: "No file waits. Answer what you drained, and end." } };
+  }
+  takes(box, file, hand);
+  return { result: { result: drains(file) } };
+}
+
+// The hold moves to the file, and the log says the hand starts it. [[spec/design_output/stop#the-hand-walks-the-list]]
+function takes(box, file, hand) {
+  box.walk.taken.push(file);
+  holdsFile(box, file, hand);
+  box.log.say(
+    "info",
+    "refactor",
+    `the hand takes ${file}, of ${listHere(box).length} standing`,
+    { file },
+  );
+}
+
+// The walk ends here. A hand that falls writes why at warn, and a hand that ends clean writes nothing. [[spec/design_output/stop#the-hand-walks-the-list]]
 export function onRefactorAnswered(e, box) {
   releasesHold(box);
+  box.walk = null;
   const said = String(e?.deny ?? "") || (e?.isError ? String(e?.text ?? "") : "");
-  box.log.say(
-    said ? "warn" : "info",
-    "refactor",
-    `the hand leaves ${e?.file ?? "a file"}`,
-    {
-      detail: said || String(e?.text ?? "").slice(0, SAID),
-    },
-  );
+  if (said) {
+    box.log.say("warn", "refactor", "the refactoring hand falls", {
+      detail: said.slice(0, SAID),
+    });
+  }
   return { result: { result: "the refactoring hand answered" } };
 }
 
@@ -338,9 +383,9 @@ function wroteIn(box, names) {
   return out;
 }
 
-// The file the hand takes: the oldest at rest outside the window, off the list. [[spec/tickets/the-spawn-reaches-its-guidance]]
-function restingFile(box) {
-  const files = filesOn(listHere(box));
+// The file the hand takes: the oldest at rest outside the window, off the list, and new to this walk. [[spec/design_output/stop#the-hand-walks-the-list]]
+function restingFile(box, taken = []) {
+  const files = filesOn(listHere(box)).filter((one) => !taken.includes(one));
   const now = Math.floor(box.clock.now().getTime() / MS);
   return takesFile(
     files,

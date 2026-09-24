@@ -175,13 +175,33 @@ a time, and the calls ending a turn pass whatever stands.
 
 | the ask | what opens it | what answers it |
 |---|---|---|
-| the refactoring hand | the list past `refactor.mostWarnings`, and a file at rest past `refactor.untouchedFor` | the turn's end, where the stop door spawns the hand |
+| the refactoring hand | the list past `refactor.mostWarnings`, and a file at rest past `refactor.untouchedFor` | the turn's end, where the stop door spawns the hand that walks the list |
 | the plan's three questions | every `plan.everyCalls` calls | a `plan` field on a level zero call, or the `plan` call |
 | the owner's ask for an update | the sidebar's ask, with `grace.update` calls before the reply is due | the reply, in the chat and through `report` |
 | the finish hold | the sidebar's hold at finish, with `grace.finish` calls before the calls refuse | the turn's end |
 
 The list stands in `.se/.runtime/refactor.json`, one entry a warning, which
 the lint writes at each check. `refactor.grace` names the calls that pass.
+
+## The hand walks the list
+
+One refactoring hand drains the list file after file. The stop door spawns it
+on the oldest file at rest, and `refactor.mostAtOnce` bounds the spawns a
+session makes. The hand calls `refactor_next` as it finishes each file.
+
+| `refactor_next` finds | what it answers |
+|---|---|
+| a file at rest, and new to this hand | that file, held for this hand |
+| no file at rest, or `refactor.mostFiles` spent | that no file waits, so the hand ends |
+| a call from outside the hand | a refusal |
+
+The hand stages, commits and pushes nothing. The session beside it lands
+what the hand leaves. The files a hand drains stay out of its walk, because
+their last commit still reads old.
+
+The log takes one line as the hand spawns, and one as it takes each file.
+A hand that falls writes its reason at `warn`. `walksList` and `drains` in
+`lib/warnings.js` hold the prompts.
 
 ## The hand holds its file
 
@@ -193,6 +213,7 @@ holds the file it drains, and `refactor-hold.js` keeps the hold in
 |---|---|
 | the stop door spawns the hand | it names the file, no hand yet, and the time |
 | the first helper writes that file | its `agentId` fills the hand |
+| the hand calls `refactor_next` | the hold moves to the next file, with the hand and a fresh time |
 | the hand answers, or its spawn fails | `refactor.answered` takes the hold off |
 | the hold stands past `refactor.holdFor` | it reads as none, and the next hand takes the file |
 | a session starts | the hold comes off, because no hand of the last session answers here |

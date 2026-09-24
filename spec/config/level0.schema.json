@@ -394,6 +394,11 @@
           "unit": "hands",
           "help": "The hands one session starts. 0 lifts the bound."
         },
+        "mostFiles": {
+          "type": "number",
+          "unit": "files",
+          "help": "The files one hand takes on its walk. 0 lifts the bound, and the hand walks the whole list."
+        },
         "untouchedFor": {
           "type": "string",
           "unit": "span, as 30m, 12h or 7d",

@@ -29,6 +29,7 @@
     "parallel": true,
     "mostWarnings": 10,
     "mostAtOnce": 1,
+    "mostFiles": 0,
     "untouchedFor": "5m",
     "grace": 3,
     "holdFor": "30m"
