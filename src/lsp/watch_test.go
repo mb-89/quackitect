@@ -147,3 +147,61 @@ func TestASweepTheDoorLandsRedrawsTheFileItMoved(t *testing.T) {
 	}
 	t.Fatalf("the file the sweep moved draws nothing: %s", out.String())
 }
+
+// A server over a fake door holding a note and a second note pointing at it. [[spec/design_output/lsp#the-panel-follows-the-index]]
+func leaningServer(t *testing.T, pointer string) (*fakeIndex, *server, *guardedBuffer, string) {
+	t.Helper()
+	door := newFakeIndex(map[string]string{
+		"spec/one.md": "# A heading\n\nA line.\n",
+		"spec/two.md": "# Two\n\nA line naming " + pointer + ".\n",
+	})
+	disk, err := overIndex("/tree", door.ask, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tree := treeOver("/tree", disk)
+	tree.Words = 1
+	out := &guardedBuffer{}
+	one := &server{checker: &Checker{tree: tree}, out: out, panel: newPanel()}
+	one.panel.own["spec/two.md"] = one.checker.Over("spec/two.md")
+	one.shows(tree, "spec/two.md")
+	return door, one, out, uriOf(filepath.Join("/tree", "spec/two.md"))
+}
+
+// The note a pointer names gains the heading, and the file carrying the pointer clears, though it never moved. [[spec/design_output/lsp#the-panel-follows-the-index]]
+func TestAHeadingThatLandsClearsTheFilePointingAtIt(t *testing.T) {
+	door, one, out, uri := leaningServer(t, "[[spec/one#a-second-heading]]")
+	if said := urisDrawn(spoken(t, out.String()))[uri]; said == 0 {
+		t.Fatal("the pointing file draws nothing before the heading lands")
+	}
+
+	door.writes("spec/one.md", "# A heading\n\nA line.\n\n## A second heading\n\nA line.\n")
+	moved, gone, err := one.checker.Tree().Pulls()
+	if err != nil {
+		t.Fatal(err)
+	}
+	one.redraws(moved, gone)
+
+	if said, drew := urisDrawn(spoken(t, out.String()))[uri]; !drew || said != 0 {
+		t.Fatalf("the pointing file still draws %d finding(s), drawn %v", said, drew)
+	}
+}
+
+// The note a pointer names leaves the index, and the file carrying the pointer draws the dead pointer. [[spec/design_output/lsp#the-panel-follows-the-index]]
+func TestANoteTheIndexDropsDrawsTheFilePointingAtIt(t *testing.T) {
+	door, one, out, uri := leaningServer(t, "[[spec/one#a-heading]]")
+	if said := urisDrawn(spoken(t, out.String()))[uri]; said != 0 {
+		t.Fatalf("the pointing file draws %d finding(s) before the drop", said)
+	}
+
+	door.lands(func() { delete(door.files, "spec/one.md") })
+	moved, gone, err := one.checker.Tree().Pulls()
+	if err != nil {
+		t.Fatal(err)
+	}
+	one.redraws(moved, gone)
+
+	if said := urisDrawn(spoken(t, out.String()))[uri]; said == 0 {
+		t.Fatalf("the pointing file draws nothing once its note goes: %s", out.String())
+	}
+}

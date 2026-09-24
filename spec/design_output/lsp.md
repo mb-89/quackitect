@@ -100,6 +100,7 @@ it: an agent, git, or a script.
 | a tracked file whose hash moves | redraws it off the index, drops the bridge's rows on it, and asks the bridge again until one answers |
 | a tracked file the index drops | takes its row with it, and no rule reads it |
 | a file git tracks nowhere | nothing, because no rule reads it |
+| a file a pointer names, where the file moves or goes | redraws the file carrying the pointer too, off this server's own rules, so a heading that lands clears the dead anchor on it |
 
 An open file follows the editor's buffer. A write on disk reaches the panel
 once the index moves the rows the write names.
