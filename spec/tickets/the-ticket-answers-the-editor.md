@@ -125,7 +125,7 @@ The engine answers every question the editor asks as a verb writing JSON. The ve
 - [[spec/tickets/the-fill-answers-on-stdout]], standard
 - [[spec/tickets/yours-counts-the-waiting]], standard
 - [[spec/tickets/the-config-declares-work]], standard
-- [[spec/tickets/the-server-helps-pick-a-process]], standard
+- [[spec/tickets/the-server-offers-processes]], standard
 - [[spec/tickets/an-update-keeps-a-route]], standard
 
 ## checked
