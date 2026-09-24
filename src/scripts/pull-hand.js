@@ -29,6 +29,7 @@ import {
 } from "../engine/group.js";
 import { noteRows, readsOf, writeHold } from "./guidance-hand.js";
 import { workAnswer } from "./pull-chapter.js";
+import { cleanupOf } from "./pull-cleanup.js";
 import { roleOf } from "./pull-hand-of.js";
 import { landedAlone } from "./pull-landed.js";
 import { queued, stoodHere } from "./pull-queue.js";
@@ -148,7 +149,10 @@ export function handOut(it, who) {
     if (other && !who.oneStep) return spawnAnswer(other);
   }
 
-  say(WAIT, why.length ? why : [nothingFor(who)]);
+  // [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
+  const cleanup = who.wanted ? null : cleanupOf(it);
+  if (cleanup) say(cleanup.word, cleanup.rows);
+  else say(WAIT, why.length ? why : [nothingFor(who)]);
   // A person's question leaves the branch, so the group lands. [[spec/design_output/work#a-person-step-leaves]]
   if (person) console.log(`\n${unblockPrompt(person.name, person.leaf)}`);
   return 0;

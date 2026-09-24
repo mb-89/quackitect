@@ -24,6 +24,7 @@ it:
 | `wait` | nothing to hand out, and a reason per ticket the pull skips | says so, and stops. Where a person's step is all that stands, the answer names the road out, and [[spec/design_output/work#a-person-step-leaves]] carries it |
 | `spawn` | the only open step excludes this hand, with a helper's name and its prompt | spawns that hand, and pulls again once it answers |
 | `done` | a hand under `--as` hands its one step back | stops, because a one-step hand takes no next leaf |
+| `cleanup` | a desk meets no ticket, and a file on the refactor list or the check stands | drains the file or runs the check, then pulls again. [[spec/design_output/pull#an-empty-queue-hands-cleanup]] carries it |
 
 The hand-out is `ticket pull`. The hand-back is `ticket pull <ticket>` with a
 verdict: `--pass`, `--fail "why"`, `--became <ticket>` or `--answered <ticket>`. A leaf holding a
@@ -53,6 +54,21 @@ what the session already stands beside, and nothing another branch holds.
 
 A name means the hand-back where a leaf stands in hand already, and the hold
 is what tells the two apart.
+
+## An empty queue hands cleanup
+
+A desk pull meeting no leaf, no spawn and no name answers `cleanup` in place of
+`wait`, and hands the first row that applies:
+
+| order | applies where | the answer hands |
+|---|---|---|
+| merge | a done cloud branch stands | nothing new, because the desk pull on trunk hands it ahead of the queue through `it.ready` |
+| refactor | the refactor list holds a file the refactoring hand holds no hold on | the oldest such file by its last commit, with the verbs that drain it |
+| check | the list stands empty, and the check stamp reads a failing check or names a commit other than `HEAD` | `./RUNME.sh check` |
+
+A cleanup carries no file and no hold, so each pull reads the list again. The
+pull reads the hold file itself, so a stale hold keeps its one file out until
+the next spawn clears it. A cloud box's pull hands no cleanup.
 
 ## The engine takes the branch
 

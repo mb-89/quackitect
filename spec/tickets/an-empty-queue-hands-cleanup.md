@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -126,6 +126,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 065e6d65890ffeade2911c56a21e7b888efdd692
+    hash_after: 065e6d65890ffeade2911c56a21e7b888efdd692
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -262,11 +270,17 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/scripts/pull-cleanup.js src/scripts/pull-hand.js spec/design_output/pull.md test/level0/pull-cleanup.test.js test/level0/pull-hand.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the cleanup module, its test, the pull hand at its wait, and the pull note
+- the module reads through the disk, git and clock doors, and the cases hand in their fakes
+- the module, the call in the pull hand and the pull note each point at the cleanup chapter
 
 ## tests-green
 
