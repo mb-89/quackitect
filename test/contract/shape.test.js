@@ -183,7 +183,7 @@ ifVale(
   ),
 );
 
-// The vocabulary rule compiles its patterns once a run, and still refuses a word off its shape, a core entry naming no source, a term naming no note, a term saying nothing of what it means, and a source that is no web address or holds a comma. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+// The vocabulary rule compiles its patterns once a run, and still refuses a word off its shape, a core entry naming no source, a term pointing at a note, a term saying nothing of what it means, and a source that is no web address or holds a comma. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 const VOCABULARY = "spec/vocabulary/probe.yml";
 const ENTRY = "VoiceShape.VocabularyEntry";
 
@@ -192,29 +192,33 @@ ifVale(
   proves(
     {
       good: at(
-        "words:\n  - {word: door, from: ste}\nterms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\", means: \"a small script that finds the tool\"}\n  - {word: vale, defines: \"[[spec/guidance/voice]]\", means: \"a prose linter\", source: \"https://vale.sh\"}\nswaps:\n  - {word: utilize, write: use}\n",
+        "words:\n  - {word: door, from: ste}\nterms:\n  - {word: shim, means: \"a small script that finds the tool\"}\n  - {word: vale, means: \"a prose linter\", source: \"https://vale.sh\"}\nswaps:\n  - {word: utilize, write: use}\n",
         VOCABULARY,
       ),
       shapeless: at("words:\n  - {word: Door, from: ste}\n", VOCABULARY),
       sourceless: at("words:\n  - {word: door, from: nowhere}\n", VOCABULARY),
-      noteless: at("terms:\n  - {word: shim, defines: somewhere, means: \"a script\"}\n", VOCABULARY),
-      meaningless: at("terms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\"}\n", VOCABULARY),
+      pointing: at(
+        "terms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\", means: \"a script\"}\n",
+        VOCABULARY,
+      ),
+      linked: at("terms:\n  - {word: shim, means: \"a script\", source: \"[[spec/guidance/voice]]\"}\n", VOCABULARY),
+      meaningless: at("terms:\n  - {word: shim}\n", VOCABULARY),
       comma: at(
-        "terms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\", means: \"a script, and more\"}\n",
+        "terms:\n  - {word: shim, means: \"a script, and more\"}\n",
         VOCABULARY,
       ),
       split: at(
-        "terms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\", means: \"a script\", source: \"https://a.org/x,y\"}\n",
+        "terms:\n  - {word: shim, means: \"a script\", source: \"https://a.org/x,y\"}\n",
         VOCABULARY,
       ),
       addressless: at(
-        "terms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\", means: \"a script\", source: somewhere}\n",
+        "terms:\n  - {word: shim, means: \"a script\", source: somewhere}\n",
         VOCABULARY,
       ),
     },
     (said) => {
       passes(said, ENTRY, "good");
-      for (const key of ["shapeless", "sourceless", "noteless", "meaningless", "comma", "split", "addressless"]) {
+      for (const key of ["shapeless", "sourceless", "pointing", "linked", "meaningless", "comma", "split", "addressless"]) {
         refuses(said, ENTRY, key);
       }
     },

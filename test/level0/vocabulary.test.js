@@ -24,7 +24,6 @@ import {
   swapsOf,
   TERMS,
   termsOf,
-  undefinedTerms,
   wordsOf,
 } from "../../.claude/skills/level0/lib/vocabulary.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -44,10 +43,10 @@ words:
 
 const TERMS_TEXT = `
 terms:
-  - {word: door, defines: "[[spec/design_output/doors]]", means: "the refuse gate"}
-  - {word: write, defines: "[[spec/design_output/level0#the-write-door]]", means: "a door with no refusal", source: "https://example.org/write"}
-  - {word: level zero, defines: "[[spec/design_output/level0]]"}
-  - {word: jargon, defines: ""}
+  - {word: door, means: "the refuse gate"}
+  - {word: write, means: "a door with no refusal", source: "https://example.org/write"}
+  - {word: level zero}
+  - {word: jargon}
 `;
 
 const SWAPS_TEXT = `
@@ -164,14 +163,6 @@ test("the table of endings stands a stem, a prefix, and nothing past them", () =
 });
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
-test("a term with no defining note reads as jargon", () => {
-  assert.deepEqual(
-    undefinedTerms(readYaml(TERMS_TEXT)).map((one) => one.word),
-    ["jargon"],
-  );
-});
-
-// [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 test("the words join the core and the terms, split on a hyphen and a space, less the swaps", () => {
   assert.deepEqual(wordsOf(lists()), [
     "a",
@@ -206,7 +197,7 @@ test("the projector writes one rule inlining the words and the swaps", () => {
   assert.ok(rule, "the rule stands");
   assert.match(rule, /\bdoor\b/);
   assert.match(rule, /deny=refuse/);
-  assert.match(rule, /spec\/vocabulary\/terms\.yml/);
+  assert.match(rule, /spec\/vocabulary\/terms\.yml with one line that says what it means/);
   assert.equal(rulesFrom(readYaml(SCHEMA), "", null).has("Vocabulary.yml"), false);
 });
 
@@ -266,9 +257,11 @@ test("the refusal names the road for a word outside the lists", () => {
     },
   ];
   const said = grown(found);
-  assert.match(said, /jargon until a note defines it/);
+  assert.match(said, /one line that says what it means/);
+  assert.match(said, /means: "<one line>"/);
+  assert.doesNotMatch(said, /defines/);
   assert.match(said, /`flibbertigibbet`, `whatsit`/);
   assert.match(said, /spec\/vocabulary\/terms\.yml/);
-  assert.match(refusal("notes.md", found), /jargon until a note defines it/);
+  assert.match(refusal("notes.md", found), /one line that says what it means/);
   assert.equal(grown(found.slice(2)), "");
 });

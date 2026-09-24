@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -106,6 +106,17 @@ record:
     hand: box a0ae5042621d · claude-code-remote · helper-2
     hash_before: f713b1b569f92991b3afb4ad19597eb3849db8cc
     hash_after: f713b1b569f92991b3afb4ad19597eb3849db8cc
+  - step: implement/tests-red
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 920305b6fee5cd1e2d59183c24cf65d6c1835f2f
+    hash_after: 920305b6fee5cd1e2d59183c24cf65d6c1835f2f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -212,17 +223,33 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/vocabulary.test.js test/contract/shape.test.js test/level0/vocabulary.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+| test | stands |
+|---|---|
+| the list test | red, because every term still carries `defines` |
+| the shape test | red, because the rule still asks for `defines` and passes a term carrying one |
+| the refusal test | red, because the refusal still asks for a note |
+| the rule test | red, because the rule still names the note a term wants |
+
+Nothing surprises me. The field child leaves every term a line, so the list
+loses nothing when `defines` goes.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch the list, the two rules and the refusal, and the ask names each
+- the tests read fixture text and the lists through the disk door, and reach no other door
+- each test carries a comment naming the design output
 
 ## reflect
 

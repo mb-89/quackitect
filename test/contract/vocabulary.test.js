@@ -1,6 +1,5 @@
-// The word lists this tree ships. Every term names a note that stands, and a
-// chapter it names stands in that note, because a term with no defining note
-// is jargon.
+// The word lists this tree ships. Every term says what it means in core words
+// and other terms, and points at no note in the tree.
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 
 import assert from "node:assert/strict";
@@ -17,7 +16,6 @@ import {
   swapsOf,
   TERMS,
   termsOf,
-  undefinedTerms,
   wordsOf,
 } from "../../.claude/skills/level0/lib/vocabulary.js";
 import { disk } from "../../src/doors/disk.js";
@@ -35,35 +33,14 @@ test("the slug answers every case the source holds", () => {
   }
 });
 
-function noteAt(link) {
-  const [path, anchor] = link.replace(/^\[\[|\]\]$/g, "").split("#");
-  for (const ending of ["", ".md", ".yaml", ".yml"]) {
-    const at = join(root, `${path}${ending}`);
-    if (files.exists(at)) return { at, anchor, text: ending ? files.read(at) : "" };
-  }
-  return null;
-}
-
-// [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
-test("every term names a note that stands, and a chapter that stands in it", () => {
-  const terms = termsOf(read(TERMS));
-  assert.ok(terms.length >= 100, `the terms hold ${terms.length}`);
-  assert.deepEqual(undefinedTerms(read(TERMS)), []);
-
-  const broken = [];
-  for (const one of terms) {
-    const note = noteAt(one.defines);
-    if (!note) {
-      broken.push(`${one.word}: ${one.defines} stands nowhere`);
-      continue;
-    }
-    if (!note.anchor || !note.text) continue;
-    const headings = note.text.split("\n").filter((line) => /^#{1,6} /.test(line));
-    if (!headings.some((line) => slugOf(line.replace(/^#+ /, "")) === note.anchor)) {
-      broken.push(`${one.word}: no chapter ${note.anchor} in ${one.defines}`);
-    }
-  }
-  assert.deepEqual(broken, []);
+// The dictionary is the source, so a term points at no note. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+test("no term points at a note in the tree", () => {
+  const rows = read(TERMS).terms ?? [];
+  assert.ok(rows.length >= 100, `the terms hold ${rows.length}`);
+  const pointing = rows
+    .filter((one) => "defines" in one || Object.values(one).some((v) => String(v).includes("[[")))
+    .map((one) => one.word);
+  assert.deepEqual(pointing, []);
 });
 
 // A term says what it means in words a reader holds. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
