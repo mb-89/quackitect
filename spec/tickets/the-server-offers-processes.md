@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hand: box 2bc65ec92430 · claude-code-remote
     hash_before: 38c3922a1fc5a8624deba614d7f7fe6bf5bfcc80
     hash_after: 38c3922a1fc5a8624deba614d7f7fe6bf5bfcc80
+  - step: design/review
+    hand: box 2bc65ec92430 · claude-code-remote · helper-4
+    hash_before: 835ea1451bc557f72dae2b2974ce43784124b638
+    hash_after: 835ea1451bc557f72dae2b2974ce43784124b638
 ---
 
 # Ask
@@ -192,11 +196,10 @@ Go tests under `src/lsp` cover the offer, the fold and the Go skip. A case in `t
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `frontFaults` in `src/lsp/schema.go` raises missing steps and state on its own, before the bridge answers.
-- Teach `frontFaults` the `x-filled-by` skip too, and cover it with a Go test under `src/lsp`.
-- Add `src/lsp/schema.go` `frontFaults` to the callers list.
+- `frontFaults` and `mapFaults` both take the `x-filled-by` skip, so the earlier finding stands answered.
+- `propertyValues` offers `spec/processes` links, and `took` answers the fold, so every line of the ask stands covered.
 
 # implement
 
