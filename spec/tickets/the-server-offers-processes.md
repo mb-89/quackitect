@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -145,6 +145,12 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/the-server-offers-processes.md:291:3: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: verdict
+    hand: box 2bc65ec92430 · claude-code-remote · helper-9
+    hash_before: a3a1f22ae10bb6173429abf09554c988f636eecd
+    hash_after: a3a1f22ae10bb6173429abf09554c988f636eecd
+    returns: 1
+    why: "`foldsOf` in `src/lsp/fold.go` repeats the fence scan `frontOf` in `src/lsp/note.go` owns. Reuse `frontOf`.; The new `fence` constant in `src/lsp/fold.go` serves one file while four others write the literal.; The `spec/design_output/schema.md` keyword table names neither `x-filled-by` nor `x-values`. Add both rows there.; Four comments restate what `x-filled-by` means. Point each at the `spec/design_output/schema.md` row.; `./RUNME.sh check` exits 0, and every ask line carries a test that fires.; The handback carries no retro."
 ---
 
 # Ask
@@ -373,17 +379,44 @@ The two checkers each read the key: `frontFaults` in `src/lsp/schema.go` on ever
 
 <!-- the form is files -->
 
+.claude/skills/level0/lib/schema.js
+spec/schemas/ticket.schema.yaml
+spec/tickets/the-server-offers-processes.md
+src/lsp/complete.go
+src/lsp/complete_test.go
+src/lsp/fold.go
+src/lsp/fold_test.go
+src/lsp/lsp.go
+src/lsp/schema.go
+src/lsp/schema_test.go
+test/level0/schema.test.js
+src/lsp/note.go
+spec/design_output/schema.md
+spec/design_output/lsp.md
+spec/design_input/the-editor-draws-the-ticket.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+- `foldsOf` in `src/lsp/fold.go` repeats the fence scan `frontOf` in `src/lsp/note.go` owns. Reuse `frontOf`.
+- The new `fence` constant in `src/lsp/fold.go` serves one file while four others write the literal.
+- The `spec/design_output/schema.md` keyword table names neither `x-filled-by` nor `x-values`. Add both rows there.
+- Four comments restate what `x-filled-by` means. Point each at the `spec/design_output/schema.md` row.
+- `./RUNME.sh check` exits 0, and every ask line carries a test that fires.
+- The handback carries no retro.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place. The fence scan and the two keywords each stand in several places, so the verdict fails.
 
 # Discussion
 
