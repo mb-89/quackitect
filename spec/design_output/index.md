@@ -121,6 +121,10 @@ log grows a line a door call, so a watch on it moves rows for nothing. A search
 of the log reads the file. For how, see
 [[spec/design_output/log#one-verb-reads-the-log]].
 
+The watch holds the runtime folder alone, for the plan file. A plan write moves
+no row and counts one on the tick, so the work tab reads its todos again. For
+the plan, see [[spec/design_output/stop#the-plan]].
+
 A box where no watch stands still answers, out of the sweep the door makes on
 the way up and on its clock.
 

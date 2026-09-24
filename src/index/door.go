@@ -65,10 +65,11 @@ type door struct {
 	eyes  *fsnotify.Watcher
 
 	pending atomic.Bool
-	// The paths the watch names since the last settle, and whether git's own index moved. [[spec/design_output/index#a-change-moves-its-rows]]
+	// The paths the watch names since the last settle, whether git's own index moved, and whether the plan moved. [[spec/design_output/index#a-change-moves-its-rows]]
 	heard   sync.Mutex
 	touched map[string]bool
 	retrack bool
+	replan  bool
 	// Git's list as the last sweep or retrack read it, so a change reads it and spawns no git. [[spec/design_output/index#a-change-moves-its-rows]]
 	tracked func(rel string) bool
 
@@ -186,15 +187,18 @@ func (one *door) stands(listen net.Listener) error {
 	return os.WriteFile(standingPath(one.root), append(said, '\n'), 0o644)
 }
 
-// A path the watch names. Git's own index turns the tracked flags, and every other path the walk stands off moves no row. [[spec/design_output/index#a-change-moves-its-rows]]
+// A path the watch names. Git's own index turns the tracked flags, the plan counts a tick, and every other path the walk stands off moves no row. [[spec/design_output/index#a-change-moves-its-rows]]
 func (one *door) Touched(rel string) {
-	if rel != gitIndex && outside(rel) {
+	if rel != gitIndex && rel != Plan && outside(rel) {
 		return
 	}
 	one.heard.Lock()
-	if rel == gitIndex {
+	switch rel {
+	case gitIndex:
 		one.retrack = true
-	} else {
+	case Plan:
+		one.replan = true
+	default:
 		one.touched[rel] = true
 	}
 	one.heard.Unlock()
@@ -220,13 +224,17 @@ func (one *door) settles() {
 		return
 	}
 	one.heard.Lock()
-	paths, retrack := named(one.touched), one.retrack
-	one.touched, one.retrack = map[string]bool{}, false
+	paths, retrack, replan := named(one.touched), one.retrack, one.replan
+	one.touched, one.retrack, one.replan = map[string]bool{}, false, false
 	one.heard.Unlock()
+	moved := 0
+	// A plan write moves no row, and counts one so the work tab reads its todos again. [[spec/design_output/index#the-index-fires-on-change]]
+	if replan {
+		moved++
+	}
 	if retrack {
 		one.tracked = trackedIn(one.root)
 	}
-	moved := 0
 	if len(paths) > 0 {
 		if rows, err := touches(one.db, one.root, paths, one.tracked); err == nil {
 			moved += rows

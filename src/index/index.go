@@ -62,6 +62,9 @@ var skipped = map[string]bool{
 // The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
 const Runtime = ".se/.runtime"
 
+// The plan file `PLANS` in runs.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_output/index#the-index-fires-on-change]]
+const Plan = Runtime + "/plan.json"
+
 // The private folder folders.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_output/index#the-rows-the-walk-writes]]
 const Private = ".se"
 
