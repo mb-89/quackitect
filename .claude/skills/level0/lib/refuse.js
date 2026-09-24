@@ -25,9 +25,9 @@ export function grown(found) {
   const words = outsideIn(found);
   if (!words.length) return "";
   return [
-    `A word outside the core is jargon until a note defines it. Write a core word, or`,
-    `add ${namesThe(words)} to ${TERMS} as`,
-    '`- {word: <the word>, defines: "[[<the note>]]"}` where that note defines it,',
+    `A word outside the core is jargon until a term says what it means. Write a core word, or`,
+    `add ${namesThe(words)} to ${TERMS} with one line that says what it means, as`,
+    '`- {word: <the word>, means: "<one line>"}` in core words and other terms,',
     "and write the line again. The next write reads the new rule.",
   ].join("\n");
 }

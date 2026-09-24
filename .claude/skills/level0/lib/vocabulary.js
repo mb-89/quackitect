@@ -10,7 +10,6 @@ export const TERMS = "spec/vocabulary/terms.yml";
 export const SWAPS = "spec/vocabulary/swaps.yml";
 
 const WORD = /^[a-z][a-z-]*( [a-z][a-z-]*)*$/;
-const LINK = /^\[\[[^\]\s]+\]\]$/;
 // A part shorter than this stands, in the check and in the rule alike. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
 const SHORTEST = 3;
 
@@ -44,16 +43,10 @@ export function termsOf(said) {
   return rowsOf(said?.terms)
     .map((one) => ({
       word: lower(one.word),
-      defines: String(one.defines ?? "").trim(),
       means: String(one.means ?? "").trim(),
       source: String(one.source ?? "").trim(),
     }))
     .filter((one) => WORD.test(one.word));
-}
-
-// A term with no defining note is jargon. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
-export function undefinedTerms(said) {
-  return termsOf(said).filter((one) => !LINK.test(one.defines));
 }
 
 // A swap wins over the corpus, so a swapped word stands on no list. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
@@ -191,7 +184,7 @@ export function vocabularyRule(layer, lists) {
   const where = pathOf(layer);
   const tail =
     "stands outside the words this tree writes. Write a core word, or add it to " +
-    `${where} with the note that defines it.`;
+    `${where} with one line that says what it means.`;
 
   return scripted(`A word ${tail}`, [
     ...prelude([], true, layer.prose),
@@ -287,7 +280,7 @@ export function vocabularyRule(layer, lists) {
     '    say += "Write " + road + " instead."',
     "  } else {",
     `    say += ${quoted("Write a core word, or add ")} + bad +`,
-    `      ${quoted(` to ${where} with the note that defines it.`)}`,
+    `      ${quoted(` to ${where} with one line that says what it means.`)}`,
     "  }",
     "  matches = append(matches, {begin: m.begin, end: m.end, message: say})",
     "}",

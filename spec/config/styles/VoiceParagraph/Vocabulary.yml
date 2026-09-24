@@ -2,7 +2,7 @@
 # every time the tree is projected, so an edit here is lost. Source:
 # spec/schemas/paragraph.schema.yaml
 extends: script
-message: "A word stands outside the words this tree writes. Write a core word, or add it to spec/vocabulary/terms.yml with the note that defines it."
+message: "A word stands outside the words this tree writes. Write a core word, or add it to spec/vocabulary/terms.yml with one line that says what it means."
 link: spec/design_output/projection.md
 level: error
 scope: raw
@@ -2473,7 +2473,7 @@ script: |
       say += "Write " + road + " instead."
     } else {
       say += "Write a core word, or add " + bad +
-        " to spec/vocabulary/terms.yml with the note that defines it."
+        " to spec/vocabulary/terms.yml with one line that says what it means."
     }
     matches = append(matches, {begin: m.begin, end: m.end, message: say})
   }

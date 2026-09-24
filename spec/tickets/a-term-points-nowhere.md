@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -117,6 +117,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: ed2c819ba8b31ddb918cfe3de12839c1d91271f9
+    hash_after: ed2c819ba8b31ddb918cfe3de12839c1d91271f9
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -277,11 +285,17 @@ loses nothing when `defines` goes.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the list, both rules, the refusal, the schema, the notes the ask names and their tests
+- the tests reach the disk door alone, and the fake disk stands for it
+- the shape rule and the reader each carry a comment naming the design output
 
 ## tests-green
 
@@ -293,11 +307,15 @@ loses nothing when `defines` goes.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/vocabulary.test.js test/contract/shape.test.js test/level0/vocabulary.test.js test/level0/hooks.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -305,11 +323,32 @@ loses nothing when `defines` goes.
 
 <!-- the form is text -->
 
+No term points at a note now. The line under `means` says what a term means,
+and the dictionary is the source.
+
+| piece | what changes |
+|---|---|
+| `terms.yml` | every entry drops `defines`, and the header says a term carries its line |
+| `VocabularyEntry.yml` | refuses `defines` and a link anywhere in a term |
+| `vocabulary.js` | `termsOf` drops `defines`, `undefinedTerms` goes, and the rule names the line a term wants |
+| `refuse.js` | the refusal writes the entry with `means` |
+| the schema and the notes | the growth entry, `vocabulary.md`, rule fifteen of `voice.md` and the header of `core.yml` say a term carries its line |
+
+The design review names three gaps, and each lands here:
+
+- the projected `Vocabulary.yml` stands projected again
+- `answerFindings` and `gateNote` reach `grown` through `road`, so the new refusal reaches them too
+- the `who` line of the growth entry names no note
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the list, both rules, the refusal, the schema, the notes the ask names and their tests
+- the tests reach the disk door alone, and the fake disk stands for it
+- the shape rule and the reader each carry a comment naming the design output
 
 # verdict
 

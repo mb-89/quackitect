@@ -18,12 +18,18 @@ terms the writer defines, and nothing else.
 | list | holds | who writes it |
 |---|---|---|
 | `core.yml` | the words the standard approves, the openste seed, and the 20000 most common English words | a script, and nobody by hand |
-| `terms.yml` | this tree's own words, each with the note that defines it | a person, or a session together with the note |
+| `terms.yml` | this tree's own words, each with one line that says what it means | a person, or a session that needs the word |
 | `swaps.yml` | a refused word and the core word to write in its place | a person, and the retro |
 
-A term with no defining note is jargon, and the shape rule over `terms.yml`
-refuses the entry. So a session adds no word because it wants one. It writes a
-core word, or it writes the note first and adds the term with the link.
+The dictionary is the source of what a term means. A term carries `means`, one
+line in core words and other terms, and the check `looseMeanings` holds every
+word of it to the lists. A term citing a standard, a paper or a tool outside the
+tree names its address under `source`.
+
+A note points at a term, and a term points at no note in the tree. The shape
+rule over `terms.yml` refuses `defines` and a link in a term, and a term with no
+`means`. So a session adds no word because it wants one. It writes a core word,
+or it adds the term with the line that says what it means.
 
 # The rule matches a stem
 
@@ -43,12 +49,12 @@ rule reads a paragraph one word at a time.
 
 1. The door refuses a paragraph and names every word outside the lists.
 2. Where a swap names the word, the refusal hands the writer the core word.
-3. Where none does, the refusal names `terms.yml` and the note it wants.
+3. Where none does, the refusal names `terms.yml` and the line a term wants.
 
 # The slug reads one source
 
-A term names a note and a chapter in it, and the slug turns that heading into
-the anchor the term carries. `spec/config/slug.yaml` holds the cases the slug
+A pointer names a note and a chapter in it, and the slug turns that heading
+into the anchor the pointer carries. `spec/config/slug.yaml` holds the cases the slug
 answers, and each tool chain drives its own function off them. The moves run in
 this order:
 
@@ -73,7 +79,7 @@ prose takes it.
 
 The retro reads the terms new since the last one, keeps each, or moves it to
 the swaps with the word to write instead. So the lists settle: a term the tree
-keeps holds its note, and a term it drops turns into a swap nobody writes past.
+keeps holds its line, and a term it drops turns into a swap nobody writes past.
 
 # A list write re-projects
 

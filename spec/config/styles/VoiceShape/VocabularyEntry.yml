@@ -1,5 +1,5 @@
 extends: script
-message: "A core entry carries word and from, a term carries word, the note that defines it and what it means, and a swap carries word and write."
+message: "A core entry carries word and from, a term carries word and what it means, and a swap carries word and write."
 link: spec/design_output/vocabulary.md
 level: error
 scope: raw
@@ -9,7 +9,6 @@ script: |
   // The patterns compile once a run, because the core list holds tens of thousands of entries and one run carries them all.
   wordShape := text.re_compile(`^[a-z][a-z-]*( [a-z][a-z-]*)*$`)
   fromShape := text.re_compile(`^(ste|openste|common|pronoun)$`)
-  definesShape := text.re_compile(`^"?\[\[[^\]\s]+\]\]"?$`)
   // The entry splits on the comma and the colon, so a means line holds neither, and no bracket either.
   meansShape := text.re_compile(`, means: "[^",:\[\]{}]+"(,|\}$)`)
   // The source reads off the whole line too, so a comma the split cuts meets the refusal.
@@ -77,11 +76,12 @@ script: |
       continue
     }
     if kind == "term" {
-      if held.defines == undefined || !definesShape.match(held.defines) {
+      // The dictionary is the source, so a term points at no note in the tree.
+      if held.defines != undefined || text.contains(trimmed, "[[") {
         matches = append(matches, {
           begin: at,
           end: at + len(line),
-          message: held.word + " names no defining note. Write defines: \"[[<the note>]]\", because a term with no note is jargon."
+          message: held.word + " points at a note in the tree. Say what it means under means, and cite an outside source under source."
         })
       }
       if !meansShape.match(trimmed) {
