@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -151,6 +151,10 @@ record:
     hash_after: 21049dc4a8961f31cc081e74d3f0984a21c5dfb2
     returns: 1
     why: "craft: `canonical` in `src/scripts/ticket-route.js` restates the sorted-key form `canonicalOf` in `.claude/skills/level0/lib/schema-route.js` holds. Call `canonicalOf`, and drop `canonical`.; craft: `route` in `src/scripts/ticket.js` refuses an unknown ticket with exit 2, where the approach answers 1 on a refusal. Answer 1, or name 2 in the approach.; craft: no case drives the unknown-ticket refusal. Add one in `test/level0/ticket-route.test.js` asserting the exit and the JSON."
+  - step: implement/reflect
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 4b62f7b2b1db1190a8d4fa645ba6e57104ca95bd
+    hash_after: 4b62f7b2b1db1190a8d4fa645ba6e57104ca95bd
 ---
 
 # Ask
@@ -285,11 +289,19 @@ Every case fails on its own assertion, with the verb unknown and `aheadOnly` a s
 
 <!-- the form is text -->
 
+The findings share one class: the change wrote a thing twice where one home stood. `canonical` copies `canonicalOf`, and the unknown ticket took its own exit where the approach names one for every refusal. The fix for the class is a search for the owner before a helper lands. One table in the approach then holds every exit, and the code and the cases read it.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The fix stays in the verb's module, the dispatch and the route cases.
+- every door the change reaches has a fake. The new case drives the fake disk.
+- a comment names the approach the change implements. The comments stand, and point at the design input.
+
 
 ## change
 
