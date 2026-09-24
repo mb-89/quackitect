@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -146,6 +146,14 @@ record:
     hand: box a0ae5042621d · claude-code-remote
     hash_before: 7c789e64c1cee00c00748f0b08e6948b7e06b512
     hash_after: 7c789e64c1cee00c00748f0b08e6948b7e06b512
+  - step: implement/change
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 51021a32bf4c07066a84b28739ba6cde9f19039e
+    hash_after: 51021a32bf4c07066a84b28739ba6cde9f19039e
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -367,6 +375,7 @@ and the dictionary is the source.
 The design review names three gaps, and each lands here:
 
 - the projected `Vocabulary.yml` stands projected again
+- a link under a field no other check reads meets the refusal, and a shape case holds it
 - `answerFindings` and `gateNote` reach `grown` through `road`, so the new refusal reaches them too
 - the `who` line of the growth entry names no note
 

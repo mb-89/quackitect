@@ -202,6 +202,7 @@ ifVale(
         VOCABULARY,
       ),
       linked: at("terms:\n  - {word: shim, means: \"a script\", source: \"[[spec/guidance/voice]]\"}\n", VOCABULARY),
+      aside: at("terms:\n  - {word: shim, means: \"a script\", see: \"[[spec/guidance/voice]]\"}\n", VOCABULARY),
       meaningless: at("terms:\n  - {word: shim}\n", VOCABULARY),
       comma: at(
         "terms:\n  - {word: shim, means: \"a script, and more\"}\n",
@@ -218,7 +219,7 @@ ifVale(
     },
     (said) => {
       passes(said, ENTRY, "good");
-      for (const key of ["shapeless", "sourceless", "pointing", "linked", "meaningless", "comma", "split", "addressless"]) {
+      for (const key of ["shapeless", "sourceless", "pointing", "linked", "aside", "meaningless", "comma", "split", "addressless"]) {
         refuses(said, ENTRY, key);
       }
     },
