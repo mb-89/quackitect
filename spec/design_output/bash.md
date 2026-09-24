@@ -20,6 +20,7 @@ over. One parse splits it, and the rules below read that one parse.
 | the name a checkout cuts | a branch name meets the cap |
 | a test run naming no file | a test run points somewhere |
 | a commit stepping past the hook | the escape, in [[spec/design_output/private]] |
+| the commits a `git revert` or a `git reset` takes back | a pull commit stands |
 
 The parse reads quotes, backslashes, operators and heredoc bodies. A word
 inside quotes carries no operator, so `git commit -m "a > b"` writes nothing.
@@ -87,6 +88,24 @@ That last row is the one that matters. A session reaches for a heredoc because
 a formatter reflows a file between a read and an edit, and a string replacement
 then fails silently. So the refusal names the road: read the file again, then
 change it with Edit.
+
+# A target behind a variable
+
+A redirection lands where its variable points, so the door reads the value the
+command gives the name. A segment of assignments alone, bare or behind
+`export`, sets each value, and a later segment reads it.
+
+| the command | the door reads |
+|---|---|
+| `f=README.md; echo x > $f` | `README.md`, which it refuses |
+| `out=/tmp; echo x > $out/y.md` | `/tmp/y.md`, which stays free |
+| `echo x > $f` | a name with no value, which it refuses |
+| `echo x > $TMPDIR/msg.md` | a temp variable, which stays free |
+
+The free paths read first, so a temp variable stays free with no value. A
+target still holding a name past that refuses, because the door cannot say
+where it lands. The door resolves a redirection's target, and `tee`, `cp` and
+`mv` read their words as written.
 
 # A commit message meets voice
 
@@ -156,6 +175,52 @@ answers every path under `.se` a `git add` names, with `-f` or without.
 
 `PrivateStaysHome` is the finding, and the refusal names the folder and the
 road back. For details, see [[spec/design_output/private#the-second-door]].
+
+# A landing follows its gate
+
+A landing waits on the command before it. `LandingFollowsItsGate` in
+`lib/bash.js` refuses a landing whose gate runs it whatever the gate answers.
+
+| the landing | what it lands |
+|---|---|
+| `ticket pull`, with a name or bare | a hand-back or a take |
+| `ticket open` | the open's commit |
+| `git commit` and the commit verb | a commit |
+
+| the operator before it | the door |
+|---|---|
+| `&&` | passes, because the landing runs on a green gate alone |
+| `;` and a newline | refuses |
+| a double bar, and a lone `&` | refuses |
+
+The rule reads the command with its heredocs taken out, so a body's newline
+reads as no gate.
+
+# A pull commit stands
+
+A pull commit moves a ticket's `step`, `state` and evidence, and the take-back
+verb restores all three. `PullCommitStands` in `lib/pulled.js` refuses a shell
+undo over one, and names `./RUNME.sh ticket pull <name> --back <leaf>`.
+
+| the undo | what the door reads |
+|---|---|
+| `git revert <rev>` | `git log --no-walk --format=%s <rev>`, the named commits alone |
+| `git reset <rev>` | `git log --format=%s <rev>..HEAD`, the range the reset drops |
+| a bare `git reset`, or one over paths | nothing, because HEAD stays |
+
+A flag taking a value keeps that value out of the revisions, so `-m 1` names no
+commit. A subject opening on `<name>:` reads as a pull commit where
+`spec/tickets/<name>.md` or the same file in the private tickets folder stands.
+
+The leaf comes off the subject each pull writes:
+
+- `passes <leaf>` and `fails <leaf> back to <back>`
+- `<leaf> fails back to <back>`
+- `<hand> takes <leaf> back`
+
+A subject naming none leaves `<leaf>` in the refusal. The bridge hands the rule
+its `subjects` read, the way it hands `script`, so a case feeds a fake process.
+The command line lands its own commits past this door, so a pull meets no row.
 
 # The description names verbs
 

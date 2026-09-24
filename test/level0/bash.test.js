@@ -3,6 +3,7 @@
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import { test } from "node:test";
 import {
   addsIn,
@@ -17,6 +18,7 @@ import {
   writesAPath,
 } from "../../.claude/skills/level0/lib/bash.js";
 import { scriptsIn } from "../../.claude/skills/level0/lib/scripted.js";
+import { called, edits, NUMBERED, realDisk, refused, served, TREE } from "./mark-doors.js";
 
 const rules = (command, most = 5, it = {}) =>
   findings(command, most, it).map((one) => one.rule);
@@ -423,4 +425,66 @@ test("the description names the verbs, and answers the same string twice", () =>
   const said = verbLine();
   assert.equal(said, verbLine());
   for (const verb of VERBS) assert.match(said, new RegExp(`./RUNME.sh ${verb}`));
+});
+
+// A landing waits on its gate, so a chain running it whatever the gate answers comes back refused. [[spec/design_output/bash#a-landing-follows-its-gate]]
+test("a landing after a semicolon, a newline, a double bar or an ampersand refuses, and a double ampersand passes", () => {
+  for (const command of [
+    "true; ./RUNME.sh ticket pull a-child --pass",
+    "true; ./RUNME.sh ticket pull a-child",
+    "true; ./RUNME.sh ticket pull",
+    "true; ./RUNME.sh ticket open a-child",
+    "true; git commit -m 'x'",
+    'true; ./RUNME.sh commit "x"',
+    "true\n./RUNME.sh ticket pull a-child --pass",
+    "false || git commit -m 'x'",
+    "sleep 1 & git commit -m 'x'",
+  ]) {
+    assert.ok(rules(command).includes("LandingFollowsItsGate"), command);
+  }
+  for (const command of [
+    "true && ./RUNME.sh ticket pull a-child --pass",
+    "./RUNME.sh ticket pull a-child --pass",
+    "./RUNME.sh check 2>&1 && git commit -m 'x'",
+    "git commit -F - <<'EOF'\nthe first line\nthe second line\nEOF",
+    "true; ls spec",
+  ]) {
+    assert.ok(!rules(command).includes("LandingFollowsItsGate"), command);
+  }
+});
+
+// A target behind a variable reads through the value the command gives it, and one the command gives none refuses. [[spec/design_output/bash#a-shell-writes-nothing]]
+test("a variable target resolves off the command, and one with no value refuses as unresolved", () => {
+  assert.deepEqual(paths("f=README.md; echo x > $f"), ["README.md"]);
+  assert.deepEqual(rules("f=README.md; echo x > $f"), ["ShellWritesNothing"]);
+  assert.deepEqual(paths('f=README.md && echo x > "$f"'), ["README.md"]);
+  assert.deepEqual(paths("echo x > $f"), ["$f"], "a target the command gives no value refuses");
+  assert.deepEqual(rules("echo x > $f"), ["ShellWritesNothing"]);
+});
+
+// A value naming a free path stays free, and a temp variable reads free before the unresolved rule. [[spec/design_output/bash#a-shell-writes-nothing]]
+test("a variable resolving to a free path passes, and a temp variable passes unresolved", () => {
+  assert.deepEqual(paths("out=/tmp; echo x > $out/y.md"), [], "the value lands under /tmp");
+  assert.deepEqual(rules("out=/tmp; echo x > $out/y.md"), []);
+  assert.deepEqual(paths("echo x > $TMPDIR/msg.md"), []);
+  assert.deepEqual(paths(`echo x > $${"{TMPDIR}"}/msg.md`), []);
+  assert.deepEqual(paths("out=spec; echo x > $out/y.md"), ["spec/y.md"]);
+});
+
+// [[spec/design_output/level0#a-write-meets-its-mark]]
+test("sed -n '1,5p' README.md marks lines 1 to 5, and a read with a pipe after it marks nothing", async () => {
+  const at = join(TREE, "README.md");
+  const it = served(realDisk({ [at]: NUMBERED }));
+  await called(it, { tool: "Bash", command: "sed -n '1,5p' README.md" });
+
+  const outside = await called(it, edits(at, "line 7\n", "seven\n"));
+  assert.match(refused(outside), /moved on the disk after you read it/);
+  const inside = await called(it, edits(at, "line 3\n", "three\n"));
+  assert.equal(refused(inside), "", "an edit inside the printed lines lands");
+
+  const other = join(TREE, "other.md");
+  const piped = served(realDisk({ [other]: NUMBERED }));
+  await called(piped, { tool: "Bash", command: "cat other.md | head -n 2" });
+  const said = await called(piped, edits(other, "line 1\n", "one\n"));
+  assert.match(refused(said), /has read none of it/, "a read feeding a pipe sets no mark");
 });

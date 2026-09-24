@@ -1,5 +1,5 @@
 // The compaction probe. It runs the client headless under one variable, and
-// reads the log that run leaves for the two lines that answer the question.
+// reads the log that run leaves for the lines that answer the question.
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
 
 import { HEARD, PROBE } from "../../.claude/skills/level0/lib/guidance.js";

@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeProc } from "../../src/doors/fake/proc.js";
 import {
   fromHold,
   HOLD,
@@ -14,6 +15,7 @@ import {
   ticket,
   updated,
 } from "../../src/scripts/ticket.js";
+import { semicolonVale } from "./semicolon-vale.js";
 
 const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
@@ -270,6 +272,32 @@ test("ticket note takes a name and a line, and refuses a note standing already",
   const twice = heard(() => ticket(ROOT, ["note", "slow-lint", "Again."], said.it));
   assert.equal(twice.code, 2);
   assert.match(twice.said, /stands already/);
+});
+
+// The note reads its minted text through the lint's road before it writes. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+test("ticket note refuses a line the lint warns on, names Characters at its line, and writes no file", () => {
+  const VALE = "/tree/.se/.runtime/bin/vale";
+  const ran = [];
+  const said = treeWithProcesses();
+  const proc = fakeProc();
+  proc.teach([VALE], semicolonVale(ran));
+  const it = { ...said.it, proc, root: ROOT, vale: VALE };
+
+  const refused = heard(() => ticket(ROOT, ["note", "a-name", "one; two"], it));
+
+  assert.equal(refused.code, 1, refused.said);
+  assert.match(refused.said, /breaks Characters/);
+  const line =
+    String(ran[0]?.stdin ?? "")
+      .split("\n")
+      .indexOf("one; two") + 1;
+  assert.ok(line > 0, "Vale reads the minted ticket whole");
+  assert.match(refused.said, new RegExp(`line ${line} breaks Characters`));
+  assert.equal(said.disk.exists(at(`${NOTES}/a-name.md`)), false, "no file stands");
+
+  const clean = heard(() => ticket(ROOT, ["note", "a-name", "One and two."], it));
+  assert.equal(clean.code, 0, clean.said);
+  assert.equal(said.disk.exists(at(`${NOTES}/a-name.md`)), true);
 });
 
 test("ticket update refuses where step names a leaf the new route lacks", () => {

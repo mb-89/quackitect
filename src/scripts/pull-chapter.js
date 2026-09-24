@@ -5,8 +5,7 @@
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
-import { faultIn, fromJson } from "../../.claude/skills/level0/lib/vale.js";
-import { readsText, valeArgvOf } from "../bridge/findings.js";
+import { voiceOver } from "../bridge/findings.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
@@ -284,37 +283,18 @@ export function verdictIn(rows) {
   return { said: word, reason: rest.join("; ") };
 }
 
-// The levels that refuse a hand-back, the ones the lint names. [[spec/design_output/pull#the-voice-reads-the-evidence]]
-const REFUSES = new Set(["error", "warning"]);
 const FORMS_READ = ["text", "list", "checklist", "verdict"];
 const HEADING = /^#{1,6}\s/;
 
-// The pull reads the ticket the way the lint reads it: the lint's Vale call and its per-file reading, over the whole ticket with the fields laid in. It keeps what lands on the leaf's chapter. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+// The pull reads the ticket the way the lint reads it, over the whole ticket with the fields laid in. It keeps what lands on the leaf's chapter. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 export function voiceFaults(it, one, leaf) {
   if (!it.vale) return [];
   const read = voiceText(one.text, leaf);
   if (!read) return [];
-  let ran;
-  try {
-    ran = it.proc.run([...valeArgvOf(it), `--path=${one.path}`], {
-      stdin: read.text,
-      cwd: it.root,
-    });
-  } catch {
-    return [];
-  }
-  if (faultIn(ran.stdout)) return [];
-  return readsText(it, one.path, read.text, fromJson(ran.stdout))
-    .filter(
-      (fault) =>
-        REFUSES.has(fault.severity) &&
-        fault.line >= read.first &&
-        fault.line <= read.last,
-    )
-    .map(
-      (fault) =>
-        `${leaf.path} breaks ${fault.rule} at line ${fault.line} of ${one.path}: ${fault.message}`,
-    );
+  return voiceOver(it, one.path, read.text, read).map(
+    (fault) =>
+      `${leaf.path} breaks ${fault.rule} at line ${fault.line} of ${one.path}: ${fault.message}`,
+  );
 }
 
 // The ticket with the rows the voice passes blanked in place, so every row keeps its file line: a field in no prose form, and an answered row. A comment stays, so a Vale marker holds as it does in the lint. [[spec/design_output/pull#the-voice-reads-the-evidence]]

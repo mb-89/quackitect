@@ -92,7 +92,7 @@ and what do they say.
 
 # What every shape shares
 
-Four things hold whichever shape wins:
+These hold whichever shape wins:
 
 1. Every firing writes a row naming the rule, the path and the line. The door
    log carries rows of that shape today.

@@ -278,11 +278,14 @@ test("a hand-back the record answers gets the recorded answer, and a stale take 
   assert.equal(stale.disk.exists(HOLD), false);
 });
 
+// Git names a moved branch in its own words, and a rebase runs on them alone. [[spec/design_output/pull#the-rejected-push]]
+const MOVED = { exitCode: 1, stderr: " ! [rejected] x -> x (fetch first)\n" };
+
 // [[spec/design_output/pull#the-rejected-push]]
 test("a rejected push fetches, rebases the commit, tries once more, and then answers refused", () => {
   let pushes = 0;
   const once = doors(standing(filled(CHILD(), "### approach", "The approach.")), {
-    [`git push origin ${BRANCH}`]: () => ({ exitCode: pushes++ ? 0 : 1 }),
+    [`git push origin ${BRANCH}`]: () => (pushes++ ? { exitCode: 0 } : MOVED),
   });
   heard(() => pulling(ROOT, ["pull"], once.it));
   const { code } = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], once.it));
@@ -292,20 +295,20 @@ test("a rejected push fetches, rebases the commit, tries once more, and then ans
   assert.equal(ran.filter((one) => one === `git push origin ${BRANCH}`).length, 2);
 
   const stuck = doors(standing(filled(CHILD(), "### approach", "The approach.")), {
-    [`git push origin ${BRANCH}`]: { exitCode: 1 },
+    [`git push origin ${BRANCH}`]: MOVED,
     [`git rebase origin/${BRANCH}`]: { exitCode: 1 },
   });
   heard(() => pulling(ROOT, ["pull"], stuck.it));
   const refused = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], stuck.it));
   assert.equal(refused.code, 1);
-  assert.match(refused.said, /moves under this hand-back/);
+  assert.match(refused.said, /work\/one-group moves on origin, and one rebase falls short/);
   assert.ok(ranGit(stuck.outside).includes("git rebase --abort"));
   assert.equal(
     stuck.disk.exists(HOLD),
     false,
     "the hand-back stands, so the hold drops and outlives no closed ticket",
   );
-  assert.match(refused.said, /push work\/one-group and pull again/);
+  assert.match(refused.said, /Push work\/one-group, then pull again/);
 });
 
 // [[spec/design_output/pull#a-need-is-a-verb]]

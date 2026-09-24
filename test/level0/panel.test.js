@@ -202,6 +202,17 @@ test("the bottom section draws an editor matching the type, and the unit beside 
   assert.match(said, /<span class="unit">turns<\/span>/);
 });
 
+// [[spec/design_output/extension#the-folds-press-at-once]]
+test("the config section draws an open press and a shut press beside its filter", () => {
+  const said = drawn();
+  const filter = said.indexOf('<input class="filter"');
+  const opens = said.indexOf('data-fold="open"');
+  const shuts = said.indexOf('data-fold="shut"');
+  assert.ok(filter > 0 && opens > 0 && shuts > 0, "the filter and both presses draw");
+  assert.ok(said.indexOf("<div class=\"find\">") < filter, "one row holds the filter");
+  assert.ok(opens < said.indexOf('<div class="tree">'), "the presses stand above the tree");
+});
+
 test("a row hovers its help, and carries the words the filter reads", () => {
   assert.match(drawn(), /data-said="stop\.mostInARow 3 The turns it carries\."/);
   assert.match(drawn(), /title="The turns it carries\."/);

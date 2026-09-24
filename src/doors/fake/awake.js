@@ -17,6 +17,7 @@ export function fakeAwake(platform = "win32") {
           why: one.held ? "" : `no hold stands for ${platform}`,
           release() {
             one.released = true;
+            return Promise.resolve();
           },
         };
       },

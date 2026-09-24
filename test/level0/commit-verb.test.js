@@ -56,6 +56,10 @@ const doors = (found = [], answers = {}) => {
     exitCode: 0,
     stdout: "The rules pass.\n",
   });
+  git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), "test"], {
+    exitCode: 0,
+    stdout: "ok\n",
+  });
   return { it, git };
 };
 
@@ -140,4 +144,37 @@ test("the no-push flag leaves the branch where it stands", async () => {
 
   assert.equal(code, 0);
   assert.ok(!ranGit(git).some((one) => one.startsWith("git push")));
+});
+
+// The tests gate the commit, so a red run stages nothing and commits nothing. [[spec/design_output/work#the-battery-answers-first]]
+test("a red test run commits nothing, and names what the run says", async () => {
+  const { it, git } = doors();
+  git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), "test"], {
+    exitCode: 1,
+    stdout: "not ok 1 - the door refuses\n",
+  });
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 1);
+  assert.match(said, /not ok 1 - the door refuses/);
+  const ran = ranGit(git);
+  assert.ok(!ran.includes("git add -A"), "nothing stages");
+  assert.ok(!ran.some((one) => one.startsWith("git commit")), "nothing commits");
+});
+
+// The tests run before anything stages, and the check runs after the commit, so the stamp names the commit that lands. [[spec/design_output/work#one-verb-feeds-that-stamp]]
+test("the tests run before the staging, and the check after the commit", async () => {
+  const { it, git } = doors();
+
+  await heard(() => commitVerb(it, [CLEAN]));
+
+  const ran = git.ran.map((one) => one.argv.join(" "));
+  const cli = join(ROOT, "src", "scripts", "cli.js");
+  const tests = ran.indexOf(`node ${cli} test`);
+  const staged = ran.indexOf("git add -A");
+  const committed = ran.indexOf(`git commit -m ${CLEAN}`);
+  const checked = ran.indexOf(`node ${cli} check`);
+  assert.ok(tests >= 0 && tests < staged, "the tests run first");
+  assert.ok(committed < checked, "the check stamps the commit");
 });

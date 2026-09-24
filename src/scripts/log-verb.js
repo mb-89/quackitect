@@ -1,5 +1,5 @@
-// The verb behind `./RUNME.sh log`: the rows the log holds, narrowed by the
-// four flags, printed the way the window prints them.
+// The verb behind `./RUNME.sh log`: the rows the log holds, narrowed by its
+// flags, printed the way the window prints them.
 // [[spec/design_output/log#one-verb-reads-the-log]]
 
 import {
@@ -21,6 +21,7 @@ const USAGE = [
   "  --kind <name>   the rows of that kind",
   "  --words <text>  the rows carrying every word, in any case",
   "  --last <count>  the last rows, after every filter above",
+  "  --count         one row a kind, over the rows the filters keep",
 ];
 
 export function logVerb(it, argv) {
@@ -38,7 +39,8 @@ export function logVerb(it, argv) {
   }
 
   const rows = narrowed(rowsIn(it, paths), said, now);
-  for (const one of rows) console.log(asRow(one));
+  const shown = said.includes("--count") ? countsOf(rows) : rows.map(asRow);
+  for (const one of shown) console.log(one);
   return 0;
 }
 
@@ -55,6 +57,15 @@ export function narrowed(rows, argv, now) {
     ),
     flagOf(said, "--last"),
   );
+}
+
+// [[spec/design_output/log#one-verb-reads-the-log]]
+export function countsOf(rows) {
+  const per = new Map();
+  for (const one of rows ?? []) per.set(one.kind, (per.get(one.kind) ?? 0) + 1);
+  return [...per]
+    .sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0])))
+    .map(([kind, count]) => `${count}  ${kind}`);
 }
 
 function flagOf(argv, name) {

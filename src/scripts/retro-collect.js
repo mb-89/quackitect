@@ -7,6 +7,7 @@
 import { LOG, PRIVATE, RETRO } from "../../.claude/skills/level0/lib/folders.js";
 import { STAMP, saysGreen, stampOf } from "../../.claude/skills/level0/lib/runs.js";
 import { BATTERY } from "../engine/retro/effect.js";
+import { medianParts } from "./battery.js";
 import { holdsAnywhere } from "./guidance-hand.js";
 import { outsideInto } from "./retro-outside.js";
 
@@ -85,12 +86,22 @@ export function collect(it, name, again = false) {
     `${JSON.stringify({ at, since: since ? new Date(since).toISOString() : "", folders: outside.folders }, null, 2)}\n`,
   );
   // The battery's report the retro opens on, kept one a retro, so the next effect step reads the two side by side. [[spec/guidance/retro/effect]]
-  const report = parsed(read(it, it.join(it.root, ...STAMP.split("/"))))?.battery;
+  const report = keptReport(parsed(read(it, it.join(it.root, ...STAMP.split("/")))));
   if (report) it.disk.write(it.join(home, BATTERY), `${JSON.stringify(report, null, 2)}\n`);
 
   said(name, counts, outside.folders, since);
   for (const one of refused) console.error(`  refused ${one.path}: ${one.refused}`);
   return stands(it) && !refused.length ? 0 : 1;
+}
+
+// The parts read as their median over the runs the stamp keeps, and the slowest cases and the files stay off the last run. [[spec/guidance/retro/effect]]
+export function keptReport(stamp) {
+  const report = stamp?.battery;
+  if (!report) return null;
+  const runs = Array.isArray(stamp.runs) && stamp.runs.length ? stamp.runs : [report.parts ?? {}];
+  const parts = medianParts(runs);
+  const total = Object.values(parts).reduce((sum, ms) => sum + ms, 0);
+  return { ...report, parts, total, runs: runs.length };
 }
 
 // Every entry straight under the private folder moves whole, a folder with all it holds. A dot folder stays, and the log is the one dot folder that moves. [[spec/guidance/retro/collect]]

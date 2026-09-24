@@ -1,4 +1,4 @@
-// The resolver, driven over a fake disk. Three layers stand in memory, a write
+// The resolver, driven over a fake disk. The layers stand in memory, a write
 // lands in the per-box file, and every ask reads that file again.
 // [[spec/guidance/code/testing]]
 

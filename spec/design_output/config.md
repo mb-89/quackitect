@@ -191,6 +191,14 @@ nobody beside it. It pulls until the queue holds nothing for it, and a finished
 ticket brings the next one. The stop hook refuses a stop where the ticket
 stands open, or where the queue holds more work.
 
+Under `queue` the hook takes a stop on a helper's wait:
+
+- A helper running beside a ticket in hand ends the turn, and its answer wakes the session.
+- The same holds beside a group in hand, and beside a waiting queue.
+- A named pull refuses, save the ticket a verb mints for this session.
+- `retro new` sets `minted` to the retro it writes, and pulls it.
+- A refusal names the binding and who sets it: [[spec/design_output/stop#a-refusal-names-the-binding]].
+
 **`unbound` is the mode a person talks in.** A session here takes the one ticket
 a person names, and skips the chain behind it. The stop hook still refuses a
 stop while that ticket stands open. Once the ticket closes, the queue hands out

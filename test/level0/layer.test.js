@@ -1,4 +1,4 @@
-// Inheritance between the two roots, driven with no disk.
+// Inheritance between the roots, driven with no disk.
 // [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";

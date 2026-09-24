@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -89,7 +89,61 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: edbf8035f331c6b5a82210bf4f13c0ce8ef1c778
+    hash_after: edbf8035f331c6b5a82210bf4f13c0ce8ef1c778
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: c46a382e999e12a5f47ead2b901f7fd292bce616
+    hash_after: c46a382e999e12a5f47ead2b901f7fd292bce616
+    returns: 1
+    why: "design: the stated cost misreads both halves. The hold file under `.se/.runtime` survives a server restart.; design: `spawns` in the bridgehead fires `refactor.answered` on a failed spawn too, so that path already releases.; design: a hold lost with a dying bridgehead then refuses every hand for good. The approach needs a release for that case.; design: `checked` in `src/bridge/apply.js` calls `onWrite` without the `agentId`. The owning hand's patch then refuses.; craft: `landsOnTrunk` reads a bare `git push` on `main` as a pass. The row needs that case too.; craft: the spawn event carries a kind and an empty `agentId`, so a parallel helper writing first owns the file.; craft: the row, the guidance line and the cases otherwise answer the Ask."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 4caa6dda863464c6c21eaf97492e0c545c455c85
+    hash_after: 4caa6dda863464c6c21eaf97492e0c545c455c85
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-4
+    hash_before: a927c492425955067b1b02bf23344e563a44a43b
+    hash_after: a927c492425955067b1b02bf23344e563a44a43b
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 07b0c191d80c9f351af2f8843b988454d05d1644
+    hash_after: 07b0c191d80c9f351af2f8843b988454d05d1644
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 11 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: f5a0cbd8ef7ea7a932e41e09ae2b9c6732d5e3ad
+    hash_after: f5a0cbd8ef7ea7a932e41e09ae2b9c6732d5e3ad
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: adb66ef415f73e9cdcd12727834bba41ac391331
+    hash_after: adb66ef415f73e9cdcd12727834bba41ac391331
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 39 test(s) pass in 6 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-9
+    hash_before: f610c684bc85045ed703e2aa9430ff5c760775bd
+    hash_after: f610c684bc85045ed703e2aa9430ff5c760775bd
+reason: done
 ---
 
 # Ask
@@ -117,6 +171,52 @@ A batch commit carries many topics past the commit verb, and two hands write one
 
 <!-- the form is text -->
 
+One commit a helper, through the commit verb, and one hand a held file.
+
+| part | the file | what changes |
+|---|---|---|
+| the row | `src/bridge/bash.js` | `trunkGuard` refuses a raw `git commit` or `git push` landing on `main`, on a desk too |
+| a bare push | the same | a `git push` naming no branch lands on `main` where the box stands on it, so it refuses too |
+| what it says | the same | the refusal names `./RUNME.sh commit "<message>"`, which lints, checks and pushes |
+| what passes | the same | a commit the CLI makes, because the pull and the merge run git off the Bash door |
+| the hold | `src/bridge/stop.js` | `refactorHand` writes `{ file, hand, since }` into a hold file under `.se/.runtime` |
+| the hand | the same | the first helper write to that file fills `hand` with its `agentId` |
+| the release | the same | `onRefactorAnswered` removes the hold, and a failed spawn fires it too |
+| the age | the same | a hold older than `refactor.holdFor` reads as none, and the next hand takes the file |
+| the start | `opensSession` in `src/bridge/server.js` | a session start drops the hold, because no hand of the last session answers into this one |
+| the refusal | `src/bridge/write.js` | `onWrite` refuses a write to the held file from any other `agentId`, the session's own included |
+| the patch road | `checked` in `src/bridge/apply.js` | the write it hands the door carries the call's `agentId` |
+| the mint road | `src/bridge/tools.js` | the same, for the note the mint writes |
+| the path | `.claude/skills/level0/lib/runs.js` | the hold file's name stands beside `REFACTORS` |
+| the span | `spec/config/level0.json` | `refactor.holdFor`, beside `refactor.grace` |
+| the guidance | `spec/guidance/working.md` | one actionable: land each helper's work through `./RUNME.sh commit` once its report and tests pass |
+
+The assumption: the door tells hands apart by `agentId` alone, so the first helper to write the file owns it.
+
+The cases:
+
+- `bash.test.js`: `git commit -m x` on `main` refuses and names the verb, and on a work branch it passes
+- `bash.test.js`: a bare `git push` standing on `main` refuses
+- `stop-hold.test.js` or its neighbour: the hold stands from the spawn to the answer, and reads as none past the span
+- `write.test.js`: the session's write to the held file refuses, and the owning hand's write lands
+- `apply.test.js`: the owning hand's patch lands on the held file
+
+The callers:
+
+- `onBash` runs `trunkGuard` on every Bash call
+- `onStop` in `stop.js` calls `refactorHand`, and the bridgehead fires `refactor.answered`
+- `onWrite` serves Write, Edit, the patch tools and the mint
+
+The answers to the earlier review:
+
+- the cost read wrong: the age and the session start release a stale hold
+- a failed spawn: it fires the answer, so it releases the hold
+- a bridgehead dying mid-hand: the age releases it
+- the patch and mint roads: both carry `agentId`
+- the bare push: it refuses where the box stands on `main`
+
+The cost: a hand working past the span loses the hold, and another hand may then write its file.
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -126,6 +226,15 @@ A batch commit carries many topics past the commit verb, and two hands write one
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- design: the row, the hold, the write door, the guidance line and the cases answer the Ask.
+- design: each earlier finding stands answered. The age, the session start and the failed spawn release the hold.
+- design: the patch road and the mint road carry the `agentId` into `onWrite`.
+- craft: `touchesGit` reads the whole command. A commit verb message naming `git commit` then refuses. Test that case.
+- craft: a push naming `main` from a cloud work branch keeps the hand-back text. The commit verb there pushes the work branch.
+- craft: the first writer still owns the held file. The approach names this cost, so the reader sees it.
+- craft: a Bash write such as `sed -i` meets no write door. The hold covers Write, Edit, the patch and the mint.
 
 # implement
 
@@ -139,17 +248,32 @@ A batch commit carries many topics past the commit verb, and two hands write one
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/trunk.test.js test/level0/trunk-door.test.js test/level0/refactor-hold.test.js test/level0/hold-roads.test.js test/level0/apply-door.test.js test/level0/hand-tools.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Eleven cases fail on their own assertion, and each names the row or the hold it waits for.
+
+- `trunk.test.js`: a commit verb message naming `git commit` touches no git, and a bare push on `main` lands there
+- `trunk-door.test.js`: a raw landing on `main` names `./RUNME.sh commit "<message>"`, on a desk too
+- `trunk-door.test.js`: a work branch pushing `main` keeps the hand-back text
+- `refactor-hold.test.js`: the spawn writes the hold, the answer takes it off, and the door lets the owning hand alone through
+- `hold-roads.test.js`: the patch and the mint carry the hand, and a session start drops the hold
+- the surprise: `stop.js` stands at 592 lines and `server.js` at 599, so the hold takes a module of its own
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch the files the approach names, and a new module holds the hold
+- the tests reach disk, proc and clock through fakes alone
+- each new case carries a pointer to the design note it proves
 
 ## reflect
 
@@ -177,11 +301,17 @@ A batch commit carries many topics past the commit verb, and two hands write one
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/runs.js .claude/skills/level0/lib/trunk.js spec/config/level0.json spec/config/level0.schema.json spec/design_output/level0.md spec/design_output/stop.md spec/design_output/work.md spec/guidance/working.md src/bridge/apply.js src/bridge/bash.js src/bridge/server.js src/bridge/stop.js src/bridge/tools.js src/bridge/write.js .claude/commands/se-config-refactor-holdFor.md src/bridge/refactor-hold.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and `refactor-hold.js` holds the hold beside `stop.js`
+- the hold reaches disk and clock through the box, and the tests hand it fakes
+- each changed function carries a pointer to `work#a-landing-takes-the-verb` or `stop#the-hand-holds-its-file`
 
 ## tests-green
 
@@ -193,11 +323,15 @@ A batch commit carries many topics past the commit verb, and two hands write one
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/trunk.test.js test/level0/trunk-door.test.js test/level0/refactor-hold.test.js test/level0/hold-roads.test.js test/level0/apply-door.test.js test/level0/hand-tools.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -205,11 +339,26 @@ A batch commit carries many topics past the commit verb, and two hands write one
 
 <!-- the form is text -->
 
+A raw landing on `main` now meets the commit verb, and the refactoring hand holds the file it drains.
+
+- `trunkGuard` refuses a raw commit or push landing on `main`, and names `./RUNME.sh commit "<message>"`
+- a bare push standing on `main` counts as a landing there
+- a cloud box holding a work branch keeps its hand-back text
+- `touchesGit` reads past the words a verb of this tree takes, so a message naming `git commit` passes
+- `refactor-hold.js` keeps the hold from the spawn to the answer, and a session start drops it
+- the write door refuses the held file to every other hand, over Write, Edit, the patch and the mint
+- `refactor.holdFor` ages a lost hold, and 0 switches the hold off
+- `working.md` rule 4 lands each helper's work through the commit verb
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, plus the hold module and its projected command
+- the hold reaches disk and clock through the box, and every case hands it fakes
+- `stop#the-hand-holds-its-file` and `work#a-landing-takes-the-verb` name the approach, and the code points at both
 
 # verdict
 
@@ -221,17 +370,51 @@ A batch commit carries many topics past the commit verb, and two hands write one
 
 <!-- the form is files -->
 
+- spec/tickets/each-helper-lands-one-commit.md
+- .claude/commands/se-config-refactor-holdFor.md
+- .claude/skills/level0/lib/runs.js
+- .claude/skills/level0/lib/trunk.js
+- spec/config/level0.json
+- spec/config/level0.schema.json
+- spec/design_output/level0.md
+- spec/design_output/stop.md
+- spec/design_output/work.md
+- spec/guidance/working.md
+- src/bridge/apply.js
+- src/bridge/bash.js
+- src/bridge/refactor-hold.js
+- src/bridge/server.js
+- src/bridge/stop.js
+- src/bridge/tools.js
+- src/bridge/write.js
+- src/scripts/commit-verb.js
+- test/level0/hold-roads.test.js
+- test/level0/refactor-hold.test.js
+- test/level0/trunk-door.test.js
+- test/level0/trunk.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- design: the row, the hold, the write door, the guidance line and the cases answer the Ask.
+- design: `./RUNME.sh check` exits 0 on the branch.
+- design: the Ask gates every landing on main through the verb. So the edited trunk-door case stands inside it.
+- craft: the refusal off main says the verb pushes the branch you stand on. That push lands nowhere on main.
+- craft: the comment over `takesABranch` still says every other cloud session lands its own work. It now reads stale.
+- craft: `pass` in `server.js` changes shape past the Ask. The fix is trivial.
+- craft: no retro stands in the handback yet.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the hold stands in `stop.md` and the landing in `work.md`, and the code points at both
 
 # Discussion
 

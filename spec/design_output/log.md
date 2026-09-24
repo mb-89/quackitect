@@ -198,6 +198,7 @@ current one alone.
 | `--kind <name>` | the rows of that kind | the row's own field |
 | `--words <text>` | the rows carrying every word, in any case | `carrying` |
 | `--last <count>` | the last rows, after every filter above | the verb itself |
+| `--count` | one row a kind, the most first, over the rows the filters keep | `countsOf` |
 
 `./RUNME.sh find --log <words>` hands its words to this verb, because the index
 walks no log. `src/scripts/log-read.js` owns the read over the session file and

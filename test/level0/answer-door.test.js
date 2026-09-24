@@ -19,18 +19,14 @@ function box() {
   return { said, log: { say: (...row) => said.push(row) } };
 }
 
+// [[spec/design_output/level0#the-first-call-asks]]
 test("a report pays the demand, and no call after it meets the door", () => {
   const it = box();
   demands(it, "The owner sent a prompt");
   assert.deepEqual(
     holdsForAnswer({ tool: "Read" }, it),
-    null,
-    "the first call after the prompt passes",
-  );
-  assert.deepEqual(
-    holdsForAnswer({ tool: "Read" }, it),
     { needs: "reply" },
-    "the second asks for the reply",
+    "the first call after the prompt asks for the reply",
   );
 
   const answer = pays(it, "Understood: the tests first, then the door.");

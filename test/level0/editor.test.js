@@ -1,4 +1,4 @@
-// The editor's own extension list, and the three rules v3 and v4 paid for. Each
+// The editor's own extension list, and the rules v3 and v4 paid for. Each
 // case here is one of those failures, so a later writer cannot reintroduce it.
 // [[spec/design_output/extension#a-file-another-program-owns]]
 

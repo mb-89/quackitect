@@ -1,4 +1,4 @@
-// Two rules the paragraph schema projects, over a sentence and over a table.
+// The rules the paragraph schema projects, over a sentence and over a table.
 // The schema hands the values in, and this holds the Tengo they run.
 // [[spec/design_output/projection#a-layer-writes-two-files]]
 

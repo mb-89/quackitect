@@ -8,7 +8,7 @@ about: what level zero holds at its close, what the older lines and the field pu
 Level zero is the layer that holds before anything else does, and it is agent
 control. Level one is work, level two is processes, and level three is the
 applications, the specific processes. This note is level zero's roundup at
-the close of its build, in four parts:
+the close of its build, in these parts:
 
 - what it holds
 - what v3 and v4 carry, and what v5 takes or leaves
@@ -93,7 +93,7 @@ under the tree's own rules, and the bound sessions score within noise of the
 unbound ones. So the prompt fails here as it fails everywhere, and the door is
 the answer the field gives for everything else.
 
-Three numbers from the field bound what a door buys and costs:
+These numbers from the field bound what a door buys and costs:
 
 | the number | where |
 |---|---|

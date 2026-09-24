@@ -14,6 +14,7 @@ import {
   roadsOf,
   serveOf,
 } from "../../src/stub/.claude/skills/level0/hooks/bridgehead.js";
+import { register as level0 } from "../../.claude/skills/level0/hooks/level0.js";
 
 const STUB = "/stub";
 const HOME = "/home/agent";
@@ -286,4 +287,21 @@ test("a record naming no upstream stops before the clone", async () => {
   assert.equal(line.level, "warn");
   assert.equal(line.step, "clone");
   assert.match(line.detail, /upstream/);
+});
+
+// A server tool the harness registered once answers nowhere past the hook, so a dead bridge says so. [[spec/design_output/level0#the-bridge-says-it-falls]]
+test("a mcp__level0__plan call with no server answers the line", async () => {
+  const hooks = {};
+  level0((event, fn) => {
+    hooks[event] = fn;
+  }, {});
+  const files = fakeDisk();
+  const $ = hand(files, fakeGit({}, STUB));
+  const handed = Object.assign(async (e) => ({ handed: e }), { event: "tool.call" });
+
+  const said = await hooks["*"]($, { tool: "mcp__level0__plan" }, handed);
+
+  assert.match(String(said?.result ?? ""), /no server answers at .*6510/);
+  assert.match(String(said.result), /mcp__level0__plan/, "the line names the tool");
+  assert.match(String(said.result), /\.\/RUNME\.sh serve/, "the line names the road back");
 });

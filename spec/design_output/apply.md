@@ -75,6 +75,23 @@ stand against.
 Both halves ride in the entry, and no hash stands in for the text. `.se` sits
 outside git, so an overwritten file lives in the entry or nowhere.
 
+## A create makes its folder
+
+A file the apply brings into being makes its folder before the write, so a
+`create` into a new folder lands whole.
+
+## A first fault writes nothing
+
+A first file refusing the write leaves every byte of the tree. The answer opens
+on `nothing written`, and the entry stays with `landed: false`.
+
+The entry stays, because an older apply of the same name stands newest once it
+goes. An undo meeting an entry with `landed: false` answers that nothing waits,
+and drops the entry. The older apply stands.
+
+The marks go back to what they held before the call, the way a preview puts
+them back. So the next Edit on those files lands.
+
 ## An entry says whose apply
 
 An entry carries the `on` its apply names, and an undo walks past every entry

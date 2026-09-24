@@ -7,14 +7,18 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeProc } from "../../src/doors/fake/proc.js";
+import { fakeGit } from "../../src/doors/fake/git.js";
 import { askFaults } from "../../src/scripts/ticket-ask-lint.js";
 import { askLines, ticket } from "../../src/scripts/ticket.js";
+import { semicolonVale } from "./semicolon-vale.js";
 
 const ROOT = "/tree";
 const VALE = "/tree/.se/.runtime/bin/vale";
 const AT = "spec/tickets/a-thing.md";
 const at = (path) => join(ROOT, ...path.split("/"));
+// The Ask's own line in DRAFT, and a line under the do chapter past it, as the lint names them. [[spec/design_output/pull#a-draft-opens]]
+const ASK_LINE = 10;
+const DO_LINE = 14;
 
 const SCHEMA = `kind: ticket
 
@@ -75,7 +79,7 @@ const FOUND = JSON.stringify({
   "stdin.md": [
     {
       Check: "VoiceParagraph.Characters",
-      Line: 1,
+      Line: ASK_LINE,
       Span: [17, 17],
       Message: "The character < stands outside the set a paragraph admits.",
       Severity: "error",
@@ -84,13 +88,22 @@ const FOUND = JSON.stringify({
 });
 
 function box(said) {
-  const line = `${VALE} --config=.vale.ini --path=${AT} --output=JSON --no-exit`;
+  // The open reads through the lint's Vale call, on the config the assembly writes, and names the path last. [[spec/design_output/pull#a-draft-opens]]
+  const line = `${VALE} --config=.vale.ini --output=JSON --no-exit --path=${AT}`;
   const disk = fakeDisk({
     [at("spec/schemas/ticket.schema.yaml")]: SCHEMA,
     [at(AT)]: DRAFT,
   });
-  const proc = fakeProc({ [line]: { stdout: said } });
-  return { it: { disk, proc, root: ROOT, join, words: 5, vale: VALE }, disk, proc };
+  const git = fakeGit(
+    { [line]: typeof said === "function" ? said : { stdout: said } },
+    ROOT,
+  );
+  const proc = git.proc;
+  return {
+    it: { disk, proc, git, root: ROOT, join, words: 5, vale: VALE },
+    disk,
+    proc,
+  };
 }
 
 function heard(what) {
@@ -112,7 +125,7 @@ test("an Ask breaking a rule refuses the open, names the rule and leaves the dra
   const ran = heard(() => ticket(ROOT, ["open", "a-thing"], it));
   assert.equal(ran.code, 1);
   assert.match(ran.said, /breaks the voice rules/);
-  assert.match(ran.said, /line 1 breaks Characters/);
+  assert.match(ran.said, new RegExp(`line ${ASK_LINE} breaks Characters`));
   assert.match(ran.said, /Rewrite the Ask, then open it again\./);
   assert.match(disk.read(at(AT)), /^state: draft$/m, "the draft stands");
 });
@@ -125,21 +138,46 @@ test("an Ask that passes opens the ticket at its first leaf", () => {
   assert.match(ran.said, /stands open at do/);
 });
 
-test("a warning leaves the open alone, and a box with no Vale opens as it stands", () => {
-  const warned = JSON.stringify({
-    "stdin.md": [
-      {
-        Check: "VoiceParagraph.Wordy",
-        Line: 1,
-        Severity: "warning",
-        Message: "Wordy.",
-      },
-    ],
-  });
-  assert.equal(heard(() => ticket(ROOT, ["open", "a-thing"], box(warned).it)).code, 0);
+// The open reads at the lint's level, so a warning on the Ask refuses as an error does. [[spec/design_output/pull#a-draft-opens]]
+test("a warning on the Ask refuses the open, a warning past the Ask leaves it alone, and a box with no Vale opens as it stands", () => {
+  const warnedAt = (line) =>
+    JSON.stringify({
+      "stdin.md": [
+        {
+          Check: "VoiceParagraph.Wordy",
+          Line: line,
+          Severity: "warning",
+          Message: "Wordy.",
+        },
+      ],
+    });
+  const onAsk = heard(() =>
+    ticket(ROOT, ["open", "a-thing"], box(warnedAt(ASK_LINE)).it),
+  );
+  assert.equal(onAsk.code, 1, onAsk.said);
+  assert.match(onAsk.said, new RegExp(`line ${ASK_LINE} breaks Wordy`));
+  const past = heard(() =>
+    ticket(ROOT, ["open", "a-thing"], box(warnedAt(DO_LINE)).it),
+  );
+  assert.equal(past.code, 0, past.said);
   const bare = box("{}");
-  assert.deepEqual(askFaults({ ...bare.it, vale: "" }, AT, ["a line"]), []);
+  assert.deepEqual(askFaults({ ...bare.it, vale: "" }, AT, DRAFT), []);
   assert.equal(bare.proc.ran.length, 0, "no Vale, no run");
+});
+
+// [[spec/design_output/pull#a-draft-opens]]
+test("ticket open over an Ask carrying a semicolon refuses, naming Characters at the file's line, and the draft stands", () => {
+  const ran = [];
+  const { it, disk } = box(semicolonVale(ran));
+  const text = DRAFT.replace("<upstream>", "the upstream; and more");
+  disk.write(at(AT), text);
+
+  const said = heard(() => ticket(ROOT, ["open", "a-thing"], it));
+
+  assert.equal(said.code, 1, said.said);
+  assert.match(said.said, new RegExp(`line ${ASK_LINE} breaks Characters`));
+  assert.match(disk.read(at(AT)), /^state: draft$/m, "the draft stands");
+  assert.equal(ran[0]?.stdin, text, "Vale reads the whole ticket");
 });
 
 // [[spec/design_output/pull#a-draft-opens]]
@@ -172,4 +210,23 @@ test("an ask of blanks alone holds nothing, and one line makes it hold", () => {
   assert.equal(holds(["", "  ", ""]), false);
   assert.equal(holds(["", "<!-- gain -->", ""]), false);
   assert.equal(holds(["", "A thing.", ""]), true);
+});
+
+// The open lands the ticket it opens in one commit, so the open reaches the queue with the push. [[spec/design_output/pull#a-draft-opens]]
+test("an open commits the ticket it opens, and names it", () => {
+  const git = fakeGit({}, ROOT);
+  const disk = fakeDisk({
+    [at("spec/schemas/ticket.schema.yaml")]: SCHEMA,
+    [at(AT)]: DRAFT.replace("<upstream>", "the upstream"),
+  });
+  const it = { disk, proc: git.proc, git, root: ROOT, join, words: 5, vale: "" };
+
+  const ran = heard(() => ticket(ROOT, ["open", "a-thing"], it));
+
+  assert.equal(ran.code, 0, ran.said);
+  const commits = git.ran
+    .map((one) => one.argv.join(" "))
+    .filter((one) => one.startsWith("git commit"));
+  assert.equal(commits.length, 1, "one commit lands");
+  assert.match(commits[0], /a-thing/, "the commit names the ticket");
 });

@@ -1,4 +1,4 @@
-// A column two ways. A finding and a Go string count bytes, and the protocol
+// A column in bytes and in units. A finding and a Go string count bytes, and the protocol
 // counts UTF-16 units, so a column crossing the pipe turns from one to the
 // other here.
 // [[spec/design_output/lsp#a-finding-is-a-diagnostic]]

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -89,7 +89,71 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 9fbbfec925f5c7700bf6e42d34103fa4de036855
+    hash_after: 9fbbfec925f5c7700bf6e42d34103fa4de036855
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: d2eb7633360734ae2c151f87f74b0c472634f1e2
+    hash_after: d2eb7633360734ae2c151f87f74b0c472634f1e2
+    returns: 1
+    why: "design: a check before `git add` stamps the parent commit over an unclean tree.; design: `saysGreen` then refuses that stamp, so the verb's push to trunk and `branch done` both stop.; design: fix it by running the check first, then stamping the new commit once it lands.; craft: `partsOf` drops each operator, so the rule walks `tokensOf` to read the `;` itself.; craft: `tokensOf` reads a newline as `;`, so the design note names the two-line command too.; craft: `||` runs the landing on a red gate, so the rule refuses it beside `;`.; craft: `bash.test.js` covers `ticket open`, `git commit` and the commit verb after a `;` as well.; craft: `ticket.test.js` reads the schema alone, so the open case sits beside `ask-lint.test.js`.; craft: `spec/design_output/pull.md` names the hand-back, so it takes the bare pull line too.; craft: the verdict leaf keeps its bare hand-back, because the pull refuses a flag there. This reading of the Ask holds."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: a198b38e23a010219c3ab5b642c006e4f583fe39
+    hash_after: a198b38e23a010219c3ab5b642c006e4f583fe39
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-4
+    hash_before: ff09de9e02abf0050bbf75d137e1f31d1bdaa235
+    hash_after: ff09de9e02abf0050bbf75d137e1f31d1bdaa235
+    returns: 2
+    why: "design: the rule refuses a `;` before a pull with a flag, and the Ask names every `ticket pull`.; craft: `open` hands its text to `landedAlone`, which writes the file, so the open drops its own write.; design: fix it by counting every `ticket pull` as a landing, as the Ask line says.; craft: the rule walks the tokens of the text `withoutHeredocs` leaves, so a heredoc body raises no `;`.; craft: a `&` runs the landing beside its gate, so the rule refuses it beside `;` and `||`.; craft: `open` hands its text to `landedAlone`, which writes the file itself, so the open drops its own write.; craft: the earlier findings all stand answered, from the stamp order to the verdict leaf."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: e18b19cf15681e7789052300cdfcde1a6ce24131
+    hash_after: e18b19cf15681e7789052300cdfcde1a6ce24131
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-6
+    hash_before: 01b11a7206a981833a7cbd5dde3d1cc4730f1a7e
+    hash_after: 01b11a7206a981833a7cbd5dde3d1cc4730f1a7e
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 4ace689deb6548c8bec394c0ce7efda4fcd6bf7d
+    hash_after: 4ace689deb6548c8bec394c0ce7efda4fcd6bf7d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 59b2788fe85192cc3a7b8b9bb5637ef4605da0c1
+    hash_after: 59b2788fe85192cc3a7b8b9bb5637ef4605da0c1
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 4e929c5b05159b6d9f446293245aa08067b3364a
+    hash_after: 4e929c5b05159b6d9f446293245aa08067b3364a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 47 test(s) pass in 4 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-11
+    hash_before: 3c52e5194d3528bb2c9d5e185ccb19e608bf120d
+    hash_after: 3c52e5194d3528bb2c9d5e185ccb19e608bf120d
+reason: done
 ---
 
 # Ask
@@ -117,6 +181,59 @@ A `;` chain lands a hand-back over a refused write, and a commit over a failing 
 
 <!-- the form is text -->
 
+Each landing waits on its gate, in four places.
+
+| part | what changes |
+|---|---|
+| the `;` rule | `findings` in `.claude/skills/level0/lib/bash.js` names `LandingFollowsItsGate` |
+| the walk | the rule walks `tokensOf` over the text `withoutHeredocs` leaves, because `partsOf` drops the operator between segments |
+| what it refuses | a `;`, a newline, a `\|\|` or a `&` whose next segment lands |
+| a landing | any `ticket pull`, `ticket open`, `git commit`, or the commit verb |
+| what passes | `&&`, which runs the landing on a green gate alone |
+| the bare pull | `pull` in `src/scripts/pull.js` shows the leaf in hand where a name comes with no flag |
+| the verdict leaf | a leaf holding a verdict field still hands back on the bare name, because the field is its flag |
+| the open | `open` in `src/scripts/ticket.js` hands its text to `landedAlone` in `pull-landed.js`, which writes it and commits |
+| the open's refusal | a commit the hook refuses puts the draft back, and the verb exits 1 |
+| the commit verb | `landsAndPushes` in `commit-verb.js` runs `./RUNME.sh test` before `git add` |
+| a red test | the verb exits 1 with the run's output, and stages nothing |
+| the stamp | the check runs after the commit as it does, so the stamp names the landed commit |
+| the design | `bash.md` names the rule, `work.md#the-battery-answers-first` the order, and `pull.md` the bare pull |
+
+The assumption: the verdict leaf keeps its bare hand-back, because the pull refuses a verdict flag there.
+
+The cases:
+
+- `bash.test.js`: a `;` before each landing refuses, a bare `ticket pull` among them
+- `bash.test.js`: a newline, a `\|\|` and a `&` refuse, a heredoc's newline passes, and `&&` passes
+- `pull.test.js`: a bare name on a plain leaf prints the chapter, and the git log stays put
+- `ask-lint.test.js`: `ticket open` runs one commit naming the ticket
+- `commit-verb.test.js`: a red test run leaves `git add` and `git commit` unrun
+
+The callers:
+
+- `onBash` in `src/bridge/bash.js` runs `findings`, so the rule reaches every Bash call
+- `pull-spawn.js` prints `ticket open`, and its text stands
+- `pull-chapter.js` prints the bare hand-back line on a verdict leaf, and its text stands
+
+The answers to the earlier review:
+
+- the check before the commit stamped the parent: the tests run first, and the check stamps the commit after
+- the operators: the rule walks `tokensOf`
+- the newline: it refuses as a `;` does, and `bash.md` says so
+- the `\|\|`: it refuses beside `;`
+- the four landings: each takes a case
+- the open's case: it stands beside `ask-lint.test.js`
+- `pull.md`: it names the bare pull
+
+The answers to the second review:
+
+- a bare pull on a verdict leaf lands: every `ticket pull` counts as a landing
+- a heredoc's newline: the walk reads the text with the heredocs taken out
+- the `&`: it refuses beside `;`
+- the open's write: `landedAlone` writes the ticket, and `open` drops its own write
+
+The cost: the commit verb runs the tests twice, once as its gate and once inside the check.
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -126,6 +243,15 @@ A `;` chain lands a hand-back over a refused write, and a commit over a failing 
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- craft: the second review's findings all stand answered, from every `ticket pull` to the open's write.
+- craft: `tokensOf` reads `2>&1` as `>&`, so the `&` refusal leaves a redirect alone. Add a case for it.
+- craft: a `|` still runs the landing whatever the gate answers. Refuse it beside `&`, or name it in `bash.md`.
+- craft: `verbLine` lists what level zero refuses, so it names the new refusal too.
+- craft: a bare pull with `--fields` on a plain leaf shows the leaf. Say whether the payload drops or rides the hold.
+- craft: the rule reads the commit verb as `RUNME.sh commit`. Name the forms it matches, `cli.js commit` among them.
+- craft: the verdict leaf keeps its bare hand-back, because `handBack` refuses a flag there, and the rule gates that pull.
 
 # implement
 
@@ -139,17 +265,33 @@ A `;` chain lands a hand-back over a refused write, and a commit over a failing 
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/bash.test.js test/level0/commit-verb.test.js test/level0/pull.test.js test/level0/ask-lint.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Four cases fail, each on its own assertion: the chain rule, the red test run,
+the bare pull and the open's commit.
+
+- the commit verb case teaches the fake a green `test` run, so the cases already green keep their road
+- the open case builds a fake git beside the fake Vale, because `ask-lint.test.js` carried none
+- the chain case holds a heredoc and a `2>&1` among the passing commands
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch the four files the approach names
+- every door the cases reach has a fake: git, the process and the disk
+- a comment above each case points at the chapter the approach names
+
 
 ## reflect
 
@@ -177,11 +319,19 @@ A `;` chain lands a hand-back over a refused write, and a commit over a failing 
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/bash.js src/scripts/pull.js src/scripts/ticket.js src/scripts/commit-verb.js spec/design_output/bash.md spec/design_output/pull.md spec/design_output/work.md
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the Bash rule, the pull, the open, the commit verb and the chapters each names
+- every door the change reaches has a fake: git, the process and the disk
+- a comment names the approach on each changed function, through its chapter's pointer
+
 
 ## tests-green
 
@@ -193,11 +343,17 @@ A `;` chain lands a hand-back over a refused write, and a commit over a failing 
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/bash.test.js test/level0/commit-verb.test.js test/level0/pull-bare.test.js test/level0/ask-lint.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
+
 
 ### says
 
@@ -205,11 +361,25 @@ A `;` chain lands a hand-back over a refused write, and a commit over a failing 
 
 <!-- the form is text -->
 
+Each landing now waits on its gate.
+
+- `LandingFollowsItsGate` in `lib/bash.js` refuses a landing after a `;`, a newline, a double bar or a `&`
+- a bare name on a plain leaf shows the leaf, and a verdict leaf still hands back on it
+- `ticket open` lands the ticket in one commit through `landedAlone`
+- the commit verb runs the tests before it stages, and the check after the commit stamps it
+- the bare pull's case moves to `pull-bare.test.js`, so `pull.test.js` stays under the file ceiling
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the Bash rule, the pull, the open, the commit verb and the chapters each names
+- every door the change reaches has a fake: git, the process and the disk
+- a comment names the approach on each changed function, through its chapter's pointer
+
 
 # verdict
 
@@ -221,17 +391,47 @@ A `;` chain lands a hand-back over a refused write, and a commit over a failing 
 
 <!-- the form is files -->
 
+- spec/tickets/a-landing-follows-its-gate.md
+- .claude/skills/level0/lib/bash.js
+- spec/design_output/bash.md
+- spec/design_output/pull.md
+- spec/design_output/work.md
+- src/scripts/commit-verb.js
+- src/scripts/pull.js
+- src/scripts/pull-landed.js
+- src/scripts/ticket.js
+- src/scripts/cli.js
+- src/tui/frame_test.go
+- src/tui/tree/treefilter.go
+- test/level0/ask-lint.test.js
+- test/level0/bash.test.js
+- test/level0/commit-verb.test.js
+- test/level0/pull.test.js
+- test/level0/pull-bare.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- craft: `./RUNME.sh check` exits 0 on this branch.
+- craft: each Ask line lands, and a case under `test/level0` covers it.
+- craft: the handback holds no retro field, so none stands there.
+- craft: a bare pull with `--fields` on a plain leaf shows the leaf and drops the payload silently.
+- craft: `landingOf` matches `RUNME.sh` anywhere in a segment, so an `echo` of a landing refuses too.
+- craft: `verbLine` still leaves the new refusal unnamed, as the design review asks.
+- craft: the tests-green command names `pull-bare.test.js`, where tests-red named `pull.test.js`.
+- craft: two Go comments lose a doubled word outside the Ask, and the fix is trivial.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each fact stands once in its chapter, and every code comment points at that chapter.
 
 # Discussion
 

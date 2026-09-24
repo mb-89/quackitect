@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -89,7 +89,51 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 1e40e441ab60cc0a3dc2104d2bf538dc94877f55
+    hash_after: 1e40e441ab60cc0a3dc2104d2bf538dc94877f55
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: 28fe29d78c6f3214fe9bcdf25d3423cb2da9905a
+    hash_after: 28fe29d78c6f3214fe9bcdf25d3423cb2da9905a
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 5f80e387cc6c45c18665f520ef84e447b44f768b
+    hash_after: 5f80e387cc6c45c18665f520ef84e447b44f768b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 7 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 80ff34d908a17529b8205be3ac769293bb708dbb
+    hash_after: 80ff34d908a17529b8205be3ac769293bb708dbb
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: f39ee869ec154ebccbecaf6b2e97a0a0fff8b4a4
+    hash_after: f39ee869ec154ebccbecaf6b2e97a0a0fff8b4a4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 30 test(s) pass in 4 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-7
+    hash_before: 118b5ac4700ea196c35c6afc1d6ab334f751fc63
+    hash_after: 118b5ac4700ea196c35c6afc1d6ab334f751fc63
+reason: done
 ---
 
 # Ask
@@ -117,6 +161,36 @@ Under queue the stop hook pushes `ticket pull` and filler turns against the owne
 
 <!-- the form is text -->
 
+The refusal says the binding, a minted ticket passes it, and a helper's wait
+ends the turn under every binding.
+
+| part | the file | what changes |
+|---|---|---|
+| the layer | `src/bridge/config.js` | `whereFrom(box, key)` answers the value and its layer: the local file, the environment or the tracked file |
+| the moment | `src/bridge/stop.js` | the box keeps the binding it last read and the clock at the change, and the log says each change |
+| the refusal | the same | `asksForStop` closes with one line naming the binding, its layer and that moment |
+| the minted ticket | `src/scripts/pull.js` | the queue refusal of a named pull skips a name equal to `it.minted` |
+| who mints | `src/scripts/retro-new.js` | the verb sets `it.minted` to the retro it writes, then pulls it |
+| the helpers | `src/bridge/stop.js` | `helpers-running` reads `helpersRun` alone, under every binding |
+| the rule text | `spec/config/stop/level0.yml` | `your-helpers-still-run` drops the sentence saying the queue refuses it |
+| the falls text | `stop.js` | `FALLS["helpers-running"]` keeps the second sentence alone |
+| the design | `spec/design_output/config.md#the-engine-controls` | the table's queue row names the helper's wait as a stop the hook takes |
+
+The cases:
+
+- `stop.test.js`: a refusal under `queue` from the local file names `queue`, the local file and the moment
+- `pull.test.js`: under `queue` a named pull refuses, and the same name as `it.minted` passes
+- a new `retro-new.test.js`: the verb takes its retro under `queue`
+- `stop-helper.test.js`: under `queue` with a running helper, the turn ends on the wait
+
+The callers:
+
+- `onStop` runs `asksForStop` and the checks
+- `claimFalls` reads `FALLS`
+- only `retro-new.js` mints and pulls in one verb today, so one verb sets `it.minted`
+
+The cost: a helper running beside a ticket in hand ends the turn under `queue`, and its answer wakes the session.
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -126,6 +200,15 @@ Under queue the stop hook pushes `ticket pull` and filler turns against the owne
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- design: each part answers an Ask line, and the cost holds. `your-helpers-still-run` at 83 beats the level1 rules.
+- craft: the cost names a ticket in hand. The same claim also ends a turn over a group in hand and a waiting queue.
+- craft: `asks` reads the local file and the tracked file alone. So `whereFrom` must read the same layers the hook reads.
+- craft: the moment is the first read after a change, and the box loses it when the server starts again.
+- craft: `retro-new.test.js` stands already, so the new case joins that file.
+- craft: `stop-helper.test.js` holds a case where the queue holds the turn beside a helper. The change flips that case.
 
 # implement
 
@@ -139,17 +222,31 @@ Under queue the stop hook pushes `ticket pull` and filler turns against the owne
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/stop-binding.test.js test/level0/stop-helper.test.js test/level0/pull-leaves.test.js test/level0/retro-new.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Seven cases fail on their own assertion, and each names what it waits for.
+
+- `stop-binding.test.js` is new, because `stop.test.js` reads the rules alone and holds no box.
+- The pull case joins `pull-leaves.test.js` beside the named pull, because `pull.test.js` stands at 588 lines.
+- The retro case joins the `retro-new.test.js` that stands.
+- The helper case in `stop-helper.test.js` now ends the turn under `queue`.
+- `src/bridge/stop.js` stands at 595 lines, so the change moves the moment into a module of its own.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the cases touch the named test files and one new file.
+- every door the change reaches has a fake: the cases drive the fake disk, clock, proc and git.
+- a comment names the approach the change implements: each case points at the design note it holds.
 
 ## reflect
 
@@ -177,11 +274,17 @@ Under queue the stop hook pushes `ticket pull` and filler turns against the owne
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/bridge/config.js src/bridge/binding.js src/bridge/stop.js src/scripts/pull.js src/scripts/retro-new.js spec/config/stop/level0.yml spec/design_output/stop.md spec/design_output/config.md test/level0/stop-binding.test.js test/level0/stop-hold.test.js test/level0/stop-door.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: `binding.js` holds the moment, because `stop.js` stands near 600 lines.
+- every door the change reaches has a fake: the stop hold cases now carry the fake clock the moment reads.
+- a comment names the approach the change implements: each new line points at a design note heading.
 
 ## tests-green
 
@@ -193,11 +296,15 @@ Under queue the stop hook pushes `ticket pull` and filler turns against the owne
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/stop-binding.test.js test/level0/stop-helper.test.js test/level0/pull-leaves.test.js test/level0/retro-new.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -205,11 +312,24 @@ Under queue the stop hook pushes `ticket pull` and filler turns against the owne
 
 <!-- the form is text -->
 
+A stop refusal now says the binding, and the queue stops pulling against the session's own work.
+
+- A refusal ends on a line naming the binding, the file that sets it, and a moment.
+- `whereFrom` reads the local file, then the tracked file, the same layers `asks` reads.
+- The moment lives in the box, so a restart of the server loses it.
+- A named pull under `queue` passes where the name equals `it.minted`.
+- `retro new` sets `minted` to its retro, so it takes the retro under `queue`.
+- A running helper ends the turn under every binding, and its answer wakes the session.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the diff holds the named files, `binding.js`, and their cases.
+- every door the change reaches has a fake: the cases drive the fake disk, clock, proc and git.
+- a comment names the approach the change implements: each new line points at a design note heading.
 
 # verdict
 
@@ -221,17 +341,45 @@ Under queue the stop hook pushes `ticket pull` and filler turns against the owne
 
 <!-- the form is files -->
 
+- spec/tickets/the-binding-reads-the-session.md
+- spec/config/stop/level0.yml
+- spec/design_output/config.md
+- spec/design_output/stop.md
+- src/bridge/binding.js
+- src/bridge/config.js
+- src/bridge/stop.js
+- src/scripts/pull.js
+- src/scripts/retro-new.js
+- test/level0/pull-leaves.test.js
+- test/level0/retro-new.test.js
+- test/level0/stop-binding.test.js
+- test/level0/stop-door.test.js
+- test/level0/stop-helper.test.js
+- test/level0/stop-hold.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- design: each Ask line has a hunk and a case under `test/level0`.
+- design: `./RUNME.sh check` exits 0 on the branch.
+- design: the refusal ends on a line naming the binding, its file and the moment.
+- design: `retro new` sets `minted`, and the named pull lets that name through.
+- design: `helpers-running` reads `helpersRun` alone, so the wait ends the turn under `queue`.
+- craft: the comment on `whereFrom` points at the config note, but the design lives in the stop note.
+- craft: the helper's wait under `queue` stands in both design notes. The config note can point at the stop note instead.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- one place a fact: the refusal facts stand in the stop note, and the config note points there.
 
 # Discussion
 

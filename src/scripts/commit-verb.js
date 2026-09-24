@@ -27,6 +27,15 @@ export async function commitVerb(it, argv) {
 
 // Nothing stages before the message reads clean, so a refused message leaves the tree standing. [[spec/design_output/work#the-battery-answers-first]]
 function landsAndPushes(it, argv, message) {
+  // The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
+  const tested = it.proc.run([it.node, it.join(it.root, "src", "scripts", "cli.js"), "test"], {
+    cwd: it.root,
+  });
+  if (tested.exitCode !== 0) {
+    console.error("The tests answer red, so nothing stages and nothing lands:");
+    console.error(saidBy(tested) || "the test run answers nothing");
+    return 1;
+  }
   const staged = it.git.run(["add", "-A"], true);
   if (!staged.ok) {
     console.error("The staging comes back refused, so the commit stands undone:");
@@ -64,7 +73,7 @@ function landsAndPushes(it, argv, message) {
 }
 
 // A run answers on two streams, and a read of one alone names the wrong line. [[spec/design_output/work#one-verb-feeds-that-stamp]]
-function saidBy(ran) {
+export function saidBy(ran) {
   return [ran?.err, ran?.stderr, ran?.out, ran?.stdout]
     .map((one) => String(one ?? "").trim())
     .filter(Boolean)

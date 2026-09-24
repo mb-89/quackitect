@@ -309,9 +309,10 @@ test("a turn with no stop line holds, and the block names the reasons", () => {
     said.result.block,
     /the-work-stands-complete: Does the work stand complete/,
   );
-  assert.match(it.said[0][2], /the turn holds/);
+  const row = it.said.find((one) => one[1] === "stop");
+  assert.match(row[2], /the turn holds/);
   assert.match(
-    it.said[0][3].prompts,
+    row[3].prompts,
     /names no stop reason/,
     "the log carries what prompts after",
   );

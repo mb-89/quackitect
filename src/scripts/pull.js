@@ -31,6 +31,7 @@ import {
   verdictIn,
   voiceFaults,
   withPayload,
+  workAnswer,
 } from "./pull-chapter.js";
 import {
   handOut,
@@ -60,6 +61,7 @@ import {
   passed,
   pushed,
   returnsOf,
+  sentOut,
   tipOf,
 } from "./pull-writes.js";
 import { NOTES, schemasHere } from "./ticket.js";
@@ -107,7 +109,8 @@ export function pull(it, argv) {
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
   // A name with a leaf in hand hands that leaf back. A name with none asks for that ticket. [[spec/design_output/pull#the-hand-out]]
   const asking = Boolean(name) && !named && !verdict.said && !held;
-  if (asking && it.binding === QUEUE) {
+  // A ticket a verb mints for this session passes the queue. [[spec/design_output/config#the-engine-controls]]
+  if (asking && it.binding === QUEUE && name !== it.minted) {
     console.error(`${name} stands behind the queue, because this session binds to it.`);
     console.error(
       "Run ./RUNME.sh ticket pull with no name, and take what it hands you.",
@@ -230,11 +233,9 @@ export function escalate(it, argv) {
   }
   dropHold(it, hand);
   // The step stands in the record by now, so the branch is what a hand pushes. [[spec/design_output/pull#the-rejected-push]]
-  if (!one.private && !pushed(it, branch)) {
-    say(REFUSED, [
-      `${put.path} stands on this box, and ${branch} moves under it.`,
-      `Push ${branch}, then run ./RUNME.sh ticket pull.`,
-    ]);
+  const sent = one.private ? { ok: true } : pushed(it, branch);
+  if (!sent.ok) {
+    say(REFUSED, [`${put.path} stands on this box, and its push reaches no origin.`, ...sent.why]);
     return 1;
   }
   const who = {
@@ -408,10 +409,9 @@ export function takeBack(it, who, name, path) {
   });
   one.text = withField(withField(text, "step", path), "state", OPEN);
   landed(it, one, [`${role} takes ${path} back`]);
-  if (!one.private && !pushed(it, who.branch)) {
-    say(REFUSED, [
-      `${who.branch} moves under this take-back, and one rebase fell short. Pull again.`,
-    ]);
+  const sent = one.private ? { ok: true } : pushed(it, who.branch);
+  if (!sent.ok) {
+    say(REFUSED, ["The take-back stands on this box, and its push reaches no origin.", ...sent.why]);
     return 1;
   }
   say(WORK, [`${name} stands at ${path} again, and the next pull hands it out.`]);
@@ -459,14 +459,18 @@ export function handBack(it, who, name, verdict) {
       String(entry.hash_before ?? "") === held.hash,
   );
   if (done) {
-    if (!one.private && !pushed(it, who.branch)) {
+    // The record holds this hand-back already, so the pull pushes it again. [[spec/design_output/pull#the-rejected-push]]
+    const sent = sentOut(it, one, who.branch, leafOf(one.front, held.step));
+    if (!sent.ok) {
       say(REFUSED, [
-        `${who.branch} moves under this hand-back. Pull again to push it.`,
+        `${held.ticket} at ${held.step} answered, and the record holds this hand-back already. Its push reaches no origin.`,
+        ...sent.why,
       ]);
       return 1;
     }
     return onward(it, who, [
       `${held.ticket} at ${held.step} answered already, and the record holds it.`,
+      ...sent.why,
     ]);
   }
   if ((fieldOf(one.text, "step") || leavesOf(one.front)[0]?.path) !== held.step) {
@@ -492,6 +496,11 @@ export function handBack(it, who, name, verdict) {
   if (!leaf) {
     say(REFUSED, [`${held.step} names no leaf of ${held.ticket}.`]);
     return 1;
+  }
+  // A bare name on a leaf the verdict field decides nowhere shows the leaf, and lands nothing. [[spec/design_output/pull#bare-pulls-show-the-leaf]]
+  if (!verdict.said && !leaf.evidence.some((field) => field.form === "verdict")) {
+    console.log(workAnswer(it, one, leaf));
+    return 0;
   }
 
   // A payload rides the hold until the checks pass, so a refused word reaches no disk. [[spec/design_output/pull#the-fields-ride-the-payload]]

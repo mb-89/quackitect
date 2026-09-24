@@ -1,4 +1,4 @@
-// The rules Vale reads, assembled where two roots hold them. The method's
+// The rules Vale reads, assembled where the roots hold them. The method's
 // styles come down, the project's stand over them by name, and the result is a
 // folder nobody edits.
 // [[spec/design_output/vehicle#the-styles-assemble-once]]

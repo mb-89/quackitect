@@ -23,8 +23,6 @@ const alive = (pid) => {
   }
 };
 
-const settled = (ms) => new Promise((done) => setTimeout(done, ms));
-
 test("each box names the child that holds it, and an unknown box names none", () => {
   assert.equal(holdArgv("win32", 1)[0], "powershell");
   assert.deepEqual(holdArgv("darwin", 42), ["caffeinate", "-i", "-w", "42"]);
@@ -44,9 +42,19 @@ test("the real door holds a child while the server lives, and the release ends i
   }
   assert.ok(alive(held.pid), "the child stands");
 
-  held.release();
-  await settled(1500);
-  assert.equal(alive(held.pid), false, "the child ends with its input");
+  const ended = held.release();
+  assert.ok(ended instanceof Promise, "the release answers a promise");
+  await ended;
+  assert.equal(alive(held.pid), false, "the child ends before the release settles");
+});
+
+// A caller awaits the release on every road, so no branch answers nothing. [[spec/design_output/level0#the-server-holds-off-sleep]]
+test("every release answers a promise that settles, the unheld door and the fake alike", async () => {
+  for (const held of [awake("sunos").hold(), fakeAwake().hold(), fakeAwake("other").hold()]) {
+    const ended = held.release();
+    assert.ok(ended instanceof Promise, "the release answers a promise");
+    await ended;
+  }
 });
 
 test("the fake answers what the real door answers, and records the release", () => {

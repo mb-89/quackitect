@@ -25,8 +25,9 @@ export async function batteryRun(steps, clock) {
 }
 
 // [[spec/design_output/work#the-battery-answers-first]]
-export function stamped(code, battery = null) {
+export async function stamped(code, battery = null) {
   const sha = it.git.run(["rev-parse", "HEAD"], true).out;
+  const at = join(root, STAMP);
   const clean = !it.git.run(["status", "--porcelain"], true).out;
   // The list the lint left, so a door reading the stamp counts the warnings without a lint of its own. [[spec/tickets/the-spawn-reaches-its-guidance]]
   const stood = warningsStood();
@@ -37,16 +38,26 @@ export function stamped(code, battery = null) {
     at: it.clock.now().toISOString(),
     stood,
     battery,
+    before: lastStamp(at),
+    keep: await it.config.ask("battery.runs"),
   });
   files.makeDir(join(root, ".se"));
   // The list stands in its own file, because the hand changes what it names and the stamp changes nothing. [[spec/design_output/stop#the-grace]]
   files.write(join(root, REFACTORS), `${JSON.stringify(stood, null, 2)}\n`);
-  files.write(join(root, STAMP), `${JSON.stringify(said, null, 2)}\n`);
+  files.write(at, `${JSON.stringify(said, null, 2)}\n`);
   return code;
 }
 
+function lastStamp(at) {
+  try {
+    return JSON.parse(files.read(at));
+  } catch {
+    return null;
+  }
+}
+
 // The stamp's shape, off what the check found; the battery's report rides it where one stands, and a retro keeps one a retro. [[spec/guidance/retro/effect]]
-export function stampFor({ code, sha, clean, at, stood = [], battery = null }) {
+export function stampFor({ code, sha, clean, at, stood = [], battery = null, before = null, keep = 1 }) {
   return {
     sha,
     ok: code === 0,
@@ -54,6 +65,12 @@ export function stampFor({ code, sha, clean, at, stood = [], battery = null }) {
     at,
     warnings: stood.length,
     files: filesOn(stood),
-    ...(battery ? { battery } : {}),
+    ...(battery ? { battery, runs: runsKept(battery, before, sha, keep) } : {}),
   };
+}
+
+// The last runs' parts at this commit, newest first, up to the count, so a retro reads a median over one tree. [[spec/guidance/retro/effect]]
+function runsKept(battery, before, sha, keep) {
+  const earlier = before?.sha === sha ? (before?.runs ?? []) : [];
+  return [battery.parts ?? {}, ...earlier].slice(0, Math.max(1, Number(keep) || 1));
 }

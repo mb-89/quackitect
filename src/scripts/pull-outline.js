@@ -9,6 +9,8 @@ import { fieldOf, GROUP, todoOf } from "../engine/group.js";
 // The words a todo carries in place of a row's name: the front of the level, and its end. [[spec/design_output/pull#the-queue-is-an-outline]]
 export const FIRST = "first";
 export const LAST = "last";
+// A todo past every row at its level, which a place digit past the queue writes. [[spec/design_output/pull#a-todo-forces-a-place]]
+export const END = "end";
 
 // The place of a row a cloud branch holds: this box cannot take it, so it stands past every number. [[spec/design_output/pull#the-queue-is-an-outline]]
 export const CLOUD_PLACE = "∞";
@@ -84,10 +86,11 @@ function anchored(names, kids, best) {
   const order = [...names].sort((a, b) => best.get(a) - best.get(b));
   const moved = order.filter((name) => kids.todo.get(name));
   const last = moved.filter((name) => kids.todo.get(name) === LAST);
+  const ends = moved.filter((name) => kids.todo.get(name) === END);
   const named = (name) => levelOf(kids.todo.get(name), names, kids);
   // A todo naming no row here stands at the front, in the order the queue gives it. [[spec/design_output/pull#a-todo-forces-a-place]]
   const fronts = moved.filter(
-    (name) => !last.includes(name) && !names.includes(named(name)),
+    (name) => !last.includes(name) && !ends.includes(name) && !names.includes(named(name)),
   );
   for (const name of fronts) order.splice(order.indexOf(name), 1);
   order.splice(0, 0, ...fronts);
@@ -97,8 +100,15 @@ function anchored(names, kids, best) {
     const at = order.findIndex((one) => !kids.todo.get(one));
     order.splice(at < 0 ? order.length : at, 0, name);
   }
+  // A todo at the end stands after every row, in the order the queue gives it. [[spec/design_output/pull#a-todo-forces-a-place]]
+  for (const name of ends) {
+    order.splice(order.indexOf(name), 1);
+    order.push(name);
+  }
   // A todo naming a row moves after that row settles, so one naming a todo lands right before it. [[spec/design_output/pull#a-todo-forces-a-place]]
-  let pending = moved.filter((name) => !last.includes(name) && !fronts.includes(name));
+  let pending = moved.filter(
+    (name) => !last.includes(name) && !ends.includes(name) && !fronts.includes(name),
+  );
   while (pending.length) {
     const ready = pending.filter((name) => !pending.includes(named(name)));
     for (const name of ready.length ? ready : pending) {

@@ -175,6 +175,21 @@ test("the fake copies a folder the way the real door copies it", () => {
   assert.deepEqual(copying(fakeDisk()), copying(disk()));
 });
 
+// A list of a file is a fault on the disk, so the fake throws where the disk throws. [[spec/design_output/doors#a-fake-behaves]]
+test("both doors throw on a list of a file, and read an empty folder as empty", () => {
+  for (const door of [disk(), fakeDisk()]) {
+    const at = door.tempDir("level0-list-");
+    try {
+      door.write(join(at, "one.md"), "one\n");
+      door.makeDir(join(at, "empty"));
+      assert.throws(() => door.list(join(at, "one.md")), (err) => err.code === "ENOTDIR");
+      assert.deepEqual(door.list(join(at, "empty")), []);
+    } finally {
+      door.remove(at);
+    }
+  }
+});
+
 test("both doors refuse a file nobody wrote", () => {
   for (const door of [disk(), fakeDisk()]) {
     assert.throws(() => door.read("/nothing/at/all.md"), /no such file|ENOENT/);

@@ -401,14 +401,24 @@ Level zero refuses, on a cloud box holding a work branch:
 - a `git commit` made while standing on `main`
 - a `git push` naming `main`, from any branch
 
-The refusal names `./RUNME.sh branch take` as the way out. A desk box meets none
-of it, because a box off the cloud merges by choice.
+The refusal names `./RUNME.sh branch take` as the way out. The branch in hand
+is the whole of the reason. A cloud box takes a work branch out of the queue
+and hands it back the same road. So trunk reaches that work through the
+hand-back alone. The branch it stands on says which session it is.
 
-The branch in hand is the whole of the reason. A cloud box takes a work branch
-out of the queue and hands it back the same road. So trunk reaches that work
-through the hand-back alone. A cloud session outside that flow answers to the
-owner, and the green battery is the door it meets. The branch it stands on says
-which session it is.
+## A landing takes the verb
+
+Every other box lands on `main` through `./RUNME.sh commit "<message>"`. The
+Bash door refuses a raw landing there and names the verb:
+
+- a `git commit` made while standing on `main`
+- a `git push` naming `main`
+- a `git push` naming no branch, or `HEAD`, while standing on `main`
+
+A red battery answers first, and the verb refusal follows it on a green one. So
+each commit carries one helper's work, and the verb's check gates each one. One
+review reads it, and one undo takes it back. The verb takes its message whole,
+so a message naming `git commit` lands nowhere.
 
 `branch take` and `branch done` reach git inside the command line, so the door sees
 the verb and leaves the plumbing alone.
@@ -476,6 +486,18 @@ retro. For what a retro reads off it, see [[spec/guidance/retro/effect]].
 | `red` | each red case, with the error line the runner writes under it |
 | `spawns` | the spawns the tests make, and how many of them are Vale |
 
+The stamp keeps each run's `parts` under `runs`, newest first, up to the count
+`battery.runs` names in `spec/config/level0.json`. It keeps a run of the
+stamp's own `sha` alone, so a median reads one tree and no change of code
+reads as noise. Collect writes each part's median into the retro's report.
+It reads a part over the runs that reach it, because a red run leaves the parts
+past it unrun. The median covers `parts` and their `total` alone. The `slowest`
+cases and the `files` stay off the last run.
+
+A first retro reads against nothing, so the effect step writes its battery
+with `baseline: true` and names the baseline's total. The next retro reads
+against it.
+
 The report fills while the tests run:
 
 | writer | writes |
@@ -505,6 +527,7 @@ reads, in the steps below:
 | the step | what it runs | what it answers on red |
 |---|---|---|
 | the message | `messageFaults`, exported from `src/bridge/bash.js` | every finding at once, and no commit |
+| the tests | `./RUNME.sh test`, before anything stages | what the run says, and no commit |
 | the commit | `git add -A` and `git commit`, in the verb | what git says, with the staging back |
 | the check | `./RUNME.sh check`, which writes the stamp | what the check says, and no push |
 | the push | `git push origin`, which the pre-push door reads | what that door says |

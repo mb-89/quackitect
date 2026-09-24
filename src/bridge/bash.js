@@ -2,7 +2,7 @@
 // over a command line runs here before the command does.
 // [[spec/design_output/bash#what-the-door-reads]]
 
-import { join } from "node:path";
+import { isAbsolute, join } from "node:path";
 import {
   commitIn,
   findings,
@@ -11,6 +11,8 @@ import {
   withoutTrailers,
 } from "../../.claude/skills/level0/lib/bash.js";
 import { bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
+import { linesIn } from "../../.claude/skills/level0/lib/marks.js";
+import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import { NOTES, privateNow } from "../../.claude/skills/level0/lib/private.js";
 import {
   refusedCommand,
@@ -32,9 +34,10 @@ import {
   versionRefs,
 } from "../../.claude/skills/level0/lib/trunk.js";
 import { WORK_BRANCH } from "../engine/group.js";
+import { heldTests } from "../scripts/guidance-hand.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
-import { errorsIn } from "./write.js";
+import { errorsIn, marksSeen } from "./write.js";
 
 const COMMIT = "level0-commit.md";
 const PASS = { pass: true };
@@ -54,7 +57,45 @@ export async function onBash(e, box) {
     const found = await check(command, e, box);
     if (found) return { result: { deny: found } };
   }
+  marksShown(command, box);
   return PASS;
+}
+
+// The shell reads that hand the agent a file's lines, each a shape and the span it prints. [[spec/design_output/level0#a-lone-shell-read-marks]]
+const SHOWS = [
+  { shape: /^cat\s+(\S+)$/, span: () => null },
+  { shape: /^head\s+-n\s*(\d+)\s+(\S+)$/, span: (n) => ({ from: 1, to: Number(n) }) },
+  {
+    shape: /^tail\s+-n\s*(\d+)\s+(\S+)$/,
+    span: (n, text) => ({ from: linesIn(text) - Number(n) + 1, to: linesIn(text) }),
+  },
+  {
+    shape: /^sed\s+-n\s+(['"]?)(\d+),(\d+)p\1\s+(\S+)$/,
+    span: (_q, from, to) => ({ from: Number(from), to: Number(to) }),
+  },
+];
+// A pipe, a chain or a redirection hands the agent something else than the file. [[spec/design_output/level0#a-lone-shell-read-marks]]
+const JOINS = /[|;&<>`$()\n]/;
+
+// A lone shell read hands the agent what it prints, so the mark comes off it. [[spec/design_output/level0#a-lone-shell-read-marks]]
+function marksShown(command, box) {
+  const line = command.trim();
+  if (JOINS.test(line)) return;
+  for (const one of SHOWS) {
+    const found = line.match(one.shape);
+    if (!found) continue;
+    const named = found.at(-1).replace(/^['"]|['"]$/g, "");
+    const path = isAbsolute(named) ? named : join(box.root, named);
+    const where = relativeTo(box.root, path);
+    if (!where || where.startsWith("..") || isAbsolute(where)) return;
+    try {
+      const text = String(box.disk.read(path));
+      marksSeen(box, where, text, one.span(...found.slice(1, -1), text));
+    } catch {
+      // [[spec/design_output/level0#a-lone-shell-read-marks]]
+    }
+    return;
+  }
 }
 
 // [[spec/design_output/bash#the-description-names-verbs]]
@@ -73,6 +114,7 @@ async function commandRules(command, _e, box) {
   const found = findings(command, asks(box, "names.words"), {
     cloud: onACloud(box),
     script: (path) => fileText(reader(box), path),
+    subjects: (undo) => subjectsOf(box, undo),
   });
   found.push(...(await commitVoice(command, box)));
   if (!onACloud(box) && skipsTheHook(command)) {
@@ -88,6 +130,14 @@ async function commandRules(command, _e, box) {
     detail: command,
   });
   return refusedCommand(command, found);
+}
+
+// A revert reads each revision alone, and a reset walks the range it drops. [[spec/design_output/bash#a-pull-commit-stands]]
+function subjectsOf(box, undo) {
+  const walk = undo.walks ? [] : ["--no-walk"];
+  return git(box, ["log", ...walk, "--format=%s", ...undo.revs])
+    .split("\n")
+    .filter(Boolean);
 }
 
 // A message meets the voice rules, and a break of form lands the way a write does. [[spec/rationales/voice#11-form-and-substance]]
@@ -139,6 +189,7 @@ async function testedDelta(command, _e, box) {
     await git(box, ["diff", "--cached", "--unified=0"]),
     (path) => fileText(reader(box), path),
     merging,
+    heldTests(reader(box)),
   );
   if (!found.length) return "";
   box.log.say("warn", "tested", `refused ${found.length} file(s) with no test`, {
@@ -214,12 +265,11 @@ function trunkGuard(command, _e, box) {
       ].join("\n");
     }
   }
-  if (!onACloud(box)) return "";
-  if (!takesABranch(box)) return "";
   box.log.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, {
     tool: "Bash",
     detail: command,
   });
+  if (!onACloud(box) || !takesABranch(box)) return throughTheVerb(how);
   return [
     `A cloud box holding a work branch hands it back, and ${TRUNK} stays shut here.`,
     "",
@@ -229,6 +279,17 @@ function trunkGuard(command, _e, box) {
     "",
     "Run `./RUNME.sh ticket pull`, which takes a branch for a cloud box and moves you onto it.",
     "Push that branch, run `branch done`, and a box off the cloud takes it into trunk.",
+  ].join("\n");
+}
+
+// Each commit carries one helper's work, and the verb's check gates every landing on trunk. [[spec/design_output/work#a-landing-takes-the-verb]]
+function throughTheVerb(how) {
+  return [
+    `This ${how} lands on ${TRUNK} past the commit verb.`,
+    "",
+    'Run `./RUNME.sh commit "<message>"`, which reads the message, runs the tests,',
+    "commits, runs the check and pushes the branch you stand on. One helper's work",
+    "rides one commit, so one review reads it and one undo takes it back.",
   ].join("\n");
 }
 

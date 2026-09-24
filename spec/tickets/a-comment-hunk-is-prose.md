@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -89,12 +89,81 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: verdict
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
     hash_before: 95724fc23e4ca789bf744dccd9d28f956e95966a
     hash_after: 95724fc23e4ca789bf744dccd9d28f956e95966a
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 168f447477bd2282f632ec77632e6d6cb7f70d45
+    hash_after: 168f447477bd2282f632ec77632e6d6cb7f70d45
+    returns: 1
+    why: "Design: `hunksIn` keeps the added lines alone, so a hunk trading a code line for a comment passes.; That hunk holds a line of code, and the ask says it meets the door as before.; Fix: read the removed lines too, and let a removed line of code ask for a test.; A pointer fix trades a comment for a comment, so it still passes.; Add that trade to the mixed case: one code line out, one comment in, and the door refuses.; The rest stands: the added reading, the comment-only case, and the note in `tree.md`."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 6e737488edfb394f3e27868180fd5d8ec135d80c
+    hash_after: 6e737488edfb394f3e27868180fd5d8ec135d80c
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-4
+    hash_before: 6ab3a6675a50a6beb5c06c2abb1320a3d0ae3d20
+    hash_after: 6ab3a6675a50a6beb5c06c2abb1320a3d0ae3d20
+    returns: 2
+    why: "Design: `hunksIn` reads each `--- a/` header as a removed line of the file above it.; Both doors pipe `git diff --cached --unified=0`, so that header comes before each next `+++ b/`.; The header reads as code, so each file but the last asks a test.; A comment-only fix across seven modules then refuses, and the ask says it passes.; Fix: name in the `hunksIn` row that it skips a `---` header, as it skips `+++`.; Fix: add a comment-only case with two files, and assert it passes.; The rest stands: the removed lines, the trade case, the callers and the note."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 03e9d1042d535e828ddc3a285d98a4b278a3013f
+    hash_after: 03e9d1042d535e828ddc3a285d98a4b278a3013f
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-6
+    hash_before: eaf13f7b84341b014b6f36e6c2e4be4a6754f19c
+    hash_after: eaf13f7b84341b014b6f36e6c2e4be4a6754f19c
+    returns: 3
+    why: "Design: `hunksIn` keeps the last `+++ b/` file through a deleted file's hunk.; A deleted file ends its header with `+++ /dev/null`, and that line sets no file.; Its removed code then lands under the file above it, and that file asks a test.; A comment fix beside a deleted module then refuses, and the ask says it passes.; Fix: name in the `hunksIn` row that each `diff --git` line resets the file.; Fix: add a case with a comment fix and a deleted module, and assert the fix passes.; Craft: skip `--- a/` and `--- /dev/null` alone, so a removed `--x` line still reads.; The earlier findings stand answered: the removed lines, the trade case and the `---` header.; The rest stands: the callers, the note, and `names` over the added lines."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: e2529c35c999debb19ef048793fd6e168f951879
+    hash_after: e2529c35c999debb19ef048793fd6e168f951879
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-8
+    hash_before: afc0a586e64139ae7a13349e0e49ef1eeafb5c09
+    hash_after: afc0a586e64139ae7a13349e0e49ef1eeafb5c09
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: cc000c7182270b021ce0e247bf68f02f5e464ea5
+    hash_after: cc000c7182270b021ce0e247bf68f02f5e464ea5
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: e5e7d8c6541d9edec0111066dc69e640258b029e
+    hash_after: e5e7d8c6541d9edec0111066dc69e640258b029e
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 55df9c73dfc66f773ebd69fbe15669f25fd10567
+    hash_after: 55df9c73dfc66f773ebd69fbe15669f25fd10567
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 16 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-13
+    hash_before: 88bf0de2b89add9dc13b81a1ec5cecbfcb4e8031
+    hash_after: 88bf0de2b89add9dc13b81a1ec5cecbfcb4e8031
+reason: done
 ---
 
 # Ask
@@ -124,16 +193,29 @@ hand.
 
 <!-- the form is text -->
 
-The door holds the rule already. `untestedIn` in
-`.claude/skills/level0/lib/tested.js` reads each file's own hunk through
-`codeIn`, which passes a hunk adding comment lines and blank lines alone, and
-`test/level0/tested.test.js` holds the comment-only half.
+The door reads each file's hunk through `codeIn` in
+`.claude/skills/level0/lib/tested.js`, and today it reads the added lines
+alone. So a hunk trading a line of code for a comment passes. The change reads
+the removed lines too.
 
-| part | what the work adds |
+| part | what changes |
 |---|---|
-| the mixed case | a hunk adding one line of code beside a comment, which the door refuses |
-| the code | nothing, because the reading stands |
-| the note | `spec/design_output/tree#the-rules-over-two-files` already names the comment rule |
+| `hunksIn` | keeps each file's removed lines beside its added ones, as `{ added, removed }` |
+| the file | each `diff --git a/<x> b/<y>` line opens a file named `<y>`, and a `deleted file` header opens none, as today |
+| the content | a `+` or `-` line counts only past an `@@` line of that file, so no header line reads as content |
+| `codeIn` | a hunk asks for a test where a line either side is code, or where it adds nothing and takes code away |
+| `names` | reads the added lines of a test, as before |
+| the comment-only case | a comment traded for a comment passes, the way a pointer fix trades one |
+| the mixed cases | a code line added beside a comment refuses, and a code line traded for a comment refuses |
+| the header case | a comment-only delta over two files passes, so the second file's `--- a/` line reads for neither |
+| the deleted case | a comment-only fix staged beside a deleted module passes |
+| the content case | a removed line reading `--x` inside a hunk counts as code |
+| the note | `spec/design_output/tree#the-rules-over-two-files` names the removed lines beside the added |
+
+The callers of `untestedIn` read its list of files alone, so they change nothing:
+
+- `src/scripts/precommit.js`, the commit door
+- `src/bridge/bash.js`, the door over a commit the agent runs
 
 ## review
 
@@ -144,6 +226,17 @@ The door holds the rule already. `untestedIn` in
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- The approach meets each line of the Ask: comment-only passes, mixed refuses, and a case feeds both.
+- The third finding stands answered: each `diff --git` line opens a file, and a deleted file opens none.
+- The deleted case asserts a comment fix beside a deleted module passes.
+- The craft point stands answered: content counts past an `@@` line, and the `--x` case proves it.
+- The earlier findings stay answered: the removed lines, the trade case and the two-file header case.
+- The callers pass `git diff --cached --unified=0` and read a list of files, so they change nothing.
+- Craft: say in the file row that a `diff --git` line also closes the `@@` reading of the file above.
+- Craft: say in the file row that a `diff --git` line closes the `@@` reading above.
 
 # implement
 
@@ -157,17 +250,33 @@ The door holds the rule already. `untestedIn` in
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/tested.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+One case fails on its own assertion: a code line traded for a comment passes
+the door today. The rest pass today and hold the new reading in place.
+
+- the rename case guards the empty file the new reading opens, so no hunk asks nothing
+- the deleted case passes today, because `+++ /dev/null` opens no file
+- the cases write the full header block git writes, so a header line meets the reading
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch `test/level0/tested.test.js` alone, the file the ask names through its case
+- the door reads a delta as text, so the cases hand it text and no door
+- a comment above each case points at this ticket
+
 
 ## reflect
 
@@ -195,11 +304,19 @@ The door holds the rule already. `untestedIn` in
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/tested.js spec/design_output/tree.md test/level0/tested.test.js
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `tested.js`, its test and the chapter the rule owns
+- the door reads a delta as text, so it reaches no door
+- a comment on `hunksIn` and `codeIn` names the reading, through the chapter's pointer
+
 
 ## tests-green
 
@@ -211,11 +328,17 @@ The door holds the rule already. `untestedIn` in
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/tested.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
+
 
 ### says
 
@@ -223,11 +346,23 @@ The door holds the rule already. `untestedIn` in
 
 <!-- the form is text -->
 
+The commit door reads each file's hunk both ways. `hunksIn` opens a file at
+each `diff --git` line, drops a deleted file, and counts a line past its `@@`
+line alone. `codeIn` asks a test where a line either side is code, or where a
+hunk takes lines away and adds none. So a pointer fix passes, and a code line
+traded for a comment asks a test, as the ask names.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `tested.js`, its test and the chapter the rule owns
+- the door reads a delta as text, so it reaches no door
+- a comment on `hunksIn` and `codeIn` names the reading, through the chapter's pointer
+
 
 # verdict
 
@@ -239,17 +374,39 @@ The door holds the rule already. `untestedIn` in
 
 <!-- the form is files -->
 
+- spec/tickets/a-comment-hunk-is-prose.md
+- .claude/skills/level0/lib/tested.js
+- test/level0/tested.test.js
+- spec/design_output/tree.md
+- src/scripts/precommit.js
+- src/bridge/bash.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- A comment traded for a comment over two files passes, so a pointer fix lands.
+- A code line added beside a comment refuses, and so does a code line traded away.
+- `hunksIn` opens a file at each `diff --git` line and drops a deleted file.
+- A line counts past its `@@` line alone, and the `--x` case proves it.
+- The cases write the full header git writes, so each header line meets the reading.
+- The real diff of this branch reads the same line counts `git show --stat` prints.
+- Both callers read a list of files alone, so they change nothing.
+- `./RUNME.sh check` exits 0.
+- Craft: the comment on `COMMENT` still says "a hunk adding these alone", and the removed lines count now.
+- Craft: the `hunksIn` comment repeats the `@@` line from `tree.md`, where the pointer alone would do.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The reading stands in the `tree.md` table, and the code comments point at it with a short restatement.
 
 # Discussion
 

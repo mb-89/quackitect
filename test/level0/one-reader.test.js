@@ -46,9 +46,14 @@ function behavingVale(disk, ran) {
 }
 
 // Every file a path reaches, named relative to the root. [[spec/design_output/doors#a-fake-behaves]]
+// A list of a file throws, so the catch reads the file, and an empty folder reads as empty. [[spec/design_output/doors#a-fake-behaves]]
 function filesUnder(disk, path) {
-  const entries = disk.list(join(ROOT, path));
-  if (!entries.length) return [[path, disk.read(join(ROOT, path))]];
+  let entries;
+  try {
+    entries = disk.list(join(ROOT, path));
+  } catch {
+    return [[path, disk.read(join(ROOT, path))]];
+  }
   return entries.flatMap((one) => filesUnder(disk, `${path}/${one.name}`));
 }
 

@@ -61,7 +61,7 @@ function stepsIn(text) {
     if (dash) {
       openers = openers.filter((one) => one.at <= at);
       items = items.filter((one) => one.at < at);
-      items.push(itemOf(openers.at(-1), key, value, at, steps));
+      items.push(itemOf(openers.at(-1), at, steps));
       keyOn(items.at(-1), key, value);
       continue;
     }
@@ -74,25 +74,23 @@ function stepsIn(text) {
   return steps;
 }
 
-function itemOf(opener, key, value, at, steps) {
-  if (key !== "name" || !opener) return { at, kind: "other" };
-  if (opener.key === "evidence" && opener.owner?.kind === "step")
+// An item under a route's steps is a step whatever key opens it, and its name arrives on any of its lines. [[spec/tickets/a-count-meets-the-lint]]
+function itemOf(opener, at, steps) {
+  if (opener?.key === "evidence" && opener.owner?.kind === "step")
     return { at, kind: "evidence", step: opener.owner.step };
-  if (opener.key !== "steps") return { at, kind: "other" };
+  if (opener?.key !== "steps") return { at, kind: "other" };
   const above = opener.owner?.kind === "step" ? opener.owner.step : null;
   if (above) above.leaf = false;
-  const step = {
-    path: above ? `${above.path}/${bare(value)}` : bare(value),
-    by: "",
-    verdict: false,
-    leaf: true,
-    above,
-  };
+  const step = { path: "", by: "", verdict: false, leaf: true, above };
   steps.push(step);
   return { at, kind: "step", step };
 }
 
 function keyOn(item, key, value) {
+  if (item?.kind === "step" && key === "name") {
+    const above = item.step.above;
+    item.step.path = above ? `${above.path}/${bare(value)}` : bare(value);
+  }
   if (item?.kind === "step" && key === "by") item.step.by = bare(value);
   if (item?.kind === "evidence" && key === "form" && bare(value) === "verdict")
     item.step.verdict = true;

@@ -279,10 +279,12 @@ stands before, or one of the words below:
 | the name of a row | right before that row, and before that row's group where the row nests |
 | `true` | first at its level |
 | `last` | after every other todo at its level, and before the first row no todo places |
+| `end` | after every row at its level, which a place digit past the queue writes |
 | a name standing nowhere | first at its level, because the row it names stands off the queue |
 
 The place moves as the queue drains, because the todo holds the order and
-no number. The work tab writes it under `p` and a digit, the pull hands a
+no number. Todos of the plan tied on every score keep the order the plan
+writes them in. The work tab writes it under `p` and a digit, the pull hands a
 tagged ticket out first, and the `T` letter lights on every tagged row.
 
 The tab draws the place it reads and holds no rule of its own. A place
@@ -332,6 +334,12 @@ itself marks its payload `own`, and carries no tag, because that hand is its own
 helper read apart in the prompt and in the record.
 
 # The hand-back
+
+## Bare pulls show the leaf
+
+A name with no flag on a leaf in hand shows that leaf again, and lands nothing.
+A leaf holding a verdict field hands back on the bare name, because the field
+is its flag.
 
 ## The hand-back matches the hold
 
@@ -442,16 +450,38 @@ chain carries a checklist, and the ticket door lets the hand write it.
 ## The voice reads the evidence
 
 The hand-back reads its ticket the way `./RUNME.sh lint` reads a file, where
-vale stands on the box. `voiceFaults` in `src/scripts/pull-chapter.js` hands
-Vale the whole ticket on stdin, with the payload's fields under their headings. The call opens on
-`valeArgvOf`, and `readsText` reads the answer. `findingsOver` in
-`src/bridge/findings.js` calls both over each file the lint reads.
+vale stands on the box. `voiceOver` in `src/bridge/findings.js` hands Vale a
+ticket's text on stdin through `valeArgvOf`, and `readsText` reads the answer.
+`findingsOver` calls both over each file the lint reads. `voiceFaults` in
+`src/scripts/pull-chapter.js` hands `voiceOver` the whole ticket, with the
+payload's fields under their headings.
 
 | part | what the pull does |
 |---|---|
 | the text | blanks a field in no prose form and an `answered` row, so every row keeps its file line and a Vale marker holds |
 | the lines | keeps a finding on the leaf's chapter, and names it at its line in the ticket |
 | the level | refuses on an error and on a warning, so the lint names nothing later that the hand-back lets through |
+
+Every verb taking a hand's prose into a ticket reads it through `voiceOver`,
+so no fix commit follows a landing.
+
+| the verb | what it reads |
+|---|---|
+| the pull | the leaf's chapter, with the fields laid in |
+| `ticket open` | the Ask, over the whole ticket, as [[spec/design_output/pull#a-draft-opens]] says |
+| `ticket note` | the Ask it mints, before it writes |
+| `retro new` | the Ask carrying the `--why` line, before it writes |
+
+The road reads through `readsText`, the lint's own reading. `readsProse` in
+`src/bridge/prose.js` serves the write door, and it drops a long sentence and a
+word outside the vocabulary where it judges the finding false. The lint keeps
+those findings, so a verb reading through `readsProse` lets a line through that
+the lint names later.
+
+A contract case in `test/contract/process.test.js` mints a ticket off every
+route under `spec/processes`, and real Vale reads it. A line a route writes
+carries no finding there, so a verb minting off a route meets no refusal over
+the route's own words.
 
 ## The commands answer
 
@@ -480,14 +510,32 @@ one level deeper, which is how `answered` lands.
 
 ## The rejected push
 
-A push origin refuses fetches the branch, rebases once, and pushes again. A
-rebase that fails stops and puts the tree back, and the pull answers
-`refused` with the branch moving. The hand-back stands by then. The record
-carries its answer, the ticket stands at its next leaf or closed, and the
-commit stands on the box. So the hold drops before the push, and the refusal
-says to push the branch and pull again. A hold past that point stands on a
-closed ticket, and the stop hook holds the turn open for a hand-back nobody
-owes.
+`pushed` in `src/scripts/pull-push.js` lands a hand-back on origin, and it
+answers `{ ok, local, why }`. Each caller prints `why`, so the hand reads the
+real cause. The hold drops before the push, because the hand-back stands by
+then. A hold past that point stands on a closed ticket, and the stop hook holds
+the turn open for a hand-back nobody owes.
+
+| the road | what `pushed` does |
+|---|---|
+| trunk | runs `./RUNME.sh check` over the commit first, so the stamp names the commit the push carries |
+| a red check | pushes nothing, and the answer names the check's own lines |
+| a tests-red leaf | stands on this box on trunk, and the next green push carries it |
+| a moved branch | fetches, rebases once, and pushes again |
+| a rebase on trunk | runs the check again, because the rebase moves the commit off the stamp |
+| any other refusal | answers the push door's own lines, and runs no rebase |
+| a work branch | pushes with no check, because its push meets no battery |
+
+Git names a moved branch with `fetch first` or `non-fast-forward`, and the
+rebase runs on those words alone. A rebase that fails puts the tree back, and
+the answer says to push the branch and pull again.
+
+The cost: a pass on trunk runs one full check, and the hand runs none of its
+own. At tests-green the `check` field runs the check, and `pushed` runs it again.
+
+The re-push of a hand-back the record holds already answers the same way.
+`repairPersonSteps` in `src/scripts/pull-hand.js` lands the engine's own repair,
+and it reads no answer, so it stays quiet.
 
 ## The refused commit
 
@@ -625,17 +673,32 @@ refuses while the ask stands empty. So the pull hands out what a person
 writes, and nothing else.
 
 The verb reads the voice rules over the Ask too, and refuses one that breaks
-a rule at the error level. The Ask is the engine's from the open on, so the
-ticket door refuses every later hand there. A rule broken past the open
-stands in the lint over the tree until a person reaches for the door.
-`src/scripts/ticket-ask-lint.js` holds the run, and a box with no Vale opens as it
-stands.
+a rule at the error or the warning level. `askFaults` in
+`src/scripts/ticket-ask-lint.js` hands `voiceOver` the whole ticket, and keeps
+the findings on the Ask's lines, so a line number names the file's line. The
+Ask is the engine's from the open on, so the ticket door refuses every later
+hand there. A box with no Vale opens as it stands.
+
+`ticket note` and `retro new` write an Ask from a hand's line, and read it
+through `askFaults` before they write. Their refusal reads as the open's does.
+
+- It writes no file.
+- It names each finding at its line.
+- It exits with a fault, so a script stops there.
+
+The cost: a draft whose Ask carries a warning stops opening until a hand
+rewrites its Ask. The refusal names each line, so the rewrite takes minutes.
+
+The open lands in one commit naming the ticket, through `landedAlone` in
+`pull-landed.js`. A commit the hook refuses puts the draft back, and the verb
+exits with a fault.
 
 ## The blank lines stand
 
-`askLines` hands Vale the Ask with every blank line in it, and drops the
-placeholder comments alone. A blank line is what parts a paragraph from a
-table, so Vale reads the parts the writer means.
+`askFaults` hands Vale the whole ticket, so every blank line and every table
+stand as the file holds them. A blank line is what parts a paragraph from a
+table, so Vale reads the parts the writer means. `askLines` keeps the Ask's
+rows for the test on an empty Ask alone.
 
 Rows that drop the blanks run a table into the prose around it. Vale then reads
 the run as one paragraph, and the sentence rule counts the whole of it as one
@@ -665,3 +728,12 @@ The tests stand in Node and Go, and the verb runs both. A changed `*.test.js`
 joins the node run, and a changed `*_test.go` names the module under `src` that
 holds it, which the verb runs with `go test`. The answer reads green where
 every run does, and it names the first that does not.
+
+## The test verb takes names
+
+`./RUNME.sh test` with names runs this same verb over them:
+
+- a bare `./RUNME.sh test` runs the whole suite, as the check does
+- a named folder under `src` names the module at or above it
+- a named run reads no branch point
+- a named run takes the check's spawn tally, and a Go run takes `goEnvOf` too

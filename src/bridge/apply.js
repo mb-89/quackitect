@@ -2,7 +2,7 @@
 // with a journal that puts every file back.
 // [[spec/design_output/apply#the-write-tools]]
 
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import {
   applied,
   filesIn,
@@ -58,21 +58,27 @@ async function replaces(e, box) {
 
 async function lands(e, took, box) {
   if (!took.ok) return { result: { result: took.why } };
-  // A preview moves no disk, so the marks it meets stand as they stood. [[spec/design_output/level0#a-write-meets-its-mark]]
-  const held = e.preview === true ? new Map(marksOf(box)) : null;
-  const refused = await checked(took, box);
-  if (refused) return { result: { result: refused } };
+  // A call writing nothing moves no disk, so the marks it meets stand as they stood. [[spec/design_output/level0#a-write-meets-its-mark]]
+  const held = new Map(marksOf(box));
+  const refused = await checked(took, box, e.agentId);
+  if (refused) {
+    box.marks = held;
+    return { result: { result: refused } };
+  }
   if (e.preview === true) {
     box.marks = held;
     return { result: { result: wouldLand(took) } };
   }
-  return { result: { result: writes(took, String(e.on ?? ""), box) } };
+  const wrote = writes(took, String(e.on ?? ""), box);
+  if (!wrote.landed) box.marks = held;
+  return { result: { result: wrote.said } };
 }
 
-async function checked(took, box) {
+// The write carries the call's hand, so the hand holding a file patches it. [[spec/design_output/stop#the-hand-holds-its-file]]
+async function checked(took, box, agentId) {
   for (const one of took.files) {
     const said = await onWrite(
-      { tool: "Write", file_path: one.file, content: one.made },
+      { tool: "Write", file_path: one.file, content: one.made, agentId },
       box,
     );
     if (said?.result?.deny)
@@ -87,34 +93,61 @@ async function checked(took, box) {
 function writes(took, on, box) {
   const at = box.clock.stamp();
   const where = join(box.root, UNDONE, nameOf(at));
+  const journal = journalOf(at, on, "level0", took.files);
   try {
     box.disk.makeDir(join(box.root, UNDONE));
-    box.disk.write(
-      where,
-      `${JSON.stringify(journalOf(at, on, "level0", took.files), null, 2)}\n`,
-    );
+    box.disk.write(where, `${JSON.stringify(journal, null, 2)}\n`);
   } catch (bad) {
-    return `the undo journal would not write, so nothing did: ${bad?.message ?? bad}`;
+    return {
+      landed: false,
+      said: `the undo journal would not write, so nothing did: ${bad?.message ?? bad}`,
+    };
   }
   const wrote = [];
   for (const one of took.files) {
+    const path = join(box.root, inTheTree(box.root, one.file));
     try {
-      box.disk.write(join(box.root, inTheTree(box.root, one.file)), one.made);
+      // [[spec/design_output/apply#a-create-makes-its-folder]]
+      if (one.born) box.disk.makeDir(dirname(path));
+      box.disk.write(path, one.made);
       wrote.push(one.file);
     } catch (bad) {
-      return `${one.file} would not write: ${bad?.message ?? bad}\nThe tree stands part written. Run undo to put it back, out of ${where}.`;
+      if (!wrote.length) return unlanded(box, where, journal, one.file, bad);
+      return {
+        landed: true,
+        said: `${one.file} would not write: ${bad?.message ?? bad}\nThe tree stands part written. Run undo to put it back, out of ${where}.`,
+      };
     }
   }
   box.log.say("info", "apply", `${wrote.length} file(s) written`, {
     detail: on,
     file: where,
   });
-  return [
-    `${wrote.length} file(s) written, and ${relativeTo(box.root, where)} holds what they said before.`,
-    ...wrote.map((one) => `  ${one} (${took.counts[one]} place(s))`),
-    "",
-    "Run undo to take this back while nothing else touches these files.",
-  ].join("\n");
+  return {
+    landed: true,
+    said: [
+      `${wrote.length} file(s) written, and ${relativeTo(box.root, where)} holds what they said before.`,
+      ...wrote.map((one) => `  ${one} (${took.counts[one]} place(s))`),
+      "",
+      "Run undo to take this back while nothing else touches these files.",
+    ].join("\n"),
+  };
+}
+
+// The journal stays with a word that nothing landed, so an undo takes back no older apply. [[spec/design_output/apply#a-first-fault-writes-nothing]]
+function unlanded(box, where, journal, file, bad) {
+  try {
+    box.disk.write(where, `${JSON.stringify({ ...journal, landed: false }, null, 2)}\n`);
+  } catch {
+    // [[spec/design_output/apply#a-first-fault-writes-nothing]]
+  }
+  box.log.say("warn", "apply", `nothing written: ${file} would not write`, {
+    file: where,
+  });
+  return {
+    landed: false,
+    said: `nothing written: ${file} would not write: ${bad?.message ?? bad}`,
+  };
 }
 
 function wouldLand(took) {
@@ -151,6 +184,11 @@ async function undoes(e, box) {
       `nothing of ${on || "this session"} to undo: an undo takes back what its own name wrote`,
       on,
     );
+  }
+  // [[spec/design_output/apply#a-first-fault-writes-nothing]]
+  if (newest.entry.landed === false) {
+    box.disk.remove(join(folder, newest.name));
+    return said(box, false, "nothing waits to undo: the newest apply wrote nothing", on);
   }
   const held = readsFiles(
     box,

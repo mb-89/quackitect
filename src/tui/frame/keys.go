@@ -1,6 +1,6 @@
 // Every key the window holds, as a binding carrying its own name and sentence.
 // The window reads the registration the help draws, so a key nobody registers
-// reaches the help nowhere and works nowhere. Three bands stand: the global
+// reaches the help nowhere and works nowhere. The bands stand: the global
 // one, the one the open tab adds, and the one the selected thing adds.
 // [[spec/design_output/tui#the-help-reads-the-cursor]]
 

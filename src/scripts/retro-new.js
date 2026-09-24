@@ -8,6 +8,7 @@ import { firstLeaf } from "../engine/group.js";
 import { askRows, processAt } from "./process.js";
 import { pull } from "./pull.js";
 import { fromHold, schemasHere } from "./ticket.js";
+import { askFaults, lineRefusal } from "./ticket-ask-lint.js";
 
 const TICKETS = "spec/tickets";
 const RETRO = "retro";
@@ -52,11 +53,18 @@ export function newRetro(it, argv) {
     console.error(made.why);
     return 1;
   }
+  // The --why line lands in the Ask, so the mint reads it through the lint's road before it writes. [[spec/design_output/pull#a-draft-opens]]
+  const found = askFaults(it, path, made.text);
+  if (found.length) {
+    console.error(lineRefusal(path, found));
+    return 1;
+  }
 
   it.disk.makeDir(it.join(it.root, ...TICKETS.split("/")));
   it.disk.write(at, made.text);
   // The pull says what a hand reads next, and this verb writes none of those words again. [[spec/guidance/working]]
-  return pull(it, ["pull", name]);
+  // The verb mints the retro for this session, so the queue lets its pull through. [[spec/design_output/config#the-engine-controls]]
+  return pull({ ...it, minted: name }, ["pull", name]);
 }
 
 function flagOf(rest, flag) {

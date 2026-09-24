@@ -417,8 +417,9 @@ names the schema file, the finding and `mint_note` as the road.
 
 # The verbs own their fields
 
-A property naming `x-engine: true` belongs to the verbs, and an agent's write to
-it stands refused. These carry it on a ticket:
+A property naming `x-engine: true` belongs to the verbs. An agent's write to it
+lands with the field back at its value on the disk. The rest of the write lands
+beside it. These carry it on a ticket:
 
 | field | who writes it |
 |---|---|
@@ -427,8 +428,11 @@ it stands refused. These carry it on a ticket:
 | `steps` | the mint, `ticket update`, and a person |
 | `record` | the pull, at the hand-back |
 
-`verbFaults` compares the old value against the new one, so a write leaving a
-field where it stands reaches no rule. A person's editor meets no door here, so a
+`restoredFields` in `.claude/skills/level0/lib/ticket.js` swaps the rows of
+each field the write moves for the disk's. The write door hands that write on,
+with a note naming each field. An edit moving these fields alone lands nothing and comes
+back refused, naming them. `verbFaults` compares the old value against the new
+one, so a write leaving a field where it stands reaches no rule. A person's editor meets no door here, so a
 person edits what they like.
 
 # The three places

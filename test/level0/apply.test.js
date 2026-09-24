@@ -2,15 +2,18 @@
 // [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import test from "node:test";
-import { applied, filesIn } from "../../.claude/skills/level0/lib/apply.js";
+import { applied, filesIn, PATCH } from "../../.claude/skills/level0/lib/apply.js";
 import { agrees, marked, staleFault } from "../../.claude/skills/level0/lib/marks.js";
 import {
   journalOf,
   nameOf,
   newestOn,
   restores,
+  UNDO,
 } from "../../.claude/skills/level0/lib/undo.js";
+import { called, edits, reads, realDisk, refused, served, TREE } from "./mark-doors.js";
 
 const held = (text) => ({ "one.md": { exists: true, text } });
 
@@ -195,4 +198,47 @@ test("a mark reaches the path it names alone", () => {
   const held = marked(new Map(), "one.md", "alpha\n");
   assert.equal(agrees(held, "one.md", "alpha\n"), true);
   assert.equal(agrees(held, "two.md", "alpha\n"), false);
+});
+
+const patch = (ops, on = "") => ({ tool: `mcp__level0__${PATCH}`, ops, on });
+const told = (said) => String(said?.result?.result ?? "");
+
+// [[spec/design_output/apply#the-journal-holds-both-halves]]
+test("a create into a new folder lands, and a failed first write answers nothing written", async () => {
+  const disk = realDisk({ [join(TREE, "held", "inner.md")]: "inner\n" });
+  const it = served(disk);
+  const born = await called(it, patch([{ file: "deep/new/one.md", op: "create", new: "one\n" }]));
+  assert.match(told(born), /^1 file\(s\) written/);
+  assert.equal(disk.read(join(TREE, "deep", "new", "one.md")), "one\n");
+
+  const at = join(TREE, "one.md");
+  disk.write(at, "alpha\n");
+  await called(it, reads(at));
+  const failed = await called(
+    it,
+    patch([
+      { file: "held", op: "create", new: "x\n" },
+      { file: "one.md", old: "alpha", new: "beta" },
+    ]),
+  );
+  assert.match(told(failed), /^nothing written/);
+  assert.equal(disk.read(at), "alpha\n", "the second file stands as it stood");
+  const next = await called(it, edits(at, "alpha", "gamma"));
+  assert.equal(refused(next), "", "the held marks come back, so the next Edit lands");
+});
+
+// [[spec/design_output/apply#drift-refuses-the-restore]]
+test("an undo after a failed first write answers nothing waits to undo, and an earlier apply stands", async () => {
+  const at = join(TREE, "one.md");
+  const disk = realDisk({ [at]: "alpha\n", [join(TREE, "held", "inner.md")]: "inner\n" });
+  const it = served(disk);
+  const first = await called(it, patch([{ file: "one.md", old: "alpha", new: "beta" }], "x"));
+  assert.match(told(first), /^1 file\(s\) written/);
+  it.clock.tick();
+  const failed = await called(it, patch([{ file: "held", op: "create", new: "x\n" }], "x"));
+  assert.match(told(failed), /^nothing written/);
+
+  const undone = await called(it, { tool: `mcp__level0__${UNDO}`, on: "x" });
+  assert.match(told(undone), /nothing waits to undo/);
+  assert.equal(disk.read(at), "beta\n", "the earlier apply stands");
 });

@@ -6,14 +6,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
-import {
-  everyModuleTested,
-  untestedIn,
-} from "../../.claude/skills/level0/lib/tested.js";
+import * as tested from "../../.claude/skills/level0/lib/tested.js";
 import { behaves } from "../../src/doors/fake/behaves.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
+
+const { everyModuleTested, untestedIn } = tested;
 
 const FAKE = "/fake";
 
@@ -173,4 +172,135 @@ test("the import counts off the test's own hunk, and off no other file's", () =>
   ].join("\n");
 
   assert.deepEqual(untestedIn(said), ["src/bridge/one.js"]);
+});
+
+// A delta the way `git diff --cached --unified=0` writes it, one file a block, headers and all. [[spec/tickets/a-comment-hunk-is-prose]]
+function staged(...files) {
+  return [
+    ...files.flatMap(({ path, gone = false, rows = [] }) => [
+      `diff --git a/${path} b/${path}`,
+      ...(gone ? ["deleted file mode 100644"] : []),
+      "index 1111111..2222222 100644",
+      `--- a/${path}`,
+      gone ? "+++ /dev/null" : `+++ b/${path}`,
+      ...(rows.length ? ["@@ -3,1 +3,1 @@", ...rows] : []),
+    ]),
+    "",
+  ].join("\n");
+}
+
+const POINTER_WAS = "-// [[spec/design_output/tree]]";
+const POINTER_NOW = "+// [[spec/design_output/tree#the-rules-over-two-files]]";
+
+// A pointer fix trades a comment for a comment in every module it reaches, and the door asks nothing. [[spec/tickets/a-comment-hunk-is-prose]]
+test("a comment traded for a comment over two files asks no test, headers and all", () => {
+  const said = staged(
+    { path: "src/bridge/one.js", rows: [POINTER_WAS, POINTER_NOW] },
+    { path: "src/bridge/two.js", rows: [POINTER_WAS, POINTER_NOW] },
+  );
+  assert.deepEqual(untestedIn(said), []);
+});
+
+// [[spec/tickets/a-comment-hunk-is-prose]]
+test("a line of code beside a comment asks a test, added or traded away", () => {
+  const added = staged({
+    path: "src/bridge/one.js",
+    rows: [POINTER_NOW, "+export const one = 1;"],
+  });
+  assert.deepEqual(untestedIn(added), ["src/bridge/one.js"]);
+
+  const traded = staged({
+    path: "src/bridge/one.js",
+    rows: ["-export const one = 1;", POINTER_NOW],
+  });
+  assert.deepEqual(untestedIn(traded), ["src/bridge/one.js"], "code traded for a comment");
+
+  const dashed = staged({
+    path: "src/bridge/one.js",
+    rows: ["---x;", POINTER_NOW],
+  });
+  assert.deepEqual(untestedIn(dashed), ["src/bridge/one.js"], "a removed line reading --x is code");
+});
+
+// [[spec/tickets/a-comment-hunk-is-prose]]
+test("a comment fix beside a deleted module asks nothing, and a rename with no hunk asks nothing", () => {
+  const said = staged(
+    { path: "src/bridge/one.js", rows: [POINTER_WAS, POINTER_NOW] },
+    { path: "src/bridge/two.js", gone: true, rows: ["-export const two = 2;"] },
+  );
+  assert.deepEqual(untestedIn(said), []);
+
+  const renamed = [
+    "diff --git a/src/bridge/one.js b/src/bridge/uno.js",
+    "similarity index 100%",
+    "rename from src/bridge/one.js",
+    "rename to src/bridge/uno.js",
+    "",
+  ].join("\n");
+  assert.deepEqual(untestedIn(renamed), []);
+});
+
+// Go, the level0 lib and its hooks are code the door reads, and a Go test answers for every file of its folder. [[spec/design_output/tree#the-rules-over-two-files]]
+test("a Go file, a lib file and a hook file each ask a test, and a Go test of the folder answers", () => {
+  assert.deepEqual(untestedIn(delta("src/engine/queue/pick.go")), ["src/engine/queue/pick.go"]);
+  assert.deepEqual(untestedIn(delta(".claude/skills/level0/lib/one.js")), [
+    ".claude/skills/level0/lib/one.js",
+  ]);
+  assert.deepEqual(untestedIn(delta(".claude/skills/level0/hooks/two.js")), [
+    ".claude/skills/level0/hooks/two.js",
+  ]);
+  assert.deepEqual(
+    untestedIn(delta("src/engine/queue/pick.go", "src/engine/queue/order_test.go")),
+    [],
+    "a Go test names every file of its own folder",
+  );
+  assert.deepEqual(
+    untestedIn(delta("src/engine/queue/pick.go", "src/engine/other/order_test.go")),
+    ["src/engine/queue/pick.go"],
+    "a Go test of another folder names none",
+  );
+  assert.deepEqual(untestedIn(delta("src/engine/queue/order_test.go")), [], "a Go test is no source");
+});
+
+// The tests-red leaf lands the test, and the change leaf carries it. [[spec/design_output/tree#the-rules-over-two-files]]
+test("a test the held ticket carries answers the change, and a stray one carries none", () => {
+  const code = delta("src/bridge/one.js");
+  assert.deepEqual(untestedIn(code, undefined, false, ["test/level0/one.test.js"]), []);
+  assert.deepEqual(untestedIn(code, undefined, false, ["test/level0/other.test.js"]), [
+    "src/bridge/one.js",
+  ]);
+  const read = (path) =>
+    path === "test/level0/other.test.js" ? "import { one } from '../../src/bridge/one.js';\n" : "";
+  assert.deepEqual(untestedIn(code, read, false, ["test/level0/other.test.js"]), []);
+  assert.deepEqual(
+    untestedIn(delta("src/engine/queue/pick.go"), undefined, false, ["src/engine/queue/pick_test.go"]),
+    [],
+  );
+});
+
+// A command field holds one line indented four spaces, and a test path or a Go test path in it carries. [[spec/design_output/tree#the-rules-over-two-files]]
+test("the carried tests are the test paths the ticket's command lines name, and prose names none", () => {
+  assert.equal(typeof tested.carriedIn, "function", "tested.js answers the carried tests");
+  const ticket = [
+    "---",
+    "kind: [[ticket]]",
+    "---",
+    "",
+    "The prose names test/level0/prose.test.js and carries nothing.",
+    "",
+    "### tests",
+    "",
+    "    ./RUNME.sh branch test test/level0/one.test.js test/contract/disk.test.js",
+    "",
+    "### check",
+    "",
+    "    ./RUNME.sh branch test src/engine/queue/pick_test.go",
+    "",
+  ].join("\n");
+  assert.deepEqual(tested.carriedIn(ticket), [
+    "test/level0/one.test.js",
+    "test/contract/disk.test.js",
+    "src/engine/queue/pick_test.go",
+  ]);
+  assert.deepEqual(tested.carriedIn(""), []);
 });

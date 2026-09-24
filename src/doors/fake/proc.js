@@ -7,10 +7,14 @@ import { behaves } from "./behaves.js";
 export function fakeProc(answers = {}) {
   const ran = [];
   const table = new Map(Object.entries(answers));
+  const lives = new Set();
 
   return behaves(
     {
       ran,
+      lives,
+      // A process stands while its number stands in the set a test fills. [[spec/design_output/level0#the-wait-returns-on-signals]]
+      alive: (pid) => lives.has(Number(pid)),
       teach: (argv, said) => void table.set(key(argv), said),
       // The fake answers a start the way it answers a run, on the next tick. [[spec/design_output/lsp]]
       async start(argv, init = {}) {

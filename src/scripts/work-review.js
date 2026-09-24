@@ -1,5 +1,5 @@
 // The verb behind `./RUNME.sh branch review <name>`. It gathers what a reader
-// needs, answers the two questions a program owns, and prints the report. No
+// needs, answers the questions a program owns, and prints the report. No
 // model runs here.
 // [[spec/design_output/review#what-the-verb-gathers]]
 
@@ -19,7 +19,7 @@ import { DONE, standingAll, standOf } from "./work.js";
 
 const LOUD = 5;
 
-// What the install writes and git ignores, which the check reads and never writes. [[spec/design_output/review#a-worktree-runs-the-check]]
+// What the install writes and git ignores, which the check reads alone. [[spec/design_output/review#a-worktree-runs-the-check]]
 const BORROWED = ["node_modules", `${BIN}/zig`];
 
 export function review(it, name, argv) {
@@ -134,7 +134,7 @@ function checkOn(it, at) {
   }
 
   const ran = it.proc.run([it.node, "src/scripts/cli.js", "check"], { cwd: where });
-  // The links go first, so the removal below never walks into the caller's own folders.
+  // The links go first, so the removal below keeps to the worktree. [[spec/design_output/review#a-worktree-runs-the-check]]
   for (const rel of borrowed) it.disk.remove(it.join(where, rel));
   it.git.run(["worktree", "remove", "--force", where], true);
   it.disk.remove(where);

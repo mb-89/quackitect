@@ -22,7 +22,8 @@ import { TODO } from "../../.claude/skills/level0/lib/todo.js";
 import { fieldOf, GROUP, withField, withoutField } from "../engine/group.js";
 import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
-import { askFaults, askRefusal } from "./ticket-ask-lint.js";
+import { landedAlone } from "./pull-landed.js";
+import { askFaults, askRefusal, lineRefusal } from "./ticket-ask-lint.js";
 
 export const NOTES = TICKETS;
 export const HOLDS = OWNED_HOLDS;
@@ -113,6 +114,12 @@ function note(it, name, argv) {
   });
   if (made.why) {
     console.error(made.why);
+    return 1;
+  }
+  // The note reads its Ask through the lint's road before it writes. [[spec/design_output/pull#a-draft-opens]]
+  const found = askFaults(it, path, made.text);
+  if (found.length) {
+    console.error(lineRefusal(path, found));
     return 1;
   }
 
@@ -221,14 +228,29 @@ function open(it, name) {
   const found = askFaults(
     it,
     at.path.split("\\").join("/").replace(`${it.root}/`, ""),
-    rows,
+    text,
   );
   if (found.length) {
     console.error(askRefusal(at.said, found));
     return 1;
   }
   const step = String(front.step ?? "").trim() || firstLeafOf(front.steps);
-  it.disk.write(at.path, withField(withField(text, "state", "open"), "step", step));
+  // The open lands in one commit of its own, so the queue a push carries holds it. [[spec/design_output/pull#a-draft-opens]]
+  const refused = landedAlone(
+    it,
+    {
+      at: at.path,
+      text: withField(withField(text, "state", "open"), "step", step),
+      name: at.said.split("/").pop().replace(/\.md$/, ""),
+      private: at.said.startsWith(`${NOTES}/`),
+    },
+    ["opens"],
+  );
+  if (refused) {
+    console.error(`the hook refuses the commit, so ${at.said} stands a draft:`);
+    console.error(refused);
+    return 1;
+  }
   console.log(`${at.said} stands open at ${step}, and the pull hands it out.`);
   return 0;
 }

@@ -10,6 +10,7 @@ import {
 
 import { actionables, bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
+import { carriedIn } from "../../.claude/skills/level0/lib/tested.js";
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
 import { agentOf, BOX, handOf } from "./pull-hand-of.js";
 
@@ -32,6 +33,11 @@ export function holdOf(it, hand) {
 
 // Whether any hand holds a step on this box, out of the folder and the older file alike. [[spec/design_output/pull#the-hand-and-the-hold]]
 export function holdsAnywhere(it) {
+  return everyHold(it)[0] ?? null;
+}
+
+// Every hold on this box, one a hand, because several hands work one box. [[spec/design_output/pull#the-hand-and-the-hold]]
+export function everyHold(it) {
   const folder = it.join(it.root, ...HOLDS.split("/"));
   const rows = it.disk.exists(folder)
     ? it.disk
@@ -39,12 +45,25 @@ export function holdsAnywhere(it) {
         .filter((one) => one.kind === "file" && one.name.endsWith(".json"))
         .map((one) => it.join(folder, one.name))
     : [];
+  const out = [];
   for (const at of [...rows, it.join(it.root, ...HOLD.split("/"))]) {
     if (!it.disk.exists(at)) continue;
     const held = parsed(it.disk.read(at));
-    if (held) return { at, held };
+    if (held) out.push({ at, held });
   }
-  return null;
+  return out;
+}
+
+// The tests every held ticket's command lines carry, which the commit door counts beside the staged ones. [[spec/design_output/tree#the-rules-over-two-files]]
+export function heldTests(it) {
+  const out = new Set();
+  for (const { held } of everyHold(it)) {
+    if (!held?.path) continue;
+    const at = it.join(it.root, ...String(held.path).split("/"));
+    if (!it.disk.exists(at)) continue;
+    for (const one of carriedIn(it.disk.read(at))) out.add(one);
+  }
+  return [...out];
 }
 
 export function parsed(text) {

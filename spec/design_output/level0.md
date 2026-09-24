@@ -276,6 +276,13 @@ the light.
 | Linux | `systemd-inhibit` over `cat`, which ends with its input |
 | any other | no child, and the door says so once in the log |
 
+### A release awaits the end
+
+Every release answers a promise, the unheld road and the fake alike. The door
+listens for the child's `exit` from the spawn on, so a child that ends early
+still settles it. A child that outlives the wait lets the promise settle at a
+timeout, so a caller awaiting the release gets its answer on every box.
+
 ## The bridge says it falls
 
 A server falling under a running session leaves the doors passing quietly. The
@@ -287,6 +294,7 @@ later. So the bridgehead says it where a person stands.
 | writes one `warn` row naming the event route | the first event the server answers nothing for |
 | says one line in the chat, through `$.ui.log` | the first such event past the session start |
 | drops both marks | the server answers again |
+| answers the `no server answers` line to a level zero tool | a tool call the server answers nothing for, since its hook finds nothing past it |
 
 A post nobody takes reads the port pointer first, because a server restarting
 on another port writes it again. Where the pointer names another port, the
@@ -480,7 +488,8 @@ So the write door already holds over a helper, and the guidance is the gap.
 
 - Outcome: a helper's `turn.step` and `turn.complete` reach the session's hooks, and both return at once under an `agentId`.
 - Cause: the gate reads a helper's answer at its turn end and prompts the session after a standing stop.
-- Door: a helper gets no reply line, no canary, no stop vote and no gate. So nothing from level zero prompts after a standing stop.
+- Door: a helper gets no reply line, no canary, no stop vote and no answer gate. So nothing from level zero prompts after a standing stop.
+- Agent: a helper's own `Agent` call meets the Agent gate. A helper waiting on its helper holds the turn the same way. For details, see [[spec/design_output/level0#an-agent-call-runs-behind]].
 - Demand: a helper's step text answers no demand of the owner's, so the session's own text has to.
 
 ## The spawn carries a rewrite
@@ -855,6 +864,7 @@ naming the rule, the line and the phrase.
 | prose | Vale, then the prose reader |
 | code | Biome |
 | a shell command landing a file | [[spec/design_output/bash]] |
+| a write to the file the refactoring hand holds | [[spec/design_output/stop#the-hand-holds-its-file]] |
 
 The private half answers first, so a note's own words stop at the door. The
 refusal closes by asking the writer to hold that rule for the rest of the turn.
@@ -891,8 +901,9 @@ The reading that sets the mark is the whole of the mechanism. The door reads the
 for itself on every edit, so a mark off that read compares against itself. The
 mark comes off the read reaching the agent.
 
-The hand carries nothing. `lib/marks.js` holds the hash and the refusal, and
-the box holds the marks against the tree it serves. This door writes a refusal
+The hand carries nothing. `lib/marks.js` holds the hash, the spans and the
+refusal. The box holds the marks against the tree it serves, and the runtime
+file keeps them. This door writes a refusal
 of its own, because the voice refusal opens on the prose rules and says the
 wrong thing here. It names the file, says which case stands, and
 asks for a read.
@@ -901,6 +912,50 @@ The door answers ahead of the write, so a write the engine drops leaves the
 mark ahead of the disk. The next write refuses and asks for a read, which costs
 a read and keeps the tree whole. The batch lane reads every file inside the
 call that writes it. That read is the agent's own, so the lane takes no token.
+A batch call writing nothing puts back the marks it meets:
+
+- a preview
+- a refusal at the door
+- a first file refusing the write
+
+### The marks survive a restart
+
+The box loads the marks off `.se/.runtime/marks.json` on the first ask, and
+`runs.js` names the file. `decide` runs `marksKept` once a call, after the door
+answers. So a sweep writing many marks writes the file once.
+
+`marksKept` writes the file only where a mark moves. A read handing back the
+text the mark holds writes nothing.
+
+### The mark holds line spans
+
+A mark holds the whole hash and a list of line spans, each with its own hash.
+
+| the read | what it marks |
+|---|---|
+| a whole Read | the whole hash, and it drops the spans |
+| a Read with `offset` or `limit` | a span over the lines it hands back, beside the whole hash |
+| a Write landing | the whole hash |
+
+A write passes where the whole hash agrees with the disk. An Edit passes too
+where the lines it changes lie inside a span that still agrees. The lines it
+changes come off the common head and tail of the disk text and the new text.
+A Write replacing the file asks for the whole hash.
+
+### A lone shell read marks
+
+A shell read standing alone hands the agent the lines it prints, so it marks
+them.
+
+| the command | what it marks |
+|---|---|
+| `cat <file>` | the whole hash |
+| `head -n <n> <file>` | lines 1 to n |
+| `tail -n <n> <file>` | the last n lines |
+| `sed -n 'a,bp' <file>` | lines a to b |
+
+A pipe, a chain or a redirection sets no mark. `cat` at the head of a pipe
+hands the agent a part of the file, and the door cannot tell which part.
 
 ## The door reaches a helper
 
@@ -1082,8 +1137,9 @@ opens no line of. `canaryIn` reads the first line and answers `same`, `other`
 or `none`. The first one alone pays. A line with other counts comes out of a
 block the session lacks, so it owes what silence owes.
 
-While the debt stands, `tool.call` behaves the way the owner's prompt door
-behaves. For details, see [[spec/design_output/level0#the-first-call-is-free]].
+While the debt stands, `tool.call` warns once and then refuses, the way a
+demand with a grace of one does. For details, see
+[[spec/design_output/stop#the-grace]].
 
 | the call | what it meets | the `gate` line |
 |---|---|---|
@@ -1171,7 +1227,7 @@ session remembers them. So a door holds them instead.
 ## What the door reads
 
 The door opens a demand for what a person waits for. It holds every
-`tool.call` after the first while nothing pays it. What pays it:
+`tool.call` past the demand's grace while nothing pays it. What pays it:
 
 | what pays | when |
 |---|---|
@@ -1197,7 +1253,8 @@ late pays too.
   ask pays on a text in the shape of `spec/config/status.yaml` alone.
 
 The door reads the key at every `tool.call`, so a button pressed mid-turn
-reaches the next call. The latest demand replaces the one before it. The hold
+reaches the next call. The latest demand replaces the one before it, and an
+unpaid prompt stands ahead of an ask. The hold
 is no demand: it stands in the stop door. For details, see
 [[spec/design_output/stop#the-hold]].
 
@@ -1219,14 +1276,22 @@ carries.
 | one asking for a note | a note row, or a text answer |
 | every other prompt | a text answer alone |
 
-## The first call is free
+## The first call asks
 
-The response in flight when a demand lands can carry the answer as its first
-text. So the first call after the demand passes, with the demand as context.
-Every call after it asks the bridgehead for the texts. A call with nothing new
-comes back refused. The refusal quotes the last text seen and its length, so a
-stale read and a wrong reply read apart. `AskUserQuestion` and the report tool
-pass the hold.
+A prompt opens its demand with no grace, so the first call after it asks the
+bridgehead for the texts. A mid-turn prompt otherwise waits behind the calls in
+flight, and the owner asks twice. The cost: a hand calling a tool before it
+writes the reply meets a refusal, writes the reply, and calls again.
+
+| the demand | the calls it lets pass |
+|---|---|
+| the owner's prompt | none |
+| the owner's ask for an update | `grace.update`, one at least |
+
+An ask pressed while a prompt stands unpaid waits for the pay, so the first
+call still meets the gate. A call with nothing new comes back refused. The
+refusal quotes the last text seen and its length, so a stale read and a wrong
+reply read apart. `AskUserQuestion` and the report tool pass the hold.
 
 Each refusal writes a `gate` line at `debug`, because the agent reads the
 refusal itself.
@@ -1266,6 +1331,19 @@ tooth submits prompts under `plugin`, and a session owes no readback to itself.
 
 `unclassified` stays out. The engine hands it both a person's socket and its own
 delivery receipts, so a door reading it bites the wrong turn.
+
+## An Agent call runs behind
+
+A helper the turn waits on holds every prompt behind it. So `onAgent` in
+`src/bridge/agent.js` refuses an `Agent` call carrying `run_in_background:
+false`, and names the background road. The door reads the flat field, the way
+the command door reads `command`.
+
+| the call | what it meets |
+|---|---|
+| `run_in_background: false` | a refusal naming `run_in_background: true` |
+| the field absent, or `true` | a pass |
+| a helper's own call | the same door |
 
 ## What the refusal says
 
@@ -1324,9 +1402,10 @@ copy honest. A copy nobody can edit needs no guard.
 
 The turn's end runs the answer through Vale under the `*answer.md` section of
 `.vale.ini`, and the score of what comes back cuts into bands. The reply
-already stands on screen when `turn.complete` fires, so the gate refuses
+already stands on screen when `turn.complete` fires, so that gate refuses
 nothing. It re-prompts, it carries a line into the next prompt, or it does
-nothing at all.
+nothing at all. The stop door reads the same answer before the turn ends,
+and it holds a rewrite.
 
 The measurement behind the bands stands in
 [[spec/funnel/a-paragraph-has-a-schema]].
@@ -1350,6 +1429,7 @@ edges, and the score falls into one of the bands below:
 |---|---|
 | under `warnAt` | nothing |
 | from `warnAt` up | the `answer` line at `warn`, and the findings ride the next tool call |
+| from `ceiling` up | the stop door holds the turn with the findings |
 
 An answer carrying no finding reads clean, whatever its length. Every band
 writes one `answer` line naming the score and the findings. The ceiling names
@@ -1387,6 +1467,25 @@ refusing nothing leaves open.
 
 The tool registers at the session's start, and `spec/guidance/working.md`
 carries the line that sends a session to it.
+
+`readsAnswer` in `src/bridge/answer-read.js` holds the reading, and the tool
+and the stop door both call it.
+
+## The stop holds a rewrite
+
+The server's `classic.Stop` door runs `gatesAnswer` over the turn's last text,
+after the handover and before the tooth. A draft in the `rewrite` band holds
+the turn, and the block carries the findings in the wording above. Any other
+band passes on to the tooth.
+
+- A helper's stop passes ahead of the gate, so Vale reads no helper's answer.
+- The turn's end asks for no needs table, which a stop for the owner carries alone.
+- `answer.enabled` at false takes the gate out.
+- The gate counts its holds in a row, and past `stop.mostInARow` it lets the turn go.
+- A clean read or a let-go turn starts the count again.
+
+The limit is the tooth's own, so the gate holds no turn without end. Each stop
+of the session's own runs Vale over the answer once.
 
 ## A note reads clean first
 
@@ -1685,3 +1784,23 @@ still stand. What falls is the check on the agent. The line reads `god mode
 lets the refusal of Write through`, and names the reason it lets through. A
 demand paid by nothing stands until the turn's end, which pays it as ever.
 
+# The wait returns on signals
+
+`mcp__level0__wait` returns on the first signal the table below names, and at
+its cap where none comes. A hand asks it where it writes a loop of sleeps today.
+
+| the field | the signal |
+|---|---|
+| `agent` | the helper's report stands on the box |
+| `output` | the file stands quiet past `wait.quiet`, or the process `pid` names exits |
+| `files` | every named file stands quiet past `wait.quiet` |
+
+A helper's stop is its report. `helperReports` in `src/bridge/wait.js` writes
+a `report` row to the log with the helper's `agentId`, and keeps the id on the
+box for the wait. A file stands quiet while its size and its stamp hold, and
+the span counts from the last change the wait sees. The process door's
+`alive` reads a process's end off its number.
+
+`wait.most` in `spec/config/level0.json` caps the wait in seconds. The wait
+looks at its signals once a second, and the clock decides the rest, so a case
+drives it on the fake clock.

@@ -139,6 +139,10 @@ export function fakeDisk(seed = {}) {
       makeDir: (path) => void folders.add(norm(path)),
       list(path) {
         const at = norm(path);
+        // A list of a file is a fault on the real disk, so the fake throws the same code. [[spec/design_output/doors#a-fake-behaves]]
+        if (files.has(at)) {
+          throw Object.assign(new Error(`not a folder: ${path}`), { code: "ENOTDIR" });
+        }
         const seen = new Map();
         for (const key of folders) {
           if (!key.startsWith(`${at}/`)) continue;
@@ -163,7 +167,8 @@ export function fakeDisk(seed = {}) {
   );
 }
 
-function norm(path) {
+// The key the fake files a path under, so a test reading its maps finds a Windows path too. [[spec/design_output/doors#a-fake-behaves]]
+export function norm(path) {
   const said = String(path).split("\\").join("/");
   return said.replace(/^\.\//, "").replace(/\/+$/, "");
 }

@@ -129,7 +129,7 @@ call. The table lands at the turn's end when the answer takes research.
 # The bottom line comes first
 
 Under the question table, an answer opens with a TL;DR list and puts the detail
-under it. Three rules hold that, two mechanical and one judged:
+under it. These rules hold that, the mechanical ones and the judged one:
 
 - The block after the question table is a list. Each item is one sentence,
   and each sentence is one bottom line. The shape rule holds it.
@@ -143,7 +143,7 @@ detail for whoever reads on.
 # A list is a list
 
 Voice rule 3 says structure comes first and prose comes where none of the three
-fits. The schema holds it in three rows, one per structure:
+fits. The schema holds it in a row per structure:
 
 | the shape | the test | holder |
 |---|---|---|
@@ -185,7 +185,7 @@ it goes out meets the gate clean, and the guidance carries that one line.
 # The retro grows the list
 
 A whitelist refuses what it does not know, so it starts wrong and gets right.
-The loop has four parts, and three of them stand already:
+The loop's parts, and which of them stand already:
 
 | part | stands | what it does |
 |---|---|---|

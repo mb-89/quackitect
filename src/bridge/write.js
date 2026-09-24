@@ -2,9 +2,15 @@
 // design note names, and the code door follows.
 // [[spec/design_output/level0#the-write-door]]
 
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { CODE } from "../../.claude/skills/level0/lib/code.js";
-import { marked, staleFault } from "../../.claude/skills/level0/lib/marks.js";
+import {
+  marked,
+  marksFrom,
+  marksText,
+  spanned,
+  staleFault,
+} from "../../.claude/skills/level0/lib/marks.js";
 import { isDraft, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import {
   carriedFrom,
@@ -12,7 +18,7 @@ import {
   refusedPrivate,
 } from "../../.claude/skills/level0/lib/private.js";
 import { refusal } from "../../.claude/skills/level0/lib/refuse.js";
-import { REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
+import { MARKS, REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
 import { PROSE } from "../../.claude/skills/level0/lib/vale.js";
 import {
   checkNote,
@@ -25,7 +31,11 @@ import {
   schemasFrom,
   strangerFault,
 } from "../../.claude/skills/level0/lib/schema.js";
-import { refusedTicket, ticketFaults } from "../../.claude/skills/level0/lib/ticket.js";
+import {
+  refusedTicket,
+  restoredFields,
+  ticketFaults,
+} from "../../.claude/skills/level0/lib/ticket.js";
 import {
   mergedWarnings,
   rowOf,
@@ -42,20 +52,34 @@ import {
 import { codeDoor } from "./code.js";
 import { marksStale, ownerDoor } from "./projection.js";
 import { readsProse } from "./prose.js";
+import { holdDoor } from "./refactor-hold.js";
 
 const PASS = { pass: true };
 const UNRAN = "VoiceRulesRan";
+const TICKET_KIND = "ticket";
+// The lines a Read hands back where it names no limit. [[spec/design_output/level0#the-mark-holds-line-spans]]
+const READ_LINES = 2000;
 
 // [[spec/design_output/schema#the-door-refuses-a-departure]]
 export function schemasHere(disk, root) {
   return schemasFrom(readFolder(disk, join(root, SCHEMAS), END));
 }
 
-export async function onWrite(e, box) {
-  const writing = asWrite(e);
+export async function onWrite(asked, box) {
+  let e = asked;
+  let writing = asWrite(e);
   if (!writing) return PASS;
   const where = relativeTo(box.root, writing.path);
   if (/^([A-Za-z]:)?[\\/]/.test(where) || isDraft(where)) return PASS;
+  const holder = holdDoor(e, where, box);
+  if (holder) return { result: { deny: holder } };
+  // The engine's fields come back first, so every door reads the write that lands. [[spec/design_output/schema#the-verbs-own-their-fields]]
+  const restored = engineRestores(e, writing, where, box);
+  if (restored?.deny) return { result: { deny: restored.deny } };
+  if (restored) {
+    e = restored.e;
+    writing = asWrite(e);
+  }
 
   const checks = [markDoor, ownerDoor, privateDoor, schemaDoor, voiceDoor];
   const held = {};
@@ -72,23 +96,108 @@ export async function onWrite(e, box) {
     return said;
   }
   marksSeen(box, where, whole);
-  return warnsOf(e, where, held.warned, box) ?? PASS;
+  const warned = warnsOf(e, where, held.warned, box);
+  if (restored) return putBack(e, where, restored.keys, warned, box);
+  return warned ?? PASS;
 }
 
-// [[spec/design_output/level0#a-write-meets-its-mark]]
+// The write lands with the fields back, and the context names each one. [[spec/design_output/schema#the-verbs-own-their-fields]]
+function putBack(e, where, keys, warned, box) {
+  box.log.say("info", "ticket", `put back ${keys.join(", ")} in ${where}`, {
+    file: where,
+    tool: String(e.tool),
+  });
+  const said = `${keys.join(", ")} stand as the engine holds them in ${where}, and the rest of the write lands. A verb writes these fields: ./RUNME.sh ticket pull moves step and state.`;
+  return { event: e, after: { context: [...(warned?.after?.context ?? []), said] } };
+}
+
+// A write to a ticket carrying an engine field, turned into one carrying the disk's value there. An edit whose text the field reaches past takes the refusal the ticket door gives. [[spec/design_output/schema#the-verbs-own-their-fields]]
+function engineRestores(e, writing, where, box) {
+  if (!where.endsWith(".md") || e.tool === "MultiEdit" || e.replace_all) return null;
+  const was = textAt(box.disk, writing.path);
+  if (was === null) return null;
+  const whole = wholeAfter(e, writing, box.disk);
+  if (kindOf(whole) !== TICKET_KIND) return null;
+  if (!box.schemas) box.schemas = schemasHere(box.disk, box.method);
+  const put = restoredFields(was, whole, box.schemas.get(TICKET_KIND));
+  if (!put.keys.length) return null;
+  if (e.tool === "Write") return { e: { ...e, content: put.text }, keys: put.keys };
+  const from = String(e.old_string ?? "");
+  const at = was.indexOf(from);
+  const head = was.slice(0, at);
+  const tail = was.slice(at + from.length);
+  const reaches =
+    at >= 0 &&
+    put.text.startsWith(head) &&
+    put.text.endsWith(tail) &&
+    put.text.length >= head.length + tail.length;
+  if (!reaches) return null;
+  const text = put.text.slice(head.length, put.text.length - tail.length);
+  if (text === from) {
+    return {
+      deny: `This edit changes ${put.keys.join(", ")} alone, and the engine holds those in ${where}, so nothing of it lands. A verb writes them: ./RUNME.sh ticket pull moves step and state.`,
+    };
+  }
+  return { e: { ...e, new_string: text }, keys: put.keys };
+}
+
+// The box loads the marks off the runtime file on the first ask. [[spec/design_output/level0#the-marks-survive-a-restart]]
 export function marksOf(box) {
-  if (!box.marks) box.marks = new Map();
+  if (box.marks) return box.marks;
+  box.marks = marksFrom(textAt(box.disk, marksAt(box)));
+  box.marksKeptAs = marksText(box.marks);
   return box.marks;
 }
 
-// [[spec/design_output/level0#a-write-meets-its-mark]]
-export function marksSeen(box, where, text) {
-  marked(marksOf(box), where, text);
+// A span of `{ from, to }` marks the lines a partial read hands back. [[spec/design_output/level0#the-mark-holds-line-spans]]
+export function marksSeen(box, where, text, span = null) {
+  if (span) spanned(marksOf(box), where, text, span.from, span.to);
+  else marked(marksOf(box), where, text);
 }
 
-// [[spec/design_output/level0#a-write-meets-its-mark]]
+// The file takes the marks once a call, and only where a mark moves. [[spec/design_output/level0#the-marks-survive-a-restart]]
+export function marksKept(box) {
+  if (!box.marks) return;
+  const text = marksText(box.marks);
+  const at = marksAt(box);
+  if (!at || text === box.marksKeptAs) return;
+  try {
+    box.disk.makeDir(dirname(at));
+    box.disk.write(at, text);
+    box.marksKeptAs = text;
+  } catch {
+    // [[spec/design_output/level0#the-marks-survive-a-restart]]
+  }
+}
+
+function marksAt(box) {
+  const work = String(box.work ?? box.root ?? "");
+  return work ? join(work, ...MARKS.split("/")) : "";
+}
+
+// A read hands the agent the text, so the mark comes off it. [[spec/design_output/level0#a-write-meets-its-mark]]
+export function onRead(e, box) {
+  const path = String(e?.file_path ?? "");
+  if (!path) return PASS;
+  try {
+    marksSeen(box, relativeTo(box.root, path), String(box.disk.read(path)), linesRead(e));
+  } catch {
+    // [[spec/design_output/level0#a-write-meets-its-mark]]
+  }
+  return PASS;
+}
+
+// [[spec/design_output/level0#the-mark-holds-line-spans]]
+function linesRead(e) {
+  if (e?.offset === undefined && e?.limit === undefined) return null;
+  const from = Math.max(1, Number(e.offset) || 1);
+  return { from, to: from + (Number(e.limit) || READ_LINES) - 1 };
+}
+
+// A Write replacing the file asks for the whole mark. [[spec/design_output/level0#the-mark-holds-line-spans]]
 function markDoor(e, writing, where, box) {
-  const found = staleFault(marksOf(box), where, textAt(box.disk, writing.path));
+  const after = e.tool === "Write" ? null : wholeAfter(e, writing, box.disk);
+  const found = staleFault(marksOf(box), where, textAt(box.disk, writing.path), after);
   if (!found) return "";
   box.log.say("warn", "mark", `refused a write over a stale read of ${where}`, {
     file: where,

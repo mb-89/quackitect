@@ -53,6 +53,8 @@ test("branch escalate on trunk hands the next free ticket, as the pull does ther
     {
       "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
       "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
+      // On trunk the push runs the check first. [[spec/design_output/pull#the-rejected-push]]
+      [`node ${at("src/scripts/cli.js")} check`]: { exitCode: 0 },
     },
     { cloud: false },
   );

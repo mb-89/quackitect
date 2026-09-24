@@ -7,10 +7,21 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
+import { MARKS } from "../../.claude/skills/level0/lib/runs.js";
 import { errorsIn, marksSeen, onWrite } from "../../src/bridge/write.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeDisk, norm } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
+import {
+  called,
+  edits,
+  NUMBERED,
+  reads,
+  realDisk,
+  refused,
+  served,
+  TREE,
+} from "./mark-doors.js";
 
 const METHOD = "/tools";
 const WORK = "/stub";
@@ -229,4 +240,101 @@ test("a box with no vale lets the write land, and says so in the log once", asyn
     bare.log.lines().filter((one) => one.kind === "vale" && one.level === "warn").length,
     1,
   );
+});
+
+// A field the engine owns comes back to its value on the disk, and the prose beside it lands. [[spec/design_output/schema#the-verbs-own-their-fields]]
+test("a Write carrying state and a prose field lands the prose, puts state back, and names it", async () => {
+  const at = join(WORK, "spec", "tickets", "good.md");
+  const it = box({ [at]: GOOD });
+  marksSeen(it, relativeTo(it.root, at), GOOD);
+  const wrote = GOOD.replace("state: open", "state: closed").replace(
+    "## change\n",
+    "## change\n\nThe door puts the field back.\n",
+  );
+
+  const said = await onWrite(write(at, wrote), it);
+
+  assert.equal(said?.result?.deny, undefined, "the write lands");
+  assert.match(said.event.content, /^state: open$/m, "state stands at its disk value");
+  assert.match(said.event.content, /The door puts the field back\./, "the prose lands");
+  assert.match(said.after.context.join("\n"), /state/, "the answer names the field");
+});
+
+// [[spec/design_output/schema#the-verbs-own-their-fields]]
+test("an Edit over state, a route line and a prose field lands the prose and puts the rest back", async () => {
+  const at = join(WORK, "spec", "tickets", "good.md");
+  const it = box({ [at]: GOOD });
+  marksSeen(it, relativeTo(it.root, at), GOOD);
+  const old_string = GOOD.slice(GOOD.indexOf("state: open"), GOOD.indexOf("## change\n") + "## change\n".length);
+  const new_string = old_string
+    .replace("state: open", "state: closed")
+    .replace("makes the change the ask names", "makes it")
+    .replace("## change\n", "## change\n\nThe door puts the route back.\n");
+
+  const said = await onWrite(
+    { tool: "Edit", file_path: at, old_string, new_string },
+    it,
+  );
+
+  assert.equal(said?.result?.deny, undefined, "the edit lands");
+  assert.equal(
+    said.event.new_string,
+    old_string.replace("## change\n", "## change\n\nThe door puts the route back.\n"),
+    "state and the route stand as the disk holds them, and the prose lands",
+  );
+  assert.match(said.after.context.join("\n"), /state/);
+  assert.match(said.after.context.join("\n"), /steps/);
+});
+
+// [[spec/design_output/schema#the-verbs-own-their-fields]]
+test("an Edit changing engine fields alone comes back refused, naming them, because nothing of it lands", async () => {
+  const at = join(WORK, "spec", "tickets", "good.md");
+  const it = box({ [at]: GOOD });
+  marksSeen(it, relativeTo(it.root, at), GOOD);
+
+  const said = await onWrite(
+    { tool: "Edit", file_path: at, old_string: "state: open", new_string: "state: closed" },
+    it,
+  );
+
+  assert.match(said?.result?.deny ?? "", /state/);
+});
+
+// [[spec/design_output/level0#a-write-meets-its-mark]]
+test("a mark written on one box reads on a fresh box over the same disk", async () => {
+  const at = join(TREE, "notes.txt");
+  const disk = realDisk({ [at]: NUMBERED });
+  await called(served(disk), reads(at));
+
+  const said = await called(served(disk), edits(at, "line 3\n", "three\n"));
+
+  assert.equal(refused(said), "", "the restarted box reads the mark off the disk");
+});
+
+// [[spec/design_output/level0#a-write-meets-its-mark]]
+test("a Read of lines 10 to 20 lets an Edit inside them land, and refuses one at line 30", async () => {
+  const at = join(TREE, "notes.txt");
+  const it = served(realDisk({ [at]: NUMBERED }));
+  await called(it, reads(at, { offset: 10, limit: 11 }));
+
+  const outside = await called(it, edits(at, "line 30\n", "thirty\n"));
+  assert.match(refused(outside), /moved on the disk after you read it/);
+
+  const inside = await called(it, edits(at, "line 15\n", "fifteen\n"));
+  assert.equal(refused(inside), "", "an edit inside the span lands");
+});
+
+// [[spec/design_output/level0#a-write-meets-its-mark]]
+test("a read handing back the text the mark holds writes the marks file once", async () => {
+  const at = join(TREE, "notes.txt");
+  const kept = norm(join(TREE, MARKS));
+  const disk = realDisk({ [at]: NUMBERED });
+  const it = served(disk);
+  await called(it, reads(at));
+  const first = disk.times.get(kept);
+  assert.ok(first, "the first read writes the marks file");
+  assert.deepEqual(Object.keys(JSON.parse(disk.read(kept))), ["notes.txt"]);
+
+  await called(it, reads(at));
+  assert.equal(disk.times.get(kept), first, "a second read of the same text writes nothing");
 });

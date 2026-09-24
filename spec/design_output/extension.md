@@ -225,6 +225,16 @@ value and the help. A node shows where it matches, or where a row under it
 matches. A filter standing as no expression falls back to a plain search, so a
 person typing `mod(el` sees rows.
 
+## The folds press at once
+
+A press beside the filter reaches every group of the config tree at once.
+`folded` in `src/extension/webview/clicks.js` sets each group's `open`.
+
+| the press | what every group does |
+|---|---|
+| `data-fold="open"` | opens |
+| `data-fold="shut"` | shuts |
+
 # A click becomes a message
 
 The browser side holds one delegated listener per kind of event, and each one

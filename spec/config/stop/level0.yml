@@ -63,7 +63,7 @@
   priority: 83
   decides: claimed
   runs: helpers-running
-  asks: Does a helper you started still run, so its answer wakes this session? The queue binding refuses it.
+  asks: Does a helper you started still run, so its answer wakes this session?
   says: A helper still runs and its answer wakes this session, so this turn ends and waits.
 
 - id: work-still-stands

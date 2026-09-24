@@ -13,6 +13,17 @@ export function asks(box, key) {
   return held !== undefined ? held : tracked?.[section]?.[leaf];
 }
 
+// The value and the file that sets it, over the same two layers asks reads, so a refusal names no layer the hook skips. [[spec/design_output/config#the-engine-controls]]
+export function whereFrom(box, key) {
+  const [section, leaf] = String(key).split(".");
+  for (const layer of [LOCAL, TRACKED]) {
+    const root = layer === LOCAL ? box.work : box.method;
+    const value = parsed(box.disk, join(root, layer))?.[section]?.[leaf];
+    if (value !== undefined) return { value, layer };
+  }
+  return { value: undefined, layer: "" };
+}
+
 // A text key read through all three layers: the local file, then the environment, then the tracked file. [[spec/design_output/config#the-resolver-holds-the-layers]]
 export function asksText(box, key) {
   const [section, leaf] = String(key).split(".");

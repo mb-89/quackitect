@@ -42,9 +42,11 @@ import {
 } from "../../.claude/skills/level0/lib/warnings.js";
 import { spanOf, ticketAt, WORK_BRANCH } from "../engine/group.js";
 import { holdsTurn } from "./answer.js";
+import { bindingLine } from "./binding.js";
 import { asks, writes } from "./config.js";
 import { reacted, wants } from "./grace.js";
 import { plansHere } from "./plan.js";
+import { holdsFile, releasesHold } from "./refactor-hold.js";
 import { REPORT_CALL } from "./report.js";
 
 const ENABLED = "stop.enabled";
@@ -235,7 +237,7 @@ export function onStop(e, box) {
       ? claimFalls({ off, hold, box, claimed, text })
       : "";
   const why = said.ends ? endsWhy(said) : falls || (said.go?.says ?? "");
-  const prompts = said.ends ? "" : asksForStop(rules, why);
+  const prompts = said.ends ? "" : asksForStop(rules, why, box);
   // The runaway writes at warn, so a reader of the log finds the turn the cap ended. [[spec/design_output/stop#three-in-a-row]]
   box.log.say(
     said.runaway ? "warn" : "info",
@@ -280,6 +282,7 @@ export function refactorHand(box) {
   const file = restingFile(box);
   if (!file) return null;
   box.refactors = (box.refactors ?? 0) + 1;
+  holdsFile(box, file);
   box.log.say(
     "info",
     "refactor",
@@ -297,6 +300,7 @@ export function refactorHand(box) {
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
 export function onRefactorAnswered(e, box) {
+  releasesHold(box);
   const said = String(e?.deny ?? "") || (e?.isError ? String(e?.text ?? "") : "");
   box.log.say(
     said ? "warn" : "info",
@@ -361,11 +365,12 @@ function endsWhy(said) {
   return said.stop?.says ?? "the turn ends";
 }
 
-// [[spec/design_output/stop#a-turn-with-no-line]]
-function asksForStop(rules, why) {
+// The last line names the binding, so the hand reads who sets what the hook asks. [[spec/design_output/stop#a-refusal-names-the-binding]]
+function asksForStop(rules, why, box) {
   return [
     `${why} This turn holds open. Carry on, or end the turn with one last line, alone: stop: <reason>, with one of these reasons:`.trim(),
     ...stopReasons(rules).map((one) => `  ${one.id}: ${one.asks}`),
+    bindingLine(box),
   ].join("\n");
 }
 
@@ -398,8 +403,7 @@ const CHECKS = {
   "ticket-in-hand": (held) => holdStands(held.box) || privateStands(held.box),
   "queue-waits": (held) => queueWaits(held.box),
   // [[spec/design_output/stop#a-helper-still-runs]]
-  "helpers-running": (held) =>
-    asks(held.box, BINDING) !== QUEUE && helpersRun(held.tasks),
+  "helpers-running": (held) => helpersRun(held.tasks),
   // A claim a fact denies reads as no stop line, so the turn holds and the fact re-prompts. [[spec/design_output/stop#a-talk-follows-a-report]]
   "no-stop-line": (held) => !claimStands(held),
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
@@ -465,10 +469,8 @@ const FALLS = {
     return `the plan still holds ${held.map((one) => `"${one}"`).join(", ")}. Name each under done in mcp__level0__plan, then claim again.`;
   },
   // [[spec/design_output/stop#a-helper-still-runs]]
-  "helpers-running": (box) =>
-    asks(box, BINDING) === QUEUE
-      ? "the queue binding holds the turn while a helper runs, so take the next leaf or wait inside a call."
-      : "the harness names no helper running at this turn's end, so its answer wakes nothing.",
+  "helpers-running": () =>
+    "the harness names no helper running at this turn's end, so its answer wakes nothing.",
 };
 
 // The checks reading the answer's text, which the stop call runs before any answer stands. [[spec/design_output/stop#a-refusal-names-its-check]]

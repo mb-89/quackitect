@@ -364,3 +364,52 @@ ifVale(
     },
   ),
 );
+
+// A line counting the list or the table under it says what the structure says already. [[spec/tickets/a-count-meets-the-lint]]
+ifVale(
+  "a line counting the list under it warns in a note, and a line naming the list passes",
+  proves(
+    {
+      counted: at("The three steps below run in order:\n\n- one\n- two\n- three\n", "notes.md"),
+      named: at("The steps below run in order:\n\n- one\n- two\n- three\n", "notes.md"),
+    },
+    (said) => {
+      const rows = said.found("counted").filter((one) => one.rule === "CountedList");
+      assert.equal(rows.length, 1, "the counting line warns");
+      assert.equal(rows[0].severity, "warning");
+      assert.deepEqual(
+        said.rules("named").filter((one) => one === "CountedList"),
+        [],
+      );
+    },
+  ),
+);
+
+// A header past five lines, or one carrying a count, refuses at the write door. [[spec/tickets/a-count-meets-the-lint]]
+ifVale(
+  "a header past five lines refuses, a header carrying a count refuses, and a short plain one passes",
+  proves(
+    {
+      long: at(
+        "// one\n// two\n// three\n// four\n// five\n// six\n\nexport const one = 1;\n",
+        "src/bridge/probe.js",
+      ),
+      counted: at(
+        "// The four doors this module reads.\n\nexport const one = 1;\n",
+        "src/bridge/probe.js",
+      ),
+      plain: at("// The doors this module reads.\n\nexport const one = 1;\n", "src/bridge/probe.js"),
+    },
+    (said) => {
+      for (const key of ["long", "counted"]) {
+        const rows = said.found(key).filter((one) => one.rule === "CodeHeader");
+        assert.equal(rows.length, 1, `${key} meets the header rule`);
+        assert.equal(rows[0].severity, "error", `${key} refuses`);
+      }
+      assert.deepEqual(
+        said.rules("plain").filter((one) => one === "CodeHeader"),
+        [],
+      );
+    },
+  ),
+);

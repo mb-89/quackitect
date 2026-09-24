@@ -1,6 +1,6 @@
 // The retro's collect, driven through fake doors. It moves the private folder
 // past its dot folders into the retro's input folder, copies the transcripts,
-// the memory and the scratchpads beside it, and leaves two folders behind.
+// the memory and the scratchpads beside it, and leaves the folders behind.
 // [[spec/guidance/retro/collect]]
 
 import assert from "node:assert/strict";
@@ -294,7 +294,8 @@ test("collect keeps the battery's report beside the record, one a retro", () => 
 
   assert.deepEqual(
     JSON.parse(it.disk.read(at(`.se/.retro/${RETRO}/battery.json`))),
-    battery,
+    { ...battery, runs: 1 },
+    "a stamp from before the runs reads as one run",
   );
 
   const bare = doors();

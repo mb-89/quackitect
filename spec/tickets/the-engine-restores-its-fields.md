@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ group: the-review-lands-overnight
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 724bd9ddd7d9ea31bb039839d3fec8758401ca0c
+    hash_after: 724bd9ddd7d9ea31bb039839d3fec8758401ca0c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 37 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -57,11 +70,17 @@ text breaks a rule, no hand may fix it, and the push door refuses the ticket.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/write.test.js test/level0/rewritten-event.test.js test/level0/ticket.test.js
+
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
+
 
 ## says
 
@@ -69,11 +88,24 @@ text breaks a rule, no hand may fix it, and the push door refuses the ticket.
 
 <!-- the form is text -->
 
+A write to a ticket field the engine owns lands with that field back at its
+value on the disk. The rest of the write lands beside it. `restoredFields` in
+`lib/ticket.js` swaps the rows of each moved field for the disk's. The write
+door hands the write on with a note naming each field, and the bridgehead
+carries that note beside the rewritten event. An edit moving engine fields
+alone lands nothing, so the door refuses it and names them.
+
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask, and an edit moving engine fields alone refuses, because nothing of it lands
+- the cleanup: the bridgehead carries a note beside a rewritten event, which the note naming the field needs
+- the rule stands in `schema.md#the-verbs-own-their-fields`, and the code points there
+
 
 # Discussion
 

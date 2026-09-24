@@ -416,3 +416,24 @@ test("the queue listing pads every place to one width, so the names line up", ()
     assert.equal(row.indexOf("  ", COL.place - 1), COL.place, "one width for all");
   }
 });
+
+// Todos of the plan anchored on one row keep the plan's order, so the place each takes reads the order the plan writes. [[spec/design_output/pull#a-todo-forces-a-place]]
+test("two todos anchored on one row stand in the order the plan writes them", () => {
+  const { it } = doors({
+    [join(ROOT, ".se", ".runtime", "plan.json")]: JSON.stringify({
+      todos: [
+        { title: "zeta todo", todo: "a-loose-one" },
+        { title: "alpha todo", todo: "a-loose-one" },
+      ],
+    }),
+  });
+  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
+
+  const said = answerOf(it);
+  const place = Object.fromEntries(said.loose.map((one) => [one.name, one.queue]));
+
+  assert.deepEqual(
+    [place["zeta todo"], place["alpha todo"], place["a-loose-one"]],
+    ["1", "2", "3"],
+  );
+});

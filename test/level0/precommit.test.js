@@ -200,3 +200,25 @@ diff --git a/test/level0/other.test.js b/test/level0/other.test.js
   assert.equal(said.code, 0, said.said);
 });
 
+
+// Every hand on the box holds its own ticket, and the hook runs with no hand, so it reads every hold. [[spec/design_output/tree#the-rules-over-two-files]]
+test("a test any hold's ticket carries answers the change at the hook", async () => {
+  const code = [
+    "diff --git a/src/bridge/one.js b/src/bridge/one.js",
+    "+++ b/src/bridge/one.js",
+    "@@ -0,0 +1 @@",
+    "+export const one = 1;",
+    "",
+  ].join("\n");
+  const hold = (ticket) => JSON.stringify({ ticket, path: `spec/tickets/${ticket}.md` });
+  const ticket = (line) => `# Ask\n\n### tests\n\n    ${line}\n`;
+  const here = box({
+    "/tree/.se/.runtime/hold/a-hand.json": hold("first"),
+    "/tree/.se/.runtime/hold/b-hand.json": hold("second"),
+    "/tree/spec/tickets/first.md": ticket("./RUNME.sh branch test test/level0/other.test.js"),
+    "/tree/spec/tickets/second.md": ticket("./RUNME.sh branch test test/level0/one.test.js"),
+  });
+
+  assert.deepEqual(await holds(here, code), { code: 0, said: "" });
+  assert.equal((await holds(box(), code)).code, 1, "no hold carries nothing");
+});

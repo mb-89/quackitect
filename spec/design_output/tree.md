@@ -34,8 +34,32 @@ Biome holds.
 | `EveryPointerResolves` | every pointer a tracked file writes, and the note or chapter it names. The server holds this one, in `src/lsp/pointer.go`. For details, see [[spec/design_output/lsp#every-pointer-resolves]] |
 
 The commit door reads the staged delta with `EveryModuleTested` too, and asks
-for a test beside each source file the delta changes. A hunk adding comment
-lines alone changes no code, so it asks for none.
+for a test beside each source file the delta changes. It reads each file's
+hunk both ways, the lines it adds and the lines it takes away:
+
+| the hunk | what the door asks |
+|---|---|
+| comment lines either side, as a pointer fix trades them | no test |
+| a line of code it adds, or trades for a comment | a test |
+| lines it takes away, where it adds none | a test |
+| a deleted file, or a file with no hunk | no test |
+
+A line counts past its file's `@@` line alone, so no header reads as content.
+
+The source the door reads:
+
+- the JavaScript under `src`
+- the Go under `src`, past its `_test.go` files
+- the JavaScript in `lib` and `hooks` under `.claude/skills/level0`
+
+A Go test answers for every Go file of its own folder, because Go reads a
+folder as one package.
+
+A test the held ticket carries answers beside the staged ones. The tests-red
+leaf lands the test, and the change leaf stages code alone. So the door reads
+the test paths each held ticket's command lines name. A path under `test/` and
+a `_test.go` path carry. The git hook runs with no hand, and several hands hold
+on one box, so the door reads every hold under `.se/.runtime/hold`.
 
 # Why lint prints them
 

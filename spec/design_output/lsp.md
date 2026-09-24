@@ -57,6 +57,14 @@ empty string where no binary stands, so a box carrying no Biome reads one list.
 `test/contract/one-reading.test.js` holds the fronts against each other
 over the whole tree.
 
+## The lint ends on findings
+
+`./RUNME.sh lint` prints the count a rule first, then the sum, then the
+finding lines. A long run scrolls its head away, and the eye lands on the
+last lines. So the lines a hand fixes stand last. `lintRows` in
+`src/scripts/cli-read.js` owns the order, and the warning note stands between
+the count and the findings.
+
 # The server reads the index
 
 Every front reads the tree off the index door, and no file of the tree off the

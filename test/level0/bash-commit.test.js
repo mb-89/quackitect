@@ -19,10 +19,10 @@ const CODE = [
 ].join("\n");
 
 // The box carries the environment, so a case sets one on it and touches nothing outside. [[spec/design_output/doors#a-door-reads-the-outside]]
-function box(merging) {
+function box(merging, seed = {}) {
   return {
     env: {},
-    disk: fakeDisk({}),
+    disk: fakeDisk(seed),
     proc: fakeProc({
       "git rev-parse --abbrev-ref HEAD": { stdout: "claude/a-thing\n" },
       "git diff --cached --unified=0": { stdout: CODE },
@@ -70,4 +70,17 @@ test("a push off a work branch lands whatever the lint says", async () => {
     vale: { stands: () => true, lint: async () => ({ ran: true, found: warned }) },
   };
   assert.equal(denied(await onBash({ command: "git push origin claude/a-thing" }, it)), "");
+});
+
+// The change leaf stages code alone, and the test its tests-red leaf landed rides the ticket. [[spec/design_output/tree#the-rules-over-two-files]]
+test("a commit whose test a held ticket carries lands at the door", async () => {
+  const seed = {
+    [`${ROOT}/.se/.runtime/hold/a-hand.json`]: JSON.stringify({
+      ticket: "one",
+      path: "spec/tickets/one.md",
+    }),
+    [`${ROOT}/spec/tickets/one.md`]:
+      "# Ask\n\n### tests\n\n    ./RUNME.sh branch test test/level0/one.test.js\n",
+  };
+  assert.equal(denied(await onBash({ command: COMMIT }, box(false, seed))), "");
 });

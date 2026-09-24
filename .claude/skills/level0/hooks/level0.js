@@ -8,7 +8,7 @@ import { patchSpec, replaceSpec } from "../lib/apply.js";
 import { SERVE, SESSION } from "../lib/log.js";
 import { findSpec } from "../lib/search.js";
 import { undoSpec } from "../lib/undo.js";
-import { POINTER, PORT_BASE as PORT } from "../lib/vehicle.js";
+import { POINTER, PORT_BASE as PORT, SELF_TEST, TESTING } from "../lib/vehicle.js";
 
 // The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], under the runtime folder folders.js owns.
 const HAND_FILE = ".se/.runtime/session.json";
@@ -18,7 +18,7 @@ const SHORT = 4000;
 const TEXTS = 4;
 // The span the start road takes. An install on a fresh clone runs past a spawn, and the road reaches this only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 const STARTING = 180_000;
-// The skip list of [[spec/design_output/level0#the-setup-writes-the-flag]], spelled again here because this hook imports nothing.
+// The skip list of [[spec/design_output/level0#the-setup-writes-the-flag]], spelled again here because this hook imports its own folder alone.
 const INSTALL_SKIP = "editor-link editor-extensions editor-client go index se-lsp";
 // The code REASONS reads for a box carrying no node, which a refused spawn means. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 const NO_NODE = 5;
@@ -58,7 +58,7 @@ export const START = [
   "}",
   "if (!existsSync(method + '/node_modules')) process.exit(6);",
   // The code proves it loads before a server starts on it, so a broken tree writes one line and loops nowhere. [[spec/design_output/level0#new-code-proves-it-loads]]
-  "const tested = spawnSync(process.execPath, [method + '/src/bridge/server.js', '--selftest', method], { cwd: method, encoding: 'utf8', timeout: 60000, windowsHide: true });",
+  `const tested = spawnSync(process.execPath, [method + '/src/bridge/server.js', '${SELF_TEST}', method], { cwd: method, encoding: 'utf8', timeout: ${TESTING}, windowsHide: true });`,
   "if (tested.status !== 0) {",
   "  process.stderr.write(String(tested.stderr || tested.error || 'the self-test answers nothing').trim().split('\\n').slice(0, 4).join(' '));",
   "  process.exit(8);",
@@ -114,7 +114,8 @@ export function spawnTagOf(held) {
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const READ_TOOLS = [findSpec(), patchSpec(), replaceSpec(), undoSpec()];
-const CALLED = READ_TOOLS.map((one) => `mcp__level0__${one.name}`);
+const SERVED = "mcp__level0__";
+const CALLED = READ_TOOLS.map((one) => `${SERVED}${one.name}`);
 const HEALTH = 200;
 
 // The engine takes one session start a module and counts them in the source, so this registers none: the module wrapping this one holds the start and calls startsSession from it. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
@@ -152,6 +153,10 @@ async function seen($, e, next) {
     : await ask($, event, e, next, await fillOf($, event, e));
   if (!answer) {
     if (event === "session.start") await starts($);
+    // A tool the server registered answers nowhere past this hook, so a dead bridge says so. [[spec/design_output/level0#the-bridge-says-it-falls]]
+    if (event === "tool.call" && String(e?.tool ?? "").startsWith(SERVED)) {
+      return { result: deadLine(e) };
+    }
     // The server answers nothing, so the bridgehead says the cage stands down where a reader stands. [[spec/design_output/level0#a-session-says-its-cage]]
     if (event === "prompt.context" && cage) {
       return merged(await next(e), {
@@ -168,6 +173,9 @@ async function seen($, e, next) {
   }
   if (answer.spawn !== undefined) return spawns($, answer, next);
   if (answer.result !== undefined) return answer.result;
+  // A door rewriting the event names what it puts back, and the note rides the answer the call gives. [[spec/design_output/schema#the-verbs-own-their-fields]]
+  if (answer.event !== undefined && answer.after !== undefined)
+    return merged(await next(answer.event), answer.after);
   if (answer.event !== undefined) return next(answer.event);
   if (answer.after !== undefined) return merged(await next(e), answer.after);
   return next(e);
@@ -392,13 +400,14 @@ async function reads($, event, e, next) {
   const coming = launched;
   launched = false;
   if (!coming || !(await healthy($))) {
-    return {
-      result: {
-        result: `no server answers at ${url()}, so ${String(e?.tool ?? "")} reads nothing. Run ./RUNME.sh serve, and read ${SERVE} for what it says.`,
-      },
-    };
+    return { result: { result: deadLine(e) } };
   }
   return ask($, event, e, next);
+}
+
+// The one line a level zero tool answers where no server answers. [[spec/design_output/level0#the-bridge-says-it-falls]]
+function deadLine(e) {
+  return `no server answers at ${url()}, so ${String(e?.tool ?? "")} answers nothing. Run ./RUNME.sh serve, and read ${SERVE} for what it says.`;
 }
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]

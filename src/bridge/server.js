@@ -5,7 +5,7 @@
 import { join } from "node:path";
 import { BINDING, GOD } from "../../.claude/skills/level0/lib/config.js";
 import { FOLDER as LOG_FOLDER, SERVE } from "../../.claude/skills/level0/lib/log.js";
-import { relativeTo, runsHere } from "../../.claude/skills/level0/lib/paths.js";
+import { runsHere } from "../../.claude/skills/level0/lib/paths.js";
 import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { awake } from "../doors/awake.js";
 import { biome } from "../doors/biome.js";
@@ -25,6 +25,8 @@ import {
   onTurnEnd,
   SPOKE,
 } from "./answer.js";
+import { onAgent } from "./agent.js";
+import { gatesAnswer } from "./answer-read.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
@@ -55,12 +57,14 @@ import {
   PLAN,
   PLAN_CALL,
   planField,
+  planned,
   SPECS as planSpecs,
   TOOLS as planTools,
 } from "./plan.js";
 import { SPECS as logSpecs, TOOLS as logTools } from "./logline.js";
 import { freshens } from "./projection.js";
 import { SPECS as proseSpecs, TOOLS as proseTools } from "./prose.js";
+import { releasesHold } from "./refactor-hold.js";
 import { movedCode, provesCode, SELF_TEST } from "./reload.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import {
@@ -84,7 +88,8 @@ import {
 } from "./stop.js";
 import { TOOLS as handTools, SPECS as toolSpecs } from "./tools.js";
 import { registeredPort } from "./vehicle.js";
-import { marksSeen, onWrite, schemasHere } from "./write.js";
+import { helperReports, SPECS as waitSpecs, TOOLS as waitTools } from "./wait.js";
+import { marksKept, onRead, onWrite, schemasHere } from "./write.js";
 
 const OK = 200;
 const NOT_FOUND = 404;
@@ -110,8 +115,12 @@ const DOORS = {
   "session.measure": onSessionMeasure,
   "turn.said": onTurnSaid,
   "turn.complete": endsTurn,
-  // A session due holds its turn for the handover ahead of the tooth. [[spec/design_output/stop#the-context-hands-over]]
-  "classic.Stop": (e, box) => holdsForHandover(e, box) ?? onStop(e, box),
+  // A helper's stop reports, a session due holds for the handover, and the answer gate holds ahead of the tooth. [[spec/design_output/stop#the-context-hands-over]] [[spec/design_output/level0#the-gate-reads-the-answer]]
+  "classic.Stop": async (e, box) =>
+    helperReports(e, box) ??
+    holdsForHandover(e, box) ??
+    (await gatesAnswer(e, box)) ??
+    onStop(e, box),
   "agent.spawn": onAgentSpawn,
   "tool.describe": onDescribe,
   "tool.call": onToolCall,
@@ -127,6 +136,7 @@ const TOOLS = {
   Edit: onWrite,
   MultiEdit: onWrite,
   Bash: onBash,
+  Agent: onAgent,
   [`mcp__level0__${FIND}`]: runsFind,
   ...applyTools,
   ...handTools,
@@ -136,6 +146,7 @@ const TOOLS = {
   ...planTools,
   ...proseTools,
   ...logTools,
+  ...waitTools,
 };
 
 export async function decide(said, box) {
@@ -147,6 +158,8 @@ export async function decide(said, box) {
   if (said?.fill !== undefined) measures(box, said.fill);
   const door = DOORS[String(said?.event ?? "")] ?? pass;
   const answer = letsThrough((await door(said?.e ?? {}, box)) ?? PASS, said, box);
+  // The call's marks reach the file once, after the door answers. [[spec/design_output/level0#the-marks-survive-a-restart]]
+  marksKept(box);
   if (box.registered || String(said?.event ?? "") === "engine.create") return answer;
   box.registered = true;
   return { ...answer, register: answer.register ?? box.specs };
@@ -171,6 +184,7 @@ function specsOf(box) {
     ...planSpecs(),
     ...proseSpecs(),
     ...logSpecs(),
+    ...waitSpecs(),
   ].map(withPlanField);
 }
 
@@ -194,24 +208,11 @@ function planRides(e, box) {
     tool === PLAN_CALL
   )
     return;
-  planTools[PLAN_CALL](e.plan, box);
+  // The field changes the plan alone, and the answer rides no reply, so this road reads the queue no second time. [[spec/design_output/stop#the-plan]]
+  planned(e.plan, box);
 }
 
-function pass() {
-  return PASS;
-}
-
-// A read hands the agent the text, so the mark comes off it. [[spec/design_output/level0#a-write-meets-its-mark]]
-function onRead(e, box) {
-  const path = String(e?.file_path ?? "");
-  if (!path) return PASS;
-  try {
-    marksSeen(box, relativeTo(box.root, path), String(box.disk.read(path)));
-  } catch {
-    // [[spec/design_output/level0#a-write-meets-its-mark]]
-  }
-  return PASS;
-}
+const pass = () => PASS;
 
 // [[spec/design_output/level0#god-mode]]
 function letsThrough(answer, said, box) {
@@ -242,6 +243,7 @@ function opensSession(e, box) {
   box.tallies = {};
   // [[spec/design_output/level0#a-cache-follows-its-file]]
   dropsAll(box);
+  releasesHold(box);
   onSessionStart(e, box);
   box.projections = projectionsHere(box.disk, box.method);
   box.sources = sourcesOf(box.projections, box.disk, box.method, box.work);

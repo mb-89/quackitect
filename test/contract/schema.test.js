@@ -1,4 +1,4 @@
-// The six schemas this tree ships, and the real Vale over a parked draft. Each
+// The schemas this tree ships, and the real Vale over a parked draft. Each
 // case drives the thing itself: the schemas off disk, mint through the checker,
 // and the write door's own linter over a name opening with an underscore.
 // [[spec/design_output/schema#the-sweep-over-the-tree]]

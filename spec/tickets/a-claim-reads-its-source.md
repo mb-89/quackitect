@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -89,7 +89,61 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 3a2d46149d34a67f1d8ba04e2e2d827287381fcd
+    hash_after: 3a2d46149d34a67f1d8ba04e2e2d827287381fcd
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: 94c8ec812cc823699d2cd411dd261ab9494a09f4
+    hash_after: 94c8ec812cc823699d2cd411dd261ab9494a09f4
+    returns: 1
+    why: "design: The bridge box carries no `join`, so `planHere` throws and the queue read drops every todo row.; design: The bridge box carries no `agent`, so `takeable` orders rows apart from `branch list --queue` in a harness.; design: The fix builds the read door off `handDoors(box.env)`, `join`, a git door, `weights` and `stale`, and names each.; design: A digit past the last row lands `last`, which stands before the first untagged row.; craft: `planRides` drops the tool's answer, so a plan riding another call reads git twice for nothing.; craft: `answerOf` lives in `src/scripts/work-answer.js`, and the callers list names `work-list.js`.; craft: Two todos with one digit in one call anchor on one row, so a case pins their order."
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 8fd5f56521d9ea8db947a6b716ff9f4f0ba5f6c1
+    hash_after: 8fd5f56521d9ea8db947a6b716ff9f4f0ba5f6c1
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-4
+    hash_before: e2055d951f6404f5b4ca642e2f0a17917afa0fa2
+    hash_after: e2055d951f6404f5b4ca642e2f0a17917afa0fa2
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 9a8b1347c52e9b7f7ae415756662f68093b73766
+    hash_after: 9a8b1347c52e9b7f7ae415756662f68093b73766
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 8dec657b1cbd8d07132b9fa808704052e91f948f
+    hash_after: 8dec657b1cbd8d07132b9fa808704052e91f948f
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: ac2f680bc28d7af054da77f4d8661bd8ca35aa3c
+    hash_after: ac2f680bc28d7af054da77f4d8661bd8ca35aa3c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-9
+    hash_before: 1b348805d8701c334fda4bda20b06efde5bd67a8
+    hash_after: 1b348805d8701c334fda4bda20b06efde5bd67a8
+reason: done
 ---
 
 # Ask
@@ -116,6 +170,61 @@ A draft misses callers an earlier review names, and fails review again. The hand
 
 <!-- the form is text -->
 
+Two changes, one each for the draft and the todo.
+
+| part | what changes |
+|---|---|
+| the draft leaf | `spec/processes/standard.yaml` gives `design/draft` two list fields beside `approach` |
+| `callers` | every caller of what the approach changes, one a line, as a file and a function |
+| `answers` | every finding an earlier review names, one a line, with the answer the approach gives it, or `first` on a first draft |
+| the queue read | `plans` in `src/bridge/plan.js` reads the queue through `answerOf` in `src/scripts/work-answer.js` |
+| the read door | `readDoorOf(box)` in `plan.js` builds what `answerOf` reads, one row below each |
+| the digit | `placeWord` takes the rows at a whole place from `1` up, and a digit names the row standing at that place |
+| the front | a digit of `1` stays `true` |
+| the end | a digit past the last row takes a new word, `end`, which stands after every row at its level |
+| the anchor | `anchored` in `src/scripts/pull-outline.js` places `end` rows last, in the order the queue gives them |
+| the answer | the door reads the queue again once the plan stands, and names each new todo with its place |
+| the design | `stop.md#the-plan` names the digit and the answer, and `pull.md#a-todo-forces-a-place` names `end` |
+| the cases | `test/level0/plan.test.js` teaches a fake process a queue of three tickets |
+
+The read door carries these, each off the box:
+
+- `disk`, `clock` and `root`, which `box.work` gives
+- `join`, from `node:path`, because `planHere` joins the plan path
+- `git`, the door `src/doors/git.js` builds on `box.proc` at `box.work`
+- `weights` and `stale`, read through `asks` off the keys `cli-doors.js` reads
+- `handDoors(box.env)`, so `takeable` reads the agent the listing reads
+
+The cases hold four claims:
+
+- a digit of `2` anchors the todo before the ticket at place `2`, whatever the plan's todo order
+- a digit past the last row lands after it, at the end
+- two todos at one digit in one call stand in the order the call gives
+- the answer names each new todo with the place `branch list --queue` prints for it
+
+The callers:
+
+- `TOOLS[PLAN_CALL]` in `src/bridge/server.js`, and `planRides` there, which call `plans`
+- `placeWord` in `src/bridge/plan.js`, which `plans` alone calls
+- `answerOf` in `src/scripts/work-answer.js`, which `list --json` and `queueOnly` call
+- `anchored` in `pull-outline.js`, which every reading of the outline calls
+- no code names `design/draft`, so the new fields reach a hand through the route the pull copies
+
+The answers to the earlier review:
+
+- the bridge box holds no `join`: the read door carries it
+- the bridge box holds no `agent`: the read door carries `handDoors(box.env)`
+- the read door names each of its fields
+- a digit past the rows landed near the top: `end` places it last
+- `planRides` reads git twice for no answer: the field road skips the answer's read, and the tool road keeps it
+- the callers line misnamed the file of `answerOf`: it names `work-answer.js`
+- two todos at one digit: a case pins their order
+
+The costs:
+
+- each plan call reads git once for the digit, and the tool road reads once more for the answer
+- an open ticket keeps its copy of the old route, and `./RUNME.sh ticket update` copies the new leaf onto it
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -125,6 +234,14 @@ A draft misses callers an earlier review names, and fails review again. The hand
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- The approach answers each of the seven earlier findings, and each answer holds against the code.
+- The read door covers every field `answerOf` and `takeable` read, the hand fields among them.
+- The callers list matches the code, and `answerOf` stands in `work-answer.js`.
+- craft: `queued` breaks a score tie on the name, so two todos at one digit stand in title order.
+- craft: The case for call order fails unless the change names a tie-break, such as the plan file order.
+- craft: The approach names no word for a digit past nine, and `placeWord` gives `last` there today.
 
 # implement
 
@@ -138,17 +255,32 @@ A draft misses callers an earlier review names, and fails review again. The hand
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/plan-queue.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Four cases fail, each on its own assertion. The digit reads the plan's own
+todos today, so a digit of two names no ticket. The answer names no place.
+
+- the queue answers off a fake git, so the bridge box reads it through its process door
+- the tie case pins call order, because the score breaks a tie by name
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch one new file, which the ask names through its case
+- the git read runs on the fake git `work-doors.js` builds, and the disk and clock are fakes
+- a comment above each case points at the chapter the approach names
+
 
 ## reflect
 
@@ -176,11 +308,19 @@ A draft misses callers an earlier review names, and fails review again. The hand
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/bridge/plan.js src/bridge/server.js src/scripts/pull-outline.js src/scripts/pull-queue.js src/scripts/work-answer.js spec/processes/standard.yaml spec/design_output/stop.md spec/design_output/pull.md
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the plan door, the outline, the queue's tie, the route and the two chapters named
+- the queue read runs on the box's process door, and the case fakes it with the fake git
+- a comment names the approach on each changed function, through its chapter's pointer
+
 
 ## tests-green
 
@@ -192,11 +332,17 @@ A draft misses callers an earlier review names, and fails review again. The hand
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/plan-queue.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
+
 
 ### says
 
@@ -204,11 +350,26 @@ A draft misses callers an earlier review names, and fails review again. The hand
 
 <!-- the form is text -->
 
+A place digit reads the queue now, and the answer names the place each new
+todo takes.
+
+- `plans` in `src/bridge/plan.js` builds a read door on the box, and asks `answerOf` for the rows
+- a digit names the row at that place, and a digit past the last row writes `end`
+- `anchored` in `pull-outline.js` places an `end` todo after every row
+- todos tied on every score keep the plan's order
+- the field on another call changes the plan alone
+- the standard route's draft leaf asks for the callers and the answers to an earlier review
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the plan door, the outline, the queue's tie, the route and the two chapters named
+- the queue read runs on the box's process door, and the case fakes it with the fake git
+- a comment names the approach on each changed function, through its chapter's pointer
+
 
 # verdict
 
@@ -220,17 +381,50 @@ A draft misses callers an earlier review names, and fails review again. The hand
 
 <!-- the form is files -->
 
+- spec/tickets/a-claim-reads-its-source.md
+- spec/guidance/review/reviewing.md
+- spec/processes/standard.yaml
+- spec/design_output/stop.md
+- spec/design_output/pull.md
+- src/bridge/plan.js
+- src/bridge/server.js
+- src/scripts/pull-outline.js
+- src/scripts/pull-queue.js
+- src/scripts/work-answer.js
+- src/scripts/pull-hand-of.js
+- src/scripts/cli-doors.js
+- test/level0/plan-queue.test.js
+- test/level0/pull-outline.test.js
+- test/level0/queue.test.js
+- test/level0/restart-box.test.js
+- test/level0/work-answer.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- The draft leaf in `standard.yaml` carries `callers` and `answers` beside `approach`.
+- A place digit reads the queue through `answerOf`, and names the row at that place.
+- A digit past the last row writes `end`, and `anchored` places it after every row.
+- The plan door answers the place each new todo takes, off one read after the plan stands.
+- The field road calls `planned` alone, so it skips the answer's read as the approach says.
+- The cases in `plan-queue.test.js` cover the digit, the end, the tie and the answer.
+- `./RUNME.sh check` exits 0 on the branch.
+- No retro stands in the hand-back yet.
+- craft: `readDoorOf` repeats the weight keys `cli-doors.js` already maps, so one list serves both.
+- craft: The tool's place description restates the rule `stop.md` holds.
+- craft: The restart case covers a front todo on the field road, and no digit past one.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `end` stands in `pull.md`, and `stop.md` points at it, but the weight keys stand in two files
 
 # Discussion
 

@@ -23,7 +23,14 @@ export function batteryEffect(it, name, last) {
   };
   const now = read(name);
   if (!now) return null;
-  return { last: last ?? "", ...batteryDelta(last ? read(last) : null, now), slowest: now.slowest ?? [] };
+  // A retro with no last one reads against nothing, so its battery stands as the baseline. [[spec/guidance/retro/effect]]
+  const before = last ? read(last) : null;
+  return {
+    last: last ?? "",
+    ...(before ? {} : { baseline: true }),
+    ...batteryDelta(before, now),
+    slowest: now.slowest ?? [],
+  };
 }
 
 // The retro before this one holding class fixes, by the time its collect ran. [[spec/guidance/retro/effect]]
@@ -76,6 +83,7 @@ export function effect(it, name) {
       `${JSON.stringify({ last: "", classes: [], battery }, null, 2)}\n`,
     );
     console.log("No earlier retro holds class fixes, so nothing stands to measure.");
+    if (battery) console.log(`battery  baseline ${battery.total.now} ms, which the next retro reads against`);
     return 0;
   }
   const record = recordOf(it.disk.read(it.join(homeOf(it, last), CLASSES)));

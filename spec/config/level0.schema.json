@@ -209,6 +209,19 @@
         }
       }
     },
+    "battery": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "runs": {
+          "type": "number",
+          "unit": "runs",
+          "help": "The check's runs the stamp keeps at one commit. A retro reads each part's median over them."
+        }
+      }
+    },
     "names": {
       "type": "object",
       "required": [
@@ -222,6 +235,24 @@
           "type": "number",
           "unit": "words",
           "help": "The words a file, a folder and a branch name each hold at most."
+        }
+      }
+    },
+    "wait": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "most": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The span the wait tool holds at most before it returns with no signal."
+        },
+        "quiet": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The span a file stands unchanged before the wait reads it as quiet."
         }
       }
     },
@@ -327,6 +358,11 @@
           "type": "string",
           "unit": "span, as 30m, 12h or 7d",
           "help": "The span a file stands untouched before a hand takes it."
+        },
+        "holdFor": {
+          "type": "string",
+          "unit": "span, as 30m, 12h or 7d",
+          "help": "The span the hand holds its file against every other write. 0 switches the hold off."
         }
       }
     },

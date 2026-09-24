@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -169,6 +169,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 7583e31729f7705e0b826ec1ff2ae16620a69910
+    hash_after: 7583e31729f7705e0b826ec1ff2ae16620a69910
+reason: done
 ---
 
 # Ask
@@ -370,17 +375,41 @@ now refuses the hand-back, where an error alone did before.
 
 <!-- the form is files -->
 
+- spec/tickets/one-reader-judges-a-verdict.md
+- src/bridge/findings.js
+- src/scripts/pull-chapter.js
+- src/scripts/pull.js
+- spec/design_output/pull.md
+- test/level0/one-reader.test.js
+- test/level0/findings.test.js
+- test/level0/pull-chapter.test.js
+- test/level0/pull-fields.test.js
+- test/level0/pull.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- The pull opens Vale on `valeArgvOf` and reads through `readsText`, as `findingsOver` does.
+- A warning now refuses the hand-back, the level the lint names.
+- The semicolon case comes back refused at the ticket's own line.
+- The marker cases hold the pull's list against `findingsOver` over one ticket.
+- `./RUNME.sh check` answers 0 on the branch.
+- The hunk in `pull.js` beside `verdictFlag` is a format fix, and rides as trivial.
+- Craft, no return: `one-reader.test.js` landed inside commit a2854316, whose message names a todo row.
+- Craft, no return: the third case in `one-reader.test.js` repeats the export assertions the fourth opens on.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the refusing level stands in the pull note, and the code comments point at it
 
 # Discussion
 

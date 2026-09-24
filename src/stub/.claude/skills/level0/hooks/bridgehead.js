@@ -1,5 +1,5 @@
 // The bridgehead: the one plugin a stub carries. At session start it finds
-// the vehicle on three roads, clones the upstream where none stands, and
+// the vehicle along its roads, clones the upstream where none stands, and
 // attaches through the vehicle's own verb. The hook the attach writes carries
 // the cage from the next session.
 // [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]

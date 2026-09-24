@@ -179,6 +179,28 @@ a time, and the calls ending a turn pass whatever stands.
 The list stands in `.se/.runtime/refactor.json`, one entry a warning, which
 the lint writes at each check. `refactor.grace` names the calls that pass.
 
+## The hand holds its file
+
+Hands writing one file drop each other's work. So the refactoring hand
+holds the file it drains, and `refactor-hold.js` keeps the hold in
+`.se/.runtime/refactor-hold.json`.
+
+| when | what the hold does |
+|---|---|
+| the stop door spawns the hand | it names the file, no hand yet, and the time |
+| the first helper writes that file | its `agentId` fills the hand |
+| the hand answers, or its spawn fails | `refactor.answered` takes the hold off |
+| the hold stands past `refactor.holdFor` | it reads as none, and the next hand takes the file |
+| a session starts | the hold comes off, because no hand of the last session answers here |
+
+The write door refuses the held file to every other hand, the session's own
+too. Write, Edit, the patch and the mint all carry the call's `agentId` there.
+
+The door tells hands apart by `agentId` alone. So the first helper to write the
+file owns it, whatever its spawn asks of it. A Bash write, as `sed -i`, meets no
+write door, so the hold covers it nowhere. A hand working past the span loses
+the hold, and the next hand to write its file takes it.
+
 ## The plan
 
 Where a model keeps a private todo list, this tree keeps it in the queue. A
@@ -191,7 +213,14 @@ holds the door.
 |---|---|
 | what you work on now, by title or ticket name | the plan names it, and the queue draws it held |
 | which todos you finish | they leave the queue |
-| which todos you add, each at its place | they land, up to `plan.mostOpen` open ones |
+| which todos you add, each at its place | they land, up to `plan.mostOpen` open ones, and the answer names the place each takes |
+
+A place digit reads the queue as it stands. The todo lands before the row at
+that place, and a digit past the last row writes `end`. `plans` in `plan.js`
+reads the queue through `answerOf`, off a read door it builds on the box. The
+field on another call changes the plan alone, so it reads the queue for the
+digit and no more. For the words a place writes, see
+[[spec/design_output/pull#a-todo-forces-a-place]].
 
 The count of calls reaches the number, and the ask stands due. It lands on the
 first call no other ask holds, and the count starts over at the answer alone.
@@ -315,12 +344,9 @@ work goes on at the answer.
 hold, because a session waiting on its helpers keeps both. It carries no
 `yields`, because the check reads the harness, and no hand's opinion.
 
-| the binding | a stop while a helper runs |
-|---|---|
-| `queue` | refused, so the queue hands the next leaf |
-| `unbound`, `god` | stands |
-
-For what each binding means, see [[spec/design_output/config#the-engine-controls]].
+The claim stands under every binding, `queue` too. A session waiting on its own
+helpers ends the turn on the wait, and the helper's answer wakes it. For what
+each binding means, see [[spec/design_output/config#the-engine-controls]].
 
 ## A refusal names its check
 
@@ -335,6 +361,18 @@ Every refusal of a claim says which check falls, and what the check sees.
 `FALLS` carries what a check sees, one entry a check. The plan check names every
 todo and the thing in hand, and says to name each under `done`. The stop call
 skips the checks reading the answer's text, since no answer stands yet.
+
+## A refusal names the binding
+
+The last line of every refusal names the binding, the file that sets it, and a
+moment. `bindingLine` in `src/bridge/binding.js` writes it.
+
+- `whereFrom` in `src/bridge/config.js` reads the local file, then the tracked file.
+- `asks` reads those same layers, so the line names no layer the hook skips.
+- The environment stays out of both, because the hook reads none of it.
+- The moment is when the server first reads the binding after a change.
+- The box keeps it in memory, so a restart of the server loses it.
+- Each change writes a line in the log under `binding`.
 
 ## A check beats a claim
 

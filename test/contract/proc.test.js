@@ -151,3 +151,18 @@ test("the real door hands standard input to the program", () => {
   );
   assert.equal(said.stdout, "back");
 });
+
+// A wait reads a process's end off its number. [[spec/design_output/level0#the-wait-returns-on-signals]]
+test("a process stands while it runs, and a number nothing runs under stands nowhere, in the real door and the fake alike", () => {
+  const door = proc();
+  const ended = door.run([
+    process.execPath,
+    "-e",
+    "process.stdout.write(String(process.pid))",
+  ]);
+  const real = [door.alive(process.pid), door.alive(Number(ended.stdout))];
+  assert.deepEqual(real, [true, false]);
+  const fake = fakeProc();
+  fake.lives.add(process.pid);
+  assert.deepEqual([fake.alive(process.pid), fake.alive(Number(ended.stdout))], real);
+});

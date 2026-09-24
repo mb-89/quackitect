@@ -26,6 +26,12 @@ steps:
           - name: approach
             form: text
             says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
       - name: review
         does: reads the approach against the ask
         not: draft

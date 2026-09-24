@@ -6,15 +6,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
-import {
-  batteryDelta,
-  batteryOf,
-  filesIn,
-  partsTimed,
-  redIn,
-  slowestIn,
-  spawnsIn,
-} from "../../src/scripts/battery.js";
+
+const { batteryDelta, batteryOf, filesIn, partsTimed, redIn, slowestIn, spawnsIn } = battery;
+import * as battery from "../../src/scripts/battery.js";
 
 test("the clock over the parts holds what each took, and hands each answer through", async () => {
   const clock = fakeClock("2026-01-01T00:00:00.000Z", 250);
@@ -182,4 +176,17 @@ test("a delta against no earlier report reads every part and case as new", () =>
   assert.deepEqual(said.unrun, []);
   assert.deepEqual(said.red, []);
   assert.deepEqual(said.spawns, { before: null, now: null });
+});
+
+// One run reads the box's noise, so a retro reads each part's median over the kept runs. [[spec/guidance/retro/effect]]
+test("three runs keep each part's median, and a part reads only off the runs that reached it", () => {
+  assert.equal(typeof battery.medianParts, "function", "battery.js answers the median");
+  const runs = [
+    { tests: 100, go: 40, rules: 10 },
+    { tests: 300, go: 60 },
+    { tests: 200, go: 50, rules: 30 },
+  ];
+  assert.deepEqual(battery.medianParts(runs), { tests: 200, go: 50, rules: 20 });
+  assert.deepEqual(battery.medianParts([{ tests: 7 }]), { tests: 7 });
+  assert.deepEqual(battery.medianParts([]), {});
 });

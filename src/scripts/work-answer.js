@@ -153,7 +153,7 @@ export function planHere(it) {
 function todoRows(plan) {
   return plan.todos
     .filter((one) => one?.title)
-    .map((one) => ({ name: String(one.title), path: "", text: "", front: { todo: one.todo ?? "last" }, plan: true }));
+    .map((one, order) => ({ name: String(one.title), path: "", text: "", front: { todo: one.todo ?? "last" }, plan: true, order }));
 }
 
 // The plan's todos as rows of the answer, which the tab draws beside the tickets with no link. [[spec/design_output/stop#the-plan]]

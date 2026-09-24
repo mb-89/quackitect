@@ -17,6 +17,15 @@ export function proc() {
     if (tally) disk().append(tally, `${argv[0]}\n`);
   };
   return {
+    // A signal of nothing asks whether the number runs, and a refusal means it runs under another owner. [[spec/design_output/level0#the-wait-returns-on-signals]]
+    alive(pid) {
+      try {
+        process.kill(Number(pid), 0);
+        return true;
+      } catch (error) {
+        return error?.code === "EPERM";
+      }
+    },
     run(argv, init = {}) {
       noted(argv);
       const ran = spawnSync(argv[0], argv.slice(1), {

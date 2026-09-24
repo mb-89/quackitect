@@ -26,6 +26,7 @@ import {
   wordsIn,
 } from "../../.claude/skills/level0/lib/answer.js";
 import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
+import { holdsForAnswer, onPromptSubmit } from "../../src/bridge/answer.js";
 
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 test("a person opens a turn, and a machine does not", () => {
@@ -350,4 +351,13 @@ test("a shape finding asks for a rewrite whatever the score", () => {
   assert.equal(shapeIn([{ rule: "Passive" }]), false);
   assert.equal(bandOf(0.1, bands, [{ rule: NEEDS }]), "rewrite");
   assert.equal(bandOf(0.1, bands, [{ rule: "Passive" }]), "clean");
+});
+
+// [[spec/design_output/level0#the-first-call-asks]]
+test("after an owner prompt the first Bash call asks for the reply, and a helper's call passes", () => {
+  const box = { log: { say: () => {} } };
+  onPromptSubmit({ text: "get to work", origin: { kind: "composer" } }, box);
+  assert.equal(holdsForAnswer({ tool: "Bash", agentId: "a1" }, box), null, "a helper's call passes");
+  assert.deepEqual(holdsForAnswer({ tool: "Bash" }, box), { needs: "reply" }, "the first call asks");
+  assert.deepEqual(holdsForAnswer({ tool: "Bash" }, box), { needs: "reply" }, "and so does the next");
 });

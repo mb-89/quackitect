@@ -10,7 +10,7 @@ with `./RUNME.sh branch merge`. The merge runs on the desk's clone, checks the
 merged tree, and frees the open tickets. `branch close` then deletes the branch.
 For the road, see [[spec/design_output/work#the-round-trip]].
 
-Two frictions push toward a pull request:
+These frictions push toward a pull request:
 
 | friction | where it bites |
 |---|---|

@@ -1,5 +1,5 @@
 // The frame the window draws: the strip of tabs, the numbers opening them, the
-// three bands of the help and the footer of status marks. Every model here
+// bands of the help and the footer of status marks. Every model here
 // reads memory and no file.
 
 package main

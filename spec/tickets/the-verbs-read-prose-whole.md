@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -89,7 +89,51 @@ steps:
 group: the-review-lands-overnight
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 614c1aa4b8e9220e93e59a8afa6bbbf3016a1391
+    hash_after: 614c1aa4b8e9220e93e59a8afa6bbbf3016a1391
+  - step: design/review
+    hand: box dcd73916add7 · claude-code-remote · helper-2
+    hash_before: 09245012fb0b240a8abcabdad6f399dccd5597ff
+    hash_after: 09245012fb0b240a8abcabdad6f399dccd5597ff
+  - step: implement/tests-red
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: b2e6ff24a06f4b7d1561e2042d9ac5157a966350
+    hash_after: b2e6ff24a06f4b7d1561e2042d9ac5157a966350
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 31f4eb1d08844b9fdeecdb6a3f6d1b2667b94010
+    hash_after: 31f4eb1d08844b9fdeecdb6a3f6d1b2667b94010
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box dcd73916add7 · claude-code-remote
+    hash_before: 7055d603b289644597dcd8fe375d1a6d46bbddaa
+    hash_after: 7055d603b289644597dcd8fe375d1a6d46bbddaa
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 37 test(s) pass in 4 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box dcd73916add7 · claude-code-remote · helper-7
+    hash_before: ec7f3db69ac16d4dfd14f29fe41397fa09d275aa
+    hash_after: ec7f3db69ac16d4dfd14f29fe41397fa09d275aa
+reason: done
 ---
 
 # Ask
@@ -116,6 +160,36 @@ step: design/draft
 
 <!-- the form is text -->
 
+One reading over a ticket's text in memory, shared by the pull, the open and
+the note. The pull's half landed it inside `voiceFaults`, so this change lifts
+it out.
+
+| part | the file | what changes |
+|---|---|---|
+| the reading | `src/bridge/findings.js` | `readsDraft(it, path, text, lines)` runs Vale on `valeArgvOf` with the text on stdin, then `readsText` |
+| what it keeps | the same | the findings at error and at warning on the lines the caller names |
+| the pull | `src/scripts/pull-chapter.js` | `voiceFaults` calls `readsDraft` over its chapter's lines, and `REFUSES` moves beside the reading |
+| the open | `src/scripts/ticket-ask-lint.js` | `askFaults` calls `readsDraft` over the whole ticket, and keeps the Ask's lines |
+| the note | `src/scripts/ticket.js` | `note` reads the minted text through `readsDraft` before it writes, and keeps the Ask's lines |
+| its refusal | the same | the note writes nothing, prints each finding at its line, and exits 1 |
+| the routes | `test/contract/process.test.js` | a case mints a ticket off every route under `spec/processes`, and real Vale reads it |
+| what it holds | the same | no finding stands on a line the route writes: a heading, a `does` comment or a `says` comment |
+| the design | `spec/design_output/pull.md#the-voice-reads-the-evidence` | the chapter names the open and the note beside the pull |
+
+The cases:
+
+- `ticket.test.js`: `ticket open` over an Ask carrying a semicolon refuses, naming `Characters`
+- `ticket.test.js`: `ticket note a-name "one; two"` refuses, and writes no file
+- `one-reader.test.js` keeps passing, because the pull reads through the same function
+
+The callers:
+
+- `handBack` in `pull.js` calls `voiceFaults`
+- `open` in `ticket.js` calls `askFaults`
+- `retro-new.js` mints through `mintedNote`, and the route case covers what it renders
+
+The cost: a warning in a route's own text now fails the contract case, and the change fixes each one it finds.
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -125,6 +199,22 @@ step: design/draft
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- The road, the level, the routes case and the callers match the ask and the code.
+- Craft: a `readsDraft` stands in `prose.js` already, as the handler of `check_prose`.
+- Give the shared reading a name apart from it, so one name reads one thing.
+- Craft: the ask names `readsProse`, and the approach reads through `readsText`.
+- Say why in the approach: `readsProse` drops findings the lint keeps.
+- Craft: `test/level0/ticket.test.js` holds the door's cases, and the verbs have no case there.
+- Put the open case in `ask-lint.test.js`, and the note case in `ticket-verb.test.js`.
+- Craft: a case in `ask-lint.test.js` says a warning leaves the open alone.
+- The change turns that case around, so name it beside the cases.
+- Craft: `askFaults` takes the rows `askLines` keeps, and those rows drop the comment rows.
+- Hand `askFaults` the whole ticket and the Ask's first and last line, so a finding names its file line.
+- Craft: the stated cost leaves out a draft whose Ask carries a warning today.
+- That draft stops opening until a hand rewrites its Ask.
+- Craft: `retro-new.js` puts its `--why` line in the Ask, and no reading covers it.
 
 # implement
 
@@ -138,17 +228,35 @@ step: design/draft
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/ask-lint.test.js test/level0/ticket-verb.test.js test/level0/retro-new.test.js test/contract/process.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Five cases fail on their own assertion, and the route case passes already. Real Vale finds no line a route writes today, so that case holds the routes from here on.
+
+- `ask-lint.test.js`: an error on the Ask names the file's line 10, and the fake Vale reads the lint's argv.
+- `ask-lint.test.js`: a warning on the Ask refuses the open, and a warning past the Ask opens it.
+- `ask-lint.test.js`: an Ask carrying a semicolon refuses, naming `Characters` at line 10.
+- `ticket-verb.test.js`: `ticket note a-name "one; two"` refuses and writes no file.
+- `retro-new.test.js`: a `--why` line carrying a semicolon refuses and writes no ticket.
+- `process.test.js`: a ticket minted off every route draws no finding from real Vale.
+- `semicolon-vale.js`: a fake Vale that names each semicolon on the line the text holds it.
+
+The shared reading stands as a stub named `voiceOver` in `src/bridge/findings.js`, so the route case builds. No ticket under `spec/tickets` stands a draft today.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The tests touch the three verbs, the shared reading and the routes, and the ask names each one.
+- Vale reaches the cases through the fake process door, and the route case drives the real Vale.
+- Each new case carries a pointer to the design chapter it holds.
 
 ## reflect
 
@@ -176,11 +284,17 @@ step: design/draft
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint spec/design_output/pull.md src/bridge/findings.js src/scripts/pull-chapter.js src/scripts/ticket-ask-lint.js src/scripts/ticket.js src/scripts/retro-new.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change touches the files the ask and the review name, and no other.
+- Vale stays behind the process door, and the fake process answers it in every level0 case.
+- Each new function carries a pointer to `spec/design_output/pull.md`, and the chapter names the road.
 
 ## tests-green
 
@@ -192,11 +306,15 @@ step: design/draft
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/ask-lint.test.js test/level0/ticket-verb.test.js test/level0/retro-new.test.js test/contract/process.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -204,11 +322,26 @@ step: design/draft
 
 <!-- the form is text -->
 
+Every verb taking a hand's prose into a ticket reads it the way the lint reads the file.
+
+- `voiceOver` in `src/bridge/findings.js` runs Vale on `valeArgvOf` with the text on stdin, then `readsText`.
+- It keeps the findings at error and at warning on the lines the caller names.
+- The pull's `voiceFaults` calls it over the leaf's chapter, and `REFUSES` stands beside it.
+- `askFaults` hands it the whole ticket and keeps the Ask's lines, so a line number names the file's line.
+- `ticket open` now refuses an Ask carrying a warning, and a draft like that waits for a rewrite.
+- `ticket note` and `retro new` read the Ask they mint, and a refusal writes no file.
+- A contract case mints a ticket off every route, and real Vale finds nothing on it.
+- The road reads through `readsText`, because `readsProse` drops findings the lint keeps.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change touches the files the ask and the review name, and no other.
+- Vale stays behind the process door, and the fake process answers it in every level0 case.
+- Each new function carries a pointer to `spec/design_output/pull.md`, and the chapter names the road.
 
 # verdict
 
@@ -220,17 +353,46 @@ step: design/draft
 
 <!-- the form is files -->
 
+- spec/tickets/the-verbs-read-prose-whole.md
+- spec/design_output/pull.md
+- src/bridge/findings.js
+- src/scripts/pull-chapter.js
+- src/scripts/retro-new.js
+- src/scripts/ticket-ask-lint.js
+- src/scripts/ticket.js
+- test/contract/process.test.js
+- test/level0/ask-lint.test.js
+- test/level0/pull-chapter.test.js
+- test/level0/retro-new.test.js
+- test/level0/semicolon-vale.js
+- test/level0/ticket-verb.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+- The open, the note and the retro's mint read the whole ticket through `voiceOver` at the lint's level.
+- The pull reads through the same function, and `REFUSES` stands once in `findings.js`.
+- The route case runs on real Vale in the check, and it passes.
+- Each verb has a level0 case with a semicolon, and each case refuses and writes no file.
+- `./RUNME.sh check` exits 0 on ec7f3db6.
+- Craft: the Ask names `readsProse`, and the road reads through `readsText`.
+- The design chapter gives the reason, so the Ask's word lags the approach.
+- Craft: `ticket-ask-lint.js` now takes `chapterEnd` from `pull-chapter.js`, a large file for one helper.
+- Craft: `ask-lint.test.js` and `retro-new.test.js` reflow lines the change leaves alone.
+- Craft: `pull.md` names the note and the retro's mint in two chapters.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `REFUSES` and the Vale call stand in `findings.js` alone, and each caller points there.
+- The note and the retro's mint stand twice in `pull.md`, a craft point under the pass.
 
 # Discussion
 

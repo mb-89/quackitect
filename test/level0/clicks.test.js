@@ -1,4 +1,4 @@
-// The browser side, driven with no browser. A fake page answers the four calls
+// The browser side, driven with no browser. A fake page answers the calls
 // the script makes, so a click becomes a message here exactly as it does in the
 // webview.
 // [[spec/guidance/code/testing]]
@@ -190,4 +190,33 @@ test("a section a person unticks goes, and the tick rides through a redraw", () 
   restore(root, { picks: { "agent control": true } });
   assert.ok(!section.classList.contains("gone"));
   assert.equal(box.checked, true);
+});
+
+// [[spec/design_output/extension#the-folds-press-at-once]]
+test("the open press opens every group of the config section, and the shut press shuts each", () => {
+  const groups = [
+    node("details.file", { open: false }),
+    node("details.keys", { open: false }),
+    node("details.keys", { open: true }),
+  ];
+  const opens = { dataset: { fold: "open" } };
+  const shuts = { dataset: { fold: "shut" } };
+  const root = page(groups);
+  wire(root, () => {}, { get: () => ({}), set: () => {} });
+  const pressed = (button) =>
+    root.fire("click", { closest: (want) => (want === ".fold" ? button : null) });
+
+  pressed(opens);
+  assert.deepEqual(
+    groups.map((one) => one.open),
+    [true, true, true],
+    "every group opens",
+  );
+
+  pressed(shuts);
+  assert.deepEqual(
+    groups.map((one) => one.open),
+    [false, false, false],
+    "every group shuts",
+  );
 });

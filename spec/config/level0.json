@@ -25,12 +25,13 @@
     "rule": 6
   },
   "refactor": {
-    "comment": "The hand the stop door starts while the list stands past the number and a file rests past the window. The grace is the calls the engine lets pass before it refuses them. spec/guidance/code/refactoring.md says what that hand does.",
+    "comment": "The hand the stop door starts while the list stands past the number and a file rests past the window. The grace is the calls the engine lets pass before it refuses them. The hold keeps the hand's file its own for the span, and 0 switches it off. spec/guidance/code/refactoring.md says what that hand does.",
     "parallel": true,
     "mostWarnings": 10,
     "mostAtOnce": 1,
     "untouchedFor": "5m",
-    "grace": 3
+    "grace": 3,
+    "holdFor": "30m"
   },
   "grace": {
     "comment": "The calls the engine lets pass before an ask refuses them: the owner's ask for an update, and the finish hold before it stops hard. spec/design_output/stop.md, chapter The grace, says the rest.",
@@ -62,6 +63,11 @@
     "ceiling": 15,
     "words": 150
   },
+  "wait": {
+    "comment": "The wait tool's spans, in seconds: its cap, and the span a file stands unchanged before it reads as quiet. spec/design_output/level0.md, chapter The wait returns on a signal, says the rest.",
+    "most": 600,
+    "quiet": 30
+  },
   "log": {
     "comment": "The level this box writes at, on the ladder debug, info, warn, error, fatal. info writes every line a door says, debug writes what the hooks see too, warn writes a refusal and a fault, error writes a fault, fatal writes what ends a session.",
     "level": "info"
@@ -70,6 +76,10 @@
     "comment": "The ceilings a function and a file hold, in lines. The write door refuses a write that grows past one, and the check names what stands past one.",
     "functionLines": 150,
     "fileLines": 600
+  },
+  "battery": {
+    "comment": "The check's runs the stamp keeps at one commit, and a retro reads each part's median over them. spec/guidance/retro/effect.md says the rest.",
+    "runs": 5
   },
   "names": {
     "comment": "The words a file, a folder and a branch name each hold at most. Vale counts a heading, and lib/names.js counts a path.",
