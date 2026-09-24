@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [yours-counts-the-waiting]
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -146,6 +146,12 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/the-config-declares-work.md:309:3: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: verdict
+    hand: box 2bc65ec92430 · claude-code-remote · helper-9
+    hash_before: 87c377afcd51464dee1a3cde02a1e165e5075a93
+    hash_after: 87c377afcd51464dee1a3cde02a1e165e5075a93
+    returns: 1
+    why: work-buttons.test.js asserts each button waits undrawn, and tree.test.js owns that fact already.; work-buttons.test.js asserts each button carries help, and tree.test.js owns that fact already.; Drop both asserts from work-buttons.test.js, and keep the icon and widget checks.
 ---
 
 # Ask
@@ -367,17 +373,32 @@ Each button carries no group, so the sidebar draws none of them yet. The desk gr
 
 <!-- the form is files -->
 
+- spec/tickets/the-config-declares-work.md
+- spec/config/level0.schema.json
+- test/contract/work-buttons.test.js
+- test/contract/tree.test.js
+- test/contract/sidebar.test.js
+- test/level0/sidebar.test.js
+- spec/design_input/the-editor-draws-the-ticket.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+- work-buttons.test.js asserts each button waits undrawn, and tree.test.js owns that fact already.
+- work-buttons.test.js asserts each button carries help, and tree.test.js owns that fact already.
+- Drop both asserts from work-buttons.test.js, and keep the icon and widget checks.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place. The undrawn and help facts stand twice, so the verdict fails.
 
 # Discussion
 
