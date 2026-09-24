@@ -96,6 +96,32 @@ A side panel reading the same script is the road back. Where a release breaks
 the inset, the same drawing opens beside the text, and nothing past its host
 changes.
 
+# The drawing takes an edit
+
+The owner wants the drawing to take an edit, and a desk trial decides how far.
+Each thing the drawing shows comes from a field, and the field says who writes
+it:
+
+| the drawing shows | the field | who writes it | an edit in the drawing |
+|---|---|---|---|
+| the leaves and the phases | `steps` | a person, and the verbs | adds, drops or moves a step the ticket has yet to reach |
+| a pass edge | the order of `steps` | a person, and the verbs | reorders the steps ahead |
+| a fail edge | `on_fail` | a person, and the verbs | draws the step a hand-back that fails returns to |
+| a person's node, a dotted node | `by`, `when` | a person, and the verbs | picks the hand, or the condition |
+| a form behind a leaf | the leaf's chapter in the body | the hand at that leaf | fills the evidence |
+| the pointer, the skips, the returns | `step`, `record` | the pull alone | none, and a press on the pointer runs the take or the hand-back |
+
+On a process file the drawing edits every row but the last, since a process
+holds no pointer and no record.
+
+The write door refuses an agent's hand edit to `steps`, and a person stands
+outside that door. So the drawing edits under the rights a person already
+holds. A route the drawing moves drifts from its process, and `process_hash`
+names that drift.
+
+The trial answers one question: whether a person edits a ticket's route at
+all, or edits the process and runs `./RUNME.sh ticket update`.
+
 # The work group
 
 The group holds three buttons and no switch:
@@ -136,6 +162,28 @@ that door, so the save writes them through the verb.
 A save over a ticket whose route stands already copies nothing. A changed
 process goes to `./RUNME.sh ticket update`, which a person runs.
 
+# A report takes a template
+
+A report is work output, and it stands apart from any process. The tree holds
+two kinds today:
+
+| the kind | where it stands | its shape |
+|---|---|---|
+| a markdown report | the review's answer, the retro's report chapter | the note or the answer that carries it |
+| an HTML page beside a note | `spec/funnel` and `spec/design_input` | its own style sheet, written by hand each time |
+
+Each HTML page carries fonts, colours and a layout of its own. A reader meets
+a new look on every page, and a hand spends its turn on the look.
+
+The shape on offer is a template per kind of report, under `spec`. The report
+carries the content, and the template carries the look. Two roads write the
+page:
+
+| road | what it costs |
+|---|---|
+| a projection writes the HTML from a markdown report and its template | one source, and the page follows it, at the price of what markdown draws |
+| a hand writes the HTML inside the template's frame | every drawing HTML takes, at the price of a second copy beside the note |
+
 # What closes level one
 
 | the piece | where it stands |
@@ -148,6 +196,7 @@ process goes to `./RUNME.sh ticket update`, which a person runs.
 | the work group and its three buttons | this note |
 | a new ticket that fills on save | this note |
 | the engine keys leaving the schema | this note |
+| a template per kind of report | this note |
 | the open tickets under `spec/tickets` | a search for `state: open` there names them |
 
 Level one closes where a person takes a ticket, works it and hands it back
@@ -159,8 +208,9 @@ from the editor alone, with no terminal and no switch.
 |---|---|
 | whether the launch flag reaches a VS Code already running | `./RUNME.sh` passes it on a fresh launch, and a running window keeps the flags it starts with, where the editor's own `argv.json` holds the flag instead |
 | whether the inset takes the height of a drawing that grows | a long route either scrolls inside the inset or asks for a height on every draw |
-| whether the drawing takes an edit, or reads alone | an edit brings the library of blocks and the evidence form behind a leaf, which the design input sets as desk work |
-| where a new ticket lands, `spec/tickets` or `.se/tickets` | a private ticket travels nowhere, and a note is the smallest ticket |
+| how far the drawing edits a ticket's route | the desk trial, and the library of blocks the design input sets as desk work |
+| which kinds of report take a template first | the review, the retro and the page beside a note each read differently |
+| whether a projection or a hand writes the HTML | a single source against every drawing HTML takes |
 | whether pull for me opens the ticket or its chapter at the step | the chapter puts the cursor where the evidence goes |
 | what calls for an engine that lives on | work that moves with nobody asking, and today the routine's schedule carries all of it |
 | what the design input and `level-zero-closes` say once the beat goes | both name the beat and the four controls, and a ruling here rewrites both |
