@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -111,6 +111,11 @@ record:
     hand: box 711806cd7e87 · claude-code-remote
     hash_before: 7a6c89f36d2a406c881e459862a271d6758f4ed1
     hash_after: 7a6c89f36d2a406c881e459862a271d6758f4ed1
+  - step: retro/cloud
+    hand: box 711806cd7e87 · claude-code-remote
+    hash_before: 080b1b2fa88c1bde51db73a4f4657605cd6374b8
+    hash_after: 080b1b2fa88c1bde51db73a4f4657605cd6374b8
+reason: done
 ---
 
 # Ask
@@ -243,17 +248,26 @@ The graph carried no route fields and no hold, so the page could not build the r
 
 <!-- the form is list -->
 
+- nothing: install fetched every tool, and the browser case ran against the Chromium the box carries
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the commit door's test rule, on `layout.js` changed with no test staged
+- the list item word cap, at the child's hand-back and at this retro
+- no conflict at the take, which brought main in clean
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted outside this group
+- the handover: [[spec/design_output/drawing]] names every message the editor host runs, for group `the-editor-holds-the-drawing`
 
 # Discussion
 
