@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [the-route-edits-ahead]
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -123,6 +123,17 @@ record:
     hash_after: 6d3a680f277e7b83b2c3f0ac10cc05e4c6780afa
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 3f174fcb17d945154eea54dd81abf5555f610bcf
+    hash_after: 3f174fcb17d945154eea54dd81abf5555f610bcf
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 29 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -310,7 +321,7 @@ The drift, the missing version and `driftOf` fail on their own assertion. The co
 | no version answering the hash | the reason, no write, exit 1 |
 | either refusal under `--over` | the new route, over the edit |
 
-So a route a person edits through `ticket route` survives an update, or the verb says where it stands.
+So a route a person edits through `ticket route` survives an update, or the verb says where it stands. The update cases in `test/level0/ticket-verb.test.js` and `test/level0/roots.test.js` carry no history, so each passes `--over`. A stub whose method root stands in another repository finds no version through the work root's git, so it updates under `--over` too.
 
 
 ### checked
