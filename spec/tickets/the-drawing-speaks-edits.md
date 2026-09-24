@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process_hash: 05e53b89dab63152
 group: the-drawing-draws-a-route
 depends_on: [the-ticket-answers-the-editor]
 step: do
+record:
+  - step: do
+    hand: box 711806cd7e87 · claude-code-remote
+    hash_before: 806dee5d3bc417d3ea7d019ce1b66903d5cd31bc
+    hash_after: 87d0ad664042f7b3bb8a383d77b8a78ece035207
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 31 test(s) pass in 4 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -89,8 +102,8 @@ The `graph` message now carries `steps` and `held`, since the graph holds no rou
 
 <!-- the form is checklist -->
 
-- the change follows the ask, and a move or drop stands as the edit, while an add waits on the desk trial
-- the cleanup it reveals is in the change: the reached rule comes from `reachedOf`, so the page and the verb share one rule
+- the change follows the ask: a move or drop is the edit, and an add waits on the desk trial
+- the cleanup is in the change: `reached` comes from `reachedOf`, so the page and the verb share one rule
 - the protocol stands in the design output note alone, and every function points at its heading
 
 # Discussion
