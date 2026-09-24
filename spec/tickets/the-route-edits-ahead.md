@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -161,6 +161,17 @@ record:
     hash_after: 624466889de2c2f86c303d64c7490cf97bc8260e
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 52f23082b3de19a83ff5f4ad6dc295dae421a370
+    hash_after: 52f23082b3de19a83ff5f4ad6dc295dae421a370
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 35 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -368,7 +379,7 @@ The findings share one class: the change wrote a thing twice where one home stoo
 - every reached leaf opens the route, in its order and as it stood
 - a phase holding one keeps each field but `steps`
 
-A refusal names the leaf or the phase, and writes nothing. Both roads answer one JSON object, so the editor reads the verb's answer as data. `reachedOf` reads the reached leaves once, and `updated` calls it too.
+A refusal names the leaf or the phase, and writes nothing. Both roads answer one JSON object, so the editor reads the verb's answer as data. `reachedOf` reads the reached leaves once, and `updated` calls it too. A route compares its leaves through `canonicalOf`, and every refusal exits 1.
 
 
 ### checked
