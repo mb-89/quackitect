@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -193,6 +193,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 2bc65ec92430 · claude-code-remote · helper-15
+    hash_before: 573666e77da33c8f90842be72cb6ea41d5f08d98
+    hash_after: 573666e77da33c8f90842be72cb6ea41d5f08d98
+reason: done
 ---
 
 # Ask
@@ -422,7 +427,6 @@ The findings share one class: the change rebuilt a reading the pull already owns
 - src/scripts/cli.js
 - test/level0/ticket-yours.test.js
 - src/scripts/pull-route.js
-- src/engine/group.js
 
 ## verdict
 
@@ -430,15 +434,14 @@ The findings share one class: the change rebuilt a reading the pull already owns
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- craft: `handOut` still builds its own tagged pool, so `taggedFirst` has one caller and the drift stands
-- fix: `handOut` calls `taggedFirst`, or both read one tagged filter from pull-hand.js
-- craft: `waiting` reads `front.step` raw, so an empty pointer skips the first leaf `stepPathOf` resolves
-- `leafOf` now resolves the nearest `by`, and a case proves a person phase counts
-- `frontIn` now delegates to `frontOf`, which answers the repeated front finding
+- `handOut` and `taggedFirst` both call `taggedIn`, so one filter holds the tagged pool
+- `waiting` and `rowOf` read the pointer through `stepPathOf`, as every pull road reads it
+- a case proves a ticket with no pointer counts its first person leaf
+- `leafOf` resolves the nearest `by`, and a case proves a person phase counts
 - `ticket.js` and `cli.js` only wire the verb and its usage, trivial and inside the ask
-- `./RUNME.sh check` exits 0, and queue.test.js with ticket-yours.test.js pass, 15 tests
+- `./RUNME.sh check` exits 0, and queue.test.js with ticket-yours.test.js pass 16 tests
 - no retro stands in the handback
 
 ## checked
@@ -447,7 +450,7 @@ fail
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place. It still fails, since the tagged pool stands in `handOut` and in `taggedFirst`.
+- every fact the change adds stands in one place. `taggedIn` holds the tag filter, and `stepPathOf` holds the pointer read.
 
 # Discussion
 
