@@ -1,5 +1,5 @@
-// The refactoring hand's hold: one file, from the spawn to the hand's answer,
-// and the write door lets the hand holding it alone through.
+// The refactoring hand's hold: the one file it drains now, and the write door
+// lets the hand holding it alone through.
 // [[spec/design_output/stop#the-hand-holds-its-file]]
 
 import { join } from "node:path";
@@ -14,9 +14,9 @@ const holdAt = (box) => join(box.work, ...REFACTOR_HOLD.split("/"));
 const nowOf = (box) => Math.floor(box.clock.now().getTime() / MS);
 
 // [[spec/design_output/stop#the-hand-holds-its-file]]
-export function holdsFile(box, file) {
+export function holdsFile(box, file, hand = "") {
   if (!spanOf(asks(box, HOLD_FOR))) return;
-  writesHold(box, { file, hand: "", since: nowOf(box) });
+  writesHold(box, { file, hand, since: nowOf(box) });
 }
 
 // [[spec/design_output/stop#the-hand-holds-its-file]]

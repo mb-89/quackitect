@@ -159,15 +159,16 @@ layers:
     core: spec/vocabulary/core.yml
     terms: spec/vocabulary/terms.yml
     swaps: spec/vocabulary/swaps.yml
-    stems: a plural, a past form and an -ing form of a listed word stand
+    endings: spec/config/stems.yaml
+    stems: a plural, a past form and an -ing form of a listed word stand, and so does a prefix, as the table of endings names
     outside:
       - a code span
       - a link
       - a path
       - a word opening with a capital past the first word
     growth:
-      who: a person, or a session together with the note that defines the word
-      entry: word and defines, a link to the note that defines it
+      who: a person, or a session that needs the word
+      entry: word and means, one line in core words and other terms, and source where it cites an address outside the tree
       review: the retro reads the terms added since, keeps each, or moves it to the swaps with the word to write
       swap: a swap wins over every list, so a swapped word meets a refusal until the writer takes the word it names
     exceptions:

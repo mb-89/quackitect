@@ -21,7 +21,7 @@ style: true
 12. Name the role, and leave the person out: the owner, the agent, the reader, the reviewer, the maintainer.
 13. Open an answer with a table of the questions the prompt asks, then the TL;DR list. `^`
 14. Close an answer ending on a stop call with the numbered table What the agent needs. `^`
-15. Write a core word, or a term a note defines. Add a term with its note, and add no jargon. [[spec/vocabulary/terms.yml]]
+15. Write a core word, or a term the dictionary defines. Add a term with the line saying what it means, and add no jargon. [[spec/vocabulary/terms.yml]]
 
 # Examples
 

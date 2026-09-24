@@ -291,9 +291,14 @@ session on that box reads. Level zero reads it at `prompt.context`, hands it to
 the agent as the block `level0-handover` after the rules, and deletes it. So it
 stays fresh, and nobody keeps a rule about clearing it.
 
-The same read drops from the plan the work in hand and every todo whose title
-names the handover. So a handover stands in the work tab until the next session
-reads it, and a hand closes no row of it.
+A handover todo is one whose title names the handover, and it stands in the
+work tab from the context mark to the clear alone:
+
+| when | the plan |
+|---|---|
+| before `context.handoverAt` comes due | drops a handover todo and the work in hand naming it, and takes none |
+| from the mark to the clear | takes a handover todo |
+| the next session reads the handover | drops the work in hand and every handover todo, so a hand closes no row of it |
 
 `prompt.context` fires at a session's first prompt and again after a
 compaction and a `/clear`. A `/clear` fires no `session.start`, so a handover

@@ -1,0 +1,19 @@
+{
+  "name": "inset-probe",
+  "displayName": "quackitect inset probe",
+  "description": "The trial of spec/tickets/the-editor-takes-an-inset: draws a page between the lines of a ticket, and writes what it finds.",
+  "version": "0.0.1",
+  "private": true,
+  "publisher": "quackitect",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "main": "./extension.js",
+  "enabledApiProposals": [
+    "editorInsets"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ]
+}

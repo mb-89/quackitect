@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -74,6 +74,18 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
+step: children
+record:
+  - step: sync
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: f557e5c56139658231d08fe4af300c90ceea4568
+  - step: sync
+    skipped: true
+    why: the box runs off the cloud
+  - step: split
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 59f5ef62a4da20b6365fb3e30222335890ecfebf
+    hash_after: abe7834950dc122148a4ef8cbf7dd799963e6b78
 ---
 
 # Ask
@@ -101,11 +113,22 @@ A person takes a ticket, works it and hands it back from VS Code alone, and that
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-editor-takes-an-inset]], experiment
+- [[spec/tickets/the-inset-folds-the-frontmatter]], standard
+- [[spec/tickets/the-host-runs-the-verbs]], standard
+- [[spec/tickets/a-save-fills-the-ticket]], standard
+- [[spec/tickets/the-work-group-draws-buttons]], standard
+- [[spec/tickets/the-owner-walks-a-ticket]], question
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each child takes one row of the plan's table, so a reviewer reads it whole
+- the children take the plan's rows one to one, and the walk closes the goal
+- the probe waits on nothing, and every other child names what it waits on under `depends_on`
 
 # children
 

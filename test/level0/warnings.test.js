@@ -12,8 +12,10 @@ import {
   rowOf,
   ruledWarnings,
   standsPast,
-  takesFile,
+  oldestFile,
+  WALK_TOOL,
   WARNING,
+  walksList,
   warnedNote,
   warningsOn,
 } from "../../.claude/skills/level0/lib/warnings.js";
@@ -88,16 +90,16 @@ test("the list stands past the number where the count runs over it", () => {
   assert.equal(standsPast(99, 0), false);
 });
 
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("the hand takes the oldest file outside the window, and none inside it", () => {
+// [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
+test("the oldest file a commit names goes first, and a file no commit names stays out", () => {
   const now = 1_800_000_000;
   const week = 604_800;
   const wrote = { "a.md": now - week * 2, "b.md": now - week * 3, "c.md": now - 60 };
 
-  assert.equal(takesFile(["a.md", "b.md", "c.md"], wrote, now, week), "b.md");
-  assert.equal(takesFile(["c.md"], wrote, now, week), "");
-  assert.equal(takesFile(["d.md"], wrote, now, week), "");
-  assert.equal(takesFile([], wrote, now, week), "");
+  assert.equal(oldestFile(["a.md", "b.md", "c.md"], wrote), "b.md");
+  assert.equal(oldestFile(["c.md"], wrote), "c.md");
+  assert.equal(oldestFile(["d.md"], wrote), "");
+  assert.equal(oldestFile([], wrote), "");
 });
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
@@ -109,6 +111,19 @@ test("the prompt the hand reads names one file and the verbs over it", () => {
   assert.match(said, /RUNME\.sh fix/);
   assert.match(said, /FileCeiling, cut the file first/);
   assert.match(said, /RUNME\.sh split spec\/guidance\/voice\.md --to <path> --lines/);
+});
+
+// The session lands what the hand leaves, so the hand's prompt names no git step. [[spec/design_output/stop#the-hand-walks-the-list]]
+test("the hand's prompts name the walk and no git step", () => {
+  const spawn = walksList("old.md");
+  const next = drains("new.md");
+
+  assert.match(spawn, /old\.md/);
+  assert.match(spawn, new RegExp(`mcp__level0__${WALK_TOOL}`));
+  assert.match(spawn, /no file waits/);
+  for (const said of [spawn, next]) {
+    assert.doesNotMatch(said, /commit|\bgit\b/i);
+  }
 });
 
 // [[spec/design_output/level0#the-ceiling-feeds-the-list]]
@@ -149,10 +164,10 @@ test("a write's warnings replace the file's rows on the list, and leave the othe
 });
 
 // [[spec/design_output/level0#a-warning-feeds-the-list]]
-test("the note after a write names each row, and says the work goes on", () => {
+test("the note after a write names each row, and says the lines stand while the ask goes on", () => {
   const said = warnedNote("a.md", [found("a.md", "warning")], 3);
   assert.match(said, /1 line\(s\) of a\.md stand at warning, and the write lands/);
-  assert.match(said, /carry on/);
+  assert.match(said, /leave the lines as they stand and carry on with the ask/);
   assert.match(said, /a\.md:3 Hedge: Cut the hedge\./);
   assert.match(said, /3 row\(s\) now/);
   assert.equal(rowOf(found("a.md", "warning")), "a.md:3 Hedge: Cut the hedge.");

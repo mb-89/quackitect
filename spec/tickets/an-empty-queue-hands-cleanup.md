@@ -1,0 +1,401 @@
+---
+kind: [[ticket]]
+state: closed
+steps:
+  - name: design
+    reads: [[spec/guidance/voice]]
+    steps:
+      - name: draft
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+      - name: review
+        does: reads the approach against the ask
+        not: draft
+        on_fail: draft
+        reads: [[spec/guidance/review/reviewing]]
+        input: design/draft
+        evidence:
+          - name: verdict
+            form: verdict
+            says: pass or fail, with findings one a line
+  - name: implement
+    reads: [[spec/guidance/code/testing]]
+    needs: ["branch test"]
+    input: design/draft
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements"]
+    steps:
+      - name: tests-red
+        does: writes the tests the ask calls for
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+      - name: reflect
+        does: names the class of error in the findings, and the fix for the class
+        when: returned
+        input: verdict
+        evidence:
+          - name: class
+            form: text
+            says: the class of error the findings describe, and the fix for the class
+      - name: change
+        does: makes the change
+        reads: [[spec/guidance/code/code]]
+        evidence:
+          - name: lint
+            form: command
+            expects: 0
+            says: the tree builds and lints
+      - name: tests-green
+        does: makes the tests pass
+        input: tests-red
+        evidence:
+          - name: tests
+            form: command
+            expects: green
+            says: the same tests pass
+          - name: check
+            form: command
+            expects: 0
+            says: the check is green on the commit
+          - name: says
+            form: text
+            says: what changes and why, for a reader who was not there
+  - name: verdict
+    does: reads every hunk against the ask and the approach
+    not: implement
+    on_fail: implement/reflect
+    reads: [[spec/guidance/review/reviewing]]
+    input: ["diff", "implement"]
+    to: retro
+    checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    evidence:
+      - name: read
+        form: files
+        says: every file you read, one a line
+      - name: verdict
+        form: verdict
+        says: pass or fail, findings one a line
+process: [[spec/processes/standard]]
+process_hash: 7a1a6e274b56e7ee
+group: the-editor-holds-the-drawing
+step: verdict
+record:
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: dffed25933787f0bf1f0f49c35246aaa0fd28d3a
+    hash_after: dffed25933787f0bf1f0f49c35246aaa0fd28d3a
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-2
+    hash_before: 20c28d1bbd74ca8249357d990dc4f1625161f04a
+    hash_after: 20c28d1bbd74ca8249357d990dc4f1625161f04a
+    returns: 1
+    why: "`pull-writes.js`'s `onward` also calls `handOut`, and stands out of the callers list.; `pull-cleanup.test.js`'s fixture carries no `method`.; `asks` joins `box.method` with no guard, and `holdHere` calls it once a hold file stands.; So the refactor row's hold check throws against that fixture, and the approach names no read that survives it."
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 2f4d47d2dd0e543fdae5fbd4e873a6b8e7be7c98
+    hash_after: 2f4d47d2dd0e543fdae5fbd4e873a6b8e7be7c98
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-3
+    hash_before: 038ee57383d79c2c72601311bc73bc9f6ceb2974
+    hash_after: 038ee57383d79c2c72601311bc73bc9f6ceb2974
+  - step: implement/tests-red
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: ced4fee7c3638c25777887c6407387f468f505ad
+    hash_after: ced4fee7c3638c25777887c6407387f468f505ad
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 065e6d65890ffeade2911c56a21e7b888efdd692
+    hash_after: 065e6d65890ffeade2911c56a21e7b888efdd692
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 9951f66dfa0c8c708d6625b9280e86b22ef2db78
+    hash_after: 3ccb82f3fe60e5c489d9540509f7c98571e8c2a8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "src/bridge/stop.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 640. Split it by topic."
+  - step: verdict
+    hand: box d6f05e3a585030 · claude-code · helper-9
+    hash_before: b41d5d173f30611f93db5e7645247c202f2b68d5
+    hash_after: b41d5d173f30611f93db5e7645247c202f2b68d5
+reason: done
+---
+
+# Ask
+
+A desk whose queue stands empty still owes the tree its cleanup. So the pull hands that cleanup out as implicit tickets, in order, whenever one applies. A done cloud branch comes first, on a desk alone. The warnings on the refactor list come next, and the main session drains them. The problems the check names come last.
+
+Without it a session with an empty queue waits, while warnings and failed checks stand until a person remembers them.
+
+- a desk pull meeting no ticket hands out the oldest file on the refactor list, as `test/level0/pull-cleanup.test.js` drives it
+- a file the refactoring hand holds stays out of that hand-out, and the same test drives it
+- an empty list and a failed or stale check stamp hand out the check, and the same test drives it
+- a cloud box's pull meeting no ticket hands out none of it, and the same test drives it
+
+# design
+
+## draft
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
+The pull answers a new word, `cleanup`, where `handOut` meets no leaf to hand, no spawn and no name asked, on a desk alone. A cleanup ticket carries no file and no hold, so each pull reads the list again. The answer names the work and the verbs, in this order:
+
+| order | applies where | the answer hands |
+|---|---|---|
+| merge | a done cloud branch stands | nothing new: the desk pull on trunk hands it ahead of the queue already, through `it.ready` |
+| refactor | the refactor list holds a warning on a file the refactoring hand holds no hold on | the oldest such file by its last commit, with `drains(file)` |
+| check | the list stands empty, and the check stamp reads failed or names a commit other than `HEAD` | `./RUNME.sh check`, and the fixes it names |
+
+- The merge keeps its place ahead of the free tickets, because a closed ticket rules it there.
+- `src/scripts/pull-cleanup.js` holds the reading, because `pull-hand.js` stands near its ceiling.
+- `spec/design_output/pull.md` takes the answer row and a chapter.
+- The pull reads the hold file itself, off `it.disk` at `it.work`, and skips the file it names.
+- `holdHere` reads the config through `box.method`, which the pull's context lacks.
+- A stale hold skips its one file until the next spawn or session clears it.
+
+<!-- the form is text -->
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+
+- `src/scripts/pull-hand.js` `handOut`, at its wait
+- `src/scripts/pull.js` `pull`, which returns what `handOut` answers
+- `src/scripts/pull-writes.js` `onward`, which calls `handOut` after a pass
+
+<!-- the form is list -->
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+
+- `onward` calls `handOut`: the callers list names it, and a pass meeting no next leaf hands out the cleanup too
+- `holdHere` needs `box.method`: the pull reads the hold file itself, so the fixture needs no `method`
+
+<!-- the form is list -->
+
+## review
+
+<!-- reads the approach against the ask -->
+
+### verdict
+
+<!-- pass or fail, with findings one a line -->
+
+<!-- the form is verdict -->
+
+pass
+
+- The callers list now names `pull-writes.js`'s `onward`, which the first review found missing.
+- The approach drops `holdHere` and reads `REFACTOR_HOLD` off `it.disk` directly, so the fixture's missing `method` field costs it nothing.
+- The three-row table and its desk-alone gate answer all four ask bullets, in the ask's own order.
+
+# implement
+
+## tests-red
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+
+<!-- the form is command -->
+
+    ./RUNME.sh branch test test/level0/pull-cleanup.test.js
+
+### seen
+
+<!-- what you see, and what surprises you -->
+
+<!-- the form is text -->
+
+- the stub answers no cleanup, so each case fails on its own assertion
+- the held-file case read the rows of a null answer, so it now asserts the word first
+- the cloud case passed on the stub, so it now shows the desk gets the same cleanup first
+- what surprises the hand: a case asserting a null answer proves nothing against a stub answering null
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+- the change touches the cleanup module and its test, and the pull hand and pull note follow
+- the disk door and the git door carry the reading, and their fakes answer both in the cases
+- the module and the test each open on a comment naming the approach, with a pointer at the pull note
+
+## reflect
+
+<!-- names the class of error in the findings, and the fix for the class -->
+
+### class
+
+<!-- the class of error the findings describe, and the fix for the class -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+## change
+
+<!-- makes the change -->
+
+### lint
+
+<!-- the tree builds and lints -->
+
+<!-- the form is command -->
+
+    ./RUNME.sh lint src/scripts/pull-cleanup.js src/scripts/pull-hand.js spec/design_output/pull.md test/level0/pull-cleanup.test.js test/level0/pull-hand.test.js
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+- the change touches the cleanup module, its test, the pull hand at its wait, and the pull note
+- the module reads through the disk, git and clock doors, and the cases hand in their fakes
+- the module, the call in the pull hand and the pull note each point at the cleanup chapter
+
+## tests-green
+
+<!-- makes the tests pass -->
+
+### tests
+
+<!-- the same tests pass -->
+
+<!-- the form is command -->
+
+    ./RUNME.sh branch test test/level0/pull-cleanup.test.js test/level0/pull-hand.test.js
+
+### check
+
+<!-- the check is green on the commit -->
+
+<!-- the form is command -->
+
+    ./RUNME.sh check
+
+### says
+
+<!-- what changes and why, for a reader who was not there -->
+
+<!-- the form is text -->
+
+A desk pull meeting no ticket hands out the cleanup: the oldest file on the refactor list, then the check. A skipped ticket or a person's step keeps the pull's wait ahead of the cleanup, so a person's question stays in front. A cloud box hands out no cleanup.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+- the pull hand and the pull note carry the ask, and the commit adds the lint fixes the check needs
+- the cases hand the disk, git and clock fakes in, and the pull hand's wait reads no new door
+- the call at the pull hand's wait points at the cleanup chapter of the pull note
+
+# verdict
+
+<!-- reads every hunk against the ask and the approach -->
+
+## read
+
+<!-- every file you read, one a line -->
+
+<!-- the form is files -->
+
+- spec/tickets/an-empty-queue-hands-cleanup.md
+- src/scripts/pull-cleanup.js
+- src/scripts/pull-hand.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
+- src/scripts/pull-hand-of.js
+- src/scripts/cli-doors.js
+- src/scripts/ticket.js
+- spec/design_output/pull.md
+- spec/guidance/working.md
+- test/level0/pull-cleanup.test.js
+- test/level0/pull-hand.test.js
+- test/level0/pull-doors.js
+- test/contract/stop-dry-run.test.js
+- .claude/skills/inset-probe/extension.js
+- .claude/skills/level0/lib/warnings.js
+- .claude/skills/level0/lib/runs.js
+- .claude/skills/level0/lib/cloud.js
+- .vale.ini
+- src/bridge/refactor-hand.js
+- src/bridge/server.js
+- src/bridge/stop.js
+- test/level0/refactor-hold.test.js
+
+## verdict
+
+<!-- pass or fail, findings one a line -->
+
+<!-- the form is verdict -->
+
+pass
+
+- Each ask bullet holds a case in `test/level0/pull-cleanup.test.js`. `test/level0/pull-hand.test.js` drives the cleanup through `handOut`.
+- `handOut` answers the cleanup only where no name, no skipped ticket and no person's step stands. A person's question keeps its wait.
+- `handDoors` sets `cloud` on the real pull, so the cloud gate holds outside the fakes.
+- A hand-back carries no `wanted`, so a pass through `onward` reaches the cleanup as the approach says.
+- The lint fixes past the ask stay trivial: a moved test, named numbers, one exemption and a row order.
+- `./RUNME.sh check` exits 0 at warning, and the tests answer green.
+- Craft, for a later ticket: a refactor list of uncommitted files alone hands out no file. The check stays out too, so the pull waits.
+- `./RUNME.sh branch review` names the retro absent from the handback, and the retro leaf follows this one.
+- An uncommitted cut of `src/bridge/stop.js` into `src/bridge/refactor-hand.js` stands in the tree. It rides in no commit of this ticket.
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+- the order and the gates stand in the cleanup chapter of the pull note. The module, the wait and both tests point at it
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->

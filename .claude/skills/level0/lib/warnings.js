@@ -68,7 +68,7 @@ export function rowOf(one) {
 // What the agent reads after a write lands with a warning: the rows, and that the work goes on. [[spec/design_output/level0#a-warning-feeds-the-list]]
 export function warnedNote(file, found, standing) {
   return [
-    `${found.length} line(s) of ${file} stand at warning, and the write lands. The refactoring hand drains them, so carry on.`,
+    `${found.length} line(s) of ${file} stand at warning, and the write lands. The refactoring hand drains them, so leave the lines as they stand and carry on with the ask.`,
     ...found.map((one) => `  ${rowOf(one)}`),
     `The list holds ${standing} row(s) now.`,
   ].join("\n");
@@ -86,19 +86,22 @@ export function standsPast(count, most) {
   return Number(most) > 0 && Number(count) > Number(most);
 }
 
-// The hand takes one file. A write inside the window holds its file back, and the oldest of the rest goes. Both spans read seconds, as `git log --format=%ct` answers them. [[spec/tickets/the-spawn-reaches-its-guidance]]
-export function takesFile(files, wrote, now, window) {
+// The oldest file a commit names, as `git log --format=%ct` answers each one's last write. [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
+export function oldestFile(files, wrote) {
   const at = (name) => Number(wrote?.[name] ?? 0);
   return (
     [files ?? []]
       .flat()
       .filter(Boolean)
-      .filter((one) => at(one) > 0 && Number(now) - at(one) >= Number(window))
+      .filter((one) => at(one) > 0)
       .sort((a, b) => at(a) - at(b))[0] ?? ""
   );
 }
 
-// What the hand reads when it starts: one file, and the verbs that name what stands on it. [[spec/tickets/the-spawn-reaches-its-guidance]]
+// The tool the refactoring hand calls for its next file. [[spec/design_output/stop#the-hand-walks-the-list]]
+export const WALK_TOOL = "refactor_next";
+
+// What the hand reads for each file it takes: the file, and the verbs that name what stands on it. [[spec/design_output/stop#the-hand-walks-the-list]]
 export function drains(file) {
   return [
     `Take ${file}, and drain the warnings the rules name on it.`,
@@ -106,7 +109,19 @@ export function drains(file) {
     `Run \`./RUNME.sh lint ${file}\` to read them, and \`./RUNME.sh fix ${file}\` for what a program mends.`,
     // A cut comes first, because it moves the lines every other warning names. [[spec/design_output/level0#the-ceiling-feeds-the-list]]
     `Where the lint names FileCeiling, cut the file first: \`./RUNME.sh split ${file} --to <path> --lines <from>-<to>\`, one --to and --lines for each target, and --dry to read the cut before it writes.`,
-    "Mend the rest by hand. Leave every line the rules pass, and commit this one file.",
+    "Mend the rest by hand, and leave every line the rules pass.",
+  ].join("\n");
+}
+
+// What the hand reads at its spawn: the first file, and the walk over the rest. The session beside it lands what the hand leaves. [[spec/design_output/stop#the-hand-walks-the-list]]
+export function walksList(file) {
+  return [
+    drains(file),
+    "",
+    `Once the file stands clean, or you leave it, call \`mcp__level0__${WALK_TOOL}\`.`,
+    "It hands you the next file, and you drain that one the same way.",
+    "End once it answers that no file waits.",
+    "Stage nothing and push nothing, because the session beside you lands what you leave.",
   ].join("\n");
 }
 

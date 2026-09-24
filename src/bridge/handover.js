@@ -4,10 +4,15 @@
 // [[spec/design_output/stop#the-context-hands-over]]
 
 import { join } from "node:path";
-import { HANDOVER, HOLDS } from "../../.claude/skills/level0/lib/folders.js";
+import { BINDING, QUEUE } from "../../.claude/skills/level0/lib/config.js";
+import { HANDOVER, HOLDS, RETRO } from "../../.claude/skills/level0/lib/folders.js";
 import { asks } from "./config.js";
+import { waitsForOwner } from "./stop.js";
 
 const AT = "context.handoverAt";
+const NOW = "context.writeAt";
+// A path into the retro folder, with either slash. [[spec/design_output/stop#the-context-hands-over]]
+const RETRO_PATH = /\.se[\\/]\.retro[^\s`)|\]]*/;
 const MOST = "stop.mostInARow";
 export const FINISH = "finish";
 export const CLEAR = "clear";
@@ -25,6 +30,11 @@ export function measures(box, tokens) {
   const fill = Number(tokens);
   if (!Number.isFinite(fill) || fill <= 0) return;
   box.fill = fill;
+  // The queue alone clears, so a session under god or unbound keeps its conversation and goes due nowhere. [[spec/design_output/stop#the-queue-alone-clears]]
+  if (!clearsHere(box)) {
+    box.handover = null;
+    return;
+  }
   const at = Number(asks(box, AT) ?? 0);
   if (!(at > 0)) return;
   // The first reading after a clear is what the next conversation opens on, and a key under it hands over into a loop. [[spec/design_output/stop#the-context-hands-over]]
@@ -39,13 +49,36 @@ export function measures(box, tokens) {
       );
     }
   }
-  if (box.handover || box.standsDown || fill < at) return;
+  if (box.handover) {
+    writesNow(box, fill, at);
+    return;
+  }
+  if (box.standsDown || fill < at) return;
   box.handover = { phase: FINISH, asked: 0 };
   box.log.say(
     "info",
     "handover",
     `the context holds ${fill} tokens, past ${AT} at ${at}, so the session hands over`,
     { tokens: fill, at },
+  );
+  writesNow(box, fill, at);
+}
+
+// [[spec/design_output/stop#the-queue-alone-clears]]
+export function clearsHere(box) {
+  return String(asks(box, BINDING) ?? "") === QUEUE;
+}
+
+// A fill past context.writeAt turns the finish into the handover itself: the step stays where it stands. A key at zero, or under the first key, adds no second stage. [[spec/design_output/stop#the-context-hands-over]]
+function writesNow(box, fill, at) {
+  const now = Number(asks(box, NOW) ?? 0);
+  if (box.handover.now || !(now > at) || fill < now) return;
+  box.handover.now = true;
+  box.log.say(
+    "info",
+    "handover",
+    `the context holds ${fill} tokens, past ${NOW} at ${now}, so the handover gets written now`,
+    { tokens: fill, at: now },
   );
 }
 
@@ -63,13 +96,24 @@ export function ridesCall(e, box, before = null) {
 }
 
 export function dueText(box) {
+  if (box.handover?.now) {
+    return [
+      "# Write the handover now",
+      "",
+      `The context holds ${box.fill ?? "more"} tokens, past \`${NOW}\` at ${asks(box, NOW)}.`,
+      "Stop the step where it stands and leave it in hand. Write",
+      `\`${HANDOVER}\` now: what stands, what waits, and the ticket and step in hand.`,
+      `Name no file under \`${RETRO}\`. End the turn there.`,
+    ].join("\n");
+  }
   return [
     "# The context hands over",
     "",
     `The context holds ${box.fill ?? "more"} tokens, past \`${AT}\` at ${asks(box, AT)}.`,
-    "Bring the work to a point a hand picks up: commit it, hand the step back or",
-    "leave it in hand, and start nothing new. Then write",
+    "Finish the step in hand, and start nothing new: commit it, hand the step",
+    "back or leave it in hand. Then write",
     `\`${HANDOVER}\`: what stands, what waits, and the ticket and step in hand.`,
+    `Name no file under \`${RETRO}\`: the next retro reads that folder, and a hand does not.`,
     "End the turn there. Level zero clears the conversation, and the next one",
     "reads the handover, the rules and the step again.",
   ].join("\n");
@@ -79,7 +123,17 @@ export function dueText(box) {
 export function holdsForHandover(e, box) {
   const due = box.handover;
   if (e?.agentId || due?.phase !== FINISH) return null;
-  if (handoverStands(box)) {
+  // A stop waiting on the owner holds the clear: the tooth votes, the session stays due, and the next turn's end clears. [[spec/tickets/the-clear-keeps-questions]]
+  if (waitsForOwner(e, box)) {
+    box.log.say(
+      "info",
+      "handover",
+      "the turn waits on the owner, so the clear waits for the next turn's end",
+    );
+    return null;
+  }
+  const retro = namesRetro(box);
+  if (handoverStands(box) && !retro) {
     due.phase = CLEAR;
     box.log.say(
       "info",
@@ -100,8 +154,35 @@ export function holdsForHandover(e, box) {
     box.handover = null;
     return null;
   }
+  if (retro) {
+    box.log.say("warn", "handover", `${HANDOVER} names ${retro}, so the turn holds`);
+    return { result: { block: retroText(retro) } };
+  }
   box.log.say("info", "handover", `the turn holds until ${HANDOVER} stands`);
   return { result: { block: dueText(box) } };
+}
+
+// A handover naming the retro folder sends the next conversation to read it. The retro alone reads that folder. [[spec/design_output/stop#the-context-hands-over]]
+export function namesRetro(box) {
+  const at = join(box.work, ...HANDOVER.split("/"));
+  let text = "";
+  try {
+    text = String(box.disk.read(at));
+  } catch {
+    return "";
+  }
+  const found = text.match(RETRO_PATH);
+  return found ? found[0] : "";
+}
+
+function retroText(found) {
+  return [
+    "# The handover names the retro",
+    "",
+    `\`${HANDOVER}\` names \`${found}\`. The next retro reads \`${RETRO}\`, and a hand`,
+    "does not, so the next conversation must not read it. Name the ticket or the",
+    "class by its name, take the path out, and end the turn again.",
+  ].join("\n");
 }
 
 export function handoverStands(box) {
@@ -117,6 +198,11 @@ export function handoverStands(box) {
 export function clearsAfter(e, box, answer) {
   if (e?.agentId || e?.reason !== "answer" || box.handover?.phase !== CLEAR)
     return answer;
+  // A binding changed while the clear stood keeps the conversation. [[spec/design_output/stop#the-queue-alone-clears]]
+  if (!clearsHere(box)) {
+    box.handover = null;
+    return answer;
+  }
   box.handover = null;
   box.log.say(
     "info",

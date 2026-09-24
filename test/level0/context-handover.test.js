@@ -15,6 +15,7 @@ import {
   forgetsReads,
   holdsForHandover,
   measures,
+  namesRetro,
   onSessionMeasure,
   RESUME,
   ridesCall,
@@ -25,8 +26,12 @@ const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
 const HOLD = `${HOLDS}/box-1.json`;
 
-function box(handoverAt = 150000, files = {}) {
-  const config = { stop: { mostInARow: 3 }, context: { handoverAt } };
+function box(handoverAt = 150000, files = {}, writeAt = 0, binding = "queue") {
+  const config = {
+    stop: { mostInARow: 3 },
+    context: { handoverAt, writeAt },
+    engine: { binding },
+  };
   const said = [];
   return {
     disk: fakeDisk({
@@ -53,6 +58,32 @@ test("a fill under the key marks nothing, and a fill past it marks the session d
   onSessionMeasure({ context: { tokens: 150000 } }, it);
   assert.equal(it.handover.phase, FINISH);
   assert.ok(it.said.some((one) => one.kind === "handover"));
+});
+
+// [[spec/design_output/stop#the-queue-alone-clears]]
+test("a session under god or unbound goes due nowhere, and keeps its conversation", () => {
+  for (const binding of ["god", "unbound"]) {
+    const it = box(150000, {}, 0, binding);
+    measures(it, 160000);
+    assert.equal(it.fill, 160000, "the fill still reads");
+    assert.equal(it.handover, null, binding);
+    assert.equal(ridesCall({ tool: "Read" }, it), null, binding);
+    assert.equal(holdsForHandover({}, it), null, binding);
+  }
+});
+
+// [[spec/design_output/stop#the-queue-alone-clears]]
+test("a binding moved off the queue while the clear stands asks for no clear", () => {
+  const it = box();
+  it.handover = { phase: CLEAR, asked: 0 };
+  it.disk.write(
+    at("spec/config/level0.json"),
+    JSON.stringify({ context: { handoverAt: 150000 }, engine: { binding: "god" } }),
+  );
+  assert.deepEqual(clearsAfter({ reason: "answer" }, it, { pass: true }), {
+    pass: true,
+  });
+  assert.equal(it.handover, null);
 });
 
 test("a conversation opening past the key after a clear stands the door down", () => {
@@ -187,4 +218,117 @@ test("a session end for any other reason leaves the hold alone", () => {
   onSessionEnd({ reason: "other" }, it);
 
   assert.equal(JSON.parse(it.disk.read(at(HOLD))).reads.length, 1);
+});
+
+test("a fill past writeAt turns the block into the handover itself", () => {
+  const it = box(150000, {}, 175000);
+  measures(it, 40000);
+  measures(it, 160000);
+  assert.match(
+    ridesCall({ tool: "Read" }, it).after.context[0],
+    /Finish the step in hand/,
+  );
+
+  measures(it, 176000);
+
+  const block = ridesCall({ tool: "Read" }, it).after.context[0];
+  assert.match(block, /# Write the handover now/);
+  assert.match(block, /176000 tokens/);
+  assert.match(holdsForHandover({}, it).result.block, /# Write the handover now/);
+  assert.equal(it.said.filter((one) => /writeAt/.test(one.line)).length, 1);
+});
+
+test("a first fill past both keys hands over now at once", () => {
+  const it = box(150000, {}, 175000);
+
+  measures(it, 40000);
+  measures(it, 180000);
+
+  assert.equal(it.handover.phase, FINISH);
+  assert.equal(it.handover.now, true);
+});
+
+test("writeAt at 0 or under handoverAt adds no second stage", () => {
+  for (const writeAt of [0, 120000]) {
+    const it = box(150000, {}, writeAt);
+    measures(it, 40000);
+    measures(it, 900000);
+
+    assert.equal(it.handover.now, undefined);
+    assert.match(
+      ridesCall({ tool: "Read" }, it).after.context[0],
+      /# The context hands over/,
+    );
+  }
+});
+
+test("a handover naming the retro folder holds the turn, and one without it clears", () => {
+  const it = box(150000, {
+    [at(HANDOVER)]: "| the promotions | `.se/.retro/retro-899accd/classes.json` |\n",
+  });
+  measures(it, 40000);
+  measures(it, 160000);
+
+  const held = holdsForHandover({}, it);
+  assert.match(held.result.block, /# The handover names the retro/);
+  assert.match(held.result.block, /retro-899accd\/classes\.json/);
+  assert.equal(it.handover.phase, FINISH);
+
+  it.disk.write(at(HANDOVER), "| the promotions | the retro's classes, by name |\n");
+  assert.deepEqual(holdsForHandover({}, it), { pass: true });
+  assert.equal(it.handover.phase, CLEAR);
+});
+
+test("the retro check reads a backslash path too", () => {
+  const it = box(150000, { [at(HANDOVER)]: "read .se\\.retro\\x\\report.md\n" });
+
+  assert.equal(namesRetro(it), ".se\\.retro\\x\\report.md");
+});
+
+// The rules the claim reads, one waiting on the owner and one not. [[spec/tickets/the-clear-keeps-questions]]
+const WAITING = `
+- id: the-owner-asks-to-talk
+  side: stop
+  priority: 100
+  decides: claimed
+  waits: owner
+  asks: Does the owner open a discussion?
+  says: The owner opens a discussion.
+
+- id: the-work-stands-complete
+  side: stop
+  priority: 45
+  decides: claimed
+  asks: Does the work stand complete?
+  says: The work stands complete.
+`;
+
+// [[spec/tickets/the-clear-keeps-questions]]
+test("a stop waiting on the owner holds the clear, and the next turn's end clears", () => {
+  const it = box(150000, {
+    [at("spec/config/stop/level0.yml")]: WAITING,
+    [at(HANDOVER)]: "# Where it stands\n",
+  });
+  measures(it, 160000);
+
+  const asks = {
+    last_assistant_message: "A question.\n\nstop: the-owner-asks-to-talk",
+  };
+  assert.equal(holdsForHandover(asks, it), null, "the tooth votes on the waiting stop");
+  assert.equal(it.handover.phase, FINISH, "the session stays due");
+  assert.deepEqual(clearsAfter({ reason: "answer" }, it, { pass: true }), {
+    pass: true,
+  });
+
+  it.claim = "the-owner-asks-to-talk";
+  assert.equal(holdsForHandover({}, it), null, "a claim the call made waits too");
+  it.claim = null;
+
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+  assert.deepEqual(holdsForHandover(done, it), { pass: true });
+  assert.equal(it.handover.phase, CLEAR);
+  assert.deepEqual(clearsAfter({ reason: "answer" }, it, { pass: true }), {
+    pass: true,
+    clear: { prompt: RESUME },
+  });
 });

@@ -4,7 +4,7 @@
 
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
-import { readNote } from "../../.claude/skills/level0/lib/schema.js";
+import { readNote, sectionAt } from "../../.claude/skills/level0/lib/schema.js";
 import { voiceOver } from "../bridge/findings.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
@@ -122,26 +122,6 @@ export function withFieldText(text, path, name, said) {
   return { text: rows.join("\n") };
 }
 
-export function sectionAt(sections, path) {
-  const parts = path.split("/");
-  let from = 0;
-  let found = -1;
-  for (let depth = 0; depth < parts.length; depth++) {
-    const level = depth + 1;
-    found = -1;
-    for (let i = from; i < sections.length; i++) {
-      if (sections[i].level < level && i > from) break;
-      if (sections[i].level === level && sections[i].header === parts[depth]) {
-        found = i;
-        break;
-      }
-    }
-    if (found < 0) return -1;
-    from = found + 1;
-  }
-  return found;
-}
-
 export function chapterEnd(sections, at, level, last) {
   for (let i = at + 1; i < sections.length; i++) {
     if (sections[i].level <= level) return sections[i].line - 1;
@@ -152,24 +132,10 @@ export function chapterEnd(sections, at, level, last) {
 // [[spec/design_output/pull#the-fields-hold-their-forms]]
 export function chapterOf(text, path) {
   const sections = readNote(text).sections;
-  const parts = path.split("/");
-  let from = 0;
-  let found = -1;
-  for (let depth = 0; depth < parts.length; depth++) {
-    const level = depth + 1;
-    found = -1;
-    for (let i = from; i < sections.length; i++) {
-      if (sections[i].level < level && i > from) break;
-      if (sections[i].level === level && sections[i].header === parts[depth]) {
-        found = i;
-        break;
-      }
-    }
-    if (found < 0) return { stands: false, own: [], fields: new Map() };
-    from = found + 1;
-  }
+  const found = sectionAt(sections, path);
+  if (found < 0) return { stands: false, own: [], fields: new Map() };
 
-  const level = parts.length;
+  const level = path.split("/").length;
   const own = lines(sections[found].own);
   const fields = new Map();
   for (let i = found + 1; i < sections.length; i++) {

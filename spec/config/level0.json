@@ -25,12 +25,11 @@
     "rule": 6
   },
   "refactor": {
-    "comment": "The hand the stop door starts while the list stands past the number and a file rests past the window. The grace is the calls the engine lets pass before it refuses them. The hold keeps the hand's file its own for the span, and 0 switches it off. spec/guidance/code/refactoring.md says what that hand does.",
+    "comment": "The hand the stop door starts while the list stands past the number. It walks every file on the list, whatever its age. The hold keeps the hand's file its own for the span, and 0 switches it off. spec/guidance/code/refactoring.md says what that hand does.",
     "parallel": true,
     "mostWarnings": 10,
     "mostAtOnce": 1,
-    "untouchedFor": "5m",
-    "grace": 3,
+    "mostFiles": 0,
     "holdFor": "30m"
   },
   "grace": {
@@ -39,8 +38,15 @@
     "finish": 10
   },
   "context": {
-    "comment": "The context a session carries before it hands over: it finishes, writes .se/HANDOVER.md, clears, and reads the handover in a fresh conversation. 0 switches it off. spec/design_output/stop.md, chapter The context hands over, says the rest.",
-    "handoverAt": 150000
+    "comment": "The context a session carries before it hands over. Past handoverAt it finishes the step in hand, writes .se/HANDOVER.md, clears, and reads the handover in a fresh conversation. Past writeAt it stops the step and writes the handover now. 0 switches each off. spec/design_output/stop.md, chapter The context hands over, says the rest.",
+    "handoverAt": 150000,
+    "writeAt": 175000
+  },
+  "helper": {
+    "comment": "The model each tier of helper work runs on. The session weighs the work it hands and names the tier's model on the Agent call. find finds, lists, reads and reports. change makes a scoped change with its test, or reviews against a list. decide takes a design, an unknown cause, or a verdict the owner reads. spec/design_output/level0.md, chapter A spawn names its tier, says the rest.",
+    "find": "haiku",
+    "change": "sonnet",
+    "decide": "opus"
   },
   "plan": {
     "comment": "The engine's three questions every so many calls: what you work on, which todos you finished, which you add. The third stays away past mostOpen. spec/design_output/stop.md, chapter The plan, says the rest.",

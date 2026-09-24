@@ -13,8 +13,8 @@ const WAS = [
   "# The terms: the words this tree writes past the core.",
   "",
   "terms:",
-  '  - {word: shim, defines: "[[spec/design_output/vehicle]]"}',
-  '  - {word: stub, defines: "[[spec/design_output/vehicle]]"}',
+  '  - {word: shim, means: "a script that finds the vehicle"}',
+  '  - {word: stub, means: "a bare project"}',
   "",
 ].join("\n");
 
@@ -23,13 +23,12 @@ test("an edit far from the header reads as the whole file with the edit in place
   const e = {
     tool: "Edit",
     file_path: PATH,
-    old_string: '  - {word: stub, defines: "[[spec/design_output/vehicle]]"}',
-    new_string:
-      '  - {word: stub, defines: "[[spec/design_output/vehicle#a-stub-takes-its-vehicle]]"}',
+    old_string: '  - {word: stub, means: "a bare project"}',
+    new_string: '  - {word: stub, means: "a bare project the vehicle drives"}',
   };
   const whole = wholeAfter(e, { path: PATH, text: e.new_string }, disk);
   assert.ok(whole.startsWith("# The terms"), "the header stands, far above the edit");
-  assert.match(whole, /vehicle#a-stub-takes-its-vehicle/);
+  assert.match(whole, /a bare project the vehicle drives/);
   assert.equal(
     whole.split("\n").length,
     WAS.split("\n").length,

@@ -16,12 +16,15 @@ import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import {
   CORE,
   coreOf,
+  knownIn,
+  looseMeanings,
   pathsOf,
+  STEMS,
+  stemsOf,
   SWAPS,
   swapsOf,
   TERMS,
   termsOf,
-  undefinedTerms,
   wordsOf,
 } from "../../.claude/skills/level0/lib/vocabulary.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -41,10 +44,22 @@ words:
 
 const TERMS_TEXT = `
 terms:
-  - {word: door, defines: "[[spec/design_output/doors]]"}
-  - {word: write, defines: "[[spec/design_output/level0#the-write-door]]"}
-  - {word: level zero, defines: "[[spec/design_output/level0]]"}
-  - {word: jargon, defines: ""}
+  - {word: door, means: "the refuse gate"}
+  - {word: write, means: "a door with no refusal", source: "https://example.org/write"}
+  - {word: level zero}
+  - {word: jargon}
+`;
+
+const STEMS_TEXT = `
+endings:
+  - end: s
+    to: [none]
+  - end: ed
+    to: [none, e, drop]
+  - end: zz
+    to: [y]
+    long: true
+prefixes: [un]
 `;
 
 const SWAPS_TEXT = `
@@ -82,6 +97,7 @@ layers:
     core: ${CORE}
     terms: ${TERMS}
     swaps: ${SWAPS}
+    endings: ${STEMS}
     exceptions:
       - word: TL;DR
         reason: a name the answer register uses
@@ -99,6 +115,7 @@ const lists = () => ({
   core: readYaml(CORE_TEXT),
   terms: readYaml(TERMS_TEXT),
   swaps: readYaml(SWAPS_TEXT),
+  stems: readYaml(STEMS_TEXT),
 });
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
@@ -107,6 +124,7 @@ test("the schema names the three lists, and leaves a missing one at its default"
     core: CORE,
     terms: TERMS,
     swaps: SWAPS,
+    endings: STEMS,
   });
   assert.deepEqual(
     pathsOf(readYaml("kind: paragraph\nlayers:\n  vocabulary:\n    terms: t.yml\n")),
@@ -114,6 +132,7 @@ test("the schema names the three lists, and leaves a missing one at its default"
       core: CORE,
       terms: "t.yml",
       swaps: SWAPS,
+      endings: STEMS,
     },
   );
 });
@@ -132,11 +151,33 @@ test("the core and the terms read their entries, and a malformed word drops out"
 });
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
-test("a term with no defining note reads as jargon", () => {
-  assert.deepEqual(
-    undefinedTerms(readYaml(TERMS_TEXT)).map((one) => one.word),
-    ["jargon"],
-  );
+test("a term answers what it means, and the source it cites", () => {
+  const [door, write, zero] = termsOf(readYaml(TERMS_TEXT));
+  assert.equal(door.means, "the refuse gate");
+  assert.equal(door.source, "");
+  assert.equal(write.means, "a door with no refusal");
+  assert.equal(write.source, "https://example.org/write");
+  assert.equal(zero.means, "");
+});
+
+// [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+test("a means line answers every word the lists leave out, and a stem stands", () => {
+  assert.deepEqual(looseMeanings(lists()), [
+    { word: "door", loose: ["gate"] },
+    { word: "write", loose: ["door", "with", "refusal"] },
+  ]);
+});
+
+// The rule and the check read one table of endings, and the lists hand it in. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+test("the table of endings stands a stem, a prefix, and nothing past them", () => {
+  const stems = stemsOf(readYaml(STEMS_TEXT));
+  const known = knownIn(new Set(["read", "refuse", "stop", "cay"]), stems);
+  for (const w of ["reads", "refused", "stopped", "cazz", "unread"]) assert.ok(known(w), w);
+  for (const w of ["reader", "reading", "cities", "reread", "azz"]) assert.ok(!known(w), w);
+  const rule = rulesFrom(readYaml(SCHEMA), "", lists()).get("Vocabulary.yml") ?? "";
+  assert.match(rule, /has_suffix\(w, "zz"\)/);
+  assert.doesNotMatch(rule, /has_suffix\(w, "ing"\)/);
+  assert.match(rule, /for pre in \["un"\]/);
 });
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
@@ -174,16 +215,16 @@ test("the projector writes one rule inlining the words and the swaps", () => {
   assert.ok(rule, "the rule stands");
   assert.match(rule, /\bdoor\b/);
   assert.match(rule, /deny=refuse/);
-  assert.match(rule, /spec\/vocabulary\/terms\.yml/);
+  assert.match(rule, /spec\/vocabulary\/terms\.yml with one line that says what it means/);
   assert.equal(rulesFrom(readYaml(SCHEMA), "", null).has("Vocabulary.yml"), false);
 });
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 test("the projection reads the three lists the schema names, beside the schema", () => {
   const texts = new Map([[SOURCE, SCHEMA]]);
-  assert.deepEqual(alsoReads(ENTRY, texts), [CORE, TERMS, SWAPS]);
+  assert.deepEqual(alsoReads(ENTRY, texts), [CORE, TERMS, SWAPS, STEMS]);
   texts.set(CORE, CORE_TEXT);
-  assert.deepEqual(alsoReads(ENTRY, texts), [TERMS, SWAPS]);
+  assert.deepEqual(alsoReads(ENTRY, texts), [TERMS, SWAPS, STEMS]);
   assert.deepEqual(alsoReads({ ...ENTRY, shape: "other" }, texts), []);
 });
 
@@ -234,9 +275,11 @@ test("the refusal names the road for a word outside the lists", () => {
     },
   ];
   const said = grown(found);
-  assert.match(said, /jargon until a note defines it/);
+  assert.match(said, /one line that says what it means/);
+  assert.match(said, /means: "<one line>"/);
+  assert.doesNotMatch(said, /defines/);
   assert.match(said, /`flibbertigibbet`, `whatsit`/);
   assert.match(said, /spec\/vocabulary\/terms\.yml/);
-  assert.match(refusal("notes.md", found), /jargon until a note defines it/);
+  assert.match(refusal("notes.md", found), /one line that says what it means/);
   assert.equal(grown(found.slice(2)), "");
 });

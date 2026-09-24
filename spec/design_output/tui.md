@@ -294,20 +294,21 @@ wears the terminal's own and draws on.
 
 # The details
 
-The details show the kind and the time to the millisecond, then every field the
-writer adds, then the whole text. `text` stands where the writer adds one, and
-`said` stands otherwise.
+| order | what the details show |
+|---|---|
+| 1 | the kind |
+| 2 | the time, to the millisecond |
+| 3 | every field the writer adds |
+| 4 | the whole text: `text` where the writer adds one, `said` otherwise |
 
 A prompt shows the reply ending its turn, and a reply shows every prompt since
 the reply before it. A person adding a prompt mid-turn gets one reply for all of
 them. For details, see [[spec/design_output/log#a-reply-beside-its-prompt]].
 
-A note stands with the prompt holding it:
-
-| the row | what stands under it |
-|---|---|
-| a prompt | every note between it and the prompt after it, ahead of its answer and after it |
-| a note | the prompt above it, the way an answer does |
+A prompt's details carry every note between it and the prompt after it, ahead
+of its answer and after it. A note stands apart from any prompt: opening one
+shows no pair, because a note stands independent of the prompt that asks for
+it.
 
 A long line wraps at the pane's width. A field's value wraps under itself, and a
 word wider than the pane breaks where it stands.

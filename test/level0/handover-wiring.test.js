@@ -22,6 +22,8 @@ const HOLD = `${HOLDS}/box-1.json`;
 const CONFIG = {
   stop: { enabled: true, mostInARow: 3, hold: "off" },
   context: { handoverAt: 60000 },
+  // The queue alone clears. [[spec/design_output/stop#the-queue-alone-clears]]
+  engine: { binding: "queue" },
 };
 
 function served() {
@@ -77,6 +79,37 @@ test("the turn's end holds for the handover, then ends, and the completion asks 
     box,
   );
   assert.equal(done.clear?.prompt, RESUME);
+});
+
+// [[spec/tickets/the-clear-keeps-questions]]
+test("a turn ending on a stop that waits for the owner asks for no clear, and the next turn's end clears", async () => {
+  const box = served();
+  box.disk.write(
+    at("spec/config/stop/level0.yml"),
+    "- id: the-owner-asks-to-talk\n  side: stop\n  priority: 100\n  decides: claimed\n  waits: owner\n  asks: Does the owner open a discussion?\n  says: The owner opens a discussion.\n",
+  );
+  await call(box, 40000);
+  await call(box, 70000);
+  box.disk.write(at(HANDOVER), "# Where it stands\n");
+  const complete = () =>
+    decide({ event: "turn.complete", e: { reason: "answer", answer: "done" } }, box);
+
+  await decide(
+    {
+      event: "classic.Stop",
+      e: { last_assistant_message: "A question.\n\nstop: the-owner-asks-to-talk" },
+      fill: 70000,
+    },
+    box,
+  );
+  assert.equal(
+    (await complete()).clear,
+    undefined,
+    "the waiting turn keeps the conversation",
+  );
+
+  await stops(box);
+  assert.equal((await complete()).clear?.prompt, RESUME, "the next turn's end clears");
 });
 
 test("the session end of a clear empties the reads, and the ticket stays in hand", async () => {

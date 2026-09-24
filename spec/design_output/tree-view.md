@@ -81,9 +81,10 @@ standing and nothing more.
 | collapses every row | every parent shuts, and the cursor goes to the top |
 | expands every row | every parent opens |
 
-A row holds its address, as `0/2/1`, and the view holds the address of every
-parent standing shut. So an item arriving or leaving costs the view nothing it has to
-carry by hand.
+A row holds its address, as `0/2/1`, and an edit writes through it. The view
+holds the names down to every parent standing shut. A tree handed over
+again carries that set and the row under the cursor by name. So an item
+arriving or leaving shuts nothing and opens nothing.
 
 ## A flat view nests nothing
 

@@ -17,6 +17,7 @@ import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
 import { wire } from "../doors/wire.js";
 import { projectionsHere, sourcesOf } from "../engine/projection.js";
+import { onAgent } from "./agent.js";
 import {
   holdsForAnswer,
   onAgentSpoke,
@@ -25,7 +26,6 @@ import {
   onTurnEnd,
   SPOKE,
 } from "./answer.js";
-import { onAgent } from "./agent.js";
 import { gatesAnswer } from "./answer-read.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
@@ -34,13 +34,6 @@ import { dropsAll, dropsMoved } from "./caches.js";
 import { asks, asksText } from "./config.js";
 import { FINDINGS, findingsFor, heldFor } from "./findings.js";
 import { holdsGrace } from "./grace.js";
-import {
-  clearsAfter,
-  holdsForHandover,
-  measures,
-  onSessionMeasure,
-  ridesCall,
-} from "./handover.js";
 import {
   onAgentSpawn,
   onPromptContext,
@@ -53,6 +46,14 @@ import {
   surveyHere,
 } from "./guidance.js";
 import {
+  clearsAfter,
+  holdsForHandover,
+  measures,
+  onSessionMeasure,
+  ridesCall,
+} from "./handover.js";
+import { SPECS as logSpecs, TOOLS as logTools } from "./logline.js";
+import {
   asksForPlan,
   PLAN,
   PLAN_CALL,
@@ -61,9 +62,9 @@ import {
   SPECS as planSpecs,
   TOOLS as planTools,
 } from "./plan.js";
-import { SPECS as logSpecs, TOOLS as logTools } from "./logline.js";
 import { freshens } from "./projection.js";
 import { SPECS as proseSpecs, TOOLS as proseTools } from "./prose.js";
+import { onRefactorAnswered, REFACTOR_ANSWERED, tellsHand } from "./refactor-hand.js";
 import { releasesHold } from "./refactor-hold.js";
 import { movedCode, provesCode, SELF_TEST } from "./reload.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
@@ -78,9 +79,7 @@ import {
   dropsHold,
   ENDS_TURN,
   holdsCall,
-  onRefactorAnswered,
   onStop,
-  REFACTOR_ANSWERED,
   sawCall,
   sawPrompt,
   SPECS as stopSpecs,
@@ -276,7 +275,7 @@ async function onToolCall(e, box) {
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (!passes(said)) return said;
-  return held ?? ridesCall(e, box, owesCanary(e, box)) ?? PASS;
+  return held ?? ridesCall(e, box, tellsHand(e, box, owesCanary(e, box))) ?? PASS;
 }
 
 function passes(said) {

@@ -33,7 +33,7 @@ const heard = async (what) => {
   }
 };
 
-const doors = (found = [], answers = {}) => {
+const doors = (found = [], answers = {}, env = { SE_CLOUD: "1" }) => {
   const git = fakeGit(
     {
       "git rev-parse --abbrev-ref HEAD": { stdout: "work/one-group\n" },
@@ -51,6 +51,7 @@ const doors = (found = [], answers = {}) => {
     log: { say: () => {} },
     vale: { stands: () => true, lint: async () => ({ ran: true, found }) },
     proc: git.proc,
+    env,
   };
   git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), "check"], {
     exitCode: 0,
@@ -105,7 +106,11 @@ test("a red check holds the push back, and names what the check refuses", async 
 
   assert.equal(code, 1);
   assert.match(said, /no push reaches origin/);
-  assert.match(said, /Passive: Write in the active voice/, "the fault reaches the reader");
+  assert.match(
+    said,
+    /Passive: Write in the active voice/,
+    "the fault reaches the reader",
+  );
   assert.ok(!ranGit(git).some((one) => one.startsWith("git push")));
 });
 
@@ -134,6 +139,18 @@ test("a commit the door refuses lands nothing, and the staging comes back", asyn
   assert.match(said, /nothing lands/);
   assert.match(said, /the hook refuses it/, "the door's own line reaches the reader");
   assert.ok(ranGit(git).includes("git reset -q"), "the staging comes back");
+});
+
+// A desk's verb pushes nothing. [[spec/guidance/working]]
+test("a desk lands and checks the commit, and pushes nothing", async () => {
+  const { it, git } = doors([], {}, {});
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 0);
+  assert.ok(ranGit(git).includes(`git commit -m ${CLEAN}`));
+  assert.ok(!ranGit(git).some((one) => one.startsWith("git push")));
+  assert.match(said, /the check answers green/);
 });
 
 // [[spec/design_output/work#the-battery-answers-first]]

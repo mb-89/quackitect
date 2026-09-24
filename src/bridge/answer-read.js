@@ -11,6 +11,7 @@ import {
   tableFaults,
 } from "../../.claude/skills/level0/lib/answer.js";
 import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
+import { stopsAlone } from "../../.claude/skills/level0/lib/stop.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
 
@@ -21,6 +22,8 @@ const MOST = "stop.mostInARow";
 
 // The reading answers why where it reads nothing, and the findings, the score and the band where it reads. [[spec/design_output/level0#the-tool-reads-a-draft]]
 export async function readsAnswer(box, text, stop) {
+  // The stop line alone ends a turn the answer before it reported, so it reads clean. [[spec/design_output/stop#the-stop-is-one-line]]
+  if (stopsAlone(text)) return { found: [], score: 0, band: "clean" };
   if (!box.vale.stands())
     return { why: "No vale stands here, so the draft goes unread." };
   const ran = await box.vale.lint(text, ANSWER);

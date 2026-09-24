@@ -247,8 +247,8 @@ func TestTheSaidColumnReadsTheKindListAndNamesNoColourOfItsOwn(t *testing.T) {
 	}
 }
 
-// A person opening the prompt reads what the session parked under it. [[spec/design_output/tui#the-details]]
-func TestAPromptShowsTheNoteItCarriesAndTheNoteShowsItsPrompt(t *testing.T) {
+// A person opening the prompt reads what the session parked under it, and a note stands apart from the prompt that asked for it. [[spec/design_output/tui#the-details]]
+func TestAPromptShowsTheNoteItCarriesAndTheNoteStandsApartFromItsPrompt(t *testing.T) {
 	t.Parallel()
 	all := []Record{
 		row(1, "prompt", "are you bound?"),
@@ -259,15 +259,15 @@ func TestAPromptShowsTheNoteItCarriesAndTheNoteShowsItsPrompt(t *testing.T) {
 	if said := details(all, 0); !strings.Contains(said, "the lint drags") {
 		t.Fatalf("the prompt's details carry the note it holds, and read:\n%s", said)
 	}
-	if said := details(all, 1); !strings.Contains(said, "are you bound?") {
-		t.Fatalf("the note's details carry the prompt above it, and read:\n%s", said)
+	if said := details(all, 1); strings.Contains(said, "are you bound?") {
+		t.Fatalf("the note's details carry no prompt, and read:\n%s", said)
 	}
 	if said := details(all, 3); strings.Contains(said, "the lint drags") {
 		t.Fatalf("a prompt after the note borrows none, and read:\n%s", said)
 	}
 }
 
-// A note after the answer stands with the prompt too, up to the prompt after it. [[spec/design_output/tui#the-details]]
+// A note after the answer stands with the prompt too, up to the prompt after it, and each note stands apart from any prompt on its own. [[spec/design_output/tui#the-details]]
 func TestAPromptShowsTheNotesOnBothSidesOfItsAnswer(t *testing.T) {
 	t.Parallel()
 	all := []Record{
@@ -288,8 +288,8 @@ func TestAPromptShowsTheNotesOnBothSidesOfItsAnswer(t *testing.T) {
 	if strings.Contains(said, "under the second prompt") {
 		t.Fatalf("a note under the prompt after it stays there, and the details read:\n%s", said)
 	}
-	if got := details(all, 3); !strings.Contains(got, "are you bound?") {
-		t.Fatalf("the note after the answer shows the prompt above it, and reads:\n%s", got)
+	if got := details(all, 3); strings.Contains(got, "are you bound?") {
+		t.Fatalf("the note after the answer stands apart from the prompt above it, and reads:\n%s", got)
 	}
 }
 

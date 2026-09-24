@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { voiceFaults } from "../../src/scripts/pull-chapter.js";
+import { chapterOf, voiceFaults } from "../../src/scripts/pull-chapter.js";
 import { semicolonVale } from "./semicolon-vale.js";
 
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
@@ -31,4 +31,12 @@ test("a semicolon on the leaf's chapter names Characters at its file line, and o
   const found = voiceFaults({ vale: VALE, proc, root: "/tree" }, one, leaf);
   assert.equal(found.length, 1, found.join("\n"));
   assert.match(found[0], /^do breaks Characters at line 13 of spec\/tickets\/one\.md/);
+});
+
+test("chapterOf reads the fields under a step's chapter, and a missing one stands nowhere", () => {
+  const text = "# Ask\n\nA thing.\n\n# design\n\n## draft\n\n### approach\n\nIt reads.\n\n# Discussion\n";
+  const found = chapterOf(text, "design/draft");
+  assert.equal(found.stands, true);
+  assert.deepEqual(found.fields.get("approach"), ["It reads."]);
+  assert.equal(chapterOf(text, "design/review").stands, false);
 });

@@ -246,3 +246,49 @@ func TestAParentOverNoMatchCarriesNoMark(t *testing.T) {
 		t.Fatalf("a parent the filter empties carries no mark, and draws:\n%s", view.Rows(60, 1))
 	}
 }
+
+// [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
+func TestARedrawKeepsTheGroupsAPersonOpened(t *testing.T) {
+	t.Parallel()
+	was := NewTree(columns(), []Item{
+		item("the window", "open", "", item("the frame", "open", "")),
+		item("the tree", "open", "", item("the rows", "open", "")),
+	}, true)
+	was.Collapse(true)
+	was.MoveTo(1)
+	was.Toggle()
+	now := NewTree(columns(), []Item{
+		item("a note", "open", ""),
+		item("the window", "open", "", item("the frame", "open", "")),
+		item("the tree", "open", "", item("the rows", "open", "")),
+	}, true)
+	now.Carry(was)
+	if held := now.Selected(); held == nil || held.Name != "the tree" {
+		t.Fatalf("the cursor stays on the row a person stood on, and stands on %v", held)
+	}
+	want := "a note|the window|the tree|the rows"
+	if got := strings.Join(namesOf(now), "|"); got != want {
+		t.Fatalf("a row arriving above shuts and opens nothing, and the rows read %q", got)
+	}
+}
+
+// [[spec/design_output/tree-view#a-sort-holds-several-keys]]
+func TestARedrawKeepsTheOrderUnlessAPlaceChanges(t *testing.T) {
+	t.Parallel()
+	queued := func(items ...Item) *Tree {
+		out := NewTree(columns(), items, true)
+		out.Sorted([]Sort{{Key: "says"}})
+		return out
+	}
+	was := queued(item("one", "open", "1"), item("two", "open", ""), item("three", "open", ""))
+	now := queued(item("a note", "open", ""), item("one", "open", "1"), item("two", "open", ""), item("three", "open", ""))
+	now.Carry(was)
+	if got := strings.Join(namesOf(now), "|"); got != "one|a note|two|three" {
+		t.Fatalf("a redraw keeps the order of the rows, and they read %q", got)
+	}
+	moved := queued(item("one", "open", "2"), item("two", "open", "1"), item("three", "open", ""))
+	moved.Carry(was)
+	if got := strings.Join(namesOf(moved), "|"); got != "two|one|three" {
+		t.Fatalf("a place that changes moves its row, and the rows read %q", got)
+	}
+}

@@ -56,7 +56,19 @@ type twig struct {
 	item  Item
 	depth int
 	at    string
+	key   string
 	kids  bool
+}
+
+// This byte stands outside every name, so it joins the names down to a row. [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
+const keyStep = "\x1f"
+
+// A row's key is the path of names down to it, so a shut parent stays shut where rows arrive or leave around it. [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
+func keyOf(above, name string) string {
+	if above == "" {
+		return name
+	}
+	return above + keyStep + name
 }
 
 // [[spec/design_output/tree-view#the-view-draws-a-tree]]
@@ -101,12 +113,12 @@ func amend(items []Item, change func(*Item)) {
 // [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
 func (t *Tree) rebuild() {
 	t.flat = t.flat[:0]
-	t.walk(t.Items, 0, "")
+	t.walk(t.Items, 0, "", "")
 	t.sel = max(0, min(t.sel, len(t.flat)-1))
 }
 
 // The sort orders one level, and the place a row keeps is its own. [[spec/design_output/tree-view#a-sort-holds-several-keys]]
-func (t *Tree) walk(items []Item, depth int, above string) {
+func (t *Tree) walk(items []Item, depth int, above, up string) {
 	for _, at := range t.order(items) {
 		one := items[at]
 		here := strconv.Itoa(at)
@@ -116,13 +128,14 @@ func (t *Tree) walk(items []Item, depth int, above string) {
 		if !t.keeps(one) {
 			continue
 		}
+		key := keyOf(up, one.Name)
 		kids := t.Nests && t.kept(one.Kids)
-		t.flat = append(t.flat, twig{item: one, depth: depth, at: here, kids: kids})
+		t.flat = append(t.flat, twig{item: one, depth: depth, at: here, key: key, kids: kids})
 		switch {
-		case kids && !t.shut[here]:
-			t.walk(one.Kids, depth+1, here)
+		case kids && !t.shut[key]:
+			t.walk(one.Kids, depth+1, here, key)
 		case !t.Nests && t.kept(one.Kids):
-			t.walk(one.Kids, depth, here)
+			t.walk(one.Kids, depth, here, key)
 		}
 	}
 }
@@ -141,7 +154,7 @@ func (t Tree) kept(kids []Item) bool {
 // [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
 func (t *Tree) Toggle() {
 	if held := t.twig(); held != nil && held.kids {
-		t.shut[held.at] = !t.shut[held.at]
+		t.shut[held.key] = !t.shut[held.key]
 		t.rebuild()
 	}
 }
@@ -150,7 +163,7 @@ func (t *Tree) Toggle() {
 func (t *Tree) Expand(every bool) {
 	if !every {
 		if held := t.twig(); held != nil && held.kids {
-			delete(t.shut, held.at)
+			delete(t.shut, held.key)
 		}
 	} else {
 		t.shut = map[string]bool{}
@@ -162,8 +175,8 @@ func (t *Tree) Expand(every bool) {
 func (t *Tree) Collapse(every bool) {
 	held := t.twig()
 	if !every {
-		if held != nil && held.kids && !t.shut[held.at] {
-			t.shut[held.at] = true
+		if held != nil && held.kids && !t.shut[held.key] {
+			t.shut[held.key] = true
 		} else if held != nil {
 			t.toParent(held)
 		}
@@ -183,18 +196,15 @@ func (t *Tree) toParent(held *twig) {
 	for at, one := range t.flat {
 		if one.at == held.at[:up] {
 			t.sel = at
-			t.shut[one.at] = true
+			t.shut[one.key] = true
 			return
 		}
 	}
 }
 
 func (t *Tree) shutAll(items []Item, above string) {
-	for at, one := range items {
-		here := strconv.Itoa(at)
-		if above != "" {
-			here = above + "/" + here
-		}
+	for _, one := range items {
+		here := keyOf(above, one.Name)
 		if len(one.Kids) > 0 {
 			t.shut[here] = true
 			t.shutAll(one.Kids, here)
@@ -217,11 +227,22 @@ func (t *Tree) Carry(from *Tree) {
 	}
 	t.cur = min(from.cur, len(t.Cols)-1)
 	t.Schema = from.Schema
-	for at := range from.shut {
-		t.shut[at] = true
+	for key, shut := range from.shut {
+		if shut {
+			t.shut[key] = true
+		}
 	}
 	t.rebuild()
 	t.sel = max(0, min(from.sel, len(t.flat)-1))
+	// The row a person stands on keeps the cursor, where rows arrive above it. [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
+	if held := from.twig(); held != nil {
+		for at, one := range t.flat {
+			if one.key == held.key {
+				t.sel = at
+				break
+			}
+		}
+	}
 	t.top = from.top
 }
 

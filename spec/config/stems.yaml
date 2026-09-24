@@ -1,0 +1,86 @@
+# The endings and the prefixes a listed word takes and still stands. The rule,
+# the check over a means line and the hover each read this one table.
+# A row names an ending and what takes its place: none cuts the ending, drop
+# cuts one more letter, and letters stand in for it. A long row leaves the stem
+# two letters at least. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+endings:
+  - end: ies
+    to: [y]
+  - end: es
+    to: [none, e]
+  - end: s
+    to: [none]
+  - end: ied
+    to: [y]
+  - end: ed
+    to: [none, e, drop]
+  - end: ing
+    to: [none, e, drop]
+  - end: ves
+    to: [f, fe]
+  - end: ily
+    to: [y]
+    long: true
+  - end: ly
+    to: [none, e]
+    long: true
+  - end: er
+    to: [none, e]
+    long: true
+  - end: est
+    to: [none, e]
+    long: true
+  - end: able
+    to: [none, e]
+    long: true
+  - end: ible
+    to: [none, e]
+    long: true
+  - end: less
+    to: [none]
+    long: true
+  - end: most
+    to: [none]
+    long: true
+prefixes: [un, re, mis, out, over, non, pre, sub]
+cases:
+  - word: cities
+    reaches: city
+  - word: boxes
+    reaches: box
+  - word: doors
+    reaches: door
+  - word: carried
+    reaches: carry
+  - word: refused
+    reaches: refuse
+  - word: stopped
+    reaches: stop
+  - word: making
+    reaches: make
+  - word: running
+    reaches: run
+  - word: leaves
+    reaches: leaf
+  - word: easily
+    reaches: easy
+  - word: widely
+    reaches: wide
+  - word: faster
+    reaches: fast
+  - word: safest
+    reaches: safe
+  - word: readable
+    reaches: read
+  - word: usable
+    reaches: use
+  - word: reversible
+    reaches: reverse
+  - word: endless
+    reaches: end
+  - word: topmost
+    reaches: top
+  - word: unread
+    reaches: read
+  - word: rereads
+    reaches: read

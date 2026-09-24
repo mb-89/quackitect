@@ -451,7 +451,7 @@ test("the schema this tree ships places every widget in a cell of its own", () =
 });
 
 // [[spec/design_output/extension#one-declaration-draws-it]]
-test("seven controls draw, and the engine state stands declared and undrawn", () => {
+test("seven controls draw, and the work buttons stand declared and undrawn", () => {
   const schema = read(SCHEMA);
   assert.deepEqual(
     drawnIn(schema).map((one) => one.key),
@@ -469,7 +469,7 @@ test("seven controls draw, and the engine state stands declared and undrawn", ()
   const waiting = entriesIn(schema).filter((one) => one.widget && !one.group);
   assert.deepEqual(
     waiting.map((one) => one.key),
-    ["engine.state"],
+    ["work.editor", "work.pull", "work.new"],
   );
   for (const one of waiting) {
     assert.ok(one.help, `${one.key} says what it is`);
@@ -508,9 +508,11 @@ test("npm reaches the extension and the tense reader, and nothing else at the ro
   const paths = said.stdout.split(/\r?\n/).filter(Boolean);
 
   assert.ok(paths.includes("package.json"), "the root names one");
+  // A trial's manifest names no dependency, so npm reaches nothing through it. [[spec/design_output/work#an-experiment-decides]]
   for (const path of paths) {
-    if (path === "package.json") continue;
-    assert.match(path, /^src\/extension\//, `${path} stands under the extension`);
+    if (path === "package.json" || /^src\/extension\//.test(path)) continue;
+    assert.match(path, /^\.claude\/skills\/[^/]+\/package\.json$/, `${path} stands under the extension or a trial`);
+    assert.deepEqual(read(path).dependencies ?? {}, {}, `${path} names no dependency`);
   }
 
   const bare = read("package.json");

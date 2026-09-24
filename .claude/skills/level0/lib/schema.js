@@ -44,7 +44,7 @@ export {
   typed,
   typeOf,
 } from "./schema-fault.js";
-export { FENCE, kindOf, readNote } from "./schema-read.js";
+export { FENCE, kindOf, readNote, sectionAt } from "./schema-read.js";
 export {
   canonicalOf,
   entriesIn,
@@ -176,13 +176,19 @@ function heldIn(front, schema, kind, where, calls, schemas) {
   };
 }
 
+// [[spec/design_output/schema#a-finding-names-the-section]]
+function waitsForFill(said, rule) {
+  const from = rule?.["x-filled-by"];
+  return Boolean(from) && Object.hasOwn(said ?? {}, from) && empty(said[from]);
+}
+
 // [[spec/design_output/schema#the-checker-walks-every-key]]
 function mapFaults(said, spec, held, path) {
   const out = [];
   const props = spec.properties ?? {};
 
   for (const key of spec.required ?? []) {
-    if (!empty(said?.[key])) continue;
+    if (!empty(said?.[key]) || waitsForFill(said, props[key])) continue;
     out.push(
       fault(
         key,

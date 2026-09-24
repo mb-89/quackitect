@@ -7,7 +7,14 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { todoOf } from "../../src/engine/group.js";
-import { emptyGroup, takeable, ticketsHere } from "../../src/scripts/pull-hand.js";
+import { REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
+import {
+  emptyGroup,
+  handOut,
+  takeable,
+  ticketsHere,
+} from "../../src/scripts/pull-hand.js";
+import { doors, heard } from "./pull-doors.js";
 import { CHILD, ROOT } from "./work-doors.js";
 
 const at = (rel) => join(ROOT, ...rel.split("/"));
@@ -39,6 +46,19 @@ test("a group no ticket names reads empty, one with a child reads full, and a pl
   assert.match(emptyGroup(it, group, "a-lonely-one"), /no ticket names it under group/);
   assert.equal(emptyGroup(it, group, "the-whole"), "");
   assert.equal(emptyGroup(it, CHILD("", "draft"), "a-part"), "");
+});
+
+// [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
+test("a desk pull meeting no ticket answers cleanup, and a named pull meeting none still waits", () => {
+  const listed = {
+    [at(REFACTORS)]: JSON.stringify([{ file: "old.md", rule: "Sentence", line: 1 }]),
+  };
+  const log = { "git log -1 --format=%ct -- old.md": { stdout: "100\n" } };
+  const desk = () => doors(listed, log, { cloud: false, root: ROOT }).it;
+  const plain = heard(() => handOut(desk(), {}));
+  assert.match(plain.said, /^cleanup\n\s*Take old\.md/);
+  const named = heard(() => handOut(desk(), { wanted: "nobody" }));
+  assert.match(named.said, /^wait\n\s*nobody stands nowhere here/);
 });
 
 // A trivial draft opens at the pull, so takeable reads it as open, and any other draft waits on a person. [[spec/design_output/pull#a-draft-opens]]

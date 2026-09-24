@@ -24,7 +24,7 @@ import { onNoteRoute } from "../../.claude/skills/level0/lib/ticket.js";
 import { takeable } from "./pull.js";
 import { ticketsHere } from "./pull-hand.js";
 import { leafOf, leavesOf } from "./pull-route.js";
-import { CLOUD_PLACE, outlineIn } from "./pull-outline.js";
+import { CLOUD_PLACE, FIRST, LAST, outlineIn } from "./pull-outline.js";
 
 // The place of the work in hand, and the state a row there reads. [[spec/design_output/pull#the-queue-is-an-outline]]
 const HELD_PLACE = "0";
@@ -150,7 +150,7 @@ export function placesIn(it, read, stood) {
     all,
     at,
   );
-  const out = outlineIn(persons, inHand, [...agents, ...back], all, plan.places);
+  const out = outlineIn(persons, inHand, [...agents, ...back], all, overridesOf(plan));
   for (const one of all) {
     if (onCloud.has(one.name) && fieldOf(one.text, "state") !== CLOSED)
       out.set(one.name, CLOUD_PLACE);
@@ -174,16 +174,35 @@ export function planHere(it) {
 
 // The plan's todos as the queue reads them: a name, an anchor, and no text, so the score skips them and the anchor places them. [[spec/design_output/stop#the-plan]]
 function todoRows(plan) {
+  const titles = new Set(plan.todos.map((one) => String(one?.title ?? "")));
   return plan.todos
     .filter((one) => one?.title)
     .map((one, order) => ({
       name: String(one.title),
       path: "",
       text: "",
-      front: { todo: one.todo ?? "last" },
+      front: { todo: anchorOf(one.todo, titles) },
       plan: true,
       order,
     }));
+}
+
+// The work tab's override on a todo passes the same check as the todo's own anchor, so no writer places a todo past a ticket. [[spec/design_output/pull#a-todo-forces-a-place]]
+function overridesOf(plan) {
+  const titles = new Set(plan.todos.map((one) => String(one?.title ?? "")));
+  return Object.fromEntries(
+    Object.entries(plan.places ?? {}).map(([name, said]) => [
+      name,
+      titles.has(name) ? anchorOf(said, titles) : said,
+    ]),
+  );
+}
+
+// A todo stands before every ticket: it anchors at the front or on another todo, and any other anchor lands it after the todos. [[spec/design_output/pull#a-todo-forces-a-place]]
+function anchorOf(said, titles) {
+  const word = String(said ?? "").trim();
+  if (word === "true" || word === FIRST || titles.has(word)) return word;
+  return LAST;
 }
 
 // The plan's todos as rows of the answer, which the tab draws beside the tickets with no link. [[spec/design_output/stop#the-plan]]
@@ -295,8 +314,10 @@ export function answerOf(it, queue = true) {
         )
         .map((one) => rowOfTicket(one, places, stood, open, overrides)),
       ...planRows(planHere(it), places),
+      // A ticket on this disk that origin lacks still carries its name, so the work in hand draws once. [[spec/design_output/stop#the-plan]]
       ...heldRow(planHere(it), [
         ...ticketsIn(read).map((one) => one.name),
+        ...diskNames(it),
         ...planHere(it).todos.map((one) => String(one?.title ?? "")),
       ]),
     ],
@@ -314,6 +335,12 @@ function diskCopy(it, one) {
   } catch {
     return one;
   }
+}
+
+// The names of every ticket on this disk, committed or not. [[spec/design_output/stop#the-plan]]
+function diskNames(it) {
+  if (!it.disk || !it.join) return [];
+  return ticketsHere(it).map((one) => one.name);
 }
 
 // The private notes on this box, read the way the pull reads them, and nothing where the box holds none. [[spec/design_output/pull#the-queue-is-an-outline]]

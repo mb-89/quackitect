@@ -24,6 +24,11 @@ import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
 import { emptyGroup } from "./pull-hand.js";
 import { landedAlone } from "./pull-landed.js";
+import { COMMENT } from "./pull-route.js";
+import { baseOf, driftOf } from "./ticket-drift.js";
+import { filled } from "./ticket-fill.js";
+import { reachedOf, routed } from "./ticket-route.js";
+import { yours } from "./ticket-yours.js";
 import { askFaults, askRefusal, lineRefusal } from "./ticket-ask-lint.js";
 
 export const NOTES = TICKETS;
@@ -32,6 +37,8 @@ export const HOLD = OWNED_HOLD;
 export const NOTE = "note";
 // The flag on a note that waits for a person. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 const TALK = "talk";
+// The flag that copies a new route over a person's edit. [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
+const OVER = "--over";
 const TRAVELS = "spec/tickets";
 const SCHEMAS = "spec/schemas";
 
@@ -39,7 +46,15 @@ export function ticket(root, argv, doors) {
   const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
   const name = argv[1];
-  const doing = { note, update, open, todo };
+  const doing = {
+    note,
+    update,
+    open,
+    todo,
+    route,
+    fill,
+    yours: (it, _name, argv) => yours(it, argv),
+  };
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh ticket <verb>\n");
     console.log(
@@ -49,13 +64,22 @@ export function ticket(root, argv, doors) {
       "  note <name> <line>  write a private ticket off the note process, and carry on",
     );
     console.log(
-      "  update <ticket>     copy the ticket's process onto the steps it has yet to reach",
+      "  update <ticket>     copy the ticket's process onto the steps it has yet to reach, and --over writes over drift",
     );
     console.log(
       "  open <ticket>       open a draft whose ask stands written, so a hand can pull it",
     );
     console.log(
       "  todo <ticket>       park it for the next pull, and --off takes the tag away",
+    );
+    console.log(
+      "  route <ticket>      write the steps past the pointer, off --steps=<json>, and answer JSON",
+    );
+    console.log(
+      "  yours               the tickets waiting on a person as JSON, or --count, or --next",
+    );
+    console.log(
+      "  fill <path>         write the route a saved ticket's process names, or print it under --stdout",
     );
     console.log(
       `                      note takes --${TALK} where a person decides it, and --${TODO} to park it`,
@@ -185,7 +209,7 @@ function said(it, kind, line, more) {
 
 // [[spec/design_output/pull#a-draft-opens]]
 export function askLines(ask) {
-  return (ask?.own ?? []).filter((row) => !/^\s*<!--.*-->\s*$/.test(row));
+  return (ask?.own ?? []).filter((row) => !COMMENT.test(row));
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
@@ -225,6 +249,26 @@ function open(it, name) {
   return 0;
 }
 
+// [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
+function route(it, name, argv) {
+  const at = name ? ticketAt(it, name) : null;
+  if (!at) {
+    console.log(JSON.stringify({ refused: `${name ?? ""} names no ticket under ${NOTES} or ${TRAVELS}.`, at: "" }));
+    return 1;
+  }
+  return routed(it, at, argv, schemasHere(it).get("ticket"));
+}
+
+// [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+function fill(it, name, argv) {
+  const at = name ? ticketAt(it, name) : null;
+  if (!at) {
+    console.error(`${name ?? "ticket fill"} names no ticket: ./RUNME.sh ticket fill spec/tickets/slow-lint.md`);
+    return 2;
+  }
+  return filled(it, at, argv, schemasHere(it));
+}
+
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 function update(it, name, argv) {
   if (!name) {
@@ -249,6 +293,25 @@ function update(it, name, argv) {
   if (String(front.process_hash ?? "") === held.hash && !asked) {
     console.log(`${at.said} already carries ${held.name} as it stands.`);
     return 0;
+  }
+
+  // A person's edit past the reached leaves stops the copy, unless --over says to write over it. [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
+  if (!(argv ?? []).includes(OVER)) {
+    const own = processAt(it.disk, it.method, it.join, front.process);
+    const base = own.why ? null : baseOf(it.git, own.path, String(front.process_hash ?? ""));
+    if (!base) {
+      console.error(
+        `The process version ${at.said} copied stands nowhere in the history, so any drift stays unread. Run it again with ${OVER} to copy the new route over the route as it stands.`,
+      );
+      return 1;
+    }
+    const drift = driftOf(front, base);
+    if (drift.length) {
+      console.error(
+        `${at.said} carries drift from the process it copied, at ${drift.join(", ")}. Nothing changes. Run it again with ${OVER} to copy the new route over it.`,
+      );
+      return 1;
+    }
   }
 
   const route = updated(front, held.route);
@@ -276,13 +339,7 @@ export function updated(front, route) {
   }
 
   const old = entriesIn(front?.steps, "steps");
-  const at = old.findIndex((one) => one.path === step);
-  const reached = new Set(
-    old.filter((one, i) => one.leaf && at >= 0 && i <= at).map((one) => one.path),
-  );
-  for (const one of [front?.record ?? []].flat()) {
-    if (one?.step) reached.add(String(one.step));
-  }
+  const reached = reachedOf(front);
 
   const held = new Map(old.map((one) => [one.path, one.said]));
   let kept = 0;

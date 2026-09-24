@@ -11,6 +11,13 @@ export const OFF = "stop-hook-off";
 // [[spec/design_output/stop#the-stop-is-one-line]]
 export const STOP_TOOL = "stop";
 export const STOP_CALL = `mcp__level0__${STOP_TOOL}`;
+// [[spec/design_output/stop#the-stop-is-one-line]]
+export const STOP_LINE = /^stop:\s*([a-z0-9-]+)\s*$/i;
+
+// A message holding the stop line alone ends a turn, and carries no answer for the voice rules to read. [[spec/design_output/stop#the-stop-is-one-line]]
+export function stopsAlone(text) {
+  return STOP_LINE.test(String(text ?? "").trim());
+}
 
 // [[spec/design_output/level0#the-needs-table]]
 export const NEEDS_LINE =
@@ -64,7 +71,7 @@ export function decide(rules, held = {}) {
   const stop = highest(firing, "stop");
   const go = highest(firing, "continue");
   // A claim reads the agent, and a check reads the tree, so the check wins. [[spec/design_output/stop#a-check-beats-a-claim]]
-  const yields = Boolean(stop?.yields) && go?.decides === "mechanical";
+  const yields = Boolean(stop?.yields) && firing.some(beatsClaim);
 
   return {
     ends:
@@ -89,6 +96,11 @@ function fires(one, held, unknown) {
     return false;
   }
   return Boolean(said);
+}
+
+// A check over a hand's work beside the agent reads no work of the agent's own, so it beats no claim. [[spec/design_output/stop#a-check-beats-a-claim]]
+function beatsClaim(one) {
+  return one.side === "continue" && one.decides === "mechanical" && !one.beside;
 }
 
 function asks(one) {

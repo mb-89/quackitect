@@ -14,9 +14,8 @@ import {
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
 import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
-import { MS, SESSION, tallied } from "../../.claude/skills/level0/lib/log.js";
+import { SESSION, tallied } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
-import { REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
 import {
   decide,
   detail,
@@ -24,6 +23,7 @@ import {
   pool,
   RULES,
   STOP_CALL,
+  STOP_LINE,
   stopReasons,
   stopSpec,
   todos,
@@ -34,49 +34,36 @@ import {
   openPrivate,
   queueHolds,
 } from "../../.claude/skills/level0/lib/ticket.js";
-import {
-  drains,
-  filesOn,
-  standsPast,
-  takesFile,
-} from "../../.claude/skills/level0/lib/warnings.js";
-import { spanOf, ticketAt, WORK_BRANCH } from "../engine/group.js";
+import { ticketAt, WORK_BRANCH } from "../engine/group.js";
 import { holdsTurn } from "./answer.js";
 import { bindingLine } from "./binding.js";
 import { asks, writes } from "./config.js";
-import { reacted, wants } from "./grace.js";
 import { plansHere } from "./plan.js";
-import { holdsFile, releasesHold } from "./refactor-hold.js";
+import {
+  handWanted,
+  REFACTOR_ANSWERED,
+  refactorHand,
+  WALK_CALL,
+  walkSpec,
+  walks,
+} from "./refactor-hand.js";
 import { REPORT_CALL } from "./report.js";
 
 const ENABLED = "stop.enabled";
 // The calls the finish hold lets pass before it refuses them the way the stop hold does. [[spec/design_output/stop#the-grace]]
 const GRACE_FINISH = "grace.finish";
 const MOST = "stop.mostInARow";
-// The refactoring hand this door starts. [[spec/tickets/the-spawn-reaches-its-guidance]]
-const REFACTOR = {
-  on: "refactor.parallel",
-  most: "refactor.mostWarnings",
-  atOnce: "refactor.mostAtOnce",
-  untouched: "refactor.untouchedFor",
-  grace: "refactor.grace",
-};
-export const KIND = "refactor";
-export const REFACTOR_ANSWERED = "refactor.answered";
 const BREAK = "SE_BREAK_ON_STOP";
-const HELPER = "general-purpose";
-const SAID = 200;
-const LINE = /^stop:\s*([a-z0-9-]+)\s*$/i;
 const PASS = { pass: true };
 
-export const TOOLS = { [STOP_CALL]: claims };
+export const TOOLS = { [STOP_CALL]: claims, [WALK_CALL]: walks };
 
 export function rulesHere(disk, method) {
   return pool(readFolder(disk, join(method, RULES), ".yml")).rules;
 }
 
 export function SPECS(box) {
-  return [stopSpec(rulesOf(box))];
+  return [stopSpec(rulesOf(box)), walkSpec()];
 }
 
 // The three calls a turn ends with, which the hold at stop lets through. [[spec/design_output/stop#the-hold]]
@@ -145,20 +132,6 @@ export function sawCall(e, box) {
   if (e?.agentId) return;
   toothOf_(box).sawCall();
   todosOf(box).sawCall(e);
-  asksForHand(box);
-}
-
-// The list past the number with a file at rest asks the agent for the turn, over the grace. [[spec/design_output/stop#the-grace]]
-function asksForHand(box) {
-  // One ask stands at a time, so a standing grace leaves the list and git unread. [[spec/design_output/stop#the-grace]]
-  if (box.grace) return;
-  if (!handWanted(box) || !restingFile(box)) return;
-  wants(box, {
-    id: KIND,
-    why: `${listHere(box).length} warnings stand, and a file rests past the window, so the refactoring hand wants the turn.`,
-    react: "end this turn with a stop line, so the hand takes a file",
-    calls: asks(box, REFACTOR.grace),
-  });
 }
 
 // A prompt from outside this plugin opens a turn, and the tooth counts them. A hold is one turn long, so the mark of the turn before drops here. [[spec/design_output/stop#the-tooth-holds-its-state]]
@@ -219,7 +192,8 @@ export function onStop(e, box) {
   if (shaped.result) return shaped;
   const rules = rulesOf(box);
   const text = String(e?.last_assistant_message ?? "");
-  const claimed = box.claim ?? lastLineReason(text);
+  if (reportStands(text)) box.reported = true;
+  const claimed = claimOf(e, box);
   box.claim = null;
   // The hold that stood over this turn, so the order the two events arrive in decides nothing. [[spec/design_output/stop#the-hold-outlives-its-drop]]
   const hold = holdHere(box);
@@ -255,8 +229,6 @@ export function onStop(e, box) {
     debugger;
     box.log.say("debug", "stop", "the debugger read the stop", paused);
   }
-  // The turn's end is the reaction the grace waits for, so the calls pass again. [[spec/design_output/stop#the-grace]]
-  reacted(box, KIND);
   // The vote and the hand ride one answer, so the turn's block stands and the cleaning starts beside it. [[spec/tickets/the-spawn-reaches-its-guidance]]
   const hand = refactorHand(box);
   const answer = said.ends ? { ...PASS } : { result: { block: prompts } };
@@ -266,98 +238,6 @@ export function onStop(e, box) {
     spawn: hand,
     back: { event: REFACTOR_ANSWERED, file: hand.file },
   };
-}
-
-// Whether a hand still wants to go: the flag on, the list past the number, and this session's count unspent. The vote reads this, because a rule reading the list alone holds every turn open on a tree carrying warnings. [[spec/tickets/the-spawn-reaches-its-guidance]]
-export function handWanted(box) {
-  if (asks(box, REFACTOR.on) === false) return false;
-  if (!standsPast(listHere(box).length, asks(box, REFACTOR.most))) return false;
-  const most = Number(asks(box, REFACTOR.atOnce) ?? 0);
-  return !(most > 0 && (box.refactors ?? 0) >= most);
-}
-
-// The hand the rule starts: the file it takes, and the count it spends. [[spec/tickets/the-spawn-reaches-its-guidance]]
-export function refactorHand(box) {
-  if (!handWanted(box)) return null;
-  const file = restingFile(box);
-  if (!file) return null;
-  box.refactors = (box.refactors ?? 0) + 1;
-  holdsFile(box, file);
-  box.log.say(
-    "info",
-    "refactor",
-    `a hand takes ${file}, of ${listHere(box).length} standing`,
-    { file },
-  );
-  return {
-    prompt: drains(file),
-    description: `drain the warnings in ${file}`,
-    subagentType: HELPER,
-    kind: KIND,
-    file,
-  };
-}
-
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-export function onRefactorAnswered(e, box) {
-  releasesHold(box);
-  const said = String(e?.deny ?? "") || (e?.isError ? String(e?.text ?? "") : "");
-  box.log.say(
-    said ? "warn" : "info",
-    "refactor",
-    `the hand leaves ${e?.file ?? "a file"}`,
-    {
-      detail: said || String(e?.text ?? "").slice(0, SAID),
-    },
-  );
-  return { result: { result: "the refactoring hand answered" } };
-}
-
-// The git door answers each file's last write, in the seconds the window reads. One log over the whole list answers every file, newest first, so the first stamp above a name is its last write. [[spec/tickets/the-spawn-reaches-its-guidance]]
-function wroteIn(box, names) {
-  const wanted = new Set(names ?? []);
-  const out = Object.fromEntries([...wanted].map((name) => [name, 0]));
-  if (!wanted.size) return out;
-  let said = "";
-  try {
-    said = String(
-      box.proc.run(
-        ["git", "log", "--format=%ct", "--name-only", "--relative", "--", ...wanted],
-        { cwd: box.work },
-      ).stdout ?? "",
-    );
-  } catch {
-    return out;
-  }
-  let at = 0;
-  for (const line of said.split("\n")) {
-    const row = line.trim();
-    if (/^\d+$/.test(row)) at = Number(row);
-    else if (wanted.has(row) && !out[row]) out[row] = at;
-  }
-  return out;
-}
-
-// The file the hand takes: the oldest at rest outside the window, off the list. [[spec/tickets/the-spawn-reaches-its-guidance]]
-function restingFile(box) {
-  const files = filesOn(listHere(box));
-  const now = Math.floor(box.clock.now().getTime() / MS);
-  return takesFile(
-    files,
-    wroteIn(box, files),
-    now,
-    spanOf(asks(box, REFACTOR.untouched)),
-  );
-}
-
-// The list the lint leaves, one entry a warning, which the hand drains. [[spec/design_output/stop#the-grace]]
-function listHere(box) {
-  try {
-    const said = JSON.parse(String(box.disk.read(join(box.work, REFACTORS))));
-    return Array.isArray(said) ? said : [];
-  } catch {
-    return [];
-  }
 }
 
 function endsWhy(said) {
@@ -374,12 +254,26 @@ function asksForStop(rules, why, box) {
   ].join("\n");
 }
 
+// The turn's claim: the stop call's reason, or the last line's. [[spec/design_output/stop#the-claim-rides-the-call]]
+export function claimOf(e, box) {
+  return box.claim ?? lastLineReason(String(e?.last_assistant_message ?? ""));
+}
+
+// A turn ending on a rule under `waits: owner` waits for the owner's answer. [[spec/tickets/the-clear-keeps-questions]]
+export function waitsForOwner(e, box) {
+  const claimed = claimOf(e, box);
+  return (
+    Boolean(claimed) &&
+    rulesOf(box).some((one) => one.id === claimed && one.waits === "owner")
+  );
+}
+
 function lastLineReason(text) {
   const lines = String(text ?? "")
     .split("\n")
     .map((one) => one.trim())
     .filter(Boolean);
-  const found = LINE.exec(lines.at(-1) ?? "");
+  const found = STOP_LINE.exec(lines.at(-1) ?? "");
   return found ? found[1] : "";
 }
 
@@ -411,7 +305,8 @@ const CHECKS = {
   // [[spec/tickets/the-spawn-reaches-its-guidance]]
   "warnings-standing": (held) => handWanted(held.box),
   // [[spec/design_output/stop#a-talk-follows-a-report]]
-  "a-report-stands": (held) => reportStands(held.text),
+  // A report an earlier message of this turn carries stands too, so a stop line sent alone repeats nothing. [[spec/design_output/stop#a-talk-follows-a-report]]
+  "a-report-stands": (held) => reportStands(held.text) || Boolean(held.box?.reported),
   // What an unbuilt rule runs, so it stands off the vote and writes no line. [[spec/design_output/stop#the-mechanical-checks]]
   never: () => false,
   // A claim of done stands on an empty plan: no todo open, and nothing in hand. [[spec/design_output/stop#the-plan]]
