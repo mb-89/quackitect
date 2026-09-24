@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -165,6 +165,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box a0ae5042621d · claude-code-remote · helper-11
+    hash_before: 7bb673569145998a5ce0a095ceb24f7969d542e1
+    hash_after: 7bb673569145998a5ce0a095ceb24f7969d542e1
+    returns: 2
+    why: "design: the branch answers each row of the Ask table, and `./RUNME.sh check` answers 0.; design: no term carries `defines` or a link, and no caller reads `defines` or `undefinedTerms`.; craft: the `aside` case puts its link under `see`, so the link check alone refuses it.; craft: the `pointing` case carries `defines` and a link, so the link check refuses it with the `defines` check gone.; craft: add a case with `defines: somewhere` and no link, and assert a refusal."
 ---
 
 # Ask
@@ -421,7 +427,6 @@ The design review names three gaps, and each lands here:
 - spec/design_output/vocabulary.md
 - spec/guidance/voice.md
 - .claude/output-styles/level0.md
-- spec/design_input/the-editor-draws-the-ticket.md
 - test/contract/vocabulary.test.js
 - test/contract/shape.test.js
 - test/level0/vocabulary.test.js
@@ -436,10 +441,10 @@ The design review names three gaps, and each lands here:
 fail
 
 - design: the branch answers each row of the Ask table, and `./RUNME.sh check` answers 0.
-- design: each term drops `defines` and keeps its line, and no caller reads `defines` or `undefinedTerms`.
-- craft: the `linked` case puts the link under `source`, and the source shape refuses that already.
-- craft: so no case proves the new link check fires, and the rule passes its test without it.
-- craft: add a case with a link under a field no other check reads, and assert a refusal.
+- design: no term carries `defines` or a link, and no caller reads `defines` or `undefinedTerms`.
+- craft: the `aside` case puts its link under `see`, so the link check alone refuses it.
+- craft: the `pointing` case carries `defines` and a link, so the link check refuses it with the `defines` check gone.
+- craft: add a case with `defines: somewhere` and no link, and assert a refusal.
 
 ## checked
 
