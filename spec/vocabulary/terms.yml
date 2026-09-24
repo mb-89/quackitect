@@ -24,7 +24,7 @@ terms:
   - {word: branch, defines: "[[spec/design_output/work#what-a-work-branch-is]]"}
   - {word: cage, defines: "[[spec/design_output/level0#the-write-door]]"}
   - {word: canary, defines: "[[spec/design_output/level0#the-canary]]"}
-  - {word: inset, defines: "[[spec/funnel/a-person-works-the-ticket#one-file-holds-both-halves]]"}
+  - {word: inset, defines: "[[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]]"}
   - {word: canvas, defines: "[[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]"}
   - {word: cap, defines: "[[spec/design_output/level0#the-cap-counts-the-prose]]"}
   - {word: chapter, defines: "[[spec/design_output/schema]]"}
