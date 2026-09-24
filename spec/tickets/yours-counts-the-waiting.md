@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -116,6 +116,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: d03a491cc323735a6dc822cb34d3c089aa881304
+    hash_after: d03a491cc323735a6dc822cb34d3c089aa881304
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -257,11 +265,19 @@ Every case fails on its own assertion, with the verb unknown and `waiting` a stu
 
 <!-- the form is command -->
 
+./RUNME.sh lint src/scripts/ticket-yours.js src/scripts/ticket.js src/scripts/cli.js test/level0/ticket-yours.test.js
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It adds the verb's module, wires the dispatch, and names the verb in the command line's list.
+- every door the change reaches has a fake. The verb reaches the disk and git, and the cases drive both fakes.
+- a comment names the approach the change implements. The module opens on the design input, and each function points at its note.
+
 
 ## tests-green
 
@@ -273,11 +289,17 @@ Every case fails on its own assertion, with the verb unknown and `waiting` a stu
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/ticket-yours.test.js test/level0/queue.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -285,11 +307,27 @@ Every case fails on its own assertion, with the verb unknown and `waiting` a stu
 
 <!-- the form is text -->
 
+`./RUNME.sh ticket yours` answers the tickets waiting on a person, as JSON. `waiting` in `src/scripts/ticket-yours.js` holds the rule: an open ticket whose pointer's leaf carries `by: person`.
+
+| the flag | the answer |
+|---|---|
+| `--count` | how many wait |
+| `--next` | the first in queue order, or a null ticket |
+| none | every one, in queue order |
+
+The order is the one `handOut` reads: a tagged ticket first, then `sorted` over `weighing`. So the button the work group draws takes the ticket the pull would hand a person.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It touches the verb's module, the dispatch, the command line's list, and the cases.
+- every door the change reaches has a fake. The cases drive the fake disk and the fake git.
+- a comment names the approach the change implements. Each new function points at the design input it builds.
+
 
 # verdict
 

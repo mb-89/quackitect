@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
+import { verbs } from "../../src/scripts/cli.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { waiting } from "../../src/scripts/ticket-yours.js";
 
@@ -114,4 +115,8 @@ test("bare yours lists every ticket waiting, in queue order", () => {
     ["b-urgent-one", "a-later-one"],
   );
   assert.equal(said.json?.tickets?.[1]?.step, "sign");
+});
+
+test("the command line's ticket entry names the yours verb", () => {
+  assert.match(verbs.ticket.says, /\byours\b/);
 });

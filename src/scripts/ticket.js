@@ -25,6 +25,7 @@ import { askRows, processAt } from "./process.js";
 import { emptyGroup } from "./pull-hand.js";
 import { landedAlone } from "./pull-landed.js";
 import { reachedOf, routed } from "./ticket-route.js";
+import { yours } from "./ticket-yours.js";
 import { askFaults, askRefusal, lineRefusal } from "./ticket-ask-lint.js";
 
 export const NOTES = TICKETS;
@@ -40,7 +41,7 @@ export function ticket(root, argv, doors) {
   const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
   const name = argv[1];
-  const doing = { note, update, open, todo, route };
+  const doing = { note, update, open, todo, route, yours: (it, _name, argv) => yours(it, argv) };
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh ticket <verb>\n");
     console.log(
@@ -60,6 +61,9 @@ export function ticket(root, argv, doors) {
     );
     console.log(
       "  route <ticket>      write the steps past the pointer, off --steps=<json>, and answer JSON",
+    );
+    console.log(
+      "  yours               the tickets waiting on a person as JSON, or --count, or --next",
     );
     console.log(
       `                      note takes --${TALK} where a person decides it, and --${TODO} to park it`,
