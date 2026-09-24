@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [the-route-edits-ahead]
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -136,6 +136,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 2bc65ec92430 · claude-code-remote · helper-7
+    hash_before: 3f82e33b1c23311c3df3b8002fee3b7652bf5b5a
+    hash_after: 3f82e33b1c23311c3df3b8002fee3b7652bf5b5a
+    returns: 1
+    why: test/level0/ticket-drift.test.js repeats `heard`, which test/level0/pull-doors.js already exports; `same` in ticket-drift.js repeats the canonical compare of `same` in ticket-route.js, so export that one; the refusals, the reached leaf and `--over` each carry a case that fires, and nothing else strays; `./RUNME.sh check` exits 0, and ticket-drift, ticket-verb and roots tests pass
 ---
 
 # Ask
@@ -345,17 +351,39 @@ So a route a person edits through `ticket route` survives an update, or the verb
 
 <!-- the form is files -->
 
+- spec/tickets/an-update-keeps-a-route.md
+- src/scripts/ticket-drift.js
+- src/scripts/ticket.js
+- src/scripts/ticket-route.js
+- src/scripts/process.js
+- src/doors/git.js
+- src/doors/fake/git.js
+- .claude/skills/level0/lib/schema-route.js
+- test/level0/ticket-drift.test.js
+- test/level0/ticket-verb.test.js
+- test/level0/roots.test.js
+- test/level0/pull-doors.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+- test/level0/ticket-drift.test.js repeats `heard`, which test/level0/pull-doors.js already exports
+- `same` in ticket-drift.js repeats the canonical compare of `same` in ticket-route.js, so export that one
+- the refusals, the reached leaf and `--over` each carry a case that fires, and nothing else strays
+- `./RUNME.sh check` exits 0, and ticket-drift, ticket-verb and roots tests pass
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place. It fails here, since `heard` and `same` repeat pull-doors.js and ticket-route.js.
 
 # Discussion
 
