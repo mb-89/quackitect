@@ -234,7 +234,7 @@ function route(it, name, argv) {
   const at = name ? ticketAt(it, name) : null;
   if (!at) {
     console.log(JSON.stringify({ refused: `${name ?? ""} names no ticket under ${NOTES} or ${TRAVELS}.`, at: "" }));
-    return 2;
+    return 1;
   }
   return routed(it, at, argv, schemasHere(it).get("ticket"));
 }

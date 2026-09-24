@@ -224,3 +224,12 @@ test("reachedOf names each leaf up to the pointer, and each step the record name
 test("the command line's ticket entry names the route verb", () => {
   assert.match(verbs.ticket.says, /\broute\b/);
 });
+
+test("a ticket standing nowhere is refused with exit 1, as JSON naming the folders", () => {
+  const disk = fakeDisk({ [at("spec/schemas/ticket.schema.yaml")]: TICKET_SCHEMA });
+  const ran = heard(() => ticket(ROOT, ["route", "nowhere", "--steps=[]"], { disk, join }));
+  assert.equal(ran.code, 1);
+  const said = JSON.parse(ran.said);
+  assert.match(said.refused, /nowhere names no ticket under .* or spec\/tickets/);
+  assert.equal(said.at, "");
+});

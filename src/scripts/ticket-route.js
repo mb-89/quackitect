@@ -3,7 +3,7 @@
 // route as JSON, checks it with `aheadOnly`, and answers JSON on both roads.
 // [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
 
-import { entriesIn, readNote } from "../../.claude/skills/level0/lib/schema.js";
+import { canonicalOf, entriesIn, readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 
 const FLAG = "--steps=";
@@ -98,14 +98,5 @@ function fieldsOf(said) {
 }
 
 function same(a, b) {
-  return canonical(a) === canonical(b);
-}
-
-function canonical(said) {
-  if (Array.isArray(said)) return `[${said.map(canonical).join(",")}]`;
-  if (said && typeof said === "object") {
-    const keys = Object.keys(said).sort();
-    return `{${keys.map((key) => `${JSON.stringify(key)}:${canonical(said[key])}`).join(",")}}`;
-  }
-  return JSON.stringify(said ?? null);
+  return JSON.stringify(canonicalOf(a)) === JSON.stringify(canonicalOf(b));
 }
