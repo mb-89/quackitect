@@ -51,6 +51,7 @@ import {
   STYLES,
   settings,
 } from "./cli-doors.js";
+import { browserSays } from "./browser.js";
 import { namesIn, show, walk } from "./cli-read.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { formatFaults, goEnvOf, goModulesIn } from "./cli-go.js";
@@ -546,6 +547,7 @@ export async function doctor() {
         : "missing",
     ],
     ["sidebar", sidebarSays()],
+    ["browser", browserSays()],
     ["commit hook", hooksSay()],
     [
       "vale rules",

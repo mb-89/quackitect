@@ -42,8 +42,15 @@ test("the install fetches the Go modules as a want, after go and before the buil
   const wants = `${list[1]} ${list[2]}`.split(/\s+/);
   const at = wants.indexOf("go-modules");
   assert.ok(at > wants.indexOf("go"), "the modules follow Go");
-  assert.ok(at < wants.indexOf("index") && at < wants.indexOf("se-lsp"), "the builds follow the modules");
-  assert.match(said, /\[ "\$1" = "go-modules" \]/, "a missing module set stops no verb");
+  assert.ok(
+    at < wants.indexOf("index") && at < wants.indexOf("se-lsp"),
+    "the builds follow the modules",
+  );
+  assert.match(
+    said,
+    /\[ "\$1" = "go-modules" \]/,
+    "a missing module set stops no verb",
+  );
   assert.match(said, /go mod download/, "the want fetches each module");
 });
 
@@ -68,4 +75,21 @@ test("both announcement lines wait on a missing want, so a warm tree runs silent
     /^\[ -n "\$missing" \] && say "Ready\./,
     "the closing line carries the same test on its own row",
   );
+});
+
+// The drawing and its browser are wants, so a box with no registry and no browser still runs every verb. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
+test("the install bundles the drawing and resolves a browser, both as wants", () => {
+  const said = disk().read(join(root, "src", "scripts", "install.sh"));
+  const list = /^for one in (.+?)\s*\\\n\s*(.+?); do/m.exec(said);
+  const wants = `${list[1]} ${list[2]}`.split(/\s+/);
+  for (const one of ["drawing", "browser"]) {
+    assert.ok(wants.includes(one), `the loop names ${one}`);
+    assert.match(
+      said,
+      new RegExp(`\\[ "\\$1" = "${one}" \\]`),
+      `a missing ${one} stops no verb`,
+    );
+  }
+  assert.match(said, /node src\/scripts\/bundle\.js/, "the want runs the bundle step");
+  assert.match(said, /node src\/scripts\/browser\.js/, "the want asks the resolver");
 });
