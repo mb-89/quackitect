@@ -183,7 +183,7 @@ ifVale(
   ),
 );
 
-// The vocabulary rule compiles its patterns once a run, and still refuses a word off its shape, a core entry naming no source, a term pointing at a note, a term saying nothing of what it means, and a source that is no web address or holds a comma. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+// The vocabulary rule compiles its patterns once a run, and still refuses a word off its shape, an open brace, an entry naming no word, a swap naming no write, an entry under no list, a core entry naming no source, a term pointing at a note, a term saying nothing of what it means, and a source that is no web address or holds a comma. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 const VOCABULARY = "spec/vocabulary/probe.yml";
 const ENTRY = "VoiceShape.VocabularyEntry";
 
@@ -199,6 +199,10 @@ ifVale(
       sourceless: at("words:\n  - {word: door, from: nowhere}\n", VOCABULARY),
       pointing: at("terms:\n  - {word: shim, defines: somewhere, means: \"a script\"}\n", VOCABULARY),
       aside: at("terms:\n  - {word: shim, means: \"a script\", see: \"[[spec/guidance/voice]]\"}\n", VOCABULARY),
+      open: at("words:\n  - {word: door, from: ste\n", VOCABULARY),
+      wordless: at("words:\n  - {from: ste}\n", VOCABULARY),
+      writeless: at("swaps:\n  - {word: utilize}\n", VOCABULARY),
+      listless: at("  - {word: door, from: ste}\n", VOCABULARY),
       meaningless: at("terms:\n  - {word: shim}\n", VOCABULARY),
       comma: at(
         "terms:\n  - {word: shim, means: \"a script, and more\"}\n",
@@ -215,7 +219,7 @@ ifVale(
     },
     (said) => {
       passes(said, ENTRY, "good");
-      for (const key of ["shapeless", "sourceless", "pointing", "aside", "meaningless", "comma", "split", "addressless"]) {
+      for (const key of ["shapeless", "sourceless", "open", "wordless", "writeless", "listless", "pointing", "aside", "meaningless", "comma", "split", "addressless"]) {
         refuses(said, ENTRY, key);
       }
     },
