@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -36,6 +36,7 @@ process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
 group: the-editor-holds-the-drawing
 depends_on: [the-host-runs-the-verbs, a-save-fills-the-ticket, the-work-group-draws-buttons]
+step: answer
 ---
 
 # Ask
