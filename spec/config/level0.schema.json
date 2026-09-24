@@ -45,6 +45,41 @@
         }
       }
     },
+    "helper": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "find": {
+          "type": "string",
+          "enum": [
+            "haiku",
+            "sonnet",
+            "opus"
+          ],
+          "help": "The model a helper runs on that finds, lists, reads and reports."
+        },
+        "change": {
+          "type": "string",
+          "enum": [
+            "haiku",
+            "sonnet",
+            "opus"
+          ],
+          "help": "The model a helper runs on that makes a scoped change with its test, or reviews against a list."
+        },
+        "decide": {
+          "type": "string",
+          "enum": [
+            "haiku",
+            "sonnet",
+            "opus"
+          ],
+          "help": "The model a helper runs on that takes a design, an unknown cause, or a verdict the owner reads."
+        }
+      }
+    },
     "context": {
       "type": "object",
       "properties": {
