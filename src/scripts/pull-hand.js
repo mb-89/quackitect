@@ -105,6 +105,13 @@ export function sorted(list, at = {}) {
   return queued(list, at.all ?? list, at);
 }
 
+// A tagged ticket stands first, as the list holds it, and the score orders the rest. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+export function taggedFirst(list, at = {}) {
+  const tagged = list.filter((one) => todoOf(one.front) !== "");
+  const rest = list.filter((one) => todoOf(one.front) === "");
+  return [...tagged, ...sorted(rest, at)];
+}
+
 // [[spec/design_output/pull#what-a-hand-out-reads]]
 export function handOut(it, who) {
   repairPersonSteps(it, who);

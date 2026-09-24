@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -145,6 +145,14 @@ record:
     hand: box 2bc65ec92430 · claude-code-remote
     hash_before: e5e9ecf1e1d6f0f17f0aad0c9af056e4aa2c8a4c
     hash_after: e5e9ecf1e1d6f0f17f0aad0c9af056e4aa2c8a4c
+  - step: implement/change
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 45ced2c6686494d36bab464b4d51979a32fa88ed
+    hash_after: 45ced2c6686494d36bab464b4d51979a32fa88ed
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -336,7 +344,7 @@ The findings share one class: the change rebuilt a reading the pull already owns
 
 <!-- the form is text -->
 
-`./RUNME.sh ticket yours` answers the tickets waiting on a person, as JSON. `waiting` in `src/scripts/ticket-yours.js` holds the rule: an open ticket whose pointer's leaf carries `by: person`.
+`./RUNME.sh ticket yours` answers the tickets waiting on a person, as JSON. `waiting` in `src/scripts/ticket-yours.js` holds the rule: an open ticket whose pointer's leaf a person holds. `leafOf` answers the hand, so a person named on a phase holds each leaf under it.
 
 | the flag | the answer |
 |---|---|
@@ -344,7 +352,7 @@ The findings share one class: the change rebuilt a reading the pull already owns
 | `--next` | the first in queue order, or a null ticket |
 | none | every one, in queue order |
 
-The order is the one `handOut` reads: a tagged ticket first, then `sorted` over `weighing`. So the button the work group draws takes the ticket the pull would hand a person.
+`taggedFirst` in `src/scripts/pull-hand.js` holds the order: a tagged ticket first, then `sorted` over `weighing`. So the button the work group draws takes the ticket the pull would hand a person.
 
 
 ### checked

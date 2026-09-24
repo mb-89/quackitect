@@ -8,6 +8,7 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { verbs } from "../../src/scripts/cli.js";
+import { taggedFirst } from "../../src/scripts/pull-hand.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { waiting } from "../../src/scripts/ticket-yours.js";
 
@@ -119,4 +120,34 @@ test("bare yours lists every ticket waiting, in queue order", () => {
 
 test("the command line's ticket entry names the yours verb", () => {
   assert.match(verbs.ticket.says, /\byours\b/);
+});
+
+test("a person named on the phase holds each leaf under it", () => {
+  const text = `---
+kind: [[ticket]]
+state: open
+steps:
+  - name: sign
+    by: person
+    steps:
+      - name: read
+        does: reads the change
+step: sign/read
+---
+`;
+  assert.deepEqual(
+    waiting([{ name: "a-phase-one", path: "spec/tickets/a-phase-one.md", text }]).map(
+      (one) => one.name,
+    ),
+    ["a-phase-one"],
+  );
+});
+
+test("taggedFirst keeps the tagged tickets first as listed, and scores the rest", () => {
+  const one = (name, front) => ({ name, path: `${name}.md`, text: "", front });
+  const list = [one("a", {}), one("b", { todo: true }), one("c", {}), one("d", { todo: true })];
+  assert.deepEqual(
+    taggedFirst(list).map((it) => it.name),
+    ["b", "d", "a", "c"],
+  );
 });
