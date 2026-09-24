@@ -56,7 +56,7 @@ function planSpec() {
               place: {
                 type: "integer",
                 description:
-                  "The place in the queue, 1 to 9: the todo stands before the row at that place now, and past the last row it stands at the end.",
+                  "The place in the queue, 1 to 9: the todo stands before the todo at that place now. A place on a ticket or past the todos puts it after every todo, before the first ticket.",
               },
             },
             required: ["title"],

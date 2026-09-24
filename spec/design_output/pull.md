@@ -300,6 +300,9 @@ stands before, or one of the words below:
 | `end` | after every row at its level, which a place digit past the queue writes |
 | a name standing nowhere | first at its level, because the row it names stands off the queue |
 
+A todo of the plan stands before every ticket. It anchors at `true` or on
+another todo of the plan, and any other anchor reads as `last`.
+
 The place moves as the queue drains, because the todo holds the order and
 no number. Todos of the plan tied on every score keep the order the plan
 writes them in. The work tab writes it under `p` and a digit, the pull hands a
