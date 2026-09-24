@@ -197,11 +197,7 @@ ifVale(
       ),
       shapeless: at("words:\n  - {word: Door, from: ste}\n", VOCABULARY),
       sourceless: at("words:\n  - {word: door, from: nowhere}\n", VOCABULARY),
-      pointing: at(
-        "terms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\", means: \"a script\"}\n",
-        VOCABULARY,
-      ),
-      linked: at("terms:\n  - {word: shim, means: \"a script\", source: \"[[spec/guidance/voice]]\"}\n", VOCABULARY),
+      pointing: at("terms:\n  - {word: shim, defines: somewhere, means: \"a script\"}\n", VOCABULARY),
       aside: at("terms:\n  - {word: shim, means: \"a script\", see: \"[[spec/guidance/voice]]\"}\n", VOCABULARY),
       meaningless: at("terms:\n  - {word: shim}\n", VOCABULARY),
       comma: at(
@@ -219,7 +215,7 @@ ifVale(
     },
     (said) => {
       passes(said, ENTRY, "good");
-      for (const key of ["shapeless", "sourceless", "pointing", "linked", "aside", "meaningless", "comma", "split", "addressless"]) {
+      for (const key of ["shapeless", "sourceless", "pointing", "aside", "meaningless", "comma", "split", "addressless"]) {
         refuses(said, ENTRY, key);
       }
     },

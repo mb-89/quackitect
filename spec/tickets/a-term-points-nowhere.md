@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -171,6 +171,10 @@ record:
     hash_after: 7bb673569145998a5ce0a095ceb24f7969d542e1
     returns: 2
     why: "design: the branch answers each row of the Ask table, and `./RUNME.sh check` answers 0.; design: no term carries `defines` or a link, and no caller reads `defines` or `undefinedTerms`.; craft: the `aside` case puts its link under `see`, so the link check alone refuses it.; craft: the `pointing` case carries `defines` and a link, so the link check refuses it with the `defines` check gone.; craft: add a case with `defines: somewhere` and no link, and assert a refusal."
+  - step: implement/reflect
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: cf0366a234e76cff90938049cbe8a10e684f9dec
+    hash_after: cf0366a234e76cff90938049cbe8a10e684f9dec
 ---
 
 # Ask
@@ -315,10 +319,12 @@ loses nothing when `defines` goes.
 
 <!-- the form is text -->
 
-The class is a case that a second check refuses first. The `linked` case puts
-its link under `source`, where the address check already refuses it, so the
-case passes with the link check gone. The fix gives each refusal a case that
-breaks that refusal alone, here a link under a field no other check reads.
+The class is a case that a second check refuses first. A case carrying two
+faults passes with either check gone. The earlier fix gave the link check a
+case of its own and left `pointing` carrying `defines` and a link. The fix for
+the class holds for every refusal of the rule: each case carries one fault.
+So `pointing` carries `defines` with no link. `linked` goes, because `aside`
+and `addressless` each carry one of its two faults.
 
 ### checked
 
