@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -163,6 +163,17 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 9927239c7ddf43dc74e4feea249293f5e3fd7d63
+    hash_after: 9927239c7ddf43dc74e4feea249293f5e3fd7d63
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 29 test(s) pass in 1 file(s); green, src/lsp passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-server-offers-processes.md:405:2: Sentence: A sentence holds 25 words. Cut this one in two."
 ---
 
 # Ask
