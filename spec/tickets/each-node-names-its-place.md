@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -116,6 +116,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 8e8d613a71038911f65d530ea43f84ec0f2c8d71
+    hash_after: 8e8d613a71038911f65d530ea43f84ec0f2c8d71
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -249,11 +257,19 @@ The ticket case fails on its own assertion, since no node carries a place yet. T
 
 <!-- the form is command -->
 
+./RUNME.sh lint src/scripts/graph.js src/scripts/pull-chapter.js .claude/skills/level0/lib/schema-read.js .claude/skills/level0/lib/schema.js test/level0/graph.test.js test/level0/pull-chapter.test.js
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It touches the emitter, the reader `sectionAt` moves into, and the chapter file that calls it.
+- every door the change reaches has a fake. The emitter and the reader read text alone.
+- a comment names the approach the change implements. `placed` and `sectionAt` point at their notes.
+
 
 ## tests-green
 
@@ -265,11 +281,17 @@ The ticket case fails on its own assertion, since no node carries a place yet. T
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/graph.test.js test/level0/pull-chapter.test.js test/level0/drawing.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -277,11 +299,26 @@ The ticket case fails on its own assertion, since no node carries a place yet. T
 
 <!-- the form is text -->
 
+Each node `./RUNME.sh graph` answers over a ticket now carries its place in the body:
+
+| the key | what it holds |
+|---|---|
+| `chapter` | the heading as the body writes it, such as `## draft` |
+| `line` | the heading's line in the file, counted from one |
+
+A process file holds no body, so its nodes carry neither. `sectionAt` moves into `.claude/skills/level0/lib/schema-read.js` beside `readNote`, so the emitter the extension loads stays off the voice doors. `chapterOf` calls it too, so one walk finds a step's heading.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It touches the emitter, the reader, the chapter file, and their cases.
+- every door the change reaches has a fake. The cases hand the emitter text, and it reaches no door.
+- a comment names the approach the change implements. Each new function points at its note.
+
 
 # verdict
 

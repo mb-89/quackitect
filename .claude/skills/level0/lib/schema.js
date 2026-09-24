@@ -44,7 +44,7 @@ export {
   typed,
   typeOf,
 } from "./schema-fault.js";
-export { FENCE, kindOf, readNote } from "./schema-read.js";
+export { FENCE, kindOf, readNote, sectionAt } from "./schema-read.js";
 export {
   canonicalOf,
   entriesIn,

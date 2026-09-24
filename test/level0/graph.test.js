@@ -15,6 +15,8 @@ import {
   PASS,
   PHASE,
 } from "../../src/scripts/graph.js";
+import { sectionAt as sectionThrough } from "../../.claude/skills/level0/lib/schema.js";
+import { readNote, sectionAt } from "../../.claude/skills/level0/lib/schema-read.js";
 
 const ROUTE = `
 steps:
@@ -193,4 +195,15 @@ test("a node drawn from a bare process carries no place", () => {
     assert.equal(one.chapter, undefined, `${one.id} carries no chapter`);
     assert.equal(one.line, undefined, `${one.id} carries no line`);
   }
+});
+
+test("sectionAt finds a step's heading one level a step deep, and answers -1 elsewhere", () => {
+  const sections = readNote(TICKET).sections;
+  assert.equal(sections[sectionAt(sections, "design/review")].header, "review");
+  assert.equal(sectionAt(sections, "review"), -1);
+  assert.equal(sectionAt(sections, "do"), -1);
+});
+
+test("the schema module hands on the one sectionAt the reader holds", () => {
+  assert.equal(sectionThrough, sectionAt);
 });

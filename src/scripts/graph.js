@@ -9,6 +9,7 @@ import {
   entryNamed,
   readNote,
   readYaml,
+  sectionAt,
 } from "../../.claude/skills/level0/lib/schema.js";
 
 export const PHASE = "phase";
@@ -17,13 +18,13 @@ export const PASS = "pass";
 export const FAIL = "fail";
 export const HOLDS = "holds";
 
-// [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
-export function graphOf(front) {
+// A note's sections give each node the chapter it writes under, and a process hands none. [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
+export function graphOf(front, sections = []) {
   const said = front ?? {};
   const walk = entriesIn(said.steps, "steps");
   const record = recordOf(said.record);
   return {
-    nodes: walk.map((one) => nodeOf(one, said, record)),
+    nodes: walk.map((one) => placed(nodeOf(one, said, record), sections)),
     edges: [...holdEdges(walk), ...passEdges(walk), ...failEdges(walk)],
   };
 }
@@ -31,9 +32,17 @@ export function graphOf(front) {
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 export function graphIn(text) {
   const said = String(text ?? "");
-  return graphOf(
-    said.startsWith("---") ? (readNote(said).front.said ?? {}) : readYaml(said),
-  );
+  if (!said.startsWith("---")) return graphOf(readYaml(said));
+  const note = readNote(said);
+  return graphOf(note.front.said ?? {}, note.sections);
+}
+
+// [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
+function placed(node, sections) {
+  const at = sectionAt(sections, node.id);
+  if (at < 0) return node;
+  const one = sections[at];
+  return { ...node, chapter: `${"#".repeat(one.level)} ${one.header}`, line: one.line };
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
