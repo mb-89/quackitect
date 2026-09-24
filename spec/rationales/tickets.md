@@ -43,25 +43,25 @@ line, and the retro decides it later with the tree in front of it.
 The alternative is a hand weighing every stray thought against the step it
 stands on, which stops the step.
 
-## 9. A note is private
+## 10. A note is private
 
 A note is the smallest ticket, and most of them die at the retro. A private
 ticket under `.se` costs nothing to write and stays off git, so a session parks
 a thought without a commit and without a review.
 
-## 10. The memory folder drains
+## 11. The memory folder drains
 
 The agent's memory folder stands on one box and travels with nothing. A rule
 that lives there shapes one box alone. So the retro moves every such entry into
 the tree, where a clone and a cloud box read it.
 
-## 11. A group is a branch
+## 12. A group is a branch
 
 A branch is the one thing git decides on. So the claim on a group is a push, and
 two boxes reaching for one group meet one rejected push. The children ride the
 branch, and the merge is the verdict over the sum.
 
-## 13. The mark means stopped work
+## 14. The mark means stopped work
 
 The queue orders every ticket by its score, and the mark overrides the score.
 So the mark carries meaning only while few tickets carry it. The three urgency

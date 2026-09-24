@@ -199,7 +199,7 @@ stands for every tab, because the strip names the tab.
 | the tab | its presets |
 |---|---|
 | the log | the prompts and the replies under `alt+q`, and the selected row's kind under `alt+⇧f` |
-| the work | the groups of its base file, each under a number with alt: the queue, in hand, recently done, urgent |
+| the work | the groups of its base file, each under a number with alt: the queue, in hand, recently done, urgent, todos, open, notes |
 
 A preset is one row of the pane: its key and its name, and nothing else,
 because its filter runs long. The row stands lit while the line holds that

@@ -253,7 +253,8 @@ every reader draws as it stands.
 | an open step the pull holds back: one waiting on a dependency, one another hand holds | counts on after the agent's |
 | a group | one number, where its best member stands |
 | a ticket under a group | the group's number, a dot, and its own place under it, as `1.2` |
-| a private note on this box | a place of its own, because the pull hands it out too |
+| a private ticket on this box | a place of its own, because the pull hands it out too |
+| a note on this box | none, because it waits for its retro |
 | a closed ticket | none |
 
 An agent takes no negative place, so the person's rows stand for a person
