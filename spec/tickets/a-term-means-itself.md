@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -122,6 +122,17 @@ record:
     hash_after: 02d13319745389078ad2433d184e0814cc6f8406
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: f877ac45d3303c6c9212f2b1a4b1d64c329e591d
+    hash_after: f877ac45d3303c6c9212f2b1a4b1d64c329e591d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 28 test(s) pass in 3 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -310,11 +321,15 @@ comma splits in two, so a `means` line holds no comma.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/vocabulary.test.js test/contract/shape.test.js test/level0/vocabulary.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -322,11 +337,30 @@ comma splits in two, so a `means` line holds no comma.
 
 <!-- the form is text -->
 
+Every term in `spec/vocabulary/terms.yml` now says what it means in one line
+under `means`. A term naming an outside tool or format cites its address under
+`source`. `termsOf` answers both fields, so the refusal and the hover read one
+source.
+
+| piece | what changes |
+|---|---|
+| `terms.yml` | every entry carries `means`, and the outside ones carry `source` |
+| `vocabulary.js` | one table of endings drives the stem the rule runs and the check `looseMeanings` |
+| `VocabularyEntry.yml` | refuses a term with no `means`, a comma, colon or bracket in it, and a source that is no web address |
+| the tests | hold the lines, the table and the three refusals |
+
+A `means` line holds no comma, because the reader of a one-line entry splits
+a quoted value on it. `defines` stays until the refusal child takes it away.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the reader, both rules, the list and their tests, and the ask names each
+- the tests reach the disk door alone, and the fake disk stands for it
+- the table, the check and the shape rule each carry a comment naming the design output
 
 # verdict
 
