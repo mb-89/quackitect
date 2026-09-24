@@ -207,7 +207,7 @@ test("a folder dialog closed on nothing runs nothing, and writes no line", async
   assert.deepEqual(sidebar.logbook.lines(), []);
 });
 
-test("the two buttons draw in a section of their own, beside where the engine state lands", async () => {
+test("the two buttons draw in a section of their own", async () => {
   const said = await sidebarOf(doorOf()).html();
   assert.match(said, /data-section="engine"/);
   assert.match(said, /at-0-0-1-1" data-key="engine\.vehicle" data-widget="action"/);

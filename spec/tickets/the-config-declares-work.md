@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [yours-counts-the-waiting]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -127,6 +127,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 94b0607e8263c437442729289fc9d0004119fba7
+    hash_after: 94b0607e8263c437442729289fc9d0004119fba7
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -274,11 +282,19 @@ Every case fails on its own assertion. The cases read the declaration the tree s
 
 <!-- the form is command -->
 
+./RUNME.sh lint spec/config/level0.schema.json test/contract/work-buttons.test.js test/contract/tree.test.js test/contract/sidebar.test.js test/level0/sidebar.test.js
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It touches the declaration, and the tests that read it.
+- every door the change reaches has a fake. The change adds data alone, and no code reaches a door.
+- a comment names the approach the change implements. The section comments say what each section holds now.
+
 
 ## tests-green
 
@@ -290,11 +306,17 @@ Every case fails on its own assertion. The cases read the declaration the tree s
 
 <!-- the form is command -->
 
+./RUNME.sh test test/contract/work-buttons.test.js test/contract/tree.test.js test/contract/sidebar.test.js test/level0/sidebar.test.js test/level0/config.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -302,11 +324,27 @@ Every case fails on its own assertion. The cases read the declaration the tree s
 
 <!-- the form is text -->
 
+`spec/config/level0.schema.json` drops `engine.state` and `engine.beat`, which nothing read. The `work` section keeps its knobs and declares the work group's three buttons:
+
+| the key | the button | what it declares |
+|---|---|---|
+| `work.editor` | the work editor | `runs` the work tab, and `counts` through `ticket yours --count` |
+| `work.pull` | pull for me | `runs` `ticket yours --next`, whose ticket the host pulls and opens |
+| `work.new` | new ticket | `asks` a name, and `opens` the file it names |
+
+Each button carries no group, so the sidebar draws none of them yet. The desk group's host reads `counts` and `opens`, and its work group child adds the group.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It touches the declaration and the tests that read it.
+- every door the change reaches has a fake. The change reaches no door.
+- a comment names the approach the change implements. The new contract file opens on the design input.
+
 
 # verdict
 
