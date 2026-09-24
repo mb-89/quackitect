@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -105,6 +105,17 @@ record:
     hand: box 2bc65ec92430 · claude-code-remote · helper-2
     hash_before: 671713f72c32205c8d4afd58d2117c70fc39617c
     hash_after: 671713f72c32205c8d4afd58d2117c70fc39617c
+  - step: implement/tests-red
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: f18376d690c84c21bc698886edf5854c48a11cbc
+    hash_after: f18376d690c84c21bc698886edf5854c48a11cbc
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -200,17 +211,28 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/ticket-fill.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Every case fails on its own assertion, with the verb unknown. The cases stand in a new file, `test/level0/ticket-fill.test.js`, since `test/level0/ticket-verb.test.js` sits close to the line ceiling. They read the shared ticket schema and the trivial route out of `test/level0/fixtures.js`. A refusal of a bare `process` reads the reason `processAt` gives.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It adds the verb's module and its cases.
+- every door the change reaches has a fake. The verb reaches the disk alone, and the cases drive the fake disk.
+- a comment names the approach the change implements. Both new files open on the design input they build.
+
 
 ## reflect
 
