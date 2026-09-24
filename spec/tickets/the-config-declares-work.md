@@ -96,7 +96,12 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [yours-counts-the-waiting]
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: b457f4514cd785e6e7ffc5305a8a17674111b93f
+    hash_after: b457f4514cd785e6e7ffc5305a8a17674111b93f
 ---
 
 # Ask
@@ -125,17 +130,47 @@ The sidebar keeps keys no code reads, and the work group has nowhere to declare 
 
 <!-- the form is text -->
 
+Two edits to `spec/config/level0.schema.json`, and the tests that read the declaration follow.
+
+| the edit | what changes |
+|---|---|
+| the engine keys leave | `engine.state` and `engine.beat` go, and the `engine` comment drops its line on widgets nothing draws |
+| the work section | a new section, `work`, declares three action widgets under the group `work`, in one row |
+
+| the key | the button | what it declares |
+|---|---|---|
+| `work.editor` | the work editor | `runs` the work tab through `./RUNME.sh tui work`, and `counts` through `./RUNME.sh ticket yours --count` |
+| `work.pull` | pull for me | `runs` `./RUNME.sh ticket yours --next`, whose ticket the host pulls and opens |
+| `work.new` | new ticket | `asks` a name, and `opens` the file under `spec/tickets` it names |
+
+The schema declares the buttons, and the host the desk group builds draws them. So `counts` and `opens` are new widget keys the host reads. Each carries its `help`, an `icon` and a cell, so the grid check holds.
+
+| the test | the change |
+|---|---|
+| `test/contract/tree.test.js` | the drawn list gains the three keys, and the list of widgets waiting for a group empties |
+| `test/contract/sidebar.test.js` | the vehicle and the stub share a section with each other, since the engine state leaves |
+| `test/level0/config.test.js` | one case says the engine keys stand nowhere, and one says each work button runs a verb the ticket verb answers |
+
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/extension/lib/widgets.js` `drawnIn` and `groupsIn`, which draw the new group unchanged
+- `src/extension/sidebar.js` the button message, which runs `runs` unchanged
+- `test/contract/tree.test.js` and `test/contract/sidebar.test.js`, which read the declaration
+
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first draft
+
 
 ## review
 
