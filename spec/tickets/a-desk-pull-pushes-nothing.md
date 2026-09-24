@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,19 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: d62d892ec3dac1de087aeb304c53f98cd87abab1
+    hash_after: 7558bf06b0f45c99bb863736da60143516b41412
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 15 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "src/bridge/refactor-hand.js:142:55: Modal: This register holds the modals can, must, will. Say what is, or name the one "
+reason: done
 ---
 
 # Ask
@@ -52,11 +65,15 @@ Without it every hand-back on a desk pushes `main`, so a desk breaks working rul
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/level0/pull-push.test.js test/level0/pull-escalate.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -64,11 +81,17 @@ Without it every hand-back on a desk pushes `main`, so a desk breaks working rul
 
 <!-- the form is text -->
 
+`pushed` in `src/scripts/pull-push.js` answers local on a desk, before any check or push. So every pull hand-back on a desk stands on the box, and the owner pushes. A cloud box pushes through the same function. One test drives the desk hand-back and the cloud push, and the escalation on a desk pushes nothing. `spec/design_output/pull.md` names the desk road.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the desk commits and pushes nothing, the cloud box pushes, and one test drives both
+- the cleanup: the trunk road of `pushed` has no pull caller, and the note `trunk-push-has-no-caller` carries it
+- one place: the desk road stands in the `pull.md` table, and the code comment points at the working guidance
 
 # Discussion
 
