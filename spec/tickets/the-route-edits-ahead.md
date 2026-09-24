@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -115,6 +115,17 @@ record:
     hand: box 2bc65ec92430 · claude-code-remote · helper-4
     hash_before: c0935535c54b673c8b9cb7ec0f656f73b10f0afc
     hash_after: c0935535c54b673c8b9cb7ec0f656f73b10f0afc
+  - step: implement/tests-red
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 362b132c94e7986e9df855e5a83f16f94ce8ec13
+    hash_after: 362b132c94e7986e9df855e5a83f16f94ce8ec13
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 10 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -217,17 +228,27 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/ticket-route.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Every case fails on its own assertion, with the verb unknown and `aheadOnly` a stub. The cases stand in a new file, `test/level0/ticket-route.test.js`, since `test/level0/ticket-verb.test.js` sits close to the line ceiling. The verb takes a new module, `src/scripts/ticket-route.js`, for the same reason. The shared ticket schema in `test/level0/fixtures.js` serves the fake disk, so the cases write no schema of their own.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It adds the verb's module and its test file, and touches the dispatch.
+- every door the change reaches has a fake. The verb reaches the disk alone, and the cases drive the fake disk.
+- a comment names the approach the change implements. Both new files open on the design input they build.
 
 ## reflect
 
