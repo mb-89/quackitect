@@ -95,12 +95,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
     hash_before: 3ba0d68d6aaf8ed96468301c50eac3e2b5e7f38a
     hash_after: 3ba0d68d6aaf8ed96468301c50eac3e2b5e7f38a
+  - step: design/review
+    hand: box 2bc65ec92430 · claude-code-remote · helper-2
+    hash_before: 671713f72c32205c8d4afd58d2117c70fc39617c
+    hash_after: 671713f72c32205c8d4afd58d2117c70fc39617c
 ---
 
 # Ask
@@ -177,6 +181,12 @@ A new file, `src/scripts/ticket-fill.js`, holds the verb, so `ticket.js` stays u
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- `--stdout` prints the text `mintedNote` builds through `mintNote`, and writes no file.
+- Without `--stdout` the verb writes the same text over the path.
+- `withRoute` copies the route and the hash, the road the mint verb takes.
 
 # implement
 

@@ -21,7 +21,7 @@ test("the engine keys nothing reads stand nowhere in the declaration", () => {
   assert.equal(keyed.has("engine.beat"), false);
 });
 
-// Whether each waits undrawn, and says what it is, stands in test/contract/tree.test.js.
+// Whether each waits undrawn, and says what it is, stands in the tree contract. [[spec/design_output/extension#one-declaration-draws-it]]
 test("the work section keeps its knobs, and declares its three buttons", () => {
   assert.ok(keyed.has("work.staleAfter"), "a knob the work verbs read stays");
   for (const key of BUTTONS) {
