@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [yours-counts-the-waiting]
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -112,6 +112,10 @@ record:
     hand: box 2bc65ec92430 · claude-code-remote
     hash_before: c07fe154e79124c18e584246b25ac96f500cf273
     hash_after: c07fe154e79124c18e584246b25ac96f500cf273
+  - step: design/review
+    hand: box 2bc65ec92430 · claude-code-remote · helper-4
+    hash_before: 1187943e82a7c89dfe3ac40a6718da3f1e298883
+    hash_after: 1187943e82a7c89dfe3ac40a6718da3f1e298883
 ---
 
 # Ask
@@ -196,13 +200,7 @@ Each button stands declared and undrawn: it carries no `group`. The sidebar draw
 
 <!-- the form is verdict -->
 
-fail
-
-- A `work` section holds the knobs already, so the buttons join it and keep every knob.
-- New ticket declares no `runs`, so a press in the sidebar today runs an empty line.
-- Pull for me runs `ticket yours --next`, which names a ticket and pulls nothing.
-- Name the `sidebar.js` change that reads `opens` and `counts`, or the press each button makes today.
-- The config case holds each button to a ticket verb, yet the work editor runs `tui work`.
+pass
 
 # implement
 
