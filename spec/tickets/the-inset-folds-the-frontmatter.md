@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -96,6 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-editor-takes-an-inset, the-ticket-answers-the-editor, the-drawing-draws-a-route]
+step: design/draft
 ---
 
 # Ask
@@ -104,11 +105,12 @@ depends_on: [the-editor-takes-an-inset, the-ticket-answers-the-editor, the-drawi
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-A person opens a ticket and reads its route as a drawing where the frontmatter stands, and a button flips the drawing to the YAML code and back, as Obsidian flips a render and its source. The body stays the markdown editor's own text, so the completion, the Vale findings and the ticket buttons hold there. The probe decides between the inset and the side panel, and the plan stands in [[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]].
+A person opens a ticket and reads its route as a drawing where the frontmatter stands. A button flips the drawing to the YAML code and back, as Obsidian flips a render and its source. The body stays the markdown editor's own text. So the completion, the Vale findings and the ticket buttons hold there. The probe decides between the inset and the side panel. The plan stands in [[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]].
 
-Without it the drawing the two cloud groups build reaches no editor, so a person reads the route as raw YAML and level one stays open.
+Without it the drawing of the two cloud groups reaches no editor. So a person reads the route as raw YAML, and level one stays open.
 
-- a ticket opened in the editor draws its route over the folded frontmatter, in the inset or the side panel the probe decides, and a test drives it through a fake editor
+- a ticket draws its route over the folded frontmatter, and a test drives it through a fake editor
+- the drawing stands in the inset or the side panel the probe decides
 - a button flips the drawing to the YAML code and back, and a test drives it
 - a change to the file redraws the drawing, and a test drives it
 - `./RUNME.sh check` passes
