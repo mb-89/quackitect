@@ -95,6 +95,7 @@ record:
   - step: children
     hand: box 711806cd7e87 · claude-code-remote
     hash_before: 5b0cc1e761a877f955049b43e70e564897591435
+    hash_after: 729b9a0bb933af7fb1f7049db04e9d9d02549711
   - step: children
     hand: the engine
     hash_before: 5cb57b54363da9fd561c488c1447f4ce58159e06
