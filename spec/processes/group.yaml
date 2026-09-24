@@ -21,7 +21,7 @@ steps:
         expects: 0
         says: branch sync, so the branch carries trunk
   - name: split
-    does: mints the children, or assigns standing tickets, each naming this group
+    does: reads the standing children, and mints more where the goal needs them, each naming this group
     from: anyone
     by: anyone
     input: ask

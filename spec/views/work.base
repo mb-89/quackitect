@@ -52,6 +52,12 @@ groups:
   - name: todos
     filters:
       - todo: true
+  - name: open
+    filters:
+      - not state: closed
+  - name: notes
+    filters:
+      - route: note
 views:
   - type: table
     name: every ticket

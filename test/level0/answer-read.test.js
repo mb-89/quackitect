@@ -44,7 +44,7 @@ function served(found) {
     }),
     clock: fakeClock(),
     proc: fakeProc({}),
-    log: fakeLog(),
+    log: fakeLog(fakeClock(), { level: "debug" }),
     index: { warm: () => ({ warmed: false }), dead: () => "" },
     vale: {
       stands: () => true,
@@ -119,6 +119,23 @@ test("the reading answers the band, the score and the findings of a draft", asyn
   assert.ok(read.score > CONFIG.answer.ceiling);
   const stopping = await readsAnswer(box, TEXT, true);
   assert.equal(stopping.found.length, 2, "a stop for the owner asks for the needs table too");
+});
+
+// The band tells the owner nothing to act on, so the line stands at debug under its own kind. [[spec/design_output/level0#the-three-bands]]
+test("the reading and the hold write a draft line at debug, and no answer line", async () => {
+  const { box } = served(FOUND);
+
+  await stops(box);
+
+  const drafts = box.log.lines().filter((one) => one.kind === "draft");
+  assert.deepEqual(
+    drafts.map((one) => [one.level, one.said]),
+    [
+      ["debug", "a draft reads rewrite"],
+      ["debug", "the gate holds the turn for a rewrite"],
+    ],
+  );
+  assert.equal(box.log.lines().filter((one) => one.kind === "answer").length, 0);
 });
 
 // `checksAnswer` in the hand tools answers the same reading in the gate's wording. [[spec/design_output/level0#the-tool-reads-a-draft]]

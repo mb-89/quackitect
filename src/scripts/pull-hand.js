@@ -88,6 +88,12 @@ export function childrenOf(all, group) {
   return all.filter((one) => names.has(one.name));
 }
 
+// The children stand before their group, so a group no ticket names refuses. [[spec/design_output/work#a-group-is-a-ticket]]
+export function emptyGroup(it, text, name) {
+  if (!isGroup(text) || childrenOf(ticketsHere(it), name).length) return "";
+  return `${name} is a group, and no ticket names it under group. Mint a child naming ${name} under group first, then the group.`;
+}
+
 // The score orders the queue, and the terms a weighing carries answer it. [[spec/design_output/pull#the-queue-is-a-score]]
 export function weighing(it, all) {
   return { clock: it.clock, weights: it.weights, stood: stoodHere(it), all };

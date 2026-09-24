@@ -35,13 +35,19 @@ func TestABaseFileNamesThePresetsUnderGroups(t *testing.T) {
 		}
 	}
 	// The urgent preset keeps the open ones, because a closed ticket asks nothing of anybody. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-	urgent := said[len(said)-2]
-	if urgent.Name != "urgent" || !strings.Contains(urgent.Filters, "not state: closed") {
+	if urgent := said[3]; urgent.Name != "urgent" || !strings.Contains(urgent.Filters, "not state: closed") {
 		t.Fatalf("urgent keeps the open tickets alone, and it reads %v", urgent)
 	}
 	// The todos preset keeps every row a todo places, the sentence todos among them. [[spec/design_output/stop#the-plan]]
-	if last := said[len(said)-1]; last.Name != "todos" || last.Filters != "todo: true" {
-		t.Fatalf("the todos preset stands last on alt+5, and it reads %v", last)
+	if todos := said[4]; todos.Name != "todos" || todos.Filters != "todo: true" {
+		t.Fatalf("the todos preset stands on alt+5, and it reads %v", todos)
+	}
+	// The open preset keeps every row a hand still works, and the notes preset the notes, which take no place. [[spec/design_output/pull#the-queue-is-an-outline]]
+	if open := said[5]; open.Name != "open" || open.Filters != "not state: closed" {
+		t.Fatalf("the open preset stands on alt+6, and it reads %v", open)
+	}
+	if notes := said[6]; notes.Name != "notes" || notes.Filters != "route: note" {
+		t.Fatalf("the notes preset stands on alt+7, and it reads %v", notes)
 	}
 }
 
