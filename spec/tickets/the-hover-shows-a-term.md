@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -118,6 +118,10 @@ record:
     hash_after: 79ad01c3e4118d1bc075e5d7b9f7fe9886312f11
     returns: 2
     why: "| finding | fix |; |---|---|; | The vocabulary layer of `paragraph.schema.yaml` holds `stems` as a line of prose, so `pathsOf` takes that line as the path | Name the key the path takes, and move or rename the line of prose |; | `VocabularyEntry` reads every file in `spec/vocabulary` and refuses a row under a key past `words`, `terms` and `swaps` | Name the change to the shape rule, or put the table beside `spec/config/slug.yaml` |; | `WATCHES` in `src/extension/lib/lsp.js` holds markdown alone, so the client sends no buffer of `terms.yml` | Hold the save case in the test, or add the list to `WATCHES` and drop \"the client needs no change\" |; | `rulesFrom` in `.claude/skills/level0/lib/paragraph.js` calls `vocabularyRule` and stands off the callers | Add it to the callers |; The six earlier findings stand settled by the answers. The rest reads true, and each piece stands as the draft says:; `took` and `Tree.Read` in `src/lsp`; `listsOf` and `alsoReads` in the projection; `wordsHere` and the caches in `src/bridge`"
+  - step: design/draft
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 7b4092316d9b3d15c285ea66c88843fa27bc1b15
+    hash_after: 7b4092316d9b3d15c285ea66c88843fa27bc1b15
 ---
 
 # Ask
@@ -162,34 +166,36 @@ holds the answer:
 | piece | change |
 |---|---|
 | `initialize` | names `hoverProvider` |
-| the terms | read off `terms.yml` through the tree on each ask, so an open buffer or a save counts at once |
+| the terms | read off `terms.yml` through the tree on each ask, so a save counts at once |
 | the paths | the vocabulary layer of `paragraph.schema.yaml` names them, as `pathsOf` reads them, and the defaults stand where it names none |
 | the word | the run of letters under the cursor, widened to the longest term covering it, such as `level zero` |
-| a stem or a prefix | the server reads the table of endings and the prefixes off `stems.yml`, as the rule does |
+| a stem or a prefix | the server reads the table of endings and the prefixes off `stems.yaml`, as the rule does |
 | the answer | the term, its `means` line, and its `source` under it where it cites one, as markdown |
 | a core word or no word | no hover |
 
-The table of endings and the prefixes move out of `vocabulary.js` into a new
-list, `spec/vocabulary/stems.yml`. So the rule, the check and the server read
-one source:
+The table of endings and the prefixes move out of `vocabulary.js` into
+`spec/config/stems.yaml`, beside the slug cases. The shape rule over the word
+lists leaves it alone there. The rule, the check and the server read one source:
 
-- `pathsOf` names `stems` beside the three lists, so a write to it projects the rule again
+- `pathsOf` names it under a new key, `endings`, because the layer holds a line of prose under `stems`
+- a write to it projects the rule again, because `alsoReads` reads every path `pathsOf` names
 - `knownIn`, `looseMeanings` and `vocabularyRule` take the table from the lists
-- `stems.yml` carries cases, each a word and the listed word it reaches, and both tests drive them
+- `stems.yaml` carries cases, each a word and the listed word it reaches, and both tests drive them
 
 | test | holds |
 |---|---|
 | `src/lsp/hover_test.go` | a hover over a term, a plural, a prefix, a term of two words and a source, and no hover over a core word |
-| the same file | a hover after `terms.yml` changes in an open buffer shows the new line |
-| the same file | the Go reader reaches every case `stems.yml` names |
+| the same file | a hover after a save to `terms.yml` shows the new line |
+| the same file | the Go reader reaches every case `stems.yaml` names |
 | `test/level0/vocabulary.test.js` | the JavaScript reader reaches every case, and the rule writes every row |
 
 The client needs no change. The extension already starts the server over
 markdown files, and the language client asks for a hover once the server
 names `hoverProvider`.
 
-`spec/design_output/lsp.md` gains a chapter on the hover, and
-`spec/design_output/vocabulary.md` names the fourth list.
+The extension watches no `terms.yml` buffer, so the server reads the saved
+file. `spec/design_output/lsp.md` gains a chapter on the hover, and
+`spec/design_output/vocabulary.md` names the table.
 
 ### callers
 
@@ -200,6 +206,7 @@ names `hoverProvider`.
 - `src/lsp/lsp.go`, `took` answers `initialize` and gains the hover case
 - `.claude/skills/level0/lib/vocabulary.js`, where `knownIn`, `looseMeanings` and `vocabularyRule` read the table
 - `.claude/skills/level0/lib/projection.js`, `listsOf` and `alsoReads` read the paths `pathsOf` names
+- `.claude/skills/level0/lib/paragraph.js`, `rulesFrom` calls `vocabularyRule` with the lists
 - `src/bridge/prose.js`, `wordsHere` reads the lists, and `src/bridge/caches.js` watches their paths
 - `test/level0/vocabulary.test.js` and `test/contract/vocabulary.test.js` drive the table and the lists
 - `src/extension/lib/lsp.js`, the client, needs no change, because it asks for a hover off the capabilities
@@ -216,6 +223,10 @@ names `hoverProvider`.
 - the prefixes stand unnamed: the hover reads them off `stems.yml` too, so `unread` reaches `read`
 - the client stands unnamed: the callers say it needs no change, and why
 - no test for the two lines of done: the table of tests names each
+- the key `stems` stands taken: the path goes under `endings`
+- the shape rule refuses a table under the word lists: the table stands in `spec/config`
+- the editor sends no `terms.yml` buffer: the test holds a save, and the server reads the saved file
+- `rulesFrom` stands unnamed: the callers name it
 
 ## review
 
