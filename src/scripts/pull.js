@@ -121,8 +121,8 @@ export function pull(it, argv) {
   if (!named && (verdict.said || (name && held)))
     return handBack(it, who, name, verdict);
   if (held) return stillHeld(it, held);
-  // The plain pull hands out at the queue alone, and this gate stands above every road it closes. [[spec/design_output/config#the-engine-controls]]
-  if (!asking && !handsOut(it.binding)) {
+  // The plain pull hands out at the queue alone, and this gate stands above every road it closes. A group a person names passes it. [[spec/design_output/config#the-engine-controls]]
+  if (!asking && !named && !handsOut(it.binding)) {
     say(WAIT, [
       `this session binds to ${it.binding}, so the pull hands nothing out.`,
       `Name a ticket to take one, or set engine.binding to ${QUEUE}.`,
