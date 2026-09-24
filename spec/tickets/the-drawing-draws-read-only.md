@@ -55,11 +55,15 @@ The editor host has nothing to hold, and a person reads a route as YAML alone.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -67,11 +71,27 @@ The editor host has nothing to hold, and a person reads a route as YAML alone.
 
 <!-- the form is text -->
 
+The page stands, and [[spec/design_output/drawing]] owns it: the classes, the messages and the fake host.
+
+| file | holds |
+|---|---|
+| `src/extension/webview/route/layout.js` | the graph turned into React Flow's nodes and edges, placed by `@dagrejs/dagre` |
+| `src/extension/webview/route/drawing.js` | the entry: it posts `ready`, and reads `graph` and `theme` |
+| `src/extension/webview/route/drawing.css` | the marks, in the colours the editor sets on a webview |
+| `test/level0/layout.test.js` | the layout in node |
+| `test/contract/drawing-page.test.js` | the page in the browser install resolves, driven by a fake host |
+
+The browser case loads the bundle into a blank page with `acquireVsCodeApi` faked. It posts a ticket's graph carrying every mark, and reads the classes back off each node. A box with no browser, or no modules, skips the case and names why.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask, line for line
+- the cleanup it reveals is in the change: the bundle child's placeholder entry gives way to the page
+- the protocol stands in the design output note alone, and every function points at its heading
 
 # Discussion
 
