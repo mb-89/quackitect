@@ -95,12 +95,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
     hash_before: c9ec8dd0ffd9dfaab4527a92822749d2665db2af
     hash_after: c9ec8dd0ffd9dfaab4527a92822749d2665db2af
+  - step: design/review
+    hand: box 2bc65ec92430 · claude-code-remote · helper-2
+    hash_before: 0a4f5ae1d07648df8ba54363c4674d87d3771bc3
+    hash_after: 0a4f5ae1d07648df8ba54363c4674d87d3771bc3
+    returns: 1
+    why: "`frontFaults` in `src/lsp/schema.go` raises missing steps and state on its own, before the bridge answers.; Teach `frontFaults` the `x-filled-by` skip too, and cover it with a Go test under `src/lsp`.; Add `src/lsp/schema.go` `frontFaults` to the callers list."
 ---
 
 # Ask
@@ -173,6 +179,12 @@ Go tests under `src/lsp` cover the offer and the fold, and a case in `test/level
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- `frontFaults` in `src/lsp/schema.go` raises missing steps and state on its own, before the bridge answers.
+- Teach `frontFaults` the `x-filled-by` skip too, and cover it with a Go test under `src/lsp`.
+- Add `src/lsp/schema.go` `frontFaults` to the callers list.
 
 # implement
 
