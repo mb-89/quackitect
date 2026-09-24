@@ -88,8 +88,8 @@ test("a desk's hand-back commits and pushes nothing, and a cloud box's pushes", 
     !desk.ran.some((one) => one.startsWith("git push")),
     "the desk pushes nothing",
   );
-  assert.ok(!desk.ran.includes(CHECK), "the owner's push meets the check");
-  assert.match(desk.said, /stands on this box, and the owner pushes main/);
+  assert.ok(!desk.ran.includes(CHECK), "the next push meets the check");
+  assert.match(desk.said, /stands on this box, and main goes out with the next push/);
 
   const branch = doors({}, {}, { cloud: false });
   assert.equal(pushed(branch.it, BRANCH).local, true);

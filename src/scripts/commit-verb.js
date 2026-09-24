@@ -30,9 +30,12 @@ export async function commitVerb(it, argv) {
 // Nothing stages before the message reads clean, so a refused message leaves the tree standing. [[spec/design_output/work#the-battery-answers-first]]
 function landsAndPushes(it, argv, message) {
   // The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
-  const tested = it.proc.run([it.node, it.join(it.root, "src", "scripts", "cli.js"), "test"], {
-    cwd: it.root,
-  });
+  const tested = it.proc.run(
+    [it.node, it.join(it.root, "src", "scripts", "cli.js"), "test"],
+    {
+      cwd: it.root,
+    },
+  );
   if (tested.exitCode !== 0) {
     console.error("The tests answer red, so nothing stages and nothing lands:");
     console.error(saidBy(tested) || "the test run answers nothing");
@@ -63,7 +66,7 @@ function landsAndPushes(it, argv, message) {
     return 1;
   }
   console.log("The commit lands, and the check answers green on it.");
-  // A desk leaves the push to the owner, and a cloud box pushes, because it dies with its tree. [[spec/guidance/working]] [[spec/guidance/cloud]]
+  // A desk's verb pushes nothing, and a cloud box pushes, because it dies with its tree. [[spec/guidance/working]] [[spec/guidance/cloud]]
   if (argv.includes("--no-push") || !inCloud(it.env)) return 0;
 
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out.trim();

@@ -66,7 +66,7 @@ test("the test verb runs the file you name, and answers one word on it", () => {
   assert.match(ran.stdout, /^green, \d+ test\(s\) pass in 1 file\(s\)/m);
 });
 
-// A desk leaves the push to the owner, so the commit verb says where it pushes. [[spec/guidance/working]]
+// A desk's verb pushes nothing, so the commit verb says where it pushes. [[spec/guidance/working]]
 test("the commit verb says it pushes from a cloud box", () => {
   assert.match(saysOf("commit"), /from a cloud box/);
 });

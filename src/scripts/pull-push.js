@@ -14,12 +14,14 @@ const SENT = Object.freeze({ ok: true, local: false, why: [] });
 
 // [[spec/design_output/pull#the-rejected-push]]
 export function pushed(it, branch, { red = false } = {}) {
-  // A desk lands its hand-back on this box, as its commit verb does, and the owner pushes. [[spec/guidance/working]]
+  // A desk lands its hand-back on this box, as its commit verb does. [[spec/guidance/working]]
   if (!(it.cloud ?? inCloud(it.env ?? {}))) {
     return {
       ok: true,
       local: true,
-      why: [`The hand-back stands on this box, and the owner pushes ${branch}.`],
+      why: [
+        `The hand-back stands on this box, and ${branch} goes out with the next push.`,
+      ],
     };
   }
   const trunk = branch === TRUNK;

@@ -45,7 +45,7 @@ test("branch escalate inserts a person step before the held leaf, drops the hold
   // [[spec/tickets/a-desk-pull-pushes-nothing]]
   assert.ok(
     !ranGit(outside).includes(`git push origin ${BRANCH}`),
-    "the owner pushes a desk's work",
+    "a desk's verb pushes nothing",
   );
 });
 

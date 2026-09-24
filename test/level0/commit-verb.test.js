@@ -106,7 +106,11 @@ test("a red check holds the push back, and names what the check refuses", async 
 
   assert.equal(code, 1);
   assert.match(said, /no push reaches origin/);
-  assert.match(said, /Passive: Write in the active voice/, "the fault reaches the reader");
+  assert.match(
+    said,
+    /Passive: Write in the active voice/,
+    "the fault reaches the reader",
+  );
   assert.ok(!ranGit(git).some((one) => one.startsWith("git push")));
 });
 
@@ -137,7 +141,7 @@ test("a commit the door refuses lands nothing, and the staging comes back", asyn
   assert.ok(ranGit(git).includes("git reset -q"), "the staging comes back");
 });
 
-// A desk leaves the push to the owner. [[spec/guidance/working]]
+// A desk's verb pushes nothing. [[spec/guidance/working]]
 test("a desk lands and checks the commit, and pushes nothing", async () => {
   const { it, git } = doors([], {}, {});
 
