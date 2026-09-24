@@ -95,7 +95,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: a3a8a31febf0c81458ac97b0041d5b4132762795
+    hash_after: a3a8a31febf0c81458ac97b0041d5b4132762795
 ---
 
 # Ask
@@ -124,17 +129,41 @@ A step marked by: person waits unseen until a hand pulls past it.
 
 <!-- the form is text -->
 
+A new file, `src/scripts/ticket-yours.js`, holds the verb and one pure function, `waiting`. A ticket waits on a person where both hold:
+
+- its state reads open
+- the leaf its pointer names carries `by: person`
+
+The verb reads the tickets through `ticketsHere` in `src/scripts/pull-hand.js`. It orders them the way `handOut` orders a pool, tagged first and then `sorted` over `weighing`.
+
+| the call | the JSON it prints |
+|---|---|
+| `ticket yours --count` | `count` |
+| `ticket yours --next` | `ticket`, `path` and `step` of the first, or `ticket` as null |
+| `ticket yours` | `tickets`, each with its `ticket`, `path` and `step`, in queue order |
+
+The exit is 0 on every road, since nothing waiting is an answer.
+
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/scripts/ticket.js` `ticket`, which dispatches the new verb and prints its usage line
+- `src/scripts/cli.js` the `ticket` entry, whose `says` names the verbs
+- `src/scripts/pull-hand.js` `ticketsHere`, `sorted` and `weighing`, which the verb calls unchanged
+
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first draft
+
 
 ## review
 
