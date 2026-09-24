@@ -95,12 +95,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
     hash_before: a3f4e059640d0b9a89ebe7f2d2db34dd512a89e2
     hash_after: 2b0bcf56b2369620d5fec2bd3cffec184672d926
+  - step: design/review
+    hand: box 2bc65ec92430 · claude-code-remote · helper-2
+    hash_before: ff3c6492b7d870d2668fd5494b8f633db43d3ee5
+    hash_after: ff3c6492b7d870d2668fd5494b8f633db43d3ee5
+    returns: 1
+    why: "design: the new check `rerouted` stands a case apart from `reRouted`. Give the check a distinct name.; design: the shared rule changes `update` and `updated` in `src/scripts/ticket.js`. List both under callers.; design: `updated` copies reached leaves over, and the new rule refuses. Say which rule `update` follows.; design: \"changes a phase holding one\" refuses a new step past the pointer in its phase. Name the phase fields held fixed.; craft: the approach names no test for each refusal road. Name one test a road."
 ---
 
 # Ask
@@ -177,6 +183,13 @@ Both roads print one JSON object:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+- design: the new check `rerouted` stands a case apart from `reRouted`. Give the check a distinct name.
+- design: the shared rule changes `update` and `updated` in `src/scripts/ticket.js`. List both under callers.
+- design: `updated` copies reached leaves over, and the new rule refuses. Say which rule `update` follows.
+- design: "changes a phase holding one" refuses a new step past the pointer in its phase. Name the phase fields held fixed.
+- craft: the approach names no test for each refusal road. Name one test a road.
 
 # implement
 
