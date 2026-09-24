@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -111,6 +111,10 @@ record:
     hand: box d6f05e3a585030 · claude-code
     hash_before: 2f4d47d2dd0e543fdae5fbd4e873a6b8e7be7c98
     hash_after: 2f4d47d2dd0e543fdae5fbd4e873a6b8e7be7c98
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-3
+    hash_before: 038ee57383d79c2c72601311bc73bc9f6ceb2974
+    hash_after: 038ee57383d79c2c72601311bc73bc9f6ceb2974
 ---
 
 # Ask
@@ -180,12 +184,11 @@ The pull answers a new word, `cleanup`, where `handOut` meets no leaf to hand, n
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `pull-writes.js`'s `onward` also calls `handOut`, and stands out of the callers list.
-- `pull-cleanup.test.js`'s fixture carries no `method`.
-- `asks` joins `box.method` with no guard, and `holdHere` calls it once a hold file stands.
-- So the refactor row's hold check throws against that fixture, and the approach names no read that survives it.
+- The callers list now names `pull-writes.js`'s `onward`, which the first review found missing.
+- The approach drops `holdHere` and reads `REFACTOR_HOLD` off `it.disk` directly, so the fixture's missing `method` field costs it nothing.
+- The three-row table and its desk-alone gate answer all four ask bullets, in the ask's own order.
 
 # implement
 
