@@ -96,12 +96,18 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [yours-counts-the-waiting]
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
     hash_before: b457f4514cd785e6e7ffc5305a8a17674111b93f
     hash_after: b457f4514cd785e6e7ffc5305a8a17674111b93f
+  - step: design/review
+    hand: box 2bc65ec92430 · claude-code-remote · helper-2
+    hash_before: ea8a28f96918911aeeeb8b26cb3cb51a06bcb7e4
+    hash_after: ea8a28f96918911aeeeb8b26cb3cb51a06bcb7e4
+    returns: 1
+    why: A `work` section holds the knobs already, so the buttons join it and keep every knob.; New ticket declares no `runs`, so a press in the sidebar today runs an empty line.; Pull for me runs `ticket yours --next`, which names a ticket and pulls nothing.; Name the `sidebar.js` change that reads `opens` and `counts`, or the press each button makes today.; The config case holds each button to a ticket verb, yet the work editor runs `tui work`.
 ---
 
 # Ask
@@ -181,6 +187,14 @@ The schema declares the buttons, and the host the desk group builds draws them. 
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- A `work` section holds the knobs already, so the buttons join it and keep every knob.
+- New ticket declares no `runs`, so a press in the sidebar today runs an empty line.
+- Pull for me runs `ticket yours --next`, which names a ticket and pulls nothing.
+- Name the `sidebar.js` change that reads `opens` and `counts`, or the press each button makes today.
+- The config case holds each button to a ticket verb, yet the work editor runs `tui work`.
 
 # implement
 
