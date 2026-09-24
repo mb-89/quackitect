@@ -107,9 +107,13 @@ export function sorted(list, at = {}) {
 
 // A tagged ticket stands first, as the list holds it, and the score orders the rest. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
 export function taggedFirst(list, at = {}) {
-  const tagged = list.filter((one) => todoOf(one.front) !== "");
-  const rest = list.filter((one) => todoOf(one.front) === "");
-  return [...tagged, ...sorted(rest, at)];
+  const tagged = taggedIn(list);
+  return [...tagged, ...sorted(list.filter((one) => !tagged.includes(one)), at)];
+}
+
+// The tickets a tag parks for the next pull. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+export function taggedIn(list) {
+  return list.filter((one) => todoOf(one.front) !== "");
 }
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]
@@ -118,8 +122,8 @@ export function handOut(it, who) {
   const all = ticketsHere(it);
   const groupTicket = all.find((one) => !one.private && one.name === who.group);
   // The tag says the next pull hands it first, on a note and on a ticket alike. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
-  const tagged = all.filter((one) => todoOf(one.front) !== "");
-  const privates = all.filter((one) => one.private && todoOf(one.front) === "");
+  const tagged = taggedIn(all);
+  const privates = all.filter((one) => one.private && !tagged.includes(one));
   const at = weighing(it, all);
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
   const pools = who.group

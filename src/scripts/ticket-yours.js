@@ -6,14 +6,14 @@
 import { frontOf } from "../engine/group.js";
 import { PERSON } from "./pull-hand-of.js";
 import { taggedFirst, ticketsHere, weighing } from "./pull-hand.js";
-import { leafOf } from "./pull-route.js";
+import { leafOf, stepPathOf } from "./pull-route.js";
 
 // [[spec/design_input/the-editor-draws-the-ticket#the-work-group]]
 export function waiting(all) {
   return [all ?? []].flat().filter((one) => {
     const front = frontIn(one);
     if (String(front.state ?? "") !== "open") return false;
-    return leafOf(front, String(front.step ?? "").trim())?.by === PERSON;
+    return leafOf(front, stepPathOf(front))?.by === PERSON;
   });
 }
 
@@ -30,7 +30,7 @@ export function yours(it, argv) {
 }
 
 function rowOf(one) {
-  return { ticket: one.name, path: one.path, step: String(frontIn(one).step ?? "") };
+  return { ticket: one.name, path: one.path, step: stepPathOf(frontIn(one)) };
 }
 
 function frontIn(one) {

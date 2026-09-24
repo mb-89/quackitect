@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -170,6 +170,10 @@ record:
     hash_after: c69881c20f5e53366fda9f73b5f0639db660db0c
     returns: 2
     why: "craft: `handOut` still builds its own tagged pool, so `taggedFirst` has one caller and the drift stands; fix: `handOut` calls `taggedFirst`, or both read one tagged filter from pull-hand.js; craft: `waiting` reads `front.step` raw, so an empty pointer skips the first leaf `stepPathOf` resolves; `leafOf` now resolves the nearest `by`, and a case proves a person phase counts; `frontIn` now delegates to `frontOf`, which answers the repeated front finding; `ticket.js` and `cli.js` only wire the verb and its usage, trivial and inside the ask; `./RUNME.sh check` exits 0, and queue.test.js with ticket-yours.test.js pass, 15 tests; no retro stands in the handback"
+  - step: implement/reflect
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 8ffc985e37597f245ae4d0cb05c53bbf48b7e6cd
+    hash_after: 8ffc985e37597f245ae4d0cb05c53bbf48b7e6cd
 ---
 
 # Ask
@@ -295,8 +299,7 @@ Every case fails on its own assertion, with the verb unknown and `waiting` a stu
 
 <!-- the form is text -->
 
-The findings share one class: the change rebuilt a reading the pull already owns. The hand a leaf admits, the front of a ticket, and the queue order each stand in one home. The fix for the class is to call that home, and to lift the order into one function both roads call.
-
+The findings share one class: the change rebuilt a reading the pull already owns. The first fix lifted the order, and left its first caller behind. The fix for the class is one filter, `taggedIn`, which `handOut` and `taggedFirst` both call. The pointer reads through `stepPathOf`, as every pull road reads it.
 
 ### checked
 

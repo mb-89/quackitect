@@ -151,3 +151,15 @@ test("taggedFirst keeps the tagged tickets first as listed, and scores the rest"
     ["b", "d", "a", "c"],
   );
 });
+
+test("a ticket with no pointer reads its first leaf, as the pull reads it", () => {
+  const text = `---
+kind: [[ticket]]
+state: open
+steps:
+  - name: sign
+    by: person
+---
+`;
+  assert.equal(waiting([{ name: "a", path: "a.md", text }]).length, 1);
+});
