@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -136,6 +136,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box a0ae5042621d · claude-code-remote · helper-7
+    hash_before: 2289fe49fca86ce807117f49caa3cd3d6b9d4675
+    hash_after: 2289fe49fca86ce807117f49caa3cd3d6b9d4675
+    returns: 1
+    why: "design: the branch answers each row of the Ask table, and `./RUNME.sh check` answers 0.; design: each term drops `defines` and keeps its line, and no caller reads `defines` or `undefinedTerms`.; craft: the `linked` case puts the link under `source`, and the source shape refuses that already.; craft: so no case proves the new link check fires, and the rule passes its test without it.; craft: add a case with a link under a field no other check reads, and assert a refusal."
 ---
 
 # Ask
@@ -371,17 +377,44 @@ The design review names three gaps, and each lands here:
 
 <!-- the form is files -->
 
+- spec/tickets/a-term-points-nowhere.md
+- spec/vocabulary/terms.yml
+- spec/vocabulary/core.yml
+- spec/config/styles/VoiceShape/VocabularyEntry.yml
+- spec/config/styles/VoiceParagraph/Vocabulary.yml
+- .claude/skills/level0/lib/vocabulary.js
+- .claude/skills/level0/lib/refuse.js
+- spec/schemas/paragraph.schema.yaml
+- spec/design_output/vocabulary.md
+- spec/guidance/voice.md
+- .claude/output-styles/level0.md
+- spec/design_input/the-editor-draws-the-ticket.md
+- test/contract/vocabulary.test.js
+- test/contract/shape.test.js
+- test/level0/vocabulary.test.js
+- test/level0/hooks.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+- design: the branch answers each row of the Ask table, and `./RUNME.sh check` answers 0.
+- design: each term drops `defines` and keeps its line, and no caller reads `defines` or `undefinedTerms`.
+- craft: the `linked` case puts the link under `source`, and the source shape refuses that already.
+- craft: so no case proves the new link check fires, and the rule passes its test without it.
+- craft: add a case with a link under a field no other check reads, and assert a refusal.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the line stands in `terms.yml` alone, and each note points at `terms.yml` or `vocabulary.md`
 
 # Discussion
 
