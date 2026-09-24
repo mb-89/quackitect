@@ -673,10 +673,11 @@ waits for a retro.
 refuses while the ask stands empty. So the pull hands out what a person
 writes, and nothing else.
 
-A draft on the `trivial` route waits on no person. The pull opens it through
-`opensDraft` in `src/scripts/ticket.js`, the road the verb takes, and hands its
-first leaf. The queue counts it among the agent's rows. A refusal on that road
-leaves the draft standing, and the wait answer names the refusal. A group opens with its children standing, as
+A draft on the `trivial` route waits on no person:
+
+- the pull opens it through `opensDraft` in `src/scripts/ticket.js`, the road the verb takes, and hands its first leaf
+- the queue counts it among the agent's rows
+- a refusal on that road leaves the draft standing, and the wait answer names the refusal A group opens with its children standing, as
 [[spec/design_output/work#a-group-is-a-ticket]] says.
 
 The verb reads the voice rules over the Ask too, and refuses one that breaks
