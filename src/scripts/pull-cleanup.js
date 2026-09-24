@@ -3,7 +3,6 @@
 // reads failed or stale. A cloud box gets none of it.
 // [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
 
-import { MS } from "../../.claude/skills/level0/lib/log.js";
 import {
   REFACTOR_HOLD,
   REFACTORS,
@@ -13,7 +12,7 @@ import {
 import {
   drains,
   filesOn,
-  takesFile,
+  oldestFile,
 } from "../../.claude/skills/level0/lib/warnings.js";
 
 export const CLEANUP = "cleanup";
@@ -62,7 +61,7 @@ function oldestOf(it, files) {
       Number(it.git.run(["log", "-1", "--format=%ct", "--", file], true).out),
     ]),
   );
-  return takesFile(files, wrote, Math.floor(it.clock.now().getTime() / MS), 0);
+  return oldestFile(files, wrote);
 }
 
 function staleWhy(it) {

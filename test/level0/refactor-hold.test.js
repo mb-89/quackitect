@@ -22,7 +22,6 @@ const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
 const HOLD = at(".se/.runtime/refactor-hold.json");
 const NOW = 1_800_000_000;
-const WEEK = 604_800;
 const HOUR = 3600;
 
 const RULES = `
@@ -45,11 +44,10 @@ const REFACTOR = {
   parallel: true,
   mostWarnings: 2,
   mostAtOnce: 1,
-  untouchedFor: "7d",
   holdFor: "30m",
 };
 
-// The stamp and the list the refactoring rule reads, over one file at rest. [[spec/design_output/stop#the-hand-walks-the-list]]
+// The stamp and the list the refactoring rule reads. [[spec/design_output/stop#the-hand-walks-the-list]]
 function stamped(warnings, names = ["old.md"]) {
   const list = Array.from({ length: warnings }, (_, line) => ({
     file: names[line % names.length],
@@ -69,7 +67,7 @@ function stamped(warnings, names = ["old.md"]) {
   };
 }
 
-function box(files = {}, wrote = `${NOW - WEEK * 2}\n\nold.md\n`) {
+function box(files = {}) {
   return {
     disk: fakeDisk({
       [at("spec/config/level0.json")]: JSON.stringify({
@@ -87,7 +85,6 @@ function box(files = {}, wrote = `${NOW - WEEK * 2}\n\nold.md\n`) {
     clock: { now: () => new Date(NOW * 1000) },
     proc: fakeProc({
       "git rev-parse --abbrev-ref HEAD": { stdout: "work/a-thing\n" },
-      git: () => ({ stdout: wrote }),
     }),
     log: fakeLog(),
     vale: { stands: () => false },
@@ -157,11 +154,8 @@ test("a hold span of 0 switches the hold off", () => {
   assert.equal(it.disk.exists(HOLD), false, "the spawn writes none");
 });
 
-// The files at rest, the oldest last, as one git log answers them. [[spec/design_output/stop#the-hand-walks-the-list]]
-const RESTING = `${NOW - WEEK * 2}\n\nb.md\n${NOW - WEEK * 3}\n\na.md\n`;
-
 function walking(refactor = REFACTOR) {
-  const it = box(stamped(9, ["a.md", "b.md"]), RESTING);
+  const it = box(stamped(9, ["a.md", "b.md"]));
   it.disk.write(at("spec/config/level0.json"), JSON.stringify({ refactor }));
   const rows = [];
   it.log = { say: (...row) => rows.push(row) };
@@ -176,7 +170,7 @@ const turn = { last_assistant_message: "Some text and no stop." };
 test("one hand walks the list, the hold moves with it, and the log says the spawn and each file", () => {
   const { it, lines } = walking();
   const said = onStop(turn, it);
-  assert.equal(said.spawn.file, "a.md", "the oldest file at rest goes first");
+  assert.equal(said.spawn.file, "a.md", "the first file on the list goes first");
   assert.match(said.spawn.prompt, /mcp__level0__refactor_next/);
   assert.deepEqual(JSON.parse(it.disk.read(HOLD)), {
     file: "a.md",
@@ -248,7 +242,7 @@ test("the walk ends where the hand spends refactor.mostFiles", () => {
   assert.match(answered(walks(helper("h1"), it)), /No file waits/);
 });
 
-// [[spec/design_output/stop#the-agent-spawns-where-the-engine-cannot]]
+// [[spec/design_output/stop#the-agent-spawns-instead]]
 test("a refused spawn keeps the walk and its hold, and the agent's next call carries the spawn once", () => {
   const { it, rows } = walking();
   onStop(turn, it);

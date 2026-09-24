@@ -419,11 +419,6 @@
           "unit": "files",
           "help": "The files one hand takes on its walk. 0 lifts the bound, and the hand walks the whole list."
         },
-        "untouchedFor": {
-          "type": "string",
-          "unit": "span, as 30m, 12h or 7d",
-          "help": "The span a file stands untouched before a hand takes it."
-        },
         "holdFor": {
           "type": "string",
           "unit": "span, as 30m, 12h or 7d",

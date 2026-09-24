@@ -182,27 +182,27 @@ a time, and the calls ending a turn pass whatever stands.
 ## The hand walks the list
 
 One refactoring hand drains the list file after file. The stop door spawns it
-at a turn's end on the oldest file at rest, while the list stands past
-`refactor.mostWarnings`, and asks the agent nothing: no grace, no refused
+at a turn's end on the first file of the list, whatever its age, while the list stands past
+`refactor.mostWarnings`. It asks the agent nothing: no grace, no refused
 call, no stop. `refactor.mostAtOnce` bounds the spawns a session makes. The
 list stands in `.se/.runtime/refactor.json`, one entry a warning, which the
 lint writes at each check. The hand calls `refactor_next` as it finishes each file.
 
 | `refactor_next` finds | what it answers |
 |---|---|
-| a file at rest, and new to this hand | that file, held for this hand |
-| no file at rest, or `refactor.mostFiles` spent | that no file waits, so the hand ends |
+| a file on the list, and new to this hand | that file, held for this hand |
+| no file stands, or `refactor.mostFiles` spent | that no file waits, so the hand ends |
 | a call from outside the hand | a refusal |
 
 The hand stages, commits and pushes nothing. The session beside it lands
 what the hand leaves. The files a hand drains stay out of its walk, because
-their last commit still reads old.
+the list names them until the next check.
 
 The log takes one line as the hand spawns, and one as it takes each file.
 A hand that falls writes its reason at `warn`. `walksList` and `drains` in
 `lib/warnings.js` hold the prompts.
 
-## The agent spawns where the engine cannot
+## The agent spawns instead
 
 A spawn the harness refuses keeps the walk and its hold. The agent's next
 call carries one block, once: spawn the hand in the background, on the
@@ -307,7 +307,7 @@ The handover runs under `engine.binding` at `queue` alone. Under `god` and
 `unbound` the owner is in the loop, and a clear makes them explain the work
 twice. So there a session goes due nowhere: no block rides a call, no turn
 holds for the handover, and no clear follows. The fill still reads. A binding
-moved off the queue while the clear stands asks for no clear.
+that moves off the queue while the clear stands asks for no clear.
 
 # The vote
 

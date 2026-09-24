@@ -25,12 +25,11 @@
     "rule": 6
   },
   "refactor": {
-    "comment": "The hand the stop door starts while the list stands past the number and a file rests past the window. The hold keeps the hand's file its own for the span, and 0 switches it off. spec/guidance/code/refactoring.md says what that hand does.",
+    "comment": "The hand the stop door starts while the list stands past the number. It walks every file on the list, whatever its age. The hold keeps the hand's file its own for the span, and 0 switches it off. spec/guidance/code/refactoring.md says what that hand does.",
     "parallel": true,
     "mostWarnings": 10,
     "mostAtOnce": 1,
     "mostFiles": 0,
-    "untouchedFor": "5m",
     "holdFor": "30m"
   },
   "grace": {

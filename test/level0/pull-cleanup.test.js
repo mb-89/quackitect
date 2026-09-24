@@ -51,6 +51,23 @@ test("a desk meeting no ticket takes the oldest file on the refactor list", () =
   assert.match(said.rows.join("\n"), /Take old\.md/);
 });
 
+// The hand walks its whole list, whatever each file's age. [[spec/design_output/stop#the-hand-walks-the-list]]
+test("a file written this second still goes out as the cleanup", () => {
+  const clock = fakeClock();
+  const now = Math.floor(clock.now().getTime() / 1000);
+  const it = desk({ ...listed("fresh.md"), ...stamped(true) }, { clock });
+  it.git = fakeGit(
+    {
+      "git rev-parse HEAD": { stdout: `${SHA}\n` },
+      "git log -1 --format=%ct -- fresh.md": { stdout: `${now}\n` },
+    },
+    ROOT,
+  );
+  const said = cleanupOf(it);
+  assert.equal(said?.word, CLEANUP);
+  assert.match(said.rows.join("\n"), /Take fresh\.md/);
+});
+
 test("a file the refactoring hand holds stays out of the cleanup", () => {
   const held = {
     [at(REFACTOR_HOLD)]: JSON.stringify({ file: "old.md", hand: "a1", since: 0 }),

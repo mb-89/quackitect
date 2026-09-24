@@ -3,17 +3,14 @@
 // [[spec/design_output/stop#the-hand-walks-the-list]]
 
 import { join } from "node:path";
-import { MS } from "../../.claude/skills/level0/lib/log.js";
 import { REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
 import {
   drains,
   filesOn,
   standsPast,
-  takesFile,
   WALK_TOOL,
   walksList,
 } from "../../.claude/skills/level0/lib/warnings.js";
-import { spanOf } from "../engine/group.js";
 import { asks } from "./config.js";
 import { holdsFile, releasesHold } from "./refactor-hold.js";
 
@@ -22,7 +19,6 @@ const REFACTOR = {
   on: "refactor.parallel",
   most: "refactor.mostWarnings",
   atOnce: "refactor.mostAtOnce",
-  untouched: "refactor.untouchedFor",
   files: "refactor.mostFiles",
 };
 // The tier the hand's work takes, which the agent names on a spawn of its own. [[spec/design_output/level0#a-spawn-names-its-tier]]
@@ -57,7 +53,7 @@ export function handWanted(box) {
 // The hand the rule starts: its first file, and the count it spends. It walks the rest itself. [[spec/design_output/stop#the-hand-walks-the-list]]
 export function refactorHand(box) {
   if (!handWanted(box)) return null;
-  const file = restingFile(box);
+  const file = nextFile(box);
   if (!file) return null;
   box.refactors = (box.refactors ?? 0) + 1;
   box.walk = { hand: "", taken: [] };
@@ -90,8 +86,7 @@ export function walks(e, box) {
   walk.hand = hand;
   releasesHold(box);
   const most = Number(asks(box, REFACTOR.files) ?? 0);
-  const file =
-    most > 0 && walk.taken.length >= most ? "" : restingFile(box, walk.taken);
+  const file = most > 0 && walk.taken.length >= most ? "" : nextFile(box, walk.taken);
   if (!file) {
     return { result: { result: "No file waits. Answer what you drained, and end." } };
   }
@@ -111,7 +106,7 @@ function takes(box, file, hand) {
   );
 }
 
-// The walk ends here. A hand that falls writes why at warn, and a hand that ends clean writes nothing. A refused spawn keeps the walk and its hold for the hand the agent spawns. [[spec/design_output/stop#the-agent-spawns-where-the-engine-cannot]]
+// The walk ends here. A hand that falls writes why at warn, and a hand that ends clean writes nothing. A refused spawn keeps the walk and its hold for the hand the agent spawns. [[spec/design_output/stop#the-agent-spawns-instead]]
 export function onRefactorAnswered(e, box) {
   const refused = String(e?.deny ?? "");
   const file = String(e?.file ?? "");
@@ -139,7 +134,7 @@ export function onRefactorAnswered(e, box) {
   return { result: { result: "the refactoring hand answered" } };
 }
 
-// The agent's next call carries the spawn the engine could not start, once. [[spec/design_output/stop#the-agent-spawns-where-the-engine-cannot]]
+// The agent's next call carries the spawn the engine leaves unstarted, once. [[spec/design_output/stop#the-agent-spawns-instead]]
 export function tellsHand(e, box, before = null) {
   const file = String(box.handToSpawn ?? "");
   if (e?.agentId || !file) return before;
@@ -148,7 +143,7 @@ export function tellsHand(e, box, before = null) {
   return { ...(before ?? {}), after: { ...(before?.after ?? {}), context } };
 }
 
-// [[spec/design_output/stop#the-agent-spawns-where-the-engine-cannot]]
+// [[spec/design_output/stop#the-agent-spawns-instead]]
 export function spawnText(file, model) {
   return [
     "# Spawn the refactoring hand",
@@ -161,41 +156,9 @@ export function spawnText(file, model) {
   ].join("\n");
 }
 
-// The git door answers each file's last write, in the seconds the window reads. One log over the whole list answers every file, newest first, so the first stamp above a name is its last write. [[spec/tickets/the-spawn-reaches-its-guidance]]
-function wroteIn(box, names) {
-  const wanted = new Set(names ?? []);
-  const out = Object.fromEntries([...wanted].map((name) => [name, 0]));
-  if (!wanted.size) return out;
-  let said = "";
-  try {
-    said = String(
-      box.proc.run(
-        ["git", "log", "--format=%ct", "--name-only", "--relative", "--", ...wanted],
-        { cwd: box.work },
-      ).stdout ?? "",
-    );
-  } catch {
-    return out;
-  }
-  let at = 0;
-  for (const line of said.split("\n")) {
-    const row = line.trim();
-    if (/^\d+$/.test(row)) at = Number(row);
-    else if (wanted.has(row) && !out[row]) out[row] = at;
-  }
-  return out;
-}
-
-// The file the hand takes: the oldest at rest outside the window, off the list, and new to this walk. [[spec/design_output/stop#the-hand-walks-the-list]]
-function restingFile(box, taken = []) {
-  const files = filesOn(listHere(box)).filter((one) => !taken.includes(one));
-  const now = Math.floor(box.clock.now().getTime() / MS);
-  return takesFile(
-    files,
-    wroteIn(box, files),
-    now,
-    spanOf(asks(box, REFACTOR.untouched)),
-  );
+// The file the hand takes: the next on the list and new to this walk, whatever its age. [[spec/design_output/stop#the-hand-walks-the-list]]
+function nextFile(box, taken = []) {
+  return filesOn(listHere(box)).find((one) => !taken.includes(one)) ?? "";
 }
 
 // The list the lint leaves, one entry a warning, which the hand drains. [[spec/design_output/stop#the-grace]]

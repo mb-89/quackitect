@@ -86,14 +86,14 @@ export function standsPast(count, most) {
   return Number(most) > 0 && Number(count) > Number(most);
 }
 
-// The hand takes one file. A write inside the window holds its file back, and the oldest of the rest goes. Both spans read seconds, as `git log --format=%ct` answers them. [[spec/tickets/the-spawn-reaches-its-guidance]]
-export function takesFile(files, wrote, now, window) {
+// The oldest file a commit names, as `git log --format=%ct` answers each one's last write. [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
+export function oldestFile(files, wrote) {
   const at = (name) => Number(wrote?.[name] ?? 0);
   return (
     [files ?? []]
       .flat()
       .filter(Boolean)
-      .filter((one) => at(one) > 0 && Number(now) - at(one) >= Number(window))
+      .filter((one) => at(one) > 0)
       .sort((a, b) => at(a) - at(b))[0] ?? ""
   );
 }

@@ -12,7 +12,7 @@ import {
   rowOf,
   ruledWarnings,
   standsPast,
-  takesFile,
+  oldestFile,
   WALK_TOOL,
   WARNING,
   walksList,
@@ -90,16 +90,16 @@ test("the list stands past the number where the count runs over it", () => {
   assert.equal(standsPast(99, 0), false);
 });
 
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("the hand takes the oldest file outside the window, and none inside it", () => {
+// [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
+test("the oldest file a commit names goes first, and a file no commit names stays out", () => {
   const now = 1_800_000_000;
   const week = 604_800;
   const wrote = { "a.md": now - week * 2, "b.md": now - week * 3, "c.md": now - 60 };
 
-  assert.equal(takesFile(["a.md", "b.md", "c.md"], wrote, now, week), "b.md");
-  assert.equal(takesFile(["c.md"], wrote, now, week), "");
-  assert.equal(takesFile(["d.md"], wrote, now, week), "");
-  assert.equal(takesFile([], wrote, now, week), "");
+  assert.equal(oldestFile(["a.md", "b.md", "c.md"], wrote), "b.md");
+  assert.equal(oldestFile(["c.md"], wrote), "c.md");
+  assert.equal(oldestFile(["d.md"], wrote), "");
+  assert.equal(oldestFile([], wrote), "");
 });
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]

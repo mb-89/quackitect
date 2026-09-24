@@ -73,11 +73,9 @@ const REFACTOR = {
   parallel: true,
   mostWarnings: 2,
   mostAtOnce: 1,
-  untouchedFor: "7d",
 };
 
 const NOW = 1_800_000_000;
-const WEEK = 604_800;
 
 function box(files = {}, refactor = REFACTOR) {
   const disk = fakeDisk({
@@ -100,12 +98,6 @@ function box(files = {}, refactor = REFACTOR) {
       clock: { now: () => new Date(NOW * 1000) },
       proc: fakeProc({
         "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
-        // One log answers the whole list, newest first, whatever order the list names the files in. [[spec/tickets/the-spawn-reaches-its-guidance]]
-        git: (argv) => ({
-          stdout: argv.includes("--name-only")
-            ? `${NOW - 60}\n\nnew.md\n${NOW - WEEK * 2}\n\nold.md\n${NOW - WEEK * 3}\n\nnew.md\nold.md\n`
-            : "",
-        }),
       }),
       log: { say: (...row) => said.push(row) },
     },
@@ -394,14 +386,14 @@ ${RULES}`;
 });
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("the door answers the vote and the hand together, and the hand takes the file outside the window", () => {
+test("the door answers the vote and the hand together, and the hand takes the first file on the list, whatever its age", () => {
   const it = box(stamped(9, ["old.md", "new.md"]));
   const said = onStop({ last_assistant_message: "Some text and no stop." }, it.box);
 
   assert.match(said.result.block, /names no stop reason/);
   assert.equal(said.spawn.kind, "refactor");
-  assert.equal(said.spawn.file, "old.md");
-  assert.match(said.spawn.prompt, /old\.md/);
+  assert.equal(said.spawn.file, "new.md");
+  assert.match(said.spawn.prompt, /new\.md/);
   assert.equal(said.back.event, "refactor.answered");
 });
 
@@ -413,8 +405,12 @@ test("a call under a long list asks the agent nothing, and the turn's end starts
   assert.equal(it.box.grace, undefined, "the call opens no ask");
   assert.equal(logs().length, 0, "the call asks git nothing");
   const said = onStop({ last_assistant_message: "Some text and no stop." }, it.box);
-  assert.equal(said.spawn.file, "old.md");
-  assert.equal(logs().length, 1, "one log answers the whole list");
+  assert.equal(said.spawn.file, "new.md");
+  assert.equal(
+    logs().length,
+    0,
+    "the hand asks git nothing, since no file's age holds it back",
+  );
 });
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]

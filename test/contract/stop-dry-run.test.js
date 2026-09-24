@@ -27,7 +27,6 @@ const CONFIG = {
     parallel: true,
     mostWarnings: 2,
     mostAtOnce: 1,
-    untouchedFor: "7d",
   },
 };
 const WARNINGS = Array.from({ length: 3 }, () => ({
