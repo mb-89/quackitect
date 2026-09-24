@@ -96,7 +96,12 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 13edadb5938b7e4cc1e59cbab7b5d7bf22ba59b4
+    hash_after: 13edadb5938b7e4cc1e59cbab7b5d7bf22ba59b4
 ---
 
 # Ask
@@ -135,17 +140,43 @@ opens `terms.yml` to learn one word.
 
 <!-- the form is text -->
 
+The server answers `textDocument/hover`, and a new file `src/lsp/hover.go`
+holds the answer:
+
+| piece | change |
+|---|---|
+| `initialize` | names `hoverProvider` |
+| the terms | read off `terms.yml` through the tree on each ask, so an open buffer or a save counts at once |
+| the path | the vocabulary layer of `paragraph.schema.yaml` names it, as `pathsOf` reads it, and the default stands where it names none |
+| the word | the run of letters under the cursor, widened to the longest term covering it, such as `level zero` |
+| a stem | the Go reader of the table of endings tries each row, as `knownIn` does |
+| the answer | the term, its `means` line, and its `source` under it where it cites one, as markdown |
+
+Go carries a copy of the table, because the server imports no JavaScript. A
+new file `spec/config/stems.yaml` holds the cases, a word and the term it
+reaches. The Go test and the JavaScript test both drive them, as the slug
+cases do, so a drift turns a suite red.
+
+`spec/design_output/lsp.md` gains a chapter on the hover.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/lsp/lsp.go`, `took` answers `initialize` and gains the hover case
+- `.claude/skills/level0/lib/vocabulary.js`, `knownIn` reads the table the Go copy follows
+- `test/level0/vocabulary.test.js`, the table test gains the shared cases
+- `src/extension`, the client asks the server for a hover once the server names it
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first
 
 ## review
 
