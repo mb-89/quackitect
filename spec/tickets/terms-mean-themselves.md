@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box a0ae5042621d · claude-code-remote
@@ -87,6 +87,10 @@ record:
       - name: sync
         exit: 0
         said: work/terms-mean-themselves already carries every commit on main.
+  - step: split
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 7b3e18a6a48b8226a0666347724e55a7935a1cbd
+    hash_after: 3712afcb32da02ab82948bb116a57239fd554073
 ---
 
 # Ask
@@ -116,11 +120,19 @@ Every term says what it means in one line of core words and other terms, and the
 
 <!-- the form is list -->
 
+- [[spec/tickets/a-term-means-itself]], under the standard process
+- [[spec/tickets/a-term-points-nowhere]], under the standard process
+- [[spec/tickets/the-hover-shows-a-term]], under the standard process
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each child reads whole. The field is one data change, the refusal one rule, and the hover one request in the server
+- the field child carries the field, the outside source and every term. The other two carry the refusal and the hover, so every row of the plan lands
+- the refusal and the hover both read the line, so both name the field child under depends_on
 
 # children
 
