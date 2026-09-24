@@ -24,6 +24,7 @@ import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
 import { emptyGroup } from "./pull-hand.js";
 import { landedAlone } from "./pull-landed.js";
+import { baseOf, driftOf } from "./ticket-drift.js";
 import { reachedOf, routed } from "./ticket-route.js";
 import { yours } from "./ticket-yours.js";
 import { askFaults, askRefusal, lineRefusal } from "./ticket-ask-lint.js";
@@ -34,6 +35,8 @@ export const HOLD = OWNED_HOLD;
 export const NOTE = "note";
 // The flag on a note that waits for a person. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 const TALK = "talk";
+// The flag that copies a new route over a person's edit. [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
+const OVER = "--over";
 const TRAVELS = "spec/tickets";
 const SCHEMAS = "spec/schemas";
 
@@ -51,7 +54,7 @@ export function ticket(root, argv, doors) {
       "  note <name> <line>  write a private ticket off the note process, and carry on",
     );
     console.log(
-      "  update <ticket>     copy the ticket's process onto the steps it has yet to reach",
+      "  update <ticket>     copy the ticket's process onto the steps it has yet to reach, and --over writes over drift",
     );
     console.log(
       "  open <ticket>       open a draft whose ask stands written, so a hand can pull it",
@@ -267,6 +270,25 @@ function update(it, name, argv) {
   if (String(front.process_hash ?? "") === held.hash && !asked) {
     console.log(`${at.said} already carries ${held.name} as it stands.`);
     return 0;
+  }
+
+  // A person's edit past the reached leaves stops the copy, unless --over says to write over it. [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
+  if (!(argv ?? []).includes(OVER)) {
+    const own = processAt(it.disk, it.method, it.join, front.process);
+    const base = own.why ? null : baseOf(it.git, own.path, String(front.process_hash ?? ""));
+    if (!base) {
+      console.error(
+        `The process version ${at.said} copied stands nowhere in the history, so any drift stays unread. Run it again with ${OVER} to copy the new route over the route as it stands.`,
+      );
+      return 1;
+    }
+    const drift = driftOf(front, base);
+    if (drift.length) {
+      console.error(
+        `${at.said} carries drift from the process it copied, at ${drift.join(", ")}. Nothing changes. Run it again with ${OVER} to copy the new route over it.`,
+      );
+      return 1;
+    }
   }
 
   const route = updated(front, held.route);

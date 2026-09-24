@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [the-route-edits-ahead]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -117,6 +117,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 6d3a680f277e7b83b2c3f0ac10cc05e4c6780afa
+    hash_after: 6d3a680f277e7b83b2c3f0ac10cc05e4c6780afa
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -251,11 +259,19 @@ The drift, the missing version and `driftOf` fail on their own assertion. The co
 
 <!-- the form is command -->
 
+./RUNME.sh lint src/scripts/ticket-drift.js src/scripts/ticket.js test/level0/ticket-drift.test.js test/level0/ticket-verb.test.js
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It adds the drift module, guards the update verb, and passes the flag in the old update cases.
+- every door the change reaches has a fake. The walk reaches git through the git door, and the cases drive `fakeGit`.
+- a comment names the approach the change implements. The module and the guard point at the design input.
+
 
 ## tests-green
 
@@ -267,11 +283,17 @@ The drift, the missing version and `driftOf` fail on their own assertion. The co
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/ticket-drift.test.js test/level0/ticket-verb.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -279,11 +301,28 @@ The drift, the missing version and `driftOf` fail on their own assertion. The co
 
 <!-- the form is text -->
 
+`./RUNME.sh ticket update` now reads the process version a ticket copied before it writes. `baseOf` in `src/scripts/ticket-drift.js` walks the git history of the ticket's own process file, and stops at the version whose `processHash` answers `process_hash`.
+
+| what the verb finds | the answer |
+|---|---|
+| no drift past the reached leaves | the new route, as before |
+| a step added, changed, moved or dropped | the steps named as drift, no write, exit 1 |
+| no version answering the hash | the reason, no write, exit 1 |
+| either refusal under `--over` | the new route, over the edit |
+
+So a route a person edits through `ticket route` survives an update, or the verb says where it stands.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It touches the drift module, the update verb, and the update cases.
+- every door the change reaches has a fake. The cases drive the fake disk and a fake git history.
+- a comment names the approach the change implements. Each new function points at the design input it builds.
+
 
 # verdict
 

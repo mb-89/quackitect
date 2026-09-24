@@ -155,3 +155,13 @@ test("driftOf names an added, a dropped and a changed step, and skips the reache
   ];
   assert.deepEqual(driftOf(front, base), ["check", "sign", "land"]);
 });
+
+test("driftOf names a step moved past the reached leaves", () => {
+  const base = [
+    { name: "do", does: "makes the change" },
+    { name: "check", does: "checks it" },
+    { name: "land", does: "lands it" },
+  ];
+  const front = { step: "do", steps: [base[0], base[2], base[1]] };
+  assert.deepEqual(driftOf(front, base), ["land"]);
+});
