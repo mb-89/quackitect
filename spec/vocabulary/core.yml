@@ -1,7 +1,7 @@
 # The core: the words ASD-STE100 approves, the openste seed over it, and the
 # 20000 most common English words of the Google corpus. A script writes this
 # file, and nobody edits it by hand. A word the tree needs past it is a term,
-# and spec/vocabulary/terms.yml holds those with the note that defines each.
+# and spec/vocabulary/terms.yml holds those with the line saying what each means.
 # [[spec/schemas/paragraph.schema.yaml]]
 
 words:

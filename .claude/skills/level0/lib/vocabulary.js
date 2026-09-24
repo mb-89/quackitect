@@ -8,9 +8,11 @@ import { grouped, left, pattern, prelude, quoted, scripted } from "./snippets.js
 export const CORE = "spec/vocabulary/core.yml";
 export const TERMS = "spec/vocabulary/terms.yml";
 export const SWAPS = "spec/vocabulary/swaps.yml";
+export const STEMS = "spec/config/stems.yaml";
 
 const WORD = /^[a-z][a-z-]*( [a-z][a-z-]*)*$/;
-const LINK = /^\[\[[^\]\s]+\]\]$/;
+// A part shorter than this stands, in the check and in the rule alike. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+const SHORTEST = 3;
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 export function pathsOf(said) {
@@ -23,6 +25,8 @@ export function pathsOf(said) {
     core: one("core", CORE),
     terms: one("terms", TERMS),
     swaps: one("swaps", SWAPS),
+    // The layer holds a line of prose under stems, so the table takes a key of its own. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+    endings: one("endings", STEMS),
   };
 }
 
@@ -42,14 +46,10 @@ export function termsOf(said) {
   return rowsOf(said?.terms)
     .map((one) => ({
       word: lower(one.word),
-      defines: String(one.defines ?? "").trim(),
+      means: String(one.means ?? "").trim(),
+      source: String(one.source ?? "").trim(),
     }))
     .filter((one) => WORD.test(one.word));
-}
-
-// A term with no defining note is jargon. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
-export function undefinedTerms(said) {
-  return termsOf(said).filter((one) => !LINK.test(one.defines));
 }
 
 // A swap wins over the corpus, so a swapped word stands on no list. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
@@ -78,6 +78,83 @@ export function swapsOf(lists) {
   return new Map([...out].sort((a, b) => (a[0] < b[0] ? -1 : 1)));
 }
 
+// A row names an ending and what takes its place: none cuts it, drop cuts one letter more. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+const NONE = "none";
+const DROP = "drop";
+
+// The table the lists hand in, one row an ending, and the prefixes. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+export function stemsOf(said) {
+  const endings = rowsOf(said?.endings)
+    .map((one) => ({
+      end: lower(one.end),
+      to: (Array.isArray(one.to) ? one.to : []).map(lower).filter(Boolean),
+      long: one.long === true,
+    }))
+    .filter((one) => one.end && one.to.length);
+  const prefixes = (Array.isArray(said?.prefixes) ? said.prefixes : []).map(lower).filter(Boolean);
+  return { endings, prefixes };
+}
+
+// The shortest word a row reads, and the letters a stem cuts. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+function overOf(row) {
+  return row.end.length + (row.long ? 1 : 0);
+}
+
+function cutOf(row, to) {
+  return row.end.length + (to === DROP ? 1 : 0);
+}
+
+function addOf(to) {
+  return to === DROP || to === NONE ? "" : to;
+}
+
+// The table read in JavaScript, for a check outside the rule. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+export function knownIn(held, stems) {
+  const listed = (w) =>
+    held.has(w) ||
+    stems.endings.some(
+      (row) =>
+        w.length > overOf(row) &&
+        w.endsWith(row.end) &&
+        row.to.some((to) => held.has(w.slice(0, w.length - cutOf(row, to)) + addOf(to))),
+    );
+  return (w) =>
+    listed(w) ||
+    stems.prefixes.some(
+      (pre) => w.length > pre.length + 2 && w.startsWith(pre) && listed(w.slice(pre.length)),
+    );
+}
+
+// The table read as the Tengo the rule runs. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+function endingLines(stems) {
+  const out = [];
+  for (const row of stems.endings) {
+    out.push(`  if n > ${overOf(row)} && text.has_suffix(w, ${quoted(row.end)}) {`);
+    for (const to of row.to) {
+      const cut = `w[:n-${cutOf(row, to)}]`;
+      const stem = addOf(to) ? `${cut} + ${quoted(addOf(to))}` : cut;
+      out.push(`    if inside[${stem}] != undefined { return true }`);
+    }
+    out.push("  }");
+  }
+  return out;
+}
+
+// Every word of a means line the lists leave out, one row a term. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+export function looseMeanings(lists) {
+  const known = knownIn(new Set(wordsOf(lists)), stemsOf(lists?.stems));
+  const out = [];
+  for (const one of termsOf(lists?.terms)) {
+    const loose = one.means
+      .toLowerCase()
+      .split(/[^a-z-]+/)
+      .flatMap((word) => word.split("-"))
+      .filter((part) => part.length >= SHORTEST && !known(part));
+    if (loose.length) out.push({ word: one.word, loose });
+  }
+  return out;
+}
+
 function rowsOf(said) {
   return (Array.isArray(said) ? said : []).filter(
     (one) => one && typeof one === "object",
@@ -100,10 +177,11 @@ function pathOf(layer) {
 export function vocabularyRule(layer, lists) {
   const words = wordsOf(lists);
   const swaps = swapsOf(lists);
+  const stems = stemsOf(lists?.stems);
   const where = pathOf(layer);
   const tail =
     "stands outside the words this tree writes. Write a core word, or add it to " +
-    `${where} with the note that defines it.`;
+    `${where} with one line that says what it means.`;
 
   return scripted(`A word ${tail}`, [
     ...prelude([], true, layer.prose),
@@ -128,67 +206,18 @@ export function vocabularyRule(layer, lists) {
     "  if len(pair) == 2 { swaps[pair[0]] = pair[1] }",
     "}",
     "",
-    // A plural, a past form and an -ing form stand in. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+    // [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
     "listed := func(w) {",
     "  if inside[w] != undefined { return true }",
     "  n := len(w)",
-    '  if n > 3 && text.has_suffix(w, "ies") {',
-    '    if inside[w[:n-3] + "y"] != undefined { return true }',
-    "  }",
-    '  if n > 2 && text.has_suffix(w, "es") {',
-    "    if inside[w[:n-2]] != undefined { return true }",
-    "    if inside[w[:n-1]] != undefined { return true }",
-    "  }",
-    '  if n > 1 && text.has_suffix(w, "s") {',
-    "    if inside[w[:n-1]] != undefined { return true }",
-    "  }",
-    '  if n > 3 && text.has_suffix(w, "ied") {',
-    '    if inside[w[:n-3] + "y"] != undefined { return true }',
-    "  }",
-    '  if n > 2 && text.has_suffix(w, "ed") {',
-    "    if inside[w[:n-2]] != undefined { return true }",
-    "    if inside[w[:n-1]] != undefined { return true }",
-    "    if inside[w[:n-3]] != undefined { return true }",
-    "  }",
-    '  if n > 3 && text.has_suffix(w, "ing") {',
-    "    if inside[w[:n-3]] != undefined { return true }",
-    '    if inside[w[:n-3] + "e"] != undefined { return true }',
-    "    if inside[w[:n-4]] != undefined { return true }",
-    "  }",
-    // An adverb, a comparative, an -able and a -less form stand in too. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    '  if n > 3 && text.has_suffix(w, "ves") {',
-    '    if inside[w[:n-3] + "f"] != undefined { return true }',
-    '    if inside[w[:n-3] + "fe"] != undefined { return true }',
-    "  }",
-    '  if n > 4 && text.has_suffix(w, "ily") {',
-    '    if inside[w[:n-3] + "y"] != undefined { return true }',
-    "  }",
-    '  if n > 3 && text.has_suffix(w, "ly") {',
-    "    if inside[w[:n-2]] != undefined { return true }",
-    '    if inside[w[:n-2] + "e"] != undefined { return true }',
-    "  }",
-    '  if n > 3 && text.has_suffix(w, "er") {',
-    "    if inside[w[:n-2]] != undefined { return true }",
-    "    if inside[w[:n-1]] != undefined { return true }",
-    "  }",
-    '  if n > 4 && text.has_suffix(w, "est") {',
-    "    if inside[w[:n-3]] != undefined { return true }",
-    "    if inside[w[:n-2]] != undefined { return true }",
-    "  }",
-    '  if n > 5 && (text.has_suffix(w, "able") || text.has_suffix(w, "ible")) {',
-    "    if inside[w[:n-4]] != undefined { return true }",
-    '    if inside[w[:n-4] + "e"] != undefined { return true }',
-    "  }",
-    '  if n > 5 && (text.has_suffix(w, "less") || text.has_suffix(w, "most")) {',
-    "    if inside[w[:n-4]] != undefined { return true }",
-    "  }",
+    ...endingLines(stems),
     "  return false",
     "}",
     "",
     // A prefix on a listed word stands too: unread, rerun, misread, outlive. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
     "known := func(w) {",
     "  if listed(w) { return true }",
-    '  for pre in ["un", "re", "mis", "out", "over", "non", "pre", "sub"] {',
+    `  for pre in [${stems.prefixes.map(quoted).join(", ")}] {`,
     "    if len(w) > len(pre) + 2 && text.has_prefix(w, pre) && listed(w[len(pre):]) { return true }",
     "  }",
     "  return false",
@@ -235,7 +264,7 @@ export function vocabularyRule(layer, lists) {
     '  for part in text.split(low, "-") {',
     "    p := text.trim_space(part)",
     // A prefix such as re- or co- stands on no list. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    "    if len(p) < 3 { continue }",
+    `    if len(p) < ${SHORTEST} { continue }`,
     "    if known(p) { continue }",
     "    bad = p",
     "    break",
@@ -248,7 +277,7 @@ export function vocabularyRule(layer, lists) {
     '    say += "Write " + road + " instead."',
     "  } else {",
     `    say += ${quoted("Write a core word, or add ")} + bad +`,
-    `      ${quoted(` to ${where} with the note that defines it.`)}`,
+    `      ${quoted(` to ${where} with one line that says what it means.`)}`,
     "  }",
     "  matches = append(matches, {begin: m.begin, end: m.end, message: say})",
     "}",

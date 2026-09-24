@@ -126,6 +126,8 @@ func (one *server) took(said message) bool {
 				"documentLinkProvider": map[string]any{"resolveProvider": false},
 				// The schema offers what a note carries at the cursor. [[spec/design_output/lsp#the-completion-reads-the-schema]]
 				"completionProvider": map[string]any{"triggerCharacters": triggers},
+				// A term shows what it means under the cursor. [[spec/design_output/lsp#the-hover-shows-a-term]]
+				"hoverProvider": true,
 			},
 			"serverInfo": map[string]any{"name": "se-lsp", "version": Version},
 		})
@@ -133,6 +135,8 @@ func (one *server) took(said message) bool {
 		one.answers(said.ID, one.links(said.Params))
 	case "textDocument/completion":
 		one.answers(said.ID, one.completes(said.Params))
+	case "textDocument/hover":
+		one.answers(said.ID, one.hovers(said.Params))
 	case "initialized":
 		one.sweeps()
 		go one.follows()
