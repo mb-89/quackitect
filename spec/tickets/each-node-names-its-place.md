@@ -149,7 +149,7 @@ A process file holds no body, so its nodes carry neither key. A node whose chapt
 
 - `src/scripts/cli.js` `drawing`, which prints the graph unchanged
 - `src/extension/lib/drawing.js` the emitter read, which hands the graph to the editor unchanged
-- `src/scripts/pull-chapter.js` `writeField` and the checklist read, which call `sectionAt` from its new home
+- `src/scripts/pull-chapter.js` `withFieldText` and `voiceText`, which call `sectionAt` from its new home
 
 
 ### answers

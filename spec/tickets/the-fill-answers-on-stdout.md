@@ -95,7 +95,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 3ba0d68d6aaf8ed96468301c50eac3e2b5e7f38a
+    hash_after: 3ba0d68d6aaf8ed96468301c50eac3e2b5e7f38a
 ---
 
 # Ask
@@ -124,17 +129,44 @@ The editor copies the mint's shape by hand, and the two drift.
 
 <!-- the form is text -->
 
+`ticket fill <path>` reads the ticket a person saves, and builds the mint's fields from it:
+
+| the field | from |
+|---|---|
+| every frontmatter key the person writes, `process` among them | the frontmatter, as it stands |
+| `Ask` and `Discussion` | the body of each chapter, where it holds text |
+
+`withRoute` in `src/scripts/process.js` copies the route and the hash in, and `mintedNote` writes the text. So the mint verb and the fill share one road.
+
+| the ticket | the verb |
+|---|---|
+| carries a route already | copies nothing, says so, and exits 0 |
+| names no process, or one standing nowhere | refuses with the reason `withRoute` gives, and exits 2 |
+| carries a process and no route, under `--stdout` | prints the filled text, and writes no file |
+| carries a process and no route | writes the filled text over the path, and prints JSON naming `ticket` and `process` |
+
+A new file, `src/scripts/ticket-fill.js`, holds the verb, so `ticket.js` stays under the ceiling.
+
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/scripts/ticket.js` `ticket`, which dispatches the new verb and prints its usage line
+- `src/scripts/cli.js` the `ticket` entry, whose `says` names the verbs
+- `src/scripts/process.js` `withRoute`, and `.claude/skills/level0/lib/schema-mint.js` `mintedNote`, which the verb calls unchanged
+
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first draft
+
 
 ## review
 
