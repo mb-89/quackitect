@@ -64,7 +64,7 @@ export function decide(rules, held = {}) {
   const stop = highest(firing, "stop");
   const go = highest(firing, "continue");
   // A claim reads the agent, and a check reads the tree, so the check wins. [[spec/design_output/stop#a-check-beats-a-claim]]
-  const yields = Boolean(stop?.yields) && go?.decides === "mechanical";
+  const yields = Boolean(stop?.yields) && firing.some(beatsClaim);
 
   return {
     ends:
@@ -89,6 +89,11 @@ function fires(one, held, unknown) {
     return false;
   }
   return Boolean(said);
+}
+
+// A check over a hand's work beside the agent reads no work of the agent's own, so it beats no claim. [[spec/design_output/stop#a-check-beats-a-claim]]
+function beatsClaim(one) {
+  return one.side === "continue" && one.decides === "mechanical" && !one.beside;
 }
 
 function asks(one) {

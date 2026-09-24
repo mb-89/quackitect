@@ -28,6 +28,13 @@ test("every stop the agent claims over its own work yields to a check", () => {
 });
 
 // [[spec/design_output/stop#a-check-beats-a-claim]]
+test("the warnings check reads the hand's work, so a claim of done stands over it", () => {
+  const said = by("warnings-stand-past-the-number");
+  assert.equal(said?.beside, true);
+  assert.ok(said.priority < by("the-work-stands-complete").priority);
+});
+
+// [[spec/design_output/stop#a-check-beats-a-claim]]
 test("a stop the owner drives stands over a check", () => {
   assert.equal(by("the-owner-asks-to-talk")?.yields, undefined);
   assert.equal(by("the-chat-is-new")?.yields, undefined);

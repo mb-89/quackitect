@@ -10,7 +10,9 @@
 # yields   the claim loses to any mechanical continue that fires, whatever the
 #          priorities say. It marks a stop the agent claims over its own work,
 #          where the check reads the tree and the claim reads the agent.
-# asks     the question the re-prompt puts to the agent.
+# beside   the check reads a hand's work beside the agent, so no claim yields
+#          to it, and the priorities decide.
+# asks    the question the re-prompt puts to the agent.
 # says     the sentence a person or an agent reads.
 
 - id: the-owner-asks-to-talk
@@ -78,6 +80,7 @@
   priority: 10
   decides: mechanical
   runs: warnings-standing
+  beside: true
   says: The warnings stand past the number, and a hand drains them beside you. Carry on with your own work.
 
 - id: the-last-line-names-no-stop
