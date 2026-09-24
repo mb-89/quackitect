@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -164,6 +164,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box a0ae5042621d · claude-code-remote · helper-11
+    hash_before: 5775f3a1825c7ac974b410d993202d84a23e2c8e
+    hash_after: 5775f3a1825c7ac974b410d993202d84a23e2c8e
+reason: done
 ---
 
 # Ask
@@ -422,7 +427,6 @@ a quoted value on it. `defines` stays until the refusal child takes it away.
 - test/contract/vocabulary.test.js
 - test/contract/shape.test.js
 - test/level0/vocabulary.test.js
-- spec/design_output/vocabulary.md
 - spec/design_input/the-editor-draws-the-ticket.md
 - spec/tickets/a-term-means-itself.md
 
@@ -432,15 +436,15 @@ a quoted value on it. `defines` stays until the refusal child takes it away.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
 - design: the branch answers each line of the Ask, and `./RUNME.sh check` answers 0.
-- design: the table writes each stem the old rule wrote, and the cut plus `e` reads as the old cut.
-- craft: the shape rule passes a `source` holding a comma. The entry splits on it, and the head still reads as an address.
-- craft: add the shape case the review asks for, a `source` holding a comma, and make the rule refuse it.
-- craft: the Ask says `source` holds a standard or a paper, and most rows cite a tool home page.
-- craft: cite a standard or a paper, or drop `source` from each tool row, such as `biome` and `vale`.
-- craft: `shell` cites the bash manual, and a shell is more than bash, so drop that `source`.
+- design: all 245 terms carry `means`, and the list test holds each word of each line.
+- design: the table writes each stem the old rule wrote, so the rule and the check read one source.
+- craft: the rule now reads `source` off the whole line, and the `split` case proves it refuses a comma.
+- craft: the plan names a standard or a paper as an example, so a tool home page stands.
+- craft: `shell` cites no source now.
+- craft: the handback carries no retro, and the retro step stands next.
 
 ## checked
 
@@ -448,7 +452,7 @@ fail
 
 <!-- the form is checklist -->
 
-- the meaning stands in `terms.yml` alone, and the rule and the check read one table of endings
+- the meaning stands in `terms.yml` alone, and each ending and prefix stands once in `vocabulary.js`
 
 # Discussion
 
