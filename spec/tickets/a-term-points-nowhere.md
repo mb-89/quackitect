@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -194,6 +194,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box a0ae5042621d · claude-code-remote · helper-15
+    hash_before: 65f4cff4e546bbdbd0f5efdc6c87b32891e99fa0
+    hash_after: 65f4cff4e546bbdbd0f5efdc6c87b32891e99fa0
+reason: done
 ---
 
 # Ask
@@ -463,13 +468,13 @@ The design review names three gaps, and each lands here:
 
 <!-- the form is verdict -->
 
-fail
+pass
 
 - design: the branch answers each row of the Ask table, and `./RUNME.sh check` answers 0.
 - design: no term carries `defines` or a link, and no caller reads `defines` or `undefinedTerms`.
-- craft: the `aside` case puts its link under `see`, so the link check alone refuses it.
-- craft: the `pointing` case carries `defines` and a link, so the link check refuses it with the `defines` check gone.
-- craft: add a case with `defines: somewhere` and no link, and assert a refusal.
+- craft: `pointing` carries `defines` with no link, and `aside` carries a link with no `defines`.
+- craft: each other case carries one fault, so each check of the term meets a case only it refuses.
+- design: four older refusals carry no case, and each stands from before the ask.
 
 ## checked
 
