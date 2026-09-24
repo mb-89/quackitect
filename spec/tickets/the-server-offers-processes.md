@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -174,6 +174,11 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/the-server-offers-processes.md:405:2: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: verdict
+    hand: box 2bc65ec92430 · claude-code-remote · helper-13
+    hash_before: 70fc1dcd992ecdb651821e898dd880ffde1d58a9
+    hash_after: 70fc1dcd992ecdb651821e898dd880ffde1d58a9
+reason: done
 ---
 
 # Ask
@@ -414,6 +419,7 @@ The two checkers each read the key: `frontFaults` in `src/lsp/schema.go` on ever
 <!-- the form is files -->
 
 .claude/skills/level0/lib/schema.js
+spec/design_output/schema.md
 spec/schemas/ticket.schema.yaml
 spec/tickets/the-server-offers-processes.md
 src/lsp/complete.go
@@ -421,13 +427,10 @@ src/lsp/complete_test.go
 src/lsp/fold.go
 src/lsp/fold_test.go
 src/lsp/lsp.go
+src/lsp/note.go
 src/lsp/schema.go
 src/lsp/schema_test.go
 test/level0/schema.test.js
-src/lsp/note.go
-spec/design_output/schema.md
-spec/design_output/lsp.md
-spec/design_input/the-editor-draws-the-ticket.md
 
 ## verdict
 
@@ -435,14 +438,15 @@ spec/design_input/the-editor-draws-the-ticket.md
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `foldsOf` in `src/lsp/fold.go` repeats the fence scan `frontOf` in `src/lsp/note.go` owns. Reuse `frontOf`.
-- The new `fence` constant in `src/lsp/fold.go` serves one file while four others write the literal.
-- The `spec/design_output/schema.md` keyword table names neither `x-filled-by` nor `x-values`. Add both rows there.
-- Four comments restate what `x-filled-by` means. Point each at the `spec/design_output/schema.md` row.
-- `./RUNME.sh check` exits 0, and every ask line carries a test that fires.
-- The handback carries no retro.
+- `foldsOf` now reads `frontOf`, which records the closing fence in `Close`.
+- The `fence` constant stands gone, so `frontOf` alone scans the fence.
+- The `spec/design_output/schema.md` table now owns `x-filled-by` and `x-values`.
+- Every `x-filled-by` and `x-values` comment now points at that table.
+- Each ask line carries a Go or JS test that fires.
+- `./RUNME.sh check` exits 0, and the named tests pass.
+- The handback carries no retro yet, and the retro step follows this verdict.
 
 ## checked
 
@@ -450,7 +454,7 @@ fail
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place. The fence scan and the two keywords each stand in several places, so the verdict fails.
+- every fact the change adds stands in one place. The fence scan lives in `frontOf`, and the keywords live in one design table.
 
 # Discussion
 
