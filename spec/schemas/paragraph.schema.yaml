@@ -159,7 +159,8 @@ layers:
     core: spec/vocabulary/core.yml
     terms: spec/vocabulary/terms.yml
     swaps: spec/vocabulary/swaps.yml
-    stems: a plural, a past form and an -ing form of a listed word stand
+    endings: spec/config/stems.yaml
+    stems: a plural, a past form and an -ing form of a listed word stand, and so does a prefix, as the table of endings names
     outside:
       - a code span
       - a link

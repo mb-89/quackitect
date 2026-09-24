@@ -338,6 +338,23 @@ The editor counts the cursor in UTF-16 units, so `byteAt` in
 line holds from the colon, the hashes or the brackets up to the cursor. A
 pointer closes its brackets where the line holds none.
 
+# The hover shows a term
+
+`hoverAt` in `src/lsp/hover.go` reads the word under the cursor and answers the
+line the dictionary holds for it:
+
+| the cursor stands on | the hover shows |
+|---|---|
+| a term, or an ending or a prefix on one | the term and its `means` line |
+| a word of a term of several words | the whole term, the longest that covers the cursor |
+| a term carrying `source` | the line, then the address |
+| a core word or no word | nothing |
+
+The server reads `terms.yml` and the table of endings on each ask, off the
+paths the vocabulary layer names. The extension sends no buffer of the list, so
+a save reaches the next hover. For the table, see
+[[spec/design_output/vocabulary#the-rule-matches-a-stem]].
+
 # An engine field warns
 
 A property carrying `x-engine: true` belongs to the verbs. For who writes each

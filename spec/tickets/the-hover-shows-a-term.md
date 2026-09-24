@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -147,6 +147,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 21fb4137735c4316f8b424bde8a9057ca316746c
+    hash_after: 21fb4137735c4316f8b424bde8a9057ca316746c
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -357,11 +365,17 @@ rule keeps a comma out of `means` and `source`, so a split on the comma holds.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the server, the table, its readers, the schema and the two design notes the approach names
+- the hover tests read a fake tree, and the JavaScript tests read the disk through its door
+- each new function carries a comment naming the design output
 
 ## tests-green
 
@@ -373,11 +387,15 @@ rule keeps a comma out of `means` and `source`, so a split on the comma holds.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/vocabulary.test.js test/contract/vocabulary.test.js src/lsp
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -385,11 +403,31 @@ rule keeps a comma out of `means` and `source`, so a split on the comma holds.
 
 <!-- the form is text -->
 
+The language server shows what a term means where the cursor rests on it.
+
+| piece | what changes |
+|---|---|
+| `src/lsp/hover.go` | answers a hover with the term, its line and its source, off `terms.yml` read on each ask |
+| `src/lsp/lsp.go` | names `hoverProvider` and routes the request, and a protocol test holds both |
+| `spec/config/stems.yaml` | holds the table of endings, the prefixes and their cases, out of the code |
+| `vocabulary.js` | `stemsOf` reads the table the lists hand in, and the rule, the check and `knownIn` take it |
+| `projection.js` | hands the table to the rule beside the three lists |
+| the schema | names the table under `endings` |
+| the design notes | `lsp.md` gains the hover, and `vocabulary.md` names the table |
+
+The projected rule stands byte for byte, because it reads the same table from
+the file. The Go reader of YAML reads no braces, so the hover reads each line
+of `terms.yml` with a reader of its own.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the server, the table, its readers, the schema and the two design notes the approach names
+- the hover tests read a fake tree, and the JavaScript tests read the disk through its door
+- each new function carries a comment naming the design output
 
 # verdict
 

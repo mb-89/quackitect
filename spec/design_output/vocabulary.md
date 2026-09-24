@@ -34,13 +34,16 @@ or it adds the term with the line that says what it means.
 # The rule matches a stem
 
 The projection inlines the words and the swaps into `Vocabulary.yml`, and the
-rule reads a paragraph one word at a time.
+rule reads a paragraph one word at a time. `spec/config/stems.yaml` holds the
+endings and the prefixes a listed word takes, under the key `endings` of the
+vocabulary layer. The rule, the check over a `means` line and the hover each
+read that one table, and its cases drive a test in each tool chain.
 
 | the word | stands |
 |---|---|
 | a listed word | yes |
-| a plural, a past form or an `-ing` form of one | yes |
-| `un`, `re`, `mis`, `out`, `over`, `non`, `pre` or `sub` on one | yes |
+| an ending the table names on one | yes |
+| a prefix the table names on one | yes |
 | a code span, a link, a path, a digit or a one-letter token | outside the layer |
 | a capital past the first word of a sentence | a name, outside the layer |
 | a prefix of two letters on a hyphen | outside the layer |

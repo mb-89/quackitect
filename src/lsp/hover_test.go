@@ -3,8 +3,11 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -101,5 +104,31 @@ func TestTheStemsReachEveryCase(t *testing.T) {
 		if !table.reaches(one.word, map[string]bool{one.reaches: true}) {
 			t.Errorf("%s reaches no %s", one.word, one.reaches)
 		}
+	}
+}
+
+// The server names the hover, and a hover request over the protocol answers the line. [[spec/design_output/lsp#the-hover-shows-a-term]]
+func TestTheServerAnswersAHover(t *testing.T) {
+	tree := hoverTree(hoverTerms)
+	at := strings.Index(hoverNote, "doors") + 1
+	out := &bytes.Buffer{}
+	said := []string{
+		`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}`,
+		`{"jsonrpc":"2.0","id":2,"method":"textDocument/hover","params":{"textDocument":{"uri":"file:///tree/spec/notes/one.md"},"position":{"line":0,"character":` + strconv.Itoa(at) + `}}}`,
+	}
+	if err := Speaks(&Checker{tree: tree}, framed(said...), out); err != nil {
+		t.Fatal(err)
+	}
+	answers := spoken(t, out.String())
+	if len(answers) != 2 {
+		t.Fatalf("the server answers %d messages", len(answers))
+	}
+	named, _ := json.Marshal(answers[0].Result)
+	if !strings.Contains(string(named), `"hoverProvider":true`) {
+		t.Errorf("the capabilities read %s", named)
+	}
+	shown, _ := json.Marshal(answers[1].Result)
+	if !strings.Contains(string(shown), "the one place the tree guards an outside thing") {
+		t.Errorf("the hover reads %s", shown)
 	}
 }

@@ -25,6 +25,8 @@ export function pathsOf(said) {
     core: one("core", CORE),
     terms: one("terms", TERMS),
     swaps: one("swaps", SWAPS),
+    // The layer holds a line of prose under stems, so the table takes a key of its own. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+    endings: one("endings", STEMS),
   };
 }
 
@@ -76,26 +78,22 @@ export function swapsOf(lists) {
   return new Map([...out].sort((a, b) => (a[0] < b[0] ? -1 : 1)));
 }
 
-// Each row holds an ending and what takes its place, where a dash drops one more letter, and the rule and the check both read it. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-export const ENDINGS = [
-  { end: "ies", to: ["y"] },
-  { end: "es", to: ["", "e"] },
-  { end: "s", to: [""] },
-  { end: "ied", to: ["y"] },
-  { end: "ed", to: ["", "e", "-"] },
-  { end: "ing", to: ["", "e", "-"] },
-  { end: "ves", to: ["f", "fe"] },
-  { end: "ily", to: ["y"], long: true },
-  { end: "ly", to: ["", "e"], long: true },
-  { end: "er", to: ["", "e"], long: true },
-  { end: "est", to: ["", "e"], long: true },
-  { end: "able", to: ["", "e"], long: true },
-  { end: "ible", to: ["", "e"], long: true },
-  { end: "less", to: [""], long: true },
-  { end: "most", to: [""], long: true },
-];
+// A row names an ending and what takes its place: none cuts it, drop cuts one letter more. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+const NONE = "none";
+const DROP = "drop";
 
-const DROP = "-";
+// The table the lists hand in, one row an ending, and the prefixes. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+export function stemsOf(said) {
+  const endings = rowsOf(said?.endings)
+    .map((one) => ({
+      end: lower(one.end),
+      to: (Array.isArray(one.to) ? one.to : []).map(lower).filter(Boolean),
+      long: one.long === true,
+    }))
+    .filter((one) => one.end && one.to.length);
+  const prefixes = (Array.isArray(said?.prefixes) ? said.prefixes : []).map(lower).filter(Boolean);
+  return { endings, prefixes };
+}
 
 // The shortest word a row reads, and the letters a stem cuts. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
 function overOf(row) {
@@ -107,21 +105,14 @@ function cutOf(row, to) {
 }
 
 function addOf(to) {
-  return to === DROP ? "" : to;
+  return to === DROP || to === NONE ? "" : to;
 }
-
-// A prefix on a listed word stands too: unread, rerun, misread, outlive. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-export const PREFIXES = ["un", "re", "mis", "out", "over", "non", "pre", "sub"];
 
 // The table read in JavaScript, for a check outside the rule. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-export function stemsOf(said) {
-  return { endings: ENDINGS, prefixes: PREFIXES };
-}
-
-export function knownIn(held, stems = stemsOf()) {
+export function knownIn(held, stems) {
   const listed = (w) =>
     held.has(w) ||
-    ENDINGS.some(
+    stems.endings.some(
       (row) =>
         w.length > overOf(row) &&
         w.endsWith(row.end) &&
@@ -129,15 +120,15 @@ export function knownIn(held, stems = stemsOf()) {
     );
   return (w) =>
     listed(w) ||
-    PREFIXES.some(
+    stems.prefixes.some(
       (pre) => w.length > pre.length + 2 && w.startsWith(pre) && listed(w.slice(pre.length)),
     );
 }
 
 // The table read as the Tengo the rule runs. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-function endingLines() {
+function endingLines(stems) {
   const out = [];
-  for (const row of ENDINGS) {
+  for (const row of stems.endings) {
     out.push(`  if n > ${overOf(row)} && text.has_suffix(w, ${quoted(row.end)}) {`);
     for (const to of row.to) {
       const cut = `w[:n-${cutOf(row, to)}]`;
@@ -151,7 +142,7 @@ function endingLines() {
 
 // Every word of a means line the lists leave out, one row a term. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 export function looseMeanings(lists) {
-  const known = knownIn(new Set(wordsOf(lists)));
+  const known = knownIn(new Set(wordsOf(lists)), stemsOf(lists?.stems));
   const out = [];
   for (const one of termsOf(lists?.terms)) {
     const loose = one.means
@@ -186,6 +177,7 @@ function pathOf(layer) {
 export function vocabularyRule(layer, lists) {
   const words = wordsOf(lists);
   const swaps = swapsOf(lists);
+  const stems = stemsOf(lists?.stems);
   const where = pathOf(layer);
   const tail =
     "stands outside the words this tree writes. Write a core word, or add it to " +
@@ -218,14 +210,14 @@ export function vocabularyRule(layer, lists) {
     "listed := func(w) {",
     "  if inside[w] != undefined { return true }",
     "  n := len(w)",
-    ...endingLines(),
+    ...endingLines(stems),
     "  return false",
     "}",
     "",
     // A prefix on a listed word stands too: unread, rerun, misread, outlive. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
     "known := func(w) {",
     "  if listed(w) { return true }",
-    `  for pre in [${PREFIXES.map(quoted).join(", ")}] {`,
+    `  for pre in [${stems.prefixes.map(quoted).join(", ")}] {`,
     "    if len(w) > len(pre) + 2 && text.has_prefix(w, pre) && listed(w[len(pre):]) { return true }",
     "  }",
     "  return false",

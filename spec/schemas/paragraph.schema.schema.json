@@ -134,6 +134,7 @@
             "terms": { "type": "string" },
             "swaps": { "type": "string" },
             "stems": { "type": "string" },
+            "endings": { "type": "string" },
             "outside": { "type": "array", "items": { "type": "string" } },
             "growth": { "type": "object" },
             "exceptions": { "type": "array" }

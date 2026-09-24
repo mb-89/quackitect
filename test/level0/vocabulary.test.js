@@ -19,6 +19,7 @@ import {
   knownIn,
   looseMeanings,
   pathsOf,
+  STEMS,
   stemsOf,
   SWAPS,
   swapsOf,
@@ -96,6 +97,7 @@ layers:
     core: ${CORE}
     terms: ${TERMS}
     swaps: ${SWAPS}
+    endings: ${STEMS}
     exceptions:
       - word: TL;DR
         reason: a name the answer register uses
@@ -122,6 +124,7 @@ test("the schema names the three lists, and leaves a missing one at its default"
     core: CORE,
     terms: TERMS,
     swaps: SWAPS,
+    endings: STEMS,
   });
   assert.deepEqual(
     pathsOf(readYaml("kind: paragraph\nlayers:\n  vocabulary:\n    terms: t.yml\n")),
@@ -129,6 +132,7 @@ test("the schema names the three lists, and leaves a missing one at its default"
       core: CORE,
       terms: "t.yml",
       swaps: SWAPS,
+      endings: STEMS,
     },
   );
 });
@@ -218,9 +222,9 @@ test("the projector writes one rule inlining the words and the swaps", () => {
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 test("the projection reads the three lists the schema names, beside the schema", () => {
   const texts = new Map([[SOURCE, SCHEMA]]);
-  assert.deepEqual(alsoReads(ENTRY, texts), [CORE, TERMS, SWAPS]);
+  assert.deepEqual(alsoReads(ENTRY, texts), [CORE, TERMS, SWAPS, STEMS]);
   texts.set(CORE, CORE_TEXT);
-  assert.deepEqual(alsoReads(ENTRY, texts), [TERMS, SWAPS]);
+  assert.deepEqual(alsoReads(ENTRY, texts), [TERMS, SWAPS, STEMS]);
   assert.deepEqual(alsoReads({ ...ENTRY, shape: "other" }, texts), []);
 });
 
