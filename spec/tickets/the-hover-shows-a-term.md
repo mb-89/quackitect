@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -112,6 +112,12 @@ record:
     hand: box a0ae5042621d · claude-code-remote
     hash_before: 61e1ad45a0ffa0412a9f94402d1935163740625f
     hash_after: 61e1ad45a0ffa0412a9f94402d1935163740625f
+  - step: design/review
+    hand: box a0ae5042621d · claude-code-remote · helper-4
+    hash_before: 79ad01c3e4118d1bc075e5d7b9f7fe9886312f11
+    hash_after: 79ad01c3e4118d1bc075e5d7b9f7fe9886312f11
+    returns: 2
+    why: "| finding | fix |; |---|---|; | The vocabulary layer of `paragraph.schema.yaml` holds `stems` as a line of prose, so `pathsOf` takes that line as the path | Name the key the path takes, and move or rename the line of prose |; | `VocabularyEntry` reads every file in `spec/vocabulary` and refuses a row under a key past `words`, `terms` and `swaps` | Name the change to the shape rule, or put the table beside `spec/config/slug.yaml` |; | `WATCHES` in `src/extension/lib/lsp.js` holds markdown alone, so the client sends no buffer of `terms.yml` | Hold the save case in the test, or add the list to `WATCHES` and drop \"the client needs no change\" |; | `rulesFrom` in `.claude/skills/level0/lib/paragraph.js` calls `vocabularyRule` and stands off the callers | Add it to the callers |; The six earlier findings stand settled by the answers. The rest reads true, and each piece stands as the draft says:; `took` and `Tree.Read` in `src/lsp`; `listsOf` and `alsoReads` in the projection; `wordsHere` and the caches in `src/bridge`"
 ---
 
 # Ask
@@ -225,14 +231,16 @@ fail
 
 | finding | fix |
 |---|---|
-| The cases pin only the rows they name, so a Go row drifts unseen | Move `ENDINGS` and `PREFIXES` into `stems.yaml`, and let both readers load the table |
-| No Go test reads `slug.yaml`, so "as the slug cases do" holds on the JavaScript side alone | Name the Go test that loads `stems.yaml` |
-| The slug test stands in `test/contract/vocabulary.test.js` | Name the file the shared cases land in |
-| `knownIn` reads `PREFIXES` too, so `unread` reaches `read` | Say whether the hover reads a prefix |
-| `src/extension` asks for a hover off the server's capabilities | Write that the client needs no change |
-| The draft names no test for either done line | Name the hover test and the test after `terms.yml` changes |
+| The vocabulary layer of `paragraph.schema.yaml` holds `stems` as a line of prose, so `pathsOf` takes that line as the path | Name the key the path takes, and move or rename the line of prose |
+| `VocabularyEntry` reads every file in `spec/vocabulary` and refuses a row under a key past `words`, `terms` and `swaps` | Name the change to the shape rule, or put the table beside `spec/config/slug.yaml` |
+| `WATCHES` in `src/extension/lib/lsp.js` holds markdown alone, so the client sends no buffer of `terms.yml` | Hold the save case in the test, or add the list to `WATCHES` and drop "the client needs no change" |
+| `rulesFrom` in `.claude/skills/level0/lib/paragraph.js` calls `vocabularyRule` and stands off the callers | Add it to the callers |
 
-The rest reads true: `took`, `Tree.Read`, `pathsOf` and the terms file each stand as the draft says.
+The six earlier findings stand settled by the answers. The rest reads true, and each piece stands as the draft says:
+
+- `took` and `Tree.Read` in `src/lsp`
+- `listsOf` and `alsoReads` in the projection
+- `wordsHere` and the caches in `src/bridge`
 
 # implement
 
