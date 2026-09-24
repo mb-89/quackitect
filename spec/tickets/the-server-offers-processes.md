@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -115,6 +115,17 @@ record:
     hand: box 2bc65ec92430 · claude-code-remote · helper-4
     hash_before: 835ea1451bc557f72dae2b2974ce43784124b638
     hash_after: 835ea1451bc557f72dae2b2974ce43784124b638
+  - step: implement/tests-red
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: f670ac8814e94fc24d5e11d768e0356e00d37295
+    hash_after: f670ac8814e94fc24d5e11d768e0356e00d37295
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -213,17 +224,35 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh test src/lsp test/level0/schema.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Each new case fails on its own assertion:
+
+- the process offer, in `src/lsp/complete_test.go`
+- the fold and its announcement, in a new `src/lsp/fold_test.go`
+- the Go skip, in `src/lsp/schema_test.go`
+- the JS skip, in `test/level0/schema.test.js`
+
+The announcement reads `capabilitiesOf`, which `took` now calls, so a test reads the capabilities without a wire. `foldsOf` stands as a stub in `src/lsp/fold.go` so the package builds.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It touches the server's completion, its capabilities and its checker, the JS checker, and their tests.
+- every door the change reaches has a fake. The Go cases read a fixture tree in a temporary folder, as their neighbours do.
+- a comment names the approach the change implements. Each new case and file points at the design input.
+
 
 ## reflect
 

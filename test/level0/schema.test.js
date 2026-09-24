@@ -239,3 +239,37 @@ test("a note names its kind through the link its frontmatter carries", () => {
   assert.equal(kindOf("# No frontmatter\n"), "");
   assert.equal(readNote(good).sections[0].header, "Scope");
 });
+
+// [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+test("an empty process holds back the keys the fill writes, and a missing one holds back nothing", () => {
+  const schema = readYaml(`kind: ticket
+frontmatter:
+  type: object
+  required: [kind, state, steps]
+  properties:
+    kind:
+      const: ticket
+      x-link: true
+    state:
+      enum: [draft, open]
+      x-filled-by: process
+    steps:
+      type: array
+      x-filled-by: process
+    process:
+      x-link: true
+body:
+  headingLevel: 1
+  sections:
+    - header: Ask
+      required: true
+`);
+  const fresh = "---\nkind: [[ticket]]\nprocess:\n---\n\n# Ask\n\nA thing.\n";
+  const keys = (text) =>
+    checkNote(text, schema, "spec/tickets/a.md")
+      .map((one) => one.rule)
+      .filter((rule) => /state|steps/.test(rule))
+      .sort();
+  assert.deepEqual(keys(fresh), []);
+  assert.deepEqual(keys(fresh.replace("process:\n", "")), ["Schema.state", "Schema.steps"]);
+});

@@ -202,3 +202,37 @@ func TestTheServerAnswersACompletion(t *testing.T) {
 	}
 	t.Fatal("the completion answers nothing")
 }
+
+// A key naming a folder under x-values offers every file there as a link. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+const pickedSchema = `kind: ticket
+governs:
+  - spec/tickets/**
+frontmatter:
+  type: object
+  properties:
+    kind:
+      const: ticket
+      x-link: true
+    process:
+      x-link: true
+      x-values: spec/processes
+      description: the route the mint copies from
+body:
+  headingLevel: 1
+  sections:
+    - header: Ask
+      required: true
+`
+
+func TestAProcessKeyOffersEveryProcess(t *testing.T) {
+	tree := offeredTree(t, map[string]string{
+		"spec/schemas/ticket.schema.yaml": pickedSchema,
+		"spec/processes/standard.yaml":    "for: a change\n",
+		"spec/processes/trivial.yaml":     "for: a fix\n",
+	})
+	text := "---\nkind: [[ticket]]\nprocess: \n---\n"
+	got := offeredAt(t, tree, "spec/tickets/a.md", text, 2)
+	if said := strings.Join(labels(got), ","); said != "[[spec/processes/standard]],[[spec/processes/trivial]]" {
+		t.Fatalf("the process key offers %s", said)
+	}
+}

@@ -120,14 +120,8 @@ func (one *server) took(said message) bool {
 	switch said.Method {
 	case "initialize":
 		one.answers(said.ID, map[string]any{
-			"capabilities": map[string]any{
-				"textDocumentSync": 1,
-				// A pointer opens its target on a click. [[spec/design_output/lsp#a-pointer-opens-its-target]]
-				"documentLinkProvider": map[string]any{"resolveProvider": false},
-				// The schema offers what a note carries at the cursor. [[spec/design_output/lsp#the-completion-reads-the-schema]]
-				"completionProvider": map[string]any{"triggerCharacters": triggers},
-			},
-			"serverInfo": map[string]any{"name": "se-lsp", "version": Version},
+			"capabilities": capabilitiesOf(),
+			"serverInfo":   map[string]any{"name": "se-lsp", "version": Version},
 		})
 	case "textDocument/documentLink":
 		one.answers(said.ID, one.links(said.Params))
@@ -154,6 +148,17 @@ func (one *server) took(said message) bool {
 		}
 	}
 	return false
+}
+
+// What the server answers, which initialize announces. [[spec/design_output/lsp#one-checker-every-front-asks]]
+func capabilitiesOf() map[string]any {
+	return map[string]any{
+		"textDocumentSync": 1,
+		// A pointer opens its target on a click. [[spec/design_output/lsp#a-pointer-opens-its-target]]
+		"documentLinkProvider": map[string]any{"resolveProvider": false},
+		// The schema offers what a note carries at the cursor. [[spec/design_output/lsp#the-completion-reads-the-schema]]
+		"completionProvider": map[string]any{"triggerCharacters": triggers},
+	}
 }
 
 // [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
