@@ -173,7 +173,7 @@ terms:
   - {word: dispatcher, defines: "[[spec/design_output/copilot]]"}
   - {word: emitter, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
   - {word: emoji, defines: "[[spec/design_output/projection#the-second-target]]"}
-  - {word: enabler, defines: "[[spec/funnel/level-zero-closes]]"}
+  - {word: enabler, defines: "[[spec/design_input/the-agent-pulls-tickets#the-route]]"}
   - {word: ellipsis, defines: "[[spec/design_output/projection#the-second-target]]"}
   - {word: fixer, defines: "[[spec/design_output/bash]]"}
   - {word: headless, defines: "[[spec/design_output/level0#what-the-probe-does]]"}
@@ -243,7 +243,6 @@ terms:
   - {word: recursion, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
   - {word: regexp, defines: "[[spec/design_output/index]]"}
   - {word: ruleset, defines: "[[spec/design_output/copilot]]"}
-  - {word: tripwire, defines: "[[spec/funnel/level-zero-closes]]"}
   - {word: truncate, defines: "[[spec/design_output/level0]]"}
   - {word: vscode, defines: "[[spec/design_output/extension]]"}
   - {word: wink-nlp, defines: "[[spec/design_output/level0#the-tense-reader]]"}
