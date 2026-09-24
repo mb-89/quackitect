@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -175,6 +175,14 @@ record:
     hand: box a0ae5042621d · claude-code-remote
     hash_before: cf0366a234e76cff90938049cbe8a10e684f9dec
     hash_after: cf0366a234e76cff90938049cbe8a10e684f9dec
+  - step: implement/change
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: f14d0e145de88c376293e6637ae2076fdf004337
+    hash_after: f14d0e145de88c376293e6637ae2076fdf004337
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
