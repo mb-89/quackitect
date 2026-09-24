@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -135,6 +135,11 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/each-node-names-its-place.md:260:3: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: verdict
+    hand: box 2bc65ec92430 · claude-code-remote · helper-7
+    hash_before: 4e9a0045e93a8da832bde75f009616cc116c9945
+    hash_after: 4e9a0045e93a8da832bde75f009616cc116c9945
+reason: done
 ---
 
 # Ask
@@ -341,17 +346,38 @@ A process file holds no body, so its nodes carry neither. `sectionAt` moves into
 
 <!-- the form is files -->
 
+- spec/tickets/each-node-names-its-place.md
+- src/scripts/graph.js
+- src/scripts/pull-chapter.js
+- .claude/skills/level0/lib/schema-read.js
+- .claude/skills/level0/lib/schema.js
+- .claude/skills/level0/lib/schema-mint.js
+- test/level0/graph.test.js
+- test/level0/pull-chapter.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- `./RUNME.sh graph` over this ticket prints each node with its heading and its file line
+- the bare process case asserts no node carries a chapter or a line
+- `sectionAt` lives once in schema-read.js, and `chapterOf` calls it and drops its copy
+- a case proves `sectionAt` finds a nested heading and answers -1 for a missing one
+- the new `chapterOf` case asserts a present chapter's fields and a missing chapter
+- `./RUNME.sh check` exits 0, and graph.test.js passes 17 tests
+- the handback carries no retro
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place. `sectionAt` lives in schema-read.js, and schema.js only hands it on.
 
 # Discussion
 
