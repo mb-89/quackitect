@@ -6,12 +6,12 @@ import { behaves } from "./behaves.js";
 const HOPS = 8;
 
 export function fakeDisk(seed = {}) {
-  const files = new Map(Object.entries(seed).map(([at, said]) => [norm(at), said]));
+  const files = new PathMap(Object.entries(seed));
   const folders = new Set();
   const links = new Map();
   const runs = new Set();
   // The fake's clock ticks once a write, so a later write reads as newer. [[spec/guidance/retro/collect]]
-  const times = new Map();
+  const times = new PathMap();
   let tick = 0;
   let made = 0;
 
@@ -165,6 +165,22 @@ export function fakeDisk(seed = {}) {
     },
     "disk",
   );
+}
+
+// The maps a test reads key every path through norm, so a Windows path and a posix one find the same row. [[spec/design_output/doors#a-fake-behaves]]
+class PathMap extends Map {
+  get(at) {
+    return super.get(norm(at));
+  }
+  has(at) {
+    return super.has(norm(at));
+  }
+  set(at, said) {
+    return super.set(norm(at), said);
+  }
+  delete(at) {
+    return super.delete(norm(at));
+  }
 }
 
 // The key the fake files a path under, so a test reading its maps finds a Windows path too. [[spec/design_output/doors#a-fake-behaves]]

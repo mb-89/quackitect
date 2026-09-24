@@ -6,7 +6,9 @@ import { behaves } from "./behaves.js";
 
 export function fakeProc(answers = {}) {
   const ran = [];
-  const table = new Map(Object.entries(answers));
+  const table = new Map(
+    Object.entries(answers).map(([argv, said]) => [slashed(argv), said]),
+  );
   const lives = new Set();
 
   return behaves(
@@ -41,7 +43,7 @@ export function fakeProc(answers = {}) {
 
   function answerOf(argv, init) {
     ran.push({ argv: [...argv], init });
-    const said = table.get(key(argv)) ?? table.get(argv[0]);
+    const said = table.get(key(argv)) ?? table.get(slashed(argv[0]));
     if (said === undefined) {
       throw new Error(`this fake was never taught: ${key(argv)}`);
     }
@@ -50,5 +52,10 @@ export function fakeProc(answers = {}) {
 }
 
 function key(argv) {
-  return argv.join(" ");
+  return slashed(argv.join(" "));
+}
+
+// A command keys with forward slashes on both sides, so a table naming a posix path answers a Windows run. [[spec/design_output/doors#a-fake-behaves]]
+function slashed(said) {
+  return String(said).split("\\").join("/");
 }

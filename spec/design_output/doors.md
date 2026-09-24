@@ -93,6 +93,11 @@ reads the time replays.
 A fake that answers where the real door throws hides the fault until the first
 real box.
 
+A fake keys a path the same way on every platform. The disk's maps key through
+`norm`, and the process table keys a command with forward slashes on both sides.
+So a test reading a map, or teaching a command by a posix path, reads the same on
+the desk and on a cloud box. A branch green on one stays green on the other.
+
 `behaves` stands beside the fakes as the guard they share. It wraps a fake, and
 a call the fake holds no answer for throws with the door's name. So a test
 driving a door through a fake asserts on something.
