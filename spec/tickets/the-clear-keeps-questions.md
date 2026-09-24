@@ -94,7 +94,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -106,6 +106,10 @@ record:
     hash_after: cbc92406db54bc6a050a63b6919aa1183fca8eec
     returns: 1
     why: "`stop.js`'s turn-end vote resets `box.claim` to null right after it reads the reason.; `classic.Stop` fires that vote before `turn.complete` fires the clear step in `handover.js`, so `box.claim` reads null there.; The approach has the clear step read the turn's claim, and no claim survives that far.; Ask line one fails this way: no live claim tells the clear step to hold the clear.; The callers list credits the turn-end vote with holding the claim, not with saving it past its own reset.; The callers list names no place that moves the phase from asked back to clear.; `pool` loads a rule's fields as written, and nothing yet reads the new `waits` key.; The prompt split by `e.mine` matches the pattern the turn counter already uses for a prompt, and holds.; The clear still gates on the queue-binding check in `handover.js`, so `engine.binding` at queue still governs it."
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 7dd55aee982403aa9c9a844fbc6aa06e61d7adb9
+    hash_after: 7dd55aee982403aa9c9a844fbc6aa06e61d7adb9
 ---
 
 # Ask
@@ -140,9 +144,10 @@ The handover gains a phase `asked` between `clear` and the clear itself. `src/br
 | piece | how |
 |---|---|
 | which stops wait | a rule key `waits: owner` in `spec/config/stop/level0.yml`, on `the-owner-asks-to-talk`, `a-wrong-answer-leaves-the-box` and `the-chat-is-new` |
-| the hold | `clearsAfter` reads the turn's claim. A rule under `waits: owner` moves the phase to `asked`, keeps the question, and asks for no clear |
+| the mark | `onStop` reads the claim before it resets it. A turn ending on a rule under `waits: owner` writes `box.handover.waits`, carrying the question |
+| the hold | `clearsAfter` reads that mark at `turn.complete`, moves the phase to `asked`, and asks for no clear |
 | the question | the table under What the agent needs in the turn's last message, or its last lines where no table stands |
-| the answer | the owner's next prompt appends one row to `.se/HANDOVER.md`: the question, and the prompt's text |
+| the answer | `submitsPrompt` on the owner's next prompt appends one row to `.se/HANDOVER.md`: the question, and the prompt's text. The phase moves back to `clear` |
 | the clear | that turn's end clears, and the next conversation reads the row |
 | every other stop | clears at `context.handoverAt`, as the phase `clear` does now |
 
@@ -157,8 +162,8 @@ A prompt of the plugin's own leaves the phase standing, so the tooth's re-prompt
 - `src/bridge/handover.js`, `clearsAfter` and `holdsForHandover`, which move the phase
 - `src/bridge/server.js`, `endsTurn`, which calls `clearsAfter`
 - `src/bridge/server.js`, `submitsPrompt`, which gains the answer's row
-- `src/bridge/stop.js`, `onStop`, which holds the turn's claim
-- `.claude/skills/level0/lib/stop.js`, `pool`, which reads the new rule key
+- `src/bridge/stop.js`, `onStop`, which writes the mark before it resets the claim
+- `.claude/skills/level0/lib/stop.js`, `pool`, which keeps the new rule key, and `stopReasons`, which the mark reads it through
 
 ### answers
 
@@ -166,7 +171,9 @@ A prompt of the plugin's own leaves the phase standing, so the tooth's re-prompt
 
 <!-- the form is list -->
 
-- first draft
+- the claim reads null at the clear: `onStop` writes the mark before its reset, and the clear reads the mark
+- no place moves the phase back: `submitsPrompt` moves `asked` to `clear` on the owner's prompt
+- nothing reads `waits`: the mark reads it off the claimed rule, through `stopReasons`
 
 ## review
 
