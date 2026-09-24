@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -166,6 +166,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box a0ae5042621d · claude-code-remote · helper-13
+    hash_before: 1f1a4e955a187f7edcbd4eff8736d0dddad2f326
+    hash_after: 1f1a4e955a187f7edcbd4eff8736d0dddad2f326
+reason: done
 ---
 
 # Ask
@@ -450,17 +455,55 @@ of `terms.yml` with a reader of its own.
 
 <!-- the form is files -->
 
+- spec/tickets/the-hover-shows-a-term.md
+- spec/guidance/review/reviewing.md
+- src/lsp/hover.go
+- src/lsp/hover_test.go
+- src/lsp/lsp.go
+- src/lsp/columns.go
+- src/lsp/fake_test.go
+- src/lsp/paths.go
+- src/lsp/go.mod
+- spec/config/stems.yaml
+- .claude/skills/level0/lib/vocabulary.js
+- .claude/skills/level0/lib/projection.js
+- spec/schemas/paragraph.schema.yaml
+- spec/schemas/paragraph.schema.schema.json
+- spec/design_output/lsp.md
+- spec/design_output/vocabulary.md
+- spec/vocabulary/terms.yml
+- test/level0/vocabulary.test.js
+- test/contract/vocabulary.test.js
+- test/contract/shape.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- the hover answers each row of the ask
+- the tests in `src/lsp` hold a term, a plural, a prefix, two words, a source and a save
+- `reaches` in Go reads the table as `knownIn` does, with the same shortest word, cut and prefix room
+- `Vocabulary.yml` stays as it was, and the check reads every target as projected
+- a hover answers over `wink-nlp`, over a word past an emoji, and at the end of a line
+- `./RUNME.sh check` exits 0, and the branch test answers green
+- the handback carries no retro
+- every file the diff touches stands in the approach
+
+A detail for later, which breaks no row of the ask:
+
+- the Go reader leaves the case of the table as it stands, and `stemsOf` lowers it
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the table stands in `stems.yaml` alone, and `lsp.md` points at `vocabulary.md` for it
 
 # Discussion
 
