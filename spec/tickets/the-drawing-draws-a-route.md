@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box 742a1c2f7477 · claude-code-remote
@@ -87,6 +87,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-drawing-draws-a-route already carries every commit on main.
+  - step: split
+    hand: box 742a1c2f7477 · claude-code-remote
+    hash_before: f7c81a82e44973baa4a64420e387a08b13823ce2
+    hash_after: 29d8afa1a94ae4e991aff2e155a8807a671e02b8
 ---
 
 # Ask
@@ -116,11 +120,19 @@ One web page draws a ticket's route from the graph, and speaks to its host throu
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-drawing-bundles]], trivial
+- [[spec/tickets/the-drawing-draws-read-only]], trivial
+- [[spec/tickets/the-drawing-speaks-edits]], trivial
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each child is one row of the design input's table, and a reader holds it whole
+- the bundle, the read-only page and the messages add up to the goal, and the design input carries the approach
+- the page names the bundle under `depends_on`, and the messages name the engine group, which carries the node places
 
 # children
 
