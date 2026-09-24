@@ -95,7 +95,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: c9ec8dd0ffd9dfaab4527a92822749d2665db2af
+    hash_after: c9ec8dd0ffd9dfaab4527a92822749d2665db2af
 ---
 
 # Ask
@@ -125,17 +130,39 @@ A person types a process name from memory, and the server raises missing steps o
 
 <!-- the form is text -->
 
+Three changes, each read off the schema or the note, so the server learns no ticket rule by name:
+
+| the need | the change |
+|---|---|
+| a process to pick | `process` in `spec/schemas/ticket.schema.yaml` carries `x-values: spec/processes`. `propertyValues` in `src/lsp/complete.go` offers every tracked file under that folder as a link, such as `[[spec/processes/standard]]` |
+| the frontmatter folds | the server announces `foldingRangeProvider`, and answers `textDocument/foldingRange` with one range from the opening fence to the closing one. A note with no frontmatter answers an empty list |
+| no false finding | `steps` and `state` carry `x-filled-by: process`. `mapFaults` in `.claude/skills/level0/lib/schema.js` skips such a required key while the note writes `process` and it holds nothing |
+
+The server draws its findings through the bridge, which asks the JS checker. So the third change reaches the editor with no Go change. A ticket naming no `process` key at all still meets the finding.
+
+Go tests under `src/lsp` cover the offer and the fold, and a case in `test/level0/schema.test.js` covers the skip.
+
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/lsp/complete.go` `propertyValues`, which reads the new key
+- `src/lsp/lsp.go` `took`, which announces and answers the fold
+- `.claude/skills/level0/lib/schema.js` `mapFaults`, which reads `x-filled-by`
+- `spec/schemas/ticket.schema.yaml` `process`, `steps` and `state`, which carry the two keys
+
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first draft
+
 
 ## review
 
