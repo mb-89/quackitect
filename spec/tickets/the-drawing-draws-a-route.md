@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box 742a1c2f7477 · claude-code-remote
     hash_before: 178f0cefca766131029b685bc5008c3952eb6038
+  - step: sync
+    hand: box 742a1c2f7477 · claude-code-remote
+    hash_before: c2600a8bb323c6154947b08335b5f55ea16d009a
+    hash_after: c2600a8bb323c6154947b08335b5f55ea16d009a
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-drawing-draws-a-route already carries every commit on main.
 ---
 
 # Ask
@@ -95,6 +103,8 @@ One web page draws a ticket's route from the graph, and speaks to its host throu
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
