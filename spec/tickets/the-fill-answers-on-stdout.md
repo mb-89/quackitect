@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -135,6 +135,12 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/the-config-declares-work.md:362:3: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: verdict
+    hand: box 2bc65ec92430 · claude-code-remote · helper-7
+    hash_before: 9c2490bd40b89cd06cfa66ce244872b21f686920
+    hash_after: 9c2490bd40b89cd06cfa66ce244872b21f686920
+    returns: 1
+    why: "`src/scripts/ticket-fill.js` redefines `COMMENT`, which `src/scripts/pull-route.js` exports already. Import it from there.; `chapterText` repeats the comment filter `askLines` in `src/scripts/ticket.js` owns. Call `askLines` and join its rows.; No case feeds a process standing nowhere, so the `withRoute` refusal runs with no test.; `test/contract/work-buttons.test.js` swaps a path for a link in one comment, a trivial fix past the ask.; The ask holds otherwise. `--stdout` prints the minted text and writes nothing, and `./RUNME.sh check` exits 0."
 ---
 
 # Ask
@@ -354,17 +360,38 @@ So a save in the editor runs one verb, and the route it writes matches the mint'
 
 <!-- the form is files -->
 
+- src/scripts/ticket-fill.js
+- src/scripts/ticket.js
+- src/scripts/cli.js
+- src/scripts/process.js
+- src/scripts/pull-route.js
+- src/engine/group.js
+- test/level0/ticket-fill.test.js
+- spec/tickets/the-fill-answers-on-stdout.md
+- spec/tickets/each-node-names-its-place.md
+- test/contract/work-buttons.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+- `src/scripts/ticket-fill.js` redefines `COMMENT`, which `src/scripts/pull-route.js` exports already. Import it from there.
+- `chapterText` repeats the comment filter `askLines` in `src/scripts/ticket.js` owns. Call `askLines` and join its rows.
+- No case feeds a process standing nowhere, so the `withRoute` refusal runs with no test.
+- `test/contract/work-buttons.test.js` swaps a path for a link in one comment, a trivial fix past the ask.
+- The ask holds otherwise. `--stdout` prints the minted text and writes nothing, and `./RUNME.sh check` exits 0.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place. The comment pattern and its filter stand twice, so the verdict fails.
 
 # Discussion
 
