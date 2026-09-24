@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box 742a1c2f7477 · claude-code-remote
@@ -99,6 +99,14 @@ record:
     hand: the engine
     hash_before: 5cb57b54363da9fd561c488c1447f4ce58159e06
     hash_after: 5cb57b54363da9fd561c488c1447f4ce58159e06
+  - step: retro/notes
+    hand: box 711806cd7e87 · claude-code-remote
+    hash_before: 34f91b46cdc24861f02bd7091e0d50abdfb17c66
+    hash_after: 34f91b46cdc24861f02bd7091e0d50abdfb17c66
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -155,6 +163,8 @@ One web page draws a ticket's route from the graph, and speaks to its host throu
 <!-- retro notes, which passes when the private folder is empty -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh retro notes
 
 ## write
 
