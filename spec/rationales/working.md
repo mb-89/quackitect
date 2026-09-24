@@ -125,6 +125,11 @@ One wrong line in it spends a box.
 So the owner reads the ask before it lands. That costs one reading, and it buys
 back every session the ask would misdirect.
 
+Sessions closed their reports on a row asking whether to push. The owner
+answered the same row turn after turn, and the answer never changed: the owner
+pushes. A cloud box still pushes each finished thing, because the box dies with
+its tree. A desk keeps its tree, so a commit loses nothing.
+
 ## 14. One place owns a thing
 
 A tree writes one concept in three places, and the three drift. Each reader
