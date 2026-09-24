@@ -7,8 +7,9 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { REFACTOR_ANSWERED } from "../../src/bridge/refactor-hand.js";
 import { SELF_TEST } from "../../src/bridge/reload.js";
-import { selfTests } from "../../src/bridge/selftest.js";
+import { doorsOver, ROOT as SCRATCH, selfTests } from "../../src/bridge/selftest.js";
 import { boxOf, decide } from "../../src/bridge/server.js";
 import { proc } from "../../src/doors/proc.js";
 
@@ -44,4 +45,13 @@ test("a decide that throws exits 1 and names the event", async () => {
   };
   assert.equal(await selfTests(ROOT, broken, (line) => said.push(line)), 1);
   assert.match(said[0], /session\.start.*ReferenceError: dropsMoved is not defined/s);
+});
+
+// The server takes the refactoring hand's answer from its own module, so the walk ends where the hand answers.
+test("the refactoring hand's answer reaches its door through decide", async () => {
+  const box = boxOf(SCRATCH, SCRATCH, doorsOver(ROOT));
+  box.walk = { file: "old.md" };
+  const said = await decide({ event: REFACTOR_ANSWERED, e: {} }, box);
+  assert.equal(said.result?.result, "the refactoring hand answered");
+  assert.equal(box.walk, null, "the answer ends the walk");
 });

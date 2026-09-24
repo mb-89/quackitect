@@ -11,7 +11,7 @@ import { fakeLog } from "../doors/fake/log.js";
 
 // The files the scratch box copies off the method root, so the doors read the rules this tree holds. [[spec/design_output/level0#new-code-proves-it-loads]]
 const SEEDS = ["spec/config/level0.json", "spec/config/stop", "spec/schemas"];
-const ROOT = "/selftest";
+export const ROOT = "/selftest";
 
 // One of each event the harness sends, so a name a door lacks throws here and nowhere else. [[spec/design_output/level0#new-code-proves-it-loads]]
 const EVENTS = [
@@ -50,7 +50,7 @@ export async function selfTests(
 }
 
 // Doors standing in memory: a disk seeded off the method root, and a process door that runs nothing. [[spec/design_output/level0#new-code-proves-it-loads]]
-function doorsOver(method) {
+export function doorsOver(method) {
   const disk = fakeDisk(seedsOf(method));
   const idle = { exitCode: 1, stdout: "", stderr: "the self-test runs nothing" };
   return {

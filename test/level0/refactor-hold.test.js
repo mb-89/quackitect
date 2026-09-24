@@ -6,8 +6,9 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { onRefactorAnswered, walks } from "../../src/bridge/refactor-hand.js";
 import { holdHere, holdsFile } from "../../src/bridge/refactor-hold.js";
-import { onRefactorAnswered, onStop, walks } from "../../src/bridge/stop.js";
+import { onStop } from "../../src/bridge/stop.js";
 import { onWrite } from "../../src/bridge/write.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
@@ -107,7 +108,11 @@ test("the spawn writes the hold on its file, and the hand's answer takes it off"
   const said = onStop({ last_assistant_message: "Some text and no stop." }, it);
   assert.equal(said.spawn.file, "old.md");
   assert.ok(it.disk.exists(HOLD), "the spawn writes the hold");
-  assert.deepEqual(JSON.parse(it.disk.read(HOLD)), { file: "old.md", hand: "", since: NOW });
+  assert.deepEqual(JSON.parse(it.disk.read(HOLD)), {
+    file: "old.md",
+    hand: "",
+    since: NOW,
+  });
 
   onRefactorAnswered({ file: "old.md" }, it);
   assert.equal(it.disk.exists(HOLD), false, "the answer takes the hold off");
@@ -129,7 +134,11 @@ test("another hand's write to a held file refuses, and the owning hand's lands",
 
 test("a hold past its span reads as none, and the session's write lands", async () => {
   const it = box(held("a1", NOW - HOUR));
-  assert.equal(denied(await onWrite(write(""), it)), "", "the aged hold stands for nothing");
+  assert.equal(
+    denied(await onWrite(write(""), it)),
+    "",
+    "the aged hold stands for nothing",
+  );
 });
 
 // A span of 0 switches the hold off, so the spawn writes none and a standing one reads as none. [[spec/design_output/stop#the-hand-holds-its-file]]
@@ -166,12 +175,24 @@ test("one hand walks the list, the hold moves with it, and the log says the spaw
   const said = onStop(turn, it);
   assert.equal(said.spawn.file, "a.md", "the oldest file at rest goes first");
   assert.match(said.spawn.prompt, /mcp__level0__refactor_next/);
-  assert.deepEqual(JSON.parse(it.disk.read(HOLD)), { file: "a.md", hand: "", since: NOW });
+  assert.deepEqual(JSON.parse(it.disk.read(HOLD)), {
+    file: "a.md",
+    hand: "",
+    since: NOW,
+  });
 
   assert.match(answered(walks(helper("h1"), it)), /Take b\.md/);
-  assert.deepEqual(JSON.parse(it.disk.read(HOLD)), { file: "b.md", hand: "h1", since: NOW });
+  assert.deepEqual(JSON.parse(it.disk.read(HOLD)), {
+    file: "b.md",
+    hand: "h1",
+    since: NOW,
+  });
 
-  assert.match(answered(walks(helper("h1"), it)), /No file waits/, "a file the hand took stays out");
+  assert.match(
+    answered(walks(helper("h1"), it)),
+    /No file waits/,
+    "a file the hand took stays out",
+  );
   assert.equal(it.disk.exists(HOLD), false, "the walk's end takes the hold off");
 
   onRefactorAnswered({ file: "a.md", text: "Drained two files." }, it);
@@ -184,17 +205,38 @@ test("one hand walks the list, the hold moves with it, and the log says the spaw
 
 test("the walk refuses a call from outside its hand, and a hand that falls says why at warn", () => {
   const { it, rows } = walking();
-  assert.match(denied(walks(helper("h1"), it)), /No refactoring walk stands/, "no walk yet");
+  assert.match(
+    denied(walks(helper("h1"), it)),
+    /No refactoring walk stands/,
+    "no walk yet",
+  );
   onStop(turn, it);
   assert.match(answered(walks(helper("h1"), it)), /Take b\.md/);
-  assert.match(denied(walks(helper("h2"), it)), /No refactoring walk stands/, "another hand");
-  assert.match(denied(walks({ tool: "mcp__level0__refactor_next" }, it)), /No refactoring walk/);
-  assert.equal(JSON.parse(it.disk.read(HOLD)).file, "b.md", "a refusal leaves the hold");
+  assert.match(
+    denied(walks(helper("h2"), it)),
+    /No refactoring walk stands/,
+    "another hand",
+  );
+  assert.match(
+    denied(walks({ tool: "mcp__level0__refactor_next" }, it)),
+    /No refactoring walk/,
+  );
+  assert.equal(
+    JSON.parse(it.disk.read(HOLD)).file,
+    "b.md",
+    "a refusal leaves the hold",
+  );
 
   onRefactorAnswered({ file: "a.md", deny: "the spawn falls" }, it);
   assert.equal(it.disk.exists(HOLD), false);
-  assert.ok(rows.some((row) => row[0] === "warn" && row[2] === "the refactoring hand falls"));
-  assert.match(denied(walks(helper("h1"), it)), /No refactoring walk stands/, "the answer ends it");
+  assert.ok(
+    rows.some((row) => row[0] === "warn" && row[2] === "the refactoring hand falls"),
+  );
+  assert.match(
+    denied(walks(helper("h1"), it)),
+    /No refactoring walk stands/,
+    "the answer ends it",
+  );
 });
 
 test("the walk ends where the hand spends refactor.mostFiles", () => {
