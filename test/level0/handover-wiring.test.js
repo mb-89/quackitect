@@ -22,6 +22,8 @@ const HOLD = `${HOLDS}/box-1.json`;
 const CONFIG = {
   stop: { enabled: true, mostInARow: 3, hold: "off" },
   context: { handoverAt: 60000 },
+  // The queue alone clears. [[spec/design_output/stop#the-queue-alone-clears]]
+  engine: { binding: "queue" },
 };
 
 function served() {

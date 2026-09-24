@@ -300,6 +300,14 @@ every conversation after it opens past the key too. The log says so at
 A clear the owner types takes the same forget step, so the next pull hands the
 step's notes again. A compaction empties the reads too.
 
+## The queue alone clears
+
+The handover runs under `engine.binding` at `queue` alone. Under `god` and
+`unbound` the owner is in the loop, and a clear makes them explain the work
+twice. So there a session goes due nowhere: no block rides a call, no turn
+holds for the handover, and no clear follows. The fill still reads. A binding
+moved off the queue while the clear stands asks for no clear.
+
 # The vote
 
 Every rule carries a side, a priority and a way of firing. The turn ends where
