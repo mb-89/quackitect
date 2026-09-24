@@ -29,3 +29,10 @@ func TestTheServerAnnouncesTheFold(t *testing.T) {
 		t.Fatalf("the capabilities read %v", said)
 	}
 }
+
+func TestTheFrontRecordsItsClosingFence(t *testing.T) {
+	front := frontOf([]string{"---", "kind: [[ticket]]", "state: open", "---", "", "# Ask"})
+	if !front.Stands || front.Close != 3 {
+		t.Fatalf("the front reads %v at %d", front.Stands, front.Close)
+	}
+}

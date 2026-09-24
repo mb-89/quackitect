@@ -38,7 +38,7 @@ frontmatter:
     state:
       enum: [draft, open, closed]
       x-engine: true
-      # The fill writes it, so an empty process holds it back.
+      # [[spec/design_output/schema#a-finding-names-the-section]]
       x-filled-by: process
       description: whether anybody pulls it, and the pull writes this
 
@@ -64,7 +64,7 @@ frontmatter:
     steps:
       type: array
       x-engine: true
-      # The fill writes it, so an empty process holds it back.
+      # [[spec/design_output/schema#a-finding-names-the-section]]
       x-filled-by: process
       description: the route, as a tree of steps in the order a hand meets them
       default:
@@ -183,7 +183,7 @@ frontmatter:
 
     process:
       x-link: true
-      # The completion offers every process standing in this folder.
+      # [[spec/design_output/schema#a-finding-names-the-section]]
       x-values: spec/processes
       description: the route the mint copies from, as a link to a process
 

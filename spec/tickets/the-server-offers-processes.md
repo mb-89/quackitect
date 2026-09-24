@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -151,6 +151,10 @@ record:
     hash_after: a3a1f22ae10bb6173429abf09554c988f636eecd
     returns: 1
     why: "`foldsOf` in `src/lsp/fold.go` repeats the fence scan `frontOf` in `src/lsp/note.go` owns. Reuse `frontOf`.; The new `fence` constant in `src/lsp/fold.go` serves one file while four others write the literal.; The `spec/design_output/schema.md` keyword table names neither `x-filled-by` nor `x-values`. Add both rows there.; Four comments restate what `x-filled-by` means. Point each at the `spec/design_output/schema.md` row.; `./RUNME.sh check` exits 0, and every ask line carries a test that fires.; The handback carries no retro."
+  - step: implement/reflect
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 9614e040bae84f9f3c96c0927bfd46a69e74525f
+    hash_after: 9614e040bae84f9f3c96c0927bfd46a69e74525f
 ---
 
 # Ask
@@ -289,11 +293,22 @@ The announcement reads `capabilitiesOf`, which `took` now calls, so a test reads
 
 <!-- the form is text -->
 
+The findings share one class: the change stated a fact where no owner stood, and then stated it again. The fence scan had an owner in `frontOf`, and the two keywords had none. The fix for the class is to give each fact one home and point at it:
+
+- `frontOf` records the closing fence, and `foldsOf` reads it
+- a table in the schema design output owns both keywords, and every comment points there
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The fix touches the fold, the note reader, the comments, and the design output that owns the keywords.
+- every door the change reaches has a fake. The fold cases read text alone.
+- a comment names the approach the change implements. Each comment now points at the owning note.
+
 
 ## change
 

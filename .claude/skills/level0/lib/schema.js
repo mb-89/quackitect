@@ -176,7 +176,7 @@ function heldIn(front, schema, kind, where, calls, schemas) {
   };
 }
 
-// A key the fill writes waits while the note writes the key it fills from, and that key holds nothing. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+// [[spec/design_output/schema#a-finding-names-the-section]]
 function waitsForFill(said, rule) {
   const from = rule?.["x-filled-by"];
   return Boolean(from) && Object.hasOwn(said ?? {}, from) && empty(said[from]);

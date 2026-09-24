@@ -11,8 +11,6 @@ import (
 // The kind the protocol names for a fold that is neither a comment nor an import. [[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]]
 const regionFold = "region"
 
-const fence = "---"
-
 type foldingRange struct {
 	StartLine int    `json:"startLine"`
 	EndLine   int    `json:"endLine"`
@@ -21,16 +19,11 @@ type foldingRange struct {
 
 // [[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]]
 func foldsOf(text string) []foldingRange {
-	rows := strings.Split(text, "\n")
-	if strings.TrimSpace(rows[0]) != fence {
+	front := frontOf(strings.Split(text, "\n"))
+	if !front.Stands {
 		return []foldingRange{}
 	}
-	for i := 1; i < len(rows); i++ {
-		if strings.TrimSpace(rows[i]) == fence {
-			return []foldingRange{{StartLine: 0, EndLine: i, Kind: regionFold}}
-		}
-	}
-	return []foldingRange{}
+	return []foldingRange{{StartLine: 0, EndLine: front.Close, Kind: regionFold}}
 }
 
 // The folds of a file, read off the buffer the tree holds. [[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]]

@@ -454,7 +454,7 @@ func joined(said []any, with string) string {
 	return strings.Join(parts, with)
 }
 
-// A key the fill writes waits while the note writes the key it fills from, and that key holds nothing. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+// [[spec/design_output/schema#a-finding-names-the-section]]
 func waitsForFill(said, rule *yaml.Doc) bool {
 	if rule == nil {
 		return false

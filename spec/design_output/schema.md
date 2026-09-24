@@ -198,6 +198,13 @@ These keywords answer a finding today:
 `tense`, `detailMarker` and `description` answer none. Vale holds the tense, and
 a person reads the marker.
 
+These keywords shape a finding or an offer, and answer none:
+
+| keyword | what it does |
+|---|---|
+| `x-filled-by` | holds a `required` field back while the note writes the key it names, and that key holds nothing |
+| `x-values` | names the folder whose files the completion offers as the field's values |
+
 `matches` names a frontmatter key, and the note that key points at marks the
 items a chapter here argues. So the checker reads a second file for it, and the
 write door passes over it with one buffer in hand.
