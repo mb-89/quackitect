@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -174,6 +174,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 2bc65ec92430 · claude-code-remote · helper-13
+    hash_before: 8a0fc5199dfc8e4b618ddb5d656c0339739defd6
+    hash_after: 8a0fc5199dfc8e4b618ddb5d656c0339739defd6
+reason: done
 ---
 
 # Ask
@@ -404,8 +409,6 @@ A refusal names the leaf or the phase, and writes nothing. Both roads answer one
 <!-- the form is files -->
 
 - spec/tickets/the-route-edits-ahead.md
-- spec/guidance/review/reviewing.md
-- spec/design_input/the-editor-draws-the-ticket.md
 - src/scripts/ticket-route.js
 - src/scripts/ticket.js
 - src/scripts/cli.js
@@ -419,10 +422,12 @@ A refusal names the leaf or the phase, and writes nothing. Both roads answer one
 
 <!-- the form is verdict -->
 
-fail
-- craft: `canonical` in `src/scripts/ticket-route.js` restates the sorted-key form `canonicalOf` in `.claude/skills/level0/lib/schema-route.js` holds. Call `canonicalOf`, and drop `canonical`.
-- craft: `route` in `src/scripts/ticket.js` refuses an unknown ticket with exit 2, where the approach answers 1 on a refusal. Answer 1, or name 2 in the approach.
-- craft: no case drives the unknown-ticket refusal. Add one in `test/level0/ticket-route.test.js` asserting the exit and the JSON.
+pass
+- ask: the verb writes past the pointer, refuses naming the step, and answers JSON.
+- check: `./RUNME.sh check` exits 0, and 35 tests pass across both files.
+- earlier findings: `same` calls `canonicalOf`, the unknown ticket exits 1, and a case drives that refusal.
+- scope: only the verb's module, the dispatch, the `cli.js` verb list and the route tests change.
+- retro: the handback holds none.
 
 
 ## checked
@@ -431,7 +436,7 @@ fail
 
 <!-- the form is checklist -->
 
-- each fact stands in one place. `reachedOf` lifts the read out of `updated`, and comments point at the design input. `canonical` repeats `canonicalOf`, so the first finding stands.
+- each fact stands in one place. `reachedOf` holds the reached read, `canonicalOf` the sorted form, and comments point at the design input.
 
 # Discussion
 
