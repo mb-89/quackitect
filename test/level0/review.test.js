@@ -16,11 +16,12 @@ import {
   TOOL,
   WORKTREE,
 } from "../../.claude/skills/level0/lib/review.js";
-import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
+import { BIN, TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { whatFailed } from "../../src/scripts/work-review.js";
+import { PLUGIN } from "../../src/scripts/brand.js";
 import { work } from "../../src/scripts/work.js";
+import { whatFailed } from "../../src/scripts/work-review.js";
 
 const ROOT = "/tree";
 const NAME = "the-config-holds-numbers";
@@ -139,6 +140,63 @@ test("the check runs on the surveyed tools, so the worktree downloads none", () 
   assert.equal(runs.length, 1, "the check runs once");
   assert.equal(runs[0].cwd, AT, "it runs inside the worktree");
   assert.equal(runs[0].survey, true, "the survey lands there first");
+});
+
+test("the worktree carries the caller's brand before the check runs", () => {
+  const { it, disk } = doorsSaying(standing());
+  const stamped = [];
+  it.proc.teach(["/node", "src/scripts/cli.js", "check"], () => {
+    stamped.push(disk.exists(join(AT, PLUGIN)));
+    return { exitCode: 0 };
+  });
+
+  heard(() => work(ROOT, ["review", NAME, "--json"], it));
+
+  assert.deepEqual(stamped, [true], "the plugin manifest lands before the check");
+});
+
+test("the worktree borrows the caller's modules and compiler, and gives them back before git removes it", () => {
+  const kept = ["node_modules", `${BIN}/zig`];
+  const { it, disk } = doorsSaying(
+    standing(),
+    Object.fromEntries(kept.map((rel) => [join(ROOT, rel, "held"), ""])),
+  );
+  const seen = [];
+  it.proc.teach(["/node", "src/scripts/cli.js", "check"], () => {
+    for (const rel of kept) {
+      seen.push(disk.realOf(join(AT, rel)) === disk.realOf(join(ROOT, rel)));
+    }
+    return { exitCode: 0 };
+  });
+
+  heard(() => work(ROOT, ["review", NAME, "--json"], it));
+
+  assert.deepEqual(seen, [true, true], "the check runs on the caller's two");
+  for (const rel of kept) {
+    assert.equal(
+      disk.isLink(join(AT, rel)),
+      false,
+      `the ${rel} link leaves with the worktree`,
+    );
+    assert.equal(
+      disk.exists(join(ROOT, rel, "held")),
+      true,
+      `the caller's ${rel} stands`,
+    );
+  }
+});
+
+test("the worktree borrows nothing out of the caller's bin but the compiler", () => {
+  const { it, disk } = doorsSaying(standing(), { [join(ROOT, BIN, "logview")]: "" });
+  let linked = true;
+  it.proc.teach(["/node", "src/scripts/cli.js", "check"], () => {
+    linked = disk.isLink(join(AT, BIN)) || disk.isLink(join(AT, BIN, "logview"));
+    return { exitCode: 0 };
+  });
+
+  heard(() => work(ROOT, ["review", NAME, "--json"], it));
+
+  assert.equal(linked, false, "a branch's build lands in its own bin");
 });
 
 test("a red check comes back with the rows the runner refused", () => {
@@ -297,6 +355,16 @@ test("a run naming no failing row falls back to its last lines", () => {
   const said = whatFailed({ stdout: "one\ntwo\n", stderr: "the rules refuse three\n" });
 
   assert.match(said, /the rules refuse three/);
+});
+
+test("a red spec run answers each failing case once, and leaves the list header out", () => {
+  const said = whatFailed({
+    stdout:
+      "✔ one holds\n✖ two breaks (1ms)\n✖ failing tests:\n✖ two breaks (1ms)\nℹ fail 1\n",
+    stderr: "",
+  });
+
+  assert.equal(said, "✖ two breaks (1ms)");
 });
 
 test("a red lint answers with the lines naming the rule", () => {

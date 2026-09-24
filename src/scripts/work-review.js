@@ -3,6 +3,7 @@
 // model runs here.
 // [[spec/design_output/review#what-the-verb-gathers]]
 
+import { dirname } from "node:path";
 import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import {
   DIFF_CAP,
@@ -10,11 +11,16 @@ import {
   retroOnTicket,
   WORKTREE,
 } from "../../.claude/skills/level0/lib/review.js";
-import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
+import { BIN, TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { brandOf } from "../../.claude/skills/level0/lib/vehicle.js";
+import { stamps } from "./brand.js";
 import { DONE, standingAll, standOf } from "./work.js";
 
 const LOUD = 5;
+
+// What the install writes and git ignores, which the check reads and never writes. [[spec/design_output/review#a-worktree-runs-the-check]]
+const BORROWED = ["node_modules", `${BIN}/zig`];
 
 export function review(it, name, argv) {
   if (!name) {
@@ -120,8 +126,16 @@ function checkOn(it, at) {
     it.disk.makeDir(it.join(where, RUN));
     it.disk.write(it.join(where, TOOLS), it.disk.read(survey));
   }
+  stamps(it.disk, where, brandOf(it.root));
+  const borrowed = BORROWED.filter((rel) => it.disk.exists(it.join(it.root, rel)));
+  for (const rel of borrowed) {
+    it.disk.makeDir(dirname(it.join(where, rel)));
+    it.disk.link(it.join(it.root, rel), it.join(where, rel));
+  }
 
   const ran = it.proc.run([it.node, "src/scripts/cli.js", "check"], { cwd: where });
+  // The links go first, so the removal below never walks into the caller's own folders.
+  for (const rel of borrowed) it.disk.remove(it.join(where, rel));
   it.git.run(["worktree", "remove", "--force", where], true);
   it.disk.remove(where);
   it.git.run(["worktree", "prune"], true);
@@ -136,8 +150,13 @@ export function whatFailed(ran) {
     .split(/\r?\n/)
     .map((one) => one.trim());
 
-  for (const named of [/^not ok \d/, /^[^\s:]+:\d+:\d+: \S+: /]) {
-    const found = lines.filter((one) => named.test(one));
+  // The spec reporter names a failing case after a cross, and prints the list twice, so a case reads once. [[spec/design_output/review#a-worktree-runs-the-check]]
+  for (const named of [
+    /^not ok \d/,
+    /^✖ (?!failing tests)/,
+    /^[^\s:]+:\d+:\d+: \S+: /,
+  ]) {
+    const found = [...new Set(lines.filter((one) => named.test(one)))];
     if (found.length) return found.slice(0, LOUD).join("\n");
   }
   return lines.filter(Boolean).slice(-LOUD).join("\n");
