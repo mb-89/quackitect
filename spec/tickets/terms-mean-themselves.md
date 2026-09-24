@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box a0ae5042621d · claude-code-remote
@@ -103,6 +103,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 335fc616032ccab181fb8e7cfb63c39319762ba0
+    hash_after: 335fc616032ccab181fb8e7cfb63c39319762ba0
 ---
 
 # Ask
@@ -172,36 +176,70 @@ Every term says what it means in one line of core words and other terms, and the
 
 <!-- the form is list -->
 
+| ticket or thing | what it lands |
+|---|---|
+| [[spec/tickets/a-term-means-itself]] | a `means` line on every term, `source` on an outside one, and one table of endings |
+| [[spec/tickets/a-term-points-nowhere]] | no term carries `defines`, and the shape rule refuses a link in a term |
+| [[spec/tickets/the-hover-shows-a-term]] | the hover, and the table in `spec/config/stems.yaml` |
+| the note on the shape rule | a case of its own for each refusal of the rule over the word lists |
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
 
+- helpers wrote the lines fast off the old links, and a check held each word to the lists
+- each review read the code beside the draft, so each return named a real fault
+- each fix met a test that turns red with the check gone
 ### badly
 
 <!-- what did not, each with its moment in the log or the transcript -->
 
 <!-- the form is list -->
 
+| moment | what went wrong |
+|---|---|
+| the first review of the field child | its hand-back met my code in the working tree, and the pull commits the whole tree |
+| the hover design | it went back to draft three times, because it named readers it had left unread |
+| the refusal verdict | it went back twice, because a shape case carried two faults |
+| the hover ticket | a replace over the whole file changed a quote in its record, and the diff caught it |
+| the note at the retro | the pull handed out the group's leaf first, and the note came out with the todo tag alone |
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
 
+| home | the fix |
+|---|---|
+| `spec/guidance/cloud.md` | work in hand leaves the working tree while a helper holds a step |
+| the draft step of `spec/processes/standard.yaml` | a draft opens every reader it names before it claims a change to it |
+| `spec/guidance/code/testing.md` | a case for a refusal carries that one fault |
+| `spec/guidance/tickets.md` | an edit to a ticket stands under the chapter of the leaf in hand |
+| `spec/design_output/pull.md` | a note under `by: retro` goes to the group's hand before the group's leaf |
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 
 <!-- the form is text -->
 
+The plan named the hover as one row, and it turned out the largest child. The
+forms of a word needed the table of endings in Go, and one source meant moving
+the table out of the code. The rule, the check and the server now read one
+file.
+
+| open risk | where it stands |
+|---|---|
+| a test holds each word of a line to the lists, and no test holds a line true | the retro reads the new terms |
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- each fact stands once: the lines in `terms.yml`, the table in `stems.yaml`, and the notes point at both
+- each number carries a name: `SHORTEST` in the code and `prefixRoom` in Go
+- each new header says what its file is for: `stems.yaml`, `hover.go` and `terms.yml`
 ## cloud
 
 <!-- names what the box lacked, met and leaves for a person -->
