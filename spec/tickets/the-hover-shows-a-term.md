@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -122,6 +122,12 @@ record:
     hand: box a0ae5042621d · claude-code-remote
     hash_before: 7b4092316d9b3d15c285ea66c88843fa27bc1b15
     hash_after: 7b4092316d9b3d15c285ea66c88843fa27bc1b15
+  - step: design/review
+    hand: box a0ae5042621d · claude-code-remote · helper-6
+    hash_before: 9f9a15cdae34af957244a412cf79149ed5d84bed
+    hash_after: 9f9a15cdae34af957244a412cf79149ed5d84bed
+    returns: 3
+    why: "| finding | fix |; |---|---|; | The approach names `stems.yaml`, and the answers name `stems.yml` | Name the file one way in every line |; | `test/level0/vocabulary.test.js` reads fixture lists and touches no disk, so it reaches no case the real `stems.yaml` holds | Drive the cases in `test/contract/vocabulary.test.js` beside the slug test, and keep a fixture table in the level zero file |; | No test in `src/lsp` reads a file of the tree, and `hover_test.go` reads the real `stems.yaml` | Name the path the Go test reads and the disk it reads through |; | `paragraph.schema.schema.json` names `stems` in the vocabulary layer and leaves `endings` out | Add `endings` as a string to the shape |; The ten earlier findings stand settled by the answers. The rest reads true:; `took` answers `initialize`, and `Tree.Read` reads an open buffer or the index copy, which `follows` pulls after a save; `alsoReads` and the caches take every path `pathsOf` names, so a new key reaches both; `faultsOf` refuses no key the shape leaves out, and nothing in `spec/config` refuses a new yaml file"
 ---
 
 # Ask
@@ -242,16 +248,16 @@ fail
 
 | finding | fix |
 |---|---|
-| The vocabulary layer of `paragraph.schema.yaml` holds `stems` as a line of prose, so `pathsOf` takes that line as the path | Name the key the path takes, and move or rename the line of prose |
-| `VocabularyEntry` reads every file in `spec/vocabulary` and refuses a row under a key past `words`, `terms` and `swaps` | Name the change to the shape rule, or put the table beside `spec/config/slug.yaml` |
-| `WATCHES` in `src/extension/lib/lsp.js` holds markdown alone, so the client sends no buffer of `terms.yml` | Hold the save case in the test, or add the list to `WATCHES` and drop "the client needs no change" |
-| `rulesFrom` in `.claude/skills/level0/lib/paragraph.js` calls `vocabularyRule` and stands off the callers | Add it to the callers |
+| The approach names `stems.yaml`, and the answers name `stems.yml` | Name the file one way in every line |
+| `test/level0/vocabulary.test.js` reads fixture lists and touches no disk, so it reaches no case the real `stems.yaml` holds | Drive the cases in `test/contract/vocabulary.test.js` beside the slug test, and keep a fixture table in the level zero file |
+| No test in `src/lsp` reads a file of the tree, and `hover_test.go` reads the real `stems.yaml` | Name the path the Go test reads and the disk it reads through |
+| `paragraph.schema.schema.json` names `stems` in the vocabulary layer and leaves `endings` out | Add `endings` as a string to the shape |
 
-The six earlier findings stand settled by the answers. The rest reads true, and each piece stands as the draft says:
+The ten earlier findings stand settled by the answers. The rest reads true:
 
-- `took` and `Tree.Read` in `src/lsp`
-- `listsOf` and `alsoReads` in the projection
-- `wordsHere` and the caches in `src/bridge`
+- `took` answers `initialize`, and `Tree.Read` reads an open buffer or the index copy, which `follows` pulls after a save
+- `alsoReads` and the caches take every path `pathsOf` names, so a new key reaches both
+- `faultsOf` refuses no key the shape leaves out, and nothing in `spec/config` refuses a new yaml file
 
 # implement
 
