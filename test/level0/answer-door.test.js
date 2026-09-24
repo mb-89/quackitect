@@ -5,7 +5,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { ANSWER_KIND, rowOf } from "../../.claude/skills/level0/lib/log.js";
+import { REPLY_KIND, rowOf } from "../../.claude/skills/level0/lib/log.js";
 import {
   demands,
   holdsForAnswer,
@@ -89,11 +89,11 @@ test("a display carrying no text leaves the demand standing", () => {
 });
 
 // [[spec/design_output/log#an-answer-stands-in-chat]]
-test("an answer row keeps its lines, so a list and a table keep their shape, and any other row reads as one line", () => {
+test("a reply row keeps its lines, so a list and a table keep their shape, and any other row reads as one line", () => {
   const text = "- one\n- two\n\n| a | b |\n|---|---|\n| 1 | 2 |";
-  assert.equal(rowOf("now", "info", ANSWER_KIND, text).said, text);
+  assert.equal(rowOf("now", "info", REPLY_KIND, text).said, text);
   assert.equal(
-    rowOf("now", "info", "reply", text).said,
+    rowOf("now", "info", "note", text).said,
     "- one - two | a | b | |---|---| | 1 | 2 |",
   );
 });
