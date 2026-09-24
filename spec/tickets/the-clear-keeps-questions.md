@@ -94,7 +94,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -135,6 +135,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: fdf75055e66698a03e88203d8648b208dd2fa7a4
+    hash_after: 71c064e652a1d39630a6a9bfc5b107beb26d2b62
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/bridge/refactor-hand.js:142:55: Modal: This register holds the modals can, must, will. Say what is, or name the one "
 ---
 
 # Ask
@@ -278,11 +286,17 @@ The handover door moves the phase to clear on any claim, so a waiting stop clear
 
 <!-- the form is command -->
 
+./RUNME.sh check
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `handover.js`, `stop.js`, the stop rules, `stop.md` and their tests
+- the tests read fake disks and a fake log
+- `handover.js` and `stop.js` name this ticket beside the change
 
 ## tests-green
 
