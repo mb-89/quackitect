@@ -95,7 +95,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: a3f4e059640d0b9a89ebe7f2d2db34dd512a89e2
+    hash_after: 2b0bcf56b2369620d5fec2bd3cffec184672d926
 ---
 
 # Ask
@@ -125,17 +130,43 @@ The editor edits the frontmatter by hand, and a slip rewrites the record or the 
 
 <!-- the form is text -->
 
+`ticket route <ticket> --steps=<json>` takes the whole route the drawing leaves, as a JSON list of steps. The verb reads the reached leaves the way `updated` in `src/scripts/ticket.js` reads them. That is every leaf at or before the pointer, and every step the record names.
+
+| the new route | the verb |
+|---|---|
+| opens on the reached leaves, in their order, each the same as it stood | writes the route through `reRouted`, and keeps `process_hash`, so the drift from the process shows |
+| drops, moves or changes a reached leaf, or a phase holding one | refuses, names the first such step, and writes nothing |
+| no longer holds the pointer's leaf | refuses, and names the pointer |
+| arrives as no JSON list | refuses, and says the flag it wants |
+
+Both roads print one JSON object:
+
+| the road | the keys |
+|---|---|
+| a write | `ticket`, `step`, `steps` |
+| a refusal | `refused`, `at` |
+ The exit is 0 on a write and 1 on a refusal. One function, `rerouted`, holds the check, so the update child reads the same rule.
+
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/scripts/ticket.js` `ticket`, which dispatches the new verb and prints its usage line
+- `src/scripts/cli.js` the `ticket` entry, whose `says` names the verbs
+- `.claude/skills/level0/lib/schema-mint.js` `reRouted`, which the verb calls unchanged
+
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first draft
+
 
 ## review
 
