@@ -179,6 +179,24 @@ test("a closed ticket on trunk stands off the queue, whatever a merged branch sa
     "a draft waits on a person, so it takes a negative place",
   );
   assert.equal(draft.loose.find((one) => one.name === "a-loose-one").queue, "1");
+  // A draft on the trivial route waits on no person, so it counts up with the agent's rows. [[spec/design_output/pull#a-draft-opens]]
+  const trivial = answerOf({
+    ...doorsSaying(
+      remoteSaying([], {
+        "origin/main:spec/tickets/a-draft.md": LOOSE.replace(
+          "state: open",
+          "state: draft\nprocess: [[spec/processes/trivial]]",
+        ),
+      }),
+    ).it,
+    root: ROOT,
+    clock: fakeClock("2026-01-01T03:00:00.000Z"),
+  });
+  assert.match(
+    trivial.loose.find((one) => one.name === "a-draft").queue,
+    /^[1-9]/,
+    "a trivial draft takes a place of the agent's",
+  );
   // A merged branch speaks for no ticket, so one trunk holds nowhere takes no place at all. [[spec/design_output/pull#the-queue-is-an-outline]]
   const orphan = answerOf({
     ...doorsSaying(
@@ -256,7 +274,38 @@ test("a todo moves a ticket before the row it names, and a private note takes a 
   assert.match(
     place("parked"),
     /^\d+$/,
-    "a private note on this box takes a place of its own",
+    "a private ticket on this box takes a place of its own",
+  );
+});
+
+// A note waits for its retro, so it stands in the tab with no place, and the rows around it number with no gap. [[spec/design_output/pull#the-queue-is-an-outline]]
+test("a note on this box takes no place, and the todos number with no gap", () => {
+  const { it } = doorsSaying(
+    remoteSaying([], { "origin/main:spec/tickets/a-loose-one.md": LOOSE }),
+    {
+      [join(ROOT, ".se/tickets/a-doubt.md")]: LOOSE.replace(
+        "state: open\n",
+        "state: open\nprocess: [[spec/processes/note]]\n",
+      ),
+      [join(ROOT, ".se/.runtime/plan.json")]: JSON.stringify({
+        working: "",
+        todos: [{ title: "read the log" }, { title: "write the handover" }],
+      }),
+    },
+  );
+  it.root = ROOT;
+  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
+  const said = answerOf(it);
+  const note = said.loose.find((one) => one.name === "a-doubt");
+  assert.ok(note, "the note stands in the tab");
+  assert.equal("queue" in note, false, "and takes no place");
+  assert.deepEqual(
+    said.loose
+      .filter((one) => "queue" in one)
+      .map((one) => one.queue)
+      .sort(),
+    ["1", "2", "3"],
+    "the rows around it number with no gap",
   );
 });
 

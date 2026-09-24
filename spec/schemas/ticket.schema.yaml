@@ -50,7 +50,7 @@ frontmatter:
 
     todo:
       type: [boolean, string]
-      description: a place in the queue a hand forces, as true for the front or the name of the row this one stands before, and a note lacking it reads false. A hand parking a private note tags it here, so the pull hands it out first on this box
+      description: a place in the queue a hand forces, as true for the front or the name of the row this one stands before, and a note lacking it reads false. A note waits for its retro and carries no tag
 
     step:
       type: string

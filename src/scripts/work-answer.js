@@ -4,6 +4,7 @@
 // [[spec/design_output/work#one-reading-answers-git]]
 
 import {
+  agentOpens,
   askOf,
   CLOSED,
   dependsOn,
@@ -19,6 +20,7 @@ import {
   urgent,
 } from "../engine/group.js";
 import { PLANS } from "../../.claude/skills/level0/lib/runs.js";
+import { onNoteRoute } from "../../.claude/skills/level0/lib/ticket.js";
 import { takeable } from "./pull.js";
 import { ticketsHere } from "./pull-hand.js";
 import { leafOf, leavesOf } from "./pull-route.js";
@@ -32,7 +34,13 @@ import { staleClaim } from "./work-free.js";
 import { readWork, standingAll } from "./work-stands.js";
 
 // [[spec/design_output/work#one-reading-answers-git]]
-export function rowOfTicket(one, places, stood = new Map(), open = new Set(), overrides = {}) {
+export function rowOfTicket(
+  one,
+  places,
+  stood = new Map(),
+  open = new Set(),
+  overrides = {},
+) {
   const place = places.get(one.name);
   const said = {
     name: one.name,
@@ -113,13 +121,23 @@ export function placesIn(it, read, stood) {
   const all = [...ticketsIn(read), ...todoRows(plan)];
   // A row a standing branch holds belongs to the cloud, so it leaves this box's lists and stands at infinity. [[spec/design_output/pull#the-queue-is-an-outline]]
   const onCloud = new Set(
-    read.stand.filter((held) => !held.merged).flatMap((held) => [held.name, ...ownTickets(held).map((one) => one.name)]),
+    read.stand
+      .filter((held) => !held.merged)
+      .flatMap((held) => [held.name, ...ownTickets(held).map((one) => one.name)]),
   );
-  const open = all.filter((one) => fieldOf(one.text, "state") !== CLOSED && !onCloud.has(one.name));
+  // A note waits for its retro, so it takes no place. [[spec/design_output/pull#the-queue-is-an-outline]]
+  const open = all.filter(
+    (one) =>
+      fieldOf(one.text, "state") !== CLOSED &&
+      !onCloud.has(one.name) &&
+      !onNoteRoute(one.text),
+  );
   const at = { clock: it.clock, weights: it.weights, stood };
   // A person's step and a draft wait on a person. The agent's takeable steps count next, and every other open ticket after them. [[spec/design_output/pull#the-queue-is-an-outline]]
   // A ticket a hand holds, or the one the plan names, stands at zero. [[spec/design_output/pull#the-queue-is-an-outline]]
-  const inHand = open.filter((one) => Boolean(heldIn(one.text)) || one.name === plan.working);
+  const inHand = open.filter(
+    (one) => Boolean(heldIn(one.text)) || one.name === plan.working,
+  );
   const free = open.filter((one) => !inHand.includes(one));
   const persons = queued(free.filter(waitsOnPerson), all, at);
   const agents = queued(
@@ -134,7 +152,8 @@ export function placesIn(it, read, stood) {
   );
   const out = outlineIn(persons, inHand, [...agents, ...back], all, plan.places);
   for (const one of all) {
-    if (onCloud.has(one.name) && fieldOf(one.text, "state") !== CLOSED) out.set(one.name, CLOUD_PLACE);
+    if (onCloud.has(one.name) && fieldOf(one.text, "state") !== CLOSED)
+      out.set(one.name, CLOUD_PLACE);
   }
   return out;
 }
@@ -143,7 +162,11 @@ export function placesIn(it, read, stood) {
 export function planHere(it) {
   try {
     const said = JSON.parse(it.disk.read(it.join(it.root, ...PLANS.split("/"))));
-    return { working: String(said?.working ?? ""), places: said?.places ?? {}, todos: [said?.todos ?? []].flat() };
+    return {
+      working: String(said?.working ?? ""),
+      places: said?.places ?? {},
+      todos: [said?.todos ?? []].flat(),
+    };
   } catch {
     return { working: "", places: {}, todos: [] };
   }
@@ -153,7 +176,14 @@ export function planHere(it) {
 function todoRows(plan) {
   return plan.todos
     .filter((one) => one?.title)
-    .map((one, order) => ({ name: String(one.title), path: "", text: "", front: { todo: one.todo ?? "last" }, plan: true, order }));
+    .map((one, order) => ({
+      name: String(one.title),
+      path: "",
+      text: "",
+      front: { todo: one.todo ?? "last" },
+      plan: true,
+      order,
+    }));
 }
 
 // The plan's todos as rows of the answer, which the tab draws beside the tickets with no link. [[spec/design_output/stop#the-plan]]
@@ -204,12 +234,15 @@ function heldRow(plan, names) {
 
 // [[spec/design_output/pull#the-queue-is-an-outline]]
 function waitsOnPerson(one) {
-  return personStep(one.text) || fieldOf(one.text, "state") === DRAFT;
+  return (
+    personStep(one.text) ||
+    (fieldOf(one.text, "state") === DRAFT && !agentOpens(one.text))
+  );
 }
 
 // The queue rides every answer, because a reader of the listing wants each row's place. [[spec/design_output/pull#the-queue-is-a-score]]
 export function answerOf(it, queue = true) {
-  // The box's private notes stand in the queue beside trunk's tickets, because the pull hands them out too. [[spec/design_output/pull#the-queue-is-an-outline]]
+  // The box's private tickets stand in the tab beside trunk's, and a note among them stands there with no place. [[spec/design_output/pull#the-queue-is-an-outline]]
   const read = { ...readWork(it, true), private: privateHere(it) };
   // A desk's own edit stands on the disk before any commit, so trunk's copy reads off the working tree where the file stands there. [[spec/design_output/pull#a-todo-forces-a-place]]
   read.loose = read.loose.map((one) => diskCopy(it, one));
@@ -257,10 +290,15 @@ export function answerOf(it, queue = true) {
     // Every other ticket on trunk stands here, a group among them, and the tab nests each one under the group it names. [[spec/design_output/tree-view#the-name-column-nests]]
     loose: [
       ...[...read.loose, ...read.private]
-        .filter((one) => !branched.has(one.name) && !branched.has(fieldOf(one.text, GROUP)))
+        .filter(
+          (one) => !branched.has(one.name) && !branched.has(fieldOf(one.text, GROUP)),
+        )
         .map((one) => rowOfTicket(one, places, stood, open, overrides)),
       ...planRows(planHere(it), places),
-      ...heldRow(planHere(it), [...ticketsIn(read).map((one) => one.name), ...planHere(it).todos.map((one) => String(one?.title ?? ""))]),
+      ...heldRow(planHere(it), [
+        ...ticketsIn(read).map((one) => one.name),
+        ...planHere(it).todos.map((one) => String(one?.title ?? "")),
+      ]),
     ],
   };
 }
@@ -269,7 +307,10 @@ export function answerOf(it, queue = true) {
 function diskCopy(it, one) {
   if (!it.disk || !it.join || !one?.path) return one;
   try {
-    return { ...one, text: String(it.disk.read(it.join(it.root, ...String(one.path).split("/")))) };
+    return {
+      ...one,
+      text: String(it.disk.read(it.join(it.root, ...String(one.path).split("/")))),
+    };
   } catch {
     return one;
   }

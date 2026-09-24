@@ -26,6 +26,7 @@ import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { toolLines, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { heldReadsIn } from "../scripts/guidance-hand.js";
 import { forgetsReads } from "./handover.js";
+import { dropsHandover } from "./plan.js";
 import { readTools, writeSurvey } from "../engine/tools.js";
 import { asks } from "./config.js";
 import { deadIndexLine } from "./search.js";
@@ -200,6 +201,7 @@ function handoverHere(box) {
       `${HANDOVER} reaches the session, and the read deletes it`,
       {
         detail: text.split("\n")[0],
+        dropped: dropsHandover(box),
       },
     );
     return text;

@@ -78,3 +78,14 @@ test("the command line, the tools, the hand and the retro reach the mint through
   assert.equal(typeof newRetro, "function");
   assert.equal(typeof handOut, "function");
 });
+
+// The command line exits at import, so its text says the mint refuses an empty group. [[spec/design_output/work#a-group-is-a-ticket]]
+test("the mint on the command line reads the group through emptyGroup before it writes", () => {
+  const cli = String(files.read(join(root, "src", "scripts", "cli.js")));
+  const mint = cli.slice(cli.indexOf("export function mint("));
+  assert.ok(mint.indexOf("emptyGroup(") > 0, "the mint calls emptyGroup");
+  assert.ok(
+    mint.indexOf("emptyGroup(") < mint.indexOf("files.write(at"),
+    "and calls it before the write",
+  );
+});

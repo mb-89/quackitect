@@ -285,6 +285,43 @@ test("ticket open turns a draft with an ask into an open ticket at its first lea
   assert.equal(heard(() => ticket(ROOT, ["open", "a-child"], empty.it)).code, 1);
 });
 
+// [[spec/design_output/pull#a-draft-opens]]
+test("the pull opens a trivial draft and hands its first leaf, and leaves any other draft to a person", () => {
+  const trivial = (text) =>
+    text.replace(
+      "kind: [[ticket]]\n",
+      "kind: [[ticket]]\nprocess: [[spec/processes/trivial]]\n",
+    );
+  const { it, disk } = doors(standing(trivial(CHILD("draft", ""))));
+
+  const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
+
+  assert.equal(code, 0, said);
+  assert.match(
+    said,
+    /opens at design\/draft, because a trivial draft waits on no person/,
+  );
+  const now = disk.read(at("spec/tickets/a-child.md"));
+  assert.equal(fieldOf(now, "state"), "open");
+  assert.equal(fieldOf(now, "step"), "design/draft");
+
+  const empty = doors(
+    standing(trivial(CHILD("draft", "")).replace("One piece of it.\n", "")),
+  );
+  heard(() => pulling(ROOT, ["pull"], empty.it));
+  assert.equal(
+    fieldOf(empty.disk.read(at("spec/tickets/a-child.md")), "state"),
+    "draft",
+  );
+
+  const other = doors(standing(CHILD("draft", "")));
+  heard(() => pulling(ROOT, ["pull"], other.it));
+  assert.equal(
+    fieldOf(other.disk.read(at("spec/tickets/a-child.md")), "state"),
+    "draft",
+  );
+});
+
 // [[spec/design_output/pull#the-checks]]
 test("the judge's material is the leaf's evidence and the rules its reads name, as JSON", () => {
   const { it } = doors(standing(filled(CHILD(), "### approach", "The approach.")));
@@ -402,7 +439,11 @@ test("under queue a named pull refuses, and the name this session minted passes"
   const minted = doors(standing(), {}, { binding: "queue", minted: "a-child" });
   const took = heard(() => pulling(ROOT, ["pull", "a-child"], minted.it));
   assert.doesNotMatch(took.said, /behind the queue/);
-  assert.match(took.said, /a-child at design\/draft/, "the minted name hands that ticket out");
+  assert.match(
+    took.said,
+    /a-child at design\/draft/,
+    "the minted name hands that ticket out",
+  );
 });
 
 // [[spec/design_output/pull#done-leaves-no-takeable-step]]

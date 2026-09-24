@@ -37,7 +37,8 @@ export async function readsAnswer(box, text, stop) {
     ceiling: asks(box, "answer.ceiling"),
   };
   const band = found.length ? bandOf(score, bands, found) : "clean";
-  box.log.say("info", "answer", `a draft reads ${band}`, {
+  // The band tells the owner nothing to act on, so it stands at debug. [[spec/design_output/level0#the-three-bands]]
+  box.log.say("debug", "draft", `a draft reads ${band}`, {
     detail: `score=${score} findings=${found.length}`,
   });
   return { found, score, band };
@@ -55,7 +56,7 @@ export async function gatesAnswer(e, box) {
     return null;
   }
   box.answerHolds = (box.answerHolds ?? 0) + 1;
-  box.log.say("info", "answer", "the gate holds the turn for a rewrite", {
+  box.log.say("debug", "draft", "the gate holds the turn for a rewrite", {
     detail: `holds=${box.answerHolds} score=${read.score}`,
   });
   return { result: { block: answerFindings(ANSWER, read) } };
