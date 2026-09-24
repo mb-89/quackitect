@@ -1,7 +1,9 @@
 // The verb behind `./RUNME.sh commit "<message>"`: the message reads through
-// the door's own rules, the commit lands, the check runs, and green pushes.
+// the door's own rules, the commit lands, the check runs, and green pushes
+// from a cloud box alone.
 // [[spec/design_output/work#the-battery-answers-first]]
 
+import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { line } from "../../.claude/skills/level0/lib/refuse.js";
 import { messageFaults } from "../bridge/bash.js";
 
@@ -61,7 +63,8 @@ function landsAndPushes(it, argv, message) {
     return 1;
   }
   console.log("The commit lands, and the check answers green on it.");
-  if (argv.includes("--no-push")) return 0;
+  // A desk leaves the push to the owner, and a cloud box pushes, because it dies with its tree. [[spec/guidance/working]] [[spec/guidance/cloud]]
+  if (argv.includes("--no-push") || !inCloud(it.env)) return 0;
 
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out.trim();
   if (!it.git.run(["push", "origin", branch]).ok) {

@@ -114,6 +114,7 @@ export function commitDoors() {
     proc: outside,
     log: it.log,
     vale: vale(files, outside, root),
+    env: process.env,
   };
 }
 

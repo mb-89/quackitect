@@ -178,7 +178,7 @@ export const verbs = {
     run: async () => (await import("./split-verb.js")).splitVerb(splitDoors(), rest),
   },
   commit: {
-    says: "read the message, land the commit, run the check, and push on green",
+    says: "read the message, land the commit, run the check, and push on green from a cloud box",
     run: async () => (await import("./commit-verb.js")).commitVerb(commitDoors(), rest),
   },
   serve: {
