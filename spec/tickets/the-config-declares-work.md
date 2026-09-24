@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [yours-counts-the-waiting]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -156,6 +156,14 @@ record:
     hand: box 2bc65ec92430 · claude-code-remote
     hash_before: 5a7849afe3f776308828a533bc15f8f84ee0dc48
     hash_after: 5a7849afe3f776308828a533bc15f8f84ee0dc48
+  - step: implement/change
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 74a83f8320b8b2c79dec7bb54368d44aca428124
+    hash_after: 74a83f8320b8b2c79dec7bb54368d44aca428124
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/contract/work-buttons.test.js:24:1: CodeComment: Code carries no comment here. Write a header of at most five lines"
 ---
 
 # Ask
