@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 742a1c2f7477 · claude-code-remote
@@ -107,6 +107,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box 711806cd7e87 · claude-code-remote
+    hash_before: 7a6c89f36d2a406c881e459862a271d6758f4ed1
+    hash_after: 7a6c89f36d2a406c881e459862a271d6758f4ed1
 ---
 
 # Ask
@@ -176,11 +180,18 @@ One web page draws a ticket's route from the graph, and speaks to its host throu
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-drawing-speaks-edits]]: the page posts `jump`, `take`, `handback` and `edit`, and refuses an edit behind the pointer
+- the emitter marks each node `ticket route` holds fixed as `reached`
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- the edits child ran whole on the box, because the engine group landed its node places and `ticket route` first
+- the browser cases passed at once: the page child's fake host took the new messages unchanged
+- each edit test checks its answer against `aheadOnly`, so the page and the verb read one rule
 
 ### badly
 
@@ -188,11 +199,21 @@ One web page draws a ticket's route from the graph, and speaks to its host throu
 
 <!-- the form is list -->
 
+- the first commit came back refused: `layout.js` changed with no test beside it
+- the first check exited 1 on a missing button `type`, past tense and a digit word in the design note
+- the first hand-back came back refused on two checklist lines past the word cap
+- a second `--pass` went to `retro/write` with no evidence written, and the door refused it
+- an edit test fed JSON as frontmatter, and the reader parsed no steps out of it
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- [[spec/guidance/code/testing]] rule five already names the test door, so the hand reads it before staging
+- a hand runs `./RUNME.sh check` before the commit verb, which catches the lint findings first
+- a hand hands back one leaf a call, and reads the answer before the next
 
 ### thoughts
 
@@ -200,11 +221,17 @@ One web page draws a ticket's route from the graph, and speaks to its host throu
 
 <!-- the form is text -->
 
+The graph carried no route fields and no hold, so the page could not build the route `ticket route` takes out of it alone. The `graph` message took `steps` and `held` in place of a wider emitter, and the emitter took `reached` alone, since the refusal rule belongs to the engine. Adding a step, and picking a hand, a condition or a fail edge, stay out until the desk trial decides how far the drawing edits.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the protocol stands in [[spec/design_output/drawing]] alone, and the ticket's says points at it
+- the change adds no number a note repeats
+- the new file `edit.js` opens on a header saying what it holds, and counts nothing
 
 ## cloud
 
