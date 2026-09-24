@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -154,6 +154,11 @@ record:
       - name: check
         exit: 0
         said: "src/bridge/refactor-hand.js:142:55: Modal: This register holds the modals can, must, will. Say what is, or name the one "
+  - step: verdict
+    hand: box d6f05e3a585030 · claude-code · helper-11
+    hash_before: 19acfd6192e767c22ad79559ca84c8612643e886
+    hash_after: 19acfd6192e767c22ad79559ca84c8612643e886
+reason: done
 ---
 
 # Ask
@@ -357,17 +362,39 @@ A turn ending on a stop that waits for the owner holds the context clear. The ha
 
 <!-- the form is files -->
 
+spec/tickets/the-clear-keeps-questions.md
+spec/config/stop/level0.yml
+spec/design_output/stop.md
+src/bridge/handover.js
+src/bridge/stop.js
+src/bridge/server.js
+test/contract/stop-rules.test.js
+test/level0/handover-wiring.test.js
+test/level0/context-handover.test.js
+.claude/skills/level0/lib/stop.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- `waitsForOwner` in `src/bridge/stop.js` matches the claimed id alone, and skips the `decide` vote that fires the rule's own check. A false claim of a waiting reason can still hold the clear, on a turn that ends for another reason. The design review names this same gap and passes it. The session only stays due a turn longer, and drops nothing.
+- The three rules the ask names carry `waits: owner` in `spec/config/stop/level0.yml`. `test/contract/stop-rules.test.js` proves each one fires, plus a false case and a call-claim case.
+- `test/level0/context-handover.test.js` and `test/level0/handover-wiring.test.js` drive the hold through `holdsForHandover` and the real server switch. Both read a fake disk, and match the two tests the ask calls for.
+- The diff touches exactly the seven files the ask names, and no other file.
+- `spec/design_output/stop.md` states the `waits: owner` case once. `src/bridge/handover.js`'s comment names this ticket alone, and carries no part of the design.
+- `./RUNME.sh check` exits 0, and no new warning lands on a changed line.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `spec/design_output/stop.md` states the `waits: owner` case once, under its table. `src/bridge/handover.js`'s comment names `spec/tickets/the-clear-keeps-questions` alone, and carries no restatement.
 
 # Discussion
 
