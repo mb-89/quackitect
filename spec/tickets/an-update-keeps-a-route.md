@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -165,6 +165,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 2bc65ec92430 · claude-code-remote · helper-11
+    hash_before: 73d6e9de834c99bcc6546225d5233d356e98a904
+    hash_after: 73d6e9de834c99bcc6546225d5233d356e98a904
+reason: done
 ---
 
 # Ask
@@ -387,13 +392,10 @@ So a route a person edits through `ticket route` survives an update, or the verb
 
 - spec/tickets/an-update-keeps-a-route.md
 - src/scripts/ticket-drift.js
-- src/scripts/ticket.js
 - src/scripts/ticket-route.js
-- src/scripts/process.js
-- src/doors/git.js
-- src/doors/fake/git.js
-- .claude/skills/level0/lib/schema-route.js
+- src/scripts/ticket.js
 - test/level0/ticket-drift.test.js
+- test/level0/ticket-route.test.js
 - test/level0/ticket-verb.test.js
 - test/level0/roots.test.js
 - test/level0/pull-doors.js
@@ -404,12 +406,15 @@ So a route a person edits through `ticket route` survives an update, or the verb
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- test/level0/ticket-drift.test.js repeats `heard`, which test/level0/pull-doors.js already exports
-- `same` in ticket-drift.js repeats the canonical compare of `same` in ticket-route.js, so export that one
-- the refusals, the reached leaf and `--over` each carry a case that fires, and nothing else strays
-- `./RUNME.sh check` exits 0, and ticket-drift, ticket-verb and roots tests pass
+- ticket-drift.test.js imports `heard` from pull-doors.js, which answers the first finding
+- ticket-drift.js reads `sameStep` and `fieldsOf` from ticket-route.js, which answers the second finding
+- a ticket-route case proves `sameStep` reads past key order and `fieldsOf` drops steps
+- the drift, missing-version, reached-leaf and `--over` cases each fire and assert the outcome
+- the `--over` edits in ticket-verb and roots tests stay trivial and within the ask
+- `./RUNME.sh check` exits 0, and the four touched test files pass 49 tests
+- the handback carries no retro
 
 ## checked
 
@@ -417,7 +422,7 @@ fail
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place. It fails here, since `heard` and `same` repeat pull-doors.js and ticket-route.js.
+- every fact the change adds stands in one place. `heard`, `sameStep` and `fieldsOf` each live once, and `OVER` names the flag once.
 
 # Discussion
 
