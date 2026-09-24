@@ -95,12 +95,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
     hash_before: b4915f89595781fc657a7e01b1bd0c11231fa55d
     hash_after: b4915f89595781fc657a7e01b1bd0c11231fa55d
+  - step: design/review
+    hand: box 2bc65ec92430 · claude-code-remote · helper-2
+    hash_before: e80e872ef031cc568b9740c37f4a37a6128cf0bf
+    hash_after: e80e872ef031cc568b9740c37f4a37a6128cf0bf
 ---
 
 # Ask
@@ -170,6 +174,8 @@ A process file holds no body, so its nodes carry neither key. A node whose chapt
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
 
 # implement
 
