@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hand: box 2bc65ec92430 · claude-code-remote
     hash_before: 2471703e3ac92f0ce4cf578f5ac4a9d2be9e62f4
     hash_after: 2471703e3ac92f0ce4cf578f5ac4a9d2be9e62f4
+  - step: design/review
+    hand: box 2bc65ec92430 · claude-code-remote · helper-4
+    hash_before: c0935535c54b673c8b9cb7ec0f656f73b10f0afc
+    hash_after: c0935535c54b673c8b9cb7ec0f656f73b10f0afc
 ---
 
 # Ask
@@ -198,12 +202,8 @@ A case in `test/level0/ticket-verb.test.js` covers each road in the first table,
 
 <!-- the form is verdict -->
 
-fail
-- design: the new check `rerouted` stands a case apart from `reRouted`. Give the check a distinct name.
-- design: the shared rule changes `update` and `updated` in `src/scripts/ticket.js`. List both under callers.
-- design: `updated` copies reached leaves over, and the new rule refuses. Say which rule `update` follows.
-- design: "changes a phase holding one" refuses a new step past the pointer in its phase. Name the phase fields held fixed.
-- craft: the approach names no test for each refusal road. Name one test a road.
+pass
+- craft: `aheadOnly` and `updated` both read the reached leaves. Lift that read into one function both call.
 
 # implement
 
