@@ -1345,6 +1345,33 @@ the command door reads `command`.
 | the field absent, or `true` | a pass |
 | a helper's own call | the same door |
 
+## A spawn names its tier
+
+A helper on the model of the session costs that model for work a lighter one
+does. So the session weighs the work it hands, and the `Agent` call names the
+model of that tier. The door enforces that a model is named, and the session
+picks it.
+
+| tier | the work | the model in `spec/config/level0.json` |
+|---|---|---|
+| find | find, list, read and report | `helper.find` |
+| change | a scoped change with its test, or a review against a list | `helper.change` |
+| decide | a design, an unknown cause, or a verdict the owner reads | `helper.decide` |
+
+`src/bridge/agent.js` owns the tiers. The tools block carries a line naming
+each tier and its model, so a spawn names the model before the door asks.
+
+| the call | what it meets |
+|---|---|
+| `model` names a tier's model | a pass |
+| `model` absent, or a model of no tier | a refusal naming each tier and its model |
+| a config naming no tier | a pass, and the door stays off |
+| a helper's own call | the same door |
+
+`agent.spawn` writes the model of each spawn to the log at `info`. The retro
+reads the tier against the rework, and a tier doing its work twice moves up in
+the config.
+
 ## What the refusal says
 
     The owner asked something and nothing has answered it. Write the answer in
