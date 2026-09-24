@@ -96,7 +96,12 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: ad4e1e2e92fc384e7bf4c82c4e74c35b5dd9cc8a
+    hash_after: ad4e1e2e92fc384e7bf4c82c4e74c35b5dd9cc8a
 ---
 
 # Ask
@@ -138,17 +143,40 @@ dictionary splits its meaning over the notes.
 
 <!-- the form is text -->
 
+Every term drops `defines`, and each reader stops asking for it:
+
+| piece | change |
+|---|---|
+| `terms.yml` | every entry drops `defines`, and the header says a term carries its line |
+| `VocabularyEntry.yml` | refuses `defines`, and a link anywhere in a term |
+| `vocabulary.js` | `termsOf` drops `defines`, `undefinedTerms` and its pattern go, and the refusal names the line a term wants |
+| `refuse.js` | the refusal writes the entry with `means` |
+| `paragraph.schema.yaml` | the growth entry names `means` and `source` |
+| `vocabulary.md`, `voice.md`, the header of `core.yml` | say a term carries its line |
+
+The list test stops resolving notes. It holds that no term carries `defines`
+or a link, beside the test the field child adds.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `test/contract/vocabulary.test.js`, the list test calls `undefinedTerms` and resolves `defines`
+- `test/level0/vocabulary.test.js`, the layer test calls `undefinedTerms` and reads the refusal from `grown`
+- `.claude/skills/level0/lib/refuse.js`, `refusal` calls `grown`
+- `.claude/skills/level0/lib/paragraph.js`, the projection calls `vocabularyRule`
+- `test/level0/hooks.test.js`, the write door case edits a term line
+- `test/contract/shape.test.js`, the entry cases run `VocabularyEntry.yml`
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first
 
 ## review
 
