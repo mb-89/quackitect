@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -107,6 +107,10 @@ record:
     hash_after: ff3c6492b7d870d2668fd5494b8f633db43d3ee5
     returns: 1
     why: "design: the new check `rerouted` stands a case apart from `reRouted`. Give the check a distinct name.; design: the shared rule changes `update` and `updated` in `src/scripts/ticket.js`. List both under callers.; design: `updated` copies reached leaves over, and the new rule refuses. Say which rule `update` follows.; design: \"changes a phase holding one\" refuses a new step past the pointer in its phase. Name the phase fields held fixed.; craft: the approach names no test for each refusal road. Name one test a road."
+  - step: design/draft
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 2471703e3ac92f0ce4cf578f5ac4a9d2be9e62f4
+    hash_after: 2471703e3ac92f0ce4cf578f5ac4a9d2be9e62f4
 ---
 
 # Ask
@@ -141,9 +145,12 @@ The editor edits the frontmatter by hand, and a slip rewrites the record or the 
 | the new route | the verb |
 |---|---|
 | opens on the reached leaves, in their order, each the same as it stood | writes the route through `reRouted`, and keeps `process_hash`, so the drift from the process shows |
-| drops, moves or changes a reached leaf, or a phase holding one | refuses, names the first such step, and writes nothing |
+| drops, moves or changes a reached leaf | refuses, names the first such leaf, and writes nothing |
+| changes a field of a phase holding a reached leaf, past its `steps` | refuses, and names the phase |
 | no longer holds the pointer's leaf | refuses, and names the pointer |
 | arrives as no JSON list | refuses, and says the flag it wants |
+
+A phase holding a reached leaf keeps every field but `steps`, such as `reads` and `checklist`. A new step past the pointer may join its `steps`.
 
 Both roads print one JSON object:
 
@@ -151,7 +158,10 @@ Both roads print one JSON object:
 |---|---|
 | a write | `ticket`, `step`, `steps` |
 | a refusal | `refused`, `at` |
- The exit is 0 on a write and 1 on a refusal. One function, `rerouted`, holds the check, so the update child reads the same rule.
+
+The exit is 0 on a write and 1 on a refusal. One exported function, `aheadOnly`, holds the check. This child leaves `update` and `updated` as they stand. The update child reads `aheadOnly` and decides which rule `update` follows.
+
+A case in `test/level0/ticket-verb.test.js` covers each road in the first table, and one more covers the JSON a write prints.
 
 
 ### callers
@@ -171,7 +181,11 @@ Both roads print one JSON object:
 
 <!-- the form is list -->
 
-- first draft
+- the check shares a name with `reRouted`: it takes the name `aheadOnly`
+- the rule changes `update`: this child leaves both functions alone, and the update child decides
+- which rule `update` follows: the update child decides, off `aheadOnly`
+- the phase refusal reaches a new step: a phase keeps each field but `steps`, and a new step joins it
+- no test a road: one case a road, in `test/level0/ticket-verb.test.js`
 
 
 ## review
