@@ -109,11 +109,22 @@ A person takes a ticket, works it and hands it back from VS Code alone, and that
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-editor-takes-an-inset]], experiment
+- [[spec/tickets/the-inset-folds-the-frontmatter]], standard
+- [[spec/tickets/the-host-runs-the-verbs]], standard
+- [[spec/tickets/a-save-fills-the-ticket]], standard
+- [[spec/tickets/the-work-group-draws-buttons]], standard
+- [[spec/tickets/the-owner-walks-a-ticket]], question
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each child takes one row of the plan's table, so a reviewer reads it whole
+- the children take the plan's rows one to one, and the walk closes the goal
+- the probe waits on nothing, and every other child names what it waits on under `depends_on`
 
 # children
 
