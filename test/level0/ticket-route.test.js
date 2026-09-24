@@ -6,8 +6,9 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { verbs } from "../../src/scripts/cli.js";
 import { ticket } from "../../src/scripts/ticket.js";
-import { aheadOnly } from "../../src/scripts/ticket-route.js";
+import { aheadOnly, reachedOf } from "../../src/scripts/ticket-route.js";
 import { TICKET_SCHEMA } from "./fixtures.js";
 
 const ROOT = "/tree";
@@ -209,4 +210,17 @@ test("aheadOnly passes a route whose reached leaves stand as they stood", () => 
     steps: ROUTE,
   };
   assert.deepEqual(aheadOnly(front, ROUTE), { steps: ROUTE });
+});
+
+test("reachedOf names each leaf up to the pointer, and each step the record names", () => {
+  const front = {
+    step: "design/draft",
+    record: [{ step: "do" }],
+    steps: ROUTE,
+  };
+  assert.deepEqual([...reachedOf(front)].sort(), ["design/draft", "do"]);
+});
+
+test("the command line's ticket entry names the route verb", () => {
+  assert.match(verbs.ticket.says, /\broute\b/);
 });

@@ -138,7 +138,7 @@ export const verbs = {
     run: async () => cloud(it.work, rest, it),
   },
   ticket: {
-    says: "tickets: pull, note, update, open, todo",
+    says: "tickets: pull, note, update, open, todo, route",
     // You pull a ticket, and the engine takes the branch it stands on. [[spec/design_output/pull#the-hand-out]]
     run: async () =>
       rest[0] === "pull"

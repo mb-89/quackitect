@@ -24,6 +24,7 @@ import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
 import { emptyGroup } from "./pull-hand.js";
 import { landedAlone } from "./pull-landed.js";
+import { reachedOf, routed } from "./ticket-route.js";
 import { askFaults, askRefusal, lineRefusal } from "./ticket-ask-lint.js";
 
 export const NOTES = TICKETS;
@@ -39,7 +40,7 @@ export function ticket(root, argv, doors) {
   const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
   const name = argv[1];
-  const doing = { note, update, open, todo };
+  const doing = { note, update, open, todo, route };
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh ticket <verb>\n");
     console.log(
@@ -56,6 +57,9 @@ export function ticket(root, argv, doors) {
     );
     console.log(
       "  todo <ticket>       park it for the next pull, and --off takes the tag away",
+    );
+    console.log(
+      "  route <ticket>      write the steps past the pointer, off --steps=<json>, and answer JSON",
     );
     console.log(
       `                      note takes --${TALK} where a person decides it, and --${TODO} to park it`,
@@ -225,6 +229,16 @@ function open(it, name) {
   return 0;
 }
 
+// [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
+function route(it, name, argv) {
+  const at = name ? ticketAt(it, name) : null;
+  if (!at) {
+    console.log(JSON.stringify({ refused: `${name ?? ""} names no ticket under ${NOTES} or ${TRAVELS}.`, at: "" }));
+    return 2;
+  }
+  return routed(it, at, argv, schemasHere(it).get("ticket"));
+}
+
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 function update(it, name, argv) {
   if (!name) {
@@ -276,13 +290,7 @@ export function updated(front, route) {
   }
 
   const old = entriesIn(front?.steps, "steps");
-  const at = old.findIndex((one) => one.path === step);
-  const reached = new Set(
-    old.filter((one, i) => one.leaf && at >= 0 && i <= at).map((one) => one.path),
-  );
-  for (const one of [front?.record ?? []].flat()) {
-    if (one?.step) reached.add(String(one.step));
-  }
+  const reached = reachedOf(front);
 
   const held = new Map(old.map((one) => [one.path, one.said]));
   let kept = 0;

@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -126,6 +126,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 585e0bcb76c139334e196391b791b792897d9f4d
+    hash_after: 585e0bcb76c139334e196391b791b792897d9f4d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -276,11 +284,19 @@ Every case fails on its own assertion, with the verb unknown and `aheadOnly` a s
 
 <!-- the form is command -->
 
+./RUNME.sh lint src/scripts/ticket-route.js src/scripts/ticket.js src/scripts/cli.js test/level0/ticket-route.test.js
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It adds the verb's module, wires the dispatch, and names the verb in the command line's list.
+- every door the change reaches has a fake. The verb reaches the disk alone, through the doors it takes.
+- a comment names the approach the change implements. The module opens on the design input, and each function points there.
+
 
 ## tests-green
 
