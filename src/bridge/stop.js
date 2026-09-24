@@ -192,6 +192,7 @@ export function onStop(e, box) {
   if (shaped.result) return shaped;
   const rules = rulesOf(box);
   const text = String(e?.last_assistant_message ?? "");
+  if (reportStands(text)) box.reported = true;
   const claimed = claimOf(e, box);
   box.claim = null;
   // The hold that stood over this turn, so the order the two events arrive in decides nothing. [[spec/design_output/stop#the-hold-outlives-its-drop]]
@@ -304,7 +305,8 @@ const CHECKS = {
   // [[spec/tickets/the-spawn-reaches-its-guidance]]
   "warnings-standing": (held) => handWanted(held.box),
   // [[spec/design_output/stop#a-talk-follows-a-report]]
-  "a-report-stands": (held) => reportStands(held.text),
+  // A report an earlier message of this turn carries stands too, so a stop line sent alone repeats nothing. [[spec/design_output/stop#a-talk-follows-a-report]]
+  "a-report-stands": (held) => reportStands(held.text) || Boolean(held.box?.reported),
   // What an unbuilt rule runs, so it stands off the vote and writes no line. [[spec/design_output/stop#the-mechanical-checks]]
   never: () => false,
   // A claim of done stands on an empty plan: no todo open, and nothing in hand. [[spec/design_output/stop#the-plan]]

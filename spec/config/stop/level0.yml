@@ -23,8 +23,8 @@
   decides: claimed
   waits: owner
   runs: a-report-stands
-  asks: Does the last thing the owner said open a discussion in their own words, past a question you answer yourself, and does this same message carry the report with the table What the agent needs above the stop line?
-  says: The owner opens a discussion, and the report stands in this message, so this turn ends and waits.
+  asks: Does the last thing the owner said open a discussion in their own words, past a question you answer yourself, and does a message of this turn carry the report with the table What the agent needs? Where one already carries it, send the stop line alone.
+  says: The owner opens a discussion, and the report stands in this turn, so this turn ends and waits.
 
 - id: the-owner-says-carry-on
   side: continue

@@ -444,10 +444,11 @@ spawns at that turn's end.
 ## A talk follows a report
 
 A stop line with no report above it tells the owner nothing to talk about.
-So `the-owner-asks-to-talk` runs `a-report-stands`: the message ending the
-turn carries the needs table, or the claim fires nothing and the turn holds.
-The report and the line stand in one message, because the owner's view shows
-the last message alone.
+So `the-owner-asks-to-talk` runs `a-report-stands`: a message of this turn
+carries the needs table, or the claim fires nothing and the turn holds. The
+owner's view shows every message of the turn. A missing stop line comes alone
+in the next message, and the report stands once. An owner's prompt
+opens a new turn, and the report before it counts no more.
 
 The band table puts `90` to `100` in the owner's hands. A claim about the agent's
 own work stands there today, and it overrides every check reading the branch. The

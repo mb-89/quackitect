@@ -15,6 +15,7 @@ import {
   TOOLS,
 } from "../../src/bridge/stop.js";
 import { STOP_CALL } from "../../.claude/skills/level0/lib/stop.js";
+import { onPromptSubmit } from "../../src/bridge/answer.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -214,6 +215,25 @@ test("a talk stop ends the turn only where the same message carries the report",
     false,
     "a heading with no row is no report",
   );
+});
+
+// A report an earlier message of this turn carries stands, so the stop line comes alone; an owner's prompt opens a turn with none. [[spec/design_output/stop#a-talk-follows-a-report]]
+test("a stop line alone passes the talk where this turn's report stands, and a prompt clears it", () => {
+  const report = [
+    "The work stands here.",
+    "",
+    "# What the agent needs",
+    "",
+    "| No. | question | proposed answer |",
+    "|---|---|---|",
+    "| 1 | which road | the short one |",
+  ].join("\n");
+  const line = { last_assistant_message: "stop: the-owner-asks-to-talk" };
+  const it = box();
+  assert.ok(onStop({ last_assistant_message: report }, it.box).result?.block);
+  assert.deepEqual(onStop(line, it.box), { pass: true });
+  onPromptSubmit({ origin: { kind: "composer" }, text: "go on" }, it.box);
+  assert.match(onStop(line, it.box).result.block, /a-report-stands answers false/);
 });
 
 // A claim of done meets the plan: a todo open or a thing in hand holds the turn, and an empty plan lets it end. [[spec/design_output/stop#the-plan]]
