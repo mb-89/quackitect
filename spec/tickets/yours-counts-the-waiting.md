@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -141,6 +141,10 @@ record:
     hash_after: 7915d57a4880c6c41e394c5bef55582c7e01aea6
     returns: 1
     why: "`waiting` reads only the leaf's own `by`, so a person step inherited from a parent goes uncounted; call `stepPathOf` and `leafOf` in src/scripts/pull-route.js, which resolve the nearest `by`; `frontIn` repeats `frontOf` in src/engine/group.js, and `ticketsHere` already carries `front`; the tagged-then-score order repeats the pools of `handOut` in src/scripts/pull-hand.js, so the two drift; no case sets `by: person` on a parent step and asserts the ticket counts; `./RUNME.sh check` exits 0, and queue.test.js with ticket-yours.test.js pass"
+  - step: implement/reflect
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: e5e9ecf1e1d6f0f17f0aad0c9af056e4aa2c8a4c
+    hash_after: e5e9ecf1e1d6f0f17f0aad0c9af056e4aa2c8a4c
 ---
 
 # Ask
@@ -266,11 +270,19 @@ Every case fails on its own assertion, with the verb unknown and `waiting` a stu
 
 <!-- the form is text -->
 
+The findings share one class: the change rebuilt a reading the pull already owns. The hand a leaf admits, the front of a ticket, and the queue order each stand in one home. The fix for the class is to call that home, and to lift the order into one function both roads call.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The fix touches the verb's module, the pull's order, and the cases.
+- every door the change reaches has a fake. The new case drives the fake disk.
+- a comment names the approach the change implements. The lifted function points at the queue's note.
+
 
 ## change
 
