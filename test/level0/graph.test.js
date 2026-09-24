@@ -144,3 +144,53 @@ test("a ticket reads through its frontmatter, and a process through its file", (
 test("a route nobody hands it answers an empty graph", () => {
   assert.deepEqual(graphOf(null), { nodes: [], edges: [] });
 });
+
+// [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
+const TICKET = `---
+kind: [[ticket]]
+steps:
+  - name: design
+    steps:
+      - name: draft
+        does: writes the approach
+      - name: review
+        does: reads the approach
+  - name: do
+    does: makes the change
+step: design/draft
+---
+
+# Ask
+
+A thing.
+
+# design
+
+## draft
+
+### approach
+
+## review
+
+# Discussion
+`;
+
+test("each node a ticket's body holds names its chapter and its line", () => {
+  const graph = graphIn(TICKET);
+  assert.deepEqual(
+    graph.nodes.map((one) => [one.id, one.chapter, one.line]),
+    [
+      ["design", "# design", 19],
+      ["design/draft", "## draft", 21],
+      ["design/review", "## review", 25],
+      ["do", undefined, undefined],
+    ],
+  );
+});
+
+test("a node drawn from a bare process carries no place", () => {
+  for (const one of drawn().nodes) {
+    assert.equal(one.chapter, undefined, `${one.id} carries no chapter`);
+    assert.equal(one.line, undefined, `${one.id} carries no line`);
+  }
+});

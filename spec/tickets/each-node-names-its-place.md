@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -105,6 +105,17 @@ record:
     hand: box 2bc65ec92430 · claude-code-remote · helper-2
     hash_before: e80e872ef031cc568b9740c37f4a37a6128cf0bf
     hash_after: e80e872ef031cc568b9740c37f4a37a6128cf0bf
+  - step: implement/tests-red
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: a587c08a244752dcd56db7e1b9d0854389d81df7
+    hash_after: a587c08a244752dcd56db7e1b9d0854389d81df7
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -189,17 +200,28 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/graph.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The ticket case fails on its own assertion, since no node carries a place yet. The bare process case passes already, and it holds that road while the change lands. A leaf whose chapter the body lacks, `do` here, carries no place either.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The cases join the graph's own test file.
+- every door the change reaches has a fake. The emitter reads text alone, and reaches no door.
+- a comment names the approach the change implements. The new cases point at the design input.
+
 
 ## reflect
 
