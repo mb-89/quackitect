@@ -192,7 +192,7 @@ export function onStop(e, box) {
   if (shaped.result) return shaped;
   const rules = rulesOf(box);
   const text = String(e?.last_assistant_message ?? "");
-  const claimed = box.claim ?? lastLineReason(text);
+  const claimed = claimOf(e, box);
   box.claim = null;
   // The hold that stood over this turn, so the order the two events arrive in decides nothing. [[spec/design_output/stop#the-hold-outlives-its-drop]]
   const hold = holdHere(box);
@@ -251,6 +251,20 @@ function asksForStop(rules, why, box) {
     ...stopReasons(rules).map((one) => `  ${one.id}: ${one.asks}`),
     bindingLine(box),
   ].join("\n");
+}
+
+// The turn's claim: the stop call's reason, or the last line's. [[spec/design_output/stop#the-claim-rides-the-call]]
+export function claimOf(e, box) {
+  return box.claim ?? lastLineReason(String(e?.last_assistant_message ?? ""));
+}
+
+// A turn ending on a rule under `waits: owner` waits for the owner's answer. [[spec/tickets/the-clear-keeps-questions]]
+export function waitsForOwner(e, box) {
+  const claimed = claimOf(e, box);
+  return (
+    Boolean(claimed) &&
+    rulesOf(box).some((one) => one.id === claimed && one.waits === "owner")
+  );
 }
 
 function lastLineReason(text) {

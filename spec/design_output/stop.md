@@ -288,6 +288,7 @@ switches it off.
 | the case | what the door does |
 |---|---|
 | a session writes no handover | lets go past `stop.mostInARow` asks, and the log says so at `warn` |
+| a turn ends on a rule under `waits: owner` | holds the clear, and the tooth votes. The session stays due, and the next turn's end clears |
 | the person breaks off a turn | asks for no clear |
 | a fill past `context.writeAt` | caps the finish, because each call past the first key costs the most in the conversation. The key at zero, or under `context.handoverAt`, adds no second stage |
 | a handover names a file under `.se/.retro` | holds the turn's end until the handover names the ticket or the class by its name. The retro alone reads that folder, and a file there costs the next conversation a whole read. The log says so at `warn` |

@@ -12,6 +12,8 @@
 #          where the check reads the tree and the claim reads the agent.
 # beside   the check reads a hand's work beside the agent, so no claim yields
 #          to it, and the priorities decide.
+# waits    owner marks a stop waiting on the owner's answer, which holds the
+#          context clear until the next turn's end.
 # asks    the question the re-prompt puts to the agent.
 # says     the sentence a person or an agent reads.
 
@@ -19,6 +21,7 @@
   side: stop
   priority: 100
   decides: claimed
+  waits: owner
   runs: a-report-stands
   asks: Does the last thing the owner said open a discussion in their own words, past a question you answer yourself, and does this same message carry the report with the table What the agent needs above the stop line?
   says: The owner opens a discussion, and the report stands in this message, so this turn ends and waits.
@@ -33,6 +36,7 @@
   side: stop
   priority: 95
   decides: claimed
+  waits: owner
   runs: chat-is-new
   asks: Is this the opening turn of a chat where nobody has said what to do yet?
   says: The chat is new and a person stands at this box, so this turn ends and asks.
@@ -41,6 +45,7 @@
   side: stop
   priority: 90
   decides: claimed
+  waits: owner
   runs: a-person-sits-here
   yields: true
   asks: Would a wrong answer here reach past this branch, so no later commit undoes it? A cloud box answers it instead, so claim this from a desk alone.

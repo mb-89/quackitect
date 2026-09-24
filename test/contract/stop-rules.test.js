@@ -7,7 +7,12 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { pool } from "../../.claude/skills/level0/lib/stop.js";
-import { ENGINE_CHECKS, knowsCheck, standsDown } from "../../src/bridge/stop.js";
+import {
+  ENGINE_CHECKS,
+  knowsCheck,
+  standsDown,
+  waitsForOwner,
+} from "../../src/bridge/stop.js";
 import { disk } from "../../src/doors/disk.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -48,6 +53,26 @@ test("the helper stop stands over the plan, and yields to no check", () => {
 // The owner asks for an update through the report, so no stop rule claims one. [[spec/design_output/stop#a-check-beats-a-claim]]
 test("no stop rule claims an update", () => {
   assert.equal(by("an-update-is-worth-giving"), undefined);
+});
+
+// A stop waiting on the owner holds the clear, and a claim of done waits for nobody. [[spec/tickets/the-clear-keeps-questions]]
+test("the stops asking the owner wait for the owner, and a claim of done waits for nobody", () => {
+  const box = { stopRules: rules };
+  const ends = (reason) => ({ last_assistant_message: `Text.\n\nstop: ${reason}` });
+  for (const id of [
+    "the-owner-asks-to-talk",
+    "the-chat-is-new",
+    "a-wrong-answer-leaves-the-box",
+  ]) {
+    assert.equal(waitsForOwner(ends(id), box), true, id);
+  }
+  assert.equal(waitsForOwner(ends("the-work-stands-complete"), box), false);
+  assert.equal(waitsForOwner({ last_assistant_message: "No line." }, box), false);
+  assert.equal(
+    waitsForOwner({}, { ...box, claim: "the-chat-is-new" }),
+    true,
+    "the call's claim",
+  );
 });
 
 // [[spec/design_output/stop#the-blast-radius-decides]]
