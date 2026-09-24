@@ -95,12 +95,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
     hash_before: a3a8a31febf0c81458ac97b0041d5b4132762795
     hash_after: a3a8a31febf0c81458ac97b0041d5b4132762795
+  - step: design/review
+    hand: box 2bc65ec92430 · claude-code-remote · helper-2
+    hash_before: 6452e5465edc274fa4e610b7924846048c479bd6
+    hash_after: 6452e5465edc274fa4e610b7924846048c479bd6
 ---
 
 # Ask
@@ -174,6 +178,12 @@ The exit is 0 on every road, since nothing waiting is an answer.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- `--count` counts open tickets whose pointed leaf carries `by: person`, as the ask calls for
+- `--next` orders through `sorted` over `weighing`, which calls `queued` in pull-queue.js
+- `ticketsHere`, `sorted` and `weighing` stand unchanged, so every caller keeps its road
 
 # implement
 
