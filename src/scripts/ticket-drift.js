@@ -3,13 +3,8 @@
 // names that version, and the git history holds it.
 // [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
 
-import {
-  canonicalOf,
-  entriesIn,
-  processHash,
-  readYaml,
-} from "../../.claude/skills/level0/lib/schema.js";
-import { reachedOf } from "./ticket-route.js";
+import { entriesIn, processHash, readYaml } from "../../.claude/skills/level0/lib/schema.js";
+import { fieldsOf, reachedOf, sameStep } from "./ticket-route.js";
 
 // The steps a ticket's version of its process held, off the first commit whose file answers the hash, or null. [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
 export function baseOf(git, path, hash) {
@@ -46,8 +41,7 @@ export function driftOf(front, base) {
 }
 
 function same(one, was) {
-  const plain = (entry) => (entry.leaf ? entry.said : { ...entry.said, steps: undefined });
-  return (
-    JSON.stringify(canonicalOf(plain(one))) === JSON.stringify(canonicalOf(plain(was)))
-  );
+  return one.leaf
+    ? sameStep(one.said, was.said)
+    : sameStep(fieldsOf(one.said), fieldsOf(was.said));
 }

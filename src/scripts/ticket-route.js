@@ -39,7 +39,7 @@ export function aheadOnly(front, steps) {
   const leaves = fresh.filter((one) => one.leaf);
   for (const [i, one] of held.entries()) {
     const got = leaves[i];
-    if (got?.path === one.path && same(got.said, one.said)) continue;
+    if (got?.path === one.path && sameStep(got.said, one.said)) continue;
     return {
       why: `${one.path} stands reached, so the route opens on it as it stood. Edit the steps past the pointer.`,
       at: one.path,
@@ -50,7 +50,7 @@ export function aheadOnly(front, steps) {
   for (const one of old.filter((it) => !it.leaf)) {
     if (!held.some((leaf) => leaf.path.startsWith(`${one.path}/`))) continue;
     const got = byPath.get(one.path);
-    if (got && same(fieldsOf(got.said), fieldsOf(one.said))) continue;
+    if (got && sameStep(fieldsOf(got.said), fieldsOf(one.said))) continue;
     return {
       why: `${one.path} holds a reached leaf, so it keeps every field but steps.`,
       at: one.path,
@@ -92,11 +92,13 @@ function answer(code, said) {
   return code;
 }
 
-function fieldsOf(said) {
+// A phase's own fields, past the steps it holds. [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
+export function fieldsOf(said) {
   const { steps: _steps, ...rest } = said ?? {};
   return rest;
 }
 
-function same(a, b) {
+// Two steps read the same where their canonical forms match. [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
+export function sameStep(a, b) {
   return JSON.stringify(canonicalOf(a)) === JSON.stringify(canonicalOf(b));
 }

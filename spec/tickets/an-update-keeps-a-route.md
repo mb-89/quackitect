@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [the-route-edits-ahead]
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -142,6 +142,10 @@ record:
     hash_after: 3f82e33b1c23311c3df3b8002fee3b7652bf5b5a
     returns: 1
     why: test/level0/ticket-drift.test.js repeats `heard`, which test/level0/pull-doors.js already exports; `same` in ticket-drift.js repeats the canonical compare of `same` in ticket-route.js, so export that one; the refusals, the reached leaf and `--over` each carry a case that fires, and nothing else strays; `./RUNME.sh check` exits 0, and ticket-drift, ticket-verb and roots tests pass
+  - step: implement/reflect
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 24d9c55f0d10dd7d14ea3e9c1651b4a3b0bed8c5
+    hash_after: 24d9c55f0d10dd7d14ea3e9c1651b4a3b0bed8c5
 ---
 
 # Ask
@@ -260,11 +264,22 @@ The drift, the missing version and `driftOf` fail on their own assertion. The co
 
 <!-- the form is text -->
 
+The findings share one class: a helper the tree already owns stands copied in the change. The fix for the class is to import the owner:
+
+- `sameStep` and `fieldsOf` leave `src/scripts/ticket-route.js` as exports
+- the cases import `heard` from `test/level0/pull-doors.js`
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The fix touches the drift module, the route module's exports, and the drift cases.
+- every door the change reaches has a fake. The cases drive the same fakes.
+- a comment names the approach the change implements. The comments stand.
+
 
 ## change
 

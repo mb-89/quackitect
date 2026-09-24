@@ -8,7 +8,7 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { verbs } from "../../src/scripts/cli.js";
 import { ticket } from "../../src/scripts/ticket.js";
-import { aheadOnly, reachedOf } from "../../src/scripts/ticket-route.js";
+import { aheadOnly, fieldsOf, reachedOf, sameStep } from "../../src/scripts/ticket-route.js";
 import { TICKET_SCHEMA } from "./fixtures.js";
 
 const ROOT = "/tree";
@@ -232,4 +232,13 @@ test("a ticket standing nowhere is refused with exit 1, as JSON naming the folde
   const said = JSON.parse(ran.said);
   assert.match(said.refused, /nowhere names no ticket under .* or spec\/tickets/);
   assert.equal(said.at, "");
+});
+
+test("sameStep reads past key order, and fieldsOf drops a phase's steps", () => {
+  assert.equal(sameStep({ name: "a", does: "b" }, { does: "b", name: "a" }), true);
+  assert.equal(sameStep({ name: "a", does: "b" }, { name: "a", does: "c" }), false);
+  assert.deepEqual(fieldsOf({ name: "p", reads: "r", steps: [{ name: "x" }] }), {
+    name: "p",
+    reads: "r",
+  });
 });

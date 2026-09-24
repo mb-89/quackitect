@@ -12,6 +12,7 @@ import { fakeGit } from "../../src/doors/fake/git.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { driftOf } from "../../src/scripts/ticket-drift.js";
 import { TICKET_SCHEMA } from "./fixtures.js";
+import { heard } from "./pull-doors.js";
 
 const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
@@ -70,20 +71,6 @@ function history(versions) {
     answers[`git show ${sha}:${PROCESS}`] = { exitCode: 0, stdout: text };
   }
   return fakeGit(answers);
-}
-
-function heard(what) {
-  const lines = [];
-  const wasLog = console.log;
-  const wasError = console.error;
-  console.log = (...said) => lines.push(said.join(" "));
-  console.error = (...said) => lines.push(said.join(" "));
-  try {
-    return { code: what(), said: lines.join("\n") };
-  } finally {
-    console.log = wasLog;
-    console.error = wasError;
-  }
 }
 
 function updating(text, versions, flags = []) {
