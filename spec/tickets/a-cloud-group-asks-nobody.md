@@ -94,7 +94,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: c1784e141f3fe804dcc2f04470a25a0ed880cf09
+    hash_after: c1784e141f3fe804dcc2f04470a25a0ed880cf09
 ---
 
 # Ask
@@ -123,17 +128,39 @@ Without it a child at a person step stands in the cloud with nobody to answer it
 
 <!-- the form is text -->
 
+A tree rule `GroupAsksNobody` joins `RULES` in `.claude/skills/level0/lib/tree.js`, which the check runs at error. It reads every ticket under `spec/tickets`, and names one where all three hold:
+
+- the ticket stands open, and names a `group`
+- that group stands open
+- the step the ticket stands at reads `by: person`
+
+| part | what it does |
+|---|---|
+| the finding | names the ticket and its step, and says to run `./RUNME.sh branch unblock <ticket> <successor>` |
+| an unblocked child | closes `became`, so the rule passes it |
+| the module | stands beside `tree.js`, because that file stands near the line ceiling |
+| the leaf reader | the one `branch unblock` uses. The implement step moves it from `src/scripts` into `lib`, and both callers import it there |
+| the design | [[spec/design_output/work#a-person-step-leaves]] gains one line: the check holds an open group to no person step |
+| a cloud box | answers the step itself, so its group passes the rule |
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `.claude/skills/level0/lib/tree.js`, `treeFaults`, which runs `RULES`
+- `src/scripts/cli-check.js`, the check, which reports the tree faults
+- `src/scripts/work-unblock.js`, `unblock`, which reads the leaf through `leafOf` and `stepPathOf`
+- `src/scripts/pull.js`, `leafOf` and `stepPathOf`, where the leaf reader stands
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first draft
 
 ## review
 
