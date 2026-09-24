@@ -107,6 +107,16 @@ fix costs a line, and a reader tells it from the ask at a glance.
 A deeper fix costs the ask. It buries the work somebody asked for under work
 nobody asked for. So it becomes a finding, and the code stands.
 
+A warning marks a break of form, and the write lands over it. The door puts
+the rows on the refactoring hand's list, and the hand drains that list once it
+stands past its number. For details, see
+[[spec/design_output/level0#a-warning-feeds-the-list]].
+
+Sessions still wrote the same file again to clear its warning, since a warning
+looked like a trivial fault tripped over. Each rewrite cost a round trip, and
+the ask waited behind form the hand cleans anyway. So a warning stands, the
+work goes on, and the retro reads the list for what the next session learns.
+
 ## 11. The owner reads an ask
 
 An ask leaving for the cloud becomes the whole job of a session nobody watches.

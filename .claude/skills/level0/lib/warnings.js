@@ -68,7 +68,7 @@ export function rowOf(one) {
 // What the agent reads after a write lands with a warning: the rows, and that the work goes on. [[spec/design_output/level0#a-warning-feeds-the-list]]
 export function warnedNote(file, found, standing) {
   return [
-    `${found.length} line(s) of ${file} stand at warning, and the write lands. The refactoring hand drains them, so carry on.`,
+    `${found.length} line(s) of ${file} stand at warning, and the write lands. The refactoring hand drains them, so leave the lines as they stand and carry on with the ask.`,
     ...found.map((one) => `  ${rowOf(one)}`),
     `The list holds ${standing} row(s) now.`,
   ].join("\n");

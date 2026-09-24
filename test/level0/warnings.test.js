@@ -149,10 +149,10 @@ test("a write's warnings replace the file's rows on the list, and leave the othe
 });
 
 // [[spec/design_output/level0#a-warning-feeds-the-list]]
-test("the note after a write names each row, and says the work goes on", () => {
+test("the note after a write names each row, and says the lines stand while the ask goes on", () => {
   const said = warnedNote("a.md", [found("a.md", "warning")], 3);
   assert.match(said, /1 line\(s\) of a\.md stand at warning, and the write lands/);
-  assert.match(said, /carry on/);
+  assert.match(said, /leave the lines as they stand and carry on with the ask/);
   assert.match(said, /a\.md:3 Hedge: Cut the hedge\./);
   assert.match(said, /3 row\(s\) now/);
   assert.equal(rowOf(found("a.md", "warning")), "a.md:3 Hedge: Cut the hedge.");
