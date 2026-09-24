@@ -1349,8 +1349,8 @@ the command door reads `command`.
 
 A helper on the model of the session costs that model for work a lighter one
 does. So the session weighs the work it hands, and the `Agent` call names the
-model of that tier. The door enforces that a model is named, and the session
-picks it.
+model of that tier. The door refuses a call naming no model, and the session
+picks the model.
 
 | tier | the work | the model in `spec/config/level0.json` |
 |---|---|---|
