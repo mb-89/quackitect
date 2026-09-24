@@ -94,7 +94,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 57af1b3bc0e245a60f3dd550001d5832a0c0bab2
+    hash_after: 57af1b3bc0e245a60f3dd550001d5832a0c0bab2
 ---
 
 # Ask
@@ -124,17 +129,38 @@ Without it the clear drops the question, the next session carries on blind, and 
 
 <!-- the form is text -->
 
+The handover gains a phase `asked` between `clear` and the clear itself. `src/bridge/handover.js` holds it.
+
+| piece | how |
+|---|---|
+| which stops wait | a rule key `waits: owner` in `spec/config/stop/level0.yml`, on `the-owner-asks-to-talk`, `a-wrong-answer-leaves-the-box` and `the-chat-is-new` |
+| the hold | `clearsAfter` reads the turn's claim. A rule under `waits: owner` moves the phase to `asked`, keeps the question, and asks for no clear |
+| the question | the table under What the agent needs in the turn's last message, or its last lines where no table stands |
+| the answer | the owner's next prompt appends one row to `.se/HANDOVER.md`: the question, and the prompt's text |
+| the clear | that turn's end clears, and the next conversation reads the row |
+| every other stop | clears at `context.handoverAt`, as the phase `clear` does now |
+
+A prompt of the plugin's own leaves the phase standing, so the tooth's re-prompt carries no answer. `stop#the-context-hands-over` gains the phase as a row.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/bridge/handover.js`, `clearsAfter` and `holdsForHandover`, which move the phase
+- `src/bridge/server.js`, `endsTurn`, which calls `clearsAfter`
+- `src/bridge/server.js`, `submitsPrompt`, which gains the answer's row
+- `src/bridge/stop.js`, `onStop`, which holds the turn's claim
+- `.claude/skills/level0/lib/stop.js`, `pool`, which reads the new rule key
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first draft
 
 ## review
 
