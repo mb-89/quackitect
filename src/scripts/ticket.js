@@ -24,6 +24,7 @@ import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
 import { emptyGroup } from "./pull-hand.js";
 import { landedAlone } from "./pull-landed.js";
+import { COMMENT } from "./pull-route.js";
 import { baseOf, driftOf } from "./ticket-drift.js";
 import { filled } from "./ticket-fill.js";
 import { reachedOf, routed } from "./ticket-route.js";
@@ -208,7 +209,7 @@ function said(it, kind, line, more) {
 
 // [[spec/design_output/pull#a-draft-opens]]
 export function askLines(ask) {
-  return (ask?.own ?? []).filter((row) => !/^\s*<!--.*-->\s*$/.test(row));
+  return (ask?.own ?? []).filter((row) => !COMMENT.test(row));
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]

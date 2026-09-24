@@ -83,3 +83,11 @@ test("fill over a path standing nowhere refuses with exit 2", () => {
   assert.equal(ran.code, 2);
   assert.match(ran.said, /names no ticket/);
 });
+
+test("fill over a ticket naming a process standing nowhere refuses, and names what stands", () => {
+  const lost = SAVED.replace("spec/processes/trivial", "spec/processes/lost");
+  const said = filled(lost);
+  assert.equal(said.code, 2);
+  assert.match(said.said, /holds no lost\. It holds trivial/);
+  assert.equal(said.now, lost);
+});

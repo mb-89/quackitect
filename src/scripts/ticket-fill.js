@@ -7,11 +7,11 @@
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { processAt, withRoute } from "./process.js";
+import { askLines } from "./ticket.js";
 
 const STDOUT = "--stdout";
 // The chapters a person writes before the fill, which ride into the mint as they stand. [[spec/schemas/ticket.schema.yaml]]
 const WRITTEN = ["Ask", "Discussion"];
-const COMMENT = /^\s*<!--.*-->\s*$/;
 
 // [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
 export function filled(it, at, argv, schemas) {
@@ -56,9 +56,5 @@ export function filled(it, at, argv, schemas) {
 
 function chapterText(sections, header) {
   const one = sections.find((it) => it.level === 1 && it.header === header);
-  if (!one) return "";
-  return one.own
-    .filter((row) => !COMMENT.test(row))
-    .join("\n")
-    .trim();
+  return askLines(one).join("\n").trim();
 }

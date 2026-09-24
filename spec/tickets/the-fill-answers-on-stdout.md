@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -141,6 +141,10 @@ record:
     hash_after: 9c2490bd40b89cd06cfa66ce244872b21f686920
     returns: 1
     why: "`src/scripts/ticket-fill.js` redefines `COMMENT`, which `src/scripts/pull-route.js` exports already. Import it from there.; `chapterText` repeats the comment filter `askLines` in `src/scripts/ticket.js` owns. Call `askLines` and join its rows.; No case feeds a process standing nowhere, so the `withRoute` refusal runs with no test.; `test/contract/work-buttons.test.js` swaps a path for a link in one comment, a trivial fix past the ask.; The ask holds otherwise. `--stdout` prints the minted text and writes nothing, and `./RUNME.sh check` exits 0."
+  - step: implement/reflect
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 9241f88ff5db3b9b37df6e9760ae9295d4e4fb9c
+    hash_after: 9241f88ff5db3b9b37df6e9760ae9295d4e4fb9c
 ---
 
 # Ask
@@ -269,11 +273,19 @@ Every case fails on its own assertion, with the verb unknown. The cases stand in
 
 <!-- the form is text -->
 
+The findings share one class: the change wrote a reading the tree owns already, and left one refusal road without a case. The fix for the class is to import the owner, and to give each refusal the approach names a case. `askLines` in `src/scripts/ticket.js` now reads `COMMENT` too, so one pattern holds the tree.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The fix touches the fill module, the one filter in the ticket verb, and the fill cases.
+- every door the change reaches has a fake. The new case drives the fake disk.
+- a comment names the approach the change implements. The comments stand.
+
 
 ## change
 
