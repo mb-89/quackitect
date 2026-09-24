@@ -94,7 +94,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -110,6 +110,12 @@ record:
     hand: box d6f05e3a585030 · claude-code
     hash_before: 7dd55aee982403aa9c9a844fbc6aa06e61d7adb9
     hash_after: 7dd55aee982403aa9c9a844fbc6aa06e61d7adb9
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-4
+    hash_before: ea321d5ab1e882eac3d71b40f17cd76b9b91b1a7
+    hash_after: ea321d5ab1e882eac3d71b40f17cd76b9b91b1a7
+    returns: 2
+    why: "`onStop` writes `box.handover.waits`, and `box.handover` stands null outside a context handover, so the write throws.; `the-chat-is-new` ends nearly every chat's first turn, so this null case is the common path, not an edge case.; A door that throws answers pass, per `server.js`, so the turn's stop decision skips, and the turn holds unended.; A guard creating `box.handover` fresh makes `measures` in `handover.js` treat it as a handover due, and skip the real one.; The approach leaves this failure mode unnamed, and the callers list wants a guard for `box.handover` standing null.; `onStop` now saves the claimed reason past its own reset, answering the earlier read of null.; `submitsPrompt` moves the phase back, and `stopReasons` carries `waits` through to the reader."
 ---
 
 # Ask
@@ -183,15 +189,13 @@ A prompt of the plugin's own leaves the phase standing, so the tooth's re-prompt
 
 fail
 
-- `stop.js`'s turn-end vote resets `box.claim` to null right after it reads the reason.
-- `classic.Stop` fires that vote before `turn.complete` fires the clear step in `handover.js`, so `box.claim` reads null there.
-- The approach has the clear step read the turn's claim, and no claim survives that far.
-- Ask line one fails this way: no live claim tells the clear step to hold the clear.
-- The callers list credits the turn-end vote with holding the claim, not with saving it past its own reset.
-- The callers list names no place that moves the phase from asked back to clear.
-- `pool` loads a rule's fields as written, and nothing yet reads the new `waits` key.
-- The prompt split by `e.mine` matches the pattern the turn counter already uses for a prompt, and holds.
-- The clear still gates on the queue-binding check in `handover.js`, so `engine.binding` at queue still governs it.
+- `onStop` writes `box.handover.waits`, and `box.handover` stands null outside a context handover, so the write throws.
+- `the-chat-is-new` ends nearly every chat's first turn, so this null case is the common path, not an edge case.
+- A door that throws answers pass, per `server.js`, so the turn's stop decision skips, and the turn holds unended.
+- A guard creating `box.handover` fresh makes `measures` in `handover.js` treat it as a handover due, and skip the real one.
+- The approach leaves this failure mode unnamed, and the callers list wants a guard for `box.handover` standing null.
+- `onStop` now saves the claimed reason past its own reset, answering the earlier read of null.
+- `submitsPrompt` moves the phase back, and `stopReasons` carries `waits` through to the reader.
 
 <!-- the form is verdict -->
 
