@@ -95,7 +95,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: b4915f89595781fc657a7e01b1bd0c11231fa55d
+    hash_after: b4915f89595781fc657a7e01b1bd0c11231fa55d
 ---
 
 # Ask
@@ -124,17 +129,37 @@ A click on a node lands nowhere, and the drawing group's edits-and-clicks child 
 
 <!-- the form is text -->
 
+`graphIn` reads a note's sections where the text opens on frontmatter, and hands them to `graphOf`. Each node whose chapter stands in the body carries two keys:
+
+| the key | what it holds |
+|---|---|
+| `chapter` | the heading as the body writes it, such as `## draft` |
+| `line` | the heading's line in the file, counted from one |
+
+A process file holds no body, so its nodes carry neither key. A node whose chapter stands nowhere in the body carries neither key too.
+
+`sectionAt` finds a step's heading in `src/scripts/pull-chapter.js` today, and that file imports the voice doors. So `sectionAt` moves into `.claude/skills/level0/lib/schema-read.js` beside `readNote`, and `pull-chapter.js` imports it from there. The extension loads the emitter, so the emitter keeps off the voice doors.
+
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/scripts/cli.js` `drawing`, which prints the graph unchanged
+- `src/extension/lib/drawing.js` the emitter read, which hands the graph to the editor unchanged
+- `src/scripts/pull-chapter.js` `writeField` and the checklist read, which call `sectionAt` from its new home
+
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first draft
+
 
 ## review
 
