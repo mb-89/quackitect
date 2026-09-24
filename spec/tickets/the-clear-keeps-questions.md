@@ -94,7 +94,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -141,6 +141,17 @@ record:
     hash_after: 71c064e652a1d39630a6a9bfc5b107beb26d2b62
     answered:
       - name: lint
+        exit: 0
+        said: "src/bridge/refactor-hand.js:142:55: Modal: This register holds the modals can, must, will. Say what is, or name the one "
+  - step: implement/tests-green
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 62e958a90be0176f99b731713608a16bdadd8574
+    hash_after: 62e958a90be0176f99b731713608a16bdadd8574
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 33 test(s) pass in 3 file(s)
+      - name: check
         exit: 0
         said: "src/bridge/refactor-hand.js:142:55: Modal: This register holds the modals can, must, will. Say what is, or name the one "
 ---
@@ -308,11 +319,15 @@ The handover door moves the phase to clear on any claim, so a waiting stop clear
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/level0/context-handover.test.js test/level0/handover-wiring.test.js test/contract/stop-rules.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -320,11 +335,17 @@ The handover door moves the phase to clear on any claim, so a waiting stop clear
 
 <!-- the form is text -->
 
+A turn ending on a stop that waits for the owner holds the context clear. The handover door lets the tooth vote there, and the session stays due. The next turn's end clears. Three stop rules carry `waits: owner`.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the draft names
+- the tests read fake disks and a fake log
+- `handover.js` names this ticket beside the change
 
 # verdict
 
