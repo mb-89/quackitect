@@ -58,6 +58,7 @@ steps:
       - every experiment stands decided, which `retro audit` answers
       - every refusal teaches the hand, and no hand retries it blind
       - the battery's report reads beside the last retro's, and each part that grows has a finding, as [[spec/guidance/retro/effect]] asks
+      - the chat's answers score under `answer.ceiling` in `spec/config/level0.json`, which `./RUNME.sh voice measure --transcripts` over the window's transcripts answers
     evidence:
       - name: audits
         form: list

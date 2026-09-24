@@ -66,8 +66,10 @@ migration branch is the cost to plan for.
 
 # What stands open
 
+The owner rules two questions. The canary stays, because it is how a session
+proves what the client loads. The voice measurement runs in the retro, as an
+item of the audit's checklist in `spec/processes/retro.yaml`.
+
 | the question | what hangs on it |
 |---|---|
-| what breaks when Claude Mods lands | the declarations move, and one branch pays the migration |
-| whether the canary stays once the client names what loads | `InstructionsLoaded` reads `CLAUDE.md` today, and a plugin's block waits |
-| whether a run of `./RUNME.sh voice measure` shows the chat under the ceiling | the tool stands, and no run stands on record as the close's proof |
+| what breaks when Claude Mods lands | Claude Mods is the name the client's function hooks ship under, the ground the whole plugin stands on. Their author says the API changes between releases, so the declarations move, `test/contract/server-loads.test.js` fails first, and one branch pays the migration |

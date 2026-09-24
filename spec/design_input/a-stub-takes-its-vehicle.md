@@ -4,7 +4,7 @@ kind: [[design_input]]
 
 # Scope
 
-The owner rules three things on top of [[spec/funnel/a-button-makes-a-vehicle]]. This note takes the steps that follow, each with its proof, and the branches an agent works.
+The owner rules three things on top of the ask for one button that makes a vehicle, which [[spec/design_output/vehicle]] now carries built. This note takes the steps that follow, each with its proof, and the branches an agent works.
 
 | ruling | what it settles |
 |---|---|

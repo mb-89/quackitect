@@ -122,7 +122,7 @@ reason: done
 
 Two buttons beside the engine's play and stop marks: one makes a vehicle, one makes a stub, each asking for a folder.
 
-The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group, its proof and what it waits for. The funnel [[spec/funnel/a-button-makes-a-vehicle]] carries the owner's ask.
+The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group, its proof and what it waits for. The design output [[spec/design_output/vehicle]] carries what stands built.
 
 # sync
 

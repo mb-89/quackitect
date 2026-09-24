@@ -144,7 +144,7 @@ reason: done
 
 The extension id, the view id, the display name and the icon read the folder name. So a vehicle and this tree stand side by side in the editor.
 
-The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group, its proof and what it waits for. The funnel [[spec/funnel/a-button-makes-a-vehicle]] carries the owner's ask.
+The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group, its proof and what it waits for. The design output [[spec/design_output/vehicle]] carries what stands built.
 
 # sync
 
