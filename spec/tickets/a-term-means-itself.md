@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -135,6 +135,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box a0ae5042621d · claude-code-remote · helper-7
+    hash_before: aba475be2e88d47fccfb0f45debc4aaa91ea9c3c
+    hash_after: aba475be2e88d47fccfb0f45debc4aaa91ea9c3c
+    returns: 1
+    why: "design: the branch answers each line of the Ask, and `./RUNME.sh check` answers 0.; design: the table writes each stem the old rule wrote, and the cut plus `e` reads as the old cut.; craft: the shape rule passes a `source` holding a comma. The entry splits on it, and the head still reads as an address.; craft: add the shape case the review asks for, a `source` holding a comma, and make the rule refuse it.; craft: the Ask says `source` holds a standard or a paper, and most rows cite a tool home page.; craft: cite a standard or a paper, or drop `source` from each tool row, such as `biome` and `vale`.; craft: `shell` cites the bash manual, and a shell is more than bash, so drop that `source`."
 ---
 
 # Ask
@@ -372,17 +378,40 @@ a quoted value on it. `defines` stays until the refusal child takes it away.
 
 <!-- the form is files -->
 
+- .claude/skills/level0/lib/vocabulary.js
+- spec/config/styles/VoiceShape/VocabularyEntry.yml
+- spec/config/styles/VoiceParagraph/Vocabulary.yml
+- spec/vocabulary/terms.yml
+- test/contract/vocabulary.test.js
+- test/contract/shape.test.js
+- test/level0/vocabulary.test.js
+- spec/design_output/vocabulary.md
+- spec/design_input/the-editor-draws-the-ticket.md
+- spec/tickets/a-term-means-itself.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+- design: the branch answers each line of the Ask, and `./RUNME.sh check` answers 0.
+- design: the table writes each stem the old rule wrote, and the cut plus `e` reads as the old cut.
+- craft: the shape rule passes a `source` holding a comma. The entry splits on it, and the head still reads as an address.
+- craft: add the shape case the review asks for, a `source` holding a comma, and make the rule refuse it.
+- craft: the Ask says `source` holds a standard or a paper, and most rows cite a tool home page.
+- craft: cite a standard or a paper, or drop `source` from each tool row, such as `biome` and `vale`.
+- craft: `shell` cites the bash manual, and a shell is more than bash, so drop that `source`.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the meaning stands in `terms.yml` alone, and the rule and the check read one table of endings
 
 # Discussion
 
