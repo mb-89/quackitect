@@ -94,7 +94,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -116,6 +116,10 @@ record:
     hash_after: ea321d5ab1e882eac3d71b40f17cd76b9b91b1a7
     returns: 2
     why: "`onStop` writes `box.handover.waits`, and `box.handover` stands null outside a context handover, so the write throws.; `the-chat-is-new` ends nearly every chat's first turn, so this null case is the common path, not an edge case.; A door that throws answers pass, per `server.js`, so the turn's stop decision skips, and the turn holds unended.; A guard creating `box.handover` fresh makes `measures` in `handover.js` treat it as a handover due, and skip the real one.; The approach leaves this failure mode unnamed, and the callers list wants a guard for `box.handover` standing null.; `onStop` now saves the claimed reason past its own reset, answering the earlier read of null.; `submitsPrompt` moves the phase back, and `stopReasons` carries `waits` through to the reader."
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 508cdf32b33d17ee68afc13203a241bd0b7672e3
+    hash_after: 508cdf32b33d17ee68afc13203a241bd0b7672e3
 ---
 
 # Ask
@@ -150,7 +154,9 @@ The handover gains a phase `asked` between `clear` and the clear itself. `src/br
 | piece | how |
 |---|---|
 | which stops wait | a rule key `waits: owner` in `spec/config/stop/level0.yml`, on `the-owner-asks-to-talk`, `a-wrong-answer-leaves-the-box` and `the-chat-is-new` |
-| the mark | `onStop` reads the claim before it resets it. A turn ending on a rule under `waits: owner` writes `box.handover.waits`, carrying the question |
+| the mark | `holdsForHandover` writes it, at the turn it moves the phase to `clear`. That door runs ahead of `onStop` on `classic.Stop`, and answers pass there, so `onStop` stays silent on that turn |
+| the claim | `holdsForHandover` reads it through `claimOf`, the reader `onStop` uses, and resets it the same way. A rule under `waits: owner` writes `box.handover.waits`, carrying the question |
+| the guard | the mark stands on a handover at phase `clear` alone. An ordinary turn carries no handover, and nothing clears to hold |
 | the hold | `clearsAfter` reads that mark at `turn.complete`, moves the phase to `asked`, and asks for no clear |
 | the question | the table under What the agent needs in the turn's last message, or its last lines where no table stands |
 | the answer | `submitsPrompt` on the owner's next prompt appends one row to `.se/HANDOVER.md`: the question, and the prompt's text. The phase moves back to `clear` |
@@ -168,7 +174,8 @@ A prompt of the plugin's own leaves the phase standing, so the tooth's re-prompt
 - `src/bridge/handover.js`, `clearsAfter` and `holdsForHandover`, which move the phase
 - `src/bridge/server.js`, `endsTurn`, which calls `clearsAfter`
 - `src/bridge/server.js`, `submitsPrompt`, which gains the answer's row
-- `src/bridge/stop.js`, `onStop`, which writes the mark before it resets the claim
+- `src/bridge/stop.js`, `onStop`, and `claimOf`, the claim reader it shares with the handover door
+- `src/bridge/server.js`, the `classic.Stop` door, which runs `holdsForHandover` ahead of `onStop`
 - `.claude/skills/level0/lib/stop.js`, `pool`, which keeps the new rule key, and `stopReasons`, which the mark reads it through
 
 ### answers
@@ -180,6 +187,8 @@ A prompt of the plugin's own leaves the phase standing, so the tooth's re-prompt
 - the claim reads null at the clear: `onStop` writes the mark before its reset, and the clear reads the mark
 - no place moves the phase back: `submitsPrompt` moves `asked` to `clear` on the owner's prompt
 - nothing reads `waits`: the mark reads it off the claimed rule, through `stopReasons`
+- `box.handover` stands null on an ordinary turn: the mark moves into `holdsForHandover`, where the handover stands at phase `clear`
+- `onStop` runs on no turn that moves the phase: `holdsForHandover` reads and resets the claim there
 
 ## review
 
