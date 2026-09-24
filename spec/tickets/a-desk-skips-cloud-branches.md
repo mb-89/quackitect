@@ -94,7 +94,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 0ed73f5c263eee3034470b49a6259578ee63ad83
+    hash_after: 0ed73f5c263eee3034470b49a6259578ee63ad83
 ---
 
 # Ask
@@ -124,17 +129,35 @@ Without it a desk commits its own work onto a group branch, `main` falls behind,
 
 <!-- the form is text -->
 
+One guard, `onDesk(it, branch)`, stands in `src/scripts` and answers a refusal where the box is a desk and the branch starts `work/`. The desk reads as `it.cloud ?? inCloud(it.env)`, the read `pushed` takes.
+
+| verb | what the guard does |
+|---|---|
+| `ticket pull` | refuses before any read, and names `git switch main` |
+| `./RUNME.sh commit` | refuses before the tests run, so nothing stages |
+| `branch take` | refuses on a desk, because a desk leaves a cloud branch |
+| `branch merge` | runs on `main` alone already, and takes the branch in by a merge |
+
+The design notes change with it. `pull#the-engine-takes-the-branch` drops the desk's road onto a group, and `work` names the guard.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/scripts/pull.js`, `pull`, which reads the branch first
+- `src/scripts/commit-verb.js`, `landsAndPushes`, which runs the tests first
+- `src/scripts/work.js`, `take`, the desk's road onto a group
+- `src/scripts/work-merge.js`, `merge`, which the test drives on a cloud branch
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first draft
 
 ## review
 
