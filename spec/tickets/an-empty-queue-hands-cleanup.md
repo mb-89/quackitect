@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -134,6 +134,17 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 9951f66dfa0c8c708d6625b9280e86b22ef2db78
+    hash_after: 3ccb82f3fe60e5c489d9540509f7c98571e8c2a8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "src/bridge/stop.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 640. Split it by topic."
 ---
 
 # Ask
@@ -292,11 +303,15 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/pull-cleanup.test.js test/level0/pull-hand.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -304,11 +319,17 @@ pass
 
 <!-- the form is text -->
 
+A desk pull meeting no ticket hands out the cleanup: the oldest file on the refactor list, then the check. A skipped ticket or a person's step keeps the pull's wait ahead of the cleanup, so a person's question stays in front. A cloud box hands out no cleanup.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the pull hand and the pull note carry the ask, and the commit adds the lint fixes the check needs
+- the cases hand the disk, git and clock fakes in, and the pull hand's wait reads no new door
+- the call at the pull hand's wait points at the cleanup chapter of the pull note
 
 # verdict
 
