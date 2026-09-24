@@ -79,7 +79,7 @@ process_hash: 3c35c048932fd579
 # Ask
 
 <!-- goal, as text: what these tickets add up to, for the hand that takes them -->
-Every term says what it means in one line of core words and other terms, and the hover shows that line. The doors refuse a term that points at a note in place of a meaning. The plan stands in [[spec/design_input/the-editor-draws-the-ticket#terms-mean-themselves]].
+Every term says what it means in one line of core words and other terms, and the hover shows that line. The dictionary is the source, so the doors refuse a term that points at a note in this tree. A term can cite a source outside the tree. The plan stands in [[spec/design_input/the-editor-draws-the-ticket#terms-mean-themselves]].
 
 # sync
 

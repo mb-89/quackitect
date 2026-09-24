@@ -30,6 +30,7 @@ a test, so the cloud box proves the page with no editor.
 | the drawing's libraries | `@xyflow/react` draws, and `@dagrejs/dagre` lays the graph out |
 | a browser test in the check | the check runs it, and the browser joins the dependencies |
 | the group on terms | it opens now, beside the engine and the drawing |
+| the dictionary | it is the source, and points at nothing inside the tree |
 
 A webview reaches no dev server, so a bundler's live reload buys nothing here.
 
@@ -151,8 +152,10 @@ on nothing.
 
 # The drawing draws a route
 
-Group `the-drawing-draws-a-route` builds this at a cloud box, after the child
-that names each node's place.
+Group `the-drawing-draws-a-route` builds this at a cloud box, and it starts
+beside the engine group. The child for edits and clicks names the engine's
+node-place child under `depends_on`, because a jump needs the chapter and the
+line.
 
 | child | what it adds |
 |---|---|
@@ -179,9 +182,15 @@ runs alone, and the rest wait on the two groups above.
 Group `terms-mean-themselves` builds this at a cloud box, and it waits on
 nothing.
 
+The dictionary is the source of what a term means, so a term points at no
+note in this tree. A note points at a term, and the dictionary points at
+nothing inside the tree. A term can cite a source outside the tree, such as a
+standard or a paper, by its address.
+
 | child | what it adds |
 |---|---|
 | the field | a term carries `means`: one line in core words and other terms, with no link |
-| the refusal | the shape rule and the entry schema refuse `defines` and a link, and `lib/vocabulary.js` words the refusal |
+| the refusal | the shape rule and the entry schema refuse `defines` and a link into the tree, and `lib/vocabulary.js` words the refusal |
+| the outside source | a term carries `source` where it cites an address outside the tree |
 | every term | each term in `spec/vocabulary/terms.yml` carries its line |
 | the hover | the language server shows `means` over a term |

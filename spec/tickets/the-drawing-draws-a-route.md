@@ -79,7 +79,7 @@ process_hash: 3c35c048932fd579
 # Ask
 
 <!-- goal, as text: what these tickets add up to, for the hand that takes them -->
-One web page draws a ticket's route from the graph, and speaks to its host through messages alone. Install bundles it and resolves a browser, and the check drives the page through a fake host in that browser. The plan stands in [[spec/design_input/the-editor-draws-the-ticket#the-drawing-draws-a-route]]. It waits on the node places the engine group adds.
+One web page draws a ticket's route from the graph, and speaks to its host through messages alone. Install bundles it and resolves a browser, and the check drives the page through a fake host in that browser. The plan stands in [[spec/design_input/the-editor-draws-the-ticket#the-drawing-draws-a-route]]. It starts beside the engine group, and the child for clicks waits on the engine's node places.
 
 # sync
 
