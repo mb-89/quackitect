@@ -82,6 +82,7 @@ record:
   - step: sync
     skipped: true
     why: the box runs off the cloud
+    hash_after: ec9ac4efa7d1e3ce82cfe742a5265bbbe18b585e
   - step: split
     hand: box d6f05e3a585030 · claude-code
     hash_before: 59f5ef62a4da20b6365fb3e30222335890ecfebf
