@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -122,6 +122,17 @@ record:
     hash_after: d03a491cc323735a6dc822cb34d3c089aa881304
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 75b8d1a94ab39130e0de8c0c688fc2784547ceb0
+    hash_after: 75b8d1a94ab39130e0de8c0c688fc2784547ceb0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 13 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
