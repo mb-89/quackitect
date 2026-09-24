@@ -96,12 +96,16 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
     hash_before: ad4e1e2e92fc384e7bf4c82c4e74c35b5dd9cc8a
     hash_after: ad4e1e2e92fc384e7bf4c82c4e74c35b5dd9cc8a
+  - step: design/review
+    hand: box a0ae5042621d · claude-code-remote · helper-2
+    hash_before: f713b1b569f92991b3afb4ad19597eb3849db8cc
+    hash_after: f713b1b569f92991b3afb4ad19597eb3849db8cc
 ---
 
 # Ask
@@ -187,6 +191,14 @@ or a link, beside the test the field child adds.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- design: the approach answers each row of the Ask table and each line of Done when.
+- design: every term carries `means` already, because `a-term-means-itself` stands closed.
+- craft: the pieces leave out `VoiceParagraph/Vocabulary.yml`, so project it again, or the check reads it stale.
+- craft: the callers leave out `answerFindings` and `gateNote` in `refuse.js`, which reach `grown` too.
+- craft: the `who` line of the growth entry names the note, so change it with `entry`.
 
 # implement
 
