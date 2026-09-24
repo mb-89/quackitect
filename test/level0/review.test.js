@@ -299,6 +299,15 @@ test("a run naming no failing row falls back to its last lines", () => {
   assert.match(said, /the rules refuse three/);
 });
 
+test("a red spec run answers each failing case once, and leaves the list header out", () => {
+  const said = whatFailed({
+    stdout: "✔ one holds\n✖ two breaks (1ms)\n✖ failing tests:\n✖ two breaks (1ms)\nℹ fail 1\n",
+    stderr: "",
+  });
+
+  assert.equal(said, "✖ two breaks (1ms)");
+});
+
 test("a red lint answers with the lines naming the rule", () => {
   const said = whatFailed({
     stdout: "The rules pass.\nspec/a.md:8:11: PastTense: Write the present tense.\n",

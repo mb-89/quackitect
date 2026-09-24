@@ -136,8 +136,9 @@ export function whatFailed(ran) {
     .split(/\r?\n/)
     .map((one) => one.trim());
 
-  for (const named of [/^not ok \d/, /^[^\s:]+:\d+:\d+: \S+: /]) {
-    const found = lines.filter((one) => named.test(one));
+  // The spec reporter names a failing case after a cross, and prints the list twice, so a case reads once. [[spec/design_output/review#a-worktree-runs-the-check]]
+  for (const named of [/^not ok \d/, /^✖ (?!failing tests)/, /^[^\s:]+:\d+:\d+: \S+: /]) {
+    const found = [...new Set(lines.filter((one) => named.test(one)))];
     if (found.length) return found.slice(0, LOUD).join("\n");
   }
   return lines.filter(Boolean).slice(-LOUD).join("\n");
