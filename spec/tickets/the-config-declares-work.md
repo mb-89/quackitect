@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [yours-counts-the-waiting]
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -116,6 +116,17 @@ record:
     hand: box 2bc65ec92430 · claude-code-remote · helper-4
     hash_before: 1187943e82a7c89dfe3ac40a6718da3f1e298883
     hash_after: 1187943e82a7c89dfe3ac40a6718da3f1e298883
+  - step: implement/tests-red
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 9a633c5d89fd375a49ca09224b984b7ec490c5e5
+    hash_after: 9a633c5d89fd375a49ca09224b984b7ec490c5e5
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -214,17 +225,28 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh test test/contract/work-buttons.test.js
+
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Every case fails on its own assertion. The cases read the declaration the tree ships, so they stand in a contract file, `test/contract/work-buttons.test.js`. The resolver cases in `test/level0/config.test.js` read a schema of their own, so the approach's line on that file moves here. `test/contract/tree.test.js` stands near the line ceiling, so its one edit stays the undrawn list.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The cases take a contract file of their own.
+- every door the change reaches has a fake. The declaration is data, and the contract file reads the real disk door, as its neighbours do.
+- a comment names the approach the change implements. The file opens on the design input it builds.
+
 
 ## reflect
 
