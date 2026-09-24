@@ -52,6 +52,27 @@ function sectionsOf(rows) {
   return out;
 }
 
+// The section a step's chapter opens on, one heading level a step deep, or -1. [[spec/design_output/schema#what-a-note-reads-as]]
+export function sectionAt(sections, path) {
+  const parts = path.split("/");
+  let from = 0;
+  let found = -1;
+  for (let depth = 0; depth < parts.length; depth++) {
+    const level = depth + 1;
+    found = -1;
+    for (let i = from; i < sections.length; i++) {
+      if (sections[i].level < level && i > from) break;
+      if (sections[i].level === level && sections[i].header === parts[depth]) {
+        found = i;
+        break;
+      }
+    }
+    if (found < 0) return -1;
+    from = found + 1;
+  }
+  return found;
+}
+
 // [[spec/design_output/schema#what-a-note-reads-as]]
 export function kindOf(text) {
   const said = frontOf(String(text ?? "").split(/\r?\n/)).said.kind;

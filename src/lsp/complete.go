@@ -6,6 +6,7 @@ package main
 
 import (
 	"encoding/json"
+	"path/filepath"
 	"strings"
 
 	"quackitect/yaml"
@@ -202,6 +203,16 @@ func (one typing) propertyValues(key string) []valued {
 	for _, kind := range yaml.Flat(rule.Get("type")) {
 		if yaml.AsString(kind) == "boolean" {
 			said = append(said, "true", "false")
+		}
+	}
+	// [[spec/design_output/schema#a-finding-names-the-section]]
+	if folder := yaml.AsString(rule.Get("x-values")); folder != "" && one.tree != nil {
+		for _, path := range one.tree.Paths() {
+			name, found := strings.CutPrefix(path, folder+"/")
+			if !found || strings.Contains(name, "/") {
+				continue
+			}
+			said = append(said, strings.TrimSuffix(path, filepath.Ext(path)))
 		}
 	}
 	out := []valued{}

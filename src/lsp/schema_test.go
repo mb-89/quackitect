@@ -263,3 +263,41 @@ func TestASchemaNamingChaptersReadsAsANoteSchema(t *testing.T) {
 		t.Error("no schema is no note schema")
 	}
 }
+
+// A required key the fill writes waits while the note writes an empty process. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+const fillSchema = `kind: ticket
+frontmatter:
+  type: object
+  required: [kind, state, steps]
+  properties:
+    kind:
+      const: ticket
+      x-link: true
+    state:
+      enum: [draft, open]
+      x-filled-by: process
+    steps:
+      type: array
+      x-filled-by: process
+    process:
+      x-link: true
+body:
+  headingLevel: 1
+  sections:
+    - header: Ask
+      required: true
+`
+
+func TestAnEmptyProcessHoldsBackTheKeysTheFillWrites(t *testing.T) {
+	schema := yaml.AsDoc(yaml.Read(fillSchema))
+	fresh := "---\nkind: [[ticket]]\nprocess:\n---\n\n# Ask\n\nA thing.\n"
+	found := checkNote(fresh, schema, "spec/tickets/a.md")
+	if names(found, "Schema.steps")+names(found, "Schema.state") != 0 {
+		t.Fatalf("a fresh ticket answers %v", rules(found))
+	}
+	bare := strings.Replace(fresh, "process:\n", "", 1)
+	found = checkNote(bare, schema, "spec/tickets/a.md")
+	if names(found, "Schema.steps") != 1 || names(found, "Schema.state") != 1 {
+		t.Fatalf("a ticket naming no process answers %v", rules(found))
+	}
+}

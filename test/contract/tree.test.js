@@ -451,7 +451,7 @@ test("the schema this tree ships places every widget in a cell of its own", () =
 });
 
 // [[spec/design_output/extension#one-declaration-draws-it]]
-test("seven controls draw, and the engine state stands declared and undrawn", () => {
+test("seven controls draw, and the work buttons stand declared and undrawn", () => {
   const schema = read(SCHEMA);
   assert.deepEqual(
     drawnIn(schema).map((one) => one.key),
@@ -469,7 +469,7 @@ test("seven controls draw, and the engine state stands declared and undrawn", ()
   const waiting = entriesIn(schema).filter((one) => one.widget && !one.group);
   assert.deepEqual(
     waiting.map((one) => one.key),
-    ["engine.state"],
+    ["work.editor", "work.pull", "work.new"],
   );
   for (const one of waiting) {
     assert.ok(one.help, `${one.key} says what it is`);

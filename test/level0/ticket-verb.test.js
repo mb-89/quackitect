@@ -304,7 +304,7 @@ test("ticket update refuses where step names a leaf the new route lacks", () => 
   const front = `---\nkind: [[ticket]]\nstate: open\nurgency: soon\nstep: decide\nsteps:\n  - name: decide\n    does: says what the note becomes\n    to: retro\nprocess: [[spec/processes/note]]\nprocess_hash: old\n---\n\n# Ask\n\nA thing.\n\n# decide\n\n<!-- says what the note becomes -->\n\n# Discussion\n\nNothing yet.\n`;
   const said = treeWithProcesses({ [at(`${NOTES}/slow-lint.md`)]: front });
   const ran = heard(() =>
-    ticket(ROOT, ["update", "slow-lint", "--process=trivial"], said.it),
+    ticket(ROOT, ["update", "slow-lint", "--process=trivial", "--over"], said.it),
   );
   assert.equal(ran.code, 1);
   assert.match(ran.said, /holds no such leaf/);
@@ -313,7 +313,7 @@ test("ticket update refuses where step names a leaf the new route lacks", () => 
 test("ticket update copies the current route, and keeps the leaves already reached", () => {
   const front = `---\nkind: [[ticket]]\nstate: open\nurgency: soon\nstep: do\nsteps:\n  - name: do\n    does: makes the change, the old way\n    to: retro\n    evidence:\n      - name: says\n        form: text\n        says: what changes and why\nprocess: [[spec/processes/trivial]]\nprocess_hash: old\n---\n\n# Ask\n\nA thing.\n\n# do\n\n<!-- makes the change, the old way -->\n\n## says\n\nIt changes the lint.\n\n# Discussion\n\nNothing yet.\n`;
   const said = treeWithProcesses({ [at(`${NOTES}/slow-lint.md`)]: front });
-  const ran = heard(() => ticket(ROOT, ["update", "slow-lint"], said.it));
+  const ran = heard(() => ticket(ROOT, ["update", "slow-lint", "--over"], said.it));
 
   assert.equal(ran.code, 0);
   const now = said.disk.read(at(`${NOTES}/slow-lint.md`));

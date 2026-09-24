@@ -120,16 +120,8 @@ func (one *server) took(said message) bool {
 	switch said.Method {
 	case "initialize":
 		one.answers(said.ID, map[string]any{
-			"capabilities": map[string]any{
-				"textDocumentSync": 1,
-				// A pointer opens its target on a click. [[spec/design_output/lsp#a-pointer-opens-its-target]]
-				"documentLinkProvider": map[string]any{"resolveProvider": false},
-				// The schema offers what a note carries at the cursor. [[spec/design_output/lsp#the-completion-reads-the-schema]]
-				"completionProvider": map[string]any{"triggerCharacters": triggers},
-				// A term shows what it means under the cursor. [[spec/design_output/lsp#the-hover-shows-a-term]]
-				"hoverProvider": true,
-			},
-			"serverInfo": map[string]any{"name": "se-lsp", "version": Version},
+			"capabilities": capabilitiesOf(),
+			"serverInfo":   map[string]any{"name": "se-lsp", "version": Version},
 		})
 	case "textDocument/documentLink":
 		one.answers(said.ID, one.links(said.Params))
@@ -137,6 +129,8 @@ func (one *server) took(said message) bool {
 		one.answers(said.ID, one.completes(said.Params))
 	case "textDocument/hover":
 		one.answers(said.ID, one.hovers(said.Params))
+	case "textDocument/foldingRange":
+		one.answers(said.ID, one.folds(said.Params))
 	case "initialized":
 		one.sweeps()
 		go one.follows()
@@ -158,6 +152,21 @@ func (one *server) took(said message) bool {
 		}
 	}
 	return false
+}
+
+// What the server answers, which initialize announces. [[spec/design_output/lsp#one-checker-every-front-asks]]
+func capabilitiesOf() map[string]any {
+	return map[string]any{
+		"textDocumentSync": 1,
+		// A pointer opens its target on a click. [[spec/design_output/lsp#a-pointer-opens-its-target]]
+		"documentLinkProvider": map[string]any{"resolveProvider": false},
+		// The schema offers what a note carries at the cursor. [[spec/design_output/lsp#the-completion-reads-the-schema]]
+		"completionProvider": map[string]any{"triggerCharacters": triggers},
+		// The frontmatter folds, so the drawing stands over it. [[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]]
+		"foldingRangeProvider": true,
+		// A term shows what it means under the cursor. [[spec/design_output/lsp#the-hover-shows-a-term]]
+		"hoverProvider": true,
+	}
 }
 
 // [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
