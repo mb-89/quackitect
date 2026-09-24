@@ -213,3 +213,13 @@ One web page draws a ticket's route from the graph, and speaks to its host throu
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The box releases the group at the children step, with two of three children closed:
+
+| child | stands |
+|---|---|
+| [[spec/tickets/the-drawing-bundles]] | closed: install bundles the drawing into `.se/.runtime/drawing` and resolves a browser |
+| [[spec/tickets/the-drawing-draws-read-only]] | closed: the page draws a route, and a fake host drives it in the check |
+| [[spec/tickets/the-drawing-speaks-edits]] | open at `do`, waiting on `the-ticket-answers-the-editor` |
+
+The engine group's branch carries no child yet, so no node place stands for a jump to read. The next box takes this group once that group lands, works the edits child, then runs the retro. [[spec/design_output/drawing]] owns the protocol the edits child extends.
