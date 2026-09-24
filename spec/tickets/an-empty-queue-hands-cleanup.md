@@ -95,12 +95,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
     hash_before: dffed25933787f0bf1f0f49c35246aaa0fd28d3a
     hash_after: dffed25933787f0bf1f0f49c35246aaa0fd28d3a
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-2
+    hash_before: 20c28d1bbd74ca8249357d990dc4f1625161f04a
+    hash_after: 20c28d1bbd74ca8249357d990dc4f1625161f04a
+    returns: 1
+    why: "`pull-writes.js`'s `onward` also calls `handOut`, and stands out of the callers list.; `pull-cleanup.test.js`'s fixture carries no `method`.; `asks` joins `box.method` with no guard, and `holdHere` calls it once a hold file stands.; So the refactor row's hold check throws against that fixture, and the approach names no read that survives it."
 ---
 
 # Ask
@@ -164,6 +170,13 @@ The merge keeps its place ahead of the free tickets, because a closed ticket rul
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- `pull-writes.js`'s `onward` also calls `handOut`, and stands out of the callers list.
+- `pull-cleanup.test.js`'s fixture carries no `method`.
+- `asks` joins `box.method` with no guard, and `holdHere` calls it once a hold file stands.
+- So the refactor row's hold check throws against that fixture, and the approach names no read that survives it.
 
 # implement
 
