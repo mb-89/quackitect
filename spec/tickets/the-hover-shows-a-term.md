@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -128,6 +128,10 @@ record:
     hash_after: 9f9a15cdae34af957244a412cf79149ed5d84bed
     returns: 3
     why: "| finding | fix |; |---|---|; | The approach names `stems.yaml`, and the answers name `stems.yml` | Name the file one way in every line |; | `test/level0/vocabulary.test.js` reads fixture lists and touches no disk, so it reaches no case the real `stems.yaml` holds | Drive the cases in `test/contract/vocabulary.test.js` beside the slug test, and keep a fixture table in the level zero file |; | No test in `src/lsp` reads a file of the tree, and `hover_test.go` reads the real `stems.yaml` | Name the path the Go test reads and the disk it reads through |; | `paragraph.schema.schema.json` names `stems` in the vocabulary layer and leaves `endings` out | Add `endings` as a string to the shape |; The ten earlier findings stand settled by the answers. The rest reads true:; `took` answers `initialize`, and `Tree.Read` reads an open buffer or the index copy, which `follows` pulls after a save; `alsoReads` and the caches take every path `pathsOf` names, so a new key reaches both; `faultsOf` refuses no key the shape leaves out, and nothing in `spec/config` refuses a new yaml file"
+  - step: design/draft
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: f44e23101baa6c0bc98869a3eb905f5a80ba8535
+    hash_after: f44e23101baa6c0bc98869a3eb905f5a80ba8535
 ---
 
 # Ask
@@ -184,16 +188,18 @@ The table of endings and the prefixes move out of `vocabulary.js` into
 lists leaves it alone there. The rule, the check and the server read one source:
 
 - `pathsOf` names it under a new key, `endings`, because the layer holds a line of prose under `stems`
+- `paragraph.schema.schema.json` gains `endings` as a string
 - a write to it projects the rule again, because `alsoReads` reads every path `pathsOf` names
 - `knownIn`, `looseMeanings` and `vocabularyRule` take the table from the lists
 - `stems.yaml` carries cases, each a word and the listed word it reaches, and both tests drive them
 
 | test | holds |
 |---|---|
-| `src/lsp/hover_test.go` | a hover over a term, a plural, a prefix, a term of two words and a source, and no hover over a core word |
+| `src/lsp/hover_test.go` | a hover over a term, a plural, a prefix, two words and a source, and none over a core word |
 | the same file | a hover after a save to `terms.yml` shows the new line |
-| the same file | the Go reader reaches every case `stems.yaml` names |
-| `test/level0/vocabulary.test.js` | the JavaScript reader reaches every case, and the rule writes every row |
+| the same file | the Go reader reaches every case the real `stems.yaml` names, read through `os.ReadFile` off the tree root, as `src/tui/work_test.go` reads the tree |
+| `test/contract/vocabulary.test.js` | the JavaScript reader reaches every case of the real `stems.yaml` through the disk door, beside the slug test |
+| `test/level0/vocabulary.test.js` | the reader and the rule over a fixture table |
 
 The client needs no change. The extension already starts the server over
 markdown files, and the language client asks for a hover once the server
@@ -223,16 +229,20 @@ file. `spec/design_output/lsp.md` gains a chapter on the hover, and
 
 <!-- the form is list -->
 
-- a Go copy of the table drifts: the table moves into `stems.yml`, and both readers load it
-- no Go test reads the slug cases: `hover_test.go` loads `stems.yml` and drives its cases
-- the shared cases land in the wrong file: they land in `test/level0/vocabulary.test.js`, beside the table test
-- the prefixes stand unnamed: the hover reads them off `stems.yml` too, so `unread` reaches `read`
+- a Go copy of the table drifts: the table moves into `stems.yaml`, and both readers load it
+- no Go test reads the slug cases: `hover_test.go` loads `stems.yaml` and drives its cases
+- the shared cases land in the wrong file: they land in `test/contract/vocabulary.test.js`, beside the slug test
+- the prefixes stand unnamed: the hover reads them off `stems.yaml` too, so `unread` reaches `read`
 - the client stands unnamed: the callers say it needs no change, and why
 - no test for the two lines of done: the table of tests names each
 - the key `stems` stands taken: the path goes under `endings`
 - the shape rule refuses a table under the word lists: the table stands in `spec/config`
 - the editor sends no `terms.yml` buffer: the test holds a save, and the server reads the saved file
 - `rulesFrom` stands unnamed: the callers name it
+- the file name drifts: every line names `stems.yaml`
+- the layer test reads no disk: the real cases land in the contract test, and it keeps a fixture
+- the Go test names no path: it reads the real table off the tree root, as the viewer tests do
+- the shape of the schema lacks the key: `endings` joins it as a string
 
 ## review
 
