@@ -4,6 +4,7 @@
 // [[spec/design_output/work#one-reading-answers-git]]
 
 import {
+  agentOpens,
   askOf,
   CLOSED,
   dependsOn,
@@ -233,7 +234,10 @@ function heldRow(plan, names) {
 
 // [[spec/design_output/pull#the-queue-is-an-outline]]
 function waitsOnPerson(one) {
-  return personStep(one.text) || fieldOf(one.text, "state") === DRAFT;
+  return (
+    personStep(one.text) ||
+    (fieldOf(one.text, "state") === DRAFT && !agentOpens(one.text))
+  );
 }
 
 // The queue rides every answer, because a reader of the listing wants each row's place. [[spec/design_output/pull#the-queue-is-a-score]]
