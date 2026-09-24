@@ -39,8 +39,9 @@
     "finish": 10
   },
   "context": {
-    "comment": "The context a session carries before it hands over: it finishes, writes .se/HANDOVER.md, clears, and reads the handover in a fresh conversation. 0 switches it off. spec/design_output/stop.md, chapter The context hands over, says the rest.",
-    "handoverAt": 150000
+    "comment": "The context a session carries before it hands over. Past handoverAt it finishes the step in hand, writes .se/HANDOVER.md, clears, and reads the handover in a fresh conversation. Past writeAt it stops the step and writes the handover now. 0 switches each off. spec/design_output/stop.md, chapter The context hands over, says the rest.",
+    "handoverAt": 150000,
+    "writeAt": 175000
   },
   "plan": {
     "comment": "The engine's three questions every so many calls: what you work on, which todos you finished, which you add. The third stays away past mostOpen. spec/design_output/stop.md, chapter The plan, says the rest.",

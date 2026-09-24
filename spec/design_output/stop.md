@@ -246,8 +246,9 @@ switches it off.
 | step | what happens | who does it |
 |---|---|---|
 | measure | the fill rides every call of the agent's own and the turn's end, and `session.measure` after each turn | the bridgehead reads `$.session.usage()` |
-| finish | a fill past the key marks the session due, and the block rides every call: put the work down, start nothing new, write the handover | the context door |
-| handover | the turn's end holds, ahead of the tooth, until `.se/HANDOVER.md` stands, and then ends whatever the tooth votes | the context door |
+| finish | a fill past the key marks the session due, and the block rides every call: finish the step in hand, start nothing new, write the handover | the context door |
+| write now | a fill past `context.writeAt` turns the block: stop the step where it stands, leave it in hand, write the handover now | the context door |
+| handover | the turn's end holds, ahead of the tooth, until `.se/HANDOVER.md` stands and names no file under `.se/.retro`, and then ends whatever the tooth votes | the context door |
 | clear | the turn completes, the bridgehead runs `/clear`, and it submits the prompt that opens the next conversation | the bridgehead |
 | forget | `session.end` with reason `clear` opens the canary debt and empties `reads` in every hold on the box | the guidance door |
 | re-read | `prompt.context` fires again: the system prompt, then the rules and the canary, then the handover | the harness and the guidance door |
@@ -255,6 +256,16 @@ switches it off.
 
 A session writing no handover lets go past `stop.mostInARow` asks, and the log
 says so at `warn`. A turn the person breaks off asks for no clear.
+
+The finish runs past the first key, and each call there costs the most in the
+conversation. So `context.writeAt` stands above `context.handoverAt` and caps
+the finish. A `context.writeAt` at zero, or under the first key, adds no second
+stage.
+
+The retro alone reads `.se/.retro`. A handover naming a file there sends the
+next conversation to read it, at up to 15000 tokens a file. So the turn's end
+holds until the handover names the ticket or the class by its name and names no
+path under that folder. The log says so at `warn`.
 
 The first reading after a clear is what the next conversation opens on. A
 reading past the key there stands the door down for the session, because
