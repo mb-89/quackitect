@@ -126,7 +126,7 @@ terms:
   - {word: schema, defines: "[[spec/design_output/schema]]", means: "a file that says which fields and chapters a note of one kind holds"}
   - {word: scope, defines: "[[spec/guidance/guidance]]", means: "the field that names which files or readers a guidance note covers"}
   - {word: session, defines: "[[spec/design_output/level0#what-level-zero-is]]", means: "one run of the agent in the harness from its first prompt to its end"}
-  - {word: shell, defines: "[[spec/design_output/bash]]", means: "the command line program that runs the commands the agent types", source: "https://www.gnu.org/software/bash/"}
+  - {word: shell, defines: "[[spec/design_output/bash]]", means: "the command line program that runs the commands the agent types"}
   - {word: sidebar, defines: "[[spec/design_output/extension]]", means: "the view the editor extension draws beside the files to show and set the tree values"}
   - {word: slash command, defines: "[[spec/design_output/config]]", means: "a command a person types in the chat after a forward slash to run a stored prompt"}
   - {word: spawn, defines: "[[spec/design_output/level0#the-spawn-carries-a-rewrite]]", means: "the moment a session starts a subagent which a hook can catch to rewrite its prompt"}

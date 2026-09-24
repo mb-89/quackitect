@@ -183,7 +183,7 @@ ifVale(
   ),
 );
 
-// The vocabulary rule compiles its patterns once a run, and still refuses a word off its shape, a core entry naming no source, a term naming no note, a term saying nothing of what it means, and a source that is no web address. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+// The vocabulary rule compiles its patterns once a run, and still refuses a word off its shape, a core entry naming no source, a term naming no note, a term saying nothing of what it means, and a source that is no web address or holds a comma. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 const VOCABULARY = "spec/vocabulary/probe.yml";
 const ENTRY = "VoiceShape.VocabularyEntry";
 
@@ -203,6 +203,10 @@ ifVale(
         "terms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\", means: \"a script, and more\"}\n",
         VOCABULARY,
       ),
+      split: at(
+        "terms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\", means: \"a script\", source: \"https://a.org/x,y\"}\n",
+        VOCABULARY,
+      ),
       addressless: at(
         "terms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\", means: \"a script\", source: somewhere}\n",
         VOCABULARY,
@@ -210,7 +214,7 @@ ifVale(
     },
     (said) => {
       passes(said, ENTRY, "good");
-      for (const key of ["shapeless", "sourceless", "noteless", "meaningless", "comma", "addressless"]) {
+      for (const key of ["shapeless", "sourceless", "noteless", "meaningless", "comma", "split", "addressless"]) {
         refuses(said, ENTRY, key);
       }
     },

@@ -12,7 +12,9 @@ script: |
   definesShape := text.re_compile(`^"?\[\[[^\]\s]+\]\]"?$`)
   // The entry splits on the comma and the colon, so a means line holds neither, and no bracket either.
   meansShape := text.re_compile(`, means: "[^",:\[\]{}]+"(,|\}$)`)
-  sourceShape := text.re_compile(`^"?https?://[^\s",]+"?$`)
+  // The source reads off the whole line too, so a comma the split cuts meets the refusal.
+  sourceHeld := text.re_compile(`, source: `)
+  sourceShape := text.re_compile(`, source: "https?://[^\s",]+"(,|\}$)`)
 
   lines := text.split(scope, "\n")
   matches := []
@@ -89,7 +91,7 @@ script: |
           message: held.word + " says nothing of what it means. Write means: \"<one line>\" in core words and other terms, with no comma, colon or bracket."
         })
       }
-      if held.source != undefined && !sourceShape.match(held.source) {
+      if sourceHeld.match(trimmed) && !sourceShape.match(trimmed) {
         matches = append(matches, {
           begin: at,
           end: at + len(line),
