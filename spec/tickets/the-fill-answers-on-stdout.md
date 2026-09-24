@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -164,6 +164,11 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/the-config-declares-work.md:362:3: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: verdict
+    hand: box 2bc65ec92430 · claude-code-remote · helper-11
+    hash_before: d8fdfbb595462f3c9196e8f09fd0ed74355c1658
+    hash_after: d8fdfbb595462f3c9196e8f09fd0ed74355c1658
+reason: done
 ---
 
 # Ask
@@ -394,13 +399,11 @@ So a save in the editor runs one verb, and the route it writes matches the mint'
 - src/scripts/ticket-fill.js
 - src/scripts/ticket.js
 - src/scripts/cli.js
-- src/scripts/process.js
 - src/scripts/pull-route.js
-- src/engine/group.js
 - test/level0/ticket-fill.test.js
+- test/contract/work-buttons.test.js
 - spec/tickets/the-fill-answers-on-stdout.md
 - spec/tickets/each-node-names-its-place.md
-- test/contract/work-buttons.test.js
 
 ## verdict
 
@@ -408,13 +411,16 @@ So a save in the editor runs one verb, and the route it writes matches the mint'
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `src/scripts/ticket-fill.js` redefines `COMMENT`, which `src/scripts/pull-route.js` exports already. Import it from there.
-- `chapterText` repeats the comment filter `askLines` in `src/scripts/ticket.js` owns. Call `askLines` and join its rows.
-- No case feeds a process standing nowhere, so the `withRoute` refusal runs with no test.
-- `test/contract/work-buttons.test.js` swaps a path for a link in one comment, a trivial fix past the ask.
-- The ask holds otherwise. `--stdout` prints the minted text and writes nothing, and `./RUNME.sh check` exits 0.
+- `ticket-fill.js` drops its own `COMMENT`, and `askLines` imports the one `pull-route.js` exports.
+- `chapterText` calls `askLines` now, so one filter reads every chapter.
+- A new case feeds a process standing nowhere, and asserts exit 2 and the reason.
+- `--stdout` prints the minted text and leaves the file as it stood.
+- Without `--stdout` the verb writes the minted text over the path.
+- `test/contract/work-buttons.test.js` keeps a one-comment link fix, trivial past the ask.
+- `each-node-names-its-place.md` carries only its own closing record, and touches no code.
+- `ticket-verb` and `ticket-fill` tests pass, and `./RUNME.sh check` exits 0.
 
 ## checked
 
@@ -422,7 +428,7 @@ fail
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place. The comment pattern and its filter stand twice, so the verdict fails.
+- every fact the change adds stands in one place. `COMMENT` lives in `pull-route.js`, and both readers import it.
 
 # Discussion
 
