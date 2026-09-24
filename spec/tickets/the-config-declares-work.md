@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -175,6 +175,11 @@ record:
       - name: check
         exit: 0
         said: "test/contract/work-buttons.test.js:24:1: CodeComment: Code carries no comment here. Write a header of at most five lines"
+  - step: verdict
+    hand: box 2bc65ec92430 · claude-code-remote · helper-13
+    hash_before: a1e4596328abdec57cb070f4d667ff164e310481
+    hash_after: a1e4596328abdec57cb070f4d667ff164e310481
+reason: done
 ---
 
 # Ask
@@ -410,6 +415,7 @@ Each button carries no group, so the sidebar draws none of them yet. The desk gr
 - test/contract/tree.test.js
 - test/contract/sidebar.test.js
 - test/level0/sidebar.test.js
+- test/level0/panel.test.js
 - spec/design_input/the-editor-draws-the-ticket.md
 
 ## verdict
@@ -418,10 +424,7 @@ Each button carries no group, so the sidebar draws none of them yet. The desk gr
 
 <!-- the form is verdict -->
 
-fail
-- work-buttons.test.js asserts each button waits undrawn, and tree.test.js owns that fact already.
-- work-buttons.test.js asserts each button carries help, and tree.test.js owns that fact already.
-- Drop both asserts from work-buttons.test.js, and keep the icon and widget checks.
+pass
 
 ## checked
 
@@ -429,7 +432,7 @@ fail
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place. The undrawn and help facts stand twice, so the verdict fails.
+- every fact the change adds stands in one place. work-buttons.test.js drops the undrawn and help asserts, and a comment points at tree.test.js.
 
 # Discussion
 
