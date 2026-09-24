@@ -3,7 +3,7 @@
 # spec/schemas/paragraph.schema.yaml
 extends: script
 message: "A word stands outside the words this tree writes. Write a core word, or add it to spec/vocabulary/terms.yml with the note that defines it."
-link: spec/funnel/a-paragraph-has-a-schema.md
+link: spec/design_output/projection.md
 level: error
 scope: raw
 script: |

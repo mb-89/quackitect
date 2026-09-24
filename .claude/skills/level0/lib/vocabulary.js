@@ -90,7 +90,7 @@ function lower(said) {
     .toLowerCase();
 }
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 function pathOf(layer) {
   const said = String(layer?.terms ?? "").trim();
   return said || TERMS;
@@ -107,7 +107,7 @@ export function vocabularyRule(layer, lists) {
 
   return scripted(`A word ${tail}`, [
     ...prelude([], true, layer.prose),
-    // [[spec/funnel/a-paragraph-has-a-schema]]
+    // [[spec/design_output/projection#the-second-target]]
     // A map literal this long overruns the Tengo stack. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
     "list := `",
     ...grouped(words),

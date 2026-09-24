@@ -610,7 +610,7 @@ into the group goes to work before the retro's last leaf.
 | trunk hands out no group's child | on trunk the pull offers a box a group to take, and a person the tickets of no group |
 | the branch holds the truth | while the branch stands, its copy of the group and of its children is the record |
 | a box leaves | when the group's last leaf passes, it writes `hash_after`, closes the group as `done` where every child stands closed, and leaves it open otherwise |
-| a group returns | an open group nobody holds comes back to the beat once a person answers on its branch |
+| a group returns | an open group nobody holds comes back to the pull once a person answers on its branch |
 | the merge is a desk's | `branch merge` runs on a box off the cloud, an agent's or a person's, since a cloud box pushes no trunk, and `branch close` drops the branch |
 | the merge lands the truth | `branch merge` runs the check on the merge commit and undoes it on red. It refuses where trunk's copy of the group or of a child differs from the branch point, and names the lines |
 | the merge frees the tickets | an open child of a merged group loses its `group`, so a ticket waiting on a person stands loose on trunk |
@@ -826,10 +826,10 @@ verb belongs to a person or the engine. The shell is the verb, under
 `./RUNME.sh branch`. A plugin tool wraps it for a session that holds the plugin,
 which is v4's ruling that one function runs under both doors.
 
-The engine is these verbs and the beat, and it runs with nobody on the box.
-That is why it stands in level one and outside level zero. Level zero holds
-before anything else does, and the engine has to keep working with no person
-there.
+The engine is these verbs. It answers where a hand, a person or a routine
+pulls, and no process of it lives between two pulls. A road that needs the
+server starts it first. It stands in level one and outside level zero, because
+level zero holds before anything else does.
 
 A pull carries at most two things: the ticket it hands back and a verdict.
 The verdict is `pass`, `fail` with a reason, or `became` with the successor
@@ -893,7 +893,7 @@ The pull runs at two levels, and the same rule shape holds at each:
 
 | who pulls | what | the rule |
 |---|---|---|
-| the beat | a box per free group | groups at `todo`, none of whose tickets wait on an unmerged group, by urgency |
+| the routine | a box per free group | groups at `todo`, none of whose tickets wait on an unmerged group, by urgency |
 | the box | the next ticket of its group | tickets at `open` with no open dependency on trunk, children before their group, a step this hand can take, by urgency then name |
 | a person | anything | the same two lists on the board, and no refusal |
 
@@ -1075,18 +1075,17 @@ stays unknown to the board, and any reader of git expects that.
 The editor stands outside the sidebar, in a window of its own. Its shape waits
 for a design note of its own once the back end stands, and v4's work editor is
 the starting point. It can end as a Kanban board, or as something else. The
-sidebar gains one group, `work`, and it holds four controls:
+sidebar gains one group, `work`, with three buttons and no switch. For the
+shape on offer, see [[spec/funnel/a-person-works-the-ticket]].
 
-| control | does |
+| button | does |
 |---|---|
-| the engine's switch | starts and stops the beat, which is the `engine.state` widget the schema already declares |
-| the editor button | opens the work editor, and carries the count of tickets waiting on you, the way a mail icon carries its unread count |
-| `note` | mints a note in one press, which is the shortcut a hand takes mid-work |
-| `mint` | mints anything else: a ticket by process, or any note a schema in the tree holds |
+| the work editor | opens the work editor, and carries the count of tickets waiting on you, the way a mail icon carries its unread count |
+| pull for me | runs the pull for the person, and opens the ticket it hands out |
+| new ticket | opens a new ticket in the markdown editor, with a process to pick |
 
-The count on the editor button is the declared `count` widget, which the beat
-replaces on every tick. So a person sees that something waits on them with the
-editor shut, and clicks.
+The index answers the count where the sidebar draws. So a person sees that
+something waits on them with the editor shut, and clicks.
 
 Yours stands first, oldest first: every ticket at a step whose `by` is
 `person`, with its `asks`. Every held group whose tip is older than
@@ -1119,7 +1118,7 @@ folder.
 | the spawn hook hands the guidance to a helper | it tags the helper with the session's hand too |
 | `engine.binding` at `queue` and `unbound` draw the status bar | `queue` hands out, `unbound` hands out nothing, and `pull <ticket>` takes a named one |
 | `engine.autonomy` draws nowhere | `finish` mints notes alone, `start` mints into its own group, `ideation` mints loose tickets, which ride the group's branch on a cloud box |
-| `engine.state` and `engine.beat` draw nowhere | the switch runs the beat on a desk, and `engine.beat` reads the newest tip of a group's branch |
+| `engine.state` and `engine.beat` draw nowhere | both leave the schema, and the hook button under agent control stays the one switch |
 | the trunk guard refuses a commit on `main` | unchanged |
 
 The cloud guidance note changes one line: the first verb is the pull.
@@ -1145,7 +1144,7 @@ the only fact it meets is a route.
 | the stop rule | `spec/config/stop/level1.yml` |
 | the hold and the box id | `.se/hold/<hand>.json`, `.se/box.json` |
 | the config | the `engine` and `work` sections of `spec/config/level0.json` |
-| the `work` group and its four controls | `spec/config/level0.schema.json` |
+| the `work` group and its three buttons | `spec/config/level0.schema.json` |
 
 | key | default | what it decides |
 |---|---|---|
@@ -1178,7 +1177,7 @@ the only fact it meets is a route.
 | a spawn ceiling of zero for delegated writing | v3 | the engine spawns for a step alone, and a hand the session spawns is the session's |
 | controls only ever stop the engine refusing | v3 | stays |
 | notes, then the retro, then the mint | v3 | the note process, and the mint's privacy check on promotion |
-| a claim lapses after a set number of hours | v4 | out, because a stale branch is a person's to look at, and the beat names it |
+| a claim lapses after a set number of hours | v4 | out, because a stale branch is a person's to look at, and the listing names it |
 | the machine builds the form, and a pull carries it back | v3 | the evidence forms, which the mint renders |
 
 # The order of work
@@ -1193,7 +1192,7 @@ Ten branches, and the dependencies make the order binding:
 | 4 | `the-agent-pulls-a-ticket` | the pull, its checks, its answers, the record, a hold per hand, the stop rule | 2, 3 |
 | 5 | `a-step-changes-hands` | the hand id, the spawn and its tag, person steps, escalation | 4 |
 | 6 | `guidance-rides-the-step` | `reads`, the verb, the log line, the standing layer shrinks | 4 |
-| 7 | `the-work-group-draws` | the `work` group, its four controls, the count on the editor button, the beat, the notification that names questions and stale groups | 4 |
+| 7 | `the-work-group-draws` | the `work` group, its three buttons, the count on the editor button, the notification that names questions and stale groups | 4 |
 | 8 | `level-zero-hands-over` | the brief door goes, and the controls wire up | 4 |
 | 9 | `the-retro-is-a-ticket` | `retro collect`, the chapters and the counts, the files the mine leaves read, `retro notes` and `score`, the readers as helpers, the first retro on a desk | 4, 5 |
 | 10 | `the-box-runs-the-route` | the cloud guidance around the pull, the routine takes a group, the brief's contract retires, `adopt`, the first cloud run | 4, 8, 9 |

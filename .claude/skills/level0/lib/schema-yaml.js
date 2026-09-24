@@ -63,7 +63,7 @@ function listAt(rows, cursor, indent, path) {
     const at = `${path}[${out.length}]`;
     mark(cursor, at, one.line);
     const rest = one.said.slice(2).trim();
-    // [[spec/funnel/a-paragraph-has-a-schema]]
+    // [[spec/design_output/projection#the-second-target]]
     if (rest.startsWith("{")) {
       out.push(scalar(rest));
       continue;
@@ -109,7 +109,7 @@ function under(rows, cursor, indent, path) {
 function scalar(said) {
   const flat = unquote(said);
   if (LINK.test(flat)) return flat;
-  // [[spec/funnel/a-paragraph-has-a-schema]]
+  // [[spec/design_output/projection#the-second-target]]
   if (flat.startsWith("{") && flat.endsWith("}")) return mapping(flat.slice(1, -1));
   if (flat.startsWith("[") && flat.endsWith("]")) {
     return flowItems(flat.slice(1, -1))
@@ -149,7 +149,7 @@ function flowItems(inside) {
   return out;
 }
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 function mapping(said) {
   const out = {};
   for (const one of parted(said)) {
@@ -160,7 +160,7 @@ function mapping(said) {
   return out;
 }
 
-// A comma inside a bracket belongs to its own list. [[spec/funnel/a-paragraph-has-a-schema]]
+// A comma inside a bracket belongs to its own list. [[spec/design_output/projection#the-second-target]]
 function parted(said) {
   const out = [];
   let depth = 0;

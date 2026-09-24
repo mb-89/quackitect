@@ -132,7 +132,7 @@ ifVale(
 const BINDS = "- The door shall refuse the write, and it should name the rule.\n";
 const INPUT = "spec/design_input/one.md";
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 ifVale(
   "the requirement register takes shall and should, and no other does",
   proves(
@@ -201,14 +201,14 @@ ifVale(
   ),
 );
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 const saidOf = (said, key, rule) =>
   said
     .found(key)
     .filter((one) => one.rule === rule)
     .map((one) => one.message);
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 ifVale(
   "a word the list leaves out is refused, and the refusal names it",
   proves({ it: "The door refuses a flibbertigibbet." }, (said) => {
@@ -222,7 +222,7 @@ ifVale(
   }),
 );
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 ifVale(
   "a word the list swaps is refused, and the refusal names the swap",
   proves({ it: "The door utilize the list." }, (said) => {
@@ -232,7 +232,7 @@ ifVale(
   }),
 );
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 ifVale(
   "the words this tree writes pass, and so does what stands outside a layer",
   proves(
@@ -252,7 +252,7 @@ ifVale(
   ),
 );
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 ifVale(
   "a plural, a past form and an -ing form of a listed word stand",
   proves(

@@ -116,7 +116,7 @@ neither is the third, and no checker asks it anything.
 
 `spec/schemas/paragraph.schema.yaml` is the third shape. It names no chapter, so
 `schemasIn` leaves it out, the write door asks it nothing, and `mint` offers the
-note kinds alone. For details, see [[spec/funnel/a-paragraph-has-a-schema]].
+note kinds alone. For details, see [[spec/design_output/projection#the-second-target]].
 
 # A data schema holds YAML
 

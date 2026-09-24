@@ -1,7 +1,7 @@
 // The voice verbs. `measure` scores a folder of prose through Vale, and
 // `refused` ranks what the doors turn away. The pure half stands in
 // lib/voice.js, and this half reaches the disk, the clock and the process.
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 
 import { dirname, join } from "node:path";
 import { FOLDER } from "../../.claude/skills/level0/lib/log.js";
@@ -29,7 +29,7 @@ const ROWS = /\.jsonl$/i;
 const TRANSCRIPTS = "--transcripts";
 const NOISE = [".git", "node_modules"];
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 export async function voice(root, argv, it, bin) {
   const what = String(argv[0] ?? "");
   if (what === "measure") return measure(root, argv.slice(1), it, bin);
@@ -46,7 +46,7 @@ export async function voice(root, argv, it, bin) {
   return what ? 2 : 0;
 }
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 async function measure(root, argv, it, bin) {
   if (!bin || !it.disk.exists(bin)) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
@@ -101,7 +101,7 @@ async function measure(root, argv, it, bin) {
   return 0;
 }
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 async function refused(root, argv, it) {
   const said = Number(argv[0]);
   const days = Number.isFinite(said) && said > 0 ? said : DAYS;
@@ -120,7 +120,7 @@ async function refused(root, argv, it) {
   return 0;
 }
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 function pullAnswers(root, folder, it) {
   let made = 0;
   for (const path of filesUnder(it.disk, under(root, folder), ROWS)) {
@@ -135,7 +135,7 @@ function pullAnswers(root, folder, it) {
   return made;
 }
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 function filesUnder(disk, at, wanted, skip = []) {
   const out = [];
   const into = (path) => {
@@ -160,14 +160,14 @@ function filesUnder(disk, at, wanted, skip = []) {
   return out.sort();
 }
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 function under(root, path) {
   const said = String(path);
   if (said.startsWith("/") || /^[A-Za-z]:[\\/]/.test(said)) return said;
   return join(root, ...said.split("/"));
 }
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 function shown(root, path) {
   const flat = String(path).split("\\").join("/");
   const base = String(root).split("\\").join("/");

@@ -178,7 +178,7 @@ export function rulesFrom(said, banner = "", lists = null) {
   };
   const modals = modal(binding);
   if (modals) put("ModalRequirement.yml", modals);
-  // [[spec/funnel/a-paragraph-has-a-schema]]
+  // [[spec/design_output/projection#the-second-target]]
   const words = wordsOf(lists);
   if (words.length) put("Vocabulary.yml", vocabularyRule(layer("vocabulary"), lists));
   return out;

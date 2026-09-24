@@ -4,7 +4,7 @@
 # The projection writes it into spec/config/styles/VoiceParagraph, one rule per
 # layer. A person edits this file, and the write door refuses a hand edit to a
 # target.
-# [[spec/funnel/a-paragraph-has-a-schema]]
+# [[spec/design_output/projection#the-second-target]]
 #
 # A register overrides a value for the paths it names, and keeps every value it
 # leaves out. `exceptions` under a layer is the list the retro grows: one entry,

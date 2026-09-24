@@ -3,7 +3,7 @@
 # spec/schemas/paragraph.schema.yaml
 extends: script
 message: "A run holds 3 paragraphs."
-link: spec/funnel/a-paragraph-has-a-schema.md
+link: spec/design_output/projection.md
 level: warning
 scope: raw
 script: |

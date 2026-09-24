@@ -6,7 +6,7 @@
 
 import { frontless } from "./helpers.js";
 
-export const LINK = "spec/funnel/a-paragraph-has-a-schema.md";
+export const LINK = "spec/design_output/projection.md";
 export const WIDTH = { banner: 76, row: 72 };
 
 // Vale hands a rule the whole file, frontmatter and all. A verb writes most of those fields and the schema rules them, so a prose rule blanks the block and keeps the fields the schema calls prose. [[spec/tickets/voice-rules-skip-the-record]]
@@ -132,7 +132,7 @@ export function quoted(said) {
   return JSON.stringify(String(said));
 }
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 export function grouped(said, at = WIDTH.row) {
   const out = [];
   let row = "";

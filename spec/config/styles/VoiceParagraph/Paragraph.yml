@@ -3,7 +3,7 @@
 # spec/schemas/paragraph.schema.yaml
 extends: occurrence
 message: "A paragraph holds 6 sentences. Break this one."
-link: spec/funnel/a-paragraph-has-a-schema.md
+link: spec/design_output/projection.md
 level: warning
 scope: paragraph
 max: 6

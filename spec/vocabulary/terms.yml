@@ -166,19 +166,19 @@ terms:
   - {word: applier, defines: "[[spec/design_output/apply]]"}
   - {word: backlog, defines: "[[spec/design_output/work#a-row-per-group]]"}
   - {word: backslash, defines: "[[spec/design_output/bash]]"}
-  - {word: blacklist, defines: "[[spec/funnel/a-paragraph-has-a-schema]]"}
+  - {word: blacklist, defines: "[[spec/design_output/projection#the-second-target]]"}
   - {word: bundler, defines: "[[spec/design_output/extension]]"}
   - {word: caller, defines: "[[spec/design_output/apply]]"}
   - {word: cgo, defines: "[[spec/design_output/index#the-compiler-it-needs]]"}
   - {word: dispatcher, defines: "[[spec/design_output/copilot]]"}
   - {word: emitter, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
-  - {word: emoji, defines: "[[spec/funnel/a-paragraph-has-a-schema]]"}
+  - {word: emoji, defines: "[[spec/design_output/projection#the-second-target]]"}
   - {word: enabler, defines: "[[spec/funnel/level-zero-closes]]"}
-  - {word: ellipsis, defines: "[[spec/funnel/a-paragraph-has-a-schema]]"}
+  - {word: ellipsis, defines: "[[spec/design_output/projection#the-second-target]]"}
   - {word: fixer, defines: "[[spec/design_output/bash]]"}
   - {word: headless, defines: "[[spec/design_output/level0#what-the-probe-does]]"}
   - {word: hover, defines: "[[spec/design_output/extension]]"}
-  - {word: hyphen, defines: "[[spec/funnel/a-paragraph-has-a-schema]]"}
+  - {word: hyphen, defines: "[[spec/design_output/projection#the-second-target]]"}
   - {word: idempotent, defines: "[[spec/design_output/pull#the-hand-back-matches-the-hold]]"}
   - {word: indent, defines: "[[spec/design_output/schema]]"}
   - {word: kebab, defines: "[[spec/design_output/config]]"}
@@ -189,7 +189,7 @@ terms:
   - {word: newline, defines: "[[spec/design_output/bash]]"}
   - {word: nonce, defines: "[[spec/design_output/extension]]"}
   - {word: openste, defines: "[[spec/vocabulary/core]]"}
-  - {word: participle, defines: "[[spec/funnel/a-paragraph-has-a-schema]]"}
+  - {word: participle, defines: "[[spec/design_output/projection#the-second-target]]"}
   - {word: placeholder, defines: "[[spec/design_output/schema#a-placeholder-stands-at-warning]]"}
   - {word: quackitect, defines: "[[README]]"}
   - {word: redraw, defines: "[[spec/design_output/extension]]"}
@@ -200,7 +200,7 @@ terms:
   - {word: ripgrep, defines: "[[spec/design_output/index]]"}
   - {word: runme, defines: "[[README]]"}
   - {word: scratchpad, defines: "[[spec/guidance/working]]"}
-  - {word: semicolon, defines: "[[spec/funnel/a-paragraph-has-a-schema]]"}
+  - {word: semicolon, defines: "[[spec/design_output/projection#the-second-target]]"}
   - {word: serialize, defines: "[[spec/design_output/apply]]"}
   - {word: shebang, defines: "[[spec/design_output/bash]]"}
   - {word: sipoc, defines: "[[spec/design_input/the-agent-pulls-tickets#the-route]]"}
@@ -210,7 +210,7 @@ terms:
   - {word: throwaway, defines: "[[spec/design_output/review]]"}
   - {word: underscore, defines: "[[spec/design_output/level0#the-path-a-rule-reads]]"}
   - {word: validator, defines: "[[spec/design_output/config]]"}
-  - {word: whitelist, defines: "[[spec/funnel/a-paragraph-has-a-schema]]"}
+  - {word: whitelist, defines: "[[spec/design_output/projection#the-second-target]]"}
   - {word: whitespace, defines: "[[spec/design_output/bash]]"}
   - {word: wildcard, defines: "[[spec/design_output/index#a-type-is-a-glob]]"}
   - {word: yaml, defines: "[[spec/design_output/schema]]"}

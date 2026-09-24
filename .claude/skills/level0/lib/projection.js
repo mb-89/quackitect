@@ -83,7 +83,7 @@ export function alsoReads(entry, texts) {
   );
 }
 
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// [[spec/design_output/projection#the-second-target]]
 function listsOf(said, texts) {
   const paths = pathsOf(said);
   const read = (path) => readYaml(texts.get(path) ?? "");
@@ -213,7 +213,7 @@ function schemaInto(entry, texts, write) {
 
   const target = folderOf(entry.target);
   const said = readYaml(source);
-  // [[spec/funnel/a-paragraph-has-a-schema]]
+  // [[spec/design_output/projection#the-second-target]]
   const lists = listsOf(said, texts);
   for (const [name, text] of write(said, saysGenerated(entry.from), lists)) {
     out.set(`${target}/${name}`, text);
@@ -342,7 +342,7 @@ export function readAll(entries, sources, targets = sources) {
     for (const path of readsIn(entry, sources)) {
       if (sources.exists(path)) texts.set(path, sources.read(path));
     }
-    // [[spec/funnel/a-paragraph-has-a-schema]]
+    // [[spec/design_output/projection#the-second-target]]
     for (const path of alsoReads(entry, texts)) {
       if (sources.exists(path)) texts.set(path, sources.read(path));
     }

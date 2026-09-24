@@ -1,6 +1,6 @@
 ---
 kind: [[funnel]]
-about: the editor a person works a ticket in, the engine that answers a pull and holds no beat, and what else closes level one
+about: the editor a person works a ticket in, and what else closes level one
 ---
 
 # Scope
@@ -22,38 +22,19 @@ because a cloud box proves no editor.
 
 # The engine answers a pull
 
-The design input gives the engine a beat, a clock that hands a box a free
-group on every tick. No code runs that clock. The pull and the mint each run
-as one process, read the files, write the files, and exit. No key under
-`engine` reaches any code past its tests, which a search for `engine.state`
-and `engine.beat` under `src` shows.
+The owner rules the engine holds no beat and no switch, and the design input
+carries the ruling. For details, see
+[[spec/design_input/the-agent-pulls-tickets#the-pull]]. The engine is the
+verbs, and a road that needs the server starts it first, the way a read tool
+does. For details, see [[spec/design_output/level0#the-first-call-pays]].
 
-The shape on offer drops the beat. The engine is the verbs, and it acts where
-somebody asks:
+What stays to build is small:
 
-| who asks | what answers |
+| the piece | what it asks |
 |---|---|
-| an agent, through the pull | the pull verb |
-| a person, through a button or the verb | the same pull verb |
-| the editor, drawing a ticket | the emitter, through `./RUNME.sh graph` |
-| a routine on a cloud box | the pull, on the routine's own schedule |
-
-A road that needs a server starts it first, the way a read tool starts the
-server on its first call. For details, see
-[[spec/design_output/level0#the-first-call-pays]]. So the index and the bridge
-stay the processes that live on, and the engine lives as long as one answer.
-
-The hook button under agent control stays the one switch. The engine switch
-goes, and `engine.state` and `engine.beat` leave the schema.
-
-| what the beat carries in the design input | where it lands |
-|---|---|
-| hands a free group to a box | the routine's schedule, which the platform holds |
-| replaces the count of what waits on you | the editor reads the count where it draws, off the index |
-| names a stale group | the listing reads a tip's age where a person asks |
-
-The cost is a count that moves when something reads it, and stands still while
-nothing does.
+| `engine.state` and `engine.beat` | leave `spec/config/level0.schema.json`, and the hook button under agent control stays the one switch |
+| the count of what waits on a person | the editor button reads it off the index where the sidebar draws |
+| a stale group | the listing reads a tip's age where a person asks |
 
 # One file holds both halves
 
@@ -213,4 +194,3 @@ from the editor alone, with no terminal and no switch.
 | whether a projection or a hand writes the HTML | a single source against every drawing HTML takes |
 | whether pull for me opens the ticket or its chapter at the step | the chapter puts the cursor where the evidence goes |
 | what calls for an engine that lives on | work that moves with nobody asking, and today the routine's schedule carries all of it |
-| what the design input says once the beat goes | it names the beat, the switch and the four controls, and a ruling here rewrites it |
