@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -116,6 +116,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: dd51f48d622b992cb2b3aa611d9fe95517d48802
+    hash_after: dd51f48d622b992cb2b3aa611d9fe95517d48802
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -260,11 +268,19 @@ Every case fails on its own assertion, with the verb unknown. The cases stand in
 
 <!-- the form is command -->
 
+./RUNME.sh lint src/scripts/ticket-fill.js src/scripts/ticket.js src/scripts/cli.js test/level0/ticket-fill.test.js
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It adds the verb's module, wires the dispatch, and names the verb in the command line's list.
+- every door the change reaches has a fake. The verb reaches the disk alone, through the doors it takes.
+- a comment names the approach the change implements. The module opens on the design input, and each function points there.
+
 
 ## tests-green
 
@@ -276,11 +292,17 @@ Every case fails on its own assertion, with the verb unknown. The cases stand in
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/ticket-fill.test.js test/level0/ticket-verb.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -288,11 +310,28 @@ Every case fails on its own assertion, with the verb unknown. The cases stand in
 
 <!-- the form is text -->
 
+`./RUNME.sh ticket fill <path>` fills a ticket a person saves with a process and no route. `filled` in `src/scripts/ticket-fill.js` hands the frontmatter and the written chapters to `withRoute` and `mintedNote`, the road the mint verb takes.
+
+| the ticket | the answer |
+|---|---|
+| a process and no route, under `--stdout` | the filled text, and no write |
+| a process and no route | the filled text over the path, and JSON naming `ticket` and `process` |
+| a route already | nothing copied, and a line saying so |
+| no process | the reason `processAt` gives, and exit 2 |
+
+So a save in the editor runs one verb, and the route it writes matches the mint's.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It touches the verb's module, the dispatch, the command line's list, and the cases.
+- every door the change reaches has a fake. The cases drive the fake disk alone.
+- a comment names the approach the change implements. Each new function points at the design input it builds.
+
 
 # verdict
 

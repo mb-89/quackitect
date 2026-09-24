@@ -76,3 +76,10 @@ test("fill over a ticket naming no process refuses, and writes nothing", () => {
 test("the command line's ticket entry names the fill verb", () => {
   assert.match(verbs.ticket.says, /\bfill\b/);
 });
+
+test("fill over a path standing nowhere refuses with exit 2", () => {
+  const disk = fakeDisk({ [at("spec/schemas/ticket.schema.yaml")]: TICKET_SCHEMA });
+  const ran = heard(() => ticket(ROOT, ["fill", "spec/tickets/nowhere.md"], { disk, join }));
+  assert.equal(ran.code, 2);
+  assert.match(ran.said, /names no ticket/);
+});

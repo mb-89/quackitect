@@ -25,6 +25,7 @@ import { askRows, processAt } from "./process.js";
 import { emptyGroup } from "./pull-hand.js";
 import { landedAlone } from "./pull-landed.js";
 import { baseOf, driftOf } from "./ticket-drift.js";
+import { filled } from "./ticket-fill.js";
 import { reachedOf, routed } from "./ticket-route.js";
 import { yours } from "./ticket-yours.js";
 import { askFaults, askRefusal, lineRefusal } from "./ticket-ask-lint.js";
@@ -44,7 +45,15 @@ export function ticket(root, argv, doors) {
   const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
   const name = argv[1];
-  const doing = { note, update, open, todo, route, yours: (it, _name, argv) => yours(it, argv) };
+  const doing = {
+    note,
+    update,
+    open,
+    todo,
+    route,
+    fill,
+    yours: (it, _name, argv) => yours(it, argv),
+  };
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh ticket <verb>\n");
     console.log(
@@ -67,6 +76,9 @@ export function ticket(root, argv, doors) {
     );
     console.log(
       "  yours               the tickets waiting on a person as JSON, or --count, or --next",
+    );
+    console.log(
+      "  fill <path>         write the route a saved ticket's process names, or print it under --stdout",
     );
     console.log(
       `                      note takes --${TALK} where a person decides it, and --${TODO} to park it`,
@@ -244,6 +256,16 @@ function route(it, name, argv) {
     return 1;
   }
   return routed(it, at, argv, schemasHere(it).get("ticket"));
+}
+
+// [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+function fill(it, name, argv) {
+  const at = name ? ticketAt(it, name) : null;
+  if (!at) {
+    console.error(`${name ?? "ticket fill"} names no ticket: ./RUNME.sh ticket fill spec/tickets/slow-lint.md`);
+    return 2;
+  }
+  return filled(it, at, argv, schemasHere(it));
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
