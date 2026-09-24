@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 2bc65ec92430 · claude-code-remote
@@ -103,6 +103,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: f1b1cc576d4de3020003ca3588c8cdde94f10c6f
+    hash_after: f1b1cc576d4de3020003ca3588c8cdde94f10c6f
 ---
 
 # Ask
@@ -177,11 +181,25 @@ The engine answers every question the editor asks as a verb writing JSON. The ve
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-route-edits-ahead]]: `ticket route` writes the steps past the pointer, and refuses a reached leaf
+- [[spec/tickets/yours-counts-the-waiting]]: `ticket yours` answers the tickets waiting on a person
+- [[spec/tickets/an-update-keeps-a-route]]: `ticket update` names drift from the copied process, and `--over` writes over it
+- [[spec/tickets/each-node-names-its-place]]: each graph node carries its chapter and its line
+- [[spec/tickets/the-config-declares-work]]: the engine keys leave, and the work buttons stand declared and undrawn
+- [[spec/tickets/the-fill-answers-on-stdout]]: `ticket fill` writes the mint's route, or prints it under `--stdout`
+- [[spec/tickets/the-server-offers-processes]]: the server offers processes, folds the frontmatter, and holds back the filled keys
+
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- every child closed through the whole standard route, since a spawned hand read each draft and each change
+- the verdicts caught copied helpers the draft hand missed, since each spawned hand searched for owners
+- each red check pointed at one file, since the check names the test and the rule
+
 
 ### badly
 
@@ -189,11 +207,29 @@ The engine answers every question the editor asks as a verb writing JSON. The ve
 
 <!-- the form is list -->
 
+- the check went red after the split, since one child name ran past the word cap
+- the change leaf met the no-test hook on several children, since tests-red had landed the tests already
+- verdicts failed on helpers the tree owned already, such as `canonicalOf`, `leafOf`, `heard` and `COMMENT`
+- the config draft named a new `work` section, and one stood already
+- the server draft missed the Go checker, which raises a missing key before the bridge answers
+- the update change turned a roots case red, and the draft named no such case
+- two spawned hands wrote a verdict under the wrong chapter first, and restored the file
+- the route and yours cases still copy `heard`, which `test/level0/pull-doors.js` exports
+
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- `ticket open` in `src/scripts/ticket.js` refuses a child name past the word cap, as the tree rule does
+- `carriedIn` in `.claude/skills/level0/lib/tested.js` reads the tests-red command, so the change leaf passes the hook
+- the draft checklist in `spec/processes/standard.yaml` asks for a search for each helper's owner
+- the draft checklist asks the draft hand to read every checker a key reaches
+- the spawn prompt in `src/scripts/pull-spawn.js` names the chapter the verdict writes under
+- a trivial ticket moves the copied `heard` in the route and yours cases onto the shared one
+
 
 ### thoughts
 
@@ -201,11 +237,19 @@ The engine answers every question the editor asks as a verb writing JSON. The ve
 
 <!-- the form is text -->
 
+The drafts read the code a caller touches, and stopped there. Each failed verdict found a second reader or an owner one step further out. The work kept moving because every refusal named its file. The cost sat in round trips, and a search before each helper lands would have saved most of them.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact stands in one place. Each line points at the ticket or the file that owns it.
+- every number carries a name in one place. The retro adds no number.
+- every header the change writes says what its file is for, and counts nothing. The retro writes no header.
+
 
 ## cloud
 
