@@ -147,7 +147,7 @@ export function planned(e, box) {
   box.log.say(
     "info",
     PLAN,
-    `the plan holds ${plan.todos.length} todo(s), working on ${plan.working || "nothing named"}`,
+    `the plan holds ${plan.todos.length} ${plan.todos.length === 1 ? "todo" : "todos"}`,
     {
       detail: [...done].join(", "),
     },

@@ -147,6 +147,39 @@ func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
 	}
 }
 
+// [[spec/design_output/index#the-index-fires-on-change]]
+func TestAChangesCallFiresOnAPlanWriteWithinASecond(t *testing.T) {
+	root := tree(t)
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	first, err := posts(standing, []string{"changes", "0"})
+	if err != nil || first.Error != "" {
+		t.Fatalf("a changes call from nothing answers the tick now, and answered %v %q", err, first.Error)
+	}
+	tick := tickOf(t, first)
+
+	write(t, root, Plan, `{"working":"","todos":[]}`)
+	started := time.Now()
+	next, err := posts(standing, []string{"changes", strconv.FormatInt(tick, decimalBase)})
+	if err != nil || next.Error != "" {
+		t.Fatalf("a changes call past the tick answers, and answered %v %q", err, next.Error)
+	}
+	if tickOf(t, next) <= tick {
+		t.Fatalf("a plan write counts one more, so the work tab reads the todos again, and the tick stayed at %d", tick)
+	}
+	if time.Since(started) > time.Second {
+		t.Fatalf("the call fires within a second of the plan write, and took %v", time.Since(started))
+	}
+}
+
 func tickOf(t *testing.T, said answer) int64 {
 	t.Helper()
 	held, ok := said.Result.(map[string]any)

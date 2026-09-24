@@ -22,6 +22,11 @@ func watches(root string, one *door) (*fsnotify.Watcher, error) {
 	}
 	// Git's own folder alone, with no folder under it, so a change to the tracked list reaches the flags. [[spec/design_output/index#a-change-moves-its-rows]]
 	eyes.Add(filepath.Join(root, ".git"))
+	// The runtime folder alone, for the plan file the work tab draws, so a plan write reaches the tab. [[spec/design_output/index#the-index-fires-on-change]]
+	runtime := filepath.Join(root, filepath.FromSlash(Runtime))
+	if makeDir(runtime, 0o755) == nil {
+		eyes.Add(runtime)
+	}
 
 	go func() {
 		for {

@@ -47,6 +47,11 @@ test("the ask rides the calls it lets pass, and a spent grace refuses the next",
     2,
     "the ask and the refusal each write a line",
   );
+  assert.deepEqual(
+    [...new Set(it.said.filter((row) => row[1] === "grace").map((row) => row[0]))],
+    ["debug"],
+    "the grace is the agent's to answer, so its lines stand under debug",
+  );
 });
 
 // [[spec/design_output/stop#the-grace]]

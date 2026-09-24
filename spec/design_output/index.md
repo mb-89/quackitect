@@ -116,10 +116,10 @@ The watch is what holds the rows level with the tree. It watches every folder
 the walk covers, and names each path a write reaches. For what the door does
 with a path, see [[spec/design_output/index#a-change-moves-its-rows]].
 
-The watch stands off every folder the walk stands off, the log among them. The
-log grows a line a door call, so a watch on it moves rows for nothing. A search
-of the log reads the file. For how, see
-[[spec/design_output/log#one-verb-reads-the-log]].
+| what the watch meets | what it does |
+|---|---|
+| a folder the walk stands off, the log among them | stands off it. The log grows a line a door call, and a watch on it moves rows for nothing. A search of the log reads the file, see [[spec/design_output/log#one-verb-reads-the-log]] |
+| the runtime folder | holds that folder alone, for the plan file. A plan write moves no row and counts one on the tick. The work tab then reads its todos again, see [[spec/design_output/stop#the-plan]] |
 
 A box where no watch stands still answers, out of the sweep the door makes on
 the way up and on its clock.
