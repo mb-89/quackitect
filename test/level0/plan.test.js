@@ -166,3 +166,48 @@ test("the handover's own work leaves the plan, the word matched whole, and a pla
   assert.equal(dropsHandover(it.box), 0);
   assert.equal(String(it.disk.read(at(PLANS))), before);
 });
+
+// A handover todo stands from the context mark to the clear alone. [[spec/design_output/work#one-handover-stands]]
+test("the plan takes a handover todo once the context mark is due, and drops one standing before", () => {
+  const it = box({
+    [at(PLANS)]: JSON.stringify({
+      working: "write the handover",
+      todos: [
+        { title: "the handover", details: "", todo: "end" },
+        { title: "the handovers tab", details: "", todo: "end" },
+      ],
+      places: {},
+    }),
+  });
+
+  const early = plan(
+    { add: [{ title: "write the handover" }, { title: "one" }] },
+    it.box,
+  );
+  assert.match(early.result.result, /write the handover waits for the context mark/);
+  let held = plansHere(it.box);
+  assert.equal(held.working, "", "the handover in hand leaves before the mark");
+  assert.deepEqual(
+    held.todos.map((one) => one.title),
+    ["the handovers tab", "one"],
+  );
+
+  plan({ working: "the handover" }, it.box);
+  assert.equal(plansHere(it.box).working, "", "nor does it come back in hand");
+
+  it.box.handover = { phase: "finish", asked: 0 };
+  plan(
+    {
+      done: ["one"],
+      add: [{ title: "write the handover" }],
+      working: "write the handover",
+    },
+    it.box,
+  );
+  held = plansHere(it.box);
+  assert.equal(held.working, "write the handover");
+  assert.deepEqual(
+    held.todos.map((one) => one.title),
+    ["the handovers tab", "write the handover"],
+  );
+});

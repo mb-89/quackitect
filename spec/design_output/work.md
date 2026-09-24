@@ -295,6 +295,10 @@ The same read drops from the plan the work in hand and every todo whose title
 names the handover. So a handover stands in the work tab until the next session
 reads it, and a hand closes no row of it.
 
+The plan takes a handover todo once `context.handoverAt` comes due, and before
+that it drops one and takes none. So the row stands from the mark to the clear,
+and leaves as the next session reads the handover.
+
 `prompt.context` fires at a session's first prompt and again after a
 compaction and a `/clear`. A `/clear` fires no `session.start`, so a handover
 written before a clear reaches the conversation after it.
