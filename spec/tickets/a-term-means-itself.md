@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -141,6 +141,10 @@ record:
     hash_after: aba475be2e88d47fccfb0f45debc4aaa91ea9c3c
     returns: 1
     why: "design: the branch answers each line of the Ask, and `./RUNME.sh check` answers 0.; design: the table writes each stem the old rule wrote, and the cut plus `e` reads as the old cut.; craft: the shape rule passes a `source` holding a comma. The entry splits on it, and the head still reads as an address.; craft: add the shape case the review asks for, a `source` holding a comma, and make the rule refuse it.; craft: the Ask says `source` holds a standard or a paper, and most rows cite a tool home page.; craft: cite a standard or a paper, or drop `source` from each tool row, such as `biome` and `vale`.; craft: `shell` cites the bash manual, and a shell is more than bash, so drop that `source`."
+  - step: implement/reflect
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 200c79e4d58c18b26c93b1341cdb8fea411d644f
+    hash_after: 200c79e4d58c18b26c93b1341cdb8fea411d644f
 ---
 
 # Ask
@@ -289,11 +293,25 @@ comma splits in two, so a `means` line holds no comma.
 
 <!-- the form is text -->
 
+The class is a check that reads a field after the entry splits. The split cuts
+a value at its first comma, so a check over the cut value passes what the whole
+line breaks.
+
+| finding | answer |
+|---|---|
+| a `source` holding a comma passes | the rule reads `source` off the whole line, as it reads `means`, and a shape case holds it |
+| `source` names tools, not standards | the plan names a standard and a paper as examples of an outside source, so the home of a tool stands |
+| `shell` cites the bash manual | the `source` goes, because a shell is more than bash |
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fix touches the shape rule, its test and the list, and the ask names each
+- the shape test reaches the rule through the one door it reads, and no other
+- the rule carries its comment beside the new pattern
 
 ## change
 
