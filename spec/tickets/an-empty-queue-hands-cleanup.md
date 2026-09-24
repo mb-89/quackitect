@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -115,6 +115,17 @@ record:
     hand: box d6f05e3a585030 · claude-code · helper-3
     hash_before: 038ee57383d79c2c72601311bc73bc9f6ceb2974
     hash_after: 038ee57383d79c2c72601311bc73bc9f6ceb2974
+  - step: implement/tests-red
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: ced4fee7c3638c25777887c6407387f468f505ad
+    hash_after: ced4fee7c3638c25777887c6407387f468f505ad
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -202,17 +213,28 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/pull-cleanup.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the stub answers no cleanup, so each case fails on its own assertion
+- the held-file case read the rows of a null answer, so it now asserts the word first
+- the cloud case passed on the stub, so it now shows the desk gets the same cleanup first
+- what surprises the hand: a case asserting a null answer proves nothing against a stub answering null
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the cleanup module and its test, and the pull hand and pull note follow
+- the disk door and the git door carry the reading, and their fakes answer both in the cases
+- the module and the test each open on a comment naming the approach, with a pointer at the pull note
 
 ## reflect
 

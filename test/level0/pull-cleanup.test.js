@@ -56,6 +56,7 @@ test("a file the refactoring hand holds stays out of the cleanup", () => {
     [at(REFACTOR_HOLD)]: JSON.stringify({ file: "old.md", hand: "a1", since: 0 }),
   };
   const said = cleanupOf(desk({ ...listed("new.md", "old.md"), ...held }));
+  assert.equal(said?.word, CLEANUP);
   assert.match(said.rows.join("\n"), /Take new\.md/);
 });
 
@@ -69,6 +70,7 @@ test("an empty list and a failed or stale stamp hand out the check, and a green 
 });
 
 test("a cloud box meeting no ticket gets no cleanup", () => {
-  const box = desk({ ...listed("old.md"), ...stamped(false) }, { cloud: true });
-  assert.equal(cleanupOf(box), null);
+  const files = { ...listed("old.md"), ...stamped(false) };
+  assert.equal(cleanupOf(desk(files))?.word, CLEANUP);
+  assert.equal(cleanupOf(desk(files, { cloud: true })), null);
 });
