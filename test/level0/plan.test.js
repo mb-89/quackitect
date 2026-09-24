@@ -81,6 +81,15 @@ test("one call adds todos at their place, finishes some, and names the work in h
   );
 });
 
+// The owner reads the count in the log, and the work in hand stands in the tab. [[spec/design_output/stop#the-plan]]
+test("the log's plan line names the count of todos alone", () => {
+  const it = box();
+  plan({ add: [{ title: "one" }], working: "one" }, it.box);
+  plan({ add: [{ title: "two" }] }, it.box);
+  const lines = it.said.filter((row) => row[1] === PLAN).map((row) => row[2]);
+  assert.deepEqual(lines, ["the plan holds 1 todo", "the plan holds 2 todos"]);
+});
+
 // Past the number, a new todo stays out, and the answer says to finish one or write a ticket. [[spec/design_output/stop#the-plan]]
 test("the open todos hold a number, and one past it stays out", () => {
   const it = box();

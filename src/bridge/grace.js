@@ -15,7 +15,8 @@ export function wants(box, ask) {
     tool: String(ask.tool ?? ""),
     left: Math.max(0, Number(ask.calls) || 0),
   };
-  box.log.say("info", "grace", `the engine wants ${box.grace.id}: ${box.grace.why}`, {
+  // The grace is the agent's to answer, so its lines stand under debug. [[spec/design_output/stop#the-grace]]
+  box.log.say("debug", "grace", `the engine wants ${box.grace.id}: ${box.grace.why}`, {
     detail: `${box.grace.left} call(s) of grace`,
   });
   return true;
@@ -24,7 +25,7 @@ export function wants(box, ask) {
 // The agent reacted, or the ask fell away, so the calls pass again. [[spec/design_output/stop#the-grace]]
 export function reacted(box, id) {
   if (!box.grace || box.grace.id !== String(id)) return false;
-  box.log.say("info", "grace", `${box.grace.id} is answered, and the calls pass`);
+  box.log.say("debug", "grace", `${box.grace.id} is answered, and the calls pass`);
   box.grace = null;
   return true;
 }
@@ -39,7 +40,7 @@ export function holdsGrace(e, box, passes = new Set()) {
     return { after: { context: [graceBlock(grace)] } };
   }
   box.log.say(
-    "warn",
+    "debug",
     "grace",
     `${grace.id} is unanswered, and ${e?.tool ?? "the call"} is refused`,
     {
