@@ -139,7 +139,7 @@ func (t Tree) nameHead(one twig) string {
 	if t.Nests {
 		mark := strings.Repeat(" ", MarkWide)
 		switch {
-		case one.kids && t.shut[one.at]:
+		case one.kids && t.shut[one.key]:
 			mark = "▸ "
 		case one.kids:
 			mark = "▾ "

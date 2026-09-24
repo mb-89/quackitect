@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -23,9 +23,23 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
+group: the-editor-holds-the-drawing
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 639f41e8c2a9085c88faaf1d9095de1d613e0607
+    hash_after: 639f41e8c2a9085c88faaf1d9095de1d613e0607
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui passes
+      - name: check
+        exit: 0
+        said: "src/bridge/stop.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 640. Split it by topic."
+reason: done
 ---
 
 # Ask
@@ -52,11 +66,15 @@ Without it every redraw folds each group shut, and a person opens them again aft
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test src/tui/tree/tree_test.go
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -64,11 +82,17 @@ Without it every redraw folds each group shut, and a person opens them again aft
 
 <!-- the form is text -->
 
+The tree view keys a shut parent by the names down to it, and no more by its index. A new note under `.se/tickets` sorts ahead of every ticket, so an index key moved the shut set onto other groups on every redraw. A tree handed over again carries the shut set and the row under the cursor by name. A parent a person opens again stays open. The address an edit writes through stays the index. For details, see [[spec/design_output/tree-view#a-parent-expands-and-collapses]].
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: two tests drive the open groups and the row order
+- the carry copied an opened parent as shut, and the change fixes it with the rest
+- the tree-view note owns the address, and the code points at it
 
 # Discussion
 
