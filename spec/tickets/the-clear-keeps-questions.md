@@ -94,7 +94,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -120,6 +120,10 @@ record:
     hand: box d6f05e3a585030 · claude-code
     hash_before: 508cdf32b33d17ee68afc13203a241bd0b7672e3
     hash_after: 508cdf32b33d17ee68afc13203a241bd0b7672e3
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-6
+    hash_before: c8b6966c4918c3d60df140b855934550a27d7281
+    hash_after: c8b6966c4918c3d60df140b855934550a27d7281
 ---
 
 # Ask
@@ -196,15 +200,12 @@ A prompt of the plugin's own leaves the phase standing, so the tooth's re-prompt
 
 ### verdict
 
-fail
+pass
 
-- `onStop` writes `box.handover.waits`, and `box.handover` stands null outside a context handover, so the write throws.
-- `the-chat-is-new` ends nearly every chat's first turn, so this null case is the common path, not an edge case.
-- A door that throws answers pass, per `server.js`, so the turn's stop decision skips, and the turn holds unended.
-- A guard creating `box.handover` fresh makes `measures` in `handover.js` treat it as a handover due, and skip the real one.
-- The approach leaves this failure mode unnamed, and the callers list wants a guard for `box.handover` standing null.
-- `onStop` now saves the claimed reason past its own reset, answering the earlier read of null.
-- `submitsPrompt` moves the phase back, and `stopReasons` carries `waits` through to the reader.
+- The answers list credits `onStop` with writing the mark, though `holdsForHandover` writes it and ends the classic.Stop chain first.
+- The new phase value `asked` shares its name with `due.asked`, the retry counter `holdsForHandover` already keeps.
+- `holdsForHandover` reads the claim through `claimOf` and skips the `decide` vote, so an unfired claim can hold the clear.
+- The design names no function that turns the ending message into the question text it stores.
 
 <!-- the form is verdict -->
 
