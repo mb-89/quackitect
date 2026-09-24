@@ -5,9 +5,9 @@
 
 terms:
   - {word: splice, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
-  - {word: bridgehead, defines: "[[spec/funnel/a-button-makes-a-vehicle#the-bridgehead]]"}
-  - {word: shim, defines: "[[spec/funnel/a-button-makes-a-vehicle#the-bridgehead]]"}
-  - {word: stub, defines: "[[spec/funnel/a-button-makes-a-vehicle#the-stub]]"}
+  - {word: bridgehead, defines: "[[spec/design_output/vehicle#two-roads-to-the-vehicle]]"}
+  - {word: shim, defines: "[[spec/design_output/vehicle#two-roads-to-the-vehicle]]"}
+  - {word: stub, defines: "[[spec/design_output/vehicle#a-stub-takes-its-vehicle]]"}
   - {word: agent, defines: "[[spec/guidance/voice]]"}
   - {word: answer, defines: "[[spec/design_output/level0#the-gate-reads-the-answer]]"}
   - {word: apply, defines: "[[spec/design_output/apply]]"}
@@ -25,7 +25,7 @@ terms:
   - {word: cage, defines: "[[spec/design_output/level0#the-write-door]]"}
   - {word: canary, defines: "[[spec/design_output/level0#the-canary]]"}
   - {word: inset, defines: "[[spec/funnel/a-person-works-the-ticket#one-file-holds-both-halves]]"}
-  - {word: canvas, defines: "[[spec/funnel/a-process-is-data]]"}
+  - {word: canvas, defines: "[[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]"}
   - {word: cap, defines: "[[spec/design_output/level0#the-cap-counts-the-prose]]"}
   - {word: chapter, defines: "[[spec/design_output/schema]]"}
   - {word: checker, defines: "[[spec/design_output/schema#the-reader-and-the-checker]]"}
@@ -90,7 +90,7 @@ terms:
   - {word: module, defines: "[[spec/design_output/level0#a-module-imports-a-sibling]]"}
   - {word: node, defines: "[[spec/design_output/config]]"}
   - {word: note, defines: "[[spec/design_output/schema]]"}
-  - {word: orphan, defines: "[[spec/funnel/a-process-is-data]]"}
+  - {word: orphan, defines: "[[spec/design_output/work]]"}
   - {word: owner, defines: "[[spec/guidance/voice]]"}
   - {word: pane, defines: "[[spec/design_output/tui]]"}
   - {word: panel, defines: "[[spec/design_output/extension]]"}
@@ -203,7 +203,7 @@ terms:
   - {word: semicolon, defines: "[[spec/funnel/a-paragraph-has-a-schema]]"}
   - {word: serialize, defines: "[[spec/design_output/apply]]"}
   - {word: shebang, defines: "[[spec/design_output/bash]]"}
-  - {word: sipoc, defines: "[[spec/funnel/a-process-is-data]]"}
+  - {word: sipoc, defines: "[[spec/design_input/the-agent-pulls-tickets#the-route]]"}
   - {word: stdin, defines: "[[spec/design_output/bash]]"}
   - {word: stdio, defines: "[[spec/design_output/lsp]]"}
   - {word: subcommand, defines: "[[spec/design_output/work]]"}

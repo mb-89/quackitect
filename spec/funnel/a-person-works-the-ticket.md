@@ -79,7 +79,7 @@ the main line of VS Code, so it carries three costs:
 | the editor refuses the call without a flag | the extension names `editorInsets` under `enabledApiProposals`, and the launch passes `--enable-proposed-api quackitect.quackitect` |
 | a proposed API changes between releases | a release can break the drawing, and the body holds on |
 
-The drawing carries the stack `a-process-is-data` names from v4:
+The drawing carries the stack v4 picks:
 
 | piece | what it does |
 |---|---|
@@ -213,4 +213,4 @@ from the editor alone, with no terminal and no switch.
 | whether a projection or a hand writes the HTML | a single source against every drawing HTML takes |
 | whether pull for me opens the ticket or its chapter at the step | the chapter puts the cursor where the evidence goes |
 | what calls for an engine that lives on | work that moves with nobody asking, and today the routine's schedule carries all of it |
-| what the design input and `level-zero-closes` say once the beat goes | both name the beat and the four controls, and a ruling here rewrites both |
+| what the design input says once the beat goes | it names the beat, the switch and the four controls, and a ruling here rewrites it |
