@@ -96,12 +96,18 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
     hash_before: 13edadb5938b7e4cc1e59cbab7b5d7bf22ba59b4
     hash_after: 13edadb5938b7e4cc1e59cbab7b5d7bf22ba59b4
+  - step: design/review
+    hand: box a0ae5042621d · claude-code-remote · helper-2
+    hash_before: 89c6e4b1043e4f41545199f3b5fde71305a3b368
+    hash_after: 89c6e4b1043e4f41545199f3b5fde71305a3b368
+    returns: 1
+    why: "| finding | fix |; |---|---|; | The cases pin only the rows they name, so a Go row drifts unseen | Move `ENDINGS` and `PREFIXES` into `stems.yaml`, and let both readers load the table |; | No Go test reads `slug.yaml`, so \"as the slug cases do\" holds on the JavaScript side alone | Name the Go test that loads `stems.yaml` |; | The slug test stands in `test/contract/vocabulary.test.js` | Name the file the shared cases land in |; | `knownIn` reads `PREFIXES` too, so `unread` reaches `read` | Say whether the hover reads a prefix |; | `src/extension` asks for a hover off the server's capabilities | Write that the client needs no change |; | The draft names no test for either done line | Name the hover test and the test after `terms.yml` changes |; The rest reads true: `took`, `Tree.Read`, `pathsOf` and the terms file each stand as the draft says."
 ---
 
 # Ask
@@ -187,6 +193,19 @@ cases do, so a drift turns a suite red.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+| finding | fix |
+|---|---|
+| The cases pin only the rows they name, so a Go row drifts unseen | Move `ENDINGS` and `PREFIXES` into `stems.yaml`, and let both readers load the table |
+| No Go test reads `slug.yaml`, so "as the slug cases do" holds on the JavaScript side alone | Name the Go test that loads `stems.yaml` |
+| The slug test stands in `test/contract/vocabulary.test.js` | Name the file the shared cases land in |
+| `knownIn` reads `PREFIXES` too, so `unread` reaches `read` | Say whether the hover reads a prefix |
+| `src/extension` asks for a hover off the server's capabilities | Write that the client needs no change |
+| The draft names no test for either done line | Name the hover test and the test after `terms.yml` changes |
+
+The rest reads true: `took`, `Tree.Read`, `pathsOf` and the terms file each stand as the draft says.
 
 # implement
 
