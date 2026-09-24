@@ -536,6 +536,7 @@ the turn open for a hand-back nobody owes.
 
 | the road | what `pushed` does |
 |---|---|
+| a desk | pushes nothing and runs no check: the hand-back stands on this box, and the owner pushes, as with the commit verb. [[spec/guidance/working]] |
 | trunk | runs `./RUNME.sh check` over the commit first, so the stamp names the commit the push carries |
 | a red check | pushes nothing, and the answer names the check's own lines |
 | a tests-red leaf | stands on this box on trunk, and the next green push carries it |

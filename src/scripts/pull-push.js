@@ -3,6 +3,7 @@
 // stands on this box. A refusal answers the push door's own cause.
 // [[spec/design_output/pull#the-rejected-push]]
 
+import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { saidBy } from "./commit-verb.js";
 
@@ -13,6 +14,14 @@ const SENT = Object.freeze({ ok: true, local: false, why: [] });
 
 // [[spec/design_output/pull#the-rejected-push]]
 export function pushed(it, branch, { red = false } = {}) {
+  // A desk lands its hand-back on this box, as its commit verb does, and the owner pushes. [[spec/guidance/working]]
+  if (!(it.cloud ?? inCloud(it.env ?? {}))) {
+    return {
+      ok: true,
+      local: true,
+      why: [`The hand-back stands on this box, and the owner pushes ${branch}.`],
+    };
+  }
   const trunk = branch === TRUNK;
   if (trunk && red) {
     return {
@@ -42,7 +51,9 @@ export function pushed(it, branch, { red = false } = {}) {
 
 // [[spec/design_output/pull#the-rejected-push]]
 export function redLeaf(leaf) {
-  return (leaf?.evidence ?? []).some((one) => String(one?.expects ?? "") === "assertion");
+  return (leaf?.evidence ?? []).some(
+    (one) => String(one?.expects ?? "") === "assertion",
+  );
 }
 
 // [[spec/design_output/pull#the-rejected-push]]
@@ -63,16 +74,22 @@ function tried(it, branch) {
     said: {
       ok: false,
       local: true,
-      why: [`The push door refuses ${branch}:`, ...(lines.length ? lines : ["it names no cause"])],
+      why: [
+        `The push door refuses ${branch}:`,
+        ...(lines.length ? lines : ["it names no cause"]),
+      ],
     },
   };
 }
 
 // [[spec/design_output/pull#the-rejected-push]]
 function checkRed(it) {
-  const ran = it.proc.run([it.node, it.join(it.root, "src", "scripts", "cli.js"), "check"], {
-    cwd: it.root,
-  });
+  const ran = it.proc.run(
+    [it.node, it.join(it.root, "src", "scripts", "cli.js"), "check"],
+    {
+      cwd: it.root,
+    },
+  );
   if (ran.exitCode === 0) return null;
   return {
     ok: false,

@@ -20,7 +20,7 @@ import {
 } from "./pull-doors.js";
 
 // A desk hands the question to a person, and a cloud box answers it itself. [[spec/guidance/cloud]]
-test("branch escalate inserts a person step before the held leaf, drops the hold and pushes", () => {
+test("branch escalate inserts a person step before the held leaf, drops the hold, and a desk pushes nothing", () => {
   const { it, disk, outside } = doors(standing(), {}, { cloud: false });
   heard(() => pulling(ROOT, ["pull"], it));
   assert.equal(JSON.parse(disk.read(HOLD)).step, "design/draft");
@@ -42,7 +42,11 @@ test("branch escalate inserts a person step before the held leaf, drops the hold
     ranGit(outside).some((one) => one.startsWith("git commit")),
     "one commit names the ticket and the step",
   );
-  assert.ok(ranGit(outside).includes(`git push origin ${BRANCH}`), "and it pushes");
+  // [[spec/tickets/a-desk-pull-pushes-nothing]]
+  assert.ok(
+    !ranGit(outside).includes(`git push origin ${BRANCH}`),
+    "the owner pushes a desk's work",
+  );
 });
 
 // Trunk names no group, so the hand-out after an escalate reads the free tickets. [[spec/design_output/pull#the-engine-takes-the-branch]]
@@ -53,8 +57,6 @@ test("branch escalate on trunk hands the next free ticket, as the pull does ther
     {
       "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
       "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
-      // On trunk the push runs the check first. [[spec/design_output/pull#the-rejected-push]]
-      [`node ${at("src/scripts/cli.js")} check`]: { exitCode: 0 },
     },
     { cloud: false },
   );
@@ -63,7 +65,11 @@ test("branch escalate on trunk hands the next free ticket, as the pull does ther
   const { code, said } = heard(() => work(ROOT, ["escalate", "which road"], it));
 
   assert.equal(code, 0, said);
-  assert.match(said, /^work {2}b-other at design\/draft/m, "the free ticket comes next");
+  assert.match(
+    said,
+    /^work {2}b-other at design\/draft/m,
+    "the free ticket comes next",
+  );
 });
 
 test("branch escalate with options writes a choice answer carrying the words", () => {
