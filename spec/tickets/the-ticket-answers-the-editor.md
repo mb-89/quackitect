@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -107,6 +107,11 @@ record:
     hand: box 2bc65ec92430 · claude-code-remote
     hash_before: f1b1cc576d4de3020003ca3588c8cdde94f10c6f
     hash_after: f1b1cc576d4de3020003ca3588c8cdde94f10c6f
+  - step: retro/cloud
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 87586cd9fd415fc49ab569526c84d855e0216734
+    hash_after: 87586cd9fd415fc49ab569526c84d855e0216734
+reason: done
 ---
 
 # Ask
@@ -261,17 +266,31 @@ The drafts read the code a caller touches, and stopped there. Each failed verdic
 
 <!-- the form is list -->
 
+- the level zero tools the working guidance names, such as `report`, `patch` and `check_answer`, stood absent from the session
+- `code` stood off the path, so the bare `./RUNME.sh` opened no editor
+
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the word cap, on a child name at the check after the split
+- the no-test hook, on the change leaf of several children
+- no trunk guard, and no conflict at sync
+
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- no person step stands parked, and every minted ticket names this group
+- the work buttons wait for the desk group's work group child, which adds their group and reads `counts` and `opens`
+- the improve lines of the retro wait for a hand to mint them
+
 
 # Discussion
 
