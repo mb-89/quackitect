@@ -95,7 +95,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: d0fbc75a2f079c272e9ffec2ff3592cfbdf61a45
+    hash_after: d0fbc75a2f079c272e9ffec2ff3592cfbdf61a45
 ---
 
 # Ask
@@ -135,17 +140,42 @@ to learn one word. The note and the term then drift apart.
 
 <!-- the form is text -->
 
+Each entry in `terms.yml` gains two fields, and the readers learn them:
+
+| piece | change |
+|---|---|
+| `terms.yml` | every entry gains `means`, and a term naming an outside tool or standard gains `source` |
+| `termsOf` | answers `means` and `source` beside `word` and `defines` |
+| the stem | one table of endings and one list of prefixes in `vocabulary.js` write the Tengo stem the rule runs, and a JS function reads the same table |
+| `looseMeanings` | answers every word of a `means` line the lists leave out, through that JS function |
+| `VocabularyEntry.yml` | refuses a term with no `means`, a `means` holding a comma, a colon or a bracket, and a `source` that is no web address |
+
+A `means` line holds no comma, colon or bracket, because the reader of a
+one-line entry splits on the comma and the colon. `defines` stays until the
+refusal child takes it away.
+
+The stem moves into a table, so the rule and the check read one source. A
+second copy of the endings drifts from the first.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `.claude/skills/level0/lib/vocabulary.js`, `wordsOf` and `undefinedTerms` call `termsOf`
+- `.claude/skills/level0/lib/paragraph.js`, the projection calls `vocabularyRule`
+- `test/contract/vocabulary.test.js`, the list test calls `termsOf`
+- `test/level0/vocabulary.test.js`, the layer test calls `termsOf` and `vocabularyRule`
+- `test/contract/shape.test.js`, the entry cases run `VocabularyEntry.yml`
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first
 
 ## review
 
