@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -132,6 +132,10 @@ record:
     hand: box a0ae5042621d · claude-code-remote
     hash_before: f44e23101baa6c0bc98869a3eb905f5a80ba8535
     hash_after: f44e23101baa6c0bc98869a3eb905f5a80ba8535
+  - step: design/review
+    hand: box a0ae5042621d · claude-code-remote · helper-8
+    hash_before: 754d7afc61e13a2fe30603b7de28d8630adbad1f
+    hash_after: 754d7afc61e13a2fe30603b7de28d8630adbad1f
 ---
 
 # Ask
@@ -254,20 +258,26 @@ file. `spec/design_output/lsp.md` gains a chapter on the hover, and
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-| finding | fix |
-|---|---|
-| The approach names `stems.yaml`, and the answers name `stems.yml` | Name the file one way in every line |
-| `test/level0/vocabulary.test.js` reads fixture lists and touches no disk, so it reaches no case the real `stems.yaml` holds | Drive the cases in `test/contract/vocabulary.test.js` beside the slug test, and keep a fixture table in the level zero file |
-| No test in `src/lsp` reads a file of the tree, and `hover_test.go` reads the real `stems.yaml` | Name the path the Go test reads and the disk it reads through |
-| `paragraph.schema.schema.json` names `stems` in the vocabulary layer and leaves `endings` out | Add `endings` as a string to the shape |
+- the fourteen earlier findings stand settled by the answers
+- the approach answers each row of the ask
 
-The ten earlier findings stand settled by the answers. The rest reads true:
+The rest reads true:
 
-- `took` answers `initialize`, and `Tree.Read` reads an open buffer or the index copy, which `follows` pulls after a save
-- `alsoReads` and the caches take every path `pathsOf` names, so a new key reaches both
-- `faultsOf` refuses no key the shape leaves out, and nothing in `spec/config` refuses a new yaml file
+- `took` in `src/lsp/lsp.go` answers `initialize`, so `hoverProvider` joins it there
+- `Tree.Read` reads an open buffer or the saved file, so a save to `terms.yml` counts at the next hover
+- `src/tui/work_test.go` reads the tree through `os.ReadFile` off the root, and `hover_test.go` can read `stems.yaml` the same way
+- `src/lsp/go.mod` holds `quackitect/yaml`, so the Go reader loads `stems.yaml` with no new dependency
+- the projection and the bridge caches take every path `pathsOf` names, so `endings` reaches each
+- `paragraph.schema.schema.json` holds no `endings` today, and the approach adds it
+- `test/contract/vocabulary.test.js` reads the slug cases off the disk door, and the stem cases can land beside them
+
+The implement step settles these details:
+
+- `knownIn` takes a set alone today, so it gains the table as a second argument
+- `test/level0/vocabulary.test.js` imports `ENDINGS`, so it reads the fixture table instead
+- `wordsHere` in `src/bridge/prose.js` builds the words alone, so it needs no table
 
 # implement
 
