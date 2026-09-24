@@ -55,5 +55,6 @@ test("the label carries the returns, and an empty graph draws nothing", () => {
   assert.equal(labelOf({ id: "x", name: "draft", returns: 2 }), "draft ↺2");
   assert.equal(labelOf({ id: "x" }), "x");
   assert.equal(classOf({}), "leaf");
+  assert.equal(classOf({ kind: "leaf", reached: true }), "leaf reached");
   assert.deepEqual(laidOut(undefined), { nodes: [], edges: [] });
 });

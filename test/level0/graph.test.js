@@ -207,3 +207,27 @@ test("sectionAt finds a step's heading one level a step deep, and answers -1 els
 test("the schema module hands on the one sectionAt the reader holds", () => {
   assert.equal(sectionThrough, sectionAt);
 });
+
+test("a leaf the ticket reached, and a phase holding one, carry reached", () => {
+  const graph = graphIn(`---
+steps:
+  - name: design
+    steps:
+      - name: draft
+      - name: review
+  - name: ship
+step: design/draft
+record:
+  - step: design/review
+---
+`);
+  assert.deepEqual(
+    graph.nodes.map((one) => [one.id, one.reached === true]),
+    [
+      ["design", true],
+      ["design/draft", true],
+      ["design/review", true],
+      ["ship", false],
+    ],
+  );
+});

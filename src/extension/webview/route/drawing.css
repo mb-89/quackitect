@@ -49,3 +49,24 @@ body {
 .react-flow__edge.holds .react-flow__edge-path {
   stroke-dasharray: 4 4;
 }
+
+.react-flow__node.reached {
+  background: var(--vscode-editorWidget-background, #f3f3f3);
+}
+
+/* The pointer's button and a step ahead's edits.
+   [[spec/design_output/drawing#the-page-takes-an-edit]] */
+.react-flow__node button {
+  margin-left: 4px;
+  padding: 0 4px;
+  font: inherit;
+  color: var(--vscode-button-foreground, inherit);
+  background: var(--vscode-button-background, transparent);
+  border: 1px solid var(--vscode-button-border, currentColor);
+  cursor: pointer;
+}
+
+.react-flow__node button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

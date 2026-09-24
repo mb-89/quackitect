@@ -12,7 +12,7 @@ const GAP = 36;
 const HALF = 2;
 
 // The flags a node carries, each one a class the style sheet reads. [[spec/design_output/drawing#the-layout-reads-the-graph]]
-const MARKS = ["at", "person", "dotted", "skipped"];
+const MARKS = ["at", "person", "dotted", "skipped", "reached"];
 
 // [[spec/design_output/drawing#the-layout-reads-the-graph]]
 export function classOf(node) {

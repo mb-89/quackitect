@@ -55,11 +55,15 @@ The drawing reads and does nothing, and a person edits the YAML by hand to move 
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -67,11 +71,27 @@ The drawing reads and does nothing, and a person edits the YAML by hand to move 
 
 <!-- the form is text -->
 
+The page now posts what a person presses, and [[spec/design_output/drawing#the-page-takes-an-edit]] owns the messages and the edit.
+
+| file | holds |
+|---|---|
+| `src/scripts/graph.js` | `reached` on each node `ticket route` holds as it stands, off `reachedOf` |
+| `src/extension/webview/route/edit.js` | a move and a drop over the host's `steps`, each answering the whole route or null |
+| `src/extension/webview/route/drawing.js` | `jump` on a node press, `take` or `handback` on the pointer's button, `edit` on a move or drop |
+| `test/level0/drawing-edit.test.js` | the edits in node, each answer checked against `aheadOnly` |
+| `test/contract/drawing-page.test.js` | each message through the fake host, and the refusal behind the pointer |
+
+The `graph` message now carries `steps` and `held`, since the graph holds no route fields to edit and no hold. The page draws no edit of its own: the host runs the verb, and the next graph draws the result. Adding a step, and picking a hand, a condition or a fail edge, wait on the desk trial the design input names.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask, and a move or drop stands as the edit, while an add waits on the desk trial
+- the cleanup it reveals is in the change: the reached rule comes from `reachedOf`, so the page and the verb share one rule
+- the protocol stands in the design output note alone, and every function points at its heading
 
 # Discussion
 
