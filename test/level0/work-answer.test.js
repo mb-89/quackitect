@@ -356,6 +356,26 @@ test("a ticket in hand stands at place zero", () => {
   assert.equal(row.queue, "0");
   assert.equal(row.state, "held");
   assert.equal(row.kind, "todo");
+  // A ticket on this disk that origin lacks carries the name, so no second row stands for it. [[spec/design_output/stop#the-plan]]
+  const local = answerOf({
+    ...doorsSaying(
+      remoteSaying([], { "origin/main:spec/tickets/a-loose-one.md": LOOSE }),
+      {
+        [join(ROOT, "spec/tickets/fresh.md")]: LOOSE,
+        [join(ROOT, ".se/.runtime/plan.json")]: JSON.stringify({
+          working: "fresh",
+          todos: [],
+        }),
+      },
+    ).it,
+    root: ROOT,
+    clock: fakeClock("2026-01-01T03:00:00.000Z"),
+  });
+  assert.equal(
+    local.loose.some((one) => one.name === "fresh" && one.kind === "todo"),
+    false,
+    "the plan draws no row for a ticket the disk holds",
+  );
 });
 
 // [[spec/design_output/pull#the-queue-is-an-outline]]
