@@ -95,12 +95,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
     hash_before: d0fbc75a2f079c272e9ffec2ff3592cfbdf61a45
     hash_after: d0fbc75a2f079c272e9ffec2ff3592cfbdf61a45
+  - step: design/review
+    hand: box a0ae5042621d · claude-code-remote · helper-2
+    hash_before: 7dd7cfac752450dc43eb7e2d442de4a1100a564e
+    hash_after: 7dd7cfac752450dc43eb7e2d442de4a1100a564e
 ---
 
 # Ask
@@ -186,6 +190,19 @@ second copy of the endings drifts from the first.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- design: the approach answers each line of the Ask: the two fields, `termsOf`, the shape rule and the word check.
+- design: `defines` stays, and the refusal child takes it away, as the plan splits the children.
+- design: the stem table keeps one source for the rule and the check, as the word line needs.
+- design: the callers match the code, and `src/bridge/prose.js` reaches `termsOf` through `wordsOf` alone.
+- craft: `./RUNME.sh check` answers 1 on this tree, because Biome refuses the numbers in the `ENDINGS` table.
+- craft: write each stem as the ending it puts in place, so the table holds no bare number.
+- craft: the rule skips a capital word past the first, and `looseMeanings` does not, so say which one holds.
+- craft: `source` holds the address of a standard or a paper, as the Ask says.
+- craft: the shape rule splits on a comma, so a `source` holding a comma reads wrong. A case proves it.
+- craft: add a shape case for each new refusal: no `means`, a comma in `means`, a `source` off its shape.
 
 # implement
 
