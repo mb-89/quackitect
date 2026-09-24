@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -107,6 +107,10 @@ record:
     hash_after: 0a4f5ae1d07648df8ba54363c4674d87d3771bc3
     returns: 1
     why: "`frontFaults` in `src/lsp/schema.go` raises missing steps and state on its own, before the bridge answers.; Teach `frontFaults` the `x-filled-by` skip too, and cover it with a Go test under `src/lsp`.; Add `src/lsp/schema.go` `frontFaults` to the callers list."
+  - step: design/draft
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 38c3922a1fc5a8624deba614d7f7fe6bf5bfcc80
+    hash_after: 38c3922a1fc5a8624deba614d7f7fe6bf5bfcc80
 ---
 
 # Ask
@@ -142,11 +146,18 @@ Three changes, each read off the schema or the note, so the server learns no tic
 |---|---|
 | a process to pick | `process` in `spec/schemas/ticket.schema.yaml` carries `x-values: spec/processes`. `propertyValues` in `src/lsp/complete.go` offers every tracked file under that folder as a link, such as `[[spec/processes/standard]]` |
 | the frontmatter folds | the server announces `foldingRangeProvider`, and answers `textDocument/foldingRange` with one range from the opening fence to the closing one. A note with no frontmatter answers an empty list |
-| no false finding | `steps` and `state` carry `x-filled-by: process`. `mapFaults` in `.claude/skills/level0/lib/schema.js` skips such a required key while the note writes `process` and it holds nothing |
+| no false finding | `steps` and `state` carry `x-filled-by: process`. Both checkers skip such a required key while the note writes `process` and it holds nothing |
 
-The server draws its findings through the bridge, which asks the JS checker. So the third change reaches the editor with no Go change. A ticket naming no `process` key at all still meets the finding.
+Two checkers raise a missing required key, and each takes the skip:
 
-Go tests under `src/lsp` cover the offer and the fold, and a case in `test/level0/schema.test.js` covers the skip.
+| the checker | the function |
+|---|---|
+| the server's own, on every open and change | `frontFaults` in `src/lsp/schema.go` |
+| the JS one, which the bridge and the lint ask | `mapFaults` in `.claude/skills/level0/lib/schema.js` |
+
+A ticket naming no `process` key at all still meets the finding.
+
+Go tests under `src/lsp` cover the offer, the fold and the Go skip. A case in `test/level0/schema.test.js` covers the JS skip.
 
 
 ### callers
@@ -158,6 +169,7 @@ Go tests under `src/lsp` cover the offer and the fold, and a case in `test/level
 - `src/lsp/complete.go` `propertyValues`, which reads the new key
 - `src/lsp/lsp.go` `took`, which announces and answers the fold
 - `.claude/skills/level0/lib/schema.js` `mapFaults`, which reads `x-filled-by`
+- `src/lsp/schema.go` `frontFaults`, which reads `x-filled-by` on every open and change
 - `spec/schemas/ticket.schema.yaml` `process`, `steps` and `state`, which carry the two keys
 
 
@@ -167,7 +179,7 @@ Go tests under `src/lsp` cover the offer and the fold, and a case in `test/level
 
 <!-- the form is list -->
 
-- first draft
+- `frontFaults` raises the finding before the bridge answers: it reads `x-filled-by` too, under a Go test
 
 
 ## review
