@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box 2bc65ec92430 · claude-code-remote
     hash_before: a7045d07268b7b6d3b3fe89a5839e83c5b4d3023
+  - step: sync
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 44a54ede21d66a4b1292615b666990408ed5b2cd
+    hash_after: 44a54ede21d66a4b1292615b666990408ed5b2cd
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-ticket-answers-the-editor already carries every commit on main.
 ---
 
 # Ask
@@ -95,6 +103,8 @@ The engine answers every question the editor asks as a verb writing JSON. The ve
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
