@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -134,6 +134,17 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 647ae701559b2b35fabe94833328bd68dc4bbfa9
+    hash_after: 647ae701559b2b35fabe94833328bd68dc4bbfa9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 29 test(s) pass in 1 file(s); green, src/lsp passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-server-offers-processes.md:291:3: Sentence: A sentence holds 25 words. Cut this one in two."
 ---
 
 # Ask
@@ -312,11 +323,17 @@ The announcement reads `capabilitiesOf`, which `took` now calls, so a test reads
 
 <!-- the form is command -->
 
+./RUNME.sh test src/lsp test/level0/schema.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -324,11 +341,27 @@ The announcement reads `capabilitiesOf`, which `took` now calls, so a test reads
 
 <!-- the form is text -->
 
+The language server helps a person pick a process:
+
+| the need | the change |
+|---|---|
+| a process to pick | `process` carries `x-values: spec/processes`, and `propertyValues` offers every file standing there as a link |
+| the frontmatter folds | the server announces `foldingRangeProvider`, and `foldsOf` in `src/lsp/fold.go` answers one range from fence to fence |
+| no false finding | `state` and `steps` carry `x-filled-by: process`, and both checkers hold them back while `process` stands written and empty |
+
+The two checkers each read the key: `frontFaults` in `src/lsp/schema.go` on every open and change, and `mapFaults` in `.claude/skills/level0/lib/schema.js` for the bridge and the lint. A ticket naming no `process` key still meets the finding.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It touches the server, the JS checker, the ticket schema, and their tests.
+- every door the change reaches has a fake. The Go cases read a fixture tree, and the JS cases read text.
+- a comment names the approach the change implements. Each new function and schema key points at its note or says what it does.
+
 
 # verdict
 
