@@ -273,7 +273,7 @@ The ticket case fails on its own assertion, since no node carries a place yet. T
 
 <!-- the form is command -->
 
-./RUNME.sh lint src/scripts/graph.js src/scripts/pull-chapter.js .claude/skills/level0/lib/schema-read.js .claude/skills/level0/lib/schema.js test/level0/graph.test.js test/level0/pull-chapter.test.js
+./RUNME.sh lint src/scripts .claude/skills/level0/lib/schema-read.js .claude/skills/level0/lib/schema.js test/level0
 
 
 ### checked

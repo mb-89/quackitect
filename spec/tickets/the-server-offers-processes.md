@@ -344,7 +344,7 @@ The findings share one class: the change stated a fact where no owner stood, and
 
 <!-- the form is command -->
 
-./RUNME.sh lint src/lsp/complete.go src/lsp/fold.go src/lsp/lsp.go src/lsp/schema.go src/lsp/complete_test.go src/lsp/fold_test.go src/lsp/schema_test.go .claude/skills/level0/lib/schema.js spec/schemas/ticket.schema.yaml test/level0/schema.test.js
+./RUNME.sh lint src/lsp .claude/skills/level0/lib/schema.js spec/schemas/ticket.schema.yaml test/level0/schema.test.js
 
 
 ### checked
@@ -418,19 +418,19 @@ The two checkers each read the key: `frontFaults` in `src/lsp/schema.go` on ever
 
 <!-- the form is files -->
 
-.claude/skills/level0/lib/schema.js
-spec/design_output/schema.md
-spec/schemas/ticket.schema.yaml
-spec/tickets/the-server-offers-processes.md
-src/lsp/complete.go
-src/lsp/complete_test.go
-src/lsp/fold.go
-src/lsp/fold_test.go
-src/lsp/lsp.go
-src/lsp/note.go
-src/lsp/schema.go
-src/lsp/schema_test.go
-test/level0/schema.test.js
+- .claude/skills/level0/lib/schema.js
+- spec/design_output/schema.md
+- spec/schemas/ticket.schema.yaml
+- spec/tickets/the-server-offers-processes.md
+- src/lsp/complete.go
+- src/lsp/complete_test.go
+- src/lsp/fold.go
+- src/lsp/fold_test.go
+- src/lsp/lsp.go
+- src/lsp/note.go
+- src/lsp/schema.go
+- src/lsp/schema_test.go
+- test/level0/schema.test.js
 
 ## verdict
 

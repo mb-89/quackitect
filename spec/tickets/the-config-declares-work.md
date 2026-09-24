@@ -335,7 +335,7 @@ The findings share one class: a new case asserted a fact another case owns alrea
 
 <!-- the form is command -->
 
-./RUNME.sh lint spec/config/level0.schema.json test/contract/work-buttons.test.js test/contract/tree.test.js test/contract/sidebar.test.js test/level0/sidebar.test.js
+./RUNME.sh lint spec/config/level0.schema.json test/contract test/level0/sidebar.test.js
 
 
 ### checked
@@ -359,7 +359,7 @@ The findings share one class: a new case asserted a fact another case owns alrea
 
 <!-- the form is command -->
 
-./RUNME.sh test test/contract/work-buttons.test.js test/contract/tree.test.js test/contract/sidebar.test.js test/level0/sidebar.test.js test/level0/config.test.js
+./RUNME.sh test test/contract test/level0/sidebar.test.js test/level0/config.test.js
 
 
 ### check
