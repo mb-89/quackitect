@@ -9,7 +9,7 @@ import { test } from "node:test";
 import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import { MARKS } from "../../.claude/skills/level0/lib/runs.js";
 import { errorsIn, marksSeen, onWrite } from "../../src/bridge/write.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeDisk, norm } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
 import {
@@ -327,7 +327,7 @@ test("a Read of lines 10 to 20 lets an Edit inside them land, and refuses one at
 // [[spec/design_output/level0#a-write-meets-its-mark]]
 test("a read handing back the text the mark holds writes the marks file once", async () => {
   const at = join(TREE, "notes.txt");
-  const kept = join(TREE, MARKS);
+  const kept = norm(join(TREE, MARKS));
   const disk = realDisk({ [at]: NUMBERED });
   const it = served(disk);
   await called(it, reads(at));

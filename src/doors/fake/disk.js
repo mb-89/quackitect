@@ -167,7 +167,8 @@ export function fakeDisk(seed = {}) {
   );
 }
 
-function norm(path) {
+// The key the fake files a path under, so a test reading its maps finds a Windows path too. [[spec/design_output/doors#a-fake-behaves]]
+export function norm(path) {
   const said = String(path).split("\\").join("/");
   return said.replace(/^\.\//, "").replace(/\/+$/, "");
 }

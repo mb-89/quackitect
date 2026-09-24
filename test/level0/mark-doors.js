@@ -6,7 +6,7 @@
 import { dirname } from "node:path";
 import { boxOf, decide } from "../../src/bridge/server.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeDisk, norm } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 
 export const TREE = "/tree";
@@ -21,7 +21,7 @@ export const NUMBERED = Array.from({ length: LINES }, (_, at) => `line ${at + 1}
 export function realDisk(seed = {}) {
   const inner = fakeDisk(seed);
   const write = (path, text) => {
-    if (!inner.files.has(path) && inner.exists(path)) {
+    if (!inner.files.has(norm(path)) && inner.exists(path)) {
       throw Object.assign(new Error(`a folder stands at ${path}`), { code: "EISDIR" });
     }
     if (!inner.exists(dirname(path))) {
