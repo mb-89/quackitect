@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -108,6 +108,10 @@ record:
     hash_after: 89c6e4b1043e4f41545199f3b5fde71305a3b368
     returns: 1
     why: "| finding | fix |; |---|---|; | The cases pin only the rows they name, so a Go row drifts unseen | Move `ENDINGS` and `PREFIXES` into `stems.yaml`, and let both readers load the table |; | No Go test reads `slug.yaml`, so \"as the slug cases do\" holds on the JavaScript side alone | Name the Go test that loads `stems.yaml` |; | The slug test stands in `test/contract/vocabulary.test.js` | Name the file the shared cases land in |; | `knownIn` reads `PREFIXES` too, so `unread` reaches `read` | Say whether the hover reads a prefix |; | `src/extension` asks for a hover off the server's capabilities | Write that the client needs no change |; | The draft names no test for either done line | Name the hover test and the test after `terms.yml` changes |; The rest reads true: `took`, `Tree.Read`, `pathsOf` and the terms file each stand as the draft says."
+  - step: design/draft
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 61e1ad45a0ffa0412a9f94402d1935163740625f
+    hash_after: 61e1ad45a0ffa0412a9f94402d1935163740625f
 ---
 
 # Ask
@@ -153,17 +157,33 @@ holds the answer:
 |---|---|
 | `initialize` | names `hoverProvider` |
 | the terms | read off `terms.yml` through the tree on each ask, so an open buffer or a save counts at once |
-| the path | the vocabulary layer of `paragraph.schema.yaml` names it, as `pathsOf` reads it, and the default stands where it names none |
+| the paths | the vocabulary layer of `paragraph.schema.yaml` names them, as `pathsOf` reads them, and the defaults stand where it names none |
 | the word | the run of letters under the cursor, widened to the longest term covering it, such as `level zero` |
-| a stem | the Go reader of the table of endings tries each row, as `knownIn` does |
+| a stem or a prefix | the server reads the table of endings and the prefixes off `stems.yml`, as the rule does |
 | the answer | the term, its `means` line, and its `source` under it where it cites one, as markdown |
+| a core word or no word | no hover |
 
-Go carries a copy of the table, because the server imports no JavaScript. A
-new file `spec/config/stems.yaml` holds the cases, a word and the term it
-reaches. The Go test and the JavaScript test both drive them, as the slug
-cases do, so a drift turns a suite red.
+The table of endings and the prefixes move out of `vocabulary.js` into a new
+list, `spec/vocabulary/stems.yml`. So the rule, the check and the server read
+one source:
 
-`spec/design_output/lsp.md` gains a chapter on the hover.
+- `pathsOf` names `stems` beside the three lists, so a write to it projects the rule again
+- `knownIn`, `looseMeanings` and `vocabularyRule` take the table from the lists
+- `stems.yml` carries cases, each a word and the listed word it reaches, and both tests drive them
+
+| test | holds |
+|---|---|
+| `src/lsp/hover_test.go` | a hover over a term, a plural, a prefix, a term of two words and a source, and no hover over a core word |
+| the same file | a hover after `terms.yml` changes in an open buffer shows the new line |
+| the same file | the Go reader reaches every case `stems.yml` names |
+| `test/level0/vocabulary.test.js` | the JavaScript reader reaches every case, and the rule writes every row |
+
+The client needs no change. The extension already starts the server over
+markdown files, and the language client asks for a hover once the server
+names `hoverProvider`.
+
+`spec/design_output/lsp.md` gains a chapter on the hover, and
+`spec/design_output/vocabulary.md` names the fourth list.
 
 ### callers
 
@@ -172,9 +192,11 @@ cases do, so a drift turns a suite red.
 <!-- the form is list -->
 
 - `src/lsp/lsp.go`, `took` answers `initialize` and gains the hover case
-- `.claude/skills/level0/lib/vocabulary.js`, `knownIn` reads the table the Go copy follows
-- `test/level0/vocabulary.test.js`, the table test gains the shared cases
-- `src/extension`, the client asks the server for a hover once the server names it
+- `.claude/skills/level0/lib/vocabulary.js`, where `knownIn`, `looseMeanings` and `vocabularyRule` read the table
+- `.claude/skills/level0/lib/projection.js`, `listsOf` and `alsoReads` read the paths `pathsOf` names
+- `src/bridge/prose.js`, `wordsHere` reads the lists, and `src/bridge/caches.js` watches their paths
+- `test/level0/vocabulary.test.js` and `test/contract/vocabulary.test.js` drive the table and the lists
+- `src/extension/lib/lsp.js`, the client, needs no change, because it asks for a hover off the capabilities
 
 ### answers
 
@@ -182,7 +204,12 @@ cases do, so a drift turns a suite red.
 
 <!-- the form is list -->
 
-- first
+- a Go copy of the table drifts: the table moves into `stems.yml`, and both readers load it
+- no Go test reads the slug cases: `hover_test.go` loads `stems.yml` and drives its cases
+- the shared cases land in the wrong file: they land in `test/level0/vocabulary.test.js`, beside the table test
+- the prefixes stand unnamed: the hover reads them off `stems.yml` too, so `unread` reaches `read`
+- the client stands unnamed: the callers say it needs no change, and why
+- no test for the two lines of done: the table of tests names each
 
 ## review
 
