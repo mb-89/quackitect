@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -13,7 +13,7 @@ steps:
         expects: 0
         says: branch sync, so the branch carries trunk
   - name: split
-    does: mints the children, or assigns standing tickets, each naming this group
+    does: reads the standing children, and mints more where the goal needs them, each naming this group
     from: anyone
     by: anyone
     input: ask
@@ -73,7 +73,8 @@ steps:
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
-process_hash: 3c35c048932fd579
+process_hash: 94d924fb96257431
+step: sync
 ---
 
 # Ask

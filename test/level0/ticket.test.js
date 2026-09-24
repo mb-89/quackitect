@@ -7,6 +7,8 @@ import { test } from "node:test";
 import { readNote, readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import {
   engineRows,
+  onNoteRoute,
+  openPrivate,
   placesIn,
   queueHolds,
   refusedTicket,
@@ -364,7 +366,8 @@ test("the queue holds work where a free open ticket has a leaf a hand takes, or 
 
 // The pull reads a group by its own name, so the branch spelling hides a child from its group. [[spec/design_output/work#a-group-is-a-ticket]]
 test("a group named as a branch is refused, and the bare name passes", () => {
-  const naming = (said) => open.replace("state: open\n", `state: open\ngroup: ${said}\n`);
+  const naming = (said) =>
+    open.replace("state: open\n", `state: open\ngroup: ${said}\n`);
 
   const found = weighed(naming("work/one-group"), naming("work/one-group"));
   assert.deepEqual(
@@ -379,7 +382,10 @@ test("a group named as a branch is refused, and the bare name passes", () => {
 // A group's children stand under it already, so an ask naming one is refused, and the same name in the discussion passes. [[spec/design_output/work#a-group-is-a-ticket]]
 test("an ask naming a child of the group is refused, and the discussion may name it", () => {
   const kids = ["the-flag-parks-work", "the-door-reads-marks"];
-  const asking = open.replace("What it asks for.", "What it asks for, with the-door-reads-marks.");
+  const asking = open.replace(
+    "What it asks for.",
+    "What it asks for, with the-door-reads-marks.",
+  );
   const found = ticketFaults(open, asking, SCHEMA, WHERE, kids);
   assert.deepEqual(
     found.map((one) => one.rule),
@@ -389,5 +395,33 @@ test("an ask naming a child of the group is refused, and the discussion may name
 
   const talking = open.replace("Nothing yet.", "See the-door-reads-marks.");
   assert.deepEqual(ticketFaults(open, talking, SCHEMA, WHERE, kids), []);
-  assert.deepEqual(ticketFaults(open, asking, SCHEMA, WHERE), [], "a ticket with no children names nothing");
+  assert.deepEqual(
+    ticketFaults(open, asking, SCHEMA, WHERE),
+    [],
+    "a ticket with no children names nothing",
+  );
+});
+
+// A note keeps a thing for the retro, so the route test tells it apart, and an open private ticket off that route carries the turn. [[spec/design_output/pull#the-private-queue]]
+test("a note reads on the note route, and only an open ticket off it carries the turn", () => {
+  const on = (process, state = "open") =>
+    `---\nkind: [[ticket]]\nstate: ${state}\nprocess: ${process}\n---\n\n# Ask\n\nA line.\n`;
+  assert.equal(
+    onNoteRoute(on("[[spec/processes/note]]")),
+    true,
+    "a linked route reads",
+  );
+  assert.equal(onNoteRoute(on("note")), true, "a bare route reads");
+  assert.equal(onNoteRoute(on("[[spec/processes/standard]]")), false);
+  assert.equal(
+    openPrivate(on("[[spec/processes/note]]")),
+    false,
+    "a note carries no turn",
+  );
+  assert.equal(
+    openPrivate(on("[[spec/processes/trivial]]")),
+    true,
+    "an open breakdown carries it",
+  );
+  assert.equal(openPrivate(on("[[spec/processes/trivial]]", "closed")), false);
 });

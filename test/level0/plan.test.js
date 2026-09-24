@@ -9,6 +9,7 @@ import { PLANS } from "../../.claude/skills/level0/lib/runs.js";
 import { reacted, wants } from "../../src/bridge/grace.js";
 import {
   asksForPlan,
+  dropsHandover,
   PLAN,
   PLAN_CALL,
   plansHere,
@@ -138,4 +139,30 @@ test("the ask due behind another ask lands on the first call after that one is a
   assert.equal(asksForPlan(it.box, 12), true, "the plan's ask lands on the next call");
   assert.equal(it.box.grace.id, PLAN);
   assert.equal(asksForPlan(it.box, 13), false, "one ask stands at a time");
+});
+
+// [[spec/design_output/work#one-handover-stands]]
+test("the handover's own work leaves the plan, the word matched whole, and a plan without it stays unwritten", () => {
+  const it = box({
+    [at(PLANS)]: JSON.stringify({
+      working: "write the Handover",
+      todos: [
+        { title: "the handover", details: "", todo: "end" },
+        { title: "the handovers tab", details: "", todo: "end" },
+      ],
+      places: {},
+    }),
+  });
+
+  assert.equal(dropsHandover(it.box), 2);
+  const held = plansHere(it.box);
+  assert.equal(held.working, "");
+  assert.deepEqual(
+    held.todos.map((one) => one.title),
+    ["the handovers tab"],
+  );
+
+  const before = String(it.disk.read(at(PLANS)));
+  assert.equal(dropsHandover(it.box), 0);
+  assert.equal(String(it.disk.read(at(PLANS))), before);
 });

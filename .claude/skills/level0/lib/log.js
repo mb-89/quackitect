@@ -15,7 +15,7 @@ export const LOG_TOOL = "log";
 export const MS = 1000;
 
 // [[spec/design_output/log#an-answer-stands-in-chat]]
-export const ANSWER_KIND = "answer";
+export const REPLY_KIND = "reply";
 
 // The ladder Python's logging climbs, and an empty or unknown level reads as info. [[spec/design_output/log#what-a-box-writes]]
 export const LEVELS = ["debug", "info", "warn", "error", "fatal"];
@@ -42,9 +42,9 @@ export function rowOf(at, level, kind, said, more = {}) {
     at,
     level: LEVELS.includes(level) ? level : DEFAULT,
     kind: String(kind),
-    // An answer keeps its whole text and its lines, because the owner reads it there and a list or a table stands on its lines. [[spec/design_output/log#an-answer-stands-in-chat]]
+    // A reply keeps its whole text and its lines, because the owner reads it there and a list or a table stands on its lines. [[spec/design_output/log#an-answer-stands-in-chat]]
     said:
-      String(kind) === ANSWER_KIND
+      String(kind) === REPLY_KIND
         ? String(said).trim()
         : String(said).replace(/\s+/g, " ").trim().slice(0, SAID),
     ...rest,
@@ -81,19 +81,18 @@ export function logSpec() {
       "viewer. The hook stamps the time. Name the kind, such as status or note,",
       "and say one sentence; text carries more where one sentence runs short.",
       "An answer to the owner's prompt stands in the chat, as text, and the hook",
-      `logs it from there under kind ${ANSWER_KIND}. This tool answers no prompt.`,
+      `logs it from there under kind ${REPLY_KIND}. This tool answers no prompt.`,
     ].join(" "),
     inputSchema: {
       type: "object",
       properties: {
         kind: {
           type: "string",
-          description: `What the line is, such as ${ANSWER_KIND}, status or note.`,
+          description: "What the line is, such as status or note.",
         },
         said: {
           type: "string",
-          description:
-            "One sentence, 80 characters at most. An answer carries its whole text here.",
+          description: "One sentence, 80 characters at most.",
         },
         text: { type: "string", description: "The whole text, where said runs short." },
         level: {

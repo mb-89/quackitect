@@ -119,8 +119,12 @@ func TestAPresetWritesItsFilterIntoTheLineAndAgainClearsIt(t *testing.T) {
 	if m.Input.Value() != "queue: /^0$/" {
 		t.Fatalf("alt+2 writes the second preset's filter, and the line reads %q", m.Input.Value())
 	}
+	// A note takes no place in the queue, so a preset of its own shows the notes. [[spec/design_output/pull#the-queue-is-an-outline]]
+	if said := alt(m, '7').Input.Value(); said != "route: note" {
+		t.Fatalf("alt+7 writes the notes preset's filter, and the line reads %q", said)
+	}
 	pane := frame.RenderParts(alt(m, 'f').PresetParts(), 80)
-	for _, want := range []string{"alt+1  queue", "alt+2  in hand", "alt+3  recently done", "alt+4  urgent"} {
+	for _, want := range []string{"alt+1  queue", "alt+2  in hand", "alt+3  recently done", "alt+4  urgent", "alt+6  open", "alt+7  notes"} {
 		if !strings.Contains(pane, want) {
 			t.Fatalf("the pane names each preset with its key and name, and reads:\n%s", pane)
 		}

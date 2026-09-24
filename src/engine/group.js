@@ -48,7 +48,8 @@ export function urgent(text) {
 // The todo a front carries: nothing, `first` where it stands as a bare tag, or the name of the row it stands before. [[spec/design_output/pull#the-queue-is-an-outline]]
 export function todoOf(front) {
   const said = front?.todo;
-  if (said === undefined || said === null || said === false || String(said) === "false") return "";
+  if (said === undefined || said === null || said === false || String(said) === "false")
+    return "";
   if (said === true || String(said).trim() === "true") return "first";
   return String(said).trim();
 }
@@ -67,6 +68,17 @@ export function dependsOn(front) {
     )
     .filter(Boolean);
 }
+
+// A draft on the trivial route takes no person: the pull opens it, and an agent works it. [[spec/design_output/pull#a-draft-opens]]
+export function agentOpens(text) {
+  return (
+    Boolean(text) &&
+    fieldOf(text, "state") === DRAFT &&
+    fieldOf(text, "process").split("/").pop() === TRIVIAL
+  );
+}
+
+const TRIVIAL = "trivial";
 
 // [[spec/design_output/work#a-group-is-a-ticket]]
 export function isGroup(text) {

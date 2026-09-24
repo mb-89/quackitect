@@ -15,6 +15,7 @@ import {
   forgetsReads,
   holdsForHandover,
   measures,
+  namesRetro,
   onSessionMeasure,
   RESUME,
   ridesCall,
@@ -25,8 +26,8 @@ const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
 const HOLD = `${HOLDS}/box-1.json`;
 
-function box(handoverAt = 150000, files = {}) {
-  const config = { stop: { mostInARow: 3 }, context: { handoverAt } };
+function box(handoverAt = 150000, files = {}, writeAt = 0) {
+  const config = { stop: { mostInARow: 3 }, context: { handoverAt, writeAt } };
   const said = [];
   return {
     disk: fakeDisk({
@@ -187,4 +188,63 @@ test("a session end for any other reason leaves the hold alone", () => {
   onSessionEnd({ reason: "other" }, it);
 
   assert.equal(JSON.parse(it.disk.read(at(HOLD))).reads.length, 1);
+});
+
+test("a fill past writeAt turns the block into the handover itself", () => {
+  const it = box(150000, {}, 175000);
+  measures(it, 40000);
+  measures(it, 160000);
+  assert.match(ridesCall({ tool: "Read" }, it).after.context[0], /Finish the step in hand/);
+
+  measures(it, 176000);
+
+  const block = ridesCall({ tool: "Read" }, it).after.context[0];
+  assert.match(block, /# Write the handover now/);
+  assert.match(block, /176000 tokens/);
+  assert.match(holdsForHandover({}, it).result.block, /# Write the handover now/);
+  assert.equal(it.said.filter((one) => /writeAt/.test(one.line)).length, 1);
+});
+
+test("a first fill past both keys hands over now at once", () => {
+  const it = box(150000, {}, 175000);
+
+  measures(it, 40000);
+  measures(it, 180000);
+
+  assert.equal(it.handover.phase, FINISH);
+  assert.equal(it.handover.now, true);
+});
+
+test("writeAt at 0 or under handoverAt adds no second stage", () => {
+  for (const writeAt of [0, 120000]) {
+    const it = box(150000, {}, writeAt);
+    measures(it, 40000);
+    measures(it, 900000);
+
+    assert.equal(it.handover.now, undefined);
+    assert.match(ridesCall({ tool: "Read" }, it).after.context[0], /# The context hands over/);
+  }
+});
+
+test("a handover naming the retro folder holds the turn, and one without it clears", () => {
+  const it = box(150000, {
+    [at(HANDOVER)]: "| the promotions | `.se/.retro/retro-899accd/classes.json` |\n",
+  });
+  measures(it, 40000);
+  measures(it, 160000);
+
+  const held = holdsForHandover({}, it);
+  assert.match(held.result.block, /# The handover names the retro/);
+  assert.match(held.result.block, /retro-899accd\/classes\.json/);
+  assert.equal(it.handover.phase, FINISH);
+
+  it.disk.write(at(HANDOVER), "| the promotions | the retro's classes, by name |\n");
+  assert.deepEqual(holdsForHandover({}, it), { pass: true });
+  assert.equal(it.handover.phase, CLEAR);
+});
+
+test("the retro check reads a backslash path too", () => {
+  const it = box(150000, { [at(HANDOVER)]: "read .se\\.retro\\x\\report.md\n" });
+
+  assert.equal(namesRetro(it), ".se\\.retro\\x\\report.md");
 });

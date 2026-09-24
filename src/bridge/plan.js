@@ -72,7 +72,8 @@ function planSpec() {
 export function planField() {
   return {
     type: "object",
-    description: "The answer to the engine's three questions, riding this call: what you work on, which todos you finished, which you add.",
+    description:
+      "The answer to the engine's three questions, riding this call: what you work on, which todos you finished, which you add.",
     properties: planSpec().inputSchema.properties,
   };
 }
@@ -87,6 +88,20 @@ export function plansHere(box) {
   } catch {
     return { working: "", todos: [], places: {} };
   }
+}
+
+// The handover's own work leaves the plan once the next session reads the handover: the work in hand and every todo whose title names it. [[spec/design_output/work#one-handover-stands]]
+export function dropsHandover(box) {
+  const plan = plansHere(box);
+  const todos = plan.todos.filter((one) => !namesHandover(one?.title));
+  const working = namesHandover(plan.working) ? "" : plan.working;
+  const dropped = plan.todos.length - todos.length + (working === plan.working ? 0 : 1);
+  if (dropped) writes(box, { ...plan, todos, working });
+  return dropped;
+}
+
+function namesHandover(title) {
+  return /\bhandover\b/i.test(String(title ?? ""));
 }
 
 function writes(box, plan) {
@@ -189,7 +204,9 @@ function placesSaid(box, titles) {
   const place = new Map(
     said.loose.filter((one) => one.todo).map((one) => [one.name, one.queue]),
   );
-  return titles.map((one) => `${one} stands at ${place.get(one) ?? "no place"}.`).join(" ");
+  return titles
+    .map((one) => `${one} stands at ${place.get(one) ?? "no place"}.`)
+    .join(" ");
 }
 
 // A place is the todo, the way the tab writes it: first, before the row standing at that place in the queue, or at the end past every row. [[spec/design_output/pull#a-todo-forces-a-place]]

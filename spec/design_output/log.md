@@ -34,7 +34,7 @@ The `prompt` kind carries what the owner submits, and the `reply` kind carries
 the answer that ends the turn. Both carry the whole of it in `text`. The details
 of a prompt show its reply, and the details of a reply show its prompt.
 
-A reply stands at the turn's end, and the answer stands right under its prompt.
+A reply ending the turn stands at the turn's end, and a reply to a demand stands right under its prompt.
 
 ## A prompt is the owner's
 
@@ -51,15 +51,16 @@ prompts beside the session's replies to them.
 
 # The answer under its prompt
 
-The hook writes an `answer` line at `info` the moment it finds the session's
-answer to a demand. A demand is a prompt, an update a person asks for, or a
-hold. The line carries the whole answer in `text` and the demand in `detail`.
+The hook writes a `reply` line at `info` the moment it finds the session's
+reply to a demand. A demand is a prompt, an update a person asks for, or a
+hold. The line carries the whole reply in `text` and the demand in `detail`.
 The session writes nothing for it, because the cage writes it.
 
-Two more kinds come out of the gate:
+More kinds come out of the gate:
 
 - `gate` carries a call the gate warns or refuses, at `warn`.
 - `god` carries a refusal god mode passes, at `warn`.
+- `draft` carries the band the gate reads a draft at, at `debug`, since the owner acts on none of it. For details, see [[spec/design_output/level0#the-three-bands]].
 
 For details, see [[spec/design_output/level0#a-step-arrives-late]].
 
@@ -72,8 +73,8 @@ For details, see [[spec/design_output/level0#a-step-arrives-late]].
 | `prompt` | every prompt the owner submits | `prompt.submit` |
 | `agent` | a helper's hand-back, a task's notice, and a helper's layer | `prompt.submit`, `agent.spawn` |
 | `stop` | a turn ends, or goes on | `turn.complete` |
-| `reply` | every answer ending a turn | `turn.complete` |
-| `answer` | the session's answer to a demand | `turn.step`, `tool.call` |
+| `reply` | every text the session sends the owner: the one ending a turn, and the one answering a demand | `turn.complete`, `turn.step`, `tool.call` |
+| `draft` | the band the gate reads a draft at | `check_answer`, `turn.complete` |
 | `write` | the code door refuses a write | `tool.call` |
 | `vale` | the rules refuse prose, and how long a lint takes | the hook, and `lint` |
 | `bash` | a commit or a push aims at trunk | `tool.call` |
@@ -223,9 +224,9 @@ means for the owner lands where the owner reads.
 
 # An answer stands in chat
 
-- Outcome: the answer to the owner's prompt stands in the chat as text. The hook logs it whole under kind `answer`, and the agent calls nothing for it.
+- Outcome: the answer to the owner's prompt stands in the chat as text. The hook logs it whole under kind `reply`, and the agent calls nothing for it.
 - Cause: an answer through the log tool alone reaches no chat, and the owner reads the chat mid-turn.
-- Door: the step carrying the text clears the demand, and a log call of kind `answer` clears nothing.
+- Door: the step carrying the text clears the demand, and a log call of kind `reply` clears nothing.
 - Teacher: the warning and the refusal ask for text in the chat, and name no call.
 
 # Nothing here deletes a log

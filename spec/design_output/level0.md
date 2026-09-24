@@ -1428,11 +1428,11 @@ edges, and the score falls into one of the bands below:
 | the score | what happens |
 |---|---|
 | under `warnAt` | nothing |
-| from `warnAt` up | the `answer` line at `warn`, and the findings ride the next tool call |
+| from `warnAt` up | the findings ride the next tool call |
 | from `ceiling` up | the stop door holds the turn with the findings |
 
 An answer carrying no finding reads clean, whatever its length. Every band
-writes one `answer` line naming the score and the findings. The ceiling names
+writes one `draft` line at `debug` naming the score and the findings. The ceiling names
 the band `rewrite` in that line, and nothing more hangs on it.
 
 ## The findings ride the call

@@ -37,9 +37,14 @@ export function writesHere(leaf, hand = {}) {
 // [[spec/design_output/pull#the-private-queue]]
 export function openPrivate(text) {
   const front = readNote(String(text ?? "")).front.said ?? {};
-  if (String(front.state ?? "") !== "open") return false;
+  return String(front.state ?? "") === "open" && !onNoteRoute(text);
+}
+
+// A note keeps a thing for the retro, so it stands off the queue and carries no turn. [[spec/design_output/pull#the-private-queue]]
+export function onNoteRoute(text) {
+  const front = readNote(String(text ?? "")).front.said ?? {};
   const process = String(front.process ?? "").replace(/^\[\[|\]\]$/g, "");
-  return process !== "note" && !process.endsWith("/note");
+  return process === "note" || process.endsWith("/note");
 }
 
 // The queue holds work for a desk where a free open ticket has a leaf a hand takes, or a group carries the mark. [[spec/design_output/stop#the-mechanical-checks]]
@@ -232,7 +237,8 @@ function withBlock(rows, key, block) {
   const now = frontBlocks(rows);
   if (now.close < 0) return rows;
   const out = [...rows];
-  if (now.at.has(key)) out.splice(now.at.get(key), now.blocks.get(key).length, ...block);
+  if (now.at.has(key))
+    out.splice(now.at.get(key), now.blocks.get(key).length, ...block);
   else out.splice(now.close, 0, ...block);
   return out;
 }

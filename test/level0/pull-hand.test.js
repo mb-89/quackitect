@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { todoOf } from "../../src/engine/group.js";
-import { ticketsHere } from "../../src/scripts/pull-hand.js";
+import { emptyGroup, takeable, ticketsHere } from "../../src/scripts/pull-hand.js";
 import { CHILD, ROOT } from "./work-doors.js";
 
 const at = (rel) => join(ROOT, ...rel.split("/"));
@@ -26,4 +26,33 @@ test("the hand reads trunk's tickets and the box's private notes, each with its 
   assert.deepEqual(names, ["a-loose-one:false", "parked:true"]);
   assert.equal(todoOf(all.find((one) => one.name === "parked").front), "a-loose-one");
   assert.equal(todoOf(all.find((one) => one.name === "a-loose-one").front), "");
+});
+
+// The children stand before their group. [[spec/design_output/work#a-group-is-a-ticket]]
+test("a group no ticket names reads empty, one with a child reads full, and a plain ticket reads neither", () => {
+  const group =
+    "---\nkind: [[ticket]]\nstate: draft\nprocess: [[spec/processes/group]]\n---\n";
+  const disk = fakeDisk({
+    [at("spec/tickets/a-part.md")]: CHILD("the-whole", "draft"),
+  });
+  const it = { root: ROOT, disk, join };
+  assert.match(emptyGroup(it, group, "a-lonely-one"), /no ticket names it under group/);
+  assert.equal(emptyGroup(it, group, "the-whole"), "");
+  assert.equal(emptyGroup(it, CHILD("", "draft"), "a-part"), "");
+});
+
+// A trivial draft opens at the pull, so takeable reads it as open, and any other draft waits on a person. [[spec/design_output/pull#a-draft-opens]]
+test("takeable answers a trivial draft's first leaf, and nothing for any other draft", () => {
+  const open = CHILD("", "open").replace("group: \n", "");
+  const it = { root: ROOT, disk: fakeDisk({}), join };
+  const leaf = takeable(it, { name: "a", text: open });
+  const trivial = open.replace(
+    "state: open",
+    "state: draft\nprocess: [[spec/processes/trivial]]",
+  );
+  assert.equal(takeable(it, { name: "a", text: trivial }), leaf);
+  assert.equal(
+    takeable(it, { name: "a", text: open.replace("state: open", "state: draft") }),
+    "",
+  );
 });

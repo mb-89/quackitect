@@ -246,14 +246,15 @@ every reader draws as it stands.
 
 | the row | its place |
 |---|---|
-| a step a person owns, and a draft | negative, and the most pressing counts lowest, so `-2` stands over `-1` |
+| a step a person owns, and a draft off any route but `trivial` | negative, and the most pressing counts lowest, so `-2` stands over `-1` |
 | a ticket a hand holds, or the one the plan names as the work in hand | `0`, so the queue shows what stands in hand and no letter says it |
 | a group on a standing cloud branch, and its tickets | `∞`, because the cloud takes it and this box cannot |
 | a step an agent takes now | counts up from `1` |
 | an open step the pull holds back: one waiting on a dependency, one another hand holds | counts on after the agent's |
 | a group | one number, where its best member stands |
 | a ticket under a group | the group's number, a dot, and its own place under it, as `1.2` |
-| a private note on this box | a place of its own, because the pull hands it out too |
+| a private ticket on this box | a place of its own, because the pull hands it out too |
+| a note on this box | none, because it waits for its retro |
 | a closed ticket | none |
 
 An agent takes no negative place, so the person's rows stand for a person
@@ -670,7 +671,15 @@ waits for a retro.
 
 `ticket open <name>` turns a draft into an open ticket at its first leaf, and
 refuses while the ask stands empty. So the pull hands out what a person
-writes, and nothing else.
+writes, and nothing else. A group opens with its children standing, as
+[[spec/design_output/work#a-group-is-a-ticket]] says.
+
+A draft on the `trivial` route waits on no person:
+
+- the pull opens it through `opensDraft` in `src/scripts/ticket.js`, the verb's own road
+- the pull hands its first leaf
+- the queue counts it among the agent's rows
+- a refusal on that road leaves the draft standing, and the wait answer names the refusal
 
 The verb reads the voice rules over the Ask too, and refuses one that breaks
 a rule at the error or the warning level. `askFaults` in

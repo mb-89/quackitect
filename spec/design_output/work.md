@@ -56,6 +56,10 @@ one schema covers everything that moves, and `spec/schemas` names no group kind.
 | its children | every ticket under `spec/tickets` naming it under `group` |
 | the claim | the push that writes the record |
 
+The children stand before their group. `emptyGroup` in
+`src/scripts/pull-hand.js` refuses a group mint and a group open while no
+ticket names the group under `group`, so no group stands empty.
+
 A group of one ticket is the ordinary case, and a group of many is the same
 shape. The children stand under the group, so the write door refuses an ask
 naming one of them. The ask says what the group adds up to.
@@ -286,6 +290,10 @@ the verb refuses it. So a desk mints the successor off this route:
 session on that box reads. Level zero reads it at `prompt.context`, hands it to
 the agent as the block `level0-handover` after the rules, and deletes it. So it
 stays fresh, and nobody keeps a rule about clearing it.
+
+The same read drops from the plan the work in hand and every todo whose title
+names the handover. So a handover stands in the work tab until the next session
+reads it, and a hand closes no row of it.
 
 `prompt.context` fires at a session's first prompt and again after a
 compaction and a `/clear`. A `/clear` fires no `session.start`, so a handover
