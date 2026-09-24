@@ -96,7 +96,12 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [the-route-edits-ahead]
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: d0b8b00e88342b65c07a58d2425724b380df306f
+    hash_after: d0b8b00e88342b65c07a58d2425724b380df306f
 ---
 
 # Ask
@@ -124,17 +129,39 @@ ticket update overwrites a person's edit to a step ahead of the pointer without 
 
 <!-- the form is text -->
 
+`ticket update` finds the process version the ticket copied, and compares the steps the ticket has yet to reach against it. The ticket's `process_hash` names that version. The verb walks `git log` over the process file, and reads each version through `git show` until `processHash` answers the ticket's hash.
+
+| what the verb finds | what it does |
+|---|---|
+| the version, and every step past the reached leaves stands as that version wrote it | copies the new route as it does today |
+| the version, and a step past the reached leaves differs from it | names each such step as drift, changes nothing, and exits 1 |
+| no version answering the hash | says the base stands nowhere in the history, changes nothing, and exits 1 |
+| either refusal, under `--over` | copies the new route over the edit, as it does today |
+
+A step differs where it stands added, dropped, moved, or changed. A phase compares every field but `steps`. `reachedOf` in `src/scripts/ticket-route.js` names the reached leaves, so a leaf the route verb holds is a leaf this verb skips. The comparison reads through `canonicalOf`, as `aheadOnly` does.
+
+A new module, `src/scripts/ticket-drift.js`, holds `driftOf` and the history walk. The walk reaches git through the git door, and the cases drive `fakeGit`.
+
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/scripts/ticket.js` `update`, which asks `driftOf` before it writes, and reads `--over`
+- `src/scripts/ticket.js` `ticket`, whose usage line names `--over`
+- `test/level0/ticket-verb.test.js` the update cases, whose ticket carries a hash no history answers, so each passes `--over`
+
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first draft
+
 
 ## review
 
