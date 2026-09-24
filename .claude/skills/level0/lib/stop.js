@@ -11,6 +11,13 @@ export const OFF = "stop-hook-off";
 // [[spec/design_output/stop#the-stop-is-one-line]]
 export const STOP_TOOL = "stop";
 export const STOP_CALL = `mcp__level0__${STOP_TOOL}`;
+// [[spec/design_output/stop#the-stop-is-one-line]]
+export const STOP_LINE = /^stop:\s*([a-z0-9-]+)\s*$/i;
+
+// A message holding the stop line alone ends a turn, and carries no answer for the voice rules to read. [[spec/design_output/stop#the-stop-is-one-line]]
+export function stopsAlone(text) {
+  return STOP_LINE.test(String(text ?? "").trim());
+}
 
 // [[spec/design_output/level0#the-needs-table]]
 export const NEEDS_LINE =

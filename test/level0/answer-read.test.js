@@ -153,3 +153,14 @@ test("the draft tool answers the reading's findings, and a box with no Vale read
     /No vale stands here/,
   );
 });
+
+// [[spec/design_output/stop#the-stop-is-one-line]]
+test("the stop line alone reads clean, at the stop door and in the draft tool", async () => {
+  const { box, reads } = served(FOUND);
+
+  const read = await readsAnswer(box, "stop: the-work-stands-complete", true);
+  assert.equal(read.band, "clean");
+  assert.deepEqual(read.found, []);
+  assert.equal(blockOf(await stops(box, { last_assistant_message: "stop: done" })), "");
+  assert.deepEqual(reads, [], "no line of vale reads the stop line");
+});

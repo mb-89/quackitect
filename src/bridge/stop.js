@@ -24,6 +24,7 @@ import {
   pool,
   RULES,
   STOP_CALL,
+  STOP_LINE,
   stopReasons,
   stopSpec,
   todos,
@@ -66,7 +67,6 @@ export const REFACTOR_ANSWERED = "refactor.answered";
 const BREAK = "SE_BREAK_ON_STOP";
 const HELPER = "general-purpose";
 const SAID = 200;
-const LINE = /^stop:\s*([a-z0-9-]+)\s*$/i;
 const PASS = { pass: true };
 
 export const TOOLS = { [STOP_CALL]: claims };
@@ -379,7 +379,7 @@ function lastLineReason(text) {
     .split("\n")
     .map((one) => one.trim())
     .filter(Boolean);
-  const found = LINE.exec(lines.at(-1) ?? "");
+  const found = STOP_LINE.exec(lines.at(-1) ?? "");
   return found ? found[1] : "";
 }
 

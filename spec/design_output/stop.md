@@ -61,6 +61,10 @@ The tool `stop` stands beside the line. A call with a known reason claims it,
 and its result says to end the message with the line. A claim lives until the
 turn's end.
 
+A message holding the stop line alone ends a turn too, and the answer gate
+reads it clean. `stopsAlone` in `lib/stop.js` holds the test, and
+`test/level0/stop-dry-run.test.js` runs both gates over one answer.
+
 ## A turn with no line
 
 The rule `the-last-line-names-no-stop` fires where the last line names no
