@@ -187,3 +187,4 @@ Every term says what it means in one line of core words and other terms, and the
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+The owner asks why `inset` points at the design input. The term schema demands `defines` today, so every term points at a note, and this group ends that.
