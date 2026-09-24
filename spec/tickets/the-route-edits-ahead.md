@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -132,6 +132,17 @@ record:
     hash_after: 585e0bcb76c139334e196391b791b792897d9f4d
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 05da0afe2196a1fe41174e2f8acf50419ad5a119
+    hash_after: 05da0afe2196a1fe41174e2f8acf50419ad5a119
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 34 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -308,11 +319,17 @@ Every case fails on its own assertion, with the verb unknown and `aheadOnly` a s
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/ticket-route.test.js test/level0/ticket-verb.test.js
+
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
+
 
 ### says
 
@@ -320,11 +337,24 @@ Every case fails on its own assertion, with the verb unknown and `aheadOnly` a s
 
 <!-- the form is text -->
 
+`./RUNME.sh ticket route <ticket> --steps=<json>` writes a route a person edits over the steps past the pointer. `aheadOnly` in `src/scripts/ticket-route.js` holds the rule:
+
+- every reached leaf opens the route, in its order and as it stood
+- a phase holding one keeps each field but `steps`
+
+A refusal names the leaf or the phase, and writes nothing. Both roads answer one JSON object, so the editor reads the verb's answer as data. `reachedOf` reads the reached leaves once, and `updated` calls it too.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It touches the verb's module, the dispatch, the command line's list, and their tests.
+- every door the change reaches has a fake. The cases drive the fake disk alone.
+- a comment names the approach the change implements. Each new function points at the design input it builds.
+
 
 # verdict
 
