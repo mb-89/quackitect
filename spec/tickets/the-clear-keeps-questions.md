@@ -94,12 +94,18 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
     hash_before: 57af1b3bc0e245a60f3dd550001d5832a0c0bab2
     hash_after: 57af1b3bc0e245a60f3dd550001d5832a0c0bab2
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-2
+    hash_before: cbc92406db54bc6a050a63b6919aa1183fca8eec
+    hash_after: cbc92406db54bc6a050a63b6919aa1183fca8eec
+    returns: 1
+    why: "`stop.js`'s turn-end vote resets `box.claim` to null right after it reads the reason.; `classic.Stop` fires that vote before `turn.complete` fires the clear step in `handover.js`, so `box.claim` reads null there.; The approach has the clear step read the turn's claim, and no claim survives that far.; Ask line one fails this way: no live claim tells the clear step to hold the clear.; The callers list credits the turn-end vote with holding the claim, not with saving it past its own reset.; The callers list names no place that moves the phase from asked back to clear.; `pool` loads a rule's fields as written, and nothing yet reads the new `waits` key.; The prompt split by `e.mine` matches the pattern the turn counter already uses for a prompt, and holds.; The clear still gates on the queue-binding check in `handover.js`, so `engine.binding` at queue still governs it."
 ---
 
 # Ask
@@ -168,7 +174,17 @@ A prompt of the plugin's own leaves the phase standing, so the tooth's re-prompt
 
 ### verdict
 
-<!-- pass or fail, with findings one a line -->
+fail
+
+- `stop.js`'s turn-end vote resets `box.claim` to null right after it reads the reason.
+- `classic.Stop` fires that vote before `turn.complete` fires the clear step in `handover.js`, so `box.claim` reads null there.
+- The approach has the clear step read the turn's claim, and no claim survives that far.
+- Ask line one fails this way: no live claim tells the clear step to hold the clear.
+- The callers list credits the turn-end vote with holding the claim, not with saving it past its own reset.
+- The callers list names no place that moves the phase from asked back to clear.
+- `pool` loads a rule's fields as written, and nothing yet reads the new `waits` key.
+- The prompt split by `e.mine` matches the pattern the turn counter already uses for a prompt, and holds.
+- The clear still gates on the queue-binding check in `handover.js`, so `engine.binding` at queue still governs it.
 
 <!-- the form is verdict -->
 
