@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [yours-counts-the-waiting]
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -162,6 +162,17 @@ record:
     hash_after: 74a83f8320b8b2c79dec7bb54368d44aca428124
     answered:
       - name: lint
+        exit: 0
+        said: "test/contract/work-buttons.test.js:24:1: CodeComment: Code carries no comment here. Write a header of at most five lines"
+  - step: implement/tests-green
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 284b35821b77193f0db5536decc9b49ebffb371f
+    hash_after: 284b35821b77193f0db5536decc9b49ebffb371f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 79 test(s) pass in 5 file(s)
+      - name: check
         exit: 0
         said: "test/contract/work-buttons.test.js:24:1: CodeComment: Code carries no comment here. Write a header of at most five lines"
 ---
