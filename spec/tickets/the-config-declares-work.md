@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [yours-counts-the-waiting]
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -108,6 +108,10 @@ record:
     hash_after: ea8a28f96918911aeeeb8b26cb3cb51a06bcb7e4
     returns: 1
     why: A `work` section holds the knobs already, so the buttons join it and keep every knob.; New ticket declares no `runs`, so a press in the sidebar today runs an empty line.; Pull for me runs `ticket yours --next`, which names a ticket and pulls nothing.; Name the `sidebar.js` change that reads `opens` and `counts`, or the press each button makes today.; The config case holds each button to a ticket verb, yet the work editor runs `tui work`.
+  - step: design/draft
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: c07fe154e79124c18e584246b25ac96f500cf273
+    hash_after: c07fe154e79124c18e584246b25ac96f500cf273
 ---
 
 # Ask
@@ -141,22 +145,22 @@ Two edits to `spec/config/level0.schema.json`, and the tests that read the decla
 | the edit | what changes |
 |---|---|
 | the engine keys leave | `engine.state` and `engine.beat` go, and the `engine` comment drops its line on widgets nothing draws |
-| the work section | a new section, `work`, declares three action widgets under the group `work`, in one row |
+| the buttons join `work` | the section standing already keeps every knob, and gains three action widgets |
+
+Each button stands declared and undrawn: it carries no `group`. The sidebar draws a widget with a group at once, and it runs `runs` in a terminal. The host the desk group builds reads `opens` and `counts`, and its work group child adds the group. So no button draws a press that does nothing today.
 
 | the key | the button | what it declares |
 |---|---|---|
-| `work.editor` | the work editor | `runs` the work tab through `./RUNME.sh tui work`, and `counts` through `./RUNME.sh ticket yours --count` |
+| `work.editor` | the work editor | `runs` `./RUNME.sh tui work`, and `counts` `./RUNME.sh ticket yours --count` |
 | `work.pull` | pull for me | `runs` `./RUNME.sh ticket yours --next`, whose ticket the host pulls and opens |
 | `work.new` | new ticket | `asks` a name, and `opens` the file under `spec/tickets` it names |
 
-The schema declares the buttons, and the host the desk group builds draws them. So `counts` and `opens` are new widget keys the host reads. Each carries its `help`, an `icon` and a cell, so the grid check holds.
-
 | the test | the change |
 |---|---|
-| `test/contract/tree.test.js` | the drawn list gains the three keys, and the list of widgets waiting for a group empties |
-| `test/contract/sidebar.test.js` | the vehicle and the stub share a section with each other, since the engine state leaves |
-| `test/level0/config.test.js` | one case says the engine keys stand nowhere, and one says each work button runs a verb the ticket verb answers |
-
+| `test/contract/tree.test.js` | the undrawn list holds the three work buttons, and the drawn list stays |
+| `test/contract/sidebar.test.js` | the vehicle and the stub share a section with each other |
+| `test/level0/sidebar.test.js` | the title drops the engine state |
+| `test/level0/config.test.js` | one case says the engine keys stand nowhere, and one says each `runs` and `counts` names a verb the command line knows |
 
 ### callers
 
@@ -175,7 +179,11 @@ The schema declares the buttons, and the host the desk group builds draws them. 
 
 <!-- the form is list -->
 
-- first draft
+- a `work` section stands already: the buttons join it, and every knob stays
+- new ticket runs nothing: no button carries a group, so none draws before the host reads it
+- pull for me pulls nothing: the host pulls the ticket `yours --next` names, and the button draws with the host
+- the sidebar reads neither new key: the desk group's host reads them, and adds the group
+- the work editor runs no ticket verb: the case checks each line names a verb the command line knows
 
 
 ## review
