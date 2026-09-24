@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
 depends_on: [yours-counts-the-waiting]
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -152,6 +152,10 @@ record:
     hash_after: 87c377afcd51464dee1a3cde02a1e165e5075a93
     returns: 1
     why: work-buttons.test.js asserts each button waits undrawn, and tree.test.js owns that fact already.; work-buttons.test.js asserts each button carries help, and tree.test.js owns that fact already.; Drop both asserts from work-buttons.test.js, and keep the icon and widget checks.
+  - step: implement/reflect
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 5a7849afe3f776308828a533bc15f8f84ee0dc48
+    hash_after: 5a7849afe3f776308828a533bc15f8f84ee0dc48
 ---
 
 # Ask
@@ -283,11 +287,19 @@ Every case fails on its own assertion. The cases read the declaration the tree s
 
 <!-- the form is text -->
 
+The findings share one class: a new case asserted a fact another case owns already. The fix for the class is a search for the owning case before an assert lands. The new file keeps what it alone asserts, and a comment points at the owner of the rest.
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The fix touches the new contract file alone.
+- every door the change reaches has a fake. The fix reaches no door.
+- a comment names the approach the change implements. A comment points at the case that owns the dropped asserts.
+
 
 ## change
 

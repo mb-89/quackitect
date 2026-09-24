@@ -21,14 +21,13 @@ test("the engine keys nothing reads stand nowhere in the declaration", () => {
   assert.equal(keyed.has("engine.beat"), false);
 });
 
-test("the work section keeps its knobs, and declares its three buttons undrawn", () => {
+// Whether each waits undrawn, and says what it is, stands in test/contract/tree.test.js.
+test("the work section keeps its knobs, and declares its three buttons", () => {
   assert.ok(keyed.has("work.staleAfter"), "a knob the work verbs read stays");
   for (const key of BUTTONS) {
     const one = keyed.get(key);
     assert.ok(one, `${key} stands in the declaration`);
     assert.equal(one.widget, "action");
-    assert.equal(one.group, undefined, `${key} waits for the host to draw it`);
-    assert.ok(one.help, `${key} says what it does on hover`);
     assert.ok(one.icon, `${key} wears a mark`);
   }
 });
