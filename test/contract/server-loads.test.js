@@ -47,7 +47,6 @@ test("a decide that throws exits 1 and names the event", async () => {
   assert.match(said[0], /session\.start.*ReferenceError: dropsMoved is not defined/s);
 });
 
-// The server takes the refactoring hand's answer from its own module, so the walk ends where the hand answers.
 test("the refactoring hand's answer reaches its door through decide", async () => {
   const box = boxOf(SCRATCH, SCRATCH, doorsOver(ROOT));
   box.walk = { file: "old.md" };

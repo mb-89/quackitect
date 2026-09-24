@@ -101,11 +101,12 @@ carries the reading, the plan and the result.
 
 ## 10. Trivial goes in
 
-A branch tripping over a fault either fixes it or carries it forward. A trivial
-fix costs a line, and a reader tells it from the ask at a glance.
+A branch tripping over a fault either fixes it or carries it forward.
 
-A deeper fix costs the ask. It buries the work somebody asked for under work
-nobody asked for. So it becomes a finding, and the code stands.
+| the fault | what happens |
+|---|---|
+| trivial | costs a line, and a reader tells it from the ask at a glance, so the fix goes in |
+| deeper | costs the ask, burying work nobody asked for under work nobody asked for, so it becomes a finding, and the code stands |
 
 A warning marks a break of form, and the write lands over it. The door puts
 the rows on the refactoring hand's list, and the hand drains that list once it
@@ -126,8 +127,8 @@ So the owner reads the ask before it lands. That costs one reading, and it buys
 back every session the ask would misdirect.
 
 Sessions closed their reports on a row asking whether to push. The owner
-answered the same row turn after turn, and the answer never changed: the owner
-pushes. A cloud box still pushes each finished thing, because the box dies with
+answered the same row turn after turn, and the answer stayed the same: the
+owner pushes. A cloud box still pushes each finished thing, because the box dies with
 its tree. A desk keeps its tree, so a commit loses nothing.
 
 ## 14. One place owns a thing

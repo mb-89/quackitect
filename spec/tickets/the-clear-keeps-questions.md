@@ -362,16 +362,16 @@ A turn ending on a stop that waits for the owner holds the context clear. The ha
 
 <!-- the form is files -->
 
-spec/tickets/the-clear-keeps-questions.md
-spec/config/stop/level0.yml
-spec/design_output/stop.md
-src/bridge/handover.js
-src/bridge/stop.js
-src/bridge/server.js
-test/contract/stop-rules.test.js
-test/level0/handover-wiring.test.js
-test/level0/context-handover.test.js
-.claude/skills/level0/lib/stop.js
+- spec/tickets/the-clear-keeps-questions.md
+- spec/config/stop/level0.yml
+- spec/design_output/stop.md
+- src/bridge/handover.js
+- src/bridge/stop.js
+- src/bridge/server.js
+- test/contract/stop-rules.test.js
+- test/level0/handover-wiring.test.js
+- test/level0/context-handover.test.js
+- .claude/skills/level0/lib/stop.js
 
 ## verdict
 

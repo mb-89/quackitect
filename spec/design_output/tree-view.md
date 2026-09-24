@@ -82,7 +82,7 @@ standing and nothing more.
 | expands every row | every parent opens |
 
 A row holds its address, as `0/2/1`, and an edit writes through it. The view
-holds the names down to every parent standing shut, and a tree handed over
+holds the names down to every parent standing shut. A tree handed over
 again carries that set and the row under the cursor by name. So an item
 arriving or leaving shuts nothing and opens nothing.
 

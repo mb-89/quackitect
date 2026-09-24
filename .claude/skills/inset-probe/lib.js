@@ -8,8 +8,6 @@ function escaped(text) {
   return String(text).replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 }
 
-// The page posts `drawn` with its own height once it stands, so the host reads
-// whether it drew and how tall it runs.
 function pageOf(steps) {
   const boxes = steps
     .map((one) => `<div class="step">${escaped(one)}</div>`)
@@ -27,8 +25,6 @@ requestAnimationFrame(() => host.postMessage({ drawn: true, height: document.bod
 </body></html>`;
 }
 
-// The editor sizes an inset in lines, so a page of so many pixels asks for the
-// lines that hold it, and one more for the border.
 function linesFor(px, linePx) {
   if (!(px > 0) || !(linePx > 0)) return 1;
   return Math.ceil(px / linePx) + 1;
