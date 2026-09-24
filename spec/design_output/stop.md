@@ -246,15 +246,20 @@ switches it off.
 | step | what happens | who does it |
 |---|---|---|
 | measure | the fill rides every call of the agent's own and the turn's end, and `session.measure` after each turn | the bridgehead reads `$.session.usage()` |
-| finish | a fill past the key marks the session due, and the block rides every call: put the work down, start nothing new, write the handover | the context door |
-| handover | the turn's end holds, ahead of the tooth, until `.se/HANDOVER.md` stands, and then ends whatever the tooth votes | the context door |
+| finish | a fill past the key marks the session due. The block rides every call: finish the step in hand, start nothing new, write the handover | the context door |
+| write now | a fill past `context.writeAt` turns the block: stop the step where it stands, leave it in hand, write the handover now | the context door |
+| handover | the turn's end holds, ahead of the tooth, until `.se/HANDOVER.md` stands and names no file under `.se/.retro`, and then ends whatever the tooth votes | the context door |
 | clear | the turn completes, the bridgehead runs `/clear`, and it submits the prompt that opens the next conversation | the bridgehead |
 | forget | `session.end` with reason `clear` opens the canary debt and empties `reads` in every hold on the box | the guidance door |
 | re-read | `prompt.context` fires again: the system prompt, then the rules and the canary, then the handover | the harness and the guidance door |
 | resume | the prompt says to read the handover and pull, so the step hands its notes again | the agent |
 
-A session writing no handover lets go past `stop.mostInARow` asks, and the log
-says so at `warn`. A turn the person breaks off asks for no clear.
+| the case | what the door does |
+|---|---|
+| a session writes no handover | lets go past `stop.mostInARow` asks, and the log says so at `warn` |
+| the person breaks off a turn | asks for no clear |
+| a fill past `context.writeAt` | caps the finish, because each call past the first key costs the most in the conversation. The key at zero, or under `context.handoverAt`, adds no second stage |
+| a handover names a file under `.se/.retro` | holds the turn's end until the handover names the ticket or the class by its name. The retro alone reads that folder, and a file there costs the next conversation a whole read. The log says so at `warn` |
 
 The first reading after a clear is what the next conversation opens on. A
 reading past the key there stands the door down for the session, because

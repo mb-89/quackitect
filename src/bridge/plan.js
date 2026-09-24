@@ -72,7 +72,8 @@ function planSpec() {
 export function planField() {
   return {
     type: "object",
-    description: "The answer to the engine's three questions, riding this call: what you work on, which todos you finished, which you add.",
+    description:
+      "The answer to the engine's three questions, riding this call: what you work on, which todos you finished, which you add.",
     properties: planSpec().inputSchema.properties,
   };
 }
@@ -87,6 +88,20 @@ export function plansHere(box) {
   } catch {
     return { working: "", todos: [], places: {} };
   }
+}
+
+// The handover's own work leaves the plan once the next session reads the handover: the work in hand and every todo whose title names it. [[spec/design_output/work#one-handover-stands]]
+export function dropsHandover(box) {
+  const plan = plansHere(box);
+  const todos = plan.todos.filter((one) => !namesHandover(one?.title));
+  const working = namesHandover(plan.working) ? "" : plan.working;
+  const dropped = plan.todos.length - todos.length + (working === plan.working ? 0 : 1);
+  if (dropped) writes(box, { ...plan, todos, working });
+  return dropped;
+}
+
+function namesHandover(title) {
+  return /\bhandover\b/i.test(String(title ?? ""));
 }
 
 function writes(box, plan) {
@@ -104,6 +119,10 @@ function plans(e, box) {
     said.push(
       `${added.refused.length} todo(s) stay out, because ${added.most} stand open already: ${added.refused.join(", ")}. Finish one, or write a ticket.`,
     );
+  if (added.early.length)
+    said.push(
+      `${added.early.join(", ")} waits for the context mark, because a handover todo stands from context.handoverAt to the clear alone.`,
+    );
   return { result: { result: said.join(" ") } };
 }
 
@@ -117,13 +136,24 @@ export function planned(e, box) {
       .filter(Boolean),
   );
   plan.todos = plan.todos.filter((one) => !done.has(one.title));
+  // A handover todo stands from the context mark to the clear alone, so before the mark the plan drops one and takes none. [[spec/design_output/work#one-handover-stands]]
+  const beforeMark = !box.handover;
+  if (beforeMark) {
+    plan.todos = plan.todos.filter((one) => !namesHandover(one?.title));
+    if (namesHandover(plan.working)) plan.working = "";
+  }
   const most = Number(asks(box, MOST_OPEN) ?? 0);
   const refused = [];
+  const early = [];
   const titles = [];
   const wanted = [e?.add ?? []].flat().filter((one) => String(one?.title ?? "").trim());
   const rows = wanted.some((one) => Number(one?.place) > 1) ? queueRows(box) : [];
   for (const one of wanted) {
     const title = String(one.title).trim();
+    if (beforeMark && namesHandover(title)) {
+      early.push(title);
+      continue;
+    }
     if (most > 0 && plan.todos.length >= most) {
       refused.push(title);
       continue;
@@ -137,7 +167,7 @@ export function planned(e, box) {
     titles.push(title);
   }
   const working = String(e?.working ?? "").trim();
-  if (working) plan.working = working;
+  if (working && !(beforeMark && namesHandover(working))) plan.working = working;
   // Finishing the thing in hand names it done, and the hand stands empty. [[spec/design_output/stop#the-plan]]
   if (done.has(plan.working)) plan.working = "";
   writes(box, plan);
@@ -152,7 +182,7 @@ export function planned(e, box) {
       detail: [...done].join(", "),
     },
   );
-  return { plan, titles, refused, most };
+  return { plan, titles, refused, early, most };
 }
 
 // What the queue reader takes, built off the box: the disk, git on the process door, the weights, and the hand the listing reads. [[spec/design_output/stop#the-plan]]
@@ -189,7 +219,9 @@ function placesSaid(box, titles) {
   const place = new Map(
     said.loose.filter((one) => one.todo).map((one) => [one.name, one.queue]),
   );
-  return titles.map((one) => `${one} stands at ${place.get(one) ?? "no place"}.`).join(" ");
+  return titles
+    .map((one) => `${one} stands at ${place.get(one) ?? "no place"}.`)
+    .join(" ");
 }
 
 // A place is the todo, the way the tab writes it: first, before the row standing at that place in the queue, or at the end past every row. [[spec/design_output/pull#a-todo-forces-a-place]]

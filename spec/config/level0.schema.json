@@ -45,6 +45,41 @@
         }
       }
     },
+    "helper": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "find": {
+          "type": "string",
+          "enum": [
+            "haiku",
+            "sonnet",
+            "opus"
+          ],
+          "help": "The model a helper runs on that finds, lists, reads and reports."
+        },
+        "change": {
+          "type": "string",
+          "enum": [
+            "haiku",
+            "sonnet",
+            "opus"
+          ],
+          "help": "The model a helper runs on that makes a scoped change with its test, or reviews against a list."
+        },
+        "decide": {
+          "type": "string",
+          "enum": [
+            "haiku",
+            "sonnet",
+            "opus"
+          ],
+          "help": "The model a helper runs on that takes a design, an unknown cause, or a verdict the owner reads."
+        }
+      }
+    },
     "context": {
       "type": "object",
       "properties": {
@@ -55,6 +90,11 @@
           "type": "number",
           "unit": "tokens",
           "help": "The context a session carries before it finishes, writes the handover and clears. 0 switches it off."
+        },
+        "writeAt": {
+          "type": "number",
+          "unit": "tokens",
+          "help": "The context past which the session stops the step and writes the handover now. 0, or a value under handoverAt, switches it off."
         }
       }
     },

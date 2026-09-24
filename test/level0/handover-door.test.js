@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { HANDOVER } from "../../.claude/skills/level0/lib/folders.js";
+import { PLANS } from "../../.claude/skills/level0/lib/runs.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import {
   HANDOVER_BLOCK,
@@ -88,4 +89,39 @@ test("a second read with no new handover hands none again", () => {
   const blocks = onPromptContext({}, it).after.blocks;
 
   assert.equal(names(blocks).includes(HANDOVER_BLOCK), false);
+});
+
+test("the read drops the handover's own work from the plan, and keeps the rest", () => {
+  const plan = {
+    working: "the handover",
+    todos: [
+      { title: "write the new handover", details: "", todo: "end" },
+      { title: "the probe runs", details: "", todo: "end" },
+    ],
+    places: {},
+  };
+  const it = box({
+    [at(HANDOVER)]: "once",
+    [at(PLANS)]: JSON.stringify(plan),
+  });
+  onSessionStart({}, it);
+
+  onPromptContext({}, it);
+
+  const left = JSON.parse(String(it.disk.read(at(PLANS))));
+  assert.equal(left.working, "");
+  assert.deepEqual(
+    left.todos.map((one) => one.title),
+    ["the probe runs"],
+  );
+});
+
+test("with no handover to read, the plan stands as it is", () => {
+  const plan = JSON.stringify({ working: "the handover", todos: [], places: {} });
+  const it = box({ [at(PLANS)]: plan });
+  onSessionStart({}, it);
+
+  onPromptContext({}, it);
+
+  assert.equal(String(it.disk.read(at(PLANS))), plan);
 });

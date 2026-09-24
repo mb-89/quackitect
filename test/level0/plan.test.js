@@ -9,6 +9,7 @@ import { PLANS } from "../../.claude/skills/level0/lib/runs.js";
 import { reacted, wants } from "../../src/bridge/grace.js";
 import {
   asksForPlan,
+  dropsHandover,
   PLAN,
   PLAN_CALL,
   plansHere,
@@ -138,4 +139,75 @@ test("the ask due behind another ask lands on the first call after that one is a
   assert.equal(asksForPlan(it.box, 12), true, "the plan's ask lands on the next call");
   assert.equal(it.box.grace.id, PLAN);
   assert.equal(asksForPlan(it.box, 13), false, "one ask stands at a time");
+});
+
+// [[spec/design_output/work#one-handover-stands]]
+test("the handover's own work leaves the plan, the word matched whole, and a plan without it stays unwritten", () => {
+  const it = box({
+    [at(PLANS)]: JSON.stringify({
+      working: "write the Handover",
+      todos: [
+        { title: "the handover", details: "", todo: "end" },
+        { title: "the handovers tab", details: "", todo: "end" },
+      ],
+      places: {},
+    }),
+  });
+
+  assert.equal(dropsHandover(it.box), 2);
+  const held = plansHere(it.box);
+  assert.equal(held.working, "");
+  assert.deepEqual(
+    held.todos.map((one) => one.title),
+    ["the handovers tab"],
+  );
+
+  const before = String(it.disk.read(at(PLANS)));
+  assert.equal(dropsHandover(it.box), 0);
+  assert.equal(String(it.disk.read(at(PLANS))), before);
+});
+
+// A handover todo stands from the context mark to the clear alone. [[spec/design_output/work#one-handover-stands]]
+test("the plan takes a handover todo once the context mark is due, and drops one standing before", () => {
+  const it = box({
+    [at(PLANS)]: JSON.stringify({
+      working: "write the handover",
+      todos: [
+        { title: "the handover", details: "", todo: "end" },
+        { title: "the handovers tab", details: "", todo: "end" },
+      ],
+      places: {},
+    }),
+  });
+
+  const early = plan(
+    { add: [{ title: "write the handover" }, { title: "one" }] },
+    it.box,
+  );
+  assert.match(early.result.result, /write the handover waits for the context mark/);
+  let held = plansHere(it.box);
+  assert.equal(held.working, "", "the handover in hand leaves before the mark");
+  assert.deepEqual(
+    held.todos.map((one) => one.title),
+    ["the handovers tab", "one"],
+  );
+
+  plan({ working: "the handover" }, it.box);
+  assert.equal(plansHere(it.box).working, "", "nor does it come back in hand");
+
+  it.box.handover = { phase: "finish", asked: 0 };
+  plan(
+    {
+      done: ["one"],
+      add: [{ title: "write the handover" }],
+      working: "write the handover",
+    },
+    it.box,
+  );
+  held = plansHere(it.box);
+  assert.equal(held.working, "write the handover");
+  assert.deepEqual(
+    held.todos.map((one) => one.title),
+    ["the handovers tab", "write the handover"],
+  );
 });

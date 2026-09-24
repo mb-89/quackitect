@@ -11,6 +11,7 @@ import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
 import {
+  agentOpens,
   CLOSED,
   dependsOn,
   fieldOf,
@@ -44,7 +45,7 @@ import {
 } from "./pull-route.js";
 import { HELPER, SPAWN, spawnPrompt, unblockPrompt } from "./pull-spawn.js";
 import { entriesOf, pushed, returnsOf, shut, target, tipOf } from "./pull-writes.js";
-import { NOTES, schemasHere } from "./ticket.js";
+import { NOTES, opensDraft, schemasHere } from "./ticket.js";
 
 export function ticketsHere(it) {
   const out = [];
@@ -132,7 +133,12 @@ export function handOut(it, who) {
   let other = null;
   let person = null;
   for (const pool of asked) {
-    for (const one of pool) {
+    for (const found of pool) {
+      const one = agentOpens(found.text) ? openedHere(it, found, all) : found;
+      if (one.why) {
+        why.push(`${one.name} ${one.why}`);
+        continue;
+      }
       const said = offer(it, who, one, all);
       if (said.leaf) return handed(it, who, one, said.leaf);
       if (said.why) why.push(`${one.name} ${said.why}`);
@@ -146,6 +152,23 @@ export function handOut(it, who) {
   // A person's question leaves the branch, so the group lands. [[spec/design_output/work#a-person-step-leaves]]
   if (person) console.log(`\n${unblockPrompt(person.name, person.leaf)}`);
   return 0;
+}
+
+// A trivial draft the pull meets opens through the verb's road, and stands in the reading as open from there. [[spec/design_output/pull#a-draft-opens]]
+function openedHere(it, one, all) {
+  const opened = opensDraft(it, { path: one.at, said: one.path });
+  if (opened.refused)
+    return {
+      name: one.name,
+      why: `stands a trivial draft the pull cannot open: ${opened.refused}`,
+    };
+  console.log(
+    `${one.path} opens at ${opened.step}, because a trivial draft waits on no person.`,
+  );
+  const text = it.disk.read(one.at);
+  const now = { ...one, text, front: frontOf(text) };
+  all.splice(all.indexOf(one), 1, now);
+  return now;
 }
 
 // What the wait answer says where no ticket at all offers a leaf. [[spec/design_output/pull#the-hand-out]]
@@ -215,7 +238,8 @@ export function spawnAnswer(other) {
 // [[spec/design_output/pull#done-leaves-no-takeable-step]]
 export function takeable(it, one, all = [], group = "") {
   const front = frontOf(one.text);
-  if (String(front.state ?? "") !== OPEN) return "";
+  // A trivial draft opens at the pull, so it reads as the open ticket it becomes. [[spec/design_output/pull#a-draft-opens]]
+  if (String(front.state ?? "") !== OPEN && !agentOpens(one.text)) return "";
   // The offer waits on a dependency, so this waits on it too. [[spec/design_output/work#a-dependency-waits-for-trunk]]
   if (dependsOn(front).some((dep) => !closedHere(it, all, dep))) return "";
   const path = stepPathOf(front);

@@ -25,7 +25,9 @@ import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { toolLines, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { heldReadsIn } from "../scripts/guidance-hand.js";
+import { tiersText } from "./agent.js";
 import { forgetsReads } from "./handover.js";
+import { dropsHandover } from "./plan.js";
 import { readTools, writeSurvey } from "../engine/tools.js";
 import { asks } from "./config.js";
 import { deadIndexLine } from "./search.js";
@@ -200,6 +202,7 @@ function handoverHere(box) {
       `${HANDOVER} reaches the session, and the read deletes it`,
       {
         detail: text.split("\n")[0],
+        dropped: dropsHandover(box),
       },
     );
     return text;
@@ -227,7 +230,10 @@ export function surveyHere(box) {
 
 function toolsText(box) {
   const lines = toolLines(box.tools ?? {}, WANTED, box.specs ?? []);
-  return lines.length ? [TOOLS_HEADING, "", ...lines].join("\n") : "";
+  if (!lines.length) return "";
+  // The tiers ride the tools block, so a spawn names its model before the Agent door asks. [[spec/design_output/level0#a-spawn-names-its-tier]]
+  const tiers = tiersText(box);
+  return [TOOLS_HEADING, "", ...lines, ...(tiers ? ["", tiers] : [])].join("\n");
 }
 
 function rulesText(standing) {
@@ -326,6 +332,10 @@ export function onSessionEnd(e, box) {
 // [[spec/design_output/level0#the-helper-takes-the-guidance]]
 export function onAgentSpawn(e, box) {
   const kind = String(e?.kind ?? "");
+  // The model each spawn runs on reaches the log, so the retro reads the tier against the rework. [[spec/design_output/level0#a-spawn-names-its-tier]]
+  box.log.say("info", "agent", `a helper spawns on ${e?.model || e?.parentModel || "the default model"}`, {
+    detail: String(e?.description ?? ""),
+  });
   // A restart hands the box over bare, so the accessor reads the guidance again. [[spec/design_output/level0#a-restart-fills-the-box]]
   const standing = layerHere(guidanceOf(box), kind);
   if (!standing) return { pass: true };

@@ -211,55 +211,17 @@ function open(it, name) {
     console.error(`${name} names no ticket under ${NOTES} or ${TRAVELS}.`);
     return 2;
   }
-  const text = it.disk.read(at.path);
-  const note = readNote(text);
-  const front = note.front.said ?? {};
-  if (String(front.state ?? "") !== "draft") {
-    console.log(`${at.said} stands ${front.state ?? "with no state"} already.`);
+  const state = fieldOf(it.disk.read(at.path), "state");
+  if (state !== "draft") {
+    console.log(`${at.said} stands ${state || "with no state"} already.`);
     return 0;
   }
-  const ask = note.sections.find((one) => one.header.toLowerCase() === "ask");
-  const rows = askLines(ask);
-  if (!rows.some((row) => row.trim())) {
-    console.error(
-      `${at.said} holds an empty ask, and open waits for one. Write the ask first.`,
-    );
+  const opened = opensDraft(it, at);
+  if (opened.refused) {
+    console.error(opened.refused);
     return 1;
   }
-  const called = at.said.split("/").pop().replace(/\.md$/, "");
-  // [[spec/design_output/work#a-group-is-a-ticket]]
-  const alone = emptyGroup(it, text, called);
-  if (alone) {
-    console.error(alone);
-    return 1;
-  }
-  const found = askFaults(
-    it,
-    at.path.split("\\").join("/").replace(`${it.root}/`, ""),
-    text,
-  );
-  if (found.length) {
-    console.error(askRefusal(at.said, found));
-    return 1;
-  }
-  const step = String(front.step ?? "").trim() || firstLeafOf(front.steps);
-  // The open lands in one commit of its own, so the queue a push carries holds it. [[spec/design_output/pull#a-draft-opens]]
-  const refused = landedAlone(
-    it,
-    {
-      at: at.path,
-      text: withField(withField(text, "state", "open"), "step", step),
-      name: called,
-      private: at.said.startsWith(`${NOTES}/`),
-    },
-    ["opens"],
-  );
-  if (refused) {
-    console.error(`the hook refuses the commit, so ${at.said} stands a draft:`);
-    console.error(refused);
-    return 1;
-  }
-  console.log(`${at.said} stands open at ${step}, and the pull hands it out.`);
+  console.log(`${at.said} stands open at ${opened.step}, and the pull hands it out.`);
   return 0;
 }
 
@@ -356,6 +318,45 @@ function ticketAt(it, name) {
   if (live || standing.length) return live ?? standing[0];
   const direct = it.join(it.root, ...String(name).split("/"));
   return it.disk.exists(direct) ? { path: direct, said: String(name) } : null;
+}
+
+// The road from a draft to an open ticket, which the verb and the pull's trivial draft share. It answers the step it opens at, or the refusal. [[spec/design_output/pull#a-draft-opens]]
+export function opensDraft(it, at) {
+  const text = it.disk.read(at.path);
+  const note = readNote(text);
+  const front = note.front.said ?? {};
+  const ask = note.sections.find((one) => one.header.toLowerCase() === "ask");
+  if (!askLines(ask).some((row) => row.trim()))
+    return {
+      refused: `${at.said} holds an empty ask, and open waits for one. Write the ask first.`,
+    };
+  const called = at.said.split("/").pop().replace(/\.md$/, "");
+  // [[spec/design_output/work#a-group-is-a-ticket]]
+  const alone = emptyGroup(it, text, called);
+  if (alone) return { refused: alone };
+  const found = askFaults(
+    it,
+    at.path.split("\\").join("/").replace(`${it.root}/`, ""),
+    text,
+  );
+  if (found.length) return { refused: askRefusal(at.said, found) };
+  const step = String(front.step ?? "").trim() || firstLeafOf(front.steps);
+  // The open lands in one commit of its own, so the queue a push carries holds it. [[spec/design_output/pull#a-draft-opens]]
+  const refused = landedAlone(
+    it,
+    {
+      at: at.path,
+      text: withField(withField(text, "state", "open"), "step", step),
+      name: called,
+      private: at.said.startsWith(`${NOTES}/`),
+    },
+    ["opens"],
+  );
+  if (refused)
+    return {
+      refused: `the hook refuses the commit, so ${at.said} stands a draft:\n${refused}`,
+    };
+  return { step };
 }
 
 function firstLeafOf(route) {

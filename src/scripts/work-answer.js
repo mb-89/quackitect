@@ -4,6 +4,7 @@
 // [[spec/design_output/work#one-reading-answers-git]]
 
 import {
+  agentOpens,
   askOf,
   CLOSED,
   dependsOn,
@@ -233,7 +234,10 @@ function heldRow(plan, names) {
 
 // [[spec/design_output/pull#the-queue-is-an-outline]]
 function waitsOnPerson(one) {
-  return personStep(one.text) || fieldOf(one.text, "state") === DRAFT;
+  return (
+    personStep(one.text) ||
+    (fieldOf(one.text, "state") === DRAFT && !agentOpens(one.text))
+  );
 }
 
 // The queue rides every answer, because a reader of the listing wants each row's place. [[spec/design_output/pull#the-queue-is-a-score]]
@@ -291,8 +295,10 @@ export function answerOf(it, queue = true) {
         )
         .map((one) => rowOfTicket(one, places, stood, open, overrides)),
       ...planRows(planHere(it), places),
+      // A ticket on this disk that origin lacks still carries its name, so the work in hand draws once. [[spec/design_output/stop#the-plan]]
       ...heldRow(planHere(it), [
         ...ticketsIn(read).map((one) => one.name),
+        ...diskNames(it),
         ...planHere(it).todos.map((one) => String(one?.title ?? "")),
       ]),
     ],
@@ -310,6 +316,12 @@ function diskCopy(it, one) {
   } catch {
     return one;
   }
+}
+
+// The names of every ticket on this disk, committed or not. [[spec/design_output/stop#the-plan]]
+function diskNames(it) {
+  if (!it.disk || !it.join) return [];
+  return ticketsHere(it).map((one) => one.name);
 }
 
 // The private notes on this box, read the way the pull reads them, and nothing where the box holds none. [[spec/design_output/pull#the-queue-is-an-outline]]
