@@ -44,6 +44,26 @@ Does the owner's VS Code draw a web page between the lines of a ticket through `
 
 <!-- the form is text -->
 
+| the part | what it is |
+|---|---|
+| the trial | a probe extension, `quackitect.inset-probe`, under `.claude/skills/inset-probe` |
+| the first draw | a long route in an inset over the group ticket's first line, whose page posts its height back |
+| the grow | the inset drawn again at the lines that height asks for |
+| the finding | `.se/probe/inset.json`, and then the window closes |
+| the flag road | `code --new-window --extensionDevelopmentPath=<tree>/.claude/skills/inset-probe --enable-proposed-api quackitect.inset-probe` |
+| the list of extensions | untouched, since the probe runs as a development extension |
+
+| the question | what the run shows |
+|---|---|
+| does the page draw | yes: the API stands on, and the page's script posts back from inside the ticket |
+| does a running editor take the flag | yes for the new window the command opens inside it. A window open before the command stays untried |
+| does the inset grow with a long route | yes: the inset draws again at the lines the page's height asks for, and the page posts back |
+| does the `argv.json` road hold | open: it wants the owner's editor restarted, so the decide step takes it |
+
+The probe reads the page's own report, and sees no pixels. So the owner looks at `decide`: the page stands between the lines, and fits the grown inset.
+
+The linked extension runs in the window a person opens by hand, with no flag. So `argv.json` is the road for daily use, and the flag serves a trial.
+
 # decide
 
 <!-- keeps the trial, drops it, or grows it into a ticket of its own -->

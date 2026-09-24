@@ -508,9 +508,11 @@ test("npm reaches the extension and the tense reader, and nothing else at the ro
   const paths = said.stdout.split(/\r?\n/).filter(Boolean);
 
   assert.ok(paths.includes("package.json"), "the root names one");
+  // A trial's manifest names no dependency, so npm reaches nothing through it. [[spec/design_output/work#an-experiment-decides]]
   for (const path of paths) {
-    if (path === "package.json") continue;
-    assert.match(path, /^src\/extension\//, `${path} stands under the extension`);
+    if (path === "package.json" || /^src\/extension\//.test(path)) continue;
+    assert.match(path, /^\.claude\/skills\/[^/]+\/package\.json$/, `${path} stands under the extension or a trial`);
+    assert.deepEqual(read(path).dependencies ?? {}, {}, `${path} names no dependency`);
   }
 
   const bare = read("package.json");
