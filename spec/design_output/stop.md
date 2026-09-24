@@ -397,6 +397,11 @@ agent, and a check reads the tree. So the tree wins:
 A stop the owner drives carries no flag. `the-owner-asks-to-talk` reads the
 owner's own words, so it stands over every check but one.
 
+A check carrying `beside` reads a hand's work beside the agent, and no claim
+yields to it. `warnings-stand-past-the-number` carries it. The refactoring hand
+drains the list, so a claim of done ends the turn over it. The hand still
+spawns at that turn's end.
+
 ## A talk follows a report
 
 A stop line with no report above it tells the owner nothing to talk about.
