@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -164,6 +164,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 2bc65ec92430 · claude-code-remote · helper-11
+    hash_before: c69881c20f5e53366fda9f73b5f0639db660db0c
+    hash_after: c69881c20f5e53366fda9f73b5f0639db660db0c
+    returns: 2
+    why: "craft: `handOut` still builds its own tagged pool, so `taggedFirst` has one caller and the drift stands; fix: `handOut` calls `taggedFirst`, or both read one tagged filter from pull-hand.js; craft: `waiting` reads `front.step` raw, so an empty pointer skips the first leaf `stepPathOf` resolves; `leafOf` now resolves the nearest `by`, and a case proves a person phase counts; `frontIn` now delegates to `frontOf`, which answers the repeated front finding; `ticket.js` and `cli.js` only wire the verb and its usage, trivial and inside the ask; `./RUNME.sh check` exits 0, and queue.test.js with ticket-yours.test.js pass, 15 tests; no retro stands in the handback"
 ---
 
 # Ask
@@ -389,14 +395,12 @@ The findings share one class: the change rebuilt a reading the pull already owns
 
 - spec/tickets/yours-counts-the-waiting.md
 - src/scripts/ticket-yours.js
+- src/scripts/pull-hand.js
 - src/scripts/ticket.js
 - src/scripts/cli.js
 - test/level0/ticket-yours.test.js
-- src/scripts/pull-hand.js
 - src/scripts/pull-route.js
-- src/scripts/pull-hand-of.js
 - src/engine/group.js
-- src/extension/lib/lens.js
 
 ## verdict
 
@@ -406,12 +410,14 @@ The findings share one class: the change rebuilt a reading the pull already owns
 
 fail
 
-- `waiting` reads only the leaf's own `by`, so a person step inherited from a parent goes uncounted
-- call `stepPathOf` and `leafOf` in src/scripts/pull-route.js, which resolve the nearest `by`
-- `frontIn` repeats `frontOf` in src/engine/group.js, and `ticketsHere` already carries `front`
-- the tagged-then-score order repeats the pools of `handOut` in src/scripts/pull-hand.js, so the two drift
-- no case sets `by: person` on a parent step and asserts the ticket counts
-- `./RUNME.sh check` exits 0, and queue.test.js with ticket-yours.test.js pass
+- craft: `handOut` still builds its own tagged pool, so `taggedFirst` has one caller and the drift stands
+- fix: `handOut` calls `taggedFirst`, or both read one tagged filter from pull-hand.js
+- craft: `waiting` reads `front.step` raw, so an empty pointer skips the first leaf `stepPathOf` resolves
+- `leafOf` now resolves the nearest `by`, and a case proves a person phase counts
+- `frontIn` now delegates to `frontOf`, which answers the repeated front finding
+- `ticket.js` and `cli.js` only wire the verb and its usage, trivial and inside the ask
+- `./RUNME.sh check` exits 0, and queue.test.js with ticket-yours.test.js pass, 15 tests
+- no retro stands in the handback
 
 ## checked
 
@@ -419,7 +425,7 @@ fail
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place. It fails here, since `frontIn`, the leaf lookup and the queue order repeat pull-route.js, group.js and pull-hand.js.
+- every fact the change adds stands in one place. It still fails, since the tagged pool stands in `handOut` and in `taggedFirst`.
 
 # Discussion
 
