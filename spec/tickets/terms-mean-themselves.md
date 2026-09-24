@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box a0ae5042621d · claude-code-remote
     hash_before: a6be6079e5e01c0a5bf76bea89945e47fc0e4600
+  - step: sync
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: b9f5b6f30aa3e54ff852ae4d77662331da81f091
+    hash_after: b9f5b6f30aa3e54ff852ae4d77662331da81f091
+    answered:
+      - name: sync
+        exit: 0
+        said: work/terms-mean-themselves already carries every commit on main.
 ---
 
 # Ask
@@ -95,6 +103,8 @@ Every term says what it means in one line of core words and other terms, and the
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
