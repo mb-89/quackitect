@@ -1,0 +1,78 @@
+---
+kind: [[ticket]]
+state: open
+steps:
+  - name: do
+    does: makes the change, with the test that covers it
+    from: anyone
+    by: anyone
+    to: retro
+    input: ask
+    reads: [[spec/guidance/working]]
+    needs: ["branch test"]
+    checklist: ["the change follows the ask, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    evidence:
+      - name: tests
+        form: command
+        expects: green
+        says: the tests that cover the change, or the check where it touches no code
+      - name: check
+        form: command
+        expects: 0
+        says: the check is green on the commit
+      - name: says
+        form: text
+        says: what changes and why, for a reader who was not there
+process: [[spec/processes/trivial]]
+process_hash: 05e53b89dab63152
+group: the-drawing-draws-a-route
+depends_on: [the-drawing-bundles]
+step: do
+---
+
+# Ask
+
+<!-- gain, as text: what is gained by doing it, and not only what it does -->
+One web page draws a ticket's route from the graph the emitter answers, and a host speaks to it through messages alone. The cloud box proves the page in a browser through a fake host, so the desk host meets a drawing that already works. The plan stands in [[spec/design_input/the-editor-draws-the-ticket#the-drawing-draws-a-route]].
+
+<!-- breaks, as text: what breaks if it is never done -->
+The editor host has nothing to hold, and a person reads a route as YAML alone.
+
+<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+- the page takes a `graph` message and draws every node and edge the graph carries, laid out by `@dagrejs/dagre`
+- the page marks the pointer, a person's node, a dotted node, a skipped node and the returns
+- the page answers `ready` once it loads, and takes a `theme` message
+- a browser test drives the page through a fake host, and `./RUNME.sh check` runs it
+- the protocol stands in one design output note, and the page and the test point at it
+
+# do
+
+<!-- makes the change, with the test that covers it -->
+
+## tests
+
+<!-- the tests that cover the change, or the check where it touches no code -->
+
+<!-- the form is command -->
+
+## check
+
+<!-- the check is green on the commit -->
+
+<!-- the form is command -->
+
+## says
+
+<!-- what changes and why, for a reader who was not there -->
+
+<!-- the form is text -->
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
