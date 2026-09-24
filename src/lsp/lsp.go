@@ -127,6 +127,8 @@ func (one *server) took(said message) bool {
 		one.answers(said.ID, one.links(said.Params))
 	case "textDocument/completion":
 		one.answers(said.ID, one.completes(said.Params))
+	case "textDocument/foldingRange":
+		one.answers(said.ID, one.folds(said.Params))
 	case "initialized":
 		one.sweeps()
 		go one.follows()
@@ -158,6 +160,8 @@ func capabilitiesOf() map[string]any {
 		"documentLinkProvider": map[string]any{"resolveProvider": false},
 		// The schema offers what a note carries at the cursor. [[spec/design_output/lsp#the-completion-reads-the-schema]]
 		"completionProvider": map[string]any{"triggerCharacters": triggers},
+		// The frontmatter folds, so the drawing stands over it. [[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]]
+		"foldingRangeProvider": true,
 	}
 }
 

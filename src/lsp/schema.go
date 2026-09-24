@@ -130,7 +130,7 @@ func frontFaults(note Note, spec *yaml.Doc, kind, where string) []Finding {
 	props := yaml.AsDoc(spec.Get("properties"))
 
 	for _, key := range yaml.StringsOf(spec.Get("required")) {
-		if !yaml.Empty(said.Get(key)) {
+		if !yaml.Empty(said.Get(key)) || waitsForFill(said, yaml.AsDoc(props.Get(key))) {
 			continue
 		}
 		out = append(out, schemaFault(key, where, 1,
@@ -452,4 +452,13 @@ func joined(said []any, with string) string {
 		parts = append(parts, yaml.AsString(one))
 	}
 	return strings.Join(parts, with)
+}
+
+// A key the fill writes waits while the note writes the key it fills from, and that key holds nothing. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+func waitsForFill(said, rule *yaml.Doc) bool {
+	if rule == nil {
+		return false
+	}
+	from := yaml.AsString(rule.Get("x-filled-by"))
+	return from != "" && said.Has(from) && yaml.Empty(said.Get(from))
 }

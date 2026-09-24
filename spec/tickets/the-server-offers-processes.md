@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -126,6 +126,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 2bc65ec92430 · claude-code-remote
+    hash_before: 76d5a456c958be029f40e4a510eb2e73214a0c2e
+    hash_after: 76d5a456c958be029f40e4a510eb2e73214a0c2e
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -280,11 +288,19 @@ The announcement reads `capabilitiesOf`, which `took` now calls, so a test reads
 
 <!-- the form is command -->
 
+./RUNME.sh lint src/lsp/complete.go src/lsp/fold.go src/lsp/lsp.go src/lsp/schema.go src/lsp/complete_test.go src/lsp/fold_test.go src/lsp/schema_test.go .claude/skills/level0/lib/schema.js spec/schemas/ticket.schema.yaml test/level0/schema.test.js
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. It touches the server's completion, fold, capabilities and checker, the JS checker, the ticket schema, and their tests.
+- every door the change reaches has a fake. The fold reads the buffer the tree holds, and the cases read a fixture tree.
+- a comment names the approach the change implements. Each new function and schema key points at the design input or says what it does.
+
 
 ## tests-green
 

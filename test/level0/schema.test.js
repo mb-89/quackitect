@@ -273,3 +273,23 @@ body:
   assert.deepEqual(keys(fresh), []);
   assert.deepEqual(keys(fresh.replace("process:\n", "")), ["Schema.state", "Schema.steps"]);
 });
+
+// [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+test("a process the note names holds back nothing, so a missing route stands named", () => {
+  const schema = readYaml(`kind: ticket
+frontmatter:
+  type: object
+  required: [kind, steps]
+  properties:
+    kind:
+      const: ticket
+      x-link: true
+    steps:
+      type: array
+      x-filled-by: process
+    process:
+      x-link: true
+`);
+  const said = checkNote("---\nkind: [[ticket]]\nprocess: [[spec/processes/trivial]]\n---\n", schema, "a.md");
+  assert.ok(said.some((one) => one.rule === "Schema.steps"));
+});

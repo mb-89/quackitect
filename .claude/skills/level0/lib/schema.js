@@ -176,13 +176,19 @@ function heldIn(front, schema, kind, where, calls, schemas) {
   };
 }
 
+// A key the fill writes waits while the note writes the key it fills from, and that key holds nothing. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+function waitsForFill(said, rule) {
+  const from = rule?.["x-filled-by"];
+  return Boolean(from) && Object.hasOwn(said ?? {}, from) && empty(said[from]);
+}
+
 // [[spec/design_output/schema#the-checker-walks-every-key]]
 function mapFaults(said, spec, held, path) {
   const out = [];
   const props = spec.properties ?? {};
 
   for (const key of spec.required ?? []) {
-    if (!empty(said?.[key])) continue;
+    if (!empty(said?.[key]) || waitsForFill(said, props[key])) continue;
     out.push(
       fault(
         key,

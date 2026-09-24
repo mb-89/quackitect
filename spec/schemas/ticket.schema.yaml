@@ -38,6 +38,8 @@ frontmatter:
     state:
       enum: [draft, open, closed]
       x-engine: true
+      # The fill writes it, so an empty process holds it back.
+      x-filled-by: process
       description: whether anybody pulls it, and the pull writes this
 
     reason:
@@ -62,6 +64,8 @@ frontmatter:
     steps:
       type: array
       x-engine: true
+      # The fill writes it, so an empty process holds it back.
+      x-filled-by: process
       description: the route, as a tree of steps in the order a hand meets them
       default:
         - name: do
@@ -179,6 +183,8 @@ frontmatter:
 
     process:
       x-link: true
+      # The completion offers every process standing in this folder.
+      x-values: spec/processes
       description: the route the mint copies from, as a link to a process
 
     process_hash:

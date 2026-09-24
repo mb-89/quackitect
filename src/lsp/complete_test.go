@@ -236,3 +236,15 @@ func TestAProcessKeyOffersEveryProcess(t *testing.T) {
 		t.Fatalf("the process key offers %s", said)
 	}
 }
+
+func TestAProcessOfferSkipsAFileInAFolderBelow(t *testing.T) {
+	tree := offeredTree(t, map[string]string{
+		"spec/schemas/ticket.schema.yaml": pickedSchema,
+		"spec/processes/trivial.yaml":     "for: a fix\n",
+		"spec/processes/old/gone.yaml":    "for: a relic\n",
+	})
+	got := offeredAt(t, tree, "spec/tickets/a.md", "---\nkind: [[ticket]]\nprocess: \n---\n", 2)
+	if said := strings.Join(labels(got), ","); said != "[[spec/processes/trivial]]" {
+		t.Fatalf("the process key offers %s", said)
+	}
+}
