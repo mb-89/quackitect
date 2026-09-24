@@ -675,7 +675,8 @@ writes, and nothing else.
 
 A draft on the `trivial` route waits on no person:
 
-- the pull opens it through `opensDraft` in `src/scripts/ticket.js`, the road the verb takes, and hands its first leaf
+- the pull opens it through `opensDraft` in `src/scripts/ticket.js`, the verb's own road
+- the pull hands its first leaf
 - the queue counts it among the agent's rows
 - a refusal on that road leaves the draft standing, and the wait answer names the refusal A group opens with its children standing, as
 [[spec/design_output/work#a-group-is-a-ticket]] says.
