@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -145,6 +145,11 @@ record:
       - name: check
         exit: 0
         said: "src/bridge/stop.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 640. Split it by topic."
+  - step: verdict
+    hand: box d6f05e3a585030 · claude-code · helper-9
+    hash_before: b41d5d173f30611f93db5e7645247c202f2b68d5
+    hash_after: b41d5d173f30611f93db5e7645247c202f2b68d5
+reason: done
 ---
 
 # Ask
@@ -341,17 +346,55 @@ A desk pull meeting no ticket hands out the cleanup: the oldest file on the refa
 
 <!-- the form is files -->
 
+- spec/tickets/an-empty-queue-hands-cleanup.md
+- src/scripts/pull-cleanup.js
+- src/scripts/pull-hand.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
+- src/scripts/pull-hand-of.js
+- src/scripts/cli-doors.js
+- src/scripts/ticket.js
+- spec/design_output/pull.md
+- spec/guidance/working.md
+- test/level0/pull-cleanup.test.js
+- test/level0/pull-hand.test.js
+- test/level0/pull-doors.js
+- test/contract/stop-dry-run.test.js
+- .claude/skills/inset-probe/extension.js
+- .claude/skills/level0/lib/warnings.js
+- .claude/skills/level0/lib/runs.js
+- .claude/skills/level0/lib/cloud.js
+- .vale.ini
+- src/bridge/refactor-hand.js
+- src/bridge/server.js
+- src/bridge/stop.js
+- test/level0/refactor-hold.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- Each ask bullet holds a case in `test/level0/pull-cleanup.test.js`. `test/level0/pull-hand.test.js` drives the cleanup through `handOut`.
+- `handOut` answers the cleanup only where no name, no skipped ticket and no person's step stands. A person's question keeps its wait.
+- `handDoors` sets `cloud` on the real pull, so the cloud gate holds outside the fakes.
+- A hand-back carries no `wanted`, so a pass through `onward` reaches the cleanup as the approach says.
+- The lint fixes past the ask stay trivial: a moved test, named numbers, one exemption and a row order.
+- `./RUNME.sh check` exits 0 at warning, and the tests answer green.
+- Craft, for a later ticket: a refactor list of uncommitted files alone hands out no file. The check stays out too, so the pull waits.
+- `./RUNME.sh branch review` names the retro absent from the handback, and the retro leaf follows this one.
+- An uncommitted cut of `src/bridge/stop.js` into `src/bridge/refactor-hand.js` stands in the tree. It rides in no commit of this ticket.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the order and the gates stand in the cleanup chapter of the pull note. The module, the wait and both tests point at it
 
 # Discussion
 
