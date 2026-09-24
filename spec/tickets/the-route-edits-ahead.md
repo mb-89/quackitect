@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-ticket-answers-the-editor
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 2bc65ec92430 · claude-code-remote
@@ -145,6 +145,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 2bc65ec92430 · claude-code-remote · helper-9
+    hash_before: 21049dc4a8961f31cc081e74d3f0984a21c5dfb2
+    hash_after: 21049dc4a8961f31cc081e74d3f0984a21c5dfb2
+    returns: 1
+    why: "craft: `canonical` in `src/scripts/ticket-route.js` restates the sorted-key form `canonicalOf` in `.claude/skills/level0/lib/schema-route.js` holds. Call `canonicalOf`, and drop `canonical`.; craft: `route` in `src/scripts/ticket.js` refuses an unknown ticket with exit 2, where the approach answers 1 on a refusal. Answer 1, or name 2 in the approach.; craft: no case drives the unknown-ticket refusal. Add one in `test/level0/ticket-route.test.js` asserting the exit and the JSON."
 ---
 
 # Ask
@@ -366,17 +372,35 @@ A refusal names the leaf or the phase, and writes nothing. Both roads answer one
 
 <!-- the form is files -->
 
+- spec/tickets/the-route-edits-ahead.md
+- spec/guidance/review/reviewing.md
+- spec/design_input/the-editor-draws-the-ticket.md
+- src/scripts/ticket-route.js
+- src/scripts/ticket.js
+- src/scripts/cli.js
+- test/level0/ticket-route.test.js
+- .claude/skills/level0/lib/schema-route.js
+
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+- craft: `canonical` in `src/scripts/ticket-route.js` restates the sorted-key form `canonicalOf` in `.claude/skills/level0/lib/schema-route.js` holds. Call `canonicalOf`, and drop `canonical`.
+- craft: `route` in `src/scripts/ticket.js` refuses an unknown ticket with exit 2, where the approach answers 1 on a refusal. Answer 1, or name 2 in the approach.
+- craft: no case drives the unknown-ticket refusal. Add one in `test/level0/ticket-route.test.js` asserting the exit and the JSON.
+
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each fact stands in one place. `reachedOf` lifts the read out of `updated`, and comments point at the design input. `canonical` repeats `canonicalOf`, so the first finding stands.
 
 # Discussion
 
