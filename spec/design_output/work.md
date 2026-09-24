@@ -56,6 +56,10 @@ one schema covers everything that moves, and `spec/schemas` names no group kind.
 | its children | every ticket under `spec/tickets` naming it under `group` |
 | the claim | the push that writes the record |
 
+The children stand before their group. `emptyGroup` in
+`src/scripts/pull-hand.js` refuses a group mint and a group open while no
+ticket names the group under `group`, so no group stands empty.
+
 A group of one ticket is the ordinary case, and a group of many is the same
 shape. The children stand under the group, so the write door refuses an ask
 naming one of them. The ask says what the group adds up to.

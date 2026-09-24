@@ -22,6 +22,7 @@ import { TODO } from "../../.claude/skills/level0/lib/todo.js";
 import { fieldOf, GROUP, withField, withoutField } from "../engine/group.js";
 import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
+import { emptyGroup } from "./pull-hand.js";
 import { landedAlone } from "./pull-landed.js";
 import { askFaults, askRefusal, lineRefusal } from "./ticket-ask-lint.js";
 
@@ -225,6 +226,13 @@ function open(it, name) {
     );
     return 1;
   }
+  const called = at.said.split("/").pop().replace(/\.md$/, "");
+  // [[spec/design_output/work#a-group-is-a-ticket]]
+  const alone = emptyGroup(it, text, called);
+  if (alone) {
+    console.error(alone);
+    return 1;
+  }
   const found = askFaults(
     it,
     at.path.split("\\").join("/").replace(`${it.root}/`, ""),
@@ -241,7 +249,7 @@ function open(it, name) {
     {
       at: at.path,
       text: withField(withField(text, "state", "open"), "step", step),
-      name: at.said.split("/").pop().replace(/\.md$/, ""),
+      name: called,
       private: at.said.startsWith(`${NOTES}/`),
     },
     ["opens"],

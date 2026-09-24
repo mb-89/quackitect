@@ -671,7 +671,8 @@ waits for a retro.
 
 `ticket open <name>` turns a draft into an open ticket at its first leaf, and
 refuses while the ask stands empty. So the pull hands out what a person
-writes, and nothing else.
+writes, and nothing else. A group opens with its children standing, as
+[[spec/design_output/work#a-group-is-a-ticket]] says.
 
 The verb reads the voice rules over the Ask too, and refuses one that breaks
 a rule at the error or the warning level. `askFaults` in

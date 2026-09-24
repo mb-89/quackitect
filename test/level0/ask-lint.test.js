@@ -130,6 +130,33 @@ test("an Ask breaking a rule refuses the open, names the rule and leaves the dra
   assert.match(disk.read(at(AT)), /^state: draft$/m, "the draft stands");
 });
 
+const GROUP_DRAFT = DRAFT.replace(
+  "state: draft\n",
+  "state: draft\nprocess: [[spec/processes/group]]\n",
+);
+const CHILD =
+  "---\nkind: [[ticket]]\nstate: draft\ngroup: a-thing\n---\n\n# Ask\n\nA part.\n";
+
+// [[spec/design_output/work#a-group-is-a-ticket]]
+test("a group no ticket names refuses the open, and the draft stands", () => {
+  const { it, disk } = box("{}");
+  disk.write(at(AT), GROUP_DRAFT);
+  const ran = heard(() => ticket(ROOT, ["open", "a-thing"], it));
+  assert.equal(ran.code, 1);
+  assert.match(ran.said, /no ticket names it under group/);
+  assert.match(disk.read(at(AT)), /^state: draft$/m, "the draft stands");
+});
+
+// [[spec/design_output/work#a-group-is-a-ticket]]
+test("a group with a child standing opens", () => {
+  const { it, disk } = box("{}");
+  disk.write(at(AT), GROUP_DRAFT);
+  disk.write(at("spec/tickets/a-part.md"), CHILD);
+  const ran = heard(() => ticket(ROOT, ["open", "a-thing"], it));
+  assert.equal(ran.code, 0, ran.said);
+  assert.match(disk.read(at(AT)), /^state: open$/m);
+});
+
 test("an Ask that passes opens the ticket at its first leaf", () => {
   const { it, disk } = box("{}");
   const ran = heard(() => ticket(ROOT, ["open", "a-thing"], it));

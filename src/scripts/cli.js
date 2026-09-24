@@ -2,7 +2,7 @@
 // function behind it, and the dispatch at the foot of the table.
 // [[spec/design_output/editor#one-command-opens-the-editor]]
 
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { runsHere } from "../../.claude/skills/level0/lib/paths.js";
@@ -49,6 +49,7 @@ import { batteryRun, stamped } from "./cli-stamp.js";
 import { graphIn } from "./graph.js";
 import { probe } from "./probe.js";
 import { withRoute } from "./process.js";
+import { emptyGroup } from "./pull-hand.js";
 import { pullArgvOf } from "./pull-tool.js";
 import { renaming, renamingText } from "./rename.js";
 import { retro } from "./retro.js";
@@ -469,6 +470,12 @@ export function mint(argv) {
   const made = mintedNote(schemas, { kind, path, fields: copied.fields });
   if (made.why) {
     console.error(made.why);
+    return 2;
+  }
+  // [[spec/design_output/work#a-group-is-a-ticket]]
+  const alone = emptyGroup({ ...it, root, join }, made.text, basename(path, ".md"));
+  if (alone) {
+    console.error(alone);
     return 2;
   }
 
