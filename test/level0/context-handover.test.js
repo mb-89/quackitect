@@ -284,3 +284,51 @@ test("the retro check reads a backslash path too", () => {
 
   assert.equal(namesRetro(it), ".se\\.retro\\x\\report.md");
 });
+
+// The rules the claim reads, one waiting on the owner and one not. [[spec/tickets/the-clear-keeps-questions]]
+const WAITING = `
+- id: the-owner-asks-to-talk
+  side: stop
+  priority: 100
+  decides: claimed
+  waits: owner
+  asks: Does the owner open a discussion?
+  says: The owner opens a discussion.
+
+- id: the-work-stands-complete
+  side: stop
+  priority: 45
+  decides: claimed
+  asks: Does the work stand complete?
+  says: The work stands complete.
+`;
+
+// [[spec/tickets/the-clear-keeps-questions]]
+test("a stop waiting on the owner holds the clear, and the next turn's end clears", () => {
+  const it = box(150000, {
+    [at("spec/config/stop/level0.yml")]: WAITING,
+    [at(HANDOVER)]: "# Where it stands\n",
+  });
+  measures(it, 160000);
+
+  const asks = {
+    last_assistant_message: "A question.\n\nstop: the-owner-asks-to-talk",
+  };
+  assert.equal(holdsForHandover(asks, it), null, "the tooth votes on the waiting stop");
+  assert.equal(it.handover.phase, FINISH, "the session stays due");
+  assert.deepEqual(clearsAfter({ reason: "answer" }, it, { pass: true }), {
+    pass: true,
+  });
+
+  it.claim = "the-owner-asks-to-talk";
+  assert.equal(holdsForHandover({}, it), null, "a claim the call made waits too");
+  it.claim = null;
+
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+  assert.deepEqual(holdsForHandover(done, it), { pass: true });
+  assert.equal(it.handover.phase, CLEAR);
+  assert.deepEqual(clearsAfter({ reason: "answer" }, it, { pass: true }), {
+    pass: true,
+    clear: { prompt: RESUME },
+  });
+});

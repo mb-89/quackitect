@@ -94,7 +94,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -124,6 +124,17 @@ record:
     hand: box d6f05e3a585030 · claude-code · helper-6
     hash_before: c8b6966c4918c3d60df140b855934550a27d7281
     hash_after: c8b6966c4918c3d60df140b855934550a27d7281
+  - step: implement/tests-red
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 902114153b1e90a1aa5e7eb2bda47655e97b505c
+    hash_after: 902114153b1e90a1aa5e7eb2bda47655e97b505c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -221,17 +232,25 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/level0/context-handover.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The handover door moves the phase to clear on any claim, so a waiting stop clears. The claim reads off the turn's last line or the stop call.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `handover.js`, `stop.js`, the stop rules and their test, which the ask names
+- the test reads a fake disk and a fake log, and no other door
+- a comment in `handover.js` names this ticket
 
 ## reflect
 
@@ -318,3 +337,5 @@ pass
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The owner narrows the ask: a stop waiting on the owner holds the clear, and nothing more. The question-and-answer row drops. The session stays due, and the next turn's end clears.
