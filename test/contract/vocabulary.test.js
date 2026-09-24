@@ -12,6 +12,7 @@ import { CASES, slugOf } from "../../.claude/skills/level0/lib/slug.js";
 import {
   CORE,
   coreOf,
+  looseMeanings,
   SWAPS,
   swapsOf,
   TERMS,
@@ -63,6 +64,18 @@ test("every term names a note that stands, and a chapter that stands in it", () 
     }
   }
   assert.deepEqual(broken, []);
+});
+
+// A term says what it means in words a reader holds. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+test("every term says what it means, in core words and other terms", () => {
+  const lists = { core: read(CORE), terms: read(TERMS), swaps: read(SWAPS) };
+  assert.deepEqual(
+    termsOf(lists.terms)
+      .filter((one) => !one.means)
+      .map((one) => one.word),
+    [],
+  );
+  assert.deepEqual(looseMeanings(lists), []);
 });
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]

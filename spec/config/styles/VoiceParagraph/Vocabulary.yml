@@ -2359,7 +2359,7 @@ script: |
     }
     if n > 2 && text.has_suffix(w, "es") {
       if inside[w[:n-2]] != undefined { return true }
-      if inside[w[:n-1]] != undefined { return true }
+      if inside[w[:n-2] + "e"] != undefined { return true }
     }
     if n > 1 && text.has_suffix(w, "s") {
       if inside[w[:n-1]] != undefined { return true }
@@ -2369,7 +2369,7 @@ script: |
     }
     if n > 2 && text.has_suffix(w, "ed") {
       if inside[w[:n-2]] != undefined { return true }
-      if inside[w[:n-1]] != undefined { return true }
+      if inside[w[:n-2] + "e"] != undefined { return true }
       if inside[w[:n-3]] != undefined { return true }
     }
     if n > 3 && text.has_suffix(w, "ing") {
@@ -2390,17 +2390,24 @@ script: |
     }
     if n > 3 && text.has_suffix(w, "er") {
       if inside[w[:n-2]] != undefined { return true }
-      if inside[w[:n-1]] != undefined { return true }
+      if inside[w[:n-2] + "e"] != undefined { return true }
     }
     if n > 4 && text.has_suffix(w, "est") {
       if inside[w[:n-3]] != undefined { return true }
-      if inside[w[:n-2]] != undefined { return true }
+      if inside[w[:n-3] + "e"] != undefined { return true }
     }
-    if n > 5 && (text.has_suffix(w, "able") || text.has_suffix(w, "ible")) {
+    if n > 5 && text.has_suffix(w, "able") {
       if inside[w[:n-4]] != undefined { return true }
       if inside[w[:n-4] + "e"] != undefined { return true }
     }
-    if n > 5 && (text.has_suffix(w, "less") || text.has_suffix(w, "most")) {
+    if n > 5 && text.has_suffix(w, "ible") {
+      if inside[w[:n-4]] != undefined { return true }
+      if inside[w[:n-4] + "e"] != undefined { return true }
+    }
+    if n > 5 && text.has_suffix(w, "less") {
+      if inside[w[:n-4]] != undefined { return true }
+    }
+    if n > 5 && text.has_suffix(w, "most") {
       if inside[w[:n-4]] != undefined { return true }
     }
     return false

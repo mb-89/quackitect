@@ -183,7 +183,7 @@ ifVale(
   ),
 );
 
-// The vocabulary rule compiles its patterns once a run, and still refuses a word off its shape, a core entry naming no source, and a term naming no note. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+// The vocabulary rule compiles its patterns once a run, and still refuses a word off its shape, a core entry naming no source, a term naming no note, a term saying nothing of what it means, and a source that is no web address. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 const VOCABULARY = "spec/vocabulary/probe.yml";
 const ENTRY = "VoiceShape.VocabularyEntry";
 
@@ -192,16 +192,27 @@ ifVale(
   proves(
     {
       good: at(
-        "words:\n  - {word: door, from: ste}\nterms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\"}\nswaps:\n  - {word: utilize, write: use}\n",
+        "words:\n  - {word: door, from: ste}\nterms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\", means: \"a small script that finds the tool\"}\n  - {word: vale, defines: \"[[spec/guidance/voice]]\", means: \"a prose linter\", source: \"https://vale.sh\"}\nswaps:\n  - {word: utilize, write: use}\n",
         VOCABULARY,
       ),
       shapeless: at("words:\n  - {word: Door, from: ste}\n", VOCABULARY),
       sourceless: at("words:\n  - {word: door, from: nowhere}\n", VOCABULARY),
-      noteless: at("terms:\n  - {word: shim, defines: somewhere}\n", VOCABULARY),
+      noteless: at("terms:\n  - {word: shim, defines: somewhere, means: \"a script\"}\n", VOCABULARY),
+      meaningless: at("terms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\"}\n", VOCABULARY),
+      comma: at(
+        "terms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\", means: \"a script, and more\"}\n",
+        VOCABULARY,
+      ),
+      addressless: at(
+        "terms:\n  - {word: shim, defines: \"[[spec/guidance/voice]]\", means: \"a script\", source: somewhere}\n",
+        VOCABULARY,
+      ),
     },
     (said) => {
       passes(said, ENTRY, "good");
-      for (const key of ["shapeless", "sourceless", "noteless"]) refuses(said, ENTRY, key);
+      for (const key of ["shapeless", "sourceless", "noteless", "meaningless", "comma", "addressless"]) {
+        refuses(said, ENTRY, key);
+      }
     },
   ),
 );

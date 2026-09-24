@@ -16,6 +16,9 @@ import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import {
   CORE,
   coreOf,
+  ENDINGS,
+  knownIn,
+  looseMeanings,
   pathsOf,
   SWAPS,
   swapsOf,
@@ -41,8 +44,8 @@ words:
 
 const TERMS_TEXT = `
 terms:
-  - {word: door, defines: "[[spec/design_output/doors]]"}
-  - {word: write, defines: "[[spec/design_output/level0#the-write-door]]"}
+  - {word: door, defines: "[[spec/design_output/doors]]", means: "the refuse gate"}
+  - {word: write, defines: "[[spec/design_output/level0#the-write-door]]", means: "a door with no refusal", source: "https://example.org/write"}
   - {word: level zero, defines: "[[spec/design_output/level0]]"}
   - {word: jargon, defines: ""}
 `;
@@ -129,6 +132,35 @@ test("the core and the terms read their entries, and a malformed word drops out"
     ["door", "write", "level zero", "jargon"],
   );
   assert.deepEqual(coreOf(undefined), []);
+});
+
+// [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+test("a term answers what it means, and the source it cites", () => {
+  const [door, write, zero] = termsOf(readYaml(TERMS_TEXT));
+  assert.equal(door.means, "the refuse gate");
+  assert.equal(door.source, "");
+  assert.equal(write.means, "a door with no refusal");
+  assert.equal(write.source, "https://example.org/write");
+  assert.equal(zero.means, "");
+});
+
+// [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+test("a means line answers every word the lists leave out, and a stem stands", () => {
+  assert.deepEqual(looseMeanings(lists()), [
+    { word: "door", loose: ["gate"] },
+    { word: "write", loose: ["door", "with", "refusal"] },
+  ]);
+});
+
+// The rule and the check read one table of endings. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+test("the table of endings stands a stem, a prefix, and nothing past them", () => {
+  const known = knownIn(new Set(["read", "refuse", "city", "leaf", "wide"]));
+  for (const w of ["reads", "refused", "refusing", "cities", "leaves", "widely", "unread", "rereads"]) {
+    assert.ok(known(w), w);
+  }
+  for (const w of ["ready", "gate", "unready"]) assert.ok(!known(w), w);
+  const rule = rulesFrom(readYaml(SCHEMA), "", lists()).get("Vocabulary.yml") ?? "";
+  for (const { end } of ENDINGS) assert.match(rule, new RegExp(`has_suffix\\(w, "${end}"\\)`));
 });
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]

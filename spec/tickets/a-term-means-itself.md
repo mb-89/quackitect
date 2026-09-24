@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -105,6 +105,17 @@ record:
     hand: box a0ae5042621d · claude-code-remote · helper-2
     hash_before: 7dd7cfac752450dc43eb7e2d442de4a1100a564e
     hash_after: 7dd7cfac752450dc43eb7e2d442de4a1100a564e
+  - step: implement/tests-red
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: eccc9caf15f066dfd5985950bd2ca50c6a58870c
+    hash_after: eccc9caf15f066dfd5985950bd2ca50c6a58870c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -216,17 +227,32 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/vocabulary.test.js test/contract/shape.test.js test/level0/vocabulary.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+| test | stands |
+|---|---|
+| the list test | red, because no term carries `means` yet |
+| the shape test | red, because the rule passes a term with no `means`, a comma in it, and a source that is no web address |
+| the reader and the table | green, because they land with their tests |
+
+The one surprise is the reader of a one-line entry. A quoted value holding a
+comma splits in two, so a `means` line holds no comma.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the reader, the rule, the list and their tests, and each stands in the ask
+- the tests read fixture text and the lists on disk through the disk door, and reach no other door
+- the table and the check each carry a comment naming the design output
 
 ## reflect
 
