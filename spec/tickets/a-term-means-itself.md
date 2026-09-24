@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -151,6 +151,17 @@ record:
     hash_after: 16fe663873a04f0648376a2e19d3d9a53691670f
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 9bd0ec45ef5a6f021c923e4ddd0ea152cfe2a9c9
+    hash_after: 9bd0ec45ef5a6f021c923e4ddd0ea152cfe2a9c9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 28 test(s) pass in 3 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -378,7 +389,7 @@ source.
 |---|---|
 | `terms.yml` | every entry carries `means`, and the outside ones carry `source` |
 | `vocabulary.js` | one table of endings drives the stem the rule runs and the check `looseMeanings` |
-| `VocabularyEntry.yml` | refuses a term with no `means`, a comma, colon or bracket in it, and a source that is no web address |
+| `VocabularyEntry.yml` | refuses a term with no `means`, a comma, colon or bracket in it, and a source that is no web address or holds a comma |
 | the tests | hold the lines, the table and the three refusals |
 
 A `means` line holds no comma, because the reader of a one-line entry splits
