@@ -6,7 +6,11 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { onRefactorAnswered, walks } from "../../src/bridge/refactor-hand.js";
+import {
+  onRefactorAnswered,
+  tellsHand,
+  walks,
+} from "../../src/bridge/refactor-hand.js";
 import { holdHere, holdsFile } from "../../src/bridge/refactor-hold.js";
 import { onStop } from "../../src/bridge/stop.js";
 import { onWrite } from "../../src/bridge/write.js";
@@ -42,11 +46,10 @@ const REFACTOR = {
   mostWarnings: 2,
   mostAtOnce: 1,
   untouchedFor: "7d",
-  grace: 1,
   holdFor: "30m",
 };
 
-// The stamp and the list the refactoring rule reads, over one file at rest. [[spec/design_output/stop#the-grace]]
+// The stamp and the list the refactoring rule reads, over one file at rest. [[spec/design_output/stop#the-hand-walks-the-list]]
 function stamped(warnings, names = ["old.md"]) {
   const list = Array.from({ length: warnings }, (_, line) => ({
     file: names[line % names.length],
@@ -227,7 +230,7 @@ test("the walk refuses a call from outside its hand, and a hand that falls says 
     "a refusal leaves the hold",
   );
 
-  onRefactorAnswered({ file: "a.md", deny: "the spawn falls" }, it);
+  onRefactorAnswered({ file: "a.md", isError: true, text: "the hand falls" }, it);
   assert.equal(it.disk.exists(HOLD), false);
   assert.ok(
     rows.some((row) => row[0] === "warn" && row[2] === "the refactoring hand falls"),
@@ -243,4 +246,33 @@ test("the walk ends where the hand spends refactor.mostFiles", () => {
   const { it } = walking({ ...REFACTOR, mostFiles: 1 });
   onStop(turn, it);
   assert.match(answered(walks(helper("h1"), it)), /No file waits/);
+});
+
+// [[spec/design_output/stop#the-agent-spawns-where-the-engine-cannot]]
+test("a refused spawn keeps the walk and its hold, and the agent's next call carries the spawn once", () => {
+  const { it, rows } = walking();
+  onStop(turn, it);
+  onRefactorAnswered({ file: "a.md", deny: "no spawn at the turn's end" }, it);
+  assert.equal(JSON.parse(it.disk.read(HOLD)).file, "a.md", "the hold stands");
+  assert.ok(
+    rows.some((row) => row[0] === "warn" && /the agent spawns it/.test(row[2])),
+  );
+
+  assert.equal(
+    tellsHand({ tool: "Read", agentId: "h1" }, it),
+    null,
+    "a helper's call carries nothing",
+  );
+  const said = tellsHand({ tool: "Read" }, it);
+  const note = said.after.context.join("\n");
+  assert.match(note, /# Spawn the refactoring hand/);
+  assert.match(note, /run_in_background/);
+  assert.match(note, /Take a\.md/);
+  assert.equal(tellsHand({ tool: "Read" }, it), null, "the note rides one call");
+
+  assert.match(
+    answered(walks(helper("h1"), it)),
+    /Take b\.md/,
+    "the agent's hand walks on",
+  );
 });

@@ -74,7 +74,6 @@ const REFACTOR = {
   mostWarnings: 2,
   mostAtOnce: 1,
   untouchedFor: "7d",
-  grace: 1,
 };
 
 const NOW = 1_800_000_000;
@@ -113,7 +112,7 @@ function box(files = {}, refactor = REFACTOR) {
   };
 }
 
-// The stamp the check leaves, and the list beside it, which the refactoring rule reads. [[spec/design_output/stop#the-grace]]
+// The stamp the check leaves, and the list beside it, which the refactoring rule reads. [[spec/design_output/stop#the-hand-walks-the-list]]
 function stamped(warnings, names) {
   const list = Array.from({ length: warnings }, (_, at) => ({
     file: names[at % names.length],
@@ -406,28 +405,16 @@ test("the door answers the vote and the hand together, and the hand takes the fi
   assert.equal(said.back.event, "refactor.answered");
 });
 
-// The list past the number with a file at rest asks for the turn over the grace, and the turn's end answers it. [[spec/design_output/stop#the-grace]]
-test("a call under a long list opens the grace, and the turn's end clears it", () => {
-  const it = box(stamped(9, ["old.md"]));
-  sawCall({ tool: "Read" }, it.box);
-  assert.equal(it.box.grace?.id, "refactor", "the call opens the ask");
-  assert.match(it.box.grace.why, /9 warnings stand/);
-  const said = onStop({ last_assistant_message: "Some text and no stop." }, it.box);
-  assert.equal(it.box.grace, null, "the turn's end is the reaction");
-  assert.equal(said.spawn.file, "old.md");
-  const fresh = box(stamped(9, ["new.md"]));
-  sawCall({ tool: "Read" }, fresh.box);
-  assert.equal(fresh.box.grace, undefined, "a list over files still warm asks nothing");
-});
-
-// One ask stands at a time, so a call under a standing grace asks git nothing. [[spec/design_output/stop#the-grace]]
-test("a call under a standing grace reads no list and asks git nothing, and one log answers the whole list", () => {
+// The engine starts the hand itself and asks the agent nothing, so a call under a long list opens no grace and reads no list. [[spec/design_output/stop#the-hand-walks-the-list]]
+test("a call under a long list asks the agent nothing, and the turn's end starts the hand", () => {
   const it = box(stamped(9, ["old.md", "new.md"]));
-  sawCall({ tool: "Read" }, it.box);
   const logs = () => it.box.proc.ran.filter((one) => one.argv[1] === "log");
-  assert.equal(logs().length, 1, "one log over the whole list");
   sawCall({ tool: "Read" }, it.box);
-  assert.equal(logs().length, 1, "the standing grace reads nothing more");
+  assert.equal(it.box.grace, undefined, "the call opens no ask");
+  assert.equal(logs().length, 0, "the call asks git nothing");
+  const said = onStop({ last_assistant_message: "Some text and no stop." }, it.box);
+  assert.equal(said.spawn.file, "old.md");
+  assert.equal(logs().length, 1, "one log answers the whole list");
 });
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]

@@ -38,12 +38,9 @@ import { ticketAt, WORK_BRANCH } from "../engine/group.js";
 import { holdsTurn } from "./answer.js";
 import { bindingLine } from "./binding.js";
 import { asks, writes } from "./config.js";
-import { reacted } from "./grace.js";
 import { plansHere } from "./plan.js";
 import {
-  asksForHand,
   handWanted,
-  KIND,
   REFACTOR_ANSWERED,
   refactorHand,
   WALK_CALL,
@@ -135,7 +132,6 @@ export function sawCall(e, box) {
   if (e?.agentId) return;
   toothOf_(box).sawCall();
   todosOf(box).sawCall(e);
-  asksForHand(box);
 }
 
 // A prompt from outside this plugin opens a turn, and the tooth counts them. A hold is one turn long, so the mark of the turn before drops here. [[spec/design_output/stop#the-tooth-holds-its-state]]
@@ -232,8 +228,6 @@ export function onStop(e, box) {
     debugger;
     box.log.say("debug", "stop", "the debugger read the stop", paused);
   }
-  // The turn's end is the reaction the grace waits for, so the calls pass again. [[spec/design_output/stop#the-grace]]
-  reacted(box, KIND);
   // The vote and the hand ride one answer, so the turn's block stands and the cleaning starts beside it. [[spec/tickets/the-spawn-reaches-its-guidance]]
   const hand = refactorHand(box);
   const answer = said.ends ? { ...PASS } : { result: { block: prompts } };

@@ -28,7 +28,6 @@ const CONFIG = {
     mostWarnings: 2,
     mostAtOnce: 1,
     untouchedFor: "7d",
-    grace: 1,
   },
 };
 const WARNINGS = Array.from({ length: 3 }, () => ({

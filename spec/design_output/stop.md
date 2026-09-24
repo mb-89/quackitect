@@ -175,19 +175,18 @@ a time, and the calls ending a turn pass whatever stands.
 
 | the ask | what opens it | what answers it |
 |---|---|---|
-| the refactoring hand | the list past `refactor.mostWarnings`, and a file at rest past `refactor.untouchedFor` | the turn's end, where the stop door spawns the hand that walks the list |
 | the plan's three questions | every `plan.everyCalls` calls | a `plan` field on a level zero call, or the `plan` call |
 | the owner's ask for an update | the sidebar's ask, with `grace.update` calls before the reply is due | the reply, in the chat and through `report` |
 | the finish hold | the sidebar's hold at finish, with `grace.finish` calls before the calls refuse | the turn's end |
 
-The list stands in `.se/.runtime/refactor.json`, one entry a warning, which
-the lint writes at each check. `refactor.grace` names the calls that pass.
-
 ## The hand walks the list
 
 One refactoring hand drains the list file after file. The stop door spawns it
-on the oldest file at rest, and `refactor.mostAtOnce` bounds the spawns a
-session makes. The hand calls `refactor_next` as it finishes each file.
+at a turn's end on the oldest file at rest, while the list stands past
+`refactor.mostWarnings`, and asks the agent nothing: no grace, no refused
+call, no stop. `refactor.mostAtOnce` bounds the spawns a session makes. The
+list stands in `.se/.runtime/refactor.json`, one entry a warning, which the
+lint writes at each check. The hand calls `refactor_next` as it finishes each file.
 
 | `refactor_next` finds | what it answers |
 |---|---|
@@ -202,6 +201,13 @@ their last commit still reads old.
 The log takes one line as the hand spawns, and one as it takes each file.
 A hand that falls writes its reason at `warn`. `walksList` and `drains` in
 `lib/warnings.js` hold the prompts.
+
+## The agent spawns where the engine cannot
+
+A spawn the harness refuses keeps the walk and its hold. The agent's next
+call carries one block, once: spawn the hand in the background, on the
+`helper.change` model, with the walk's prompt. The agent's hand then calls
+`refactor_next` as the engine's hand does.
 
 ## The hand holds its file
 

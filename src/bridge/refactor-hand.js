@@ -15,7 +15,6 @@ import {
 } from "../../.claude/skills/level0/lib/warnings.js";
 import { spanOf } from "../engine/group.js";
 import { asks } from "./config.js";
-import { wants } from "./grace.js";
 import { holdsFile, releasesHold } from "./refactor-hold.js";
 
 // The refactoring hand this door starts. [[spec/tickets/the-spawn-reaches-its-guidance]]
@@ -24,9 +23,10 @@ const REFACTOR = {
   most: "refactor.mostWarnings",
   atOnce: "refactor.mostAtOnce",
   untouched: "refactor.untouchedFor",
-  grace: "refactor.grace",
   files: "refactor.mostFiles",
 };
+// The tier the hand's work takes, which the agent names on a spawn of its own. [[spec/design_output/level0#a-spawn-names-its-tier]]
+const TIER = "helper.change";
 export const KIND = "refactor";
 export const REFACTOR_ANSWERED = "refactor.answered";
 const HELPER = "general-purpose";
@@ -44,19 +44,6 @@ export function walkSpec() {
     ].join(" "),
     inputSchema: { type: "object", properties: {} },
   };
-}
-
-// The list past the number with a file at rest asks the agent for the turn, over the grace. [[spec/design_output/stop#the-grace]]
-export function asksForHand(box) {
-  // One ask stands at a time, so a standing grace leaves the list and git unread. [[spec/design_output/stop#the-grace]]
-  if (box.grace) return;
-  if (!handWanted(box) || !restingFile(box)) return;
-  wants(box, {
-    id: KIND,
-    why: `${listHere(box).length} warnings stand, and a file rests past the window, so the refactoring hand wants the turn.`,
-    react: "end this turn with a stop line, so the hand takes a file",
-    calls: asks(box, REFACTOR.grace),
-  });
 }
 
 // Whether a hand still wants to go: the flag on, the list past the number, and this session's count unspent. The vote reads this, because a rule reading the list alone holds every turn open on a tree carrying warnings. [[spec/tickets/the-spawn-reaches-its-guidance]]
@@ -124,17 +111,54 @@ function takes(box, file, hand) {
   );
 }
 
-// The walk ends here. A hand that falls writes why at warn, and a hand that ends clean writes nothing. [[spec/design_output/stop#the-hand-walks-the-list]]
+// The walk ends here. A hand that falls writes why at warn, and a hand that ends clean writes nothing. A refused spawn keeps the walk and its hold for the hand the agent spawns. [[spec/design_output/stop#the-agent-spawns-where-the-engine-cannot]]
 export function onRefactorAnswered(e, box) {
+  const refused = String(e?.deny ?? "");
+  const file = String(e?.file ?? "");
+  if (refused && file && box.walk) {
+    box.handToSpawn = file;
+    box.log.say(
+      "warn",
+      "refactor",
+      "the engine cannot start the refactoring hand, so the agent spawns it",
+      {
+        file,
+        detail: refused.slice(0, SAID),
+      },
+    );
+    return { result: { result: "the agent spawns the refactoring hand" } };
+  }
   releasesHold(box);
   box.walk = null;
-  const said = String(e?.deny ?? "") || (e?.isError ? String(e?.text ?? "") : "");
+  const said = refused || (e?.isError ? String(e?.text ?? "") : "");
   if (said) {
     box.log.say("warn", "refactor", "the refactoring hand falls", {
       detail: said.slice(0, SAID),
     });
   }
   return { result: { result: "the refactoring hand answered" } };
+}
+
+// The agent's next call carries the spawn the engine could not start, once. [[spec/design_output/stop#the-agent-spawns-where-the-engine-cannot]]
+export function tellsHand(e, box, before = null) {
+  const file = String(box.handToSpawn ?? "");
+  if (e?.agentId || !file) return before;
+  box.handToSpawn = "";
+  const context = [...(before?.after?.context ?? []), spawnText(file, asks(box, TIER))];
+  return { ...(before ?? {}), after: { ...(before?.after ?? {}), context } };
+}
+
+// [[spec/design_output/stop#the-agent-spawns-where-the-engine-cannot]]
+export function spawnText(file, model) {
+  return [
+    "# Spawn the refactoring hand",
+    "",
+    "The engine cannot start the refactoring hand here, so spawn it beside your work:",
+    `one \`Agent\` call, \`subagent_type\` ${HELPER}, \`model\` ${model || "sonnet"}, \`run_in_background\` true,`,
+    "and the prompt below. Carry on with your own work while it runs.",
+    "",
+    walksList(file),
+  ].join("\n");
 }
 
 // The git door answers each file's last write, in the seconds the window reads. One log over the whole list answers every file, newest first, so the first stamp above a name is its last write. [[spec/tickets/the-spawn-reaches-its-guidance]]

@@ -64,7 +64,7 @@ import {
 } from "./plan.js";
 import { freshens } from "./projection.js";
 import { SPECS as proseSpecs, TOOLS as proseTools } from "./prose.js";
-import { onRefactorAnswered, REFACTOR_ANSWERED } from "./refactor-hand.js";
+import { onRefactorAnswered, REFACTOR_ANSWERED, tellsHand } from "./refactor-hand.js";
 import { releasesHold } from "./refactor-hold.js";
 import { movedCode, provesCode, SELF_TEST } from "./reload.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
@@ -275,7 +275,7 @@ async function onToolCall(e, box) {
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (!passes(said)) return said;
-  return held ?? ridesCall(e, box, owesCanary(e, box)) ?? PASS;
+  return held ?? ridesCall(e, box, tellsHand(e, box, owesCanary(e, box))) ?? PASS;
 }
 
 function passes(said) {
