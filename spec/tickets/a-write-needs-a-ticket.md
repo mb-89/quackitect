@@ -94,7 +94,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 9263e768b3783f2ae879601391c50cf7382f424f
+    hash_after: 9263e768b3783f2ae879601391c50cf7382f424f
 ---
 
 # Ask
@@ -123,17 +128,36 @@ Without it a session edits and mints while the work tab shows nothing in its han
 
 <!-- the form is text -->
 
+A `ticketDoor` joins the checks in `onWrite` in `src/bridge/write.js`, after `holdDoor`. It refuses a write where no ticket stands in hand, and names `./RUNME.sh ticket pull`. It reads the hand the way the `ticket-in-hand` stop check does, through one reader both import.
+
+| the write | what the door does |
+|---|---|
+| a session holding no ticket | refuses, and names the pull |
+| a session holding a ticket, public or private | passes |
+| a helper's write, carrying an `agentId` | passes, because the refactoring hand and a helper work beside the session |
+| a new ticket under `spec/tickets` or a note under `.se/tickets` | passes, because the mint and the note open the ask |
+| `.se/HANDOVER.md` | passes |
+| `engine.binding` at `god` | passes, because the owner orders a fix with no ticket there |
+
+The last row is an assumption, and the owner decides it. The god-mode fixes of this session land with no ticket held.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/bridge/write.js`, `onWrite`, which runs the doors
+- `src/bridge/stop.js`, `holdStands` and `privateStands`, the hand reader the door shares
+- `src/bridge/server.js`, `onToolCall`, which reaches `onWrite` for Write, Edit, the patch and the mint
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first draft
 
 ## review
 
