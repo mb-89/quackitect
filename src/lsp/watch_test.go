@@ -168,7 +168,7 @@ func leaningServer(t *testing.T, pointer string) (*fakeIndex, *server, *guardedB
 	return door, one, out, uriOf(filepath.Join("/tree", "spec/two.md"))
 }
 
-// The note a pointer names gains the heading, and the file carrying the pointer clears, though it never moved. [[spec/design_output/lsp#the-panel-follows-the-index]]
+// The note a pointer names gains the heading, and the file carrying the pointer clears where it stands. [[spec/design_output/lsp#the-panel-follows-the-index]]
 func TestAHeadingThatLandsClearsTheFilePointingAtIt(t *testing.T) {
 	door, one, out, uri := leaningServer(t, "[[spec/one#a-second-heading]]")
 	if said := urisDrawn(spoken(t, out.String()))[uri]; said == 0 {
