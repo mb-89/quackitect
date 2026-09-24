@@ -43,7 +43,8 @@ func pairsOf(all []Record, at int) []Record {
 			}
 		}
 		return out
-	case "answer", "note":
+	// A note stands independent of the prompt that asked for it, so it borrows no pair. [[spec/design_output/tui#the-details]]
+	case "answer":
 		for back := at - 1; back >= 0; back-- {
 			if all[back].Kind == "prompt" {
 				return []Record{all[back]}
