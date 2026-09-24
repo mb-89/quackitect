@@ -75,6 +75,10 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
 step: sync
+record:
+  - step: sync
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: a6be6079e5e01c0a5bf76bea89945e47fc0e4600
 ---
 
 # Ask
