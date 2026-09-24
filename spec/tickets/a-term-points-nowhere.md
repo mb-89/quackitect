@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: terms-mean-themselves
 depends_on: ["a-term-means-itself"]
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box a0ae5042621d · claude-code-remote
@@ -152,6 +152,17 @@ record:
     hash_after: 51021a32bf4c07066a84b28739ba6cde9f19039e
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box a0ae5042621d · claude-code-remote
+    hash_before: 343e6cc90b189946856aea0a899b24a854a6b7c2
+    hash_after: 343e6cc90b189946856aea0a899b24a854a6b7c2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 30 test(s) pass in 4 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
