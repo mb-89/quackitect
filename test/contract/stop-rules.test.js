@@ -18,11 +18,7 @@ const by = (id) => rules.find((one) => one.id === id);
 
 // [[spec/design_output/stop#a-check-beats-a-claim]]
 test("every stop the agent claims over its own work yields to a check", () => {
-  for (const id of [
-    "a-wrong-answer-leaves-the-box",
-    "the-work-stands-complete",
-    "an-update-is-worth-giving",
-  ]) {
+  for (const id of ["a-wrong-answer-leaves-the-box", "the-work-stands-complete"]) {
     assert.equal(by(id)?.yields, true, `${id} yields to a check`);
   }
 });
@@ -49,6 +45,11 @@ test("the helper stop stands over the plan, and yields to no check", () => {
   assert.ok(said.priority > by("work-still-stands").priority, "the plan holds no wait");
 });
 
+// The owner asks for an update through the report, so no stop rule claims one. [[spec/design_output/stop#a-check-beats-a-claim]]
+test("no stop rule claims an update", () => {
+  assert.equal(by("an-update-is-worth-giving"), undefined);
+});
+
 // [[spec/design_output/stop#the-blast-radius-decides]]
 test("the stop rule asks the blast radius, and the person test goes", () => {
   assert.equal(by("a-person-holds-the-answer"), undefined, "the person test goes");
@@ -63,14 +64,21 @@ test("the door answers every check the shipped rules name, and the gate names fo
   const shipped = files
     .list(where)
     .filter((one) => one.name.endsWith(".yml"))
-    .flatMap((one) => pool([{ name: one.name, text: files.read(join(where, one.name)) }]).rules)
+    .flatMap(
+      (one) =>
+        pool([{ name: one.name, text: files.read(join(where, one.name)) }]).rules,
+    )
     .map((one) => one.runs)
     .filter((one) => one && one !== "never");
   assert.ok(shipped.length, "the rules name a check");
   for (const name of new Set(shipped)) {
     assert.ok(knowsCheck(name), `the stop door answers ${name}`);
   }
-  assert.equal(knowsCheck("a-check-nobody-wrote"), false, "a name the door answers nowhere");
+  assert.equal(
+    knowsCheck("a-check-nobody-wrote"),
+    false,
+    "a name the door answers nowhere",
+  );
   for (const name of ENGINE_CHECKS) {
     assert.ok(shipped.includes(name), `${name} stands in the shipped rules`);
     assert.equal(standsDown(name, "god"), true, name);

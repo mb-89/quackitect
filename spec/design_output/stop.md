@@ -431,7 +431,6 @@ agent, and a check reads the tree. So the tree wins:
 |---|---|
 | `a-wrong-answer-leaves-the-box` | what the agent takes a wrong answer to cost |
 | `the-work-stands-complete` | what the agent takes for a finish |
-| `an-update-is-worth-giving` | what the agent takes the owner to want |
 
 A stop the owner drives carries no flag. `the-owner-asks-to-talk` reads the
 owner's own words, so it stands over every check but one.
@@ -559,7 +558,6 @@ room that knows. For the table, see [[spec/design_output/level0#the-needs-table]
       the-owner-asks-to-talk: Does the last thing the owner said open a discussion?
       a-wrong-answer-leaves-the-box: Would a wrong answer here reach past this branch?
       the-work-stands-complete: Does the work stand complete?
-      an-update-is-worth-giving: Is there an update the owner wants before you go on?
     Before the call, close the answer with the heading What the agent needs and a table headed No., question and proposed answer, one numbered row a need.
 
 # Three in a row
