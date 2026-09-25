@@ -14,7 +14,7 @@ rationale: [[spec/rationales/reviewing]]
 6. Feed a rule something bad and assert it refuses. A test asserting nothing passes, and proves nothing. *
 7. Count a file outside the ask as a fault only where it redesigns what the ask leaves alone. A review refusing every stray file sends a trivial fix back for a round. *
 8. Write each answer as one short line, and keep the whole report short enough to read at a glance.
-9. Hand the report back as a list of fixes, and merge once every fix lands. A report of opinions leaves the drafter guessing what to change. *
+9. Hand back a list of fixes, and return the branch for a fundamental fault alone. A small fix lands with the merge or on a ticket, so it spends no round. *
 10. Run `./RUNME.sh branch review <name>` to gather all of this from git.
 
 # Examples

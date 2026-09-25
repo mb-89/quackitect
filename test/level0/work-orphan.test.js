@@ -45,7 +45,8 @@ test("take passes over a branch sharing no ancestor with trunk, and names it", (
     { [on("fine")]: GROUP_NOTE.replace("urgent: true\n", ""), ...HAND },
   );
 
-  const { code, said } = heard(() => work(ROOT, ["take"], it));
+  // A take runs on a cloud box alone. [[spec/design_output/work#a-desk-works-on-trunk]]
+  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, cloud: true }));
 
   assert.equal(code, 0);
   assert.ok(

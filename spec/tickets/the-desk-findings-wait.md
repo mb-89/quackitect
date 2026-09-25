@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -34,7 +34,24 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
-step: answer
+step: do
+record:
+  - step: answer
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: e9602ad48e8f9121e3fa73a71fe71b7c6a39f8b0
+    hash_after: e9602ad48e8f9121e3fa73a71fe71b7c6a39f8b0
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 790450b6d111e0386c30a6439ced4cf094e0afed
+    hash_after: 694305d3f4bf4721421316c64523bfc02460c56f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 48 test(s) pass in 7 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -60,6 +77,9 @@ How does the design of [[spec/tickets/a-desk-skips-cloud-branches]] answer the f
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
+The ask of [[spec/tickets/a-desk-skips-cloud-branches]] stands as written. Every finding under `Discussion` is a fix the builder makes in place, so none fails the design. [[spec/guidance/review/design]]
+
+The `do` step builds that ask, and fixes each finding on the way.
 
 <!-- the form is text -->
 
@@ -73,11 +93,15 @@ How does the design of [[spec/tickets/a-desk-skips-cloud-branches]] answer the f
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/cloud-desk.test.js test/level0/pull-hand-desk.test.js test/level0/bash-desk.test.js test/level0/work-desk.test.js test/level0/commit-verb.test.js test/level0/work-group.test.js test/level0/pull-unbound.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -85,11 +109,17 @@ How does the design of [[spec/tickets/a-desk-skips-cloud-branches]] answer the f
 
 <!-- the form is text -->
 
+A desk works on `main` alone. Its pull, commit, push and take on a `work/` branch refuse, and each names `git switch main` and `branch merge`. A cloud box owns its branch, so a desk takes one in by a merge and runs none of its leaves. The Bash door and the verbs read the cloud through `cloudHere` in `.claude/skills/level0/lib/cloud.js`. [[spec/design_output/work#a-desk-works-on-trunk]]
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the answer: the ask of `a-desk-skips-cloud-branches` stands as written, and each review finding stands fixed in place
+- the cleanup the change reveals stands as notes of its own: `the-unblock-reaches-nobody`, `the-take-names-a-person`, `the-stop-counts-urgent-groups` and `the-cloud-reads-three-ways`
+- the cloud read stands in `cloudHere` alone, and the refusal text in `deskRefusal` alone, and `work#a-desk-works-on-trunk` holds the design
 
 # Discussion
 

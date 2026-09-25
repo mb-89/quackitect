@@ -2,6 +2,7 @@
 // group ticket at spec/tickets/<name>.md.
 // [[spec/design_output/work#the-round-trip]]
 
+import { cloudHere, deskRefusal } from "../../.claude/skills/level0/lib/cloud.js";
 import {
   STAMP,
   saysGreen,
@@ -191,8 +192,13 @@ function tell(it, what, code) {
 }
 
 // [[spec/design_output/work#why-a-routine-needs-this]]
-// A name picks one branch, which is the owner's road onto a group from a desk. [[spec/design_output/pull#the-engine-takes-the-branch]]
+// A name picks one branch. [[spec/design_output/pull#the-engine-takes-the-branch]]
 function take(it, name = "") {
+  // A desk takes a cloud branch in by a merge alone, so it takes no branch at all. [[spec/design_output/work#a-desk-works-on-trunk]]
+  if (!cloudHere(it)) {
+    console.error(deskRefusal("branch take moves this box onto no branch").join("\n"));
+    return 2;
+  }
   if (dirty(it)) return 2;
 
   // A take acts on the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]

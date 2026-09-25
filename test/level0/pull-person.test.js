@@ -7,9 +7,19 @@ import { test } from "node:test";
 import { recordIn } from "../../src/engine/group.js";
 import { handFaults, handOf } from "../../src/scripts/pull.js";
 import { pulling } from "../../src/scripts/work.js";
-import { at, CHILD, doors, filled, heard, ROOT, standing } from "./pull-doors.js";
+import {
+  at,
+  CHILD,
+  deskDoors,
+  doors,
+  filled,
+  heard,
+  ROOT,
+  standing,
+} from "./pull-doors.js";
 
-const PERSON = { agent: false, cloud: false, env: {} };
+// A person's hand sits at a desk, which works on trunk alone. [[spec/design_output/work#a-desk-works-on-trunk]]
+const PERSON = { agent: false, env: {} };
 const AUTHOR = { "git config user.name": { stdout: "Ada\n" } };
 
 test("an agent hand-back on a person's step comes back refused, and names the step", () => {
@@ -40,7 +50,7 @@ test("an agent hand-back on a person's step comes back refused, and names the st
 });
 
 test("a hand off a harness carries the git author name, and the record writes the role", () => {
-  const { it, disk } = doors(
+  const { it, disk } = deskDoors(
     standing(filled(CHILD(), "### approach", "The approach.")),
     AUTHOR,
     PERSON,
@@ -62,7 +72,7 @@ test("a hand off a harness carries the git author name, and the record writes th
 
 // [[spec/design_output/pull#a-leaf-comes-back]]
 test("a person takes a leaf back, because the record's role answers their hand", () => {
-  const { it, disk } = doors(
+  const { it, disk } = deskDoors(
     standing(filled(CHILD(), "### approach", "The approach.")),
     AUTHOR,
     PERSON,
@@ -82,7 +92,7 @@ test("a person takes a leaf back, because the record's role answers their hand",
 });
 
 test("personSigns refuses a person's hand-back on an unsigned tip, and names the tip", () => {
-  const { it } = doors(
+  const { it } = deskDoors(
     standing(filled(CHILD(), "### approach", "The approach.")),
     { ...AUTHOR, "git log -1 --format=%G? HEAD": { stdout: "N\n" } },
     { ...PERSON, personSigns: true },
@@ -98,7 +108,7 @@ test("personSigns refuses a person's hand-back on an unsigned tip, and names the
 });
 
 test("personSigns lets a signed tip through, and an agent's hand-back reads no signature", () => {
-  const signed = doors(
+  const signed = deskDoors(
     standing(filled(CHILD(), "### approach", "The approach.")),
     { ...AUTHOR, "git log -1 --format=%G? HEAD": { stdout: "U\n" } },
     { ...PERSON, personSigns: true },

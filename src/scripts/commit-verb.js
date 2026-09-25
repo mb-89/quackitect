@@ -3,7 +3,11 @@
 // from a cloud box alone.
 // [[spec/design_output/work#the-battery-answers-first]]
 
-import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
+import {
+  cloudHere,
+  deskRefusal,
+  onDesk,
+} from "../../.claude/skills/level0/lib/cloud.js";
 import { line } from "../../.claude/skills/level0/lib/refuse.js";
 import { formIn, refusesIn } from "../../.claude/skills/level0/lib/warnings.js";
 import { messageFaults, messageNote } from "../bridge/bash.js";
@@ -45,6 +49,12 @@ export async function commitVerb(it, argv) {
 
 // Nothing stages before the message reads clean, so a refused message leaves the tree standing. [[spec/design_output/work#the-battery-answers-first]]
 function landsAndPushes(it, argv, message, paths) {
+  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out.trim();
+  // A desk lands nothing on a work branch, so the refusal comes before the tests run. [[spec/design_output/work#a-desk-works-on-trunk]]
+  if (onDesk(it, branch)) {
+    console.error(deskRefusal(`this commit lands nowhere on ${branch}`).join("\n"));
+    return 2;
+  }
   // The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
   const tested = it.proc.run(
     [it.node, it.join(it.root, "src", "scripts", "cli.js"), "test"],
@@ -85,9 +95,8 @@ function landsAndPushes(it, argv, message, paths) {
   }
   console.log("The commit lands, and the check answers green on it.");
   // A desk's verb pushes nothing, and a cloud box pushes, because it dies with its tree. [[spec/guidance/working]] [[spec/guidance/cloud]]
-  if (argv.includes("--no-push") || !inCloud(it.env)) return 0;
+  if (argv.includes("--no-push") || !cloudHere(it)) return 0;
 
-  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out.trim();
   if (!it.git.run(["push", "origin", branch]).ok) {
     console.error(`The push of ${branch} came back refused. The commit stands here.`);
     return 1;

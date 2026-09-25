@@ -157,7 +157,8 @@ export function withHashAfter(text, after) {
   const spans = entrySpans(rows, opens, ends);
   if (!spans.length) return rows.join("\n");
 
-  const open = spans.filter((one) => !hasAfter(rows, one)).at(-1);
+  // The row heldIn reads as open: hash_before set, hash_after empty. [[spec/design_output/work#held-derives-from-the-record]]
+  const open = spans.filter((one) => hasBefore(rows, one) && !hasAfter(rows, one)).at(-1);
   if (open) {
     rows.splice(open.ends, 0, `    hash_after: ${after}`);
     return rows.join("\n");
@@ -184,6 +185,13 @@ function entrySpans(rows, opens, ends) {
 function hasAfter(rows, span) {
   for (let at = span.opens; at < span.ends; at++) {
     if (/^\s+hash_after:/.test(rows[at])) return true;
+  }
+  return false;
+}
+
+function hasBefore(rows, span) {
+  for (let at = span.opens; at < span.ends; at++) {
+    if (/^\s+hash_before:/.test(rows[at])) return true;
   }
   return false;
 }

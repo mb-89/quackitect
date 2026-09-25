@@ -59,6 +59,7 @@ steps:
       - every door the change reaches has a fake
       - a comment names the approach the change implements
       - every fact the change adds stands in one place, and a note points at the file instead of repeating it
+      - every row the design review passes with stands fixed in the change
     steps:
       - name: tests-red
         does: writes the tests the ask calls for

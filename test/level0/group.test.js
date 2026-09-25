@@ -170,6 +170,39 @@ test("a hand-back after the take leaves the claim standing, and the release clos
   );
 });
 
+// [[spec/design_output/work#held-derives-from-the-record]]
+test("a release closes the row heldIn reads as open, and leaves a skip row without hash_before untouched", () => {
+  const took = withEntry(NOTE, {
+    step: "sync",
+    hand: "box d6f05e3a585030 · claude-code",
+    hash_before: "f557e5c56139658231d08fe4af300c90ceea4568",
+  });
+  const skipped = withEntry(took, {
+    step: "sync",
+    skipped: true,
+    why: "the box runs off the cloud",
+  });
+  const split = withEntry(skipped, {
+    step: "split",
+    hand: "box d6f05e3a585030 · claude-code",
+    hash_before: "59f5ef62a4da20b6365fb3e30222335890ecfebf",
+    hash_after: "abe7834950dc122148a4ef8cbf7dd799963e6b78",
+  });
+
+  const gave = withHashAfter(split, "99a888");
+  assert.equal(heldIn(gave), null, "the release closes the sync take, not the skip row");
+  assert.equal(
+    recordIn(gave)[0].hash_after,
+    "99a888",
+    "the sync take carries the release's hash",
+  );
+  assert.equal(
+    Object.hasOwn(recordIn(gave)[1], "hash_after"),
+    false,
+    "the skip row stays without hash_after",
+  );
+});
+
 // [[spec/design_output/work#a-box-leaves]]
 test("a second hash_after on one entry replaces the first, and writes no other line", () => {
   const took = withEntry(NOTE, {

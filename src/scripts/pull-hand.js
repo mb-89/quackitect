@@ -2,7 +2,7 @@
 // The offer, the hold, and the rules a hand meets on its way to one.
 // [[spec/design_output/pull#the-hand-out]]
 
-import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
+import { cloudHere, deskRefusal } from "../../.claude/skills/level0/lib/cloud.js";
 import { entryNamed } from "../../.claude/skills/level0/lib/schema.js";
 import { reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
@@ -23,7 +23,6 @@ import {
   TICKETS,
   ticketNamed,
   todoOf,
-  urgent,
   withEntry,
   withField,
 } from "../engine/group.js";
@@ -39,6 +38,7 @@ import {
   holdsVerb,
   leafOf,
   MOST_MOVES,
+  REFUSED,
   say,
   stepPathOf,
   WAIT,
@@ -229,22 +229,25 @@ export function cutForGroups(it, all) {
   }
 }
 
-// A desk takes a group on two roads alone: the owner names it, or it carries the mark. [[spec/design_output/pull#the-engine-takes-the-branch]]
+// A group a pull names on trunk: a cloud box takes it, and a desk refuses it. [[spec/design_output/pull#the-engine-takes-the-branch]]
 export function namedGroup(it, name) {
   const one = ticketsHere(it).find((held) => !held.private && held.name === name);
   return one && isGroup(one.text) ? name : "";
 }
 
-export function urgentGroup(it) {
-  const all = ticketsHere(it);
-  const groups = all.filter(
-    (one) =>
-      !one.private &&
-      isGroup(one.text) &&
-      fieldOf(one.text, "state") === OPEN &&
-      urgent(one.text),
-  );
-  return groups.length ? (sorted(groups, weighing(it, all))[0]?.name ?? "") : "";
+// The pull on trunk: a cloud box takes a branch, and a desk takes none. Null hands the pull on to the queue. [[spec/design_output/pull#the-engine-takes-the-branch]]
+export function branchTaken(it, named) {
+  if (cloudHere(it)) return it.take(named);
+  // A desk takes a cloud branch in by a merge alone. [[spec/design_output/work#a-desk-works-on-trunk]]
+  if (named) return deskRefused(`the pull takes no branch for ${named}`, named);
+  // A done cloud branch stands ahead of the queue on a desk. [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
+  return it.ready?.() ? 0 : null;
+}
+
+// [[spec/design_output/work#a-desk-works-on-trunk]]
+export function deskRefused(what, name) {
+  say(REFUSED, deskRefusal(what, name));
+  return 2;
 }
 
 export function spawnAnswer(other) {
@@ -443,7 +446,7 @@ export function handRule(it, front, all, group, helper = false) {
     helper: Boolean(helper),
     agent: Boolean(it.agent),
     ownerSays: Boolean(it.ownerSays),
-    cloud: Boolean(it.cloud ?? inCloud(it.env ?? {})),
+    cloud: cloudHere(it),
     atRetro: todoOf(front) !== "" || atRetro(all ?? [], group),
   };
 }

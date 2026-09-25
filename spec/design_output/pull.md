@@ -83,14 +83,11 @@ group works on a branch, and the cloud takes that branch. So a desk pull
 meeting an open group standing without a branch cuts `work/<name>` from trunk.
 It pushes the branch, and the group leaves the desk's queue with that.
 
-A desk takes a group on either road alone, and both run through the pull:
+A group a pull names on `main` takes its branch on a cloud box. A desk takes no
+group, and takes a done cloud branch in through `branch merge`. For details,
+see [[spec/design_output/work#a-desk-works-on-trunk]].
 
-| road | the desk types | the engine does |
-|---|---|---|
-| the owner names it | `ticket pull <group>` | `take(group)`, which switches onto that branch alone |
-| its urgency reads `now` | `ticket pull` | takes the first such group, by name order |
-
-`branch take` stays a verb the engine and a person run, and a name after it
+`branch take` stays a verb the engine runs on a cloud box, and a name after it
 picks one branch. No hand runs it by itself. A free ticket carrying the `todo`
 tag comes before every other free ticket, so `ticket todo` orders a desk's
 queue the way it orders the notes.

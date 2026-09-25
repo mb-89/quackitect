@@ -10,7 +10,11 @@ import {
   verbLine,
   withoutTrailers,
 } from "../../.claude/skills/level0/lib/bash.js";
-import { bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
+import {
+  cloudHere,
+  deskRefusal,
+  onDesk,
+} from "../../.claude/skills/level0/lib/cloud.js";
 import { linesIn } from "../../.claude/skills/level0/lib/marks.js";
 import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import { NOTES, privateNow } from "../../.claude/skills/level0/lib/private.js";
@@ -42,7 +46,6 @@ import { marksSeen } from "./write.js";
 
 const COMMIT = "level0-commit.md";
 const PASS = { pass: true };
-const CLOUD = "---\nenv:\n  - CLAUDE_CODE_REMOTE\n  - SE_CLOUD\n---\n";
 
 export async function onBash(e, box) {
   const command = String(e?.command ?? "");
@@ -51,6 +54,7 @@ export async function onBash(e, box) {
     privateDelta,
     testedDelta,
     todoOnPush,
+    deskGuard,
     trunkGuard,
     versionGuard,
   ];
@@ -114,14 +118,14 @@ function reader(box) {
 // [[spec/design_output/bash#a-shell-writes-nothing]]
 async function commandRules(command, _e, box, held) {
   const found = findings(command, asks(box, "names.words"), {
-    cloud: onACloud(box),
+    cloud: cloudHere(box),
     script: (path) => fileText(reader(box), path),
     subjects: (undo) => subjectsOf(box, undo),
   });
   const voiced = await commitVoice(command, box);
   found.push(...refusesIn(voiced));
   held.warned = formIn(voiced);
-  if (!onACloud(box) && skipsTheHook(command)) {
+  if (!cloudHere(box) && skipsTheHook(command)) {
     box.log.say("warn", "private", "a commit steps past the hook", {
       tool: "Bash",
       detail: command,
@@ -270,6 +274,20 @@ function versionGuard(command, _e, box) {
   return refusedVersion(found);
 }
 
+// A desk lands nothing on a work branch, and the verbs read the same answer. [[spec/design_output/work#a-desk-works-on-trunk]]
+function deskGuard(command, _e, box) {
+  const touched = touchesGit(command);
+  if (!touched.commits && !touched.pushes) return "";
+  const branch = git(box, ["rev-parse", "--abbrev-ref", "HEAD"]);
+  if (!onDesk(box, branch)) return "";
+  const how = touched.commits ? "commit" : "push";
+  box.log.say("warn", "bash", `refused a ${how} on ${branch} at a desk`, {
+    tool: "Bash",
+    detail: command,
+  });
+  return deskRefusal(`this ${how} lands nowhere on ${branch}`).join("\n");
+}
+
 // [[spec/design_output/work#a-box-writes-its-branch]]
 function trunkGuard(command, _e, box) {
   // A command making no commit and no push lands nowhere, so git answers nothing for it. [[spec/design_output/work#a-box-writes-its-branch]]
@@ -300,7 +318,7 @@ function trunkGuard(command, _e, box) {
     tool: "Bash",
     detail: command,
   });
-  if (!onACloud(box) || !takesABranch(box)) return throughTheVerb(how);
+  if (!cloudHere(box) || !takesABranch(box)) return throughTheVerb(how);
   return [
     `A cloud box holding a work branch hands it back, and ${TRUNK} stays shut here.`,
     "",
@@ -377,12 +395,4 @@ function notesIn(box) {
   } catch {
     return [];
   }
-}
-
-function onACloud(box) {
-  const env = box.env ?? {};
-  return bindsHere(CLOUD, {
-    CLAUDE_CODE_REMOTE: env.CLAUDE_CODE_REMOTE ?? "",
-    SE_CLOUD: env.SE_CLOUD ?? "",
-  });
 }

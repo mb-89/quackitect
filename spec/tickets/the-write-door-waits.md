@@ -34,7 +34,12 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
-step: answer
+step: do
+record:
+  - step: answer
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: f507d8e0e0601d577ccbfb8d108f72fb2bd2ec46
+    hash_after: f507d8e0e0601d577ccbfb8d108f72fb2bd2ec46
 ---
 
 # Ask
@@ -58,6 +63,9 @@ Does the design of [[spec/tickets/a-write-needs-a-ticket]] take both fixes its s
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
+The ask of [[spec/tickets/a-write-needs-a-ticket]] stands as written, and the design takes both fixes the table under `Discussion` names. Each is a fix the builder makes in place, so neither fails the design. [[spec/guidance/review/design]]
+
+The `do` step builds that ask with both fixes.
 
 <!-- the form is text -->
 

@@ -9,7 +9,17 @@ import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { fieldOf, withEntry } from "../../src/engine/group.js";
 import { withPersonStep } from "../../src/scripts/pull.js";
 import { pulling } from "../../src/scripts/work.js";
-import { at, CHILD, doors, filled, HOLD, heard, ROOT, standing } from "./pull-doors.js";
+import {
+  at,
+  CHILD,
+  deskDoors,
+  doors,
+  filled,
+  HOLD,
+  heard,
+  ROOT,
+  standing,
+} from "./pull-doors.js";
 
 // The ticket failed back from design/review once already. [[spec/design_output/pull#the-fail]]
 const failedOnce = () =>
@@ -34,7 +44,8 @@ function failedTwice(more, text = null) {
       });
     return { exitCode: 0 };
   };
-  const made = doors(
+  // A desk works on trunk alone. [[spec/design_output/work#a-desk-works-on-trunk]]
+  const made = (more.cloud ? doors : deskDoors)(
     standing(text ?? filled(failedOnce(), "### verdict", "fail\n- still thin")),
     { git },
     { fails: 2, ...more },
@@ -126,7 +137,7 @@ test("a second fail past the split cap asks for a split, drops the hold, answers
 
 // The refusal cap reaches the fail, so it takes the fail's road to the owner. [[spec/design_output/pull#the-hand-back-refused]]
 test("a hand-back meeting the refusal cap at the fail cap puts a person step before the leaf, asking the finding", () => {
-  const { it, disk } = doors(standing(), {}, { refusals: 1, fails: 1, cloud: false });
+  const { it, disk } = deskDoors(standing(), {}, { refusals: 1, fails: 1 });
   heard(() => pulling(ROOT, ["pull"], it));
 
   const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], it));

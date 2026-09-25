@@ -441,6 +441,40 @@ so a message naming `git commit` lands nowhere.
 `branch take` and `branch done` reach git inside the command line, so the door sees
 the verb and leaves the plumbing alone.
 
+A desk standing on a `work/` branch meets a guard of its own:
+[[spec/design_output/work#a-desk-works-on-trunk]].
+
+# A desk works on trunk
+
+A desk works on `main` alone, and takes a cloud branch into `main` through
+`branch merge` alone. A cloud box owns its branch, and the owner reads a desk's
+work on `main`.
+
+`cloudHere` in `.claude/skills/level0/lib/cloud.js` is the one read of the
+cloud, for the Bash door and the verbs alike. The doors' own `cloud` flag
+answers first, and the cloud variables answer where it stands unset. `onDesk`
+beside it answers where a box off the cloud stands on a `work/` branch.
+
+Each road below refuses on a desk, and the refusal names `git switch main` and
+`branch merge`:
+
+| road | on a desk |
+|---|---|
+| `ticket pull` on a `work/` branch | refuses before it reads a ticket |
+| `ticket pull <group>` on `main` | refuses, and names `branch merge <group>` |
+| `branch take` | refuses on every branch |
+| `./RUNME.sh commit` on a `work/` branch | refuses before the tests run, so nothing stages |
+| a raw `git commit` or `git push` on a `work/` branch | the Bash door refuses it |
+
+The verbs below run on a desk as they stand:
+
+- `branch release` frees a claim and carries no work
+- `branch merge` runs on `main` alone
+
+The guard holds the agent's doors, and a person in a terminal keeps raw git.
+`.githooks/pre-commit` carries no guard, because `release` commits through git
+and meets that hook too.
+
 # The mark, and what waits
 
 The frontmatter carries two more fields, and `branch take` reads both:

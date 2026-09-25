@@ -7,7 +7,12 @@ import { join } from "node:path";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { TICKETS } from "../../src/engine/group.js";
+import {
+  TICKETS,
+  withEntry,
+  withField,
+  withHashAfter,
+} from "../../src/engine/group.js";
 import { REF_FORMAT } from "../../src/scripts/work-read.js";
 
 export const ROOT = "/tree";
@@ -161,6 +166,37 @@ function payloadOf(ask, objects, named) {
 
 // A payload reads a character a byte, the way a raw run answers. [[spec/design_output/doors#a-raw-run-keeps-bytes]]
 const asBytes = (said) => Buffer.from(String(said), "utf8").toString("latin1");
+
+// A merge on trunk of a group standing done on its branch, and the check green on it. [[spec/design_output/work#the-merge-lands-the-truth]]
+export const merging = (extra = {}) => ({
+  "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+  "git rev-parse HEAD": { stdout: `${SHA}\n` },
+  [`git show origin/work/one-group:${GROUP_AT}`]: {
+    stdout: withField(
+      withHashAfter(
+        withEntry(GROUP_NOTE, {
+          step: "sync",
+          hand: "box 3f9a",
+          hash_before: "a1b2c3",
+        }),
+        "d4e5f6",
+      ),
+      "state",
+      "closed",
+    ),
+  },
+  "git merge-base origin/main origin/work/one-group": { stdout: "base111\n" },
+  "git diff --name-only base111..origin/work/one-group -- spec/tickets": {
+    stdout: `${GROUP_AT}\n`,
+  },
+  [`git diff --unified=0 base111..origin/main -- ${GROUP_AT}`]: { stdout: "" },
+  "git merge --no-ff --no-edit origin/work/one-group": { exitCode: 0 },
+  [`node ${join(ROOT, "src/scripts/cli.js")} check`]: {
+    exitCode: 0,
+    stdout: "green\n",
+  },
+  ...extra,
+});
 
 export const groupRemote = (note = GROUP_NOTE, more = {}) => ({
   ...remoteSaying([{ branch: "work/one-group", tip: "aaa", when: more.when ?? 0 }], {

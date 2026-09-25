@@ -64,6 +64,21 @@ export function doors(files, answers = {}, more = {}) {
   return { it, outside: said, disk };
 }
 
+// A desk works on trunk alone, so a desk case stands on main, and its tickets stand in no group. [[spec/design_output/work#a-desk-works-on-trunk]]
+export function deskDoors(files, answers = {}, more = {}) {
+  const loose = Object.fromEntries(
+    Object.entries(files).map(([path, text]) => [
+      path,
+      String(text).replace("group: one-group\n", ""),
+    ]),
+  );
+  const trunk = {
+    "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+    "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
+  };
+  return doors(loose, { ...trunk, ...answers }, { cloud: false, ...more });
+}
+
 export const ranGit = (said) => said.ran.map((one) => one.argv.join(" "));
 
 export const GROUP_NOTE = `---

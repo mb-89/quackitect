@@ -154,8 +154,12 @@ test("a commit the door refuses lands nothing, and the staging comes back", asyn
 });
 
 // A desk's verb pushes nothing. [[spec/guidance/working]]
-test("a desk lands and checks the commit, and pushes nothing", async () => {
-  const { it, git } = doors([], {}, {});
+test("a desk lands and checks the commit on main, and pushes nothing", async () => {
+  const { it, git } = doors(
+    [],
+    { "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
+    {},
+  );
 
   const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
 
@@ -163,6 +167,18 @@ test("a desk lands and checks the commit, and pushes nothing", async () => {
   assert.ok(ranGit(git).includes(`git commit -m ${CLEAN}`));
   assert.ok(!ranGit(git).some((one) => one.startsWith("git push")));
   assert.match(said, /the check answers green/);
+});
+
+// [[spec/design_output/work#a-desk-works-on-trunk]]
+test("a desk's commit on a work branch refuses, names main, and runs no test and stages nothing", async () => {
+  const { it, git } = doors([], {}, {});
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 2);
+  assert.match(said, /A desk works on main alone/);
+  assert.match(said, /git switch main/);
+  assert.deepEqual(ranGit(git), ["git rev-parse --abbrev-ref HEAD"]);
 });
 
 // [[spec/design_output/work#the-battery-answers-first]]

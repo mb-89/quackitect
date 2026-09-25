@@ -31,14 +31,20 @@ test("the working note asks the owner a design question before the build", () =>
   );
 });
 
-// A design review fails an unusable approach alone, a finding rides out as a child, and form fails nothing. [[spec/tickets/one-review-a-ticket]]
-test("the design review note fails an unusable approach alone, sends each other finding to a child, and fails nothing on form", () => {
+// A design review fails a fundamental fault alone, a finding rides out as a child, and form fails nothing. [[spec/tickets/one-review-a-ticket]]
+test("the design review note fails a fundamental fault alone, sends each other finding to a child, and fails nothing on form", () => {
   const path = "spec/guidance/review/design.md";
   assert.ok(files.exists(join(root, ...path.split("/"))), `${path} stands`);
   const rules = rulesIn(path);
 
-  const fails = rules.filter((one) => /\bfail/i.test(one) && /unusable/i.test(one));
-  assert.equal(fails.length, 1, "one rule fails a design, on an unusable approach");
+  const fails = rules.filter(
+    (one) => /\bfail/i.test(one) && /fundamental fault alone/i.test(one),
+  );
+  assert.equal(
+    fails.length,
+    1,
+    "one rule fails a design, on a fundamental fault alone",
+  );
   const findings = rules.filter((one) => /pass with findings/i.test(one));
   assert.equal(
     findings.length,
@@ -58,20 +64,27 @@ test("the design review note fails an unusable approach alone, sends each other 
 });
 
 // [[spec/tickets/a-question-reaches-its-owner]]
-test("the design review note hands a craft finding to the implement step, under a plain pass", () => {
+test("the design review note hands a fault the builder fixes to the build, under a pass", () => {
   const rules = rulesIn("spec/guidance/review/design.md");
-  const said = rules.filter((one) => /craft/i.test(one));
+  const said = rules.filter((one) => /builder fixes in place/i.test(one));
 
-  assert.equal(said.length, 1, "one rule grades a craft finding");
-  assert.match(said[0], /under a plain `pass`/i, "the rule passes over it");
-  assert.match(
-    said[0],
-    /for the implement step/i,
-    "the rule says where a craft one goes",
+  assert.equal(
+    said.length,
+    2,
+    "the fail rule and the pass rule each name the builder's fix",
+  );
+  assert.ok(
+    said.some((one) => /^Pass with a row/i.test(one)),
+    "a fault the builder fixes rides as a row under a pass",
+  );
+  const branch = rulesIn("spec/guidance/review/reviewing.md");
+  assert.equal(
+    branch.filter((one) => /fundamental fault alone/i.test(one)).length,
+    1,
+    "the branch review returns a branch on a fundamental fault alone",
   );
   assert.equal(
-    rulesIn("spec/guidance/review/reviewing.md").filter((one) => /craft/i.test(one))
-      .length,
+    branch.filter((one) => /builder fixes in place/i.test(one)).length,
     0,
     "the branch review note holds no design rule",
   );

@@ -76,3 +76,7 @@ gate off, and the switch stays off.
 
 So the reader hands back a list of fixes, and the merge stays a person's call.
 It spends a person's attention where it pays.
+
+A branch sent back for a small fix spent a whole round on a line the desk
+fixed at the merge. So the owner kept a return for a fundamental fault: a
+branch that broke, missed its ask, or clashed with another part of the tree.
