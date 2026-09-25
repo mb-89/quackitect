@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor, a-save-fills-the-ticket]
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -108,6 +108,10 @@ record:
     hash_after: 93d057508dc51c5efc59ee42bd68ccdd795b86e8
     returns: 1
     why: "| grade | finding | fix |; |---|---|---|; | blocking | Four done lines each call for a test, and the approach names none. | Name one test a done line in `test/level0/sidebar.test.js`, with the fake each feeds. |; | detail | `runsVerb` takes an argv, and `counts` holds a shell line opening with `./RUNME.sh`. | Drop the `./RUNME.sh` head and split the rest into the argv. |; | detail | `runsVerb` wraps each run in a progress toast, and `html` runs on every redraw. | Run the count on a road that shows no toast. |; | detail | `work.pull` carries `runs`, and the approach keys the pull on `pulls`, which no row adds. | Add `pulls` in the config row, or key the pull on `work.pull`. |; | detail | `door.asks` in the sidebar opens a folder picker, and a ticket name wants a line. | Ask the name through `asksLine`, and name it in the callers list. |; | detail | `ticket yours --next` answers `{\"ticket\":null}` on an empty queue. | Name what pull for me tells the person then. |; `./RUNME.sh check` answers 0 on this commit."
+  - step: design/draft
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: d3385d91d3712a26988317d4f965829fb7b1d5cb
+    hash_after: d3385d91d3712a26988317d4f965829fb7b1d5cb
 ---
 
 # Ask
@@ -142,15 +146,28 @@ The config already declares the buttons, and the sidebar draws a group where an 
 
 | part | file | what it does |
 |---|---|---|
-| the group | `spec/config/level0.schema.json`, `work.editor`, `work.pull`, `work.new` | each names `group: work`, a row and a column, so `groupsIn` draws them |
-| the count | `src/extension/sidebar.js`, `html` | runs the line an entry's `counts` names through `door.runsVerb`, and hands the answer to the panel |
+| the group | `spec/config/level0.schema.json`, `work.editor`, `work.pull`, `work.new` | each names `group: work`, a row and a column, so `groupsIn` draws them. `work.pull` gains `pulls: true` |
+| the line | `src/extension/lib/work.js`, `argvOf(line)` | drops the `./RUNME.sh` head of a config line, and splits the rest into the argv a verb takes |
+| the count | `src/extension/sidebar.js`, `html` | runs the line an entry's `counts` names through `door.asksVerb`, a run with no progress toast, and hands the count to the panel |
 | the badge | `src/extension/lib/panel.js`, `widget` | draws the count beside the mark |
-| the pull | `src/extension/sidebar.js`, `took` | where the entry carries `pulls`, runs its line, pulls the ticket the answer names, and opens its path |
-| the new ticket | `src/extension/sidebar.js`, `took` | where the entry carries `opens`, asks for the name, writes a ticket with `kind` and an empty `process` where no file stands, and opens it |
-| the answers | `src/extension/lib/work.js` | reads the count and the next ticket off the verb's JSON, turns a name into a path, and holds the new ticket's text. It calls no editor, so a test reads every string |
-| the door | `src/extension/editor-files.js`, `opens(path)` | opens a file in the markdown editor |
+| the pull | `src/extension/sidebar.js`, `took` | where the entry carries `pulls`, runs its line, and takes the ticket the answer names through `ticketLensOf(door).took`. It then opens the path |
+| the empty queue | `src/extension/sidebar.js`, `took` | where the answer names no ticket, tells the person that nothing waits on them, and runs no pull |
+| the new ticket | `src/extension/sidebar.js`, `took` | where the entry carries `opens`, asks the name through `door.asksLine`, writes a ticket with `kind` and an empty `process` where no file stands, and opens it |
+| the answers | `src/extension/lib/work.js` | reads the count and the next ticket off the verb's JSON, turns a name into a path, and holds the new ticket's text. It calls no editor |
+| the doors | `src/extension/editor-files.js`, `opens(path)`, and `src/extension/editor-lens.js`, `asksVerb(argv)` | open a file in the markdown editor, and run a verb with no toast |
 
-The pull runs as a person, through the same `runsVerb` the ticket buttons run. The fill on save then writes the new ticket's route. For details, see [[spec/tickets/a-save-fills-the-ticket]].
+The pull runs as a person, through the road the ticket buttons run. The fill on save then writes the new ticket's route. For details, see [[spec/tickets/a-save-fills-the-ticket]].
+
+The tests stand in `test/level0/work-group.test.js`, over the sidebar's fake door with a fake for each new door call:
+
+| done line | case |
+|---|---|
+| the group draws the three buttons | the HTML carries `work.editor`, `work.pull` and `work.new` in the section `work` |
+| the count rides the work editor | an `asksVerb` answering `{"count":3}` draws the count 3 on `work.editor`, and the line it ran is `ticket yours --count` |
+| pull for me pulls and opens | a press runs `ticket yours --next`, then `ticket pull` on the answer, and opens its path. An empty queue tells and pulls nothing |
+| new ticket asks and opens | a press asks a name, writes `spec/tickets/<name>.md` with an empty `process`, and opens it. A name standing already opens the file and writes nothing |
+
+`test/level0/work.test.js` holds the strings of `lib/work.js`.
 
 ### callers
 
@@ -160,9 +177,11 @@ The pull runs as a person, through the same `runsVerb` the ticket buttons run. T
 
 - `src/extension/extension.js`, `activate`, which hands the sidebar its door
 - `src/extension/editor.js`, `editorDoor`, which spreads the file door and the lens door the sidebar now calls
+- `src/extension/editor-lens.js`, `asksLine`, which the new ticket asks the name through
+- `src/extension/lib/lens.js`, `ticketLensOf().took`, which pull for me takes the ticket through
 - `src/extension/lib/panel.js`, `panelHtml`, which draws the badge
 - `src/extension/lib/widgets.js`, `groupsIn`, which reads the group the config names
-- `test/level0/sidebar.test.js`, `doorOf`, which gains `runsVerb` and `opens`
+- `test/level0/sidebar.test.js`, `doorOf`, the fake the new test builds on, whose cases stay green on a door with no `asksVerb`
 
 ### answers
 
@@ -170,7 +189,12 @@ The pull runs as a person, through the same `runsVerb` the ticket buttons run. T
 
 <!-- the form is list -->
 
-- first
+- a test a done line: the case table names one for each
+- the shell line: `argvOf` drops the head and splits the rest
+- the toast on every redraw: the count runs through `asksVerb`, which shows none
+- the `pulls` key: the config row adds it
+- the folder picker: the name comes through `asksLine`
+- the empty queue: the person reads that nothing waits on them, and no pull runs
 
 ## review
 
