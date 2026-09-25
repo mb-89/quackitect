@@ -3,30 +3,15 @@
 // [[spec/tickets/the-owner-walks-the-editor]]
 
 import assert from "node:assert/strict";
-import { mkdtempSync, writeFileSync } from "node:fs";
-import { createRequire } from "node:module";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import { test } from "node:test";
-import { pathToFileURL } from "node:url";
+import { editorRequire } from "../../src/doors/fake/vscode.js";
 
-const require = createRequire(import.meta.url);
-const Module = require("node:module");
 const vscode = {
   Uri: { joinPath: (...parts) => parts },
   window: { visibleTextEditors: [] },
   workspace: {},
 };
-const resolve = Module._resolveFilename;
-Module._resolveFilename = function (request, ...rest) {
-  return request === "vscode" ? "vscode" : resolve.call(this, request, ...rest);
-};
-require.cache.vscode = {
-  id: "vscode",
-  filename: "vscode",
-  loaded: true,
-  exports: vscode,
-};
+const require = editorRequire(vscode, import.meta.url);
 const { fileDoor } = require("../../src/extension/editor-files.js");
 const { insetDoor } = require("../../src/extension/editor-inset.js");
 
@@ -43,11 +28,9 @@ function warned(run) {
 
 // Node on Windows refuses a bare drive path, so the door hands import the URL. [[spec/tickets/the-owner-walks-the-editor]]
 test("a drawing imports through the URL, and a Windows path in fsPath breaks nothing", async () => {
-  const file = join(mkdtempSync(join(tmpdir(), "editor-doors-")), "emitter.mjs");
-  writeFileSync(file, "export const said = 'drawn';\n");
   const uriOf = () => ({
     fsPath: "C:\\tree\\src\\emitter.mjs",
-    toString: () => pathToFileURL(file).href,
+    toString: () => "data:text/javascript,export const said = 'drawn';",
   });
   const door = fileDoor({ subscriptions: [] }, {}, uriOf);
   assert.equal((await door.imports("src/emitter.mjs")).said, "drawn");
