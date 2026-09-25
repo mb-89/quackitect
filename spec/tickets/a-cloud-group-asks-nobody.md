@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -128,6 +128,10 @@ record:
     hand: box d6f05e3a585030 · claude-code
     hash_before: 9bbce0d43ddfbc7baecf03549237ae611c12b3bc
     hash_after: 9bbce0d43ddfbc7baecf03549237ae611c12b3bc
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-12
+    hash_before: f86ac9a09a499efb6d2e12b12b6885c87bce0450
+    hash_after: f86ac9a09a499efb6d2e12b12b6885c87bce0450
 ---
 
 # Ask
@@ -283,6 +287,23 @@ pass
 | form, for the Problems panel | `./RUNME.sh check` exits 1 on long sentences and `contradict` in this review history, and one list item in `reviewing.md` | the owner cuts them before a push |
 
 The draft section draws no finding.
+
+pass
+
+| grade | finding | fix |
+|---|---|---|
+| design | `Rules` in `src/lsp/check.go` feeds `treeFaults`, and `Checker.Sweep` runs it for `se-lsp check` | none |
+| design | `the-editor-takes-an-inset` at `decide` and `the-owner-walks-a-ticket` at `answer` stand at `by: person` | none, the approach frees both on `main` |
+| design | the other open children stand at `design/draft`, under `by: anyone` | none |
+| design | `unblock` reads the group off the branch, and `refuses` compares the child's `group` to it | none, the approach names the change on `main` |
+| design | `admits` takes a successor opening at `by: person`, as the approach mints it | none |
+| design | `leafOf` and `stepPathOf` in `src/scripts/pull-route.js` read `by` and an empty `step` as the approach names | none |
+| design | `Tree.Names`, `Tree.Read` and `isHistory` stand in `src/lsp` | none |
+| craft | `readingFor` falls back to the JavaScript `treeFaults` where `se-lsp` stands absent, and that list lacks the rule | the implement step names the fallback in `says` |
+| craft | `contradict` stands in `spec/vocabulary/terms.yml` | none |
+| form, for the Problems panel | `./RUNME.sh check` on `main` exits 0, with three warnings in this review history | the owner cuts them before a push |
+
+The approach answers every finding of the earlier rounds.
 
 # implement
 
