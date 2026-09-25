@@ -76,7 +76,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code · the owner says so
@@ -86,6 +86,14 @@ record:
     hand: person
     hash_before: e162d3de5052bf1d0c8ed8dd215c87d20abef62e
     hash_after: e162d3de5052bf1d0c8ed8dd215c87d20abef62e
+  - step: implement/tests-red
+    hand: person
+    hash_before: 58d6c270b4db3bd2c6e00204c069cb9b75924cc1
+    hash_after: 9502c622eb4fea9f75b08edcdab599a4344848aa
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 9 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -200,20 +208,27 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test test/level0/fields-to-fill.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion: the host answers no mark, and the door draws no underline and registers no hover. The host and the door stand as empty modules, so the file loads and the assertions decide. The start case surprises: the drawing host imports the graph emitter through the same door, so the fake door answers that module too. The route host now exports its schema path, so the marks share it and spell it nowhere else.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the tests touch the test file, the empty host and door, and the schema path the route host exports, and nothing the ask leaves out
+- the host meets a fake door over the fake disk, and the editor door meets a stand-in for vscode that records every decoration, hover and diagnostic collection
+- every case and both empty modules point at the section the approach names in the extension design output
+- the tests import the paths of the route, the chapter and the schema from the modules owning them
+- the design review passes clean, so no row waits
 
 ## change
 

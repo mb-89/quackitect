@@ -85,7 +85,8 @@ function routeHostOf(door) {
     if (kind === "jump") return door.jumps(path, Number(message.line ?? 1));
     if (kind === "edit") return routes(path, ticket, message.steps);
     if (kind === "take") return tickets.took("take", ticket, path);
-    if (kind === "handback") return handsBack(path, ticket, one, String(message.step ?? ""));
+    if (kind === "handback")
+      return handsBack(path, ticket, one, String(message.step ?? ""));
     return undefined;
   };
 
@@ -122,7 +123,8 @@ function routeHostOf(door) {
       const one = shown.get(path);
       if (!one) return undefined;
       const message = await graphOf(path, text);
-      if (linesOf(message.graph) !== one.lines) return opens(path, text, message, one.yaml);
+      if (linesOf(message.graph) !== one.lines)
+        return opens(path, text, message, one.yaml);
       one.text = text;
       one.message = message;
       one.page.post(message);
@@ -164,4 +166,4 @@ function refusalIn(ran) {
   }
 }
 
-module.exports = { FLIP, linesOf, routeHostOf };
+module.exports = { FLIP, SCHEMA, linesOf, routeHostOf };
