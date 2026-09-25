@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-editor-takes-an-inset, the-ticket-answers-the-editor, the-drawing-draws-a-route]
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -108,6 +108,10 @@ record:
     hash_after: 06835a53e105ab1f1554762252ca0b929c63749f
     returns: 1
     why: "The ask calls for three tests, and the approach names none: the draw through a fake editor, the flip, and the redraw on a change. Name the test file and the case for each.; `lensesOf` reads `path`, `text` and `holds` alone, so the flip lens has no input saying which side shows. Name where that state lives and how it reaches `lensesOf`.; `lensesOf` answers nothing on a ticket whose `state` reads other than open, so a closed ticket gets no flip. Name where the flip lens stands apart from that return.; A lens runs `COMMAND`, and `argvOf` answers no verb for a flip. Name the command and the handler a press on the flip runs.; The jump belongs to the ask of [[spec/tickets/the-host-runs-the-verbs]]. Hand it on beside `take`, `handback` and `edit`.; The `graph` message carries `graph`, `steps` and `held`, and the host names `graph` alone. Name where `steps` and `held` come from, or hand them on. For details, see [[spec/design_output/drawing#the-page-speaks-in-messages]].; `src/scripts/bundle.js` writes the bundle into the workspace's runtime folder, outside the extension folder. Name that folder among `localResourceRoots`, and where the extension spells its path, since it bundles alone."
+  - step: design/draft
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 4fd4f9079ccaef655e629edb23fcc31537c84184
+    hash_after: 4fd4f9079ccaef655e629edb23fcc31537c84184
 ---
 
 # Ask
@@ -138,17 +142,32 @@ Without it the drawing of the two cloud groups reaches no editor. So a person re
 
 <!-- the form is text -->
 
-The probe's `decide` waits on the owner. So the host tries the inset, and opens the side panel where the editor refuses the call. The page and the messages stay the same under both. For details, see [[spec/design_output/drawing#the-page-speaks-in-messages]].
+The probe's `decide` waits on the owner. So the host tries the inset, and opens the side panel where the editor refuses the call. The page and its messages hold under both. For details, see [[spec/design_output/drawing#the-page-speaks-in-messages]].
 
 | part | file | what it does |
 |---|---|---|
-| the host | `src/extension/lib/route-host.js`, `routeHostOf(door)` | reads a ticket's text, answers the page's `ready` with `graph` and `theme`, answers `jump` with a reveal of the line, and posts `graph` again on each change. It calls no `vscode`, so a test drives it over a fake door |
-| the flip | `src/extension/lib/lens.js`, `lensesOf` | a lens on the first line reads `Show the YAML` or `Show the drawing`, and a press folds the frontmatter under the drawing or unfolds it and hides the drawing |
-| the door | `src/extension/editor-inset.js`, `insetDoor(context, folder)` | `createWebviewTextEditorInset` over the first line where the call stands, and `createWebviewPanel` beside the text otherwise. It folds the frontmatter through `editor.fold`, and hands each text change on to the host |
+| the host | `src/extension/lib/route-host.js`, `routeHostOf(door)` | holds one drawing a ticket, and which side each shows. It calls no `vscode`, so a test drives it over a fake door |
+| the open | `routeHostOf().opened(path, text)` | asks the door for a page over the first line, folds the frontmatter, and draws nothing past a path `drawable` refuses |
+| the message | `routeHostOf().graphOf(path, text)` | answers `graph` out of `graphIn`, `steps` out of the frontmatter `readNote` reads, and `held` out of the holds `holdsIn` reads |
+| the answer | `routeHostOf().took(path, message)` | answers `ready` with `graph` and `theme`, and hands `jump`, `take`, `handback` and `edit` on to [[spec/tickets/the-host-runs-the-verbs]] |
+| the redraw | `routeHostOf().changed(path, text)` | posts `graph` again over the text the editor holds |
+| the flip | `routeHostOf().flipped(path)` | hides the page and unfolds the frontmatter, or shows the page and folds it again |
+| the flip button | `routeHostOf().lenses(path)` | a lens on the first line of every drawable ticket, whatever its `state`, reading `Show the YAML` or `Show the drawing`. It runs the command `quackitect.route.flip` with the path |
+| the door | `src/extension/editor-inset.js`, `insetDoor(context, folder)` | `page(path)` calls `createWebviewTextEditorInset` where the call stands, and `createWebviewPanel` beside the text otherwise. `folds` and `unfolds` run `editor.fold` and `editor.unfold` on the first line |
+| the script | `src/extension/editor-inset.js`, `DRAWING` | the bundle's folder `src/scripts/bundle.js` writes, spelled again because the extension bundles alone. The page names it and the extension's own folder under `localResourceRoots` |
 | the manifest | `src/extension/package.json` | names `editorInsets` under `enabledApiProposals`, and the flip command |
-| the wire | `src/extension/extension.js`, `activate` | opens the host on every visible ticket, and on a change of the active editor |
+| the wire | `src/extension/extension.js`, `activate` | registers the flip command, and adds the flip lens beside the ticket lens. It opens the host on each visible ticket and each change of the active editor |
 
-The page loads the bundle `src/scripts/bundle.js` writes, so the webview names its folder among `localResourceRoots`. The host hands `take`, `handback` and `edit` on to [[spec/tickets/the-host-runs-the-verbs]], and answers them with nothing here.
+The tests stand in `test/level0/route-host.test.js`, over a fake door:
+
+| case | what it asserts |
+|---|---|
+| a ticket draws its route over the folded frontmatter | the open asks for a page and a fold, and `ready` answers `graph` with `graph`, `steps` and `held`, and `theme` |
+| the side panel stands in where the inset fails | a door refusing the inset opens the panel, and the page gets the same messages |
+| the flip shows the YAML and back | a flip hides the page and unfolds, a second shows and folds, and the lens title follows |
+| a change redraws the drawing | `changed` posts a `graph` carrying the new route |
+| a closed ticket carries the flip | the lens stands on a ticket whose `state` reads `closed` |
+| the verbs wait for the next ticket | `take`, `handback`, `edit` and `jump` post nothing and run nothing |
 
 ### callers
 
@@ -156,11 +175,12 @@ The page loads the bundle `src/scripts/bundle.js` writes, so the webview names i
 
 <!-- the form is list -->
 
-- `src/extension/extension.js`, `activate`, which opens the host
+- `src/extension/extension.js`, `activate`, which opens the host and registers the flip
 - `src/extension/editor.js`, `editorDoor`, which spreads the inset door beside the lens door
-- `src/extension/lib/lens.js`, `lensesOf`, which gains the flip lens
-- `src/extension/lib/drawing.js`, `graphAt`, which the host reads the graph through
-- `test/level0/lens.test.js`, the lens cases the flip lens joins
+- `src/extension/editor-lens.js`, `lenses`, whose provider now answers the flip lens beside the ticket lens
+- `src/extension/lib/drawing.js`, `drawable` and `EMITTER`, which the host reads
+- `src/extension/lib/lens.js`, `holdsIn`, which the host reads `held` through
+- `test/level0/sidebar.test.js`, `doorOf`, the fake door `activate` takes, which carries no inset and stays as it stands
 
 ### answers
 
@@ -168,7 +188,13 @@ The page loads the bundle `src/scripts/bundle.js` writes, so the webview names i
 
 <!-- the form is list -->
 
-- first
+- the three tests the ask calls for: the test table names the file and a case for each
+- the flip state: `routeHostOf` holds the side each ticket shows, and its own `lenses` reads it
+- the closed ticket: the flip lens stands in the host, apart from `lensesOf`, and a case drives a closed ticket
+- the flip command: `quackitect.route.flip` runs `routeHostOf().flipped`
+- the jump: the host hands it on beside `take`, `handback` and `edit`
+- `steps` and `held`: the message table names where each comes from
+- the bundle's folder: `DRAWING` names it, and `localResourceRoots` holds it
 
 ## review
 
