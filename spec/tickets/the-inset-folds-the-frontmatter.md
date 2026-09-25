@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -137,6 +137,17 @@ record:
     hand: box 75b31b3d5012 · claude-code-remote · helper-6
     hash_before: 274a0c1a18ca4f799b4bc7a30f54ef93cca9ec13
     hash_after: 274a0c1a18ca4f799b4bc7a30f54ef93cca9ec13
+  - step: implement/tests-red
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 7f45c250412c3c6a2ed3437ee006f2a60991500d
+    hash_after: 7f45c250412c3c6a2ed3437ee006f2a60991500d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 8 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 group: the-editor-holds-the-drawing
 depends_on: ["the-editor-takes-an-inset", "the-ticket-answers-the-editor", "the-drawing-draws-a-route"]
 ---
@@ -276,17 +287,25 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/route-host.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+A stub host answering nothing leaves every case red but the one on a note outside the ticket folders, which draws nothing either way. The fake door hands a page carrying `post`, `onMessage`, `hide`, `show` and `dispose`, so the inset and the side panel read alike to the host. The fake `imports` hands the real emitter and the real schema reader, so the graph and the steps a case reads come off the code the verbs run.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch the new host and its test file, which the approach names
+- the page, the fold, the theme, the holds and the imports each carry a fake in `doorOf`
+- the host's header and the test's header point at this ticket
 
 ## reflect
 
