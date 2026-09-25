@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor, a-save-fills-the-ticket]
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -112,6 +112,10 @@ record:
     hand: box 75b31b3d5012 · claude-code-remote
     hash_before: d3385d91d3712a26988317d4f965829fb7b1d5cb
     hash_after: d3385d91d3712a26988317d4f965829fb7b1d5cb
+  - step: design/review
+    hand: box 75b31b3d5012 · claude-code-remote · helper-4
+    hash_before: f818c23ca75ef164f5d376eaa4b21c91642afee2
+    hash_after: f818c23ca75ef164f5d376eaa4b21c91642afee2
 ---
 
 # Ask
@@ -206,16 +210,25 @@ The tests stand in `test/level0/work-group.test.js`, over the sidebar's fake doo
 
 <!-- the form is verdict -->
 
-fail
+pass
 
 | grade | finding | fix |
 |---|---|---|
-| blocking | Four done lines each call for a test, and the approach names none. | Name one test a done line in `test/level0/sidebar.test.js`, with the fake each feeds. |
-| detail | `runsVerb` takes an argv, and `counts` holds a shell line opening with `./RUNME.sh`. | Drop the `./RUNME.sh` head and split the rest into the argv. |
-| detail | `runsVerb` wraps each run in a progress toast, and `html` runs on every redraw. | Run the count on a road that shows no toast. |
-| detail | `work.pull` carries `runs`, and the approach keys the pull on `pulls`, which no row adds. | Add `pulls` in the config row, or key the pull on `work.pull`. |
-| detail | `door.asks` in the sidebar opens a folder picker, and a ticket name wants a line. | Ask the name through `asksLine`, and name it in the callers list. |
-| detail | `ticket yours --next` answers `{"ticket":null}` on an empty queue. | Name what pull for me tells the person then. |
+| detail | The cases sit in `work-group.test.js`, and `doorOf` stands unexported in `sidebar.test.js`. | Put the cases in `sidebar.test.js`, or lift the fake into a shared module. |
+| detail | The fake door seeds a test schema, and the first done line reads the config. | Seed the real `level0.schema.json` for the work group case. |
+| detail | `ticketLensOf().took` calls `says`, `tells`, `saves` and `lensChanged` on the door. | Give the fake door each of these, and assert the pull runs `ticket pull`. |
+| detail | `work.new` carries `asks`, so `lineOf` opens the folder picker first. | Branch on `opens` ahead of `lineOf` in `took`. |
+| detail | A typed name can carry a slash or a dot pair. | Refuse a name outside the ticket name form, and test the refusal. |
+| detail | The new `argvOf` in `lib/work.js` shares a name with the `lens.js` export. | Name the new one for the config line it splits. |
+
+Every finding of the earlier review meets its answer:
+
+- a test a done line: met, by the case table
+- the shell line: met, by the split
+- the toast on every redraw: met, by `asksVerb`
+- the `pulls` key: met, in the config row
+- the folder picker: met, by `asksLine` in the callers list
+- the empty queue: met, by the line telling the person
 
 `./RUNME.sh check` answers 0 on this commit.
 
