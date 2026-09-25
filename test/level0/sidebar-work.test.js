@@ -13,9 +13,21 @@ const NEXT = JSON.stringify({ ticket: "one", path: "spec/tickets/one.md", step: 
 
 function doorOf({ seed = {}, answers = {}, typed = "" } = {}) {
   const files = fakeDisk({ [SCHEMA]: JSON.stringify(schema), ...seed });
-  const said = { asked: [], ran: [], quiet: [], opened: [], told: [], saved: [], says: [] };
+  const said = {
+    asked: [],
+    ran: [],
+    quiet: [],
+    opened: [],
+    told: [],
+    saved: [],
+    says: [],
+  };
   const answer = (argv) =>
-    answers[argv.slice(0, 2).join(" ")] ?? { code: 0, out: "work\n  the next leaf\n", err: "" };
+    answers[argv.slice(0, 2).join(" ")] ?? {
+      code: 0,
+      out: "work\n  the next leaf\n",
+      err: "",
+    };
   return {
     files,
     said,
@@ -47,7 +59,11 @@ function doorOf({ seed = {}, answers = {}, typed = "" } = {}) {
 }
 
 const press = (door, key) =>
-  sidebarOf(door).took({ kind: "run", key, runs: schema.properties.work.properties[key.split(".")[1]].runs });
+  sidebarOf(door).took({
+    kind: "run",
+    key,
+    runs: schema.properties.work.properties[key.split(".")[1]].runs,
+  });
 
 test("the work group draws the three buttons the config declares", async () => {
   const html = await sidebarOf(doorOf()).html();
@@ -57,13 +73,18 @@ test("the work group draws the three buttons the config declares", async () => {
     assert.ok(section.includes(`data-key="${key}"`), key);
 });
 
-test("the work editor's button carries the count the queue answers", async () => {
-  const door = doorOf({ answers: { "ticket yours": { code: 0, out: '{"count":3}\n', err: "" } } });
+test("the work editor's button carries the count of the rows the work tab draws", async () => {
+  const door = doorOf({
+    answers: { "tui work": { code: 0, out: '{"count":3}\n', err: "" } },
+  });
   const html = await sidebarOf(door).html();
-  assert.deepEqual(door.said.quiet, [["ticket", "yours", "--count"]]);
+  assert.deepEqual(door.said.quiet, [["tui", "work", "--count"]]);
   assert.deepEqual(door.said.ran, []);
   const button = html.slice(html.indexOf('data-key="work.editor"'));
-  assert.match(button.slice(0, button.indexOf("</button>")), /<span class="count">3<\/span>/);
+  assert.match(
+    button.slice(0, button.indexOf("</button>")),
+    /<span class="count">3<\/span>/,
+  );
 });
 
 test("pull for me takes the ticket the queue names, and opens it", async () => {
@@ -75,7 +96,9 @@ test("pull for me takes the ticket the queue names, and opens it", async () => {
 });
 
 test("pull for me over an empty queue says so, and pulls nothing", async () => {
-  const door = doorOf({ answers: { "ticket yours": { code: 0, out: '{"ticket":null}', err: "" } } });
+  const door = doorOf({
+    answers: { "ticket yours": { code: 0, out: '{"ticket":null}', err: "" } },
+  });
   await press(door, "work.pull");
   assert.deepEqual(door.said.ran, []);
   assert.deepEqual(door.said.opened, []);

@@ -33,11 +33,13 @@ test("the work section keeps its knobs, and declares its three buttons", () => {
 });
 
 test("each line a work button runs or counts names a verb the command line knows", () => {
-  const lines = BUTTONS.flatMap((key) => [keyed.get(key)?.runs, keyed.get(key)?.counts])
-    .filter(Boolean);
+  const lines = BUTTONS.flatMap((key) => [
+    keyed.get(key)?.runs,
+    keyed.get(key)?.counts,
+  ]).filter(Boolean);
   assert.deepEqual(lines, [
     "./RUNME.sh tui work",
-    "./RUNME.sh ticket yours --count",
+    "./RUNME.sh tui work --count",
     "./RUNME.sh ticket yours --next",
   ]);
   for (const line of lines) {

@@ -76,7 +76,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: person
@@ -86,6 +86,14 @@ record:
     hand: box d6f05e3a585030 · claude-code · helper-2
     hash_before: eff3f578bc3f6900e5b6ef635d149fd7bc23fda4
     hash_after: eff3f578bc3f6900e5b6ef635d149fd7bc23fda4
+  - step: implement/tests-red
+    hand: person
+    hash_before: c04cd61806b78fea813da1633e025bd22dcab201
+    hash_after: c04cd61806b78fea813da1633e025bd22dcab201
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -211,20 +219,29 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/tui test/level0/tui-count.test.js test/level0/sidebar-work.test.js test/contract/work-buttons.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new test fails on its own assertion. A stub `work.Drawn` answers zero with no error. So the Go case reads a count of 0 where the tab draws 4, and each error case reads no error. The three `tui-count` cases fail because `tui work --count` still takes the window road. The sidebar and contract cases fail because the `counts` line still names `ticket yours --count`.
+
+Two surprises. The commit door reads a Go test in the code's own folder alone, so the no-base-file case stands in `src/tui/work/workcount_test.go`. The no-verb case stays in `src/tui`, beside the fake index. And the Go case runs the real `node` over a fake `src/scripts/cli.js`, since `runPlaces` has no seam. The fake prints the answer `branch list --json` gives.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the tests stand in the files the draft and the review name
+- every door has a fake: `fakeDoor` for the index, a fake `cli.js` for the verb, `fakeProc`, and a `fetch` recorder
+- a comment names the approach: each test file points at `spec/design_output/tui#the-work-tab`
+- every fact stands in one place: the Go case reads the base file this tree ships, and moves its press in place
+- every review row stands fixed: the contract test asserts the new line, and the error cases assert stderr and exit 1
 
 ## change
 
