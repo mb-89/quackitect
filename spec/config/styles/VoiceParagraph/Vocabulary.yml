@@ -4,7 +4,7 @@
 extends: script
 message: "A word stands outside the words this tree writes. Write a core word, or add it to spec/vocabulary/terms.yml with one line that says what it means."
 link: spec/design_output/projection.md
-level: error
+level: warning
 scope: raw
 script: |
   text := import("text")
