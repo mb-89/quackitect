@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -185,6 +185,17 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-inset-folds-the-frontmatter.md:419:166: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: implement/tests-green
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: c2db5e6b16d3e797f02911980a11b1d70adab1c0
+    hash_after: c2db5e6b16d3e797f02911980a11b1d70adab1c0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 36 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-inset-folds-the-frontmatter.md:212:1: CodeSpans: A sentence holds 4 code spans, and this one holds 5. C"
 group: the-editor-holds-the-drawing
 depends_on: ["the-editor-takes-an-inset", "the-ticket-answers-the-editor", "the-drawing-draws-a-route"]
 ---
@@ -354,7 +365,7 @@ A stub host answering nothing leaves every case red but the one on a note outsid
 
 <!-- the form is text -->
 
-Both findings share one class: the host holds a page's state, and an event outside the host moves that state with no word to it.
+Both findings share one class. The host holds a page's state, and an event outside the host moves it unseen.
 
 | the event | what the host held | the fix |
 |---|---|---|
@@ -422,11 +433,19 @@ The fix for the class: every state the host holds changes through the host alone
 
 <!-- the form is text -->
 
-A ticket open in the editor now carries its route as a drawing over its first line, and the frontmatter folds under it. The drawing stands in an inset where the editor runs `createWebviewTextEditorInset`, and in a side panel otherwise. So the probe's open `decide` blocks nothing. A lens flips the drawing to the YAML and back, on every ticket whatever its state. An edit redraws the drawing, and a longer route opens a taller inset. A theme change reaches every page.
+A ticket open in the editor carries its route as a drawing over its first line, and the frontmatter folds under it.
 
-The inset takes a proposed API, so `package.json` names `editorInsets`. The editor turns it on through `--enable-proposed-api quackitect.quackitect` or `argv.json`. A press on a node, the pointer or an edit posts nothing yet, since [[spec/tickets/the-host-runs-the-verbs]] runs the verbs behind them.
+| what | how it holds |
+|---|---|
+| the host | an inset where the editor runs `createWebviewTextEditorInset`, and a side panel otherwise, so the probe's open `decide` blocks nothing |
+| the flip | a lens shows the YAML and the drawing in turn, on every ticket whatever its state |
+| the redraw | an edit posts the new route, and a longer route opens a taller inset, keeping the side it shows |
+| the theme | a change reaches every page |
+| a close | a page the person closes leaves the host |
+| the proposed API | `package.json` names `editorInsets`, and the editor takes the flag or `argv.json` |
+| the presses | a node, the pointer or an edit posts nothing yet, since [[spec/tickets/the-host-runs-the-verbs]] runs the verbs |
 
-The start also carries a case for the wire in `test/level0/sidebar.test.js`, which the commit hook asked for beside the code.
+The wire carries a case in `test/level0/sidebar.test.js`, which the commit hook asked for beside the code.
 
 ### checked
 
