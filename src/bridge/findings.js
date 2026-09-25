@@ -4,7 +4,6 @@
 // and the battery read one list. The server restarts when this code moves.
 // [[spec/design_output/lsp]]
 
-import { join } from "node:path";
 import {
   CONFIG_DIR,
   fromJson as codeRows,
@@ -14,21 +13,15 @@ import { codeFaults } from "../../.claude/skills/level0/lib/magic.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { SIZED } from "../../.claude/skills/level0/lib/size.js";
 import { stopFolderIsData, treeOf } from "../../.claude/skills/level0/lib/tree.js";
-import {
-  faultIn,
-  fromJson,
-  UNREASONED,
-  unreasoned,
-} from "../../.claude/skills/level0/lib/vale.js";
+import { faultIn, fromJson, unreasoned } from "../../.claude/skills/level0/lib/vale.js";
 import { withoutFalsePast } from "../engine/tense.js";
-import { readTools, whereIs } from "../engine/tools.js";
+import { whereIs } from "../engine/tools.js";
 import {
   faultsIn as faultsInGrid,
   RULE as GRID,
   lineOf,
 } from "../extension/lib/grid.js";
 import { assemble } from "../scripts/styles.js";
-import { asks } from "./config.js";
 
 // The folders no rule reads: the private folder, the packages, git, and a draft under an underscore. [[spec/design_output/tree#the-tree-handed-in]]
 export const PARKED = [
@@ -39,8 +32,6 @@ export const OURS = `--glob=!{${PARKED.join(",")}}`;
 const SKIP = new Set([".git", "node_modules", ".se", ".claude", ".claude-plugin"]);
 const PROSE = /\.(md|markdown|txt)$/i;
 const WHOLE = ".";
-// The route the language server asks, spelled again in src/lsp/bridge.go because a Go module imports no JavaScript. [[spec/design_output/lsp]]
-export const FINDINGS = "/findings";
 
 // Which front draws a finding in the editor already, so the panel draws each once. [[spec/design_output/lsp]]
 export const FROM = { vale: "vale", biome: "biome", tree: "tree" };
@@ -116,28 +107,6 @@ export function biomeFor(files, root, known) {
   return files.exists(at) ? at : "";
 }
 
-// The server's answer to GET /findings, over the paths the query names or the whole tree. [[spec/design_output/lsp]]
-export async function findingsFor(box, url) {
-  const asked = new URL(String(url), "http://here").searchParams.getAll("path");
-  const known = readTools(box.disk, box.method);
-  const got = await findingsOver(
-    {
-      disk: box.disk,
-      proc: box.proc,
-      join,
-      // The findings read the work root, where a project's notes stand, through the pair the door reads. [[spec/design_output/vehicle#the-styles-assemble-once]]
-      root: box.work,
-      method: box.method,
-      work: box.work,
-      vale: whereIs(box.disk, box.method, "vale", known),
-      biome: biomeFor(box.disk, box.method, known),
-      ceilings: ceilingsOf(box),
-    },
-    asked.length ? asked : [WHOLE],
-  );
-  return { ok: !got.fault, found: got.found, fault: got.fault };
-}
-
 // The levels that refuse a write, the ones the lint names. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 export const REFUSES = new Set(["error", "warning"]);
 
@@ -181,50 +150,6 @@ function configOf(it) {
   const method = it.method ?? it.root;
   const work = it.work ?? it.root;
   return assemble(it.disk, { method, work, itself: method === work }).config;
-}
-
-// The ceilings the code faults read, off the config. [[spec/design_output/level0#the-size-ceiling]]
-function ceilingsOf(box) {
-  return {
-    function: asks(box, "code.functionLines"),
-    file: asks(box, "code.fileLines"),
-  };
-}
-
-// A buffer the editor holds, read as it stands: Vale at the buffer's own path through the tense reader, then the code faults. Biome stays with its own server on an open file. [[spec/design_output/lsp#the-panel-lints-as-typed]]
-export async function heldOver(it, held) {
-  const found = [];
-  for (const { path, text } of held) {
-    const at = String(path ?? "");
-    const body = String(text ?? "");
-    if (!at || isDraft(at)) continue;
-    if (PROSE.test(at)) {
-      const said = await it.lint(body, at);
-      if (!said.ran) return { found: [], fault: said.why };
-      const named = said.found.map((one) => ({ ...one, file: at }));
-      for (const one of withoutFalsePast(body, named)) {
-        found.push(from(one, one.rule === UNREASONED ? FROM.tree : FROM.vale));
-      }
-    }
-    if (SIZED.test(at)) {
-      for (const one of codeFaults(body, at, it.ceilings))
-        found.push(from(one, FROM.tree));
-    }
-  }
-  return { found, fault: "" };
-}
-
-// The server's answer to POST /findings, over the buffers the body holds. [[spec/design_output/lsp#the-panel-lints-as-typed]]
-export async function heldFor(box, body) {
-  let held = [];
-  try {
-    held = JSON.parse(body || "{}").held;
-  } catch {}
-  const got = await heldOver(
-    { lint: box.vale.lint, ceilings: ceilingsOf(box) },
-    Array.isArray(held) ? held : [],
-  );
-  return { ok: !got.fault, found: got.found, fault: got.fault };
 }
 
 // What a reading names, sorted, so a case holds one front's list against the other's. [[spec/design_output/lsp#one-checker-every-front-asks]]

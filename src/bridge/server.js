@@ -32,7 +32,6 @@ import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
 import { dropsAll, dropsMoved } from "./caches.js";
 import { asks, asksText } from "./config.js";
-import { FINDINGS, findingsFor, heldFor } from "./findings.js";
 import { holdsGrace } from "./grace.js";
 import {
   onAgentSpawn,
@@ -345,34 +344,6 @@ export function serve(method, port = PORT_BASE, say = console.log) {
   };
 
   const onRequest = (request, response) => {
-    // The problems panel reads the battery's findings here, so a rule reaches the editor off one list. [[spec/design_output/lsp]]
-    if (request.method === "GET" && String(request.url).startsWith(FINDINGS)) {
-      findingsFor(own, request.url).then(
-        (said) => answer(response, OK, said),
-        (error) =>
-          answer(response, OK, {
-            ok: false,
-            found: [],
-            fault: String(error?.message ?? error),
-          }),
-      );
-      return;
-    }
-    // A buffer the editor holds reads here as typed, so no source waits for a save. [[spec/design_output/lsp#the-panel-lints-as-typed]]
-    if (request.method === "POST" && request.url === FINDINGS) {
-      readBody(request, (body) =>
-        heldFor(own, body).then(
-          (said) => answer(response, OK, said),
-          (error) =>
-            answer(response, OK, {
-              ok: false,
-              found: [],
-              fault: String(error?.message ?? error),
-            }),
-        ),
-      );
-      return;
-    }
     if (request.method === "POST" && request.url === "/stop") {
       answer(response, OK, { ok: true });
       setTimeout(stop, SOON);
