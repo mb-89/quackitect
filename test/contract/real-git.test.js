@@ -27,7 +27,7 @@ const KEPT = new Map([
   ],
 ]);
 
-// The spellings of the real door and of a fresh repository, split so this file carries neither whole.
+// The spellings of the real door and of a fresh repository, split so this file carries neither whole. [[spec/design_output/doors#a-door-standing-on-another]]
 const DOOR = new RegExp(`doors/${"git"}\\.js["']`);
 const INIT = new RegExp(
   [
@@ -37,7 +37,7 @@ const INIT = new RegExp(
   ].join("|"),
 );
 
-// Every file a test run reaches, by its path from the root.
+// Every file a test run reaches, by its path from the root. [[spec/design_output/doors#a-door-standing-on-another]]
 function testFiles(at = TESTS) {
   const out = [];
   for (const one of files.list(join(root, at))) {
