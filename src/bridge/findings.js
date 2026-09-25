@@ -82,6 +82,23 @@ export async function findingsOver(it, asked) {
   return { found, fault: "" };
 }
 
+// A closed ticket is history, and no rule reads it, the way isHistory in src/lsp/history.go reads it. [[spec/design_output/lsp#a-closed-ticket-is-history]]
+export function pastHistory(it, found) {
+  const history = new Map();
+  const isHistory = (file) => {
+    const shown = showOf(it, file ?? "");
+    if (!/^spec\/tickets\/.*\.md$/.test(shown)) return false;
+    if (!history.has(shown)) {
+      const at = it.join(it.root, shown);
+      const text = it.disk.exists(at) ? it.disk.read(at) : "";
+      const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text)?.[1] ?? "";
+      history.set(shown, /^state:\s*closed\s*$/m.test(front));
+    }
+    return history.get(shown);
+  };
+  return found.filter((one) => !isHistory(one.file));
+}
+
 // The rules the language server holds nowhere yet, which the lint lays beside the server's list. [[spec/design_output/lsp#a-port-serves-the-list]]
 export function aloneOver(it, asked) {
   const where = asked.filter(
@@ -98,7 +115,7 @@ export function aloneOver(it, asked) {
     found.push(...stopFolderIsData(tree).map((one) => from(one, FROM.tree)));
   }
   found.push(...gridOver(it, where).map((one) => from(one, FROM.tree)));
-  return found;
+  return pastHistory(it, found);
 }
 
 // One guard answers both fronts, because a tool standing nowhere is no tool. [[spec/design_output/lsp#one-checker-every-front-asks]]

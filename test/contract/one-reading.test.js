@@ -65,6 +65,27 @@ test("the lint reads each row of the server's list once", async () => {
   assert.equal(new Set(check).size, check.length, "no row reads twice");
 });
 
+// [[spec/design_output/lsp#a-closed-ticket-is-history]]
+test("a closed ticket's row leaves the lint, and an open one's stays", () => {
+  const text = {
+    "/tree/spec/tickets/done.md": "---\nstate: closed\n---\n",
+    "/tree/spec/tickets/open.md": "---\nstate: open\n---\n",
+  };
+  const at = {
+    root: "/tree",
+    join: (...parts) => parts.join("/"),
+    disk: { exists: (one) => one in text, read: (one) => text[one] },
+  };
+  const kept = findings.pastHistory(at, [
+    { file: "spec/tickets/done.md", rule: "EveryPointerResolves" },
+    { file: "spec/tickets/open.md", rule: "EveryPointerResolves" },
+  ]);
+  assert.deepEqual(
+    kept.map((one) => one.file),
+    ["spec/tickets/open.md"],
+  );
+});
+
 // [[spec/design_output/lsp#a-port-serves-the-list]]
 test("a row on a private note holds no push", () => {
   assert.equal(privateRow(".se/tickets/a-note.md"), true);

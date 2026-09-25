@@ -43,7 +43,7 @@ var readers = map[string][]func(*Tree) []Finding{
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 func (one *Checker) Over(path string) []Finding {
 	where := relativeTo(one.tree.Root, path)
-	if isDraft(where) {
+	if isDraft(where) || isHistory(one.tree, where) {
 		return nil
 	}
 
@@ -120,7 +120,7 @@ func (one *Checker) Sweep() []Finding {
 	out = append(out, syntaxSweep(one.tree)...)
 	out = append(out, anchorSweep(one.tree)...)
 	out = append(out, one.restatedAll()...)
-	return sorted(out)
+	return sorted(pastHistory(one.tree, out))
 }
 
 func (one *Checker) Tree() *Tree { return one.tree }
@@ -144,7 +144,7 @@ func (one *Checker) OutsideSweep() []Finding {
 	if one.outside == nil {
 		return nil
 	}
-	return one.outside.Sweep(one.tree)
+	return pastHistory(one.tree, one.outside.Sweep(one.tree))
 }
 
 // The tools over the paths named, or nothing where the checker holds none. [[spec/design_output/lsp#the-server-runs-the-tools]]
@@ -152,5 +152,5 @@ func (one *Checker) OutsideOver(where []string) []Finding {
 	if one.outside == nil || len(where) == 0 {
 		return nil
 	}
-	return one.outside.Over(one.tree, where)
+	return pastHistory(one.tree, one.outside.Over(one.tree, where))
 }

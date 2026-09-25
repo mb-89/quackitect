@@ -345,6 +345,19 @@ answers nothing stands stale.
 editor reads the same list. `TestThePortAnswersWhatTheCheckAnswers` in
 `src/lsp/port_test.go` holds the two against each other.
 
+# A closed ticket is history
+
+A closed ticket records the tree at its close. A note or a name it points at
+leaves later, and the record stands as it is. So no rule reads a ticket
+under `spec/tickets` whose frontmatter says `state: closed`:
+
+| the front | where it drops the rows |
+|---|---|
+| the server | `isHistory` in `src/lsp/history.go`, in the checker's four entry points |
+| the lint | `pastHistory` in `src/bridge/findings.js` |
+
+An open ticket keeps every row.
+
 # The build beside the index
 
 The server is pure Go, so it needs no compiler and no network. It shares no

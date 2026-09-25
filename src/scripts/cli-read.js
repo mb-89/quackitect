@@ -12,6 +12,7 @@ import {
   aloneOver,
   biomeFor,
   findingsOver,
+  pastHistory,
   readThrough,
   showOf,
   walkOver,
@@ -61,7 +62,10 @@ export async function readingFor(where, served) {
   const said = served === undefined ? await serverFaults(where) : served;
   if (said)
     return {
-      found: [...said, ...aloneOver({ disk: files, join, root }, where)],
+      found: pastHistory({ disk: files, join, root }, [
+        ...said,
+        ...aloneOver({ disk: files, join, root }, where),
+      ]),
       fault: "",
     };
 
@@ -91,7 +95,7 @@ export async function readingFor(where, served) {
     found.push(...treeFaults(tree).filter((one) => one.rule !== "StopFolderIsData"));
     found.push(...schemaFaults(tree));
   }
-  return { found, fault: "" };
+  return { found: pastHistory({ disk: files, join, root }, found), fault: "" };
 }
 
 export async function lint(where) {
