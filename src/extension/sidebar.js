@@ -7,6 +7,7 @@ const { fresh, pressed } = require("./lib/gesture.js");
 const { logbookOf } = require("./lib/logbook.js");
 const { panelHtml } = require("./lib/panel.js");
 const { newestIn, rowsIn } = require("./lib/rows.js");
+const { ticketLensOf } = require("./lib/lens.js");
 const { opened } = require("./lib/session.js");
 const { statesOf } = require("./lib/states.js");
 const { asType, parsed, withValue } = require("./lib/values.js");
@@ -19,6 +20,7 @@ const {
   treeIn,
   valuesOf,
 } = require("./lib/widgets.js");
+const { NEW_TICKET, countIn, lineArgvOf, nextIn, ticketPathOf } = require("./lib/work.js");
 
 const SCHEMA = "spec/config/level0.schema.json";
 
@@ -44,6 +46,12 @@ function sidebarOf(door) {
     const typed = asType(value, one?.type);
     await door.write(LOCAL, withValue(await door.read(LOCAL), key, typed));
     await logbook.say("info", "sidebar", `${key} is ${typed}`, { detail: how });
+  };
+
+  const entryOf = async (key) => {
+    if (!key) return undefined;
+    const schema = parsed(await door.read(SCHEMA));
+    return entriesIn(schema).find((each) => each.key === String(key));
   };
 
   // [[spec/design_output/extension#two-buttons-make-both]]
@@ -86,8 +94,9 @@ function sidebarOf(door) {
     async html() {
       const said = await readAll();
       const values = valuesOf(said.tracked, said.local);
+      const groups = litBy(groupsIn(said.schema, values), door.processes?.() ?? {});
       return panelHtml({
-        groups: litBy(groupsIn(said.schema, values), door.processes?.() ?? {}),
+        groups: await counted(door, groups),
         tree: treeIn(said.schema, [
           { path: TRACKED, said: said.tracked },
           { path: LOCAL, said: said.local },
@@ -101,6 +110,10 @@ function sidebarOf(door) {
     // [[spec/design_output/extension#a-click-writes-the-file]]
     async took(message) {
       if (message?.kind === "run") {
+        const one = await entryOf(message.key);
+        // [[spec/tickets/the-work-group-draws-buttons]]
+        if (one?.opens) return newTicket(door, one);
+        if (one?.pulls) return pullsNext(door, one);
         const runs = await lineOf(message);
         if (runs === undefined) return undefined;
         await logbook.say(
@@ -135,6 +148,38 @@ function sidebarOf(door) {
       return said;
     },
   };
+}
+
+// A button naming `counts` carries the count its line answers, run with no toast on every draw. [[spec/tickets/the-work-group-draws-buttons]]
+async function counted(door, groups) {
+  if (!door.asksVerb) return groups;
+  for (const group of groups) {
+    for (const row of group.rows ?? []) {
+      for (const cell of row.cells) {
+        if (cell.counts) cell.count = countIn(await door.asksVerb(lineArgvOf(cell.counts)));
+      }
+    }
+  }
+  return groups;
+}
+
+// Pull for me takes the ticket the queue names, through the road the ticket's buttons run. [[spec/design_input/the-editor-draws-the-ticket#the-work-group]]
+async function pullsNext(door, one) {
+  const next = nextIn(await door.asksVerb(lineArgvOf(one.runs)));
+  if (!next) return door.tells("Nothing waits on you", "", false);
+  const said = await ticketLensOf(door).took("take", next.ticket, next.path);
+  if (said?.word !== "refused") await door.opens(next.path);
+  return said;
+}
+
+// New ticket writes a kind and an empty process where no file stands, and the save fills the rest. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+async function newTicket(door, one) {
+  const name = String((await door.asksLine("Name the new ticket, in lower-case words")) ?? "");
+  if (!name.trim()) return undefined;
+  const path = ticketPathOf(one.opens, name);
+  if (!path) return door.tells(`${name} names no ticket`, "Write lower-case words joined by a dash.", true);
+  if (!(await door.read(path))) await door.write(path, NEW_TICKET);
+  return door.opens(path);
 }
 
 // [[spec/design_output/extension#the-button-prints-the-log]]

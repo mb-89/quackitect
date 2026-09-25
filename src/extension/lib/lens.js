@@ -165,6 +165,18 @@ function argvOf(act, ticket, reason) {
   return lines[act] ? ["ticket", "pull", ...lines[act]] : [];
 }
 
+// The route a press in the drawing moves, as the whole list `ticket route` takes. [[spec/tickets/the-host-runs-the-verbs]]
+function routeArgvOf(ticket, steps) {
+  return ["ticket", "route", ticket, `--steps=${JSON.stringify(steps ?? [])}`];
+}
+
+// A save over a ticket naming a process and carrying no route runs the fill, which writes what the mint writes. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+function fillArgvOf(path, text) {
+  if (!ticketOf(path)) return [];
+  if (!fieldOf(text, "process") || stepsIn(text).length) return [];
+  return ["ticket", "fill", String(path).replace(/\\/g, "/")];
+}
+
 // The child runs as a person, so the names a harness sets stay behind. [[spec/design_output/pull#the-hand-rule]]
 function personEnv(env, root) {
   const out = { ...(env ?? {}) };
@@ -224,6 +236,20 @@ function ticketLensOf(door) {
       door.lensChanged?.();
       return said;
     },
+    // [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+    async saved(path, text) {
+      const argv = fillArgvOf(path, text);
+      if (!argv.length) return undefined;
+      const ran = await door.runsVerb(argv);
+      const lines = `${ran?.out ?? ""}\n${ran?.err ?? ""}`
+        .split(/\r?\n/)
+        .filter((one) => one.trim());
+      door.says([`./RUNME.sh ${argv.join(" ")}`, "", ...lines]);
+      if (Number(ran?.code ?? 0) !== 0)
+        door.tells(`${ticketOf(path)}: the fill refused`, lines[0] ?? "", true);
+      door.lensChanged?.();
+      return ran;
+    },
   };
 }
 
@@ -231,12 +257,16 @@ module.exports = {
   CLI,
   COMMAND,
   HARNESS,
+  HOLD,
   HOLDS,
   answerOf,
   argvOf,
+  fillArgvOf,
   holdsIn,
   lensesOf,
   personEnv,
+  personHolds,
+  routeArgvOf,
   stepsIn,
   ticketLensOf,
   ticketOf,

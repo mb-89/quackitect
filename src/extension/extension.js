@@ -6,6 +6,7 @@
 const { SCHEMA, sidebarOf } = require("./sidebar.js");
 const { COMMAND, ticketLensOf } = require("./lib/lens.js");
 const { serverAsk } = require("./lib/lsp.js");
+const { FLIP, routeHostOf } = require("./lib/route-host.js");
 const { toastsOf } = require("./lib/states.js");
 
 const VIEW = "quackitect.sidebar";
@@ -36,7 +37,24 @@ async function activate(context, given) {
   // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
   const tickets = ticketLensOf(door);
   door.registers(COMMAND, tickets.took);
-  door.lenses?.(tickets);
+  // The drawing over a ticket, and its flip beside the ticket's buttons. [[spec/tickets/the-inset-folds-the-frontmatter]]
+  const route = routeHostOf(door);
+  door.registers(FLIP, (path) => {
+    route.flipped(path);
+    door.lensChanged?.();
+  });
+  door.lenses?.({
+    ...tickets,
+    lenses: async (path, text) => [...route.lenses(path), ...(await tickets.lenses(path, text))],
+  });
+  door.onEditors?.(async (path, text) => {
+    await route.opened(path, text);
+    door.lensChanged?.();
+  });
+  door.onChange?.((path, text) => route.changed(path, text));
+  door.onTheme?.(() => route.themed());
+  // [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+  door.onSave?.(tickets.saved);
 
   // [[spec/design_output/extension#runme-opens-the-panel]]
   if ((await door.read(SHOW)).trim()) {

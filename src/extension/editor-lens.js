@@ -51,6 +51,20 @@ function lensDoor(context, folder) {
       }
     },
 
+    // A save under the ticket folders hands its path and text on. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+    onSave(run) {
+      context.subscriptions.push(
+        vscode.workspace.onDidSaveTextDocument((doc) => {
+          if (doc.uri.scheme === "file") run(pathOf(doc.uri), doc.getText());
+        }),
+      );
+    },
+
+    // A closed pick answers empty. [[spec/tickets/the-host-runs-the-verbs]]
+    async picks(prompt, options) {
+      return (await vscode.window.showQuickPick(options, { placeHolder: prompt })) ?? "";
+    },
+
     async asksLine(prompt) {
       return (await vscode.window.showInputBox({ prompt, ignoreFocusOut: true })) ?? "";
     },
@@ -69,12 +83,18 @@ function lensDoor(context, folder) {
       else vscode.window.showInformationMessage(said);
     },
 
+    // A verb a draw runs, so no progress toast rides it. [[spec/tickets/the-work-group-draws-buttons]]
+    asksVerb(argv) {
+      const home = join(realpathSync.native(context.extensionPath), "..", "..");
+      return ranOf(join(home, ...CLI.split("/")), argv, root);
+    },
+
     runsVerb(argv) {
       const home = join(realpathSync.native(context.extensionPath), "..", "..");
       return vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: `ticket pull ${argv.slice(2).join(" ")}`,
+          title: argv.join(" "),
         },
         () => ranOf(join(home, ...CLI.split("/")), argv, root),
       );

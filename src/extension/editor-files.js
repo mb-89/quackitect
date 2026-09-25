@@ -43,6 +43,11 @@ function fileDoor(context, folder, uriOf) {
       await vscode.workspace.fs.writeFile(uriOf(path), encoder.encode(String(text)));
     },
 
+    // The markdown editor opens the file, where the lens and the fill on save take it. [[spec/tickets/the-work-group-draws-buttons]]
+    async opens(path) {
+      await vscode.window.showTextDocument(uriOf(path));
+    },
+
     // [[spec/design_output/extension#the-watcher-draws-it-again]]
     watch(paths, said) {
       for (const path of paths) {

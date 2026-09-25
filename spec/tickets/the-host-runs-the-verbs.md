@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -96,7 +96,51 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-inset-folds-the-frontmatter, the-ticket-answers-the-editor, the-drawing-draws-a-route]
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: b591f43f5f7b9f9f2da4f58b8920959557b016c7
+    hash_after: b591f43f5f7b9f9f2da4f58b8920959557b016c7
+  - step: design/review
+    hand: box 75b31b3d5012 · claude-code-remote · helper-11
+    hash_before: cf85e458a4e58ac8ac801e765e811b509c92c188
+    hash_after: cf85e458a4e58ac8ac801e765e811b509c92c188
+  - step: implement/tests-red
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: bb6e52379bbad3a0c3c615a39346ee88bf4a430a
+    hash_after: bb6e52379bbad3a0c3c615a39346ee88bf4a430a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 6 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: d3380c931a50f59bbf308e23ced960185a370cda
+    hash_after: d3380c931a50f59bbf308e23ced960185a370cda
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-host-runs-the-verbs.md:206:1: Shape: A run holds 3 paragraphs with no list, table or diagram between th"
+  - step: implement/tests-green
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: dd4d4f705fa886d2a7397975106ff3755636fa63
+    hash_after: dd4d4f705fa886d2a7397975106ff3755636fa63
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 38 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-host-runs-the-verbs.md:214:1: Shape: A run holds 3 paragraphs with no list, table or diagram between th"
+  - step: verdict
+    hand: box 75b31b3d5012 · claude-code-remote · helper-12
+    hash_before: 32b52d85d64cf726ef2a30dce5fde48ba3fb0446
+    hash_after: 32b52d85d64cf726ef2a30dce5fde48ba3fb0446
+reason: done
 ---
 
 # Ask
@@ -127,17 +171,55 @@ Without it the drawing draws and does nothing, so a person edits the route as YA
 
 <!-- the form is text -->
 
+The host answers every press the page posts, and runs a verb through the road the ticket buttons run. So the take, the hand-back and a refusal read alike from a button and from the drawing.
+
+| the press | the host runs | through |
+|---|---|---|
+| `jump` | opens the ticket, and puts the cursor on the node's `line` | `door.jumps(path, line)` |
+| `edit` | `ticket route <ticket> --steps=<json>`, with the whole route the page posts | `door.runsVerb`, as `routeArgvOf(ticket, steps)` answers it |
+| `take` | the pull the take button runs | `ticketLensOf(door).took("take", ticket, path)` |
+| `handback` on a verdict leaf | the pull the verdict button runs | `ticketLensOf(door).took("back", ticket, path)` |
+| `handback` on another leaf | a pick of pass or fail, then the pull that button runs | `door.picks`, then `ticketLensOf(door).took` |
+
+| part | file | what it does |
+|---|---|---|
+| the answers | `src/extension/lib/route-host.js`, `took` | routes each press as the table says, and posts nothing to the page. The next `changed` redraws the route the verb writes |
+| the route line | `src/extension/lib/lens.js`, `routeArgvOf(ticket, steps)` | the argv of `ticket route`, beside `argvOf` |
+| the refusal | `src/extension/lib/route-host.js`, `took` | reads the route verb's JSON, and a `refused` raises a warning through `door.tells` and says the lines through `door.says` |
+| the verdict leaf | `src/extension/lib/route-host.js`, `took` | reads the leaf `stepsIn` answers for the step, the way `handBackOf` does |
+| the jump | `src/extension/editor-inset.js`, `jumps(path, line)` | `showTextDocument` with a selection on the line |
+| the pick | `src/extension/editor-lens.js`, `picks(prompt, options)` | `showQuickPick`, and an empty answer where the person closes it |
+
+The tests stand in `test/level0/route-host.test.js`, over the fake door:
+
+| case | what it asserts |
+|---|---|
+| a jump opens the chapter's line | `jumps` gets the path and the node's line |
+| an edit runs the route verb | `runsVerb` gets `ticket route <ticket> --steps=<json>` |
+| a take runs the pull | `runsVerb` gets `ticket pull <ticket>` |
+| a hand-back on a verdict leaf runs the pull | `runsVerb` gets `ticket pull <ticket>`, and the ticket saves first |
+| a hand-back on another leaf asks | a pick of pass runs `--pass`, and a closed pick runs nothing |
+| a refused route shows its refusal | `tells` gets the refusal as a warning |
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/extension/lib/route-host.js`, `routeHostOf`, whose `took` answers each press
+- `src/extension/lib/lens.js`, `ticketLensOf().took`, which the host calls for the take and the hand-back
+- `src/extension/editor-lens.js`, `lensDoor`, which gains `picks`
+- `src/extension/editor-inset.js`, `insetDoor`, which gains `jumps`
+- `test/level0/route-host.test.js`, `doorOf`, which gains a fake for each door call the table names, and `runsVerb`
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first
 
 ## review
 
@@ -148,6 +230,26 @@ Without it the drawing draws and does nothing, so a person edits the route as YA
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+The approach answers each line of the ask, and no finding blocks it.
+
+| the ask | the approach |
+|---|---|
+| a jump opens the chapter's line | `door.jumps(path, line)`, with a case |
+| a route edit runs `ticket route` | `routeArgvOf`, with a case reading the argv |
+| a press on the pointer takes or hands back | `ticketLensOf(door).took`, with three cases |
+| a refusal shows in the editor | the route JSON through `door.tells`, with a case |
+| `./RUNME.sh check` passes | it answers 0 on this commit |
+
+The findings, each a detail the implement step carries:
+
+- The graph's `line` counts from one, so `jumps` selects `line - 1` in the editor.
+- `took` in the host reads the path from the `pageFor` closure, since `one` holds none.
+- The route verb writes the disk, so the host saves a dirty ticket before the edit.
+- The case "the verbs wait for the next ticket" goes, since the verbs now run.
+- A take through the lens shows its own refusal, so the route case covers the new road.
 
 # implement
 
@@ -161,17 +263,25 @@ Without it the drawing draws and does nothing, so a person edits the route as YA
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/route-host.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Each press case fails on its own assertion, since the host still answers `ready` alone. The case on the verbs waiting for this ticket goes, as the review asked. The fake `runsVerb` answers the pull's word by default, and a case hands it the route verb's refused JSON. So the refusal case reads the road the route takes, and the lens's own refusal stays with the lens test.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch the host test alone
+- every door call the host makes carries a fake in `doorOf`
+- the new cases point at this ticket
 
 ## reflect
 
@@ -199,11 +309,17 @@ Without it the drawing draws and does nothing, so a person edits the route as YA
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the host, the lens, the two doors and their tests, which the approach names
+- the jump, the pick, the save and the verb each carry a fake in the host test
+- each new function points at this ticket, and the hand-back at the design output on the ticket's buttons
 
 ## tests-green
 
@@ -215,11 +331,15 @@ Without it the drawing draws and does nothing, so a person edits the route as YA
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/route-host.test.js test/level0/lens.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -227,11 +347,26 @@ Without it the drawing draws and does nothing, so a person edits the route as YA
 
 <!-- the form is text -->
 
+A press in the drawing over a ticket now runs what it shows:
+
+| the press | what runs |
+|---|---|
+| a node | the ticket opens at the node's chapter line |
+| a move or a drop | the ticket saves, and `ticket route` writes the whole route the page posts |
+| the pointer, free | the take the ticket's button runs |
+| the pointer, held | the hand-back the ticket's button runs, with a pick of pass or fail where the leaf holds no verdict |
+
+A refused route edit raises a warning naming why, and the log holds the verb's lines. The take and the hand-back ride `ticketLensOf().took`, so the drawing and the buttons share one road.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change stays in the host, the lens, the two doors and their tests
+- every door call carries a fake in the host test
+- each new function points at this ticket
 
 # verdict
 
@@ -243,17 +378,46 @@ Without it the drawing draws and does nothing, so a person edits the route as YA
 
 <!-- the form is files -->
 
+- src/extension/lib/route-host.js
+- src/extension/lib/lens.js
+- src/extension/editor-inset.js
+- src/extension/editor-lens.js
+- src/extension/editor.js
+- src/extension/webview/route/drawing.js
+- src/scripts/ticket-route.js
+- test/level0/route-host.test.js
+- test/level0/lens.test.js
+- spec/tickets/the-host-runs-the-verbs.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+Every line of the ask holds, and no hunk is wrong.
+
+- A jump calls `door.jumps` with the node's line, and the editor selects one line up.
+- An edit saves first, then runs `ticket route` with the whole list the page posts.
+- A take and a hand-back ride `ticketLensOf().took`, the road the buttons run.
+- A verdict leaf hands back with no flag, and another leaf asks pass or fail.
+- A refused route raises the verb's `refused` field as a warning, and a test drives it.
+- The page posts `line` and `steps`, the fields the host reads.
+- `./RUNME.sh check` answers 0, with one shape warning in this ticket's prose.
+- Each press carries a test, and the refusal cases feed bad answers and assert the warning.
+- No handback retro stands here yet, since the retro step follows.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `routeArgvOf` stands once in the lens, and the host imports it.
+- The hand-back reuses the lens road, so the argv stands once in `argvOf`.
+- New comments point at this ticket instead of repeating the approach.
 
 # Discussion
 

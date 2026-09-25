@@ -27,12 +27,20 @@
       {
         "command": "quackitect.ticket",
         "title": "quackitect: a ticket button"
+      },
+      {
+        "command": "quackitect.route.flip",
+        "title": "quackitect: flip the drawing and the YAML"
       }
     ],
     "menus": {
       "commandPalette": [
         {
           "command": "quackitect.ticket",
+          "when": "false"
+        },
+        {
+          "command": "quackitect.route.flip",
           "when": "false"
         }
       ]
@@ -56,5 +64,8 @@
         }
       ]
     }
-  }
+  },
+  "enabledApiProposals": [
+    "editorInsets"
+  ]
 }
