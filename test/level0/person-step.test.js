@@ -131,23 +131,13 @@ function heard(run) {
   }
 }
 
-// The road out of the branch is a desk's, so this case sits at one. [[spec/design_output/work#a-person-step-leaves]]
-test("the pull names the mint, the open and the unblock where a person's step is all that stands", () => {
-  const { said } = heard(() => pulling(ROOT, ["pull"], doors({ cloud: false })));
+// A desk works on trunk alone, so it takes no leaf of a group branch, a person's step among them. [[spec/design_output/work#a-desk-works-on-trunk]]
+test("a desk's pull on a group branch whose one child waits for a person refuses, and hands no unblock", () => {
+  const { code, said } = heard(() => pulling(ROOT, ["pull"], doors({ cloud: false })));
 
-  assert.match(said, /a-child waits for a person at design\/person-1/);
-  assert.match(
-    said,
-    /--process=question/,
-    "the answer names the route a successor takes",
-  );
-  assert.match(said, /ticket open <name>/, "the answer opens the successor");
-  assert.match(
-    said,
-    /branch unblock a-child <name>/,
-    "the answer hands the question out",
-  );
-  assert.match(said, /branch done/, "the answer lands the rest of the group");
+  assert.equal(code, 2, said);
+  assert.match(said, /git switch main/);
+  assert.doesNotMatch(said, /branch unblock/);
 });
 
 // A cloud box answers every question it meets, so that step stands open to it. [[spec/guidance/cloud]]

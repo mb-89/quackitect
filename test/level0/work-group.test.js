@@ -33,6 +33,7 @@ import {
   groupRemote,
   HAND,
   heard,
+  merging,
   on,
   onBranch,
   ROOT,
@@ -48,7 +49,9 @@ test("take claims a group by writing the hand and hash_before into its record, a
     ...HAND,
   });
 
-  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, agent: true }));
+  const { code, said } = heard(() =>
+    work(ROOT, ["take"], { ...it, agent: true, cloud: true }),
+  );
 
   assert.equal(code, 0);
   assert.ok(ranGit(outside).includes("git switch work/one-group"));
@@ -91,53 +94,31 @@ test("a pull on trunk takes a group for a cloud box, the way branch take does", 
 });
 
 // [[spec/design_output/pull#the-engine-takes-the-branch]]
-test("a desk's pull on trunk takes a marked group, and leaves an unmarked one to the cloud", () => {
-  const urgent = doorsSaying(
-    { ...groupRemote(), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
-    { [on("one-group")]: GROUP_NOTE, ...HAND },
-  );
-  const took = heard(() => pulling(ROOT, ["pull"], { ...urgent.it, cloud: false }));
-  assert.equal(took.code, 0, took.said);
-  assert.ok(
-    ranGit(urgent.outside).includes("git switch work/one-group"),
-    "the mark takes the group",
-  );
-
+test("a desk's pull on trunk leaves every group to the cloud, a marked one and an unmarked one alike", () => {
   const soon = GROUP_NOTE.replace("urgent: true\n", "");
-  const calm = doorsSaying(
-    { ...groupRemote(soon), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
-    { [on("one-group")]: soon, ...HAND },
-  );
-  const left = heard(() => pulling(ROOT, ["pull"], { ...calm.it, cloud: false }));
-  assert.equal(left.code, 0, left.said);
-  assert.ok(
-    !ranGit(calm.outside).includes("git switch work/one-group"),
-    "soon stays with the cloud",
-  );
-  assert.ok(
-    !ranGit(calm.outside).some((one) => one.startsWith("git branch work/")),
-    "its branch stands already",
-  );
-
-  const named = doorsSaying(
-    { ...groupRemote(soon), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
-    { [on("one-group")]: soon, ...HAND },
-  );
-  const asked = heard(() =>
-    pulling(ROOT, ["pull", "one-group"], { ...named.it, cloud: false }),
-  );
-  assert.equal(asked.code, 0, asked.said);
-  assert.ok(
-    ranGit(named.outside).includes("git switch work/one-group"),
-    "the owner names it, so the desk takes it",
-  );
+  for (const note of [GROUP_NOTE, soon]) {
+    const desk = doorsSaying(
+      { ...groupRemote(note), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
+      { [on("one-group")]: note, ...HAND },
+    );
+    const left = heard(() => pulling(ROOT, ["pull"], { ...desk.it, cloud: false }));
+    assert.equal(left.code, 0, left.said);
+    assert.ok(
+      !ranGit(desk.outside).some((one) => one.startsWith("git switch")),
+      "the group stays with the cloud",
+    );
+    assert.ok(
+      !ranGit(desk.outside).some((one) => one.startsWith("git branch work/")),
+      "its branch stands already",
+    );
+  }
 });
 
-// [[spec/tickets/the-group-leaves-at-todo]]
-test("take leaves a group whose open children all wait for a person at todo, and writes no line", () => {
+// A take runs on a cloud box alone, and a person's step stands open to it, so a need the box lacks parks the child. [[spec/tickets/the-group-leaves-at-todo]]
+test("take leaves a group whose open children no hand on this box can take at todo, and writes no line", () => {
   const parked = CHILD("one-group", "open").replace(
     "    does: makes the change the ask names\n",
-    "    does: makes the change the ask names\n    by: person\n",
+    '    does: makes the change the ask names\n    needs: ["nowhere here"]\n',
   );
   const { it, outside } = doorsSaying(groupRemote(), {
     [on("one-group")]: withField(GROUP_NOTE, "step", "children"),
@@ -145,10 +126,13 @@ test("take leaves a group whose open children all wait for a person at todo, and
     ...HAND,
   });
 
-  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, agent: true }));
+  const { code, said } = heard(() =>
+    work(ROOT, ["take"], { ...it, agent: true, cloud: true }),
+  );
 
-  assert.equal(code, 0);
-  assert.match(said, /a-child waits for a person at do/);
+  assert.equal(code, 0, said);
+  assert.match(said, /work\/one-group stays at todo/);
+  assert.match(said, /a-child waits for/);
   assert.ok(
     !ranGit(outside).some((one) => one.startsWith("git commit")),
     "the take writes no line",
@@ -165,7 +149,7 @@ test("branch take with a name takes that branch alone, and refuses a name nobody
     { ...groupRemote(), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
     { [on("one-group")]: GROUP_NOTE, ...HAND },
   );
-  const { code } = heard(() => work(ROOT, ["take", "one-group"], it));
+  const { code } = heard(() => work(ROOT, ["take", "one-group"], { ...it, cloud: true }));
   assert.equal(code, 0);
   assert.ok(ranGit(outside).includes("git switch work/one-group"));
 
@@ -173,7 +157,9 @@ test("branch take with a name takes that branch alone, and refuses a name nobody
     { ...groupRemote(), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
     { [on("one-group")]: GROUP_NOTE, ...HAND },
   );
-  const refused = heard(() => work(ROOT, ["take", "nope"], other.it));
+  const refused = heard(() =>
+    work(ROOT, ["take", "nope"], { ...other.it, cloud: true }),
+  );
   assert.equal(refused.code, 1);
   assert.match(refused.said, /work\/nope stands at no free todo/);
   assert.ok(!ranGit(other.outside).some((one) => one.startsWith("git switch")));
@@ -186,7 +172,7 @@ test("a take meeting a rejected push names both roads, and claims no race", () =
     { [on("one-group")]: GROUP_NOTE, ...HAND },
   );
 
-  const { code, said } = heard(() => work(ROOT, ["take"], it));
+  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, cloud: true }));
 
   assert.equal(code, 1);
   assert.match(said, /The push of work\/one-group came back refused/);
@@ -213,7 +199,7 @@ test("a take whose claim will not commit stops, and puts the ticket back", () =>
     { [on("one-group")]: GROUP_NOTE, ...HAND },
   );
 
-  const { code, said } = heard(() => work(ROOT, ["take"], it));
+  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, cloud: true }));
 
   assert.equal(code, 1, said);
   assert.match(said, /would not commit, so the take stands undone/);
@@ -455,36 +441,6 @@ test("done on a group refuses where trunk stands ahead of it, and names the sync
     undefined,
     "the record stands where the sync is owed",
   );
-});
-
-const merging = (extra = {}) => ({
-  "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
-  "git rev-parse HEAD": { stdout: `${SHA}\n` },
-  [`git show origin/work/one-group:${GROUP_AT}`]: {
-    stdout: withField(
-      withHashAfter(
-        withEntry(GROUP_NOTE, {
-          step: "sync",
-          hand: "box 3f9a",
-          hash_before: "a1b2c3",
-        }),
-        "d4e5f6",
-      ),
-      "state",
-      "closed",
-    ),
-  },
-  "git merge-base origin/main origin/work/one-group": { stdout: "base111\n" },
-  "git diff --name-only base111..origin/work/one-group -- spec/tickets": {
-    stdout: `${GROUP_AT}\n`,
-  },
-  [`git diff --unified=0 base111..origin/main -- ${GROUP_AT}`]: { stdout: "" },
-  "git merge --no-ff --no-edit origin/work/one-group": { exitCode: 0 },
-  [`node ${join(ROOT, "src/scripts/cli.js")} check`]: {
-    exitCode: 0,
-    stdout: "green\n",
-  },
-  ...extra,
 });
 
 // [[spec/design_output/work#the-merge-lands-the-truth]]

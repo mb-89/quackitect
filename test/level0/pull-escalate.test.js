@@ -9,8 +9,8 @@ import { withPersonStep } from "../../src/scripts/pull.js";
 import { pulling, work } from "../../src/scripts/work.js";
 import {
   at,
-  BRANCH,
   CHILD,
+  deskDoors,
   doors,
   HOLD,
   heard,
@@ -21,7 +21,7 @@ import {
 
 // A desk hands the question to a person, and a cloud box answers it itself. [[spec/guidance/cloud]]
 test("branch escalate inserts a person step before the held leaf, drops the hold, and a desk pushes nothing", () => {
-  const { it, disk, outside } = doors(standing(), {}, { cloud: false });
+  const { it, disk, outside } = deskDoors(standing());
   heard(() => pulling(ROOT, ["pull"], it));
   assert.equal(JSON.parse(disk.read(HOLD)).step, "design/draft");
 
@@ -44,7 +44,7 @@ test("branch escalate inserts a person step before the held leaf, drops the hold
   );
   // [[spec/tickets/a-desk-pull-pushes-nothing]]
   assert.ok(
-    !ranGit(outside).includes(`git push origin ${BRANCH}`),
+    !ranGit(outside).includes("git push origin main"),
     "a desk's verb pushes nothing",
   );
 });

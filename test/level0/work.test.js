@@ -153,7 +153,7 @@ test("take stops on a tree carrying uncommitted work", () => {
     "git status --porcelain -uall": { stdout: " M a.md" },
   });
 
-  const { code, said } = heard(() => work(ROOT, ["take"], it));
+  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, cloud: true }));
 
   assert.equal(code, 2);
   assert.match(said, /uncommitted changes/);
@@ -183,7 +183,7 @@ test("the uncommitted check looks past a tagged ticket, and take carries on", ()
     { [on("one-group")]: GROUP_NOTE, [PARKED_AT]: parked, ...HAND },
   );
 
-  const { code, said } = heard(() => work(ROOT, ["take"], it));
+  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, cloud: true }));
 
   assert.equal(code, 0);
   assert.doesNotMatch(said, /uncommitted changes/);
@@ -200,7 +200,7 @@ test("take puts every tagged file back, so the reset leaves the tag standing", (
     { [on("one-group")]: GROUP_NOTE, [PARKED_AT]: parked, ...HAND },
   );
 
-  heard(() => work(ROOT, ["take"], it));
+  heard(() => work(ROOT, ["take"], { ...it, cloud: true }));
 
   const ran = ranGit(outside);
   assert.ok(ran.includes("git checkout -- spec/tickets/slow-lint.md"));
@@ -223,7 +223,7 @@ test("an untagged change still stops a take, and the tagged one beside it change
     { [PARKED_AT]: parked },
   );
 
-  const { code, said } = heard(() => work(ROOT, ["take"], it));
+  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, cloud: true }));
 
   assert.equal(code, 2);
   assert.match(said, /uncommitted changes/);
@@ -261,7 +261,7 @@ test("take refuses where this box stands ahead of origin", () => {
     "git rev-list --count origin/work/fix-lsp..work/fix-lsp": { stdout: "1\n" },
   });
 
-  const { code, said } = heard(() => work(ROOT, ["take"], it));
+  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, cloud: true }));
 
   assert.equal(code, 2);
   assert.match(said, /holds 1 commit\(s\) origin lacks/);
@@ -284,7 +284,7 @@ test("take refuses where the branch it picks holds a commit origin lacks", () =>
     { [on("one-group")]: GROUP_NOTE },
   );
 
-  const { code, said } = heard(() => work(ROOT, ["take"], it));
+  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, cloud: true }));
 
   assert.equal(code, 2);
   assert.match(said, /work\/one-group holds 3 commit\(s\) origin lacks/);

@@ -3,6 +3,7 @@
 // the record, moves the step, commits, pushes, and hands out the next leaf.
 // [[spec/design_output/pull#the-answers]]
 
+import { onDesk } from "../../.claude/skills/level0/lib/cloud.js";
 import { forEvidence } from "../../.claude/skills/level0/lib/guidance.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { checkNote } from "../../.claude/skills/level0/lib/schema.js";
@@ -35,10 +36,11 @@ import {
   workAnswer,
 } from "./pull-chapter.js";
 import {
+  branchTaken,
+  deskRefused,
   handOut,
   namedGroup,
   ticketsHere,
-  urgentGroup,
   withPersonStep,
 } from "./pull-hand.js";
 import {
@@ -85,6 +87,9 @@ export function pull(it, argv) {
 
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   const onTrunk = branch === TRUNK;
+  // A desk works on trunk alone, so its pull on a work branch reads nothing further. [[spec/design_output/work#a-desk-works-on-trunk]]
+  if (onDesk(it, branch))
+    return deskRefused(`the pull hands nothing out on ${branch}`);
   if (!onTrunk && !branch.startsWith("work/")) {
     console.error(
       `ticket pull runs on ${TRUNK} or a work branch, and this is ${branch}.`,
@@ -107,7 +112,7 @@ export function pull(it, argv) {
   if (rest.includes("--judge")) return judgeMaterial(it, held, name);
   if (rest.includes("--drop")) return dropped(it, who);
   if (verdict.said === "back") return takeBack(it, who, name, verdict.reason);
-  // A name on trunk that is a group takes its branch. [[spec/design_output/pull#the-engine-takes-the-branch]]
+  // A name on trunk that is a group takes its branch on a cloud box, and a desk refuses it. [[spec/design_output/pull#the-engine-takes-the-branch]]
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
   // A name with a leaf in hand hands that leaf back. A name with none asks for that ticket. [[spec/design_output/pull#the-hand-out]]
   const asking = Boolean(name) && !named && !verdict.said && !held;
@@ -134,9 +139,8 @@ export function pull(it, argv) {
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
   // A hand asking for one ticket takes no branch, because the queue answers neither. [[spec/design_output/pull#the-hand-out]]
   if (onTrunk && it.take && !asking) {
-    if (it.cloud && !named) return it.take();
-    const wanted = named || urgentGroup(it);
-    if (wanted || it.ready?.()) return wanted ? it.take(wanted) : 0;
+    const took = branchTaken(it, named);
+    if (took !== null) return took;
   }
   if (!fetched(it, branch)) return 1;
   if (group && closedGroup(it, group)) return groupDone(group);
