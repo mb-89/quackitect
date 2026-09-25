@@ -372,12 +372,11 @@ test("unblock on main frees a child by its own group field", () => {
   assert.match(said, /stands outside one-group/, "the verb names the child's group");
 });
 
-// A ticket on main standing in no group hands its person step out too, and the successor stands in no group alike. [[spec/tickets/the-desk-findings-need-an-answer]]
+// A ticket on main standing in no group hands its person step out too, and the successor stands in no group alike. [[spec/tickets/the-desk-findings-wait]]
 test("unblock on main frees a child standing in no group", () => {
-  const { it, disk } = doors(
-    standing(CHILD().replace("group: one-group\n", "")),
-    { "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
-  );
+  const { it, disk } = doors(standing(CHILD().replace("group: one-group\n", "")), {
+    "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+  });
 
   const { code, said } = heard(() =>
     work(ROOT, ["unblock", "a-child", "a-successor"], it),
@@ -387,7 +386,11 @@ test("unblock on main frees a child standing in no group", () => {
   const now = disk.read(at("spec/tickets/a-child.md"));
   assert.equal(fieldOf(now, "state"), "closed", "the child closes");
   assert.equal(fieldOf(now, "reason"), "became", "it closes as became");
-  assert.doesNotMatch(said, /stands (in|outside) [,.]/, "the verb names no empty group");
+  assert.doesNotMatch(
+    said,
+    /stands (in|outside) [,.]/,
+    "the verb names no empty group",
+  );
 });
 
 // [[spec/design_output/work#a-person-step-leaves]]

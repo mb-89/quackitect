@@ -112,7 +112,7 @@ function refuses(child, successor, group, nextName) {
     return `${child.name} names no group of ${group}, so this branch does not hold it.`;
   if (fieldOf(successor.text, "state") !== OPEN)
     return `${nextName} stands ${fieldOf(successor.text, "state")}, and a successor stands open.`;
-  // A ticket on main standing in no group frees no group, so a successor in no group stands outside it. [[spec/tickets/the-desk-findings-need-an-answer]]
+  // A ticket on main standing in no group frees no group, so a successor in no group stands outside it. [[spec/tickets/the-desk-findings-wait]]
   if (group && String(successor.front[GROUP] ?? "") === group)
     return `${nextName} stands in ${group}, and a successor stands outside the group it frees.`;
   return admits(successor, nextName);
