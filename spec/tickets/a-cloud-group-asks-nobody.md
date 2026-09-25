@@ -94,7 +94,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -106,6 +106,10 @@ record:
     hash_after: 72c970e44b46c42c421b97a9f42e2d0ab5a340fa
     returns: 1
     why: "| grade | finding | fix |; |---|---|---|; | design | `the-editor-takes-an-inset` and `the-owner-walks-a-ticket` stand open at a `by: person` step in the open group `the-editor-holds-the-drawing`, so the rule turns `./RUNME.sh check` red where it lands | name what the implement step does with the two, so the third line of the ask holds |; | design | `branch unblock` refuses on a cloud box, and the finding names it on every box | name the line the finding gives a cloud box, or name the change that lets a cloud box hand the question out as the ask says |; | craft | `waiting` in `src/scripts/ticket-yours.js` already names an open ticket at a person leaf | call it from the rule in place of a second reader |; | craft | the leaf reader stands in `src/scripts/pull-route.js`, and `lib/copilot-dispatch.js` already imports from `src` | import the reader where it stands, and drop the move |; | craft | `treeFaults` runs from `src/scripts/cli-read.js`, which the callers list leaves out | name `cli-read.js` in place of `cli-check.js` |; | craft | the approach names no test | name the fake tree the test feeds: a child at a person step refused, and a child closed `became` passed |"
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: a1d7cf67a1452cb44dfe9feb4004fdc860236f1c
+    hash_after: a1d7cf67a1452cb44dfe9feb4004fdc860236f1c
 ---
 
 # Ask
@@ -134,20 +138,32 @@ Without it a child at a person step stands in the cloud with nobody to answer it
 
 <!-- the form is text -->
 
-A tree rule `GroupAsksNobody` joins `RULES` in `.claude/skills/level0/lib/tree.js`, which the check runs at error. It reads every ticket under `spec/tickets`, and names one where all three hold:
+A tree rule `groupAsksNobody` joins `RULES` in `.claude/skills/level0/lib/tree.js`, which the check runs at error. It names a ticket where all three hold:
 
-- the ticket stands open, and names a `group`
-- that group stands open
-- the step the ticket stands at reads `by: person`
+- `waiting` in `src/scripts/ticket-yours.js` names it: open, at a `by: person` leaf
+- it names a `group`
+- that group's ticket stands open
 
 | part | what it does |
 |---|---|
-| the finding | names the ticket and its step, and says to run `./RUNME.sh branch unblock <ticket> <successor>` |
+| the module | `.claude/skills/level0/lib/group-asks.js`, beside `tree.js`, as `everyModuleTested` stands in `tested.js` |
+| the reading | the tickets under `spec/tickets`, through `tree.paths` and `tree.read` |
+| the person leaf | `waiting` answers it, so the rule writes no reader of its own |
+| the finding on a desk | names the ticket and its step, and the line `./RUNME.sh branch unblock <ticket> <successor>` |
+| the finding on a cloud box | names the ticket and its step, and points at rule 7 of [[spec/guidance/cloud]]: take the step and answer it |
 | an unblocked child | closes `became`, so the rule passes it |
-| the module | stands beside `tree.js`, because that file stands near the line ceiling |
-| the leaf reader | the one `branch unblock` uses. The implement step moves it from `src/scripts` into `lib`, and both callers import it there |
 | the design | [[spec/design_output/work#a-person-step-leaves]] gains one line: the check holds an open group to no person step |
-| a cloud box | answers the step itself, so its group passes the rule |
+
+The group `the-editor-holds-the-drawing` holds two children at a person step: `the-editor-takes-an-inset` and `the-owner-walks-a-ticket`. The implement step frees them before the rule lands:
+
+1. mint a successor for each, outside the group, opening at a `by: person` step
+2. on `work/the-editor-holds-the-drawing`, run `./RUNME.sh branch unblock` for each
+3. merge that branch to main, then land the rule, so `./RUNME.sh check` stands green
+
+The test is `test/level0/group-asks.test.js`. It feeds a fake tree with an open group and two children:
+
+- a child open at a `by: person` step, which the rule names
+- a child closed `became`, which the rule passes
 
 ### callers
 
@@ -156,9 +172,8 @@ A tree rule `GroupAsksNobody` joins `RULES` in `.claude/skills/level0/lib/tree.j
 <!-- the form is list -->
 
 - `.claude/skills/level0/lib/tree.js`, `treeFaults`, which runs `RULES`
-- `src/scripts/cli-check.js`, the check, which reports the tree faults
-- `src/scripts/work-unblock.js`, `unblock`, which reads the leaf through `leafOf` and `stepPathOf`
-- `src/scripts/pull.js`, `leafOf` and `stepPathOf`, where the leaf reader stands
+- `src/scripts/cli-read.js`, the sweep, which calls `treeFaults`
+- `src/scripts/ticket-yours.js`, `waiting`, which the rule calls and leaves as it stands
 
 ### answers
 
@@ -166,7 +181,12 @@ A tree rule `GroupAsksNobody` joins `RULES` in `.claude/skills/level0/lib/tree.j
 
 <!-- the form is list -->
 
-- first draft
+- two children stand open at a person step: the implement step unblocks both on their group's branch and merges it before the rule lands
+- `branch unblock` refuses on a cloud box: the finding on a cloud box points at rule 7 of the cloud guidance in its place
+- `waiting` already names a person leaf: the rule calls it
+- the leaf reader stands in `src/scripts/pull-route.js`: nothing moves, and `waiting` reaches it where it stands
+- `treeFaults` runs from `cli-read.js`: the callers name `cli-read.js`
+- the approach names no test: `test/level0/group-asks.test.js` feeds the fake tree the approach names
 
 ## review
 
