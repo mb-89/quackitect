@@ -35,8 +35,19 @@ const ticket = (state, names) =>
 const SHORT = ticket("open", ["draft"]);
 const LONG = ticket("open", ["draft", "review", "change", "test", "ship", "land", "tell"]);
 
-function doorOf({ files = {}, inset = true, theme = "dark" } = {}) {
-  const said = { pages: [], panels: [], folds: [], unfolds: [] };
+function doorOf({ files = {}, inset = true, theme = "dark", ran = {}, picked = "" } = {}) {
+  const said = {
+    pages: [],
+    panels: [],
+    folds: [],
+    unfolds: [],
+    ran: [],
+    saved: [],
+    says: [],
+    told: [],
+    picks: [],
+    jumps: [],
+  };
   const pageOf = (path, lines) => {
     const page = {
       path,
@@ -87,6 +98,19 @@ function doorOf({ files = {}, inset = true, theme = "dark" } = {}) {
     },
     folds: (path) => said.folds.push(path),
     unfolds: (path) => said.unfolds.push(path),
+    jumps: (path, line) => said.jumps.push([path, line]),
+    picks: async (prompt, options) => {
+      said.picks.push([prompt, options]);
+      return picked;
+    },
+    asksLine: async () => "the ask stands unmet",
+    saves: async (path) => said.saved.push(path),
+    runsVerb: async (argv) => {
+      said.ran.push(argv);
+      return ran[argv[1]] ?? { code: 0, out: "work\n  the next leaf\n", err: "" };
+    },
+    says: (lines) => said.says.push(lines),
+    tells: (title, detail, refused) => said.told.push([title, detail, refused]),
   };
 }
 
@@ -204,16 +228,6 @@ test("a longer route opens a taller inset, and a change of height opens it again
   assert.ok(short.said.pages.at(-1).lines > first.lines);
 });
 
-test("the verbs wait for the next ticket, so a press posts and runs nothing", async () => {
-  const door = doorOf();
-  const host = routeHostOf(door);
-  await host.opened(PATH, SHORT);
-  const page = door.said.pages[0];
-  for (const kind of ["take", "handback", "edit", "jump"])
-    await page.hears({ kind, step: "draft" });
-  assert.deepEqual(page.posts, []);
-});
-
 test("a longer route under the YAML side reopens the page hidden, and folds nothing", async () => {
   const door = doorOf();
   const host = routeHostOf(door);
@@ -239,4 +253,77 @@ test("a page the person closes leaves the host, so a change posts nothing", asyn
   host.themed();
   assert.deepEqual(page.posts, []);
   assert.deepEqual(host.lenses(PATH), []);
+});
+
+// [[spec/tickets/the-host-runs-the-verbs]]
+const VERDICT = [
+  "---",
+  "kind: [[ticket]]",
+  "state: open",
+  "step: review",
+  "steps:",
+  "  - name: review",
+  "    evidence:",
+  "      - name: verdict",
+  "        form: verdict",
+  "---",
+  "",
+  "# Ask",
+  "",
+].join("\n");
+
+async function pressed(message, options = {}, text = SHORT) {
+  const door = doorOf(options);
+  await routeHostOf(door).opened(PATH, text);
+  await door.said.pages[0].hears(message);
+  return door.said;
+}
+
+test("a jump opens the ticket at the line its node names", async () => {
+  const said = await pressed({ kind: "jump", step: "draft", chapter: "# draft", line: 12 });
+  assert.deepEqual(said.jumps, [[PATH, 12]]);
+  assert.deepEqual(said.ran, []);
+});
+
+test("an edit saves the ticket, and runs the route verb over the whole route", async () => {
+  const steps = [{ name: "draft", does: "works draft" }];
+  const said = await pressed({ kind: "edit", steps });
+  assert.deepEqual(said.saved, [PATH]);
+  assert.deepEqual(said.ran, [["ticket", "route", "one", `--steps=${JSON.stringify(steps)}`]]);
+  assert.deepEqual(said.told, []);
+});
+
+test("a press on the pointer takes the ticket", async () => {
+  const said = await pressed({ kind: "take", step: "draft" });
+  assert.deepEqual(said.ran, [["ticket", "pull", "one"]]);
+});
+
+test("a hand-back on a verdict leaf saves, and runs the pull the verdict decides", async () => {
+  const said = await pressed({ kind: "handback", step: "review" }, {}, VERDICT);
+  assert.deepEqual(said.picks, []);
+  assert.deepEqual(said.saved, [PATH]);
+  assert.deepEqual(said.ran, [["ticket", "pull", "one"]]);
+});
+
+test("a hand-back on another leaf asks pass or fail, and a closed pick runs nothing", async () => {
+  const passed = await pressed({ kind: "handback", step: "draft" }, { picked: "pass" });
+  assert.equal(passed.picks.length, 1);
+  assert.deepEqual(passed.ran, [["ticket", "pull", "one", "--pass"]]);
+
+  const failed = await pressed({ kind: "handback", step: "draft" }, { picked: "fail" });
+  assert.deepEqual(failed.ran, [["ticket", "pull", "one", "--fail", "the ask stands unmet"]]);
+
+  const closed = await pressed({ kind: "handback", step: "draft" });
+  assert.deepEqual(closed.ran, []);
+});
+
+test("a refused route edit shows its refusal as a warning", async () => {
+  const refused = {
+    code: 1,
+    out: JSON.stringify({ refused: "draft stands behind the pointer.", at: "draft" }),
+    err: "",
+  };
+  const said = await pressed({ kind: "edit", steps: [] }, { ran: { route: refused } });
+  assert.deepEqual(said.told, [["one: refused", "draft stands behind the pointer.", true]]);
+  assert.equal(said.says[0][0], "./RUNME.sh ticket route one --steps=[]");
 });

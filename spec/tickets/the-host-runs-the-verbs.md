@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-inset-folds-the-frontmatter, the-ticket-answers-the-editor, the-drawing-draws-a-route]
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -106,6 +106,17 @@ record:
     hand: box 75b31b3d5012 · claude-code-remote · helper-11
     hash_before: cf85e458a4e58ac8ac801e765e811b509c92c188
     hash_after: cf85e458a4e58ac8ac801e765e811b509c92c188
+  - step: implement/tests-red
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: bb6e52379bbad3a0c3c615a39346ee88bf4a430a
+    hash_after: bb6e52379bbad3a0c3c615a39346ee88bf4a430a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 6 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -228,17 +239,25 @@ The findings, each a detail the implement step carries:
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/route-host.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Each press case fails on its own assertion, since the host still answers `ready` alone. The case on the verbs waiting for this ticket goes, as the review asked. The fake `runsVerb` answers the pull's word by default, and a case hands it the route verb's refused JSON. So the refusal case reads the road the route takes, and the lens's own refusal stays with the lens test.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch the host test alone
+- every door call the host makes carries a fake in `doorOf`
+- the new cases point at this ticket
 
 ## reflect
 
