@@ -94,8 +94,13 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/draft
+step: design/review
 todo: true
+record:
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 783c6897343e892e2b01e854d7b0c053c6b2ae4f
+    hash_after: 783c6897343e892e2b01e854d7b0c053c6b2ae4f
 ---
 
 # Ask
@@ -127,17 +132,59 @@ Without it a design goes round a review five times, and a second review reads th
 
 <!-- the form is text -->
 
+The route loses its second review, and the engine carries the two roads out of the one review that stays.
+
+| part | the change |
+|---|---|
+| `spec/processes/standard.yaml` | drops the `verdict` phase and the `implement/reflect` leaf, whose input is that verdict; `to: retro` moves onto `implement` |
+| `design/draft` | gains the evidence field `tests`, as a list: every test the change adds, as a file and a test name |
+| `design/draft` | gains a checklist: every file, function and verb the approach names stands opened and checked; the callers list is complete; every done_when line has a named test |
+| `design/review` | reads `[[spec/guidance/review/design]]`, and its verdict field says pass, pass with findings one a line, or fail |
+| `spec/guidance/review/design.md` | a new guidance note, minted with its rationale: the review judges structure alone, and a form finding fails nothing |
+| `passed` in `src/scripts/pull-writes.js` | a verdict leaf passing with rows under the pass mints one child ticket a row, then moves on as today |
+| `failed` in `src/scripts/pull-writes.js` | at `work.failsBeforeOwner` returns, it calls `withPersonStep` before the target, with the reason as the question |
+| `work.failsBeforeWait` | renamed `work.failsBeforeOwner` in the config, its schema and `cli-doors.js` |
+| `spec/design_output/pull.md` | "The fail" and "A count inserts no step" say the new road; "The pass" names the children |
+
+A child ticket:
+
+- takes the name `<parent>-finding-<n>`, and `n` counts from one over the children the parent carries
+- follows `spec/processes/trivial.yaml`, through the mint verb the retro's `mint` in `src/engine/retro/mint.js` runs
+- carries the finding as `gain` and a link to the parent under `breaks`, through `withAsk` and `askOf` from the same file
+- stands at `todo`, because a finding carries no `done_when`; the hand that fills it opens it
+- lands in the parent's pass commit, and the commit line names it
+
+The second fail inserts `person-<n>` through the escalation's own function, so a desk sends it to the owner. A cloud box writes `by: anyone` there, as [[spec/guidance/cloud]] rules, and answers the question itself.
+
+The tests:
+
+- `test/level0/pull-steps.test.js`: a pass with two finding rows mints two children at todo, and the parent stands at `implement/tests-red`
+- `test/level0/pull-steps.test.js`: a bare pass mints no child
+- `test/level0/pull-person.test.js`: a first fail sends `design/review` back to `design/draft`, with no person step
+- `test/level0/pull-person.test.js`: a second fail inserts `person-1` before `design/draft`, `by: person`, asking the fail's reason
+- `test/level0/schema-route.test.js`: `standard.yaml` holds one leaf with a verdict field, at `design/review`, and `design/draft` holds `tests`
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/scripts/pull.js` `handBack`, which calls `passed` and `failed`
+- `src/scripts/pull.js` `refused`, which calls `failed` past `work.refusalsBeforeFail`
+- `src/scripts/pull.js` the escalate verb, which calls `withPersonStep`
+- `src/scripts/cli-doors.js` the door reading `work.failsBeforeWait` into `it.fails`
+- `src/engine/retro/mint.js` `mint`, whose `askOf` and `withAsk` the child mint reuses
+- `spec/guidance/review/reviewing.md`, which `design/review` stops reading and the group route keeps
+- every ticket on `spec/processes/standard.yaml`, which `./RUNME.sh ticket update` moves onto the new route
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first
 
 ## review
 
