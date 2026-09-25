@@ -258,9 +258,7 @@ person step, so `./RUNME.sh check` names each one until it leaves.
 
 So `branch done` meets no open child, the group closes, and one push carries the
 successor with it. The person answers on a ticket of their own, and every step
-behind them runs on.
-
-The verb refuses these:
+behind them runs on. The verb refuses these:
 
 - a hand standing on a cloud box, which answers the step itself
 - a ticket standing where a hand can take it

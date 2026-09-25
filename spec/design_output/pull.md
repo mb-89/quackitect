@@ -653,7 +653,7 @@ person step and the fail share one commit. The counts below stand:
 |---|---|
 | `work.refusalsBeforeFail` | fails the leaf back, carrying the count and the first finding, and the fail count reads it |
 | `work.failsBeforePerson` | puts a person step in before the target, asking the reason |
-| `work.stepsBeforeSplit`, reached | leaves the person step out, drops the hold and answers `wait` |
+| `work.stepsBeforeSplit`, at its cap | leaves the person step out, drops the hold and answers `wait` |
 
 A desk writes `by: person` on that step, and a cloud box writes `by: anyone`
 and answers it itself.
