@@ -94,7 +94,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -110,6 +110,12 @@ record:
     hand: box d6f05e3a585030 · claude-code
     hash_before: a1d7cf67a1452cb44dfe9feb4004fdc860236f1c
     hash_after: a1d7cf67a1452cb44dfe9feb4004fdc860236f1c
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-4
+    hash_before: b7536508e337614380d046f9ea6d290bcbc46d97
+    hash_after: b7536508e337614380d046f9ea6d290bcbc46d97
+    returns: 2
+    why: "| grade | finding | fix |; |---|---|---|; | design | `the-editor-takes-an-inset` and `the-owner-walks-a-ticket` stand open at a `by: person` step in the open group `the-editor-holds-the-drawing`, so the rule turns `./RUNME.sh check` red where it lands | name what the implement step does with the two, so the third line of the ask holds |; | design | `branch unblock` refuses on a cloud box, and the finding names it on every box | name the line the finding gives a cloud box, or name the change that lets a cloud box hand the question out as the ask says |; | craft | `waiting` in `src/scripts/ticket-yours.js` already names an open ticket at a person leaf | call it from the rule in place of a second reader |; | craft | the leaf reader stands in `src/scripts/pull-route.js`, and `lib/copilot-dispatch.js` already imports from `src` | import the reader where it stands, and drop the move |; | craft | `treeFaults` runs from `src/scripts/cli-read.js`, which the callers list leaves out | name `cli-read.js` in place of `cli-check.js` |; | craft | the approach names no test | name the fake tree the test feeds: a child at a person step refused, and a child closed `became` passed |; fail; | grade | finding | fix |; |---|---|---|; | design | `readingFor` in `src/scripts/cli-read.js` runs the JavaScript `RULES` only where `se-lsp` answers nothing, and the check's `rules` part takes the served list wherever `se-lsp` stands, so a rule in `tree.js` alone leaves `./RUNME.sh check` green and the first line of the ask fails | name the list the check reads under `se-lsp`: `Rules` in `src/lsp/check.go` with a Go test, or `aloneOver` in `src/bridge/findings.js` calling `waiting` |; | design | step 3 merges `work/the-editor-holds-the-drawing` to main, and `branch merge` takes a group at `done` alone, while four of its children stand open at `design/draft` | name a road the verbs take: the rule lands after the group merges, where the merge drops `group` from an open child, or name the verb that frees the two on main |; | craft | the tree a rule reads carries no environment, so the rule cannot tell a desk from a cloud box | name where the rule reads `inCloud` from `.claude/skills/level0/lib/cloud.js`, or give both boxes one finding naming both roads |; | craft | the callers list names `tree.js` and `cli-read.js` alone | name the callers of the list the first fix picks |"
 ---
 
 # Ask
@@ -208,6 +214,15 @@ fail
 | craft | the leaf reader stands in `src/scripts/pull-route.js`, and `lib/copilot-dispatch.js` already imports from `src` | import the reader where it stands, and drop the move |
 | craft | `treeFaults` runs from `src/scripts/cli-read.js`, which the callers list leaves out | name `cli-read.js` in place of `cli-check.js` |
 | craft | the approach names no test | name the fake tree the test feeds: a child at a person step refused, and a child closed `became` passed |
+
+fail
+
+| grade | finding | fix |
+|---|---|---|
+| design | `readingFor` in `src/scripts/cli-read.js` runs the JavaScript `RULES` only where `se-lsp` answers nothing, and the check's `rules` part takes the served list wherever `se-lsp` stands, so a rule in `tree.js` alone leaves `./RUNME.sh check` green and the first line of the ask fails | name the list the check reads under `se-lsp`: `Rules` in `src/lsp/check.go` with a Go test, or `aloneOver` in `src/bridge/findings.js` calling `waiting` |
+| design | step 3 merges `work/the-editor-holds-the-drawing` to main, and `branch merge` takes a group at `done` alone, while four of its children stand open at `design/draft` | name a road the verbs take: the rule lands after the group merges, where the merge drops `group` from an open child, or name the verb that frees the two on main |
+| craft | the tree a rule reads carries no environment, so the rule cannot tell a desk from a cloud box | name where the rule reads `inCloud` from `.claude/skills/level0/lib/cloud.js`, or give both boxes one finding naming both roads |
+| craft | the callers list names `tree.js` and `cli-read.js` alone | name the callers of the list the first fix picks |
 
 # implement
 
