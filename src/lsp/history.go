@@ -20,7 +20,12 @@ func isHistory(tree *Tree, path string) bool {
 	if !strings.HasPrefix(where, ticketsAt) || !strings.HasSuffix(where, ".md") {
 		return false
 	}
-	front := frontOf(yaml.SplitLines(tree.Read(where)))
+	// The disk decides, so a buffer writing the close draws its own warning until the engine writes it. [[spec/design_output/lsp#an-engine-field-warns]]
+	text, stands := tree.OnDisk(where)
+	if !stands {
+		return false
+	}
+	front := frontOf(yaml.SplitLines(text))
 	return yaml.AsString(front.Said.Get("state")) == closed
 }
 

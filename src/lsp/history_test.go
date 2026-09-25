@@ -30,3 +30,15 @@ func TestAClosedTicketBlocksNothing(t *testing.T) {
 		t.Fatalf("an open ticket keeps its dead pointer, and the sweep answers %v", rules(swept))
 	}
 }
+
+// The disk decides, so an open ticket whose buffer writes the close still draws its rows. [[spec/design_output/lsp#a-closed-ticket-is-history]]
+func TestABufferWritingTheCloseKeepsItsRows(t *testing.T) {
+	dead := "# Ask\n\nFor details, see [[spec/design_output/viewer]].\n"
+	tree := fixture(t, map[string]string{
+		"spec/tickets/open.md": "---\nstate: open\n---\n\n" + dead,
+	})
+	tree.Holds("spec/tickets/open.md", "---\nstate: closed\n---\n\n"+dead)
+	if isHistory(tree, "spec/tickets/open.md") {
+		t.Fatal("the buffer's close reads as history before the disk holds it")
+	}
+}
