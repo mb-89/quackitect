@@ -131,6 +131,8 @@ Without it a session edits and mints while the work tab shows nothing in its han
 
 <!-- the form is text -->
 
+The owner takes both fixes of the second review. The door reads the session's own hold through `holdOf` alone, and `privateStands` stays in the stop check. The draft names both tests, and each one refuses.
+
 ## draft
 
 <!-- writes the approach the ask calls for -->
