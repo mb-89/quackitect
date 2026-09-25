@@ -11,6 +11,7 @@ import {
   HOLDS,
   lensesOf,
   personEnv,
+  routeArgvOf,
   stepsIn,
   ticketLensOf,
   ticketOf,
@@ -329,4 +330,15 @@ test("a saved ticket whose route stands runs nothing, and says nothing", async (
   await ticketLensOf(door).saved(PATH, ticket("open", "design/draft"));
   assert.deepEqual(door.said.ran, []);
   assert.deepEqual(door.said.says, []);
+});
+
+// [[spec/tickets/the-host-runs-the-verbs]]
+test("a route edit builds the route line over the whole list", () => {
+  assert.deepEqual(routeArgvOf("one", [{ name: "do" }]), [
+    "ticket",
+    "route",
+    "one",
+    '--steps=[{"name":"do"}]',
+  ]);
+  assert.deepEqual(routeArgvOf("one"), ["ticket", "route", "one", "--steps=[]"]);
 });

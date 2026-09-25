@@ -327,3 +327,9 @@ test("a refused route edit shows its refusal as a warning", async () => {
   assert.deepEqual(said.told, [["one: refused", "draft stands behind the pointer.", true]]);
   assert.equal(said.says[0][0], "./RUNME.sh ticket route one --steps=[]");
 });
+
+test("a refusal carrying no JSON shows the verb's first line", async () => {
+  const refused = { code: 2, out: "", err: "route names no ticket: one\n" };
+  const said = await pressed({ kind: "edit", steps: [] }, { ran: { route: refused } });
+  assert.deepEqual(said.told, [["one: refused", "route names no ticket: one", true]]);
+});

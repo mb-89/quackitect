@@ -4,7 +4,16 @@
 // [[spec/tickets/the-inset-folds-the-frontmatter]]
 
 const { EMITTER, drawable } = require("./drawing.js");
-const { HOLDS, holdsIn, personHolds, ticketOf } = require("./lens.js");
+const {
+  HOLDS,
+  answerOf,
+  holdsIn,
+  personHolds,
+  routeArgvOf,
+  stepsIn,
+  ticketLensOf,
+  ticketOf,
+} = require("./lens.js");
 
 const FLIP = "quackitect.route.flip";
 const SCHEMA = ".claude/skills/level0/lib/schema.js";
@@ -14,6 +23,7 @@ const FLOOR = 8;
 const CEILING = 40;
 const YAML = "Show the YAML";
 const DRAWING = "Show the drawing";
+const HAND_BACKS = ["pass", "fail"];
 
 // [[spec/tickets/the-inset-folds-the-frontmatter]]
 function linesOf(graph) {
@@ -24,6 +34,7 @@ function linesOf(graph) {
 // [[spec/tickets/the-inset-folds-the-frontmatter]]
 function routeHostOf(door) {
   const shown = new Map();
+  const tickets = ticketLensOf(door);
 
   // The message the page draws: the graph, the route, and whether the person holds the ticket. [[spec/design_output/drawing#the-page-speaks-in-messages]]
   const graphOf = async (path, text) => {
@@ -44,7 +55,7 @@ function routeHostOf(door) {
   // A page the person closes leaves the host, so nothing posts to it again. [[spec/tickets/the-inset-folds-the-frontmatter#reflect]]
   const pageFor = (path, lines, one) => {
     const page = door.page(path, lines) ?? door.panel(path);
-    page.onMessage((message) => took(one, message));
+    page.onMessage((message) => took(path, one, message));
     page.onGone?.(() => {
       if (shown.get(path) === one) shown.delete(path);
     });
@@ -52,9 +63,9 @@ function routeHostOf(door) {
   };
 
   // The side a ticket shows outlives a reopen, so an edit under the YAML folds nothing. [[spec/tickets/the-inset-folds-the-frontmatter#reflect]]
-  const opens = (path, message, yaml) => {
+  const opens = (path, text, message, yaml) => {
     shown.get(path)?.page.dispose();
-    const one = { message, lines: linesOf(message.graph), yaml };
+    const one = { text, message, lines: linesOf(message.graph), yaml };
     one.page = pageFor(path, one.lines, one);
     shown.set(path, one);
     if (yaml) one.page.hide();
@@ -62,12 +73,41 @@ function routeHostOf(door) {
     return one;
   };
 
-  // A press on a node, the pointer or an edit waits for [[spec/tickets/the-host-runs-the-verbs]].
-  const took = async (one, message) => {
-    if (message?.kind !== "ready") return undefined;
-    one.page.post(one.message);
-    one.page.post(theme());
+  // Each press runs the verb it shows, and the next `changed` draws what the verb writes. [[spec/tickets/the-host-runs-the-verbs]]
+  const took = async (path, one, message) => {
+    const ticket = ticketOf(path);
+    const kind = message?.kind;
+    if (kind === "ready") {
+      one.page.post(one.message);
+      one.page.post(theme());
+      return undefined;
+    }
+    if (kind === "jump") return door.jumps(path, Number(message.line ?? 1));
+    if (kind === "edit") return routes(path, ticket, message.steps);
+    if (kind === "take") return tickets.took("take", ticket, path);
+    if (kind === "handback") return handsBack(path, ticket, one, String(message.step ?? ""));
     return undefined;
+  };
+
+  // The route verb writes the disk, so the ticket saves first, and a refusal raises a warning. [[spec/tickets/the-host-runs-the-verbs]]
+  const routes = async (path, ticket, steps) => {
+    await door.saves(path);
+    const argv = routeArgvOf(ticket, steps);
+    const ran = await door.runsVerb(argv);
+    const said = answerOf(ran);
+    door.says([`./RUNME.sh ${argv.join(" ")}`, "", ...said.lines]);
+    const refused = refusalIn(ran);
+    if (refused) door.tells(`${ticket}: refused`, refused, true);
+    return ran;
+  };
+
+  // A verdict leaf hands back with no flag, and another leaf asks pass or fail, as the ticket's buttons do. [[spec/design_output/extension#a-ticket-carries-its-buttons]]
+  const handsBack = async (path, ticket, one, step) => {
+    const leaf = stepsIn(one.text).find((each) => each.leaf && each.path === step);
+    if (leaf?.verdict) return tickets.took("back", ticket, path);
+    const picked = await door.picks(`Hand back ${step}`, HAND_BACKS);
+    if (!HAND_BACKS.includes(picked)) return undefined;
+    return tickets.took(picked, ticket, path);
   };
 
   return {
@@ -75,14 +115,15 @@ function routeHostOf(door) {
 
     async opened(path, text) {
       if (drawable(path) !== "ticket") return undefined;
-      return opens(path, await graphOf(path, text), false);
+      return opens(path, text, await graphOf(path, text), false);
     },
 
     async changed(path, text) {
       const one = shown.get(path);
       if (!one) return undefined;
       const message = await graphOf(path, text);
-      if (linesOf(message.graph) !== one.lines) return opens(path, message, one.yaml);
+      if (linesOf(message.graph) !== one.lines) return opens(path, text, message, one.yaml);
+      one.text = text;
       one.message = message;
       one.page.post(message);
       return one;
@@ -111,6 +152,16 @@ function routeHostOf(door) {
       return [{ title: one.yaml ? DRAWING : YAML, command: FLIP, arguments: [path] }];
     },
   };
+}
+
+// The route verb answers JSON, and a refusal names why in `refused`. [[spec/tickets/the-host-runs-the-verbs]]
+function refusalIn(ran) {
+  if (Number(ran?.code ?? 0) === 0) return "";
+  try {
+    return String(JSON.parse(String(ran?.out ?? "").trim()).refused ?? "");
+  } catch {
+    return answerOf(ran).detail || "the verb refused";
+  }
 }
 
 module.exports = { FLIP, linesOf, routeHostOf };

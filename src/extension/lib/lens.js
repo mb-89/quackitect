@@ -165,6 +165,11 @@ function argvOf(act, ticket, reason) {
   return lines[act] ? ["ticket", "pull", ...lines[act]] : [];
 }
 
+// The route a press in the drawing moves, as the whole list `ticket route` takes. [[spec/tickets/the-host-runs-the-verbs]]
+function routeArgvOf(ticket, steps) {
+  return ["ticket", "route", ticket, `--steps=${JSON.stringify(steps ?? [])}`];
+}
+
 // A save over a ticket naming a process and carrying no route runs the fill, which writes what the mint writes. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
 function fillArgvOf(path, text) {
   if (!ticketOf(path)) return [];
@@ -261,6 +266,7 @@ module.exports = {
   lensesOf,
   personEnv,
   personHolds,
+  routeArgvOf,
   stepsIn,
   ticketLensOf,
   ticketOf,

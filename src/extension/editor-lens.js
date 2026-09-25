@@ -60,6 +60,11 @@ function lensDoor(context, folder) {
       );
     },
 
+    // A closed pick answers empty. [[spec/tickets/the-host-runs-the-verbs]]
+    async picks(prompt, options) {
+      return (await vscode.window.showQuickPick(options, { placeHolder: prompt })) ?? "";
+    },
+
     async asksLine(prompt) {
       return (await vscode.window.showInputBox({ prompt, ignoreFocusOut: true })) ?? "";
     },

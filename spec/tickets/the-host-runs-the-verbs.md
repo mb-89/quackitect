@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-inset-folds-the-frontmatter, the-ticket-answers-the-editor, the-drawing-draws-a-route]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -117,6 +117,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: d3380c931a50f59bbf308e23ced960185a370cda
+    hash_after: d3380c931a50f59bbf308e23ced960185a370cda
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-host-runs-the-verbs.md:206:1: Shape: A run holds 3 paragraphs with no list, table or diagram between th"
 ---
 
 # Ask
@@ -285,11 +293,17 @@ Each press case fails on its own assertion, since the host still answers `ready`
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the host, the lens, the two doors and their tests, which the approach names
+- the jump, the pick, the save and the verb each carry a fake in the host test
+- each new function points at this ticket, and the hand-back at the design output on the ticket's buttons
 
 ## tests-green
 

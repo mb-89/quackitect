@@ -83,6 +83,15 @@ function insetDoor(context, folder) {
       }, drawn);
     },
 
+    // The graph counts lines from one, and the editor from nought. [[spec/tickets/the-host-runs-the-verbs]]
+    async jumps(path, line) {
+      const doc = await vscode.workspace.openTextDocument(
+        vscode.Uri.joinPath(folder.uri, ...path.split("/")),
+      );
+      const at = new vscode.Position(Math.max(0, line - 1), 0);
+      await vscode.window.showTextDocument(doc, { selection: new vscode.Range(at, at) });
+    },
+
     folds: (path) => onFirstLine(path, "editor.fold"),
     unfolds: (path) => onFirstLine(path, "editor.unfold"),
 
