@@ -387,6 +387,7 @@ test("a start registers the flip, and hands the editor the events the drawing op
   door.onEditors = (one) => handed.editors.push(one);
   door.onChange = (one) => handed.changes.push(one);
   door.onTheme = (one) => handed.themes.push(one);
+  door.list = async () => [];
   await activate({}, door);
 
   assert.equal(typeof door.said.commands.get(FLIP), "function");

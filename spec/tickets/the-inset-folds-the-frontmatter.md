@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -156,6 +156,17 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-inset-folds-the-frontmatter.md:175:1: CodeSpans: A sentence holds 4 code spans, and this one holds 5. C"
+  - step: implement/tests-green
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: e45673ac52f13309ed54e91e2509be6ac7f04aed
+    hash_after: e45673ac52f13309ed54e91e2509be6ac7f04aed
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 34 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-inset-folds-the-frontmatter.md:384:166: Sentence: A sentence holds 25 words. Cut this one in two."
 group: the-editor-holds-the-drawing
 depends_on: ["the-editor-takes-an-inset", "the-ticket-answers-the-editor", "the-drawing-draws-a-route"]
 ---
@@ -363,11 +374,15 @@ A stub host answering nothing leaves every case red but the one on a note outsid
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/route-host.test.js test/level0/sidebar.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -375,11 +390,21 @@ A stub host answering nothing leaves every case red but the one on a note outsid
 
 <!-- the form is text -->
 
+A ticket open in the editor now carries its route as a drawing over its first line, and the frontmatter folds under it. The drawing stands in an inset where the editor runs `createWebviewTextEditorInset`, and in a side panel otherwise. So the probe's open `decide` blocks nothing. A lens flips the drawing to the YAML and back, on every ticket whatever its state. An edit redraws the drawing, and a longer route opens a taller inset. A theme change reaches every page.
+
+The inset takes a proposed API, so `package.json` names `editorInsets`. The editor turns it on through `--enable-proposed-api quackitect.quackitect` or `argv.json`. A press on a node, the pointer or an edit posts nothing yet, since [[spec/tickets/the-host-runs-the-verbs]] runs the verbs behind them.
+
+The start also carries a case for the wire in `test/level0/sidebar.test.js`, which the commit hook asked for beside the code.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change stays inside the files the approach names, and the wire case joins the sidebar test
+- the host test fakes every call the host makes, and the wire case fakes the events
+- the host and the inset door point at this ticket in their headers
 
 # verdict
 

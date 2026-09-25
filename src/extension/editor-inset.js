@@ -6,7 +6,7 @@
 
 const vscode = require("vscode");
 
-// The bundle's folder, which src/scripts/bundle.js writes under the runtime folder, spelled again here because the extension bundles alone. [[spec/design_input/the-editor-draws-the-ticket#the-owner-rules]]
+// The bundle folder of src/scripts/bundle.js, under the runtime folder .claude/skills/level0/lib/folders.js owns, spelled again here because the extension bundles alone. [[spec/design_input/the-editor-draws-the-ticket#the-owner-rules]]
 const DRAWING = ".se/.runtime/drawing";
 const SCRIPT = "route.js";
 const STYLE = "route.css";
