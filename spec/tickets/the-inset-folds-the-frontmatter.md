@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -125,6 +125,10 @@ record:
     hash_after: 737916ddbdad2c1c22f6df09a987a17d77c148aa
     returns: 2
     why: The answers list meets each finding of the earlier review.; The door names `page`, `folds` and `unfolds` alone. Name the editor events that call `opened` and `changed`.; Those events cover the visible tickets, a switch of the active editor, and an edit to the text.; The host answers `theme` on open and on change. Name the door call reading the editor's theme, and its event.; The probe grows the inset to the height its page posts back. Name the inset's height, and the message growing it.; `held` reads a hold whose hand is the person, through `personHolds`. Export it from `lens.js`, or name the host's own reading.; `graphIn` and `readNote` load as modules into a CommonJS host. Name the `door.imports` call reaching each, as `graphAt` does.; `activate` runs over the fake `doorOf` in `sidebar.test.js`. Name the guard keeping it green there.
+  - step: design/person-1
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 39813f51c8b57783c2dd1b2e4dcdec1ee5509d1e
+    hash_after: 39813f51c8b57783c2dd1b2e4dcdec1ee5509d1e
 group: the-editor-holds-the-drawing
 depends_on: ["the-editor-takes-an-inset", "the-ticket-answers-the-editor", "the-drawing-draws-a-route"]
 ---
@@ -156,6 +160,8 @@ Without it the drawing of the two cloud groups reaches no editor. So a person re
 <!-- the answer, which the step behind this one reads -->
 
 <!-- the form is text -->
+
+The approach holds, and each finding asks for a name the draft leaves out. The next draft names each one, as the answers list shows. No finding changes the design, so the draft goes on.
 
 ## draft
 
