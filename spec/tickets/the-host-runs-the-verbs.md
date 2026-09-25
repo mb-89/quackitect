@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-inset-folds-the-frontmatter, the-ticket-answers-the-editor, the-drawing-draws-a-route]
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -125,6 +125,17 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-host-runs-the-verbs.md:206:1: Shape: A run holds 3 paragraphs with no list, table or diagram between th"
+  - step: implement/tests-green
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: dd4d4f705fa886d2a7397975106ff3755636fa63
+    hash_after: dd4d4f705fa886d2a7397975106ff3755636fa63
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 38 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-host-runs-the-verbs.md:214:1: Shape: A run holds 3 paragraphs with no list, table or diagram between th"
 ---
 
 # Ask
@@ -315,11 +326,15 @@ Each press case fails on its own assertion, since the host still answers `ready`
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/route-host.test.js test/level0/lens.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -327,11 +342,26 @@ Each press case fails on its own assertion, since the host still answers `ready`
 
 <!-- the form is text -->
 
+A press in the drawing over a ticket now runs what it shows:
+
+| the press | what runs |
+|---|---|
+| a node | the ticket opens at the node's chapter line |
+| a move or a drop | the ticket saves, and `ticket route` writes the whole route the page posts |
+| the pointer, free | the take the ticket's button runs |
+| the pointer, held | the hand-back the ticket's button runs, with a pick of pass or fail where the leaf holds no verdict |
+
+A refused route edit raises a warning naming why, and the log holds the verb's lines. The take and the hand-back ride `ticketLensOf().took`, so the drawing and the buttons share one road.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change stays in the host, the lens, the two doors and their tests
+- every door call carries a fake in the host test
+- each new function points at this ticket
 
 # verdict
 
