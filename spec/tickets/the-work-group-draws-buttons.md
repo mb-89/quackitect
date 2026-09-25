@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor, a-save-fills-the-ticket]
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -116,6 +116,17 @@ record:
     hand: box 75b31b3d5012 · claude-code-remote · helper-4
     hash_before: f818c23ca75ef164f5d376eaa4b21c91642afee2
     hash_after: f818c23ca75ef164f5d376eaa4b21c91642afee2
+  - step: implement/tests-red
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: cba1c8ca07fa4253970c40299b894194b7a0ea33
+    hash_after: cba1c8ca07fa4253970c40299b894194b7a0ea33
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 12 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -244,17 +255,25 @@ Every finding of the earlier review meets its answer:
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/work-group.test.js test/level0/work.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The group case seeds the real config through a JSON import, so it reads the buttons the config declares, and no disk. The fake door carries its own `doorOf`, since the sidebar test keeps its fake to itself. A stub `lib/work.js` answering nothing leaves each strings case red. The sidebar draws no `work` section yet, so the group cases fail on their own assertions.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch two new test files and the stub the approach names
+- the verbs, the name box, the file open, the save and the warning each carry a fake in `doorOf`
+- both test files and the stub point at this ticket
 
 ## reflect
 
