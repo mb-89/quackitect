@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -146,6 +146,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 75b31b3d5012 · claude-code-remote · helper-9
+    hash_before: 067e8cac1e4873538ae951b4716bc763095fd724
+    hash_after: 067e8cac1e4873538ae951b4716bc763095fd724
+reason: done
 ---
 
 # Ask
@@ -347,17 +352,39 @@ A save of a ticket in the editor now runs `./RUNME.sh ticket fill` where the tic
 
 <!-- the form is files -->
 
+- spec/tickets/a-save-fills-the-ticket.md
+- src/extension/lib/lens.js
+- src/extension/editor-lens.js
+- src/extension/extension.js
+- src/scripts/ticket.js
+- test/level0/lens.test.js
+- test/level0/save-fills.test.js
+- test/level0/sidebar.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+| grade | finding | fix |
+|---|---|---|
+| ask | `fillArgvOf` answers `ticket fill` over a picked process and no route, and `save-fills.test.js` runs the verb over a fake disk and finds `steps`, `process_hash` and a chapter | none |
+| ask | a standing route and an empty `process` answer nothing, and `lens.test.js` drives both | none |
+| check | `./RUNME.sh check` exits 0, and the three test files run 45 green | none |
+| craft | every hunk in `src` and `test` stands in the approach, and the `runsVerb` title change is the one the approach names | none |
+| craft | the wire test in `sidebar.test.js` asserts a function reaches `onSave`, not `tickets.saved` itself | a later change can compare it with the lens `door.lenses` gets |
+| retro | the hand-back carries no retro | none |
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the ticket folders stay in `FOLDERS` behind `ticketOf`, the route test stays in `stepsIn`, and the fill stays in `ticket fill`, so the save repeats no fact
 
 # Discussion
 
