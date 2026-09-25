@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -33,8 +34,8 @@ steps:
   - name: implement
     reads: [[spec/guidance/code/testing]]
     needs: ["branch test"]
-    input: design/draft
-    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements"]
+    input: ["design/draft", "design/review"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     steps:
       - name: tests-red
         does: writes the tests the ask calls for
@@ -46,14 +47,6 @@ steps:
           - name: seen
             form: text
             says: what you see, and what surprises you
-      - name: reflect
-        does: names the class of error in the findings, and the fix for the class
-        when: returned
-        input: verdict
-        evidence:
-          - name: class
-            form: text
-            says: the class of error the findings describe, and the fix for the class
       - name: change
         does: makes the change
         reads: [[spec/guidance/code/code]]
@@ -65,6 +58,7 @@ steps:
       - name: tests-green
         does: makes the tests pass
         input: tests-red
+        to: retro
         evidence:
           - name: tests
             form: command
@@ -77,24 +71,8 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-  - name: verdict
-    does: reads every hunk against the ask and the approach
-    not: implement
-    on_fail: implement/reflect
-    reads: [[spec/guidance/review/reviewing]]
-    input: ["diff", "implement"]
-    to: retro
-    checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
-    evidence:
-      - name: read
-        form: files
-        says: every file you read, one a line
-      - name: verdict
-        form: verdict
-        says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
-process_hash: 7a1a6e274b56e7ee
-step: design/review
+process_hash: 6bfe67ab65bf2e6d
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -193,22 +171,6 @@ The last row is an assumption, and the owner decides it. The god-mode fixes of t
 
 <!-- the form is checklist -->
 
-## reflect
-
-<!-- names the class of error in the findings, and the fix for the class -->
-
-### class
-
-<!-- the class of error the findings describe, and the fix for the class -->
-
-<!-- the form is text -->
-
-### checked
-
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
-
 ## change
 
 <!-- makes the change -->
@@ -248,28 +210,6 @@ The last row is an assumption, and the owner decides it. The god-mode fixes of t
 <!-- the form is text -->
 
 ### checked
-
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
-
-# verdict
-
-<!-- reads every hunk against the ask and the approach -->
-
-## read
-
-<!-- every file you read, one a line -->
-
-<!-- the form is files -->
-
-## verdict
-
-<!-- pass or fail, findings one a line -->
-
-<!-- the form is verdict -->
-
-## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
