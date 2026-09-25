@@ -237,14 +237,19 @@ export function formFault(it, field, rows, where, one, held) {
   return [];
 }
 
-// [[spec/design_output/pull#the-fields-hold-their-forms]]
+// A verdict field keeps every round, so the last row opening with pass or fail decides. [[spec/design_output/pull#the-fields-hold-their-forms]]
 export function verdictIn(rows) {
-  const first = String(rows[0] ?? "")
-    .replace(/^[-*]\s+/, "")
-    .trim();
-  const word = first.split(/[\s:.,]+/)[0].toLowerCase();
-  if (word !== "pass" && word !== "fail") return { said: "" };
-  const rest = [first.slice(word.length).replace(/^[\s:.,]+/, ""), ...rows.slice(1)]
+  const opener = (row) =>
+    String(row ?? "")
+      .replace(/^[-*]\s+/, "")
+      .trim()
+      .split(/[\s:.,]+/)[0]
+      .toLowerCase();
+  const at = rows.findLastIndex((row) => ["pass", "fail"].includes(opener(row)));
+  if (at < 0) return { said: "" };
+  const first = String(rows[at]).replace(/^[-*]\s+/, "").trim();
+  const word = opener(first);
+  const rest = [first.slice(word.length).replace(/^[\s:.,]+/, ""), ...rows.slice(at + 1)]
     .map((row) => row.replace(/^[-*]\s+/, "").trim())
     .filter(Boolean);
   return { said: word, reason: rest.join("; ") };

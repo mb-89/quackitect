@@ -145,6 +145,13 @@ test("a leaf's chapter reads its fields by heading, past the comments and the en
   assert.deepEqual(verdictIn(["maybe"]), { said: "" });
 });
 
+// A verdict field keeps every round, so the newest verdict decides. [[spec/design_output/pull#the-fields-hold-their-forms]]
+test("the newest verdict in a field of many rounds decides", () => {
+  const rounds = ["fail", "| craft | long | cut |", "Old words.", "pass", "| design | holds | none |"];
+  assert.deepEqual(verdictIn(rounds), { said: "pass", reason: "| design | holds | none |" });
+  assert.deepEqual(verdictIn(["pass", "fail: thin"]), { said: "fail", reason: "thin" });
+});
+
 // [[spec/design_output/pull#the-fields-hold-their-forms]]
 test("a command line the box finds nothing for comes back naming the shape a command field takes", () => {
   const it = {
