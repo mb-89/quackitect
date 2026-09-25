@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor]
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -112,6 +112,10 @@ record:
     hand: box 75b31b3d5012 · claude-code-remote
     hash_before: 63c8237d4219b03cff26cf91612212a0dcdb2355
     hash_after: 63c8237d4219b03cff26cf91612212a0dcdb2355
+  - step: design/review
+    hand: box 75b31b3d5012 · claude-code-remote · helper-4
+    hash_before: 8c9139f117ba30c7bd944982774bc484bae6d6fb
+    hash_after: 8c9139f117ba30c7bd944982774bc484bae6d6fb
 ---
 
 # Ask
@@ -187,13 +191,14 @@ The wire calls `door.onSave?.`, so the fake door `doorOf` in `test/level0/sideba
 
 <!-- the form is verdict -->
 
-fail
+pass
 
 | grade | finding | fix |
 |---|---|---|
-| design | the fake `runsVerb` in `test/level0/lens.test.js` stops at the argv, so no test named proves a save writes the route and chapters, which the first line of the ask calls for | name the test that runs `ticket fill` on the saved path over a fake disk and asserts `steps`, `process_hash` and a chapter per step |
-| craft | `activate` in `src/extension/extension.js` gets the fake door `doorOf` in `test/level0/sidebar.test.js`, which carries no `onSave`, and the callers list leaves it out | name `sidebar.test.js`, `doorOf` as a caller, and say whether the wire calls `door.onSave?.` or the fake gains `onSave` |
-| craft | `saved` calls `door.runsVerb` as a second caller, and the title change reaches `took` too | name `src/extension/editor-lens.js`, `runsVerb` in the callers list |
+| ask | the three done lines map to `fillArgvOf` over a picked process, a standing route and an empty `process`, and `ticket fill` holds the mint's road | none |
+| answers | the three findings of the earlier review each carry an answer: `save-fills.test.js`, `door.onSave?.` with `doorOf` named, and `runsVerb` named | none |
+| craft | the wire in `activate` carries no test, so a save that never reaches `saved` passes every test named | add a test in `test/level0/sidebar.test.js` that sets `door.onSave` and asserts it gets `tickets.saved`, the way the lens test reads `door.lenses` |
+| craft | a blank line splits the approach table, so the rows `the tests` and `the road` fall outside it | drop the blank line above `the tests` |
 
 # implement
 
