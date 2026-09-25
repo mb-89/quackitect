@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -175,6 +175,11 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/the-work-group-draws-buttons.md:446:1: Shape: A run holds 3 paragraphs with no list, table or diagram betwe"
+  - step: verdict
+    hand: box 75b31b3d5012 · claude-code-remote · helper-14
+    hash_before: 072921b099e7009a81fbf3f75db312069fb38125
+    hash_after: 072921b099e7009a81fbf3f75db312069fb38125
+reason: done
 ---
 
 # Ask
@@ -429,13 +434,17 @@ The first round wrote over the branch verb tests. This round restores both files
 
 - spec/tickets/the-work-group-draws-buttons.md
 - spec/guidance/review/reviewing.md
+- spec/design_input/the-editor-draws-the-ticket.md
 - spec/config/level0.schema.json
 - src/extension/lib/work.js
 - src/extension/sidebar.js
 - src/extension/lib/panel.js
 - src/extension/lib/lens.js
+- src/extension/editor.js
 - src/extension/editor-lens.js
 - src/extension/editor-files.js
+- test/level0/sidebar-work.test.js
+- test/level0/work-strings.test.js
 - test/level0/work.test.js
 - test/level0/work-group.test.js
 - test/contract/tree-extension.test.js
@@ -446,17 +455,17 @@ The first round wrote over the branch verb tests. This round restores both files
 
 <!-- the form is verdict -->
 
-fail
+pass
 
 | grade | finding | fix |
 |---|---|---|
-| blocking | The change overwrites `test/level0/work.test.js`, which held the branch verb cases. | Restore it from `93d05750`, and put the strings cases in a new file. |
-| blocking | The change overwrites `test/level0/work-group.test.js`, which held the group take, done and merge cases. | Restore it from `93d05750`, and put the sidebar cases in a new file. |
-| detail | About 48 cases over `src/scripts/work.js` vanish, and no other file holds them. | Check each restored case runs green beside the new files. |
+| detail | Both old test files match `93d05750` byte for byte, so the blocking findings stand met. | None. |
+| detail | Each done line carries a case in `sidebar-work.test.js` or `work-strings.test.js`. | None. |
+| detail | The pull runs through `ticketLensOf().took`, the road the ticket buttons run. | None. |
+| detail | `opens` and `asksVerb` read right, and `editorDoor` spreads both doors. | None. |
+| detail | The contract test change follows from the ask drawing the work buttons. | None. |
 
-The ask is met: the group draws, the count, the pull and the new ticket each carry a test.
-
-The source hunks match the approach, and both editor doors read right.
+The four test files run green, 60 cases in all.
 
 `./RUNME.sh check` answers 0 on this commit.
 
@@ -468,7 +477,7 @@ No retro stands in the handback.
 
 <!-- the form is checklist -->
 
-- the name form, the new ticket text and the argv split each stand once, in `lib/work.js`
+- the name form, the new ticket text and the line split each stand once, in `lib/work.js`
 
 # Discussion
 
