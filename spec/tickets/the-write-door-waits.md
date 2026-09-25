@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -34,6 +34,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
+step: answer
 ---
 
 # Ask
@@ -41,6 +42,14 @@ process_hash: 1f3006ec4b044a89
 <!-- question, as text: what a person decides, and the ticket the question comes from -->
 <!-- waits, as list: one line each, naming what stands still until the answer lands -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+
+Does the design of [[spec/tickets/a-write-needs-a-ticket]] take both fixes its second review names? The owner's answer stands there under `design/person-1`, and the findings stand under `Discussion`.
+
+- the ticket door on a write
+
+- a write refuses where the session holds no ticket and names the pull, and a test drives it
+- a ticket mint, a note and the handover pass with no ticket held, and the test drives each
+- `./RUNME.sh check` passes
 
 # answer
 
