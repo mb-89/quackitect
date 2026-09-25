@@ -195,7 +195,8 @@ Under `queue` the hook takes a stop on a helper's wait:
 
 - A helper running beside a ticket in hand ends the turn, and its answer wakes the session.
 - The same holds beside a group in hand, and beside a waiting queue.
-- A named pull refuses, save the ticket a verb mints for this session.
+- A named pull from an agent refuses, save the ticket a verb mints for this session.
+- A person's named pull passes, and so does one under `--owner-says`.
 - `retro new` sets `minted` to the retro it writes, and pulls it.
 - A refusal names the binding and who sets it: [[spec/design_output/stop#a-refusal-names-the-binding]].
 

@@ -22,7 +22,7 @@ import {
   withField,
 } from "../engine/group.js";
 import { dropHold, guidanceText, holdOf, writeHold } from "./guidance-hand.js";
-import { handOf, roleOf, SAYS } from "./pull-hand-of.js";
+import { byPerson, handOf, roleOf, SAYS } from "./pull-hand-of.js";
 import { landed } from "./pull-landed.js";
 import {
   chapterOf,
@@ -88,8 +88,7 @@ export function pull(it, argv) {
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   const onTrunk = branch === TRUNK;
   // A desk works on trunk alone, so its pull on a work branch reads nothing further. [[spec/design_output/work#a-desk-works-on-trunk]]
-  if (onDesk(it, branch))
-    return deskRefused(`the pull hands nothing out on ${branch}`);
+  if (onDesk(it, branch)) return deskRefused(`the pull hands nothing out on ${branch}`);
   if (!onTrunk && !branch.startsWith("work/")) {
     console.error(
       `ticket pull runs on ${TRUNK} or a work branch, and this is ${branch}.`,
@@ -116,8 +115,8 @@ export function pull(it, argv) {
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
   // A name with a leaf in hand hands that leaf back. A name with none asks for that ticket. [[spec/design_output/pull#the-hand-out]]
   const asking = Boolean(name) && !named && !verdict.said && !held;
-  // A ticket a verb mints for this session passes the queue. [[spec/design_output/config#the-engine-controls]]
-  if (asking && it.binding === QUEUE && name !== it.minted) {
+  // A ticket a verb mints for this session passes the queue, and so does a person's hand or the owner's word. [[spec/design_output/config#the-engine-controls]]
+  if (asking && it.binding === QUEUE && name !== it.minted && !byPerson(it, took)) {
     console.error(`${name} stands behind the queue, because this session binds to it.`);
     console.error(
       "Run ./RUNME.sh ticket pull with no name, and take what it hands you.",
@@ -241,7 +240,10 @@ export function escalate(it, argv) {
   // The step stands in the record by now, so the branch is what a hand pushes. [[spec/design_output/pull#the-rejected-push]]
   const sent = one.private ? { ok: true } : pushed(it, branch);
   if (!sent.ok) {
-    say(REFUSED, [`${put.path} stands on this box, and its push reaches no origin.`, ...sent.why]);
+    say(REFUSED, [
+      `${put.path} stands on this box, and its push reaches no origin.`,
+      ...sent.why,
+    ]);
     return 1;
   }
   const who = {
@@ -417,7 +419,10 @@ export function takeBack(it, who, name, path) {
   landed(it, one, [`${role} takes ${path} back`]);
   const sent = one.private ? { ok: true } : pushed(it, who.branch);
   if (!sent.ok) {
-    say(REFUSED, ["The take-back stands on this box, and its push reaches no origin.", ...sent.why]);
+    say(REFUSED, [
+      "The take-back stands on this box, and its push reaches no origin.",
+      ...sent.why,
+    ]);
     return 1;
   }
   say(WORK, [`${name} stands at ${path} again, and the next pull hands it out.`]);

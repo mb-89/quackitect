@@ -147,8 +147,17 @@ test("a leaf's chapter reads its fields by heading, past the comments and the en
 
 // A verdict field keeps every round, so the newest verdict decides. [[spec/design_output/pull#the-fields-hold-their-forms]]
 test("the newest verdict in a field of many rounds decides", () => {
-  const rounds = ["fail", "| craft | long | cut |", "Old words.", "pass", "| design | holds | none |"];
-  assert.deepEqual(verdictIn(rounds), { said: "pass", reason: "| design | holds | none |" });
+  const rounds = [
+    "fail",
+    "| craft | long | cut |",
+    "Old words.",
+    "pass",
+    "| design | holds | none |",
+  ];
+  assert.deepEqual(verdictIn(rounds), {
+    said: "pass",
+    reason: "| design | holds | none |",
+  });
   assert.deepEqual(verdictIn(["pass", "fail: thin"]), { said: "fail", reason: "thin" });
 });
 
@@ -162,7 +171,8 @@ test("a pass with findings answers findings, with the child's name and the findi
     ]),
     {
       said: "findings",
-      reason: "cut-the-long-line: the second line runs long; link-the-note: the note names no link",
+      reason:
+        "cut-the-long-line: the second line runs long; link-the-note: the note names no link",
       findings: [
         { name: "cut-the-long-line", line: "the second line runs long" },
         { name: "link-the-note", line: "the note names no link" },
@@ -174,13 +184,20 @@ test("a pass with findings answers findings, with the child's name and the findi
 // [[spec/tickets/one-review-a-ticket]]
 test("the newest opener decides between a pass with findings and a fail, and a plain pass with rows stays a pass", () => {
   assert.equal(
-    verdictIn(["fail: thin", "pass with findings", "- link-the-note: the note names no link"])
-      .said,
+    verdictIn([
+      "fail: thin",
+      "pass with findings",
+      "- link-the-note: the note names no link",
+    ]).said,
     "findings",
     "a pass with findings after a fail decides",
   );
   assert.deepEqual(
-    verdictIn(["pass with findings", "- link-the-note: the note names no link", "fail: thin"]),
+    verdictIn([
+      "pass with findings",
+      "- link-the-note: the note names no link",
+      "fail: thin",
+    ]),
     { said: "fail", reason: "thin" },
     "a fail after a pass with findings decides",
   );
@@ -490,6 +507,22 @@ test("under queue a named pull refuses, and the name this session minted passes"
     /a-child at design\/draft/,
     "the minted name hands that ticket out",
   );
+});
+
+// A person takes any ticket at any time, and the owner's word sends a hand the same way. [[spec/design_output/config#the-engine-controls]]
+test("under queue a person's named pull passes, and so does one under --owner-says", () => {
+  const person = doors(standing(), {}, { binding: "queue", agent: false });
+  const mine = heard(() => pulling(ROOT, ["pull", "a-child"], person.it));
+  assert.doesNotMatch(mine.said, /behind the queue/);
+  assert.match(
+    mine.said,
+    /a-child at design\/draft/,
+    "a person's name hands that ticket out",
+  );
+
+  const says = doors(standing(), {}, { binding: "queue" });
+  const sent = heard(() => pulling(ROOT, ["pull", "a-child", "--owner-says"], says.it));
+  assert.doesNotMatch(sent.said, /behind the queue/);
 });
 
 // [[spec/design_output/pull#done-leaves-no-takeable-step]]

@@ -9,7 +9,7 @@ import { IDENTITY } from "../../.claude/skills/level0/lib/vehicle.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { handOf } from "../../src/scripts/pull-hand-of.js";
+import { byPerson, handOf } from "../../src/scripts/pull-hand-of.js";
 
 const METHOD = "/method";
 const WORK = "/work";
@@ -38,4 +38,12 @@ test("a work root holding no box file takes the identity under the method root",
     "the identity file carries its own name",
   );
   assert.equal(handOf(it), "box d462e994b4cef · session s7 · claude-code");
+});
+
+// A person's hand takes any ticket, and the owner's word sends a hand the same way. [[spec/design_output/config#the-engine-controls]]
+test("a person's hand and the owner's word pass as a person, and an agent's hand alone does not", () => {
+  assert.equal(byPerson({}, "person"), true);
+  assert.equal(byPerson({}, "person somebody"), true);
+  assert.equal(byPerson({ ownerSays: true }, "box d462e994b4cef · claude-code"), true);
+  assert.equal(byPerson({}, "box d462e994b4cef · claude-code"), false);
 });

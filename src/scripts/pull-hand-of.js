@@ -64,6 +64,11 @@ export function roleOf(hand) {
   return said === PERSON || said.startsWith(`${PERSON} `) ? PERSON : said;
 }
 
+// A person's hand takes any ticket, and the owner's word sends a hand the same way. [[spec/design_output/config#the-engine-controls]]
+export function byPerson(it, hand) {
+  return roleOf(hand) === PERSON || Boolean(it.ownerSays);
+}
+
 function named(role, who) {
   const said = String(who ?? "").trim();
   return said ? `${role} ${said}` : role;
