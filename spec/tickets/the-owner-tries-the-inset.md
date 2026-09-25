@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -39,7 +39,19 @@ record:
     hand: box d6f05e3a585030 · claude-code · the owner says so
     hash_before: 0b8d33c950095ad932e55997f97c671b02208090
     hash_after: 0b8d33c950095ad932e55997f97c671b02208090
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: d8650b8d37e731a083fc7555b67f6c2546e9e87c
+    hash_after: 4c58425e35cf9f394fc77e6c6cd09fe2f4c1ed71
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 42 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
 step: do
+reason: done
 ---
 
 # Ask
@@ -72,11 +84,15 @@ Yes. The owner ran the probe, and its page stands between the lines of the ticke
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/route-host.test.js test/level0/sidebar.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -84,11 +100,17 @@ Yes. The owner ran the probe, and its page stands between the lines of the ticke
 
 <!-- the form is text -->
 
+The editor host is the inset. The group [[spec/tickets/the-editor-holds-the-drawing]] builds it, and its merge lands the host on `main`. The owner's `argv.json` turns the proposed API on from the next VS Code restart.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the answer: the host draws in an inset, and the merge carries it
+- the cleanup the change reveals stands in no note, since the probe's test route stays a trial
+- the host's design stands in [[spec/design_input/the-editor-draws-the-ticket]], and this ticket points there
 
 # Discussion
 
