@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -95,7 +95,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 step: verdict
-todo: true
+todo: false
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -135,6 +135,11 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/one-review-a-ticket.md:308:3: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: verdict
+    hand: box d6f05e3a585030 · claude-code · helper-7
+    hash_before: 223868996d6b2726f32abb2fcb0bba22cc1810d8
+    hash_after: 8cd87f0a38e98e5e73294490b798ab7be4593112
+reason: done
 ---
 
 # Ask
@@ -375,17 +380,53 @@ The check runs every test green, and exits 1 on form findings alone. The owner's
 
 <!-- the form is files -->
 
+- spec/processes/standard.yaml
+- spec/config/level0.json
+- spec/config/level0.schema.json
+- spec/schemas/ticket.schema.yaml
+- spec/design_output/pull.md
+- spec/design_output/review.md
+- spec/guidance/review/design.md
+- spec/guidance/review/reviewing.md
+- spec/rationales/design-review.md
+- spec/rationales/reviewing.md
+- spec/vocabulary/terms.yml
+- spec/config/styles/VoiceParagraph/Vocabulary.yml
+- spec/tickets/one-review-a-ticket.md
+- test/level0/work-answer.test.js
+- .claude/commands/se-config-work-failsBeforePerson.md
+- src/scripts/pull-writes.js
+- src/scripts/pull-chapter.js
+- src/scripts/pull.js
+- src/scripts/pull-hand.js
+- src/scripts/cli-doors.js
+- src/scripts/ticket.js
+- src/scripts/work-answer.js
+- test/level0/pull-findings.test.js
+- test/level0/pull-fails.test.js
+- test/level0/pull-leaves.test.js
+- test/level0/pull-steps.test.js
+- test/contract/process.test.js
+- test/contract/question-grades.test.js
+- test/contract/one-config.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass with findings
+- findings-reuse-the-note-mint: `minted` in `src/scripts/pull-writes.js` copies the note mint of `src/scripts/ticket.js` and skips its `askFaults` read. Build both through one function.
+- design-rule-links-its-check: rule 4 of `spec/guidance/review/design.md` restates the refusal `spec/design_output/pull.md` owns. Link the check in its place.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each fact stands in one place, but for the child build and the name refusal, and each rides out as a child above
 
 # Discussion
 
