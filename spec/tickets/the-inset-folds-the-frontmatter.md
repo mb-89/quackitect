@@ -1,10 +1,20 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: anyone
+        to: engine
+        asks: "design/review fails back 2 times: The answers list meets each finding of the earlier review.; The door names `page`, `folds` and `unfolds` alone. Name the editor events that call `opened` and `changed`.; Those events cover the visible tickets, a switch of the active editor, and an edit to the text.; The host answers `theme` on open and on change. Name the door call reading the editor's theme, and its event.; The probe grows the inset to the height its page posts back. Name the inset's height, and the message growing it.; `held` reads a hold whose hand is the person, through `personHolds`. Export it from `lens.js`, or name the host's own reading.; `graphIn` and `readNote` load as modules into a CommonJS host. Name the `door.imports` call reaching each, as `graphAt` does.; `activate` runs over the fake `doorOf` in `sidebar.test.js`. Name the guard keeping it green there."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -94,9 +104,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-group: the-editor-holds-the-drawing
-depends_on: [the-editor-takes-an-inset, the-ticket-answers-the-editor, the-drawing-draws-a-route]
-step: design/review
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -112,6 +119,14 @@ record:
     hand: box 75b31b3d5012 · claude-code-remote
     hash_before: 4fd4f9079ccaef655e629edb23fcc31537c84184
     hash_after: 4fd4f9079ccaef655e629edb23fcc31537c84184
+  - step: design/review
+    hand: box 75b31b3d5012 · claude-code-remote · helper-4
+    hash_before: 737916ddbdad2c1c22f6df09a987a17d77c148aa
+    hash_after: 737916ddbdad2c1c22f6df09a987a17d77c148aa
+    returns: 2
+    why: The answers list meets each finding of the earlier review.; The door names `page`, `folds` and `unfolds` alone. Name the editor events that call `opened` and `changed`.; Those events cover the visible tickets, a switch of the active editor, and an edit to the text.; The host answers `theme` on open and on change. Name the door call reading the editor's theme, and its event.; The probe grows the inset to the height its page posts back. Name the inset's height, and the message growing it.; `held` reads a hold whose hand is the person, through `personHolds`. Export it from `lens.js`, or name the host's own reading.; `graphIn` and `readNote` load as modules into a CommonJS host. Name the `door.imports` call reaching each, as `graphAt` does.; `activate` runs over the fake `doorOf` in `sidebar.test.js`. Name the guard keeping it green there.
+group: the-editor-holds-the-drawing
+depends_on: ["the-editor-takes-an-inset", "the-ticket-answers-the-editor", "the-drawing-draws-a-route"]
 ---
 
 # Ask
@@ -131,6 +146,16 @@ Without it the drawing of the two cloud groups reaches no editor. So a person re
 - `./RUNME.sh check` passes
 
 # design
+
+## person-1
+
+<!-- design/review fails back 2 times: The answers list meets each finding of the earlier review.; The door names `page`, `folds` and `unfolds` alone. Name the editor events that call `opened` and `changed`.; Those events cover the visible tickets, a switch of the active editor, and an edit to the text.; The host answers `theme` on open and on change. Name the door call reading the editor's theme, and its event.; The probe grows the inset to the height its page posts back. Name the inset's height, and the message growing it.; `held` reads a hold whose hand is the person, through `personHolds`. Export it from `lens.js`, or name the host's own reading.; `graphIn` and `readNote` load as modules into a CommonJS host. Name the `door.imports` call reaching each, as `graphAt` does.; `activate` runs over the fake `doorOf` in `sidebar.test.js`. Name the guard keeping it green there. -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -207,13 +232,14 @@ The tests stand in `test/level0/route-host.test.js`, over a fake door:
 <!-- the form is verdict -->
 
 fail
-- The ask calls for three tests, and the approach names none: the draw through a fake editor, the flip, and the redraw on a change. Name the test file and the case for each.
-- `lensesOf` reads `path`, `text` and `holds` alone, so the flip lens has no input saying which side shows. Name where that state lives and how it reaches `lensesOf`.
-- `lensesOf` answers nothing on a ticket whose `state` reads other than open, so a closed ticket gets no flip. Name where the flip lens stands apart from that return.
-- A lens runs `COMMAND`, and `argvOf` answers no verb for a flip. Name the command and the handler a press on the flip runs.
-- The jump belongs to the ask of [[spec/tickets/the-host-runs-the-verbs]]. Hand it on beside `take`, `handback` and `edit`.
-- The `graph` message carries `graph`, `steps` and `held`, and the host names `graph` alone. Name where `steps` and `held` come from, or hand them on. For details, see [[spec/design_output/drawing#the-page-speaks-in-messages]].
-- `src/scripts/bundle.js` writes the bundle into the workspace's runtime folder, outside the extension folder. Name that folder among `localResourceRoots`, and where the extension spells its path, since it bundles alone.
+- The answers list meets each finding of the earlier review.
+- The door names `page`, `folds` and `unfolds` alone. Name the editor events that call `opened` and `changed`.
+- Those events cover the visible tickets, a switch of the active editor, and an edit to the text.
+- The host answers `theme` on open and on change. Name the door call reading the editor's theme, and its event.
+- The probe grows the inset to the height its page posts back. Name the inset's height, and the message growing it.
+- `held` reads a hold whose hand is the person, through `personHolds`. Export it from `lens.js`, or name the host's own reading.
+- `graphIn` and `readNote` load as modules into a CommonJS host. Name the `door.imports` call reaching each, as `graphAt` does.
+- `activate` runs over the fake `doorOf` in `sidebar.test.js`. Name the guard keeping it green there.
 
 # implement
 
