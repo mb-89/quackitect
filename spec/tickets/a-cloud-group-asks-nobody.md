@@ -94,7 +94,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
@@ -136,6 +136,10 @@ record:
     hash_after: 6924e2bba3856c78122473775632c9d9c3b36b02
     returns: 4
     why: "| grade | finding | fix |; |---|---|---|; | design | `the-editor-takes-an-inset` and `the-owner-walks-a-ticket` stand open at a `by: person` step in the open group `the-editor-holds-the-drawing`, so the rule turns `./RUNME.sh check` red where it lands | name what the implement step does with the two, so the third line of the ask holds |; | design | `branch unblock` refuses on a cloud box, and the finding names it on every box | name the line the finding gives a cloud box, or name the change that lets a cloud box hand the question out as the ask says |; | craft | `waiting` in `src/scripts/ticket-yours.js` already names an open ticket at a person leaf | call it from the rule in place of a second reader |; | craft | the leaf reader stands in `src/scripts/pull-route.js`, and `lib/copilot-dispatch.js` already imports from `src` | import the reader where it stands, and drop the move |; | craft | `treeFaults` runs from `src/scripts/cli-read.js`, which the callers list leaves out | name `cli-read.js` in place of `cli-check.js` |; | craft | the approach names no test | name the fake tree the test feeds: a child at a person step refused, and a child closed `became` passed |; fail; | grade | finding | fix |; |---|---|---|; | design | `readingFor` in `src/scripts/cli-read.js` runs the JavaScript `RULES` only where `se-lsp` answers nothing, and the check's `rules` part takes the served list wherever `se-lsp` stands, so a rule in `tree.js` alone leaves `./RUNME.sh check` green and the first line of the ask fails | name the list the check reads under `se-lsp`: `Rules` in `src/lsp/check.go` with a Go test, or `aloneOver` in `src/bridge/findings.js` calling `waiting` |; | design | step 3 merges `work/the-editor-holds-the-drawing` to main, and `branch merge` takes a group at `done` alone, while four of its children stand open at `design/draft` | name a road the verbs take: the rule lands after the group merges, where the merge drops `group` from an open child, or name the verb that frees the two on main |; | craft | the tree a rule reads carries no environment, so the rule cannot tell a desk from a cloud box | name where the rule reads `inCloud` from `.claude/skills/level0/lib/cloud.js`, or give both boxes one finding naming both roads |; | craft | the callers list names `tree.js` and `cli-read.js` alone | name the callers of the list the first fix picks |; fail; | grade | finding | fix |; |---|---|---|; | craft | three answers contradict the approach: a merge on the group's branch, a rule calling `waiting`, and `test/level0/group-asks.test.js` | rewrite the three to the approach: unblock on `main`, a Go reader, `src/lsp/group_test.go` |; | craft | `leafOf` takes `by` from the nearest step on the path, and `stepPathOf` reads an empty `step` as the first leaf | name both in the Go reader, and feed `group_test.go` a leaf under a `by: person` parent |; | craft | the unblock table in [[spec/design_output/work#a-person-step-leaves]] reads the child \"in this group\" off the branch | name the line the design gains for `unblock` on `main`, beside the check's line |; The design findings of both earlier rounds stand answered. `./RUNME.sh check` on `main` exits 0.; fail; | grade | finding | fix |; |---|---|---|; | craft | `./RUNME.sh check` on `main` exits 1, on prose findings in this ticket alone | cut each line the check names, so the third line of the ask holds |; | craft | the check names lines under `## draft`: long sentences, long list items and a `never` | cut each line it names there |; | craft | the check names lines under `## review`, where the drafter writes nothing | the next review hand cuts each line the check names there |; The approach answers every design finding of the earlier rounds. The two children it frees stand alone at a person step in an open group."
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 06fa5b0e8cb66d7fbc231a89aea24c783b15c57a
+    hash_after: 06fa5b0e8cb66d7fbc231a89aea24c783b15c57a
 ---
 
 # Ask
@@ -176,9 +180,9 @@ A Go rule `groupAsksNobody` joins `Rules` in `src/lsp/check.go`, because the che
 | the leaf's `by` | the nearest step on the path that names `by`, and `anyone` where none does, as `leafOf` reads it |
 | an empty `step` | the first leaf of the route, as `stepPathOf` reads it |
 | the reading | the tickets under `spec/tickets`, through `tree.Names` and `tree.Read`. A closed ticket passes, as `isHistory` reads it |
-| the finding | names the ticket and its step, and both roads: a desk runs `./RUNME.sh branch unblock <ticket> <successor>`, and a cloud box takes the step, per rule 7 of [[spec/guidance/cloud]] |
+| the finding | names the ticket, its step and both roads. A desk runs `./RUNME.sh branch unblock <ticket> <successor>`. A cloud box takes the step, per rule 7 of [[spec/guidance/cloud]] |
 | an unblocked child | closes `became`, so the rule passes it |
-| the design | [[spec/design_output/work#a-person-step-leaves]] gains two lines: the check holds an open group to no person step, and on `main` the unblock verb reads the group off the child |
+| the design | [[spec/design_output/work#a-person-step-leaves]] gains two lines. The check holds an open group to no person step. On `main`, the unblock verb reads the group off the child |
 
 The leaf reader in `src/scripts/pull-route.js` stays for the pull. The Go rule reads the same `steps` shape, which the ticket schema owns.
 
@@ -192,7 +196,7 @@ The implement step frees the two children of `the-editor-holds-the-drawing` befo
 
 The tests:
 
-- `src/lsp/group_test.go` feeds a fake tree: a child open at a person step draws the finding, and a child closed `became` passes
+- `src/lsp/group_test.go` feeds a fake tree. A child open at a person step draws the finding, and a child closed `became` passes
 - the same test feeds a leaf with no `by` under a `by: person` parent, which draws the finding
 - `test/level0/unblock.test.js` gains a case: on `main`, the verb frees a child by its own `group` field
 
@@ -215,17 +219,17 @@ The tests:
 
 - two children stand open at a person step: the implement step unblocks both on `main` before the rule lands
 - `branch unblock` refuses on a cloud box: the finding names both roads, and a cloud box takes the step
-- `waiting` already names a person leaf: the rule stands in Go, so a Go reader reads the leaf as `leafOf` does
+- `waiting` already names a person leaf: the rule stands in Go, and its reader reads the leaf as `leafOf` does
 - the leaf reader stands in `src/scripts/pull-route.js`: nothing moves, and it stays for the pull
 - `treeFaults` runs from `cli-read.js`: the callers name `readingFor` there
 - the approach names no test: `src/lsp/group_test.go` feeds the fake tree the approach names
-- the check reads `se-lsp`'s list, so a rule in `tree.js` never fires: the rule stands in Go, in `Rules`
+- the check reads the Go list, so a rule in `tree.js` stays silent: the rule stands in Go, in `Rules`
 - `branch merge` takes a done group alone: nothing merges, and `unblock` runs on `main` off the child's `group` field
 - a rule cannot tell a desk from a cloud box: one finding names both roads
 - the callers name `tree.js` alone: they name the Go sweep, the check's reader and the unblock verb
 - the Go rule reads a leaf with no `waiting` to call: it carries a small leaf reader of its own
 - three answers disagree with the approach: each now names `main`, the Go reader and `group_test.go`
-- the Go reader names no `by` from a parent, and no empty `step`: the approach names both, and a test feeds the parent case
+- the Go reader skips a parent's `by` and an empty `step`: the approach names both, and tests the parent
 - the design reads the child's group off the branch: it gains a line for `unblock` on `main`
 
 ## review
