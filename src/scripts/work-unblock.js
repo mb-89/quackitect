@@ -83,11 +83,13 @@ export function unblock(it, name, argv) {
     return 1;
   }
 
-  console.log(`${name} closes became ${nextName}, which stands outside ${group}.`);
+  const outside = group ? `, which stands outside ${group}` : "";
+  console.log(`${name} closes became ${nextName}${outside}.`);
   console.log(
     `${nextName} carries the question ${leaf.path} asks, and waits for a person.`,
   );
-  console.log("Work what is left of this group, then run ./RUNME.sh branch done.");
+  if (group)
+    console.log("Work what is left of this group, then run ./RUNME.sh branch done.");
   return 0;
 }
 
@@ -110,7 +112,8 @@ function refuses(child, successor, group, nextName) {
     return `${child.name} names no group of ${group}, so this branch does not hold it.`;
   if (fieldOf(successor.text, "state") !== OPEN)
     return `${nextName} stands ${fieldOf(successor.text, "state")}, and a successor stands open.`;
-  if (String(successor.front[GROUP] ?? "") === group)
+  // A ticket on main standing in no group frees no group, so a successor in no group stands outside it. [[spec/tickets/the-desk-findings-need-an-answer]]
+  if (group && String(successor.front[GROUP] ?? "") === group)
     return `${nextName} stands in ${group}, and a successor stands outside the group it frees.`;
   return admits(successor, nextName);
 }
