@@ -13,8 +13,8 @@ function box() {
 }
 
 const ASK = {
-  id: "refactor",
-  why: "Twelve warnings stand.",
+  id: "update",
+  why: "The owner asks for an update.",
   react: "end this turn with a stop line",
   calls: 2,
 };
@@ -29,7 +29,7 @@ test("the ask rides the calls it lets pass, and a spent grace refuses the next",
     "one ask stands at a time",
   );
   const first = holdsGrace({ tool: "Read" }, it.box);
-  assert.match(first.after.context[0], /Twelve warnings stand\. 1 more call/);
+  assert.match(first.after.context[0], /The owner asks for an update\. 1 more call/);
   const second = holdsGrace({ tool: "Read" }, it.box);
   assert.match(second.after.context[0], /the last call that passes/);
   const third = holdsGrace({ tool: "Read" }, it.box);
@@ -65,7 +65,7 @@ test("the calls ending a turn pass a spent grace, a helper passes, and a reactio
   assert.equal(holdsGrace({ tool: "Read", agentId: "a1" }, it.box), null);
   assert.ok(holdsGrace({ tool: "Read" }, it.box).result.deny);
   assert.equal(reacted(it.box, "plan"), false, "another ask's reaction clears nothing");
-  assert.equal(reacted(it.box, "refactor"), true);
+  assert.equal(reacted(it.box, "update"), true);
   assert.equal(holdsGrace({ tool: "Read" }, it.box), null, "the calls pass again");
-  assert.equal(reacted(it.box, "refactor"), false, "nothing stands to clear");
+  assert.equal(reacted(it.box, "update"), false, "nothing stands to clear");
 });

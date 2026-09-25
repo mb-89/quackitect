@@ -15,7 +15,7 @@ rationale: [[spec/rationales/working]]
 7. Name the assumption you take where the owner says to carry on, and take it. Read `spec/design_input`, then ask the owner a design question before you build your own answer.
 8. Put a script of your own under `.se/scripts`, which git ignores.
 9. Read `.se/.runtime/tools.json` for the path of a tool, and run `./RUNME.sh tools` where that file is absent.
-10. Leave a line at warning as it stands, and carry on with the ask. The refactoring hand drains the warnings list, and a rewrite for form spends the turn the ask pays for. Fix any other fault you trip over where the fix is trivial. Write a deeper one down as a finding. *
+10. Leave a line at warning as it stands, and carry on with the ask. The push waits until the Problems panel stands clear. A rewrite for form spends the turn the ask pays for. Fix any other fault you trip over where the fix is trivial. Write a deeper one down as a finding. *
 11. Push when you want to, and ask nothing about it. Show a group's ask to the owner before it reaches the cloud. An unread ask builds the wrong thing on a cloud box. *
 12. Run `check_answer` over a draft answer past sixty words before you send it. A draft checked there meets the gate clean.
 13. Change many lines or files with `mcp__level0__patch` and `mcp__level0__replace`, and one spot with Edit.

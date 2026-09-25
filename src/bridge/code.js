@@ -4,7 +4,6 @@
 
 import { refusal } from "../../.claude/skills/level0/lib/refuse.js";
 import { FILE_RULE, grows } from "../../.claude/skills/level0/lib/size.js";
-import { listsWarning } from "../../.claude/skills/level0/lib/warnings.js";
 import { asks } from "./config.js";
 
 export async function codeDoor(e, writing, where, whole, box) {
@@ -21,9 +20,7 @@ export async function codeDoor(e, writing, where, whole, box) {
     });
     return {
       result: {
-        deny: [refusal(where, grown), listed(box, where, grown)]
-          .filter(Boolean)
-          .join("\n"),
+        deny: [refusal(where, grown), cutsOf(where, grown)].filter(Boolean).join("\n"),
       },
     };
   }
@@ -48,15 +45,10 @@ export async function codeDoor(e, writing, where, whole, box) {
   return { pass: true };
 }
 
-// A file past the file ceiling stands on the warnings list, and the refactoring hand cuts it. [[spec/design_output/level0#the-ceiling-feeds-the-list]]
-function listed(box, where, grown) {
-  const rows = grown.filter((one) => one.rule === FILE_RULE);
-  if (!rows.length) return "";
-  listsWarning(box, where, rows);
-  return [
-    `${where} stands on the warnings list, and the refactoring hand cuts it.`,
-    `To cut it now, run ./RUNME.sh split ${where} --to <path> --lines <from>-<to>.`,
-  ].join("\n");
+// A refusal naming the file ceiling names the verb that cuts the file. [[spec/design_output/level0#the-ceiling-names-the-cut]]
+function cutsOf(where, grown) {
+  if (!grown.some((one) => one.rule === FILE_RULE)) return "";
+  return `To cut ${where}, run ./RUNME.sh split ${where} --to <path> --lines <from>-<to>.`;
 }
 
 function textAt(disk, path) {

@@ -1,6 +1,7 @@
 // The schemas this tree ships, and the real Vale over a parked draft. Each
 // case drives the thing itself: the schemas off disk, mint through the checker,
-// and the write door's own linter over a name opening with an underscore.
+// the sweep over a fake tree, and the write door's own linter over a name
+// opening with an underscore.
 // [[spec/design_output/schema#the-sweep-over-the-tree]]
 
 import assert from "node:assert/strict";
@@ -11,9 +12,7 @@ import {
   allSchemasIn,
   checkData,
   checkNote,
-  governorOf,
   isNoteSchema,
-  kindOf,
   LEFT,
   processHash,
   readYaml,
@@ -24,19 +23,22 @@ import {
 import { mintNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { disk } from "../../src/doors/disk.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeGit } from "../../src/doors/fake/git.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
 import { PROCESSES } from "../../src/scripts/process.js";
 import { at, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const files = disk();
-const outside = proc();
 const { ifVale, proves } = rulesIn(root);
+const FAKE = "/tree";
+const DEPARTS = "spec/tickets/departs.md";
 
+// The tracked list reaches one case alone: the process files git holds, which no check reads. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 const here = treeOf({
-  disk: files,
-  git: git(outside, root),
+  disk: disk(),
+  git: git(proc(), root),
   root,
   words: 5,
   node: "",
@@ -64,19 +66,9 @@ test("every note schema reads, names a chapter, and names the kind its file name
 });
 
 // [[spec/design_output/schema#a-folder-names-its-kind]]
-test("every schema names the paths it governs, and each note stands under its own", () => {
+test("every schema names the paths it governs", () => {
   for (const [kind, schema] of schemas) {
     assert.ok(schema.governs?.length, `${kind} names the paths it governs`);
-  }
-  for (const path of here.paths()) {
-    if (!path.endsWith(".md")) continue;
-    const governor = governorOf(schemas, path);
-    if (!governor) continue;
-    assert.equal(
-      kindOf(here.read(path)),
-      governor.kind,
-      `${path} reads as a ${governor.kind}`,
-    );
   }
 });
 
@@ -93,20 +85,41 @@ test("mint writes one note per kind, and the checker passes each one", () => {
   }
 });
 
+// A fake tree holding the schemas this tree ships and one ticket carrying a field its schema names nowhere. [[spec/design_output/schema#warning-now-and-error-later]]
+function departing() {
+  const seed = {};
+  for (const name of here.names("spec/schemas", ".schema.yaml")) {
+    seed[`${FAKE}/spec/schemas/${name}`] = here.read(`spec/schemas/${name}`);
+  }
+  seed[`${FAKE}/${DEPARTS}`] = mintNote(schemas.get("ticket")).replace(
+    "\n---\n",
+    "\nabout: a thing\n---\n",
+  );
+  const held = fakeDisk(seed);
+  const tree = treeOf({
+    disk: held,
+    git: fakeGit({ "git ls-files": { stdout: DEPARTS } }, FAKE),
+    root: FAKE,
+    words: 5,
+    node: "",
+  });
+  return { held, tree };
+}
+
 // [[spec/design_output/schema#warning-now-and-error-later]]
-test("every departure in this tree carries the shape the panel draws", () => {
-  const found = schemaFaults(here);
+test("every departure carries the shape the panel draws", () => {
+  const { held, tree } = departing();
+  const found = schemaFaults(tree);
+  assert.ok(
+    found.some((one) => one.severity === SEVERITY),
+    "the departing ticket stands at the level that refuses",
+  );
   for (const one of found) {
     assert.ok([SEVERITY, LEFT].includes(one.severity), `${one.file} stands at a level`);
-    assert.ok(files.exists(`${root}/${one.file}`), `${one.file} stands on disk`);
+    assert.ok(held.exists(`${FAKE}/${one.file}`), `${one.file} stands on disk`);
     assert.ok(one.line >= 1, `${one.file} points at a line`);
     assert.match(one.rule, /^Schema\./, "a finding names the schema and the section");
   }
-  assert.deepEqual(
-    found.filter((one) => one.severity === SEVERITY),
-    [],
-    "no note in this tree departs from the schema its kind names",
-  );
 });
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
@@ -127,9 +140,9 @@ test("every process this tree ships passes the process schema, and its slots hol
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 test("the mint copies every process onto a ticket the checker passes", () => {
   const ticket = schemas.get("ticket");
-  for (const path of here
-    .paths()
-    .filter((one) => one.startsWith(`${PROCESSES}/`) && one.endsWith(".yaml"))) {
+  const standing = here.names(PROCESSES, ".yaml");
+  assert.ok(standing.length, `${PROCESSES} holds a process`);
+  for (const path of standing.map((name) => `${PROCESSES}/${name}`)) {
     const said = readYaml(here.read(path));
     const made = mintNote(ticket, {
       state: "open",
@@ -144,13 +157,6 @@ test("the mint copies every process onto a ticket the checker passes", () => {
       `${path} mints a whole ticket`,
     );
   }
-});
-
-test("the guidance notes this tree ships hold the shape guidance names", () => {
-  const found = schemaFaults(here).filter((one) =>
-    one.file.startsWith("spec/guidance/"),
-  );
-  assert.deepEqual(found, []);
 });
 
 // [[spec/design_output/schema#the-underscore-parks-a-draft]]

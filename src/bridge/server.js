@@ -64,8 +64,6 @@ import {
 } from "./plan.js";
 import { freshens } from "./projection.js";
 import { SPECS as proseSpecs, TOOLS as proseTools } from "./prose.js";
-import { onRefactorAnswered, REFACTOR_ANSWERED, tellsHand } from "./refactor-hand.js";
-import { releasesHold } from "./refactor-hold.js";
 import { movedCode, provesCode, SELF_TEST } from "./reload.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import {
@@ -124,7 +122,6 @@ const DOORS = {
   "tool.describe": onDescribe,
   "tool.call": onToolCall,
   [ANSWERED]: onAgentAnswered,
-  [REFACTOR_ANSWERED]: onRefactorAnswered,
 };
 
 const TOOLS = {
@@ -242,7 +239,6 @@ function opensSession(e, box) {
   box.tallies = {};
   // [[spec/design_output/level0#a-cache-follows-its-file]]
   dropsAll(box);
-  releasesHold(box);
   onSessionStart(e, box);
   box.projections = projectionsHere(box.disk, box.method);
   box.sources = sourcesOf(box.projections, box.disk, box.method, box.work);
@@ -275,7 +271,7 @@ async function onToolCall(e, box) {
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (!passes(said)) return said;
-  return held ?? ridesCall(e, box, tellsHand(e, box, owesCanary(e, box))) ?? PASS;
+  return held ?? ridesCall(e, box, owesCanary(e, box)) ?? PASS;
 }
 
 function passes(said) {

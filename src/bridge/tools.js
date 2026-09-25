@@ -38,7 +38,7 @@ async function mintsNote(e, box) {
       `${made.path} stands already. Name a path nothing holds yet.`,
       e,
     );
-  // The write carries the call's hand, so the hand holding a file mints it. [[spec/design_output/stop#the-hand-holds-its-file]]
+  // The write carries the call's hand, as the agent's own write does. [[spec/design_output/level0#the-write-door]]
   const door = await onWrite(
     { tool: "Write", file_path: at, content: made.text, agentId: e?.agentId },
     box,

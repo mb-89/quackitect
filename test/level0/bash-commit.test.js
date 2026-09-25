@@ -52,9 +52,25 @@ test("a message carrying a warning lands, and one carrying an error is refused",
     ...box(true),
     vale: { stands: () => true, lint: async () => ({ ran: true, found }) },
   });
-  const warned = [{ rule: "VoiceVale.Passive", line: 1, column: 1, severity: "warning", message: "passive" }];
+  const warned = [
+    {
+      rule: "VoiceVale.Passive",
+      line: 1,
+      column: 1,
+      severity: "warning",
+      message: "passive",
+    },
+  ];
   assert.equal(denied(await onBash({ command: COMMIT }, saying(warned))), "");
-  const erred = [{ rule: "VoiceParagraph.Vocabulary", line: 1, column: 1, severity: "error", message: "jargon" }];
+  const erred = [
+    {
+      rule: "VoiceParagraph.Vocabulary",
+      line: 1,
+      column: 1,
+      severity: "error",
+      message: "jargon",
+    },
+  ];
   assert.match(denied(await onBash({ command: COMMIT }, saying(erred))), /Vocabulary/);
 });
 
@@ -62,14 +78,25 @@ test("a merge commit passes the door whole", async () => {
   assert.equal(denied(await onBash({ command: COMMIT }, box(true))), "");
 });
 
-// A warning holds no push, because the refactoring hand drains it on the box. [[spec/design_output/config#the-engine-controls]]
+// A warning holds no push at this door. [[spec/design_output/config#the-engine-controls]]
 test("a push off a work branch lands whatever the lint says", async () => {
-  const warned = [{ rule: "VoiceVale.Passive", line: 1, column: 1, severity: "warning", message: "passive" }];
+  const warned = [
+    {
+      rule: "VoiceVale.Passive",
+      line: 1,
+      column: 1,
+      severity: "warning",
+      message: "passive",
+    },
+  ];
   const it = {
     ...box(false),
     vale: { stands: () => true, lint: async () => ({ ran: true, found: warned }) },
   };
-  assert.equal(denied(await onBash({ command: "git push origin claude/a-thing" }, it)), "");
+  assert.equal(
+    denied(await onBash({ command: "git push origin claude/a-thing" }, it)),
+    "",
+  );
 });
 
 // The change leaf stages code alone, and the test its tests-red leaf landed rides the ticket. [[spec/design_output/tree#the-rules-over-two-files]]

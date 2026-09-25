@@ -40,7 +40,6 @@ function boundBox(local, env = {}) {
     [at(TRACKED)]: JSON.stringify({
       stop: { enabled: true, mostInARow: 9, hold: "off" },
       engine: { binding: "unbound" },
-      refactor: { parallel: false },
     }),
     [at("spec/config/stop/level0.yml")]: RULES,
   };

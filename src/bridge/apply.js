@@ -74,7 +74,7 @@ async function lands(e, took, box) {
   return { result: { result: wrote.said } };
 }
 
-// The write carries the call's hand, so the hand holding a file patches it. [[spec/design_output/stop#the-hand-holds-its-file]]
+// The write carries the call's hand, as the agent's own write does. [[spec/design_output/level0#the-write-door]]
 async function checked(took, box, agentId) {
   for (const one of took.files) {
     const said = await onWrite(

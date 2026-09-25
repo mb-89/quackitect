@@ -23,17 +23,7 @@ const CONFIG = {
   stop: { enabled: true, mostInARow: 3, hold: "off" },
   answer: { enabled: true, warnAt: 5, ceiling: 15, words: 150 },
   engine: { binding: "unbound" },
-  refactor: {
-    parallel: true,
-    mostWarnings: 2,
-    mostAtOnce: 1,
-  },
 };
-const WARNINGS = Array.from({ length: 3 }, () => ({
-  file: "old.md",
-  rule: "VoiceParagraph.Sentence",
-  line: 1,
-}));
 const DONE = "stop: the-work-stands-complete";
 const REPORT = [
   "- The work stands complete.",
@@ -73,7 +63,6 @@ function served(plan = { working: "", todos: [], places: {} }) {
       [at("spec/config/level0.json")]: JSON.stringify(CONFIG),
       [at(RULES)]: disk().read(join(TREE, RULES)),
       [at(SURVEY)]: "{}",
-      [at(".se/.runtime/refactor.json")]: JSON.stringify(WARNINGS),
       [at(".se/.runtime/plan.json")]: JSON.stringify(plan),
     }),
     clock: fakeClock(),
@@ -92,13 +81,13 @@ const stops = (box, text) =>
 const blockOf = (said) => String(said?.result?.block ?? "");
 
 // [[spec/design_output/stop#the-stop-is-one-line]]
-test("the stop line alone ends a finished turn over warnings past the number", async () => {
+test("the stop line alone ends a finished turn", async () => {
   const said = await stops(served(), DONE);
   assert.equal(blockOf(said), "", "neither gate holds the turn");
 });
 
 // [[spec/design_output/stop#a-check-beats-a-claim]]
-test("a report closing on the stop line ends a finished turn over warnings past the number", async () => {
+test("a report closing on the stop line ends a finished turn", async () => {
   const said = await stops(served(), REPORT);
   assert.equal(blockOf(said), "", "neither gate holds the turn");
 });

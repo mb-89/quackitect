@@ -108,15 +108,16 @@ A branch tripping over a fault either fixes it or carries it forward.
 | trivial | costs a line, and a reader tells it from the ask at a glance, so the fix goes in |
 | deeper | costs the ask, burying work nobody asked for under work nobody asked for, so it becomes a finding, and the code stands |
 
-A warning marks a break of form, and the write lands over it. The door puts
-the rows on the refactoring hand's list, and the hand drains that list once it
-stands past its number. For details, see
-[[spec/design_output/level0#a-warning-feeds-the-list]].
+A warning marks a break of form, and the write lands over it. The warning
+stands in the Problems panel, and the push waits until the panel stands clear.
+For details, see [[spec/design_output/level0#the-panel-holds-a-warning]].
 
 Sessions still wrote the same file again to clear its warning, since a warning
 looked like a trivial fault tripped over. Each rewrite cost a round trip, and
-the ask waited behind form the hand cleans anyway. So a warning stands, the
-work goes on, and the retro reads the list for what the next session learns.
+the ask waited behind form. A refactoring hand once drained the warnings beside
+the session. The owner took it out, because the panel holds the one list and
+whoever pushes cleans it. So a warning stands, the work goes on, and the push
+clears the panel once, before anything leaves the box.
 
 ## 11. The owner reads an ask
 

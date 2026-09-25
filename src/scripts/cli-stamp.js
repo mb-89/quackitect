@@ -3,7 +3,7 @@
 // [[spec/design_output/work#the-battery-answers-first]]
 
 import { join } from "node:path";
-import { REFACTORS, STAMP } from "../../.claude/skills/level0/lib/runs.js";
+import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { filesOn } from "../../.claude/skills/level0/lib/warnings.js";
 import { partsTimed } from "./battery.js";
 import { files, it, root } from "./cli-doors.js";
@@ -29,7 +29,7 @@ export async function stamped(code, battery = null) {
   const sha = it.git.run(["rev-parse", "HEAD"], true).out;
   const at = join(root, STAMP);
   const clean = !it.git.run(["status", "--porcelain"], true).out;
-  // The list the lint left, so a door reading the stamp counts the warnings without a lint of its own. [[spec/tickets/the-spawn-reaches-its-guidance]]
+  // The list the lint left, so a door reading the stamp counts the warnings without a lint of its own. [[spec/design_output/work#the-battery-answers-first]]
   const stood = warningsStood();
   const said = stampFor({
     code,
@@ -42,8 +42,6 @@ export async function stamped(code, battery = null) {
     keep: await it.config.ask("battery.runs"),
   });
   files.makeDir(join(root, ".se"));
-  // The list stands in its own file, because the hand changes what it names and the stamp changes nothing. [[spec/design_output/stop#the-grace]]
-  files.write(join(root, REFACTORS), `${JSON.stringify(stood, null, 2)}\n`);
   files.write(at, `${JSON.stringify(said, null, 2)}\n`);
   return code;
 }
@@ -57,7 +55,16 @@ function lastStamp(at) {
 }
 
 // The stamp's shape, off what the check found; the battery's report rides it where one stands, and a retro keeps one a retro. [[spec/guidance/retro/effect]]
-export function stampFor({ code, sha, clean, at, stood = [], battery = null, before = null, keep = 1 }) {
+export function stampFor({
+  code,
+  sha,
+  clean,
+  at,
+  stood = [],
+  battery = null,
+  before = null,
+  keep = 1,
+}) {
   return {
     sha,
     ok: code === 0,

@@ -39,14 +39,6 @@ import { holdsTurn } from "./answer.js";
 import { bindingLine } from "./binding.js";
 import { asks, writes } from "./config.js";
 import { plansHere } from "./plan.js";
-import {
-  handWanted,
-  REFACTOR_ANSWERED,
-  refactorHand,
-  WALK_CALL,
-  walkSpec,
-  walks,
-} from "./refactor-hand.js";
 import { REPORT_CALL } from "./report.js";
 
 const ENABLED = "stop.enabled";
@@ -56,14 +48,14 @@ const MOST = "stop.mostInARow";
 const BREAK = "SE_BREAK_ON_STOP";
 const PASS = { pass: true };
 
-export const TOOLS = { [STOP_CALL]: claims, [WALK_CALL]: walks };
+export const TOOLS = { [STOP_CALL]: claims };
 
 export function rulesHere(disk, method) {
   return pool(readFolder(disk, join(method, RULES), ".yml")).rules;
 }
 
 export function SPECS(box) {
-  return [stopSpec(rulesOf(box)), walkSpec()];
+  return [stopSpec(rulesOf(box))];
 }
 
 // The three calls a turn ends with, which the hold at stop lets through. [[spec/design_output/stop#the-hold]]
@@ -229,15 +221,7 @@ export function onStop(e, box) {
     debugger;
     box.log.say("debug", "stop", "the debugger read the stop", paused);
   }
-  // The vote and the hand ride one answer, so the turn's block stands and the cleaning starts beside it. [[spec/tickets/the-spawn-reaches-its-guidance]]
-  const hand = refactorHand(box);
-  const answer = said.ends ? { ...PASS } : { result: { block: prompts } };
-  if (!hand) return answer;
-  return {
-    ...answer,
-    spawn: hand,
-    back: { event: REFACTOR_ANSWERED, file: hand.file },
-  };
+  return said.ends ? { ...PASS } : { result: { block: prompts } };
 }
 
 function endsWhy(said) {
@@ -302,8 +286,6 @@ const CHECKS = {
   "no-stop-line": (held) => !claimStands(held),
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
   "a-person-sits-here": (held) => !inCloud(held.box.env ?? {}),
-  // [[spec/tickets/the-spawn-reaches-its-guidance]]
-  "warnings-standing": (held) => handWanted(held.box),
   // [[spec/design_output/stop#a-talk-follows-a-report]]
   // A report an earlier message of this turn carries stands too, so a stop line sent alone repeats nothing. [[spec/design_output/stop#a-talk-follows-a-report]]
   "a-report-stands": (held) => reportStands(held.text) || Boolean(held.box?.reported),

@@ -59,12 +59,34 @@ test("a tool call on a fresh box registers the patch tool and the check tool", a
 test("a plan field on a level zero call answers the ask, and every such call takes the field", async () => {
   const box = restarted();
   const said = await reads(box);
-  assert.ok(specNamed(said.register, "report").inputSchema.properties.plan, "the report call takes the field");
-  await decide({ event: "tool.call", e: { tool: "mcp__level0__report", text: "hi", plan: { working: "the door" } } }, box);
+  assert.ok(
+    specNamed(said.register, "report").inputSchema.properties.plan,
+    "the report call takes the field",
+  );
+  await decide(
+    {
+      event: "tool.call",
+      e: { tool: "mcp__level0__report", text: "hi", plan: { working: "the door" } },
+    },
+    box,
+  );
   assert.equal(plansHere(box).working, "the door");
   // The field changes the plan alone, so a todo at the front lands with no queue read. [[spec/design_output/stop#the-plan]]
-  await decide({ event: "tool.call", e: { tool: "mcp__level0__report", text: "hi", plan: { add: [{ title: "a todo", place: 1 }] } } }, box);
-  assert.deepEqual(plansHere(box).todos.map((one) => `${one.title}:${one.todo}`), ["a todo:true"]);
+  await decide(
+    {
+      event: "tool.call",
+      e: {
+        tool: "mcp__level0__report",
+        text: "hi",
+        plan: { add: [{ title: "a todo", place: 1 }] },
+      },
+    },
+    box,
+  );
+  assert.deepEqual(
+    plansHere(box).todos.map((one) => `${one.title}:${one.todo}`),
+    ["a todo:true"],
+  );
 });
 
 // The server counts the agent's own calls, so the plan's ask comes round on them and on no helper's. [[spec/design_output/stop#the-plan]]
@@ -80,11 +102,26 @@ test("a call counts once on the box, and a helper's counts nowhere", async () =>
 // The engine's ask meets every call through the server, so a spent grace refuses a read and lets the stop call through. [[spec/design_output/stop#the-grace]]
 test("a spent grace refuses a call through the server, and the stop call passes it", async () => {
   const box = restarted();
-  box.grace = { id: "refactor", why: "Twelve warnings stand.", react: "end this turn with a stop line", left: 0 };
+  box.grace = {
+    id: "update",
+    why: "The owner asks for an update.",
+    react: "end this turn with a stop line",
+    left: 0,
+  };
   const said = await reads(box);
   assert.match(String(said.result?.deny ?? ""), /The grace is spent/);
-  const stop = await decide({ event: "tool.call", e: { tool: "mcp__level0__stop", reason: "the-work-stands-complete" } }, box);
-  assert.equal(stop.result?.deny, undefined, "the call ending the turn passes the grace");
+  const stop = await decide(
+    {
+      event: "tool.call",
+      e: { tool: "mcp__level0__stop", reason: "the-work-stands-complete" },
+    },
+    box,
+  );
+  assert.equal(
+    stop.result?.deny,
+    undefined,
+    "the call ending the turn passes the grace",
+  );
 });
 
 test("the mint spec names every kind the schemas hold", async () => {
@@ -153,8 +190,13 @@ test("a box building its own log writes at the level the config names, and follo
   });
   const said = { event: "tool.call", e: { tool: "Read" } };
   await box.log.event(said, await decide(said, box));
-  const kinds = () => (disk.exists(box.log.path) ? String(disk.read(box.log.path)) : "");
-  assert.doesNotMatch(kinds(), /"kind":"hook"/, "a hook event stays off an info box's disk");
+  const kinds = () =>
+    disk.exists(box.log.path) ? String(disk.read(box.log.path)) : "";
+  assert.doesNotMatch(
+    kinds(),
+    /"kind":"hook"/,
+    "a hook event stays off an info box's disk",
+  );
 
   disk.write(at(LOCAL), JSON.stringify({ log: { level: "debug" } }));
   await box.log.event(said, await decide(said, box));

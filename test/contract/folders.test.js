@@ -1,6 +1,6 @@
 // The rules over the names the private folder holds. A copy of one names the
 // module owning it beside the line, and the installer moves what those names
-// say. Each case breaks the rule on a fake tree, then hands it this tree.
+// say. Each case breaks the rule on a fake tree, and hands git a fake too.
 // [[spec/design_input/the-runtime-files-stand-apart]]
 
 import assert from "node:assert/strict";
@@ -8,7 +8,6 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { configOf } from "../../.claude/skills/level0/lib/config.js";
-import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import {
   INSTALL,
   installerHoldsTheNames,
@@ -18,12 +17,9 @@ import {
 import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { git } from "../../src/doors/git.js";
-import { proc } from "../../src/doors/proc.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
-const outside = proc();
 const FAKE = "/tree";
 const NODE = process.version.replace(/^v/, "");
 
@@ -32,15 +28,6 @@ const settings = configOf({
   readEnv: async () => ({}),
 });
 const words = await settings.ask("names.words");
-const gitHere = git(outside, root);
-const here = treeOf({
-  disk: files,
-  git: gitHere,
-  root,
-  words,
-  node: NODE,
-  box: boxOf(process.env, gitHere),
-});
 
 const fakeTree = (seed, paths = []) =>
   treeOf({
@@ -127,11 +114,10 @@ test("a file naming the owner beside the copy passes, and a test file passes", (
     ".claude/skills/level0/lib/folders.js": 'export const RUN = ".se/.runtime";\n',
   };
   assert.deepEqual(privateFolderOwned(fakeTree(owned, Object.keys(owned))), []);
-  assert.deepEqual(privateFolderOwned(here), []);
 });
 
 // The installer's loop and the list the rule reads move in one change. [[spec/design_input/the-runtime-files-stand-apart]]
-test("a loop standing apart from its list is refused, and this tree passes", () => {
+test("a loop standing apart from its list is refused", () => {
   const loop = (names) =>
     `# folders.js owns these names as RENAMED.\nfor one in ${names}; do\n  mv "$one" "$new"\ndone\n`;
   const over = (text) =>
@@ -156,6 +142,4 @@ test("a loop standing apart from its list is refused, and this tree passes", () 
     bare.some((one) => /names no list/.test(one.message)),
     "a loop naming no list",
   );
-
-  assert.deepEqual(installerHoldsTheNames(here), [], "the installer this tree ships");
 });

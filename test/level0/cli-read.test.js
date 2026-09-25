@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { lintRows, version, warningsStood } from "../../src/scripts/cli-read.js";
 
-// A warning lands under every door, and the refactoring hand drains the list the stamp carries. [[spec/design_output/config#the-engine-controls]]
+// A warning lands under every door, and the stamp carries the list. [[spec/design_output/config#the-engine-controls]]
 test("the warnings stand as a list, empty before any lint, and the version reads as text", () => {
   assert.deepEqual(
     warningsStood(),

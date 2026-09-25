@@ -84,7 +84,7 @@ a chat answer as much as a file, because the reader is the same person.
 A rule breaks in two ways. A break of form leaves the meaning standing. That is
 a sentence past the cap, a list item past its cap, a past tense, a passive, a
 mark outside the set. A hand fixes it without knowing what the line is for, so
-the refactoring hand takes it, and the write lands. A break of substance says
+the write lands, and the Problems panel holds the warning. A break of substance says
 a wrong thing: a word outside the core, a private name, a read past the doors.
 No hand fixes that without the writer, so the door refuses it there.
 

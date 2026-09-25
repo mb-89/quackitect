@@ -179,59 +179,6 @@ a time, and the calls ending a turn pass whatever stands.
 | the owner's ask for an update | the sidebar's ask, with `grace.update` calls before the reply is due | the reply, in the chat and through `report` |
 | the finish hold | the sidebar's hold at finish, with `grace.finish` calls before the calls refuse | the turn's end |
 
-## The hand walks the list
-
-One refactoring hand drains the list file after file. The stop door spawns it
-at a turn's end on the first file of the list, whatever its age, while the list stands past
-`refactor.mostWarnings`. It asks the agent nothing: no grace, no refused
-call, no stop. `refactor.mostAtOnce` bounds the spawns a session makes. The
-list stands in `.se/.runtime/refactor.json`, one entry a warning, which the
-lint writes at each check. The hand calls `refactor_next` as it finishes each file.
-
-| `refactor_next` finds | what it answers |
-|---|---|
-| a file on the list, and new to this hand | that file, held for this hand |
-| no file stands, or `refactor.mostFiles` spent | that no file waits, so the hand ends |
-| a call from outside the hand | a refusal |
-
-The hand stages, commits and pushes nothing. The session beside it lands
-what the hand leaves. The files a hand drains stay out of its walk, because
-the list names them until the next check.
-
-The log takes one line as the hand spawns, and one as it takes each file.
-A hand that falls writes its reason at `warn`. `walksList` and `drains` in
-`lib/warnings.js` hold the prompts.
-
-## The agent spawns instead
-
-A spawn the harness refuses keeps the walk and its hold. The agent's next
-call carries one block, once: spawn the hand in the background, on the
-`helper.change` model, with the walk's prompt. The agent's hand then calls
-`refactor_next` as the engine's hand does.
-
-## The hand holds its file
-
-Hands writing one file drop each other's work. So the refactoring hand
-holds the file it drains, and `refactor-hold.js` keeps the hold in
-`.se/.runtime/refactor-hold.json`.
-
-| when | what the hold does |
-|---|---|
-| the stop door spawns the hand | it names the file, no hand yet, and the time |
-| the first helper writes that file | its `agentId` fills the hand |
-| the hand calls `refactor_next` | the hold moves to the next file, with the hand and a fresh time |
-| the hand answers, or its spawn fails | `refactor.answered` takes the hold off |
-| the hold stands past `refactor.holdFor` | it reads as none, and the next hand takes the file |
-| a session starts | the hold comes off, because no hand of the last session answers here |
-
-The write door refuses the held file to every other hand, the session's own
-too. Write, Edit, the patch and the mint all carry the call's `agentId` there.
-
-The door tells hands apart by `agentId` alone. So the first helper to write the
-file owns it, whatever its spawn asks of it. A Bash write, as `sed -i`, meets no
-write door, so the hold covers it nowhere. A hand working past the span loses
-the hold, and the next hand to write its file takes it.
-
 ## The plan
 
 Where a model keeps a private todo list, this tree keeps it in the queue. A
@@ -255,7 +202,7 @@ digit and no more. For the words a place writes, see
 
 The count of calls reaches the number, and the ask stands due. It lands on the
 first call no other ask holds, and the count starts over at the answer alone.
-So a standing update or refactor ask delays it, and the ask lands once the
+So a standing update ask delays it, and the ask lands once the
 agent answers that one. A hand answering nothing spends the grace and meets the
 refusal.
 
@@ -437,9 +384,7 @@ A stop the owner drives carries no flag. `the-owner-asks-to-talk` reads the
 owner's own words, so it stands over every check but one.
 
 A check carrying `beside` reads a hand's work beside the agent, and no claim
-yields to it. `warnings-stand-past-the-number` carries it. The refactoring hand
-drains the list, so a claim of done ends the turn over it. The hand still
-spawns at that turn's end.
+yields to it.
 
 ## A talk follows a report
 

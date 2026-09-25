@@ -1,6 +1,5 @@
-// The bridgehead answering a vote and a hand in one call. The stop door votes
-// and starts the refactoring hand together, so this drives both out of one
-// answer over a fake session.
+// The bridgehead answering a vote and a hand in one call, so this drives both
+// out of one answer over a fake session.
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
 
 import assert from "node:assert/strict";
@@ -25,7 +24,7 @@ function session(said = { text: "the hand is done" }) {
   };
 }
 
-const HAND = { prompt: "drain old.md", description: "drain", kind: "refactor" };
+const HAND = { prompt: "read the branch", description: "read", kind: "review" };
 
 test("the hand runs, and the vote stands as the answer", async () => {
   const it = session();
@@ -34,7 +33,7 @@ test("the hand runs, and the vote stands as the answer", async () => {
     {
       result: { block: "carry on" },
       spawn: HAND,
-      back: { event: "refactor.answered", file: "old.md" },
+      back: { event: "agent.answered", file: "old.md" },
     },
     {},
     () => ({ pass: true }),
@@ -42,7 +41,7 @@ test("the hand runs, and the vote stands as the answer", async () => {
 
   assert.deepEqual(said, { block: "carry on" });
   assert.deepEqual(it.spawned, [HAND]);
-  assert.equal(it.posted[0].event, "refactor.answered");
+  assert.equal(it.posted[0].event, "agent.answered");
   assert.equal(it.posted[0].e.file, "old.md");
   assert.equal(it.posted[0].e.text, "the hand is done");
 });

@@ -80,14 +80,6 @@
   runs: work-waiting
   says: Something on your list stands unfinished, so carry on with it.
 
-- id: warnings-stand-past-the-number
-  side: continue
-  priority: 10
-  decides: mechanical
-  runs: warnings-standing
-  beside: true
-  says: The warnings stand past the number, and a hand drains them beside you. Carry on with your own work.
-
 - id: the-last-line-names-no-stop
   side: continue
   priority: 50

@@ -10,7 +10,6 @@ import {
   dropsHold,
   onStop,
   reportStands,
-  sawCall,
   sawPrompt,
   TOOLS,
 } from "../../src/bridge/stop.js";
@@ -54,13 +53,6 @@ const RULES = `
   asks: Does the work stand complete, with no todo open in the plan and nothing in hand there?
   says: The work stands complete, so this turn ends.
 
-- id: warnings-stand-past-the-number
-  side: continue
-  priority: 10
-  decides: mechanical
-  runs: warnings-standing
-  says: The warnings stand past the number, and a hand drains them beside you.
-
 - id: the-tooth-is-out
   side: continue
   priority: 0
@@ -69,21 +61,13 @@ const RULES = `
   says: The stop hook stands off.
 `;
 
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-const REFACTOR = {
-  parallel: true,
-  mostWarnings: 2,
-  mostAtOnce: 1,
-};
-
 const NOW = 1_800_000_000;
 
-function box(files = {}, refactor = REFACTOR) {
+function box(files = {}) {
   const disk = fakeDisk({
     [at("spec/config/level0.json")]: JSON.stringify({
       stop: { enabled: true, mostInARow: 3, hold: "off" },
       engine: { binding: "queue" },
-      refactor,
     }),
     [at("spec/config/stop/level0.yml")]: RULES,
     ...files,
@@ -102,26 +86,6 @@ function box(files = {}, refactor = REFACTOR) {
       }),
       log: { say: (...row) => said.push(row) },
     },
-  };
-}
-
-// The stamp the check leaves, and the list beside it, which the refactoring rule reads. [[spec/design_output/stop#the-hand-walks-the-list]]
-function stamped(warnings, names) {
-  const list = Array.from({ length: warnings }, (_, at) => ({
-    file: names[at % names.length],
-    rule: "VoiceParagraph.Sentence",
-    line: at + 1,
-  }));
-  return {
-    [at(".se/.runtime/check.json")]: JSON.stringify({
-      sha: "a1",
-      ok: true,
-      clean: true,
-      at: "2026-01-01T00:00:00Z",
-      warnings,
-      files: names,
-    }),
-    [at(".se/.runtime/refactor.json")]: JSON.stringify(list),
   };
 }
 
@@ -405,73 +369,6 @@ ${RULES}`;
   );
 });
 
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("the door answers the vote and the hand together, and the hand takes the first file on the list, whatever its age", () => {
-  const it = box(stamped(9, ["old.md", "new.md"]));
-  const said = onStop({ last_assistant_message: "Some text and no stop." }, it.box);
-
-  assert.match(said.result.block, /names no stop reason/);
-  assert.equal(said.spawn.kind, "refactor");
-  assert.equal(said.spawn.file, "new.md");
-  assert.match(said.spawn.prompt, /new\.md/);
-  assert.equal(said.back.event, "refactor.answered");
-});
-
-// The engine starts the hand itself and asks the agent nothing, so a call under a long list opens no grace and reads no list. [[spec/design_output/stop#the-hand-walks-the-list]]
-test("a call under a long list asks the agent nothing, and the turn's end starts the hand", () => {
-  const it = box(stamped(9, ["old.md", "new.md"]));
-  const logs = () => it.box.proc.ran.filter((one) => one.argv[1] === "log");
-  sawCall({ tool: "Read" }, it.box);
-  assert.equal(it.box.grace, undefined, "the call opens no ask");
-  assert.equal(logs().length, 0, "the call asks git nothing");
-  const said = onStop({ last_assistant_message: "Some text and no stop." }, it.box);
-  assert.equal(said.spawn.file, "new.md");
-  assert.equal(
-    logs().length,
-    0,
-    "the hand asks git nothing, since no file's age holds it back",
-  );
-});
-
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("the hand goes once a session, and the flag off starts none", () => {
-  const it = box(stamped(9, ["old.md"]));
-  const turn = { last_assistant_message: "Some text and no stop." };
-
-  assert.equal(onStop(turn, it.box).spawn.file, "old.md");
-  assert.equal(onStop(turn, it.box).spawn, undefined, "the count bounds the session");
-
-  const off = box(stamped(9, ["old.md"]), { ...REFACTOR, parallel: false });
-  assert.equal(onStop(turn, off.box).spawn, undefined);
-});
-
-// A rule reading the list alone holds every turn open on a tree carrying warnings. [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("the vote holds the turn open while a hand wants to go, and lets it end after", () => {
-  const it = box(stamped(9, ["old.md"]));
-  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
-
-  assert.match(onStop(done, it.box).result.block, /warnings stand past the number/);
-  assert.deepEqual(
-    onStop(done, it.box),
-    { pass: true },
-    "the count spends, and the turn ends",
-  );
-
-  const off = box(stamped(9, ["old.md"]), { ...REFACTOR, parallel: false });
-  assert.deepEqual(onStop(done, off.box), { pass: true }, "the flag off holds no turn");
-});
-
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("a list under the number starts no hand, and the vote reads the stamp", () => {
-  const it = box(stamped(1, ["old.md"]));
-  const said = onStop(
-    { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" },
-    it.box,
-  );
-
-  assert.deepEqual(said, { pass: true });
-});
-
 test("the queue holds a stop on completion while a free ticket stands", () => {
   const free =
     "---\nkind: [[ticket]]\nstate: open\nurgency: soon\nsteps:\n  - name: do\n---\n\n# Ask\n\nA thing.\n";
@@ -506,7 +403,6 @@ function heldBox(hold) {
     [at("spec/config/level0.json")]: JSON.stringify({
       stop: { enabled: true, mostInARow: 3, hold },
       engine: { binding: "queue" },
-      refactor: REFACTOR,
     }),
     [at("spec/config/stop/level0.yml")]: HOLD_RULES,
   });

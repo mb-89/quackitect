@@ -25,7 +25,6 @@ const EVERY = [
   "queue-waits",
   "no-stop-line",
   "a-person-sits-here",
-  "warnings-standing",
 ];
 
 const onTrunk = { "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } };
@@ -49,8 +48,6 @@ test("the checks reading the engine's own work stand down at god", () => {
   assert.equal(typeof standsDown, "function", "stop.js answers standsDown");
   const wanted = ["ticket-in-hand", "group-in-hand", "work-waiting"];
   for (const name of wanted) assert.equal(standsDown(name, "god"), true, name);
-  // A warning lands under every binding, and the hand drains it, so the check stands at god too. [[spec/design_output/config#the-engine-controls]]
-  assert.equal(standsDown("warnings-standing", "god"), false);
 });
 
 test("those same checks hold at the queue and at unbound", () => {
@@ -79,8 +76,12 @@ test("the list names the three, and the stop rules name each of them", () => {
 });
 
 test("the gate answers every name this list holds, and the gate names fewer", () => {
-  assert.ok(EVERY.length > (ENGINE_CHECKS ?? []).length, "the door answers more than the gate");
-  for (const name of EVERY) assert.equal(typeof standsDown(name, "queue"), "boolean", name);
+  assert.ok(
+    EVERY.length > (ENGINE_CHECKS ?? []).length,
+    "the door answers more than the gate",
+  );
+  for (const name of EVERY)
+    assert.equal(typeof standsDown(name, "queue"), "boolean", name);
 });
 
 // The pull hands out at the queue alone, on every road. [[spec/design_output/config#the-engine-controls]]

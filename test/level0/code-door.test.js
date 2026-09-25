@@ -7,8 +7,6 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { TICKETS as NOTES } from "../../.claude/skills/level0/lib/folders.js";
-import { REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
-import { FILE_RULE } from "../../.claude/skills/level0/lib/size.js";
 import { codeDoor } from "../../src/bridge/code.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
@@ -88,24 +86,9 @@ test("a write under every ceiling passes, and a cut to a file past its ceiling p
   assert.match(grown.result.deny, /FileCeiling/);
 });
 
-const listOf = (it) => {
-  try {
-    return JSON.parse(it.disk.read(at(REFACTORS)));
-  } catch {
-    return [];
-  }
-};
-
-// [[spec/design_output/level0#the-ceiling-feeds-the-list]]
-test("a file ceiling puts one row on the warnings list, twice refused or once, and mints no note", async () => {
+// [[spec/design_output/level0#the-ceiling-names-the-cut]]
+test("a file ceiling names the cut, and mints no note", async () => {
   const it = box();
-  it.disk.write(
-    at(REFACTORS),
-    JSON.stringify([
-      { file: "src/a.js", rule: "MagicNumber", line: 3, severity: "warning" },
-      { file: "src/b.js", rule: FILE_RULE, line: 1, severity: "warning" },
-    ]),
-  );
 
   const tall = new Array(7).fill("const one = 1;").join("\n");
   const path = at("src/a.js");
@@ -113,21 +96,7 @@ test("a file ceiling puts one row on the warnings list, twice refused or once, a
 
   const said = await codeDoor(...ask);
   assert.match(said.result.deny, /FileCeiling/);
-  assert.match(said.result.deny, /stands on the warnings list/);
   assert.match(said.result.deny, /RUNME\.sh split src\/a\.js --to/);
-
-  await codeDoor(...ask);
-  const list = listOf(it);
-  const ceiling = list.filter(
-    (one) => one.file === "src/a.js" && one.rule === FILE_RULE,
-  );
-  assert.equal(ceiling.length, 1, "a second refusal keeps one row");
-  assert.deepEqual(
-    [ceiling[0].line, ceiling[0].severity, ceiling[0].source],
-    [1, "warning", "door"],
-  );
-  assert.match(ceiling[0].message, /A file holds 6 lines, and the file holds 7/);
-  assert.equal(list.length, 3, "the file's other rule and the other file stand");
   assert.equal(
     it.disk.exists(at(NOTES)),
     false,
@@ -136,7 +105,7 @@ test("a file ceiling puts one row on the warnings list, twice refused or once, a
 });
 
 // [[spec/design_output/level0#the-size-ceiling]]
-test("a function ceiling alone puts nothing on the list", async () => {
+test("a function ceiling alone names no cut", async () => {
   const it = box();
   const long = [
     "function s() {",
@@ -156,6 +125,5 @@ test("a function ceiling alone puts nothing on the list", async () => {
   );
 
   assert.match(said.result.deny, /FunctionCeiling/);
-  assert.doesNotMatch(said.result.deny, /warnings list/);
-  assert.deepEqual(listOf(it), []);
+  assert.doesNotMatch(said.result.deny, /RUNME\.sh split/);
 });

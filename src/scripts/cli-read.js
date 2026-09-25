@@ -7,7 +7,6 @@ import { BIN as INDEX_BIN } from "../../.claude/skills/level0/lib/index.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
 import { schemaFaults } from "../../.claude/skills/level0/lib/schema.js";
 import { treeFaults } from "../../.claude/skills/level0/lib/tree.js";
-import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { WARNING } from "../../.claude/skills/level0/lib/warnings.js";
 import {
   biomeFor,
@@ -20,7 +19,7 @@ import { readTools } from "../engine/tools.js";
 import { serverFaults, treeHere } from "./cli-check.js";
 import { bin, COL, files, it, outside, root, SHOWN } from "./cli-doors.js";
 
-// What the last lint left standing at warning. The stamp takes it, and the stop door reads the stamp. [[spec/tickets/the-spawn-reaches-its-guidance]]
+// What the last lint left standing at warning. The stamp takes it, and `branch done` reads the stamp. [[spec/design_output/work#the-battery-answers-first]]
 let stood = [];
 
 export function warningsStood() {
@@ -127,7 +126,7 @@ export async function lint(where) {
     ? []
     : [
         "",
-        `${found.length} stand at warning. A commit and a push land over them, and the refactoring hand drains them past ${TRUNK}'s check.`,
+        `${found.length} stand at warning. They stand in the Problems panel, and the push waits until the panel stands clear.`,
       ];
   for (const row of lintRows(
     found,
@@ -136,7 +135,7 @@ export async function lint(where) {
   ))
     console.log(row);
   if (refused) return 1;
-  // A warning turns nothing red, because the hand drains it and the doors let it land. [[spec/design_output/config#the-engine-controls]]
+  // A warning turns nothing red, because the doors let it land and the push waits on the panel. [[spec/design_output/config#the-engine-controls]]
   return 0;
 }
 

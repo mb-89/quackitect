@@ -17,19 +17,20 @@ import {
   TRACKED,
   varOf,
 } from "../../.claude/skills/level0/lib/config.js";
-import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import {
   EDITOR_EXTENSIONS,
   EDITOR_SETTINGS,
   EDITOR_VALE_INI,
 } from "../../.claude/skills/level0/lib/servers.js";
 import { pool } from "../../.claude/skills/level0/lib/stop.js";
+import { everyModuleTested } from "../../.claude/skills/level0/lib/tested.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import {
   biomeOnWindows,
   editorDrawsWriteRules,
   extensionsOnOffer,
   INSTALL,
+  installerHoldsTheNames,
   nameHoldsTheWords,
   noLogDeleted,
   nothingPrivateTravels,
@@ -38,7 +39,6 @@ import {
   stopFolderIsData,
   surveyFindsNode,
   surveyNamesInstalls,
-  treeFaults,
   treeOf,
 } from "../../.claude/skills/level0/lib/tree.js";
 import { disk } from "../../src/doors/disk.js";
@@ -67,14 +67,13 @@ const settings = configOf({
   readEnv: async () => ({}),
 });
 const words = await settings.ask("names.words");
-const gitHere = git(outside, root);
+// The tracked list reaches one case alone: the rules over this tree no check runs. [[spec/design_output/tree#the-rules-over-two-files]]
 const here = treeOf({
   disk: files,
-  git: gitHere,
+  git: git(outside, root),
   root,
   words,
   node: NODE,
-  box: boxOf(process.env, gitHere),
 });
 
 const fakeTree = (seed, paths = [], node = NODE, box = {}) =>
@@ -113,8 +112,18 @@ test("every verb the Bash description names stands in the command line", () => {
 });
 
 // [[spec/design_output/tree#the-rules-over-two-files]]
-test("this tree breaks none of the rules over two files", () => {
-  assert.deepEqual(treeFaults(here), []);
+// The lint's sweep holds every other rule over this tree, so this case reads these alone. [[spec/design_output/tree#the-rules-over-two-files]]
+test("this tree breaks none of the rules the sweep leaves out", () => {
+  const unswept = [
+    everyModuleTested,
+    stopFolderIsData,
+    privateFolderOwned,
+    installerHoldsTheNames,
+  ];
+  assert.deepEqual(
+    unswept.flatMap((rule) => rule(here)),
+    [],
+  );
 });
 
 // [[spec/design_output/private#a-fixture-carries-no-shape]]
@@ -164,7 +173,7 @@ test("a git name and a git address off this box are refused too", () => {
   );
 });
 
-test("a box naming nobody reads clean, and so does this tree", () => {
+test("a box naming nobody reads clean", () => {
   const seed = {
     "spec/funnel/one.md": "A cloud box writes under /home/user, as root.\n",
   };
@@ -173,7 +182,6 @@ test("a box naming nobody reads clean, and so does this tree", () => {
     nothingPrivateTravels(fakeTree(seed, ["spec/funnel/one.md"], NODE, box)),
     [],
   );
-  assert.deepEqual(nothingPrivateTravels(here), []);
 });
 
 // [[spec/design_output/private#a-fixture-carries-no-shape]]
@@ -201,7 +209,6 @@ test("a settings file naming another binary is refused", () => {
   assert.equal(found[0].file, EDITOR_SETTINGS);
   assert.match(found[0].message, /vale\.valeCLI\.path/);
   assert.ok(found[0].line > 1, "it points at the line naming the binary");
-  assert.deepEqual(settingsNameBinaries(here), []);
 });
 
 test("an install script installing no vale is refused", () => {
@@ -230,7 +237,6 @@ test("a settings file drawing at its own level is refused", () => {
   assert.equal(found.length, 1);
   assert.equal(found[0].rule, "EditorDrawsWriteRules");
   assert.match(found[0].message, /inherited/);
-  assert.deepEqual(editorDrawsWriteRules(here), []);
 });
 
 // [[spec/design_output/lsp#the-panel-reads-the-battery]]
@@ -267,7 +273,6 @@ test("a plain biome path on Windows is refused", () => {
   assert.equal(found.length, 1);
   assert.equal(found[0].rule, "BiomeOnWindows");
   assert.match(found[0].message, /win32-x64/);
-  assert.deepEqual(biomeOnWindows(here), []);
 });
 
 test("a clone opening without both extensions is refused", () => {
@@ -297,7 +302,6 @@ test("a clone opening without both extensions is refused", () => {
   assert.equal(stranger.length, 1);
   assert.equal(stranger[0].file, EDITOR_SETTINGS);
   assert.match(stranger[0].message, /somebody\.else/);
-  assert.deepEqual(extensionsOnOffer(here), []);
 });
 
 // [[spec/design_output/stop#where-the-rules-live]]
@@ -309,7 +313,6 @@ test("a stop file short of a field is refused", () => {
   assert.equal(found.length, 1);
   assert.equal(found[0].rule, "StopFolderIsData");
   assert.equal(found[0].file, `${STOP}/level0.yml`);
-  assert.deepEqual(stopFolderIsData(here), []);
 });
 
 test("a line deleting a log file is refused", () => {
@@ -325,7 +328,6 @@ test("a line deleting a log file is refused", () => {
   assert.equal(found.length, 1);
   assert.equal(found[0].rule, "NoLogDeleted");
   assert.equal(found[0].line, 2);
-  assert.deepEqual(noLogDeleted(here), []);
 });
 
 // [[spec/design_input/the-runtime-files-stand-apart]]
@@ -393,7 +395,6 @@ test("a tracked name past the cap is refused", () => {
   assert.equal(found.length, 1);
   assert.equal(found[0].rule, "NameHoldsTheWords");
   assert.match(found[0].message, new RegExp(String(words)));
-  assert.deepEqual(nameHoldsTheWords(here), []);
 });
 
 // [[spec/design_output/tools#what-the-survey-names]]
@@ -407,7 +408,6 @@ test("an install of a tool the survey misses is refused", () => {
   assert.equal(found.length, 1);
   assert.equal(found[0].rule, "SurveyNamesInstalls");
   assert.match(found[0].message, /zig/);
-  assert.deepEqual(surveyNamesInstalls(here), []);
 });
 
 // [[spec/design_output/tools#what-the-survey-writes]]
@@ -423,7 +423,6 @@ test("a survey naming another node is refused", () => {
   const absent = surveyFindsNode(fakeTree({}));
   assert.equal(absent.length, 1);
   assert.equal(absent[0].file, INSTALL);
-  assert.deepEqual(surveyFindsNode(here), []);
 });
 
 // [[spec/design_output/config#the-editor-draws-the-schema]]
@@ -511,7 +510,11 @@ test("npm reaches the extension and the tense reader, and nothing else at the ro
   // A trial's manifest names no dependency, so npm reaches nothing through it. [[spec/design_output/work#an-experiment-decides]]
   for (const path of paths) {
     if (path === "package.json" || /^src\/extension\//.test(path)) continue;
-    assert.match(path, /^\.claude\/skills\/[^/]+\/package\.json$/, `${path} stands under the extension or a trial`);
+    assert.match(
+      path,
+      /^\.claude\/skills\/[^/]+\/package\.json$/,
+      `${path} stands under the extension or a trial`,
+    );
     assert.deepEqual(read(path).dependencies ?? {}, {}, `${path} names no dependency`);
   }
 

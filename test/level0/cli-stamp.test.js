@@ -4,7 +4,6 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { REFACTORS, STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { batteryRun, stampFor } from "../../src/scripts/cli-stamp.js";
 
@@ -51,9 +50,6 @@ test("a green run stamps ok with no warning, and a red run stamps the code", () 
   const red = stampFor({ code: 1, sha: "abc", clean: false, at: AT });
   assert.equal(red.ok, false);
   assert.equal(red.clean, false);
-  // The list stands in its own file beside the stamp, because the hand changes what it names. [[spec/design_output/stop#the-grace]]
-  assert.match(REFACTORS, /refactor\.json$/);
-  assert.equal(REFACTORS.slice(0, REFACTORS.lastIndexOf("/")), STAMP.slice(0, STAMP.lastIndexOf("/")), "the list stands in the stamp's folder");
 });
 
 // [[spec/guidance/retro/effect]]
@@ -74,14 +70,45 @@ test("the stamp keeps the last runs' parts at its commit, up to the count, and d
   const battery = { parts: { tests: 30 }, total: 30, slowest: [] };
   const before = { sha: "abc", runs: [{ tests: 20 }, { tests: 10 }] };
 
-  const kept = stampFor({ code: 0, sha: "abc", clean: true, at: AT, battery, before, keep: 3 });
+  const kept = stampFor({
+    code: 0,
+    sha: "abc",
+    clean: true,
+    at: AT,
+    battery,
+    before,
+    keep: 3,
+  });
   assert.deepEqual(kept.runs, [{ tests: 30 }, { tests: 20 }, { tests: 10 }]);
 
-  const capped = stampFor({ code: 0, sha: "abc", clean: true, at: AT, battery, before, keep: 2 });
-  assert.deepEqual(capped.runs, [{ tests: 30 }, { tests: 20 }], "the count caps the runs");
+  const capped = stampFor({
+    code: 0,
+    sha: "abc",
+    clean: true,
+    at: AT,
+    battery,
+    before,
+    keep: 2,
+  });
+  assert.deepEqual(
+    capped.runs,
+    [{ tests: 30 }, { tests: 20 }],
+    "the count caps the runs",
+  );
 
-  const moved = stampFor({ code: 0, sha: "def", clean: true, at: AT, battery, before, keep: 3 });
+  const moved = stampFor({
+    code: 0,
+    sha: "def",
+    clean: true,
+    at: AT,
+    battery,
+    before,
+    keep: 3,
+  });
   assert.deepEqual(moved.runs, [{ tests: 30 }], "a run of another commit drops");
 
-  assert.equal("runs" in stampFor({ code: 0, sha: "abc", clean: true, at: AT, before }), false);
+  assert.equal(
+    "runs" in stampFor({ code: 0, sha: "abc", clean: true, at: AT, before }),
+    false,
+  );
 });

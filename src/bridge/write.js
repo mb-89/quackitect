@@ -18,7 +18,7 @@ import {
   refusedPrivate,
 } from "../../.claude/skills/level0/lib/private.js";
 import { refusal } from "../../.claude/skills/level0/lib/refuse.js";
-import { MARKS, REFACTORS } from "../../.claude/skills/level0/lib/runs.js";
+import { MARKS } from "../../.claude/skills/level0/lib/runs.js";
 import { PROSE } from "../../.claude/skills/level0/lib/vale.js";
 import {
   checkNote,
@@ -37,7 +37,6 @@ import {
   ticketFaults,
 } from "../../.claude/skills/level0/lib/ticket.js";
 import {
-  mergedWarnings,
   rowOf,
   WARNING,
   warnedNote,
@@ -52,7 +51,6 @@ import {
 import { codeDoor } from "./code.js";
 import { marksStale, ownerDoor } from "./projection.js";
 import { readsProse } from "./prose.js";
-import { holdDoor } from "./refactor-hold.js";
 
 const PASS = { pass: true };
 const UNRAN = "VoiceRulesRan";
@@ -71,8 +69,6 @@ export async function onWrite(asked, box) {
   if (!writing) return PASS;
   const where = relativeTo(box.root, writing.path);
   if (/^([A-Za-z]:)?[\\/]/.test(where) || isDraft(where)) return PASS;
-  const holder = holdDoor(e, where, box);
-  if (holder) return { result: { deny: holder } };
   // The engine's fields come back first, so every door reads the write that lands. [[spec/design_output/schema#the-verbs-own-their-fields]]
   const restored = engineRestores(e, writing, where, box);
   if (restored?.deny) return { result: { deny: restored.deny } };
@@ -180,7 +176,12 @@ export function onRead(e, box) {
   const path = String(e?.file_path ?? "");
   if (!path) return PASS;
   try {
-    marksSeen(box, relativeTo(box.root, path), String(box.disk.read(path)), linesRead(e));
+    marksSeen(
+      box,
+      relativeTo(box.root, path),
+      String(box.disk.read(path)),
+      linesRead(e),
+    );
   } catch {
     // [[spec/design_output/level0#a-write-meets-its-mark]]
   }
@@ -309,7 +310,7 @@ function unran(where, why, box) {
   ];
 }
 
-// A rule reading warning is a break of form, and the write lands with it standing for the refactoring hand. [[spec/rationales/voice#11-form-and-substance]]
+// A rule reading warning is a break of form, and the write lands with it standing in the Problems panel. [[spec/rationales/voice#11-form-and-substance]]
 export function errorsIn(found) {
   return (found ?? []).filter((one) => String(one?.severity ?? "error") !== "warning");
 }
@@ -331,32 +332,16 @@ async function voiceDoor(e, writing, where, box, held) {
   return refusal(where, found);
 }
 
-// A write landing with a warning puts the rows on the refactoring hand's list, writes them to the log, and tells the agent to carry on. [[spec/design_output/level0#a-warning-feeds-the-list]]
+// A write landing with a warning writes the rows to the log, and tells the agent to carry on. [[spec/design_output/level0#the-panel-holds-a-warning]]
 function warnsOf(e, where, warned, box) {
-  if (!warned) return null;
-  const at = join(box.work, ...REFACTORS.split("/"));
-  let list = [];
-  try {
-    list = JSON.parse(String(box.disk.read(at)));
-  } catch {
-    list = [];
-  }
-  const held = [list].flat().some((one) => String(one?.file ?? "") === where);
-  if (!held && !warned.length) return null;
-  const merged = mergedWarnings(list, where, warned);
-  try {
-    box.disk.write(at, `${JSON.stringify(merged, null, 2)}\n`);
-  } catch {
-    // The runtime folder stands on every box the server runs on, so a miss here is a fake with no folder. [[spec/design_output/level0#a-warning-feeds-the-list]]
-  }
-  if (!warned.length) return null;
+  if (!warned?.length) return null;
   box.log.say("warn", "vale", `${warned.length} line(s) stand at warning in ${where}`, {
     file: where,
     rule: warned[0]?.rule,
     tool: String(e.tool),
     detail: warned.map(rowOf).join("\n"),
   });
-  return { after: { context: [warnedNote(where, warned, merged.length)] } };
+  return { after: { context: [warnedNote(where, warned)] } };
 }
 
 function asWrite(e) {
