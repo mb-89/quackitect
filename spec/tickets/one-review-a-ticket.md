@@ -94,7 +94,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: implement/tests-green
+step: verdict
 todo: true
 record:
   - step: design/draft
@@ -124,6 +124,17 @@ record:
       - name: lint
         exit: 0
         said: "test/level0/pull-findings.test.js:53:1: CodeComment: Code carries no comment here. Write a header of at most five lines "
+  - step: implement/tests-green
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 0b60f7b20fd7e2e00733f898dce7db303ea72082
+    hash_after: 0b60f7b20fd7e2e00733f898dce7db303ea72082
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 51 test(s) pass in 7 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/one-review-a-ticket.md:308:3: Sentence: A sentence holds 25 words. Cut this one in two."
 ---
 
 # Ask
@@ -320,11 +331,15 @@ The fail cases live in `test/level0/pull-fails.test.js`, because `pull-steps.tes
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/pull-leaves.test.js test/level0/pull-findings.test.js test/level0/pull-fails.test.js test/level0/pull-steps.test.js test/contract/process.test.js test/contract/question-grades.test.js test/contract/one-config.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -332,11 +347,23 @@ The fail cases live in `test/level0/pull-fails.test.js`, because `pull-steps.tes
 
 <!-- the form is text -->
 
+A standard ticket meets one review, on its design, and goes on to the code. The route drops `implement/reflect` and `verdict`.
+
+- a pass with findings mints a draft child a finding, on the trivial route, and the parent goes on
+- a first fail sends the ticket back to `design/draft`, and a second fail asks the owner
+- `spec/guidance/review/design.md` holds the design rules, and judges structure alone
+
+The check runs every test green, and exits 1 on form findings alone. The owner's rule holds those findings in the Problems panel until the push.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every file the change commit touches serves the route, the pull, the config key, the schema or the review guidance
+- every door the change reaches runs on the fakes of `test/level0/pull-doors.js`
+- the new code in `pull-writes.js` and `pull-chapter.js` links the approach in `spec/design_output/pull.md`
 
 # verdict
 

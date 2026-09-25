@@ -250,3 +250,5 @@ terms:
   - {word: adjective, means: "a word that describes a noun which the tense reader must not mistake for a past verb"}
   - {word: starfish, means: "the retro form that asks what to start and stop and keep and do more and less"}
   - {word: mechanize, means: "to turn a lesson into a check or a tool so it holds without anyone remembering it"}
+  - {word: contradict, means: "to say the opposite of another claim so both cannot hold at once"}
+  - {word: fallback, means: "the second road a step takes where its first road fails"}

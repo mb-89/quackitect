@@ -11,7 +11,7 @@ import { withPersonStep } from "../../src/scripts/pull.js";
 import { pulling } from "../../src/scripts/work.js";
 import { at, CHILD, doors, filled, HOLD, heard, ROOT, standing } from "./pull-doors.js";
 
-// The ticket failed back from design/review once already.
+// The ticket failed back from design/review once already. [[spec/design_output/pull#the-fail]]
 const failedOnce = () =>
   withEntry(CHILD("open", "design/review"), {
     step: "design/review",
@@ -22,7 +22,7 @@ const failedOnce = () =>
     why: "thin",
   });
 
-// A review failing, the ticket standing at design/review. Git keeps each commit of the hand-back with the ticket as it stood then.
+// A review failing, the ticket standing at design/review. Git keeps each commit of the hand-back with the ticket as it stood then. [[spec/design_output/pull#the-fail]]
 function failedTwice(more, text = null) {
   const commits = [];
   let disk = null;
@@ -67,7 +67,7 @@ test("a second fail on a desk puts a person step before design/draft, asking the
   const person = readNote(now).front.said.steps[0].steps[0];
   assert.equal(person.by, "person", "a desk sends it to a person");
   assert.match(String(person.asks), /still thin/, "the step asks the fail's reason");
-  // The hand-out after the fail commits for the next ticket, so the case reads this ticket's commits alone.
+  // The hand-out after the fail commits for the next ticket, so the case reads this ticket's commits alone. [[spec/design_output/pull#the-fail]]
   const own = commits.filter((one) => one.subject.startsWith("a-child:"));
   assert.equal(own.length, 1, "one commit lands the fail");
   assert.match(own[0].subject, /^a-child: fails design\/review back to design\/draft/);

@@ -19,7 +19,7 @@ import {
   standing,
 } from "./pull-doors.js";
 
-// The route a child follows, as the tree ships it in spec/processes/trivial.yaml.
+// The route a child follows, as the tree ships it in spec/processes/trivial.yaml. [[spec/design_output/pull#a-finding-rides-out]]
 const TRIVIAL = `for: a fix small enough that the ask is the design
 ask:
   - name: gain
@@ -50,7 +50,7 @@ const FINDINGS = [
   "- link-the-note: the note names no link",
 ].join("\n");
 
-// The parent stands at its review, the verdict filled, and git keeps each commit with the ticket as it stood then.
+// The parent stands at its review, the verdict filled, and git keeps each commit with the ticket as it stood then. [[spec/design_output/pull#a-finding-rides-out]]
 function reviewed(
   rows,
   {

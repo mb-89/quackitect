@@ -265,7 +265,7 @@ export function answerOf(it, queue = true) {
   const read = { ...readWork(it, true), private: privateHere(it) };
   // A desk's own edit stands on the disk before any commit, so trunk's copy reads off the working tree where the file stands there. [[spec/design_output/pull#a-todo-forces-a-place]]
   read.loose = read.loose.map((one) => diskCopy(it, one));
-  // A ticket minted on this disk and not yet on origin/main draws its own row too, so it stands in the queue before the push carries it there. [[spec/design_output/pull#the-queue-is-an-outline]]
+  // A ticket minted on this disk ahead of origin/main draws its own row too, so it stands in the queue before the push carries it there. [[spec/design_output/pull#the-queue-is-an-outline]]
   const looseNames = new Set(read.loose.map((one) => one.name));
   for (const one of ticketsHere(it)) {
     if (one.private || looseNames.has(one.name)) continue;

@@ -644,8 +644,8 @@ hand reaches the person step, and one mechanism inserts every kind.
 
 ## A count asks a person
 
-A design review fails an unusable approach alone, so a second fail is no
-quarrel between hands. The owner rules that it goes to the owner. `failed` in
+A design review fails an unusable approach alone, so a second fail says
+the approach stays unusable. The owner rules that it goes to the owner. `failed` in
 `src/scripts/pull-writes.js` calls `withPersonStep` before it lands, so the
 person step and the fail share one commit. The counts below stand:
 
