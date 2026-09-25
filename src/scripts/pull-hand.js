@@ -109,7 +109,13 @@ export function sorted(list, at = {}) {
 // A tagged ticket stands first, as the list holds it, and the score orders the rest. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
 export function taggedFirst(list, at = {}) {
   const tagged = taggedIn(list);
-  return [...tagged, ...sorted(list.filter((one) => !tagged.includes(one)), at)];
+  return [
+    ...tagged,
+    ...sorted(
+      list.filter((one) => !tagged.includes(one)),
+      at,
+    ),
+  ];
 }
 
 // The tickets a tag parks for the next pull. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
@@ -154,7 +160,9 @@ export function handOut(it, who) {
       const said = offer(it, who, one, all);
       if (said.leaf) return handed(it, who, one, said.leaf);
       if (said.why) why.push(`${one.name} ${said.why}`);
-      if (said.person && !person) person = { name: one.name, leaf: said.person };
+      // A hand-out frees a group, so a ticket in no group waits for its person where it stands. [[spec/tickets/the-desk-findings-wait]]
+      if (said.person && !person && fieldOf(one.text, GROUP))
+        person = { name: one.name, leaf: said.person };
       if (said.other && !other) other = { one, leaf: said.other, why: said.why };
     }
     if (other && !who.oneStep) return spawnAnswer(other);

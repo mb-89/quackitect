@@ -71,3 +71,49 @@ test("takeable answers a trivial draft's first leaf, and nothing for any other d
     "",
   );
 });
+
+// A ticket in no group holds no branch up, so a hand-out frees nothing, and a question ticket handed on hands on again. [[spec/tickets/the-desk-findings-wait]]
+test("a desk on main hands no person's step out of a ticket standing in no group", () => {
+  const loose = `---
+kind: [[ticket]]
+state: open
+urgency: now
+step: design/person-1
+steps:
+  - name: design
+    steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: which name does the plugin take?
+        evidence:
+          - name: answer
+            form: text
+            says: the answer
+---
+
+# Ask
+
+One piece of it.
+
+# design
+
+## person-1
+
+### answer
+
+# Discussion
+`;
+  const { it } = doors(
+    { [at("spec/tickets/a-loose-question.md")]: loose },
+    {
+      "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+      "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
+    },
+    { cloud: false, root: ROOT },
+  );
+  const { said } = heard(() => handOut(it, {}));
+  assert.match(said, /a-loose-question waits for a person at design\/person-1/);
+  assert.ok(!said.includes("branch unblock"), said);
+});
