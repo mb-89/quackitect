@@ -34,6 +34,12 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
+record:
+  - step: answer
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: a025ca5c9405361b5ba08b5dcf9223c0636bd818
+    hash_after: a025ca5c9405361b5ba08b5dcf9223c0636bd818
+step: do
 ---
 
 # Ask
@@ -50,9 +56,17 @@ Does a person create, take, work and hand back a ticket from VS Code alone? The 
 
 ## answer
 
-<!-- the answer, which the step behind this one reads -->
+The walk leaves the editor, or breaks inside it, at these places:
 
-<!-- the form is text -->
+| place | what the owner sees |
+|---|---|
+| the work tab | the sidebar counts seven items, and the work editor shows one |
+| the lens take | a named take refuses under `queue`, and a person takes any ticket at any time |
+| the frontmatter | the editor draws no route, because the inset import breaks on a Windows path |
+| the inset door | a refused proposed API draws nothing, and the door names no reason |
+| the Problems panel | `EngineOwnsField` stands as a warning on `steps`, and reads as a hint |
+| the Problems panel | `ValeRuns` stands as an error on `.vale.ini`, over this ticket |
+| the fields to fill | a take marks no field the step still wants |
 
 # do
 
