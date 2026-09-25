@@ -93,4 +93,8 @@ How does the design of [[spec/tickets/a-desk-skips-cloud-branches]] answer the f
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+- [[spec/tickets/a-desk-skips-cloud-branches]] hands this over at `design/person-1`, which waits for a person.
+  - design/review fails back 2 times: `pull` in `src/scripts/pull.js` reaches `it.ready()`, which is `readyToMerge` in `src/scripts/work-review.js`, inside the take block on a desk alone. `pull#an-empty-queue-hands-cleanup` and `test/level0/ready.test.js` depend on that road. Say whether a desk pull still calls `it.ready()` before the hand-out, and list `readyToMerge` as a caller.
+  - `test/level0/work-doors.js` hands every case `env: {}`, so each `work(ROOT, [\"take\"], ...)` case in `test/level0/work.test.js`, `test/level0/work-group.test.js` and `test/level0/work-orphan.test.js` drives `take` as a desk. List them as callers, and name how they reach a cloud box once `take` refuses on a desk.
+  - `test/level0/work-group.test.js` asserts that a desk pull takes a marked group and a named one. List it beside `test/level0/pull-unbound.test.js`.
+  - `onDesk` reads the cloud as `pushed` does, while `src/bridge/bash.js` reads it through `onACloud`. Name the one read the Bash door guard and the verbs share.
