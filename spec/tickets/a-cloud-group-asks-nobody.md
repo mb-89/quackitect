@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -148,6 +148,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/a-cloud-group-asks-nobody.md:367:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+  - step: implement/tests-green
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 6ff51e8cadfdac4825c615cb51b8bd48638b881f
+    hash_after: 6ff51e8cadfdac4825c615cb51b8bd48638b881f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 14 test(s) pass in 1 file(s); green, src/lsp passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/a-cloud-group-asks-nobody.md:375:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+reason: done
 ---
 
 # Ask
@@ -387,11 +399,15 @@ Three Go cases fail on their own assertion: a child at a person step, a leaf und
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/lsp test/level0/unblock.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -399,11 +415,18 @@ Three Go cases fail on their own assertion: a child at a person step, a leaf und
 
 <!-- the form is text -->
 
+The rule `GroupAsksNobody` in `src/lsp/group.go` names an open child at a person step inside an open group. A cloud box then works the group to its merge and waits on nobody. The finding names the fix: a desk runs `./RUNME.sh branch unblock`, and a cloud box takes the step. The unblock verb reads the child's `group` on `main`, so a desk unblocks with no branch in hand. The rule runs in `se-lsp` alone. Where the server stands absent, `readingFor` in `src/scripts/cli-read.js` runs the JavaScript sweep, and this rule stays unchecked there.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the rule, the unblock verb and their tests
+- every door the change reaches has a fake: `fakeTree`, and the fake git and disk
+- a comment names the approach the change implements: `group.go` and `work-unblock.js` link the design
+- every fact the change adds stands in one place: the design note points at `src/lsp/group.go`
 
 # Discussion
 
