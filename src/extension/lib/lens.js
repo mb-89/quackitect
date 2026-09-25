@@ -8,6 +8,7 @@ const FOLDERS = ["spec/tickets", ".se/tickets"];
 const HOLDS = ".se/.runtime/hold";
 // The one-hand hold file, which folders.js owns beside the hold folder. [[spec/design_output/pull#the-hand-and-the-hold]]
 const HOLD = ".se/.runtime/hold.json";
+const HOLD_WATCHES = [`${HOLDS}/*.json`, HOLD];
 const CLI = "src/scripts/cli.js";
 const COMMAND = "quackitect.ticket";
 // The names the pull reads a harness off, from [[spec/design_output/pull#the-hand-rule]].
@@ -219,7 +220,7 @@ function parsedOrNull(text) {
 function ticketLensOf(door) {
   const holds = async () => holdsIn(await door.list(HOLDS), (path) => door.read(path));
   return {
-    watches: [`${HOLDS}/*.json`, HOLD],
+    watches: HOLD_WATCHES,
     lenses: async (path, text) => lensesOf({ path, text, holds: await holds() }),
     async took(act, ticket, path) {
       let reason = "";
@@ -259,6 +260,7 @@ module.exports = {
   HARNESS,
   HOLD,
   HOLDS,
+  HOLD_WATCHES,
   answerOf,
   argvOf,
   fillArgvOf,

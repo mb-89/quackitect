@@ -657,6 +657,28 @@ without `CLAUDECODE`, `CLAUDE_CODE_REMOTE` and `SE_CLOUD`, and
 the pull reads a person. `SE_WORK_ROOT` names the open folder, so a vehicle's
 own tickets answer.
 
+## A take marks the fields
+
+A person's hold on a ticket marks every field its leaf still wants, with an
+underline in the editor's information colour. `lib/fields.js` decides
+the marks, and `editor-fields.js` draws them:
+
+| what stands | the marks |
+|---|---|
+| a person's hold names the ticket | each field the leaf still wants, on its heading, in route order, with `checked` last |
+| a field holds no line | its heading, or the leaf's heading where the field has none |
+| a person newly takes the ticket | the cursor lands on the first mark |
+| a hold standing as the editor starts | the marks, and the cursor stays |
+| no person's hold names the ticket | nothing |
+
+The leaf and its fields come from `leafOf` in `src/scripts/pull-route.js`,
+and the lines each field holds from `chapterOf` in `src/scripts/pull-chapter.js`.
+The hover over a mark shows the leaf's path and `does`, then the field's
+name, `form` and `says`. On `checked` it lists the checklist.
+
+The marks are a decoration and a hover. The Problems panel lists diagnostics
+alone, so it lists no mark, and a mark blocks no check, commit or push.
+
 # What stands open
 
 - The extension holds its own reader of a key, because `lib/config.js` in the

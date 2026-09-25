@@ -4,6 +4,7 @@
 // [[spec/design_output/extension#it-starts-silent]]
 
 const { SCHEMA, sidebarOf } = require("./sidebar.js");
+const { fieldMarksOf } = require("./lib/fields.js");
 const { COMMAND, ticketLensOf } = require("./lib/lens.js");
 const { serverAsk } = require("./lib/lsp.js");
 const { FLIP, routeHostOf } = require("./lib/route-host.js");
@@ -45,13 +46,24 @@ async function activate(context, given) {
   });
   door.lenses?.({
     ...tickets,
-    lenses: async (path, text) => [...route.lenses(path), ...(await tickets.lenses(path, text))],
+    lenses: async (path, text) => [
+      ...route.lenses(path),
+      ...(await tickets.lenses(path, text)),
+    ],
   });
+  // [[spec/design_output/extension#a-take-marks-the-fields]]
+  const fields = door.marksFields ? fieldMarksOf(door) : null;
+  if (fields) {
+    await fields.starts();
+    door.watch(fields.watches, () => fields.held());
+  }
   door.onEditors?.(async (path, text) => {
-    await route.opened(path, text);
+    await Promise.all([route.opened(path, text), fields?.sees(path, text)]);
     door.lensChanged?.();
   });
-  door.onChange?.((path, text) => route.changed(path, text));
+  door.onChange?.((path, text) =>
+    Promise.all([route.changed(path, text), fields?.sees(path, text)]),
+  );
   door.onTheme?.(() => route.themed());
   // [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
   door.onSave?.(tickets.saved);
