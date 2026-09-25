@@ -6,9 +6,9 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -37,31 +37,55 @@ func TestAFileTheIndexMendsLeavesThePanel(t *testing.T) {
 	}
 }
 
-// The rows the bridge drew for a file read the text it held before it moved, so they go with the move, whether or not a bridge answers. [[spec/design_output/lsp#the-panel-follows-the-index]]
-func TestAFileTheIndexMovesDropsTheBridgesOldRows(t *testing.T) {
-	tree := sweptTree(t, nil)
-	bridge := bridgeFor(t, tree)
-	out := &guardedBuffer{}
-	one := &server{checker: &Checker{tree: tree}, out: out, panel: newPanel()}
-	uri := uriOf(filepath.Join(tree.Root, "HANDOVER.md"))
-	one.panel.extra["HANDOVER.md"] = []Finding{{File: "HANDOVER.md", Rule: "VoiceParagraph.Sentence", Line: 40, Column: 1, Severity: SeverityWarning, Source: fromVale}}
-	one.shows(tree, "HANDOVER.md")
-	if said := urisDrawn(spoken(t, out.String()))[uri]; said != 1 {
-		t.Fatalf("the fixture draws %d row(s) before the change, and it draws its one", said)
+// A fault Vale draws leaves the panel once the file mends on disk, and the run reads that one file at once. [[spec/design_output/lsp#the-panel-follows-the-index]]
+func TestAFileTheIndexMendsLeavesTheToolsRowsAtOnce(t *testing.T) {
+	tree := sweptTree(t, map[string]string{"README.md": "# One\n\n" + spooky + " stands.\n"})
+	one, tools, out := toolServer(tree, testQuiet)
+	uri := uriOf(filepath.Join(tree.Root, "README.md"))
+	one.sweeps()
+	settles(t, one)
+	if said := names(extraOn(one, "README.md"), "Spooky"); said != 1 {
+		t.Fatalf("the fixture draws %d Spooky row(s) before the mend, and it draws its one", said)
 	}
 
-	if err := os.WriteFile(filepath.Join(tree.Root, "HANDOVER.md"), []byte(standing), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(tree.Root, "README.md"), []byte("# One\n\nA line.\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	one.redraws([]string{"HANDOVER.md"}, nil)
+	one.redraws([]string{"README.md"}, nil)
+	settles(t, one)
 
-	if said, drew := urisDrawn(spoken(t, out.String()))[uri]; !drew || said != 0 {
-		t.Fatalf("the moved file still draws %d row(s) off the bridge, drawn %v", said, drew)
+	if said := extraOn(one, "README.md"); len(said) != 0 {
+		t.Fatalf("the mended file still holds the tools' rows %v", said)
 	}
-	bridge.waits(t, lintQuiet, 1)
-	if asks := bridge.asked(); fmt.Sprint(asks[0]) != "[HANDOVER.md]" {
-		t.Fatalf("the ask after the move names %v", asks[0])
+	if said := drawnOn(lastDrawn(spoken(t, out.String()), uri), uri); len(said) != 0 {
+		t.Fatalf("the panel still draws %d row(s) on the mended file", len(said))
 	}
+	if calls := tools.naming("vale", "README.md"); calls != 1 {
+		t.Fatalf("Vale reads the mended file %d time(s) past the sweep", calls)
+	}
+}
+
+// A file the tools read beside the tree moves every file's rows, so the tools run over the whole tree again. [[spec/design_output/lsp#the-panel-follows-the-index]]
+func TestAToolInputTheIndexMovesRunsTheWholeTree(t *testing.T) {
+	tree := sweptTree(t, nil)
+	one, tools, _ := toolServer(tree, testQuiet)
+
+	one.redraws([]string{ValeIni}, nil)
+	settles(t, one)
+
+	if said := tools.naming("vale", valeSkips+" ."); said != 1 {
+		t.Fatalf("a moved Vale config runs %d whole sweep(s): %v", said, tools.asked())
+	}
+}
+
+// The frames after the last one naming the path, so a case reads what the panel draws now. [[spec/design_output/lsp#the-panel-reads-the-battery]]
+func lastDrawn(said []message, uri string) []message {
+	for i := len(said) - 1; i >= 0; i-- {
+		if drawnOn(said[i:i+1], uri) != nil || strings.Contains(string(said[i].Params), uri) {
+			return said[i:]
+		}
+	}
+	return nil
 }
 
 func TestARenameClearsTheOldRowAndDrawsTheNew(t *testing.T) {

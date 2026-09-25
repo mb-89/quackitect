@@ -14,15 +14,18 @@ For the ask, see [[spec/design_input/one-server-holds-the-shape]].
 
 # The panel reads the battery
 
-The panel draws the list `./RUNME.sh check` reads, and a finding standing there
-holds a push. The server asks the bridge for that list, so a rule reaches the
+The panel draws the list `se-lsp check` answers, and a finding standing there
+holds a push. The server runs every source itself, so a rule reaches the
 editor the way it reaches the check:
 
 | source | draws an open file | draws a closed file |
 |---|---|---|
 | this server's own checks | this server | this server |
-| Vale, through the tense reader | this server | this server |
+| Vale, through the tense reader | this server, off the buffer | this server |
+| the code faults and the exemption markers | this server, off the buffer | this server |
 | Biome | the Biome extension, while a person types | this server |
+
+For how the server runs each tool, see [[spec/design_output/lsp#the-server-runs-the-tools]].
 
 The Vale extension runs raw Vale, which knows no tense reader. So the
 workspace settings hand it a filter no rule passes, and it draws nothing.
@@ -31,11 +34,13 @@ A file redraws on the roads below:
 
 | road | what redraws |
 |---|---|
-| the server starts | every file, off this server's sweep and one ask to the bridge |
+| the server starts | every file, off this server's sweep, then off Vale and Biome over the tree |
 | the editor opens a file | that file, off the buffer |
-| a person types in a file | that file off the buffer, and the bridge again after the quiet span |
-| the editor saves or closes a file | that file, and a save asks the bridge again |
-| anything changes a file on disk | that file, off the index once it sweeps, and the bridge |
+| a person types in a file | that file off the buffer, and Vale again after the quiet span |
+| the editor saves a file | that file, and Vale and Biome over it at once |
+| the editor closes a file | that file off the disk, and Vale and Biome over it again |
+| anything changes a file on disk | that file, off the index once it sweeps, and Vale and Biome over it at once |
+| a file the tools read changes | every file, off Vale and Biome over the tree |
 
 ## One checker every front asks
 
@@ -43,19 +48,18 @@ The fronts below ask for a reading, and each reaches one rule set:
 
 | the front | what it asks |
 |---|---|
-| the editor's panel | this server's own sweep, and the bridge beside it |
-| `./RUNME.sh check` | the bridge's sweep, and `se-lsp check` over that same sweep |
-| a person, at `se-lsp check` | the sweep alone |
+| the editor's panel | this server's own sweep, and Vale and Biome beside it |
+| the port | the list the panel holds |
+| a person, at `se-lsp check` | the same sweep, fresh |
+| `./RUNME.sh lint` | `se-lsp check`, and `findingsOver` in `src/bridge/findings.js` beside it |
 
-`Checker` in `src/lsp/check.go` holds this server's half, and `findingsOver` in
-`src/bridge/findings.js` holds the bridge's. The tree readers and the schema
-readers in `src/scripts/cli-read.js` stand behind `se-lsp check`, for a box
-carrying no server.
+`Whole` in `src/lsp/check.go` holds the sweep every front reads: this server's
+own rules, and the tools beside them. The tree readers and the schema readers
+in `src/scripts/cli-read.js` stand behind `se-lsp check`, for a box carrying no
+server.
 
-One guard names each tool for both fronts. `biomeFor` in the bridge hands the
-empty string where no binary stands, so a box carrying no Biome reads one list.
-`test/contract/one-reading.test.js` holds the fronts against each other
-over the whole tree.
+`test/contract/one-reading.test.js` holds the fronts against each other over
+one file.
 
 ## The lint ends on findings
 
@@ -68,7 +72,8 @@ the count and the findings.
 # The server reads the index
 
 Every front reads the tree off the index door, and no file of the tree off the
-disk. `indexDisk` in `src/lsp/indexed.go` holds what it pulls: each path, its
+disk. Vale and Biome read a file no editor holds off the disk themselves, and a
+buffer reaches Vale on its input. `indexDisk` in `src/lsp/indexed.go` holds what it pulls: each path, its
 hash, whether git tracks it, and its text. For the verbs it asks, see
 [[spec/design_output/index#a-reader-takes-the-tree]].
 
@@ -97,10 +102,14 @@ it: an agent, git, or a script.
 
 | what the pull names | what the panel does |
 |---|---|
-| a tracked file whose hash moves | redraws it off the index, drops the bridge's rows on it, and asks the bridge again until one answers |
+| a tracked file whose hash moves | redraws it off the index, and runs Vale and Biome over it at once |
 | a tracked file the index drops | takes its row with it, and no rule reads it |
 | a file git tracks nowhere | nothing, because no rule reads it |
 | a file a pointer names, where the file moves or goes | redraws the file carrying the pointer too, off this server's own rules, so a heading that lands clears the dead anchor on it |
+| a file the tools read, which `toolInputs` in `src/lsp/outside.go` names | runs Vale and Biome over the whole tree again |
+
+One run of the tools goes at a time. A file named while one runs waits for the
+next, so the rows that land read the newest text.
 
 An open file follows the editor's buffer. A write on disk reaches the panel
 once the index moves the rows the write names.
@@ -108,20 +117,19 @@ once the index moves the rows the write names.
 # The panel lints as typed
 
 A change to an open file waits the quiet span `lintQuiet` names in
-`src/lsp/bridge.go`, and every change inside that span joins one ask. The ask
-carries each buffer as it stands to `POST /findings`, and `heldOver` in
-`src/bridge/findings.js` reads it there.
+`src/lsp/panel.go`, and every change inside that span joins one run. The run
+hands each buffer as it stands to Vale on its input.
 
 | what reads the buffer | how |
 |---|---|
-| Vale | through the Vale door, at the buffer's own path, so the config sections match |
+| Vale | on its input, at the buffer's own path, so the config sections match |
 | the tense reader | over the buffer's text |
-| the code faults | over the buffer's text |
+| the code faults and the exemption markers | over the buffer's text |
 | Biome | nowhere, because its own server draws an open file |
 
 So a Vale finding leaves as a person fixes the line, and no source waits for a
-save. A file the editor closes inside the span asks nothing, because its buffer stands no
-more.
+save. A file the editor closes inside the span reads off the disk again, because
+its buffer stands no more.
 
 ## A change reads one note
 
@@ -135,6 +143,44 @@ come from:
 | a note's parse | its text differs from the one the parse reads |
 | the pairs of guidance rules | a guidance note's text changes |
 | the list of paths | a buffer names a path the list lacks |
+
+# The server runs the tools
+
+The server runs both binaries the way `findingsOver` in
+`src/bridge/findings.js` runs them for the lint, so both lists name the same
+rows. `Outside` in `src/lsp/outside.go` holds the runs:
+
+| what | where the server reads it |
+|---|---|
+| each binary, and node | `.se/.runtime/tools.json`, else the runtime binary folder |
+| the Vale config | `.vale.ini` at the root, else the one the assembly writes under `.se/vale` |
+| the folders Vale skips | `PARKED` in `src/bridge/findings.js` |
+| the Biome config | `CONFIG_DIR` in `.claude/skills/level0/lib/code.js` |
+| a past tense row | the tense reader in `src/engine/tense.js`, run through node |
+| the code ceilings | `code.functionLines` and `code.fileLines`, through the config reader |
+
+`src/lsp/textfaults.go` reads the code faults and the exemption markers the
+way the lint reads them, over the files the lint walks. `SKIP` in
+`src/bridge/findings.js` names the folders that walk passes.
+
+Each row names its source, so the panel leaves an open file's Biome rows to the
+Biome extension:
+
+| the rows | the source |
+|---|---|
+| Vale's | `vale` |
+| Biome's | `biome` |
+| the code faults and the exemption markers | `tree` |
+
+| the box | what the server draws |
+|---|---|
+| a row names a file the index holds nowhere, or a draft | nothing |
+| Vale answers a fault, or stands nowhere | `ValeRuns` on the config, in Vale's own words, so a broken rule stands in the panel |
+| no node, or no tense reader | every past tense row |
+| no Biome | no Biome row |
+
+`StopFolderIsData` and `GridHolds` read JavaScript modules, so this server
+draws neither.
 
 # The config reads absolute paths
 
@@ -265,6 +311,39 @@ start once. `Serve` in `src/lsp/serve.go` writes where it stands into
 `reaches` in `src/lsp/main.go` reads that file first. A server answering on
 that port with the same root and stamp takes the call. It tells a stale one to stop, drops the file, and starts a
 fresh server, as many times as `tries` there allows.
+
+# A port serves the list
+
+While the editor speaks to the server over stdio, the server also listens on the
+loopback address. It writes where it stands into `.se/.runtime/panel.json`, the
+way the bridge writes `vehicle.json`:
+
+| the field | what it says |
+|---|---|
+| `port` | where the server listens |
+| `pid` | the process holding it |
+| `root` | the tree it reads |
+
+`GET /findings` answers the list the panel holds. Each `path` in the query
+keeps the rows on that file or under that folder, and a query naming none keeps
+every row. The answer waits until every run of the tools lands, up to the span
+`settleWait` names in `src/lsp/port.go`:
+
+| the key | what it holds |
+|---|---|
+| `ok` | true |
+| `settled` | whether every run lands before the answer |
+| `open` | the paths an editor holds, whose rows read the buffer |
+| `found` | each finding: `file`, `line`, `column`, `rule`, `severity`, `message`, and `source` where a tool draws it |
+
+The list carries an open file's Biome rows too, read off the disk, which the
+panel leaves to the Biome extension. The server drops the file as it exits,
+where the file still names its own process. A file naming a process that
+answers nothing stands stale.
+
+`se-lsp check` runs the same sweep with no server standing, so a caller with no
+editor reads the same list. `TestThePortAnswersWhatTheCheckAnswers` in
+`src/lsp/port_test.go` holds the two against each other.
 
 # The build beside the index
 

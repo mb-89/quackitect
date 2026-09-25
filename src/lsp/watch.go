@@ -12,6 +12,9 @@ import (
 	"quackitect/yaml"
 )
 
+// The pause before the server asks a door that failed again. [[spec/design_output/lsp#the-panel-follows-the-index]]
+const followRetry = 5 * time.Second
+
 // [[spec/design_output/lsp#the-panel-follows-the-index]]
 func (one *server) follows() {
 	tree := one.checker.Tree()
@@ -22,7 +25,7 @@ func (one *server) follows() {
 			return
 		}
 		if err != nil {
-			time.Sleep(bridgeRetry)
+			time.Sleep(followRetry)
 			continue
 		}
 		if tick == since {
@@ -42,7 +45,7 @@ func (one *server) syncs() {
 	one.redraws(moved, gone)
 }
 
-// A file the index moves redraws, and the bridge answers for it again. A file the index drops takes its row with it. An open file follows the editor instead. [[spec/design_output/lsp#the-panel-follows-the-index]]
+// A file the index moves redraws, and the tools run over it at once. A file the index drops takes its row with it. An open file follows the editor instead. [[spec/design_output/lsp#the-panel-follows-the-index]]
 func (one *server) redraws(moved, gone []string) {
 	tree := one.checker.Tree()
 	one.guard.Lock()
@@ -58,7 +61,12 @@ func (one *server) redraws(moved, gone []string) {
 	}
 	// A file pointing at a moved or dropped note reads that note's headings, so it redraws too. [[spec/design_output/lsp#the-panel-follows-the-index]]
 	leaning := pointingAt(tree, append(append([]string{}, moved...), gone...), paths)
+	// A file the tools read beside the tree moves every file's rows, so they run over the whole tree. [[spec/design_output/lsp#the-panel-follows-the-index]]
+	whole := readByTools(append(append([]string{}, moved...), gone...))
 	if len(paths)+len(leaning) == 0 {
+		if whole {
+			one.owes(nil, true)
+		}
 		return
 	}
 	got := map[string][]Finding{}
@@ -69,17 +77,14 @@ func (one *server) redraws(moved, gone []string) {
 		}
 	}
 	one.guard.Lock()
-	// The rows the bridge drew for a moved file read the text it held before, so they go now, and the bridge draws them again once it answers. [[spec/design_output/lsp#the-panel-follows-the-index]]
-	for _, at := range paths {
-		delete(one.panel.extra, at)
-	}
 	for path, said := range got {
 		one.panel.own[path] = said
 		one.shows(tree, path)
 	}
 	one.guard.Unlock()
-	if len(paths) > 0 {
-		go one.owes(paths)
+	// The tools' rows on a moved file stand until the run lands, which follows at once. [[spec/design_output/lsp#the-panel-follows-the-index]]
+	if len(paths) > 0 || whole {
+		one.owes(paths, whole)
 	}
 }
 

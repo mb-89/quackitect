@@ -127,14 +127,14 @@ func (one *door) answers(said call) (any, error) {
 			return nil, err
 		}
 		if asked.Path == "" {
-			return one.checker.Sweep(), nil
+			return one.checker.Whole(), nil
 		}
-		return one.checker.Over(asked.Path), nil
+		return one.checker.Reads([]string{asked.Path}), nil
 	case "sweep":
 		if _, _, err := one.checker.Tree().Pulls(); err != nil {
 			return nil, err
 		}
-		return one.checker.Sweep(), nil
+		return one.checker.Whole(), nil
 	case "standing":
 		return map[string]any{
 			"root":    one.checker.Tree().Root,

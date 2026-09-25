@@ -17,7 +17,7 @@ type Finding struct {
 	Column   int    `json:"column"`
 	Message  string `json:"message"`
 	Severity string `json:"severity"`
-	// The front a finding comes from, where the bridge hands it over. [[spec/design_output/lsp]]
+	// The tool a finding comes from, where a tool draws it, and nothing for this server's own rules. [[spec/design_output/lsp#the-server-runs-the-tools]]
 	Source string `json:"source,omitempty"`
 }
 

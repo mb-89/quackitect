@@ -62,7 +62,7 @@ type server struct {
 	out     io.Writer
 	guard   sync.Mutex
 	panel   *panel
-	// The quiet span a change waits before the bridge reads the buffer, and the timer counting it. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+	// The quiet span a change waits before Vale reads the buffer, and the timer counting it. [[spec/design_output/lsp#the-panel-lints-as-typed]]
 	quiet time.Duration
 	timer *time.Timer
 	// The panel's goroutines and the answers share one pipe, so a frame goes out whole under this lock. [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
@@ -71,7 +71,16 @@ type server struct {
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 func Speaks(checker *Checker, in io.Reader, out io.Writer) error {
-	one := &server{checker: checker, out: out, panel: newPanel(), quiet: lintQuiet}
+	return newServer(checker, out).speaks(in)
+}
+
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
+func newServer(checker *Checker, out io.Writer) *server {
+	return &server{checker: checker, out: out, panel: newPanel(), quiet: lintQuiet}
+}
+
+// Reads the editor's frames until it says exit or the pipe ends. [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+func (one *server) speaks(in io.Reader) error {
 	reader := bufio.NewReader(in)
 	for {
 		said, err := reads(reader)
@@ -289,7 +298,7 @@ type errorOf string
 
 func (one errorOf) Error() string { return string(one) }
 
-// A finding the bridge hands over names the front it comes from, and the rest are this server's. [[spec/design_output/lsp]]
+// A finding a tool draws names the tool, and the rest are this server's. [[spec/design_output/lsp#the-server-runs-the-tools]]
 func sourceOf(said Finding) string {
 	if said.Source == "" {
 		return "se-lsp"
