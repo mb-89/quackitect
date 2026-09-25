@@ -94,7 +94,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: implement/tests-red
+step: implement/change
 todo: true
 record:
   - step: design/draft
@@ -105,6 +105,17 @@ record:
     hand: box d6f05e3a585030 · claude-code · helper-2
     hash_before: 4e556f8c584107510c5cb8aeed2a70d2b753bce3
     hash_after: 4e556f8c584107510c5cb8aeed2a70d2b753bce3
+  - step: implement/tests-red
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 693ec5549082854106ee1605de312c6255262ef4
+    hash_after: 693ec5549082854106ee1605de312c6255262ef4
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 12 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -223,17 +234,34 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/pull-leaves.test.js test/level0/pull-findings.test.js test/level0/pull-fails.test.js test/level0/pull-steps.test.js test/contract/process.test.js test/contract/question-grades.test.js test/contract/one-config.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Each new test fails on its own assertion: `verdictIn` answers pass for a findings verdict, no child file stands, the second fail leaves the step at `design/draft`, the route still holds `implement/reflect` and `verdict`, `design.md` stands nowhere, and the old config key stays. The first-fail test and the bare-pass test pass today, and they guard the roads that stay.
+
+The settled design departs from the draft in four places, and the review's findings and a planner's check of the code carry each:
+
+- the reviewer names each child, as `- <child-name>: <finding>`, because an engine name breaks the name cap
+- the opener `pass with findings` mints, and a plain pass with rows stays a pass
+- a child stands at `draft` on `trivial`, and an agent's pull opens it
+- the config key reads `failsBeforePerson`, the name the design input uses
+
+The fail cases live in `test/level0/pull-fails.test.js`, because `pull-steps.test.js` stands near its line ceiling.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the route, the pull's pass and fail, the config key and the review guidance, which the ask names
+- every door the tests reach runs on the fakes of `test/level0/pull-doors.js`
+- a comment in `passed` and `failed` links the approach, at the change step
 
 ## reflect
 

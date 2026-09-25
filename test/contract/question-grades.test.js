@@ -31,6 +31,24 @@ test("the working note asks the owner a design question before the build", () =>
   );
 });
 
+// A design review fails an unusable approach alone, a finding rides out as a child, and form fails nothing. [[spec/tickets/one-review-a-ticket]]
+test("the design review note fails an unusable approach alone, sends each other finding to a child, and fails nothing on form", () => {
+  const path = "spec/guidance/review/design.md";
+  assert.ok(files.exists(join(root, ...path.split("/"))), `${path} stands`);
+  const rules = rulesIn(path);
+
+  const fails = rules.filter((one) => /\bfail/i.test(one) && /unusable/i.test(one));
+  assert.equal(fails.length, 1, "one rule fails a design, on an unusable approach");
+  const findings = rules.filter((one) => /pass with findings/i.test(one));
+  assert.equal(findings.length, 1, "one rule sends the other findings under pass with findings");
+  assert.match(findings[0], /child/i, "the rule mints a child");
+  assert.match(findings[0], /\brow\b/i, "one child a row");
+  const form = rules.filter((one) => /\bform\b/i.test(one));
+  assert.equal(form.length, 1, "one rule grades a form finding");
+  assert.doesNotMatch(form[0], /\bfails? (the|a) (design|review)\b/i, "a form finding fails no review");
+  assert.match(form[0], /\bpass/i, "the review passes over it");
+});
+
 // [[spec/tickets/a-question-reaches-its-owner]]
 test("the reviewing note fails a design on design alone, and hands craft to the implement step", () => {
   const rules = rulesIn("spec/guidance/review/reviewing.md");
