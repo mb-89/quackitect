@@ -1,40 +1,54 @@
-// The yours verb: the tickets waiting on a person, in the order the queue
-// hands them out. A ticket waits on a person where it stands open and the leaf
-// its pointer names carries `by: person`. Each road answers one JSON object.
+// The yours verb: the rows the work tab's queue holds on this box, in the
+// order the outline places them. The verb reads the one answer the work tab
+// reads, so the count beside the sidebar button and the count in the tab's
+// name are one number. Each road answers one JSON object.
 // [[spec/design_input/the-editor-draws-the-ticket#the-work-group]]
 
-import { frontOf } from "../engine/group.js";
-import { PERSON } from "./pull-hand-of.js";
-import { taggedFirst, ticketsHere, weighing } from "./pull-hand.js";
-import { leafOf, stepPathOf } from "./pull-route.js";
+import { OPEN } from "../engine/group.js";
+import { ticketsHere } from "./pull-hand.js";
+import { CLOUD_PLACE, compareOutline } from "./pull-outline.js";
+import { answerOf } from "./work-answer.js";
 
-// [[spec/design_input/the-editor-draws-the-ticket#the-work-group]]
-export function waiting(all) {
-  return [all ?? []].flat().filter((one) => {
-    const front = frontIn(one);
-    if (String(front.state ?? "") !== "open") return false;
-    return leafOf(front, stepPathOf(front))?.by === PERSON;
-  });
+// The rows this box takes: every row the answer places, off the cloud, each name once. src/tui/work/workplaces.go counts the same rows behind the tab's name. [[spec/design_output/tui#the-work-tab]]
+export function queueIn(answer) {
+  const rows = new Map();
+  for (const one of answer?.branches ?? []) {
+    rows.set(one.name, one);
+    for (const child of one.tickets ?? []) rows.set(child.name, child);
+  }
+  for (const one of answer?.loose ?? []) rows.set(one.name, one);
+  return [...rows.values()]
+    .filter((one) => one.queue && one.queue !== CLOUD_PLACE)
+    .sort((left, right) => compareOutline(left.queue, right.queue));
 }
 
-// The order `taggedFirst` holds, which the pull reads too. [[spec/design_output/pull#the-queue-is-a-score]]
+// Pull for me takes the first open row of the queue at a person's step, so a note waiting for its retro stays out of it. [[spec/design_output/pull#the-queue-is-an-outline]]
 export function yours(it, argv) {
-  const all = ticketsHere(it);
-  const at = weighing(it, all);
-  const queue = taggedFirst(waiting(all), at).map(rowOf);
+  const paths = new Map(ticketsHere(it).map((one) => [one.name, one.path]));
+  const queue = queueIn(answerOf(it, true)).map((one) => rowOf(one, paths));
 
   const flags = new Set(argv ?? []);
   if (flags.has("--count")) return answer({ count: queue.length });
-  if (flags.has("--next")) return answer(queue[0] ?? { ticket: null });
+  if (flags.has("--next")) {
+    const next = queue.find((one) => one.person && one.path && one.state === OPEN);
+    return answer(
+      next
+        ? { ticket: next.ticket, path: next.path, step: next.step }
+        : { ticket: null },
+    );
+  }
   return answer({ tickets: queue });
 }
 
-function rowOf(one) {
-  return { ticket: one.name, path: one.path, step: stepPathOf(frontIn(one)) };
-}
-
-function frontIn(one) {
-  return one.front ?? frontOf(one.text);
+function rowOf(one, paths) {
+  return {
+    ticket: one.name,
+    path: paths.get(one.name) ?? "",
+    step: one.step ?? "",
+    queue: one.queue,
+    state: one.state ?? "",
+    person: Boolean(one.person),
+  };
 }
 
 function answer(said) {
