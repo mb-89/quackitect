@@ -87,7 +87,12 @@ export function alsoReads(entry, texts) {
 function listsOf(said, texts) {
   const paths = pathsOf(said);
   const read = (path) => readYaml(texts.get(path) ?? "");
-  return { core: read(paths.core), terms: read(paths.terms), swaps: read(paths.swaps) };
+  return {
+    core: read(paths.core),
+    terms: read(paths.terms),
+    swaps: read(paths.swaps),
+    stems: read(paths.endings),
+  };
 }
 
 // [[spec/design_output/projection#projecting-in-memory]]

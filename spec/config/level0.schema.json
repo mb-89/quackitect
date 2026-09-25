@@ -297,7 +297,7 @@
       }
     },
     "work": {
-      "comment": "Level one. The knobs the work verbs read over a group and its tickets.",
+      "comment": "Level one. The knobs the work verbs read over a group and its tickets, and the work group's buttons, which wait for the host to draw them.",
       "type": "object",
       "properties": {
         "comment": {
@@ -351,6 +351,26 @@
           "type": "number",
           "unit": "score",
           "help": "The score a ticket takes for each hand-back that comes back refused."
+        },
+        "editor": {
+          "help": "Open the work tab, which draws every ticket and takes a cell edit. The count beside it is the tickets waiting on you.",
+          "widget": "action",
+          "icon": "🗂",
+          "runs": "./RUNME.sh tui work",
+          "counts": "./RUNME.sh ticket yours --count"
+        },
+        "pull": {
+          "help": "Take the ticket waiting on you first, and open it.",
+          "widget": "action",
+          "icon": "📥",
+          "runs": "./RUNME.sh ticket yours --next"
+        },
+        "new": {
+          "help": "Open a new ticket under the name the press asks for, with a process to pick.",
+          "widget": "action",
+          "icon": "📝",
+          "asks": "name",
+          "opens": "spec/tickets/<name>.md"
         }
       }
     },
@@ -373,63 +393,12 @@
         }
       }
     },
-    "refactor": {
-      "comment": "The refactoring hand the stop door starts beside the vote, while the warnings stand past the number.",
-      "type": "object",
-      "properties": {
-        "comment": {
-          "type": "string"
-        },
-        "parallel": {
-          "type": "boolean",
-          "help": "true starts the hand beside the work. false leaves the list to the session itself."
-        },
-        "mostWarnings": {
-          "type": "number",
-          "unit": "warnings",
-          "help": "The warnings the tree holds before the rule fires. 0 switches the rule off."
-        },
-        "mostAtOnce": {
-          "type": "number",
-          "unit": "hands",
-          "help": "The hands one session starts. 0 lifts the bound."
-        },
-        "mostFiles": {
-          "type": "number",
-          "unit": "files",
-          "help": "The files one hand takes on its walk. 0 lifts the bound, and the hand walks the whole list."
-        },
-        "untouchedFor": {
-          "type": "string",
-          "unit": "span, as 30m, 12h or 7d",
-          "help": "The span a file stands untouched before a hand takes it."
-        },
-        "holdFor": {
-          "type": "string",
-          "unit": "span, as 30m, 12h or 7d",
-          "help": "The span the hand holds its file against every other write. 0 switches the hold off."
-        }
-      }
-    },
     "engine": {
-      "comment": "Level one. Each key here names a widget nothing draws yet, because an engine has to answer it first. Marking a group is what draws one.",
+      "comment": "Level one. The buttons that make a vehicle and a stub, and where the session takes its work from.",
       "type": "object",
       "properties": {
         "comment": {
           "type": "string"
-        },
-        "state": {
-          "type": "string",
-          "enum": [
-            "rest",
-            "running"
-          ],
-          "help": "What a person last asked the engine to do.",
-          "widget": "status",
-          "sets": "engine.state",
-          "watches": "engine.beat",
-          "icon": "the owner picks one mark per state: play and stop",
-          "gesture": 1
         },
         "vehicle": {
           "help": "Make a vehicle: a copy of this tree that works on itself, in the folder the press asks for.",
@@ -454,11 +423,6 @@
           "colSpan": 1,
           "asks": "folder",
           "runs": "./RUNME.sh stub into <folder>"
-        },
-        "beat": {
-          "type": "number",
-          "unit": "seconds",
-          "help": "The beat the engine touches, which the light beside it reads."
         },
         "binding": {
           "type": "string",

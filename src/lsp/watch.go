@@ -8,7 +8,12 @@ import (
 	"errors"
 	"strings"
 	"time"
+
+	"quackitect/yaml"
 )
+
+// The pause before the server asks a door that failed again. [[spec/design_output/lsp#the-panel-follows-the-index]]
+const followRetry = 5 * time.Second
 
 // [[spec/design_output/lsp#the-panel-follows-the-index]]
 func (one *server) follows() {
@@ -20,7 +25,7 @@ func (one *server) follows() {
 			return
 		}
 		if err != nil {
-			time.Sleep(bridgeRetry)
+			time.Sleep(followRetry)
 			continue
 		}
 		if tick == since {
@@ -40,7 +45,7 @@ func (one *server) syncs() {
 	one.redraws(moved, gone)
 }
 
-// A file the index moves redraws, and the bridge answers for it again. A file the index drops takes its row with it. An open file follows the editor instead. [[spec/design_output/lsp#the-panel-follows-the-index]]
+// A file the index moves redraws, and the tools run over it at once. A file the index drops takes its row with it. An open file follows the editor instead. [[spec/design_output/lsp#the-panel-follows-the-index]]
 func (one *server) redraws(moved, gone []string) {
 	tree := one.checker.Tree()
 	one.guard.Lock()
@@ -51,30 +56,81 @@ func (one *server) redraws(moved, gone []string) {
 	}
 	paths := one.closed(moved)
 	one.guard.Unlock()
-	if len(paths) == 0 {
-		return
-	}
 	for _, at := range paths {
 		tree.Drops(at)
 	}
+	// A file pointing at a moved or dropped note reads that note's headings, so it redraws too. [[spec/design_output/lsp#the-panel-follows-the-index]]
+	leaning := pointingAt(tree, append(append([]string{}, moved...), gone...), paths)
+	// A file the tools read beside the tree moves every file's rows, so they run over the whole tree. [[spec/design_output/lsp#the-panel-follows-the-index]]
+	whole := readByTools(append(append([]string{}, moved...), gone...))
+	if len(paths)+len(leaning) == 0 {
+		if whole {
+			one.owes(nil, true)
+		}
+		return
+	}
 	got := map[string][]Finding{}
-	for _, at := range paths {
+	for _, at := range append(append([]string{}, paths...), leaning...) {
 		got[at] = nil
 		for path, said := range grouped(one.checker.Over(at)) {
 			got[path] = append(got[path], said...)
 		}
 	}
 	one.guard.Lock()
-	// The rows the bridge drew for a moved file read the text it held before, so they go now, and the bridge draws them again once it answers. [[spec/design_output/lsp#the-panel-follows-the-index]]
-	for _, at := range paths {
-		delete(one.panel.extra, at)
-	}
 	for path, said := range got {
 		one.panel.own[path] = said
 		one.shows(tree, path)
 	}
 	one.guard.Unlock()
-	go one.owes(paths)
+	// The tools' rows on a moved file stand until the run lands, which follows at once. [[spec/design_output/lsp#the-panel-follows-the-index]]
+	if len(paths) > 0 || whole {
+		one.owes(paths, whole)
+	}
+}
+
+// The tracked files a pointer of which names one of the paths, past the ones named to skip. [[spec/design_output/lsp#the-panel-follows-the-index]]
+func pointingAt(tree *Tree, targets, skip []string) []string {
+	out := []string{}
+	if len(targets) == 0 {
+		return out
+	}
+	for _, path := range tree.Paths() {
+		if listed(skip, path) {
+			continue
+		}
+		text := tree.Read(path)
+		if !strings.Contains(text, "[[") || !textual(text) {
+			continue
+		}
+		for _, said := range pointersIn(path, yaml.SplitLines(text)) {
+			if namesAny(said.target, targets) {
+				out = append(out, path)
+				break
+			}
+		}
+	}
+	return out
+}
+
+// Whether a pointer names one of the paths: as written, past an ending, by its id, or as a folder over it. [[spec/design_output/index#a-note-and-its-links]]
+func namesAny(target string, paths []string) bool {
+	name, _, _ := strings.Cut(target, "#")
+	name = strings.Trim(strings.TrimSpace(name), "/")
+	if name == "" {
+		return false
+	}
+	for _, path := range paths {
+		base := path[strings.LastIndex(path, "/")+1:]
+		for _, end := range pointerEndings {
+			if path == name+end || base == name+end {
+				return true
+			}
+		}
+		if strings.HasPrefix(path, name+"/") || strings.HasPrefix(name, path+"/") {
+			return true
+		}
+	}
+	return false
 }
 
 // The paths no editor holds open, under the guard. [[spec/design_output/lsp#the-panel-follows-the-index]]

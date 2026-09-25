@@ -1,11 +1,13 @@
 // The code door: the formatter applies itself, and a function or a file past
-// the size ceiling comes back refused.
+// the size ceiling or a lint row lands with a warning.
 // [[spec/design_output/level0#the-formatter-applies-itself]]
 
-import { refusal } from "../../.claude/skills/level0/lib/refuse.js";
 import { FILE_RULE, grows } from "../../.claude/skills/level0/lib/size.js";
-import { listsWarning } from "../../.claude/skills/level0/lib/warnings.js";
+import { rowOf, warnedNote } from "../../.claude/skills/level0/lib/warnings.js";
 import { asks } from "./config.js";
+
+// The levels of a Biome row the Problems panel draws, so the note names each one. [[spec/design_output/level0#the-panel-holds-a-warning]]
+const DRAWN = new Set(["error", "warning"]);
 
 export async function codeDoor(e, writing, where, whole, box) {
   // [[spec/design_output/level0#the-size-ceiling]]
@@ -13,50 +15,39 @@ export async function codeDoor(e, writing, where, whole, box) {
     function: asks(box, "code.functionLines"),
     file: asks(box, "code.fileLines"),
   });
-  if (grown.length) {
-    box.log.say("warn", "write", `refused ${grown.length} ceiling(s) in ${where}`, {
-      file: where,
-      rule: grown[0]?.rule,
-      tool: String(e.tool),
-    });
-    return {
-      result: {
-        deny: [refusal(where, grown), listed(box, where, grown)]
-          .filter(Boolean)
-          .join("\n"),
-      },
-    };
-  }
-  if (!box.biome.stands()) return { pass: true };
+  if (!box.biome.stands()) return landed(e, writing, whole, grown, where, box);
   let text = whole;
   if (e.tool === "Write") {
     const put = await box.biome.format(text, writing.path);
     if (put.ran) text = put.text;
   }
   const said = await box.biome.lint(text, writing.path);
-  const found = (said.found ?? []).filter((one) => one.severity === "error");
-  if (found.length) {
-    box.log.say("warn", "write", `refused ${found.length} line(s) in ${where}`, {
-      file: where,
-      rule: found[0]?.rule,
-      tool: String(e.tool),
-    });
-    return { result: { deny: refusal(where, found) } };
-  }
-  if (e.tool === "Write" && text !== writing.text)
-    return { event: { ...e, content: text } };
-  return { pass: true };
+  const linted = (said.found ?? []).filter((one) => DRAWN.has(String(one?.severity)));
+  return landed(e, writing, text, [...grown, ...linted], where, box);
 }
 
-// A file past the file ceiling stands on the warnings list, and the refactoring hand cuts it. [[spec/design_output/level0#the-ceiling-feeds-the-list]]
-function listed(box, where, grown) {
-  const rows = grown.filter((one) => one.rule === FILE_RULE);
-  if (!rows.length) return "";
-  listsWarning(box, where, rows);
-  return [
-    `${where} stands on the warnings list, and the refactoring hand cuts it.`,
-    `To cut it now, run ./RUNME.sh split ${where} --to <path> --lines <from>-<to>.`,
-  ].join("\n");
+// The write lands with the formatted text, and a break of form rides the context and the log. [[spec/design_output/level0#the-panel-holds-a-warning]]
+function landed(e, writing, text, found, where, box) {
+  const event =
+    e.tool === "Write" && text !== writing.text ? { ...e, content: text } : null;
+  if (!found.length) return event ? { event } : { pass: true };
+  const rows = found.map((one) => ({ ...one, file: one?.file || where }));
+  box.log.say("warn", "write", `${rows.length} line(s) stand at warning in ${where}`, {
+    file: where,
+    rule: rows[0]?.rule,
+    tool: String(e.tool),
+    detail: rows.map(rowOf).join("\n"),
+  });
+  const note = [warnedNote(where, rows), cutsOf(where, rows)]
+    .filter(Boolean)
+    .join("\n");
+  return { ...(event ? { event } : {}), after: { context: [note] } };
+}
+
+// A warning naming the file ceiling names the verb that cuts the file. [[spec/design_output/level0#the-ceiling-names-the-cut]]
+function cutsOf(where, grown) {
+  if (!grown.some((one) => one.rule === FILE_RULE)) return "";
+  return `To cut ${where}, run ./RUNME.sh split ${where} --to <path> --lines <from>-<to>.`;
 }
 
 function textAt(disk, path) {

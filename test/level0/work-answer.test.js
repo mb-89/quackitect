@@ -404,6 +404,32 @@ test("the plan's todos stand in the answer as rows with a place", () => {
   assert.equal(said.branches[0].queue, "∞");
 });
 
+// A todo stands before every ticket, whatever its anchor names. [[spec/design_output/pull#a-todo-forces-a-place]]
+test("a todo anchored at the end or on a ticket stands before every ticket", () => {
+  const { it } = doors({
+    [join(ROOT, ".se/.runtime/plan.json")]: JSON.stringify({
+      working: "",
+      todos: [
+        { title: "at the end", todo: "end" },
+        { title: "on a ticket", todo: "one-group" },
+        { title: "in front", todo: "true" },
+        { title: "moved by the tab", todo: "true" },
+      ],
+      places: { "moved by the tab": "end" },
+    }),
+  });
+  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
+  const said = answerOf(it);
+  const todos = said.loose.filter((one) => one.kind === "todo").map((one) => one.queue);
+  const tickets = [...said.branches, ...said.loose]
+    .filter((one) => one.kind !== "todo" && /^\d+$/.test(String(one.queue ?? "")))
+    .map((one) => Number(one.queue));
+  assert.equal(todos.length, 4);
+  for (const place of todos) {
+    for (const ticket of tickets) assert.ok(Number(place) < ticket, `todo ${place} before ticket ${ticket}`);
+  }
+});
+
 // The override lives in the plan file on this box, over the front, and lights the todo letter. [[spec/design_output/pull#a-todo-forces-a-place]]
 test("an override in the plan file moves the row and lights its todo, and travels into no ticket", () => {
   const { it } = doors({

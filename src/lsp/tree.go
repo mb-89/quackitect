@@ -99,6 +99,18 @@ func (one *Tree) Held(path string) bool {
 	return open
 }
 
+// The paths an editor holds a buffer of, in order. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+func (one *Tree) Buffers() []string {
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	out := []string{}
+	for path := range one.overlay {
+		out = append(out, path)
+	}
+	sort.Strings(out)
+	return out
+}
+
 func (one *Tree) Read(path string) string {
 	said := slashed(path)
 	one.guard.Lock()

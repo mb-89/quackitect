@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import { MARKS } from "../../.claude/skills/level0/lib/runs.js";
-import { errorsIn, marksSeen, onWrite } from "../../src/bridge/write.js";
+import { marksSeen, onWrite } from "../../src/bridge/write.js";
 import { fakeDisk, norm } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
@@ -101,8 +101,8 @@ test("a ticket under the stub keeping the vehicle's schema passes, and the stub 
   assert.deepEqual(said, { pass: true });
 });
 
-// A warning lets the write land, puts the rows on the refactoring hand's list, and tells the agent to carry on. [[spec/design_output/level0#a-warning-feeds-the-list]]
-test("a write at warning lands, feeds the refactor list, and the note after it says carry on", async () => {
+// A warning lets the write land, and tells the agent it stands in the panel and to carry on. [[spec/design_output/level0#the-panel-holds-a-warning]]
+test("a write at warning lands, and the note after it names the panel and says carry on", async () => {
   const at = join(WORK, "spec", "tickets", "warned.md");
   const warning = (rule) => ({
     file: "spec/tickets/warned.md",
@@ -112,7 +112,7 @@ test("a write at warning lands, feeds the refactor list, and the note after it s
     message: "Cut this one in two.",
     severity: "warning",
   });
-  const it = box({ [join(WORK, ".se", ".runtime", "refactor.json")]: "[]\n" });
+  const it = box();
   let found = [warning("VoiceVale.Passive")];
   it.vale = { stands: () => true, lint: async () => ({ ran: true, found }) };
 
@@ -123,20 +123,17 @@ test("a write at warning lands, feeds the refactor list, and the note after it s
     /stand at warning, and the write lands/,
   );
   assert.match(said.after.context[0], /carry on/);
-  const list = JSON.parse(it.disk.read(join(WORK, ".se", ".runtime", "refactor.json")));
-  assert.deepEqual(
-    list.map((one) => `${one.file} ${one.rule}`),
-    ["spec/tickets/warned.md VoiceVale.Passive"],
+  assert.match(said.after.context[0], /Problems panel/);
+  assert.match(said.after.context[0], /VoiceVale\.Passive/);
+  assert.equal(
+    it.disk.exists(join(WORK, ".se", ".runtime", "refactor.json")),
+    false,
+    "the door keeps no list of its own",
   );
 
   found = [];
   const clean = await onWrite(write(at, GOOD), it);
   assert.deepEqual(clean, { pass: true });
-  assert.deepEqual(
-    JSON.parse(it.disk.read(join(WORK, ".se", ".runtime", "refactor.json"))),
-    [],
-    "a clean write takes the file's rows off the list",
-  );
 });
 
 // The door reads the children off the work root, so a group's ask naming one comes back refused. [[spec/design_output/work#a-group-is-a-ticket]]
@@ -196,18 +193,34 @@ test("the same bad ticket written into the vehicle's own tree is refused the sam
   assert.match(said?.result?.deny ?? "", /steps/);
 });
 
-// A rule of form reads warning, and the write lands with it standing for the refactoring hand. [[spec/rationales/voice#11-form-and-substance]]
-test("a warning lets the write land, and an error refuses it", () => {
-  const warned = { rule: "VoiceParagraph.Sentence", line: 1, severity: "warning" };
-  const erred = { rule: "VoiceParagraph.Vocabulary", line: 1, severity: "error" };
-  const bare = { rule: "VoiceVale.History", line: 1 };
-  assert.deepEqual(errorsIn([warned]), [], "a warning alone refuses nothing");
-  assert.deepEqual(
-    errorsIn([warned, erred, bare]),
-    [erred, bare],
-    "an error stands, and a finding naming no side reads error",
+// A break of form lands at any level, and the note names it; a private name still refuses. [[spec/design_output/level0#the-panel-holds-a-warning]]
+test("a prose finding at error lands with the warning note, and a private name comes back refused", async () => {
+  const at = join(WORK, "spec", "tickets", "warned.md");
+  const finding = (rule) => ({
+    file: "spec/tickets/warned.md",
+    rule,
+    line: 5,
+    column: 1,
+    message: "Say it another way.",
+    severity: "error",
+  });
+  const it = box();
+  let found = [finding("VoiceParagraph.Vocabulary")];
+  it.vale = { stands: () => true, lint: async () => ({ ran: true, found }) };
+
+  const said = await onWrite(write(at, GOOD), it);
+  assert.equal(said?.result?.deny, undefined, "the write lands");
+  assert.match(said?.after?.context?.[0] ?? "", /VoiceParagraph\.Vocabulary/);
+  assert.match(said.after.context[0], /the write lands/);
+  assert.equal(
+    it.log.lines().some((one) => one.level === "warn" && one.kind === "vale"),
+    true,
+    "the log carries the warning",
   );
-  assert.deepEqual(errorsIn(undefined), []);
+
+  found = [finding("VoiceVale.Private")];
+  const home = await onWrite(write(at, GOOD), it);
+  assert.match(home?.result?.deny ?? "", /VoiceVale\.Private/);
 });
 
 // [[spec/design_output/level0#a-broken-rule-says-so]]
@@ -219,7 +232,10 @@ test("a lint that ran nowhere refuses a prose write and names the fault, and a w
       lint: async () => ({ ran: false, why: "E201 Invalid rule", found: [] }),
     },
   };
-  const said = await onWrite(write(join(WORK, "spec", "notes.md"), "# Notes\n"), broken);
+  const said = await onWrite(
+    write(join(WORK, "spec", "notes.md"), "# Notes\n"),
+    broken,
+  );
   assert.match(String(said?.result?.deny ?? ""), /E201 Invalid rule/);
   assert.equal(
     broken.log.lines().some((one) => one.level === "warn" && one.kind === "vale"),
@@ -237,7 +253,8 @@ test("a box with no vale lets the write land, and says so in the log once", asyn
   await onWrite(write(join(WORK, "spec", "one.md"), "# One\n"), bare);
   await onWrite(write(join(WORK, "spec", "two.md"), "# Two\n"), bare);
   assert.equal(
-    bare.log.lines().filter((one) => one.kind === "vale" && one.level === "warn").length,
+    bare.log.lines().filter((one) => one.kind === "vale" && one.level === "warn")
+      .length,
     1,
   );
 });
@@ -265,7 +282,10 @@ test("an Edit over state, a route line and a prose field lands the prose and put
   const at = join(WORK, "spec", "tickets", "good.md");
   const it = box({ [at]: GOOD });
   marksSeen(it, relativeTo(it.root, at), GOOD);
-  const old_string = GOOD.slice(GOOD.indexOf("state: open"), GOOD.indexOf("## change\n") + "## change\n".length);
+  const old_string = GOOD.slice(
+    GOOD.indexOf("state: open"),
+    GOOD.indexOf("## change\n") + "## change\n".length,
+  );
   const new_string = old_string
     .replace("state: open", "state: closed")
     .replace("makes the change the ask names", "makes it")
@@ -293,7 +313,12 @@ test("an Edit changing engine fields alone comes back refused, naming them, beca
   marksSeen(it, relativeTo(it.root, at), GOOD);
 
   const said = await onWrite(
-    { tool: "Edit", file_path: at, old_string: "state: open", new_string: "state: closed" },
+    {
+      tool: "Edit",
+      file_path: at,
+      old_string: "state: open",
+      new_string: "state: closed",
+    },
     it,
   );
 
@@ -336,5 +361,9 @@ test("a read handing back the text the mark holds writes the marks file once", a
   assert.deepEqual(Object.keys(JSON.parse(disk.read(kept))), ["notes.txt"]);
 
   await called(it, reads(at));
-  assert.equal(disk.times.get(kept), first, "a second read of the same text writes nothing");
+  assert.equal(
+    disk.times.get(kept),
+    first,
+    "a second read of the same text writes nothing",
+  );
 });

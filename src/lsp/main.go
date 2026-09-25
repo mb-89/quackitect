@@ -73,17 +73,31 @@ func rootHere() (string, error) {
 func speaks(root string) int {
 	out := &wire{out: bufio.NewWriter(stdout)}
 	defer out.Flush()
-	// The editor starts the server again once it ends, so a swapped binary ends it. [[spec/design_output/lsp]]
-	swap.Watches(func() {
-		out.Flush()
-		exits(0)
-	})
 	checker, err := checkerAt(root, false)
 	if err != nil {
 		fmt.Fprintln(stderr, err)
 		return 1
 	}
-	if err := Speaks(checker, stdin, out); err != nil {
+	one := newServer(checker, out)
+	// The port beside the pipe, whose pointer goes as the server ends, however it ends. [[spec/design_output/lsp#a-port-serves-the-list]]
+	drops, err := one.listens(root)
+	if err != nil {
+		fmt.Fprintln(stderr, "the port did not stand:", err)
+		drops = func() {}
+	}
+	defer drops()
+	ends := func() {
+		drops()
+		out.Flush()
+		exits(0)
+	}
+	// The editor starts the server again once it ends, so a swapped binary ends it. [[spec/design_output/lsp]]
+	swap.Watches(ends)
+	go func() {
+		<-stops(func(func()) {})
+		ends()
+	}()
+	if err := one.speaks(stdin); err != nil {
 		fmt.Fprintln(stderr, err)
 		return 1
 	}
@@ -130,14 +144,12 @@ func checks(root string, where []string) int {
 		fmt.Fprintln(stderr, err)
 		return 1
 	}
+	// The same sweep the running server holds, so a caller with no editor reads the same list. [[spec/design_output/lsp#a-port-serves-the-list]]
 	found := []Finding{}
 	if len(where) == 0 || (len(where) == 1 && where[0] == ".") {
-		found = checker.Sweep()
+		found = checker.Whole()
 	} else {
-		for _, one := range pathsUnder(checker.Tree(), where) {
-			found = append(found, checker.Over(one)...)
-		}
-		found = sorted(found)
+		found = checker.Reads(where)
 	}
 
 	out, err := json.MarshalIndent(found, "", "  ")

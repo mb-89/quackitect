@@ -221,7 +221,7 @@ test("ticket note writes under the work root, off the note process under the met
 
 test("ticket update reads the route off the method root, and writes the ticket under the work root", () => {
   const { it, disk } = roots({ [w("spec/tickets/small.md")]: STALE });
-  const ran = heard(() => ticket(WORK, ["update", "small"], it));
+  const ran = heard(() => ticket(WORK, ["update", "small", "--over"], it));
 
   assert.equal(ran.code, 0, ran.said);
   const text = disk.read(w("spec/tickets/small.md"));

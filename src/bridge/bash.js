@@ -34,10 +34,11 @@ import {
   versionRefs,
 } from "../../.claude/skills/level0/lib/trunk.js";
 import { WORK_BRANCH } from "../engine/group.js";
+import { formIn, refusesIn, rowOf } from "../../.claude/skills/level0/lib/warnings.js";
 import { heldTests } from "../scripts/guidance-hand.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
-import { errorsIn, marksSeen } from "./write.js";
+import { marksSeen } from "./write.js";
 
 const COMMIT = "level0-commit.md";
 const PASS = { pass: true };
@@ -53,12 +54,13 @@ export async function onBash(e, box) {
     trunkGuard,
     versionGuard,
   ];
+  const held = {};
   for (const check of checks) {
-    const found = await check(command, e, box);
+    const found = await check(command, e, box, held);
     if (found) return { result: { deny: found } };
   }
   marksShown(command, box);
-  return PASS;
+  return messageWarns(held.warned ?? [], box) ?? PASS;
 }
 
 // The shell reads that hand the agent a file's lines, each a shape and the span it prints. [[spec/design_output/level0#a-lone-shell-read-marks]]
@@ -110,13 +112,15 @@ function reader(box) {
 }
 
 // [[spec/design_output/bash#a-shell-writes-nothing]]
-async function commandRules(command, _e, box) {
+async function commandRules(command, _e, box, held) {
   const found = findings(command, asks(box, "names.words"), {
     cloud: onACloud(box),
     script: (path) => fileText(reader(box), path),
     subjects: (undo) => subjectsOf(box, undo),
   });
-  found.push(...(await commitVoice(command, box)));
+  const voiced = await commitVoice(command, box);
+  found.push(...refusesIn(voiced));
+  held.warned = formIn(voiced);
   if (!onACloud(box) && skipsTheHook(command)) {
     box.log.say("warn", "private", "a commit steps past the hook", {
       tool: "Bash",
@@ -140,13 +144,13 @@ function subjectsOf(box, undo) {
     .filter(Boolean);
 }
 
-// A message meets the voice rules, and a break of form lands the way a write does. [[spec/rationales/voice#11-form-and-substance]]
+// A message meets the voice rules, and every finding comes back, so the caller warns on form and refuses the rest. [[spec/design_output/bash#a-commit-message-meets-voice]]
 export async function messageFaults(message, box) {
   if (!box.vale.stands()) return [];
   const text = withoutTrailers(String(message ?? ""));
   if (!text.trim()) return [];
   const ran = await box.vale.lint(text, COMMIT);
-  return ran.ran ? errorsIn(readsProse(box, text, ran.found)) : [];
+  return ran.ran ? readsProse(box, text, ran.found) : [];
 }
 
 // [[spec/design_output/bash#a-commit-message-meets-voice]]
@@ -161,6 +165,31 @@ async function commitVoice(command, box) {
     }
   }
   return await messageFaults(said.text, box);
+}
+
+// A break of form in a message lands with the commit, and the rows reach the log and the agent. [[spec/design_output/bash#a-commit-message-meets-voice]]
+function messageWarns(found, box) {
+  if (!found.length) return null;
+  const rows = found.map((one) => ({ ...one, file: one?.file || COMMIT }));
+  box.log.say(
+    "warn",
+    "bash",
+    `${rows.length} line(s) of a commit message stand at warning`,
+    {
+      tool: "Bash",
+      rule: rows[0]?.rule,
+      detail: rows.map(rowOf).join("\n"),
+    },
+  );
+  return { after: { context: [messageNote(rows)] } };
+}
+
+// What the agent reads after a commit lands over a break of form. [[spec/design_output/bash#a-commit-message-meets-voice]]
+export function messageNote(rows) {
+  return [
+    `${rows.length} line(s) of the commit message break a rule of form, and the commit lands. Leave it as it stands, carry on with the ask, and hold these rules in the next message.`,
+    ...rows.map((one) => `  ${rowOf(one)}`),
+  ].join("\n");
 }
 
 // [[spec/design_output/private#two-doors-one-check]]
@@ -184,7 +213,9 @@ async function privateDelta(command, _e, box) {
 async function testedDelta(command, _e, box) {
   if (!commitIn(command)) return "";
   // Git holds a merge in progress under MERGE_HEAD, so the read asks git where it stands. [[spec/design_output/tree#the-rules-over-two-files]]
-  const merging = Boolean(await git(box, ["rev-parse", "-q", "--verify", "MERGE_HEAD"]));
+  const merging = Boolean(
+    await git(box, ["rev-parse", "-q", "--verify", "MERGE_HEAD"]),
+  );
   const found = untestedIn(
     await git(box, ["diff", "--cached", "--unified=0"]),
     (path) => fileText(reader(box), path),
@@ -284,6 +315,13 @@ function trunkGuard(command, _e, box) {
 
 // Each commit carries one helper's work, and the verb's check gates every landing on trunk. [[spec/design_output/work#a-landing-takes-the-verb]]
 function throughTheVerb(how) {
+  if (how === "push")
+    return [
+      `This push lands on ${TRUNK} past the push verb.`,
+      "",
+      "Run `./RUNME.sh push`, which reads the check's stamp and pushes the branch",
+      "you stand on once the check answers green on it.",
+    ].join("\n");
   return [
     `This ${how} lands on ${TRUNK} past the commit verb.`,
     "",

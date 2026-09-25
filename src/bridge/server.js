@@ -17,6 +17,7 @@ import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
 import { wire } from "../doors/wire.js";
 import { projectionsHere, sourcesOf } from "../engine/projection.js";
+import { onAgent } from "./agent.js";
 import {
   holdsForAnswer,
   onAgentSpoke,
@@ -25,22 +26,13 @@ import {
   onTurnEnd,
   SPOKE,
 } from "./answer.js";
-import { onAgent } from "./agent.js";
-import { gatesAnswer } from "./answer-read.js";
+import { answerRides, gatesAnswer } from "./answer-read.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
 import { dropsAll, dropsMoved } from "./caches.js";
 import { asks, asksText } from "./config.js";
-import { FINDINGS, findingsFor, heldFor } from "./findings.js";
 import { holdsGrace } from "./grace.js";
-import {
-  clearsAfter,
-  holdsForHandover,
-  measures,
-  onSessionMeasure,
-  ridesCall,
-} from "./handover.js";
 import {
   onAgentSpawn,
   onPromptContext,
@@ -53,6 +45,14 @@ import {
   surveyHere,
 } from "./guidance.js";
 import {
+  clearsAfter,
+  holdsForHandover,
+  measures,
+  onSessionMeasure,
+  ridesCall,
+} from "./handover.js";
+import { SPECS as logSpecs, TOOLS as logTools } from "./logline.js";
+import {
   asksForPlan,
   PLAN,
   PLAN_CALL,
@@ -61,10 +61,8 @@ import {
   SPECS as planSpecs,
   TOOLS as planTools,
 } from "./plan.js";
-import { SPECS as logSpecs, TOOLS as logTools } from "./logline.js";
 import { freshens } from "./projection.js";
 import { SPECS as proseSpecs, TOOLS as proseTools } from "./prose.js";
-import { releasesHold } from "./refactor-hold.js";
 import { movedCode, provesCode, SELF_TEST } from "./reload.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import {
@@ -78,9 +76,7 @@ import {
   dropsHold,
   ENDS_TURN,
   holdsCall,
-  onRefactorAnswered,
   onStop,
-  REFACTOR_ANSWERED,
   sawCall,
   sawPrompt,
   SPECS as stopSpecs,
@@ -125,7 +121,6 @@ const DOORS = {
   "tool.describe": onDescribe,
   "tool.call": onToolCall,
   [ANSWERED]: onAgentAnswered,
-  [REFACTOR_ANSWERED]: onRefactorAnswered,
 };
 
 const TOOLS = {
@@ -243,7 +238,6 @@ function opensSession(e, box) {
   box.tallies = {};
   // [[spec/design_output/level0#a-cache-follows-its-file]]
   dropsAll(box);
-  releasesHold(box);
   onSessionStart(e, box);
   box.projections = projectionsHere(box.disk, box.method);
   box.sources = sourcesOf(box.projections, box.disk, box.method, box.work);
@@ -276,7 +270,8 @@ async function onToolCall(e, box) {
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (!passes(said)) return said;
-  return held ?? ridesCall(e, box, owesCanary(e, box)) ?? PASS;
+  // [[spec/design_output/level0#the-findings-ride-the-call]]
+  return held ?? ridesCall(e, box, answerRides(e, box, owesCanary(e, box))) ?? PASS;
 }
 
 function passes(said) {
@@ -349,34 +344,6 @@ export function serve(method, port = PORT_BASE, say = console.log) {
   };
 
   const onRequest = (request, response) => {
-    // The problems panel reads the battery's findings here, so a rule reaches the editor off one list. [[spec/design_output/lsp]]
-    if (request.method === "GET" && String(request.url).startsWith(FINDINGS)) {
-      findingsFor(own, request.url).then(
-        (said) => answer(response, OK, said),
-        (error) =>
-          answer(response, OK, {
-            ok: false,
-            found: [],
-            fault: String(error?.message ?? error),
-          }),
-      );
-      return;
-    }
-    // A buffer the editor holds reads here as typed, so no source waits for a save. [[spec/design_output/lsp#the-panel-lints-as-typed]]
-    if (request.method === "POST" && request.url === FINDINGS) {
-      readBody(request, (body) =>
-        heldFor(own, body).then(
-          (said) => answer(response, OK, said),
-          (error) =>
-            answer(response, OK, {
-              ok: false,
-              found: [],
-              fault: String(error?.message ?? error),
-            }),
-        ),
-      );
-      return;
-    }
     if (request.method === "POST" && request.url === "/stop") {
       answer(response, OK, { ok: true });
       setTimeout(stop, SOON);

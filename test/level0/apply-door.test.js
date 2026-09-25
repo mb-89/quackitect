@@ -120,6 +120,22 @@ test("a patch over code writes the text the formatter answers, so the next edit 
   assert.equal(next?.result?.deny, undefined, "the mark stands on the text the disk holds");
 });
 
+// A break of form the door warns on lands with the batch, and the answer names the rows. [[spec/design_output/level0#the-panel-holds-a-warning]]
+test("a patch over code past a lint row writes, and the answer carries the warning", async () => {
+  const box = formatting({ "/tree/one.js": "const a = 1;\n" });
+  box.biome.lint = async () => ({
+    ran: true,
+    found: [{ rule: "lint/style/useConst", line: 1, column: 1, message: "Use const.", severity: "error" }],
+  });
+  const said = await TOOLS[`mcp__level0__${PATCH}`](
+    { ops: [{ file: "one.js", old: "a = 1;", new: "a = 2;" }] },
+    box,
+  );
+  assert.match(said.result.result, /1 file\(s\) written/);
+  assert.match(said.result.result, /one\.js:1 lint\/style\/useConst: Use const\./);
+  assert.equal(box.disk.read("/tree/one.js"), "const a = 2;\n");
+});
+
 // [[spec/design_output/apply#bytes-in-bytes-out]]
 test("an exact edit writes a dollar sign as a dollar sign", () => {
   const took = applied({ "one.md": { exists: true, text: "price\n" } }, [

@@ -138,7 +138,7 @@ export const verbs = {
     run: async () => cloud(it.work, rest, it),
   },
   ticket: {
-    says: "tickets: pull, note, update, open, todo",
+    says: "tickets: pull, note, update, open, todo, route, yours, fill",
     // You pull a ticket, and the engine takes the branch it stands on. [[spec/design_output/pull#the-hand-out]]
     run: async () =>
       rest[0] === "pull"
@@ -180,6 +180,10 @@ export const verbs = {
   commit: {
     says: "read the message, land the commit, run the check, and push on green from a cloud box",
     run: async () => (await import("./commit-verb.js")).commitVerb(commitDoors(), rest),
+  },
+  push: {
+    says: "push the branch you stand on, once the check answers green on it",
+    run: async () => (await import("./push-verb.js")).pushVerb(commitDoors()),
   },
   serve: {
     says: "the server behind the bridgehead, under the debugger with --inspect",

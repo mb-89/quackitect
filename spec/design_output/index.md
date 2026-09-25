@@ -36,8 +36,10 @@ whole answer or the one before it.
 | `line_text` | every line, for the word question |
 
 `index.go` names the folders standing outside the walk. Each holds the
-machinery, or what a tool writes on its own. `machinery` there holds the rule
-under `.se`, and the walk, a change and the watch all ask it:
+machinery, or what a tool writes on its own, or a checkout of its own left
+standing under this one. `machinery` there holds the rule under `.se`,
+`ownsGit` holds the rule for a nested checkout, and `skips` asks both for the
+walk, a change and the watch alike:
 
 | folder | the walk and the watch |
 |---|---|
@@ -45,6 +47,7 @@ under `.se`, and the walk, a change and the watch all ask it:
 | any other folder under `.se`, as `.se/tickets`, `.se/notes` | stand inside, though git ignores it |
 | `.git`, `node_modules` | stand outside |
 | a plugin folder | stands inside, because it holds a tracked manifest |
+| a folder below the root carrying its own `.git`, a file for a worktree or a folder for a clone | stands outside, whole. The root's own `.git` stays as it is today |
 
 The walk asks git for its list once, and marks each row git tracks. A root git
 holds nowhere tracks every file the walk reads.
@@ -181,7 +184,10 @@ Each one is a walk the tree takes in one call:
 
 ## The index answers the tickets
 
-`tickets` answers every note of kind `ticket`, one row a ticket, and a reader
+`tickets` answers a ticket only from `spec/tickets/<name>.md` or
+`.se/tickets/<name>.md` directly under the root, the folders `FOLDERS` in
+`src/extension/lib/lens.js` names. A ticket-kind note anywhere else, such as
+inside a nested git worktree, is no ticket. One row a ticket, and a reader
 opens no file and no git for it. `ticket.go` holds it, and
 `./RUNME.sh index tickets` prints the rows.
 

@@ -10,11 +10,11 @@ import {
   dropsHold,
   onStop,
   reportStands,
-  sawCall,
   sawPrompt,
   TOOLS,
 } from "../../src/bridge/stop.js";
 import { STOP_CALL } from "../../.claude/skills/level0/lib/stop.js";
+import { onPromptSubmit } from "../../src/bridge/answer.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -53,13 +53,6 @@ const RULES = `
   asks: Does the work stand complete, with no todo open in the plan and nothing in hand there?
   says: The work stands complete, so this turn ends.
 
-- id: warnings-stand-past-the-number
-  side: continue
-  priority: 10
-  decides: mechanical
-  runs: warnings-standing
-  says: The warnings stand past the number, and a hand drains them beside you.
-
 - id: the-tooth-is-out
   side: continue
   priority: 0
@@ -68,24 +61,13 @@ const RULES = `
   says: The stop hook stands off.
 `;
 
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-const REFACTOR = {
-  parallel: true,
-  mostWarnings: 2,
-  mostAtOnce: 1,
-  untouchedFor: "7d",
-  grace: 1,
-};
-
 const NOW = 1_800_000_000;
-const WEEK = 604_800;
 
-function box(files = {}, refactor = REFACTOR) {
+function box(files = {}) {
   const disk = fakeDisk({
     [at("spec/config/level0.json")]: JSON.stringify({
       stop: { enabled: true, mostInARow: 3, hold: "off" },
       engine: { binding: "queue" },
-      refactor,
     }),
     [at("spec/config/stop/level0.yml")]: RULES,
     ...files,
@@ -101,35 +83,9 @@ function box(files = {}, refactor = REFACTOR) {
       clock: { now: () => new Date(NOW * 1000) },
       proc: fakeProc({
         "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
-        // One log answers the whole list, newest first, whatever order the list names the files in. [[spec/tickets/the-spawn-reaches-its-guidance]]
-        git: (argv) => ({
-          stdout: argv.includes("--name-only")
-            ? `${NOW - 60}\n\nnew.md\n${NOW - WEEK * 2}\n\nold.md\n${NOW - WEEK * 3}\n\nnew.md\nold.md\n`
-            : "",
-        }),
       }),
       log: { say: (...row) => said.push(row) },
     },
-  };
-}
-
-// The stamp the check leaves, and the list beside it, which the refactoring rule reads. [[spec/design_output/stop#the-grace]]
-function stamped(warnings, names) {
-  const list = Array.from({ length: warnings }, (_, at) => ({
-    file: names[at % names.length],
-    rule: "VoiceParagraph.Sentence",
-    line: at + 1,
-  }));
-  return {
-    [at(".se/.runtime/check.json")]: JSON.stringify({
-      sha: "a1",
-      ok: true,
-      clean: true,
-      at: "2026-01-01T00:00:00Z",
-      warnings,
-      files: names,
-    }),
-    [at(".se/.runtime/refactor.json")]: JSON.stringify(list),
   };
 }
 
@@ -223,6 +179,25 @@ test("a talk stop ends the turn only where the same message carries the report",
     false,
     "a heading with no row is no report",
   );
+});
+
+// A report an earlier message of this turn carries stands, so the stop line comes alone; an owner's prompt opens a turn with none. [[spec/design_output/stop#a-talk-follows-a-report]]
+test("a stop line alone passes the talk where this turn's report stands, and a prompt clears it", () => {
+  const report = [
+    "The work stands here.",
+    "",
+    "# What the agent needs",
+    "",
+    "| No. | question | proposed answer |",
+    "|---|---|---|",
+    "| 1 | which road | the short one |",
+  ].join("\n");
+  const line = { last_assistant_message: "stop: the-owner-asks-to-talk" };
+  const it = box();
+  assert.ok(onStop({ last_assistant_message: report }, it.box).result?.block);
+  assert.deepEqual(onStop(line, it.box), { pass: true });
+  onPromptSubmit({ origin: { kind: "composer" }, text: "go on" }, it.box);
+  assert.match(onStop(line, it.box).result.block, /a-report-stands answers false/);
 });
 
 // A claim of done meets the plan: a todo open or a thing in hand holds the turn, and an empty plan lets it end. [[spec/design_output/stop#the-plan]]
@@ -394,81 +369,6 @@ ${RULES}`;
   );
 });
 
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("the door answers the vote and the hand together, and the hand takes the file outside the window", () => {
-  const it = box(stamped(9, ["old.md", "new.md"]));
-  const said = onStop({ last_assistant_message: "Some text and no stop." }, it.box);
-
-  assert.match(said.result.block, /names no stop reason/);
-  assert.equal(said.spawn.kind, "refactor");
-  assert.equal(said.spawn.file, "old.md");
-  assert.match(said.spawn.prompt, /old\.md/);
-  assert.equal(said.back.event, "refactor.answered");
-});
-
-// The list past the number with a file at rest asks for the turn over the grace, and the turn's end answers it. [[spec/design_output/stop#the-grace]]
-test("a call under a long list opens the grace, and the turn's end clears it", () => {
-  const it = box(stamped(9, ["old.md"]));
-  sawCall({ tool: "Read" }, it.box);
-  assert.equal(it.box.grace?.id, "refactor", "the call opens the ask");
-  assert.match(it.box.grace.why, /9 warnings stand/);
-  const said = onStop({ last_assistant_message: "Some text and no stop." }, it.box);
-  assert.equal(it.box.grace, null, "the turn's end is the reaction");
-  assert.equal(said.spawn.file, "old.md");
-  const fresh = box(stamped(9, ["new.md"]));
-  sawCall({ tool: "Read" }, fresh.box);
-  assert.equal(fresh.box.grace, undefined, "a list over files still warm asks nothing");
-});
-
-// One ask stands at a time, so a call under a standing grace asks git nothing. [[spec/design_output/stop#the-grace]]
-test("a call under a standing grace reads no list and asks git nothing, and one log answers the whole list", () => {
-  const it = box(stamped(9, ["old.md", "new.md"]));
-  sawCall({ tool: "Read" }, it.box);
-  const logs = () => it.box.proc.ran.filter((one) => one.argv[1] === "log");
-  assert.equal(logs().length, 1, "one log over the whole list");
-  sawCall({ tool: "Read" }, it.box);
-  assert.equal(logs().length, 1, "the standing grace reads nothing more");
-});
-
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("the hand goes once a session, and the flag off starts none", () => {
-  const it = box(stamped(9, ["old.md"]));
-  const turn = { last_assistant_message: "Some text and no stop." };
-
-  assert.equal(onStop(turn, it.box).spawn.file, "old.md");
-  assert.equal(onStop(turn, it.box).spawn, undefined, "the count bounds the session");
-
-  const off = box(stamped(9, ["old.md"]), { ...REFACTOR, parallel: false });
-  assert.equal(onStop(turn, off.box).spawn, undefined);
-});
-
-// A rule reading the list alone holds every turn open on a tree carrying warnings. [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("the vote holds the turn open while a hand wants to go, and lets it end after", () => {
-  const it = box(stamped(9, ["old.md"]));
-  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
-
-  assert.match(onStop(done, it.box).result.block, /warnings stand past the number/);
-  assert.deepEqual(
-    onStop(done, it.box),
-    { pass: true },
-    "the count spends, and the turn ends",
-  );
-
-  const off = box(stamped(9, ["old.md"]), { ...REFACTOR, parallel: false });
-  assert.deepEqual(onStop(done, off.box), { pass: true }, "the flag off holds no turn");
-});
-
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("a list under the number starts no hand, and the vote reads the stamp", () => {
-  const it = box(stamped(1, ["old.md"]));
-  const said = onStop(
-    { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" },
-    it.box,
-  );
-
-  assert.deepEqual(said, { pass: true });
-});
-
 test("the queue holds a stop on completion while a free ticket stands", () => {
   const free =
     "---\nkind: [[ticket]]\nstate: open\nurgency: soon\nsteps:\n  - name: do\n---\n\n# Ask\n\nA thing.\n";
@@ -503,7 +403,6 @@ function heldBox(hold) {
     [at("spec/config/level0.json")]: JSON.stringify({
       stop: { enabled: true, mostInARow: 3, hold },
       engine: { binding: "queue" },
-      refactor: REFACTOR,
     }),
     [at("spec/config/stop/level0.yml")]: HOLD_RULES,
   });

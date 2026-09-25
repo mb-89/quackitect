@@ -48,7 +48,6 @@ function helperBox(binding) {
       [at("spec/config/level0.json")]: JSON.stringify({
         stop: { enabled: true, mostInARow: 3, hold: "off" },
         engine: { binding },
-        refactor: { parallel: false },
       }),
       [at("spec/config/stop/level0.yml")]: RULES,
       [at("spec/tickets/a-free.md")]: FREE,

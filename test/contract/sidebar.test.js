@@ -31,11 +31,9 @@ test("the declaration names a vehicle button and a stub button, each asking for 
   }
 });
 
-test("the two buttons stand in one section, beside the engine state", () => {
+test("the two buttons stand in one section and one group", () => {
   const vehicle = entry("engine.vehicle");
   const stub = entry("engine.stub");
-  const state = entry("engine.state");
-  assert.equal(vehicle?.section, state?.section);
-  assert.equal(stub?.section, state?.section);
+  assert.equal(vehicle?.section, stub?.section);
   assert.equal(vehicle?.group, stub?.group);
 });

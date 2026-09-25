@@ -73,13 +73,25 @@ func skips(root, abs string, info fs.FileInfo) bool {
 		return true
 	}
 	rel, ok := relOf(root, abs)
-	return ok && machinery(rel)
+	if !ok {
+		return false
+	}
+	if rel != "." && ownsGit(abs) {
+		return true
+	}
+	return machinery(rel)
 }
 
 // A dot folder under the private one holds what a tool writes: the runtime, the retro, the log. The walk and the watch stand off it, and read every other folder there. [[spec/design_output/index#the-rows-the-walk-writes]]
 func machinery(rel string) bool {
 	under, ok := strings.CutPrefix(rel, Private+"/")
 	return ok && strings.HasPrefix(under, ".")
+}
+
+// Whether a folder carries its own .git, a file for a worktree or a folder for a clone: a checkout of its own, left standing under this one. The walk and the watch stand off it whole, and the root's own .git stays as it is today. [[spec/design_output/index#the-rows-the-walk-writes]]
+func ownsGit(abs string) bool {
+	_, err := lstatOf(filepath.Join(abs, ".git"))
+	return err == nil
 }
 
 func Open(root, at string) (*sql.DB, error) {

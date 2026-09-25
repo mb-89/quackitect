@@ -4,7 +4,8 @@
 
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
-import { readNote } from "../../.claude/skills/level0/lib/schema.js";
+import { readNote, sectionAt } from "../../.claude/skills/level0/lib/schema.js";
+import { formIn, refusesIn } from "../../.claude/skills/level0/lib/warnings.js";
 import { voiceOver } from "../bridge/findings.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
@@ -122,26 +123,6 @@ export function withFieldText(text, path, name, said) {
   return { text: rows.join("\n") };
 }
 
-export function sectionAt(sections, path) {
-  const parts = path.split("/");
-  let from = 0;
-  let found = -1;
-  for (let depth = 0; depth < parts.length; depth++) {
-    const level = depth + 1;
-    found = -1;
-    for (let i = from; i < sections.length; i++) {
-      if (sections[i].level < level && i > from) break;
-      if (sections[i].level === level && sections[i].header === parts[depth]) {
-        found = i;
-        break;
-      }
-    }
-    if (found < 0) return -1;
-    from = found + 1;
-  }
-  return found;
-}
-
 export function chapterEnd(sections, at, level, last) {
   for (let i = at + 1; i < sections.length; i++) {
     if (sections[i].level <= level) return sections[i].line - 1;
@@ -152,24 +133,10 @@ export function chapterEnd(sections, at, level, last) {
 // [[spec/design_output/pull#the-fields-hold-their-forms]]
 export function chapterOf(text, path) {
   const sections = readNote(text).sections;
-  const parts = path.split("/");
-  let from = 0;
-  let found = -1;
-  for (let depth = 0; depth < parts.length; depth++) {
-    const level = depth + 1;
-    found = -1;
-    for (let i = from; i < sections.length; i++) {
-      if (sections[i].level < level && i > from) break;
-      if (sections[i].level === level && sections[i].header === parts[depth]) {
-        found = i;
-        break;
-      }
-    }
-    if (found < 0) return { stands: false, own: [], fields: new Map() };
-    from = found + 1;
-  }
+  const found = sectionAt(sections, path);
+  if (found < 0) return { stands: false, own: [], fields: new Map() };
 
-  const level = parts.length;
+  const level = path.split("/").length;
   const own = lines(sections[found].own);
   const fields = new Map();
   for (let i = found + 1; i < sections.length; i++) {
@@ -286,14 +253,26 @@ export function verdictIn(rows) {
 const FORMS_READ = ["text", "list", "checklist", "verdict"];
 const HEADING = /^#{1,6}\s/;
 
-// The pull reads the ticket the way the lint reads it, over the whole ticket with the fields laid in. It keeps what lands on the leaf's chapter. [[spec/design_output/pull#the-voice-reads-the-evidence]]
-export function voiceFaults(it, one, leaf) {
+// The pull reads the ticket the way the lint reads it, over the whole ticket with the fields laid in. It keeps what lands on the leaf's chapter: it answers the lines that refuse, and puts each break of form on `warned`, so the hand-back lands over it. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+export function voiceFaults(it, one, leaf, warned = []) {
   if (!it.vale) return [];
   const read = voiceText(one.text, leaf);
   if (!read) return [];
-  return voiceOver(it, one.path, read.text, read).map(
-    (fault) =>
-      `${leaf.path} breaks ${fault.rule} at line ${fault.line} of ${one.path}: ${fault.message}`,
+  const found = voiceOver(it, one.path, read.text, read);
+  const row = (fault) =>
+    `${leaf.path} breaks ${fault.rule} at line ${fault.line} of ${one.path}: ${fault.message}`;
+  warned.push(...formIn(found).map(row));
+  return refusesIn(found).map(row);
+}
+
+// A hand-back landing over a break of form names each line. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+export function warnsOf(warned) {
+  if (!warned.length) return;
+  console.log(
+    [
+      "These lines break a rule of form, and the hand-back lands. Leave them as they stand:",
+      ...warned.map((one) => `  ${one}`),
+    ].join("\n"),
   );
 }
 

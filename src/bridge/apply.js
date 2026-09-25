@@ -71,11 +71,14 @@ async function lands(e, took, box) {
   }
   const wrote = writes(took, String(e.on ?? ""), box);
   if (!wrote.landed) box.marks = held;
-  return { result: { result: wrote.said } };
+  // A break of form lands with the batch, and its note rides the answer. [[spec/design_output/level0#the-panel-holds-a-warning]]
+  const warned = wrote.landed ? (took.warned ?? []) : [];
+  return { result: { result: [wrote.said, ...warned].join("\n\n") } };
 }
 
-// The write carries the call's hand, so the hand holding a file patches it. [[spec/design_output/stop#the-hand-holds-its-file]]
+// The write carries the call's hand, as the agent's own write does. [[spec/design_output/level0#the-write-door]]
 async function checked(took, box, agentId) {
+  took.warned = [];
   for (const one of took.files) {
     const said = await onWrite(
       { tool: "Write", file_path: one.file, content: one.made, agentId },
@@ -85,6 +88,7 @@ async function checked(took, box, agentId) {
       return `${one.file} refuses the batch, and nothing is written.\n\n${said.result.deny}`;
     // The door formats code and marks the text it answers, so the disk takes that text and the next edit meets its mark. [[spec/design_output/level0#the-formatter-applies-itself]]
     if (typeof said?.event?.content === "string") one.made = said.event.content;
+    took.warned.push(...(said?.after?.context ?? []));
   }
   return "";
 }

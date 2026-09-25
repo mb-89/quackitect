@@ -201,7 +201,7 @@ test("a hand-back with a field empty answers refused, keeps the hold, and counts
 });
 
 // [[spec/design_output/pull#the-pass]]
-test("the voice rules read the evidence at the hand-back, and an error refuses it", () => {
+test("the voice rules read the evidence at the hand-back, and a break of form warns as it lands", () => {
   const vale = "/tree/.se/.runtime/bin/vale";
   const TICKET = "spec/tickets/a-child.md";
   const lineIn = (text) => text.split("\n").indexOf("A long approach.") + 1;
@@ -232,7 +232,8 @@ test("the voice rules read the evidence at the hand-back, and an error refuses i
 
   const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], it));
 
-  assert.equal(code, 1);
+  assert.equal(code, 0, said);
+  assert.match(said, /break a rule of form, and the hand-back lands/);
   assert.ok(line > 0, "the approach stands in the ticket");
   assert.match(
     said,
@@ -240,7 +241,7 @@ test("the voice rules read the evidence at the hand-back, and an error refuses i
       `design/draft breaks Sentence at line ${line} of ${TICKET}: A sentence holds 25 words\\.`,
     ),
   );
-  assert.equal(disk.exists(HOLD), true);
+  assert.equal(disk.exists(HOLD), false, "the hand-back lands, so the hold goes");
 });
 
 // [[spec/design_output/pull#a-leaf-comes-back]]

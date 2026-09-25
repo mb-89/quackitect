@@ -9,7 +9,9 @@ import {
   entryNamed,
   readNote,
   readYaml,
+  sectionAt,
 } from "../../.claude/skills/level0/lib/schema.js";
+import { reachedOf } from "./ticket-route.js";
 
 export const PHASE = "phase";
 export const LEAF = "leaf";
@@ -17,13 +19,16 @@ export const PASS = "pass";
 export const FAIL = "fail";
 export const HOLDS = "holds";
 
-// [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
-export function graphOf(front) {
+// A note's sections give each node the chapter it writes under, and a process hands none. [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
+export function graphOf(front, sections = []) {
   const said = front ?? {};
   const walk = entriesIn(said.steps, "steps");
   const record = recordOf(said.record);
+  const reached = reachedOf(said);
   return {
-    nodes: walk.map((one) => nodeOf(one, said, record)),
+    nodes: walk.map((one) =>
+      placed(nodeOf(one, said, record, reached), sections),
+    ),
     edges: [...holdEdges(walk), ...passEdges(walk), ...failEdges(walk)],
   };
 }
@@ -31,13 +36,21 @@ export function graphOf(front) {
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 export function graphIn(text) {
   const said = String(text ?? "");
-  return graphOf(
-    said.startsWith("---") ? (readNote(said).front.said ?? {}) : readYaml(said),
-  );
+  if (!said.startsWith("---")) return graphOf(readYaml(said));
+  const note = readNote(said);
+  return graphOf(note.front.said ?? {}, note.sections);
+}
+
+// [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
+function placed(node, sections) {
+  const at = sectionAt(sections, node.id);
+  if (at < 0) return node;
+  const one = sections[at];
+  return { ...node, chapter: `${"#".repeat(one.level)} ${one.header}`, line: one.line };
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
-function nodeOf(one, front, record) {
+function nodeOf(one, front, record, reached) {
   const said = one.said ?? {};
   const held = record.get(one.path) ?? {};
   const node = {
@@ -58,7 +71,14 @@ function nodeOf(one, front, record) {
     node.why = String(held.why ?? "");
   }
   if (Number(held.returns) > 0) node.returns = Number(held.returns);
+  if (holdsReached(one.path, reached)) node.reached = true;
   return node;
+}
+
+// A leaf the ticket reached, or a phase holding one, stands as it stood under `ticket route`. [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
+function holdsReached(path, reached) {
+  for (const one of reached) if (one === path || one.startsWith(`${path}/`)) return true;
+  return false;
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]

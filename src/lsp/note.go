@@ -31,6 +31,8 @@ type Front struct {
 	Said     *yaml.Doc
 	Lines    map[string]int
 	LineKeys []string
+	// The row of the closing fence, counted from zero. [[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]]
+	Close int
 }
 
 type Note struct {
@@ -81,7 +83,7 @@ func frontOf(rows []string) Front {
 	if said == nil {
 		said = yaml.New()
 	}
-	return Front{Stands: true, Said: said, Lines: lines, LineKeys: order}
+	return Front{Stands: true, Said: said, Lines: lines, LineKeys: order, Close: close}
 }
 
 func sectionsOf(rows []string) []Section {

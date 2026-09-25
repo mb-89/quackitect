@@ -62,7 +62,7 @@ type server struct {
 	out     io.Writer
 	guard   sync.Mutex
 	panel   *panel
-	// The quiet span a change waits before the bridge reads the buffer, and the timer counting it. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+	// The quiet span a change waits before Vale reads the buffer, and the timer counting it. [[spec/design_output/lsp#the-panel-lints-as-typed]]
 	quiet time.Duration
 	timer *time.Timer
 	// The panel's goroutines and the answers share one pipe, so a frame goes out whole under this lock. [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
@@ -71,7 +71,16 @@ type server struct {
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 func Speaks(checker *Checker, in io.Reader, out io.Writer) error {
-	one := &server{checker: checker, out: out, panel: newPanel(), quiet: lintQuiet}
+	return newServer(checker, out).speaks(in)
+}
+
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
+func newServer(checker *Checker, out io.Writer) *server {
+	return &server{checker: checker, out: out, panel: newPanel(), quiet: lintQuiet}
+}
+
+// Reads the editor's frames until it says exit or the pipe ends. [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+func (one *server) speaks(in io.Reader) error {
 	reader := bufio.NewReader(in)
 	for {
 		said, err := reads(reader)
@@ -120,19 +129,17 @@ func (one *server) took(said message) bool {
 	switch said.Method {
 	case "initialize":
 		one.answers(said.ID, map[string]any{
-			"capabilities": map[string]any{
-				"textDocumentSync": 1,
-				// A pointer opens its target on a click. [[spec/design_output/lsp#a-pointer-opens-its-target]]
-				"documentLinkProvider": map[string]any{"resolveProvider": false},
-				// The schema offers what a note carries at the cursor. [[spec/design_output/lsp#the-completion-reads-the-schema]]
-				"completionProvider": map[string]any{"triggerCharacters": triggers},
-			},
-			"serverInfo": map[string]any{"name": "se-lsp", "version": Version},
+			"capabilities": capabilitiesOf(),
+			"serverInfo":   map[string]any{"name": "se-lsp", "version": Version},
 		})
 	case "textDocument/documentLink":
 		one.answers(said.ID, one.links(said.Params))
 	case "textDocument/completion":
 		one.answers(said.ID, one.completes(said.Params))
+	case "textDocument/hover":
+		one.answers(said.ID, one.hovers(said.Params))
+	case "textDocument/foldingRange":
+		one.answers(said.ID, one.folds(said.Params))
 	case "initialized":
 		one.sweeps()
 		go one.follows()
@@ -154,6 +161,21 @@ func (one *server) took(said message) bool {
 		}
 	}
 	return false
+}
+
+// What the server answers, which initialize announces. [[spec/design_output/lsp#one-checker-every-front-asks]]
+func capabilitiesOf() map[string]any {
+	return map[string]any{
+		"textDocumentSync": 1,
+		// A pointer opens its target on a click. [[spec/design_output/lsp#a-pointer-opens-its-target]]
+		"documentLinkProvider": map[string]any{"resolveProvider": false},
+		// The schema offers what a note carries at the cursor. [[spec/design_output/lsp#the-completion-reads-the-schema]]
+		"completionProvider": map[string]any{"triggerCharacters": triggers},
+		// The frontmatter folds, so the drawing stands over it. [[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]]
+		"foldingRangeProvider": true,
+		// A term shows what it means under the cursor. [[spec/design_output/lsp#the-hover-shows-a-term]]
+		"hoverProvider": true,
+	}
 }
 
 // [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
@@ -276,7 +298,7 @@ type errorOf string
 
 func (one errorOf) Error() string { return string(one) }
 
-// A finding the bridge hands over names the front it comes from, and the rest are this server's. [[spec/design_output/lsp]]
+// A finding a tool draws names the tool, and the rest are this server's. [[spec/design_output/lsp#the-server-runs-the-tools]]
 func sourceOf(said Finding) string {
 	if said.Source == "" {
 		return "se-lsp"

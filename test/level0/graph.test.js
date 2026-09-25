@@ -15,6 +15,8 @@ import {
   PASS,
   PHASE,
 } from "../../src/scripts/graph.js";
+import { sectionAt as sectionThrough } from "../../.claude/skills/level0/lib/schema.js";
+import { readNote, sectionAt } from "../../.claude/skills/level0/lib/schema-read.js";
 
 const ROUTE = `
 steps:
@@ -143,4 +145,89 @@ test("a ticket reads through its frontmatter, and a process through its file", (
 
 test("a route nobody hands it answers an empty graph", () => {
   assert.deepEqual(graphOf(null), { nodes: [], edges: [] });
+});
+
+// [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
+const TICKET = `---
+kind: [[ticket]]
+steps:
+  - name: design
+    steps:
+      - name: draft
+        does: writes the approach
+      - name: review
+        does: reads the approach
+  - name: do
+    does: makes the change
+step: design/draft
+---
+
+# Ask
+
+A thing.
+
+# design
+
+## draft
+
+### approach
+
+## review
+
+# Discussion
+`;
+
+test("each node a ticket's body holds names its chapter and its line", () => {
+  const graph = graphIn(TICKET);
+  assert.deepEqual(
+    graph.nodes.map((one) => [one.id, one.chapter, one.line]),
+    [
+      ["design", "# design", 19],
+      ["design/draft", "## draft", 21],
+      ["design/review", "## review", 25],
+      ["do", undefined, undefined],
+    ],
+  );
+});
+
+test("a node drawn from a bare process carries no place", () => {
+  for (const one of drawn().nodes) {
+    assert.equal(one.chapter, undefined, `${one.id} carries no chapter`);
+    assert.equal(one.line, undefined, `${one.id} carries no line`);
+  }
+});
+
+test("sectionAt finds a step's heading one level a step deep, and answers -1 elsewhere", () => {
+  const sections = readNote(TICKET).sections;
+  assert.equal(sections[sectionAt(sections, "design/review")].header, "review");
+  assert.equal(sectionAt(sections, "review"), -1);
+  assert.equal(sectionAt(sections, "do"), -1);
+});
+
+test("the schema module hands on the one sectionAt the reader holds", () => {
+  assert.equal(sectionThrough, sectionAt);
+});
+
+test("a leaf the ticket reached, and a phase holding one, carry reached", () => {
+  const graph = graphIn(`---
+steps:
+  - name: design
+    steps:
+      - name: draft
+      - name: review
+  - name: ship
+step: design/draft
+record:
+  - step: design/review
+---
+`);
+  assert.deepEqual(
+    graph.nodes.map((one) => [one.id, one.reached === true]),
+    [
+      ["design", true],
+      ["design/draft", true],
+      ["design/review", true],
+      ["ship", false],
+    ],
+  );
 });

@@ -56,7 +56,7 @@ function planSpec() {
               place: {
                 type: "integer",
                 description:
-                  "The place in the queue, 1 to 9: the todo stands before the row at that place now, and past the last row it stands at the end.",
+                  "The place in the queue, 1 to 9: the todo stands before the todo at that place now. A place on a ticket or past the todos puts it after every todo, before the first ticket.",
               },
             },
             required: ["title"],
@@ -174,8 +174,9 @@ export function planned(e, box) {
   reacted(box, PLAN);
   // The count starts over at an answer, so the next ask stands the full span away. [[spec/design_output/stop#the-plan]]
   box.calls = 0;
+  // The todo tab shows the plan, so the count rides at debug, below what the owner reads. [[spec/design_output/stop#the-plan]]
   box.log.say(
-    "info",
+    "debug",
     PLAN,
     `the plan holds ${plan.todos.length} ${plan.todos.length === 1 ? "todo" : "todos"}`,
     {

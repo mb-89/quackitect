@@ -274,8 +274,8 @@ test("ticket note takes a name and a line, and refuses a note standing already",
   assert.match(twice.said, /stands already/);
 });
 
-// The note reads its minted text through the lint's road before it writes. [[spec/design_output/pull#the-voice-reads-the-evidence]]
-test("ticket note refuses a line the lint warns on, names Characters at its line, and writes no file", () => {
+// The note reads its minted text through the lint's road, and a break of form warns while the note lands. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+test("ticket note writes a line the lint warns on, and names Characters at its line", () => {
   const VALE = "/tree/.se/.runtime/bin/vale";
   const ran = [];
   const said = treeWithProcesses();
@@ -283,28 +283,24 @@ test("ticket note refuses a line the lint warns on, names Characters at its line
   proc.teach([VALE], semicolonVale(ran));
   const it = { ...said.it, proc, root: ROOT, vale: VALE };
 
-  const refused = heard(() => ticket(ROOT, ["note", "a-name", "one; two"], it));
+  const warned = heard(() => ticket(ROOT, ["note", "a-name", "one; two"], it));
 
-  assert.equal(refused.code, 1, refused.said);
-  assert.match(refused.said, /breaks Characters/);
+  assert.equal(warned.code, 0, warned.said);
+  assert.match(warned.said, /breaks a rule of form, and it lands/);
   const line =
     String(ran[0]?.stdin ?? "")
       .split("\n")
       .indexOf("one; two") + 1;
   assert.ok(line > 0, "Vale reads the minted ticket whole");
-  assert.match(refused.said, new RegExp(`line ${line} breaks Characters`));
-  assert.equal(said.disk.exists(at(`${NOTES}/a-name.md`)), false, "no file stands");
-
-  const clean = heard(() => ticket(ROOT, ["note", "a-name", "One and two."], it));
-  assert.equal(clean.code, 0, clean.said);
-  assert.equal(said.disk.exists(at(`${NOTES}/a-name.md`)), true);
+  assert.match(warned.said, new RegExp(`line ${line} breaks Characters`));
+  assert.equal(said.disk.exists(at(`${NOTES}/a-name.md`)), true, "the note stands");
 });
 
 test("ticket update refuses where step names a leaf the new route lacks", () => {
   const front = `---\nkind: [[ticket]]\nstate: open\nurgency: soon\nstep: decide\nsteps:\n  - name: decide\n    does: says what the note becomes\n    to: retro\nprocess: [[spec/processes/note]]\nprocess_hash: old\n---\n\n# Ask\n\nA thing.\n\n# decide\n\n<!-- says what the note becomes -->\n\n# Discussion\n\nNothing yet.\n`;
   const said = treeWithProcesses({ [at(`${NOTES}/slow-lint.md`)]: front });
   const ran = heard(() =>
-    ticket(ROOT, ["update", "slow-lint", "--process=trivial"], said.it),
+    ticket(ROOT, ["update", "slow-lint", "--process=trivial", "--over"], said.it),
   );
   assert.equal(ran.code, 1);
   assert.match(ran.said, /holds no such leaf/);
@@ -313,7 +309,7 @@ test("ticket update refuses where step names a leaf the new route lacks", () => 
 test("ticket update copies the current route, and keeps the leaves already reached", () => {
   const front = `---\nkind: [[ticket]]\nstate: open\nurgency: soon\nstep: do\nsteps:\n  - name: do\n    does: makes the change, the old way\n    to: retro\n    evidence:\n      - name: says\n        form: text\n        says: what changes and why\nprocess: [[spec/processes/trivial]]\nprocess_hash: old\n---\n\n# Ask\n\nA thing.\n\n# do\n\n<!-- makes the change, the old way -->\n\n## says\n\nIt changes the lint.\n\n# Discussion\n\nNothing yet.\n`;
   const said = treeWithProcesses({ [at(`${NOTES}/slow-lint.md`)]: front });
-  const ran = heard(() => ticket(ROOT, ["update", "slow-lint"], said.it));
+  const ran = heard(() => ticket(ROOT, ["update", "slow-lint", "--over"], said.it));
 
   assert.equal(ran.code, 0);
   const now = said.disk.read(at(`${NOTES}/slow-lint.md`));

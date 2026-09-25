@@ -39,6 +39,8 @@ export function onPromptSubmit(e, box) {
     text: String(e?.text ?? ""),
   });
   if (!OWNER.has(from)) return { pass: true };
+  // An owner's prompt opens a turn, and the report of the last turn answers nothing in it. [[spec/design_output/stop#a-talk-follows-a-report]]
+  box.reported = false;
   // [[spec/design_output/level0#the-first-call-asks]]
   demands(box, "The owner sent a prompt");
   box.demand.prompt = true;

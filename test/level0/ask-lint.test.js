@@ -120,13 +120,23 @@ function heard(what) {
   }
 }
 
-test("an Ask breaking a rule refuses the open, names the rule and leaves the draft", () => {
+// A break of form on the Ask warns, and the open lands. [[spec/design_output/pull#a-draft-opens]]
+test("an Ask breaking a rule of form opens, and the answer names the rule as a warning", () => {
   const { it, disk } = box(FOUND);
+  const ran = heard(() => ticket(ROOT, ["open", "a-thing"], it));
+  assert.equal(ran.code, 0, ran.said);
+  assert.match(ran.said, /breaks a rule of form, and it lands/);
+  assert.match(ran.said, new RegExp(`line ${ASK_LINE} breaks Characters`));
+  assert.match(disk.read(at(AT)), /^state: open$/m, "the ticket opens");
+});
+
+// A private name on the Ask still refuses the open. [[spec/design_output/pull#a-draft-opens]]
+test("an Ask carrying a private name refuses the open, and the draft stands", () => {
+  const { it, disk } = box(FOUND.replace("VoiceParagraph.Characters", "VoiceVale.Private"));
   const ran = heard(() => ticket(ROOT, ["open", "a-thing"], it));
   assert.equal(ran.code, 1);
   assert.match(ran.said, /breaks the voice rules/);
-  assert.match(ran.said, new RegExp(`line ${ASK_LINE} breaks Characters`));
-  assert.match(ran.said, /Rewrite the Ask, then open it again\./);
+  assert.match(ran.said, new RegExp(`line ${ASK_LINE} breaks Private`));
   assert.match(disk.read(at(AT)), /^state: draft$/m, "the draft stands");
 });
 
@@ -165,8 +175,8 @@ test("an Ask that passes opens the ticket at its first leaf", () => {
   assert.match(ran.said, /stands open at do/);
 });
 
-// The open reads at the lint's level, so a warning on the Ask refuses as an error does. [[spec/design_output/pull#a-draft-opens]]
-test("a warning on the Ask refuses the open, a warning past the Ask leaves it alone, and a box with no Vale opens as it stands", () => {
+// The open reads at the lint's level, so a warning on the Ask warns as an error does. [[spec/design_output/pull#a-draft-opens]]
+test("a warning on the Ask opens with its line named, a warning past the Ask stays unnamed, and a box with no Vale opens as it stands", () => {
   const warnedAt = (line) =>
     JSON.stringify({
       "stdin.md": [
@@ -181,19 +191,23 @@ test("a warning on the Ask refuses the open, a warning past the Ask leaves it al
   const onAsk = heard(() =>
     ticket(ROOT, ["open", "a-thing"], box(warnedAt(ASK_LINE)).it),
   );
-  assert.equal(onAsk.code, 1, onAsk.said);
+  assert.equal(onAsk.code, 0, onAsk.said);
   assert.match(onAsk.said, new RegExp(`line ${ASK_LINE} breaks Wordy`));
   const past = heard(() =>
     ticket(ROOT, ["open", "a-thing"], box(warnedAt(DO_LINE)).it),
   );
   assert.equal(past.code, 0, past.said);
+  assert.doesNotMatch(past.said, /breaks Wordy/);
   const bare = box("{}");
-  assert.deepEqual(askFaults({ ...bare.it, vale: "" }, AT, DRAFT), []);
+  assert.deepEqual(askFaults({ ...bare.it, vale: "" }, AT, DRAFT), {
+    refused: [],
+    warned: [],
+  });
   assert.equal(bare.proc.ran.length, 0, "no Vale, no run");
 });
 
 // [[spec/design_output/pull#a-draft-opens]]
-test("ticket open over an Ask carrying a semicolon refuses, naming Characters at the file's line, and the draft stands", () => {
+test("ticket open over an Ask carrying a semicolon opens, naming Characters at the file's line", () => {
   const ran = [];
   const { it, disk } = box(semicolonVale(ran));
   const text = DRAFT.replace("<upstream>", "the upstream; and more");
@@ -201,9 +215,9 @@ test("ticket open over an Ask carrying a semicolon refuses, naming Characters at
 
   const said = heard(() => ticket(ROOT, ["open", "a-thing"], it));
 
-  assert.equal(said.code, 1, said.said);
+  assert.equal(said.code, 0, said.said);
   assert.match(said.said, new RegExp(`line ${ASK_LINE} breaks Characters`));
-  assert.match(disk.read(at(AT)), /^state: draft$/m, "the draft stands");
+  assert.match(disk.read(at(AT)), /^state: open$/m, "the ticket opens");
   assert.equal(ran[0]?.stdin, text, "Vale reads the whole ticket");
 });
 

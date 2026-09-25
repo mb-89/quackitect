@@ -453,6 +453,7 @@ func writeFile(path string, data []byte, mode fs.FileMode) error {
 	return os.WriteFile(path, data, mode)
 }
 func statOf(path string) (fs.FileInfo, error)     { return os.Stat(path) }
+func lstatOf(path string) (fs.FileInfo, error)    { return os.Lstat(path) }
 func makeDir(path string, mode fs.FileMode) error { return os.MkdirAll(path, mode) }
 func removeFile(path string) error                { return os.Remove(path) }
 

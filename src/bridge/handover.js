@@ -4,8 +4,10 @@
 // [[spec/design_output/stop#the-context-hands-over]]
 
 import { join } from "node:path";
+import { BINDING, QUEUE } from "../../.claude/skills/level0/lib/config.js";
 import { HANDOVER, HOLDS, RETRO } from "../../.claude/skills/level0/lib/folders.js";
 import { asks } from "./config.js";
+import { waitsForOwner } from "./stop.js";
 
 const AT = "context.handoverAt";
 const NOW = "context.writeAt";
@@ -28,6 +30,11 @@ export function measures(box, tokens) {
   const fill = Number(tokens);
   if (!Number.isFinite(fill) || fill <= 0) return;
   box.fill = fill;
+  // The queue alone clears, so a session under god or unbound keeps its conversation and goes due nowhere. [[spec/design_output/stop#the-queue-alone-clears]]
+  if (!clearsHere(box)) {
+    box.handover = null;
+    return;
+  }
   const at = Number(asks(box, AT) ?? 0);
   if (!(at > 0)) return;
   // The first reading after a clear is what the next conversation opens on, and a key under it hands over into a loop. [[spec/design_output/stop#the-context-hands-over]]
@@ -55,6 +62,11 @@ export function measures(box, tokens) {
     { tokens: fill, at },
   );
   writesNow(box, fill, at);
+}
+
+// [[spec/design_output/stop#the-queue-alone-clears]]
+export function clearsHere(box) {
+  return String(asks(box, BINDING) ?? "") === QUEUE;
 }
 
 // A fill past context.writeAt turns the finish into the handover itself: the step stays where it stands. A key at zero, or under the first key, adds no second stage. [[spec/design_output/stop#the-context-hands-over]]
@@ -111,6 +123,15 @@ export function dueText(box) {
 export function holdsForHandover(e, box) {
   const due = box.handover;
   if (e?.agentId || due?.phase !== FINISH) return null;
+  // A stop waiting on the owner holds the clear: the tooth votes, the session stays due, and the next turn's end clears. [[spec/tickets/the-clear-keeps-questions]]
+  if (waitsForOwner(e, box)) {
+    box.log.say(
+      "info",
+      "handover",
+      "the turn waits on the owner, so the clear waits for the next turn's end",
+    );
+    return null;
+  }
   const retro = namesRetro(box);
   if (handoverStands(box) && !retro) {
     due.phase = CLEAR;
@@ -177,6 +198,11 @@ export function handoverStands(box) {
 export function clearsAfter(e, box, answer) {
   if (e?.agentId || e?.reason !== "answer" || box.handover?.phase !== CLEAR)
     return answer;
+  // A binding changed while the clear stood keeps the conversation. [[spec/design_output/stop#the-queue-alone-clears]]
+  if (!clearsHere(box)) {
+    box.handover = null;
+    return answer;
+  }
   box.handover = null;
   box.log.say(
     "info",

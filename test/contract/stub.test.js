@@ -9,7 +9,7 @@ import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { clock } from "../../src/doors/clock.js";
 import { disk } from "../../src/doors/disk.js";
-import { git } from "../../src/doors/git.js";
+import { fakeGit } from "../../src/doors/fake/git.js";
 import { proc } from "../../src/doors/proc.js";
 import { stubInto } from "../../src/scripts/stub.js";
 import { identityHere } from "../../src/scripts/vehicle.js";
@@ -23,6 +23,16 @@ const MARKER = `${PLUGIN}/.claude-plugin/plugin.json`;
 const METHOD = ["package.json", "src/scripts/cli.js", "spec/guidance/voice.md", ".se"];
 const quoted = (said) => String(said).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const either = (path) => `(?:${quoted(path)}|${quoted(path.split("\\").join("/"))})`;
+const UPSTREAM = "https://host/a/b.git";
+const REMOTE = "git remote get-url origin";
+
+// The one git read a stub makes, answered by a fake: a vehicle with a remote, and one without. [[spec/design_output/vehicle#the-record-names-the-vehicle]]
+const remoted = () => fakeGit({ [REMOTE]: { stdout: `${UPSTREAM}\n` } }, root);
+const unremoted = () =>
+  fakeGit(
+    { [REMOTE]: { exitCode: 2, stderr: "error: No such remote 'origin'\n" } },
+    root,
+  );
 
 function walk(at, rel = "") {
   const out = [];
@@ -49,8 +59,14 @@ test("a stub holds its files, reads every one back, and no file of the method", 
   const where = files.tempDir("stub-");
   const dest = join(where, "stub");
   try {
-    const said = stubInto(files, git(outside, root), clock(), root, dest, process.pid);
+    const door = remoted();
+    const said = stubInto(files, door, clock(), root, dest, process.pid);
     assert.equal(said.ok, true, said.why);
+    assert.deepEqual(
+      door.ran.map((one) => one.argv.join(" ")),
+      [REMOTE],
+      "the stub asks git its remote, and nothing else",
+    );
     assert.ok(files.exists(dest), "the stub stands");
     assert.deepEqual(
       walk(dest),
@@ -83,12 +99,7 @@ test("a stub holds its files, reads every one back, and no file of the method", 
       "the identity is this vehicle's",
     );
     assert.equal(record.name, basename(root), "the name is this folder's");
-    const remote = git(outside, root).run(["remote", "get-url", "origin"], true);
-    assert.equal(
-      record.upstream,
-      remote.out.trim(),
-      "the upstream is this vehicle's remote",
-    );
+    assert.equal(record.upstream, UPSTREAM, "the upstream is this vehicle's remote");
 
     const ran = outside.run(["sh", "-c", "test -x RUNME.sh"], { cwd: dest });
     assert.equal(ran.exitCode, 0, "the shim carries its run bit");
@@ -102,7 +113,7 @@ test("a stub's plugin carries the name its settings allow, so a tool answers to 
   const where = files.tempDir("stub-");
   const dest = join(where, "stub");
   try {
-    const said = stubInto(files, git(outside, root), clock(), root, dest, process.pid);
+    const said = stubInto(files, remoted(), clock(), root, dest, process.pid);
     assert.equal(said.ok, true, said.why);
     const name = basename(PLUGIN);
     assert.equal(
@@ -128,7 +139,7 @@ test("the shim hands a verb to the vehicle it names", () => {
   const where = files.tempDir("stub-");
   const dest = join(where, "stub");
   try {
-    const said = stubInto(files, git(outside, root), clock(), root, dest, process.pid);
+    const said = stubInto(files, remoted(), clock(), root, dest, process.pid);
     assert.equal(said.ok, true, said.why);
     const vehicle = fakeVehicle(where);
     const ran = outside.run(["sh", "RUNME.sh", "vehicle"], {
@@ -194,7 +205,7 @@ test("a shim finding no vehicle exits one, and names the upstream and the instal
   const where = files.tempDir("stub-");
   const dest = join(where, "stub");
   try {
-    const said = stubInto(files, git(outside, root), clock(), root, dest);
+    const said = stubInto(files, remoted(), clock(), root, dest);
     assert.equal(said.ok, true, said.why);
     const record = JSON.parse(files.read(join(dest, "vehicle.json")));
     const lost = outside.run(["sh", "RUNME.sh", "vehicle"], {
@@ -220,17 +231,14 @@ test("a shim finding no vehicle exits one, and names the upstream and the instal
 
 test("a vehicle with no remote refuses, and the folder stands as it was", () => {
   const where = files.tempDir("stub-");
-  const repo = join(where, "repo");
   const dest = join(where, "stub");
-  files.makeDir(repo);
   try {
-    assert.equal(outside.run(["git", "init", "-q"], { cwd: repo }).exitCode, 0);
-    const refused = stubInto(files, git(outside, repo), clock(), root, dest, process.pid);
+    const refused = stubInto(files, unremoted(), clock(), root, dest, process.pid);
     assert.equal(refused.ok, false);
     assert.match(refused.why, /--upstream/);
     assert.equal(files.exists(dest), false, "a refusal writes nothing");
 
-    const named = stubInto(files, git(outside, repo), clock(), root, dest, process.pid, {
+    const named = stubInto(files, unremoted(), clock(), root, dest, process.pid, {
       upstream: "https://host/c/d.git",
     });
     assert.equal(named.ok, true, named.why);
@@ -284,7 +292,7 @@ slow(
     const dest = join(where, "stub");
     files.makeDir(home);
     try {
-      const said = stubInto(files, git(outside, root), clock(), root, dest, process.pid, {
+      const said = stubInto(files, remoted(), clock(), root, dest, process.pid, {
         upstream: root,
       });
       assert.equal(said.ok, true, said.why);

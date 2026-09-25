@@ -864,24 +864,17 @@ naming the rule, the line and the phrase.
 | prose | Vale, then the prose reader |
 | code | Biome |
 | a shell command landing a file | [[spec/design_output/bash]] |
-| a write to the file the refactoring hand holds | [[spec/design_output/stop#the-hand-holds-its-file]] |
 
 The private half answers first, so a note's own words stop at the door. The
 refusal closes by asking the writer to hold that rule for the rest of the turn.
 A refusal teaching one line costs a round trip on every line.
 
-## A warning feeds the list
+## The panel holds a warning
 
 A rule at warning is a break of form, and the write lands over it. The door
-puts the file's rows on the refactoring hand's list, in place of the rows the
-file held there. It writes each row to the log under the warning. The context
-after the call tells the agent that the rows stand and the work goes on.
-
-So the list fills as the tree changes, and the hand fires off it during a
-session. The check's lint writes the whole list again, so the two meet. A
-refused write feeds the list too, where the file ceiling refuses it. For
-details, see [[spec/design_output/level0#the-ceiling-feeds-the-list]].
-[[spec/design_output/stop#the-grace]] says when the hand wants the turn.
+writes each row to the log under the warning. The context after the call tells
+the agent that the warning stands in the Problems panel. The push waits until
+the panel stands clear, and the work goes on.
 
 ## A write meets its mark
 
@@ -1015,22 +1008,11 @@ refused too, because the second cut writes over the first.
 holds every target and the rest, so `mcp__level0__undo` takes the whole cut
 back. For details, see [[spec/design_output/apply#the-journal-holds-both-halves]].
 
-### The ceiling feeds the list
+### The ceiling names the cut
 
-A refusal naming the file ceiling puts on the warnings list the `FileCeiling`
-row the check names for that file, at warning, from the door. The write stays
-refused. The refusal says the file stands on the list, and names
-`./RUNME.sh split <file>` for a hand cutting it now. A function ceiling alone
-puts nothing on the list.
-
-| where | what it does |
-|---|---|
-| `src/bridge/code.js` | refuses the growth, and hands the row on |
-| `listsWarning` in `lib/warnings.js` | writes the row in place of the row the file's rule holds, and keeps the file's other rows |
-| `drains` in `lib/warnings.js` | tells the refactoring hand to cut a file past the ceiling before it drains the rest |
-
-A second refusal of the same file keeps one row. The refactoring hand takes
-the file off the list. For details, see [[spec/design_output/stop#the-grace]].
+A refusal naming the file ceiling names `./RUNME.sh split <file>`, the verb
+that cuts the file. The write stays refused. A function ceiling alone names no
+cut. `src/bridge/code.js` owns the refusal.
 
 ## The path a rule reads
 

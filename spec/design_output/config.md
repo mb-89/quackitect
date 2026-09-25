@@ -184,7 +184,7 @@ here.
 |---|---|---|
 | `queue` | the queue hands out the next leaf, and hands another the moment one closes | a stop while the ticket stands open, and a stop while the queue holds anything at all |
 | `unbound` | a person names the ticket, and the pull hands out nothing on its own | a stop while the ticket stands open |
-| `god` | a person, and the engine stands aside | nothing, and the refactoring hand still drains the warnings |
+| `god` | a person, and the engine stands aside | nothing |
 
 **`queue` is an endless loop.** A cloud box runs here, because it works with
 nobody beside it. It pulls until the queue holds nothing for it, and a finished

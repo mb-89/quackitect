@@ -5,6 +5,8 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"io/fs"
@@ -21,6 +23,30 @@ import (
 func runs(name string, argv ...string) (string, error) {
 	said, err := exec.Command(name, argv...).Output()
 	return string(said), err
+}
+
+// A tool of the box run at the root, with the text on its input. It answers the output whatever the exit, because Biome exits on a finding, and an error where the tool says nothing. [[spec/design_output/lsp#the-server-runs-the-tools]]
+func runsIn(dir, input, name string, argv ...string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), toolWait)
+	defer cancel()
+	one := exec.CommandContext(ctx, name, argv...)
+	one.Dir = dir
+	if input != "" {
+		one.Stdin = strings.NewReader(input)
+	}
+	var out, errs bytes.Buffer
+	one.Stdout, one.Stderr = &out, &errs
+	err := one.Run()
+	if err != nil && out.Len() == 0 {
+		return "", fmt.Errorf("%v: %s", err, strings.TrimSpace(errs.String()))
+	}
+	return out.String(), nil
+}
+
+// Whether a file stands on the disk, for a tool the box holds. [[spec/design_output/lsp#the-server-runs-the-tools]]
+func standsAt(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
 }
 
 // [[spec/design_output/private#the-box-names-the-owner]]

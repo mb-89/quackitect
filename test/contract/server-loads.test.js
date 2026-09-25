@@ -45,3 +45,10 @@ test("a decide that throws exits 1 and names the event", async () => {
   assert.equal(await selfTests(ROOT, broken, (line) => said.push(line)), 1);
   assert.match(said[0], /session\.start.*ReferenceError: dropsMoved is not defined/s);
 });
+
+// The language server answers the list on its own port, so the bridge serves no findings. [[spec/design_output/lsp#a-port-serves-the-list]]
+test("the bridge serves no finding route", async () => {
+  const { disk } = await import("../../src/doors/disk.js");
+  const source = disk().read(join(ROOT, "src", "bridge", "server.js"));
+  assert.doesNotMatch(source, /findingsFor|heldFor|FINDINGS/);
+});

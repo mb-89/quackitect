@@ -5,9 +5,9 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { commitVerb } from "../../src/scripts/commit-verb.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
+import { commitVerb } from "../../src/scripts/commit-verb.js";
 
 const ROOT = "/tree";
 const CLEAN = "the-verb: the message reads clean";
@@ -66,15 +66,27 @@ const doors = (found = [], answers = {}, env = { SE_CLOUD: "1" }) => {
 
 const ranGit = (git) => git.ran.map((one) => one.argv.join(" "));
 
-// [[spec/design_output/work#the-battery-answers-first]]
-test("a message the rules refuse names every finding, and stages nothing", async () => {
+// A break of form in the message warns, and the commit lands. [[spec/design_output/work#the-battery-answers-first]]
+test("a message breaking a rule of form names every finding, and the commit lands", async () => {
   const { it, git } = doors(FOUND);
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 0);
+  assert.match(said, /break a rule of form, and the commit lands/);
+  assert.match(said, /VoiceShape\.Antithesis/);
+  assert.ok(ranGit(git).includes(`git commit -m ${CLEAN}`), "the commit lands");
+});
+
+// A private name leaves no box, so the message stays refused. [[spec/design_output/work#the-battery-answers-first]]
+test("a message carrying a private name is refused, and stages nothing", async () => {
+  const { it, git } = doors([{ ...FOUND[0], rule: "VoiceVale.Private" }]);
 
   const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
 
   assert.equal(code, 2);
   assert.match(said, /refuse this message/);
-  assert.match(said, /VoiceShape\.Antithesis/);
+  assert.match(said, /VoiceVale\.Private/);
   assert.deepEqual(ranGit(git), [], "the tree stands untouched");
 });
 
@@ -106,7 +118,11 @@ test("a red check holds the push back, and names what the check refuses", async 
 
   assert.equal(code, 1);
   assert.match(said, /no push reaches origin/);
-  assert.match(said, /Passive: Write in the active voice/, "the fault reaches the reader");
+  assert.match(
+    said,
+    /Passive: Write in the active voice/,
+    "the fault reaches the reader",
+  );
   assert.ok(!ranGit(git).some((one) => one.startsWith("git push")));
 });
 
@@ -137,7 +153,7 @@ test("a commit the door refuses lands nothing, and the staging comes back", asyn
   assert.ok(ranGit(git).includes("git reset -q"), "the staging comes back");
 });
 
-// A desk leaves the push to the owner. [[spec/guidance/working]]
+// A desk's verb pushes nothing. [[spec/guidance/working]]
 test("a desk lands and checks the commit, and pushes nothing", async () => {
   const { it, git } = doors([], {}, {});
 
@@ -190,4 +206,22 @@ test("the tests run before the staging, and the check after the commit", async (
   const checked = ran.indexOf(`node ${cli} check`);
   assert.ok(tests >= 0 && tests < staged, "the tests run first");
   assert.ok(committed < checked, "the check stamps the commit");
+});
+
+// A call naming paths stages and commits those alone, so a helper's files stand apart from the landing. [[spec/design_output/work#one-verb-feeds-that-stamp]]
+test("a call naming paths lands those paths alone", async () => {
+  const { it, git } = doors();
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "src/a.js", "test/a.test.js", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const ran = ranGit(git);
+  assert.ok(ran.includes("git add -A -- src/a.js test/a.test.js"), "the paths stage");
+  assert.ok(
+    ran.includes(`git commit -m ${CLEAN} -- src/a.js test/a.test.js`),
+    "the commit takes the paths alone",
+  );
+  assert.ok(!ran.includes("git add -A"), "the whole tree stays unstaged");
 });

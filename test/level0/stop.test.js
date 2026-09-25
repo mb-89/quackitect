@@ -316,21 +316,21 @@ test("a yielding stop stands over a check reading a hand's work beside the agent
   const beside = [
     ...YIELDING,
     {
-      id: "warnings-stand",
+      id: "a-hand-works-beside",
       side: "continue",
       priority: 10,
       decides: "mechanical",
-      runs: "warnings-standing",
+      runs: "hand-beside",
       beside: true,
-      says: "a hand drains the warnings",
+      says: "a hand works beside you",
     },
   ];
-  const said = decide(beside, { claimed: "own-judgment", ran: ranOf(["warnings-standing"]) });
-  assert.equal(said.ends, true, "the hand's list holds no turn over a claim");
+  const said = decide(beside, { claimed: "own-judgment", ran: ranOf(["hand-beside"]) });
+  assert.equal(said.ends, true, "the hand's work holds no turn over a claim");
   assert.equal(said.yields, false);
   const both = decide(beside, {
     claimed: "own-judgment",
-    ran: ranOf(["warnings-standing", "work-waiting"]),
+    ran: ranOf(["hand-beside", "work-waiting"]),
   });
   assert.equal(both.ends, false, "the agent's own work still beats the claim");
 });

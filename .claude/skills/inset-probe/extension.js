@@ -8,19 +8,13 @@ const { ROUTE, linesFor, pageOf } = require("./lib.js");
 
 const TICKET = "spec/tickets/the-editor-holds-the-drawing.md";
 const FOUND = ".se/probe/inset.json";
-// The first inset stands short, so the grow has something to answer.
 const SHORT = 4;
 const WAIT = 10000;
 const CLOSE_AFTER = 3000;
-// The editor's own defaults: its font size, the least height it reads as
-// pixels, and the ratio it derives a line from a font size by.
 const FONT_SIZE = 14;
 const LEAST_PX = 8;
 const LINE_RATIO = 1.35;
 
-// The editor opens a folder in one window alone, so the probe's window holds
-// none where the owner's window holds the tree. The probe finds the tree from
-// its own folder, three levels down.
 async function activate(context) {
   const root = vscode.Uri.joinPath(context.extensionUri, "..", "..", "..");
   const found = {
@@ -60,7 +54,6 @@ async function probes(root, found) {
   };
 }
 
-// Draws the page in an inset of so many lines, and answers what the page says.
 function drawn(editor, lines) {
   const inset = vscode.window.createWebviewTextEditorInset(editor, 0, lines, {
     enableScripts: true,
@@ -79,8 +72,6 @@ function drawn(editor, lines) {
   });
 }
 
-// The editor's line height in pixels, where the settings name one, or the
-// height the editor derives from its font size.
 function lineHeight() {
   const said = vscode.workspace.getConfiguration("editor");
   const height = Number(said.get("lineHeight"));
@@ -90,7 +81,6 @@ function lineHeight() {
   return Math.round(size * LINE_RATIO);
 }
 
-// Whether the owner asks the window to stay open for a look.
 function stays() {
   return !!process.env.QUACKITECT_PROBE_STAY;
 }

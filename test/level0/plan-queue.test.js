@@ -75,12 +75,12 @@ test("a digit past the last row lands at the end", () => {
 });
 
 // [[spec/design_output/stop#the-plan]]
-test("the answer names each new todo with the place it takes in the queue", () => {
+test("the answer names each new todo with the place it takes, before every ticket", () => {
   const it = box();
 
   const said = plan({ add: [{ title: "read the note", place: 2 }] }, it);
 
-  assert.match(said.result.result, /read the note stands at 2\b/);
+  assert.match(said.result.result, /read the note stands at 1\b/);
 });
 
 // [[spec/design_output/pull#a-todo-forces-a-place]]
@@ -97,8 +97,8 @@ test("two todos at one digit in one call stand in the order the call gives", () 
     it,
   );
 
-  assert.match(said.result.result, /zeta todo stands at 2\b/);
-  assert.match(said.result.result, /alpha todo stands at 3\b/);
+  assert.match(said.result.result, /zeta todo stands at 1\b/);
+  assert.match(said.result.result, /alpha todo stands at 2\b/);
 });
 
 // A box carrying no process door reads no queue, so a digit past the front lands at the end. [[spec/design_output/stop#the-plan]]

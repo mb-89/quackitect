@@ -8,7 +8,7 @@ import { firstLeaf } from "../engine/group.js";
 import { askRows, processAt } from "./process.js";
 import { pull } from "./pull.js";
 import { fromHold, schemasHere } from "./ticket.js";
-import { askFaults, lineRefusal } from "./ticket-ask-lint.js";
+import { askFaults, askWarning, lineRefusal } from "./ticket-ask-lint.js";
 
 const TICKETS = "spec/tickets";
 const RETRO = "retro";
@@ -55,10 +55,11 @@ export function newRetro(it, argv) {
   }
   // The --why line lands in the Ask, so the mint reads it through the lint's road before it writes. [[spec/design_output/pull#a-draft-opens]]
   const found = askFaults(it, path, made.text);
-  if (found.length) {
-    console.error(lineRefusal(path, found));
+  if (found.refused.length) {
+    console.error(lineRefusal(path, found.refused));
     return 1;
   }
+  if (found.warned.length) console.error(askWarning(path, found.warned));
 
   it.disk.makeDir(it.join(it.root, ...TICKETS.split("/")));
   it.disk.write(at, made.text);

@@ -5,17 +5,12 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
-  drains,
   filesOn,
-  mergedWarnings,
+  formIn,
   refusedWarnings,
+  refusesIn,
   rowOf,
-  ruledWarnings,
-  standsPast,
-  takesFile,
-  WALK_TOOL,
   WARNING,
-  walksList,
   warnedNote,
   warningsOn,
 } from "../../.claude/skills/level0/lib/warnings.js";
@@ -74,66 +69,13 @@ test("the refusal names each file, each rule and the command that reads them", (
   assert.match(said, /RUNME\.sh lint/);
 });
 
-// A warning holds no push, because the refactoring hand drains it on the box, so the door reads no lint. [[spec/design_output/config#the-engine-controls]]
+// A warning holds no push at this door, so the door reads no lint. [[spec/design_output/config#the-engine-controls]]
 test("a push carrying a file at warning lands, and the door reads no lint", () => {
   const carried = () => [{ name: "a.md", text: "" }];
   const warned = () => [found("a.md", "warning")];
 
   assert.deepEqual(holds(refsIn(toWork), "", carried, warned), { code: 0, said: "" });
   assert.deepEqual(holds(refsIn(toWork), "", carried), { code: 0, said: "" });
-});
-
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("the list stands past the number where the count runs over it", () => {
-  assert.equal(standsPast(26, 25), true);
-  assert.equal(standsPast(25, 25), false);
-  assert.equal(standsPast(99, 0), false);
-});
-
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("the hand takes the oldest file outside the window, and none inside it", () => {
-  const now = 1_800_000_000;
-  const week = 604_800;
-  const wrote = { "a.md": now - week * 2, "b.md": now - week * 3, "c.md": now - 60 };
-
-  assert.equal(takesFile(["a.md", "b.md", "c.md"], wrote, now, week), "b.md");
-  assert.equal(takesFile(["c.md"], wrote, now, week), "");
-  assert.equal(takesFile(["d.md"], wrote, now, week), "");
-  assert.equal(takesFile([], wrote, now, week), "");
-});
-
-// [[spec/tickets/the-spawn-reaches-its-guidance]]
-test("the prompt the hand reads names one file and the verbs over it", () => {
-  const said = drains("spec/guidance/voice.md");
-
-  assert.match(said, /spec\/guidance\/voice\.md/);
-  assert.match(said, /RUNME\.sh lint/);
-  assert.match(said, /RUNME\.sh fix/);
-  assert.match(said, /FileCeiling, cut the file first/);
-  assert.match(said, /RUNME\.sh split spec\/guidance\/voice\.md --to <path> --lines/);
-});
-
-// The session lands what the hand leaves, so the hand's prompt names no git step. [[spec/design_output/stop#the-hand-walks-the-list]]
-test("the hand's prompts name the walk and no git step", () => {
-  const spawn = walksList("old.md");
-  const next = drains("new.md");
-
-  assert.match(spawn, /old\.md/);
-  assert.match(spawn, new RegExp(`mcp__level0__${WALK_TOOL}`));
-  assert.match(spawn, /no file waits/);
-  for (const said of [spawn, next]) {
-    assert.doesNotMatch(said, /commit|\bgit\b/i);
-  }
-});
-
-// [[spec/design_output/level0#the-ceiling-feeds-the-list]]
-test("a refused file's row stands in place of its rule's row, and the file's other rows stay", () => {
-  const list = [found("a.md", "warning"), found("a.md", "warning", "FileCeiling")];
-  const ruled = ruledWarnings(list, "a.md", [found("a.md", "error", "FileCeiling")]);
-  assert.deepEqual(
-    ruled.map((one) => `${one.rule} ${one.severity} ${one.source ?? ""}`),
-    ["Hedge warning ", "FileCeiling warning door"],
-  );
 });
 
 // A warning outside the files a push carries holds no push. [[spec/tickets/one-list-holds-the-warnings]]
@@ -147,28 +89,31 @@ test("a warning on a file the push leaves alone holds no push", () => {
   });
 });
 
-// [[spec/design_output/level0#a-warning-feeds-the-list]]
-test("a write's warnings replace the file's rows on the list, and leave the other files' rows", () => {
-  const list = [found("a.md", "warning"), found("b.md", "warning")];
-  const merged = mergedWarnings(list, "a.md", [
-    found("a.md", "warning", "Sentence"),
-    found("a.md", "error"),
-  ]);
-  assert.deepEqual(
-    merged.map((one) => `${one.file} ${one.rule}`),
-    ["b.md Hedge", "a.md Sentence"],
-    "the file's old row goes, the error stays off the list, and the other file stands",
+// [[spec/design_output/level0#the-panel-holds-a-warning]]
+test("the note after a write names each row, and says the lines stand in the panel while the ask goes on", () => {
+  const said = warnedNote("a.md", [found("a.md", "warning")]);
+  assert.match(said, /1 line\(s\) of a\.md stand at warning, and the write lands/);
+  assert.match(
+    said,
+    /stands in the Problems panel, and the push waits until the panel stands clear/,
   );
-  assert.equal(merged[1].source, "door");
-  assert.deepEqual(mergedWarnings(list, "a.md", []), [found("b.md", "warning")]);
+  assert.match(said, /Leave the lines as they stand and carry on with the ask/);
+  assert.match(said, /a\.md:3 Hedge: Cut the hedge\./);
+  assert.doesNotMatch(said, /refactoring hand/);
+  assert.equal(rowOf(found("a.md", "warning")), "a.md:3 Hedge: Cut the hedge.");
 });
 
-// [[spec/design_output/level0#a-warning-feeds-the-list]]
-test("the note after a write names each row, and says the lines stand while the ask goes on", () => {
-  const said = warnedNote("a.md", [found("a.md", "warning")], 3);
-  assert.match(said, /1 line\(s\) of a\.md stand at warning, and the write lands/);
-  assert.match(said, /leave the lines as they stand and carry on with the ask/);
-  assert.match(said, /a\.md:3 Hedge: Cut the hedge\./);
-  assert.match(said, /3 row\(s\) now/);
-  assert.equal(rowOf(found("a.md", "warning")), "a.md:3 Hedge: Cut the hedge.");
+// A break of form warns at every door, whatever its level, and a lint that ran nowhere or a private name still refuses. [[spec/design_output/level0#the-panel-holds-a-warning]]
+test("a finding of form warns at any level, and the lint that ran nowhere and a private name refuse", () => {
+  const erred = found("a.md", "error", "VoiceParagraph.Vocabulary");
+  const warned = found("a.md", "warning", "VoiceParagraph.Sentence");
+  const bare = { rule: "FunctionCeiling", line: 1 };
+  const unran = found("a.md", "error", "VoiceRulesRan");
+  const home = found("a.md", "error", "VoiceVale.Private");
+  const stripped = found("a.md", "error", "Private");
+  const all = [erred, warned, bare, unran, home, stripped];
+  assert.deepEqual(refusesIn(all), [unran, home, stripped], "the name past the style decides");
+  assert.deepEqual(formIn(all), [erred, warned, bare]);
+  assert.deepEqual(refusesIn(undefined), []);
+  assert.deepEqual(formIn(undefined), []);
 });

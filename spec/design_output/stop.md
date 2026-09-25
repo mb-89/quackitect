@@ -175,56 +175,9 @@ a time, and the calls ending a turn pass whatever stands.
 
 | the ask | what opens it | what answers it |
 |---|---|---|
-| the refactoring hand | the list past `refactor.mostWarnings`, and a file at rest past `refactor.untouchedFor` | the turn's end, where the stop door spawns the hand that walks the list |
 | the plan's three questions | every `plan.everyCalls` calls | a `plan` field on a level zero call, or the `plan` call |
 | the owner's ask for an update | the sidebar's ask, with `grace.update` calls before the reply is due | the reply, in the chat and through `report` |
 | the finish hold | the sidebar's hold at finish, with `grace.finish` calls before the calls refuse | the turn's end |
-
-The list stands in `.se/.runtime/refactor.json`, one entry a warning, which
-the lint writes at each check. `refactor.grace` names the calls that pass.
-
-## The hand walks the list
-
-One refactoring hand drains the list file after file. The stop door spawns it
-on the oldest file at rest, and `refactor.mostAtOnce` bounds the spawns a
-session makes. The hand calls `refactor_next` as it finishes each file.
-
-| `refactor_next` finds | what it answers |
-|---|---|
-| a file at rest, and new to this hand | that file, held for this hand |
-| no file at rest, or `refactor.mostFiles` spent | that no file waits, so the hand ends |
-| a call from outside the hand | a refusal |
-
-The hand stages, commits and pushes nothing. The session beside it lands
-what the hand leaves. The files a hand drains stay out of its walk, because
-their last commit still reads old.
-
-The log takes one line as the hand spawns, and one as it takes each file.
-A hand that falls writes its reason at `warn`. `walksList` and `drains` in
-`lib/warnings.js` hold the prompts.
-
-## The hand holds its file
-
-Hands writing one file drop each other's work. So the refactoring hand
-holds the file it drains, and `refactor-hold.js` keeps the hold in
-`.se/.runtime/refactor-hold.json`.
-
-| when | what the hold does |
-|---|---|
-| the stop door spawns the hand | it names the file, no hand yet, and the time |
-| the first helper writes that file | its `agentId` fills the hand |
-| the hand calls `refactor_next` | the hold moves to the next file, with the hand and a fresh time |
-| the hand answers, or its spawn fails | `refactor.answered` takes the hold off |
-| the hold stands past `refactor.holdFor` | it reads as none, and the next hand takes the file |
-| a session starts | the hold comes off, because no hand of the last session answers here |
-
-The write door refuses the held file to every other hand, the session's own
-too. Write, Edit, the patch and the mint all carry the call's `agentId` there.
-
-The door tells hands apart by `agentId` alone. So the first helper to write the
-file owns it, whatever its spawn asks of it. A Bash write, as `sed -i`, meets no
-write door, so the hold covers it nowhere. A hand working past the span loses
-the hold, and the next hand to write its file takes it.
 
 ## The plan
 
@@ -249,7 +202,7 @@ digit and no more. For the words a place writes, see
 
 The count of calls reaches the number, and the ask stands due. It lands on the
 first call no other ask holds, and the count starts over at the answer alone.
-So a standing update or refactor ask delays it, and the ask lands once the
+So a standing update ask delays it, and the ask lands once the
 agent answers that one. A hand answering nothing spends the grace and meets the
 refusal.
 
@@ -282,6 +235,7 @@ switches it off.
 | the case | what the door does |
 |---|---|
 | a session writes no handover | lets go past `stop.mostInARow` asks, and the log says so at `warn` |
+| a turn ends on a rule under `waits: owner` | holds the clear, and the tooth votes. The session stays due, and the next turn's end clears |
 | the person breaks off a turn | asks for no clear |
 | a fill past `context.writeAt` | caps the finish, because each call past the first key costs the most in the conversation. The key at zero, or under `context.handoverAt`, adds no second stage |
 | a handover names a file under `.se/.retro` | holds the turn's end until the handover names the ticket or the class by its name. The retro alone reads that folder, and a file there costs the next conversation a whole read. The log says so at `warn` |
@@ -293,6 +247,14 @@ every conversation after it opens past the key too. The log says so at
 
 A clear the owner types takes the same forget step, so the next pull hands the
 step's notes again. A compaction empties the reads too.
+
+## The queue alone clears
+
+The handover runs under `engine.binding` at `queue` alone. Under `god` and
+`unbound` the owner is in the loop, and a clear makes them explain the work
+twice. So there a session goes due nowhere: no block rides a call, no turn
+holds for the handover, and no clear follows. The fill still reads. A binding
+that moves off the queue while the clear stands asks for no clear.
 
 # The vote
 
@@ -417,23 +379,21 @@ agent, and a check reads the tree. So the tree wins:
 |---|---|
 | `a-wrong-answer-leaves-the-box` | what the agent takes a wrong answer to cost |
 | `the-work-stands-complete` | what the agent takes for a finish |
-| `an-update-is-worth-giving` | what the agent takes the owner to want |
 
 A stop the owner drives carries no flag. `the-owner-asks-to-talk` reads the
 owner's own words, so it stands over every check but one.
 
 A check carrying `beside` reads a hand's work beside the agent, and no claim
-yields to it. `warnings-stand-past-the-number` carries it. The refactoring hand
-drains the list, so a claim of done ends the turn over it. The hand still
-spawns at that turn's end.
+yields to it.
 
 ## A talk follows a report
 
 A stop line with no report above it tells the owner nothing to talk about.
-So `the-owner-asks-to-talk` runs `a-report-stands`: the message ending the
-turn carries the needs table, or the claim fires nothing and the turn holds.
-The report and the line stand in one message, because the owner's view shows
-the last message alone.
+So `the-owner-asks-to-talk` runs `a-report-stands`: a message of this turn
+carries the needs table, or the claim fires nothing and the turn holds. The
+owner's view shows every message of the turn. A missing stop line comes alone
+in the next message, and the report stands once. An owner's prompt
+opens a new turn, and the report before it counts no more.
 
 The band table puts `90` to `100` in the owner's hands. A claim about the agent's
 own work stands there today, and it overrides every check reading the branch. The
@@ -545,7 +505,6 @@ room that knows. For the table, see [[spec/design_output/level0#the-needs-table]
       the-owner-asks-to-talk: Does the last thing the owner said open a discussion?
       a-wrong-answer-leaves-the-box: Would a wrong answer here reach past this branch?
       the-work-stands-complete: Does the work stand complete?
-      an-update-is-worth-giving: Is there an update the owner wants before you go on?
     Before the call, close the answer with the heading What the agent needs and a table headed No., question and proposed answer, one numbered row a need.
 
 # Three in a row

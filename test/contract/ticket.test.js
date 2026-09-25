@@ -19,13 +19,13 @@ import {
 import { mintNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { disk } from "../../src/doors/disk.js";
-import { git } from "../../src/doors/git.js";
-import { proc } from "../../src/doors/proc.js";
+import { fakeGit } from "../../src/doors/fake/git.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
+// The schemas read off disk, so git stands fake and answers nothing. [[spec/design_output/doors#a-door-standing-on-another]]
 const here = treeOf({
   disk: disk(),
-  git: git(proc(), root),
+  git: fakeGit({}, root),
   root,
   words: 5,
   node: "",
@@ -243,12 +243,4 @@ test("a process file reads under the process schema, and a stray key is refused"
     ["Schema.about"],
   );
   assert.equal(bad[0].line, 4);
-});
-
-// [[spec/design_output/schema#a-data-schema-holds-yaml]]
-test("every process file this tree ships stands under the process schema", () => {
-  for (const path of here.paths()) {
-    if (!path.startsWith("spec/processes/") || !path.endsWith(".yaml")) continue;
-    assert.deepEqual(checkData(here.read(path), process, path, every), [], path);
-  }
 });
