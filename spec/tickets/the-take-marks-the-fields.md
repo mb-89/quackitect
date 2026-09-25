@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -102,7 +102,19 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
-todo: true
+  - step: implement/tests-green
+    hand: person
+    hash_before: b645f0c965b2e4512820e98a9e58c95596e186a2
+    hash_after: b645f0c965b2e4512820e98a9e58c95596e186a2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-take-marks-the-fields.md:237:3: Sentence: A sentence holds 25 words. Cut this one in two."
+todo: false
+reason: done
 ---
 
 # Ask
@@ -270,26 +282,40 @@ Every case fails on its own assertion: the host answers no mark, and the door dr
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/fields-to-fill.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A person taking a ticket in the editor sees every field the step in hand still wants, underlined in the information colour, and the cursor lands on the first.
+
+- a hover over a mark names the step's `does`, and the field's `form` and `says`
+- a put-back or a filled field takes its mark away
+- the marks stand as decorations, off the Problems panel, so no check, commit or push reads them
+
+For details, see [[spec/design_output/extension#a-take-marks-the-fields]].
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the host, its door, the wiring, the hold paths and the design section alone
+- the host meets a fake door, and the editor door meets a stand-in for vscode
+- every new function points at the section the change adds to the extension design output
+- the hold paths stand in `lib/lens.js`, and the schema path in `lib/route-host.js`
+- the design review passes clean, so no row waits
 
 # Discussion
 
