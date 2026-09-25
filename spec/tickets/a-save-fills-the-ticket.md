@@ -96,12 +96,18 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor]
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
     hash_before: e2aab03f1ba38256155aa62fc11a14fdf9ed669a
     hash_after: e2aab03f1ba38256155aa62fc11a14fdf9ed669a
+  - step: design/review
+    hand: box 75b31b3d5012 · claude-code-remote · helper-2
+    hash_before: 9ba488747341f372a9b4a6eac6c23938ff5b4678
+    hash_after: 9ba488747341f372a9b4a6eac6c23938ff5b4678
+    returns: 1
+    why: "| grade | finding | fix |; |---|---|---|; | design | the fake `runsVerb` in `test/level0/lens.test.js` stops at the argv, so no test named proves a save writes the route and chapters, which the first line of the ask calls for | name the test that runs `ticket fill` on the saved path over a fake disk and asserts `steps`, `process_hash` and a chapter per step |; | craft | `activate` in `src/extension/extension.js` gets the fake door `doorOf` in `test/level0/sidebar.test.js`, which carries no `onSave`, and the callers list leaves it out | name `sidebar.test.js`, `doorOf` as a caller, and say whether the wire calls `door.onSave?.` or the fake gains `onSave` |; | craft | `saved` calls `door.runsVerb` as a second caller, and the title change reaches `took` too | name `src/extension/editor-lens.js`, `runsVerb` in the callers list |"
 ---
 
 # Ask
@@ -169,6 +175,14 @@ The fill writes the file on disk. The editor reloads a saved file it holds clean
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+| grade | finding | fix |
+|---|---|---|
+| design | the fake `runsVerb` in `test/level0/lens.test.js` stops at the argv, so no test named proves a save writes the route and chapters, which the first line of the ask calls for | name the test that runs `ticket fill` on the saved path over a fake disk and asserts `steps`, `process_hash` and a chapter per step |
+| craft | `activate` in `src/extension/extension.js` gets the fake door `doorOf` in `test/level0/sidebar.test.js`, which carries no `onSave`, and the callers list leaves it out | name `sidebar.test.js`, `doorOf` as a caller, and say whether the wire calls `door.onSave?.` or the fake gains `onSave` |
+| craft | `saved` calls `door.runsVerb` as a second caller, and the title change reaches `took` too | name `src/extension/editor-lens.js`, `runsVerb` in the callers list |
 
 # implement
 
