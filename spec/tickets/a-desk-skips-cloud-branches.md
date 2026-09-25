@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -84,6 +84,10 @@ record:
     hash_after: 287d591cdbea52af40e32418a29ba3f1130df008
     returns: 1
     why: "`pull` in `src/scripts/pull.js` hands a desk on trunk `it.take(named || urgentGroup(it))`, so a guard in `take` turns a plain desk pull into a refusal while an urgent group stands. Name the change that road takes, and list `namedGroup` and `urgentGroup` in `src/scripts/pull-hand.js` as callers.; `trunkGuard` in `src/bridge/bash.js` guards `main` alone, so a desk's raw `git commit` on a `work/` branch lands past a guard in `landsAndPushes`. Name the door that refuses it, the Bash door or `.githooks/pre-commit`, or say why the commit verb alone answers the ask.; `release` in `src/scripts/work.js` moves a desk onto a `work/` branch and commits there through `letGo`. Say whether the guard reaches it."
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 907345b23e215afea3bba92287e9977833b71762
+    hash_after: 907345b23e215afea3bba92287e9977833b71762
 ---
 
 # Ask
@@ -113,16 +117,25 @@ Without it a desk commits its own work onto a group branch, `main` falls behind,
 
 <!-- the form is text -->
 
-One guard, `onDesk(it, branch)`, stands in `src/scripts` and answers a refusal where the box is a desk and the branch starts `work/`. The desk reads as `it.cloud ?? inCloud(it.env)`, the read `pushed` takes.
+One read, `onDesk(it, branch)`, answers true where the box stands off the cloud on a `work/` branch. It reads the cloud as `pushed` does. Every refusal names `git switch main`.
 
-| verb | what the guard does |
+| road | the change |
 |---|---|
-| `ticket pull` | refuses before any read, and names `git switch main` |
+| `ticket pull` on a `work/` branch | refuses before any read |
+| the pull on `main` | calls `take` on a cloud box alone, so a desk pull hands out free tickets |
+| a group a desk names | refuses, and names `branch merge` for a finished cloud branch |
 | `./RUNME.sh commit` | refuses before the tests run, so nothing stages |
-| `branch take` | refuses on a desk, because a desk leaves a cloud branch |
-| `branch merge` | runs on `main` alone already, and takes the branch in by a merge |
+| a raw `git commit` or `git push` | the Bash door refuses it, in a guard beside `trunkGuard` |
+| `branch take` | refuses on a desk |
+| `branch release` | runs as it stands: it frees a claim and carries no work |
+| `branch merge` | runs on `main` alone already |
 
-The design notes change with it. `pull#the-engine-takes-the-branch` drops the desk's road onto a group, and `work` names the guard.
+The guard holds the agent's doors, and a person in a terminal keeps raw git. `.githooks/pre-commit` stays out of it, because `letGo` commits through git and meets that hook too.
+
+`urgentGroup` leaves the tree, because the desk's road was its one caller. The design notes change with it:
+
+- `pull#the-engine-takes-the-branch` drops the desk's road onto a group
+- `work#a-box-writes-its-branch` names the desk guard
 
 ### callers
 
@@ -130,10 +143,15 @@ The design notes change with it. `pull#the-engine-takes-the-branch` drops the de
 
 <!-- the form is list -->
 
-- `src/scripts/pull.js`, `pull`, which reads the branch first
+- `src/scripts/pull.js`, `pull`, which reads the branch first and holds the take road
+- `src/scripts/pull-hand.js`, `namedGroup`, which the desk's refusal reads
+- `src/scripts/pull-hand.js`, `urgentGroup`, which leaves the tree
 - `src/scripts/commit-verb.js`, `landsAndPushes`, which runs the tests first
-- `src/scripts/work.js`, `take`, the desk's road onto a group
+- `src/bridge/bash.js`, the check list beside `trunkGuard`
+- `src/scripts/work.js`, `take`, which refuses on a desk
+- `src/scripts/work.js`, `release`, which stands unchanged
 - `src/scripts/work-merge.js`, `merge`, which the test drives on a cloud branch
+- `test/level0/pull-unbound.test.js`, the case where a desk takes the group it names
 
 ### answers
 
@@ -141,7 +159,9 @@ The design notes change with it. `pull#the-engine-takes-the-branch` drops the de
 
 <!-- the form is list -->
 
-- first draft
+- the pull reaches `take` on a desk: the pull calls `take` on a cloud box alone, and `urgentGroup` leaves
+- a raw `git commit` lands on a `work/` branch: the Bash door refuses it beside `trunkGuard`
+- `release` commits on a `work/` branch: it runs as it stands, since it carries no work
 
 ## review
 
