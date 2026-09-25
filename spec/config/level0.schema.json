@@ -353,14 +353,14 @@
           "help": "The score a ticket takes for each hand-back that comes back refused."
         },
         "editor": {
-          "help": "Open the work tab, which draws every ticket and takes a cell edit. The count beside it is the number in the work tab's name: the rows its queue places on this box.",
+          "help": "Open the work tab, which draws every ticket and takes a cell edit. The count beside it is the rows the work tab draws as it opens.",
           "widget": "action",
           "icon": "🗂",
           "group": "work",
           "row": 0,
           "column": 0,
           "runs": "./RUNME.sh tui work",
-          "counts": "./RUNME.sh ticket yours --count"
+          "counts": "./RUNME.sh tui work --count"
         },
         "pull": {
           "help": "Take the ticket waiting on you first, and open it.",

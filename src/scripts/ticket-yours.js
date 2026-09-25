@@ -1,7 +1,6 @@
 // The yours verb: the rows the work tab's queue holds on this box, in the
 // order the outline places them. The verb reads the one answer the work tab
-// reads, so the count beside the sidebar button and the count in the tab's
-// name are one number. Each road answers one JSON object.
+// reads. Each road answers one JSON object.
 // [[spec/design_input/the-editor-draws-the-ticket#the-work-group]]
 
 import { OPEN } from "../engine/group.js";
@@ -28,7 +27,6 @@ export function yours(it, argv) {
   const queue = queueIn(answerOf(it, true)).map((one) => rowOf(one, paths));
 
   const flags = new Set(argv ?? []);
-  if (flags.has("--count")) return answer({ count: queue.length });
   if (flags.has("--next")) {
     const next = queue.find((one) => one.person && one.path && one.state === OPEN);
     return answer(

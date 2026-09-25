@@ -445,6 +445,12 @@ ticket stands off it. For the places, see
 Nothing off the body draws there, because the name in the table opens the
 note.
 
+`./RUNME.sh tui work --count` prints `{"count":N}`, the rows the tab draws as it opens, and the
+work editor's button in the sidebar draws that count. `Drawn` in `src/tui/work/workcount.go` takes the
+tab's own roads, so the two agree. An index or a verb answering nothing prints its reason on stderr
+and exits failing, so the button draws no count. A tree lacking the viewer prints `{"count":null}`. Each
+sidebar draw pays a viewer start, and a `go build` where `viewerOf` finds the viewer stale.
+
 `src/tui/work/workindex.go` holds the road to the door, and `src/tui/work/workitems.go` turns the rows
 into items. A box with no door and no binary draws the reason in the tab, and
 asks again after a pause. So a build landing later reaches the tab with no

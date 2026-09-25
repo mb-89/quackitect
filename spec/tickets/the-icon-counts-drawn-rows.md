@@ -76,7 +76,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: person
@@ -94,6 +94,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 5 test(s) fail on their own assertion
+  - step: implement/change
+    hand: person
+    hash_before: 5ac426326917e030e140fd9e390c166da02ace0e
+    hash_after: 5ac426326917e030e140fd9e390c166da02ace0e
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -252,14 +260,24 @@ Two surprises. The commit door reads a Go test in the code's own folder alone, s
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    go -C src/tui build ./... && ./RUNME.sh lint src/tui/work/workcount.go src/tui/work/workcount_test.go src/tui/workcount_test.go src/tui/main.go src/scripts/tui.js src/scripts/ticket-yours.js src/scripts/ticket.js spec/config/level0.schema.json spec/design_output/tui.md test/level0/tui-count.test.js test/level0/ticket-yours.test.js test/level0/sidebar-work.test.js test/contract/work-buttons.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft's table and the review name, and no other
+- every door has a fake: the index, the branch verb, the process door and `fetch` each answer a fake in the tests
+- each new file and road points at `spec/design_output/tui#the-work-tab`, and a line there names the count's road
+- every fact stands once: `Drawn` calls `Load`, `runPlaces`, `Placed` and `Opening`, and the note points at the file
+- review row one: `test/contract/work-buttons.test.js` asserts `./RUNME.sh tui work --count`
+- review row two: the `work.editor` help names the rows the tab draws as it opens
+- review row three: the stale header sentence of `src/scripts/ticket-yours.js` goes with `--count`
+- review row four: an index or verb error prints on stderr and exits failing, so the button draws no count
+- review row five: the design line names the viewer start and the `go build` a stale viewer costs
 
 ## tests-green
 

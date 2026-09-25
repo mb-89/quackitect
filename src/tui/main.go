@@ -32,12 +32,24 @@ func main() {
 	floor := flag.String("floor", "", "with --frame: the floor to stand at, as debug, info, warn, error or fatal")
 	mouse := flag.Bool("mouse", true, "take the mouse, which costs the terminal's own text selection")
 	tab := flag.String("tab", "", "the tab the window opens on, as log or work")
+	count := flag.Bool("count", false, "print the rows the work tab draws as it opens, as JSON, and exit")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		fmt.Fprintln(stderr, "usage: logview [--frame --size WxH --pane details|help|filter --filter text] [--mouse=false --tab log|work] <session.jsonl>")
+		fmt.Fprintln(stderr, "usage: logview [--frame --size WxH --pane details|help|filter --filter text] [--mouse=false --tab log|work] [--count] <session.jsonl>")
 		exits(2)
 	}
 	path := flag.Arg(0)
+
+	// [[spec/design_output/tui#the-work-tab]]
+	if *count {
+		drawn, err := work.Drawn(path)
+		if err != nil {
+			fmt.Fprintln(stderr, err)
+			exits(1)
+		}
+		fmt.Printf("{\"count\":%d}\n", drawn)
+		return
+	}
 	// The colours stand in the config, and the window reads them once. [[spec/design_output/tui#colours]]
 	draw.LoadColours(work.Root(path))
 

@@ -76,7 +76,7 @@ export function ticket(root, argv, doors) {
       "  route <ticket>      write the steps past the pointer, off --steps=<json>, and answer JSON",
     );
     console.log(
-      "  yours               the tickets waiting on a person as JSON, or --count, or --next",
+      "  yours               the tickets waiting on a person as JSON, or --next",
     );
     console.log(
       "  fill <path>         write the route a saved ticket's process names, or print it under --stdout",

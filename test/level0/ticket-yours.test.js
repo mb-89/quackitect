@@ -1,5 +1,5 @@
 // The yours verb, over a fake disk and a fake git. It reads the answer the work
-// tab reads, so its count is the number in the tab's name.
+// tab reads, so it lists the rows the tab's queue places.
 // [[spec/design_input/the-editor-draws-the-ticket#the-work-group]]
 
 import assert from "node:assert/strict";
@@ -89,19 +89,6 @@ const TREE = {
   "spec/tickets/e-closed-one.md": ticketText({ state: "closed" }),
   ".se/tickets/f-note-one.md": NOTE_TEXT,
 };
-
-test("yours --count answers the number the work tab's name carries", () => {
-  const said = asked(TREE, ["--count"]);
-  assert.equal(said.code, 0);
-  assert.deepEqual(said.json, { count: tabCount(TREE) });
-  assert.equal(said.json.count, 4);
-});
-
-test("a note waiting for its retro at a person's step stays out of the count", () => {
-  const bare = { ...TREE };
-  delete bare[".se/tickets/f-note-one.md"];
-  assert.deepEqual(asked(TREE, ["--count"]).json, asked(bare, ["--count"]).json);
-});
 
 test("yours --next prints the ticket the queue hands a person first, as JSON", () => {
   const said = asked(TREE, ["--next"]);

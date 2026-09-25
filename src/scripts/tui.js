@@ -23,8 +23,23 @@ export async function openTui(it, argv) {
   const viewer = plain ? { exe: "", why: "" } : it.viewer();
   if (viewer.why) console.error(viewer.why);
   const session = it.join(it.root, SESSION);
+  if (argv.includes(COUNT)) return counted(it, viewer.exe, session);
   if (viewer.exe) return await opens(it, viewer.exe, session, tabWanted(argv));
   return plainRows(it, argv, session, plain);
+}
+
+const COUNT = "--count";
+
+// The viewer counts the rows its work tab draws as it opens, and leaves a standing window its tab. [[spec/design_output/tui#the-work-tab]]
+function counted(it, exe, session) {
+  if (!exe) {
+    console.log(JSON.stringify({ count: null }));
+    return 0;
+  }
+  const ran = it.proc.run([exe, COUNT, session], { cwd: it.root });
+  if (ran.stderr.trim()) console.error(ran.stderr.trim());
+  if (ran.stdout.trim()) console.log(ran.stdout.trim());
+  return ran.exitCode;
 }
 
 // [[spec/design_output/tui#a-second-launch-hands-over]]
