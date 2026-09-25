@@ -96,7 +96,12 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-inset-folds-the-frontmatter, the-ticket-answers-the-editor, the-drawing-draws-a-route]
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: b591f43f5f7b9f9f2da4f58b8920959557b016c7
+    hash_after: b591f43f5f7b9f9f2da4f58b8920959557b016c7
 ---
 
 # Ask
@@ -127,17 +132,55 @@ Without it the drawing draws and does nothing, so a person edits the route as YA
 
 <!-- the form is text -->
 
+The host answers every press the page posts, and runs a verb through the road the ticket buttons run. So the take, the hand-back and a refusal read alike from a button and from the drawing.
+
+| the press | the host runs | through |
+|---|---|---|
+| `jump` | opens the ticket, and puts the cursor on the node's `line` | `door.jumps(path, line)` |
+| `edit` | `ticket route <ticket> --steps=<json>`, with the whole route the page posts | `door.runsVerb`, as `routeArgvOf(ticket, steps)` answers it |
+| `take` | the pull the take button runs | `ticketLensOf(door).took("take", ticket, path)` |
+| `handback` on a verdict leaf | the pull the verdict button runs | `ticketLensOf(door).took("back", ticket, path)` |
+| `handback` on another leaf | a pick of pass or fail, then the pull that button runs | `door.picks`, then `ticketLensOf(door).took` |
+
+| part | file | what it does |
+|---|---|---|
+| the answers | `src/extension/lib/route-host.js`, `took` | routes each press as the table says, and posts nothing to the page. The next `changed` redraws the route the verb writes |
+| the route line | `src/extension/lib/lens.js`, `routeArgvOf(ticket, steps)` | the argv of `ticket route`, beside `argvOf` |
+| the refusal | `src/extension/lib/route-host.js`, `took` | reads the route verb's JSON, and a `refused` raises a warning through `door.tells` and says the lines through `door.says` |
+| the verdict leaf | `src/extension/lib/route-host.js`, `took` | reads the leaf `stepsIn` answers for the step, the way `handBackOf` does |
+| the jump | `src/extension/editor-inset.js`, `jumps(path, line)` | `showTextDocument` with a selection on the line |
+| the pick | `src/extension/editor-lens.js`, `picks(prompt, options)` | `showQuickPick`, and an empty answer where the person closes it |
+
+The tests stand in `test/level0/route-host.test.js`, over the fake door:
+
+| case | what it asserts |
+|---|---|
+| a jump opens the chapter's line | `jumps` gets the path and the node's line |
+| an edit runs the route verb | `runsVerb` gets `ticket route <ticket> --steps=<json>` |
+| a take runs the pull | `runsVerb` gets `ticket pull <ticket>` |
+| a hand-back on a verdict leaf runs the pull | `runsVerb` gets `ticket pull <ticket>`, and the ticket saves first |
+| a hand-back on another leaf asks | a pick of pass runs `--pass`, and a closed pick runs nothing |
+| a refused route shows its refusal | `tells` gets the refusal as a warning |
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/extension/lib/route-host.js`, `routeHostOf`, whose `took` answers each press
+- `src/extension/lib/lens.js`, `ticketLensOf().took`, which the host calls for the take and the hand-back
+- `src/extension/editor-lens.js`, `lensDoor`, which gains `picks`
+- `src/extension/editor-inset.js`, `insetDoor`, which gains `jumps`
+- `test/level0/route-host.test.js`, `doorOf`, which gains a fake for each door call the table names, and `runsVerb`
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first
 
 ## review
 
