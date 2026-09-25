@@ -334,30 +334,30 @@ script: |
   brad bradford bradley brady braille brain brains brake brakes branch
   branches brand branded branding brandon brands brandy branson bras
   brasil brass braun brave braves bravo brazil brazilian breach bread
-  breadth break breakdown breaker breakers breakfast breakfasts breaking
-  breakout breaks breakthrough breast breastfeeding breasts breath breathe
-  breathing breathtaking bred breed breeder breeders breeding breeds
-  breeze bremen brenda brendan brennan brent brentwood brethren brett brew
-  brewer brewers brewery brewing brian brick bricks bridal bride brides
-  bridge bridgehead bridgeport bridges bridget bridgewater bridging brief
-  briefcase briefing briefings briefly briefs brigade briggs bright
-  brighter brightly brightness brighton brilliant bring bringing brings
-  brisbane bristol brit britain britannica british britney brittany bro
-  broad broadband broadcast broadcasters broadcasting broadcasts broader
-  broadly broadway broccoli brochure brochures brock broke brokeback
-  broken broker brokerage brokers broncos bronx bronze brook brooke
-  brooklyn brooks bros brother brotherhood brothers brought brown browne
-  browning browns browse browser browsers browsing bruce bruins brunch
-  brunei brunette bruno brunswick brush brushed brushes brussels brutal
-  bryan bryant bryce bsc bsd bse bst btw bubble bubbles buchanan buck
-  bucket buckingham buckinghamshire buckle buckley bucks bud budapest
-  buddha buddhism buddhist buddies buddy budget budgetary budgeting
-  budgets buds buena buenos buf buff buffalo buffer buffers buffet buffy
-  bufing bug buggy bugs bugzilla buick build builder builders building
-  buildings builds built bukkake bulb bulbs bulgaria bulgarian bulk bull
-  bulldog bulldogs bullet bulletin bulletins bullets bullock bulls
-  bullshit bullying bump bumper bunch bundle bundled bundler bundles
-  bungalow bunk bunker bunny bur burbank burberry burden bureau
+  breadcrumb breadcrumbs breadth break breakdown breaker breakers
+  breakfast breakfasts breaking breakout breaks breakthrough breast
+  breastfeeding breasts breath breathe breathing breathtaking bred breed
+  breeder breeders breeding breeds breeze bremen brenda brendan brennan
+  brent brentwood brethren brett brew brewer brewers brewery brewing brian
+  brick bricks bridal bride brides bridge bridgehead bridgeport bridges
+  bridget bridgewater bridging brief briefcase briefing briefings briefly
+  briefs brigade briggs bright brighter brightly brightness brighton
+  brilliant bring bringing brings brisbane bristol brit britain britannica
+  british britney brittany bro broad broadband broadcast broadcasters
+  broadcasting broadcasts broader broadly broadway broccoli brochure
+  brochures brock broke brokeback broken broker brokerage brokers broncos
+  bronx bronze brook brooke brooklyn brooks bros brother brotherhood
+  brothers brought brown browne browning browns browse browser browsers
+  browsing bruce bruins brunch brunei brunette bruno brunswick brush
+  brushed brushes brussels brutal bryan bryant bryce bsc bsd bse bst btw
+  bubble bubbles buchanan buck bucket buckingham buckinghamshire buckle
+  buckley bucks bud budapest buddha buddhism buddhist buddies buddy budget
+  budgetary budgeting budgets buds buena buenos buf buff buffalo buffer
+  buffers buffet buffy bufing bug buggy bugs bugzilla buick build builder
+  builders building buildings builds built bukkake bulb bulbs bulgaria
+  bulgarian bulk bull bulldog bulldogs bullet bulletin bulletins bullets
+  bullock bulls bullshit bullying bump bumper bunch bundle bundled bundler
+  bundles bungalow bunk bunker bunny bur burbank burberry burden bureau
   bureaucracy burger burgers burgess burgundy burial buried burke burkina
   burlington burma burn burned burner burners burnett burning burns burnt
   burr burst burt burton burundi bury bus busch buses bush business
@@ -2221,26 +2221,26 @@ script: |
   utterly uzbekistan vac vacancies vacancy vacant vacation vacations
   vaccination vaccine vaccines vacuum vagina vaginal vaginas vague vail
   vain vaio val vale valencia valentine valentines valentino valerie valet
-  valid validated validation validator validity valium vallarta valley
-  valleys valuable valuation value valued values valve valves vampire
-  vampires van vance vancouver vanderbilt vanessa vanguard vanilla vanity
-  vans vantage vanuatu vapor var variability variable variables variance
-  variant variants variation variations varied varies varieties variety
-  various varsity vary varying vascular vase vases vast vat vatican
-  vaughan vaughn vault vaults vauxhall vbulletin vcd vcr vdata vector
-  vectors vega vegan vegas vegetable vegetables vegetarian vegetation
-  vehicle vehicles veil vein veins vel velcro velocity velvet vending
-  vendor vendors venetian venezuela vengeance venice venom vent
+  valid validate validated validation validator validity valium vallarta
+  valley valleys valuable valuation value valued values valve valves
+  vampire vampires van vance vancouver vanderbilt vanessa vanguard vanilla
+  vanity vans vantage vanuatu vapor var variability variable variables
+  variance variant variants variation variations varied varies varieties
+  variety various varsity vary varying vascular vase vases vast vat
+  vatican vaughan vaughn vault vaults vauxhall vbulletin vcd vcr vdata
+  vector vectors vega vegan vegas vegetable vegetables vegetarian
+  vegetation vehicle vehicles veil vein veins vel velcro velocity velvet
+  vending vendor vendors venetian venezuela vengeance venice venom vent
   ventilation ventricular ventura venture ventures venue venues venus ver
   vera verb verbal verbatim verbs verde verdict verification verified
-  verifying verisign veritas verizon verlag vermont vernacular vernon
-  verona veronica versa versace versatile verse verses version versions
-  versus vertex vertical vertically vertices very verzeichnis vessel
-  vessels vest vested vests vet veteran veterans veterinary veto vets vga
-  vgroup vhf vhs via viability viable viagra vibe vibrant vibrating
-  vibration vibrator vibrators vic vice vicinity vicious vicki vicodin
-  victim victims victor victoria victorian victories victory vid vida
-  video videogames videos videotape vids vie vienna viet vietnam
+  verify verifying verisign veritas verizon verlag vermont vernacular
+  vernon verona veronica versa versace versatile verse verses version
+  versions versus vertex vertical vertically vertices very verzeichnis
+  vessel vessels vest vested vests vet veteran veterans veterinary veto
+  vets vga vgroup vhf vhs via viability viable viagra vibe vibrant
+  vibrating vibration vibrator vibrators vic vice vicinity vicious vicki
+  vicodin victim victims victor victoria victorian victories victory vid
+  vida video videogames videos videotape vids vie vienna viet vietnam
   vietnamese view viewed viewer viewers viewing viewpicture viewpoint
   viewpoints views viewsonic vigorous vii viii viking vikings villa
   village villagers villages villas ville vin vince vincent vinci vine
@@ -2342,7 +2342,7 @@ script: |
   leverage=use mend=fix modify=change numerous=many obtain=get
   prior=before purchase=buy regarding=about skim=read subsequently=then
   sufficient=enough terminate=end terse=short therefore=so utilise=use
-  utilize=use validate=check verify=check whilst=while wrongly=in error
+  utilize=use whilst=while wrongly=in error
   `
 
   swaps := {}
