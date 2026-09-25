@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor]
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -133,6 +133,17 @@ record:
     hash_after: 12e14e40c596243c4e7546f3608aab2c004c7922
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: c061d7112c22b13e520cde42b0f0c5a908dd8fe8
+    hash_after: c061d7112c22b13e520cde42b0f0c5a908dd8fe8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 45 test(s) pass in 3 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -298,11 +309,15 @@ A stub `fillArgvOf` and `saved` leaves these cases red: the fill over a picked p
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/lens.test.js test/level0/save-fills.test.js test/level0/sidebar.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -310,11 +325,17 @@ A stub `fillArgvOf` and `saved` leaves these cases red: the fill over a picked p
 
 <!-- the form is text -->
 
+A save of a ticket in the editor now runs `./RUNME.sh ticket fill` where the ticket names a process and carries no route. So a person picks a process, writes the ask, saves, and meets the route and a chapter per step. The fill writes through the mint, so one road writes a route. A save over a standing route or an empty `process` runs nothing. A refused fill raises a warning, and the log holds the verb's answer.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change stays inside the lens, the lens door, the start and their tests
+- `runsVerb` carries a fake in the lens test and in `save-fills.test.js`
+- each new function names the design input's heading on a ticket picking a process
 
 # verdict
 
