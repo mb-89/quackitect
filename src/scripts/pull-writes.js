@@ -6,11 +6,9 @@ import { entryNamed } from "../../.claude/skills/level0/lib/schema.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
-import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import {
   CLOSED,
   fieldOf,
-  firstLeaf,
   frontOf,
   OPEN,
   recordIn,
@@ -19,7 +17,7 @@ import {
   withField,
 } from "../engine/group.js";
 import { dropHold } from "./guidance-hand.js";
-import { askRows, processAt } from "./process.js";
+import { processAt } from "./process.js";
 import { roleOf } from "./pull-hand-of.js";
 import { landed, unlandedRows } from "./pull-landed.js";
 import {
@@ -29,7 +27,7 @@ import {
   ticketsHere,
   withPersonStep,
 } from "./pull-hand.js";
-import { fromHold, NOTES, schemasHere } from "./ticket.js";
+import { fromHold, NOTES, routedTicket } from "./ticket.js";
 import { DONE, REFUSED, say, WAIT, WORK, walkOf } from "./pull-route.js";
 import { changedIn } from "./work.js";
 import { pushed, sentOut } from "./pull-push.js";
@@ -91,19 +89,10 @@ export function minted(it, who, one, leaf, held, findings, answered) {
   const built = [];
   for (const { name, line } of findings) {
     const path = `${folder}/${name}.md`;
-    const made = mintedNote(schemasHere(it), {
-      kind: "ticket",
-      path,
-      fields: {
-        state: DRAFT,
-        process: route.link,
-        process_hash: route.hash,
-        steps: fromHold(route.route, { ticket: one.name, step: leaf.path }),
-        step: firstLeaf(route.route),
-        parent: one.name,
-        ...(group ? { group } : {}),
-        Ask: [askRows(route.ask), "", line].join("\n").trim(),
-      },
+    const made = routedTicket(it, path, route, {
+      steps: fromHold(route.route, { ticket: one.name, step: leaf.path }),
+      line,
+      fields: { state: DRAFT, parent: one.name, ...(group ? { group } : {}) },
     });
     if (made.why) return unminted(one, leaf, `${name} mints nothing: ${made.why}`);
     built.push({ at: it.join(it.root, ...path.split("/")), text: made.text });
@@ -229,7 +218,9 @@ export function became(it, who, one, leaf, held, successor, answered) {
 // [[spec/design_output/pull#answered]]
 export function answeredBy(it, who, one, leaf, held, answerer, answered) {
   if (answerer === one.name) {
-    say(REFUSED, [`${one.name} answers no ask of its own. Name the ticket answering it.`]);
+    say(REFUSED, [
+      `${one.name} answers no ask of its own. Name the ticket answering it.`,
+    ]);
     return 1;
   }
   if (!ticketsHere(it).some((held) => held.name === answerer)) {
@@ -282,7 +273,10 @@ export function unlanded(one, leaf, finding) {
 
 // [[spec/design_output/pull#the-rejected-push]]
 export function refusedPush(said) {
-  say(REFUSED, ["The hand-back stands on this box, and its push reaches no origin.", ...said.why]);
+  say(REFUSED, [
+    "The hand-back stands on this box, and its push reaches no origin.",
+    ...said.why,
+  ]);
   return 1;
 }
 

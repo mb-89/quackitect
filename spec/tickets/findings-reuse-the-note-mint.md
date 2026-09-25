@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ step: do
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 parent: one-review-a-ticket
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: dca96a657a3148c2a80dfafad93f68ecff200332
+    hash_after: dca96a657a3148c2a80dfafad93f68ecff200332
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 63 test(s) pass in 5 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/findings-reuse-the-note-mint.md:62:1: Shape: A run holds 3 paragraphs with no list, table or diagram betwee"
+reason: done
 ---
 
 # Ask
@@ -47,11 +60,15 @@ parent: one-review-a-ticket
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/pull-findings.test.js test/level0/pull-leaves.test.js test/level0/ticket-verb.test.js test/level0/ask-lint.test.js test/level0/pull-fails.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -59,11 +76,19 @@ parent: one-review-a-ticket
 
 <!-- the form is text -->
 
+`routedTicket` in `src/scripts/ticket.js` mints a ticket off a route and reads its Ask through `askFaults`. `note` and `minted` both call it, so one function owns the mint.
+
+The pull's evidence read refuses a private name on the verdict row before `minted` runs, and a child's Ask is that row. So the Ask read on a child refuses nothing new, and the existing tests of both callers cover the change.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `ticket.js` and `pull-writes.js` alone, as the ask names
+- the cleanup drops the imports the shared mint replaces
+- the mint stands in `routedTicket` alone
 
 # Discussion
 

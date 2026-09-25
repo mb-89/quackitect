@@ -12,9 +12,11 @@ import {
   HOLD,
   NOTE,
   NOTES,
+  routedTicket,
   ticket,
   updated,
 } from "../../src/scripts/ticket.js";
+import { processAt } from "../../src/scripts/process.js";
 import { semicolonVale } from "./semicolon-vale.js";
 
 const ROOT = "/tree";
@@ -294,6 +296,61 @@ test("ticket note writes a line the lint warns on, and names Characters at its l
   assert.ok(line > 0, "Vale reads the minted ticket whole");
   assert.match(warned.said, new RegExp(`line ${line} breaks Characters`));
   assert.equal(said.disk.exists(at(`${NOTES}/a-name.md`)), true, "the note stands");
+});
+
+const SECRET = "SECRET";
+
+// A Vale that behaves over stdin: it names each line holding the marker as a private name, at error. [[spec/design_output/doors#a-fake-behaves]]
+function privateVale(argv, init = {}) {
+  const named = argv.find((one) => one.startsWith("--path="));
+  const file = named ? named.slice("--path=".length) : "stdin.md";
+  const rows = String(init.stdin ?? "")
+    .split("\n")
+    .flatMap((line, i) =>
+      line.includes(SECRET)
+        ? [
+            {
+              Check: "VoiceVale.Private",
+              Line: i + 1,
+              Span: [1, 1],
+              Match: SECRET,
+              Message: "A private name leaves the box.",
+              Severity: "error",
+            },
+          ]
+        : [],
+    );
+  return { exitCode: 0, stdout: JSON.stringify(rows.length ? { [file]: rows } : {}) };
+}
+
+// A finding's child and a note mint through one function, which reads the Ask before it writes. [[spec/design_output/pull#a-finding-rides-out]]
+test("routedTicket mints a draft off the route, and a line carrying a private name mints nothing", () => {
+  const VALE = "/tree/.se/.runtime/bin/vale";
+  const said = treeWithProcesses();
+  const proc = fakeProc();
+  proc.teach([VALE], privateVale);
+  const it = { ...said.it, proc, root: ROOT, vale: VALE };
+  const held = processAt(said.disk, ROOT, join, "trivial");
+  const mint = (line) =>
+    routedTicket(it, "spec/tickets/a-child.md", held, {
+      steps: fromHold(held.route, { ticket: "a-parent", step: "design/review" }),
+      line,
+      fields: { state: "draft" },
+    });
+
+  const made = mint("the note names no link");
+  assert.equal(made.why, undefined, made.why);
+  assert.match(made.text, /^state: draft$/m, "the child stands at draft");
+  assert.match(made.text, /^step: do$/m, "the child stands at the route's first leaf");
+  assert.match(made.text, /the note names no link/, "the line lands as the Ask");
+  const refused = mint(`the note names ${SECRET}`);
+  assert.match(
+    String(refused.why),
+    /so the verb writes nothing/,
+    "the Ask read refuses",
+  );
+  assert.match(String(refused.why), /breaks Private/, "the refusal names the rule");
+  assert.equal(refused.text, undefined, "a refused line mints nothing");
 });
 
 test("ticket update refuses where step names a leaf the new route lacks", () => {
