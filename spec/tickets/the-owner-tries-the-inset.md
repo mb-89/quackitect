@@ -34,6 +34,12 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
+record:
+  - step: answer
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: 0b8d33c950095ad932e55997f97c671b02208090
+    hash_after: 0b8d33c950095ad932e55997f97c671b02208090
+step: do
 ---
 
 # Ask
@@ -51,6 +57,8 @@ Does the owner's VS Code draw a web page between the lines of a ticket through `
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
+
+Yes. The owner ran the probe, and its page stands between the lines of the ticket, so the editor host is the inset. The page drew the probe's own test route, and its first short draw stood under the grown one. The host draws the real route, and takes one inset a place.
 
 <!-- the form is text -->
 
