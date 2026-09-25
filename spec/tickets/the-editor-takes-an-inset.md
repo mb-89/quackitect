@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: run
     does: builds the trial and says what it shows
@@ -32,6 +32,8 @@ record:
     hand: box d6f05e3a585030 · claude-code
     hash_before: 594647e5546be4e0c4d697dad8bb6abb0bf528ab
     hash_after: 4766e199c7276f308c991d6848d58443b7b1beb0
+reason: became
+successors: [the-owner-tries-the-inset]
 ---
 
 # Ask

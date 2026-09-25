@@ -13,7 +13,8 @@ export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import { notesSaid, parsed } from "./guidance-hand.js";
 import { PERSON, roleOf } from "./pull-hand-of.js";
-import { excludes, handRule } from "./pull-hand.js";
+import { overLong } from "../../.claude/skills/level0/lib/names.js";
+import { excludes, handRule, ticketsHere } from "./pull-hand.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
 import { changedSince, commitsFor, tipOf } from "./pull-writes.js";
 
@@ -232,22 +233,56 @@ export function formFault(it, field, rows, where, one, held) {
       ];
     if (said.said === "fail" && !said.reason)
       return [`${where} fails with no finding under it.`];
+    if (said.said === FOUND) return findingFaults(it, said, where);
     return [];
   }
   return [];
 }
 
-// [[spec/design_output/pull#the-fields-hold-their-forms]]
+// A verdict field keeps every round, so the last row opening with pass or fail decides. [[spec/design_output/pull#the-fields-hold-their-forms]]
 export function verdictIn(rows) {
-  const first = String(rows[0] ?? "")
-    .replace(/^[-*]\s+/, "")
-    .trim();
-  const word = first.split(/[\s:.,]+/)[0].toLowerCase();
-  if (word !== "pass" && word !== "fail") return { said: "" };
-  const rest = [first.slice(word.length).replace(/^[\s:.,]+/, ""), ...rows.slice(1)]
+  const opener = (row) =>
+    String(row ?? "")
+      .replace(/^[-*]\s+/, "")
+      .trim()
+      .split(/[\s:.,]+/)[0]
+      .toLowerCase();
+  const at = rows.findLastIndex((row) => ["pass", "fail"].includes(opener(row)));
+  if (at < 0) return { said: "" };
+  const first = String(rows[at]).replace(/^[-*]\s+/, "").trim();
+  const findings = FINDINGS.exec(first);
+  const word = findings ? findings[0] : opener(first);
+  const rest = [first.slice(word.length).replace(/^[\s:.,]+/, ""), ...rows.slice(at + 1)]
     .map((row) => row.replace(/^[-*]\s+/, "").trim())
     .filter(Boolean);
-  return { said: word, reason: rest.join("; ") };
+  if (!findings) return { said: word, reason: rest.join("; ") };
+  return { said: FOUND, reason: rest.join("; "), findings: rest.map(findingOf) };
+}
+
+// A design review passing with findings names a child a row, as `- <child-name>: <finding>`. [[spec/design_output/pull#a-finding-rides-out]]
+const FINDINGS = /^pass\s+with\s+findings\b/i;
+export const FOUND = "findings";
+
+function findingOf(row) {
+  const said = /^([^\s:]+):\s*(.*)$/.exec(row);
+  return said ? { name: said[1], line: said[2].trim() } : { name: "", line: row };
+}
+
+// A pass with findings mints a child a row, so a row names a child the tree holds nowhere yet. [[spec/design_output/pull#a-finding-rides-out]]
+function findingFaults(it, said, where) {
+  if (!said.findings.length) return [`${where} passes with findings, and names none.`];
+  const out = [];
+  const taken = new Set(ticketsHere(it).map((one) => one.name));
+  const seen = new Set();
+  for (const { name, line } of said.findings) {
+    if (!name) out.push(`${where} names no child in ${line}; write it as - <child-name>: <finding>.`);
+    else if (overLong(name, it.words))
+      out.push(`${where} names ${name}, and a ticket name holds ${it.words} words.`);
+    else if (taken.has(name)) out.push(`${where} names ${name}, which a ticket holds already.`);
+    else if (seen.has(name)) out.push(`${where} names ${name} twice.`);
+    seen.add(name);
+  }
+  return out;
 }
 
 const FORMS_READ = ["text", "list", "checklist", "verdict"];

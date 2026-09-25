@@ -72,3 +72,13 @@ over.
 A mark on most rows orders nothing. So the mark takes one meaning: work stops
 here until somebody fixes it. A retro's finding is a defect that waits, and the
 owner marks the few that do not.
+
+## 15. The author checks first
+
+One design went round five drafts. The first two reviews each named a fact one
+search away: a caller the draft got wrong, a reader that already stood, a rule
+list `se-lsp` owns, and a merge the verb refuses. The drafter named each file,
+and opened none of them.
+
+A review then did the author's check, one round at a time. The owner reads more
+than one round as the author's fault, and so does this rule.

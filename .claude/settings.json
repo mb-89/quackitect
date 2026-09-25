@@ -15,7 +15,8 @@
       "TaskList",
       "TaskGet",
       "mcp__github",
-      "mcp__Claude_Code_Remote"
+      "mcp__Claude_Code_Remote",
+      "Agent"
     ],
     "deny": [
       "Artifact"

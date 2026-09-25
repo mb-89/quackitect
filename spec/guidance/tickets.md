@@ -20,6 +20,7 @@ rationale: [[spec/rationales/tickets]]
 12. Name the group a ticket lands in under `group`, and read a group as one branch with children. [[spec/design_output/work]]
 13. Run `./RUNME.sh ticket update <ticket>` after a process file changes, so the leaves ahead take the new route.
 14. Mark a ticket `urgent` where a break stops work until somebody fixes it, and mark no other. A defect that waits stands unmarked, and so does every finding a retro mints. *
+15. Open every file, function and verb your step names, and check each claim there before you hand it back. A second review round names an author who skipped that check. *
 
 # Examples
 

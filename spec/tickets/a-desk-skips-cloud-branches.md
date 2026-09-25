@@ -1,10 +1,20 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review fails back 2 times: `pull` in `src/scripts/pull.js` reaches `it.ready()`, which is `readyToMerge` in `src/scripts/work-review.js`, inside the take block on a desk alone. `pull#an-empty-queue-hands-cleanup` and `test/level0/ready.test.js` depend on that road. Say whether a desk pull still calls `it.ready()` before the hand-out, and list `readyToMerge` as a caller.; `test/level0/work-doors.js` hands every case `env: {}`, so each `work(ROOT, [\"take\"], ...)` case in `test/level0/work.test.js`, `test/level0/work-group.test.js` and `test/level0/work-orphan.test.js` drives `take` as a desk. List them as callers, and name how they reach a cloud box once `take` refuses on a desk.; `test/level0/work-group.test.js` asserts that a desk pull takes a marked group and a named one. List it beside `test/level0/pull-unbound.test.js`.; `onDesk` reads the cloud as `pushed` does, while `src/bridge/bash.js` reads it through `onACloud`. Name the one read the Bash door guard and the verbs share."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -33,8 +43,8 @@ steps:
   - name: implement
     reads: [[spec/guidance/code/testing]]
     needs: ["branch test"]
-    input: design/draft
-    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements"]
+    input: ["design/draft", "design/review"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     steps:
       - name: tests-red
         does: writes the tests the ask calls for
@@ -46,14 +56,6 @@ steps:
           - name: seen
             form: text
             says: what you see, and what surprises you
-      - name: reflect
-        does: names the class of error in the findings, and the fix for the class
-        when: returned
-        input: verdict
-        evidence:
-          - name: class
-            form: text
-            says: the class of error the findings describe, and the fix for the class
       - name: change
         does: makes the change
         reads: [[spec/guidance/code/code]]
@@ -65,6 +67,7 @@ steps:
       - name: tests-green
         does: makes the tests pass
         input: tests-red
+        to: retro
         evidence:
           - name: tests
             form: command
@@ -77,29 +80,30 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-  - name: verdict
-    does: reads every hunk against the ask and the approach
-    not: implement
-    on_fail: implement/reflect
-    reads: [[spec/guidance/review/reviewing]]
-    input: ["diff", "implement"]
-    to: retro
-    checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
-    evidence:
-      - name: read
-        form: files
-        says: every file you read, one a line
-      - name: verdict
-        form: verdict
-        says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
-process_hash: 7a1a6e274b56e7ee
-step: design/review
+process_hash: 6bfe67ab65bf2e6d
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
     hash_before: 0ed73f5c263eee3034470b49a6259578ee63ad83
     hash_after: 0ed73f5c263eee3034470b49a6259578ee63ad83
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-2
+    hash_before: 287d591cdbea52af40e32418a29ba3f1130df008
+    hash_after: 287d591cdbea52af40e32418a29ba3f1130df008
+    returns: 1
+    why: "`pull` in `src/scripts/pull.js` hands a desk on trunk `it.take(named || urgentGroup(it))`, so a guard in `take` turns a plain desk pull into a refusal while an urgent group stands. Name the change that road takes, and list `namedGroup` and `urgentGroup` in `src/scripts/pull-hand.js` as callers.; `trunkGuard` in `src/bridge/bash.js` guards `main` alone, so a desk's raw `git commit` on a `work/` branch lands past a guard in `landsAndPushes`. Name the door that refuses it, the Bash door or `.githooks/pre-commit`, or say why the commit verb alone answers the ask.; `release` in `src/scripts/work.js` moves a desk onto a `work/` branch and commits there through `letGo`. Say whether the guard reaches it."
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 907345b23e215afea3bba92287e9977833b71762
+    hash_after: 907345b23e215afea3bba92287e9977833b71762
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-4
+    hash_before: 60d353d56e5f9358b8b2fa6589517a8d39c480e6
+    hash_after: 60d353d56e5f9358b8b2fa6589517a8d39c480e6
+    returns: 2
+    why: "`pull` in `src/scripts/pull.js` reaches `it.ready()`, which is `readyToMerge` in `src/scripts/work-review.js`, inside the take block on a desk alone. `pull#an-empty-queue-hands-cleanup` and `test/level0/ready.test.js` depend on that road. Say whether a desk pull still calls `it.ready()` before the hand-out, and list `readyToMerge` as a caller.; `test/level0/work-doors.js` hands every case `env: {}`, so each `work(ROOT, [\\\"take\\\"], ...)` case in `test/level0/work.test.js`, `test/level0/work-group.test.js` and `test/level0/work-orphan.test.js` drives `take` as a desk. List them as callers, and name how they reach a cloud box once `take` refuses on a desk.; `test/level0/work-group.test.js` asserts that a desk pull takes a marked group and a named one. List it beside `test/level0/pull-unbound.test.js`.; `onDesk` reads the cloud as `pushed` does, while `src/bridge/bash.js` reads it through `onACloud`. Name the one read the Bash door guard and the verbs share."
+urgent: true
 ---
 
 # Ask
@@ -119,6 +123,16 @@ Without it a desk commits its own work onto a group branch, `main` falls behind,
 
 # design
 
+## person-1
+
+<!-- design/review fails back 2 times: `pull` in `src/scripts/pull.js` reaches `it.ready()`, which is `readyToMerge` in `src/scripts/work-review.js`, inside the take block on a desk alone. `pull#an-empty-queue-hands-cleanup` and `test/level0/ready.test.js` depend on that road. Say whether a desk pull still calls `it.ready()` before the hand-out, and list `readyToMerge` as a caller.; `test/level0/work-doors.js` hands every case `env: {}`, so each `work(ROOT, ["take"], ...)` case in `test/level0/work.test.js`, `test/level0/work-group.test.js` and `test/level0/work-orphan.test.js` drives `take` as a desk. List them as callers, and name how they reach a cloud box once `take` refuses on a desk.; `test/level0/work-group.test.js` asserts that a desk pull takes a marked group and a named one. List it beside `test/level0/pull-unbound.test.js`.; `onDesk` reads the cloud as `pushed` does, while `src/bridge/bash.js` reads it through `onACloud`. Name the one read the Bash door guard and the verbs share. -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
+
 ## draft
 
 <!-- writes the approach the ask calls for -->
@@ -129,16 +143,25 @@ Without it a desk commits its own work onto a group branch, `main` falls behind,
 
 <!-- the form is text -->
 
-One guard, `onDesk(it, branch)`, stands in `src/scripts` and answers a refusal where the box is a desk and the branch starts `work/`. The desk reads as `it.cloud ?? inCloud(it.env)`, the read `pushed` takes.
+One read, `onDesk(it, branch)`, answers true where the box stands off the cloud on a `work/` branch. It reads the cloud as `pushed` does. Every refusal names `git switch main`.
 
-| verb | what the guard does |
+| road | the change |
 |---|---|
-| `ticket pull` | refuses before any read, and names `git switch main` |
+| `ticket pull` on a `work/` branch | refuses before any read |
+| the pull on `main` | calls `take` on a cloud box alone, so a desk pull hands out free tickets |
+| a group a desk names | refuses, and names `branch merge` for a finished cloud branch |
 | `./RUNME.sh commit` | refuses before the tests run, so nothing stages |
-| `branch take` | refuses on a desk, because a desk leaves a cloud branch |
-| `branch merge` | runs on `main` alone already, and takes the branch in by a merge |
+| a raw `git commit` or `git push` | the Bash door refuses it, in a guard beside `trunkGuard` |
+| `branch take` | refuses on a desk |
+| `branch release` | runs as it stands: it frees a claim and carries no work |
+| `branch merge` | runs on `main` alone already |
 
-The design notes change with it. `pull#the-engine-takes-the-branch` drops the desk's road onto a group, and `work` names the guard.
+The guard holds the agent's doors, and a person in a terminal keeps raw git. `.githooks/pre-commit` stays out of it, because `letGo` commits through git and meets that hook too.
+
+`urgentGroup` leaves the tree, because the desk's road was its one caller. The design notes change with it:
+
+- `pull#the-engine-takes-the-branch` drops the desk's road onto a group
+- `work#a-box-writes-its-branch` names the desk guard
 
 ### callers
 
@@ -146,10 +169,15 @@ The design notes change with it. `pull#the-engine-takes-the-branch` drops the de
 
 <!-- the form is list -->
 
-- `src/scripts/pull.js`, `pull`, which reads the branch first
+- `src/scripts/pull.js`, `pull`, which reads the branch first and holds the take road
+- `src/scripts/pull-hand.js`, `namedGroup`, which the desk's refusal reads
+- `src/scripts/pull-hand.js`, `urgentGroup`, which leaves the tree
 - `src/scripts/commit-verb.js`, `landsAndPushes`, which runs the tests first
-- `src/scripts/work.js`, `take`, the desk's road onto a group
+- `src/bridge/bash.js`, the check list beside `trunkGuard`
+- `src/scripts/work.js`, `take`, which refuses on a desk
+- `src/scripts/work.js`, `release`, which stands unchanged
 - `src/scripts/work-merge.js`, `merge`, which the test drives on a cloud branch
+- `test/level0/pull-unbound.test.js`, the case where a desk takes the group it names
 
 ### answers
 
@@ -157,7 +185,9 @@ The design notes change with it. `pull#the-engine-takes-the-branch` drops the de
 
 <!-- the form is list -->
 
-- first draft
+- the pull reaches `take` on a desk: the pull calls `take` on a cloud box alone, and `urgentGroup` leaves
+- a raw `git commit` lands on a `work/` branch: the Bash door refuses it beside `trunkGuard`
+- `release` commits on a `work/` branch: it runs as it stands, since it carries no work
 
 ## review
 
@@ -168,6 +198,13 @@ The design notes change with it. `pull#the-engine-takes-the-branch` drops the de
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- `pull` in `src/scripts/pull.js` reaches `it.ready()`, which is `readyToMerge` in `src/scripts/work-review.js`, inside the take block on a desk alone. `pull#an-empty-queue-hands-cleanup` and `test/level0/ready.test.js` depend on that road. Say whether a desk pull still calls `it.ready()` before the hand-out, and list `readyToMerge` as a caller.
+- `test/level0/work-doors.js` hands every case `env: {}`, so each `work(ROOT, ["take"], ...)` case in `test/level0/work.test.js`, `test/level0/work-group.test.js` and `test/level0/work-orphan.test.js` drives `take` as a desk. List them as callers, and name how they reach a cloud box once `take` refuses on a desk.
+- `test/level0/work-group.test.js` asserts that a desk pull takes a marked group and a named one. List it beside `test/level0/pull-unbound.test.js`.
+- `onDesk` reads the cloud as `pushed` does, while `src/bridge/bash.js` reads it through `onACloud`. Name the one read the Bash door guard and the verbs share.
 
 # implement
 
@@ -184,22 +221,6 @@ The design notes change with it. `pull#the-engine-takes-the-branch` drops the de
 ### seen
 
 <!-- what you see, and what surprises you -->
-
-<!-- the form is text -->
-
-### checked
-
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
-
-## reflect
-
-<!-- names the class of error in the findings, and the fix for the class -->
-
-### class
-
-<!-- the class of error the findings describe, and the fix for the class -->
 
 <!-- the form is text -->
 
@@ -248,28 +269,6 @@ The design notes change with it. `pull#the-engine-takes-the-branch` drops the de
 <!-- the form is text -->
 
 ### checked
-
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
-
-# verdict
-
-<!-- reads every hunk against the ask and the approach -->
-
-## read
-
-<!-- every file you read, one a line -->
-
-<!-- the form is files -->
-
-## verdict
-
-<!-- pass or fail, findings one a line -->
-
-<!-- the form is verdict -->
-
-## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 

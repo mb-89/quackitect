@@ -355,6 +355,23 @@ test("unblock refuses a successor standing inside the group it leaves", () => {
   assert.match(said, /a-successor stands in one-group/);
 });
 
+// A desk works on main, so the verb reads the group off the child's own field. [[spec/tickets/a-cloud-group-asks-nobody]]
+test("unblock on main frees a child by its own group field", () => {
+  const { it, disk } = doors(standing(), {
+    "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+  });
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["unblock", "a-child", "a-successor"], it),
+  );
+
+  assert.equal(code, 0, said);
+  const now = disk.read(at("spec/tickets/a-child.md"));
+  assert.equal(fieldOf(now, "state"), "closed", "the child closes");
+  assert.equal(fieldOf(now, "reason"), "became", "it closes as became");
+  assert.match(said, /stands outside one-group/, "the verb names the child's group");
+});
+
 // [[spec/design_output/work#a-person-step-leaves]]
 test("unblock names the successor it needs, and mints none of its own", () => {
   const { it } = doors(standing());

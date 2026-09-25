@@ -14,6 +14,7 @@ import {
   GROUP_AT,
   GROUP_NOTE,
   heard,
+  on,
   ROOT,
   remoteSaying,
 } from "./work-doors.js";
@@ -55,6 +56,24 @@ test("the answer names every branch, the tickets on it and the loose ones", () =
     said.loose.map((held) => held.name),
     ["a-loose-one"],
   );
+});
+
+// A ticket minted on this disk stands off origin until the push, so the answer still draws its row. [[spec/design_output/pull#the-queue-is-an-outline]]
+test("a ticket on disk that origin lacks still draws a loose row with a place", () => {
+  const { it } = doors({
+    [on("a-disk-only")]: CHILD("one-group", "open").replace("group: one-group\n", ""),
+  });
+  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
+  const said = answerOf(it);
+
+  assert.deepEqual(
+    said.loose.map((held) => held.name).sort(),
+    ["a-disk-only", "a-loose-one"],
+  );
+  const row = said.loose.find((one) => one.name === "a-disk-only");
+  assert.equal(row.state, "open");
+  assert.equal(row.step, "do");
+  assert.equal("queue" in row, true, "the disk-only row takes a queue place too");
 });
 
 // The queue rides every answer, so the tab draws each row's place. [[spec/design_output/pull#the-queue-is-a-score]]

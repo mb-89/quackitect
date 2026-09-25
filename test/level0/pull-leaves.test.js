@@ -145,6 +145,52 @@ test("a leaf's chapter reads its fields by heading, past the comments and the en
   assert.deepEqual(verdictIn(["maybe"]), { said: "" });
 });
 
+// A verdict field keeps every round, so the newest verdict decides. [[spec/design_output/pull#the-fields-hold-their-forms]]
+test("the newest verdict in a field of many rounds decides", () => {
+  const rounds = ["fail", "| craft | long | cut |", "Old words.", "pass", "| design | holds | none |"];
+  assert.deepEqual(verdictIn(rounds), { said: "pass", reason: "| design | holds | none |" });
+  assert.deepEqual(verdictIn(["pass", "fail: thin"]), { said: "fail", reason: "thin" });
+});
+
+// A finding rides out as a child the review names, so the row carries the child's name and the finding. [[spec/tickets/one-review-a-ticket]]
+test("a pass with findings answers findings, with the child's name and the finding of each row", () => {
+  assert.deepEqual(
+    verdictIn([
+      "pass with findings",
+      "- cut-the-long-line: the second line runs long",
+      "- link-the-note: the note names no link",
+    ]),
+    {
+      said: "findings",
+      reason: "cut-the-long-line: the second line runs long; link-the-note: the note names no link",
+      findings: [
+        { name: "cut-the-long-line", line: "the second line runs long" },
+        { name: "link-the-note", line: "the note names no link" },
+      ],
+    },
+  );
+});
+
+// [[spec/tickets/one-review-a-ticket]]
+test("the newest opener decides between a pass with findings and a fail, and a plain pass with rows stays a pass", () => {
+  assert.equal(
+    verdictIn(["fail: thin", "pass with findings", "- link-the-note: the note names no link"])
+      .said,
+    "findings",
+    "a pass with findings after a fail decides",
+  );
+  assert.deepEqual(
+    verdictIn(["pass with findings", "- link-the-note: the note names no link", "fail: thin"]),
+    { said: "fail", reason: "thin" },
+    "a fail after a pass with findings decides",
+  );
+  assert.deepEqual(
+    verdictIn(["pass", "- link-the-note: the note names no link"]),
+    { said: "pass", reason: "link-the-note: the note names no link" },
+    "a plain pass keeps its rows as the reason, and names no finding",
+  );
+});
+
 // [[spec/design_output/pull#the-fields-hold-their-forms]]
 test("a command line the box finds nothing for comes back naming the shape a command field takes", () => {
   const it = {

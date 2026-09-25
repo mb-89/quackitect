@@ -135,96 +135,16 @@ with `steps` under it is a phase, and it carries what its steps share. A step
 with none is a leaf, and the pull hands out leaves alone. A leaf carries what
 differs: its own reads, its own hand rule, and the form of its evidence.
 
-    steps:
-      - name: design
-        reads: [[spec/guidance/voice]]
-        steps:
-          - name: draft
-            does: writes the approach the ask calls for
-            evidence:
-              - name: approach
-                form: text
-                says: the approach here where it takes minutes, or a link to the design output where it takes a note
-          - name: review
-            does: reads the approach against the ask
-            not: draft
-            on_fail: draft
-            reads: [[spec/guidance/review/reviewing]]
-            evidence:
-              - name: verdict
-                form: verdict
-                says: pass or fail, with findings one a line
-      - name: implement
-        reads: [[spec/guidance/code/testing]]
-        needs: [work test]
-        checklist:
-          - the change touches no file the ask leaves out
-          - every door the change reaches has a fake
-          - a comment names the approach the change implements
-        steps:
-          - name: tests-red
-            does: writes the tests the ask calls for
-            input: design/draft
-            evidence:
-              - name: tests
-                form: command
-                expects: assertion
-                says: the tests you write fail on their own assertion
-              - name: seen
-                form: text
-                says: what you see, and what surprises you
-          - name: reflect
-            does: names the class of error in the findings, and the fix for the class
-            when: returned
-            input: verdict
-            evidence:
-              - name: class
-                form: text
-                says: the class of error the findings describe, and the fix for the class
-          - name: change
-            does: makes the change
-            reads: [[spec/guidance/code/code]]
-            evidence:
-              - name: lint
-                form: command
-                expects: 0
-                says: the tree builds and lints
-          - name: tests-green
-            does: makes the tests pass
-            input: tests-red
-            evidence:
-              - name: tests
-                form: command
-                expects: green
-                says: the same tests pass
-              - name: check
-                form: command
-                expects: 0
-                says: the check is green on the commit
-              - name: says
-                form: text
-                says: what changes and why, for a reader who was not there
-      - name: verdict
-        does: reads every hunk against the ask and the approach
-        not: implement
-        on_fail: implement/reflect
-        reads: [[spec/guidance/review/reviewing]]
-        input: [diff, implement]
-        to: owner
-        evidence:
-          - name: read
-            form: files
-            says: every file you read, one a line
-          - name: verdict
-            form: verdict
-            says: pass or fail, findings one a line
+The standard route runs `design` (draft, review), then `implement`
+(tests-red, change, tests-green), with one review. For the route in full,
+see [[spec/processes/standard]].
 
 | field | holds |
 |---|---|
 | `name` | one word or a pair with a hyphen, unique among its siblings |
 | `steps` | the steps under a phase, in order |
 | `by` | `anyone`, `person`, `agent`, `helper`, `retro`, or `children` |
-| `not` | a step whose hand this step's hand can not be, as `draft` or `implement` |
+| `not` | a step whose hand this step's hand can not be, as `draft` |
 | `reads` | links to the guidance notes the step's hand reads |
 | `on_fail` | an earlier step, where a failed hand-back sends the ticket |
 | `asks` | the question a person answers, on a step a person takes, with `options` where one word answers it |
@@ -296,9 +216,8 @@ parser of its own.
 | `cloud` | the box runs under the cloud guidance |
 | `desk` | a person's box |
 
-So `reflect` runs on the way back from a failed verdict alone. It asks for
-the class of error the findings describe and the fix for that class. So the
-fix reaches the class and no single instance. The list of conditions is the
+So a leaf under `when: returned` runs on the way back from a failed review
+alone. The list of conditions is the
 engine's, and a route names one or none.
 
 A checklist is what a hand has to do at this step, and it stands in the
@@ -372,7 +291,7 @@ sees what goes where, and an agent meets the same slots.
 | `files` | the files read, one a line | every file the branch changes since the ticket's first take stands in it |
 | `choice` | one of the words `options` names | it is one of them |
 | `checklist` | one line per item of the step's checklist, on how you take it into account | a line stands for every item, and the judge reads them against the items |
-| `verdict` | `pass` or `fail`, then findings one a line | one of the two words, and findings where it fails |
+| `verdict` | `pass`, `pass` with findings naming a child a line, or `fail` with findings one a line | one of the two words, and findings where it fails |
 
 `expects` names what a command must answer: an exit code, or a word the verb
 prints, such as the test verb's `assertion`. The engine writes each command's
@@ -456,7 +375,7 @@ Each stands under `process.schema.yaml` and holds the ask's fields under
 |---|---|---|
 | `note` | `decide` | a thing to look at later, with no work in it yet |
 | `trivial` | `do` | a fix small enough that the ask is the design |
-| `standard` | `design` (draft, review), `implement` (tests-red, change, tests-green), `verdict` | a change that wants an approach first, tests before code, and a second pair of eyes after |
+| `standard` | `design` (draft, review), `implement` (tests-red, change, tests-green) | a change that wants an approach first, one review of it, and tests before code |
 | `group` | `sync`, `split`, `children`, `retro` (notes, write, cloud) | a set of tickets that lands as one, and what a cloud run does |
 | `retro` | `collect`, `field`, `score`, `notes`, `readers`, `mine` (nine leaves), `improve`, `report`, `distribute` | a window of the record, and the changes to the machinery it earns |
 | `chapter` | `read` | one chapter of a retro's window, read by one spawned hand |

@@ -80,3 +80,20 @@ ifVale("a rule a project alone carries refuses on every road", async () => {
     files.remove(work);
   }
 });
+
+// A second fail sends the ticket to a person, so the knob names the person. [[spec/tickets/one-review-a-ticket]]
+test("the doors read work.failsBeforePerson into the fail cap, and the config names no failsBeforeWait", async () => {
+  const { it } = await import("../../src/scripts/cli-doors.js");
+  const config = JSON.parse(files.read(join(method, "spec", "config", "level0.json")));
+  const schema = JSON.parse(files.read(join(method, "spec", "config", "level0.schema.json")));
+
+  assert.equal(config.work.failsBeforeWait, undefined, "the old key leaves the config");
+  assert.equal(schema.properties.work.properties.failsBeforeWait, undefined, "and the schema");
+  assert.equal(typeof config.work.failsBeforePerson, "number", "the config names the new key");
+  assert.equal(
+    schema.properties.work.properties.failsBeforePerson?.type,
+    "number",
+    "the schema declares it",
+  );
+  assert.equal(it.fails, config.work.failsBeforePerson, "the doors read it into the fail cap");
+});

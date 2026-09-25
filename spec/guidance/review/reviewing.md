@@ -16,7 +16,6 @@ rationale: [[spec/rationales/reviewing]]
 8. Write each answer as one short line, and keep the whole report short enough to read at a glance.
 9. Hand the report back as a list of fixes, and merge once every fix lands. A report of opinions leaves the drafter guessing what to change. *
 10. Run `./RUNME.sh branch review <name>` to gather all of this from git.
-11. Grade each question a return names as design or craft, and hand a craft one back to the drafter.
 
 # Examples
 

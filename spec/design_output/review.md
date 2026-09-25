@@ -95,6 +95,9 @@ They live in `spec/guidance/review/reviewing.md`, written as actionables the way
 other guidance note is. Level zero hands them to every session, so the reader
 gets them inside the standing layer and the prompt names no rule twice.
 
+A design review reads another note. `design/review` on the standard route reads
+[[spec/guidance/review/design]], and no route reads the branch review's note.
+
 # What the reader answers
 
 The reader answers one JSON object, and `readerSays` reads it back:

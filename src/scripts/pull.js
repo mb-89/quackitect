@@ -58,6 +58,7 @@ import {
   became,
   entriesOf,
   failed,
+  minted,
   onward,
   passed,
   pushed,
@@ -559,13 +560,15 @@ export function handBack(it, who, name, verdict) {
     return answeredBy(it, who, one, leaf, held, said.reason, answered);
   if (said.said === "fail")
     return failed(it, who, one, leaf, held, said.reason, answered);
+  // [[spec/design_output/pull#a-finding-rides-out]]
+  if (said.findings) return minted(it, who, one, leaf, held, said.findings, answered);
   return passed(it, who, one, leaf, held, answered);
 }
 
 // [[spec/design_output/pull#the-hand-back-refused]]
 export function refused(it, who, one, leaf, held, found) {
   const count = Number(held.refused ?? 0) + 1;
-  // The cap sends the leaf back with the findings, because a step a box inserts waits for a person nobody sends. [[spec/design_output/pull#the-hand-back-refused]]
+  // The cap sends the leaf back with the findings, and the fail takes its own road from there, to a person past its cap. [[spec/design_output/pull#the-hand-back-refused]]
   if (Number(it.refusals) > 0 && count >= Number(it.refusals)) {
     if (one.stood) one.text = one.stood;
     say(REFUSED, [
@@ -573,15 +576,8 @@ export function refused(it, who, one, leaf, held, found) {
       "",
       `${count} refusals in a row, so ${leaf.path} goes back.`,
     ]);
-    return failed(
-      it,
-      who,
-      one,
-      leaf,
-      held,
-      `the hand-back met refused ${count} times: ${found[0]}`,
-      [],
-    );
+    const why = `the hand-back met refused ${count} times: ${found[0]}`;
+    return failed(it, who, one, leaf, held, why, []);
   }
   writeHold(it, who.hand, {
     ...held,

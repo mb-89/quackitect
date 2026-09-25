@@ -41,6 +41,7 @@ rules:
   Contraction: warning
   Latin: warning
   EtCetera: warning
+  Vocabulary: warning
 
 # The frontmatter answers to its own schema, so these rules leave it alone. A
 # key below names a field a person writes prose into, and the rules read the

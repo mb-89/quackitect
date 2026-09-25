@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: closed
+state: open
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -34,27 +34,15 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
-group: the-editor-holds-the-drawing
-depends_on: [the-host-runs-the-verbs, a-save-fills-the-ticket, the-work-group-draws-buttons]
-step: answer
-reason: became
-successors: [the-owner-walks-the-editor]
 ---
 
 # Ask
 
-<!-- question, as text: what a person decides, and the ticket the question comes from -->
-<!-- waits, as list: one line each, naming what stands still until the answer lands -->
-<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+Does a person create, take, work and hand back a ticket from VS Code alone? The question comes from [[spec/tickets/the-owner-walks-a-ticket]], and the owner names each place the walk leaves the editor.
 
-Does a person create, take, work and hand back a ticket from VS Code alone? The owner walks one ticket through the editor with no terminal, and names each place the walk leaves the editor. The question comes from the group `the-editor-holds-the-drawing`, and the plan stands in [[spec/design_input/the-editor-draws-the-ticket#the-editor-holds-the-drawing]].
-
-- the close of the group `the-editor-holds-the-drawing`
 - the close of level one, which [[spec/design_input/the-agent-pulls-tickets#three-rules-hold-level-one]] names
 
 - the owner writes under `answer` that the walk stays in the editor, or names each place it leaves
-- a ticket in this group stands for each place the walk leaves the editor
-- `./RUNME.sh check` passes
 
 # answer
 
@@ -96,4 +84,4 @@ Does a person create, take, work and hand back a ticket from VS Code alone? The 
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+- [[spec/tickets/the-owner-walks-a-ticket]] hands this over at `answer`, which waits for a person.

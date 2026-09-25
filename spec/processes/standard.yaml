@@ -1,8 +1,9 @@
-# A change that wants an approach first, tests before code, and a second
-# pair of eyes after. The ask is the owner's words, the design phase turns
-# them into an approach a reader can disagree with, and the rest implements it.
-# [[spec/design_input/the-agent-pulls-tickets#the-route]]
-for: a change that wants an approach first, tests before code, and a second pair of eyes after
+# A change that wants an approach first, one review of it, and tests before
+# code. The ask is the owner's words, the design phase turns them into an
+# approach a reader can disagree with, and the rest implements it. A finding
+# the review names rides out as a child ticket, so the parent goes on.
+# [[spec/design_output/pull#a-finding-rides-out]]
+for: a change that wants an approach first, one review of it, and tests before code
 ask:
   - name: gain
     form: text
@@ -22,6 +23,10 @@ steps:
         from: anyone
         by: anyone
         input: ask
+        checklist:
+          - every file, function and verb the approach names stands opened, and each claim checked there
+          - the callers list names every caller of what the approach changes
+          - every done_when line names the test that decides it
         evidence:
           - name: approach
             form: text
@@ -29,6 +34,9 @@ steps:
           - name: callers
             form: list
             says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
           - name: answers
             form: list
             says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
@@ -36,20 +44,21 @@ steps:
         does: reads the approach against the ask
         not: draft
         on_fail: draft
-        reads: [[spec/guidance/review/reviewing]]
+        reads: [[spec/guidance/review/design]]
         input: design/draft
         evidence:
           - name: verdict
             form: verdict
-            says: pass or fail, with findings one a line
+            says: pass, pass with findings naming a child a line, or fail with findings one a line
   - name: implement
     reads: [[spec/guidance/code/testing]]
     needs: [branch test]
-    input: design/draft
+    input: [design/draft, design/review]
     checklist:
       - the change touches no file the ask leaves out
       - every door the change reaches has a fake
       - a comment names the approach the change implements
+      - every fact the change adds stands in one place, and a note points at the file instead of repeating it
     steps:
       - name: tests-red
         does: writes the tests the ask calls for
@@ -61,14 +70,6 @@ steps:
           - name: seen
             form: text
             says: what you see, and what surprises you
-      - name: reflect
-        does: names the class of error in the findings, and the fix for the class
-        when: returned
-        input: verdict
-        evidence:
-          - name: class
-            form: text
-            says: the class of error the findings describe, and the fix for the class
       - name: change
         does: makes the change
         reads: [[spec/guidance/code/code]]
@@ -80,6 +81,7 @@ steps:
       - name: tests-green
         does: makes the tests pass
         input: tests-red
+        to: retro
         evidence:
           - name: tests
             form: command
@@ -92,19 +94,3 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-  - name: verdict
-    does: reads every hunk against the ask and the approach
-    not: implement
-    on_fail: implement/reflect
-    reads: [[spec/guidance/review/reviewing]]
-    input: [diff, implement]
-    to: retro
-    checklist:
-      - every fact the change adds stands in one place, and a note points at the file instead of repeating it
-    evidence:
-      - name: read
-        form: files
-        says: every file you read, one a line
-      - name: verdict
-        form: verdict
-        says: pass or fail, findings one a line

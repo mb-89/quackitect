@@ -29,12 +29,7 @@ import { baseOf, driftOf } from "./ticket-drift.js";
 import { filled } from "./ticket-fill.js";
 import { reachedOf, routed } from "./ticket-route.js";
 import { yours } from "./ticket-yours.js";
-import {
-  askFaults,
-  askRefusal,
-  askWarning,
-  lineRefusal,
-} from "./ticket-ask-lint.js";
+import { askFaults, askRefusal, askWarning, lineRefusal } from "./ticket-ask-lint.js";
 
 export const NOTES = TICKETS;
 export const HOLDS = OWNED_HOLDS;
@@ -127,32 +122,17 @@ function note(it, name, argv) {
     return 1;
   }
 
-  const made = mintedNote(schemasHere(it), {
-    kind: "ticket",
-    path,
-    fields: {
-      state: "open",
-      ...(parks ? { [TODO]: true } : {}),
-      process: held.link,
-      process_hash: held.hash,
-      steps: talks
-        ? personDecides(fromHold(held.route, holdOf(it)))
-        : fromHold(held.route, holdOf(it)),
-      step: firstLeafOf(held.route),
-      Ask: [askRows(held.ask), "", line].join("\n").trim(),
-    },
+  const steps = fromHold(held.route, holdOf(it));
+  const made = routedTicket(it, path, held, {
+    steps: talks ? personDecides(steps) : steps,
+    line,
+    fields: { state: "open", ...(parks ? { [TODO]: true } : {}) },
   });
   if (made.why) {
     console.error(made.why);
     return 1;
   }
-  // The note reads its Ask through the lint's road before it writes. [[spec/design_output/pull#a-draft-opens]]
-  const found = askFaults(it, path, made.text);
-  if (found.refused.length) {
-    console.error(lineRefusal(path, found.refused));
-    return 1;
-  }
-  if (found.warned.length) console.error(askWarning(path, found.warned));
+  if (made.warned.length) console.error(askWarning(path, made.warned));
 
   it.disk.makeDir(it.join(it.root, ...NOTES.split("/")));
   it.disk.write(at, made.text);
@@ -164,6 +144,26 @@ function note(it, name, argv) {
         : `${path} stands, and it waits for a retro to decide it.`,
   );
   return said(it, NOTE, line, { ticket: name });
+}
+
+// A ticket minted off a route, the hand's line as its Ask. The Ask reads through the lint's road before any write, so a refusal writes nothing. [[spec/design_output/pull#a-draft-opens]]
+export function routedTicket(it, path, held, { steps, line, fields }) {
+  const made = mintedNote(schemasHere(it), {
+    kind: "ticket",
+    path,
+    fields: {
+      ...fields,
+      process: held.link,
+      process_hash: held.hash,
+      steps,
+      step: firstLeafOf(held.route),
+      Ask: [askRows(held.ask), "", line].join("\n").trim(),
+    },
+  });
+  if (made.why) return made;
+  const found = askFaults(it, path, made.text);
+  if (found.refused.length) return { why: lineRefusal(path, found.refused) };
+  return { text: made.text, warned: found.warned };
 }
 
 // A note asking for a discussion waits for a person, so the pull hands it to no agent at a desk. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
@@ -259,7 +259,12 @@ function open(it, name) {
 function route(it, name, argv) {
   const at = name ? ticketAt(it, name) : null;
   if (!at) {
-    console.log(JSON.stringify({ refused: `${name ?? ""} names no ticket under ${NOTES} or ${TRAVELS}.`, at: "" }));
+    console.log(
+      JSON.stringify({
+        refused: `${name ?? ""} names no ticket under ${NOTES} or ${TRAVELS}.`,
+        at: "",
+      }),
+    );
     return 1;
   }
   return routed(it, at, argv, schemasHere(it).get("ticket"));
@@ -269,7 +274,9 @@ function route(it, name, argv) {
 function fill(it, name, argv) {
   const at = name ? ticketAt(it, name) : null;
   if (!at) {
-    console.error(`${name ?? "ticket fill"} names no ticket: ./RUNME.sh ticket fill spec/tickets/slow-lint.md`);
+    console.error(
+      `${name ?? "ticket fill"} names no ticket: ./RUNME.sh ticket fill spec/tickets/slow-lint.md`,
+    );
     return 2;
   }
   return filled(it, at, argv, schemasHere(it));
@@ -304,7 +311,9 @@ function update(it, name, argv) {
   // A person's edit past the reached leaves stops the copy, unless --over says to write over it. [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
   if (!(argv ?? []).includes(OVER)) {
     const own = processAt(it.disk, it.method, it.join, front.process);
-    const base = own.why ? null : baseOf(it.git, own.path, String(front.process_hash ?? ""));
+    const base = own.why
+      ? null
+      : baseOf(it.git, own.path, String(front.process_hash ?? ""));
     if (!base) {
       console.error(
         `The process version ${at.said} copied stands nowhere in the history, so any drift stays unread. Run it again with ${OVER} to copy the new route over the route as it stands.`,

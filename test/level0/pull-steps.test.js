@@ -30,33 +30,6 @@ import {
   standing,
 } from "./pull-doors.js";
 
-// [[spec/design_output/pull#the-fail]]
-test("a step failing back past the cap drops the hold, answers wait, and writes no step", () => {
-  const once = withEntry(CHILD("open", "design/review"), {
-    step: "design/review",
-    hand: "box other",
-    hash_before: "aaaa",
-    hash_after: "aaaa",
-    returns: 1,
-    why: "thin",
-  });
-  const twice = filled(once, "### verdict", "fail\n- still thin");
-  const { it, disk } = doors(standing(twice), {}, { fails: 2 });
-  heard(() => pulling(ROOT, ["pull"], it));
-
-  const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child"], it));
-
-  assert.equal(code, 0);
-  const now = disk.read(at("spec/tickets/a-child.md"));
-  assert.equal(fieldOf(now, "step"), "design/draft");
-  assert.doesNotMatch(now, /by: person/, "a count of returns writes no person step");
-  assert.doesNotMatch(now, /name: settle/, "and no settle step either");
-  assert.match(said, /^wait/m);
-  assert.match(said, /fails design\/review back to design\/draft/);
-  assert.match(said, /The hold drops here/);
-  assert.equal(disk.exists(HOLD), false, "the hold drops");
-});
-
 // [[spec/design_output/pull#the-hand-back-refused]]
 test("a hand-back meeting the refusal cap fails the leaf back, carrying the finding", () => {
   const { it, disk } = doors(standing(), {}, { refusals: 1 });

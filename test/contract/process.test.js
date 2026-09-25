@@ -14,7 +14,9 @@ import { proc } from "../../src/doors/proc.js";
 import { firstLeaf } from "../../src/engine/group.js";
 import { readTools, whereIs } from "../../src/engine/tools.js";
 import { askRows, processAt } from "../../src/scripts/process.js";
+import { slotFaults } from "../../.claude/skills/level0/lib/schema-route.js";
 import { leafOf, stepPathOf } from "../../src/scripts/pull.js";
+import { leavesOf, walkOf } from "../../src/scripts/pull-route.js";
 import { schemasHere } from "../../src/scripts/ticket.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -29,6 +31,41 @@ test("the question route opens at a step waiting for a person", () => {
 
   assert.equal(path, "answer", "the route opens at its answer step");
   assert.equal(leafOf(front, path)?.by, "person", "and that step waits for a person");
+});
+
+// A standard ticket meets one review, on its design, and goes on to the code. [[spec/tickets/one-review-a-ticket]]
+test("the standard route reviews the design once, and its last leaf hands on to the retro", () => {
+  const front = routeOf("standard");
+
+  assert.deepEqual(
+    leavesOf(front).map((one) => one.path),
+    [
+      "design/draft",
+      "design/review",
+      "implement/tests-red",
+      "implement/change",
+      "implement/tests-green",
+    ],
+    "one review, and no verdict step after the code",
+  );
+  const review = leafOf(front, "design/review");
+  assert.ok(review.reads.includes("spec/guidance/review/design"), "the review reads the design note");
+  assert.ok(!review.reads.includes("spec/guidance/review/reviewing"), "and no other review note");
+  assert.equal(review.on_fail, "draft", "a fail goes back to the draft");
+  const draft = leafOf(front, "design/draft");
+  assert.equal(
+    draft.evidence.find((one) => one.name === "tests")?.form,
+    "list",
+    "the draft names its tests, one a line",
+  );
+  assert.ok([draft.said.checklist ?? []].flat().length > 0, "the draft leaf holds its own checklist");
+  assert.equal(leafOf(front, "implement/tests-green").said.to, "retro");
+  assert.deepEqual(
+    walkOf(front).find((one) => one.path === "implement")?.said.input,
+    ["design/draft", "design/review"],
+    "the code reads the draft and the review's findings",
+  );
+  assert.deepEqual(slotFaults(front, "spec/processes/standard.yaml"), [], "every slot fills");
 });
 
 const vale = whereIs(files, root, "vale", readTools(files, root));
