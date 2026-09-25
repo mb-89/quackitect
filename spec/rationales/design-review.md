@@ -18,6 +18,8 @@ A design review failing on craft sent a draft round for a local fix the implemen
 
 So a design review stopped what reached past one spot: a wrong road, a verb that refused, a rule nothing ran. The owner drew that line.
 
+Two designs still failed twice on craft after that line. One missed a caller list, and one read the cloud two ways. Both reached the owner as questions, and neither finding doubted the ask. So the owner named the grounds a fail stands on. They are a broken approach, an unmet goal, a goal making no sense, and a clash with another part of the tree. Every other finding went to the builder.
+
 ## 3. A finding rides out
 
 A design going round a review five times spent a session each round, and the queue behind it waited. A finding the parent survived went out as a child ticket, so the parent moved on the same day.
