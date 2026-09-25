@@ -1,18 +1,25 @@
-// The context door. A session past context.handoverAt finishes, writes the
-// handover, and ends the turn; the bridgehead clears the conversation there
-// and prompts the next one, which reads the handover and the step again.
+// The context door. A session past context.handoverAt goes due, and the pull
+// hands the clear's tickets once the ticket in hand stands done. A held clear
+// ends the turn, the bridgehead clears the conversation there, and the next
+// one opens on the ticket that reads the handover.
 // [[spec/design_output/stop#the-context-hands-over]]
 
 import { join } from "node:path";
 import { BINDING, QUEUE } from "../../.claude/skills/level0/lib/config.js";
-import { HANDOVER, HOLDS, RETRO } from "../../.claude/skills/level0/lib/folders.js";
+import { HOLDS } from "../../.claude/skills/level0/lib/folders.js";
+import {
+  CLEAR as CLEAR_TICKET,
+  dropsDue,
+  heldAs,
+  holdsIn,
+  isEphemeral,
+  marksDue,
+  READ,
+} from "../scripts/ephemeral.js";
 import { asks } from "./config.js";
 import { waitsForOwner } from "./stop.js";
 
 const AT = "context.handoverAt";
-const NOW = "context.writeAt";
-// A path into the retro folder, with either slash. [[spec/design_output/stop#the-context-hands-over]]
-const RETRO_PATH = /\.se[\\/]\.retro[^\s`)|\]]*/;
 const MOST = "stop.mostInARow";
 export const FINISH = "finish";
 export const CLEAR = "clear";
@@ -20,9 +27,8 @@ export const CLEAR = "clear";
 // What the next conversation reads first, as its opening prompt. [[spec/design_output/stop#the-context-hands-over]]
 export const RESUME = [
   "Level zero cleared the conversation, because the context passed",
-  `\`${AT}\`. The handover block says where the work stands. Read it, run`,
-  "`./RUNME.sh ticket pull` where a ticket stands in your hand, so the step and",
-  "its guidance reach you again, and carry on.",
+  `\`${AT}\`. Run \`./RUNME.sh ticket pull\`: \`${READ}\` stands in your hand,`,
+  "and the handover block says where the work stands.",
 ].join(" ");
 
 // A fill past the key marks the session due. Every reading lands here, off the call and off the turn's measure alike. [[spec/design_output/stop#the-context-hands-over]]
@@ -33,6 +39,7 @@ export function measures(box, tokens) {
   // The queue alone clears, so a session under god or unbound keeps its conversation and goes due nowhere. [[spec/design_output/stop#the-queue-alone-clears]]
   if (!clearsHere(box)) {
     box.handover = null;
+    dropsDue(box.disk, box.work);
     return;
   }
   const at = Number(asks(box, AT) ?? 0);
@@ -49,37 +56,22 @@ export function measures(box, tokens) {
       );
     }
   }
-  if (box.handover) {
-    writesNow(box, fill, at);
-    return;
-  }
+  if (box.handover) return;
   if (box.standsDown || fill < at) return;
   box.handover = { phase: FINISH, asked: 0 };
+  // The pull runs apart from this server, so the mark stands on disk. [[spec/design_input/the-clear-hands-ephemeral-tickets#a-ticket-is-the-unit-of-work]]
+  marksDue(box.disk, box.work, { tokens: fill, at });
   box.log.say(
     "info",
     "handover",
     `the context holds ${fill} tokens, past ${AT} at ${at}, so the session hands over`,
     { tokens: fill, at },
   );
-  writesNow(box, fill, at);
 }
 
 // [[spec/design_output/stop#the-queue-alone-clears]]
 export function clearsHere(box) {
   return String(asks(box, BINDING) ?? "") === QUEUE;
-}
-
-// A fill past context.writeAt turns the finish into the handover itself: the step stays where it stands. A key at zero, or under the first key, adds no second stage. [[spec/design_output/stop#the-context-hands-over]]
-function writesNow(box, fill, at) {
-  const now = Number(asks(box, NOW) ?? 0);
-  if (box.handover.now || !(now > at) || fill < now) return;
-  box.handover.now = true;
-  box.log.say(
-    "info",
-    "handover",
-    `the context holds ${fill} tokens, past ${NOW} at ${now}, so the handover gets written now`,
-    { tokens: fill, at: now },
-  );
 }
 
 // [[spec/design_output/stop#the-context-hands-over]]
@@ -88,110 +80,89 @@ export function onSessionMeasure(e, box) {
   return { pass: true };
 }
 
-// The block rides every call of a session due, so the agent puts the work down before the turn's end asks for the file. [[spec/design_output/stop#the-context-hands-over]]
-export function ridesCall(e, box, before = null) {
-  if (e?.agentId || box.handover?.phase !== FINISH) return before;
-  const context = [...(before?.after?.context ?? []), dueText(box)];
-  return { ...(before ?? {}), after: { ...(before?.after ?? {}), context } };
-}
-
+// What a session due holding nothing reads at the turn's end. [[spec/design_output/stop#the-context-hands-over]]
 export function dueText(box) {
-  if (box.handover?.now) {
-    return [
-      "# Write the handover now",
-      "",
-      `The context holds ${box.fill ?? "more"} tokens, past \`${NOW}\` at ${asks(box, NOW)}.`,
-      "Stop the step where it stands and leave it in hand. Write",
-      `\`${HANDOVER}\` now: what stands, what waits, and the ticket and step in hand.`,
-      `Name no file under \`${RETRO}\`. End the turn there.`,
-    ].join("\n");
-  }
   return [
     "# The context hands over",
     "",
     `The context holds ${box.fill ?? "more"} tokens, past \`${AT}\` at ${asks(box, AT)}.`,
-    "Finish the step in hand, and start nothing new: commit it, hand the step",
-    "back or leave it in hand. Then write",
-    `\`${HANDOVER}\`: what stands, what waits, and the ticket and step in hand.`,
-    `Name no file under \`${RETRO}\`: the next retro reads that folder, and a hand does not.`,
-    "End the turn there. Level zero clears the conversation, and the next one",
-    "reads the handover, the rules and the step again.",
+    "Run `./RUNME.sh ticket pull`. It hands the handover ticket, then the clear,",
+    "and the clear ends the turn.",
   ].join("\n");
 }
 
-// The turn's end of a session due: it holds until the handover stands, then ends whatever the tooth votes. [[spec/design_output/stop#the-context-hands-over]]
+// The turn's end: a held clear ends it whatever the tooth votes, a ticket in hand leaves it to the tooth, and a session due holding nothing is sent to the pull. [[spec/design_output/stop#the-context-hands-over]]
 export function holdsForHandover(e, box) {
-  const due = box.handover;
-  if (e?.agentId || due?.phase !== FINISH) return null;
-  // A stop waiting on the owner holds the clear: the tooth votes, the session stays due, and the next turn's end clears. [[spec/tickets/the-clear-keeps-questions]]
-  if (waitsForOwner(e, box)) {
-    box.log.say(
-      "info",
-      "handover",
-      "the turn waits on the owner, so the clear waits for the next turn's end",
-    );
-    return null;
-  }
-  const retro = namesRetro(box);
-  if (handoverStands(box) && !retro) {
-    due.phase = CLEAR;
-    box.log.say(
-      "info",
-      "handover",
-      `${HANDOVER} stands, so the turn ends and the clear follows`,
-    );
+  if (e?.agentId) return null;
+  const clearing = clearHeld(box);
+  if (clearing) {
+    // A binding moved off the queue keeps the conversation, so the clear drops. [[spec/design_output/stop#the-queue-alone-clears]]
+    if (!clearsHere(box)) {
+      dropsClear(box);
+      box.handover = null;
+      return null;
+    }
+    if (ownerWaits(e, box)) return null;
+    box.handover = { asked: 0, ...(box.handover ?? {}), phase: CLEAR };
+    box.log.say("info", "handover", "the clear stands in hand, so the turn ends and the clear follows");
     return { pass: true };
   }
+  const due = box.handover;
+  if (due?.phase !== FINISH || ownerWaits(e, box)) return null;
+  // A ticket is the unit of work, so a hold standing carries the turn through the tooth. [[spec/design_input/the-clear-hands-ephemeral-tickets#a-ticket-is-the-unit-of-work]]
+  if (holdsIn(box.disk, box.work).length) return null;
   due.asked += 1;
   const most = Number(asks(box, MOST) ?? 0);
-  // The same cap the tooth keeps, so a session that writes no handover runs away nowhere. [[spec/design_output/stop#three-in-a-row]]
+  // The same cap the tooth keeps, so a session that pulls nothing runs away nowhere. [[spec/design_output/stop#three-in-a-row]]
   if (most > 0 && due.asked > most) {
     box.log.say(
       "warn",
       "handover",
-      `no ${HANDOVER} after ${most} asks, so the session hands over nothing`,
+      `no pull after ${most} asks, so the session hands over nothing`,
     );
     box.handover = null;
+    dropsDue(box.disk, box.work);
     return null;
   }
-  if (retro) {
-    box.log.say("warn", "handover", `${HANDOVER} names ${retro}, so the turn holds`);
-    return { result: { block: retroText(retro) } };
-  }
-  box.log.say("info", "handover", `the turn holds until ${HANDOVER} stands`);
+  box.log.say("info", "handover", "the turn holds until the pull hands the handover ticket");
   return { result: { block: dueText(box) } };
 }
 
-// A handover naming the retro folder sends the next conversation to read it. The retro alone reads that folder. [[spec/design_output/stop#the-context-hands-over]]
-export function namesRetro(box) {
-  const at = join(box.work, ...HANDOVER.split("/"));
-  let text = "";
-  try {
-    text = String(box.disk.read(at));
-  } catch {
-    return "";
-  }
-  const found = text.match(RETRO_PATH);
-  return found ? found[0] : "";
+// A stop waiting on the owner holds the clear: the tooth votes, and the next turn's end clears. [[spec/tickets/the-clear-keeps-questions]]
+function ownerWaits(e, box) {
+  if (!waitsForOwner(e, box)) return false;
+  box.log.say(
+    "info",
+    "handover",
+    "the turn waits on the owner, so the clear waits for the next turn's end",
+  );
+  return true;
 }
 
-function retroText(found) {
-  return [
-    "# The handover names the retro",
-    "",
-    `\`${HANDOVER}\` names \`${found}\`. The next retro reads \`${RETRO}\`, and a hand`,
-    "does not, so the next conversation must not read it. Name the ticket or the",
-    "class by its name, take the path out, and end the turn again.",
-  ].join("\n");
+// [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+function clearHeld(box) {
+  return holdsIn(box.disk, box.work).some(
+    ({ held }) => isEphemeral(held) && held.ticket === CLEAR_TICKET,
+  );
 }
 
-export function handoverStands(box) {
-  const at = join(box.work, ...HANDOVER.split("/"));
-  try {
-    return box.disk.exists(at) && String(box.disk.read(at)).trim() !== "";
-  } catch {
-    return false;
+function dropsClear(box) {
+  for (const { at, held } of holdsIn(box.disk, box.work)) {
+    if (isEphemeral(held) && held.ticket === CLEAR_TICKET) box.disk.remove(at);
   }
+  dropsDue(box.disk, box.work);
+}
+
+// The clear closes the clear ticket and puts the one reading the handover in its hand, and the mark drops. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+export function readsNext(box) {
+  let put = 0;
+  for (const { at, held } of holdsIn(box.disk, box.work)) {
+    if (!isEphemeral(held) || held.ticket !== CLEAR_TICKET) continue;
+    box.disk.write(at, `${JSON.stringify(heldAs(READ, held.hand, held.taken), null, 2)}\n`);
+    put += 1;
+  }
+  dropsDue(box.disk, box.work);
+  return put;
 }
 
 // The turn the handover ends asks the bridgehead for the clear and the prompt after it. [[spec/design_output/stop#the-context-hands-over]]

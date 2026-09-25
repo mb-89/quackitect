@@ -31,7 +31,7 @@ plan todo, see [[spec/design_output/stop#the-plan]].
 - A session past `context.handoverAt` shall go due, and no block rides a call.
 - The ticket in hand shall run to its end: the pull hands its next leaf to this hand while one admits it.
 - The clear shall start at the first pull that reaches past that ticket.
-- `context.writeAt` stands at zero, so no stage stops a step.
+- No stage stops a step, and `context.writeAt` goes.
 
 The owner accepts the cost: a long ticket runs past `context.handoverAt` with
 no brake, up to the harness's own compaction.
@@ -42,7 +42,7 @@ no brake, up to the harness's own compaction.
 |---|---|---|---|
 | 1 | `handover` | writes `.se/HANDOVER.md` | the hand-back, where the file stands and names no file under `.se/.retro` |
 | 2 | `clear` | ends the turn | the engine, at `session.end` with reason `clear`, after the bridgehead runs `/clear` |
-| 3 | `read-handover` | reads the handover block the first message carries | the hand-back, naming the ticket the handover says comes next, or none |
+| 3 | `read-handover` | reads the handover block the first message carries | the hand-back on `--pass`, and the queue hands the next leaf |
 
 - The agent types no `/clear`, and the bridgehead runs it at the turn's end.
 - A held `clear` shall let the turn end, where every other hold carries it.

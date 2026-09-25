@@ -50,7 +50,6 @@ import {
   holdsForHandover,
   measures,
   onSessionMeasure,
-  ridesCall,
 } from "./handover.js";
 import { SPECS as logSpecs, TOOLS as logTools } from "./logline.js";
 import {
@@ -275,7 +274,7 @@ async function onToolCall(e, box) {
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (!passes(said)) return said;
-  return held ?? ridesCall(e, box, tellsHand(e, box, owesCanary(e, box))) ?? PASS;
+  return held ?? tellsHand(e, box, owesCanary(e, box)) ?? PASS;
 }
 
 function passes(said) {

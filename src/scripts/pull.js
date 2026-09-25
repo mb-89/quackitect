@@ -20,6 +20,7 @@ import {
   withEntry,
   withField,
 } from "../engine/group.js";
+import { ephemeralPull } from "./ephemeral-pull.js";
 import { dropHold, guidanceText, holdOf, writeHold } from "./guidance-hand.js";
 import { handOf, roleOf, SAYS } from "./pull-hand-of.js";
 import { landed } from "./pull-landed.js";
@@ -104,6 +105,8 @@ export function pull(it, argv) {
 
   if (rest.includes("--judge")) return judgeMaterial(it, held, name);
   if (rest.includes("--drop")) return dropped(it, who);
+  // An ephemeral ticket stands in the hold alone, so its hand-back reads no file. [[spec/design_input/the-clear-hands-ephemeral-tickets#an-ephemeral-ticket-stands-held]]
+  if (held?.ephemeral) return ephemeralPull(it, who, verdict);
   if (verdict.said === "back") return takeBack(it, who, name, verdict.reason);
   // A name on trunk that is a group takes its branch. [[spec/design_output/pull#the-engine-takes-the-branch]]
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
@@ -193,9 +196,9 @@ export function escalate(it, argv) {
   const as = flagValue(rest, "--as");
   const hand = as ? `${handOf(it)} · ${as}` : handOf(it);
   const held = holdOf(it, hand);
-  if (!held) {
+  if (!held?.path) {
     say(REFUSED, [
-      "nothing stands in your hand, so no leaf takes a person step.",
+      "no ticket file stands in your hand, so no leaf takes a person step.",
       "Run ./RUNME.sh ticket pull to take a leaf, then run this again.",
     ]);
     return 1;
@@ -290,7 +293,7 @@ export function dropped(it, who) {
 
 // [[spec/design_output/pull#the-checks]]
 export function judgeMaterial(it, held, name) {
-  if (!held || (name && name !== held.ticket)) {
+  if (!held?.path || (name && name !== held.ticket)) {
     console.log("null");
     return 1;
   }

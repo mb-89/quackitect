@@ -121,7 +121,7 @@ function plans(e, box) {
     );
   if (added.early.length)
     said.push(
-      `${added.early.join(", ")} waits for the context mark, because a handover todo stands from context.handoverAt to the clear alone.`,
+      `${added.early.join(", ")} stays out, because the clear's tickets carry the handover and the work tab draws them.`,
     );
   return { result: { result: said.join(" ") } };
 }
@@ -136,12 +136,9 @@ export function planned(e, box) {
       .filter(Boolean),
   );
   plan.todos = plan.todos.filter((one) => !done.has(one.title));
-  // A handover todo stands from the context mark to the clear alone, so before the mark the plan drops one and takes none. [[spec/design_output/work#one-handover-stands]]
-  const beforeMark = !box.handover;
-  if (beforeMark) {
-    plan.todos = plan.todos.filter((one) => !namesHandover(one?.title));
-    if (namesHandover(plan.working)) plan.working = "";
-  }
+  // The clear's tickets carry the handover's work, so the plan drops a handover todo and takes none. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+  plan.todos = plan.todos.filter((one) => !namesHandover(one?.title));
+  if (namesHandover(plan.working)) plan.working = "";
   const most = Number(asks(box, MOST_OPEN) ?? 0);
   const refused = [];
   const early = [];
@@ -150,7 +147,7 @@ export function planned(e, box) {
   const rows = wanted.some((one) => Number(one?.place) > 1) ? queueRows(box) : [];
   for (const one of wanted) {
     const title = String(one.title).trim();
-    if (beforeMark && namesHandover(title)) {
+    if (namesHandover(title)) {
       early.push(title);
       continue;
     }
@@ -167,7 +164,7 @@ export function planned(e, box) {
     titles.push(title);
   }
   const working = String(e?.working ?? "").trim();
-  if (working && !(beforeMark && namesHandover(working))) plan.working = working;
+  if (working && !namesHandover(working)) plan.working = working;
   // Finishing the thing in hand names it done, and the hand stands empty. [[spec/design_output/stop#the-plan]]
   if (done.has(plan.working)) plan.working = "";
   writes(box, plan);

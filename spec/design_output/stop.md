@@ -271,27 +271,30 @@ an answer, and the grace stands past a batch of calls sent at once.
 A long context answers worse than a short one, and a compaction rewrites the
 old prompts into a summary. So a session past `context.handoverAt` hands over
 to a fresh conversation of its own, and a clear takes the place of the
-compaction. `src/bridge/handover.js` holds the door, and the key at zero
-switches it off.
+compaction. A ticket is the unit of work, so the ticket in hand runs to its
+end first. The clear then runs as three ephemeral tickets. For the owner's
+words, see [[spec/design_input/the-clear-hands-ephemeral-tickets]].
+`src/bridge/handover.js` holds the door, `src/scripts/ephemeral.js` holds the
+tickets, and the key at zero switches it off.
 
 | step | what happens | who does it |
 |---|---|---|
 | measure | the fill rides every call of the agent's own and the turn's end, and `session.measure` after each turn | the bridgehead reads `$.session.usage()` |
-| finish | a fill past the key marks the session due. The block rides every call: finish the step in hand, start nothing new, write the handover | the context door |
-| write now | a fill past `context.writeAt` turns the block: stop the step where it stands, leave it in hand, write the handover now | the context door |
-| handover | the turn's end holds, ahead of the tooth, until `.se/HANDOVER.md` stands and names no file under `.se/.retro`, and then ends whatever the tooth votes | the context door |
-| clear | the turn completes, the bridgehead runs `/clear`, and it submits the prompt that opens the next conversation | the bridgehead |
-| forget | `session.end` with reason `clear` opens the canary debt and empties `reads` in every hold on the box | the guidance door |
+| mark | a fill past the key marks the session due, and writes `.se/.runtime/due.json`. No block rides a call | the context door |
+| finish | the pull hands the next leaf of the ticket the hand gives back, while one admits this hand | the pull |
+| `handover` | the first pull reaching past that ticket hands the `handover` ticket. Its hand-back checks that `.se/HANDOVER.md` stands and names no file under `.se/.retro`, and hands `clear` | the pull |
+| `clear` | a held `clear` ends the turn ahead of the tooth, whatever it votes. The turn completes, the bridgehead runs `/clear`, and it submits the prompt that opens the next conversation | the context door and the bridgehead |
+| forget | `session.end` with reason `clear` opens the canary debt, empties `reads` in every hold on the box, turns `clear` into `read-handover`, and drops the mark | the guidance door |
 | re-read | `prompt.context` fires again: the system prompt, then the rules and the canary, then the handover | the harness and the guidance door |
-| resume | the prompt says to read the handover and pull, so the step hands its notes again | the agent |
+| `read-handover` | the prompt sends the agent to the pull, which shows the ticket's ask. Its hand-back on `--pass` closes it, and the queue hands the next leaf | the agent and the pull |
 
 | the case | what the door does |
 |---|---|
-| a session writes no handover | lets go past `stop.mostInARow` asks, and the log says so at `warn` |
+| a turn ends with a ticket in hand past the key | leaves the turn to the tooth, which carries it on the hold |
+| a turn ends on a session due holding nothing | holds the turn and sends the agent to the pull, and lets go past `stop.mostInARow` asks with a `warn` line |
 | a turn ends on a rule under `waits: owner` | holds the clear, and the tooth votes. The session stays due, and the next turn's end clears |
 | the person breaks off a turn | asks for no clear |
-| a fill past `context.writeAt` | caps the finish, because each call past the first key costs the most in the conversation. The key at zero, or under `context.handoverAt`, adds no second stage |
-| a handover names a file under `.se/.retro` | holds the turn's end until the handover names the ticket or the class by its name. The retro alone reads that folder, and a file there costs the next conversation a whole read. The log says so at `warn` |
+| a helper pulls | takes none of the three tickets |
 
 The first reading after a clear is what the next conversation opens on. A
 reading past the key there stands the door down for the session, because
@@ -305,9 +308,10 @@ step's notes again. A compaction empties the reads too.
 
 The handover runs under `engine.binding` at `queue` alone. Under `god` and
 `unbound` the owner is in the loop, and a clear makes them explain the work
-twice. So there a session goes due nowhere: no block rides a call, no turn
-holds for the handover, and no clear follows. The fill still reads. A binding
-that moves off the queue while the clear stands asks for no clear.
+twice. So there a session goes due nowhere: no mark stands, no turn holds for
+the handover, and no clear follows. The fill still reads. A binding that moves
+off the queue while the clear stands asks for no clear, and drops a held
+`clear`.
 
 # The vote
 

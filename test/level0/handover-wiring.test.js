@@ -1,16 +1,17 @@
 // The context handover through the server's own switch: the fill rides the
-// call, the block rides the answer, the turn's end holds ahead of the tooth
-// until the handover stands, the turn's completion asks for the clear, and the
-// clear's session end empties the hold's reads.
+// call and marks the session due, a held clear ends the turn ahead of the
+// tooth, the turn's completion asks for the clear, and the clear's session end
+// empties the hold's reads and puts the read of the handover in hand.
 // [[spec/design_output/stop#the-context-hands-over]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { HANDOVER, HOLDS } from "../../.claude/skills/level0/lib/folders.js";
+import { DUE, HOLDS } from "../../.claude/skills/level0/lib/folders.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { RESUME } from "../../src/bridge/handover.js";
 import { boxOf, decide } from "../../src/bridge/server.js";
+import { heldAs, READ } from "../../src/scripts/ephemeral.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
@@ -19,6 +20,7 @@ import { fakeProc } from "../../src/doors/fake/proc.js";
 const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
 const HOLD = `${HOLDS}/box-1.json`;
+const CLEARING = JSON.stringify(heldAs("clear", "box 1"));
 const CONFIG = {
   stop: { enabled: true, mostInARow: 3, hold: "off" },
   context: { handoverAt: 60000 },
@@ -55,22 +57,21 @@ const stops = (box) =>
 const handed = (said) =>
   (said?.after?.context ?? []).some((one) => one.includes("# The context hands over"));
 
-test("a call under the key carries no block, and a call past it does", async () => {
+test("no call carries a block, under the key or past it", async () => {
   const box = served();
 
   assert.equal(handed(await call(box, 40000)), false);
-  assert.equal(handed(await call(box, 70000)), true);
+  assert.equal(handed(await call(box, 70000)), false);
 });
 
-test("the turn's end holds for the handover, then ends, and the completion asks for the clear", async () => {
+// [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+test("a held clear ends the turn, the completion asks for the clear, and the clear hands the read", async () => {
   const box = served();
   await call(box, 40000);
   await call(box, 70000);
+  assert.equal(box.disk.exists(at(DUE)), true);
 
-  const held = await stops(box);
-  assert.match(String(held.result?.block), /# The context hands over/);
-
-  box.disk.write(at(HANDOVER), "# Where it stands\n");
+  box.disk.write(at(HOLD), CLEARING);
   const ended = await stops(box);
   assert.equal(ended.result?.block, undefined);
 
@@ -79,6 +80,10 @@ test("the turn's end holds for the handover, then ends, and the completion asks 
     box,
   );
   assert.equal(done.clear?.prompt, RESUME);
+
+  await decide({ event: "session.end", e: { reason: "clear" } }, box);
+  assert.equal(JSON.parse(box.disk.read(at(HOLD))).ticket, READ);
+  assert.equal(box.disk.exists(at(DUE)), false);
 });
 
 // [[spec/tickets/the-clear-keeps-questions]]
@@ -90,7 +95,7 @@ test("a turn ending on a stop that waits for the owner asks for no clear, and th
   );
   await call(box, 40000);
   await call(box, 70000);
-  box.disk.write(at(HANDOVER), "# Where it stands\n");
+  box.disk.write(at(HOLD), CLEARING);
   const complete = () =>
     decide({ event: "turn.complete", e: { reason: "answer", answer: "done" } }, box);
 

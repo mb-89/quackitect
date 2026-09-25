@@ -26,7 +26,8 @@ import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { toolLines, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { heldReadsIn } from "../scripts/guidance-hand.js";
 import { tiersText } from "./agent.js";
-import { forgetsReads } from "./handover.js";
+import { dropsDue } from "../scripts/ephemeral.js";
+import { forgetsReads, readsNext } from "./handover.js";
 import { dropsHandover } from "./plan.js";
 import { readTools, writeSurvey } from "../engine/tools.js";
 import { asks } from "./config.js";
@@ -160,6 +161,7 @@ export function onSessionStart(_e, box) {
   box.handover = null;
   box.cleared = false;
   box.standsDown = false;
+  dropsDue(box.disk, box.work);
   return { pass: true };
 }
 
@@ -324,6 +326,8 @@ export function onSessionEnd(e, box) {
   box.cleared = true;
   box.log.say("info", CLEARED, "a clear runs, and the guidance reads again", {
     forgot: forgetsReads(box),
+    // [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+    next: readsNext(box),
     detail: box.guidance.sentence,
   });
   return { pass: true };

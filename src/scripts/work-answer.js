@@ -21,6 +21,7 @@ import {
 } from "../engine/group.js";
 import { PLANS } from "../../.claude/skills/level0/lib/runs.js";
 import { onNoteRoute } from "../../.claude/skills/level0/lib/ticket.js";
+import { ASKS, holdsIn, isEphemeral } from "./ephemeral.js";
 import { takeable } from "./pull.js";
 import { ticketsHere } from "./pull-hand.js";
 import { leafOf, leavesOf } from "./pull-route.js";
@@ -251,6 +252,28 @@ function heldRow(plan, names) {
   ];
 }
 
+// Each ephemeral ticket a hold carries stands at zero as a row of its own, with no file behind it, the way the tab draws a plan todo. [[spec/design_input/the-clear-hands-ephemeral-tickets#an-ephemeral-ticket-stands-held]]
+function ephemeralRows(it) {
+  if (!it.disk || !it.root) return [];
+  return holdsIn(it.disk, it.root)
+    .filter(({ held }) => isEphemeral(held))
+    .map(({ held }) => ({
+      name: String(held.ticket),
+      kind: "todo",
+      state: HELD,
+      step: "",
+      progress: "",
+      group: "",
+      urgent: false,
+      person: false,
+      held: true,
+      waits: false,
+      todo: false,
+      says: (ASKS[held.ticket] ?? []).join(" "),
+      queue: HELD_PLACE,
+    }));
+}
+
 // [[spec/design_output/pull#the-queue-is-an-outline]]
 function waitsOnPerson(one) {
   return (
@@ -314,6 +337,7 @@ export function answerOf(it, queue = true) {
         )
         .map((one) => rowOfTicket(one, places, stood, open, overrides)),
       ...planRows(planHere(it), places),
+      ...ephemeralRows(it),
       // A ticket on this disk that origin lacks still carries its name, so the work in hand draws once. [[spec/design_output/stop#the-plan]]
       ...heldRow(planHere(it), [
         ...ticketsIn(read).map((one) => one.name),

@@ -223,6 +223,16 @@ A clear and a compaction each empty `reads` in every hold on the box, and the
 ticket and the step stay. So the next pull hands the notes again. For details,
 see [[spec/design_output/stop#the-context-hands-over]].
 
+## An ephemeral ticket stands in the hold
+
+An ephemeral ticket carries no file. The pull mints it into the hold, with
+`ephemeral: true` and an empty `path`, and its hand-back deletes it or hands
+the next. It takes `--pass` alone. The work answer draws it as a held row at
+`0`, the way it draws a plan todo. `src/scripts/ephemeral.js` names the
+tickets and their asks, and `src/scripts/ephemeral-pull.js` hands them out and
+takes them back. The clear runs as three of them. For details, see
+[[spec/design_output/stop#the-context-hands-over]].
+
 ## The work answer
 
 The answer says `does` first, then the ask, then one line per field with its

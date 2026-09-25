@@ -27,6 +27,8 @@ import {
   withEntry,
   withField,
 } from "../engine/group.js";
+import { isDue } from "./ephemeral.js";
+import { dueHandOut } from "./ephemeral-pull.js";
 import { noteRows, readsOf, writeHold } from "./guidance-hand.js";
 import { workAnswer } from "./pull-chapter.js";
 import { cleanupOf } from "./pull-cleanup.js";
@@ -121,6 +123,8 @@ export function taggedIn(list) {
 export function handOut(it, who) {
   repairPersonSteps(it, who);
   const all = ticketsHere(it);
+  // A session due takes the clear's tickets once the ticket in hand stands done, and a helper takes none. [[spec/design_input/the-clear-hands-ephemeral-tickets#a-ticket-is-the-unit-of-work]]
+  if (!who.wanted && !who.oneStep && isDue(it.disk, it.root)) return dueHandOut(it, who, all);
   const groupTicket = all.find((one) => !one.private && one.name === who.group);
   // The tag says the next pull hands it first, on a note and on a ticket alike. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
   const tagged = taggedIn(all);
