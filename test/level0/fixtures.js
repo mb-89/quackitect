@@ -236,3 +236,10 @@ steps:
         form: text
         says: what changes and why
 `;
+
+// The open ticket a case's writes name, seeded under the root it writes in. [[spec/design_output/level0#a-write-names-its-ticket]]
+export const NAMED = "a-ticket";
+export const named = (root) => ({
+  [`${root}/spec/tickets/${NAMED}.md`]:
+    "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n",
+});

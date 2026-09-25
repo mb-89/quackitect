@@ -5,6 +5,12 @@
 export const OPS = ["", "exact", "create", "write", "append", "prepend", "regex"];
 export const PATCH = "patch";
 export const REPLACE = "replace";
+// Every call that writes names the ticket it serves. [[spec/design_output/level0#a-write-names-its-ticket]]
+const TICKET = {
+  type: "string",
+  description:
+    "the open ticket this write serves: its file name under spec/tickets or .se/tickets, without .md",
+};
 
 // [[spec/design_output/apply#check-everything-then-write]]
 export function patchSpec() {
@@ -18,7 +24,8 @@ export function patchSpec() {
       "line endings, and text that reads a line ending differently finds",
       "nothing. Ops: exact {file, old, new, replace_all} · create {file, new} ·",
       "write {file, new} · append or prepend {file, new} · regex {file,",
-      "pattern, replacement, flags, expect_count}.",
+      "pattern, replacement, flags, expect_count}. Name the ticket the write",
+      "serves in `ticket`.",
     ].join(" "),
     inputSchema: {
       type: "object",
@@ -41,6 +48,7 @@ export function patchSpec() {
             required: ["file"],
           },
         },
+        ticket: TICKET,
         on: {
           type: "string",
           description: "what this change is for, which undo takes back",
@@ -50,7 +58,7 @@ export function patchSpec() {
           description: "answer what would land and write nothing",
         },
       },
-      required: ["ops"],
+      required: ["ops", "ticket"],
     },
   };
 }
@@ -65,7 +73,8 @@ export function replaceSpec() {
       "through the tree. The index answers which files carry the pattern, so",
       "the sweep costs no walk. A pattern matching nothing is a refusal, and",
       "expect_count refuses unless the total across the tree is exactly that.",
-      "Level zero journals every file, so `undo` puts the sweep back.",
+      "Level zero journals every file, so `undo` puts the sweep back. Name the",
+      "ticket the sweep serves in `ticket`.",
     ].join(" "),
     inputSchema: {
       type: "object",
@@ -75,10 +84,11 @@ export function replaceSpec() {
         replacement: { type: "string" },
         flags: { type: "string", description: "flags out of i m s, with g implied" },
         expect_count: { type: "number" },
+        ticket: TICKET,
         on: { type: "string" },
         preview: { type: "boolean" },
       },
-      required: ["glob", "pattern", "replacement"],
+      required: ["glob", "pattern", "replacement", "ticket"],
     },
   };
 }

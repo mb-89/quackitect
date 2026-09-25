@@ -11,12 +11,14 @@ import { onWrite } from "../../src/bridge/write.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
+import { named, NAMED } from "./fixtures.js";
 
 // A box the server builds, with doors in memory and an index that answers the sweep. [[spec/design_output/apply#the-write-tools]]
 function routed() {
   const disk = fakeDisk({
     "/tree/one.md": "alpha beta\n",
     "/tree/two.md": "gamma 12\n",
+    ...named("/tree"),
   });
   return boxOf("/tree", "/tree", {
     disk,
@@ -42,6 +44,7 @@ test("the server routes a patch with an exact and a regex op, and a replace, to 
       event: "tool.call",
       e: {
         tool: `mcp__level0__${PATCH}`,
+        ticket: NAMED,
         ops: [
           { file: "one.md", old: "beta", new: "delta" },
           { file: "two.md", op: "regex", pattern: "(\\d+)", replacement: "[$1]" },
@@ -57,7 +60,13 @@ test("the server routes a patch with an exact and a regex op, and a replace, to 
   const replace = await decide(
     {
       event: "tool.call",
-      e: { tool: `mcp__level0__${REPLACE}`, pattern: "a(lpha|mma)", replacement: "A$1", glob: "*.md" },
+      e: {
+        tool: `mcp__level0__${REPLACE}`,
+        ticket: NAMED,
+        pattern: "a(lpha|mma)",
+        replacement: "A$1",
+        glob: "*.md",
+      },
     },
     box,
   );
@@ -106,9 +115,9 @@ function formatting(files) {
 
 // [[spec/design_output/level0#the-formatter-applies-itself]]
 test("a patch over code writes the text the formatter answers, so the next edit meets its mark", async () => {
-  const box = formatting({ "/tree/one.js": "const a = 1;\n" });
+  const box = formatting({ "/tree/one.js": "const a = 1;\n", ...named("/tree") });
   const said = await TOOLS[`mcp__level0__${PATCH}`](
-    { ops: [{ file: "one.js", old: "a = 1;", new: "a = 2;   " }] },
+    { ticket: NAMED, ops: [{ file: "one.js", old: "a = 1;", new: "a = 2;   " }] },
     box,
   );
   assert.match(said.result.result, /1 file\(s\) written/);
@@ -117,18 +126,30 @@ test("a patch over code writes the text the formatter answers, so the next edit 
     { tool: "Edit", file_path: "/tree/one.js", old_string: "2", new_string: "3" },
     box,
   );
-  assert.equal(next?.result?.deny, undefined, "the mark stands on the text the disk holds");
+  assert.equal(
+    next?.result?.deny,
+    undefined,
+    "the mark stands on the text the disk holds",
+  );
 });
 
 // A break of form the door warns on lands with the batch, and the answer names the rows. [[spec/design_output/level0#the-panel-holds-a-warning]]
 test("a patch over code past a lint row writes, and the answer carries the warning", async () => {
-  const box = formatting({ "/tree/one.js": "const a = 1;\n" });
+  const box = formatting({ "/tree/one.js": "const a = 1;\n", ...named("/tree") });
   box.biome.lint = async () => ({
     ran: true,
-    found: [{ rule: "lint/style/useConst", line: 1, column: 1, message: "Use const.", severity: "error" }],
+    found: [
+      {
+        rule: "lint/style/useConst",
+        line: 1,
+        column: 1,
+        message: "Use const.",
+        severity: "error",
+      },
+    ],
   });
   const said = await TOOLS[`mcp__level0__${PATCH}`](
-    { ops: [{ file: "one.js", old: "a = 1;", new: "a = 2;" }] },
+    { ticket: NAMED, ops: [{ file: "one.js", old: "a = 1;", new: "a = 2;" }] },
     box,
   );
   assert.match(said.result.result, /1 file\(s\) written/);

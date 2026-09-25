@@ -5,6 +5,7 @@
 
 import { dirname } from "node:path";
 import { boxOf, decide } from "../../src/bridge/server.js";
+import { onWrite } from "../../src/bridge/write.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk, norm } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
@@ -13,9 +14,10 @@ export const TREE = "/tree";
 const LINES = 40;
 
 // A text of numbered lines, so a case names a line by its number. [[spec/design_output/level0#a-write-meets-its-mark]]
-export const NUMBERED = Array.from({ length: LINES }, (_, at) => `line ${at + 1}\n`).join(
-  "",
-);
+export const NUMBERED = Array.from(
+  { length: LINES },
+  (_, at) => `line ${at + 1}\n`,
+).join("");
 
 // The real disk refuses a write into a folder nobody made, and a write where a folder stands, so the fake refuses both. [[spec/guidance/code/testing]]
 export function realDisk(seed = {}) {
@@ -57,6 +59,11 @@ export function served(disk, clock = fakeClock()) {
 // One tool call through decide, the road every call of the agent takes. [[spec/design_output/level0#the-bridgehead-and-the-server]]
 export function called(box, e) {
   return decide({ event: "tool.call", e }, box);
+}
+
+// The mark door stands behind the write door, which the harness's own Edit reaches no more, so a case drives it straight. [[spec/design_output/level0#a-write-names-its-ticket]]
+export function wrote(box, e) {
+  return onWrite(e, box);
 }
 
 export const reads = (path, more = {}) => ({ tool: "Read", file_path: path, ...more });

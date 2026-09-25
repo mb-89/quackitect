@@ -11,6 +11,7 @@ import {
   spanned,
   staleFault,
 } from "../../.claude/skills/level0/lib/marks.js";
+import { HANDOVER } from "../../.claude/skills/level0/lib/folders.js";
 import { isDraft, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import {
   carriedFrom,
@@ -49,6 +50,7 @@ import {
   TICKETS,
   ticketNamed,
 } from "../engine/group.js";
+import { toolRefusal } from "../engine/named.js";
 import { codeDoor } from "./code.js";
 import { marksStale, ownerDoor } from "./projection.js";
 import { readsProse } from "./prose.js";
@@ -64,12 +66,23 @@ export function schemasHere(disk, root) {
   return schemasFrom(readFolder(disk, join(root, SCHEMAS), END));
 }
 
+// The harness's own write tools carry no ticket field, so they reach the handover and the world outside the tree alone. [[spec/design_output/level0#a-write-names-its-ticket]]
+export async function onToolWrite(e, box) {
+  const where = relativeTo(box.root, String(e?.file_path ?? e?.notebook_path ?? ""));
+  if (outside(where) || where === HANDOVER) return onWrite(e, box);
+  box.log.say("warn", "ticket", `refused a ${e?.tool} naming no ticket`, {
+    file: where,
+    tool: String(e?.tool),
+  });
+  return { result: { deny: toolRefusal(e?.tool) } };
+}
+
 export async function onWrite(asked, box) {
   let e = asked;
   let writing = asWrite(e);
   if (!writing) return PASS;
   const where = relativeTo(box.root, writing.path);
-  if (/^([A-Za-z]:)?[\\/]/.test(where) || isDraft(where)) return PASS;
+  if (outside(where) || isDraft(where)) return PASS;
   // The engine's fields come back first, so every door reads the write that lands. [[spec/design_output/schema#the-verbs-own-their-fields]]
   const restored = engineRestores(e, writing, where, box);
   if (restored?.deny) return { result: { deny: restored.deny } };
@@ -339,6 +352,10 @@ export function warnsOf(e, where, warned, box, kind = "vale") {
     detail: rows.map(rowOf).join("\n"),
   });
   return { after: { context: [warnedNote(where, rows)] } };
+}
+
+function outside(where) {
+  return /^([A-Za-z]:)?[\\/]/.test(where);
 }
 
 function asWrite(e) {

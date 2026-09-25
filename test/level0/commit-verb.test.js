@@ -8,9 +8,10 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { commitVerb } from "../../src/scripts/commit-verb.js";
+import { named, NAMED } from "./fixtures.js";
 
 const ROOT = "/tree";
-const CLEAN = "the-verb: the message reads clean";
+const CLEAN = `${NAMED}: the message reads clean`;
 const FOUND = [
   {
     rule: "VoiceShape.Antithesis",
@@ -47,7 +48,7 @@ const doors = (found = [], answers = {}, env = { SE_CLOUD: "1" }) => {
     join,
     node: "node",
     git,
-    disk: fakeDisk({}),
+    disk: fakeDisk(named(ROOT)),
     log: { say: () => {} },
     vale: { stands: () => true, lint: async () => ({ ran: true, found }) },
     proc: git.proc,

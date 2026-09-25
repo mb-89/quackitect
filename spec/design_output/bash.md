@@ -87,7 +87,7 @@ and writes on another, through a variable.
 That last row is the one that matters. A session reaches for a heredoc because
 a formatter reflows a file between a read and an edit, and a string replacement
 then fails silently. So the refusal names the road: read the file again, then
-change it with Edit.
+change it with `mcp__level0__patch`.
 
 # A target behind a variable
 

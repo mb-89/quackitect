@@ -11,6 +11,7 @@ import {
   REPLACE,
   replaceSpec,
 } from "../../.claude/skills/level0/lib/apply.js";
+import { HANDOVER } from "../../.claude/skills/level0/lib/folders.js";
 import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import {
   journalOf,
@@ -21,6 +22,7 @@ import {
   FOLDER as UNDONE,
   undoSpec,
 } from "../../.claude/skills/level0/lib/undo.js";
+import { FIELD_HOW, ticketFault } from "../engine/named.js";
 import { marksOf, marksSeen, onWrite } from "./write.js";
 
 export const SPECS = () => [patchSpec(), replaceSpec(), undoSpec()];
@@ -58,6 +60,8 @@ async function replaces(e, box) {
 
 async function lands(e, took, box) {
   if (!took.ok) return { result: { result: took.why } };
+  const unnamed = unnamedIn(e, took, box);
+  if (unnamed) return { result: { result: unnamed } };
   // A call writing nothing moves no disk, so the marks it meets stand as they stood. [[spec/design_output/level0#a-write-meets-its-mark]]
   const held = new Map(marksOf(box));
   const refused = await checked(took, box, e.agentId);
@@ -74,6 +78,17 @@ async function lands(e, took, box) {
   // A break of form lands with the batch, and its note rides the answer. [[spec/design_output/level0#the-panel-holds-a-warning]]
   const warned = wrote.landed ? (took.warned ?? []) : [];
   return { result: { result: [wrote.said, ...warned].join("\n\n") } };
+}
+
+// A batch writing the handover alone names no ticket. [[spec/design_output/level0#a-write-names-its-ticket]]
+function unnamedIn(e, took, box) {
+  if (took.files.every((one) => inTheTree(box.root, one.file) === HANDOVER)) return "";
+  const fault = ticketFault(e.ticket, { disk: box.disk, root: box.work }, FIELD_HOW);
+  if (fault)
+    box.log.say("warn", "ticket", "refused a batch naming no open ticket", {
+      detail: String(e.ticket ?? ""),
+    });
+  return fault;
 }
 
 // The write carries the call's hand, as the agent's own write does. [[spec/design_output/level0#the-write-door]]
@@ -141,7 +156,10 @@ function writes(took, on, box) {
 // The journal stays with a word that nothing landed, so an undo takes back no older apply. [[spec/design_output/apply#a-first-fault-writes-nothing]]
 function unlanded(box, where, journal, file, bad) {
   try {
-    box.disk.write(where, `${JSON.stringify({ ...journal, landed: false }, null, 2)}\n`);
+    box.disk.write(
+      where,
+      `${JSON.stringify({ ...journal, landed: false }, null, 2)}\n`,
+    );
   } catch {
     // [[spec/design_output/apply#a-first-fault-writes-nothing]]
   }
@@ -192,7 +210,12 @@ async function undoes(e, box) {
   // [[spec/design_output/apply#a-first-fault-writes-nothing]]
   if (newest.entry.landed === false) {
     box.disk.remove(join(folder, newest.name));
-    return said(box, false, "nothing waits to undo: the newest apply wrote nothing", on);
+    return said(
+      box,
+      false,
+      "nothing waits to undo: the newest apply wrote nothing",
+      on,
+    );
   }
   const held = readsFiles(
     box,

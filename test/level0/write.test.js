@@ -21,6 +21,7 @@ import {
   refused,
   served,
   TREE,
+  wrote,
 } from "./mark-doors.js";
 
 const METHOD = "/tools";
@@ -331,7 +332,7 @@ test("a mark written on one box reads on a fresh box over the same disk", async 
   const disk = realDisk({ [at]: NUMBERED });
   await called(served(disk), reads(at));
 
-  const said = await called(served(disk), edits(at, "line 3\n", "three\n"));
+  const said = await wrote(served(disk), edits(at, "line 3\n", "three\n"));
 
   assert.equal(refused(said), "", "the restarted box reads the mark off the disk");
 });
@@ -342,10 +343,10 @@ test("a Read of lines 10 to 20 lets an Edit inside them land, and refuses one at
   const it = served(realDisk({ [at]: NUMBERED }));
   await called(it, reads(at, { offset: 10, limit: 11 }));
 
-  const outside = await called(it, edits(at, "line 30\n", "thirty\n"));
+  const outside = await wrote(it, edits(at, "line 30\n", "thirty\n"));
   assert.match(refused(outside), /moved on the disk after you read it/);
 
-  const inside = await called(it, edits(at, "line 15\n", "fifteen\n"));
+  const inside = await wrote(it, edits(at, "line 15\n", "fifteen\n"));
   assert.equal(refused(inside), "", "an edit inside the span lands");
 });
 

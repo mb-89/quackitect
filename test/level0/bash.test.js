@@ -18,7 +18,16 @@ import {
   writesAPath,
 } from "../../.claude/skills/level0/lib/bash.js";
 import { scriptsIn } from "../../.claude/skills/level0/lib/scripted.js";
-import { called, edits, NUMBERED, realDisk, refused, served, TREE } from "./mark-doors.js";
+import {
+  called,
+  edits,
+  NUMBERED,
+  realDisk,
+  refused,
+  served,
+  TREE,
+  wrote,
+} from "./mark-doors.js";
 
 const rules = (command, most = 5, it = {}) =>
   findings(command, most, it).map((one) => one.rule);
@@ -316,7 +325,11 @@ test("every refusal names the rule, what it reads and the road that works", () =
     const one = findings(said, 5)[0];
     assert.ok(one, said);
     assert.ok(one.said, `${said} names what it reads`);
-    assert.match(one.message, /Write|Edit|RUNME|git commit -m|node --test/, said);
+    assert.match(
+      one.message,
+      /mcp__level0__patch|RUNME|git commit -m|node --test/,
+      said,
+    );
     assert.equal(one.severity, "error");
   }
 });
@@ -458,13 +471,21 @@ test("a variable target resolves off the command, and one with no value refuses 
   assert.deepEqual(paths("f=README.md; echo x > $f"), ["README.md"]);
   assert.deepEqual(rules("f=README.md; echo x > $f"), ["ShellWritesNothing"]);
   assert.deepEqual(paths('f=README.md && echo x > "$f"'), ["README.md"]);
-  assert.deepEqual(paths("echo x > $f"), ["$f"], "a target the command gives no value refuses");
+  assert.deepEqual(
+    paths("echo x > $f"),
+    ["$f"],
+    "a target the command gives no value refuses",
+  );
   assert.deepEqual(rules("echo x > $f"), ["ShellWritesNothing"]);
 });
 
 // A value naming a free path stays free, and a temp variable reads free before the unresolved rule. [[spec/design_output/bash#a-shell-writes-nothing]]
 test("a variable resolving to a free path passes, and a temp variable passes unresolved", () => {
-  assert.deepEqual(paths("out=/tmp; echo x > $out/y.md"), [], "the value lands under /tmp");
+  assert.deepEqual(
+    paths("out=/tmp; echo x > $out/y.md"),
+    [],
+    "the value lands under /tmp",
+  );
   assert.deepEqual(rules("out=/tmp; echo x > $out/y.md"), []);
   assert.deepEqual(paths("echo x > $TMPDIR/msg.md"), []);
   assert.deepEqual(paths(`echo x > $${"{TMPDIR}"}/msg.md`), []);
@@ -477,14 +498,18 @@ test("sed -n '1,5p' README.md marks lines 1 to 5, and a read with a pipe after i
   const it = served(realDisk({ [at]: NUMBERED }));
   await called(it, { tool: "Bash", command: "sed -n '1,5p' README.md" });
 
-  const outside = await called(it, edits(at, "line 7\n", "seven\n"));
+  const outside = await wrote(it, edits(at, "line 7\n", "seven\n"));
   assert.match(refused(outside), /moved on the disk after you read it/);
-  const inside = await called(it, edits(at, "line 3\n", "three\n"));
+  const inside = await wrote(it, edits(at, "line 3\n", "three\n"));
   assert.equal(refused(inside), "", "an edit inside the printed lines lands");
 
   const other = join(TREE, "other.md");
   const piped = served(realDisk({ [other]: NUMBERED }));
   await called(piped, { tool: "Bash", command: "cat other.md | head -n 2" });
-  const said = await called(piped, edits(other, "line 1\n", "one\n"));
-  assert.match(refused(said), /has read none of it/, "a read feeding a pipe sets no mark");
+  const said = await wrote(piped, edits(other, "line 1\n", "one\n"));
+  assert.match(
+    refused(said),
+    /has read none of it/,
+    "a read feeding a pipe sets no mark",
+  );
 });

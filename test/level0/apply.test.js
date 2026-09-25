@@ -13,7 +13,17 @@ import {
   restores,
   UNDO,
 } from "../../.claude/skills/level0/lib/undo.js";
-import { called, edits, reads, realDisk, refused, served, TREE } from "./mark-doors.js";
+import { named, NAMED } from "./fixtures.js";
+import {
+  called,
+  edits,
+  reads,
+  realDisk,
+  refused,
+  served,
+  TREE,
+  wrote,
+} from "./mark-doors.js";
 
 const held = (text) => ({ "one.md": { exists: true, text } });
 
@@ -200,14 +210,25 @@ test("a mark reaches the path it names alone", () => {
   assert.equal(agrees(held, "two.md", "alpha\n"), false);
 });
 
-const patch = (ops, on = "") => ({ tool: `mcp__level0__${PATCH}`, ops, on });
+const patch = (ops, on = "") => ({
+  tool: `mcp__level0__${PATCH}`,
+  ops,
+  on,
+  ticket: NAMED,
+});
 const told = (said) => String(said?.result?.result ?? "");
 
 // [[spec/design_output/apply#the-journal-holds-both-halves]]
 test("a create into a new folder lands, and a failed first write answers nothing written", async () => {
-  const disk = realDisk({ [join(TREE, "held", "inner.md")]: "inner\n" });
+  const disk = realDisk({
+    ...named(TREE),
+    [join(TREE, "held", "inner.md")]: "inner\n",
+  });
   const it = served(disk);
-  const born = await called(it, patch([{ file: "deep/new/one.md", op: "create", new: "one\n" }]));
+  const born = await called(
+    it,
+    patch([{ file: "deep/new/one.md", op: "create", new: "one\n" }]),
+  );
   assert.match(told(born), /^1 file\(s\) written/);
   assert.equal(disk.read(join(TREE, "deep", "new", "one.md")), "one\n");
 
@@ -223,19 +244,29 @@ test("a create into a new folder lands, and a failed first write answers nothing
   );
   assert.match(told(failed), /^nothing written/);
   assert.equal(disk.read(at), "alpha\n", "the second file stands as it stood");
-  const next = await called(it, edits(at, "alpha", "gamma"));
+  const next = await wrote(it, edits(at, "alpha", "gamma"));
   assert.equal(refused(next), "", "the held marks come back, so the next Edit lands");
 });
 
 // [[spec/design_output/apply#drift-refuses-the-restore]]
 test("an undo after a failed first write answers nothing waits to undo, and an earlier apply stands", async () => {
   const at = join(TREE, "one.md");
-  const disk = realDisk({ [at]: "alpha\n", [join(TREE, "held", "inner.md")]: "inner\n" });
+  const disk = realDisk({
+    ...named(TREE),
+    [at]: "alpha\n",
+    [join(TREE, "held", "inner.md")]: "inner\n",
+  });
   const it = served(disk);
-  const first = await called(it, patch([{ file: "one.md", old: "alpha", new: "beta" }], "x"));
+  const first = await called(
+    it,
+    patch([{ file: "one.md", old: "alpha", new: "beta" }], "x"),
+  );
   assert.match(told(first), /^1 file\(s\) written/);
   it.clock.tick();
-  const failed = await called(it, patch([{ file: "held", op: "create", new: "x\n" }], "x"));
+  const failed = await called(
+    it,
+    patch([{ file: "held", op: "create", new: "x\n" }], "x"),
+  );
   assert.match(told(failed), /^nothing written/);
 
   const undone = await called(it, { tool: `mcp__level0__${UNDO}`, on: "x" });

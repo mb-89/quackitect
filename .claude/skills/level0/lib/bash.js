@@ -75,7 +75,10 @@ export function writesAPath(command) {
   const out = [];
   for (const one of segments) {
     out.push(...writesIn(one, bodies, values));
-    assigned(one.filter((word) => !word.op).map((word) => word.text), values);
+    assigned(
+      one.filter((word) => !word.op).map((word) => word.text),
+      values,
+    );
   }
   return out;
 }
@@ -216,8 +219,8 @@ export function findings(command, most, it = {}) {
     out.push(
       row(said, "ShellWritesNothing", one.path, [
         `A shell writes past every rule in this tree, so ${one.how} into ${one.path}`,
-        `meets none. Read ${one.path} with Read. Write the whole file with Write, one`,
-        "spot with Edit, and many with mcp__level0__patch or mcp__level0__replace.",
+        `meets none. Read ${one.path} with Read, and write it with mcp__level0__patch`,
+        "or mcp__level0__replace, naming the ticket the write serves in its ticket field.",
       ]),
     );
   }
@@ -468,12 +471,14 @@ function landingsAfterGates(command) {
 // What a segment lands, where it lands at all: a ticket pull, a ticket open, a git commit or the commit verb. [[spec/design_output/bash#a-landing-follows-its-gate]]
 function landingOf(segment) {
   const words = wordsIn(segment);
-  if (baseName(words[0]) === "git") return afterGit(words)[0] === "commit" ? "git commit" : "";
+  if (baseName(words[0]) === "git")
+    return afterGit(words)[0] === "commit" ? "git commit" : "";
   const at = words.findIndex((one) => VERB_ROOTS.has(baseName(one)));
   if (at < 0) return "";
   const [verb, sub] = words.slice(at + 1);
   if (verb === "commit") return "./RUNME.sh commit";
-  if (verb === "ticket" && (sub === "pull" || sub === "open")) return `./RUNME.sh ticket ${sub}`;
+  if (verb === "ticket" && (sub === "pull" || sub === "open"))
+    return `./RUNME.sh ticket ${sub}`;
   return "";
 }
 
@@ -595,4 +600,3 @@ function lineOf(command, said) {
   if (at < 0) return 1;
   return String(command).slice(0, at).split("\n").length;
 }
-

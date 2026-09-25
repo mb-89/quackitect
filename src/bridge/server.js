@@ -85,7 +85,7 @@ import {
 import { TOOLS as handTools, SPECS as toolSpecs } from "./tools.js";
 import { registeredPort } from "./vehicle.js";
 import { helperReports, SPECS as waitSpecs, TOOLS as waitTools } from "./wait.js";
-import { marksKept, onRead, onWrite, schemasHere } from "./write.js";
+import { marksKept, onRead, onToolWrite, schemasHere } from "./write.js";
 
 const OK = 200;
 const NOT_FOUND = 404;
@@ -127,9 +127,11 @@ const TOOLS = {
   Grep: answersFromIndex,
   Glob: answersFromIndex,
   Read: onRead,
-  Write: onWrite,
-  Edit: onWrite,
-  MultiEdit: onWrite,
+  // [[spec/design_output/level0#a-write-names-its-ticket]]
+  Write: onToolWrite,
+  Edit: onToolWrite,
+  MultiEdit: onToolWrite,
+  NotebookEdit: onToolWrite,
   Bash: onBash,
   Agent: onAgent,
   [`mcp__level0__${FIND}`]: runsFind,

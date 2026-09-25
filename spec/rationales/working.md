@@ -142,6 +142,18 @@ One wrong line in it spends a box.
 So the owner reads the ask before it lands. That costs one reading, and it buys
 back every session the ask would misdirect.
 
+## 13. A write names its ticket
+
+The agent forgot to pick a ticket up and to put it down. An earlier design let
+a write pass on a ticket held, and a hold the agent forgets tells it nothing. The
+owner turned that design down. Every call that writes names the ticket it
+serves, so each write asks the agent again which ticket it works on.
+
+Edit and Write carry fields the harness fixes, so no ticket rides them. The door
+refuses them and points at `mcp__level0__patch`, whose `exact` op does the one
+spot Edit did. The rule once sent one spot to Edit, and that road now stands
+shut.
+
 ## 14. One place owns a thing
 
 A tree writes one concept in three places, and the three drift. Each reader

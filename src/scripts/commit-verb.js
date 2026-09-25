@@ -11,6 +11,7 @@ import {
 import { line } from "../../.claude/skills/level0/lib/refuse.js";
 import { formIn, refusesIn } from "../../.claude/skills/level0/lib/warnings.js";
 import { messageFaults, messageNote } from "../bridge/bash.js";
+import { MESSAGE_HOW, ticketFault, ticketOf } from "../engine/named.js";
 
 const USAGE = ['Usage: ./RUNME.sh commit "<message>" [<path>...] [--no-push]'];
 
@@ -19,6 +20,13 @@ export async function commitVerb(it, argv) {
   const [message = "", ...paths] = said.filter((one) => !one.startsWith("--"));
   if (!message) {
     for (const row of USAGE) console.log(row);
+    return 2;
+  }
+
+  // [[spec/design_output/level0#a-write-names-its-ticket]]
+  const unnamed = ticketFault(ticketOf(message), it, MESSAGE_HOW);
+  if (unnamed) {
+    console.error(unnamed);
     return 2;
   }
 
