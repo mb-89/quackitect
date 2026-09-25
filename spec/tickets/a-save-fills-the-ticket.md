@@ -96,7 +96,12 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor]
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: e2aab03f1ba38256155aa62fc11a14fdf9ed669a
+    hash_after: e2aab03f1ba38256155aa62fc11a14fdf9ed669a
 ---
 
 # Ask
@@ -126,17 +131,34 @@ Without it a person minting a ticket leaves the editor for the terminal, and lev
 
 <!-- the form is text -->
 
+The save rides the lens's own road, so the test holds it with no editor.
+
+| part | file | what it does |
+|---|---|---|
+| the choice | `src/extension/lib/lens.js`, `fillArgvOf(path, text)` | answers `ticket fill <path>` where the path names a ticket, `process` holds a value and `stepsIn` finds no step, and answers nothing otherwise |
+| the run | `src/extension/lib/lens.js`, `ticketLensOf(door).saved(path, text)` | runs the line through `door.runsVerb`, writes the answer to the log, and warns on a refusal |
+| the hook | `src/extension/editor-lens.js`, `onSave(run)` | hands every save under the ticket folders to `run` |
+| the wire | `src/extension/extension.js`, `activate` | hands `tickets.saved` to `door.onSave` |
+
+The fill writes the file on disk. The editor reloads a saved file it holds clean, so the person meets the route and the chapters. The progress title of `runsVerb` names the verb it runs, in place of a fixed `ticket pull`.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/extension/extension.js`, `activate`, which wires the save
+- `src/extension/lib/lens.js`, `ticketLensOf().took`, which calls `door.runsVerb`
+- `test/level0/lens.test.js`, the fake door behind `ticketLensOf`
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first
 
 ## review
 
