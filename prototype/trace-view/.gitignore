@@ -1,0 +1,9 @@
+# The build writes these next to its scripts, and each run writes them again.
+tree2.json
+gocov.json
+lcov.info
+cover-*.out
+*.built
+trace-view.html
+three/
+*.png
