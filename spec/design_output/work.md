@@ -242,6 +242,9 @@ group:
 | on `main`, the group the ticket's own `group` field names | the same close, since a desk works on `main` |
 | the successor stands open and names no group | the question that step asks, under the successor's `Discussion`, beside the ticket it comes from |
 
+The pull offers this hand-out on a ticket naming a group alone. A ticket in no
+group holds no branch up, so it waits for its person where it stands.
+
 A question rides the frontmatter on one line, so it carries its own lines as
 `\n`. The unblock writes them back under `Discussion`:
 
