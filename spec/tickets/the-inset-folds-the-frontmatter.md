@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: verdict
+step: implement/reflect
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -167,6 +167,12 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/the-inset-folds-the-frontmatter.md:384:166: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: verdict
+    hand: box 75b31b3d5012 · claude-code-remote · helper-8
+    hash_before: f196511b7b79e907e0314e3a7e8a3caf263826aa
+    hash_after: f196511b7b79e907e0314e3a7e8a3caf263826aa
+    returns: 1
+    why: "An edit in the YAML view that changes the node count calls `opened` again.; That reopens the drawing and folds the frontmatter under the person's cursor.; Fix: keep the YAML side on a height change, and reopen the page hidden.; Add a case: flip, change to a longer route, and assert no fold and a hidden page.; A side panel the person closes stays in the host, and a later post throws.; Fix: forget the page on the panel's `onDidDispose` event, and on the inset's too.; The rest meets the ask: the draw, the panel fallback, the flip and the redraw each carry a test.; The check answers exit 0, and no retro stands in the hand-back."
 group: the-editor-holds-the-drawing
 depends_on: ["the-editor-takes-an-inset", "the-ticket-answers-the-editor", "the-drawing-draws-a-route"]
 ---
@@ -416,17 +422,45 @@ The start also carries a case for the wire in `test/level0/sidebar.test.js`, whi
 
 <!-- the form is files -->
 
+- src/extension/lib/route-host.js
+- src/extension/editor-inset.js
+- src/extension/editor.js
+- src/extension/extension.js
+- src/extension/lib/lens.js
+- src/extension/package.json
+- test/level0/route-host.test.js
+- test/level0/sidebar.test.js
+- src/extension/editor-lens.js
+- src/extension/lib/drawing.js
+- src/scripts/bundle.js
+- .claude/skills/level0/lib/folders.js
+- spec/tickets/the-inset-folds-the-frontmatter.md
+- src/extension/webview/route/drawing.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+- An edit in the YAML view that changes the node count calls `opened` again.
+- That reopens the drawing and folds the frontmatter under the person's cursor.
+- Fix: keep the YAML side on a height change, and reopen the page hidden.
+- Add a case: flip, change to a longer route, and assert no fold and a hidden page.
+- A side panel the person closes stays in the host, and a later post throws.
+- Fix: forget the page on the panel's `onDidDispose` event, and on the inset's too.
+- The rest meets the ask: the draw, the panel fallback, the flip and the redraw each carry a test.
+- The check answers exit 0, and no retro stands in the hand-back.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The bundle folder repeats in `editor-inset.js`, and its comment points at the owning file.
+- The schema path and the flip command each stand in one constant.
 
 # Discussion
 
