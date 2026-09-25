@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -136,6 +136,11 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/the-host-runs-the-verbs.md:214:1: Shape: A run holds 3 paragraphs with no list, table or diagram between th"
+  - step: verdict
+    hand: box 75b31b3d5012 · claude-code-remote · helper-12
+    hash_before: 32b52d85d64cf726ef2a30dce5fde48ba3fb0446
+    hash_after: 32b52d85d64cf726ef2a30dce5fde48ba3fb0446
+reason: done
 ---
 
 # Ask
@@ -373,17 +378,46 @@ A refused route edit raises a warning naming why, and the log holds the verb's l
 
 <!-- the form is files -->
 
+- src/extension/lib/route-host.js
+- src/extension/lib/lens.js
+- src/extension/editor-inset.js
+- src/extension/editor-lens.js
+- src/extension/editor.js
+- src/extension/webview/route/drawing.js
+- src/scripts/ticket-route.js
+- test/level0/route-host.test.js
+- test/level0/lens.test.js
+- spec/tickets/the-host-runs-the-verbs.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+Every line of the ask holds, and no hunk is wrong.
+
+- A jump calls `door.jumps` with the node's line, and the editor selects one line up.
+- An edit saves first, then runs `ticket route` with the whole list the page posts.
+- A take and a hand-back ride `ticketLensOf().took`, the road the buttons run.
+- A verdict leaf hands back with no flag, and another leaf asks pass or fail.
+- A refused route raises the verb's `refused` field as a warning, and a test drives it.
+- The page posts `line` and `steps`, the fields the host reads.
+- `./RUNME.sh check` answers 0, with one shape warning in this ticket's prose.
+- Each press carries a test, and the refusal cases feed bad answers and assert the warning.
+- No handback retro stands here yet, since the retro step follows.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `routeArgvOf` stands once in the lens, and the host imports it.
+- The hand-back reuses the lens road, so the argv stands once in `argvOf`.
+- New comments point at this ticket instead of repeating the approach.
 
 # Discussion
 
