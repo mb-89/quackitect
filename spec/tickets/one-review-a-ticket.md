@@ -94,13 +94,17 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/review
+step: implement/tests-red
 todo: true
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
     hash_before: 783c6897343e892e2b01e854d7b0c053c6b2ae4f
     hash_after: 783c6897343e892e2b01e854d7b0c053c6b2ae4f
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-2
+    hash_before: 4e556f8c584107510c5cb8aeed2a70d2b753bce3
+    hash_after: 4e556f8c584107510c5cb8aeed2a70d2b753bce3
 ---
 
 # Ask
@@ -195,6 +199,17 @@ The tests:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- `passed` receives no rows: `verdictIn` in `src/scripts/pull-chapter.js` joins the rows under the pass with "; ". Make it return the rows, and have `handBack` hand them to `passed`.
+- `failed` lands and pushes before it reads the cap. Call `withPersonStep` before `landed`, so the person step rides the fail commit.
+- `withPersonStep` answers an empty path past `work.stepsBeforeSplit`. Keep the wait answer as the fallback there.
+- `refused` calls `failed` past `work.refusalsBeforeFail`, so a refusal cap reaches the owner road too. Say whether it counts, and test the answer.
+- The test "a step failing back past the cap drops the hold, answers wait, and writes no step" in `test/level0/pull-steps.test.js` asserts the old road. Name it for the rewrite.
+- `spec/processes/group.yaml` reads `spec/guidance/working` alone, so no route reads `spec/guidance/review/reviewing.md` after the change. Say what becomes of it, and fix the reader list in `spec/design_output/review.md`.
+- A ticket state is draft, open or closed, and `todo` is the queue tag. A minted child stands at `draft`, so write that in the approach and the test.
+- `spec/design_output/pull.md` names `failsBeforePerson` beside the weights. Fold that line into the rename, and rename `.claude/commands/se-config-work-failsBeforeWait.md` with the key.
+- `runIn` and `cliOf` in `src/engine/retro/mint.js` stay unexported. Export the mint call the child reuses.
 
 # implement
 
