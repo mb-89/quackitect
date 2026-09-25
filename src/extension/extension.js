@@ -37,6 +37,8 @@ async function activate(context, given) {
   const tickets = ticketLensOf(door);
   door.registers(COMMAND, tickets.took);
   door.lenses?.(tickets);
+  // [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+  door.onSave?.(tickets.saved);
 
   // [[spec/design_output/extension#runme-opens-the-panel]]
   if ((await door.read(SHOW)).trim()) {

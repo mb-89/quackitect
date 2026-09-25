@@ -51,6 +51,15 @@ function lensDoor(context, folder) {
       }
     },
 
+    // A save under the ticket folders hands its path and text on. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+    onSave(run) {
+      context.subscriptions.push(
+        vscode.workspace.onDidSaveTextDocument((doc) => {
+          if (doc.uri.scheme === "file") run(pathOf(doc.uri), doc.getText());
+        }),
+      );
+    },
+
     async asksLine(prompt) {
       return (await vscode.window.showInputBox({ prompt, ignoreFocusOut: true })) ?? "";
     },
@@ -74,7 +83,7 @@ function lensDoor(context, folder) {
       return vscode.window.withProgress(
         {
           location: vscode.ProgressLocation.Notification,
-          title: `ticket pull ${argv.slice(2).join(" ")}`,
+          title: argv.join(" "),
         },
         () => ranOf(join(home, ...CLI.split("/")), argv, root),
       );

@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -127,6 +127,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 12e14e40c596243c4e7546f3608aab2c004c7922
+    hash_after: 12e14e40c596243c4e7546f3608aab2c004c7922
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -164,7 +172,6 @@ The save rides the lens's own road, so the test holds it with no editor.
 | the run | `src/extension/lib/lens.js`, `ticketLensOf(door).saved(path, text)` | runs the line through `door.runsVerb`, writes the answer to the log, and warns on a refusal |
 | the hook | `src/extension/editor-lens.js`, `onSave(run)` | hands every save under the ticket folders to `run` |
 | the wire | `src/extension/extension.js`, `activate` | hands `tickets.saved` to `door.onSave` |
-
 | the tests | `test/level0/lens.test.js` | the choice over a picked process, a standing route and an empty `process`, and `saved` over a fake door |
 | the road | `test/level0/save-fills.test.js` | `saved` over a door whose `runsVerb` runs the `ticket` verb over the fake disk `ticket-fill.test.js` builds, and the saved file carries `steps`, `process_hash` and a chapter per step |
 
@@ -188,7 +195,7 @@ The wire calls `door.onSave?.`, so the fake door `doorOf` in `test/level0/sideba
 
 <!-- the form is list -->
 
-- the design finding on a test proving the route and chapters: `test/level0/save-fills.test.js` runs the verb over a fake disk and reads the saved file
+- the design finding on the route and chapters: `test/level0/save-fills.test.js` runs the verb over a fake disk
 - the craft finding on `doorOf`: the wire calls `door.onSave?.`, and the callers list names the fake
 - the craft finding on `runsVerb`: the callers list names it
 
@@ -208,7 +215,7 @@ pass
 |---|---|---|
 | ask | the three done lines map to `fillArgvOf` over a picked process, a standing route and an empty `process`, and `ticket fill` holds the mint's road | none |
 | answers | the three findings of the earlier review each carry an answer: `save-fills.test.js`, `door.onSave?.` with `doorOf` named, and `runsVerb` named | none |
-| craft | the wire in `activate` carries no test, so a save that never reaches `saved` passes every test named | add a test in `test/level0/sidebar.test.js` that sets `door.onSave` and asserts it gets `tickets.saved`, the way the lens test reads `door.lenses` |
+| craft | the wire in `activate` carries no test, so a save that skips `saved` passes every test named | add a test in `test/level0/sidebar.test.js` that sets `door.onSave` and asserts it gets `tickets.saved`, the way the lens test reads `door.lenses` |
 | craft | a blank line splits the approach table, so the rows `the tests` and `the road` fall outside it | drop the blank line above `the tests` |
 
 # implement
@@ -231,7 +238,7 @@ pass
 
 <!-- the form is text -->
 
-The cases a stub `fillArgvOf` and `saved` leave red are the fill over a picked process, the run of `saved`, the road through the verb, and the wire in `activate`. The cases on a standing route and an empty `process` stand green on the stub, since both answer nothing. The lens test imports a CommonJS module, so a missing export fails the whole file on import, and the stub moves that failure onto the assertions.
+A stub `fillArgvOf` and `saved` leaves these cases red: the fill over a picked process, the run of `saved`, the road through the verb, and the wire in `activate`. The cases on a standing route and an empty `process` stand green on the stub, since both answer nothing. The lens test imports a CommonJS module, so a missing export fails the whole file on import. The stub moves that failure onto the assertions.
 
 ### checked
 
@@ -239,7 +246,7 @@ The cases a stub `fillArgvOf` and `saved` leave red are the fill over a picked p
 
 <!-- the form is checklist -->
 
-- the tests touch the lens, its tests, the sidebar test and one new test file, all of which the approach names
+- the tests touch the lens, its tests, the sidebar test and one new test file, and the approach names each
 - the road runs the verb over `fakeDisk`, and the lens cases run over the fake door the lens test builds
 - `save-fills.test.js` and each new case name the design input's heading on a ticket picking a process
 
@@ -269,11 +276,17 @@ The cases a stub `fillArgvOf` and `saved` leave red are the fill over a picked p
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the lens, the lens door, the start and the tests the approach names
+- the save reaches `runsVerb`, which the lens test and `save-fills.test.js` fake
+- `fillArgvOf`, `saved`, `onSave` and the wire each name the design input's heading on a ticket picking a process
 
 ## tests-green
 
