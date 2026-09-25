@@ -286,10 +286,13 @@ The installer links it beside the extension, so no copy travels.
 
 ## A finding is a diagnostic
 
-`drawsAs` turns one finding into one diagnostic. The rule is the code, the
-message is the text, and a warning draws as a warning. The range runs from the
-column to the end of the line. A finding counts its line and column from one
-and the editor from zero, so the draw takes one off each.
+`drawsAs` turns one finding into one diagnostic. The rule is the code, and the
+message is the text. Each severity draws at the Language Server Protocol's
+level of the same name: an error, a warning, or a hint. A hint draws as a
+faint mark under the text alone, and the Problems panel holds no row for it.
+The range runs from the column to the end of the line. A finding counts its
+line and column from one and the editor from zero, so the draw takes one off
+each.
 
 A finding counts its column in bytes, and the editor in UTF-16 units. So
 `unitsTo` in `src/lsp/columns.go` turns the column, and a line carrying `ä` or
@@ -455,13 +458,16 @@ one, see [[spec/design_output/schema#the-verbs-own-their-fields]].
 
 `engineFaults` in `src/lsp/owned.go` reads an open buffer against the file the
 index holds. Where the value of such a key differs, it draws
-`EngineOwnsField` at warning, on the line of that key:
+`EngineOwnsField` at hint, on the line of that key. `hint` in
+`src/lsp/finding.go` owns the level, and
+[[spec/design_output/lsp#a-finding-is-a-diagnostic]] says what it draws as.
 
 | the buffer | what draws |
 |---|---|
 | an engine key standing as the file holds it | nothing |
-| an engine key the buffer changes | a warning naming the verbs, because the next pull writes over the edit |
-| an engine key the buffer drops | a warning, on the frontmatter's first line |
+| an engine key the buffer changes | a hint naming the verbs, because the next pull writes over the edit |
+| an engine key the buffer drops | a hint, on the frontmatter's first line |
 | a file no editor holds | nothing, so the sweep and the check draw nothing |
 
-A person edits what they like, so the warning refuses nothing.
+A person edits what they like, so the hint refuses nothing, and stands off
+the Problems panel.

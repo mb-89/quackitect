@@ -1,6 +1,6 @@
 // A field the verbs write, weighed in an open buffer against the file the
 // index holds. A person's edit there stands, and the next pull writes over it,
-// so the panel warns and refuses nothing.
+// so the panel hints and refuses nothing. hint in finding.go owns the level.
 // [[spec/design_output/lsp#an-engine-field-warns]]
 package main
 
@@ -14,7 +14,7 @@ import (
 // [[spec/design_output/lsp#an-engine-field-warns]]
 const EngineOwnsField = "EngineOwnsField"
 
-// A warning on each engine key the buffer writes other than the file does. A file no editor holds draws nothing. [[spec/design_output/lsp#an-engine-field-warns]]
+// A hint on each engine key the buffer writes other than the file does. A file no editor holds draws nothing. [[spec/design_output/lsp#an-engine-field-warns]]
 func engineFaults(tree *Tree, path string) []Finding {
 	if !tree.Held(path) {
 		return nil
@@ -48,7 +48,7 @@ func engineFaults(tree *Tree, path string) []Finding {
 		if line == 0 {
 			line = 1
 		}
-		out = append(out, warn(EngineOwnsField, path, line,
+		out = append(out, hint(EngineOwnsField, path, line,
 			"The verbs write "+key+", as ./RUNME.sh ticket pull does, and the next pull writes over this edit."))
 	}
 	return out

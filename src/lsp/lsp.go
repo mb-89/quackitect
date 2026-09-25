@@ -21,8 +21,10 @@ const (
 	Version         = "0.1.0"
 	severityError   = 1
 	severityWarning = 2
-	driveColon      = 2
-	methodNotFound  = -32601
+	// The Language Server Protocol's hint level: a faint mark under the text, and no row in the Problems panel. [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
+	severityHint   = 4
+	driveColon     = 2
+	methodNotFound = -32601
 )
 
 type message struct {
@@ -198,8 +200,11 @@ func drawsAs(said Finding, rows []string) diagnostic {
 	}
 
 	severity := severityError
-	if said.Severity == SeverityWarning {
+	switch said.Severity {
+	case SeverityWarning:
 		severity = severityWarning
+	case SeverityHint:
+		severity = severityHint
 	}
 	return diagnostic{
 		Range:    span{Start: position{Line: line, Character: start}, End: position{Line: line, Character: end}},

@@ -8,6 +8,8 @@ import "sort"
 const (
 	SeverityError   = "error"
 	SeverityWarning = "warning"
+	// A hint draws under the text alone, off the Problems panel. [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
+	SeverityHint = "hint"
 )
 
 type Finding struct {
@@ -23,6 +25,11 @@ type Finding struct {
 
 func fault(rule, file string, line int, message string) Finding {
 	return Finding{File: file, Rule: rule, Line: line, Column: 1, Message: message, Severity: SeverityError}
+}
+
+// A finding a person acts on at their own pace, not one the Problems panel lists. [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
+func hint(rule, file string, line int, message string) Finding {
+	return Finding{File: file, Rule: rule, Line: line, Column: 1, Message: message, Severity: SeverityHint}
 }
 
 // [[spec/design_output/tree#what-a-rule-answers]]

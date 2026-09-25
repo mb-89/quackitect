@@ -55,7 +55,7 @@ func TestAnEngineFieldTheBufferChangesWarns(t *testing.T) {
 
 	tree.Holds("spec/tickets/a.md", strings.Replace(heldTicket, "state: open", "state: closed", 1))
 	one := onlyOne(t, checker.Over("spec/tickets/a.md"), EngineOwnsField)
-	if one.Line != 3 || one.Severity != SeverityWarning || !strings.Contains(one.Message, "./RUNME.sh ticket pull") {
+	if one.Line != 3 || one.Severity != SeverityHint || !strings.Contains(one.Message, "./RUNME.sh ticket pull") {
 		t.Fatalf("the state edit draws %+v", one)
 	}
 	if found := checker.Sweep(); names(found, EngineOwnsField) != 0 {
@@ -73,8 +73,8 @@ func TestAnEngineFieldTheBufferChangesWarns(t *testing.T) {
 	}
 }
 
-// The warning reaches the editor at severity two. [[spec/design_output/lsp#an-engine-field-warns]]
-func TestAnEngineFieldDrawsAsAWarning(t *testing.T) {
+// The hint reaches the editor at severity four, off the Problems panel the way a warning or an error lists there. [[spec/design_output/lsp#an-engine-field-warns]]
+func TestAnEngineFieldDrawsAsAHint(t *testing.T) {
 	tree := ownedTree(t)
 	uri := uriOf(filepath.Join(tree.Root, "spec", "tickets", "a.md"))
 	open := fmt.Sprintf(`{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":%q,"text":%q}}}`,
@@ -84,7 +84,7 @@ func TestAnEngineFieldDrawsAsAWarning(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, one := range drawnOn(spoken(t, out.String()), uri) {
-		if one.Code == EngineOwnsField && one.Severity == severityWarning && one.Range.Start.Line == 2 {
+		if one.Code == EngineOwnsField && one.Severity == severityHint && one.Range.Start.Line == 2 {
 			return
 		}
 	}
