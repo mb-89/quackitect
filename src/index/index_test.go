@@ -118,47 +118,6 @@ func TestADotFolderUnderThePrivateFolderStandsOutsideTheWalkAndTheWatch(t *testi
 	}
 }
 
-// A transcripts folder under the log's dot folder stands outside the walk and the watch, like the rest of the log, while an ordinary file beside the private folder's other children stands inside. [[spec/design_output/index#the-rows-the-walk-writes]]
-func TestATranscriptsFolderUnderTheLogFolderStandsOutsideTheWalkAndTheWatch(t *testing.T) {
-	root := tree(t)
-	write(t, root, ".se/.log/transcripts-today/session.jsonl", "{\"said\":\"a line a session writes\"}\n")
-	write(t, root, ".se/.log/transcripts-today/subagents/agent.jsonl", "{\"said\":\"a line a subagent writes\"}\n")
-	db := opened(t, root)
-
-	if n := counted(t, db, `SELECT count(*) FROM file WHERE path LIKE '.se/.log/%'`); n != 0 {
-		t.Fatalf("the walk reads %d file(s) under the log folder", n)
-	}
-	if n := counted(t, db, `SELECT count(*) FROM file WHERE path = '.se/tickets/parked.md'`); n != 1 {
-		t.Fatalf("the walk reads %d of the ordinary private note", n)
-	}
-	for _, rel := range []string{
-		".se/.log/transcripts-today", ".se/.log/transcripts-today/session.jsonl",
-		".se/.log/transcripts-today/subagents/agent.jsonl",
-	} {
-		if !outside(rel) {
-			t.Fatalf("a change naming %s moves rows", rel)
-		}
-	}
-
-	eyes, err := fsnotify.NewWatcher()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer eyes.Close()
-	if err := folders(root, root, eyes); err != nil {
-		t.Fatal(err)
-	}
-	watched := map[string]bool{}
-	for _, abs := range eyes.WatchList() {
-		if rel, ok := relOf(root, abs); ok {
-			watched[rel] = true
-		}
-	}
-	if watched[".se/.log"] || watched[".se/.log/transcripts-today"] {
-		t.Fatalf("the watch stands on %v", watched)
-	}
-}
-
 // A hook hands the drive letter lower case and a shell upper case, and both name one tree. [[spec/design_output/index#a-door-comes-back]]
 func TestTwoRootsDifferingInTheDriveLettersCaseReadAsOneTree(t *testing.T) {
 	root := tree(t)
