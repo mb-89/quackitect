@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -129,6 +129,10 @@ record:
     hand: box 75b31b3d5012 · claude-code-remote
     hash_before: 39813f51c8b57783c2dd1b2e4dcdec1ee5509d1e
     hash_after: 39813f51c8b57783c2dd1b2e4dcdec1ee5509d1e
+  - step: design/draft
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 662875782b2e85ca3eeb82649d837ccc0923990c
+    hash_after: 662875782b2e85ca3eeb82649d837ccc0923990c
 group: the-editor-holds-the-drawing
 depends_on: ["the-editor-takes-an-inset", "the-ticket-answers-the-editor", "the-drawing-draws-a-route"]
 ---
@@ -179,15 +183,18 @@ The probe's `decide` waits on the owner. So the host tries the inset, and opens 
 |---|---|---|
 | the host | `src/extension/lib/route-host.js`, `routeHostOf(door)` | holds one drawing a ticket, and which side each shows. It calls no `vscode`, so a test drives it over a fake door |
 | the open | `routeHostOf().opened(path, text)` | asks the door for a page over the first line, folds the frontmatter, and draws nothing past a path `drawable` refuses |
-| the message | `routeHostOf().graphOf(path, text)` | answers `graph` out of `graphIn`, `steps` out of the frontmatter `readNote` reads, and `held` out of the holds `holdsIn` reads |
+| the message | `routeHostOf().graphOf(path, text)` | answers `graph` out of `graphIn`, `steps` out of the frontmatter `readNote` reads, and `held` where a hold `personHolds` reads names the ticket. `graphIn` loads through `door.imports(EMITTER)`, and `readNote` through `door.imports(".claude/skills/level0/lib/schema.js")`, as `graphAt` loads the emitter |
 | the answer | `routeHostOf().took(path, message)` | answers `ready` with `graph` and `theme`, and hands `jump`, `take`, `handback` and `edit` on to [[spec/tickets/the-host-runs-the-verbs]] |
 | the redraw | `routeHostOf().changed(path, text)` | posts `graph` again over the text the editor holds |
 | the flip | `routeHostOf().flipped(path)` | hides the page and unfolds the frontmatter, or shows the page and folds it again |
 | the flip button | `routeHostOf().lenses(path)` | a lens on the first line of every drawable ticket, whatever its `state`, reading `Show the YAML` or `Show the drawing`. It runs the command `quackitect.route.flip` with the path |
-| the door | `src/extension/editor-inset.js`, `insetDoor(context, folder)` | `page(path)` calls `createWebviewTextEditorInset` where the call stands, and `createWebviewPanel` beside the text otherwise. `folds` and `unfolds` run `editor.fold` and `editor.unfold` on the first line |
+| the door | `src/extension/editor-inset.js`, `insetDoor(context, folder)` | `page(path, lines)` calls `createWebviewTextEditorInset` where the call stands, and `createWebviewPanel` beside the text otherwise. `folds` and `unfolds` run `editor.fold` and `editor.unfold` on the first line |
+| the events | `insetDoor().onEditors(run)`, `onChange(run)`, `onTheme(run)` | `onDidChangeVisibleTextEditors` calls `opened` on each ticket shown, and so covers a switch of the active editor. `onDidChangeTextDocument` calls `changed`, and `onDidChangeActiveColorTheme` posts `theme` again |
+| the theme | `insetDoor().theme()` | reads `activeColorTheme.kind`, and answers `light` for the light kinds and `dark` otherwise |
+| the height | `routeHostOf().linesOf(graph)` | the inset's height in lines, one per node the layout stacks, between a floor and a ceiling the host names. A change of height opens the inset again at the new height, as the probe's grow did. The page's protocol holds no size message, so the host reads the height off the graph |
 | the script | `src/extension/editor-inset.js`, `DRAWING` | the bundle's folder `src/scripts/bundle.js` writes, spelled again because the extension bundles alone. The page names it and the extension's own folder under `localResourceRoots` |
 | the manifest | `src/extension/package.json` | names `editorInsets` under `enabledApiProposals`, and the flip command |
-| the wire | `src/extension/extension.js`, `activate` | registers the flip command, and adds the flip lens beside the ticket lens. It opens the host on each visible ticket and each change of the active editor |
+| the wire | `src/extension/extension.js`, `activate` | registers the flip command, and adds the flip lens beside the ticket lens. It hands the host to `door.onEditors?.`, `door.onChange?.` and `door.onTheme?.`, so the fake `doorOf` carrying none of them stays green |
 
 The tests stand in `test/level0/route-host.test.js`, over a fake door:
 
@@ -197,6 +204,8 @@ The tests stand in `test/level0/route-host.test.js`, over a fake door:
 | the side panel stands in where the inset fails | a door refusing the inset opens the panel, and the page gets the same messages |
 | the flip shows the YAML and back | a flip hides the page and unfolds, a second shows and folds, and the lens title follows |
 | a change redraws the drawing | `changed` posts a `graph` carrying the new route |
+| a theme change reaches the page | `onTheme` posts `theme` with the kind the door answers |
+| a longer route opens a taller inset | a graph with more nodes asks the door for a page at more lines |
 | a closed ticket carries the flip | the lens stands on a ticket whose `state` reads `closed` |
 | the verbs wait for the next ticket | `take`, `handback`, `edit` and `jump` post nothing and run nothing |
 
@@ -210,8 +219,8 @@ The tests stand in `test/level0/route-host.test.js`, over a fake door:
 - `src/extension/editor.js`, `editorDoor`, which spreads the inset door beside the lens door
 - `src/extension/editor-lens.js`, `lenses`, whose provider now answers the flip lens beside the ticket lens
 - `src/extension/lib/drawing.js`, `drawable` and `EMITTER`, which the host reads
-- `src/extension/lib/lens.js`, `holdsIn`, which the host reads `held` through
-- `test/level0/sidebar.test.js`, `doorOf`, the fake door `activate` takes, which carries no inset and stays as it stands
+- `src/extension/lib/lens.js`, `holdsIn` and `personHolds`, which the host reads `held` through, and which the change exports
+- `test/level0/sidebar.test.js`, `doorOf`, the fake door `activate` takes, which carries no inset and stays as it stands behind the `?.` calls
 
 ### answers
 
@@ -226,6 +235,12 @@ The tests stand in `test/level0/route-host.test.js`, over a fake door:
 - the jump: the host hands it on beside `take`, `handback` and `edit`
 - `steps` and `held`: the message table names where each comes from
 - the bundle's folder: `DRAWING` names it, and `localResourceRoots` holds it
+- the editor events: the events row names each, and the tests drive `opened` and `changed`
+- the theme: `theme()` reads the kind, and `onTheme` posts it again
+- the height: `linesOf` answers it off the graph, and a change of height opens the inset again
+- `personHolds`: `lens.js` exports it, and the host reads `held` through it
+- the modules: the message row names the `door.imports` call for each
+- the guard: `activate` calls each new door function through `?.`
 
 ## review
 
