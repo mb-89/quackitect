@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box d6f05e3a585030 · claude-code
@@ -103,6 +103,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: fbf4857274f53c30a3dc901f25e30fe2d3a126c4
+    hash_after: fbf4857274f53c30a3dc901f25e30fe2d3a126c4
 ---
 
 # Ask
@@ -173,11 +177,21 @@ A person takes a ticket, works it and hands it back from VS Code alone, and that
 
 <!-- the form is list -->
 
+- [[spec/tickets/a-save-fills-the-ticket]]: a save over a picked process and an empty route runs `ticket fill`
+- [[spec/tickets/the-inset-folds-the-frontmatter]]: the drawing stands over the folded frontmatter, in an inset or a side panel, with a flip lens
+- [[spec/tickets/the-host-runs-the-verbs]]: a jump, a route edit, a take and a hand-back run from the drawing
+- [[spec/tickets/the-work-group-draws-buttons]]: the sidebar draws the work editor with its count, pull for me and new ticket
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- a fake door drove every press with no editor, since the lens splits each choice from its vscode call
+- the take and the hand-back from the drawing ride `ticketLensOf().took`, so the drawing and the buttons share one road
+- a second hand read every draft and every diff, and caught the overwritten tests before the push
+- the side panel stands in for the inset, so the work went on while the probe waits
 
 ### badly
 
@@ -185,11 +199,23 @@ A person takes a ticket, works it and hands it back from VS Code alone, and that
 
 <!-- the form is list -->
 
+- tests-red wrote two test files over standing names through a shell redirect, at `ed79e730`. The verdict at `9843715f` caught it
+- the fold's draft left out the events, the theme, the height and the imports. It failed review at `4fd4f907` and `39813f51`
+- the fold's change landed with a wire case throwing a `TypeError`, at `e45673ac`, since no test ran before the hand-back
+- the commit hook refused three change commits carrying code and no test, since the tests had landed at tests-red
+- a blanket rename rewrote the record's `why` and the reviewers' text. The diff caught it before the commit
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- a new file goes through the Write tool, which refuses an unread path. Home: `AGENTS.md`, under a rule on new files
+- the draft names every event, door call and import the approach reaches. Home: the `design/draft` checklist of `spec/processes/standard`
+- the change step runs the ticket's own test command before the hand-back. Home: `needs` on `implement/change` in `spec/processes/standard`
+- the change step says a code commit carries a test edit, even where tests-red wrote the file. Home: `spec/guidance/code/testing`, rule five
+- an edit over a ticket reaches the hand's own field alone. Home: the write door on tickets
 
 ### thoughts
 
@@ -197,11 +223,26 @@ A person takes a ticket, works it and hands it back from VS Code alone, and that
 
 <!-- the form is text -->
 
+The reviews earned their cost. Each fail named a gap the code carried toward the editor:
+
+- an unwired event
+- a refold under the cursor
+- a lost page
+- two lost test files
+
+The drafts ran thin where the approach reached vscode. The fake door answered each call, so the draft left each call unnamed.
+
+The probe's `decide` still waits on the owner. The host tries the inset first and falls back to the side panel, so either answer holds. The owner's own look at the editor stays the one proof no box gives.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the retro points at each ticket and each file, and restates none of their fields
+- the inset's floor, ceiling and lines a node carry names in `route-host.js`. The bundle folder's copy says why beside it
+- each new file's header says what it is for, and counts nothing
 
 ## cloud
 
