@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/reflect
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -173,6 +173,10 @@ record:
     hash_after: f196511b7b79e907e0314e3a7e8a3caf263826aa
     returns: 1
     why: "An edit in the YAML view that changes the node count calls `opened` again.; That reopens the drawing and folds the frontmatter under the person's cursor.; Fix: keep the YAML side on a height change, and reopen the page hidden.; Add a case: flip, change to a longer route, and assert no fold and a hidden page.; A side panel the person closes stays in the host, and a later post throws.; Fix: forget the page on the panel's `onDidDispose` event, and on the inset's too.; The rest meets the ask: the draw, the panel fallback, the flip and the redraw each carry a test.; The check answers exit 0, and no retro stands in the hand-back."
+  - step: implement/reflect
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: ddb6b949009f269a33e017981e0018fddb903d66
+    hash_after: ddb6b949009f269a33e017981e0018fddb903d66
 group: the-editor-holds-the-drawing
 depends_on: ["the-editor-takes-an-inset", "the-ticket-answers-the-editor", "the-drawing-draws-a-route"]
 ---
@@ -342,11 +346,24 @@ A stub host answering nothing leaves every case red but the one on a note outsid
 
 <!-- the form is text -->
 
+Both findings share one class: the host holds a page's state, and an event outside the host moves that state with no word to it.
+
+| the event | what the host held | the fix |
+|---|---|---|
+| an edit changing the height, under the YAML side | the side each ticket shows | the reopen keeps the side, and opens the page hidden with no fold |
+| a close of the panel or the inset | the page itself | the door hands a close to the host through `onGone`, and the host forgets the page |
+
+The fix for the class: every state the host holds changes through the host alone, and the door reports each close it sees. A test drives each event.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fix stays in the host, the inset door and the host test
+- the fake page gains `onGone`, so a test closes a page
+- the fix carries the pointer the host already holds
 
 ## change
 
