@@ -96,7 +96,12 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor, a-save-fills-the-ticket]
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 71b21c6846ab7a4b348874ba61258361a4c6e63d
+    hash_after: 71b21c6846ab7a4b348874ba61258361a4c6e63d
 ---
 
 # Ask
@@ -127,17 +132,39 @@ Without it a person reaches the queue and a new ticket through the terminal alon
 
 <!-- the form is text -->
 
+The config already declares the buttons, and the sidebar draws a group where an entry names it. So the change marks the buttons' group, and teaches the sidebar the keys the entries carry.
+
+| part | file | what it does |
+|---|---|---|
+| the group | `spec/config/level0.schema.json`, `work.editor`, `work.pull`, `work.new` | each names `group: work`, a row and a column, so `groupsIn` draws them |
+| the count | `src/extension/sidebar.js`, `html` | runs the line an entry's `counts` names through `door.runsVerb`, and hands the answer to the panel |
+| the badge | `src/extension/lib/panel.js`, `widget` | draws the count beside the mark |
+| the pull | `src/extension/sidebar.js`, `took` | where the entry carries `pulls`, runs its line, pulls the ticket the answer names, and opens its path |
+| the new ticket | `src/extension/sidebar.js`, `took` | where the entry carries `opens`, asks for the name, writes a ticket with `kind` and an empty `process` where no file stands, and opens it |
+| the answers | `src/extension/lib/work.js` | reads the count and the next ticket off the verb's JSON, turns a name into a path, and holds the new ticket's text. It calls no editor, so a test reads every string |
+| the door | `src/extension/editor-files.js`, `opens(path)` | opens a file in the markdown editor |
+
+The pull runs as a person, through the same `runsVerb` the ticket buttons run. The fill on save then writes the new ticket's route. For details, see [[spec/tickets/a-save-fills-the-ticket]].
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/extension/extension.js`, `activate`, which hands the sidebar its door
+- `src/extension/editor.js`, `editorDoor`, which spreads the file door and the lens door the sidebar now calls
+- `src/extension/lib/panel.js`, `panelHtml`, which draws the badge
+- `src/extension/lib/widgets.js`, `groupsIn`, which reads the group the config names
+- `test/level0/sidebar.test.js`, `doorOf`, which gains `runsVerb` and `opens`
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first
 
 ## review
 
