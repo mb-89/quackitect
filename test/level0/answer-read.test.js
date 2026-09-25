@@ -1,6 +1,6 @@
-// The answer gate at the server's stop door: a draft past the ceiling holds the
-// turn with its findings, a clean one ends, and the holds in a row stop at the
-// tooth's own limit.
+// The answer gate at the server's stop door: a draft past the warning edge
+// holds no turn, and its findings ride the next call of the agent's own and
+// the log.
 // [[spec/design_output/level0#the-gate-reads-the-answer]]
 
 import assert from "node:assert/strict";
@@ -59,41 +59,42 @@ function served(found) {
 
 const stops = (box, e = { last_assistant_message: TEXT }) =>
   decide({ event: "classic.Stop", e }, box);
+const calls = (box, e = { tool: "Read", file_path: at("one.md") }) =>
+  decide({ event: "tool.call", e }, box);
 const blockOf = (said) => String(said?.result?.block ?? "");
+const contextOf = (said) => String(said?.after?.context?.join("\n") ?? "");
+const RIDES = /The gate read your last answer at rewrite, and it stands as sent/;
 
-// [[spec/design_output/level0#the-gate-reads-the-answer]]
-test("a draft past the ceiling holds the turn at the stop door, with its findings", async () => {
+// A break of form in an answer warns: the turn goes on to the tooth, and the findings ride the next call. [[spec/design_output/level0#the-findings-ride-the-call]]
+test("a draft past the ceiling holds no turn, and its findings ride the next call once, and the log", async () => {
   const { box, reads } = served(FOUND);
 
   const said = await stops(box);
 
   assert.deepEqual(reads, [TEXT], "the gate reads the turn's last text");
-  assert.match(blockOf(said), REFUSES);
-  assert.match(blockOf(said), /Jargon/);
+  assert.doesNotMatch(blockOf(said), REFUSES, "the gate holds no turn");
+  assert.doesNotMatch(blockOf(said), /Jargon/);
+  const warned = box.log.lines().filter((one) => one.level === "warn" && one.kind === "gate");
+  assert.equal(warned.length, 1, "the log carries the warning");
+  assert.match(String(warned[0].detail), /VoiceVale\.Jargon/);
+
+  const helper = await calls(box, { tool: "Read", file_path: at("one.md"), agentId: "a1" });
+  assert.doesNotMatch(contextOf(helper), RIDES, "a helper's call carries none");
+  const next = await calls(box);
+  assert.match(contextOf(next), RIDES);
+  assert.match(contextOf(next), /Jargon/);
+  assert.doesNotMatch(contextOf(await calls(box)), RIDES, "the note rides once");
 });
 
 // [[spec/design_output/level0#the-gate-reads-the-answer]]
-test("a clean draft passes the gate to the tooth", async () => {
+test("a clean draft passes the gate to the tooth, and nothing rides", async () => {
   const { box, reads } = served([]);
 
   const said = await stops(box);
 
   assert.equal(reads.length, 1);
   assert.doesNotMatch(blockOf(said), REFUSES);
-});
-
-// The gate holds ahead of the tooth, so the same limit bounds it. [[spec/design_output/level0#the-gate-reads-the-answer]]
-test("the gate holds as many turns in a row as stop.mostInARow names, and lets the next one go", async () => {
-  const { box } = served(FOUND);
-
-  assert.match(blockOf(await stops(box)), REFUSES);
-  assert.match(blockOf(await stops(box)), REFUSES);
-  assert.doesNotMatch(
-    blockOf(await stops(box)),
-    REFUSES,
-    "the third stop goes past the gate",
-  );
-  assert.match(blockOf(await stops(box)), REFUSES, "the count starts again");
+  assert.doesNotMatch(contextOf(await calls(box)), RIDES);
 });
 
 // [[spec/design_output/level0#the-gate-reads-the-answer]]
@@ -122,7 +123,7 @@ test("the reading answers the band, the score and the findings of a draft", asyn
 });
 
 // The band tells the owner nothing to act on, so the line stands at debug under its own kind. [[spec/design_output/level0#the-three-bands]]
-test("the reading and the hold write a draft line at debug, and no answer line", async () => {
+test("the reading writes a draft line at debug, and no answer line", async () => {
   const { box } = served(FOUND);
 
   await stops(box);
@@ -130,10 +131,7 @@ test("the reading and the hold write a draft line at debug, and no answer line",
   const drafts = box.log.lines().filter((one) => one.kind === "draft");
   assert.deepEqual(
     drafts.map((one) => [one.level, one.said]),
-    [
-      ["debug", "a draft reads rewrite"],
-      ["debug", "the gate holds the turn for a rewrite"],
-    ],
+    [["debug", "a draft reads rewrite"]],
   );
   assert.equal(box.log.lines().filter((one) => one.kind === "answer").length, 0);
 });

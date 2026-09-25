@@ -479,7 +479,7 @@ payload's fields under their headings.
 |---|---|
 | the text | blanks a field in no prose form and an `answered` row, so every row keeps its file line and a Vale marker holds |
 | the lines | keeps a finding on the leaf's chapter, and names it at its line in the ticket |
-| the level | refuses on an error and on a warning, so the lint names nothing later that the hand-back lets through |
+| the level | refuses on a private name, and warns on a break of form, so the hand-back goes on and the lint names the same lines |
 
 Every verb taking a hand's prose into a ticket reads it through `voiceOver`,
 so no fix commit follows a landing.
@@ -700,8 +700,8 @@ A draft on the `trivial` route waits on no person:
 - the queue counts it among the agent's rows
 - a refusal on that road leaves the draft standing, and the wait answer names the refusal
 
-The verb reads the voice rules over the Ask too, and refuses one that breaks
-a rule at the error or the warning level. `askFaults` in
+The verb reads the voice rules over the Ask too. A break of form warns, names
+each line, and the ticket opens. A private name refuses. `askFaults` in
 `src/scripts/ticket-ask-lint.js` hands `voiceOver` the whole ticket, and keeps
 the findings on the Ask's lines, so a line number names the file's line. The
 Ask is the engine's from the open on, so the ticket door refuses every later

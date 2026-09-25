@@ -6,7 +6,9 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   filesOn,
+  formIn,
   refusedWarnings,
+  refusesIn,
   rowOf,
   WARNING,
   warnedNote,
@@ -99,4 +101,19 @@ test("the note after a write names each row, and says the lines stand in the pan
   assert.match(said, /a\.md:3 Hedge: Cut the hedge\./);
   assert.doesNotMatch(said, /refactoring hand/);
   assert.equal(rowOf(found("a.md", "warning")), "a.md:3 Hedge: Cut the hedge.");
+});
+
+// A break of form warns at every door, whatever its level, and a lint that ran nowhere or a private name still refuses. [[spec/design_output/level0#the-panel-holds-a-warning]]
+test("a finding of form warns at any level, and the lint that ran nowhere and a private name refuse", () => {
+  const erred = found("a.md", "error", "VoiceParagraph.Vocabulary");
+  const warned = found("a.md", "warning", "VoiceParagraph.Sentence");
+  const bare = { rule: "FunctionCeiling", line: 1 };
+  const unran = found("a.md", "error", "VoiceRulesRan");
+  const home = found("a.md", "error", "VoiceVale.Private");
+  const stripped = found("a.md", "error", "Private");
+  const all = [erred, warned, bare, unran, home, stripped];
+  assert.deepEqual(refusesIn(all), [unran, home, stripped], "the name past the style decides");
+  assert.deepEqual(formIn(all), [erred, warned, bare]);
+  assert.deepEqual(refusesIn(undefined), []);
+  assert.deepEqual(formIn(undefined), []);
 });

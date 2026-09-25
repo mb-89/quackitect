@@ -51,6 +51,16 @@ work ends.
 
 So the session carries on to that end. The three grounds below are the exits.
 
+A wait is no exit either. A session stood still for most of an hour with two
+helpers running. The commit verb staged the whole tree, so each landing asked
+every helper to hold, waited for each reply, set their files aside, committed
+and let them go. The queue held a ticket and the Problems panel held findings
+the whole time, and the owner found the session idle.
+
+The cost doubles, because a held helper waits too. The work standing free
+needed no answer from anybody: a ticket, a todo, a finding. So the rule names
+where the next item stands, and the waiting hand takes it.
+
 ## 5. Three grounds and no others
 
 An open list of reasons to stop grows one reason at a time, and each one reads

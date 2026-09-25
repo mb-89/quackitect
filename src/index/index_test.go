@@ -118,6 +118,34 @@ func TestADotFolderUnderThePrivateFolderStandsOutsideTheWalkAndTheWatch(t *testi
 	}
 }
 
+// A folder below the root carrying its own .git, a worktree's file or a clone's folder, stands off the walk and the watch whole; the root's own .git stays as it is today. [[spec/design_output/index#the-rows-the-walk-writes]]
+func TestAFolderCarryingItsOwnGitStandsOffTheWalkAndTheWatch(t *testing.T) {
+	root := tree(t)
+	write(t, root, ".se/wt/drawing/.git", "gitdir: ../../../.git/worktrees/drawing\n")
+	write(t, root, ".se/wt/drawing/spec/tickets/dup.md", "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nA duplicate off a leftover worktree.\n")
+	write(t, root, "vendor/other/.git/HEAD", "ref: refs/heads/main\n")
+	write(t, root, "vendor/other/README.md", "Another checkout entirely.\n")
+	db := opened(t, root)
+
+	if n := counted(t, db, `SELECT count(*) FROM file WHERE path LIKE '.se/wt/%' OR path LIKE 'vendor/%'`); n != 0 {
+		t.Fatalf("the walk reached a nested checkout: %d file(s)", n)
+	}
+
+	eyes, err := fsnotify.NewWatcher()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer eyes.Close()
+	if err := folders(root, root, eyes); err != nil {
+		t.Fatal(err)
+	}
+	for _, abs := range eyes.WatchList() {
+		if rel, ok := relOf(root, abs); ok && (strings.HasPrefix(rel, ".se/wt/") || strings.HasPrefix(rel, "vendor/")) {
+			t.Fatalf("the watch stands on the nested checkout at %s", rel)
+		}
+	}
+}
+
 // A hook hands the drive letter lower case and a shell upper case, and both name one tree. [[spec/design_output/index#a-door-comes-back]]
 func TestTwoRootsDifferingInTheDriveLettersCaseReadAsOneTree(t *testing.T) {
 	root := tree(t)

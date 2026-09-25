@@ -37,9 +37,9 @@ type Listing struct {
 	Found   []Finding `json:"found"`
 }
 
-// The runtime folder folders.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
+// The runtime folder .claude/skills/level0/lib/folders.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
 func pointerPath(root string) string {
-	return filepath.Join(root, ".se", ".runtime", "panel.json")
+	return filepath.Join(root, ".se", ".runtime", "panel.json") // .claude/skills/level0/lib/folders.js owns the folder
 }
 
 // Listens on the loopback address and writes the pointer. The answer closes the port and drops the pointer, once however often it runs. [[spec/design_output/lsp#a-port-serves-the-list]]

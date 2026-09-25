@@ -30,6 +30,7 @@ import {
   handFaults,
   verdictIn,
   voiceFaults,
+  warnsOf,
   withPayload,
   workAnswer,
 } from "./pull-chapter.js";
@@ -534,9 +535,10 @@ export function handBack(it, who, name, verdict) {
   const chapter = chapterOf(one.text, leaf.path);
   // A became leaves the leaf's fields to the successor, and an answered leaves them to the answerer, so the hold and the hand alone decide. [[spec/design_output/pull#became]]
   const becomes = verdict.said === "became" || verdict.said === "answered";
+  const warned = [];
   if (!becomes) {
     found.push(...formFaults(it, one, leaf, chapter, held));
-    if (!found.length) found.push(...voiceFaults(it, one, leaf));
+    if (!found.length) found.push(...voiceFaults(it, one, leaf, warned));
   }
   // A fail runs its commands for the record, and none of them refuses it. [[spec/design_output/pull#the-fail]]
   const fails = verdict.said === "fail";
@@ -545,6 +547,7 @@ export function handBack(it, who, name, verdict) {
   found.push(...handFaults(it, one, leaf, who.hand, held));
 
   if (found.length) return refused(it, who, one, leaf, held, found);
+  warnsOf(warned);
 
   const said = verdictField
     ? verdictIn(chapter.fields.get(verdictField.name) ?? [])

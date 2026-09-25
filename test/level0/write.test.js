@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import { MARKS } from "../../.claude/skills/level0/lib/runs.js";
-import { errorsIn, marksSeen, onWrite } from "../../src/bridge/write.js";
+import { marksSeen, onWrite } from "../../src/bridge/write.js";
 import { fakeDisk, norm } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
@@ -193,18 +193,34 @@ test("the same bad ticket written into the vehicle's own tree is refused the sam
   assert.match(said?.result?.deny ?? "", /steps/);
 });
 
-// A rule of form reads warning, and the write lands with it standing in the Problems panel. [[spec/rationales/voice#11-form-and-substance]]
-test("a warning lets the write land, and an error refuses it", () => {
-  const warned = { rule: "VoiceParagraph.Sentence", line: 1, severity: "warning" };
-  const erred = { rule: "VoiceParagraph.Vocabulary", line: 1, severity: "error" };
-  const bare = { rule: "VoiceVale.History", line: 1 };
-  assert.deepEqual(errorsIn([warned]), [], "a warning alone refuses nothing");
-  assert.deepEqual(
-    errorsIn([warned, erred, bare]),
-    [erred, bare],
-    "an error stands, and a finding naming no side reads error",
+// A break of form lands at any level, and the note names it; a private name still refuses. [[spec/design_output/level0#the-panel-holds-a-warning]]
+test("a prose finding at error lands with the warning note, and a private name comes back refused", async () => {
+  const at = join(WORK, "spec", "tickets", "warned.md");
+  const finding = (rule) => ({
+    file: "spec/tickets/warned.md",
+    rule,
+    line: 5,
+    column: 1,
+    message: "Say it another way.",
+    severity: "error",
+  });
+  const it = box();
+  let found = [finding("VoiceParagraph.Vocabulary")];
+  it.vale = { stands: () => true, lint: async () => ({ ran: true, found }) };
+
+  const said = await onWrite(write(at, GOOD), it);
+  assert.equal(said?.result?.deny, undefined, "the write lands");
+  assert.match(said?.after?.context?.[0] ?? "", /VoiceParagraph\.Vocabulary/);
+  assert.match(said.after.context[0], /the write lands/);
+  assert.equal(
+    it.log.lines().some((one) => one.level === "warn" && one.kind === "vale"),
+    true,
+    "the log carries the warning",
   );
-  assert.deepEqual(errorsIn(undefined), []);
+
+  found = [finding("VoiceVale.Private")];
+  const home = await onWrite(write(at, GOOD), it);
+  assert.match(home?.result?.deny ?? "", /VoiceVale\.Private/);
 });
 
 // [[spec/design_output/level0#a-broken-rule-says-so]]

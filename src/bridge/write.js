@@ -37,8 +37,9 @@ import {
   ticketFaults,
 } from "../../.claude/skills/level0/lib/ticket.js";
 import {
+  formIn,
+  refusesIn,
   rowOf,
-  WARNING,
   warnedNote,
 } from "../../.claude/skills/level0/lib/warnings.js";
 import {
@@ -310,18 +311,13 @@ function unran(where, why, box) {
   ];
 }
 
-// A rule reading warning is a break of form, and the write lands with it standing in the Problems panel. [[spec/rationales/voice#11-form-and-substance]]
-export function errorsIn(found) {
-  return (found ?? []).filter((one) => String(one?.severity ?? "error") !== "warning");
-}
-
-// [[spec/design_output/level0#the-write-door]]
+// A break of form lands at any level, and the door refuses the findings `refusesIn` names alone. [[spec/design_output/level0#the-panel-holds-a-warning]]
 async function voiceDoor(e, writing, where, box, held) {
   const whole = wholeAfter(e, writing, box.disk);
   const all = await proseFaults(whole, where, box);
-  const found = errorsIn(all);
+  const found = refusesIn(all);
   if (!found.length) {
-    held.warned = all.filter((one) => String(one?.severity ?? "") === WARNING);
+    held.warned = formIn(all);
     return "";
   }
   box.log.say("warn", "vale", `refused ${found.length} line(s) in ${where}`, {
@@ -333,15 +329,16 @@ async function voiceDoor(e, writing, where, box, held) {
 }
 
 // A write landing with a warning writes the rows to the log, and tells the agent to carry on. [[spec/design_output/level0#the-panel-holds-a-warning]]
-function warnsOf(e, where, warned, box) {
+export function warnsOf(e, where, warned, box, kind = "vale") {
   if (!warned?.length) return null;
-  box.log.say("warn", "vale", `${warned.length} line(s) stand at warning in ${where}`, {
+  const rows = warned.map((one) => ({ ...one, file: one?.file || where }));
+  box.log.say("warn", kind, `${rows.length} line(s) stand at warning in ${where}`, {
     file: where,
-    rule: warned[0]?.rule,
+    rule: rows[0]?.rule,
     tool: String(e.tool),
-    detail: warned.map(rowOf).join("\n"),
+    detail: rows.map(rowOf).join("\n"),
   });
-  return { after: { context: [warnedNote(where, warned)] } };
+  return { after: { context: [warnedNote(where, rows)] } };
 }
 
 function asWrite(e) {

@@ -159,3 +159,12 @@ func TestThePointerGoesWithTheServer(t *testing.T) {
 		t.Fatal("a server drops the pointer another process wrote")
 	}
 }
+
+// The pointer stands in the runtime folder under the root, beside the other runtime files. [[spec/design_output/lsp#a-port-serves-the-list]]
+func TestThePointerStandsInTheRuntimeFolder(t *testing.T) {
+	root := t.TempDir()
+	want := filepath.Join(root, ".se", ".runtime", "panel.json") // .claude/skills/level0/lib/folders.js owns the folder
+	if got := pointerPath(root); got != want {
+		t.Fatalf("the pointer stands at %s, and the runtime folder holds %s", got, want)
+	}
+}

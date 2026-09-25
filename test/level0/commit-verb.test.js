@@ -66,15 +66,27 @@ const doors = (found = [], answers = {}, env = { SE_CLOUD: "1" }) => {
 
 const ranGit = (git) => git.ran.map((one) => one.argv.join(" "));
 
-// [[spec/design_output/work#the-battery-answers-first]]
-test("a message the rules refuse names every finding, and stages nothing", async () => {
+// A break of form in the message warns, and the commit lands. [[spec/design_output/work#the-battery-answers-first]]
+test("a message breaking a rule of form names every finding, and the commit lands", async () => {
   const { it, git } = doors(FOUND);
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 0);
+  assert.match(said, /break a rule of form, and the commit lands/);
+  assert.match(said, /VoiceShape\.Antithesis/);
+  assert.ok(ranGit(git).includes(`git commit -m ${CLEAN}`), "the commit lands");
+});
+
+// A private name leaves no box, so the message stays refused. [[spec/design_output/work#the-battery-answers-first]]
+test("a message carrying a private name is refused, and stages nothing", async () => {
+  const { it, git } = doors([{ ...FOUND[0], rule: "VoiceVale.Private" }]);
 
   const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
 
   assert.equal(code, 2);
   assert.match(said, /refuse this message/);
-  assert.match(said, /VoiceShape\.Antithesis/);
+  assert.match(said, /VoiceVale\.Private/);
   assert.deepEqual(ranGit(git), [], "the tree stands untouched");
 });
 

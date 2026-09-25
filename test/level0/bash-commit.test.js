@@ -46,32 +46,29 @@ test("a commit carrying code and no test is refused at the door", async () => {
   );
 });
 
-// A break of form in the message lands, and a break of substance refuses it. [[spec/rationales/voice#11-form-and-substance]]
-test("a message carrying a warning lands, and one carrying an error is refused", async () => {
+// A break of form in the message lands at any level with a warning, and a private name refuses it. [[spec/design_output/bash#a-commit-message-meets-voice]]
+test("a message breaking a rule of form lands with a warning, and one carrying a private name is refused", async () => {
+  const said = [];
   const saying = (found) => ({
     ...box(true),
+    log: { say: (...row) => said.push(row) },
     vale: { stands: () => true, lint: async () => ({ ran: true, found }) },
   });
-  const warned = [
-    {
-      rule: "VoiceVale.Passive",
-      line: 1,
-      column: 1,
-      severity: "warning",
-      message: "passive",
-    },
+  const finding = (rule) => [
+    { rule, line: 1, column: 1, severity: "error", message: "say it plainly" },
   ];
-  assert.equal(denied(await onBash({ command: COMMIT }, saying(warned))), "");
-  const erred = [
-    {
-      rule: "VoiceParagraph.Vocabulary",
-      line: 1,
-      column: 1,
-      severity: "error",
-      message: "jargon",
-    },
-  ];
-  assert.match(denied(await onBash({ command: COMMIT }, saying(erred))), /Vocabulary/);
+  const landed = await onBash({ command: COMMIT }, saying(finding("VoiceParagraph.Vocabulary")));
+  assert.equal(denied(landed), "");
+  assert.match(landed?.after?.context?.[0] ?? "", /VoiceParagraph\.Vocabulary: say it plainly/);
+  assert.match(landed.after.context[0], /the commit lands/);
+  assert.ok(
+    said.some((row) => row[0] === "warn" && /commit message/.test(row[2])),
+    "the log carries the warning",
+  );
+  assert.match(
+    denied(await onBash({ command: COMMIT }, saying(finding("VoiceVale.Private")))),
+    /VoiceVale\.Private/,
+  );
 });
 
 test("a merge commit passes the door whole", async () => {

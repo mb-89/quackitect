@@ -1,24 +1,24 @@
 // The reading of one answer: the draft tool runs it, and the stop door runs it
-// over the turn's last text, holding a draft past the ceiling.
+// over the turn's last text, so its findings ride the next call.
 // [[spec/design_output/level0#the-gate-reads-the-answer]]
 
 import {
   bandOf,
+  CARRY,
   lengthFaults,
   needsFaults,
   REWRITE,
   scoreOf,
   tableFaults,
 } from "../../.claude/skills/level0/lib/answer.js";
-import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
+import { gateNote } from "../../.claude/skills/level0/lib/refuse.js";
 import { stopsAlone } from "../../.claude/skills/level0/lib/stop.js";
+import { rowOf } from "../../.claude/skills/level0/lib/warnings.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
 
 export const ANSWER = "level0-answer.md";
 const ENABLED = "answer.enabled";
-// The tooth's own limit, so the gate holds no more turns in a row than the tooth does. [[spec/design_output/level0#the-gate-reads-the-answer]]
-const MOST = "stop.mostInARow";
 
 // The reading answers why where it reads nothing, and the findings, the score and the band where it reads. [[spec/design_output/level0#the-tool-reads-a-draft]]
 export async function readsAnswer(box, text, stop) {
@@ -47,20 +47,25 @@ export async function readsAnswer(box, text, stop) {
   return { found, score, band };
 }
 
-// A draft past the ceiling holds the turn with its findings, and the holds in a row stop at the tooth's limit. [[spec/design_output/level0#the-gate-reads-the-answer]]
+// A break of form in an answer holds no turn: the findings of a draft past the warning edge reach the log, and wait for the next call. [[spec/design_output/level0#the-findings-ride-the-call]]
 export async function gatesAnswer(e, box) {
   const text = String(e?.last_assistant_message ?? "");
   if (e?.agentId || !text.trim() || asks(box, ENABLED) === false) return null;
   // The turn's end asks for no needs table, which an answer stopping for the owner carries alone. [[spec/design_output/level0#the-gate-reads-the-answer]]
   const read = await readsAnswer(box, text, false);
-  const most = Number(asks(box, MOST) ?? 0);
-  if (read.band !== REWRITE || (most > 0 && (box.answerHolds ?? 0) >= most)) {
-    box.answerHolds = 0;
-    return null;
-  }
-  box.answerHolds = (box.answerHolds ?? 0) + 1;
-  box.log.say("debug", "draft", "the gate holds the turn for a rewrite", {
-    detail: `holds=${box.answerHolds} score=${read.score}`,
+  if (read.band !== REWRITE && read.band !== CARRY) return null;
+  box.log.say("warn", "gate", `the answer reads ${read.band}, and it stands as sent`, {
+    detail: read.found.map((one) => rowOf({ ...one, file: ANSWER })).join("\n"),
   });
-  return { result: { block: answerFindings(ANSWER, read) } };
+  box.answerWaits = gateNote(ANSWER, read);
+  return null;
+}
+
+// The findings of the last answer ride the next call of the agent's own, once. [[spec/design_output/level0#the-findings-ride-the-call]]
+export function answerRides(e, box, before = null) {
+  const note = box.answerWaits;
+  if (e?.agentId || !note) return before;
+  box.answerWaits = "";
+  const context = [...(before?.after?.context ?? []), note];
+  return { ...(before ?? {}), after: { ...(before?.after ?? {}), context } };
 }

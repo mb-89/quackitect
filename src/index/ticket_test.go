@@ -172,6 +172,21 @@ func TestATodoNamingARowLightsTheFlag(t *testing.T) {
 	}
 }
 
+// A ticket-kind note stands only directly under spec/tickets or .se/tickets; one nested inside a leftover worktree is no ticket. [[spec/design_output/index#the-index-answers-the-tickets]]
+func TestATicketStandsOnlyDirectlyUnderTheTicketFolders(t *testing.T) {
+	root := ticketTree(t)
+	write(t, root, ".se/wt/drawing/spec/tickets/a-child.md", child("one-group", "open"))
+	write(t, root, "spec/tickets/nested/deeper.md", "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: do\n---\n\n# Ask\n\nA ticket nested under the tickets folder itself.\n\n# Discussion\n")
+	db := opened(t, root)
+	said, err := Tickets(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(said) != 5 {
+		t.Fatalf("a ticket-kind note outside the two ticket folders answers no ticket, and the index answers %d", len(said))
+	}
+}
+
 func TestAGroupNobodyHoldsStandsAtTodo(t *testing.T) {
 	if heldIn("state: open\nrecord:\n  - step: sync\n    hash_before: aaa\n    hash_after: bbb\n") {
 		t.Fatal("an entry with both hashes holds nothing")

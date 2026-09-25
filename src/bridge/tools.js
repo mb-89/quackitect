@@ -55,7 +55,9 @@ async function mintsNote(e, box) {
       e,
     );
   }
-  return said(box, true, leftIn(made), e);
+  // A break of form lands with the note, and its warning rides the answer. [[spec/design_output/level0#the-panel-holds-a-warning]]
+  const warned = door?.after?.context ?? [];
+  return said(box, true, [leftIn(made), ...warned].join("\n\n"), e);
 }
 
 function said(box, ok, result, e) {

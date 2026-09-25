@@ -1,6 +1,6 @@
-// The code door over a fake box: a write that grows past a ceiling comes back
-// refused, and a cut to a file already past it passes. Biome stands off, so
-// the ceiling alone speaks here.
+// The code door over a fake box: a write that grows past a ceiling lands with
+// a warning, and a cut to a file already past it passes clean. Biome stands
+// off, so the ceiling alone speaks here, past the one case handing in a lint.
 // [[spec/design_output/level0#the-size-ceiling]]
 
 import assert from "node:assert/strict";
@@ -31,8 +31,9 @@ function box(files = {}) {
 }
 
 const write = (path, text) => ({ tool: "Write", file_path: path, content: text });
+const noteOf = (said) => String(said?.after?.context?.join("\n") ?? "");
 
-test("a new file past a ceiling comes back refused, naming the function and its lines", async () => {
+test("a new file past a ceiling lands with a warning, naming the function and its lines", async () => {
   const it = box();
   const text = ["function long() {", "  a();", "  b();", "  c();", "}", ""].join("\n");
   const path = at("src/a.js");
@@ -43,9 +44,11 @@ test("a new file past a ceiling comes back refused, naming the function and its 
     text,
     it.box,
   );
-  assert.match(said.result.deny, /FunctionCeiling/);
-  assert.match(said.result.deny, /long holds 5/);
-  assert.equal(it.said[0][1], "write", "the log names the door");
+  assert.equal(said.result?.deny, undefined, "the write lands");
+  assert.match(noteOf(said), /FunctionCeiling/);
+  assert.match(noteOf(said), /long holds 5/);
+  assert.match(noteOf(said), /the write lands/);
+  assert.deepEqual(it.said[0].slice(0, 2), ["warn", "write"], "the log names the door at warn");
 });
 
 test("a write under every ceiling passes, and a cut to a file past its ceiling passes too", async () => {
@@ -83,11 +86,11 @@ test("a write under every ceiling passes, and a cut to a file past its ceiling p
     `${tall}\nconst more = 1;`,
     it.box,
   );
-  assert.match(grown.result.deny, /FileCeiling/);
+  assert.match(noteOf(grown), /FileCeiling/);
 });
 
 // [[spec/design_output/level0#the-ceiling-names-the-cut]]
-test("a file ceiling names the cut, and mints no note", async () => {
+test("a file ceiling warning names the cut, and mints no note", async () => {
   const it = box();
 
   const tall = new Array(7).fill("const one = 1;").join("\n");
@@ -95,8 +98,8 @@ test("a file ceiling names the cut, and mints no note", async () => {
   const ask = [write(path, tall), { path, text: tall }, "src/a.js", tall, it.box];
 
   const said = await codeDoor(...ask);
-  assert.match(said.result.deny, /FileCeiling/);
-  assert.match(said.result.deny, /RUNME\.sh split src\/a\.js --to/);
+  assert.match(noteOf(said), /FileCeiling/);
+  assert.match(noteOf(said), /RUNME\.sh split src\/a\.js --to/);
   assert.equal(
     it.disk.exists(at(NOTES)),
     false,
@@ -124,6 +127,26 @@ test("a function ceiling alone names no cut", async () => {
     it.box,
   );
 
-  assert.match(said.result.deny, /FunctionCeiling/);
-  assert.doesNotMatch(said.result.deny, /RUNME\.sh split/);
+  assert.match(noteOf(said), /FunctionCeiling/);
+  assert.doesNotMatch(noteOf(said), /RUNME\.sh split/);
+});
+
+// A lint error from Biome is a break of form, so the formatted text lands and the note names the row. [[spec/design_output/level0#the-panel-holds-a-warning]]
+test("a Biome error lands the formatted write with a warning naming the rule", async () => {
+  const it = box();
+  it.box.biome = {
+    stands: () => true,
+    format: async (text) => ({ ran: true, text: `${text}\n` }),
+    lint: async () => ({
+      found: [
+        { rule: "lint/style/useConst", line: 1, column: 1, message: "Use const.", severity: "error" },
+      ],
+    }),
+  };
+  const text = "let s = 1;";
+  const path = at("src/c.js");
+  const said = await codeDoor(write(path, text), { path, text }, "src/c.js", text, it.box);
+  assert.equal(said.result?.deny, undefined, "the write lands");
+  assert.equal(said.event?.content, `${text}\n`, "the formatter still applies itself");
+  assert.match(noteOf(said), /src\/c\.js:1 lint\/style\/useConst: Use const\./);
 });

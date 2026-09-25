@@ -17,6 +17,7 @@ import {
   ROOT,
   standing,
 } from "./pull-doors.js";
+import { semicolonVale } from "./semicolon-vale.js";
 
 // [[spec/design_output/pull#the-fields-ride-the-payload]]
 test("the fields ride the payload, and the engine writes them under their headings before it checks", () => {
@@ -62,6 +63,25 @@ test("the fields ride the payload, and the engine writes them under their headin
     /### tests\n\nnode --test\n\n### checked\n\n- one\n- two\n\n## reflect/,
   );
   assert.match(withPayload("x", "a", "nope").why, /takes a JSON object/);
+});
+
+// A break of form in the evidence warns, and the hand-back lands. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+test("a hand-back whose field breaks a rule of form lands, and names the line", () => {
+  const vale = "/tree/.se/.runtime/bin/vale";
+  const { it, disk } = doors(standing(CHILD(), withField(GROUP_NOTE, "step", "children")), {
+    [`${vale} --config=.vale.ini --output=JSON --no-exit --path=spec/tickets/a-child.md`]:
+      semicolonVale(),
+  });
+  it.vale = vale;
+  heard(() => pulling(ROOT, ["pull"], it));
+
+  const said = heard(() =>
+    pulling(ROOT, ["pull", "a-child", "--pass", "--fields", '{"approach": "Read it; then write."}'], it),
+  );
+  assert.equal(said.code, 0, said.said);
+  assert.match(said.said, /break a rule of form, and the hand-back lands/);
+  assert.match(said.said, /design\/draft breaks Characters/);
+  assert.equal(fieldOf(disk.read(at("spec/tickets/a-child.md")), "step"), "design/review");
 });
 
 // [[spec/design_output/pull#the-fields-ride-the-payload]]

@@ -29,7 +29,12 @@ import { baseOf, driftOf } from "./ticket-drift.js";
 import { filled } from "./ticket-fill.js";
 import { reachedOf, routed } from "./ticket-route.js";
 import { yours } from "./ticket-yours.js";
-import { askFaults, askRefusal, lineRefusal } from "./ticket-ask-lint.js";
+import {
+  askFaults,
+  askRefusal,
+  askWarning,
+  lineRefusal,
+} from "./ticket-ask-lint.js";
 
 export const NOTES = TICKETS;
 export const HOLDS = OWNED_HOLDS;
@@ -143,10 +148,11 @@ function note(it, name, argv) {
   }
   // The note reads its Ask through the lint's road before it writes. [[spec/design_output/pull#a-draft-opens]]
   const found = askFaults(it, path, made.text);
-  if (found.length) {
-    console.error(lineRefusal(path, found));
+  if (found.refused.length) {
+    console.error(lineRefusal(path, found.refused));
     return 1;
   }
+  if (found.warned.length) console.error(askWarning(path, found.warned));
 
   it.disk.makeDir(it.join(it.root, ...NOTES.split("/")));
   it.disk.write(at, made.text);
@@ -396,7 +402,9 @@ export function opensDraft(it, at) {
     at.path.split("\\").join("/").replace(`${it.root}/`, ""),
     text,
   );
-  if (found.length) return { refused: askRefusal(at.said, found) };
+  if (found.refused.length) return { refused: askRefusal(at.said, found.refused) };
+  // A break of form on the Ask warns, and the open goes on. [[spec/design_output/pull#a-draft-opens]]
+  if (found.warned.length) console.error(askWarning(at.said, found.warned));
   const step = String(front.step ?? "").trim() || firstLeafOf(front.steps);
   // The open lands in one commit of its own, so the queue a push carries holds it. [[spec/design_output/pull#a-draft-opens]]
   const refused = landedAlone(

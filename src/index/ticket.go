@@ -18,6 +18,19 @@ const (
 	commentOpen = "<!--"
 )
 
+// The two folders a ticket stands directly under, the same ones FOLDERS in src/extension/lib/lens.js names, spelled again here because a Go module imports no JavaScript. [[spec/design_output/index#the-index-answers-the-tickets]]
+var ticketFolders = []string{"spec/tickets/", ".se/tickets/"}
+
+// Whether a path stands directly under one of the two ticket folders, and no deeper: a ticket-kind note elsewhere, such as inside a leftover git worktree, is no ticket. [[spec/design_output/index#the-index-answers-the-tickets]]
+func ticketPath(rel string) bool {
+	for _, folder := range ticketFolders {
+		if under, ok := strings.CutPrefix(rel, folder); ok && !strings.Contains(under, "/") {
+			return true
+		}
+	}
+	return false
+}
+
 // The standing a group's branch gives it, the words [[spec/design_output/work#what-the-standing-says]] names.
 const (
 	standingTodo = "todo"
@@ -57,7 +70,7 @@ func Tickets(db *sql.DB) ([]Ticket, error) {
 		if err := rows.Scan(&path, &id, &kind, &text, &changed); err != nil {
 			return nil, err
 		}
-		if linkName(kind) != ticketKind {
+		if linkName(kind) != ticketKind || !ticketPath(path) {
 			continue
 		}
 		one := ticketOf(path, id, text, changed)

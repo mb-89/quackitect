@@ -26,7 +26,7 @@ import {
   onTurnEnd,
   SPOKE,
 } from "./answer.js";
-import { gatesAnswer } from "./answer-read.js";
+import { answerRides, gatesAnswer } from "./answer-read.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe } from "./bash.js";
@@ -271,7 +271,8 @@ async function onToolCall(e, box) {
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (!passes(said)) return said;
-  return held ?? ridesCall(e, box, owesCanary(e, box)) ?? PASS;
+  // [[spec/design_output/level0#the-findings-ride-the-call]]
+  return held ?? ridesCall(e, box, answerRides(e, box, owesCanary(e, box))) ?? PASS;
 }
 
 function passes(said) {

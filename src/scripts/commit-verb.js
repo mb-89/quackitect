@@ -5,7 +5,8 @@
 
 import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { line } from "../../.claude/skills/level0/lib/refuse.js";
-import { messageFaults } from "../bridge/bash.js";
+import { formIn, refusesIn } from "../../.claude/skills/level0/lib/warnings.js";
+import { messageFaults, messageNote } from "../bridge/bash.js";
 
 const USAGE = ['Usage: ./RUNME.sh commit "<message>" [--no-push]'];
 
@@ -17,11 +18,21 @@ export async function commitVerb(it, argv) {
     return 2;
   }
 
-  const found = await messageFaults(message, it);
+  const all = await messageFaults(message, it);
+  const found = refusesIn(all);
   if (found.length) {
     console.error("The voice rules refuse this message. Write it again.");
     for (const one of found) console.error(line(one, "the message"));
     return 2;
+  }
+  // A break of form lands with the commit, and the rows reach the output and the log. [[spec/design_output/work#the-battery-answers-first]]
+  const warned = formIn(all).map((one) => ({ ...one, file: "the message" }));
+  if (warned.length) {
+    console.error(messageNote(warned));
+    it.log?.say?.("warn", "commit", `${warned.length} line(s) of a commit message stand at warning`, {
+      rule: warned[0].rule,
+      detail: message,
+    });
   }
 
   return landsAndPushes(it, said, message);

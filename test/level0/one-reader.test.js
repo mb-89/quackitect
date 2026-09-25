@@ -109,7 +109,7 @@ const names = (said, rule, line) =>
     .some((row) => row.includes(rule) && new RegExp(`\\b${line}\\b`).test(row));
 
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
-test("a verdict carrying a semicolon comes back refused, naming Characters at the ticket's own line, and a semicolon outside the chapter refuses nothing", () => {
+test("a verdict carrying a semicolon lands with a warning naming Characters at the ticket's own line, and a semicolon outside the chapter names nothing", () => {
   const { it, ran, text } = atReview("One piece; of it.");
   const verdict = `pass\n\n${LISTED}`;
   const whole = laidIn(text, verdict);
@@ -119,11 +119,11 @@ test("a verdict carrying a semicolon comes back refused, naming Characters at th
   const { code, said } = handBack(it, verdict);
 
   assert.ok(ran.length, "the pull runs Vale over the verdict");
-  assert.equal(code, 1, said);
-  assert.match(said, /^refused/);
+  assert.equal(code, 0, said);
+  assert.match(said, /break a rule of form, and the hand-back lands/);
   assert.ok(
     names(said, "Characters", line),
-    `the refusal names Characters at line ${line} of ${TICKET}: ${said}`,
+    `the warning names Characters at line ${line} of ${TICKET}: ${said}`,
   );
   assert.ok(
     !names(said, "Characters", ask),
@@ -238,7 +238,7 @@ test("a Vale off marker in a verdict reaches Vale in the pull and holds the rule
 });
 
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
-test("a Vale off marker with no reason in a verdict refuses the hand-back, naming the line the lint names", async () => {
+test("a Vale off marker with no reason in a verdict warns at the hand-back, naming the line the lint names", async () => {
   const { it, text } = atReview();
   const verdict = `pass\n\n${OFF}\n${LISTED}\n${ON}`;
   const whole = laidIn(text, verdict);
@@ -255,9 +255,9 @@ test("a Vale off marker with no reason in a verdict refuses the hand-back, namin
 
   const { code, said } = handBack(it, verdict);
 
-  assert.equal(code, 1, said);
+  assert.equal(code, 0, said);
   assert.ok(
     names(said, UNREASONED, marker),
-    `the refusal names ${UNREASONED} at line ${marker}: ${said}`,
+    `the warning names ${UNREASONED} at line ${marker}: ${said}`,
   );
 });
