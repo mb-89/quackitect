@@ -76,7 +76,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: 838d350b32ef84ab8c18c291d0972ef6423401e5
+    hash_after: 838d350b32ef84ab8c18c291d0972ef6423401e5
 ---
 
 # Ask
@@ -103,11 +108,42 @@ A person hunts the frontmatter for the fields to write, and a hand-back fails on
 
 <!-- the form is text -->
 
+A person's hold on a ticket marks every field its leaf still wants, as a wavy underline in the editor's information colour, and a hover over the mark names what the field asks. The change adds `## A take marks the fields` under `# A ticket carries its buttons` in [[spec/design_output/extension]], and the code comments point there.
+
+| the part | where it stands | what it does |
+|---|---|---|
+| the choices | `src/extension/lib/fields.js`, `fieldMarksOf(door)` | reads the holds through `holdsIn` of `lib/lens.js`, and answers the marks of a ticket a person holds |
+| the editor calls | `src/extension/editor-fields.js`, `fieldDoor(context, folder)` | draws the marks as a decoration, and answers the hover |
+| the wiring | `activate` in `src/extension/extension.js` | hands the host the ticket text from `onEditors` and `onChange`, and the hold watch |
+
+The rules the host reads, each from its owner through `door.imports`, as `lib/route-host.js` reads `schema.js`:
+
+- the leaf a hold names: `leafOf` in `src/scripts/pull-route.js`, with its `does`, its `evidence` and the `checklist` it inherits
+- a field still wanted: its entry in `chapterOf` of `src/scripts/pull-chapter.js` holds no line, so a heading carrying comments alone still wants its text
+- the line of a heading: `readNote` and `sectionAt` of `.claude/skills/level0/lib/schema.js`
+
+The marks follow the hold, and no take or put-back needs a hook of its own:
+
+- a hold whose hand reads person names the ticket: every field the leaf still wants takes a mark, the evidence in route order and `checked` last, as the pull prints them. A field missing its heading marks the leaf's heading
+- a hold the person newly takes puts the cursor on the first mark through `door.jumps`, the call the drawing's jump takes. A hold standing at activation moves no cursor
+- no person's hold names the ticket, after a drop or a hand-back: the ticket carries no mark
+- an edit filling a field takes its mark away on the next change
+
+The hover over a mark shows the leaf's path and `does`, then the field's name, `form` and `says`. On `checked`, it lists the checklist items.
+
+The marks stay out of the Problems panel, as the owner settles under Discussion. VS Code lists every entry of a `DiagnosticCollection` there, so the door draws them through `createTextEditorDecorationType`, with `underline wavy` in `editorInfo.foreground`, and answers the hover through `registerHoverProvider`. No check, commit or push reads a decoration, so the marks block nothing.
+
+The tree holds no design input on the blue line of the earlier versions. A search of `spec/design_input` for blue, underline and decoration finds nothing, so this design stands on the ask alone.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/extension/extension.js`, `activate`: wires `fieldMarksOf` where the door carries `marksFields`
+- `src/extension/editor.js`, `editorDoor`: spreads `fieldDoor` beside the other doors
+- `test/level0/sidebar.test.js`, the `activate` cases: a fake door carrying no `marksFields` skips the wiring, so they stand unchanged
 
 ### tests
 
@@ -115,17 +151,30 @@ A person hunts the frontmatter for the fields to write, and a hand-back fails on
 
 <!-- the form is list -->
 
+- `test/level0/fields-to-fill.test.js`, "a take marks every field the step still wants, and the door draws them in the information colour"
+- `test/level0/fields-to-fill.test.js`, "the take puts the cursor on the next field to fill"
+- `test/level0/fields-to-fill.test.js`, "a put-back takes every mark away"
+- `test/level0/fields-to-fill.test.js`, "a hover shows the step's does, and the field's form and says"
+- `test/level0/fields-to-fill.test.js`, "a field filled in loses its mark"
+- `test/level0/fields-to-fill.test.js`, "the door lists nothing in the Problems panel"
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: `lib/lens.js`, `lib/route-host.js`, `editor-inset.js` for `jumps`, `editor-files.js` for `imports` and `watch`, `pull-route.js` for `leafOf`, `pull-chapter.js` for `chapterOf`, and `schema-read.js` for `readNote` and `sectionAt`
+- the callers list names `activate` and `editorDoor`, the two places the change reaches, and the sidebar cases driving `activate`
+- every done_when line names its test in `test/level0/fields-to-fill.test.js`, and the last one names `./RUNME.sh check`, which the tests-green `check` field answers
 
 ## review
 
@@ -207,5 +256,5 @@ A person hunts the frontmatter for the fields to write, and a hand-back fails on
 
 # Discussion
 
-- Open for the owner: does the Problems panel list the underlines, or do they stand in the ticket text alone? Where the panel lists them, they block nothing.
+- The owner settles it: the underlines stand in the ticket text alone, and the Problems panel lists none of them. They block nothing: no commit, no push and no check.
 - The owner-walk ticket [[spec/tickets/the-owner-walks-the-editor]] names this fault under `answer`.
