@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor]
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -108,6 +108,10 @@ record:
     hash_after: 9ba488747341f372a9b4a6eac6c23938ff5b4678
     returns: 1
     why: "| grade | finding | fix |; |---|---|---|; | design | the fake `runsVerb` in `test/level0/lens.test.js` stops at the argv, so no test named proves a save writes the route and chapters, which the first line of the ask calls for | name the test that runs `ticket fill` on the saved path over a fake disk and asserts `steps`, `process_hash` and a chapter per step |; | craft | `activate` in `src/extension/extension.js` gets the fake door `doorOf` in `test/level0/sidebar.test.js`, which carries no `onSave`, and the callers list leaves it out | name `sidebar.test.js`, `doorOf` as a caller, and say whether the wire calls `door.onSave?.` or the fake gains `onSave` |; | craft | `saved` calls `door.runsVerb` as a second caller, and the title change reaches `took` too | name `src/extension/editor-lens.js`, `runsVerb` in the callers list |"
+  - step: design/draft
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 63c8237d4219b03cff26cf91612212a0dcdb2355
+    hash_after: 63c8237d4219b03cff26cf91612212a0dcdb2355
 ---
 
 # Ask
@@ -146,7 +150,10 @@ The save rides the lens's own road, so the test holds it with no editor.
 | the hook | `src/extension/editor-lens.js`, `onSave(run)` | hands every save under the ticket folders to `run` |
 | the wire | `src/extension/extension.js`, `activate` | hands `tickets.saved` to `door.onSave` |
 
-The fill writes the file on disk. The editor reloads a saved file it holds clean, so the person meets the route and the chapters. The progress title of `runsVerb` names the verb it runs, in place of a fixed `ticket pull`.
+| the tests | `test/level0/lens.test.js` | the choice over a picked process, a standing route and an empty `process`, and `saved` over a fake door |
+| the road | `test/level0/save-fills.test.js` | `saved` over a door whose `runsVerb` runs the `ticket` verb over the fake disk `ticket-fill.test.js` builds, and the saved file carries `steps`, `process_hash` and a chapter per step |
+
+The wire calls `door.onSave?.`, so the fake door `doorOf` in `test/level0/sidebar.test.js` stays as it stands. The fill writes the file on disk. The editor reloads a saved file it holds clean, so the person meets the route and the chapters. The progress title of `runsVerb` names the verb it runs, in place of a fixed `ticket pull`.
 
 ### callers
 
@@ -156,7 +163,9 @@ The fill writes the file on disk. The editor reloads a saved file it holds clean
 
 - `src/extension/extension.js`, `activate`, which wires the save
 - `src/extension/lib/lens.js`, `ticketLensOf().took`, which calls `door.runsVerb`
+- `src/extension/editor-lens.js`, `runsVerb`, whose title changes for `took` and `saved` alike
 - `test/level0/lens.test.js`, the fake door behind `ticketLensOf`
+- `test/level0/sidebar.test.js`, `doorOf`, the fake door `activate` takes, which carries no `onSave`
 
 ### answers
 
@@ -164,7 +173,9 @@ The fill writes the file on disk. The editor reloads a saved file it holds clean
 
 <!-- the form is list -->
 
-- first
+- the design finding on a test proving the route and chapters: `test/level0/save-fills.test.js` runs the verb over a fake disk and reads the saved file
+- the craft finding on `doorOf`: the wire calls `door.onSave?.`, and the callers list names the fake
+- the craft finding on `runsVerb`: the callers list names it
 
 ## review
 
