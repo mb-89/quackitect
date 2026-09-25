@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor, a-save-fills-the-ticket]
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -164,6 +164,17 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-work-group-draws-buttons.md:436:1: Shape: A run holds 3 paragraphs with no list, table or diagram betwe"
+  - step: implement/tests-green
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 8ab8bf3a794aa878aab94a105ce71d2517f811ae
+    hash_after: 8ab8bf3a794aa878aab94a105ce71d2517f811ae
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 13 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-work-group-draws-buttons.md:446:1: Shape: A run holds 3 paragraphs with no list, table or diagram betwe"
 ---
 
 # Ask
@@ -393,6 +404,8 @@ The sidebar now draws the section `work`, with the three buttons the config decl
 | new ticket | asks a name in lower-case words, writes a ticket with an empty `process` where no file stands, and opens it |
 
 The fill on save then writes the new ticket's route. The count runs with no progress toast, since it rides every draw. The contract test that pinned the buttons undrawn now asserts every declared control draws.
+
+The first round wrote over the branch verb tests. This round restores both files byte for byte, and the new cases stand in `test/level0/work-strings.test.js` and `test/level0/sidebar-work.test.js`.
 
 ### checked
 
