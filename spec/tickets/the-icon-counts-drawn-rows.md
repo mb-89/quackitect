@@ -76,12 +76,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: person
     hash_before: 3d677235324507ac9955df83224b9420f6c40fa0
     hash_after: 3d677235324507ac9955df83224b9420f6c40fa0
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-2
+    hash_before: eff3f578bc3f6900e5b6ef635d149fd7bc23fda4
+    hash_after: eff3f578bc3f6900e5b6ef635d149fd7bc23fda4
 ---
 
 # Ask
@@ -189,6 +193,14 @@ The viewer answers the count because it holds every rule the tab draws by. A sec
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- the callers list misses `test/contract/work-buttons.test.js`, whose line check asserts `./RUNME.sh ticket yours --count`. The change rewrites that line to `./RUNME.sh tui work --count`
+- the `help` of `work.editor` in `spec/config/level0.schema.json` says the count is the number in the tab's name. The change rewrites it to the rows the tab draws as it opens
+- the header comment of `src/scripts/ticket-yours.js` says the button's count and the tab's name share one number. The change cuts that sentence with `--count`
+- the `--count` road answers a count where `Load` or `runPlaces` answers an error, the way the tab does: an index error prints `{"count":null}`, and a verb error counts the rows the tab draws with no places
+- the cost line names the `go build` that `viewerOf` runs on a stale viewer, beside the viewer start, since a sidebar draw pays both
 
 # implement
 
