@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -102,6 +102,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: person
+    hash_before: a173560346499f32a69fc535ef5461165465d865
+    hash_after: a173560346499f32a69fc535ef5461165465d865
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 14 test(s) pass in 3 file(s); green, src/tui passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-icon-counts-drawn-rows.md:275:1: CodeSpans: A sentence holds 4 code spans, and this one holds 5. Carry "
+reason: done
 ---
 
 # Ask
@@ -286,26 +298,44 @@ Two surprises. The commit door reads a Go test in the code's own folder alone, s
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/tui test/level0/tui-count.test.js test/level0/sidebar-work.test.js test/contract/work-buttons.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The work editor's button in the sidebar now counts the rows the work tab draws as it opens. Before, it drew the number in the tab's name, which answers a third question.
+
+| where | what changes |
+|---|---|
+| `src/tui/work/workcount.go` | `Drawn` loads the tab's tree, lays the verb's places over it, and presses the base file's preset |
+| `src/tui/main.go` | `--count` prints `Drawn` as JSON, or the reason on stderr with a failing exit |
+| `src/scripts/tui.js` | `tui work --count` runs the viewer with `--count`, and leaves a standing window alone |
+| `spec/config/level0.schema.json` | the button counts through `./RUNME.sh tui work --count` |
+| `src/scripts/ticket-yours.js` | `--count` goes, and `--next` stays for pull for me |
+
+The viewer answers the count because it holds every rule the tab draws by. A second copy in the scripts drifts from it. The Go test lays `Drawn` beside the window's own tab on one case tree, then moves the pressed preset and reads both again.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft's table and the review name, and no other
+- every door has a fake: the index, the branch verb, the process door and `fetch` each answer a fake
+- each new file and road points at `spec/design_output/tui#the-work-tab`
+- every fact stands once: `Drawn` calls the tab's own functions, and the note points at the file
+- every review row stands fixed, and the change leaf lists each one
 
 # Discussion
 
