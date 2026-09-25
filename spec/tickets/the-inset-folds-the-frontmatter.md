@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -177,6 +177,14 @@ record:
     hand: box 75b31b3d5012 · claude-code-remote
     hash_before: ddb6b949009f269a33e017981e0018fddb903d66
     hash_after: ddb6b949009f269a33e017981e0018fddb903d66
+  - step: implement/change
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: a80846132df159ae39f60ba4d261ccdc8a5a11ab
+    hash_after: a80846132df159ae39f60ba4d261ccdc8a5a11ab
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-inset-folds-the-frontmatter.md:419:166: Sentence: A sentence holds 25 words. Cut this one in two."
 group: the-editor-holds-the-drawing
 depends_on: ["the-editor-takes-an-inset", "the-ticket-answers-the-editor", "the-drawing-draws-a-route"]
 ---
@@ -386,6 +394,7 @@ The fix for the class: every state the host holds changes through the host alone
 - the change touches the host, the inset door, the editor door, the start, the lens exports and the manifest
 - the host reaches the editor through the door alone, and `doorOf` in the host test fakes each call
 - the host and the inset door point at this ticket in their headers
+- the fix for the verdict points at the reflect chapter, and two cases in the host test drive it
 
 ## tests-green
 

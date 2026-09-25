@@ -45,9 +45,13 @@ function doorOf({ files = {}, inset = true, theme = "dark" } = {}) {
       hidden: false,
       disposed: false,
       hears: () => {},
+      gone: () => {},
       post: (message) => page.posts.push(message),
       onMessage: (hear) => {
         page.hears = hear;
+      },
+      onGone: (run) => {
+        page.gone = run;
       },
       hide: () => {
         page.hidden = true;
@@ -208,4 +212,31 @@ test("the verbs wait for the next ticket, so a press posts and runs nothing", as
   for (const kind of ["take", "handback", "edit", "jump"])
     await page.hears({ kind, step: "draft" });
   assert.deepEqual(page.posts, []);
+});
+
+test("a longer route under the YAML side reopens the page hidden, and folds nothing", async () => {
+  const door = doorOf();
+  const host = routeHostOf(door);
+  await host.opened(PATH, SHORT);
+  host.flipped(PATH);
+  await host.changed(PATH, LONG);
+
+  const now = door.said.pages.at(-1);
+  assert.equal(door.said.pages.length, 2);
+  assert.equal(now.hidden, true);
+  assert.deepEqual(door.said.folds, [PATH]);
+  assert.equal(host.lenses(PATH)[0].title, "Show the drawing");
+});
+
+test("a page the person closes leaves the host, so a change posts nothing", async () => {
+  const door = doorOf({ inset: false });
+  const host = routeHostOf(door);
+  await host.opened(PATH, SHORT);
+  const page = door.said.panels[0];
+  page.gone();
+
+  await host.changed(PATH, ticket("open", ["draft", "review"]));
+  host.themed();
+  assert.deepEqual(page.posts, []);
+  assert.deepEqual(host.lenses(PATH), []);
 });

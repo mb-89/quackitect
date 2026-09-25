@@ -56,7 +56,11 @@ function insetDoor(context, folder) {
       try {
         return pageOf(() => {
           const inset = make(editor, 0, lines, options());
-          return { webview: inset.webview, dispose: () => inset.dispose() };
+          return {
+            webview: inset.webview,
+            dispose: () => inset.dispose(),
+            onDispose: (run) => inset.onDidDispose(run),
+          };
         }, drawn);
       } catch {
         return null;
@@ -71,7 +75,11 @@ function insetDoor(context, folder) {
           { viewColumn: vscode.ViewColumn.Beside, preserveFocus: true },
           options(),
         );
-        return { webview: panel.webview, dispose: () => panel.dispose() };
+        return {
+          webview: panel.webview,
+          dispose: () => panel.dispose(),
+          onDispose: (run) => panel.onDidDispose(run),
+        };
       }, drawn);
     },
 
@@ -108,14 +116,26 @@ function insetDoor(context, folder) {
   };
 }
 
-// A page the host hides and shows again: a hide closes the webview, and a show opens a new one, which posts ready. [[spec/tickets/the-inset-folds-the-frontmatter]]
+// A page the host hides and shows again: a hide closes the webview, and a show opens a new one, which posts ready. A close from outside the host reaches it as gone. [[spec/tickets/the-inset-folds-the-frontmatter#reflect]]
 function pageOf(open, drawn) {
   let held = null;
   let hear = () => {};
+  let gone = () => {};
   const opens = () => {
-    held = open();
-    held.webview.html = drawn(held.webview);
-    held.webview.onDidReceiveMessage((message) => hear(message));
+    const one = open();
+    held = one;
+    one.webview.html = drawn(one.webview);
+    one.webview.onDidReceiveMessage((message) => hear(message));
+    one.onDispose(() => {
+      if (held !== one) return;
+      held = null;
+      gone();
+    });
+  };
+  const closes = () => {
+    const one = held;
+    held = null;
+    one?.dispose();
   };
   opens();
   return {
@@ -123,17 +143,14 @@ function pageOf(open, drawn) {
     onMessage: (run) => {
       hear = run;
     },
-    hide: () => {
-      held?.dispose();
-      held = null;
+    onGone: (run) => {
+      gone = run;
     },
+    hide: closes,
     show: () => {
       if (!held) opens();
     },
-    dispose: () => {
-      held?.dispose();
-      held = null;
-    },
+    dispose: closes,
   };
 }
 

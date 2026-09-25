@@ -41,10 +41,25 @@ function routeHostOf(door) {
   const theme = () => ({ kind: "theme", theme: door.theme() });
 
   // The page an inset draws, or the side panel where the editor refuses the inset. [[spec/design_input/the-editor-draws-the-ticket#one-file-holds-both-halves]]
+  // A page the person closes leaves the host, so nothing posts to it again. [[spec/tickets/the-inset-folds-the-frontmatter#reflect]]
   const pageFor = (path, lines, one) => {
     const page = door.page(path, lines) ?? door.panel(path);
     page.onMessage((message) => took(one, message));
+    page.onGone?.(() => {
+      if (shown.get(path) === one) shown.delete(path);
+    });
     return page;
+  };
+
+  // The side a ticket shows outlives a reopen, so an edit under the YAML folds nothing. [[spec/tickets/the-inset-folds-the-frontmatter#reflect]]
+  const opens = (path, message, yaml) => {
+    shown.get(path)?.page.dispose();
+    const one = { message, lines: linesOf(message.graph), yaml };
+    one.page = pageFor(path, one.lines, one);
+    shown.set(path, one);
+    if (yaml) one.page.hide();
+    else door.folds(path);
+    return one;
   };
 
   // A press on a node, the pointer or an edit waits for [[spec/tickets/the-host-runs-the-verbs]].
@@ -60,20 +75,14 @@ function routeHostOf(door) {
 
     async opened(path, text) {
       if (drawable(path) !== "ticket") return undefined;
-      shown.get(path)?.page.dispose();
-      const message = await graphOf(path, text);
-      const one = { message, lines: linesOf(message.graph), yaml: false };
-      one.page = pageFor(path, one.lines, one);
-      shown.set(path, one);
-      door.folds(path);
-      return one;
+      return opens(path, await graphOf(path, text), false);
     },
 
     async changed(path, text) {
       const one = shown.get(path);
       if (!one) return undefined;
       const message = await graphOf(path, text);
-      if (linesOf(message.graph) !== one.lines) return this.opened(path, text);
+      if (linesOf(message.graph) !== one.lines) return opens(path, message, one.yaml);
       one.message = message;
       one.page.post(message);
       return one;
