@@ -18,7 +18,7 @@ export const READ = "read-handover";
 // A path into the retro folder, with either slash. [[spec/design_output/stop#the-context-hands-over]]
 export const RETRO_PATH = /\.se[\\/]\.retro[^\s`)|\]]*/;
 
-// What each ticket asks, as the pull hands it out. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+// What each ticket asks, as the pull hands it out. [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
 export const ASKS = {
   [WRITE]: [
     "The context passed context.handoverAt, and the ticket in hand stands done.",
@@ -58,7 +58,7 @@ function dueAt(root) {
   return join(root, ...DUE.split("/"));
 }
 
-// [[spec/design_input/the-clear-hands-ephemeral-tickets#a-ticket-is-the-unit-of-work]]
+// [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
 export function isDue(disk, root) {
   try {
     return disk.exists(dueAt(root));
@@ -83,7 +83,7 @@ export function retroIn(text) {
   return found ? found[0] : "";
 }
 
-// What keeps the handover ticket in hand: no file, an empty one, or one naming the retro folder. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+// What keeps the handover ticket in hand: no file, an empty one, or one naming the retro folder. [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
 export function handoverFault(disk, root) {
   const at = join(root, ...HANDOVER.split("/"));
   let text = "";

@@ -21,12 +21,13 @@ The work tab shows the agent at each one.
 - The hand-back shall run the check, and delete the hold where the check passes.
 - The ticket schema shall stay as it stands, and no `held` joins its `state` enum.
 - The work tab shall draw a held ephemeral ticket the way it draws a plan todo.
-- The stop hook shall carry a turn while an ephemeral ticket stands held, as it does for any hold, with the one exception the clear names.
+- The stop hook shall carry a turn while an ephemeral ticket stands held, as it does for any hold.
+- A held `clear` stands as the one exception, and the clear's chapter names it.
 
 For the hold, see [[spec/design_output/pull#the-hand-and-the-hold]]. For the
 plan todo, see [[spec/design_output/stop#the-plan]].
 
-# A ticket is the unit of work
+# The ticket ends first
 
 - A session past `context.handoverAt` shall go due, and no block rides a call.
 - The ticket in hand shall run to its end: the pull hands its next leaf to this hand while one admits it.
@@ -36,7 +37,7 @@ plan todo, see [[spec/design_output/stop#the-plan]].
 The owner accepts the cost: a long ticket runs past `context.handoverAt` with
 no brake, up to the harness's own compaction.
 
-# The clear runs as three tickets
+# Three tickets run the clear
 
 | order | the ticket | the agent does | what closes it |
 |---|---|---|---|
@@ -60,7 +61,7 @@ no brake, up to the harness's own compaction.
 
 For details, see [[spec/design_output/stop#the-queue-alone-clears]].
 
-# The cleanups take the same road
+# Cleanups turn ephemeral
 
 The refactor and check cleanups become ephemeral tickets, so the work tab
 shows the agent at them. The refactoring hand changes apart from this note.

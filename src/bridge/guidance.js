@@ -326,7 +326,7 @@ export function onSessionEnd(e, box) {
   box.cleared = true;
   box.log.say("info", CLEARED, "a clear runs, and the guidance reads again", {
     forgot: forgetsReads(box),
-    // [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+    // [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
     next: readsNext(box),
     detail: box.guidance.sentence,
   });

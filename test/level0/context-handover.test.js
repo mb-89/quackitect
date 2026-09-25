@@ -136,7 +136,7 @@ test("a helper's measure touches nothing", () => {
   assert.equal(holdsForHandover({ agentId: "a1" }, it), null);
 });
 
-// [[spec/design_input/the-clear-hands-ephemeral-tickets#a-ticket-is-the-unit-of-work]]
+// [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
 test("a ticket in hand leaves the turn's end to the tooth, however far past the key", () => {
   const hold = { ticket: "t", step: "implement", reads: [] };
   const it = box(150000, { [at(HOLD)]: JSON.stringify(hold) });
@@ -164,7 +164,7 @@ test("a session due holding nothing is sent to the pull, and lets go past the to
   assert.ok(it.said.some((one) => one.level === "warn" && one.kind === "handover"));
 });
 
-// [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+// [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
 test("a held clear ends the turn, and the completion asks the bridgehead for the clear", () => {
   const it = box(150000, { [at(HOLD)]: CLEARING });
   measures(it, 40000);
@@ -219,7 +219,7 @@ test("the session end of a clear forgets the reads and drops a standing handover
   assert.ok(it.said.some((one) => one.kind === "clear"));
 });
 
-// [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+// [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
 test("the session end of a clear closes the clear, and puts the read of the handover in hand", () => {
   const it = box(150000, { [at(HOLD)]: CLEARING, [at(DUE)]: "{}" });
 

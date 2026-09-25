@@ -59,7 +59,7 @@ export function measures(box, tokens) {
   if (box.handover) return;
   if (box.standsDown || fill < at) return;
   box.handover = { phase: FINISH, asked: 0 };
-  // The pull runs apart from this server, so the mark stands on disk. [[spec/design_input/the-clear-hands-ephemeral-tickets#a-ticket-is-the-unit-of-work]]
+  // The pull runs apart from this server, so the mark stands on disk. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
   marksDue(box.disk, box.work, { tokens: fill, at });
   box.log.say(
     "info",
@@ -109,7 +109,7 @@ export function holdsForHandover(e, box) {
   }
   const due = box.handover;
   if (due?.phase !== FINISH || ownerWaits(e, box)) return null;
-  // A ticket is the unit of work, so a hold standing carries the turn through the tooth. [[spec/design_input/the-clear-hands-ephemeral-tickets#a-ticket-is-the-unit-of-work]]
+  // A ticket is the unit of work, so a hold standing carries the turn through the tooth. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
   if (holdsIn(box.disk, box.work).length) return null;
   due.asked += 1;
   const most = Number(asks(box, MOST) ?? 0);
@@ -139,7 +139,7 @@ function ownerWaits(e, box) {
   return true;
 }
 
-// [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+// [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
 function clearHeld(box) {
   return holdsIn(box.disk, box.work).some(
     ({ held }) => isEphemeral(held) && held.ticket === CLEAR_TICKET,
@@ -153,7 +153,7 @@ function dropsClear(box) {
   dropsDue(box.disk, box.work);
 }
 
-// The clear closes the clear ticket and puts the one reading the handover in its hand, and the mark drops. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+// The clear closes the clear ticket and puts the one reading the handover in its hand, and the mark drops. [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
 export function readsNext(box) {
   let put = 0;
   for (const { at, held } of holdsIn(box.disk, box.work)) {

@@ -167,7 +167,7 @@ test("the handover's own work leaves the plan, the word matched whole, and a pla
   assert.equal(String(it.disk.read(at(PLANS))), before);
 });
 
-// The clear's tickets carry the handover's work. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+// The clear's tickets carry the handover's work. [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
 test("the plan takes no handover todo, due or not, and drops one standing", () => {
   const it = box({
     [at(PLANS)]: JSON.stringify({

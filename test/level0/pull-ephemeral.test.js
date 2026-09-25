@@ -30,7 +30,7 @@ const due = { [at(DUE)]: JSON.stringify({ tokens: 140000, at: 130000 }) };
 const holding = (name) => ({ [HOLD]: JSON.stringify(heldAs(name, HAND)) });
 const held = (disk) => JSON.parse(disk.read(HOLD));
 
-// [[spec/design_input/the-clear-hands-ephemeral-tickets#a-ticket-is-the-unit-of-work]]
+// [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
 test("a pull with no mark hands the queue, and a pull on a session due hands the handover ticket", () => {
   const plain = desk();
   assert.match(heard(() => pulling(ROOT, ["pull"], plain.it)).said, /^work {2}free-one/m);
@@ -74,7 +74,7 @@ test("a helper's pull takes none of the clear's tickets", () => {
   assert.ok(!said.includes("handover stands in your hand"), said);
 });
 
-// [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+// [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
 test("the handover's hand-back refuses a missing or retro-naming file, and hands the clear on a good one", () => {
   const { it, disk } = desk({ ...due, ...holding("handover") });
 

@@ -64,7 +64,7 @@ test("no call carries a block, under the key or past it", async () => {
   assert.equal(handed(await call(box, 70000)), false);
 });
 
-// [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+// [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
 test("a held clear ends the turn, the completion asks for the clear, and the clear hands the read", async () => {
   const box = served();
   await call(box, 40000);

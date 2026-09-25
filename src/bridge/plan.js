@@ -136,7 +136,7 @@ export function planned(e, box) {
       .filter(Boolean),
   );
   plan.todos = plan.todos.filter((one) => !done.has(one.title));
-  // The clear's tickets carry the handover's work, so the plan drops a handover todo and takes none. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+  // The clear's tickets carry the handover's work, so the plan drops a handover todo and takes none. [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
   plan.todos = plan.todos.filter((one) => !namesHandover(one?.title));
   if (namesHandover(plan.working)) plan.working = "";
   const most = Number(asks(box, MOST_OPEN) ?? 0);

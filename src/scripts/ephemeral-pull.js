@@ -16,7 +16,7 @@ export function handsEphemeral(it, hand, name, rows = []) {
   return 0;
 }
 
-// A bare pull shows the ask, and a pass runs the ticket's check. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+// A bare pull shows the ask, and a pass runs the ticket's check. [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
 export function ephemeralPull(it, who, verdict) {
   const held = who.held;
   if (!verdict.said) {
@@ -35,7 +35,7 @@ export function ephemeralPull(it, who, verdict) {
     }
     return handsEphemeral(it, who.hand, CLEAR, [`${WRITE} closes, and ${HANDOVER} stands.`]);
   }
-  // Level zero closes the clear at the clear itself, so no hand-back reaches it. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-clear-runs-as-three-tickets]]
+  // Level zero closes the clear at the clear itself, so no hand-back reaches it. [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
   if (held.ticket === CLEAR) {
     say(REFUSED, ASKS[CLEAR]);
     return 1;
@@ -43,7 +43,7 @@ export function ephemeralPull(it, who, verdict) {
   return onward(it, who, [`${held.ticket} closes.`]);
 }
 
-// The ticket the hand gives back hands its next leaf to this hand where one admits it, and the handover ticket goes out otherwise. [[spec/design_input/the-clear-hands-ephemeral-tickets#a-ticket-is-the-unit-of-work]]
+// The ticket the hand gives back hands its next leaf to this hand where one admits it, and the handover ticket goes out otherwise. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
 export function dueHandOut(it, who, all) {
   const last = who.held?.ephemeral
     ? null
