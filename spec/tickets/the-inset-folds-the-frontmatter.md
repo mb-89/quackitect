@@ -96,7 +96,12 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-editor-takes-an-inset, the-ticket-answers-the-editor, the-drawing-draws-a-route]
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 6684e0b917fda94b0ab8f35ac4f27a34aa428034
+    hash_after: 6684e0b917fda94b0ab8f35ac4f27a34aa428034
 ---
 
 # Ask
@@ -127,17 +132,37 @@ Without it the drawing of the two cloud groups reaches no editor. So a person re
 
 <!-- the form is text -->
 
+The probe's `decide` waits on the owner. So the host tries the inset, and opens the side panel where the editor refuses the call. The page and the messages stay the same under both. For details, see [[spec/design_output/drawing#the-page-speaks-in-messages]].
+
+| part | file | what it does |
+|---|---|---|
+| the host | `src/extension/lib/route-host.js`, `routeHostOf(door)` | reads a ticket's text, answers the page's `ready` with `graph` and `theme`, answers `jump` with a reveal of the line, and posts `graph` again on each change. It calls no `vscode`, so a test drives it over a fake door |
+| the flip | `src/extension/lib/lens.js`, `lensesOf` | a lens on the first line reads `Show the YAML` or `Show the drawing`, and a press folds the frontmatter under the drawing or unfolds it and hides the drawing |
+| the door | `src/extension/editor-inset.js`, `insetDoor(context, folder)` | `createWebviewTextEditorInset` over the first line where the call stands, and `createWebviewPanel` beside the text otherwise. It folds the frontmatter through `editor.fold`, and hands each text change on to the host |
+| the manifest | `src/extension/package.json` | names `editorInsets` under `enabledApiProposals`, and the flip command |
+| the wire | `src/extension/extension.js`, `activate` | opens the host on every visible ticket, and on a change of the active editor |
+
+The page loads the bundle `src/scripts/bundle.js` writes, so the webview names its folder among `localResourceRoots`. The host hands `take`, `handback` and `edit` on to [[spec/tickets/the-host-runs-the-verbs]], and answers them with nothing here.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
 
+- `src/extension/extension.js`, `activate`, which opens the host
+- `src/extension/editor.js`, `editorDoor`, which spreads the inset door beside the lens door
+- `src/extension/lib/lens.js`, `lensesOf`, which gains the flip lens
+- `src/extension/lib/drawing.js`, `graphAt`, which the host reads the graph through
+- `test/level0/lens.test.js`, the lens cases the flip lens joins
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
+
+- first
 
 ## review
 
