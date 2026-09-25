@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -84,6 +84,10 @@ record:
     hash_after: b809c934adb7818e6b5220386c1c9b1dcb88beab
     returns: 1
     why: "| finding | fix |; |---|---|; | `holdStands` in `src/bridge/stop.js` reads any `.json` under `HOLDS`, and a hold stands one a hand, so a helper's hold passes a session holding nothing | Read the session's own hold, through `holdAt` or `holdOf` in `src/scripts/guidance-hand.js` and the session's hand, and add a test where a helper holds a ticket and the session holds none |; | `holdDoor` stands nowhere; `onWrite` in `src/bridge/write.js` runs `markDoor`, `ownerDoor`, `privateDoor`, `schemaDoor` and `voiceDoor` | Name the door the new one follows in that list |; | `holdStands` and `privateStands` stand unexported inside `src/bridge/stop.js` | Name the module the shared reader moves to, and both importers |; | The callers name `onToolCall` in `src/bridge/server.js` alone, while `checked` in `src/bridge/apply.js` and `mintsNote` in `src/bridge/tools.js` call `onWrite` directly | Add both, each as a file and a function |; | The `god` row reads as an owner's assumption, while [[spec/design_output/config#the-engine-controls]] decides it and `standsDown` in `src/bridge/stop.js` already stands `ticket-in-hand` down there | Point at that chapter, and call `standsDown` in place of a check of its own |; The rest holds against the code:; `onToolCall` reaches `onWrite` for Write, Edit and MultiEdit through `TOOLS` in `src/bridge/server.js`.; `checked` and `mintsNote` pass the call's `agentId` into `onWrite`, so the helper row reads it.; `HANDOVER` in `.claude/skills/level0/lib/folders.js` names `.se/HANDOVER.md`, and `TICKETS` names `.se/tickets`.; `./RUNME.sh check` reads at implement, since a design leaf carries no branch, and no retro rides a design handback."
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: bd39522d303c32e481121d4debba8055292f3ddd
+    hash_after: bd39522d303c32e481121d4debba8055292f3ddd
 ---
 
 # Ask
@@ -112,7 +116,15 @@ Without it a session edits and mints while the work tab shows nothing in its han
 
 <!-- the form is text -->
 
-A `ticketDoor` joins the checks in `onWrite` in `src/bridge/write.js`, after `holdDoor`. It refuses a write where no ticket stands in hand, and names `./RUNME.sh ticket pull`. It reads the hand the way the `ticket-in-hand` stop check does, through one reader both import.
+A `ticketDoor` joins the checks in `onWrite` in `src/bridge/write.js`, after `ownerDoor` and before `privateDoor`. It refuses a write where the session holds no ticket, and names `./RUNME.sh ticket pull`.
+
+The door reads the session's own hand, and no other hand's:
+
+- the hold: `holdOf` in `src/scripts/guidance-hand.js`, at the hand `handOf` names
+- a private ticket: `privateStands` moves out of `src/bridge/stop.js` into `src/scripts/guidance-hand.js`, and both files import it
+- the binding: `standsDown` in `src/bridge/stop.js`, over `engine.binding` through `asks`
+
+The `ticket-in-hand` stop check keeps `holdStands`, which reads every hand on the box.
 
 | the write | what the door does |
 |---|---|
@@ -121,9 +133,7 @@ A `ticketDoor` joins the checks in `onWrite` in `src/bridge/write.js`, after `ho
 | a helper's write, carrying an `agentId` | passes, because the refactoring hand and a helper work beside the session |
 | a new ticket under `spec/tickets` or a note under `.se/tickets` | passes, because the mint and the note open the ask |
 | `.se/HANDOVER.md` | passes |
-| `engine.binding` at `god` | passes, because the owner orders a fix with no ticket there |
-
-The last row is an assumption, and the owner decides it. The god-mode fixes of this session land with no ticket held.
+| `engine.binding` at `god` | passes through `standsDown`. For details, see [[spec/design_output/config#the-engine-controls]] |
 
 ### callers
 
@@ -132,8 +142,13 @@ The last row is an assumption, and the owner decides it. The god-mode fixes of t
 <!-- the form is list -->
 
 - `src/bridge/write.js`, `onWrite`, which runs the doors
-- `src/bridge/stop.js`, `holdStands` and `privateStands`, the hand reader the door shares
-- `src/bridge/server.js`, `onToolCall`, which reaches `onWrite` for Write, Edit, the patch and the mint
+- `src/bridge/server.js`, `onToolCall`, which reaches `onWrite` for Write, Edit and MultiEdit
+- `src/bridge/apply.js`, `checked`, which reaches `onWrite` for the patch
+- `src/bridge/tools.js`, `mintsNote`, which reaches `onWrite` for the mint
+- `src/bridge/stop.js`, `privateStands`, which moves out
+- `src/bridge/stop.js`, `standsDown`, which the door calls
+- `src/scripts/guidance-hand.js`, `holdOf`, which the door calls
+- `src/scripts/pull-hand-of.js`, `handOf`, which names the session's hand
 
 ### answers
 
@@ -141,7 +156,11 @@ The last row is an assumption, and the owner decides it. The god-mode fixes of t
 
 <!-- the form is list -->
 
-- first draft
+- a helper's hold passes a session holding nothing: the door reads the session's own hold through `holdOf`
+- `holdDoor` stands nowhere: the door follows `ownerDoor`
+- the shared reader has no home: `privateStands` moves to `src/scripts/guidance-hand.js`
+- the callers miss two: `checked` and `mintsNote` join the list
+- the owner decides the god row: `standsDown` decides it, per the config design
 
 ## review
 
