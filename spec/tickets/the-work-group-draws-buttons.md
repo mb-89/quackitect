@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor, a-save-fills-the-ticket]
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -133,6 +133,17 @@ record:
     hash_after: ed79e7304df8d0359a3512601b495e94fe612bfb
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 749168e36194bb12085bf6ee3db644de5ee31d37
+    hash_after: 749168e36194bb12085bf6ee3db644de5ee31d37
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 13 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -331,11 +342,15 @@ The group case seeds the real config through a JSON import, so it reads the butt
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/work-group.test.js test/level0/work.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -343,11 +358,25 @@ The group case seeds the real config through a JSON import, so it reads the butt
 
 <!-- the form is text -->
 
+The sidebar now draws the section `work`, with the three buttons the config declares:
+
+| button | a press |
+|---|---|
+| the work editor | opens the work tab, and the button carries the count of tickets waiting on the person |
+| pull for me | takes the ticket the queue names, through the road the ticket's buttons run, and opens it. An empty queue says so |
+| new ticket | asks a name in lower-case words, writes a ticket with an empty `process` where no file stands, and opens it |
+
+The fill on save then writes the new ticket's route. The count runs with no progress toast, since it rides every draw. The contract test that pinned the buttons undrawn now asserts every declared control draws.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change stays in the files the approach names, and the contract test pinning the old state
+- every door call carries a fake in the work group test
+- each new function points at this ticket or the design input
 
 # verdict
 
