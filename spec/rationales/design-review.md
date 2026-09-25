@@ -16,7 +16,7 @@ Read this note again on either of two signs:
 
 A design review failing on craft sent a draft round for a local fix the implementer made in passing. Four rounds of one ticket named craft findings, and each cost a full redraft.
 
-So a design review stopped what reached past one spot: a wrong road, a verb that refused, a rule that never ran. The owner drew that line.
+So a design review stopped what reached past one spot: a wrong road, a verb that refused, a rule nothing ran. The owner drew that line.
 
 ## 3. A finding rides out
 
