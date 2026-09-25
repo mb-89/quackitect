@@ -96,12 +96,16 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-inset-folds-the-frontmatter, the-ticket-answers-the-editor, the-drawing-draws-a-route]
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
     hash_before: b591f43f5f7b9f9f2da4f58b8920959557b016c7
     hash_after: b591f43f5f7b9f9f2da4f58b8920959557b016c7
+  - step: design/review
+    hand: box 75b31b3d5012 · claude-code-remote · helper-11
+    hash_before: cf85e458a4e58ac8ac801e765e811b509c92c188
+    hash_after: cf85e458a4e58ac8ac801e765e811b509c92c188
 ---
 
 # Ask
@@ -191,6 +195,26 @@ The tests stand in `test/level0/route-host.test.js`, over the fake door:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+The approach answers each line of the ask, and no finding blocks it.
+
+| the ask | the approach |
+|---|---|
+| a jump opens the chapter's line | `door.jumps(path, line)`, with a case |
+| a route edit runs `ticket route` | `routeArgvOf`, with a case reading the argv |
+| a press on the pointer takes or hands back | `ticketLensOf(door).took`, with three cases |
+| a refusal shows in the editor | the route JSON through `door.tells`, with a case |
+| `./RUNME.sh check` passes | it answers 0 on this commit |
+
+The findings, each a detail the implement step carries:
+
+- The graph's `line` counts from one, so `jumps` selects `line - 1` in the editor.
+- `took` in the host reads the path from the `pageFor` closure, since `one` holds none.
+- The route verb writes the disk, so the host saves a dirty ticket before the edit.
+- The case "the verbs wait for the next ticket" goes, since the verbs now run.
+- A take through the lens shows its own refusal, so the route case covers the new road.
 
 # implement
 
