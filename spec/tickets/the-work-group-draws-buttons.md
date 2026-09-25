@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor, a-save-fills-the-ticket]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -156,6 +156,14 @@ record:
     hand: box 75b31b3d5012 · claude-code-remote
     hash_before: 9843715fce8131c942ce4031ea823d3f68656962
     hash_after: 9843715fce8131c942ce4031ea823d3f68656962
+  - step: implement/change
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 0a9a3029420ca0d3cc22fb8de56544cb2dcbeaef
+    hash_after: 0a9a3029420ca0d3cc22fb8de56544cb2dcbeaef
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-work-group-draws-buttons.md:436:1: Shape: A run holds 3 paragraphs with no list, table or diagram betwe"
 ---
 
 # Ask
@@ -314,7 +322,7 @@ The group case seeds the real config through a JSON import, so it reads the butt
 
 <!-- the form is text -->
 
-The class: a write over a path the hand never read. The tests-red step wrote two test files through a shell redirect, and both names stood already, holding the branch verb cases.
+The class: a write lands on a path the hand writes blind. The tests-red step wrote two test files through a shell redirect, and both names stood already, holding the branch verb cases.
 
 The fix for the class: look at a target before a write, and create a new file through a road that refuses a standing one. The fix here moves the new cases to `test/level0/work-strings.test.js` and `test/level0/sidebar-work.test.js`. It restores both old files byte for byte from the commit before the change.
 
