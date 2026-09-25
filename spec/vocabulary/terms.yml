@@ -170,6 +170,8 @@ terms:
   - {word: backlog, means: "the loose tickets on trunk that name no group and wait for a person to sort them"}
   - {word: backslash, means: "the character that escapes the next character in a shell command"}
   - {word: blacklist, means: "a list of forms a rule refuses inside a larger list of allowed words"}
+  - {word: breadcrumb, means: "one step in the path shown on top of a view that a click jumps back to"}
+  - {word: breadcrumbs, means: "the path of steps shown on top of a view from the start page down to where the reader stands"}
   - {word: bundler, means: "a tool that joins the extension source files into one file the editor loads"}
   - {word: caller, means: "the code or agent that calls a tool and states what it expects back"}
   - {word: cgo, means: "the go feature that lets go code call c code and so needs a c compiler to build", source: "https://pkg.go.dev/cmd/cgo"}
