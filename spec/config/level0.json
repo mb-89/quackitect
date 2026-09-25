@@ -40,6 +40,10 @@
     "change": "opus",
     "decide": "opus"
   },
+  "judge": {
+    "comment": "The model the pull asks over a hand-back's evidence before the leaf lands. It stands off on the owner's word.",
+    "enabled": false
+  },
   "plan": {
     "comment": "The engine's three questions every so many calls: what you work on, which todos you finished, which you add. The third stays away past mostOpen. spec/design_output/stop.md, chapter The plan, says the rest.",
     "everyCalls": 10,

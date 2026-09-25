@@ -76,7 +76,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: person
+    hash_before: 3d677235324507ac9955df83224b9420f6c40fa0
+    hash_after: 3d677235324507ac9955df83224b9420f6c40fa0
 ---
 
 # Ask
