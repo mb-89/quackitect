@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/review
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -78,6 +78,12 @@ record:
     hand: box d6f05e3a585030 · claude-code
     hash_before: 0ed73f5c263eee3034470b49a6259578ee63ad83
     hash_after: 0ed73f5c263eee3034470b49a6259578ee63ad83
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-2
+    hash_before: 287d591cdbea52af40e32418a29ba3f1130df008
+    hash_after: 287d591cdbea52af40e32418a29ba3f1130df008
+    returns: 1
+    why: "`pull` in `src/scripts/pull.js` hands a desk on trunk `it.take(named || urgentGroup(it))`, so a guard in `take` turns a plain desk pull into a refusal while an urgent group stands. Name the change that road takes, and list `namedGroup` and `urgentGroup` in `src/scripts/pull-hand.js` as callers.; `trunkGuard` in `src/bridge/bash.js` guards `main` alone, so a desk's raw `git commit` on a `work/` branch lands past a guard in `landsAndPushes`. Name the door that refuses it, the Bash door or `.githooks/pre-commit`, or say why the commit verb alone answers the ask.; `release` in `src/scripts/work.js` moves a desk onto a `work/` branch and commits there through `letGo`. Say whether the guard reaches it."
 ---
 
 # Ask
@@ -146,6 +152,12 @@ The design notes change with it. `pull#the-engine-takes-the-branch` drops the de
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- `pull` in `src/scripts/pull.js` hands a desk on trunk `it.take(named || urgentGroup(it))`, so a guard in `take` turns a plain desk pull into a refusal while an urgent group stands. Name the change that road takes, and list `namedGroup` and `urgentGroup` in `src/scripts/pull-hand.js` as callers.
+- `trunkGuard` in `src/bridge/bash.js` guards `main` alone, so a desk's raw `git commit` on a `work/` branch lands past a guard in `landsAndPushes`. Name the door that refuses it, the Bash door or `.githooks/pre-commit`, or say why the commit verb alone answers the ask.
+- `release` in `src/scripts/work.js` moves a desk onto a `work/` branch and commits there through `letGo`. Say whether the guard reaches it.
 
 # implement
 
