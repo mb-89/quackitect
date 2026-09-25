@@ -460,7 +460,7 @@ nests, and each field is the heading one level under it. A comment, an
 | `link` | one line, resolving to a file or a note in the tree |
 | `files` | the files under this ticket's commits since the first take, and the working tree while the tip stands at the hold's. `commitsFor` answers whose commit is whose |
 | `choice` | one line, among the options |
-| `verdict` | opens with `pass` or `fail`, and a fail carries a finding |
+| `verdict` | opens with `pass`, `pass with findings` or `fail`. A fail carries a finding, and a pass with findings carries a row a child, as `- <child-name>: <finding>` |
 | `checked` | one line per item of the checklist, where the leaf or a phase above carries one |
 
 The schema renders `checked` as an optional chapter under every leaf whose
@@ -522,6 +522,28 @@ skipping the ones whose condition fails, or closes the ticket `done` past the
 last. It sets `state: open`, stages everything, and commits as `<ticket>:
 <what changes>`. Then it drops the hold, pushes, and hands out the next leaf.
 
+## A finding rides out
+
+A verdict opening `pass with findings` mints a child ticket a row, and the
+parent goes on to its next leaf. `verdictIn` in `src/scripts/pull-chapter.js`
+answers `findings` with each row's name and finding, and a plain `pass` keeps
+its rows as the reason.
+
+| the row | what the hand-back does |
+|---|---|
+| no row under the opener | refuses, and the hold stands |
+| a row naming no child | refuses, and names the row |
+| a name past `names.words` | refuses, and names the name |
+| a name a ticket carries, or a name twice | refuses, and names the name |
+| every row sound | mints each child, then passes the parent |
+
+`minted` in `src/scripts/pull-writes.js` builds every child before it writes
+any. A child follows `spec/processes/trivial.yaml` and stands at `draft`. It
+carries `parent`, the parent's `group` where one stands, and the finding as its
+Ask. The children land in the parent's pass commit, whose subject reads
+`<parent>: passes <leaf>, mints <a>, <b>`. A private parent writes its children
+under `.se/tickets`. The hand that fills a child's ask opens it.
+
 ## The record holds the answers
 
 `withEntry` writes one entry as YAML rows. A list of objects under a key nests
@@ -576,8 +598,10 @@ stay out of a commit naming another ticket.
 `--fail "why"` writes an entry with the reason and `returns`, one past the
 most this step carries. It sets `step` to the row's `on_fail`, or to the leaf
 itself where none stands. A phase named there sends the ticket to its first
-leaf. At `work.failsBeforeWait` returns the pull drops the hold and answers
-`wait`, so the target stands open for the hand that takes it next.
+leaf. At `work.failsBeforePerson` returns the pull puts a person step in before
+the target, asking the fail's reason, and the step rides the fail commit. A
+first fail below the cap goes back with no step. For the road past the cap, see
+[[spec/design_output/pull#a-count-asks-a-person]].
 
 A fail says the step works not, so its commands run for the record and refuse
 nothing. A step whose evidence stands red is exactly a step a hand fails, and
@@ -591,11 +615,11 @@ A question carries a grade, and the grade picks the road:
 | the grade | who answers it | the road |
 |---|---|---|
 | design, which the notes under `spec/design_input` leave open | the owner | `branch escalate`, which inserts the person step below |
-| craft, which those notes settle | the drafter | the fail verdict, which `on_fail` routes to the drafting step |
+| craft, which those notes settle | the implementer | a row under the design review's plain `pass`, which the implement step reads |
 
-So a craft question reaches the drafter through a road the engine holds
+So a craft question reaches the implementer through a road the engine holds
 already, and the route takes on no person step. [[spec/guidance/working]] and
-[[spec/guidance/review/reviewing]] each carry the rule naming the grade.
+[[spec/guidance/review/design]] each carry the rule naming the grade.
 
 `withPersonStep` puts a step named `person-<n>` before the target, `by:
 person`, `to: engine`, with the question under `asks` and one `answer`
@@ -618,19 +642,21 @@ Then it drops the hold, commits by ticket and step, pushes, and hands out
 the next ticket. With no hold standing it refuses and names the pull. So a
 hand reaches the person step, and one mechanism inserts every kind.
 
-## A count inserts no step
+## A count asks a person
 
-The escalation verb is the one road a step goes in by, so a count inserts
-none. The owner rules that a step a box writes waits for a person the box
-cannot reach. The counts below stand, and each answers on its own road:
+A design review fails an unusable approach alone, so a second fail is no
+quarrel between hands. The owner rules that it goes to the owner. `failed` in
+`src/scripts/pull-writes.js` calls `withPersonStep` before it lands, so the
+person step and the fail share one commit. The counts below stand:
 
 | the count | what the pull does |
 |---|---|
-| `work.refusalsBeforeFail` | fails the leaf back, carrying the count and the first finding |
-| `work.failsBeforeWait` | drops the hold and answers `wait` |
+| `work.refusalsBeforeFail` | fails the leaf back, carrying the count and the first finding, and the fail count reads it |
+| `work.failsBeforePerson` | puts a person step in before the target, asking the reason |
+| `work.stepsBeforeSplit`, reached | leaves the person step out, drops the hold and answers `wait` |
 
-So a hand reaching no answer leaves the leaf open, and the next hand takes it
-where it stands.
+A desk writes `by: person` on that step, and a cloud box writes `by: anyone`
+and answers it itself.
 
 [[spec/rationales/cloud]] carries what a count costs where it reaches a person
 first.

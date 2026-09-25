@@ -94,7 +94,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: implement/change
+step: implement/tests-green
 todo: true
 record:
   - step: design/draft
@@ -116,6 +116,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 98ca5dce38a82d61250cec7b5a44bef42351d545
+    hash_after: 98ca5dce38a82d61250cec7b5a44bef42351d545
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/pull-findings.test.js:53:1: CodeComment: Code carries no comment here. Write a header of at most five lines "
 ---
 
 # Ask
@@ -289,11 +297,18 @@ The fail cases live in `test/level0/pull-fails.test.js`, because `pull-steps.tes
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/scripts/pull-chapter.js src/scripts/pull-writes.js src/scripts/pull.js src/scripts/cli-doors.js test/level0/pull-fails.test.js test/level0/pull-findings.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the route, the pull's pass and fail, the config key, the ticket schema's `parent` and the review guidance, which the ask names
+- every door the change reaches runs on the fakes of `test/level0/pull-doors.js`
+- `minted`, `passed` and `failed` link `spec/design_output/pull.md`, which carries the approach
+- the design rules stand in `spec/guidance/review/design.md` alone, and `reviewing.md` loses them
 
 ## tests-green
 

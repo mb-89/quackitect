@@ -6,18 +6,38 @@ import { entryNamed } from "../../.claude/skills/level0/lib/schema.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
-import { CLOSED, frontOf, OPEN, recordIn, withEntry, withField } from "../engine/group.js";
+import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
+import {
+  CLOSED,
+  fieldOf,
+  firstLeaf,
+  frontOf,
+  OPEN,
+  recordIn,
+  TICKETS,
+  withEntry,
+  withField,
+} from "../engine/group.js";
 import { dropHold } from "./guidance-hand.js";
+import { askRows, processAt } from "./process.js";
 import { roleOf } from "./pull-hand-of.js";
 import { landed, unlandedRows } from "./pull-landed.js";
-import { childrenSay, handOut, holdsHere, ticketsHere } from "./pull-hand.js";
+import {
+  childrenSay,
+  handOut,
+  holdsHere,
+  ticketsHere,
+  withPersonStep,
+} from "./pull-hand.js";
+import { fromHold, NOTES, schemasHere } from "./ticket.js";
 import { DONE, REFUSED, say, WAIT, WORK, walkOf } from "./pull-route.js";
 import { changedIn } from "./work.js";
 import { pushed, sentOut } from "./pull-push.js";
 
 export { pushed, sentOut };
 
-export function passed(it, who, one, leaf, held, answered) {
+// `more` carries what rides the pass commit beside the ticket: the changes its subject names, and the files it wrote, which a refused commit takes back. [[spec/design_output/pull#a-finding-rides-out]]
+export function passed(it, who, one, leaf, held, answered, more = {}) {
   const tip = one.private ? "" : tipOf(it);
   let text = withEntry(one.text, {
     step: leaf.path,
@@ -26,7 +46,7 @@ export function passed(it, who, one, leaf, held, answered) {
     hash_after: tip,
     answered,
   });
-  const changes = [`passes ${leaf.path}`];
+  const changes = [`passes ${leaf.path}`, ...(more.changes ?? [])];
 
   let next = leaf.leaves[leaf.at + 1];
   while (next) {
@@ -52,11 +72,59 @@ export function passed(it, who, one, leaf, held, answered) {
 
   one.text = text;
   const finding = landed(it, one, changes);
-  if (finding) return unlanded(one, leaf, finding);
+  if (finding) {
+    for (const at of more.wrote ?? []) it.disk.remove(at);
+    return unlanded(one, leaf, finding);
+  }
   dropHold(it, who.hand);
   const sent = sentOut(it, one, who.branch, leaf);
   if (!sent.ok) return refusedPush(sent);
   return onward(it, who, [`${one.name} ${changes.join(", ")}.`, ...sent.why]);
+}
+
+// A design review passing with findings mints a draft child a row on the trivial route, and every child is built before any is written. The children ride the parent's pass commit. [[spec/design_output/pull#a-finding-rides-out]]
+export function minted(it, who, one, leaf, held, findings, answered) {
+  const route = processAt(it.disk, it.method ?? it.root, it.join, CHILD_ROUTE);
+  if (route.why) return unminted(one, leaf, route.why);
+  const folder = one.private ? NOTES : TICKETS;
+  const group = fieldOf(one.text, "group");
+  const built = [];
+  for (const { name, line } of findings) {
+    const path = `${folder}/${name}.md`;
+    const made = mintedNote(schemasHere(it), {
+      kind: "ticket",
+      path,
+      fields: {
+        state: DRAFT,
+        process: route.link,
+        process_hash: route.hash,
+        steps: fromHold(route.route, { ticket: one.name, step: leaf.path }),
+        step: firstLeaf(route.route),
+        parent: one.name,
+        ...(group ? { group } : {}),
+        Ask: [askRows(route.ask), "", line].join("\n").trim(),
+      },
+    });
+    if (made.why) return unminted(one, leaf, `${name} mints nothing: ${made.why}`);
+    built.push({ at: it.join(it.root, ...path.split("/")), text: made.text });
+  }
+  it.disk.makeDir(it.join(it.root, ...folder.split("/")));
+  for (const child of built) it.disk.write(child.at, child.text);
+  const names = findings.map((finding) => finding.name).join(", ");
+  return passed(it, who, one, leaf, held, answered, {
+    changes: [`mints ${names}`],
+    wrote: built.map((child) => child.at),
+  });
+}
+
+// The route a finding's child follows. [[spec/design_output/pull#a-finding-rides-out]]
+const CHILD_ROUTE = "trivial";
+const DRAFT = "draft";
+
+// A child that mints nothing lands nothing, so the hold stands. [[spec/design_output/pull#a-finding-rides-out]]
+function unminted(one, leaf, why) {
+  say(REFUSED, [why, "", `Fix it, and ${one.name} stays in hand at ${leaf.path}.`]);
+  return 1;
 }
 
 // [[spec/design_output/pull#children-before-their-group]]
@@ -83,15 +151,20 @@ export function failed(it, who, one, leaf, held, reason, answered) {
   });
   const changes = [`fails ${leaf.path} back to ${back}`];
   one.text = withField(withField(text, "step", back), "state", OPEN);
+  // At the cap a person step goes in before the target, asking the reason, so it rides the fail commit. [[spec/design_output/pull#the-fail]]
+  const most = Number(it.fails);
+  const capped = most > 0 && returns >= most;
+  const asks = `${leaf.path} fails back ${returns} times: ${reason}`;
+  const person = capped ? withPersonStep(it, one, back, asks).path : "";
+  if (person) changes.push(`asks ${person}`);
 
   const finding = landed(it, one, changes);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
   const sent = sentOut(it, one, who.branch, leaf);
   if (!sent.ok) return refusedPush(sent);
-  // Past the cap the hold drops and the answer waits, because a leaf going round writes a step a box inserts and nobody answers. [[spec/design_output/pull#the-fail]]
-  const most = Number(it.fails);
-  if (most > 0 && returns >= most) {
+  // Where the split cap refuses the person step, the hold drops and the answer waits. [[spec/design_output/pull#the-fail]]
+  if (capped && !person) {
     say(WAIT, [
       `${one.name} ${changes.join(", ")}, and ${leaf.path} fails back ${returns} times.`,
       `The hold drops here, so ${back} stands open for the hand that takes it next.`,

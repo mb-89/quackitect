@@ -76,21 +76,3 @@ gate off, and the switch stays off.
 
 So the reader hands back a list of fixes, and the merge stays a person's call.
 It spends a person's attention where it pays.
-
-## 11. A design review stops structure
-
-A design review failing on craft sends a draft round for a local fix the
-implementer makes in passing. Four rounds of one ticket named craft findings,
-and each cost a full redraft.
-
-So a design review stops what reaches past one spot: a wrong road, a verb that
-refuses, a rule that never runs. The owner drew that line.
-
-## 12. Form waits for the push
-
-The write door lets a line at warning land, and tells the hand to leave it. A
-review failing on that same line sent one ticket through five drafts, and the
-last fail named prose alone.
-
-So a form finding stands in the Problems panel, and the push clears it. The
-owner set this for the whole tree.

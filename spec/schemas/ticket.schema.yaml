@@ -258,7 +258,7 @@ frontmatter:
 
     parent:
       type: string
-      description: the ticket whose children step waits for this one
+      description: the ticket whose design review minted this one
 
     depends_on:
       type: [array, string]

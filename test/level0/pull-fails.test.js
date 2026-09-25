@@ -67,13 +67,12 @@ test("a second fail on a desk puts a person step before design/draft, asking the
   const person = readNote(now).front.said.steps[0].steps[0];
   assert.equal(person.by, "person", "a desk sends it to a person");
   assert.match(String(person.asks), /still thin/, "the step asks the fail's reason");
-  assert.equal(commits.length, 1, "one commit lands the fail");
+  // The hand-out after the fail commits for the next ticket, so the case reads this ticket's commits alone.
+  const own = commits.filter((one) => one.subject.startsWith("a-child:"));
+  assert.equal(own.length, 1, "one commit lands the fail");
+  assert.match(own[0].subject, /^a-child: fails design\/review back to design\/draft/);
   assert.match(
-    commits[0].subject,
-    /^a-child: fails design\/review back to design\/draft/,
-  );
-  assert.match(
-    commits[0].text,
+    own[0].text,
     /- name: person-1\n/,
     "the person step rides the fail commit",
   );

@@ -40,21 +40,39 @@ test("the design review note fails an unusable approach alone, sends each other 
   const fails = rules.filter((one) => /\bfail/i.test(one) && /unusable/i.test(one));
   assert.equal(fails.length, 1, "one rule fails a design, on an unusable approach");
   const findings = rules.filter((one) => /pass with findings/i.test(one));
-  assert.equal(findings.length, 1, "one rule sends the other findings under pass with findings");
+  assert.equal(
+    findings.length,
+    1,
+    "one rule sends the other findings under pass with findings",
+  );
   assert.match(findings[0], /child/i, "the rule mints a child");
   assert.match(findings[0], /\brow\b/i, "one child a row");
   const form = rules.filter((one) => /\bform\b/i.test(one));
   assert.equal(form.length, 1, "one rule grades a form finding");
-  assert.doesNotMatch(form[0], /\bfails? (the|a) (design|review)\b/i, "a form finding fails no review");
+  assert.doesNotMatch(
+    form[0],
+    /\bfails? (the|a) (design|review)\b/i,
+    "a form finding fails no review",
+  );
   assert.match(form[0], /\bpass/i, "the review passes over it");
 });
 
 // [[spec/tickets/a-question-reaches-its-owner]]
-test("the reviewing note fails a design on design alone, and hands craft to the implement step", () => {
-  const rules = rulesIn("spec/guidance/review/reviewing.md");
+test("the design review note hands a craft finding to the implement step, under a plain pass", () => {
+  const rules = rulesIn("spec/guidance/review/design.md");
   const said = rules.filter((one) => /craft/i.test(one));
 
-  assert.equal(said.length, 1, "one rule grades the question");
-  assert.match(said[0], /on a design finding alone/i, "the rule fails a design on design alone");
-  assert.match(said[0], /craft finding to the implement step/i, "the rule says where a craft one goes");
+  assert.equal(said.length, 1, "one rule grades a craft finding");
+  assert.match(said[0], /under a plain `pass`/i, "the rule passes over it");
+  assert.match(
+    said[0],
+    /for the implement step/i,
+    "the rule says where a craft one goes",
+  );
+  assert.equal(
+    rulesIn("spec/guidance/review/reviewing.md").filter((one) => /craft/i.test(one))
+      .length,
+    0,
+    "the branch review note holds no design rule",
+  );
 });

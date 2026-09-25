@@ -58,7 +58,7 @@ export async function doorsHere() {
     work: roots.work,
     words: await said.ask("names.words"),
     stale: await said.ask("work.staleAfter"),
-    fails: await said.ask("work.failsBeforeWait"),
+    fails: await said.ask("work.failsBeforePerson"),
     refusals: await said.ask("work.refusalsBeforeFail"),
     splits: await said.ask("work.stepsBeforeSplit"),
     // [[spec/design_output/pull#the-hand-rule]]
