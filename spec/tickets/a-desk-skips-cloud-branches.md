@@ -1,11 +1,20 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/review
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review fails back 2 times: `pull` in `src/scripts/pull.js` reaches `it.ready()`, which is `readyToMerge` in `src/scripts/work-review.js`, inside the take block on a desk alone. `pull#an-empty-queue-hands-cleanup` and `test/level0/ready.test.js` depend on that road. Say whether a desk pull still calls `it.ready()` before the hand-out, and list `readyToMerge` as a caller.; `test/level0/work-doors.js` hands every case `env: {}`, so each `work(ROOT, [\"take\"], ...)` case in `test/level0/work.test.js`, `test/level0/work-group.test.js` and `test/level0/work-orphan.test.js` drives `take` as a desk. List them as callers, and name how they reach a cloud box once `take` refuses on a desk.; `test/level0/work-group.test.js` asserts that a desk pull takes a marked group and a named one. List it beside `test/level0/pull-unbound.test.js`.; `onDesk` reads the cloud as `pushed` does, while `src/bridge/bash.js` reads it through `onACloud`. Name the one read the Bash door guard and the verbs share."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -88,6 +97,12 @@ record:
     hand: box d6f05e3a585030 · claude-code
     hash_before: 907345b23e215afea3bba92287e9977833b71762
     hash_after: 907345b23e215afea3bba92287e9977833b71762
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-4
+    hash_before: 60d353d56e5f9358b8b2fa6589517a8d39c480e6
+    hash_after: 60d353d56e5f9358b8b2fa6589517a8d39c480e6
+    returns: 2
+    why: "`pull` in `src/scripts/pull.js` reaches `it.ready()`, which is `readyToMerge` in `src/scripts/work-review.js`, inside the take block on a desk alone. `pull#an-empty-queue-hands-cleanup` and `test/level0/ready.test.js` depend on that road. Say whether a desk pull still calls `it.ready()` before the hand-out, and list `readyToMerge` as a caller.; `test/level0/work-doors.js` hands every case `env: {}`, so each `work(ROOT, [\\\"take\\\"], ...)` case in `test/level0/work.test.js`, `test/level0/work-group.test.js` and `test/level0/work-orphan.test.js` drives `take` as a desk. List them as callers, and name how they reach a cloud box once `take` refuses on a desk.; `test/level0/work-group.test.js` asserts that a desk pull takes a marked group and a named one. List it beside `test/level0/pull-unbound.test.js`.; `onDesk` reads the cloud as `pushed` does, while `src/bridge/bash.js` reads it through `onACloud`. Name the one read the Bash door guard and the verbs share."
 ---
 
 # Ask
@@ -106,6 +121,16 @@ Without it a desk commits its own work onto a group branch, `main` falls behind,
 - `./RUNME.sh check` passes
 
 # design
+
+## person-1
+
+<!-- design/review fails back 2 times: `pull` in `src/scripts/pull.js` reaches `it.ready()`, which is `readyToMerge` in `src/scripts/work-review.js`, inside the take block on a desk alone. `pull#an-empty-queue-hands-cleanup` and `test/level0/ready.test.js` depend on that road. Say whether a desk pull still calls `it.ready()` before the hand-out, and list `readyToMerge` as a caller.; `test/level0/work-doors.js` hands every case `env: {}`, so each `work(ROOT, ["take"], ...)` case in `test/level0/work.test.js`, `test/level0/work-group.test.js` and `test/level0/work-orphan.test.js` drives `take` as a desk. List them as callers, and name how they reach a cloud box once `take` refuses on a desk.; `test/level0/work-group.test.js` asserts that a desk pull takes a marked group and a named one. List it beside `test/level0/pull-unbound.test.js`.; `onDesk` reads the cloud as `pushed` does, while `src/bridge/bash.js` reads it through `onACloud`. Name the one read the Bash door guard and the verbs share. -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -175,9 +200,10 @@ The guard holds the agent's doors, and a person in a terminal keeps raw git. `.g
 
 fail
 
-- `pull` in `src/scripts/pull.js` hands a desk on trunk `it.take(named || urgentGroup(it))`, so a guard in `take` turns a plain desk pull into a refusal while an urgent group stands. Name the change that road takes, and list `namedGroup` and `urgentGroup` in `src/scripts/pull-hand.js` as callers.
-- `trunkGuard` in `src/bridge/bash.js` guards `main` alone, so a desk's raw `git commit` on a `work/` branch lands past a guard in `landsAndPushes`. Name the door that refuses it, the Bash door or `.githooks/pre-commit`, or say why the commit verb alone answers the ask.
-- `release` in `src/scripts/work.js` moves a desk onto a `work/` branch and commits there through `letGo`. Say whether the guard reaches it.
+- `pull` in `src/scripts/pull.js` reaches `it.ready()`, which is `readyToMerge` in `src/scripts/work-review.js`, inside the take block on a desk alone. `pull#an-empty-queue-hands-cleanup` and `test/level0/ready.test.js` depend on that road. Say whether a desk pull still calls `it.ready()` before the hand-out, and list `readyToMerge` as a caller.
+- `test/level0/work-doors.js` hands every case `env: {}`, so each `work(ROOT, ["take"], ...)` case in `test/level0/work.test.js`, `test/level0/work-group.test.js` and `test/level0/work-orphan.test.js` drives `take` as a desk. List them as callers, and name how they reach a cloud box once `take` refuses on a desk.
+- `test/level0/work-group.test.js` asserts that a desk pull takes a marked group and a named one. List it beside `test/level0/pull-unbound.test.js`.
+- `onDesk` reads the cloud as `pushed` does, while `src/bridge/bash.js` reads it through `onACloud`. Name the one read the Bash door guard and the verbs share.
 
 # implement
 
