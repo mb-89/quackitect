@@ -5,5 +5,4 @@ lcov.info
 cover-*.out
 *.built
 trace-view.html
-three/
 *.png

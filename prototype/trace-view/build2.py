@@ -40,13 +40,17 @@ head = re.sub(r'<nav>.*?</nav>', '''<nav><h1>Trace view</h1>
 <p>Tests cover code by the imports they carry, and line coverage comes from the battery's coverage report.</p></nav>''', head, flags=re.S)
 tail = tail.replace('</body>', '<div class="tt" id="tt"></div></body>', 1)
 # three.js draws the city: the classic build and its orbit controls, inline, so the page stands alone
-# the library stays out of git: the build fetches the pinned package where it stands missing
-if not os.path.exists(os.path.join(S, 'three/package/build/three.min.js')):
+# the library stays out of git and out of the tree's checks: the build fetches the pinned package
+# into the box's private cache where it stands missing, and unpacks the two files it reads
+TH = os.path.join(root, '.se/cache/three')
+THREE_FILES = ['package/build/three.min.js', 'package/examples/js/controls/OrbitControls.js']
+if not os.path.exists(os.path.join(TH, THREE_FILES[0])):
     import subprocess, tarfile
-    os.makedirs(os.path.join(S, 'three'), exist_ok=True)
-    subprocess.run(['npm', 'pack', 'three@0.147.0'], cwd=os.path.join(S, 'three'), check=True)
-    tarfile.open(os.path.join(S, 'three/three-0.147.0.tgz')).extractall(os.path.join(S, 'three'), members=None)
-three = ''.join(open(os.path.join(S, 'three/package', p)).read() + '\n' for p in ['build/three.min.js', 'examples/js/controls/OrbitControls.js'])
+    os.makedirs(TH, exist_ok=True)
+    subprocess.run(['npm', 'pack', 'three@0.147.0'], cwd=TH, check=True)
+    with tarfile.open(os.path.join(TH, 'three-0.147.0.tgz')) as tf:
+        tf.extractall(TH, members=[tf.getmember(p) for p in THREE_FILES])
+three = ''.join(open(os.path.join(TH, p)).read() + '\n' for p in THREE_FILES)
 head = head.replace('</style>', '.split{grid-template-rows:minmax(0,1fr) 7px minmax(0,1fr);gap:0}.split.big{grid-template-rows:minmax(0,2fr) 7px minmax(0,1fr)}.splitter{cursor:row-resize;position:relative}.splitter::after{content:"";position:absolute;left:0;right:0;top:3px;border-top:1px solid var(--rule)}.splitter:hover::after,.splitter.dragging::after{border-top:3px solid var(--fill);top:2px}.botv{border-top:none!important}.topv{display:flex;flex-direction:column}.topv>.cgdraw,.topv>.ctwrap,.topv>.mxsplit{flex:1 1 auto;min-height:0;max-height:none!important}.topv>*{flex-shrink:0}.topv>.cgdraw,.topv>.ctwrap{flex-shrink:1}\n.city3{position:relative;overflow:hidden;border:1px solid var(--rule);border-radius:4px}.city3 canvas{display:block}.citylabels{position:absolute;inset:0;pointer-events:none}.citylabels .cityname{position:absolute;transform:translate(-50%,-50%);font:600 12.5px system-ui;color:var(--ink);text-shadow:0 0 3px var(--bg),0 0 3px var(--bg),0 0 2px var(--bg);white-space:nowrap}\n</style>', 1)
 # the page stands dark, whatever the system asks: every surface, scroll bar and control takes the dark scheme
 LIGHT = ':root{--bg:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--rule:#e4e3df;--head:#f3f2ef;--hi:#e8f0fb;--fill:#2a78d6;--off:#ecebe7;--refine:#8a8984;--ver:#2a78d6;--val:#eb6834;--src:#1baf7a}'
