@@ -1,11 +1,20 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/review
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review fails back 2 times: | finding | fix |; |---|---|; | `privateStands` in `src/bridge/stop.js` passes on any open private ticket under `.se/tickets` through `openPrivate`, whoever holds it and where nobody holds it, so a helper's private ticket or an unpulled breakdown passes a session holding nothing | Drop `privateStands` from the door, and keep it in `src/bridge/stop.js`. `handed` in `src/scripts/pull-hand.js` writes a hold for a private ticket too, so `holdOf` answers both rows |; | The draft names no test for the first round's first finding | Name the tests: a helper holds a ticket and the session holds none, and an open private ticket stands that the session holds no hold on. Both refuse |; The earlier findings, read against the code:; the helper's hold: answered. `holdOf` at `handOf` reads the session's own hold, and `heldReadsIn` in `src/scripts/guidance-hand.js` shows how the bridge builds the `it` it reads; the door order: answered. `onWrite` runs `markDoor`, `ownerDoor`, `privateDoor`, `schemaDoor` and `voiceDoor`; the shared reader: dissolves under the first fix, since the move goes; the callers: answered. `onWrite` has three callers: `onToolCall` in `src/bridge/server.js`, `checked` in `src/bridge/apply.js` and `mintsNote` in `src/bridge/tools.js`; the god row: answered. `standsDown` stands exported, `BINDING` names `engine.binding`, and `src/bridge/stop.js` imports nothing reaching `src/bridge/write.js`. The door passes `ticket-in-hand` as the name, since `standsDown` reads a name off `ENGINE_CHECKS`; `./RUNME.sh check` reads at implement, and no retro rides a design handback."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -88,6 +97,12 @@ record:
     hand: box d6f05e3a585030 · claude-code
     hash_before: bd39522d303c32e481121d4debba8055292f3ddd
     hash_after: bd39522d303c32e481121d4debba8055292f3ddd
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-4
+    hash_before: a469fa75b12aad5eb77505a9e47deed35d5f2945
+    hash_after: a469fa75b12aad5eb77505a9e47deed35d5f2945
+    returns: 2
+    why: "| finding | fix |; |---|---|; | `privateStands` in `src/bridge/stop.js` passes on any open private ticket under `.se/tickets` through `openPrivate`, whoever holds it and where nobody holds it, so a helper's private ticket or an unpulled breakdown passes a session holding nothing | Drop `privateStands` from the door, and keep it in `src/bridge/stop.js`. `handed` in `src/scripts/pull-hand.js` writes a hold for a private ticket too, so `holdOf` answers both rows |; | The draft names no test for the first round's first finding | Name the tests: a helper holds a ticket and the session holds none, and an open private ticket stands that the session holds no hold on. Both refuse |; The earlier findings, read against the code:; the helper's hold: answered. `holdOf` at `handOf` reads the session's own hold, and `heldReadsIn` in `src/scripts/guidance-hand.js` shows how the bridge builds the `it` it reads; the door order: answered. `onWrite` runs `markDoor`, `ownerDoor`, `privateDoor`, `schemaDoor` and `voiceDoor`; the shared reader: dissolves under the first fix, since the move goes; the callers: answered. `onWrite` has three callers: `onToolCall` in `src/bridge/server.js`, `checked` in `src/bridge/apply.js` and `mintsNote` in `src/bridge/tools.js`; the god row: answered. `standsDown` stands exported, `BINDING` names `engine.binding`, and `src/bridge/stop.js` imports nothing reaching `src/bridge/write.js`. The door passes `ticket-in-hand` as the name, since `standsDown` reads a name off `ENGINE_CHECKS`; `./RUNME.sh check` reads at implement, and no retro rides a design handback."
 ---
 
 # Ask
@@ -105,6 +120,16 @@ Without it a session edits and mints while the work tab shows nothing in its han
 - `./RUNME.sh check` passes
 
 # design
+
+## person-1
+
+<!-- design/review fails back 2 times: | finding | fix |; |---|---|; | `privateStands` in `src/bridge/stop.js` passes on any open private ticket under `.se/tickets` through `openPrivate`, whoever holds it and where nobody holds it, so a helper's private ticket or an unpulled breakdown passes a session holding nothing | Drop `privateStands` from the door, and keep it in `src/bridge/stop.js`. `handed` in `src/scripts/pull-hand.js` writes a hold for a private ticket too, so `holdOf` answers both rows |; | The draft names no test for the first round's first finding | Name the tests: a helper holds a ticket and the session holds none, and an open private ticket stands that the session holds no hold on. Both refuse |; The earlier findings, read against the code:; the helper's hold: answered. `holdOf` at `handOf` reads the session's own hold, and `heldReadsIn` in `src/scripts/guidance-hand.js` shows how the bridge builds the `it` it reads; the door order: answered. `onWrite` runs `markDoor`, `ownerDoor`, `privateDoor`, `schemaDoor` and `voiceDoor`; the shared reader: dissolves under the first fix, since the move goes; the callers: answered. `onWrite` has three callers: `onToolCall` in `src/bridge/server.js`, `checked` in `src/bridge/apply.js` and `mintsNote` in `src/bridge/tools.js`; the god row: answered. `standsDown` stands exported, `BINDING` names `engine.binding`, and `src/bridge/stop.js` imports nothing reaching `src/bridge/write.js`. The door passes `ticket-in-hand` as the name, since `standsDown` reads a name off `ENGINE_CHECKS`; `./RUNME.sh check` reads at implement, and no retro rides a design handback. -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -176,18 +201,18 @@ fail
 
 | finding | fix |
 |---|---|
-| `holdStands` in `src/bridge/stop.js` reads any `.json` under `HOLDS`, and a hold stands one a hand, so a helper's hold passes a session holding nothing | Read the session's own hold, through `holdAt` or `holdOf` in `src/scripts/guidance-hand.js` and the session's hand, and add a test where a helper holds a ticket and the session holds none |
-| `holdDoor` stands nowhere; `onWrite` in `src/bridge/write.js` runs `markDoor`, `ownerDoor`, `privateDoor`, `schemaDoor` and `voiceDoor` | Name the door the new one follows in that list |
-| `holdStands` and `privateStands` stand unexported inside `src/bridge/stop.js` | Name the module the shared reader moves to, and both importers |
-| The callers name `onToolCall` in `src/bridge/server.js` alone, while `checked` in `src/bridge/apply.js` and `mintsNote` in `src/bridge/tools.js` call `onWrite` directly | Add both, each as a file and a function |
-| The `god` row reads as an owner's assumption, while [[spec/design_output/config#the-engine-controls]] decides it and `standsDown` in `src/bridge/stop.js` already stands `ticket-in-hand` down there | Point at that chapter, and call `standsDown` in place of a check of its own |
+| `privateStands` in `src/bridge/stop.js` passes on any open private ticket under `.se/tickets` through `openPrivate`, whoever holds it and where nobody holds it, so a helper's private ticket or an unpulled breakdown passes a session holding nothing | Drop `privateStands` from the door, and keep it in `src/bridge/stop.js`. `handed` in `src/scripts/pull-hand.js` writes a hold for a private ticket too, so `holdOf` answers both rows |
+| The draft names no test for the first round's first finding | Name the tests: a helper holds a ticket and the session holds none, and an open private ticket stands that the session holds no hold on. Both refuse |
 
-The rest holds against the code:
+The earlier findings, read against the code:
 
-- `onToolCall` reaches `onWrite` for Write, Edit and MultiEdit through `TOOLS` in `src/bridge/server.js`.
-- `checked` and `mintsNote` pass the call's `agentId` into `onWrite`, so the helper row reads it.
-- `HANDOVER` in `.claude/skills/level0/lib/folders.js` names `.se/HANDOVER.md`, and `TICKETS` names `.se/tickets`.
-- `./RUNME.sh check` reads at implement, since a design leaf carries no branch, and no retro rides a design handback.
+- the helper's hold: answered. `holdOf` at `handOf` reads the session's own hold, and `heldReadsIn` in `src/scripts/guidance-hand.js` shows how the bridge builds the `it` it reads
+- the door order: answered. `onWrite` runs `markDoor`, `ownerDoor`, `privateDoor`, `schemaDoor` and `voiceDoor`
+- the shared reader: dissolves under the first fix, since the move goes
+- the callers: answered. `onWrite` has three callers: `onToolCall` in `src/bridge/server.js`, `checked` in `src/bridge/apply.js` and `mintsNote` in `src/bridge/tools.js`
+- the god row: answered. `standsDown` stands exported, `BINDING` names `engine.binding`, and `src/bridge/stop.js` imports nothing reaching `src/bridge/write.js`. The door passes `ticket-in-hand` as the name, since `standsDown` reads a name off `ENGINE_CHECKS`
+
+`./RUNME.sh check` reads at implement, and no retro rides a design handback.
 
 # implement
 
