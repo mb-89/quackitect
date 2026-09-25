@@ -5,7 +5,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fieldOf } from "../../src/engine/group.js";
-import { withPersonStep } from "../../src/scripts/pull.js";
+import * as pull from "../../src/scripts/pull.js";
+import { askedIn, escalate, wordsIn } from "../../src/scripts/pull-escalate.js";
+
+const { withPersonStep } = pull;
 import { pulling, work } from "../../src/scripts/work.js";
 import {
   at,
@@ -136,4 +139,12 @@ test("a ticket at the split cap refuses another person step, and asks for a spli
     assert.equal(withPersonStep(rooted, one, "design/draft", "second").path, ""),
   );
   assert.match(said, /carries 1 person steps already, so split it/);
+});
+
+// The escalation stands in a file of its own, and the pull still answers for it. [[spec/design_output/pull#a-person-step-goes-in]]
+test("the escalation's own file and the pull name the same verb, and it reads its words", () => {
+  assert.equal(pull.escalate, escalate);
+  assert.equal(askedIn(["--as", "helper", "which", "road?"]), "which road?");
+  assert.deepEqual(wordsIn("left, right,"), ["left", "right"]);
+  assert.equal(wordsIn(""), undefined);
 });
