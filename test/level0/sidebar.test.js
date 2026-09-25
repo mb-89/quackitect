@@ -378,6 +378,18 @@ test("a start registers the ticket command, and hands the editor the lens its cl
   assert.equal(door.said.commands.get(COMMAND), handed[0].took);
 });
 
+// [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+test("a start hands the editor the save the fill runs on", async () => {
+  const door = doorOf();
+  const handed = [];
+  door.lenses = () => {};
+  door.onSave = (one) => handed.push(one);
+  await activate({}, door);
+
+  assert.equal(handed.length, 1);
+  assert.equal(typeof handed[0], "function");
+});
+
 // [[spec/design_output/extension#runme-opens-the-panel]]
 test("a start RUNME marks reveals the panel once, and clears the mark", async () => {
   const door = doorOf({ ".se/.runtime/show-panel": "yes\n" });

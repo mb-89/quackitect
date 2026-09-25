@@ -165,6 +165,11 @@ function argvOf(act, ticket, reason) {
   return lines[act] ? ["ticket", "pull", ...lines[act]] : [];
 }
 
+// [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+function fillArgvOf(path, text) {
+  return [];
+}
+
 // The child runs as a person, so the names a harness sets stay behind. [[spec/design_output/pull#the-hand-rule]]
 function personEnv(env, root) {
   const out = { ...(env ?? {}) };
@@ -224,6 +229,9 @@ function ticketLensOf(door) {
       door.lensChanged?.();
       return said;
     },
+    async saved(path, text) {
+      return undefined;
+    },
   };
 }
 
@@ -234,6 +242,7 @@ module.exports = {
   HOLDS,
   answerOf,
   argvOf,
+  fillArgvOf,
   holdsIn,
   lensesOf,
   personEnv,

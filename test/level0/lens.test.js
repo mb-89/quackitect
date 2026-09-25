@@ -7,6 +7,7 @@ import { test } from "node:test";
 import {
   answerOf,
   argvOf,
+  fillArgvOf,
   HOLDS,
   lensesOf,
   personEnv,
@@ -277,4 +278,55 @@ test("a step whose item opens on by names its leaf and its hand", () => {
     stepsIn(text).map((one) => `${one.path}:${one.by}:${one.leaf}`),
     ["decide:person:true"],
   );
+});
+
+// [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+const picked = (process, route = []) =>
+  [
+    "---",
+    "kind: [[ticket]]",
+    `process: ${process}`,
+    ...route,
+    "---",
+    "",
+    "# Ask",
+    "",
+  ].join("\n");
+
+test("a save over a picked process and an empty route runs the fill on the path", () => {
+  assert.deepEqual(fillArgvOf(PATH, picked("[[spec/processes/trivial]]")), [
+    "ticket",
+    "fill",
+    PATH,
+  ]);
+  assert.deepEqual(fillArgvOf(PATH, picked("[[spec/processes/trivial]]", ["steps: []"])), [
+    "ticket",
+    "fill",
+    PATH,
+  ]);
+});
+
+test("a save over a ticket whose route stands runs nothing", () => {
+  assert.deepEqual(fillArgvOf(PATH, picked("[[spec/processes/trivial]]", ROUTE)), []);
+});
+
+test("a save over an empty process, or a file outside the ticket folders, runs nothing", () => {
+  assert.deepEqual(fillArgvOf(PATH, picked("")), []);
+  assert.deepEqual(fillArgvOf(PATH, picked('""')), []);
+  assert.deepEqual(fillArgvOf("spec/notes/one.md", picked("[[spec/processes/trivial]]")), []);
+});
+
+test("a saved ticket the fill takes runs the verb, and says the answer", async () => {
+  const door = doorOf({});
+  await ticketLensOf(door).saved(PATH, picked("[[spec/processes/trivial]]"));
+  assert.deepEqual(door.said.ran, [["ticket", "fill", PATH]]);
+  assert.equal(door.said.says[0][0], `./RUNME.sh ticket fill ${PATH}`);
+  assert.deepEqual(door.said.told, []);
+});
+
+test("a saved ticket whose route stands runs nothing, and says nothing", async () => {
+  const door = doorOf({});
+  await ticketLensOf(door).saved(PATH, ticket("open", "design/draft"));
+  assert.deepEqual(door.said.ran, []);
+  assert.deepEqual(door.said.says, []);
 });

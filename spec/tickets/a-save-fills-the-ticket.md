@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor]
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -116,6 +116,17 @@ record:
     hand: box 75b31b3d5012 · claude-code-remote · helper-4
     hash_before: 8c9139f117ba30c7bd944982774bc484bae6d6fb
     hash_after: 8c9139f117ba30c7bd944982774bc484bae6d6fb
+  - step: implement/tests-red
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: fbf3199065c344a5c0e0aed093c03de3c27aef69
+    hash_after: fbf3199065c344a5c0e0aed093c03de3c27aef69
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -212,17 +223,25 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/lens.test.js test/level0/save-fills.test.js test/level0/sidebar.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The cases a stub `fillArgvOf` and `saved` leave red are the fill over a picked process, the run of `saved`, the road through the verb, and the wire in `activate`. The cases on a standing route and an empty `process` stand green on the stub, since both answer nothing. The lens test imports a CommonJS module, so a missing export fails the whole file on import, and the stub moves that failure onto the assertions.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch the lens, its tests, the sidebar test and one new test file, all of which the approach names
+- the road runs the verb over `fakeDisk`, and the lens cases run over the fake door the lens test builds
+- `save-fills.test.js` and each new case name the design input's heading on a ticket picking a process
 
 ## reflect
 
