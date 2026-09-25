@@ -76,12 +76,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code · the owner says so
     hash_before: 838d350b32ef84ab8c18c291d0972ef6423401e5
     hash_after: 838d350b32ef84ab8c18c291d0972ef6423401e5
+  - step: design/review
+    hand: person
+    hash_before: e162d3de5052bf1d0c8ed8dd215c87d20abef62e
+    hash_after: e162d3de5052bf1d0c8ed8dd215c87d20abef62e
 ---
 
 # Ask
@@ -183,8 +187,9 @@ The tree holds no design input on the blue line of the earlier versions. A searc
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
 
 # implement
 

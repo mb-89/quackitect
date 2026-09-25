@@ -37,7 +37,7 @@
   "helper": {
     "comment": "The model each tier of helper work runs on. The session weighs the work it hands and names the tier's model on the Agent call. find finds, lists, reads and reports. change makes a scoped change with its test, or reviews against a list. decide takes a design, an unknown cause, or a verdict the owner reads. spec/design_output/level0.md, chapter A spawn names its tier, says the rest.",
     "find": "haiku",
-    "change": "sonnet",
+    "change": "opus",
     "decide": "opus"
   },
   "plan": {
