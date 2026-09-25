@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor, a-save-fills-the-ticket]
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -146,6 +146,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 75b31b3d5012 · claude-code-remote · helper-13
+    hash_before: a051d25f3c940b2aa8b111d507196256e74cb55d
+    hash_after: a051d25f3c940b2aa8b111d507196256e74cb55d
+    returns: 1
+    why: "| grade | finding | fix |; |---|---|---|; | blocking | The change overwrites `test/level0/work.test.js`, which held the branch verb cases. | Restore it from `93d05750`, and put the strings cases in a new file. |; | blocking | The change overwrites `test/level0/work-group.test.js`, which held the group take, done and merge cases. | Restore it from `93d05750`, and put the sidebar cases in a new file. |; | detail | About 48 cases over `src/scripts/work.js` vanish, and no other file holds them. | Check each restored case runs green beside the new files. |; The ask is met: the group draws, the count, the pull and the new ticket each carry a test.; The source hunks match the approach, and both editor doors read right.; `./RUNME.sh check` answers 0 on this commit.; No retro stands in the handback."
 ---
 
 # Ask
@@ -388,17 +394,48 @@ The fill on save then writes the new ticket's route. The count runs with no prog
 
 <!-- the form is files -->
 
+- spec/tickets/the-work-group-draws-buttons.md
+- spec/guidance/review/reviewing.md
+- spec/config/level0.schema.json
+- src/extension/lib/work.js
+- src/extension/sidebar.js
+- src/extension/lib/panel.js
+- src/extension/lib/lens.js
+- src/extension/editor-lens.js
+- src/extension/editor-files.js
+- test/level0/work.test.js
+- test/level0/work-group.test.js
+- test/contract/tree-extension.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+| grade | finding | fix |
+|---|---|---|
+| blocking | The change overwrites `test/level0/work.test.js`, which held the branch verb cases. | Restore it from `93d05750`, and put the strings cases in a new file. |
+| blocking | The change overwrites `test/level0/work-group.test.js`, which held the group take, done and merge cases. | Restore it from `93d05750`, and put the sidebar cases in a new file. |
+| detail | About 48 cases over `src/scripts/work.js` vanish, and no other file holds them. | Check each restored case runs green beside the new files. |
+
+The ask is met: the group draws, the count, the pull and the new ticket each carry a test.
+
+The source hunks match the approach, and both editor doors read right.
+
+`./RUNME.sh check` answers 0 on this commit.
+
+No retro stands in the handback.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the name form, the new ticket text and the argv split each stand once, in `lib/work.js`
 
 # Discussion
 
