@@ -532,15 +532,21 @@ test("the extension imports the editor, its own folder, and what it declares", (
   const paths = found.stdout.split(/\r?\n/).filter(Boolean);
   assert.ok(paths.length > 5, "the extension carries its modules");
 
-  const declared = Object.keys(read("src/extension/package.json").dependencies ?? {});
-  const named = (said) =>
-    declared.some((one) => said === one || said.startsWith(`${one}/`));
+  // The webview bundles its own modules, so its files read its own manifest. [[spec/design_input/the-editor-draws-the-ticket#the-owner-rules]]
+  const manifest = (path) =>
+    path.startsWith("src/extension/webview/")
+      ? "src/extension/webview/package.json"
+      : "src/extension/package.json";
+  const named = (path, said) =>
+    Object.keys(read(manifest(path)).dependencies ?? {}).some(
+      (one) => said === one || said.startsWith(`${one}/`),
+    );
 
   for (const path of paths) {
     const text = files.read(join(root, path));
     for (const hit of text.matchAll(/(?:from|require\()\s*["']([^"']+)["']/g)) {
       const said = hit[1];
-      if (said === "vscode" || said.startsWith("node:") || named(said)) continue;
+      if (said === "vscode" || said.startsWith("node:") || named(path, said)) continue;
       assert.match(said, /^\.\.?\//, `${path} imports ${said} as a path of its own`);
       assert.ok(!said.includes("../../"), `${path} stays inside src/extension`);
     }
@@ -549,7 +555,12 @@ test("the extension imports the editor, its own folder, and what it declares", (
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 test("every package the extension declares carries an exact version", () => {
-  const declared = read("src/extension/package.json").dependencies ?? {};
+  const webview = read("src/extension/webview/package.json");
+  const declared = {
+    ...read("src/extension/package.json").dependencies,
+    ...webview.dependencies,
+    ...webview.devDependencies,
+  };
   for (const [name, said] of Object.entries(declared)) {
     assert.match(said, /^\d+\.\d+\.\d+$/, `${name} names one version and no range`);
   }

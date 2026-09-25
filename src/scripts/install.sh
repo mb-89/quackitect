@@ -385,6 +385,32 @@ get_client() {
   [ -d "$client_folder" ]
 }
 
+# THE DRAWING IS ONE SCRIPT A WEBVIEW LOADS. Its modules land beside it, and
+# bundle.js writes the script where no bundle stands or a source outruns it.
+# [[spec/design_input/the-editor-draws-the-ticket#the-owner-rules]]
+webview_folder="$root/src/extension/webview"
+
+drawing_here() {
+  [ -d "$webview_folder/node_modules/esbuild" ] && (cd "$root" && node src/scripts/bundle.js here)
+}
+
+get_drawing() {
+  say "  installing the drawing's modules, and bundling it"
+  (cd "$webview_folder" && npm install --no-audit --no-fund --silent) || return 1
+  (cd "$root" && node src/scripts/bundle.js) || return 1
+}
+
+# THE BROWSER THE DRAWING'S TEST DRIVES. browser.js holds the order, and the
+# download is the last rung. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
+browser_here() {
+  (cd "$root" && node src/scripts/browser.js) >/dev/null 2>&1
+}
+
+get_browser() {
+  say "  downloading chromium through playwright"
+  (cd "$webview_folder" && npx --yes playwright-core install chromium) || return 1
+}
+
 editor_folder="$HOME/.vscode/extensions"
 
 # A COPY IS A STALE EXTENSION, AND THAT IS THE ONE THING THIS CANNOT BE. A copy
@@ -446,7 +472,8 @@ set_hooks() {
 wanted() {
   [ "$1" = "vale-ls" ] || [ "$1" = "go" ] || [ "$1" = "go-modules" ] || [ "$1" = "git-hooks" ] ||
     [ "$1" = "editor-link" ] || [ "$1" = "editor-extensions" ] ||
-    [ "$1" = "index" ] || [ "$1" = "se-lsp" ] || [ "$1" = "editor-client" ]
+    [ "$1" = "index" ] || [ "$1" = "se-lsp" ] || [ "$1" = "editor-client" ] ||
+    [ "$1" = "drawing" ] || [ "$1" = "browser" ]
 }
 
 missed() {
@@ -457,6 +484,8 @@ missed() {
     index) say "  the index stays unbuilt, so find and links read the files." >&2 ;;
     se-lsp) say "  the language server stays unbuilt, so lint reads the node rules." >&2 ;;
     editor-client) say "  no language client here, so the editor draws no server line." >&2 ;;
+    drawing) say "  the drawing stays unbundled, so the editor draws no route." >&2 ;;
+    browser) say "  no browser here, so the check skips the drawing's test." >&2 ;;
     editor-link) say "  the sidebar stays unlinked, so the editor draws no panel here." >&2 ;;
     editor-extensions) say "  no code on the PATH, so a person takes the recommendation." >&2 ;;
     git-hooks) say "  git reads its own hooks here, so a hand commit meets no privacy check." >&2 ;;
@@ -475,6 +504,8 @@ here() {
     index) index_here ;;
     se-lsp) lsp_here || ! have go ;;
     editor-client) [ -d "$client_folder" ] ;;
+    drawing) drawing_here ;;
+    browser) browser_here ;;
     editor-link) editor_linked ;;
     editor-extensions) extensions_here ;;
     git-hooks) hooks_here ;;
@@ -493,6 +524,8 @@ why() {
     index) say "index: the warm model of this tree, which find and links ask" ;;
     se-lsp) say "se-lsp: this tree's own language server, which draws the note shape and the names" ;;
     editor-client) say "editor-client: the language client the extension starts the server through" ;;
+    drawing) say "drawing: the modules the route drawing takes, bundled into the one script a webview loads" ;;
+    browser) say "browser: the chromium the drawing's test drives" ;;
     editor-link) say "editor-link: this tree's own sidebar, linked into the editor and named in its list" ;;
     editor-extensions) say "editor-extensions: the Vale and Biome extensions the tracked settings point at" ;;
     git-hooks) say "git-hooks: the pre-commit and pre-push doors, so a commit by hand meets the privacy check and a push to main meets the battery" ;;
@@ -511,6 +544,8 @@ get() {
     index) get_index ;;
     se-lsp) get_lsp ;;
     editor-client) get_client ;;
+    drawing) get_drawing ;;
+    browser) get_browser ;;
     editor-link) link_editor ;;
     editor-extensions) get_extensions ;;
     git-hooks) set_hooks ;;
@@ -520,7 +555,7 @@ get() {
 # SE_INSTALL_SKIP names the wants a caller leaves out, so a test vehicle builds
 # no index and links no editor while it proves the vehicle stands alone.
 missing=""
-for one in node modules vale biome vale-ls go go-modules index se-lsp editor-client editor-link \
+for one in node modules vale biome vale-ls go go-modules index se-lsp editor-client drawing browser editor-link \
   editor-extensions git-hooks; do
   case " ${SE_INSTALL_SKIP:-} " in *" $one "*) continue ;; esac
   here "$one" || missing="$missing $one"

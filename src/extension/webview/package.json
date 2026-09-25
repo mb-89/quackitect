@@ -2,5 +2,15 @@
   "name": "quackitect-webview",
   "private": true,
   "type": "module",
-  "description": "The scripts the browser side of the sidebar runs. A module here loads in the webview and in a test, and it reaches neither the editor nor node."
+  "description": "The scripts the browser side of the sidebar runs. A module here loads in the webview and in a test, and it reaches neither the editor nor node.",
+  "dependencies": {
+    "@dagrejs/dagre": "3.1.1",
+    "@xyflow/react": "12.12.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "playwright-core": "1.63.0"
+  }
 }
