@@ -94,12 +94,18 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code
     hash_before: c1784e141f3fe804dcc2f04470a25a0ed880cf09
     hash_after: c1784e141f3fe804dcc2f04470a25a0ed880cf09
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code · helper-2
+    hash_before: 72c970e44b46c42c421b97a9f42e2d0ab5a340fa
+    hash_after: 72c970e44b46c42c421b97a9f42e2d0ab5a340fa
+    returns: 1
+    why: "| grade | finding | fix |; |---|---|---|; | design | `the-editor-takes-an-inset` and `the-owner-walks-a-ticket` stand open at a `by: person` step in the open group `the-editor-holds-the-drawing`, so the rule turns `./RUNME.sh check` red where it lands | name what the implement step does with the two, so the third line of the ask holds |; | design | `branch unblock` refuses on a cloud box, and the finding names it on every box | name the line the finding gives a cloud box, or name the change that lets a cloud box hand the question out as the ask says |; | craft | `waiting` in `src/scripts/ticket-yours.js` already names an open ticket at a person leaf | call it from the rule in place of a second reader |; | craft | the leaf reader stands in `src/scripts/pull-route.js`, and `lib/copilot-dispatch.js` already imports from `src` | import the reader where it stands, and drop the move |; | craft | `treeFaults` runs from `src/scripts/cli-read.js`, which the callers list leaves out | name `cli-read.js` in place of `cli-check.js` |; | craft | the approach names no test | name the fake tree the test feeds: a child at a person step refused, and a child closed `became` passed |"
 ---
 
 # Ask
@@ -171,6 +177,17 @@ A tree rule `GroupAsksNobody` joins `RULES` in `.claude/skills/level0/lib/tree.j
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+| grade | finding | fix |
+|---|---|---|
+| design | `the-editor-takes-an-inset` and `the-owner-walks-a-ticket` stand open at a `by: person` step in the open group `the-editor-holds-the-drawing`, so the rule turns `./RUNME.sh check` red where it lands | name what the implement step does with the two, so the third line of the ask holds |
+| design | `branch unblock` refuses on a cloud box, and the finding names it on every box | name the line the finding gives a cloud box, or name the change that lets a cloud box hand the question out as the ask says |
+| craft | `waiting` in `src/scripts/ticket-yours.js` already names an open ticket at a person leaf | call it from the rule in place of a second reader |
+| craft | the leaf reader stands in `src/scripts/pull-route.js`, and `lib/copilot-dispatch.js` already imports from `src` | import the reader where it stands, and drop the move |
+| craft | `treeFaults` runs from `src/scripts/cli-read.js`, which the callers list leaves out | name `cli-read.js` in place of `cli-check.js` |
+| craft | the approach names no test | name the fake tree the test feeds: a child at a person step refused, and a child closed `became` passed |
 
 # implement
 
