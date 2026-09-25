@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: verdict
 steps:
   - name: design
@@ -196,8 +196,13 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/the-inset-folds-the-frontmatter.md:212:1: CodeSpans: A sentence holds 4 code spans, and this one holds 5. C"
+  - step: verdict
+    hand: box 75b31b3d5012 · claude-code-remote · helper-10
+    hash_before: b01d9164a7bba322c7f81174e5618e2eed496421
+    hash_after: b01d9164a7bba322c7f81174e5618e2eed496421
 group: the-editor-holds-the-drawing
 depends_on: ["the-editor-takes-an-inset", "the-ticket-answers-the-editor", "the-drawing-draws-a-route"]
+reason: done
 ---
 
 # Ask
@@ -475,12 +480,7 @@ The wire carries a case in `test/level0/sidebar.test.js`, which the commit hook 
 - src/extension/package.json
 - test/level0/route-host.test.js
 - test/level0/sidebar.test.js
-- src/extension/editor-lens.js
-- src/extension/lib/drawing.js
-- src/scripts/bundle.js
-- .claude/skills/level0/lib/folders.js
 - spec/tickets/the-inset-folds-the-frontmatter.md
-- src/extension/webview/route/drawing.js
 
 ## verdict
 
@@ -488,15 +488,16 @@ The wire carries a case in `test/level0/sidebar.test.js`, which the commit hook 
 
 <!-- the form is verdict -->
 
-fail
-- An edit in the YAML view that changes the node count calls `opened` again.
-- That reopens the drawing and folds the frontmatter under the person's cursor.
-- Fix: keep the YAML side on a height change, and reopen the page hidden.
-- Add a case: flip, change to a longer route, and assert no fold and a hidden page.
-- A side panel the person closes stays in the host, and a later post throws.
-- Fix: forget the page on the panel's `onDidDispose` event, and on the inset's too.
-- The rest meets the ask: the draw, the panel fallback, the flip and the redraw each carry a test.
-- The check answers exit 0, and no retro stands in the hand-back.
+pass
+- The first finding holds fixed: a reopen under the YAML side hides the page and folds nothing.
+- A case drives it: flip, a longer route, then a hidden page and one fold.
+- The second finding holds fixed: `onDispose` reaches the host as `onGone`, and the host forgets the page.
+- A case drives it: a closed panel takes no post from a change or a theme.
+- A hide or a host dispose clears `held` first, so it fires no `gone`.
+- The draw, the panel fallback, the flip and the redraw each carry a test.
+- The check answers exit 0, and 36 tests pass in the two files.
+- No hunk reaches past the files the approach names.
+- No retro stands in the hand-back.
 
 ## checked
 
