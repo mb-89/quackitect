@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor, a-save-fills-the-ticket]
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -152,6 +152,10 @@ record:
     hash_after: a051d25f3c940b2aa8b111d507196256e74cb55d
     returns: 1
     why: "| grade | finding | fix |; |---|---|---|; | blocking | The change overwrites `test/level0/work.test.js`, which held the branch verb cases. | Restore it from `93d05750`, and put the strings cases in a new file. |; | blocking | The change overwrites `test/level0/work-group.test.js`, which held the group take, done and merge cases. | Restore it from `93d05750`, and put the sidebar cases in a new file. |; | detail | About 48 cases over `src/scripts/work.js` vanish, and no other file holds them. | Check each restored case runs green beside the new files. |; The ask is met: the group draws, the count, the pull and the new ticket each carry a test.; The source hunks match the approach, and both editor doors read right.; `./RUNME.sh check` answers 0 on this commit.; No retro stands in the handback."
+  - step: implement/reflect
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 9843715fce8131c942ce4031ea823d3f68656962
+    hash_after: 9843715fce8131c942ce4031ea823d3f68656962
 ---
 
 # Ask
@@ -198,7 +202,7 @@ The config already declares the buttons, and the sidebar draws a group where an 
 
 The pull runs as a person, through the road the ticket buttons run. The fill on save then writes the new ticket's route. For details, see [[spec/tickets/a-save-fills-the-ticket]].
 
-The tests stand in `test/level0/work-group.test.js`, over the sidebar's fake door with a fake for each new door call:
+The tests stand in `test/level0/sidebar-work.test.js`, over the sidebar's fake door with a fake for each new door call:
 
 | done line | case |
 |---|---|
@@ -207,7 +211,7 @@ The tests stand in `test/level0/work-group.test.js`, over the sidebar's fake doo
 | pull for me pulls and opens | a press runs `ticket yours --next`, then `ticket pull` on the answer, and opens its path. An empty queue tells and pulls nothing |
 | new ticket asks and opens | a press asks a name, writes `spec/tickets/<name>.md` with an empty `process`, and opens it. A name standing already opens the file and writes nothing |
 
-`test/level0/work.test.js` holds the strings of `lib/work.js`.
+`test/level0/work-strings.test.js` holds the strings of `lib/work.js`.
 
 ### callers
 
@@ -280,7 +284,7 @@ Every finding of the earlier review meets its answer:
 
 <!-- the form is command -->
 
-./RUNME.sh test test/level0/work-group.test.js test/level0/work.test.js
+./RUNME.sh test test/level0/sidebar-work.test.js test/level0/work-strings.test.js
 
 ### seen
 
@@ -310,11 +314,19 @@ The group case seeds the real config through a JSON import, so it reads the butt
 
 <!-- the form is text -->
 
+The class: a write over a path the hand never read. The tests-red step wrote two test files through a shell redirect, and both names stood already, holding the branch verb cases.
+
+The fix for the class: look at a target before a write, and create a new file through a road that refuses a standing one. The fix here moves the new cases to `test/level0/work-strings.test.js` and `test/level0/sidebar-work.test.js`. It restores both old files byte for byte from the commit before the change.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fix touches the two restored files and the two new names alone
+- the moved cases keep their fakes, and all four files run green
+- the moved files keep their headers pointing at this ticket
 
 ## change
 
@@ -348,7 +360,7 @@ The group case seeds the real config through a JSON import, so it reads the butt
 
 <!-- the form is command -->
 
-./RUNME.sh test test/level0/work-group.test.js test/level0/work.test.js
+./RUNME.sh test test/level0/sidebar-work.test.js test/level0/work-strings.test.js
 
 ### check
 
