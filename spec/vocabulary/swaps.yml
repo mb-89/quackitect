@@ -31,8 +31,6 @@ swaps:
   - {word: invoke, write: call}
   - {word: initiate, write: start}
   - {word: modify, write: change}
-  - {word: verify, write: check}
-  - {word: validate, write: check}
   - {word: mend, write: fix}
   - {word: skim, write: read}
   - {word: terse, write: short}

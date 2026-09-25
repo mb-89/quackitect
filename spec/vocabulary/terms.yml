@@ -155,6 +155,8 @@ terms:
   - {word: vehicle, means: "the copy of this tooling that another project carries and that drives the work there"}
   - {word: verb, means: "a named command the tool runs such as a command that acts on a work branch"}
   - {word: verdict, means: "a pass or fail answer that a review step gives with its findings"}
+  - {word: verify, means: "to check a thing against the spec it answers such as a test that checks a requirement"}
+  - {word: validate, means: "to check a thing against the need of the person it serves such as a demonstration that checks a story"}
   - {word: viewer, means: "the program that shows the session log as rows in a terminal window"}
   - {word: vocabulary, means: "the full set of words this tree lets a writer use made of the core and the terms"}
   - {word: watcher, means: "the part that watches the folders for writes and keeps the index rows level with the files"}
