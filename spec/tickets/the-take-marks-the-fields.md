@@ -240,11 +240,19 @@ Every case fails on its own assertion: the host answers no mark, and the door dr
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/extension/lib/fields.js src/extension/editor-fields.js src/extension/extension.js src/extension/editor.js src/extension/lib/lens.js test/level0/fields-to-fill.test.js spec/design_output/extension.md
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the host, its door, the wiring, the hold paths and the design section alone
+- the host meets a fake door, and the editor door meets a stand-in for vscode
+- every new function points at the section the change adds to the extension design output
+- the hold paths stand in `lib/lens.js`, and the schema path in `lib/route-host.js`
+- the design review passes clean, so no row waits
 
 ## tests-green
 
