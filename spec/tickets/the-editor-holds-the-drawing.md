@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -107,6 +107,11 @@ record:
     hand: box 75b31b3d5012 · claude-code-remote
     hash_before: fbf4857274f53c30a3dc901f25e30fe2d3a126c4
     hash_after: fbf4857274f53c30a3dc901f25e30fe2d3a126c4
+  - step: retro/cloud
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 5028b375d05ddb2937961d4ae56c81c382fcbb3d
+    hash_after: 5028b375d05ddb2937961d4ae56c81c382fcbb3d
+reason: done
 ---
 
 # Ask
@@ -254,17 +259,29 @@ The probe's `decide` still waits on the owner. The host tries the inset first an
 
 <!-- the form is list -->
 
+- VS Code, so no case ran the inset, the side panel or the fold in a real editor. The fake door stood in for each
+- nothing else: no host refused, no right refused, and the install ran clean at the take
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the commit hook refused three code commits carrying no test beside them. Each stood at a change step
+- the push door refused a push over a check on an older commit. A check on the head cleared it
+- the form warnings stood in fields other hands and the engine wrote, and the pull let each land
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/the-owner-tries-the-inset]]: the owner answers whether the inset draws in their editor. The host falls back to the side panel either way
+- [[spec/tickets/the-owner-walks-the-editor]]: the owner walks a ticket from creation to hand-back in VS Code. The answer names each place the walk leaves it
+- no ticket minted with no group
+- the handover: the inset needs `--enable-proposed-api quackitect.quackitect` or `argv.json`, and a reload of the extension
 
 # Discussion
 
