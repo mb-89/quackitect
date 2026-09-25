@@ -17,6 +17,7 @@ rationale: [[spec/rationales/reviewing]]
 9. Hand the report back as a list of fixes, and merge once every fix lands. A report of opinions leaves the drafter guessing what to change. *
 10. Run `./RUNME.sh branch review <name>` to gather all of this from git.
 11. Grade each question a return names as design or craft, and hand a craft one back to the drafter.
+12. Grade a finding of prose or shape as form, and pass on it: it stands in the Problems panel until the push. A review failing on form sends a draft round and round on lines the write door says to leave. *
 
 # Examples
 
