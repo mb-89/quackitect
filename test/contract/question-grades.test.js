@@ -32,11 +32,11 @@ test("the working note asks the owner a design question before the build", () =>
 });
 
 // [[spec/tickets/a-question-reaches-its-owner]]
-test("the reviewing note grades each question, and hands a craft one back", () => {
+test("the reviewing note fails a design on design alone, and hands craft to the implement step", () => {
   const rules = rulesIn("spec/guidance/review/reviewing.md");
   const said = rules.filter((one) => /craft/i.test(one));
 
   assert.equal(said.length, 1, "one rule grades the question");
-  assert.match(said[0], /design or craft/i, "the rule names both grades");
-  assert.match(said[0], /back to the drafter/i, "the rule says where a craft one goes");
+  assert.match(said[0], /on a design finding alone/i, "the rule fails a design on design alone");
+  assert.match(said[0], /craft finding to the implement step/i, "the rule says where a craft one goes");
 });
