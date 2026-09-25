@@ -49,7 +49,7 @@ test("a variable naming no file falls to the browsers folder, newest build first
   const env = { PLAYWRIGHT_CHROMIUM: "/gone", PLAYWRIGHT_BROWSERS_PATH: "/pw" };
   assert.equal(
     browserFrom({ ...env, HOME: home }, disk).path,
-    "/pw/chromium-12/chrome-linux/chrome",
+    join("/pw", "chromium-12", "chrome-linux", "chrome"),
   );
 });
 
@@ -57,7 +57,7 @@ test("the path answers in the order the calls name, before the download's folder
   const disk = fake(["/b/google-chrome", "/a/chromium-browser", cached]);
   const env = { PATH: "/a:/b" };
   assert.deepEqual(browserFrom({ ...env, HOME: home }, disk), {
-    path: "/a/chromium-browser",
+    path: join("/a", "chromium-browser"),
     from: "PATH",
   });
 });

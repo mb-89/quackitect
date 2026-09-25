@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { after, before, test } from "node:test";
+import { pathToFileURL } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { browserFrom } from "../../src/scripts/browser.js";
 import { bundle, bundled, OUT, WEBVIEW } from "../../src/scripts/bundle.js";
@@ -60,7 +61,7 @@ let page;
 before(async () => {
   if (why) return;
   if (!bundled(files)) await bundle();
-  const { chromium } = await import(DRIVER);
+  const { chromium } = await import(pathToFileURL(DRIVER).href);
   driven = await chromium.launch({ executablePath: browser, headless: true });
   page = await driven.newPage();
   await page.setContent(PAGE);
