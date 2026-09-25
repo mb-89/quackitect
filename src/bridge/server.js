@@ -29,7 +29,7 @@ import {
 import { answerRides, gatesAnswer } from "./answer-read.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
-import { onBash, onDescribe } from "./bash.js";
+import { onBash, onDescribe, onPowerShell } from "./bash.js";
 import { dropsAll, dropsMoved } from "./caches.js";
 import { asks, asksText } from "./config.js";
 import { holdsGrace } from "./grace.js";
@@ -133,6 +133,7 @@ const TOOLS = {
   MultiEdit: onToolWrite,
   NotebookEdit: onToolWrite,
   Bash: onBash,
+  PowerShell: onPowerShell,
   Agent: onAgent,
   [`mcp__level0__${FIND}`]: runsFind,
   ...applyTools,

@@ -8,6 +8,7 @@ import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { onBash } from "../../src/bridge/bash.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
+import { NAMED, named } from "./fixtures.js";
 
 const ROOT = "/tree";
 const SHA = "abc123";
@@ -16,11 +17,15 @@ const PUSH = "git push origin main";
 
 const CLOUD = { CLAUDE_CODE_REMOTE: "true" };
 
+// A call names its ticket at the head of its description, so a case wraps its command with the shared open one. [[spec/design_output/level0#a-shell-names-its-ticket]]
+const call = (command) => ({ command, description: `${NAMED}: drives the door` });
+
 // The box carries the environment, so a case sets one on it and touches nothing outside. [[spec/design_output/doors#a-door-reads-the-outside]]
 function box(branch, green = true, env = CLOUD, warnings = 0) {
   return {
     env,
     disk: fakeDisk({
+      ...named(ROOT),
       [`${ROOT}/${STAMP}`]: JSON.stringify({
         sha: green ? SHA : "0000",
         ok: true,
@@ -44,59 +49,56 @@ function box(branch, green = true, env = CLOUD, warnings = 0) {
 const denied = (said) => String(said?.result?.deny ?? "");
 
 test("a work branch in hand hands the work back, and trunk stays shut", async () => {
-  const said = await onBash({ command: PUSH }, box("work/a-thing"));
+  const said = await onBash(call(PUSH), box("work/a-thing"));
   assert.match(denied(said), /hands it back/);
 });
 
 // A raw landing on trunk meets the commit verb, which lints, checks and pushes. [[spec/design_output/work#a-box-writes-its-branch]]
 test("a session outside the queue pushes trunk through the push verb alone", async () => {
-  const said = await onBash({ command: PUSH }, box("claude/a-thing"));
+  const said = await onBash(call(PUSH), box("claude/a-thing"));
   assert.match(denied(said), /\.\/RUNME\.sh push/);
 });
 
 test("a work branch pushing trunk keeps the hand-back, and names no commit verb", async () => {
-  const said = await onBash({ command: PUSH }, box("work/a-thing"));
+  const said = await onBash(call(PUSH), box("work/a-thing"));
   assert.doesNotMatch(denied(said), /RUNME\.sh commit/);
 });
 
 // A desk on a work branch meets the desk guard instead. [[spec/design_output/work#a-desk-works-on-trunk]]
 test("a desk commit standing on trunk refuses and names the verb, and one on a branch off the queue lands", async () => {
-  const said = await onBash({ command: "git commit -m x" }, box("main", true, {}));
+  const said = await onBash(call("git commit -m x"), box("main", true, {}));
   assert.match(denied(said), /\.\/RUNME\.sh commit "<message>"/);
-  const off = await onBash(
-    { command: "git commit -m x" },
-    box("claude/a-thing", true, {}),
-  );
+  const off = await onBash(call("git commit -m x"), box("claude/a-thing", true, {}));
   assert.equal(denied(off), "", "the door says nothing");
 });
 
 test("a bare push standing on trunk refuses on a desk, and names the push verb", async () => {
-  const said = await onBash({ command: "git push" }, box("main", true, {}));
+  const said = await onBash(call("git push"), box("main", true, {}));
   assert.match(denied(said), /\.\/RUNME\.sh push/);
 });
 
 // [[spec/design_output/work#one-verb-feeds-that-stamp]]
 test("the push verb standing on trunk passes the door", async () => {
-  const said = await onBash({ command: "./RUNME.sh push" }, box("main", true, {}));
+  const said = await onBash(call("./RUNME.sh push"), box("main", true, {}));
   assert.equal(denied(said), "", "the door says nothing");
 });
 
 test("the commit verb standing on trunk passes, though its message names git commit", async () => {
   const said = await onBash(
-    { command: './RUNME.sh commit "the row answers a raw git commit"' },
+    call('./RUNME.sh commit "the row answers a raw git commit"'),
     box("main", true, {}),
   );
   assert.equal(denied(said), "", "the door says nothing");
 });
 
 test("a red battery refuses the push on any branch", async () => {
-  const said = await onBash({ command: PUSH }, box("claude/a-thing", false));
+  const said = await onBash(call(PUSH), box("claude/a-thing", false));
   assert.match(denied(said), /green battery/);
 });
 
 // A warning standing in the tree reads red, so the same door holds the push and names the lint. [[spec/design_output/work#the-battery-answers-first]]
 test("a warning standing in the tree refuses the push, and names the lint", async () => {
-  const said = await onBash({ command: PUSH }, box("claude/a-thing", true, CLOUD, 3));
+  const said = await onBash(call(PUSH), box("claude/a-thing", true, CLOUD, 3));
   assert.match(denied(said), /3 warning\(s\) stand in 1 file\(s\)/);
   assert.match(denied(said), /RUNME\.sh lint/);
 });
@@ -106,17 +108,14 @@ test("the door reads a script off the disk, and refuses the write inside it", as
   const it = box("claude/a-thing");
   it.disk.write(`${ROOT}/.se/scripts/edit.mjs`, 'writeFileSync("README.md", "one");\n');
 
-  const said = await onBash({ command: "node .se/scripts/edit.mjs" }, it);
+  const said = await onBash(call("node .se/scripts/edit.mjs"), it);
 
   assert.match(denied(said), /README\.md/);
   assert.match(denied(said), /\.se\/scripts\/edit\.mjs/);
 });
 
 test("a script standing nowhere leaves the command alone", async () => {
-  const said = await onBash(
-    { command: "node .se/scripts/gone.mjs" },
-    box("claude/a-thing"),
-  );
+  const said = await onBash(call("node .se/scripts/gone.mjs"), box("claude/a-thing"));
 
   assert.equal(denied(said), "", "the door says nothing");
 });
@@ -124,7 +123,7 @@ test("a script standing nowhere leaves the command alone", async () => {
 // [[spec/design_output/work#a-box-writes-its-branch]]
 test("a command making no commit and no push asks git nothing", async () => {
   const it = box("main");
-  await onBash({ command: "ls src" }, it);
+  await onBash(call("ls src"), it);
   assert.deepEqual(
     it.proc.ran.map((one) => one.argv.join(" ")),
     [],

@@ -881,6 +881,7 @@ forgets to take a ticket up and to put it down.
 | `mcp__level0__patch`, `mcp__level0__replace` | the `ticket` field | `unnamedIn` in `src/bridge/apply.js` |
 | `./RUNME.sh commit` | `<ticket>:` at the head of the message | `commitVerb` in `src/scripts/commit-verb.js` |
 | Edit, Write, MultiEdit, NotebookEdit | nothing, since the harness fixes their fields | `onToolWrite` in `src/bridge/write.js`, which refuses them and names `mcp__level0__patch` |
+| Bash, PowerShell | `<ticket>:` at the head of `description` | `ticketDoor` in `src/bridge/bash.js` |
 
 `ticketFault` in `src/engine/named.js` reads the name. A ticket stands open
 where `spec/tickets/<name>.md` or `.se/tickets/<name>.md` carries a `state`
@@ -900,6 +901,26 @@ These write with no ticket named:
 - the handover `.se/HANDOVER.md`, through Write or through a patch writing it alone
 - a path outside the tree, which the write door reads nowhere
 - the ticket verbs, which commit through git themselves
+
+## A shell names its ticket
+
+A Bash or PowerShell call names the open ticket it serves at the head of its
+`description`, the way a patch names it in its `ticket` field. `ticketDoor`
+in `src/bridge/bash.js` reads `e.description` through `ticketOf` and
+`ticketFault`, and `DESCRIPTION_HOW` in `src/engine/named.js` says how to
+name one. `onPowerShell` runs the same gate for the PowerShell tool, and no
+rule past it, since every rule above reads a POSIX command line.
+
+A session holds no ticket before its first pull, so `freeOfTicket` in
+`.claude/skills/level0/lib/bash.js` reads these forms as needing none:
+
+- `./RUNME.sh ticket pull`
+- `./RUNME.sh mint ticket`
+- `./RUNME.sh ticket note`
+
+A call chaining one of these with another command still names its ticket.
+`freeOfTicket` checks every segment, and passes only where each one matches a
+free form alone.
 
 ## The panel holds a warning
 

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: closed
+state: draft
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -25,14 +25,6 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
-step: do
-record:
-  - step: do
-    hand: box d6f05e3a585030 · claude-code
-    hash_before: ea3a01628939978ba7622c99a7fb7eebd146740a
-    hash_after: ea3a01628939978ba7622c99a7fb7eebd146740a
-reason: became
-successors: [shell-calls-name-their-ticket]
 ---
 
 # Ask
@@ -57,15 +49,11 @@ Without it a shell call writes through a verb or git with no ticket named, and t
 
 <!-- the form is command -->
 
-    ./RUNME.sh test test/level0/bash-ticket.test.js test/level0/named.test.js test/level0/bash.test.js test/level0/bash-commit.test.js test/level0/bash-desk.test.js test/level0/trunk-door.test.js test/level0/pulled.test.js
-
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
-
-    ./RUNME.sh check
 
 ## says
 
@@ -73,17 +61,11 @@ Without it a shell call writes through a verb or git with no ticket named, and t
 
 <!-- the form is text -->
 
-Every Bash and PowerShell call names the open ticket it serves, at the head of its description. A call naming none refuses and says the form. A ticket pull, a mint and a note pass unnamed. [[spec/design_output/level0#a-shell-names-its-ticket]]
-
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
-
-- the change follows the ask: the Bash and PowerShell doors read the ticket off the description
-- the name of this ticket runs past the cap, and it closes here as it stands
-- `src/engine/named.js` owns the ticket check and its wording, and the Bash door calls it
 
 # Discussion
 

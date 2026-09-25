@@ -334,3 +334,20 @@ test("a commit message opening with an open ticket lands", async () => {
     ),
   );
 });
+
+// [[spec/design_output/level0#a-shell-names-its-ticket]]
+test("a PowerShell call naming no open ticket refuses, and one naming an open ticket passes", async () => {
+  const box = routed();
+  const bare = await called(box, {
+    tool: "PowerShell",
+    command: "Get-ChildItem",
+    description: "List the files",
+  });
+  assert.match(refused(bare), /Open the description with <ticket>:/);
+  const named = await called(box, {
+    tool: "PowerShell",
+    command: "Get-ChildItem",
+    description: "open-one: list the files",
+  });
+  assert.equal(refused(named), "");
+});

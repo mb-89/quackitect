@@ -6,6 +6,7 @@ import { isAbsolute, join } from "node:path";
 import {
   commitIn,
   findings,
+  freeOfTicket,
   skipsTheHook,
   verbLine,
   withoutTrailers,
@@ -38,6 +39,7 @@ import {
   versionRefs,
 } from "../../.claude/skills/level0/lib/trunk.js";
 import { WORK_BRANCH } from "../engine/group.js";
+import { DESCRIPTION_HOW, ticketFault, ticketOf } from "../engine/named.js";
 import { formIn, refusesIn, rowOf } from "../../.claude/skills/level0/lib/warnings.js";
 import { heldTests } from "../scripts/guidance-hand.js";
 import { asks } from "./config.js";
@@ -50,6 +52,7 @@ const PASS = { pass: true };
 export async function onBash(e, box) {
   const command = String(e?.command ?? "");
   const checks = [
+    ticketDoor,
     commandRules,
     privateDelta,
     testedDelta,
@@ -65,6 +68,34 @@ export async function onBash(e, box) {
   }
   marksShown(command, box);
   return messageWarns(held.warned ?? [], box) ?? PASS;
+}
+
+// [[spec/design_output/level0#a-shell-names-its-ticket]]
+export async function onPowerShell(e, box) {
+  const command = String(e?.command ?? "");
+  const found = ticketDoor(command, e, box);
+  return found ? { result: { deny: found } } : PASS;
+}
+
+// [[spec/design_output/level0#a-shell-names-its-ticket]]
+function ticketDoor(command, e, box) {
+  if (freeOfTicket(command)) return "";
+  const fault = ticketFault(
+    ticketOf(e?.description),
+    { disk: box.disk, root: box.work },
+    DESCRIPTION_HOW,
+  );
+  if (!fault) return "";
+  box.log.say(
+    "warn",
+    "ticket",
+    `refused a ${e?.tool ?? "Bash"} call naming no open ticket`,
+    {
+      tool: String(e?.tool ?? "Bash"),
+      detail: String(e?.description ?? ""),
+    },
+  );
+  return fault;
 }
 
 // The shell reads that hand the agent a file's lines, each a shape and the span it prints. [[spec/design_output/level0#a-lone-shell-read-marks]]

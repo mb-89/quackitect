@@ -14,6 +14,7 @@ const HEAD = /^([^\s:]+):/;
 
 export const FIELD_HOW = `Name the open ticket this write serves in the ticket field: ${WHERE}.`;
 export const MESSAGE_HOW = `Open the message with <ticket>:, where <ticket> names the open ticket this commit serves: ${WHERE}.`;
+export const DESCRIPTION_HOW = `Open the description with <ticket>: what it does, where <ticket> names the open ticket this call serves: ${WHERE}.`;
 
 // [[spec/design_output/level0#a-write-names-its-ticket]]
 export function ticketFault(name, { disk, root }, how) {

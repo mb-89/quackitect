@@ -211,6 +211,26 @@ export function addsIn(command) {
   return out;
 }
 
+// [[spec/design_output/level0#a-shell-names-its-ticket]]
+const TICKET_FREE = [
+  ["ticket", "pull"],
+  ["mint", "ticket"],
+  ["ticket", "note"],
+];
+
+// [[spec/design_output/level0#a-shell-names-its-ticket]]
+export function freeOfTicket(command) {
+  const { segments } = partsOf(command);
+  return segments.length > 0 && segments.every((one) => freeVerbIn(wordsIn(one)));
+}
+
+function freeVerbIn(words) {
+  const at = words.findIndex((word) => VERB_ROOTS.has(baseName(word)));
+  if (at < 0) return false;
+  const [verb, sub] = words.slice(at + 1);
+  return TICKET_FREE.some(([said, form]) => said === verb && form === sub);
+}
+
 export function findings(command, most, it = {}) {
   const said = String(command ?? "");
   const out = [];
