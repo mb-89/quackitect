@@ -8,11 +8,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 // The whole module, so a name the reader answers nowhere yet fails an assertion. [[spec/tickets/a-claim-meets-the-view]]
 import * as findings from "../../src/bridge/findings.js";
-import { boxOf } from "../../src/bridge/server.js";
 import { disk } from "../../src/doors/disk.js";
-import { serverFaults } from "../../src/scripts/cli-check.js";
 // The whole module, so a name the command line answers nowhere yet fails an assertion. [[spec/tickets/a-claim-meets-the-view]]
 import * as reading from "../../src/scripts/cli-read.js";
+import { privateRow, serverFaults } from "../../src/scripts/cli-served.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -46,8 +45,8 @@ test("the guard hands nothing where no binary stands, and the path where one doe
   assert.equal(findings.biomeFor(standing, "/tree", {}), at);
 });
 
-// The line of done_when asking for a sweep the way the panel does. [[spec/tickets/a-claim-meets-the-view]]
-test("each front's own route answers one list over one file", async () => {
+// The lint reads the server's list and the rules it holds nowhere yet, and each row once. [[spec/design_output/lsp#a-port-serves-the-list]]
+test("the lint reads each row of the server's list once", async () => {
   assert.equal(typeof findings.linesNamed, "function", "the reader answers linesNamed");
   assert.equal(
     typeof reading.readingFor,
@@ -55,22 +54,23 @@ test("each front's own route answers one list over one file", async () => {
     "the command line answers readingFor",
   );
 
-  // One file proves the contract, and the language server reads it once for both fronts, because a sweep over a folder costs the battery seconds and proves no more. [[spec/tickets/one-reading-proves-one-file]]
+  // One file proves the contract, and the language server reads it once, because a sweep over a folder costs the battery seconds and proves no more. [[spec/tickets/one-reading-proves-one-file]]
   const file = "spec/guidance/working.md";
-  const served = serverFaults([file]) ?? [];
-  const drawn = await findings.findingsFor(
-    boxOf(root),
-    `${findings.FINDINGS}?path=${file}`,
-  );
+  const served = (await serverFaults([file])) ?? [];
   const printed = await reading.readingFor([file], served);
+  const alone = findings.aloneOver({ disk: files, join, root }, [file]);
 
-  const panel = findings.linesNamed([...drawn.found, ...served]);
   const check = findings.linesNamed(printed.found);
+  assert.deepEqual(check, findings.linesNamed([...served, ...alone]));
+  assert.equal(new Set(check).size, check.length, "no row reads twice");
+});
 
-  const alone = (one, other) => one.filter((row) => !other.includes(row));
-  assert.deepEqual(alone(panel, check), [], "the panel names no line alone");
-  assert.deepEqual(alone(check, panel), [], "the check names no line alone");
-  assert.equal(panel.length, check.length);
+// [[spec/design_output/lsp#a-port-serves-the-list]]
+test("a row on a private note holds no push", () => {
+  assert.equal(privateRow(".se/tickets/a-note.md"), true);
+  assert.equal(privateRow(".se\\tickets\\a-note.md"), true);
+  assert.equal(privateRow("spec/tickets/a-note.md"), false);
+  assert.equal(privateRow(".semantic/a.md"), false);
 });
 
 // The rule the ask asks for, read off the note that ships. [[spec/tickets/a-claim-meets-the-view]]

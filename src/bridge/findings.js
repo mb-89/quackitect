@@ -27,8 +27,8 @@ import {
   RULE as GRID,
   lineOf,
 } from "../extension/lib/grid.js";
-import { asks } from "./config.js";
 import { assemble } from "../scripts/styles.js";
+import { asks } from "./config.js";
 
 // The folders no rule reads: the private folder, the packages, git, and a draft under an underscore. [[spec/design_output/tree#the-tree-handed-in]]
 export const PARKED = [
@@ -89,6 +89,25 @@ export async function findingsOver(it, asked) {
   if (it.biome)
     found.push(...(await biomeOver(it, where)).map((one) => from(one, FROM.biome)));
   return { found, fault: "" };
+}
+
+// The rules the language server holds nowhere yet, which the lint lays beside the server's list. [[spec/design_output/lsp#a-port-serves-the-list]]
+export function aloneOver(it, asked) {
+  const where = asked.filter(
+    (one) => one === WHOLE || it.disk.exists(it.join(it.root, one)),
+  );
+  const found = [];
+  for (const file of walkOver(it, where)) {
+    const shown = showOf(it, file);
+    for (const one of unreasoned(it.disk.read(file)))
+      found.push(from({ ...one, file: shown }, FROM.tree));
+  }
+  if (where.includes(WHOLE)) {
+    const tree = treeOf({ disk: it.disk, root: it.root });
+    found.push(...stopFolderIsData(tree).map((one) => from(one, FROM.tree)));
+  }
+  found.push(...gridOver(it, where).map((one) => from(one, FROM.tree)));
+  return found;
 }
 
 // One guard answers both fronts, because a tool standing nowhere is no tool. [[spec/design_output/lsp#one-checker-every-front-asks]]

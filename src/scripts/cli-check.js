@@ -39,7 +39,6 @@ import {
   HEALTH_WAIT,
   it,
   known,
-  lsp,
   OURS,
   outside,
   PLUGIN,
@@ -58,18 +57,6 @@ import { formatFaults, goEnvOf, goModulesIn } from "./cli-go.js";
 import { HOOKS } from "./precommit.js";
 import { writeSurvey } from "../engine/tools.js";
 import { viewerOf } from "./tui-build.js";
-
-export function serverFaults(where) {
-  if (!files.exists(lsp)) return null;
-  const ran = outside.run([lsp, "check", ...where], { cwd: root });
-  if (ran.exitCode !== 0) return null;
-  try {
-    const said = JSON.parse(ran.stdout || "[]");
-    return Array.isArray(said) ? said : null;
-  } catch {
-    return null;
-  }
-}
 
 export function treeHere() {
   return treeOf({
@@ -363,7 +350,12 @@ export async function serverSays(get = fetch) {
   try {
     const answer = await get(where, { signal: AbortSignal.timeout(HEALTH_WAIT) });
     const body = await answer.json();
-    return { answers: true, ok: Boolean(body?.ok), where, why: String(body?.dead ?? "") };
+    return {
+      answers: true,
+      ok: Boolean(body?.ok),
+      where,
+      why: String(body?.dead ?? ""),
+    };
   } catch (bad) {
     return { answers: false, ok: false, where, why: bad?.message ?? String(bad) };
   }
