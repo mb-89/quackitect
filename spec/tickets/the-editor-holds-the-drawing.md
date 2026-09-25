@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box d6f05e3a585030 · claude-code
@@ -95,6 +95,14 @@ record:
     hand: the engine
     hash_before: 75fbfce25a7c2ed94218f76a6b75f1cc5a224d95
     hash_after: 75fbfce25a7c2ed94218f76a6b75f1cc5a224d95
+  - step: retro/notes
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: bf0d846d8c43ca7dcdaef1fde9639a8fe269fcd3
+    hash_after: bf0d846d8c43ca7dcdaef1fde9639a8fe269fcd3
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -152,6 +160,8 @@ A person takes a ticket, works it and hands it back from VS Code alone, and that
 <!-- retro notes, which passes when the private folder is empty -->
 
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
