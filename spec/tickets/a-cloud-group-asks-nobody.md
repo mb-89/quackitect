@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -132,6 +132,14 @@ record:
     hand: box d6f05e3a585030 · claude-code · helper-12
     hash_before: f86ac9a09a499efb6d2e12b12b6885c87bce0450
     hash_after: f86ac9a09a499efb6d2e12b12b6885c87bce0450
+  - step: implement/tests-red
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 8d077aaac475e320293eef9abd61b2769c67a326
+    hash_after: 8d077aaac475e320293eef9abd61b2769c67a326
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -317,17 +325,26 @@ The approach answers every finding of the earlier rounds.
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/lsp test/level0/unblock.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Three Go cases fail on their own assertion: a child at a person step, a leaf under a `by: person` parent, and an empty `step`. Each wants one `GroupAsksNobody`, and the stub answers none. Three pass as they stand: a child closed `became`, a child at a step anyone takes, and a child of a closed group. The unblock case fails on `main`, because the verb reads the group off the branch. The surprise: a Go test calling a missing function fails to build, so `src/lsp/group.go` stands as an empty stub outside `Rules`.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the tests touch `src/lsp` and the unblock test alone
+- every door the change reaches has a fake: the Go cases feed `fakeTree`, and the unblock case feeds the fake git and disk
+- a comment names the approach the change implements: each case links the design it holds
+- every fact the change adds stands in one place: the tests assert the rule, and no note repeats it
 
 ## change
 
