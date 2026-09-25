@@ -6,7 +6,7 @@ import { createRequire } from "node:module";
 
 const NAME = "vscode";
 
-// A require from the test's own place, where vscode answers the fake the case hands in.
+// A require from the test's own place, where vscode answers the fake the case hands in. [[spec/design_output/doors#a-fake-behaves]]
 export function editorRequire(fake, from) {
   const require = createRequire(from);
   const Module = require("node:module");
