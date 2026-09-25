@@ -96,12 +96,18 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-editor-takes-an-inset, the-ticket-answers-the-editor, the-drawing-draws-a-route]
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
     hash_before: 6684e0b917fda94b0ab8f35ac4f27a34aa428034
     hash_after: 6684e0b917fda94b0ab8f35ac4f27a34aa428034
+  - step: design/review
+    hand: box 75b31b3d5012 · claude-code-remote · helper-2
+    hash_before: 06835a53e105ab1f1554762252ca0b929c63749f
+    hash_after: 06835a53e105ab1f1554762252ca0b929c63749f
+    returns: 1
+    why: "The ask calls for three tests, and the approach names none: the draw through a fake editor, the flip, and the redraw on a change. Name the test file and the case for each.; `lensesOf` reads `path`, `text` and `holds` alone, so the flip lens has no input saying which side shows. Name where that state lives and how it reaches `lensesOf`.; `lensesOf` answers nothing on a ticket whose `state` reads other than open, so a closed ticket gets no flip. Name where the flip lens stands apart from that return.; A lens runs `COMMAND`, and `argvOf` answers no verb for a flip. Name the command and the handler a press on the flip runs.; The jump belongs to the ask of [[spec/tickets/the-host-runs-the-verbs]]. Hand it on beside `take`, `handback` and `edit`.; The `graph` message carries `graph`, `steps` and `held`, and the host names `graph` alone. Name where `steps` and `held` come from, or hand them on. For details, see [[spec/design_output/drawing#the-page-speaks-in-messages]].; `src/scripts/bundle.js` writes the bundle into the workspace's runtime folder, outside the extension folder. Name that folder among `localResourceRoots`, and where the extension spells its path, since it bundles alone."
 ---
 
 # Ask
@@ -173,6 +179,15 @@ The page loads the bundle `src/scripts/bundle.js` writes, so the webview names i
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+- The ask calls for three tests, and the approach names none: the draw through a fake editor, the flip, and the redraw on a change. Name the test file and the case for each.
+- `lensesOf` reads `path`, `text` and `holds` alone, so the flip lens has no input saying which side shows. Name where that state lives and how it reaches `lensesOf`.
+- `lensesOf` answers nothing on a ticket whose `state` reads other than open, so a closed ticket gets no flip. Name where the flip lens stands apart from that return.
+- A lens runs `COMMAND`, and `argvOf` answers no verb for a flip. Name the command and the handler a press on the flip runs.
+- The jump belongs to the ask of [[spec/tickets/the-host-runs-the-verbs]]. Hand it on beside `take`, `handback` and `edit`.
+- The `graph` message carries `graph`, `steps` and `held`, and the host names `graph` alone. Name where `steps` and `held` come from, or hand them on. For details, see [[spec/design_output/drawing#the-page-speaks-in-messages]].
+- `src/scripts/bundle.js` writes the bundle into the workspace's runtime folder, outside the extension folder. Name that folder among `localResourceRoots`, and where the extension spells its path, since it bundles alone.
 
 # implement
 
