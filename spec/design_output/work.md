@@ -554,6 +554,7 @@ What the run leaves behind:
 - nothing stages before the message reads clean, so a refused message leaves the tree standing
 - the push door reads the stamp this run writes, so no stale stamp stops a clean commit
 - `--no-push` leaves the branch where it stands
+- `./RUNME.sh push` pushes the branch from a desk, once the stamp answers green on the commit it stands on
 - a path after the message lands that path alone, so a helper's files stand apart from another hand's landing
 
 The reading of the message stands with the bash door, which reads the same rules over a

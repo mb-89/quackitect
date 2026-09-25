@@ -34,11 +34,7 @@ import {
   versionRefs,
 } from "../../.claude/skills/level0/lib/trunk.js";
 import { WORK_BRANCH } from "../engine/group.js";
-import {
-  formIn,
-  refusesIn,
-  rowOf,
-} from "../../.claude/skills/level0/lib/warnings.js";
+import { formIn, refusesIn, rowOf } from "../../.claude/skills/level0/lib/warnings.js";
 import { heldTests } from "../scripts/guidance-hand.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
@@ -175,11 +171,16 @@ async function commitVoice(command, box) {
 function messageWarns(found, box) {
   if (!found.length) return null;
   const rows = found.map((one) => ({ ...one, file: one?.file || COMMIT }));
-  box.log.say("warn", "bash", `${rows.length} line(s) of a commit message stand at warning`, {
-    tool: "Bash",
-    rule: rows[0]?.rule,
-    detail: rows.map(rowOf).join("\n"),
-  });
+  box.log.say(
+    "warn",
+    "bash",
+    `${rows.length} line(s) of a commit message stand at warning`,
+    {
+      tool: "Bash",
+      rule: rows[0]?.rule,
+      detail: rows.map(rowOf).join("\n"),
+    },
+  );
   return { after: { context: [messageNote(rows)] } };
 }
 
@@ -212,7 +213,9 @@ async function privateDelta(command, _e, box) {
 async function testedDelta(command, _e, box) {
   if (!commitIn(command)) return "";
   // Git holds a merge in progress under MERGE_HEAD, so the read asks git where it stands. [[spec/design_output/tree#the-rules-over-two-files]]
-  const merging = Boolean(await git(box, ["rev-parse", "-q", "--verify", "MERGE_HEAD"]));
+  const merging = Boolean(
+    await git(box, ["rev-parse", "-q", "--verify", "MERGE_HEAD"]),
+  );
   const found = untestedIn(
     await git(box, ["diff", "--cached", "--unified=0"]),
     (path) => fileText(reader(box), path),
@@ -312,6 +315,13 @@ function trunkGuard(command, _e, box) {
 
 // Each commit carries one helper's work, and the verb's check gates every landing on trunk. [[spec/design_output/work#a-landing-takes-the-verb]]
 function throughTheVerb(how) {
+  if (how === "push")
+    return [
+      `This push lands on ${TRUNK} past the push verb.`,
+      "",
+      "Run `./RUNME.sh push`, which reads the check's stamp and pushes the branch",
+      "you stand on once the check answers green on it.",
+    ].join("\n");
   return [
     `This ${how} lands on ${TRUNK} past the commit verb.`,
     "",

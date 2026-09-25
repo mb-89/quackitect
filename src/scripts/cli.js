@@ -181,6 +181,10 @@ export const verbs = {
     says: "read the message, land the commit, run the check, and push on green from a cloud box",
     run: async () => (await import("./commit-verb.js")).commitVerb(commitDoors(), rest),
   },
+  push: {
+    says: "push the branch you stand on, once the check answers green on it",
+    run: async () => (await import("./push-verb.js")).pushVerb(commitDoors()),
+  },
   serve: {
     says: "the server behind the bridgehead, under the debugger with --inspect",
     run: async () => serveBridge(rest),

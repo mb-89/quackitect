@@ -34,6 +34,7 @@ test("every verb in the table says what it does", () => {
     "vehicle",
     "stub",
     "tui",
+    "push",
   ]) {
     assert.ok(saysOf(verb).length > 0, `${verb} says something`);
   }

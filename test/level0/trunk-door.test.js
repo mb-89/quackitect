@@ -49,9 +49,9 @@ test("a work branch in hand hands the work back, and trunk stays shut", async ()
 });
 
 // A raw landing on trunk meets the commit verb, which lints, checks and pushes. [[spec/design_output/work#a-box-writes-its-branch]]
-test("a session outside the queue lands on trunk through the commit verb alone", async () => {
+test("a session outside the queue pushes trunk through the push verb alone", async () => {
   const said = await onBash({ command: PUSH }, box("claude/a-thing"));
-  assert.match(denied(said), /\.\/RUNME\.sh commit "<message>"/);
+  assert.match(denied(said), /\.\/RUNME\.sh push/);
 });
 
 test("a work branch pushing trunk keeps the hand-back, and names no commit verb", async () => {
@@ -62,13 +62,22 @@ test("a work branch pushing trunk keeps the hand-back, and names no commit verb"
 test("a desk commit standing on trunk refuses and names the verb, and one on a branch lands", async () => {
   const said = await onBash({ command: "git commit -m x" }, box("main", true, {}));
   assert.match(denied(said), /\.\/RUNME\.sh commit "<message>"/);
-  const off = await onBash({ command: "git commit -m x" }, box("work/a-thing", true, {}));
+  const off = await onBash(
+    { command: "git commit -m x" },
+    box("work/a-thing", true, {}),
+  );
   assert.equal(denied(off), "", "the door says nothing");
 });
 
-test("a bare push standing on trunk refuses on a desk", async () => {
+test("a bare push standing on trunk refuses on a desk, and names the push verb", async () => {
   const said = await onBash({ command: "git push" }, box("main", true, {}));
-  assert.match(denied(said), /\.\/RUNME\.sh commit "<message>"/);
+  assert.match(denied(said), /\.\/RUNME\.sh push/);
+});
+
+// [[spec/design_output/work#one-verb-feeds-that-stamp]]
+test("the push verb standing on trunk passes the door", async () => {
+  const said = await onBash({ command: "./RUNME.sh push" }, box("main", true, {}));
+  assert.equal(denied(said), "", "the door says nothing");
 });
 
 test("the commit verb standing on trunk passes, though its message names git commit", async () => {
@@ -103,7 +112,10 @@ test("the door reads a script off the disk, and refuses the write inside it", as
 });
 
 test("a script standing nowhere leaves the command alone", async () => {
-  const said = await onBash({ command: "node .se/scripts/gone.mjs" }, box("claude/a-thing"));
+  const said = await onBash(
+    { command: "node .se/scripts/gone.mjs" },
+    box("claude/a-thing"),
+  );
 
   assert.equal(denied(said), "", "the door says nothing");
 });
@@ -118,4 +130,3 @@ test("a command making no commit and no push asks git nothing", async () => {
     "no git runs for a command that lands nowhere",
   );
 });
-
