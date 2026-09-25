@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -140,6 +140,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 11d9d7b9a83c6d4c4635464440d1ef52b0e99182
+    hash_after: cc105e8d672b532e5112ef5dc2b52a123047c06c
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/a-cloud-group-asks-nobody.md:367:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
 ---
 
 # Ask
@@ -356,11 +364,18 @@ Three Go cases fail on their own assertion: a child at a person step, a leaf und
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the rule, the unblock verb, the design note and the two successors the approach names
+- every door the change reaches has a fake: the rule reads the tree, which `fakeTree` stands in for
+- a comment names the approach the change implements: `group.go` and `work-unblock.js` link the design
+- every fact the change adds stands in one place: the design note points at `src/lsp/group.go`
 
 ## tests-green
 

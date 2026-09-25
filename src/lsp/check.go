@@ -102,6 +102,7 @@ var Rules = []func(*Tree) []Finding{
 	surveyNamesInstalls,
 	surveyFindsNode,
 	everyPointerResolves,
+	groupAsksNobody,
 }
 
 // [[spec/design_output/tree#what-a-rule-answers]]

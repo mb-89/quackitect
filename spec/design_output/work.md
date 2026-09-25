@@ -239,6 +239,7 @@ group:
 | what it reads | what it writes |
 |---|---|
 | the ticket stands open, in this group, at a step `by: person` | the ticket closes `state: closed`, `reason: became`, `successors: [<name>]` |
+| on `main`, the group the ticket's own `group` field names | the same close, since a desk works on `main` |
 | the successor stands open and names no group | the question that step asks, under the successor's `Discussion`, beside the ticket it comes from |
 
 A question rides the frontmatter on one line, so it carries its own lines as
@@ -251,6 +252,9 @@ A question rides the frontmatter on one line, so it carries its own lines as
 
 A semicolon whitespace follows cuts one question from the next. So a word
 carrying a semicolon stays whole.
+
+`GroupAsksNobody` in `src/lsp/group.go` holds an open group to no child at a
+person step, so `./RUNME.sh check` names each one until it leaves.
 
 So `branch done` meets no open child, the group closes, and one push carries the
 successor with it. The person answers on a ticket of their own, and every step

@@ -13,6 +13,7 @@ import {
   ticketAt,
   withField,
 } from "../engine/group.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { landedAlone } from "./pull-landed.js";
 import { leafOf, stepPathOf } from "./pull.js";
 
@@ -40,11 +41,13 @@ export function unblock(it, name, argv) {
     return 2;
   }
 
-  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out.trim();
-  const group = branch.replace(/^work\//, "");
-
   const child = noteAt(it, name);
   if (child.why) return tell(child.why);
+
+  // A desk works on main, so there the child's own field names its group. [[spec/design_output/work#a-person-step-leaves]]
+  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out.trim();
+  const group =
+    branch === TRUNK ? String(child.front[GROUP] ?? "") : branch.replace(/^work\//, "");
   const successor = noteAt(it, nextName);
   if (successor.why) {
     console.error(`${nextName} stands nowhere yet.`);
