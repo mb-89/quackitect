@@ -96,12 +96,18 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor, a-save-fills-the-ticket]
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
     hash_before: 71b21c6846ab7a4b348874ba61258361a4c6e63d
     hash_after: 71b21c6846ab7a4b348874ba61258361a4c6e63d
+  - step: design/review
+    hand: box 75b31b3d5012 · claude-code-remote · helper-2
+    hash_before: 93d057508dc51c5efc59ee42bd68ccdd795b86e8
+    hash_after: 93d057508dc51c5efc59ee42bd68ccdd795b86e8
+    returns: 1
+    why: "| grade | finding | fix |; |---|---|---|; | blocking | Four done lines each call for a test, and the approach names none. | Name one test a done line in `test/level0/sidebar.test.js`, with the fake each feeds. |; | detail | `runsVerb` takes an argv, and `counts` holds a shell line opening with `./RUNME.sh`. | Drop the `./RUNME.sh` head and split the rest into the argv. |; | detail | `runsVerb` wraps each run in a progress toast, and `html` runs on every redraw. | Run the count on a road that shows no toast. |; | detail | `work.pull` carries `runs`, and the approach keys the pull on `pulls`, which no row adds. | Add `pulls` in the config row, or key the pull on `work.pull`. |; | detail | `door.asks` in the sidebar opens a folder picker, and a ticket name wants a line. | Ask the name through `asksLine`, and name it in the callers list. |; | detail | `ticket yours --next` answers `{\"ticket\":null}` on an empty queue. | Name what pull for me tells the person then. |; `./RUNME.sh check` answers 0 on this commit."
 ---
 
 # Ask
@@ -175,6 +181,19 @@ The pull runs as a person, through the same `runsVerb` the ticket buttons run. T
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+| grade | finding | fix |
+|---|---|---|
+| blocking | Four done lines each call for a test, and the approach names none. | Name one test a done line in `test/level0/sidebar.test.js`, with the fake each feeds. |
+| detail | `runsVerb` takes an argv, and `counts` holds a shell line opening with `./RUNME.sh`. | Drop the `./RUNME.sh` head and split the rest into the argv. |
+| detail | `runsVerb` wraps each run in a progress toast, and `html` runs on every redraw. | Run the count on a road that shows no toast. |
+| detail | `work.pull` carries `runs`, and the approach keys the pull on `pulls`, which no row adds. | Add `pulls` in the config row, or key the pull on `work.pull`. |
+| detail | `door.asks` in the sidebar opens a folder picker, and a ticket name wants a line. | Ask the name through `asksLine`, and name it in the callers list. |
+| detail | `ticket yours --next` answers `{"ticket":null}` on an empty queue. | Name what pull for me tells the person then. |
+
+`./RUNME.sh check` answers 0 on this commit.
 
 # implement
 
