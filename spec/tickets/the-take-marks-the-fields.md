@@ -76,7 +76,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d6f05e3a585030 · claude-code · the owner says so
@@ -94,6 +94,15 @@ record:
       - name: tests
         exit: 1
         said: assertion, 9 test(s) fail on their own assertion
+  - step: implement/change
+    hand: person
+    hash_before: 4de66451a2063080ee57f0b4c6268462dffb42a6
+    hash_after: 4de66451a2063080ee57f0b4c6268462dffb42a6
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+todo: true
 ---
 
 # Ask

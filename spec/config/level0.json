@@ -31,8 +31,8 @@
   },
   "context": {
     "comment": "The context a session carries before it hands over. Past handoverAt it finishes the step in hand, writes .se/HANDOVER.md, clears, and reads the handover in a fresh conversation. Past writeAt it stops the step and writes the handover now. 0 switches each off. spec/design_output/stop.md, chapter The context hands over, says the rest.",
-    "handoverAt": 150000,
-    "writeAt": 175000
+    "handoverAt": 300000,
+    "writeAt": 325000
   },
   "helper": {
     "comment": "The model each tier of helper work runs on. The session weighs the work it hands and names the tier's model on the Agent call. find finds, lists, reads and reports. change makes a scoped change with its test, or reviews against a list. decide takes a design, an unknown cause, or a verdict the owner reads. spec/design_output/level0.md, chapter A spawn names its tier, says the rest.",
