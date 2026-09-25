@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -39,7 +39,19 @@ record:
     hand: box d6f05e3a585030 · claude-code · the owner says so
     hash_before: a025ca5c9405361b5ba08b5dcf9223c0636bd818
     hash_after: a025ca5c9405361b5ba08b5dcf9223c0636bd818
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 8aa05819fc862872c37174aca7d03cb305e959d2
+    hash_after: ab4843318013f13b3c9e59230536dada1eb508e7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 44 test(s) pass in 5 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
 step: do
+reason: done
 ---
 
 # Ask
@@ -78,11 +90,15 @@ The walk leaves the editor, or breaks inside it, at these places:
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/pull-leaves.test.js test/level0/pull-hand-of.test.js test/level0/pull-escalate.test.js test/level0/editor-doors.test.js test/level0/ticket-yours.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -90,11 +106,26 @@ The walk leaves the editor, or breaks inside it, at these places:
 
 <!-- the form is text -->
 
+Each fault under `answer` takes a fix and a test:
+
+- The inset imports a URL, so Node on Windows takes the path.
+- The inset door warns why it draws nothing.
+- A person's named pull passes the queue.
+- The sidebar badge reads the queue the work tab counts.
+- `EngineOwnsField` draws at hint, off the Problems panel.
+- The restore of this ticket's frontmatter clears the `ValeRuns` error.
+
+The blue lines move to [[spec/tickets/the-take-marks-the-fields]].
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the answer: each row under `answer` names its fix under `says`
+- the cleanup stands in the change: `pull.js` splits its escalation out to keep under its ceiling
+- every fact stands once: the binding rule lives in [[spec/design_output/config#the-engine-controls]], and the hint level in `src/lsp/finding.go`
 
 # Discussion
 
