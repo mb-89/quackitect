@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -40,6 +40,18 @@ record:
     hand: box d6f05e3a585030 · claude-code · the owner says so
     hash_before: f507d8e0e0601d577ccbfb8d108f72fb2bd2ec46
     hash_after: f507d8e0e0601d577ccbfb8d108f72fb2bd2ec46
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 44f26e42dd33ac5268b56750a6e15705f1e5254c
+    hash_after: 4747f7b550e57b7714d46c4186ab5a6b9db56fd5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 109 test(s) pass in 6 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -79,11 +91,15 @@ The `do` step builds that ask with both fixes.
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/named.test.js test/level0/apply-door.test.js test/level0/apply.test.js test/level0/bash.test.js test/level0/commit-verb.test.js test/level0/write.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -91,11 +107,17 @@ The `do` step builds that ask with both fixes.
 
 <!-- the form is text -->
 
+Every call that writes names the open ticket it serves, so each write asks the agent whether it still works that ticket. `patch` and `replace` take a `ticket` field, and a commit message opens with `<ticket>:`. Edit, Write, MultiEdit and NotebookEdit carry no such field, so the door refuses them inside the tree. A mint, a note and the handover pass with no ticket. [[spec/design_output/level0#a-write-names-its-ticket]]
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change departs from the answer on the owner's word, and the table under `Discussion` says how
+- the cleanup the change reveals stands as notes: `the-mark-door-stands-idle`, `raw-commits-skip-the-ticket` and `the-ticket-folders-stand-twice`
+- `src/engine/named.js` owns the ticket check and every refusal line, and `level0#a-write-names-its-ticket` owns the design
 
 # Discussion
 
@@ -126,3 +148,13 @@ The earlier findings, read against the code:
 `./RUNME.sh check` reads at implement, and no retro rides a design handback.
 
 The owner's answer under `design/person-1` of [[spec/tickets/a-write-needs-a-ticket]] takes both fixes.
+
+The `do` step departs from that design on the owner's word. The door reads no hold. Every call that writes names the ticket it serves, so each write asks the agent whether it still works that ticket:
+
+| the road | what it names |
+|---|---|
+| `mcp__level0__patch` and `mcp__level0__replace` | a `ticket` field, which names an open ticket |
+| `./RUNME.sh commit` | a message opening with `<ticket>:` |
+| Edit, Write and NotebookEdit | nothing, since their fields stand fixed, so the door refuses them and names `mcp__level0__patch` |
+
+A ticket mint, a note and the handover pass with no ticket named.
