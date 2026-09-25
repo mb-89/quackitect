@@ -43,3 +43,8 @@ test("a new ticket carries its kind and an empty process, and an ask to fill", (
   assert.match(NEW_TICKET, /^---\nkind: \[\[ticket\]\]\nprocess: ""\n---\n/);
   assert.match(NEW_TICKET, /^# Ask$/m);
 });
+
+test("an answer of the wrong shape reads as none", () => {
+  assert.equal(countIn({ code: 0, out: '{"count":"3"}' }), undefined);
+  assert.equal(nextIn({ code: 0, out: '{"ticket":"one"}' }), null);
+});

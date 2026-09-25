@@ -74,6 +74,8 @@ function widget(cell) {
     ` data-state="${escaped(cell.state ?? "")}"`,
     ` title="${escaped(hover(cell))}">`,
     `<span class="mark">${escaped(markOf(cell.icon))}</span>`,
+    // [[spec/tickets/the-work-group-draws-buttons]]
+    cell.count === undefined ? "" : `<span class="count">${escaped(cell.count)}</span>`,
     cell.widget === "status" || cell.widget === "process"
       ? `<span class="light ${escaped(cell.lit)}"></span>`
       : "",

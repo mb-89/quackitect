@@ -83,6 +83,12 @@ function lensDoor(context, folder) {
       else vscode.window.showInformationMessage(said);
     },
 
+    // A verb a draw runs, so no progress toast rides it. [[spec/tickets/the-work-group-draws-buttons]]
+    asksVerb(argv) {
+      const home = join(realpathSync.native(context.extensionPath), "..", "..");
+      return ranOf(join(home, ...CLI.split("/")), argv, root);
+    },
+
     runsVerb(argv) {
       const home = join(realpathSync.native(context.extensionPath), "..", "..");
       return vscode.window.withProgress(

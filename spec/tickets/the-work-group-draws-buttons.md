@@ -96,7 +96,7 @@ process: [[spec/processes/standard]]
 process_hash: 7a1a6e274b56e7ee
 group: the-editor-holds-the-drawing
 depends_on: [the-ticket-answers-the-editor, a-save-fills-the-ticket]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 75b31b3d5012 · claude-code-remote
@@ -127,6 +127,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: ed79e7304df8d0359a3512601b495e94fe612bfb
+    hash_after: ed79e7304df8d0359a3512601b495e94fe612bfb
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -301,11 +309,17 @@ The group case seeds the real config through a JSON import, so it reads the butt
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and `test/contract/tree-extension.test.js`, which pinned the work buttons undrawn
+- the verbs, the name box, the file open and the warning each carry a fake in the work group test
+- each new function points at this ticket or at the design input's work group
 
 ## tests-green
 
