@@ -11,6 +11,7 @@ const DRAWING = ".se/.runtime/drawing";
 const SCRIPT = "route.js";
 const STYLE = "route.css";
 const PANEL = "quackitect.route";
+const NAME = "quackitect";
 
 // [[spec/tickets/the-inset-folds-the-frontmatter]]
 function insetDoor(context, folder) {
@@ -25,7 +26,9 @@ function insetDoor(context, folder) {
   const options = () => ({ enableScripts: true, localResourceRoots: roots() });
   const drawn = (webview) => {
     const at = (name) =>
-      webview.asWebviewUri(vscode.Uri.joinPath(folder.uri, ...DRAWING.split("/"), name));
+      webview.asWebviewUri(
+        vscode.Uri.joinPath(folder.uri, ...DRAWING.split("/"), name),
+      );
     return pageHtml({
       nonce: globalThis.crypto.randomUUID().split("-").join(""),
       source: webview.cspSource,
@@ -44,7 +47,10 @@ function insetDoor(context, folder) {
   return {
     theme() {
       const kind = vscode.window.activeColorTheme?.kind;
-      const light = [vscode.ColorThemeKind.Light, vscode.ColorThemeKind.HighContrastLight];
+      const light = [
+        vscode.ColorThemeKind.Light,
+        vscode.ColorThemeKind.HighContrastLight,
+      ];
       return light.includes(kind) ? "light" : "dark";
     },
 
@@ -52,7 +58,14 @@ function insetDoor(context, folder) {
     page(path, lines) {
       const editor = editorOf(path);
       const make = vscode.window.createWebviewTextEditorInset;
-      if (!editor || typeof make !== "function") return null;
+      if (!editor) return null;
+      // A refused inset says why, so the side panel standing in reads as a choice. [[spec/tickets/the-owner-walks-the-editor]]
+      if (typeof make !== "function") {
+        console.warn(
+          `${NAME}: no inset over ${path}, because the editor withholds the proposed API.`,
+        );
+        return null;
+      }
       try {
         return pageOf(() => {
           const inset = make(editor, 0, lines, options());
@@ -62,7 +75,10 @@ function insetDoor(context, folder) {
             onDispose: (run) => inset.onDidDispose(run),
           };
         }, drawn);
-      } catch {
+      } catch (error) {
+        console.warn(
+          `${NAME}: no inset over ${path}, because ${error?.message ?? error}.`,
+        );
         return null;
       }
     },
@@ -89,7 +105,9 @@ function insetDoor(context, folder) {
         vscode.Uri.joinPath(folder.uri, ...path.split("/")),
       );
       const at = new vscode.Position(Math.max(0, line - 1), 0);
-      await vscode.window.showTextDocument(doc, { selection: new vscode.Range(at, at) });
+      await vscode.window.showTextDocument(doc, {
+        selection: new vscode.Range(at, at),
+      });
     },
 
     folds: (path) => onFirstLine(path, "editor.fold"),
@@ -120,7 +138,9 @@ function insetDoor(context, folder) {
     },
 
     onTheme(run) {
-      context.subscriptions.push(vscode.window.onDidChangeActiveColorTheme(() => run()));
+      context.subscriptions.push(
+        vscode.window.onDidChangeActiveColorTheme(() => run()),
+      );
     },
   };
 }

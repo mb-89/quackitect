@@ -61,9 +61,9 @@ function fileDoor(context, folder, uriOf) {
       }
     },
 
-    // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
+    // Node's import takes a URL, and refuses a bare drive path on Windows. [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
     imports(path) {
-      return import(uriOf(path).fsPath);
+      return import(uriOf(path).toString());
     },
 
     // [[spec/design_output/extension#the-log-opens-a-terminal]]
