@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ step: do
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 parent: one-review-a-ticket
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: db4fb41e8c7e54c303527b109d088fa491386662
+    hash_after: db4fb41e8c7e54c303527b109d088fa491386662
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/a-cloud-group-asks-nobody.md:250:179: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -47,11 +60,15 @@ rule 4 of `spec/guidance/review/design.md` restates the refusal `spec/design_out
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/question-grades.test.js test/contract/process.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -59,11 +76,17 @@ rule 4 of `spec/guidance/review/design.md` restates the refusal `spec/design_out
 
 <!-- the form is text -->
 
+Rule 4 of `spec/guidance/review/design.md` links the table under "A finding rides out" in `spec/design_output/pull.md`, which owns the child-name refusals. The rule stops restating the cap and the taken name.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches rule 4 alone, as the ask names
+- the change reveals no cleanup
+- the refusals stand in the `pull.md` table alone, and rule 4 points there
 
 # Discussion
 
