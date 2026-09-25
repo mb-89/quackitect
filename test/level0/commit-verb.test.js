@@ -5,9 +5,9 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { commitVerb } from "../../src/scripts/commit-verb.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
+import { commitVerb } from "../../src/scripts/commit-verb.js";
 
 const ROOT = "/tree";
 const CLEAN = "the-verb: the message reads clean";
@@ -206,4 +206,22 @@ test("the tests run before the staging, and the check after the commit", async (
   const checked = ran.indexOf(`node ${cli} check`);
   assert.ok(tests >= 0 && tests < staged, "the tests run first");
   assert.ok(committed < checked, "the check stamps the commit");
+});
+
+// A call naming paths stages and commits those alone, so a helper's files stand apart from the landing. [[spec/design_output/work#one-verb-feeds-that-stamp]]
+test("a call naming paths lands those paths alone", async () => {
+  const { it, git } = doors();
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "src/a.js", "test/a.test.js", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const ran = ranGit(git);
+  assert.ok(ran.includes("git add -A -- src/a.js test/a.test.js"), "the paths stage");
+  assert.ok(
+    ran.includes(`git commit -m ${CLEAN} -- src/a.js test/a.test.js`),
+    "the commit takes the paths alone",
+  );
+  assert.ok(!ran.includes("git add -A"), "the whole tree stays unstaged");
 });

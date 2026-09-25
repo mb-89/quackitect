@@ -8,11 +8,11 @@ import { line } from "../../.claude/skills/level0/lib/refuse.js";
 import { formIn, refusesIn } from "../../.claude/skills/level0/lib/warnings.js";
 import { messageFaults, messageNote } from "../bridge/bash.js";
 
-const USAGE = ['Usage: ./RUNME.sh commit "<message>" [--no-push]'];
+const USAGE = ['Usage: ./RUNME.sh commit "<message>" [<path>...] [--no-push]'];
 
 export async function commitVerb(it, argv) {
   const said = argv ?? [];
-  const message = said.find((one) => !one.startsWith("--")) ?? "";
+  const [message = "", ...paths] = said.filter((one) => !one.startsWith("--"));
   if (!message) {
     for (const row of USAGE) console.log(row);
     return 2;
@@ -29,17 +29,22 @@ export async function commitVerb(it, argv) {
   const warned = formIn(all).map((one) => ({ ...one, file: "the message" }));
   if (warned.length) {
     console.error(messageNote(warned));
-    it.log?.say?.("warn", "commit", `${warned.length} line(s) of a commit message stand at warning`, {
-      rule: warned[0].rule,
-      detail: message,
-    });
+    it.log?.say?.(
+      "warn",
+      "commit",
+      `${warned.length} line(s) of a commit message stand at warning`,
+      {
+        rule: warned[0].rule,
+        detail: message,
+      },
+    );
   }
 
-  return landsAndPushes(it, said, message);
+  return landsAndPushes(it, said, message, paths);
 }
 
 // Nothing stages before the message reads clean, so a refused message leaves the tree standing. [[spec/design_output/work#the-battery-answers-first]]
-function landsAndPushes(it, argv, message) {
+function landsAndPushes(it, argv, message, paths) {
   // The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
   const tested = it.proc.run(
     [it.node, it.join(it.root, "src", "scripts", "cli.js"), "test"],
@@ -52,15 +57,17 @@ function landsAndPushes(it, argv, message) {
     console.error(saidBy(tested) || "the test run answers nothing");
     return 1;
   }
-  const staged = it.git.run(["add", "-A"], true);
+  // The paths a call names land alone, so one hand's landing leaves another's files standing. [[spec/design_output/work#one-verb-feeds-that-stamp]]
+  const only = paths.length ? ["--", ...paths] : [];
+  const staged = it.git.run(["add", "-A", ...only], true);
   if (!staged.ok) {
     console.error("The staging comes back refused, so the commit stands undone:");
     console.error(saidBy(staged));
     return 1;
   }
-  const made = it.git.run(["commit", "-m", message], true);
+  const made = it.git.run(["commit", "-m", message, ...only], true);
   if (!made.ok) {
-    it.git.run(["reset", "-q"], true);
+    it.git.run(["reset", "-q", ...only], true);
     console.error("The commit comes back refused, so nothing lands:");
     console.error(saidBy(made));
     return 1;

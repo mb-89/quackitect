@@ -541,7 +541,7 @@ reads, in the steps below:
 |---|---|---|
 | the message | `messageFaults`, exported from `src/bridge/bash.js` | every finding at once, and no commit |
 | the tests | `./RUNME.sh test`, before anything stages | what the run says, and no commit |
-| the commit | `git add -A` and `git commit`, in the verb | what git says, with the staging back |
+| the commit | `git add -A` and `git commit`, over the paths the call names or the whole tree | what git says, with the staging back |
 | the check | `./RUNME.sh check`, which writes the stamp | what the check says, and no push |
 | the push | `git push origin`, which the pre-push door reads | what that door says |
 
@@ -554,6 +554,7 @@ What the run leaves behind:
 - nothing stages before the message reads clean, so a refused message leaves the tree standing
 - the push door reads the stamp this run writes, so no stale stamp stops a clean commit
 - `--no-push` leaves the branch where it stands
+- a path after the message lands that path alone, so a helper's files stand apart from another hand's landing
 
 The reading of the message stands with the bash door, which reads the same rules over a
 `git commit` a hand types. For details, see
