@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -133,6 +133,10 @@ record:
     hand: box 75b31b3d5012 · claude-code-remote
     hash_before: 662875782b2e85ca3eeb82649d837ccc0923990c
     hash_after: 662875782b2e85ca3eeb82649d837ccc0923990c
+  - step: design/review
+    hand: box 75b31b3d5012 · claude-code-remote · helper-6
+    hash_before: 274a0c1a18ca4f799b4bc7a30f54ef93cca9ec13
+    hash_after: 274a0c1a18ca4f799b4bc7a30f54ef93cca9ec13
 group: the-editor-holds-the-drawing
 depends_on: ["the-editor-takes-an-inset", "the-ticket-answers-the-editor", "the-drawing-draws-a-route"]
 ---
@@ -252,15 +256,13 @@ The tests stand in `test/level0/route-host.test.js`, over a fake door:
 
 <!-- the form is verdict -->
 
-fail
-- The answers list meets each finding of the earlier review.
-- The door names `page`, `folds` and `unfolds` alone. Name the editor events that call `opened` and `changed`.
-- Those events cover the visible tickets, a switch of the active editor, and an edit to the text.
-- The host answers `theme` on open and on change. Name the door call reading the editor's theme, and its event.
-- The probe grows the inset to the height its page posts back. Name the inset's height, and the message growing it.
-- `held` reads a hold whose hand is the person, through `personHolds`. Export it from `lens.js`, or name the host's own reading.
-- `graphIn` and `readNote` load as modules into a CommonJS host. Name the `door.imports` call reaching each, as `graphAt` does.
-- `activate` runs over the fake `doorOf` in `sidebar.test.js`. Name the guard keeping it green there.
+pass
+- The approach meets each line of the ask, and the test table drives each one.
+- The answers list meets all seven findings of the first review, and all eight of the second.
+- Detail for implement: `onDidChangeVisibleTextEditors` skips editors shown at activation, so the host opens `visibleTextEditors` once.
+- Detail for implement: `lensDoor().lenses` walks `lens.watches`, so the flip host answers an empty `watches`.
+- Detail for implement: the fold asks the markdown folding for a frontmatter range, and a test fakes it.
+- Detail for implement: `linesOf` replaces the probe's posted height, so the drawing test checks the page fits.
 
 # implement
 
