@@ -8,6 +8,7 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { activate } from "../../src/extension/extension.js";
 import { COMMAND } from "../../src/extension/lib/lens.js";
+import { FLIP } from "../../src/extension/lib/route-host.js";
 import { KEY } from "../../src/extension/lib/session.js";
 import { LOCAL, TRACKED } from "../../src/extension/lib/widgets.js";
 import { sidebarOf } from "../../src/extension/sidebar.js";
@@ -376,6 +377,23 @@ test("a start registers the ticket command, and hands the editor the lens its cl
   assert.equal(handed.length, 1);
   assert.equal(typeof handed[0].lenses, "function");
   assert.equal(door.said.commands.get(COMMAND), handed[0].took);
+});
+
+// [[spec/tickets/the-inset-folds-the-frontmatter]]
+test("a start registers the flip, and hands the editor the events the drawing opens on", async () => {
+  const door = doorOf();
+  const handed = { lenses: [], editors: [], changes: [], themes: [] };
+  door.lenses = (one) => handed.lenses.push(one);
+  door.onEditors = (one) => handed.editors.push(one);
+  door.onChange = (one) => handed.changes.push(one);
+  door.onTheme = (one) => handed.themes.push(one);
+  await activate({}, door);
+
+  assert.equal(typeof door.said.commands.get(FLIP), "function");
+  assert.equal(handed.editors.length, 1);
+  assert.equal(handed.changes.length, 1);
+  assert.equal(handed.themes.length, 1);
+  assert.deepEqual(await handed.lenses[0].lenses("spec/guidance/working.md", ""), []);
 });
 
 // [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]

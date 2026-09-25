@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -148,6 +148,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 75b31b3d5012 · claude-code-remote
+    hash_before: 8d1c6c9c4c3d7619a8e1f9db1955b3b655cc77a4
+    hash_after: 8d1c6c9c4c3d7619a8e1f9db1955b3b655cc77a4
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-inset-folds-the-frontmatter.md:175:1: CodeSpans: A sentence holds 4 code spans, and this one holds 5. C"
 group: the-editor-holds-the-drawing
 depends_on: ["the-editor-takes-an-inset", "the-ticket-answers-the-editor", "the-drawing-draws-a-route"]
 ---
@@ -295,7 +303,7 @@ pass
 
 <!-- the form is text -->
 
-A stub host answering nothing leaves every case red but the one on a note outside the ticket folders, which draws nothing either way. The fake door hands a page carrying `post`, `onMessage`, `hide`, `show` and `dispose`, so the inset and the side panel read alike to the host. The fake `imports` hands the real emitter and the real schema reader, so the graph and the steps a case reads come off the code the verbs run.
+A stub host answering nothing leaves every case red but the one on a note outside the ticket folders, which draws nothing either way. The fake door hands a page, and the inset and the side panel read alike to the host. The fake `imports` hands the real emitter and the real schema reader. So the graph and the steps a case reads come off the code the verbs run.
 
 ### checked
 
@@ -333,11 +341,17 @@ A stub host answering nothing leaves every case red but the one on a note outsid
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the host, the inset door, the editor door, the start, the lens exports and the manifest
+- the host reaches the editor through the door alone, and `doorOf` in the host test fakes each call
+- the host and the inset door point at this ticket in their headers
 
 ## tests-green
 
