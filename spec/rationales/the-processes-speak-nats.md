@@ -27,7 +27,7 @@ server ran inside the index, in pure Go, over loopback TCP on Linux and Windows.
 
 A push could go missing. Each value carried its revision, and a subscriber
 seeing a gap read the name again, so a loss cost one round trip. The wire
-checked no type, so the index refused a peer built from another commit. The
+checked no type, so the index refused a peer whose `q` package differed. The
 library grew the binary.
 
 ## 4. What would make it wrong

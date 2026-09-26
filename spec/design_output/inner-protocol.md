@@ -50,8 +50,10 @@ The payload is JSON of a Go struct the `q` package declares, so every peer
 reads the same type off the same source. A header carries the revision, the
 session id of the inbound call, and the deadline.
 
-The header carries the build stamp too. The index refuses a peer whose stamp
-differs from its own, so both ends of a message build from one commit.
+The header carries the stamp of the `q` package too. The index refuses a peer
+whose stamp differs from its own, so both ends of a message read one set of
+types. A module rebuilt alone keeps the stamp, per
+[[spec/design_output/processes#a-module-rebuilds-alone]].
 
 A subscriber missing a push sees a gap in the revisions, and sends a `get` for
 the name. So a push that goes missing costs one round trip, and no value stays

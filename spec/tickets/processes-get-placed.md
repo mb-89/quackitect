@@ -48,27 +48,38 @@ it the split lands as each box sees fit.
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+[[spec/design_output/processes]] specifies how the system places the
+processes:
 
-<!-- the form is text -->
+- one binary, `quack`, with a verb for the index, the doors and a module
+- the start road, the same on Linux and Windows, and the stop over the bus
+- the standing file and its fields
+- placements under a config key, and a process of its own for every other topic
+- a crash against a hang: defaults for an exit, a stale mark for a lease
+- a module that rebuilds and restarts alone
+
+The note reveals a clash in [[spec/design_output/inner-protocol]]. A stamp of
+the whole build refuses a module rebuilt alone, so the stamp now covers the `q`
+package. The protocol's rationale says the same.
+
+Weighed: defaults or stale values for a module that dies. The design input asks
+for both, so an exit reads as defaults and a hang as stale. Assumed: a cloud box
+leaves the rebuild watch off.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change follows the ask: the note covers the start, the spawn, the standing file and the rebuild
+- the cleanup it reveals: the stamp in the protocol note and its rationale, in this change
+- the note points at the doors and watchdogs notes, and restates neither
 
-<!-- the form is checklist -->
 
 # Discussion
 
