@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -108,6 +108,11 @@ record:
     hand: box d7a540d981d5 · claude-code-remote
     hash_before: e4ce4b8707426ddabe5888ccf0add7fb2d91214a
     hash_after: e4ce4b8707426ddabe5888ccf0add7fb2d91214a
+  - step: retro/cloud
+    hand: box d7a540d981d5 · claude-code-remote
+    hash_before: 0e317d204b5f690008d717f7c79ae5f0c7fbe9f4
+    hash_after: 0e317d204b5f690008d717f7c79ae5f0c7fbe9f4
+reason: done
 ---
 
 # Ask
@@ -224,21 +229,18 @@ for both, so the processes note splits them by cause.
 
 ### lacked
 
-<!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
-<!-- the form is list -->
+- nothing: every tool stood, and the proxy refused no host
 
 ### met
 
-<!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
-<!-- the form is list -->
+- no conflict at sync, because the branch carried `main` already
+- the engine's plan hook, which holds every call until the plan answers
+- the write door, which takes writes for the ticket in hand alone
 
 ### left
 
-<!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
-<!-- the form is list -->
+- no person step parks, and every ticket minted names this group
+- the handover says the phase stands specified, and the foundation group comes next once its switch reads `true`
 
 # Discussion
 
