@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: sync
+step: split
 record:
   - step: sync
     hand: box 0dde19be1600 · claude-code-remote
@@ -83,6 +83,14 @@ record:
   - step: sync
     hand: box fcc1ba4a896f · claude-code-remote
     hash_before: 18e9a3fd425b8be1063c3ff4b7402c35bd6c3da3
+  - step: sync
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: d200c5f8fa28583ea2e31e2ffed293ef76db9483
+    hash_after: aec0af7ae76a937c689a6bd17f2859467066a337
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-owners-word-reaches-work already carries every commit on main.
 ---
 
 # Ask
@@ -98,6 +106,8 @@ The owner's words reach the work as said. A claim of done rests on the owner's v
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
