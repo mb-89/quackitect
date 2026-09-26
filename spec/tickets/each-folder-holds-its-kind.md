@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: d8d7a14f7b5c7143e1ef95a74740fbfa5a60455e
+    hash_after: d8d7a14f7b5c7143e1ef95a74740fbfa5a60455e
 ---
 
 # Ask
@@ -104,11 +109,41 @@ The check and the write door read a note alone. A page or a screenshot then land
 
 <!-- the form is text -->
 
+A note schema governs a folder through a `governs` glob, and a data schema
+names its own glob. So a file past its folder's kind is a path a note schema
+governs that ends off `.md`, and that no data schema governs.
+
+| the piece | the change |
+|---|---|
+| `schemaFaults` in `src/lsp/schema.go` | a path off `.md` that `governorOf` places under a note schema draws a `Folder` finding at warning, naming the kind the folder holds |
+| `schemaFaults` in `.claude/skills/level0/lib/schema.js` | the same finding, where `governorOf(data, path)` answers nothing and `governorOf(schemas, path)` answers a schema |
+| `folderFault` in both files | one message: the path, the kind, and where the file belongs off the governed tree |
+| `schemaDoor` in `src/bridge/write.js` | a write off `.md` under a note schema's folder comes back refused with the same message, and logs at warn |
+
+The funnel note:
+
+- a design input `spec/design_input/the-editor-draws-the-trace.md` carries each ruling as the funnel table records it, under the owner's words
+- the funnel note's rulings chapter becomes a pointer at that design input, and its scope keeps the state of play
+- the owner's words stand in the funnel table alone, so the design input quotes that table row by row
+
+The pages standing past their folders draw the warning, and the owner moves them:
+
+- `spec/design_input/harnesssurface_2.html`
+- `spec/design_input/the-agent-pulls-tickets.html`
+- `spec/funnel/the-bench-reruns-design-inputs.html`
+
+`spec/views/work.base` stands in a folder no schema governs, so it draws nothing.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/lsp/check.go`, the sweep calling `schemaFaults`
+- `src/scripts/cli-read.js`, the lint calling `schemaFaults`
+- `src/bridge/write.js`, the write hook running `schemaDoor` among its checks
+- `spec/funnel/the-retro-reads-the-structure.md`, which points at the funnel note
 
 ### tests
 
@@ -116,17 +151,27 @@ The check and the write door read a note alone. A page or a screenshot then land
 
 <!-- the form is list -->
 
+- `src/lsp/schema_test.go`, `TestAPagePastTheFolderKindWarns`, a page under `spec/funnel`
+- `test/level0/schema-sweep.test.js`, "a page under a note folder draws a warning, and a data file under its own schema draws none"
+- `test/level0/write.test.js`, "a screenshot written under spec/tickets comes back refused, naming the ticket kind"
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] every file, function and verb the approach names stands opened, and each claim checked there: both `schemaFaults`, both `governorOf`, `schemaDoor`, the schemas' `governs` globs and the funnel note stand read
+- [x] the callers list names every caller of what the approach changes: a search for `schemaFaults(` and `schemaDoor` backs it
+- [x] every done_when line names the test that decides it: the sweep lines map to the Go and JS cases, the door line to the write case, the funnel line to the design input, and the check line to `./RUNME.sh check`
 
 ## review
 
