@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: fb38d274e4bcd57a1cc5891b6c01579290460856
+    hash_after: fb38d274e4bcd57a1cc5891b6c01579290460856
 ---
 
 # Ask
@@ -102,11 +107,27 @@ The clear fires mid-retro on a binding that reads `queue` with no press logged, 
 
 <!-- the form is text -->
 
+Two changes: the clear waits on a retro, and every binding change names its maker.
+
+| the file | the change |
+|---|---|
+| `src/bridge/handover.js` | `clearsHere` answers false where a hold under `holdsIn` names a retro: a ticket on `spec/processes/retro`, or a step under a group's `retro` |
+| `src/extension/lib/session.js` | `opened` already answers `cleared`, the keys a new window drops. `opened` in `src/extension/sidebar.js` writes one `sidebar` line naming them, with `a new window` as the maker |
+| `src/bridge/binding.js` | `bindingLine` runs at `prompt.submit` and at the turn's end besides the stop refusal. A change no line names reads as a change by hand, with the layer |
+
+The sidebar's `set` already writes its line with the button as the maker. The window road stands as the likely source of a `queue` reading with no press. It wipes the local file, and the tracked layer then answers.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/bridge/handover.js` `measures` and `holdsForHandover`, and the clear road at the third call, which call `clearsHere`
+- `src/extension/sidebar.js` the `opened` entry, which calls `opened` in `lib/session.js`
+- `src/extension/extension.js`, which calls the sidebar's `opened` at a window start
+- `src/bridge/stop.js` the refusal's last line, which calls `bindingLine`
+- `src/bridge/server.js` `submitsPrompt` and the turn's end, which gain a `bindingLine` call
 
 ### tests
 
@@ -114,17 +135,28 @@ The clear fires mid-retro on a binding that reads `queue` with no press logged, 
 
 <!-- the form is list -->
 
+- `test/level0/handover.test.js` a retro in hand keeps the conversation past the handover key
+- `test/level0/handover.test.js` a hold on any other ticket clears under the queue as today
+- `test/extension/session.test.js` a new window writes a line naming the keys it drops
+- `test/level0/binding.test.js` a binding changed in the file writes a line at the next prompt, naming the layer
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first draft
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `clearsHere`, `holdsIn`, `heldAs`, `bindingLine`, `whereFrom`, the sidebar `set` and `opened` stand opened. The extension call site of `opened` stands unread, and the implement step reads it first
+- the callers list comes off a grep for `clearsHere`, `bindingLine` and `opened`
+- each done_when line names its test above. Where the test files stand is a guess the implement step settles, and `./RUNME.sh check` decides the last
 
 ## review
 
