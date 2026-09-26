@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box fcc1ba4a896f · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 6 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: 4e2f8bad971e2e4d1ace1baafd0551daec5013ae
+    hash_after: 4e2f8bad971e2e4d1ace1baafd0551daec5013ae
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-owners-words-travel-verbatim.md:239:1: ListItem: A sentence in a list item holds 20 words, and this one"
 ---
 
 # Ask
@@ -228,11 +236,20 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the handover schema, both routes, the voice rule, the condition module, the hand rule, the mint and the handover prompt
+- the mint's flag and the conditions take fakes in their cases, and the shipped files meet contract cases
+- each new line carries a pointer at this ticket or the condition note
+- the conditions stand in `pull-when.js` over one Ask-line reader, and the pull note points there
+- the review rows stand fixed: `handed` in `pull-when.js`, the mint writes `from: handover`, and the size rides here
+- the terms wait on `the-owner-names-three-things`, which the owner answers
 
 ## tests-green
 

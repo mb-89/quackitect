@@ -6,6 +6,9 @@ ask:
   - name: line
     form: text
     says: the smallest case that shows it, why it matters, and what a stranger needs in order to act on it
+  - name: said
+    form: list
+    says: the owner's words the note rests on, each quoted as said with its transcript line, or none
 steps:
   - name: decide
     does: says what the note becomes, and closes it

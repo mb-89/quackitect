@@ -5,8 +5,10 @@
 
 import { entriesOf } from "./pull-writes.js";
 
-// The line under `# Ask` naming the view the owner reads the change in. [[spec/tickets/the-owner-view-decides-done]]
-const VIEW = /^view:[ \t]*(.*)$/im;
+// The lines under `# Ask` a condition reads: the view the owner reads the change in, and where the ask comes from. [[spec/tickets/the-owner-view-decides-done]]
+const VIEW = "view";
+const FROM = "from";
+export const HANDOVER = "handover";
 const NONE = "none";
 
 // [[spec/design_output/pull#a-condition-skips-a-leaf]]
@@ -28,14 +30,28 @@ export function holdsHere(it, when, front, text = "") {
     const named = viewOf(text);
     return { holds: named !== "", why: "the ask names no view the owner reads" };
   }
+  // [[spec/tickets/the-owners-words-travel-verbatim]]
+  if (when === "handed") {
+    const from = askLine(text, FROM).toLowerCase();
+    return { holds: from === HANDOVER, why: "the ask comes off no handover" };
+  }
   return { holds: false, why: `${when} names no condition the pull reads` };
 }
 
 // The view the Ask names, or nothing where it names none. [[spec/tickets/the-owner-view-decides-done]]
 export function viewOf(text) {
+  return askLine(text, VIEW);
+}
+
+// The value of a `<name>:` line under `# Ask`, or nothing where the line stands elsewhere or says none. [[spec/tickets/the-owners-words-travel-verbatim]]
+export function askLine(text, name) {
   const ask = String(text ?? "").split(/^# (?!Ask\s*$)/m)[0];
   const at = ask.search(/^# Ask\s*$/m);
   if (at < 0) return "";
-  const said = ask.slice(at).match(VIEW)?.[1]?.trim() ?? "";
+  const said =
+    ask
+      .slice(at)
+      .match(new RegExp(`^${name}:[ \\t]*(.*)$`, "im"))?.[1]
+      ?.trim() ?? "";
   return said.toLowerCase() === NONE ? "" : said;
 }

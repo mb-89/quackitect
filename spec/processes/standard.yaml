@@ -17,10 +17,22 @@ ask:
   - name: view
     form: text
     says: the view the owner reads the change in and the number there, in the owner's words, or none
+  - name: from
+    form: text
+    says: handover where the ask comes off a handover line, so the owner reads it first, or none
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
       - name: draft
         does: writes the approach the ask calls for
         from: anyone

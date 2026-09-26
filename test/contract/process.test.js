@@ -40,6 +40,7 @@ test("the standard route reviews the design once, and its last leaf hands on to 
   assert.deepEqual(
     leavesOf(front).map((one) => one.path),
     [
+      "design/owner-read",
       "design/draft",
       "design/review",
       "implement/tests-red",

@@ -16,14 +16,17 @@ const RESTATED = "restated";
 const BRANCH = "work/";
 
 // Whether a hand works a leaf, answered once so the pull and the write door agree by construction. [[spec/tickets/the-one-answer-takes-shape]]
+// The conditions naming a step the owner alone answers. [[spec/tickets/the-owners-words-travel-verbatim]]
+const OWNERS = ["view", "handed"];
+
 export function writesHere(leaf, hand = {}) {
   const by = String(leaf?.by ?? "anyone");
   const at = String(leaf?.path ?? "");
   const no = (why, more = {}) => ({ writes: false, why, ...more });
 
   // A cloud box answers every question it meets, so a person's step stands open to it. [[spec/guidance/cloud]]
-  // The owner's view is the owner's alone, on the cloud too. [[spec/tickets/the-owner-view-decides-done]]
-  const cloud = hand.cloud && String(leaf?.when ?? "") !== "view";
+  // The owner's view and the owner's read are the owner's alone, on the cloud too. [[spec/tickets/the-owner-view-decides-done]]
+  const cloud = hand.cloud && !OWNERS.includes(String(leaf?.when ?? ""));
   if (by === "person" && hand.agent && !hand.ownerSays && !cloud)
     return no(`waits for a person at ${at}`, { person: true });
   if (by === "agent" && !hand.agent) return no(`waits for an agent at ${at}`);
