@@ -12,7 +12,9 @@ import { line } from "../../.claude/skills/level0/lib/refuse.js";
 import { formIn, refusesIn } from "../../.claude/skills/level0/lib/warnings.js";
 import { messageFaults, messageNote } from "../bridge/bash.js";
 import { MESSAGE_HOW, ticketFault, ticketOf } from "../engine/named.js";
+import { FOLDER as UNDONE } from "../../.claude/skills/level0/lib/undo.js";
 import { coldIn, probeCold } from "./probe-cold.js";
+import { BY as RENAMED } from "./rename.js";
 
 const USAGE = ['Usage: ./RUNME.sh commit "<message>" [<path>...] [--no-push]'];
 
@@ -128,6 +130,34 @@ function movedFrom(it, paths) {
     const [how, from, to] = row.split("\t");
     if (/^R/.test(how ?? "") && paths.includes(to) && !paths.includes(from))
       out.push(from);
+  }
+  for (const one of journaledMoves(it)) {
+    for (const path of paths) {
+      const under =
+        path === one.to
+          ? ""
+          : path.startsWith(`${one.to}/`)
+            ? path.slice(one.to.length)
+            : null;
+      if (under === null) continue;
+      const from = `${one.from}${under}`;
+      if (!paths.includes(from) && !out.includes(from)) out.push(from);
+    }
+  }
+  return out;
+}
+
+// The rename verb journals each move, so a rewrite past git's similarity cut still names its old path. [[spec/tickets/rename-detection-misses-rewrites]]
+function journaledMoves(it) {
+  const folder = it.join(it.root, ...UNDONE.split("/"));
+  if (!it.disk?.exists?.(folder)) return [];
+  const out = [];
+  for (const row of it.disk.list(folder)) {
+    if (row.kind !== "file" || !row.name.endsWith(".json")) continue;
+    try {
+      const entry = JSON.parse(String(it.disk.read(it.join(folder, row.name))));
+      if (entry?.by === RENAMED && entry.moved?.to) out.push(entry.moved);
+    } catch {}
   }
   return out;
 }

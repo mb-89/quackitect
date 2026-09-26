@@ -259,6 +259,10 @@ test("a move writes a journal naming the ticket in hand, and the undo puts the m
   const [row] = disk.list(folder);
   const entry = JSON.parse(disk.read(join(folder, row.name)));
   assert.equal(entry.ticket, "a-ticket");
+  assert.deepEqual(entry.moved, {
+    from: `spec/tickets/${OLD}.md`,
+    to: `spec/tickets/${NEW}.md`,
+  });
   assert.deepEqual(entry.files.map((one) => one.file).sort(), [
     "spec/a-note.md",
     `spec/tickets/${OLD}.md`,

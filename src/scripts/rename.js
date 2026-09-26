@@ -170,7 +170,11 @@ function movesOf(it, files, source, from, to) {
 function journals(it, from, to, files) {
   if (!it.clock || !files.length) return;
   const stamp = it.clock.stamp();
-  const entry = journalOf(stamp, `${BY}:${stamp}`, BY, files, heldTicket(it));
+  // The move rides the entry, so the commit verb lands the old path where git reads no rename. [[spec/tickets/rename-detection-misses-rewrites]]
+  const entry = {
+    ...journalOf(stamp, `${BY}:${stamp}`, BY, files, heldTicket(it)),
+    moved: { from: String(from), to: String(to) },
+  };
   it.disk.makeDir(it.join(it.root, ...UNDONE.split("/")));
   it.disk.write(
     it.join(it.root, ...UNDONE.split("/"), nameOf(stamp)),

@@ -286,6 +286,35 @@ test("a commit naming a renamed ticket lands the old path's deletion with it", a
   assert.ok(!ran.some((one) => one.includes("src/a.js")), "an unnamed path stays out");
 });
 
+// A rename rewriting a file past git's similarity cut reads as a delete and an add, so the rename journal names the old path. [[spec/tickets/rename-detection-misses-rewrites]]
+test("a commit naming a renamed path lands the old path the rename journal names, where git reads no rename", async () => {
+  const { it, git } = doors([], {
+    "git diff --cached --name-status -M": {
+      stdout: "D\tspec/tickets/old-name.md\nA\tspec/tickets/new-name.md\n",
+    },
+  });
+  it.disk.makeDir(join(ROOT, ".se", ".runtime", "undo"));
+  it.disk.write(
+    join(ROOT, ".se", ".runtime", "undo", "20260101000000000000.json"),
+    JSON.stringify({
+      by: "rename",
+      files: [],
+      moved: { from: "spec/tickets/old-name.md", to: "spec/tickets/new-name.md" },
+    }),
+  );
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "spec/tickets/new-name.md", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const both = "-- spec/tickets/new-name.md spec/tickets/old-name.md";
+  assert.ok(
+    ranGit(git).includes(`git add -A ${both}`),
+    "the old path stages with the new",
+  );
+});
+
 // [[spec/design_output/level0#the-cold-probe]]
 test("a staged file on the cold path runs the probe after the tests and before the commit", async () => {
   const { it, git, asked } = cold(["src/bridge/server.js", "README.md"]);
