@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box c28a93a32b71 · claude-code-remote
@@ -97,6 +97,14 @@ record:
     hand: box c28a93a32b71 · claude-code-remote · helper-4
     hash_before: 6b2cbd7745c19007386b4fa10d5a4eb253f28a5b
     hash_after: 6b2cbd7745c19007386b4fa10d5a4eb253f28a5b
+  - step: implement/tests-red
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 50df0e512c3ae03fb9314ed11e65f26d1a077769
+    hash_after: 50df0e512c3ae03fb9314ed11e65f26d1a077769
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -205,17 +213,27 @@ pass with findings
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/verbs.test.js test/level0/canary-debt.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Five cases fail on their own assertion: the repeat twice, and the three transcript cases. Two pass today and hold the new road green: a paying step with the turn's end, and a line after a compaction. The existing transcript case put its long text first. It now puts it last, because the last text of a turn stands as its answer.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the two files and two test files the ask names
+- every door the change reaches has a fake: the fake disk, the fake log and transcript fixtures
+- each new case opens on a comment naming this ticket
+- the repeat rule stands in `level0.md` once, and the cases point at the ticket
+- the review's three rows stand in the cases: no `paidBy`, a meta row opens no turn, and the callers name both readers
 
 ## change
 

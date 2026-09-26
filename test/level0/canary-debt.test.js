@@ -124,3 +124,49 @@ test("the line draws highlighted in the wording that owes it and the wording tha
     );
   }
 });
+
+// A context repeats the canary, and the repeat draws a finding. [[spec/tickets/answers-read-the-last-text]]
+function heard(it) {
+  const said = [];
+  it.log = { say: (...row) => said.push(row) };
+  return said;
+}
+
+const repeats = (said) => said.filter((one) => one[0] === "warn" && one[2] === HEARD.again);
+
+// [[spec/tickets/answers-read-the-last-text]]
+test("a second step opening on the canary in one context draws the repeat finding", () => {
+  const it = box();
+  const said = heard(it);
+  onTurnSaid({ text: `${LINE}\n\nThe work goes on.` }, it);
+  onTurnSaid({ text: `${LINE}\n\nThe next piece.` }, it);
+  assert.equal(repeats(said).length, 1);
+});
+
+// [[spec/tickets/answers-read-the-last-text]]
+test("a step that pays, then the turn's end carrying the same text, draws no finding", () => {
+  const it = box();
+  const said = heard(it);
+  onTurnSaid({ text: `${LINE}\n\nThe work stands done.` }, it);
+  onTurnComplete({ reason: "answer", answer: `${LINE}\n\nThe work stands done.` }, it);
+  assert.equal(repeats(said).length, 0);
+});
+
+// [[spec/tickets/answers-read-the-last-text]]
+test("the canary alone written twice in one context draws the finding", () => {
+  const it = box();
+  const said = heard(it);
+  onTurnSaid({ text: LINE }, it);
+  onTurnSaid({ text: LINE }, it);
+  assert.equal(repeats(said).length, 1);
+});
+
+// [[spec/tickets/answers-read-the-last-text]]
+test("a line after a compaction pays and draws no finding", () => {
+  const it = box();
+  const said = heard(it);
+  onTurnSaid({ text: LINE }, it);
+  onSessionCompact({ trigger: "auto" }, it);
+  onTurnSaid({ text: LINE }, it);
+  assert.equal(repeats(said).length, 0);
+});

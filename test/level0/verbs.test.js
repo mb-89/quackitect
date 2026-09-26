@@ -50,10 +50,9 @@ test("a line nobody can read drops out, and the rest stand", () => {
 
 test("an answer comes out of a transcript, and a helper stays behind", () => {
   const text = [
-    spoke(long(SHORTEST + 5)),
     spoke(long(SHORTEST), { isSidechain: true }),
     spoke(long(SHORTEST), { agentId: "one" }),
-    spoke(long(SHORTEST - 1)),
+    spoke(long(SHORTEST + 5)),
     JSON.stringify({
       type: "user",
       message: { content: [{ type: "text", text: long(40) }] },
@@ -61,7 +60,7 @@ test("an answer comes out of a transcript, and a helper stays behind", () => {
   ].join("\n");
 
   const found = answersIn(text);
-  assert.equal(found.length, 1, "the sidechain, the helper and the short one go");
+  assert.equal(found.length, 1, "the sidechain and the helper go");
   assert.equal(wordsIn(found[0]), SHORTEST + 5);
 });
 
@@ -231,4 +230,40 @@ test("the two tables read the way the design draws them", () => {
   );
   assert.match(ranked.split("\n")[0], /^rule\s+fires\s+phrase$/);
   assert.match(ranked.split("\n")[1], /^B\s+1\s+x$/);
+});
+
+const owner = (content) => JSON.stringify({ type: "user", message: { content } });
+
+// A turn's answer is its last text, so a progress line scores nothing. [[spec/tickets/answers-read-the-last-text]]
+test("a turn holding a progress line and an answer gives the answer back alone", () => {
+  const answer = long(SHORTEST + 3);
+  const text = [
+    owner("Fix the door."),
+    spoke(`Reading the door first, then ${long(SHORTEST)}.`),
+    owner([{ type: "tool_result", content: "a line" }]),
+    spoke(answer),
+    owner([{ type: "text", text: "Next." }]),
+    spoke(long(SHORTEST + 1)),
+  ].join("\n");
+  assert.deepEqual(answersIn(text), [answer, long(SHORTEST + 1)]);
+});
+
+// [[spec/tickets/answers-read-the-last-text]]
+test("a tool result row and a meta row open no turn", () => {
+  const answer = long(SHORTEST + 3);
+  const text = [
+    owner("Fix the door."),
+    spoke(long(SHORTEST + 2)),
+    owner([{ type: "tool_result", content: "a line" }]),
+    JSON.stringify({ type: "user", isMeta: true, message: { content: "a caveat" } }),
+    JSON.stringify({ type: "user", isCompactSummary: true, message: { content: "a summary" } }),
+    spoke(answer),
+  ].join("\n");
+  assert.deepEqual(answersIn(text), [answer]);
+});
+
+// A short last text is the turn's answer, and the floor drops it. [[spec/tickets/answers-read-the-last-text]]
+test("a turn whose last text runs short gives nothing back", () => {
+  const text = [owner("Go."), spoke(long(SHORTEST + 4)), spoke("Done.")].join("\n");
+  assert.deepEqual(answersIn(text), []);
 });
