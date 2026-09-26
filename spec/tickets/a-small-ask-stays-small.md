@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box fcc1ba4a896f · claude-code-remote
     hash_before: 5fed4e85bc0a9bfedf2e5f8570f4e2850fa988f4
     hash_after: 5fed4e85bc0a9bfedf2e5f8570f4e2850fa988f4
+  - step: design/review
+    hand: box fcc1ba4a896f · claude-code-remote · helper-2
+    hash_before: f4b06c455402d30ab538c1adf0f35e1078d59d90
+    hash_after: f4b06c455402d30ab538c1adf0f35e1078d59d90
 ---
 
 # Ask
@@ -143,9 +147,10 @@ Four edits, one a `done_when` line, each beside the test that holds it.
 
 ### verdict
 
-<!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
+pass with findings
 
-<!-- the form is verdict -->
+- the-hook-awaits-the-spawn: the callers list misses the `tool.call` handler in `.claude/skills/level0/hooks/pull-tool.js`, which reads the spawn answer through `spawnPromptIn` in `.claude/skills/level0/lib/pull.js`, awaits `spawned` and pulls again. The new words tell the session to spawn in the background, so name that handler and keep what it does in step with the words
+- the-new-rule-appends: a rule placed after rule 6 in `spec/guidance/tickets.md` renumbers rules 7 to 15, and `spec/rationales/tickets.md` sections 8 to 15 and the `Examples` rows 11 and 14 key on those numbers. Append the rule as rule 16, or renumber every reference with it
 
 # implement
 
