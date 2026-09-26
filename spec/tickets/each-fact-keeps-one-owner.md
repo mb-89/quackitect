@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 1b8e70c6b51ce3bb82a05e2f3e96a68f291bea8f
+    hash_after: 1b8e70c6b51ce3bb82a05e2f3e96a68f291bea8f
 ---
 
 # Ask
@@ -105,11 +110,42 @@ A code header counts its members in a number word and passes. The cloud read, th
 
 <!-- the form is text -->
 
+Each copy the ask names moves to its owner, or meets a test where a language
+wall forces the copy:
+
+| the fact | the change | the owner |
+|---|---|---|
+| the cloud read | `pushed` in `src/scripts/pull-push.js` and the stop rules in `src/bridge/stop.js` call `cloudHere` in place of `inCloud` over `env` | `cloudHere` in `.claude/skills/level0/lib/cloud.js` |
+| the ticket folders | `apply.js` exports `TICKET_WHERE`, built off `TICKETS` and `NOTE_END` in `src/engine/group.js` and `TICKETS` in `folders.js`, and `TICKET` reads it. `named.js` imports it in place of its own `WHERE` | `TICKET_WHERE` in `.claude/skills/level0/lib/apply.js` |
+| the pointer path | a test reads the `filepath.Join` inside `pointerPath` off `src/lsp/port.go`, and matches it to `PANEL` | `pointerPath` in `src/lsp/port.go` |
+| the port wait | the same test reads `settleWait` as a count of `time.Minute` or `time.Second`, and matches it in milliseconds to `PORT_WAIT` | `settleWait` in `src/lsp/port.go` |
+
+The two Vale rules widen:
+
+- `CodeHeader` refuses a number word from two to twelve standing alone, beside the digit or word before a plural it reads today
+- `CountedList` reads a heading line as a candidate, so a heading over a list or a table warns where it counts
+- every header the wider `CodeHeader` refuses gets rewritten in the same change, `src/scripts/ephemeral.js` among them, so the check stays green
+
+The import runs one way: `named.js` imports `apply.js`, and `apply.js` imports
+`group.js` and `folders.js`, neither of which imports `apply.js`.
+`.claude/skills/level0/lib/cloud.js` imports `src/engine/group.js` already, so
+the reach from the skill folder into `src/engine` has a precedent.
+`cloudHere` reads `cloud` first and `env` after, so a box carrying no `cloud`
+flag answers as `inCloud` does today.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/scripts/pull-push.js`, `pushed`
+- `src/bridge/stop.js`, the `a-person-sits-here` rule and the two readers beside `THE CHAT IS NEW`
+- `.claude/skills/level0/lib/apply.js`, `patchSpec` and `replaceSpec`, through `TICKET`
+- `src/engine/named.js`, `FIELD_HOW`, `MESSAGE_HOW` and `DESCRIPTION_HOW`, through `WHERE`
+- `src/scripts/cli-served.js`, `portFaults`, through `PANEL` and `PORT_WAIT`
+- `spec/config/styles/VoiceVale/CodeHeader.yml`, over every tracked `.js` and `.go` header outside `prototype`
+- `spec/config/styles/VoiceVale/CountedList.yml`, over every Markdown note
 
 ### tests
 
@@ -117,17 +153,29 @@ A code header counts its members in a number word and passes. The cloud read, th
 
 <!-- the form is list -->
 
+- `test/level0/cloud-desk.test.js`, "every reader of the cloud asks cloudHere, and a push reads the doors' own flag first"
+- `test/level0/cloud-desk.test.js`, "the ticket field and the named faults spell the folders out of one place"
+- `test/contract/cli-check-doors.test.js`, "the panel pointer and the port wait match pointerPath and settleWait in port.go"
+- `test/contract/vale.test.js`, "a header naming a number word refuses, over the header ephemeral.js carried"
+- `test/contract/vale.test.js`, "a heading counting the list or the table under it warns"
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] every file, function and verb the approach names stands opened, and each claim checked there: `cloud.js`, `pull-push.js`, `stop.js`, `apply.js`, `named.js`, `group.js`, `cli-served.js`, `port.go`, both Vale rules and both test files stand read
+- [x] the callers list names every caller of what the approach changes: a search for `inCloud`, `WHERE`, `PANEL` and `PORT_WAIT` over `src`, `.claude` and `test` backs it
+- [x] every done_when line names the test that decides it: each ask line maps to a row under tests, and the check line to `./RUNME.sh check`
 
 ## review
 
