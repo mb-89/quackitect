@@ -3,17 +3,14 @@
 // [[spec/tickets/go-code-shares-one-module]]
 
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { goModulesIn } from "../../src/scripts/cli-go.js";
 import { goPackagesOf } from "../../src/scripts/work-test.js";
 
 const ROOT = "/tree";
 const MOD = "module quackitect\n";
-const HERE = fileURLToPath(new URL("../..", import.meta.url));
 
 function tree(paths) {
   return {
@@ -22,15 +19,6 @@ function tree(paths) {
     root: ROOT,
   };
 }
-
-// [[spec/tickets/go-code-shares-one-module]]
-test("the tree holds one go.mod, at the root", () => {
-  const said = execFileSync("git", ["ls-files", "*go.mod"], {
-    cwd: HERE,
-    encoding: "utf8",
-  });
-  assert.deepEqual(said.split("\n").filter(Boolean), ["go.mod"]);
-});
 
 // [[spec/tickets/go-code-shares-one-module]]
 test("the battery lists the one module at the root", () => {

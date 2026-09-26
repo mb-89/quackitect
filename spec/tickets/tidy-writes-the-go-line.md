@@ -36,7 +36,7 @@ parent: go-code-shares-one-module
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-the approach leaves the Go version to the implement step. Settle it here: `src/tui` asks for 1.27 today, yet it builds on this box's 1.24 once its `go.mod` asks for 1.24, and `go mod tidy` then writes `go 1.24.2` as the floor its dependencies set. Take the line tidy writes at the root, and take the root `go.sum` from `go mod tidy` in place of a hand union of the two sums
+the approach leaves the Go version to the implement step. Settle it here: `src/tui` asks for 1.27 today, yet it builds on this box's 1.24 once its `go.mod` asks for 1.24. Then `go mod tidy` writes `go 1.24.2` as the floor its dependencies set. Take the line tidy writes at the root. Take the root `go.sum` from `go mod tidy`, in place of a hand union of the two sums
 
 # do
 

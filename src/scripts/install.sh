@@ -268,7 +268,8 @@ compiler_here() {
 # one builds beside it in under a second on every box.
 # [[spec/design_output/index#the-compiler-it-needs]]
 # A binary built off other source lints against rules the tree no longer
-# carries, so a hash of its folder and of each folder its go.mod replaces
+# carries, so a hash of its folder, of each tree package it imports and of the
+# root go.mod and go.sum
 # stands beside it, and a hash that moves asks for the build again.
 # [[spec/design_output/lsp#the-build-beside-the-index]]
 lsp_here() {
@@ -291,7 +292,7 @@ swap_in() {
 
 get_lsp() {
   say "  building the language server"
-  (cd "$root/src/lsp" && CGO_ENABLED=0 go build -o "$bin/se-lsp${exe}.new" .) || return 1
+  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-lsp${exe}.new" ./src/lsp) || return 1
   swap_in "$bin/se-lsp${exe}.new" "$bin/se-lsp${exe}" || return 1
   (cd "$root" && node src/scripts/go-source.js stamp se-lsp) || return 1
   lsp_here
@@ -313,10 +314,8 @@ modules_here() {
 }
 
 get_modules() {
-  say "  fetching the modules every Go module names"
-  for mod in $(cd "$root" && git ls-files '*go.mod'); do
-    (cd "$root/$(dirname "$mod")" && go mod download) || return 1
-  done
+  say "  fetching the modules the Go module names"
+  (cd "$root" && go mod download) || return 1
   mkdir -p "$run"
   go_sums > "$go_stamp"
 }
@@ -365,8 +364,8 @@ get_index() {
     return 1
   }
   say "  building the index with $cc"
-  (cd "$root/src/index" && CC="$cc" CGO_ENABLED=1 GOFLAGS=-tags=sqlite_fts5 \
-    go build -o "$bin/se-index${exe}.new" .) || return 1
+  (cd "$root" && CC="$cc" CGO_ENABLED=1 GOFLAGS=-tags=sqlite_fts5 \
+    go build -o "$bin/se-index${exe}.new" ./src/index) || return 1
   swap_in "$bin/se-index${exe}.new" "$bin/se-index${exe}" || return 1
   (cd "$root" && node src/scripts/go-source.js stamp se-index) || return 1
   index_here

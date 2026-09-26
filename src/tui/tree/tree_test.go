@@ -9,7 +9,7 @@ import (
 
 	"github.com/charmbracelet/x/ansi"
 
-	"quackitect/tui/draw"
+	"quackitect/src/tui/draw"
 )
 
 func item(name, state, says string, kids ...Item) Item {

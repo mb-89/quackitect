@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 23 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: 8c2682d7e5db5c7c1177a2ee6b631fbbabef5ec8
+    hash_after: 8c2682d7e5db5c7c1177a2ee6b631fbbabef5ec8
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/tidy-writes-the-go-line.md:39:59: Sentence: A sentence holds 25 words. Cut this one in two."
 ---
 
 # Ask
@@ -249,11 +257,22 @@ Every new case fails on its own assertion, and every case the layout leaves alon
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the Go files, the Go helpers and their tests
+- it touches the install, the CI step and the chapters naming the split, all inside the ask
+- the one case reading the real tree stands in `test/contract`, over the disk door
+- each changed file names this ticket beside the line it changes
+- the module files stand once, in `MODULE_FILES`, and both stamps read them there
+- all seven `go.mod` files and both `go.sum` files leave
+- the root takes the Go line `go mod tidy` writes, and its `go.sum` comes from tidy
+- the root keeps every version the old modules pinned
 
 ## tests-green
 
@@ -286,3 +305,7 @@ Every new case fails on its own assertion, and every case the layout leaves alon
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The import rename in each Go package rides that package's own tests, and the battery's check rides the check server's. This command runs them:
+
+    ./RUNME.sh test src/index/index_test.go src/tui/draw/colour_test.go src/tui/frame/part_test.go src/tui/work/workplaces_test.go test/level0/check-server.test.js

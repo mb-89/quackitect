@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"quackitect/tui/tree"
+	"quackitect/src/tui/tree"
 )
 
 // The key opening the chord, and the digits closing it. [[spec/design_output/tui#the-work-tab-takes-edits]]

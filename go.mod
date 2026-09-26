@@ -1,8 +1,9 @@
-module quackitect/tui
+// THE GO CODE STANDS IN ONE MODULE, AND PACKAGES SEPARATE IT.
+// Every package keeps its folder under src, and an import names that folder.
+// [[spec/rationales/go-stands-as-one-module]]
+module quackitect
 
-go 1.27
-
-replace quackitect/yaml => ../yaml
+go 1.24.2
 
 require (
 	github.com/charmbracelet/bubbles v1.0.0
@@ -10,9 +11,8 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/charmbracelet/x/ansi v0.11.6
 	github.com/fsnotify/fsnotify v1.10.1
+	github.com/mattn/go-sqlite3 v1.14.52
 	github.com/muesli/termenv v0.16.0
-	quackitect/config v0.0.0
-	quackitect/yaml v0.0.0
 )
 
 require (
@@ -36,5 +36,3 @@ require (
 	golang.org/x/sys v0.38.0 // indirect
 	golang.org/x/text v0.3.8 // indirect
 )
-
-replace quackitect/config => ../config

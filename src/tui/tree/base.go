@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"strings"
 
-	"quackitect/yaml"
+	"quackitect/src/yaml"
 )
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]

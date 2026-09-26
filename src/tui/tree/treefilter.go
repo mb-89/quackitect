@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"quackitect/tui/draw"
+	"quackitect/src/tui/draw"
 )
 
 // [[spec/design_output/tree-view#the-filter-reads-an-item]]

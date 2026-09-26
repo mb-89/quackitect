@@ -17,9 +17,9 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"quackitect/tui/draw"
-	"quackitect/tui/tree"
-	"quackitect/yaml"
+	"quackitect/src/tui/draw"
+	"quackitect/src/tui/tree"
+	"quackitect/src/yaml"
 )
 
 // The schema the door weighs a ticket against, owned by spec/schemas and read here for its fields. [[spec/design_output/schema#the-verbs-own-their-fields]]

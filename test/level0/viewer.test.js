@@ -27,12 +27,16 @@ const goWrites = (disk) =>
     },
   });
 
-test("a box with no binary builds one in the viewer's folder and stamps its source", () => {
+test("a box with no binary builds the viewer's folder from the root and stamps its source", () => {
   const disk = source();
   const proc = goWrites(disk);
   assert.deepEqual(viewerOf({ disk, proc, root: ROOT }), { exe: EXE, why: "" });
   assert.equal(proc.ran.length, 1);
-  assert.equal(proc.ran[0].init.cwd, `${ROOT}/${SOURCE}`);
+  assert.equal(
+    proc.ran[0].init.cwd,
+    ROOT,
+    "the build stands where the one module stands",
+  );
   assert.match(disk.read(`${ROOT}/${STAMP}`), /^[0-9a-f]{16}\n$/);
 });
 

@@ -6,7 +6,7 @@ package main
 import (
 	"strings"
 
-	"quackitect/yaml"
+	"quackitect/src/yaml"
 )
 
 // A note's headings and, for a guidance note, its rule lines, beside the text they come from. [[spec/design_output/lsp#a-change-reads-one-note]]

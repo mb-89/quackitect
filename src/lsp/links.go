@@ -11,7 +11,7 @@ import (
 	"strings"
 	"unicode/utf16"
 
-	"quackitect/yaml"
+	"quackitect/src/yaml"
 )
 
 // [[spec/design_output/lsp#a-pointer-opens-its-target]]

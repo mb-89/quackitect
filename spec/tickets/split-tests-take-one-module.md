@@ -36,7 +36,17 @@ parent: go-code-shares-one-module
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-the callers list misses the tests that assert the split layout, and each breaks under one module: `test/level0/go-modules.test.js` and `test/level0/go-tests.test.js` on `goModulesIn`, `test/level0/test-verb.test.js` on `go -C src/index test ./...` and `goModulesOf`, `test/level0/pull-leaves.test.js` on `goModulesOf`, `test/level0/go-source.test.js` on the replace-line `foldersOf`, `test/level0/viewer.test.js` on its `go build -o <exe>.new .` fake and its `src/tui/go.mod`, and `test/contract/install.test.js` on the module fetch. Rewrite each beside the caller it tests
+The callers list misses the tests asserting the split layout, and each breaks under one module. Rewrite each beside the caller it tests:
+
+| the test | what it asserts |
+|---|---|
+| `test/level0/go-modules.test.js` | `goModulesIn` |
+| `test/level0/go-tests.test.js` | `goModulesIn` |
+| `test/level0/test-verb.test.js` | the Go run in the module's folder, and `goModulesOf` |
+| `test/level0/pull-leaves.test.js` | `goModulesOf` |
+| `test/level0/go-source.test.js` | the replace-line `foldersOf` |
+| `test/level0/viewer.test.js` | the build in the window's folder, and its `go.mod` |
+| `test/contract/install.test.js` | the module fetch |
 
 # do
 

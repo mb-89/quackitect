@@ -10,7 +10,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"quackitect/tui/draw"
+	"quackitect/src/tui/draw"
 )
 
 type states struct{ allowed []string }

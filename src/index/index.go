@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3" // the real SQLite, through cgo, so FTS5 answers
-	"quackitect/pointer"
+	"quackitect/src/pointer"
 )
 
 const shape = `

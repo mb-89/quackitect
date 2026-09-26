@@ -116,7 +116,7 @@ export function viewerHere() {
   });
 }
 
-// Every Go module's tests run in the battery, the index's through the pinned Zig. [[spec/design_output/index#the-compiler-it-needs]]
+// Every Go module's tests run in the battery, the index's through the pinned Zig. The one module stands at the root. [[spec/tickets/go-code-shares-one-module]]
 export function goHolds() {
   const at = { disk: files, join, root };
   const env = goEnvOf(at);
@@ -142,7 +142,9 @@ export function goHolds() {
 function goFormat(folder, env) {
   let ran;
   try {
-    ran = outside.run(["gofmt", "-l", "."], { cwd: join(root, folder), env });
+    // The root holds more than Go, so the formatter reads src alone there. [[spec/tickets/go-code-shares-one-module]]
+    const over = folder === "." ? "src" : ".";
+    ran = outside.run(["gofmt", "-l", over], { cwd: join(root, folder), env });
   } catch {
     return 0;
   }

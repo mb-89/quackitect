@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"quackitect/config"
+	"quackitect/src/config"
 )
 
 const (
