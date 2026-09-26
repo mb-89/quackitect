@@ -74,11 +74,16 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+step: design/review
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
 depends_on: [the-q-core-holds-names]
+record:
+  - step: design/draft
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: 85d541d35ac8ddd2ebef68b23469cc38ea31d092
+    hash_after: d05637e98a855bf6d470f9530a06162ed13441d0
 ---
 
 # Ask
