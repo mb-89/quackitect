@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-red
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -84,6 +84,10 @@ record:
     hand: box d7a69cb6601d7 · claude-code-remote
     hash_before: 86f6feaac417b2837ccb432ed8b58202aef10914
     hash_after: 86f6feaac417b2837ccb432ed8b58202aef10914
+  - step: design/review
+    hand: box d7a69cb6601d7 · claude-code-remote · helper-2
+    hash_before: 430b32b4a9b9972011a4a89f5977018374732de4
+    hash_after: 430b32b4a9b9972011a4a89f5977018374732de4
 ---
 
 # Ask
@@ -195,6 +199,14 @@ What else holds:
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- start-check-runs-in-serve: Run `q.Check` in `Serve` in `src/index/door.go`. `main` runs for every command-line verb, not the start alone.
+- serve-takes-a-catalog-seam: Give `Serve` a catalog seam so the broken-catalog test plants a fault. Update its callers in `door_test.go` and `serves`.
+- catalog-holds-name-families: Hold a family such as `ops/<id>` once in the catalog. Check each name's lowercase segments, which `operations-and-leases-land` needs.
+- check-reads-provider-keys: Name where `Check` reads the `providers.<name>` keys, since the `cfg/` topic stands nowhere yet.
+- migration-names-the-q-package: Add a `src/q` row to the migration table, which gives the model to `src/index` alone.
 
 # implement
 
