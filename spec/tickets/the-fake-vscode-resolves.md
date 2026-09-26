@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-owners-word-reaches-work
 parent: the-owner-view-decides-done
+record:
+  - step: do
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: c21f293a82ff4bf2b1609906b6ff522f8f609e8e
+    hash_after: c21f293a82ff4bf2b1609906b6ff522f8f609e8e
+reason: became
+successors: [the-owner-view-decides-done]
 ---
 
 # Ask
