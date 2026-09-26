@@ -257,6 +257,11 @@ exits clean. `RESPAWN_WAIT` in `src/bridge/server.js` holds the window, and
 `SERVE` in `lib/log.js` names the file. `respawned` takes the exit as an
 argument, so a case drives the fall through the fake process door.
 
+`restarts` in `src/bridge/server.js` ends the listen and starts the child on
+the next turn of the loop. Node's own close callback waits on every open
+connection, and a running wait holds one for minutes. So the restart waits on
+none, and the old process ends them as it exits.
+
 ## The server holds off sleep
 
 A box asleep answers no hook, so a session under agent control dies with the
@@ -299,6 +304,15 @@ later. So the bridgehead says it where a person stands.
 A post nobody takes reads the port pointer first, because a server restarting
 on another port writes it again. Where the pointer names another port, the
 bridgehead posts there once more before the server reads as down.
+
+The host's fetch cuts a post at its own timeout, and a wait runs past it. So a
+`mcp__level0__wait` post falling with no status after `CUT` or more in
+`.claude/skills/level0/hooks/level0.js` asks `/health` once.
+
+| the health | the wait |
+|---|---|
+| answers | goes again as the same post, and its answer stands in place of the `no server answers` line |
+| answers nothing | reads as down, as above |
 
 The route both name is the one the bridgehead posts to, which `url()` answers.
 The line names it, what the wire says, and the commands a person runs:
@@ -1866,3 +1880,8 @@ the span counts from the last change the wait sees. The process door's
 `wait.most` in `spec/config/level0.json` caps the wait in seconds. The wait
 looks at its signals once a second, and the clock decides the rest, so a case
 drives it on the fake clock.
+
+The bridgehead stamps a wait with `since`, the moment of its first post, and
+posts it again under the same stamp where the host cuts it. The box keeps the
+watch a stamp begins, so a post again carries on its signals, and the cap
+counts from `since`. The older loop ends once a later post takes the watch.

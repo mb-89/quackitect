@@ -342,7 +342,7 @@ export function serve(method, port = PORT_BASE, say = console.log) {
   const restart = () => {
     held.release();
     own.log.say("info", "bridge", `the server restarts at ${where}`);
-    server.close(() => respawned(own, [process.execPath, ...process.argv.slice(1)]));
+    restarts(server, () => respawned(own, [process.execPath, ...process.argv.slice(1)]));
   };
 
   const onRequest = (request, response) => {
@@ -422,6 +422,13 @@ export async function respawned(own, argv, exit = process.exit, wait = RESPAWN_W
     );
   } catch {}
   exit(1);
+}
+
+// The listen ends at once, and the child starts on the next turn of the loop. Node's own close callback waits on every open connection, and a wait or a kept socket holds one for minutes, so the restart hands it nothing. The old process exits once the child stands, which ends the rest. [[spec/design_output/level0#a-restart-watches-its-child]]
+export function restarts(server, then, soon = setImmediate) {
+  server.close();
+  server.closeIdleConnections?.();
+  soon(then);
 }
 
 // The line naming the fault, out of what the child wrote: the first naming an error, else the last. [[spec/design_output/level0#a-restart-watches-its-child]]

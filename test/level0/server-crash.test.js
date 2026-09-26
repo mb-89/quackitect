@@ -6,7 +6,13 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { SERVE } from "../../.claude/skills/level0/lib/log.js";
-import { answersEvent, crashed, respawned, takesOver } from "../../src/bridge/server.js";
+import {
+  answersEvent,
+  crashed,
+  respawned,
+  restarts,
+  takesOver,
+} from "../../src/bridge/server.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
@@ -123,6 +129,42 @@ test("a respawn that falls with no words names the empty log", async () => {
   );
   assert.equal(code, 1);
   assert.match(it.rows[0][2], /exit 7: it wrote nothing to \.se\/\.log\/serve\.log/);
+});
+
+// A server shaped as node's: close ends the listen at once, and its callback waits on every open connection. [[spec/tickets/every-server-stands-and-answers]]
+function listening(open) {
+  const waits = [];
+  const server = {
+    listening: true,
+    open,
+    close(then) {
+      server.listening = false;
+      if (then) waits.push(then);
+      if (!server.open) for (const one of waits.splice(0)) one();
+      return server;
+    },
+    closeIdleConnections() {},
+    ends() {
+      server.open = 0;
+      if (!server.listening) for (const one of waits.splice(0)) one();
+    },
+  };
+  return server;
+}
+
+// [[spec/tickets/every-server-stands-and-answers]]
+test("a restart starts the child once the port stops listening, with a connection open", async () => {
+  const server = listening(1);
+  const born = new Promise((take) => restarts(server, () => take(server.listening)));
+
+  const was = await Promise.race([
+    born,
+    new Promise((take) => setTimeout(() => take("waits"), 50)),
+  ]);
+  server.ends();
+
+  assert.equal(was, false, "the child starts on a closed listen, and the open connection holds it back not at all");
+  assert.equal(server.open, 0);
 });
 
 test("a crash writes its error and stack at fatal, then exits with one", async () => {

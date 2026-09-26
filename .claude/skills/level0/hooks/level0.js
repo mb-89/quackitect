@@ -34,6 +34,11 @@ let saidDown = false;
 let toldDown = false;
 let started = false;
 let waiting = STARTING;
+// The span a post runs before a fall with no status reads as the host's cut. The host cuts at its own timeout, well past this, and a fault falls at once. [[spec/design_output/level0#the-bridge-says-it-falls]]
+const CUT = 1000;
+let cut = CUT;
+// The wait tool's name, which `WAIT_CALL` in src/bridge/wait.js owns, spelled again here because this hook imports its own folder alone. [[spec/design_output/level0#the-wait-returns-on-signals]]
+const WAIT_CALL = "mcp__level0__wait";
 let stepText = "";
 // What the start road answered where it stood down, so the first prompt says the cage is missing. [[spec/design_output/level0#a-session-says-its-cage]]
 let cage = null;
@@ -123,6 +128,7 @@ export function register(on, options) {
   method = String(options?.method ?? "");
   // A caller hands the wait in, so a case reads the running out without burning the span. [[spec/design_output/level0#the-first-call-pays]]
   waiting = Number(options?.waiting) || STARTING;
+  cut = Number(options?.cut ?? CUT);
   started = false;
   launched = false;
   on("*", ($, e, next) => seen($, e, next));
@@ -215,7 +221,8 @@ async function opens($, e) {
   }
 }
 
-async function ask($, event, e, next, extra = {}) {
+async function ask($, event, given, next, extra = {}) {
+  const e = stamped(event, given);
   let body = "";
   try {
     body = JSON.stringify({
@@ -236,20 +243,54 @@ async function ask($, event, e, next, extra = {}) {
       root,
       ...extra,
     });
-  try {
-    return await posted($, body);
-  } catch (error) {
-    // A server restarting on another port writes the pointer again, so a post nobody took reads it before the server reads as down. [[spec/design_output/level0#the-bridge-says-it-falls]]
-    if (!error?.status && (await repoints($))) {
-      try {
-        return await posted($, body);
-      } catch (again) {
-        await down($, event, again);
-        return null;
-      }
+  for (;;) {
+    const from = Date.now();
+    try {
+      return await posted($, body);
+    } catch (error) {
+      // The host cuts a wait at its own timeout, and a server answering its health still runs the wait, so the same post goes again. [[spec/design_output/level0#the-bridge-says-it-falls]]
+      if (waited(event, e) && cutAfter(error, from) && (await alive($))) continue;
+      return fell($, event, body, error);
     }
-    await down($, event, error);
-    return null;
+  }
+}
+
+async function fell($, event, body, error) {
+  // A server restarting on another port writes the pointer again, so a post nobody took reads it before the server reads as down. [[spec/design_output/level0#the-bridge-says-it-falls]]
+  if (!error?.status && (await repoints($))) {
+    try {
+      return await posted($, body);
+    } catch (again) {
+      await down($, event, again);
+      return null;
+    }
+  }
+  await down($, event, error);
+  return null;
+}
+
+// A wait carries the stamp of its first post, so a post again carries on the watch and its cap. [[spec/design_output/level0#the-wait-returns-on-signals]]
+function stamped(event, e) {
+  if (!waited(event, e) || e?.since) return e;
+  return { ...e, since: Date.now() };
+}
+
+function waited(event, e) {
+  return event === "tool.call" && String(e?.tool ?? "") === WAIT_CALL;
+}
+
+// A fall with no status, after the post ran the span, reads as the host's cut. A fault falls at once. [[spec/design_output/level0#the-bridge-says-it-falls]]
+function cutAfter(error, from) {
+  return !error?.status && Date.now() - from >= cut;
+}
+
+// One ask of the health, so a cut on a live server reads apart from a fall. [[spec/design_output/level0#the-bridge-says-it-falls]]
+async function alive($) {
+  try {
+    const said = await $.http.fetch(`http://127.0.0.1:${port}/health`, { method: "GET" });
+    return Boolean(said?.ok);
+  } catch {
+    return false;
   }
 }
 
