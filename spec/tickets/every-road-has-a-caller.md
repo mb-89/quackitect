@@ -82,15 +82,22 @@ step: design/draft
 
 # Ask
 
-The judge runs where the config turns it on alone, and every road left in the engine serves a route or a box that reaches it, so a reader meets code that runs.
+The judge runs where the config turns it on alone. Every road left in the engine serves a route or a box that reaches it, so a reader meets code that runs.
 
-A config with no judge key turns the judge on, because `judged` stops on false alone. The `returned` condition, the mark door, the unblock prompt and the push's trunk road stand with their tests, and no shipped route or box calls them.
+A config with no judge key turns the judge on, because `judged` stops on false alone. The `returned` condition, the mark door, the unblock prompt and the push's trunk road stand with their tests. No shipped route or box calls them.
 
-- `judged` in `.claude/skills/level0/hooks/pull-tool.js` runs on `judge.enabled: true` alone, `spec/config/level0.schema.json` declares the key off by default, and a case under `test/level0` holds a config with no judge key running no judge
-- `holdsHere` in `src/scripts/pull-hand.js` and the `when` enum in `spec/schemas/ticket.schema.yaml` drop `returned`, and the closed tickets carrying `when: returned` pass the schema check
-- `markDoor` leaves the checks in `onWrite` in `src/bridge/write.js` with its cases, and the marks it alone reads leave with it or name the reader they serve
-- `unblockPrompt` in `src/scripts/pull-spawn.js` and the person road in `handOut` in `src/scripts/pull-hand.js` leave with their cases, and `spec/design_output/work.md` names who answers a person step
-- the trunk road of `pushed` in `src/scripts/pull-push.js` leaves with `checkRed` and its cases, once a read of the cloud route shows no box hands back on trunk
+- `judged` in `.claude/skills/level0/hooks/pull-tool.js` runs on `judge.enabled: true` alone
+- `spec/config/level0.schema.json` declares the key off by default
+- a case under `test/level0` holds a config with no judge key running no judge
+- `holdsHere` in `src/scripts/pull-hand.js` drops `returned`
+- the `when` enum in `spec/schemas/ticket.schema.yaml` drops `returned`
+- the closed tickets carrying `when: returned` pass the schema check
+- `markDoor` leaves the checks in `onWrite` in `src/bridge/write.js` with its cases
+- the marks `markDoor` alone reads leave with it, or name the reader they serve
+- `unblockPrompt` in `src/scripts/pull-spawn.js` leaves with its cases
+- the person road in `handOut` in `src/scripts/pull-hand.js` leaves with its cases
+- `spec/design_output/work.md` names who answers a person step
+- the trunk road of `pushed` in `src/scripts/pull-push.js` leaves with `checkRed` and its cases. The road leaves once a read of the cloud route shows no box hands back on trunk
 - `./RUNME.sh check` exits 0
 
 # design

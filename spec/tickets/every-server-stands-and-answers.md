@@ -84,13 +84,18 @@ step: design/draft
 
 A level zero tool, the editor and `doctor` each tell a live server from a dead one. A server that restarts or runs stale code comes back with no hand running `./RUNME.sh serve` or reloading the window.
 
-The host fetch cuts a `wait` post at its own abort, and the plugin reads the cut as a dead server. A restart waits on open connections before it respawns, a Go binary rebuilds off its own folder alone, and the language client gives up on se-lsp at its default cap.
+The host fetch cuts a `wait` post at its own timeout, and the plugin reads the cut as a dead server. A restart waits on open connections before it respawns. A Go binary rebuilds off its own folder alone. The language client gives up on `se-lsp` at its default cap.
 
-- a `mcp__level0__wait` call on a live server running past the host fetch's abort answers its signal or its cap, never the `no server answers` line, and a case in `test/level0/bridgehead.test.js` holds it
-- `restart` in `src/bridge/server.js` starts the child once the port stops listening, with no wait on open connections, and a case in `test/level0/server-crash.test.js` holds a respawn with a connection open
-- a change to a `.go` file under `src/lsp`, `src/index` or a package their `go.mod` replaces rebuilds that binary, keyed on a source hash as `sourceHash` in `src/scripts/tui-build.js` keys one, and a case under `test/level0` holds it
-- the language client `startsServer` in `src/extension/editor.js` builds restarts se-lsp on every close, and a case in `test/level0/lsp.test.js` holds it
-- `doctor` in `src/scripts/cli-check.js` prints an se-lsp row off a probe that starts `se-lsp lsp` and names the diagnostics it gets back, and cases in `test/level0/doctor-hooks.test.js` hold a server that answers and one that exits
+- a `mcp__level0__wait` call on a live server running past the host fetch's timeout answers its signal or its cap
+- that answer takes the place of the `no server answers` line, and a case in `test/level0/bridgehead.test.js` holds both
+- `restart` in `src/bridge/server.js` starts the child once the port stops listening, with no wait on open connections
+- a case in `test/level0/server-crash.test.js` holds a respawn with a connection open
+- a change to a `.go` file under `src/lsp`, `src/index` or a package their `go.mod` replaces rebuilds that binary
+- the rebuild keys on a source hash, as `sourceHash` in `src/scripts/tui-build.js` keys one, and a case under `test/level0` holds it
+- the language client `startsServer` in `src/extension/editor.js` builds restarts `se-lsp` on every close, and a case in `test/level0/lsp.test.js` holds it
+- `doctor` in `src/scripts/cli-check.js` prints an `se-lsp` row off a probe that starts `se-lsp lsp`
+- that row names the diagnostics the probe gets back
+- cases in `test/level0/doctor-hooks.test.js` hold a server that answers and one that exits
 - `./RUNME.sh check` exits 0
 
 # design

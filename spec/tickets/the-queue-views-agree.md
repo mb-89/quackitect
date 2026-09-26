@@ -84,15 +84,20 @@ step: design/draft
 
 The sidebar badge shows the number in the work tab's brackets, under a briefcase, and follows the queue with no window reload. The tab and the branch list draw a ticket once, with what it waits on.
 
-The badge counts the rows the tab draws, and the sidebar redraws on a config change alone, so the badge and the brackets show two numbers for one queue. The tab draws a plan todo nested under its group again at the top.
+The badge counts the rows the tab draws, and the sidebar redraws on a config change alone. So the badge and the brackets show two numbers for one queue. The tab draws a plan todo nested under its group again at the top.
 
-- the `editor` entry in `spec/config/level0.schema.json` counts through a verb printing `Places.Takeable`, the number the work tab draws in its brackets, and `src/tui/workcount_test.go` holds the printed count equal to the brackets
+- the `editor` entry in `spec/config/level0.schema.json` counts through a verb printing `Places.Takeable`, the number in the work tab's brackets
+- `src/tui/workcount_test.go` holds the printed count equal to the brackets
 - the `editor` entry carries a briefcase icon, and its help names the bracket number
-- the sidebar in `src/extension/sidebar.js` redraws once after a burst of writes to a ticket folder, the plan file or the hold folder, and a case in `test/level0/sidebar.test.js` holds a ticket write changing the badge
-- `Placed` in `src/tui/work/workplaces.go` reads every nested row before it adds a plan todo, and a case in `src/tui/workplaces_test.go` holds a todo under its group drawn once
-- `childRows` in `src/scripts/work-list.js` names the tickets a child waits on, the group row names a group branch behind main, and cases in `test/level0/work-group.test.js` hold both
-- `lensesOf` in `src/extension/lib/lens.js` draws no lens over a ticket standing on a cloud branch, and a case under `test/level0` holds it
-- a person step: the owner compares the sidebar badge with the work tab's brackets in the editor, before and after a ticket moves, with no window reload
+- the sidebar redraws once after a burst of writes to a ticket folder, the plan file or the hold folder
+- that redraw stands in `src/extension/sidebar.js`, and a case in `test/level0/sidebar.test.js` holds a ticket write changing the badge
+- `Placed` in `src/tui/work/workplaces.go` reads every nested row before it adds a plan todo
+- a case in `src/tui/workplaces_test.go` holds a todo under its group drawn once
+- `childRows` in `src/scripts/work-list.js` names the tickets a child waits on
+- the group row names a group branch behind main
+- cases in `test/level0/work-group.test.js` hold both the child row and the group row
+- `lensesOf` in `src/extension/lib/lens.js` draws no lens over a ticket standing on a cloud branch. A case under `test/level0` holds it
+- a person step: the owner compares the sidebar badge with the work tab's brackets in the editor. The compare runs before and after a ticket moves, with no window reload
 - `./RUNME.sh check` exits 0
 
 # design
