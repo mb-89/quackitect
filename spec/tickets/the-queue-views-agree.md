@@ -112,11 +112,52 @@ The badge counts the rows the tab draws, and the sidebar redraws on a config cha
 
 <!-- the form is text -->
 
+Four roads draw the queue, and each one takes a small change. The table names the part, the file and what changes.
+
+| part | file | what changes |
+|---|---|---|
+| the count | `src/tui/work/workcount.go`, `Drawn` | becomes `Takeable(path)`, which runs `runPlaces` and answers `PlacesIn(said).Takeable`, the number `Label` in `src/tui/work/work.go` draws in the brackets. It reads no index and no base file |
+| the flag | `src/tui/main.go`, `main` | `--count` prints `{"count":N}` off `work.Takeable`, and its flag help names the brackets |
+| the button | `spec/config/level0.schema.json`, `work.editor` | the icon turns to a briefcase, `💼`. The help says the number is the one in the work tab's brackets. `counts` keeps `./RUNME.sh tui work --count`, so `src/scripts/tui.js` and `test/contract/work-buttons.test.js` stand as they are |
+| the note | `spec/design_output/tui.md`, the paragraph on `--count` under the work tab | says the count is `Takeable`, and points at `Label` in place of `Drawn` |
+| the redraw | `src/extension/sidebar.js` | the sidebar answers `redraws`, the ticket folders `spec/tickets/*.md` and `.se/tickets/*.md`, the plan file `.se/.runtime/plan.json`, and `HOLD_WATCHES` out of `lens.js`. `settled(run, wait)` holds a timer and starts it again on each event, so a burst runs `run` once after `SETTLES` quiet milliseconds |
+| the wire | `src/extension/extension.js`, `activate` | the view watches `sidebar.redraws` through `settled(draw)`, beside its watch on `sidebar.watches`. The status bar keeps its watch on the config alone |
+| the todo | `src/tui/work/workplaces.go`, `Placed` | `standing` walks every item and its kids, so a todo the index nests under its group lands no second row at the left |
+| the child row | `src/scripts/work-list.js`, `childRows` | reads `dependsOn` off the child, and names each ticket on the same tip standing open, as `waits for a, b` in place of the step |
+| the behind read | `src/scripts/work-stands.js`, `refsHere` | reads `rev-parse origin/main` once, and marks a ref `behind` where `baseOnTrunk` shares a base and that base is no trunk tip |
+| the group row | `src/scripts/work-list.js`, `rowOf` | the why column names `behind main` for a ref marked `behind`, after what it waits for and before the mark |
+| the note | `spec/design_output/work.md`, the reads of the listing | the table gains the one `rev-parse` row |
+| the cloud read | `src/extension/lib/work.js`, `cloudIn(ran)` | reads the `branch list --json` answer, and answers the set of names on a branch standing unmerged: the group and each ticket on it |
+| the lens | `src/extension/lib/lens.js`, `lensesOf` | takes `cloud`, a set of names, and answers no lens for a ticket in it |
+| the lens door | `src/extension/lib/lens.js`, `ticketLensOf` | asks `door.asksVerb(["branch", "list", "--json"])` once, keeps the set, and forgets it on each watch event, so a lens draw spawns no git read |
+
+The redraw test drives `activate` over the fake door `doorOf`, with `mock.timers` from `node:test`. The door's `asksVerb` answers the count, and a ticket write fires the watch the view registers.
+
+The owner's compare in the editor stays a person step, and no test decides it.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/tui/main.go`, `main`, the one caller of `work.Drawn`
+- `src/tui/workcount_test.go`, `TestTheButtonsCountIsTheRowsTheTabDrawsAsItOpens` and `TestTheCountAnswersWhyWhereNoBranchVerbStands`, which call `work.Drawn`
+- `src/tui/work/workcount_test.go`, `TestTheCountAnswersWhyWhereNoBaseFileStands`, which calls `Drawn`
+- `src/scripts/tui.js`, `counted`, which runs the viewer's `--count`
+- `src/extension/sidebar.js`, `counted`, which runs the `counts` line of `work.editor`
+- `test/contract/work-buttons.test.js`, which reads the `work.editor` entry
+- `src/tui/work/work.go`, `Tab.Update`, the two calls of `Placed`
+- `src/tui/workplace_test.go`, which calls `work.Placed`
+- `src/scripts/work-list.js`, `list`, the one caller of `rowOf` and `childRows`
+- `src/scripts/work-stands.js`, `readWork`, the one caller of `refsHere`
+- `src/scripts/work-answer.js`, `answerOf`, which reads the refs through `readWork`
+- `src/scripts/work-stands.js`, `standOf`, which reads the refs through `readWork`
+- `test/level0/work-doors.js`, `remoteSaying`, the fake git the listing cases run over
+- `src/extension/extension.js`, `activate`, which reads `sidebar.watches` and `ticketLensOf`
+- `src/extension/lib/lens.js`, `ticketLensOf().lenses`, the one caller of `lensesOf` in `src`
+- `src/extension/editor-lens.js`, `lenses`, which calls `lens.lenses` and watches `lens.watches`
+- `test/level0/lens.test.js`, which calls `lensesOf` and `ticketLensOf`
 
 ### tests
 
@@ -124,17 +165,34 @@ The badge counts the rows the tab draws, and the sidebar redraws on a config cha
 
 <!-- the form is list -->
 
+- `src/tui/workcount_test.go`, `TestThePrintedCountIsTheNumberInTheTabsBrackets`, in place of the case on the rows the tab draws
+- `src/tui/workcount_test.go`, `TestTheCountAnswersWhyWhereNoBranchVerbStands`, kept over `work.Takeable`
+- `src/tui/workplaces_test.go`, `TestATodoUnderItsGroupDrawsOnce`
+- `test/level0/sidebar.test.js`, `a burst of ticket writes redraws the sidebar once, and the badge follows the queue`
+- `test/level0/sidebar.test.js`, `the sidebar watches the ticket folders, the plan file and the hold folder`
+- `test/level0/work-group.test.js`, `a child row names the tickets it waits on`
+- `test/level0/work-group.test.js`, `a group row names a branch behind main`
+- `test/level0/lens.test.js`, `a ticket standing on a cloud branch draws no lens`
+- `test/level0/lens.test.js`, `the lens door reads the cloud once, and reads it again after a watch event`
+- `test/contract/work-buttons.test.js`, `the work editor wears a briefcase, and its help names the brackets`
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every file and function the table names stands opened, and each one reads as the table says
+- the callers list names each caller a search finds for every name the table changes
+- each done_when line names its test in the tests list, and the owner's compare stays a person step
 
 ## review
 
