@@ -11,6 +11,8 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import {
   COLD,
+  COLD_PATH,
+  coldIn,
   coldLines,
   coldPort,
   probeCold,
@@ -316,4 +318,64 @@ test("a client standing nowhere fails the probe, and the clone still goes", asyn
   assert.equal(code, 1);
   assert.match(said_.join("\n"), /claude stands nowhere/);
   assert.equal(disk.exists("/tmp/se-cold-1"), false);
+});
+
+// The cold path is the one list the commit verb gates on. [[spec/design_output/level0#the-cold-probe]]
+test("a path under the hooks folder or a named cold file sits on the cold path", () => {
+  assert.deepEqual(
+    coldIn([
+      ".claude/skills/level0/hooks/level0.js",
+      "src/bridge/server.js",
+      "src/scripts/install.sh",
+      "src/scripts/probe-cold.js",
+    ]),
+    [
+      ".claude/skills/level0/hooks/level0.js",
+      "src/bridge/server.js",
+      "src/scripts/install.sh",
+      "src/scripts/probe-cold.js",
+    ],
+  );
+  assert.ok(COLD_PATH.includes("src/bridge/guidance.js"));
+  assert.ok(COLD_PATH.includes(".claude/skills/level0/lib/guidance.js"));
+});
+
+test("a path elsewhere, or one sharing a cold name's prefix alone, sits off the cold path", () => {
+  assert.deepEqual(
+    coldIn([
+      "spec/design_output/level0.md",
+      "src/bridge/server.json",
+      "src/bridge/guidance-read.js",
+      "test/level0/probe-cold.test.js",
+    ]),
+    [],
+  );
+});
+
+// The probe clones the commit standing, so a staged change reaches the clone as a patch. [[spec/design_output/level0#the-cold-probe]]
+test("a staged delta lands in the clone before the install runs", async () => {
+  const { disk, proc, it } = runner({ exitCode: 1, stdout: "" });
+  await probeCold("/repo", it, "claude", () => {}, "diff --git a/x b/x\n");
+
+  const ran = proc.ran.map((one) => one.argv.join(" "));
+  const applied = ran.indexOf("git apply --index /tmp/se-cold-1/staged.patch");
+  const installed = ran.findIndex((one) => one.startsWith("sh "));
+  assert.ok(applied > 0 && applied < installed, ran.join("\n"));
+  const apply = proc.ran[applied];
+  assert.equal(apply.init.cwd, "/tmp/se-cold-1/tree");
+  assert.equal(disk.exists("/tmp/se-cold-1"), false);
+});
+
+test("a delta the clone refuses fails the probe before the client runs", async () => {
+  const { proc, it } = runner({ exitCode: 0, stdout: "" });
+  proc.teach(["git", "apply", "--index", "/tmp/se-cold-1/staged.patch"], {
+    exitCode: 1,
+    stderr: "patch does not apply",
+  });
+  const said_ = [];
+  const code = await probeCold("/repo", it, "claude", (one) => said_.push(one), "x\n");
+
+  assert.equal(code, 1);
+  assert.match(said_.join("\n"), /FAIL delta: patch does not apply/);
+  assert.ok(!proc.ran.some((one) => one.argv[0] === "claude"));
 });

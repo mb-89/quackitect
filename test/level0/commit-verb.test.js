@@ -67,6 +67,26 @@ const doors = (found = [], answers = {}, env = { SE_CLOUD: "1" }) => {
 
 const ranGit = (git) => git.ran.map((one) => one.argv.join(" "));
 
+// The cold gate's doors: a staged list, a client on the disk, and a probe answering a code and its lines. [[spec/design_output/level0#the-cold-probe]]
+const CLIENT = "/bin/claude";
+const LISTED = "git diff --cached --name-only --no-renames";
+const cold = (
+  staged,
+  probed = { code: 0, lines: ["PASS hook: row"] },
+  client = CLIENT,
+) => {
+  const { it, git } = doors([], { [LISTED]: { stdout: `${staged.join("\n")}\n` } });
+  const asked = [];
+  it.claude = client;
+  it.disk.write(CLIENT, "");
+  it.cold = async (root, _it, via, say, delta) => {
+    asked.push({ root, via, delta });
+    for (const one of probed.lines) say(one);
+    return probed.code;
+  };
+  return { it, git, asked };
+};
+
 // A break of form in the message warns, and the commit lands. [[spec/design_output/work#the-battery-answers-first]]
 test("a message breaking a rule of form names every finding, and the commit lands", async () => {
   const { it, git } = doors(FOUND);
@@ -241,4 +261,85 @@ test("a call naming paths lands those paths alone", async () => {
     "the commit takes the paths alone",
   );
   assert.ok(!ran.includes("git add -A"), "the whole tree stays unstaged");
+});
+
+// [[spec/design_output/level0#the-cold-probe]]
+test("a staged file on the cold path runs the probe after the tests and before the commit", async () => {
+  const { it, git, asked } = cold(["src/bridge/server.js", "README.md"]);
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 0, said);
+  assert.equal(asked.length, 1, "the probe runs once");
+  assert.equal(asked[0].via, CLIENT);
+  assert.match(said, /The cold probe passes/);
+  const ran = ranGit(git);
+  const cli = join(ROOT, "src", "scripts", "cli.js");
+  assert.ok(ran.indexOf(`node ${cli} test`) < ran.indexOf(LISTED));
+  assert.ok(
+    ran.includes("git diff --cached --binary --no-renames"),
+    "the delta reaches the probe",
+  );
+  assert.ok(ran.indexOf(LISTED) < ran.indexOf(`git commit -m ${CLEAN}`));
+});
+
+test("a staged list off the cold path runs no probe", async () => {
+  const { it, git, asked } = cold(["README.md", "src/bridge/answer.js"]);
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 0);
+  assert.equal(asked.length, 0);
+  assert.doesNotMatch(said, /cold probe/);
+  assert.ok(ranGit(git).includes(`git commit -m ${CLEAN}`));
+});
+
+test("a failing cold probe refuses the commit, prints its lines, and unstages", async () => {
+  const { it, git } = cold([".claude/skills/level0/hooks/level0.js"], {
+    code: 1,
+    lines: ["PASS hook: row", "FAIL canary: no level0 row names the sentence"],
+  });
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 1);
+  assert.match(said, /FAIL canary: no level0 row names the sentence/);
+  assert.match(said, /nothing lands/);
+  const ran = ranGit(git);
+  assert.ok(!ran.some((one) => one.startsWith("git commit")), "nothing commits");
+  assert.ok(ran.includes("git reset -q"), "the staging comes back");
+});
+
+test("a cold-path commit on a box holding no claude refuses in one line", async () => {
+  const { it, git, asked } = cold(["src/scripts/install.sh"], undefined, "claude");
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 1);
+  assert.equal(asked.length, 0);
+  assert.match(said, /claude stands nowhere/);
+  assert.equal(said.split("\n").filter((one) => /claude/.test(one)).length, 1);
+  assert.ok(!ranGit(git).some((one) => one.startsWith("git commit")));
+});
+
+test("a call naming paths gates on the paths it lands alone", async () => {
+  const { it, git, asked } = cold(["src/bridge/guidance.js"]);
+  git.proc.teach(
+    ["git", ...`${LISTED.slice(4)} -- src/bridge/guidance.js`.split(" ")],
+    {
+      stdout: "src/bridge/guidance.js\n",
+    },
+  );
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "src/bridge/guidance.js", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  assert.equal(asked.length, 1);
+  assert.ok(
+    ranGit(git).includes(
+      "git diff --cached --binary --no-renames -- src/bridge/guidance.js",
+    ),
+  );
 });

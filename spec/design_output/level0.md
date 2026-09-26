@@ -722,14 +722,27 @@ run costs ninety seconds and two model calls, so `SE_SLOW` switches it on and
 
 ## The cold probe
 
-Run `./RUNME.sh probe cold` before a change to the bridgehead, the start road
-or the guidance delivery lands. A unit test passes on each part, and a real box
-still breaks where the parts meet.
+A unit test passes on each part, and a real box still breaks where the parts
+meet. So the commit verb runs the cold probe on every commit touching the cold
+path, and no hand remembers it. `COLD_PATH` in `src/scripts/probe-cold.js`
+names the path: the bridgehead, the start road, the guidance delivery and the
+probe itself.
 
-The verb runs one cold box from start to end:
+| what the commit verb meets | what it does |
+|---|---|
+| a landing off the cold path | commits, and runs no probe |
+| a landing on it, and the probe passes | prints one line, then commits |
+| a landing on it, and a check fails | prints the probe's lines, unstages, and commits nothing |
+| a landing on it, and no `claude` in the tool survey | says so in one line, and commits nothing |
 
-1. It clones the commit this tree stands on into a fresh folder under the
-   temp folder.
+The gate runs after the tests pass and before the commit. It hands the staged
+delta to the probe as a patch, so the clone runs the commit about to land.
+`./RUNME.sh probe cold` runs the same probe over the commit the tree stands on.
+
+The probe runs one cold box from start to end:
+
+1. It clones the commit this tree stands on into a fresh temp folder.
+   It applies the delta the commit verb hands it.
 2. It runs `src/scripts/install.sh` under the skip list the setup names, so
    the plugin manifest lands.
 3. It writes the clone's pointer at a port of its own, so a desk server keeps
@@ -751,7 +764,7 @@ and the stream:
 | canary | the first text opens on the sentence, and no later text repeats it |
 
 The canary check also fails on a `HEARD.again` row, and on a `gate` row asking
-for the canary after the payment. The verb prints one line a check, and exits
+for the canary after the payment. The probe prints one line a check, and exits
 `0` where every check passes.
 
 ## Without the verb
