@@ -29,6 +29,11 @@ const PULL = ["ticket", "pull"];
 const TOOL = "--tool";
 const ENABLED = "judge.enabled";
 const MODEL = "judge.model";
+const REFUSALS = "judge.refusalsBeforePass";
+// The quote call names a model, and classify's default is the small one. [[spec/tickets/prose-verbs-land-first-try]]
+const QUOTE_MODEL = "haiku";
+// The refusals each leaf meets, by ticket and step, so a hand-back past the count goes through. [[spec/tickets/prose-verbs-land-first-try]]
+const refusals = new Map();
 const RUNNING = 600000;
 const JUDGE = "--judge";
 const BACKGROUND =
@@ -151,18 +156,47 @@ async function judged($, e) {
   const material = parsed(ran.stdout);
   if (!material?.rules?.length || !String(material.evidence ?? "").trim()) return "";
 
+  const model = await settings.ask(MODEL);
   let said;
   try {
     said = await $.model.classify(
       judgeAsk(material.evidence, material.rules),
       judgeLabels(material.rules),
-      { model: await settings.ask(MODEL) },
+      { model },
     );
   } catch {
     return "";
   }
+  const key = `${material.ticket} ${material.step}`;
   const broke = ruleBroken(said, material.rules);
-  return broke ? judgeRefusal(`at ${material.step}, ${broke}`) : "";
+  if (!broke) {
+    refusals.delete(key);
+    return "";
+  }
+  // Past the count the hand-back goes through, and the count starts over. [[spec/tickets/prose-verbs-land-first-try]]
+  const most = Number(await settings.ask(REFUSALS)) || 0;
+  const count = (refusals.get(key) ?? 0) + 1;
+  if (most && count > most) {
+    refusals.delete(key);
+    return "";
+  }
+  refusals.set(key, count);
+  const line = await quoted($, material, said, model || QUOTE_MODEL);
+  return judgeRefusal(`at ${material.step}, ${broke}`, line);
+}
+
+// The model names the line, and the line stands where the evidence holds it word for word. [[spec/tickets/prose-verbs-land-first-try]]
+async function quoted($, material, label, model) {
+  try {
+    const said = await $.model.complete({
+      model,
+      prompt: judgeAsk(material.evidence, material.rules, label),
+    });
+    const line = said?.isAnswered ? String(said.text ?? "").trim() : "";
+    return line && String(material.evidence).includes(line) ? line : "";
+  } catch {
+    return "";
+  }
 }
 
 function parsed(text) {

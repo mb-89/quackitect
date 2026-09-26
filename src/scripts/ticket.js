@@ -104,12 +104,14 @@ function note(it, name, argv) {
     );
     return 2;
   }
-  if (overLong(name, it.words)) {
-    console.error(`A ticket name holds at most ${it.words} words, and ${name} holds more.`);
-    return 2;
-  }
+  // A note lands on its first call, so a name past the cap cuts to its first words and says so. [[spec/tickets/prose-verbs-land-first-try]]
+  const named = cutTo(name, it.words);
+  if (named !== name)
+    console.log(
+      `${name} holds more than ${it.words} words, so the note stands as ${named}.`,
+    );
 
-  const path = `${NOTES}/${name}.md`;
+  const path = `${NOTES}/${named}.md`;
   const at = it.join(it.root, ...path.split("/"));
   if (it.disk.exists(at)) {
     console.error(`${path} stands already. Name a note nothing holds yet.`);
@@ -143,7 +145,17 @@ function note(it, name, argv) {
         ? `${path} stands, and it waits for a person to decide it.`
         : `${path} stands, and it waits for a retro to decide it.`,
   );
-  return said(it, NOTE, line, { ticket: name });
+  return said(it, NOTE, line, { ticket: named });
+}
+
+// The first words of a name, as many as the cap holds, joined by a hyphen. [[spec/tickets/prose-verbs-land-first-try]]
+function cutTo(name, most) {
+  if (!overLong(name, most)) return name;
+  return name
+    .split(/[-_.]+/)
+    .filter(Boolean)
+    .slice(0, most)
+    .join("-");
 }
 
 // A ticket minted off a route, the hand's line as its Ask. The Ask reads through the lint's road before any write, so a refusal writes nothing. [[spec/design_output/pull#a-draft-opens]]

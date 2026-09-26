@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7a55188b9103 · claude-code-remote
+    hash_before: 1bac6ae2df4cf35fcd69062c6c6adc1455bdec93
+    hash_after: 1bac6ae2df4cf35fcd69062c6c6adc1455bdec93
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -231,11 +239,19 @@ The three cases fail on their own assertion. The ask names no `word for word` li
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/pull.js .claude/skills/level0/hooks/pull-tool.js src/scripts/ticket.js spec/config/level0.json spec/config/level0.schema.json test/level0/level1.test.js test/level0/ticket-verb.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the ask names, and `spec/config/level0.schema.json` beside the config, because the schema reads every key the config holds
+- the hook reaches the disk, the process and both model calls, and each case hands a fake for each
+- each new function carries a comment linking this ticket
+- the count stands in `spec/config/level0.json` alone, and the hook reads it by its key
+- both review rows stand fixed: the cases turn the judge on, and the quote rides `$.model.complete`
 
 ## tests-green
 

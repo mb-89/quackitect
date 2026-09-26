@@ -458,7 +458,10 @@ test("the judge asks for the line that breaks the rule, and the refusal quotes i
   const ask = judgeAsk("one\ntwo", RULES, "voice-3");
   assert.match(ask, /voice-3: Put the bottom line first\./);
   assert.match(ask, /word for word/);
-  assert.match(judgeRefusal("at design/draft, voice-3", "two"), /\n  the line: two\n/);
+  assert.match(
+    judgeRefusal("at design/draft, voice-3", "two"),
+    /\n {2}the line: two\n/,
+  );
 
   const on = { judge: { enabled: true } };
   const quoted = await judgeHook(on, {
@@ -466,7 +469,7 @@ test("the judge asks for the line that breaks the rule, and the refusal quotes i
     label: "voice-3",
     quote: "two",
   });
-  assert.match(await quoted(), /\n  the line: two\n/);
+  assert.match(await quoted(), /\n {2}the line: two\n/);
   const loose = await judgeHook(on, {
     ticket: "a-loose",
     label: "voice-3",
