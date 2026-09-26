@@ -241,10 +241,22 @@ it out. For details, see [[spec/design_output/work#the-merge-frees-the-tickets]]
 
 # A person step leaves
 
-A step whose `by` reads `person` stops no cloud box, which answers it and moves
-on. A desk hands one out instead: `branch unblock <ticket> <successor>` takes
-the ticket standing at that step and hands its rest to a ticket outside the
-group:
+A step whose `by` reads `person` names who answers it by the box the pull runs
+on:
+
+| the box | who answers the step |
+|---|---|
+| a cloud box | the box itself, and it moves on. [[spec/guidance/cloud]] |
+| a desk, under the owner's word | the hand `--owner-says` sends in, and the record names both. [[spec/design_output/pull#the-hand-rule]] |
+| a desk, under a person's own hand | that person, through their own pull |
+| an agent on a desk, with no word | nobody: the pull answers `wait` and names the step |
+
+A desk takes no leaf of a work branch, so a person step there waits for the
+cloud box. [[spec/design_output/work#a-desk-works-on-trunk]]
+
+A desk hands a question out through `branch unblock <ticket> <successor>`. The
+verb takes the ticket standing at that step and hands its rest to a ticket
+outside the group:
 
 | what it reads | what it writes |
 |---|---|
@@ -252,8 +264,8 @@ group:
 | on `main`, the group the ticket's own `group` field names | the same close, since a desk works on `main` |
 | the successor stands open and names no group | the question that step asks, under the successor's `Discussion`, beside the ticket it comes from |
 
-The pull offers this hand-out on a ticket naming a group alone. A ticket in no
-group holds no branch up, so it waits for its person where it stands.
+A ticket in no group holds no branch up, so it waits for its person where it
+stands.
 
 A question rides the frontmatter on one line, so it carries its own lines as
 `\n`. The unblock writes them back under `Discussion`:

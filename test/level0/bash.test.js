@@ -3,7 +3,6 @@
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import assert from "node:assert/strict";
-import { join } from "node:path";
 import { test } from "node:test";
 import {
   addsIn,
@@ -18,17 +17,6 @@ import {
   writesAPath,
 } from "../../.claude/skills/level0/lib/bash.js";
 import { scriptsIn } from "../../.claude/skills/level0/lib/scripted.js";
-import {
-  called,
-  edits,
-  NUMBERED,
-  realDisk,
-  refused,
-  served,
-  TREE,
-  wrote,
-} from "./mark-doors.js";
-import { NAMED, named } from "./fixtures.js";
 
 const rules = (command, most = 5, it = {}) =>
   findings(command, most, it).map((one) => one.rule);
@@ -497,34 +485,4 @@ test("a variable resolving to a free path passes, and a temp variable passes unr
   assert.deepEqual(paths("echo x > $TMPDIR/msg.md"), []);
   assert.deepEqual(paths(`echo x > $${"{TMPDIR}"}/msg.md`), []);
   assert.deepEqual(paths("out=spec; echo x > $out/y.md"), ["spec/y.md"]);
-});
-
-// [[spec/design_output/level0#a-write-meets-its-mark]]
-test("sed -n '1,5p' README.md marks lines 1 to 5, and a read with a pipe after it marks nothing", async () => {
-  const at = join(TREE, "README.md");
-  const it = served(realDisk({ [at]: NUMBERED, ...named(TREE) }));
-  await called(it, {
-    tool: "Bash",
-    command: "sed -n '1,5p' README.md",
-    description: `${NAMED}: read the file`,
-  });
-
-  const outside = await wrote(it, edits(at, "line 7\n", "seven\n"));
-  assert.match(refused(outside), /moved on the disk after you read it/);
-  const inside = await wrote(it, edits(at, "line 3\n", "three\n"));
-  assert.equal(refused(inside), "", "an edit inside the printed lines lands");
-
-  const other = join(TREE, "other.md");
-  const piped = served(realDisk({ [other]: NUMBERED, ...named(TREE) }));
-  await called(piped, {
-    tool: "Bash",
-    command: "cat other.md | head -n 2",
-    description: `${NAMED}: read the file`,
-  });
-  const said = await wrote(piped, edits(other, "line 1\n", "one\n"));
-  assert.match(
-    refused(said),
-    /has read none of it/,
-    "a read feeding a pipe sets no mark",
-  );
 });

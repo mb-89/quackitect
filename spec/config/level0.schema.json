@@ -80,6 +80,22 @@
         }
       }
     },
+    "judge": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "model": {
+          "type": "string",
+          "help": "The model the judge asks, where the judge runs."
+        }
+      }
+    },
     "context": {
       "type": "object",
       "properties": {

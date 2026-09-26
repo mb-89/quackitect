@@ -41,4 +41,25 @@ function serverAsk(root, platform) {
   };
 }
 
-module.exports = { BIN, ID, NAME, WATCHES, binaryOf, serverAsk };
+// The pause before each start again, so a server falling at its start loops once a second. [[spec/design_output/lsp#the-client-starts-it-again]]
+const PAUSE = 1000;
+
+// The client the editor starts se-lsp through. The client's own handler stops at a cap of starts again, and a rebuild or a stale binary ends the server as often as the source moves. So every close starts it again. [[spec/design_output/lsp#the-client-starts-it-again]]
+function clientOf(node, ask, wait = sleep) {
+  return new node.LanguageClient(ask.id, ask.name, ask.server, {
+    ...ask.client,
+    errorHandler: {
+      error: () => ({ action: node.ErrorAction.Continue }),
+      closed: async () => {
+        await wait(PAUSE);
+        return { action: node.CloseAction.Restart };
+      },
+    },
+  });
+}
+
+function sleep(ms) {
+  return new Promise((done) => setTimeout(done, ms));
+}
+
+module.exports = { BIN, ID, NAME, WATCHES, binaryOf, clientOf, serverAsk };

@@ -301,6 +301,11 @@ exits clean. `RESPAWN_WAIT` in `src/bridge/server.js` holds the window, and
 `SERVE` in `lib/log.js` names the file. `respawned` takes the exit as an
 argument, so a case drives the fall through the fake process door.
 
+`restarts` in `src/bridge/server.js` ends the listen and starts the child on
+the next turn of the loop. Node's own close callback waits on every open
+connection, and a running wait holds one for minutes. So the restart waits on
+none, and the old process ends them as it exits.
+
 ## The server holds off sleep
 
 A box asleep answers no hook, so a session under agent control dies with the
@@ -344,6 +349,15 @@ later. So the bridgehead says it where a person stands.
 A post nobody takes reads the port pointer first, because a server restarting
 on another port writes it again. Where the pointer names another port, the
 bridgehead posts there once more before the server reads as down.
+
+The host's fetch cuts a post at its own timeout, and a wait runs past it. So a
+`mcp__level0__wait` post falling with no status after `CUT` or more in
+`.claude/skills/level0/hooks/level0.js` asks `/health` once.
+
+| the health | the wait |
+|---|---|
+| answers | goes again as the same post, and its answer stands in place of the `no server answers` line |
+| answers nothing | reads as down, as above |
 
 The route both name is the one the bridgehead posts to, which `url()` answers.
 The line names it, what the wire says, and the commands a person runs:
@@ -1039,77 +1053,21 @@ the panel stands clear, and the work goes on.
 
 ## A write meets its mark
 
-Separate hands on one tree drop each other's work. One reads a file, the other
-writes it, and the first write lands over text the other leaves. So the door
-keeps a mark against each path, and a write meets it.
+No door reads a mark, so the write door keeps none. The Read door, the patch
+lane, the undo and the shell reads set no mark either. For the reason, see
+[[spec/tickets/every-road-has-a-caller]].
 
-| when | what the door does |
-|---|---|
-| content reaches the agent, by a read or by its own write landing | it hashes that text and keeps it against the path |
-| the agent writes that path | it hashes what the disk holds now |
-| the two agree | the write lands |
-| the two differ | it refuses, and asks for a read |
-| the disk holds the path nowhere | the write lands, because a new file agrees with anything |
-
-The reading that sets the mark is the whole of the mechanism. The door reads the file
-for itself on every edit, so a mark off that read compares against itself. The
-mark comes off the read reaching the agent.
-
-The hand carries nothing. `lib/marks.js` holds the hash, the spans and the
-refusal. The box holds the marks against the tree it serves, and the runtime
-file keeps them. This door writes a refusal
-of its own, because the voice refusal opens on the prose rules and says the
-wrong thing here. It names the file, says which case stands, and
-asks for a read.
-
-The door answers ahead of the write, so a write the engine drops leaves the
-mark ahead of the disk. The next write refuses and asks for a read, which costs
-a read and keeps the tree whole. The batch lane reads every file inside the
-call that writes it. That read is the agent's own, so the lane takes no token.
-A batch call writing nothing puts back the marks it meets:
-
-- a preview
-- a refusal at the door
-- a first file refusing the write
+`lib/marks.js` and `MARKS` in `lib/runs.js` stand under `.claude`, where the
+hand working that ticket writes nothing. Their own cases in
+`test/level0/apply.test.js` read them alone, and they leave together.
 
 ### The marks survive a restart
 
-The box loads the marks off `.se/.runtime/marks.json` on the first ask, and
-`runs.js` names the file. `decide` runs `marksKept` once a call, after the door
-answers. So a sweep writing many marks writes the file once.
-
-`marksKept` writes the file only where a mark moves. A read handing back the
-text the mark holds writes nothing.
+`MARKS` names `.se/.runtime/marks.json`, and no box writes it.
 
 ### The mark holds line spans
 
-A mark holds the whole hash and a list of line spans, each with its own hash.
-
-| the read | what it marks |
-|---|---|
-| a whole Read | the whole hash, and it drops the spans |
-| a Read with `offset` or `limit` | a span over the lines it hands back, beside the whole hash |
-| a Write landing | the whole hash |
-
-A write passes where the whole hash agrees with the disk. An Edit passes too
-where the lines it changes lie inside a span that still agrees. The lines it
-changes come off the common head and tail of the disk text and the new text.
-A Write replacing the file asks for the whole hash.
-
-### A lone shell read marks
-
-A shell read standing alone hands the agent the lines it prints, so it marks
-them.
-
-| the command | what it marks |
-|---|---|
-| `cat <file>` | the whole hash |
-| `head -n <n> <file>` | lines 1 to n |
-| `tail -n <n> <file>` | the last n lines |
-| `sed -n 'a,bp' <file>` | lines a to b |
-
-A pipe, a chain or a redirection sets no mark. `cat` at the head of a pipe
-hands the agent a part of the file, and the door cannot tell which part.
+`spanned` keeps a span beside the whole hash, and no read sets one.
 
 ## The door reaches a helper
 
@@ -1984,3 +1942,8 @@ the span counts from the last change the wait sees. The process door's
 `wait.most` in `spec/config/level0.json` caps the wait in seconds. The wait
 looks at its signals once a second, and the clock decides the rest, so a case
 drives it on the fake clock.
+
+The bridgehead stamps a wait with `since`, the moment of its first post, and
+posts it again under the same stamp where the host cuts it. The box keeps the
+watch a stamp begins, so a post again carries on its signals, and the cap
+counts from `since`. The older loop ends once a later post takes the watch.

@@ -7,6 +7,8 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 // The whole module, so a name the reader answers nowhere yet fails an assertion. [[spec/tickets/a-claim-meets-the-view]]
+import { checkNote, schemasIn } from "../../.claude/skills/level0/lib/schema.js";
+import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import * as findings from "../../src/bridge/findings.js";
 import { disk } from "../../src/doors/disk.js";
 // The whole module, so a name the command line answers nowhere yet fails an assertion. [[spec/tickets/a-claim-meets-the-view]]
@@ -84,6 +86,30 @@ test("a closed ticket's row leaves the lint, and an open one's stays", () => {
     kept.map((one) => one.file),
     ["spec/tickets/open.md"],
   );
+});
+
+// The schema drops returned, and the closed tickets carrying it stand as history. [[spec/tickets/every-road-has-a-caller]]
+test("a closed ticket carrying when returned meets the schema, and its rows leave the check", () => {
+  const tree = treeOf({ root, disk: files });
+  const schemas = schemasIn(tree);
+  const ticket = schemas.get("ticket");
+  const carrying = tree
+    .names("spec/tickets", ".md")
+    .map((name) => `spec/tickets/${name}`)
+    .filter((path) => /^\s+when: returned$/m.test(tree.read(path)));
+  assert.ok(carrying.length > 0, "the tree holds closed tickets carrying when returned");
+  const rows = carrying.flatMap((path) =>
+    checkNote(tree.read(path), ticket, path, schemas),
+  );
+  assert.ok(
+    rows.some((one) => /when reads returned/.test(one.message)),
+    "the schema allows returned nowhere",
+  );
+  const at = { root, join, disk: files };
+  for (const path of carrying) {
+    assert.match(tree.read(path), /^state: closed$/m, `${path} stands closed`);
+  }
+  assert.deepEqual(findings.pastHistory(at, rows), []);
 });
 
 // [[spec/design_output/lsp#a-port-serves-the-list]]

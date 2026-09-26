@@ -340,3 +340,49 @@ test("a module loaded again marks its posts fresh until the tools come back", as
   assert.deepEqual(registered, [{ name: "plan" }], "the answer registers them");
   assert.equal(bodies[1].fresh, undefined, "and the next post asks no more");
 });
+
+// A wire where the host cuts the first post of a wait at its own timeout, and /health answers while the server stands. [[spec/tickets/every-server-stands-and-answers]]
+function cutting(stands) {
+  const posts = [];
+  const fetch = async (url, init) => {
+    if (url.endsWith("/health")) {
+      if (stands) return { ok: true, status: 200, text: "{}" };
+      throw new Error("Unable to connect");
+    }
+    posts.push(JSON.parse(init.body));
+    if (posts.length === 1 || !stands) throw new Error("The operation timed out.");
+    const line = "The helper a1 reports.";
+    return { ok: true, status: 200, text: JSON.stringify({ result: { result: line } }) };
+  };
+  return { posts, fetch };
+}
+
+// [[spec/tickets/every-server-stands-and-answers]]
+test("a wait the host cuts answers its signal on a live server, and the line on a dead one", async () => {
+  const hooks = {};
+  level0(
+    (event, fn) => {
+      hooks[event] = fn;
+    },
+    { cut: 0 },
+  );
+  const handed = Object.assign(async (e) => ({ handed: e }), { event: "tool.call" });
+  const call = { tool: "mcp__level0__wait", agent: "a1" };
+
+  const live = cutting(true);
+  const $ = { ...hand(fakeDisk(), fakeGit({}, STUB)), http: { fetch: live.fetch } };
+  const said = await hooks["*"]($, call, handed);
+
+  assert.equal(said?.result, "The helper a1 reports.", "the signal takes the line's place");
+  assert.equal(live.posts.length, 2, "the cut post goes again");
+  assert.ok(live.posts[0].e.since > 0, "the post carries the wait's since");
+  assert.equal(live.posts[1].e.since, live.posts[0].e.since, "and the post again the same");
+  assert.deepEqual($.logged, [], "a cut on a live server tells nobody it falls");
+
+  const dead = cutting(false);
+  const gone = { ...hand(fakeDisk(), fakeGit({}, STUB)), http: { fetch: dead.fetch } };
+  const line = await hooks["*"](gone, call, handed);
+
+  assert.match(String(line?.result ?? ""), /no server answers at .*mcp__level0__wait/);
+  assert.equal(dead.posts.length, 1, "a dead server takes no post again");
+});

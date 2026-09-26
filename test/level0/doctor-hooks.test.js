@@ -5,7 +5,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeProc } from "../../src/doors/fake/proc.js";
 import { hookRows, hooksNamed } from "../../src/scripts/cli-check.js";
+import { lspProbe } from "../../src/scripts/lsp-probe.js";
 
 const ROOT = "/tree";
 const HOME = "/home/nobody";
@@ -174,4 +176,70 @@ test("the rows come back in the order the reader names them", async () => {
 
 test("a box naming no hook reads no row", async () => {
   assert.deepEqual(await hookRows([], wire().get), []);
+});
+
+const LSP = "/tree/.se/.runtime/bin/se-lsp";
+
+// The frames a language server reads off its input, in the order the probe writes them. [[spec/tickets/every-server-stands-and-answers]]
+function framesIn(input) {
+  const out = [];
+  let rest = String(input ?? "");
+  for (;;) {
+    const head = /^Content-Length: (\d+)\r\n\r\n/.exec(rest);
+    if (!head) return out;
+    const length = Number(head[1]);
+    out.push(JSON.parse(rest.slice(head[0].length, head[0].length + length)));
+    rest = rest.slice(head[0].length + length);
+  }
+}
+
+const framed = (said) => {
+  const body = JSON.stringify({ jsonrpc: "2.0", ...said });
+  return `Content-Length: ${Buffer.byteLength(body)}\r\n\r\n${body}`;
+};
+
+// A server answering each frame the way se-lsp does: the initialize and the shutdown by id, and a note it opens with its diagnostics. [[spec/tickets/every-server-stands-and-answers]]
+function answering(codes) {
+  const answer = (one) => {
+    if (one.method === "initialize" || one.method === "shutdown")
+      return framed({ id: one.id, result: {} });
+    if (one.method !== "textDocument/didOpen") return "";
+    const diagnostics = codes.map((code) => ({ code, message: `${code} fires` }));
+    return framed({
+      method: "textDocument/publishDiagnostics",
+      params: { uri: one.params.textDocument.uri, diagnostics },
+    });
+  };
+  return fakeProc({
+    [`${LSP} lsp`]: (_argv, init) => ({
+      exitCode: 0,
+      stdout: framesIn(init.stdin).map(answer).join(""),
+    }),
+  });
+}
+
+// [[spec/tickets/every-server-stands-and-answers]]
+test("a language server that answers draws a row naming each diagnostic it sends", () => {
+  const proc = answering(["Schema.Kind", "Voice.Tense"]);
+  const row = lspProbe(proc, LSP, ROOT);
+
+  assert.match(row, /^answers, and draws Schema\.Kind, Voice\.Tense on the probe note/);
+  const frames = framesIn(proc.ran[0].init.stdin).map((one) => one.method);
+  assert.deepEqual(frames, ["initialize", "textDocument/didOpen", "shutdown", "exit"]);
+  assert.equal(proc.ran[0].init.cwd, ROOT, "the server reads the tree it stands in");
+});
+
+// [[spec/tickets/every-server-stands-and-answers]]
+test("a language server that exits draws a warn row naming the exit", () => {
+  const proc = fakeProc({
+    [`${LSP} lsp`]: { exitCode: 2, stderr: "panic: the checker reads no tree\ngoroutine 1\n" },
+  });
+  const row = lspProbe(proc, LSP, ROOT);
+
+  assert.match(row, /^warn: se-lsp lsp exits with 2 before it answers/);
+  assert.match(row, /panic: the checker reads no tree/);
+});
+
+test("a language server standing nowhere draws the install's line", () => {
+  assert.equal(lspProbe(fakeProc({}), "", ROOT), "missing, run ./RUNME.sh");
 });

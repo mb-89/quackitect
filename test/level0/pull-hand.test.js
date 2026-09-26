@@ -10,6 +10,7 @@ import { todoOf } from "../../src/engine/group.js";
 import {
   emptyGroup,
   handOut,
+  holdsHere,
   takeable,
   ticketsHere,
 } from "../../src/scripts/pull-hand.js";
@@ -116,4 +117,17 @@ One piece of it.
   const { said } = heard(() => handOut(it, {}));
   assert.match(said, /a-loose-question waits for a person at design\/person-1/);
   assert.ok(!said.includes("branch unblock"), said);
+});
+
+// A condition reads the box, and the record names none. [[spec/tickets/every-road-has-a-caller]]
+test("the pull reads cloud and desk, and returned names no condition it reads", () => {
+  assert.deepEqual(holdsHere({ cloud: true }, "cloud"), {
+    holds: true,
+    why: "the box runs off the cloud",
+  });
+  assert.equal(holdsHere({ cloud: true }, "desk").holds, false);
+  assert.deepEqual(holdsHere({ cloud: true }, "returned"), {
+    holds: false,
+    why: "returned names no condition the pull reads",
+  });
 });

@@ -58,6 +58,7 @@ import { formatFaults, goEnvOf, goModulesIn } from "./cli-go.js";
 import { HOOKS } from "./precommit.js";
 import { whereIs, writeSurvey } from "../engine/tools.js";
 import { viewerOf } from "./tui-build.js";
+import { lspProbe } from "./lsp-probe.js";
 
 export function treeHere() {
   return treeOf({
@@ -543,6 +544,7 @@ export async function doctor() {
   const rows = [
     ...WANTED.map((one) => [one.name, standsAt(found[one.name])]),
     ["biome lsp-proxy", files.exists(biome) ? lspProxy() : "missing, run ./RUNME.sh"],
+    ["se-lsp lsp", lspProbe(outside, found["se-lsp"]?.path ?? "", root)],
     [
       "editor",
       files.exists(join(root, EDITOR_SETTINGS))

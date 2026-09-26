@@ -184,6 +184,17 @@ test("a here case asking find for a newer source names the binary that rebuilds"
   assert.deepEqual(rebuilt(said), ["lsp"]);
 });
 
+// A binary keys on a hash of its source and of the folders its go.mod replaces. [[spec/tickets/every-server-stands-and-answers]]
+test("a here case asking go-source.js fresh names the binary that rebuilds", () => {
+  const said = [
+    "index_here() {",
+    '  [ -x "$bin/se-index" ] && (cd "$root" && node src/scripts/go-source.js fresh se-index)',
+    "}",
+  ].join("\n");
+
+  assert.deepEqual(rebuilt(said), ["index"]);
+});
+
 test("every wanted tool says when to reach for it", () => {
   for (const one of WANTED) {
     assert.ok(String(one.for ?? "").trim(), `${one.name} carries no for`);

@@ -12,9 +12,20 @@ const RED = {
   sh: { exitCode: 1, stdout: "assertion, 1 test(s) fail on their own assertion\n" },
 };
 
+const REFLECT = `      - name: reflect
+        does: names the class of error
+        when: view
+        to: retro
+        evidence:
+          - name: class
+            form: text
+            says: the class
+`;
+
 function passedRed(view) {
   const route = CHILD("open", "implement/tests-red")
-    .replace("when: returned", "when: view")
+    .replace("      - name: change\n", `${REFLECT}      - name: change\n`)
+    .replace("## change\n", "## reflect\n\n### class\n\n## change\n")
     .replace("One piece of it.", `One piece of it.\n\nview: ${view}`);
   const ready = filled(
     route,
