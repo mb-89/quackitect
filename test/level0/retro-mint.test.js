@@ -7,7 +7,8 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { askOf, promotionName, withAsk } from "../../src/engine/retro/mint.js";
+import { faultsOf } from "../../src/engine/retro/classes.js";
+import { askOf, mintFaults, promotionName, withAsk } from "../../src/engine/retro/mint.js";
 import { retro } from "../../src/scripts/retro.js";
 
 const ROOT = "/tree";
@@ -162,4 +163,17 @@ test("a promotion carrying no ticket mints nothing, and the verb names it by its
 test("a promotion's name reads its what, and its place where the what stands empty", () => {
   assert.equal(promotionName({ what: " the land rule " }, 0), 'promotion "the land rule"');
   assert.equal(promotionName({}, 2), "promotion 3");
+});
+
+// [[spec/tickets/a-promotion-ticket-reads-once]]
+test("a promotion's ticket stands checked by the mint alone, and classes read its what, from and to", () => {
+  const record = {
+    classes: [],
+    dispositions: {},
+    promotions: [{ what: "the land rule", from: "memory", to: "spec/guidance/working" }],
+    limits: [],
+    checklist: [],
+  };
+  assert.deepEqual(faultsOf(record, []), []);
+  assert.equal(mintFaults(record).length, 4);
 });

@@ -10,9 +10,10 @@ rationale: [[spec/rationales/verifying]]
 2. Mark a class whose fix stands already `fixed:` and name where it stands. A fixed class standing open sends a hand to build it again. *
 3. Mark a class the tree moves past `past:` and say what moves it. A past class standing open asks for a fix to a thing that stands no more. *
 4. Leave the rest `open`, and write each one a ticket name, a gain, a breaks and a done_when. An open class missing one of the four mints a ticket no hand can close. *
-5. Name the check holding a fix in place where the rule for it stands already. A fix with no check drifts back the first time nobody looks. *
-6. Run `./RUNME.sh retro mint <retro>`, which mints one ticket a class standing open.
-7. Run `./RUNME.sh retro matrix <retro>` again, so the report carries each status and ticket.
+5. Write every promotion no ticket names yet a ticket name, a gain, a breaks and a done_when. `retro classes` reads only its `what`, `from` and `to`, so a promotion missing one of the four stops `retro mint` alone. *
+6. Name the check holding a fix in place where the rule for it stands already. A fix with no check drifts back the first time nobody looks. *
+7. Run `./RUNME.sh retro mint <retro>`, which mints one ticket a class standing open.
+8. Run `./RUNME.sh retro matrix <retro>` again, so the report carries each status and ticket.
 
 # Examples
 
