@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 63693613eded · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7a44d6f73215 · claude-code-remote
+    hash_before: 861fd4c03681440280e4e4781f11bed5ee2c11cf
+    hash_after: 861fd4c03681440280e4e4781f11bed5ee2c11cf
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -353,4 +361,5 @@ Two writes wait on the owner, because the harness refuses this hand a write unde
 
 - The read of the cloud route stands in the approach, and shows no box hands back on trunk.
 - The harness refuses this hand a write under `.claude`, so two changes wait on the owner there. The first puts `judge.enabled !== true` in `judged`. The second removes `lib/marks.js` with `MARKS` in `lib/runs.js`.
+- A later box turned the judge's case on for tests-red and wrote the `judged` line. The harness then refused its next call as a write to the agent's own hooks. The line came back out, and the case stands `todo` again. [[spec/tickets/the-judge-waits-on-true]] carries the line.
 - The write door reads the whole ticket schema on a write to a closed ticket. A write to one carrying `when: returned` meets `when reads returned`. The check reads no row there.

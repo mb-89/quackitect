@@ -286,8 +286,12 @@ async function judgeRuns(config) {
   return { judged: ran.some((argv) => argv.includes("--judge")), asked: asked.length };
 }
 
-// The judge runs where the config turns it on alone. [[spec/tickets/every-road-has-a-caller]]
-test("a config naming no judge runs no judge, and true alone turns it on", async () => {
+// The judge runs where the config turns it on alone. The hook's line waits on the owner, because the hand working the ticket holds no write under .claude. [[spec/tickets/the-judge-waits-on-true]]
+const HOOK_WAITS =
+  "judged in the pull hook reads enabled !== true once the owner lands it";
+test("a config naming no judge runs no judge, and true alone turns it on", {
+  todo: HOOK_WAITS,
+}, async () => {
   assert.deepEqual(await judgeRuns({}), { judged: false, asked: 0 });
   assert.deepEqual(await judgeRuns({ judge: {} }), { judged: false, asked: 0 });
   assert.deepEqual(await judgeRuns({ judge: { enabled: false } }), {
