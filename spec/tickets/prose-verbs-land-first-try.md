@@ -86,9 +86,9 @@ A hand fixes a refused draft on its next try, because the judge quotes the line 
 
 The judge answers a rule and no line, so a hand sends the same draft again blind. `ticket note` refuses a name past the cap and writes nothing, so one note takes several calls.
 
-- `judgeAsk` in `.claude/skills/level0/lib/pull.js` asks for the evidence line that breaks the rule, and `judgeRefusal` quotes it, which a case in `test/level0/level1.test.js` decides
-- `judged` in `.claude/skills/level0/hooks/pull-tool.js` lets a hand-back through past a count of refusals on one leaf, which a key under `judge` in `spec/config/level0.json` names and a case in `test/level0/level1.test.js` decides
-- `note` in `src/scripts/ticket.js` cuts a name past the cap, writes the note under the cut name and prints it, which a case in `test/level0/ticket-verb.test.js` decides
+- `judgeAsk` in `.claude/skills/level0/lib/pull.js` asks for the evidence line that breaks the rule, and `judgeRefusal` quotes it. A case in `test/level0/level1.test.js` decides it
+- `judged` in `.claude/skills/level0/hooks/pull-tool.js` lets a hand-back through past a count of refusals on one leaf. A key under `judge` in `spec/config/level0.json` names the count, and a case in `test/level0/level1.test.js` decides it
+- `note` in `src/scripts/ticket.js` cuts a name past the cap, writes the note under the cut name and prints it. A case in `test/level0/ticket-verb.test.js` decides it
 - `./RUNME.sh check` exits 0
 
 # design

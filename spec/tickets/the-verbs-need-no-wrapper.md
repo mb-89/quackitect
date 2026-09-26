@@ -82,7 +82,7 @@ step: design/draft
 
 # Ask
 
-A hand reads the failing case off the last lines of `check`, `test` and `branch merge`, finds each verb's usage in the session's tools block, and adds a line to a standing note in place of a twin.
+A hand reads the failing case off the last lines of `check`, `test` and `branch merge`. It finds each verb's usage in the session's tools block. It adds a line to a standing note in place of a twin.
 
 `check` ends on the whole run's output and takes no `--errors`, `test` counts failing tests and names none, and `branch merge` prints the check's last line alone. The tools block names tools and no verb, so a fresh session runs `--help` and calls Biome by path where `./RUNME.sh fix <file>` and `./RUNME.sh lint <file>` stand.
 

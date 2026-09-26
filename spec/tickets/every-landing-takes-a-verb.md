@@ -82,17 +82,17 @@ step: design/draft
 
 # Ask
 
-The agent reaches git through the engine alone: a hand lands, proves red, renames and takes in a cloud branch through a verb, and each commit carries the files of its own ticket alone.
+The agent reaches git through the engine alone. A hand lands, proves red, renames and takes in a cloud branch through a verb. Each commit carries the files of its own ticket alone.
 
-`landed` in `src/scripts/pull-landed.js` runs `git add -A`, so a pass commit carries a sibling hand's edits under the ticket's name. No verb proves a test red, the commit verb over a renamed ticket leaves the old file, `merge` in `src/scripts/work-merge.js` reads `work/<name>` alone, and the shell door passes `git mv` under `spec/tickets`.
+`landed` in `src/scripts/pull-landed.js` runs `git add -A`, so a pass commit carries a sibling hand's edits under the ticket's name. No verb proves a test red, and the commit verb over a renamed ticket leaves the old file. `merge` in `src/scripts/work-merge.js` reads `work/<name>` alone. The shell door passes `git mv` under `spec/tickets`.
 
-- `landed` in `src/scripts/pull-landed.js` stages the ticket and the paths its step's hand writes, and a case in `test/level0/landed.test.js` leaves a sibling's edit unstaged after a pass
+- `landed` in `src/scripts/pull-landed.js` stages the ticket and the paths its step's hand writes. A case in `test/level0/landed.test.js` leaves a sibling's edit unstaged after a pass
 - `spec/design_output/pull.md` under `The refused commit` names what a hand-back stages
-- `./RUNME.sh test --red <test> <source>...` sets the named sources aside, runs the test, puts them back, and answers red or refuses, with both answers in `test/level0/test-verb.test.js`
-- `./RUNME.sh commit` naming the new path after `./RUNME.sh rename` lands the old path's deletion in the same commit, with a case in `test/level0/commit-verb.test.js`
-- `./RUNME.sh branch merge` takes a `claude/` branch: it reads the branch against main, merges it or names it superseded, runs the check, and deletes it, with a case in `test/level0/work-group.test.js`
-- `findings` in `.claude/skills/level0/lib/bash.js` refuses `git mv` under `spec/tickets` and names `./RUNME.sh rename`, with a case in `test/level0/bash.test.js`
-- the Bash door refuses every git command that writes the repository, and names the verb standing for it, with a case in `test/level0/bash.test.js`
+- `./RUNME.sh test --red <test> <source>...` sets the named sources aside, runs the test and puts them back. It answers red or refuses, with a case for each answer in `test/level0/test-verb.test.js`
+- `./RUNME.sh commit` naming the new path after `./RUNME.sh rename` lands the old path's deletion in the same commit. A case in `test/level0/commit-verb.test.js` decides it
+- `./RUNME.sh branch merge` takes a `claude/` branch and reads it against main. It merges the branch or names main as carrying its work, then runs the check and deletes the branch. A case in `test/level0/work-group.test.js` decides it
+- `findings` in `.claude/skills/level0/lib/bash.js` refuses `git mv` under `spec/tickets`. It names `./RUNME.sh rename`, with a case in `test/level0/bash.test.js`
+- The Bash door refuses every git command that writes the repository, and names the verb standing for it. A case in `test/level0/bash.test.js` decides it
 - `./RUNME.sh check` exits 0
 
 # design

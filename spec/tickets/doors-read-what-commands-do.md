@@ -82,15 +82,15 @@ step: design/draft
 
 # Ask
 
-A read, a grep and a scratch write pass the shell door, a landing behind a pipe meets it, a pure move commits with no test, and the pull tool and the shell verb read one hand.
+A read, a grep and a scratch write pass the shell door, and a landing behind a pipe meets it. A pure move commits with no test, and the pull tool and the shell verb read one hand.
 
-`GIT_VERB` in `.claude/skills/level0/lib/trunk.js` matches `git push` or `git commit` anywhere in the text, so a read quoting either meets the commit verb refusal. `LandingFollowsItsGate` refuses a read before `;` and passes a pipe before `&&`, the harness scratchpad reads as a tree path, a pure move asks a test, and the pull tool runs the verb with no harness env.
+`GIT_VERB` in `.claude/skills/level0/lib/trunk.js` matches `git push` or `git commit` anywhere in the text, so a read quoting either meets the commit verb refusal. `LandingFollowsItsGate` refuses a read before `;` and passes a pipe before `&&`. The harness scratchpad reads as a tree path, and a pure move asks a test. The pull tool runs the verb with no harness env.
 
-- `touchesGit` in `.claude/skills/level0/lib/trunk.js` reads git as the command word of a segment, and a case in `test/level0/trunk.test.js` passes a grep whose quoted pattern names `git push` or `git commit`
-- `LandingFollowsItsGate` in `.claude/skills/level0/lib/bash.js` passes a read-only segment before `;` and refuses a pipe before `&&` ahead of a landing, with both cases in `test/level0/bash.test.js`
+- `touchesGit` in `.claude/skills/level0/lib/trunk.js` reads git as the command word of a segment. A case in `test/level0/trunk.test.js` passes a grep whose quoted pattern names `git push` or `git commit`
+- `LandingFollowsItsGate` in `.claude/skills/level0/lib/bash.js` passes a read-only segment before `;` and refuses a pipe before `&&` ahead of a landing. Both cases stand in `test/level0/bash.test.js`
 - `FREE` in `.claude/skills/level0/lib/bash.js` takes the harness scratchpad, and a case in `test/level0/bash.test.js` passes a redirect into it
 - `untestedIn` in `.claude/skills/level0/lib/tested.js` passes a delta whose lines move and change nothing, with a case in `test/level0/tested.test.js`
-- `.claude/skills/level0/hooks/pull-tool.js` runs the verb under the session's harness env, and a case in `test/level0/level1.test.js` reads the hand the tool's pull takes as the hand the shell verb reads
+- `.claude/skills/level0/hooks/pull-tool.js` runs the verb under the session's harness env. A case in `test/level0/level1.test.js` reads the hand the tool's pull takes as the hand the shell verb reads
 - `./RUNME.sh check` exits 0
 
 # design

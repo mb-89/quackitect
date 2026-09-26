@@ -82,7 +82,7 @@ step: design/draft
 
 # Ask
 
-The tests part of the check falls back, and each slow case proves its step over a fixture in place of the real tree, shell or bundler.
+The tests part of the check falls back. Each slow case proves its step over a fixture in place of the real tree, shell or bundler.
 
 `test/contract/vehicle.test.js` copies the whole method and runs `RUNME.sh vehicle` in a real shell, the slowest case in the battery's report. `test/contract/process.test.js` spawns Vale once a route, `test/contract/cli-verbs.test.js` spawns `cli.js test` where a fake proves the verb, and `test/contract/drawing-bundle.test.js` bundles the real drawing.
 
