@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-verbs-land-whole
 parent: doors-read-what-commands-do
+record:
+  - step: do
+    hand: box d1fe1ca62214 · claude-code-remote
+    hash_before: 1fb07f024c558dce954758604d35d08aa065bb53
+    hash_after: 1fb07f024c558dce954758604d35d08aa065bb53
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 37 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-verbs-need-no-wrapper.md:184:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ anchor the `FREE` scratchpad pattern to an absolute path, as `^/.*/claude-[^/]+/
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/bash.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ anchor the `FREE` scratchpad pattern to an absolute path, as `^/.*/claude-[^/]+/
 
 <!-- the form is text -->
 
+The scratchpad pattern in `FREE` in `lib/bash.js` opens at the root or a drive letter, so it reads an absolute path alone. A case in `test/level0/bash.test.js` passes three desk scratchpads and refuses a tree path of the same shape.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask, and landed with the implement step of `doors-read-what-commands-do`
+- no cleanup stands open
+- the shape stands in `FREE` alone
 
 # Discussion
 
