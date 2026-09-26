@@ -8,8 +8,10 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeGit } from "../../src/doors/fake/git.js";
 import { retro } from "../../src/scripts/retro.js";
 import { belongs, slugOf } from "../../src/scripts/retro-outside.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 
 const ROOT = "/tree";
 const HOME = "/home";
@@ -56,9 +58,63 @@ function doors(files = FILES, more = {}) {
     clock: fakeClock("2026-09-19T12:00:00.000Z"),
     home: HOME,
     temp: TEMP,
-    git: { run: () => ({ ok: true, out: "abc123" }) },
+    git: trunkGit(),
     ...more,
   };
+}
+
+// A trunk as git keeps it. A commit names each ticket it changes and the text it leaves, and a branch's own commit stands off the first-parent line. The fake answers `rev-parse`, `log` and `show` by their arguments. [[spec/tickets/the-retro-reads-cloud-retros]]
+function trunkGit(commits = []) {
+  return fakeGit({
+    git: (argv) => {
+      const args = argv.slice(1);
+      if (args[0] === "rev-parse") return { stdout: "abc123" };
+      if (args[0] === "log") return logOf(commits, args);
+      if (args[0] === "show") return shownAt(commits, args[1]);
+      return { exitCode: 1, stderr: `this fake answers no git ${args[0]}` };
+    },
+  });
+}
+
+// [[spec/tickets/the-retro-reads-cloud-retros]]
+function logOf(commits, args) {
+  if (!args.includes(TRUNK)) return { exitCode: 128, stderr: "a ref this fake lacks" };
+  const firstParent = args.includes("--first-parent");
+  const since = Date.parse(args.find((one) => one.startsWith("--since="))?.slice(8) ?? "");
+  const grep = args.includes("-G") ? new RegExp(args[args.indexOf("-G") + 1], "m") : null;
+  const format = args.find((one) => one.startsWith("--format="))?.slice(9) ?? "%H";
+  const under = args.slice(args.indexOf("--") + 1);
+  const rows = [];
+  for (const one of [...commits].sort((a, b) => Date.parse(b.at) - Date.parse(a.at))) {
+    if (firstParent && !one.trunk) continue;
+    if (Number.isFinite(since) && Date.parse(one.at) < since) continue;
+    const names = Object.keys(one.changes).filter(
+      (path) =>
+        under.some((top) => path.startsWith(`${top}/`)) &&
+        (!grep || changedLines(commits, one, path).some((row) => grep.test(row))),
+    );
+    if (!names.length) continue;
+    rows.push(format.replace("%H", one.sha).replace("%cI", one.at));
+    if (args.includes("--name-only")) rows.push("", ...names);
+  }
+  return { stdout: rows.join("\n") };
+}
+
+// The lines a commit adds or drops against the trunk commit before it. [[spec/tickets/the-retro-reads-cloud-retros]]
+function changedLines(commits, one, path) {
+  const before = commits
+    .filter((other) => other.trunk && other.changes[path] && Date.parse(other.at) < Date.parse(one.at))
+    .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))[0];
+  const was = new Set(String(before?.changes[path] ?? "").split("\n"));
+  const now = new Set(one.changes[path].split("\n"));
+  return [...[...now].filter((row) => !was.has(row)), ...[...was].filter((row) => !now.has(row))];
+}
+
+// [[spec/tickets/the-retro-reads-cloud-retros]]
+function shownAt(commits, said) {
+  const [sha, path] = String(said).split(":");
+  const text = commits.find((one) => one.sha === sha)?.changes[path];
+  return text === undefined ? { exitCode: 128, stderr: `${said} stands nowhere` } : { stdout: text };
 }
 
 // A retro opens on a battery green at this commit, with no warning standing. [[spec/guidance/retro/collect]]
@@ -491,4 +547,147 @@ test("a collect copies .se/scripts and leaves it in place, and a second pass cop
   assert.equal(it.disk.exists(at(".se/scripts/two.mjs")), true);
   assert.equal(it.disk.read(input("scripts/two.mjs")), "// a later script\n");
   assert.equal(it.disk.exists(input("scripts/one.2.mjs")), false, "an unchanged script copies once");
+});
+
+const LAST = ".se/.retro/retro-older/collected.json";
+const ticketText = (name, state, process, retroChapter = "") =>
+  [
+    "---",
+    "kind: [[ticket]]",
+    `state: ${state}`,
+    `process: [[spec/processes/${process}]]`,
+    "---",
+    "",
+    "# Ask",
+    "",
+    `The ask of ${name}.`,
+    "",
+    retroChapter,
+    "# Discussion",
+    "",
+    "<!-- what anybody adds, at any time, on this ticket -->",
+    "",
+    "a line past the retro",
+    "",
+  ].join("\n");
+const RETRO_CHAPTER = [
+  "# retro",
+  "",
+  "## write",
+  "",
+  "### badly",
+  "",
+  "<!-- the form is list -->",
+  "",
+  "- the sync meets a conflict, at 10:04, and the owner prompt turns it",
+  "",
+  "### thoughts",
+  "",
+  "The box reads the trunk guard late.",
+  "",
+].join("\n");
+const groupAt = (name, state = "closed", chapter = RETRO_CHAPTER) =>
+  ticketText(name, state, "group", chapter);
+const ticketPath = (name) => `spec/tickets/${name}.md`;
+
+// [[spec/tickets/the-retro-reads-cloud-retros]]
+test("collect gathers the retro chapter of every group closing in the window, with the close of the trunk commit landing it, once the branch leaves", () => {
+  const closed = groupAt("cloud-one");
+  const it = doors(
+    { ...FILES, [at(LAST)]: '{"at":"2026-09-12T00:00:00.000Z"}\n' },
+    {
+      git: trunkGit([
+        { sha: "open1", at: "2026-09-08T09:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-one")]: groupAt("cloud-one", "open", "") } },
+        { sha: "box1", at: "2026-09-11T09:00:00+00:00", trunk: false, changes: { [ticketPath("cloud-one")]: closed } },
+        { sha: "merge1", at: "2026-09-15T10:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-one")]: closed } },
+      ]),
+    },
+  );
+
+  const { code, said } = heard(() => retro(ROOT, ["collect", RETRO], it));
+
+  assert.equal(code, 0, said);
+  assert.equal(it.disk.exists(input("groups/cloud-one.md")), true, "the chapter lands in the input");
+  const chapter = it.disk.read(input("groups/cloud-one.md"));
+  assert.match(chapter, /^# retro$/m);
+  assert.match(chapter, /^### badly$/m);
+  assert.match(chapter, /the sync meets a conflict, at 10:04/);
+  assert.match(chapter, /The box reads the trunk guard late\./);
+  assert.doesNotMatch(chapter, /The ask of cloud-one/, "the ask stays out");
+  assert.doesNotMatch(chapter, /a line past the retro/, "the chapter after stays out");
+  assert.deepEqual(
+    JSON.parse(it.disk.read(input("groups/closed.json"))),
+    { "cloud-one": "2026-09-15T10:00:00.000Z" },
+    "the close is the trunk commit landing the group, past the box's own close",
+  );
+  assert.equal(
+    manifestOf(it).find((one) => one.path === "groups/cloud-one.md")?.from,
+    "groups",
+  );
+  assert.equal(
+    it.git.ran.some((one) => one.argv.join(" ").includes("work/")),
+    false,
+    "collect reads trunk alone, so a branch that leaves takes nothing with it",
+  );
+});
+
+// [[spec/tickets/the-retro-reads-cloud-retros]]
+test("a group closing before the window stays out, and a ticket closing that is no group stays out", () => {
+  const it = doors(
+    { ...FILES, [at(LAST)]: '{"at":"2026-09-12T00:00:00.000Z"}\n' },
+    {
+      git: trunkGit([
+        { sha: "merge0", at: "2026-09-10T10:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-old")]: groupAt("cloud-old") } },
+        { sha: "fix1", at: "2026-09-14T10:00:00+00:00", trunk: true, changes: { [ticketPath("a-fix")]: ticketText("a-fix", "closed", "standard", RETRO_CHAPTER) } },
+      ]),
+    },
+  );
+
+  const { code, said } = heard(() => retro(ROOT, ["collect", RETRO], it));
+
+  assert.equal(code, 0, said);
+  assert.equal(it.disk.exists(input("groups/cloud-old.md")), false, "a close before the window stays out");
+  assert.equal(it.disk.exists(input("groups/a-fix.md")), false, "a ticket that is no group stays out");
+  assert.equal(it.disk.exists(input("groups/closed.json")), false);
+});
+
+// [[spec/tickets/the-retro-reads-cloud-retros]]
+test("a group closing with no retro text writes nothing, and the print names it", () => {
+  const bare = "# retro\n\n## write\n\n### badly\n\n<!-- the form is list -->\n\n";
+  const it = doors(FILES, {
+    git: trunkGit([
+      { sha: "merge2", at: "2026-09-15T10:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-bare")]: groupAt("cloud-bare", "closed", bare) } },
+    ]),
+  });
+
+  const { code, said } = heard(() => retro(ROOT, ["collect", RETRO], it));
+
+  assert.equal(code, 0, said);
+  assert.equal(it.disk.exists(input("groups/cloud-bare.md")), false);
+  assert.match(said, /cloud-bare closes with no retro text/);
+});
+
+// [[spec/tickets/the-retro-reads-cloud-retros]]
+test("a second pass takes each group once, and the count prints the groups", () => {
+  const commits = [
+    { sha: "merge3", at: "2026-09-19T12:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-a")]: groupAt("cloud-a") } },
+  ];
+  const it = doors(FILES, { git: trunkGit(commits) });
+  const first = heard(() => retro(ROOT, ["collect", RETRO], it));
+  assert.equal(first.code, 0, first.said);
+  assert.match(first.said, /groups\s+2 file\(s\)/, "the chapter and the closes");
+  const was = it.disk.modified(input("groups/cloud-a.md"));
+
+  commits.push({ sha: "merge4", at: "2026-09-19T13:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-b")]: groupAt("cloud-b") } });
+  const again = heard(() => retro(ROOT, ["collect", RETRO, "--again"], it));
+
+  assert.equal(again.code, 0, again.said);
+  assert.equal(it.disk.modified(input("groups/cloud-a.md")), was, "a group the first pass takes stays as it is");
+  assert.equal(it.disk.exists(input("groups/cloud-a.2.md")), false);
+  assert.equal(it.disk.exists(input("groups/cloud-b.md")), true);
+  assert.deepEqual(JSON.parse(it.disk.read(input("groups/closed.json"))), {
+    "cloud-a": "2026-09-19T12:00:00.000Z",
+    "cloud-b": "2026-09-19T13:00:00.000Z",
+  });
+  assert.match(again.said, /groups\s+3 file\(s\)/);
 });

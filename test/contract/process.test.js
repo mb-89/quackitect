@@ -137,3 +137,37 @@ test("the audit checklist reads whole, and collect names .se/scripts beside the 
   const collect = routeOf("retro").steps.find((one) => one.name === "collect");
   assert.match(collect.evidence[0].says, /\.se\/scripts/);
 });
+
+// A box's transcript stays home, so the group's `write` step carries its account off it. [[spec/tickets/the-retro-reads-cloud-retros]]
+test("the group's write step asks the owner prompts and errors of the run off the transcript, with their times", () => {
+  const retroStep = routeOf("group").steps.find((one) => one.name === "retro");
+  const write = retroStep.steps.find((one) => one.name === "write");
+  const badly = write.evidence.find((one) => one.name === "badly");
+  assert.match(badly.says, /each error of the run/);
+  assert.match(badly.says, /each owner prompt/);
+  assert.match(badly.says, /with its time/);
+  assert.ok(
+    write.checklist.includes(
+      "the chapter carries the run's owner prompts and errors off the transcript, each with its time",
+    ),
+    "the checklist asks the prompts and the errors",
+  );
+  assert.ok(
+    write.checklist.includes(
+      "the chapter says the role, and carries no name, address or path of the box",
+    ),
+    "the checklist keeps the box's names off the chapter",
+  );
+});
+
+// [[spec/tickets/the-retro-reads-cloud-retros]]
+test("the reader rule hands each group chapter to the reader whose hours hold its close, as the one reach past its lines", () => {
+  const read = guidanceOf("read");
+  const rules = read.split("\n").filter((row) => /^\d+\. /.test(row));
+  const reach = rules.find((row) => row.includes("input/groups/closed.json"));
+  assert.ok(reach, "a rule reads the closes");
+  assert.match(reach, /`input\/groups\/<group>\.md`/);
+  assert.match(reach, /hours hold/);
+  const number = reach.split(".")[0];
+  assert.match(rules[0], new RegExp(`the one reach rule ${number} names`), "rule one names the reach");
+});

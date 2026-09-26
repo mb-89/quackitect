@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
@@ -97,6 +97,14 @@ record:
     hand: box b8ae1b45d463 · claude-code-remote · helper-4
     hash_before: 86aee6b0b70d99e4b2260b41ba8d139724e4b404
     hash_after: 86aee6b0b70d99e4b2260b41ba8d139724e4b404
+  - step: implement/tests-red
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 0ef134b9e64f715bdb95f9eec008db798389bd24
+    hash_after: 0ef134b9e64f715bdb95f9eec008db798389bd24
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -254,17 +262,34 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/retro-collect.test.js test/contract/process.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Five cases fail on their own assertion, and the rest stand green:
+
+- `collect` writes no `input/groups` file, so the gather, the no-text print and the second pass fail
+- the `write` step in `spec/processes/group.yaml` asks no owner prompt, so its contract case fails
+- `spec/guidance/retro/read.md` names no `input/groups/closed.json`, so the reader rule case fails
+- the case on a group before the window and a ticket that is no group passes now, as a guard
+- `trunkGit` answers `rev-parse`, `log` and `show` by their arguments, and every older case now runs on it
+- the surprise: the fake needs its own `-G` over the lines a commit adds or drops, else an edit reads as a close
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: the tests touch `retro-collect.test.js` and `process.test.js` alone
+- [x] every door the change reaches has a fake: `trunkGit` stands on `fakeGit`, and the disk is `fakeDisk`
+- [x] a comment names the approach the change implements: each new case and helper carries `[[spec/tickets/the-retro-reads-cloud-retros]]`
+- [x] every fact the change adds stands in one place, and a note points at the file instead of repeating it: the fake reads `TRUNK` off `trunk.js`
+- [x] every row the design review passes with stands fixed in the change: the `write` case sits in `test/contract`, the close reads off the first-parent merge, the reach case reads rule one, and the fake answers by arguments
 
 ## change
 
