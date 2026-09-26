@@ -220,17 +220,36 @@ pass with findings
 
 <!-- the form is command -->
 
+`./RUNME.sh test src/index/start_test.go src/q/catalog_test.go src/q/store_test.go`
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Every case in `src/q` fails on its own assertion, over stubs in `src/q/q.go` that answer zero values, so the tests compile.
+
+- `TestAPlainRegistrationStandsBesideAnAlt` passes on the stubs, and guards the check against refusing too much.
+- `TestABrokenCatalogRefusesTheStart` fails with the door standing on a catalog naming `t/n` twice.
+- `Serve` takes the catalog as its third argument, and `door_test.go` and `serves` pass one. This answers `serve-takes-a-catalog-seam`.
+- `Check` takes the provider keys as a map, which answers `check-reads-provider-keys` until a config topic stands.
+- `TestAFamilyAnswersEachKey` and `TestANameOfOtherThanLowercaseSegmentsRefuses` answer `catalog-holds-name-families`.
+- A plain `go test` on `src/index` fails on `no such module: fts5`, and the test verb adds the tag, per `src/scripts/cli-go.js`.
+
+One call is mine: `q.DerivedIn(c, ...)` takes the catalog first, and `q.Derived` wraps it over `q.Main`, because Go takes no type parameter on a method. So each test builds its own catalog, and the tests run side by side.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `src/q`, and `Serve` in `src/index` with its callers and start test, as the review names
+- `src/q` reaches no door, so it needs no fake
+- each file's header names the model note it implements
+- the tests point at the model note, and repeat no fact of it
+- the review's five children each map to a case above, and the migration row lands in the change step
 
 ## change
 

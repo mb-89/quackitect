@@ -8,11 +8,13 @@ import (
 	"strconv"
 	"testing"
 	"time"
+
+	"quackitect/src/q"
 )
 
 func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 	root := tree(t)
-	stop, listen, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	stop, listen, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,7 +49,7 @@ func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 
 func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +71,7 @@ func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 // [[spec/design_output/index#the-watcher-keeps-it-warm]]
 func TestAWriteUnderTheTreeReachesTheIndex(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -114,7 +116,7 @@ func TestADoorFromAnotherBuildStandsAside(t *testing.T) {
 // [[spec/design_output/index#the-index-fires-on-change]]
 func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -150,7 +152,7 @@ func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
 // [[spec/design_output/index#the-index-fires-on-change]]
 func TestAChangesCallFiresOnAPlanWriteWithinASecond(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}

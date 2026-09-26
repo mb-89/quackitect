@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"quackitect/src/engine/swap"
+	"quackitect/src/q"
 )
 
 const (
@@ -71,7 +72,7 @@ func serves(root string) int {
 		fmt.Fprintln(stderr, "the runtime folder did not stand:", err)
 		return 1
 	}
-	stop, _, err := Serve(root, filepath.Join(root, Runtime, "index.db"))
+	stop, _, err := Serve(root, filepath.Join(root, Runtime, "index.db"), q.Main)
 	if err != nil {
 		fmt.Fprintln(stderr, "the index door did not stand:", err)
 		return 1

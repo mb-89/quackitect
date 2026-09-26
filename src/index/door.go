@@ -18,6 +18,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	"quackitect/src/q"
 	"sync/atomic"
 	"syscall"
 	"time"
@@ -130,7 +132,7 @@ func trackedIn(root string) func(rel string) bool {
 	return func(rel string) bool { return held[rel] }
 }
 
-func Serve(root, at string) (func(), net.Listener, error) {
+func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 	db, err := Open(root, at)
 	if err != nil {
 		return nil, nil, err
