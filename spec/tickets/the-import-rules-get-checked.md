@@ -74,11 +74,16 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+step: design/review
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
 depends_on: [go-code-shares-one-module]
+record:
+  - step: design/draft
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: fb30c49323723d9767cf3fd2eb803f4b0048eb60
+    hash_after: fb30c49323723d9767cf3fd2eb803f4b0048eb60
 ---
 
 # Ask
@@ -103,11 +108,35 @@ The model stays whole only while a door special-cases no name. Without the check
 
 <!-- the form is text -->
 
+A package `src/imports` holds one `go/analysis` analyzer per rule. A Go test runs both over the tree, so the check runs them inside `go test ./...`, with no step of its own.
+
+| the analyzer | what it refuses |
+|---|---|
+| `nodoor` | an import of a package under `src/doors` from a package under `src/modules` |
+| `noname` | an import of a package under `src/modules` from a door, the index or a renderer |
+
+The renderers stand in one list in the package: `src/tui/frame` and `src/tui/tree`, per [[spec/design_output/migration]]. The index stands in `src/index`.
+
+| the part | what it holds |
+|---|---|
+| `imports.go` | the two analyzers and the list of the renderers |
+| `imports_test.go` | the planted cases, through `analysistest`, over packages under `testdata` |
+| `tree_test.go` | both analyzers over every package of the module, loaded through `go/packages` |
+
+The module takes `golang.org/x/tools` at its last release asking Go 1.24. The check asks no new step, because the battery runs every Go test.
+
+No Go door and no Go module stands yet, so the tree passes today. Each rule holds from the first file that lands under those folders.
+
+The other analyzers of [[spec/design_output/go-doors#the-build-checks-imports]] wait for the Go doors, since each reads a door file.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/scripts/cli-check.js` `goHolds`, which runs `go test ./...` and so the tree test
+- the root `go.mod`, which takes `golang.org/x/tools`
 
 ### tests
 
@@ -115,17 +144,31 @@ The model stays whole only while a door special-cases no name. Without the check
 
 <!-- the form is list -->
 
+- `src/imports/imports_test.go` `TestAModuleImportingADoorIsNamed`, deciding the second done line
+- `src/imports/imports_test.go` `TestADoorImportingAModuleIsNamed`
+- `src/imports/imports_test.go` `TestARendererImportingAModuleIsNamed`
+- `src/imports/imports_test.go` `TestAModuleImportingAModulePasses`
+- `src/imports/tree_test.go` `TestTheTreeHoldsTheImportRules`
+- `go test ./...` from the root, deciding the first done line
+- `./RUNME.sh check`, deciding the third
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the rule chapter of the model input, the Go doors note and the migration note stand opened
+- the battery in `cli-check.js` stands opened, and it runs every Go test
+- each done line names its test in the tests list
 
 ## review
 
