@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box b8ae1b45d463 · claude-code-remote
@@ -103,6 +103,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 470baff3e4a17e49b67a9eeaf548a9253fff2a06
+    hash_after: 470baff3e4a17e49b67a9eeaf548a9253fff2a06
 ---
 
 # Ask
@@ -178,11 +182,23 @@ Each fact and each note stands in its one place, and small faults land fixed. A 
 
 <!-- the form is list -->
 
+- `each-fact-keeps-one-owner`: the cloud read, the ticket folders and the port pair each keep one owner, and both count rules widen
+- `each-folder-holds-its-kind`: a file off the note end under a governed folder warns in the sweep and meets a refusal at the door
+- `the-retro-finishes-its-asks`: the retro route ends on a report and a mint, and `retro read` prints a chapter's lines
+- `the-retro-reads-cloud-retros`: `retro collect` gathers the retro chapter of each group closing on trunk in the window
+- `the-small-faults-land`: `fix` reads its flags, the cap reads as a ceiling, and a verdict table stays a table
+- the trivial children the retro review minted, each closed on its own leaf
+- `vale-ls-on-windows`: a question ticket carrying the desk trial a person on Windows runs
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- a reviewer of its own caught the plugin import past its folder, because it read the design note on the bridgehead
+- the first review of the cloud retro failed the transcript push, because it read the private rules first
+- helpers took whole tickets in the foreground, so one hand at a time wrote the tree
 
 ### badly
 
@@ -190,11 +206,23 @@ Each fact and each note stands in its one place, and small faults land fixed. A 
 
 <!-- the form is list -->
 
+- the first ticket landed its change before its tests-red leaf, so the engine refused the red at hand-back
+- a pull committed the whole working tree, and carried a half-done change of another ticket with it
+- `apply.js` imported a module past the plugin folder, and the check went red at the manifest step
+- the first cloud retro draft pushed raw transcripts to a ref, and the review failed it
+- ticket prose carries warnings in every `checked` line, because the form asks for brackets the rule refuses
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- `spec/guidance/working`: a hand writes the change after the tests-red leaf lands, never before it
+- `src/scripts/pull-chapter.js`: the pull commits the ticket file alone, so another ticket's work stays out
+- `.claude/skills/level0/lib/tree.js`: a rule refuses an import past the plugin folder at the write
+- `spec/guidance/retro/collect.md`: a transcript stays on its box, and the retro chapter carries its account
+- `spec/config/styles/VoiceParagraph/Characters.yml`: a task mark on a checklist line reads as structure
 
 ### thoughts
 
@@ -202,11 +230,54 @@ Each fact and each note stands in its one place, and small faults land fixed. A 
 
 <!-- the form is text -->
 
+The engine's order holds the work honest: a red leaf asks for a red run on a
+tree where the change is missing, and a change landing early turns that into a
+replay against an earlier commit. The replay stands in `.se/scripts/red-at.sh`
+and runs the tip's tests over an earlier tree.
+
+The ask for the cloud retro reads a transcript as the record of a run. The
+private rules read it as the owner's names. The group's own retro chapter
+answers both, so the owner reads that departure at the merge.
+
+The scripts this box writes:
+
+```sh
+# .se/scripts/red-at.sh <commit> <test>...: runs the tip's tests over an earlier tree
+at="$1"; shift
+root=$(git rev-parse --show-toplevel); tmp=$(mktemp -d)
+git -C "$root" worktree add --detach "$tmp/tree" "$at"
+ln -s "$root/node_modules" "$tmp/tree/node_modules"
+mkdir -p "$tmp/tree/.se" && ln -s "$root/.se/.runtime" "$tmp/tree/.se/.runtime"
+for t in "$@"; do git -C "$root" show "HEAD:$t" > "$tmp/tree/$t"; done
+out=$(cd "$tmp/tree" && node --test "$@" 2>&1)
+git -C "$root" worktree remove --force "$tmp/tree"; rm -rf "$tmp"
+echo "$out" | grep -q AssertionError && { echo "assertion at $at"; exit 1; }
+echo "$out" | grep -q "^# fail 0" && { echo "green at $at"; exit 0; }
+echo "build at $at"; exit 1
+```
+
+```python
+# .se/scripts/fill.py <ticket> <step> <field> <file>: writes one field under one step
+import sys, re
+path, step, field, src = sys.argv[1:5]
+text = open(src).read().rstrip("\n") + "\n"
+s = open(path).read()
+i = s.index(f"\n## {step}\n"); j = s.index(f"\n### {field}\n", i)
+e = s.index("-->\n", s.index("<!-- the form is", j)) + 4
+nxt = re.search(r"\n#{1,3} ", s[e:])
+end = e + (nxt.start() if nxt else len(s) - e)
+open(path, "w").write(s[:e] + "\n" + text + s[end:])
+```
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] every fact the change adds stands in one place: `folders.js` owns the ticket folder, and `port.go` the port pair
+- [x] every number the change adds carries a name in one place: the port wait meets a test beside its Go owner
+- [x] every header the change writes says what its file is for: the wider rule refuses a number word in a header
 
 ## cloud
 
