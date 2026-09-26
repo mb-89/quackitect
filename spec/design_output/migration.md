@@ -12,6 +12,9 @@ piece becomes. A box working a phase reads its slice here before it ports it.
 The order of the phases stands in
 [[spec/design_input/the-migration-runs-in-slices]].
 
+The page beside this note carries the inventory as tables:
+[the-migration-inventory.html](../pages/the-migration-inventory.html).
+
 `wc -l` over a folder answers its size, so this note carries none.
 
 # Where each folder goes
