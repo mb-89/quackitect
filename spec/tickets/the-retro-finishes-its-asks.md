@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: each-thing-stands-in-place
 steps:
   - name: design
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
+  - step: implement/tests-green
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: ba82dff0974e9a4861850db6a8c307f48ff0e26f
+    hash_after: ba82dff0974e9a4861850db6a8c307f48ff0e26f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 33 test(s) pass in 4 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
+reason: done
 ---
 
 # Ask
@@ -331,11 +343,15 @@ What surprises me:
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/retro-mint.test.js test/level0/retro-collect.test.js test/level0/retro-read.test.js test/contract/process.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -343,11 +359,37 @@ What surprises me:
 
 <!-- the form is text -->
 
+A retro now ends on the owner's read, then mints every class and promotion. Each reader reads its chapter through one verb.
+
+| what changes | where | why |
+|---|---|---|
+| the route runs `check`, then `report` by the owner, then `mint` | `spec/processes/retro.yaml` | the owner weighs every fix before a ticket mints |
+| the check guidance names the `report` and `mint` steps | `spec/guidance/retro/check.md` | the hand knows which step mints |
+| `mint` mints each promotion after the classes | `src/engine/retro/mint.js` | a promoted rule reaches a ticket |
+| a transcript keeps its lines past the last retro's collect | `withinWindow` in `src/scripts/retro-outside.js` | an old line in a live file stays out |
+| a second pass cuts at the same window | `collect` in `src/scripts/retro-collect.js` | the lines the first pass takes stay |
+| `.se/scripts` copies and stays in place | `keptInto` in `src/scripts/retro-collect.js` | the classify generator survives `--again` |
+| `retro read <retro> <chapter>` prints prompts, faults and commands | `src/engine/retro/read.js` | no reader writes a parser |
+| a list item quoted whole reads as text | `quotedWhole` in `schema-yaml.js` | the pull prints the audit checklist whole |
+
+The children land their parts first:
+
+- `a-promotion-names-its-fault` and `a-promotion-ticket-reads-once` land the promotion check
+- `the-quoted-pair-stays-paired` lands the `listAt` fix
+- `callers-name-work-answer-home` corrects the callers list
+- the collect row answers `the-second-collect-keeps-lines`
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: the rationales and `pull-route.js` follow the guidance and the verb
+- [x] every door the change reaches has a fake: disk and proc run as fakes
+- [x] a comment names the approach the change implements: each new function points at this ticket
+- [x] every fact the change adds stands in one place, and a note points at the file instead of repeating it: yes
+- [x] every row the design review passes with stands fixed in the change: each child lands first, and collect windows at `sinceLast`
 
 # Discussion
 
