@@ -4,7 +4,7 @@
 
 import { join } from "node:path";
 import { CHECK, NEEDS_HEADING } from "../../.claude/skills/level0/lib/answer.js";
-import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
+import { cloudHere } from "../../.claude/skills/level0/lib/cloud.js";
 import { BINDING, GOD, QUEUE } from "../../.claude/skills/level0/lib/config.js";
 import {
   controlBlock,
@@ -285,7 +285,7 @@ const CHECKS = {
   // A claim a fact denies reads as no stop line, so the turn holds and the fact re-prompts. [[spec/design_output/stop#a-talk-follows-a-report]]
   "no-stop-line": (held) => !claimStands(held),
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
-  "a-person-sits-here": (held) => !inCloud(held.box.env ?? {}),
+  "a-person-sits-here": (held) => !cloudHere(held.box),
   // [[spec/design_output/stop#a-talk-follows-a-report]]
   // A report an earlier message of this turn carries stands too, so a stop line sent alone repeats nothing. [[spec/design_output/stop#a-talk-follows-a-report]]
   "a-report-stands": (held) => reportStands(held.text) || Boolean(held.box?.reported),
@@ -403,7 +403,7 @@ function privateStands(box) {
 
 // THE CHAT IS NEW WHILE NOBODY HAS SAID WHAT TO DO IN IT. The session log holds one prompt row a turn and rotates at a session start, so the count survives a restart of the server and starts again with the next chat, and a cloud box carrying nobody to ask reads false. [[spec/design_output/stop#the-chat-is-new]]
 function chatIsNew(box) {
-  if (inCloud(box.env ?? {})) return false;
+  if (cloudHere(box)) return false;
   return promptsIn(box) <= 1;
 }
 
@@ -422,7 +422,7 @@ function promptsIn(box) {
 
 // A desk bound to the queue on trunk has work while a free ticket stands, so a stop on completion waits. [[spec/design_output/stop#the-mechanical-checks]]
 function queueWaits(box) {
-  if (inCloud(box.env ?? {})) return false;
+  if (cloudHere(box)) return false;
   if (asks(box, BINDING) !== QUEUE) return false;
   if (branchOf(box) !== "main") return false;
   const texts = readFolder(box.disk, join(box.work, "spec", "tickets"), ".md").map(

@@ -1,5 +1,5 @@
 // The plan door over a fake box: the ask opens every so many calls, the third
-// question stays away past the number, and one call answers all three.
+// question stays away past the number, and one call answers them all.
 // [[spec/design_output/stop#the-plan]]
 
 import assert from "node:assert/strict";

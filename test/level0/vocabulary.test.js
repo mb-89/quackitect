@@ -1,4 +1,4 @@
-// The vocabulary layer. Fixture lists of a few words stand in for the three
+// The vocabulary layer. Fixture lists of a few words stand in for the vocabulary
 // files, so every case here reads the projector and the refusal and touches
 // no disk.
 // [[spec/guidance/code/testing]]

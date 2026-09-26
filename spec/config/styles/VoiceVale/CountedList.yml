@@ -1,6 +1,6 @@
-# A line right above a list or a table that counts it says what the structure
-# says already, and the count goes stale the next time a row lands. A count is
-# a digit, or a number word from two up, before a plural.
+# A line or a heading right above a list or a table that counts it says what
+# the structure says already, and the count goes stale the next time a row
+# lands. A count is a digit, or a number word from two up, before a plural.
 # [[spec/guidance/voice]]
 extends: script
 message: "'%s' counts the structure under it. Name what the list holds, and let the rows count themselves."
@@ -33,7 +33,7 @@ script: |
     if t == "---" && front < 2 { front++; continue }
     if front == 1 { continue }
     if text.has_prefix(t, fence) { fenced = !fenced; continue }
-    if fenced || t == "" || isStructure(t) || text.has_prefix(t, "#") || text.has_prefix(t, "<!--") { continue }
+    if fenced || t == "" || isStructure(t) || text.has_prefix(t, "<!--") { continue }
     if text.re_match(`^(?: {4,}|\t)`, lines[i]) { continue }
 
     next := ""

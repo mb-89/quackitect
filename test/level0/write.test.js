@@ -1,4 +1,4 @@
-// The write door over two fake roots. The path reads relative to the work
+// The write door over a pair of fake roots. The path reads relative to the work
 // root, and the schema comes off the method root, so a stub's bad ticket
 // meets the vehicle's rules.
 // [[spec/design_output/level0#the-write-door]]

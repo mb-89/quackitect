@@ -1,5 +1,5 @@
 // The branch listing: one row a group, its tickets under it, the loose
-// tickets after, and the two narrow reads a flag asks for. The verbs that
+// tickets after, and the narrow reads a flag asks for. The verbs that
 // move a branch stand in work.js beside this file.
 // [[spec/design_output/work#a-row-per-group]]
 

@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 7373a6344bbaeb98f02684ef9593798cc51a2de4
+    hash_after: 7373a6344bbaeb98f02684ef9593798cc51a2de4
 ---
 
 # Ask
@@ -106,11 +111,65 @@ An owner rule a retro promotes waits unbuilt, and the owner repeats it the next 
 
 <!-- the form is text -->
 
+Each ask line takes one change, over the files the ask names:
+
+| the ask | the change | where |
+|---|---|---|
+| the route | `check` keeps its reading and closing, and its evidence runs `retro matrix`. A new `report` step follows, `by: person`, with a `verdict` field and `on_fail: check`. A new `mint` step stands last, and its evidence runs `retro mint` | `spec/processes/retro.yaml` |
+| the guidance | rules six and seven swap order, so the matrix draws before the owner reads. A rule names the `report` step and the `mint` step, and a rule asks a ticket for every promotion | `spec/guidance/retro/check.md` |
+| the promotions | `mintFaults` refuses a promotion carrying no ticket `name`, `gain`, `breaks` or `done_when`, unless its `tickets` names one. `mint` walks `record.promotions` after `record.classes`, and mints each the same way | `mintFaults` and `mint` in `src/engine/retro/mint.js` |
+| the window | `copyTree` hands each transcript `.jsonl` through a new `withinWindow`, which drops every line stamped before `since`. A line carrying no stamp takes the stamp before it, as `timedFiles` reads it | `copyTree` in `src/scripts/retro-outside.js` |
+| the read verb | a new `readChapter` reads `chapters/<id>.json`, walks each line range, and prints every owner prompt, fault and shell command as `path:line  kind  text` | a new `src/engine/retro/read.js` |
+| the dispatch | `retro` sends `read` to `readChapter` with the retro and the chapter, and the usage names it | `retro` in `src/scripts/retro.js` |
+| the fault test | `FAULT` gets exported, so `readChapter` marks a fault the way the timeline counts it | `src/engine/retro/timeline.js` |
+| the reader guidance | a rule asks each reader to run `./RUNME.sh retro read <retro> <chapter>` in place of a parser of its own | `spec/guidance/retro/read.md` |
+| the quoted item | `listAt` pushes a list item as a scalar where it opens and closes on the same quote mark, before `PAIR` reads it as a key | `listAt` in `.claude/skills/level0/lib/schema-yaml.js` |
+| the scripts | `movedInto` skips a new `KEPT` name, `scripts`, and `stands` passes it. A first pass copies `.se/scripts` into `input/scripts`, and `--again` copies only what changes since | `movedInto`, `stands` and `collect` in `src/scripts/retro-collect.js` |
+| the collect guidance | rule four names `.se/scripts` beside the dot folders, and the `collect` step's evidence says so too | `spec/guidance/retro/collect.md`, `spec/processes/retro.yaml` |
+
+Each claim of the ask stands checked against the code:
+
+- `mint` walks `record.classes` alone, and `recordOf` in `classes.js` reads `promotions` that nothing mints
+- `copyTree` skips a file by its modified time, so an old line inside a live transcript rides in whole
+- `movedInto` moves every name past a dot, so every collect moves `.se/scripts`, the first as well as `--again`
+- `PAIR` matches the quoted audit item, so `readYaml` answers an object, and `workAnswer` prints `[object Object]`
+- the retro verbs hold no `read`, and `timedFiles` already reads the stamps `readChapter` needs
+
+The assumptions the approach takes:
+
+- an owner prompt is a transcript line of `"type":"user"` carrying text, outside a `subagents` folder
+- a command is a `tool_use` of `Bash`, and a fault is a line `FAULT` in `timeline.js` matches
+- a promotion carries the same `ticket` fields a class carries, and `classify.md` stays as it stands
+- a first collect still copies `.se/scripts`, so rule seven of `read.md` finds every script a hand writes
+- the `report` step carries `to: owner` off `check`, so the owner reads before any ticket mints
+- the fix in `listAt` changes the hash of `retro.yaml`, and the closed retro tickets keep theirs
+
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/scripts/retro.js`, `retro`, through `mint`, `collect` and the new `read`
+- `src/scripts/cli.js`, the `retro` entry of the verbs, through `retro`
+- `src/engine/retro/mint.js`, `mint`, through `mintFaults`
+- `src/scripts/retro-collect.js`, `collect`, through `outsideInto` and `copyTree`
+- `src/scripts/retro-collect.js`, `collect`, through `movedInto` and `stands`
+- `src/engine/retro/timeline.js`, `timedFiles`, which keeps `FAULT` as it reads it
+- `.claude/skills/level0/lib/schema-yaml.js`, `block` and `under`, through `listAt`
+- `.claude/skills/level0/lib/schema-yaml.js`, `readYaml`, through `block`
+- `.claude/skills/level0/lib/schema-read.js`, `frontOf`, through `readYaml`
+- `.claude/skills/level0/lib/schema-route.js`, `processHash`, through `readYaml`
+- `.claude/skills/level0/lib/schema.js`, `kindsIn`, `checkData` and `kindsFrom`, through `readYaml`
+- `src/scripts/process.js`, `processAt`, through `readYaml` and `processHash`
+- `src/scripts/ticket-drift.js`, `baseOf`, through `readYaml`
+- `src/scripts/graph.js`, `graphIn`, through `readYaml`
+- `src/bridge/prose.js`, `wordsHere` and `schemaOf`, through `readYaml`
+- `src/scripts/pull-hand.js`, `handed`, through `workAnswer` and the checklist it prints
+- `src/scripts/pull.js`, `handBack`, through `workAnswer`
+- `spec/tickets/retro-65c3028.md`, the `audit` checklist, which carries the quoted item
+
 
 ### tests
 
@@ -118,17 +177,35 @@ An owner rule a retro promotes waits unbuilt, and the owner repeats it the next 
 
 <!-- the form is list -->
 
+- `test/level0/retro-mint.test.js`, "a promotion carrying no ticket mints nothing, and the verb names it"
+- `test/level0/retro-mint.test.js`, "every promotion mints one ticket with its ask, after the classes"
+- `test/level0/retro-mint.test.js`, "the retro route ends on the report the owner passes, then the mint"
+- `test/level0/retro-collect.test.js`, "a transcript line stamped before the last collect stays out of the input"
+- `test/level0/retro-collect.test.js`, "a second pass leaves .se/scripts in place, and the guidance names it beside the dot folders"
+- `test/level0/retro-read.test.js`, "retro read prints every owner prompt, fault and command of the chapter with its file and line"
+- `test/level0/retro-read.test.js`, "retro read refuses a chapter the retro holds nowhere"
+- `test/level0/schema.test.js`, "a quoted list item holding a colon reads as text, and the pull prints the audit checklist whole"
+
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] every file, function and verb the approach names stands opened, and each claim checked there: each file in the table stands read, and `readYaml` over `retro.yaml` answers the object
+- [x] the callers list names every caller of what the approach changes: a search for `mintFaults`, `outsideInto`, `listAt`, `readYaml`, `workAnswer` and `retro(` over `src`, `.claude` and `test` backs it
+- [x] every done_when line names the test that decides it: each ask line maps to a row under tests, and the check line to `./RUNME.sh check`
+
 
 ## review
 

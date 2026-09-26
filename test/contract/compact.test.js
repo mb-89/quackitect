@@ -1,6 +1,6 @@
 // The compaction probe, against the real client. One headless run over a few turns,
 // and the word the verb reads out of the log it leaves. It costs ninety
-// seconds and two model calls, so SE_SLOW switches it on.
+// seconds and a pair of model calls, so SE_SLOW switches it on.
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
 
 import assert from "node:assert/strict";

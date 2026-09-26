@@ -1,4 +1,4 @@
-// The two language servers and their release assets. A wrong asset name costs
+// The language servers and their release assets. A wrong asset name costs
 // a person one failed install. The cases that read the tracked settings drive
 // the real disk, so they stand in test/contract.
 

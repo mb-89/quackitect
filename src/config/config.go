@@ -1,5 +1,5 @@
-// The config a Go program reads. One reader answers a key over the three
-// layers, and answers the map a named file holds at a key.
+// The config a Go program reads. One reader answers a key over every
+// layer, and answers the map a named file holds at a key.
 // [[spec/design_output/config#the-go-reader]]
 package config
 
