@@ -110,15 +110,23 @@ Done when [[spec/design_output/inner-protocol]] names the inner protocol and the
 
 ## children
 
-<!-- every child as a link, one a line, with its process -->
-
-<!-- the form is list -->
+- [[spec/tickets/the-inner-protocol-gets-chosen]], trivial
+- [[spec/tickets/the-index-model-gets-specified]], trivial
+- [[spec/tickets/doors-get-specified]], trivial
+- [[spec/tickets/operations-get-specified]], trivial
+- [[spec/tickets/watchdogs-get-specified]], trivial
+- [[spec/tickets/the-hook-protocol-gets-specified]], trivial
+- [[spec/tickets/declared-views-get-specified]], trivial
+- [[spec/tickets/the-decisions-get-rationales]], trivial
+- [[spec/tickets/surfaces-get-specified]], trivial, minted here
+- [[spec/tickets/processes-get-placed]], trivial, minted here
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- every child is one design note, or one set of rationales, and a reviewer reads each whole
+- the children add up to the goal: the two minted here cover the module file, the surfaces and the processes
+- no child waits on another, because each note points at the design input where a sibling lands later
 
-<!-- the form is checklist -->
 
 # children
 
