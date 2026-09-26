@@ -329,3 +329,4 @@ Every server comes back on its own now.
 <!-- what anybody adds, at any time, on this ticket -->
 
 - `REPLACE` in `src/scripts/go-source.js` reads a replace on one line. A `replace ( … )` block slips past it, so a folder named there moves no hash. Neither `go.mod` writes a block, so the review passes and the line stands here.
+- The code and its cases landed in one commit ahead of the review. So `implement/tests-red` runs its command on a green tree, and the pull refuses `--pass`. Two changes of that commit stand under `.claude`. The harness refuses a cloud box a write there. So no box takes the code out to show red. The `seen` field holds the red the first box saw over stubs. A person passes the leaf on that record. Otherwise the route grows a road for a change standing ahead of its leaf.
