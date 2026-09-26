@@ -301,11 +301,15 @@ One call is mine: `q.DerivedIn(c, ...)` takes the catalog first, and `q.Derived`
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/index/start_test.go src/q/catalog_test.go src/q/store_test.go
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -313,11 +317,30 @@ One call is mine: `q.DerivedIn(c, ...)` takes the catalog first, and `q.Derived`
 
 <!-- the form is text -->
 
+The package `src/q` now owns every name the index answers, and `Serve` refuses to start on a broken catalog.
+
+| the file | what it holds |
+|---|---|
+| `src/q/q.go` | the registrations: `Given`, `Derived` and `Fold`, each with an `In` form taking a catalog, and the options |
+| `src/q/check.go` | the catalog check, answering every fault at once with its file and line |
+| `src/q/store.go` | the store: a snapshot reads one revision, and a commit copies the values it replaces |
+| `src/index/door.go` | `Serve` takes the catalog, and checks it before the database opens |
+
+- The index passes `q.Main`, which stands empty, so the index behaves as it did.
+- `Serve` passes no provider keys until a config topic stands.
+- `go test -race` over `src/q` passes three runs.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the ask and the review name, and no other
+- `src/q` reaches no door, so it needs no fake
+- each file's header names the model note section it implements
+- the table above names files, and the model note keeps the shape
+- the five review rows stand fixed, as `seen` under tests-red maps them
 
 # Discussion
 
