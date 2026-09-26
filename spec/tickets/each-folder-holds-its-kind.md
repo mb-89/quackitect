@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 78ffc558d9d47f8d9fe76a2997371d81a673e088
+    hash_after: 727eef5c69dfbccfe964f650fcdb0cf1ec44bf40
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
 ---
 
 # Ask
@@ -251,11 +259,19 @@ The approach meets every `done_when` line. The implement step fixes these rows i
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: both sweeps, the door, the funnel note and the design input the ask names
+- [x] every door the change reaches has a fake: the door case runs over a fake disk and a fake log
+- [x] a comment names the approach the change implements: `folderFault` on both sides and `strangerFile` point at this ticket
+- [x] every fact the change adds stands in one place: the Go message names the JavaScript `folderFault` as the wording it keeps
+- [x] every row the design review passes with stands fixed in the change: warning on both sides, the Go side reads note schemas alone, the design input names its source
 
 ## tests-green
 
