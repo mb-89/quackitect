@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
     hash_before: cf0844ea1f938382f1869c2adaa78caf2b5dd729
     hash_after: cf0844ea1f938382f1869c2adaa78caf2b5dd729
+  - step: design/review
+    hand: box d1fe1ca62214 · claude-code-remote · helper-2
+    hash_before: 2cf20e88e07aa09555e74acaeb0b2488ffc867c7
+    hash_after: 2cf20e88e07aa09555e74acaeb0b2488ffc867c7
 ---
 
 # Ask
@@ -188,6 +192,16 @@ The agent reaches git through the engine alone. A hand lands, proves red, rename
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+- journal-the-rename-verb: `landed` reads apply journals alone, and `rename` in `src/scripts/rename.js` stages a move and writes no journal, so a renamed path stays out of the pass commit.
+- rename-detection-misses-rewrites: `git diff --cached -M` reads a move as a delete and an add where the rename rewrites the file past the similarity cut, so `landsAndPushes` misses the old path. Read the staged deletions, or have `rename` record the move.
+- git-writes-lacking-a-verb: approach item 7 names a verb for each git write, and `stash`, `rebase`, `reset`, `tag` and `cherry-pick` have none. Name what the refusal says for each.
+- merge-deletes-after-the-push: approach item 5 deletes the `claude/` branch on green while `main` stands ahead of origin. `close` refuses that order, so the merge pushes `main` first or keeps the branch.
+- red-verb-meets-new-sources: approach item 3 writes each source's `HEAD` text, and a source new to the change has none. The working text also stands in memory alone, so a killed run loses it. Hold it on disk under `.se`.
+- one-row-for-git-mv: a `git mv` under `spec/tickets` meets rule 6 and rule 7 both, and answers two rows for one command.
+- verb-line-names-new-refusals: `verbLine` in `.claude/skills/level0/lib/bash.js` lists what the door refuses, and the approach leaves it standing.
+- git-write-tests-outside-ask: refusing every git write breaks cases in `test/level0/bash-commit.test.js` and `test/level0/private.test.js`, which the ask leaves out, and the implement checklist refuses a file the ask leaves out. Name them in the ask.
 
 # implement
 
