@@ -73,7 +73,7 @@ test("the work group draws the three buttons the config declares", async () => {
     assert.ok(section.includes(`data-key="${key}"`), key);
 });
 
-test("the work editor's button carries the count of the rows the work tab draws", async () => {
+test("the work editor's button carries the number in the work tab's brackets", async () => {
   const door = doorOf({
     answers: { "tui work": { code: 0, out: '{"count":3}\n', err: "" } },
   });
