@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box c28a93a32b71 · claude-code-remote
@@ -103,6 +103,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: d5ba4be3a4699eca6c35e64273c3564c5593eb17
+    hash_after: d5ba4be3a4699eca6c35e64273c3564c5593eb17
 ---
 
 # Ask
@@ -192,11 +196,23 @@ Every gate reads what the session holds. The stop claims a true reason, and an a
 
 <!-- the form is list -->
 
+- [[spec/tickets/a-reply-follows-its-prompt]]: the answer door keys a prompt on its own transcript row, and the prompt's event carries the warning
+- [[spec/tickets/answers-read-the-last-text]]: `voice measure` reads the last text of each turn, and a repeated canary draws a warning
+- [[spec/tickets/the-retro-holds-the-clear]]: a retro in the session's own hand keeps the conversation, and a new window keeps the binding
+- [[spec/tickets/the-stop-reads-the-state]]: the talk rule goes, the owner's step ends a turn, the stop call reads helpers, and a taken group leaves the queue
+- [[spec/tickets/the-todo-joins-the-queue]]: the name doors pass what stands in hand, and the pull answers a working todo
+- the review findings: each closed as a trivial child
+- [[spec/tickets/the-reply-probe-runs]]: the same-message reply and the warning's reach wait on a person's probe
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- a second hand reviewed each design, and each review found a real fault: a late transcript paying a prompt, a repeat check firing on every paying turn, a helper's retro holding the clear
+- the queue named each review finding as a child, so none stood lost in prose
+- `./RUNME.sh check` ran before every hand-back that landed code, and each landed green
 
 ### badly
 
@@ -204,11 +220,21 @@ Every gate reads what the session holds. The stop claims a true reason, and an a
 
 <!-- the form is list -->
 
+- the queue handed a review's children ahead of the parent's implement step three times. The parent's change landed under a child, and three parents closed as answered, with the red run in their Discussion alone
+- the first child's design failed review twice and reached a person step. The draft rested on a client order nobody measured
+- two change hand-backs met the commit door's missing-test refusal. The tests had landed at tests-red, and the change staged code alone
+- the judge read the last line of `./RUNME.sh check` as a warning, so a check command under a `tests` field refused
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- the hand-out in `src/scripts/pull-hand.js` hands a review's children after the parent's implement step, where each child touches the parent's change
+- `spec/guidance/review/design` asks a draft to name each client fact it rests on, with the probe that measured it
+- the test-first door in `.claude/skills/level0/lib/tested.js` reads the held ticket's tests-red paths, which a hand-back after a commit left out
+- the judge's `green` read in the pull reads the exit code of `./RUNME.sh check`, beside its last line
 
 ### thoughts
 
@@ -216,11 +242,17 @@ Every gate reads what the session holds. The stop claims a true reason, and an a
 
 <!-- the form is text -->
 
+The agent weighed stopping at the first child, whose same-message road rests on a probe this box cannot run. It built every part the probe does not decide instead, and parked the rest on a person's question. It also doubted closing three parents as answered. It chose that close over replaying a red run by reverting code on a pushed branch. The Discussion of each parent carries the red run instead.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each fact stands in the ticket or the design output that owns it, and this retro points at the tickets
+- this retro adds no number
+- this retro writes no header
 
 ## cloud
 
