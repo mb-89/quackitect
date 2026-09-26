@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d1fe1ca62214 · claude-code-remote
+    hash_before: b725878524324842e809751c050743c08ddff6a9
+    hash_after: b725878524324842e809751c050743c08ddff6a9
+    answered:
+      - name: lint
+        exit: 0
+        said: ".claude/skills/level0/lib/trunk.js:11:1: correctness/noUnusedVariables: This variable GIT_VERB is unused."
 ---
 
 # Ask
@@ -238,11 +246,19 @@ Three cases fail on their own assertion: a read before `;` still gates, a scratc
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/bash.js .claude/skills/level0/hooks/pull-tool.js .claude/skills/level0/lib/trunk.js .claude/skills/level0/lib/tested.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `lib/bash.js` and `hooks/pull-tool.js`, which the ask names
+- the level1 case fakes `$.process.run`, the one door the change reaches
+- a comment above each change names this ticket
+- the read words stand in `READS` and `GIT_READS` alone, and the scratchpad shape in `FREE` alone
+- the review rows land here: the read list refuses a gate nobody listed, the scratchpad reads absolute alone, and the hook guards a scope holding no process
 
 ## tests-green
 

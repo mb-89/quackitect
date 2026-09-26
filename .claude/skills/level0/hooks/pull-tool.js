@@ -3,8 +3,6 @@
 // so the judge and the spawn run here.
 // [[spec/design_output/pull#the-checks]]
 
-// One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
-import { READ_TOOLS, register as bridgehead } from "./level0.js";
 import {
   judgeAsk,
   judgeLabels,
@@ -16,6 +14,8 @@ import {
   sessionOf,
   spawnPromptIn,
 } from "../lib/pull.js";
+// One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
+import { register as bridgehead, READ_TOOLS } from "./level0.js";
 
 const CLI_SCRIPT = "src/scripts/cli.js";
 // The script stands under the method root, which a project root holds nowhere, so the call names it whole. [[spec/design_output/vehicle#the-work-root-inherits]]
@@ -87,8 +87,14 @@ function toolCall(e) {
   return [...cli, ...PULL, TOOL, JSON.stringify(e ?? {})];
 }
 
+// The verb runs under the env the session carries, so it reads the harness keys, and the hand the shell verb reads. A hook scope holding no process hands none, and the child takes the engine's own. [[spec/tickets/doors-read-what-commands-do]]
+function running() {
+  const env = globalThis.process?.env;
+  return env ? { timeoutMs: RUNNING, env: { ...env } } : { timeoutMs: RUNNING };
+}
+
 async function pulled($, e) {
-  const ran = await $.process.run(toolCall(e), { timeoutMs: RUNNING });
+  const ran = await $.process.run(toolCall(e), running());
   return `${ran.stdout ?? ""}${ran.stderr ?? ""}`.trim() || `exit ${ran.exitCode}`;
 }
 
@@ -116,7 +122,7 @@ async function judged($, e) {
   const judge = settings?.judge ?? {};
   if (judge.enabled === false) return "";
 
-  const ran = await $.process.run([...toolCall(e), JUDGE], { timeoutMs: RUNNING });
+  const ran = await $.process.run([...toolCall(e), JUDGE], running());
   const material = parsed(ran.stdout);
   if (!material?.rules?.length || !String(material.evidence ?? "").trim()) return "";
 
