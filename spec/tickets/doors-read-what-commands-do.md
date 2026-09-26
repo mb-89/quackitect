@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
     hash_before: 0de3b3f411719a815d051fc6a474343c6473abc3
     hash_after: 0de3b3f411719a815d051fc6a474343c6473abc3
+  - step: design/review
+    hand: box d1fe1ca62214 · claude-code-remote · helper-2
+    hash_before: 418083ca590f33bed4555e29790a1c6d8a3097ee
+    hash_after: 418083ca590f33bed4555e29790a1c6d8a3097ee
 ---
 
 # Ask
@@ -174,6 +178,13 @@ Each fix stays inside the function the ask names, and reads the command through 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+- a-nested-git-still-lands: `touchesGit` reading git as the command word misses `bash -c "git push origin main"` and `xargs git commit`, which `GIT_VERB` catches today, so `trunkGuard` in `src/bridge/bash.js` and `landsOnTrunk` in `lib/copilot-runtime.js` pass a trunk push; read into a `SHELLS` `-c` body the way `writesAPath` in `lib/bash.js` does, and add a `trunk.test.js` case
+- only-a-read-gates-nothing: step 2 names both a gate list (a test, a check, a commit) and a read list (`cat`, `grep`, `ls`, `git status`); refuse every segment before `;`, `||` or `&` except one on a read list, so an unnamed gate still refuses
+- a-reorder-asks-a-test: an added and removed multiset match in `untestedIn` passes a reorder of statements, as a `return` moved above a call, which changes code; pass only a block moved whole, contiguous lines kept in order, and add a `tested.test.js` case where a reorder still asks a test
+- pull-env-meets-the-engine: the `env` key on `$.process.run` stands unchecked against the engine, and the `level1.test.js` case fakes it, so that done_when line passes while the real tool still runs with no harness env; check the engine surface first, or have the verb read `--tool` input carrying the agent
+- the-scratchpad-reads-absolute: anchor the `FREE` scratchpad pattern to an absolute path, as `^/.*/claude-[^/]+/.*/scratchpad/`, since the harness nests the scratchpad below a project folder and a session id, and a relative tree path holding `claude-*/…/scratchpad` stays under the rules
 
 # implement
 
