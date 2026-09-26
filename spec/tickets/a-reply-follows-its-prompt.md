@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -127,6 +127,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: b15b6cfce1bd89b72bad4af5734d985c6aee8138
+    hash_after: b15b6cfce1bd89b72bad4af5734d985c6aee8138
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 group: the-gates-read-the-state
 ---
 
@@ -309,11 +317,19 @@ Three cases fail on their own assertion: the restart with a row id, the restart 
 
 <!-- the form is command -->
 
+./RUNME.sh lint src/bridge/answer.js .claude/skills/level0/hooks/level0.js test/level0/answer-door.test.js test/level0/answer.test.js test/level0/read-tools.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the answer door, the bridgehead's transcript read, and the three test files holding their cases
+- every door the change reaches has a fake: the stamp reads the box's clock door, and the cases hand a fake one
+- `freshTexts`, `pastRow`, `speaks`, `rowOf` and `beforeOf` each open on a comment naming this ticket
+- the row key stands in `pastRow` alone, and the bridgehead's `ROWS` names how far back it reads
+- the review's first finding holds: a transcript carrying no row ids stands the road down
 
 ## tests-green
 

@@ -149,3 +149,12 @@ test("a text past the prompt's own row pays the demand", () => {
   assert.deepEqual(said, { pass: true });
   assert.equal(it.demand, null);
 });
+
+// One writer stamps the spoken text off the box's clock. [[spec/tickets/a-reply-follows-its-prompt]]
+test("a text the chat shows stands stamped with the clock's time", () => {
+  const it = box();
+  it.clock = { now: () => new Date("2026-01-01T00:00:05.000Z") };
+  onMessageDisplay({ delta: "The work goes on." }, it);
+  assert.equal(it.spoken, "The work goes on.");
+  assert.equal(it.spokenAt, Date.parse("2026-01-01T00:00:05.000Z"));
+});
