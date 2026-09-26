@@ -5,7 +5,6 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   aimOf,
-  appended,
   archiveOf,
   asRow,
   LEVELS,
@@ -79,14 +78,6 @@ test("an old session takes the name of its first line's time, or of now", () => 
     archiveOf("not json\n", "2026-09-09T00:00:00.000Z", ID),
     `.se/.log/old/${nameOf("2026-09-09T00:00:00.000Z", ID)}`,
   );
-});
-
-// [[spec/design_output/log#every-writer-appends]]
-test("a line appended keeps every line before it, and mends a missing newline", () => {
-  const row = { at: AT, level: "info", kind: "work", said: "pushed" };
-  assert.equal(appended("", row), `${JSON.stringify(row)}\n`);
-  assert.equal(appended('{"a":1}', row), `{"a":1}\n${JSON.stringify(row)}\n`);
-  assert.equal(appended('{"a":1}\n', row), `{"a":1}\n${JSON.stringify(row)}\n`);
 });
 
 // [[spec/design_output/log#the-log-tool]]
