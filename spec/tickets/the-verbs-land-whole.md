@@ -202,3 +202,18 @@ Every mechanical step runs through a verb that lands it whole, and the agent rea
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+Where the branch stands, for the next box:
+
+| child | where it stands |
+|---|---|
+| [[spec/tickets/the-battery-runs-on-fixtures]] | the review verdict stands written. A fresh take hands it back as it stands |
+| [[spec/tickets/the-verbs-need-no-wrapper]] | waits at its design review |
+| [[spec/tickets/verb-line-names-new-refusals]] | a trivial draft, waiting at do |
+| every other child | closed |
+
+Three faults the sync met, each fixed on this branch:
+
+- The cold probe's session met a refused `git log`, then pulled a ticket and ran to the cap. Its prompt now ends the session at a refused call.
+- The commit verb's refusal ran a bare `git reset -q`, which cleared `MERGE_HEAD`. It now resets by a pathspec, so a refused merge stays a merge.
+- The check writes a slash command for each new config key, and the commit door takes only the ticket in hand. That commit then names a review ticket, and the verdict guard reads it as the reviewer's work. A generated file lands with the change that adds its key, before the next take.
