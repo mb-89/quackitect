@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: retro/write
+step: retro/cloud
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 enabled_by: migration.phase0
@@ -104,6 +104,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box d7a540d981d5 · claude-code-remote
+    hash_before: e4ce4b8707426ddabe5888ccf0add7fb2d91214a
+    hash_after: e4ce4b8707426ddabe5888ccf0add7fb2d91214a
 ---
 
 # Ask
@@ -162,39 +166,57 @@ Done when [[spec/design_output/inner-protocol]] names the inner protocol and the
 
 ### done
 
-<!-- what was done, one line a ticket or a thing -->
-
-<!-- the form is list -->
+- [[spec/tickets/declared-views-get-specified]]: [[spec/design_output/views]]
+- [[spec/tickets/doors-get-specified]]: [[spec/design_output/go-doors]]
+- [[spec/tickets/operations-get-specified]]: [[spec/design_output/operations]]
+- [[spec/tickets/the-decisions-get-rationales]]: a rationale per ruling, and a map in the migration note
+- [[spec/tickets/the-hook-protocol-gets-specified]]: [[spec/design_output/hook-protocol]]
+- [[spec/tickets/the-index-model-gets-specified]]: [[spec/design_output/model]]
+- [[spec/tickets/the-inner-protocol-gets-chosen]]: NATS and `quack lsp`, a rationale each, the funnel gone
+- [[spec/tickets/watchdogs-get-specified]]: [[spec/design_output/watchdogs]]
+- [[spec/tickets/processes-get-placed]], minted at split: [[spec/design_output/processes]]
+- [[spec/tickets/surfaces-get-specified]], minted at split: [[spec/design_output/surfaces]]
 
 ### well
 
-<!-- what went well, and what made it go well -->
-
-<!-- the form is list -->
+- `check_prose` over a draft before the write: most notes landed in one write
+- the design input and the migration note named each part, so every note refined one chapter
+- the processes note caught a clash in the protocol note, and the fix rode the same change
 
 ### badly
 
-<!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
-<!-- the form is list -->
+- 19:07 UTC: a write named the protocol ticket while the pull held the views ticket, and the door refused it
+- 19:12 UTC: the pass read the new views note as unwritten, because it stood untracked
+- 19:13 UTC: the pass refused lint as the `tests` field, and `branch test` answered missing
+- 19:44 UTC: a `ticket open` behind a `;` met `LandingFollowsItsGate`
+- the pull handed the children in its own order, so the protocol note landed after the notes pointing at it
 
 ### improve
 
-<!-- how each bad line stops happening, named by its home -->
-
-<!-- the form is list -->
+- the ticket in hand: a box reads the pull's pick before its first write, as `guidance/cloud` says
+- the untracked note: the trivial process names a staged note in the `do` step, home `spec/processes/trivial.md`
+- the `tests` field: the trivial process names the check with `&& echo green` for a change with no code
+- the landing: join a landing to its gate with `&&`, as the refusal says
+- the order: a split names `depends_on` on the child the others rest on, home `spec/processes/group.md`
 
 ### thoughts
 
-<!-- what the thoughts say that the actions do not, off the transcript -->
+The hard call was the protocol. `gRPC` reads as the safe choice, and its
+typing buys little over an open catalog with every peer in one Go module. The
+loss NATS brings, a push at most once, meets the revision each value already
+carries.
 
-<!-- the form is text -->
+The second call was where the specs disagree with the design input. A crash
+shows defaults, and an expired lease shows a stale value. The design input asks
+for both, so the processes note splits them by cause.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- each fact stands in one note, and the others point at it: the subjects, the families and the tool list
+- the notes add config keys by name, and the foundation adds their values
+- each new note opens on its scope, and counts nothing
+- the run carries no owner prompt, and each error stands with its time
+- the chapter names roles and tree paths alone
 
 ## cloud
 
