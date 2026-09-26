@@ -170,8 +170,9 @@ The assumptions the approach takes:
 - `src/scripts/ticket-drift.js`, `baseOf`, through `readYaml`
 - `src/scripts/graph.js`, `graphIn`, through `readYaml`
 - `src/bridge/prose.js`, `wordsHere` and `schemaOf`, through `readYaml`
-- `src/scripts/pull-hand.js`, `handed`, through `workAnswer` and the checklist it prints
-- `src/scripts/pull.js`, `handBack`, through `workAnswer`
+- `src/scripts/pull-chapter.js`, `workAnswer`, which prints the checklist `readYaml` reads
+- `src/scripts/pull-hand.js`, `handed`, through `workAnswer` in `pull-chapter.js`
+- `src/scripts/pull.js`, `handBack`, through `workAnswer` in `pull-chapter.js`
 - `spec/tickets/retro-65c3028.md`, the `audit` checklist, which carries the quoted item
 
 
