@@ -48,7 +48,7 @@ export function passed(it, who, one, leaf, held, answered, more = {}) {
 
   let next = leaf.leaves[leaf.at + 1];
   while (next) {
-    const when = holdsHere(it, String(next.said.when ?? ""), frontOf(text));
+    const when = holdsHere(it, String(next.said.when ?? ""));
     if (when.holds) break;
     text = withEntry(text, { step: next.path, skipped: true, why: when.why });
     changes.push(`skips ${next.path}`);
@@ -75,7 +75,7 @@ export function passed(it, who, one, leaf, held, answered, more = {}) {
     return unlanded(one, leaf, finding);
   }
   dropHold(it, who.hand);
-  const sent = sentOut(it, one, who.branch, leaf);
+  const sent = sentOut(it, one, who.branch);
   if (!sent.ok) return refusedPush(sent);
   return onward(it, who, [`${one.name} ${changes.join(", ")}.`, ...sent.why]);
 }
@@ -150,7 +150,7 @@ export function failed(it, who, one, leaf, held, reason, answered) {
   const finding = landed(it, one, changes);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
-  const sent = sentOut(it, one, who.branch, leaf);
+  const sent = sentOut(it, one, who.branch);
   if (!sent.ok) return refusedPush(sent);
   // Where the split cap refuses the person step, the hold drops and the answer waits. [[spec/design_output/pull#the-fail]]
   if (capped && !person) {
@@ -210,7 +210,7 @@ export function became(it, who, one, leaf, held, successor, answered) {
   const finding = landed(it, one, [`closes became ${successor}`]);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
-  const sent = sentOut(it, one, who.branch, leaf);
+  const sent = sentOut(it, one, who.branch);
   if (!sent.ok) return refusedPush(sent);
   return onward(it, who, [`${one.name} closes became ${successor}.`, ...sent.why]);
 }
@@ -241,7 +241,7 @@ export function answeredBy(it, who, one, leaf, held, answerer, answered) {
   const finding = landed(it, one, [`closes answered by ${answerer}`]);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
-  const sent = sentOut(it, one, who.branch, leaf);
+  const sent = sentOut(it, one, who.branch);
   if (!sent.ok) return refusedPush(sent);
   return onward(it, who, [`${one.name} closes answered by ${answerer}.`, ...sent.why]);
 }

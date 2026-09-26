@@ -234,3 +234,62 @@ test("the pull hook matches the level zero call, and runs the script the method 
   assert.deepEqual(await handler($, {}, async () => null), { result: "wait" });
   assert.deepEqual(ran[0].slice(0, 2), ["node", "/vehicle/src/scripts/cli.js"]);
 });
+
+// The pull hook over a config, answering whether the judge ran and how often it asked the model. [[spec/tickets/every-road-has-a-caller]]
+async function judgeRuns(config) {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const calls = [];
+  register((event, ...rest) => {
+    if (event === "tool.call" && rest.length > 1) calls.push(rest);
+  }, {});
+  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
+  const ran = [];
+  const asked = [];
+  const material = { ticket: "a-child", step: "design/draft", evidence: "x", rules: RULES };
+  const $ = {
+    fs: { read: async () => JSON.stringify(config) },
+    process: {
+      run: async (argv) => {
+        ran.push(argv);
+        const judging = argv.includes("--judge");
+        return {
+          stdout: judging ? JSON.stringify(material) : "done",
+          stderr: "",
+          exitCode: 0,
+        };
+      },
+    },
+    model: {
+      classify: async (...said) => {
+        asked.push(said);
+        return "follows";
+      },
+    },
+  };
+  await handler($, { ticket: "a-child", verdict: "pass" }, async () => null);
+  return { judged: ran.some((argv) => argv.includes("--judge")), asked: asked.length };
+}
+
+// The judge runs where the config turns it on alone. The hook's line waits on the owner, because the hand working the ticket holds no write under .claude. [[spec/tickets/every-road-has-a-caller]]
+const HOOK_WAITS = "judged in the pull hook reads enabled !== true once the owner lands it";
+test("a config naming no judge runs no judge, and true alone turns it on", { todo: HOOK_WAITS }, async () => {
+  assert.deepEqual(await judgeRuns({}), { judged: false, asked: 0 });
+  assert.deepEqual(await judgeRuns({ judge: {} }), { judged: false, asked: 0 });
+  assert.deepEqual(await judgeRuns({ judge: { enabled: false } }), {
+    judged: false,
+    asked: 0,
+  });
+  assert.deepEqual(await judgeRuns({ judge: { enabled: true } }), {
+    judged: true,
+    asked: 1,
+  });
+});
+
+// [[spec/tickets/every-road-has-a-caller]]
+test("the config schema declares the judge off by default", async () => {
+  const { default: schema } = await import("../../spec/config/level0.schema.json", {
+    with: { type: "json" },
+  });
+  assert.equal(schema.properties.judge?.properties?.enabled?.type, "boolean");
+  assert.equal(schema.properties.judge?.properties?.enabled?.default, false);
+});

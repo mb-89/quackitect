@@ -374,7 +374,7 @@ export function handBack(it, who, name, verdict) {
   );
   if (done) {
     // The record holds this hand-back already, so the pull pushes it again. [[spec/design_output/pull#the-rejected-push]]
-    const sent = sentOut(it, one, who.branch, leafOf(one.front, held.step));
+    const sent = sentOut(it, one, who.branch);
     if (!sent.ok) {
       say(REFUSED, [
         `${held.ticket} at ${held.step} answered, and the record holds this hand-back already. Its push reaches no origin.`,

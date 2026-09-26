@@ -124,7 +124,7 @@ frontmatter:
             description: the words that answer `asks`, where one word answers it
 
           when:
-            enum: [returned, cloud, desk]
+            enum: [cloud, desk]
             description: the condition the pull reads, and it skips the leaf where it fails
 
           checklist:

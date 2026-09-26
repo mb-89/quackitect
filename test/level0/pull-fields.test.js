@@ -60,7 +60,7 @@ test("the fields ride the payload, and the engine writes them under their headin
   );
   assert.match(
     listed.text,
-    /### tests\n\nnode --test\n\n### checked\n\n- one\n- two\n\n## reflect/,
+    /### tests\n\nnode --test\n\n### checked\n\n- one\n- two\n\n## change/,
   );
   assert.match(withPayload("x", "a", "nope").why, /takes a JSON object/);
 });
@@ -94,7 +94,7 @@ test("the payload spans a fence, a porcelain row reads whole, and a files field 
   const put = withPayload(fenced, "implement/tests-red", '{"tests": "node --test"}');
   assert.match(
     put.text,
-    /### tests\n\nnode --test\n\n## reflect/,
+    /### tests\n\nnode --test\n\n## change/,
     "the fence goes with the old text",
   );
 

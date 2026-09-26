@@ -76,7 +76,7 @@ frontmatter:
             type: array
             description: the words that answer asks
           when:
-            enum: [returned, cloud, desk]
+            enum: [cloud, desk]
             description: the condition the pull reads
           checklist:
             type: array
