@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -107,6 +107,11 @@ record:
     hand: box c28a93a32b71 · claude-code-remote
     hash_before: d5ba4be3a4699eca6c35e64273c3564c5593eb17
     hash_after: d5ba4be3a4699eca6c35e64273c3564c5593eb17
+  - step: retro/cloud
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: fc596bc1adcc839f53d5cb79546fe435c250462e
+    hash_after: fc596bc1adcc839f53d5cb79546fe435c250462e
+reason: done
 ---
 
 # Ask
@@ -264,17 +269,29 @@ The agent weighed stopping at the first child, whose same-message road rests on 
 
 <!-- the form is list -->
 
+- level zero's function hooks: the session opened with no `mcp__level0` tool, no canary line and no cage block, and `./RUNME.sh doctor` read no server on its port
+- so the write door, the answer door and the stop door stood off for the whole run, and every write went through the plain file tools
+- a client that loads function hooks, for `./RUNME.sh probe reply`
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the commit door's missing-test refusal, at two change hand-backs
+- the judge reading a warning as the last line of the check, at one `do` hand-back
+- the name cap on minted children, which refused three reviewers' first hand-backs
+- no conflict at sync, no trunk guard, and no test failing on this box alone
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/the-reply-probe-runs]], minted with no group, waits on a person at its answer step. A person runs the reply probe on a desk whose client loads function hooks
+- no handover stands, because the group closes in this session
 
 # Discussion
 
