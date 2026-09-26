@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { askOf, withAsk } from "../../src/engine/retro/mint.js";
+import { askOf, promotionName, withAsk } from "../../src/engine/retro/mint.js";
 import { retro } from "../../src/scripts/retro.js";
 
 const ROOT = "/tree";
@@ -45,9 +45,9 @@ const FIXED = {
   ticket: undefined,
 };
 
-function doors(classes) {
+function doors(classes, promotions = []) {
   const disk = fakeDisk({
-    [at("classes.json")]: JSON.stringify({ classes, dispositions: {} }),
+    [at("classes.json")]: JSON.stringify({ classes, dispositions: {}, promotions }),
   });
   const proc = fakeProc({
     [`${CLI} mint ticket spec/tickets/the-land-verb-lands.md --process=standard`]:
@@ -140,4 +140,26 @@ test("the ask reads as the chapter, and lands where the mint leaves it empty", (
   const said = withAsk(DRAFT, ask);
   assert.ok(said.indexOf("a commit lands in one call") < said.indexOf("# design"));
   assert.doesNotMatch(said, /gain, as text/);
+});
+
+// [[spec/tickets/a-promotion-names-its-fault]]
+test("a promotion carrying no ticket mints nothing, and the verb names it by its what or its place", () => {
+  const promotions = [
+    { what: "the land rule", from: "memory", to: "spec/guidance/working" },
+    { what: "", from: "memory", to: "spec/guidance/voice" },
+    { what: "a rule minted already", from: "memory", to: "spec/guidance/retro", tickets: ["the-land-verb-lands"] },
+  ];
+  const { code, said } = heard(() =>
+    retro(ROOT, ["mint", RETRO], doors([FIXED], promotions)),
+  );
+  assert.equal(code, 1);
+  assert.match(said, /promotion "the land rule" waits, and its ticket carries no name/);
+  assert.match(said, /promotion 2 waits, and its ticket carries no done_when/);
+  assert.doesNotMatch(said, /a rule minted already/);
+  assert.doesNotMatch(said, /undefined/);
+});
+
+test("a promotion's name reads its what, and its place where the what stands empty", () => {
+  assert.equal(promotionName({ what: " the land rule " }, 0), 'promotion "the land rule"');
+  assert.equal(promotionName({}, 2), "promotion 3");
 });

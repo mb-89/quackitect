@@ -45,7 +45,7 @@ export function withAsk(text, ask) {
   return [...rows.slice(0, head + 1), "", ask, ...rows.slice(end)].join("\n");
 }
 
-// Every fault standing between the classes and their tickets. [[spec/guidance/retro/check]]
+// Every fault standing between the classes and promotions and their tickets. [[spec/guidance/retro/check]]
 export function mintFaults(record) {
   const faults = [];
   for (const one of record.classes) {
@@ -60,13 +60,30 @@ export function mintFaults(record) {
       continue;
     }
     if (status !== OPEN || one.tickets?.length) continue;
-    for (const field of ["name", "gain", "breaks"]) {
-      if (!String(one.ticket?.[field] ?? "").trim())
-        faults.push(`${one.id} stands open, and its ticket carries no ${field}`);
-    }
-    if (!(one.ticket?.done_when ?? []).length)
-      faults.push(`${one.id} stands open, and its ticket carries no done_when`);
+    faults.push(...ticketFaults(`${one.id} stands open`, one.ticket));
   }
+  (record.promotions ?? []).forEach((one, at) => {
+    if (one?.tickets?.length) return;
+    faults.push(...ticketFaults(`${promotionName(one, at)} waits`, one?.ticket));
+  });
+  return faults;
+}
+
+// A promotion carries no id, so its fault names its what, or its place where the what stands empty. [[spec/tickets/a-promotion-names-its-fault]]
+export function promotionName(one, at) {
+  const what = String(one?.what ?? "").trim();
+  return what ? `promotion "${what}"` : `promotion ${at + 1}`;
+}
+
+// Every field a ticket to mint carries none of, each named after the thing it serves. [[spec/tickets/a-promotion-names-its-fault]]
+function ticketFaults(said, ticket) {
+  const faults = [];
+  for (const field of ["name", "gain", "breaks"]) {
+    if (!String(ticket?.[field] ?? "").trim())
+      faults.push(`${said}, and its ticket carries no ${field}`);
+  }
+  if (!(ticket?.done_when ?? []).length)
+    faults.push(`${said}, and its ticket carries no done_when`);
   return faults;
 }
 
