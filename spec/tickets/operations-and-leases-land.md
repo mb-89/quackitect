@@ -103,11 +103,43 @@ Every action after this one returns a handle, and every part holds a lease. With
 
 <!-- the form is text -->
 
+The shape stands in [[spec/design_output/operations]] and [[spec/design_output/watchdogs]]. This slice lands the state each note holds, over an injected clock, and leaves the processes it acts on to the phase that brings them.
+
+| the package | what it holds |
+|---|---|
+| `src/ops` | the family `ops/<id>`, the moves the states table allows, the writer queue, the restart, the deadline and the retention |
+| `src/watchdog` | the leases, the wait before a restart, the alarms, and the given name `session/alarms` |
+| `src/q` | the stale mark: `Store.Stale` marks a part, `Snapshot.Stale` reads it, and a commit of the part clears it |
+| `src/index` | the table `op`, which keeps each operation past a restart, behind the seam `ops.Keep` |
+| `spec/config/level0.json` | the keys both notes name, with their defaults, and their schema rows |
+
+- A part is a topic, the first segment of a name, so a stale `work` marks every name under `work/`.
+- An id reads the start time, zero-padded, and a counter, so ids sort by start time.
+- A move off the states table refuses, and names both states.
+- `Book.Restart` moves every `queued` or `running` operation to `failed`, with the reason the index restarts.
+- `Book.Expire` fails an operation past its deadline, and `Book.Sweep` drops an ended one past its window.
+- The wait doubles from `watchdog.backoff.first` up to `watchdog.backoff.cap`.
+- `watchdog.faults` faults inside `watchdog.window` raise an alarm, and `Clear` takes it off `session/alarms`.
+
+What waits:
+
+- a restart of a process, for the doors process
+- a deadline over a derived name, for the scheduler the q core leaves waiting
+- the undo steps of a failed operation, for `q.Action`, and meanwhile `undone` records what a runner reports
+- the lease heartbeat, for the work loop
+- the surfaces, for the command line and the HTTP door
+
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/q/store.go` `Commit`, which clears the stale mark of each part it writes
+- `src/index/door.go` `Serve`, which opens the keep and runs `Book.Restart` at start
+- `src/index/index.go` `shape`, which gains the table `op`
+- `spec/config/level0.json` and `spec/config/level0.schema.json`, which gain the keys
 
 ### tests
 
@@ -115,17 +147,40 @@ Every action after this one returns a handle, and every part holds a lease. With
 
 <!-- the form is list -->
 
+- `src/watchdog/lease_test.go` `TestAnExpiredLeaseMarksEachNameOfItsPartStale`, deciding the second done line
+- `src/watchdog/lease_test.go` `TestTheWaitDoublesUpToItsCap`
+- `src/watchdog/lease_test.go` `TestFaultsInTheWindowRaiseAnAlarm`
+- `src/watchdog/lease_test.go` `TestAClearedAlarmLeavesSessionAlarms`
+- `src/q/store_test.go` `TestACommitOfThePartClearsItsStaleMark`
+- `src/ops/ops_test.go` `TestAStartAnswersAQueuedHandle`
+- `src/ops/ops_test.go` `TestTheIdsSortByStartTime`
+- `src/ops/ops_test.go` `TestAWriterWaitsBehindTheWriterAhead`
+- `src/ops/ops_test.go` `TestAReaderRunsBesideAWriter`
+- `src/ops/ops_test.go` `TestAMoveOffTheTableRefuses`
+- `src/ops/ops_test.go` `TestARestartFailsEveryOpInFlight`
+- `src/ops/ops_test.go` `TestAnOpPastItsDeadlineFails`
+- `src/ops/ops_test.go` `TestAnEndedOpLeavesAfterItsWindow`
+- `src/index/ops_test.go` `TestTheOpRowsOutliveTheDoor`
+- `go test ./...` from the root, deciding the first done line
+- `./RUNME.sh check`, deciding the third
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- both notes, the config file, the store and `Serve` stand opened
+- a search for `ops/` and `lease` in Go names no caller beyond the list
+- each done line names its test in the tests list
 
 ## review
 
