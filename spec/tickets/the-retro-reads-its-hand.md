@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-gates-read-the-state
 parent: the-retro-holds-the-clear
+record:
+  - step: do
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: b5054be43dc346dd5417270bf6f686a0caf9838e
+    hash_after: b5054be43dc346dd5417270bf6f686a0caf9838e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-window-keeps-the-binding.md:39:130: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ parent: the-retro-holds-the-clear
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/retro-clear.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ parent: the-retro-holds-the-clear
 
 <!-- the form is text -->
 
+`retroInHand` in `src/bridge/handover.js` reads the retro holds, then keeps the one whose hand is the session's own, off `handOf`. A helper's hold carries its own name after the session's hand, so a helper's retro clears nothing away. The case a helper holding a retro leaves the session clearing under the queue, in `test/level0/retro-clear.test.js`, holds it.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the session's own hold decides
+- the cleanup: a box with no process door names no hand, and `ownHand` answers empty there
+- the rule stands in `stop.md` under `The queue alone clears`
 
 # Discussion
 
