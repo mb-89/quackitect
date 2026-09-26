@@ -19,6 +19,7 @@ const CLI = `${NODE} ${join(METHOD, "src", "scripts", "cli.js")}`;
 const RETRO = "retro-a1b2c3";
 const at = (path) => join(ROOT, ".se", ".retro", RETRO, ...path.split("/"));
 const TICKET = join(ROOT, "spec", "tickets", "the-land-verb-lands.md");
+const PROMOTED = join(ROOT, "spec", "tickets", "the-rule-lands.md");
 const DRAFT =
   "---\nkind: [[ticket]]\nstate: draft\n---\n\n# Ask\n\n<!-- gain, as text -->\n<!-- breaks, as text -->\n\n# design\n\n## approach\n";
 
@@ -57,6 +58,11 @@ function doors(classes, promotions = []) {
         return { exitCode: 0 };
       },
     [`${CLI} ticket open the-land-verb-lands`]: { exitCode: 0 },
+    [`${CLI} mint ticket spec/tickets/the-rule-lands.md --process=standard`]: () => {
+      disk.write(PROMOTED, DRAFT);
+      return { exitCode: 0 };
+    },
+    [`${CLI} ticket open the-rule-lands`]: { exitCode: 0 },
     [`${CLI} mint ticket spec/tickets/a-second-ticket.md --process=standard`]: {
       exitCode: 2,
       stderr: "the ask names a word outside the vocabulary",
@@ -176,4 +182,32 @@ test("a promotion's ticket stands checked by the mint alone, and classes read it
   };
   assert.deepEqual(faultsOf(record, []), []);
   assert.equal(mintFaults(record).length, 4);
+});
+
+// [[spec/tickets/the-retro-finishes-its-asks]]
+test("every promotion mints one ticket with its ask, after the classes", () => {
+  const promotion = {
+    what: "the land rule",
+    from: "memory",
+    to: "spec/guidance/working",
+    ticket: {
+      name: "the-rule-lands",
+      gain: "the owner states the rule once",
+      breaks: "the owner repeats the rule the next day",
+      done_when: ["spec/guidance/working holds the rule"],
+    },
+  };
+  const it = doors([CLASS], [promotion]);
+  const { code, said } = heard(() => retro(ROOT, ["mint", RETRO], it));
+
+  assert.equal(code, 0, said);
+  assert.match(said, /promotion "the land rule" {2}spec\/tickets\/the-rule-lands\.md/);
+  assert.ok(said.indexOf("the-land-verb-lands.md") < said.indexOf("the-rule-lands.md"));
+  assert.match(it.disk.read(PROMOTED), /# Ask\n\nthe owner states the rule once/);
+  assert.deepEqual(JSON.parse(it.disk.read(at("classes.json"))).promotions[0].tickets, [
+    "the-rule-lands",
+  ]);
+  assert.match(said, /2 ticket\(s\) mint/);
+  const again = heard(() => retro(ROOT, ["mint", RETRO], it));
+  assert.match(again.said, /0 ticket\(s\) mint/);
 });

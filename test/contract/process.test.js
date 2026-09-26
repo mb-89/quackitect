@@ -107,3 +107,33 @@ ifVale(
     assert.deepEqual(found, [], "a route writes no line the voice refuses");
   },
 );
+
+const guidanceOf = (name) =>
+  files.read(join(root, "spec", "guidance", "retro", `${name}.md`));
+
+// [[spec/tickets/the-retro-finishes-its-asks]]
+test("the retro route ends on the report the owner passes, then the mint", () => {
+  const steps = routeOf("retro").steps;
+  const named = (name) => steps.find((one) => one.name === name);
+  assert.deepEqual(
+    steps.slice(-3).map((one) => one.name),
+    ["check", "report", "mint"],
+  );
+  assert.match(named("check").evidence[0].says, /retro matrix/);
+  assert.equal(named("report").by, "person");
+  assert.equal(named("report").on_fail, "check");
+  assert.equal(named("report").evidence[0].form, "verdict");
+  assert.match(named("mint").evidence[0].says, /retro mint/);
+  const check = guidanceOf("check");
+  assert.match(check, /`report` step/);
+  assert.match(check, /`mint` step/);
+});
+
+// [[spec/tickets/the-retro-finishes-its-asks]]
+test("the audit checklist reads whole, and collect names .se/scripts beside the dot folders", () => {
+  const audit = routeOf("retro").steps.find((one) => one.name === "audit");
+  assert.ok(audit.checklist.every((one) => typeof one === "string"), "every item reads as text");
+  assert.match(guidanceOf("collect"), /`\.se\/scripts`/);
+  const collect = routeOf("retro").steps.find((one) => one.name === "collect");
+  assert.match(collect.evidence[0].says, /\.se\/scripts/);
+});

@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box b8ae1b45d463 · claude-code-remote · helper-2
     hash_before: 48bcc6dfb1dff923098040f765e71c7467f772a0
     hash_after: 48bcc6dfb1dff923098040f765e71c7467f772a0
+  - step: implement/tests-red
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 6bd6c57126db2a6251657a19f993adf168ccc6b9
+    hash_after: 6bd6c57126db2a6251657a19f993adf168ccc6b9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 8 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -242,17 +250,44 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/retro-mint.test.js test/level0/retro-collect.test.js test/level0/retro-read.test.js test/contract/process.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Each case fails on its own assertion:
+
+| the case | what it sees now |
+|---|---|
+| a promotion mints | `mint` walks the classes alone, so no promotion ticket prints |
+| the window | the copy holds the line stamped before the last collect |
+| the scripts | a collect moves `.se/scripts` away |
+| retro read | `retro` answers the usage for `read` |
+| the route | the retro route ends on `check` |
+| the collect guidance | `collect.md` names no `.se/scripts` |
+
+What surprises me:
+
+- the children land parts first, so `mintFaults` over promotions and the `listAt` fix stand green already
+- the audit checklist case passes today, and it guards the `listAt` fix
+- the second-pass case passes today too, and it guards the finding of `the-second-collect-keeps-lines`
+- the route and guidance cases read the real files, so they stand under `test/contract`
+- the case moving everything past the dot folders now expects `scripts` to stay
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: the tests stand beside the files the ask names
+- [x] every door the change reaches has a fake: disk and proc run as fakes
+- [x] a comment names the approach the change implements: each case points at this ticket
+- [x] every fact the change adds stands in one place, and a note points at the file instead of repeating it: yes
+- [x] every row the design review passes with stands fixed in the change: the second-pass case guards the collect row
 
 ## change
 

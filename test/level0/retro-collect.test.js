@@ -145,7 +145,7 @@ test("collect moves everything past the dot folders, and leaves the runtime fold
   const { code } = heard(() => retro(ROOT, ["collect", RETRO], it));
 
   assert.equal(code, 0);
-  assert.deepEqual(standing(it), [".doc", ".retro", ".runtime"]);
+  assert.deepEqual(standing(it), [".doc", ".retro", ".runtime", "scripts"]);
   assert.equal(it.disk.read(input("log/one.jsonl")), '{"said":"a line"}\n');
   assert.equal(it.disk.exists(input("tickets/a-note.md")), true);
   assert.equal(it.disk.exists(input("scripts/one.mjs")), true);
@@ -431,4 +431,64 @@ test("a folder the disk refuses to move whole moves file by file, and leaves not
     manifestOf(it).some((one) => one.refused),
     false,
   );
+});
+
+const stamped = (when, more = "") => `{"timestamp":"${when}"${more}}`;
+
+// [[spec/tickets/the-retro-finishes-its-asks]]
+test("a transcript line stamped before the last collect stays out of the input", () => {
+  const session = home(`.claude/projects/${SLUG}/session.jsonl`);
+  const it = doors({
+    ...FILES,
+    [at(".se/.retro/retro-older/collected.json")]: '{"at":"2026-09-12T00:00:00.000Z"}\n',
+    [session]: [
+      stamped("2026-09-11T08:00:00.000Z", ',"said":"old"'),
+      '{"said":"old, no stamp"}',
+      stamped("2026-09-13T08:00:00.000Z", ',"said":"new"'),
+      '{"said":"new, no stamp"}',
+    ].join("\n"),
+  });
+  it.disk.times.set(session.split("\\").join("/"), Date.parse("2026-09-13T08:00:00.000Z"));
+
+  heard(() => retro(ROOT, ["collect", RETRO], it));
+
+  const copied = it.disk.read(input(`transcripts/${SLUG}/session.jsonl`));
+  assert.doesNotMatch(copied, /"old/);
+  assert.match(copied, /"said":"new"/);
+  assert.match(copied, /new, no stamp/);
+});
+
+// [[spec/tickets/the-second-collect-keeps-lines]]
+test("a second pass keeps the lines the first pass takes, and adds the lines past it", () => {
+  const session = home(`.claude/projects/${SLUG}/session.jsonl`);
+  const first = stamped("2026-09-19T11:00:00.000Z", ',"said":"first"');
+  const it = doors({ ...FILES, [session]: first });
+  heard(() => retro(ROOT, ["collect", RETRO], it));
+
+  it.disk.write(session, [first, stamped("2026-09-19T13:00:00.000Z", ',"said":"later"')].join("\n"));
+  it.disk.times.set(session.split("\\").join("/"), Date.parse("2026-09-19T13:00:00.000Z"));
+  heard(() => retro(ROOT, ["collect", RETRO, "--again"], it));
+
+  const copied = it.disk.read(input(`transcripts/${SLUG}/session.jsonl`));
+  assert.match(copied, /"said":"first"/);
+  assert.match(copied, /"said":"later"/);
+});
+
+// [[spec/tickets/the-retro-finishes-its-asks]]
+test("a collect copies .se/scripts and leaves it in place, and a second pass copies what changes", () => {
+  const it = doors();
+  const first = heard(() => retro(ROOT, ["collect", RETRO], it));
+  assert.equal(first.code, 0, first.said);
+  assert.equal(it.disk.exists(at(".se/scripts/one.mjs")), true, "the scripts stay in place");
+  assert.equal(it.disk.exists(input("scripts/one.mjs")), true);
+
+  it.disk.write(at(".se/scripts/two.mjs"), "// a later script\n");
+  it.disk.times.set(at(".se/scripts/two.mjs").split("\\").join("/"), Date.parse("2026-09-19T13:00:00.000Z"));
+  const again = heard(() => retro(ROOT, ["collect", RETRO, "--again"], it));
+
+  assert.equal(again.code, 0, again.said);
+  assert.equal(it.disk.exists(at(".se/scripts/one.mjs")), true);
+  assert.equal(it.disk.exists(at(".se/scripts/two.mjs")), true);
+  assert.equal(it.disk.read(input("scripts/two.mjs")), "// a later script\n");
+  assert.equal(it.disk.exists(input("scripts/one.2.mjs")), false, "an unchanged script copies once");
 });
