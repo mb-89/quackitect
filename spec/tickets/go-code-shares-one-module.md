@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/tidy-writes-the-go-line.md:39:59: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: implement/tests-green
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: 6682bf2be540902246899015e32e6453f0774cb6
+    hash_after: 6682bf2be540902246899015e32e6453f0774cb6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 52 test(s) pass in 7 file(s); green, src/tui/frame passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/tidy-writes-the-go-line.md:39:59: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -284,11 +296,15 @@ Every new case fails on its own assertion, and every case the layout leaves alon
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/contract/go-module.test.js test/level0/go-modules.test.js test/level0/go-tests.test.js test/level0/go-source.test.js test/level0/test-verb.test.js test/level0/pull-leaves.test.js test/level0/viewer.test.js src/tui/frame/part_test.go
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -296,11 +312,31 @@ Every new case fails on its own assertion, and every case the layout leaves alon
 
 <!-- the form is text -->
 
+The Go code stands in one module, `quackitect`, whose `go.mod` sits at the root. The seven modules under `src` and their two sums leave. Every import names the package folder, such as `quackitect/src/yaml`.
+
+| the part | what it does now |
+|---|---|
+| the Go line | `go 1.24.2`, the floor `go mod tidy` writes |
+| the versions | every dependency at the version the old modules pinned |
+| the battery | runs `go test ./...` once at the root, and `gofmt -l src` |
+| the test verb | runs `go test ./<folder>/...` from the root for a changed test's folder |
+| the stamps | hash the binary's folder, every tree package it imports, and the root `go.mod` and `go.sum` |
+| the install | builds from the root, and fetches the modules once |
+| CI | reads its Go off the root `go.mod` |
+
+The window asked for Go 1.27 alone, and it builds and passes on 1.24, so the one line takes the floor. The case reading the real tree stands in `test/contract/go-module.test.js`, since a level zero test reaches no real door.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the Go files, the Go helpers, their tests, the install, CI and the chapters naming the split
+- the one real-tree case reads the disk door, and every other case reads the fakes
+- each changed file names this ticket beside the line it changes
+- the module files stand once, in `MODULE_FILES`
+- the three review rows stand fixed: the split tests, the tidy Go line and sum, and all seven files gone
 
 # Discussion
 
