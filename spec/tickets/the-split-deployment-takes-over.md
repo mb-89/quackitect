@@ -78,12 +78,11 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: module-processes-switch-over
-depends_on: [module-processes-may-switch, module-processes-land-in-shadow]
 ---
 
 # Ask
 
-`migration.processes` moves to `new`, and the one process gives way to the split.
+`slices.processes` moves to `new`, and the one process gives way to the split.
 
 The model's isolation then holds on every box.
 

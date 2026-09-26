@@ -463,6 +463,111 @@
           "colSpan": 1
         }
       }
+    },
+    "migration": {
+      "type": "object",
+      "required": [
+        "phase0",
+        "phase1",
+        "phase2shadow",
+        "phase2switch",
+        "phase3shadow",
+        "phase3switch",
+        "phase4shadow",
+        "phase4switch",
+        "phase5shadow",
+        "phase5switch",
+        "phase6shadow",
+        "phase6switch",
+        "phase7shadow",
+        "phase7switch",
+        "phase8shadow",
+        "phase8switch",
+        "phase9shadow",
+        "phase9switch",
+        "phase10"
+      ],
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "phase0": {
+          "type": "boolean",
+          "help": "Phase 0, the specs. true in the tracked file on main lets a cloud box take the-migration-writes-its-specs. A write on this box turns nothing on in the cloud."
+        },
+        "phase1": {
+          "type": "boolean",
+          "help": "Phase 1, the foundation. true in the tracked file on main lets a cloud box take the-foundation-lands-unchanged. A write on this box turns nothing on in the cloud."
+        },
+        "phase2shadow": {
+          "type": "boolean",
+          "help": "Phase 2 in shadow. true in the tracked file on main lets a cloud box take open-tasks-land-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase2switch": {
+          "type": "boolean",
+          "help": "Phase 2 switched over. true in the tracked file on main lets a cloud box take open-tasks-switch-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase3shadow": {
+          "type": "boolean",
+          "help": "Phase 3 in shadow. true in the tracked file on main lets a cloud box take read-topics-land-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase3switch": {
+          "type": "boolean",
+          "help": "Phase 3 switched over. true in the tracked file on main lets a cloud box take read-topics-switch-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase4shadow": {
+          "type": "boolean",
+          "help": "Phase 4 in shadow. true in the tracked file on main lets a cloud box take quack-verbs-land-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase4switch": {
+          "type": "boolean",
+          "help": "Phase 4 switched over. true in the tracked file on main lets a cloud box take quack-verbs-switch-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase5shadow": {
+          "type": "boolean",
+          "help": "Phase 5 in shadow. true in the tracked file on main lets a cloud box take go-cage-lands-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase5switch": {
+          "type": "boolean",
+          "help": "Phase 5 switched over. true in the tracked file on main lets a cloud box take go-cage-switches-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase6shadow": {
+          "type": "boolean",
+          "help": "Phase 6 in shadow. true in the tracked file on main lets a cloud box take tui-shell-lands-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase6switch": {
+          "type": "boolean",
+          "help": "Phase 6 switched over. true in the tracked file on main lets a cloud box take tui-shell-switches-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase7shadow": {
+          "type": "boolean",
+          "help": "Phase 7 in shadow. true in the tracked file on main lets a cloud box take lsp-door-lands-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase7switch": {
+          "type": "boolean",
+          "help": "Phase 7 switched over. true in the tracked file on main lets a cloud box take lsp-door-switches-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase8shadow": {
+          "type": "boolean",
+          "help": "Phase 8 in shadow. true in the tracked file on main lets a cloud box take sidebar-lands-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase8switch": {
+          "type": "boolean",
+          "help": "Phase 8 switched over. true in the tracked file on main lets a cloud box take sidebar-switches-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase9shadow": {
+          "type": "boolean",
+          "help": "Phase 9 in shadow. true in the tracked file on main lets a cloud box take module-processes-land-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase9switch": {
+          "type": "boolean",
+          "help": "Phase 9 switched over. true in the tracked file on main lets a cloud box take module-processes-switch-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase10": {
+          "type": "boolean",
+          "help": "Phase 10, Node leaving the boxes. true in the tracked file on main lets a cloud box take node-leaves-the-boxes. A write on this box turns nothing on in the cloud."
+        }
+      }
     }
   }
 }

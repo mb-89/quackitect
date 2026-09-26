@@ -76,13 +76,14 @@ step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [tui-shell-switches-over]
+enabled_by: migration.phase7shadow
 ---
 
 # Ask
 
 Phase 7 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the LSP door and the checks. The rules move into the check module, and a `buffers/` input carries unsaved editor text. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
 
-Done when the new path runs in shadow on `main`, and [[spec/tickets/lsp-door-may-switch]] stands ready for the owner.
+Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 
 # sync
 

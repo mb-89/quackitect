@@ -1,7 +1,7 @@
 // A group waiting on a question the owner closes on trunk stands at todo, and
 // the take walks past it to the next free group, so one gate holds no other
 // work up.
-// [[spec/design_output/work#the-owner-opens-the-gate]]
+// [[spec/design_output/work#the-take-writes-the-record]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -41,7 +41,7 @@ Does the slice switch over?
 Nothing yet.
 `;
 
-// Two free groups: the first waits on the gate, and the second holds a child a hand takes. [[spec/design_output/work#the-owner-opens-the-gate]]
+// Two free groups: the first waits on the gate, and the second holds a child a hand takes. [[spec/design_output/work#the-take-writes-the-record]]
 function twoGroups(gate) {
   const first = gated(withField(GROUP_NOTE, "step", "children"));
   const second = withField(GROUP_NOTE, "step", "children");

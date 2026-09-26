@@ -520,40 +520,32 @@ from a trunk carrying none of that work. It then builds that work a second time.
 
 `branch list` shows what each branch waits for, in place of its mark.
 
-## The owner opens the gate
+## A switch holds a group
 
-A gate holds a group until the owner says go. A `by: person` step holds no
-cloud box, so a gate stands on a ticket no box takes: a question on `main`,
-naming no group. [[spec/processes/question]] opens it at `answer`, a person's
-step.
+A group names a config key under `enabled_by`, and it waits while that key reads
+anything but `true`:
 
-| who meets the gate | what holds it |
+    enabled_by: migration.phase2switch
+
+The wait reads the tracked `spec/config/level0.json` on `origin/main`, the file
+every box shares. A per-box file, a variable and the sidebar each write this
+box alone, so none of them lets the cloud take the group. `readWork` in
+`src/scripts/work-stands.js` reads that file once, through `flatten` in the one
+resolver, where some group names the field.
+
+| the verb | what it does with a switched-off group |
 |---|---|
-| a cloud box | it takes a `work/` branch alone, and the gate stands on none |
-| an agent at a desk | the hand rule refuses it a person's step, short of `--owner-says` |
-| the group behind the gate | the group and every child name the gate under `depends_on` |
+| `branch take` | passes it over, and takes the next free group |
+| `branch list` | says it waits for the key to read true |
+| `cloud trigger` | counts it nowhere among the free groups |
 
-`closedHere` in `src/scripts/pull-hand.js` reads a name the group lacks off
-`origin/main`, so a take reads the gate as the owner's last push leaves it. The
-branch-level wait reads branches alone and passes the gate over, so the group
-reads as free. `standsOpen` finds nothing a hand takes there, and the take moves
-on to the next group, as [[spec/design_output/work#the-take-writes-the-record]]
-says.
+The switch adds to `depends_on`, and replaces none of it. A group takes both: the
+groups it names land, and its key reads true.
 
-The owner opens the gate from a terminal on `main`, where no harness names an
-agent:
-
-    ./RUNME.sh ticket pull <gate>
-    ./RUNME.sh ticket pull <gate> --answered <group>
-    git push origin main
-
-The second pull closes the gate `reason: answered`, naming the group it frees,
-and the push carries the close to `main`. A desk session does the same where
-the owner says so in the chat, with `--owner-says` on both pulls. The next take
-finds the group free.
-
-A gate missing from `main` reads as closed, so the gate stands on `main` before
-the group it holds.
+The owner turns a group on with an edit of `spec/config/level0.json` on `main`,
+setting its key to `true`, then a commit and a push. `./RUNME.sh config` writes
+the per-box file alone, so it turns nothing on in the cloud. A desk session makes
+the same edit where the owner says so.
 
 # The battery answers first
 

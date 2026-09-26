@@ -76,13 +76,14 @@ step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [open-tasks-switch-over]
+enabled_by: migration.phase3shadow
 ---
 
 # Ask
 
 Phase 3 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the read-only topics. `cfg/`, `log/`, `guidance/` and the `check/` names, and the prose checks in Go, each with its own key. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
 
-Done when the new path runs in shadow on `main`, and [[spec/tickets/read-topics-may-switch]] stands ready for the owner.
+Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 
 # sync
 

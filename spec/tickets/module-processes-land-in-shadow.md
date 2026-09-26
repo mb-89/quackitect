@@ -76,13 +76,14 @@ step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [sidebar-switches-over]
+enabled_by: migration.phase9shadow
 ---
 
 # Ask
 
 Phase 9 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the deployment. The doors process, and module processes the system places, with watchdogs across the processes. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
 
-Done when the new path runs in shadow on `main`, and [[spec/tickets/module-processes-may-switch]] stands ready for the owner.
+Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 
 # sync
 

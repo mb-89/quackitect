@@ -76,13 +76,14 @@ step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [lsp-door-switches-over]
+enabled_by: migration.phase8shadow
 ---
 
 # Ask
 
 Phase 8 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the extension. A generic sidebar and form renderer, and `spec/config/level0.schema.json` generated from the declarations. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
 
-Done when the new path runs in shadow on `main`, and [[spec/tickets/sidebar-may-switch]] stands ready for the owner.
+Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 
 # sync
 

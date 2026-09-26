@@ -78,12 +78,11 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: lsp-door-switches-over
-depends_on: [lsp-door-may-switch, lsp-door-lands-in-shadow]
 ---
 
 # Ask
 
-`migration.lsp` moves to `new`, and the LSP's own server, port and index client leave the tree.
+`slices.lsp` moves to `new`, and the LSP's own server, port and index client leave the tree.
 
 A second server drifts from the model.
 

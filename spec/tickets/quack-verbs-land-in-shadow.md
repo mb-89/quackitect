@@ -76,13 +76,14 @@ step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [read-topics-switch-over]
+enabled_by: migration.phase4shadow
 ---
 
 # Ask
 
 Phase 4 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the actions and the command line. A generated `quack`, verbs ported topic by topic as actions returning operations, and the tool list the index generates. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
 
-Done when the new path runs in shadow on `main`, and [[spec/tickets/quack-verbs-may-switch]] stands ready for the owner.
+Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 
 # sync
 

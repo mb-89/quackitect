@@ -75,12 +75,13 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [read-topics-land-in-shadow, read-topics-may-switch]
+depends_on: [read-topics-land-in-shadow]
+enabled_by: migration.phase3switch
 ---
 
 # Ask
 
-Phase 3 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration` moves to `new`, and the old path leaves the tree. The group waits for the owner's go on [[spec/tickets/read-topics-may-switch]].
+Phase 3 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase3switch` to read true in the tracked config on `main`.
 
 Done when no JavaScript twin of a Go check stands.
 
