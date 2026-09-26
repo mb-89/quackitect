@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box fcc1ba4a896f · claude-code-remote
     hash_before: c46c5879b5ca7e1de8e6fcf186f8d471d1525c5f
     hash_after: c46c5879b5ca7e1de8e6fcf186f8d471d1525c5f
+  - step: design/review
+    hand: box fcc1ba4a896f · claude-code-remote · helper-2
+    hash_before: 71706063de906881fc2866d5dcd92934730d636b
+    hash_after: 71706063de906881fc2866d5dcd92934730d636b
 ---
 
 # Ask
@@ -150,6 +154,13 @@ The ask names the view, a condition reads it, and a person leaf closes the route
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+- the-view-fails-to-implement: the `view` step names no `on_fail`, so `failed` in `src/scripts/pull-writes.js` holds the ticket at `view` and the owner's fail reaches no code; the step carries `on_fail: implement`
+- the-cloud-waits-for-owners: the hand rule admits a hand on a cloud box at a `by: person` leaf, so a cloud agent passes the `view` leaf the owner passes in the editor; the leaf waits for the owner's desk or `--owner-says`
+- the-callers-name-their-files: `handFaults` stands in `src/scripts/pull-chapter.js`; the case in `test/contract/process.test.js` asserts no verdict step after the code, and `to: retro` moves from `implement/tests-green` to `view`
+- the-fake-vscode-resolves: `vscode` resolves to no file, so an entry in the require cache alone meets no `require("vscode")`; the case in `test/level0/extension-load.test.js` hooks `Module._load` or `Module._resolveFilename`
+- the-draft-names-its-size: the draft carries no `size`, and the ask leaves out `src/scripts/pull-hand.js`, `src/scripts/pull-writes.js`, `test/contract/process.test.js` and `test/contract/question-grades.test.js`
 
 # implement
 
