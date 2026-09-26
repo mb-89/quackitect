@@ -351,3 +351,53 @@ test("a PowerShell call naming no open ticket refuses, and one naming an open ti
   });
   assert.equal(refused(named), "");
 });
+
+// A write names what stands in hand: a held ticket or the plan's working todo. [[spec/tickets/the-todo-joins-the-queue]]
+const HELD = (ticket) => ({
+  "/tree/.se/.runtime/hold/box-1.json": JSON.stringify({
+    ticket,
+    path: `spec/tickets/${ticket}.md`,
+    step: "do",
+    hand: "box 1",
+  }),
+});
+const PLAN = (working) => ({
+  "/tree/.se/.runtime/plan.json": JSON.stringify({ working, todos: [], places: {} }),
+});
+const fault = (name, seed) =>
+  ticketFault(name, { disk: fakeDisk({ ...TICKETS, ...seed }), root: ROOT }, "How.");
+
+// [[spec/tickets/the-todo-joins-the-queue]]
+test("the held ticket passes and a stranger open ticket fails while a hold stands", () => {
+  assert.equal(fault("open-one", HELD("open-one")), "");
+  const said = fault("private-one", HELD("open-one"));
+  assert.match(said, /private-one/);
+  assert.match(said, /open-one/, "the refusal names the ticket in hand");
+});
+
+// [[spec/tickets/the-todo-joins-the-queue]]
+test("the working todo's title passes, and the refusal names the hold and the todo", () => {
+  assert.equal(fault("fix the door", PLAN("fix the door")), "");
+  const said = fault("open-one", { ...HELD("private-one"), ...PLAN("fix the door") });
+  assert.match(said, /private-one/, "it names the hold");
+  assert.match(said, /fix the door/, "it names the todo");
+});
+
+// An ephemeral ticket stands in the hold alone, so its name passes with no file. [[spec/tickets/the-door-passes-ephemeral-holds]]
+test("an ephemeral hold's ticket passes with no file behind it", () => {
+  const seed = {
+    "/tree/.se/.runtime/hold/box-1.json": JSON.stringify({
+      ticket: "clear",
+      step: "clear",
+      ephemeral: true,
+      hand: "box 1",
+    }),
+  };
+  assert.equal(fault("clear", seed), "");
+});
+
+// With nothing in hand, any open ticket passes, so the commit verb run by hand still lands. [[spec/tickets/the-open-road-stays-named]]
+test("with nothing in hand, any open ticket passes and a closed one fails", () => {
+  assert.equal(fault("open-one", {}), "");
+  assert.match(fault("done-one", {}), /closed/);
+});

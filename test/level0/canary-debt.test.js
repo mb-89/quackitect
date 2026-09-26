@@ -4,8 +4,8 @@
 // [[spec/design_output/level0#the-line-lands-once]]
 // [[spec/design_output/level0#the-debt-survives-a-restart]]
 
-import { join } from "node:path";
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import { test } from "node:test";
 import {
   canary,
@@ -86,7 +86,10 @@ test("a restart after the line leaves the gate quiet", () => {
 });
 
 test("a restart before the line asks for the canary", () => {
-  assert.equal(owes(box([rowOf(AT, "info", "context", "1 block(s) reach the session")])), true);
+  assert.equal(
+    owes(box([rowOf(AT, "info", "context", "1 block(s) reach the session")])),
+    true,
+  );
 });
 
 test("a compaction after the line opens the debt again, and a restart reads that", () => {
@@ -123,4 +126,51 @@ test("the line draws highlighted in the wording that owes it and the wording tha
       `the line stands on a line of its own: ${said}`,
     );
   }
+});
+
+// A context repeats the canary, and the repeat draws a finding. [[spec/tickets/answers-read-the-last-text]]
+function heard(it) {
+  const said = [];
+  it.log = { say: (...row) => said.push(row) };
+  return said;
+}
+
+const repeats = (said) =>
+  said.filter((one) => one[0] === "warn" && one[2] === HEARD.again);
+
+// [[spec/tickets/answers-read-the-last-text]]
+test("a second step opening on the canary in one context draws the repeat finding", () => {
+  const it = box();
+  const said = heard(it);
+  onTurnSaid({ text: `${LINE}\n\nThe work goes on.` }, it);
+  onTurnSaid({ text: `${LINE}\n\nThe next piece.` }, it);
+  assert.equal(repeats(said).length, 1);
+});
+
+// [[spec/tickets/answers-read-the-last-text]]
+test("a step that pays, then the turn's end carrying the same text, draws no finding", () => {
+  const it = box();
+  const said = heard(it);
+  onTurnSaid({ text: `${LINE}\n\nThe work stands done.` }, it);
+  onTurnComplete({ reason: "answer", answer: `${LINE}\n\nThe work stands done.` }, it);
+  assert.equal(repeats(said).length, 0);
+});
+
+// [[spec/tickets/answers-read-the-last-text]]
+test("the canary alone written twice in one context draws the finding", () => {
+  const it = box();
+  const said = heard(it);
+  onTurnSaid({ text: LINE }, it);
+  onTurnSaid({ text: LINE }, it);
+  assert.equal(repeats(said).length, 1);
+});
+
+// [[spec/tickets/answers-read-the-last-text]]
+test("a line after a compaction pays and draws no finding", () => {
+  const it = box();
+  const said = heard(it);
+  onTurnSaid({ text: LINE }, it);
+  onSessionCompact({ trigger: "auto" }, it);
+  onTurnSaid({ text: LINE }, it);
+  assert.equal(repeats(said).length, 0);
 });

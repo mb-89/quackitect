@@ -15,6 +15,7 @@ export const HEARD = {
   same: "the canary opens the answer whole",
   other: "the canary opens the answer with other counts",
   none: "the canary opens no answer",
+  again: "the canary opens a second answer in one context",
 };
 
 // The line stands set in, on a line of its own. A reader finds it there without reading the wording around it. [[spec/design_output/level0#the-canary]]

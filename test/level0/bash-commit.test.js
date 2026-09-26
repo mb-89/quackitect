@@ -103,8 +103,9 @@ test("a push off a work branch lands whatever the lint says", async () => {
 // The change leaf stages code alone, and the test its tests-red leaf landed rides the ticket. [[spec/design_output/tree#the-rules-over-two-files]]
 test("a commit whose test a held ticket carries lands at the door", async () => {
   const seed = {
+    // The call names the ticket in hand, so the name door passes it. [[spec/tickets/the-todo-joins-the-queue]]
     [`${ROOT}/.se/.runtime/hold/a-hand.json`]: JSON.stringify({
-      ticket: "one",
+      ticket: NAMED,
       path: "spec/tickets/one.md",
     }),
     [`${ROOT}/spec/tickets/one.md`]:
