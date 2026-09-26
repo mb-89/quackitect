@@ -12,8 +12,9 @@ rationale: [[spec/rationales/verifying]]
 4. Leave the rest `open`, and write each one a ticket name, a gain, a breaks and a done_when. An open class missing one of the four mints a ticket no hand can close. *
 5. Write each promotion a ticket name, a gain, a breaks and a done_when, where no ticket names it yet. A promotion short of one stops `retro mint`, and `retro classes` passes it. *
 6. Name the check holding a fix in place where the rule for it stands already. A fix with no check drifts back the first time nobody looks. *
-7. Run `./RUNME.sh retro mint <retro>`, which mints one ticket a class standing open.
-8. Run `./RUNME.sh retro matrix <retro>` again, so the report carries each status and ticket.
+7. Run `./RUNME.sh retro matrix <retro>` again, then hand the check to the `report` step. A report drawn after the mint shows the owner tickets made before the read. *
+8. Let the owner pass the `report` step, and send the check back where the owner fails it. A class the owner has yet to weigh mints a fix nobody asks for. *
+9. Run `./RUNME.sh retro mint <retro>` in the `mint` step, for every open class and waiting promotion. An unminted promotion waits unbuilt, and the owner repeats it. *
 
 # Examples
 

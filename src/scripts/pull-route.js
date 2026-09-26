@@ -67,6 +67,8 @@ export const VERBS = {
     "timeline",
     "chapters",
     "matrix",
+    // [[spec/tickets/the-retro-finishes-its-asks]]
+    "read",
     "effect",
     "classes",
     "mint",

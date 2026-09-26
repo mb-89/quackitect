@@ -6,6 +6,8 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { rowsOf } from "../../src/engine/retro/read.js";
+import { FAULT } from "../../src/engine/retro/timeline.js";
 import { retro } from "../../src/scripts/retro.js";
 
 const ROOT = "/tree";
@@ -81,4 +83,13 @@ test("retro read refuses a chapter the retro holds nowhere", () => {
   assert.equal(code, 2);
   assert.match(out, /c9/);
   assert.match(out, /retro read/);
+});
+
+// The reader marks a fault the way the timeline counts it. [[spec/tickets/the-retro-finishes-its-asks]]
+test("a row reads a fault as the timeline counts it, and a line reading as no JSON earns none", () => {
+  const warn = JSON.stringify({ at: WHEN, level: "warn", msg: "a slow door" });
+  assert.equal(FAULT.test(warn), true);
+  assert.deepEqual(rowsOf("log/session.jsonl", warn), [{ kind: "fault", text: "a slow door" }]);
+  assert.deepEqual(rowsOf("log/session.jsonl", "not json"), []);
+  assert.deepEqual(rowsOf("transcripts/one/a.jsonl", said("user", "   ")), []);
 });

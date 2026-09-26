@@ -43,3 +43,20 @@ Where the rule already stands and the defect keeps coming, writing the rule
 again changes nothing. The test-first rule stands in the code guidance, and
 the audit still found code landing without a test. So the fix names the check
 that holds the rule, and the ticket carries that check.
+
+## 7. The report before the mint
+
+The matrix draws each status and promotion the check writes. The owner reads
+that report before a ticket mints, so a class drawn after the mint would show
+the owner work already made.
+
+## 8. The owner passes the report
+
+A retro mints the fixes the owner weighs. The `report` step waits on the owner,
+and a fail sends the check back with what it changes.
+
+## 9. A promotion mints too
+
+A rule a retro promotes waits unbuilt where no ticket carries it, and the owner
+states it again the next day. So the `mint` step mints a ticket a promotion as
+it mints one a class.

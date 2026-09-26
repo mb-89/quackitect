@@ -1,7 +1,8 @@
 // The retro's collect, its first step. It moves everything the private folder
-// holds, past the dot folders, into the retro's own input folder, and copies
-// the transcripts, the memory and the scratchpads beside it. After it, the
-// private folder holds the runtime folder and the retro folder alone.
+// holds, past the dot folders and the scripts, into the retro's own input
+// folder, and copies the scripts, the transcripts, the memory and the
+// scratchpads beside it. After it, the private folder holds the runtime
+// folder, the retro folder and the scripts alone.
 // [[spec/guidance/retro/collect]]
 
 import { LOG, PRIVATE, RETRO } from "../../.claude/skills/level0/lib/folders.js";
@@ -9,7 +10,7 @@ import { STAMP, saysGreen, stampOf } from "../../.claude/skills/level0/lib/runs.
 import { BATTERY } from "../engine/retro/effect.js";
 import { medianParts } from "./battery.js";
 import { holdsAnywhere } from "./guidance-hand.js";
-import { outsideInto } from "./retro-outside.js";
+import { copyTree, outsideInto } from "./retro-outside.js";
 
 const INPUT = "input";
 const MANIFEST = "manifest.jsonl";
@@ -19,6 +20,8 @@ const DOT = ".";
 // The one dot folder collect drains: a running session writes the log through a retro, and the log is history. [[spec/guidance/retro/collect]]
 const DRAINED = LOG.split("/").at(-1);
 const DRAINED_INTO = "log";
+// The folder collect copies and leaves in place, since the classify step runs the generators a hand keeps there. [[spec/tickets/the-retro-finishes-its-asks]]
+const KEPT = ["scripts"];
 // The column a source name fills, so the counts stand in one line down the page. [[spec/guidance/retro/collect]]
 const SOURCE_WIDTH = 12;
 
@@ -68,11 +71,14 @@ export function collect(it, name, again = false) {
 
   // A torn run holds files it moves, so the next run carries on where it stops, and deletes nothing. [[spec/guidance/retro/collect]]
   // A second pass takes what arrives past this retro's own collect, and merges it into the same input. [[spec/guidance/retro/collect]]
-  const since = again ? ownAt(it, home) || sinceLast(it, name) : sinceLast(it, name);
+  // A transcript keeps its lines past the last retro's collect, so a second pass copies a changed one whole again, and keeps what the first took. [[spec/tickets/the-second-collect-keeps-lines]]
+  const window = sinceLast(it, name);
+  const since = again ? ownAt(it, home) || window : window;
   it.disk.makeDir(into);
   const moved = movedInto(it, into);
-  const outside = outsideInto(it, into, since);
-  const refused = [...moved.refused, ...outside.refused];
+  const kept = keptInto(it, into, again ? since : 0);
+  const outside = outsideInto(it, into, since, window);
+  const refused = [...moved.refused, ...kept.refused, ...outside.refused];
 
   const rows = [...linesOf(it, into), ...refused];
   it.disk.write(
@@ -104,12 +110,21 @@ export function keptReport(stamp) {
   return { ...report, parts, total, runs: runs.length };
 }
 
+// Every kept folder copies into the input, and stays where it stands. [[spec/tickets/the-retro-finishes-its-asks]]
+function keptInto(it, into, since) {
+  const out = { taken: [], refused: [] };
+  for (const one of KEPT)
+    copyTree(it, it.join(it.root, PRIVATE, one), it.join(into, one), since, out, []);
+  return out;
+}
+
 // Every entry straight under the private folder moves whole, a folder with all it holds. A dot folder stays, and the log is the one dot folder that moves. [[spec/guidance/retro/collect]]
 function movedInto(it, into) {
   const from = it.join(it.root, PRIVATE);
   const out = { refused: [] };
   for (const one of listed(it, from)) {
     if (one.name.startsWith(DOT) && one.name !== DRAINED) continue;
+    if (KEPT.includes(one.name)) continue;
     const was = it.join(from, one.name);
     const now = it.join(into, one.name === DRAINED ? DRAINED_INTO : one.name);
     try {
@@ -235,7 +250,7 @@ function countsOf(rows) {
 // What stands straight under the private folder past the two dot folders, which a clean collect leaves empty. [[spec/guidance/retro/collect]]
 function stands(it) {
   const left = listed(it, it.join(it.root, PRIVATE)).filter(
-    (one) => !one.name.startsWith(DOT),
+    (one) => !one.name.startsWith(DOT) && !KEPT.includes(one.name),
   );
   for (const one of left)
     console.error(`  ${PRIVATE}/${one.name} still stands beside the dot folders.`);

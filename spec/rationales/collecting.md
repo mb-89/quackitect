@@ -70,8 +70,10 @@ Collect moves everything past the dot folders, a move and no copy. So the next
 retro starts empty, and nothing counts twice. A folder under a dot name is one
 the owner keeps out of every retro.
 
-The log is the one dot folder collect drains. A running session writes it
-through the whole retro, so its dot keeps the private folder empty meanwhile.
+Collect treats these apart:
+
+- the log, the one dot folder collect drains. A running session writes it through the whole retro.
+- `.se/scripts`, which collect copies and leaves in place. The classify step runs the generators kept there.
 
 A third thing standing after a collect is a writer putting a file where it does
 not belong. The collect names it and answers one.
