@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-gates-read-the-state
 steps:
   - name: design
@@ -87,6 +87,12 @@ record:
     hand: box c28a93a32b71 · claude-code-remote · helper-2
     hash_before: 13cde42f0cb12920b8f5a6963381269dfef06864
     hash_after: 13cde42f0cb12920b8f5a6963381269dfef06864
+  - step: implement/tests-red
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 69cf007d1aba486a21db0e2a2f105c13c25cb08b
+    hash_after: 69cf007d1aba486a21db0e2a2f105c13c25cb08b
+    why: helper-mark-drops-at-stop answers this ask
+reason: answered
 ---
 
 # Ask
@@ -262,3 +268,5 @@ pass with findings
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The queue handed the children `helper-mark-drops-at-stop` and `step-rule-names-its-rank` ahead of this ticket's implement step, and the whole change landed under the first one's hand-back. Before it, the cases for the dropped talk rule, the owner's step, the stop call's helper mark and the taken group each failed on their own assertion. After it, `./RUNME.sh check` exits 0. So this ticket closes as answered by that child.
