@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 8 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 0f11689da536ffd11f7617138e463c1d1a8a5fb1
+    hash_after: c38a7232838817638b81ab8b49c779d969b06498
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
 ---
 
 # Ask
@@ -299,11 +307,19 @@ What surprises me:
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: the rationales and `pull-route.js` follow the guidance and the verb
+- [x] every door the change reaches has a fake: disk and proc run as fakes
+- [x] a comment names the approach the change implements: each new function points at this ticket
+- [x] every fact the change adds stands in one place, and a note points at the file instead of repeating it: yes
+- [x] every row the design review passes with stands fixed in the change: each child lands first, and collect windows at `sinceLast`
 
 ## tests-green
 
