@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-servers-and-views-hold
 steps:
   - name: design
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7a44d6f73215 · claude-code-remote
+    hash_before: 5937083878f0b5d6962d05c31d23d16bc4e67b6c
+    hash_after: 5937083878f0b5d6962d05c31d23d16bc4e67b6c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 46 test(s) pass in 6 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/every-road-has-a-caller.md:270:100: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
