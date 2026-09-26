@@ -156,15 +156,20 @@ The mark reads meet one limit. `lib/marks.js` and `MARKS` in `lib/runs.js` stand
 - `src/scripts/pull-hand.js` `advanced`, which calls `holdsHere`
 - `src/scripts/pull-writes.js` `passed`, which calls `holdsHere`
 - `src/bridge/findings.js` `pastHistory`, which `readingFor` in `src/scripts/cli-read.js` calls over the schema rows
-- `src/bridge/apply.js` `checked`, `lands`, `undone` and `readsFiles`, which called `onWrite` and set marks
+- `src/bridge/apply.js` `checked` and `lands`, which called `onWrite` and set marks
+- `src/bridge/apply.js` `undone` and `readsFiles`, which called `onWrite` and set marks
 - `src/bridge/tools.js` `mintsNote`, which calls `onWrite`
 - `src/bridge/bash.js` `onBash`, which called `marksShown`
-- `src/bridge/server.js` `decide` and the `TOOLS` table, which called `marksKept` and `onRead`
+- `src/bridge/server.js` `decide`, which called `marksKept` and `onRead`
+- `src/bridge/server.js` the `TOOLS` table, which called `marksKept` and `onRead`
 - `src/scripts/pull-hand.js` `handOut`, which called `unblockPrompt`
 - `src/scripts/pull-hand.js` `admits`, which handed `handOut` the person field
 - `src/scripts/pull.js` `handBack`, which calls `sentOut`
-- `src/scripts/pull-writes.js` `passed`, `failed`, `became` and `answeredBy`, which call `sentOut`
-- `src/scripts/pull-hand.js` `repairPersonSteps`, `src/scripts/pull.js` `takeBack` and `src/scripts/pull-escalate.js`, which call `pushed`
+- `src/scripts/pull-writes.js` `passed` and `failed`, which call `sentOut`
+- `src/scripts/pull-writes.js` `became` and `answeredBy`, which call `sentOut`
+- `src/scripts/pull-hand.js` `repairPersonSteps`, which calls `pushed`
+- `src/scripts/pull.js` `takeBack`, which calls `pushed`
+- `src/scripts/pull-escalate.js`, which calls `pushed`
 
 ### tests
 
@@ -194,8 +199,8 @@ The mark reads meet one limit. `lib/marks.js` and `MARKS` in `lib/runs.js` stand
 
 <!-- the form is checklist -->
 
-- every file, function and verb the approach names stands opened, and each claim checked there. The table of the cloud route reads `branchTaken`, `take` in `src/scripts/work.js`, `serving`, the queue gate in `pull`, `newRetro` and `spec/guidance/cloud`.
-- the callers list names every caller of what the approach changes. A search for `holdsHere`, `sentOut`, `pushed`, `onWrite`, `marksSeen`, `marksOf`, `marksKept`, `onRead` and `unblockPrompt` found each one.
+- every file, function and verb the approach names stands opened, and each claim checked there. The table of the cloud route reads `branchTaken`, `take` in `src/scripts/work.js` and `serving`. It also reads the queue gate in `pull`, `newRetro` and `spec/guidance/cloud`.
+- the callers list names every caller of what the approach changes. A search found each one. It ran for `holdsHere`, `sentOut` and `pushed`. It ran for `onWrite`, `marksSeen` and `marksOf`. It ran for `marksKept`, `onRead` and `unblockPrompt`.
 - every done_when line names the test that decides it. The tests list holds one case a line, and `./RUNME.sh check` decides the last.
 
 ## review
@@ -220,7 +225,7 @@ The mark reads meet one limit. `lib/marks.js` and `MARKS` in `lib/runs.js` stand
 
 <!-- the form is command -->
 
-./RUNME.sh test test/level0/level1.test.js test/level0/pull-hand.test.js test/level0/pull-spawn.test.js test/contract/one-reading.test.js test/level0/write.test.js test/level0/pull-push.test.js
+    ./RUNME.sh test test/level0/level1.test.js test/level0/pull-hand.test.js test/level0/pull-spawn.test.js test/contract/one-reading.test.js test/level0/write.test.js test/level0/pull-push.test.js
 
 ### seen
 
@@ -228,7 +233,11 @@ The mark reads meet one limit. `lib/marks.js` and `MARKS` in `lib/runs.js` stand
 
 <!-- the form is text -->
 
-Over the code before the change, every new case fails. Five fail on their own assertion. The push case fails where the fake names the check it was never taught, which is the trunk road running. The judge's case stays red after the change too, because its line stands under `.claude`, so it stands `todo` and names that.
+Over the code before the change, every new case fails:
+
+- five fail on their own assertion
+- the push case fails where the fake names a check outside its script. That check is the trunk road running.
+- the judge's case stays red after the change too, because its line stands under `.claude`. It stands `todo` and names that.
 
 What surprises: the check already reads no row on a closed ticket, so the closed tickets carrying `when: returned` pass with no edit. The write door still reads the whole schema on a write to one of them.
 
@@ -238,10 +247,10 @@ What surprises: the check already reads no row on a closed ticket, so the closed
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. It touches the files the ask names, their callers, the cases of each, and the three design notes naming the roads.
-- every door the change reaches has a fake. The cases drive the fake disk, the fake git and the fake proc, and the judge's case hands the hook a fake harness.
+- the change touches no file the ask leaves out. It touches the files the ask names, their callers and the cases of each. It also touches the three design notes naming the roads.
+- every door the change reaches has a fake. The cases drive the fake disk, the fake git and the fake proc. The judge's case hands the hook a fake harness.
 - a comment names the approach the change implements. Each changed road carries a pointer at this ticket.
-- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The read of the cloud route stands here, and `spec/design_output/pull.md` points at it.
+- every fact the change adds stands in one place, and a note points at the file that holds it. The read of the cloud route stands here, and `spec/design_output/pull.md` points at it.
 - every row the design review passes with stands fixed in the change. No review ran yet.
 
 ## change
@@ -254,7 +263,7 @@ What surprises: the check already reads no row on a closed ticket, so the closed
 
 <!-- the form is command -->
 
-./RUNME.sh lint src/scripts/pull-push.js src/scripts/pull-hand.js src/scripts/pull-writes.js src/scripts/pull.js src/scripts/pull-spawn.js src/bridge/write.js src/bridge/apply.js src/bridge/bash.js src/bridge/server.js spec/design_output/work.md spec/design_output/pull.md spec/design_output/level0.md spec/config/level0.schema.json spec/schemas/ticket.schema.yaml
+    ./RUNME.sh lint src/scripts/pull-push.js src/scripts/pull-hand.js src/scripts/pull-writes.js src/scripts/pull.js src/scripts/pull-spawn.js src/bridge/write.js src/bridge/apply.js src/bridge/bash.js src/bridge/server.js spec/design_output/work.md spec/design_output/pull.md spec/design_output/level0.md spec/config/level0.schema.json spec/schemas/ticket.schema.yaml
 
 ### checked
 
@@ -262,10 +271,10 @@ What surprises: the check already reads no row on a closed ticket, so the closed
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. It touches the files the ask names, their callers, the cases of each, and the three design notes naming the roads.
-- every door the change reaches has a fake. The cases drive the fake disk, the fake git and the fake proc, and the judge's case hands the hook a fake harness.
+- the change touches no file the ask leaves out. It touches the files the ask names, their callers and the cases of each. It also touches the three design notes naming the roads.
+- every door the change reaches has a fake. The cases drive the fake disk, the fake git and the fake proc. The judge's case hands the hook a fake harness.
 - a comment names the approach the change implements. Each changed road carries a pointer at this ticket.
-- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The read of the cloud route stands here, and `spec/design_output/pull.md` points at it.
+- every fact the change adds stands in one place, and a note points at the file that holds it. The read of the cloud route stands here, and `spec/design_output/pull.md` points at it.
 - every row the design review passes with stands fixed in the change. No review ran yet.
 
 ## tests-green
@@ -278,7 +287,7 @@ What surprises: the check already reads no row on a closed ticket, so the closed
 
 <!-- the form is command -->
 
-./RUNME.sh test test/level0/level1.test.js test/level0/pull-hand.test.js test/level0/pull-spawn.test.js test/contract/one-reading.test.js test/level0/write.test.js test/level0/pull-push.test.js
+    ./RUNME.sh test test/level0/level1.test.js test/level0/pull-hand.test.js test/level0/pull-spawn.test.js test/contract/one-reading.test.js test/level0/write.test.js test/level0/pull-push.test.js
 
 ### check
 
@@ -294,9 +303,17 @@ What surprises: the check already reads no row on a closed ticket, so the closed
 
 <!-- the form is text -->
 
-The engine held roads no shipped route or box reaches, and a judge that ran on a config naming no judge. The change takes out the `returned` condition, the mark door and every writer of a mark, the unblock prompt, the person road in `handOut`, and the trunk road of the push. A read of the cloud route shows no box hands back on trunk. The config schema declares the judge off. The work note names who answers a person step, one row a box.
+The engine held roads no shipped route or box reaches, and a judge that ran on a config naming no judge. The change takes out these roads:
 
-Two writes wait on the owner, because the harness refuses this hand a write under `.claude`. One is `judge.enabled !== true` in `judged`, whose case stands `todo`. The other takes out `lib/marks.js`, `MARKS` in `lib/runs.js`, and their cases in `test/level0/apply.test.js`.
+- the `returned` condition
+- the mark door and every writer of a mark
+- the unblock prompt
+- the person road in `handOut`
+- the trunk road of the push
+
+A read of the cloud route shows no box hands back on trunk. The config schema declares the judge off. The work note names who answers a person step, one row a box.
+
+Two writes wait on the owner, because the harness refuses this hand a write under `.claude`. One writes `judge.enabled !== true` into `judged`, whose case stands `todo`. The other takes out `lib/marks.js`, `MARKS` in `lib/runs.js`, and their cases in `test/level0/apply.test.js`.
 
 ### checked
 
@@ -304,10 +321,10 @@ Two writes wait on the owner, because the harness refuses this hand a write unde
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. It touches the files the ask names, their callers, the cases of each, and the three design notes naming the roads.
-- every door the change reaches has a fake. The cases drive the fake disk, the fake git and the fake proc, and the judge's case hands the hook a fake harness.
+- the change touches no file the ask leaves out. It touches the files the ask names, their callers and the cases of each. It also touches the three design notes naming the roads.
+- every door the change reaches has a fake. The cases drive the fake disk, the fake git and the fake proc. The judge's case hands the hook a fake harness.
 - a comment names the approach the change implements. Each changed road carries a pointer at this ticket.
-- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The read of the cloud route stands here, and `spec/design_output/pull.md` points at it.
+- every fact the change adds stands in one place, and a note points at the file that holds it. The read of the cloud route stands here, and `spec/design_output/pull.md` points at it.
 - every row the design review passes with stands fixed in the change. No review ran yet.
 
 # Discussion
@@ -315,5 +332,5 @@ Two writes wait on the owner, because the harness refuses this hand a write unde
 <!-- what anybody adds, at any time, on this ticket -->
 
 - The read of the cloud route stands in the approach, and shows no box hands back on trunk.
-- The harness refuses this hand a write under `.claude`. Two changes wait on the owner there: `judge.enabled !== true` in `judged`, and the removal of `lib/marks.js` with `MARKS` in `lib/runs.js`.
-- The write door reads the whole ticket schema on a write to a closed ticket, so a write to one carrying `when: returned` meets `when reads returned`. The check reads no row there.
+- The harness refuses this hand a write under `.claude`, so two changes wait on the owner there. The first puts `judge.enabled !== true` in `judged`. The second removes `lib/marks.js` with `MARKS` in `lib/runs.js`.
+- The write door reads the whole ticket schema on a write to a closed ticket. A write to one carrying `when: returned` meets `when reads returned`. The check reads no row there.
