@@ -78,6 +78,7 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: read-topics-land-in-shadow
+depends_on: [open-tasks-switch-over]
 ---
 
 # Ask

@@ -78,7 +78,7 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: read-topics-switch-over
-depends_on: [read-topics-may-switch, readers-take-the-go-topics]
+depends_on: [read-topics-may-switch, readers-take-the-go-topics, read-topics-land-in-shadow]
 ---
 
 # Ask

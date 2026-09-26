@@ -78,6 +78,7 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: module-processes-land-in-shadow
+depends_on: [sidebar-switches-over]
 ---
 
 # Ask

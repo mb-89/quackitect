@@ -78,7 +78,7 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: tui-shell-switches-over
-depends_on: [tui-shell-may-switch]
+depends_on: [tui-shell-may-switch, tui-shell-lands-in-shadow]
 ---
 
 # Ask

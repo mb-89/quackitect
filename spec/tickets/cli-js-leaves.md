@@ -78,7 +78,7 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: quack-verbs-switch-over
-depends_on: [quack-verbs-may-switch, agents-call-quack-directly]
+depends_on: [quack-verbs-may-switch, agents-call-quack-directly, quack-verbs-land-in-shadow]
 ---
 
 # Ask

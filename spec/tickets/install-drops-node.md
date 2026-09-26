@@ -78,7 +78,7 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: node-leaves-the-boxes
-depends_on: [go-prose-checks-stand-alone, the-webview-ships-prebuilt]
+depends_on: [go-prose-checks-stand-alone, the-webview-ships-prebuilt, module-processes-switch-over]
 ---
 
 # Ask

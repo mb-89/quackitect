@@ -46,9 +46,10 @@ Every group outside the migration keeps moving. The owner's commands stand in
 
 # The phases
 
-Each group names the one before it under `depends_on`, and a switch group names
-its gate as well. Nothing outside the migration waits on these groups, and none
-carries `urgent`.
+Each group names the one before it under `depends_on`, and so does each of its
+children, so the order holds whichever branch a desk cuts first. A switch group
+and its children name the gate as well. Nothing outside the migration waits on
+these groups, and none carries `urgent`.
 
 | phase | the groups | done when |
 |---|---|---|

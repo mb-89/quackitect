@@ -78,7 +78,7 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: quack-verbs-land-in-shadow
-depends_on: [runme-hands-verbs-to-quack]
+depends_on: [runme-hands-verbs-to-quack, read-topics-switch-over]
 ---
 
 # Ask
