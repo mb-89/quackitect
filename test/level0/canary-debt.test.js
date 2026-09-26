@@ -46,7 +46,7 @@ const paidRow = () => rowOf(AT, "info", "level0", HEARD.same, { detail: LINE });
 const compactRow = () => rowOf(AT, "info", "compact", "a compaction runs");
 
 const owes = (it) => Boolean(owesCanary({ tool: "Read" }, it));
-// A box whose session the layer reached, so the line stands owed.
+// A box whose session the layer reached, so the line stands owed. [[spec/design_output/level0#rules-ride-the-first-answer]]
 const reached = () =>
   box([rowOf(AT, "info", "context", "4 block(s) reach the session")]);
 
