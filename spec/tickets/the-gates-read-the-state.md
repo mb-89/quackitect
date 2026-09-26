@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: split
+step: children
 record:
   - step: sync
     hand: box c28a93a32b71 · claude-code-remote
@@ -87,6 +87,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-gates-read-the-state already carries every commit on main.
+  - step: split
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 0b3308e8bc03decabb45e28384461e56761919e8
+    hash_after: 0b3308e8bc03decabb45e28384461e56761919e8
 ---
 
 # Ask
@@ -115,11 +119,40 @@ Every gate reads what the session holds. The stop claims a true reason, and an a
 
 <!-- the form is list -->
 
+- [[spec/tickets/a-late-count-pays-nothing]], trivial
+- [[spec/tickets/a-reply-follows-its-prompt]], standard
+- [[spec/tickets/answers-read-the-last-text]], standard
+- [[spec/tickets/callers-name-both-readers]], trivial
+- [[spec/tickets/canary-repeat-ignores-paid-text]], trivial
+- [[spec/tickets/helper-mark-drops-at-stop]], trivial
+- [[spec/tickets/meta-rows-open-no-turn]], trivial
+- [[spec/tickets/step-rule-names-its-rank]], trivial
+- [[spec/tickets/the-bridge-names-no-maker]], trivial
+- [[spec/tickets/the-callers-drop-ticket-faults]], trivial
+- [[spec/tickets/the-door-passes-ephemeral-holds]], trivial
+- [[spec/tickets/the-door-picks-a-hold]], trivial
+- [[spec/tickets/the-hand-reads-plans-here]], trivial
+- [[spec/tickets/the-open-road-stays-named]], trivial
+- [[spec/tickets/the-retro-holds-the-clear]], standard
+- [[spec/tickets/the-retro-reads-its-hand]], trivial
+- [[spec/tickets/the-stop-reads-the-state]], standard
+- [[spec/tickets/the-talk-prose-leaves-stop]], trivial
+- [[spec/tickets/the-todo-joins-the-queue]], standard
+- [[spec/tickets/the-todo-road-stands-first]], trivial
+- [[spec/tickets/the-warning-has-fallback]], trivial
+- [[spec/tickets/the-warning-keeps-readers]], trivial
+- [[spec/tickets/the-window-case-in-level0]], trivial
+- [[spec/tickets/the-window-keeps-the-binding]], trivial
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each standard child reads whole in one review, and each review finding stands as a trivial child of its own
+- the five standard children cover the four sentences of the ask: the answer door, the canary and the measure, the retro's clear, the stop's reasons, and the todo's hold
+- no child waits on another, so none names depends_on
 
 # children
 
