@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -111,6 +111,10 @@ record:
     hand: box c28a93a32b71 · claude-code-remote
     hash_before: fe0c78daa6dc8f9a43105fa551959f583e019e54
     hash_after: fe0c78daa6dc8f9a43105fa551959f583e019e54
+  - step: design/draft
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 58e39e1db337198f71aaec2200c5f53c73bae71e
+    hash_after: 58e39e1db337198f71aaec2200c5f53c73bae71e
 group: the-gates-read-the-state
 ---
 
@@ -155,23 +159,30 @@ The findings stand, and the next draft takes each:
 
 <!-- the form is text -->
 
-The demand a prompt opens keys on the prompt itself, and every road that pays it reads that key. The same-message road waits on a probe, because no road this tree knows carries that text at the first call.
+The demand a prompt opens keys on the prompt itself, and every road that pays it reads that key. The same-message road rests on the `tool.call` event, and a probe proves it first.
 
 | the road | the change |
 |---|---|
-| the demand | `onPromptSubmit` in `src/bridge/answer.js` stores `at`, the server's time at the prompt, and `said`, the prompt's own text |
-| the spoken text | one writer, `speaks(box, text)`, sets `box.spoken` and `box.spokenAt`. `onMessageDisplay`, `pays`, `paid` and `onTurnEnd` call it in place of their own writes |
+| the demand | `onPromptSubmit` in `src/bridge/answer.js` stores `at`, the server's time at the prompt, and `owners`, the owner rows the bridgehead counts at `prompt.submit` |
+| the warning | `onPromptSubmit` answers `event`, the prompt with its text opening on the `warns` line. The bridgehead's `seen` hands it on through `answer.event`, the way `agent.spawn` prepends its line |
+| the spoken text | one writer, `speaks(box, text)`, sets `box.spoken` and `box.spokenAt`. `onMessageDisplay`, `pays`, `paid` and `onTurnEnd` call it |
 | the display | a display pays a prompt's demand where its `spokenAt` falls after `at` |
-| the transcript | `lastTexts` in the bridgehead posts `rows`, each with its role and text. `onAgentSpoke` counts an assistant text past the row whose text equals `said` alone. A transcript missing that row pays nothing, so a late flush after a restart hands no older text |
-| the warning | `onPromptContext` in `src/bridge/guidance.js` adds a `level0-answer` block carrying `warns(...)` while a prompt's demand stands unpaid. The cage block rides the same road |
+| the transcript | `lastTexts` posts `rows`, each with its role, its text and its id where it carries one. `onAgentSpoke` counts an assistant text past the prompt's own row alone |
+| the same message | `holdsForAnswer` pays off the text the `tool.call` event carries for its own message, on the field the probe names |
 
-The same message: the ask says the chat shows that text after the door reads. `turn.step` fires at the step's first tool result, so `stepText` stands empty at the first call of the first step. That call is the one after a prompt, and the display lands behind it. So the implement step opens on `./RUNME.sh probe reply`, a mode beside `probe compact`. It logs what `tool.call`, `$.session.messages()` and `turn.step` carry at the first call after a prompt whose message holds text and a call.
+The transcript finds the prompt's row this way:
 
-| what the probe finds | the road the change builds |
+- by its id, where the row carries one the bridgehead read at `prompt.submit`
+- otherwise, as the owner row past `owners`. Two prompts with the same text then read apart
+- a transcript still short of that row pays nothing
+- a session past the transcript's window reads the display road alone, because a count there shifts
+
+The implement step opens on `./RUNME.sh probe reply`, a mode beside `probe compact`. It logs three things at the first call after a prompt whose message holds text and a call: the `tool.call` event's fields, the rewritten prompt the session reads, and whether a transcript row carries an id. `$.session.messages()` carries no text from the response in flight, per [[spec/design_output/level0#a-step-arrives-late]], and `turn.step` fires after the first call. So the `tool.call` event stands as the one open road.
+
+| what the probe finds | what the change does |
 |---|---|
 | the text on the `tool.call` event | `holdsForAnswer` pays off that field |
-| the text in the transcript at the call | the transcript road above pays it |
-| the text on no road | the ask's third line goes back to the owner, with the probe's log |
+| the text on no field | the ask's third line goes back to the owner, with the probe's log |
 
 ### callers
 
@@ -179,9 +190,10 @@ The same message: the ask says the chat shows that text after the door reads. `t
 
 <!-- the form is list -->
 
-- `src/bridge/server.js` `submitsPrompt`, which calls `onPromptSubmit`
+- `src/bridge/server.js` `submitsPrompt`, which calls `onPromptSubmit` and now passes its `event` on
+- `.claude/skills/level0/hooks/level0.js` `seen`, which hands `answer.event` on for `prompt.submit`, and gains the owner-row count there
 - `src/bridge/server.js` the `classic.MessageDisplay` and `agent.spoke` entries, which call `onMessageDisplay` and `onAgentSpoke`
-- `src/bridge/server.js` the `prompt.context` entry, which calls `onPromptContext`
+- `src/bridge/server.js` the `tool.call` road, which calls `holdsForAnswer`
 - `src/bridge/report.js`, which calls `pays`
 - `src/bridge/answer.js` `onTurnEnd`, `paid` and `pays`, which write `box.spoken` through `speaks`
 - `src/bridge/ask.js` `asksForUpdate`, which calls `demands` with no `at`, so an ask keeps today's read
@@ -194,11 +206,11 @@ The same message: the ask says the chat shows that text after the door reads. `t
 
 <!-- the form is list -->
 
-- `test/level0/answer-door.test.js` after a restart, a transcript missing the prompt's row pays nothing
-- `test/level0/answer-door.test.js` a text past the prompt's row in the transcript pays the demand
+- `test/level0/answer-door.test.js` after a restart, a transcript short of the prompt's row pays nothing
+- `test/level0/answer-door.test.js` two prompts with the same text, and a transcript a turn late, pay nothing off the older one
 - `test/level0/answer-door.test.js` a display stamped before the prompt pays nothing
-- `test/level0/answer-door.test.js` a text on the road the probe finds, in the message of the next call, pays the door
-- `test/level0/answer.test.js` the context read while a prompt stands unpaid carries the warning block
+- `test/level0/answer-door.test.js` a text on the `tool.call` event, in the message of that call, pays the door
+- `test/level0/answer.test.js` the prompt's answer rewrites its text to open on the warning line
 
 ### answers
 
@@ -206,12 +218,14 @@ The same message: the ask says the chat shows that text after the door reads. `t
 
 <!-- the form is list -->
 
-- the display order stands unmeasured: the approach opens implement on a probe, and names the road for each thing it finds
-- `stepText` stands unnamed: the approach names it, and says `turn.step` fires after the first call of the first step
-- the transcript road keys on the last owner row: it keys on the prompt's own row now, and a transcript lacking that row pays nothing
-- the warning rides `prompt.submit`: it rides a `prompt.context` block now, beside the cage block
-- `box.spoken` has four writers: `speaks` owns the write, and each writer calls it
-- `sinceTheOwner` has no export: the approach reads the prompt's row on the server, and `sinceTheOwner` stays as it stands
+- the warning rides `prompt.context`: it rides `prompt.submit` through `answer.event` now, and the probe shows the session reads it
+- the cage block as a precedent: dropped
+- the probe's transcript row: dropped. The `tool.call` event stands as the one open road, and the owner decides where it carries nothing
+- the transcript key by text: it keys on a row id, or on the owner row past the count taken at `prompt.submit`. A test drives two prompts with the same text
+- the display order stands unmeasured: the probe opens implement
+- `stepText` stands unnamed: named, with `turn.step` firing after the first call
+- `box.spoken` has four writers: `speaks` owns the write
+- `sinceTheOwner` has no export: the server reads the prompt's row itself, and `sinceTheOwner` stays
 
 ### checked
 
