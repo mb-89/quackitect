@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: c46c5879b5ca7e1de8e6fcf186f8d471d1525c5f
+    hash_after: c46c5879b5ca7e1de8e6fcf186f8d471d1525c5f
 ---
 
 # Ask
@@ -100,33 +105,41 @@ A ticket changing the sidebar or a tab closes on a count verb or a test over a f
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+The ask names the view, a condition reads it, and a person leaf closes the route where it holds.
 
-<!-- the form is text -->
+1. `spec/processes/standard.yaml` gains an ask field `view`, form `text`: the view the owner reads the change in and the number there, in the owner's words, or `none`. `askRows` in `src/scripts/process.js` renders it as a comment like every field. The author writes it as a line opening `view:` under `# Ask`.
+2. `spec/processes/standard.yaml` gains a top-level step `view` after `implement`: `by: person`, `when: view`, `does: reads the change in the view the ask names`, and one `verdict` evidence field `seen`, saying what the view shows against the ask's number.
+3. `holdsHere` in `src/scripts/pull-hand.js` reads a `view` condition. It takes the ticket text as a fourth argument, and holds where the Ask chapter carries a `view:` line whose value is not `none`. Where it fails, the pull skips the leaf as it skips a `cloud` leaf, and the ticket closes on tests-green as it does today.
+4. `spec/guidance/tickets.md` gains a rule: an ask changing a thing the owner sees names the view and its number under `view:`, and a claim of done rests on the owner's pass at the `view` leaf. An `Examples` row pairs the sidebar count named under `view:` with a close on a count verb alone.
+5. `test/level0/extension-load.test.js` loads `src/extension/extension.js` through `createRequire`, with a fake `vscode` module standing in the require cache, and calls `activate` with a fake context and no door. It fails where the load or `activate` throws.
 
 ### callers
 
-<!-- every caller of what the approach changes, one a line, as a file and a function -->
-
-<!-- the form is list -->
+- `src/scripts/pull-hand.js` `advanced`, which calls `holdsHere` on the leaf it stands on, and passes the ticket text
+- `src/scripts/pull-writes.js` the pass that skips leaves after a hand-back, which calls `holdsHere` on each next leaf, and passes the text it holds
+- `src/scripts/process.js` `askRows` and `withRoute`, which render the new ask field at the mint
+- `src/scripts/pull-hand.js` `handFaults` in `src/scripts/pull.js`, which refuses an agent on the `by: person` leaf at a desk
+- `src/scripts/pull-hand.js` `withEngineReader`, which reads person steps named `person` alone, so the `view` step stays outside it
+- `test/contract/process.test.js` the standard route case, whose leaf list gains `view`
+- `./RUNME.sh ticket update`, which carries the new step onto every open standard ticket short of it
 
 ### tests
 
-<!-- every test the change adds, one a line, as a file and a test name -->
-
-<!-- the form is list -->
+- `test/level0/process.test.js` "the standard route asks for the view the owner reads, in the owner's words"
+- `test/level0/pull-person.test.js` "a ticket whose ask names a view closes on the owner's pass at the view leaf"
+- `test/level0/pull-person.test.js` "a ticket whose ask says view: none skips the view leaf and closes on tests-green"
+- `test/contract/question-grades.test.js` "the tickets note rests a claim of done on the owner's view"
+- `test/level0/extension-load.test.js` "the extension loads and activates as the editor loads it"
 
 ### answers
 
-<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
-<!-- the form is list -->
+- first on a first draft
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- every file, function and verb named stands opened: `holdsHere`, `advanced`, the skip pass in `pull-writes.js`, `askRows`, `withEngineReader`, `activate` and the `vscode` requires under `src/extension`
+- the callers list names both callers of `holdsHere`, the mint path for the ask, and the readers of person steps
+- every `done_when` line names its test above, and `./RUNME.sh check` decides the last
 
 ## review
 
