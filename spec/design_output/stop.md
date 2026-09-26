@@ -315,9 +315,10 @@ a hole somebody walks through, so the name reaches a function alone.
 | `work-waiting` | a todo stands unfinished, or this branch stands at `held` |
 | `ticket-in-hand` | a hold stands under `.se/.runtime/hold`, or an open private ticket stands |
 | `group-in-hand` | this branch's group carries a take with no hand-back |
-| `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` |
+| `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` whose work branch stands nowhere |
+| `step-waits-on-person` | a held ticket, or the group it names, stands at a leaf carrying `by: person` |
 | `chat-is-new` | the session log holds one prompt row at most, the box is no cloud box, and the answer names no next step |
-| `helpers-running` | the binding reads other than `queue`, and the turn's end names a helper the harness still runs |
+| `helpers-running` | the turn's end names a helper the harness still runs, or a helper spawned in the background sends no stop yet |
 | `a-report-stands` | the message ending the turn carries the heading What the agent needs with a numbered row under it |
 | `the-plan-is-empty` | the plan holds no todo and nothing in hand, so a claim of done stands on an empty plan |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
@@ -340,7 +341,10 @@ wakes the session. So a turn ending while a helper runs ends on a wait, and the
 work goes on at the answer.
 
 `classic.Stop` carries `background_tasks`, the harness's own list, and
-`helpersRun` reads it: a `subagent` entry at `running` stands. The rule
+`helpersRun` reads it: a `subagent` entry at `running` stands. The stop call
+carries no such list, so the box counts too. A spawn in the background adds one,
+and a helper's own `classic.Stop` takes one off. No id stands on both events, so
+the mark is a count. The rule
 `your-helpers-still-run` takes the claim at priority `83`, over the plan and the
 hold, because a session waiting on its helpers keeps both. It carries no
 `yields`, because the check reads the harness, and no hand's opinion.
@@ -389,8 +393,8 @@ agent, and a check reads the tree. So the tree wins:
 | `a-wrong-answer-leaves-the-box` | what the agent takes a wrong answer to cost |
 | `the-work-stands-complete` | what the agent takes for a finish |
 
-A stop the owner drives carries no flag. `the-owner-asks-to-talk` reads the
-owner's own words, so it stands over every check but one.
+A stop the owner drives carries no flag. `the-owner-holds-the-step` reads a
+step a person takes, so it stands over every continue that loops the wait.
 
 A check carrying `beside` reads a hand's work beside the agent, and no claim
 yields to it.
@@ -398,8 +402,9 @@ yields to it.
 ## A talk follows a report
 
 A stop line with no report above it tells the owner nothing to talk about.
-So `the-owner-asks-to-talk` runs `a-report-stands`: a message of this turn
-carries the needs table, or the claim fires nothing and the turn holds. The
+So a rule running `a-report-stands` fires where a message of this turn
+carries the needs table, and otherwise the turn holds. No shipped rule runs it,
+and a level file's rule reaches it by name. The
 owner's view shows every message of the turn. A missing stop line comes alone
 in the next message, and the report stands once. An owner's prompt
 opens a new turn, and the report before it counts no more.
@@ -511,7 +516,7 @@ The agent reads them and answers itself, because it is the only thing in the
 room that knows. For the table, see [[spec/design_output/level0#the-needs-table]].
 
     Something on your list stands unfinished, so carry on with it. To stop, call mcp__level0__stop last, with one reason:
-      the-owner-asks-to-talk: Does the last thing the owner said open a discussion?
+      the-owner-holds-the-step: Does the ticket in hand, or its group, stand at a step a person takes?
       a-wrong-answer-leaves-the-box: Would a wrong answer here reach past this branch?
       the-work-stands-complete: Does the work stand complete?
     Before the call, close the answer with the heading What the agent needs and a table headed No., question and proposed answer, one numbered row a need.

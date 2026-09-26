@@ -75,6 +75,8 @@ import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.
 import {
   dropsHold,
   ENDS_TURN,
+  helperEnds,
+  helperSpawns,
   holdsCall,
   onStop,
   sawCall,
@@ -112,12 +114,21 @@ const DOORS = {
   "turn.said": onTurnSaid,
   "turn.complete": endsTurn,
   // A helper's stop reports, a session due holds for the handover, and the answer gate holds ahead of the tooth. [[spec/design_output/stop#the-context-hands-over]] [[spec/design_output/level0#the-gate-reads-the-answer]]
-  "classic.Stop": async (e, box) =>
-    helperReports(e, box) ??
-    holdsForHandover(e, box) ??
-    (await gatesAnswer(e, box)) ??
-    onStop(e, box),
-  "agent.spawn": onAgentSpawn,
+  "classic.Stop": async (e, box) => {
+    // A helper's stop takes its mark off. [[spec/tickets/helper-mark-drops-at-stop]]
+    helperEnds(e, box);
+    return (
+      helperReports(e, box) ??
+      holdsForHandover(e, box) ??
+      (await gatesAnswer(e, box)) ??
+      onStop(e, box)
+    );
+  },
+  // A helper spawned in the background marks the box, so the stop call reads it running. [[spec/tickets/the-stop-reads-the-state]]
+  "agent.spawn": (e, box) => {
+    helperSpawns(e, box);
+    return onAgentSpawn(e, box);
+  },
   "tool.describe": onDescribe,
   "tool.call": onToolCall,
   [ANSWERED]: onAgentAnswered,
