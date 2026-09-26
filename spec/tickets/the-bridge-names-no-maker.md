@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-gates-read-the-state
 parent: the-retro-holds-the-clear
+record:
+  - step: do
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: d589e9a050a3f9a2b61426c1a9a5d62e649cf671
+    hash_after: d589e9a050a3f9a2b61426c1a9a5d62e649cf671
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 16 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-window-keeps-the-binding.md:39:130: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ the draft's `bindingLine` reads a change no line names as a change by hand, yet 
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/retro-clear.test.js test/level0/binding.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ the draft's `bindingLine` reads a change no line names as a change by hand, yet 
 
 <!-- the form is text -->
 
+The bridge's binding line names the value and the file that sets it, and no maker. `submitsPrompt` in `src/bridge/server.js` now calls `bindingLine` at every prompt, so a change lands in the log at the next prompt. The maker's own line stands where one writes it: the sidebar's `set` and the config verb. The case a binding changed in its file writes a line at the next prompt, naming the layer, in `test/level0/retro-clear.test.js`, holds it. This commit carries the parent's whole change, which its own hand-back names.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the line names the binding and the layer alone
+- the cleanup: none stands
+- the wording stands in `bindingLine` once
 
 # Discussion
 

@@ -260,6 +260,11 @@ the handover, and no clear follows. The fill still reads. A binding that moves
 off the queue while the clear stands asks for no clear, and drops a held
 `clear`.
 
+A retro runs to its end in one conversation. So a retro in the session's own
+hand keeps the conversation under the queue too. A retro is a ticket on the
+retro process, or a group's step under `retro`. A helper's retro clears nothing away, because
+the helper's hold carries a hand of its own.
+
 # The vote
 
 Every rule carries a side, a priority and a way of firing. The turn ends where

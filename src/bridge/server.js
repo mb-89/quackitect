@@ -30,6 +30,7 @@ import { answerRides, gatesAnswer } from "./answer-read.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe, onPowerShell } from "./bash.js";
+import { bindingLine } from "./binding.js";
 import { dropsAll, dropsMoved } from "./caches.js";
 import { asks, asksText } from "./config.js";
 import { holdsGrace } from "./grace.js";
@@ -251,6 +252,8 @@ function opensSession(e, box) {
 
 function submitsPrompt(e, box) {
   sawPrompt(e, box);
+  // A change of the binding writes its line at the next prompt, naming the file that sets it. [[spec/tickets/the-retro-holds-the-clear]]
+  bindingLine(box);
   return onPromptSubmit(e, box);
 }
 
