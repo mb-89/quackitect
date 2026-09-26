@@ -46,23 +46,26 @@ const paidRow = () => rowOf(AT, "info", "level0", HEARD.same, { detail: LINE });
 const compactRow = () => rowOf(AT, "info", "compact", "a compaction runs");
 
 const owes = (it) => Boolean(owesCanary({ tool: "Read" }, it));
+// A box whose session the layer reached, so the line stands owed. [[spec/design_output/level0#rules-ride-the-first-answer]]
+const reached = () =>
+  box([rowOf(AT, "info", "context", "4 block(s) reach the session")]);
 
 test("a step carrying the line pays the debt, and the next call meets no gate", () => {
-  const it = box();
-  assert.equal(owes(it), true, "a box with no session of its own owes it");
+  const it = reached();
+  assert.equal(owes(it), true, "a box the layer reached owes it");
 
   onTurnSaid({ text: `${LINE}\n\nThe work goes on.` }, it);
   assert.equal(owes(it), false);
 });
 
 test("a step without the line leaves the debt standing", () => {
-  const it = box();
+  const it = reached();
   onTurnSaid({ text: "The work goes on." }, it);
   assert.equal(owes(it), true);
 });
 
 test("a helper's step pays nothing, because a helper carries a canary of its own", () => {
-  const it = box();
+  const it = reached();
   onTurnSaid({ text: LINE, agentId: "a-helper" }, it);
   assert.equal(owes(it), true);
 });
@@ -83,6 +86,11 @@ test("a first turn answering without the line owes it", () => {
 
 test("a restart after the line leaves the gate quiet", () => {
   assert.equal(owes(box([paidRow()])), false);
+});
+
+// [[spec/design_output/level0#rules-ride-the-first-answer]]
+test("a server starting late, before the layer reached the session, asks for no canary", () => {
+  assert.equal(owes(box()), false);
 });
 
 test("a restart before the line asks for the canary", () => {

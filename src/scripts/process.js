@@ -78,3 +78,11 @@ export function processAt(files, root, join, said) {
     hash: processHash(held),
   };
 }
+
+// A mint off a handover line writes the Ask's `from:` line itself, so the owner's read gates the ticket whatever the hand recalls. [[spec/tickets/the-owners-words-travel-verbatim]]
+export const FROM_HANDOVER = "--from=handover";
+
+export function fromHandover(fields) {
+  const ask = String(fields?.Ask ?? "").trim();
+  return { ...fields, Ask: ask ? `from: handover\n\n${ask}` : "from: handover" };
+}

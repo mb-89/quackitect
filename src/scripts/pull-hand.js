@@ -49,6 +49,9 @@ import {
 import { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 import { entriesOf, pushed, returnsOf, shut, target, tipOf } from "./pull-writes.js";
 import { NOTES, opensDraft, schemasHere } from "./ticket.js";
+import { holdsHere } from "./pull-when.js";
+
+export { holdsHere };
 
 export function ticketsHere(it) {
   const out = [];
@@ -130,7 +133,8 @@ export function handOut(it, who) {
   repairPersonSteps(it, who);
   const all = ticketsHere(it);
   // A session due takes the clear's tickets once the ticket in hand stands done, and a helper takes none. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
-  if (!who.wanted && !who.oneStep && isDue(it.disk, it.root)) return dueHandOut(it, who, all);
+  if (!who.wanted && !who.oneStep && isDue(it.disk, it.root))
+    return dueHandOut(it, who, all);
   const groupTicket = all.find((one) => !one.private && one.name === who.group);
   // The tag says the next pull hands it first, on a note and on a ticket alike. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
   const tagged = taggedIn(all);
@@ -253,7 +257,7 @@ export function spawnAnswer(other) {
   const helper = `${HELPER}-${entriesOf(other.one.front).length + 1}`;
   say(SPAWN, [
     `${other.one.name} at ${other.leaf.path} ${other.why}.`,
-    "Spawn a hand of its own with the prompt below, and pull again once it answers.",
+    "Spawn a hand of its own with the prompt below in the background, and take the next item. Pull again once it answers.",
   ]);
   console.log("");
   console.log(spawnPrompt(other.one.name, other.leaf, helper));
@@ -320,7 +324,7 @@ export function advanced(it, one, all) {
       return { why: `stands at ${path || "no step"}, which its route lacks` };
     }
 
-    const when = holdsHere(it, leaf.when);
+    const when = holdsHere(it, leaf.when, front, text);
     if (!when.holds) {
       text = withEntry(text, { step: leaf.path, skipped: true, why: when.why });
       changes.push(`skips ${leaf.path}`);
@@ -381,16 +385,6 @@ export function advanced(it, one, all) {
     path = next.path;
   }
   return { why: "loops in its route" };
-}
-
-// A route names the box it runs on, and no shipped route reads the record. [[spec/tickets/every-road-has-a-caller]]
-// [[spec/design_output/pull#a-condition-skips-a-leaf]]
-export function holdsHere(it, when) {
-  if (!when) return { holds: true };
-  if (when === "cloud")
-    return { holds: Boolean(it.cloud), why: "the box runs off the cloud" };
-  if (when === "desk") return { holds: !it.cloud, why: "the box runs on the cloud" };
-  return { holds: false, why: `${when} names no condition the pull reads` };
 }
 
 // [[spec/design_output/pull#children-before-their-group]]

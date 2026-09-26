@@ -149,6 +149,13 @@ reason. The pull then moves to the next leaf, or closes the ticket `done` past
 the last. A closed ticket carrying `when: returned` stands as history, and the
 check reads no row on it.
 
+The conditions below read the ticket's Ask, and `src/scripts/pull-when.js` reads them:
+
+| `when` | holds where the Ask carries |
+|---|---|
+| `view` | a `view:` line naming anything but `none` |
+| `handed` | `from: handover`, which a mint under `--from=handover` writes |
+
 ## A need is a verb
 
 `needs` names verbs as `branch test` or `retro notes`. The pull holds the table
@@ -161,6 +168,7 @@ holds no open note.
 | the route says | the pull admits |
 |---|---|
 | `by: person` | a hand off a harness, a hand on a cloud box, or one under `--owner-says`. An agent at a desk waits |
+| `by: person` under `when: view` or `when: handed` | a hand off a harness, or one under `--owner-says`. An agent waits, on a cloud box too |
 | `by: agent` | a hand on a harness |
 | `by: helper` | nobody yet, until the spawn lands |
 | `by: retro` | a hand while its group stands at a retro step, or a note with the tag |

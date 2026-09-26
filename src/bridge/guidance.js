@@ -131,7 +131,9 @@ function afterARestart(box) {
   const paid = paidIn(rows);
   // A server the start road launched late meets a log holding no layer line, so its first answer hands the layer over. [[spec/design_output/level0#rules-ride-the-first-answer]]
   const given = rows.some((one) => one?.kind === CONTEXT);
-  return { reads: 1, firstTurn: false, paid, owes: !paid, given };
+  // The debt stands where the layer or a compaction reached the session, because a session owes a line it read. [[spec/design_output/level0#rules-ride-the-first-answer]]
+  const reached = given || rows.some((one) => opens(one) || pays(one));
+  return { reads: 1, firstTurn: !reached, paid, owes: reached && !paid, given };
 }
 
 function logRows(box) {

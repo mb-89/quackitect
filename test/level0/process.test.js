@@ -9,6 +9,7 @@ import { processHash, readYaml } from "../../.claude/skills/level0/lib/schema.js
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import {
   askRows,
+  fromHandover,
   nameOf,
   PROCESSES,
   processAt,
@@ -111,4 +112,10 @@ test("a kind carrying no route takes no copy", () => {
 test("a mint naming no process copies nothing", () => {
   const made = withRoute(diskWith(), ROOT, join, SCHEMA, { urgency: "soon" });
   assert.deepEqual(made.fields, { urgency: "soon" });
+});
+
+// [[spec/tickets/the-owners-words-travel-verbatim]]
+test("a mint off a handover writes the from line above the ask", () => {
+  assert.equal(fromHandover({ Ask: "the rows" }).Ask, "from: handover\n\nthe rows");
+  assert.equal(fromHandover({}).Ask, "from: handover");
 });

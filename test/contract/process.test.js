@@ -4,17 +4,17 @@
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { skip, test } from "node:test";
-import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
+import { fileURLToPath } from "node:url";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
+import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
+import { slotFaults } from "../../.claude/skills/level0/lib/schema-route.js";
 import { voiceOver } from "../../src/bridge/findings.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 import { firstLeaf } from "../../src/engine/group.js";
 import { readTools, whereIs } from "../../src/engine/tools.js";
 import { askRows, processAt } from "../../src/scripts/process.js";
-import { slotFaults } from "../../.claude/skills/level0/lib/schema-route.js";
 import { leafOf, stepPathOf } from "../../src/scripts/pull.js";
 import { leavesOf, walkOf } from "../../src/scripts/pull-route.js";
 import { schemasHere } from "../../src/scripts/ticket.js";
@@ -40,17 +40,25 @@ test("the standard route reviews the design once, and its last leaf hands on to 
   assert.deepEqual(
     leavesOf(front).map((one) => one.path),
     [
+      "design/owner-read",
       "design/draft",
       "design/review",
       "implement/tests-red",
       "implement/change",
       "implement/tests-green",
+      "view",
     ],
-    "one review, and no verdict step after the code",
+    "one review, and the owner's view the one verdict after the code",
   );
   const review = leafOf(front, "design/review");
-  assert.ok(review.reads.includes("spec/guidance/review/design"), "the review reads the design note");
-  assert.ok(!review.reads.includes("spec/guidance/review/reviewing"), "and no other review note");
+  assert.ok(
+    review.reads.includes("spec/guidance/review/design"),
+    "the review reads the design note",
+  );
+  assert.ok(
+    !review.reads.includes("spec/guidance/review/reviewing"),
+    "and no other review note",
+  );
   assert.equal(review.on_fail, "draft", "a fail goes back to the draft");
   const draft = leafOf(front, "design/draft");
   assert.equal(
@@ -58,14 +66,27 @@ test("the standard route reviews the design once, and its last leaf hands on to 
     "list",
     "the draft names its tests, one a line",
   );
-  assert.ok([draft.said.checklist ?? []].flat().length > 0, "the draft leaf holds its own checklist");
+  assert.ok(
+    [draft.said.checklist ?? []].flat().length > 0,
+    "the draft leaf holds its own checklist",
+  );
+  // The review weighs the spread against the ask. [[spec/tickets/a-small-ask-stays-small]]
+  assert.equal(
+    draft.evidence.find((one) => one.name === "size")?.form,
+    "list",
+    "the draft names every file it touches, one a line",
+  );
   assert.equal(leafOf(front, "implement/tests-green").said.to, "retro");
   assert.deepEqual(
     walkOf(front).find((one) => one.path === "implement")?.said.input,
     ["design/draft", "design/review"],
     "the code reads the draft and the review's findings",
   );
-  assert.deepEqual(slotFaults(front, "spec/processes/standard.yaml"), [], "every slot fills");
+  assert.deepEqual(
+    slotFaults(front, "spec/processes/standard.yaml"),
+    [],
+    "every slot fills",
+  );
 });
 
 const vale = whereIs(files, root, "vale", readTools(files, root));
@@ -132,7 +153,10 @@ test("the retro route ends on the report the owner passes, then the mint", () =>
 // [[spec/tickets/the-retro-finishes-its-asks]]
 test("the audit checklist reads whole, and collect names .se/scripts beside the dot folders", () => {
   const audit = routeOf("retro").steps.find((one) => one.name === "audit");
-  assert.ok(audit.checklist.every((one) => typeof one === "string"), "every item reads as text");
+  assert.ok(
+    audit.checklist.every((one) => typeof one === "string"),
+    "every item reads as text",
+  );
   assert.match(guidanceOf("collect"), /`\.se\/scripts`/);
   const collect = routeOf("retro").steps.find((one) => one.name === "collect");
   assert.match(collect.evidence[0].says, /\.se\/scripts/);
@@ -169,5 +193,44 @@ test("the reader rule hands each group chapter to the reader whose hours hold it
   assert.match(reach, /`input\/groups\/<group>\.md`/);
   assert.match(reach, /hours hold/);
   const number = reach.split(".")[0];
-  assert.match(rules[0], new RegExp(`the one reach rule ${number} names`), "rule one names the reach");
+  assert.match(
+    rules[0],
+    new RegExp(`the one reach rule ${number} names`),
+    "rule one names the reach",
+  );
+});
+
+// The owner names the view and its number, and the owner's view closes the route. [[spec/tickets/the-owner-view-decides-done]]
+test("the standard route asks for the view the owner reads, in the owner's words", () => {
+  const held = processAt(files, root, join, "standard");
+  const view = held.ask.find((one) => one.name === "view");
+
+  assert.equal(view?.form, "text", "the ask carries a view field");
+  assert.match(view.says, /owner's words/, "in the owner's words");
+  const last = held.route.at(-1);
+  assert.equal(last.name, "view", "the view step closes the route");
+  assert.equal(last.by, "person", "and a person passes it");
+  assert.equal(last.when, "view", "where the ask names a view");
+  assert.equal(last.on_fail, "implement", "a fail goes back to the code");
+});
+
+// The owner's words travel as quoted, and a ticket off a handover waits on the owner's read. [[spec/tickets/the-owners-words-travel-verbatim]]
+test("the note route asks for the owner's quoted words with their transcript line", () => {
+  const said = processAt(files, root, join, "note").ask.find(
+    (one) => one.name === "said",
+  );
+  assert.equal(said?.form, "list", "the note asks for the owner's words, one a line");
+  assert.match(said.says, /transcript line/, "each with its transcript line");
+});
+
+test("the standard route opens on the owner's read where the ask comes off a handover", () => {
+  const held = processAt(files, root, join, "standard");
+  assert.equal(held.ask.find((one) => one.name === "from")?.form, "text");
+  const first = leavesOf(
+    readYaml(files.read(join(root, "spec", "processes", "standard.yaml"))),
+  )[0];
+  assert.equal(first.path, "design/owner-read", "the owner's read stands first");
+  const read = leafOf(routeOf("standard"), "design/owner-read");
+  assert.equal(read.by, "person");
+  assert.equal(read.when, "handed");
 });

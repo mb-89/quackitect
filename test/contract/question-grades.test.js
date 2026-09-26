@@ -3,8 +3,8 @@
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { actionables } from "../../.claude/skills/level0/lib/guidance.js";
 import { disk } from "../../src/doors/disk.js";
 
@@ -88,4 +88,50 @@ test("the design review note hands a fault the builder fixes to the build, under
     0,
     "the branch review note holds no design rule",
   );
+});
+
+// A draft names every file it touches, and the review weighs that spread against the ask. [[spec/tickets/a-small-ask-stays-small]]
+test("the design review note weighs the draft's size against the ask", () => {
+  const rules = rulesIn("spec/guidance/review/design.md");
+  const said = rules.filter((one) => /`size`/.test(one));
+
+  assert.equal(said.length, 1, "one rule weighs the size field");
+  assert.match(said[0], /\bask\b/i, "the rule weighs it against the ask");
+  assert.match(said[0], /pass with a row/i, "a spread past the ask rides out as a row");
+});
+
+// [[spec/tickets/a-small-ask-stays-small]]
+test("the tickets note sends a one-line change the owner orders to the trivial route", () => {
+  const rules = rulesIn("spec/guidance/tickets.md");
+  const said = rules.filter((one) => /--process=trivial/.test(one));
+
+  assert.equal(said.length, 1, "one rule names the trivial route");
+  assert.match(
+    said[0],
+    /one-line change the owner orders/i,
+    "the rule names the change it takes",
+  );
+  assert.match(said[0], /draft, a review and a build/i, "the rule names its failure");
+  const text = files.read(join(root, "spec", "guidance", "tickets.md"));
+  assert.match(text, /^\| \d+ \| `--process=trivial`/m, "an Examples row pairs it");
+});
+
+// [[spec/tickets/the-owner-view-decides-done]]
+test("the tickets note rests a claim of done on the owner's view", () => {
+  const rules = rulesIn("spec/guidance/tickets.md");
+  const said = rules.filter((one) => /`view:`/.test(one));
+
+  assert.equal(said.length, 1, "one rule names the view line");
+  assert.match(said[0], /claim of done/i, "the rule rests done on the view");
+  const text = files.read(join(root, "spec", "guidance", "tickets.md"));
+  assert.match(text, /^\| \d+ \| .*`view:`/m, "an Examples row pairs it");
+});
+
+// [[spec/tickets/the-owners-words-travel-verbatim]]
+test("the voice note takes the owner's word before a coined word", () => {
+  const said = rulesIn("spec/guidance/voice.md").filter((one) =>
+    /owner's word/i.test(one),
+  );
+  assert.equal(said.length, 1, "one rule takes the owner's word");
+  assert.match(said[0], /coined word/i, "before a coined word");
 });
