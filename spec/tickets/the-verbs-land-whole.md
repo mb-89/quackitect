@@ -221,3 +221,10 @@ Three faults the sync met, each fixed on this branch:
 - The cold probe's session met a refused `git log`, then pulled a ticket and ran to the cap. Its prompt now ends the session at a refused call.
 - The commit verb's refusal ran a bare `git reset -q`, which cleared `MERGE_HEAD`. It now resets the paths it staged, so a refused merge stays a merge.
 - The check writes a slash command for each new config key. The commit door takes only the ticket in hand. That commit then names a review ticket, and the verdict guard reads it as the reviewer's work. A generated file lands with the change that adds its key, before the next take.
+
+One fault stops the next hand-back:
+
+- [[spec/tickets/battery-ask-names-the-bundle]] carries its ask line and every field of `do`, on a commit the check reads green.
+- Its hand-back with `--pass` reads the last line `./RUNME.sh check` prints as the verdict of `tests`. That line is a warning inside the approach of [[spec/tickets/the-verbs-need-no-wrapper]].
+- The ticket door refuses a hand at `do` a write to that approach, and to the battery verdict.
+- The next box fixes the reader of a command field so it takes the exit code and the stamp. Or it reviews the wrapper ticket first, so its drafter cuts the lines.
