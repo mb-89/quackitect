@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: split
+step: children
 record:
   - step: sync
     hand: box 63693613eded · claude-code-remote
@@ -96,6 +96,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-servers-and-views-hold already carries every commit on main.
+  - step: split
+    hand: box d7a44d6f73215 · claude-code-remote
+    hash_before: 2de3ec05c97cf040138e3bbb537267c62a416a03
+    hash_after: 2de3ec05c97cf040138e3bbb537267c62a416a03
 ---
 
 # Ask
@@ -124,11 +128,18 @@ The servers answer while they run, and come back after a restart. Every view of 
 
 <!-- the form is list -->
 
+- [[spec/tickets/every-road-has-a-caller]], standard
+- [[spec/tickets/a-closed-ticket-takes-writes]], trivial
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: each closed in one review.
+- the children add up to what stays in the group. The branch done freed the server, queue view, judge and mark tickets, and each carries its own ask on to the queue.
+- neither child waits on the other, so neither names a depends_on.
 
 # children
 
