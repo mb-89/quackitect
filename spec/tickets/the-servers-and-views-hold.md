@@ -159,6 +159,8 @@ The servers answer while they run, and come back after a restart. Every view of 
 
 <!-- the form is command -->
 
+    ./RUNME.sh retro notes
+
 ## write
 
 <!-- writes the retro over the box's own window -->
