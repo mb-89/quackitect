@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-migration-writes-its-specs
 step: do
+record:
+  - step: do
+    hand: box d7a540d981d5 · claude-code-remote
+    hash_before: 16986137afc7bb3d1637961e3691caf86dc6896a
+    hash_after: 6b5c62453fc61bc858d2a5775496e3827b194d79
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
