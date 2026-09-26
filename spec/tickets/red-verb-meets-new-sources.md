@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-verbs-land-whole
 parent: every-landing-takes-a-verb
+record:
+  - step: do
+    hand: box d7a55188b9103 · claude-code-remote
+    hash_before: 6ab1de5feb7d65c637ca45abad69ff6115a964d8
+    hash_after: 6ab1de5feb7d65c637ca45abad69ff6115a964d8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "src/scripts/rename.js:170:1: correctness/noUnusedFunctionParameters: This parameter to is unused."
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ approach item 3 writes each source's `HEAD` text, and a source new to the change
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/test-verb.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ approach item 3 writes each source's `HEAD` text, and a source new to the change
 
 <!-- the form is text -->
 
+`redTest` in `src/scripts/work-test.js` holds each working text on disk under `.se/.runtime/red`, beside a list of the sources. A source `HEAD` lacks stands aside whole. A run killed mid-way leaves the list, and the next run puts every source back first. The branch carries that code, and a new case in `test/level0/test-verb.test.js` holds the killed run.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the texts wait on disk, and a new source stands aside whole
+- the cleanup: none stands past the new case
+- the aside folder stands in `ASIDE` in the verb alone, and the design note links there
 
 # Discussion
 

@@ -148,6 +148,30 @@ test("test --red sets the sources aside, answers red on an assertion, and puts t
 });
 
 // [[spec/design_output/pull#the-test-verb]]
+// The working texts wait on disk under .se, so a run killed mid-way loses none, and the next run puts them back first. [[spec/tickets/red-verb-meets-new-sources]]
+test("test --red after a killed run puts the working texts back, a new source among them", () => {
+  const { it, disk } = redTree(FAILS);
+  disk.write(`${ROOT}/${SOURCE}`, "the text at HEAD\n");
+  disk.remove(`${ROOT}/${FRESH}`);
+  disk.makeDir(`${ASIDE}/src/scripts`);
+  disk.write(`${ASIDE}/${SOURCE}`, "the working text\n");
+  disk.write(`${ASIDE}/${FRESH}`, "a new file\n");
+  disk.write(
+    `${ASIDE}/sources.json`,
+    JSON.stringify([
+      { path: SOURCE, kept: true },
+      { path: FRESH, kept: true },
+    ]),
+  );
+
+  const { code, said } = quiet(() => verbs.redTest(it, [RED_TEST, SOURCE, FRESH], {}));
+
+  assert.equal(code, 0, said);
+  assert.equal(disk.read(`${ROOT}/${SOURCE}`), "the working text\n");
+  assert.equal(disk.read(`${ROOT}/${FRESH}`), "a new file\n");
+  assert.equal(disk.exists(ASIDE), false, "nothing stays aside");
+});
+
 test("test --red refuses where the test passes with the sources set aside", () => {
   const { it, disk } = redTree(PASS);
   assert.equal(typeof verbs.redTest, "function", "the red verb stands");
