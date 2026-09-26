@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-red
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -83,6 +83,10 @@ record:
     hand: box d7a69cb6601d7 · claude-code-remote
     hash_before: b0ac652023873f16e6fcb7cd77c6af570ae6d8ed
     hash_after: b0ac652023873f16e6fcb7cd77c6af570ae6d8ed
+  - step: design/review
+    hand: box d7a69cb6601d7 · claude-code-remote · helper-2
+    hash_before: 0831e91ee4fa4af07f8b27b79d940bcb97bb13d1
+    hash_after: 0831e91ee4fa4af07f8b27b79d940bcb97bb13d1
 ---
 
 # Ask
@@ -184,6 +188,12 @@ Where a package of the window needs a later Go, the one version rises to the low
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- split-tests-take-one-module: the callers list misses the tests that assert the split layout, and each breaks under one module: `test/level0/go-modules.test.js` and `test/level0/go-tests.test.js` on `goModulesIn`, `test/level0/test-verb.test.js` on `go -C src/index test ./...` and `goModulesOf`, `test/level0/pull-leaves.test.js` on `goModulesOf`, `test/level0/go-source.test.js` on the replace-line `foldersOf`, `test/level0/viewer.test.js` on its `go build -o <exe>.new .` fake and its `src/tui/go.mod`, and `test/contract/install.test.js` on the module fetch. Rewrite each beside the caller it tests
+- tidy-writes-the-go-line: the approach leaves the Go version to the implement step. Settle it here: `src/tui` asks for 1.27 today, yet it builds on this box's 1.24 once its `go.mod` asks for 1.24, and `go mod tidy` then writes `go 1.24.2` as the floor its dependencies set. Take the line tidy writes at the root, and take the root `go.sum` from `go mod tidy` in place of a hand union of the two sums
+- seven-go-mods-leave: the approach says the six other `go.mod` files leave, and `git ls-files '*go.mod'` names seven, none at the root. All seven leave, with both `go.sum` files, and the new root `go.mod` stands as the one the first done line counts
 
 # implement
 
