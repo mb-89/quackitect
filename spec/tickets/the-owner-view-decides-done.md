@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-owners-word-reaches-work
 steps:
   - name: design
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-view-fails-to-implement.md:39:1: CodeSpans: A sentence holds 4 code spans, and this one holds 6. Carry "
+  - step: implement/tests-green
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: c45296a0db032da4a63d8aa7cd6d7d5b941933ca
+    hash_after: c45296a0db032da4a63d8aa7cd6d7d5b941933ca
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 26 test(s) pass in 6 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-view-fails-to-implement.md:39:1: CodeSpans: A sentence holds 4 code spans, and this one holds 6. Carry "
+reason: done
 ---
 
 # Ask
@@ -252,11 +264,15 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/extension-load.test.js test/level0/pull-person.test.js test/level0/pull-when.test.js test/level0/pull-writes-view.test.js test/contract/question-grades.test.js test/contract/process.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -264,11 +280,25 @@ pass with findings
 
 <!-- the form is text -->
 
+A standard ticket whose ask changes a thing the owner sees now closes on the owner's view.
+
+- The ask carries a `view:` line naming the view and its number, in the owner's words, or `none`.
+- The route ends on a `view` step under `by: person` and `when: view`, and a fail goes back to `implement`.
+- `src/scripts/pull-when.js` owns every `when` condition, and `view` holds where the Ask names a view.
+- An agent waits at the view step on a cloud box too, since only the owner sees the view.
+- Rule 7 of the tickets note carries the rule, and a case loads the extension as the editor loads it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the ask names, the condition module, the schema words and their fixtures
+- the load case takes the fake `vscode` door, and the pass cases take the fake tree
+- the new module and each case carry a pointer at this ticket or the condition note
+- the condition stands once, in `pull-when.js`, and the pull note points at it
+- every review row stands fixed, and `the-view-fails-to-implement` closes into this change
 
 # Discussion
 
