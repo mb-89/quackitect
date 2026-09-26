@@ -2,6 +2,7 @@
 // so the door parses the command line and reads what it lands.
 // [[spec/design_output/bash#what-the-door-reads]]
 
+import { testIn } from "./bash-test.js";
 import { CODE } from "./code.js";
 import { overLong } from "./names.js";
 import { NOTES } from "./private.js";
@@ -12,6 +13,7 @@ import { baseName, BREAKS, clean, READERS, SHELLS, tokensOf } from "./tokens.js"
 import { PROSE } from "./vale.js";
 
 export { tokensOf };
+export { testIn };
 
 export const VERBS = ["check", "branch", "tui", "doctor"];
 
@@ -38,7 +40,6 @@ const PASSES = new Set(["sudo", "env", "command", "nohup", "time", "exec"]);
 const EDITS = new Set(["sed", "perl"]);
 const COPIES = new Set(["cp", "mv"]);
 const TAKES = new Set(["-I", "-n", "-P", "-L", "-d", "-s", "-a", "-E"]);
-const RUNNERS = new Set(["npm", "pnpm", "yarn", "bun"]);
 
 const VALUED = ["m", "F", "C", "c", "t", "S", "u"];
 const IN_PLACE = /^(--in-place(=.*)?|-[A-Za-z]*i[A-Za-z]*(\.\S+)?)$/;
@@ -172,26 +173,6 @@ export function branchIn(command) {
   return out;
 }
 
-// [[spec/design_output/bash#a-test-run-points-somewhere]]
-export function testIn(command) {
-  const out = [];
-  for (const one of partsOf(command).segments) {
-    const words = wordsIn(one);
-    const name = baseName(words[0]);
-    const args = words.slice(1);
-
-    if (name === "node" && args.includes("--test") && !narrowed(args)) {
-      out.push(words.join(" "));
-      continue;
-    }
-    const suite = wholeSuite(args);
-    if (RUNNERS.has(name) && suite.whole && !narrowed(suite.rest)) {
-      out.push(words.join(" "));
-    }
-  }
-  return out;
-}
-
 // [[spec/design_output/private#the-second-door]]
 export function addsIn(command) {
   const out = [];
@@ -213,6 +194,8 @@ export function addsIn(command) {
 
 // [[spec/design_output/level0#a-shell-names-its-ticket]]
 const TICKET_FREE = [
+  ["branch", "take"],
+  ["branch", "list"],
   ["ticket", "pull"],
   ["mint", "ticket"],
   ["ticket", "note"],
@@ -577,30 +560,6 @@ function steps(args) {
     }
   }
   return false;
-}
-
-function narrowed(args) {
-  return args.some(
-    (one) =>
-      (!one.startsWith("-") && one !== "--" && one !== "--test") ||
-      one.startsWith("--test-name-pattern") ||
-      one.startsWith("--test-only"),
-  );
-}
-
-function wholeSuite(args) {
-  const bare = args.filter((one) => !one.startsWith("-"));
-  const took =
-    bare[0] === "run" && bare[1] === "test"
-      ? 2
-      : bare[0] === "test" || bare[0] === "t"
-        ? 1
-        : 0;
-  if (!took) return { whole: false, rest: [] };
-  return {
-    whole: true,
-    rest: args.filter((one) => !bare.slice(0, took).includes(one)),
-  };
 }
 
 export function row(command, rule, said, message) {

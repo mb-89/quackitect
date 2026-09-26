@@ -37,6 +37,8 @@ test("freeOfTicket reads a pull, a mint and a note as free, and every other comm
     "./RUNME.sh ticket pull a-child --pass",
     "./RUNME.sh mint ticket spec/tickets/fresh.md --process=standard",
     './RUNME.sh ticket note a-thought "a line to keep"',
+    "./RUNME.sh branch take",
+    "./RUNME.sh branch list",
   ]) {
     assert.equal(freeOfTicket(command), true, command);
   }
