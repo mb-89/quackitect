@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
@@ -89,6 +89,10 @@ record:
     hash_after: d24e17b72c02718522f6ded893a0075bb2b7890c
     returns: 1
     why: "the keep pushes the raw transcript to the remote, and a transcript carries the owner's name, email, home and note text, which the private half keeps home. `git hash-object` and `git commit-tree` walk past the commit door, so the draft's assumption that the door keeps a transcript off git holds for no commit this approach makes. For details, see [[spec/design_output/private#the-run-and-the-token]]; the keep leans on the cloud proxy taking a push to `refs/transcripts/<group>`, and the draft checks it nowhere. A box's proxy takes a push to a branch, and a refused keep answers `1` on every `branch done`, so the group stays held and never leaves; the group ticket's `retro` step already holds the box's own account of its transcript: `write` asks `badly` with its moment in the transcript and `thoughts` off the transcript, and `cloud` asks `lacked`, `met` and `left`. That chapter lands on trunk with `branch merge`, so `cloudInto` reading it answers the first two ask lines with no ref, no keep and no change to `leaves` in `src/scripts/work.js`; the fourth ask line stands against the private half as written. Name the answer the redraft gives it: the `write` step reads the transcript on the box and the chapter carries its account, or the ask goes back to the owner to drop the line; the third ask line, a cloud transcript beside the desk's own, falls with the fourth. The redraft reads the chapter's `badly` and `thoughts` beside the desk transcript over the hours the chapter covers; the composition with `the-retro-finishes-its-asks` still reads true: `copyTree` takes `window` last, `outsideInto` alone passes it, and `keptInto` copies `KEPT`, which `movedInto` skips. A redraft keeping `cloudInto` after `outsideInto` still meets separate hunks; the count and the second pass carry into the redraft as drafted: `sourceOf` names `groups`, and a group under `input/groups` stays out of `--again`"
+  - step: design/draft
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 8ea93b0107a57e656f1797d2e27dea0807ae3b03
+    hash_after: 8ea93b0107a57e656f1797d2e27dea0807ae3b03
 ---
 
 # Ask
@@ -115,52 +119,57 @@ A cloud group writes its own retro into the group ticket, and no retro verb read
 
 <!-- the form is text -->
 
-A cloud box keeps its transcript on a ref of the group's own, and the collect reads it back with the group's `retro` chapter:
+The group ticket's `# retro` chapter is the box's own account of its run, and `retro collect` gathers it off trunk:
 
 | the part | the change | where |
 |---|---|---|
-| the box keeps its transcript | `leaves` calls `keep` ahead of the leave commit, where `cloudHere` answers true | `src/scripts/work.js` |
-| the keep | `keep` builds an orphan commit of every transcript file, and pushes it to `refs/transcripts/<group>` | `src/scripts/retro-cloud.js`, a new file |
-| the transcript files | `transcriptsHere` lists each file of every transcripts folder `belongs` names, past `memory` | `src/scripts/retro-outside.js` |
-| the groups of the window | `cloudInto` lists the group tickets a commit since `since` closes | `src/scripts/retro-cloud.js` |
-| the chapter | `cloudInto` writes the `# retro` section to `input/groups/<group>.md`, and the close to `input/groups/closed.json` | `src/scripts/retro-cloud.js` |
-| the cloud transcript | `cloudInto` writes each file of the ref under `input/transcripts/cloud-<group>` | `src/scripts/retro-cloud.js` |
-| the collect | `collect` calls `cloudInto` after `outsideInto`, and merges its refusals and folders | `src/scripts/retro-collect.js` |
+| the account | the `write` step asks the run's owner prompts and errors off the transcript, each with its time | `spec/processes/group.yaml` |
+| the landing | the chapter reaches trunk with `branch merge`, as every group ticket does | no change |
+| the groups of the window | `cloudInto` lists the group tickets a commit since `since` closes | `src/scripts/retro-collect.js` |
+| the chapter | `cloudInto` writes the `# retro` section to `input/groups/<group>.md`, and the close to `input/groups/closed.json` | `src/scripts/retro-collect.js` |
+| the collect | `collect` calls `cloudInto` after `outsideInto`, and merges its refusals | `src/scripts/retro-collect.js` |
 | the count | `sourceOf` names `groups` as a source, so the count prints the chapters | `src/scripts/retro-collect.js` |
-| the reader | a rule reads each chapter `closed.json` places in the reader's hours, and the cloud lines its chapter file names | `spec/guidance/retro/read.md` |
+| the reader | a rule hands each chapter to the reader whose hours hold its close | `spec/guidance/retro/read.md` |
 
-The keep runs through `it.proc` over a throwaway index:
+No transcript leaves the box. The approach adds no ref and no keep, and `leaves` in `src/scripts/work.js` stands as it is.
 
-- `git hash-object -w` writes each file into the object store
-- `git update-index --add --cacheinfo` places it, with `GIT_INDEX_FILE` set under `.se/.runtime`
-- `git write-tree` and `git commit-tree` make the commit, which runs no commit hook
-- `git push origin <sha>:refs/transcripts/<group>` keeps it past `branch close`
-- a refused push answers `1`, and the group stays held, so the box retries `branch done`
+The answer this design gives the third and the fourth ask line:
 
-The collect reads the window off git:
+- a transcript carries the box's names, and `privateIn` in `.claude/skills/level0/lib/private.js` keeps them off git
+- so the group's `# retro` chapter stands in for the cloud transcript, off the transcript on the box
+- the chapter passes the commit door as every tracked line does, since `branch merge` lands it
+- the readers read the chapter's `badly`, `thoughts` and owner prompts beside the desk transcript, over the hours it covers
+- the hand-back keeps the account where `retro collect` reads it, on trunk, and the transcript stays on the box
+- this departs from the two lines as written, and the redraft names it for the owner at the merge
 
-- `git log --since` over `spec/tickets` with `-G "^state: closed"` names the candidates
-- a candidate counts where `isGroup` holds and `fieldOf` reads `state` as `closed`
-- the close is the commit time of the last commit touching that line
-- `git fetch origin` takes `refs/transcripts/*`, and `git show` reads each file of a group's ref
-- a group under `input/groups` already stays out of a second pass, so `--again` takes each group once
-- a group with no ref gives its chapter alone, and the print names it
+The change to the `write` step in `spec/processes/group.yaml`:
 
-The chapter readers need no new verb. `walk` in `src/engine/retro/timeline.js` reads every `.jsonl` under `transcripts`, the cloud folders among them. So `retro timeline` draws the box's hours, and `retro chapters` hands their lines to the chapter they fall in.
+- `badly` says: what did not go well, each error of the run and each owner prompt turning it, with its time
+- a checklist line reads: the chapter carries the run's owner prompts and errors off the transcript, each with its time
+- a checklist line reads: the chapter says the role, and carries no name, address or path of the box
+- `baseOf` in `src/scripts/ticket-drift.js` reads a ticket's route off the hash it copies, so a standing group keeps its route
+
+The collect reads the window off git, through `it.git.run`:
+
+- `git log --since` over `spec/tickets` with `-G "^state: closed"` and `--name-only` names the candidates
+- a candidate counts where `isGroup` holds and `fieldOf` reads `state` as `closed`, both in `src/engine/group.js`
+- the close is the commit time of the newest commit in that log naming the ticket
+- `chapterOf` in `src/scripts/pull-chapter.js` finds the `retro` section, and `cloudInto` writes it with its headings
+- a group under `input/groups` stays out of a second pass, so `--again` takes each group once
+- a group with no `# retro` text writes nothing, and the print names it
+
+The chapter readers need no new verb:
+
+- `TIMED` in `src/engine/retro/timeline.js` reads `transcripts` and `log` alone, so `input/groups` adds no timed line
+- `retro chapters` places the desk lines as it does now, and no chapter meets a line past its cuts
+- the rule in `read.md` reads `closed.json`, and the reader whose `from` and `to` hold a close reads that chapter file
+- a finding names its evidence as `input/groups/<group>.md` and a line, as rule `6` asks
 
 This composes with `the-retro-finishes-its-asks`:
 
-- that ticket cuts desk transcript lines through `withinWindow` inside `copyTree`, which `outsideInto` alone calls
-- `cloudInto` runs after `outsideInto` and copies a group's transcript whole, since the close gates it
-- a box's hours before `since` reach this retro alone, because the group closes in this window
-- that ticket keeps `.se/scripts` through `KEPT` in `movedInto`, and this change leaves `movedInto` as it stands
-- both change `collect` and `retro-outside.js`, each at its own lines, so the merge meets separate hunks
-
-Assumptions:
-
-- the cloud proxy lets a box push a ref under `refs/transcripts`, as it lets it push `work/<group>`
-- a transcript stays off every tracked tree, because the commit door refuses a delta carrying the box's name or email
-- the transcript stands under `~/.claude/projects/<slug>`, which `it.home` reaches on a box setting `CLAUDE_CODE_REMOTE`
+- `copyTree` takes `window` last, and `outsideInto` alone passes it, so `cloudInto` leaves the cut alone
+- `keptInto` copies `KEPT`, which `movedInto` skips, and this change leaves both as they stand
+- `cloudInto` runs after `outsideInto`, so the two changes to `collect` meet separate hunks
 
 ### callers
 
@@ -169,14 +178,12 @@ Assumptions:
 <!-- the form is list -->
 
 - `src/scripts/retro.js`, `retro`, through `collect`
-- `src/scripts/retro-collect.js`, `collect`, through `cloudInto` and `sourceOf`
+- `src/scripts/retro-collect.js`, `collect`, through `cloudInto`
 - `src/scripts/retro-collect.js`, `linesOf`, through `sourceOf`
-- `src/scripts/work.js`, `finish`, through `leaves`
-- `src/scripts/work.js`, `work`, through `finish` under `done`
-- `src/scripts/work.js`, `leaves`, through `keep`
-- `src/scripts/retro-cloud.js`, `keep`, through `transcriptsHere`
-- `src/engine/retro/timeline.js`, `timedFiles`, over the files under `transcripts/cloud-<group>`
-- `src/engine/retro/chapters.js`, `chapters`, through `timedFiles`
+- `src/scripts/retro-collect.js`, `countsOf`, over the `from` that `sourceOf` names
+- `src/scripts/retro-collect.js`, `said`, over the counts `countsOf` answers
+- `src/scripts/ticket-drift.js`, `baseOf`, over the history of `spec/processes/group.yaml`
+- `spec/processes/retro.yaml`, the step reading `spec/guidance/retro/read.md`
 
 ### tests
 
@@ -185,11 +192,9 @@ Assumptions:
 <!-- the form is list -->
 
 - `test/level0/retro-collect.test.js`, "collect gathers the retro chapter of every group closing in the window, with its close"
-- `test/level0/retro-collect.test.js`, "collect copies a cloud group's kept transcript whole under transcripts, and the timeline reads it"
-- `test/level0/retro-collect.test.js`, "a group closing before the window stays out, and a second pass takes each group once"
-- `test/level0/work-group.test.js`, "done on a cloud box pushes the session transcript to the group's own ref"
-- `test/level0/work-group.test.js`, "done on a desk pushes no transcript ref"
-- `test/level0/work-group.test.js`, "done answers one where the transcript push comes back refused, and the group stays held"
+- `test/level0/retro-collect.test.js`, "a group closing before the window stays out, and a ticket closing that is no group stays out"
+- `test/level0/retro-collect.test.js`, "a second pass takes each group once, and the count prints the groups"
+- `test/level0/process.test.js`, "the group's write step asks the owner prompts and errors of the run off the transcript, with their times"
 
 ### answers
 
@@ -197,7 +202,13 @@ Assumptions:
 
 <!-- the form is list -->
 
-- first
+- the keep pushes the raw transcript: no transcript leaves the box, and the approach drops the ref and the keep
+- the proxy and the refused keep: no push past `branch merge`, so `branch done` meets no new refusal
+- the group's `retro` step holds the box's account: `cloudInto` reads that chapter off trunk, and `leaves` stands as it is
+- the fourth ask line: the `write` step reads the transcript on the box, and the chapter carries its account
+- the third ask line: the readers read the chapter beside the desk transcript, over the hours its close falls in
+- the composition with `the-retro-finishes-its-asks`: `cloudInto` runs after `outsideInto`, and the hunks stay separate
+- the count and the second pass: `sourceOf` names `groups`, and a group under `input/groups` stays out of `--again`
 
 ### checked
 
@@ -205,9 +216,9 @@ Assumptions:
 
 <!-- the form is checklist -->
 
-- [x] every file, function and verb the approach names stands opened, and each claim checked there: `retro-collect.js`, `retro-outside.js`, `work.js`, `group.js`, `cloud.js`, `timeline.js`, `chapters.js`, `private.js`, `proc.js` and `group.yaml` stand read
-- [x] the callers list names every caller of what the approach changes: a search for `collect(`, `sourceOf`, `leaves(`, `finish` and `belongs(` over `src`, `.claude` and `test` backs it
-- [x] every done_when line names the test that decides it: each ask line maps to a case under tests, or to `./RUNME.sh check`
+- [x] every file, function and verb the approach names stands opened, and each claim checked there: `retro-collect.js`, `retro-outside.js`, `group.js`, `pull-chapter.js`, `timeline.js`, `chapters.js`, `ticket-drift.js`, `private.js`, `group.yaml` and `read.md` stand read
+- [x] the callers list names every caller of what the approach changes: a search for `collect(`, `sourceOf`, `countsOf`, `processes/group` and `retro/read` over `src`, `.claude`, `spec` and `test` backs it
+- [x] every done_when line names the test that decides it: the first two lines map to the `retro-collect.test.js` cases, the next two to the `process.test.js` case, the last to `./RUNME.sh check`
 
 ## review
 
