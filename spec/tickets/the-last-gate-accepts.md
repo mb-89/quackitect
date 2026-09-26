@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: open
-group: the-servers-and-views-hold
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -77,27 +76,20 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
+group: the-engine-holds-the-route
 step: design/draft
 ---
 
 # Ask
 
-The sidebar badge shows the number in the work tab's brackets, under a briefcase, and follows the queue with no window reload. The tab and the branch list draw a ticket once, with what it waits on.
+One acceptance at the top reads the whole work and every prose criterion under it, and the process closes on its verdict. [[spec/design_input/level-two]] asks it in its chapter The final acceptance.
 
-The badge counts the rows the tab draws, and the sidebar redraws on a config change alone. So the badge and the brackets show two numbers for one queue. The tab draws a plan todo nested under its group again at the top.
+Today a process closes on the claim of its last hand, and a prose criterion stays unread.
 
-- the `editor` entry in `spec/config/level0.schema.json` counts through a verb printing `Places.Takeable`, the number in the work tab's brackets
-- `src/tui/workcount_test.go` holds the printed count equal to the brackets
-- the `editor` entry carries a briefcase icon, and its help names the bracket number
-- the sidebar redraws once after a burst of writes to a ticket folder, the plan file or the hold folder
-- that redraw stands in `src/extension/sidebar.js`, and a case in `test/level0/sidebar.test.js` holds a ticket write changing the badge
-- `Placed` in `src/tui/work/workplaces.go` reads every nested row before it adds a plan todo
-- a case in `src/tui/workplaces_test.go` holds a todo under its group drawn once
-- `childRows` in `src/scripts/work-list.js` names the tickets a child waits on
-- the group row names a group branch behind main
-- cases in `test/level0/work-group.test.js` hold both the child row and the group row
-- `lensesOf` in `src/extension/lib/lens.js` draws no lens over a ticket standing on a cloud branch. A case under `test/level0` holds it
-- a person step: the owner compares the sidebar badge with the work tab's brackets in the editor. The compare runs before and after a ticket moves, with no window reload
+- a final acceptance waits until every step and fix ticket under it closes. A case under `test/level0` decides it
+- its second run reads the diff since the tip of its last verdict, with the merges, and runs every command. A case under `test/level0` decides it
+- past its cap, the process closes `became` onto a question ticket. A case under `test/level0` decides it
+- a process inside a delivery ends after implement, and the final acceptance of the delivery reads it. A case under `test/level0` decides it
 - `./RUNME.sh check` exits 0
 
 # design

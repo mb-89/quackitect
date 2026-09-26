@@ -630,6 +630,11 @@ the history of one group and what it holds.
 `branch close [name]` deletes a branch git says is inside `main`, here and on
 origin. Naming no branch closes every one of them. It reaches the kinds below:
 
+A branch whose tip stands on trunk's own line is a cut waiting for a box, so
+it reads open while trunk moves on. A landed branch joins trunk through a
+merge commit, off that line, and `mergedHere` in `src/scripts/work-stands.js`
+reads the two apart.
+
 | branch | cut by | throwaway once |
 |---|---|---|
 | `work/<name>` | `branch open` | trunk holds its commits |
