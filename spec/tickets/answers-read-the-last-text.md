@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-gates-read-the-state
 steps:
   - name: design
@@ -113,6 +113,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 7a58a272780d665d34c19ca437933e43c6d59836
+    hash_after: 7a58a272780d665d34c19ca437933e43c6d59836
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 34 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-todo-joins-the-queue.md:161:1: CodeSpans: A sentence holds 4 code spans, and this one holds 6. Carry th"
+reason: done
 ---
 
 # Ask
@@ -277,11 +289,15 @@ Five cases fail on their own assertion: the repeat twice, and the three transcri
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/verbs.test.js test/level0/canary-debt.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -289,11 +305,27 @@ Five cases fail on their own assertion: the repeat twice, and the three transcri
 
 <!-- the form is text -->
 
+`voice measure` now scores the answer the owner reads, and a repeated canary draws a finding.
+
+| what changes | why |
+|---|---|
+| `answersIn` keeps the last text of each turn, cut at owner rows | a progress line pushed the measure past the gate's ceiling |
+| a meta row and a compaction summary open no turn | neither is the owner speaking |
+| `onTurnSaid` writes a `warn` row, `HEARD.again`, where a step opens on the canary once it stands paid | a session repeated the line in one context, and nothing named it |
+
+The check reads steps alone, because the turn's end carries the last step's text again. A compaction opens the debt, so the line after it pays and draws nothing.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the ask names, their tests and the design output
+- every door the change reaches has a fake
+- each new function opens on a comment naming this ticket
+- the new saying stands in `lib/guidance.js` once
+- the review's three rows stand fixed in the change
 
 # Discussion
 
