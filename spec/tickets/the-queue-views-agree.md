@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: open
-group: the-servers-and-views-hold
 steps:
   - name: design
     reads: [[spec/guidance/voice]]

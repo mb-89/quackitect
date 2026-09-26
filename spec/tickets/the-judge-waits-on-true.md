@@ -26,7 +26,6 @@ steps:
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
-group: the-servers-and-views-hold
 parent: every-road-has-a-caller
 ---
 

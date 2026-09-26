@@ -96,7 +96,6 @@ record:
     hand: box d7a44d6f73215 · claude-code-remote
     hash_before: 5c3d6d4364231de251fd2e293cb4a2e6815931b6
     hash_after: 5c3d6d4364231de251fd2e293cb4a2e6815931b6
-group: the-servers-and-views-hold
 ---
 
 # Ask
