@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-gates-read-the-state
 parent: the-retro-holds-the-clear
+record:
+  - step: do
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 7f038d5adf5e7b737f94e3b4fa86fd9ab88bb916
+    hash_after: 7f038d5adf5e7b737f94e3b4fa86fd9ab88bb916
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 36 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-window-keeps-the-binding.md:39:130: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ parent: the-retro-holds-the-clear
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/binding.test.js test/level0/sidebar.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ parent: the-retro-holds-the-clear
 
 <!-- the form is text -->
 
+`opened` in `src/extension/lib/session.js` carries `engine.binding` across a new window, under `KEPT`. It drops every other local value as before, and `cleared` names those alone. So the binding holds until the owner changes it, and the tracked `queue` answers no more after a window opens. `extension.md` says so under `The local file dies`.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the binding crosses a new window
+- the cleanup: `cleared` names no kept key
+- the kept keys stand in `KEPT` once
 
 # Discussion
 
