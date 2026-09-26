@@ -1284,9 +1284,9 @@ late pays too.
 A prompt's demand keys on the prompt itself. At `prompt.submit` the bridgehead
 reads the id of the newest transcript row, and the demand holds it. On a hold
 the bridgehead posts the transcript rows, each with its role and id. The door
-counts an agent text past the next owner row alone. A restart empties the
-spoken text, so a transcript carrying no ids pays nothing, and the display road
-pays alone.
+counts an agent text past the next owner row alone. A transcript carrying no
+ids pays a prompt nothing, because a flush a turn late hands an older text. The
+display road then pays alone.
 
 ## What counts as owed
 

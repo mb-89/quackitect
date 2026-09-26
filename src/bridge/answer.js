@@ -104,11 +104,10 @@ export function onAgentSpoke(e, box) {
   return { result: { deny: lacks } };
 }
 
-// A prompt's demand reads the transcript past its own row. A transcript carrying no row ids, after a restart emptied the spoken text, pays nothing. [[spec/tickets/a-reply-follows-its-prompt]]
+// A prompt's demand reads the transcript past its own row. A transcript carrying no row ids pays a prompt nothing, so the display road pays alone. [[spec/tickets/a-reply-follows-its-prompt]] [[spec/tickets/a-late-count-pays-nothing]]
 function freshTexts(e, demand) {
   if (!demand.prompt || !Array.isArray(e?.rows)) return textsSince(e, demand.seen);
-  if (demand.before) return pastRow(e.rows, demand.before);
-  return demand.seen ? textsSince(e, demand.seen) : [];
+  return demand.before ? pastRow(e.rows, demand.before) : [];
 }
 
 function pastRow(rows, before) {

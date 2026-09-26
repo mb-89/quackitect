@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-gates-read-the-state
 parent: a-reply-follows-its-prompt
+record:
+  - step: do
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: b193e8fee0d495d3ea086000dcde87eee6fcbc1f
+    hash_after: b193e8fee0d495d3ea086000dcde87eee6fcbc1f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 12 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-warning-has-fallback.md:39:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ The owner-row count `owners` taken at `prompt.submit` comes off a transcript tha
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/answer-door.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ The owner-row count `owners` taken at `prompt.submit` comes off a transcript tha
 
 <!-- the form is text -->
 
+A transcript carrying no row ids now pays a prompt nothing. The draft this ticket answers keyed such a transcript on a count of owner rows, and the change never built that count. It still read a transcript without ids off the last spoken text, and a flush a turn late handed an older text through that road. `freshTexts` in `src/bridge/answer.js` stands that road down for a prompt, so the display road pays alone there. `level0.md` says so under `What the door reads`.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: no id stands the transcript road down, and the display road pays
+- the cleanup stands in the change: the seen road for a prompt goes, and its comment names both tickets
+- the rule stands in level0.md once, and the code comment points at the tickets
 
 # Discussion
 

@@ -158,3 +158,23 @@ test("a text the chat shows stands stamped with the clock's time", () => {
   assert.equal(it.spoken, "The work goes on.");
   assert.equal(it.spokenAt, Date.parse("2026-01-01T00:00:05.000Z"));
 });
+
+// A transcript carrying no row ids stands down for a prompt, so a flush a turn late hands no older text over. [[spec/tickets/a-late-count-pays-nothing]]
+test("a transcript a turn late and carrying no ids pays a prompt nothing", () => {
+  const it = box();
+  it.clock = { now: () => new Date("2026-01-01T00:00:00.000Z") };
+  it.spoken = "The last answer.";
+  onPromptSubmit({ origin: { kind: "composer" }, text: "go on" }, it);
+  const said = onAgentSpoke(
+    {
+      tool: "Read",
+      text: "An older answer.",
+      texts: ["An older answer."],
+      rows: [row("user", "go on"), row("assistant", "An older answer.")],
+    },
+    it,
+  );
+  assert.ok(said.result?.deny, "the older text pays nothing");
+  onMessageDisplay({ delta: "Understood: the door first." }, it);
+  assert.equal(it.demand, null, "and the display road still pays");
+});
