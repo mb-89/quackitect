@@ -114,6 +114,7 @@ function doorOf(seed = {}) {
     scriptUri: () => "https://box/webview/clicks.js",
     read: async (path) => (files.exists(path) ? files.read(path) : ""),
     write: async (path, text) => files.write(path, text),
+    append: async (path, text) => files.append(path, text),
     watch: (paths, draw) => said.watched.push({ paths, draw }),
     runs: (line) => said.ran.push(line),
     asks: async (what) => {
