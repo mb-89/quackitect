@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-owners-word-reaches-work
 parent: a-small-ask-stays-small
+record:
+  - step: do
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: f130d8cc6b2d7951eb3d69dd93b2d948def3689d
+    hash_after: f130d8cc6b2d7951eb3d69dd93b2d948def3689d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-owners-words-travel-verbatim.md:154:1: ListItem: A sentence in a list item holds 20 words, and this one"
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ a rule placed after rule 6 in `spec/guidance/tickets.md` renumbers rules 7 to 15
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/question-grades.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,19 @@ a rule placed after rule 6 in `spec/guidance/tickets.md` renumbers rules 7 to 15
 
 <!-- the form is text -->
 
+The trivial route joins rule 6 of `spec/guidance/tickets.md`, the rule that owns the mint. The note stands at its rule cap, so a sixteenth rule meets the lint.
+
+No rule moves its number, so every rationale section and `Examples` row keeps its key. The rationale argues it under `## 6.`
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change departs from the ask's two roads, since the cap refuses rule 16, and this ticket says why
+- no cleanup stands revealed
+- the rule stands once, in rule 6, and the rationale points at its number
 
 # Discussion
 
