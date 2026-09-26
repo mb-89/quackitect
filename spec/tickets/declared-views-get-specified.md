@@ -44,27 +44,33 @@ Phase 6 builds one renderer, and it draws what the declarations say and nothing 
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh lint spec/design_output/views.md
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+[[spec/design_output/views]] specifies the declared views. A base file gains
+`reads`, `badge`, `actions` and `follow`. An action entry pairs a trigger with
+an effect: a call, a cell edit, a form, a jump or a preset cycle.
 
-<!-- the form is text -->
+The work view reads `work/rows` and draws `work/open-tasks` in its header. The sidebar
+badge reads that name too, so the two counts become one. The log is a base file over
+`log/rows`, a fold over `session/`. The `index`, `cli` and `help` tabs are base
+files over registry names, and the form in `cli` comes off an action's input
+type. The index checks every name a view reads or calls at start.
+
+Weighed: the registry tabs as built-in screens, against base files. Base files
+win, because the ask wants a renderer drawing declarations alone. Assumed: the
+tab order rides a config key, `window.tabs`, which phase 6 adds.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask: the note names the reads, the actions, the log view and the registry tabs
+- the cleanup it reveals: none, because the note adds keys and changes no file a reader holds
+- the note points at the tree-view note for the keys standing today, and repeats none of them
 
 # Discussion
 
