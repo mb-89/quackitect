@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -107,6 +107,11 @@ record:
     hand: box b8ae1b45d463 · claude-code-remote
     hash_before: 470baff3e4a17e49b67a9eeaf548a9253fff2a06
     hash_after: 470baff3e4a17e49b67a9eeaf548a9253fff2a06
+  - step: retro/cloud
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: fca7c9488303f99ba621439a3e13ba4e64d759ab
+    hash_after: fca7c9488303f99ba621439a3e13ba4e64d759ab
+reason: done
 ---
 
 # Ask
@@ -289,17 +294,31 @@ open(path, "w").write(s[:e] + "\n" + text + s[end:])
 
 <!-- the form is list -->
 
+- the level zero tools `mcp__level0__patch` and `mcp__level0__replace` stood absent from the session, so each write went through the harness's own edit tool
+- no Windows box, so the Vale path on Windows stays unproven
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the plugin manifest check refused an import past the plugin folder, at the first full check of `each-fact-keeps-one-owner`
+- the commit door refused a code change carrying no test beside it, on the plugin fix and the Go sweep
+- the engine refused a tests-red hand-back that ran green, on `each-fact-keeps-one-owner`
+- the stop hook asked for a push while a helper held uncommitted work in the tree
+- no conflict at sync, and no test failing on this box alone
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- `vale-ls-on-windows`, a question ticket with no group, carrying the desk trial a person on Windows runs
+- the pages `harnesssurface_2.html`, `the-agent-pulls-tickets.html` and `the-bench-reruns-design-inputs.html` draw the folder warning, and the owner moves each
+- `the-retro-reads-cloud-retros` departs from its ask lines on transcripts, and the owner reads that call at the merge
+- no person step parked, and no handover written
 
 # Discussion
 
