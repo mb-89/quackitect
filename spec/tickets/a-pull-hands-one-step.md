@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: open
-group: the-servers-and-views-hold
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -77,27 +76,21 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
+group: the-engine-holds-the-route
 step: design/draft
 ---
 
 # Ask
 
-The sidebar badge shows the number in the work tab's brackets, under a briefcase, and follows the queue with no window reload. The tab and the branch list draw a ticket once, with what it waits on.
+A hand holds one step and its guidance, and tracks no route, so a clear costs it nothing. The engine writes the ticket file, as [[spec/design_input/level-two]] asks in its chapters The loop and The ticket files.
 
-The badge counts the rows the tab draws, and the sidebar redraws on a config change alone. So the badge and the brackets show two numbers for one queue. The tab draws a plan todo nested under its group again at the top.
+Today the agent reads the whole route on the ticket, writes the file by hand, and breaks its form.
 
-- the `editor` entry in `spec/config/level0.schema.json` counts through a verb printing `Places.Takeable`, the number in the work tab's brackets
-- `src/tui/workcount_test.go` holds the printed count equal to the brackets
-- the `editor` entry carries a briefcase icon, and its help names the bracket number
-- the sidebar redraws once after a burst of writes to a ticket folder, the plan file or the hold folder
-- that redraw stands in `src/extension/sidebar.js`, and a case in `test/level0/sidebar.test.js` holds a ticket write changing the badge
-- `Placed` in `src/tui/work/workplaces.go` reads every nested row before it adds a plan todo
-- a case in `src/tui/workplaces_test.go` holds a todo under its group drawn once
-- `childRows` in `src/scripts/work-list.js` names the tickets a child waits on
-- the group row names a group branch behind main
-- cases in `test/level0/work-group.test.js` hold both the child row and the group row
-- `lensesOf` in `src/extension/lib/lens.js` draws no lens over a ticket standing on a cloud branch. A case under `test/level0` holds it
-- a person step: the owner compares the sidebar badge with the work tab's brackets in the editor. The compare runs before and after a ticket moves, with no window reload
+- a pull on a standard ticket prints the step in hand alone, with its fields and its checklist. A case under `test/level0` decides it
+- the hand-back takes the answer as the fields payload, and the engine writes it into the ticket file. A case under `test/level0` decides it
+- the engine runs the formatter and the mechanical checks before it merges an answer. A case under `test/level0` decides it
+- the write door refuses an agent a write to a ticket under `spec/tickets`. A case under `test/level0` decides it
+- the work tab draws the progress of a process from its ticket file. A case under `src/tui` decides it
 - `./RUNME.sh check` exits 0
 
 # design
