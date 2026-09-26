@@ -883,12 +883,25 @@ forgets to take a ticket up and to put it down.
 | Edit, Write, MultiEdit, NotebookEdit | nothing, since the harness fixes their fields | `onToolWrite` in `src/bridge/write.js`, which refuses them and names `mcp__level0__patch` |
 | Bash, PowerShell | `<ticket>:` at the head of `description` | `ticketDoor` in `src/bridge/bash.js` |
 
-`ticketFault` in `src/engine/named.js` reads the name. A ticket stands open
-where `spec/tickets/<name>.md` or `.se/tickets/<name>.md` carries a `state`
-other than `closed`. The refusal names the fault and says how to name a ticket:
+`ticketFault` in `src/engine/named.js` reads the name against what stands in
+hand. `inHand` reads it off the box: every ticket a hold names, and the plan's
+`working` todo. Every hand writes through the same door, so a helper's hold
+passes its own ticket.
+
+| what stands in hand | what passes |
+|---|---|
+| a hold, or a working todo | a held ticket's name, an ephemeral one among them, or the todo's title |
+| nothing | any open ticket, so a commit by hand still lands |
+
+A ticket stands open where `spec/tickets/<name>.md` or `.se/tickets/<name>.md`
+carries a `state` other than `closed`. A Bash description opening on the
+working todo's title and a colon passes too. The pull answers a working todo
+ahead of every road that hands work out. The refusal names the fault and says
+how to name a ticket:
 
 | the fault | the refusal opens |
 |---|---|
+| a name outside what stands in hand | `<name> stands outside what is in hand.`, then the tickets and the todo |
 | the call names no ticket | `This write names no ticket.` |
 | no file under either folder carries the name | `No ticket named <name> stands under spec/tickets or .se/tickets.` |
 | the ticket's `state` reads `closed` | `<name> stands closed.` |

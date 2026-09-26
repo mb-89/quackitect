@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-gates-read-the-state
 parent: the-todo-joins-the-queue
+record:
+  - step: do
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 95d67aff16c594533d5cd32eb13796817cc24f6a
+    hash_after: 95d67aff16c594533d5cd32eb13796817cc24f6a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 37 test(s) pass in 4 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-todo-road-stands-first.md:39:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ an ephemeral ticket stands in the hold alone with no file, so `ticketFault` pass
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/named.test.js test/level0/bash-ticket.test.js test/level0/pull-todo.test.js test/level0/bash-commit.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ an ephemeral ticket stands in the hold alone with no file, so `ticketFault` pass
 
 <!-- the form is text -->
 
+`ticketFault` in `src/engine/named.js` reads the held names before it reads the ticket folders, so an ephemeral ticket passes with no file behind it. The case an ephemeral hold's ticket passes with no file behind it, in `test/level0/named.test.js`, holds it. This commit carries the parent's whole change, which its own close names.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the held name passes ahead of the folder read
+- the cleanup: the case in `bash-commit.test.js` now names the ticket its hold carries
+- the rule stands in `level0.md` under `A write names its ticket`
 
 # Discussion
 
