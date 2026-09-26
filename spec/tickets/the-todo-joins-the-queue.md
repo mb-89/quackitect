@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box c28a93a32b71 · claude-code-remote
     hash_before: dca9ecda9c149e96bb41fb38cab08cb656b52e60
     hash_after: dca9ecda9c149e96bb41fb38cab08cb656b52e60
+  - step: design/review
+    hand: box c28a93a32b71 · claude-code-remote · helper-2
+    hash_before: 0cb281c6992cc2de6f32de6f89ba84c914ccfd74
+    hash_after: 0cb281c6992cc2de6f32de6f89ba84c914ccfd74
 ---
 
 # Ask
@@ -171,6 +175,14 @@ Where neither a hold nor a working todo stands, `ticketFault` keeps today's read
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+- the-door-picks-a-hold: `holdsIn` answers every hold on the box, one a hand, and the door carries no hand, so `inHand` names which hold passes, such as any hold on the box, and a case in `test/level0/named.test.js` drives two holds
+- the-door-passes-ephemeral-holds: an ephemeral ticket stands in the hold alone with no file, so `ticketFault` passes the held name before it reads the folders, and a case drives it
+- the-hand-reads-plans-here: `plansHere` in `src/bridge/plan.js` reads the plan already, and `PLANS` stands in `.claude/skills/level0/lib/runs.js`, so `inHand` calls `plansHere` and reads no second copy
+- the-callers-drop-ticket-faults: `ticketFaults` in `src/bridge/write.js` comes from `.claude/skills/level0/lib/ticket.js` and checks the ticket fields, so the callers list drops it
+- the-todo-road-stands-first: the todo road in `pull` stands above the road asking for a named ticket as well as above `handsOut`, so a named pull hands out nothing while a todo stands in hand, and the pull case drives a named pull
+- the-open-road-stays-named: where neither a hold nor a working todo stands, any open ticket passes, so the commit verb keeps working, and the rule in `spec/design_output/level0.md` and a case in `test/level0/named.test.js` name that road
 
 # implement
 
