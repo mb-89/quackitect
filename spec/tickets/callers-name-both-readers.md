@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-gates-read-the-state
 parent: answers-read-the-last-text
+record:
+  - step: do
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 433504b0d6f9fcd754a715999dc3bf25b965e941
+    hash_after: 433504b0d6f9fcd754a715999dc3bf25b965e941
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 47 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-todo-joins-the-queue.md:161:1: CodeSpans: A sentence holds 4 code spans, and this one holds 6. Carry th"
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ the callers list misses `readsCompaction` in `src/scripts/probe.js`, which reads
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/probe.test.js test/level0/answer.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,20 @@ the callers list misses `readsCompaction` in `src/scripts/probe.js`, which reads
 
 <!-- the form is text -->
 
+Both readers hold under the change, and a case holds each.
+
+- `readsCompaction` in `src/scripts/probe.js` takes `HEARD.again` among its sayings. The repeat lands only once the line stands paid, so the first saying after a compaction still decides. A new case in `test/level0/probe.test.js` drives a repeat after the paying line
+- the case an owner row opening on the warning line reads as the same owner row, in `test/level0/answer.test.js`, calls `answersIn` and passes unchanged
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: it names both readers, and a case holds each
+- the cleanup: none stands
+- the readers stand named in this ticket alone
 
 # Discussion
 
