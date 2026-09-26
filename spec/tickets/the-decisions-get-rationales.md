@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ step: do
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-migration-writes-its-specs
+record:
+  - step: do
+    hand: box d7a540d981d5 · claude-code-remote
+    hash_before: d201d8aef459e49643ff544539061d2c6d7f0270
+    hash_after: 3587c274ba8dbb81cfd7d9600e12d848ebb53f37
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-decisions-get-rationales.md:71:1: ListItem: A sentence in a list item holds 20 words, and this one hold"
+reason: done
 ---
 
 # Ask
