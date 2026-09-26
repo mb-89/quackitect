@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ step: do
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-migration-writes-its-specs
+record:
+  - step: do
+    hand: box d7a540d981d5 · claude-code-remote
+    hash_before: 0e1ac0855b2fad632c91be06992d05849d3082e3
+    hash_after: 872f44d3931d8cd623a1d8678e78f0dbfd5e82ea
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-inner-protocol-gets-chosen.md:77:1: ListItem: A sentence in a list item holds 20 words, and this one ho"
+reason: done
 ---
 
 # Ask
