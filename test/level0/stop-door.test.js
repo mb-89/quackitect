@@ -4,7 +4,6 @@
 // [[spec/design_output/stop#a-standing-stop-ends-it]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { STOP_CALL } from "../../.claude/skills/level0/lib/stop.js";
@@ -17,6 +16,7 @@ import {
   sawPrompt,
   TOOLS,
 } from "../../src/bridge/stop.js";
+import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -141,9 +141,8 @@ test("four stop lines over a queue holding work: three hold, the fourth ends, an
 });
 
 // The group rule as the tree writes it, so the hold a case reads is the one a box reads. [[spec/design_output/stop#three-in-a-row]]
-const LEVEL1 = readFileSync(
-  new URL("../../spec/config/stop/level1.yml", import.meta.url),
-  "utf8",
+const LEVEL1 = disk().read(
+  new URL("../../spec/config/stop/level1.yml", import.meta.url).pathname,
 );
 const HELD_GROUP =
   "---\nkind: [[ticket]]\nstate: open\nprocess: [[spec/processes/group]]\nrecord:\n  - hash_before: abc123\n---\n\n# Ask\n\nA group.\n";
