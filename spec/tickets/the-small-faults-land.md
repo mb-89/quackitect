@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
     hash_before: 5e13001f343ccd0b002e77f69e6f092e459a1fc1
     hash_after: 5e13001f343ccd0b002e77f69e6f092e459a1fc1
+  - step: design/review
+    hand: box b8ae1b45d463 · claude-code-remote · helper-2
+    hash_before: f2330c34b75330c43f20d68f9cc0270974b351a8
+    hash_after: f2330c34b75330c43f20d68f9cc0270974b351a8
 ---
 
 # Ask
@@ -192,6 +196,12 @@ The tracked `.vscode/settings.json` holds one string for `vale.valeCLI.path`, an
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- `fix` dispatch: the flag fault lives in the `fix` row of `verbs` in `src/scripts/cli.js`, which hands `where`, the arguments with every flag dropped. The implement step changes that one row to hand `rest`, and its checklist line names `cli.js` as the dispatch the ask's `fix` line needs. `fixFlags` splits `rest` into flags and paths, and answers `["."]` when no path stands.
+- Vale on Windows: the tracked `.vscode/settings.json` holds one string, `.se/.runtime/bin/vale`, so a rule taking `vale.exe` changes nothing vale-ls meets. The implement step makes the rule take `Bin/vale` and `Bin/vale.exe`, keeps the tracked string, and a case pins it. The says field names the Windows run as open: vale-ls finds Vale there only where its spawn resolves `vale` to `vale.exe`.
+- the twin rule: `namesTheBinaries` in `.claude/skills/level0/lib/servers.js`, run by `settingsNameBinaries` in `.claude/skills/level0/lib/tree.js`, holds the same `vale` test. The implement step changes it with the Go rule, and a case in `test/contract/tree.test.js` decides it, so `./RUNME.sh lint` and the panel agree.
+- callers: the list takes `.claude/skills/level0/lib/tree.js`, `settingsNameBinaries`, through `namesTheBinaries` in `servers.js`.
 
 # implement
 
