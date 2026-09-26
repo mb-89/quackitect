@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: each-thing-stands-in-place
 steps:
   - name: design
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
+  - step: implement/tests-green
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 76845336fc428f8aa6a1922791c7fb3b705098e1
+    hash_after: 76845336fc428f8aa6a1922791c7fb3b705098e1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 35 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
+reason: done
 ---
 
 # Ask
@@ -289,11 +301,15 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/cloud-desk.test.js test/contract/cli-check-doors.test.js test/contract/vale.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -301,11 +317,35 @@ pass
 
 <!-- the form is text -->
 
+Each fact the ask names now stands with one owner, or meets a test where a
+language wall forces a copy:
+
+| the fact | where it stands now |
+|---|---|
+| the cloud read | `cloudHere`, which `pushed` and the stop rules call |
+| the public ticket folder and the note end | `folders.js` in the plugin, which `group.js`, `apply.js` and `named.js` read |
+| the pointer path and the port wait | `port.go`, and a contract case matches the copies in `cli-served.js` |
+
+The plugin imports nothing past its own folder, so the owner of the ticket
+folder moves into the plugin, and a contract case holds `apply.js` to its
+siblings.
+
+`CodeHeader` refuses a number word from two up wherever it stands, and
+`CountedList` warns on a heading counting the list or the table under it. The
+headers and headings they catch stand reworded, and every link follows the new
+anchors.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: past the named files, the headers, headings and links the wider rules reach
+- [x] every door the change reaches has a fake: the change reaches no door
+- [x] a comment names the approach the change implements: each new constant and case carries its pointer
+- [x] every fact the change adds stands in one place: the table above names each owner
+- [x] every row the design review passes with stands fixed in the change: each row stands fixed on this branch
 
 # Discussion
 
