@@ -301,3 +301,18 @@ func TestAnEmptyProcessHoldsBackTheKeysTheFillWrites(t *testing.T) {
 		t.Fatalf("a ticket naming no process answers %v", rules(found))
 	}
 }
+
+// A governed folder holds its own kind alone, so a page there draws a warning. [[spec/tickets/each-folder-holds-its-kind]]
+func TestAPagePastTheFolderKindWarns(t *testing.T) {
+	tree := fixture(t, map[string]string{
+		"spec/schemas/handover.schema.yaml": strings.Replace(handoverSchema, "  - HANDOVER.md", "  - spec/funnel/**", 1),
+		"spec/funnel/page.html":             "<html></html>\n",
+	})
+	one := onlyOne(t, schemaFaults(tree), "Schema.Folder")
+	if one.File != "spec/funnel/page.html" || one.Severity != "warning" {
+		t.Errorf("the finding reads %+v", one)
+	}
+	if !strings.Contains(one.Message, "handover") {
+		t.Errorf("the message reads %q", one.Message)
+	}
+}

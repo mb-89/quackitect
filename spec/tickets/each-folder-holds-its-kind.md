@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box b8ae1b45d463 · claude-code-remote · helper-2
     hash_before: a97d277889be7fc53bf771e768a9db5ba35c2343
     hash_after: a97d277889be7fc53bf771e768a9db5ba35c2343
+  - step: implement/tests-red
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: cf5d895274c18c601385d439aebeeae36cecc7a0
+    hash_after: cf5d895274c18c601385d439aebeeae36cecc7a0
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -209,17 +217,29 @@ The approach meets every `done_when` line. The implement step fixes these rows i
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/write.test.js test/level0/schema-sweep.test.js src/lsp
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the sweep case fails: `schemaFaults` passes over a path off `.md` in both Go and JavaScript
+- the door case fails: `schemaDoor` returns at once for a path off `.md`
+- what surprises the hand: `fault` answers error on both sides, so the new finding sets warning itself
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: the sweep on both sides, the door, the funnel note and a design input
+- [x] every door the change reaches has a fake: the sweep reads a fixture tree, and the door case a fake disk
+- [x] a comment names the approach the change implements: each case points at this ticket
+- [x] every fact the change adds stands in one place: one message builder a side, and the Go side reads the JavaScript wording
+- [x] every row the design review passes with stands fixed in the change: severity, callers, the Go clause and the source of the rulings
 
 ## change
 

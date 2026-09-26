@@ -368,3 +368,13 @@ test("a read handing back the text the mark holds writes the marks file once", a
     "a second read of the same text writes nothing",
   );
 });
+
+// A governed folder holds its own kind alone, so a page or a picture written there comes back refused. [[spec/tickets/each-folder-holds-its-kind]]
+test("a screenshot written under spec/tickets comes back refused, naming the ticket kind", async () => {
+  const said = await onWrite(
+    write(join(WORK, "spec", "tickets", "screen.png"), "not a note"),
+    box(),
+  );
+  assert.match(said?.result?.deny ?? "", /spec\/tickets\/screen\.png/);
+  assert.match(said.result.deny, /ticket/);
+});
