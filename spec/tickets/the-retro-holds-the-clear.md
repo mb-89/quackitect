@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-gates-read-the-state
 steps:
   - name: design
@@ -87,6 +87,12 @@ record:
     hand: box c28a93a32b71 · claude-code-remote · helper-2
     hash_before: a0cb3fe41b7079e53c10adf178305c632171a7dc
     hash_after: a0cb3fe41b7079e53c10adf178305c632171a7dc
+  - step: implement/tests-red
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 0c7c6ac4350675194e5c3374f89c91ba8b57acbe
+    hash_after: 0c7c6ac4350675194e5c3374f89c91ba8b57acbe
+    why: the-bridge-names-no-maker answers this ask
+reason: answered
 ---
 
 # Ask
@@ -249,3 +255,5 @@ pass with findings
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The queue handed the child `the-bridge-names-no-maker` ahead of this ticket's implement step, and the whole change landed under its hand-back. Four cases in `test/level0/retro-clear.test.js` and `test/level0/binding.test.js` failed on their own assertion before it, and `./RUNME.sh check` exits 0 after it. So this ticket closes as answered by that child.
