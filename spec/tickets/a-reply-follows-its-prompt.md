@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -107,6 +107,10 @@ record:
     hash_after: 50f9686d2ef125b6aeb5e6e9d288543292f12ee0
     returns: 2
     why: "The warning road misses the second line of the ask. `prompt.context` fires once a conversation, and again after a compaction or a `/clear`, and a second prompt fires none. For details, see [[spec/design_output/level0#the-guidance-stays-put]]. So a `level0-answer` block in `onPromptContext` reaches the first prompt alone. At that first prompt nothing shows that `prompt.context` fires after `prompt.submit` opens the demand. The ask names the prompt's own event, and `prompt.context` is not that event. Fix: name a road on `prompt.submit` itself, such as a rewritten event through `answer.event` the way `agent.spawn` prepends its line, and prove the session reads it with the probe; The cage block is no precedent for a per-prompt line. It rides the first `prompt.context` a session reads, the same once-a-conversation road; The probe table's transcript row stands against a measured fact. At `tool.call`, `$.session.messages()` carries no text from the response in flight, per [[spec/design_output/level0#a-step-arrives-late]]. With `turn.step` firing after the first call, the `tool.call` event is the one road left open. Name that, so the third row, where the owner decides, reads as the likely outcome; The transcript key matches the prompt's row by its text. Two prompts with the same text, such as `go on`, make a transcript flushed a turn late hand the older prompt's text, so it pays the new one. Key the row on its position past the last owner row seen, or on an id or time where the row carries one, and give that case a test"
+  - step: design/person-1
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: fe0c78daa6dc8f9a43105fa551959f583e019e54
+    hash_after: fe0c78daa6dc8f9a43105fa551959f583e019e54
 group: the-gates-read-the-state
 ---
 
@@ -133,6 +137,13 @@ A prompt carries no grace, so the first call after it meets the door. A reply wr
 <!-- the answer, which the step behind this one reads -->
 
 <!-- the form is text -->
+
+The findings stand, and the next draft takes each:
+
+- the warning rides `prompt.submit` itself: the door answers `answer.event` with the prompt text opening on the `warns` line, the way `agent.spawn` prepends its line. The probe shows the session reads it
+- the cage block drops out as a precedent
+- the `tool.call` event stands as the one open road for the same-message text. The probe reads it first, and the owner decides where it carries nothing
+- the transcript row keys on an id where the row carries one. Otherwise it keys on the count of owner rows the bridgehead reads at `prompt.submit`, and a text counts past the next owner row alone. A session past the transcript's window reads the display road alone
 
 ## draft
 
