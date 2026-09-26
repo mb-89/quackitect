@@ -35,11 +35,14 @@ import { guidance } from "./guidance-verb.js";
 import {
   closedHere,
   dependsOn,
+  entriesOf,
   escalate,
   handOf,
   handRule,
+  holdsHere,
   holdsVerb,
   leafOf,
+  leavesOf,
   pull,
   roleOf,
   stepPathOf,
@@ -379,7 +382,47 @@ function finish(it) {
   const stopped = ready(it, branch);
   if (stopped.code) return stopped.code;
 
+  const open = retroOpen(it, it.disk.read(path));
+  if (open) return retroFirst(it, branch, name, open);
+
   return leaves(it, branch, at, path, stopped.says);
+}
+
+// The retro step of a group, which the box writes before it leaves. [[spec/processes/group.yaml]]
+const RETRO = "retro";
+
+// The first retro leaf that applies on this box and stands unwritten, or nothing. [[spec/design_output/work#a-box-leaves]]
+export function retroOpen(it, text) {
+  const front = frontOf(text);
+  const here = { ...it, cloud: cloudHere(it) };
+  const record = entriesOf(front);
+  const written = (path) => {
+    const last = record.filter((one) => String(one.step).trim() === path).at(-1);
+    return Boolean(last?.skipped || (last?.hash_after && !last.returns));
+  };
+  const open = leavesOf(front)
+    .filter((one) => one.path.split("/")[0] === RETRO)
+    .filter((one) => holdsHere(here, String(one.said.when ?? ""), front).holds)
+    .find((one) => !written(one.path));
+  return open?.path ?? "";
+}
+
+// The open tickets leave first, because the pull hands no retro out while one stands in the group. [[spec/design_output/work#a-box-leaves]]
+function retroFirst(it, branch, name, open) {
+  const freed = freeChildren(it, name);
+  if (freed.length) {
+    it.git.run(["commit", "-m", `${branch}: the open tickets leave the group`], true);
+    it.git.run(["push", "origin", branch], true);
+  }
+  console.error(
+    `${name} stands with ${open} unwritten, and the retro comes before the box leaves.`,
+  );
+  for (const one of freed)
+    console.error(`  ${one} leaves the group, so the pull reaches the retro.`);
+  console.error(
+    `Run ./RUNME.sh ticket pull ${name}, write each retro leaf it hands out, then run ./RUNME.sh branch done.`,
+  );
+  return 1;
 }
 
 // [[spec/design_output/work#trunk-comes-in-last-too]]

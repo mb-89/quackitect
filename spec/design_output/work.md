@@ -223,8 +223,9 @@ the tip, so nothing writes to a branch nobody holds.
 # A box leaves
 
 `branch done` on a group branch writes `hash_after` into the newest record entry, which
-is the box saying it leaves. It always hands the branch back, so no box ends
-holding one:
+is the box saying it leaves. While a `retro` leaf that applies on this box
+stands unwritten, it frees the open tickets, names that leaf, and refuses. Past
+the retro it always hands the branch back, so no box ends holding one:
 
 | what stands | what it becomes |
 |---|---|
