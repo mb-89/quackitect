@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-verbs-land-whole
 steps:
   - name: design
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d1fe1ca62214 · claude-code-remote
+    hash_before: d045ea2d85138c1ac0e2f0f6c4da0e0af005555a
+    hash_after: d045ea2d85138c1ac0e2f0f6c4da0e0af005555a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 88 test(s) pass in 5 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-verbs-need-no-wrapper.md:184:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+reason: done
 ---
 
 # Ask
@@ -288,11 +300,15 @@ The eight new cases fail on their own assertion, and the eighty cases standing b
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/landed.test.js test/level0/test-verb.test.js test/level0/commit-verb.test.js test/level0/work-group.test.js test/level0/bash.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -300,11 +316,21 @@ The eight new cases fail on their own assertion, and the eighty cases standing b
 
 <!-- the form is text -->
 
+The agent now reaches git through the engine alone. A pass commit stages the ticket, its minted children and the files its hand's undo journals name, so a sibling's edit stays out. The apply door writes the ticket into each journal for this. A hand writing through no journal still hands back the whole tree, less what other tickets' journals name. So a box without the level zero door loses no work. `./RUNME.sh test --red` proves a test fails on its own assertion with the sources set back to `HEAD`. It holds the working text on disk while it runs. The commit verb takes a renamed path's old side with it. `branch merge` takes a `claude/` branch in, or names main as carrying it, then pushes main and deletes the branch. The Bash door refuses every git write and names the verb standing for it. A `git mv` under the tickets folder names the rename verb alone.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches past the ask in the files `implement/change` names, each for a reason given there
+- every door has a fake, and the whole suite runs green over them
+- each change carries a comment naming its section in the design notes
+- the verb table stands in `GIT_WRITES` alone, and the notes point at it
+- the small review rows stand fixed, and the two large ones wait in their child tickets
+- the door keeps every older rule: the git-write rows answer as the last check, so a guard reading a git write answers its own reason first
+- five door tests asserting that a raw commit or push lands now assert that the verb rule answers alone, and the `rules` helper in `bash.test.js` leaves the new rule out
 
 # Discussion
 
