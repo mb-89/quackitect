@@ -52,4 +52,8 @@ body:
       required: true
       description: what the next reader does, one row per thing
 
+    - header: The owner's words
+      required: true
+      description: the owner's words as said, one quote a line, each with its session and transcript line
+
 # A chapter between the two carries its own name.

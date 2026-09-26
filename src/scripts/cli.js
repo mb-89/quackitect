@@ -48,7 +48,7 @@ import { asksIndex, lint, version } from "./cli-read.js";
 import { batteryRun, stamped } from "./cli-stamp.js";
 import { graphIn } from "./graph.js";
 import { probe } from "./probe.js";
-import { withRoute } from "./process.js";
+import { FROM_HANDOVER, fromHandover, withRoute } from "./process.js";
 import { emptyGroup } from "./pull-hand.js";
 import { pullArgvOf } from "./pull-tool.js";
 import { renaming, renamingText } from "./rename.js";
@@ -442,7 +442,7 @@ export function mint(argv) {
     console.error("Usage: ./RUNME.sh mint <kind> <path> [--field=value ...]\n");
     console.error(`${SCHEMAS} holds ${kinds.join(", ")}.`);
     console.error(
-      "A ticket takes --process=<name>, and the route and its hash copy in.",
+      "A ticket takes --process=<name>, and the route and its hash copy in. One off a handover line takes --from=handover.",
     );
     return 2;
   }
@@ -453,7 +453,12 @@ export function mint(argv) {
     return 2;
   }
 
-  const handed = fieldsIn(argv, schema);
+  // [[spec/tickets/the-owners-words-travel-verbatim]]
+  const handover = argv.includes(FROM_HANDOVER);
+  const handed = fieldsIn(
+    argv.filter((one) => one !== FROM_HANDOVER),
+    schema,
+  );
   if (handed.why) {
     console.error(handed.why);
     return 2;
@@ -472,7 +477,8 @@ export function mint(argv) {
     return 2;
   }
 
-  const made = mintedNote(schemas, { kind, path, fields: copied.fields });
+  const fields = handover ? fromHandover(copied.fields) : copied.fields;
+  const made = mintedNote(schemas, { kind, path, fields });
   if (made.why) {
     console.error(made.why);
     return 2;

@@ -49,6 +49,9 @@ import {
 import { HELPER, SPAWN, spawnPrompt, unblockPrompt } from "./pull-spawn.js";
 import { entriesOf, pushed, returnsOf, shut, target, tipOf } from "./pull-writes.js";
 import { NOTES, opensDraft, schemasHere } from "./ticket.js";
+import { holdsHere } from "./pull-when.js";
+
+export { holdsHere };
 
 export function ticketsHere(it) {
   const out = [];
@@ -258,7 +261,7 @@ export function spawnAnswer(other) {
   const helper = `${HELPER}-${entriesOf(other.one.front).length + 1}`;
   say(SPAWN, [
     `${other.one.name} at ${other.leaf.path} ${other.why}.`,
-    "Spawn a hand of its own with the prompt below, and pull again once it answers.",
+    "Spawn a hand of its own with the prompt below in the background, and take the next item. Pull again once it answers.",
   ]);
   console.log("");
   console.log(spawnPrompt(other.one.name, other.leaf, helper));
@@ -325,7 +328,7 @@ export function advanced(it, one, all) {
       return { why: `stands at ${path || "no step"}, which its route lacks` };
     }
 
-    const when = holdsHere(it, leaf.when, front);
+    const when = holdsHere(it, leaf.when, front, text);
     if (!when.holds) {
       text = withEntry(text, { step: leaf.path, skipped: true, why: when.why });
       changes.push(`skips ${leaf.path}`);
@@ -386,24 +389,6 @@ export function advanced(it, one, all) {
     path = next.path;
   }
   return { why: "loops in its route" };
-}
-
-// [[spec/design_output/pull#a-condition-skips-a-leaf]]
-export function holdsHere(it, when, front) {
-  if (!when) return { holds: true };
-  if (when === "cloud")
-    return { holds: Boolean(it.cloud), why: "the box runs off the cloud" };
-  if (when === "desk") return { holds: !it.cloud, why: "the box runs on the cloud" };
-  if (when === "returned") {
-    const last = entriesOf(front)
-      .filter((one) => !one.skipped)
-      .at(-1);
-    return {
-      holds: Number(last?.returns ?? 0) > 0,
-      why: "the ticket arrives here by no on_fail",
-    };
-  }
-  return { holds: false, why: `${when} names no condition the pull reads` };
 }
 
 // [[spec/design_output/pull#children-before-their-group]]
