@@ -97,7 +97,7 @@ test("the design review note weighs the draft's size against the ask", () => {
 
   assert.equal(said.length, 1, "one rule weighs the size field");
   assert.match(said[0], /\bask\b/i, "the rule weighs it against the ask");
-  assert.match(said[0], /pass with findings/i, "a spread past the ask rides out as a row");
+  assert.match(said[0], /pass with a row/i, "a spread past the ask rides out as a row");
 });
 
 // [[spec/tickets/a-small-ask-stays-small]]

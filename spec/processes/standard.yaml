@@ -40,6 +40,9 @@ steps:
           - name: answers
             form: list
             says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
       - name: review
         does: reads the approach against the ask
         not: draft

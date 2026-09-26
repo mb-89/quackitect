@@ -258,7 +258,7 @@ export function spawnAnswer(other) {
   const helper = `${HELPER}-${entriesOf(other.one.front).length + 1}`;
   say(SPAWN, [
     `${other.one.name} at ${other.leaf.path} ${other.why}.`,
-    "Spawn a hand of its own with the prompt below, and pull again once it answers.",
+    "Spawn a hand of its own with the prompt below in the background, and take the next item. Pull again once it answers.",
   ]);
   console.log("");
   console.log(spawnPrompt(other.one.name, other.leaf, helper));

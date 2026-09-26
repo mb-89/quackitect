@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box fcc1ba4a896f · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: aeb4b1de278166a8aafb173a1ef96df9712240d2
+    hash_after: aeb4b1de278166a8aafb173a1ef96df9712240d2
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -207,11 +215,19 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint spec/guidance/tickets.md spec/rationales/tickets.md spec/guidance/review/design.md spec/rationales/design-review.md spec/processes/standard.yaml src/scripts/pull-hand.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the four notes, the route and `spawnAnswer`, each one the ask names
+- the change reaches no door: the notes and the route are text, and `spawnAnswer` prints
+- the rationale sections name the approach, and `pull-hand.js` stands at its line ceiling, so the case carries the pointer
+- each rule stands once, and the rationale argues it under the rule's number
+- `the-new-rule-appends` holds: the tickets note stands at its rule cap, so the trivial route joins rule 6 and no number moves
 
 ## tests-green
 
