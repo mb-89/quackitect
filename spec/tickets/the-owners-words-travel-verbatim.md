@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-owners-word-reaches-work
 steps:
   - name: design
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-owners-words-travel-verbatim.md:239:1: ListItem: A sentence in a list item holds 20 words, and this one"
+  - step: implement/tests-green
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: 5d5e4e350b44650ce46cb55b28bf03e30207134c
+    hash_after: 5d5e4e350b44650ce46cb55b28bf03e30207134c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 49 test(s) pass in 8 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-owners-words-travel-verbatim.md:247:1: ListItem: A sentence in a list item holds 20 words, and this one"
+reason: done
 ---
 
 # Ask
@@ -261,11 +273,15 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/handover-words.test.js test/contract/process.test.js test/contract/cli-mint.test.js test/level0/pull-when.test.js test/level0/pull-person.test.js test/level0/process.test.js test/level0/pull-ephemeral.test.js test/contract/question-grades.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -273,11 +289,26 @@ pass with findings
 
 <!-- the form is text -->
 
+The owner's words now travel as said, and a ticket off a handover waits on the owner's read.
+
+- A handover carries a required chapter `The owner's words`, and the handover prompt asks for it.
+- A note's ask carries `said`, the owner's quoted words with their transcript line.
+- A mint under `--from=handover` writes `from: handover` into the Ask. The standard route then opens on `design/owner-read`, which the owner alone passes.
+- Rule 15 of the voice note takes the owner's word before a coined word.
+
+The three terms wait on `the-owner-names-three-things`, since no file holds the owner's words for them.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and the output style the voice note projects
+- the level zero cases take fakes, and the contract cases run the real verbs and files
+- each new module line and case carries a pointer at this ticket
+- each fact stands once: the conditions in `pull-when.js`, the rule in the voice note
+- every review row stands fixed here, and the terms row rides on the owner's question
 
 # Discussion
 
