@@ -183,6 +183,15 @@ The pages standing past their folders draw the warning, and the owner moves them
 
 <!-- the form is verdict -->
 
+pass
+
+- Go's `Tree.Paths` lists every file, `.md` or not. `diskHolds` walks every file, and the index route answers every tracked row, a binary one with empty text. So the Go sweep meets the pages. An untracked file under `.se/tickets` stands off the index route, and `schemaDoor` holds that folder instead.
+- The warnings hold every box. `stamped` in `src/scripts/cli-stamp.js` writes the lint's warnings into the stamp, and `saysGreen` in `.claude/skills/level0/lib/runs.js` reads any warning as red. So `batterySays` in `src/scripts/work.js` refuses `./RUNME.sh branch done`, and `holds` in `src/scripts/prepush.js`, `src/scripts/push-verb.js` and the gate in `src/bridge/bash.js` refuse the push, while the three pages stand. `./RUNME.sh check` still exits zero. The approach names the order: the owner moves the pages before the change lands, or the move lands in the same commit on the owner's word.
+- `fault` answers `error` in `src/lsp/finding.go` and in `.claude/skills/level0/lib/schema-fault.js`. The new finding sets warning past it on both sides, or the lint refuses and the check goes red.
+- Go's `schemasIn` holds the note schemas alone and reads no data schema, so the Go row drops the clause on a data schema. No harm follows, since `spec/processes/*.yaml` stands under no note glob.
+- `onToolWrite` refuses the harness's own write tools inside the tree already, so `schemaDoor` meets a page through `onWrite` alone. The callers list adds `src/bridge/apply.js`, the patch door calling `onWrite`. A page copied in through Bash meets no door, and the sweep's warning catches it.
+- The funnel table says the rulings in the tree's voice. The design input names that table as the source of the owner's words, so a reader finds where each quote comes from.
+
 # implement
 
 ## tests-red

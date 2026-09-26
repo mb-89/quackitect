@@ -107,11 +107,40 @@ Every small fault a hand parks as a note lands fixed at once. The next hand then
 
 <!-- the form is text -->
 
+Each ask line takes the smallest change in the file it names:
+
+| the fault the code shows | the change | the file and function |
+|---|---|---|
+| `cli.js` hands `fix` the paths alone, so a flag drops out and `vale fix --apply` runs over `.` | the `fix` row hands `rest` in. A new `fixFlags` answers `--help` with `FIX_USAGE`, and an unknown flag refuses before `bin` is read | `fix` and `fixFlags` in `src/scripts/cli-check.js`, the `fix` row of `verbs` in `src/scripts/cli.js` |
+| `overLong` refuses a name past the cap, and the messages say a name holds exactly `it.words` words | each message says a name holds at most the cap | `note` in `src/scripts/ticket.js`, `findingFaults` in `src/scripts/pull-chapter.js`, `findings` in `.claude/skills/level0/lib/bash.js` |
+| `take` says every open step waits for a person, and `waitsAt` prints `leaf.by`, so a dependency reads as `a anyone` | `waitsAt` reads the reasons in the order `takeable` holds them. It names the open dependency first, and a person for `by: person` alone. Any other step names the need or the hand it waits for. The headline says no hand here takes an open step | `take` and `waitsAt` in `src/scripts/work.js` |
+| `verdictIn` joins every row after the opener with `; `, and `asked` in `unblock` cuts on `; `, so each table row lands as a list item | `verdictIn` joins the rows opening with a pipe by the `\n` escape `asked` reads, and keeps them out of `findings` | `verdictIn` in `src/scripts/pull-chapter.js`, read by `asked` in `src/scripts/work-unblock.js` |
+| `namesTheBinaries` passes `vale.valeCLI.path` at `Bin + "/vale"` alone, and `get_vale` writes `vale.exe` on Windows | a new `valeWrites` reads the `$bin/vale${exe}` target and each `exe` suffix off `install.sh`. `namesTheBinaries` passes a path naming any name it answers | `settingsNameBinaries`, `namesTheBinaries` and `valeWrites` in `src/lsp/tree.go` |
+| `BORROWED` holds `node_modules` and the compiler, so the worktree's check meets `src/extension/webview` with no packages | `BORROWED` takes `src/extension/webview/node_modules`, and `checkOn` links it and takes it back as it does the others | `BORROWED` and `checkOn` in `src/scripts/work-review.js` |
+| the window row of the setups table names `context.writeAt`, which `spec/config/level0.json` holds nowhere | the row and the red team's ruling name `context.handoverAt` alone | `spec/funnel/the-bench-reruns-design-inputs.md` and its `.html` twin |
+
+The name cap keeps `overLong` as it stands, since `wordsIn(part) > most` already holds the cap as a ceiling.
+The rule name `BranchNameHoldsFive` stays, because the tests and the log key on it.
+The table rows ride `why` and `asks` as one frontmatter line, so the escape keeps the frontmatter whole.
+`flatOf` quotes the `asks` line and doubles the backslash, and the reader gives the `\n` escape back.
+The tracked `.vscode/settings.json` holds one string for `vale.valeCLI.path`, and it stays at `Bin + "/vale"`.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/scripts/cli.js`, the `fix` row of `verbs`
+- `src/scripts/ticket.js`, `ticket`, through `note`
+- `src/scripts/pull-chapter.js`, `formFault`, through `verdictIn` and `findingFaults`
+- `src/scripts/pull.js`, `handBack`, through `verdictIn`
+- `src/scripts/pull-writes.js`, `failed`, which writes the reason into `why` and `asks`
+- `src/scripts/work-unblock.js`, `unblock`, through `questionRows` and `asked`
+- `src/bridge/bash.js`, `commandRules`, through `findings`
+- `src/scripts/work.js`, `work`, through `take` and `waitsAt`
+- `src/lsp/check.go`, `readers` and `Rules`, through `settingsNameBinaries`
+- `src/scripts/work-review.js`, `gather`, through `checkOn` and `BORROWED`
 
 ### tests
 
@@ -119,17 +148,35 @@ Every small fault a hand parks as a note lands fixed at once. The next hand then
 
 <!-- the form is list -->
 
+- `test/level0/fix.test.js`, "fix refuses an unknown flag, and runs nothing over the tree"
+- `test/level0/fix.test.js`, "fix answers --help with its usage"
+- `test/level0/ticket-verb.test.js`, "ticket note refuses a name past the cap, and says a name holds at most the cap"
+- `test/level0/pull-findings.test.js`, "a finding named past the cap says a ticket name holds at most the cap"
+- `test/level0/bash.test.js`, "the branch refusal says a name holds at most the cap"
+- `test/level0/work-group.test.js`, "take names the dependency a child waits on"
+- `test/level0/work-group.test.js`, "take names a person for a by: person step alone"
+- `test/level0/unblock.test.js`, "a failed verdict keeps its table rows as rows"
+- `test/level0/unblock.test.js`, "a findings table a verdict fails with lands under unblock as that table"
+- `src/lsp/tree_test.go`, "TestSettingsTakeTheValeTheInstallWrites"
+- `test/level0/review.test.js`, "the worktree borrows the webview's modules, and gives them back before git removes it"
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] every file, function and verb the approach names stands opened, and each claim checked there: every file in the table stands read. So do `names.js`, `pull-hand.js`, `pull-writes.js` and each test file.
+- [x] the callers list names every caller of what the approach changes: a search over `src`, `.claude` and `test` backs it, one name the approach changes at a time.
+- [x] every done_when line names the test that decides it: each ask line maps to rows under tests. The funnel line reads `git grep`, and the check line reads `./RUNME.sh check`.
 
 ## review
 

@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 366f68ec11412f3d513b56a640c0f69d89f0bc87
+    hash_after: 369d2106e7cf9c3ad1e7c838fcfc2f6f636f2dcd
 ---
 
 # Ask
@@ -120,7 +125,7 @@ A cloud box keeps its transcript on a ref of the group's own, and the collect re
 
 The keep runs through `it.proc` over a throwaway index:
 
-- `git hash-object -w` writes each file as a blob
+- `git hash-object -w` writes each file into the object store
 - `git update-index --add --cacheinfo` places it, with `GIT_INDEX_FILE` set under `.se/.runtime`
 - `git write-tree` and `git commit-tree` make the commit, which runs no commit hook
 - `git push origin <sha>:refs/transcripts/<group>` keeps it past `branch close`
@@ -130,20 +135,20 @@ The collect reads the window off git:
 
 - `git log --since` over `spec/tickets` with `-G "^state: closed"` names the candidates
 - a candidate counts where `isGroup` holds and `fieldOf` reads `state` as `closed`
-- the close is the committer time of the last commit touching that line
+- the close is the commit time of the last commit touching that line
 - `git fetch origin` takes `refs/transcripts/*`, and `git show` reads each file of a group's ref
 - a group under `input/groups` already stays out of a second pass, so `--again` takes each group once
 - a group with no ref gives its chapter alone, and the print names it
 
-The chapter readers need no new verb. `walk` in `src/engine/retro/timeline.js` reads every `.jsonl` under `transcripts`, `cloud-<group>` among them. So `retro timeline` draws the box's hours, and `retro chapters` hands their lines to the chapter they fall in.
+The chapter readers need no new verb. `walk` in `src/engine/retro/timeline.js` reads every `.jsonl` under `transcripts`, the cloud folders among them. So `retro timeline` draws the box's hours, and `retro chapters` hands their lines to the chapter they fall in.
 
 This composes with `the-retro-finishes-its-asks`:
 
-- that ticket cuts desk transcript lines stamped before the last collect, inside the copy `outsideInto` makes
+- that ticket cuts desk transcript lines through `withinWindow` inside `copyTree`, which `outsideInto` alone calls
 - `cloudInto` runs after `outsideInto` and copies a group's transcript whole, since the close gates it
 - a box's hours before `since` reach this retro alone, because the group closes in this window
-- that ticket keeps `.se/scripts` in `movedInto` on `--again`, and this change leaves `movedInto` as it stands
-- both change `collect`, each at its own line, so the merge meets separate hunks
+- that ticket keeps `.se/scripts` through `KEPT` in `movedInto`, and this change leaves `movedInto` as it stands
+- both change `collect` and `retro-outside.js`, each at its own lines, so the merge meets separate hunks
 
 Assumptions:
 
@@ -194,9 +199,9 @@ Assumptions:
 
 <!-- the form is checklist -->
 
-- [x] every file, function and verb the approach names stands opened, and each claim checked there: `retro-collect.js`, `retro-outside.js`, `work.js`, `work-merge.js`, `group.js`, `cloud.js`, `timeline.js`, `chapters.js`, `private.js`, `proc.js`, `git.js`, `group.yaml` and the retro notes stand read
-- [x] the callers list names every caller of what the approach changes: a search for `collect(`, `sourceOf`, `leaves(`, `finish`, `belongs(` and `walk` over `src`, `.claude` and `test` backs it
-- [x] every done_when line names the test that decides it: the collect line maps to the `retro-collect.test.js` cases, and the hand-back line to the `done` cases in `work-group.test.js`. The `read.md` line stands in the note, and the reader line meets the case where the timeline reads the kept transcript. The check line maps to `./RUNME.sh check`
+- [x] every file, function and verb the approach names stands opened, and each claim checked there: `retro-collect.js`, `retro-outside.js`, `work.js`, `group.js`, `cloud.js`, `timeline.js`, `chapters.js`, `private.js`, `proc.js` and `group.yaml` stand read
+- [x] the callers list names every caller of what the approach changes: a search for `collect(`, `sourceOf`, `leaves(`, `finish` and `belongs(` over `src`, `.claude` and `test` backs it
+- [x] every done_when line names the test that decides it: each ask line maps to a case under tests, or to `./RUNME.sh check`
 
 ## review
 
