@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -115,6 +115,10 @@ record:
     hand: box c28a93a32b71 · claude-code-remote
     hash_before: 58e39e1db337198f71aaec2200c5f53c73bae71e
     hash_after: 58e39e1db337198f71aaec2200c5f53c73bae71e
+  - step: design/review
+    hand: box c28a93a32b71 · claude-code-remote · helper-7
+    hash_before: da4610cb528712829797990339b5ff4c79b96724
+    hash_after: da4610cb528712829797990339b5ff4c79b96724
 group: the-gates-read-the-state
 ---
 
@@ -247,12 +251,11 @@ The implement step opens on `./RUNME.sh probe reply`, a mode beside `probe compa
 
 <!-- the form is verdict -->
 
-fail
+pass with findings
 
-- The warning road misses the second line of the ask. `prompt.context` fires once a conversation, and again after a compaction or a `/clear`, and a second prompt fires none. For details, see [[spec/design_output/level0#the-guidance-stays-put]]. So a `level0-answer` block in `onPromptContext` reaches the first prompt alone. At that first prompt nothing shows that `prompt.context` fires after `prompt.submit` opens the demand. The ask names the prompt's own event, and `prompt.context` is not that event. Fix: name a road on `prompt.submit` itself, such as a rewritten event through `answer.event` the way `agent.spawn` prepends its line, and prove the session reads it with the probe
-- The cage block is no precedent for a per-prompt line. It rides the first `prompt.context` a session reads, the same once-a-conversation road
-- The probe table's transcript row stands against a measured fact. At `tool.call`, `$.session.messages()` carries no text from the response in flight, per [[spec/design_output/level0#a-step-arrives-late]]. With `turn.step` firing after the first call, the `tool.call` event is the one road left open. Name that, so the third row, where the owner decides, reads as the likely outcome
-- The transcript key matches the prompt's row by its text. Two prompts with the same text, such as `go on`, make a transcript flushed a turn late hand the older prompt's text, so it pays the new one. Key the row on its position past the last owner row seen, or on an id or time where the row carries one, and give that case a test
+- a-late-count-pays-nothing: The owner-row count `owners` taken at `prompt.submit` comes off a transcript that flushes a turn late, per [[spec/design_output/level0#what-the-door-reads]]. There it misses the previous prompt's row, so "the owner row past `owners`" names that older prompt, and its replies pay the new one, the fault the ask's first line names. Where no row id stands, the transcript road stands down and the display road, the report and the `tool.call` event pay, the way the draft already treats a session past the window. A test in `test/level0/answer-door.test.js` drives a transcript a turn late at `prompt.submit`
+- the-warning-has-fallback: The probe decides whether the session reads a `prompt.submit` event rewritten through `answer.event`, and the probe table names the owner's fallback for the same-message road alone. Add the row for the rewritten prompt reaching no session: the ask's second line goes back to the owner with the probe's log
+- the-warning-keeps-readers: The rewritten prompt carries the `warns` line into the owner's row the transcript and `$.session.messages()` hand back. Name every reader of an owner row's text, `sinceTheOwner` and `answerAfter` in `.claude/skills/level0/lib/answer.js` among them, and show each reads the same with the line in front
 
 # implement
 
