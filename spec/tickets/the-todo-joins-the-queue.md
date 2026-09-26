@@ -134,7 +134,6 @@ Where neither a hold nor a working todo stands, `ticketFault` keeps today's read
 - `src/bridge/apply.js` the patch and replace door, which calls `ticketFault` with the `ticket` field
 - `src/bridge/bash.js` `ticketDoor`, called from the Bash and PowerShell doors
 - `src/scripts/commit-verb.js` the commit verb, which calls `ticketFault` on the message head
-- `src/bridge/write.js` `ticketFaults`, which reads the write's ticket beside the door
 - `src/scripts/pull.js` `pull`, which gains the todo road before `handsOut`
 
 ### tests

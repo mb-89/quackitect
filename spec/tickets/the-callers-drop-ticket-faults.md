@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-gates-read-the-state
 parent: the-todo-joins-the-queue
+record:
+  - step: do
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 3d123546521718e27827423752b54b8c25b2122a
+    hash_after: 3d123546521718e27827423752b54b8c25b2122a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 18 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-todo-road-stands-first.md:39:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ parent: the-todo-joins-the-queue
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/named.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ parent: the-todo-joins-the-queue
 
 <!-- the form is text -->
 
+The parent's callers list drops `ticketFaults` in `src/bridge/write.js`. That function comes from `.claude/skills/level0/lib/ticket.js`, checks a ticket's fields, and never calls `ticketFault`. The change touches no code.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the false caller leaves the list
+- the cleanup: none stands
+- the callers stand in the parent's draft once
 
 # Discussion
 
