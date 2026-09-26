@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: each-thing-stands-in-place
 steps:
   - name: design
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-small-faults-land.md:279:5: Characters: The character ] stands outside the set a paragraph admits: lett"
+  - step: implement/tests-green
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 7bae3ee3459ef5d7434a3d8c4be106f305843dc0
+    hash_after: 6e2ac94fed15ae45b8816ddb31827dc5cb9b56ea
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 168 test(s) pass in 8 file(s); green, src/lsp passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-small-faults-land.md:341:5: Characters: The character ] stands outside the set a paragraph admits: lett"
+reason: done
 ---
 
 # Ask
@@ -296,11 +308,15 @@ Eleven node cases and the Go case fail on their own assertion, and the rest stan
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/fix.test.js test/level0/ticket-verb.test.js test/level0/pull-findings.test.js test/level0/bash.test.js test/level0/work-group.test.js test/level0/unblock.test.js test/level0/review.test.js test/contract/tree.test.js src/lsp
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -308,11 +324,33 @@ Eleven node cases and the Go case fail on their own assertion, and the rest stan
 
 <!-- the form is text -->
 
+Each small fault a hand parked as a note now lands fixed:
+
+- the `fix` row in `cli.js` hands `rest`, so the verb reads its own flags
+- `fixFlags` in `cli-fix.js` splits flags from paths, and a call naming no path reads the tree
+- `fix` answers `--help` with `FIX_USAGE`, and refuses an unknown flag before it runs anything
+- the cap refusals in `ticket.js`, `pull-chapter.js` and `bash.js` say a name holds at most the cap
+- the take's headline says no hand here takes an open step
+- `waitsAt` names an open dependency first, then the hand rule's reason, then a missing need
+- `verdictIn` joins a table's rows by the `\n` escape, and keeps them out of the findings
+- `asked` in `work-unblock.js` also reads the doubled backslash `flatOf` writes, because the frontmatter reader unescapes nothing
+- both Vale rules take `.se/.runtime/bin/vale` and `.se/.runtime/bin/vale.exe`, and the tracked settings keep the plain name
+- `BORROWED` links `src/extension/webview/node_modules` into the review's worktree
+- the funnel note names `context.handoverAt` alone
+
+The Windows run stays unproven. vale-ls finds Vale there only where its spawn resolves `vale` to `vale.exe`. A question ticket asks a person on Windows to try it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: `cli.js` stands as the dispatch the ask's `fix` line needs. `cli-fix.js` keeps `cli-check.js` under the ceiling.
+- [x] every door the change reaches has a fake: the cases read `fakeGit` and `fakeDisk`. The `fix` cases hold `run`.
+- [x] a comment names the approach the change implements: each new function carries `[[spec/tickets/the-small-faults-land]]`.
+- [x] every fact the change adds stands in one place, and a note points at the file instead of repeating it: `FIX_USAGE` stands once.
+- [x] every row the design review passes with stands fixed in the change: the `fix` row hands `rest`. Both Vale rules take `vale.exe`, and says names Windows open.
 
 # Discussion
 
