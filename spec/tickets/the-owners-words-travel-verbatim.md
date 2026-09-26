@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box fcc1ba4a896f · claude-code-remote
     hash_before: 0358075ccf3188c52d5fc0d024d2aa4d63b8b50c
     hash_after: 0358075ccf3188c52d5fc0d024d2aa4d63b8b50c
+  - step: design/review
+    hand: box fcc1ba4a896f · claude-code-remote · helper-2
+    hash_before: a840802db4ca6b1b887cc84c022c3c7ecd6b5889
+    hash_after: a840802db4ca6b1b887cc84c022c3c7ecd6b5889
 ---
 
 # Ask
@@ -161,9 +165,12 @@ The owner's words for the sidebar button, the work tab and its brackets stand in
 
 ### verdict
 
-<!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
+pass with findings
 
-<!-- the form is verdict -->
+- handed-condition-in-pull-when: `holdsHere` stands in `src/scripts/pull-when.js` now, and `src/scripts/pull-hand.js` only re-exports it. `viewOf` reads the `view:` line alone, so the `handed` condition lands in `pull-when.js` with a `from:` reader beside `viewOf`, or one Ask-line reader both share
+- handover-mark-has-no-writer: no code writes `from: handover` on a ticket minted off a handover, so the minting agent decides whether the owner's read gates it. Name the writer that stamps the line, or the door that refuses a mint off a handover without it
+- owner-terms-await-question: the build leaves the `done_when` line on `spec/vocabulary/terms.yml` unmet, because the owner's three words stand in no file. The child asks the owner for them and lands the three terms
+- draft-size-past-ask: the draft carries no `size` list, and its route copy predates the `size` field of `spec/processes/standard.yaml`. The approach reaches files the ask leaves out: `spec/processes/standard.yaml`, `src/scripts/pull-when.js`, `.claude/skills/level0/lib/schema-mint.js`, `test/contract/process.test.js`, `test/contract/question-grades.test.js`, and every handover writer
 
 # implement
 
