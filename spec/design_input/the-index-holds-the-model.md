@@ -9,6 +9,9 @@ owns every value quackitect knows. Modules compute values, and doors reach the
 outside. The sidebar, the window, the command line, the hooks and any script
 read a value by its name, and none of them computes it.
 
+The page beside this note carries the drawings of the model:
+[the-index-holds-the-model.html](../pages/the-index-holds-the-model.html).
+
 The asks, one to a line:
 
 - Let the index own every value, with the files as one topic in it, `files/`.
