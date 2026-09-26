@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box c28a93a32b71 · claude-code-remote
     hash_before: 02898de055b9b9198e0fc35a3fafc7dc89b38a07
     hash_after: 02898de055b9b9198e0fc35a3fafc7dc89b38a07
+  - step: design/review
+    hand: box c28a93a32b71 · claude-code-remote · helper-2
+    hash_before: 13cde42f0cb12920b8f5a6963381269dfef06864
+    hash_after: 13cde42f0cb12920b8f5a6963381269dfef06864
 ---
 
 # Ask
@@ -181,6 +185,11 @@ The strongest objection: dropping the talk rule leaves a discussion with no stop
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+- step-rule-names-its-rank: the draft gives `the-owner-holds-the-step` no `decides` and no `priority`, so nothing says it outranks `work-still-stands` (80) and `the-last-line-names-no-stop` (50), the rules that make the waiting turn loop. Name both in the rules file and in `spec/design_output/stop.md`
+- helper-mark-drops-at-stop: a helper's end reaches the server as `classic.Stop` carrying `agentId`, which `helperReports` in `src/bridge/wait.js` reads. `onTurnEnd` in `src/bridge/answer.js` returns at `agentId` before it does anything. Drop the `box.helpers` mark where the helper's end lands, keyed on an id that the spawn event and that end both carry
+- the-talk-prose-leaves-stop: `spec/design_output/stop.md` names `the-owner-asks-to-talk` in the claimed-over-checks passage, in "A talk follows a report" and in the example rules block. The draft only updates the new rule and the `helpers-running` row, so rewrite or drop those passages along with the rule
 
 # implement
 
