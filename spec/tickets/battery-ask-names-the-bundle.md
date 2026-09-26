@@ -48,11 +48,15 @@ approach item 4 changes `bundle` in `src/scripts/bundle.js`, which the ask leave
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +64,17 @@ approach item 4 changes `bundle` in `src/scripts/bundle.js`, which the ask leave
 
 <!-- the form is text -->
 
+The drawing-bundle line of the battery ask names `bundle` in `src/scripts/bundle.js`. The approach gives `bundle` an optional entry and out, and the implement checklist refuses a file the ask leaves out.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change is the one line the finding asks, on the ask's drawing-bundle line.
+- The change reveals no cleanup.
+- The line names the file and the function once, and approach item 4 carries the detail.
 
 # Discussion
 

@@ -219,5 +219,5 @@ Where the branch stands, for the next box:
 Three faults the sync met, each fixed on this branch:
 
 - The cold probe's session met a refused `git log`, then pulled a ticket and ran to the cap. Its prompt now ends the session at a refused call.
-- The commit verb's refusal ran a bare `git reset -q`, which cleared `MERGE_HEAD`. It now resets by a pathspec, so a refused merge stays a merge.
-- The check writes a slash command for each new config key, and the commit door takes only the ticket in hand. That commit then names a review ticket, and the verdict guard reads it as the reviewer's work. A generated file lands with the change that adds its key, before the next take.
+- The commit verb's refusal ran a bare `git reset -q`, which cleared `MERGE_HEAD`. It now resets the paths it staged, so a refused merge stays a merge.
+- The check writes a slash command for each new config key. The commit door takes only the ticket in hand. That commit then names a review ticket, and the verdict guard reads it as the reviewer's work. A generated file lands with the change that adds its key, before the next take.
