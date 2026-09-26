@@ -9,7 +9,9 @@ import { REPLY_KIND, rowOf } from "../../.claude/skills/level0/lib/log.js";
 import {
   demands,
   holdsForAnswer,
+  onAgentSpoke,
   onMessageDisplay,
+  onPromptSubmit,
   pays,
   SAYS,
 } from "../../src/bridge/answer.js";
@@ -96,4 +98,54 @@ test("a reply row keeps its lines, so a list and a table keep their shape, and a
     rowOf("now", "info", "note", text).said,
     "- one - two | a | b | |---|---| | 1 | 2 |",
   );
+});
+
+// The demand keys on the newest transcript row the prompt found, so a restart hands no older text over. [[spec/tickets/a-reply-follows-its-prompt]]
+function prompted(before) {
+  const it = box();
+  it.clock = { now: () => new Date("2026-01-01T00:00:00.000Z") };
+  onPromptSubmit({ origin: { kind: "composer" }, text: "go on", before }, it);
+  return it;
+}
+
+const row = (role, text, id) => ({ role, text, ...(id ? { id } : {}) });
+
+// [[spec/tickets/a-reply-follows-its-prompt]]
+test("after a restart, a text written before the prompt pays nothing", () => {
+  const it = prompted("r1");
+  const said = onAgentSpoke(
+    { tool: "Read", text: "The old answer.", rows: [row("assistant", "The old answer.", "r1")] },
+    it,
+  );
+  assert.ok(said.result?.deny, "the call meets the door");
+  assert.notEqual(it.demand, null, "and the demand stands");
+});
+
+// [[spec/tickets/a-reply-follows-its-prompt]]
+test("after a restart, a transcript carrying no row ids pays nothing", () => {
+  const it = prompted("");
+  const said = onAgentSpoke(
+    { tool: "Read", text: "The old answer.", rows: [row("assistant", "The old answer.")] },
+    it,
+  );
+  assert.ok(said.result?.deny, "the transcript road stands down");
+});
+
+// [[spec/tickets/a-reply-follows-its-prompt]]
+test("a text past the prompt's own row pays the demand", () => {
+  const it = prompted("r1");
+  const said = onAgentSpoke(
+    {
+      tool: "Read",
+      text: "Understood: the door first.",
+      rows: [
+        row("assistant", "The old answer.", "r1"),
+        row("user", "go on", "r2"),
+        row("assistant", "Understood: the door first.", "r3"),
+      ],
+    },
+    it,
+  );
+  assert.deepEqual(said, { pass: true });
+  assert.equal(it.demand, null);
 });

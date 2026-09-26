@@ -23,6 +23,7 @@ import {
   spokeSince,
   TABLE,
   tableFaults,
+  warns,
   wordsIn,
 } from "../../.claude/skills/level0/lib/answer.js";
 import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
@@ -360,4 +361,18 @@ test("after an owner prompt the first Bash call asks for the reply, and a helper
   assert.equal(holdsForAnswer({ tool: "Bash", agentId: "a1" }, box), null, "a helper's call passes");
   assert.deepEqual(holdsForAnswer({ tool: "Bash" }, box), { needs: "reply" }, "the first call asks");
   assert.deepEqual(holdsForAnswer({ tool: "Bash" }, box), { needs: "reply" }, "and so does the next");
+});
+
+// The answer-first line rides the prompt's own event. [[spec/tickets/a-reply-follows-its-prompt]]
+test("the prompt's answer rewrites its text to open on the warning line", () => {
+  const box = { log: { say: () => {} }, clock: { now: () => new Date(0) } };
+  const said = onPromptSubmit({ origin: { kind: "composer" }, text: "Fix the door." }, box);
+  assert.equal(said.event?.text, `${warns("The owner sent a prompt")}\n\nFix the door.`);
+});
+
+// A machine's prompt opens no demand, so its text stays as it stands. [[spec/tickets/a-reply-follows-its-prompt]]
+test("a machine's prompt keeps its text", () => {
+  const box = { log: { say: () => {} }, clock: { now: () => new Date(0) } };
+  const said = onPromptSubmit({ origin: { kind: "plugin" }, text: "A task ends." }, box);
+  assert.equal(said.event, undefined);
 });

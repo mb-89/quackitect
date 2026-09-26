@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -119,6 +119,14 @@ record:
     hand: box c28a93a32b71 · claude-code-remote · helper-7
     hash_before: da4610cb528712829797990339b5ff4c79b96724
     hash_after: da4610cb528712829797990339b5ff4c79b96724
+  - step: implement/tests-red
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 6a2350af6079047cda98eb57b4d249c8f6bb64c2
+    hash_after: 6a2350af6079047cda98eb57b4d249c8f6bb64c2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
 group: the-gates-read-the-state
 ---
 
@@ -269,17 +277,27 @@ pass with findings
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/answer-door.test.js test/level0/answer.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Three cases fail on their own assertion: the restart with a row id, the restart with none, and the warning on the prompt's event. The case for a text past the prompt's row passes today, because an empty `box.spoken` hands every text over, and it holds the new road green. The same-message line waits on `./RUNME.sh probe reply`. This box loads no function hooks, so the probe cannot run here, and no case asserts a field nobody measured.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the ask names: `src/bridge/answer.js`, the bridgehead's `lastTexts` and prompt read, and the two test files
+- every door the change reaches has a fake: the cases drive a fake box, a fake clock and a fake log
+- each new case opens on a comment naming this ticket
+- the row id key stands in `onAgentSpoke` alone, and the cases point at it
+- the review's three findings stand as their own tickets, and this change holds the first: no id stands the transcript road down
 
 ## change
 
