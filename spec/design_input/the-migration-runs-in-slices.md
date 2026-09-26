@@ -10,7 +10,7 @@ blocks no other work, and it needs the owner at one moment a phase: the switch
 that lets the cloud take it.
 
 The page beside this note carries the order of the phases:
-[the-migration-runs-in-slices.html](the-migration-runs-in-slices.html).
+[the-migration-runs-in-slices.html](../pages/the-migration-runs-in-slices.html).
 
 The asks, one to a line:
 
