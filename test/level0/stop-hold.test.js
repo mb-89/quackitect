@@ -73,7 +73,7 @@ function ruled(hold) {
   return it;
 }
 
-// The sidebar writes the hold into the local config, and the tracked file carries the standing value. [[spec/design_output/config#the-three-layers]]
+// The sidebar writes the hold into the local config, and the tracked file carries the standing value. [[spec/design_output/config#the-layers]]
 function held(it) {
   try {
     const local = JSON.parse(it.disk.read(LOCAL))?.stop?.hold;

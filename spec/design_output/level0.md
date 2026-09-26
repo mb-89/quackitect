@@ -629,7 +629,7 @@ A second prompt on its own fires `prompt.context` once only, so the event
 counts a conversation. That control is what makes the second read a
 compaction's own.
 
-## Three roads to a compaction
+## The roads to a compaction
 
 | road | what it answers on client 2.1.269 |
 |---|---|

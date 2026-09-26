@@ -565,7 +565,7 @@ export async function doctor() {
   return 0;
 }
 
-// [[spec/design_output/private#two-doors-one-check]]
+// [[spec/design_output/private#both-doors-one-check]]
 export function hooksSay() {
   const at = join(HOOKS, "pre-commit");
   const push = join(HOOKS, "pre-push");

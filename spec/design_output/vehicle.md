@@ -19,7 +19,7 @@ the roots below, and a vehicle that knows which project it drives.
 | method | where the tooling stands: the rules and the guidance |
 | work | the folder under the agent's hands |
 
-## Three things a vehicle needs
+## What a vehicle needs
 
 | what | where it lives |
 |---|---|

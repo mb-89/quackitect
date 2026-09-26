@@ -110,7 +110,7 @@ record:
     hash_before: d96e6e0801486d05a93bb86eb8cf4fc2c6ab7918
     hash_after: d96e6e0801486d05a93bb86eb8cf4fc2c6ab7918
     returns: 2
-    why: "| the finding | the fix |; |---|---|; | A tree rule reads no delta. The reader answers `read`, `exists`, `names`, `paths`, `words`, `node` and `box`, and the import rule wants the modules the delta touches [[spec/design_output/tree#the-tree-handed-in]] | Read the whole tree and say what turns the red green, or name a door that holds a delta and land the rule there |; | A whole-tree import rule lands red, and the work carrying the modules stands nowhere. No ticket under `spec/tickets` holds them | Mint that ticket before this one lands, or carry the modules here |; | The commit door is two, and the table names one. `lib/bash.js` with the hook takes a session, `.githooks/pre-commit` takes a person [[spec/design_output/private#two-doors-one-check]] | Name the one module both doors call, the way `privateNow` holds the private rule for both |; | Each door has its fake beside it under `src/doors/fake`, and `behaves` is a fake of no door [[spec/design_output/doors#a-fake-behaves]] | Land `behaves` where a helper over the fakes stands, and link the chapter owning the rule |; | The module count and its table stand in prose, and the first test written drifts them [[spec/guidance/voice]] | Name the command answering the count, and cut the table |; What holds:; The modules the table names are exactly the `src/bridge` modules no test imports today.; The staged delta answers the hook and the Bash check both, so the second finding of the last round lands.; The delta carries the whole answer, so no exception rides on the commit message.; The row and the link land on the note owning every rule over two files. [[spec/design_output/tree#the-rules-over-two-files]]"
+    why: "| the finding | the fix |; |---|---|; | A tree rule reads no delta. The reader answers `read`, `exists`, `names`, `paths`, `words`, `node` and `box`, and the import rule wants the modules the delta touches [[spec/design_output/tree#the-tree-handed-in]] | Read the whole tree and say what turns the red green, or name a door that holds a delta and land the rule there |; | A whole-tree import rule lands red, and the work carrying the modules stands nowhere. No ticket under `spec/tickets` holds them | Mint that ticket before this one lands, or carry the modules here |; | The commit door is two, and the table names one. `lib/bash.js` with the hook takes a session, `.githooks/pre-commit` takes a person [[spec/design_output/private#both-doors-one-check]] | Name the one module both doors call, the way `privateNow` holds the private rule for both |; | Each door has its fake beside it under `src/doors/fake`, and `behaves` is a fake of no door [[spec/design_output/doors#a-fake-behaves]] | Land `behaves` where a helper over the fakes stands, and link the chapter owning the rule |; | The module count and its table stand in prose, and the first test written drifts them [[spec/guidance/voice]] | Name the command answering the count, and cut the table |; What holds:; The modules the table names are exactly the `src/bridge` modules no test imports today.; The staged delta answers the hook and the Bash check both, so the second finding of the last round lands.; The delta carries the whole answer, so no exception rides on the commit message.; The row and the link land on the note owning every rule over two files. [[spec/design_output/tree#the-rules-over-two-files]]"
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 67bc57fc48bc53560785cd24489b2b7a943b65d7
@@ -286,7 +286,7 @@ A hand meeting the refusal writes the test, and the door names the rule and the
 file it stands on.
 
 Two doors take the commit, and both call the one reading, the way both call
-`privateNow` today. [[spec/design_output/private#two-doors-one-check]]
+`privateNow` today. [[spec/design_output/private#both-doors-one-check]]
 
 | the door | who meets it |
 |---|---|
@@ -324,7 +324,7 @@ pass
 |---|---|
 | a tree rule reads no delta | the tree rule reads the whole tree, and the two commit doors hand the delta to the same module |
 | the work carrying the untested modules stands nowhere | the implement step writes a test for each, on this branch |
-| the commit door is two, and the table names one | the table names both, the way the private note names them [[spec/design_output/private#two-doors-one-check]] |
+| the commit door is two, and the table names one | the table names both, the way the private note names them [[spec/design_output/private#both-doors-one-check]] |
 | `behaves` is a fake of no door | the link to the chapter owning the rule lands |
 | the module count and its table stand in prose | the table goes, and `./RUNME.sh lint` answers the count |
 

@@ -245,7 +245,7 @@ if (runsHere(import.meta.url, process.argv)) {
   process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
 }
 
-// [[spec/design_output/vehicle#three-things-a-vehicle-needs]]
+// [[spec/design_output/vehicle#what-a-vehicle-needs]]
 export function theVehicle(argv) {
   const env = process.env;
   const said = argv[0] ?? "here";

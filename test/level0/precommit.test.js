@@ -1,7 +1,7 @@
 // The hook script a person's commit runs through. Every case hands it a fake
 // disk, a fake git and a delta on the line, so the exit code answers out of
 // memory.
-// [[spec/design_output/private#two-doors-one-check]]
+// [[spec/design_output/private#both-doors-one-check]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

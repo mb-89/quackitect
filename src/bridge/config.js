@@ -1,6 +1,6 @@
 // The config a door asks: the tracked file at the method root, and the local
 // file at the work root over it, one key as section.leaf.
-// [[spec/design_output/config#the-three-layers]]
+// [[spec/design_output/config#the-layers]]
 
 import { join } from "node:path";
 import { LOCAL, TRACKED, varOf } from "../../.claude/skills/level0/lib/config.js";

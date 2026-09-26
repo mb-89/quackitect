@@ -368,7 +368,7 @@ test("a hyphen in place of a space carries no run past the check", () => {
   assert.deepEqual(rules(noteTextIn(added, notes)), ["NoteTextStaysHome"]);
 });
 
-// [[spec/design_output/private#two-doors-one-check]]
+// [[spec/design_output/private#both-doors-one-check]]
 test("the gatherer reads the delta, the box and the notes once each", async () => {
   const asked = [];
   const found = await privateNow({
