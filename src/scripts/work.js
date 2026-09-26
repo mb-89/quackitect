@@ -20,7 +20,6 @@ import {
   frontOf,
   heldIn,
   isGroup,
-  OPEN,
   stepOf,
   TICKETS,
   ticketAt,
@@ -52,7 +51,7 @@ import { freeIn, trigger } from "./work-free.js";
 import { testVerb } from "./work-test.js";
 import { unblock } from "./work-unblock.js";
 import { list } from "./work-list.js";
-import { close, merge } from "./work-merge.js";
+import { close, freeChildren, merge } from "./work-merge.js";
 import {
   childrenHere,
   DONE,
@@ -254,7 +253,9 @@ function take(it, name = "") {
   // A box with nothing at a step it can take leaves the group at todo, before it writes a line. [[spec/tickets/the-group-leaves-at-todo]]
   const stands = standsOpen(it, one.name, it.join(it.root, ticketAt(one.name)));
   if (stands.open.length && !stands.busy.length) {
-    console.log(`${one.branch} stays at ${TODO}, because no hand here takes an open step.`);
+    console.log(
+      `${one.branch} stays at ${TODO}, because no hand here takes an open step.`,
+    );
     for (const child of stands.open)
       console.log(`  ${waitsAt(it, child, stands.children)}`);
     console.log(`Answer it, then run ./RUNME.sh branch take again.`);
@@ -328,12 +329,17 @@ function claimGroup(it, one) {
     withEntry(was, { step: stepOf(was), hand: role, hash_before: before }),
   );
   it.git.run(["add", at], true);
-  const committed = it.git.run(["commit", "-m", `${one.branch}: ${role} takes it`], true);
+  const committed = it.git.run(
+    ["commit", "-m", `${one.branch}: ${role} takes it`],
+    true,
+  );
   // A refused commit puts the ticket back as it stood, so the next move carries a clean tree. [[spec/design_output/work#the-take-writes-the-record]]
   if (!committed.ok) {
     it.git.run(["reset", "--", at], true);
     it.disk.write(path, was);
-    console.error(`The claim on ${one.branch} would not commit, so the take stands undone.`);
+    console.error(
+      `The claim on ${one.branch} would not commit, so the take stands undone.`,
+    );
     console.error(committed.err || committed.out);
     return 1;
   }
@@ -398,7 +404,7 @@ function ready(it, branch) {
   return { code: 0, says: said.says };
 }
 
-// One place answers what a hand can take across a group, so the take and the leave read the same line. [[spec/design_output/work#a-box-leaves]]
+// One place answers what a hand can take across a group, which the take reads before it claims. [[spec/design_output/work#the-take-writes-the-record]]
 export function standsOpen(it, name, path) {
   const children = childrenHere(it, name);
   const open = children.filter((one) => fieldOf(one.text, "state") !== CLOSED);
@@ -413,41 +419,28 @@ export function standsOpen(it, name, path) {
 function leaves(it, branch, at, path, says) {
   const name = branch.replace(/^work\//, "");
   const after = it.git.run(["rev-parse", "HEAD"], true).out;
-  const { open, busy } = standsOpen(it, name, path);
+  const freed = freeChildren(it, name);
 
-  if (busy.length) {
-    for (const one of busy) {
-      console.error(`${one.name} stands at ${one.step}, and a hand can take it.`);
-    }
-    console.error(
-      "Run ./RUNME.sh ticket pull, and spawn the hand a spawn answer names.",
-    );
-    console.error(
-      "branch done leaves a group only when every open step waits for a person.",
-    );
-    return 1;
-  }
-
-  let now = withHashAfter(it.disk.read(path), after);
   // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]] takes the tag off.
-  if (!open.length) {
-    now = withoutField(
-      withField(withField(now, "state", CLOSED), "reason", DONE),
-      PARKED,
-    );
-  }
+  const now = withoutField(
+    withField(
+      withField(withHashAfter(it.disk.read(path), after), "state", CLOSED),
+      "reason",
+      DONE,
+    ),
+    PARKED,
+  );
   it.disk.write(path, now);
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${branch}: the box leaves`], true);
   if (!it.git.run(["push", "origin", branch]).ok) return 1;
 
   console.log(`${branch} carries ${shortOf(after)}, and ${says}.`);
-  if (open.length) {
-    console.log(`${name} stays ${OPEN}, because ${open.length} ticket(s) stand open:`);
-    for (const one of open) console.log(`  ${one.name}`);
-  } else {
-    console.log(`${name} stands ${CLOSED}, because every ticket in it is closed.`);
-  }
+  console.log(`${name} stands ${CLOSED}, and every ticket in it is closed.`);
+  for (const one of freed)
+    console.log(
+      `  ${one} leaves the group, and stands loose on ${TRUNK} after the merge.`,
+    );
   console.log(`Run ./RUNME.sh branch merge ${name} from ${TRUNK}.`);
   return 0;
 }

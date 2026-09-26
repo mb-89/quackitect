@@ -80,8 +80,8 @@ takes the next. That box resets the branch to its remote, so its claim leaves
 the box and the next take meets no commit origin lacks. A claim the commit
 refuses leaves the ticket as the take finds it, and the take stops.
 
-The take reads the group before it writes that entry, through the same line
-`branch done` reads. A group whose open children hold no step a hand can take
+The take reads the group before it writes that entry, through `standsOpen` in
+`src/scripts/work.js`. A group whose open children hold no step a hand can take
 stays at `todo`, and the take names the step each child waits at. So a cloud
 box stops here, on the branch, and the record keeps the shape it holds.
 
@@ -223,15 +223,17 @@ the tip, so nothing writes to a branch nobody holds.
 # A box leaves
 
 `branch done` on a group branch writes `hash_after` into the newest record entry, which
-is the box saying it leaves. Then it reads the children:
+is the box saying it leaves. It always hands the branch back, so no box ends
+holding one:
 
-| what stands | what the group becomes |
+| what stands | what it becomes |
 |---|---|
-| no ticket in it stands open | `state: closed`, `reason: done` |
-| one of them stands open | `state: open`, and `done` names each open one |
+| a closed ticket of the group | stays in the group, as its history |
+| an open or draft ticket of the group | loses its `group` field, through `freeChildren` in `src/scripts/work-merge.js` |
+| the group | `state: closed`, `reason: done`, so `branch merge` takes it |
 
-So an open group nobody holds comes back to the queue, and a person answers on
-its branch.
+So a freed ticket stands loose on trunk after the merge, and the next pull hands
+it out. For details, see [[spec/design_output/work#the-merge-frees-the-tickets]].
 
 # A person step leaves
 
