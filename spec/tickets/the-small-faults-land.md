@@ -82,14 +82,14 @@ step: design/draft
 
 # Ask
 
-Every small fault a hand parks as a note lands fixed at once, and the next hand meets verbs and messages that say what the code does.
+Every small fault a hand parks as a note lands fixed at once. The next hand then meets verbs and messages that say what the code does.
 
-`fix` runs over the whole tree on an unknown flag, the name cap and the take state rules the code does not hold, a verdict table splits into list items, vale-ls finds no binary on Windows, the review's worktree fails on the webview packages, and a funnel note names a removed key.
+`fix` runs over the whole tree on an unknown flag. The name cap and the take state rules the code does not hold. A verdict table splits into list items, and vale-ls finds no binary on Windows. The review's worktree fails on the webview packages, and a funnel note names a removed key.
 
-- `fix` in `src/scripts/cli-check.js` refuses an unknown flag and writes nothing, and answers `--help` with its usage, which a case under `test/level0` decides
-- the name cap refusals in `src/scripts/ticket.js`, `src/scripts/pull-chapter.js` and `.claude/skills/level0/lib/bash.js` say a name holds at most the cap, which the cases over each decide
-- the take in `src/scripts/work.js` names the dependency a child waits on, and names a person for a step `by: person` alone, which a case under `test/level0` decides
-- `verdictIn` in `src/scripts/pull-chapter.js` keeps a verdict's rows as rows, and `branch unblock` writes a findings table as that table, which a case in `test/level0/unblock.test.js` decides
+- `fix` in `src/scripts/cli-check.js` refuses an unknown flag and writes nothing. It answers `--help` with its usage, and a case under `test/level0` decides both
+- the name cap refusals in `src/scripts/ticket.js`, `src/scripts/pull-chapter.js` and `.claude/skills/level0/lib/bash.js` say a name holds at most the cap. The cases over each file decide it
+- the take in `src/scripts/work.js` names the dependency a child waits on. It names a person for a step `by: person` alone, and a case under `test/level0` decides both
+- `verdictIn` in `src/scripts/pull-chapter.js` keeps a verdict's rows as rows. `branch unblock` writes a findings table as that table, and a case in `test/level0/unblock.test.js` decides both
 - `settingsNameBinaries` in `src/lsp/tree.go` takes the Vale binary `src/scripts/install.sh` writes on each platform, which a case in `src/lsp/tree_test.go` decides
 - `BORROWED` in `src/scripts/work-review.js` links `src/extension/webview/node_modules` into the review's worktree, which a case in `test/level0/review.test.js` decides
 - `git grep writeAt -- spec/funnel` answers nothing

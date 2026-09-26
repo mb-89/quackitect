@@ -84,12 +84,12 @@ step: design/draft
 
 A one-line change the owner orders lands in one step. A design review weighs a draft's spread against its ask before any code, and the lead takes the next item while the reviewer reads.
 
-The mint takes the standard route by habit, so a one-line config change runs a draft, a review and a build. A draft names no size, so a draft touching many files for one number passes unweighed, and the spawn answer holds the lead until the reviewer answers.
+The mint takes the standard route by habit, so a one-line config change runs a draft, a review and a build. A draft names no size, so a draft touching many files for one number passes unweighed. The spawn answer holds the lead until the reviewer answers.
 
 - `spec/guidance/tickets.md` carries a rule sending a one-line change the owner orders to `--process=trivial`, with its failure and an `Examples` row
 - `design/draft` in `spec/processes/standard.yaml` asks a `size` field naming every file the approach touches, one a line, and `test/contract/process.test.js` holds it
 - `spec/guidance/review/design.md` carries a rule weighing the `size` field against the ask, argued in `spec/rationales/design-review.md`, which a case in `test/contract/question-grades.test.js` decides
-- `spawnAnswer` in `src/scripts/pull-hand.js` tells the session to spawn the hand in the background and take the next item, which a case under `test/level0` decides
+- `spawnAnswer` in `src/scripts/pull-hand.js` tells the session to spawn the hand in the background and take the next item. A case under `test/level0` decides it
 - `./RUNME.sh check` exits 0
 
 # design

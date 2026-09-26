@@ -86,9 +86,9 @@ A retro reads what each cloud box writes of its own run, so the cloud's work in 
 
 A cloud group writes its own retro into the group ticket, and no retro verb reads it. The box's transcript leaves with its branch, so the retro names the cloud's work as a limit.
 
-- `retro collect` in `src/scripts/retro-collect.js` gathers the `retro` chapter of every group ticket that closes in the window, and a case in `test/level0/retro-collect.test.js` decides it
+- `retro collect` in `src/scripts/retro-collect.js` gathers the `retro` chapter of every group ticket that closes in the window. A case in `test/level0/retro-collect.test.js` decides it
 - `spec/guidance/retro/read.md` hands each of those chapters to the reader whose hours hold the close
-- a cloud box's hand-back of a group keeps the session transcript where `retro collect` reads it once the branch leaves, and a case under `test/level0` decides it
+- a cloud box's hand-back of a group keeps the session transcript where `retro collect` reads it once the branch leaves. A case under `test/level0` decides it
 - `./RUNME.sh check` exits 0
 
 # design

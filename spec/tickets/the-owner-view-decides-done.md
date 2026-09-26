@@ -84,12 +84,12 @@ step: design/draft
 
 A claim of done over a thing the owner sees rests on that view, so the owner meets the fix on the first look.
 
-A ticket changing the sidebar or a tab closes on a count verb or a test over a fake, and the owner finds the wrong number after the close. The standard route ends on tests-green, so no step hands the owner's view a say.
+A ticket changing the sidebar or a tab closes on a count verb or a test over a fake. The owner then finds the wrong number after the close. The standard route ends on tests-green, so no step hands the owner's view a say.
 
-- `spec/processes/standard.yaml` carries an ask field naming the view and the number there in the owner's words, and a case in `test/level0/process.test.js` holds it
-- a ticket whose ask names a view carries a person leaf after its last leaf, which the owner passes in the editor, and a case in `test/level0/pull-person.test.js` decides it
+- `spec/processes/standard.yaml` carries an ask field naming the view and the number there, in the owner's words. A case in `test/level0/process.test.js` holds it
+- a ticket whose ask names a view carries a person leaf after its last leaf. The owner passes that leaf in the editor, and a case in `test/level0/pull-person.test.js` decides it
 - `spec/guidance/tickets.md` carries the rule, with a row under `Examples`
-- a change to `src/extension` meets a case that loads `src/extension/extension.js` as the editor loads it, and the case fails where the load throws
+- a change to `src/extension` meets a case that loads `src/extension/extension.js` as the editor loads it. The case fails where the load throws
 - `./RUNME.sh check` exits 0
 
 # design

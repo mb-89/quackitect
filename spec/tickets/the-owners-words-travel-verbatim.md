@@ -82,14 +82,14 @@ step: design/draft
 
 # Ask
 
-The owner's words reach the ask, the helper and the next session as the owner says them, so a build answers the ask the owner makes.
+The owner's words reach the ask, the helper and the next session as the owner says them. A build then answers the ask the owner makes.
 
-A handover and a brief carry the agent's reading under the owner's name, and an ask minted off a handover reaches a build with no owner read. The owner then asks what a coined word means.
+A handover and a brief carry the agent's reading under the owner's name. An ask minted off a handover reaches a build with no owner read. The owner then asks what a coined word means.
 
-- `spec/schemas/handover.schema.yaml` asks a chapter of the owner's words, each a verbatim quote with its session and line, and a case in `test/level0/schema.test.js` draws a finding over a handover lacking it
-- `spec/processes/note.yaml` carries an ask field for the owner's quoted words with their transcript line, and a case in `test/level0/process.test.js` holds it
-- a ticket minted off a handover line carries a person leaf the owner passes before `design/draft`, and a case in `test/level0/pull-person.test.js` decides it
-- the vocabulary rule of `spec/guidance/voice.md` takes the owner's word for a thing before a coined word, and `spec/vocabulary/terms.yml` carries the owner's words for the sidebar button, the work tab and its brackets
+- `spec/schemas/handover.schema.yaml` asks a chapter of the owner's words, each a verbatim quote with its session and line. A case in `test/level0/schema.test.js` draws a finding over a handover lacking that chapter
+- `spec/processes/note.yaml` carries an ask field for the owner's quoted words with their transcript line. A case in `test/level0/process.test.js` holds it
+- a ticket minted off a handover line carries a person leaf the owner passes before `design/draft`. A case in `test/level0/pull-person.test.js` decides it
+- the vocabulary rule of `spec/guidance/voice.md` takes the owner's word for a thing before a coined word. `spec/vocabulary/terms.yml` carries the owner's words for the sidebar button, the work tab and its brackets
 - `./RUNME.sh check` exits 0
 
 # design

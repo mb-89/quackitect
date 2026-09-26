@@ -84,9 +84,9 @@ step: design/draft
 
 A governed folder holds its own kind alone, so a reader finds a note where its schema says.
 
-The check and the write door read a note alone, so a page or a screenshot lands in a governed folder and the check stays clean. A funnel note carries the owner's rulings.
+The check and the write door read a note alone. A page or a screenshot then lands in a governed folder, and the check stays clean. A funnel note carries the owner's rulings.
 
-- `schemaFaults` in `src/lsp/schema.go` and in `.claude/skills/level0/lib/schema.js` draw a finding at warning over a file past its folder's kind, and `src/lsp/schema_test.go` and `test/level0/schema-sweep.test.js` each hold a page under `spec/funnel`
+- `schemaFaults` in `src/lsp/schema.go` and in `.claude/skills/level0/lib/schema.js` draw a finding at warning over a file past its folder's kind. `src/lsp/schema_test.go` and `test/level0/schema-sweep.test.js` each hold a page under `spec/funnel`
 - `schemaDoor` in `src/bridge/write.js` refuses a write past the folder's kind, and a case in `test/level0/write.test.js` holds a screenshot under `spec/tickets`
 - each page past its folder's kind draws its warning in the Problems panel, and the owner moves it
 - `spec/funnel/the-editor-draws-the-trace.md` holds no ruling, and each of its rulings stands in a design input quoting the owner

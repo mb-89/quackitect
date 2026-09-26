@@ -87,11 +87,11 @@ A retro ends on one report the owner reads, then mints every class and promotion
 An owner rule a retro promotes waits unbuilt, and the owner repeats it the next day. Each reader writes its own transcript parser, `collect --again` moves the classify generator out of `.se/scripts`, and the pull hands the auditors a checklist item as an object.
 
 - `spec/processes/retro.yaml` carries a report step the owner passes, then a mint step last, and `spec/guidance/retro/check.md` points at them
-- `retro mint` in `src/engine/retro/mint.js` mints a ticket for every promotion in `classes.json`, and `mintFaults` refuses a promotion carrying no ticket, which a case in `test/level0/retro-mint.test.js` decides
-- `retro collect` in `src/scripts/retro-collect.js` hands the input no transcript line stamped before the last retro's collect, which a case in `test/level0/retro-collect.test.js` decides
-- `./RUNME.sh retro read <retro> <chapter>` prints every owner prompt, error and command of the chapter with its file and line, which a case under `test/level0` decides
-- `listAt` in `.claude/skills/level0/lib/schema-yaml.js` reads a quoted list item holding a colon as text, and the pull prints the audit checklist of `spec/processes/retro.yaml` whole, which a case under `test/level0` decides
-- `retro collect --again` leaves `.se/scripts` in place, and `spec/guidance/retro/collect.md` names that folder beside the dot folders, which a case in `test/level0/retro-collect.test.js` decides
+- `retro mint` in `src/engine/retro/mint.js` mints a ticket for every promotion in `classes.json`. `mintFaults` refuses a promotion carrying no ticket, and a case in `test/level0/retro-mint.test.js` decides it
+- `retro collect` in `src/scripts/retro-collect.js` hands the input no transcript line stamped before the last retro's collect. A case in `test/level0/retro-collect.test.js` decides it
+- `./RUNME.sh retro read <retro> <chapter>` prints every owner prompt, error and command of the chapter with its file and line. A case under `test/level0` decides it
+- `listAt` in `.claude/skills/level0/lib/schema-yaml.js` reads a quoted list item holding a colon as text. The pull then prints the audit checklist of `spec/processes/retro.yaml` whole. A case under `test/level0` decides both
+- `retro collect --again` leaves `.se/scripts` in place, and `spec/guidance/retro/collect.md` names that folder beside the dot folders. A case in `test/level0/retro-collect.test.js` decides both
 - `./RUNME.sh check` exits 0
 
 # design

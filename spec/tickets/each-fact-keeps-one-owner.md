@@ -82,13 +82,13 @@ step: design/draft
 
 # Ask
 
-A count or a copy meets a check before it lands, so each fact keeps one owner, and a reader finds the current value on the first read.
+A count or a copy meets a check before it lands, so each fact keeps one owner. A reader then finds the current value on the first read.
 
 A code header counts its members in a number word and passes. The cloud read, the ticket folders and the port wait stand spelled beside their owners, and a heading over a table counts its rows.
 
-- `src/scripts/pull-push.js` and `src/bridge/stop.js` read the cloud through `cloudHere` in `.claude/skills/level0/lib/cloud.js`, and a case in `test/level0/cloud-desk.test.js` holds it
+- `src/scripts/pull-push.js` and `src/bridge/stop.js` read the cloud through `cloudHere` in `.claude/skills/level0/lib/cloud.js`. A case in `test/level0/cloud-desk.test.js` holds it
 - the `ticket` field description in `.claude/skills/level0/lib/apply.js` builds from the folders `src/engine/named.js` builds from
-- a test ties `PANEL` and `PORT_WAIT` in `src/scripts/cli-served.js` to `pointerPath` and `settleWait` in `src/lsp/port.go`, and fails where either side moves
+- a test ties `PANEL` in `src/scripts/cli-served.js` to `pointerPath` in `src/lsp/port.go`. The same test ties `PORT_WAIT` to `settleWait`, and fails where either side of a pair moves
 - `spec/config/styles/VoiceVale/CodeHeader.yml` reads any number word, and a case in `test/contract/vale.test.js` holds it over the header of `src/scripts/ephemeral.js`
 - `spec/config/styles/VoiceVale/CountedList.yml` reads a heading over a list or a table, and a case in `test/contract/vale.test.js` holds it
 - `./RUNME.sh check` exits 0
