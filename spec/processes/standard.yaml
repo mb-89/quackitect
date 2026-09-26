@@ -14,6 +14,9 @@ ask:
   - name: done_when
     form: list
     says: one line each, decidable, naming the command that decides it
+  - name: view
+    form: text
+    says: the view the owner reads the change in and the number there, in the owner's words, or none
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -98,3 +101,14 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: [ask, implement/tests-green]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows

@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box fcc1ba4a896f · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: 17aa7e71947f6c793f4df38a492a5e9a4e248ab2
+    hash_after: 17aa7e71947f6c793f4df38a492a5e9a4e248ab2
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-view-fails-to-implement.md:39:1: CodeSpans: A sentence holds 4 code spans, and this one holds 6. Carry "
 ---
 
 # Ask
@@ -218,11 +226,21 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the route, the schema's `when` words, the tickets note and its rationale, the pull note and the modules the callers name
+- `holdsHere` reads text the caller hands in, and the load case takes the fake `vscode` door
+- `src/scripts/pull-when.js` opens on a pointer at the condition note, and the new lines name this ticket
+- the `view` condition stands in `pull-when.js` and the pull note points there
+- the review rows stand fixed: `on_fail: implement`, a cloud agent waits at the view, the callers, the fake's road, and the size rides in the build
+- `to: retro` stays on tests-green beside the view step, since a ticket naming no view skips it
+- the process case stands in `test/contract/process.test.js`, since it reads the shipped route
 
 ## tests-green
 

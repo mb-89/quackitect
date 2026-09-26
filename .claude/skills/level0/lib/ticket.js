@@ -22,7 +22,9 @@ export function writesHere(leaf, hand = {}) {
   const no = (why, more = {}) => ({ writes: false, why, ...more });
 
   // A cloud box answers every question it meets, so a person's step stands open to it. [[spec/guidance/cloud]]
-  if (by === "person" && hand.agent && !hand.ownerSays && !hand.cloud)
+  // The owner's view is the owner's alone, on the cloud too. [[spec/tickets/the-owner-view-decides-done]]
+  const cloud = hand.cloud && String(leaf?.when ?? "") !== "view";
+  if (by === "person" && hand.agent && !hand.ownerSays && !cloud)
     return no(`waits for a person at ${at}`, { person: true });
   if (by === "agent" && !hand.agent) return no(`waits for an agent at ${at}`);
   // The hand the engine spawns takes it, and the caller says whether this hand is that one. [[spec/design_output/pull#a-hand-of-its-own]]

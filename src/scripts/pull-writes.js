@@ -23,10 +23,10 @@ import { landed, unlandedRows } from "./pull-landed.js";
 import {
   childrenSay,
   handOut,
-  holdsHere,
   ticketsHere,
   withPersonStep,
 } from "./pull-hand.js";
+import { holdsHere } from "./pull-when.js";
 import { fromHold, NOTES, routedTicket } from "./ticket.js";
 import { DONE, REFUSED, say, WAIT, WORK, walkOf } from "./pull-route.js";
 import { changedIn } from "./work.js";
@@ -48,7 +48,7 @@ export function passed(it, who, one, leaf, held, answered, more = {}) {
 
   let next = leaf.leaves[leaf.at + 1];
   while (next) {
-    const when = holdsHere(it, String(next.said.when ?? ""), frontOf(text));
+    const when = holdsHere(it, String(next.said.when ?? ""), frontOf(text), text);
     if (when.holds) break;
     text = withEntry(text, { step: next.path, skipped: true, why: when.why });
     changes.push(`skips ${next.path}`);

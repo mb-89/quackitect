@@ -144,7 +144,8 @@ which leaves the group open the same way.
 
 `when` reads `cloud`, `desk` or `returned`. `cloud` and `desk` read the doors
 the command line hands in off the environment. `returned` holds where the
-newest record entry that is no skip carries `returns`, which a fail writes. A
+newest record entry that is no skip carries `returns`, which a fail writes. `view` holds where the ticket's Ask carries a `view:` line naming
+anything but `none`, and `src/scripts/pull-when.js` reads it. A
 leaf whose condition fails takes a `skipped` entry with the reason. The pull
 then moves to the next leaf, or closes the ticket `done` past the last.
 
@@ -160,6 +161,7 @@ holds no open note.
 | the route says | the pull admits |
 |---|---|
 | `by: person` | a hand off a harness, a hand on a cloud box, or one under `--owner-says`. An agent at a desk waits |
+| `by: person` under `when: view` | a hand off a harness, or one under `--owner-says`. An agent waits, on a cloud box too |
 | `by: agent` | a hand on a harness |
 | `by: helper` | nobody yet, until the spawn lands |
 | `by: retro` | a hand while its group stands at a retro step, or a note with the tag |

@@ -6,7 +6,6 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { processHash, readYaml } from "../../.claude/skills/level0/lib/schema.js";
-import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import {
   askRows,
@@ -112,19 +111,4 @@ test("a kind carrying no route takes no copy", () => {
 test("a mint naming no process copies nothing", () => {
   const made = withRoute(diskWith(), ROOT, join, SCHEMA, { urgency: "soon" });
   assert.deepEqual(made.fields, { urgency: "soon" });
-});
-
-// The owner names the view and its number, and the owner's view closes the route. [[spec/tickets/the-owner-view-decides-done]]
-test("the standard route asks for the view the owner reads, in the owner's words", () => {
-  const root = join(import.meta.dirname, "..", "..");
-  const held = processAt(disk(), root, join, "standard");
-  const view = held.ask.find((one) => one.name === "view");
-
-  assert.equal(view?.form, "text", "the ask carries a view field");
-  assert.match(view.says, /owner's words/, "in the owner's words");
-  const last = held.route.at(-1);
-  assert.equal(last.name, "view", "the view step closes the route");
-  assert.equal(last.by, "person", "and a person passes it");
-  assert.equal(last.when, "view", "where the ask names a view");
-  assert.equal(last.on_fail, "implement", "a fail goes back to the code");
 });

@@ -41,6 +41,13 @@ A one-line config change the owner ordered took the standard route by habit.
 It ran a draft, a review and a build, and each step cost a session. The trivial
 route carries the ask as its design, so one step lands the line.
 
+## 7. The owner's view decides done
+
+A ticket changing the sidebar closed on a count verb and a test over a fake. The
+owner then found the wrong number after the close. The route ended on its tests,
+so no step handed the owner's view a say. The `view:` line names that view, and
+the `view` step waits for the owner there.
+
 ## 8. A doubt costs one line
 
 A doubt a hand carries out of a session dies with the box. Parking it costs one
