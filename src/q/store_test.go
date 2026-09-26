@@ -8,7 +8,7 @@ import "testing"
 func TestASnapshotReadsOneRevision(t *testing.T) {
 	c := New()
 	GivenIn(c, "t/n", 0)
-	s := NewStore(c)
+	s := NewStore(c, nil)
 	first, err := s.Commit(s.Snapshot().Revision, map[string]any{"t/n": 1})
 	if err != nil {
 		t.Fatal(err)
@@ -30,7 +30,7 @@ func TestASnapshotReadsOneRevision(t *testing.T) {
 func TestANameNobodyWritesReadsItsDefault(t *testing.T) {
 	c := New()
 	GivenIn(c, "t/n", 7)
-	if got := NewStore(c).Snapshot().Read("t/n"); got != 7 {
+	if got := NewStore(c, nil).Snapshot().Read("t/n"); got != 7 {
 		t.Fatalf("the default reads %v", got)
 	}
 }
@@ -39,7 +39,7 @@ func TestARunCommitsTheRevisionItRead(t *testing.T) {
 	c := New()
 	GivenIn(c, "t/n", 0)
 	DerivedIn(c, "t/two", 0, func(in twoOf) int { return in.N * 2 })
-	s := NewStore(c)
+	s := NewStore(c, nil)
 	read, err := s.Commit(0, map[string]any{"t/n": 3})
 	if err != nil {
 		t.Fatal(err)
@@ -56,7 +56,7 @@ func TestARunCommitsTheRevisionItRead(t *testing.T) {
 func TestAFoldReducesEachEvent(t *testing.T) {
 	c := New()
 	FoldIn(c, "t/sum", 0, func(sum, event int) int { return sum + event })
-	s := NewStore(c)
+	s := NewStore(c, nil)
 	for _, event := range []int{1, 2, 3} {
 		if err := s.Land("t/sum", event); err != nil {
 			t.Fatal(err)
@@ -70,7 +70,7 @@ func TestAFoldReducesEachEvent(t *testing.T) {
 func TestAFamilyAnswersEachKey(t *testing.T) {
 	c := New()
 	GivenIn(c, "ops/<id>", "none")
-	s := NewStore(c)
+	s := NewStore(c, nil)
 	if _, err := s.Commit(0, map[string]any{"ops/7": "running"}); err != nil {
 		t.Fatal(err)
 	}

@@ -133,6 +133,14 @@ func trackedIn(root string) func(rel string) bool {
 }
 
 func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
+	// The catalog check runs before the database opens, so a fault refuses the start and no provider key stands yet. [[spec/design_output/model#the-catalog-check]]
+	if faults := catalog.Check(nil); len(faults) > 0 {
+		said := make([]string, 0, len(faults))
+		for _, one := range faults {
+			said = append(said, one.String())
+		}
+		return nil, nil, fmt.Errorf("the catalog refuses the start:\n  %s", strings.Join(said, "\n  "))
+	}
 	db, err := Open(root, at)
 	if err != nil {
 		return nil, nil, err

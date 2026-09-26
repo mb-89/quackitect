@@ -1,74 +1,184 @@
-// The q core: every name has one owner, one type and one default, and the
-// catalog check refuses a start on a fault. Modules register at init into
-// Main, and a test builds a catalog of its own.
+// The q core: every name has one owner, one type and one default. Modules
+// register at init into Main, and a test builds a catalog of its own.
 // [[spec/design_output/model]]
 package q
 
-import "time"
-
-// Kind names a fault the check answers.
-type Kind string
-
-const (
-	Twice     Kind = "a name registered twice"
-	NoDefault Kind = "a name with no default"
-	TwoActive Kind = "two providers active"
-	NoAlt     Kind = "a key picking no registered alt"
-	NoName    Kind = "an input naming no name"
-	OtherType Kind = "an input of another type"
-	Cycle     Kind = "a cycle among derived names"
-	BadName   Kind = "a name of other than lowercase segments"
+import (
+	"fmt"
+	"reflect"
+	"runtime"
+	"strings"
+	"sync"
+	"time"
 )
 
-// Fault is one refusal, naming every file and line it reaches.
-type Fault struct {
-	Kind  Kind
-	Name  string
-	Where []string
-	Says  string
+type provider int
+
+const (
+	given provider = iota
+	derived
+	fold
+)
+
+type input struct {
+	field string
+	name  string
+	typ   reflect.Type
 }
 
-// Catalog holds the registrations.
-type Catalog struct{}
+type registration struct {
+	name     string
+	kind     provider
+	typ      reflect.Type
+	def      any
+	missing  bool
+	alt      string
+	doc      string
+	deadline time.Duration
+	where    string
+	inputs   []input
+	run      func(Snapshot) any
+	step     func(state, event any) (any, error)
+}
 
-// Main is the one catalog the index checks at start.
+type Catalog struct {
+	mu   sync.Mutex
+	regs []*registration
+}
+
 var Main = New()
 
-// New answers an empty catalog.
 func New() *Catalog { return &Catalog{} }
 
-// Option is what a registration takes last.
-type Option func()
+type Option func(*registration)
 
-func Doc(text string) Option             { return func() {} }
-func Alt(name string) Option             { return func() {} }
-func Deadline(span time.Duration) Option { return func() {} }
+func Doc(text string) Option             { return func(one *registration) { one.doc = text } }
+func Alt(name string) Option             { return func(one *registration) { one.alt = name } }
+func Deadline(span time.Duration) Option { return func(one *registration) { one.deadline = span } }
 
-// GivenIn registers a name a door writes.
-func GivenIn[T any](c *Catalog, name string, def T, opts ...Option) {}
+func Given[T any](name string, def T, opts ...Option) {
+	Main.add(givenOf(name, def), callerAt(2), opts)
+}
 
-// DerivedIn registers a name answered by a function of an input struct.
-func DerivedIn[In, Out any](c *Catalog, name string, def Out, fn func(In) Out, opts ...Option) {}
+func GivenIn[T any](c *Catalog, name string, def T, opts ...Option) {
+	c.add(givenOf(name, def), callerAt(2), opts)
+}
 
-// FoldIn registers a name answered by a state reduced over events.
-func FoldIn[S, E any](c *Catalog, name string, def S, step func(S, E) S, opts ...Option) {}
+func Derived[In, Out any](name string, def Out, fn func(In) Out, opts ...Option) {
+	Main.add(derivedOf(name, def, fn), callerAt(2), opts)
+}
 
-// Check answers every fault in the catalog, reading the providers.<name> keys.
-func (c *Catalog) Check(keys map[string]string) []Fault { return nil }
+func DerivedIn[In, Out any](c *Catalog, name string, def Out, fn func(In) Out, opts ...Option) {
+	c.add(derivedOf(name, def, fn), callerAt(2), opts)
+}
 
-// Store holds the values at one revision.
-type Store struct{}
+func Fold[S, E any](name string, def S, step func(S, E) S, opts ...Option) {
+	Main.add(foldOf(name, def, step), callerAt(2), opts)
+}
 
-// NewStore answers a store over a catalog.
-func NewStore(c *Catalog) *Store { return &Store{} }
+func FoldIn[S, E any](c *Catalog, name string, def S, step func(S, E) S, opts ...Option) {
+	c.add(foldOf(name, def, step), callerAt(2), opts)
+}
 
-// Snapshot reads every name at one revision.
-type Snapshot struct{ Revision int64 }
+func callerAt(skip int) string {
+	_, file, line, ok := runtime.Caller(skip)
+	if !ok {
+		return "unknown"
+	}
+	return fmt.Sprintf("%s:%d", file, line)
+}
 
-func (s *Store) Snapshot() Snapshot                                    { return Snapshot{} }
-func (s *Store) Commit(read int64, values map[string]any) (int64, error) { return 0, nil }
-func (s *Store) Run(name string) error                                   { return nil }
-func (s *Store) Land(name string, event any) error                       { return nil }
+func (c *Catalog) add(one *registration, where string, opts []Option) {
+	one.where = where
+	for _, opt := range opts {
+		opt(one)
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.regs = append(c.regs, one)
+}
 
-func (one Snapshot) Read(name string) any   { return nil }
-func (one Snapshot) From(name string) int64 { return 0 }
+func (c *Catalog) all() []*registration {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return append([]*registration(nil), c.regs...)
+}
+
+func typeOf[T any]() reflect.Type { return reflect.TypeOf((*T)(nil)).Elem() }
+
+func missing(value any) bool {
+	v := reflect.ValueOf(value)
+	if !v.IsValid() {
+		return true
+	}
+	switch v.Kind() {
+	case reflect.Pointer, reflect.Map, reflect.Slice, reflect.Interface, reflect.Func, reflect.Chan:
+		return v.IsNil()
+	}
+	return false
+}
+
+func givenOf[T any](name string, def T) *registration {
+	return &registration{name: name, kind: given, typ: typeOf[T](), def: def, missing: missing(def)}
+}
+
+// Each field tagged q:"<name>" reads that name off the snapshot. [[spec/design_output/model#snapshots-and-revisions]]
+func derivedOf[In, Out any](name string, def Out, fn func(In) Out) *registration {
+	inType := typeOf[In]()
+	var inputs []input
+	if inType.Kind() == reflect.Struct {
+		for i := range inType.NumField() {
+			field := inType.Field(i)
+			if read, ok := field.Tag.Lookup("q"); ok {
+				inputs = append(inputs, input{field: field.Name, name: read, typ: field.Type})
+			}
+		}
+	}
+	run := func(snap Snapshot) any {
+		filled := reflect.New(inType).Elem()
+		for _, one := range inputs {
+			value := reflect.ValueOf(snap.Read(one.name))
+			if value.IsValid() && value.Type().AssignableTo(one.typ) {
+				filled.FieldByName(one.field).Set(value)
+			}
+		}
+		return fn(filled.Interface().(In))
+	}
+	return &registration{name: name, kind: derived, typ: typeOf[Out](), def: def, missing: missing(def), inputs: inputs, run: run}
+}
+
+func foldOf[S, E any](name string, def S, step func(S, E) S) *registration {
+	apply := func(state, event any) (any, error) {
+		now, ok := state.(S)
+		if !ok {
+			return nil, fmt.Errorf("%s holds a %T, not a %s", name, state, typeOf[S]())
+		}
+		one, ok := event.(E)
+		if !ok {
+			return nil, fmt.Errorf("%s takes a %s, not a %T", name, typeOf[E](), event)
+		}
+		return step(now, one), nil
+	}
+	return &registration{name: name, kind: fold, typ: typeOf[S](), def: def, missing: missing(def), step: apply}
+}
+
+// A family such as ops/<id> answers every key in its place. [[spec/design_output/model#a-name]]
+func matches(pattern, name string) bool {
+	if pattern == name {
+		return true
+	}
+	want, got := strings.Split(pattern, "/"), strings.Split(name, "/")
+	if len(want) != len(got) {
+		return false
+	}
+	for i := range want {
+		if want[i] != got[i] && !(isKey(want[i]) && got[i] != "") {
+			return false
+		}
+	}
+	return true
+}
+
+func isKey(segment string) bool {
+	return len(segment) > 2 && segment[0] == '<' && segment[len(segment)-1] == '>'
+}

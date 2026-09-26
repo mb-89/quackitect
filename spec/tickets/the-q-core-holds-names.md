@@ -269,11 +269,19 @@ One call is mine: `q.DerivedIn(c, ...)` takes the catalog first, and `q.Derived`
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/q/q.go src/q/check.go src/q/store.go src/index/door.go src/index/main.go spec/design_output/migration.md
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `src/q`, `Serve` and its callers, and the migration row the review names
+- `src/q` reaches no door, and `Serve` checks the catalog before it opens the database
+- each file's header and each pointer name the model note section the code implements
+- the migration row points at the package, and the code points at the model note
+- the five review rows stand fixed, as `seen` under tests-red maps them, and the migration names `src/q`
 
 ## tests-green
 
