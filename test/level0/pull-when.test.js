@@ -31,6 +31,17 @@ test("a condition the pull reads holds or skips, and one it lacks skips", () => 
 });
 
 // [[spec/tickets/the-owners-words-travel-verbatim]]
+// The record holds no condition, so a returns count on the front changes nothing. [[spec/tickets/every-road-has-a-caller]]
+test("returned names no condition, and the front's record changes no answer", () => {
+  const front = { record: [{ step: "a", returns: 2 }] };
+  assert.equal(holdsHere({}, "returned", front).holds, false);
+  assert.match(holdsHere({}, "returned", front).why, /names no condition/);
+  assert.deepEqual(
+    holdsHere({ cloud: true }, "cloud", front),
+    holdsHere({ cloud: true }, "cloud", {}),
+  );
+});
+
 test("handed holds where the Ask says from: handover, and skips elsewhere", () => {
   assert.equal(holdsHere({}, "handed", {}, TICKET("from: handover")).holds, true);
   assert.equal(holdsHere({}, "handed", {}, TICKET("from: none")).holds, false);

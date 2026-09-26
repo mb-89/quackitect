@@ -10,7 +10,7 @@ export const HANDOVER = "handover";
 const NONE = "none";
 
 // [[spec/design_output/pull#a-condition-skips-a-leaf]]
-export function holdsHere(it, when, front, text = "") {
+export function holdsHere(it, when, _front, text = "") {
   if (!when) return { holds: true };
   if (when === "cloud")
     return { holds: Boolean(it.cloud), why: "the box runs off the cloud" };
