@@ -34,7 +34,12 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
-step: answer
+step: do
+record:
+  - step: answer
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: 2c59cbac86f37527c768043c30c0fcd8d1c96a76
+    hash_after: 2c59cbac86f37527c768043c30c0fcd8d1c96a76
 ---
 
 # Ask
@@ -82,6 +87,20 @@ Write what the log and the tab show into the answer, and name any step that runs
 <!-- the answer, which the step behind this one reads -->
 
 <!-- the form is text -->
+
+The clear runs live on a desk, mid-retro, and the owner takes that run as the proof.
+
+| done_when | what the log and the session show |
+|---|---|
+| a `handover` line past the key, then a `clear` line | a `handover` line names the context past `context.handoverAt`, and a `clear` line follows it |
+| the three tickets in the order the pull hands them | the next conversation opens on `read-handover` in hand, and its pass hands the retro back |
+| no hold carrying `ephemeral` once `read-handover` closes | `.se/.runtime/hold` holds the retro's hold alone |
+| the work tab draws each of the three at place `0` | the owner takes the run as proof, and this answer reads no tab |
+
+Two steps run another way, and each stands on a ticket of its own:
+
+- a shell call naming `read-handover` meets `No ticket named read-handover`, since the ticket stands in no file: [[spec/tickets/the-todo-joins-the-queue]]
+- the clear fires mid-retro on a binding reading `queue`: [[spec/tickets/the-retro-holds-the-clear]]
 
 # do
 
