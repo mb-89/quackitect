@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 63693613eded · claude-code-remote
@@ -115,6 +115,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box d7a4c7b217104 · claude-code-remote
+    hash_before: 0827d034224a8264c365fa7811ea4f69c3b82dd2
+    hash_after: 0827d034224a8264c365fa7811ea4f69c3b82dd2
 ---
 
 # Ask
@@ -182,11 +186,21 @@ The servers answer while they run, and come back after a restart. Every view of 
 
 <!-- the form is list -->
 
+- the take meets a conflict with main in five files, and the merge takes main in at commit `40ae49a5d`.
+- the `when` enum reads four conditions: cloud, desk, view and handed.
+- main adds view and handed, which shipped routes read.
+- the branch drops returned, which no shipped route reads.
+- `src/scripts/pull-when.js` owns `holdsHere`, and the copy in `src/scripts/pull-hand.js` leaves.
+- the view test adds its own `when: view` leaf, so the shared route fixture stays as [[spec/tickets/every-road-has-a-caller]] leaves it.
+- the check answers green on the merge, and the one red row stands marked as waiting on the owner.
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- the branch's own tests name its design, so the conflict resolves off the tests with no guess.
 
 ### badly
 
@@ -194,11 +208,17 @@ The servers answer while they run, and come back after a restart. Every view of 
 
 <!-- the form is list -->
 
+- the shell door wants an open ticket before the take hands one. So the take names an unrelated open ticket.
+- the plan tool keeps the group as the working todo. The pull then refuses the group's own leaf. The pull naming the group stands behind the queue too. A hand edit of the runtime plan file clears it.
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- the shell door lets `./RUNME.sh branch take` and `./RUNME.sh ticket pull` pass with no ticket named, in the door's ticket check.
+- the pull in `src/scripts/pull.js` reads a working todo naming the bound group as that group, and hands its leaf. The plan tool takes an empty `working` to clear it.
 
 ### thoughts
 
@@ -206,11 +226,17 @@ The servers answer while they run, and come back after a restart. Every view of 
 
 <!-- the form is text -->
 
+The merge weighs two readings: take main whole, or keep the branch's cut of `returned`. The branch's tests and the design output both hold `returned` as history on closed tickets. So the cut stands, and main's new conditions stand beside it. The assumption: no open ticket on main carries `when: returned`, and the check answering green backs it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the conditions stand in `src/scripts/pull-when.js` alone, and the pull and the pass import them.
+- the change adds no number.
+- the change writes no header.
 
 ## cloud
 
