@@ -103,11 +103,38 @@ An agent asks where a value comes from, and one command answers where a search o
 
 <!-- the form is text -->
 
+`q.Why` answers a name off the catalog and a snapshot, in the parts [[spec/design_output/model#quack-why]] gives, and the index door serves it as the method `why`.
+
+| the part | what it holds |
+|---|---|
+| `Why.Value` | the value, and its state: `answered` or `default` |
+| `Why.Provider` | the active registration: its kind, its alt, and its file and line |
+| `Why.Inputs` | each input field, its name and that name's own answer, down to the names a door writes |
+| `Why.Readers` | every active derived name whose input resolves to this one |
+| `Why.Text` | the tree the design input draws, one line a part |
+
+- A name the catalog lacks refuses, and says so.
+- A family answers for each key, so `why files/spec/one.md` walks the family `files/<path...>`.
+- The walk stops at a name it meets twice, so a cycle the check misses answers once.
+- A view and a surface join the readers once the views land, per [[spec/design_output/views]].
+- The state `stale since <time>` joins once `operations-and-leases-land` gives the store its stale mark.
+
+The command line:
+
+- No ticket in this group brings the `quack` binary, so the verb stands as `se-index why <name>` on the index command line.
+- `quack why` takes the same door method once the binary lands.
+- The agent tool `index/why` waits for the MCP door.
+
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/index/door.go` `answers`, which gains `why`
+- `src/index/main.go` `main`, whose usage line names `why`, and which prints `Why.Text`
+- no other caller stands: `q.Why` is new
 
 ### tests
 
@@ -115,17 +142,32 @@ An agent asks where a value comes from, and one command answers where a search o
 
 <!-- the form is list -->
 
+- `src/q/why_test.go` `TestWhyNamesTheProvidersFileAndLine`, deciding the second done line
+- `src/q/why_test.go` `TestWhyWalksTheInputsDownToTheGivenNames`
+- `src/q/why_test.go` `TestWhyNamesEveryReader`
+- `src/q/why_test.go` `TestWhyReadsWhetherTheValueStandsAtItsDefault`
+- `src/q/why_test.go` `TestWhyOfANameTheCatalogLacksRefuses`
+- `src/index/door_test.go` `TestTheDoorAnswersWhy`
+- `go test ./...` from the root, deciding the first done line
+- `./RUNME.sh check`, deciding the third
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the model note, the design input section, `answers` and `main` stand opened
+- a search for `why` in Go names no caller, and no ticket in the group brings the binary
+- each done line names its test in the tests list
 
 ## review
 
