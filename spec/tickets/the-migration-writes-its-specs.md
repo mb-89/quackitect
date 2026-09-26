@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: retro/notes
+step: retro/write
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 enabled_by: migration.phase0
@@ -96,6 +96,14 @@ record:
     hand: the engine
     hash_before: 0d7584156ded8672659043afad515ff478692eeb
     hash_after: 0d7584156ded8672659043afad515ff478692eeb
+  - step: retro/notes
+    hand: box d7a540d981d5 · claude-code-remote
+    hash_before: 8835f23a773a4b0b6db2bb4c3873e144c1f5c52d
+    hash_after: 8835f23a773a4b0b6db2bb4c3873e144c1f5c52d
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -146,9 +154,7 @@ Done when [[spec/design_output/inner-protocol]] names the inner protocol and the
 
 ### drained
 
-<!-- retro notes, which passes when the private folder is empty -->
-
-<!-- the form is command -->
+    ./RUNME.sh retro notes
 
 ## write
 
