@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: 5fed4e85bc0a9bfedf2e5f8570f4e2850fa988f4
+    hash_after: 5fed4e85bc0a9bfedf2e5f8570f4e2850fa988f4
 ---
 
 # Ask
@@ -100,33 +105,37 @@ The mint takes the standard route by habit, so a one-line config change runs a d
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+Four edits, one a `done_when` line, each beside the test that holds it.
 
-<!-- the form is text -->
+1. `spec/guidance/tickets.md`: a rule after rule 6 sends a one-line change the owner orders to `--process=trivial`, with its failure: a draft, a review and a build spent on one line. An `Examples` row pairs `--process=trivial` on a one-line config change with the standard route on it.
+2. `spec/processes/standard.yaml`: `design/draft` gains a `size` evidence field of form `list`, saying every file the approach touches, one a line. `test/contract/process.test.js` asserts the field and its form in the standard route case. `./RUNME.sh ticket update` carries it to the standard tickets still short of `design/draft`.
+3. `spec/guidance/review/design.md`: a rule weighs `size` against the ask, and answers `pass with findings` with a row naming the spread where the draft touches files the ask leaves out. It fails nothing, since rule 2 keeps a fail for a fundamental fault. `spec/rationales/design-review.md` argues it under the rule's number. `test/contract/question-grades.test.js` holds one rule naming `size` and the ask.
+4. `src/scripts/pull-hand.js` `spawnAnswer`: the second line says to spawn the hand in the background and take the next item, then pull again once it answers. A case under `test/level0` calls `spawnAnswer` and reads the words.
 
 ### callers
 
-<!-- every caller of what the approach changes, one a line, as a file and a function -->
-
-<!-- the form is list -->
+- `src/scripts/pull-hand.js` `handOut`, the one caller of `spawnAnswer`
+- `test/level0/level1.test.js` `spawnPromptIn`, which reads the prompt out of a spawn answer, and keys on the `spawn` word the change leaves standing
+- `.claude/skills/level0/lib/schema-mint.js` `mintedNote`, which renders the `size` heading on every standard ticket it mints
+- `src/scripts/pull-route.js` `leavesOf`, which reads the draft leaf's evidence for the hand-out
+- `test/contract/process.test.js` the case minting every route through real Vale, which reads the new `says` line
 
 ### tests
 
-<!-- every test the change adds, one a line, as a file and a test name -->
-
-<!-- the form is list -->
+- `test/contract/process.test.js` "the standard route reviews the design once, and its last leaf hands on to the retro", asserting `size` of form `list`
+- `test/contract/question-grades.test.js` "the design review note weighs the draft's size against the ask"
+- `test/contract/question-grades.test.js` "the tickets note sends a one-line change the owner orders to the trivial route"
+- `test/level0/spawn-answer.test.js` "the spawn answer tells the session to spawn in the background and take the next item"
 
 ### answers
 
-<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
-<!-- the form is list -->
+- first on a first draft
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- every file, function and verb named stands opened: `spawnAnswer`, `handOut`, `spawnPrompt`, both notes, both tests and `standard.yaml`
+- the callers list names the one caller of `spawnAnswer`, and the readers of the draft leaf's evidence
+- every `done_when` line names its test above, and `./RUNME.sh check` decides the last
 
 ## review
 
