@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: each-thing-stands-in-place
 steps:
   - name: design
@@ -113,6 +113,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
+  - step: implement/tests-green
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 512d11d3effca9ff3c9fb9d60a3cecd2211b0829
+    hash_after: 512d11d3effca9ff3c9fb9d60a3cecd2211b0829
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 26 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
+reason: done
 ---
 
 # Ask
@@ -333,11 +345,15 @@ Five cases fail on their own assertion, and the rest stand green:
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/retro-collect.test.js test/contract/process.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -345,11 +361,35 @@ Five cases fail on their own assertion, and the rest stand green:
 
 <!-- the form is text -->
 
+A cloud group's own retro chapter now reaches the retro, off trunk:
+
+| the part | what changes | why |
+|---|---|---|
+| `collect` | `cloudInto` writes each closed group's `retro` chapter to `input/groups` | the cloud's work reaches the findings |
+| the close | read off the trunk commit landing the ticket, by first-parent history | a box's own close falls before its merge |
+| a second pass | a group under `input/groups` stays as the first pass takes it | `--again` takes each group once |
+| the count | `sourceOf` names `groups` | the print counts the chapters |
+| `read.md` | rule `10` hands each chapter to the reader whose hours hold its close | rule `1` names it as its one reach |
+| `group.yaml` | the `write` step asks the run's errors and owner prompts, each with its time | the chapter carries what the transcript holds |
+| the fake | `fakeTrunk` answers `log` and `show` by their arguments | the cases drive git through a fake that behaves |
+
+The departure the owner reads at the merge:
+
+- the group's retro chapter stands in for the cloud transcript
+- the private-data rules keep a transcript off git, since it carries the box's names
+- so ask lines three and four hold through the chapter, and no transcript leaves the box
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: the diff holds the collect, the route, the reader rule, the git fake and their tests
+- [x] every door the change reaches has a fake: git is the one door, and `fakeTrunk` answers it
+- [x] a comment names the approach the change implements: every new function carries the ticket link
+- [x] every fact the change adds stands in one place, and a note points at the file instead of repeating it: the rationale chapter points at `input/groups`
+- [x] every row the design review passes with stands fixed in the change: the contract case, the first-parent close, rule `10` and the fake all stand
 
 # Discussion
 
