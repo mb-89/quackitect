@@ -16,7 +16,14 @@
       "TaskGet",
       "mcp__github",
       "mcp__Claude_Code_Remote",
-      "Agent"
+      "Agent",
+      "Bash(git checkout main)",
+      "Bash(git merge:*)",
+      "Bash(git pull:*)",
+      "Bash(./RUNME.sh branch merge:*)",
+      "Bash(./RUNME.sh branch close:*)",
+      "Bash(./RUNME.sh commit:*)",
+      "Bash(./RUNME.sh push)"
     ],
     "deny": [
       "Artifact"
