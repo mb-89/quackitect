@@ -26,7 +26,8 @@ const TOOL = "--tool";
 const CONFIG = "spec/config/level0.json";
 const RUNNING = 600000;
 const JUDGE = "--judge";
-const SPAWNS = 3;
+const BACKGROUND =
+  "The hand works in the background. Take the next item, and pull again once it answers.";
 
 export function register(on, options) {
   const method = String(options?.method ?? "").replace(/[\\/]+$/, "");
@@ -49,16 +50,12 @@ export function register(on, options) {
       const said = await judged($, e);
       if (said) return { result: said };
     }
-    let answer = await pulled($, e);
-    // [[spec/design_output/pull#a-hand-of-its-own]]
-    for (let round = 0; round < SPAWNS; round++) {
-      const prompt = spawnPromptIn(answer);
-      if (!prompt) break;
-      const said = await spawned($, prompt);
-      if (said) return { result: `${answer}\n\n${said}` };
-      answer = await pulled($, {});
-    }
-    return { result: answer };
+    const answer = await pulled($, e);
+    // The hand works in the background, and the lead takes the next item. [[spec/tickets/the-hook-awaits-the-spawn]]
+    const prompt = spawnPromptIn(answer);
+    if (!prompt) return { result: answer };
+    const said = (await spawned($, prompt)) || BACKGROUND;
+    return { result: `${answer}\n\n${said}` };
   });
 }
 
@@ -99,6 +96,7 @@ async function spawned($, prompt) {
     said = await $.agent.spawn({
       prompt,
       own: true,
+      background: true,
       description: "a hand of its own works one step",
       subagentType: "general-purpose",
     });

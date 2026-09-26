@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-owners-word-reaches-work
 parent: a-small-ask-stays-small
+record:
+  - step: do
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: 621b95798957153187726dbda406fe074402d87a
+    hash_after: 621b95798957153187726dbda406fe074402d87a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 22 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-owners-words-travel-verbatim.md:154:1: ListItem: A sentence in a list item holds 20 words, and this one"
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ the callers list misses the `tool.call` handler in `.claude/skills/level0/hooks/
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/pull-spawn-hook.test.js test/level0/read-tools.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,19 @@ the callers list misses the `tool.call` handler in `.claude/skills/level0/hooks/
 
 <!-- the form is text -->
 
+The pull tool's `tool.call` handler in `.claude/skills/level0/hooks/pull-tool.js` now spawns the hand in the background, once. It answers at once, so the lead takes the next item.
+
+It used to wait on the hand and pull again. A second pull while the hand works answers the same spawn, so the handler pulls once.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the handler keeps in step with the spawn answer's words
+- the cleanup the change reveals is in it: the round constant goes with the loop
+- the words the handler adds stand once, in its constant
 
 # Discussion
 
