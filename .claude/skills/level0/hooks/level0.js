@@ -21,7 +21,8 @@ const ROWS = 64;
 // The span the start road takes. An install on a fresh clone runs past a spawn, and the road reaches this only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 const STARTING = 180_000;
 // The skip list of [[spec/design_output/level0#the-setup-writes-the-flag]], spelled again here because this hook imports its own folder alone.
-const INSTALL_SKIP = "editor-link editor-extensions editor-client go index se-lsp";
+export const INSTALL_SKIP =
+  "editor-link editor-extensions editor-client go index se-lsp";
 // The code REASONS reads for a box carrying no node, which a refused spawn means. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 const NO_NODE = 5;
 // The code REASONS reads for a road that installs the modules and then starts the server. [[spec/design_output/level0#the-bridgehead-starts-it-too]]

@@ -4,6 +4,7 @@
 
 import { HEARD, PROBE } from "../../.claude/skills/level0/lib/guidance.js";
 import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { probeCold } from "./probe-cold.js";
 
 export const SURVIVES = "survives";
 export const DROPS = "drops";
@@ -50,8 +51,10 @@ export function readsCompaction(rows) {
 
 export async function probe(root, argv, it, client) {
   const said = argv[0] ?? "";
+  // [[spec/design_output/level0#the-cold-probe]]
+  if (said === "cold") return probeCold(root, it, client);
   if (said !== "compact") {
-    console.error("Usage: ./RUNME.sh probe compact");
+    console.error("Usage: ./RUNME.sh probe compact|cold");
     return 2;
   }
   return compaction(root, it, client);

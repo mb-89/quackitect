@@ -720,6 +720,40 @@ The verb exits `0` on `survives` and `1` on anything else.
 run costs ninety seconds and two model calls, so `SE_SLOW` switches it on and
 `./RUNME.sh check` stays fast without it.
 
+## The cold probe
+
+Run `./RUNME.sh probe cold` before a change to the bridgehead, the start road
+or the guidance delivery lands. A unit test passes on each part, and a real box
+still breaks where the parts meet.
+
+The verb runs one cold box from start to end:
+
+1. It clones the commit this tree stands on into a fresh folder under the
+   temp folder.
+2. It runs `src/scripts/install.sh` under the skip list the setup names, so
+   the plugin manifest lands.
+3. It writes the clone's pointer at a port of its own, so a desk server keeps
+   its port.
+4. It runs the client headless with `--plugin-dir`, which skips the trust
+   gate, under a config folder of its own.
+5. It reads the clone's session log and the client's stream.
+6. It stops the server the clone launched, and removes the folder.
+
+`readsCold` in `src/scripts/probe-cold.js` answers each check from the rows
+and the stream:
+
+| the check | it passes where |
+|---|---|
+| hook | a bridgehead `session.start` row or a `context` row stands |
+| server | a row the bridgehead leaves unwritten stands |
+| rules | a `context` row names `level0-rules` and `level0-canary` |
+| tools | a `mcp__level0__` name past the read tools reaches the session |
+| canary | the first text opens on the sentence, and no later text repeats it |
+
+The canary check also fails on a `HEARD.again` row, and on a `gate` row asking
+for the canary after the payment. The verb prints one line a check, and exits
+`0` where every check passes.
+
 ## Without the verb
 
 The two log lines pay on their own. A session that compacts in the ordinary
