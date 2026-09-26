@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-gates-read-the-state
 parent: the-todo-joins-the-queue
+record:
+  - step: do
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 5d0e6e19be17b65bca85bbdd78f5838170b06d36
+    hash_after: 5d0e6e19be17b65bca85bbdd78f5838170b06d36
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 22 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-todo-road-stands-first.md:39:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ parent: the-todo-joins-the-queue
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/named.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ parent: the-todo-joins-the-queue
 
 <!-- the form is text -->
 
+The door reads every hold on the box, one a hand, and passes a ticket any of them names. The doors know no calling hand, and a helper writes through the same door under its own hold, so a single pick refuses a helper's own ticket. A stranger stays a ticket no hold names. `inHand` in `src/engine/named.js` owns the read.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: it names the holds that pass, and why
+- the cleanup: none stands
+- the rule stands in `level0.md` under `A write names its ticket`
 
 # Discussion
 
