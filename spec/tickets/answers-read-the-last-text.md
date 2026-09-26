@@ -77,12 +77,18 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box c28a93a32b71 · claude-code-remote
     hash_before: fcc032c28d64b0263dd942ee8dbd2961b95f037d
     hash_after: fcc032c28d64b0263dd942ee8dbd2961b95f037d
+  - step: design/review
+    hand: box c28a93a32b71 · claude-code-remote · helper-2
+    hash_before: 24f65f3fab16d000972816f74b552298c05ab3f1
+    hash_after: 24f65f3fab16d000972816f74b552298c05ab3f1
+    returns: 1
+    why: "| grade | finding | fix |; |---|---|---|; | design | `paid` reads both the step and the turn's answer. The bridgehead posts the last step's text as `turn.said`, so `onTurnSaid` pays on it, then `onTurnComplete` hands `paid` the same answer with `session.paid` already true. The repeat check then writes `HEARD.again` on every turn that pays the debt, which misses the second done_when line | put the repeat check in `onTurnSaid` alone, so `onTurnComplete` reads the answer for the debt and draws no repeat, and add a case in `test/level0/canary-debt.test.js` where a step pays and the answer at the turn's end carries the same text, with no repeat finding |; | craft | the existing case \"an answer comes out of a transcript, and a helper stays behind\" in `test/level0/verbs.test.js` puts the long text and the short one in one turn. Under last-text-alone the short one stands last, so the case breaks, and the approach names neither the case nor whether `SHORTEST` drops before or after the pick | name the order (pick the last text, then drop it where it runs short, as the ask reads), and name the case the change rewrites |; | craft | `sinceTheOwner` reads bridge rows (`role`, `toolResults`), and a transcript row carries `type` and `message.content` with `tool_result` blocks | name the transcript test for an owner row: `type: \"user\"` with no `tool_result` block in `message.content` |"
 ---
 
 # Ask
@@ -163,6 +169,14 @@ Two changes, one a file.
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+| grade | finding | fix |
+|---|---|---|
+| design | `paid` reads both the step and the turn's answer. The bridgehead posts the last step's text as `turn.said`, so `onTurnSaid` pays on it, then `onTurnComplete` hands `paid` the same answer with `session.paid` already true. The repeat check then writes `HEARD.again` on every turn that pays the debt, which misses the second done_when line | put the repeat check in `onTurnSaid` alone, so `onTurnComplete` reads the answer for the debt and draws no repeat, and add a case in `test/level0/canary-debt.test.js` where a step pays and the answer at the turn's end carries the same text, with no repeat finding |
+| craft | the existing case "an answer comes out of a transcript, and a helper stays behind" in `test/level0/verbs.test.js` puts the long text and the short one in one turn. Under last-text-alone the short one stands last, so the case breaks, and the approach names neither the case nor whether `SHORTEST` drops before or after the pick | name the order (pick the last text, then drop it where it runs short, as the ask reads), and name the case the change rewrites |
+| craft | `sinceTheOwner` reads bridge rows (`role`, `toolResults`), and a transcript row carries `type` and `message.content` with `tool_result` blocks | name the transcript test for an owner row: `type: "user"` with no `tool_result` block in `message.content` |
 
 # implement
 
