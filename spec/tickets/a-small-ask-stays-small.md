@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-owners-word-reaches-work
 steps:
   - name: design
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: 5e527f0c39829cb4f476d107f40fbff55e3d48da
+    hash_after: 5e527f0c39829cb4f476d107f40fbff55e3d48da
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 13 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-owners-words-travel-verbatim.md:154:1: ListItem: A sentence in a list item holds 20 words, and this one"
+reason: done
 ---
 
 # Ask
@@ -239,11 +251,15 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/question-grades.test.js test/contract/process.test.js test/level0/spawn-answer.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -251,11 +267,25 @@ pass with findings
 
 <!-- the form is text -->
 
+A small ask now stays small at three points.
+
+- Rule 6 of the tickets note sends a one-line change the owner orders to the trivial route.
+- The standard draft lists every file it touches under `size`, and rule 7 of the design review weighs that list against the ask.
+- The spawn answer tells the lead to spawn the hand in the background and take the next item.
+
+The hook reading the spawn answer still waits on the hand. `the-hook-awaits-the-spawn` carries that.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the ask names, and the rationales arguing its rules
+- no door stands in the change, and the spawn case fakes the console
+- the rationale sections and the case pointers name this ticket
+- each rule stands once, under its note, and the rationales argue it by number
+- the review's rule-number row holds, and the hook row rides on its own ticket
 
 # Discussion
 
