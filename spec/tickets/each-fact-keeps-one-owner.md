@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
     hash_before: 1b8e70c6b51ce3bb82a05e2f3e96a68f291bea8f
     hash_after: 1b8e70c6b51ce3bb82a05e2f3e96a68f291bea8f
+  - step: design/review
+    hand: box b8ae1b45d463 · claude-code-remote · helper-2
+    hash_before: 934c928b6451c2af045b98579c3a882101fa30da
+    hash_after: 934c928b6451c2af045b98579c3a882101fa30da
 ---
 
 # Ask
@@ -189,12 +193,11 @@ flag answers as `inCloud` does today.
 
 pass
 
-- No import cycle forms, since `group.js` and `folders.js` reach `apply.js` nowhere. The import still breaks the bridgehead. `.claude/skills/level0/hooks/level0.js` imports `apply.js`, so the hook's reach climbs past the plugin root and takes `node:path` through `schema.js` and `paths.js`. `spec/design_output/level0.md` refuses both, under "A module imports a sibling" and "Nothing imports past the plugin". The `cloud.js` precedent holds nothing here, because the hook never loads `cloud.js`. Fix: the owner of `spec/tickets` and `.md` moves into `lib`, beside `TICKETS` in `folders.js`, and `group.js` and `named.js` read it there. `apply.js` imports its siblings alone, and a case holds the hook's reach free of `node:` and of any path past the plugin.
-- The callers list misses `src/scripts/pull-hand-of.js`, `handDoors`, which spells `cloud: inCloud(env)`. It is the source of the doors' flag, so it stays as it stands or reads `cloudHere({ env })`, and the cloud-desk case names why it stands off the search.
-- The callers list misses the importers of `apply.js` whose load the new import changes: `.claude/skills/level0/hooks/level0.js` and `src/bridge/server.js`.
-- A number word from two to twelve standing alone reads the ask right. `one` stays out, because the voice says `one owner` and `one a line` as identity, and counts nothing. The rule's comment says why `one` stays out.
-- The wider `CodeHeader` refuses some fourteen headers, and the draft names `ephemeral.js` alone. The others: `src/config/config.go`, `src/extension/lib/grid.js`, `src/scripts/log-read.js`, `src/scripts/work-list.js`, and nine test headers under `test/contract` and `test/level0`. The callers list names each one.
-- The wider `CountedList` warns on some eight headings, such as `# The three layers` in `spec/design_output/config.md` and `# Two shapes stand open` in `spec/funnel/the-table-holds-every-rule.md`. `saysGreen` in `.claude/skills/level0/lib/runs.js` reads any warning as red, so `branch done` and a trunk push refuse while one stands. A new heading moves its anchor, and some twenty links name those anchors. The change renames each heading and its links in one commit.
+- The plugin import stands answered: `PUBLIC_TICKETS` and `NOTE_END` live in `.claude/skills/level0/lib/folders.js`, `apply.js` imports its sibling alone, and `src/engine/group.js` and `named.js` read the plugin. No cycle forms, and the hook's reach stays inside the plugin.
+- `src/scripts/pull-hand-of.js`, `handDoors`, spells `cloud: inCloud(env)`. It is the source of the doors' flag, so it stays, and the cloud-desk case names why it stands off the search. The implement step writes that line.
+- The callers list names every header the wider `CodeHeader` refuses, beside `ephemeral.js`: `src/config/config.go`, `src/extension/lib/grid.js`, `src/scripts/log-read.js`, `src/scripts/work-list.js` and the test headers under `test/contract` and `test/level0`. The implement step fixes each in place.
+- `one` stays out of `CodeHeader`, because the voice says `one owner` and `one a line` as identity and counts nothing. The rule's comment says so.
+- The wider `CountedList` warns on headings in `spec/design_output`, such as `## Three kinds stand apart` in `private.md`. `saysGreen` in `.claude/skills/level0/lib/runs.js` reads a warning as red, so the implement step renames each heading and every link to its anchor in the same commit, and `./RUNME.sh check` decides it.
 
 # implement
 
