@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
@@ -105,6 +105,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 5 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 5be1329cf2bf31fd630319550495a06d5c3268df
+    hash_after: 0c1e146737aecc6ec7c1d3eb80cb6bc1d217473a
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
 ---
 
 # Ask
@@ -301,11 +309,19 @@ Five cases fail on their own assertion, and the rest stand green:
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: `retro-collect.js`, `group.yaml`, `read.md` and its rationale, the git fake and the tests
+- [x] every door the change reaches has a fake: `cloudInto` reaches git alone, and `fakeTrunk` in `src/doors/fake/git.js` answers it
+- [x] a comment names the approach the change implements: `cloudInto`, `landingsOf`, `retroChapterOf` and `fakeTrunk` carry `[[spec/tickets/the-retro-reads-cloud-retros]]`
+- [x] every fact the change adds stands in one place, and a note points at the file instead of repeating it: `GROUPS`, `CLOSES` and `COMMIT_MARK` stand once, and `TRUNK` and `CLOSED` are imported
+- [x] every row the design review passes with stands fixed in the change: the close reads off `git log --first-parent --diff-merges=first-parent`, and rule `10` is the one reach rule `1` names
 
 ## tests-green
 
