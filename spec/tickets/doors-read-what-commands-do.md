@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box d1fe1ca62214 · claude-code-remote · helper-2
     hash_before: 418083ca590f33bed4555e29790a1c6d8a3097ee
     hash_after: 418083ca590f33bed4555e29790a1c6d8a3097ee
+  - step: implement/tests-red
+    hand: box d1fe1ca62214 · claude-code-remote
+    hash_before: c2daf2b5c9cdea96ef9621e07707b0b119fd72c3
+    hash_after: c2daf2b5c9cdea96ef9621e07707b0b119fd72c3
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -198,17 +206,27 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/bash.test.js test/level0/level1.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Three cases fail on their own assertion: a read before `;` still gates, a scratchpad outside `/tmp` meets the write rule, and the pull tool hands the verb no env. The trunk case and the move case stand green already, because `a-nested-git-still-lands` and `a-reorder-asks-a-test` landed them first.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `lib/bash.js`, `hooks/pull-tool.js` and their tests, which the ask names
+- every door the change reaches has a fake: the level1 case fakes `$.process.run`
+- a comment above each change names this ticket
+- the scratchpad shape stands in `FREE` alone, and the read words stand in one set in `lib/bash.js`
+- the review rows each stand as a child ticket, and the two landed children hold their rows
 
 ## change
 

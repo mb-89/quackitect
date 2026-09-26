@@ -5,6 +5,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import * as lib from "../../.claude/skills/level0/lib/pull.js";
+// The whole module, so a name the wrapper answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
+import * as level1 from "../../.claude/skills/level0/lib/pull.js";
 import {
   judgeAsk,
   judgeRefusal,
@@ -13,8 +15,6 @@ import {
   sessionOf,
   spawnPromptIn,
 } from "../../.claude/skills/level0/lib/pull.js";
-// The whole module, so a name the wrapper answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
-import * as level1 from "../../.claude/skills/level0/lib/pull.js";
 import { pullArgvOf } from "../../src/scripts/pull-tool.js";
 
 // The rules a leaf hands the judge, each label naming one rule. [[spec/tickets/the-judge-reads-answer-rules]]
@@ -72,7 +72,11 @@ test("the module registers one session start, and it registers the pull tool and
   const registered = [];
   const box = harness();
   box.$.tool.register = async (spec) => void registered.push(spec.name);
-  await starts[0](box.$, { session_id: "s1", client: "claude-code" }, async (said) => said);
+  await starts[0](
+    box.$,
+    { session_id: "s1", client: "claude-code" },
+    async (said) => said,
+  );
   assert.equal(registered[0], "pull", "the pull tool registers first");
   for (const one of READ_TOOLS) assert.ok(registered.includes(one.name), one.name);
 });
@@ -153,7 +157,11 @@ test("the judge's question names each rule by its label and carries the evidence
 
 // [[spec/tickets/the-judge-reads-answer-rules]]
 test("the labels the judge picks from open on follows, one label a rule after it", () => {
-  assert.equal(typeof level1.judgeLabels, "function", "the wrapper answers judgeLabels");
+  assert.equal(
+    typeof level1.judgeLabels,
+    "function",
+    "the wrapper answers judgeLabels",
+  );
   assert.deepEqual(level1.judgeLabels(RULES), ["follows", "voice-1", "voice-3"]);
   assert.deepEqual(level1.judgeLabels([]), ["follows"]);
 });
@@ -216,9 +224,12 @@ test("an event naming no session writes nothing, and says the hand stands at the
 test("the pull hook matches the level zero call, and runs the script the method root holds", async () => {
   const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
   const calls = [];
-  register((event, ...rest) => {
-    if (event === "tool.call" && rest.length > 1) calls.push(rest);
-  }, { method: "/vehicle/" });
+  register(
+    (event, ...rest) => {
+      if (event === "tool.call" && rest.length > 1) calls.push(rest);
+    },
+    { method: "/vehicle/" },
+  );
   const [filter, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
   assert.equal(filter?.tool, "mcp__level0__pull");
 
@@ -233,4 +244,33 @@ test("the pull hook matches the level zero call, and runs the script the method 
   };
   assert.deepEqual(await handler($, {}, async () => null), { result: "wait" });
   assert.deepEqual(ran[0].slice(0, 2), ["node", "/vehicle/src/scripts/cli.js"]);
+});
+
+// The tool's pull reads the hand the shell verb reads, so the verb runs under the harness keys the session carries. [[spec/tickets/doors-read-what-commands-do]]
+test("the pull tool runs the verb under the harness env the shell verb reads", async () => {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const { agentOf } = await import("../../src/scripts/pull-hand-of.js");
+  const calls = [];
+  register((event, ...rest) => {
+    if (event === "tool.call" && rest.length > 1) calls.push(rest);
+  }, {});
+  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
+  const before = process.env.CLAUDE_CODE_REMOTE;
+  process.env.CLAUDE_CODE_REMOTE = "true";
+  const opts = [];
+  const $ = {
+    process: {
+      run: async (_argv, said) => {
+        opts.push(said);
+        return { stdout: "wait", stderr: "", exitCode: 0 };
+      },
+    },
+  };
+  try {
+    await handler($, {}, async () => null);
+  } finally {
+    if (before === undefined) delete process.env.CLAUDE_CODE_REMOTE;
+    else process.env.CLAUDE_CODE_REMOTE = before;
+  }
+  assert.equal(agentOf(opts[0]?.env), "claude-code-remote");
 });

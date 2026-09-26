@@ -18,6 +18,7 @@ import {
   writesAPath,
 } from "../../.claude/skills/level0/lib/bash.js";
 import { scriptsIn } from "../../.claude/skills/level0/lib/scripted.js";
+import { NAMED, named } from "./fixtures.js";
 import {
   called,
   edits,
@@ -28,7 +29,6 @@ import {
   TREE,
   wrote,
 } from "./mark-doors.js";
-import { NAMED, named } from "./fixtures.js";
 
 const rules = (command, most = 5, it = {}) =>
   findings(command, most, it).map((one) => one.rule);
@@ -521,4 +521,36 @@ test("sed -n '1,5p' README.md marks lines 1 to 5, and a read with a pipe after i
     /has read none of it/,
     "a read feeding a pipe sets no mark",
   );
+});
+
+// A read gates nothing, so a landing after one passes, and a pipe answers its last command, so a gate piped ahead of a landing refuses. [[spec/tickets/doors-read-what-commands-do]]
+test("a read before a semicolon gates nothing, and a gate piped before a double ampersand refuses", () => {
+  for (const command of [
+    "cat a.md; git commit -m 'x'",
+    "grep -n x a.md; ./RUNME.sh ticket pull a-child --pass",
+    "git status; git commit -m 'x'",
+    "ls spec | head && git commit -m 'x'",
+  ]) {
+    assert.ok(!rules(command).includes("LandingFollowsItsGate"), command);
+  }
+  for (const command of [
+    "./RUNME.sh check | tail -3 && git commit -m 'x'",
+    "node --test a.test.js | grep ok && ./RUNME.sh ticket pull a-child --pass",
+  ]) {
+    assert.ok(rules(command).includes("LandingFollowsItsGate"), command);
+  }
+});
+
+// [[spec/tickets/doors-read-what-commands-do]]
+test("a redirect into the harness scratchpad passes, and a tree path of the same shape still meets the rules", () => {
+  for (const path of [
+    "/private/tmp/claude-501/-Users-user-proj/0b1c/scratchpad/out.md",
+    "/var/folders/ab/T/claude-501/-Users-user-proj/0b1c/scratchpad/out.md",
+    "C:/Users/user/AppData/Local/Temp/claude/C--proj/0b1c/scratchpad/out.md",
+  ]) {
+    assert.deepEqual(rules(`echo x > ${path}`), [], path);
+  }
+  assert.deepEqual(rules("echo x > spec/claude-1/a/scratchpad/out.md"), [
+    "ShellWritesNothing",
+  ]);
 });
