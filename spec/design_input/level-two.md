@@ -96,13 +96,14 @@ sequenceDiagram
     end
 ```
 
-# The process record
+# The ticket files
 
-- The steps of a process stand in its own file, each with a state. The work editor draws the progress from that record.
+- The ticket files hold the truth. A process, and a delivery, keeps its own ticket file.
+- The steps of a process stand in its ticket file, each with a state, as `steps` and `record` stand today. The work editor draws the progress from it.
+- A file references another, and copies nothing from it. Evidence stands in the ticket file, or in a note the ticket file links: a design input, a design output.
 - The step in hand stands in the hold as an ephemeral ticket.
-- A fix ticket is a ticket file of its own, and a child of its process.
-- One store holds each fact: the record the steps, the hold the hand-out, the fix ticket its own work.
-- An inserted step joins the record, and the count grows.
+- A fix ticket is a ticket file of its own, and a child of its process. It goes to the front of the queue, and the process goes on after it.
+- An inserted step joins the ticket file, and the count grows.
 - A step a condition skips closes as skipped at the first hold.
 
 # The standard process
@@ -188,7 +189,7 @@ The retro mint names the process each class needs. Today `src/engine/retro/mint.
 - A note carrying `env` moves under a subfolder, since the style holds one text for every box.
 - The engine resolves a note under a subfolder by tags. Each folder name is a tag, and a note adds `tags` and `env` in its frontmatter.
 - A note reaches a step that carries every tag of the note, where its `env` matches. Each step carries `tags` in its process.
-- The check refuses a note tag that no step carries, and a test pins the notes each step resolves.
+- Every note reaches some step. The check refuses a note that reaches no step, and a test pins the notes each step resolves.
 - The pull prints each resolved note as a section of the ticket, its rules numbered as the note numbers them, with its examples.
 - The spawn hook hands a helper the notes at the top. The gate ticket in its prompt carries the resolved ones.
 - A verb prints the guidance a step resolves, so a reader sees it without a guess.
@@ -209,9 +210,10 @@ One tool answer reaches the model whole up to a cap. Past it, the client writes 
 # Evidence and stale steps
 
 - Evidence past a size, or of the form `file`, stands in a file the record links.
-- The record holds the hash of each input and of the definition of the step. The engine reads the hashes from git at the tip, and the index serves as a cache keyed by the commit.
+- The ticket file holds the hash of each input and of the definition of the step. The engine asks the index for a hash, and the index reads the file again where it needs to.
 - A moved input marks exactly the steps whose checks read it, as v3 proposes in the record of its iteration i18.
-- The query runs fast over the index, and the battery holds a time budget for the pull.
+- The query runs fast over the index.
+- An append adds to a node and moves its hash on, and the steps reading it stay whole. v3 carries the append, and level two takes it back. The hashes chain, and each one reads the hashes before it.
 - A process stays editable at runtime. An edit downstream of the step in hand keeps the earlier steps. An edit upstream sends the process back to the last step that stands whole.
 - A recovery step stands written in a process, or a gate inserts it.
 
@@ -234,25 +236,21 @@ A clear flag stands on each process and each phase.
 
 An attack on the design and the strongest case against it both run before this note. Each finding meets its answer here.
 
+The owner reads each finding, and the table holds the ones that stand.
+
 | finding | the answer |
 |---|---|
-| a gate fixing a test moves an input, and the process rewinds forever | the commit of a gate moves no input of the phase it closes |
-| a person step on a cloud box meets the same agent | it leaves as a question ticket through `branch unblock` |
-| a rerun reading the fixes alone skips a trunk merge | a rerun reads the diff since its tip, with the merges, and runs every command |
+| a gate fixing a test moves an input, and the process rewinds | the commit of a gate moves no input of the phase it closes, and the append moves a hash on |
+| a person step on a cloud box meets the same agent | a branch sends the work of a person out as a ticket, and the bless stays with the agent |
+| the second run of the final acceptance skips a trunk merge | it reads the diff since its last verdict, with the merges, and runs every command |
 | the final acceptance has no exit at its cap | past its cap the process closes `became` onto a question |
-| a child file a step breaks the names cap and the draft state | the steps live in the record, and fix tickets alone are files |
-| a hand-back stages the edits of a sibling hand | the hand-back stages the ticket and the paths of its step |
-| red tests across the gate turn the check red | the check reads the listed tests as expected red until tests-green |
-| the output style holds one text for every box | a note with `env` moves under a subfolder |
-| a typo in a tag drops guidance without a word | the check refuses an orphan tag, and a test pins each resolution |
-| an agent sets the variables that allow a bless | the doors refuse the write and the command |
-| the cap sits inside the measured band | a margin below it, and the hand-out splits while the step stays whole |
-| the index trails the writes | hashes come from git, and the index caches them by commit |
-| a compaction lands mid-phase | a bare pull hands out the step and its guidance again |
-| the downstream walk cost v3 its pull time | the stale set stays exact, and the battery times the pull |
-| three stores drift apart | one store a fact, as the chapter The process record says |
-| level one hands out one leaf already | level two builds on that pull, and moves the route out of the ticket |
-| the schema list drops fields | every field that stands today stays |
+| a hand-back stages the edits of a sibling hand | the hand-back stages the ticket and the paths of its step, as `every-landing-takes-a-verb` asks |
+| a typo in a tag drops guidance without a word | every note reaches some step, and the check refuses one that reaches none |
+| an agent sets the variables that allow a bless | the doors refuse the write and the command, as a small fault |
+| the cap sits between the two answers the probe reads | a margin below it, and the hand-out splits while the step stays whole |
+| every pull runs the whole engine from cold | the time budgets, as the chapter Time budgets says |
+| a runtime edit brings back the reopen cascade of v3 | the append, and a stale set that stays exact |
+| a backlog ticket with a prose criterion waits for the retro | a cost the owner accepts |
 
 # Costs the owner accepts
 
@@ -263,6 +261,19 @@ An attack on the design and the strongest case against it both run before this n
 | guidance resolves by tags | v2 and v3 built selectors, and the tree settled on a list per step |
 | the pull carries more work | v3 names the pull its slowest call |
 | a prose criterion in the backlog waits for the retro | the judge read it at the hand-back |
+
+# Time budgets
+
+- Each call a hand makes carries a time budget: the pull, the hand-back, the resolver, the query for stale steps.
+- The budgets stand as requirements of the engine, and a test in the battery times each call against its budget.
+- The engine stays cold while every call meets its budget.
+
+# Findings
+
+- A finding reaches the owner as a question ticket, or as a note.
+- A finding names the failure it shows, the evidence it checks, and marks what it leaves unchecked.
+- A finding the design answers already is no finding.
+- The owner and the agent settle how findings reach the owner in a later session.
 
 # What waits for level three
 
