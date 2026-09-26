@@ -116,9 +116,10 @@ export function pull(it, argv) {
   if (held?.ephemeral) return ephemeralPull(it, who, verdict);
   if (verdict.said === "back") return takeBack(it, who, name, verdict.reason);
   // A working todo holds the hand as a ticket does, so the pull answers it ahead of every road that hands work out. [[spec/tickets/the-todo-joins-the-queue]] [[spec/tickets/the-todo-road-stands-first]]
+  // A pull naming the working item itself takes that ticket, because the shell door wants the ticket named as the working item first.
   const todo =
     held || verdict.said ? "" : inHand({ disk: it.disk, root: it.root }).todo;
-  if (todo) {
+  if (todo && todo !== name) {
     say(WAIT, [
       `the todo ${todo} stands in hand, so the pull hands nothing else out.`,
       "Finish it, and take it off the plan, then pull again.",
