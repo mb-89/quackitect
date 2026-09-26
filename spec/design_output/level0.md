@@ -1281,6 +1281,13 @@ alone. The bridgehead still posts the last texts of the transcript on a
 hold. The door pays on any text since the demand that fits, so a flush landing
 late pays too.
 
+A prompt's demand keys on the prompt itself. At `prompt.submit` the bridgehead
+reads the id of the newest transcript row, and the demand holds it. On a hold
+the bridgehead posts the transcript rows, each with its role and id. The door
+counts an agent text past the next owner row alone. A restart empties the
+spoken text, so a transcript carrying no ids pays nothing, and the display road
+pays alone.
+
 ## What counts as owed
 
 - A prompt a person opens a turn with, or sends mid-turn, at `prompt.submit`.
@@ -1314,7 +1321,9 @@ carries.
 ## The first call asks
 
 A prompt opens its demand with no grace, so the first call after it asks the
-bridgehead for the texts. A mid-turn prompt otherwise waits behind the calls in
+bridgehead for the texts. The prompt's own event carries the warning. The door
+answers the prompt with its text opening on the `warns` line, and the
+bridgehead hands that event on. A mid-turn prompt otherwise waits behind the calls in
 flight, and the owner asks twice. The cost: a hand calling a tool before it
 writes the reply meets a refusal, writes the reply, and calls again.
 

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -135,7 +135,19 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 0fcdb7b363f6adcbee23eb4d66d467e0d41b73a2
+    hash_after: 0fcdb7b363f6adcbee23eb4d66d467e0d41b73a2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 69 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-warning-has-fallback.md:39:1: Sentence: A sentence holds 25 words. Cut this one in two."
 group: the-gates-read-the-state
+reason: done
 ---
 
 # Ask
@@ -341,11 +353,15 @@ Three cases fail on their own assertion: the restart with a row id, the restart 
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/answer-door.test.js test/level0/answer.test.js test/level0/read-tools.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -353,11 +369,28 @@ Three cases fail on their own assertion: the restart with a row id, the restart 
 
 <!-- the form is text -->
 
+A prompt's demand now keys on the prompt itself, so a text from before it pays nothing after a restart.
+
+| what changes | why |
+|---|---|
+| the bridgehead posts the newest row's id at `prompt.submit`, and the rows with their ids on a hold | the door finds the prompt's own row, and counts a text past it alone |
+| a transcript carrying no ids pays a prompt nothing once a restart empties the spoken text | a transcript flushed late hands no older text over |
+| `onPromptSubmit` answers the prompt with its text opening on the `warns` line | the answer-first line rides the prompt's own event |
+| `speaks` owns every write of the spoken text, with its stamp | one writer, so the stamp stands beside every write |
+
+The same-message line stands open. It waits on `./RUNME.sh probe reply`, which needs a client loading function hooks, and this box loads none. The note `the-probe-reads-the-reply` carries it to the retro. The review's three findings stand as their own tickets.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the answer door, the bridgehead, their three test files and the design output the ask names
+- every door the change reaches has a fake: the clock, the log and the session's messages
+- each new function opens on a comment naming this ticket
+- the key rule stands in `level0.md` once, and the code comments point at this ticket
+- the review's first finding holds in the change, and its other two stand as their own tickets
 
 # Discussion
 
