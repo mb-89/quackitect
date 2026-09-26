@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 63693613eded · claude-code-remote
     hash_before: 4169c93d5e870e18bcf91d890d1344121637df30
     hash_after: 579cd341afd2da826980f9523f3cdd2ad2dfd3d9
+  - step: design/review
+    hand: box 63693613eded · claude-code-remote · helper-2
+    hash_before: 96b89b6f57867404aef0c0918b36c1be60ab4f4e
+    hash_after: 96b89b6f57867404aef0c0918b36c1be60ab4f4e
 ---
 
 # Ask
@@ -212,6 +216,12 @@ The mark reads meet one limit. `lib/marks.js` and `MARKS` in `lib/runs.js` stand
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- the-judge-waits-on-true: `judged` in `.claude/skills/level0/hooks/pull-tool.js` still stops on false alone. The first ask line stays unmet, and its case stands `todo`. The owner writes `judge.enabled !== true` there, and the case turns on.
+- the-mark-library-leaves: `lib/marks.js` and `MARKS` in `lib/runs.js` stand under `.claude`. Their one reader is `test/level0/apply.test.js`. The owner takes them out with those cases, because a note saying they wait names no reader.
+- a-closed-ticket-takes-writes: the write door reads the whole ticket schema. A write to a closed ticket carrying `when: returned` meets `when reads returned`. The door reads a closed ticket the way `pastHistory` in `src/bridge/findings.js` reads it.
 
 # implement
 
