@@ -76,13 +76,14 @@ step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [the-foundation-lands-unchanged]
+enabled_by: migration.phase2shadow
 ---
 
 # Ask
 
 Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the pilot. The cloud marker, the tickets topic, the queue, and `work/open-tasks`, computed beside the chain that counts them today. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
 
-Done when the new path runs in shadow on `main`, and [[spec/tickets/open-tasks-may-switch]] stands ready for the owner.
+Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 
 # sync
 

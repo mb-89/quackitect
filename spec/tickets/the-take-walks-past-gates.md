@@ -31,7 +31,7 @@ process_hash: 9d7b26202041cf4d
 |---|---|
 | the smallest case | two free groups, the first waiting on a question open on `main`, and a take that claims nothing |
 | why it matters | a gate on one migration group held every other group in the tree up |
-| where a stranger acts | `take` in `src/scripts/work.js`, and [[spec/design_output/work#the-owner-opens-the-gate]] |
+| where a stranger acts | `take` in `src/scripts/work.js`, and [[spec/design_output/work#the-take-writes-the-record]] |
 
 The fix lands with this note. The take reads each free group in turn and claims the first holding a step a hand takes. The cases stand in `test/level0/work-gate.test.js`.
 

@@ -75,12 +75,13 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [open-tasks-land-in-shadow, open-tasks-may-switch]
+depends_on: [open-tasks-land-in-shadow]
+enabled_by: migration.phase2switch
 ---
 
 # Ask
 
-Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration` moves to `new`, and the old path leaves the tree. The group waits for the owner's go on [[spec/tickets/open-tasks-may-switch]].
+Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase2switch` to read true in the tracked config on `main`.
 
 Done when the badge and the work tab's brackets read one name.
 

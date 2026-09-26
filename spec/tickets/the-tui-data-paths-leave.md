@@ -78,12 +78,11 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: tui-shell-switches-over
-depends_on: [tui-shell-may-switch, tui-shell-lands-in-shadow]
 ---
 
 # Ask
 
-`migration.window` moves to `new`, and the window's own index client, its spawns and its own writes leave the tree.
+`slices.window` moves to `new`, and the window's own index client, its spawns and its own writes leave the tree.
 
 The window stops computing a second copy of any value.
 

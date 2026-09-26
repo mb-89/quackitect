@@ -76,6 +76,7 @@ step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [module-processes-switch-over]
+enabled_by: migration.phase10
 ---
 
 # Ask

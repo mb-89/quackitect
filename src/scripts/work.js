@@ -67,7 +67,7 @@ import {
   sync,
   TODO,
   textAt,
-  waitingOn,
+  waitsOf,
   workBranchHere,
 } from "./work-stands.js";
 
@@ -247,9 +247,7 @@ function take(it, name = "") {
   if (!free.length) {
     console.log(`Every branch at ${TODO} waits for another. Nothing to take.`);
     for (const one of open) {
-      console.log(
-        `  ${one.branch} waits for ${waitingOn(one.ticket, standing).join(", ")}`,
-      );
+      console.log(`  ${one.branch} waits for ${waitsOf(one, standing).join(", ")}`);
     }
     return 0;
   }
@@ -261,7 +259,7 @@ function take(it, name = "") {
       a.branch.localeCompare(b.branch),
   );
 
-  // A group nothing here takes stands aside, and the take reads the next, so one gate holds no other work up. [[spec/design_output/work#the-owner-opens-the-gate]]
+  // A group nothing here takes stands aside, and the take reads the next, so one gate holds no other work up. [[spec/design_output/work#the-take-writes-the-record]]
   for (const one of wanted) {
     // The reset under onBranch lands on the branch this take picks, so that branch meets the same read as the one the box stands on. [[spec/design_output/work#a-branch-moves-clean]]
     if (dirty(it, one.branch)) return 2;

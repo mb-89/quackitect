@@ -264,6 +264,10 @@ frontmatter:
       type: [array, string]
       description: the tickets this one waits for, a list or one line of names
 
+    enabled_by:
+      type: string
+      description: the config key a group waits on, which the tracked file on main turns on with true
+
     successors:
       type: [array, string]
       description: the tickets this one became, on reason became

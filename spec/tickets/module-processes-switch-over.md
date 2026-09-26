@@ -75,12 +75,13 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [module-processes-land-in-shadow, module-processes-may-switch]
+depends_on: [module-processes-land-in-shadow]
+enabled_by: migration.phase9switch
 ---
 
 # Ask
 
-Phase 9 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration` moves to `new`, and the old path leaves the tree. The group waits for the owner's go on [[spec/tickets/module-processes-may-switch]].
+Phase 9 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase9switch` to read true in the tracked config on `main`.
 
 Done when a crash in one part leaves the others running, and raises an alarm.
 

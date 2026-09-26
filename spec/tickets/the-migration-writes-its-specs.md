@@ -75,6 +75,7 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
+enabled_by: migration.phase0
 ---
 
 # Ask

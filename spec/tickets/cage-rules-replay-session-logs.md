@@ -78,7 +78,7 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: go-cage-lands-in-shadow
-depends_on: [the-hooks-door-lands, quack-verbs-switch-over]
+depends_on: [the-hooks-door-lands]
 ---
 
 # Ask

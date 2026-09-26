@@ -78,7 +78,7 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: tui-shell-lands-in-shadow
-depends_on: [the-tui-becomes-a-shell, go-cage-switches-over]
+depends_on: [the-tui-becomes-a-shell]
 ---
 
 # Ask

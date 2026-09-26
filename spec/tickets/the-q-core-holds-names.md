@@ -78,7 +78,7 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
-depends_on: [go-code-shares-one-module, the-migration-writes-its-specs]
+depends_on: [go-code-shares-one-module]
 ---
 
 # Ask

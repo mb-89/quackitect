@@ -78,12 +78,12 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: quack-verbs-land-in-shadow
-depends_on: [the-quack-cli-gets-generated, read-topics-switch-over]
+depends_on: [the-quack-cli-gets-generated]
 ---
 
 # Ask
 
-`./RUNME.sh` hands a verb `quack` knows to it, and every other verb to `cli.js`. The key `migration.verbs` holds the road.
+`./RUNME.sh` hands a verb `quack` knows to it, and every other verb to `cli.js`. The key `slices.verbs` holds the road.
 
 The old verbs keep working while each topic ports.
 
