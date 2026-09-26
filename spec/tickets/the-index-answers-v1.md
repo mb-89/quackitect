@@ -103,11 +103,36 @@ Every surface after this one reads names over `/v1`. The old API stays, so nothi
 
 <!-- the form is text -->
 
+The door puts up a second listener, and Huma answers `/v1` on it off the store the files topic gives the door. The old API stands on its own port, unchanged. The routes stand in [[spec/design_output/surfaces]].
+
+| the part | what it holds |
+|---|---|
+| the module | `github.com/danielgtaylor/huma/v2` at `v2.36.0`, the last release whose `go` line reads Go 1.24 |
+| the adapter | `humago`, over the router `net/http` holds, with the prefix `/v1` |
+| `GET /v1/values/{name...}` | the value of a name at the latest revision, with that revision, or a problem answer where the catalog lacks the name |
+| `/v1/openapi.json` and `/docs` | what Huma writes off the routes |
+| the standing file | a field `v1` beside `port`, naming the new port |
+
+- A scratch module builds Huma `v2.36.0` on Go 1.24 here, and serves `/v1/values/files/a/b.md` and `/v1/openapi.json`.
+- The value answers as JSON, typed `any` in this slice. A typed schema per name waits for the registry, since a name's type stands in the catalog alone.
+- The actions and the watch stream wait for `q.Action` and the SSE door.
+- `Serve` answers the second listener beside the first, and `stop` closes both.
+
+This ticket stands on `files-topic-reads-the-rows`, which puts the store in the door.
+
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/index/door.go` `Serve`, which puts up the second listener
+- `src/index/door.go` `stands`, which writes the field `v1`
+- `src/index/main.go` `Standing`, which gains `V1`
+- `src/index/main.go` `serves`, which reads what `Serve` answers
+- `src/index/door_test.go`, each case calling `Serve`
+- `go.mod` and `go.sum`, which gain Huma
 
 ### tests
 
@@ -115,17 +140,29 @@ Every surface after this one reads names over `/v1`. The old API stays, so nothi
 
 <!-- the form is list -->
 
+- `src/index/v1_test.go` `TestOneIndexAnswersAFileOverV1AndTheOldAPI`, deciding the second done line
+- `src/index/v1_test.go` `TestV1AnswersANameTheCatalogLacksWithAProblem`
+- `src/index/v1_test.go` `TestV1WritesItsOpenAPIDocument`
+- `go test ./...` from the root, deciding the first done line
+- `./RUNME.sh check`, deciding the third
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `Serve`, `stands`, `Standing` and `serves` stand opened, and a scratch module proves the Huma release
+- a search for `Serve(` and `Standing{` names no caller beyond the list
+- each done line names its test in the tests list
 
 ## review
 
