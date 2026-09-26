@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ step: do
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-migration-writes-its-specs
+record:
+  - step: do
+    hand: box d7a540d981d5 · claude-code-remote
+    hash_before: dfa1e8c7e6527e7506cc260ceb7f67149a4b9902
+    hash_after: ea84ce6fe55af5eb311008d0e072fd4429bb0a5b
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-hook-protocol-gets-specified.md:59:1: ListItem: A sentence in a list item holds 20 words, and this one "
+reason: done
 ---
 
 # Ask
