@@ -314,11 +314,12 @@ export function renameHere(argv) {
     );
     return 2;
   }
-  const it = { disk: files, join, root, git: git(outside, root) };
+  // The clock names the journal entry the move writes. [[spec/tickets/journal-the-rename-verb]]
+  const here = { disk: files, join, root, git: git(outside, root), clock: it.clock };
   // A module's name stands as no path, so `--text` rewrites it and moves nothing. [[spec/design_output/index#a-rename-reaches-a-name]]
   const said = argv.includes("--text")
-    ? renamingText(it, from, to)
-    : renaming(it, from, to);
+    ? renamingText(here, from, to)
+    : renaming(here, from, to);
   if (said.why) {
     console.error(said.why);
     return 1;
