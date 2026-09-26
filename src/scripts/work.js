@@ -210,6 +210,18 @@ function take(it, name = "") {
 
   // A take acts on the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
   it.git.fetch();
+  // [[spec/design_output/work#the-take-writes-the-record]]
+  const mine = heldHere(it);
+  if (mine) {
+    console.log(`You already hold ${mine.branch}, so the take hands its ask again.`);
+    if (name && `${WORK_BRANCH}${name}` !== mine.branch) {
+      console.log(
+        `The take names ${WORK_BRANCH}${name}, and one branch a session keeps this box on ${mine.branch}.`,
+      );
+    }
+    brief(mine.branch, mine.name, mine.hand, mine.text);
+    return 0;
+  }
   const stand = standOf(it);
   const standing = standingAll(stand);
   const open = stand.filter((one) => standing.get(one.branch) === TODO);
@@ -353,16 +365,41 @@ function claimGroup(it, one) {
     return 1;
   }
 
+  // [[spec/design_output/work#the-take-writes-the-record]]
   if (sync(it) === 1) {
-    console.error(`Resolve the conflict on ${one.branch}, then read the group again.`);
+    console.error(
+      `Resolve the conflict on ${one.branch} and commit it, then work the ask below.`,
+    );
+    brief(one.branch, one.name, hand, was);
     return 1;
   }
 
-  console.log(`You are on ${one.branch}, and ${hand} holds it.`);
-  console.log(`Its tickets stand in ${TICKETS}, and ${at} is the group itself.`);
-  console.log(`Run ./RUNME.sh branch done when the last of them closes.\n`);
-  console.log(askOf(was));
+  brief(one.branch, one.name, hand, was);
   return 0;
+}
+
+// [[spec/design_output/work#the-take-writes-the-record]]
+function brief(branch, name, hand, text) {
+  console.log(`You are on ${branch}, and ${hand} holds it.`);
+  console.log(
+    `Its tickets stand in ${TICKETS}, and ${ticketAt(name)} is the group itself.`,
+  );
+  console.log(`Run ./RUNME.sh branch done when the last of them closes.\n`);
+  console.log(askOf(text));
+}
+
+// [[spec/design_output/work#the-take-writes-the-record]]
+function heldHere(it) {
+  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  if (!branch?.startsWith(WORK_BRANCH)) return null;
+  const name = ticketNamed(branch);
+  const path = it.join(it.root, ticketAt(name));
+  if (!it.disk.exists(path)) return null;
+  const text = it.disk.read(path);
+  const held = heldIn(text);
+  if (!held) return null;
+  const hand = handOf(it);
+  return held.hand === roleOf(hand) ? { branch, name, hand, text } : null;
 }
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
