@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: each-thing-stands-in-place
 parent: the-retro-finishes-its-asks
+record:
+  - step: do
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 6aa33efbe4d35d67c3e100985660f6655611d166
+    hash_after: 6aa33efbe4d35d67c3e100985660f6655611d166
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 16 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ parent: the-retro-finishes-its-asks
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/retro-collect.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,23 @@ parent: the-retro-finishes-its-asks
 
 <!-- the form is text -->
 
+The parent's change commit `c38a7232` fixes this, so this step lands no code.
+
+- `collect` in `src/scripts/retro-collect.js` hands `outsideInto` both `since` and `window`
+- `since` decides which files copy, and `--again` sets it to this retro's own collect
+- `window` is `sinceLast`, so `withinWindow` cuts every transcript at the last retro's collect
+- a changed transcript then copies whole again, holding the lines the first pass takes and the lines past them
+- the case "a second pass keeps the lines the first pass takes, and adds the lines past it" decides it
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change follows the ask, or the discussion says why it departs: the second pass cuts at `sinceLast`
+- [x] the cleanup the change reveals is in the change, or is a note of its own: none stands
+- [x] every fact the change adds stands in one place, and a note points at the file instead of repeating it: yes
 
 # Discussion
 
