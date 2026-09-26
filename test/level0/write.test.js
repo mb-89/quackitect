@@ -300,6 +300,32 @@ test("an Edit changing engine fields alone comes back refused, naming them, beca
   assert.match(said?.result?.deny ?? "", /state/);
 });
 
+// The door reads a closed ticket as history, the way the check reads it. [[spec/tickets/a-closed-ticket-takes-writes]]
+test("a Discussion line on a closed ticket carrying when returned lands, and the same line on an open one comes back refused", async () => {
+  const returned = GOOD.replace(
+    "    to: retro\n",
+    "    to: retro\n    when: returned\n",
+  );
+  const at = join(WORK, "spec", "tickets", "old.md");
+  const line = () => ({
+    tool: "Edit",
+    file_path: at,
+    old_string: "# Discussion\n",
+    new_string: "# Discussion\n\n- A line of history.\n",
+  });
+
+  const closed = returned.replace("state: open", "state: closed");
+  const landed = await onWrite(line(), box({ [at]: closed }));
+  assert.equal(landed?.result?.deny, undefined, "the closed ticket takes the line");
+
+  const refused_ = await onWrite(line(), box({ [at]: returned }));
+  assert.match(
+    refused_?.result?.deny ?? "",
+    /returned/,
+    "the open ticket meets the schema",
+  );
+});
+
 // A governed folder holds its own kind alone, so a page or a picture written there comes back refused. [[spec/tickets/each-folder-holds-its-kind]]
 test("a screenshot written under spec/tickets comes back refused, naming the ticket kind", async () => {
   const said = await onWrite(

@@ -45,6 +45,7 @@ import {
 } from "../engine/group.js";
 import { toolRefusal } from "../engine/named.js";
 import { codeDoor } from "./code.js";
+import { standsClosed } from "./findings.js";
 import { marksStale, ownerDoor } from "./projection.js";
 import { readsProse } from "./prose.js";
 
@@ -170,7 +171,8 @@ function schemaDoor(e, writing, where, box) {
   if (!box.schemas) box.schemas = schemasHere(box.disk, box.method);
   const schemas = box.schemas;
   // [[spec/tickets/each-folder-holds-its-kind]]
-  if (!where.endsWith(".md")) return strangerFile(e, where, governorOf(schemas, where), box);
+  if (!where.endsWith(".md"))
+    return strangerFile(e, where, governorOf(schemas, where), box);
   const whole = wholeAfter(e, writing, box.disk);
   const kind = kindOf(whole);
 
@@ -186,7 +188,9 @@ function schemaDoor(e, writing, where, box) {
   }
 
   const schema = schemas.get(kind);
-  const found = schema ? checkNote(whole, schema, where, schemas) : [];
+  // [[spec/tickets/a-closed-ticket-takes-writes]]
+  const history = standsClosed(textAt(box.disk, writing.path));
+  const found = schema && !history ? checkNote(whole, schema, where, schemas) : [];
   if (found.length) {
     box.log.say("warn", "schema", `refused ${found.length} line(s) in ${where}`, {
       file: where,
