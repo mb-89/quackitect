@@ -74,10 +74,15 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+step: design/review
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
+record:
+  - step: design/draft
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: bab88996cad2665b17b16d68f75a56c255689865
+    hash_after: bab88996cad2665b17b16d68f75a56c255689865
 ---
 
 # Ask
@@ -101,11 +106,24 @@ Some people work on Windows, and the cloud boxes run Linux. Without the job a Wi
 
 <!-- the form is text -->
 
+The check job in `.github/workflows/check.yml` runs over a matrix of two runners, `ubuntu-latest` and `windows-latest`, with `fail-fast: false`, so a fault on one still shows the other.
+
+| the step | on Windows |
+|---|---|
+| `./RUNME.sh check` | runs under `shell: bash`, the Git Bash every Windows runner carries, which the install reads as `MINGW` and so takes its Windows build |
+| the cache of `.se/bin` | keys on the runner's system as well as the pinned versions, so each system restores its own binaries |
+| the Go setup | reads the one `go.mod` at the root, which [[spec/tickets/go-code-shares-one-module]] leaves there |
+
+A fault the Windows run shows is this ticket's to fix, in the file it names, until both runs pass on the branch. The implement step reads the run through the GitHub tools.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `.github/workflows/check.yml` the `check` job, which GitHub runs on every push
+- `src/scripts/install.sh` the system case, which the Windows run reaches first
 
 ### tests
 
@@ -113,17 +131,27 @@ Some people work on Windows, and the cloud boxes run Linux. Without the job a Wi
 
 <!-- the form is list -->
 
+- `test/level0/check-workflow.test.js` "the check runs on a Linux runner and a Windows runner", deciding the runner half
+- the Windows run of the check workflow on the branch, read through the GitHub tools, which decides its second half
+- `./RUNME.sh check`, which decides the second done line
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the workflow, `RUNME.sh` and the system case of the install stand opened
+- a search for `workflows` and `check.yml` over the tree names no other reader of the workflow
+- each done line names its test in the tests list
 
 ## review
 
