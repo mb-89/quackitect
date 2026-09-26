@@ -108,6 +108,9 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box d7a4b8aac9106 · claude-code-remote
+    hash_before: 741fe98f17f5cbe1c1428d0ae3db5068f491bfe8
 ---
 
 # Ask
