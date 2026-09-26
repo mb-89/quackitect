@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box b8ae1b45d463 · claude-code-remote · helper-2
     hash_before: f2330c34b75330c43f20d68f9cc0270974b351a8
     hash_after: f2330c34b75330c43f20d68f9cc0270974b351a8
+  - step: implement/tests-red
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 3e0ed594d0ef54180b7f3bdae2fddc06ea52987c
+    hash_after: 3e0ed594d0ef54180b7f3bdae2fddc06ea52987c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 11 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -215,17 +223,36 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/fix.test.js test/level0/ticket-verb.test.js test/level0/pull-findings.test.js test/level0/bash.test.js test/level0/work-group.test.js test/level0/unblock.test.js test/level0/review.test.js test/contract/tree.test.js src/lsp
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Eleven node cases and the Go case fail on their own assertion, and the rest stand green:
+
+- `fix` reads no flag, so `fixFlags` stands nowhere and the refusal and the usage cases fail
+- the cap refusals in `ticket.js`, `pull-chapter.js` and `bash.js` say a name holds the cap, with no `at most`
+- the take prints `waits for a anyone`, and its headline says every open step waits for a person
+- `waitsAt` stands unexported, so the person half reads it through `import * as`
+- `verdictIn` joins each table row with `; `, so `unblock` writes each row as a list item
+- `BORROWED` holds no `src/extension/webview/node_modules`, so the worktree's check meets none
+- `namesTheBinaries` in Go and in `servers.js` refuse `.se/.runtime/bin/vale.exe`
+- the surprise: the fail's frontmatter keeps the `\n` escape whole, so `verdictIn` alone needs the change
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: the tests touch the files the design names. `cli.js` stands as the dispatch the ask's `fix` line needs.
+- [x] every door the change reaches has a fake: the cases run on `fakeGit` and `fakeDisk`. The `fix` cases hold the process door's `run`.
+- [x] a comment names the approach the change implements: each new case carries `[[spec/tickets/the-small-faults-land]]`.
+- [x] every fact the change adds stands in one place, and a note points at the file instead of repeating it: the cases read the cap off the fixture.
+- [x] every row the design review passes with stands fixed in the change: the `fix` cases read `fixFlags`. A call naming no path reads the tree. The Vale cases stand in `tree_test.go` and `test/contract/tree.test.js`. The contract case pins the tracked string.
 
 ## change
 

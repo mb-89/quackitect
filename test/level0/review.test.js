@@ -186,6 +186,23 @@ test("the worktree borrows the caller's modules and compiler, and gives them bac
   }
 });
 
+// The webview builds off packages of its own, so the worktree's check meets them too. [[spec/tickets/the-small-faults-land]]
+test("the worktree borrows the webview's modules, and gives them back before git removes it", () => {
+  const rel = "src/extension/webview/node_modules";
+  const { it, disk } = doorsSaying(standing(), { [join(ROOT, rel, "held")]: "" });
+  let seen = false;
+  it.proc.teach(["/node", "src/scripts/cli.js", "check"], () => {
+    seen = disk.realOf(join(AT, rel)) === disk.realOf(join(ROOT, rel));
+    return { exitCode: 0 };
+  });
+
+  heard(() => work(ROOT, ["review", NAME, "--json"], it));
+
+  assert.equal(seen, true, "the check runs on the caller's webview modules");
+  assert.equal(disk.isLink(join(AT, rel)), false, "the link leaves with the worktree");
+  assert.equal(disk.exists(join(ROOT, rel, "held")), true, "the caller's modules stand");
+});
+
 test("the worktree borrows nothing out of the caller's bin but the compiler", () => {
   const { it, disk } = doorsSaying(standing(), { [join(ROOT, BIN, "logview")]: "" });
   let linked = true;

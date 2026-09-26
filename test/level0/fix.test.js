@@ -1,7 +1,9 @@
 // The fixer, tested. Run with: ./RUNME.sh test
 //
-// The span rewriting is pure, and it is what stands here. The cases that drive
-// `vale fix --apply` over a real file stand in test/contract.
+// The span rewriting is pure, and it stands here with the verb's reading of its
+// flags. The cases that drive `vale fix --apply` over a real file stand in
+// test/contract.
+// [[spec/tickets/the-small-faults-land]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -10,6 +12,50 @@ import {
   SHOUTED,
   sentenceCase,
 } from "../../.claude/skills/level0/lib/shout.js";
+import * as check from "../../src/scripts/cli-check.js";
+import { outside } from "../../src/scripts/cli-doors.js";
+
+// The verb's lines and every spawn it asks for, held so a case reads both back and nothing runs. [[spec/tickets/the-small-faults-land]]
+async function ranFix(argv) {
+  const lines = [];
+  const spawned = [];
+  const was = { log: console.log, error: console.error, run: outside.run };
+  console.log = (...said) => lines.push(said.join(" "));
+  console.error = (...said) => lines.push(said.join(" "));
+  outside.run = (argv) => {
+    spawned.push(argv.join(" "));
+    return { exitCode: 0, stdout: "", stderr: "" };
+  };
+  try {
+    return { code: await check.fix(argv), said: lines.join("\n"), spawned };
+  } finally {
+    Object.assign(console, { log: was.log, error: was.error });
+    outside.run = was.run;
+  }
+}
+
+// [[spec/tickets/the-small-faults-land]]
+test("fix refuses an unknown flag, and runs nothing over the tree", async () => {
+  assert.equal(typeof check.fixFlags, "function", "cli-check.js reads the flags first");
+  const { code, said, spawned } = await ranFix(["--apply-everything"]);
+  assert.equal(code, 2, said);
+  assert.match(said, /fix knows no flag --apply-everything/);
+  assert.deepEqual(spawned, [], "nothing runs over the tree");
+  assert.deepEqual(check.fixFlags(["--apply-everything", "src"]).unknown, [
+    "--apply-everything",
+  ]);
+});
+
+// [[spec/tickets/the-small-faults-land]]
+test("fix answers --help with its usage", async () => {
+  assert.equal(typeof check.fixFlags, "function", "cli-check.js reads the flags first");
+  const { code, said, spawned } = await ranFix(["--help"]);
+  assert.equal(code, 0, said);
+  assert.match(said, /^Usage: \.\/RUNME\.sh fix \[path \.\.\.\]/m);
+  assert.deepEqual(spawned, [], "nothing runs over the tree");
+  assert.deepEqual(check.fixFlags([]).paths, ["."], "no path reads as the tree");
+  assert.deepEqual(check.fixFlags(["src", "spec"]).paths, ["src", "spec"]);
+});
 
 test("sentence case keeps what stands before the first letter", () => {
   assert.equal(sentenceCase("NOTHING AT ALL, yes"), "Nothing at all, yes");

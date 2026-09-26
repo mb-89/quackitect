@@ -290,6 +290,12 @@ test("a branch cut past the cap is refused, and one inside it passes", () => {
   assert.deepEqual(rules("git checkout main"), []);
 });
 
+// The cap is a ceiling, so the refusal says so. [[spec/tickets/the-small-faults-land]]
+test("the branch refusal says a name holds at most the cap", () => {
+  const [said] = findings("git switch -c a-name-that-runs-past-the-cap", 5);
+  assert.match(said.message, /A name holds at most 5 words, and a-name-that-runs-past-the-cap holds more/);
+});
+
 // [[spec/design_output/bash#a-test-run-points-somewhere]]
 test("a whole-suite run is refused, and a run naming one file passes", () => {
   for (const said of ["node --test", "npm test", "npm run test", "pnpm test"]) {

@@ -61,6 +61,22 @@ func TestSettingsNameTheBinaries(t *testing.T) {
 	}
 }
 
+// The install writes vale.exe on Windows, so the rule takes both names, and the tracked settings keep the plain one. [[spec/tickets/the-small-faults-land]]
+func TestSettingsTakeTheValeTheInstallWrites(t *testing.T) {
+	for _, path := range []string{".se/.runtime/bin/vale", ".se/.runtime/bin/vale.exe"} {
+		tree := wholeTree(t, map[string]string{
+			Settings: strings.Replace(goodSettings, `".se/.runtime/bin/vale"`, `"`+path+`"`, 1),
+		})
+		if found := settingsNameBinaries(tree); len(found) != 0 {
+			t.Errorf("%s answers %v", path, found)
+		}
+	}
+	tree := wholeTree(t, map[string]string{
+		Settings: strings.Replace(goodSettings, `".se/.runtime/bin/vale"`, `".se/.runtime/bin/vale.cmd"`, 1),
+	})
+	onlyOne(t, settingsNameBinaries(tree), "SettingsNameBinaries")
+}
+
 func TestTheInstallScriptWritesWhatTheSettingsRun(t *testing.T) {
 	tree := wholeTree(t, map[string]string{Install: "here() {\n  case $1 in\n    node) have node ;;\n  esac\n}\n"})
 	found := settingsNameBinaries(tree)

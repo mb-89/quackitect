@@ -276,6 +276,16 @@ test("ticket note takes a name and a line, and refuses a note standing already",
   assert.match(twice.said, /stands already/);
 });
 
+// The cap is a ceiling, so a name under it lands too. [[spec/tickets/the-small-faults-land]]
+test("ticket note refuses a name past the cap, and says a name holds at most the cap", () => {
+  const said = treeWithProcesses();
+  const long = "one-two-three-four-five-six";
+  const refused = heard(() => ticket(ROOT, ["note", long, "A line."], said.it));
+  assert.equal(refused.code, 2);
+  assert.match(refused.said, /A ticket name holds at most 5 words, and one-two-three-four-five-six holds more/);
+  assert.equal(said.disk.exists(at(`${NOTES}/${long}.md`)), false, "no note lands");
+});
+
 // The note reads its minted text through the lint's road, and a break of form warns while the note lands. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 test("ticket note writes a line the lint warns on, and names Characters at its line", () => {
   const VALE = "/tree/.se/.runtime/bin/vale";
