@@ -4,6 +4,7 @@
 // [[spec/design_output/stop#a-standing-stop-ends-it]]
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { STOP_CALL } from "../../.claude/skills/level0/lib/stop.js";
@@ -137,6 +138,53 @@ test("four stop lines over a queue holding work: three hold, the fourth ends, an
   const last = it.said.filter((row) => row[1] === "stop").at(-1);
   assert.equal(last[0], "warn", "the runaway writes at warn");
   assert.match(last[2], /the turn ends: the tooth lets go after 3 holds in a row/);
+});
+
+// The group rule as the tree writes it, so the hold a case reads is the one a box reads. [[spec/design_output/stop#three-in-a-row]]
+const LEVEL1 = readFileSync(
+  new URL("../../spec/config/stop/level1.yml", import.meta.url),
+  "utf8",
+);
+const HELD_GROUP =
+  "---\nkind: [[ticket]]\nstate: open\nprocess: [[spec/processes/group]]\nrecord:\n  - hash_before: abc123\n---\n\n# Ask\n\nA group.\n";
+
+function holdingGroup(env) {
+  const it = box({
+    [at("spec/config/stop/level1.yml")]: LEVEL1,
+    [at("spec/tickets/a-group.md")]: HELD_GROUP,
+  });
+  it.box.env = env;
+  it.box.proc = fakeProc({
+    "git rev-parse --abbrev-ref HEAD": { stdout: "work/a-group\n" },
+  });
+  return it;
+}
+
+// A cloud box ends only with its branch handed back, so the cap frees none holding a group. [[spec/design_output/stop#three-in-a-row]]
+test("a cloud box holding a group holds past the cap, and the hold names branch done", () => {
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+  const it = holdingGroup({ CLAUDE_CODE_REMOTE: "true" });
+  const carried = [];
+  for (let turn = 0; turn < 5; turn++) carried.push(onStop(done, it.box));
+  assert.deepEqual(
+    carried.map((one) => one.pass === true),
+    [false, false, false, false, false],
+    "the fourth hold and the fifth still hold",
+  );
+  assert.match(carried[3].result.block, /\.\/RUNME\.sh branch done/);
+});
+
+// [[spec/design_output/stop#three-in-a-row]]
+test("a desk holding a group ends at the cap as before", () => {
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+  const it = holdingGroup({});
+  const carried = [];
+  for (let turn = 0; turn < 4; turn++) carried.push(onStop(done, it.box));
+  assert.deepEqual(
+    carried.map((one) => one.pass === true),
+    [false, false, false, true],
+  );
+  assert.match(carried[0].result.block, /This box holds a group/);
 });
 
 test("a standing stop line ends the turn, and nothing prompts after it", () => {
