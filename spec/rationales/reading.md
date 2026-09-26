@@ -48,3 +48,12 @@ A script a hand writes ad hoc is a sign of a missing verb or a missing rule.
 The retro reads each one and decides where it goes. It climbs toward the
 official scripts or the engine, or the guidance changes so no hand needs it
 again.
+
+## 10. The group chapters
+
+A cloud box works a group on its branch, and its transcript stays on the box,
+since a transcript carries the names the private half keeps home. The group's
+`retro` chapter is the box's own account, and it lands on trunk with the
+merge. `retro collect` writes each one under `input/groups`, and the close of
+the trunk commit landing it. The reader whose hours hold that close reads it
+beside the desk's lines, so the cloud's work reaches one column once.

@@ -7,9 +7,13 @@
 
 import { LOG, PRIVATE, RETRO } from "../../.claude/skills/level0/lib/folders.js";
 import { STAMP, saysGreen, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import { readNote } from "../../.claude/skills/level0/lib/schema.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { CLOSED, NOTE_END, TICKETS, fieldOf, isGroup, ticketNamed } from "../engine/group.js";
 import { BATTERY } from "../engine/retro/effect.js";
 import { medianParts } from "./battery.js";
 import { holdsAnywhere } from "./guidance-hand.js";
+import { chapterEnd, lines } from "./pull-chapter.js";
 import { copyTree, outsideInto } from "./retro-outside.js";
 
 const INPUT = "input";
@@ -22,6 +26,14 @@ const DRAINED = LOG.split("/").at(-1);
 const DRAINED_INTO = "log";
 // The folder collect copies and leaves in place, since the classify step runs the generators a hand keeps there. [[spec/tickets/the-retro-finishes-its-asks]]
 const KEPT = ["scripts"];
+// The folder a group's own retro chapter lands in, beside the file of the closes. [[spec/tickets/the-retro-reads-cloud-retros]]
+const GROUPS = "groups";
+const CLOSES = "closed.json";
+// The chapter a group ticket holds its box's retro under, as its route names the step. [[spec/tickets/the-retro-reads-cloud-retros]]
+const RETRO_CHAPTER = "retro";
+// A log row opening a commit carries this mark, so a ticket path never reads as one. [[spec/tickets/the-retro-reads-cloud-retros]]
+const COMMIT_MARK = "@";
+const COMMENT = /^\s*<!--.*-->\s*$/;
 // The column a source name fills, so the counts stand in one line down the page. [[spec/guidance/retro/collect]]
 const SOURCE_WIDTH = 12;
 
@@ -78,7 +90,8 @@ export function collect(it, name, again = false) {
   const moved = movedInto(it, into);
   const kept = keptInto(it, into, again ? since : 0);
   const outside = outsideInto(it, into, since, window);
-  const refused = [...moved.refused, ...kept.refused, ...outside.refused];
+  const groups = cloudInto(it, into, since);
+  const refused = [...moved.refused, ...kept.refused, ...outside.refused, ...groups.refused];
 
   const rows = [...linesOf(it, into), ...refused];
   it.disk.write(
@@ -96,8 +109,95 @@ export function collect(it, name, again = false) {
   if (report) it.disk.write(it.join(home, BATTERY), `${JSON.stringify(report, null, 2)}\n`);
 
   said(name, counts, outside.folders, since);
+  for (const one of groups.bare) console.log(`  ${one} closes with no retro text, so it writes nothing.`);
   for (const one of refused) console.error(`  refused ${one.path}: ${one.refused}`);
   return stands(it) && !refused.length ? 0 : 1;
+}
+
+// Every group trunk takes closed since the window, its box's retro chapter and the time of the trunk commit landing it. The first-parent line reads the merge, so a group the box closes before the window and trunk takes after it still counts. [[spec/tickets/the-retro-reads-cloud-retros]]
+function cloudInto(it, into, since) {
+  const out = { refused: [], bare: [] };
+  const log = it.git.run(
+    [
+      "log",
+      TRUNK,
+      "--first-parent",
+      "--diff-merges=first-parent",
+      "-G",
+      `^state: ${CLOSED}`,
+      `--format=${COMMIT_MARK}%H %cI`,
+      "--name-only",
+      ...(since ? [`--since=${new Date(since).toISOString()}`] : []),
+      "--",
+      TICKETS,
+    ],
+    true,
+  );
+  if (!log.ok) {
+    out.refused.push({ path: GROUPS, refused: log.err || "git log" });
+    return out;
+  }
+  const at = it.join(into, GROUPS);
+  const closesAt = it.join(at, CLOSES);
+  const closes = parsed(read(it, closesAt)) ?? {};
+  let wrote = false;
+  for (const [name, landing] of landingsOf(log.out)) {
+    if (since && Date.parse(landing.at) < since) continue;
+    // A group the input holds already stays as the first pass takes it. [[spec/tickets/the-retro-reads-cloud-retros]]
+    if (it.disk.exists(it.join(at, `${name}${NOTE_END}`))) continue;
+    const path = `${TICKETS}/${name}${NOTE_END}`;
+    const shown = it.git.run(["show", `${landing.sha}:${path}`], true);
+    if (!shown.ok) {
+      out.refused.push({ path, refused: shown.err || "git show" });
+      continue;
+    }
+    if (!isGroup(shown.out) || fieldOf(shown.out, "state") !== CLOSED) continue;
+    const chapter = retroChapterOf(shown.out);
+    if (!chapter) {
+      out.bare.push(name);
+      continue;
+    }
+    it.disk.makeDir(at);
+    it.disk.write(it.join(at, `${name}${NOTE_END}`), chapter);
+    closes[name] = new Date(landing.at).toISOString();
+    wrote = true;
+  }
+  if (wrote) it.disk.write(closesAt, `${JSON.stringify(closes, null, 2)}\n`);
+  return out;
+}
+
+// The newest trunk commit naming each ticket, off a log of marked commit rows and the paths under each. [[spec/tickets/the-retro-reads-cloud-retros]]
+function landingsOf(said) {
+  const out = new Map();
+  let landing = null;
+  for (const row of String(said).split("\n")) {
+    const one = row.trim();
+    if (one.startsWith(COMMIT_MARK)) {
+      const [sha, at] = one.slice(COMMIT_MARK.length).split(" ");
+      landing = { sha, at };
+      continue;
+    }
+    if (!landing || !one.startsWith(`${TICKETS}/`) || !one.endsWith(NOTE_END)) continue;
+    const name = ticketNamed(one);
+    if (!out.has(name)) out.set(name, landing);
+  }
+  return out;
+}
+
+// The ticket's `retro` chapter with its headings, past its comments, or nothing where it holds no text. [[spec/tickets/the-retro-reads-cloud-retros]]
+function retroChapterOf(text) {
+  const sections = readNote(text).sections;
+  const found = sections.findIndex(
+    (one) => one.level === 1 && one.header === RETRO_CHAPTER,
+  );
+  if (found < 0) return "";
+  const rows = text.split(/\r?\n/);
+  const end = chapterEnd(sections, found, 1, rows.length);
+  const next = sections.findIndex((one, at) => at > found && one.level <= 1);
+  const inside = sections.slice(found, next < 0 ? sections.length : next);
+  if (!inside.some((one) => lines(one.own).length)) return "";
+  const kept = rows.slice(sections[found].line - 1, end).filter((row) => !COMMENT.test(row));
+  return `${kept.join("\n").trim()}\n`;
 }
 
 // The parts read as their median over the runs the stamp keeps, and the slowest cases and the files stay off the last run. [[spec/guidance/retro/effect]]
@@ -235,7 +335,7 @@ function linesOf(it, into, rel = "") {
 
 function sourceOf(path) {
   const top = path.split("/")[0];
-  return ["transcripts", "memory", "scratch"].includes(top) ? top : PRIVATE;
+  return ["transcripts", "memory", "scratch", GROUPS].includes(top) ? top : PRIVATE;
 }
 
 function countsOf(rows) {
