@@ -253,7 +253,7 @@ export function findings(command, most, it = {}) {
     if (!part) continue;
     out.push(
       row(said, "BranchNameHoldsFive", one, [
-        `A name holds ${most} words, and ${part} holds more. Cut it, or run`,
+        `A name holds at most ${most} words, and ${part} holds more. Cut it, or run`,
         "./RUNME.sh branch open <group>, which pushes the branch its group names.",
       ]),
     );

@@ -339,7 +339,7 @@ export function noteTextIn(added, notes) {
   return out;
 }
 
-// [[spec/design_output/private#two-doors-one-check]]
+// [[spec/design_output/private#both-doors-one-check]]
 export function privateIn(added, it = {}) {
   const mine = (added ?? []).filter((one) => reaches(one.file));
   if (!mine.length) return [];
@@ -350,7 +350,7 @@ export function privateIn(added, it = {}) {
   ];
 }
 
-// [[spec/design_output/private#two-doors-one-check]]
+// [[spec/design_output/private#both-doors-one-check]]
 export async function privateNow(reach) {
   const added = addedIn(await reach.diff());
   if (!added.length) return [];

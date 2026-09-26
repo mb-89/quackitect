@@ -255,7 +255,7 @@ func namesTheBinaries(said map[string]any) []binaryCheck {
 
 	return []binaryCheck{
 		{"vale.valeCLI.path", "The editor runs " + Bin + "/vale, which " + Install + " writes.",
-			asText(said["vale.valeCLI.path"]) == Bin+"/vale"},
+			valeNamed(asText(said["vale.valeCLI.path"]))},
 		{"vale.valeCLI.config", "The editor reads " + EditorIni + ", which turns on no style, so the panel draws Vale off the battery.",
 			asText(said["vale.valeCLI.config"]) == EditorIni},
 		{"vale.valeCLI.installVale", Install + " pins Vale, so the extension installs none of its own.",
@@ -264,6 +264,11 @@ func namesTheBinaries(said map[string]any) []binaryCheck {
 		{"biome.configurationPath", "Biome reads spec/config/biome.json, which this tree tracks.",
 			asText(said["biome.configurationPath"]) == "spec/config/biome.json"},
 	}
+}
+
+// The install writes vale.exe on Windows, so either name holds. [[spec/tickets/the-small-faults-land]]
+func valeNamed(path string) bool {
+	return path == Bin+"/vale" || path == Bin+"/vale.exe"
 }
 
 // [[spec/design_output/editor#what-the-editor-runs]]

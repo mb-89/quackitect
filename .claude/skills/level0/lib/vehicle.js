@@ -1,7 +1,7 @@
 // A vehicle, and the project it drives. A vehicle carries an identity, a
 // project names the vehicle driving it, and a register turns an identity
 // into a place, so either tree moves and the pair still holds.
-// [[spec/design_output/vehicle#three-things-a-vehicle-needs]]
+// [[spec/design_output/vehicle#what-a-vehicle-needs]]
 
 import { RUN } from "./folders.js";
 
@@ -16,7 +16,7 @@ export const MARKER = `${PLUGIN_FOLDER}/${MANIFEST}`;
 // [[spec/design_output/vehicle#what-travels-into-a-vehicle]]
 export const LEFT = [".git", ".se", "node_modules", "_to_delete"];
 
-// [[spec/design_output/vehicle#three-things-a-vehicle-needs]]
+// [[spec/design_output/vehicle#what-a-vehicle-needs]]
 export function identityOf(read, fresh, at) {
   const held = parsed(read);
   if (held?.id) return { record: held, made: false };

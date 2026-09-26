@@ -162,8 +162,8 @@ function movedOnTrunk(it, branch) {
   return out;
 }
 
-// [[spec/design_output/work#the-merge-frees-the-tickets]]
-function freeChildren(it, name) {
+// branch done frees them on the branch, and the merge frees what an older branch still holds. [[spec/design_output/work#the-merge-frees-the-tickets]]
+export function freeChildren(it, name) {
   const out = [];
   for (const one of childrenHere(it, name)) {
     if (fieldOf(one.text, "state") === CLOSED) continue;

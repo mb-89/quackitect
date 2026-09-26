@@ -68,7 +68,7 @@ function listAt(rows, cursor, indent, path) {
       out.push(scalar(rest));
       continue;
     }
-    const pair = PAIR.exec(rest);
+    const pair = quotedWhole(rest) ? null : PAIR.exec(rest);
     if (!pair) {
       out.push(scalar(rest));
       continue;
@@ -94,6 +94,25 @@ function listAt(rows, cursor, indent, path) {
     out.push(item);
   }
   return out;
+}
+
+// An item reads as quoted text where its closing quote stands last, so a colon inside stays text, and `"a": "b"` stays a pair. [[spec/tickets/the-quoted-pair-stays-paired]]
+export function quotedWhole(said) {
+  const quote = said[0];
+  if (quote !== '"' && quote !== "'") return false;
+  for (let at = 1; at < said.length; at += 1) {
+    if (quote === '"' && said[at] === "\\") {
+      at += 1;
+      continue;
+    }
+    if (said[at] !== quote) continue;
+    if (quote === "'" && said[at + 1] === "'") {
+      at += 1;
+      continue;
+    }
+    return at === said.length - 1;
+  }
+  return false;
 }
 
 function under(rows, cursor, indent, path) {

@@ -202,7 +202,7 @@ matches a whole word, and the case the box answers, so a git name of
 commits clean on a cloud box and names the owner on the owner's desk, which is
 where the leak starts.
 
-## Two doors, one check
+## Both doors, one check
 
 | the commit comes from | the door |
 |---|---|

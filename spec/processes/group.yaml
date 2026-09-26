@@ -56,6 +56,8 @@ steps:
           - every fact the change adds stands in one place, and a note points at the file instead of repeating it
           - every number the change adds carries a name in one place, and a copy a technical reason forces says so beside it
           - every header the change writes says what its file is for, and counts nothing
+          - the chapter carries the run's owner prompts and errors off the transcript, each with its time
+          - the chapter says the role, and carries no name, address or path of the box
         evidence:
           - name: done
             form: list
@@ -65,7 +67,7 @@ steps:
             says: what went well, and what made it go well
           - name: badly
             form: list
-            says: what did not, each with its moment in the log or the transcript
+            says: what did not go well, each error of the run and each owner prompt turning it, with its time
           - name: improve
             form: list
             says: how each bad line stops happening, named by its home

@@ -41,7 +41,7 @@ import {
 } from "../../.claude/skills/level0/lib/trunk.js";
 import { formIn, refusesIn, rowOf } from "../../.claude/skills/level0/lib/warnings.js";
 import { WORK_BRANCH } from "../engine/group.js";
-import { DESCRIPTION_HOW, ticketFault, ticketOf } from "../engine/named.js";
+import { DESCRIPTION_HOW, inHand, ticketFault, ticketOf } from "../engine/named.js";
 import { heldTests } from "../scripts/guidance-hand.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
@@ -82,6 +82,15 @@ export async function onPowerShell(e, box) {
 // [[spec/design_output/level0#a-shell-names-its-ticket]]
 function ticketDoor(command, e, box) {
   if (freeOfTicket(command)) return "";
+  // A description opening on the working todo's title and a colon names what stands in hand. [[spec/tickets/the-todo-joins-the-queue]]
+  const todo = inHand({ disk: box.disk, root: box.work }).todo;
+  if (
+    todo &&
+    String(e?.description ?? "")
+      .trim()
+      .startsWith(`${todo}:`)
+  )
+    return "";
   const fault = ticketFault(
     ticketOf(e?.description),
     { disk: box.disk, root: box.work },
@@ -243,7 +252,7 @@ export function messageNote(rows) {
   ].join("\n");
 }
 
-// [[spec/design_output/private#two-doors-one-check]]
+// [[spec/design_output/private#both-doors-one-check]]
 async function privateDelta(command, _e, box) {
   if (!commitIn(command)) return "";
   const found = await privateNow({

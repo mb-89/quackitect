@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import * as stop from "../../src/bridge/stop.js";
+import { opened } from "../../src/extension/lib/session.js";
 import * as route from "../../src/scripts/pull-route.js";
 import { probeOf, startOf } from "../../src/scripts/serve.js";
 import { pulling } from "../../src/scripts/work.js";
@@ -111,4 +112,19 @@ test("a pull at unbound hands nothing out, and names the road back", () => {
   assert.equal(code, 0);
   assert.match(said, /binds to unbound/);
   assert.match(said, /Name a ticket/);
+});
+
+// The binding holds until the owner changes it, so a new window carries it over. [[spec/tickets/the-window-keeps-the-binding]]
+test("a window opening under a new id keeps the binding and takes the rest", () => {
+  const text = JSON.stringify({
+    engine: { binding: "god" },
+    stop: { hold: "stop" },
+    session: { pid: 7 },
+  });
+  const said = opened(text, 42);
+  assert.deepEqual(said.cleared, ["stop.hold"]);
+  const kept = JSON.parse(said.text);
+  assert.equal(kept.engine.binding, "god");
+  assert.equal(kept.stop, undefined);
+  assert.equal(kept.session.pid, 42);
 });

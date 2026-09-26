@@ -24,7 +24,7 @@ document keeping its shape stands answered. For details, see
 [[spec/design_output/schema]]. Rule identity stays open, and this note holds
 the shapes for it. The owner weighs them, and none stands settled.
 
-# Two shapes stand open
+# The shapes standing open
 
 | shape | what moves | what it costs |
 |---|---|---|

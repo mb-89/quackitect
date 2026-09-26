@@ -110,3 +110,21 @@ test("PowerShell meets the same door, unnamed and named alike", async () => {
     "",
   );
 });
+
+// A description opening on the working todo's title and a colon names what stands in hand. [[spec/tickets/the-todo-joins-the-queue]]
+test("a description opening on the working todo's title and a colon passes", async () => {
+  const plan = {
+    [`${ROOT}/.se/.runtime/plan.json`]: JSON.stringify({
+      working: "fix the door",
+      todos: [],
+      places: {},
+    }),
+  };
+  const found = denied(
+    await onBash(
+      { command: "git status", description: "fix the door: read the state" },
+      box(plan),
+    ),
+  );
+  assert.equal(found, "");
+});

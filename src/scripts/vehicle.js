@@ -1,6 +1,6 @@
 // A vehicle, made and placed. The pure half decides, the disk
 // door writes, and a project keeps the identity of whatever drives it.
-// [[spec/design_output/vehicle#three-things-a-vehicle-needs]]
+// [[spec/design_output/vehicle#what-a-vehicle-needs]]
 
 import { dirname, join } from "node:path";
 import {

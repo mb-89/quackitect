@@ -16,7 +16,7 @@ steps:
         form: list
         says: every private note this step writes, one a line
   - name: collect
-    does: moves everything the private folder holds past its dot folders into the retro's input folder, and copies the transcripts, the memory and the scratchpads beside it
+    does: moves everything the private folder holds past its dot folders and .se/scripts into the retro's input folder, and copies .se/scripts, the transcripts, the memory and the scratchpads beside it
     by: anyone
     to: owner
     input: feedback
@@ -26,7 +26,7 @@ steps:
       - name: run
         form: command
         expects: 0
-        says: retro collect, which leaves the private folder holding .runtime and .retro alone
+        says: retro collect, which leaves the private folder holding .runtime, .retro and .se/scripts alone
   - name: effect
     does: counts the last retro's class patterns over this input, and says per class whether its failure still occurs and at what rate
     by: anyone
@@ -101,14 +101,34 @@ steps:
         expects: 0
         says: retro classes, which counts each rate and refuses a finding with no disposition
   - name: check
-    does: reads every class against the tree as it stands, closes the ones the tree answers already, and mints a ticket a class standing open
+    does: reads every class against the tree as it stands, closes the ones the tree answers already, writes each promotion its ticket, and draws the report again
     by: anyone
     to: owner
     input: classify
     needs: ["retro"]
     reads: [[spec/guidance/retro/check]]
     evidence:
+      - name: report
+        form: command
+        expects: 0
+        says: retro matrix, which draws the report the owner reads, each status and promotion in it
+  - name: report
+    does: the owner reads the report, and passes the classes and promotions to mint, or sends the check back
+    by: person
+    on_fail: check
+    input: check
+    evidence:
+      - name: verdict
+        form: verdict
+        says: pass once the report reads right, or fail with what the check changes, one a line
+  - name: mint
+    does: mints a ticket a class standing open and a promotion waiting, and opens each draft
+    by: anyone
+    input: report
+    needs: ["retro"]
+    reads: [[spec/guidance/retro/check]]
+    evidence:
       - name: minted
         form: command
         expects: 0
-        says: retro mint, which refuses a class carrying no status and mints the rest
+        says: retro mint, which refuses a class carrying no status or a promotion carrying no ticket, and mints the rest

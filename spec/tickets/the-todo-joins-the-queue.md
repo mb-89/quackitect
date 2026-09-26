@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-gates-read-the-state
 steps:
   - name: design
@@ -77,7 +77,22 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: implement/tests-red
+record:
+  - step: design/draft
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: dca9ecda9c149e96bb41fb38cab08cb656b52e60
+    hash_after: dca9ecda9c149e96bb41fb38cab08cb656b52e60
+  - step: design/review
+    hand: box c28a93a32b71 · claude-code-remote · helper-2
+    hash_before: 0cb281c6992cc2de6f32de6f89ba84c914ccfd74
+    hash_after: 0cb281c6992cc2de6f32de6f89ba84c914ccfd74
+  - step: implement/tests-red
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: f0ed3d606972fa3f01d77ed1a3e1005c47caee8d
+    hash_after: f0ed3d606972fa3f01d77ed1a3e1005c47caee8d
+    why: the-door-passes-ephemeral-holds answers this ask
+reason: answered
 ---
 
 # Ask
@@ -105,11 +120,27 @@ The write door takes any open ticket name as a pass and refuses a todo title. Th
 
 <!-- the form is text -->
 
+The doors and the pull read one answer for what stands in hand: the hold, then the plan's `working` todo.
+
+| the change | where | what it does |
+|---|---|---|
+| one reader of the hand | `inHand` in `src/engine/named.js` | answers `{ ticket, todo }` off `holdsIn` in `src/scripts/ephemeral.js` and `PLANS` in `lib/runs.js` |
+| the name check | `ticketFault` in `src/engine/named.js` | passes the held ticket or the working todo's title, and refuses any other name. The refusal names both where each stands |
+| the shell door | `ticketDoor` in `src/bridge/bash.js` | passes a description opening on the working todo's title and a colon, before `ticketOf` cuts at the first space |
+| the pull | `pull` in `src/scripts/pull.js` | answers the working todo and hands out nothing, where no ticket stands held |
+
+Where neither a hold nor a working todo stands, `ticketFault` keeps today's read, and any open ticket passes. The commit verb runs from a hand with nothing held, and the strict read there refuses every commit. The review decides that road. `spec/design_output/level0.md` names the rule under `A write names its ticket`.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/bridge/apply.js` the patch and replace door, which calls `ticketFault` with the `ticket` field
+- `src/bridge/bash.js` `ticketDoor`, called from the Bash and PowerShell doors
+- `src/scripts/commit-verb.js` the commit verb, which calls `ticketFault` on the message head
+- `src/scripts/pull.js` `pull`, which gains the todo road before `handsOut`
 
 ### tests
 
@@ -117,17 +148,28 @@ The write door takes any open ticket name as a pass and refuses a todo title. Th
 
 <!-- the form is list -->
 
+- `test/level0/named.test.js` the held ticket passes and a stranger open ticket fails while a hold stands
+- `test/level0/named.test.js` the working todo's title passes, and the refusal names the hold and the todo
+- `test/level0/bash-ticket.test.js` a description opening on the working todo's title and a colon passes
+- `test/level0/pull-todo.test.js` a working todo answers the pull, and the pull hands out nothing else
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first draft
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `ticketFault`, `ticketOf`, `ticketDoor`, `holdsIn`, `plansHere` and `pull` stand opened. `ticketFaults` in `write.js` stands unread, and the implement step reads it first
+- the callers list comes off a grep for `ticketFault` and `ticketOf`
+- each done_when line names its test above, and `./RUNME.sh check` decides the last
 
 ## review
 
@@ -138,6 +180,14 @@ The write door takes any open ticket name as a pass and refuses a todo title. Th
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+- the-door-picks-a-hold: `holdsIn` answers every hold on the box, one a hand, and the door carries no hand, so `inHand` names which hold passes, such as any hold on the box, and a case in `test/level0/named.test.js` drives two holds
+- the-door-passes-ephemeral-holds: an ephemeral ticket stands in the hold alone with no file, so `ticketFault` passes the held name before it reads the folders, and a case drives it
+- the-hand-reads-plans-here: `plansHere` in `src/bridge/plan.js` reads the plan already, and `PLANS` stands in `.claude/skills/level0/lib/runs.js`, so `inHand` calls `plansHere` and reads no second copy
+- the-callers-drop-ticket-faults: `ticketFaults` in `src/bridge/write.js` comes from `.claude/skills/level0/lib/ticket.js` and checks the ticket fields, so the callers list drops it
+- the-todo-road-stands-first: the todo road in `pull` stands above the road asking for a named ticket as well as above `handsOut`, so a named pull hands out nothing while a todo stands in hand, and the pull case drives a named pull
+- the-open-road-stays-named: where neither a hold nor a working todo stands, any open ticket passes, so the commit verb keeps working, and the rule in `spec/design_output/level0.md` and a case in `test/level0/named.test.js` name that road
 
 # implement
 
@@ -210,3 +260,5 @@ The write door takes any open ticket name as a pass and refuses a todo title. Th
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The queue handed the review's children ahead of this ticket's implement step, and the whole change landed under `the-door-passes-ephemeral-holds`. Before it, six cases in `test/level0/named.test.js`, `test/level0/bash-ticket.test.js` and `test/level0/pull-todo.test.js` failed on their own assertion. After it, `./RUNME.sh check` exits 0. So this ticket closes as answered by that child.

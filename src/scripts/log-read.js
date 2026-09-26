@@ -1,4 +1,4 @@
-// The read over the session log and the rotated files beside it, and the four
+// The read over the session log and the rotated files beside it, and the
 // narrow filters a caller composes over the rows it answers. The verb over
 // them stands in log-verb.js.
 // [[spec/design_output/log#one-verb-reads-the-log]]

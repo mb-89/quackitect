@@ -112,7 +112,7 @@ straight into `decide`, so a test drives the server with no client, no wire
 and no port. For details, see
 [[spec/design_output/level0#the-bridgehead-and-the-server]].
 
-# Two folders, and their cost
+# The folders, and their cost
 
 | folder | what stands there | what it touches |
 |---|---|---|

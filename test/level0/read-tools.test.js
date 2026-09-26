@@ -202,3 +202,48 @@ for (const tool of ["patch", "replace"]) {
     assert.deepEqual(events, ["tool.call", "agent.spoke", "tool.call"]);
   });
 }
+
+// The answer door keys a prompt on the newest transcript row, so the spoke post carries each row's role and id. [[spec/tickets/a-reply-follows-its-prompt]]
+test("a reply the door asks for posts the transcript rows with their ids", async () => {
+  const bodies = [];
+  const it = opened({
+    fetch: (where) => {
+      if (!where.endsWith("/event")) return null;
+      const body = JSON.parse(it.asked.at(-1).init.body);
+      bodies.push(body);
+      if (body.event === "agent.spoke") return { ok: true, status: 200, text: '{"pass":true}' };
+      return bodies.filter((one) => one.event === "tool.call").length === 1
+        ? { ok: true, status: 200, text: '{"needs":"reply"}' }
+        : { ok: true, status: 200, text: SAID };
+    },
+  });
+  it.$.session = {
+    messages: async () => [
+      { role: "user", text: "go on", uuid: "r1" },
+      { role: "assistant", text: " The door first. ", uuid: "r2" },
+    ],
+  };
+  await calls(it, "mcp__level0__patch");
+  const spoke = bodies.find((one) => one.event === "agent.spoke");
+  assert.deepEqual(spoke.e.rows, [
+    { role: "user", id: "r1" },
+    { role: "assistant", id: "r2", text: "The door first." },
+  ]);
+});
+
+// [[spec/tickets/a-reply-follows-its-prompt]]
+test("a prompt posts the id of the newest transcript row", async () => {
+  const bodies = [];
+  const it = opened({
+    fetch: (where) => {
+      if (!where.endsWith("/event")) return null;
+      bodies.push(JSON.parse(it.asked.at(-1).init.body));
+      return { ok: true, status: 200, text: '{"pass":true}' };
+    },
+  });
+  it.$.session = { messages: async () => [{ role: "assistant", text: "old", uuid: "r7" }] };
+  const next = Object.assign(async (e) => e, { event: "prompt.submit" });
+  await firing(it, "*").run(it.$, { text: "go on" }, next);
+  const prompt = bodies.find((one) => one.event === "prompt.submit");
+  assert.equal(prompt.e.before, "r7");
+});

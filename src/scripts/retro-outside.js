@@ -4,7 +4,12 @@
 // folder inside the tree names one of its own, so the match takes both.
 // [[spec/guidance/retro/collect]]
 
+import { TIMED } from "../engine/retro/timeline.js";
+
 const MEMORY = "memory";
+// The stamp a transcript line carries, as the timeline reads it. [[spec/tickets/the-retro-finishes-its-asks]]
+const STAMP = TIMED.find((one) => one.top === "transcripts").field;
+const LINES = ".jsonl";
 // A repository's own store and a package folder carry no record of the work, and git keeps its objects read-only. [[spec/guidance/retro/collect]]
 const STORES = [".git", "node_modules"];
 // Where the harness keeps each source, under home or under temp. [[spec/guidance/retro/collect]]
@@ -42,8 +47,8 @@ function insideOf(it) {
     .map((one) => slugOf(one.name).toLowerCase());
 }
 
-// Copies every source into the input folder, and answers the lines it takes and the files it refuses. [[spec/guidance/retro/collect]]
-export function outsideInto(it, into, since) {
+// Copies every source into the input folder, and answers the lines it takes and the files it refuses. A file changed past `since` copies, and a transcript keeps its lines stamped past `window`. [[spec/guidance/retro/collect]]
+export function outsideInto(it, into, since, window = since) {
   const out = { taken: [], refused: [], folders: [] };
   const slug = slugOf(it.root);
   const inside = insideOf(it);
@@ -58,7 +63,7 @@ export function outsideInto(it, into, since) {
       if (source.kind === "transcripts") {
         copyTree(it, from, it.join(into, "transcripts", one.name), since, out, [
           MEMORY,
-        ]);
+        ], window);
         // The memory is standing state and no event, so the boundary passes it whole. [[spec/guidance/retro/collect]]
         copyTree(
           it,
@@ -76,20 +81,24 @@ export function outsideInto(it, into, since) {
   return out;
 }
 
-function copyTree(it, from, to, since, out, skips) {
+// Copies a folder, past the stores and the skips, and keeps a transcript's lines inside the window where one stands. [[spec/guidance/retro/collect]]
+export function copyTree(it, from, to, since, out, skips, window = 0) {
   for (const one of listed(it, from)) {
     if (skips.includes(one.name) || STORES.includes(one.name)) continue;
     const was = it.join(from, one.name);
     const now = it.join(to, one.name);
     if (one.kind === "dir") {
-      copyTree(it, was, now, since, out, []);
+      copyTree(it, was, now, since, out, [], window);
       continue;
     }
     try {
       // A file older than the last collect stands in that retro already. [[spec/guidance/retro/collect]]
       if (since && it.disk.modified(was) < since) continue;
       it.disk.makeDir(to);
-      it.disk.copy(was, now);
+      // The window cuts a transcript by its lines, since a live one holds lines older than the last collect. [[spec/tickets/the-retro-finishes-its-asks]]
+      if (window && one.name.endsWith(LINES))
+        it.disk.write(now, withinWindow(it.disk.read(was), window));
+      else it.disk.copy(was, now);
       out.taken.push(now);
     } catch (error) {
       out.refused.push({
@@ -98,6 +107,19 @@ function copyTree(it, from, to, since, out, skips) {
       });
     }
   }
+}
+
+// The lines stamped at or past the window. A line with no stamp takes the stamp before it, and one before any stamp stays. [[spec/tickets/the-retro-finishes-its-asks]]
+export function withinWindow(text, window) {
+  let last = Number.NaN;
+  return String(text)
+    .split("\n")
+    .filter((line) => {
+      const when = Date.parse(STAMP.exec(line)?.[1] ?? "");
+      if (Number.isFinite(when)) last = when;
+      return !(last < window);
+    })
+    .join("\n");
 }
 
 function listed(it, at) {

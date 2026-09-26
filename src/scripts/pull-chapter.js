@@ -255,8 +255,21 @@ export function verdictIn(rows) {
   const rest = [first.slice(word.length).replace(/^[\s:.,]+/, ""), ...rows.slice(at + 1)]
     .map((row) => row.replace(/^[-*]\s+/, "").trim())
     .filter(Boolean);
-  if (!findings) return { said: word, reason: rest.join("; ") };
-  return { said: FOUND, reason: rest.join("; "), findings: rest.map(findingOf) };
+  const reason = tabled(rest).join("; ");
+  if (!findings) return { said: word, reason };
+  const named = rest.filter((row) => !row.startsWith("|"));
+  return { said: FOUND, reason, findings: named.map(findingOf) };
+}
+
+// A table's rows ride one piece, joined by the escape the unblock reads back as lines. [[spec/tickets/the-small-faults-land]]
+function tabled(rows) {
+  const out = [];
+  for (const row of rows) {
+    const table = row.startsWith("|") && String(out.at(-1) ?? "").startsWith("|");
+    if (table) out[out.length - 1] += `\\n${row}`;
+    else out.push(row);
+  }
+  return out;
 }
 
 // A design review passing with findings names a child a row, as `- <child-name>: <finding>`. [[spec/design_output/pull#a-finding-rides-out]]
@@ -277,7 +290,7 @@ function findingFaults(it, said, where) {
   for (const { name, line } of said.findings) {
     if (!name) out.push(`${where} names no child in ${line}; write it as - <child-name>: <finding>.`);
     else if (overLong(name, it.words))
-      out.push(`${where} names ${name}, and a ticket name holds ${it.words} words.`);
+      out.push(`${where} names ${name}, and a ticket name holds at most ${it.words} words.`);
     else if (taken.has(name)) out.push(`${where} names ${name}, which a ticket holds already.`);
     else if (seen.has(name)) out.push(`${where} names ${name} twice.`);
     seen.add(name);
