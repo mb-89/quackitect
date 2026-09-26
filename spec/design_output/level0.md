@@ -852,6 +852,7 @@ node itself, so the setup leans on nothing again.
 
 | what the setup installs | why the cage needs it |
 |---|---|
+| the plugin manifest | git ignores it, so a fresh clone loads no plugin until the install writes it |
 | node | the command line and the server are JavaScript |
 | the modules | the server dies at import without them |
 | Vale | the prose rules the write door reads |
