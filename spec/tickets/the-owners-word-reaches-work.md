@@ -111,6 +111,7 @@ record:
   - step: retro/write
     hand: box d7a4b8aac9106 · claude-code-remote
     hash_before: 741fe98f17f5cbe1c1428d0ae3db5068f491bfe8
+    hash_after: 84c064add2cbf30b2f2cacebfd3c08715ecd62c7
   - step: retro/write
     hand: box d7a4b8aac9106 · claude-code-remote
     hash_before: af3935de0388e926bc2ab60956a550395bc0b68d
