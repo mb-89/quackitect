@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: sync
+step: split
 record:
   - step: sync
     hand: box c28a93a32b71 · claude-code-remote
     hash_before: fe571ffaaa041b984dd3e971f7f9e90181d693e1
+  - step: sync
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: f3306a5498df6b4af2db63f4ed1f611c7bdd36ee
+    hash_after: f3306a5498df6b4af2db63f4ed1f611c7bdd36ee
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-gates-read-the-state already carries every commit on main.
 ---
 
 # Ask
@@ -94,6 +102,8 @@ Every gate reads what the session holds. The stop claims a true reason, and an a
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
