@@ -77,12 +77,18 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box c28a93a32b71 · claude-code-remote
     hash_before: d264095109b8e26e44c1652805ad8d9164f5f190
     hash_after: d264095109b8e26e44c1652805ad8d9164f5f190
+  - step: design/review
+    hand: box c28a93a32b71 · claude-code-remote · helper-2
+    hash_before: 5c34a44db98448bfa52f2e09b2410aec08ee1957
+    hash_after: 5c34a44db98448bfa52f2e09b2410aec08ee1957
+    returns: 1
+    why: "| grade | finding | fix |; |---|---|---|; | design | The third line of the ask rests on `DISPLAY_WAIT`, and the draft says nobody measured the client's display order. The ask itself says the chat shows that text after the door reads. A wait inside the `tool.call` hook sees the display only where the client posts it while the hook holds the call, and nothing shows that it does. A fake-driven test goes green either way, so the build passes while the refusal still stands | run the probe first and write the order it shows. Or name a road that reads the call's own message without the display |; | design | `streams` on `turn.step` already feeds `stepText` to `agent.spoke` as `text`, so it carries the text of the call's own step. The draft leaves that road unnamed. `spec/design_output/level0.md` says the stream carries text for the first step alone | say why `stepText` misses a later step, and whether fixing that road pays the same-message reply without a wait |; | design | The transcript road keys on the last owner row, not on the prompt's time. `What the door reads` says the transcript flushes late, sometimes a turn late. After a restart, a transcript that lacks the new prompt row makes `sinceTheOwner` return the texts after the previous prompt. An older text then pays the new prompt, and the first line of the ask fails | key the transcript texts on `at` as well, or hold the transcript road until the prompt's own row stands in it, and give that case a test |; | craft | The warning rides `after.context` on `prompt.submit`. The draft names no place that shows the harness hands context from `prompt.submit` to the session. The hook already writes context to the prompt through `prompt.context` `blocks`, as it does for the cage | open the event's result shape and name the road that reaches the session |; | craft | `paid`, `pays` and `onTurnEnd` in `src/bridge/answer.js` also write `box.spoken`. The callers list leaves them out, so `box.spokenAt` goes stale there | stamp `spokenAt` wherever `box.spoken` is written, and name each writer |; | craft | `sinceTheOwner` in `.claude/skills/level0/lib/answer.js` has no export | export it, or post the texts off `answerAfter` |"
 ---
 
 # Ask
@@ -171,6 +177,17 @@ The same-message road rests on the client posting the display before the call ru
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+| grade | finding | fix |
+|---|---|---|
+| design | The third line of the ask rests on `DISPLAY_WAIT`, and the draft says nobody measured the client's display order. The ask itself says the chat shows that text after the door reads. A wait inside the `tool.call` hook sees the display only where the client posts it while the hook holds the call, and nothing shows that it does. A fake-driven test goes green either way, so the build passes while the refusal still stands | run the probe first and write the order it shows. Or name a road that reads the call's own message without the display |
+| design | `streams` on `turn.step` already feeds `stepText` to `agent.spoke` as `text`, so it carries the text of the call's own step. The draft leaves that road unnamed. `spec/design_output/level0.md` says the stream carries text for the first step alone | say why `stepText` misses a later step, and whether fixing that road pays the same-message reply without a wait |
+| design | The transcript road keys on the last owner row, not on the prompt's time. `What the door reads` says the transcript flushes late, sometimes a turn late. After a restart, a transcript that lacks the new prompt row makes `sinceTheOwner` return the texts after the previous prompt. An older text then pays the new prompt, and the first line of the ask fails | key the transcript texts on `at` as well, or hold the transcript road until the prompt's own row stands in it, and give that case a test |
+| craft | The warning rides `after.context` on `prompt.submit`. The draft names no place that shows the harness hands context from `prompt.submit` to the session. The hook already writes context to the prompt through `prompt.context` `blocks`, as it does for the cage | open the event's result shape and name the road that reaches the session |
+| craft | `paid`, `pays` and `onTurnEnd` in `src/bridge/answer.js` also write `box.spoken`. The callers list leaves them out, so `box.spokenAt` goes stale there | stamp `spokenAt` wherever `box.spoken` is written, and name each writer |
+| craft | `sinceTheOwner` in `.claude/skills/level0/lib/answer.js` has no export | export it, or post the texts off `answerAfter` |
 
 # implement
 
