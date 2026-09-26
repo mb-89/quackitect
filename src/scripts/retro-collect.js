@@ -31,7 +31,7 @@ const GROUPS = "groups";
 const CLOSES = "closed.json";
 // The chapter a group ticket holds its box's retro under, as its route names the step. [[spec/tickets/the-retro-reads-cloud-retros]]
 const RETRO_CHAPTER = "retro";
-// A log row opening a commit carries this mark, so a ticket path never reads as one. [[spec/tickets/the-retro-reads-cloud-retros]]
+// A log row opening a commit carries this mark, and a ticket path starts with a letter. [[spec/tickets/the-retro-reads-cloud-retros]]
 const COMMIT_MARK = "@";
 const COMMENT = /^\s*<!--.*-->\s*$/;
 // The column a source name fills, so the counts stand in one line down the page. [[spec/guidance/retro/collect]]

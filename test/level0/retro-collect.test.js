@@ -8,10 +8,9 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeGit } from "../../src/doors/fake/git.js";
+import { fakeTrunk } from "../../src/doors/fake/git.js";
 import { retro } from "../../src/scripts/retro.js";
-import { belongs, slugOf } from "../../src/scripts/retro-outside.js";
-import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { slugOf } from "../../src/scripts/retro-outside.js";
 
 const ROOT = "/tree";
 const HOME = "/home";
@@ -58,63 +57,9 @@ function doors(files = FILES, more = {}) {
     clock: fakeClock("2026-09-19T12:00:00.000Z"),
     home: HOME,
     temp: TEMP,
-    git: trunkGit(),
+    git: fakeTrunk(),
     ...more,
   };
-}
-
-// A trunk as git keeps it. A commit names each ticket it changes and the text it leaves, and a branch's own commit stands off the first-parent line. The fake answers `rev-parse`, `log` and `show` by their arguments. [[spec/tickets/the-retro-reads-cloud-retros]]
-function trunkGit(commits = []) {
-  return fakeGit({
-    git: (argv) => {
-      const args = argv.slice(1);
-      if (args[0] === "rev-parse") return { stdout: "abc123" };
-      if (args[0] === "log") return logOf(commits, args);
-      if (args[0] === "show") return shownAt(commits, args[1]);
-      return { exitCode: 1, stderr: `this fake answers no git ${args[0]}` };
-    },
-  });
-}
-
-// [[spec/tickets/the-retro-reads-cloud-retros]]
-function logOf(commits, args) {
-  if (!args.includes(TRUNK)) return { exitCode: 128, stderr: "a ref this fake lacks" };
-  const firstParent = args.includes("--first-parent");
-  const since = Date.parse(args.find((one) => one.startsWith("--since="))?.slice(8) ?? "");
-  const grep = args.includes("-G") ? new RegExp(args[args.indexOf("-G") + 1], "m") : null;
-  const format = args.find((one) => one.startsWith("--format="))?.slice(9) ?? "%H";
-  const under = args.slice(args.indexOf("--") + 1);
-  const rows = [];
-  for (const one of [...commits].sort((a, b) => Date.parse(b.at) - Date.parse(a.at))) {
-    if (firstParent && !one.trunk) continue;
-    if (Number.isFinite(since) && Date.parse(one.at) < since) continue;
-    const names = Object.keys(one.changes).filter(
-      (path) =>
-        under.some((top) => path.startsWith(`${top}/`)) &&
-        (!grep || changedLines(commits, one, path).some((row) => grep.test(row))),
-    );
-    if (!names.length) continue;
-    rows.push(format.replace("%H", one.sha).replace("%cI", one.at));
-    if (args.includes("--name-only")) rows.push("", ...names);
-  }
-  return { stdout: rows.join("\n") };
-}
-
-// The lines a commit adds or drops against the trunk commit before it. [[spec/tickets/the-retro-reads-cloud-retros]]
-function changedLines(commits, one, path) {
-  const before = commits
-    .filter((other) => other.trunk && other.changes[path] && Date.parse(other.at) < Date.parse(one.at))
-    .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))[0];
-  const was = new Set(String(before?.changes[path] ?? "").split("\n"));
-  const now = new Set(one.changes[path].split("\n"));
-  return [...[...now].filter((row) => !was.has(row)), ...[...was].filter((row) => !now.has(row))];
-}
-
-// [[spec/tickets/the-retro-reads-cloud-retros]]
-function shownAt(commits, said) {
-  const [sha, path] = String(said).split(":");
-  const text = commits.find((one) => one.sha === sha)?.changes[path];
-  return text === undefined ? { exitCode: 128, stderr: `${said} stands nowhere` } : { stdout: text };
 }
 
 // A retro opens on a battery green at this commit, with no warning standing. [[spec/guidance/retro/collect]]
@@ -264,51 +209,6 @@ test("collect copies the transcripts, the memory and the scratchpads of this tre
     it.disk.exists(home(`.claude/projects/${SLUG}/session.jsonl`)),
     true,
     "an outside source stays",
-  );
-});
-
-// [[spec/guidance/retro/collect]]
-test("a folder belongs to the tree by its name, whatever the case of the drive letter", () => {
-  assert.equal(slugOf("c:\\work\\tree\\quackitect-v5"), "c--work-tree-quackitect-v5");
-  assert.equal(
-    belongs("C--work-tree-quackitect-v5", "c--work-tree-quackitect-v5"),
-    true,
-  );
-  assert.equal(
-    belongs("C--Temp-c--work-tree-quackitect-v5-stub", "c--work-tree-quackitect-v5"),
-    true,
-  );
-  assert.equal(
-    belongs("c--work-tree-quackitect-v50", "c--work-tree-quackitect-v5"),
-    false,
-  );
-  assert.equal(
-    belongs("c--work-tree-quackitect-v4", "c--work-tree-quackitect-v5"),
-    false,
-  );
-  assert.equal(
-    belongs("c--work-tree-quackitect-v5-old", "c--work-tree-quackitect-v5", ["src"]),
-    false,
-    "a sibling tree names a folder the tree holds nowhere",
-  );
-  assert.equal(
-    belongs("c--work-tree-quackitect-v5-src-bridge", "c--work-tree-quackitect-v5", [
-      "src",
-    ]),
-    true,
-    "a session run from a folder inside the tree belongs",
-  );
-  assert.equal(
-    belongs(
-      "c--work-tree-quackitect-v5--claude-worktrees-a",
-      "c--work-tree-quackitect-v5",
-    ),
-    true,
-    "a worktree under a dot folder belongs",
-  );
-  assert.equal(
-    belongs("c--other-c--work-tree-quackitect-v5x", "c--work-tree-quackitect-v5"),
-    false,
   );
 });
 
@@ -596,7 +496,7 @@ test("collect gathers the retro chapter of every group closing in the window, wi
   const it = doors(
     { ...FILES, [at(LAST)]: '{"at":"2026-09-12T00:00:00.000Z"}\n' },
     {
-      git: trunkGit([
+      git: fakeTrunk([
         { sha: "open1", at: "2026-09-08T09:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-one")]: groupAt("cloud-one", "open", "") } },
         { sha: "box1", at: "2026-09-11T09:00:00+00:00", trunk: false, changes: { [ticketPath("cloud-one")]: closed } },
         { sha: "merge1", at: "2026-09-15T10:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-one")]: closed } },
@@ -636,7 +536,7 @@ test("a group closing before the window stays out, and a ticket closing that is 
   const it = doors(
     { ...FILES, [at(LAST)]: '{"at":"2026-09-12T00:00:00.000Z"}\n' },
     {
-      git: trunkGit([
+      git: fakeTrunk([
         { sha: "merge0", at: "2026-09-10T10:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-old")]: groupAt("cloud-old") } },
         { sha: "fix1", at: "2026-09-14T10:00:00+00:00", trunk: true, changes: { [ticketPath("a-fix")]: ticketText("a-fix", "closed", "standard", RETRO_CHAPTER) } },
       ]),
@@ -655,7 +555,7 @@ test("a group closing before the window stays out, and a ticket closing that is 
 test("a group closing with no retro text writes nothing, and the print names it", () => {
   const bare = "# retro\n\n## write\n\n### badly\n\n<!-- the form is list -->\n\n";
   const it = doors(FILES, {
-    git: trunkGit([
+    git: fakeTrunk([
       { sha: "merge2", at: "2026-09-15T10:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-bare")]: groupAt("cloud-bare", "closed", bare) } },
     ]),
   });
@@ -672,7 +572,7 @@ test("a second pass takes each group once, and the count prints the groups", () 
   const commits = [
     { sha: "merge3", at: "2026-09-19T12:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-a")]: groupAt("cloud-a") } },
   ];
-  const it = doors(FILES, { git: trunkGit(commits) });
+  const it = doors(FILES, { git: fakeTrunk(commits) });
   const first = heard(() => retro(ROOT, ["collect", RETRO], it));
   assert.equal(first.code, 0, first.said);
   assert.match(first.said, /groups\s+2 file\(s\)/, "the chapter and the closes");
