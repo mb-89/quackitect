@@ -86,7 +86,7 @@ record:
 
 Phase 0 of [[spec/design_input/the-migration-runs-in-slices#the-phases]]: the specs every later phase builds on, and every open question answered. A box reads the settled rulings there first, and asks none of them again.
 
-Done when every question in [[spec/funnel/the-inner-protocol-stands-open]] stands answered, and a design note covers each part of the model.
+Done when [[spec/design_output/inner-protocol]] names the inner protocol and the LSP door. A design note covers each part of the model.
 
 # sync
 

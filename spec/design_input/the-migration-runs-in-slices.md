@@ -56,7 +56,7 @@ every other key starts at `false`.
 
 | phase | the groups, each with its key under `migration` | done when |
 |---|---|---|
-| 0, the decisions and the specs | [[spec/tickets/the-migration-writes-its-specs]], `phase0` | every open question in [[spec/funnel/the-inner-protocol-stands-open]] stands answered, and a design note covers each part of the model |
+| 0, the decisions and the specs | [[spec/tickets/the-migration-writes-its-specs]], `phase0` | the inner protocol and the LSP door stand chosen in [[spec/design_output/inner-protocol]], and a design note covers each part of the model |
 | 1, the foundation, with no change in behaviour | [[spec/tickets/the-foundation-lands-unchanged]], `phase1` | the index answers `/v1` and the old API side by side, and the check stands green on Linux and Windows |
 | 2, the pilot: `work/open-tasks` | [[spec/tickets/open-tasks-land-in-shadow]], `phase2shadow`, then [[spec/tickets/open-tasks-switch-over]], `phase2switch` | the badge and the work tab's brackets read one name |
 | 3, the read-only topics | [[spec/tickets/read-topics-land-in-shadow]], `phase3shadow`, then [[spec/tickets/read-topics-switch-over]], `phase3switch` | no JavaScript twin of a Go check stands |
@@ -93,5 +93,5 @@ The owner settles these, and a box reads the note before it asks:
 - the cage refusing while the index stands down, in [[spec/rationales/the-cage-refuses-while-down]]
 - every other ruling of the model and of this note, in [[spec/design_output/migration#the-argument-for-each-ruling]]
 
-A question the specs of phase 0 raise goes into
-[[spec/funnel/the-inner-protocol-stands-open]], and the phase 0 group answers it.
+A question the specs of phase 0 raise goes into a funnel note under
+`spec/funnel`, and the phase 0 group answers it.

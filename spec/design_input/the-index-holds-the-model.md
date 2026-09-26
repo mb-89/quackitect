@@ -220,6 +220,8 @@ file, and a user starts one program.
 | the Go code stands in one module | [[spec/rationales/go-stands-as-one-module]] |
 | git is the archive and the transport, and a group in the cloud carries `cloud: true` on `main` | [[spec/rationales/git-stays-the-archive]] |
 | Linux and Windows behave the same: loopback TCP and the standing file, no Unix socket and no named pipe, and a Windows job in CI | here |
+| the index and its processes speak NATS, with the server inside the index | [[spec/rationales/the-processes-speak-nats]] |
+| the editor starts `quack lsp`, which relays stdio to the LSP door | [[spec/rationales/the-editor-starts-quack-lsp]] |
 
 # The build holds the rules
 
