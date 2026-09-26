@@ -103,11 +103,34 @@ Modules touch no disk. Without the topic each one reads the tree itself again.
 
 <!-- the form is text -->
 
+The index registers the family `files/<path...>`, and the door commits its values into a `q.Store` off the `file` rows it already writes.
+
+| the part | what it holds |
+|---|---|
+| `files/<path...>` | a family whose key takes the rest of the name, so `files/spec/one.md` reads one file |
+| `Content` | the value: the hash and the text of the row, with the empty `Content` as default |
+| the start | `Serve` registers the family on the catalog it takes, checks it, and commits every tracked row at one revision |
+| a settle | `settles` commits the paths it moves, off their rows, at one new revision |
+| `read` | a door method answering the value of a name at the latest revision |
+
+- A key segment `<name...>` stands last alone, and takes one or more segments. `src/q` learns it, and the check refuses it elsewhere.
+- A key segment holds any text, since a path holds capitals. The lowercase check reads the family's own segments alone.
+- A path the settle drops, or git stops tracking, commits the default.
+- The store holds the text a second time, in memory, since the model reads values off a snapshot. A later ticket moves a value behind the row, where memory costs too much.
+- Modules run in this process for now, and a module in its own process reads through `read`.
+
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/index/door.go` `Serve`, which registers the family and loads the rows
+- `src/index/door.go` `settles`, which commits what moves
+- `src/index/door.go` `answers`, which gains `read`
+- `src/q/q.go` `matches`, which takes a key of many segments
+- `src/q/check.go` `wellNamed`, which places that key last
 
 ### tests
 
@@ -115,17 +138,30 @@ Modules touch no disk. Without the topic each one reads the tree itself again.
 
 <!-- the form is list -->
 
+- `src/index/topic_test.go` `TestAChangedFileReadsItsNewContentsUnderFiles`, deciding the second done line
+- `src/index/topic_test.go` `TestARemovedFileReadsTheDefaultUnderFiles`
+- `src/q/store_test.go` `TestAKeyOfManySegmentsTakesTheRestOfTheName`
+- `src/q/catalog_test.go` `TestAKeyOfManySegmentsStandsLast`
+- `go test ./...` from the root, deciding the first done line
+- `./RUNME.sh check`, deciding the third
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the door's functions the callers list names stand opened, with `touches`, `Texts` and `trackedIn`
+- a search for `Serve(` and `answers(` names no caller beyond the door, its tests and `serves`
+- each done line names its test in the tests list
 
 ## review
 
