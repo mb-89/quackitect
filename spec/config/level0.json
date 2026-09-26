@@ -85,5 +85,27 @@
   "names": {
     "comment": "The words a file, a folder and a branch name each hold at most. Vale counts a heading, and lib/names.js counts a path.",
     "words": 5
+  },
+  "migration": {
+    "comment": "One switch a migration group. A group naming a key here under enabled_by waits while this file on main reads anything but true there, so the owner sets a key on main and pushes to let the cloud take that group. A local layer or a variable unlocks nothing. spec/design_output/work.md, chapter A switch holds a group, says the rest.",
+    "phase0": true,
+    "phase1": true,
+    "phase2shadow": true,
+    "phase2switch": false,
+    "phase3shadow": false,
+    "phase3switch": false,
+    "phase4shadow": false,
+    "phase4switch": false,
+    "phase5shadow": false,
+    "phase5switch": false,
+    "phase6shadow": false,
+    "phase6switch": false,
+    "phase7shadow": false,
+    "phase7switch": false,
+    "phase8shadow": false,
+    "phase8switch": false,
+    "phase9shadow": false,
+    "phase9switch": false,
+    "phase10": false
   }
 }

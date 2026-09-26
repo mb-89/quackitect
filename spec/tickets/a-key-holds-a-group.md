@@ -18,22 +18,22 @@ steps:
         says: why, in a line, or what the successor carries
 step: decide
 process: [[spec/processes/note]]
-process_hash: 9d7b26202041cf4d
+process_hash: e02a0935ed78eb92
 ---
 
 # Ask
 
 <!-- line, as text: the smallest case that shows it, why it matters, and what a stranger needs in order to act on it -->
 
-`take` in `src/scripts/work.js` read the first free group alone. A group whose children all wait left the take at that group, and every cloud box stopped there.
+A group had no way to wait on the owner's word. A `by: person` step holds no cloud box, and a question ticket named under `depends_on` held only through a child.
 
 | what | where |
 |---|---|
-| the smallest case | two free groups, the first waiting on a question open on `main`, and a take that claims nothing |
-| why it matters | a gate on one migration group held every other group in the tree up |
-| where a stranger acts | `take` in `src/scripts/work.js`, and [[spec/design_output/work#the-take-writes-the-record]] |
+| the smallest case | a migration group the owner means to hold until a shadow runs clean, and a cloud box taking it the moment its dependency lands |
+| why it matters | the switch of a slice is the one moment the owner decides, and the cloud must wait for it |
+| where a stranger acts | `readWork` and `waitsOf` in `src/scripts/work-stands.js`, and [[spec/design_output/work#a-switch-holds-a-group]] |
 
-The fix lands with this note. The take reads each free group in turn and claims the first holding a step a hand takes. The cases stand in `test/level0/work-gate.test.js`.
+The fix lands with this note. A group names a key under `enabled_by`, and it waits while the tracked config on `main` reads anything but true there. The cases stand in `test/level0/work-switch.test.js`.
 
 # decide
 
