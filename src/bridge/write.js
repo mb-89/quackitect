@@ -24,6 +24,7 @@ import { PROSE } from "../../.claude/skills/level0/lib/vale.js";
 import {
   checkNote,
   END,
+  folderFault,
   governorOf,
   kindOf,
   refusedKind,
@@ -119,6 +120,18 @@ function putBack(e, where, keys, warned, box) {
   });
   const said = `${keys.join(", ")} stand as the engine holds them in ${where}, and the rest of the write lands. A verb writes these fields: ./RUNME.sh ticket pull moves step and state.`;
   return { event: e, after: { context: [...(warned?.after?.context ?? []), said] } };
+}
+
+// A file off the note end under a note schema's folder, refused in the sweep's own words. A data schema reads its own files, so schemasHere answers note schemas alone here. [[spec/tickets/each-folder-holds-its-kind]]
+function strangerFile(e, where, governor, box) {
+  if (!governor) return "";
+  const found = folderFault(where, governor);
+  box.log.say("warn", "schema", `refused a stranger file in ${where}`, {
+    file: where,
+    rule: found.rule,
+    tool: String(e.tool),
+  });
+  return found.message;
 }
 
 // A write to a ticket carrying an engine field, turned into one carrying the disk's value there. An edit whose text the field reaches past takes the refusal the ticket door gives. [[spec/design_output/schema#the-verbs-own-their-fields]]
@@ -238,9 +251,10 @@ function privateDoor(e, writing, where, box) {
 
 // [[spec/design_output/schema#the-door-refuses-a-departure]]
 function schemaDoor(e, writing, where, box) {
-  if (!where.endsWith(".md")) return "";
   if (!box.schemas) box.schemas = schemasHere(box.disk, box.method);
   const schemas = box.schemas;
+  // [[spec/tickets/each-folder-holds-its-kind]]
+  if (!where.endsWith(".md")) return strangerFile(e, where, governorOf(schemas, where), box);
   const whole = wholeAfter(e, writing, box.disk);
   const kind = kindOf(whole);
 

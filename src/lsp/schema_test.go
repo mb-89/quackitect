@@ -312,7 +312,8 @@ func TestAPagePastTheFolderKindWarns(t *testing.T) {
 	if one.File != "spec/funnel/page.html" || one.Severity != "warning" {
 		t.Errorf("the finding reads %+v", one)
 	}
-	if !strings.Contains(one.Message, "handover") {
+	want := "spec/funnel/page.html stands in a folder the handover schema governs, which holds handover notes alone. Move it off the governed folder."
+	if one.Message != want {
 		t.Errorf("the message reads %q", one.Message)
 	}
 }
