@@ -413,6 +413,16 @@ judge run carries the `--fields` payload of the hand-back. The material lays
 the payload over the ticket before it reads the evidence, so the judge reads
 what the hand writes.
 
+The wrapper reads `judge.enabled` and `judge.model` through `configOf`, over
+`$.fs`, so the switch a slash command sets reaches the judge:
+
+| the layer | how the judge reads it |
+|---|---|
+| the method root's `spec/config/level0.json` | first, as [[spec/design_output/vehicle#the-work-root-inherits]] says |
+| the work root's `spec/config/level0.json` | over the method root's |
+| the environment | nowhere, because `$` carries no environment |
+| `.se/.runtime/config.json` | over both tracked files |
+
 The evidence holds the prose fields alone. The leaf names the form of each
 field it asks for. So the material leaves out a field whose form reads
 `command`, and a heading carrying no line. A chapter of commands hands the

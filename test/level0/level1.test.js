@@ -16,6 +16,7 @@ import {
 // The whole module, so a name the wrapper answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
 import * as level1 from "../../.claude/skills/level0/lib/pull.js";
 import { pullArgvOf } from "../../src/scripts/pull-tool.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 // The rules a leaf hands the judge, each label naming one rule. [[spec/tickets/the-judge-reads-answer-rules]]
 const RULES = [
@@ -173,6 +174,93 @@ test("a label outside the set reads as follows, so a judge naming nothing refuse
   assert.equal(level1.ruleBroken("follows", RULES), "");
   assert.equal(level1.ruleBroken("voice-9", RULES), "");
   assert.equal(level1.ruleBroken("", RULES), "");
+});
+
+// The hand-back the judge reads, over a box whose files a fake disk holds. It answers what the shell ran, what the model was asked, and what the tool answered. [[spec/design_output/pull#the-checks]]
+async function handedBack(seed, method = "") {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const calls = [];
+  register(
+    (event, ...rest) => {
+      if (event === "tool.call" && rest.length > 1) calls.push(rest);
+    },
+    { method },
+  );
+  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
+  const files = fakeDisk(seed);
+  const ran = [];
+  const asked = [];
+  const material = { step: "design/draft", evidence: "The approach.", rules: RULES };
+  const $ = {
+    fs: { read: async (path) => files.read(path) },
+    process: {
+      run: async (argv) => {
+        ran.push(argv);
+        const asks = argv.at(-1) === "--judge";
+        return { stdout: asks ? JSON.stringify(material) : "work", exitCode: 0 };
+      },
+    },
+    model: {
+      classify: async (_ask, _labels, options) => {
+        asked.push(options);
+        return "voice-3";
+      },
+    },
+  };
+  const said = await handler(
+    $,
+    { ticket: "a-child", verdict: "pass" },
+    async () => null,
+  );
+  return {
+    said: said.result,
+    judged: ran.some((argv) => argv.at(-1) === "--judge"),
+    asked,
+  };
+}
+
+const judging = (enabled, model) => JSON.stringify({ judge: { enabled, model } });
+
+// The slash command writes the per-box file, so the switch reaches the judge through the one resolver. [[spec/design_output/config#the-layers]]
+test("the judge reads its switch through the layers, so the per-box file beats the tracked one", async () => {
+  const off = await handedBack({
+    "spec/config/level0.json": judging(true, "haiku"),
+    ".se/.runtime/config.json": judging(false),
+  });
+  assert.equal(off.judged, false, "the per-box off stops the judge");
+  assert.equal(off.said, "work");
+  assert.deepEqual(off.asked, []);
+
+  const on = await handedBack({
+    "spec/config/level0.json": judging(false, "haiku"),
+    ".se/.runtime/config.json": judging(true, "opus"),
+  });
+  assert.equal(on.judged, true, "the per-box on starts the judge");
+  assert.deepEqual(
+    on.asked,
+    [{ model: "opus" }],
+    "the per-box model reaches the judge",
+  );
+  assert.match(on.said, /^refused\n/);
+});
+
+// A stub holds no tracked file of its own, so the defaults come off the vehicle's. [[spec/design_output/vehicle#the-work-root-inherits]]
+test("the judge takes its defaults off the method root, and the work root's own file beats them", async () => {
+  const under = await handedBack(
+    { "/vehicle/spec/config/level0.json": judging(true, "haiku") },
+    "/vehicle/",
+  );
+  assert.equal(under.judged, true, "the method root's switch reaches a stub");
+  assert.deepEqual(under.asked, [{ model: "haiku" }]);
+
+  const over = await handedBack(
+    {
+      "/vehicle/spec/config/level0.json": judging(true, "haiku"),
+      "spec/config/level0.json": judging(false),
+    },
+    "/vehicle/",
+  );
+  assert.equal(over.judged, false, "the work root's file beats the method root's");
 });
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
