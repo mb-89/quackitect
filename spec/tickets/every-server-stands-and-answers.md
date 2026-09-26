@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-group: the-servers-and-views-hold
+step: implement/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -41,6 +41,16 @@ steps:
     input: ["design/draft", "design/review"]
     checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every row the design review passes with stands fixed in the change"]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: anyone
+        to: engine
+        asks: "tests-red runs on a tree the earlier commit already made green, and .claude holds half that code. Pass this leaf on the red the seen field records, with ./RUNME.sh ticket pull every-server-stands-and-answers --pass after you drop expects: assertion for this leaf, or take the code out and run it red."
+        evidence:
+          - name: answer
+            form: choice
+            says: the answer, which the step behind this one reads
+            options: ["pass on the record", "take the code out"]
       - name: tests-red
         does: writes the tests the ask calls for
         evidence:
@@ -77,7 +87,6 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
 record:
   - step: design/draft
     hand: box 63693613eded · claude-code-remote
@@ -87,6 +96,7 @@ record:
     hand: box d7a44d6f73215 · claude-code-remote
     hash_before: 5c3d6d4364231de251fd2e293cb4a2e6815931b6
     hash_after: 5c3d6d4364231de251fd2e293cb4a2e6815931b6
+group: the-servers-and-views-hold
 ---
 
 # Ask
@@ -207,6 +217,22 @@ Node's own close callback waits on every open connection, so `restarts` hands it
 pass
 
 # implement
+
+## person-1
+
+<!-- tests-red runs on a tree the earlier commit already made green, and .claude holds half that code. Pass this leaf on the red the seen field records, with ./RUNME.sh ticket pull every-server-stands-and-answers --pass after you drop expects: assertion for this leaf, or take the code out and run it red. -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is choice -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 ## tests-red
 
