@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-migration-writes-its-specs
 step: do
+record:
+  - step: do
+    hand: box d7a540d981d5 · claude-code-remote
+    hash_before: f28b85349fb361720036688ba5104eac779a9ef2
+    hash_after: a5216b2d9a9b94d85e5c5d2d994a1b9be38e2ac8
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: "spec/tickets/surfaces-get-specified.md:69:75: Vocabulary: mcp stands outside the words this tree writes. Write a core wo"
+reason: done
 ---
 
 # Ask
