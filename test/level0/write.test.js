@@ -6,23 +6,11 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
-import { MARKS } from "../../.claude/skills/level0/lib/runs.js";
-import { marksSeen, onWrite } from "../../src/bridge/write.js";
-import { fakeDisk, norm } from "../../src/doors/fake/disk.js";
+import { onWrite } from "../../src/bridge/write.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
-import {
-  called,
-  edits,
-  NUMBERED,
-  reads,
-  realDisk,
-  refused,
-  served,
-  TREE,
-  wrote,
-} from "./mark-doors.js";
+import { edits, NUMBERED, realDisk, refused, served, TREE, wrote } from "./mark-doors.js";
 
 const METHOD = "/tools";
 const WORK = "/stub";
@@ -155,34 +143,15 @@ test("a group's ask naming a child of its own comes back refused", async () => {
   assert.deepEqual(quiet, { pass: true });
 });
 
-// [[spec/design_output/level0#a-write-meets-its-mark]]
-test("a write over a standing file this hand has read none of comes back refused", async () => {
+// No door reads a mark, so a write over a file the hand has read none of meets the rules alone. [[spec/tickets/every-road-has-a-caller]]
+test("a write over a standing file lands whether or not the hand read it", async () => {
   const at = join(WORK, "spec", "tickets", "good.md");
-  const said = await onWrite(write(at, GOOD), box({ [at]: GOOD }));
-  assert.match(said?.result?.deny ?? "", /has read none of it/);
-});
+  assert.deepEqual(await onWrite(write(at, GOOD), box({ [at]: GOOD })), { pass: true });
 
-test("a read marks the file, and the write over it lands", async () => {
-  const at = join(WORK, "spec", "tickets", "good.md");
-  const it = box({ [at]: GOOD });
-  marksSeen(it, relativeTo(it.root, at), GOOD);
-  assert.deepEqual(await onWrite(write(at, GOOD), it), { pass: true });
-});
-
-test("a file moving after the read refuses the write that follows", async () => {
-  const at = join(WORK, "spec", "tickets", "good.md");
-  const it = box({ [at]: GOOD });
-  marksSeen(it, relativeTo(it.root, at), `${GOOD}\n`);
-  const said = await onWrite(write(at, GOOD), it);
-  assert.match(said?.result?.deny ?? "", /moved on the disk after you read it/);
-});
-
-test("a write landing marks what it leaves, so the next write over it lands", async () => {
-  const at = join(WORK, "spec", "tickets", "born.md");
-  const it = box();
-  assert.deepEqual(await onWrite(write(at, GOOD), it), { pass: true });
-  it.disk.write(at, GOOD);
-  assert.deepEqual(await onWrite(write(at, GOOD), it), { pass: true });
+  const numbered = join(TREE, "notes.txt");
+  const it = served(realDisk({ [numbered]: NUMBERED }));
+  const said = await wrote(it, edits(numbered, "line 30\n", "thirty\n"));
+  assert.equal(refused(said), "", "an edit nobody read lands");
 });
 
 test("the same bad ticket written into the vehicle's own tree is refused the same way", async () => {
@@ -264,7 +233,6 @@ test("a box with no vale lets the write land, and says so in the log once", asyn
 test("a Write carrying state and a prose field lands the prose, puts state back, and names it", async () => {
   const at = join(WORK, "spec", "tickets", "good.md");
   const it = box({ [at]: GOOD });
-  marksSeen(it, relativeTo(it.root, at), GOOD);
   const wrote = GOOD.replace("state: open", "state: closed").replace(
     "## change\n",
     "## change\n\nThe door puts the field back.\n",
@@ -282,7 +250,6 @@ test("a Write carrying state and a prose field lands the prose, puts state back,
 test("an Edit over state, a route line and a prose field lands the prose and puts the rest back", async () => {
   const at = join(WORK, "spec", "tickets", "good.md");
   const it = box({ [at]: GOOD });
-  marksSeen(it, relativeTo(it.root, at), GOOD);
   const old_string = GOOD.slice(
     GOOD.indexOf("state: open"),
     GOOD.indexOf("## change\n") + "## change\n".length,
@@ -311,7 +278,6 @@ test("an Edit over state, a route line and a prose field lands the prose and put
 test("an Edit changing engine fields alone comes back refused, naming them, because nothing of it lands", async () => {
   const at = join(WORK, "spec", "tickets", "good.md");
   const it = box({ [at]: GOOD });
-  marksSeen(it, relativeTo(it.root, at), GOOD);
 
   const said = await onWrite(
     {
@@ -324,47 +290,4 @@ test("an Edit changing engine fields alone comes back refused, naming them, beca
   );
 
   assert.match(said?.result?.deny ?? "", /state/);
-});
-
-// [[spec/design_output/level0#a-write-meets-its-mark]]
-test("a mark written on one box reads on a fresh box over the same disk", async () => {
-  const at = join(TREE, "notes.txt");
-  const disk = realDisk({ [at]: NUMBERED });
-  await called(served(disk), reads(at));
-
-  const said = await wrote(served(disk), edits(at, "line 3\n", "three\n"));
-
-  assert.equal(refused(said), "", "the restarted box reads the mark off the disk");
-});
-
-// [[spec/design_output/level0#a-write-meets-its-mark]]
-test("a Read of lines 10 to 20 lets an Edit inside them land, and refuses one at line 30", async () => {
-  const at = join(TREE, "notes.txt");
-  const it = served(realDisk({ [at]: NUMBERED }));
-  await called(it, reads(at, { offset: 10, limit: 11 }));
-
-  const outside = await wrote(it, edits(at, "line 30\n", "thirty\n"));
-  assert.match(refused(outside), /moved on the disk after you read it/);
-
-  const inside = await wrote(it, edits(at, "line 15\n", "fifteen\n"));
-  assert.equal(refused(inside), "", "an edit inside the span lands");
-});
-
-// [[spec/design_output/level0#a-write-meets-its-mark]]
-test("a read handing back the text the mark holds writes the marks file once", async () => {
-  const at = join(TREE, "notes.txt");
-  const kept = norm(join(TREE, MARKS));
-  const disk = realDisk({ [at]: NUMBERED });
-  const it = served(disk);
-  await called(it, reads(at));
-  const first = disk.times.get(kept);
-  assert.ok(first, "the first read writes the marks file");
-  assert.deepEqual(Object.keys(JSON.parse(disk.read(kept))), ["notes.txt"]);
-
-  await called(it, reads(at));
-  assert.equal(
-    disk.times.get(kept),
-    first,
-    "a second read of the same text writes nothing",
-  );
 });

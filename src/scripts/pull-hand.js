@@ -46,7 +46,7 @@ import {
   WAIT,
   walkOf,
 } from "./pull-route.js";
-import { HELPER, SPAWN, spawnPrompt, unblockPrompt } from "./pull-spawn.js";
+import { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 import { entriesOf, pushed, returnsOf, shut, target, tipOf } from "./pull-writes.js";
 import { NOTES, opensDraft, schemasHere } from "./ticket.js";
 
@@ -153,7 +153,6 @@ export function handOut(it, who) {
 
   const why = [];
   let other = null;
-  let person = null;
   for (const pool of asked) {
     for (const found of pool) {
       const one = agentOpens(found.text) ? openedHere(it, found, all) : found;
@@ -164,20 +163,16 @@ export function handOut(it, who) {
       const said = offer(it, who, one, all);
       if (said.leaf) return handed(it, who, one, said.leaf);
       if (said.why) why.push(`${one.name} ${said.why}`);
-      // A hand-out frees a group, so a ticket in no group waits for its person where it stands. [[spec/tickets/the-desk-findings-wait]]
-      if (said.person && !person && fieldOf(one.text, GROUP))
-        person = { name: one.name, leaf: said.person };
       if (said.other && !other) other = { one, leaf: said.other, why: said.why };
     }
     if (other && !who.oneStep) return spawnAnswer(other);
   }
 
   // [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
-  const cleanup = who.wanted || why.length || person ? null : cleanupOf(it);
+  // A person's step waits under its reason, and the note names who answers it. [[spec/design_output/work#a-person-step-leaves]]
+  const cleanup = who.wanted || why.length ? null : cleanupOf(it);
   if (cleanup) say(cleanup.word, cleanup.rows);
   else say(WAIT, why.length ? why : [nothingFor(who)]);
-  // A person's question leaves the branch, so the group lands. [[spec/design_output/work#a-person-step-leaves]]
-  if (person) console.log(`\n${unblockPrompt(person.name, person.leaf)}`);
   return 0;
 }
 
@@ -325,7 +320,7 @@ export function advanced(it, one, all) {
       return { why: `stands at ${path || "no step"}, which its route lacks` };
     }
 
-    const when = holdsHere(it, leaf.when, front);
+    const when = holdsHere(it, leaf.when);
     if (!when.holds) {
       text = withEntry(text, { step: leaf.path, skipped: true, why: when.why });
       changes.push(`skips ${leaf.path}`);
@@ -388,21 +383,13 @@ export function advanced(it, one, all) {
   return { why: "loops in its route" };
 }
 
+// A route names the box it runs on, and no shipped route reads the record. [[spec/tickets/every-road-has-a-caller]]
 // [[spec/design_output/pull#a-condition-skips-a-leaf]]
-export function holdsHere(it, when, front) {
+export function holdsHere(it, when) {
   if (!when) return { holds: true };
   if (when === "cloud")
     return { holds: Boolean(it.cloud), why: "the box runs off the cloud" };
   if (when === "desk") return { holds: !it.cloud, why: "the box runs on the cloud" };
-  if (when === "returned") {
-    const last = entriesOf(front)
-      .filter((one) => !one.skipped)
-      .at(-1);
-    return {
-      holds: Number(last?.returns ?? 0) > 0,
-      why: "the ticket arrives here by no on_fail",
-    };
-  }
   return { holds: false, why: `${when} names no condition the pull reads` };
 }
 
@@ -431,7 +418,6 @@ export function admits(it, who, one, leaf, all) {
     const spawns = String(leaf.by) === HELPER && Boolean(it.agent);
     return {
       why: said.why,
-      ...(said.person ? { person: leaf } : {}),
       ...(spawns ? { other: leaf } : {}),
     };
   }

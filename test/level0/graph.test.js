@@ -33,7 +33,7 @@ steps:
         on_fail: draft
   - name: reflect
     does: names the class of error
-    when: returned
+    when: cloud
   - name: sign
     does: says yes or no
     by: person
@@ -65,7 +65,7 @@ test("a leaf answers a node under its phase", () => {
 test("a when draws the node dotted, and says which condition", () => {
   const one = nodeAt(drawn(), "reflect");
   assert.equal(one.dotted, true);
-  assert.equal(one.when, "returned");
+  assert.equal(one.when, "cloud");
 });
 
 test("a person step stands marked", () => {
@@ -124,18 +124,18 @@ test("a ticket draws its pointer, its skips and its returns", () => {
         name: "design",
         steps: [{ name: "draft" }, { name: "review" }],
       },
-      { name: "reflect", when: "returned" },
+      { name: "reflect", when: "cloud" },
     ],
     record: [
       { step: "design/draft", returns: 2 },
-      { step: "reflect", skipped: true, why: "the ticket reaches it by no on_fail" },
+      { step: "reflect", skipped: true, why: "the box runs off the cloud" },
     ],
   });
   assert.equal(nodeAt(graph, "design/review").at, true);
   assert.equal(nodeAt(graph, "design/draft").at, undefined);
   assert.equal(nodeAt(graph, "design/draft").returns, 2);
   assert.equal(nodeAt(graph, "reflect").skipped, true);
-  assert.equal(nodeAt(graph, "reflect").why, "the ticket reaches it by no on_fail");
+  assert.equal(nodeAt(graph, "reflect").why, "the box runs off the cloud");
 });
 
 test("a ticket reads through its frontmatter, and a process through its file", () => {

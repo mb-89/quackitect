@@ -84,7 +84,7 @@ import {
 import { TOOLS as handTools, SPECS as toolSpecs } from "./tools.js";
 import { registeredPort } from "./vehicle.js";
 import { helperReports, SPECS as waitSpecs, TOOLS as waitTools } from "./wait.js";
-import { marksKept, onRead, onToolWrite, schemasHere } from "./write.js";
+import { onToolWrite, schemasHere } from "./write.js";
 
 const OK = 200;
 const NOT_FOUND = 404;
@@ -125,7 +125,6 @@ const DOORS = {
 const TOOLS = {
   Grep: answersFromIndex,
   Glob: answersFromIndex,
-  Read: onRead,
   // [[spec/design_output/level0#a-write-names-its-ticket]]
   Write: onToolWrite,
   Edit: onToolWrite,
@@ -155,8 +154,6 @@ export async function decide(said, box) {
   if (said?.fill !== undefined) measures(box, said.fill);
   const door = DOORS[String(said?.event ?? "")] ?? pass;
   const answer = letsThrough((await door(said?.e ?? {}, box)) ?? PASS, said, box);
-  // The call's marks reach the file once, after the door answers. [[spec/design_output/level0#the-marks-survive-a-restart]]
-  marksKept(box);
   if (box.registered || String(said?.event ?? "") === "engine.create") return answer;
   box.registered = true;
   return { ...answer, register: answer.register ?? box.specs };
