@@ -29,7 +29,7 @@ type Places struct {
 	Queue map[string]string
 	Cloud map[string]bool
 	Todo  map[string]bool
-	// The rows this box takes: every placed row past the cloud's, which the strip counts behind the tab's name. [[spec/design_output/tui#the-work-tab]]
+	// The rows this box takes: every placed row past the cloud's, which the strip counts behind the tab's name and the sidebar's button draws. [[spec/design_output/tui#the-work-tab]]
 	Takeable int
 	// The plan's own todos, which the index holds nowhere, so the tab adds them as rows. [[spec/design_output/stop#the-plan]]
 	Rows []answerRow
@@ -155,16 +155,21 @@ func Placed(t *tree.Tree, p Places) {
 // The verb runs off the tab, and its answer lands as a message. [[spec/design_output/tui#the-work-tab]]
 func PlacesCmd(root string) tea.Cmd {
 	return func() tea.Msg {
-		said, err := runPlaces(root)
-		if err != nil {
-			return PlacesMsg{Why: err.Error()}
-		}
-		places, err := PlacesIn(said)
+		places, err := PlacesAt(root)
 		if err != nil {
 			return PlacesMsg{Why: err.Error()}
 		}
 		return PlacesMsg{Places: places}
 	}
+}
+
+// The places the verb answers for the tree at that root, which the tab and the sidebar's count both read. [[spec/design_output/tui#the-work-tab]]
+func PlacesAt(root string) (Places, error) {
+	said, err := runPlaces(root)
+	if err != nil {
+		return Places{}, err
+	}
+	return PlacesIn(said)
 }
 
 // A root holding no verb answers its error at once, so a case's tree spawns nothing. [[spec/design_output/work#one-reading-answers-git]]
