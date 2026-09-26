@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  answerAfter,
   bandOf,
   CELL_WORDS,
   checkSpec,
@@ -27,6 +28,7 @@ import {
   wordsIn,
 } from "../../.claude/skills/level0/lib/answer.js";
 import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
+import { answersIn } from "../../.claude/skills/level0/lib/voice.js";
 import { holdsForAnswer, onPromptSubmit } from "../../src/bridge/answer.js";
 
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
@@ -358,21 +360,67 @@ test("a shape finding asks for a rewrite whatever the score", () => {
 test("after an owner prompt the first Bash call asks for the reply, and a helper's call passes", () => {
   const box = { log: { say: () => {} } };
   onPromptSubmit({ text: "get to work", origin: { kind: "composer" } }, box);
-  assert.equal(holdsForAnswer({ tool: "Bash", agentId: "a1" }, box), null, "a helper's call passes");
-  assert.deepEqual(holdsForAnswer({ tool: "Bash" }, box), { needs: "reply" }, "the first call asks");
-  assert.deepEqual(holdsForAnswer({ tool: "Bash" }, box), { needs: "reply" }, "and so does the next");
+  assert.equal(
+    holdsForAnswer({ tool: "Bash", agentId: "a1" }, box),
+    null,
+    "a helper's call passes",
+  );
+  assert.deepEqual(
+    holdsForAnswer({ tool: "Bash" }, box),
+    { needs: "reply" },
+    "the first call asks",
+  );
+  assert.deepEqual(
+    holdsForAnswer({ tool: "Bash" }, box),
+    { needs: "reply" },
+    "and so does the next",
+  );
 });
 
 // The answer-first line rides the prompt's own event. [[spec/tickets/a-reply-follows-its-prompt]]
 test("the prompt's answer rewrites its text to open on the warning line", () => {
   const box = { log: { say: () => {} }, clock: { now: () => new Date(0) } };
-  const said = onPromptSubmit({ origin: { kind: "composer" }, text: "Fix the door." }, box);
-  assert.equal(said.event?.text, `${warns("The owner sent a prompt")}\n\nFix the door.`);
+  const said = onPromptSubmit(
+    { origin: { kind: "composer" }, text: "Fix the door." },
+    box,
+  );
+  assert.equal(
+    said.event?.text,
+    `${warns("The owner sent a prompt")}\n\nFix the door.`,
+  );
 });
 
 // A machine's prompt opens no demand, so its text stays as it stands. [[spec/tickets/a-reply-follows-its-prompt]]
 test("a machine's prompt keeps its text", () => {
   const box = { log: { say: () => {} }, clock: { now: () => new Date(0) } };
-  const said = onPromptSubmit({ origin: { kind: "plugin" }, text: "A task ends." }, box);
+  const said = onPromptSubmit(
+    { origin: { kind: "plugin" }, text: "A task ends." },
+    box,
+  );
   assert.equal(said.event, undefined);
 });
+
+// The rewritten prompt puts the warning line in front of the owner's row, and every reader of that row reads the same. [[spec/tickets/the-warning-keeps-readers]]
+test("an owner row opening on the warning line reads as the same owner row", () => {
+  const warned = `${warns("The owner sent a prompt")}\n\nFix the door.`;
+  const rows = (text) => [
+    { role: "assistant", text: "The old answer." },
+    { role: "user", text },
+    { role: "assistant", text: "Understood: the door first." },
+  ];
+  assert.equal(answerAfter(rows(warned), ""), answerAfter(rows("Fix the door."), ""));
+  assert.equal(spokeSince(rows(warned)), spokeSince(rows("Fix the door.")));
+  assert.equal(
+    answersIn(transcript(warned)).join("|"),
+    answersIn(transcript("Fix the door.")).join("|"),
+  );
+});
+
+function transcript(text) {
+  const said = (type, words) =>
+    JSON.stringify({ type, message: { content: [{ type: "text", text: words }] } });
+  return [
+    said("user", text),
+    said("assistant", "Understood: the door first, then the chapters, then the check."),
+  ].join("\n");
+}
