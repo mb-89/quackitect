@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box c28a93a32b71 · claude-code-remote
     hash_before: fb38d274e4bcd57a1cc5891b6c01579290460856
     hash_after: fb38d274e4bcd57a1cc5891b6c01579290460856
+  - step: design/review
+    hand: box c28a93a32b71 · claude-code-remote · helper-2
+    hash_before: a0cb3fe41b7079e53c10adf178305c632171a7dc
+    hash_after: a0cb3fe41b7079e53c10adf178305c632171a7dc
 ---
 
 # Ask
@@ -167,6 +171,12 @@ The sidebar's `set` already writes its line with the button as the maker. The wi
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+- the-window-keeps-the-binding: `opened` in `src/extension/sidebar.js` wipes a local `engine.binding` at every new window, and the tracked `queue` then answers. The draft logs that wipe, and the Ask's "the binding holds until the owner changes it" still waits on a fix that carries the binding across a new window
+- the-bridge-names-no-maker: the draft's `bindingLine` reads a change no line names as a change by hand, yet the sidebar `set`, the `./RUNME.sh config` verb in `src/scripts/cli-check.js` `readConfig`, and the new-window wipe each write their own line first. The builder words the bridge line as the binding it reads and the layer, and names no maker
+- the-retro-reads-its-hand: `holdsIn` reads every hold on the box, so a helper holding a retro step keeps the owner's session from clearing. The builder reads the session's own hold in `clearsHere`, or records why the box-wide read stands
+- the-window-case-in-level0: the draft puts the new-window case in `test/extension/session.test.js`, and the Ask asks for a case under `test/level0`. The builder puts it in `test/level0/session-layer.test.js` or beside `test/level0/binding.test.js`
 
 # implement
 
