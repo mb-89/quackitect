@@ -93,13 +93,30 @@ export function standingOf(tickets, merged = new Set()) {
   );
 }
 
+// A branch whose tip stands on trunk's own line is a cut waiting for a box while trunk moves on, and a landed branch joins through a merge commit, off that line. [[spec/design_output/work#a-merged-branch-closes]]
 export function mergedHere(it) {
   const fresh = branchesIn(it, ["branch", "-r", "--points-at", `origin/${TRUNK}`]);
+  const line = linesOf(
+    it.git.run(["rev-list", "--first-parent", `origin/${TRUNK}`], true).out,
+  );
   return new Set(
     [...branchesIn(it, ["branch", "-r", "--merged", `origin/${TRUNK}`])].filter(
-      (row) => !fresh.has(row),
+      (row) => !fresh.has(row) && !line.has(tipOf(it, row)),
     ),
   );
+}
+
+function linesOf(said) {
+  return new Set(
+    String(said ?? "")
+      .split("\n")
+      .map((row) => row.trim())
+      .filter(Boolean),
+  );
+}
+
+function tipOf(it, branch) {
+  return String(it.git.run(["rev-parse", `origin/${branch}`], true).out ?? "").trim();
 }
 
 // A branch standing at trunk's tip carries no work, so the close leaves it alone. [[spec/design_output/work#a-merged-branch-closes]]
