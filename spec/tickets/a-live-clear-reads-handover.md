@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -40,6 +40,18 @@ record:
     hand: box d6f05e3a585030 · claude-code · the owner says so
     hash_before: 2c59cbac86f37527c768043c30c0fcd8d1c96a76
     hash_after: 2c59cbac86f37527c768043c30c0fcd8d1c96a76
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: f33fc22774862cef76a489e5d065b7c2ea76529b
+    hash_after: 3709b4d3db5c3cc114160479b7c1f5ceea5332b3
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 20 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -112,11 +124,15 @@ Two steps run another way, and each stands on a ticket of its own:
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/context-handover.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -124,11 +140,17 @@ Two steps run another way, and each stands on a ticket of its own:
 
 <!-- the form is text -->
 
+Nothing changes in the code. The live run proves the clear, and each step that runs another way stands on a ticket of its own, as the answer names.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the answer: the step follows it, and changes no code
+- the cleanup: each fault the run reveals stands on its own ticket
+- one place: the answer points at those tickets, and repeats none of their asks
 
 # Discussion
 
