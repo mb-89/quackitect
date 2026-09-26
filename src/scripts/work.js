@@ -261,22 +261,22 @@ function take(it, name = "") {
       a.branch.localeCompare(b.branch),
   );
 
-  const one = wanted[0];
-  // The reset under onBranch lands on the branch this take picks, so that branch meets the same read as the one the box stands on. [[spec/design_output/work#a-branch-moves-clean]]
-  if (dirty(it, one.branch)) return 2;
-  if (!onBranch(it, one.branch)) return 1;
-  // A box with nothing at a step it can take leaves the group at todo, before it writes a line. [[spec/tickets/the-group-leaves-at-todo]]
-  const stands = standsOpen(it, one.name, it.join(it.root, ticketAt(one.name)));
-  if (stands.open.length && !stands.busy.length) {
+  // A group nothing here takes stands aside, and the take reads the next, so one gate holds no other work up. [[spec/design_output/work#the-owner-opens-the-gate]]
+  for (const one of wanted) {
+    // The reset under onBranch lands on the branch this take picks, so that branch meets the same read as the one the box stands on. [[spec/design_output/work#a-branch-moves-clean]]
+    if (dirty(it, one.branch)) return 2;
+    if (!onBranch(it, one.branch)) return 1;
+    // A box with nothing at a step it can take leaves the group at todo, before it writes a line. [[spec/tickets/the-group-leaves-at-todo]]
+    const stands = standsOpen(it, one.name, it.join(it.root, ticketAt(one.name)));
+    if (!stands.open.length || stands.busy.length) return claimGroup(it, one);
     console.log(
       `${one.branch} stays at ${TODO}, because no hand here takes an open step.`,
     );
     for (const child of stands.open)
       console.log(`  ${waitsAt(it, child, stands.children)}`);
-    console.log(`Answer it, then run ./RUNME.sh branch take again.`);
-    return 0;
   }
-  return claimGroup(it, one);
+  console.log(`Answer it, then run ./RUNME.sh branch take again.`);
+  return 0;
 }
 
 // The step a child stands at, and what it waits for, read in the order takeable reads it. [[spec/tickets/the-small-faults-land]]
