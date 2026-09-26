@@ -122,9 +122,9 @@ person at a local box wants the button and a cloud box wants the server.
 
 The call comes back in milliseconds where the modules stand. The line
 backgrounds the server and sends its output to `.se/.log/serve.log`, so a
-session start waits for nothing. The server answers the next event in about a
-second. A first event landing before it stands reads no rules, and the log
-names the piece that misses.
+session start waits for nothing. The rules ride the first event the server
+answers, and nothing waits for it to stand. For details, see
+[[spec/design_output/level0#rules-ride-the-first-answer]].
 
 The road brings the modules where they stand nowhere. A cloud box clones the
 repository fresh when the container starts. The half of the setup writing into
@@ -140,6 +140,46 @@ names, and answers `7` where it does. That install waits, because a session
 holding no cage reads no rule at all. A session start pays it once, and on a
 box whose first event finds no server alone.
 
+### Rules ride the first answer
+
+Nothing in level zero waits on a clock. What a session reads depends on which
+events a server already answered.
+
+The server keeps one mark a session: whether the session holds its standing
+layer. `layerRides` in `src/bridge/guidance.js` reads the mark.
+
+| the event | what the server does |
+|---|---|
+| `prompt.context` | hands the layer as blocks, and sets the mark |
+| the first `tool.call` of the agent's own, with the mark unset | hands the layer as added context on the answer, and sets the mark |
+| a later `tool.call` | hands no layer |
+| a `tool.call` answering a result or a hold | hands no layer, so the next call carries it |
+
+A compaction and a `/clear` fire `prompt.context` again, and that read hands
+the layer again. For details, see
+[[spec/design_output/level0#the-guidance-stays-put]].
+
+A server restarting under a session builds the mark off the log. A `context`
+row there says the session holds the layer. A server the start road launched
+late meets no such row, so its first answer hands the layer over.
+
+The bridgehead holds no wait either:
+
+| the event, no server answering | what the bridgehead does |
+|---|---|
+| `session.start` or `prompt.context` | runs the start road once, and hands the event on |
+| a read tool | answers the starting line at once |
+| the stop on a cloud box, a launch standing, no answer yet | holds the turn with one line: level zero starts, and the next event carries its rules |
+| the stop where the road stands down, or on a desk | hands the stop on |
+
+The road answering `0` or `7` launches a server, and it exits `3` off a cloud
+box. So a launch says the box is a cloud box. A road standing down sets the
+cage and launches nothing, so a box that starts no server loops nowhere.
+
+The stop holds `HOLDS` times at most before a server answers. So a launched
+server that stays down frees the turn after the last hold. The count reads
+events alone.
+
 ### The first call pays
 
 `READ_TOOLS` in the hook names the tools a hand reads with, and the hook
@@ -149,18 +189,22 @@ a box whose server answers nothing carries the tools anyway.
 A call of a read tool takes the `*` door every event takes, and no door of its
 own. So one post reaches a server that stands, and the answer rides back the
 way every other answer does, its `register` list among it. A call landing
-before the server stands takes the steps below:
+before the server answers takes the steps below, and waits on nothing:
 
 - it posts once, and answers where a server stands
-- it runs the start above, then reads `/health` every fifth of a second, where the start brings a server up
-- `STARTING` caps that wait, and the wait running out answers the port and the log
+- it runs the start above, where the road has not run yet
+- it answers at once, with one line
 
-The wait runs once for each server the road starts. A later call on a dead
-server answers the port and the log at once. A dead server costs that one post
-before the start and one after it.
-`test/level0/read-tools.test.js` counts both over each read tool.
+| what stands | the line says |
+|---|---|
+| a launch stands, and no server answers this session yet | level zero starts, the call answers once the server stands, and the agent calls it again |
+| no launch stands, or a server answers once and then falls | the port and the log |
 
-So a hand calls `find` on its first turn, and that call pays for the server.
+`test/level0/read-tools.test.js` counts the one post over each read tool.
+
+So a hand calls `find` on its first turn, and that call starts the server. The
+call after it lands on the server, and carries the rules. For details, see
+[[spec/design_output/level0#rules-ride-the-first-answer]].
 
 ## A fix reaches the session
 
@@ -257,6 +301,11 @@ exits clean. `RESPAWN_WAIT` in `src/bridge/server.js` holds the window, and
 `SERVE` in `lib/log.js` names the file. `respawned` takes the exit as an
 argument, so a case drives the fall through the fake process door.
 
+`restarts` in `src/bridge/server.js` ends the listen and starts the child on
+the next turn of the loop. Node's own close callback waits on every open
+connection, and a running wait holds one for minutes. So the restart waits on
+none, and the old process ends them as it exits.
+
 ## The server holds off sleep
 
 A box asleep answers no hook, so a session under agent control dies with the
@@ -295,10 +344,20 @@ later. So the bridgehead says it where a person stands.
 | says one line in the chat, through `$.ui.log` | the first such event past the session start |
 | drops both marks | the server answers again |
 | answers the `no server answers` line to a level zero tool | a tool call the server answers nothing for, since its hook finds nothing past it |
+| answers the starting line to a level zero tool | a tool call before the server its start road brings up answers, per [[spec/design_output/level0#rules-ride-the-first-answer]] |
 
 A post nobody takes reads the port pointer first, because a server restarting
 on another port writes it again. Where the pointer names another port, the
 bridgehead posts there once more before the server reads as down.
+
+The host's fetch cuts a post at its own timeout, and a wait runs past it. So a
+`mcp__level0__wait` post falling with no status after `CUT` or more in
+`.claude/skills/level0/hooks/level0.js` asks `/health` once.
+
+| the health | the wait |
+|---|---|
+| answers | goes again as the same post, and its answer stands in place of the `no server answers` line |
+| answers nothing | reads as down, as above |
 
 The route both name is the one the bridgehead posts to, which `url()` answers.
 The line names it, what the wire says, and the commands a person runs:
@@ -675,6 +734,53 @@ The verb exits `0` on `survives` and `1` on anything else.
 run costs ninety seconds and two model calls, so `SE_SLOW` switches it on and
 `./RUNME.sh check` stays fast without it.
 
+## The cold probe
+
+A unit test passes on each part, and a real box still breaks where the parts
+meet. So the commit verb runs the cold probe on every commit touching the cold
+path, and no hand remembers it. `COLD_PATH` in `src/scripts/probe-cold.js`
+names the path: the bridgehead, the start road, the guidance delivery and the
+probe itself.
+
+| what the commit verb meets | what it does |
+|---|---|
+| a landing off the cold path | commits, and runs no probe |
+| a landing on it, and the probe passes | prints one line, then commits |
+| a landing on it, and a check fails | prints the probe's lines, unstages, and commits nothing |
+| a landing on it, and no `claude` in the tool survey | says so in one line, and commits nothing |
+
+The gate runs after the tests pass and before the commit. It hands the staged
+delta to the probe as a patch, so the clone runs the commit about to land.
+`./RUNME.sh probe cold` runs the same probe over the commit the tree stands on.
+
+The probe runs one cold box from start to end:
+
+1. It clones the commit this tree stands on into a fresh temp folder.
+   It applies the delta the commit verb hands it.
+2. It runs `src/scripts/install.sh` under the skip list the setup names, so
+   the plugin manifest lands.
+3. It writes the clone's pointer at a port of its own, so a desk server keeps
+   its port.
+4. It runs the client headless with `--plugin-dir`, which skips the trust
+   gate, under a config folder of its own.
+5. It reads the clone's session log and the client's stream.
+6. It stops the server the clone launched, and removes the folder.
+
+`readsCold` in `src/scripts/probe-cold.js` answers each check from the rows
+and the stream:
+
+| the check | it passes where |
+|---|---|
+| hook | a bridgehead `session.start` row or a `context` row stands |
+| server | a row the bridgehead leaves unwritten stands |
+| rules | a `context` row names `level0-rules` and `level0-canary` |
+| tools | a `mcp__level0__` name past the read tools reaches the session |
+| canary | the first text opens on the sentence, and no later text repeats it |
+
+The canary check also fails on a `HEARD.again` row, and on a `gate` row asking
+for the canary after the payment. The probe prints one line a check, and exits
+`0` where every check passes.
+
 ## Without the verb
 
 The two log lines pay on their own. A session that compacts in the ordinary
@@ -807,6 +913,7 @@ node itself, so the setup leans on nothing again.
 
 | what the setup installs | why the cage needs it |
 |---|---|
+| the plugin manifest | git ignores it, so a fresh clone loads no plugin until the install writes it |
 | node | the command line and the server are JavaScript |
 | the modules | the server dies at import without them |
 | Vale | the prose rules the write door reads |
@@ -924,9 +1031,11 @@ in `src/bridge/bash.js` reads `e.description` through `ticketOf` and
 name one. `onPowerShell` runs the same gate for the PowerShell tool, and no
 rule past it, since every rule above reads a POSIX command line.
 
-A session holds no ticket before its first pull, so `freeOfTicket` in
+A session holds no ticket before its first take or pull, so `freeOfTicket` in
 `.claude/skills/level0/lib/bash.js` reads these forms as needing none:
 
+- `./RUNME.sh branch take`
+- `./RUNME.sh branch list`
 - `./RUNME.sh ticket pull`
 - `./RUNME.sh mint ticket`
 - `./RUNME.sh ticket note`
@@ -944,77 +1053,21 @@ the panel stands clear, and the work goes on.
 
 ## A write meets its mark
 
-Separate hands on one tree drop each other's work. One reads a file, the other
-writes it, and the first write lands over text the other leaves. So the door
-keeps a mark against each path, and a write meets it.
+No door reads a mark, so the write door keeps none. The Read door, the patch
+lane, the undo and the shell reads set no mark either. For the reason, see
+[[spec/tickets/every-road-has-a-caller]].
 
-| when | what the door does |
-|---|---|
-| content reaches the agent, by a read or by its own write landing | it hashes that text and keeps it against the path |
-| the agent writes that path | it hashes what the disk holds now |
-| the two agree | the write lands |
-| the two differ | it refuses, and asks for a read |
-| the disk holds the path nowhere | the write lands, because a new file agrees with anything |
-
-The reading that sets the mark is the whole of the mechanism. The door reads the file
-for itself on every edit, so a mark off that read compares against itself. The
-mark comes off the read reaching the agent.
-
-The hand carries nothing. `lib/marks.js` holds the hash, the spans and the
-refusal. The box holds the marks against the tree it serves, and the runtime
-file keeps them. This door writes a refusal
-of its own, because the voice refusal opens on the prose rules and says the
-wrong thing here. It names the file, says which case stands, and
-asks for a read.
-
-The door answers ahead of the write, so a write the engine drops leaves the
-mark ahead of the disk. The next write refuses and asks for a read, which costs
-a read and keeps the tree whole. The batch lane reads every file inside the
-call that writes it. That read is the agent's own, so the lane takes no token.
-A batch call writing nothing puts back the marks it meets:
-
-- a preview
-- a refusal at the door
-- a first file refusing the write
+`lib/marks.js` and `MARKS` in `lib/runs.js` stand under `.claude`, where the
+hand working that ticket writes nothing. Their own cases in
+`test/level0/apply.test.js` read them alone, and they leave together.
 
 ### The marks survive a restart
 
-The box loads the marks off `.se/.runtime/marks.json` on the first ask, and
-`runs.js` names the file. `decide` runs `marksKept` once a call, after the door
-answers. So a sweep writing many marks writes the file once.
-
-`marksKept` writes the file only where a mark moves. A read handing back the
-text the mark holds writes nothing.
+`MARKS` names `.se/.runtime/marks.json`, and no box writes it.
 
 ### The mark holds line spans
 
-A mark holds the whole hash and a list of line spans, each with its own hash.
-
-| the read | what it marks |
-|---|---|
-| a whole Read | the whole hash, and it drops the spans |
-| a Read with `offset` or `limit` | a span over the lines it hands back, beside the whole hash |
-| a Write landing | the whole hash |
-
-A write passes where the whole hash agrees with the disk. An Edit passes too
-where the lines it changes lie inside a span that still agrees. The lines it
-changes come off the common head and tail of the disk text and the new text.
-A Write replacing the file asks for the whole hash.
-
-### A lone shell read marks
-
-A shell read standing alone hands the agent the lines it prints, so it marks
-them.
-
-| the command | what it marks |
-|---|---|
-| `cat <file>` | the whole hash |
-| `head -n <n> <file>` | lines 1 to n |
-| `tail -n <n> <file>` | the last n lines |
-| `sed -n 'a,bp' <file>` | lines a to b |
-
-A pipe, a chain or a redirection sets no mark. `cat` at the head of a pipe
-hands the agent a part of the file, and the door cannot tell which part.
+`spanned` keeps a span beside the whole hash, and no read sets one.
 
 ## The door reaches a helper
 
@@ -1889,3 +1942,8 @@ the span counts from the last change the wait sees. The process door's
 `wait.most` in `spec/config/level0.json` caps the wait in seconds. The wait
 looks at its signals once a second, and the clock decides the rest, so a case
 drives it on the fake clock.
+
+The bridgehead stamps a wait with `since`, the moment of its first post, and
+posts it again under the same stamp where the host cuts it. The box keeps the
+watch a stamp begins, so a post again carries on its signals, and the cap
+counts from `since`. The older loop ends once a later post takes the watch.

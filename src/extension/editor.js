@@ -10,6 +10,7 @@ const { fileDoor } = require("./editor-files.js");
 const { lensDoor } = require("./editor-lens.js");
 const { insetDoor } = require("./editor-inset.js");
 const { fieldDoor } = require("./editor-fields.js");
+const { clientOf } = require("./lib/lsp.js");
 
 const NAME = "quackitect";
 const FAR_LEFT = Number.MAX_SAFE_INTEGER;
@@ -45,7 +46,8 @@ function editorDoor(context) {
       } catch {
         return "";
       }
-      const client = new node.LanguageClient(ask.id, ask.name, ask.server, ask.client);
+      // [[spec/design_output/lsp#the-client-starts-it-again]]
+      const client = clientOf(node, ask);
       context.subscriptions.push(client);
       client.start();
       return ask.server.command;

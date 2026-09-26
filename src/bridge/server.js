@@ -41,6 +41,7 @@ import {
   onSessionEnd,
   onSessionStart,
   onTurnComplete,
+  layerRides,
   onTurnSaid,
   owesCanary,
   surveyHere,
@@ -87,7 +88,7 @@ import {
 import { TOOLS as handTools, SPECS as toolSpecs } from "./tools.js";
 import { registeredPort } from "./vehicle.js";
 import { helperReports, SPECS as waitSpecs, TOOLS as waitTools } from "./wait.js";
-import { marksKept, onRead, onToolWrite, schemasHere } from "./write.js";
+import { onToolWrite, schemasHere } from "./write.js";
 
 const OK = 200;
 const NOT_FOUND = 404;
@@ -137,7 +138,6 @@ const DOORS = {
 const TOOLS = {
   Grep: answersFromIndex,
   Glob: answersFromIndex,
-  Read: onRead,
   // [[spec/design_output/level0#a-write-names-its-ticket]]
   Write: onToolWrite,
   Edit: onToolWrite,
@@ -167,8 +167,6 @@ export async function decide(said, box) {
   if (said?.fill !== undefined) measures(box, said.fill);
   const door = DOORS[String(said?.event ?? "")] ?? pass;
   const answer = letsThrough((await door(said?.e ?? {}, box)) ?? PASS, said, box);
-  // The call's marks reach the file once, after the door answers. [[spec/design_output/level0#the-marks-survive-a-restart]]
-  marksKept(box);
   // A module the client loads again marks its post fresh, since the load drops the tools the client held. [[spec/design_output/level0#the-first-call-pays]]
   if ((box.registered && !said?.fresh) || String(said?.event ?? "") === "engine.create")
     return answer;
@@ -287,9 +285,10 @@ async function onToolCall(e, box) {
   );
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
-  if (!passes(said)) return said;
+  // The standing layer rides the first call a session takes where no context read reached the server. [[spec/design_output/level0#rules-ride-the-first-answer]]
+  if (!passes(said)) return layerRides(e, box, said);
   // [[spec/design_output/level0#the-findings-ride-the-call]]
-  return held ?? answerRides(e, box, owesCanary(e, box)) ?? PASS;
+  return layerRides(e, box, held ?? answerRides(e, box, owesCanary(e, box)) ?? PASS);
 }
 
 function passes(said) {
@@ -358,7 +357,9 @@ export function serve(method, port = PORT_BASE, say = console.log) {
   const restart = () => {
     held.release();
     own.log.say("info", "bridge", `the server restarts at ${where}`);
-    server.close(() => respawned(own, [process.execPath, ...process.argv.slice(1)]));
+    restarts(server, () =>
+      respawned(own, [process.execPath, ...process.argv.slice(1)]),
+    );
   };
 
   const onRequest = (request, response) => {
@@ -438,6 +439,13 @@ export async function respawned(own, argv, exit = process.exit, wait = RESPAWN_W
     );
   } catch {}
   exit(1);
+}
+
+// The listen ends at once, and the child starts on the next turn of the loop. Node's own close callback waits on every open connection, and a wait or a kept socket holds one for minutes, so the restart hands it nothing. The old process exits once the child stands, which ends the rest. [[spec/design_output/level0#a-restart-watches-its-child]]
+export function restarts(server, then, soon = setImmediate) {
+  server.close();
+  server.closeIdleConnections?.();
+  soon(then);
 }
 
 // The line naming the fault, out of what the child wrote: the first naming an error, else the last. [[spec/design_output/level0#a-restart-watches-its-child]]

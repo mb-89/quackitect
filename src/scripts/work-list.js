@@ -23,7 +23,7 @@ import {
   MERGED,
   readWork,
   standingAll,
-  waitingOn,
+  waitsOf,
 } from "./work-stands.js";
 
 // [[spec/design_output/work#a-row-per-group]]
@@ -75,7 +75,7 @@ export function list(it, _name, argv) {
 function rowOf(one, standing, now, it) {
   const text = one.ticket;
   const status = standing.get(one.branch) || "no status";
-  const waits = waitingOn(text, standing);
+  const waits = waitsOf(one, standing);
   const why = waits.length ? `waits for ${waits.join(", ")}` : markOf(text);
   // [[spec/design_output/work#a-stale-group-is-yours]]
   const { age, stale } =

@@ -12,6 +12,7 @@ import { line } from "../../.claude/skills/level0/lib/refuse.js";
 import { formIn, refusesIn } from "../../.claude/skills/level0/lib/warnings.js";
 import { messageFaults, messageNote } from "../bridge/bash.js";
 import { MESSAGE_HOW, ticketFault, ticketOf } from "../engine/named.js";
+import { coldIn, probeCold } from "./probe-cold.js";
 
 const USAGE = ['Usage: ./RUNME.sh commit "<message>" [<path>...] [--no-push]'];
 
@@ -56,7 +57,7 @@ export async function commitVerb(it, argv) {
 }
 
 // Nothing stages before the message reads clean, so a refused message leaves the tree standing. [[spec/design_output/work#the-battery-answers-first]]
-function landsAndPushes(it, argv, message, paths) {
+async function landsAndPushes(it, argv, message, paths) {
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out.trim();
   // A desk lands nothing on a work branch, so the refusal comes before the tests run. [[spec/design_output/work#a-desk-works-on-trunk]]
   if (onDesk(it, branch)) {
@@ -84,9 +85,13 @@ function landsAndPushes(it, argv, message, paths) {
     console.error(saidBy(staged));
     return 1;
   }
+  if ((await coldGate(it, only)) !== 0) {
+    unstages(it, only);
+    return 1;
+  }
   const made = it.git.run(["commit", "-m", message, ...only], true);
   if (!made.ok) {
-    it.git.run(["reset", "-q", ...only], true);
+    unstages(it, only);
     console.error("The commit comes back refused, so nothing lands:");
     console.error(saidBy(made));
     return 1;
@@ -125,6 +130,65 @@ function movedFrom(it, paths) {
       out.push(from);
   }
   return out;
+}
+
+// A staged file on the cold path runs the cold probe over the staged delta, so no hand remembers it. [[spec/design_output/level0#the-cold-probe]]
+export async function coldGate(it, only) {
+  const listed = it.git.run(
+    ["diff", "--cached", "--name-only", "--no-renames", ...only],
+    true,
+  );
+  const touched = coldIn(listed.out.split("\n").filter(Boolean));
+  if (!touched.length) return 0;
+  const client = clientOf(it);
+  if (!client) {
+    console.error(
+      `claude stands nowhere on this box, so ${touched.join(", ")} lands only where the cold probe runs: run ./RUNME.sh tools, or land it from a box holding claude.`,
+    );
+    return 1;
+  }
+  const delta = it.proc.run(
+    ["git", "diff", "--cached", "--binary", "--no-renames", ...only],
+    {
+      cwd: it.root,
+    },
+  );
+  if (delta.exitCode !== 0) {
+    console.error(
+      "The staged delta comes back refused, so the cold probe runs nothing:",
+    );
+    console.error(saidBy(delta));
+    return 1;
+  }
+  const lines = [];
+  const probe = it.cold ?? probeCold;
+  const code = await probe(
+    it.root,
+    it,
+    client,
+    (one) => lines.push(one),
+    delta.stdout ?? "",
+  );
+  if (code !== 0) {
+    console.error(
+      "The cold probe answers FAIL on the staged change, so nothing lands:",
+    );
+    for (const one of lines) console.error(one);
+    return 1;
+  }
+  console.log(`The cold probe passes on the staged change to ${touched.join(", ")}.`);
+  return 0;
+}
+
+// A reset naming a pathspec unstages and leaves MERGE_HEAD standing, so a refused merge commit stays a merge. [[spec/design_output/work#one-verb-feeds-that-stamp]]
+function unstages(it, only) {
+  it.git.run(["reset", "-q", ...(only.length ? only : ["--", "."])], true);
+}
+
+// The survey names where claude stands, and a name the disk lacks stands nowhere. [[spec/design_output/tools#where-a-caller-looks]]
+function clientOf(it) {
+  const at = String(it.claude ?? "");
+  return at && it.disk.exists(at) ? at : "";
 }
 
 // A run answers on two streams, and a read of one alone names the wrong line. [[spec/design_output/work#one-verb-feeds-that-stamp]]

@@ -3,7 +3,6 @@
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import assert from "node:assert/strict";
-import { join } from "node:path";
 import { test } from "node:test";
 import {
   addsIn,
@@ -19,17 +18,6 @@ import {
 } from "../../.claude/skills/level0/lib/bash.js";
 import { RULE as GIT_WRITE } from "../../.claude/skills/level0/lib/git-writes.js";
 import { scriptsIn } from "../../.claude/skills/level0/lib/scripted.js";
-import { NAMED, named } from "./fixtures.js";
-import {
-  called,
-  edits,
-  NUMBERED,
-  realDisk,
-  refused,
-  served,
-  TREE,
-  wrote,
-} from "./mark-doors.js";
 
 // Every git write answers the git-write rule too, so a case over another rule reads that rule's rows alone. [[spec/design_output/bash#git-writes-take-verbs]]
 const rules = (command, most = 5, it = {}) =>
@@ -295,7 +283,10 @@ test("a branch cut past the cap is refused, and one inside it passes", () => {
 // The cap is a ceiling, so the refusal says so. [[spec/tickets/the-small-faults-land]]
 test("the branch refusal says a name holds at most the cap", () => {
   const [said] = findings("git switch -c a-name-that-runs-past-the-cap", 5);
-  assert.match(said.message, /A name holds at most 5 words, and a-name-that-runs-past-the-cap holds more/);
+  assert.match(
+    said.message,
+    /A name holds at most 5 words, and a-name-that-runs-past-the-cap holds more/,
+  );
 });
 
 // [[spec/design_output/bash#a-test-run-points-somewhere]]
@@ -499,36 +490,6 @@ test("a variable resolving to a free path passes, and a temp variable passes unr
   assert.deepEqual(paths("echo x > $TMPDIR/msg.md"), []);
   assert.deepEqual(paths(`echo x > $${"{TMPDIR}"}/msg.md`), []);
   assert.deepEqual(paths("out=spec; echo x > $out/y.md"), ["spec/y.md"]);
-});
-
-// [[spec/design_output/level0#a-write-meets-its-mark]]
-test("sed -n '1,5p' README.md marks lines 1 to 5, and a read with a pipe after it marks nothing", async () => {
-  const at = join(TREE, "README.md");
-  const it = served(realDisk({ [at]: NUMBERED, ...named(TREE) }));
-  await called(it, {
-    tool: "Bash",
-    command: "sed -n '1,5p' README.md",
-    description: `${NAMED}: read the file`,
-  });
-
-  const outside = await wrote(it, edits(at, "line 7\n", "seven\n"));
-  assert.match(refused(outside), /moved on the disk after you read it/);
-  const inside = await wrote(it, edits(at, "line 3\n", "three\n"));
-  assert.equal(refused(inside), "", "an edit inside the printed lines lands");
-
-  const other = join(TREE, "other.md");
-  const piped = served(realDisk({ [other]: NUMBERED, ...named(TREE) }));
-  await called(piped, {
-    tool: "Bash",
-    command: "cat other.md | head -n 2",
-    description: `${NAMED}: read the file`,
-  });
-  const said = await wrote(piped, edits(other, "line 1\n", "one\n"));
-  assert.match(
-    refused(said),
-    /has read none of it/,
-    "a read feeding a pipe sets no mark",
-  );
 });
 
 // A read gates nothing, so a landing after one passes, and a pipe answers its last command, so a gate piped ahead of a landing refuses. [[spec/tickets/doors-read-what-commands-do]]

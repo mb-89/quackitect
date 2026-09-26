@@ -253,6 +253,20 @@ test("mostInARow ends a runaway", () => {
   assert.equal(it.inARow(), 0, "the count starts again");
 });
 
+// A cloud box ends with its branch handed back, so the cap frees none holding a group. [[spec/design_output/stop#three-in-a-row]]
+test("mostInARow frees no turn the caller pins", () => {
+  const it = toothOf();
+  const carried = [];
+  for (let i = 0; i < 5; i++) {
+    carried.push(it.atTurnEnd(voted(["work-waiting"]), 3, true));
+  }
+  assert.deepEqual(
+    carried.map((one) => one.ends),
+    [false, false, false, false, false],
+  );
+  assert.equal(carried.at(-1).runaway, false, "no runaway stands");
+});
+
 // A claim reads the agent, and a check reads the tree, so the check wins. [[spec/design_output/stop#a-check-beats-a-claim]]
 const YIELDING = [
   {

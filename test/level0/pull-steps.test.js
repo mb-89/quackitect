@@ -138,8 +138,8 @@ test("a person step carries its reader, and a colon takes quotes", () => {
   );
 });
 
-// [[spec/design_output/pull#a-condition-skips-a-leaf]]
-test("a leaf under when returned is skipped on the way forward, with the reason in the record", () => {
+// [[spec/design_output/pull#the-commands-answer]]
+test("a tests-red hand-back short of its checklist refuses, and the record carries the command's answer", () => {
   const ready = filled(
     CHILD("open", "implement/tests-red"),
     "### tests",
@@ -169,18 +169,13 @@ test("a leaf under when returned is skipped on the way forward, with the reason 
   const now = disk.read(at("spec/tickets/a-child.md"));
   assert.equal(fieldOf(now, "step"), "implement/change");
   const entries = recordIn(now);
-  assert.deepEqual(entries.at(-2).answered, [
+  assert.deepEqual(entries.at(-1).answered, [
     {
       name: "tests",
       exit: 1,
       said: "assertion, 1 test(s) fail on their own assertion",
     },
   ]);
-  assert.deepEqual(entries.at(-1), {
-    step: "implement/reflect",
-    skipped: true,
-    why: "the ticket arrives here by no on_fail",
-  });
 });
 
 // [[spec/design_output/pull#the-commands-answer]]

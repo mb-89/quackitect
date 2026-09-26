@@ -24,7 +24,7 @@ import {
 } from "../../.claude/skills/level0/lib/undo.js";
 import { ticketNamed } from "../engine/group.js";
 import { FIELD_HOW, ticketFault } from "../engine/named.js";
-import { marksOf, marksSeen, onWrite } from "./write.js";
+import { onWrite } from "./write.js";
 
 export const SPECS = () => [patchSpec(), replaceSpec(), undoSpec()];
 export const TOOLS = {
@@ -63,19 +63,15 @@ async function lands(e, took, box) {
   if (!took.ok) return { result: { result: took.why } };
   const unnamed = unnamedIn(e, took, box);
   if (unnamed) return { result: { result: unnamed } };
-  // A call writing nothing moves no disk, so the marks it meets stand as they stood. [[spec/design_output/level0#a-write-meets-its-mark]]
-  const held = new Map(marksOf(box));
   const refused = await checked(took, box, e.agentId);
-  if (refused) {
-    box.marks = held;
-    return { result: { result: refused } };
-  }
-  if (e.preview === true) {
-    box.marks = held;
-    return { result: { result: wouldLand(took) } };
-  }
-  const wrote = writes(took, String(e.on ?? ""), box, ticketNamed(String(e.ticket ?? "")));
-  if (!wrote.landed) box.marks = held;
+  if (refused) return { result: { result: refused } };
+  if (e.preview === true) return { result: { result: wouldLand(took) } };
+  const wrote = writes(
+    took,
+    String(e.on ?? ""),
+    box,
+    ticketNamed(String(e.ticket ?? "")),
+  );
   // A break of form lands with the batch, and its note rides the answer. [[spec/design_output/level0#the-panel-holds-a-warning]]
   const warned = wrote.landed ? (took.warned ?? []) : [];
   return { result: { result: [wrote.said, ...warned].join("\n\n") } };
@@ -102,7 +98,7 @@ async function checked(took, box, agentId) {
     );
     if (said?.result?.deny)
       return `${one.file} refuses the batch, and nothing is written.\n\n${said.result.deny}`;
-    // The door formats code and marks the text it answers, so the disk takes that text and the next edit meets its mark. [[spec/design_output/level0#the-formatter-applies-itself]]
+    // The door formats code, so the disk takes the text it answers. [[spec/design_output/level0#the-formatter-applies-itself]]
     if (typeof said?.event?.content === "string") one.made = said.event.content;
     took.warned.push(...(said?.after?.context ?? []));
   }
@@ -228,8 +224,6 @@ async function undoes(e, box) {
   const done = [];
   for (const one of put.writes) {
     box.disk.write(join(box.root, inTheTree(box.root, one.file)), one.text);
-    // The undo hands the agent what it put back. [[spec/design_output/level0#a-write-meets-its-mark]]
-    marksSeen(box, inTheTree(box.root, one.file), one.text);
     done.push(`  put back ${one.file}`);
   }
   for (const path of put.removes) {
@@ -284,7 +278,6 @@ function sweeps(e, box) {
 }
 
 // [[spec/design_output/apply#bytes-in-bytes-out]]
-// [[spec/design_output/level0#a-write-meets-its-mark]]
 function readsFiles(box, paths) {
   const held = {};
   for (const path of paths) {
@@ -296,7 +289,6 @@ function readsFiles(box, paths) {
     try {
       const text = String(box.disk.read(join(box.root, at)));
       held[path] = { exists: true, text };
-      marksSeen(box, at, text);
     } catch {
       held[path] = { exists: false };
     }

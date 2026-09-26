@@ -3,6 +3,7 @@
 // so the judge and the spawn run here.
 // [[spec/design_output/pull#the-checks]]
 
+import { configOf, SCHEMA, TRACKED } from "../lib/config.js";
 import {
   judgeAsk,
   judgeLabels,
@@ -20,17 +21,24 @@ import { register as bridgehead, READ_TOOLS } from "./level0.js";
 const CLI_SCRIPT = "src/scripts/cli.js";
 // The script stands under the method root, which a project root holds nowhere, so the call names it whole. [[spec/design_output/vehicle#the-work-root-inherits]]
 let cli = ["node", CLI_SCRIPT];
+// The tracked files the judge reads its switch from, the method root's under the work root's own. [[spec/design_output/vehicle#the-work-root-inherits]]
+let tracked = [TRACKED];
+let schema = SCHEMA;
 // The verb and the flag src/scripts/pull-tool.js reads, fixed while the argv behind them moves. [[spec/design_output/pull#the-hand-out]]
 const PULL = ["ticket", "pull"];
 const TOOL = "--tool";
-const CONFIG = "spec/config/level0.json";
+const ENABLED = "judge.enabled";
+const MODEL = "judge.model";
 const RUNNING = 600000;
 const JUDGE = "--judge";
-const SPAWNS = 3;
+const BACKGROUND =
+  "The hand works in the background. Take the next item, and pull again once it answers.";
 
 export function register(on, options) {
   const method = String(options?.method ?? "").replace(/[\\/]+$/, "");
   cli = ["node", method ? `${method}/${CLI_SCRIPT}` : CLI_SCRIPT];
+  tracked = method ? [`${method}/${TRACKED}`, TRACKED] : [TRACKED];
+  schema = method ? `${method}/${SCHEMA}` : SCHEMA;
   // The engine takes one session start a module, so the bridgehead registers none and this one registers its read tools beside the pull. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
   bridgehead(on, options);
   on("session.start", async ($, e, next) => {
@@ -49,16 +57,12 @@ export function register(on, options) {
       const said = await judged($, e);
       if (said) return { result: said };
     }
-    let answer = await pulled($, e);
-    // [[spec/design_output/pull#a-hand-of-its-own]]
-    for (let round = 0; round < SPAWNS; round++) {
-      const prompt = spawnPromptIn(answer);
-      if (!prompt) break;
-      const said = await spawned($, prompt);
-      if (said) return { result: `${answer}\n\n${said}` };
-      answer = await pulled($, {});
-    }
-    return { result: answer };
+    const answer = await pulled($, e);
+    // The hand works in the background, and the lead takes the next item. [[spec/tickets/the-hook-awaits-the-spawn]]
+    const prompt = spawnPromptIn(answer);
+    if (!prompt) return { result: answer };
+    const said = (await spawned($, prompt)) || BACKGROUND;
+    return { result: `${answer}\n\n${said}` };
   });
 }
 
@@ -126,6 +130,7 @@ async function spawned($, prompt) {
     said = await $.agent.spawn({
       prompt,
       own: true,
+      background: true,
       description: "a hand of its own works one step",
       subagentType: "general-purpose",
     });
@@ -137,11 +142,10 @@ async function spawned($, prompt) {
   return "";
 }
 
-// [[spec/design_output/pull#the-checks]]
+// The switch reads through the one resolver, so the per-box file a slash command writes beats the tracked one. [[spec/design_output/pull#the-checks]]
 async function judged($, e) {
-  const settings = await readJson($, CONFIG);
-  const judge = settings?.judge ?? {};
-  if (judge.enabled === false) return "";
+  const settings = configOf({ tracked, schema, read: async (path) => $.fs.read(path) });
+  if ((await settings.ask(ENABLED)) === false) return "";
 
   const ran = await $.process.run([...toolCall(e), JUDGE], await running($));
   const material = parsed(ran.stdout);
@@ -152,7 +156,7 @@ async function judged($, e) {
     said = await $.model.classify(
       judgeAsk(material.evidence, material.rules),
       judgeLabels(material.rules),
-      { model: judge.model },
+      { model: await settings.ask(MODEL) },
     );
   } catch {
     return "";
@@ -166,13 +170,5 @@ function parsed(text) {
     return JSON.parse(String(text ?? "").trim() || "null");
   } catch {
     return null;
-  }
-}
-
-async function readJson($, path) {
-  try {
-    return JSON.parse(await $.fs.read(path));
-  } catch {
-    return {};
   }
 }

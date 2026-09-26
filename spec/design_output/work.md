@@ -79,11 +79,14 @@ boxes reaching for one group mean one of them meets a rejected push and
 takes the next. That box resets the branch to its remote, so its claim leaves
 the box and the next take meets no commit origin lacks. A claim the commit
 refuses leaves the ticket as the take finds it, and the take stops.
+A take on a box that holds its branch hands that ask again, and a sync conflict after the claim still prints the ask.
 
 The take reads the group before it writes that entry, through `standsOpen` in
 `src/scripts/work.js`. A group whose open children hold no step a hand can take
-stays at `todo`, and the take names the step each child waits at. So a cloud
-box stops here, on the branch, and the record keeps the shape it holds.
+stays at `todo`, and the take names the step each child waits at. The take
+then reads the next free group, and claims the first one holding a step a hand
+takes. So one group waiting on a person holds no other group up, and the record
+of the waiting one keeps the shape it holds.
 
 The hand names the box and no person, because the ticket travels and
 `spec/guidance/private` binds what a tracked file carries. [[spec/guidance]]
@@ -148,7 +151,7 @@ A flag asks for that one reading in place of the rows.
 |---|---|---|
 | the refs | `for-each-ref` | every work branch, its tip, the time on that tip, and whether trunk holds it |
 | the paths | `cat-file --batch` | the ticket names each tip carries |
-| the contents | `cat-file --batch` | every ticket the paths name |
+| the contents | `cat-file --batch`, in pieces of `BATCH_ASKS` from `src/doors/git.js`, because one answer past the process door's buffer throws | every ticket the paths name, on every work branch |
 | the base | `merge-base`, once a branch | what trunk and that branch share |
 
 The fetch stands off that path. `branch list --fetch` asks for it, and `take`
@@ -238,10 +241,22 @@ it out. For details, see [[spec/design_output/work#the-merge-frees-the-tickets]]
 
 # A person step leaves
 
-A step whose `by` reads `person` stops no cloud box, which answers it and moves
-on. A desk hands one out instead: `branch unblock <ticket> <successor>` takes
-the ticket standing at that step and hands its rest to a ticket outside the
-group:
+A step whose `by` reads `person` names who answers it by the box the pull runs
+on:
+
+| the box | who answers the step |
+|---|---|
+| a cloud box | the box itself, and it moves on. [[spec/guidance/cloud]] |
+| a desk, under the owner's word | the hand `--owner-says` sends in, and the record names both. [[spec/design_output/pull#the-hand-rule]] |
+| a desk, under a person's own hand | that person, through their own pull |
+| an agent on a desk, with no word | nobody: the pull answers `wait` and names the step |
+
+A desk takes no leaf of a work branch, so a person step there waits for the
+cloud box. [[spec/design_output/work#a-desk-works-on-trunk]]
+
+A desk hands a question out through `branch unblock <ticket> <successor>`. The
+verb takes the ticket standing at that step and hands its rest to a ticket
+outside the group:
 
 | what it reads | what it writes |
 |---|---|
@@ -249,8 +264,8 @@ group:
 | on `main`, the group the ticket's own `group` field names | the same close, since a desk works on `main` |
 | the successor stands open and names no group | the question that step asks, under the successor's `Discussion`, beside the ticket it comes from |
 
-The pull offers this hand-out on a ticket naming a group alone. A ticket in no
-group holds no branch up, so it waits for its person where it stands.
+A ticket in no group holds no branch up, so it waits for its person where it
+stands.
 
 A question rides the frontmatter on one line, so it carries its own lines as
 `\n`. The unblock writes them back under `Discussion`:
@@ -504,6 +519,33 @@ itself in order, and each link starts from the one before it.
 from a trunk carrying none of that work. It then builds that work a second time.
 
 `branch list` shows what each branch waits for, in place of its mark.
+
+## A switch holds a group
+
+A group names a config key under `enabled_by`, and it waits while that key reads
+anything but `true`:
+
+    enabled_by: migration.phase2switch
+
+The wait reads the tracked `spec/config/level0.json` on `origin/main`, the file
+every box shares. A per-box file, a variable and the sidebar each write this
+box alone, so none of them lets the cloud take the group. `readWork` in
+`src/scripts/work-stands.js` reads that file once, through `flatten` in the one
+resolver, where some group names the field.
+
+| the verb | what it does with a switched-off group |
+|---|---|
+| `branch take` | passes it over, and takes the next free group |
+| `branch list` | says it waits for the key to read true |
+| `cloud trigger` | counts it nowhere among the free groups |
+
+The switch adds to `depends_on`, and replaces none of it. A group takes both: the
+groups it names land, and its key reads true.
+
+The owner turns a group on with an edit of `spec/config/level0.json` on `main`,
+setting its key to `true`, then a commit and a push. `./RUNME.sh config` writes
+the per-box file alone, so it turns nothing on in the cloud. A desk session makes
+the same edit where the owner says so.
 
 # The battery answers first
 

@@ -143,11 +143,18 @@ which leaves the group open the same way.
 
 ## A condition skips a leaf
 
-`when` reads `cloud`, `desk` or `returned`. `cloud` and `desk` read the doors
-the command line hands in off the environment. `returned` holds where the
-newest record entry that is no skip carries `returns`, which a fail writes. A
-leaf whose condition fails takes a `skipped` entry with the reason. The pull
-then moves to the next leaf, or closes the ticket `done` past the last.
+`when` reads `cloud` or `desk`, off the doors the command line hands in off
+the environment. A leaf whose condition fails takes a `skipped` entry with the
+reason. The pull then moves to the next leaf, or closes the ticket `done` past
+the last. A closed ticket carrying `when: returned` stands as history, and the
+check reads no row on it.
+
+The conditions below read the ticket's Ask, and `src/scripts/pull-when.js` reads them:
+
+| `when` | holds where the Ask carries |
+|---|---|
+| `view` | a `view:` line naming anything but `none` |
+| `handed` | `from: handover`, which a mint under `--from=handover` writes |
 
 ## A need is a verb
 
@@ -161,6 +168,7 @@ holds no open note.
 | the route says | the pull admits |
 |---|---|
 | `by: person` | a hand off a harness, a hand on a cloud box, or one under `--owner-says`. An agent at a desk waits |
+| `by: person` under `when: view` or `when: handed` | a hand off a harness, or one under `--owner-says`. An agent waits, on a cloud box too |
 | `by: agent` | a hand on a harness |
 | `by: helper` | nobody yet, until the spawn lands |
 | `by: retro` | a hand while its group stands at a retro step, or a note with the tag |
@@ -413,6 +421,16 @@ judge run carries the `--fields` payload of the hand-back. The material lays
 the payload over the ticket before it reads the evidence, so the judge reads
 what the hand writes.
 
+The wrapper reads `judge.enabled` and `judge.model` through `configOf`, over
+`$.fs`, so the switch a slash command sets reaches the judge:
+
+| the layer | how the judge reads it |
+|---|---|
+| the method root's `spec/config/level0.json` | first, as [[spec/design_output/vehicle#the-work-root-inherits]] says |
+| the work root's `spec/config/level0.json` | over the method root's |
+| the environment | nowhere, because `$` carries no environment |
+| `.se/.runtime/config.json` | over both tracked files |
+
 The evidence holds the prose fields alone. The leaf names the form of each
 field it asks for. So the material leaves out a field whose form reads
 `command`, and a heading carrying no line. A chapter of commands hands the
@@ -570,20 +588,16 @@ the turn open for a hand-back nobody owes.
 | the road | what `pushed` does |
 |---|---|
 | a desk | pushes nothing and runs no check: the hand-back stands on this box, as with the commit verb. [[spec/guidance/working]] |
-| trunk | runs `./RUNME.sh check` over the commit first, so the stamp names the commit the push carries |
-| a red check | pushes nothing, and the answer names the check's own lines |
-| a tests-red leaf | stands on this box on trunk, and the next green push carries it |
+| a cloud box | pushes its work branch with no check, because that push meets no battery |
 | a moved branch | fetches, rebases once, and pushes again |
-| a rebase on trunk | runs the check again, because the rebase moves the commit off the stamp |
 | any other refusal | answers the push door's own lines, and runs no rebase |
-| a work branch | pushes with no check, because its push meets no battery |
+
+No cloud box hands back on trunk, so the push holds no trunk road. For the
+read behind this, see [[spec/tickets/every-road-has-a-caller]].
 
 Git names a moved branch with `fetch first` or `non-fast-forward`, and the
 rebase runs on those words alone. A rebase that fails puts the tree back, and
 the answer says to push the branch and pull again.
-
-The cost: a pass on trunk runs one full check, and the hand runs none of its
-own. At tests-green the `check` field runs the check, and `pushed` runs it again.
 
 The re-push of a hand-back the record holds already answers the same way.
 `repairPersonSteps` in `src/scripts/pull-hand.js` lands the engine's own repair,

@@ -15,7 +15,7 @@ rationale: [[spec/rationales/cloud]]
 4. Work the branch you hold, and stop at its edge. A change nobody wants buries the one somebody wants. *
 5. Commit and push each time you finish a thing. This box dies and takes its working tree with it. *
 6. Decide every question this branch meets, a step under `by: person` among them, and hand none out. The merge is where a person reads your call. *
-7. Mint a question ticket for work a person alone can do: a permission, a setting, a desk trial. Write every command they need into its ask, push it, and finish the branch. An ask in the chat meets nobody. *
+7. Mint a question ticket for work a person alone can do: a permission, a setting, a desk trial, a refusal. Write every command they need into its ask, push it, and finish the branch. An ask in the chat meets nobody. *
 8. Say beside each answer what you weigh and what you assume. The hand at the merge judges the call on that. *
 9. Carry the branch to done, and stop for no answer you can write yourself. A branch standing mid-step costs the next box a session. *
 10. Finish every step an agent takes before you leave. A step you leave meets the next box and waits again. *

@@ -364,10 +364,36 @@ An open ticket keeps every row.
 # The build beside the index
 
 The server is pure Go, so it needs no compiler and no network. It shares no
-step with the index, which is C and waits on a compiler. `lsp_here` in
-`src/scripts/install.sh` builds again where a source file stands newer than the
-binary. A binary older than its source lints against rules the tree no longer
-carries.
+step with the index, which is C and waits on a compiler. A binary built off
+other source lints against rules the tree no longer carries.
+
+`lsp_here` and `index_here` in `src/scripts/install.sh` ask
+`src/scripts/go-source.js` whether the stamp beside the binary holds the hash of
+its source. The hash reads the binary's folder and every local folder its
+`go.mod` replaces, through `sourceHash` in `src/scripts/tui-build.js`. A test
+file moves nothing. The build writes the stamp.
+
+# The client starts it again
+
+A rebuild swaps the binary, and the running server ends itself once it sees the
+swap. The language client's own handler stops at a cap of starts again, which
+`DefaultErrorHandler` in `vscode-languageclient` holds. So `clientOf` in
+`src/extension/lib/lsp.js`
+hands the client a handler starting `se-lsp` again on every close, after a
+pause of a second. A server falling at its start then loops once a second.
+
+# The doctor probes the server
+
+`doctor` prints a `se-lsp lsp` row off `lspProbe` in `src/scripts/cli-check.js`.
+The probe starts `se-lsp lsp` in the tree, writes `initialize`, a `didOpen` of
+a note under `spec/tickets` carrying no frontmatter, `shutdown` and `exit`, and
+reads what comes back.
+
+| the server | the row |
+|---|---|
+| answers a publish | `answers`, with each diagnostic code it draws |
+| exits, or answers no publish | `warn`, with the exit and the first line it writes |
+| stands nowhere | `missing, run ./RUNME.sh` |
 
 # Every pointer resolves
 

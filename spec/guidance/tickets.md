@@ -11,8 +11,8 @@ rationale: [[spec/rationales/tickets]]
 3. Leave `state`, `step` and `steps` to the verbs. The door refuses your edit to the three. *
 4. Write the evidence of the leaf you stand on, under its chapter, and nothing under another leaf. A field under another leaf reads as that leaf's answer before its hand writes it. *
 5. Write anything at any time under `Discussion`, and nowhere else on a ticket you hold no step of.
-6. Mint a ticket with `./RUNME.sh mint ticket <path> --process=<name>`, so the route copies in and the ask carries its fields. [[spec/processes]]
-7. Fill every field of the ask before you open a ticket. A thin ask stops at the mint.
+6. Mint a ticket with `./RUNME.sh mint ticket <path> --process=<name>`, so the route copies in and the ask carries its fields. Mint a one-line change the owner orders with `--process=trivial`. The standard route spends a draft, a review and a build on it. [[spec/processes]] *
+7. Fill every field of the ask before you open a ticket. A thin ask stops at the mint. Name the view and its number under `view:` where the ask changes a thing the owner sees. A claim of done rests on the owner's pass there. *
 8. Park a thought, a bug or a doubt as a private note: `./RUNME.sh ticket note <name> "<line>"`. Add `--talk` where the owner asks for a discussion, and the retro decides the rest. *
 9. Keep a doubt as a note, an ask as a ticket, and a step in hand as a todo. A todo names no work the pull hands out anyway, and a note takes no place in the queue.
 10. Keep a note under `.se/tickets` until the mint moves it. A private ticket stays off git, and one moved by hand lands on git unread. *
@@ -26,5 +26,7 @@ rationale: [[spec/rationales/tickets]]
 
 | the rule | do | do not |
 |---|---|---|
+| 6 | `--process=trivial` on a one-line config change the owner orders | the standard route on that change |
+| 7 | `view:` naming the sidebar button and the count it reads | a close on a count verb alone |
 | 11 | a ticket carrying the thing for later | a line in a memory file on one box |
 | 14 | urgent on a break that stops every hand | urgent on a finding a retro mints |

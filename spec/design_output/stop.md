@@ -531,6 +531,8 @@ The hook counts the turns it carries one after another.
 - The cap holds over every continue rule, the queue's among them. A session
   refusing the stop line over work it leaves untaken is the stuck session the
   cap frees. The queue stands for the next prompt.
+- The cap frees no cloud box holding a group, because a cloud box ends only
+  with its branch handed back through `./RUNME.sh branch done`.
 
 The hook asks the resolver for `stop.mostInARow` and `stop.enabled` at each
 turn end, and `atTurnEnd` takes the cap as an argument. So the tooth carries no

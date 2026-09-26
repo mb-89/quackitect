@@ -198,7 +198,11 @@ export function onStop(e, box) {
     ran: (name) =>
       ranHere(name, { off, hold, box, claimed, text, tasks: e?.background_tasks }),
   });
-  const said = toothOf_(box).atTurnEnd(decision, Number(asks(box, MOST) ?? 0));
+  // A cloud box ends only with its branch handed back, so the cap frees none holding a group. [[spec/design_output/stop#three-in-a-row]]
+  const pinned =
+    cloudHere(box) &&
+    ranHere("group-in-hand", { off, hold, box, claimed, text }) === true;
+  const said = toothOf_(box).atTurnEnd(decision, Number(asks(box, MOST) ?? 0), pinned);
   // A line naming a reason whose check falls hears which check, and what it sees. [[spec/design_output/stop#a-refusal-names-its-check]]
   const falls =
     said.go?.runs === "no-stop-line"
