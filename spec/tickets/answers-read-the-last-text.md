@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box c28a93a32b71 · claude-code-remote
@@ -89,6 +89,10 @@ record:
     hash_after: 24f65f3fab16d000972816f74b552298c05ab3f1
     returns: 1
     why: "| grade | finding | fix |; |---|---|---|; | design | `paid` reads both the step and the turn's answer. The bridgehead posts the last step's text as `turn.said`, so `onTurnSaid` pays on it, then `onTurnComplete` hands `paid` the same answer with `session.paid` already true. The repeat check then writes `HEARD.again` on every turn that pays the debt, which misses the second done_when line | put the repeat check in `onTurnSaid` alone, so `onTurnComplete` reads the answer for the debt and draws no repeat, and add a case in `test/level0/canary-debt.test.js` where a step pays and the answer at the turn's end carries the same text, with no repeat finding |; | craft | the existing case \"an answer comes out of a transcript, and a helper stays behind\" in `test/level0/verbs.test.js` puts the long text and the short one in one turn. Under last-text-alone the short one stands last, so the case breaks, and the approach names neither the case nor whether `SHORTEST` drops before or after the pick | name the order (pick the last text, then drop it where it runs short, as the ask reads), and name the case the change rewrites |; | craft | `sinceTheOwner` reads bridge rows (`role`, `toolResults`), and a transcript row carries `type` and `message.content` with `tool_result` blocks | name the transcript test for an owner row: `type: \"user\"` with no `tool_result` block in `message.content` |"
+  - step: design/draft
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 064555ec7f07f8e47a06eef8238bef276301ac1f
+    hash_after: 064555ec7f07f8e47a06eef8238bef276301ac1f
 ---
 
 # Ask
@@ -117,8 +121,12 @@ Two changes, one a file.
 
 | the file | the change |
 |---|---|
-| `.claude/skills/level0/lib/voice.js` | `answersIn` cuts the rows into turns at each owner row, a `user` row carrying no tool result, the way `sinceTheOwner` in `lib/answer.js` reads one. It keeps the last `answerOf` text of each turn, and `SHORTEST` still drops a short one |
-| `src/bridge/guidance.js` | `paid` reads a step or an answer opening on the canary where `session.paid` already stands. It writes a `warn` row of kind `level0` with a new `HEARD.again`, and leaves the mark as it stands |
+| `.claude/skills/level0/lib/voice.js` | `answersIn` cuts the transcript into turns at each owner row, then keeps the last `answerOf` text of each turn. `SHORTEST` drops that last text where it runs short |
+| `src/bridge/guidance.js` | `onTurnSaid` reads a step opening on the canary where `session.paid` already stands. It writes a `warn` row of kind `level0` with a new `HEARD.again`, and leaves the mark as it stands |
+
+An owner row in the transcript form is a row of `type: user` whose `message.content` carries no `tool_result` block. A string content counts as an owner row too. A sidechain row and a helper's row stand outside every turn, as `answerOf` drops them today.
+
+The repeat check stands in `onTurnSaid` alone. `onTurnComplete` hands `paid` the turn's last text, which the last step already carried, so a check there fires on every turn that pays. `session.paidBy` holds the step text that paid, and a later step carrying the same text draws nothing.
 
 `HEARD.again` lands in `.claude/skills/level0/lib/guidance.js` beside the other three. A compaction sets `session.paid` false, so a line after it pays and draws nothing. `spec/design_output/level0.md` adds a row to the table under `The line lands once`.
 
@@ -129,8 +137,9 @@ Two changes, one a file.
 <!-- the form is list -->
 
 - `src/scripts/voice.js` `measure`, which calls `answersIn` on each transcript
-- `src/bridge/guidance.js` `onTurnSaid` and `onTurnComplete`, which call `paid`
-- `src/bridge/server.js` the `turn.said` entry and the turn's end, which call those two
+- `src/bridge/guidance.js` `onTurnSaid`, which gains the repeat check, and `paid`, which marks `paidBy`
+- `src/bridge/server.js` the `turn.said` entry, which calls `onTurnSaid`
+- `test/level0/verbs.test.js` the case an answer comes out of a transcript, and a helper stays behind. Its long text stands first and its short one last in one turn, so the case moves the long text last
 
 ### tests
 
@@ -139,7 +148,9 @@ Two changes, one a file.
 <!-- the form is list -->
 
 - `test/level0/verbs.test.js` a turn holding a progress line and an answer gives the answer back alone
-- `test/level0/canary-debt.test.js` a second text opening on the canary in one context draws the repeat finding
+- `test/level0/verbs.test.js` a tool result row opens no turn
+- `test/level0/canary-debt.test.js` a second step opening on the canary in one context draws the repeat finding
+- `test/level0/canary-debt.test.js` a step that pays, then the turn's end carrying the same text, draws no finding
 - `test/level0/canary-debt.test.js` a line after a compaction pays and draws no finding
 
 ### answers
@@ -148,7 +159,9 @@ Two changes, one a file.
 
 <!-- the form is list -->
 
-- first draft
+- the check in `paid` fires on every paying turn: it stands in `onTurnSaid` alone, and a case drives a paying step followed by the turn's end
+- the existing transcript case breaks: named in the callers, and its long text moves last. `SHORTEST` runs after the last text is picked
+- the owner row reads a different shape: the transcript form stands named, a `user` row carrying no `tool_result` block
 
 ### checked
 
