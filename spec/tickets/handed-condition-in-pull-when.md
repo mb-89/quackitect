@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-owners-word-reaches-work
 parent: the-owners-words-travel-verbatim
+record:
+  - step: do
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: b9675a2b423fb4975c80ce4fdd3e8849a762e169
+    hash_after: b9675a2b423fb4975c80ce4fdd3e8849a762e169
+reason: became
+successors: [the-owners-words-travel-verbatim]
 ---
 
 # Ask
