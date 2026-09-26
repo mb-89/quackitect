@@ -19,7 +19,7 @@
   priority: 82
   decides: mechanical
   runs: group-in-hand
-  says: This box holds a group, so run ./RUNME.sh ticket pull, spawn the hand a spawn answer names, and run branch done once the pull answers wait.
+  says: This box holds a group, so run ./RUNME.sh ticket pull, spawn the hand a spawn answer names, and run ./RUNME.sh branch done once the pull answers wait. A step the harness refuses stays on its ticket, and branch done hands that ticket back.
 
 - id: a-ticket-stands-in-hand
   side: continue

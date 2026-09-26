@@ -35,7 +35,7 @@ function engine(answers = {}) {
     fs: { read: async (path) => answers.read?.(path) ?? "", write: async () => {} },
     ui: { log: () => {} },
   };
-  return { on, $, held, registered, ran, asked, waiting: answers.waiting };
+  return { on, $, held, registered, ran, asked };
 }
 
 const firing = (it, event, filter) =>
@@ -46,7 +46,7 @@ const firing = (it, event, filter) =>
 // The hook holds one start a session, so each case takes a session of its own. [[spec/design_output/level0#the-first-call-pays]]
 const opened = (answers) => {
   const it = engine(answers);
-  register(it.on, { waiting: it.waiting });
+  register(it.on, {});
   return it;
 };
 
@@ -112,28 +112,28 @@ for (const spec of READ_TOOLS) {
     assert.equal(said.result, "a line", "the answer rides back as the tool's own");
   });
 
-  test(`a ${spec.name} call meeting no server starts one, and posts once more on the far side`, async () => {
-    const it = opened({
-      fetch: (where, count) => {
-        if (where.endsWith("/health"))
-          return count > 2 ? { ok: true, status: 200 } : null;
-        return count === 1 ? null : { ok: true, status: 200, text: SAID };
-      },
-    });
+  test(`a ${spec.name} call meeting no server starts one, and says at once that level zero starts`, async () => {
+    const it = opened({ fetch: () => null });
 
     const said = await calls(it, called);
 
     assert.ok(it.ran.length, "the start runs where the server answers nothing");
-    assert.ok(
+    assert.equal(
       it.asked.some((one) => one.where.endsWith("/health")),
-      "the wait reads the server's health",
+      false,
+      "the call reads no health, so it waits on nothing",
     );
-    assert.equal(posts(it), 2, "one post before the start, and one after");
-    assert.equal(said.result, "a line", "the second post answers the reader");
+    assert.equal(posts(it), 1, "one post, before the start");
+    assert.match(
+      String(said.result),
+      /Level zero is starting/,
+      "the line says it starts",
+    );
+    assert.match(String(said.result), /Call it again/, "and what the reader does");
   });
 
-  test(`a ${spec.name} wait running out names the port and the log`, async () => {
-    const it = opened({ fetch: () => null, waiting: 20 });
+  test(`a ${spec.name} call where the road launched nothing names the port and the log`, async () => {
+    const it = opened({ fetch: () => null, start: { exitCode: 3 } });
 
     const said = await calls(it, called);
 
@@ -146,15 +146,14 @@ for (const spec of READ_TOOLS) {
 const healths = (it) => it.asked.filter((one) => one.where.endsWith("/health")).length;
 
 // [[spec/design_output/level0#the-first-call-pays]]
-test("a call after the wait runs out answers at once, and reads no health", async () => {
-  const it = opened({ fetch: () => null, waiting: 20 });
+test("a second call before the server answers says it starts again, and runs no second road", async () => {
+  const it = opened({ fetch: () => null });
   await calls(it, "mcp__level0__find");
-  const waited = healths(it);
-  assert.ok(waited > 0, "the first call waits on the server the road starts");
 
   const said = await calls(it, "mcp__level0__find");
-  assert.equal(healths(it), waited, "the second call waits on nothing");
-  assert.match(String(said.result), /no server answers/);
+  assert.equal(healths(it), 0, "no call reads the health");
+  assert.equal(it.ran.length, 1, "the road runs once");
+  assert.match(String(said.result), /Level zero is starting/);
 });
 
 // [[spec/design_output/level0#the-first-call-pays]]
@@ -168,7 +167,6 @@ test("a start road starting no server leaves the call nothing to wait on", async
 // [[spec/design_output/level0#the-bridge-says-it-falls]]
 test("a post nobody takes reads the pointer again, and lands on the port it names", async () => {
   const it = opened({
-    waiting: 20,
     read: (path) => (path === POINTER ? '{"port":7001}' : ""),
     fetch: (where) =>
       where.startsWith("http://127.0.0.1:7001/event")
@@ -190,7 +188,8 @@ for (const tool of ["patch", "replace"]) {
         const event = JSON.parse(it.asked.at(-1).init.body).event;
         events.push(event);
         const tools = events.filter((one) => one === "tool.call").length;
-        if (event === "agent.spoke") return { ok: true, status: 200, text: '{"pass":true}' };
+        if (event === "agent.spoke")
+          return { ok: true, status: 200, text: '{"pass":true}' };
         return tools === 1
           ? { ok: true, status: 200, text: '{"needs":"reply"}' }
           : { ok: true, status: 200, text: SAID };
@@ -211,7 +210,8 @@ test("a reply the door asks for posts the transcript rows with their ids", async
       if (!where.endsWith("/event")) return null;
       const body = JSON.parse(it.asked.at(-1).init.body);
       bodies.push(body);
-      if (body.event === "agent.spoke") return { ok: true, status: 200, text: '{"pass":true}' };
+      if (body.event === "agent.spoke")
+        return { ok: true, status: 200, text: '{"pass":true}' };
       return bodies.filter((one) => one.event === "tool.call").length === 1
         ? { ok: true, status: 200, text: '{"needs":"reply"}' }
         : { ok: true, status: 200, text: SAID };
@@ -241,7 +241,9 @@ test("a prompt posts the id of the newest transcript row", async () => {
       return { ok: true, status: 200, text: '{"pass":true}' };
     },
   });
-  it.$.session = { messages: async () => [{ role: "assistant", text: "old", uuid: "r7" }] };
+  it.$.session = {
+    messages: async () => [{ role: "assistant", text: "old", uuid: "r7" }],
+  };
   const next = Object.assign(async (e) => e, { event: "prompt.submit" });
   await firing(it, "*").run(it.$, { text: "go on" }, next);
   const prompt = bodies.find((one) => one.event === "prompt.submit");

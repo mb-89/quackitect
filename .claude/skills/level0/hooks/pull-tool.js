@@ -5,6 +5,7 @@
 
 // One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
 import { READ_TOOLS, register as bridgehead } from "./level0.js";
+import { configOf, SCHEMA, TRACKED } from "../lib/config.js";
 import {
   judgeAsk,
   judgeLabels,
@@ -20,10 +21,14 @@ import {
 const CLI_SCRIPT = "src/scripts/cli.js";
 // The script stands under the method root, which a project root holds nowhere, so the call names it whole. [[spec/design_output/vehicle#the-work-root-inherits]]
 let cli = ["node", CLI_SCRIPT];
+// The tracked files the judge reads its switch from, the method root's under the work root's own. [[spec/design_output/vehicle#the-work-root-inherits]]
+let tracked = [TRACKED];
+let schema = SCHEMA;
 // The verb and the flag src/scripts/pull-tool.js reads, fixed while the argv behind them moves. [[spec/design_output/pull#the-hand-out]]
 const PULL = ["ticket", "pull"];
 const TOOL = "--tool";
-const CONFIG = "spec/config/level0.json";
+const ENABLED = "judge.enabled";
+const MODEL = "judge.model";
 const RUNNING = 600000;
 const JUDGE = "--judge";
 const BACKGROUND =
@@ -32,6 +37,8 @@ const BACKGROUND =
 export function register(on, options) {
   const method = String(options?.method ?? "").replace(/[\\/]+$/, "");
   cli = ["node", method ? `${method}/${CLI_SCRIPT}` : CLI_SCRIPT];
+  tracked = method ? [`${method}/${TRACKED}`, TRACKED] : [TRACKED];
+  schema = method ? `${method}/${SCHEMA}` : SCHEMA;
   // The engine takes one session start a module, so the bridgehead registers none and this one registers its read tools beside the pull. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
   bridgehead(on, options);
   on("session.start", async ($, e, next) => {
@@ -108,11 +115,10 @@ async function spawned($, prompt) {
   return "";
 }
 
-// [[spec/design_output/pull#the-checks]]
+// The switch reads through the one resolver, so the per-box file a slash command writes beats the tracked one. [[spec/design_output/pull#the-checks]]
 async function judged($, e) {
-  const settings = await readJson($, CONFIG);
-  const judge = settings?.judge ?? {};
-  if (judge.enabled === false) return "";
+  const settings = configOf({ tracked, schema, read: async (path) => $.fs.read(path) });
+  if ((await settings.ask(ENABLED)) === false) return "";
 
   const ran = await $.process.run([...toolCall(e), JUDGE], { timeoutMs: RUNNING });
   const material = parsed(ran.stdout);
@@ -123,7 +129,7 @@ async function judged($, e) {
     said = await $.model.classify(
       judgeAsk(material.evidence, material.rules),
       judgeLabels(material.rules),
-      { model: judge.model },
+      { model: await settings.ask(MODEL) },
     );
   } catch {
     return "";
@@ -137,13 +143,5 @@ function parsed(text) {
     return JSON.parse(String(text ?? "").trim() || "null");
   } catch {
     return null;
-  }
-}
-
-async function readJson($, path) {
-  try {
-    return JSON.parse(await $.fs.read(path));
-  } catch {
-    return {};
   }
 }

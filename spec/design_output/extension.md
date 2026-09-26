@@ -284,9 +284,10 @@ Every press that writes, every run and every edit in the config tree writes a
 - The log button writes `log.open runs ./RUNME.sh tui`.
 - An edit in the config tree writes `stop.mostInARow is 5`, with the detail `the config tree`.
 
-A window writes one file, named by its first line, and writes it whole on every
-line. The row shape comes from `lib/log.js`, the module every writer reads. The
-line honours `log.level`, the same as every other door.
+A window appends each line to the one file its first line names, through the
+editor door. The row shape comes from `lib/log.js`, the module every writer
+reads. The line honours `log.level`, the same as every other door. For details,
+see [[spec/design_output/log#every-writer-appends]].
 
 ## A button names its commands
 
@@ -307,6 +308,7 @@ argument, and a fake door drives the whole path.
 | the door gives | what it reaches |
 |---|---|
 | `read`, `write` | `vscode.workspace.fs`, under the workspace folder |
+| `append` | node's `appendFile`, because `vscode.workspace.fs` offers none |
 | `watch` | `createFileSystemWatcher`, over the three files |
 | `runs` | a terminal, and the line an action names |
 | `registerView` | the webview view a person opens |

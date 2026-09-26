@@ -122,9 +122,9 @@ person at a local box wants the button and a cloud box wants the server.
 
 The call comes back in milliseconds where the modules stand. The line
 backgrounds the server and sends its output to `.se/.log/serve.log`, so a
-session start waits for nothing. The server answers the next event in about a
-second. A first event landing before it stands reads no rules, and the log
-names the piece that misses.
+session start waits for nothing. The rules ride the first event the server
+answers, and nothing waits for it to stand. For details, see
+[[spec/design_output/level0#rules-ride-the-first-answer]].
 
 The road brings the modules where they stand nowhere. A cloud box clones the
 repository fresh when the container starts. The half of the setup writing into
@@ -140,6 +140,46 @@ names, and answers `7` where it does. That install waits, because a session
 holding no cage reads no rule at all. A session start pays it once, and on a
 box whose first event finds no server alone.
 
+### Rules ride the first answer
+
+Nothing in level zero waits on a clock. What a session reads depends on which
+events a server already answered.
+
+The server keeps one mark a session: whether the session holds its standing
+layer. `layerRides` in `src/bridge/guidance.js` reads the mark.
+
+| the event | what the server does |
+|---|---|
+| `prompt.context` | hands the layer as blocks, and sets the mark |
+| the first `tool.call` of the agent's own, with the mark unset | hands the layer as added context on the answer, and sets the mark |
+| a later `tool.call` | hands no layer |
+| a `tool.call` answering a result or a hold | hands no layer, so the next call carries it |
+
+A compaction and a `/clear` fire `prompt.context` again, and that read hands
+the layer again. For details, see
+[[spec/design_output/level0#the-guidance-stays-put]].
+
+A server restarting under a session builds the mark off the log. A `context`
+row there says the session holds the layer. A server the start road launched
+late meets no such row, so its first answer hands the layer over.
+
+The bridgehead holds no wait either:
+
+| the event, no server answering | what the bridgehead does |
+|---|---|
+| `session.start` or `prompt.context` | runs the start road once, and hands the event on |
+| a read tool | answers the starting line at once |
+| the stop on a cloud box, a launch standing, no answer yet | holds the turn with one line: level zero starts, and the next event carries its rules |
+| the stop where the road stands down, or on a desk | hands the stop on |
+
+The road answering `0` or `7` launches a server, and it exits `3` off a cloud
+box. So a launch says the box is a cloud box. A road standing down sets the
+cage and launches nothing, so a box that starts no server loops nowhere.
+
+The stop holds `HOLDS` times at most before a server answers. So a launched
+server that stays down frees the turn after the last hold. The count reads
+events alone.
+
 ### The first call pays
 
 `READ_TOOLS` in the hook names the tools a hand reads with, and the hook
@@ -149,18 +189,22 @@ a box whose server answers nothing carries the tools anyway.
 A call of a read tool takes the `*` door every event takes, and no door of its
 own. So one post reaches a server that stands, and the answer rides back the
 way every other answer does, its `register` list among it. A call landing
-before the server stands takes the steps below:
+before the server answers takes the steps below, and waits on nothing:
 
 - it posts once, and answers where a server stands
-- it runs the start above, then reads `/health` every fifth of a second, where the start brings a server up
-- `STARTING` caps that wait, and the wait running out answers the port and the log
+- it runs the start above, where the road has not run yet
+- it answers at once, with one line
 
-The wait runs once for each server the road starts. A later call on a dead
-server answers the port and the log at once. A dead server costs that one post
-before the start and one after it.
-`test/level0/read-tools.test.js` counts both over each read tool.
+| what stands | the line says |
+|---|---|
+| a launch stands, and no server answers this session yet | level zero starts, the call answers once the server stands, and the agent calls it again |
+| no launch stands, or a server answers once and then falls | the port and the log |
 
-So a hand calls `find` on its first turn, and that call pays for the server.
+`test/level0/read-tools.test.js` counts the one post over each read tool.
+
+So a hand calls `find` on its first turn, and that call starts the server. The
+call after it lands on the server, and carries the rules. For details, see
+[[spec/design_output/level0#rules-ride-the-first-answer]].
 
 ## A fix reaches the session
 
@@ -295,6 +339,7 @@ later. So the bridgehead says it where a person stands.
 | says one line in the chat, through `$.ui.log` | the first such event past the session start |
 | drops both marks | the server answers again |
 | answers the `no server answers` line to a level zero tool | a tool call the server answers nothing for, since its hook finds nothing past it |
+| answers the starting line to a level zero tool | a tool call before the server its start road brings up answers, per [[spec/design_output/level0#rules-ride-the-first-answer]] |
 
 A post nobody takes reads the port pointer first, because a server restarting
 on another port writes it again. Where the pointer names another port, the
@@ -807,6 +852,7 @@ node itself, so the setup leans on nothing again.
 
 | what the setup installs | why the cage needs it |
 |---|---|
+| the plugin manifest | git ignores it, so a fresh clone loads no plugin until the install writes it |
 | node | the command line and the server are JavaScript |
 | the modules | the server dies at import without them |
 | Vale | the prose rules the write door reads |
@@ -924,9 +970,11 @@ in `src/bridge/bash.js` reads `e.description` through `ticketOf` and
 name one. `onPowerShell` runs the same gate for the PowerShell tool, and no
 rule past it, since every rule above reads a POSIX command line.
 
-A session holds no ticket before its first pull, so `freeOfTicket` in
+A session holds no ticket before its first take or pull, so `freeOfTicket` in
 `.claude/skills/level0/lib/bash.js` reads these forms as needing none:
 
+- `./RUNME.sh branch take`
+- `./RUNME.sh branch list`
 - `./RUNME.sh ticket pull`
 - `./RUNME.sh mint ticket`
 - `./RUNME.sh ticket note`
