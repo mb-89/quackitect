@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 0dde19be1600 · claude-code-remote
@@ -111,6 +111,10 @@ record:
   - step: retro/write
     hand: box d7a4b8aac9106 · claude-code-remote
     hash_before: 741fe98f17f5cbe1c1428d0ae3db5068f491bfe8
+  - step: retro/write
+    hand: box d7a4b8aac9106 · claude-code-remote
+    hash_before: af3935de0388e926bc2ab60956a550395bc0b68d
+    hash_after: af3935de0388e926bc2ab60956a550395bc0b68d
 ---
 
 # Ask
@@ -183,11 +187,22 @@ The owner's words reach the work as said. A claim of done rests on the owner's v
 
 <!-- the form is list -->
 
+- `a-small-ask-stays-small`: an owner's one-line change takes the trivial route, and `design/draft` asks a `size` field
+- `the-owner-view-decides-done`: an ask naming a view carries a person leaf after its last leaf, so the owner's view decides done
+- `the-owners-words-travel-verbatim`: a handover and a note ask carry the owner's words as quotes with their session and line
+- `the-hook-awaits-the-spawn`: the callers list names the `tool.call` handler that awaits the spawn answer
+- `the-new-rule-appends`: the new tickets rule appends, so the rationale and the `Examples` rows keep their numbers
+- `the-view-fails-to-implement`: the `view` step carries `on_fail: implement`, so the owner's fail reaches code
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- each design review caught a fault before code, at `10635c3a0`, `01d2aac8a` and `720fda22d`
+- most review findings closed into their child, so the group stays at three roads and three trivial fixes
+- the verbatim child landed after the view child whose Ask-line reader it uses, as the split asks
 
 ### badly
 
@@ -195,11 +210,20 @@ The owner's words reach the work as said. A claim of done rests on the owner's v
 
 <!-- the form is list -->
 
+- a review minted five findings on `the-owner-view-decides-done` at `01d2aac8a`, since its draft named too little
+- `owner-terms-await-question` left the group at `2ed52ea59`, as a question the owner alone answers
+- the children's box let the branch go before the retro at `741fe98f1`, so this retro reads the log
+- this box met a Bash door refusing a description naming no open ticket, before `branch take` hands any ticket out
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- `spec/processes/standard.yaml`: the new `size` field makes a draft name its reach
+- `spec/processes/group.yaml`: a box writes the retro before it lets a branch go, so the transcript backs it
+- `spec/tickets/a-shell-call-names-its-ticket.md`: the shell door lets `branch take` and `ticket pull` through with no ticket
 
 ### thoughts
 
@@ -207,11 +231,20 @@ The owner's words reach the work as said. A claim of done rests on the owner's v
 
 <!-- the form is text -->
 
+- this box takes the branch at `retro/write`, so its work is the account alone
+- the design reviews carry the group's weight, and their findings fold back into each child
+- the owner-terms question waits on the owner, outside the group
+- this box writes no script under `.se/scripts`
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the retro adds points at its commit or its ticket, and repeats no rule
+- the retro adds no number
+- the retro writes no file header
 
 ## cloud
 
