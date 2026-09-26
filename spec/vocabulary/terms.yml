@@ -155,6 +155,8 @@ terms:
   - {word: vehicle, means: "the copy of this tooling that another project carries and that drives the work there"}
   - {word: verb, means: "a named command the tool runs such as a command that acts on a work branch"}
   - {word: verdict, means: "a pass or fail answer that a review step gives with its findings"}
+  - {word: verify, means: "to check a thing against the spec it answers such as a test that checks a requirement"}
+  - {word: validate, means: "to check a thing against the need of the person it serves such as a demonstration that checks a story"}
   - {word: viewer, means: "the program that shows the session log as rows in a terminal window"}
   - {word: vocabulary, means: "the full set of words this tree lets a writer use made of the core and the terms"}
   - {word: watcher, means: "the part that watches the folders for writes and keeps the index rows level with the files"}
@@ -167,7 +169,11 @@ terms:
   - {word: applier, means: "the part that makes an edit or replace land in the files and records how to undo it"}
   - {word: backlog, means: "the loose tickets on trunk that name no group and wait for a person to sort them"}
   - {word: backslash, means: "the character that escapes the next character in a shell command"}
+  - {word: barycenter, means: "an order for a matrix that moves each row to the mean place of the columns it links to and each column the same way"}
   - {word: blacklist, means: "a list of forms a rule refuses inside a larger list of allowed words"}
+  - {word: crosshair, means: "the row and the column a matrix lights up under the pointer so a reader follows both to their names"}
+  - {word: breadcrumb, means: "one step in the path shown on top of a view that a click jumps back to"}
+  - {word: breadcrumbs, means: "the path of steps shown on top of a view from the start page down to where the reader stands"}
   - {word: bundler, means: "a tool that joins the extension source files into one file the editor loads"}
   - {word: caller, means: "the code or agent that calls a tool and states what it expects back"}
   - {word: cgo, means: "the go feature that lets go code call c code and so needs a c compiler to build", source: "https://pkg.go.dev/cmd/cgo"}
