@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-gates-read-the-state
 parent: the-todo-joins-the-queue
+record:
+  - step: do
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 3a78c87524aa12265037197b8a36ea845676b168
+    hash_after: 3a78c87524aa12265037197b8a36ea845676b168
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 22 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-todo-road-stands-first.md:39:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ where neither a hold nor a working todo stands, any open ticket passes, so the c
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/named.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ where neither a hold nor a working todo stands, any open ticket passes, so the c
 
 <!-- the form is text -->
 
+With nothing in hand, any open ticket passes the name door, so the commit verb run by hand still lands. `level0.md` names the road in the table under `A write names its ticket`, and the case with nothing in hand, any open ticket passes and a closed one fails, in `test/level0/named.test.js`, holds it.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the design output and a case both name the road
+- the cleanup: none stands
+- the road stands in the design output's table once
 
 # Discussion
 
