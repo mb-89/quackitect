@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -96,6 +96,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, a test of src/index fails
+  - step: implement/change
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: a90770bc5428cae3d540e3ab91145c88b4c520dc
+    hash_after: 66516ced03485c992138fe292f0c6ed6912546b3
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
