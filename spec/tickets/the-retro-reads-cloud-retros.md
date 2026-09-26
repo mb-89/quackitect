@@ -77,12 +77,18 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
     hash_before: 366f68ec11412f3d513b56a640c0f69d89f0bc87
     hash_after: 369d2106e7cf9c3ad1e7c838fcfc2f6f636f2dcd
+  - step: design/review
+    hand: box b8ae1b45d463 · claude-code-remote · helper-2
+    hash_before: d24e17b72c02718522f6ded893a0075bb2b7890c
+    hash_after: d24e17b72c02718522f6ded893a0075bb2b7890c
+    returns: 1
+    why: "the keep pushes the raw transcript to the remote, and a transcript carries the owner's name, email, home and note text, which the private half keeps home. `git hash-object` and `git commit-tree` walk past the commit door, so the draft's assumption that the door keeps a transcript off git holds for no commit this approach makes. For details, see [[spec/design_output/private#the-run-and-the-token]]; the keep leans on the cloud proxy taking a push to `refs/transcripts/<group>`, and the draft checks it nowhere. A box's proxy takes a push to a branch, and a refused keep answers `1` on every `branch done`, so the group stays held and never leaves; the group ticket's `retro` step already holds the box's own account of its transcript: `write` asks `badly` with its moment in the transcript and `thoughts` off the transcript, and `cloud` asks `lacked`, `met` and `left`. That chapter lands on trunk with `branch merge`, so `cloudInto` reading it answers the first two ask lines with no ref, no keep and no change to `leaves` in `src/scripts/work.js`; the fourth ask line stands against the private half as written. Name the answer the redraft gives it: the `write` step reads the transcript on the box and the chapter carries its account, or the ask goes back to the owner to drop the line; the third ask line, a cloud transcript beside the desk's own, falls with the fourth. The redraft reads the chapter's `badly` and `thoughts` beside the desk transcript over the hours the chapter covers; the composition with `the-retro-finishes-its-asks` still reads true: `copyTree` takes `window` last, `outsideInto` alone passes it, and `keptInto` copies `KEPT`, which `movedInto` skips. A redraft keeping `cloudInto` after `outsideInto` still meets separate hunks; the count and the second pass carry into the redraft as drafted: `sourceOf` names `groups`, and a group under `input/groups` stays out of `--again`"
 ---
 
 # Ask
@@ -212,6 +218,16 @@ Assumptions:
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- the keep pushes the raw transcript to the remote, and a transcript carries the owner's name, email, home and note text, which the private half keeps home. `git hash-object` and `git commit-tree` walk past the commit door, so the draft's assumption that the door keeps a transcript off git holds for no commit this approach makes. For details, see [[spec/design_output/private#the-run-and-the-token]]
+- the keep leans on the cloud proxy taking a push to `refs/transcripts/<group>`, and the draft checks it nowhere. A box's proxy takes a push to a branch, and a refused keep answers `1` on every `branch done`, so the group stays held and never leaves
+- the group ticket's `retro` step already holds the box's own account of its transcript: `write` asks `badly` with its moment in the transcript and `thoughts` off the transcript, and `cloud` asks `lacked`, `met` and `left`. That chapter lands on trunk with `branch merge`, so `cloudInto` reading it answers the first two ask lines with no ref, no keep and no change to `leaves` in `src/scripts/work.js`
+- the fourth ask line stands against the private half as written. Name the answer the redraft gives it: the `write` step reads the transcript on the box and the chapter carries its account, or the ask goes back to the owner to drop the line
+- the third ask line, a cloud transcript beside the desk's own, falls with the fourth. The redraft reads the chapter's `badly` and `thoughts` beside the desk transcript over the hours the chapter covers
+- the composition with `the-retro-finishes-its-asks` still reads true: `copyTree` takes `window` last, `outsideInto` alone passes it, and `keptInto` copies `KEPT`, which `movedInto` skips. A redraft keeping `cloudInto` after `outsideInto` still meets separate hunks
+- the count and the second pass carry into the redraft as drafted: `sourceOf` names `groups`, and a group under `input/groups` stays out of `--again`
 
 # implement
 
