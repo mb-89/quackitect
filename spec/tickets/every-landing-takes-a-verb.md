@@ -335,3 +335,13 @@ The agent now reaches git through the engine alone. A pass commit stages the tic
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+Approach item 7 leaves five git writes with no verb. `GIT_WRITES` in `.claude/skills/level0/lib/git-writes.js` names the road the refusal gives for each:
+
+| git write | the road |
+|---|---|
+| `stash` | land the change through the commit verb |
+| `rebase` | take main in through the sync verb |
+| `reset` | put a write back with the undo tool, or ask a person |
+| `tag` | ask a person |
+| `cherry-pick` | take the branch in through the merge verb |
