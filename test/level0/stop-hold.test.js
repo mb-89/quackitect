@@ -1,4 +1,4 @@
-// The hold from the sidebar: at stop every call but the three that end a turn
+// The hold from the sidebar: at stop every call but the ones that end a turn
 // is refused, at finish the block rides every call, a hold no call meets stands
 // into the next turn, and a prompt landing mid-turn holds the session.
 // [[spec/design_output/stop#the-hold]]
@@ -73,7 +73,7 @@ function ruled(hold) {
   return it;
 }
 
-// The sidebar writes the hold into the local config, and the tracked file carries the standing value. [[spec/design_output/config#the-three-layers]]
+// The sidebar writes the hold into the local config, and the tracked file carries the standing value. [[spec/design_output/config#the-layers]]
 function held(it) {
   try {
     const local = JSON.parse(it.disk.read(LOCAL))?.stop?.hold;

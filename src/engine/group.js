@@ -3,10 +3,12 @@
 // where it stands. Everything here reads or writes that one note.
 // [[spec/design_output/work#a-group-is-a-ticket]]
 
+import { NOTE_END, PUBLIC_TICKETS } from "../../.claude/skills/level0/lib/folders.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 
-export const TICKETS = "spec/tickets";
-export const NOTE_END = ".md";
+// The folders the plugin owns, under the names the engine reads. [[spec/design_output/level0#a-write-names-its-ticket]]
+export const TICKETS = PUBLIC_TICKETS;
+export { NOTE_END };
 export const WORK_BRANCH = "work/";
 export const GROUP = "group";
 export const OPEN = "open";

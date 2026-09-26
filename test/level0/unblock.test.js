@@ -12,7 +12,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { fieldOf } from "../../src/engine/group.js";
 import { withRoute } from "../../src/scripts/process.js";
-import { takeable } from "../../src/scripts/pull.js";
+import { takeable, verdictIn, withPersonStep } from "../../src/scripts/pull.js";
 import { work } from "../../src/scripts/work.js";
 import { unblock } from "../../src/scripts/work-unblock.js";
 import { TICKET_SCHEMA } from "./fixtures.js";
@@ -281,6 +281,50 @@ test("two questions land one list item each", () => {
   const successor = disk.read(at("spec/tickets/a-successor.md"));
   assert.match(successor, /^ {2}- the first road$/m);
   assert.match(successor, /^ {2}- the second road$/m);
+});
+
+// A verdict failing with a table, as a reviewer writes it under the verdict heading. [[spec/tickets/the-small-faults-land]]
+const TABLED = [
+  "fail",
+  "- the rows split:",
+  "| road | cost |",
+  "| --- | --- |",
+  "| one | two |",
+  "- no test drives the hook",
+];
+
+// [[spec/tickets/the-small-faults-land]]
+test("a failed verdict keeps its table rows as rows", () => {
+  const said = verdictIn(TABLED);
+  assert.equal(said.said, "fail");
+  assert.equal(
+    said.reason,
+    "the rows split:; | road | cost |\\n| --- | --- |\\n| one | two |; no test drives the hook",
+  );
+  const rows = ["pass with findings", "- cut-the-rows: the rows split", ...TABLED.slice(2, 5)];
+  assert.deepEqual(
+    verdictIn(rows).findings.map((one) => one.name),
+    ["cut-the-rows"],
+    "a table row mints no child",
+  );
+});
+
+// The fail inserts the person step through the writer the pull runs, so the asks line rides the frontmatter as it lands. [[spec/tickets/the-small-faults-land]]
+test("a findings table a verdict fails with lands under unblock as that table", () => {
+  const schema = { [at("spec/schemas/ticket.schema.yaml")]: TICKET_SCHEMA };
+  const one = { name: "a-child", text: CHILD("implement/change") };
+  const asks = `implement/change fails back 2 times: ${verdictIn(TABLED).reason}`;
+  const held = doors(schema).it;
+  assert.equal(withPersonStep({ ...held, root: ROOT }, one, "implement/change", asks).path, "implement/person-2");
+  const { it, disk } = doors(standing(one.text, schema));
+
+  const { code, said } = heard(() => work(ROOT, ["unblock", "a-child", "a-successor"], it));
+
+  assert.equal(code, 0, said);
+  const successor = disk.read(at("spec/tickets/a-successor.md"));
+  assert.match(successor, /^\| road \| cost \|$/m, "the table keeps its own line");
+  assert.match(successor, /^\| one \| two \|$/m, "every row keeps its own line");
+  assert.match(successor, /^ {2}- no test drives the hook$/m, "a plain row stays an item");
 });
 
 // A successor minted off trivial opens under by: anyone, so the pull hands a person's question to an agent. [[spec/design_output/work#a-person-step-leaves]]

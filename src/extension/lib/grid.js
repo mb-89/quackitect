@@ -1,4 +1,4 @@
-// The grid check. A widget names where it draws, so two of them can name one
+// The grid check. A widget names where it draws, so a pair of them can name one
 // cell and one can fall off the edge. This answers both, and names the line in
 // the schema where the coordinates stand.
 // [[spec/design_output/extension#the-grid-check]]

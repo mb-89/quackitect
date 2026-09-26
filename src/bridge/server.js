@@ -30,6 +30,7 @@ import { answerRides, gatesAnswer } from "./answer-read.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe, onPowerShell } from "./bash.js";
+import { bindingLine } from "./binding.js";
 import { dropsAll, dropsMoved } from "./caches.js";
 import { asks, asksText } from "./config.js";
 import { holdsGrace } from "./grace.js";
@@ -40,6 +41,7 @@ import {
   onSessionEnd,
   onSessionStart,
   onTurnComplete,
+  layerRides,
   onTurnSaid,
   owesCanary,
   surveyHere,
@@ -74,6 +76,8 @@ import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.
 import {
   dropsHold,
   ENDS_TURN,
+  helperEnds,
+  helperSpawns,
   holdsCall,
   onStop,
   sawCall,
@@ -111,12 +115,21 @@ const DOORS = {
   "turn.said": onTurnSaid,
   "turn.complete": endsTurn,
   // A helper's stop reports, a session due holds for the handover, and the answer gate holds ahead of the tooth. [[spec/design_output/stop#the-context-hands-over]] [[spec/design_output/level0#the-gate-reads-the-answer]]
-  "classic.Stop": async (e, box) =>
-    helperReports(e, box) ??
-    holdsForHandover(e, box) ??
-    (await gatesAnswer(e, box)) ??
-    onStop(e, box),
-  "agent.spawn": onAgentSpawn,
+  "classic.Stop": async (e, box) => {
+    // A helper's stop takes its mark off. [[spec/tickets/helper-mark-drops-at-stop]]
+    helperEnds(e, box);
+    return (
+      helperReports(e, box) ??
+      holdsForHandover(e, box) ??
+      (await gatesAnswer(e, box)) ??
+      onStop(e, box)
+    );
+  },
+  // A helper spawned in the background marks the box, so the stop call reads it running. [[spec/tickets/the-stop-reads-the-state]]
+  "agent.spawn": (e, box) => {
+    helperSpawns(e, box);
+    return onAgentSpawn(e, box);
+  },
   "tool.describe": onDescribe,
   "tool.call": onToolCall,
   [ANSWERED]: onAgentAnswered,
@@ -154,7 +167,9 @@ export async function decide(said, box) {
   if (said?.fill !== undefined) measures(box, said.fill);
   const door = DOORS[String(said?.event ?? "")] ?? pass;
   const answer = letsThrough((await door(said?.e ?? {}, box)) ?? PASS, said, box);
-  if (box.registered || String(said?.event ?? "") === "engine.create") return answer;
+  // A module the client loads again marks its post fresh, since the load drops the tools the client held. [[spec/design_output/level0#the-first-call-pays]]
+  if ((box.registered && !said?.fresh) || String(said?.event ?? "") === "engine.create")
+    return answer;
   box.registered = true;
   return { ...answer, register: answer.register ?? box.specs };
 }
@@ -248,6 +263,8 @@ function opensSession(e, box) {
 
 function submitsPrompt(e, box) {
   sawPrompt(e, box);
+  // A change of the binding writes its line at the next prompt, naming the file that sets it. [[spec/tickets/the-retro-holds-the-clear]]
+  bindingLine(box);
   return onPromptSubmit(e, box);
 }
 
@@ -268,9 +285,10 @@ async function onToolCall(e, box) {
   );
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
-  if (!passes(said)) return said;
+  // The standing layer rides the first call a session takes where no context read reached the server. [[spec/design_output/level0#rules-ride-the-first-answer]]
+  if (!passes(said)) return layerRides(e, box, said);
   // [[spec/design_output/level0#the-findings-ride-the-call]]
-  return held ?? answerRides(e, box, owesCanary(e, box)) ?? PASS;
+  return layerRides(e, box, held ?? answerRides(e, box, owesCanary(e, box)) ?? PASS);
 }
 
 function passes(said) {
@@ -339,7 +357,9 @@ export function serve(method, port = PORT_BASE, say = console.log) {
   const restart = () => {
     held.release();
     own.log.say("info", "bridge", `the server restarts at ${where}`);
-    restarts(server, () => respawned(own, [process.execPath, ...process.argv.slice(1)]));
+    restarts(server, () =>
+      respawned(own, [process.execPath, ...process.argv.slice(1)]),
+    );
   };
 
   const onRequest = (request, response) => {

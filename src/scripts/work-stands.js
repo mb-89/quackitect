@@ -151,8 +151,20 @@ export function refsHere(it) {
 
 // The commit trunk and a branch share. git answers red where they share none, which is what a rewrite of trunk leaves behind. [[spec/design_output/work#the-listing-reads-git-once]]
 export function baseOnTrunk(it, branch) {
-  const said = it.git.run(["merge-base", `origin/${TRUNK}`, `origin/${branch}`], true);
+  const ask = () =>
+    it.git.run(["merge-base", `origin/${TRUNK}`, `origin/${branch}`], true);
+  let said = ask();
+  // A shallow clone holds no base older than its depth, so an empty answer there fetches the rest and asks again. [[spec/design_output/work#the-listing-reads-git-once]]
+  if (!said.ok && shallowHere(it)) {
+    it.git.run(["fetch", "--unshallow", "origin"], true);
+    said = ask();
+  }
   return { shares: said.ok, base: said.ok ? said.out.trim() : "" };
+}
+
+function shallowHere(it) {
+  const said = it.git.run(["rev-parse", "--is-shallow-repository"], true);
+  return String(said.out ?? "").trim() === "true";
 }
 
 // The refs, then the paths, then the contents. [[spec/design_output/work#the-listing-reads-git-once]]

@@ -122,9 +122,9 @@ person at a local box wants the button and a cloud box wants the server.
 
 The call comes back in milliseconds where the modules stand. The line
 backgrounds the server and sends its output to `.se/.log/serve.log`, so a
-session start waits for nothing. The server answers the next event in about a
-second. A first event landing before it stands reads no rules, and the log
-names the piece that misses.
+session start waits for nothing. The rules ride the first event the server
+answers, and nothing waits for it to stand. For details, see
+[[spec/design_output/level0#rules-ride-the-first-answer]].
 
 The road brings the modules where they stand nowhere. A cloud box clones the
 repository fresh when the container starts. The half of the setup writing into
@@ -140,6 +140,46 @@ names, and answers `7` where it does. That install waits, because a session
 holding no cage reads no rule at all. A session start pays it once, and on a
 box whose first event finds no server alone.
 
+### Rules ride the first answer
+
+Nothing in level zero waits on a clock. What a session reads depends on which
+events a server already answered.
+
+The server keeps one mark a session: whether the session holds its standing
+layer. `layerRides` in `src/bridge/guidance.js` reads the mark.
+
+| the event | what the server does |
+|---|---|
+| `prompt.context` | hands the layer as blocks, and sets the mark |
+| the first `tool.call` of the agent's own, with the mark unset | hands the layer as added context on the answer, and sets the mark |
+| a later `tool.call` | hands no layer |
+| a `tool.call` answering a result or a hold | hands no layer, so the next call carries it |
+
+A compaction and a `/clear` fire `prompt.context` again, and that read hands
+the layer again. For details, see
+[[spec/design_output/level0#the-guidance-stays-put]].
+
+A server restarting under a session builds the mark off the log. A `context`
+row there says the session holds the layer. A server the start road launched
+late meets no such row, so its first answer hands the layer over.
+
+The bridgehead holds no wait either:
+
+| the event, no server answering | what the bridgehead does |
+|---|---|
+| `session.start` or `prompt.context` | runs the start road once, and hands the event on |
+| a read tool | answers the starting line at once |
+| the stop on a cloud box, a launch standing, no answer yet | holds the turn with one line: level zero starts, and the next event carries its rules |
+| the stop where the road stands down, or on a desk | hands the stop on |
+
+The road answering `0` or `7` launches a server, and it exits `3` off a cloud
+box. So a launch says the box is a cloud box. A road standing down sets the
+cage and launches nothing, so a box that starts no server loops nowhere.
+
+The stop holds `HOLDS` times at most before a server answers. So a launched
+server that stays down frees the turn after the last hold. The count reads
+events alone.
+
 ### The first call pays
 
 `READ_TOOLS` in the hook names the tools a hand reads with, and the hook
@@ -149,18 +189,22 @@ a box whose server answers nothing carries the tools anyway.
 A call of a read tool takes the `*` door every event takes, and no door of its
 own. So one post reaches a server that stands, and the answer rides back the
 way every other answer does, its `register` list among it. A call landing
-before the server stands takes the steps below:
+before the server answers takes the steps below, and waits on nothing:
 
 - it posts once, and answers where a server stands
-- it runs the start above, then reads `/health` every fifth of a second, where the start brings a server up
-- `STARTING` caps that wait, and the wait running out answers the port and the log
+- it runs the start above, where the road has not run yet
+- it answers at once, with one line
 
-The wait runs once for each server the road starts. A later call on a dead
-server answers the port and the log at once. A dead server costs that one post
-before the start and one after it.
-`test/level0/read-tools.test.js` counts both over each read tool.
+| what stands | the line says |
+|---|---|
+| a launch stands, and no server answers this session yet | level zero starts, the call answers once the server stands, and the agent calls it again |
+| no launch stands, or a server answers once and then falls | the port and the log |
 
-So a hand calls `find` on its first turn, and that call pays for the server.
+`test/level0/read-tools.test.js` counts the one post over each read tool.
+
+So a hand calls `find` on its first turn, and that call starts the server. The
+call after it lands on the server, and carries the rules. For details, see
+[[spec/design_output/level0#rules-ride-the-first-answer]].
 
 ## A fix reaches the session
 
@@ -300,6 +344,7 @@ later. So the bridgehead says it where a person stands.
 | says one line in the chat, through `$.ui.log` | the first such event past the session start |
 | drops both marks | the server answers again |
 | answers the `no server answers` line to a level zero tool | a tool call the server answers nothing for, since its hook finds nothing past it |
+| answers the starting line to a level zero tool | a tool call before the server its start road brings up answers, per [[spec/design_output/level0#rules-ride-the-first-answer]] |
 
 A post nobody takes reads the port pointer first, because a server restarting
 on another port writes it again. Where the pointer names another port, the
@@ -643,7 +688,7 @@ A second prompt on its own fires `prompt.context` once only, so the event
 counts a conversation. That control is what makes the second read a
 compaction's own.
 
-## Three roads to a compaction
+## The roads to a compaction
 
 | road | what it answers on client 2.1.269 |
 |---|---|
@@ -821,6 +866,7 @@ node itself, so the setup leans on nothing again.
 
 | what the setup installs | why the cage needs it |
 |---|---|
+| the plugin manifest | git ignores it, so a fresh clone loads no plugin until the install writes it |
 | node | the command line and the server are JavaScript |
 | the modules | the server dies at import without them |
 | Vale | the prose rules the write door reads |
@@ -897,12 +943,25 @@ forgets to take a ticket up and to put it down.
 | Edit, Write, MultiEdit, NotebookEdit | nothing, since the harness fixes their fields | `onToolWrite` in `src/bridge/write.js`, which refuses them and names `mcp__level0__patch` |
 | Bash, PowerShell | `<ticket>:` at the head of `description` | `ticketDoor` in `src/bridge/bash.js` |
 
-`ticketFault` in `src/engine/named.js` reads the name. A ticket stands open
-where `spec/tickets/<name>.md` or `.se/tickets/<name>.md` carries a `state`
-other than `closed`. The refusal names the fault and says how to name a ticket:
+`ticketFault` in `src/engine/named.js` reads the name against what stands in
+hand. `inHand` reads it off the box: every ticket a hold names, and the plan's
+`working` todo. Every hand writes through the same door, so a helper's hold
+passes its own ticket.
+
+| what stands in hand | what passes |
+|---|---|
+| a hold, or a working todo | a held ticket's name, an ephemeral one among them, or the todo's title |
+| nothing | any open ticket, so a commit by hand still lands |
+
+A ticket stands open where `spec/tickets/<name>.md` or `.se/tickets/<name>.md`
+carries a `state` other than `closed`. A Bash description opening on the
+working todo's title and a colon passes too. The pull answers a working todo
+ahead of every road that hands work out. The refusal names the fault and says
+how to name a ticket:
 
 | the fault | the refusal opens |
 |---|---|
+| a name outside what stands in hand | `<name> stands outside what is in hand.`, then the tickets and the todo |
 | the call names no ticket | `This write names no ticket.` |
 | no file under either folder carries the name | `No ticket named <name> stands under spec/tickets or .se/tickets.` |
 | the ticket's `state` reads `closed` | `<name> stands closed.` |
@@ -1192,6 +1251,7 @@ pays:
 | what the door reads | what it does |
 |---|---|
 | a step opening on the line | pays the debt, and writes the `info` line |
+| a step opening on the line once it stands paid | writes the `warn` line naming the repeat |
 | a step without it | leaves the debt as it stands |
 | an answer at the turn's end | pays it, or opens it on the first turn |
 | a step from a helper | nothing, because a helper carries its own |
@@ -1239,6 +1299,13 @@ alone. The bridgehead still posts the last texts of the transcript on a
 hold. The door pays on any text since the demand that fits, so a flush landing
 late pays too.
 
+A prompt's demand keys on the prompt itself. At `prompt.submit` the bridgehead
+reads the id of the newest transcript row, and the demand holds it. On a hold
+the bridgehead posts the transcript rows, each with its role and id. The door
+counts an agent text past the next owner row alone. A transcript carrying no
+ids pays a prompt nothing, because a flush a turn late hands an older text. The
+display road then pays alone.
+
 ## What counts as owed
 
 - A prompt a person opens a turn with, or sends mid-turn, at `prompt.submit`.
@@ -1272,7 +1339,9 @@ carries.
 ## The first call asks
 
 A prompt opens its demand with no grace, so the first call after it asks the
-bridgehead for the texts. A mid-turn prompt otherwise waits behind the calls in
+bridgehead for the texts. The prompt's own event carries the warning. The door
+answers the prompt with its text opening on the `warns` line, and the
+bridgehead hands that event on. A mid-turn prompt otherwise waits behind the calls in
 flight, and the owner asks twice. The cost: a hand calling a tool before it
 writes the reply meets a refusal, writes the reply, and calls again.
 

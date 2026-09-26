@@ -1,5 +1,5 @@
 // The extension reads a ticket's route with a reader of its own, because it
-// bundles alone. One fixture holds that reader to the pull's, so the two name
+// bundles alone. One fixture holds that reader to the pull's, so both name
 // the same leaves.
 // [[spec/tickets/a-count-meets-the-lint]]
 

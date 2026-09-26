@@ -8,6 +8,7 @@ import { bodyFaults, placeholderFaults } from "./schema-body.js";
 import {
   empty,
   fault,
+  LEFT,
   lineOf,
   linked,
   linkless,
@@ -299,6 +300,7 @@ export function schemaFaults(tree) {
     if (!path.endsWith(".md")) {
       const governor = governorOf(data, path);
       if (governor) out.push(...checkData(tree.read(path), governor, path, every));
+      else if (governorOf(schemas, path)) out.push(folderFault(path, governorOf(schemas, path)));
       continue;
     }
     const text = tree.read(path);
@@ -327,6 +329,20 @@ export function schemaFaults(tree) {
     out.push(...placeholderFaults(text, schema, path));
   }
   return out;
+}
+
+// A governed folder holds its own kind alone, so a page or a picture there stands at warning until the owner moves it. [[spec/tickets/each-folder-holds-its-kind]]
+export function folderFault(where, schema) {
+  const kind = String(schema?.kind ?? "");
+  return {
+    ...fault(
+      "Folder",
+      where,
+      1,
+      `${where} stands in a folder the ${kind} schema governs, which holds ${kind} notes alone. Move it off the governed folder.`,
+    ),
+    severity: LEFT,
+  };
 }
 
 // [[spec/design_output/schema#the-door-refuses-a-departure]]

@@ -1,4 +1,4 @@
-// The write door over two fake roots. The path reads relative to the work
+// The write door over a pair of fake roots. The path reads relative to the work
 // root, and the schema comes off the method root, so a stub's bad ticket
 // meets the vehicle's rules.
 // [[spec/design_output/level0#the-write-door]]
@@ -10,7 +10,15 @@ import { onWrite } from "../../src/bridge/write.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
-import { edits, NUMBERED, realDisk, refused, served, TREE, wrote } from "./mark-doors.js";
+import {
+  edits,
+  NUMBERED,
+  realDisk,
+  refused,
+  served,
+  TREE,
+  wrote,
+} from "./mark-doors.js";
 
 const METHOD = "/tools";
 const WORK = "/stub";
@@ -290,4 +298,14 @@ test("an Edit changing engine fields alone comes back refused, naming them, beca
   );
 
   assert.match(said?.result?.deny ?? "", /state/);
+});
+
+// A governed folder holds its own kind alone, so a page or a picture written there comes back refused. [[spec/tickets/each-folder-holds-its-kind]]
+test("a screenshot written under spec/tickets comes back refused, naming the ticket kind", async () => {
+  const said = await onWrite(
+    write(join(WORK, "spec", "tickets", "screen.png"), "not a note"),
+    box(),
+  );
+  assert.match(said?.result?.deny ?? "", /spec\/tickets\/screen\.png/);
+  assert.match(said.result.deny, /ticket/);
 });

@@ -56,14 +56,21 @@ export function queueHolds(texts) {
     if (process === "group" || process.endsWith("/group"))
       return String(front.urgent ?? "") === "true";
     if (String(front.group ?? "").trim()) return false;
-    const walk = entriesIn(front.steps, "steps");
-    const step = String(front.step ?? "").trim();
-    const leaf = step
-      ? walk.find((one) => one.path === step)
-      : walk.find((one) => !one.said?.steps);
-    if (!leaf) return false;
-    return !["person", "children", "helper"].includes(String(leaf.said?.by ?? ""));
+    const by = leafBy(text);
+    if (by === null) return false;
+    return !["person", "children", "helper"].includes(by);
   });
+}
+
+// Who takes the leaf a ticket's pointer names, or its first leaf where no pointer stands. Null where no leaf stands. [[spec/tickets/the-stop-reads-the-state]]
+export function leafBy(text) {
+  const front = readNote(String(text ?? "")).front.said ?? {};
+  const walk = entriesIn(front.steps, "steps");
+  const step = String(front.step ?? "").trim();
+  const leaf = step
+    ? walk.find((one) => one.path === step)
+    : walk.find((one) => !one.said?.steps);
+  return leaf ? String(leaf.said?.by ?? "") : null;
 }
 
 // [[spec/design_output/pull#the-group-holds-the-turn]]

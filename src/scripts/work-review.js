@@ -20,7 +20,8 @@ import { DONE, standingAll, standOf } from "./work.js";
 const LOUD = 5;
 
 // What the install writes and git ignores, which the check reads alone. [[spec/design_output/review#a-worktree-runs-the-check]]
-const BORROWED = ["node_modules", `${BIN}/zig`];
+// The webview builds off packages of its own. [[spec/tickets/the-small-faults-land]]
+const BORROWED = ["node_modules", "src/extension/webview/node_modules", `${BIN}/zig`];
 
 export function review(it, name, argv) {
   if (!name) {

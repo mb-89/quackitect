@@ -2,7 +2,7 @@
 // pushes its work branch. A refusal answers the push door's own cause.
 // [[spec/design_output/pull#the-rejected-push]]
 
-import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
+import { cloudHere } from "../../.claude/skills/level0/lib/cloud.js";
 
 // Git names a moved branch alone with these words, so a rebase runs on them and on no other refusal. [[spec/design_output/pull#the-rejected-push]]
 const MOVED = /\((?:fetch first|non-fast-forward)\)/;
@@ -13,7 +13,7 @@ const SENT = Object.freeze({ ok: true, local: false, why: [] });
 // [[spec/design_output/pull#the-rejected-push]]
 export function pushed(it, branch) {
   // A desk lands its hand-back on this box, as its commit verb does. [[spec/guidance/working]]
-  if (!(it.cloud ?? inCloud(it.env ?? {}))) {
+  if (!cloudHere(it)) {
     return {
       ok: true,
       local: true,

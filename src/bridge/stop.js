@@ -4,7 +4,7 @@
 
 import { join } from "node:path";
 import { CHECK, NEEDS_HEADING } from "../../.claude/skills/level0/lib/answer.js";
-import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
+import { cloudHere } from "../../.claude/skills/level0/lib/cloud.js";
 import { BINDING, GOD, QUEUE } from "../../.claude/skills/level0/lib/config.js";
 import {
   controlBlock,
@@ -31,10 +31,12 @@ import {
 } from "../../.claude/skills/level0/lib/stop.js";
 import {
   heldGroup,
+  leafBy,
   openPrivate,
   queueHolds,
 } from "../../.claude/skills/level0/lib/ticket.js";
-import { ticketAt, WORK_BRANCH } from "../engine/group.js";
+import { fieldOf, ticketAt, WORK_BRANCH } from "../engine/group.js";
+import { holdsIn } from "../scripts/ephemeral.js";
 import { holdsTurn } from "./answer.js";
 import { bindingLine } from "./binding.js";
 import { asks, writes } from "./config.js";
@@ -196,7 +198,11 @@ export function onStop(e, box) {
     ran: (name) =>
       ranHere(name, { off, hold, box, claimed, text, tasks: e?.background_tasks }),
   });
-  const said = toothOf_(box).atTurnEnd(decision, Number(asks(box, MOST) ?? 0));
+  // A cloud box ends only with its branch handed back, so the cap frees none holding a group. [[spec/design_output/stop#three-in-a-row]]
+  const pinned =
+    cloudHere(box) &&
+    ranHere("group-in-hand", { off, hold, box, claimed, text }) === true;
+  const said = toothOf_(box).atTurnEnd(decision, Number(asks(box, MOST) ?? 0), pinned);
   // A line naming a reason whose check falls hears which check, and what it sees. [[spec/design_output/stop#a-refusal-names-its-check]]
   const falls =
     said.go?.runs === "no-stop-line"
@@ -281,11 +287,13 @@ const CHECKS = {
   "ticket-in-hand": (held) => holdStands(held.box) || privateStands(held.box),
   "queue-waits": (held) => queueWaits(held.box),
   // [[spec/design_output/stop#a-helper-still-runs]]
-  "helpers-running": (held) => helpersRun(held.tasks),
+  "helpers-running": (held) => helpersRun(held.tasks, held.box),
+  // [[spec/tickets/the-stop-reads-the-state]]
+  "step-waits-on-person": (held) => stepWaitsOnPerson(held.box),
   // A claim a fact denies reads as no stop line, so the turn holds and the fact re-prompts. [[spec/design_output/stop#a-talk-follows-a-report]]
   "no-stop-line": (held) => !claimStands(held),
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
-  "a-person-sits-here": (held) => !inCloud(held.box.env ?? {}),
+  "a-person-sits-here": (held) => !cloudHere(held.box),
   // [[spec/design_output/stop#a-talk-follows-a-report]]
   // A report an earlier message of this turn carries stands too, so a stop line sent alone repeats nothing. [[spec/design_output/stop#a-talk-follows-a-report]]
   "a-report-stands": (held) => reportStands(held.text) || Boolean(held.box?.reported),
@@ -296,10 +304,43 @@ const CHECKS = {
 };
 
 // The harness names every task it runs in the background at the turn's end, so a running helper reads off that list. [[spec/design_output/stop#a-helper-still-runs]]
-export function helpersRun(tasks) {
+export function helpersRun(tasks, box) {
+  if (Number(box?.helpers ?? 0) > 0) return true;
   return (Array.isArray(tasks) ? tasks : []).some(
     (one) => one?.type === "subagent" && one?.status === "running",
   );
+}
+
+// The stop call carries no background_tasks, so the box counts the helpers it spawned in the background. No id stands on both the spawn and the helper's stop, so the mark is a count. [[spec/tickets/the-stop-reads-the-state]] [[spec/tickets/helper-mark-drops-at-stop]]
+export function helperSpawns(e, box) {
+  if (!e?.background || e?.agentId) return;
+  box.helpers = Number(box.helpers ?? 0) + 1;
+}
+
+// A helper's end reaches the server as its stop, under its agentId. [[spec/tickets/helper-mark-drops-at-stop]]
+export function helperEnds(e, box) {
+  if (!e?.agentId) return;
+  box.helpers = Math.max(0, Number(box.helpers ?? 0) - 1);
+}
+
+// The ticket in hand, or its group, stands at a leaf a person takes. [[spec/tickets/the-stop-reads-the-state]]
+function stepWaitsOnPerson(box) {
+  return holdsIn(box.disk, box.work).some(({ held }) => {
+    const text = ticketText(box, String(held?.ticket ?? ""));
+    if (!text) return false;
+    if (leafBy(text) === "person") return true;
+    const group = String(fieldOf(text, "group") ?? "").trim();
+    return Boolean(group) && leafBy(ticketText(box, group)) === "person";
+  });
+}
+
+function ticketText(box, name) {
+  if (!name) return "";
+  try {
+    return String(box.disk.read(join(box.work, ticketAt(name))));
+  } catch {
+    return "";
+  }
 }
 
 // [[spec/design_output/stop#the-plan]]
@@ -403,7 +444,7 @@ function privateStands(box) {
 
 // THE CHAT IS NEW WHILE NOBODY HAS SAID WHAT TO DO IN IT. The session log holds one prompt row a turn and rotates at a session start, so the count survives a restart of the server and starts again with the next chat, and a cloud box carrying nobody to ask reads false. [[spec/design_output/stop#the-chat-is-new]]
 function chatIsNew(box) {
-  if (inCloud(box.env ?? {})) return false;
+  if (cloudHere(box)) return false;
   return promptsIn(box) <= 1;
 }
 
@@ -422,13 +463,39 @@ function promptsIn(box) {
 
 // A desk bound to the queue on trunk has work while a free ticket stands, so a stop on completion waits. [[spec/design_output/stop#the-mechanical-checks]]
 function queueWaits(box) {
-  if (inCloud(box.env ?? {})) return false;
+  if (cloudHere(box)) return false;
   if (asks(box, BINDING) !== QUEUE) return false;
   if (branchOf(box) !== "main") return false;
-  const texts = readFolder(box.disk, join(box.work, "spec", "tickets"), ".md").map(
-    (one) => one.text,
-  );
+  const taken = takenGroups(box);
+  const texts = readFolder(box.disk, join(box.work, "spec", "tickets"), ".md")
+    .filter((one) => !taken.has(one.name.replace(/\.md$/, "")))
+    .map((one) => one.text);
   return queueHolds(texts);
+}
+
+// A group whose work branch stands is taken, so the queue holds nothing of it for this box. [[spec/tickets/the-stop-reads-the-state]]
+function takenGroups(box) {
+  try {
+    const said = box.proc.run(
+      [
+        "git",
+        "for-each-ref",
+        "--format=%(refname:short)",
+        `refs/heads/${WORK_BRANCH.replace(/\/$/, "")}`,
+        `refs/remotes/origin/${WORK_BRANCH.replace(/\/$/, "")}`,
+      ],
+      { cwd: box.work },
+    );
+    return new Set(
+      String(said.stdout ?? "")
+        .split("\n")
+        .map((one) => one.trim().replace(/^origin\//, ""))
+        .filter((one) => one.startsWith(WORK_BRANCH))
+        .map((one) => one.slice(WORK_BRANCH.length)),
+    );
+  } catch {
+    return new Set();
+  }
 }
 
 function branchOf(box) {

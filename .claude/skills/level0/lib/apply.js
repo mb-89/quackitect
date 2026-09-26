@@ -2,14 +2,17 @@
 // file as the ops before it leave it, and one failure refuses the whole batch.
 // [[spec/design_output/apply#check-everything-then-write]]
 
+import { NOTE_END, TICKETS as PRIVATE, PUBLIC_TICKETS } from "./folders.js";
+
 export const OPS = ["", "exact", "create", "write", "append", "prepend", "regex"];
 export const PATCH = "patch";
 export const REPLACE = "replace";
+// Where a ticket a write names stands. The field below and the faults in src/engine/named.js read it here. [[spec/design_output/level0#a-write-names-its-ticket]]
+export const TICKET_WHERE = `its file name under ${PUBLIC_TICKETS} or ${PRIVATE}, without ${NOTE_END}`;
 // Every call that writes names the ticket it serves. [[spec/design_output/level0#a-write-names-its-ticket]]
 const TICKET = {
   type: "string",
-  description:
-    "the open ticket this write serves: its file name under spec/tickets or .se/tickets, without .md",
+  description: `the open ticket this write serves: ${TICKET_WHERE}`,
 };
 
 // [[spec/design_output/apply#check-everything-then-write]]

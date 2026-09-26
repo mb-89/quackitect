@@ -280,3 +280,7 @@ The owner's compare in the editor stays a person step, and no test decides it.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- the count lands on main, so the badge and the brackets read `Places.Takeable` off `PlacesAt`
+- `src/tui/workcount_test.go` holds the printed count equal to the brackets
+- the briefcase icon and the rest of the ask stand open

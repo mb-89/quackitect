@@ -10,11 +10,11 @@ rationale: [[spec/rationales/classifying]]
 2. Give every class a category from the improvement rows, its defect, its fix and a pattern finding the defect. A class with no pattern goes uncounted next retro. *
 3. Write the pattern over the log or the transcripts, so the engine counts it again next retro. A pattern over nothing measurable measures nothing. *
 4. Give every finding a disposition: the class it joins, or a reason to drop it. A finding with no disposition comes back next retro as new. *
-5. Name every promotion: what moves, where it stands, and where it goes. A promotion with no destination stays where it is. *
+5. Name every promotion: what moves, where it stands, and where it goes. Leave its ticket to the check step. A promotion with no destination stays where it is. *
 6. Write the classes, the dispositions, the promotions, the limits and the checklist items to `classes.json`.
 7. Run `./RUNME.sh retro classes <retro>`, which counts each rate and refuses an item with no disposition. A rate counted by hand drifts from the one the next retro counts. *
 8. Run `./RUNME.sh retro matrix <retro>` again, so the report opens on the class fixes.
-9. Mint one ticket per class once the owner reads the report, and name it under the class's tickets. A ticket minted before the read carries a fix the owner has yet to weigh. *
+9. Hand every class on to the check step, and name its tickets there. A class this step turns into a ticket skips the tree the check reads. *
 10. Give every collected note and memory a disposition: a class, done and where, a ticket, or a reason to drop. A note with no disposition stays on the box and drains nowhere. *
 11. Check a note against the tree before judging it. Most open notes stand built already, and a ticket for a built thing costs a hand a round. *
 12. Name a fix a ticket plans already by that ticket, and mint no second one. Two tickets for one fix send two hands after it. *

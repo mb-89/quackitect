@@ -21,10 +21,9 @@ import {
   withEntry,
   withField,
 } from "../engine/group.js";
+import { inHand } from "../engine/named.js";
 import { ephemeralPull } from "./ephemeral-pull.js";
 import { dropHold, guidanceText, holdOf, writeHold } from "./guidance-hand.js";
-import { byPerson, handOf, roleOf, SAYS } from "./pull-hand-of.js";
-import { landed } from "./pull-landed.js";
 import {
   chapterOf,
   commandsRun,
@@ -43,6 +42,8 @@ import {
   namedGroup,
   ticketsHere,
 } from "./pull-hand.js";
+import { byPerson, handOf, roleOf, SAYS } from "./pull-hand-of.js";
+import { landed } from "./pull-landed.js";
 import {
   DONE,
   handsOut,
@@ -114,6 +115,17 @@ export function pull(it, argv) {
   // An ephemeral ticket stands in the hold alone, so its hand-back reads no file. [[spec/design_input/the-clear-hands-ephemeral-tickets#an-ephemeral-ticket-stands-held]]
   if (held?.ephemeral) return ephemeralPull(it, who, verdict);
   if (verdict.said === "back") return takeBack(it, who, name, verdict.reason);
+  // A working todo holds the hand as a ticket does, so the pull answers it ahead of every road that hands work out. [[spec/tickets/the-todo-joins-the-queue]] [[spec/tickets/the-todo-road-stands-first]]
+  // A pull naming the working item itself takes that ticket, because the shell door wants it named there first. [[spec/design_output/pull#the-hand-out]]
+  const todo =
+    held || verdict.said ? "" : inHand({ disk: it.disk, root: it.root }).todo;
+  if (todo && todo !== name) {
+    say(WAIT, [
+      `the todo ${todo} stands in hand, so the pull hands nothing else out.`,
+      "Finish it, and take it off the plan, then pull again.",
+    ]);
+    return 0;
+  }
   // A name on trunk that is a group takes its branch on a cloud box, and a desk refuses it. [[spec/design_output/pull#the-engine-takes-the-branch]]
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
   // A name with a leaf in hand hands that leaf back. A name with none asks for that ticket. [[spec/design_output/pull#the-hand-out]]

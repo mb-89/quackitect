@@ -457,7 +457,7 @@ get_extensions() {
 # THE COMMIT DOOR A PERSON MEETS. Git reads a hook out of core.hooksPath, and
 # .githooks holds this tree's own, so one line points git at it. The Bash door
 # holds the same check for a session, and each stands without the other.
-# [[spec/design_output/private#two-doors-one-check]]
+# [[spec/design_output/private#both-doors-one-check]]
 hooks_folder=".githooks"
 
 hooks_here() {

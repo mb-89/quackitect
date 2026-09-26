@@ -105,7 +105,7 @@ function note(it, name, argv) {
     return 2;
   }
   if (overLong(name, it.words)) {
-    console.error(`A ticket name holds ${it.words} words, and ${name} holds more.`);
+    console.error(`A ticket name holds at most ${it.words} words, and ${name} holds more.`);
     return 2;
   }
 

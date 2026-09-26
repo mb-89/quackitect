@@ -113,7 +113,7 @@ export function refusedCommand(command, found) {
   return lines.join("\n");
 }
 
-// [[spec/design_output/private#two-doors-one-check]]
+// [[spec/design_output/private#both-doors-one-check]]
 export function refusedDelta(found) {
   const lines = [];
   lines.push("This commit carries something private, so the door holds it here.");

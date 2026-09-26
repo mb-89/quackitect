@@ -1,6 +1,6 @@
 // The config a door asks: the tracked file at the method root, and the local
 // file at the work root over it.
-// [[spec/design_output/config#the-three-layers]]
+// [[spec/design_output/config#the-layers]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

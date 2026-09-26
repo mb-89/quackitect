@@ -70,7 +70,7 @@ tree splits that file in two already. The tracked file holds the values a
 person edits, and the schema beside it says the type of each key. A widget
 field goes where the type stands, so one key stays one entry.
 
-# The five widgets
+# The widgets
 
 | type | writes | reads |
 |---|---|---|
@@ -141,8 +141,9 @@ reload and dies on a quit, so `process.ppid` draws that line:
 | the engine restarts | no |
 
 The id stands beside the values as `session.pid`. A view opening under an id
-that differs writes a file holding the new id alone. So a hold lasts as long as
-the window a person sets it in.
+that differs writes a file holding the new id and `engine.binding` alone. So a
+hold lasts as long as the window a person sets it in, and the binding holds
+until the owner changes it.
 
 A cloud box proves the rule and a person proves the id. `opened` answers what
 one id clears, and the reload row above waits for the first person to open the

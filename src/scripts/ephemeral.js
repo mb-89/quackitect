@@ -1,5 +1,5 @@
 // The tickets the engine mints at a pull. Each stands in the hold alone,
-// carries no file, and dies at its hand-back. The clear runs as three of them,
+// carries no file, and dies at its hand-back. The clear runs as a run of them,
 // and the context door marks the session due so the pull hands the first.
 // [[spec/design_input/the-clear-hands-ephemeral-tickets]]
 

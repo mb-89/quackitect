@@ -7,7 +7,8 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { askOf, withAsk } from "../../src/engine/retro/mint.js";
+import { faultsOf } from "../../src/engine/retro/classes.js";
+import { askOf, mintFaults, promotionName, withAsk } from "../../src/engine/retro/mint.js";
 import { retro } from "../../src/scripts/retro.js";
 
 const ROOT = "/tree";
@@ -18,6 +19,7 @@ const CLI = `${NODE} ${join(METHOD, "src", "scripts", "cli.js")}`;
 const RETRO = "retro-a1b2c3";
 const at = (path) => join(ROOT, ".se", ".retro", RETRO, ...path.split("/"));
 const TICKET = join(ROOT, "spec", "tickets", "the-land-verb-lands.md");
+const PROMOTED = join(ROOT, "spec", "tickets", "the-rule-lands.md");
 const DRAFT =
   "---\nkind: [[ticket]]\nstate: draft\n---\n\n# Ask\n\n<!-- gain, as text -->\n<!-- breaks, as text -->\n\n# design\n\n## approach\n";
 
@@ -45,9 +47,9 @@ const FIXED = {
   ticket: undefined,
 };
 
-function doors(classes) {
+function doors(classes, promotions = []) {
   const disk = fakeDisk({
-    [at("classes.json")]: JSON.stringify({ classes, dispositions: {} }),
+    [at("classes.json")]: JSON.stringify({ classes, dispositions: {}, promotions }),
   });
   const proc = fakeProc({
     [`${CLI} mint ticket spec/tickets/the-land-verb-lands.md --process=standard`]:
@@ -56,6 +58,11 @@ function doors(classes) {
         return { exitCode: 0 };
       },
     [`${CLI} ticket open the-land-verb-lands`]: { exitCode: 0 },
+    [`${CLI} mint ticket spec/tickets/the-rule-lands.md --process=standard`]: () => {
+      disk.write(PROMOTED, DRAFT);
+      return { exitCode: 0 };
+    },
+    [`${CLI} ticket open the-rule-lands`]: { exitCode: 0 },
     [`${CLI} mint ticket spec/tickets/a-second-ticket.md --process=standard`]: {
       exitCode: 2,
       stderr: "the ask names a word outside the vocabulary",
@@ -140,4 +147,67 @@ test("the ask reads as the chapter, and lands where the mint leaves it empty", (
   const said = withAsk(DRAFT, ask);
   assert.ok(said.indexOf("a commit lands in one call") < said.indexOf("# design"));
   assert.doesNotMatch(said, /gain, as text/);
+});
+
+// [[spec/tickets/a-promotion-names-its-fault]]
+test("a promotion carrying no ticket mints nothing, and the verb names it by its what or its place", () => {
+  const promotions = [
+    { what: "the land rule", from: "memory", to: "spec/guidance/working" },
+    { what: "", from: "memory", to: "spec/guidance/voice" },
+    { what: "a rule minted already", from: "memory", to: "spec/guidance/retro", tickets: ["the-land-verb-lands"] },
+  ];
+  const { code, said } = heard(() =>
+    retro(ROOT, ["mint", RETRO], doors([FIXED], promotions)),
+  );
+  assert.equal(code, 1);
+  assert.match(said, /promotion "the land rule" waits, and its ticket carries no name/);
+  assert.match(said, /promotion 2 waits, and its ticket carries no done_when/);
+  assert.doesNotMatch(said, /a rule minted already/);
+  assert.doesNotMatch(said, /undefined/);
+});
+
+test("a promotion's name reads its what, and its place where the what stands empty", () => {
+  assert.equal(promotionName({ what: " the land rule " }, 0), 'promotion "the land rule"');
+  assert.equal(promotionName({}, 2), "promotion 3");
+});
+
+// [[spec/tickets/a-promotion-ticket-reads-once]]
+test("a promotion's ticket stands checked by the mint alone, and classes read its what, from and to", () => {
+  const record = {
+    classes: [],
+    dispositions: {},
+    promotions: [{ what: "the land rule", from: "memory", to: "spec/guidance/working" }],
+    limits: [],
+    checklist: [],
+  };
+  assert.deepEqual(faultsOf(record, []), []);
+  assert.equal(mintFaults(record).length, 4);
+});
+
+// [[spec/tickets/the-retro-finishes-its-asks]]
+test("every promotion mints one ticket with its ask, after the classes", () => {
+  const promotion = {
+    what: "the land rule",
+    from: "memory",
+    to: "spec/guidance/working",
+    ticket: {
+      name: "the-rule-lands",
+      gain: "the owner states the rule once",
+      breaks: "the owner repeats the rule the next day",
+      done_when: ["spec/guidance/working holds the rule"],
+    },
+  };
+  const it = doors([CLASS], [promotion]);
+  const { code, said } = heard(() => retro(ROOT, ["mint", RETRO], it));
+
+  assert.equal(code, 0, said);
+  assert.match(said, /promotion "the land rule" {2}spec\/tickets\/the-rule-lands\.md/);
+  assert.ok(said.indexOf("the-land-verb-lands.md") < said.indexOf("the-rule-lands.md"));
+  assert.match(it.disk.read(PROMOTED), /# Ask\n\nthe owner states the rule once/);
+  assert.deepEqual(JSON.parse(it.disk.read(at("classes.json"))).promotions[0].tickets, [
+    "the-rule-lands",
+  ]);
+  assert.match(said, /2 ticket\(s\) mint/);
+  const again = heard(() => retro(ROOT, ["mint", RETRO], it));
+  assert.match(again.said, /0 ticket\(s\) mint/);
 });

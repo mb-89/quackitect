@@ -8,7 +8,7 @@ about: how a cloud box reruns a design input, so two setups of the vehicle meet 
 The owner compares setups of the vehicle on the same work. A setup is a config
 value, a binding, or a vehicle version. The page beside this note carries the
 evidence, the red team and the steel man:
-[the-bench-reruns-design-inputs.html](the-bench-reruns-design-inputs.html).
+[the-bench-reruns-design-inputs.html](../pages/the-bench-reruns-design-inputs.html).
 
 The first question is the context window. The owner reads the agent as less
 able under a short window, both at the start of a conversation and at its end.
@@ -52,7 +52,7 @@ The audit also reads whether the box learns that it runs a bench.
 
 | setup | what the run carries |
 |---|---|
-| the window | `context.handoverAt` and `context.writeAt`, set together |
+| the window | `context.handoverAt`, which the group passes |
 | the doors | `engine.binding` at `god`, so level zero refuses nothing |
 | the vehicle | a stub project, driven by a vehicle pinned at a commit |
 

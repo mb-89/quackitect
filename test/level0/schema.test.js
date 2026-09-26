@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { checkNote, readYaml } from "../../.claude/skills/level0/lib/schema.js";
+import * as yaml from "../../.claude/skills/level0/lib/schema-yaml.js";
 import { itemsIn } from "../../.claude/skills/level0/lib/schema-body.js";
 import { SEVERITY } from "../../.claude/skills/level0/lib/schema-fault.js";
 import { mintNote } from "../../.claude/skills/level0/lib/schema-mint.js";
@@ -292,4 +293,18 @@ frontmatter:
 `);
   const said = checkNote("---\nkind: [[ticket]]\nprocess: [[spec/processes/trivial]]\n---\n", schema, "a.md");
   assert.ok(said.some((one) => one.rule === "Schema.steps"));
+});
+
+// [[spec/tickets/the-quoted-pair-stays-paired]]
+test("a list item quoted whole reads as text, and a quoted key with a quoted value stays a pair", () => {
+  const read = readYaml(
+    'checklist:\n  - "no sentence says: a count, a member"\n  - \'single: text\'\n  - "a": "b"\n',
+  );
+  assert.deepEqual(read.checklist, [
+    "no sentence says: a count, a member",
+    "single: text",
+    { '"a"': "b" },
+  ]);
+  assert.equal(yaml.quotedWhole('"a \\" b: c"'), true);
+  assert.equal(yaml.quotedWhole('"a": "b"'), false);
 });
