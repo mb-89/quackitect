@@ -13,8 +13,21 @@ const WHERE = "http://127.0.0.1:6510/health";
 
 // The check reads and the stamp writes, so the two stand in two files under the file ceiling. [[spec/design_output/work#the-battery-answers-first]]
 test("the check answers no stamp of its own, and the stamp module answers it", () => {
-  assert.equal(check.stamped, undefined, "cli-check.js hands the stamp to cli-stamp.js");
+  assert.equal(
+    check.stamped,
+    undefined,
+    "cli-check.js hands the stamp to cli-stamp.js",
+  );
   assert.equal(typeof stamped, "function");
+});
+
+// The doctor's hook probe stands in its own file, so the check stays under the file ceiling. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+test("the check answers no hook probe of its own, and cli-hooks.js answers it", () => {
+  assert.equal(
+    check.hooksNamed,
+    undefined,
+    "cli-check.js hands the hook probe to cli-hooks.js",
+  );
 });
 
 // A fetch door answering the health call, so the probe runs off the wire. [[spec/design_output/doors#a-fake-behaves]]

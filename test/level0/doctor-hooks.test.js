@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { hookRows, hooksNamed } from "../../src/scripts/cli-check.js";
+import { hookRows, hooksNamed } from "../../src/scripts/cli-hooks.js";
 import { lspProbe } from "../../src/scripts/lsp-probe.js";
 
 const ROOT = "/tree";
@@ -232,7 +232,10 @@ test("a language server that answers draws a row naming each diagnostic it sends
 // [[spec/tickets/every-server-stands-and-answers]]
 test("a language server that exits draws a warn row naming the exit", () => {
   const proc = fakeProc({
-    [`${LSP} lsp`]: { exitCode: 2, stderr: "panic: the checker reads no tree\ngoroutine 1\n" },
+    [`${LSP} lsp`]: {
+      exitCode: 2,
+      stderr: "panic: the checker reads no tree\ngoroutine 1\n",
+    },
   });
   const row = lspProbe(proc, LSP, ROOT);
 
