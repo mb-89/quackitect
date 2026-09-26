@@ -1,6 +1,6 @@
 // The install script, read as it stands. A binary this tree builds goes stale
-// where its own source moves ahead, so the script asks find for a newer file
-// before it calls the binary ready.
+// where its source moves, so the script asks after its source before it calls
+// the binary ready.
 // [[spec/design_output/index#the-compiler-it-needs]]
 
 import assert from "node:assert/strict";
@@ -15,7 +15,7 @@ const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 test("every binary this tree builds rebuilds when its source moves ahead", () => {
   const said = disk().read(join(root, "src", "scripts", "install.sh"));
   for (const one of ["lsp", "index"]) {
-    assert.ok(rebuilt(said).includes(one), `${one} rebuilds off its own age alone`);
+    assert.ok(rebuilt(said).includes(one), `${one} never rebuilds when its source moves`);
   }
 });
 

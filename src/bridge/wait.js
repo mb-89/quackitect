@@ -18,23 +18,44 @@ export const TOOLS = { [WAIT_CALL]: (e, box) => waits(e, box) };
 
 // [[spec/design_output/level0#the-wait-returns-on-signals]]
 export async function waits(e, box, pause = sleep) {
-  const signals = signalsOf(e, box);
+  const watch = watchOf(e, box);
+  const { signals, from } = watch;
   if (!signals.length)
     return said(`${WAIT} takes an agent, an output or files to wait on.`);
   const most = Number(asks(box, MOST) ?? 0) * SECOND;
   const quiet = Number(asks(box, QUIET) ?? 0) * SECOND;
-  const from = nowOf(box);
+  watch.turn += 1;
+  const turn = watch.turn;
   for (;;) {
+    // A later post of the same wait reads the watch now, so this loop answers a post nobody reads and ends. [[spec/design_output/level0#the-wait-returns-on-signals]]
+    if (watch.turn !== turn) return said("A later post of this wait takes its watch.");
     for (const heard of signals) {
       const line = heard(nowOf(box), quiet);
-      if (line) return said(line);
+      if (line) return done(watch, box, line);
     }
     if (nowOf(box) - from >= most)
-      return said(
+      return done(
+        watch,
+        box,
         `The wait reaches its cap of ${most / SECOND}s, and no signal comes.`,
       );
     await pause(STEP);
   }
+}
+
+// The host cuts a long post at its own timeout, and the bridgehead posts it again under the stamp of the first. So the watch that stamp begins stands on the box, and the cap counts from it. [[spec/design_output/level0#the-wait-returns-on-signals]]
+function watchOf(e, box) {
+  const since = Number(e?.since);
+  if (!since) return { signals: signalsOf(e, box), from: nowOf(box), turn: 0 };
+  box.waits = box.waits ?? new Map();
+  if (!box.waits.has(since))
+    box.waits.set(since, { since, signals: signalsOf(e, box), from: since, turn: 0 });
+  return box.waits.get(since);
+}
+
+function done(watch, box, line) {
+  if (watch.since) box.waits?.delete(watch.since);
+  return said(line);
 }
 
 // A helper's stop lands in the log as its report, and the wait reads it off the box. The session's own stop passes on. [[spec/design_output/level0#the-wait-returns-on-signals]]

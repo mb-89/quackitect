@@ -127,6 +127,37 @@ test("the cap returns the wait where no signal comes", async () => {
   assert.equal(spent(box, from), 60);
 });
 
+// A post the host cut comes back under the stamp of the first, so the watch carries on and the older loop steps aside. [[spec/tickets/every-server-stands-and-answers]]
+test("a wait posted again under its since carries on its watch, and counts its cap from the first post", async () => {
+  const box = served();
+  const since = box.clock.now().getTime();
+  let free;
+  const held = new Promise((take) => {
+    free = take;
+  });
+  let ticks = 0;
+  // The first post runs two seconds, then stands the way a post the host cut stands: nobody reads it. [[spec/design_output/level0#the-wait-returns-on-signals]]
+  const first = waits({ files: ["a.txt"], since }, box, async (ms) => {
+    ticks += 1;
+    if (ticks > 2) return held;
+    box.clock.tick(ms);
+  });
+  await new Promise((done) => setImmediate(done));
+
+  const answer = await waits({ files: ["a.txt"], since }, box, pausing(box));
+
+  assert.match(said(answer), /^The files a\.txt stand quiet for 5s\./);
+  assert.equal(spent(box, since), 5, "the quiet counts from the first post");
+  free();
+  assert.match(said(await first), /^A later post of this wait takes its watch\./);
+
+  const late = served();
+  const now = late.clock.now().getTime();
+  const capped = await waits({ agent: "a9", since: now - 60 * STEP }, late, pausing(late));
+  assert.match(said(capped), /^The wait reaches its cap of 60s/);
+  assert.equal(spent(late, now), 0, "the cap counts from the first post");
+});
+
 // [[spec/design_output/level0#the-wait-returns-on-signals]]
 test("a wait naming no signal answers what it takes", async () => {
   const box = served();
