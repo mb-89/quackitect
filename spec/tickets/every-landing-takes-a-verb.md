@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+group: the-verbs-land-whole
 steps:
   - name: design
     reads: [[spec/guidance/voice]]

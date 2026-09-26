@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+group: each-thing-stands-in-place
 steps:
   - name: design
     reads: [[spec/guidance/voice]]

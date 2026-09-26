@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+group: the-owners-word-reaches-work
 steps:
   - name: design
     reads: [[spec/guidance/voice]]

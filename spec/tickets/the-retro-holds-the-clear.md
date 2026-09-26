@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+group: the-gates-read-the-state
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
