@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 63693613eded · claude-code-remote
+    hash_before: 3062638584d4132b1819045f9190e198799a1d2d
+    hash_after: 3062638584d4132b1819045f9190e198799a1d2d
 ---
 
 # Ask
