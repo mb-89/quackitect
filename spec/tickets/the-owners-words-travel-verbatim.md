@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: 0358075ccf3188c52d5fc0d024d2aa4d63b8b50c
+    hash_after: 0358075ccf3188c52d5fc0d024d2aa4d63b8b50c
 ---
 
 # Ask
@@ -100,33 +105,55 @@ A handover and a brief carry the agent's reading under the owner's name. An ask 
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+Each carrier gains a place for the owner's quoted words, and a read of the owner's own gates a ticket minted off a handover.
 
-<!-- the form is text -->
+| carrier | change |
+|---|---|
+| `spec/schemas/handover.schema.yaml` | a required section `The owner's words` |
+| `spec/processes/note.yaml` | an ask field `said`, of form `list` |
+| `spec/processes/standard.yaml` | an ask line `from:`, and a person leaf `owner-read` |
+| `src/scripts/pull-hand.js` | a `handed` condition in `holdsHere` |
+| `spec/guidance/voice.md` | rule 15 takes the owner's word first |
+| `spec/vocabulary/terms.yml` | the owner's words for three things |
+
+The handover section says: each line a verbatim quote, with its session and transcript line.
+
+The note field `said` says: the owner's quoted words, with their transcript line.
+
+The `owner-read` leaf stands first under `design`, before `draft`. It carries `by: person` and `when: handed`, with one `verdict` field `read`.
+
+The `handed` condition holds where the Ask carries a line `from: handover`. It reads the Ask through the same line reader the `view` condition of `the-owner-view-decides-done` adds, so this ticket depends on that one.
+
+Rule 15 gains a sentence: take the owner's word for a thing before a coined word.
+
+The owner's words for the sidebar button, the work tab and its brackets stand in no file on this box. The build mints a question ticket asking the owner for them. The three terms land when the answer does.
 
 ### callers
 
-<!-- every caller of what the approach changes, one a line, as a file and a function -->
-
-<!-- the form is list -->
+- `src/scripts/pull-hand.js` `advanced`, which calls `holdsHere` on the leaf it stands on
+- `src/scripts/pull-writes.js` the skip pass after a hand-back, which calls `holdsHere` on each next leaf
+- `src/scripts/ticket.js` `opensDraft`, whose first leaf becomes `design/owner-read` on a standard ticket
+- `.claude/skills/level0/lib/schema-mint.js` `mintedNote`, which renders the new handover section and ask fields
+- `test/contract/process.test.js` the standard route case, whose leaf list gains `design/owner-read`
+- every writer of `.se/HANDOVER.md`, which the build finds with `./RUNME.sh find HANDOVER`
 
 ### tests
 
-<!-- every test the change adds, one a line, as a file and a test name -->
-
-<!-- the form is list -->
+- `test/level0/schema.test.js` "a handover lacking the owner's words draws a finding"
+- `test/level0/process.test.js` "the note route asks for the owner's quoted words with their transcript line"
+- `test/level0/pull-person.test.js` "a ticket minted off a handover waits on the owner's read before its draft"
+- `test/level0/pull-person.test.js` "a ticket minted off no handover skips the owner's read"
+- `test/contract/question-grades.test.js` "the voice note takes the owner's word before a coined word"
 
 ### answers
 
-<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
-<!-- the form is list -->
+- first on a first draft
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- every file, function and verb named stands opened, and the handover schema, the note route and rule 15 read as the table says
+- the callers list names both callers of `holdsHere`, the mint, the open and the handover writers the build finds
+- every `done_when` line names its test above, and the terms line waits on the owner's answer
 
 ## review
 
