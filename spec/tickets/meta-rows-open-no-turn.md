@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-gates-read-the-state
 parent: answers-read-the-last-text
+record:
+  - step: do
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: b029ad717c9c42574f610a707e5c50954130c112
+    hash_after: b029ad717c9c42574f610a707e5c50954130c112
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 18 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-todo-joins-the-queue.md:161:1: CodeSpans: A sentence holds 4 code spans, and this one holds 6. Carry th"
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ a transcript `user` row with `isMeta` or `isCompactSummary` carries no `tool_res
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/verbs.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ a transcript `user` row with `isMeta` or `isCompactSummary` carries no `tool_res
 
 <!-- the form is text -->
 
+The change under `answers-read-the-last-text` built `opensTurn` in `.claude/skills/level0/lib/voice.js` to skip a row marked `isMeta` or `isCompactSummary`. The case a tool result row and a meta row open no turn, in `test/level0/verbs.test.js`, puts both marks between a progress line and the answer. It gets the answer back alone.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: an owner row carries neither mark, and a case holds it
+- the cleanup: none stands
+- the rule stands in `opensTurn` once, and this ticket points at the case
 
 # Discussion
 
