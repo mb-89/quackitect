@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: split
+step: children
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 enabled_by: migration.phase0
@@ -88,6 +88,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-migration-writes-its-specs took 4 commit(s) from main.
+  - step: split
+    hand: box d7a540d981d5 · claude-code-remote
+    hash_before: a985d952b1e798dec6aa12c91d8082ecca562914
+    hash_after: faf7d3860b02d565a86f205bda8bf52e0982bb24
 ---
 
 # Ask
