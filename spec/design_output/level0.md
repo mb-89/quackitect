@@ -339,6 +339,7 @@ later. So the bridgehead says it where a person stands.
 | says one line in the chat, through `$.ui.log` | the first such event past the session start |
 | drops both marks | the server answers again |
 | answers the `no server answers` line to a level zero tool | a tool call the server answers nothing for, since its hook finds nothing past it |
+| answers the starting line to a level zero tool | a tool call before the server its start road brings up answers, per [[spec/design_output/level0#rules-ride-the-first-answer]] |
 
 A post nobody takes reads the port pointer first, because a server restarting
 on another port writes it again. Where the pointer names another port, the
