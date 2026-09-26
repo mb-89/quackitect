@@ -31,7 +31,13 @@ A ticket the retro mints reaches a hand that stands outside the window. So
 the class hands it the gain, what breaks without it, and a done_when a
 command decides.
 
-## 5. A standing rule
+## 5. A promotion's ticket
+
+The classify step names what a promotion moves, from where and to where. The
+ask a hand builds from comes later, once the tree stands read, so the check
+step writes it. One step writing it leaves one verb checking it.
+
+## 6. A standing rule
 
 Where the rule already stands and the defect keeps coming, writing the rule
 again changes nothing. The test-first rule stands in the code guidance, and
