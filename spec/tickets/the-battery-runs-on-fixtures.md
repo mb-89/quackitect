@@ -190,6 +190,10 @@ The install bundles too, so a fresh box meets no cost there. If the report names
 
 <!-- the form is verdict -->
 
+pass with findings
+
+- battery-ask-names-the-bundle: approach item 4 changes `bundle` in `src/scripts/bundle.js`, which the ask leaves out, and the implement checklist refuses a file the ask leaves out. Name it on the ask's drawing-bundle line
+
 # implement
 
 ## tests-red
