@@ -78,7 +78,6 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: open-tasks-land-in-shadow
-depends_on: [the-foundation-lands-unchanged]
 ---
 
 # Ask

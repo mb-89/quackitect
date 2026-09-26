@@ -78,12 +78,11 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: sidebar-switches-over
-depends_on: [sidebar-may-switch, sidebar-lands-in-shadow]
 ---
 
 # Ask
 
-`migration.sidebar` moves to `new`. The extension spawns no verb and reads no file itself.
+`slices.sidebar` moves to `new`. The extension spawns no verb and reads no file itself.
 
 The extension then shows what the index holds, and computes nothing.
 

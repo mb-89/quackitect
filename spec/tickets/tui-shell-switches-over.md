@@ -75,12 +75,13 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [tui-shell-lands-in-shadow, tui-shell-may-switch]
+depends_on: [tui-shell-lands-in-shadow]
+enabled_by: migration.phase6switch
 ---
 
 # Ask
 
-Phase 6 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration` moves to `new`, and the old path leaves the tree. The group waits for the owner's go on [[spec/tickets/tui-shell-may-switch]].
+Phase 6 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase6switch` to read true in the tracked config on `main`.
 
 Done when the window reads its data off the index alone.
 

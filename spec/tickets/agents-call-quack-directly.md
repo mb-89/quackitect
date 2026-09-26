@@ -78,12 +78,11 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: quack-verbs-switch-over
-depends_on: [quack-verbs-may-switch, quack-verbs-land-in-shadow]
 ---
 
 # Ask
 
-`migration.verbs` moves to `new`. Agents call the index's tools, and shell out to no `./RUNME.sh` verb.
+`slices.verbs` moves to `new`. Agents call the index's tools, and shell out to no `./RUNME.sh` verb.
 
 A call then costs one round trip and no parse.
 

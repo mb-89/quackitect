@@ -75,12 +75,13 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [sidebar-lands-in-shadow, sidebar-may-switch]
+depends_on: [sidebar-lands-in-shadow]
+enabled_by: migration.phase8switch
 ---
 
 # Ask
 
-Phase 8 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration` moves to `new`, and the old path leaves the tree. The group waits for the owner's go on [[spec/tickets/sidebar-may-switch]].
+Phase 8 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase8switch` to read true in the tracked config on `main`.
 
 Done when the extension spawns no verb and reads no file itself.
 

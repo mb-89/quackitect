@@ -78,12 +78,11 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: go-cage-switches-over
-depends_on: [go-cage-may-switch, go-cage-lands-in-shadow]
 ---
 
 # Ask
 
-`migration.cage` moves to `new`. While the index stands down, the cage refuses, and the refusal names the alarm. [[spec/rationales/the-cage-refuses-while-down]] names the chapters this rewrites.
+`slices.cage` moves to `new`. While the index stands down, the cage refuses, and the refusal names the alarm. [[spec/rationales/the-cage-refuses-while-down]] names the chapters this rewrites.
 
 A fault then shows on the first call, and gets fixed early.
 

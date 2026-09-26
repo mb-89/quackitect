@@ -76,6 +76,7 @@ step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [the-migration-writes-its-specs]
+enabled_by: migration.phase1
 ---
 
 # Ask
