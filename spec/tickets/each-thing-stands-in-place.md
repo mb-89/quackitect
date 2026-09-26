@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: split
+step: children
 record:
   - step: sync
     hand: box b8ae1b45d463 · claude-code-remote
@@ -87,6 +87,10 @@ record:
       - name: sync
         exit: 0
         said: work/each-thing-stands-in-place took 25 commit(s) from main.
+  - step: split
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: d66e10d5034f0ed0c7cac82d977cb1d9b6fb77af
+    hash_after: d66e10d5034f0ed0c7cac82d977cb1d9b6fb77af
 ---
 
 # Ask
@@ -115,11 +119,26 @@ Each fact and each note stands in its one place, and small faults land fixed. A 
 
 <!-- the form is list -->
 
+- [[spec/tickets/each-fact-keeps-one-owner]], standard
+- [[spec/tickets/each-folder-holds-its-kind]], standard
+- [[spec/tickets/the-retro-finishes-its-asks]], standard
+- [[spec/tickets/the-retro-reads-cloud-retros]], standard
+- [[spec/tickets/the-small-faults-land]], standard
+- [[spec/tickets/a-promotion-names-its-fault]], trivial
+- [[spec/tickets/a-promotion-ticket-reads-once]], trivial
+- [[spec/tickets/callers-name-work-answer-home]], trivial
+- [[spec/tickets/the-quoted-pair-stays-paired]], trivial
+- [[spec/tickets/the-second-collect-keeps-lines]], trivial
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] every child is small enough to review whole: each standard child passed a review of its own, and the trivial ones came from the review of `the-retro-finishes-its-asks`
+- [x] the children add up to the goal: one owner a fact, one kind a folder, the small faults, and the retro's two asks each hold a child
+- [x] a child that waits on another names it: the trivial children follow their parent, and the engine hands them in order
 
 # children
 
