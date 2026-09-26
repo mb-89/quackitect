@@ -44,27 +44,33 @@ A door is the one road to the outside, and a fake in the same file keeps every t
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+[[spec/design_output/go-doors]] specifies the doors of the model. A door is one
+Go file holding its interface, the real one, the fake and a registration. A
+contract test under the `contract` tag runs one case list over both.
 
-<!-- the form is text -->
+An inbound fake replays a recording off a session log at `debug`, over an index
+in memory with every outbound fake. One process, `quack doors`, holds every
+door. The analyzers `doorsonly`, `fakebeside`, `noname` and `fakeintest`
+replace the Vale rules for the Go code.
+
+Weighed: a note of its own, against a rewrite of the standing doors note. A note
+of its own wins while the JavaScript doors still run. Assumed: recordings live
+under `test/replay`, and phase 1 adds the analyzers.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change follows the ask: the note names the file shape, the replay, the process and the import rules
+- the cleanup it reveals: the standing doors note leaves the tree once its doors do
+- the note points at the standing doors note for the fake and contract rules, and restates none
 
-<!-- the form is checklist -->
 
 # Discussion
 
