@@ -74,10 +74,15 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+step: design/review
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
+record:
+  - step: design/draft
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: b0ac652023873f16e6fcb7cd77c6af570ae6d8ed
+    hash_after: b0ac652023873f16e6fcb7cd77c6af570ae6d8ed
 ---
 
 # Ask
@@ -102,11 +107,41 @@ One module lets every package share code without a copy. Without it the Go versi
 
 <!-- the form is text -->
 
+One `go.mod` stands at the root of the tree, as `module quackitect` on `go 1.24`, the Go this box and the other modules run. One `go.sum` holds the union of the two sums the tree carries now. The packages keep their folders, and every import takes the folder under the root: `quackitect/yaml` reads `quackitect/src/yaml`, and `quackitect/swap` reads `quackitect/src/engine/swap`. The six other `go.mod` files and their `go.sum` files leave.
+
+| the part | what it does after |
+|---|---|
+| the battery | runs `go test ./...` once at the root, and `gofmt -l src` once |
+| the test verb | runs `go test ./<folder>/...` from the root, for the package folder holding a changed test |
+| a binary's stamp | hashes the root `go.mod` and `go.sum`, the package folder, and every tree package it imports, read off its import lines to the end of the chain |
+| the builds | run from the root, as `go build ./src/lsp`, `./src/index` and `./src/tui` |
+| the module fetch | runs `go mod download` once at the root |
+| CI | reads its Go off the root `go.mod`, and caches on the root `go.sum` |
+
+The import walk stands in `src/scripts/cli-go.js`, the home of every Go helper. It replaces the replace-line reader and the shared folders the window lists by hand. Each design chapter naming the old split takes the one module:
+
+- the Go reader chapter of the config note
+- the build chapter of the language server note
+- the stamp chapter of the window note
+- the last chapter of the rationale
+
+Where a package of the window needs a later Go, the one version rises to the lowest that builds every package. The implement step names it.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/scripts/cli-go.js` `goModulesIn`, which finds the root module
+- `src/scripts/cli-check.js` `goHolds` and `goFormat`, which run once at the root
+- `src/scripts/work-test.js` the Go loop, `goModulesOf` and `moduleOver`, which name a package folder
+- `src/scripts/go-source.js` `foldersOf` and `hashOf`, which take the import walk
+- `src/scripts/tui-build.js` `viewerOf`, `SHARED` and `foldersOf`, which take the import walk and build from the root
+- `src/scripts/install.sh` `get_lsp`, `get_index` and `get_modules`, which run from the root
+- `.github/workflows/check.yml` the Go setup step
+- every `.go` file importing a tree package, and `src/tui/layout_test.go` `module`
+- `spec/design_output/config.md`, `spec/design_output/lsp.md`, `spec/design_output/tui.md` and `spec/rationales/go-stands-as-one-module.md`, the chapters naming the split
 
 ### tests
 
@@ -114,17 +149,31 @@ One module lets every package share code without a copy. Without it the Go versi
 
 <!-- the form is list -->
 
+- `test/level0/go-modules.test.js` "the tree holds one go.mod, at the root", which decides the first done line
+- `test/level0/go-modules.test.js` "the battery lists the one module at the root"
+- `test/level0/go-modules.test.js` "a changed test names the package folder holding it"
+- `test/level0/go-source.test.js` "a binary's folders take every tree package it imports, to the end of the chain"
+- `go test ./...` from the root, run by the battery, which decides the second done line
+- `./RUNME.sh check`, which decides the third
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every `go.mod`, script, test and the install and CI step the approach names stands opened
+- each module passes `go test ./...` on the branch today
+- the callers list comes off a search for `go.mod`, `go build`, `go test` and `quackitect/` over the tree
+- each done line names its test in the tests list
 
 ## review
 
