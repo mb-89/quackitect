@@ -1,5 +1,5 @@
 ---
-description: "config / context / handoverAt: sets context.handoverAt to what you type. The context a session carries before it finishes, writes the handover and clears. 0 switches it off."
+description: "config / context / handoverAt: sets context.handoverAt to what you type. The context past which the next pull after the ticket in hand hands the handover, the clear and the read of the handover. 0 switches it off."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true

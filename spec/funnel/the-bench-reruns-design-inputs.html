@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The bench reruns design inputs</title>
+<style>
+  :root{
+    --bg:#fbfaf8; --fg:#1a1917; --muted:#6b6862; --rule:#dedad2;
+    --panel:#ffffff; --accent:#8a4b2a; --accent-soft:#f2e7df;
+    --ok:#2f6b3a; --ok-soft:#e3efe4; --warn:#8a6a12; --warn-soft:#f5ecd2;
+    --no:#8f2d2d; --no-soft:#f5e1e1;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#15140f; --fg:#e9e5dc; --muted:#9a958a; --rule:#332f28;
+      --panel:#1c1a15; --accent:#d4915f; --accent-soft:#2a211a;
+      --ok:#8fc79a; --ok-soft:#1d2a1f; --warn:#d9b75a; --warn-soft:#2b2512;
+      --no:#e39a9a; --no-soft:#2e1a1a;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15140f; --fg:#e9e5dc; --muted:#9a958a; --rule:#332f28;
+    --panel:#1c1a15; --accent:#d4915f; --accent-soft:#2a211a;
+    --ok:#8fc79a; --ok-soft:#1d2a1f; --warn:#d9b75a; --warn-soft:#2b2512;
+    --no:#e39a9a; --no-soft:#2e1a1a;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--fg);margin:0;
+    font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1080px;margin:0 auto;padding:44px 16px 88px}
+  h1{font-size:28px;margin:0 0 4px;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 28px}
+  h2{font-size:20px;margin:48px 0 6px;padding-top:14px;border-top:2px solid var(--fg)}
+  h2 .n{color:var(--accent);font-variant-numeric:tabular-nums;margin-right:10px}
+  p{margin:10px 0}
+  code{font-family:var(--mono);font-size:.87em;background:var(--accent-soft);padding:1px 5px;border-radius:3px}
+  .bl{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--accent);
+    padding:14px 18px;border-radius:4px;margin:18px 0}
+  .bl ul{margin:6px 0 0;padding-left:20px}
+  .bl li{margin:3px 0}
+  .scroll{overflow-x:auto;margin:14px 0}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;background:var(--panel)}
+  th,td{border:1px solid var(--rule);padding:7px 10px;text-align:left;vertical-align:top}
+  th{background:var(--accent-soft);font-weight:600}
+  td.k{white-space:nowrap;font-weight:600}
+  .tag{display:inline-block;font-size:12px;font-weight:600;padding:1px 7px;border-radius:10px;white-space:nowrap}
+  .ok{color:var(--ok);background:var(--ok-soft)}
+  .warn{color:var(--warn);background:var(--warn-soft)}
+  .no{color:var(--no);background:var(--no-soft)}
+  .note{color:var(--muted);font-size:13.5px}
+  figure{margin:18px 0 6px;padding:16px 10px 8px;background:var(--panel);border:1px solid var(--rule);border-radius:4px}
+  figcaption{color:var(--muted);font-size:13px;margin-top:6px;text-align:center}
+  svg{display:block;width:100%;height:auto}
+  svg .box{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+  svg .boxb{fill:var(--panel);stroke:var(--fg);stroke-width:1.5}
+  svg text{fill:var(--fg);font:13px -apple-system,Segoe UI,Roboto,sans-serif}
+  svg .small{fill:var(--muted);font-size:11.5px}
+  svg .arr{stroke:var(--fg);stroke-width:1.5;fill:none;marker-end:url(#ah)}
+  svg #ah path{fill:var(--fg)}
+  ol.t{padding-left:22px} ol.t li{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>The bench reruns design inputs</h1>
+<p class="sub">Funnel page. It stands beside <code>spec/funnel/the-bench-reruns-design-inputs.md</code>, which carries the short form.</p>
+
+<div class="bl">
+<strong>Bottom line.</strong> A desk cuts a start commit, and a cloud box reruns a group of tickets from it. Every run gets the same design input, and each run changes one setup. The box learns that it works in a sandbox. The transcript shows whether it stays inside. A desk grades the design output against a reference.
+<ul>
+<li><strong>Stands:</strong> one repo, runs side by side, detection in place of prevention, the design input as the task.</li>
+<li><strong>Waits:</strong> the ship door for the transcript, the two bench verbs, a stub on a cloud box, and the first bench project.</li>
+</ul>
+</div>
+
+<h2><span class="n">1</span>The question</h2>
+<p>The owner reads the agent as less able under a short context window. The owner sees a dull zone at the start of a conversation, and one at its end. At <code>handoverAt: 300000</code> the owner sees better work at once.</p>
+<p>Daily logs mix the work and the days, so they cannot hold one variable still. A bench holds the work still and moves one setup.</p>
+<p class="note">Out of scope: the finish mode past the threshold ("start nothing new"). A fix there changes daily work. It gets its own item.</p>
+
+<h2><span class="n">2</span>The run</h2>
+<figure>
+<svg viewBox="0 0 1000 200" role="img" aria-label="Flow of one bench run: a desk makes it, the routine fires a box, the box works and ships its transcript, a desk grades it">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>
+  <rect class="boxb" x="10" y="40" width="170" height="80" rx="6"/>
+  <text x="95" y="72" text-anchor="middle">desk: bench make</text>
+  <text class="small" x="95" y="94" text-anchor="middle">start commit + setup</text>
+  <text class="small" x="95" y="110" text-anchor="middle">bench/&lt;run&gt;/main</text>
+  <path class="arr" d="M182,80 L228,80"/>
+  <rect class="box" x="230" y="40" width="150" height="80" rx="6"/>
+  <text x="305" y="72" text-anchor="middle">routine</text>
+  <text class="small" x="305" y="94" text-anchor="middle">one box per run</text>
+  <path class="arr" d="M382,80 L428,80"/>
+  <rect class="box" x="430" y="40" width="170" height="80" rx="6"/>
+  <text x="515" y="72" text-anchor="middle">cloud box</text>
+  <text class="small" x="515" y="94" text-anchor="middle">pulls the group, works,</text>
+  <text class="small" x="515" y="110" text-anchor="middle">pushes, in the sandbox</text>
+  <path class="arr" d="M602,80 L648,80"/>
+  <rect class="box" x="650" y="40" width="150" height="80" rx="6"/>
+  <text x="725" y="72" text-anchor="middle">level zero</text>
+  <text class="small" x="725" y="94" text-anchor="middle">ships transcript and</text>
+  <text class="small" x="725" y="110" text-anchor="middle">session.jsonl</text>
+  <path class="arr" d="M802,80 L818,80"/>
+  <rect class="boxb" x="820" y="40" width="170" height="80" rx="6"/>
+  <text x="905" y="72" text-anchor="middle">desk: bench grade</text>
+  <text class="small" x="905" y="94" text-anchor="middle">tests, check, judge,</text>
+  <text class="small" x="905" y="110" text-anchor="middle">audit</text>
+  <text class="small" x="500" y="170" text-anchor="middle">A box sees an ordinary work branch. Runs go side by side in one repo.</text>
+</svg>
+<figcaption>One run. The desk steps stand at the ends, and the cloud steps stand between them.</figcaption>
+</figure>
+
+<div class="scroll"><table>
+<tr><th>step</th><th>the hand</th><th>what it does</th></tr>
+<tr><td class="k">make</td><td>a desk, <code>./RUNME.sh bench make</code></td><td>Cuts the start commit, writes the setup into the config, and pushes <code>bench/&lt;run&gt;/main</code> and the group branch.</td></tr>
+<tr><td class="k">fire</td><td>the routine</td><td>Starts one cloud box for each run, as for any work branch.</td></tr>
+<tr><td class="k">work</td><td>the box</td><td>Pulls the group, works every ticket, pushes. It hears one line at the start: it works in a sandbox, and the job includes staying inside it.</td></tr>
+<tr><td class="k">ship</td><td>level zero</td><td>Pushes the transcript and <code>session.jsonl</code> off the box after every turn. A dead box then loses nothing.</td></tr>
+<tr><td class="k">grade</td><td>a desk, <code>./RUNME.sh bench grade</code></td><td>Runs the reference tests and <code>./RUNME.sh check</code>, then the blind judge, then the transcript audit.</td></tr>
+</table></div>
+
+<h2><span class="n">3</span>What the box gets, and how it is graded</h2>
+<p>Every run gets the same design input and the same tickets. The box gets no test from the reference implementation. The desk runs those tests after the box finishes.</p>
+<div class="scroll"><table>
+<tr><th>layer</th><th>what it reads</th><th>what it decides</th></tr>
+<tr><td class="k">gate</td><td>the reference tests and the check, on the pushed branch</td><td>A run that fails drops out of the ranking.</td></tr>
+<tr><td class="k">ratio</td><td>quality per output token</td><td>The rank among runs that pass.</td></tr>
+<tr><td class="k">judge</td><td>the design output against the reference, blind to the setup</td><td>The quality score. The judge rewards no volume of prose.</td></tr>
+<tr><td class="k">audit</td><td>the transcript</td><td>Whether the box reached past the sandbox, and whether it learned that it runs a bench.</td></tr>
+<tr><td class="k">record</td><td>the conditions stamp over every folder that moves a run</td><td>Which runs compare. The median over three runs or more is the result.</td></tr>
+</table></div>
+
+<h2><span class="n">4</span>The setups</h2>
+<div class="scroll"><table>
+<tr><th>setup</th><th>what the run carries</th><th>note</th></tr>
+<tr><td class="k">the window</td><td><code>context.handoverAt</code> and <code>context.writeAt</code>, set together</td><td>A <code>writeAt</code> under <code>handoverAt</code> takes the second stage off. The group has to pass the value, or the setup measures nothing.</td></tr>
+<tr><td class="k">the doors</td><td><code>engine.binding: god</code></td><td>Level zero stays on and refuses nothing. The handover runs under <code>queue</code> alone, so this setup also takes the window off.</td></tr>
+<tr><td class="k">the vehicle</td><td>a stub project, driven by a vehicle pinned at a commit</td><td>Option B. The project carries its own history and a reference a desk builds first.</td></tr>
+</table></div>
+
+<h2><span class="n">5</span>The red team, and the owner's rulings</h2>
+<div class="scroll"><table>
+<tr><th>finding</th><th>what the red team says</th><th>ruling</th></tr>
+<tr><td>level zero off</td><td>The door lives in level zero, so a run with level zero off holds the full clone.</td><td><span class="tag ok">solved</span> No setup turns level zero off. The doors setup runs under <code>god</code>.</td></tr>
+<tr><td>start order</td><td>The session start waits for nothing, so a swap of <code>.git</code> races the first turn.</td><td><span class="tag ok">solved</span> No swap. The box hears that it works in a sandbox.</td></tr>
+<tr><td>leaks</td><td>In one repo, the credentials that push also fetch every branch. A door that checks fails open.</td><td><span class="tag warn">accepted</span> Detection in place of prevention. The audit and the retro read the transcript.</td></tr>
+<tr><td>the clear in a cloud box</td><td>The clear fires only at a turn's end under <code>queue</code>, and no pilot shows it in a cloud box.</td><td><span class="tag ok">answered</span> The owner sees it fire in a cloud box. The setup still sets <code>writeAt</code> with <code>handoverAt</code>.</td></tr>
+<tr><td>seven tickets</td><td>The group holds seven tickets, and one takes a new name.</td><td><span class="tag ok">no finding</span> A group is what it holds.</td></tr>
+<tr><td>tests tied to the code</td><td>The hidden tests follow the real implementation, and the box edits the same files.</td><td><span class="tag ok">solved</span> The box gets the design input. The desk runs the reference tests after the run.</td></tr>
+<tr><td>push target</td><td>A verb names its push target, so a map on the remote does nothing.</td><td><span class="tag ok">accepted</span> The box pushes to the bench branch and may see the name.</td></tr>
+<tr><td>too little data</td><td>One group, and the gate saturated before.</td><td><span class="tag warn">agreed</span> More groups, and a median over three runs or more.</td></tr>
+<tr><td>no transcript</td><td>Nothing ships a transcript today, and a box dies with it.</td><td><span class="tag warn">to build</span> The ship door, first in the list.</td></tr>
+<tr><td>claim races</td><td>Two boxes take one run, or a dead box holds a claim.</td><td><span class="tag ok">accepted</span> It rarely happens, and the record shows it.</td></tr>
+<tr><td>tells</td><td>A bench branch, the sandbox line, the clock past the start commit.</td><td><span class="tag ok">accepted</span> The audit reads whether the box noticed.</td></tr>
+</table></div>
+
+<h2><span class="n">6</span>The steel man of the opposite</h2>
+<div class="scroll"><table>
+<tr><th>position</th><th>its case at full strength</th><th>where it falls short</th><th>ruling</th></tr>
+<tr><td class="k">build nothing now</td><td>The logs name a fault already: the finish mode. Change it, run a week, compare logs. It costs days.</td><td>No reference, no same work, no vehicle compare. It fixes one mode and builds no instrument.</td><td><span class="tag no">rejected</span> The finish mode gets its own item. The bench stays.</td></tr>
+<tr><td class="k">tell the box</td><td>The ruling on <code>v3</code> says the box hears that it runs a bench. Every compare is a pair, so a bias cancels.</td><td>It shows nothing of the box that does not know.</td><td><span class="tag warn">open</span> The owner holds no position. The box hears "sandbox" alone.</td></tr>
+<tr><td class="k">a repo per run</td><td>Structure holds where a check fails open. Nothing to audit.</td><td>A repo, an environment and a routine for each run.</td><td><span class="tag no">rejected</span> Too much effort.</td></tr>
+<tr><td class="k">an outside bench</td><td>Maintained, and it compares with other results.</td><td>No groups, no handover, no long context.</td><td><span class="tag no">rejected</span> It tests the model, and the question is the vehicle.</td></tr>
+</table></div>
+
+<h2><span class="n">7</span>The evidence</h2>
+<p class="note">Read from the owner's logs and branches. Each row names what backs it and how strong it is.</p>
+<div class="scroll"><table>
+<tr><th>finding</th><th>value</th><th>source</th><th>strength</th></tr>
+<tr><td>Owner prompts that land past the threshold, in the finish mode</td><td>32 of 136, 122 minutes</td><td><code>.se/.log/session.jsonl</code>, two days</td><td><span class="tag warn">medium</span></td></tr>
+<tr><td>Tool calls before the first real edit, after a clear against one long session</td><td>21 % against 7 %</td><td><code>.se/.log/transcripts-today</code></td><td><span class="tag warn">medium</span> fits a cost at the start</td></tr>
+<tr><td>Tool-error rate by context size</td><td>5.7 % under 150k, 7.2 % from 150k to 500k, 3.1 % past 500k</td><td>same transcripts</td><td><span class="tag no">weak</span> most errors are door refusals</td></tr>
+<tr><td>Context when a clear fires, with the threshold at 150k</td><td>345k to 358k</td><td><code>session.jsonl</code>, one evening</td><td><span class="tag ok">strong</span> the clear waits for a turn's end</td></tr>
+<tr><td>Thinking blocks stored empty</td><td>1026 of 1026</td><td>transcripts, with <code>showThinkingSummaries</code> on</td><td><span class="tag ok">strong</span> the audit reads text and calls alone</td></tr>
+<tr><td>Model and effort in the editor</td><td><code>claude-opus-5-5[1m]</code>, effort high, in 7 of 7</td><td>transcripts</td><td><span class="tag ok">strong</span> the surface is no variable</td></tr>
+<tr><td>The bench before this tree</td><td>25 of 26 runs correct, 36 to 40 of 40 in 24</td><td><code>sebot_projects/benchmark/_matrix/results.jsonl</code></td><td><span class="tag ok">strong</span> easy problems saturate</td></tr>
+<tr><td>Its squeeze axis</td><td>tight and standard both at 50.7k</td><td>same file</td><td><span class="tag ok">strong</span> the axis collapsed</td></tr>
+<tr><td>A better agent at 300k</td><td>seen at once</td><td>the owner</td><td><span class="tag warn">observed</span> unmeasured, and the bench measures it</td></tr>
+</table></div>
+
+<h2><span class="n">8</span>What the bench reuses</h2>
+<div class="scroll"><table>
+<tr><th>from</th><th>what it brings</th></tr>
+<tr><td>the bench before this tree, <code>sebot_v1/.claude/skills/benchmark</code></td><td>The gate before the ratio. A judge blind to the setup that rewards no volume of prose. The dose read as the clears that happen.</td></tr>
+<tr><td>the bench on <code>v3</code>, <code>deliverable/engine/benchmark*.ts</code></td><td>The conditions stamp over every folder. The median over three runs or more. One results note for each run, under <code>spec/benchmarks</code>.</td></tr>
+<tr><td>the cloud box on <code>main</code></td><td>The work branch, the group, the routine, and the rules in <code>spec/guidance/cloud.md</code>.</td></tr>
+<tr><td>the vehicle on <code>main</code></td><td>The stub and the pinned vehicle, <code>spec/design_output/vehicle.md</code>.</td></tr>
+</table></div>
+
+<h2><span class="n">9</span>What stands open</h2>
+<div class="scroll"><table>
+<tr><th>the question</th><th>what hangs on it</th></tr>
+<tr><td>which projects carry the bench, each with a reference a desk builds first</td><td>Option B, and enough groups to read a spread.</td></tr>
+<tr><td>whether each group runs past the larger <code>handoverAt</code></td><td>A setup measures the window only where the group passes its value.</td></tr>
+<tr><td>which ref takes the transcript and <code>session.jsonl</code></td><td>The audit and the retro both read them.</td></tr>
+<tr><td>whether a stub runs on a cloud box with a pinned vehicle</td><td>The vehicle setup stands on it.</td></tr>
+<tr><td>whether the judge reads the diff, the notes, or both</td><td>The grade of a design output.</td></tr>
+<tr><td>the ruling on <code>v3</code> that tells the box it runs a bench</td><td>This item tells the box about the sandbox alone.</td></tr>
+</table></div>
+
+<h2><span class="n">10</span>The tickets that follow</h2>
+<ol class="t">
+<li>Level zero ships the transcript and <code>session.jsonl</code> off a cloud box after every turn. It pays off with no bench.</li>
+<li><code>./RUNME.sh bench make</code>: the start commit, the setup in the config, the branches, and the sandbox line.</li>
+<li><code>./RUNME.sh bench grade</code>: the reference tests, the check, the judge, the audit, and the results note.</li>
+<li>A stub runs on a cloud box with a vehicle pinned at a commit.</li>
+<li>The first bench project, with its reference built at a desk.</li>
+</ol>
+
+</div>
+</body>
+</html>

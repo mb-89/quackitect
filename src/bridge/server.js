@@ -49,7 +49,6 @@ import {
   holdsForHandover,
   measures,
   onSessionMeasure,
-  ridesCall,
 } from "./handover.js";
 import { SPECS as logSpecs, TOOLS as logTools } from "./logline.js";
 import {
@@ -274,7 +273,7 @@ async function onToolCall(e, box) {
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (!passes(said)) return said;
   // [[spec/design_output/level0#the-findings-ride-the-call]]
-  return held ?? ridesCall(e, box, answerRides(e, box, owesCanary(e, box))) ?? PASS;
+  return held ?? answerRides(e, box, owesCanary(e, box)) ?? PASS;
 }
 
 function passes(said) {

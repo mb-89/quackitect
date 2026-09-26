@@ -28,9 +28,9 @@ export function escalate(it, argv) {
   const as = flagValue(rest, "--as");
   const hand = as ? `${handOf(it)} · ${as}` : handOf(it);
   const held = holdOf(it, hand);
-  if (!held) {
+  if (!held?.path) {
     say(REFUSED, [
-      "nothing stands in your hand, so no leaf takes a person step.",
+      "no ticket file stands in your hand, so no leaf takes a person step.",
       "Run ./RUNME.sh ticket pull to take a leaf, then run this again.",
     ]);
     return 1;

@@ -53,6 +53,8 @@ export const NOTES = `${PRIVATE}/notes`;
 export const TICKETS = `${PRIVATE}/tickets`;
 // The handover one session leaves the next on this box, which the first read deletes. [[spec/design_output/work#one-handover-stands]]
 export const HANDOVER = `${PRIVATE}/HANDOVER.md`;
+// The mark the context door leaves where the session goes due, so the pull hands the clear's tickets after the ticket in hand. [[spec/design_input/the-clear-hands-ephemeral-tickets]]
+export const DUE = `${RUN}/due.json`;
 
 // [[spec/design_input/the-runtime-files-stand-apart]]
 export function inRetro(name) {

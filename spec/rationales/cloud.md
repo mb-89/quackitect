@@ -74,7 +74,7 @@ merge then judges the call with the code in front of it.
 | a wrong call the merge catches | one review |
 | a branch parked on a question | the session parking it, and every session meeting it again |
 
-## 7. A person blocks no branch
+### A person blocks no branch
 
 A cloud box runs while nobody sits beside it. So a step whose `by` reads
 `person` waits the whole session, and the branch waits with it. Every step
@@ -108,6 +108,22 @@ question this branch meets. The mechanics follow it.
 | a review returning twice | the inserted step reads `by: anyone` |
 | `branch unblock` | the verb refuses, and names the pull instead |
 | a claim that a wrong answer outlives the branch | the rule wants a person sitting here, and none does |
+
+## 7. A ticket waits instead
+
+Rule 6 covers a question, which the box answers itself. Some work stays out of
+its reach whatever it decides. A permission the harness refuses stands there,
+and so do a setting in the product and a trial on a desk. The owner changes
+those between sessions, so an ask in the chat waits on a session already gone.
+
+One box met it at the live trial of the clear. The harness refused a second
+client past its permission prompts, and the box closed on a question to the
+owner. The owner read it after the session, where no grant reaches the box.
+
+A ticket on [[spec/processes/question]] holds the work instead. Its `answer`
+step waits for a person, its ask carries every command they run, and the `do`
+step behind it lets any hand carry the result on. The branch then goes to done,
+and nothing waits in the chat.
 
 ## 8. What a leaving branch owes
 

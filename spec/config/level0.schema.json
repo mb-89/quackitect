@@ -89,12 +89,7 @@
         "handoverAt": {
           "type": "number",
           "unit": "tokens",
-          "help": "The context a session carries before it finishes, writes the handover and clears. 0 switches it off."
-        },
-        "writeAt": {
-          "type": "number",
-          "unit": "tokens",
-          "help": "The context past which the session stops the step and writes the handover now. 0, or a value under handoverAt, switches it off."
+          "help": "The context past which the next pull after the ticket in hand hands the handover, the clear and the read of the handover. 0 switches it off."
         }
       }
     },
