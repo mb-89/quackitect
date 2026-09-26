@@ -56,7 +56,7 @@ import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { FIX_USAGE, fixFlags } from "./cli-fix.js";
 import { formatFaults, goEnvOf, goModulesIn } from "./cli-go.js";
 import { HOOKS } from "./precommit.js";
-import { writeSurvey } from "../engine/tools.js";
+import { whereIs, writeSurvey } from "../engine/tools.js";
 import { viewerOf } from "./tui-build.js";
 
 export function treeHere() {
@@ -91,7 +91,7 @@ export function splitDoors() {
   return { root, join, disk: files, clock: it.clock };
 }
 
-// The commit verb reads the message through Vale, lands it, and runs the check. [[spec/design_output/work#the-battery-answers-first]]
+// The commit verb reads the message through Vale, runs the cold probe on a cold-path commit, lands it, and runs the check. [[spec/design_output/work#the-battery-answers-first]] [[spec/design_output/level0#the-cold-probe]]
 export function commitDoors() {
   return {
     root,
@@ -104,6 +104,8 @@ export function commitDoors() {
     log: it.log,
     vale: vale(files, outside, root),
     env: process.env,
+    pid: it.pid,
+    claude: whereIs(files, root, "claude", known),
   };
 }
 

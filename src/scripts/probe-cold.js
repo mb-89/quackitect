@@ -35,6 +35,26 @@ export const COLD = {
   ].join(" "),
 };
 
+// The cold path: the bridgehead, the start road, the guidance delivery, and the probe itself. A commit touching one runs the probe. [[spec/design_output/level0#the-cold-probe]]
+export const COLD_PATH = [
+  ".claude/skills/level0/hooks/",
+  ".claude/skills/level0/lib/guidance.js",
+  "src/bridge/guidance.js",
+  "src/bridge/selftest.js",
+  "src/bridge/server.js",
+  "src/scripts/install.sh",
+  "src/scripts/probe-cold.js",
+];
+
+// A folder entry ends on a slash and takes every path under it, and a file entry takes itself alone. [[spec/design_output/level0#the-cold-probe]]
+export function coldIn(paths) {
+  return (paths ?? []).filter((path) =>
+    COLD_PATH.some((cold) =>
+      cold.endsWith("/") ? path.startsWith(cold) : path === cold,
+    ),
+  );
+}
+
 export function coldPort(pid) {
   return PORT_BASE + PAST + (Number(pid) % SPREAD);
 }
@@ -179,19 +199,20 @@ export function coldLines(checks) {
 }
 
 // [[spec/design_output/level0#the-cold-probe]]
-export async function probeCold(root, it, client, say = console.log) {
+// A delta is the staged change as a patch, so the clone runs the commit about to land. [[spec/design_output/level0#the-cold-probe]]
+export async function probeCold(root, it, client, say = console.log, delta = "") {
   const temp = it.disk.tempDir("se-cold-");
   const tree = it.join(temp, "tree");
   const port = coldPort(it.pid);
   try {
-    return coldRun(root, it, client, say, { temp, tree, port });
+    return coldRun(root, it, client, say, { temp, tree, port, delta });
   } finally {
     stops(it, tree, port);
     it.disk.remove(temp);
   }
 }
 
-function coldRun(root, it, client, say, { temp, tree, port }) {
+function coldRun(root, it, client, say, { temp, tree, port, delta }) {
   const cloned = it.proc.run(
     ["git", "clone", "--quiet", "--no-hardlinks", root, tree],
     {
@@ -202,6 +223,7 @@ function coldRun(root, it, client, say, { temp, tree, port }) {
     say(`FAIL clone: ${tail(cloned.stderr)}`);
     return 1;
   }
+  if (!takesDelta(it, temp, tree, delta, say)) return 1;
   const installed = it.proc.run(["sh", it.join(tree, "src", "scripts", "install.sh")], {
     cwd: tree,
     env: { SE_INSTALL_SKIP: INSTALL_SKIP },
@@ -243,6 +265,20 @@ function coldRun(root, it, client, say, { temp, tree, port }) {
   if (ran.exitCode !== 0)
     say(`The client answers ${ran.exitCode}: ${tail(ran.stderr)}`);
   return checks.every((one) => one.pass) ? 0 : 1;
+}
+
+// [[spec/design_output/level0#the-cold-probe]]
+function takesDelta(it, temp, tree, delta, say) {
+  if (!delta) return true;
+  const patch = it.join(temp, "staged.patch");
+  it.disk.write(patch, delta.endsWith("\n") ? delta : `${delta}\n`);
+  const applied = it.proc.run(["git", "apply", "--index", patch], {
+    cwd: tree,
+    timeoutMs: WAIT,
+  });
+  if (applied.exitCode === 0) return true;
+  say(`FAIL delta: ${tail(applied.stderr || applied.stdout)}`);
+  return false;
 }
 
 function clientArgv(client, plugin) {
