@@ -49,27 +49,32 @@ it each surface names its own shapes again.
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+[[spec/design_output/surfaces]] specifies a module as one file and the surfaces
+the registry builds:
 
-<!-- the form is text -->
+- a topic folder is one package, and each file holds one registration and its test
+- the options `q.Doc`, `q.Show`, `q.Tool`, `q.Deadline` and `q.Cfg`, and who reads each
+- the command line, HTTP with its OpenAPI document, SSE, MCP, the hook tools, the editor and the window
+- the config schema, generated from the declarations
+
+Weighed: `q.Tool` as a mark, against every action as a tool. The mark wins,
+because an agent's tool list stays short and each tool a choice. Assumed: MCP
+adds `index/get` and `index/why` beside the marked actions.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change follows the ask: the note covers the module file, each surface and the options
+- the cleanup it reveals: none, because the note changes no file a reader holds
+- the note points at the model, the views and the hook protocol notes, and restates none
 
-<!-- the form is checklist -->
 
 # Discussion
 
