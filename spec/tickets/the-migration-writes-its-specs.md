@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
+step: split
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 enabled_by: migration.phase0
@@ -80,6 +80,14 @@ record:
   - step: sync
     hand: box d7a540d981d5 · claude-code-remote
     hash_before: 5fea2b450dc009561d27b931cb438208749ccb5a
+  - step: sync
+    hand: box d7a540d981d5 · claude-code-remote
+    hash_before: 199bcaa3b90d9b1e068808d48fdde664bbc99baf
+    hash_after: d991999b718878825cb30bb0b1933190afe5290c
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-migration-writes-its-specs took 4 commit(s) from main.
 ---
 
 # Ask
@@ -94,9 +102,7 @@ Done when [[spec/design_output/inner-protocol]] names the inner protocol and the
 
 ## sync
 
-<!-- branch sync, so the branch carries trunk -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch sync
 
 # split
 
