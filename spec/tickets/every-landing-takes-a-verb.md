@@ -129,7 +129,7 @@ The agent reaches git through the engine alone. A hand lands, proves red, rename
 - `./RUNME.sh commit` naming the new path after `./RUNME.sh rename` lands the old path's deletion in the same commit. A case in `test/level0/commit-verb.test.js` decides it
 - `./RUNME.sh branch merge` takes a `claude/` branch and reads it against main. It merges the branch or names main as carrying its work, then runs the check and deletes the branch. A case in `test/level0/work-group.test.js` decides it
 - `findings` in `.claude/skills/level0/lib/bash.js` refuses `git mv` under `spec/tickets`. It names `./RUNME.sh rename`, with a case in `test/level0/bash.test.js`
-- The Bash door refuses every git command that writes the repository, and names the verb standing for it. A case in `test/level0/bash.test.js` decides it
+- The Bash door refuses every git command that writes the repository, and names the verb standing for it. A case in `test/level0/bash.test.js` decides it, and the cases in `test/level0/bash-commit.test.js` and `test/level0/private.test.js` it reaches follow
 - `./RUNME.sh check` exits 0
 
 # design

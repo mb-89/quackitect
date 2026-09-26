@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-verbs-land-whole
 parent: every-landing-takes-a-verb
+record:
+  - step: do
+    hand: box d7a55188b9103 · claude-code-remote
+    hash_before: a680f435e529f10d272135f535fc6101cc0d35af
+    hash_after: a680f435e529f10d272135f535fc6101cc0d35af
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 37 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-verbs-need-no-wrapper.md:184:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ refusing every git write breaks cases in `test/level0/bash-commit.test.js` and `
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/bash-commit.test.js test/level0/private.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ refusing every git write breaks cases in `test/level0/bash-commit.test.js` and `
 
 <!-- the form is text -->
 
+The git-write line in the ask of [[spec/tickets/every-landing-takes-a-verb]] names the two test files the refusal reaches. The implement checklist then reads them as inside the ask.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the parent's ask names both files on its git-write line
+- the cleanup: none stands, because the two files already pass on the branch
+- the two file names stand on the parent's ask alone, and this ticket points there
 
 # Discussion
 
