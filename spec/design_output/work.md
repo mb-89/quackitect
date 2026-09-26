@@ -83,8 +83,10 @@ A take on a box that holds its branch hands that ask again, and a sync conflict 
 
 The take reads the group before it writes that entry, through `standsOpen` in
 `src/scripts/work.js`. A group whose open children hold no step a hand can take
-stays at `todo`, and the take names the step each child waits at. So a cloud
-box stops here, on the branch, and the record keeps the shape it holds.
+stays at `todo`, and the take names the step each child waits at. The take
+then reads the next free group, and claims the first one holding a step a hand
+takes. So one group waiting on a person holds no other group up, and the record
+of the waiting one keeps the shape it holds.
 
 The hand names the box and no person, because the ticket travels and
 `spec/guidance/private` binds what a tracked file carries. [[spec/guidance]]
@@ -149,7 +151,7 @@ A flag asks for that one reading in place of the rows.
 |---|---|---|
 | the refs | `for-each-ref` | every work branch, its tip, the time on that tip, and whether trunk holds it |
 | the paths | `cat-file --batch` | the ticket names each tip carries |
-| the contents | `cat-file --batch` | every ticket the paths name |
+| the contents | `cat-file --batch`, in pieces of `BATCH_ASKS` from `src/doors/git.js`, because one answer past the process door's buffer throws | every ticket the paths name, on every work branch |
 | the base | `merge-base`, once a branch | what trunk and that branch share |
 
 The fetch stands off that path. `branch list --fetch` asks for it, and `take`
@@ -505,6 +507,41 @@ itself in order, and each link starts from the one before it.
 from a trunk carrying none of that work. It then builds that work a second time.
 
 `branch list` shows what each branch waits for, in place of its mark.
+
+## The owner opens the gate
+
+A gate holds a group until the owner says go. A `by: person` step holds no
+cloud box, so a gate stands on a ticket no box takes: a question on `main`,
+naming no group. [[spec/processes/question]] opens it at `answer`, a person's
+step.
+
+| who meets the gate | what holds it |
+|---|---|
+| a cloud box | it takes a `work/` branch alone, and the gate stands on none |
+| an agent at a desk | the hand rule refuses it a person's step, short of `--owner-says` |
+| the group behind the gate | the group and every child name the gate under `depends_on` |
+
+`closedHere` in `src/scripts/pull-hand.js` reads a name the group lacks off
+`origin/main`, so a take reads the gate as the owner's last push leaves it. The
+branch-level wait reads branches alone and passes the gate over, so the group
+reads as free. `standsOpen` finds nothing a hand takes there, and the take moves
+on to the next group, as [[spec/design_output/work#the-take-writes-the-record]]
+says.
+
+The owner opens the gate from a terminal on `main`, where no harness names an
+agent:
+
+    ./RUNME.sh ticket pull <gate>
+    ./RUNME.sh ticket pull <gate> --answered <group>
+    git push origin main
+
+The second pull closes the gate `reason: answered`, naming the group it frees,
+and the push carries the close to `main`. A desk session does the same where
+the owner says so in the chat, with `--owner-says` on both pulls. The next take
+finds the group free.
+
+A gate missing from `main` reads as closed, so the gate stands on `main` before
+the group it holds.
 
 # The battery answers first
 
