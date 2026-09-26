@@ -91,7 +91,7 @@
     "phase0": true,
     "phase1": true,
     "phase2shadow": true,
-    "phase2switch": false,
+    "phase2switch": true,
     "phase3shadow": false,
     "phase3switch": false,
     "phase4shadow": false,
