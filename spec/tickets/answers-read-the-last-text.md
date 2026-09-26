@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: fcc032c28d64b0263dd942ee8dbd2961b95f037d
+    hash_after: fcc032c28d64b0263dd942ee8dbd2961b95f037d
 ---
 
 # Ask
@@ -102,11 +107,24 @@ step: design/draft
 
 <!-- the form is text -->
 
+Two changes, one a file.
+
+| the file | the change |
+|---|---|
+| `.claude/skills/level0/lib/voice.js` | `answersIn` cuts the rows into turns at each owner row, a `user` row carrying no tool result, the way `sinceTheOwner` in `lib/answer.js` reads one. It keeps the last `answerOf` text of each turn, and `SHORTEST` still drops a short one |
+| `src/bridge/guidance.js` | `paid` reads a step or an answer opening on the canary where `session.paid` already stands. It writes a `warn` row of kind `level0` with a new `HEARD.again`, and leaves the mark as it stands |
+
+`HEARD.again` lands in `.claude/skills/level0/lib/guidance.js` beside the other three. A compaction sets `session.paid` false, so a line after it pays and draws nothing. `spec/design_output/level0.md` adds a row to the table under `The line lands once`.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/scripts/voice.js` `measure`, which calls `answersIn` on each transcript
+- `src/bridge/guidance.js` `onTurnSaid` and `onTurnComplete`, which call `paid`
+- `src/bridge/server.js` the `turn.said` entry and the turn's end, which call those two
 
 ### tests
 
@@ -114,17 +132,27 @@ step: design/draft
 
 <!-- the form is list -->
 
+- `test/level0/verbs.test.js` a turn holding a progress line and an answer gives the answer back alone
+- `test/level0/canary-debt.test.js` a second text opening on the canary in one context draws the repeat finding
+- `test/level0/canary-debt.test.js` a line after a compaction pays and draws no finding
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first draft
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `answersIn`, `answerOf`, `paid`, `onTurnSaid`, `onTurnComplete`, `onSessionCompact` and `canaryIn` stand opened, and the compaction reset stands checked there
+- the callers list comes off a grep for `answersIn` and `paid` across `src` and the plugin
+- each done_when line names its test above, and `./RUNME.sh check` decides the last
 
 ## review
 
