@@ -91,6 +91,7 @@ The owner settles these, and a box reads the note before it asks:
 - one Go module, in [[spec/rationales/go-stands-as-one-module]]
 - git as the archive and the transport, in [[spec/rationales/git-stays-the-archive]]
 - the cage refusing while the index stands down, in [[spec/rationales/the-cage-refuses-while-down]]
+- every other ruling of the model and of this note, in [[spec/design_output/migration#the-argument-for-each-ruling]]
 
 A question the specs of phase 0 raise goes into
 [[spec/funnel/the-inner-protocol-stands-open]], and the phase 0 group answers it.

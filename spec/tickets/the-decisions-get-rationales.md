@@ -45,27 +45,33 @@ The owner settles these and wants no box to ask again. A box finds the argument 
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+A rationale now argues each ruling of the model and the migration that none
+argued. The rulings group by what one argument carries, so a cluster such as
+the slices, the shadow and the owner's switch shares one note. Each rationale
+says the ruling is final, what it gives up, and what makes it wrong.
 
-<!-- the form is text -->
+[[spec/design_output/migration#the-argument-for-each-ruling]] maps every ruling
+to its argument, the standing ones among them. The settled rulings in the
+migration's design input point at that map.
+
+Weighed: one rationale a ruling, against one a cluster. A cluster wins where
+the rulings share their evidence, because a split repeats it. Assumed: the
+rulings in the inner protocol funnel belong to their own ticket.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change follows the ask: every unargued ruling of both design inputs has a rationale, and the map names each one
+- the cleanup it reveals: none, because the map is one table and the list points at it
+- the map holds each pointer once, and the design input points at the map
 
-<!-- the form is checklist -->
 
 # Discussion
 
