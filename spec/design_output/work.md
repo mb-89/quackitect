@@ -151,7 +151,7 @@ A flag asks for that one reading in place of the rows.
 |---|---|---|
 | the refs | `for-each-ref` | every work branch, its tip, the time on that tip, and whether trunk holds it |
 | the paths | `cat-file --batch` | the ticket names each tip carries |
-| the contents | `cat-file --batch` | every ticket the paths name |
+| the contents | `cat-file --batch`, in pieces of `BATCH_ASKS` from `src/doors/git.js`, because one answer past the process door's buffer throws | every ticket the paths name, on every work branch |
 | the base | `merge-base`, once a branch | what trunk and that branch share |
 
 The fetch stands off that path. `branch list --fetch` asks for it, and `take`
