@@ -154,3 +154,23 @@ test("a ticket whose ask says view: none skips the view leaf and closes on tests
   assert.equal(holdsHere({}, "view", {}, ASKING("none")).holds, false);
   assert.equal(holdsHere({}, "view", {}, "# Ask\n\nNo view line.\n").holds, false);
 });
+
+// [[spec/tickets/the-owners-words-travel-verbatim]]
+test("a ticket minted off a handover waits on the owner's read before its draft", () => {
+  const read = {
+    by: "person",
+    when: "handed",
+    path: "design/owner-read",
+    evidence: [],
+  };
+  assert.equal(
+    writesHere(read, { agent: true, cloud: true }).writes,
+    false,
+    "an agent on a cloud box leaves the owner's read to the owner",
+  );
+  assert.equal(writesHere(read, { agent: false }).writes, true, "the owner reads it");
+});
+
+test("a ticket minted off no handover skips the owner's read", () => {
+  assert.equal(holdsHere({}, "handed", {}, ASKING("none")).holds, false);
+});

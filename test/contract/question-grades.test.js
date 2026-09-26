@@ -126,3 +126,12 @@ test("the tickets note rests a claim of done on the owner's view", () => {
   const text = files.read(join(root, "spec", "guidance", "tickets.md"));
   assert.match(text, /^\| \d+ \| .*`view:`/m, "an Examples row pairs it");
 });
+
+// [[spec/tickets/the-owners-words-travel-verbatim]]
+test("the voice note takes the owner's word before a coined word", () => {
+  const said = rulesIn("spec/guidance/voice.md").filter((one) =>
+    /owner's word/i.test(one),
+  );
+  assert.equal(said.length, 1, "one rule takes the owner's word");
+  assert.match(said[0], /coined word/i, "before a coined word");
+});

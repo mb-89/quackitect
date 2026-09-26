@@ -212,3 +212,24 @@ test("the standard route asks for the view the owner reads, in the owner's words
   assert.equal(last.when, "view", "where the ask names a view");
   assert.equal(last.on_fail, "implement", "a fail goes back to the code");
 });
+
+// The owner's words travel as quoted, and a ticket off a handover waits on the owner's read. [[spec/tickets/the-owners-words-travel-verbatim]]
+test("the note route asks for the owner's quoted words with their transcript line", () => {
+  const said = processAt(files, root, join, "note").ask.find(
+    (one) => one.name === "said",
+  );
+  assert.equal(said?.form, "list", "the note asks for the owner's words, one a line");
+  assert.match(said.says, /transcript line/, "each with its transcript line");
+});
+
+test("the standard route opens on the owner's read where the ask comes off a handover", () => {
+  const held = processAt(files, root, join, "standard");
+  assert.equal(held.ask.find((one) => one.name === "from")?.form, "text");
+  const first = leavesOf(
+    readYaml(files.read(join(root, "spec", "processes", "standard.yaml"))),
+  )[0];
+  assert.equal(first.path, "design/owner-read", "the owner's read stands first");
+  const read = leafOf(routeOf("standard"), "design/owner-read");
+  assert.equal(read.by, "person");
+  assert.equal(read.when, "handed");
+});

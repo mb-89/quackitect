@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box fcc1ba4a896f · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box fcc1ba4a896f · claude-code-remote · helper-2
     hash_before: a840802db4ca6b1b887cc84c022c3c7ecd6b5889
     hash_after: a840802db4ca6b1b887cc84c022c3c7ecd6b5889
+  - step: implement/tests-red
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: 2ed52ea596e1c12f46a2caaba0dcb5aec95320fd
+    hash_after: 2ed52ea596e1c12f46a2caaba0dcb5aec95320fd
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 6 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -184,17 +192,31 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/handover-words.test.js test/contract/process.test.js test/level0/pull-when.test.js test/level0/pull-person.test.js test/contract/question-grades.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the handover schema names no chapter of the owner's words, so the finding case fails
+- the note and standard routes carry no `said`, `from` or `owner-read`, so both route cases fail
+- `holdsHere` names no `handed`, and a cloud agent writes the read, so those cases fail
+- the voice note names no owner's word, so the grade case fails
+- what surprises the hand: the handover and route cases read shipped files, so they stand in `test/contract`
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases touch the test files the ask names, and a contract file for the shipped handover schema
+- the level zero cases take fakes, and the contract cases read the real tree
+- each case carries the pointer at this ticket
+- each case reads the note, the schema or the route that states the fact
+- the review rows ride in: `handed` in `pull-when.js`, a mint writer for `from: handover`, and the size; the terms wait on `the-owner-names-three-things`
 
 ## change
 

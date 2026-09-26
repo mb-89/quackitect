@@ -29,3 +29,10 @@ test("a condition the pull reads holds or skips, and one it lacks skips", () => 
   assert.equal(holdsHere({}, "view", {}, TICKET("view: the work tab")).holds, true);
   assert.match(holdsHere({}, "later", {}).why, /names no condition/);
 });
+
+// [[spec/tickets/the-owners-words-travel-verbatim]]
+test("handed holds where the Ask says from: handover, and skips elsewhere", () => {
+  assert.equal(holdsHere({}, "handed", {}, TICKET("from: handover")).holds, true);
+  assert.equal(holdsHere({}, "handed", {}, TICKET("from: none")).holds, false);
+  assert.equal(holdsHere({}, "handed", {}, TICKET("No line.")).holds, false);
+});
