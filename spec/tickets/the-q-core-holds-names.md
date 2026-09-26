@@ -74,11 +74,16 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+step: design/review
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
 depends_on: [go-code-shares-one-module]
+record:
+  - step: design/draft
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: 86f6feaac417b2837ccb432ed8b58202aef10914
+    hash_after: 86f6feaac417b2837ccb432ed8b58202aef10914
 ---
 
 # Ask
@@ -103,11 +108,45 @@ Every module after this one registers through it. Without it no name has one own
 
 <!-- the form is text -->
 
+The package `src/q` holds the core, imported as `quackitect/src/q`. It takes the shape [[spec/design_output/model]] gives, and it imports no door and no other tree package.
+
+| the part | what it holds |
+|---|---|
+| `Catalog` | the registrations, each with its name, type, default, kind, `Alt`, doc, deadline, and the file and line `runtime.Caller` reads |
+| `q.Derived` | a name answered by a function of an input struct, whose fields carry `q:"<name>"` tags |
+| `q.Fold` | a name answered by a state reduced over events, one event at a time |
+| `q.Doc`, `q.Alt`, `q.Deadline` | the options a registration takes |
+| `Store` | the values in memory at one revision: `Snapshot` reads names at one revision, and `Commit` lands a run's output and raises the revision |
+| `Run` | one run of a derived name: fill the input struct off a snapshot, call the function, commit the output with the revision it read |
+| `Check` | the catalog check, answering every fault at once, each naming its file and line |
+
+The check refuses these faults:
+
+- a name registered twice with the same `Alt`, naming both places
+- a default missing: a nil pointer, map, slice or interface
+- two providers active: with the key `providers.<name>` empty, every registration is active unless one plain registration stands
+- a key picking an `Alt` nobody registers
+- an input naming no name, and an input whose type differs from the name's
+- a cycle among derived names
+
+What else holds:
+
+- the view row of the model's table waits for the views, per [[spec/design_output/views]]
+- the index runs `Check` over the one catalog at start, and exits with the faults where any stands
+- the catalog stands empty in this phase, so the index behaves as it did
+- Go takes a list of options last alone, so `q.Derived(name, def, fn, opts...)` takes the function before them
+- the design sketch puts the function after the options
+- the scheduler waits for the index's work loop, which leaves one run pending on a change during a run
+- a fold's state in the database waits for that loop too, and `Run` stays the one step it calls
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/index/main.go` `main`, which runs `q.Check` at start
+- no other caller stands yet: every module after this one registers through the package
 
 ### tests
 
@@ -115,17 +154,37 @@ Every module after this one registers through it. Without it no name has one own
 
 <!-- the form is list -->
 
+- `src/q/catalog_test.go` `TestANameTwiceRefusesTheStart`, deciding the second done line
+- `src/q/catalog_test.go` `TestAMissingDefaultRefusesTheStart`, deciding the second done line
+- `src/q/catalog_test.go` `TestTwoActiveProvidersRefuseTheStart`, deciding the second done line
+- `src/q/catalog_test.go` `TestTheKeyPicksOneAlt`
+- `src/q/catalog_test.go` `TestAnInputNamingNoNameRefuses`
+- `src/q/catalog_test.go` `TestAnInputOfAnotherTypeRefuses`
+- `src/q/catalog_test.go` `TestADerivedCycleRefuses`
+- `src/q/store_test.go` `TestASnapshotReadsOneRevision`
+- `src/q/store_test.go` `TestARunCommitsTheRevisionItRead`
+- `src/q/store_test.go` `TestAFoldReducesEachEvent`
+- `src/index/start_test.go` `TestABrokenCatalogRefusesTheStart`
+- `go test ./...` from the root, deciding the first done line
+- `./RUNME.sh check`, deciding the third
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the model note, the index model input and `src/index/main.go` stand opened
+- a search for `q.` and `quackitect/src/q` names no caller beside the index start
+- each done line names its test in the tests list
 
 ## review
 
