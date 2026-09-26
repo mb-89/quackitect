@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-foundation-lands-unchanged
 parent: the-q-core-holds-names
+record:
+  - step: do
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: b88bc3a2d4ad93c2e229caf7bf15dc62d4d33c44
+    hash_after: b88bc3a2d4ad93c2e229caf7bf15dc62d4d33c44
+    why: the-q-core-holds-names answers this ask
+reason: answered
 ---
 
 # Ask
