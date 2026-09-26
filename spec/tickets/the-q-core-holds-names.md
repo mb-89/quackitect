@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -104,6 +104,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: ac0342e4756fa90a56a45f77913f9395ad807b78
+    hash_after: f54db6743c96ba5a8d693f0d54218a044eaf7195
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/q passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-q-core-holds-names.md:254:1: ListItem: A sentence in a list item holds 20 words, and this one holds 21."
+reason: done
 ---
 
 # Ask
