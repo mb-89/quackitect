@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: d264095109b8e26e44c1652805ad8d9164f5f190
+    hash_after: d264095109b8e26e44c1652805ad8d9164f5f190
 ---
 
 # Ask
@@ -104,11 +109,30 @@ A prompt carries no grace, so the first call after it meets the door. A reply wr
 
 <!-- the form is text -->
 
+The demand a prompt opens keys on the prompt's own time, and three roads read that key.
+
+| the road | the change |
+|---|---|
+| the demand | `onPromptSubmit` in `src/bridge/answer.js` calls `demands` with `at`, the time the server takes the prompt, and `seen` stays the text before it |
+| the display | `onMessageDisplay` stamps `box.spokenAt` beside `box.spoken`. A display pays a prompt's demand where its stamp falls after `at` |
+| the transcript | `lastTexts` in `.claude/skills/level0/hooks/level0.js` posts the assistant texts past the last owner row, off `sinceTheOwner` in `.claude/skills/level0/lib/answer.js`. A restart empties `box.spoken`, and a text before the prompt then stands outside the list |
+| the same message | `spoke` in the bridgehead asks `agent.spoke` once more after a named wait, `DISPLAY_WAIT`, where the first ask refuses a prompt's demand. A display the client posts for the call's own message lands in that wait and pays |
+| the warning | `onPromptSubmit` answers `after.context` carrying `warns("The owner sent a prompt")`, so the answer-first line rides the prompt |
+
+The same-message road rests on the client posting the display before the call runs its tool. This box loaded no function hooks, so nobody measured it here. The review decides whether a probe comes first. `spec/design_output/level0.md` names the key under `What the door reads` and the wait under `The first call asks`.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/bridge/server.js` `submitsPrompt`, which calls `onPromptSubmit`
+- `src/bridge/server.js` the `classic.MessageDisplay` entry, which calls `onMessageDisplay`
+- `src/bridge/server.js` the `agent.spoke` entry, which calls `onAgentSpoke`
+- `src/bridge/ask.js` `asksForUpdate` road, which calls `demands` with no `at`, so an ask keeps today's read
+- `.claude/skills/level0/hooks/level0.js` `spoke`, which calls `lastTexts` and asks `agent.spoke`
+- `src/bridge/report.js`, which calls `pays` unchanged
 
 ### tests
 
@@ -116,17 +140,27 @@ A prompt carries no grace, so the first call after it meets the door. A reply wr
 
 <!-- the form is list -->
 
+- `test/level0/answer-door.test.js` a text written before the prompt pays nothing after a restart empties the spoken text
+- `test/level0/answer-door.test.js` a text shown after the prompt, in the message of the next call, pays the door
+- `test/level0/answer.test.js` the prompt's own answer carries the warning line
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first draft
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: `answer.js` in the bridge and the lib, `server.js`, `ask.js`, `report.js` and the bridgehead `spoke` and `lastTexts`. The client's display order stands unmeasured, and the approach says so
+- the callers list comes off a grep for each changed function across `src` and the plugin
+- each done_when line names its test above, and `./RUNME.sh check` decides the last
 
 ## review
 
