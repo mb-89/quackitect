@@ -543,9 +543,9 @@ test("close drops a group's branch once trunk holds it", () => {
 // A cloud branch reads against trunk by its commits, and takes no group. [[spec/design_output/work#a-cloud-branch-comes-in]]
 const CLOUD = "claude/a-thing";
 const CHECK = `node ${join(ROOT, "src/scripts/cli.js")} check`;
-function cloudMerge(cherry) {
+function cloudMerge(cherry, more = {}) {
   const { it, outside } = doorsSaying(
-    merging({ [`git cherry main origin/${CLOUD}`]: { stdout: cherry } }),
+    merging({ [`git cherry main origin/${CLOUD}`]: { stdout: cherry }, ...more }),
   );
   const { code, said } = heard(() => merge({ ...it, root: ROOT, node: "node" }, CLOUD));
   return { code, said, ran: ranGit(outside) };
@@ -566,6 +566,17 @@ test("merge takes a claude branch in, runs the check and deletes the branch", ()
     "then the branch goes",
   );
   assert.match(said, new RegExp(`${CLOUD} is merged`));
+});
+
+// Main reaches origin before the branch goes, so a refused push leaves the branch standing. [[spec/tickets/merge-deletes-after-the-push]]
+test("merge keeps a claude branch where the push of main comes back refused", () => {
+  const { code, said, ran } = cloudMerge("+ abc123\n", {
+    "git push origin main": { exitCode: 1 },
+  });
+
+  assert.equal(code, 1);
+  assert.match(said, new RegExp(`${CLOUD} stands`));
+  assert.ok(!ran.includes(`git push origin --delete ${CLOUD}`), "the branch stays");
 });
 
 // [[spec/design_output/work#a-cloud-branch-comes-in]]
