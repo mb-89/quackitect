@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box fcc1ba4a896f · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box fcc1ba4a896f · claude-code-remote · helper-2
     hash_before: f4b06c455402d30ab538c1adf0f35e1078d59d90
     hash_after: f4b06c455402d30ab538c1adf0f35e1078d59d90
+  - step: implement/tests-red
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: 10635c3a09d5d0a6709e731a0ef139face8fec5d
+    hash_after: 10635c3a09d5d0a6709e731a0ef139face8fec5d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -164,17 +172,30 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/question-grades.test.js test/contract/process.test.js test/level0/spawn-answer.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the review note names no `size`, and the tickets note names no trivial route, so both cases fail on their match
+- the standard draft carries no `size` field, so the route case fails on its form
+- the spawn answer says nothing of the background, so its case fails on that match
+- what surprises the hand: `spawnAnswer` prints through `console.log`, so the case reads it by swapping that call
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases touch the two contract files the ask names and one new file under `test/level0`
+- `spawnAnswer` reaches the console door alone, and the case stands a fake in its place
+- each case carries the pointer at this ticket
+- no fact repeats: each case reads the note that states the rule
+- the review rows ride as children: `the-new-rule-appends` shapes the change, and `the-hook-awaits-the-spawn` stands on its own ticket
 
 ## change
 

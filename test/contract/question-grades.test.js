@@ -89,3 +89,25 @@ test("the design review note hands a fault the builder fixes to the build, under
     "the branch review note holds no design rule",
   );
 });
+
+// A draft names every file it touches, and the review weighs that spread against the ask. [[spec/tickets/a-small-ask-stays-small]]
+test("the design review note weighs the draft's size against the ask", () => {
+  const rules = rulesIn("spec/guidance/review/design.md");
+  const said = rules.filter((one) => /`size`/.test(one));
+
+  assert.equal(said.length, 1, "one rule weighs the size field");
+  assert.match(said[0], /\bask\b/i, "the rule weighs it against the ask");
+  assert.match(said[0], /pass with findings/i, "a spread past the ask rides out as a row");
+});
+
+// [[spec/tickets/a-small-ask-stays-small]]
+test("the tickets note sends a one-line change the owner orders to the trivial route", () => {
+  const rules = rulesIn("spec/guidance/tickets.md");
+  const said = rules.filter((one) => /--process=trivial/.test(one));
+
+  assert.equal(said.length, 1, "one rule names the trivial route");
+  assert.match(said[0], /one-line change the owner orders/i, "the rule names the change it takes");
+  assert.match(said[0], /draft, a review and a build/i, "the rule names its failure");
+  const text = files.read(join(root, "spec", "guidance", "tickets.md"));
+  assert.match(text, /^\| \d+ \| `--process=trivial`/m, "an Examples row pairs it");
+});

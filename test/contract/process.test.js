@@ -59,6 +59,12 @@ test("the standard route reviews the design once, and its last leaf hands on to 
     "the draft names its tests, one a line",
   );
   assert.ok([draft.said.checklist ?? []].flat().length > 0, "the draft leaf holds its own checklist");
+  // The review weighs the spread against the ask. [[spec/tickets/a-small-ask-stays-small]]
+  assert.equal(
+    draft.evidence.find((one) => one.name === "size")?.form,
+    "list",
+    "the draft names every file it touches, one a line",
+  );
   assert.equal(leafOf(front, "implement/tests-green").said.to, "retro");
   assert.deepEqual(
     walkOf(front).find((one) => one.path === "implement")?.said.input,
