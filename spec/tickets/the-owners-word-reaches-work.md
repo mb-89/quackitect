@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -115,6 +115,11 @@ record:
     hand: box d7a4b8aac9106 · claude-code-remote
     hash_before: af3935de0388e926bc2ab60956a550395bc0b68d
     hash_after: af3935de0388e926bc2ab60956a550395bc0b68d
+  - step: retro/cloud
+    hand: box d7a4b8aac9106 · claude-code-remote
+    hash_before: 6d4ef0513912f7adaf45b4e84494ad58a13cbb5f
+    hash_after: 6d4ef0513912f7adaf45b4e84494ad58a13cbb5f
+reason: done
 ---
 
 # Ask
@@ -256,17 +261,25 @@ The owner's words reach the work as said. A claim of done rests on the owner's v
 
 <!-- the form is list -->
 
+- nothing: `branch take` builds the index, the language server and the client on the box
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the shell hook refused `branch take` for naming no ticket, then for a closed one, and passed an open one
+- the take merged main in with no conflict
+- the split's `checked` line stands at warning, and the door keeps it for the engine
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- `the-owner-names-three-things`: the owner's question on coined terms, outside this group
 
 # Discussion
 
