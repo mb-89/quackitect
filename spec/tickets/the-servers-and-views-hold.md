@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: sync
+step: split
 record:
   - step: sync
     hand: box 63693613eded · claude-code-remote
@@ -88,6 +88,14 @@ record:
     hand: box d7a44d6f73215 · claude-code-remote
     hash_before: 4bb12d0a36f3fe243b3a090d02ac10232a14383c
     hash_after: ae63ba8dfef5a273ce1a6c4dd402e3bc89411d5f
+  - step: sync
+    hand: box d7a44d6f73215 · claude-code-remote
+    hash_before: 870905195a13be89442caf991782ce06e8033176
+    hash_after: 870905195a13be89442caf991782ce06e8033176
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-servers-and-views-hold already carries every commit on main.
 ---
 
 # Ask
@@ -103,6 +111,8 @@ The servers answer while they run, and come back after a restart. Every view of 
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
