@@ -8,8 +8,9 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeTrunk } from "../../src/doors/fake/git.js";
 import { retro } from "../../src/scripts/retro.js";
-import { belongs, slugOf } from "../../src/scripts/retro-outside.js";
+import { slugOf } from "../../src/scripts/retro-outside.js";
 
 const ROOT = "/tree";
 const HOME = "/home";
@@ -56,7 +57,7 @@ function doors(files = FILES, more = {}) {
     clock: fakeClock("2026-09-19T12:00:00.000Z"),
     home: HOME,
     temp: TEMP,
-    git: { run: () => ({ ok: true, out: "abc123" }) },
+    git: fakeTrunk(),
     ...more,
   };
 }
@@ -145,7 +146,7 @@ test("collect moves everything past the dot folders, and leaves the runtime fold
   const { code } = heard(() => retro(ROOT, ["collect", RETRO], it));
 
   assert.equal(code, 0);
-  assert.deepEqual(standing(it), [".doc", ".retro", ".runtime"]);
+  assert.deepEqual(standing(it), [".doc", ".retro", ".runtime", "scripts"]);
   assert.equal(it.disk.read(input("log/one.jsonl")), '{"said":"a line"}\n');
   assert.equal(it.disk.exists(input("tickets/a-note.md")), true);
   assert.equal(it.disk.exists(input("scripts/one.mjs")), true);
@@ -208,51 +209,6 @@ test("collect copies the transcripts, the memory and the scratchpads of this tre
     it.disk.exists(home(`.claude/projects/${SLUG}/session.jsonl`)),
     true,
     "an outside source stays",
-  );
-});
-
-// [[spec/guidance/retro/collect]]
-test("a folder belongs to the tree by its name, whatever the case of the drive letter", () => {
-  assert.equal(slugOf("c:\\work\\tree\\quackitect-v5"), "c--work-tree-quackitect-v5");
-  assert.equal(
-    belongs("C--work-tree-quackitect-v5", "c--work-tree-quackitect-v5"),
-    true,
-  );
-  assert.equal(
-    belongs("C--Temp-c--work-tree-quackitect-v5-stub", "c--work-tree-quackitect-v5"),
-    true,
-  );
-  assert.equal(
-    belongs("c--work-tree-quackitect-v50", "c--work-tree-quackitect-v5"),
-    false,
-  );
-  assert.equal(
-    belongs("c--work-tree-quackitect-v4", "c--work-tree-quackitect-v5"),
-    false,
-  );
-  assert.equal(
-    belongs("c--work-tree-quackitect-v5-old", "c--work-tree-quackitect-v5", ["src"]),
-    false,
-    "a sibling tree names a folder the tree holds nowhere",
-  );
-  assert.equal(
-    belongs("c--work-tree-quackitect-v5-src-bridge", "c--work-tree-quackitect-v5", [
-      "src",
-    ]),
-    true,
-    "a session run from a folder inside the tree belongs",
-  );
-  assert.equal(
-    belongs(
-      "c--work-tree-quackitect-v5--claude-worktrees-a",
-      "c--work-tree-quackitect-v5",
-    ),
-    true,
-    "a worktree under a dot folder belongs",
-  );
-  assert.equal(
-    belongs("c--other-c--work-tree-quackitect-v5x", "c--work-tree-quackitect-v5"),
-    false,
   );
 });
 
@@ -431,4 +387,207 @@ test("a folder the disk refuses to move whole moves file by file, and leaves not
     manifestOf(it).some((one) => one.refused),
     false,
   );
+});
+
+const stamped = (when, more = "") => `{"timestamp":"${when}"${more}}`;
+
+// [[spec/tickets/the-retro-finishes-its-asks]]
+test("a transcript line stamped before the last collect stays out of the input", () => {
+  const session = home(`.claude/projects/${SLUG}/session.jsonl`);
+  const it = doors({
+    ...FILES,
+    [at(".se/.retro/retro-older/collected.json")]: '{"at":"2026-09-12T00:00:00.000Z"}\n',
+    [session]: [
+      stamped("2026-09-11T08:00:00.000Z", ',"said":"old"'),
+      '{"said":"old, no stamp"}',
+      stamped("2026-09-13T08:00:00.000Z", ',"said":"new"'),
+      '{"said":"new, no stamp"}',
+    ].join("\n"),
+  });
+  it.disk.times.set(session.split("\\").join("/"), Date.parse("2026-09-13T08:00:00.000Z"));
+
+  heard(() => retro(ROOT, ["collect", RETRO], it));
+
+  const copied = it.disk.read(input(`transcripts/${SLUG}/session.jsonl`));
+  assert.doesNotMatch(copied, /"old/);
+  assert.match(copied, /"said":"new"/);
+  assert.match(copied, /new, no stamp/);
+});
+
+// [[spec/tickets/the-second-collect-keeps-lines]]
+test("a second pass keeps the lines the first pass takes, and adds the lines past it", () => {
+  const session = home(`.claude/projects/${SLUG}/session.jsonl`);
+  const first = stamped("2026-09-19T11:00:00.000Z", ',"said":"first"');
+  const it = doors({ ...FILES, [session]: first });
+  heard(() => retro(ROOT, ["collect", RETRO], it));
+
+  it.disk.write(session, [first, stamped("2026-09-19T13:00:00.000Z", ',"said":"later"')].join("\n"));
+  it.disk.times.set(session.split("\\").join("/"), Date.parse("2026-09-19T13:00:00.000Z"));
+  heard(() => retro(ROOT, ["collect", RETRO, "--again"], it));
+
+  const copied = it.disk.read(input(`transcripts/${SLUG}/session.jsonl`));
+  assert.match(copied, /"said":"first"/);
+  assert.match(copied, /"said":"later"/);
+});
+
+// [[spec/tickets/the-retro-finishes-its-asks]]
+test("a collect copies .se/scripts and leaves it in place, and a second pass copies what changes", () => {
+  const it = doors();
+  const first = heard(() => retro(ROOT, ["collect", RETRO], it));
+  assert.equal(first.code, 0, first.said);
+  assert.equal(it.disk.exists(at(".se/scripts/one.mjs")), true, "the scripts stay in place");
+  assert.equal(it.disk.exists(input("scripts/one.mjs")), true);
+
+  it.disk.write(at(".se/scripts/two.mjs"), "// a later script\n");
+  it.disk.times.set(at(".se/scripts/two.mjs").split("\\").join("/"), Date.parse("2026-09-19T13:00:00.000Z"));
+  const again = heard(() => retro(ROOT, ["collect", RETRO, "--again"], it));
+
+  assert.equal(again.code, 0, again.said);
+  assert.equal(it.disk.exists(at(".se/scripts/one.mjs")), true);
+  assert.equal(it.disk.exists(at(".se/scripts/two.mjs")), true);
+  assert.equal(it.disk.read(input("scripts/two.mjs")), "// a later script\n");
+  assert.equal(it.disk.exists(input("scripts/one.2.mjs")), false, "an unchanged script copies once");
+});
+
+const LAST = ".se/.retro/retro-older/collected.json";
+const ticketText = (name, state, process, retroChapter = "") =>
+  [
+    "---",
+    "kind: [[ticket]]",
+    `state: ${state}`,
+    `process: [[spec/processes/${process}]]`,
+    "---",
+    "",
+    "# Ask",
+    "",
+    `The ask of ${name}.`,
+    "",
+    retroChapter,
+    "# Discussion",
+    "",
+    "<!-- what anybody adds, at any time, on this ticket -->",
+    "",
+    "a line past the retro",
+    "",
+  ].join("\n");
+const RETRO_CHAPTER = [
+  "# retro",
+  "",
+  "## write",
+  "",
+  "### badly",
+  "",
+  "<!-- the form is list -->",
+  "",
+  "- the sync meets a conflict, at 10:04, and the owner prompt turns it",
+  "",
+  "### thoughts",
+  "",
+  "The box reads the trunk guard late.",
+  "",
+].join("\n");
+const groupAt = (name, state = "closed", chapter = RETRO_CHAPTER) =>
+  ticketText(name, state, "group", chapter);
+const ticketPath = (name) => `spec/tickets/${name}.md`;
+
+// [[spec/tickets/the-retro-reads-cloud-retros]]
+test("collect gathers the retro chapter of every group closing in the window, with the close of the trunk commit landing it, once the branch leaves", () => {
+  const closed = groupAt("cloud-one");
+  const it = doors(
+    { ...FILES, [at(LAST)]: '{"at":"2026-09-12T00:00:00.000Z"}\n' },
+    {
+      git: fakeTrunk([
+        { sha: "open1", at: "2026-09-08T09:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-one")]: groupAt("cloud-one", "open", "") } },
+        { sha: "box1", at: "2026-09-11T09:00:00+00:00", trunk: false, changes: { [ticketPath("cloud-one")]: closed } },
+        { sha: "merge1", at: "2026-09-15T10:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-one")]: closed } },
+      ]),
+    },
+  );
+
+  const { code, said } = heard(() => retro(ROOT, ["collect", RETRO], it));
+
+  assert.equal(code, 0, said);
+  assert.equal(it.disk.exists(input("groups/cloud-one.md")), true, "the chapter lands in the input");
+  const chapter = it.disk.read(input("groups/cloud-one.md"));
+  assert.match(chapter, /^# retro$/m);
+  assert.match(chapter, /^### badly$/m);
+  assert.match(chapter, /the sync meets a conflict, at 10:04/);
+  assert.match(chapter, /The box reads the trunk guard late\./);
+  assert.doesNotMatch(chapter, /The ask of cloud-one/, "the ask stays out");
+  assert.doesNotMatch(chapter, /a line past the retro/, "the chapter after stays out");
+  assert.deepEqual(
+    JSON.parse(it.disk.read(input("groups/closed.json"))),
+    { "cloud-one": "2026-09-15T10:00:00.000Z" },
+    "the close is the trunk commit landing the group, past the box's own close",
+  );
+  assert.equal(
+    manifestOf(it).find((one) => one.path === "groups/cloud-one.md")?.from,
+    "groups",
+  );
+  assert.equal(
+    it.git.ran.some((one) => one.argv.join(" ").includes("work/")),
+    false,
+    "collect reads trunk alone, so a branch that leaves takes nothing with it",
+  );
+});
+
+// [[spec/tickets/the-retro-reads-cloud-retros]]
+test("a group closing before the window stays out, and a ticket closing that is no group stays out", () => {
+  const it = doors(
+    { ...FILES, [at(LAST)]: '{"at":"2026-09-12T00:00:00.000Z"}\n' },
+    {
+      git: fakeTrunk([
+        { sha: "merge0", at: "2026-09-10T10:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-old")]: groupAt("cloud-old") } },
+        { sha: "fix1", at: "2026-09-14T10:00:00+00:00", trunk: true, changes: { [ticketPath("a-fix")]: ticketText("a-fix", "closed", "standard", RETRO_CHAPTER) } },
+      ]),
+    },
+  );
+
+  const { code, said } = heard(() => retro(ROOT, ["collect", RETRO], it));
+
+  assert.equal(code, 0, said);
+  assert.equal(it.disk.exists(input("groups/cloud-old.md")), false, "a close before the window stays out");
+  assert.equal(it.disk.exists(input("groups/a-fix.md")), false, "a ticket that is no group stays out");
+  assert.equal(it.disk.exists(input("groups/closed.json")), false);
+});
+
+// [[spec/tickets/the-retro-reads-cloud-retros]]
+test("a group closing with no retro text writes nothing, and the print names it", () => {
+  const bare = "# retro\n\n## write\n\n### badly\n\n<!-- the form is list -->\n\n";
+  const it = doors(FILES, {
+    git: fakeTrunk([
+      { sha: "merge2", at: "2026-09-15T10:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-bare")]: groupAt("cloud-bare", "closed", bare) } },
+    ]),
+  });
+
+  const { code, said } = heard(() => retro(ROOT, ["collect", RETRO], it));
+
+  assert.equal(code, 0, said);
+  assert.equal(it.disk.exists(input("groups/cloud-bare.md")), false);
+  assert.match(said, /cloud-bare closes with no retro text/);
+});
+
+// [[spec/tickets/the-retro-reads-cloud-retros]]
+test("a second pass takes each group once, and the count prints the groups", () => {
+  const commits = [
+    { sha: "merge3", at: "2026-09-19T12:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-a")]: groupAt("cloud-a") } },
+  ];
+  const it = doors(FILES, { git: fakeTrunk(commits) });
+  const first = heard(() => retro(ROOT, ["collect", RETRO], it));
+  assert.equal(first.code, 0, first.said);
+  assert.match(first.said, /groups\s+2 file\(s\)/, "the chapter and the closes");
+  const was = it.disk.modified(input("groups/cloud-a.md"));
+
+  commits.push({ sha: "merge4", at: "2026-09-19T13:00:00+00:00", trunk: true, changes: { [ticketPath("cloud-b")]: groupAt("cloud-b") } });
+  const again = heard(() => retro(ROOT, ["collect", RETRO, "--again"], it));
+
+  assert.equal(again.code, 0, again.said);
+  assert.equal(it.disk.modified(input("groups/cloud-a.md")), was, "a group the first pass takes stays as it is");
+  assert.equal(it.disk.exists(input("groups/cloud-a.2.md")), false);
+  assert.equal(it.disk.exists(input("groups/cloud-b.md")), true);
+  assert.deepEqual(JSON.parse(it.disk.read(input("groups/closed.json"))), {
+    "cloud-a": "2026-09-19T12:00:00.000Z",
+    "cloud-b": "2026-09-19T13:00:00.000Z",
+  });
+  assert.match(again.said, /groups\s+3 file\(s\)/);
 });

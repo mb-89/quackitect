@@ -1,5 +1,6 @@
-// The retro's tickets: one a class the check step leaves open, minted off
-// the standard route, its ask written and the draft opened.
+// The retro's tickets: one a class the check step leaves open, and one a
+// promotion, minted off the standard route, its ask written and the draft
+// opened.
 // [[spec/guidance/retro/check]]
 
 import { CLASSES, recordOf } from "./classes.js";
@@ -45,7 +46,7 @@ export function withAsk(text, ask) {
   return [...rows.slice(0, head + 1), "", ask, ...rows.slice(end)].join("\n");
 }
 
-// Every fault standing between the classes and their tickets. [[spec/guidance/retro/check]]
+// Every fault standing between the classes and promotions and their tickets. [[spec/guidance/retro/check]]
 export function mintFaults(record) {
   const faults = [];
   for (const one of record.classes) {
@@ -60,17 +61,56 @@ export function mintFaults(record) {
       continue;
     }
     if (status !== OPEN || one.tickets?.length) continue;
-    for (const field of ["name", "gain", "breaks"]) {
-      if (!String(one.ticket?.[field] ?? "").trim())
-        faults.push(`${one.id} stands open, and its ticket carries no ${field}`);
-    }
-    if (!(one.ticket?.done_when ?? []).length)
-      faults.push(`${one.id} stands open, and its ticket carries no done_when`);
+    faults.push(...ticketFaults(`${one.id} stands open`, one.ticket));
   }
+  (record.promotions ?? []).forEach((one, at) => {
+    if (one?.tickets?.length) return;
+    faults.push(...ticketFaults(`${promotionName(one, at)} waits`, one?.ticket));
+  });
   return faults;
 }
 
-// The verb: mints one ticket a class standing open, writes its ask and opens the draft. [[spec/guidance/retro/check]]
+// A promotion carries no id, so its fault names its what, or its place where the what stands empty. [[spec/tickets/a-promotion-names-its-fault]]
+export function promotionName(one, at) {
+  const what = String(one?.what ?? "").trim();
+  return what ? `promotion "${what}"` : `promotion ${at + 1}`;
+}
+
+// Every field a ticket to mint carries none of, each named after the thing it serves. [[spec/tickets/a-promotion-names-its-fault]]
+function ticketFaults(said, ticket) {
+  const faults = [];
+  for (const field of ["name", "gain", "breaks"]) {
+    if (!String(ticket?.[field] ?? "").trim())
+      faults.push(`${said}, and its ticket carries no ${field}`);
+  }
+  if (!(ticket?.done_when ?? []).length)
+    faults.push(`${said}, and its ticket carries no done_when`);
+  return faults;
+}
+
+// Mints the ticket a class or a promotion carries, writes its ask, opens the draft and names it back. [[spec/tickets/the-retro-finishes-its-asks]]
+function mintOne(it, one, label) {
+  const path = `${TICKETS}/${one.ticket.name}.md`;
+  const ran = runIn(it, ["mint", "ticket", path, `--process=${ROUTE}`]);
+  if (ran.exitCode !== 0) {
+    console.error(`${label} mints no ticket: ${String(ran.stderr ?? "").trim()}`);
+    return false;
+  }
+  const file = it.join(it.root, ...path.split("/"));
+  it.disk.write(file, withAsk(it.disk.read(file), askOf(one.ticket)));
+  const opened = runIn(it, ["ticket", "open", one.ticket.name]);
+  if (opened.exitCode !== 0) {
+    console.error(
+      `${one.ticket.name} opens not: ${String(opened.stdout ?? "").trim()} ${String(opened.stderr ?? "").trim()}`,
+    );
+    return false;
+  }
+  one.tickets = [one.ticket.name];
+  console.log(`${label}  ${path}`);
+  return true;
+}
+
+// The verb: mints one ticket a class standing open and a promotion waiting, writes its ask and opens the draft. [[spec/guidance/retro/check]]
 export function mint(it, name) {
   const home = name ? homeOf(it, name) : "";
   const at = home ? it.join(home, CLASSES) : "";
@@ -85,29 +125,21 @@ export function mint(it, name) {
     return 1;
   }
 
+  // The classes mint first, then every promotion no ticket names yet. [[spec/tickets/the-retro-finishes-its-asks]]
+  const waiting = [
+    ...record.classes
+      .filter((one) => one.status === OPEN && !one.tickets?.length)
+      .map((one) => ({ one, label: one.id })),
+    ...record.promotions
+      .map((one, place) => ({ one, label: promotionName(one, place) }))
+      .filter(({ one }) => !one.tickets?.length),
+  ];
   let made = 0;
-  for (const one of record.classes) {
-    if (one.status !== OPEN || one.tickets?.length) continue;
-    const path = `${TICKETS}/${one.ticket.name}.md`;
-    const ran = runIn(it, ["mint", "ticket", path, `--process=${ROUTE}`]);
-    if (ran.exitCode !== 0) {
-      console.error(`${one.id} mints no ticket: ${String(ran.stderr ?? "").trim()}`);
-      return 1;
-    }
-    const file = it.join(it.root, ...path.split("/"));
-    it.disk.write(file, withAsk(it.disk.read(file), askOf(one.ticket)));
-    const opened = runIn(it, ["ticket", "open", one.ticket.name]);
-    if (opened.exitCode !== 0) {
-      console.error(
-        `${one.ticket.name} opens not: ${String(opened.stdout ?? "").trim()} ${String(opened.stderr ?? "").trim()}`,
-      );
-      return 1;
-    }
-    one.tickets = [one.ticket.name];
+  for (const { one, label } of waiting) {
+    if (!mintOne(it, one, label)) return 1;
     made += 1;
     // The record lands after each ticket, so a refusal past here leaves the tickets it made named. [[spec/guidance/retro/check]]
     it.disk.write(at, `${JSON.stringify(record, null, 2)}\n`);
-    console.log(`${one.id}  ${path}`);
   }
   it.disk.write(at, `${JSON.stringify(record, null, 2)}\n`);
   const closed = record.classes.filter((one) => one.status !== OPEN);

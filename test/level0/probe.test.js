@@ -105,3 +105,16 @@ test("a torn line in the log drops alone, and the rows around it read", () => {
     ["context", "compact"],
   );
 });
+
+// The repeat saying lands only once the line stands paid, so the first saying after a compaction still decides. [[spec/tickets/callers-name-both-readers]]
+test("a repeat line after the paying one leaves the layer surviving", () => {
+  const read = readsCompaction([
+    context("first"),
+    heard(HEARD.same),
+    compaction(),
+    context("re-read"),
+    heard(HEARD.same),
+    heard(HEARD.again),
+  ]);
+  assert.equal(read.answer, SURVIVES);
+});

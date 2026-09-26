@@ -232,3 +232,15 @@ test("a pass with findings the form refuses keeps the hold, writes no child, and
     );
   }
 });
+
+// The cap is a ceiling, so the refusal says so. [[spec/tickets/the-small-faults-land]]
+test("a finding named past the cap says a ticket name holds at most the cap", () => {
+  const { back } = reviewed(
+    "pass with findings\n- one-two-three-four-five-six: a line",
+  );
+  assert.equal(back.code, 1, back.said);
+  assert.match(
+    back.said,
+    /names one-two-three-four-five-six, and a ticket name holds at most 5 words/,
+  );
+});

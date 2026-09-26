@@ -43,12 +43,23 @@ export function viewerOf({ disk, proc, root, go = "go", windows = false }) {
 
 // The old binary steps aside by rename, and the fresh one takes its name. [[spec/design_output/tui#the-verb-builds-it]]
 export function swapsIn(disk, fresh, exe) {
-  const old = `${exe}.old`;
-  try {
-    if (disk.exists(old)) disk.remove(old);
-  } catch {}
-  if (disk.exists(exe)) disk.move(exe, old);
+  if (disk.exists(exe)) disk.move(exe, asideOf(disk, `${exe}.old`));
   disk.move(fresh, exe);
+}
+
+// The names an old binary tries in turn, because a window still running one stepped aside earlier holds that file on Windows. [[spec/design_output/tui#the-verb-builds-it]]
+const ASIDE = 9;
+
+// The first name beside the binary that stands free or clears. [[spec/design_output/tui#the-verb-builds-it]]
+function asideOf(disk, old) {
+  for (let n = 0; n < ASIDE; n++) {
+    const at = n ? `${old}${n}` : old;
+    try {
+      if (disk.exists(at)) disk.remove(at);
+      return at;
+    } catch {}
+  }
+  return old;
 }
 
 // [[spec/design_output/tui#the-verb-builds-it]]

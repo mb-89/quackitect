@@ -99,7 +99,8 @@ export const verbs = {
     },
   },
   lint: { says: "the rules over the tree, or over what you name", run: lint },
-  fix: { says: "the fixes a program can make", run: fix },
+  // The fixer reads its own flags, so it takes the words after the verb whole. [[spec/tickets/the-small-faults-land]]
+  fix: { says: "the fixes a program can make", run: () => fix(rest) },
   test: {
     says: "the tests alone, or the test files and Go folders you name",
     run: async () => (rest.length ? namedTests(rest) : test()),
@@ -245,7 +246,7 @@ if (runsHere(import.meta.url, process.argv)) {
   process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
 }
 
-// [[spec/design_output/vehicle#three-things-a-vehicle-needs]]
+// [[spec/design_output/vehicle#what-a-vehicle-needs]]
 export function theVehicle(argv) {
   const env = process.env;
   const said = argv[0] ?? "here";

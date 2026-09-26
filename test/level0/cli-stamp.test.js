@@ -52,6 +52,23 @@ test("a green run stamps ok with no warning, and a red run stamps the code", () 
   assert.equal(red.clean, false);
 });
 
+test("the stamp counts every warning but the prose of a ticket, which holds no push", () => {
+  const stood = [
+    { file: "spec/tickets/a-ticket.md", source: "vale" },
+    { file: "/tree/.se/tickets/a-note.md", source: "vale" },
+    { file: "spec/tickets/a-ticket.md", source: "tree" },
+    { file: "spec/guidance/working.md", source: "vale" },
+  ];
+
+  const said = stampFor({ code: 0, sha: "abc", clean: true, at: AT, stood });
+
+  assert.equal(said.warnings, 2);
+  assert.deepEqual(said.files, [
+    "spec/guidance/working.md",
+    "spec/tickets/a-ticket.md",
+  ]);
+});
+
 // [[spec/guidance/retro/effect]]
 test("the battery's report rides the stamp where one stands, and no field stands where none does", () => {
   const battery = { parts: { tests: 12 }, total: 12, slowest: [] };

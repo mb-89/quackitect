@@ -629,7 +629,7 @@ A second prompt on its own fires `prompt.context` once only, so the event
 counts a conversation. That control is what makes the second read a
 compaction's own.
 
-## Three roads to a compaction
+## The roads to a compaction
 
 | road | what it answers on client 2.1.269 |
 |---|---|
@@ -883,12 +883,25 @@ forgets to take a ticket up and to put it down.
 | Edit, Write, MultiEdit, NotebookEdit | nothing, since the harness fixes their fields | `onToolWrite` in `src/bridge/write.js`, which refuses them and names `mcp__level0__patch` |
 | Bash, PowerShell | `<ticket>:` at the head of `description` | `ticketDoor` in `src/bridge/bash.js` |
 
-`ticketFault` in `src/engine/named.js` reads the name. A ticket stands open
-where `spec/tickets/<name>.md` or `.se/tickets/<name>.md` carries a `state`
-other than `closed`. The refusal names the fault and says how to name a ticket:
+`ticketFault` in `src/engine/named.js` reads the name against what stands in
+hand. `inHand` reads it off the box: every ticket a hold names, and the plan's
+`working` todo. Every hand writes through the same door, so a helper's hold
+passes its own ticket.
+
+| what stands in hand | what passes |
+|---|---|
+| a hold, or a working todo | a held ticket's name, an ephemeral one among them, or the todo's title |
+| nothing | any open ticket, so a commit by hand still lands |
+
+A ticket stands open where `spec/tickets/<name>.md` or `.se/tickets/<name>.md`
+carries a `state` other than `closed`. A Bash description opening on the
+working todo's title and a colon passes too. The pull answers a working todo
+ahead of every road that hands work out. The refusal names the fault and says
+how to name a ticket:
 
 | the fault | the refusal opens |
 |---|---|
+| a name outside what stands in hand | `<name> stands outside what is in hand.`, then the tickets and the todo |
 | the call names no ticket | `This write names no ticket.` |
 | no file under either folder carries the name | `No ticket named <name> stands under spec/tickets or .se/tickets.` |
 | the ticket's `state` reads `closed` | `<name> stands closed.` |
@@ -1234,6 +1247,7 @@ pays:
 | what the door reads | what it does |
 |---|---|
 | a step opening on the line | pays the debt, and writes the `info` line |
+| a step opening on the line once it stands paid | writes the `warn` line naming the repeat |
 | a step without it | leaves the debt as it stands |
 | an answer at the turn's end | pays it, or opens it on the first turn |
 | a step from a helper | nothing, because a helper carries its own |
@@ -1281,6 +1295,13 @@ alone. The bridgehead still posts the last texts of the transcript on a
 hold. The door pays on any text since the demand that fits, so a flush landing
 late pays too.
 
+A prompt's demand keys on the prompt itself. At `prompt.submit` the bridgehead
+reads the id of the newest transcript row, and the demand holds it. On a hold
+the bridgehead posts the transcript rows, each with its role and id. The door
+counts an agent text past the next owner row alone. A transcript carrying no
+ids pays a prompt nothing, because a flush a turn late hands an older text. The
+display road then pays alone.
+
 ## What counts as owed
 
 - A prompt a person opens a turn with, or sends mid-turn, at `prompt.submit`.
@@ -1314,7 +1335,9 @@ carries.
 ## The first call asks
 
 A prompt opens its demand with no grace, so the first call after it asks the
-bridgehead for the texts. A mid-turn prompt otherwise waits behind the calls in
+bridgehead for the texts. The prompt's own event carries the warning. The door
+answers the prompt with its text opening on the `warns` line, and the
+bridgehead hands that event on. A mid-turn prompt otherwise waits behind the calls in
 flight, and the owner asks twice. The cost: a hand calling a tool before it
 writes the reply meets a refusal, writes the reply, and calls again.
 

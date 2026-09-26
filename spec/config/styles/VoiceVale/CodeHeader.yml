@@ -1,6 +1,8 @@
 # The header a file opens on says what the file is for, in a few lines, and
-# counts nothing. A pointer line and a lint directive stand outside the cap,
-# the way CodeComment lets them stand anywhere.
+# counts nothing. A number word from two up counts wherever it stands, and a
+# digit counts before a plural. The word one names a thing's identity in this
+# voice, so the rule leaves it. A pointer line and a lint directive stand
+# outside the cap, the way CodeComment lets them stand anywhere.
 # [[spec/guidance/code/code]]
 extends: script
 message: "The header runs past five lines, or '%s' counts a thing. Say what the file is for, and let a command count."
@@ -11,7 +13,8 @@ script: |
   text := import("text")
 
   headerLines := 5
-  count := `(?:^|[^\w-])((?:\d+|[Tt]wo|[Tt]hree|[Ff]our|[Ff]ive|[Ss]ix|[Ss]even|[Ee]ight|[Nn]ine|[Tt]en|[Ee]leven|[Tt]welve) [a-z]+s)\b`
+  words := `[Tt]wo|[Tt]hree|[Ff]our|[Ff]ive|[Ss]ix|[Ss]even|[Ee]ight|[Nn]ine|[Tt]en|[Ee]leven|[Tt]welve`
+  count := `(?:^|[^\w-])(\d+ [a-z]+s|` + words + `)(?:[^\w-]|$)`
 
   isAllowed := func(t) {
     if text.contains(t, "[[") && text.contains(t, "]]") { return true }

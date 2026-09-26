@@ -1,5 +1,5 @@
 // The declaration on disk. The tracked schema names the buttons the sidebar
-// draws, so a case here reads the real file and holds the two that make a
+// draws, so a case here reads the real file and holds the buttons that make a
 // vehicle and a stub to the verbs the shell runs.
 // [[spec/design_output/extension#two-buttons-make-both]]
 

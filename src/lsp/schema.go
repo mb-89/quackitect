@@ -237,6 +237,15 @@ func placeholderFaults(text string, schema *yaml.Doc, where string) []Finding {
 	return out
 }
 
+// A governed folder holds its own kind alone, in the words folderFault in .claude/skills/level0/lib/schema.js answers. [[spec/tickets/each-folder-holds-its-kind]]
+func folderFault(where string, schema *yaml.Doc) Finding {
+	kind := yaml.AsString(schema.Get("kind"))
+	found := schemaFault("Folder", where, 1,
+		fmt.Sprintf("%s stands in a folder the %s schema governs, which holds %s notes alone. Move it off the governed folder.", where, kind, kind))
+	found.Severity = SeverityWarning
+	return found
+}
+
 func left(file string, line int, what string) Finding {
 	return Finding{
 		File:     file,
@@ -258,6 +267,9 @@ func schemaFaults(tree *Tree) []Finding {
 
 	for _, path := range tree.Paths() {
 		if !strings.HasSuffix(path, ".md") {
+			if governor := governorOf(schemas, path); governor != nil {
+				out = append(out, folderFault(path, governor))
+			}
 			continue
 		}
 		text := tree.Read(path)

@@ -47,6 +47,34 @@ test("a build lands beside the running binary, and the old one steps aside by re
   assert.equal(disk.exists(`${EXE}.new`), false);
 });
 
+// A disk where a running window holds one file: its removal and a move onto it throw, the way Windows answers. [[spec/design_output/tui#the-verb-builds-it]]
+const heldAt = (disk, held) => {
+  const { remove, move } = disk;
+  const refused = (path) =>
+    Object.assign(new Error(`EPERM: ${path}`), { code: "EPERM" });
+  disk.remove = (path) => {
+    if (path === held) throw refused(path);
+    remove.call(disk, path);
+  };
+  disk.move = (from, to) => {
+    if (from === held || to === held) throw refused(to);
+    move.call(disk, from, to);
+  };
+  return disk;
+};
+
+// [[spec/design_output/tui#the-verb-builds-it]]
+test("a build lands while a window holds the binary stepped aside last", () => {
+  const disk = heldAt(source(), `${EXE}.old`);
+  disk.write(EXE, "running binary");
+  disk.write(`${EXE}.old`, "older binary");
+  const proc = goWrites(disk);
+  assert.deepEqual(viewerOf({ disk, proc, root: ROOT }), { exe: EXE, why: "" });
+  assert.equal(disk.read(EXE), "binary");
+  assert.equal(disk.read(`${EXE}.old`), "older binary");
+  assert.equal(disk.read(`${EXE}.old1`), "running binary");
+});
+
 test("an unchanged source runs the binary it has and builds nothing", () => {
   const disk = source();
   const proc = goWrites(disk);

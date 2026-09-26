@@ -21,7 +21,7 @@ next. It runs when somebody asks for it.
 Nothing it says stops a merge. There is no refusal here, no verdict field, and
 no switch holding a branch back.
 
-# The two halves
+# The halves
 
 | half | who runs it | what it answers |
 |---|---|---|

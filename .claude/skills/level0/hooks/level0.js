@@ -16,6 +16,8 @@ const COMPACT = "session.compact";
 const LIMIT = 4_000_000;
 const SHORT = 4000;
 const TEXTS = 4;
+// The transcript rows the answer door reads past the prompt's own row. [[spec/tickets/a-reply-follows-its-prompt]]
+const ROWS = 64;
 // The span the start road takes. An install on a fresh clone runs past a spawn, and the road reaches this only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 const STARTING = 180_000;
 // The skip list of [[spec/design_output/level0#the-setup-writes-the-flag]], spelled again here because this hook imports its own folder alone.
@@ -33,6 +35,8 @@ let saidDown = false;
 // The chat line stands apart from the row, so a session start writing the row still leaves the line to say. [[spec/design_output/level0#the-bridge-says-it-falls]]
 let toldDown = false;
 let started = false;
+// The client drops the registered tools when it loads this module again, so a module fresh from a load asks for them on each post until an answer hands them back. [[spec/design_output/level0#the-first-call-pays]]
+let armed = false;
 let waiting = STARTING;
 let stepText = "";
 // What the start road answered where it stood down, so the first prompt says the cage is missing. [[spec/design_output/level0#a-session-says-its-cage]]
@@ -125,6 +129,7 @@ export function register(on, options) {
   waiting = Number(options?.waiting) || STARTING;
   started = false;
   launched = false;
+  armed = false;
   on("*", ($, e, next) => seen($, e, next));
   on("turn.step", streams);
   // [[spec/design_output/pull#a-hand-of-its-own]]
@@ -150,7 +155,10 @@ async function seen($, e, next) {
   if (event === "session.start") await opens($, e);
   const answer = reading(event, e)
     ? await reads($, event, e, next)
-    : await ask($, event, e, next, await fillOf($, event, e));
+    : await ask($, event, await beforeOf($, event, e), next, {
+        ...(await fillOf($, event, e)),
+        ...(armed ? {} : { fresh: true }),
+      });
   if (!answer) {
     if (event === "session.start") await starts($);
     // A tool the server registered answers nowhere past this hook, so a dead bridge says so. [[spec/design_output/level0#the-bridge-says-it-falls]]
@@ -165,7 +173,10 @@ async function seen($, e, next) {
     }
     return next(e);
   }
-  if (Array.isArray(answer.register)) await registers($, answer.register);
+  if (Array.isArray(answer.register)) {
+    await registers($, answer.register);
+    armed = true;
+  }
   if (answer.clear) return clears($, answer, e, next);
   if (answer.needs === "reply") return spoke($, e, next);
   if (answer.spawn !== undefined && (answer.result !== undefined || answer.pass)) {
@@ -330,14 +341,41 @@ async function* streams($, e, next) {
 
 async function lastTexts($) {
   const out = [];
+  let rows = [];
   try {
-    const rows = await $.session.messages();
+    rows = await $.session.messages();
     for (let at = rows.length - 1; at >= 0 && out.length < TEXTS; at--) {
       const said = String(rows[at]?.text ?? "").trim();
       if (rows[at]?.role === "assistant" && said) out.unshift(said);
     }
   } catch {}
-  return out;
+  return {
+    texts: out,
+    rows: (Array.isArray(rows) ? rows : []).slice(-ROWS).map(rowOf),
+  };
+}
+
+// A row as the answer door reads it: its role, its id where it carries one, and its text where the agent wrote it. [[spec/tickets/a-reply-follows-its-prompt]]
+function rowOf(row) {
+  const id = row?.id ?? row?.uuid;
+  return {
+    role: String(row?.role ?? ""),
+    ...(id ? { id: String(id) } : {}),
+    ...((row?.toolResults ?? []).length ? { results: true } : {}),
+    ...(row?.role === "assistant" ? { text: String(row?.text ?? "").trim() } : {}),
+  };
+}
+
+// The prompt carries the id of the newest transcript row, so the answer door keys on it. [[spec/tickets/a-reply-follows-its-prompt]]
+async function beforeOf($, event, e) {
+  if (event !== "prompt.submit" || !e || typeof e !== "object") return e;
+  try {
+    const rows = await $.session.messages();
+    const id = rows.at(-1)?.id ?? rows.at(-1)?.uuid;
+    return id ? { ...e, before: String(id) } : e;
+  } catch {
+    return e;
+  }
 }
 
 function textOf(chunk) {
@@ -346,12 +384,12 @@ function textOf(chunk) {
 }
 
 async function spoke($, e, next) {
-  const texts = await lastTexts($);
+  const { texts, rows } = await lastTexts($);
   const text = stepText || texts.at(-1) || "";
   const answer = await ask(
     $,
     "agent.spoke",
-    { tool: e?.tool, agentId: e?.agentId, text, texts },
+    { tool: e?.tool, agentId: e?.agentId, text, texts, rows },
     next,
   );
   if (!answer) return next(e);

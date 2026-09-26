@@ -1,15 +1,20 @@
 // The retro's collect, its first step. It moves everything the private folder
-// holds, past the dot folders, into the retro's own input folder, and copies
-// the transcripts, the memory and the scratchpads beside it. After it, the
-// private folder holds the runtime folder and the retro folder alone.
+// holds, past the dot folders and the scripts, into the retro's own input
+// folder, and copies the scripts, the transcripts, the memory and the
+// scratchpads beside it. After it, the private folder holds the runtime
+// folder, the retro folder and the scripts alone.
 // [[spec/guidance/retro/collect]]
 
 import { LOG, PRIVATE, RETRO } from "../../.claude/skills/level0/lib/folders.js";
 import { STAMP, saysGreen, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import { readNote } from "../../.claude/skills/level0/lib/schema.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { CLOSED, NOTE_END, TICKETS, fieldOf, isGroup, ticketNamed } from "../engine/group.js";
 import { BATTERY } from "../engine/retro/effect.js";
 import { medianParts } from "./battery.js";
 import { holdsAnywhere } from "./guidance-hand.js";
-import { outsideInto } from "./retro-outside.js";
+import { chapterEnd, lines } from "./pull-chapter.js";
+import { copyTree, outsideInto } from "./retro-outside.js";
 
 const INPUT = "input";
 const MANIFEST = "manifest.jsonl";
@@ -19,6 +24,16 @@ const DOT = ".";
 // The one dot folder collect drains: a running session writes the log through a retro, and the log is history. [[spec/guidance/retro/collect]]
 const DRAINED = LOG.split("/").at(-1);
 const DRAINED_INTO = "log";
+// The folder collect copies and leaves in place, since the classify step runs the generators a hand keeps there. [[spec/tickets/the-retro-finishes-its-asks]]
+const KEPT = ["scripts"];
+// The folder a group's own retro chapter lands in, beside the file of the closes. [[spec/tickets/the-retro-reads-cloud-retros]]
+const GROUPS = "groups";
+const CLOSES = "closed.json";
+// The chapter a group ticket holds its box's retro under, as its route names the step. [[spec/tickets/the-retro-reads-cloud-retros]]
+const RETRO_CHAPTER = "retro";
+// A log row opening a commit carries this mark, and a ticket path starts with a letter. [[spec/tickets/the-retro-reads-cloud-retros]]
+const COMMIT_MARK = "@";
+const COMMENT = /^\s*<!--.*-->\s*$/;
 // The column a source name fills, so the counts stand in one line down the page. [[spec/guidance/retro/collect]]
 const SOURCE_WIDTH = 12;
 
@@ -68,11 +83,15 @@ export function collect(it, name, again = false) {
 
   // A torn run holds files it moves, so the next run carries on where it stops, and deletes nothing. [[spec/guidance/retro/collect]]
   // A second pass takes what arrives past this retro's own collect, and merges it into the same input. [[spec/guidance/retro/collect]]
-  const since = again ? ownAt(it, home) || sinceLast(it, name) : sinceLast(it, name);
+  // A transcript keeps its lines past the last retro's collect, so a second pass copies a changed one whole again, and keeps what the first took. [[spec/tickets/the-second-collect-keeps-lines]]
+  const window = sinceLast(it, name);
+  const since = again ? ownAt(it, home) || window : window;
   it.disk.makeDir(into);
   const moved = movedInto(it, into);
-  const outside = outsideInto(it, into, since);
-  const refused = [...moved.refused, ...outside.refused];
+  const kept = keptInto(it, into, again ? since : 0);
+  const outside = outsideInto(it, into, since, window);
+  const groups = cloudInto(it, into, since);
+  const refused = [...moved.refused, ...kept.refused, ...outside.refused, ...groups.refused];
 
   const rows = [...linesOf(it, into), ...refused];
   it.disk.write(
@@ -90,8 +109,95 @@ export function collect(it, name, again = false) {
   if (report) it.disk.write(it.join(home, BATTERY), `${JSON.stringify(report, null, 2)}\n`);
 
   said(name, counts, outside.folders, since);
+  for (const one of groups.bare) console.log(`  ${one} closes with no retro text, so it writes nothing.`);
   for (const one of refused) console.error(`  refused ${one.path}: ${one.refused}`);
   return stands(it) && !refused.length ? 0 : 1;
+}
+
+// Every group trunk takes closed since the window, its box's retro chapter and the time of the trunk commit landing it. The first-parent line reads the merge, so a group the box closes before the window and trunk takes after it still counts. [[spec/tickets/the-retro-reads-cloud-retros]]
+function cloudInto(it, into, since) {
+  const out = { refused: [], bare: [] };
+  const log = it.git.run(
+    [
+      "log",
+      TRUNK,
+      "--first-parent",
+      "--diff-merges=first-parent",
+      "-G",
+      `^state: ${CLOSED}`,
+      `--format=${COMMIT_MARK}%H %cI`,
+      "--name-only",
+      ...(since ? [`--since=${new Date(since).toISOString()}`] : []),
+      "--",
+      TICKETS,
+    ],
+    true,
+  );
+  if (!log.ok) {
+    out.refused.push({ path: GROUPS, refused: log.err || "git log" });
+    return out;
+  }
+  const at = it.join(into, GROUPS);
+  const closesAt = it.join(at, CLOSES);
+  const closes = parsed(read(it, closesAt)) ?? {};
+  let wrote = false;
+  for (const [name, landing] of landingsOf(log.out)) {
+    if (since && Date.parse(landing.at) < since) continue;
+    // A group the input holds already stays as the first pass takes it. [[spec/tickets/the-retro-reads-cloud-retros]]
+    if (it.disk.exists(it.join(at, `${name}${NOTE_END}`))) continue;
+    const path = `${TICKETS}/${name}${NOTE_END}`;
+    const shown = it.git.run(["show", `${landing.sha}:${path}`], true);
+    if (!shown.ok) {
+      out.refused.push({ path, refused: shown.err || "git show" });
+      continue;
+    }
+    if (!isGroup(shown.out) || fieldOf(shown.out, "state") !== CLOSED) continue;
+    const chapter = retroChapterOf(shown.out);
+    if (!chapter) {
+      out.bare.push(name);
+      continue;
+    }
+    it.disk.makeDir(at);
+    it.disk.write(it.join(at, `${name}${NOTE_END}`), chapter);
+    closes[name] = new Date(landing.at).toISOString();
+    wrote = true;
+  }
+  if (wrote) it.disk.write(closesAt, `${JSON.stringify(closes, null, 2)}\n`);
+  return out;
+}
+
+// The newest trunk commit naming each ticket, off a log of marked commit rows and the paths under each. [[spec/tickets/the-retro-reads-cloud-retros]]
+function landingsOf(said) {
+  const out = new Map();
+  let landing = null;
+  for (const row of String(said).split("\n")) {
+    const one = row.trim();
+    if (one.startsWith(COMMIT_MARK)) {
+      const [sha, at] = one.slice(COMMIT_MARK.length).split(" ");
+      landing = { sha, at };
+      continue;
+    }
+    if (!landing || !one.startsWith(`${TICKETS}/`) || !one.endsWith(NOTE_END)) continue;
+    const name = ticketNamed(one);
+    if (!out.has(name)) out.set(name, landing);
+  }
+  return out;
+}
+
+// The ticket's `retro` chapter with its headings, past its comments, or nothing where it holds no text. [[spec/tickets/the-retro-reads-cloud-retros]]
+function retroChapterOf(text) {
+  const sections = readNote(text).sections;
+  const found = sections.findIndex(
+    (one) => one.level === 1 && one.header === RETRO_CHAPTER,
+  );
+  if (found < 0) return "";
+  const rows = text.split(/\r?\n/);
+  const end = chapterEnd(sections, found, 1, rows.length);
+  const next = sections.findIndex((one, at) => at > found && one.level <= 1);
+  const inside = sections.slice(found, next < 0 ? sections.length : next);
+  if (!inside.some((one) => lines(one.own).length)) return "";
+  const kept = rows.slice(sections[found].line - 1, end).filter((row) => !COMMENT.test(row));
+  return `${kept.join("\n").trim()}\n`;
 }
 
 // The parts read as their median over the runs the stamp keeps, and the slowest cases and the files stay off the last run. [[spec/guidance/retro/effect]]
@@ -104,12 +210,21 @@ export function keptReport(stamp) {
   return { ...report, parts, total, runs: runs.length };
 }
 
+// Every kept folder copies into the input, and stays where it stands. [[spec/tickets/the-retro-finishes-its-asks]]
+function keptInto(it, into, since) {
+  const out = { taken: [], refused: [] };
+  for (const one of KEPT)
+    copyTree(it, it.join(it.root, PRIVATE, one), it.join(into, one), since, out, []);
+  return out;
+}
+
 // Every entry straight under the private folder moves whole, a folder with all it holds. A dot folder stays, and the log is the one dot folder that moves. [[spec/guidance/retro/collect]]
 function movedInto(it, into) {
   const from = it.join(it.root, PRIVATE);
   const out = { refused: [] };
   for (const one of listed(it, from)) {
     if (one.name.startsWith(DOT) && one.name !== DRAINED) continue;
+    if (KEPT.includes(one.name)) continue;
     const was = it.join(from, one.name);
     const now = it.join(into, one.name === DRAINED ? DRAINED_INTO : one.name);
     try {
@@ -220,7 +335,7 @@ function linesOf(it, into, rel = "") {
 
 function sourceOf(path) {
   const top = path.split("/")[0];
-  return ["transcripts", "memory", "scratch"].includes(top) ? top : PRIVATE;
+  return ["transcripts", "memory", "scratch", GROUPS].includes(top) ? top : PRIVATE;
 }
 
 function countsOf(rows) {
@@ -235,7 +350,7 @@ function countsOf(rows) {
 // What stands straight under the private folder past the two dot folders, which a clean collect leaves empty. [[spec/guidance/retro/collect]]
 function stands(it) {
   const left = listed(it, it.join(it.root, PRIVATE)).filter(
-    (one) => !one.name.startsWith(DOT),
+    (one) => !one.name.startsWith(DOT) && !KEPT.includes(one.name),
   );
   for (const one of left)
     console.error(`  ${PRIVATE}/${one.name} still stands beside the dot folders.`);

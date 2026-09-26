@@ -293,3 +293,18 @@ test("the refusal names the schema, the finding and mint_note as the road", () =
   assert.match(said, /mint_note/);
   assert.match(said, /_name\.md/);
 });
+
+// [[spec/tickets/each-folder-holds-its-kind]]
+test("a page under a note folder draws a warning, and a note beside it draws none of it", () => {
+  const said = schemaFaults(
+    governedTree({
+      "spec/notes/page.html": "<html></html>\n",
+      "spec/notes/good.md": "---\nkind: [[note]]\n---\n\n# Scope\n\nWhat it covers.\n",
+    }),
+  );
+  const rows = said.filter((one) => one.rule === "Schema.Folder");
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].file, "spec/notes/page.html");
+  assert.equal(rows[0].severity, "warning");
+  assert.match(rows[0].message, /spec\/notes\/page\.html .*note/);
+});

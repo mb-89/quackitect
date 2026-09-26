@@ -253,8 +253,17 @@ function rulesText(standing) {
 // A step of a turn carries its text, so the debt clears where the line lands and a turn holding open asks once. [[spec/design_output/level0#the-line-lands-once]]
 export function onTurnSaid(e, box) {
   if (e?.agentId) return { pass: true };
+  repeats(box, e?.text);
   paid(box, e?.text);
   return { pass: true };
+}
+
+// A step opening on the canary once the line stands paid repeats it. The turn's end carries the last step's text again, so the check reads steps alone. [[spec/tickets/answers-read-the-last-text]]
+function repeats(box, text) {
+  if (!sessionHere(box).paid) return;
+  const sentence = guidanceOf(box).sentence;
+  if (canaryIn(text, sentence).found === "none") return;
+  box.log.say("warn", DOOR, HEARD.again, { detail: sentence });
 }
 
 // The line pays once a session, so no later answer opens the debt again. [[spec/design_output/level0#the-line-lands-once]]

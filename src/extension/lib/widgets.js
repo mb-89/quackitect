@@ -9,7 +9,7 @@ const DRAWS = ["action", "toggle", "status", "count", "table", "process"];
 const TRACKED = "spec/config/level0.json";
 // [[spec/design_output/extension#the-tree-holds-config-alone]]
 const MACHINERY = ["session"];
-// The local layer, owned by .claude/skills/level0/lib/folders.js and spelled again here because the extension imports its own folder alone. [[spec/design_output/config#the-three-layers]]
+// The local layer, owned by .claude/skills/level0/lib/folders.js and spelled again here because the extension imports its own folder alone. [[spec/design_output/config#the-layers]]
 const LOCAL = ".se/.runtime/config.json";
 
 function entriesIn(schema) {
