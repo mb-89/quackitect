@@ -521,6 +521,11 @@ from a trunk carrying none of that work. It then builds that work a second time.
 | red | the check says red, with the time |
 | a warning standing | how many stand, in how many files, and the lint that names them |
 
+The stamp counts no Vale warning in a file under `spec/tickets` or
+`.se/tickets`. [[spec/guidance/working]] tells a hand to leave a ticket's prose
+warning standing. `holdsPush` in `src/scripts/cli-stamp.js`
+reads that, and every other warning holds the push.
+
 So `done` stops meaning "the session believes this passes". It comes to mean
 "a program runs on this commit, and it passes with no warning standing". One
 reading, `saysGreen` in `lib/runs.js`, answers `done`, the pre-push hook and
