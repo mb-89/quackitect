@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: "assertion: the tests fail on their own assertion at 7373a634"
+  - step: implement/change
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 91023cb291f840894a26d1717c50fd30dda4a30a
+    hash_after: 305c2e316ca58649cf366acf5c995c225c118689
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
 ---
 
 # Ask
@@ -257,11 +265,19 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: past the named files, it touches the headers, the headings and the links the wider rules reach
+- [x] every door the change reaches has a fake: the change reaches no door, and the source reads stand in `test/contract`
+- [x] a comment names the approach the change implements: `TICKET_WHERE`, `PUBLIC_TICKETS` and the new cases each carry a pointer
+- [x] every fact the change adds stands in one place: `folders.js` owns the ticket folder and the note end, and `group.js` reads them there
+- [x] every row the design review passes with stands fixed in the change: the `handDoors` line and the word one each carry their comment
 
 ## tests-green
 
