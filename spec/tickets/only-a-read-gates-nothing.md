@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-verbs-land-whole
 parent: doors-read-what-commands-do
+record:
+  - step: do
+    hand: box d1fe1ca62214 · claude-code-remote
+    hash_before: 728c4e0e3e95854d789d02cba58b0fb35d4db242
+    hash_after: 728c4e0e3e95854d789d02cba58b0fb35d4db242
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 37 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-verbs-need-no-wrapper.md:184:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ step 2 names both a gate list (a test, a check, a commit) and a read list (`cat`
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/bash.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ step 2 names both a gate list (a test, a check, a commit) and a read list (`cat`
 
 <!-- the form is text -->
 
+`gatesLoosely` in `lib/bash.js` counts a segment before `;`, `||` or `&` as a gate unless every command of its pipeline stands in `READS` or `GIT_READS`. So a gate nobody listed, as `true`, still refuses. The cases in `test/level0/bash.test.js` hold both sides.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask, and it landed with the implement step of `doors-read-what-commands-do`
+- no cleanup stands open
+- the read words stand in `READS` and `GIT_READS` alone
 
 # Discussion
 
