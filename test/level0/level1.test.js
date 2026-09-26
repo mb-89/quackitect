@@ -426,6 +426,76 @@ async function judgeRuns(config) {
   return { judged: ran.some((argv) => argv.includes("--judge")), asked: asked.length };
 }
 
+// The pull hook over a config and a model answering one label and one line, the leaf's ticket apart, so each case keeps its own count. [[spec/tickets/prose-verbs-land-first-try]]
+async function judgeHook(config, { ticket, label, quote }) {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const calls = [];
+  register((event, ...rest) => {
+    if (event === "tool.call" && rest.length > 1) calls.push(rest);
+  }, {});
+  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
+  const material = { ticket, step: "design/draft", evidence: "one\ntwo", rules: RULES };
+  const $ = {
+    fs: { read: async () => JSON.stringify(config) },
+    process: {
+      run: async (argv) => ({
+        stdout: argv.includes("--judge") ? JSON.stringify(material) : "done",
+        stderr: "",
+        exitCode: 0,
+      }),
+    },
+    model: {
+      classify: async () => label,
+      complete: async () => ({ isAnswered: true, text: quote }),
+    },
+  };
+  return async () =>
+    (await handler($, { ticket, verdict: "pass" }, async () => null)).result;
+}
+
+// [[spec/tickets/prose-verbs-land-first-try]]
+test("the judge asks for the line that breaks the rule, and the refusal quotes it", async () => {
+  const ask = judgeAsk("one\ntwo", RULES, "voice-3");
+  assert.match(ask, /voice-3: Put the bottom line first\./);
+  assert.match(ask, /word for word/);
+  assert.match(judgeRefusal("at design/draft, voice-3", "two"), /\n  the line: two\n/);
+
+  const on = { judge: { enabled: true } };
+  const quoted = await judgeHook(on, {
+    ticket: "a-quote",
+    label: "voice-3",
+    quote: "two",
+  });
+  assert.match(await quoted(), /\n  the line: two\n/);
+  const loose = await judgeHook(on, {
+    ticket: "a-loose",
+    label: "voice-3",
+    quote: "nowhere",
+  });
+  const said = await loose();
+  assert.match(said, /^refused/);
+  assert.doesNotMatch(said, /nowhere/, "a line the evidence holds nowhere stays out");
+});
+
+// [[spec/tickets/prose-verbs-land-first-try]]
+test("the judge lets a hand-back through past the count of refusals on one leaf", async () => {
+  const { default: config } = await import("../../spec/config/level0.json", {
+    with: { type: "json" },
+  });
+  assert.equal(config.judge.refusalsBeforePass, 3);
+
+  const on = { judge: { enabled: true, refusalsBeforePass: 2 } };
+  const hand = await judgeHook(on, {
+    ticket: "a-count",
+    label: "voice-1",
+    quote: "one",
+  });
+  assert.match(await hand(), /^refused/);
+  assert.match(await hand(), /^refused/);
+  assert.equal(await hand(), "done", "past the count the pull runs");
+  assert.match(await hand(), /^refused/, "the pass clears the count");
+});
+
 // The judge runs where the config turns it on alone. The hook's line waits on the owner, because the hand working the ticket holds no write under .claude. [[spec/tickets/the-judge-waits-on-true]]
 const HOOK_WAITS =
   "judged in the pull hook reads enabled !== true once the owner lands it";

@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box d7a55188b9103 · claude-code-remote
     hash_before: d2ac86683bb0068e36a02e7f5399c41a6e484fe2
     hash_after: d2ac86683bb0068e36a02e7f5399c41a6e484fe2
+  - step: implement/tests-red
+    hand: box d7a55188b9103 · claude-code-remote
+    hash_before: 7adc7a89dfc6bc8ffeb7222f43e5c0d6cf796909
+    hash_after: 7adc7a89dfc6bc8ffeb7222f43e5c0d6cf796909
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -191,17 +199,27 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/level1.test.js test/level0/ticket-verb.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The three cases fail on their own assertion. The ask names no `word for word` line, the count passes no hand-back, and the note refuses the long name. The hook's type file declares `$.model.complete`, taking a model and a prompt and answering `isAnswered` and `text`. So approach item 3 stands. The note's old refusal case turns into the cut case, because the ask replaces that refusal.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the two test files the ask names
+- the hook's doors each take a fake: the disk, the process and both model calls
+- each case's comment links this ticket
+- the count and the cut each stand in one case
+- both review rows stand fixed: the judge cases turn the judge on, and the type file proves the call
 
 ## change
 
