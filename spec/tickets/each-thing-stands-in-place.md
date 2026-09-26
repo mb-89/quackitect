@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: sync
+step: split
 record:
   - step: sync
     hand: box b8ae1b45d463 · claude-code-remote
     hash_before: 24c5ff7c229e6eb08bfb916f0b9eda7b349e7dad
+  - step: sync
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: d1e40bc5b723f3ed94d9af103fd235df1dd74b7e
+    hash_after: f7b7a842d915829ede147cb7f7418ba3a1ac19ca
+    answered:
+      - name: sync
+        exit: 0
+        said: work/each-thing-stands-in-place took 25 commit(s) from main.
 ---
 
 # Ask
@@ -94,6 +102,8 @@ Each fact and each note stands in its one place, and small faults land fixed. A 
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
