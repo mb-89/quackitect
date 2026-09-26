@@ -12,8 +12,8 @@ language model: every name, group and hint comes from code.
 
 The editor splits in two panes, and a handle between them moves the split.
 The top pane holds the overview or the open level. The bottom pane holds the
-details of the selected item: its local trace, with where it comes from on the
-left and what it feeds on the right. An arrow beside a name opens the file.
+details of the selected item, which is its local trace. Where it comes from
+stands on the left, and what it feeds stands on the right. An arrow beside a name opens the file.
 
 The owner's rulings stand below. A ruling here waits for a design input, since
 a funnel note holds no decision of its own.
@@ -24,7 +24,7 @@ a funnel note holds no decision of its own.
 |---|---|
 | the upper chain is data, declared by hand from the top down | a design output names what it refines, and a walk reads `refines` from the top |
 | a declared link forms the trace, and a pointer means related to | related links stay out of the trace view |
-| the levels come from config, with no fixed row | a level names its id, its sources, what it verifies or validates, and its views, and a level drops, splits or takes more than one source |
+| the levels come from config, with no fixed row | a level names its id, its sources, what it verifies or validates, and its views. A level drops, splits or takes more than one source |
 | the V lays the levels out | the check levels stand at the height of what they check, on the right arm |
 | every level offers several views, and the tree view stands under every other | the view switch stands beside the breadcrumbs |
 | a level covers one level or more | coverage comes from the index links or from an outside tool, such as the line coverage of the test battery |
