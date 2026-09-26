@@ -256,7 +256,11 @@ test("a tool result row and a meta row open no turn", () => {
     spoke(long(SHORTEST + 2)),
     owner([{ type: "tool_result", content: "a line" }]),
     JSON.stringify({ type: "user", isMeta: true, message: { content: "a caveat" } }),
-    JSON.stringify({ type: "user", isCompactSummary: true, message: { content: "a summary" } }),
+    JSON.stringify({
+      type: "user",
+      isCompactSummary: true,
+      message: { content: "a summary" },
+    }),
     spoke(answer),
   ].join("\n");
   assert.deepEqual(answersIn(text), [answer]);

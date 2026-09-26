@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box c28a93a32b71 · claude-code-remote
@@ -105,6 +105,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 5 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: fe93129a130e85107d09eac0c95fee44b78ea337
+    hash_after: fe93129a130e85107d09eac0c95fee44b78ea337
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -245,11 +253,19 @@ Five cases fail on their own assertion: the repeat twice, and the three transcri
 
 <!-- the form is command -->
 
+./RUNME.sh lint .claude/skills/level0/lib/voice.js .claude/skills/level0/lib/guidance.js src/bridge/guidance.js test/level0/verbs.test.js test/level0/canary-debt.test.js spec/design_output/level0.md
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the two libraries, the bridge's guidance door, their tests and the design output
+- every door the change reaches has a fake: the fake disk and a capturing log
+- `answersIn`, `opensTurn` and `repeats` each open on a comment naming this ticket
+- `HEARD.again` stands in `lib/guidance.js` once, and the design output's table names the row
+- the review's rows stand fixed: no `paidBy`, a meta row opens no turn, and `readsCompaction` reads the new saying unchanged
 
 ## tests-green
 

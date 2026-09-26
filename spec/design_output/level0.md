@@ -1234,6 +1234,7 @@ pays:
 | what the door reads | what it does |
 |---|---|
 | a step opening on the line | pays the debt, and writes the `info` line |
+| a step opening on the line once it stands paid | writes the `warn` line naming the repeat |
 | a step without it | leaves the debt as it stands |
 | an answer at the turn's end | pays it, or opens it on the first turn |
 | a step from a helper | nothing, because a helper carries its own |

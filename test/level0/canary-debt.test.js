@@ -4,8 +4,8 @@
 // [[spec/design_output/level0#the-line-lands-once]]
 // [[spec/design_output/level0#the-debt-survives-a-restart]]
 
-import { join } from "node:path";
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import { test } from "node:test";
 import {
   canary,
@@ -86,7 +86,10 @@ test("a restart after the line leaves the gate quiet", () => {
 });
 
 test("a restart before the line asks for the canary", () => {
-  assert.equal(owes(box([rowOf(AT, "info", "context", "1 block(s) reach the session")])), true);
+  assert.equal(
+    owes(box([rowOf(AT, "info", "context", "1 block(s) reach the session")])),
+    true,
+  );
 });
 
 test("a compaction after the line opens the debt again, and a restart reads that", () => {
@@ -132,7 +135,8 @@ function heard(it) {
   return said;
 }
 
-const repeats = (said) => said.filter((one) => one[0] === "warn" && one[2] === HEARD.again);
+const repeats = (said) =>
+  said.filter((one) => one[0] === "warn" && one[2] === HEARD.again);
 
 // [[spec/tickets/answers-read-the-last-text]]
 test("a second step opening on the canary in one context draws the repeat finding", () => {
