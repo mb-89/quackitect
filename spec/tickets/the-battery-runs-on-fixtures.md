@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
     hash_before: 2a0e0a1108a413f8a1554ab2babd0144528c7218
     hash_after: 2a0e0a1108a413f8a1554ab2babd0144528c7218
+  - step: design/review
+    hand: box d7a71af6d6103 · claude-code-remote
+    hash_before: 08c339f3a70a654a86fe8c26711d4ca84286832d
+    hash_after: 08c339f3a70a654a86fe8c26711d4ca84286832d
 ---
 
 # Ask
