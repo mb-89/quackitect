@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 11 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: e6070d194f03c36f02256806579b7d8b7978412e
+    hash_after: 166b842e16e9606b6f97832f265cd950056d9f79
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-small-faults-land.md:279:5: Characters: The character ] stands outside the set a paragraph admits: lett"
 ---
 
 # Ask
@@ -264,11 +272,19 @@ Eleven node cases and the Go case fail on their own assertion, and the rest stan
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: `cli.js` stands as the dispatch the ask's `fix` line needs. `cli-fix.js` holds `fixFlags` under the file ceiling.
+- [x] every door the change reaches has a fake: the take, the unblock and the review read `fakeGit` and `fakeDisk`. The `fix` cases hold `run`.
+- [x] a comment names the approach the change implements: each new function carries `[[spec/tickets/the-small-faults-land]]`.
+- [x] every fact the change adds stands in one place, and a note points at the file instead of repeating it: `FIX_USAGE` stands in `cli-fix.js` alone.
+- [x] every row the design review passes with stands fixed in the change: the `fix` row hands `rest`. `fixFlags` falls back to the tree. Both Vale rules take `vale.exe`.
 
 ## tests-green
 
