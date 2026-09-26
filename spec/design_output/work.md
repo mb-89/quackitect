@@ -168,6 +168,10 @@ rewrite of trunk leaves behind:
 A branch at `orphan` reaches no sync, so a box takes it and stalls. The merge
 reads the same base, so one read answers both.
 
+A shallow clone holds no base older than its depth, and git answers red there
+too. So where the base comes back red on a shallow clone, the read fetches the
+whole history and asks again. A branch counts as `orphan` on that answer.
+
 # A row per group
 
 `branch list` names one row per branch and one per loose ticket on trunk:
