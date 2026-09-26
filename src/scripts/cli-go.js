@@ -30,6 +30,10 @@ function modulesUnder(it, folder) {
   return out;
 }
 
+export function goFoldersOf(_disk, _root, folder) {
+  return [folder];
+}
+
 // The environment a Go test runs under, naming the pinned Zig where it stands. [[spec/design_output/index#the-compiler-it-needs]]
 export function goEnvOf(it) {
   for (const name of ["zig.exe", "zig"]) {
@@ -46,5 +50,8 @@ export function formatFaults(folder, said) {
     .split("\n")
     .map((one) => one.trim())
     .filter(Boolean)
-    .map((name) => `${folder}/${name}: Gofmt: the file reads another way than the formatter writes it.`);
+    .map(
+      (name) =>
+        `${folder}/${name}: Gofmt: the file reads another way than the formatter writes it.`,
+    );
 }

@@ -1,16 +1,19 @@
-// The Go modules the battery runs: a module straight under src, and one a
-// folder below it, because the engine folder takes swap.
-// [[spec/tickets/an-engine-takes-bridge-work]]
+// The one Go module the battery runs, at the root of the tree, and the package
+// folder a changed test names. [[spec/rationales/go-stands-as-one-module]]
+// [[spec/tickets/go-code-shares-one-module]]
 
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { goModulesIn } from "../../src/scripts/cli-go.js";
-import { goModulesOf } from "../../src/scripts/work-test.js";
+import { goPackagesOf } from "../../src/scripts/work-test.js";
 
 const ROOT = "/tree";
-const MOD = "module quackitect/one\n";
+const MOD = "module quackitect\n";
+const HERE = fileURLToPath(new URL("../..", import.meta.url));
 
 function tree(paths) {
   return {
@@ -20,43 +23,47 @@ function tree(paths) {
   };
 }
 
-// [[spec/tickets/an-engine-takes-bridge-work]]
-test("the battery lists a module straight under src", () => {
-  const it = tree(["src/index/go.mod", "src/lsp/go.mod"]);
-  assert.deepEqual(goModulesIn(it), ["src/index", "src/lsp"]);
+// [[spec/tickets/go-code-shares-one-module]]
+test("the tree holds one go.mod, at the root", () => {
+  const said = execFileSync("git", ["ls-files", "*go.mod"], {
+    cwd: HERE,
+    encoding: "utf8",
+  });
+  assert.deepEqual(said.split("\n").filter(Boolean), ["go.mod"]);
 });
 
-// [[spec/tickets/an-engine-takes-bridge-work]]
-test("the battery lists a module a folder below src", () => {
-  const it = tree(["src/index/go.mod", "src/engine/swap/go.mod"]);
-  assert.deepEqual(
-    goModulesIn(it),
-    ["src/engine/swap", "src/index"],
-    "a module the engine folder holds runs in the battery too",
-  );
+// [[spec/tickets/go-code-shares-one-module]]
+test("the battery lists the one module at the root", () => {
+  const it = tree(["go.mod", "src/index/index.go", "src/engine/swap/swap.go"]);
+  assert.deepEqual(goModulesIn(it), ["."]);
 });
 
-// [[spec/tickets/an-engine-takes-bridge-work]]
+// [[spec/tickets/go-code-shares-one-module]]
+test("a module a folder under src still holds stands beside the root one", () => {
+  const it = tree(["go.mod", "src/engine/swap/go.mod"]);
+  assert.deepEqual(goModulesIn(it), [".", "src/engine/swap"]);
+});
+
+// [[spec/tickets/go-code-shares-one-module]]
 test("a folder holding no module reaches the battery nowhere", () => {
-  const it = tree(["src/index/go.mod"]);
+  const it = tree(["src/index/index.go"]);
   it.disk.makeDir(`${ROOT}/src/bridge`);
-  assert.deepEqual(goModulesIn(it), ["src/index"]);
+  assert.deepEqual(goModulesIn(it), []);
 });
 
-// [[spec/tickets/an-engine-takes-bridge-work]]
-test("a changed test names the folder holding its own module", () => {
-  const it = tree(["src/index/go.mod", "src/engine/swap/go.mod"]);
-  assert.deepEqual(
-    goModulesOf(["src/engine/swap/swap_test.go"], it),
-    ["src/engine/swap"],
-    "the module stands where go.mod stands",
-  );
-  assert.deepEqual(goModulesOf(["src/index/index_test.go"], it), ["src/index"]);
+// [[spec/tickets/go-code-shares-one-module]]
+test("a changed test names the package folder holding it", () => {
+  const it = tree(["go.mod"]);
+  assert.deepEqual(goPackagesOf(["src/engine/swap/swap_test.go"], it), [
+    "src/engine/swap",
+  ]);
+  assert.deepEqual(goPackagesOf(["src/tui/log/detail_test.go"], it), ["src/tui/log"]);
+  assert.deepEqual(goPackagesOf(["src/index/index_test.go"], it), ["src/index"]);
 });
 
-// [[spec/tickets/an-engine-takes-bridge-work]]
-test("a changed test outside every module names none", () => {
-  const it = tree(["src/index/go.mod"]);
-  assert.deepEqual(goModulesOf(["test/level0/one.test.js"], it), []);
-  assert.deepEqual(goModulesOf([], it), []);
+// [[spec/tickets/go-code-shares-one-module]]
+test("a changed test outside src names no package", () => {
+  const it = tree(["go.mod"]);
+  assert.deepEqual(goPackagesOf(["test/level0/one.test.js"], it), []);
+  assert.deepEqual(goPackagesOf([], it), []);
 });

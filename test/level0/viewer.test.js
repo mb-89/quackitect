@@ -10,12 +10,12 @@ import { SOURCE, STAMP, viewerOf } from "../../src/scripts/tui-build.js";
 
 const ROOT = "/box";
 const EXE = `${ROOT}/.se/.runtime/bin/logview`;
-const BUILD = `go build -o ${EXE}.new .`;
+const BUILD = `go build -o ${EXE}.new ./${SOURCE}`;
 
 const source = () =>
   fakeDisk({
-    [`${ROOT}/${SOURCE}/main.go`]: "package main",
-    [`${ROOT}/${SOURCE}/go.mod`]: "module quackitect/tui",
+    [`${ROOT}/${SOURCE}/main.go`]: 'package main\n\nimport "quackitect/src/yaml"\n',
+    [`${ROOT}/go.mod`]: "module quackitect",
     [`${ROOT}/${SOURCE}/ui_test.go`]: "package main",
   });
 
@@ -143,7 +143,7 @@ test("a box with no go answers no viewer and names the missing program", () => {
 test("a Windows box builds logview.exe", () => {
   const disk = source();
   const proc = fakeProc({
-    [`go build -o ${EXE}.exe.new .`]: (argv) => {
+    [`go build -o ${EXE}.exe.new ./${SOURCE}`]: (argv) => {
       disk.write(argv[3], "binary");
       return { exitCode: 0 };
     },

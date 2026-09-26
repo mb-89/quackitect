@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/tests-red
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -87,6 +87,14 @@ record:
     hand: box d7a69cb6601d7 · claude-code-remote · helper-2
     hash_before: 0831e91ee4fa4af07f8b27b79d940bcb97bb13d1
     hash_after: 0831e91ee4fa4af07f8b27b79d940bcb97bb13d1
+  - step: implement/tests-red
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: 7bc36c5b90a0f7ddb551a9350a65b2856490f4ae
+    hash_after: 7bc36c5b90a0f7ddb551a9350a65b2856490f4ae
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 23 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -207,17 +215,29 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/go-modules.test.js test/level0/go-tests.test.js test/level0/go-source.test.js test/level0/test-verb.test.js test/level0/pull-leaves.test.js test/level0/viewer.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Every new case fails on its own assertion, and every case the layout leaves alone passes. The new names `goPackagesOf` and `goFoldersOf` stand as thin stand-ins, so the red comes from the assertions and from no missing import. The surprise: the viewer's cases fail on the build line alone, so the window build keys on its command and on nothing else.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the tests of the Go helpers and two stand-ins, all inside the ask
+- every case runs over the fake disk and the fake process
+- the one case reading the tree runs `git ls-files` in place
+- each test file names this ticket in its head comment
+- the layout facts stand in the tests alone, each once
+- the split tests the review names change here
+- the Go line tidy writes and the seven files leaving land in the change step
 
 ## change
 

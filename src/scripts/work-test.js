@@ -52,6 +52,8 @@ export function testVerb(it, argv, env = {}) {
 }
 
 // A changed test names the module holding it, which is the nearest folder above it carrying a go.mod. A handle reads that folder, because a module stands any depth under src. A named folder names the module at or above it. [[spec/design_output/pull#the-test-verb]]
+export const goPackagesOf = (paths, it) => goModulesOf(paths, it);
+
 export function goModulesOf(paths, it) {
   const out = new Set();
   for (const path of paths ?? []) {
