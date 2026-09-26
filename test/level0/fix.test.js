@@ -13,10 +13,11 @@ import {
   sentenceCase,
 } from "../../.claude/skills/level0/lib/shout.js";
 import * as check from "../../src/scripts/cli-check.js";
+import { fixFlags } from "../../src/scripts/cli-fix.js";
 import { outside } from "../../src/scripts/cli-doors.js";
 
 // The verb's lines and every spawn it asks for, held so a case reads both back and nothing runs. [[spec/tickets/the-small-faults-land]]
-async function ranFix(argv) {
+async function ranFix(argv, call = () => check.fix(argv)) {
   const lines = [];
   const spawned = [];
   const was = { log: console.log, error: console.error, run: outside.run };
@@ -27,7 +28,7 @@ async function ranFix(argv) {
     return { exitCode: 0, stdout: "", stderr: "" };
   };
   try {
-    return { code: await check.fix(argv), said: lines.join("\n"), spawned };
+    return { code: await call(), said: lines.join("\n"), spawned };
   } finally {
     Object.assign(console, { log: was.log, error: was.error });
     outside.run = was.run;
@@ -36,25 +37,38 @@ async function ranFix(argv) {
 
 // [[spec/tickets/the-small-faults-land]]
 test("fix refuses an unknown flag, and runs nothing over the tree", async () => {
-  assert.equal(typeof check.fixFlags, "function", "cli-check.js reads the flags first");
   const { code, said, spawned } = await ranFix(["--apply-everything"]);
   assert.equal(code, 2, said);
   assert.match(said, /fix knows no flag --apply-everything/);
   assert.deepEqual(spawned, [], "nothing runs over the tree");
-  assert.deepEqual(check.fixFlags(["--apply-everything", "src"]).unknown, [
+  assert.deepEqual(fixFlags(["--apply-everything", "src"]).unknown, [
     "--apply-everything",
   ]);
 });
 
+// The dispatch hands the verb its words whole, so a flag reaches the refusal. The command line loads here first, under the argv this case sets. [[spec/tickets/the-small-faults-land]]
+test("the fix row in the command line hands the verb its flags, so an unknown one refuses", async () => {
+  const was = process.argv;
+  process.argv = [was[0], "/nowhere/cli.js", "fix", "--apply-everything"];
+  try {
+    const { verbs } = await import("../../src/scripts/cli.js");
+    const { code, said, spawned } = await ranFix([], () => verbs.fix.run(["."]));
+    assert.equal(code, 2, said);
+    assert.match(said, /fix knows no flag --apply-everything/);
+    assert.deepEqual(spawned, [], "nothing runs over the tree");
+  } finally {
+    process.argv = was;
+  }
+});
+
 // [[spec/tickets/the-small-faults-land]]
 test("fix answers --help with its usage", async () => {
-  assert.equal(typeof check.fixFlags, "function", "cli-check.js reads the flags first");
   const { code, said, spawned } = await ranFix(["--help"]);
   assert.equal(code, 0, said);
   assert.match(said, /^Usage: \.\/RUNME\.sh fix \[path \.\.\.\]/m);
   assert.deepEqual(spawned, [], "nothing runs over the tree");
-  assert.deepEqual(check.fixFlags([]).paths, ["."], "no path reads as the tree");
-  assert.deepEqual(check.fixFlags(["src", "spec"]).paths, ["src", "spec"]);
+  assert.deepEqual(fixFlags([]).paths, ["."], "no path reads as the tree");
+  assert.deepEqual(fixFlags(["src", "spec"]).paths, ["src", "spec"]);
 });
 
 test("sentence case keeps what stands before the first letter", () => {

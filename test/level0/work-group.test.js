@@ -133,7 +133,7 @@ test("take leaves a group whose open children no hand on this box can take at to
 
   assert.equal(code, 0, said);
   assert.match(said, /work\/one-group stays at todo/);
-  assert.match(said, /a-child waits for/);
+  assert.match(said, /a-child needs nowhere here at do/, "it names the need");
   assert.ok(
     !ranGit(outside).some((one) => one.startsWith("git commit")),
     "the take writes no line",

@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { chapterOf, voiceFaults } from "../../src/scripts/pull-chapter.js";
+import { chapterOf, verdictIn, voiceFaults } from "../../src/scripts/pull-chapter.js";
 import { CHARACTERS, semicolonVale } from "./semicolon-vale.js";
 
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
@@ -62,4 +62,10 @@ test("chapterOf reads the fields under a step's chapter, and a missing one stand
   assert.equal(found.stands, true);
   assert.deepEqual(found.fields.get("approach"), ["It reads."]);
   assert.equal(chapterOf(text, "design/review").stands, false);
+});
+
+// A table rides one piece, and a row standing between two tables keeps them apart. [[spec/tickets/the-small-faults-land]]
+test("a verdict's table rows ride one piece, and a plain row between two tables keeps them apart", () => {
+  const said = verdictIn(["fail", "| a |", "| b |", "- after", "| c |"]);
+  assert.equal(said.reason, "| a |\\n| b |; after; | c |");
 });

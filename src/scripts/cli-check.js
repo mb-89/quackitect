@@ -53,6 +53,7 @@ import {
 import { browserSays } from "./browser.js";
 import { namesIn, show, walk } from "./cli-read.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
+import { FIX_USAGE, fixFlags } from "./cli-fix.js";
 import { formatFaults, goEnvOf, goModulesIn } from "./cli-go.js";
 import { HOOKS } from "./precommit.js";
 import { writeSurvey } from "../engine/tools.js";
@@ -186,7 +187,14 @@ export async function readConfig(argv) {
   return 0;
 }
 
-export async function fix(where) {
+// A flag the fixer knows nothing of refuses before a write. [[spec/tickets/the-small-faults-land]]
+export async function fix(argv) {
+  const { help, unknown, paths: where } = fixFlags(argv);
+  if (help || unknown.length) {
+    if (help) console.log(FIX_USAGE);
+    else console.error(`fix knows no flag ${unknown.join(", ")}. ${FIX_USAGE}`);
+    return help ? 0 : 2;
+  }
   if (!files.exists(bin)) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
     return 2;

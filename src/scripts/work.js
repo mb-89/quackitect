@@ -3,6 +3,7 @@
 // [[spec/design_output/work#the-round-trip]]
 
 import { cloudHere, deskRefusal } from "../../.claude/skills/level0/lib/cloud.js";
+import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import {
   STAMP,
   saysGreen,
@@ -33,8 +34,12 @@ import {
 } from "../engine/group.js";
 import { guidance } from "./guidance-verb.js";
 import {
+  closedHere,
+  dependsOn,
   escalate,
   handOf,
+  handRule,
+  holdsVerb,
   leafOf,
   pull,
   roleOf,
@@ -249,23 +254,28 @@ function take(it, name = "") {
   // A box with nothing at a step it can take leaves the group at todo, before it writes a line. [[spec/tickets/the-group-leaves-at-todo]]
   const stands = standsOpen(it, one.name, it.join(it.root, ticketAt(one.name)));
   if (stands.open.length && !stands.busy.length) {
-    console.log(
-      `${one.branch} stays at ${TODO}, because every open step waits for a person.`,
-    );
-    for (const child of stands.open) console.log(`  ${waitsAt(child)}`);
+    console.log(`${one.branch} stays at ${TODO}, because no hand here takes an open step.`);
+    for (const child of stands.open)
+      console.log(`  ${waitsAt(it, child, stands.children)}`);
     console.log(`Answer it, then run ./RUNME.sh branch take again.`);
     return 0;
   }
   return claimGroup(it, one);
 }
 
-// The step a child stands at, and the hand it waits for, so the take names what to answer. [[spec/tickets/the-group-leaves-at-todo]]
-function waitsAt(one) {
+// The step a child stands at, and what it waits for, read in the order takeable reads it. [[spec/tickets/the-small-faults-land]]
+export function waitsAt(it, one, all) {
   const front = frontOf(one.text);
+  const open = dependsOn(front).filter((dep) => !closedHere(it, all, dep));
+  if (open.length) return `${one.name} waits for ${open.join(", ")} to close`;
   const path = stepPathOf(front);
   const leaf = leafOf(front, path);
   if (!leaf) return `${one.name} stands at ${path || "no step"}`;
-  return `${one.name} waits for a ${leaf.by} at ${leaf.path}`;
+  const hand = writesHere(leaf, handRule(it, front, all, "", it.agent));
+  if (!hand.writes) return `${one.name} ${hand.why}`;
+  const lacking = leaf.needs.filter((need) => !holdsVerb(need));
+  if (lacking.length) return `${one.name} needs ${lacking.join(", ")} at ${leaf.path}`;
+  return `${one.name} stands at ${leaf.path}`;
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]

@@ -52,7 +52,7 @@ The audit also reads whether the box learns that it runs a bench.
 
 | setup | what the run carries |
 |---|---|
-| the window | `context.handoverAt` and `context.writeAt`, set together |
+| the window | `context.handoverAt`, which the group passes |
 | the doors | `engine.binding` at `god`, so level zero refuses nothing |
 | the vehicle | a stub project, driven by a vehicle pinned at a commit |
 

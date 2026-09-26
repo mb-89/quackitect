@@ -74,7 +74,10 @@ func TestSettingsTakeTheValeTheInstallWrites(t *testing.T) {
 	tree := wholeTree(t, map[string]string{
 		Settings: strings.Replace(goodSettings, `".se/.runtime/bin/vale"`, `".se/.runtime/bin/vale.cmd"`, 1),
 	})
-	onlyOne(t, settingsNameBinaries(tree), "SettingsNameBinaries")
+	one := onlyOne(t, settingsNameBinaries(tree), "SettingsNameBinaries")
+	if !strings.Contains(one.Message, "vale.valeCLI.path names something else") {
+		t.Errorf("a vale.cmd reads %q", one.Message)
+	}
 }
 
 func TestTheInstallScriptWritesWhatTheSettingsRun(t *testing.T) {

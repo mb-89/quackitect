@@ -99,7 +99,8 @@ export const verbs = {
     },
   },
   lint: { says: "the rules over the tree, or over what you name", run: lint },
-  fix: { says: "the fixes a program can make", run: fix },
+  // The fixer reads its own flags, so it takes the words after the verb whole. [[spec/tickets/the-small-faults-land]]
+  fix: { says: "the fixes a program can make", run: () => fix(rest) },
   test: {
     says: "the tests alone, or the test files and Go folders you name",
     run: async () => (rest.length ? namedTests(rest) : test()),
