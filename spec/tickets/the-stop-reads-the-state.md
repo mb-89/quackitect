@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 02898de055b9b9198e0fc35a3fafc7dc89b38a07
+    hash_after: 02898de055b9b9198e0fc35a3fafc7dc89b38a07
 ---
 
 # Ask
@@ -105,11 +110,37 @@ A turn ends on `the-owner-asks-to-talk` where the owner asks no talk, and `your-
 
 <!-- the form is text -->
 
+Four changes, each over one check the stop vote reads.
+
+| the change | where | what it does |
+|---|---|---|
+| the talk rule goes | `spec/config/stop/level0.yml` | drops `the-owner-asks-to-talk`. The `a-report-stands` check stays for the report row |
+| a rule waits on the owner's step | the same file, and `CHECKS` in `src/bridge/stop.js` | adds `the-owner-holds-the-step`, side stop, `waits: owner`, running `step-waits-on-person` |
+| the helper check reads the box | `helpersRun` in `src/bridge/stop.js` | answers true off `background_tasks` or off `box.helpers` |
+| the queue skips a taken group | `queueWaits` in `src/bridge/stop.js` | passes the texts on to `queueHolds` without an urgent group whose branch stands |
+
+The detail under each:
+
+- `step-waits-on-person` reads the holds under `holdsIn`. It answers true where the held ticket, or the group it names, stands at a leaf carrying `by: person`. It reads the leaf the way `queueHolds` in `lib/ticket.js` does
+- `box.helpers` fills at `agent.spawn` for a spawn running in the background, keyed by its id. It empties at that helper's turn end. `claims` passes `box` to `ranHere`, so the stop call reads it with no `background_tasks`
+- `queueWaits` reads the `work/<group>` refs once with `git for-each-ref`, the way `branchOf` runs git
+
+`spec/design_output/stop.md` names the new rule and check, and its `helpers-running` row drops the binding clause the code never read.
+
+The strongest objection: dropping the talk rule leaves a discussion with no stop of its own. The ask names the drop. `the-chat-is-new` and `a-wrong-answer-leaves-the-box` stand for a desk, and the review decides whether that suffices.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/bridge/stop.js` `decide` through `ranHere`, and `claims` through `claimFalls`, which read `CHECKS`
+- `src/bridge/stop.js` `helpersRun`, called from the `helpers-running` entry alone
+- `src/bridge/stop.js` `queueWaits`, called from the `queue-waits` entry alone
+- `src/bridge/guidance.js` `onAgentSpawn`, which gains the mark on `box.helpers`
+- `src/bridge/answer.js` `onTurnEnd` for a helper, which drops the mark
+- `test/level0/context-handover.test.js`, `test/level0/handover-wiring.test.js`, `test/level0/stop.test.js` and `test/level0/stop-door.test.js`, which name the dropped rule and move to another reason
 
 ### tests
 
@@ -117,17 +148,29 @@ A turn ends on `the-owner-asks-to-talk` where the owner asks no talk, and `your-
 
 <!-- the form is list -->
 
+- `test/contract/stop-rules.test.js` no rule carries the id the-owner-asks-to-talk
+- `test/level0/stop-door.test.js` a ticket in hand at a person's leaf stands the owner-step claim
+- `test/level0/stop-door.test.js` a ticket in hand at an agent's leaf refuses the owner-step claim
+- `test/level0/stop-helper.test.js` the stop call with no background_tasks stands while a spawned helper runs
+- `test/level0/stop.test.js` an urgent group whose work branch stands leaves the queue with no wait
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first draft
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `CHECKS`, `claims`, `helpersRun`, `queueWaits`, `branchOf`, `queueHolds`, `onAgentSpawn` and the rules file stand opened. The spawn event's background field stands unread, and the implement step reads it off a logged spawn
+- the callers list comes off a grep for each changed check and for the dropped rule id
+- each done_when line names its test above, and `./RUNME.sh check` decides the last
 
 ## review
 
