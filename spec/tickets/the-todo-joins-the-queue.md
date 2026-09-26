@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-gates-read-the-state
 steps:
   - name: design
@@ -87,6 +87,12 @@ record:
     hand: box c28a93a32b71 · claude-code-remote · helper-2
     hash_before: 0cb281c6992cc2de6f32de6f89ba84c914ccfd74
     hash_after: 0cb281c6992cc2de6f32de6f89ba84c914ccfd74
+  - step: implement/tests-red
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: f0ed3d606972fa3f01d77ed1a3e1005c47caee8d
+    hash_after: f0ed3d606972fa3f01d77ed1a3e1005c47caee8d
+    why: the-door-passes-ephemeral-holds answers this ask
+reason: answered
 ---
 
 # Ask
@@ -254,3 +260,5 @@ pass with findings
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The queue handed the review's children ahead of this ticket's implement step, and the whole change landed under `the-door-passes-ephemeral-holds`. Before it, six cases in `test/level0/named.test.js`, `test/level0/bash-ticket.test.js` and `test/level0/pull-todo.test.js` failed on their own assertion. After it, `./RUNME.sh check` exits 0. So this ticket closes as answered by that child.
