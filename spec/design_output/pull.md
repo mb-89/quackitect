@@ -597,8 +597,14 @@ what the hand writes, the index empties, and the hold stays. The pull answers
 again. So a record's `hash_after` names a commit the branch holds, and a
 refused commit writes no record. `src/scripts/pull-landed.js` holds the landing.
 
-A hand-back stages the whole tree, because the hand's work lands with it. The
-engine lands a skip, a close, a repair or an unblock on the side. Such a
+A hand-back stages the ticket, the children it mints, and the files its hand's
+journals name. The apply door writes the ticket a call serves into its undo
+journal, and a journal stamped before the hold takes the ticket counts none. So
+a sibling hand's edit stays out of the commit.
+
+A hand writing through no journal hands back the whole tree, less the files the
+other tickets' journals name. The engine lands a skip, a close, a repair or an
+unblock on the side. Such a
 landing stages and commits the ticket files it writes alone. So a hand's edits
 stay out of a commit naming another ticket.
 
@@ -800,3 +806,19 @@ every run does, and it names the first that does not.
 - a named folder under `src` names the module at or above it
 - a named run reads no branch point
 - a named run takes the check's spawn tally, and a Go run takes `goEnvOf` too
+
+## A test proves red
+
+`./RUNME.sh test --red <test> <source>...` proves a test fails for the reason
+it names. It writes each source's working text under `.se/.runtime/red`, with
+a list of the sources. Then it writes each source as `HEAD` holds it, and a
+source new to the change stands aside whole. It runs the test, and puts every
+source back.
+
+| the test answers | the verb answers | exit |
+|---|---|---|
+| `assertion` | `red` | 0 |
+| anything else | `refused` | 1 |
+
+A run killed while the sources stand aside leaves the list on disk, and the
+next run puts them back before it starts.

@@ -31,11 +31,13 @@ export function undoSpec() {
 }
 
 // [[spec/design_output/apply#an-entry-says-whose-apply]]
-export function journalOf(at, on, by, files) {
+// The entry names the ticket its call serves, so a hand-back stages the files its own hand wrote. [[spec/design_output/pull#the-refused-commit]]
+export function journalOf(at, on, by, files, ticket = "") {
   return {
     on: String(on ?? ""),
     by: String(by ?? ""),
     at: String(at ?? ""),
+    ticket: String(ticket ?? ""),
     files: (files ?? []).map((one) => ({
       file: one.file,
       was: one.born ? "" : one.was,

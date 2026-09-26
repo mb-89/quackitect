@@ -76,7 +76,8 @@ function landsAndPushes(it, argv, message, paths) {
     return 1;
   }
   // The paths a call names land alone, so one hand's landing leaves another's files standing. [[spec/design_output/work#one-verb-feeds-that-stamp]]
-  const only = paths.length ? ["--", ...paths] : [];
+  const named = [...paths, ...movedFrom(it, paths)];
+  const only = named.length ? ["--", ...named] : [];
   const staged = it.git.run(["add", "-A", ...only], true);
   if (!staged.ok) {
     console.error("The staging comes back refused, so the commit stands undone:");
@@ -111,6 +112,19 @@ function landsAndPushes(it, argv, message, paths) {
   }
   console.log(`${branch} stands pushed.`);
   return 0;
+}
+
+// A named path a staged rename lands takes its old path with it, so the deletion rides the same commit. [[spec/design_output/work#one-verb-feeds-that-stamp]]
+function movedFrom(it, paths) {
+  if (!paths.length) return [];
+  const staged = it.git.run(["diff", "--cached", "--name-status", "-M"], true).out;
+  const out = [];
+  for (const row of staged.split("\n")) {
+    const [how, from, to] = row.split("\t");
+    if (/^R/.test(how ?? "") && paths.includes(to) && !paths.includes(from))
+      out.push(from);
+  }
+  return out;
 }
 
 // A run answers on two streams, and a read of one alone names the wrong line. [[spec/design_output/work#one-verb-feeds-that-stamp]]

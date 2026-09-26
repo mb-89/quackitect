@@ -3,6 +3,7 @@
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import { CODE } from "./code.js";
+import { gitWriteRows } from "./git-writes.js";
 import { overLong } from "./names.js";
 import { NOTES } from "./private.js";
 import { pullCommitsIn } from "./pulled.js";
@@ -310,6 +311,7 @@ export function findings(command, most, it = {}) {
       ]),
     );
   }
+  out.push(...gitWriteRows(said));
   return out;
 }
 
@@ -321,7 +323,8 @@ export function verbLine() {
     "Reach for the verb before the raw command.",
     "Level zero refuses a shell write to a file the rules reach, a commit carrying",
     "no message, a branch name past five words, a test run naming no file, a commit",
-    "whose delta carries something private, and a revert or a reset over a pull commit.",
+    "whose delta carries something private, a revert or a reset over a pull commit,",
+    "and every git command that writes the repository, naming the verb standing for it.",
   ].join(" ");
 }
 

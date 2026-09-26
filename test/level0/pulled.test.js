@@ -10,7 +10,7 @@ import { TICKETS } from "../../.claude/skills/level0/lib/folders.js";
 import { onBash } from "../../src/bridge/bash.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { NAMED, named } from "./fixtures.js";
+import { NAMED, named, VERB_ALONE } from "./fixtures.js";
 
 const ROOT = "/tree";
 const PULL = "a-child: passes design/draft";
@@ -125,17 +125,20 @@ function box() {
 const denied = (said) => String(said?.result?.deny ?? "");
 
 test("the door reads a reverted commit alone, and refuses a pull commit it takes back", async () => {
-  assert.equal(denied(await onBash(call("git revert abc123"), box())), "");
+  assert.match(denied(await onBash(call("git revert abc123"), box())), VERB_ALONE);
   assert.match(
     denied(await onBash(call("git revert def456"), box())),
     /ticket pull a-child --back design\/draft/,
   );
 });
 
-test("the door refuses a reset over a pull commit, and passes one over plain commits", async () => {
+test("the door refuses a reset over a pull commit, and one over plain commits meets the verb rule alone", async () => {
   assert.match(
     denied(await onBash(call("git reset --hard HEAD~2"), box())),
     /PullCommitStands/,
   );
-  assert.equal(denied(await onBash(call("git reset --hard HEAD~1"), box())), "");
+  assert.match(
+    denied(await onBash(call("git reset --hard HEAD~1"), box())),
+    VERB_ALONE,
+  );
 });

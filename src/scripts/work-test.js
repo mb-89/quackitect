@@ -2,6 +2,8 @@
 // run once, and one word on what came back.
 // [[spec/design_output/pull#the-test-verb]]
 
+import { dirname } from "node:path";
+import { inRun } from "../../.claude/skills/level0/lib/folders.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { recordIn } from "../engine/group.js";
@@ -9,9 +11,15 @@ import { goEnvOf } from "./cli-go.js";
 import { changedFiles, handOf, holdOf } from "./pull.js";
 
 const CUT_ERROR = 160;
+// The working text of each source waits here while a red run reads the source at HEAD. [[spec/design_output/pull#a-test-proves-red]]
+const ASIDE = inRun("red");
+const LIST = "sources.json";
+const RED = "--red";
+const ASSERTION = "assertion, ";
 
 // The env is the check's own, so a named run tallies its spawns the way the battery does. [[spec/design_output/pull#the-test-verb]]
 export function testVerb(it, argv, env = {}) {
+  if ((argv ?? []).includes(RED)) return redTest(it, argv.slice(1), env);
   const named = (argv ?? []).slice(1).filter((one) => !one.startsWith("--"));
   const since = named.length ? "" : sinceOf(it, holdOf(it, handOf(it)));
   const changed = named.length ? named : changedFiles(it, since);
@@ -121,4 +129,72 @@ export function testSays(ran, files) {
   }
   const line = out.split("\n").find((row) => /Error/.test(row));
   return `build, because ${count("fail")} test(s) fail outside an assertion: ${(line ?? "").trim().slice(0, CUT_ERROR)}`;
+}
+
+// The test runs over each source as HEAD holds it, and an assertion answers red. [[spec/design_output/pull#a-test-proves-red]]
+export function redTest(it, argv, env = {}) {
+  const [file, ...sources] = (argv ?? []).filter((one) => !one.startsWith("--"));
+  if (!file || !sources.length) {
+    console.log(
+      "refused, because the verb names a test and its sources: ./RUNME.sh test --red <test> <source>...",
+    );
+    return 2;
+  }
+  putBack(it);
+  let said = "";
+  try {
+    setAside(it, sources);
+    const ran = it.proc.run(
+      [it.node ?? "node", "--test", "--test-reporter=tap", file],
+      {
+        cwd: it.root,
+        env,
+      },
+    );
+    said = testSays(ran, [file]);
+  } finally {
+    putBack(it);
+  }
+  if (said.startsWith(ASSERTION)) {
+    console.log(`red, ${said.slice(ASSERTION.length)}`);
+    return 0;
+  }
+  console.log(`refused, because the test answers ${said} with the sources set aside`);
+  return 1;
+}
+
+function asideAt(it, ...path) {
+  return it.join(it.root, ...ASIDE.split("/"), ...path);
+}
+
+// Each working text goes to disk before HEAD's text takes its place, and a source HEAD lacks stands aside whole. [[spec/design_output/pull#a-test-proves-red]]
+function setAside(it, sources) {
+  const list = [];
+  it.disk.makeDir(asideAt(it));
+  for (const path of sources) {
+    const at = it.join(it.root, ...path.split("/"));
+    const kept = it.disk.exists(at);
+    if (kept) {
+      const held = asideAt(it, ...path.split("/"));
+      it.disk.makeDir(dirname(held));
+      it.disk.write(held, it.disk.read(at));
+    }
+    list.push({ path, kept });
+    it.disk.write(asideAt(it, LIST), `${JSON.stringify(list, null, 2)}\n`);
+    const head = it.proc.run(["git", "show", `HEAD:${path}`], { cwd: it.root });
+    if (head.exitCode === 0) it.disk.write(at, head.stdout ?? "");
+    else if (kept) it.disk.remove(at);
+  }
+}
+
+// A run killed while the sources stand aside leaves the list, and the next run puts them back first. [[spec/design_output/pull#a-test-proves-red]]
+function putBack(it) {
+  const listed = asideAt(it, LIST);
+  if (!it.disk.exists(listed)) return;
+  for (const one of JSON.parse(String(it.disk.read(listed)))) {
+    const at = it.join(it.root, ...one.path.split("/"));
+    if (one.kept) it.disk.write(at, it.disk.read(asideAt(it, ...one.path.split("/"))));
+    else if (it.disk.exists(at)) it.disk.remove(at);
+  }
+  it.disk.remove(asideAt(it));
 }

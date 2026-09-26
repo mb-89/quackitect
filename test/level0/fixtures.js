@@ -243,3 +243,7 @@ export const named = (root) => ({
   [`${root}/spec/tickets/${NAMED}.md`]:
     "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n",
 });
+
+// The git-write rule answers last at the Bash door, so a refusal naming it alone says every other guard passes. [[spec/design_output/bash#git-writes-take-verbs]]
+export const VERB_ALONE =
+  /^Level zero refuses this command\.\n[\s\S]*\nHold GitWritesThroughAVerb for the rest of this turn\.$/;

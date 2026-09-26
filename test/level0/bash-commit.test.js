@@ -7,7 +7,7 @@ import { test } from "node:test";
 import { onBash } from "../../src/bridge/bash.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { NAMED, named } from "./fixtures.js";
+import { NAMED, named, VERB_ALONE } from "./fixtures.js";
 
 const ROOT = "/tree";
 const COMMIT = 'git commit -m "the door reads the delta"';
@@ -47,12 +47,10 @@ test("a commit carrying code and no test is refused at the door", async () => {
   assert.match(denied(await onBash(call(COMMIT), box(false))), /no test beside it/);
 });
 
-// A break of form in the message lands at any level with a warning, and a private name refuses it. [[spec/design_output/bash#a-commit-message-meets-voice]]
-test("a message breaking a rule of form lands with a warning, and one carrying a private name is refused", async () => {
-  const said = [];
+// A break of form in the message refuses nothing, and a private name refuses it. A raw commit then meets the verb rule alone. [[spec/design_output/bash#git-writes-take-verbs]]
+test("a message breaking a rule of form meets the verb rule alone, and one carrying a private name is refused", async () => {
   const saying = (found) => ({
     ...box(true),
-    log: { say: (...row) => said.push(row) },
     vale: { stands: () => true, lint: async () => ({ ran: true, found }) },
   });
   const finding = (rule) => [
@@ -62,28 +60,19 @@ test("a message breaking a rule of form lands with a warning, and one carrying a
     call(COMMIT),
     saying(finding("VoiceParagraph.Vocabulary")),
   );
-  assert.equal(denied(landed), "");
-  assert.match(
-    landed?.after?.context?.[0] ?? "",
-    /VoiceParagraph\.Vocabulary: say it plainly/,
-  );
-  assert.match(landed.after.context[0], /the commit lands/);
-  assert.ok(
-    said.some((row) => row[0] === "warn" && /commit message/.test(row[2])),
-    "the log carries the warning",
-  );
+  assert.match(denied(landed), VERB_ALONE);
   assert.match(
     denied(await onBash(call(COMMIT), saying(finding("VoiceVale.Private")))),
     /VoiceVale\.Private/,
   );
 });
 
-test("a merge commit passes the door whole", async () => {
-  assert.equal(denied(await onBash(call(COMMIT), box(true))), "");
+test("a merge commit passes the test rule whole, and meets the verb rule alone", async () => {
+  assert.match(denied(await onBash(call(COMMIT), box(true))), VERB_ALONE);
 });
 
 // A warning holds no push at this door. [[spec/design_output/config#the-engine-controls]]
-test("a push off a work branch lands whatever the lint says", async () => {
+test("a push off a work branch meets the verb rule alone, whatever the lint says", async () => {
   const warned = [
     {
       rule: "VoiceVale.Passive",
@@ -97,11 +86,14 @@ test("a push off a work branch lands whatever the lint says", async () => {
     ...box(false),
     vale: { stands: () => true, lint: async () => ({ ran: true, found: warned }) },
   };
-  assert.equal(denied(await onBash(call("git push origin claude/a-thing"), it)), "");
+  assert.match(
+    denied(await onBash(call("git push origin claude/a-thing"), it)),
+    VERB_ALONE,
+  );
 });
 
 // The change leaf stages code alone, and the test its tests-red leaf landed rides the ticket. [[spec/design_output/tree#the-rules-over-two-files]]
-test("a commit whose test a held ticket carries lands at the door", async () => {
+test("a commit whose test a held ticket carries passes the test rule, and meets the verb rule alone", async () => {
   const seed = {
     [`${ROOT}/.se/.runtime/hold/a-hand.json`]: JSON.stringify({
       ticket: "one",
@@ -110,5 +102,5 @@ test("a commit whose test a held ticket carries lands at the door", async () => 
     [`${ROOT}/spec/tickets/one.md`]:
       "# Ask\n\n### tests\n\n    ./RUNME.sh branch test test/level0/one.test.js\n",
   };
-  assert.equal(denied(await onBash(call(COMMIT), box(false, seed))), "");
+  assert.match(denied(await onBash(call(COMMIT), box(false, seed))), VERB_ALONE);
 });

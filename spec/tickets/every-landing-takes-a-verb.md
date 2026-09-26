@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 8 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d1fe1ca62214 · claude-code-remote
+    hash_before: eff316d30de5b220c9322c995a474f58f6ca9dd5
+    hash_after: eff316d30de5b220c9322c995a474f58f6ca9dd5
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -255,11 +263,20 @@ The eight new cases fail on their own assertion, and the eighty cases standing b
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/bash.js .claude/skills/level0/lib/git-writes.js .claude/skills/level0/lib/undo.js spec/design_output/bash.md spec/design_output/pull.md spec/design_output/work.md src/bridge/apply.js src/bridge/bash.js src/scripts/commit-verb.js src/scripts/pull-landed.js src/scripts/pull-writes.js src/scripts/work-merge.js src/scripts/work-test.js test/level0/apply-door.test.js test/level0/bash-commit.test.js test/level0/bash-desk.test.js test/level0/bash.test.js test/level0/fixtures.js test/level0/pulled.test.js test/level0/trunk-door.test.js test/level0/work-group.test.js test/level0/pull-writes.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches past the ask in four places, each named: `lib/git-writes.js` holds the new rule because `lib/bash.js` stands past the file ceiling, `pull-writes.js` hands `landed` the children it mints, `apply-door.test.js` proves the journal names its ticket, and five door tests take the verb rule
+- every door the change reaches has a fake: the red verb, the merge and the landing run over the fake disk, git and process
+- a comment above each change names its section in `bash.md`, `pull.md` or `work.md`, and each section says the approach
+- the verb table stands in `GIT_WRITES` alone, the ticket folder comes from `src/engine/group.js`, and the design notes point at the files
+- the rows fixed here: `verbLine` names the new refusal, `git mv` answers one row, each write lacking a verb names its road, the merge pushes main before it deletes a branch, and the red verb holds the text on disk and sets a new source aside whole
+- the rows left to their child tickets: `journal-the-rename-verb` and `rename-detection-misses-rewrites` each take more than this change, and `git-write-tests-outside-ask` stands answered by the five door tests above
 
 ## tests-green
 

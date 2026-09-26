@@ -69,7 +69,7 @@ export function passed(it, who, one, leaf, held, answered, more = {}) {
   }
 
   one.text = text;
-  const finding = landed(it, one, changes);
+  const finding = landed(it, one, changes, more.wrote ?? []);
   if (finding) {
     for (const at of more.wrote ?? []) it.disk.remove(at);
     return unlanded(one, leaf, finding);

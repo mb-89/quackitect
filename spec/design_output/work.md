@@ -590,6 +590,7 @@ What the run leaves behind:
 - `--no-push` leaves the branch where it stands
 - `./RUNME.sh push` pushes the branch from a desk, once the stamp answers green on the commit it stands on
 - a path after the message lands that path alone, so a helper's files stand apart from another hand's landing
+- a named path a staged rename lands brings its old path, so the deletion rides the same commit
 
 The reading of the message stands with the bash door, which reads the same rules over a
 `git commit` a hand types. For details, see
@@ -603,6 +604,15 @@ group stands at `done` where its ticket reads `state: closed`. It merges with
 
 A conflict stops the merge and leaves it standing, because resolving it belongs
 to the person merging.
+
+## A cloud branch comes in
+
+`branch merge claude/<name>` takes a branch a cloud routine cuts, which carries
+no group. So the merge reads no group, and `git cherry` reads the branch
+against `main`. A commit whose change `main` lacks merges with `--no-ff`. Where
+none stands, `main` carries the branch already, and nothing merges. Either
+road runs `./RUNME.sh check`, and red resets `main` to its own tip. Green
+pushes `main`, then deletes the branch, the order `close` holds.
 
 ## The merge lands the truth
 

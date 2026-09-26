@@ -8,7 +8,7 @@ import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { onBash } from "../../src/bridge/bash.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { NAMED, named } from "./fixtures.js";
+import { NAMED, named, VERB_ALONE } from "./fixtures.js";
 
 const ROOT = "/tree";
 const SHA = "abc123";
@@ -65,11 +65,11 @@ test("a work branch pushing trunk keeps the hand-back, and names no commit verb"
 });
 
 // A desk on a work branch meets the desk guard instead. [[spec/design_output/work#a-desk-works-on-trunk]]
-test("a desk commit standing on trunk refuses and names the verb, and one on a branch off the queue lands", async () => {
+test("a desk commit standing on trunk refuses and names the verb, and one on a branch off the queue meets the verb rule alone", async () => {
   const said = await onBash(call("git commit -m x"), box("main", true, {}));
   assert.match(denied(said), /\.\/RUNME\.sh commit "<message>"/);
   const off = await onBash(call("git commit -m x"), box("claude/a-thing", true, {}));
-  assert.equal(denied(off), "", "the door says nothing");
+  assert.match(denied(off), VERB_ALONE, "the trunk guard says nothing");
 });
 
 test("a bare push standing on trunk refuses on a desk, and names the push verb", async () => {

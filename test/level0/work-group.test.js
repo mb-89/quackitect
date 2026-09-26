@@ -24,6 +24,7 @@ import {
   whyOf,
   work,
 } from "../../src/scripts/work.js";
+import { merge } from "../../src/scripts/work-merge.js";
 import {
   CHILD,
   doorsSaying,
@@ -556,59 +557,41 @@ test("close drops a group's branch once trunk holds it", () => {
   assert.ok(ranGit(outside).includes("git push origin --delete work/one-group"));
 });
 
-// A cloud branch reads against trunk by its commits, and takes no group. [[spec/design_output/work#a-desk-works-on-trunk]]
-const CLOUD_BRANCH = "claude/a-thing";
-const cloudMerging = (extra = {}) => ({
-  "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
-  "git rev-parse HEAD": { stdout: `${SHA}\n` },
-  [`node ${join(ROOT, "src/scripts/cli.js")} check`]: {
-    exitCode: 0,
-    stdout: "green\n",
-  },
-  ...extra,
-});
+// A cloud branch reads against trunk by its commits, and takes no group. [[spec/design_output/work#a-cloud-branch-comes-in]]
+const CLOUD = "claude/a-thing";
+const CHECK = `node ${join(ROOT, "src/scripts/cli.js")} check`;
+function cloudMerge(cherry) {
+  const { it, outside } = doorsSaying(
+    merging({ [`git cherry main origin/${CLOUD}`]: { stdout: cherry } }),
+  );
+  const { code, said } = heard(() => merge({ ...it, root: ROOT, node: "node" }, CLOUD));
+  return { code, said, ran: ranGit(outside) };
+}
 
-// [[spec/design_output/work#a-desk-works-on-trunk]]
+// [[spec/design_output/work#a-cloud-branch-comes-in]]
 test("merge takes a claude branch in, runs the check and deletes the branch", () => {
-  const { it, outside } = doorsSaying(
-    cloudMerging({
-      [`git cherry main origin/${CLOUD_BRANCH}`]: { stdout: "+ abc123\n- def456\n" },
-      [`git merge --no-ff --no-edit origin/${CLOUD_BRANCH}`]: { exitCode: 0 },
-    }),
-  );
-  it.node = "node";
-
-  const { code, said } = heard(() => work(ROOT, ["merge", CLOUD_BRANCH], it));
+  const { code, said, ran } = cloudMerge("+ abc123\n- def456\n");
 
   assert.equal(code, 0, said);
-  const ran = ranGit(outside);
-  assert.ok(ran.includes(`git merge --no-ff --no-edit origin/${CLOUD_BRANCH}`));
+  assert.ok(ran.includes(`git merge --no-ff --no-edit origin/${CLOUD}`));
   assert.ok(!ran.some((one) => one.startsWith("git show")), "no group reads");
+  assert.ok(ran.includes(CHECK), "the check runs");
   const pushed = ran.indexOf("git push origin main");
-  const deleted = ran.indexOf(`git push origin --delete ${CLOUD_BRANCH}`);
   assert.ok(pushed >= 0, "main reaches origin");
-  assert.ok(deleted > pushed, "the branch goes once main stands pushed");
-  assert.match(said, new RegExp(`${CLOUD_BRANCH} is merged`));
+  assert.ok(
+    ran.indexOf(`git push origin --delete ${CLOUD}`) > pushed,
+    "then the branch goes",
+  );
+  assert.match(said, new RegExp(`${CLOUD} is merged`));
 });
 
-// [[spec/design_output/work#a-desk-works-on-trunk]]
+// [[spec/design_output/work#a-cloud-branch-comes-in]]
 test("merge names main as carrying a claude branch's work, and deletes the branch", () => {
-  const { it, outside } = doorsSaying(
-    cloudMerging({
-      [`git cherry main origin/${CLOUD_BRANCH}`]: { stdout: "- abc123\n" },
-    }),
-  );
-  it.node = "node";
-
-  const { code, said } = heard(() => work(ROOT, ["merge", CLOUD_BRANCH], it));
+  const { code, said, ran } = cloudMerge("- abc123\n");
 
   assert.equal(code, 0, said);
-  const ran = ranGit(outside);
   assert.ok(!ran.some((one) => one.startsWith("git merge")), "nothing merges");
-  assert.ok(
-    ran.includes(`node ${join(ROOT, "src/scripts/cli.js")} check`),
-    "the check runs",
-  );
-  assert.ok(ran.includes(`git push origin --delete ${CLOUD_BRANCH}`));
-  assert.match(said, new RegExp(`main carries ${CLOUD_BRANCH}`));
+  assert.ok(ran.includes(CHECK), "the check runs");
+  assert.ok(ran.includes(`git push origin --delete ${CLOUD}`));
+  assert.match(said, new RegExp(`main carries ${CLOUD}`));
 });

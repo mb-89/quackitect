@@ -222,6 +222,22 @@ A subject naming none leaves `<leaf>` in the refusal. The bridge hands the rule
 its `subjects` read, the way it hands `script`, so a case feeds a fake process.
 The command line lands its own commits past this door, so a pull meets no row.
 
+# Git writes take verbs
+
+The agent reaches git through the engine alone. `GitWritesThroughAVerb` in
+`lib/git-writes.js` refuses every git command that writes the repository.
+`GIT_WRITES` there names the verb standing for each. Where no verb stands, the
+row names the road instead, as for `stash` or `reset`. The verbs run git inside
+node, past this door, so they still land.
+
+A `git mv` under `spec/tickets` answers `TicketMovesByRename` alone, which names
+`./RUNME.sh rename`. So one command answers one row. The rule stands in its own
+file, because `lib/bash.js` stands past the file ceiling already.
+
+The bridge holds these rows back to the last check of the door. So a guard
+reading a git write answers its own reason first, as the private delta, the
+test rule and the desk guard do. The verb answers what passes them all.
+
 # The description names verbs
 
 `tool.describe` rewrites what the model reads before it reaches for a tool. It

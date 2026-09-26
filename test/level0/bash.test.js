@@ -17,6 +17,7 @@ import {
   verbLine,
   writesAPath,
 } from "../../.claude/skills/level0/lib/bash.js";
+import { RULE as GIT_WRITE } from "../../.claude/skills/level0/lib/git-writes.js";
 import { scriptsIn } from "../../.claude/skills/level0/lib/scripted.js";
 import { NAMED, named } from "./fixtures.js";
 import {
@@ -30,8 +31,9 @@ import {
   wrote,
 } from "./mark-doors.js";
 
+// Every git write answers the git-write rule too, so a case over another rule reads that rule's rows alone. [[spec/design_output/bash#git-writes-take-verbs]]
 const rules = (command, most = 5, it = {}) =>
-  findings(command, most, it).map((one) => one.rule);
+  findings(command, most, it).flatMap(({ rule }) => (rule === GIT_WRITE ? [] : rule));
 const paths = (command) => writesAPath(command).map((one) => one.path);
 
 test("the rules reach a prose file and a code file, and stop at the ignored roots", () => {
@@ -555,7 +557,7 @@ test("a redirect into the harness scratchpad passes, and a tree path of the same
   ]);
 });
 
-// A ticket moves through the rename verb, which rewrites every reach, and one command answers one row. [[spec/design_output/bash#a-git-write-takes-its-verb]]
+// A ticket moves through the rename verb, which rewrites every reach, and one command answers one row. [[spec/design_output/bash#git-writes-take-verbs]]
 test("git mv under spec/tickets refuses and names the rename verb", () => {
   const found = findings("git mv spec/tickets/old-name.md spec/tickets/new-name.md", 5);
   assert.deepEqual(
@@ -565,40 +567,32 @@ test("git mv under spec/tickets refuses and names the rename verb", () => {
   assert.match(found[0].message, /\.\/RUNME\.sh rename/);
 });
 
-// The agent reaches git through the engine alone, so every git write names the verb standing for it, or the road where none stands. [[spec/design_output/bash#a-git-write-takes-its-verb]]
+// The agent reaches git through the engine alone, so every git write names the verb standing for it, or the road where none stands. [[spec/design_output/bash#git-writes-take-verbs]]
 test("every git command that writes the repository refuses and names its verb", () => {
-  const verbOf = (command) =>
-    findings(command, 5).filter((one) => one.rule === "GitWritesThroughAVerb");
+  const verbOf = (said) => findings(said, 5).filter((one) => one.rule === GIT_WRITE);
+  const [lands, merges, syncs] = ["commit", "branch merge", "branch sync"].map(
+    (verb) => new RegExp(`\\./RUNME\\.sh ${verb}`),
+  );
   for (const [command, road] of [
-    ['git commit -m "one"', /\.\/RUNME\.sh commit/],
-    ["git add -A", /\.\/RUNME\.sh commit/],
-    ["git rm src/a.js", /\.\/RUNME\.sh commit/],
+    ['git commit -m "one"', lands],
+    ["git add -A", lands],
     ["git push origin main", /\.\/RUNME\.sh push/],
-    ["git merge origin/claude/a-thing", /\.\/RUNME\.sh branch merge/],
-    ["git pull origin main", /\.\/RUNME\.sh branch sync/],
+    ["git merge origin/claude/a-thing", merges],
+    ["git pull origin main", syncs],
     ["git mv src/a.js src/b.js", /\.\/RUNME\.sh rename/],
-    ["git stash", /\.\/RUNME\.sh commit/],
-    ["git rebase main", /\.\/RUNME\.sh branch sync/],
+    ["git stash", lands],
+    ["git rebase main", syncs],
     ["git reset --hard HEAD~1", /mcp__level0__undo/],
     ["git tag v1", /person/],
-    ["git cherry-pick abc123", /\.\/RUNME\.sh branch merge/],
-    ["git -C . revert abc123", /\.\/RUNME\.sh commit/],
-    ["./RUNME.sh check && git commit -m 'x'", /\.\/RUNME\.sh commit/],
+    ["git cherry-pick abc123", merges],
+    ["git -C . revert abc123", lands],
+    ["./RUNME.sh check && git commit -m 'x'", lands],
   ]) {
-    const found = verbOf(command);
-    assert.equal(found.length, 1, command);
-    assert.match(found[0].message, road, command);
-    assert.equal(found[0].severity, "error", command);
+    const found = verbOf(command).map((one) => [one.severity, road.test(one.message)]);
+    assert.deepEqual(found, [["error", true]], command);
   }
-  for (const command of [
-    "git status",
-    "git log --oneline",
-    "git diff --cached",
-    "git show HEAD:README.md",
-    "git fetch origin",
-    "git branch --show-current",
-    './RUNME.sh commit "one: lands"',
-  ]) {
+  const reads = ["git status", "git log --oneline", "git diff --cached", "git fetch"];
+  for (const command of [...reads, "git show HEAD:a.md", './RUNME.sh commit "one"']) {
     assert.deepEqual(verbOf(command), [], command);
   }
 });

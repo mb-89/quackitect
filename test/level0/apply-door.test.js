@@ -4,14 +4,14 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { applied, PATCH, REPLACE } from "../../.claude/skills/level0/lib/apply.js";
-import { UNDO } from "../../.claude/skills/level0/lib/undo.js";
+import { FOLDER, UNDO } from "../../.claude/skills/level0/lib/undo.js";
 import { SPECS, TOOLS } from "../../src/bridge/apply.js";
 import { boxOf, decide } from "../../src/bridge/server.js";
 import { onWrite } from "../../src/bridge/write.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
-import { named, NAMED } from "./fixtures.js";
+import { NAMED, named } from "./fixtures.js";
 
 // A box the server builds, with doors in memory and an index that answers the sweep. [[spec/design_output/apply#the-write-tools]]
 function routed() {
@@ -163,4 +163,28 @@ test("an exact edit writes a dollar sign as a dollar sign", () => {
     { file: "one.md", old: "price", new: "$& costs $$5 $' $`" },
   ]);
   assert.equal(took.files[0].made, "$& costs $$5 $' $`\n");
+});
+
+// The journal names the ticket its call serves, so a hand-back stages the files its own hand wrote. [[spec/design_output/pull#the-refused-commit]]
+test("the undo journal names the ticket the call serves", async () => {
+  const box = routed();
+  await decide(
+    {
+      event: "tool.call",
+      e: {
+        tool: `mcp__level0__${PATCH}`,
+        ticket: NAMED,
+        ops: [{ file: "one.md", old: "beta", new: "delta" }],
+      },
+    },
+    box,
+  );
+  const folder = `/tree/${FOLDER}`;
+  const [name] = box.disk.list(folder).map((one) => one.name);
+  const entry = JSON.parse(box.disk.read(`${folder}/${name}`));
+  assert.equal(entry.ticket, NAMED);
+  assert.deepEqual(
+    entry.files.map((one) => one.file),
+    ["one.md"],
+  );
 });
