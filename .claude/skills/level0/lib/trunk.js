@@ -8,8 +8,6 @@ export const TRUNK = "main";
 
 // A verb of this tree's own takes its words whole, up to the next operator, so git named in them lands nowhere. [[spec/design_output/work#a-box-writes-its-branch]]
 const VERB_WORDS = /(RUNME\.(?:sh|ps1)\b)(?:[^&|;\n"']|"[^"]*"|'[^']*')*/g;
-const GIT_VERB = (verb) =>
-  new RegExp(`\\bgit\\s+(?:-\\S+(?:\\s+\\S+)?\\s+)*${verb}\\b`);
 
 function gitSaid(command) {
   return String(command ?? "").replace(VERB_WORDS, "$1");

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-verbs-land-whole
 steps:
   - name: design
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: ".claude/skills/level0/lib/trunk.js:11:1: correctness/noUnusedVariables: This variable GIT_VERB is unused."
+  - step: implement/tests-green
+    hand: box d1fe1ca62214 · claude-code-remote
+    hash_before: a3c74ed07261114e934e72efb9d858df1737d855
+    hash_after: a3c74ed07261114e934e72efb9d858df1737d855
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 84 test(s) pass in 4 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-verbs-need-no-wrapper.md:184:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+reason: done
 ---
 
 # Ask
@@ -270,15 +282,27 @@ Three cases fail on their own assertion: a read before `;` still gates, a scratc
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/bash.test.js test/level0/level1.test.js test/level0/trunk.test.js test/level0/tested.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
+
+The shell door reads what a command does, where it read the words a command holds.
+
+- `touchesGit` reads git as a command word, so a grep quoting `git push` lands nowhere
+- `landingsAfterGates` lets a landing follow a read, and refuses one after a gate piped into a read
+- `FREE` takes the harness scratchpad on any box, as an absolute path alone
+- `untestedIn` passes a block moved whole, and a reordered statement still asks a test
+- the pull tool hands the verb the session env, so both read one hand
 
 <!-- the form is text -->
 
@@ -287,6 +311,12 @@ Three cases fail on their own assertion: a read before `;` still gates, a scratc
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the ask names, and `trunk.js` drops the regex its reading left unused
+- the level1 case fakes `$.process.run`, the one door the change reaches
+- a comment above each change names this ticket
+- each rule stands in one function, and the tickets point at it
+- every review row stands fixed here or in a child that closed
 
 # Discussion
 
