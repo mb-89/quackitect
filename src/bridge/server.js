@@ -41,6 +41,7 @@ import {
   onSessionEnd,
   onSessionStart,
   onTurnComplete,
+  layerRides,
   onTurnSaid,
   owesCanary,
   surveyHere,
@@ -169,7 +170,9 @@ export async function decide(said, box) {
   const answer = letsThrough((await door(said?.e ?? {}, box)) ?? PASS, said, box);
   // The call's marks reach the file once, after the door answers. [[spec/design_output/level0#the-marks-survive-a-restart]]
   marksKept(box);
-  if (box.registered || String(said?.event ?? "") === "engine.create") return answer;
+  // A module the client loads again marks its post fresh, since the load drops the tools the client held. [[spec/design_output/level0#the-first-call-pays]]
+  if ((box.registered && !said?.fresh) || String(said?.event ?? "") === "engine.create")
+    return answer;
   box.registered = true;
   return { ...answer, register: answer.register ?? box.specs };
 }
@@ -285,9 +288,10 @@ async function onToolCall(e, box) {
   );
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
-  if (!passes(said)) return said;
+  // The standing layer rides the first call a session takes where no context read reached the server. [[spec/design_output/level0#rules-ride-the-first-answer]]
+  if (!passes(said)) return layerRides(e, box, said);
   // [[spec/design_output/level0#the-findings-ride-the-call]]
-  return held ?? answerRides(e, box, owesCanary(e, box)) ?? PASS;
+  return layerRides(e, box, held ?? answerRides(e, box, owesCanary(e, box)) ?? PASS);
 }
 
 function passes(said) {

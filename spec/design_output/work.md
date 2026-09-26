@@ -79,9 +79,10 @@ boxes reaching for one group mean one of them meets a rejected push and
 takes the next. That box resets the branch to its remote, so its claim leaves
 the box and the next take meets no commit origin lacks. A claim the commit
 refuses leaves the ticket as the take finds it, and the take stops.
+A take on a box that holds its branch hands that ask again, and a sync conflict after the claim still prints the ask.
 
-The take reads the group before it writes that entry, through the same line
-`branch done` reads. A group whose open children hold no step a hand can take
+The take reads the group before it writes that entry, through `standsOpen` in
+`src/scripts/work.js`. A group whose open children hold no step a hand can take
 stays at `todo`, and the take names the step each child waits at. So a cloud
 box stops here, on the branch, and the record keeps the shape it holds.
 
@@ -168,6 +169,10 @@ rewrite of trunk leaves behind:
 A branch at `orphan` reaches no sync, so a box takes it and stalls. The merge
 reads the same base, so one read answers both.
 
+A shallow clone holds no base older than its depth, and git answers red there
+too. So where the base comes back red on a shallow clone, the read fetches the
+whole history and asks again. A branch counts as `orphan` on that answer.
+
 # A row per group
 
 `branch list` names one row per branch and one per loose ticket on trunk:
@@ -219,15 +224,18 @@ the tip, so nothing writes to a branch nobody holds.
 # A box leaves
 
 `branch done` on a group branch writes `hash_after` into the newest record entry, which
-is the box saying it leaves. Then it reads the children:
+is the box saying it leaves. While a `retro` leaf that applies on this box
+stands unwritten, it frees the open tickets, names that leaf, and refuses. Past
+the retro it always hands the branch back, so no box ends holding one:
 
-| what stands | what the group becomes |
+| what stands | what it becomes |
 |---|---|
-| no ticket in it stands open | `state: closed`, `reason: done` |
-| one of them stands open | `state: open`, and `done` names each open one |
+| a closed ticket of the group | stays in the group, as its history |
+| an open or draft ticket of the group | loses its `group` field, through `freeChildren` in `src/scripts/work-merge.js` |
+| the group | `state: closed`, `reason: done`, so `branch merge` takes it |
 
-So an open group nobody holds comes back to the queue, and a person answers on
-its branch.
+So a freed ticket stands loose on trunk after the merge, and the next pull hands
+it out. For details, see [[spec/design_output/work#the-merge-frees-the-tickets]].
 
 # A person step leaves
 
@@ -514,6 +522,11 @@ from a trunk carrying none of that work. It then builds that work a second time.
 | an unclean tree | the check reads what the commit lacks |
 | red | the check says red, with the time |
 | a warning standing | how many stand, in how many files, and the lint that names them |
+
+The stamp counts no Vale warning in a file under `spec/tickets` or
+`.se/tickets`. [[spec/guidance/working]] tells a hand to leave a ticket's prose
+warning standing. `holdsPush` in `src/scripts/cli-stamp.js`
+reads that, and every other warning holds the push.
 
 So `done` stops meaning "the session believes this passes". It comes to mean
 "a program runs on this commit, and it passes with no warning standing". One

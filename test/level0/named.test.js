@@ -401,3 +401,18 @@ test("with nothing in hand, any open ticket passes and a closed one fails", () =
   assert.equal(fault("open-one", {}), "");
   assert.match(fault("done-one", {}), /closed/);
 });
+
+// A module the client loads again holds no tools, so a post marked fresh takes the tools back from a server that registered once already. [[spec/design_output/level0#the-first-call-pays]]
+test("a fresh post takes the tools again from a server that registered once", async () => {
+  const box = routed();
+  box.registered = true;
+
+  const plain = await decide({ event: "tool.call", e: { tool: "Read" } }, box);
+  const fresh = await decide(
+    { event: "tool.call", e: { tool: "Read" }, fresh: true },
+    box,
+  );
+
+  assert.equal(plain.register, undefined, "a plain post takes no tools twice");
+  assert.ok(Array.isArray(fresh.register), "a fresh post takes them back");
+});

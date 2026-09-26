@@ -134,9 +134,10 @@ derives it at every hand-out:
 | one stands open | waits, and names the child it waits for |
 | every one closes `done`, `became` or `answered` | writes a pass by `the engine`, and moves on |
 
-A group at `children` hands no leaf out while a child stands open. So a box
-with nothing at a step it can take writes no retro. The wait names the person
-step each child holds, and `branch done` leaves the group at `todo`. A child
+A group at `children` hands no leaf out while a child stands open. The wait
+names the person step each child holds. `branch done` frees the open children
+so the pull reaches the retro. For details, see
+[[spec/design_output/work#a-box-leaves]]. A child
 reopening past the `children` step sends the group's last leaf back there,
 which leaves the group open the same way.
 
@@ -680,11 +681,12 @@ So a hand fixes what the sweep names later through the one road there is.
 
 # Done leaves no takeable step
 
-`branch done` refuses while a ticket of the group stands at a step a hand
-can take. A hand can take a step where `by` names no person, no child and no
-helper, and the box holds every verb it needs. A step under `not` counts, because a spawned hand takes
-it. So a box leaves a group only when every open step waits for a person, or
-when the group closes.
+`branch done` frees every open ticket of the group, so the group it hands back
+holds no step a hand can take. For details, see
+[[spec/design_output/work#a-box-leaves]]. `takeable` answers what a hand can
+take: a step where `by` names no person, no child and no helper, and the box
+holds every verb it needs. A step under `not` counts, because a spawned hand
+takes it. The take reads it before it claims a group.
 
 # The group holds the turn
 

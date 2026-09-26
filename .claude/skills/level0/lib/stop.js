@@ -233,9 +233,10 @@ export function toothOf() {
     },
 
     // [[spec/design_output/config#a-caller-hands-it-in]]
-    atTurnEnd(decision, mostInARow) {
-      // The cap holds over every continue rule, because a session refusing the stop line over work it leaves untaken is the stuck session the cap frees. [[spec/design_output/stop#three-in-a-row]]
-      const runaway = !decision.ends && mostInARow > 0 && inARow >= mostInARow;
+    atTurnEnd(decision, mostInARow, pinned = false) {
+      // The cap holds over every continue rule, because a session refusing the stop line over work it leaves untaken is the stuck session the cap frees. A pinned turn, a cloud box holding its group, stays past it. [[spec/design_output/stop#three-in-a-row]]
+      const runaway =
+        !decision.ends && !pinned && mostInARow > 0 && inARow >= mostInARow;
       const ends = decision.ends || runaway;
       // The decision carries the holds the cap read, so the log line names them where the tooth lets go. [[spec/design_output/stop#three-in-a-row]]
       const held = inARow;

@@ -21,7 +21,7 @@ rationale: [[spec/rationales/cloud]]
 10. Finish every step an agent takes before you leave. A step you leave meets the next box and waits again. *
 11. Green the check before you hand the branch back, whatever hand puts the fault there. A fault with no owner outlives every hand that meets it. *
 12. Write your result, your retro and every script under `.se/scripts` into the group's retro. Git carries what this box learns, and nothing else does.
-13. Run `./RUNME.sh branch done` last, and stop at the push. It sets the standing the next box reads.
+13. Run `./RUNME.sh branch done` last, and stop at the push. It refuses while the retro stands unwritten, then hands the branch back, and each open ticket leaves the group.
 14. Work one branch a session, and leave the next branch to the next session. A second branch buries the first in one review. *
 15. Say which commit you stand on, and whether it matches origin. This box reports itself current while somebody pushes past it. *
 

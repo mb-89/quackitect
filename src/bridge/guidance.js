@@ -41,6 +41,8 @@ const COMPACT = "compact";
 const CLEARED = "clear";
 // The kind the paid line stands under, which onTurnSaid writes. [[spec/design_output/level0#the-debt-survives-a-restart]]
 const DOOR = "level0";
+// The kind the layer's line stands under, which a restart reads back to learn the session holds the layer. [[spec/design_output/level0#rules-ride-the-first-answer]]
+const CONTEXT = "context";
 export const TOOLS_BLOCK = "level0-tools";
 export const HANDOVER_BLOCK = "level0-handover";
 const TOOLS_HEADING = "# What this box has";
@@ -125,18 +127,23 @@ function sessionHere(box) {
 
 // A restart drops the box and the harness session runs on, so the debt comes back off the log. The log rotates at a session start, so what stands in it belongs to this session. [[spec/design_output/level0#the-debt-survives-a-restart]]
 function afterARestart(box) {
-  const paid = paidInLog(box);
-  return { reads: 1, firstTurn: false, paid, owes: !paid };
+  const rows = logRows(box);
+  const paid = paidIn(rows);
+  // A server the start road launched late meets a log holding no layer line, so its first answer hands the layer over. [[spec/design_output/level0#rules-ride-the-first-answer]]
+  const given = rows.some((one) => one?.kind === CONTEXT);
+  return { reads: 1, firstTurn: false, paid, owes: !paid, given };
+}
+
+function logRows(box) {
+  try {
+    return rowsIn(String(box.disk.read(join(box.work, SESSION))));
+  } catch {
+    return [];
+  }
 }
 
 // The last of the two marks says where the debt stands: the line pays it, and a compaction opens it again. [[spec/design_output/level0#the-debt-survives-a-restart]]
-function paidInLog(box) {
-  let rows = [];
-  try {
-    rows = rowsIn(String(box.disk.read(join(box.work, SESSION))));
-  } catch {
-    return false;
-  }
+function paidIn(rows) {
   return pays(rows.filter((one) => pays(one) || opens(one)).at(-1));
 }
 
@@ -156,7 +163,7 @@ export function guidanceOf(box) {
 export function onSessionStart(_e, box) {
   box.guidance = readsGuidance(box);
   box.tools = surveyHere(box);
-  box.session = { reads: 0, firstTurn: true };
+  box.session = { reads: 0, firstTurn: true, given: false };
   // A new session opens a conversation, so the context door stands ready again. [[spec/design_output/stop#the-context-hands-over]]
   box.handover = null;
   box.cleared = false;
@@ -167,17 +174,40 @@ export function onSessionStart(_e, box) {
 
 // [[spec/design_output/level0#the-guidance-stays-put]]
 export function onPromptContext(_e, box) {
+  return { after: { blocks: layerOf(box, "prompt.context") } };
+}
+
+// The blocks a read of the context hands over, and the mark saying the session holds them. [[spec/design_output/level0#rules-ride-the-first-answer]]
+function layerOf(box, road) {
   const held = guidanceOf(box);
   const session = sessionHere(box);
   session.reads += 1;
+  session.given = true;
   const blocks = blocksOf(held, box.index.dead(), toolsText(box));
   const handover = handoverHere(box);
   if (handover) blocks.push({ name: HANDOVER_BLOCK, text: handoverText(handover) });
-  box.log.say("info", "context", `${blocks.length} block(s) reach the session`, {
+  box.log.say("info", CONTEXT, `${blocks.length} block(s) reach the session`, {
     detail: blocks.map((one) => one.name).join(" "),
     reason: session.reads === 1 ? "first" : "re-read",
+    road,
   });
-  return { after: { blocks } };
+  return blocks;
+}
+
+// A session no context read reached takes the layer on the first call answer that hands the call on, and no later one. A result or a hold carries no context, so the layer waits for the next call. [[spec/design_output/level0#rules-ride-the-first-answer]]
+export function layerRides(e, box, answer) {
+  const said = answer ?? { pass: true };
+  if (e?.agentId || sessionHere(box).given) return said;
+  if (said.result !== undefined || said.needs !== undefined || said.spawn !== undefined)
+    return said;
+  const blocks = layerOf(box, "tool.call");
+  if (!blocks.length) return said;
+  const { pass: _pass, ...rest } = said;
+  const context = [
+    ...blocks.map((one) => `# ${one.name}\n${one.text}`),
+    ...(rest.after?.context ?? []),
+  ];
+  return { ...rest, after: { ...(rest.after ?? {}), context } };
 }
 
 function blocksOf(held, dead, tools) {
@@ -346,9 +376,14 @@ export function onSessionEnd(e, box) {
 export function onAgentSpawn(e, box) {
   const kind = String(e?.kind ?? "");
   // The model each spawn runs on reaches the log, so the retro reads the tier against the rework. [[spec/design_output/level0#a-spawn-names-its-tier]]
-  box.log.say("info", "agent", `a helper spawns on ${e?.model || e?.parentModel || "the default model"}`, {
-    detail: String(e?.description ?? ""),
-  });
+  box.log.say(
+    "info",
+    "agent",
+    `a helper spawns on ${e?.model || e?.parentModel || "the default model"}`,
+    {
+      detail: String(e?.description ?? ""),
+    },
+  );
   // A restart hands the box over bare, so the accessor reads the guidance again. [[spec/design_output/level0#a-restart-fills-the-box]]
   const standing = layerHere(guidanceOf(box), kind);
   if (!standing) return { pass: true };

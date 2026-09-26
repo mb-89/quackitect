@@ -27,15 +27,21 @@ const NO_NODE = 5;
 // The code REASONS reads for a road that installs the modules and then starts the server. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 const INSTALLED = 7;
 let port = PORT;
-// Whether the start road launched a server nobody has waited on yet. [[spec/design_output/level0#the-first-call-pays]]
+// Whether the start road launched a server this session. [[spec/design_output/level0#rules-ride-the-first-answer]]
 let launched = false;
+// Whether a server answered any event of this session, so a launch no answer has met reads as starting, and one met reads as a fall. [[spec/design_output/level0#rules-ride-the-first-answer]]
+let answered = false;
+// The stops held while the launched server answers nothing, so a server that stays down frees the turn after the last. [[spec/design_output/level0#rules-ride-the-first-answer]]
+let held = 0;
+const HOLDS = 3;
 let root = "";
 let method = "";
 let saidDown = false;
 // The chat line stands apart from the row, so a session start writing the row still leaves the line to say. [[spec/design_output/level0#the-bridge-says-it-falls]]
 let toldDown = false;
 let started = false;
-let waiting = STARTING;
+// The client drops the registered tools when it loads this module again, so a module fresh from a load asks for them on each post until an answer hands them back. [[spec/design_output/level0#the-first-call-pays]]
+let armed = false;
 let stepText = "";
 // What the start road answered where it stood down, so the first prompt says the cage is missing. [[spec/design_output/level0#a-session-says-its-cage]]
 let cage = null;
@@ -118,15 +124,15 @@ export function spawnTagOf(held) {
 export const READ_TOOLS = [findSpec(), patchSpec(), replaceSpec(), undoSpec()];
 const SERVED = "mcp__level0__";
 const CALLED = READ_TOOLS.map((one) => `${SERVED}${one.name}`);
-const HEALTH = 200;
 
 // The engine takes one session start a module and counts them in the source, so this registers none: the module wrapping this one holds the start and calls startsSession from it. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export function register(on, options) {
   method = String(options?.method ?? "");
-  // A caller hands the wait in, so a case reads the running out without burning the span. [[spec/design_output/level0#the-first-call-pays]]
-  waiting = Number(options?.waiting) || STARTING;
   started = false;
   launched = false;
+  answered = false;
+  held = 0;
+  armed = false;
   on("*", ($, e, next) => seen($, e, next));
   on("turn.step", streams);
   // [[spec/design_output/pull#a-hand-of-its-own]]
@@ -152,13 +158,19 @@ async function seen($, e, next) {
   if (event === "session.start") await opens($, e);
   const answer = reading(event, e)
     ? await reads($, event, e, next)
-    : await ask($, event, await beforeOf($, event, e), next, await fillOf($, event, e));
+    : await ask($, event, await beforeOf($, event, e), next, {
+        ...(await fillOf($, event, e)),
+        ...(armed ? {} : { fresh: true }),
+      });
   if (!answer) {
-    if (event === "session.start") await starts($);
+    // The session start and the conversation's first read each start the server where none answers, and the road runs once. Neither waits, and the rules ride the next event a server answers. [[spec/design_output/level0#rules-ride-the-first-answer]]
+    if (event === "session.start" || event === "prompt.context") await starts($);
     // A tool the server registered answers nowhere past this hook, so a dead bridge says so. [[spec/design_output/level0#the-bridge-says-it-falls]]
     if (event === "tool.call" && String(e?.tool ?? "").startsWith(SERVED)) {
-      return { result: deadLine(e) };
+      return { result: missingLine(e) };
     }
+    // A cloud turn ending before the launched server answers holds, so the next event carries the rules. [[spec/design_output/level0#rules-ride-the-first-answer]]
+    if (event === "classic.Stop" && holdsStop(e)) return { block: STARTING_STOP };
     // The server answers nothing, so the bridgehead says the cage stands down where a reader stands. [[spec/design_output/level0#a-session-says-its-cage]]
     if (event === "prompt.context" && cage) {
       return merged(await next(e), {
@@ -167,7 +179,10 @@ async function seen($, e, next) {
     }
     return next(e);
   }
-  if (Array.isArray(answer.register)) await registers($, answer.register);
+  if (Array.isArray(answer.register)) {
+    await registers($, answer.register);
+    armed = true;
+  }
   if (answer.clear) return clears($, answer, e, next);
   if (answer.needs === "reply") return spoke($, e, next);
   if (answer.spawn !== undefined && (answer.result !== undefined || answer.pass)) {
@@ -209,6 +224,8 @@ async function spawns($, answer, next) {
 
 async function opens($, e) {
   if (e?.cwd) root = String(e.cwd);
+  answered = false;
+  held = 0;
   try {
     const said = JSON.parse(String(await $.fs.read(POINTER)));
     port = Number(said?.port) || PORT;
@@ -296,6 +313,7 @@ async function posted($, body) {
     throw Object.assign(new Error(`status ${said.status}`), { status: said.status });
   saidDown = false;
   toldDown = false;
+  answered = true;
   // The server answers, so the cage stands and no block says it is missing. [[spec/design_output/level0#a-session-says-its-cage]]
   cage = null;
   return JSON.parse(said.text || "{}");
@@ -340,7 +358,10 @@ async function lastTexts($) {
       if (rows[at]?.role === "assistant" && said) out.unshift(said);
     }
   } catch {}
-  return { texts: out, rows: (Array.isArray(rows) ? rows : []).slice(-ROWS).map(rowOf) };
+  return {
+    texts: out,
+    rows: (Array.isArray(rows) ? rows : []).slice(-ROWS).map(rowOf),
+  };
 }
 
 // A row as the answer door reads it: its role, its id where it carries one, and its text where the agent wrote it. [[spec/tickets/a-reply-follows-its-prompt]]
@@ -417,38 +438,42 @@ function reading(event, e) {
   return event === "tool.call" && CALLED.includes(String(e?.tool ?? ""));
 }
 
-// A read tool called before the server stands brings it up, and posts once more on the far side. The answer takes the shape the server gives, so the door reads it the way it reads every other. [[spec/design_output/level0#the-first-call-pays]]
+// A read tool called before the server stands brings it up, and answers at once. The answer takes the shape the server gives, so the door reads it the way it reads every other. [[spec/design_output/level0#the-first-call-pays]]
 async function reads($, event, e, next) {
   const first = await ask($, event, e, next);
   if (first) return first;
   await starts($);
-  // The wait runs where the start road launched a server, and once, so a later call on a dead server answers at once. [[spec/design_output/level0#the-first-call-pays]]
-  const coming = launched;
-  launched = false;
-  if (!coming || !(await healthy($))) {
-    return { result: { result: deadLine(e) } };
-  }
-  return ask($, event, e, next);
+  return { result: { result: missingLine(e) } };
+}
+
+// A launch no answer has met yet reads as starting, and anything else as a dead server. [[spec/design_output/level0#the-first-call-pays]]
+function missingLine(e) {
+  return starting() ? startingLine(e) : deadLine(e);
+}
+
+function starting() {
+  return launched && !answered;
+}
+
+// The one line a level zero tool answers while the launched server stands up. [[spec/design_output/level0#the-first-call-pays]]
+function startingLine(e) {
+  return `Level zero is starting on this box, so ${String(e?.tool ?? "")} answers once the server stands. Call it again.`;
+}
+
+// The one line a cloud stop holds on while the launched server stands up. [[spec/design_output/level0#rules-ride-the-first-answer]]
+export const STARTING_STOP =
+  "Level zero is starting on this box, and the next event carries its rules. Make your next call, and read them.";
+
+// A launch means a cloud box, since the road exits before it off one. A stood-down road launched nothing, so a caged box and a desk pass. [[spec/design_output/level0#rules-ride-the-first-answer]]
+function holdsStop(e) {
+  if (e?.agentId || !starting() || held >= HOLDS) return false;
+  held += 1;
+  return true;
 }
 
 // The one line a level zero tool answers where no server answers. [[spec/design_output/level0#the-bridge-says-it-falls]]
 function deadLine(e) {
   return `no server answers at ${url()}, so ${String(e?.tool ?? "")} answers nothing. Run ./RUNME.sh serve, and read ${SERVE} for what it says.`;
-}
-
-// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-async function healthy($) {
-  const until = Date.now() + waiting;
-  while (Date.now() < until) {
-    try {
-      const said = await $.http.fetch(`http://127.0.0.1:${port}/health`, {
-        method: "GET",
-      });
-      if (said?.ok) return true;
-    } catch {}
-    await new Promise((done) => setTimeout(done, HEALTH));
-  }
-  return false;
 }
 
 function merged(said, after) {

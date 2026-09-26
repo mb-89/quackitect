@@ -139,6 +139,57 @@ test("four stop lines over a queue holding work: three hold, the fourth ends, an
   assert.match(last[2], /the turn ends: the tooth lets go after 3 holds in a row/);
 });
 
+// The group rule of spec/config/stop/level1.yml, whose hold names the exit. [[spec/design_output/stop#three-in-a-row]]
+const LEVEL1 = `
+- id: the-group-stands-in-hand
+  side: continue
+  priority: 82
+  decides: mechanical
+  runs: group-in-hand
+  says: This box holds a group, so run ./RUNME.sh ticket pull, spawn the hand a spawn answer names, and run ./RUNME.sh branch done once the pull answers wait.
+`;
+const HELD_GROUP =
+  "---\nkind: [[ticket]]\nstate: open\nprocess: [[spec/processes/group]]\nrecord:\n  - hash_before: abc123\n---\n\n# Ask\n\nA group.\n";
+
+function holdingGroup(env) {
+  const it = box({
+    [at("spec/config/stop/level1.yml")]: LEVEL1,
+    [at("spec/tickets/a-group.md")]: HELD_GROUP,
+  });
+  it.box.env = env;
+  it.box.proc = fakeProc({
+    "git rev-parse --abbrev-ref HEAD": { stdout: "work/a-group\n" },
+  });
+  return it;
+}
+
+// A cloud box ends only with its branch handed back, so the cap frees none holding a group. [[spec/design_output/stop#three-in-a-row]]
+test("a cloud box holding a group holds past the cap, and the hold names branch done", () => {
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+  const it = holdingGroup({ CLAUDE_CODE_REMOTE: "true" });
+  const carried = [];
+  for (let turn = 0; turn < 5; turn++) carried.push(onStop(done, it.box));
+  assert.deepEqual(
+    carried.map((one) => one.pass === true),
+    [false, false, false, false, false],
+    "the fourth hold and the fifth still hold",
+  );
+  assert.match(carried[3].result.block, /\.\/RUNME\.sh branch done/);
+});
+
+// [[spec/design_output/stop#three-in-a-row]]
+test("a desk holding a group ends at the cap as before", () => {
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+  const it = holdingGroup({});
+  const carried = [];
+  for (let turn = 0; turn < 4; turn++) carried.push(onStop(done, it.box));
+  assert.deepEqual(
+    carried.map((one) => one.pass === true),
+    [false, false, false, true],
+  );
+  assert.match(carried[0].result.block, /This box holds a group/);
+});
+
 test("a standing stop line ends the turn, and nothing prompts after it", () => {
   const it = box();
   const said = onStop(
