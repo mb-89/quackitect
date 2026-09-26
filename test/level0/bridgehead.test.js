@@ -303,5 +303,40 @@ test("a mcp__level0__plan call with no server answers the line", async () => {
 
   assert.match(String(said?.result ?? ""), /no server answers at .*6510/);
   assert.match(String(said.result), /mcp__level0__plan/, "the line names the tool");
-  assert.match(String(said.result), /\.\/RUNME\.sh serve/, "the line names the road back");
+  assert.match(
+    String(said.result),
+    /\.\/RUNME\.sh serve/,
+    "the line names the road back",
+  );
+});
+
+// The client drops the tools when it loads the module again, so the module marks its posts fresh until an answer hands the tools back. [[spec/design_output/level0#the-first-call-pays]]
+test("a module loaded again marks its posts fresh until the tools come back", async () => {
+  const hooks = {};
+  level0((event, fn) => {
+    hooks[event] = fn;
+  }, {});
+  const bodies = [];
+  const registered = [];
+  let answer = { register: [{ name: "plan" }] };
+  const $ = {
+    ...hand(fakeDisk(), fakeGit({}, STUB)),
+    http: {
+      fetch: async (_url, init) => {
+        bodies.push(JSON.parse(init.body));
+        const said = answer;
+        answer = {};
+        return { ok: true, status: 200, text: JSON.stringify(said) };
+      },
+    },
+    tool: { register: async (spec) => registered.push(spec) },
+  };
+  const handed = Object.assign(async (e) => e, { event: "tool.call" });
+
+  await hooks["*"]($, { tool: "Read" }, handed);
+  await hooks["*"]($, { tool: "Read" }, handed);
+
+  assert.equal(bodies[0].fresh, true, "the first post asks for the tools");
+  assert.deepEqual(registered, [{ name: "plan" }], "the answer registers them");
+  assert.equal(bodies[1].fresh, undefined, "and the next post asks no more");
 });

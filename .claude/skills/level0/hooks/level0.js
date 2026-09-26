@@ -35,6 +35,8 @@ let saidDown = false;
 // The chat line stands apart from the row, so a session start writing the row still leaves the line to say. [[spec/design_output/level0#the-bridge-says-it-falls]]
 let toldDown = false;
 let started = false;
+// The client drops the registered tools when it loads this module again, so a module fresh from a load asks for them on each post until an answer hands them back. [[spec/design_output/level0#the-first-call-pays]]
+let armed = false;
 let waiting = STARTING;
 let stepText = "";
 // What the start road answered where it stood down, so the first prompt says the cage is missing. [[spec/design_output/level0#a-session-says-its-cage]]
@@ -127,6 +129,7 @@ export function register(on, options) {
   waiting = Number(options?.waiting) || STARTING;
   started = false;
   launched = false;
+  armed = false;
   on("*", ($, e, next) => seen($, e, next));
   on("turn.step", streams);
   // [[spec/design_output/pull#a-hand-of-its-own]]
@@ -152,7 +155,10 @@ async function seen($, e, next) {
   if (event === "session.start") await opens($, e);
   const answer = reading(event, e)
     ? await reads($, event, e, next)
-    : await ask($, event, await beforeOf($, event, e), next, await fillOf($, event, e));
+    : await ask($, event, await beforeOf($, event, e), next, {
+        ...(await fillOf($, event, e)),
+        ...(armed ? {} : { fresh: true }),
+      });
   if (!answer) {
     if (event === "session.start") await starts($);
     // A tool the server registered answers nowhere past this hook, so a dead bridge says so. [[spec/design_output/level0#the-bridge-says-it-falls]]
@@ -167,7 +173,10 @@ async function seen($, e, next) {
     }
     return next(e);
   }
-  if (Array.isArray(answer.register)) await registers($, answer.register);
+  if (Array.isArray(answer.register)) {
+    await registers($, answer.register);
+    armed = true;
+  }
   if (answer.clear) return clears($, answer, e, next);
   if (answer.needs === "reply") return spoke($, e, next);
   if (answer.spawn !== undefined && (answer.result !== undefined || answer.pass)) {
@@ -340,7 +349,10 @@ async function lastTexts($) {
       if (rows[at]?.role === "assistant" && said) out.unshift(said);
     }
   } catch {}
-  return { texts: out, rows: (Array.isArray(rows) ? rows : []).slice(-ROWS).map(rowOf) };
+  return {
+    texts: out,
+    rows: (Array.isArray(rows) ? rows : []).slice(-ROWS).map(rowOf),
+  };
 }
 
 // A row as the answer door reads it: its role, its id where it carries one, and its text where the agent wrote it. [[spec/tickets/a-reply-follows-its-prompt]]

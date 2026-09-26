@@ -169,7 +169,9 @@ export async function decide(said, box) {
   const answer = letsThrough((await door(said?.e ?? {}, box)) ?? PASS, said, box);
   // The call's marks reach the file once, after the door answers. [[spec/design_output/level0#the-marks-survive-a-restart]]
   marksKept(box);
-  if (box.registered || String(said?.event ?? "") === "engine.create") return answer;
+  // A module the client loads again marks its post fresh, since the load drops the tools the client held. [[spec/design_output/level0#the-first-call-pays]]
+  if ((box.registered && !said?.fresh) || String(said?.event ?? "") === "engine.create")
+    return answer;
   box.registered = true;
   return { ...answer, register: answer.register ?? box.specs };
 }
