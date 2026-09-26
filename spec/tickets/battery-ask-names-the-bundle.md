@@ -48,7 +48,7 @@ approach item 4 changes `bundle` in `src/scripts/bundle.js`, which the ask leave
 
 <!-- the form is command -->
 
-    ./RUNME.sh check
+    ./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ## check
 
