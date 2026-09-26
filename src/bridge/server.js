@@ -41,6 +41,7 @@ import {
   onSessionEnd,
   onSessionStart,
   onTurnComplete,
+  layerRides,
   onTurnSaid,
   owesCanary,
   surveyHere,
@@ -287,9 +288,10 @@ async function onToolCall(e, box) {
   );
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
-  if (!passes(said)) return said;
+  // The standing layer rides the first call a session takes where no context read reached the server. [[spec/design_output/level0#rules-ride-the-first-answer]]
+  if (!passes(said)) return layerRides(e, box, said);
   // [[spec/design_output/level0#the-findings-ride-the-call]]
-  return held ?? answerRides(e, box, owesCanary(e, box)) ?? PASS;
+  return layerRides(e, box, held ?? answerRides(e, box, owesCanary(e, box)) ?? PASS);
 }
 
 function passes(said) {
