@@ -259,7 +259,7 @@ test("the cold port stands past the base port, so a live server keeps its own", 
   assert.equal(coldPort(12345), coldPort(12345));
 });
 
-// The runner, driven through the fake doors: the clone, the install, the client, and the cleanup.
+// The runner, driven through the fake doors: the clone, the install, the client, and the cleanup. [[spec/design_output/level0#the-cold-probe]]
 function runner(client) {
   const disk = fakeDisk();
   const proc = fakeProc({
@@ -281,7 +281,7 @@ function runner(client) {
 
 test("the runner clones, installs, runs the client, reads the log, and removes the clone", async () => {
   const log = [...whole()].map(line).join("\n");
-  const { disk, proc, it } = runner((argv, init) => {
+  const { disk, proc, it } = runner((_argv, init) => {
     disk.write(`${init.cwd}/.se/.log/session.jsonl`, `${log}\n`);
     return {
       exitCode: 0,
