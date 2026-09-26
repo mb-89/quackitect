@@ -51,3 +51,11 @@ test("every reader of the cloud asks cloudHere, and named.js builds no folder li
   const named = disk().read(join(root, "src", "engine", "named.js"));
   assert.doesNotMatch(named, /const WHERE =/, "named.js builds no folder list of its own");
 });
+
+// The hook loads the plugin alone, so a module it imports reaches no file past the plugin's folder. [[spec/tickets/each-fact-keeps-one-owner]]
+test("apply.js imports its siblings alone", () => {
+  const text = disk().read(join(root, ".claude", "skills", "level0", "lib", "apply.js"));
+  for (const one of text.matchAll(/from\s+"([^"]+)"/g)) {
+    assert.match(one[1], /^\.\/[^/]+\.js$/, `${one[1]} stands past the plugin's lib folder`);
+  }
+});
