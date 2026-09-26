@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box c28a93a32b71 · claude-code-remote
@@ -93,6 +93,10 @@ record:
     hand: box c28a93a32b71 · claude-code-remote
     hash_before: 064555ec7f07f8e47a06eef8238bef276301ac1f
     hash_after: 064555ec7f07f8e47a06eef8238bef276301ac1f
+  - step: design/review
+    hand: box c28a93a32b71 · claude-code-remote · helper-4
+    hash_before: 6b2cbd7745c19007386b4fa10d5a4eb253f28a5b
+    hash_after: 6b2cbd7745c19007386b4fa10d5a4eb253f28a5b
 ---
 
 # Ask
@@ -183,13 +187,11 @@ The repeat check stands in `onTurnSaid` alone. `onTurnComplete` hands `paid` the
 
 <!-- the form is verdict -->
 
-fail
+pass with findings
 
-| grade | finding | fix |
-|---|---|---|
-| design | `paid` reads both the step and the turn's answer. The bridgehead posts the last step's text as `turn.said`, so `onTurnSaid` pays on it, then `onTurnComplete` hands `paid` the same answer with `session.paid` already true. The repeat check then writes `HEARD.again` on every turn that pays the debt, which misses the second done_when line | put the repeat check in `onTurnSaid` alone, so `onTurnComplete` reads the answer for the debt and draws no repeat, and add a case in `test/level0/canary-debt.test.js` where a step pays and the answer at the turn's end carries the same text, with no repeat finding |
-| craft | the existing case "an answer comes out of a transcript, and a helper stays behind" in `test/level0/verbs.test.js` puts the long text and the short one in one turn. Under last-text-alone the short one stands last, so the case breaks, and the approach names neither the case nor whether `SHORTEST` drops before or after the pick | name the order (pick the last text, then drop it where it runs short, as the ask reads), and name the case the change rewrites |
-| craft | `sinceTheOwner` reads bridge rows (`role`, `toolResults`), and a transcript row carries `type` and `message.content` with `tool_result` blocks | name the transcript test for an owner row: `type: "user"` with no `tool_result` block in `message.content` |
+- canary-repeat-ignores-paid-text: `session.paidBy` lets a later step carrying the paying step's text draw nothing, so a step writing the canary line alone twice in one context draws no repeat finding, against the second done_when line. `streams` in `.claude/skills/level0/hooks/level0.js` posts each step once, so drop `paidBy` and let every step opening on the canary after the pay draw `HEARD.again`
+- callers-name-both-readers: the callers list misses `readsCompaction` in `src/scripts/probe.js`, which reads `Object.values(HEARD)` and so takes `HEARD.again`, and the case "an owner row opening on the warning line reads as the same owner row" in `test/level0/answer.test.js`, which calls `answersIn`. Both hold under the change, and the builder names them
+- meta-rows-open-no-turn: a transcript `user` row with `isMeta` or `isCompactSummary` carries no `tool_result` block, so the approach reads it as an owner row and cuts a turn there, scoring a progress line before it as an answer. Take an owner row as one carrying neither mark, and add a case in `test/level0/verbs.test.js`
 
 # implement
 
