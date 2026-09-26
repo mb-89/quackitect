@@ -86,8 +86,8 @@ step: design/draft
 
 `answersIn` takes every text block of a turn as an answer, so progress lines push the measure far past the ceiling. A session repeats the canary in one context, and no check names the repeat.
 
-- `answersIn` in `.claude/skills/level0/lib/voice.js` takes the last text of each turn alone, and a case in `test/level0/verbs.test.js` feeds a turn holding a progress line and an answer and gets the answer back alone
-- a text opening on the canary after the debt stands paid in the same context draws a finding naming the repeat, and a case in `test/level0/canary-debt.test.js` drives it
+- `answersIn` in `.claude/skills/level0/lib/voice.js` takes the last text of each turn alone. A case in `test/level0/verbs.test.js` feeds a turn holding a progress line and an answer. It gets the answer back alone
+- a text opening on the canary draws a finding where the debt stands paid in that same context. The finding names the repeat, and a case in `test/level0/canary-debt.test.js` drives it
 - `./RUNME.sh check` exits 0
 
 # design

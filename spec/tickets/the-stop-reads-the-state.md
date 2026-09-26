@@ -87,8 +87,8 @@ Every stop reason the agent claims matches the state the engine reads. A turn wa
 A turn ends on `the-owner-asks-to-talk` where the owner asks no talk, and `your-helpers-still-run` falls at the stop call while helpers run. A turn waiting on the owner's step finds no reason and loops.
 
 - `spec/config/stop/level0.yml` holds no rule `the-owner-asks-to-talk`, and `test/contract/stop-rules.test.js` asserts it
-- `spec/config/stop/level0.yml` holds a rule under `waits: owner` whose check answers true where the ticket in hand or its group stands at a leaf `by: person`, and a case in `test/level0/stop-door.test.js` drives it both ways
-- `helpersRun` in `src/bridge/stop.js` answers true at the stop call while a background helper runs, and a case in `test/level0/stop-helper.test.js` drives the stop call with no `background_tasks`
+- `spec/config/stop/level0.yml` holds a rule under `waits: owner`. Its check answers true where the ticket in hand or its group stands at a leaf `by: person`. A case in `test/level0/stop-door.test.js` drives it both ways
+- `helpersRun` in `src/bridge/stop.js` answers true at the stop call while a background helper runs. A case in `test/level0/stop-helper.test.js` drives the stop call with no `background_tasks`
 - `queue-waits` in `src/bridge/stop.js` answers false over an urgent group whose `work/<group>` branch stands, and a case under `test/level0` drives it
 - `spec/design_output/stop.md` names each new rule, and its `helpers-running` row matches the code
 - `./RUNME.sh check` exits 0

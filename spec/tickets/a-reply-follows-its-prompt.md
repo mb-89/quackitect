@@ -82,13 +82,13 @@ step: design/draft
 
 # Ask
 
-An answer written after the owner's prompt alone pays the prompt door, and the answer-first line rides the prompt, so the owner's question meets its answer before the next call.
+An answer written after the owner's prompt alone pays the prompt door. The answer-first line rides the prompt, so the owner's question meets its answer before the next call.
 
-A prompt carries no grace, so the first call after it meets the door. A reply written in the same message as that call meets a refusal too, since the chat shows the text after the door reads, and after a restart an older text pays a new prompt.
+A prompt carries no grace, so the first call after it meets the door. A reply written in the same message as that call meets a refusal too. The chat shows that text after the door reads. After a restart, an older text pays a new prompt.
 
-- `onPromptSubmit` in `src/bridge/answer.js` keys the demand on the prompt's own time, and a case in `test/level0/answer-door.test.js` shows a text written before the prompt pays nothing, across a restart that empties `box.spoken`
+- `onPromptSubmit` in `src/bridge/answer.js` keys the demand on the prompt's own time. A case in `test/level0/answer-door.test.js` drives a restart that empties `box.spoken`. It shows a text written before the prompt pays nothing
 - the prompt's own event hands the session the line `warns` in `.claude/skills/level0/lib/answer.js` writes, and a case in `test/level0/answer.test.js` asserts it
-- a text written after the prompt, in the same message as the next call, pays the door, and a case in `test/level0/answer-door.test.js` holds it
+- a text written after the prompt, in the same message as the next call, pays the door. A case in `test/level0/answer-door.test.js` holds it
 - `spec/design_output/level0.md` names both under `What the door reads` and `The first call asks`
 - `./RUNME.sh check` exits 0
 

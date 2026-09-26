@@ -82,14 +82,14 @@ step: design/draft
 
 # Ask
 
-A todo binds the agent as a held ticket does: the doors take it by name, and the pull answers it while it stands in hand.
+A todo binds the agent as a held ticket does. The doors take it by name, and the pull answers it while it stands in hand.
 
 The write door takes any open ticket name as a pass and refuses a todo title. The pull hands out other work while a todo stands in hand.
 
-- `ticketFault` in `src/engine/named.js` passes the ticket the hold names and the plan's `working` todo alone, and cases in `test/level0/named.test.js` and `test/level0/bash-ticket.test.js` drive each road and a stranger ticket
+- `ticketFault` in `src/engine/named.js` passes the ticket the hold names and the plan's `working` todo alone. Cases in `test/level0/named.test.js` and `test/level0/bash-ticket.test.js` drive each road and a stranger ticket
 - the refusal names the ticket in hand and the working todo, where each stands
 - a Bash description opening on the working todo's title and a colon passes `ticketDoor` in `src/bridge/bash.js`
-- `./RUNME.sh ticket pull` with a `working` todo in `.se/.runtime/plan.json` answers that todo and hands out nothing else, in a case under `test/level0`
+- `./RUNME.sh ticket pull` with a `working` todo in `.se/.runtime/plan.json` answers that todo and hands out nothing else. A case under `test/level0` drives it
 - `spec/design_output/level0.md#a-write-names-its-ticket` names the new rule
 - `./RUNME.sh check` exits 0
 
