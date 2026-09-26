@@ -91,6 +91,8 @@ The tests part of the check falls back. Each slow case proves its step over a fi
 - `test/contract/cli-verbs.test.js` spawns no `cli.js test`
 - `test/contract/drawing-bundle.test.js` bundles a stub entry in place of the drawing's
 - the battery report in `.se/.runtime/check.json` names none of these files among its slowest cases
+- `test/contract/paragraph.test.js`, `test/contract/vale.test.js` and `test/contract/vale-paths.test.js` keep every case. The owner keeps these tests.
+- Each of the three runs faster in the battery report, or the design step names what holds its time.
 - `./RUNME.sh check` exits 0
 
 # design
