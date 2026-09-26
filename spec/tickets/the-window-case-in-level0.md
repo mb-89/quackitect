@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-gates-read-the-state
 parent: the-retro-holds-the-clear
+record:
+  - step: do
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: d8c3551b4bacb52d2f4b25ecc19503193e693860
+    hash_after: d8c3551b4bacb52d2f4b25ecc19503193e693860
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 11 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-window-keeps-the-binding.md:39:130: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ the draft puts the new-window case in `test/extension/session.test.js`, and the 
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/binding.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ the draft puts the new-window case in `test/extension/session.test.js`, and the 
 
 <!-- the form is text -->
 
+The new-window case stands in `test/level0/binding.test.js`: a window opening under a new id keeps the binding and takes the rest. It drives `opened` in `src/extension/lib/session.js` straight, with no editor.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the case stands under `test/level0`
+- the cleanup: none stands
+- the case points at the ticket owning the rule
 
 # Discussion
 
