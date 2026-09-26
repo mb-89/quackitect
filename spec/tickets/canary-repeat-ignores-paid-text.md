@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-gates-read-the-state
 parent: answers-read-the-last-text
+record:
+  - step: do
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: 4694a05252142a4b6ab4418575cca761f7abc088
+    hash_after: 4694a05252142a4b6ab4418575cca761f7abc088
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 16 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-todo-joins-the-queue.md:161:1: CodeSpans: A sentence holds 4 code spans, and this one holds 6. Carry th"
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ parent: answers-read-the-last-text
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/canary-debt.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ parent: answers-read-the-last-text
 
 <!-- the form is text -->
 
+The change under `answers-read-the-last-text` built `repeats` in `src/bridge/guidance.js` with no `paidBy`. Every step opening on the canary once it stands paid draws `HEARD.again`. The case the canary alone written twice in one context draws the finding, in `test/level0/canary-debt.test.js`, holds it.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: no `paidBy` stands, and the line written twice draws the finding
+- the cleanup: none stands
+- the rule stands in `level0.md` under `The line lands once`, and this ticket points at the case
 
 # Discussion
 
