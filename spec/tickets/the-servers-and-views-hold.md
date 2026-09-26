@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -119,6 +119,11 @@ record:
     hand: box d7a4c7b217104 · claude-code-remote
     hash_before: 0827d034224a8264c365fa7811ea4f69c3b82dd2
     hash_after: 0827d034224a8264c365fa7811ea4f69c3b82dd2
+  - step: retro/cloud
+    hand: box d7a4c7b217104 · claude-code-remote
+    hash_before: d253b4b20ae12c58f7beac9a89ac26ace7434fa3
+    hash_after: d253b4b20ae12c58f7beac9a89ac26ace7434fa3
+reason: done
 ---
 
 # Ask
@@ -248,17 +253,25 @@ The merge weighs two readings: take main whole, or keep the branch's cut of `ret
 
 <!-- the form is list -->
 
+- nothing. Every tool the take installs builds on the box.
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- a conflict at the take, in five files over the `when` conditions.
+- the shell door wants a ticket named before the take hands one.
+- the plan hook blocks the pull while the group stands as the working todo.
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- no person step parks, and no ticket leaves unminted or ungrouped.
 
 # Discussion
 
