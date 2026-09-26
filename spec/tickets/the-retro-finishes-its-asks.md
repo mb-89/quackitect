@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
     hash_before: 7373a6344bbaeb98f02684ef9593798cc51a2de4
     hash_after: 7373a6344bbaeb98f02684ef9593798cc51a2de4
+  - step: design/review
+    hand: box b8ae1b45d463 · claude-code-remote · helper-2
+    hash_before: 48bcc6dfb1dff923098040f765e71c7467f772a0
+    hash_after: 48bcc6dfb1dff923098040f765e71c7467f772a0
 ---
 
 # Ask
@@ -216,6 +220,14 @@ The assumptions the approach takes:
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- the-second-collect-keeps-lines: `--again` sets `since` to this retro's own collect, and `copyTree` writes each transcript over the same path under `input/transcripts`, so `withinWindow` there drops every line the first pass takes; the second pass filters at `sinceLast`, or appends past the lines the input holds
+- a-promotion-names-its-fault: a promotion carries `what`, `from` and `to` and no `id`, as `faultsOf` in `classes.js` reads it, so `mintFaults` names it by `what` or its place in the list, where the class loop names `one.id`
+- a-promotion-ticket-reads-once: `listFaults` in `classes.js` reads a promotion's `what`, `from` and `to` alone, so the `ticket` fields the check step adds stand checked in `mintFaults` alone; `classify.md` and `check.md` name the one step writing them
+- the-quoted-pair-stays-paired: the `listAt` fix takes an item as text where it opens and closes on one quote mark, and `"a": "b"` does both; the fix takes an item as text where its closing quote stands last and no colon stands past it
+- callers-name-work-answer-home: the callers list places `workAnswer` in `pull-hand.js` and `pull.js`, and it stands in `src/scripts/pull-chapter.js`
 
 # implement
 
