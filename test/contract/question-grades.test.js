@@ -3,8 +3,8 @@
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { actionables } from "../../.claude/skills/level0/lib/guidance.js";
 import { disk } from "../../src/doors/disk.js";
 
@@ -106,8 +106,23 @@ test("the tickets note sends a one-line change the owner orders to the trivial r
   const said = rules.filter((one) => /--process=trivial/.test(one));
 
   assert.equal(said.length, 1, "one rule names the trivial route");
-  assert.match(said[0], /one-line change the owner orders/i, "the rule names the change it takes");
+  assert.match(
+    said[0],
+    /one-line change the owner orders/i,
+    "the rule names the change it takes",
+  );
   assert.match(said[0], /draft, a review and a build/i, "the rule names its failure");
   const text = files.read(join(root, "spec", "guidance", "tickets.md"));
   assert.match(text, /^\| \d+ \| `--process=trivial`/m, "an Examples row pairs it");
+});
+
+// [[spec/tickets/the-owner-view-decides-done]]
+test("the tickets note rests a claim of done on the owner's view", () => {
+  const rules = rulesIn("spec/guidance/tickets.md");
+  const said = rules.filter((one) => /`view:`/.test(one));
+
+  assert.equal(said.length, 1, "one rule names the view line");
+  assert.match(said[0], /claim of done/i, "the rule rests done on the view");
+  const text = files.read(join(root, "spec", "guidance", "tickets.md"));
+  assert.match(text, /^\| \d+ \| .*`view:`/m, "an Examples row pairs it");
 });

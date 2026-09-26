@@ -4,8 +4,10 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import { recordIn } from "../../src/engine/group.js";
 import { handFaults, handOf } from "../../src/scripts/pull.js";
+import { holdsHere } from "../../src/scripts/pull-hand.js";
 import { pulling } from "../../src/scripts/work.js";
 import {
   at,
@@ -125,4 +127,30 @@ test("personSigns lets a signed tip through, and an agent's hand-back reads no s
   heard(() => pulling(ROOT, ["pull"], robot.it));
   const passed = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], robot.it));
   assert.equal(passed.code, 0, passed.said);
+});
+
+// The ask names the view, and the owner's pass there closes the ticket. [[spec/tickets/the-owner-view-decides-done]]
+const ASKING = (view) =>
+  `---\nkind: [[ticket]]\n---\n\n# Ask\n\nThe count reads right.\n\nview: ${view}\n\n# design\n`;
+const VIEW = { by: "person", when: "view", path: "view", evidence: [] };
+
+test("a ticket whose ask names a view closes on the owner's pass at the view leaf", () => {
+  const said = holdsHere(
+    { cloud: true },
+    "view",
+    {},
+    ASKING("the sidebar button reads 3"),
+  );
+  assert.equal(said.holds, true, "the view leaf stands in the route");
+  assert.equal(
+    writesHere(VIEW, { agent: true, cloud: true }).writes,
+    false,
+    "an agent on a cloud box leaves the owner's view to the owner",
+  );
+  assert.equal(writesHere(VIEW, { agent: false }).writes, true, "the owner passes it");
+});
+
+test("a ticket whose ask says view: none skips the view leaf and closes on tests-green", () => {
+  assert.equal(holdsHere({}, "view", {}, ASKING("none")).holds, false);
+  assert.equal(holdsHere({}, "view", {}, "# Ask\n\nNo view line.\n").holds, false);
 });

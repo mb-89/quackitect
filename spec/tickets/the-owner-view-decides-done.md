@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box fcc1ba4a896f · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box fcc1ba4a896f · claude-code-remote · helper-2
     hash_before: 71706063de906881fc2866d5dcd92934730d636b
     hash_after: 71706063de906881fc2866d5dcd92934730d636b
+  - step: implement/tests-red
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: ff64d784ca9f476ebbe3b351a66949afeac3624c
+    hash_after: ff64d784ca9f476ebbe3b351a66949afeac3624c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -174,17 +182,31 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/extension-load.test.js test/level0/pull-person.test.js test/level0/process.test.js test/contract/question-grades.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the route carries no `view` field or step, so the process case fails on its find
+- `holdsHere` names no `view` condition, and a cloud agent writes a person leaf, so the pass case fails
+- the tickets note names no `view:` line, so the grade case fails
+- the load case passes: it guards the load, and fails where it throws
+- what surprises the hand: a fake `vscode` built on an arrow cannot construct, and the load calls `new vscode.RelativePattern`
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases touch the test files the ask names, and one grade case in the contract file
+- the load case stands a fake `vscode` in `Module._load`, since the name resolves to no file
+- each case carries the pointer at this ticket
+- each case reads the note or the route that states the fact
+- the review rows ride into the change: `on_fail`, the cloud wait, the fake's road and the callers each hold a case or a line
 
 ## change
 
