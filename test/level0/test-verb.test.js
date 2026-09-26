@@ -6,8 +6,11 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeGit } from "../../src/doors/fake/git.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { goModulesOf, testVerb } from "../../src/scripts/work-test.js";
+import * as verbs from "../../src/scripts/work-test.js";
+
+const { goModulesOf, testVerb } = verbs;
 
 const ROOT = "/tree";
 const MOD = "module quackitect/one\n";
@@ -89,4 +92,71 @@ test("a folder names the module holding it, and a Go test names its own", () => 
   assert.deepEqual(goModulesOf(["src/engine/swap/inner"], it), ["src/engine/swap"]);
   assert.deepEqual(goModulesOf(["src/index/index_test.go"], it), ["src/index"]);
   assert.deepEqual(goModulesOf(["src/bridge/wait.js", "src/bridge"], it), []);
+});
+
+const RED_TEST = "test/level0/a.test.js";
+const SOURCE = "src/scripts/a.js";
+const FRESH = "src/scripts/b.js";
+const ASIDE = `${ROOT}/.se/.runtime/red`;
+const FAILS = {
+  exitCode: 1,
+  stdout: "# tests 1\n# pass 0\n# fail 1\n",
+  stderr: "AssertionError [ERR_ASSERTION]: the change is missing\n",
+};
+
+// A test run that reads the sources as they stand while it runs. [[spec/design_output/pull#the-test-verb]]
+function redTree(answer) {
+  const seen = {};
+  const git = fakeGit({
+    [`git show HEAD:${SOURCE}`]: { stdout: "the text at HEAD\n" },
+    [`git show HEAD:${FRESH}`]: { exitCode: 128, stderr: "fatal: path not in HEAD" },
+  });
+  const disk = fakeDisk({
+    [`${ROOT}/${SOURCE}`]: "the working text\n",
+    [`${ROOT}/${FRESH}`]: "a new file\n",
+  });
+  git.proc.teach(["node", "--test", "--test-reporter=tap", RED_TEST], () => {
+    seen.source = disk.exists(`${ROOT}/${SOURCE}`)
+      ? disk.read(`${ROOT}/${SOURCE}`)
+      : null;
+    seen.fresh = disk.exists(`${ROOT}/${FRESH}`);
+    seen.held = disk.exists(`${ASIDE}/${SOURCE}`);
+    return answer;
+  });
+  return {
+    it: { root: ROOT, join, node: "node", git, disk, proc: git.proc },
+    disk,
+    seen,
+  };
+}
+
+// [[spec/design_output/pull#the-test-verb]]
+test("test --red sets the sources aside, answers red on an assertion, and puts them back", () => {
+  const { it, disk, seen } = redTree(FAILS);
+  assert.equal(typeof verbs.redTest, "function", "the red verb stands");
+
+  const { code, said } = quiet(() => verbs.redTest(it, [RED_TEST, SOURCE, FRESH], {}));
+
+  assert.equal(code, 0, said);
+  assert.match(said, /^red, 1 test\(s\) fail on their own assertion/);
+  assert.equal(seen.source, "the text at HEAD\n", "the test reads the source at HEAD");
+  assert.equal(seen.fresh, false, "a source new to the change stands aside");
+  assert.equal(seen.held, true, "the working text waits on disk while the test runs");
+  assert.equal(disk.read(`${ROOT}/${SOURCE}`), "the working text\n");
+  assert.equal(disk.read(`${ROOT}/${FRESH}`), "a new file\n");
+  assert.equal(disk.exists(ASIDE), false, "nothing stays aside");
+});
+
+// [[spec/design_output/pull#the-test-verb]]
+test("test --red refuses where the test passes with the sources set aside", () => {
+  const { it, disk } = redTree(PASS);
+  assert.equal(typeof verbs.redTest, "function", "the red verb stands");
+
+  const { code, said } = quiet(() => verbs.redTest(it, [RED_TEST, SOURCE, FRESH], {}));
+
+  assert.equal(code, 1, said);
+  assert.match(said, /^refused, because .*green/);
+  assert.equal(disk.read(`${ROOT}/${SOURCE}`), "the working text\n");
+  assert.equal(disk.read(`${ROOT}/${FRESH}`), "a new file\n");
+  assert.equal(disk.exists(ASIDE), false);
 });

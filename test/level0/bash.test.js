@@ -554,3 +554,51 @@ test("a redirect into the harness scratchpad passes, and a tree path of the same
     "ShellWritesNothing",
   ]);
 });
+
+// A ticket moves through the rename verb, which rewrites every reach, and one command answers one row. [[spec/design_output/bash#a-git-write-takes-its-verb]]
+test("git mv under spec/tickets refuses and names the rename verb", () => {
+  const found = findings("git mv spec/tickets/old-name.md spec/tickets/new-name.md", 5);
+  assert.deepEqual(
+    found.map((one) => one.rule),
+    ["TicketMovesByRename"],
+  );
+  assert.match(found[0].message, /\.\/RUNME\.sh rename/);
+});
+
+// The agent reaches git through the engine alone, so every git write names the verb standing for it, or the road where none stands. [[spec/design_output/bash#a-git-write-takes-its-verb]]
+test("every git command that writes the repository refuses and names its verb", () => {
+  const verbOf = (command) =>
+    findings(command, 5).filter((one) => one.rule === "GitWritesThroughAVerb");
+  for (const [command, road] of [
+    ['git commit -m "one"', /\.\/RUNME\.sh commit/],
+    ["git add -A", /\.\/RUNME\.sh commit/],
+    ["git rm src/a.js", /\.\/RUNME\.sh commit/],
+    ["git push origin main", /\.\/RUNME\.sh push/],
+    ["git merge origin/claude/a-thing", /\.\/RUNME\.sh branch merge/],
+    ["git pull origin main", /\.\/RUNME\.sh branch sync/],
+    ["git mv src/a.js src/b.js", /\.\/RUNME\.sh rename/],
+    ["git stash", /\.\/RUNME\.sh commit/],
+    ["git rebase main", /\.\/RUNME\.sh branch sync/],
+    ["git reset --hard HEAD~1", /mcp__level0__undo/],
+    ["git tag v1", /person/],
+    ["git cherry-pick abc123", /\.\/RUNME\.sh branch merge/],
+    ["git -C . revert abc123", /\.\/RUNME\.sh commit/],
+    ["./RUNME.sh check && git commit -m 'x'", /\.\/RUNME\.sh commit/],
+  ]) {
+    const found = verbOf(command);
+    assert.equal(found.length, 1, command);
+    assert.match(found[0].message, road, command);
+    assert.equal(found[0].severity, "error", command);
+  }
+  for (const command of [
+    "git status",
+    "git log --oneline",
+    "git diff --cached",
+    "git show HEAD:README.md",
+    "git fetch origin",
+    "git branch --show-current",
+    './RUNME.sh commit "one: lands"',
+  ]) {
+    assert.deepEqual(verbOf(command), [], command);
+  }
+});

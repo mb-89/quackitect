@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box d1fe1ca62214 · claude-code-remote · helper-2
     hash_before: 2cf20e88e07aa09555e74acaeb0b2488ffc867c7
     hash_after: 2cf20e88e07aa09555e74acaeb0b2488ffc867c7
+  - step: implement/tests-red
+    hand: box d1fe1ca62214 · claude-code-remote
+    hash_before: 227abe2cc55d57ce0c206142fc3eee22201c2bd2
+    hash_after: 227abe2cc55d57ce0c206142fc3eee22201c2bd2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 8 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -215,17 +223,27 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/landed.test.js test/level0/test-verb.test.js test/level0/commit-verb.test.js test/level0/work-group.test.js test/level0/bash.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The eight new cases fail on their own assertion, and the eighty cases standing before stay green. The red verb has no export yet, so its two cases assert that it stands before they call it. An import of a missing name fails the load, and that reads as a build fault. No hand in this box writes through the apply door, so no undo journal stands here. A landing that stages journal paths alone would drop the work of such a hand.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases stand in the five test files the design names, and no other file changes
+- each case drives a fake: the disk, the git and the process doors from `src/doors/fake`
+- a comment above each case names the design section it decides
+- the journal shape, the hold shape and the rule names each stand once in their case
+- the review rows on the red verb, the one row for `git mv` and the push before the delete each hold a case here
 
 ## change
 
