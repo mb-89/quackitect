@@ -46,7 +46,7 @@ test("a desk's refusal says what stands undone, and names main and the merge", (
   assert.match(deskRefusal("x").join("\n"), /branch merge <name>/);
 });
 
-// A reader holding the doors' flag answers the way the Bash door does. [[spec/tickets/each-fact-keeps-one-owner]]
+// A reader holding the doors' flag answers the way the Bash door does. handDoors in src/scripts/pull-hand-of.js reads inCloud, because it sets that flag. [[spec/tickets/each-fact-keeps-one-owner]]
 test("every reader of the cloud asks cloudHere, and a push reads the doors' own flag first", () => {
   const said = pushed({ cloud: false, env: { SE_CLOUD: "1" } }, "work/one-group");
   assert.equal(said.local, true, "the doors' flag says a desk, whatever the environment says");
