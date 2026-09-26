@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: each-thing-stands-in-place
 parent: the-retro-finishes-its-asks
+record:
+  - step: do
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 1814337e02fb8e8ad536adbe0f1c2b094e27cfd4
+    hash_after: beea5c434c80dfdcd967f25dcb93198e587dbb71
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ parent: the-retro-finishes-its-asks
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/retro-mint.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,22 @@ parent: the-retro-finishes-its-asks
 
 <!-- the form is text -->
 
+A promotion's ticket fields now have one writer and one checker.
+
+- `classify.md` rule five leaves a promotion's ticket to the check step
+- `check.md` rule five asks the check step for each promotion's ticket
+- `verifying.md` explains the new rule, and its standing-rule chapter moves to six
+- a case in `retro-mint.test.js` shows `faultsOf` passes the ticket, and `mintFaults` refuses it
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change follows the ask, or the discussion says why it departs: the guidance names the check step alone
+- [x] the cleanup the change reveals is in the change, or is a note of its own: the rationale gains its chapter
+- [x] every fact the change adds stands in one place, and a note points at the file instead of repeating it: `mintFaults` checks
 
 # Discussion
 
