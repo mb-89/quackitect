@@ -74,10 +74,15 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+step: design/review
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
+record:
+  - step: design/draft
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: 89ba223a6be4b6180505383d9620867a94b1573c
+    hash_after: 89ba223a6be4b6180505383d9620867a94b1573c
 ---
 
 # Ask
@@ -102,11 +107,51 @@ Five parsers and three writers disagree on quoting today. One writer ends the re
 
 <!-- the form is text -->
 
+A Go package `src/front` holds the one writer, in the module [[spec/tickets/go-code-shares-one-module]] leaves. A pure Go binary `se-front` hands it to every other language, and the install builds it beside `se-lsp`.
+
+| the op | what it writes |
+|---|---|
+| `set <key> <value>` | one top-level scalar, added before the fence where it stands nowhere |
+| `drop <key>` | one top-level key and the block under it |
+| `entry <json>` | one item at the end of `record` |
+| `after <hash>` | `hash_after` on the open record item, else on the last |
+| `mint <json>` | a whole front off an ordered map, the way the mint writes it |
+| `normalise` | the front rewritten in the writer's form, and the body left byte for byte |
+
+The rules the writer holds:
+
+- the binary takes the note in and answers it written, so a caller keeps its own file door
+- one quoting rule holds for every scalar, the rule `quotedValue` in the window holds now
+- a value holding `: ` or ` #`, opening on a YAML mark, or ending on a space takes double quotes
+- keys keep their order, and a comment line stays where it stands
+- the JavaScript writers call the binary through one function in `src/engine/group.js`, and their own row builders leave
+- the window calls the package in place of its own `WithField`
+- where the binary stands nowhere, a write refuses and names `./RUNME.sh` as the fix
+- one commit runs `se-front normalise` over every ticket and lands the rewrite alone, before the callers switch
+
+The objection: a box with no Go loses every ticket write, where a write in JavaScript ran before. The answer: the install puts Go on every box that works tickets, since the check already runs the Go tests. The refusal names the fix.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/engine/group.js` the four field writers, `withField` first, which call the binary
+- `.claude/skills/level0/lib/schema-mint.js` `mintNote` and `reRouted`, which call the binary
+- `.claude/skills/level0/lib/schema-mint.js` `keyRows` and `flatOf`, which leave
+- `src/tui/work/workedit.go` `WithField` and `writeTicket`, which call the package
+- `src/scripts/ticket.js`, a caller of the group writers and of `reRouted`
+- `src/scripts/pull-hand.js`, a caller of the group writers and of `reRouted`
+- `src/scripts/ticket-route.js`, a caller of `reRouted`
+- `src/scripts/work.js`, a caller of the group writers
+- `src/scripts/work-unblock.js`, a caller of the group writers
+- `src/scripts/work-merge.js`, a caller of the group writers
+- `src/scripts/pull.js`, a caller of the group writers
+- `src/scripts/pull-writes.js`, a caller of the group writers
+- `src/scripts/pull-chapter.js`, a caller of the group writers
+- `src/scripts/install.sh` `get_lsp`, beside which `get_front` builds the binary
+- `src/scripts/go-source.js` `BUILDS`, which takes the binary's folder
 
 ### tests
 
@@ -114,17 +159,31 @@ Five parsers and three writers disagree on quoting today. One writer ends the re
 
 <!-- the form is list -->
 
+- `src/front/front_test.go` `TestQuotesWhereYamlNeedsIt`, one case a mark
+- `src/front/front_test.go` `TestEachOpKeepsTheBody`, one case an op
+- `src/front/front_test.go` `TestNormaliseRunsTwiceAsOnce`, over every ticket of the tree, which decides the second done line
+- `test/level0/front-writer.test.js` "a group writer hands the note to the binary and writes its answer"
+- `test/level0/front-writer.test.js` "a write refuses and names the install where the binary stands nowhere"
+- `go test ./...` from the root, which decides the first done line
+- `./RUNME.sh check`, which decides the third
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the three writers stand opened: `workedit.go`, `schema-mint.js` and `group.js`, with their quoting read there
+- the callers come off a search for each writer's name over `src` and the plugin library
+- each done line names its test in the tests list
 
 ## review
 
