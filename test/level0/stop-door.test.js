@@ -16,7 +16,6 @@ import {
   sawPrompt,
   TOOLS,
 } from "../../src/bridge/stop.js";
-import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -140,10 +139,15 @@ test("four stop lines over a queue holding work: three hold, the fourth ends, an
   assert.match(last[2], /the turn ends: the tooth lets go after 3 holds in a row/);
 });
 
-// The group rule as the tree writes it, so the hold a case reads is the one a box reads. [[spec/design_output/stop#three-in-a-row]]
-const LEVEL1 = disk().read(
-  new URL("../../spec/config/stop/level1.yml", import.meta.url).pathname,
-);
+// The group rule of spec/config/stop/level1.yml, whose hold names the exit. [[spec/design_output/stop#three-in-a-row]]
+const LEVEL1 = `
+- id: the-group-stands-in-hand
+  side: continue
+  priority: 82
+  decides: mechanical
+  runs: group-in-hand
+  says: This box holds a group, so run ./RUNME.sh ticket pull, spawn the hand a spawn answer names, and run ./RUNME.sh branch done once the pull answers wait.
+`;
 const HELD_GROUP =
   "---\nkind: [[ticket]]\nstate: open\nprocess: [[spec/processes/group]]\nrecord:\n  - hash_before: abc123\n---\n\n# Ask\n\nA group.\n";
 
