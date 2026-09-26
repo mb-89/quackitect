@@ -77,6 +77,10 @@ process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [the-migration-writes-its-specs]
 enabled_by: migration.phase1
+record:
+  - step: sync
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: ef191748722031f7e521c65f9fb70c78629bde96
 ---
 
 # Ask
