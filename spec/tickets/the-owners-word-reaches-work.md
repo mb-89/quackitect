@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: split
+step: children
 record:
   - step: sync
     hand: box 0dde19be1600 · claude-code-remote
@@ -91,6 +91,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-owners-word-reaches-work already carries every commit on main.
+  - step: split
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: e6dada9d095f1b518c7b9f1fe7cb3847162df334
+    hash_after: e6dada9d095f1b518c7b9f1fe7cb3847162df334
 ---
 
 # Ask
@@ -119,11 +123,23 @@ The owner's words reach the work as said. A claim of done rests on the owner's v
 
 <!-- the form is list -->
 
+- [[spec/tickets/a-small-ask-stays-small]], standard
+- [[spec/tickets/the-owner-view-decides-done]], standard
+- [[spec/tickets/the-owners-words-travel-verbatim]], standard
+- [[spec/tickets/the-hook-awaits-the-spawn]], trivial
+- [[spec/tickets/the-new-rule-appends]], trivial
+- [[spec/tickets/the-view-fails-to-implement]], trivial
+- the other review findings, each trivial, closed into the child they name
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each child changes one road: the small ask, the owner's view, or the owner's words
+- the children add up to the ask: a small ask stays small, done rests on the view, and the words travel as said
+- the verbatim child reads the Ask-line reader the view child lands, and each landed in that order on this branch
 
 # children
 
