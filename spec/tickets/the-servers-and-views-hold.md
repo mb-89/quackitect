@@ -104,6 +104,9 @@ record:
     hand: the engine
     hash_before: e99ff292d9c32d8cbc4c683796044f87c59d8c61
     hash_after: e99ff292d9c32d8cbc4c683796044f87c59d8c61
+  - step: retro/notes
+    hand: box d7a4c7b217104 · claude-code-remote
+    hash_before: 30b7e8fa8894aab1c3efc233987cc28c95b5442c
 ---
 
 # Ask
