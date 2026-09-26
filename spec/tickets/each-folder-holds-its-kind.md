@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: each-thing-stands-in-place
 steps:
   - name: design
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
+  - step: implement/tests-green
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 6290490b6805ae6efa1d3c8c9356a00e473e55fe
+    hash_after: 6290490b6805ae6efa1d3c8c9356a00e473e55fe
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 42 test(s) pass in 2 file(s); green, src/lsp passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-small-faults-land.md:184:5: Characters: The character ] stands outside the set a paragraph admits: lett"
+reason: done
 ---
 
 # Ask
@@ -283,11 +295,15 @@ The approach meets every `done_when` line. The implement step fixes these rows i
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/write.test.js test/level0/schema-sweep.test.js src/lsp
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -295,11 +311,34 @@ The approach meets every `done_when` line. The implement step fixes these rows i
 
 <!-- the form is text -->
 
+A governed folder holds its own kind alone now:
+
+| where | what it does with a file off the note end |
+|---|---|
+| the sweep, in `src/lsp/schema.go` and `.claude/skills/level0/lib/schema.js` | draws a `Schema.Folder` finding at warning, naming the kind the folder holds |
+| the write door, in `src/bridge/write.js` | refuses the write in the same words |
+
+The pages standing past their folders draw the warning, and the owner moves each:
+
+- `spec/design_input/harnesssurface_2.html`
+- `spec/design_input/the-agent-pulls-tickets.html`
+- `spec/funnel/the-bench-reruns-design-inputs.html`
+
+The rulings of `spec/funnel/the-editor-draws-the-trace.md` stand in
+`spec/design_input/the-editor-draws-the-trace.md`, and the funnel note points
+there.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: both sweeps, the door, the funnel note and the design input
+- [x] every door the change reaches has a fake: the door case runs over a fake disk
+- [x] a comment names the approach the change implements: each new function points at this ticket
+- [x] every fact the change adds stands in one place: the Go message names its JavaScript twin
+- [x] every row the design review passes with stands fixed in the change: the pages stand for the owner, and no exemption softens the warning
 
 # Discussion
 
