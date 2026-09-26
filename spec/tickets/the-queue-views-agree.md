@@ -98,7 +98,6 @@ The badge counts the rows the tab draws, and the sidebar redraws on a config cha
 - cases in `test/level0/work-group.test.js` hold both the child row and the group row
 - `lensesOf` in `src/extension/lib/lens.js` draws no lens over a ticket standing on a cloud branch. A case under `test/level0` holds it
 - a person step: the owner compares the sidebar badge with the work tab's brackets in the editor. The compare runs before and after a ticket moves, with no window reload
-- A group branch no box has worked keeps its cloud flag after main moves on. `mergedHere` in `src/scripts/work-stands.js` reads it merged today. A case in `test/level0/work-group.test.js` decides it
 - `./RUNME.sh check` exits 0
 
 # design

@@ -4,7 +4,8 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { mergedHere, work } from "../../src/scripts/work.js";
+import { work } from "../../src/scripts/work.js";
+import { mergedHere } from "../../src/scripts/work-stands.js";
 import { refsIn } from "../../src/scripts/work-read.js";
 import {
   doorsSaying,
@@ -40,6 +41,21 @@ test("the merged set drops a branch standing at trunk's tip", () => {
     "git branch -r --points-at origin/main": {
       stdout: "  origin/main\n  origin/work/fresh-cut\n",
     },
+  });
+
+  assert.deepEqual([...mergedHere(it)], ["work/landed"]);
+});
+
+// A cut waiting for a box stays open when trunk moves past it, and a landed branch joins trunk through a merge commit, off trunk's own line. [[spec/design_output/work#a-merged-branch-closes]]
+test("the merged set drops a branch cut on trunk's line, after trunk moves on", () => {
+  const { it } = doorsSaying({
+    "git branch -r --merged origin/main": {
+      stdout: "  origin/main\n  origin/work/fresh-cut\n  origin/work/landed\n",
+    },
+    "git branch -r --points-at origin/main": { stdout: "  origin/main\n" },
+    "git rev-list --first-parent origin/main": { stdout: "m3\nm2\nm1\n" },
+    "git rev-parse origin/work/fresh-cut": { stdout: "m2\n" },
+    "git rev-parse origin/work/landed": { stdout: "b9\n" },
   });
 
   assert.deepEqual([...mergedHere(it)], ["work/landed"]);
