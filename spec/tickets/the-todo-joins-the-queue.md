@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box c28a93a32b71 · claude-code-remote
+    hash_before: dca9ecda9c149e96bb41fb38cab08cb656b52e60
+    hash_after: dca9ecda9c149e96bb41fb38cab08cb656b52e60
 ---
 
 # Ask
@@ -105,11 +110,28 @@ The write door takes any open ticket name as a pass and refuses a todo title. Th
 
 <!-- the form is text -->
 
+The doors and the pull read one answer for what stands in hand: the hold, then the plan's `working` todo.
+
+| the change | where | what it does |
+|---|---|---|
+| one reader of the hand | `inHand` in `src/engine/named.js` | answers `{ ticket, todo }` off `holdsIn` in `src/scripts/ephemeral.js` and `PLANS` in `lib/runs.js` |
+| the name check | `ticketFault` in `src/engine/named.js` | passes the held ticket or the working todo's title, and refuses any other name. The refusal names both where each stands |
+| the shell door | `ticketDoor` in `src/bridge/bash.js` | passes a description opening on the working todo's title and a colon, before `ticketOf` cuts at the first space |
+| the pull | `pull` in `src/scripts/pull.js` | answers the working todo and hands out nothing, where no ticket stands held |
+
+Where neither a hold nor a working todo stands, `ticketFault` keeps today's read, and any open ticket passes. The commit verb runs from a hand with nothing held, and the strict read there refuses every commit. The review decides that road. `spec/design_output/level0.md` names the rule under `A write names its ticket`.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/bridge/apply.js` the patch and replace door, which calls `ticketFault` with the `ticket` field
+- `src/bridge/bash.js` `ticketDoor`, called from the Bash and PowerShell doors
+- `src/scripts/commit-verb.js` the commit verb, which calls `ticketFault` on the message head
+- `src/bridge/write.js` `ticketFaults`, which reads the write's ticket beside the door
+- `src/scripts/pull.js` `pull`, which gains the todo road before `handsOut`
 
 ### tests
 
@@ -117,17 +139,28 @@ The write door takes any open ticket name as a pass and refuses a todo title. Th
 
 <!-- the form is list -->
 
+- `test/level0/named.test.js` the held ticket passes and a stranger open ticket fails while a hold stands
+- `test/level0/named.test.js` the working todo's title passes, and the refusal names the hold and the todo
+- `test/level0/bash-ticket.test.js` a description opening on the working todo's title and a colon passes
+- `test/level0/pull-todo.test.js` a working todo answers the pull, and the pull hands out nothing else
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first draft
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `ticketFault`, `ticketOf`, `ticketDoor`, `holdsIn`, `plansHere` and `pull` stand opened. `ticketFaults` in `write.js` stands unread, and the implement step reads it first
+- the callers list comes off a grep for `ticketFault` and `ticketOf`
+- each done_when line names its test above, and `./RUNME.sh check` decides the last
 
 ## review
 
