@@ -74,11 +74,16 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+step: design/review
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
 depends_on: [go-code-shares-one-module]
+record:
+  - step: design/draft
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: 39a9a56ed9b59728a1b8f13dd7dfdc8fcb75375f
+    hash_after: 39a9a56ed9b59728a1b8f13dd7dfdc8fcb75375f
 ---
 
 # Ask
@@ -103,11 +108,32 @@ A box builds the index with Go alone, as one static binary for Linux and Windows
 
 <!-- the form is text -->
 
+The index opens SQLite through `modernc.org/sqlite` at `v1.46.1`, the last release asking for Go 1.24. Every later release asks for 1.25. A scratch build on this box ran an FTS5 table, a `MATCH` and `bm25` with `CGO_ENABLED=0`, and each answered.
+
+| the part | what changes |
+|---|---|
+| the root `go.mod` | takes `modernc.org/sqlite v1.46.1`, and `github.com/mattn/go-sqlite3` leaves |
+| `src/index/index.go` | imports the pure driver and opens `sqlite`, with the same journal, busy timeout and sync settings, each written as a `_pragma` |
+| `src/scripts/install.sh` | builds the index with `CGO_ENABLED=0`, and the compiler probe, the Zig download and the Zig version leave |
+| `src/scripts/cli-go.js` | `goEnvOf` answers `CGO_ENABLED=0`, and the Zig and the FTS5 tag leave |
+| the index note | its compiler chapter says the index builds with Go alone, and keeps its heading so every pointer resolves |
+| the rationale | its last chapter says where the driver stands |
+
+The schema, the queries and the ranking stay as they stand, so the search answers as it did.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/index/index.go` `Open` and `dsn`
+- `src/scripts/install.sh` `get_index` and `get_zig`
+- `src/scripts/install.sh` `working_compiler` and `compiler_here`
+- `src/scripts/cli-go.js` `goEnvOf`
+- `src/scripts/cli-check.js` `goHolds`, a caller of `goEnvOf`
+- `src/scripts/work-test.js` `testVerb`, a caller of `goEnvOf`
+- `spec/design_output/index.md` the compiler chapter, and `spec/rationales/the-index-drops-cgo.md` its last chapter
 
 ### tests
 
@@ -115,17 +141,30 @@ A box builds the index with Go alone, as one static binary for Linux and Windows
 
 <!-- the form is list -->
 
+- `src/index/index_test.go` `TestTheIndexOpensWithoutCgo`, which opens the index and ranks a line search with `bm25`
+- `test/level0/go-tests.test.js` "the run takes no C compiler and no tag"
+- `test/level0/test-verb.test.js` "a named test file runs under the check's spawn tally", asserting `CGO_ENABLED=0`
+- `test/contract/install.test.js` "the install downloads no Zig", which decides the second done line
+- `CGO_ENABLED=0 go test ./...` from the root, which decides the first
+- `./RUNME.sh check`, which decides the third
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- `index.go`, the install's compiler lines, `cli-go.js`, the index note and the rationale stand opened
+- the callers come off a search for `zig`, `sqlite_fts5`, `CGO_ENABLED` and `sqlite3` over the tree
+- each done line names its test in the tests list
 
 ## review
 
