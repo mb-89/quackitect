@@ -38,3 +38,17 @@ test("with no working todo the pull hands out as before", () => {
   const { said } = heard(() => pulling(ROOT, ["pull"], it));
   assert.match(said, /a-child at design\/draft/);
 });
+
+// The shell door wants the ticket named as the working item, so a pull naming that item takes the ticket. [[spec/design_output/pull#the-hand-out]]
+test("a pull naming the working item hands that ticket out", () => {
+  const plan = {
+    [at(".se/.runtime/plan.json")]: JSON.stringify({
+      working: "a-child",
+      todos: [],
+      places: {},
+    }),
+  };
+  const { it } = doors({ ...standing(CHILD()), ...plan });
+  const { said } = heard(() => pulling(ROOT, ["pull", "a-child"], it));
+  assert.match(said, /a-child at design\/draft/, said);
+});

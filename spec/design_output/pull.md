@@ -134,9 +134,10 @@ derives it at every hand-out:
 | one stands open | waits, and names the child it waits for |
 | every one closes `done`, `became` or `answered` | writes a pass by `the engine`, and moves on |
 
-A group at `children` hands no leaf out while a child stands open. So a box
-with nothing at a step it can take writes no retro. The wait names the person
-step each child holds, and `branch done` leaves the group at `todo`. A child
+A group at `children` hands no leaf out while a child stands open. The wait
+names the person step each child holds. `branch done` frees the open children
+so the pull reaches the retro. For details, see
+[[spec/design_output/work#a-box-leaves]]. A child
 reopening past the `children` step sends the group's last leaf back there,
 which leaves the group open the same way.
 

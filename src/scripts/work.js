@@ -35,11 +35,14 @@ import { guidance } from "./guidance-verb.js";
 import {
   closedHere,
   dependsOn,
+  entriesOf,
   escalate,
   handOf,
   handRule,
+  holdsHere,
   holdsVerb,
   leafOf,
+  leavesOf,
   pull,
   roleOf,
   stepPathOf,
@@ -207,6 +210,18 @@ function take(it, name = "") {
 
   // A take acts on the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
   it.git.fetch();
+  // [[spec/design_output/work#the-take-writes-the-record]]
+  const mine = heldHere(it);
+  if (mine) {
+    console.log(`You already hold ${mine.branch}, so the take hands its ask again.`);
+    if (name && `${WORK_BRANCH}${name}` !== mine.branch) {
+      console.log(
+        `The take names ${WORK_BRANCH}${name}, and one branch a session keeps this box on ${mine.branch}.`,
+      );
+    }
+    brief(mine.branch, mine.name, mine.hand, mine.text);
+    return 0;
+  }
   const stand = standOf(it);
   const standing = standingAll(stand);
   const open = stand.filter((one) => standing.get(one.branch) === TODO);
@@ -350,16 +365,41 @@ function claimGroup(it, one) {
     return 1;
   }
 
+  // [[spec/design_output/work#the-take-writes-the-record]]
   if (sync(it) === 1) {
-    console.error(`Resolve the conflict on ${one.branch}, then read the group again.`);
+    console.error(
+      `Resolve the conflict on ${one.branch} and commit it, then work the ask below.`,
+    );
+    brief(one.branch, one.name, hand, was);
     return 1;
   }
 
-  console.log(`You are on ${one.branch}, and ${hand} holds it.`);
-  console.log(`Its tickets stand in ${TICKETS}, and ${at} is the group itself.`);
-  console.log(`Run ./RUNME.sh branch done when the last of them closes.\n`);
-  console.log(askOf(was));
+  brief(one.branch, one.name, hand, was);
   return 0;
+}
+
+// [[spec/design_output/work#the-take-writes-the-record]]
+function brief(branch, name, hand, text) {
+  console.log(`You are on ${branch}, and ${hand} holds it.`);
+  console.log(
+    `Its tickets stand in ${TICKETS}, and ${ticketAt(name)} is the group itself.`,
+  );
+  console.log(`Run ./RUNME.sh branch done when the last of them closes.\n`);
+  console.log(askOf(text));
+}
+
+// [[spec/design_output/work#the-take-writes-the-record]]
+function heldHere(it) {
+  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  if (!branch?.startsWith(WORK_BRANCH)) return null;
+  const name = ticketNamed(branch);
+  const path = it.join(it.root, ticketAt(name));
+  if (!it.disk.exists(path)) return null;
+  const text = it.disk.read(path);
+  const held = heldIn(text);
+  if (!held) return null;
+  const hand = handOf(it);
+  return held.hand === roleOf(hand) ? { branch, name, hand, text } : null;
 }
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
@@ -379,7 +419,47 @@ function finish(it) {
   const stopped = ready(it, branch);
   if (stopped.code) return stopped.code;
 
+  const open = retroOpen(it, it.disk.read(path));
+  if (open) return retroFirst(it, branch, name, open);
+
   return leaves(it, branch, at, path, stopped.says);
+}
+
+// The retro step of a group, which the box writes before it leaves. [[spec/processes/group.yaml]]
+const RETRO = "retro";
+
+// The first retro leaf that applies on this box and stands unwritten, or nothing. [[spec/design_output/work#a-box-leaves]]
+export function retroOpen(it, text) {
+  const front = frontOf(text);
+  const here = { ...it, cloud: cloudHere(it) };
+  const record = entriesOf(front);
+  const written = (path) => {
+    const last = record.filter((one) => String(one.step).trim() === path).at(-1);
+    return Boolean(last?.skipped || (last?.hash_after && !last.returns));
+  };
+  const open = leavesOf(front)
+    .filter((one) => one.path.split("/")[0] === RETRO)
+    .filter((one) => holdsHere(here, String(one.said.when ?? ""), front).holds)
+    .find((one) => !written(one.path));
+  return open?.path ?? "";
+}
+
+// The open tickets leave first, because the pull hands no retro out while one stands in the group. [[spec/design_output/work#a-box-leaves]]
+function retroFirst(it, branch, name, open) {
+  const freed = freeChildren(it, name);
+  if (freed.length) {
+    it.git.run(["commit", "-m", `${branch}: the open tickets leave the group`], true);
+    it.git.run(["push", "origin", branch], true);
+  }
+  console.error(
+    `${name} stands with ${open} unwritten, and the retro comes before the box leaves.`,
+  );
+  for (const one of freed)
+    console.error(`  ${one} leaves the group, so the pull reaches the retro.`);
+  console.error(
+    `Run ./RUNME.sh ticket pull ${name}, write each retro leaf it hands out, then run ./RUNME.sh branch done.`,
+  );
+  return 1;
 }
 
 // [[spec/design_output/work#trunk-comes-in-last-too]]

@@ -79,6 +79,7 @@ boxes reaching for one group mean one of them meets a rejected push and
 takes the next. That box resets the branch to its remote, so its claim leaves
 the box and the next take meets no commit origin lacks. A claim the commit
 refuses leaves the ticket as the take finds it, and the take stops.
+A take on a box that holds its branch hands that ask again, and a sync conflict after the claim still prints the ask.
 
 The take reads the group before it writes that entry, through `standsOpen` in
 `src/scripts/work.js`. A group whose open children hold no step a hand can take
@@ -223,8 +224,9 @@ the tip, so nothing writes to a branch nobody holds.
 # A box leaves
 
 `branch done` on a group branch writes `hash_after` into the newest record entry, which
-is the box saying it leaves. It always hands the branch back, so no box ends
-holding one:
+is the box saying it leaves. While a `retro` leaf that applies on this box
+stands unwritten, it frees the open tickets, names that leaf, and refuses. Past
+the retro it always hands the branch back, so no box ends holding one:
 
 | what stands | what it becomes |
 |---|---|

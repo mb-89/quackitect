@@ -261,6 +261,63 @@ test("a take whose claim will not commit stops, and puts the ticket back", () =>
   );
 });
 
+// [[spec/design_output/work#the-take-writes-the-record]]
+test("a take whose sync conflicts after the claim still hands the box its ask", () => {
+  const { it } = doorsSaying(
+    {
+      ...groupRemote(),
+      "git rev-list --count HEAD..origin/main": { stdout: "2\n" },
+      "git merge origin/main --no-edit -m work/one-group: take main in": {
+        exitCode: 1,
+      },
+    },
+    { [on("one-group")]: GROUP_NOTE, ...HAND },
+  );
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["take"], { ...it, agent: true, cloud: true }),
+  );
+
+  assert.equal(code, 1, said);
+  assert.match(said, /Resolve the conflict on work\/one-group and commit it/);
+  assert.match(said, /You are on work\/one-group, and box d462e994b4cef holds it/);
+  assert.match(
+    said,
+    /Two tickets that land as one/,
+    "the ask stands under the conflict",
+  );
+});
+
+// [[spec/design_output/work#the-take-writes-the-record]]
+test("a take on a box holding its branch hands the ask again, and claims nothing new", () => {
+  const held = withEntry(GROUP_NOTE, {
+    step: "sync",
+    hand: "box d462e994b4cef",
+    hash_before: SHA,
+  });
+  for (const argv of [["take"], ["take", "another-group"]]) {
+    const { it, outside } = doorsSaying(groupRemote(held), {
+      [on("one-group")]: held,
+      ...HAND,
+    });
+
+    const { code, said } = heard(() =>
+      work(ROOT, argv, { ...it, agent: true, cloud: true }),
+    );
+
+    assert.equal(code, 0, said);
+    assert.match(said, /You already hold work\/one-group/);
+    assert.match(said, /Two tickets that land as one/, "the ask comes again");
+    assert.ok(
+      !ranGit(outside).some(
+        (one) => one.startsWith("git switch") || one.startsWith("git commit"),
+      ),
+      "the box stays where it stands and writes no second claim",
+    );
+    if (argv[1]) assert.match(said, /one branch a session/);
+  }
+});
+
 // [[spec/design_output/work#held-derives-from-the-record]]
 test("a group holds where the record says so, and stands free where it says nothing", () => {
   const took = withEntry(GROUP_NOTE, {
