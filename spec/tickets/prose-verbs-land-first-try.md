@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
     hash_before: 6d2bc1fad2f0163354b87688e4a698d6bb7fb1e0
     hash_after: 6d2bc1fad2f0163354b87688e4a698d6bb7fb1e0
+  - step: design/review
+    hand: box d7a55188b9103 · claude-code-remote
+    hash_before: d2ac86683bb0068e36a02e7f5399c41a6e484fe2
+    hash_after: d2ac86683bb0068e36a02e7f5399c41a6e484fe2
 ---
 
 # Ask
@@ -169,6 +173,11 @@ The judge answers a rule and no line, so a hand sends the same draft again blind
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- judge-cases-turn-it-on: main sets `judge.enabled` to false in `spec/config/level0.json`, so the judge runs nowhere until the owner turns it on. The two judge cases in `test/level0/level1.test.js` hand the hook a config with `enabled: true`, as `judgeRuns` there does, or they prove a judge that never runs
+- judge-quote-proves-its-call: approach item 3 asks `$.model.complete`, and no code, design note or hook fake in this tree names that call. The tests-red step proves the call against the hook runtime before the change leans on it, and reads the quote out of `classify` where the call stands nowhere
 
 # implement
 
