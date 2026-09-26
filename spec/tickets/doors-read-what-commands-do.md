@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d1fe1ca62214 · claude-code-remote
+    hash_before: 0de3b3f411719a815d051fc6a474343c6473abc3
+    hash_after: 0de3b3f411719a815d051fc6a474343c6473abc3
 ---
 
 # Ask
@@ -105,11 +110,29 @@ A read, a grep and a scratch write pass the shell door, and a landing behind a p
 
 <!-- the form is text -->
 
+Each fix stays inside the function the ask names, and reads the command through the tokenizer `lib/tokens.js` already owns.
+
+1. `touchesGit` in `lib/trunk.js` splits the command on `tokensOf` breaks, and reads `commit` or `push` where `git` is the command word of a segment, past the `PASSES` prefixes and the `-C <dir>` style flags `GIT_VERB` skips today. `gitSaid` and `VERB_WORDS` stay for `landsOnTrunk`, which reads the push refs.
+2. `landingsAfterGates` in `lib/bash.js` settles a segment against the segment before it: a segment whose landing follows `;`, `||` or `&` refuses only where the segment before it runs a gate, as a test, a check or a commit. A read-only segment, as `cat`, `grep`, `ls` or `git status`, gates nothing. A pipe counts as a gate break, so `./RUNME.sh check | tail && git commit` refuses, because the pipe answers the exit of `tail`.
+3. `FREE` in `lib/bash.js` takes the harness scratchpad shape, a `scratchpad` folder under a `claude-*` folder, beside `/tmp`, so a desk whose scratchpad stands outside `/tmp` writes there freely.
+4. `untestedIn` in `lib/tested.js` drops a file whose added lines and removed lines hold the same multiset, trimmed, so a move inside a file asks no test.
+5. `toolCall` in `hooks/pull-tool.js` passes `{ env }` to `$.process.run`, carrying the harness keys `HARNESS` in `src/scripts/pull-hand-of.js` names off `process.env`, so `handOf` reads the same agent in the tool and the shell verb.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/bridge/bash.js` `todoOnPush`, `deskGuard` and `trunkGuard` call `touchesGit`
+- `.claude/skills/level0/lib/trunk.js` `landsOnTrunk` calls `touchesGit`
+- `.claude/skills/level0/lib/copilot-runtime.js` calls `landsOnTrunk`
+- `.claude/skills/level0/lib/bash.js` the rules loop calls `landingsAfterGates`
+- `.claude/skills/level0/lib/bash.js` `reaches` and `landing` read `FREE`
+- `.claude/skills/level0/lib/scripted.js` reads `FREE`
+- `src/bridge/bash.js` the tested guard calls `untestedIn`
+- `src/scripts/precommit.js` calls `untestedIn`
+- `.claude/skills/level0/hooks/pull-tool.js` `pulled` and `judged` call `toolCall`
 
 ### tests
 
@@ -117,17 +140,30 @@ A read, a grep and a scratch write pass the shell door, and a landing behind a p
 
 <!-- the form is list -->
 
+- `test/level0/trunk.test.js` "a read quoting git push or git commit touches no git"
+- `test/level0/bash.test.js` "a read before ; gates nothing, and a landing after it passes"
+- `test/level0/bash.test.js` "a pipe before && ahead of a landing refuses"
+- `test/level0/bash.test.js` "a redirect into the harness scratchpad passes"
+- `test/level0/tested.test.js` "a delta whose lines move and change nothing asks no test"
+- `test/level0/level1.test.js` "the pull tool runs the verb under the harness env the shell verb reads"
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first draft
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every function named above stands opened in its file, and `$.process.run` takes its options object in `hooks/level0.js` and `hooks/pull-tool.js`; the `env` key there is unchecked against the engine surface, and the level1 test fakes it
+- the callers list comes off a grep for each changed name over `src`, `.claude` and `test`
+- every done_when line maps to one test above, and `./RUNME.sh check` decides the last
 
 ## review
 
