@@ -34,6 +34,22 @@ test("a push naming the branch passes", () => {
   assert.equal(landsOnTrunk("git push", "work/fix-lsp"), "");
 });
 
+test("a read quoting git push or git commit touches no git", () => {
+  for (const said of [
+    'grep -rn "git push" src',
+    "rg 'git commit -m' .",
+    'echo "git push origin main"',
+  ]) {
+    assert.deepEqual(touchesGit(said), { commits: false, pushes: false }, said);
+  }
+});
+
+test("git inside a shell body or behind xargs still lands", () => {
+  assert.equal(landsOnTrunk('bash -c "git push origin main"', "work/fix-lsp"), "push");
+  assert.equal(landsOnTrunk("echo x | xargs git commit -m", "main"), "commit");
+  assert.equal(landsOnTrunk("cd a && git push origin main", "work/fix-lsp"), "push");
+});
+
 test("a flag before the verb does not hide it", () => {
   assert.equal(landsOnTrunk("git -C . commit -m x", "main"), "commit");
   assert.equal(landsOnTrunk("git --no-pager commit -m x", "main"), "commit");

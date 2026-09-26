@@ -2,19 +2,64 @@
 // branch, so this decides what the write door refuses there.
 // [[spec/design_output/work#a-box-writes-its-branch]]
 
+import { BREAKS, baseName, SHELLS, tokensOf } from "./tokens.js";
+
 export const TRUNK = "main";
 
 // A verb of this tree's own takes its words whole, up to the next operator, so git named in them lands nowhere. [[spec/design_output/work#a-box-writes-its-branch]]
 const VERB_WORDS = /(RUNME\.(?:sh|ps1)\b)(?:[^&|;\n"']|"[^"]*"|'[^']*')*/g;
-const GIT_VERB = (verb) => new RegExp(`\\bgit\\s+(?:-\\S+(?:\\s+\\S+)?\\s+)*${verb}\\b`);
+const GIT_VERB = (verb) =>
+  new RegExp(`\\bgit\\s+(?:-\\S+(?:\\s+\\S+)?\\s+)*${verb}\\b`);
 
 function gitSaid(command) {
   return String(command ?? "").replace(VERB_WORDS, "$1");
 }
 
+// Git counts where it is the command word of a segment, so a read quoting `git push` touches nothing. A `sh -c` body reads as a command of its own, and a prefix as `xargs` passes to the word behind it. [[spec/tickets/a-nested-git-still-lands]]
 export function touchesGit(command) {
-  const said = gitSaid(command);
-  return { commits: GIT_VERB("commit").test(said), pushes: GIT_VERB("push").test(said) };
+  const verbs = gitVerbsIn(String(command ?? ""));
+  return { commits: verbs.includes("commit"), pushes: verbs.includes("push") };
+}
+
+const PREFIXES = new Set(["sudo", "env", "command", "nohup", "time", "exec", "xargs"]);
+const ASSIGNS = /^[A-Za-z_][A-Za-z0-9_]*=/;
+
+function gitVerbsIn(text) {
+  const out = [];
+  let segment = [];
+  const settle = () => {
+    out.push(...verbsOf(segment));
+    segment = [];
+  };
+  for (const one of tokensOf(text)) {
+    if (one.op && BREAKS.has(one.text)) settle();
+    else if (!one.op) segment.push(one.text);
+  }
+  settle();
+  return out;
+}
+
+function verbsOf(words) {
+  let at = 0;
+  while (
+    at < words.length &&
+    (ASSIGNS.test(words[at]) ||
+      PREFIXES.has(baseName(words[at])) ||
+      (at > 0 && words[at].startsWith("-")))
+  )
+    at++;
+  const name = baseName(words[at]);
+  if (SHELLS.has(name)) {
+    const flag = words.indexOf("-c", at + 1);
+    return flag < 0 ? [] : gitVerbsIn(words[flag + 1] ?? "");
+  }
+  if (name !== "git") return [];
+  for (let i = at + 1; i < words.length; i++) {
+    const one = words[i];
+    if (!one.startsWith("-")) return [one];
+    if (one === "-C" || one === "-c") i++;
+  }
+  return [];
 }
 
 // A push naming no branch, or naming `HEAD`, pushes the branch the box stands on. [[spec/design_output/work#a-box-writes-its-branch]]
