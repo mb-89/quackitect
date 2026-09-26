@@ -77,7 +77,12 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d1fe1ca62214 · claude-code-remote
+    hash_before: cf0844ea1f938382f1869c2adaa78caf2b5dd729
+    hash_after: cf0844ea1f938382f1869c2adaa78caf2b5dd729
 ---
 
 # Ask
@@ -107,11 +112,34 @@ The agent reaches git through the engine alone. A hand lands, proves red, rename
 
 <!-- the form is text -->
 
+1. `landed` in `src/scripts/pull-landed.js` stages `one.at` and the paths the step's hand writes, in place of `git add -A`. The apply door in `src/bridge/apply.js` writes the call's `ticket` into its undo journal through `journalOf`. `landed` reads the journals naming `one.name` since the hold's `taken` stamp.
+2. `spec/design_output/pull.md` under `The refused commit` says a hand-back stages the ticket and the files its hand's journals name.
+3. A new `redTest` in `src/scripts/work-test.js` answers `./RUNME.sh test --red`, routed from the `test` entry in `src/scripts/cli.js`. It writes each source's `HEAD` text in place, runs the test through `testSays`, and writes the working text back. An `assertion` answers red, and anything else refuses.
+4. `landsAndPushes` in `src/scripts/commit-verb.js` reads staged renames with `git diff --cached --name-status -M`. A named new path adds its old path to what it stages and commits.
+5. `merge` in `src/scripts/work-merge.js` takes a `claude/` name as the branch and skips the group reads. It asks `git cherry` against `main`, and merges with `--no-ff` only where a commit stays over. Either road runs `checkSays`, and green deletes the branch as `close` does.
+6. `findings` in `.claude/skills/level0/lib/bash.js` refuses `git mv` under `spec/tickets` with a new rule naming `./RUNME.sh rename`.
+7. A new `gitWritesIn` in the same file reads every git subcommand that writes the repository. `findings` refuses each and names the verb a table there holds for it.
+8. `./RUNME.sh check` runs over the change and exits 0.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/scripts/pull-writes.js` `passed`
+- `src/scripts/pull-writes.js` `failed`
+- `src/scripts/pull-writes.js` `became`
+- `src/scripts/pull-writes.js` `answeredBy`
+- `src/scripts/pull.js` `takeBack`
+- `src/scripts/pull-escalate.js` `escalate`
+- `src/bridge/apply.js` `writes`, a caller of `journalOf`
+- `src/scripts/split-verb.js` `wrote`, a caller of `journalOf`
+- `src/scripts/cli.js` the `test` entry of the verb table
+- `src/scripts/commit-verb.js` `commitVerb`, the one caller of `landsAndPushes`
+- `src/scripts/cli.js` the `commit` entry, the caller of `commitVerb`
+- `src/scripts/work.js` `work`, the one caller of `merge`
+- `src/bridge/bash.js` `commandRules`, the one caller of `findings` outside tests
 
 ### tests
 
@@ -119,17 +147,37 @@ The agent reaches git through the engine alone. A hand lands, proves red, rename
 
 <!-- the form is list -->
 
+- `test/level0/landed.test.js` "a pass stages the ticket and the hand's own paths, and leaves a sibling's edit unstaged"
+- `test/level0/test-verb.test.js` "test --red sets the sources aside, answers red on an assertion, and puts them back"
+- `test/level0/test-verb.test.js` "test --red refuses where the test passes with the sources set aside"
+- `test/level0/commit-verb.test.js` "a commit naming a renamed ticket lands the old path's deletion with it"
+- `test/level0/work-group.test.js` "merge takes a claude branch in, runs the check and deletes the branch"
+- `test/level0/work-group.test.js` "merge names main as carrying a claude branch's work, and deletes the branch"
+- `test/level0/bash.test.js` "git mv under spec/tickets refuses and names the rename verb"
+- `test/level0/bash.test.js` "every git command that writes the repository refuses and names its verb"
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first draft
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- (1) I opened `pull-landed.js`, `work-merge.js`, `work-test.js`, `commit-verb.js`, `rename.js`, `lib/bash.js`, `bridge/bash.js`, `bridge/apply.js` and `pull.md`.
+- (1) `landed` runs `git add -A`. `merge` builds `work/<name>` alone. `findings` passes `git mv` under `spec/tickets`, run through node.
+- (1) `rename` stages the move, and `landsAndPushes` commits `-- <paths>` alone, so the old path's deletion stays staged. I read this, and ran it not.
+- (1) No record names the paths a hand writes today, so approach items 2 and 3 add one through the apply journal.
+- (1) `./RUNME.sh check` I ran not, so that claim stays unchecked.
+- (2) I ran grep for `landed(`, `journalOf`, `testVerb`, `commitVerb`, `merge` and `findings` over `src`, `.claude` and `test`.
+- (2) A refusal of every git write reaches cases in `test/level0/bash-commit.test.js` and `test/level0/private.test.js`, which the ask leaves out.
+- (3) Each code line of the ask names its case in tests above. The `pull.md` line stands decided by the lint, and the last line by `./RUNME.sh check`.
 
 ## review
 

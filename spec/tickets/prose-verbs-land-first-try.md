@@ -103,11 +103,28 @@ The judge answers a rule and no line, so a hand sends the same draft again blind
 
 <!-- the form is text -->
 
+1. `judgeAsk` in `.claude/skills/level0/lib/pull.js` takes an optional third argument, the broken label. With it, the question asks for the one evidence line that breaks that rule, word for word.
+2. `judgeRefusal` in the same file takes the quoted line as a second argument, and prints it under the rule. With no line, it prints as it does now.
+3. `judged` in `.claude/skills/level0/hooks/pull-tool.js` asks `$.model.complete` with that question after `$.model.classify` names a broken label. It keeps the answer only where the evidence holds that line.
+4. `judged` counts refusals in a map keyed by ticket and step, in the hook module. Past the count, it lets the hand-back through and clears the key. A pass clears the key too.
+5. `spec/config/level0.json` gains `judge.refusalsBeforePass`, set to 3. `judged` reads it beside `judge.enabled`.
+6. `note` in `src/scripts/ticket.js` cuts a name past `it.words` to its first words, joined by a hyphen. A small helper beside `note` does the cut.
+7. `note` then writes under the cut name, logs the note row under it, and prints the cut name with the cap.
+8. `./RUNME.sh check` runs over the change and exits 0.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `.claude/skills/level0/hooks/pull-tool.js` `judged` calls `judgeAsk` and `judgeRefusal`
+- `.claude/skills/level0/hooks/pull-tool.js` `register`, the `tool.call` handler, calls `judged`
+- `test/level0/level1.test.js` "the judge's question names each rule by its label and carries the evidence whole" calls `judgeAsk` and `judgeRefusal`
+- `test/level0/vehicle.test.js` `plugin` names `judgeAsk` in a fixture string alone, and calls nothing
+- `src/scripts/ticket.js` `ticket` calls `note` through its `doing` table
+- `src/scripts/cli.js` the `ticket` entry of the verb table calls `ticket`
+- `test/level0/ticket-verb.test.js`, `test/level0/roots.test.js` and `test/level0/note-answer.test.js` call `ticket` with `note`
 
 ### tests
 
@@ -115,17 +132,28 @@ The judge answers a rule and no line, so a hand sends the same draft again blind
 
 <!-- the form is list -->
 
+- `test/level0/level1.test.js` "the judge asks for the line that breaks the rule, and the refusal quotes it"
+- `test/level0/level1.test.js` "the judge lets a hand-back through past the count of refusals on one leaf"
+- `test/level0/ticket-verb.test.js` "ticket note cuts a name past the cap, writes under the cut name and says so"
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first draft
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- I opened every file, function and verb the ask names. Each claim holds, but the `complete` call shape stays unchecked, since no code calls it.
+- I searched with grep for each changed function and for the `note` verb. The callers list holds every hit.
+- The first two tests decide the judge lines, and the third decides the note line. `./RUNME.sh check` decides the last.
+
 
 ## review
 

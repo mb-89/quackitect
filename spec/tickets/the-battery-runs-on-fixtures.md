@@ -107,11 +107,38 @@ The tests part of the check falls back. Each slow case proves its step over a fi
 
 <!-- the form is text -->
 
+1. `test/contract/vehicle.test.js` builds a fixture root in its temp folder. It holds the marker, `RUNME.sh` with its run bit, `package.json` and a `.se` file.
+   - The first case calls `produce` over that root. It asserts the three files travel, `.se` stays behind, and the count matches the fixture.
+   - The third case drops the `RUNME.sh vehicle` shell run and `fakeInstall`. It calls `rootsHere` on the vehicle, the function `theVehicle` in `src/scripts/cli.js` reads.
+   - It asserts method and work both name the vehicle, and nothing names the tree.
+2. `test/contract/process.test.js` declares every route's minted ticket through `rulesIn` and `proves` in `test/contract/ruled.js`.
+   - Each text stands at `spec/tickets/<name>-rendered.md`, so the tickets section of `.vale.ini` reads it.
+   - One Vale run reads them all. The case keeps what `voiceOver` keeps: rows past `withoutFalsePast` at a severity `REFUSES` holds.
+   - It asserts `spawned()` answers one.
+3. `test/contract/cli-verbs.test.js` reads the `test` row as text, like its other cases. It asserts the row hands `rest` to `namedTests`, which calls `testVerb`.
+   - The spawn and the `proc` import go. `test/level0/test-verb.test.js` already proves the runner word over a fake.
+4. `bundle` in `src/scripts/bundle.js` takes an optional entry and out, with `ENTRY` and `OUT` as defaults.
+   - `test/contract/drawing-bundle.test.js` writes a stub entry importing one small style sheet. It bundles into a temp folder, and asserts the script and sheet land.
+5. The battery report: `./RUNME.sh check` writes `slowest` into `.se/.runtime/check.json`. The tests-green step reads it and names none of the four files there.
+6. `test/contract/paragraph.test.js`, `test/contract/vale.test.js` and `test/contract/vale-paths.test.js` stay untouched.
+7. Those three keep the real Vale binary on purpose. Its runs hold their time: one run a file through `rulesIn`, and the door runs in `vale.test.js`.
+8. `./RUNME.sh check` exits 0 on the commit, as the tests-green step records.
+
+A risk: `test/contract/drawing-page.test.js` bundles the real drawing in `before` when `bundled` says stale. Until now the bundle case ran first and left it fresh.
+The install bundles too, so a fresh box meets no cost there. If the report names `drawing-page.test.js`, that time comes off the install gap.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/scripts/bundle.js` the script guard at its foot, calling `bundle`
+- `src/scripts/install.sh` the bundle step, running `node src/scripts/bundle.js`
+- `test/contract/drawing-page.test.js` `before`, calling `bundle`
+- `test/contract/drawing-bundle.test.js` its one case, calling `bundle`
+- `src/scripts/cli.js` `testArgv`, through `test` and the `check` verb, loading every changed test file
+- `src/scripts/cli.js` `namedTests`, running a named test file through `testVerb`
 
 ### tests
 
@@ -119,17 +146,34 @@ The tests part of the check falls back. Each slow case proves its step over a fi
 
 <!-- the form is list -->
 
+- `test/contract/vehicle.test.js` "a vehicle carries the fixture's marker and run bits, and leaves its private folder behind"
+- `test/contract/vehicle.test.js` "a vehicle names itself as method and work, with no tree behind it"
+- `test/contract/process.test.js` "a ticket minted off every route draws no finding from the voice rules, in one Vale run"
+- `test/contract/cli-verbs.test.js` "the test verb hands the files you name to the branch runner"
+- `test/contract/drawing-bundle.test.js` "the step writes a script and its style sheet off a stub entry"
+- `./RUNME.sh check` and its `slowest` list decide the report line and the check line, and no test does
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first draft
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- Opened all seven test files and `test/contract/ruled.js`.
+- Opened `src/scripts/vehicle.js`, `src/scripts/bundle.js` and `src/bridge/findings.js`.
+- Opened the `test` and `vehicle` verbs in `src/scripts/cli.js`.
+- Unchecked: no `.se/.runtime/check.json` stands on this box, so which cases lead the slowest list stays unread.
+- The ask says `cli.js test` spawns where a fake proves the verb. True: `test/level0/test-verb.test.js` proves it over `fakeProc`.
+- Grep for `bundle(` and `bundle.js` gave the callers of `bundle`. The test files change no export, so the runner is their one caller.
+- Each numbered item names its case in the tests list. The report and check lines name `./RUNME.sh check` in their place.
 
 ## review
 
