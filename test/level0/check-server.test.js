@@ -28,6 +28,7 @@ test("the check answers no hook probe of its own, and cli-hooks.js answers it", 
     undefined,
     "cli-check.js hands the hook probe to cli-hooks.js",
   );
+  assert.equal(check.hookRows, undefined, "and the rows it answers");
 });
 
 // A fetch door answering the health call, so the probe runs off the wire. [[spec/design_output/doors#a-fake-behaves]]

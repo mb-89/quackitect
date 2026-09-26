@@ -19,11 +19,7 @@ import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
 import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { CONFIG, fromJson } from "../../.claude/skills/level0/lib/vale.js";
-import {
-  POINTER,
-  PORT_BASE,
-  SETTINGS,
-} from "../../.claude/skills/level0/lib/vehicle.js";
+import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { vale } from "../doors/vale.js";
 import { guidanceHere } from "../bridge/guidance.js";
 import {
