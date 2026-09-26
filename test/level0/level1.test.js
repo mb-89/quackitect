@@ -266,6 +266,20 @@ test("the pull tool runs the verb under the harness env the shell verb reads", a
       },
     },
   };
+  const read = [];
+  const engine = {
+    ...$,
+    env: {
+      get: async (key) => {
+        read.push(key);
+        return key === "SE_CLOUD" ? "1" : undefined;
+      },
+    },
+  };
+  await handler(engine, {}, async () => null);
+  assert.ok(read.includes("CLAUDE_CODE_REMOTE"), "the key reads through the engine");
+  assert.equal(opts[0]?.env?.SE_CLOUD, "1");
+  opts.length = 0;
   try {
     await handler($, {}, async () => null);
   } finally {
@@ -273,4 +287,13 @@ test("the pull tool runs the verb under the harness env the shell verb reads", a
     else process.env.CLAUDE_CODE_REMOTE = before;
   }
   assert.equal(agentOf(opts[0]?.env), "claude-code-remote");
+  const { HARNESS } = await import("../../src/scripts/pull-hand-of.js");
+  const { HARNESS_KEYS } = await import(
+    "../../.claude/skills/level0/hooks/pull-tool.js"
+  );
+  assert.deepEqual(
+    HARNESS_KEYS,
+    HARNESS.map(([key]) => key),
+    "the copy stands equal",
+  );
 });

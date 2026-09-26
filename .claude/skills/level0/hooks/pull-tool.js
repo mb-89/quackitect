@@ -87,14 +87,35 @@ function toolCall(e) {
   return [...cli, ...PULL, TOOL, JSON.stringify(e ?? {})];
 }
 
-// The verb runs under the env the session carries, so it reads the harness keys, and the hand the shell verb reads. A hook scope holding no process hands none, and the child takes the engine's own. [[spec/tickets/doors-read-what-commands-do]]
-function running() {
-  const env = globalThis.process?.env;
-  return env ? { timeoutMs: RUNNING, env: { ...env } } : { timeoutMs: RUNNING };
+// The verb runs under the harness keys the session carries, so it reads the hand the shell verb reads. The engine merges this env over its own, and `$.env.get` reads a key where the hook scope holds no process. [[spec/tickets/pull-env-meets-the-engine]]
+// A copy of the keys `HARNESS` in src/scripts/pull-hand-of.js names, because a hook reaches no file past the plugin. The level1 case reads both. [[spec/tickets/pull-env-meets-the-engine]]
+export const HARNESS_KEYS = ["CLAUDE_CODE_REMOTE", "SE_CLOUD", "CLAUDECODE"];
+
+async function running($) {
+  // The engine reads each env call off the source, so every key stands spelled at its own call. [[spec/tickets/pull-env-meets-the-engine]]
+  const said = [
+    await envOf(() => $.env.get("CLAUDE_CODE_REMOTE")),
+    await envOf(() => $.env.get("SE_CLOUD")),
+    await envOf(() => $.env.get("CLAUDECODE")),
+  ];
+  const env = {};
+  HARNESS_KEYS.forEach((key, at) => {
+    const value = said[at] ?? globalThis.process?.env?.[key];
+    if (value) env[key] = String(value);
+  });
+  return Object.keys(env).length ? { timeoutMs: RUNNING, env } : { timeoutMs: RUNNING };
+}
+
+async function envOf(read) {
+  try {
+    return await read();
+  } catch {
+    return undefined;
+  }
 }
 
 async function pulled($, e) {
-  const ran = await $.process.run(toolCall(e), running());
+  const ran = await $.process.run(toolCall(e), await running($));
   return `${ran.stdout ?? ""}${ran.stderr ?? ""}`.trim() || `exit ${ran.exitCode}`;
 }
 
@@ -122,7 +143,7 @@ async function judged($, e) {
   const judge = settings?.judge ?? {};
   if (judge.enabled === false) return "";
 
-  const ran = await $.process.run([...toolCall(e), JUDGE], running());
+  const ran = await $.process.run([...toolCall(e), JUDGE], await running($));
   const material = parsed(ran.stdout);
   if (!material?.rules?.length || !String(material.evidence ?? "").trim()) return "";
 
