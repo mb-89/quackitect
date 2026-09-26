@@ -72,7 +72,11 @@ test("the module registers one session start, and it registers the pull tool and
   const registered = [];
   const box = harness();
   box.$.tool.register = async (spec) => void registered.push(spec.name);
-  await starts[0](box.$, { session_id: "s1", client: "claude-code" }, async (said) => said);
+  await starts[0](
+    box.$,
+    { session_id: "s1", client: "claude-code" },
+    async (said) => said,
+  );
   assert.equal(registered[0], "pull", "the pull tool registers first");
   for (const one of READ_TOOLS) assert.ok(registered.includes(one.name), one.name);
 });
@@ -153,7 +157,11 @@ test("the judge's question names each rule by its label and carries the evidence
 
 // [[spec/tickets/the-judge-reads-answer-rules]]
 test("the labels the judge picks from open on follows, one label a rule after it", () => {
-  assert.equal(typeof level1.judgeLabels, "function", "the wrapper answers judgeLabels");
+  assert.equal(
+    typeof level1.judgeLabels,
+    "function",
+    "the wrapper answers judgeLabels",
+  );
   assert.deepEqual(level1.judgeLabels(RULES), ["follows", "voice-1", "voice-3"]);
   assert.deepEqual(level1.judgeLabels([]), ["follows"]);
 });
@@ -216,9 +224,12 @@ test("an event naming no session writes nothing, and says the hand stands at the
 test("the pull hook matches the level zero call, and runs the script the method root holds", async () => {
   const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
   const calls = [];
-  register((event, ...rest) => {
-    if (event === "tool.call" && rest.length > 1) calls.push(rest);
-  }, { method: "/vehicle/" });
+  register(
+    (event, ...rest) => {
+      if (event === "tool.call" && rest.length > 1) calls.push(rest);
+    },
+    { method: "/vehicle/" },
+  );
   const [filter, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
   assert.equal(filter?.tool, "mcp__level0__pull");
 
@@ -245,7 +256,12 @@ async function judgeRuns(config) {
   const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
   const ran = [];
   const asked = [];
-  const material = { ticket: "a-child", step: "design/draft", evidence: "x", rules: RULES };
+  const material = {
+    ticket: "a-child",
+    step: "design/draft",
+    evidence: "x",
+    rules: RULES,
+  };
   const $ = {
     fs: { read: async () => JSON.stringify(config) },
     process: {
@@ -270,9 +286,8 @@ async function judgeRuns(config) {
   return { judged: ran.some((argv) => argv.includes("--judge")), asked: asked.length };
 }
 
-// The judge runs where the config turns it on alone. The hook's line waits on the owner, because the hand working the ticket holds no write under .claude. [[spec/tickets/every-road-has-a-caller]]
-const HOOK_WAITS = "judged in the pull hook reads enabled !== true once the owner lands it";
-test("a config naming no judge runs no judge, and true alone turns it on", { todo: HOOK_WAITS }, async () => {
+// The judge runs where the config turns it on alone. [[spec/tickets/every-road-has-a-caller]]
+test("a config naming no judge runs no judge, and true alone turns it on", async () => {
   assert.deepEqual(await judgeRuns({}), { judged: false, asked: 0 });
   assert.deepEqual(await judgeRuns({ judge: {} }), { judged: false, asked: 0 });
   assert.deepEqual(await judgeRuns({ judge: { enabled: false } }), {

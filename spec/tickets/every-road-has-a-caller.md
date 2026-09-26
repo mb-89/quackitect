@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 63693613eded · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box 63693613eded · claude-code-remote · helper-2
     hash_before: 96b89b6f57867404aef0c0918b36c1be60ab4f4e
     hash_after: 96b89b6f57867404aef0c0918b36c1be60ab4f4e
+  - step: implement/tests-red
+    hand: box d7a44d6f73215 · claude-code-remote
+    hash_before: 2c2e2755777a51e8a16359c3159f3edf2990e002
+    hash_after: 2c2e2755777a51e8a16359c3159f3edf2990e002
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -250,6 +258,8 @@ Over the code before the change, every new case fails:
 - the judge's case stays red after the change too, because its line stands under `.claude`. It stands `todo` and names that.
 
 What surprises: the check already reads no row on a closed ticket, so the closed tickets carrying `when: returned` pass with no edit. The write door still reads the whole schema on a write to one of them.
+
+A later box finds the change landed ahead of this leaf, so every case but the judge's reads green. This box writes under `.claude`, so the judge's case drops its `todo` and fails on its own assertion: a config naming no judge still asks the model once. The change leaf writes `judge.enabled !== true` into `judged`.
 
 ### checked
 
