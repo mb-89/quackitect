@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-owners-word-reaches-work
 parent: the-owner-view-decides-done
+record:
+  - step: do
+    hand: box fcc1ba4a896f · claude-code-remote
+    hash_before: b0f7d9a96e5963495b55d4bdc4a6a917a3b5bb79
+    hash_after: b0f7d9a96e5963495b55d4bdc4a6a917a3b5bb79
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-view-fails-to-implement.md:39:1: CodeSpans: A sentence holds 4 code spans, and this one holds 6. Carry "
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ the `view` step names no `on_fail`, so `failed` in `src/scripts/pull-writes.js` 
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/process.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ the `view` step names no `on_fail`, so `failed` in `src/scripts/pull-writes.js` 
 
 <!-- the form is text -->
 
+The `view` step in `spec/processes/standard.yaml` carries `on_fail: implement`, so the owner's fail sends the ticket back to the code. It landed with `the-owner-view-decides-done`, and the standard route case asserts it.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask, and landed with its parent's build
+- no cleanup stands revealed
+- the route states the fail target once, and the case reads it there
 
 # Discussion
 
