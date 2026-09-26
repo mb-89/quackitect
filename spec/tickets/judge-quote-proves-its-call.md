@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-verbs-land-whole
 parent: prose-verbs-land-first-try
+record:
+  - step: do
+    hand: box d7a55188b9103 · claude-code-remote
+    hash_before: 9fde03145f79b264c361d8a067bbbbcd0ced3586
+    hash_after: 9fde03145f79b264c361d8a067bbbbcd0ced3586
+reason: became
+successors: [prose-verbs-land-first-try]
 ---
 
 # Ask

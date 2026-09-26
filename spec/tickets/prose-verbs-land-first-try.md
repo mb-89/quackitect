@@ -252,3 +252,5 @@ pass with findings
 <!-- what anybody adds, at any time, on this ticket -->
 
 The two judge cases the build adds hand the hook a config with `judge.enabled` set to true, as `judgeRuns` in `test/level0/level1.test.js` does. Main turns the judge off by default, so a case under the default proves nothing. [[spec/tickets/judge-cases-turn-it-on]] carries the finding into this build.
+
+Approach item 3 asks `$.model.complete`, and no code, note or fake here names that call. The tests-red step proves it against the hook runtime first. Where it stands nowhere, the quote comes out of `classify`. [[spec/tickets/judge-quote-proves-its-call]] carries the finding into this build.
