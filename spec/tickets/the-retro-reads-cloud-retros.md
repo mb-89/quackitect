@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
@@ -93,6 +93,10 @@ record:
     hand: box b8ae1b45d463 · claude-code-remote
     hash_before: 8ea93b0107a57e656f1797d2e27dea0807ae3b03
     hash_after: 8ea93b0107a57e656f1797d2e27dea0807ae3b03
+  - step: design/review
+    hand: box b8ae1b45d463 · claude-code-remote · helper-4
+    hash_before: 86aee6b0b70d99e4b2260b41ba8d139724e4b404
+    hash_after: 86aee6b0b70d99e4b2260b41ba8d139724e4b404
 ---
 
 # Ask
@@ -230,15 +234,13 @@ This composes with `the-retro-finishes-its-asks`:
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- the keep pushes the raw transcript to the remote, and a transcript carries the owner's name, email, home and note text, which the private half keeps home. `git hash-object` and `git commit-tree` walk past the commit door, so the draft's assumption that the door keeps a transcript off git holds for no commit this approach makes. For details, see [[spec/design_output/private#the-run-and-the-token]]
-- the keep leans on the cloud proxy taking a push to `refs/transcripts/<group>`, and the draft checks it nowhere. A box's proxy takes a push to a branch, and a refused keep answers `1` on every `branch done`, so the group stays held and never leaves
-- the group ticket's `retro` step already holds the box's own account of its transcript: `write` asks `badly` with its moment in the transcript and `thoughts` off the transcript, and `cloud` asks `lacked`, `met` and `left`. That chapter lands on trunk with `branch merge`, so `cloudInto` reading it answers the first two ask lines with no ref, no keep and no change to `leaves` in `src/scripts/work.js`
-- the fourth ask line stands against the private half as written. Name the answer the redraft gives it: the `write` step reads the transcript on the box and the chapter carries its account, or the ask goes back to the owner to drop the line
-- the third ask line, a cloud transcript beside the desk's own, falls with the fourth. The redraft reads the chapter's `badly` and `thoughts` beside the desk transcript over the hours the chapter covers
-- the composition with `the-retro-finishes-its-asks` still reads true: `copyTree` takes `window` last, `outsideInto` alone passes it, and `keptInto` copies `KEPT`, which `movedInto` skips. A redraft keeping `cloudInto` after `outsideInto` still meets separate hunks
-- the count and the second pass carry into the redraft as drafted: `sourceOf` names `groups`, and a group under `input/groups` stays out of `--again`
+- the redraft names its departure from ask lines 3 and 4 plainly: `privateIn` in `.claude/skills/level0/lib/private.js` keeps the box names a transcript carries off git, so the group's `# retro` chapter stands in for the transcript, and the transcript stays on the box. The owner reads that departure at the merge
+- the case the draft names for the `write` step reads the real `spec/processes/group.yaml`, and a case under `test/level0` takes fakes alone. The builder writes it in `test/contract/process.test.js`, and a fake-git case in `test/level0/retro-collect.test.js` decides that the chapter reaches `retro collect` once the branch leaves
+- the close the draft reads is the commit time of the box's own closing commit, and `branch merge` in `src/scripts/work-merge.js` lands it later with `merge --no-ff`. A group the box closes before the last retro's collect and trunk takes after it falls outside both windows. The builder reads the close off the trunk commit that lands the ticket, such as `git log --first-parent` with `--diff-merges=first-parent`
+- rule 1 in `spec/guidance/retro/read.md` holds a reader to its chapter's lines. The builder writes the new rule as the one reach past them, so the two rules read as one
+- the fake git in `test/level0/retro-collect.test.js` answers `abc123` to every call, so the new cases need a fake answering `log` and the ticket text by its arguments
 
 # implement
 
