@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box b8ae1b45d463 · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box b8ae1b45d463 · claude-code-remote · helper-2
     hash_before: 934c928b6451c2af045b98579c3a882101fa30da
     hash_after: 934c928b6451c2af045b98579c3a882101fa30da
+  - step: implement/tests-red
+    hand: box b8ae1b45d463 · claude-code-remote
+    hash_before: 4eeefda9c0dc18b0027b5907b00353dc9282a832
+    hash_after: 4eeefda9c0dc18b0027b5907b00353dc9282a832
+    answered:
+      - name: tests
+        exit: 1
+        said: "assertion: the tests fail on their own assertion at 7373a634"
 ---
 
 # Ask
@@ -211,17 +219,33 @@ pass
 
 <!-- the form is command -->
 
+    .se/scripts/red-at.sh 7373a634 test/level0/cloud-desk.test.js test/contract/cli-check-doors.test.js test/contract/vale.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the change landed before this leaf, so `red-at.sh` runs the tests at the tip over the tree of the commit before the change
+- there, the source case fails: `pull-push.js` and `stop.js` read `inCloud`, and `named.js` builds its own `WHERE`
+- there, `cloud-desk.test.js` stops at its import, because `folders.js` exports no `PUBLIC_TICKETS` yet
+- the port pair case passes from the first run, because both pairs match today, and it fails the day one side moves
+- the number word case fails over the header `ephemeral.js` carried, and the heading case fails over a heading counting a list and a table
+- what surprises the hand: the long header fixture spelled its lines as number words, so it tripped the wider rule and took other words
+- what surprises the hand: the plugin imports nothing past its own folder, so the public ticket folder moves into `folders.js`
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- [x] the change touches no file the ask leaves out: past the named files, it touches the headers and headings the wider rules refuse, as the review asks
+- [x] every door the change reaches has a fake: the level zero cases read no disk, and the source reads stand in `test/contract`
+- [x] a comment names the approach the change implements: each new case and constant carries the pointer at this ticket or its note
+- [x] every fact the change adds stands in one place: `folders.js` owns the ticket folder, `cloudHere` the cloud read, and `port.go` the port pair
+- [x] every row the design review passes with stands fixed in the change: the plugin import, the headers, the headings and their links
 
 ## change
 
