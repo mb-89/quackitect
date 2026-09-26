@@ -5,8 +5,8 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import * as tested from "../../.claude/skills/level0/lib/tested.js";
+import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { behaves } from "../../src/doors/fake/behaves.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -213,13 +213,21 @@ test("a line of code beside a comment asks a test, added or traded away", () => 
     path: "src/bridge/one.js",
     rows: ["-export const one = 1;", POINTER_NOW],
   });
-  assert.deepEqual(untestedIn(traded), ["src/bridge/one.js"], "code traded for a comment");
+  assert.deepEqual(
+    untestedIn(traded),
+    ["src/bridge/one.js"],
+    "code traded for a comment",
+  );
 
   const dashed = staged({
     path: "src/bridge/one.js",
     rows: ["---x;", POINTER_NOW],
   });
-  assert.deepEqual(untestedIn(dashed), ["src/bridge/one.js"], "a removed line reading --x is code");
+  assert.deepEqual(
+    untestedIn(dashed),
+    ["src/bridge/one.js"],
+    "a removed line reading --x is code",
+  );
 });
 
 // [[spec/tickets/a-comment-hunk-is-prose]]
@@ -242,7 +250,9 @@ test("a comment fix beside a deleted module asks nothing, and a rename with no h
 
 // Go, the level0 lib and its hooks are code the door reads, and a Go test answers for every file of its folder. [[spec/design_output/tree#the-rules-over-two-files]]
 test("a Go file, a lib file and a hook file each ask a test, and a Go test of the folder answers", () => {
-  assert.deepEqual(untestedIn(delta("src/engine/queue/pick.go")), ["src/engine/queue/pick.go"]);
+  assert.deepEqual(untestedIn(delta("src/engine/queue/pick.go")), [
+    "src/engine/queue/pick.go",
+  ]);
   assert.deepEqual(untestedIn(delta(".claude/skills/level0/lib/one.js")), [
     ".claude/skills/level0/lib/one.js",
   ]);
@@ -259,7 +269,11 @@ test("a Go file, a lib file and a hook file each ask a test, and a Go test of th
     ["src/engine/queue/pick.go"],
     "a Go test of another folder names none",
   );
-  assert.deepEqual(untestedIn(delta("src/engine/queue/order_test.go")), [], "a Go test is no source");
+  assert.deepEqual(
+    untestedIn(delta("src/engine/queue/order_test.go")),
+    [],
+    "a Go test is no source",
+  );
 });
 
 // The tests-red leaf lands the test, and the change leaf carries it. [[spec/design_output/tree#the-rules-over-two-files]]
@@ -270,17 +284,25 @@ test("a test the held ticket carries answers the change, and a stray one carries
     "src/bridge/one.js",
   ]);
   const read = (path) =>
-    path === "test/level0/other.test.js" ? "import { one } from '../../src/bridge/one.js';\n" : "";
+    path === "test/level0/other.test.js"
+      ? "import { one } from '../../src/bridge/one.js';\n"
+      : "";
   assert.deepEqual(untestedIn(code, read, false, ["test/level0/other.test.js"]), []);
   assert.deepEqual(
-    untestedIn(delta("src/engine/queue/pick.go"), undefined, false, ["src/engine/queue/pick_test.go"]),
+    untestedIn(delta("src/engine/queue/pick.go"), undefined, false, [
+      "src/engine/queue/pick_test.go",
+    ]),
     [],
   );
 });
 
 // A command field holds one line indented four spaces, and a test path or a Go test path in it carries. [[spec/design_output/tree#the-rules-over-two-files]]
 test("the carried tests are the test paths the ticket's command lines name, and prose names none", () => {
-  assert.equal(typeof tested.carriedIn, "function", "tested.js answers the carried tests");
+  assert.equal(
+    typeof tested.carriedIn,
+    "function",
+    "tested.js answers the carried tests",
+  );
   const ticket = [
     "---",
     "kind: [[ticket]]",
@@ -303,4 +325,29 @@ test("the carried tests are the test paths the ticket's command lines name, and 
     "src/engine/queue/pick_test.go",
   ]);
   assert.deepEqual(tested.carriedIn(""), []);
+});
+
+// [[spec/tickets/a-reorder-asks-a-test]]
+test("a function moved whole asks no test, and a statement moved inside a body still asks", () => {
+  const moved = [
+    "diff --git a/src/bridge/one.js b/src/bridge/one.js",
+    "@@ -1,3 +0,0 @@",
+    "-function a() {",
+    "-  return 1;",
+    "-}",
+    "@@ -9,0 +7,3 @@",
+    "+function a() {",
+    "+  return 1;",
+    "+}",
+  ].join("\n");
+  assert.deepEqual(untestedIn(moved), []);
+
+  const reordered = [
+    "diff --git a/src/bridge/one.js b/src/bridge/one.js",
+    "@@ -2 +1,0 @@",
+    "-  return x;",
+    "@@ -3,0 +3 @@",
+    "+  return x;",
+  ].join("\n");
+  assert.deepEqual(untestedIn(reordered), ["src/bridge/one.js"]);
 });
