@@ -8,6 +8,7 @@ import { classes } from "../engine/retro/classes.js";
 import { effect } from "../engine/retro/effect.js";
 import { matrix } from "../engine/retro/matrix.js";
 import { mint } from "../engine/retro/mint.js";
+import { readChapter } from "../engine/retro/read.js";
 import { timeline } from "../engine/retro/timeline.js";
 import { fieldOf, NOTE_END, TICKETS, ticketNamed } from "../engine/group.js";
 import { collect } from "./retro-collect.js";
@@ -28,6 +29,8 @@ export function retro(root, argv, doors) {
   if (what === "chapters") return chapters(it, argv[1]);
   // [[spec/guidance/retro/read]]
   if (what === "matrix") return matrix(it, argv[1]);
+  // [[spec/tickets/the-retro-finishes-its-asks]]
+  if (what === "read") return readChapter(it, argv[1], argv[2]);
   // [[spec/guidance/retro/effect]]
   if (what === "effect") return effect(it, argv[1]);
   // [[spec/guidance/retro/classify]]
@@ -52,6 +55,9 @@ export function retro(root, argv, doors) {
     "  timeline <retro> the hours holding work, per source, with the idle stretches between",
   );
   console.log("  chapters <retro> checks the cuts, and hands every chapter its lines");
+  console.log(
+    "  read <retro> <chapter>  every owner prompt, fault and command of the chapter, with its file and line",
+  );
   console.log(
     "  matrix <retro>   draws the report: the class fixes first, then the matrix",
   );

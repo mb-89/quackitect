@@ -1,4 +1,4 @@
-// The clear as three ephemeral tickets, driven through the pull's fake doors:
+// The clear as a run of ephemeral tickets, driven through the pull's fake doors:
 // a session due takes the handover ticket once the ticket in hand stands done,
 // its hand-back checks the file and hands the clear, the clear takes no
 // hand-back, and the read of the handover hands the queue back.

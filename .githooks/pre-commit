@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # The commit door for a person in a terminal.
-# [[spec/design_output/private#two-doors-one-check]]
+# [[spec/design_output/private#both-doors-one-check]]
 set -eu
 here=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 

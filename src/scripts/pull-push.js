@@ -3,7 +3,7 @@
 // stands on this box. A refusal answers the push door's own cause.
 // [[spec/design_output/pull#the-rejected-push]]
 
-import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
+import { cloudHere } from "../../.claude/skills/level0/lib/cloud.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { saidBy } from "./commit-verb.js";
 
@@ -15,7 +15,7 @@ const SENT = Object.freeze({ ok: true, local: false, why: [] });
 // [[spec/design_output/pull#the-rejected-push]]
 export function pushed(it, branch, { red = false } = {}) {
   // A desk lands its hand-back on this box, as its commit verb does. [[spec/guidance/working]]
-  if (!(it.cloud ?? inCloud(it.env ?? {}))) {
+  if (!cloudHere(it)) {
     return {
       ok: true,
       local: true,

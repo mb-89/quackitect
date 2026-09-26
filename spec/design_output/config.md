@@ -18,7 +18,7 @@ each open `spec/config/level0.json` without it. Each one keeps what it reads
 for the life of its process, so one number stands cached wherever a reader
 keeps it.
 
-# The three layers
+# The layers
 
 | layer | who writes it | when a reader reads it |
 |---|---|---|

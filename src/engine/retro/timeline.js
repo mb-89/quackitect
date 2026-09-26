@@ -6,7 +6,7 @@ import { RETRO } from "../../../.claude/skills/level0/lib/folders.js";
 
 export const INPUT = "input";
 // The sources a line carries a time in, and the field naming it. [[spec/guidance/retro/chapter]]
-const TIMED = [
+export const TIMED = [
   { top: "transcripts", field: /"timestamp":"([^"]+)"/ },
   { top: "log", field: /"at":"([^"]+)"/ },
 ];
@@ -20,7 +20,7 @@ const COLUMNS = [
 ].map((column) => ({ ...column, width: column.head.length }));
 const HOUR_KEY = 13;
 // A line a transcript writes as a failing tool result, and a log line at a failing level. [[spec/guidance/retro/signals]]
-const FAULT = /"is_error":\s*true|"level":"(?:warn|error|fatal)"/;
+export const FAULT = /"is_error":\s*true|"level":"(?:warn|error|fatal)"/;
 
 // The retro's own folder. [[spec/guidance/retro/chapter]]
 export function homeOf(it, name) {

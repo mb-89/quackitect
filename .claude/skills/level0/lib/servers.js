@@ -42,7 +42,8 @@ export function namesTheBinaries(settings) {
   const biome = read["biome.lsp.bin"] ?? {};
   const paths = typeof biome === "string" ? [biome] : Object.values(biome);
   return {
-    vale: read["vale.valeCLI.path"] === `${BIN}/vale`,
+    // The install writes vale.exe on Windows, so either name holds. [[spec/tickets/the-small-faults-land]]
+    vale: [`${BIN}/vale`, `${BIN}/vale.exe`].includes(read["vale.valeCLI.path"]),
     valeConfig: read["vale.valeCLI.config"] === EDITOR_VALE_INI,
     managesVale: read["vale.valeCLI.installVale"] === false,
     biome: paths.length > 0 && paths.every((one) => one.startsWith(`${BIN}/biome`)),

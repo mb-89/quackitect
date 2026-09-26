@@ -51,6 +51,9 @@ export const HOLD = `${RUN}/hold.json`;
 export const LOG = `${PRIVATE}/.log`;
 export const NOTES = `${PRIVATE}/notes`;
 export const TICKETS = `${PRIVATE}/tickets`;
+// The public tickets and the end every note carries. src/engine/group.js reads them here, because the plugin imports nothing outside its folder. [[spec/design_output/level0#a-write-names-its-ticket]]
+export const PUBLIC_TICKETS = "spec/tickets";
+export const NOTE_END = ".md";
 // The handover one session leaves the next on this box, which the first read deletes. [[spec/design_output/work#one-handover-stands]]
 export const HANDOVER = `${PRIVATE}/HANDOVER.md`;
 // The mark the context door leaves where the session goes due, so the pull hands the clear's tickets after the ticket in hand. [[spec/design_input/the-clear-hands-ephemeral-tickets]]

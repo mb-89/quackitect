@@ -1,5 +1,5 @@
-// The config a Go program reads. One reader answers a key over the three
-// layers, and answers the map a named file holds at a key.
+// The config a Go program reads. One reader answers a key over every
+// layer, and answers the map a named file holds at a key.
 // [[spec/design_output/config#the-go-reader]]
 package config
 
@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-// The two files the layers stand in, the local one owned by .claude/skills/level0/lib/folders.js and spelled again here because a Go module imports no JavaScript. [[spec/design_output/config#the-three-layers]]
+// The two files the layers stand in, the local one owned by .claude/skills/level0/lib/folders.js and spelled again here because a Go module imports no JavaScript. [[spec/design_output/config#the-layers]]
 const (
 	Tracked = "spec/config/level0.json"
 	Local   = ".se/.runtime/config.json" // .claude/skills/level0/lib/folders.js owns this name

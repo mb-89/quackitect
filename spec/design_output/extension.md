@@ -70,7 +70,7 @@ tree splits that file in two already. The tracked file holds the values a
 person edits, and the schema beside it says the type of each key. A widget
 field goes where the type stands, so one key stays one entry.
 
-# The five widgets
+# The widgets
 
 | type | writes | reads |
 |---|---|---|

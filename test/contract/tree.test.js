@@ -208,6 +208,21 @@ test("a settings file naming another binary is refused", () => {
   assert.ok(found[0].line > 1, "it points at the line naming the binary");
 });
 
+// The install writes vale.exe on Windows, so the rule takes it, and the tracked settings keep the plain name. [[spec/tickets/the-small-faults-land]]
+test("a settings file naming the Windows vale passes, and the tracked one names the plain vale", () => {
+  const found = settingsNameBinaries(
+    fakeTree({
+      [EDITOR_SETTINGS]: edited(EDITOR_SETTINGS, (said) => {
+        said["vale.valeCLI.path"] = ".se/.runtime/bin/vale.exe";
+      }),
+      [INSTALL]: text(INSTALL),
+    }),
+  );
+
+  assert.deepEqual(found, []);
+  assert.equal(read(EDITOR_SETTINGS)["vale.valeCLI.path"], ".se/.runtime/bin/vale");
+});
+
 test("an install script installing no vale is refused", () => {
   const found = settingsNameBinaries(
     fakeTree({

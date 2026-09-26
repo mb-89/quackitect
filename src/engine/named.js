@@ -3,13 +3,12 @@
 // [[spec/design_output/level0#a-write-names-its-ticket]]
 
 import { join } from "node:path";
-import { PATCH } from "../../.claude/skills/level0/lib/apply.js";
+import { PATCH, TICKET_WHERE as WHERE } from "../../.claude/skills/level0/lib/apply.js";
 import { TICKETS as PRIVATE } from "../../.claude/skills/level0/lib/folders.js";
 import { CLOSED, fieldOf, NOTE_END, TICKETS, ticketNamed } from "./group.js";
 
 const STATE = "state";
 const FOLDERS = [TICKETS, PRIVATE];
-const WHERE = `its file name under ${TICKETS} or ${PRIVATE}, without ${NOTE_END}`;
 const HEAD = /^([^\s:]+):/;
 
 export const FIELD_HOW = `Name the open ticket this write serves in the ticket field: ${WHERE}.`;

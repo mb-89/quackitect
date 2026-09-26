@@ -391,7 +391,7 @@ ifVale(
   proves(
     {
       long: at(
-        "// one\n// two\n// three\n// four\n// five\n// six\n\nexport const one = 1;\n",
+        "// alpha\n// beta\n// gamma\n// delta\n// epsilon\n// zeta\n\nexport const one = 1;\n",
         "src/bridge/probe.js",
       ),
       counted: at(
@@ -408,6 +408,55 @@ ifVale(
       }
       assert.deepEqual(
         said.rules("plain").filter((one) => one === "CodeHeader"),
+        [],
+      );
+    },
+  ),
+);
+
+// A number word counts a thing whatever word follows it. The fixture is the header ephemeral.js carried. [[spec/tickets/each-fact-keeps-one-owner]]
+ifVale(
+  "a header naming a number word refuses, over the header ephemeral.js carried",
+  proves(
+    {
+      ephemeral: at(
+        "// The tickets the engine mints at a pull. Each stands in the hold alone,\n// carries no file, and dies at its hand-back. The clear runs as three of them,\n// and the context door marks the session due so the pull hands the first.\n\nexport const one = 1;\n",
+        "src/scripts/ephemeral.js",
+      ),
+      plain: at(
+        "// The tickets the engine mints at a pull. The clear runs as a run of them.\n\nexport const one = 1;\n",
+        "src/scripts/ephemeral.js",
+      ),
+    },
+    (said) => {
+      const rows = said.found("ephemeral").filter((one) => one.rule === "CodeHeader");
+      assert.equal(rows.length, 1, "the number word meets the header rule");
+      assert.equal(rows[0].severity, "error");
+      assert.deepEqual(
+        said.rules("plain").filter((one) => one === "CodeHeader"),
+        [],
+      );
+    },
+  ),
+);
+
+// A heading counting the structure under it says what the rows say. [[spec/tickets/each-fact-keeps-one-owner]]
+ifVale(
+  "a heading counting the list or the table under it warns",
+  proves(
+    {
+      list: at("# Scope\n\nThe notes.\n\n## The three steps\n\n- one\n- two\n- three\n", "notes.md"),
+      table: at("# Scope\n\nThe notes.\n\n## Four rows\n\n| a | b |\n|---|---|\n| x | y |\n", "notes.md"),
+      named: at("# Scope\n\nThe notes.\n\n## The steps\n\n- one\n- two\n- three\n", "notes.md"),
+    },
+    (said) => {
+      for (const key of ["list", "table"]) {
+        const rows = said.found(key).filter((one) => one.rule === "CountedList");
+        assert.equal(rows.length, 1, `the counting heading warns on ${key}`);
+        assert.equal(rows[0].severity, "warning");
+      }
+      assert.deepEqual(
+        said.rules("named").filter((one) => one === "CountedList"),
         [],
       );
     },

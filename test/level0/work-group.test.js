@@ -15,6 +15,7 @@ import {
   withHashAfter,
 } from "../../src/engine/group.js";
 import { probeOf, startOf } from "../../src/scripts/serve.js";
+import * as works from "../../src/scripts/work.js";
 import {
   DONE,
   groupStanding,
@@ -132,7 +133,7 @@ test("take leaves a group whose open children no hand on this box can take at to
 
   assert.equal(code, 0, said);
   assert.match(said, /work\/one-group stays at todo/);
-  assert.match(said, /a-child waits for/);
+  assert.match(said, /a-child needs nowhere here at do/, "it names the need");
   assert.ok(
     !ranGit(outside).some((one) => one.startsWith("git commit")),
     "the take writes no line",
@@ -140,6 +141,52 @@ test("take leaves a group whose open children no hand on this box can take at to
   assert.ok(
     !ranGit(outside).includes("git push origin work/one-group"),
     "and pushes nothing, so the group stands at todo",
+  );
+});
+
+// A child needing a verb this box lacks, and one waiting on it, so no hand here takes either. [[spec/tickets/the-small-faults-land]]
+const NEEDS = CHILD("one-group", "open").replace(
+  "    does: makes the change the ask names\n",
+  '    does: makes the change the ask names\n    needs: ["nowhere here"]\n',
+);
+const taking = (files) => {
+  const { it } = doorsSaying(groupRemote(), {
+    [on("one-group")]: withField(GROUP_NOTE, "step", "children"),
+    ...files,
+    ...HAND,
+  });
+  return heard(() => work(ROOT, ["take"], { ...it, agent: true, cloud: true }));
+};
+
+// [[spec/tickets/the-small-faults-land]]
+test("take names the dependency a child waits on", () => {
+  const waiting = CHILD("one-group", "open").replace(
+    "group: one-group\n",
+    "group: one-group\ndepends_on: [b-child]\n",
+  );
+  const { code, said } = taking({ [on("a-child")]: waiting, [on("b-child")]: NEEDS });
+  assert.equal(code, 0, said);
+  assert.match(said, /a-child waits for b-child to close/);
+  assert.match(said, /b-child needs nowhere here at do/);
+});
+
+// [[spec/tickets/the-small-faults-land]]
+test("take names a person for a by: person step alone", () => {
+  const { code, said } = taking({ [on("a-child")]: NEEDS });
+  assert.equal(code, 0, said);
+  assert.match(said, /stays at todo, because no hand here takes an open step/);
+  assert.doesNotMatch(said, /person/, "a step no person holds names none");
+
+  assert.equal(typeof works.waitsAt, "function", "work.js answers waitsAt");
+  const person = CHILD("one-group", "open").replace(
+    "    does: makes the change the ask names\n",
+    "    does: makes the change the ask names\n    by: person\n",
+  );
+  const { it } = doorsSaying(groupRemote(), HAND);
+  const desk = { ...it, agent: true, cloud: false };
+  assert.equal(
+    works.waitsAt(desk, { name: "a-child", text: person }, []),
+    "a-child waits for a person at do",
   );
 });
 

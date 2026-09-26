@@ -227,7 +227,7 @@ export function messageNote(rows) {
   ].join("\n");
 }
 
-// [[spec/design_output/private#two-doors-one-check]]
+// [[spec/design_output/private#both-doors-one-check]]
 async function privateDelta(command, _e, box) {
   if (!commitIn(command)) return "";
   const found = await privateNow({

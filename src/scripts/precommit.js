@@ -1,7 +1,7 @@
 // The commit door a person meets. Git runs the hook, the hook pipes the staged
 // delta in, and the check the Bash door calls reads the same text. The exit code
 // is the answer git reads: zero lets the commit land, one holds it.
-// [[spec/design_output/private#two-doors-one-check]]
+// [[spec/design_output/private#both-doors-one-check]]
 
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";

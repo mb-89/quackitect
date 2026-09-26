@@ -159,9 +159,10 @@ function questionRows(from, leaf) {
 }
 
 // The frontmatter holds one line a key, so a question carrying lines rides them as an escape. The cut falls on a semicolon whitespace follows, so a word carrying one stays whole. [[spec/design_output/work#a-person-step-leaves]]
+// A quoted line keeps the doubled backslash flatOf writes, because the reader unescapes nothing. [[spec/tickets/the-small-faults-land]]
 function asked(asks) {
   return String(asks ?? "")
-    .replace(/\\n/g, "\n")
+    .replace(/\\{1,2}n/g, "\n")
     .split(/;\s/)
     .map((one) => one.trim())
     .filter(Boolean);
