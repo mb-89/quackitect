@@ -217,3 +217,7 @@ The badge counts the rows the tab draws, and the sidebar redraws on a config cha
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- the count lands on main, so the badge and the brackets read `Places.Takeable` off `PlacesAt`
+- `src/tui/workcount_test.go` holds the printed count equal to the brackets
+- the briefcase icon and the rest of the ask stand open
