@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-verbs-land-whole
 steps:
   - name: design
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7a55188b9103 · claude-code-remote
+    hash_before: 55223b3a559a67e3021b60e4ff8fb42f6b557996
+    hash_after: 55223b3a559a67e3021b60e4ff8fb42f6b557996
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 42 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "src/scripts/rename.js:170:1: correctness/noUnusedFunctionParameters: This parameter to is unused."
+reason: done
 ---
 
 # Ask
@@ -263,11 +275,15 @@ The three cases fail on their own assertion. The ask names no `word for word` li
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/level1.test.js test/level0/ticket-verb.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -275,11 +291,23 @@ The three cases fail on their own assertion. The ask names no `word for word` li
 
 <!-- the form is text -->
 
+A refusal from the judge now quotes the line it refuses. `judged` in the pull hook asks `$.model.complete` for the one line breaking the label `classify` names, and keeps the answer where the evidence holds it word for word. `judgeRefusal` prints it under the rule.
+
+Past `judge.refusalsBeforePass` refusals on one leaf, the hand-back goes through, and a pass clears the count. The judge itself stays off until the owner turns it on.
+
+`ticket note` cuts a name past the cap to its first words, writes the note there, and says so. One note lands on one call.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the ask's files, and the config's schema beside the config
+- each case hands a fake for the disk, the process and both model calls
+- each new function's comment links this ticket
+- the count stands in the config alone
+- both review rows stand fixed in the cases and the hook
 
 # Discussion
 
