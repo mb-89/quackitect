@@ -9,7 +9,7 @@ import { atRetro } from "../../src/scripts/pull-hand.js";
 import { pulling } from "../../src/scripts/work.js";
 import { at, CHILD, doors, GROUP_NOTE, heard, ROOT, standing } from "./pull-doors.js";
 
-// A note a hand parks mid-work, which the retro decides.
+// A note a hand parks mid-work, which the retro decides. [[spec/design_output/pull#the-private-queue]]
 const NOTE = `---
 kind: [[ticket]]
 state: open
