@@ -1051,24 +1051,6 @@ writes each row to the log under the warning. The context after the call tells
 the agent that the warning stands in the Problems panel. The push waits until
 the panel stands clear, and the work goes on.
 
-## A write meets its mark
-
-No door reads a mark, so the write door keeps none. The Read door, the patch
-lane, the undo and the shell reads set no mark either. For the reason, see
-[[spec/tickets/every-road-has-a-caller]].
-
-`lib/marks.js` and `MARKS` in `lib/runs.js` stand under `.claude`, where the
-hand working that ticket writes nothing. Their own cases in
-`test/level0/apply.test.js` read them alone, and they leave together.
-
-### The marks survive a restart
-
-`MARKS` names `.se/.runtime/marks.json`, and no box writes it.
-
-### The mark holds line spans
-
-`spanned` keeps a span beside the whole hash, and no read sets one.
-
 ## The door reaches a helper
 
 A subagent's writes go through the same `tool.call` chain, so the door reads
