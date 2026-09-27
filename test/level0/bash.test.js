@@ -563,6 +563,11 @@ test("every git command that writes the repository refuses and names its verb", 
     const found = verbOf(command).map((one) => [one.severity, road.test(one.message)]);
     assert.deepEqual(found, [["error", true]], command);
   }
+  // A desk on main takes the remote's main in through the same verb. [[spec/tickets/sync-takes-origin-main]]
+  assert.match(
+    verbOf("git pull origin main")[0].message,
+    /branch sync, on main or a work branch/,
+  );
   const reads = ["git status", "git log --oneline", "git diff --cached", "git fetch"];
   for (const command of [...reads, "git show HEAD:a.md", './RUNME.sh commit "one"']) {
     assert.deepEqual(verbOf(command), [], command);

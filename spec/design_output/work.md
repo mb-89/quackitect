@@ -392,6 +392,9 @@ after the first reading.
 routine pays nothing to remember it. A conflict then stops the take, while the
 work it costs still sits ahead.
 
+On `main`, `branch sync` merges `origin/main` into the desk's `main`. So a desk
+committing on `main` pushes after another box pushes first.
+
 ## Trunk comes in last too
 
 A branch greens its own tip, and the merge result reads green nowhere. So a

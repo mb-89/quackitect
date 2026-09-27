@@ -352,9 +352,16 @@ export function parkedHere(it, name) {
 }
 
 // [[spec/design_output/work#trunk-comes-in-first]]
+// A work branch takes trunk in, and a desk's trunk takes the remote's, so a desk committing on trunk pushes after another box. [[spec/design_output/work#trunk-comes-in-first]]
 export function sync(it) {
-  const branch = workBranchHere(it, "sync");
-  if (!branch) return 2;
+  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  if (branch !== TRUNK && !branch.startsWith(WORK_BRANCH)) {
+    console.error(
+      `branch sync runs on ${TRUNK} or a work branch, and this is ${branch}.`,
+    );
+    return 2;
+  }
+  const from = branch === TRUNK ? `origin/${TRUNK}` : TRUNK;
 
   it.git.run(["fetch", "origin", TRUNK], true);
   const behind = it.git.run(["rev-list", "--count", `HEAD..origin/${TRUNK}`], true).out;
@@ -368,15 +375,15 @@ export function sync(it) {
     `origin/${TRUNK}`,
     "--no-edit",
     "-m",
-    `${branch}: take ${TRUNK} in`,
+    `${branch}: take ${from} in`,
   ]);
   if (!merged.ok) {
-    console.error(`${TRUNK} conflicts with ${branch}. Resolve it, commit, and go on.`);
+    console.error(`${from} conflicts with ${branch}. Resolve it, commit, and go on.`);
     console.error("git status names the files. The merge belongs to you here.");
     return 1;
   }
 
-  console.log(`${branch} took ${behind} commit(s) from ${TRUNK}.`);
+  console.log(`${branch} took ${behind} commit(s) from ${from}.`);
   return 0;
 }
 
