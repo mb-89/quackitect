@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-foundation-closes-its-gaps
 parent: the-watchdog-starts-for-real
+record:
+  - step: do
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 1c214f5b587c677851f934dcff72d448488f34d8
+    hash_after: 1c214f5b587c677851f934dcff72d448488f34d8
+    why: the-watchdog-starts-for-real answers this ask
+reason: answered
 ---
 
 # Ask
