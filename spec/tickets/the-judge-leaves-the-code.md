@@ -78,7 +78,12 @@ process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 depends_on: [every-road-has-a-caller]
 group: the-engine-holds-the-route
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: cb75bf7602af288ea431634cb6942860e6180ee0
+    hash_after: cb75bf7602af288ea431634cb6942860e6180ee0
 ---
 
 # Ask
@@ -104,11 +109,31 @@ Today a dead road stands in the plugin, and a config key turns a model call back
 
 <!-- the form is text -->
 
+A cut, and nothing new. Each row names what leaves.
+
+| file | what leaves |
+|---|---|
+| `.claude/skills/level0/hooks/pull-tool.js` | `judged`, its label road, and the `judge.*` keys it reads. The tool runs the pull and answers what it prints |
+| `.claude/skills/level0/lib/pull.js` | `judgeAsk`, `judgeLabels`, `judgeRefusal`, and the judge line of the tool's description |
+| `src/scripts/pull.js` | the `--judge` road and `judgeMaterial` |
+| `src/scripts/pull-tool.js` | the `--judge` flag the verdict map carries |
+| `spec/config/level0.json` and its schema | the `judge` key |
+| `spec/design_output/pull.md` | the chapters The judge answers a label and A rule describing an answer, where they speak of the judge |
+| the plugin descriptions | the words the judge behind it |
+| the cases | each case in `test/level0/level1.test.js` driving the judge, and each fixture naming `judge.model`, which takes another key |
+
+The projection writes the config commands again, so `./RUNME.sh project` drops each command the `judge` key projects.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `.claude/skills/level0/hooks/pull-tool.js` the tool's run, which calls `judged`
+- `src/scripts/pull.js` `pull`, which calls `judgeMaterial`
+- `src/scripts/cli-check.js` `projections`, which reads the config keys
+- `src/scripts/brand.js` the plugin description
 
 ### tests
 
@@ -116,17 +141,26 @@ Today a dead road stands in the plugin, and a config key turns a model call back
 
 <!-- the form is list -->
 
+- `test/level0/level1.test.js` the pull tool answers what the pull prints, and asks no model
+- `test/level0/config.test.js` the config names no judge key
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every file named stands opened, and a search for judge over the code lists each
+- the callers list follows each cut function to the file calling it
+- every done_when line maps to a test row above, and `./RUNME.sh check` decides the last
 
 ## review
 
