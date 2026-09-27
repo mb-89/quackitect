@@ -1,6 +1,8 @@
 ---
 kind: [[ticket]]
 state: open
+todo: true
+step: do
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,8 +26,7 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
-process_hash: 05e53b89dab63152
-step: do
+process_hash: 2b5ab398855a1aba
 ---
 
 # Ask
