@@ -41,6 +41,7 @@ steps:
             says: the approach
       - name: tests-red
         does: writes the tests
+        input: draft
         evidence:
           - name: red
             form: list
@@ -56,6 +57,7 @@ steps:
     steps:
       - name: change
         does: makes the change
+        input: design/draft
         to: retro
         evidence:
           - name: says
@@ -118,6 +120,16 @@ const namesUnder = (text, phase) =>
     (one) => one.name,
   );
 
+const inputAt = (text, path) => {
+  let list = frontOf(text).steps;
+  let step;
+  for (const part of path.split("/")) {
+    step = list.find((one) => one.name === part);
+    list = step?.steps ?? [];
+  }
+  return [step?.input ?? []].flat().map(String);
+};
+
 // [[spec/design_output/pull#the-gate]]
 test("a gate hand-back admits the reviewer's own commit", () => {
   const hold = "a".repeat(40);
@@ -169,6 +181,31 @@ test("a reject inserts the phase again before the gate", () => {
   ]);
   assert.equal(fieldOf(text, "step"), "design/draft-2", "the copy stands in hand");
   assert.match(text, /^## draft-2$/m, "the copy takes a chapter of its own");
+});
+
+// [[spec/design_output/pull#the-gate]]
+test("a reject's copy reads the copy of its sibling", () => {
+  const { back, text } = gated("reject\n- the fail road is missing");
+
+  assert.equal(back.code, 0, back.said);
+  assert.deepEqual(inputAt(text, "design/tests-red-2"), ["draft-2"]);
+});
+
+// [[spec/design_output/pull#the-gate]]
+test("after a reject the gate and implement read both rounds", () => {
+  const { back, text } = gated("reject\n- the fail road is missing");
+
+  assert.equal(back.code, 0, back.said);
+  assert.deepEqual(inputAt(text, "gate"), [
+    "design/draft",
+    "design/tests-red",
+    "design/draft-2",
+    "design/tests-red-2",
+  ]);
+  assert.deepEqual(inputAt(text, "implement/change"), [
+    "design/draft",
+    "design/draft-2",
+  ]);
 });
 
 // [[spec/design_output/pull#the-gate]]

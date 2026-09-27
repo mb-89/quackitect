@@ -118,7 +118,7 @@ urgent: true
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: c2d9d8a68a724897
         size: 824
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 0c9e5cf245326579f9f78255c72766667574b056
+    hash_after: 0c9e5cf245326579f9f78255c72766667574b056
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 0c57d926e888efe8
+        size: 1351
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -229,26 +242,31 @@ In `reworked` in `src/scripts/pull-gate.js`, a copy whose `input` names a siblin
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-gate.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/pull-gate.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertion: the copy of tests-red reads draft, and the gate and change read the first round alone. The fixture gains the inputs a standard route carries, and the older reject cases stay green on it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line on the copies meets a case, the schema-slots case holds the pass, and the check decides the last
+- the cases reach the disk and git through the fakes pull-doors.js hands out, and nothing else
 
 # gate
 
