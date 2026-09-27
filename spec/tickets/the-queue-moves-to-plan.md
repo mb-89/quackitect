@@ -252,3 +252,5 @@ The done lines and the test deciding each:
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The sentence naming `it.capture` under the approach runs past the cap, and the full check stops on it. The review sends it back to the draft to split, because the door keeps every other hand out of the approach. [[spec/tickets/rationale-drops-release-row]] waits on that split to pass.
