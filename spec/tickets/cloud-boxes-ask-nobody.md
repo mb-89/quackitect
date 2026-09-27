@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 3823cc72715985682a2c861f36c5f6aab5f8787a
+    hash_after: 3823cc72715985682a2c861f36c5f6aab5f8787a
+    inputs:
+      - name: ask
+        hash: e79762df3f357759
+        size: 996
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -164,38 +173,68 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A door ahead of the answer door refuses `AskUserQuestion` on a cloud box, and names the question ticket.
+
+| part | where | what it does |
+|---|---|---|
+| `holdsCloudAsk(e, box)` | `src/bridge/cloud-ask.js`, new | answers `{ result: { deny } }` where the tool is `AskUserQuestion` and `cloudHere(box)` holds, writes a `gate` line to the log, and answers null otherwise |
+| the refusal | the same file, `ASKS_NOBODY` | says nobody sits beside the box, names `./RUNME.sh mint ticket spec/tickets/<name>.md --process=question`, asks for every command a person needs in its ask, a push, and the branch going on, and points at rule 7 of `spec/guidance/cloud/cloud` |
+| the wire | `onToolCall` in `src/bridge/server.js` | `holdsCall(e, box) ?? holdsCloudAsk(e, box) ?? holdsGrace(...)`, so the owner's hold still answers first |
+| the note | `spec/design_output/level0.md`, under where it must not bite, and the list of roads the canary debt leaves open | names the cloud box as the exception, and points at `holdsCloudAsk` |
+
+`cloudHere` in `.claude/skills/level0/lib/cloud.js` answers the one question of where the session runs, as the Bash door and the stop hook read it. A helper's call meets the door too, since nobody sits beside a helper on a cloud box either.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/bridge/server.js`, `onToolCall`, the one caller of `holdsCloudAsk`
+- `src/bridge/answer.js`, `holdsForAnswer`, which passes `AskUserQuestion` and stands unchanged behind the new door
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/cloud-ask.test.js`, a cloud box refuses AskUserQuestion, and the refusal names the question ticket
+- `test/level0/cloud-ask.test.js`, a desk lets AskUserQuestion pass
+- `test/level0/cloud-ask.test.js`, a cloud box lets every other tool pass this door
+
+The done lines and the case deciding each:
+
+- the cloud refusal: the first case
+- the desk pass: the second case
+- the design note: a read of `spec/design_output/level0.md` at review
+- the check: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/bridge/cloud-ask.js`
+- `src/bridge/server.js`
+- `test/level0/cloud-ask.test.js`
+- `spec/design_output/level0.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `cloudHere`, `holdsCall`, `holdsForAnswer`, `onToolCall` and both lists in `spec/design_output/level0.md` stand opened, and each reads as the table says
+- a search for `holdsForAnswer(` and `AskUserQuestion` over `src/bridge` names the callers
+- each done line names the case or read deciding it
 
 ## tests-red
 
