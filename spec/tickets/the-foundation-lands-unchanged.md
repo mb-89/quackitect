@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: retro/notes
+step: retro/write
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [the-migration-writes-its-specs]
@@ -101,6 +101,14 @@ record:
     hand: the engine
     hash_before: f67d97ff5c7a88dd659f452060e6ff41bf6cc803
     hash_after: f67d97ff5c7a88dd659f452060e6ff41bf6cc803
+  - step: retro/notes
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 8f709bab5d59169177b42709fc88f63adfe2acd0
+    hash_after: 8f709bab5d59169177b42709fc88f63adfe2acd0
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -181,6 +189,8 @@ Done when the index answers `/v1` and the old API side by side, and the check st
 <!-- retro notes, which passes when the private folder is empty -->
 
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
