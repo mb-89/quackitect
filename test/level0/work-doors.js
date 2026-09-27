@@ -119,7 +119,17 @@ export function remoteSaying(refs, objects = {}) {
     .map((one) => `  origin/${one.branch}`)
     .join("\n");
   const named = new Map(refs.map((one) => [one.tip, one.branch]));
+  // A landed group's ticket stands closed on trunk, which is what the listing reads. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+  const closedOnTrunk = Object.fromEntries(
+    refs
+      .filter((one) => one.merged)
+      .map((one) => [
+        `git show origin/main:spec/tickets/${one.branch.replace(/^work\//, "")}.md`,
+        { stdout: "---\nkind: [[ticket]]\nstate: closed\n---\n" },
+      ]),
+  );
   return {
+    ...closedOnTrunk,
     [`git for-each-ref --format=${REF_FORMAT} refs/remotes/origin/work/`]: {
       stdout: rows ? `${rows}\n` : "",
     },

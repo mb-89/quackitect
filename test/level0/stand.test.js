@@ -50,20 +50,22 @@ test("freeNow frees a branch whose dependency left the queue", () => {
   assert.deepEqual(freeNow(new Map([["work/late", waits]])), ["work/late"]);
 });
 
-test("a dependency holds its dependent while its branch stands, merged or not, and its close frees it", () => {
+test("a dependency done and unmerged holds its dependent, and merged frees it", () => {
   const tickets = new Map([
     ["work/the-schema-reads", said(DONE)],
     ["work/the-schema-refuses", said(TODO, "the-schema-reads")],
   ]);
 
-  assert.deepEqual(freeNow(tickets), [], "done waits on the close");
-  assert.deepEqual(freeNow(tickets, new Set(["work/the-schema-reads"])), [], "merged waits too");
+  assert.deepEqual(freeNow(tickets), [], "done waits on a merge");
+  assert.deepEqual(freeNow(tickets, new Set(["work/the-schema-reads"])), [
+    "work/the-schema-refuses",
+  ]);
   assert.equal(
-    standingOf(tickets, new Set(["work/the-schema-reads"])).get("work/the-schema-reads"),
+    standingOf(tickets, new Set(["work/the-schema-reads"])).get(
+      "work/the-schema-reads",
+    ),
     "merged",
   );
-  tickets.delete("work/the-schema-reads");
-  assert.deepEqual(freeNow(tickets), ["work/the-schema-refuses"], "a closed branch frees it");
 });
 
 // [[spec/design_output/work#a-stale-group-is-yours]]

@@ -145,7 +145,9 @@ export function merge(it, name) {
     console.log(`Push ${TRUNK}, then run ./RUNME.sh branch close ${name}.`);
     return 0;
   }
-  return close(it, name, []);
+  // A remote refusing the delete leaves the branch, and trunk's closed ticket frees what waits. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+  if (close(it, name, [])) console.log(`${branch} stands on the remote, and trunk carries its ticket closed.`);
+  return 0;
 }
 
 // [[spec/design_output/work#a-cloud-branch-comes-in]]
