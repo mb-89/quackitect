@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { withField } from "../../src/engine/group.js";
 import { withPayload } from "../../src/scripts/pull-chapter.js";
 import { formatted } from "../../src/scripts/pull-format.js";
@@ -13,7 +14,9 @@ import { CHILD, doors, GROUP_NOTE, heard, ROOT, standing } from "./pull-doors.js
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]
 test("the hand-out names the step in hand and no other leaf", () => {
-  const { it } = doors(standing(CHILD(), withField(GROUP_NOTE, "step", "children")));
+  const { it } = doors(
+    standing(CHILD(), withField(GROUP_NOTE, "step", "children", fakeFront())),
+  );
   const took = heard(() => pulling(ROOT, ["pull"], it));
 
   assert.match(took.said, /^work {2}a-child at design\/draft/m);

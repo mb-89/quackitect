@@ -14,8 +14,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/x/ansi"
 
-	"quackitect/tui/draw"
-	"quackitect/tui/tree"
+	"quackitect/src/tui/draw"
+	"quackitect/src/tui/tree"
 )
 
 // [[spec/design_output/tui#a-number-opens-a-tab]]

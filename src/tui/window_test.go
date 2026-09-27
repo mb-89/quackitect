@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"quackitect/tui/draw"
-	"quackitect/tui/frame"
-	"quackitect/tui/tree"
-	"quackitect/tui/work"
+	"quackitect/src/tui/draw"
+	"quackitect/src/tui/frame"
+	"quackitect/src/tui/tree"
+	"quackitect/src/tui/work"
 )
 
 func theWork(m frame.Model) *work.Tab { return m.Tabs[1].(*work.Tab) }

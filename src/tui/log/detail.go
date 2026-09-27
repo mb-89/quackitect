@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"quackitect/tui/draw"
-	"quackitect/tui/frame"
+	"quackitect/src/tui/draw"
+	"quackitect/src/tui/frame"
 )
 
 func pairsOf(all []Record, at int) []Record {

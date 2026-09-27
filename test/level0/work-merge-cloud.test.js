@@ -57,3 +57,12 @@ test("merge names main as carrying a claude branch's work, and deletes the branc
   assert.ok(ran.includes(`git push origin --delete ${CLOUD}`));
   assert.match(said, new RegExp(`main carries ${CLOUD}`));
 });
+
+// The install ran before the merge and read the old wants, so the merge runs it again before the check. [[spec/design_output/work#the-merge-lands-the-truth]]
+test("merge builds the merged tree's tools before its check", () => {
+  const { ran } = cloudMerge("+ abc123\n");
+  const install = ran.findIndex((one) => one.endsWith("src/scripts/install.sh"));
+  const check = ran.indexOf(CHECK);
+  assert.ok(install >= 0, "the merge runs the install");
+  assert.ok(install < check, "and runs it before the check");
+});

@@ -10,7 +10,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 
-	"quackitect/tui/draw"
+	"quackitect/src/tui/draw"
 )
 
 type Part struct {

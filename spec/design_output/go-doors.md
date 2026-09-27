@@ -92,6 +92,7 @@ check runs it on Linux and Windows:
 |---|---|
 | `doorsonly` | an import of `os`, `os/exec`, `net` or `net/http`, and a call to `time.Now`, outside `doors/` |
 | `fakebeside` | a door file whose package holds no fake for its interface |
+| `nodoor` | an import of a package under `doors/` from a package under `modules/` |
 | `noname` | an import of a package under `modules/` from `doors/`, `index/` or a renderer |
 | `fakeintest` | a test under `modules/` building a real door |
 

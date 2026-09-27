@@ -16,9 +16,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"quackitect/tui/draw"
-	"quackitect/tui/frame"
-	"quackitect/tui/tree"
+	"quackitect/src/tui/draw"
+	"quackitect/src/tui/frame"
+	"quackitect/src/tui/tree"
 )
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]

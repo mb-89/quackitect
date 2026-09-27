@@ -54,7 +54,7 @@ import { freeIn, trigger } from "./work-free.js";
 import { testVerb } from "./work-test.js";
 import { unblock } from "./work-unblock.js";
 import { list } from "./work-list.js";
-import { close, freeChildren, merge } from "./work-merge.js";
+import { close, freeChildren, marksTrunk, merge, offTrunk } from "./work-merge.js";
 import {
   childrenHere,
   DONE,
@@ -139,6 +139,7 @@ function openGroup(it, name) {
     );
     return 2;
   }
+  if (offTrunk(it, "open")) return 2;
   const at = ticketAt(name);
   const text = textAt(it, `origin/${TRUNK}`, at);
   if (!text) {
@@ -158,7 +159,7 @@ function openGroup(it, name) {
   it.git.fetch();
   if (standOf(it).some((one) => one.branch === branch)) {
     console.log(`${branch} already stands in the cloud, carrying ${at}.`);
-    return 0;
+    return marksTrunk(it, name) ? 0 : 1;
   }
   const mark = markOff(it, branch);
   if (!mark) {
@@ -173,6 +174,7 @@ function openGroup(it, name) {
   }
 
   console.log(`${branch} stands at ${TODO} in the cloud, carrying ${at}.`);
+  if (!marksTrunk(it, name)) return 1;
   console.log("Run ./RUNME.sh cloud trigger to fire a box at it.");
   return 0;
 }
@@ -339,7 +341,7 @@ function claimGroup(it, one) {
   const role = roleOf(hand);
   it.disk.write(
     path,
-    withEntry(was, { step: stepOf(was), hand: role, hash_before: before }),
+    withEntry(was, { step: stepOf(was), hand: role, hash_before: before }, it.front),
   );
   it.git.run(["add", at], true);
   const committed = it.git.run(
@@ -500,14 +502,14 @@ function leaves(it, branch, at, path, says) {
   const freed = freeChildren(it, name);
 
   // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]] takes the tag off.
-  const now = withoutField(
-    withField(
-      withField(withHashAfter(it.disk.read(path), after), "state", CLOSED),
-      "reason",
-      DONE,
-    ),
-    PARKED,
+  const was = withHashAfter(it.disk.read(path), after, it.front);
+  const shut = withField(
+    withField(was, "state", CLOSED, it.front),
+    "reason",
+    DONE,
+    it.front,
   );
+  const now = withoutField(shut, PARKED, it.front);
   it.disk.write(path, now);
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${branch}: the box leaves`], true);
@@ -561,10 +563,8 @@ function letGo(it, branch, name, here) {
     return 0;
   }
 
-  it.disk.write(
-    path,
-    withHashAfter(it.disk.read(path), it.git.run(["rev-parse", "HEAD"], true).out),
-  );
+  const tip = it.git.run(["rev-parse", "HEAD"], true).out;
+  it.disk.write(path, withHashAfter(it.disk.read(path), tip, it.front));
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${branch}: ${held.hand} lets it go`], true);
   if (!it.git.run(["push", "origin", branch]).ok) return 1;

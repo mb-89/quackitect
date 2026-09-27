@@ -13,7 +13,7 @@ import (
 	"testing"
 )
 
-const module = "quackitect/tui"
+const module = "quackitect/src/tui"
 
 // What each package imports of this module, as the chapter's table says. [[spec/design_output/tui#the-packages-the-window-holds]]
 var layout = map[string][]string{

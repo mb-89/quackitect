@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fieldOf, withField } from "../../src/engine/group.js";
 import { withPayload } from "../../src/scripts/pull.js";
 import { pulling } from "../../src/scripts/work.js";
@@ -22,7 +23,7 @@ import { semicolonVale } from "./semicolon-vale.js";
 // [[spec/design_output/pull#the-fields-ride-the-payload]]
 test("the fields ride the payload, and the engine writes them under their headings before it checks", () => {
   const { it, disk } = doors(
-    standing(CHILD(), withField(GROUP_NOTE, "step", "children")),
+    standing(CHILD(), withField(GROUP_NOTE, "step", "children", fakeFront())),
   );
   heard(() => pulling(ROOT, ["pull"], it));
 
@@ -68,20 +69,30 @@ test("the fields ride the payload, and the engine writes them under their headin
 // A break of form in the evidence warns, and the hand-back lands. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 test("a hand-back whose field breaks a rule of form lands, and names the line", () => {
   const vale = "/tree/.se/.runtime/bin/vale";
-  const { it, disk } = doors(standing(CHILD(), withField(GROUP_NOTE, "step", "children")), {
-    [`${vale} --config=.vale.ini --output=JSON --no-exit --path=spec/tickets/a-child.md`]:
-      semicolonVale(),
-  });
+  const { it, disk } = doors(
+    standing(CHILD(), withField(GROUP_NOTE, "step", "children", fakeFront())),
+    {
+      [`${vale} --config=.vale.ini --output=JSON --no-exit --path=spec/tickets/a-child.md`]:
+        semicolonVale(),
+    },
+  );
   it.vale = vale;
   heard(() => pulling(ROOT, ["pull"], it));
 
   const said = heard(() =>
-    pulling(ROOT, ["pull", "a-child", "--pass", "--fields", '{"approach": "Read it; then write."}'], it),
+    pulling(
+      ROOT,
+      ["pull", "a-child", "--pass", "--fields", '{"approach": "Read it; then write."}'],
+      it,
+    ),
   );
   assert.equal(said.code, 0, said.said);
   assert.match(said.said, /break a rule of form, and the hand-back lands/);
   assert.match(said.said, /design\/draft breaks Characters/);
-  assert.equal(fieldOf(disk.read(at("spec/tickets/a-child.md")), "step"), "design/review");
+  assert.equal(
+    fieldOf(disk.read(at("spec/tickets/a-child.md")), "step"),
+    "design/review",
+  );
 });
 
 // [[spec/design_output/pull#the-fields-ride-the-payload]]
@@ -108,16 +119,19 @@ test("the payload spans a fence, a porcelain row reads whole, and a files field 
     "# Discussion\n",
     "# verdict\n\n## read\n\n## verdict\n\n# Discussion\n",
   );
-  const { it } = doors(standing(body, withField(GROUP_NOTE, "step", "children")), {
-    "git status --porcelain -uall": {
-      stdout: "M spec/tickets/a-child.md\n?? .vale.ini",
-    },
-    [`${vale} --config=.vale.ini --output=JSON --no-exit --path=spec/tickets/a-child.md`]:
-      (_argv, init) => {
-        ranVale.push(init.stdin);
-        return { stdout: "{}" };
+  const { it } = doors(
+    standing(body, withField(GROUP_NOTE, "step", "children", fakeFront())),
+    {
+      "git status --porcelain -uall": {
+        stdout: "M spec/tickets/a-child.md\n?? .vale.ini",
       },
-  });
+      [`${vale} --config=.vale.ini --output=JSON --no-exit --path=spec/tickets/a-child.md`]:
+        (_argv, init) => {
+          ranVale.push(init.stdin);
+          return { stdout: "{}" };
+        },
+    },
+  );
   it.vale = vale;
   heard(() => pulling(ROOT, ["pull"], it));
 

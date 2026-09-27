@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { processHash } from "../../.claude/skills/level0/lib/schema.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -186,6 +187,7 @@ function roots(files = {}, answers = {}, more = {}) {
     disk: files_,
     git,
     join,
+    front: fakeFront(),
     clock: fakeClock(),
     agent: true,
     cloud: true,

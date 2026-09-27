@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"quackitect/yaml"
+	"quackitect/src/yaml"
 )
 
 const (

@@ -6,6 +6,7 @@
 import { join } from "node:path";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import {
   TICKETS,
@@ -22,7 +23,7 @@ export function doorsSaying(answers, files = {}) {
   const disk = fakeDisk(files);
   // A case names its own environment, so the box running it changes no answer. [[spec/guidance/code/testing]]
   return {
-    it: { proc: said.proc, disk, git: said, join, env: {} },
+    it: { proc: said.proc, disk, git: said, join, env: {}, front: fakeFront() },
     outside: said,
     disk,
   };
@@ -174,15 +175,21 @@ export const merging = (extra = {}) => ({
   [`git show origin/work/one-group:${GROUP_AT}`]: {
     stdout: withField(
       withHashAfter(
-        withEntry(GROUP_NOTE, {
-          step: "sync",
-          hand: "box 3f9a",
-          hash_before: "a1b2c3",
-        }),
+        withEntry(
+          GROUP_NOTE,
+          {
+            step: "sync",
+            hand: "box 3f9a",
+            hash_before: "a1b2c3",
+          },
+          fakeFront(),
+        ),
         "d4e5f6",
+        fakeFront(),
       ),
       "state",
       "closed",
+      fakeFront(),
     ),
   },
   "git merge-base origin/main origin/work/one-group": { stdout: "base111\n" },
@@ -191,6 +198,7 @@ export const merging = (extra = {}) => ({
   },
   [`git diff --unified=0 base111..origin/main -- ${GROUP_AT}`]: { stdout: "" },
   "git merge --no-ff --no-edit origin/work/one-group": { exitCode: 0 },
+  [`sh ${join(ROOT, "src/scripts/install.sh")}`]: { exitCode: 0 },
   [`node ${join(ROOT, "src/scripts/cli.js")} check --errors`]: {
     exitCode: 0,
     stdout: "green\n",

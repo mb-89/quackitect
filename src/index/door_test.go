@@ -8,11 +8,13 @@ import (
 	"strconv"
 	"testing"
 	"time"
+
+	"quackitect/src/q"
 )
 
 func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 	root := tree(t)
-	stop, listen, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	stop, listen, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,7 +49,7 @@ func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 
 func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +71,7 @@ func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 // [[spec/design_output/index#the-watcher-keeps-it-warm]]
 func TestAWriteUnderTheTreeReachesTheIndex(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -114,7 +116,7 @@ func TestADoorFromAnotherBuildStandsAside(t *testing.T) {
 // [[spec/design_output/index#the-index-fires-on-change]]
 func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -150,7 +152,7 @@ func TestAChangesCallFiresOnAWrittenFileWithinASecond(t *testing.T) {
 // [[spec/design_output/index#the-index-fires-on-change]]
 func TestAChangesCallFiresOnAPlanWriteWithinASecond(t *testing.T) {
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -191,4 +193,34 @@ func tickOf(t *testing.T, said answer) int64 {
 		t.Fatalf("the tick reads as a number, and reads %#v", held["tick"])
 	}
 	return int64(tick)
+}
+
+func TestTheDoorAnswersWhy(t *testing.T) {
+	root := tree(t)
+	catalog := q.New()
+	q.GivenIn(catalog, "t/n", 0)
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	said, err := posts(standing, []string{"why", "t/n"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	found, ok := said.Result.(map[string]any)
+	if said.Error != "" || !ok || found["name"] != "t/n" || found["state"] != "default" {
+		t.Fatalf("why t/n answers %#v, %q", said.Result, said.Error)
+	}
+}
+
+func TestTheWhyVerbAsksTheName(t *testing.T) {
+	method, params := asked([]string{"why", "t/n"})
+	if method != "why" || string(params) != `{"name":"t/n"}` {
+		t.Fatalf("the verb asks %s with %s", method, params)
+	}
 }

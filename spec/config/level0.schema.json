@@ -572,6 +572,28 @@
           "help": "Phase 10, Node leaving the boxes. true in the tracked file on main lets a cloud box take node-leaves-the-boxes. A write on this box turns nothing on in the cloud."
         }
       }
+    },
+    "ops": {
+      "type": "object",
+      "properties": {
+        "comment": { "type": "string" },
+        "keepDone": { "type": "number", "unit": "seconds", "help": "The span a done or cancelled operation stays under ops. Zero keeps it." },
+        "keepFailed": { "type": "number", "unit": "seconds", "help": "The span a failed operation stays under ops. Zero keeps it." }
+      }
+    },
+    "watchdog": {
+      "type": "object",
+      "properties": {
+        "comment": { "type": "string" },
+        "backoffFirst": { "type": "number", "unit": "seconds", "help": "The wait before the first restart of a part." },
+        "backoffCap": { "type": "number", "unit": "seconds", "help": "The longest wait before a restart." },
+        "faults": { "type": "number", "help": "The faults inside the window that raise an alarm and stop the restarts." },
+        "window": { "type": "number", "unit": "seconds", "help": "The span the faults of an alarm fall inside." },
+        "deadlineDerived": { "type": "number", "unit": "seconds", "help": "The span a derived provider with a pending input commits within." },
+        "deadlineFold": { "type": "number", "unit": "seconds", "help": "The span a fold with a pending event commits within." },
+        "deadlineAction": { "type": "number", "unit": "seconds", "help": "The span an action answers within." },
+        "deadlineOp": { "type": "number", "unit": "seconds", "help": "The span an operation ends within." }
+      }
     }
   }
 }

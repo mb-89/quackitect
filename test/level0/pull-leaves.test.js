@@ -9,7 +9,7 @@ import { fieldOf } from "../../src/engine/group.js";
 import { chapterOf, commandsRun, verdictIn } from "../../src/scripts/pull-chapter.js";
 import { entriesOf } from "../../src/scripts/pull-writes.js";
 import { holdOf, leafOf, takeable } from "../../src/scripts/pull.js";
-import { goModulesOf, goSays, testSays } from "../../src/scripts/work-test.js";
+import { goPackagesOf, goSays, testSays } from "../../src/scripts/work-test.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { pulling, work } from "../../src/scripts/work.js";
 import {
@@ -233,9 +233,9 @@ test("a command line the box finds nothing for comes back naming the shape a com
 });
 
 // The tests stand in two languages, and the verb runs both. [[spec/design_output/pull#the-test-verb]]
-test("a changed Go test names its module, and the verb says what that run answered", () => {
+test("a changed Go test names its package folder, and the verb says what that run answered", () => {
   assert.deepEqual(
-    goModulesOf([
+    goPackagesOf([
       "src/tui/work_test.go",
       "src/tui/tree.go",
       "src/index/index_test.go",
@@ -245,7 +245,7 @@ test("a changed Go test names its module, and the verb says what that run answer
     ]),
     ["src/tui", "src/index"],
   );
-  assert.deepEqual(goModulesOf([]), []);
+  assert.deepEqual(goPackagesOf([]), []);
 
   assert.equal(goSays({ exitCode: 0 }, "src/tui"), "green, src/tui passes");
   assert.match(

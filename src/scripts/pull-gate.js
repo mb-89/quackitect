@@ -26,15 +26,19 @@ const REJECTS_BEFORE_PERSON = 2;
 // [[spec/design_output/pull#the-gate]]
 export function rejected(it, who, one, leaf, held, reason, answered) {
   const round = returnsOf(one.front, leaf.path) + 1;
-  one.text = withEntry(one.text, {
-    step: leaf.path,
-    hand: roleOf(who.hand),
-    hash_before: held.hash,
-    hash_after: one.private ? "" : tipOf(it),
-    returns: round,
-    why: reason,
-    answered,
-  });
+  one.text = withEntry(
+    one.text,
+    {
+      step: leaf.path,
+      hand: roleOf(who.hand),
+      hash_before: held.hash,
+      hash_after: one.private ? "" : tipOf(it),
+      returns: round,
+      why: reason,
+      answered,
+    },
+    it.front,
+  );
   const copy = reworked(it, one, leaf.path, round);
   if (!copy) {
     say(REFUSED, [
@@ -80,9 +84,14 @@ function reworked(it, one, gatePath, round) {
   into.splice(nested ? into.length : at, 0, ...copies);
 
   const schema = schemasHere(it).get("ticket");
-  const text = schema ? reRouted(one.text, schema, steps, "") : one.text;
+  const text = schema ? reRouted(one.text, schema, steps, "", it.front) : one.text;
   const first = [...prefix, copies[0].name].join("/");
-  one.text = withField(withField(text, "step", first), "state", OPEN);
+  one.text = withField(
+    withField(text, "step", first, it.front),
+    "state",
+    OPEN,
+    it.front,
+  );
   return { first, names: copies.map((held) => held.name) };
 }
 

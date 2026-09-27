@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"quackitect/yaml"
+	"quackitect/src/yaml"
 )
 
 // [[spec/design_output/lsp#an-engine-field-warns]]

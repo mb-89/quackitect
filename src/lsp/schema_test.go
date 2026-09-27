@@ -1,7 +1,7 @@
 package main
 
 import (
-	"quackitect/yaml"
+	"quackitect/src/yaml"
 
 	"strings"
 	"testing"

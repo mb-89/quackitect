@@ -1,62 +1,20 @@
-// The tickets, answered off the note rows. A ticket carries its fields, and
-// its standing comes off its group ticket's record and nothing else, so a
-// reader asks here and opens no file and no git.
+// The tickets, answered off the note rows through the one reading in
+// src/tickets, so a reader asks here and opens no file and no git.
 // [[spec/design_output/index#the-index-answers-the-tickets]]
 package main
 
 import (
 	"database/sql"
-	"path"
-	"strconv"
 	"strings"
+
+	"quackitect/src/tickets"
 )
 
-const (
-	ticketKind  = "ticket"
-	groupRoute  = "group"
-	openState   = "open"
-	askHeader   = "# Ask"
-	commentOpen = "<!--"
-)
+const ticketKind = "ticket"
 
-// The two folders a ticket stands directly under, the same ones FOLDERS in src/extension/lib/lens.js names, spelled again here because a Go module imports no JavaScript. [[spec/design_output/index#the-index-answers-the-tickets]]
-var ticketFolders = []string{"spec/tickets/", ".se/tickets/"}
+type Ticket = tickets.Ticket
 
-// Whether a path stands directly under one of the two ticket folders, and no deeper: a ticket-kind note elsewhere, such as inside a leftover git worktree, is no ticket. [[spec/design_output/index#the-index-answers-the-tickets]]
-func ticketPath(rel string) bool {
-	for _, folder := range ticketFolders {
-		if under, ok := strings.CutPrefix(rel, folder); ok && !strings.Contains(under, "/") {
-			return true
-		}
-	}
-	return false
-}
-
-// The standing a group's branch gives it, the words [[spec/design_output/work#what-the-standing-says]] names.
-const (
-	standingTodo = "todo"
-	standingHeld = "held"
-	standingDone = "done"
-)
-
-type Ticket struct {
-	Name     string `json:"name"`
-	Path     string `json:"path"`
-	State    string `json:"state"`
-	Step     string `json:"step"`
-	Route    string `json:"route"`
-	Group    string `json:"group"`
-	Urgent   bool   `json:"urgent"`
-	Todo     bool   `json:"todo"`
-	Standing string `json:"standing"`
-	Says     string `json:"says"`
-	// The leaves the record passes over the leaves the route holds, as done/all. [[spec/design_output/index#the-index-answers-the-tickets]]
-	Progress string `json:"progress"`
-	// The time the file last changed, off the file table, so a view sorts the newest done ticket first. [[spec/design_output/index#the-index-answers-the-tickets]]
-	Changed int64 `json:"changed"`
-}
-
-// [[spec/design_output/index#the-index-answers-the-tickets]]
+// [[spec/tickets/the-tickets-topic-lands]]
 func Tickets(db *sql.DB) ([]Ticket, error) {
 	rows, err := db.Query(
 		`SELECT n.path, n.id, n.kind, f.text, f.mtime FROM note n JOIN file f ON f.path = n.path ORDER BY n.path`)
@@ -66,218 +24,19 @@ func Tickets(db *sql.DB) ([]Ticket, error) {
 	defer rows.Close()
 
 	out := []Ticket{}
-	groups := map[string]string{}
 	for rows.Next() {
 		var path, id, kind, text string
 		var changed int64
 		if err := rows.Scan(&path, &id, &kind, &text, &changed); err != nil {
 			return nil, err
 		}
-		if linkName(kind) != ticketKind || !ticketPath(path) {
+		if strings.Trim(strings.TrimSpace(kind), "[]") != ticketKind || !tickets.Path(path) {
 			continue
 		}
-		one := ticketOf(path, id, text, changed)
-		if one.Route == groupRoute {
-			groups[one.Name] = one.Standing
-		}
-		out = append(out, one)
+		out = append(out, tickets.Of(path, id, text, changed))
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	// A ticket's standing reads off its group's, so a child answers what its branch holds. [[spec/design_output/work#what-the-standing-says]]
-	for at := range out {
-		if out[at].Route != groupRoute && out[at].Group != "" {
-			out[at].Standing = groups[out[at].Group]
-		}
-	}
-	return out, nil
-}
-
-func ticketOf(path, id, text string, changed int64) Ticket {
-	head, body, _ := fenced(text)
-	front := topOf(head)
-	state := front["state"]
-	if state == "" {
-		state = openState
-	}
-	one := Ticket{
-		Name:     id,
-		Path:     path,
-		State:    state,
-		Step:     front["step"],
-		Route:    routeOf(front["process"]),
-		Group:    front["group"],
-		Urgent:   front["urgent"] == "true",
-		Todo:     todoIn(front["todo"]),
-		Says:     askLine(body),
-		Progress: progressOf(head),
-		Changed:  changed,
-	}
-	if one.Route == groupRoute {
-		one.Standing = groupStanding(state, head)
-	}
-	return one
-}
-
-// A todo is any value past false: a bare true, or the name of the row the ticket stands before. [[spec/design_output/pull#the-queue-is-an-outline]]
-func todoIn(said string) bool {
-	said = strings.Trim(strings.TrimSpace(said), `"'`)
-	return said != "" && said != "false"
-}
-
-// The route's own name, off the link the mint writes as a path or a hand writes as a name. [[spec/design_output/work#a-group-is-a-ticket]]
-func routeOf(said string) string {
-	name := linkName(said)
-	if name == "" {
-		return ""
-	}
-	return path.Base(name)
-}
-
-// [[spec/design_output/work#held-derives-from-the-record]]
-func groupStanding(state, head string) string {
-	switch {
-	case state == "closed":
-		return standingDone
-	case heldIn(head):
-		return standingHeld
-	}
-	return standingTodo
-}
-
-// Whether any record entry carries hash_before and no hash_after, which is the claim a take pushes. [[spec/design_output/work#held-derives-from-the-record]]
-func heldIn(head string) bool {
-	held := false
-	entry := map[string]bool{}
-	closes := func() {
-		if entry["hash_before"] && !entry["hash_after"] {
-			held = true
-		}
-		entry = map[string]bool{}
-	}
-	inRecord := false
-	for _, line := range strings.Split(head, "\n") {
-		switch {
-		case strings.HasPrefix(line, "record:"):
-			inRecord = true
-			continue
-		case !inRecord:
-			continue
-		case line != "" && !strings.HasPrefix(line, " "):
-			closes()
-			inRecord = false
-			continue
-		}
-		bare := strings.TrimSpace(line)
-		if strings.HasPrefix(bare, "- ") {
-			closes()
-			bare = strings.TrimPrefix(bare, "- ")
-		}
-		if key, value, found := strings.Cut(bare, ":"); found && strings.TrimSpace(value) != "" {
-			entry[strings.TrimSpace(key)] = true
-		}
-	}
-	closes()
-	return held
-}
-
-// The whole Ask chapter, past the comments the mint leaves, because the tab's details draw it whole. [[spec/design_output/index#the-index-answers-the-tickets]]
-func askLine(body string) string {
-	inAsk := false
-	out := []string{}
-	for _, line := range strings.Split(body, "\n") {
-		bare := strings.TrimSpace(line)
-		switch {
-		case bare == askHeader:
-			inAsk = true
-			continue
-		case strings.HasPrefix(bare, "#"):
-			if inAsk {
-				return strings.TrimSpace(strings.Join(out, "\n"))
-			}
-			continue
-		case !inAsk || strings.HasPrefix(bare, commentOpen):
-			continue
-		}
-		out = append(out, line)
-	}
-	return strings.TrimSpace(strings.Join(out, "\n"))
-}
-
-// The keys standing at the top of the front, so a key nested under record or steps shadows none of them. [[spec/design_output/index#the-index-answers-the-tickets]]
-func topOf(head string) map[string]string {
-	out := map[string]string{}
-	for _, line := range strings.Split(head, "\n") {
-		if line == "" || line[0] == ' ' || line[0] == '\t' {
-			continue
-		}
-		if key, value, found := strings.Cut(line, ":"); found && strings.TrimSpace(key) != "" {
-			out[strings.TrimSpace(key)] = strings.TrimSpace(value)
-		}
-	}
-	return out
-}
-
-// The name a link carries, with the brackets off. [[spec/design_output/index#a-note-and-its-links]]
-func linkName(said string) string {
-	return strings.TrimSpace(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSpace(said), "[["), "]]"))
-}
-
-// The leaves the record passes, closed or skipped, over the leaves the route holds, as done/all, and nothing where the route holds none. A step item is a `- name:` line whose nearest line two columns in is a `steps:` key, so an evidence item counts nothing. [[spec/design_output/index#the-index-answers-the-tickets]]
-func progressOf(head string) string {
-	lines := strings.Split(head, "\n")
-	last := map[int]string{}
-	indents := []int{}
-	inSteps := false
-	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-		if trimmed == "" {
-			continue
-		}
-		indent := len(line) - len(strings.TrimLeft(line, " "))
-		if indent == 0 {
-			inSteps = trimmed == "steps:"
-		}
-		if inSteps && indent >= 2 && strings.HasPrefix(trimmed, "- name:") && last[indent-2] == "steps:" {
-			indents = append(indents, indent)
-		}
-		last[indent] = trimmed
-	}
-	all := 0
-	for at, indent := range indents {
-		if at+1 == len(indents) || indents[at+1] <= indent {
-			all++
-		}
-	}
-	if all == 0 {
-		return ""
-	}
-	return strconv.Itoa(len(passedSteps(lines))) + "/" + strconv.Itoa(all)
-}
-
-// The steps a record entry closes, by a hash after or a skip. [[spec/design_output/index#the-index-answers-the-tickets]]
-func passedSteps(lines []string) map[string]bool {
-	out := map[string]bool{}
-	inRecord := false
-	step := ""
-	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-		if line != "" && line[0] != ' ' {
-			inRecord = trimmed == "record:"
-			continue
-		}
-		if !inRecord {
-			continue
-		}
-		if said, found := strings.CutPrefix(trimmed, "- step:"); found {
-			step = strings.TrimSpace(said)
-			continue
-		}
-		after, isAfter := strings.CutPrefix(trimmed, "hash_after:")
-		if (isAfter && strings.TrimSpace(after) != "" && strings.TrimSpace(after) != `""`) || trimmed == "skipped: true" {
-			out[step] = true
-		}
-	}
-	return out
+	return tickets.All(out), nil
 }

@@ -235,40 +235,11 @@ get_vale_ls() {
   rm -rf "$tmp"
 }
 
-# THE INDEX IS C, SO A BUILD NEEDS A C COMPILER. The pinned Zig is one download
-# and no system toolchain, and a box that already carries a working compiler
-# uses that. A name on the PATH is no proof, so this compiles a probe file.
-# [[spec/design_output/index#the-compiler-it-needs]]
-zig_version=0.16.0
-
-working_compiler() {
-  tmp=$(mktemp -d) || return 1
-  printf 'int probe(void) { return 0; }\n' > "$tmp/probe.c"
-  for one in cc gcc clang; do
-    have "$one" || continue
-    if (cd "$tmp" && "$one" -c probe.c -o probe.o) >/dev/null 2>&1; then
-      rm -rf "$tmp"; printf '%s' "$one"; return 0
-    fi
-  done
-  rm -rf "$tmp"; return 1
-}
-
-# zig is a toolbox and its C compiler is a subcommand, so the pinned answer is
-# two words. A compiler that is already a compiler is one.
-compiler_here() {
-  if [ -x "$bin/zig/zig${exe}" ]; then
-    printf '%s' "$bin/zig/zig${exe} cc"
-    return 0
-  fi
-  working_compiler
-}
-
-# THE SERVER IS PURE GO, SO IT NEEDS NO COMPILER AND NO NETWORK. It shares no
-# step with the index above: that one is C and waits on a toolchain, and this
-# one builds beside it in under a second on every box.
+# THE SERVER AND THE INDEX ARE PURE GO, SO THEY NEED NO COMPILER.
 # [[spec/design_output/index#the-compiler-it-needs]]
 # A binary built off other source lints against rules the tree no longer
-# carries, so a hash of its folder and of each folder its go.mod replaces
+# carries, so a hash of its folder, of each tree package it imports and of the
+# root go.mod and go.sum
 # stands beside it, and a hash that moves asks for the build again.
 # [[spec/design_output/lsp#the-build-beside-the-index]]
 lsp_here() {
@@ -291,10 +262,25 @@ swap_in() {
 
 get_lsp() {
   say "  building the language server"
-  (cd "$root/src/lsp" && CGO_ENABLED=0 go build -o "$bin/se-lsp${exe}.new" .) || return 1
+  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-lsp${exe}.new" ./src/lsp) || return 1
   swap_in "$bin/se-lsp${exe}.new" "$bin/se-lsp${exe}" || return 1
   (cd "$root" && node src/scripts/go-source.js stamp se-lsp) || return 1
   lsp_here
+}
+
+# The one writer of frontmatter, which every ticket write reaches, builds the
+# way the language server does. [[spec/tickets/go-writes-the-frontmatter]]
+front_here() {
+  if [ ! -x "$bin/se-front${exe}" ]; then return 1; fi
+  (cd "$root" && node src/scripts/go-source.js fresh se-front) 2>/dev/null
+}
+
+get_front() {
+  say "  building the front writer"
+  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-front${exe}.new" ./src/front/cmd) || return 1
+  swap_in "$bin/se-front${exe}.new" "$bin/se-front${exe}" || return 1
+  (cd "$root" && node src/scripts/go-source.js stamp se-front) || return 1
+  front_here
 }
 
 # THE MODULES LAND AT THE INSTALL, SO THE FIRST CHECK FETCHES NOTHING. A stamp
@@ -313,10 +299,8 @@ modules_here() {
 }
 
 get_modules() {
-  say "  fetching the modules every Go module names"
-  for mod in $(cd "$root" && git ls-files '*go.mod'); do
-    (cd "$root/$(dirname "$mod")" && go mod download) || return 1
-  done
+  say "  fetching the modules the Go module names"
+  (cd "$root" && go mod download) || return 1
   mkdir -p "$run"
   go_sums > "$go_stamp"
 }
@@ -330,43 +314,9 @@ index_here() {
 }
 
 # [[spec/design_output/index#the-compiler-it-needs]]
-get_zig() {
-  case "$os" in
-    Windows) platform=windows; ending=zip ;;
-    macOS)   platform=macos;   ending=tar.xz ;;
-    *)       platform=linux;   ending=tar.xz ;;
-  esac
-  case "$arch" in
-    arm64) machine=aarch64 ;;
-    *)     machine=x86_64 ;;
-  esac
-  name="zig-${machine}-${platform}-${zig_version}"
-  from="https://ziglang.org/download/${zig_version}/${name}.${ending}"
-
-  say "  downloading Zig ${zig_version}, the C compiler the index builds with"
-  mkdir -p "$bin"
-  tmp=$(mktemp -d)
-  if have curl; then curl -fsSL "$from" -o "$tmp/zig.$ending" || return 1
-  elif have wget; then wget -q "$from" -O "$tmp/zig.$ending" || return 1
-  else say "Neither curl nor wget downloads Zig here." >&2; return 1
-  fi
-  if [ "$ending" = zip ]; then unpack "$tmp/zig.$ending" "$tmp" || return 1
-  else tar -xJf "$tmp/zig.$ending" -C "$tmp" || return 1
-  fi
-  rm -rf "$bin/zig"
-  mv "$tmp/$name" "$bin/zig" || return 1
-  rm -rf "$tmp"
-  [ -x "$bin/zig/zig${exe}" ]
-}
-
 get_index() {
-  cc=$(compiler_here) || { get_zig && cc=$(compiler_here); } || {
-    say "  no C compiler stands here, and Zig failed to download, so the index waits." >&2
-    return 1
-  }
-  say "  building the index with $cc"
-  (cd "$root/src/index" && CC="$cc" CGO_ENABLED=1 GOFLAGS=-tags=sqlite_fts5 \
-    go build -o "$bin/se-index${exe}.new" .) || return 1
+  say "  building the index"
+  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-index${exe}.new" ./src/index) || return 1
   swap_in "$bin/se-index${exe}.new" "$bin/se-index${exe}" || return 1
   (cd "$root" && node src/scripts/go-source.js stamp se-index) || return 1
   index_here
@@ -475,7 +425,7 @@ set_hooks() {
 wanted() {
   [ "$1" = "vale-ls" ] || [ "$1" = "go" ] || [ "$1" = "go-modules" ] || [ "$1" = "git-hooks" ] ||
     [ "$1" = "editor-link" ] || [ "$1" = "editor-extensions" ] ||
-    [ "$1" = "index" ] || [ "$1" = "se-lsp" ] || [ "$1" = "editor-client" ] ||
+    [ "$1" = "index" ] || [ "$1" = "se-lsp" ] || [ "$1" = "se-front" ] || [ "$1" = "editor-client" ] ||
     [ "$1" = "drawing" ] || [ "$1" = "browser" ]
 }
 
@@ -486,6 +436,7 @@ missed() {
     go-modules) say "  the Go modules stay unfetched, so the first check downloads them." >&2 ;;
     index) say "  the index stays unbuilt, so find and links read the files." >&2 ;;
     se-lsp) say "  the language server stays unbuilt, so lint reads the node rules." >&2 ;;
+    se-front) say "  the front writer stays unbuilt, so every ticket write refuses until Go stands here." >&2 ;;
     editor-client) say "  no language client here, so the editor draws no server line." >&2 ;;
     drawing) say "  the drawing stays unbundled, so the editor draws no route." >&2 ;;
     browser) say "  no browser here, so the check skips the drawing's test." >&2 ;;
@@ -506,6 +457,7 @@ here() {
     go-modules) modules_here ;;
     index) index_here ;;
     se-lsp) lsp_here || ! have go ;;
+    se-front) front_here || ! have go ;;
     editor-client) [ -d "$client_folder" ] ;;
     drawing) drawing_here ;;
     browser) browser_here ;;
@@ -526,6 +478,7 @@ why() {
     go-modules) say "go-modules: the modules every Go module names, so the first check fetches nothing" ;;
     index) say "index: the warm model of this tree, which find and links ask" ;;
     se-lsp) say "se-lsp: this tree's own language server, which draws the note shape and the names" ;;
+    se-front) say "se-front: the one writer of frontmatter, which every ticket write reaches" ;;
     editor-client) say "editor-client: the language client the extension starts the server through" ;;
     drawing) say "drawing: the modules the route drawing takes, bundled into the one script a webview loads" ;;
     browser) say "browser: the chromium the drawing's test drives" ;;
@@ -546,6 +499,7 @@ get() {
     go-modules) get_modules ;;
     index) get_index ;;
     se-lsp) get_lsp ;;
+    se-front) get_front ;;
     editor-client) get_client ;;
     drawing) get_drawing ;;
     browser) get_browser ;;
@@ -558,7 +512,7 @@ get() {
 # SE_INSTALL_SKIP names the wants a caller leaves out, so a test vehicle builds
 # no index and links no editor while it proves the vehicle stands alone.
 missing=""
-for one in node modules vale biome vale-ls go go-modules index se-lsp editor-client drawing browser editor-link \
+for one in node modules vale biome vale-ls go go-modules index se-lsp se-front editor-client drawing browser editor-link \
   editor-extensions git-hooks; do
   case " ${SE_INSTALL_SKIP:-} " in *" $one "*) continue ;; esac
   here "$one" || missing="$missing $one"

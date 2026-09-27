@@ -5,6 +5,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { checkNote, readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import * as yaml from "../../.claude/skills/level0/lib/schema-yaml.js";
 import { itemsIn } from "../../.claude/skills/level0/lib/schema-body.js";
@@ -12,7 +13,16 @@ import { SEVERITY } from "../../.claude/skills/level0/lib/schema-fault.js";
 import { mintNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { kindOf, readNote } from "../../.claude/skills/level0/lib/schema-read.js";
 import { cellsOf, rowsIn } from "../../.claude/skills/level0/lib/schema-table.js";
-import { found, good, messages, NOTE, rules, SCHEMA, shown, swap } from "./schema-notes.js";
+import {
+  found,
+  good,
+  messages,
+  NOTE,
+  rules,
+  SCHEMA,
+  shown,
+  swap,
+} from "./schema-notes.js";
 
 const withTable = (table = shown) =>
   good.replace("# What stands open", `${table}# What stands open`);
@@ -171,7 +181,10 @@ test("numbered chapters running back down are refused", () => {
 // [[spec/design_output/schema#a-chapter-holds-a-table]]
 test("a chapter holding the table its schema names, one row per item, passes", () => {
   assert.deepEqual(found(withTable()), []);
-  assert.deepEqual(rowsIn(shown.split("\n")).map((one) => one.line), [3, 5, 6]);
+  assert.deepEqual(
+    rowsIn(shown.split("\n")).map((one) => one.line),
+    [3, 5, 6],
+  );
   assert.deepEqual(cellsOf("| 1 | do | do not |"), ["1", "do", "do not"]);
 });
 
@@ -182,7 +195,9 @@ test("a chapter holding no table, where the schema names one, is refused", () =>
 });
 
 test("a table opening with other heads is refused, at the head row", () => {
-  const bad = withTable(shown.replace("| the rule | do | do not |", "| rule | yes | no |"));
+  const bad = withTable(
+    shown.replace("| the rule | do | do not |", "| rule | yes | no |"),
+  );
   const one = found(bad).find((said) => /opens with the heads/.test(said.message));
   assert.ok(one, "the heads answer the schema");
   assert.equal(lineOf(bad, one.line), "| rule | yes | no |");
@@ -228,7 +243,7 @@ test("a comment and a fenced block count toward no bound", () => {
 });
 
 test("a minted note passes the checker of the kind it is minted from", () => {
-  const text = mintNote(SCHEMA);
+  const text = mintNote(SCHEMA, {}, fakeFront());
   assert.deepEqual(checkNote(text, SCHEMA, NOTE), []);
   assert.match(text, /^---\nkind: \[\[note\]\]\nstatus: todo\n---/);
   assert.match(text, /<!-- one rule per item -->/);
@@ -272,7 +287,10 @@ body:
       .filter((rule) => /state|steps/.test(rule))
       .sort();
   assert.deepEqual(keys(fresh), []);
-  assert.deepEqual(keys(fresh.replace("process:\n", "")), ["Schema.state", "Schema.steps"]);
+  assert.deepEqual(keys(fresh.replace("process:\n", "")), [
+    "Schema.state",
+    "Schema.steps",
+  ]);
 });
 
 // [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
@@ -291,7 +309,11 @@ frontmatter:
     process:
       x-link: true
 `);
-  const said = checkNote("---\nkind: [[ticket]]\nprocess: [[spec/processes/trivial]]\n---\n", schema, "a.md");
+  const said = checkNote(
+    "---\nkind: [[ticket]]\nprocess: [[spec/processes/trivial]]\n---\n",
+    schema,
+    "a.md",
+  );
   assert.ok(said.some((one) => one.rule === "Schema.steps"));
 });
 

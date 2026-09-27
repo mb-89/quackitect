@@ -28,7 +28,7 @@ async function checksAnswer(e, box) {
 
 // [[spec/design_output/schema#the-tool-writes-the-note]]
 async function mintsNote(e, box) {
-  const made = mintedNote(box.schemas, e);
+  const made = mintedNote(box.schemas, e, box.front);
   if (made.why) return said(box, false, made.why, e);
   const at = join(box.work, made.path);
   if (box.disk.exists(at))

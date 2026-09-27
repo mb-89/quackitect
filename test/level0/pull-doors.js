@@ -5,6 +5,7 @@
 import { join } from "node:path";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { SCHEMA } from "./pull-schema.js";
 export const ROOT = "/tree",
@@ -50,6 +51,7 @@ export function doors(files, answers = {}, more = {}) {
     proc: said.proc,
     disk,
     git: said,
+    front: fakeFront(),
     join,
     method: ROOT,
     work: ROOT,

@@ -38,9 +38,8 @@ takes one version of each dependency and one Go.
 A part shipping on its own, with a version and a release a user asks for apart
 from quackitect. That part earns a module of its own, and nothing else does.
 
-## 6. What still splits
+## 6. Where it stands
 
-Each Go folder under `src` holds its own `go.mod`, and
-[[spec/design_output/config#the-go-reader]] describes a shared module riding
-beside the window's build. The migration folds them into one module and
-rewrites that chapter.
+One `go.mod` stands at the root, as `module quackitect`, and an import names
+the package folder under it. The migration folded the seven modules into it,
+and kept every dependency at the version the old modules pinned.

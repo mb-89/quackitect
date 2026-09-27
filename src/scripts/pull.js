@@ -323,15 +323,24 @@ export function takeBack(it, who, name, path) {
     return 1;
   }
   const tip = one.private ? "" : tipOf(it);
-  const text = withEntry(one.text, {
-    step: path,
-    hand: role,
-    hash_before: tip,
-    hash_after: tip,
-    returns: returnsOf(one.front, path) + 1,
-    why: "the hand takes it back",
-  });
-  one.text = withField(withField(text, "step", path), "state", OPEN);
+  const text = withEntry(
+    one.text,
+    {
+      step: path,
+      hand: role,
+      hash_before: tip,
+      hash_after: tip,
+      returns: returnsOf(one.front, path) + 1,
+      why: "the hand takes it back",
+    },
+    it.front,
+  );
+  one.text = withField(
+    withField(text, "step", path, it.front),
+    "state",
+    OPEN,
+    it.front,
+  );
   landed(it, one, [`${role} takes ${path} back`]);
   const sent = one.private ? { ok: true } : pushed(it, who.branch);
   if (!sent.ok) {

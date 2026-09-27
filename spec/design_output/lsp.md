@@ -369,9 +369,10 @@ other source lints against rules the tree no longer carries.
 
 `lsp_here` and `index_here` in `src/scripts/install.sh` ask
 `src/scripts/go-source.js` whether the stamp beside the binary holds the hash of
-its source. The hash reads the binary's folder and every local folder its
-`go.mod` replaces, through `sourceHash` in `src/scripts/tui-build.js`. A test
-file moves nothing. The build writes the stamp.
+its source. The hash reads the binary's folder, every tree package it imports
+and the root `go.mod` and `go.sum`, through `sourceHash` in
+`src/scripts/tui-build.js`. A test file moves nothing. The build writes the
+stamp.
 
 # The client starts it again
 

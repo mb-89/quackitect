@@ -47,9 +47,8 @@ A query past the time a session waits at the tree sizes this tree reaches. The
 table above puts that far off. A slow rebuild alone makes nothing wrong, because
 the watcher keeps the index warm and a rebuild runs once.
 
-## 4. What cgo still holds
+## 4. Where the driver stands
 
-The index still builds through cgo, `github.com/mattn/go-sqlite3`, and the
-installer still fetches Zig. Phase one of the migration moves the driver. It
-replaces [[spec/design_output/index#the-compiler-it-needs]], and the reasoning
-there stands until then.
+The index builds through `modernc.org/sqlite` at `v1.46.1`, the last release
+asking for Go 1.24. Every later release asks for 1.25. The installer fetches no
+compiler, and every Go test runs with `CGO_ENABLED=0`.

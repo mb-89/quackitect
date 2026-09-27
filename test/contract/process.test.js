@@ -11,6 +11,7 @@ import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { slotFaults } from "../../.claude/skills/level0/lib/schema-route.js";
 import { REFUSES } from "../../src/bridge/findings.js";
 import { disk } from "../../src/doors/disk.js";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { firstLeaf } from "../../src/engine/group.js";
 import { withoutFalsePast } from "../../src/engine/tense.js";
 import { askRows, processAt } from "../../src/scripts/process.js";
@@ -106,18 +107,22 @@ const routes = files
 const minted = new Map(
   routes.map((name) => {
     const held = processAt(files, root, join, name);
-    const made = mintedNote(schemasHere({ disk: files, root, join }), {
-      kind: "ticket",
-      path: `spec/tickets/${name}-rendered.md`,
-      fields: {
-        state: "open",
-        process: held.link,
-        process_hash: held.hash,
-        steps: held.route,
-        step: firstLeaf(held.route),
-        Ask: [askRows(held.ask), "", CLEAN].join("\n").trim(),
+    const made = mintedNote(
+      schemasHere({ disk: files, root, join }),
+      {
+        kind: "ticket",
+        path: `spec/tickets/${name}-rendered.md`,
+        fields: {
+          state: "open",
+          process: held.link,
+          process_hash: held.hash,
+          steps: held.route,
+          step: firstLeaf(held.route),
+          Ask: [askRows(held.ask), "", CLEAN].join("\n").trim(),
+        },
       },
-    });
+      fakeFront(),
+    );
     return [name, made];
   }),
 );

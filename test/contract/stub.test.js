@@ -136,7 +136,7 @@ test("a stub's plugin carries the name its settings allow, so a tool answers to 
 });
 
 test("the shim hands a verb to the vehicle it names", () => {
-  const where = files.tempDir("stub-");
+  const where = files.realOf(files.tempDir("stub-"));
   const dest = join(where, "stub");
   try {
     const said = stubInto(files, remoted(), clock(), root, dest, process.pid);
@@ -160,7 +160,7 @@ test("the shim hands a verb to the vehicle it names", () => {
 
 // [[spec/design_output/vehicle#two-roads-to-the-vehicle]]
 test("the shim finds the vehicle through the register, and hands argv and the work root on", () => {
-  const where = files.tempDir("stub-");
+  const where = files.realOf(files.tempDir("stub-"));
   const vehicle = fakeVehicle(where);
   const register = join(where, "register");
   const dest = join(where, "stub");
