@@ -77,7 +77,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-engine-holds-the-route
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: e62c46fa9c1ce125d64867fb5b4f7989d4af09ea
+    hash_after: e62c46fa9c1ce125d64867fb5b4f7989d4af09ea
 ---
 
 # Ask
@@ -104,11 +109,30 @@ Today a process closes on the claim of its last hand, and a prose criterion stay
 
 <!-- the form is text -->
 
+The final acceptance is a gate carrying `final: true`, on the gate [[spec/tickets/a-gate-reviews-and-fixes]] lands. The change lands the chapter The final acceptance in `spec/design_output/pull.md`.
+
+| piece | the change |
+|---|---|
+| the step | the schema admits `final`, a boolean on a gate. `spec/processes/standard.yaml` ends implement with the gate `accept`, and `spec/processes/group.yaml` puts one after `children` |
+| the backlog | `holdsHere` in `src/scripts/pull-when.js` reads the new condition `backlog`, which holds where the ticket names no group. The standard `accept` carries it, so a process inside a delivery skips it |
+| the wait | `takeable` in `src/scripts/pull-hand.js` holds a final gate back while a ticket naming this one as `parent` or `group` stands open |
+| the rerun | `workAnswer` in `src/scripts/pull-chapter.js` names the diff from the `hash_after` of the gate's last verdict to the tip, merges and all. The hand-back runs every command field of the route, and the record keeps each answer |
+| the points | accept with points mints the fix tickets and leaves the step on the gate, so it waits again |
+| the cap | past `work.failsBeforePerson` verdicts short of accept, a new `acceptCapped` in `src/scripts/pull-gate.js` mints a question ticket and closes the process `became` onto it |
+
+Weighed: the cap reuses the key the fail reads, so the config grows no key. Assumed: a group's own route carries its gate, so a delivery reads every child it holds.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/scripts/pull-hand.js` `handOut` and `offer`, which call `takeable`
+- `src/scripts/pull-writes.js` `passed`, which calls `holdsHere`
+- `src/scripts/pull.js` `handBack`, which calls `commandsRun` and the gate roads
+- `src/scripts/pull-hand.js` `handed`, which prints `workAnswer`
+- every ticket on the standard and group routes, which `./RUNME.sh ticket update` moves onto the new route
 
 ### tests
 
@@ -116,17 +140,28 @@ Today a process closes on the claim of its last hand, and a prose criterion stay
 
 <!-- the form is list -->
 
+- `test/level0/pull-accept.test.js` a final acceptance waits while a fix ticket under it stands open
+- `test/level0/pull-accept.test.js` a rerun names the diff since its last verdict, and runs every command
+- `test/level0/pull-accept.test.js` past its cap the process closes became onto a question ticket
+- `test/level0/pull-accept.test.js` a process inside a delivery skips its acceptance, and the delivery's gate reads it
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every file and function named stands opened: the condition reader, the hand-out, the hand-back and both processes
+- the callers list follows each changed function to the file calling it
+- every done_when line maps to a test row above, and `./RUNME.sh check` decides the last
 
 ## review
 
