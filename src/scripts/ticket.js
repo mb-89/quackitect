@@ -19,7 +19,14 @@ import {
 } from "../../.claude/skills/level0/lib/schema.js";
 import { mintedNote, reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { TODO } from "../../.claude/skills/level0/lib/todo.js";
-import { fieldOf, GROUP, withField, withoutField } from "../engine/group.js";
+import {
+  askOf,
+  fieldOf,
+  GROUP,
+  TICKETS as PUBLIC,
+  withField,
+  withoutField,
+} from "../engine/group.js";
 import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
 import { emptyGroup } from "./pull-hand.js";
@@ -124,6 +131,12 @@ function note(it, name, argv) {
     return 1;
   }
 
+  const twin = twinOf(it, line);
+  if (twin)
+    console.error(
+      `${twin} stands open and carries these words. Add the line there in place of a twin.`,
+    );
+
   const steps = fromHold(held.route, holdOf(it));
   const made = routedTicket(it, path, held, {
     steps: talks ? personDecides(steps) : steps,
@@ -146,6 +159,37 @@ function note(it, name, argv) {
         : `${path} stands, and it waits for a retro to decide it.`,
   );
   return said(it, NOTE, line, { ticket: named });
+}
+
+// A word this long carries the meaning, where a shorter one joins the sentence. [[spec/tickets/the-verbs-need-no-wrapper]]
+const LONG_WORD = 5;
+
+// The first open note or ticket whose Ask holds most of the line's longer words. [[spec/tickets/the-verbs-need-no-wrapper]]
+function twinOf(it, line) {
+  const words = longWords(line);
+  if (!words.size) return "";
+  for (const folder of [NOTES, PUBLIC]) {
+    const dir = it.join(it.root, ...folder.split("/"));
+    if (!it.disk.exists(dir)) continue;
+    for (const one of it.disk.list(dir)) {
+      if (one.kind !== "file" || !one.name.endsWith(".md")) continue;
+      const text = it.disk.read(it.join(dir, one.name));
+      if (!/^state: open$/m.test(text)) continue;
+      const ask = longWords(askOf(text));
+      const shared = [...words].filter((word) => ask.has(word)).length;
+      if (shared * 2 > words.size) return `${folder}/${one.name}`;
+    }
+  }
+  return "";
+}
+
+function longWords(text) {
+  return new Set(
+    String(text ?? "")
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((word) => word.length >= LONG_WORD),
+  );
 }
 
 // The first words of a name, as many as the cap holds, joined by a hyphen. [[spec/tickets/prose-verbs-land-first-try]]

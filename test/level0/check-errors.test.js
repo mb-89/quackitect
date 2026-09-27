@@ -24,6 +24,13 @@ test("check --errors names each red case and each finding at error, and no warni
       ok: false,
       said: "Expected values to be strictly equal",
     }),
+    row({
+      name: "a todo case",
+      file: "test/level0/three.test.js",
+      ms: 1,
+      ok: false,
+      todo: true,
+    }),
   ].join("\n");
   const found = [
     {

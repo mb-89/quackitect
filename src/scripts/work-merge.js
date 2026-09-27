@@ -176,17 +176,15 @@ export function freeChildren(it, name) {
 }
 
 // [[spec/design_output/work#the-merge-lands-the-truth]]
+// The check under --errors prints the red cases alone, so the merge hands on every row. [[spec/tickets/the-verbs-need-no-wrapper]]
 function checkSays(it) {
   const ran = it.proc.run(
-    [it.node, it.join(it.root, "src", "scripts", "cli.js"), "check"],
+    [it.node, it.join(it.root, "src", "scripts", "cli.js"), "check", "--errors"],
     {
       cwd: it.root,
     },
   );
-  const rows = String(ran.stdout ?? "")
-    .trim()
-    .split("\n");
-  return { ok: ran.exitCode === 0, says: rows.at(-1) ?? "" };
+  return { ok: ran.exitCode === 0, says: String(ran.stdout ?? "").trim() };
 }
 
 // [[spec/design_output/work#a-merged-branch-closes]]

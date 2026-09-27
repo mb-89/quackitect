@@ -194,6 +194,7 @@ test("a red run names each failing case above its verdict line, and the verdict 
     "  error: AssertionError [ERR_ASSERTION]: it broke",
     "  ...",
     "not ok 3 - a second red case",
+    "not ok 4 - a todo case # TODO the owner lands it",
     "# tests 3",
     "# pass 1",
     "# fail 2",

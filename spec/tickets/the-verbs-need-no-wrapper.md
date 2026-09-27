@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 9 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d6327f2b101 · claude-code-remote
+    hash_before: 2864b19f9c8b403135cad5be2deb3873db4182d8
+    hash_after: 2864b19f9c8b403135cad5be2deb3873db4182d8
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-group.test.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 611. Split it by topic."
 ---
 
 # Ask
@@ -254,11 +262,19 @@ Each new case fails on its own assertion, and the merge cases keyed on `check --
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change touches the files the ask names, and four past it. The Discussion names each and why.
+- The change reaches the process door alone, and each case drives `fakeProc` or a pure function.
+- Each changed function carries a comment linking this ticket, whose approach it implements.
+- The help rows stand as the one source of the verbs, and the block reads them.
+- The review's one finding stands fixed on the ask.
 
 ## tests-green
 
@@ -291,3 +307,15 @@ Each new case fails on its own assertion, and the merge cases keyed on `check --
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+Where the change departs from the approach:
+
+| file | why |
+|---|---|
+| `src/scripts/cli-read.js` | `errorsSaid` stands here, because `cli.js` exits at import and no case reaches it there |
+| `test/level0/work-doors.js` | the merge cases drive this fake, so it answers the check under `--errors` |
+| `src/scripts/battery-reporter.js` | the row marks a TODO case, which fails by design |
+| `src/scripts/battery.js` | `redIn` passes over a TODO case, so `check --errors` names no case that turns nothing red |
+| `test/level0/battery-reporter.test.js` | the case for the TODO mark |
+| `test/contract/cli-verbs.test.js` | the case for the check row under `--errors`, which the commit door asks beside `cli.js` |
+| `test/contract/cli-check-doors.test.js` | the case for the quiet Go part, which the commit door asks beside `cli-check.js` |

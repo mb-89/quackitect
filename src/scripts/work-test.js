@@ -110,7 +110,18 @@ function sinceOf(it, held) {
   return it.git.run(["merge-base", `origin/${TRUNK}`, "HEAD"], true).out;
 }
 
+// Each failing case stands above the verdict, and the verdict stays the last line, whose first word a reader takes. [[spec/tickets/the-verbs-need-no-wrapper]]
 export function testSays(ran, files) {
+  const verdict = verdictOf(ran, files);
+  if (verdict.startsWith("green")) return verdict;
+  const out = `${ran.stdout ?? ""}\n${ran.stderr ?? ""}`;
+  const red = [...out.matchAll(/^\s*not ok \d+ - (.+)$/gm)]
+    .filter((one) => !/# (TODO|SKIP)\b/.test(one[1]))
+    .map((one) => `  not ok: ${one[1].trim()}`);
+  return [...red, verdict].join("\n");
+}
+
+function verdictOf(ran, files) {
   const out = `${ran.stdout ?? ""}\n${ran.stderr ?? ""}`;
   const count = (key) =>
     Number((new RegExp(`^# ${key} (\\d+)`, "m").exec(out) ?? [])[1] ?? 0);
@@ -155,11 +166,17 @@ export function redTest(it, argv, env = {}) {
   } finally {
     putBack(it);
   }
-  if (said.startsWith(ASSERTION)) {
-    console.log(`red, ${said.slice(ASSERTION.length)}`);
+  const rows = said.split("\n");
+  const verdict = rows.at(-1);
+  if (verdict.startsWith(ASSERTION)) {
+    console.log(
+      [...rows.slice(0, -1), `red, ${verdict.slice(ASSERTION.length)}`].join("\n"),
+    );
     return 0;
   }
-  console.log(`refused, because the test answers ${said} with the sources set aside`);
+  console.log(
+    `refused, because the test answers ${verdict} with the sources set aside`,
+  );
   return 1;
 }
 
