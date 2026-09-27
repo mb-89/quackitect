@@ -76,6 +76,10 @@ process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
 depends_on: [the-engine-holds-the-route]
 step: sync
+record:
+  - step: sync
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: 0c7092033b9aea4d01399c8cb050aeb2f4f4b126
 ---
 
 # Ask
