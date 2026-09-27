@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-queue-moves-to-plan.md:121:99: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: implement/tests-green
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: 6894ad0411ed02fe3ab8b45a5d25c0d4aab12e58
+    hash_after: 6894ad0411ed02fe3ab8b45a5d25c0d4aab12e58
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-moves-to-plan.md:121:99: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -255,26 +267,34 @@ The one review row, the first base, stands in acceptBase and in the chapter, and
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-accept.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A gate carrying final now reads the whole work before a process closes. It waits while a ticket naming it as parent or group stands open, and names the diff since its last verdict, or since the first take on a first run. The hand-back runs every command field of the route. Points leave the step on the gate, and a verdict short of accept past work.failsBeforePerson closes the process onto a question ticket. The standard route carries it under when: backlog, so a ticket in a delivery skips it, and the group route carries it after its children. The chapter The final acceptance in spec/design_output/pull.md holds the rules.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the draft names, the fixture of the route contract case, and no other.
+The cases reach the disk, git and the shell through the fakes pull-doors.js builds, and the route shape stands in the contract case.
+src/scripts/pull-accept.js links the chapter The final acceptance, which names the approach.
+The chapter owns the bases and the moments, and each code comment points at it.
+The one review row, the first base, stands in the code and the chapter, and a case decides it.
 
 # Discussion
 
