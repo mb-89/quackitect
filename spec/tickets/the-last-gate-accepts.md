@@ -250,3 +250,5 @@ pass with findings
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The first run of a final acceptance finds no verdict to base its diff on. It reads the diff since the first take of the ticket. A group reads it since its merge base with trunk. The rerun code and the chapter The final acceptance carry this base, under first-accept-names-its-base.
