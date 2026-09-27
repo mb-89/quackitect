@@ -62,6 +62,9 @@ func (s *Store) why(snap Snapshot, name string, seen map[string]bool) Why {
 	if since, ok := snap.Stale(name); ok {
 		said.State, said.Since = "stale", &since
 	}
+	if snap.NotProvided(name) {
+		said.State, said.Since = "not provided", nil
+	}
 	if seen[one.name] {
 		return said
 	}

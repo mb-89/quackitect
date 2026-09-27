@@ -24,11 +24,14 @@ const (
 type input struct {
 	field string
 	name  string
+	port  string
 	typ   reflect.Type
 }
 
 type registration struct {
 	name     string
+	instance string
+	port     string
 	kind     provider
 	typ      reflect.Type
 	def      any
@@ -131,6 +134,14 @@ func (c *Catalog) add(one *registration, where string, opts []Option) Writer {
 	defer c.mu.Unlock()
 	c.regs = append(c.regs, one)
 	return Writer{[]*registration{one}}
+}
+
+// A registration the wiring loads reads as `<instance>.<port>`, and any other as its name. [[spec/design_output/model#the-index-resolves-in-passes]]
+func (one *registration) portName() string {
+	if one.instance == "" {
+		return one.name
+	}
+	return one.instance + "." + one.port
 }
 
 func (c *Catalog) all() []*registration {

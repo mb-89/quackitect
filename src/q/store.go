@@ -23,6 +23,7 @@ type Store struct {
 	revision int64
 	values   map[string]cell
 	stale    map[*registration]time.Time
+	down     map[*registration]bool
 	heard    []func(values map[string]any)
 }
 
@@ -30,6 +31,7 @@ type Snapshot struct {
 	Revision int64
 	values   map[string]cell
 	stale    map[*registration]time.Time
+	down     map[*registration]bool
 	store    *Store
 }
 
@@ -48,7 +50,7 @@ func (s *Store) owner(name string) *registration {
 func (s *Store) Snapshot() Snapshot {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return Snapshot{Revision: s.revision, values: s.values, stale: s.stale, store: s}
+	return Snapshot{Revision: s.revision, values: s.values, stale: s.stale, down: s.down, store: s}
 }
 
 // [[spec/design_output/model#snapshots-and-revisions]]
@@ -195,6 +197,9 @@ func (one Snapshot) Stale(name string) (time.Time, bool) {
 }
 
 func (one Snapshot) Read(name string) any {
+	if owner := one.store.owner(name); owner != nil && one.down[owner] {
+		return owner.def
+	}
 	if held, ok := one.values[name]; ok {
 		return held.value
 	}
@@ -207,7 +212,30 @@ func (one Snapshot) Read(name string) any {
 func (one Snapshot) From(name string) int64 { return one.values[name].from }
 
 // Marks an instance that runs nowhere, so a read of its out-ports answers the built-in value. [[spec/design_output/model#the-index-resolves-in-passes]]
-func (s *Store) Down(instance string) error { return nil }
+func (s *Store) Down(instance string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	next := make(map[*registration]bool, len(s.down)+1)
+	for held := range s.down {
+		next[held] = true
+	}
+	found := false
+	for _, group := range s.groups {
+		for _, one := range group.regs {
+			if one.instance == instance {
+				next[one], found = true, true
+			}
+		}
+	}
+	if !found {
+		return fmt.Errorf("the wiring loads no instance %s", instance)
+	}
+	s.down = next
+	return nil
+}
 
 // [[spec/design_output/model#the-index-resolves-in-passes]]
-func (one Snapshot) NotProvided(name string) bool { return false }
+func (one Snapshot) NotProvided(name string) bool {
+	owner := one.store.owner(name)
+	return owner != nil && one.down[owner]
+}

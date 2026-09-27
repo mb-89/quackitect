@@ -81,7 +81,11 @@ func twice(group named) []Fault {
 	if len(group.regs) < 2 {
 		return nil
 	}
-	return []Fault{{Kind: Twice, Name: group.name, Where: placesOf(group.regs), Says: fmt.Sprintf("it stands %d times", len(group.regs))}}
+	ports := make([]string, 0, len(group.regs))
+	for _, one := range group.regs {
+		ports = append(ports, one.portName())
+	}
+	return []Fault{{Kind: Twice, Name: group.name, Where: placesOf(group.regs), Says: fmt.Sprintf("it stands %d times, written by %s", len(group.regs), strings.Join(ports, " and "))}}
 }
 
 func (c *Catalog) Check() []Fault {
@@ -139,11 +143,18 @@ func inputFaults(one *registration, groups []named) []Fault {
 			faults = append(faults, Fault{Kind: NoName, Name: one.name, Where: []string{one.where}, Says: fmt.Sprintf("field %s reads %s, which the catalog lacks", in.field, in.name)})
 			continue
 		}
-		if held := group.regs[0].typ; held != in.typ {
-			faults = append(faults, Fault{Kind: OtherType, Name: one.name, Where: []string{one.where}, Says: fmt.Sprintf("field %s is %s, and %s is %s", in.field, in.typ, in.name, held)})
+		if writer := group.regs[0]; writer.typ != in.typ {
+			faults = append(faults, Fault{Kind: OtherType, Name: one.name, Where: []string{one.where}, Says: fmt.Sprintf("field %s at %s is %s, and %s at %s is %s", in.field, in.portOr(), in.typ, in.name, writer.portName(), writer.typ)})
 		}
 	}
 	return faults
+}
+
+func (in input) portOr() string {
+	if in.port == "" {
+		return in.name
+	}
+	return in.port
 }
 
 func cycles(groups []named, active map[string]*registration) []Fault {

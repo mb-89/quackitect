@@ -78,6 +78,7 @@ func Load(w Wiring, types map[string]func(*Catalog)) (*Catalog, []Fault) {
 		regs := local.all()
 		for _, reg := range regs {
 			port := one.Name + "." + reg.name
+			reg.instance, reg.port = one.Name, reg.name
 			reg.name = outName(w, one.Name, reg.name)
 			writers[port] = reg.name
 		}
@@ -107,6 +108,7 @@ func bind(w Wiring, instance string, reg *registration, writers map[string]strin
 	kept := reg.inputs[:0]
 	for _, in := range reg.inputs {
 		port := instance + "." + in.name
+		in.port = port
 		to, wired := w.Wires[port]
 		switch {
 		case strings.HasPrefix(in.name, "config/"):
@@ -134,7 +136,24 @@ func bind(w Wiring, instance string, reg *registration, writers map[string]strin
 
 // Loads the wiring and checks the catalog, and answers no store where either names a fault. [[spec/design_output/model#the-index-resolves-in-passes]]
 func Start(w Wiring, types map[string]func(*Catalog)) (*Store, error) {
-	return nil, fmt.Errorf("the start stands unbuilt")
+	c, faults := Load(w, types)
+	faults = append(faults, c.Check()...)
+	if len(faults) > 0 {
+		return nil, Refused(faults)
+	}
+	return NewStore(c), nil
+}
+
+// [[spec/design_output/model#the-index-resolves-in-passes]]
+type Refused []Fault
+
+func (faults Refused) Error() string {
+	lines := make([]string, 0, len(faults)+1)
+	lines = append(lines, "the index refuses to start:")
+	for _, one := range faults {
+		lines = append(lines, one.String())
+	}
+	return strings.Join(lines, "\n")
 }
 
 // A config key by its local name, which the wiring files under `<instance>/config/<key>`. [[spec/design_output/model#config-comes-off-the-registrations]]

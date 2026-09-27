@@ -102,3 +102,14 @@ func TestAnInstanceThatRunsNowhereReadsTheBuiltInMarkedNotProvided(t *testing.T)
 		t.Fatalf("why tickets/all reads %q and %v", said.State, err)
 	}
 }
+
+func TestTheDownOfAnInstanceTheWiringLoadsNowhereRefuses(t *testing.T) {
+	w := Wiring{Instances: []Instance{{"tickets", "source"}}}
+	s, _ := started(t, w)
+	if err := s.Down("backlog"); err == nil || !strings.Contains(err.Error(), "backlog") {
+		t.Fatalf("the down of backlog answers %v", err)
+	}
+	if s.Snapshot().NotProvided("tickets/all") {
+		t.Fatalf("tickets/all reads not provided after the down of another instance")
+	}
+}

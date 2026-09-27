@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -157,6 +157,15 @@ record:
         hash: 205ea49bec3293cf
         size: 1067
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 19cae9bc022be2687d2ca018e368f58efe4baa55
+    hash_after: 19cae9bc022be2687d2ca018e368f58efe4baa55
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -300,14 +309,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft size names, and `src/q/start_test.go` from tests-red
+every case runs over a catalog and a store in memory, so the change reaches no door
+each new function points at the design section on passes, the approach it implements
+the port name stands once in `portName`, and the down mark once in `Store.down`
 
 ## tests-green
 
