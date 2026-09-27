@@ -78,6 +78,7 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 depends_on: [open-tasks-come-from-work]
+group: open-tasks-shadow-lands
 ---
 
 # Ask

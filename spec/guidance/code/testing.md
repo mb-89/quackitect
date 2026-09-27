@@ -17,6 +17,7 @@ rationale: [[spec/rationales/testing]]
 8. Take the clock and the random source as arguments, so a failing case replays.
 9. Let every test run beside every other. A test needing an order is a red test.
 10. Read the rule on the check in [[spec/guidance/code/code]], which holds it over every change.
+11. Test a Go module under `src/modules/<topic>` against the fake index in `q/qtest`. Import nothing past `q`, `q/qtest` and the pure standard library. The module meets the index alone, so its fake stands in for everything the module reads. A fixture rides in through `embed`, or the case seeds it. [[spec/design_output/model#the-fake-index]] *
 
 # Examples
 
@@ -24,3 +25,4 @@ rationale: [[spec/rationales/testing]]
 |---|---|---|
 | 4 | a fake disk that reads what it writes | a double answering a scripted string |
 | 5 | a red test before the code | code first, a test after |
+| 11 | a module test seeding `files/` through `q/qtest` | a module test reading a file off the disk |

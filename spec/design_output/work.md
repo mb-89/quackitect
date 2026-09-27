@@ -226,18 +226,21 @@ the tip, so nothing writes to a branch nobody holds.
 # A box leaves
 
 `branch done` on a group branch writes `hash_after` into the newest record entry, which
-is the box saying it leaves. While a `retro` leaf that applies on this box
-stands unwritten, it frees the open tickets, names that leaf, and refuses. Past
-the retro it always hands the branch back, so no box ends holding one:
+is the box saying it leaves. A group closes only when no ticket naming it stands
+open, so the verb refuses in this order:
 
-| what stands | what it becomes |
+| what stands | what `branch done` does |
 |---|---|
-| a closed ticket of the group | stays in the group, as its history |
-| an open or draft ticket of the group | loses its `group` field, through `freeChildren` in `src/scripts/work-merge.js` |
-| the group | `state: closed`, `reason: done`, so `branch merge` takes it |
+| an open or draft ticket naming the group | refuses, names each ticket and the step it waits at, and frees none |
+| a `retro` leaf that applies on this box, unwritten | refuses, and names the leaf |
+| every ticket at `closed`, and the retro written | closes the group `reason: done`, so `branch merge` takes it |
 
-So a freed ticket stands loose on trunk after the merge, and the next pull hands
-it out. For details, see [[spec/design_output/work#the-merge-frees-the-tickets]].
+A closed ticket stays in the group, as its history. A box that cannot close a
+ticket leaves the group open for the next box, by one of these roads:
+
+- close the ticket through the pull
+- hand a person's step on with `branch unblock`
+- run `branch release`, which leaves the group at `todo`
 
 # A person step leaves
 
@@ -687,10 +690,12 @@ again, so `main` takes a branch only where the merged tree passes.
 
 ## The merge frees the tickets
 
-An open ticket of the group loses its `group` field inside the merge commit. So
-a ticket waiting on a person stands loose on trunk, where `branch list` names it
-and a person sorts it. A closed ticket keeps its `group`, because the pair is
-the history of one group and what it holds.
+`branch done` leaves no open ticket on the branch. So an open ticket naming the
+group at the merge is one trunk gains after the branch's last sync. It loses its
+`group` field inside the merge commit, through `freeChildren` in
+`src/scripts/work-merge.js`, and stands loose on trunk, where `branch list` names
+it and the next pull hands it out. A closed ticket keeps its `group`, because the
+pair is the history of one group and what it holds.
 
 # A merged branch closes
 

@@ -35,14 +35,15 @@ every tag.
 |---|---|---|
 | `disk` | the files | a map keyed by the forward-slash path, on every platform |
 | `proc` | a program | a table of commands, and a command outside it fails naming the door |
-| `git` | a repository, over `proc` | the fake `proc`, with the git commands in its table |
+| `git` | a repository, over `proc` | `FakeGit`, a repository in memory: refs, commits and a tree a commit, which `Show`, `Commit`, `Push`, `Fetch` and `MergeBase` read and move |
 | `clock` | the time, and `clock/minute` | a time that stands still until a test calls `Tick` |
 | `watch` | changes to the files, which feed `files/` | a change the test pushes |
 | `vale` | the prose rules, over `proc` | a table of findings by file |
 | `biome` | the JavaScript format and lint, over `proc` | a table of findings by file |
 
-A door standing on another takes it as an argument, so the fake beneath stands
-in for the one above.
+A door standing on another takes it as an argument in its real one. Its fake
+answers at its own verbs, so a test of a git caller reads refs and commits, and
+writes no git command line.
 
 # An inbound fake replays
 
@@ -72,11 +73,11 @@ replays, per [[spec/design_output/migration#the-tests-after-the-move]].
 
 | the side | what the process does |
 |---|---|
-| inbound | listens for HTTP, SSE and MCP on one loopback port, takes `quack hook` and `quack lsp` over the bus, and calls the index |
+| inbound | listens for HTTP, SSE and MCP on one loopback port. It takes `quack hook` over the bus, and `quack lsp` on a TCP port of its own |
 | outbound | answers `door.<door>.<verb>` on the bus, for every module process and the index |
 
-A module process reaches disk and git through this process alone, so the
-operating system holds the boundary. For the processes, see
+A module process reaches disk and git through the index alone, which sends each
+door call here, so the operating system holds the boundary. For the processes, see
 [[spec/design_input/the-index-holds-the-model#the-system-places-the-processes]].
 
 A run picks each real door, and a test builds the doors in memory with
@@ -90,11 +91,20 @@ check runs it on Linux and Windows:
 
 | the analyzer | what it refuses |
 |---|---|
-| `doorsonly` | an import of `os`, `os/exec`, `net` or `net/http`, and a call to `time.Now`, outside `doors/` |
+| `onlyq` | an import from a package under `src/modules/`, or its tests, past `q`, `q/qtest` and the pure standard library the analyzer lists. So `os`, `io/fs`, `os/exec`, `net`, `database/sql`, `src/config`, `src/index` and a call to `time.Now` stay out |
+| `doorsonly` | an import of `os`, `os/exec`, `net` or `net/http`, and a call to `time.Now`, in `src/q` or a renderer |
 | `fakebeside` | a door file whose package holds no fake for its interface |
-| `nodoor` | an import of a package under `doors/` from a package under `modules/` |
-| `noname` | an import of a package under `modules/` from `doors/`, `index/` or a renderer |
-| `fakeintest` | a test under `modules/` building a real door |
+| `noname` | an import of a package under `src/modules/` from `src/doors/`, `src/index/` or a renderer |
+
+The index keeps the outside's own libraries: its store, the NATS server inside
+it and the supervision of its processes. So `doorsonly` holds the pure packages,
+and the index stands outside it.
+
+# A module tests in isolation
+
+A module meets the index alone, so its tests run against `q/qtest`, per
+[[spec/design_output/model#the-fake-index]], and build no door. A door's fake
+serves the door's contract test and the tests of the index itself.
 
 The analyzers replace `DoorsOnly`, `FakeDoorsInTest` and `OutsideInDoors` for
 the Go code, and the Vale rules keep the JavaScript that stays.

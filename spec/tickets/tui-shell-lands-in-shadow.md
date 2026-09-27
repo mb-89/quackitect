@@ -77,6 +77,7 @@ process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [go-cage-switches-over]
 enabled_by: migration.phase6shadow
+cloud: true
 ---
 
 # Ask

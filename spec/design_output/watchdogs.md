@@ -56,7 +56,8 @@ The next commit of the part clears the mark.
 
 The index restarts a process whose lease expires, and waits longer before each
 restart of the same process. A run of faults inside a window raises an alarm,
-and the restarts stop until the alarm clears.
+and the restarts stop until the alarm clears. The stop stands as proposal (f)
+in [[spec/funnel/the-owner-rules-the-specs]].
 
 | the config key | what it sets |
 |---|---|
@@ -67,9 +68,10 @@ and the restarts stop until the alarm clears.
 
 The foundation adds each key and its default to `spec/config/level0.json`.
 
-# `session/alarms`
+# The alarms standing
 
-`session/alarms` holds the alarms standing, one row a part:
+`session/alarms` holds the alarms standing, one row a part. The index provides
+it, off its watchdog:
 
 | the field | what it holds |
 |---|---|
@@ -89,7 +91,7 @@ The index holds a lease too, and these parts watch it:
 | the watcher | what it does when the index's lease expires |
 |---|---|
 | the doors process | restarts the index, with the same wait and alarm rules |
-| the hook module | runs `quack start` where no door answers, and the cage refuses meanwhile |
+| the hook module | runs `quack start` where no door answers, and the cage refuses meanwhile. Reading no lease stands as proposal (g) in [[spec/funnel/the-owner-rules-the-specs]] |
 
 Every expiry, restart and alarm lands in the session log as a row of kind
 `watchdog`.
