@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/draft
 steps:
   - name: design
     steps:
@@ -131,6 +131,11 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/person-1
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: dfc0996ac0aff760095677c90c4ad37533b4ed1e
+    hash_after: dfc0996ac0aff760095677c90c4ad37533b4ed1e
+    def: 1b6221c418192ec9
 ---
 
 # Ask
@@ -166,8 +171,9 @@ from: none
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is choice -->
+
+drop the ticket
 
 ## draft
 
