@@ -186,6 +186,19 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7dfbbf7a2d0 · claude-code-remote
+    hash_before: 26d0032c0093d05369cc9db663775676e7086143
+    hash_after: 26d0032c0093d05369cc9db663775676e7086143
+    returns: 1
+    why: "the check stands red on red Go tests of sibling tickets that wait on their implement steps: qtest-holds-a-module, ops-keeps-one-state, the onlyq rule and commits-name-their-writer. This change passes its own tests and lint, and needs only the check green"
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 1
+        said: FAIL
 group: the-foundation-closes-its-gaps
 ---
 
@@ -344,26 +357,33 @@ the temporary tree holds one file the case writes, and no note repeats it
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/index.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The glob case starts its index on a temporary tree and asks it to stop in a finally, so no case leaves an se-index standing, and the box index on the real tree stays warm.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches test/contract/index.test.js alone
+the case reaches the real index, which the contract folder drives, and the disk, process and clock doors each have a fake
+the source case beside it points at spec/tickets/windows-ci-turns-green
+the temporary tree holds one file the case writes, and no note repeats it
 
 # accept
 
