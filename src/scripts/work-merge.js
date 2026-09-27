@@ -76,6 +76,8 @@ export function merge(it, name) {
   const freed = freeChildren(it, name);
   if (freed.length) it.git.run(["commit", "--amend", "--no-edit"], true);
 
+  // A merge carrying a new tool builds it, because the install ran before the merge and read the old wants. [[spec/design_output/work#the-merge-lands-the-truth]]
+  installs(it);
   // [[spec/design_output/work#the-merge-lands-the-truth]]
   const said = checkSays(it);
   if (!said.ok) {
@@ -116,6 +118,7 @@ function mergeCloud(it, branch) {
     return 1;
   }
 
+  installs(it);
   const said = checkSays(it);
   if (!said.ok) {
     if (left.length) it.git.run(["reset", "--hard", was], true);
@@ -173,6 +176,13 @@ export function freeChildren(it, name) {
     out.push(one.name);
   }
   return out;
+}
+
+// The install RUNME.sh runs before every verb, run again over the merged tree. [[spec/design_output/work#the-merge-lands-the-truth]]
+function installs(it) {
+  it.proc.run(["sh", it.join(it.root, "src", "scripts", "install.sh")], {
+    cwd: it.root,
+  });
 }
 
 // [[spec/design_output/work#the-merge-lands-the-truth]]
