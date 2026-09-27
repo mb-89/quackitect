@@ -93,7 +93,7 @@ reason: done
 <!-- waits, as list: one line each, naming what stands still until the answer lands -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-Split the sentence naming `it.capture` under the approach of [[spec/tickets/the-queue-moves-to-plan]], or rule that the `tests` gate reads `check --errors` where a change touches no code. The door keeps every agent out of that approach. The queue hands [[spec/tickets/rationale-drops-release-row]] out ahead of the review that sends the draft back, so no agent reaches the fix.
+Split the sentence naming `it.capture` under the approach of [[spec/tickets/the-queue-moves-to-plan]]. Or rule that the `tests` gate reads `check --errors` where a change touches no code. The door keeps every agent out of that approach. The queue hands [[spec/tickets/rationale-drops-release-row]] out ahead of the review that sends the draft back, so no agent reaches the fix.
 
 Open the file on `work/open-tasks-land-in-shadow` and cut the sentence at line 122 in two:
 
