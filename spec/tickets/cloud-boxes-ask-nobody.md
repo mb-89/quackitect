@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: a13575bf18fdd4bf
         size: 2443
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: bca9c156df64c999ee281fa70d23717c38983efd
+    hash_after: bca9c156df64c999ee281fa70d23717c38983efd
+    inputs:
+      - name: design/draft
+        hash: a13575bf18fdd4bf
+        size: 2443
+      - name: design/tests-red
+        hash: 355ea8bb07b76d81
+        size: 668
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -289,8 +301,10 @@ Over the stub, the refusal case fails on its own assertion: the deny text stands
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- cloud-ask-names-the-hold: `spec/design_output/level0.md` says under the answer hold that `AskUserQuestion` passes it. The cloud exception belongs there too, beside the two lists the draft names
 
 # implement
 
