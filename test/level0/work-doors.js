@@ -203,6 +203,14 @@ export const merging = (extra = {}) => ({
     exitCode: 0,
     stdout: "green\n",
   },
+  // The merge pushes trunk and closes the branch trunk now holds. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+  "git push origin main": { exitCode: 0 },
+  "git rev-list --count origin/main..main": { stdout: "0\n" },
+  "git branch -r --merged origin/main": { stdout: "  origin/main\n  origin/work/one-group\n" },
+  "git branch -r --points-at origin/main": { stdout: "  origin/main\n" },
+  "git rev-list --first-parent origin/main": { stdout: `${SHA}\n` },
+  "git rev-parse origin/work/one-group": { stdout: "b9\n" },
+  "git push origin --delete work/one-group": { exitCode: 0 },
   ...extra,
 });
 

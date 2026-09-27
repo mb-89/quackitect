@@ -556,11 +556,17 @@ them, in the order the score sets. [[spec/tickets/the-queue-is-a-score]]
 
 ## A dependency waits for trunk
 
-A branch meets its dependency once trunk holds the branch it names, or once that
-branch goes because somebody merges and closes it. `done` alone holds the
-dependent, because `done` waits on the merge, which a box off the cloud runs.
-So a chain of work runs
-itself in order, and each link starts from the one before it.
+A branch meets its dependency once the branch it names stands no more:
+
+| the dependency's branch | the dependent |
+|---|---|
+| stands at `todo`, held or `done` | waits |
+| merged, and still on the remote | waits |
+| gone | runs |
+
+The read looks for the branch on the remote alone, and reads no history. So a
+shallow clone reads the same answer as a full one. A merge closes the branch
+once trunk holds all of it, so a chain of work runs itself in order.
 
 `take` merges trunk in. A dependent taken before its dependency lands starts
 from a trunk carrying none of that work. It then builds that work a second time.
@@ -739,6 +745,10 @@ it and the next pull hands it out. A closed ticket keeps its `group`, because th
 pair is the history of one group and what it holds.
 
 # A merged branch closes
+
+`branch merge` closes the branch it lands. Once the check passes on the merge
+commit, it pushes trunk and runs the close. So trunk on origin holds the whole
+branch before the branch goes. A refused push leaves the branch standing.
 
 `branch close [name]` deletes a branch git says is inside `main`, here and on
 origin. Naming no branch closes every one of them. It reaches the kinds below:

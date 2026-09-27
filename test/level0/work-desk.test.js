@@ -49,4 +49,6 @@ test("a desk's branch merge takes a done cloud branch into main, and the check p
     said,
     /work\/one-group is merged, and the check passes on the merge commit/,
   );
+  assert.ok(ranGit(outside).includes("git push origin --delete work/one-group"), said);
+  assert.match(said, /work\/one-group is closed/);
 });
