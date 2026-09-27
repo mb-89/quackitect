@@ -114,10 +114,20 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
+record:
+  - step: design/draft
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 2fa661bb371637d0ef61a638a05371c0a575d832
+    hash_after: 2fa661bb371637d0ef61a638a05371c0a575d832
+    inputs:
+      - name: ask
+        hash: 99b403a86cb2dc33
+        size: 536
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -149,38 +159,46 @@ A red job trains every reader to skip it, so a Windows fault lands unseen. A lea
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The Windows job of check.yml passes on main at run 36322578200, so the first done_when line holds once the branch takes main in. The work left is the leak. A contract case in test/contract/index.test.js starts the index on a temporary work tree, reads the pid off the standing file under .se/.runtime/index.json, asks stop, and polls until process.kill(pid, 0) throws, or fails past a few seconds naming the pid. Where the case goes red, the stop call in src/index/door.go closes the listeners and exits the process, and the index door gains nothing. Weighed: a case per start over one sweep of the box after the battery, since a sweep reads the box index too, and that one stays warm by design. Assumed: every case that starts the index on a temporary tree asks stop in a finally, as the two standing cases do.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+test/contract/index.test.js: the tickets and changes cases, which start the index on a temporary tree and ask stop,src/index/door.go: the stop call
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/contract/index.test.js: a stopped index leaves no se-index process past the case
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+test/contract/index.test.js,src/index/door.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened check.yml runs on main, the index door, the contract cases, and the Standing struct and stop call in door.go, and checked each claim there
+the callers come off a grep for index( and stop over test and src/index
+the first done_when line meets the Windows job of check.yml, the second meets the new contract case, and the check decides the third
 
 ## tests-red
 
