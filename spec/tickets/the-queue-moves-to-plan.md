@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -113,6 +113,23 @@ record:
         exit: 0
         said: The rules pass.
     def: 21d63335f32dfcda
+  - step: implement/tests-green
+    hand: person
+    hash_before: 23dfd253fb4367357f7a17d6925fa9f7e7b69e5f
+    hash_after: f547c5011eb41ab94646c3e7660e74e586b857c7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 17 test(s) pass in 1 file(s); green, src/plan passes; green, src/tickets passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-moves-to-plan.md:240:1: ListItem: A sentence in a list item holds 20 words, and this one holds 25"
+    inputs:
+      - name: implement/tests-red
+        hash: bbc5c60bdd674eca
+        size: 1103
+    def: a27db29c1d1562f2
+reason: done
 ---
 
 # Ask
@@ -272,26 +289,34 @@ Every new case fails on its own assertion over stubs that answer nothing: the qu
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/work-answer.test.js src/plan/queue_test.go src/plan/outline_test.go src/plan/golden_test.go src/tickets/tickets_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A new Go package `src/plan` ports the queue's score and its outline from `pull-queue.js` and `pull-outline.js`. It reads the rows a caller hands in, and touches no git, no disk and no index. `tickets.Ticket` reads `depends_on` and the failed hand-backs, so a row comes off the one reading. `placesIn` hands an optional capture hook one run. `test/level0/queue-golden.js` writes that run to `src/plan/testdata/queue.golden.json`, and `TestQueueGolden` answers every place the same. A tie folds the case before it compares bytes, as `localeCompare` reads the tree's names.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and the golden file under `src/plan/testdata`
+- the port reaches no door, and the golden script runs the real doors from the command line alone
+- a comment in each file names the ticket the change implements
+- the weights and the day stand in `src/plan/queue.go`, and the four words in `src/plan/outline.go`
+- the design review passes with no row
 
 # Discussion
 
