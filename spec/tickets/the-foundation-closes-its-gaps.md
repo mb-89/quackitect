@@ -106,6 +106,7 @@ record:
   - step: sync
     hand: box d7e10c2f00cd · claude-code-remote
     hash_before: 7517168931eb6b2e989e70598da6e8806a42820f
+    hash_after: 4097e42023b2f38dd1125e04feb53dec94c3c6d1
 ---
 
 # Ask
