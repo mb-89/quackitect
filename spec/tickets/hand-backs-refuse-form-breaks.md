@@ -292,3 +292,5 @@ from: none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- the ask says the check exits 1 on these lines, and it exits 0 on them. They stand at warning, so the push waits and the check passes. The fault stands as the ask names it otherwise

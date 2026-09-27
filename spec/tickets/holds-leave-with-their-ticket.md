@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-green
+step: accept
 steps:
   - name: design
     steps:
@@ -164,6 +164,22 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 3ee99ef0ec43d1d7c95dc4b49efdaed5c6c8487a
+    hash_after: 3ee99ef0ec43d1d7c95dc4b49efdaed5c6c8487a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:245:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: b1d5d7b286e9be5f
+        size: 907
+    def: ec253787263043a7
 todo: true
 ---
 
@@ -376,26 +392,33 @@ Rows for the implement step to fix in place:
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/holds-leave.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A hold leaves with its ticket. `stillHeld` in `src/engine/named.js` reads the ticket file a hold names, and a file reading `state: closed` stands in no hand. Every hold reader calls it, the door and the stop among them. The pull removes each closed hold file before it reads the hand. The lens reads the state before the holds. A hold naming no path stands. So does one whose ticket file stands on another branch alone, since a work branch or a mint moves the file. The older `hold.json`, which no verb writes, leaves the readers.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files match the draft size, plus the lens and the older hold file readers the gate rows name
+- the change reaches the disk door alone, and every case runs over the fake disk
+- each changed reader links the hold chapter of `spec/design_output/pull.md`, which says the state decides
+- `stillHeld` in `src/engine/named.js` owns the rule, and every hold reader calls it
 
 # accept
 
