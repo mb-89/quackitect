@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: guidance-rides-each-step
 parent: an-answer-stays-under-cap
+record:
+  - step: do
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: 8895363046911ea729ac9347dda034c907b68773
+    hash_after: 8895363046911ea729ac9347dda034c907b68773
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-style-carries-the-top.md:143:56: Vocabulary: blocksof stands outside the words this tree writes. Write "
+reason: done
 ---
 
 # Ask
@@ -45,26 +58,32 @@ partOf in src/scripts/pull-chapter.js cuts at a UTF-8 boundary inside room where
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/pull-cap.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+partOf lives in src/scripts/pull-cap.js, beside the rest of the cap. A first line longer than the room cuts at the last character inside it, so the cut splits no UTF-8 character, and the case a line longer than the room cuts at a character holds it.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and partOf stands in src/scripts/pull-cap.js in place of pull-chapter.js, since the cap owns it
+- the change reveals no cleanup
+- the cut stands once, in partOf
 
 # Discussion
 
