@@ -9,6 +9,7 @@ export const FETCHING = [
   "biome",
   "vale-ls",
   "go",
+  "go-modules",
   "index",
   "se-lsp",
   "editor-client",
