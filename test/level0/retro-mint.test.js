@@ -206,6 +206,19 @@ test("a promotion's ticket stands checked by the mint alone, and classes read it
 });
 
 // [[spec/tickets/the-retro-reads-the-backlog]]
+test("a promotion naming a process that stands nowhere is refused by its what", () => {
+  const promotion = {
+    what: "the land rule",
+    ticket: { ...CLASS.ticket, name: "the-rule-lands", process: "nowhere" },
+  };
+  const it = doors([], [promotion]);
+
+  assert.deepEqual(mintFaults({ classes: [], promotions: [promotion] }, it), [
+    'promotion "the land rule" waits, and its ticket names process nowhere: spec/processes holds no nowhere. It holds standard, trivial.',
+  ]);
+});
+
+// [[spec/tickets/the-retro-reads-the-backlog]]
 test("a class naming trivial mints a trivial ticket", () => {
   const trivial = {
     ...CLASS,

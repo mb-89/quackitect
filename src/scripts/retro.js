@@ -3,6 +3,7 @@
 // before it leaves. The retro's own route lands on a later branch.
 // [[spec/design_output/pull#a-need-is-a-verb]]
 
+import { backlog } from "../engine/retro/backlog.js";
 import { chapters } from "../engine/retro/chapters.js";
 import { classes } from "../engine/retro/classes.js";
 import { effect } from "../engine/retro/effect.js";
@@ -22,6 +23,8 @@ export function retro(root, argv, doors) {
   if (what === "notes") return notes(it);
   // [[spec/design_output/work#an-experiment-decides]]
   if (what === "audit") return audit(it);
+  // [[spec/tickets/the-retro-reads-the-backlog]]
+  if (what === "backlog") return backlog(it, argv[1]);
   // [[spec/design_input/the-agent-pulls-tickets]]
   if (what === "collect") return collect(it, argv[1], argv.includes("--again"));
   // [[spec/guidance/retro/chapter]]
@@ -68,6 +71,7 @@ export function retro(root, argv, doors) {
     "  classes <retro>  counts each class's rate, and refuses a finding with no disposition",
   );
   console.log(
+    "  backlog <retro>  every prose criterion the window closes, and 0 once each holds a verdict",
     "  mint <retro>     mints one ticket a class standing open, and opens each draft",
   );
   console.log(

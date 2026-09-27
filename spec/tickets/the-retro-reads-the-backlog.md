@@ -146,7 +146,7 @@ src/engine/retro/mint.js mintOne, which reads the route off the ticket,src/engin
 <!-- every test the change adds, one a line, as a file and a test name -->
 <!-- the form is list -->
 
-test/level0/retro-mint.test.js a class naming trivial mints a trivial ticket,test/level0/retro-mint.test.js a class naming no process is refused,test/level0/retro-mint.test.js a class naming a process that stands nowhere is refused,test/level0/retro-backlog.test.js the backlog verb prints each prose criterion of a backlog ticket the window closes,test/level0/retro-backlog.test.js the backlog verb answers 1 while a criterion holds no verdict, and 0 once each does,test/level0/retro-backlog.test.js a group's ticket and a criterion naming a command stay out,test/level0/retro-route.test.js the retro route holds backlog after audit
+test/level0/retro-mint.test.js a class naming trivial mints a trivial ticket,test/level0/retro-mint.test.js a class naming no process is refused,test/level0/retro-mint.test.js a class naming a process that stands nowhere is refused,test/level0/retro-backlog.test.js the backlog verb prints each prose criterion of a backlog ticket the window closes,test/level0/retro-backlog.test.js the backlog verb answers 1 while a criterion holds no verdict, and 0 once each does,test/level0/retro-backlog.test.js a group's ticket and a criterion naming a command stay out,test/contract/retro-route.test.js the retro route holds backlog after audit
 
 ### answers
 
@@ -187,7 +187,7 @@ pass with findings
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh test test/level0/retro-mint.test.js test/level0/retro-backlog.test.js test/level0/retro-route.test.js
+./RUNME.sh test test/level0/retro-mint.test.js test/level0/retro-backlog.test.js test/contract/retro-route.test.js
 
 ### seen
 

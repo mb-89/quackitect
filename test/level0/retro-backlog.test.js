@@ -7,7 +7,9 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeTrunk } from "../../src/doors/fake/git.js";
+import { criteriaOf } from "../../src/engine/retro/backlog.js";
 import { retro } from "../../src/scripts/retro.js";
+import { closedIn } from "../../src/scripts/retro-collect.js";
 
 const ROOT = "/tree";
 const RETRO = "retro-a1b2c3";
@@ -153,4 +155,34 @@ test("a group's ticket and a criterion naming a command stay out", () => {
   assert.doesNotMatch(said, /a member's criterion/);
   assert.doesNotMatch(said, /a group's criterion/);
   assert.doesNotMatch(said, /RUNME\.sh check/);
+});
+
+// [[spec/tickets/the-retro-reads-the-backlog]]
+test("a prose criterion is an Ask bullet naming no command, under either bullet mark", () => {
+  const text = ticket("closed", [], [PROSE, COMMAND]).replace(
+    `- ${PROSE}`,
+    `* ${PROSE}`,
+  );
+
+  assert.deepEqual(criteriaOf(text), [PROSE]);
+  assert.deepEqual(
+    criteriaOf("---\nstate: closed\n---\n\n# Ask\n\nProse alone.\n"),
+    [],
+  );
+});
+
+// [[spec/tickets/the-retro-reads-the-backlog]]
+test("closedIn answers every ticket trunk closes inside the window, with the commit landing it", () => {
+  const closed = closedIn(
+    { git: fakeTrunk(COMMITS) },
+    Date.parse("2026-09-10T00:00:00.000Z"),
+  );
+
+  assert.equal(closed.ok, true);
+  assert.deepEqual([...closed.landings.keys()].sort(), [
+    "a-backlog-one",
+    "a-group",
+    "a-member",
+  ]);
+  assert.equal(closed.landings.get("a-backlog-one").sha, "c1");
 });

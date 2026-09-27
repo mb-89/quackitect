@@ -1,8 +1,9 @@
 // The retro's tickets: one a class the check step leaves open, and one a
-// promotion, minted off the standard route, its ask written and the draft
-// opened.
+// promotion, minted off the route its ticket names, its ask written and the
+// draft opened.
 // [[spec/guidance/retro/check]]
 
+import { processAt } from "../../scripts/process.js";
 import { CLASSES, recordOf } from "./classes.js";
 import { homeOf } from "./timeline.js";
 
@@ -10,7 +11,6 @@ export const TICKETS = "spec/tickets";
 // A class the check step closes opens on one of these, and where or why follows. [[spec/guidance/retro/check]]
 export const CLOSED = ["fixed:", "past:"];
 const OPEN = "open";
-const ROUTE = "standard";
 
 // The command line stands under the method root, and a stub's work root holds none, so the call names it there and hands the child the work root. [[spec/design_output/vehicle#the-work-root-inherits]]
 function cliOf(it) {
@@ -47,7 +47,7 @@ export function withAsk(text, ask) {
 }
 
 // Every fault standing between the classes and promotions and their tickets. [[spec/guidance/retro/check]]
-export function mintFaults(record) {
+export function mintFaults(record, it) {
   const faults = [];
   for (const one of record.classes) {
     const status = String(one.status ?? "");
@@ -61,11 +61,11 @@ export function mintFaults(record) {
       continue;
     }
     if (status !== OPEN || one.tickets?.length) continue;
-    faults.push(...ticketFaults(`${one.id} stands open`, one.ticket));
+    faults.push(...ticketFaults(`${one.id} stands open`, one.ticket, it));
   }
   (record.promotions ?? []).forEach((one, at) => {
     if (one?.tickets?.length) return;
-    faults.push(...ticketFaults(`${promotionName(one, at)} waits`, one?.ticket));
+    faults.push(...ticketFaults(`${promotionName(one, at)} waits`, one?.ticket, it));
   });
   return faults;
 }
@@ -77,11 +77,19 @@ export function promotionName(one, at) {
 }
 
 // Every field a ticket to mint carries none of, each named after the thing it serves. [[spec/tickets/a-promotion-names-its-fault]]
-function ticketFaults(said, ticket) {
+function ticketFaults(said, ticket, it) {
   const faults = [];
   for (const field of ["name", "gain", "breaks"]) {
     if (!String(ticket?.[field] ?? "").trim())
       faults.push(`${said}, and its ticket carries no ${field}`);
+  }
+  // A class names the route its ticket mints onto, and the mint refuses one standing nowhere. [[spec/tickets/the-retro-reads-the-backlog]]
+  const process = String(ticket?.process ?? "").trim();
+  if (!process) faults.push(`${said}, and its ticket carries no process`);
+  else if (it) {
+    const found = processAt(it.disk, it.root, it.join, process);
+    if (found.why)
+      faults.push(`${said}, and its ticket names process ${process}: ${found.why}`);
   }
   if (!(ticket?.done_when ?? []).length)
     faults.push(`${said}, and its ticket carries no done_when`);
@@ -91,7 +99,12 @@ function ticketFaults(said, ticket) {
 // Mints the ticket a class or a promotion carries, writes its ask, opens the draft and names it back. [[spec/tickets/the-retro-finishes-its-asks]]
 function mintOne(it, one, label) {
   const path = `${TICKETS}/${one.ticket.name}.md`;
-  const ran = runIn(it, ["mint", "ticket", path, `--process=${ROUTE}`]);
+  const ran = runIn(it, [
+    "mint",
+    "ticket",
+    path,
+    `--process=${String(one.ticket.process).trim()}`,
+  ]);
   if (ran.exitCode !== 0) {
     console.error(`${label} mints no ticket: ${String(ran.stderr ?? "").trim()}`);
     return false;
@@ -119,7 +132,7 @@ export function mint(it, name) {
     return 2;
   }
   const record = recordOf(it.disk.read(at));
-  const faults = record ? mintFaults(record) : [`${CLASSES} reads as no JSON`];
+  const faults = record ? mintFaults(record, it) : [`${CLASSES} reads as no JSON`];
   if (faults.length) {
     for (const one of faults) console.error(one);
     return 1;

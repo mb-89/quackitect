@@ -67,10 +67,21 @@ steps:
         form: command
         expects: 0
         says: retro audit, which answers 0 once every experiment stands decided
+  - name: backlog
+    does: reads every prose criterion a ticket the window closes carries, and writes each a verdict into backlog.json
+    by: anyone
+    input: audit
+    needs: ["retro"]
+    tags: [retro, backlog]
+    evidence:
+      - name: backlog
+        form: command
+        expects: 0
+        says: retro backlog, which answers 0 once each prose criterion holds a verdict with its reason
   - name: chapter
     does: cuts the window into chapters of about six hours, and the engine hands every chapter its lines
     by: anyone
-    input: audit
+    input: backlog
     needs: ["retro"]
     tags: [retro, chapter]
     evidence:
