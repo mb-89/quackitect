@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -145,6 +145,18 @@ record:
         hash: 2c23db1c6fc9a5e2
         size: 4127
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 4319461702ea90a852cc654007839aff7c41c843
+    hash_after: 4319461702ea90a852cc654007839aff7c41c843
+    inputs:
+      - name: design/draft
+        hash: 2c23db1c6fc9a5e2
+        size: 4127
+      - name: design/tests-red
+        hash: 28f78e33c9a88d43
+        size: 952
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -293,8 +305,14 @@ the cases run over the memory keep, a moved clock and a fake accept that holds a
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the size misses .claude/commands/se-config-watchdog-deadlineAction.md: the projection rewrites its help line when deadlineAction takes the operation's span, so the builder lists it beside the deadlineOp command it removes.
+- the slow case races its 50ms wait against the disk answer that moves Progress to one of two: the builder widens the wait or has the case wait on the first move, so a loaded box under -race reads no fraction of zero.
+- deadlineAction moves from 30 to 600 seconds: every action's watchdog then waits the operation's span, which the model's deadline table already names; the builder checks no hook reads the 30 as a reply span.
+- the seen line names q.NewStore(c, nil): the-wiring-file-binds-ports closed with NewStore taking the catalog alone, and the cases call it so, so nothing changes.
+- store_test.go TestAnActionDeclaresItsDeadlineAndItsWrite stands unwritten: the grep for Op() over src/q decides the split, so the builder rewrites the handle case in place at implement.
 
 # implement
 
