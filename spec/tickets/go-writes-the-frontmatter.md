@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: dd5e39bdb69af8c65f904a923be69374485519e1
+    hash_after: dd5e39bdb69af8c65f904a923be69374485519e1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 7 test(s) pass in 3 file(s); green, src/front passes; green, src/tui/work passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/sqlite-runs-pure-go.md:111:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -288,11 +300,15 @@ The surprise: the tree's JavaScript reader strips a quote and unescapes nothing.
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/front src/tui/work test/level0/front-writer.test.js test/level0/pull-hand-front.test.js test/contract/front.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -300,15 +316,32 @@ The surprise: the tree's JavaScript reader strips a quote and unescapes nothing.
 
 <!-- the form is text -->
 
+Go writes every front now. The package `src/front` holds six ops and one quoting rule, and `se-front` hands them to every other language.
+
+| the writer | what it calls |
+|---|---|
+| the four group writers | the front door on `it`, which runs `se-front` |
+| the mint and the re-route | `mint` through the same door |
+| the window | the package in place |
+
+The install builds `se-front` beside `se-lsp`, and a box with no binary refuses a write and names `./RUNME.sh`. Commit `af268f380` rewrites the four tickets out of form, alone. A second `normalise` moves nothing, which `TestNormaliseRunsTwiceAsOnce` holds. A bare `go test ./...` still fails the index cases on `fts5`, which [[spec/tickets/sqlite-runs-pure-go]] owns.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change touches the callers the design lists, their tests and the door bags
+- the front door's fake stands under `src/doors/fake`, held to the binary by the contract test
+- each new file opens on the approach and links this ticket
+- the quoting rule stands in `Quote`, and the fake mirrors it under the contract test
+- the review passes with no rows
+
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
 
 - The build refines one line of the approach. A writer takes the front door as its last argument, in place of one function in `group.js` reaching the binary. Every verb hands in `it.front`, and every test hands in `fakeFront()`, so a memory-only test spawns no process. `test/contract/front.test.js` holds the fake to the binary over tickets of this tree.
-- `set` writes a flow list or a flow map as written, since `successors` takes a list, and normalise leaves a flow as written too.
+- `set` writes a flow list or a flow map as written, since `successors` takes a list.
+- `normalise` leaves a flow as written too.
