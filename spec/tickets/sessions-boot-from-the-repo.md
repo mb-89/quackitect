@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -256,6 +256,21 @@ record:
         hash: 0dbbf5047a23c593
         size: 3078
     def: 08e16d07b0de477c
+  - step: design/draft-2
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: e4bc60a0613a0db4e4610eda1aeb09c352be5420
+    hash_after: e4bc60a0613a0db4e4610eda1aeb09c352be5420
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/design_output/level0]]
+        hash: 22fc99331ec488bc
+        size: 87937
+    def: 2fcb4abe3d77d8a2
 group: the-cloud-works-its-queue
 ---
 
@@ -398,11 +413,8 @@ Four cases fail on their own assertion against the stub boot, and the settings f
 <!-- the form is text -->
 
 The level zero plugin loads off a manifest git ignores, and its bridgehead installs what a cloud box lacks once it loads. So the boot hook holds one job: it brings the manifest and the modules for the next session on a box where either stands nowhere.
-
 The approach takes this as unmeasured: the client reads the plugins before any SessionStart hook runs, because a plugin registers SessionStart hooks of its own. So the session running the first install holds no level zero, and the setup keeps its install line, its trust flag and its auto mode. The note says so, and names the probe that retires the install line.
-
 `src/scripts/boot.js` runs as the hook, through node. Its pure part `boots(it)` runs nothing off a cloud box, under the guard the bridgehead reads: `CLAUDE_CODE_REMOTE` or `SE_CLOUD`. Where the manifest and `node_modules` both stand, it runs nothing. Otherwise it runs `sh src/scripts/install.sh` through the proc door, under `SE_INSTALL_SKIP` set to `INSTALL_SKIP` from the hooks module. It answers 0 always, so a failed install holds no session up.
-
 `.claude/settings.json` gains `hooks.SessionStart` with one command hook running node over `boot.js`.
 
 ### callers
@@ -437,6 +449,7 @@ The approach takes this as unmeasured: the client reads the plugins before any S
 - the stamp and HEAD: no stamp stands, and the manifest and the modules decide
 - a tool gone under a matching stamp: a case holds the modules gone
 - the Windows road: boot runs off a cloud box nowhere, so a desk keeps `RUNME`
+- the restale: the design input drops its funnel line alone, and the boot section stands as draft-2 reads it
 
 ### size
 
