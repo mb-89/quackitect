@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: split
+step: children
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [the-migration-writes-its-specs]
@@ -93,6 +93,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-foundation-lands-unchanged already carries every commit on main.
+  - step: split
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 3e064c85f62618d412b45d64f7b37483b0e32c32
+    hash_after: 3e064c85f62618d412b45d64f7b37483b0e32c32
 ---
 
 # Ask
@@ -123,11 +127,42 @@ Done when the index answers `/v1` and the old API side by side, and the check st
 
 <!-- the form is list -->
 
+- [[spec/tickets/go-code-shares-one-module]], under the standard process
+- [[spec/tickets/seven-go-mods-leave]], under the trivial process
+- [[spec/tickets/split-tests-take-one-module]], under the trivial process
+- [[spec/tickets/tidy-writes-the-go-line]], under the trivial process
+- [[spec/tickets/sqlite-runs-pure-go]], under the standard process
+- [[spec/tickets/the-compiler-leaves-every-caller]], under the trivial process
+- [[spec/tickets/the-q-core-holds-names]], under the standard process
+- [[spec/tickets/catalog-holds-name-families]], under the trivial process
+- [[spec/tickets/migration-names-the-q-package]], under the trivial process
+- [[spec/tickets/actions-declare-op-and-writes]], under the trivial process
+- [[spec/tickets/operations-and-leases-land]], under the standard process
+- [[spec/tickets/op-moves-reach-the-log]], under the trivial process
+- [[spec/tickets/stale-marks-follow-the-provider]], under the trivial process
+- [[spec/tickets/quack-why-answers-a-name]], under the standard process
+- [[spec/tickets/why-reads-the-stale-mark]], under the trivial process
+- [[spec/tickets/files-topic-reads-the-rows]], under the standard process
+- [[spec/tickets/the-index-answers-v1]], under the standard process
+- [[spec/tickets/v1-values-read-stale]], under the trivial process
+- [[spec/tickets/serve-takes-a-catalog-seam]], under the trivial process
+- [[spec/tickets/serve-callers-take-the-listener]], under the trivial process
+- [[spec/tickets/start-check-runs-in-serve]], under the trivial process
+- [[spec/tickets/the-import-rules-get-checked]], under the standard process
+- [[spec/tickets/doors-note-names-every-analyzer]], under the trivial process
+- [[spec/tickets/check-reads-provider-keys]], under the trivial process
+- [[spec/tickets/ci-runs-a-windows-job]], under the standard process
+- [[spec/tickets/go-writes-the-frontmatter]], under the standard process
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each child closes on its own review, and a standard child holds one piece of the goal, a trivial one a single change
+- the children cover the goal piece by piece: one module, the pure Go driver, the `q` core, the `/v1` door beside the old API, the import check, the Windows job and the Go frontmatter writer, and every child stands closed
+- every child stands closed, so none waits on another and none names anything under depends_on
 
 # children
 
