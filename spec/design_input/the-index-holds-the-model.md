@@ -27,7 +27,7 @@ The asks, one to a line:
 - Let a module talk to the index alone, and test every module in isolation against a fake index.
 - Build every surface from the registry: the command line, the window, the sidebar, HTTP and MCP.
 - Declare the views, and let one renderer draw every one of them.
-- Hand every longer action a handle, and keep recent ones.
+- Answer every call within the wait its caller sets, and hand an agent the rest in its next turn.
 - Put a watchdog and a dead-man switch on every part.
 - Let the cage refuse while the index stands down.
 - Let the system place the modules in processes, where no author sees it.
@@ -253,20 +253,24 @@ The window is the first renderer, and it is the command line with tabs:
 | `cli` | the command tree, and a form built from an action's input, with the command line it runs |
 | `help` | the help |
 
-# Operations carry a handle
+# A caller sets its wait
 
-An action taking longer than a moment returns a handle at once: a name in the
-index, `ops/<id>`, with its state, progress, deadline and result.
+One kind of action stands, and every call takes a record, `ops/<id>`, inside the
+index. The caller sets a wait, and a call ending within it answers the result. One
+running past it answers `still running`, with the handle, the fraction done
+and the time gone by. An agent stores no handle and spends no turn polling.
+
 
 | the rule | what holds |
 |---|---|
-| callback or poll | a caller watches `ops/<id>` or reads it, the way it reads every name |
+| the agent | the hook module hands a result arriving late into the session's next turn, and the Stop hook names what still runs |
+| the wait | set per call, and a default per surface, a second for the agents' tools |
 | states | `queued`, `running`, then `done`, `failed` or `cancelled`, and the index pushes each move |
 | the deadline | the watchdog ends a late operation loudly as a failure, and its undo steps run |
 | one writer | writing operations queue one at a time per tree. A read waits on nothing, except the read of an unwatched pending name, which waits for its run and for no write. So a git hook reading names answers at once |
 | the caller | an operation outlives it, and another client reads the result |
 | retention | the running and queued ones stay, finished ones stay for a window config sets, a failure stays longer, and the session log keeps every change |
-| reads | a read takes no handle, and the cage's answer inside a hook stays synchronous |
+| reads | a read takes no record, and the cage's answer inside a hook stays synchronous |
 
 They carry the name operations, because a ticket names the work here.
 

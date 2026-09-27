@@ -58,7 +58,7 @@ func Doc(text string) Option             { return func(one *registration) { one.
 func Alt(name string) Option             { return func(one *registration) { one.alt = name } }
 func Deadline(span time.Duration) Option { return func(one *registration) { one.deadline = span } }
 
-// An action declares its length and its writes. [[spec/design_output/model#an-action-declares-its-length]]
+// An action declares its writes; the Op option stands until every call takes a record and a wait. [[spec/design_output/model#a-caller-sets-its-wait]]
 func Op() Option     { return func(one *registration) { one.op = true } }
 func Writes() Option { return func(one *registration) { one.writes = true } }
 

@@ -117,7 +117,7 @@ func (s *Store) Land(name string, event any) error {
 	return err
 }
 
-// [[spec/design_output/model#an-action-declares-its-length]]
+// [[spec/design_output/model#a-caller-sets-its-wait]]
 type Declared struct {
 	Op       bool
 	Writes   bool

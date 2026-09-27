@@ -305,7 +305,7 @@ session.
 |---|---|---|
 | `q.Derived` | a function of its inputs | when an input moves |
 | `q.Fold` | a state reduced over the events of `session/`, one event at a time | when an event lands |
-| `q.Action` and `q.Op` | a list of requests to IO modules | when a caller calls it |
+| `q.Action` | a list of requests to IO modules | when a caller calls it |
 
 A provider runs once at a time. A change during a run waits for the next wave,
 per [[spec/design_output/model#one-wave-settles-a-change]]. A provider
@@ -886,28 +886,59 @@ replaces them.
 
 # Operations
 
-Operations: the handle a longer action answers, its states, the one writer per
-tree, and what stays for how long. The rules stand in
-[[spec/design_input/the-index-holds-the-model#operations-carry-a-handle]], and
+Operations: the record every call takes, the wait a caller sets, the states,
+the one writer per tree, and what stays for how long. An agent stores no handle
+and spends no turn polling. The rules stand in
+[[spec/design_input/the-index-holds-the-model#a-caller-sets-its-wait]], and
 this note gives them their shape.
 
-## An action declares its length
+## A caller sets its wait
 
-Each action says at registration whether it answers at once or with a handle,
-so a caller knows the shape before it calls:
+One kind of action stands. Every call takes an operation record, `ops/<id>`,
+inside the index, and the handle stays the index's own record, which the caller
+needs no word of.
+An action declares its deadline, and `q.Writes` where it writes, and nothing
+about its length.
 
-| the declaration | what a call answers | such as |
-|---|---|---|
-| `q.Action` | the result, within the action's deadline | `tickets/set-field`, `work/place` |
-| `q.Op` | a handle, `ops/<id>`, at once | `work/pull`, `check/run`, `retro/write` |
+Every call carries a wait budget:
 
-A read takes no handle, and the cage's answer inside a hook stays a plain
-action.
+| the case | what the call answers |
+|---|---|
+| the action ends within the wait | the result, the way a plain call answers. Most calls end here |
+| the wait runs out first | `still running`, with the handle, the fraction done, such as 40 percent, and the time gone by. The caller works out the rest |
+
+| the surface | its default wait, a config key of its IO module |
+|---|---|
+| the hooks and MCP, the agents' side | a second |
+| the command line | to the end, and `--detach` answers at once |
+| HTTP | none, unless the request sends `Prefer: wait=N`, per RFC 7240 |
+
+Each call sets its own wait, and the table holds defaults alone. A caller passes
+its own number where it wants another, up to a cap, such as an agent waiting
+half a minute for the check. A progress step sets the fraction done, and an
+action with no steps answers the time gone by alone. A read takes no record, and
+the cage's answer inside a hook stays a plain call.
+
+## The agent does not poll
+
+An operation an agent's session starts sometimes ends after the call answers.
+The hook module then hands the result into that session's next turn. It rides
+the added context of a hook answer, on the next tool use or prompt. `caller`
+holds the session id, so the session's open operations are a query by session,
+and the agent holds no handle:
+
+| the part | what it does |
+|---|---|
+| `ops/wait` with no handle | waits on the session's open operations |
+| the Stop hook | names the operations still running, with the fraction done and the time gone by, to an agent ending its turn. It lets the stop through |
+
+The model is the Bash tool of Claude Code. It runs while the turn waits, up to a
+timeout, then runs on behind it, and its end arrives as a notification.
 
 ## The handle is a name
 
 `ops/` is a family the catalog declares once, and the index manager provides it.
-Each call of a `q.Op` action adds a key under it, so the catalog stays whole.
+Each call of an action adds a key under it, so the catalog stays whole.
 The id sorts by start time.
 
 | the field | what it holds |
@@ -918,21 +949,24 @@ The id sorts by start time.
 | `state` | `queued`, `running`, `done`, `failed` or `cancelled` |
 | `progress` | the steps done, the steps known, and one line on the step in hand |
 | `deadline` | when the watchdog ends it |
+
 | `result` | the action's output, once it stands `done` |
 | `error` | the reason, once it stands `failed` or `cancelled` |
 | `undone` | the undo steps the run takes back, in order |
 
-A caller watches `ops/<id>` or reads it, the way it reads every name.
+A caller who wants the handle watches `ops/<id>` or reads it, the way it reads
+every name. An agent waits through its budget instead, and the hook module
+hands it the rest.
 
 ## The states
 
 | the move | who makes it | what follows |
 |---|---|---|
-| to `queued` | the call | the handle goes back to the caller |
+| to `queued` | the call | the call waits through its budget |
 | `queued` to `running` | the writer queue, or at once for an action that writes nothing | the index hands the module process the input snapshot, and the module answers its list of requests |
-| `running` to `done` | the last request answering | `result` stands |
+| `running` to `done` | the last request answering | `result` stands, and the call answers it, or the hook module hands it to the session's next turn |
 | `running` to `failed` | a request failing, a process ending, or the deadline passing | the undo steps run, newest first |
-| `queued` or `running` to `cancelled` | `ops/cancel` with the handle | a running one stops before its next request, and its undo steps run |
+| `queued` or `running` to `cancelled` | `ops/cancel`, with the handle or for the session's open operations | a running one stops before its next request, and its undo steps run |
 
 The index pushes each move, and the session log carries it as a row of kind
 `op`. The index runs every request of an operation, per
@@ -972,11 +1006,11 @@ each key with its built-in value.
 
 ## The surfaces
 
-| the surface | a `q.Op` call |
+| the surface | a call running past its wait |
 |---|---|
-| the command line | `quack run work/pull` follows the handle and prints its progress, and `--detach` prints the handle alone |
-| HTTP | `POST /v1/actions/work/pull` answers `202`, with the handle's path under `/v1/values` |
-| MCP and the hook module | the tool answers the handle, and `ops/wait` answers once it ends or at its cap |
+| the command line | `quack run work/pull` prints its progress to the end, and `--detach` prints the handle alone |
+| HTTP | `POST /v1/actions/work/pull` answers `202`, with the handle's path under `/v1/values`, per RFC 7240 |
+| MCP and the hook module | the tool answers `still running` with the fraction done and the time gone by, and the result reaches the session's next turn |
 | a view | the last line draws the state until it ends |
 
 # Watchdogs
@@ -1010,8 +1044,7 @@ keeps its deadline under the config key the table names.
 | the kind | what the deadline holds | the config key |
 |---|---|---|
 | `q.Derived` and `q.Fold` | a provider with a pending input commits within it | `watchdog.deadlineDerived`, `watchdog.deadlineFold` |
-| `q.Action` | the action answers within it | `watchdog.deadlineAction` |
-| `q.Op` | the operation ends within it, per [[spec/design_output/model#operations]] | `watchdog.deadlineOp` |
+| `q.Action` | the operation ends within it, per [[spec/design_output/model#operations]] | `watchdog.deadlineAction` |
 
 A run past its deadline gets cancelled, its undo steps run where it is an
 action, and the index restarts its process.
@@ -1384,7 +1417,7 @@ An action answers a result, or a handle for a longer one. The renderer draws a
 handle's state on the last line, off `ops/<id>`, until it ends. A refusal comes
 back as the action's failure, with its reason, and the last line draws it. For
 the handle, see
-[[spec/design_input/the-index-holds-the-model#operations-carry-a-handle]].
+[[spec/design_input/the-index-holds-the-model#a-caller-sets-its-wait]].
 
 ## The log is a view
 

@@ -25,7 +25,7 @@ A box reads the argument here before it asks about a ruling:
 | a dumb core, every part a module, and a module flagged `io` alone reaching the outside, with its fake inside | [[spec/rationales/every-part-is-a-module]] |
 | a module is one file, and the registry builds every surface | [[spec/rationales/the-registry-builds-surfaces]] |
 | a file declares each view, and one renderer draws them | [[spec/rationales/views-are-declarations]] |
-| a longer action answers a handle, and one writer runs per tree | [[spec/rationales/long-actions-take-a-handle]] |
+| every call takes a record and a wait its caller sets, and one writer runs per tree | [[spec/rationales/a-caller-sets-its-wait]] |
 | every part holds a lease | [[spec/rationales/every-part-holds-a-lease]] |
 | the IO process, the index and the placements of module instances run as processes | [[spec/rationales/modules-run-apart]] |
 | Go holds the core, and Linux and Windows behave the same | [[spec/rationales/go-holds-the-core]] |
