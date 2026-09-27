@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-red
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -84,6 +84,10 @@ record:
     hand: box d7a69cb6601d7 · claude-code-remote
     hash_before: c12beb185bf3c00632dee34d3432f94389aaca7a
     hash_after: 2780b45e84f2da699e3eca7fba58aeaaf7614312
+  - step: design/review
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: f091d93507b67cfdce7df777fa43755586beb1d3
+    hash_after: f091d93507b67cfdce7df777fa43755586beb1d3
 ---
 
 # Ask
@@ -196,6 +200,12 @@ What waits:
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- stale-marks-follow-the-provider: key a stale mark by the provider, not the topic. The watchdogs note names a part as a process, a door or a provider. A sibling provider under the same topic stays current.
+- actions-declare-op-and-writes: add `q.Op` and `q.Writes` beside `q.Deadline` in `src/q/q.go`. An action then declares its handle and its write, and the writer queue gains a caller.
+- op-moves-reach-the-log: land the session log rows of kind `op` and `watchdog`, and `ops/cancel`. Otherwise name them under what waits.
 
 # implement
 
