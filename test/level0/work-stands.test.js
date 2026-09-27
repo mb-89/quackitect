@@ -46,15 +46,14 @@ test("a ref whose base stands short of the trunk tip reads behind, and one with 
     refsHere({
       git: fakeGit(
         {
-          ...remoteSaying([{ branch: "work/one-group", tip: "aaa" }]),
-          "git merge-base origin/main origin/work/one-group": { stdout: "older\n" },
+          ...remoteSaying([{ branch: "work/one-group", tip: "aaa", base: "older" }]),
           ...more,
         },
         ROOT,
       ),
     });
 
-  const [behind] = refs({ "git rev-parse origin/main": { stdout: "tip\n" } });
+  const [behind] = refs({});
   assert.equal(behind.behind, true);
   assert.equal(behind.orphan, false);
   const [level] = refs({ "git rev-parse origin/main": { exitCode: 1 } });

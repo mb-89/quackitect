@@ -8,6 +8,7 @@ import { whyOf, work } from "../../src/scripts/work.js";
 import {
   CHILD,
   doorsSaying,
+  GROUP_AT,
   GROUP_NOTE,
   groupRemote,
   heard,
@@ -106,15 +107,16 @@ test("a group row names a branch behind main", () => {
   const listed = (base) => {
     const { it } = doorsSaying({
       ...groupRemote(GROUP_NOTE),
-      "git merge-base origin/main origin/work/one-group": { stdout: `${base}\n` },
-      "git rev-parse origin/main": { stdout: "tip\n" },
+      ...remoteSaying([{ branch: "work/one-group", tip: "aaa", base }], {
+        [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+      }),
     });
     return heard(() => work(ROOT, ["list"], it)).said;
   };
 
   assert.match(listed("older"), /work\/one-group\s+todo\s+behind main/);
   assert.doesNotMatch(
-    listed("tip"),
+    listed(undefined),
     /behind main/,
     "a branch on the trunk tip stands level",
   );

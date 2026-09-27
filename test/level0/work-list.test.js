@@ -9,6 +9,7 @@ import { work } from "../../src/scripts/work.js";
 import {
   CHILD,
   doorsSaying,
+  GROUP_AT,
   GROUP_NOTE,
   groupRemote,
   heard,
@@ -127,8 +128,9 @@ test("the listing shows everything under --all", () => {
 test("a group row behind main keeps its mark after the behind", () => {
   const { it } = doorsSaying({
     ...groupRemote(GROUP_NOTE),
-    "git merge-base origin/main origin/work/one-group": { stdout: "older\n" },
-    "git rev-parse origin/main": { stdout: "tip\n" },
+    ...remoteSaying([{ branch: "work/one-group", tip: "aaa", base: "older" }], {
+      [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+    }),
   });
   const { said } = heard(() => work(ROOT, ["list"], it));
   assert.match(said, /work\/one-group\s+todo\s+behind main, urgent/);
