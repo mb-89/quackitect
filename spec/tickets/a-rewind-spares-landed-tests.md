@@ -116,11 +116,20 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 8ac6708a8e1ef2ee9c5b65e70efa7b64e168f0aa
+    hash_after: 8ac6708a8e1ef2ee9c5b65e70efa7b64e168f0aa
+    inputs:
+      - name: ask
+        hash: 51cba604bf4d0a4a
+        size: 822
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -156,38 +165,71 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A red leaf is a leaf whose evidence holds a command field expecting `assertion`. The walk meets one that a pass in the record already carries. Where every test its command names holds content that stood in the tree of that pass's `hash_after`, the walk keeps the leaf and goes past it. The entry reads `{ step, skipped: true, kept: <hash_after>, why }`, so the progress counts it passed and the stale read reads the red pass behind it.
+
+The check reads content, so a rename moving a test keeps the leaf. A test whose content moved hands the leaf out again, as today.
+
+| part | where |
+|---|---|
+| `keptRed(it, text, leaf)` answers the check | `src/scripts/pull-kept.js`, new |
+| the walk after a pass calls it beside the `when` condition | `stepOn` in `src/scripts/pull-writes.js` |
+| the walk at a pull calls it, so a ticket already stranded walks on | `advanced` in `src/scripts/pull-hand.js` |
+| the blobs of the red commit | `git ls-tree -r <hash_after>` through the git door |
+| the blob of each working test | `git hash-object <path>` through the git door |
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/scripts/pull-writes.js`, `stepOn`, which a pass runs
+- `src/scripts/pull-bless.js`, `blessed`, which runs `stepOn`
+- `src/scripts/pull-hand.js`, `advanced`, which a pull runs
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/pull-kept.test.js`, a rewound ticket walks past a red leaf whose tests stand as they stood red
+- `test/level0/pull-kept.test.js`, a rename moving a test the draft names keeps the red leaf, the rewind the-retro-reads-the-backlog meets
+- `test/level0/pull-kept.test.js`, a test whose content moved hands the red leaf out again
+- `test/level0/pull-kept.test.js`, a pull meeting a ticket stranded at a red leaf walks it on
+
+The done lines and the case deciding each:
+
+- the rewind keeps a landed `tests-red`: the first case
+- the replay of the rename: the second case
+- the check: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/scripts/pull-kept.js`
+- `src/scripts/pull-writes.js`
+- `src/scripts/pull-hand.js`
+- `test/level0/pull-kept.test.js`
+- `spec/design_output/pull.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `stepOn`, `advanced`, `inputRead` and `lastOf` stand opened, and a skipped entry counts as passed in `passedSteps` of `src/tickets/tickets.go`
+- the callers come off a search for `stepOn(` and `advanced(` over `src`
+- each done line names the case deciding it
 
 ## tests-red
 
