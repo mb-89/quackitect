@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-prints-its-plan, fix-groups-end-the-chain]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -135,6 +135,19 @@ record:
         hash: 5a2557d24d86ab34
         size: 13510
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 18d75c5ae31a8b7b7ec03c761e438cf8ccba156e
+    hash_after: 18d75c5ae31a8b7b7ec03c761e438cf8ccba156e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 9 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 199329f3676e2920
+        size: 3307
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -238,26 +251,31 @@ dispatch without --dry carries the plan out in src/scripts/dispatch.js, and --dr
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/dispatch.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/dispatch.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Nine write cases fail on their own assertion, since the run without --dry answers 2 today. The case holding the run to --dry leaves, because this ask turns that road into the writes. The fake answer to the dispatch branch list reads what the run itself pushed, so the second run meets the branch the first one made, as a real remote does. The fix group mints over a seeded ticket schema and a small group process, and the ask meets the semicolon Vale the level0 cases use.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a failing case, and ./RUNME.sh check decides the last
+- the cases reach git, the disk and Vale through the fakes alone
 
 # gate
 

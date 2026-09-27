@@ -6,7 +6,15 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
-import { withEntry, withField, withHashAfter } from "../../src/engine/group.js";
+import {
+  fieldOf,
+  withEntry,
+  withField,
+  withHashAfter,
+} from "../../src/engine/group.js";
+import { askFaults } from "../../src/scripts/ticket-ask-lint.js";
+import { TICKET_SCHEMA } from "./fixtures.js";
+import { semicolonVale } from "./semicolon-vale.js";
 import { dispatch, planOf } from "../../src/scripts/dispatch.js";
 import { verbs } from "../../src/scripts/cli.js";
 import { freeNow } from "../../src/scripts/work-free.js";
@@ -177,11 +185,6 @@ test("--json prints the plan as one JSON object", () => {
   assert.deepEqual(names(JSON.parse(said.said).ready), ["first"]);
 });
 
-test("a run without --dry answers 2, since the writes land in a later child", () => {
-  const { it } = planned([]);
-  assert.equal(heard(() => dispatch(ROOT, [], it)).code, 2);
-});
-
 test("freeNow and the plan name the same ready groups", () => {
   const groups = [
     { name: "first", note: GROUP_NOTE },
@@ -229,4 +232,182 @@ test("a child reads off its own group's branch, and another branch's older copy 
   it.clock = fakeClock(FROM);
   it.stale = "12h";
   assert.deepEqual(planOf(it).questions, []);
+});
+
+// The writes: a fix group per parent, the branches a ready group lacks, and one commit on a branch of their own. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
+const MAIN = "c0ffee1234abcdef";
+const SHORT = MAIN.slice(0, 7);
+const WRITE_BRANCH = `claude/dispatch-${SHORT}`;
+const WORKTREE = `${ROOT}/.se/.runtime/dispatch`;
+const FIX_NAME = `loose-fixes-${SHORT}`;
+const VALE = `${ROOT}/.se/.runtime/bin/vale`;
+const GROUP_PROCESS = `for: work that lands as one
+steps:
+  - name: children
+    by: children
+`;
+const onMain = GROUP_NOTE.replace("urgent: true\n", "");
+
+// A run over one main, where the answers to the dispatch branches read what the run itself pushed. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
+function writing(trunk, { groups = [], standing = [], merged = [] } = {}) {
+  const doors = planned(groups, trunk, {
+    "git rev-parse origin/main": { stdout: `${MAIN}\n` },
+    [`${VALE} --config=.vale.ini --output=JSON --no-exit --path=spec/tickets/${FIX_NAME}.md`]:
+      semicolonVale(),
+  });
+  const pushed = () =>
+    doors.outside.ran
+      .map((one) => one.argv.join(" "))
+      .filter((row) => row.includes("refs/heads/claude/dispatch-"))
+      .map((row) => `  origin/${row.split("refs/heads/")[1]}`);
+  doors.outside.proc.teach(
+    ["git", "branch", "-r", "--list", "origin/claude/dispatch-*"],
+    () => ({
+      stdout: [...standing.map((one) => `  origin/${one}`), ...pushed()].join("\n"),
+    }),
+  );
+  const landed = merged.map((one) => `  origin/${one}`).join("\n");
+  doors.outside.proc.teach(["git", "branch", "-r", "--merged", "origin/main"], {
+    stdout: `  origin/main\n${landed}\n`,
+  });
+  doors.disk.write(`${ROOT}/spec/schemas/ticket.schema.yaml`, TICKET_SCHEMA);
+  doors.disk.write(`${ROOT}/spec/processes/group.yaml`, GROUP_PROCESS);
+  doors.it.root = ROOT;
+  doors.it.words = 5;
+  doors.it.vale = VALE;
+  return doors;
+}
+
+const written = (disk, name) => disk.read(`${WORKTREE}/spec/tickets/${name}.md`);
+const gitRows = (outside) => ranGit(outside);
+const commits = (outside) =>
+  gitRows(outside).filter((row) => /^git -C \S+ commit( |$)/.test(row));
+
+test("the run writes one fix group carrying fix: true, holding the loose agent tickets", () => {
+  const { it, disk } = writing({ "a-loose-one": loose, "b-loose-one": loose });
+  assert.equal(heard(() => dispatch(ROOT, [], it)).code, 0);
+  const group = written(disk, FIX_NAME);
+  assert.equal(fieldOf(group, "fix"), "true");
+  assert.match(fieldOf(group, "process"), /group\]\]$/);
+  for (const name of ["a-loose-one", "b-loose-one"])
+    assert.equal(
+      fieldOf(written(disk, name), "group"),
+      FIX_NAME,
+      `${name} lands in the fix group`,
+    );
+});
+
+test("the run makes one commit on claude/dispatch-<commit>, and no push names main", () => {
+  const { it, outside } = writing({ "a-loose-one": loose });
+  assert.equal(heard(() => dispatch(ROOT, [], it)).code, 0);
+  assert.equal(commits(outside).length, 1);
+  const pushes = gitRows(outside).filter((row) => / push( |$)/.test(row));
+  assert.ok(
+    pushes.some((row) => row.endsWith(`HEAD:refs/heads/${WRITE_BRANCH}`)),
+    `the write branch is pushed: ${pushes.join(" | ")}`,
+  );
+  assert.deepEqual(
+    pushes.filter((row) => /(^| |:|\/)main$/.test(row)),
+    [],
+    "no push names main",
+  );
+});
+
+test("a second run over one main finds its branch standing and writes nothing", () => {
+  const { it, outside } = writing({ "a-loose-one": loose });
+  heard(() => dispatch(ROOT, [], it));
+  assert.equal(heard(() => dispatch(ROOT, [], it)).code, 0);
+  assert.equal(commits(outside).length, 1, "one commit over two runs");
+  assert.equal(
+    gitRows(outside).filter((row) => row.endsWith(`HEAD:refs/heads/${WRITE_BRANCH}`))
+      .length,
+    1,
+    "one branch over two runs",
+  );
+});
+
+test("an unmerged claude/dispatch branch stops every write, and the plan still names the workers to start", () => {
+  const { it, outside } = writing(
+    { "a-loose-one": loose },
+    {
+      groups: [{ name: "first", note: GROUP_NOTE }],
+      standing: ["claude/dispatch-0ld0ld0"],
+    },
+  );
+  const said = heard(() => dispatch(ROOT, ["--json"], it));
+  assert.equal(said.code, 0);
+  assert.deepEqual(commits(outside), []);
+  assert.deepEqual(
+    gitRows(outside).filter((row) => / push( |$)/.test(row)),
+    [],
+  );
+  assert.match(said.said, /^\{.*\}$/);
+  assert.deepEqual(names(JSON.parse(said.said).ready), ["first"]);
+});
+
+test("a merged claude/dispatch branch stops nothing", () => {
+  const { it, outside } = writing(
+    { "a-loose-one": loose },
+    { standing: ["claude/dispatch-0ld0ld0"], merged: ["claude/dispatch-0ld0ld0"] },
+  );
+  assert.equal(heard(() => dispatch(ROOT, [], it)).code, 0);
+  assert.equal(commits(outside).length, 1);
+});
+
+test("the run leaves a ticket for a person loose, and names it under the questions", () => {
+  const { it, disk } = writing({ "a-loose-one": loose, "a-question": forPerson });
+  const said = heard(() => dispatch(ROOT, ["--json"], it));
+  assert.equal(said.code, 0);
+  assert.equal(
+    disk.exists(`${WORKTREE}/spec/tickets/a-question.md`),
+    false,
+    "the question stays as main holds it",
+  );
+  const plan = JSON.parse(said.said);
+  assert.deepEqual(plan.questions, [{ ticket: "a-question", group: "" }]);
+});
+
+test("the run opens work/<name> for a ready group on main with no branch, and leaves a group with a branch alone", () => {
+  const { it, outside, disk } = writing(
+    { "new-group": onMain, first: onMain },
+    { groups: [{ name: "first", note: GROUP_NOTE }] },
+  );
+  assert.equal(heard(() => dispatch(ROOT, [], it)).code, 0);
+  const pushes = gitRows(outside).filter((row) => / push( |$)/.test(row));
+  assert.ok(
+    pushes.some((row) => row.endsWith(":refs/heads/work/new-group")),
+    `work/new-group is pushed: ${pushes.join(" | ")}`,
+  );
+  assert.ok(
+    !pushes.some((row) => row.endsWith(":refs/heads/work/first")),
+    "work/first stands already",
+  );
+  assert.equal(
+    fieldOf(written(disk, "new-group"), "cloud"),
+    "true",
+    "the cloud marker rides the write branch",
+  );
+});
+
+test("the fix group's name holds names.words at most", () => {
+  const { it, disk } = writing({ "a-loose-one": loose });
+  it.words = 3;
+  heard(() => dispatch(ROOT, [], it));
+  const made = disk
+    .list(`${WORKTREE}/spec/tickets`)
+    .map((one) => one.name.replace(/\.md$/, ""))
+    .filter((name) => name !== "a-loose-one");
+  assert.equal(made.length, 1, `one fix group stands: ${made.join(", ")}`);
+  assert.ok(made[0].split("-").length <= 3, `${made[0]} holds three words at most`);
+});
+
+test("askFaults finds nothing in the fix group's ask", () => {
+  const { it, disk } = writing({ "a-loose-one": loose });
+  heard(() => dispatch(ROOT, [], it));
+  const text = written(disk, FIX_NAME);
+  assert.match(text, /# Ask\n\n\S/, "the ask holds a line");
+  assert.deepEqual(askFaults(it, `spec/tickets/${FIX_NAME}.md`, text), {
+    refused: [],
+    warned: [],
+  });
 });
