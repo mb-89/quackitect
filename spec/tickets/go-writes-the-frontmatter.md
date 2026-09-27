@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-red
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -83,6 +83,10 @@ record:
     hand: box d7a69cb6601d7 · claude-code-remote
     hash_before: 89ba223a6be4b6180505383d9620867a94b1573c
     hash_after: 89ba223a6be4b6180505383d9620867a94b1573c
+  - step: design/review
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 2e2ccb8fb617e7976869e3e568d6c1ae15724aa3
+    hash_after: 2e2ccb8fb617e7976869e3e568d6c1ae15724aa3
 ---
 
 # Ask
@@ -192,6 +196,8 @@ The objection: a box with no Go loses every ticket write, where a write in JavaS
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
+
+pass
 
 <!-- the form is verdict -->
 
