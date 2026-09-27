@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -166,7 +166,6 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-engine-fixes-its-faults
 record:
   - step: design/owner-read
     skipped: true
@@ -199,6 +198,9 @@ record:
     hash_after: 172fd0c19e906958617353edd36f0758fc0e6d66
     returns: 1
     why: "keptRed reads the wrong tree. `passed` in pull-writes.js writes `hash_after` as the tip before the pass commit, and `landed` stages the red tests of the hand into that pass commit, so `git ls-tree -r <hash_after>` holds no new red test and the keep never holds. The own red pass of this ticket shows it: d8a6b89ab lacks test/level0/pull-kept.test.js, and the pass commit f46fe8257 carries it. The red pass of the-retro-reads-the-backlog shows it too: 916443192 lacks retro-backlog.test.js and retro-route.test.js, and its pass commit f27f6c9fc carries them.; A whole-file blob check fails the case the ask names. implement/change 7c8c13970 appends cases to retro-mint.test.js and retro-backlog.test.js, so their blobs move while their red cases stand, and only the renamed route test keeps its blob 312a209. That ticket still strands at implement/tests-red. Pick a keep that survives an appended case, or take the other branch of the ask: a rerun at the recorded commit.; The replay case replays no real rewind. Its fake answers `git ls-tree -r <hash_after>` with the test present, and its record holds the red pass alone: no change pass, no stale review, no appended case. Build the fixture off the record of the-retro-reads-the-backlog, so the case fails on a keep that rescues nothing.; The keep also runs before the change lands. On the standard route a draft edit marks design/tests-red stale, `inputRead` puts the step there, and `advanced` keeps it, so a case the edited draft adds is never written red. Keep a red leaf only where a pass of a later leaf follows its red pass.; The callers list names `blessed` in pull-bless.js, which stands nowhere. The caller is `bless`, and `offer` in pull-hand.js calls `advanced`."
+  - step: design/tests-red
+    hand: the engine
+    stale: design/draft
 ---
 
 # Ask
