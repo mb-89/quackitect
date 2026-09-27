@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -109,6 +109,11 @@ record:
     hand: box d7d80931cecf · claude-code-remote
     hash_before: c115be15dead0c5ec7da65764ca7d4aa2930e7f8
     hash_after: c115be15dead0c5ec7da65764ca7d4aa2930e7f8
+  - step: retro/cloud
+    hand: box d7d80931cecf · claude-code-remote
+    hash_before: cd02f0ab67541592b7a1dfbed8f6a5cd9d8cc9d7
+    hash_after: cd02f0ab67541592b7a1dfbed8f6a5cd9d8cc9d7
+reason: done
 ---
 
 # Ask
@@ -243,17 +248,27 @@ The agent weighs building the shadow path here, and refuses it, because four tic
 
 <!-- the form is list -->
 
+- none: every tool and host this run needs answers on the box
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the ticket door, on a Bash call and a commit naming no ticket
+- the plan gate, which blocks the pull while a todo stands in hand
+- the stop hook, which turns the turn toward `branch done`
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/queue-approach-sentence-split]], the person step the whole chain waits on
+- [[spec/tickets/the-badge-reads-open-tasks]] and [[spec/tickets/the-count-chain-leaves]], out of the group at `branch done`
+- the owner decides whether `migration.phase2switch` stays true before the shadow runs
 
 # Discussion
 
