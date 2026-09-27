@@ -135,7 +135,18 @@ func (s *Store) Run(name string) error {
 		return fmt.Errorf("%s names no derived provider", name)
 	}
 	snap := s.Snapshot()
-	_, err := s.Commit(snap.Revision, Writer{[]*registration{one}}, map[string]any{name: one.run(snap)})
+	value := any(nil)
+	// A loaded projection runs per key, so a run reaches one file. [[spec/design_output/model#everything-on-disk-mirrors]]
+	if one.keyed != nil {
+		parsed, err := one.keyed(snap, name)
+		if err != nil {
+			return err
+		}
+		value = parsed
+	} else {
+		value = one.run(snap)
+	}
+	_, err := s.Commit(snap.Revision, Writer{[]*registration{one}}, map[string]any{name: value})
 	return err
 }
 

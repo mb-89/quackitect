@@ -43,6 +43,10 @@ type registration struct {
 	where    string
 	inputs   []input
 	run      func(Snapshot) any
+	keyed    func(snap Snapshot, name string) (any, error)
+	mirror   Mirror
+	globs    []string
+	trip     func(body []byte) ([]byte, error)
 	step     func(state, event any) (any, error)
 	act      func(input any) ([]Request, error)
 }

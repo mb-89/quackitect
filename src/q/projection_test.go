@@ -69,3 +69,16 @@ func TestADumpNamesEveryNameUnderItsPrefix(t *testing.T) {
 		t.Fatalf("the dump of t/ reads %q, %v", said, err)
 	}
 }
+
+func TestTheCatalogNamesEveryGlobOfAProjection(t *testing.T) {
+	c := New()
+	ProjectIn(c, "config", "a.txt", Codec[[]string](linesCodec{}), Loaded, []string{}, Also("b.txt"))
+	GivenIn(c, "t/n", 0)
+	got := c.Projections()
+	if len(got) != 2 || got[0].Glob != "a.txt" || got[1].Glob != "b.txt" || got[0].Kind != Loaded {
+		t.Fatalf("the catalog names %+v", got)
+	}
+	if out, err := got[1].RoundTrip([]byte("x\ny\n")); err != nil || string(out) != "x\ny\n" {
+		t.Fatalf("the round trip writes %q, %v", out, err)
+	}
+}

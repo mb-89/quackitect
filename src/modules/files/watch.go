@@ -28,6 +28,23 @@ var skipped = map[string]bool{".git": true, "node_modules": true}
 
 const private = ".se"
 
+// The dot folders under the private one the watch adds by name, since a loaded projection reads their JSON files. Each stands alone, and no folder under it joins. [[spec/design_output/model#everything-on-disk-mirrors]]
+var named = map[string]bool{".se/.runtime": true, ".se/.runtime/hold": true}
+
+const namedExt = ".json"
+
+// Whether a change at rel reaches the family: a path the walk stands off does not, past a JSON file straight under a named folder. [[spec/design_output/model#everything-on-disk-mirrors]]
+func heard(rel string) bool {
+	parts := strings.Split(rel, "/")
+	for i, part := range parts[:len(parts)-1] {
+		if skipped[part] || (i > 0 && parts[i-1] == private && strings.HasPrefix(part, ".")) {
+			folder := rel[:strings.LastIndex(rel, "/")]
+			return named[folder] && strings.HasSuffix(rel, namedExt)
+		}
+	}
+	return true
+}
+
 // Hands each change as a path and its text, and gone where the file leaves. [[spec/design_output/model#io-modules-and-their-fakes]]
 type Watch interface {
 	Changes(hand func(path, text string, gone bool)) (stop func(), err error)
@@ -46,6 +63,9 @@ func (one watch) Changes(hand func(path, text string, gone bool)) (func(), error
 	if err := one.adds(eyes, one.root); err != nil {
 		eyes.Close()
 		return func() {}, err
+	}
+	for folder := range named {
+		_ = eyes.Add(filepath.Join(one.root, filepath.FromSlash(folder)))
 	}
 	done := make(chan struct{})
 	go func() {
@@ -79,6 +99,12 @@ func (one watch) hears(eyes *fsnotify.Watcher, event fsnotify.Event, hand func(p
 		return
 	}
 	rel = filepath.ToSlash(rel)
+	if !heard(rel) {
+		if named[rel] {
+			_ = eyes.Add(event.Name)
+		}
+		return
+	}
 	if event.Has(fsnotify.Remove) || event.Has(fsnotify.Rename) {
 		hand(rel, "", true)
 		return
@@ -120,6 +146,9 @@ func NewFakeWatchOver(over *FakeDisk) *FakeWatch {
 }
 
 func (one *FakeWatch) Push(path, text string, gone bool) {
+	if !heard(path) {
+		return
+	}
 	one.mu.Lock()
 	hands := make([]func(path, text string, gone bool), 0, len(one.hands))
 	for _, hand := range one.hands {

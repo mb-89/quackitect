@@ -309,3 +309,26 @@ func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
 	}
 	t.Fatalf("the lease of %s stands at %v, and the work loop renews nothing", leasePart, first.Renewed)
 }
+
+// The door answers the dump text, and the root writes it. [[spec/design_output/model#everything-on-disk-mirrors]]
+func TestTheDoorAnswersADumpOfAPrefix(t *testing.T) {
+	root := tree(t)
+	catalog := q.New()
+	q.GivenIn(catalog, "t/n", 4, q.Doc("a count"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	said, err := posts(standing, []string{"dump", "t/"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if text, _ := said.Result.(string); text != "{\n  \"t/n\": 4\n}\n" {
+		t.Fatalf("the dump of t/ answers %#v, %q", said.Result, said.Error)
+	}
+}

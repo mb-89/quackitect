@@ -22,7 +22,7 @@ const (
 	fileMode   = 0o644
 )
 
-// The arguments of the request disk.write. [[spec/design_output/model#an-action-lists-requests]]
+// The arguments of the request disk.write. Read carries the hash of the file its writer read, and stays empty where the writer met no file. [[spec/design_output/model#everything-on-disk-mirrors]]
 type Write struct {
 	Path string
 	Text string
@@ -122,6 +122,9 @@ func Accept(to Disk) func(q.Request) (any, error) {
 		switch args := one.Args.(type) {
 		case Write:
 			if one.Verb == "write" {
+				if err := current(to, args); err != nil {
+					return nil, err
+				}
 				return nil, to.Write(args.Path, args.Text)
 			}
 		case string:
@@ -131,4 +134,20 @@ func Accept(to Disk) func(q.Request) (any, error) {
 		}
 		return nil, fmt.Errorf("the disk takes no %s over a %T", one.Verb, one.Args)
 	}
+}
+
+// A write goes back one way: it lands where the file still stands at the revision its writer read. [[spec/design_output/model#everything-on-disk-mirrors]]
+func current(to Disk, args Write) error {
+	text, held, err := to.Read(args.Path)
+	if err != nil {
+		return err
+	}
+	now := ""
+	if held {
+		now = ContentOf(text).Hash
+	}
+	if now != args.Read {
+		return fmt.Errorf("%s moves since its writer read it, so the write stands refused", args.Path)
+	}
+	return nil
 }

@@ -29,7 +29,7 @@ const (
 func Main(starts ...Start) {
 	argv := argsOf()[1:]
 	if len(argv) == 0 {
-		fmt.Fprintln(stderr, "usage: se-index <serve|find|notes|links|dangling|same|tickets|changes|reindex|standing|why> [words]\n       se-index call <method> <json params>")
+		fmt.Fprintln(stderr, "usage: se-index <serve|find|notes|links|dangling|same|tickets|changes|reindex|standing|why|dump> [words]\n       se-index call <method> <json params>")
 		exits(2)
 	}
 
@@ -86,6 +86,22 @@ func serves(root string, starts []Start) int {
 	<-stops(swap.Watches)
 	stop()
 	return 0
+}
+
+// Asks the index standing over the root, and answers its result, so the composition root runs a verb that writes through a module. [[spec/design_output/model#everything-on-disk-mirrors]]
+func Ask(argv ...string) (any, error) {
+	root, err := rootHere()
+	if err != nil {
+		return nil, err
+	}
+	said, err := reaches(root, argv)
+	if err != nil {
+		return nil, err
+	}
+	if said.Error != "" {
+		return nil, errorOf(said.Error)
+	}
+	return said.Result, nil
 }
 
 func asks(root string, argv []string) int {
@@ -198,7 +214,7 @@ func asked(argv []string) (string, json.RawMessage) {
 			}
 		case "links":
 			params["target"] = argv[1]
-		case "why":
+		case "why", "dump":
 			params["name"] = argv[1]
 		case "same":
 			params["path"] = argv[1]

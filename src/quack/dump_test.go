@@ -19,3 +19,11 @@ func TestADumpIsReadByNothing(t *testing.T) {
 		}
 	}
 }
+
+func TestADumpNamesItsFileAfterItsPrefix(t *testing.T) {
+	for prefix, want := range map[string]string{"ops/": ".se/dump/ops.json", "files/src/": ".se/dump/files-src.json", "": ".se/dump/all.json"} {
+		if got := dumpPath(prefix); got != want {
+			t.Fatalf("the dump of %q lands at %s", prefix, got)
+		}
+	}
+}

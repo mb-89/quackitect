@@ -42,6 +42,44 @@ func watchSuite(t *testing.T, open func(t *testing.T) (Disk, Watch)) {
 			}
 		}
 	})
+	t.Run("a runtime JSON file comes back, and the database does not", func(t *testing.T) {
+		disk, watch := open(t)
+		for _, folder := range []string{".se/.runtime/hold/keep.json", ".se/.runtime/undo/keep.json"} {
+			if err := disk.Write(folder, "{}\n"); err != nil {
+				t.Fatal(err)
+			}
+		}
+		seen := make(chan string, 64)
+		stop, err := watch.Changes(func(path, _ string, gone bool) {
+			if !gone {
+				select {
+				case seen <- path:
+				default:
+				}
+			}
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer stop()
+		for _, path := range []string{".se/.runtime/index.db", ".se/.runtime/undo/one.json", ".se/.runtime/plan.json"} {
+			if err := disk.Write(path, "{}\n"); err != nil {
+				t.Fatal(err)
+			}
+		}
+		until := time.After(patience)
+		for {
+			select {
+			case path := <-seen:
+				if path == ".se/.runtime/plan.json" {
+					return
+				}
+				t.Fatalf("the watch hands %s", path)
+			case <-until:
+				t.Fatal("the plan never comes back")
+			}
+		}
+	})
 }
 
 func TestWatchKeepsItsContract(t *testing.T) {

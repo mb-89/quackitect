@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -157,6 +157,15 @@ record:
         hash: ccfd8911c1f05b99
         size: 1111
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 1fea3a6b9653473a1df1b57beba3910ae6adaefc
+    hash_after: 1fea3a6b9653473a1df1b57beba3910ae6adaefc
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -342,14 +351,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/index/door.go src/index/main.go src/modules/files/disk.go src/modules/files/watch.go src/modules/files/watch_contract_test.go src/q/codec.go src/q/projection.go src/q/q.go src/q/store.go src/quack/main.go src/modules/config/config.go src/modules/queue/queue.go src/modules/holds/holds.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size list names, past the wiring file, since the root loads the three projection modules beside the watch instead of as wiring instances
+the disk refusal runs over the fake disk, the modules run over the fake index, and the watch rule runs in its contract suite over the fake and the real watch
+each new function carries a pointer at the mirrors chapter of the model
+the files prefix, the config names, the plan and the hold glob each carry a comment naming the file that owns them, since a module imports q alone
 
 ## tests-green
 

@@ -469,6 +469,10 @@ func (one *door) answers(said call) (any, error) {
 	switch strings.ToLower(said.Method) {
 	case "why":
 		return one.store.Why(asked.Name)
+	case "dump":
+		// The door answers the text, and the root writes it through disk. [[spec/design_output/model#everything-on-disk-mirrors]]
+		text, err := one.store.Dump(asked.Name)
+		return string(text), err
 	case "files":
 		return Files(one.db)
 	case "read":
