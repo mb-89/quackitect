@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -209,6 +209,21 @@ record:
   - step: design/draft
     hand: the engine
     stale: [[spec/guidance/cloud/cloud]]
+  - step: design/draft
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: a8d18a5a36f6a50e4b366eb9c6ce3b651671bd9e
+    hash_after: a8d18a5a36f6a50e4b366eb9c6ce3b651671bd9e
+    inputs:
+      - name: ask
+        hash: c0a5647ee3b28623
+        size: 1295
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 5a2557d24d86ab34
+        size: 13510
+      - name: [[spec/guidance/cloud/cloud]]
+        hash: 9b73064120e245e0
+        size: 2802
+    def: 7883b3d10633c780
 ---
 
 # Ask
