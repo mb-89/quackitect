@@ -190,3 +190,34 @@ test("a pass leaves out a journaled path git ignores", () => {
     "the ignored path stays out",
   );
 });
+
+// A rename moves a file its journal names, so the old path stands nowhere and git refuses a commit naming it. [[spec/design_output/pull#the-refused-commit]]
+test("a landing stages no path standing nowhere on disk and nowhere in git", () => {
+  const MOVED = "/tree/src/moved.js";
+  const LANDED = "/tree/src/landed.js";
+  const journal = (file) =>
+    JSON.stringify({
+      at: "9999-01-01T00:00:00.000Z",
+      ticket: "a-child",
+      files: [{ file }],
+    });
+  const git = fakeGit(
+    { [`git ls-files --error-unmatch -- ${MOVED}`]: { exitCode: 1 } },
+    "/tree",
+  );
+  const disk = fakeDisk({
+    [AT]: WROTE,
+    [LANDED]: "the new place\n",
+    "/tree/.se/.runtime/undo/1.json": journal("src/moved.js"),
+    "/tree/.se/.runtime/undo/2.json": journal("src/landed.js"),
+  });
+  const ran = () => git.ran.map((one) => one.argv.join(" "));
+
+  assert.equal(
+    landed({ disk, git, root: "/tree", join }, one, ["passes design/draft"]),
+    "",
+  );
+
+  assert.ok(ran().includes(`git add -- ${AT} ${LANDED}`), ran().join("\n"));
+  assert.ok(!ran().some((row) => row.startsWith("git add") && row.includes(MOVED)));
+});
