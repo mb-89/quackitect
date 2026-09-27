@@ -108,6 +108,10 @@ test("the Go run skips every test a red Go file names, and nothing where no Go f
     "-skip",
     "^(TestOne|TestTwo)$",
   ]);
+  assert.deepEqual(skipOf(["src/q/b_test.go, test/level0/x.test.js,src/q/a_test.go"], read), [
+    "-skip",
+    "^(TestOne|TestTwo)$",
+  ], "a ticket's line of red files, commas between");
   assert.deepEqual(skipOf(["test/level0/x.test.js"], read), []);
   assert.deepEqual(skipOf(["src/q/gone_test.go"], () => { throw new Error("gone"); }), []);
 });

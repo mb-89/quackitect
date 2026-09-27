@@ -148,7 +148,9 @@ export function goHolds(quiet = false, red = []) {
 // A red Go test file stands apart until its tests-green closes, as a red JavaScript one does, so the Go run skips the tests it names. [[spec/design_output/pull#the-gate]]
 export function skipOf(red, read) {
   const names = [];
-  for (const path of red.filter((one) => one.endsWith("_test.go"))) {
+  // A ticket names its red files in one comma-separated line. [[spec/design_output/pull#the-gate]]
+  const paths = red.flatMap((one) => String(one).split(",")).map((one) => one.trim());
+  for (const path of paths.filter((one) => one.endsWith("_test.go"))) {
     let text = "";
     try {
       text = read(path);
