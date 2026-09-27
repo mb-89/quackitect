@@ -153,3 +153,28 @@ test("a pull meeting a ticket stranded at its red leaf walks it on to the change
   const moved = advanced(it, one, [one]);
   assert.equal(moved.leaf?.path, CHANGE);
 });
+
+// [[spec/tickets/kept-red-reads-red-list]]
+test("the keep reads the leaf's red list, so a fixture the red commit lands and a later change deletes keeps the leaf", () => {
+  const FIXTURE = "test/fixtures/one.json";
+  const { it, text } = built(RED_LEAF, [redPass(), changePass], {
+    ...logSince(AFTER, [
+      [RED_COMMIT, `a-child: passes ${RED_LEAF}`],
+      [CHANGED, `a-child: passes ${CHANGE}`],
+    ]),
+    ...landsIn(RED_COMMIT, [`A\t${TEST}`, `A\t${FIXTURE}`]),
+    ...movedSince(RED_COMMIT, [`D\t${FIXTURE}`]),
+  });
+  const leaf = leafOf(frontOf(text), RED_LEAF);
+  assert.equal(
+    keptRed(it, text, leaf),
+    null,
+    "with no red list, the deleted fixture hands the leaf out",
+  );
+  const listed = text.replace(
+    "## tests-red\n\n### tests\n",
+    `## tests-red\n\n### tests\n\n### red\n\n- ${TEST}\n`,
+  );
+  assert.notEqual(listed, text);
+  assert.equal(keptRed(it, listed, leaf)?.kept, RED_COMMIT);
+});

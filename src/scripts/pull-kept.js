@@ -5,6 +5,7 @@
 
 import { frontOf, recordIn } from "../engine/group.js";
 import { walkOf } from "./pull-route.js";
+import { redListOf } from "./red-list.js";
 
 const RED = "assertion";
 const TESTS = "test/";
@@ -32,7 +33,8 @@ export function keptRed(it, text, leaf, name = "") {
 
   const commit = redCommit(it, after, leaf.path, name);
   if (!commit) return null;
-  const tests = landedTests(it, commit);
+  const listed = redListOf(text, leaf.path);
+  const tests = listed.length ? listed : landedTests(it, commit);
   if (!tests.length) return null;
   const gone = goneSince(it, commit);
   if (!gone || tests.some((path) => gone.has(path))) return null;

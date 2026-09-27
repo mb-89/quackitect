@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-engine-fixes-its-faults
 parent: a-rewind-spares-landed-tests
+record:
+  - step: do
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: 84fb72a7f3c43f506af50b27fba3c7bac9ce92e1
+    hash_after: 84fb72a7f3c43f506af50b27fba3c7bac9ce92e1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    inputs:
+      - name: ask
+        hash: cadf78746dfa825b
+        size: 139
+    def: c81a2888c939396e
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ the keep reads the test files off the leaf's `red` evidence, since the red pass 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-kept.test.js test/level0/red-list.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The keep guessed the red tests off the paths under `test/` its red commit lands, so a fixture landing there counted as a test. It now reads the leaf's own `red` list through `redListOf` in `src/scripts/red-list.js`, the reader the check already uses. It falls back to the paths where the leaf lists none.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask
+- the row reading moves out of `expectedRed` into `redListOf`, so the check and the keep read one list
+- `pull.md` names the list under Kept red leaves, and the code points there
 
 # Discussion
 

@@ -758,7 +758,7 @@ A red leaf holds a command field expecting `assertion`. Once the change lands, i
 | the red pass | the last entry of the leaf carrying `def`, with no `stale`, `skipped` or `returns` |
 | a later pass | an entry after it, of a leaf past the red leaf in route order, of the same kind |
 | the red commit | the first commit after the red pass's `hash_after` whose subject names the ticket and carries the whole change `passes <leaf>` |
-| the red tests | the files under `test/` the red commit lands |
+| the red tests | the leaf's `red` list, through `redListOf` in `src/scripts/red-list.js`, or the files under `test/` the red commit lands where the leaf lists none |
 | they stand | `git diff -M --name-status` from the red commit to HEAD deletes none of them, and a rename keeps one |
 
 The entry reads `{ step, skipped: true, kept: <red commit>, why }`, and the change line reads `keeps <leaf>`.
