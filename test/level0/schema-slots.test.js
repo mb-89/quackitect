@@ -168,6 +168,49 @@ steps:
   );
 });
 
+test("a reject's copies read as read where a later step reads the leaves they copy", () => {
+  assert.deepEqual(
+    slotted(`
+steps:
+  - name: design
+    steps:
+      - name: draft
+        does: writes it
+        input: ask
+        evidence:
+          - name: approach
+            form: text
+            says: the approach
+      - name: tests-red
+        does: writes the tests
+        input: draft
+        evidence:
+          - name: seen
+            form: text
+            says: what you see
+      - name: draft-2
+        does: writes it
+        input: ask
+        evidence:
+          - name: approach
+            form: text
+            says: the approach
+      - name: tests-red-2
+        does: writes the tests
+        input: draft
+        evidence:
+          - name: seen
+            form: text
+            says: what you see
+  - name: gate
+    does: reads the design
+    input: ["design/draft", "design/tests-red"]
+    to: retro
+`),
+    [],
+  );
+});
+
 test("an input reads ask, diff, an earlier step, or an earlier field", () => {
   assert.deepEqual(
     slotted(`
