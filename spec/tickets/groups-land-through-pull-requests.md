@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [the-skills-start-the-workers, groups-hold-groups]
-step: implement/tests-green
+step: design/draft
 record:
   - step: design/owner-read
     skipped: true
@@ -169,6 +169,9 @@ record:
         exit: 0
         said: "src/scripts/work.js:67:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/design_input/the-cloud-runs-itself]]
 ---
 
 # Ask
