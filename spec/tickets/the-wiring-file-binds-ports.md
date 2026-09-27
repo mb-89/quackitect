@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -145,6 +145,18 @@ record:
         hash: 58296f0a043bc171
         size: 4966
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e10c2f00cd · claude-code-remote · helper-3
+    hash_before: fcd4bd97fa3479140c65a53184b8269df01983f5
+    hash_after: fcd4bd97fa3479140c65a53184b8269df01983f5
+    inputs:
+      - name: design/draft
+        hash: 58296f0a043bc171
+        size: 4966
+      - name: design/tests-red
+        hash: c7cf080aaa594786
+        size: 1024
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -298,8 +310,15 @@ the cases run over a catalog in memory, and the import case plants its packages 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the approach answers every done_when line: the six wiring cases in src/q/wiring_test.go and TestAModuleImportingAModuleIsNamed stand red on their own assertions under ./RUNME.sh branch test, and go test and the check decide the first and last lines
+- the approach claims no module type registers yet, but src/modules/clock, env and files each hold Registers(c), on the local names minute, vars/<name> and files/<path...>. spec/wiring.yaml still stands empty here, since io-modules-own-their-names wires those instances, but the implement keeps Load renaming a family port whose local name carries a pattern segment
+- the tests list names the planted modules/work for nomodule, and the case plants modules/greedy. It also leaves out TestABuiltInInPortKeepsItsZeroValue, which the file holds. The implement fixes the list in place
+- derivedOf runs over its own closed inputs slice today, so the run reads the registration inputs as the approach says, or a rename never reaches it
+- analyzers-read-the-io-flag plans nomodule and its case too. Its draft takes the NoModule this ticket lands, and adds no second one
+- the model names the config declaration q.Cfg, and the code names it CfgIn beside GivenIn and DerivedIn. This is form, and waits for the push
 
 # implement
 
