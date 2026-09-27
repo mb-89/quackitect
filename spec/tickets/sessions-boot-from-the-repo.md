@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -271,6 +271,19 @@ record:
         hash: 22fc99331ec488bc
         size: 87937
     def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: d8d01a46a05fdb7fb8d8f2b9f1ce45a9e51cf016
+    hash_after: d8d01a46a05fdb7fb8d8f2b9f1ce45a9e51cf016
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 0dbbf5047a23c593
+        size: 3078
+    def: 897ac034247c0bca
 group: the-cloud-works-its-queue
 ---
 
@@ -493,7 +506,7 @@ The approach takes this as unmeasured: the client reads the plugins before any S
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Four cases fail on their own assertion against the stub boot, and the settings file carries no SessionStart hook yet. The case where everything stands and the case off a cloud box pass on the stub, as negative cases do. The skip list case reads INSTALL_SKIP from the hooks module, so the list stands in one place.
+Four cases fail on their own assertion against the stub boot, and the settings file carries no SessionStart hook yet. The case where everything stands and the case off a cloud box pass on the stub, as negative cases do. The run after the restale reads the same four.
 
 ### checked
 
