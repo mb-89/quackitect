@@ -23,7 +23,9 @@
       "Bash(./RUNME.sh branch merge:*)",
       "Bash(./RUNME.sh branch close:*)",
       "Bash(./RUNME.sh commit:*)",
-      "Bash(./RUNME.sh push)"
+      "Bash(./RUNME.sh push)",
+      "Bash(./RUNME.sh branch take:*)",
+      "Bash(./RUNME.sh ticket pull:*)"
     ],
     "deny": [
       "Artifact"
