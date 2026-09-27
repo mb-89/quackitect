@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: decide
     does: says what the note becomes, and closes it
@@ -19,6 +19,21 @@ steps:
 step: decide
 process: [[spec/processes/note]]
 process_hash: e02a0935ed78eb92
+todo: false
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: 7905a3c7a9fae05484277e8e733d3c971779a97b
+    hash_after: 7905a3c7a9fae05484277e8e733d3c971779a97b
+    inputs:
+      - name: ask
+        hash: 7284ded0b200ec4f
+        size: 796
+      - name: [[spec/design_output/work]]
+        hash: b7f02b4b69038b04
+        size: 36721
+    def: 9e2520e6318baf46
+reason: done
 ---
 
 # Ask
@@ -42,14 +57,16 @@ The fix lands with this note. A group names a key under `enabled_by`, and it wai
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+done
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+The fix stands on main: readWork and waitsOf in src/scripts/work-stands.js hold a group while its enabled_by key reads anything but true on main, and test/level0/work-switch.test.js holds it.
 
 # Discussion
 
