@@ -645,6 +645,7 @@ A step carrying `gate` is a gate: its value names the question it answers, and a
 | `reject` | `rejected` in `src/scripts/pull-gate.js` puts the leaves of the phase in again at its end, each named `<leaf>-<round>`, and points `step` at the first copy |
 | a second `reject` | puts a person step in before the copies too, through `withPersonStep` |
 
+- The hand-out of a gate prints its question, and `BEFORE_CLEAR` in `src/scripts/pull-chapter.js` beside it.
 - The reviewer fixes within its own diff, as its own commit. So at a gate, `handFaults` lets a commit naming the ticket stand.
 - A copy keeps no leaf a condition holds, no person step and no earlier copy.
 - Tests-red lists its red files under `red`. `expectedRed` in `src/scripts/red-list.js` reads every ticket past tests-red and short of tests-green. The check's test run leaves those files out and names them.

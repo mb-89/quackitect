@@ -10,18 +10,21 @@ import { voiceOver } from "../bridge/findings.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
+import { overLong } from "../../.claude/skills/level0/lib/names.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import { notesSaid, parsed } from "./guidance-hand.js";
-import { PERSON, roleOf } from "./pull-hand-of.js";
-import { overLong } from "../../.claude/skills/level0/lib/names.js";
-import { excludes, handRule, ticketsHere } from "./pull-hand.js";
-import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
-import { formatted } from "./pull-format.js";
-import { changedSince, commitsFor, tipOf } from "./pull-writes.js";
 import { acceptRows } from "./pull-accept.js";
+import { formatted } from "./pull-format.js";
+import { excludes, handRule, ticketsHere } from "./pull-hand.js";
+import { PERSON, roleOf } from "./pull-hand-of.js";
+import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
+import { changedSince, commitsFor, tipOf } from "./pull-writes.js";
 
 // A shell answers this where it finds no command, which a backtick or a fence around the line earns. [[spec/design_output/pull#the-fields-hold-their-forms]]
 const NO_COMMAND = 127;
+
+// The question a gate's reviewer asks before it clears. [[spec/design_output/pull#the-gate]]
+export const BEFORE_CLEAR = "does anything here contradict what you see in the phase?";
 
 export function workAnswer(it, one, leaf) {
   const rows = [];
@@ -30,6 +33,9 @@ export function workAnswer(it, one, leaf) {
     `${WORK}  ${one.name} at ${leaf.path}, leaf ${leaf.at + 1} of ${leaf.of}${phase}`,
   );
   if (leaf.does) rows.push(`      ${leaf.does}`);
+  // A gate names the question it answers. [[spec/design_output/pull#the-gate]]
+  if (leaf.gate)
+    rows.push(`      answers: ${leaf.gate}`, `      before the clear: ${BEFORE_CLEAR}`);
   if (leaf.final) rows.push(...acceptRows(it, one, leaf));
   rows.push("", "# Ask", "", askOf(one.text) || "(the ask stands empty)", "");
 
