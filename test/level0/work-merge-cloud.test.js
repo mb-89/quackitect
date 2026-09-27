@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { merge } from "../../src/scripts/work-merge.js";
+import { work } from "../../src/scripts/work.js";
 import { doorsSaying, heard, merging, ranGit, ROOT } from "./work-doors.js";
 
 // A cloud branch reads against trunk by its commits, and takes no group. [[spec/design_output/work#a-cloud-branch-comes-in]]
@@ -67,4 +68,21 @@ test("merge builds the merged tree's tools before its check", () => {
   const check = ran.indexOf(CHECK);
   assert.ok(install >= 0, "the merge runs the install");
   assert.ok(install < check, "and runs it before the check");
+});
+
+// A work branch's merge closes it once trunk reaches origin, and a refused push leaves it standing. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+test("merge of a work branch pushes main and closes the branch, and keeps it where the push comes back refused", () => {
+  const closed = doorsSaying(merging());
+  closed.it.node = "node";
+  const shut = heard(() => work(ROOT, ["merge", "one-group"], { ...closed.it, cloud: false }));
+  assert.equal(shut.code, 0, shut.said);
+  const ran = ranGit(closed.outside);
+  assert.ok(ran.indexOf("git push origin main") < ran.indexOf("git push origin --delete work/one-group"));
+
+  const kept = doorsSaying(merging({ "git push origin main": { exitCode: 1 } }));
+  kept.it.node = "node";
+  const held = heard(() => work(ROOT, ["merge", "one-group"], { ...kept.it, cloud: false }));
+  assert.equal(held.code, 0, held.said);
+  assert.ok(!ranGit(kept.outside).includes("git push origin --delete work/one-group"));
+  assert.match(held.said, /then run \.\/RUNME\.sh branch close one-group/);
 });
