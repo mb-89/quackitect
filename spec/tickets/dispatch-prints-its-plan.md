@@ -117,11 +117,23 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 71ae70f7eb56cc006e6325c3f98a7f4e883ce8f8
+    hash_after: 71ae70f7eb56cc006e6325c3f98a7f4e883ce8f8
+    inputs:
+      - name: ask
+        hash: 50d9d461a66c6351
+        size: 1574
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 5a2557d24d86ab34
+        size: 13510
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -165,38 +177,59 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new module src/scripts/dispatch.js holds planOf(it, now), which reads git once through readWork(it, true): the work branches and the tickets on origin/main. It answers five lists. Ready takes freeIn over the branches with the config and the clock, so a stale hold reads free the way the take reads it, and ready names the same groups freeNow names where no hold stands. Held names each hold younger than work.staleAfter. Waiting names each open group whose dependencies stand open, with what it waits for. Stuck names each group at done whose branch stands on origin unmerged, where git rev-list --count origin/<branch>..origin/main answers past zero, or where the tip age runs past staleSpan. Bundles names every open ticket on origin/main carrying no group, no group process and no person wait, under one fix bundle for the top, since no parent stands yet. Questions names every open ticket on origin/main or on a branch where waitsOnPerson holds, with the group it holds open. The verb dispatch(root, argv, doors) runs planOf and prints it as rows, or as one JSON object under --json. It takes --dry alone for now, and a run without it answers 2 and names the child bringing the writes. waitsOnPerson leaves src/scripts/work-answer.js as an export, so the queue and the plan read one rule. The verb table in cli.js gains dispatch beside cloud.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/cli.js: the verb table gains a dispatch row calling dispatch(it.work, rest, it)
+- src/scripts/work-answer.js: the queue reads waitsOnPerson, which becomes an export and keeps its body
+- src/scripts/dispatch.js: planOf reads freeIn, staleClaim and staleSpan off src/scripts/work-free.js and readWork off src/scripts/work-stands.js, and changes neither
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/dispatch.test.js: a group whose dependencies stand closed reads ready
+- test/level0/dispatch.test.js: a group waiting on an open group reads waiting
+- test/level0/dispatch.test.js: a hold past work.staleAfter reads ready, and a fresh hold reads held
+- test/level0/dispatch.test.js: the loose agent tickets stand in the bundle, and a ticket for a person under the questions alone
+- test/level0/dispatch.test.js: a group at done behind origin/main reads as a stuck hand-over
+- test/level0/dispatch.test.js: a group at done past work.staleAfter reads as a stuck hand-over
+- test/level0/dispatch.test.js: the dry run writes no file, makes no commit and pushes nothing
+- test/level0/dispatch.test.js: freeNow and the plan name the same ready groups
+- test/level0/dispatch.test.js: --json prints the plan as one JSON object
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/scripts/dispatch.js
+- src/scripts/cli.js
+- src/scripts/work-answer.js
+- test/level0/dispatch.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened work-free.js, work-stands.js, work-answer.js, cli.js and cli-doors.js, and each named function stands there as the approach says
+- the callers list names the verb table, the queue reading waitsOnPerson, and the reads the plan takes
+- each done_when line names its case under tests, and ./RUNME.sh check decides the last
 
 ## tests-red
 
