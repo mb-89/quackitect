@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -228,6 +228,21 @@ record:
   - step: design/draft-2
     hand: the engine
     stale: [[spec/design_input/the-cloud-runs-itself]]
+  - step: design/draft
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 3c10717a5e0479c3f16671a73c1322d9b22739ce
+    hash_after: 3c10717a5e0479c3f16671a73c1322d9b22739ce
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/design_output/level0]]
+        hash: 22fc99331ec488bc
+        size: 87937
+    def: 7883b3d10633c780
 group: the-cloud-works-its-queue
 ---
 
@@ -269,51 +284,63 @@ The source: none.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-A new script src/scripts/boot.js runs as the SessionStart hook, through node, since node stands on a cloud box and on a Windows desk alike, and sh stands on neither Windows desk. Its pure part boots(it) reads a stamp at .se/.runtime/boot.json holding the hash of src/scripts/install.sh and HEAD. Where the stamp matches and the plugin manifest and node_modules stand, it answers at once and runs nothing. Otherwise it runs sh src/scripts/install.sh through the proc door, under SE_INSTALL_SKIP naming the skip list the setup names today, and writes the stamp on a zero exit. It always exits 0, so a failed install holds no session up. .claude/settings.json gains hooks.SessionStart with one command hook: node "$CLAUDE_PROJECT_DIR/src/scripts/boot.js". The skip list stands in boot.js once, and the setup text in spec/design_output/level0.md points at it. The trust flag in ~/.claude.json and the auto mode in ~/.claude/settings.json stay in the setup: the client reads the trust before any hook runs, and it takes defaultMode auto off user settings alone, as the note says under Where the mode stands. The note names the hook as the road for the install, and names those two lines as what the setup still holds.
+The level zero plugin loads off a manifest git ignores, and its bridgehead installs what a cloud box lacks once it loads. So the boot hook holds one job: it brings the manifest and the modules for the next session on a box where either stands nowhere.
+The approach takes this as unmeasured: the client reads the plugins before any SessionStart hook runs, because a plugin registers SessionStart hooks of its own. So the session running the first install holds no level zero, and the setup keeps its install line, its trust flag and its auto mode. The note says so, and names the probe that retires the install line.
+`src/scripts/boot.js` runs as the hook, through node. Its pure part `boots(it)` runs nothing off a cloud box, under the guard the bridgehead reads: `CLAUDE_CODE_REMOTE` or `SE_CLOUD`. Where the manifest and `node_modules` both stand, it runs nothing. Otherwise it runs `sh src/scripts/install.sh` through the proc door, under `SE_INSTALL_SKIP` set to `INSTALL_SKIP` from the hooks module. It answers 0 always, so a failed install holds no session up.
+`.claude/settings.json` gains `hooks.SessionStart` with one command hook running node over `boot.js`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-- .claude/settings.json: hooks.SessionStart calls src/scripts/boot.js
-- src/scripts/boot.js: boots calls src/scripts/install.sh through the proc door
-- spec/design_output/level0.md: the setup script loses its install line and keeps the trust and the mode
+- `.claude/settings.json`: `hooks.SessionStart` runs `src/scripts/boot.js`
+- `src/scripts/boot.js`: `boots` runs `src/scripts/install.sh` through the proc door
+- `src/scripts/boot.js`: `boots` reads `INSTALL_SKIP` from `.claude/skills/level0/hooks/level0.js`
+- `spec/design_output/level0.md`: the setup chapter names the hook, and says why every setup line stays
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
 <!-- the form is list -->
 
-- test/level0/hooks.test.js: .claude/settings.json carries a SessionStart hook running src/scripts/boot.js
-- test/level0/hooks.test.js: boots runs no install where the stamp matches and every tool stands
-- test/level0/hooks.test.js: boots runs the install under the skip list, and writes the stamp, where the stamp is stale
+- `test/level0/hooks.test.js`: the project settings carry a SessionStart hook running `src/scripts/boot.js`
+- `test/level0/hooks.test.js`: boot runs no install where the manifest and the modules stand
+- `test/level0/hooks.test.js`: boot runs the install under the skip list where the manifest stands nowhere
+- `test/level0/hooks.test.js`: boot runs the install where the modules stand nowhere
+- `test/level0/hooks.test.js`: boot runs nothing off a cloud box
+- `test/level0/hooks.test.js`: boot answers 0 where the install fails
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- first
+- the first session: the setup keeps its install line, and the note names the probe that retires it
+- the trust claim: the approach drops it, and the setup keeps the trust flag and the mode
+- the stamp and HEAD: no stamp stands, and the manifest and the modules decide
+- a tool gone under a matching stamp: a case holds the modules gone
+- the Windows road: boot runs off a cloud box nowhere, so a desk keeps `RUNME`
+- the restale: the design input drops its funnel line alone, and the boot section stands as draft-2 reads it
 
 ### size
 
 <!-- every file the approach touches, one a line -->
 <!-- the form is list -->
 
-- .claude/settings.json
-- src/scripts/boot.js
-- test/level0/hooks.test.js
-- spec/design_output/level0.md
+- `.claude/settings.json`
+- `src/scripts/boot.js`
+- `test/level0/hooks.test.js`
+- `spec/design_output/level0.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- opened .claude/settings.json, install.sh and its SE_INSTALL_SKIP loop, and the setup and mode chapters of level0.md, and each claim stands there
-- the callers list names the hook, the install call and the setup text
-- each done_when line names its case, the two note lines name level0.md, and ./RUNME.sh check decides the last
+- opened the bridgehead `START` and `starts`, `INSTALL_SKIP`, the manifest line in `.gitignore`, and the setup and mode chapters
+- the callers list names the hook, the install call, the skip list and the setup text
+- each `done_when` line meets a case or the note, and the check decides the last
 
 ## tests-red
 
