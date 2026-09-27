@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-foundation-lands-unchanged
 parent: the-index-answers-v1
+record:
+  - step: do
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 2c3c441245639c53c201bafbde1a16fbad20d94f
+    hash_after: 2c3c441245639c53c201bafbde1a16fbad20d94f
+    why: the-index-answers-v1 answers this ask
+reason: answered
 ---
 
 # Ask
@@ -48,11 +55,15 @@ parent: the-index-answers-v1
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/index
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +71,17 @@ parent: the-index-answers-v1
 
 <!-- the form is text -->
 
+`Serve` keeps its signature in [[spec/tickets/the-index-answers-v1]]. The standing file names the port of `/v1`, and `stop` closes both listeners. So every caller of `Serve` stands as it is, and each test reads the second port off the standing file.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change departs from the ask: no caller changes, because `Serve` keeps its signature
+- the change reveals no cleanup
+- the standing file owns the port, and each test reads it there
 
 # Discussion
 

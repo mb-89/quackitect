@@ -200,17 +200,27 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/index
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The three door cases meet a `404` from a listener holding no route, and the stale case meets an empty value. `Serve` keeps its signature: the standing file names the port of `/v1`, and `stop` closes both listeners. So no caller of `Serve` changes, which answers [[spec/tickets/serve-callers-take-the-listener]]. `TestV1ReadsAStaleName` answers [[spec/tickets/v1-values-read-stale]].
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch `src/index`, `go.mod` and `go.sum`, which the draft names
+- the door tests run a real door, and the stale case a store of its own
+- each file opens on a comment pointing at the surfaces note
+- the routes stand in the surfaces note, and the code points there
+- both review rows stand answered
 
 ## change
 

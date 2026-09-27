@@ -44,6 +44,7 @@ const (
 
 type Standing struct {
 	Port  int    `json:"port"`
+	V1    int    `json:"v1,omitempty"`
 	Pid   int    `json:"pid"`
 	Root  string `json:"root"`
 	Stamp string `json:"stamp"`
@@ -64,6 +65,7 @@ type answer struct {
 type door struct {
 	db    *sql.DB
 	book  *ops.Book
+	v1    net.Listener
 	root  string
 	guard sync.Mutex
 	dirty chan struct{}
@@ -184,6 +186,14 @@ func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 	go one.sweeps()
 	go one.guards()
 	go server.Serve(listen)
+	// The old API keeps its port, and /v1 stands on a port of its own. [[spec/design_output/surfaces]]
+	v1, served, err := one.servesV1()
+	if err != nil {
+		server.Close()
+		db.Close()
+		return nil, nil, err
+	}
+	one.v1 = v1
 
 	eyes, err := watches(root, one)
 	if err == nil {
@@ -192,6 +202,7 @@ func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 	// The stop lets go of the database and the watch too, so a test's folder clears on Windows. [[spec/design_output/index#the-door-owns-the-database]]
 	stop := func() {
 		server.Close()
+		served.Close()
 		if one.eyes != nil {
 			one.eyes.Close()
 		}
@@ -206,6 +217,7 @@ func (one *door) stands(listen net.Listener) error {
 	}
 	said, err := json.Marshal(Standing{
 		Port:  listen.Addr().(*net.TCPAddr).Port,
+		V1:    one.v1.Addr().(*net.TCPAddr).Port,
 		Pid:   os.Getpid(),
 		Root:  one.root,
 		Stamp: stampHere(),
