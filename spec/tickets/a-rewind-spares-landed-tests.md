@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: design/person-1
 steps:
   - name: design
     steps:
@@ -202,6 +202,19 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: design/draft
+  - step: design/tests-red
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 0a66d07cd42e7e837b08ee7a608c10eeb7694089
+    hash_after: 0a66d07cd42e7e837b08ee7a608c10eeb7694089
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: d6c724cf430b4044
+        size: 2389
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -326,15 +339,7 @@ The done lines and the case deciding each:
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Over a keptRed that keeps nothing, these cases fail on their own assertion. They are the kept leaf, the rename, the rewound review walking past, and the stranded ticket walking on. The case where a test's content moves passes over the stub, because it guards the other side. There a leaf whose tests move goes out again.
-
-| the case | the class of fault it guards |
-|---|---|
-| a red leaf whose tests hold their red content | a rewind asks a landed change to fail again |
-| a rename moving a test | a move of a file reads as a change of its tests |
-| a test whose content moved | a keep passes over tests that no longer stand as they stood red |
-| a rewound review walking past | the pass after a rewind strands the ticket at its red leaf |
-| a stranded ticket at a pull | a ticket stranded today stays stranded |
+The rerun meets the same four cases failing on their own assertion over the stub keptRed: the kept leaf, the rename, the rewound review walking past, and the stranded ticket walking on. The case where a test's content moves passes over the stub, because it guards the other side. The gate rejects the design these cases test, so tests-red-2 rewrites them over draft-2.
 
 ### checked
 
