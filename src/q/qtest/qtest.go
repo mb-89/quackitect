@@ -27,6 +27,12 @@ func New(t testing.TB, register func(*q.Catalog)) *Index {
 		q.GivenIn(c, "clock/minute", int64(0), q.Doc("the minute, as the case seeds it")),
 	)
 	register(c)
+	return Over(t, c, inputs)
+}
+
+// Drives a catalog another hand filled, the real index's among them, through the same steps as the fake. [[spec/design_output/model#the-fake-keeps-a-contract]]
+func Over(t testing.TB, c *q.Catalog, inputs q.Writer) *Index {
+	t.Helper()
 	if faults := c.Check(nil); len(faults) > 0 {
 		t.Fatalf("the catalog refuses: %v", faults)
 	}
@@ -62,17 +68,17 @@ func (one *Index) Land(name string, events ...any) any {
 	return one.Read(name)
 }
 
-// Every call the action answers, in order: each list's last Then reads the answers the case hands it, one slice a list. [[spec/design_output/model#an-action-lists-calls]]
-func (one *Index) Act(name string, input any, answers ...[]any) []q.Call {
+// Every request the action answers, in order: each list's last Then reads the answers the case hands it, one slice a list. [[spec/design_output/model#an-action-lists-requests]]
+func (one *Index) Act(name string, input any, answers ...[]any) []q.Request {
 	one.t.Helper()
-	calls, err := one.store.Act(name, input)
+	asked, err := one.store.Act(name, input)
 	if err != nil {
 		one.t.Fatal(err)
 	}
-	var ran []q.Call
-	for len(calls) > 0 {
-		ran = append(ran, calls...)
-		last := calls[len(calls)-1]
+	var ran []q.Request
+	for len(asked) > 0 {
+		ran = append(ran, asked...)
+		last := asked[len(asked)-1]
 		if last.Then == nil {
 			break
 		}
@@ -80,7 +86,7 @@ func (one *Index) Act(name string, input any, answers ...[]any) []q.Call {
 		if len(answers) > 0 {
 			said, answers = answers[0], answers[1:]
 		}
-		calls = last.Then(said)
+		asked = last.Then(said)
 	}
 	return ran
 }

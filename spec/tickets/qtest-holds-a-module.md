@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -174,6 +174,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7dfbbf7a2d0 · claude-code-remote
+    hash_before: 69d8b8aa393fdf836d23f7d8b4dc089fbd0e5852
+    hash_after: 69d8b8aa393fdf836d23f7d8b4dc089fbd0e5852
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q/qtest fails
+    inputs:
+      - name: design/draft
+        hash: 86c2562aecacf92a
+        size: 3833
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -276,22 +289,22 @@ each done_when line names its test: go test and the check decide the first and l
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
 <!-- the form is list -->
 
-src/q/action_test.go,src/q/qtest/qtest_test.go,src/imports/imports_test.go
+src/q/action_test.go,src/q/qtest/qtest_test.go,src/index/contract_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-The action, commits and onlyq cases fail on their assertions, since Store.Act answers no call, Commit reaches no OnCommit hand, and OnlyQ reports nothing. The derived and fold cases pass already, since Run and Land stand. The surprise: q holds no action at all, so this ticket builds q.Call and q.ActionIn beside the harness. The fake types files/, buffers/ and cfg/ as text and clock/minute as an int64, and the index types files/ as its own Content, so the two part until a later ticket names one type in q.
+The suite runs the same cases against the fake and against the index catalog in process, and both sides fail alike: the action case answers no request, since Store.Act answers none, and the commits case reads no commit, since Store.Commit reaches no OnCommit hand. The derived provider over a seeded config key and the fold pass on both sides already. The surprise: src/index is package main, so the contract test stands in package main beside door.go. The index registers no cfg/ and no clock/minute of its own, so its harness registers the two the way the config module will once it stands.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-every done_when line meets a red case: the action and commits cases in qtest, and the planted modules/nosy for onlyq, and go test and the check decide the rest as commands
-the fake index is the fake the module tests ask for, and the analyzer reads planted packages in a temporary folder, so no door stands unfaked
+every done_when line meets a case: Suite holds the derived provider, the fold, the action with its requests, the commits and the config key, and TestTheIndexKeepsTheContract runs it against the real index; go test and the check decide the rest as commands
+the index side runs with no database, no port and no NATS, and the fake side opens no disk, so no door stands unfaked
 
 # gate
 

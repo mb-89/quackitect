@@ -42,7 +42,7 @@ type registration struct {
 	inputs   []input
 	run      func(Snapshot) any
 	step     func(state, event any) (any, error)
-	act      func(input any) ([]Call, error)
+	act      func(input any) ([]Request, error)
 }
 
 type Catalog struct {
