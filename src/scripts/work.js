@@ -54,7 +54,7 @@ import { freeIn, trigger } from "./work-free.js";
 import { testVerb } from "./work-test.js";
 import { unblock } from "./work-unblock.js";
 import { list } from "./work-list.js";
-import { close, freeChildren, marksTrunk, merge, offTrunk } from "./work-merge.js";
+import { close, marksTrunk, merge, offTrunk } from "./work-merge.js";
 import {
   childrenHere,
   DONE,
@@ -418,9 +418,10 @@ function finish(it) {
 
   const stopped = ready(it, branch);
   if (stopped.code) return stopped.code;
+  if (childrenStand(it, name)) return 1;
 
   const open = retroOpen(it, it.disk.read(path));
-  if (open) return retroFirst(it, branch, name, open);
+  if (open) return retroFirst(name, open);
 
   return leaves(it, branch, at, path, stopped.says);
 }
@@ -444,18 +445,27 @@ export function retroOpen(it, text) {
   return open?.path ?? "";
 }
 
-// The open tickets leave first, because the pull hands no retro out while one stands in the group. [[spec/design_output/work#a-box-leaves]]
-function retroFirst(it, branch, name, open) {
-  const freed = freeChildren(it, name);
-  if (freed.length) {
-    it.git.run(["commit", "-m", `${branch}: the open tickets leave the group`], true);
-    it.git.run(["push", "origin", branch], true);
-  }
+// A group closes where no ticket naming it stands open, so a box leaving work undone hands the group back and closes nothing. [[spec/design_output/work#a-box-leaves]]
+function childrenStand(it, name) {
+  const children = childrenHere(it, name);
+  const open = children.filter((one) => fieldOf(one.text, "state") !== CLOSED);
+  if (!open.length) return false;
+  console.error(`${name} closes once no ticket naming it stands open:`);
+  for (const one of open) console.error(`  ${waitsAt(it, one, children)}`);
+  console.error(
+    "Close each through the pull, or hand a person's step on with ./RUNME.sh branch unblock.",
+  );
+  console.error(
+    `Or run ./RUNME.sh branch release ${name}, and the group stands open for the next box.`,
+  );
+  return true;
+}
+
+// [[spec/design_output/work#a-box-leaves]]
+function retroFirst(name, open) {
   console.error(
     `${name} stands with ${open} unwritten, and the retro comes before the box leaves.`,
   );
-  for (const one of freed)
-    console.error(`  ${one} leaves the group, so the pull reaches the retro.`);
   console.error(
     `Run ./RUNME.sh ticket pull ${name}, write each retro leaf it hands out, then run ./RUNME.sh branch done.`,
   );
@@ -499,7 +509,6 @@ export function standsOpen(it, name, path) {
 function leaves(it, branch, at, path, says) {
   const name = branch.replace(/^work\//, "");
   const after = it.git.run(["rev-parse", "HEAD"], true).out;
-  const freed = freeChildren(it, name);
 
   // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]] takes the tag off.
   const was = withHashAfter(it.disk.read(path), after, it.front);
@@ -517,10 +526,6 @@ function leaves(it, branch, at, path, says) {
 
   console.log(`${branch} carries ${shortOf(after)}, and ${says}.`);
   console.log(`${name} stands ${CLOSED}, and every ticket in it is closed.`);
-  for (const one of freed)
-    console.log(
-      `  ${one} leaves the group, and stands loose on ${TRUNK} after the merge.`,
-    );
   console.log(`Run ./RUNME.sh branch merge ${name} from ${TRUNK}.`);
   return 0;
 }
