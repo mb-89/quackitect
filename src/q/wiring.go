@@ -132,6 +132,11 @@ func bind(w Wiring, instance string, reg *registration, writers map[string]strin
 	return faults
 }
 
+// Loads the wiring and checks the catalog, and answers no store where either names a fault. [[spec/design_output/model#the-index-resolves-in-passes]]
+func Start(w Wiring, types map[string]func(*Catalog)) (*Store, error) {
+	return nil, fmt.Errorf("the start stands unbuilt")
+}
+
 // A config key by its local name, which the wiring files under `<instance>/config/<key>`. [[spec/design_output/model#config-comes-off-the-registrations]]
 func CfgIn[T any](c *Catalog, key string, def T, opts ...Option) Writer {
 	return c.add(givenOf("config/"+key, def), callerAt(2), opts)

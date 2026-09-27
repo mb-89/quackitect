@@ -205,3 +205,9 @@ func (one Snapshot) Read(name string) any {
 }
 
 func (one Snapshot) From(name string) int64 { return one.values[name].from }
+
+// Marks an instance that runs nowhere, so a read of its out-ports answers the built-in value. [[spec/design_output/model#the-index-resolves-in-passes]]
+func (s *Store) Down(instance string) error { return nil }
+
+// [[spec/design_output/model#the-index-resolves-in-passes]]
+func (one Snapshot) NotProvided(name string) bool { return false }

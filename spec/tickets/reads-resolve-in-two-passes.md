@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -132,6 +132,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: d147a2ac3ce62a2be6e6daa1d21b60adb2ea7208
+    hash_after: d147a2ac3ce62a2be6e6daa1d21b60adb2ea7208
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: aa0fb1a917cce672
+        size: 2936
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -229,26 +242,31 @@ Each done_when line names its test in `src/q/start_test.go`, or the command `go 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/start_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every start case fails on its own assertion over the stubs: Start answers no store and the error 'the start stands unbuilt', so the started cases refuse and the refused cases find no port named in the error. Down answers nil and NotProvided answers false. The surprise: Load already binds in two passes, since it names every writer before it binds any in-port, so a reader loaded before its writer binds today, and the work left is Start, the port names in each fault, and the down mark. The send and writer cases in src/q stand red on the lists of io-modules-own-their-names and commits-name-their-writer.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a case: the reader before its writer, the unwired in-port, the two out-ports on one standard name, the in-port of another type and the instance that runs nowhere each have a case in src/q/start_test.go, and go test and the check decide the rest as commands
+the cases run over a catalog and a store in memory, so no door stands unfaked
 
 # gate
 
