@@ -180,6 +180,31 @@ record:
         hash: b1d5d7b286e9be5f
         size: 907
     def: ec253787263043a7
+  - step: accept
+    hand: box d6f05e3a585030 · claude-code · helper-7
+    hash_before: ea413a7ca1873370ca06782fa2a4ac14298a4585
+    hash_after: 0100e8845f3644be3463af7e5f0f9db06deb6c2b
+    answered:
+      - name: design/tests-red/tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: implement/change/lint
+        exit: 0
+        said: The rules pass.
+      - name: implement/tests-green/tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: implement/tests-green/check
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:265:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 260b59b15e28d7e0
+        size: 565
+      - name: implement
+        hash: 6ff8893262e81181
+        size: 1715
+    def: 5050b7ed72b70652
 ---
 
 # Ask
@@ -426,8 +451,10 @@ A hold leaves with its ticket. `stillHeld` in `src/engine/named.js` reads the ti
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- editor-reads-skip-closed-holds: `graphOf` in `src/extension/lib/route-host.js` and `personal` in `src/extension/lib/fields.js` read the hold a person keeps on a closed ticket. The page then reads it held, and the fields draw marks, until the next pull. The hold chapter of `spec/design_output/pull.md` says the readers skip it. The lens still reads and watches the older `hold.json`, which the tests-green says leaves the readers.
 
 # view
 
