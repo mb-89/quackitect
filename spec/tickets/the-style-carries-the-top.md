@@ -77,7 +77,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: 946f720fba4dae3be85f3897102af0696733ceac
+    hash_after: 946f720fba4dae3be85f3897102af0696733ceac
 ---
 
 # Ask
@@ -100,32 +105,43 @@ Today working, tickets and guidance arrive once in the standing layer, and a lon
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+- `styleFrom` in `.claude/skills/level0/lib/projection.js` writes every note at the top of `spec/guidance` into `.claude/output-styles/level0.md`, in place of the notes marked `style`. The `style` key leaves `spec/schemas/guidance.schema.yaml` and the notes.
+- `guidanceHere` in `src/bridge/guidance.js` hands the session no top note, since the style carries them. `blocksOf` writes the canary with no rules block, and the handover block rides as before.
+- The canary counts the rules and the notes of the style, so its line says what level zero loaded.
+- The tools block and the index line stay as they stand. They carry the box and its verbs, and no rule.
+- `./RUNME.sh rename spec/guidance/cloud spec/guidance/cloud/cloud` moves the note with its `env`, and rewrites every link reaching it. The group process's cloud steps carry the `cloud` tag, so the resolver of guidance-resolves-by-tags hands the note on a cloud box.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/bridge/guidance.js layerOf and layerRides, which read guidanceHere and blocksOf,src/scripts/cli-check.js project and projectionsHold, which run the projection,src/scripts/cli-check.js standing, which prints the standing layer,src/scripts/probe-cold.js, which looks for level0-rules beside level0-canary
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/style-top.test.js the projection writes every note at the top of spec/guidance into the output style,test/level0/style-top.test.js the standing layer carries the canary and the handover alone
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: styleFrom, styled, guidanceHere, blocksOf, the rename verb, both schemas
+- the callers list names every reader of guidanceHere, blocksOf and the projection, found by a search
+- each done_when line names a case in test/level0/style-top.test.js, and the check reads the move
 
 ## review
 
