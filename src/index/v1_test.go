@@ -1,7 +1,7 @@
 // One running index answers a name over /v1 and over the old API, a name the
 // catalog lacks as a problem, and its OpenAPI document.
 // [[spec/design_output/model#surfaces]]
-package main
+package index
 
 import (
 	"encoding/json"
@@ -20,7 +20,12 @@ import (
 func standingV1(t *testing.T) Standing {
 	t.Helper()
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	c := q.New()
+	hand := q.GivenIn(c, "files/<path...>", q.Content{})
+	file := func(_ string, commit Commit) (func(), error) {
+		return func() {}, commit(hand, map[string]any{"files/spec/one.md": q.Content{Hash: "one", Text: "one"}})
+	}
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), c, file)
 	if err != nil {
 		t.Fatal(err)
 	}

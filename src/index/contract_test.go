@@ -1,7 +1,7 @@
 // The real index keeps the contract the fake index stands for, run in
 // process, with no database, no port and no NATS.
 // [[spec/design_output/model#the-fake-keeps-a-contract]]
-package main
+package index
 
 import (
 	"testing"
@@ -11,13 +11,13 @@ import (
 	"quackitect/src/watchdog"
 )
 
-// The catalog Serve builds, seeding files/ through the topic's own writer, with the config and clock inputs the config module registers once it stands.
+// The catalog Serve builds, with the files, config and clock inputs the IO modules and the config module register. [[spec/design_output/model#the-fake-keeps-a-contract]]
 func inProcess(t testing.TB, register func(*q.Catalog)) qtest.Harness {
 	c := q.New()
-	topics := registersTopics(c)
+	registersTopics(c)
 	watchdog.Registers(c)
 	inputs := q.Join(
-		topics.files,
+		q.GivenIn(c, "files/<path...>", q.Content{}, q.Doc("a file's hash and text, as the case seeds it")),
 		q.GivenIn(c, "cfg/<key...>", "", q.Doc("a config value, as the case seeds it")),
 		q.GivenIn(c, "clock/minute", int64(0), q.Doc("the minute, as the case seeds it")),
 	)

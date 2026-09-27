@@ -32,3 +32,17 @@ func TestTheMinuteMovesOnTick(t *testing.T) {
 		t.Fatalf("the minute reads %v after a tick, not %d", got, first+1)
 	}
 }
+
+func TestAStoppedClockCommitsNoMinute(t *testing.T) {
+	fake := NewFake(time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC))
+	commits := 0
+	stop := Start(fake, func(map[string]any) error {
+		commits++
+		return nil
+	})
+	stop()
+	fake.Tick(time.Minute)
+	if commits != 1 {
+		t.Fatalf("the clock commits %d times, past the one at start", commits)
+	}
+}

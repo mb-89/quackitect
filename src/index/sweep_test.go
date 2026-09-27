@@ -1,7 +1,7 @@
 // The rows move with the files and nothing clears them: a sweep rewrites what
 // moved alone, a change names its own paths, and git's list turns the flags.
 // [[spec/design_output/index#a-change-moves-its-rows]]
-package main
+package index
 
 import (
 	"bytes"
@@ -113,7 +113,7 @@ func doorOver(t *testing.T, root string, db *sql.DB) *door {
 	registersTopics(catalog)
 	return &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}),
 		touched: map[string]bool{}, tracked: func(string) bool { return true },
-		store: q.NewStore(catalog), published: map[string]bool{}}
+		store: q.NewStore(catalog)}
 }
 
 // A change reads git's list off the door, so a saved file spawns no git. [[spec/design_output/index#a-change-moves-its-rows]]

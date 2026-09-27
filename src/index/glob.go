@@ -1,7 +1,7 @@
 // A glob, turned into a regexp over a slash-separated path. One translation
 // answers the file question and the filter on a search alike.
 // [[spec/design_output/index#a-glob-becomes-a-pattern]]
-package main
+package index
 
 import (
 	"regexp"

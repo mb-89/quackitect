@@ -11,7 +11,7 @@ import (
 )
 
 func TestTheTreeHoldsTheImportRules(t *testing.T) {
-	loaded, err := packages.Load(&packages.Config{Mode: packages.NeedName | packages.NeedImports, Dir: "../..", Tests: true}, "./...")
+	loaded, err := packages.Load(&packages.Config{Mode: packages.NeedName | packages.NeedImports | packages.NeedFiles | packages.NeedCompiledGoFiles | packages.NeedSyntax, Dir: "../..", Tests: true}, "./...")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -26,7 +26,7 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 		for path := range one.Imports {
 			imported = append(imported, path)
 		}
-		for _, fault := range Faults(one.PkgPath, imported) {
+		for _, fault := range FaultsIn(one.PkgPath, imported, CarriesIO(one.Syntax)) {
 			t.Error(fault)
 		}
 	}

@@ -2,4 +2,13 @@
 # io-modules-own-their-names wires the first instances.
 # [[spec/design_output/model#the-wiring-file]]
 instances:
+  watch:
+    module: watch
+  clock:
+    module: clock
+  env:
+    module: env
 wires:
+  watch.files/<path...>: files/<path...>
+  clock.minute: clock/minute
+  env.vars/<name>: env/<name>

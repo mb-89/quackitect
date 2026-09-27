@@ -39,7 +39,7 @@ test("the Go gate on a box with no Go answers red and names the refusal", () => 
 });
 
 // [[spec/tickets/go-checks-need-go]]
-test("the Go gate runs the tests and the formatter at the root", () => {
+test("the Go gate runs the tests with the contract suites and the formatter at the root", () => {
   const ran = [];
   const run = (argv) => {
     ran.push(argv);
@@ -47,7 +47,7 @@ test("the Go gate runs the tests and the formatter at the root", () => {
   };
   assert.equal(goGate({ go: "go", run, say: () => {} }), 0);
   assert.deepEqual(ran, [
-    ["go", "test", "./..."],
+    ["go", "test", "-tags", "contract", "./..."],
     ["gofmt", "-l", "src"],
   ]);
 });
@@ -63,7 +63,9 @@ test("the Go gate skips the red tests, and a failing run answers red before the 
     goGate({ go: "go", run, say: () => {}, skip: ["-skip", "^(TestB)$"] }),
     1,
   );
-  assert.deepEqual(ran, [["go", "test", "-skip", "^(TestB)$", "./..."]]);
+  assert.deepEqual(ran, [
+    ["go", "test", "-tags", "contract", "-skip", "^(TestB)$", "./..."],
+  ]);
 });
 
 // [[spec/design_output/index#the-compiler-it-needs]]

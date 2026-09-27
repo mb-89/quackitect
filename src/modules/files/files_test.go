@@ -56,3 +56,13 @@ func TestAPushedChangeReachesTheFamily(t *testing.T) {
 		t.Fatalf("files/spec/c.md reads %+v", got)
 	}
 }
+
+func TestTheDiskRefusesARequestToAnotherModule(t *testing.T) {
+	disk := NewFakeDisk()
+	if _, err := Accept(disk)(q.Request{Module: "git", Verb: "commit"}); err == nil {
+		t.Fatal("the disk takes a request to git")
+	}
+	if _, ok, _ := disk.Read("a.md"); ok {
+		t.Fatal("a refused request wrote a file")
+	}
+}

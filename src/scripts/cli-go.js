@@ -7,6 +7,8 @@
 const SRC = "src";
 // The module path every tree import opens on. [[spec/tickets/go-code-shares-one-module]]
 const MODULE = "quackitect";
+// The build tag a contract suite stands under, which the gate runs beside every other test. [[spec/design_output/model#the-fake-keeps-a-contract]]
+const CONTRACT = "contract";
 
 // A tree import names a package folder under the root, and a test file's import builds no binary. [[spec/tickets/go-code-shares-one-module]]
 const IMPORT = new RegExp(`"${MODULE}/(${SRC}/[^"]+)"`, "g");
@@ -76,7 +78,7 @@ export function formatFaults(said) {
 export function goGate({ go, run, say, quiet = false, skip = [] }) {
   let ran;
   try {
-    ran = run([go, "test", ...skip, "./..."], { quiet });
+    ran = run([go, "test", "-tags", CONTRACT, ...skip, "./..."], { quiet });
   } catch {
     say(
       "go stands nowhere, so the check refuses: run ./RUNME.sh tools, or install Go.",

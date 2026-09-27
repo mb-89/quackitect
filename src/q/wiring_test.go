@@ -130,3 +130,43 @@ func TestReadWiringReadsInstancesAndWires(t *testing.T) {
 		t.Fatalf("the wires read %v", w.Wires)
 	}
 }
+
+func TestAFamilyWireKeepsItsNameAndCarriesItsKeys(t *testing.T) {
+	family := func(c *Catalog, hands map[string]Writer) { hands["vars"] = GivenIn(c, "vars/<name>", "") }
+	w := Wiring{Instances: []Instance{{"env", "env"}}, Wires: map[string]string{"env.vars/<name>": "env/<name>"}}
+	s, hands := loaded(t, w, map[string]func(*Catalog, map[string]Writer){"env": family})
+	bound := w.Bound("env", "vars/SE_ROLE")
+	if bound != "env/SE_ROLE" {
+		t.Fatalf("vars/SE_ROLE binds to %s", bound)
+	}
+	seed(t, s, hands["vars"], bound, "cloud")
+	if got := s.Snapshot().Read("env/SE_ROLE"); got != "cloud" {
+		t.Fatalf("env/SE_ROLE reads %v", got)
+	}
+}
+
+func TestARestKeyCarriesEverySegment(t *testing.T) {
+	w := Wiring{Wires: map[string]string{"watch.files/<path...>": "files/<path...>", "clock.minute": "clock/minute"}}
+	if got := w.Bound("watch", "files/spec/a.md"); got != "files/spec/a.md" {
+		t.Fatalf("files/spec/a.md binds to %s", got)
+	}
+	if got := w.Bound("clock", "minute"); got != "clock/minute" {
+		t.Fatalf("minute binds to %s", got)
+	}
+	if got := w.Bound("clock", "hour"); got != "clock/hour" {
+		t.Fatalf("an unwired port binds to %s", got)
+	}
+}
+
+func TestTakeJoinsTheLoadedCatalog(t *testing.T) {
+	w := Wiring{Instances: []Instance{{"clock", "clock"}}, Wires: map[string]string{"clock.minute": "clock/minute"}}
+	loadedOne, faults := Load(w, map[string]func(*Catalog){"clock": func(c *Catalog) { GivenIn(c, "minute", int64(0)) }})
+	if len(faults) > 0 {
+		t.Fatal(faults)
+	}
+	c := New()
+	c.Take(loadedOne)
+	if got := NewStore(c).Snapshot().Read("clock/minute"); got != int64(0) {
+		t.Fatalf("clock/minute reads %v in the joined catalog", got)
+	}
+}

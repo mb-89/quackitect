@@ -26,3 +26,14 @@ func TestEnvWritesEachVariableAtStart(t *testing.T) {
 		t.Fatalf("vars/HOME reads %v", got)
 	}
 }
+
+func TestAnEnvWithNoVariableCommitsNothing(t *testing.T) {
+	committed := false
+	err := Start(FakeEnv{"HOME": "/root"}, func(map[string]any) error {
+		committed = true
+		return nil
+	})
+	if err != nil || committed {
+		t.Fatalf("the env commits %v, and answers %v", committed, err)
+	}
+}

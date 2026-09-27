@@ -1,7 +1,7 @@
 // The table op keeps each operation past the door, and the door's start
 // fails every one it finds in flight.
 // [[spec/design_output/model#an-operation-outlives-callers]]
-package main
+package index
 
 import (
 	"path/filepath"

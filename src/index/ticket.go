@@ -1,7 +1,7 @@
 // The tickets, answered off the note rows through the one reading in
 // src/tickets, so a reader asks here and opens no file and no git.
 // [[spec/design_output/index#the-index-answers-the-tickets]]
-package main
+package index
 
 import (
 	"database/sql"

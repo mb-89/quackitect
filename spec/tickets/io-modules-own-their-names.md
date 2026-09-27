@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -170,6 +170,15 @@ record:
       - name: lint
         exit: 0
         said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+  - step: implement/change
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: eaed468c6ff9f13dc7ac8f809180703fd961fe09
+    hash_after: eaed468c6ff9f13dc7ac8f809180703fd961fe09
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -364,17 +373,17 @@ accept
 <!-- the tree builds and lints -->
 <!-- the form is command -->
 
-./RUNME.sh lint src/q
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-the change waits, so it touches no file yet
-no door stands reached yet
-no comment stands yet
-no fact stands added yet
+the change touches the files the draft size names, and past them `src/q/wiring.go`, `src/imports`, `install.sh`, `.vale.ini` and `test/level0`
+each IO module file carries its fake, and each contract suite runs over the fake and the real outside
+each new function points at the model section on IO modules or the wiring file
+the hash of a file stands once in `ContentOf`, and the wired name once in `Wiring.Bound`
 
 ## tests-green
 
@@ -432,3 +441,5 @@ The gate passes these to the implementer, to fix in place:
 
 - The draft names `TestTheCoreWritesNoInputName` under `src/index/topic_test.go`, and the case stands in `src/index/core_test.go`.
 - `q.Start` stands now, so the composition root calls it in place of `Load` and `Check`.
+
+The implement lands before `analyzers-read-the-io-flag`, since that ticket waits on this one. So `onlyq` takes the first cut of the flag here: `CarriesIO` in `src/imports/imports.go` reads a `q.IO()` call in the package, and `FaultsIn` lets such a package pass `onlyq`. The real watch hands the changes after its start, and no file standing before it.

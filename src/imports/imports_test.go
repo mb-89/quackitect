@@ -76,6 +76,15 @@ func TestFaultsNameAModuleImportingOs(t *testing.T) {
 	}
 }
 
+func TestAnIOModuleImportingOsPassesOnlyQ(t *testing.T) {
+	if said := FaultsIn("quackitect/src/modules/files", []string{"os", "github.com/fsnotify/fsnotify"}, true); len(said) != 0 {
+		t.Fatalf("the faults read %v", said)
+	}
+	if said := FaultsIn("quackitect/src/modules/files", []string{"quackitect/src/modules/names"}, true); len(said) != 1 {
+		t.Fatalf("an IO module importing a module reads %v", said)
+	}
+}
+
 func TestFaultsNameADoorImportOnce(t *testing.T) {
 	if said := Faults("quackitect/src/modules/work", []string{"quackitect/src/q/qtest", "quackitect/src/doors/disk"}); len(said) != 1 {
 		t.Fatalf("the faults read %v", said)

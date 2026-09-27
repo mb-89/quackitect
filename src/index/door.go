@@ -1,7 +1,7 @@
 // The resident process that owns the database. One writer keeps the tree and
 // the rows in step, and every reader asks the same warm cache.
 // [[spec/design_output/index#the-door-owns-the-database]]
-package main
+package index
 
 import (
 	"database/sql"
@@ -85,10 +85,9 @@ type door struct {
 	wake     chan struct{}
 	wakeLock sync.Mutex
 
-	// The values modules read, and the paths committed under files/ so far. [[spec/tickets/files-topic-reads-the-rows]]
-	store     *q.Store
-	writers   writers
-	published map[string]bool
+	// The values modules read. [[spec/tickets/files-topic-reads-the-rows]]
+	store   *q.Store
+	writers writers
 }
 
 // What a changes call answers: the tick the rows stand at. [[spec/design_output/index#the-index-fires-on-change]]
@@ -142,7 +141,13 @@ func trackedIn(root string) func(rel string) bool {
 	return func(rel string) bool { return held[rel] }
 }
 
-func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
+// Commits values into the served store as the writer a module holds. [[spec/design_output/model#io-modules-are-modules]]
+type Commit func(as q.Writer, values map[string]any) error
+
+// Starts an IO module over the root, committing what comes in, and answers its stop. [[spec/design_output/model#io-modules-are-modules]]
+type Start func(root string, commit Commit) (stop func(), err error)
+
+func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Listener, error) {
 	topics := registersTopics(catalog)
 	watchdog.Registers(catalog)
 	// The catalog check runs before the database opens, so a fault refuses the start. [[spec/design_output/model#the-index-resolves-in-passes]]
@@ -165,8 +170,13 @@ func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 
 	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
-	one.store, one.writers, one.published = q.NewStore(catalog), topics, map[string]bool{}
+	one.store, one.writers = q.NewStore(catalog), topics
 	if err := one.opensBook(); err != nil {
+		db.Close()
+		return nil, nil, err
+	}
+	stops, err := one.starts(starts)
+	if err != nil {
 		db.Close()
 		return nil, nil, err
 	}
@@ -201,6 +211,9 @@ func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 	}
 	// The stop lets go of the database and the watch too, so a test's folder clears on Windows. [[spec/design_output/index#the-door-owns-the-database]]
 	stop := func() {
+		for _, one := range stops {
+			one()
+		}
 		server.Close()
 		served.Close()
 		if one.eyes != nil {
@@ -209,6 +222,26 @@ func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 		one.db.Close()
 	}
 	return stop, listen, one.stands(listen)
+}
+
+// Each IO module commits through the store at its own revision, and a start that fails stops the ones before it. [[spec/design_output/model#io-modules-are-modules]]
+func (one *door) starts(starts []Start) ([]func(), error) {
+	commit := func(as q.Writer, values map[string]any) error {
+		_, err := one.store.Commit(one.store.Snapshot().Revision, as, values)
+		return err
+	}
+	var stops []func()
+	for _, start := range starts {
+		stop, err := start(one.root, commit)
+		if err != nil {
+			for _, done := range stops {
+				done()
+			}
+			return nil, err
+		}
+		stops = append(stops, stop)
+	}
+	return stops, nil
 }
 
 func (one *door) stands(listen net.Listener) error {

@@ -1,7 +1,7 @@
 // The command line over the door. Every verb here asks the resident process,
 // and starts one where none stands.
 // [[spec/design_output/index#the-door-owns-the-database]]
-package main
+package index
 
 import (
 	"bytes"
@@ -25,7 +25,8 @@ const (
 	startPollPause     = 100 * time.Millisecond
 )
 
-func main() {
+// The command line the composition root runs, with the IO modules it starts in the served index. [[spec/design_output/model#io-modules-are-modules]]
+func Main(starts ...Start) {
 	argv := argsOf()[1:]
 	if len(argv) == 0 {
 		fmt.Fprintln(stderr, "usage: se-index <serve|find|notes|links|dangling|same|tickets|changes|reindex|standing|why> [words]\n       se-index call <method> <json params>")
@@ -39,10 +40,13 @@ func main() {
 	}
 
 	if argv[0] == "serve" {
-		exits(serves(root))
+		exits(serves(root, starts))
 	}
 	exits(asks(root, argv))
 }
+
+// The root every verb works in, which the composition root reads its wiring off. [[spec/design_output/index#a-door-comes-back]]
+func Root() (string, error) { return rootHere() }
 
 func rootHere() (string, error) {
 	said := envOf("QUACKITECT_ROOT")
@@ -66,13 +70,13 @@ func rooted(path string) string {
 	return path
 }
 
-func serves(root string) int {
+func serves(root string, starts []Start) int {
 	// A fresh tree holds no runtime folder yet, and the database needs one to open in. [[spec/design_output/index#the-door-owns-the-database]]
 	if err := makeDir(filepath.Join(root, Runtime), 0o755); err != nil {
 		fmt.Fprintln(stderr, "the runtime folder did not stand:", err)
 		return 1
 	}
-	stop, _, err := Serve(root, filepath.Join(root, Runtime, "index.db"), q.Main)
+	stop, _, err := Serve(root, filepath.Join(root, Runtime, "index.db"), q.Main, starts...)
 	if err != nil {
 		fmt.Fprintln(stderr, "the index door did not stand:", err)
 		return 1

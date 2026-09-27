@@ -293,3 +293,5 @@ A module without the flag then reaches the outside nowhere. A fake with no contr
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+`io-modules-own-their-names` lands the `q.IO()` option and a first cut of the flag in `onlyq`: `CarriesIO` and `FaultsIn` in `src/imports/imports.go`. This ticket takes them further for `ioonly` and `fakesuite`, and drops the Vale sections the IO module files take in `.vale.ini`.

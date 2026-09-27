@@ -1,7 +1,7 @@
 // The watch that holds the rows level with the tree. It names each path it
 // hears, and the door moves those rows alone once a burst settles.
 // [[spec/design_output/index#the-watcher-keeps-it-warm]]
-package main
+package index
 
 import (
 	"io/fs"

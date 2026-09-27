@@ -1,7 +1,7 @@
 // The start: the door checks the catalog it takes, and a fault refuses it
 // before a listener or a standing file stands.
 // [[spec/design_output/model#the-index-resolves-in-passes]]
-package main
+package index
 
 import (
 	"os"

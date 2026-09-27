@@ -1,7 +1,7 @@
 // The door, driven over loopback. A case puts one up on a tree it wrote, asks
 // it the questions a verb asks, and reads the answers back as JSON.
 // [[spec/design_output/index#the-door-owns-the-database]]
-package main
+package index
 
 import (
 	"path/filepath"

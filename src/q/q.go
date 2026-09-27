@@ -40,6 +40,7 @@ type registration struct {
 	deadline time.Duration
 	op       bool
 	writes   bool
+	io       bool
 	where    string
 	inputs   []input
 	run      func(Snapshot) any
@@ -93,6 +94,9 @@ func Deadline(span time.Duration) Option { return func(one *registration) { one.
 func Op() Option     { return func(one *registration) { one.op = true } }
 func Writes() Option { return func(one *registration) { one.writes = true } }
 
+// Marks the registration of an IO module, whose package reaches the outside. [[spec/design_output/model#io-modules-are-modules]]
+func IO() Option { return func(one *registration) { one.io = true } }
+
 func Given[T any](name string, def T, opts ...Option) Writer {
 	return Main.add(givenOf(name, def), callerAt(2), opts)
 }
@@ -142,6 +146,14 @@ func (one *registration) portName() string {
 		return one.name
 	}
 	return one.instance + "." + one.port
+}
+
+// Takes every registration of another catalog, such as the one the wiring loads. [[spec/design_output/model#the-wiring-file]]
+func (c *Catalog) Take(other *Catalog) {
+	regs := other.all()
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.regs = append(c.regs, regs...)
 }
 
 func (c *Catalog) all() []*registration {

@@ -1,6 +1,6 @@
 // The table op, behind the seam ops.Keep, so an operation outlives the door.
 // [[spec/design_output/model#an-operation-outlives-callers]]
-package main
+package index
 
 import (
 	"database/sql"

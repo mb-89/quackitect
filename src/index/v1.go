@@ -1,7 +1,7 @@
 // The index answers /v1 through Huma, on a port of its own beside the old
 // API, with openapi.json and the docs.
 // [[spec/design_output/model#surfaces]]
-package main
+package index
 
 import (
 	"context"

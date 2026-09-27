@@ -5,6 +5,7 @@ package imports
 
 import (
 	"fmt"
+	"go/ast"
 	"strconv"
 	"strings"
 
@@ -20,12 +21,13 @@ type rule struct {
 	from, to func(string) bool
 	says     string
 	past     func(from, to string) bool
+	flagged  bool
 }
 
 var (
 	noDoor   = rule{from: isModule, to: isDoor, says: "a module imports no door"}
 	noModule = rule{from: seesModules, to: isModule, says: "a module, a door, the index or a renderer imports no other module", past: ownModule}
-	onlyQ    = rule{from: isModule, to: pastQ, says: "a module imports q, q/qtest and the pure standard library alone"}
+	onlyQ    = rule{from: isModule, to: pastQ, says: "a module imports q, q/qtest and the pure standard library alone", flagged: true}
 )
 
 // The standard library packages that reach the outside, per [[spec/design_output/model#the-build-checks-imports]].
@@ -52,8 +54,16 @@ var NoModule = &analysis.Analyzer{
 
 // [[spec/design_output/model#the-build-checks-imports]]
 func Faults(from string, imported []string) []string {
+	return FaultsIn(from, imported, false)
+}
+
+// The faults of a package, where io says its registration carries q.IO(), which onlyq lets pass. [[spec/design_output/model#the-build-checks-imports]]
+func FaultsIn(from string, imported []string, io bool) []string {
 	out := []string{}
 	for _, one := range []rule{noDoor, noModule, onlyQ} {
+		if one.flagged && io {
+			continue
+		}
 		for _, path := range imported {
 			if fault := one.fault(from, path); fault != "" {
 				out = append(out, fault)
@@ -71,6 +81,9 @@ func (one rule) fault(from, path string) string {
 }
 
 func (one rule) run(pass *analysis.Pass) (any, error) {
+	if one.flagged && CarriesIO(pass.Files) {
+		return nil, nil
+	}
 	for _, file := range pass.Files {
 		for _, spec := range file.Imports {
 			path, err := strconv.Unquote(spec.Path.Value)
@@ -83,6 +96,26 @@ func (one rule) run(pass *analysis.Pass) (any, error) {
 		}
 	}
 	return nil, nil
+}
+
+// Whether a file of the package calls q.IO(), the flag of an IO module. [[spec/design_output/model#io-modules-are-modules]]
+func CarriesIO(files []*ast.File) bool {
+	found := false
+	for _, file := range files {
+		ast.Inspect(file, func(node ast.Node) bool {
+			call, ok := node.(*ast.CallExpr)
+			if !ok || found {
+				return !found
+			}
+			if pick, ok := call.Fun.(*ast.SelectorExpr); ok && pick.Sel.Name == "IO" {
+				if named, ok := pick.X.(*ast.Ident); ok && named.Name == "q" {
+					found = true
+				}
+			}
+			return !found
+		})
+	}
+	return found
 }
 
 func under(path, folder string) bool {

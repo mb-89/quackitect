@@ -1,7 +1,7 @@
 // The tickets, over a tree a case writes. A group's standing comes off its
 // record, a child reads its group's, and a loose ticket carries none.
 // [[spec/guidance/code/testing]]
-package main
+package index
 
 import (
 	"testing"
