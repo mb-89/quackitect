@@ -37,6 +37,10 @@ type registration struct {
 	def      any
 	missing  bool
 	doc      string
+	label    string
+	icon     string
+	looks    Look
+	fields   []Field
 	deadline time.Duration
 	writes   bool
 	io       bool

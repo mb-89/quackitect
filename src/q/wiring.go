@@ -187,6 +187,7 @@ func bind(w Wiring, instance string, reg *registration, writers map[string]strin
 func Start(w Wiring, types map[string]func(*Catalog)) (*Store, error) {
 	c, faults := Load(w, types)
 	faults = append(faults, c.Check()...)
+	faults = append(faults, c.Undescribed()...)
 	if len(faults) > 0 {
 		return nil, Refused(faults)
 	}

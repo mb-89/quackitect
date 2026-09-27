@@ -46,10 +46,10 @@ func run(t *testing.T, s *Store, name string) any {
 	return s.Snapshot().Read(name)
 }
 
-var source = func(c *Catalog, hands map[string]Writer) { hands["source"] = GivenIn(c, "all", 0) }
+var source = func(c *Catalog, hands map[string]Writer) { hands["source"] = GivenIn(c, "all", 0, Doc("every row")) }
 
 var counter = func(c *Catalog, _ map[string]Writer) {
-	DerivedIn(c, "count", 0, func(in rowsOf) int { return in.Rows })
+	DerivedIn(c, "count", 0, func(in rowsOf) int { return in.Rows }, Doc("the rows counted"))
 }
 
 func TestAStandardNameCarriesTheValueFromOutPortToInPort(t *testing.T) {

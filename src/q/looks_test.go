@@ -29,6 +29,15 @@ func TestTheStartRefusesAnActionWithNoDocNamingItsFileAndLine(t *testing.T) {
 	refused(t, Wiring{Instances: []Instance{{"work", "puller"}}}, types, string(NoDoc), "pull", "looks_test.go:")
 }
 
+func TestAnInputFieldCarriesItsLabelAndDoc(t *testing.T) {
+	c := New()
+	ActionIn(c, "pull", func(pullIn) []Request { return nil }, Doc("pulls a ticket"))
+	got, _ := c.Presentation("pull")
+	if len(got.Fields) != 2 || got.Fields[0] != (Field{Name: "Ticket", Key: "ticket", Label: "Ticket", Doc: "the ticket to pull, or the next one when empty"}) {
+		t.Fatalf("pull presents the fields %+v", got.Fields)
+	}
+}
+
 func TestTheStartRefusesAnInputFieldWithNoDocTag(t *testing.T) {
 	types := map[string]func(*Catalog){"puller": func(c *Catalog) {
 		ActionIn(c, "pull", func(pullIn) []Request { return nil }, Doc("pulls a ticket"))

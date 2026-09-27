@@ -31,7 +31,7 @@ func actionOf[In any](name string, fn func(In) []Request) *registration {
 		}
 		return fn(one), nil
 	}
-	return &registration{name: name, kind: action, typ: typeOf[[]Request](), def: []Request{}, act: act}
+	return &registration{name: name, kind: action, typ: typeOf[[]Request](), def: []Request{}, act: act, fields: fieldsOf(typeOf[In]())}
 }
 
 // [[spec/design_output/model#an-action-lists-requests]]

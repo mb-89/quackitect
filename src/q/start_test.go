@@ -13,7 +13,7 @@ type labelOf struct {
 }
 
 var labeller = func(c *Catalog) {
-	DerivedIn(c, "label", "", func(in labelOf) string { return in.Rows })
+	DerivedIn(c, "label", "", func(in labelOf) string { return in.Rows }, Doc("the rows as a label"))
 }
 
 // Starts the wiring, and answers the store and the writer each source instance hands back. [[spec/design_output/model#the-index-resolves-in-passes]]

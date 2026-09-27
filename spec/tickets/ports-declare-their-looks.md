@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -157,6 +157,15 @@ record:
         hash: fc25582a6d83a8e0
         size: 644
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 5e0ca1b3827c7d545b4c33c800b601b01653e60a
+    hash_after: 5e0ca1b3827c7d545b4c33c800b601b01653e60a
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -311,14 +320,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q/looks.go src/q/q.go src/q/action.go src/q/wiring.go src/q/looks_test.go src/q/wiring_test.go src/q/start_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft size names, and no other past looks_test.go, which gains the field label case the gate asked for
+the cases run over a catalog and a wiring in memory, and reach no door
+looks.go carries the pointer at spec/design_output/model#the-options over each option and the Presentation it implements
+the fields, the options and the refusal stand in looks.go alone, and Start calls Undescribed there
 
 ## tests-green
 
