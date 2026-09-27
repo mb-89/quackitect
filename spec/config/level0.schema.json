@@ -350,7 +350,7 @@
         "editor": {
           "help": "Open the work tab, which draws every ticket and takes a cell edit. The count beside it is the number in the work tab's brackets.",
           "widget": "action",
-          "icon": "🗂",
+          "icon": "💼",
           "group": "work",
           "row": 0,
           "column": 0,
