@@ -75,7 +75,7 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [sidebar-switches-over]
+depends_on: [go-cage-switches-over, lsp-door-switches-over, sidebar-switches-over]
 enabled_by: migration.phase9shadow
 cloud: true
 ---

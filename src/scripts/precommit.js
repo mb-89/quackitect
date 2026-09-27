@@ -10,6 +10,7 @@ import {
   NOTES,
   privateNow,
 } from "../../.claude/skills/level0/lib/private.js";
+import { markedIn, mergeRefusal } from "../../.claude/skills/level0/lib/markers.js";
 import { refusedDelta } from "../../.claude/skills/level0/lib/refuse.js";
 import { fileText } from "../../.claude/skills/level0/lib/scripted.js";
 import { refusedTest, untestedIn } from "../../.claude/skills/level0/lib/tested.js";
@@ -22,6 +23,10 @@ export const STDIN = 0;
 export const HOOKS = ".githooks";
 
 export async function holds(it, delta) {
+  // A marker the delta adds refuses the commit, whichever road makes it. [[spec/design_output/work#no-commit-carries-a-marker]]
+  const marked = mergeRefusal([], markedIn(delta));
+  if (marked) return { code: 1, said: marked };
+
   const found = await privateNow({
     diff: () => String(delta ?? ""),
     box: () => boxOf(it),

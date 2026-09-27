@@ -8,6 +8,12 @@ import {
   deskRefusal,
   onDesk,
 } from "../../.claude/skills/level0/lib/cloud.js";
+import {
+  markersIn,
+  mergeRefusal,
+  stagedFault,
+  unmergedIn,
+} from "../../.claude/skills/level0/lib/markers.js";
 import { line } from "../../.claude/skills/level0/lib/refuse.js";
 import { formIn, refusesIn } from "../../.claude/skills/level0/lib/warnings.js";
 import { messageFaults, messageNote } from "../bridge/bash.js";
@@ -66,6 +72,12 @@ async function landsAndPushes(it, argv, message, paths) {
     console.error(deskRefusal(`this commit lands nowhere on ${branch}`).join("\n"));
     return 2;
   }
+  // A merge lands through this verb once its files carry no marker, so a marker refuses before anything stages. [[spec/design_output/work#no-commit-carries-a-marker]]
+  const unresolved = markedUnmerged(it);
+  if (unresolved) {
+    console.error(unresolved);
+    return 1;
+  }
   // The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
   const tested = it.proc.run(
     [it.node, it.join(it.root, "src", "scripts", "cli.js"), "test"],
@@ -91,6 +103,12 @@ async function landsAndPushes(it, argv, message, paths) {
   if (!staged.ok) {
     console.error("The staging comes back refused, so the commit stands undone:");
     console.error(saidBy(staged));
+    return 1;
+  }
+  const marked = stagedFault(it.git, only);
+  if (marked) {
+    unstages(it, only);
+    console.error(marked);
     return 1;
   }
   if ((await coldGate(it, only)) !== 0) {
@@ -125,6 +143,18 @@ async function landsAndPushes(it, argv, message, paths) {
   }
   console.log(`${branch} stands pushed.`);
   return 0;
+}
+
+// Each unmerged file still carrying a marker on disk, by the line it stands on. [[spec/design_output/work#no-commit-carries-a-marker]]
+function markedUnmerged(it) {
+  const marked = [];
+  for (const file of unmergedIn(it.git).keys()) {
+    const at = it.join(it.root, ...file.split("/"));
+    if (!it.disk?.exists?.(at)) continue;
+    const [line] = markersIn(it.disk.read(at));
+    if (line) marked.push({ file, line });
+  }
+  return mergeRefusal([], marked);
 }
 
 // A named path a staged rename lands takes its old path with it, so the deletion rides the same commit. [[spec/design_output/work#one-verb-feeds-that-stamp]]

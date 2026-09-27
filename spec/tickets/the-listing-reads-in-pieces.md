@@ -1,6 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+todo: false
+step: decide
 steps:
   - name: decide
     does: says what the note becomes, and closes it
@@ -16,9 +18,19 @@ steps:
       - name: says
         form: text
         says: why, in a line, or what the successor carries
-step: decide
 process: [[spec/processes/note]]
-process_hash: 9d7b26202041cf4d
+process_hash: e02a0935ed78eb92
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: 39a5c79081a62e226fab430b6572c643f39f6188
+    hash_after: 39a5c79081a62e226fab430b6572c643f39f6188
+    inputs:
+      - name: ask
+        hash: 5139613addf89a3c
+        size: 832
+    def: 9e2520e6318baf46
+reason: done
 ---
 
 # Ask
@@ -42,14 +54,16 @@ The fix lands with this note: the door asks in pieces of `BATCH_ASKS`. The read 
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+done
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+The fix stands on main: batch in src/doors/git.js asks in pieces of BATCH_ASKS, so readWork stays under the process door buffer, and test/level0/git-batch.test.js holds it.
 
 # Discussion
 

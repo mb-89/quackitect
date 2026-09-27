@@ -8,7 +8,7 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { commitVerb } from "../../src/scripts/commit-verb.js";
-import { NAMED, named } from "./fixtures.js";
+import { conflicted, NAMED, named } from "./fixtures.js";
 
 const ROOT = "/tree";
 const CLEAN = `${NAMED}: the message reads clean`;
@@ -431,4 +431,32 @@ test("a call naming paths gates on the paths it lands alone", async () => {
       "git diff --cached --binary --no-renames -- src/bridge/guidance.js",
     ),
   );
+});
+
+// The verb concludes a merge once its files carry no marker, so a marker left on disk refuses before the tests run. [[spec/design_output/work#no-commit-carries-a-marker]]
+test("an unmerged file still carrying a marker refuses the commit and stages nothing", async () => {
+  const path = "spec/tickets/a-group.md";
+  const { it, git } = doors([], {
+    "git ls-files -u": { stdout: `100644 abc123 2\t${path}\n` },
+  });
+  it.disk.write(join(ROOT, path), `${conflicted(["a: 1"], ["b: 2"]).join("\n")}\n`);
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 1);
+  assert.match(said, /spec\/tickets\/a-group\.md:1 {2}a conflict marker/);
+  assert.ok(!ranGit(git).includes("git add -A"), ranGit(git).join("\n"));
+});
+
+test("an unmerged file written clean lands the merge through the verb", async () => {
+  const path = "spec/tickets/a-group.md";
+  const { it, git } = doors([], {
+    "git ls-files -u": { stdout: `100644 abc123 2\t${path}\n` },
+  });
+  it.disk.write(join(ROOT, path), "---\nstate: open\n---\n");
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 0, said);
+  assert.ok(ranGit(git).includes(`git commit -m ${CLEAN}`));
 });

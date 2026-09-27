@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { accept, CONFIG, configPath, FLAG, trusted } from "../../src/scripts/trust.js";
+import { accept, CONFIG, configPath, FLAG, main, trusted } from "../../src/scripts/trust.js";
 
 test("a config carrying nothing comes back trusting the folder", () => {
   const said = trusted({}, "/home/user/quackitect");
@@ -63,4 +63,20 @@ test("a box carrying a config keeps what the client wrote there", () => {
   const said = JSON.parse(files.read("/home/user/.claude.json"));
   assert.equal(said.userID, "abc");
   assert.equal(said.projects["/tree"][FLAG], true);
+});
+
+test("a Windows box naming USERPROFILE and no HOME lands the flag in that folder", () => {
+  const files = fakeDisk();
+  const home = "C:\\Users\\one";
+  const said = main(["node", "trust.js", "/tree"], { USERPROFILE: home }, files);
+
+  assert.equal(said, 0);
+  const where = join(home, CONFIG);
+  assert.equal(JSON.parse(files.read(where)).projects[join("/tree")][FLAG], true);
+});
+
+test("a box naming no home folder writes no flag", () => {
+  const files = fakeDisk();
+
+  assert.equal(main(["node", "trust.js", "/tree"], {}, files), 1);
 });

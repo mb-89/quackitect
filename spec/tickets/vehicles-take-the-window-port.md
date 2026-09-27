@@ -1,6 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+todo: false
+step: decide
 steps:
   - name: decide
     does: says what the note becomes, and closes it
@@ -16,9 +18,19 @@ steps:
       - name: says
         form: text
         says: why, in a line, or what the successor carries
-step: decide
 process: [[spec/processes/note]]
-process_hash: 9d7b26202041cf4d
+process_hash: e02a0935ed78eb92
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: 8b3742ab6d97f092ba9acffdaa9fb8c3fc26c340
+    hash_after: 8b3742ab6d97f092ba9acffdaa9fb8c3fc26c340
+    inputs:
+      - name: ask
+        hash: c4d6f8701635cb06
+        size: 806
+    def: 9e2520e6318baf46
+reason: done
 ---
 
 # Ask
@@ -42,14 +54,16 @@ process_hash: 9d7b26202041cf4d
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+done
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+Fixed in 22aeeba26: PORT in src/bridge/window.js stands one below PORT_BASE, where WindowPort in src/tui/frame/door.go already listens and withPort hands out nothing, and test/level0/window-door.test.js holds it.
 
 # Discussion
 

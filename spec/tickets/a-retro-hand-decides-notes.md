@@ -1,6 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+todo: false
+step: do
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,8 +26,28 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
-process_hash: 05e53b89dab63152
-step: do
+process_hash: 2b5ab398855a1aba
+record:
+  - step: do
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: c43e0bea3f5e121db709ab81fc0d940424c01907
+    hash_after: c43e0bea3f5e121db709ab81fc0d940424c01907
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 3 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:219:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: abdc26d393c9eb0e
+        size: 717
+      - name: [[spec/design_output/pull]]
+        hash: 5ded6a7d555f6900
+        size: 44159
+    def: 41499778917f0d75
+reason: done
 ---
 
 # Ask
@@ -45,26 +67,32 @@ Today the hold refuses the note. A pull naming it answers that one hand holds on
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/retro-notes-pull.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A group standing at a retro step hands its private notes out before itself, so the hand holding it decides each note and retro notes exits 0. The fix landed in e1fe50650 with test/level0/retro-notes-pull.test.js, and this hand ran both again.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: a hand at retro/notes pulls a note, decides it, and the step passes
+the cleanup the change reveals is in the change, and nothing further stands
+the rule stands once in handOut in src/scripts/pull-hand.js, and spec/design_output/pull#the-private-queue points at it
 
 # Discussion
 

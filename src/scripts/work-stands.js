@@ -5,6 +5,13 @@
 
 import { flatten, TRACKED } from "../../.claude/skills/level0/lib/config.js";
 import { MS } from "../../.claude/skills/level0/lib/log.js";
+import {
+  BASE,
+  markersIn,
+  OURS,
+  THEIRS,
+  unmergedIn,
+} from "../../.claude/skills/level0/lib/markers.js";
 import { isTagged, reaches } from "../../.claude/skills/level0/lib/todo.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import {
@@ -19,6 +26,7 @@ import {
   ticketNamed,
   WORK_BRANCH,
 } from "../engine/group.js";
+import { mergedFront } from "../engine/front-merge.js";
 import { asText, framed, namesIn, REF_FORMAT, refsIn } from "./work-read.js";
 
 export const COL = { branch: 34, child: 32, place: 6, status: 6, why: 24 };
@@ -370,21 +378,67 @@ export function sync(it) {
     return 0;
   }
 
-  const merged = it.git.run([
-    "merge",
-    `origin/${TRUNK}`,
-    "--no-edit",
-    "-m",
-    `${branch}: take ${from} in`,
-  ]);
-  if (!merged.ok) {
+  const message = `${branch}: take ${from} in`;
+  const merged = it.git.run(["merge", `origin/${TRUNK}`, "--no-edit", "-m", message]);
+  if (!merged.ok) return settles(it, { branch, from, behind, message });
+
+  console.log(`${branch} took ${behind} commit(s) from ${from}.`);
+  return 0;
+}
+
+// A ticket whose front alone conflicts merges here, and the merge commits once nothing stays for a hand. [[spec/design_output/work#a-conflicted-front-resolves-itself]]
+function settles(it, { branch, from, behind, message }) {
+  const unmerged = unmergedIn(it.git);
+  if (!unmerged.size) {
     console.error(`${from} conflicts with ${branch}. Resolve it, commit, and go on.`);
     console.error("git status names the files. The merge belongs to you here.");
     return 1;
   }
+  const took = [];
+  const left = [];
+  const retired = [];
+  for (const [path, stages] of unmerged) {
+    if (!stages.has(THEIRS) && stages.has(OURS) && path.startsWith(`${TICKETS}/`))
+      retired.push(path);
+    else if (frontSettles(it, path, stages)) took.push(path);
+    else left.push(path);
+  }
+  if (!left.length && !retired.length) {
+    const made = it.git.run(["commit", "-m", message], true);
+    if (made.ok) {
+      console.log(`${branch} took ${behind} commit(s) from ${from}.`);
+      console.log(`The front of ${took.join(", ")} merges on its own.`);
+      return 0;
+    }
+    console.error(`The merge commit comes back refused: ${made.err || made.out}`);
+    return 1;
+  }
+  console.error(`${from} conflicts with ${branch}, and the merge stands open.`);
+  if (took.length)
+    console.error(
+      `The front of ${took.join(", ")} merges on its own, and stands staged.`,
+    );
+  if (left.length) console.error("These wait for a hand:");
+  for (const path of left) console.error(`  ${path}`);
+  for (const path of retired)
+    console.error(
+      `  ${path}: ${from} retires this ticket, and ${branch} changes it. Keep the change or let it go.`,
+    );
+  console.error(
+    "The write door lets a hand write each file until the merge commits. Write each one without its conflict markers, then land the merge with ./RUNME.sh commit.",
+  );
+  return 1;
+}
 
-  console.log(`${branch} took ${behind} commit(s) from ${from}.`);
-  return 0;
+// Both sides' front, merged key by key over the base, written and staged. [[spec/design_output/work#a-conflicted-front-resolves-itself]]
+function frontSettles(it, path, stages) {
+  if (!path.startsWith(`${TICKETS}/`) || !stages.has(OURS) || !stages.has(THEIRS))
+    return false;
+  const side = (stage) => (stages.has(stage) ? textAt(it, `:${stage}`, path) : "");
+  const said = mergedFront(side(BASE), side(OURS), side(THEIRS));
+  if (!said.text || markersIn(said.text).length) return false;
+  it.disk.write(it.join(it.root, ...path.split("/")), said.text);
+  return it.git.run(["add", "--", path], true).ok;
 }
 
 // [[spec/design_output/work#a-box-leaves]]

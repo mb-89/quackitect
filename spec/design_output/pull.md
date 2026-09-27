@@ -418,6 +418,15 @@ with no `--fields` meets the same checks over the same text. A refusal at the
 cap inserts the person step on the ticket without the payload, so a word the
 rules refuse reaches no branch.
 
+### A merge opens the ticket
+
+A merge conflict leaves an open ticket with its markers in, and no verb writes
+a ticket that reads so. While git lists the ticket unmerged, the write door
+takes a hand's whole write there, past the ticket door and the engine's fields.
+It refuses a write still carrying a marker line, and names each line. The schema
+reads the write as a first one, because the markers stand in the text on disk.
+The merge commit closes it again.
+
 ## The checks
 
 1. the hold, as above

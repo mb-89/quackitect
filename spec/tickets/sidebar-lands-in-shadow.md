@@ -75,7 +75,7 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [lsp-door-switches-over]
+depends_on: [tui-shell-lands-in-shadow]
 enabled_by: migration.phase8shadow
 cloud: true
 ---

@@ -75,7 +75,7 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [go-cage-switches-over]
+depends_on: [quack-verbs-land-in-shadow, read-topics-land-in-shadow]
 enabled_by: migration.phase6shadow
 cloud: true
 ---

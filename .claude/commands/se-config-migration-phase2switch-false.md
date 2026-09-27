@@ -1,5 +1,5 @@
 ---
-description: "config / migration / phase2switch: sets migration.phase2switch to false. Phase 2 switched over. true in the tracked file on main lets a cloud box take open-tasks-switch-over. A write on this box turns nothing on in the cloud."
+description: "config / migration / phase2switch: sets migration.phase2switch to false. Phase 2 switched over. true in the tracked file on main lets a cloud box take open-tasks-switch-lands. A write on this box turns nothing on in the cloud."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
