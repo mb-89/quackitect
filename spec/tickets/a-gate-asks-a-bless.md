@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -113,6 +113,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-retro-reads-the-backlog.md:145:1: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: implement/tests-green
+    hand: box d7d9b0d5dfcf · claude-code-remote
+    hash_before: 2946d1d369e3dd827ec7aa937b1bb1d9bcc2a9d7
+    hash_after: 2946d1d369e3dd827ec7aa937b1bb1d9bcc2a9d7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 53 test(s) pass in 5 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-retro-reads-the-backlog.md:145:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -249,26 +261,34 @@ the four review rows each stand fixed: the guard reads scripts under .se, the bu
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/pull-bless.test.js test/level0/write-bless.test.js test/level0/bash-bless.test.js test/contract/schema-bless.test.js test/level0/sidebar.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A gate carrying bless true now waits after its verdict: the accept records the verdict and leaves the step on the gate, and the pull says the gate waits for a bless. The verb ticket bless records the hash of the gate chapter and its input chapters, and moves the step on. An edit to one of those chapters drops the bless, and the next hand-out puts the step back on the gate. A person blesses anywhere, an agent on a cloud box blesses, and an agent at a desk blesses where the bless file under .se/.runtime holds agent true. The sidebar button writes that file, the write door refuses an agent writing it, and the shell door refuses a command or a script under .se naming it or moving a variable that names the hand or the box. The schema case moves to test/contract, because it reads the tracked schema files. The landing now leaves out a journaled path that git knows nowhere, because a moved file broke the hand-back.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft callers name, plus the shell guard module, the panel and click modules for the button, and the landing fix the hand-back met
+every door the cases reach runs on a fake, and the schema case reads the tracked files from test/contract
+each new function carries a pointer at the bless section of the pull design
+the bless path stands once in pull-bless.js, and the sidebar copy names folders.js beside it
+the four review rows stand fixed, each with a case
 
 # Discussion
 
