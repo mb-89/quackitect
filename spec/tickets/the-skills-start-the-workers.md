@@ -118,11 +118,26 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 069b8a6b0af850a654b0efff8fa4292d8995f37f
+    hash_after: 069b8a6b0af850a654b0efff8fa4292d8995f37f
+    inputs:
+      - name: ask
+        hash: 99785aee8d05058a
+        size: 1293
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 5a2557d24d86ab34
+        size: 13510
+      - name: [[spec/guidance/cloud/cloud]]
+        hash: 095e262b0b5667dc
+        size: 2735
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -161,38 +176,76 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Two skill files carry the road, and the verb carries every decision. A skill reads the verb's JSON and acts on each list in it.
+
+The dispatch skill, `.claude/skills/dispatch/SKILL.md`:
+
+1. Run `./RUNME.sh dispatch --json`, and read its object.
+2. Where `write.state` reads `pushed` or `standing`, open a pull request over `write.branch` through the GitHub connector, with auto-merge on. Where one stands already, leave it.
+3. Start one session through the cloud-sessions connector for each entry under `ready` and under `stuck`, with the prompt `run the work skill`.
+4. Send the owner one message naming each entry under `questions`, with its ticket and its group.
+5. Leave. The skill counts, sorts and judges nothing the object answers.
+
+The work skill, `.claude/skills/work/SKILL.md`:
+
+1. Run `./RUNME.sh branch take`, and read the ask it prints.
+2. Work the group as `spec/guidance/cloud/cloud.md` says.
+3. Run `./RUNME.sh branch done`.
+4. Open a pull request over the branch through the GitHub connector, with auto-merge on.
+
+Each file opens with the `name` and `description` the skill loader reads.
+
+The test, `test/level0/skills.test.js`, reads both files off the disk. It parses the frontmatter, and gathers every `./RUNME.sh <verb>` the body names. It imports `verbs` from `src/scripts/cli.js`, the table `help` prints, so the verb list stands in one place.
+
+`spec/guidance/cloud/cloud.md` gains a rule pointing a worker at the work skill for its road, and the skill links the guidance back for the rules.
+
+I assume a connector names the session tool and the pull request tool, so the skill names the connector and no tool id, because tool ids drift between boxes. The objection is a skill too vague to act on. The step names the act, its input and its prompt, which a session maps onto whichever tool its connector lists.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- none: both skill files stand new, and the cloud routine prompt names them later
+- spec/guidance/cloud/cloud.md: gains the pointer rule
+- src/scripts/cli.js verbs: read by the new test alone
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/skills.test.js: both skills carry a name and a description
+- test/level0/skills.test.js: every verb a skill names stands among the verbs help lists
+- test/level0/skills.test.js: the dispatch skill reads each key the verb's JSON answers
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .claude/skills/dispatch/SKILL.md
+- .claude/skills/work/SKILL.md
+- test/level0/skills.test.js
+- spec/guidance/cloud/cloud.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened the dispatch JSON through the verb itself, the write states in dispatch.js carried, the verbs table in cli.js, and the design input sections
+- the callers list names the guidance and the verbs table, and nothing calls a skill file yet
+- each done_when line maps to a case in the tests list, the guidance line stands as a checkpoint, and the check needs none
 
 ## tests-red
 
