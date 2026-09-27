@@ -77,7 +77,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: fa5a46b626147f54ea022bc86ae22494ccf7e30e
+    hash_after: fa5a46b626147f54ea022bc86ae22494ccf7e30e
 ---
 
 # Ask
@@ -99,32 +104,43 @@ Today a step with long guidance lands on disk as a preview, and the hand works f
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+- `spec/config/level0.json` gains a `pull` key holding `cap`, the bytes one tool answer reaches the model whole, and `margin`, the bytes the engine keeps free below it. `spec/config/level0.schema.json` declares both as numbers in bytes.
+- `src/scripts/cli-doors.js` `doorsHere` reads both into `it.cap`, as `{ bytes, margin }`.
+- `src/scripts/pull-chapter.js` gains `partOf(text, room)`: it answers the text whole where it fits in `room` bytes, and else cuts at the last line ending inside `room` and answers the rest.
+- `src/scripts/pull-hand.js` `handed` renders `workAnswer`, cuts it at the cap less the margin, prints the head with a closing line naming the pull that prints the rest, and writes the rest into the hold under `rest`.
+- `src/scripts/pull-route.js` `stillHeld` prints the next part where the hold carries `rest`, writes the hold again with what stays, and answers 0. The step stays whole: the hold, the leaf and the hand-back stand as before.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/pull-hand.js handOut, which calls handed,src/scripts/ephemeral-pull.js ephemeralPull, which calls handed,src/scripts/pull.js pull, which calls stillHeld,src/scripts/cli-doors.js doorsHere, which builds it for every verb
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/pull-cap.test.js the config names the cap and its margin, and the schema declares both,test/level0/pull-cap.test.js a hand-out past the margin splits, and the next pull on the same step prints the rest
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: handed, stillHeld, workAnswer, doorsHere, configOf
+- the callers list names handOut, ephemeralPull, pull and doorsHere, found by a search for handed and stillHeld
+- each done_when line names a case in test/level0/pull-cap.test.js, and the check line names ./RUNME.sh check
 
 ## review
 
