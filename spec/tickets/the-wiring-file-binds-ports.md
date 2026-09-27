@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 30e0c9ca08929179736050ed370e6bb1b498befa
+    hash_after: 30e0c9ca08929179736050ed370e6bb1b498befa
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/imports passes
+      - name: check
+        exit: 0
+        said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
+    inputs:
+      - name: design/tests-red
+        hash: c7cf080aaa594786
+        size: 1024
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -359,26 +382,33 @@ the wiring file format stands in spec/design_output/model.md alone, and spec/wir
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/wiring_test.go src/imports/imports_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A module now names its own ports alone, and spec/wiring.yaml names the instances to load and binds each port to a name. Load in src/q/wiring.go registers each instance on a catalog of its own, then renames its ports: an out-port takes the standard name its wire gives, or instance/port with no wire, and an in-port binds to a standard name, to another instance's port, or to its built-in zero value. A config key lands under instance/config, so one module type loads twice with two configs. The alt option and the providers keys leave, since another module type in the wiring stands in for an alternative calculation, so NewStore and Check take no keys. The nomodule rule in src/imports refuses a module importing another module's package, and the next analyzer ticket reuses it. The wiring file stands empty until io-modules-own-their-names wires the clock, env and files modules.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change reaches past the size list in src/q/why.go and in the test files the dropped keys argument forces, each inside the ask since it names the providers keys leaving
+no door is new, and the wiring tests plant their own module types in place of any door
+comments in src/q/wiring.go and on NoModule in src/imports/imports.go point at the wiring file chapter of the model and at this ticket
+the wiring file format stands in spec/design_output/model.md alone, and spec/wiring.yaml points at it in its header
 
 # accept
 
