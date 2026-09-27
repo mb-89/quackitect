@@ -114,11 +114,21 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [the-scheduler-runs-providers]
+record:
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 09dec5e6bc344458da4622fba6c1423c34bcc14f
+    hash_after: 09dec5e6bc344458da4622fba6c1423c34bcc14f
+    inputs:
+      - name: ask
+        hash: 0166fa6e285204cc
+        size: 416
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -151,38 +161,66 @@ A watchdog nothing starts watches nothing, so a hung part looks healthy.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Serve builds the watchdog over its store, with the writer watchdog.Registers hands back, and the index takes a lease under the part index.
+The beat comes off the work loop. A ticker at watchdog.beat pushes a tick into the dirty queue, and each step of sweeps beats the lease before it settles.
+So an idle loop beats through the same queue as its work, and a hung loop beats nothing while the ticker runs, per the lease chapter of the model.
+Each step then runs Dog.Check, which marks an expired lease stale, and Book.Expire, which fails an operation past its deadline.
+Assumption: the ask's start of ops reads as that deadline watch, since Serve opens the book and sweeps it already.
+The ticker stops with the stop func Serve answers.
+Serve wraps a new serves, which answers the door too, so a case reads the lease through a new Dog.Lease.
+Two config keys join the watchdog block: watchdog.beat for the tick and watchdog.lease for the term, in seconds.
+Fault answers a nil error with an empty error text in place of a panic.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/index/door.go: Serve, which builds the dog and starts the ticker
+src/index/door.go: sweeps, which beats, checks and expires on each step
+src/watchdog/lease.go: Fault, which takes a nil error
+src/watchdog/lease.go: Lease, which a case reads
+src/ops/ops.go: Expire, which the loop calls
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+./...: go test ./... from the root
+src/index/door_test.go: TestTheIndexLeaseRenewsOffItsWorkLoop
+src/watchdog/lease_test.go: TestAFaultWithNoErrorRaisesNoPanic
+RUNME.sh: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/index/door.go
+src/index/door_test.go
+src/watchdog/lease.go
+src/watchdog/lease_test.go
+spec/config/level0.json
+spec/config/level0.schema.json
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened Serve, sweeps, guards, opensBook, the Dog and Book.Expire, and checked each claim there
+I grepped Hold, Beat, Check and Expire across src, and none has a caller past its tests, so the callers list names the new ones
+each done_when line names its case, or the command go test or the check
 
 ## tests-red
 
