@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ step: do
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-migration-writes-its-specs
+record:
+  - step: do
+    hand: box d7a540d981d5 · claude-code-remote
+    hash_before: 9983c1ebe74ead16b5c531978c982bc1ea118ac8
+    hash_after: 969954a06d9d76afc4901635a362cdfbf42bd196
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -44,27 +57,33 @@ A part that stops reads as stopped only where every part carries a lease.
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+[[spec/design_output/watchdogs]] specifies the watchdogs:
 
-<!-- the form is text -->
+- a lease with its term, renewed as a step of the work loop on `lease.<part>`
+- a deadline a name or action declares, with a default per kind
+- the stale mark a reader meets, and the commit that clears it
+- restarts that wait longer each time, and an alarm after a run of faults
+- the fields of `session/alarms`, and who draws and hands them on
+- the doors process and the hook module watching the index's own lease
+
+Weighed: restarts that go on forever, against restarts that stop at an alarm.
+The stop wins, because a part that fails each start burns the box and hides the
+fault. Assumed: the foundation adds the config keys with their defaults.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change follows the ask: the note covers the leases, deadlines, stale marks, restarts and alarms
+- the cleanup it reveals: none, because the note changes no file a reader holds
+- the note points at the protocol note for the subject and the operations note for `q.Op`
 
-<!-- the form is checklist -->
 
 # Discussion
 

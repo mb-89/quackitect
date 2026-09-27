@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"quackitect/tui/frame"
-	"quackitect/tui/work"
+	"quackitect/src/tui/frame"
+	"quackitect/src/tui/work"
 )
 
 const countRowsSaid = `[

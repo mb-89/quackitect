@@ -44,7 +44,7 @@ import {
   root,
   TESTS,
 } from "./cli-doors.js";
-import { asksIndex, lint, version } from "./cli-read.js";
+import { asksIndex, errorsSaid, errorsStood, lint, version } from "./cli-read.js";
 import { batteryRun, stamped } from "./cli-stamp.js";
 import { graphIn } from "./graph.js";
 import { probe } from "./probe.js";
@@ -79,19 +79,31 @@ export const verbs = {
   check: {
     says: "the tests, the doors, the server, then the rules over the tree",
     // Each part runs timed, so the stamp carries the battery's report and a retro reads it. [[spec/guidance/retro/effect]]
+    // Under --errors the parts run quiet, and the check prints the red cases and the findings at error alone. [[spec/tickets/the-verbs-need-no-wrapper]]
     run: async (w) => {
-      const { code, parts, unrun } = await batteryRun(
-        [
-          ["tests", () => test()],
-          ["go", () => goHolds()],
-          ["doors", () => doorsHold()],
-          ["projections", () => projectionsHold()],
-          ["plugin", () => pluginHolds()],
-          ["server", () => serverHolds()],
-          ["rules", () => lint(w)],
-        ],
-        it.clock,
-      );
+      const errors = rest.includes("--errors");
+      const loud = console.log;
+      if (errors) console.log = () => {};
+      let ran;
+      try {
+        ran = await batteryRun(
+          [
+            ["tests", () => test(errors)],
+            ["go", () => goHolds(errors)],
+            ["doors", () => doorsHold()],
+            ["projections", () => projectionsHold()],
+            ["plugin", () => pluginHolds()],
+            ["server", () => serverHolds()],
+            ["rules", () => lint(w)],
+          ],
+          it.clock,
+        );
+      } finally {
+        console.log = loud;
+      }
+      const { code, parts, unrun } = ran;
+      if (errors)
+        for (const row of errorsSaid(timesHere(), errorsStood())) console.log(row);
       return stamped(
         code,
         batteryOf(parts, timesHere(), { unrun, spawns: spawnsHere() }),
@@ -314,11 +326,12 @@ export function renameHere(argv) {
     );
     return 2;
   }
-  const it = { disk: files, join, root, git: git(outside, root) };
+  // The clock names the journal entry the move writes. [[spec/tickets/journal-the-rename-verb]]
+  const here = { disk: files, join, root, git: git(outside, root), clock: it.clock };
   // A module's name stands as no path, so `--text` rewrites it and moves nothing. [[spec/design_output/index#a-rename-reaches-a-name]]
   const said = argv.includes("--text")
-    ? renamingText(it, from, to)
-    : renaming(it, from, to);
+    ? renamingText(here, from, to)
+    : renaming(here, from, to);
   if (said.why) {
     console.error(said.why);
     return 1;
@@ -397,11 +410,11 @@ export function testArgv(at) {
   ];
 }
 
-export function test() {
+export function test(quiet = false) {
   const tally = freshTally();
   const ran = outside.run([process.execPath, ...testArgv(root)], {
     cwd: root,
-    inherit: true,
+    inherit: !quiet,
     env: { SE_SPAWNS: tally },
   });
   return ran.exitCode;
@@ -478,7 +491,7 @@ export function mint(argv) {
   }
 
   const fields = handover ? fromHandover(copied.fields) : copied.fields;
-  const made = mintedNote(schemas, { kind, path, fields });
+  const made = mintedNote(schemas, { kind, path, fields }, it.front);
   if (made.why) {
     console.error(made.why);
     return 2;

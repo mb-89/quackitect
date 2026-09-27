@@ -131,8 +131,8 @@ mid-session reaches the turn after it.
 
 ## The Go reader
 
-A Go module imports no JavaScript, so the resolver above reaches it nowhere.
-`src/config` is the shared module answering the same layers, and every Go
+A Go package imports no JavaScript, so the resolver above reaches it nowhere.
+`src/config` is the shared package answering the same layers, and every Go
 program in the tree calls it:
 
 | what it answers | what it reads |
@@ -147,8 +147,8 @@ the `names` object. A named file takes no layer, because a person setting a
 colour sets it in one place. The window reads its colours that way, as
 [[spec/design_output/tui#colours]] says.
 
-The module rides `SHARED` in `src/scripts/viewer.js`, so the window's build
-carries it beside `quackitect/yaml`.
+The window imports it, so the window's stamp reads it and a move here rebuilds
+the window. For details, see [[spec/rationales/go-stands-as-one-module]].
 
 # The verb names the layer
 

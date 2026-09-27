@@ -68,3 +68,19 @@ test("an event that is no case answers nothing", () => {
   assert.equal(rowOf({ type: "test:diagnostic", data: {} }, FROM), null);
   assert.equal(rowOf({ type: "test:start", data: { name: "a" } }, FROM), null);
 });
+
+// A TODO case fails by design, so its row carries the mark and the red readers pass over it. [[spec/tickets/the-verbs-need-no-wrapper]]
+test("a TODO case reads as a row marked todo, and a plain case carries no mark", () => {
+  const event = (todo) => ({
+    type: "test:fail",
+    data: {
+      name: "a later case",
+      file: FILE,
+      details: { error: new Error("no") },
+      todo,
+    },
+  });
+  assert.equal(rowOf(event("the owner lands it"), FROM).todo, true);
+  assert.equal(rowOf(event(true), FROM).todo, true);
+  assert.equal("todo" in rowOf(event(undefined), FROM), false);
+});

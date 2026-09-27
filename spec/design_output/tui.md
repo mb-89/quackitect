@@ -24,11 +24,11 @@ one tab reads them all. These packages part it, and every import runs down:
 
 | the package | what it holds | what it imports |
 |---|---|---|
-| `src/tui/draw` | `Cut`, `Pad`, `OneLine`, `Wrap`, the gutter, the filter language, the link, the palette and the styles | `quackitect/config`, for the palette |
-| `src/tui/tree` | the tree, the rows it draws and the base file | `src/tui/draw`, and `quackitect/yaml` for the base file |
+| `src/tui/draw` | `Cut`, `Pad`, `OneLine`, `Wrap`, the gutter, the filter language, the link, the palette and the styles | `src/config`, for the palette |
+| `src/tui/tree` | the tree, the rows it draws and the base file | `src/tui/draw`, and `src/yaml` for the base file |
 | `src/tui/frame` | `Model`, the `Tab` interface, the parts a pane renders, the keys, the mouse, the strip, the filter pane, the help, the footer and the window's door | the draw and the tree packages |
 | `src/tui/log` | the log tab: its records, its tailer, its columns, its details and the said style | the frame and the draw packages |
-| `src/tui/work` | the work tab: its tree, its edit, its places, the index calls and the index start | the frame, the tree and the draw packages, and `quackitect/yaml` for the ticket schema |
+| `src/tui/work` | the work tab: its tree, its edit, its places, the index calls and the index start | the frame, the tree and the draw packages, and `src/yaml` for the ticket schema |
 | `src/tui` | the window, which builds the tab list | the frame, each tab, and the draw package for the palette and the filter language |
 
 A tab owns its own rows and its own state, so the frame reads no record and
@@ -369,8 +369,8 @@ draws the window once and prints it. A reader with no terminal sees the same win
 | a build failing over an old binary | says why, and runs the old one |
 | no Go and no binary | prints the session as plain rows |
 
-The stamp is a hash of the `.go`, `go.mod` and `go.sum` files, and a test file
-stays out of it. It stands in `.se/.runtime/bin/.logview-source`. The hash only has to
+The stamp is a hash of the `.go` files of the window and of every tree package
+it imports, and of the root `go.mod` and `go.sum`. A test file stays out of it. It stands in `.se/.runtime/bin/.logview-source`. The hash only has to
 tell one source from the next, so it is a plain two-lane hash in the module and
 imports nothing.
 

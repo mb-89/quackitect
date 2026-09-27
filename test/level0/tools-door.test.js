@@ -70,9 +70,39 @@ test("a surveyed box reads the file and runs nothing", () => {
 
   const tools = blocksOf(it).find((one) => one.name === TOOLS_BLOCK);
 
-  assert.equal(it.proc.ran.length, 0, "the survey stays as it stands");
+  const surveyed = it.proc.ran.filter((one) => !one.argv.includes("help"));
+  assert.equal(surveyed.length, 0, "the survey stays as it stands");
   assert.match(tools.text, /- `vale` 3\.20\.0, for the prose rules/);
   assert.doesNotMatch(tools.text, /`node`/);
+});
+
+// The help rows stand as the one source of the verbs, so a fresh session reads each verb's usage in the block. [[spec/tickets/the-verbs-need-no-wrapper]]
+test("the tools block names each verb of the command line with its usage line", () => {
+  const survey = JSON.stringify({ vale: { path: "/usr/bin/vale", version: "3.20.0" } });
+  const help = [
+    "Usage: ./RUNME.sh <verb> [path ...]",
+    "",
+    "  check      the tests, the doors, the server, then the rules over the tree",
+    "  lint       the rules over the tree, or over what you name",
+  ].join("\n");
+  const it = box(
+    { [at(TOOLS)]: survey },
+    { [`node ${ROOT}/src/scripts/cli.js help`]: { stdout: help } },
+  );
+  it.node = "node";
+
+  const tools = blocksOf(it).find((one) => one.name === TOOLS_BLOCK);
+
+  assert.match(tools.text, /# The verbs/);
+  assert.match(
+    tools.text,
+    /- `\.\/RUNME\.sh check`: the tests, the doors, the server, then the rules over the tree/,
+  );
+  assert.match(
+    tools.text,
+    /- `\.\/RUNME\.sh lint`: the rules over the tree, or over what you name/,
+  );
+  assert.doesNotMatch(tools.text, /Usage:/, "the usage head stays out");
 });
 
 // [[spec/design_output/level0#a-spawn-names-its-tier]]

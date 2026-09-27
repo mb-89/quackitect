@@ -16,6 +16,7 @@ import {
   deskRefusal,
   onDesk,
 } from "../../.claude/skills/level0/lib/cloud.js";
+import { RULE as GIT_WRITE } from "../../.claude/skills/level0/lib/git-writes.js";
 import { NOTES, privateNow } from "../../.claude/skills/level0/lib/private.js";
 import {
   refusedCommand,
@@ -57,6 +58,7 @@ export async function onBash(e, box) {
     deskGuard,
     trunkGuard,
     versionGuard,
+    gitWriteDoor,
   ];
   const held = {};
   for (const check of checks) {
@@ -116,11 +118,13 @@ function reader(box) {
 
 // [[spec/design_output/bash#a-shell-writes-nothing]]
 async function commandRules(command, _e, box, held) {
-  const found = findings(command, asks(box, "names.words"), {
+  const all = findings(command, asks(box, "names.words"), {
     cloud: cloudHere(box),
     script: (path) => fileText(reader(box), path),
     subjects: (undo) => subjectsOf(box, undo),
   });
+  held.gitWrites = all.filter((one) => one.rule === GIT_WRITE);
+  const found = all.filter((one) => one.rule !== GIT_WRITE);
   const voiced = await commitVoice(command, box);
   found.push(...refusesIn(voiced));
   held.warned = formIn(voiced);
@@ -137,6 +141,18 @@ async function commandRules(command, _e, box, held) {
     detail: command,
   });
   return refusedCommand(command, found);
+}
+
+// Every other guard reads a git write first, so its own reason answers before the verb does. [[spec/design_output/bash#git-writes-take-verbs]]
+function gitWriteDoor(command, _e, box, held) {
+  const rows = held.gitWrites ?? [];
+  if (!rows.length) return "";
+  box.log.say("warn", "bash", "refused a git write that a verb stands for", {
+    tool: "Bash",
+    rule: GIT_WRITE,
+    detail: command,
+  });
+  return refusedCommand(command, rows);
 }
 
 // A revert reads each revision alone, and a reset walks the range it drops. [[spec/design_output/bash#a-pull-commit-stands]]

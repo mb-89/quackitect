@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import {
   aged,
   askOf,
@@ -87,11 +88,15 @@ test("the step of a group with none is the first leaf of its route", () => {
 
 // [[spec/design_output/work#the-take-writes-the-record]]
 test("the take writes one record entry, and a second entry lands under the first", () => {
-  const once = withEntry(NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const once = withEntry(
+    NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
   assert.deepEqual(recordIn(once), [
     { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" },
   ]);
@@ -105,11 +110,15 @@ test("the take writes one record entry, and a second entry lands under the first
     "the body stands untouched",
   );
 
-  const twice = withEntry(once, {
-    step: "retro/write",
-    hand: "box 7c1d",
-    hash_before: "d4e5f6",
-  });
+  const twice = withEntry(
+    once,
+    {
+      step: "retro/write",
+      hand: "box 7c1d",
+      hash_before: "d4e5f6",
+    },
+    fakeFront(),
+  );
   assert.deepEqual(
     recordIn(twice).map((one) => one.step),
     ["sync", "retro/write"],
@@ -120,47 +129,63 @@ test("the take writes one record entry, and a second entry lands under the first
 test("a group holds where its newest entry carries hash_before and no hash_after", () => {
   assert.equal(heldIn(NOTE), null, "a group nobody took holds nowhere");
 
-  const took = withEntry(NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const took = withEntry(
+    NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
   assert.deepEqual(heldIn(took), {
     step: "sync",
     hand: "box 3f9a",
     hash_before: "a1b2c3",
   });
 
-  const gave = withHashAfter(took, "d4e5f6");
+  const gave = withHashAfter(took, "d4e5f6", fakeFront());
   assert.equal(heldIn(gave), null, "a box that left holds nothing");
   assert.equal(recordIn(gave).at(-1).hash_after, "d4e5f6");
 
-  const again = withEntry(gave, {
-    step: "sync",
-    hand: "box 7c1d",
-    hash_before: "0a0b0c",
-  });
+  const again = withEntry(
+    gave,
+    {
+      step: "sync",
+      hand: "box 7c1d",
+      hash_before: "0a0b0c",
+    },
+    fakeFront(),
+  );
   assert.equal(heldIn(again).hand, "box 7c1d", "the newest entry answers");
 });
 
 // [[spec/design_output/work#held-derives-from-the-record]]
 test("a hand-back after the take leaves the claim standing, and the release closes that entry", () => {
-  const took = withEntry(NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
-  const ran = withEntry(took, {
-    step: "split",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-    hash_after: "d4e5f6",
-  });
+  const took = withEntry(
+    NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
+  const ran = withEntry(
+    took,
+    {
+      step: "split",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+      hash_after: "d4e5f6",
+    },
+    fakeFront(),
+  );
 
   assert.equal(heldIn(ran).hand, "box 3f9a", "the box holds what it took");
   assert.equal(heldIn(ran).step, "sync", "the claim is the entry the take opens");
 
-  const gave = withHashAfter(ran, "99a888");
+  const gave = withHashAfter(ran, "99a888", fakeFront());
   assert.equal(heldIn(gave), null, "the release closes the take");
   assert.equal(recordIn(gave)[0].hash_after, "99a888");
   assert.equal(
@@ -172,25 +197,41 @@ test("a hand-back after the take leaves the claim standing, and the release clos
 
 // [[spec/design_output/work#held-derives-from-the-record]]
 test("a release closes the row heldIn reads as open, and leaves a skip row without hash_before untouched", () => {
-  const took = withEntry(NOTE, {
-    step: "sync",
-    hand: "box d6f05e3a585030 · claude-code",
-    hash_before: "f557e5c56139658231d08fe4af300c90ceea4568",
-  });
-  const skipped = withEntry(took, {
-    step: "sync",
-    skipped: true,
-    why: "the box runs off the cloud",
-  });
-  const split = withEntry(skipped, {
-    step: "split",
-    hand: "box d6f05e3a585030 · claude-code",
-    hash_before: "59f5ef62a4da20b6365fb3e30222335890ecfebf",
-    hash_after: "abe7834950dc122148a4ef8cbf7dd799963e6b78",
-  });
+  const took = withEntry(
+    NOTE,
+    {
+      step: "sync",
+      hand: "box d6f05e3a585030 · claude-code",
+      hash_before: "f557e5c56139658231d08fe4af300c90ceea4568",
+    },
+    fakeFront(),
+  );
+  const skipped = withEntry(
+    took,
+    {
+      step: "sync",
+      skipped: true,
+      why: "the box runs off the cloud",
+    },
+    fakeFront(),
+  );
+  const split = withEntry(
+    skipped,
+    {
+      step: "split",
+      hand: "box d6f05e3a585030 · claude-code",
+      hash_before: "59f5ef62a4da20b6365fb3e30222335890ecfebf",
+      hash_after: "abe7834950dc122148a4ef8cbf7dd799963e6b78",
+    },
+    fakeFront(),
+  );
 
-  const gave = withHashAfter(split, "99a888");
-  assert.equal(heldIn(gave), null, "the release closes the sync take, not the skip row");
+  const gave = withHashAfter(split, "99a888", fakeFront());
+  assert.equal(
+    heldIn(gave),
+    null,
+    "the release closes the sync take, not the skip row",
+  );
   assert.equal(
     recordIn(gave)[0].hash_after,
     "99a888",
@@ -205,19 +246,32 @@ test("a release closes the row heldIn reads as open, and leaves a skip row witho
 
 // [[spec/design_output/work#a-box-leaves]]
 test("a second hash_after on one entry replaces the first, and writes no other line", () => {
-  const took = withEntry(NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
-  const gave = withHashAfter(withHashAfter(took, "d4e5f6"), "99a888");
+  const took = withEntry(
+    NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
+  const gave = withHashAfter(
+    withHashAfter(took, "d4e5f6", fakeFront()),
+    "99a888",
+    fakeFront(),
+  );
   assert.equal(recordIn(gave).length, 1);
   assert.equal(recordIn(gave)[0].hash_after, "99a888");
 });
 
 // [[spec/design_output/work#a-box-leaves]]
 test("a field writes over the one standing, and a new field lands in the frontmatter", () => {
-  const shut = withField(withField(NOTE, "state", "closed"), "reason", "done");
+  const shut = withField(
+    withField(NOTE, "state", "closed", fakeFront()),
+    "reason",
+    "done",
+    fakeFront(),
+  );
   assert.equal(fieldOf(shut, "state"), "closed");
   assert.equal(fieldOf(shut, "reason"), "done");
   assert.equal(fieldOf(shut, "urgency"), "soon", "the fields beside it stand");
@@ -228,12 +282,12 @@ test("a ticket loses its group, and the route under it stands", () => {
   const child = NOTE.replace("process: [[group]]", "group: a-group-is-a-branch");
   assert.equal(fieldOf(child, "group"), "a-group-is-a-branch");
 
-  const loose = withoutField(child, "group");
+  const loose = withoutField(child, "group", fakeFront());
   assert.equal(fieldOf(loose, "group"), "");
   assert.equal(fieldOf(loose, "urgency"), "soon");
   assert.equal(stepOf(loose), "sync", "the route survives the cut");
   assert.equal(
-    withoutField(loose, "group"),
+    withoutField(loose, "group", fakeFront()),
     loose,
     "dropping it twice changes nothing",
   );

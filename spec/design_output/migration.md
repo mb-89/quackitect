@@ -17,11 +17,34 @@ The page beside this note carries the inventory as tables:
 
 `wc -l` over a folder answers its size, so this note carries none.
 
+# The argument for each ruling
+
+A box reads the argument here before it asks about a ruling:
+
+| the ruling | the argument |
+|---|---|
+| one provider and a default per name, a catalog fixed at start | [[spec/rationales/one-owner-holds-each-name]] |
+| a struct naming the inputs, one snapshot in, a pure run, one commit out | [[spec/rationales/a-provider-runs-pure]] |
+| a door on each side, one file each with its fake, and a check over the imports | [[spec/rationales/doors-carry-their-fakes]] |
+| a module is one file, and the registry builds every surface | [[spec/rationales/the-registry-builds-surfaces]] |
+| a file declares each view, and one renderer draws them | [[spec/rationales/views-are-declarations]] |
+| a longer action answers a handle, and one writer runs per tree | [[spec/rationales/long-actions-take-a-handle]] |
+| every part holds a lease | [[spec/rationales/every-part-holds-a-lease]] |
+| the doors, the index and each module topic run as processes | [[spec/rationales/modules-run-apart]] |
+| Go holds the core, and Linux and Windows behave the same | [[spec/rationales/go-holds-the-core]] |
+| the pure Go driver for SQLite | [[spec/rationales/the-index-drops-cgo]] |
+| one Go module | [[spec/rationales/go-stands-as-one-module]] |
+| git as the archive and the transport | [[spec/rationales/git-stays-the-archive]] |
+| the cage refusing while the index stands down | [[spec/rationales/the-cage-refuses-while-down]] |
+| every step on `main`, slices in shadow, a switch per phase | [[spec/rationales/the-migration-runs-beside]] |
+| golden files per twin, Go alone writing frontmatter, the prose checks in Go | [[spec/rationales/one-implementation-survives]] |
+
 # Where each folder goes
 
 | today | becomes | fate |
 |---|---|---|
 | `src/index` | the index process: the model, supervision, `files/`, SQLite | grows |
+| `src/q` | the model's core: names, providers, the store and the catalog check, which the index and every module import | new |
 | `src/lsp` | the LSP door keeps the protocol, and the checks and schema rules become the check module | splits |
 | `src/tui` | `quack tui`: `frame` becomes the generic shell and `tree` the base-view renderer, and the log and the work become declared views | reshaped |
 | `src/config`, `src/yaml`, `src/pointer`, `src/engine/swap` | the index's `cfg/` topic, and process supervision | merged |

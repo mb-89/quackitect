@@ -130,95 +130,25 @@ export function askOf(text) {
   return said ? said.own.join("\n").trim() : "";
 }
 
+// The four writers hand the note to the front door, which se-front answers. [[spec/tickets/go-writes-the-frontmatter]]
 // [[spec/design_output/work#the-take-writes-the-record]]
-export function withEntry(text, entry) {
-  const rows = String(text ?? "").split("\n");
-  const shut = frontShut(rows);
-  if (shut < 0) return rows.join("\n");
+export function withEntry(text, entry, front) {
+  return front.entry(text, entry);
+}
 
-  const item = entryRows(entry);
-  if (!item.length) return rows.join("\n");
-
-  const opens = keyAt(rows, shut, "record");
-  if (opens < 0) {
-    rows.splice(shut, 0, "record:", ...item);
-    return rows.join("\n");
-  }
-  rows.splice(blockEnd(rows, opens, shut), 0, ...item);
-  return rows.join("\n");
+// The row heldIn reads as open takes hash_after: hash_before set, hash_after empty. [[spec/design_output/work#held-derives-from-the-record]]
+export function withHashAfter(text, after, front) {
+  return front.after(text, after);
 }
 
 // [[spec/design_output/work#a-box-leaves]]
-export function withHashAfter(text, after) {
-  const rows = String(text ?? "").split("\n");
-  const shut = frontShut(rows);
-  const opens = shut < 0 ? -1 : keyAt(rows, shut, "record");
-  if (opens < 0) return rows.join("\n");
-
-  const ends = blockEnd(rows, opens, shut);
-  const spans = entrySpans(rows, opens, ends);
-  if (!spans.length) return rows.join("\n");
-
-  // The row heldIn reads as open: hash_before set, hash_after empty. [[spec/design_output/work#held-derives-from-the-record]]
-  const open = spans.filter((one) => hasBefore(rows, one) && !hasAfter(rows, one)).at(-1);
-  if (open) {
-    rows.splice(open.ends, 0, `    hash_after: ${after}`);
-    return rows.join("\n");
-  }
-
-  const last = spans.at(-1);
-  for (let at = last.opens; at < last.ends; at++) {
-    if (/^\s+hash_after:/.test(rows[at])) rows[at] = `    hash_after: ${after}`;
-  }
-  return rows.join("\n");
-}
-
-// Where each row of the record opens and ends, so a caller reaches one entry. [[spec/design_output/work#held-derives-from-the-record]]
-function entrySpans(rows, opens, ends) {
-  const starts = [];
-  for (let at = opens + 1; at < ends; at++)
-    if (rows[at].startsWith("  - ")) starts.push(at);
-  return starts.map((one, which) => ({
-    opens: one,
-    ends: which + 1 < starts.length ? starts[which + 1] : ends,
-  }));
-}
-
-function hasAfter(rows, span) {
-  for (let at = span.opens; at < span.ends; at++) {
-    if (/^\s+hash_after:/.test(rows[at])) return true;
-  }
-  return false;
-}
-
-function hasBefore(rows, span) {
-  for (let at = span.opens; at < span.ends; at++) {
-    if (/^\s+hash_before:/.test(rows[at])) return true;
-  }
-  return false;
-}
-
-// [[spec/design_output/work#a-box-leaves]]
-export function withField(text, key, value) {
-  const rows = String(text ?? "").split("\n");
-  const shut = frontShut(rows);
-  if (shut < 0) return rows.join("\n");
-
-  const at = keyAt(rows, shut, key);
-  if (at < 0) rows.splice(shut, 0, `${key}: ${value}`);
-  else rows[at] = `${key}: ${value}`;
-  return rows.join("\n");
+export function withField(text, key, value, front) {
+  return front.set(text, key, value);
 }
 
 // [[spec/design_output/work#the-merge-frees-the-tickets]]
-export function withoutField(text, key) {
-  const rows = String(text ?? "").split("\n");
-  const shut = frontShut(rows);
-  const at = shut < 0 ? -1 : keyAt(rows, shut, key);
-  if (at < 0) return rows.join("\n");
-
-  rows.splice(at, blockEnd(rows, at, shut) - at);
-  return rows.join("\n");
+export function withoutField(text, key, front) {
+  return front.drop(text, key);
 }
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
@@ -233,60 +163,6 @@ export function aged(seconds) {
   if (held >= SPANS.d) return `${Math.floor(held / SPANS.d)}d`;
   if (held >= SPANS.h) return `${Math.floor(held / SPANS.h)}h`;
   return `${Math.floor(held / SPANS.m)}m`;
-}
-
-// [[spec/design_output/pull#the-record-holds-the-answers]]
-function entryRows(entry) {
-  const out = [];
-  for (const [key, said] of Object.entries(entry)) {
-    if (
-      said === undefined ||
-      said === null ||
-      String(said) === "" ||
-      (Array.isArray(said) && !said.length)
-    )
-      continue;
-    const lead = out.length ? "    " : "  - ";
-    if (!Array.isArray(said)) {
-      out.push(`${lead}${key}: ${quoted(said)}`);
-      continue;
-    }
-    out.push(`${lead}${key}:`);
-    for (const one of said) {
-      const pairs = Object.entries(one ?? {}).filter(
-        ([, value]) => value !== undefined && value !== null,
-      );
-      for (const [at, [name, value]] of pairs.entries()) {
-        out.push(`${at ? "        " : "      - "}${name}: ${quoted(value)}`);
-      }
-    }
-  }
-  return out;
-}
-
-// A value a reader takes for a mapping, a comment or a quote goes in quotes. [[spec/design_output/work#the-record-quotes-its-value]]
-export function quoted(said) {
-  const text = String(said);
-  if (!/: |^["'>|&*!%@`[{]|#| $|^$/.test(text)) return text;
-  return `"${text.split("\\").join("\\\\").split('"').join('\\"')}"`;
-}
-
-function frontShut(rows) {
-  if (rows[0]?.trim() !== "---") return -1;
-  return rows.findIndex((one, at) => at > 0 && one.trim() === "---");
-}
-
-function keyAt(rows, shut, key) {
-  for (let at = 1; at < shut; at++) {
-    if (rows[at] === `${key}:` || rows[at].startsWith(`${key}: `)) return at;
-  }
-  return -1;
-}
-
-function blockEnd(rows, opens, shut) {
-  let at = opens + 1;
-  while (at < shut && (rows[at].startsWith(" ") || !rows[at].trim())) at++;
-  return at;
 }
 
 function bare(said) {

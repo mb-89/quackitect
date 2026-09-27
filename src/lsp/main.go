@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"quackitect/swap"
+	"quackitect/src/engine/swap"
 )
 
 const (

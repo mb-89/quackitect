@@ -15,11 +15,15 @@ export function rowOf(event, from) {
   const error = said.details?.error;
   const words = String(error?.cause?.message ?? error?.message ?? "").split(/\r?\n/)[0];
   return {
-    file: relative(from, String(said.file ?? "")).split("\\").join("/"),
+    file: relative(from, String(said.file ?? ""))
+      .split("\\")
+      .join("/"),
     name: String(said.name ?? ""),
     nesting: Number(said.nesting) || 0,
     ms: Number(said.details?.duration_ms) || 0,
     ok: event.type === PASS,
+    // A TODO case fails by design and turns no run red, so the row marks it. [[spec/tickets/the-verbs-need-no-wrapper]]
+    ...(said.todo !== undefined && said.todo !== false ? { todo: true } : {}),
     ...(event.type === FAIL ? { said: words } : {}),
   };
 }

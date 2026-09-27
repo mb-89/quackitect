@@ -37,18 +37,22 @@ export function newRetro(it, argv) {
   }
 
   const route = fromHold(held.route, null);
-  const made = mintedNote(schemasHere(it), {
-    kind: "ticket",
-    path,
-    fields: {
-      state: "open",
-      process: held.link,
-      process_hash: held.hash,
-      steps: route,
-      step: firstLeaf(route),
-      Ask: [askRows(held.ask), "", why].join("\n").trim(),
+  const made = mintedNote(
+    schemasHere(it),
+    {
+      kind: "ticket",
+      path,
+      fields: {
+        state: "open",
+        process: held.link,
+        process_hash: held.hash,
+        steps: route,
+        step: firstLeaf(route),
+        Ask: [askRows(held.ask), "", why].join("\n").trim(),
+      },
     },
-  });
+    it.front,
+  );
   if (made.why) {
     console.error(made.why);
     return 1;

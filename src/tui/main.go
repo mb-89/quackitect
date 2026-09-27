@@ -13,10 +13,10 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"quackitect/tui/draw"
-	"quackitect/tui/frame"
-	"quackitect/tui/log"
-	"quackitect/tui/work"
+	"quackitect/src/tui/draw"
+	"quackitect/src/tui/frame"
+	"quackitect/src/tui/log"
+	"quackitect/src/tui/work"
 )
 
 const (

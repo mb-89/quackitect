@@ -5,10 +5,16 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { verbs } from "../../src/scripts/cli.js";
 import { ticket } from "../../src/scripts/ticket.js";
-import { aheadOnly, fieldsOf, reachedOf, sameStep } from "../../src/scripts/ticket-route.js";
+import {
+  aheadOnly,
+  fieldsOf,
+  reachedOf,
+  sameStep,
+} from "../../src/scripts/ticket-route.js";
 import { TICKET_SCHEMA } from "./fixtures.js";
 
 const ROOT = "/tree";
@@ -84,7 +90,11 @@ function routed(steps) {
   });
   const flag = typeof steps === "string" ? steps : JSON.stringify(steps);
   const ran = heard(() =>
-    ticket(ROOT, ["route", "slow-lint", `--steps=${flag}`], { disk, join }),
+    ticket(ROOT, ["route", "slow-lint", `--steps=${flag}`], {
+      disk,
+      join,
+      front: fakeFront(),
+    }),
   );
   let json = null;
   try {
@@ -227,7 +237,13 @@ test("the command line's ticket entry names the route verb", () => {
 
 test("a ticket standing nowhere is refused with exit 1, as JSON naming the folders", () => {
   const disk = fakeDisk({ [at("spec/schemas/ticket.schema.yaml")]: TICKET_SCHEMA });
-  const ran = heard(() => ticket(ROOT, ["route", "nowhere", "--steps=[]"], { disk, join }));
+  const ran = heard(() =>
+    ticket(ROOT, ["route", "nowhere", "--steps=[]"], {
+      disk,
+      join,
+      front: fakeFront(),
+    }),
+  );
   assert.equal(ran.code, 1);
   const said = JSON.parse(ran.said);
   assert.match(said.refused, /nowhere names no ticket under .* or spec\/tickets/);

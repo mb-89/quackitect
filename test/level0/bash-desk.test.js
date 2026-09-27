@@ -7,7 +7,7 @@ import { test } from "node:test";
 import { onBash } from "../../src/bridge/bash.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { NAMED, named } from "./fixtures.js";
+import { NAMED, named, VERB_ALONE } from "./fixtures.js";
 
 const ROOT = "/tree";
 
@@ -48,16 +48,16 @@ test("a desk's raw push on a work branch refuses, and names main", async () => {
 });
 
 // [[spec/design_output/work#a-desk-works-on-trunk]]
-test("a cloud box commits and pushes its work branch past the desk guard", async () => {
+test("a cloud box's commit and push pass the desk guard, and meet the verb rule alone", async () => {
   const cloud = { CLAUDE_CODE_REMOTE: "true" };
-  assert.equal(
+  assert.match(
     denied(await onBash(call("git commit -m x"), box("work/a-thing", cloud))),
-    "",
+    VERB_ALONE,
   );
-  assert.equal(
+  assert.match(
     denied(
       await onBash(call("git push origin work/a-thing"), box("work/a-thing", cloud)),
     ),
-    "",
+    VERB_ALONE,
   );
 });

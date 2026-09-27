@@ -326,18 +326,26 @@ export function advanced(it, one, all) {
 
     const when = holdsHere(it, leaf.when, front, text);
     if (!when.holds) {
-      text = withEntry(text, { step: leaf.path, skipped: true, why: when.why });
+      text = withEntry(
+        text,
+        { step: leaf.path, skipped: true, why: when.why },
+        it.front,
+      );
       changes.push(`skips ${leaf.path}`);
     } else if (leaf.by === "children") {
       const said = childrenSay(all, one.name);
       if (said.dropped.length) {
         const back = target(leaf, leaf.on_fail);
-        text = withEntry(text, {
-          step: leaf.path,
-          hand: ENGINE,
-          returns: returnsOf(front, leaf.path) + 1,
-          why: `${said.dropped.join(", ")} closed dropped`,
-        });
+        text = withEntry(
+          text,
+          {
+            step: leaf.path,
+            hand: ENGINE,
+            returns: returnsOf(front, leaf.path) + 1,
+            why: `${said.dropped.join(", ")} closed dropped`,
+          },
+          it.front,
+        );
         changes.push(`${leaf.path} fails back to ${back}`);
         moved = true;
         front = frontOf(text);
@@ -354,17 +362,21 @@ export function advanced(it, one, all) {
         // Every open child waits for a person, so the group stands here and hands no retro out. [[spec/tickets/the-group-leaves-at-todo]]
         return { why: `waits for ${said.open.join(", ")}` };
       } else {
-        text = withEntry(text, {
-          step: leaf.path,
-          hand: ENGINE,
-          hash_before: tipOf(it),
-          hash_after: tipOf(it),
-        });
+        text = withEntry(
+          text,
+          {
+            step: leaf.path,
+            hand: ENGINE,
+            hash_before: tipOf(it),
+            hash_after: tipOf(it),
+          },
+          it.front,
+        );
         changes.push(`passes ${leaf.path}`);
       }
     } else {
       if (moved) {
-        text = withField(text, "step", path);
+        text = withField(text, "step", path, it.front);
         one.text = text;
         one.front = frontOf(text);
         landedAlone(it, one, changes);
@@ -376,7 +388,7 @@ export function advanced(it, one, all) {
     front = frontOf(text);
     const next = leaf.leaves[leaf.at + 1];
     if (!next) {
-      text = shut(text, front, DONE);
+      text = shut(text, front, DONE, it.front);
       one.text = text;
       one.front = frontOf(text);
       landedAlone(it, one, changes.concat(`closes ${DONE}`));
@@ -517,7 +529,7 @@ export function withEngineReader(it, one) {
     if (step) step.to = "engine";
   }
   const schema = schemasHere(it).get("ticket");
-  return schema ? reRouted(one.text, schema, steps, "") : "";
+  return schema ? reRouted(one.text, schema, steps, "", it.front) : "";
 }
 
 // [[spec/design_output/pull#a-person-step-goes-in]]
@@ -570,8 +582,13 @@ function inserted(it, one, before, name, said) {
 
   const path = [...parts.slice(0, -1), name].join("/");
   const schema = schemasHere(it).get("ticket");
-  const text = schema ? reRouted(one.text, schema, steps, "") : one.text;
-  one.text = withField(withField(text, "step", path), "state", OPEN);
+  const text = schema ? reRouted(one.text, schema, steps, "", it.front) : one.text;
+  one.text = withField(
+    withField(text, "step", path, it.front),
+    "state",
+    OPEN,
+    it.front,
+  );
   return { path };
 }
 

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ step: do
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-migration-writes-its-specs
+record:
+  - step: do
+    hand: box d7a540d981d5 · claude-code-remote
+    hash_before: 20bafc06364f021f4ee186cb31d537a7b2be5aa8
+    hash_after: 9cda5ee57adfe70d163df3a8fb7d4845d1980f86
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -44,27 +57,35 @@ A pull, the check and a retro each run past a hook's patience. A handle keeps th
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+[[spec/design_output/operations]] specifies operations. An action declares
+at registration whether it answers at once, `q.Action`, or with a handle,
+`q.Op`. The handle `ops/<id>` is a key under a family the catalog declares
+once, so the index adds no name at runtime.
 
-<!-- the form is text -->
+The note names the fields, each move between the states and who makes it, and
+the undo on failure and cancel. Writing operations queue one at a time per
+checkout, and a git hook reads names alone. An index restart fails every
+operation it finds unfinished. Two config keys hold the windows.
+
+Weighed: a length each call decides, against one each action declares. The
+declaration wins, because a caller then knows the answer's shape before it
+calls. Assumed: a restart fails an operation it finds unfinished, because a half-run
+door list resumes on state nobody checks.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change follows the ask: the note names the handle, its states, the one writer and the retention
+- the cleanup it reveals: none, because the note changes no file a reader holds
+- the note points at the design input for the rules, and gives each one its shape without restating it
 
-<!-- the form is checklist -->
 
 # Discussion
 

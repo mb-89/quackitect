@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"quackitect/yaml"
+	"quackitect/src/yaml"
 )
 
 const rationaleHere = `kind: rationale

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -74,11 +74,48 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
 depends_on: [go-code-shares-one-module]
+record:
+  - step: design/draft
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: 86f6feaac417b2837ccb432ed8b58202aef10914
+    hash_after: 86f6feaac417b2837ccb432ed8b58202aef10914
+  - step: design/review
+    hand: box d7a69cb6601d7 · claude-code-remote · helper-2
+    hash_before: 430b32b4a9b9972011a4a89f5977018374732de4
+    hash_after: 430b32b4a9b9972011a4a89f5977018374732de4
+  - step: implement/tests-red
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: bc7f1ea0659d538ec405c388661eaad8a29cec0c
+    hash_after: 8c65cd545d489707f84fbcadb39e15f54c6b8710
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+  - step: implement/change
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: a90770bc5428cae3d540e3ab91145c88b4c520dc
+    hash_after: 66516ced03485c992138fe292f0c6ed6912546b3
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7a69cb6601d7 · claude-code-remote
+    hash_before: ac0342e4756fa90a56a45f77913f9395ad807b78
+    hash_after: f54db6743c96ba5a8d693f0d54218a044eaf7195
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/q passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-q-core-holds-names.md:254:1: ListItem: A sentence in a list item holds 20 words, and this one holds 21."
+reason: done
 ---
 
 # Ask
@@ -103,11 +140,45 @@ Every module after this one registers through it. Without it no name has one own
 
 <!-- the form is text -->
 
+The package `src/q` holds the core, imported as `quackitect/src/q`. It takes the shape [[spec/design_output/model]] gives, and it imports no door and no other tree package.
+
+| the part | what it holds |
+|---|---|
+| `Catalog` | the registrations, each with its name, type, default, kind, `Alt`, doc, deadline, and the file and line `runtime.Caller` reads |
+| `q.Derived` | a name answered by a function of an input struct, whose fields carry `q:"<name>"` tags |
+| `q.Fold` | a name answered by a state reduced over events, one event at a time |
+| `q.Doc`, `q.Alt`, `q.Deadline` | the options a registration takes |
+| `Store` | the values in memory at one revision: `Snapshot` reads names at one revision, and `Commit` lands a run's output and raises the revision |
+| `Run` | one run of a derived name: fill the input struct off a snapshot, call the function, commit the output with the revision it read |
+| `Check` | the catalog check, answering every fault at once, each naming its file and line |
+
+The check refuses these faults:
+
+- a name registered twice with the same `Alt`, naming both places
+- a default missing: a nil pointer, map, slice or interface
+- two providers active: with the key `providers.<name>` empty, every registration is active unless one plain registration stands
+- a key picking an `Alt` nobody registers
+- an input naming no name, and an input whose type differs from the name's
+- a cycle among derived names
+
+What else holds:
+
+- the view row of the model's table waits for the views, per [[spec/design_output/views]]
+- the index runs `Check` over the one catalog at start, and exits with the faults where any stands
+- the catalog stands empty in this phase, so the index behaves as it did
+- Go takes a list of options last alone, so `q.Derived(name, def, fn, opts...)` takes the function before them
+- the design sketch puts the function after the options
+- the scheduler waits for the index's work loop, which leaves one run pending on a change during a run
+- a fold's state in the database waits for that loop too, and `Run` stays the one step it calls
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/index/main.go` `main`, which runs `q.Check` at start
+- no other caller stands yet: every module after this one registers through the package
 
 ### tests
 
@@ -115,17 +186,37 @@ Every module after this one registers through it. Without it no name has one own
 
 <!-- the form is list -->
 
+- `src/q/catalog_test.go` `TestANameTwiceRefusesTheStart`, deciding the second done line
+- `src/q/catalog_test.go` `TestAMissingDefaultRefusesTheStart`, deciding the second done line
+- `src/q/catalog_test.go` `TestTwoActiveProvidersRefuseTheStart`, deciding the second done line
+- `src/q/catalog_test.go` `TestTheKeyPicksOneAlt`
+- `src/q/catalog_test.go` `TestAnInputNamingNoNameRefuses`
+- `src/q/catalog_test.go` `TestAnInputOfAnotherTypeRefuses`
+- `src/q/catalog_test.go` `TestADerivedCycleRefuses`
+- `src/q/store_test.go` `TestASnapshotReadsOneRevision`
+- `src/q/store_test.go` `TestARunCommitsTheRevisionItRead`
+- `src/q/store_test.go` `TestAFoldReducesEachEvent`
+- `src/index/start_test.go` `TestABrokenCatalogRefusesTheStart`
+- `go test ./...` from the root, deciding the first done line
+- `./RUNME.sh check`, deciding the third
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the model note, the index model input and `src/index/main.go` stand opened
+- a search for `q.` and `quackitect/src/q` names no caller beside the index start
+- each done line names its test in the tests list
 
 ## review
 
@@ -136,6 +227,14 @@ Every module after this one registers through it. Without it no name has one own
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- start-check-runs-in-serve: Run `q.Check` in `Serve` in `src/index/door.go`. `main` runs for every command-line verb, not the start alone.
+- serve-takes-a-catalog-seam: Give `Serve` a catalog seam so the broken-catalog test plants a fault. Update its callers in `door_test.go` and `serves`.
+- catalog-holds-name-families: Hold a family such as `ops/<id>` once in the catalog. Check each name's lowercase segments, which `operations-and-leases-land` needs.
+- check-reads-provider-keys: Name where `Check` reads the `providers.<name>` keys, since the `cfg/` topic stands nowhere yet.
+- migration-names-the-q-package: Add a `src/q` row to the migration table, which gives the model to `src/index` alone.
 
 # implement
 
@@ -149,17 +248,36 @@ Every module after this one registers through it. Without it no name has one own
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/index/start_test.go src/q/catalog_test.go src/q/store_test.go
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Every case in `src/q` fails on its own assertion, over stubs in `src/q/q.go` that answer zero values, so the tests compile.
+
+- `TestAPlainRegistrationStandsBesideAnAlt` passes on the stubs, and guards the check against refusing too much.
+- `TestABrokenCatalogRefusesTheStart` fails with the door standing on a catalog naming `t/n` twice.
+- `Serve` takes the catalog as its third argument, and `door_test.go` and `serves` pass one. This answers `serve-takes-a-catalog-seam`.
+- `Check` takes the provider keys as a map, which answers `check-reads-provider-keys` until a config topic stands.
+- `TestAFamilyAnswersEachKey` and `TestANameOfOtherThanLowercaseSegmentsRefuses` answer `catalog-holds-name-families`.
+- A plain `go test` on `src/index` fails on `no such module: fts5`, and the test verb adds the tag, per `src/scripts/cli-go.js`.
+
+One call is mine: `q.DerivedIn(c, ...)` takes the catalog first, and `q.Derived` wraps it over `q.Main`, because Go takes no type parameter on a method. So each test builds its own catalog, and the tests run side by side.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `src/q`, and `Serve` in `src/index` with its callers and start test, as the review names
+- `src/q` reaches no door, so it needs no fake
+- each file's header names the model note it implements
+- the tests point at the model note, and repeat no fact of it
+- the review's five children each map to a case above, and the migration row lands in the change step
 
 ## change
 
@@ -171,11 +289,19 @@ Every module after this one registers through it. Without it no name has one own
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/q/q.go src/q/check.go src/q/store.go src/index/door.go src/index/main.go spec/design_output/migration.md
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `src/q`, `Serve` and its callers, and the migration row the review names
+- `src/q` reaches no door, and `Serve` checks the catalog before it opens the database
+- each file's header and each pointer name the model note section the code implements
+- the migration row points at the package, and the code points at the model note
+- the five review rows stand fixed, as `seen` under tests-red maps them, and the migration names `src/q`
 
 ## tests-green
 
@@ -187,11 +313,15 @@ Every module after this one registers through it. Without it no name has one own
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/index/start_test.go src/q/catalog_test.go src/q/store_test.go
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -199,11 +329,30 @@ Every module after this one registers through it. Without it no name has one own
 
 <!-- the form is text -->
 
+The package `src/q` now owns every name the index answers, and `Serve` refuses to start on a broken catalog.
+
+| the file | what it holds |
+|---|---|
+| `src/q/q.go` | the registrations: `Given`, `Derived` and `Fold`, each with an `In` form taking a catalog, and the options |
+| `src/q/check.go` | the catalog check, answering every fault at once with its file and line |
+| `src/q/store.go` | the store: a snapshot reads one revision, and a commit copies the values it replaces |
+| `src/index/door.go` | `Serve` takes the catalog, and checks it before the database opens |
+
+- The index passes `q.Main`, which stands empty, so the index behaves as it did.
+- `Serve` passes no provider keys until a config topic stands.
+- `go test -race` over `src/q` passes three runs.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the ask and the review name, and no other
+- `src/q` reaches no door, so it needs no fake
+- each file's header names the model note section it implements
+- the table above names files, and the model note keeps the shape
+- the five review rows stand fixed, as `seen` under tests-red maps them
 
 # Discussion
 

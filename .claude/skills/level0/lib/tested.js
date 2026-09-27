@@ -34,7 +34,7 @@ export function hunksIn(delta) {
     if (opened) {
       file = opened[1];
       inHunk = false;
-      if (!out.has(file)) out.set(file, { added: [], removed: [] });
+      if (!out.has(file)) out.set(file, { added: [], removed: [], blocks: [] });
       continue;
     }
     if (!file) continue;
@@ -45,11 +45,18 @@ export function hunksIn(delta) {
     }
     if (line.startsWith(HUNK)) {
       inHunk = true;
+      out.get(file).blocks.push({ added: [], removed: [] });
       continue;
     }
     if (!inHunk) continue;
-    if (line.startsWith("+")) out.get(file).added.push(line.slice(1));
-    else if (line.startsWith("-")) out.get(file).removed.push(line.slice(1));
+    const block = out.get(file).blocks.at(-1);
+    if (line.startsWith("+")) {
+      out.get(file).added.push(line.slice(1));
+      block.added.push(line.slice(1));
+    } else if (line.startsWith("-")) {
+      out.get(file).removed.push(line.slice(1));
+      block.removed.push(line.slice(1));
+    }
   }
   return out;
 }
@@ -62,10 +69,14 @@ export function untestedIn(delta, read, merging = false, carried = []) {
   const files = [...hunks.keys()];
   const tests = [...new Set([...files.filter(isTest), ...carried.filter(isTest)])];
   return files
-    .filter((one) => SOURCE.some((said) => said.test(one)) && !COPIED.some((said) => said.test(one)))
+    .filter(
+      (one) =>
+        SOURCE.some((said) => said.test(one)) && !COPIED.some((said) => said.test(one)),
+    )
     .filter((one) => codeIn(hunks.get(one)))
     .filter(
-      (one) => !tests.some((test) => names(test, one, hunks.get(test)?.added ?? [], read)),
+      (one) =>
+        !tests.some((test) => names(test, one, hunks.get(test)?.added ?? [], read)),
     );
 }
 
@@ -89,14 +100,49 @@ function isTest(path) {
 function codeIn(hunk) {
   const added = hunk?.added ?? [];
   const removed = hunk?.removed ?? [];
+  if (movedWhole(hunk?.blocks ?? [])) return false;
   if (!added.length && removed.length) return true;
   return [...added, ...removed].some((line) => !COMMENT.test(line));
+}
+
+// A move changes no code where every hunk takes away or adds one whole block, and each block taken away lands again, its lines in order. A block is whole where it opens at the left margin and its brackets close, so a statement moved inside a body still asks. [[spec/tickets/a-reorder-asks-a-test]]
+export function movedWhole(blocks) {
+  const gone = [];
+  const come = [];
+  for (const one of blocks) {
+    if (one.added.length && one.removed.length) return false;
+    if (one.removed.length) gone.push(one.removed);
+    if (one.added.length) come.push(one.added);
+  }
+  if (!gone.length || gone.length !== come.length) return false;
+  const key = (lines) => lines.join("\n");
+  const left = come.map(key);
+  for (const lines of gone) {
+    if (!wholeBlock(lines)) return false;
+    const at = left.indexOf(key(lines));
+    if (at < 0) return false;
+    left.splice(at, 1);
+  }
+  return true;
+}
+
+function wholeBlock(lines) {
+  const code = lines.filter((line) => line.trim());
+  if (!code.length || /^\s/.test(code[0])) return false;
+  let depth = 0;
+  for (const ch of code.join("\n")) {
+    if ("([{".includes(ch)) depth++;
+    else if (")]}".includes(ch)) depth--;
+    if (depth < 0) return false;
+  }
+  return depth === 0;
 }
 
 // A test names the file it drives by its import, or by the name it carries. [[spec/design_output/tree#the-rules-over-two-files]]
 function names(test, path, added, read) {
   // A Go test reaches every file of its own package, which is its folder. [[spec/design_output/tree#the-rules-over-two-files]]
-  if (GO_TEST.test(test)) return path.endsWith(".go") && folderOf(test) === folderOf(path);
+  if (GO_TEST.test(test))
+    return path.endsWith(".go") && folderOf(test) === folderOf(path);
   const one = path.split("/").pop().replace(/\.js$/, "");
   const said = test
     .split("/")

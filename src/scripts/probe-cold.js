@@ -32,6 +32,8 @@ export const COLD = {
     "Then answer in five lines at most.",
     "End the answer with one line starting `TOOLS:` that names every tool you hold",
     "whose name starts with mcp__level0__, or `TOOLS: none`.",
+    "A refused call counts as made: name the refusal in the answer, and end the turn.",
+    "Pull no ticket, call no verb and work nothing else, because this session probes and holds no work.",
   ].join(" "),
 };
 
