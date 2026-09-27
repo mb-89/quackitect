@@ -4,7 +4,7 @@ state: open
 steps:
   - name: do
     does: makes the change, with the test that covers it
-    from: the-bridge-outlives-its-starter/gate
+    from: anyone
     by: anyone
     to: retro
     input: ask
@@ -23,11 +23,10 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
-step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-engine-fixes-its-faults
-parent: the-bridge-outlives-its-starter
+step: do
 ---
 
 # Ask
@@ -36,7 +35,12 @@ parent: the-bridge-outlives-its-starter
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-`portIn` in `src/scripts/serve.js` reads the pointer, and a vehicle tree carries none, so the probe asks `PORT_BASE`. A server started with no `--port` listens where `registeredPort` in `src/bridge/vehicle.js` says. Where the register hands this vehicle another port, `./RUNME.sh serve` meets another vehicle's bridge and starts nothing, and `servesHere` shares the read. The probe and the listen take one port.
+The commit verb lands a file that a rename moved long ago, so a ticket keeps its commits after its rename lands.
+
+Without it, `movedFrom` in `src/scripts/commit-verb.js` takes every move the undo journal holds. An old path that left `HEAD` then joins the pathspec of `git commit`, and git refuses it. So every commit naming a renamed ticket's file fails until the journal entry leaves. A desk met it on `the-engine-fixes-its-faults`.
+
+- a case in `test/level0/commit-verb.test.js` commits a file whose journaled old path stands nowhere
+- `./RUNME.sh test test/level0/commit-verb.test.js` answers green
 
 # do
 

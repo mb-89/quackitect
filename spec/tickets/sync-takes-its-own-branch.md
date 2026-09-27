@@ -128,12 +128,13 @@ step: design/owner-read
 <!-- view, as text: the view the owner reads the change in and the number there, in the owner's words, or none -->
 <!-- from, as text: handover where the ask comes off a handover line, so the owner reads it first, or none -->
 
-A cloud box pushes its own work branch alone, and `main` takes its work through `branch merge` on a desk. So the owner reads what lands on `main` before it lands.
+Where the remote carries a commit the box lacks, `branch sync` on a work branch takes `origin/<the branch>` in first. It takes it with a plain merge, then takes `main`. So a box whose branch another hand pushed to keeps both sides and goes on, and asks nobody.
 
-Without it a cloud box pushes onto `origin/main`, as `claude/focused-cray-mug1k7` did with a merge of its own. Every desk then takes trunk in again before its own push, and unread work stands on `main`. The owner rules that no box but the desk pushes `main`.
+Without it the box meets a pull that suggests `git pull --rebase`, which level zero refuses, and stops. On 09-27 the box on `work/the-foundation-closes-its-gaps` held 14 unpushed commits past a commit the desk pushed. It asked the owner in the chat and stood there for hours, and every migration group waited behind it.
 
-- a case in `test/level0/prepush.test.js` refuses a push to `main` from a cloud box
-- a case there lets a cloud box push its own work branch
+- a case in the sync tests merges a diverged `origin/<branch>` into the box's branch and keeps both sides' commits
+- a case there leaves the branch alone where the remote carries nothing new
+- a real conflict between the two sides stops with the files named, as the trunk merge does
 - `./RUNME.sh check` exits 0
 
 The view: none.
@@ -299,5 +300,3 @@ The source: none.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
-
-The draft reads [[spec/design_input/the-cloud-runs-itself]] first. There a cloud group lands through a pull request, per [[spec/tickets/groups-land-through-pull-requests]]. A rule on `main` takes pull requests alone, and its last chapter leaves that rule open. This ticket holds the refusal on the cloud box itself, so it holds while the rule stands open.

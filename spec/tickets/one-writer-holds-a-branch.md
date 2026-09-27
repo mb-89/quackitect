@@ -128,12 +128,14 @@ step: design/owner-read
 <!-- view, as text: the view the owner reads the change in and the number there, in the owner's words, or none -->
 <!-- from, as text: handover where the ask comes off a handover line, so the owner reads it first, or none -->
 
-A cloud box pushes its own work branch alone, and `main` takes its work through `branch merge` on a desk. So the owner reads what lands on `main` before it lands.
+The push door refuses a push to a `work/` branch while an open hold on it names another box. Every other hand lands its change on `main`, and the holder takes it in with `branch sync`. So a branch has one writer at a time.
 
-Without it a cloud box pushes onto `origin/main`, as `claude/focused-cray-mug1k7` did with a merge of its own. Every desk then takes trunk in again before its own push, and unread work stands on `main`. The owner rules that no box but the desk pushes `main`.
+Without it any session pushes onto a branch a box holds. On 09-27 the desk pushed a one-line fix onto `work/the-foundation-closes-its-gaps` while a box held it. The box's own commits diverged from the remote, and the box stopped. The merge watch's rule already says this, and nothing enforced it.
 
-- a case in `test/level0/prepush.test.js` refuses a push to `main` from a cloud box
-- a case there lets a cloud box push its own work branch
+- a case in `test/level0/prepush.test.js` refuses a push to a `work/` branch another box holds
+- the refusal names the holder, and `main` as the road
+- a case there lets the holding box push its own branch
+- a case there lets a push through to a `work/` branch nobody holds
 - `./RUNME.sh check` exits 0
 
 The view: none.
@@ -299,5 +301,3 @@ The source: none.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
-
-The draft reads [[spec/design_input/the-cloud-runs-itself]] first. There a cloud group lands through a pull request, per [[spec/tickets/groups-land-through-pull-requests]]. A rule on `main` takes pull requests alone, and its last chapter leaves that rule open. This ticket holds the refusal on the cloud box itself, so it holds while the rule stands open.

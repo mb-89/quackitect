@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -82,6 +82,8 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
+step: sync
+cloud: true
 ---
 
 # Ask
@@ -207,3 +209,10 @@ Done when every child closes through the command it names.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The owner moves every loose agent ticket into the cloud, so the group also carries two aims past its goal:
+
+- the bridge on a desk outlives the editor and the shell that start it
+- the bridge's last check asks the owner to close the editor and read `/health`
+- the probe gains a `reply` run
+- the probe's run on a desk with function hooks goes to the owner as a question

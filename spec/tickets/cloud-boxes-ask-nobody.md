@@ -128,12 +128,13 @@ step: design/owner-read
 <!-- view, as text: the view the owner reads the change in and the number there, in the owner's words, or none -->
 <!-- from, as text: handover where the ask comes off a handover line, so the owner reads it first, or none -->
 
-A cloud box pushes its own work branch alone, and `main` takes its work through `branch merge` on a desk. So the owner reads what lands on `main` before it lands.
+A cloud box meets a door where it calls `AskUserQuestion`. The refusal tells it to mint a question ticket carrying every command a person needs, push it, and go on with the branch. So a door holds rule 7 of `spec/guidance/cloud/cloud`.
 
-Without it a cloud box pushes onto `origin/main`, as `claude/focused-cray-mug1k7` did with a merge of its own. Every desk then takes trunk in again before its own push, and unread work stands on `main`. The owner rules that no box but the desk pushes `main`.
+Without it a box asks in the chat, where nobody sits, and the session waits on the question until the owner happens to look. On 09-27 the box on `work/the-foundation-closes-its-gaps` asked a question the guidance answers, and blocked every migration group behind it. The design output lists `AskUserQuestion` among the roads a door must not bite. That stays true on a desk, and a cloud box is the exception.
 
-- a case in `test/level0/prepush.test.js` refuses a push to `main` from a cloud box
-- a case there lets a cloud box push its own work branch
+- a case in `test/level0` refuses `AskUserQuestion` where the session runs in the cloud, and the refusal names the question ticket
+- a case there lets `AskUserQuestion` pass on a desk
+- `spec/design_output/level0` names the cloud exception where it lists the roads a door must not bite
 - `./RUNME.sh check` exits 0
 
 The view: none.
@@ -299,5 +300,3 @@ The source: none.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
-
-The draft reads [[spec/design_input/the-cloud-runs-itself]] first. There a cloud group lands through a pull request, per [[spec/tickets/groups-land-through-pull-requests]]. A rule on `main` takes pull requests alone, and its last chapter leaves that rule open. This ticket holds the refusal on the cloud box itself, so it holds while the rule stands open.
