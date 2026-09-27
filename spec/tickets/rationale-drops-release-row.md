@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: do
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -23,10 +24,8 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
-step: do
 process: [[spec/processes/trivial]]
-process_hash: 05e53b89dab63152
-parent: groups-carry-the-cloud-marker
+process_hash: 2b5ab398855a1aba
 record:
   - step: do
     hand: box d7d70c069f441 · claude-code-remote
@@ -41,6 +40,7 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/the-queue-moves-to-plan.md:122:99: Sentence: A sentence holds 25 words. Cut this one in two."
+parent: groups-carry-the-cloud-marker
 ---
 
 # Ask
