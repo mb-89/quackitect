@@ -75,7 +75,7 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
 depends_on: [the-engine-holds-the-route]
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box d7d8cca5d3cd · claude-code-remote
@@ -108,6 +108,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box d7d9cc78d3ce · claude-code-remote
+    hash_before: 4c63277de0056af1b21853e07960ecdf3aa03b4a
+    hash_after: 4c63277de0056af1b21853e07960ecdf3aa03b4a
 ---
 
 # Ask
@@ -178,38 +182,54 @@ Each step carries the guidance its tags resolve, and the notes at the top ride t
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the-style-carries-the-top: design review passed with one finding, then tests, change and green check; every top note rides the output style, the layer carries the canary and the handover
+- cloud-note-reaches-every-step: a note binding an env reaches every leaf where it binds
+- the pull stages no path a move leaves behind, with its case in test/level0/landed.test.js
+- rename-rewrites-each-link-once: minted open, outside the group
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the design review read the callers by search, so the missed test callers and the cloud reach surfaced before the build
+- the child landed before the parent move, so the move met a resolver ready for it
 
 ### badly
 
 <!-- what did not, each with its moment in the log or the transcript -->
-
 <!-- the form is list -->
+
+- the rename verb rewrote links already at the new path into cloud/cloud/cloud, and rewrote closed tickets the door refuses a hand, at the rename call of the-style-carries-the-top change
+- the change hand-back refused on a pathspec for the moved file, since the journal still named it
+- the retro notes step refused while the group stood in hand, and the drop verb took a search to find
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- rename-rewrites-each-link-once in spec/tickets holds the rename fix
+- pull-landed.js standsSomewhere holds the pathspec fix, with its case in landed.test.js
+- the hand-back refusal on retro/notes can name --drop, a line for spec/design_output/pull under The private queue
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The ask treated the cloud move as a file move, and the review found that the move also narrows when the cloud rules reach a cloud box. The env on a note already says which box it binds, so the env alone decides its reach and the tags stay for the step. Assumed: the moment before the first pull stays with the cloud routine prompt, since no leaf stands there.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the rule the change adds stands once, in spec/design_output/level0 under The style carries the top
+- the change adds no number
+- the new test file header says what it tests, and counts nothing
 
 ## cloud
 
