@@ -27,6 +27,11 @@ export function startOf(root, node = "node") {
   return [node, "-e", START, root, root];
 }
 
+// A desk start stands detached, so the shell that asks returns and the server stays. [[spec/tickets/the-bridge-outlives-its-starter]]
+export async function servesDetached() {
+  return "";
+}
+
 // [[spec/design_output/level0#the-cloud-starts-the-server]]
 export function servesHere(it) {
   const port = portIn(it);

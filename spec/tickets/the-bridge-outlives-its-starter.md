@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -130,6 +130,19 @@ record:
         hash: 9e98d07b09f0f5b3
         size: 839
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 9da988af58b98b5f049c485dcd5b6bb0e9a32ffb
+    hash_after: 9da988af58b98b5f049c485dcd5b6bb0e9a32ffb
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 34100fc0dd71b112
+        size: 3626
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -244,26 +257,40 @@ The done lines and the case deciding each:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/serve.test.js test/contract/desk-start.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/serve.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Over a `servesDetached` that answers nothing, the three serve cases fail on their own assertion: the detached start, the standing server left alone, and the fall naming the server line.
+
+The contract case passes today, and it guards the road the change takes. `respawn` in `src/doors/proc.js` starts a stub detached, the starter exits, and the stub writes its marker after. So the editor and the shell take a start that already outlives its starter on this Windows box.
+
+| the case | the class of fault it guards |
+|---|---|
+| a detached start over a silent port | a shell start that holds the server as its child |
+| a standing server left alone | a start that takes over a server already standing |
+| a fall naming the server line | a start that fails with no reason |
+| a stub outliving its starter | a detached start that dies with the process that makes it |
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a case: the editor start meets the contract case and the checkpoint, the serve lines meet the first two serve cases, and the check comes at tests-green
+- the serve cases reach the proc and disk doors through their fakes, and the contract case reaches the real proc door, as the contract folder does
 
 # gate
 
