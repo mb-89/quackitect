@@ -62,6 +62,11 @@ through the index alone.
 A name is a path of lowercase segments, such as `work/open-tasks`. The first
 segment is its topic, the module folder that provides it.
 
+A module names its own values locally. The framework adds its topic prefix to
+everything it writes, so `weight` in the queue module becomes
+`queue/config/weight`. A module spells a full name only for what it reads from
+another module.
+
 | the part | what it holds |
 |---|---|
 | the name | the path, unique in the catalog |
@@ -120,13 +125,15 @@ flowchart LR
 |---|---|---|
 | inputs | the struct fields a provider reads, each with the tag `q:"<name>"`, and the events a fold takes | now |
 | outputs | each `q.Derived`, `q.Fold` and `q.Action` it registers, with its built-in value | now |
-| config | `q.Cfg(key, builtin, help)`, the type read off the built-in value | now |
+| config | `q.Cfg(key, builtin, help)` by local name, the type read off the built-in value | now |
 | state | `q.State(name, reader)`, its insides, readable for diagnosis | later |
 | debug | `q.Debug(flag, help)`, a switch for a diagnosis | later |
 
 State and debug stand in the contract now, and no code builds them yet. A module
 writes its registered outputs alone, and the core refuses a commit naming
-another.
+another. A module knows nothing about where its config values come from. It
+reads a key like any other input, per
+[[spec/design_output/model#config-comes-off-the-registrations]].
 
 ## The topics and their writers
 
@@ -139,7 +146,7 @@ Every topic has a module writing it:
 | `clock/minute` | the `clock` IO module | the time, cut to the minute, and a push each minute |
 | `session/<id>/events` | the `hooks` IO module | the events of a session |
 | `session/<id>/` | the modules folding the events | the values the folds answer |
-| `cfg/<key...>`, and every topic carrying the flag `config` | the config module | every key a module declares, as its layers set it |
+| `<module>/config/<key>`, each carrying the flag `config` | the config module | every key a module declares, as its layers set it |
 | `env/<name>` | the `env` IO module | the `SE_` variables, read at start |
 | `tickets/` | the tickets module | every ticket, read off `files/` |
 | `queue/` | the queue module | the score, the outline and the places, read off `tickets/` |
@@ -170,7 +177,7 @@ flowchart LR
     queue["queue: JSON"]
     holds["holds: JSON"]
   end
-  topics["tickets/, cfg/, queue/, hold/"]
+  topics["tickets/, queue/, hold/, and every module's config/"]
   tree --> watch --> files --> owners --> topics
   owners -- "serialize, then a write request" --> disk --> tree
 ```
@@ -181,7 +188,7 @@ The module declares a glob, a codec that parses and serializes, and a kind:
 | the files | the module | its codec | its topic |
 |---|---|---|---|
 | `spec/tickets/*.md` | tickets | markdown with its frontmatter | `tickets/` |
-| `spec/config/level0.json`, `.se/.runtime/config.json` | config | JSON | `cfg/` |
+| `spec/config/level0.json`, `.se/.runtime/config.json` | config | JSON, keyed by module and then by key | every `<module>/config/` |
 | `.se/.runtime/plan.json` | queue | JSON | `queue/` |
 | `.se/.runtime/hold/<hand>.json` | holds | JSON | `hold/` |
 
@@ -390,27 +397,41 @@ input nowhere, per [[spec/rationales/git-stays-the-archive]].
 
 ## Config comes off the registrations
 
-Config is a flag on a topic. A module declares its keys with `q.Cfg` in a topic
-carrying the flag `config`. Each key takes a type, a built-in value, a help
-line, and the mark `shared` where the project shares it. The declaring module reads a key like any other input,
-and every list of keys comes off those registrations:
+No central config topic stands. A module declares its keys with `q.Cfg` by
+their local names, and the framework files each under `<module>/config/<key>`.
+That subtopic carries the flag `config`. Each key takes a type, a built-in
+value, a help line, and the mark `shared` where the project shares it.
+
+A module knows nothing about where its config values come from. It declares its
+keys and reads them like any other input, and its code and its API name no
+file, environment, context, override or layer. The config module and the
+surfaces alone know the layers, such as `quack cfg show` and a config editor.
+In `qtest`, a case seeds a config value the way it seeds any other input.
+
+Every list of keys comes off the registrations:
 
 | what comes off them | what stands today |
 |---|---|
 | the config schema, `spec/config/level0.schema.json` | a file a person writes by hand |
 | the built-in values | the values in `spec/config/level0.json` |
 | the slash commands | the projection over the tracked file |
-| the command-line help, and the window's `index` tab | nothing |
+| the command-line help, the window's `index` tab, and a config editor showing every `*/config` subtopic | nothing |
 
 `spec/config/level0.json`, the default file, keeps the values someone sets, and
-nothing else.
+nothing else. The default file and the local file both key by module and then
+by key, such as `{"queue": {"weight": 3}}`.
+
+The `migration` switches keep a namespace of their own. A `migration` module
+declares them as shared keys and holds nothing else, and the queue module reads
+`migration/config/<phase>`. So the default file keeps its `migration` block,
+and each group's `enabled_by` names its key as it stands.
 
 ## The config module
 
 `config` is a small module the index always loads, beside the index manager and
 apart from it. The core stays dumb, and the manager stays about the system's
-health. The config module owns every name in the topics carrying the flag
-`config`, and gathers its layers:
+health. The config module owns every name under a `*/config/` subtopic, and
+gathers its layers:
 
 | what it gathers | where it comes from |
 |---|---|
@@ -427,14 +448,15 @@ flowchart LR
   env["env/, from the env IO module"] --> config
   requests["the requests opening contexts and setting overrides"] --> config
   manager["the index manager: the leases of open contexts"] --> config
-  config["the config module, always loaded"] -- "writes" --> key["cfg/queue/weight"]
-  queue["the queue module"] -. "declares, with its type, built-in value and help" .-> key
+  config["the config module, always loaded"] -- "writes" --> key["queue/config/weight"]
+  queue["the queue module"] -. "declares weight, its own name, with its type, built-in value and help" .-> key
   key -- "read as an input" --> queue
 ```
 
-Here alone a module declares names another module writes. Declaring a key in a
-`config` topic registers an input and its schema. The config module is the
-registered writer, and the start resolves it in its passes, like any other.
+The `*/config/*` subtopics stand as the one place a module declares names
+another module writes. Declaring a key registers an input and its schema. The
+config module is the registered writer, and the start resolves it in its passes,
+like any other.
 
 ## A key's layers
 
@@ -507,7 +529,7 @@ past them.
 | the step | what it does |
 |---|---|
 | build | a catalog off the module's `Register` alone, and the catalog check over it |
-| seed | the names IO modules write, which a case names: `files/`, `buffers/`, `cfg/`, `clock/minute` and `session/` events |
+| seed | the names a case names: `files/`, `buffers/`, a `<module>/config/<key>`, `clock/minute` and `session/` events |
 | run | a derived provider, a fold over the seeded events, or an action with its input |
 | assert | the commits the run makes, and the list of requests an action answers |
 
@@ -603,7 +625,7 @@ beside the others, and no separate tree holds it.
 
 | what it does | such as |
 |---|---|
-| writes the names of what comes in, as its outputs | `watch` writes `files/<path...>`, `hooks` writes `session/<id>/events`, `clock` writes `clock/minute`, `config` writes `cfg/<key...>` |
+| writes the names of what comes in, as its outputs | `watch` writes `files/<path...>`, `hooks` writes `session/<id>/events`, `clock` writes `clock/minute` |
 | accepts the requests going out, which an action's commit carries | `git` takes a commit or a push, `disk` takes a write |
 
 It holds no business logic, only IO. A value it passes through counts the same

@@ -4,9 +4,10 @@ kind: [[rationale]]
 
 # Why
 
-The owner decided this for the model, and the decision is final. Config became a
-flag on a topic, and a key came off its layers: override, context, environment,
-local, default and built-in. A small config module the index always loaded
+The owner decided this for the model, and the decision is final. No central
+config topic stood: each module's keys stood under `<module>/config/`, and a key
+came off its layers. The layers ran override, context, environment, local,
+default and built-in. A small config module the index always loaded
 resolved them. An agent reads this note before it asks again.
 
 ## 1. What it bought
@@ -25,10 +26,15 @@ Overrides replaced the wipe of the local file a new editor window made in
 ## 2. Why a module
 
 The core stayed dumb, and the index manager stayed about the system's health.
-So the layers went to a module of their own. Declaring a key in a `config` topic
-registered an input, and the config module stood as its writer. That was the
+So the layers went to a module of their own. Declaring a key under
+`<module>/config/` registered an input, and the config module stood as its
+writer. That was the
 one place a module declared a name another wrote, and the ownership rule said
 so.
+
+A module knew nothing about where its config values came from, and read a key
+like any other input. So a test seeded a config value the way it seeded any
+other.
 
 ## 3. Why built-in
 

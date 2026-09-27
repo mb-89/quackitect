@@ -57,7 +57,7 @@ the config, and the index's own management.
 | the index core | resolves reads to writers, and stores name to value. It takes a write from the name's registered writer alone, hands out one snapshot and pushes changes. Where no value stands, or its writer runs nowhere, it answers the built-in value, with the mark `not provided` |
 | a compute module | reads names, and writes the names it registers |
 | an IO module | a module flagged `io`: it owns the names of what comes in, and accepts requests going out, with no business logic |
-| the config module | a small module the index always loads. It owns every topic carrying the flag `config`, resolves the layers and writes the value that wins |
+| the config module | a small module the index always loads. It owns every `*/config/*` subtopic, resolves the layers and writes the value that wins |
 | the `watch` and `disk` IO modules | the only ones touching the disk: `watch` brings changes in as `files/`, and `disk` writes on request |
 | the index manager | a module the index always loads, holding supervision, leases, alarms, operations and retention |
 
@@ -70,13 +70,18 @@ Each module registers five groups:
 |---|---|---|
 | inputs | the names it reads | now |
 | outputs | the names it writes, each with its built-in value | now |
-| config | its keys, each with a type, a built-in value and a help line | now |
+| config | its keys by local name, each with a type, a built-in value and a help line | now |
 | state | its insides, readable for diagnosis | later, and part of the contract now |
 | debug | the flags that switch a diagnosis on | later, and part of the contract now |
 
 A module writes its registered outputs alone. The config schema, the built-in values,
 the slash commands, the command-line help and the window's index tab come off
 the config group. So nobody writes a list of keys by hand.
+
+A module knows nothing about where its config values come from. It declares its
+keys and reads them like any other input, and names no file, environment,
+context, override or layer. The config module and the surfaces alone know the
+layers.
 
 Modules load in any order, so a read names a name no module registers yet. The
 index resolves in two passes. A read still open after the second is a bug, and
@@ -88,7 +93,8 @@ nobody loads. Its readers take the built-in value, with the mark `not provided`.
 
 | the rule | what it gives |
 |---|---|
-| a key declared in a `config` topic has the config module as its writer, the one place a module declares a name another writes | the declaring module reads the key as an input, and the start resolves its writer in its passes |
+| a key a module declares under `<module>/config/` has the config module as its writer, the one place a module declares a name another writes | the declaring module reads the key as an input, and the start resolves its writer in its passes |
+| a module names its own values locally, and the framework adds its topic prefix | a module spells a full name only for what it reads from another |
 | each name has one provider and a built-in value | no value stands computed in two places, so two numbers cannot disagree |
 | an alternative provider lives in a file of its own, and config picks one at start-up | a box chooses its calculation, and the name stays one |
 | the index adds no name at runtime | the catalog a reader sees is the whole catalog |
@@ -143,7 +149,7 @@ talks to the index alone, and the build holds it.
 
 | the side | the IO modules |
 |---|---|
-| inbound, the outside reaching quackitect | LSP, hooks, MCP, HTTP, SSE, the file watcher, the clock, the config files |
+| inbound, the outside reaching quackitect | LSP, hooks, MCP, HTTP, SSE, the file watcher, the clock, the environment |
 | outbound, quackitect reaching the outside | disk, git, processes, Vale, Biome |
 
 An IO module is an ordinary module with the flag. It registers inputs, outputs
@@ -286,7 +292,8 @@ Every ruling stands, and a box builds on it with no question:
 | the editor starts `quack lsp`, which relays stdio to the IO process over a TCP stream of its own | [[spec/rationales/the-editor-starts-quack-lsp]] |
 | a value past the bus's payload cap rides in numbered chunks | [[spec/design_output/model#large-values-ride-in-chunks]] |
 | `files/` mirrors the disk, and each structured file is a projection with a codec and a kind | [[spec/design_output/model#everything-on-disk-mirrors]] |
-| config is a flag on a topic, and the config module resolves every key off its layers | [[spec/design_output/model#the-config-module]] |
+| no central config topic stands: each module's keys stand under `<module>/config/`, and the config module resolves them off their layers | [[spec/design_output/model#the-config-module]] |
+| a module knows nothing about where its config values come from | [[spec/design_output/model#config-comes-off-the-registrations]] |
 | a script opens a context with a lease, and an override wins over every context | [[spec/design_output/model#a-context-holds-a-lease]] |
 | a shared key reads the default file alone | [[spec/design_output/model#a-keys-layers]] |
 | the value a registration writes is its built-in value, and the default is the project's file | [[spec/design_output/model#a-keys-layers]] |
