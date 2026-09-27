@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -127,6 +127,11 @@ record:
     hand: box d7d6327f2b101 · claude-code-remote
     hash_before: 96685d9cfacca7ad6c10e223c4bd557da37cbf35
     hash_after: 96685d9cfacca7ad6c10e223c4bd557da37cbf35
+  - step: retro/cloud
+    hand: box d7d6327f2b101 · claude-code-remote
+    hash_before: 4883921f5473381a0df7f6efdd07115e70b7382b
+    hash_after: 4883921f5473381a0df7f6efdd07115e70b7382b
+reason: done
 ---
 
 # Ask
@@ -292,17 +297,28 @@ The tests-red leaf asks each test to fail on its assertion, and a pure test refa
 
 <!-- the form is list -->
 
+- Nothing: the take installed the index, the language server and the client, and no host came back refused.
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- The sync met no conflict, because the take had taken main in already.
+- The shell hook refused a call naming no ticket, a git write, and a pull chained after a pipe.
+- The commit hook refused two source files with no test beside them.
+- The push refused the branch while two file ceilings stood at warning.
+- The vehicle identity case failed on some runs, on any box that makes two ids in one millisecond.
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- No person step stands parked, and no ticket stands minted outside this group.
+- The handover says every child stands closed and the branch waits on the owner's merge. It stands in the private folder, which this box takes with it.
 
 # Discussion
 
