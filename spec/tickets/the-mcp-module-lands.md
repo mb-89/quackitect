@@ -117,21 +117,21 @@ steps:
 step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-foundation-closes-its-gaps
-depends_on: [every-call-takes-a-record]
+group: go-cage-lands-in-shadow
+depends_on: [the-hooks-door-lands]
 ---
 
 # Ask
 
-The MCP IO module and the `/v1` actions answer a call within the wait it sets, per [[spec/design_output/model#a-caller-sets-its-wait]]. Each surface's default wait is a config key of its IO module.
+The `mcp` IO module stands, flagged with `q.IO()`, and serves every action as a tool from the registry, per [[spec/design_output/model#the-io-process]]. Each tool answers within the wait its call sets, per [[spec/design_output/model#a-caller-sets-its-wait]]. The default wait is a config key of the IO module.
 
-An agent then needs one call once the system runs live. A call running past its wait answers with enough to read it later.
+Copilot carries no function hooks, so MCP is its road to the index. With the wait built in, an agent needs one call once the system runs live.
 
 - `go test ./...` from the root passes
-- a case calls an MCP tool with no wait, and reads the default of a second
-- a case passes a wait argument to an MCP tool, and reads the call wait that long
-- a case posts to a `/v1` action with `Prefer: wait=5`, and reads the result
-- a case posts with `Prefer: wait=0`, and reads `202` with the fraction done, the time and the handle path
+- an inbound fake replays a recorded MCP session, and the IO module answers it
+- a case calls a tool with no wait, and reads the default of a second off its config key
+- a case passes a wait argument to a tool, and reads the call wait that long
+- a case calls a slow tool, and reads `still running` with the fraction done, the time and the handle
 - `./RUNME.sh check` exits 0
 
 # design
