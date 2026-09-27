@@ -100,6 +100,7 @@ export function writesOf(it, plan, read, main) {
       out.set(ticketAt(name), withField(loose.get(name), GROUP, made.name, it.front));
   }
   const texts = new Map(read.loose.map((one) => [one.name, one.text]));
+  // The cloud marker rides this commit, and never marksTrunk or openGroup, because both commit and push main.
   for (const name of plan.opens)
     out.set(ticketAt(name), withField(texts.get(name), "cloud", true, it.front));
   return { files: out };
