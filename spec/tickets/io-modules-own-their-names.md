@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -179,6 +179,29 @@ record:
         exit: 0
         said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 6df17ecdc9f53cb79a7ab5bfceaf585a237e714b
+    hash_after: 6df17ecdc9f53cb79a7ab5bfceaf585a237e714b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/modules/files passes; green, src/modules/clock passes; green, src/modules/env passes; gr
+      - name: check
+        exit: 0
+        said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
+    inputs:
+      - name: design/tests-red
+        hash: 60198dd1c4b48de3
+        size: 1461
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -392,26 +415,40 @@ the hash of a file stands once in `ContentOf`, and the wired name once in `Wirin
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/send_test.go src/modules/files src/modules/clock src/modules/env src/index/core_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The IO modules `watch`, `disk`, `clock` and `env` stand under `src/modules`, each file with its real outside and its fake.
+Each registration carries the new `q.IO()` flag, and `onlyq` lets a package carrying it import the outside.
+Each module keeps a contract suite under the build tag `contract`, and the check runs that tag.
+The index core registers no `files/` family now, so it writes no input name.
+The index becomes a library, and the new root `src/quack` reads `spec/wiring.yaml`, loads the IO modules into the catalog, and hands the index a start for each.
+A start commits the module local names under the names `Wiring.Bound` gives them, such as `env/SE_ROLE` for `vars/SE_ROLE`.
+`Store.Send` runs the requests an action answers in order, and undoes the ones before a failing request, newest first.
+The install builds `se-index` off `src/quack`.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft size names, and past them `src/q/wiring.go`, `src/imports`, `install.sh`, `.vale.ini` and `test/level0`
+each IO module file carries its fake, and each contract suite runs over the fake and the real outside
+each new function points at the model section on IO modules or the wiring file
+the hash of a file stands once in `ContentOf`, and the wired name once in `Wiring.Bound`
 
 # accept
 
