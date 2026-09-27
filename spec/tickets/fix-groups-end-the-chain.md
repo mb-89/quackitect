@@ -117,11 +117,23 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 3a80df1de257d7830de164a1588646aaed4dc85e
+    hash_after: 3a80df1de257d7830de164a1588646aaed4dc85e
+    inputs:
+      - name: ask
+        hash: a2273d7db3871c84
+        size: 1188
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 5a2557d24d86ab34
+        size: 13510
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -161,38 +173,54 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The schema spec/schemas/ticket.schema.yaml gains fix, a boolean on a group ticket, which the dispatch writes. A new module src/scripts/work-fix.js holds fixLeaves(it, text), which answers the agent tickets a fix group leaves. It reads nothing where the group ticket lacks fix: true. Otherwise it lists the tickets the branch adds through git diff --name-only --diff-filter=A origin/main...HEAD -- spec/tickets. It keeps each one that stands open, names no group, is no group itself, and where waitsOnPerson answers false. finish in src/scripts/work.js calls it after childrenStand and before the retro read. Where it answers any ticket, done answers 1 and names each with the two lines turning it into a question ticket: ./RUNME.sh mint ticket spec/tickets/<name>-question.md --process=question, then ./RUNME.sh ticket pull <name> --became <name>-question. A feature group reads no fix field, so fixLeaves answers nothing and done hands back its loose agent tickets as it does today. waitsOnPerson stands exported from src/scripts/work-answer.js, as dispatch-prints-its-plan writes it, so the queue, the plan and this refusal read one rule.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/work.js: finish, which branch done runs, calls fixLeaves after childrenStand
+- src/scripts/work-answer.js: the queue keeps reading waitsOnPerson, now an export
+- src/scripts/work-fix.js: fixLeaves reads waitsOnPerson and the branch diff
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/work-done.test.js: done on a fix group refuses an agent ticket it leaves, and names the mint of a question ticket for it
+- test/level0/work-done.test.js: done on a fix group passes where every ticket it leaves waits on a person
+- test/level0/work-done.test.js: done on a feature group hands back an open agent ticket it adds, as it does today
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- spec/schemas/ticket.schema.yaml
+- src/scripts/work-fix.js
+- src/scripts/work.js
+- src/scripts/work-answer.js
+- test/level0/work-done.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened work.js finish and childrenStand, work-answer.js waitsOnPerson, work-merge.js freeChildren and the schema, and each claim stands there
+- the callers list names finish, the queue and the new reader
+- each done_when line names its case under tests, the schema line names the schema file, and ./RUNME.sh check decides the last
 
 ## tests-red
 
