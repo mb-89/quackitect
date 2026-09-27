@@ -149,6 +149,19 @@ test("branch close refuses off trunk, and deletes nothing", () => {
   assert.ok(!ranGit(outside).some((one) => one.startsWith("git push")));
 });
 
+test("branch close refuses a dirty tree, and deletes nothing", () => {
+  const { it, outside } = doorsSaying(
+    closing({ "git status --porcelain -uall": { stdout: " M src/one.js\n" } }),
+    { [on("one-group")]: MARKED },
+  );
+
+  const { code, said } = heard(() => work(ROOT, ["close", "one-group", "--force"], it));
+
+  assert.equal(code, 2);
+  assert.match(said, /uncommitted changes/);
+  assert.ok(!ranGit(outside).some((one) => one.startsWith("git push")));
+});
+
 test("branch release leaves the marker, and the branch stands at todo", () => {
   const held = withEntry(
     MARKED,
