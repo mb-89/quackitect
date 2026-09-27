@@ -316,7 +316,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `ticket-in-hand` | a hold stands under `.se/.runtime/hold`, or an open private ticket stands |
 | `group-in-hand` | this branch's group carries a take with no hand-back |
 | `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` whose work branch stands nowhere |
-| `step-waits-on-person` | a held ticket, or the group it names, stands at a leaf carrying `by: person` |
+| `step-waits-on-person` | a held ticket, or the group it names, stands at a leaf carrying `by: person`, and the box is no cloud box |
 | `chat-is-new` | the session log holds one prompt row at most, the box is no cloud box, and the answer names no next step |
 | `helpers-running` | the turn's end names a helper the harness still runs, or a helper spawned in the background sends no stop yet |
 | `a-report-stands` | the message ending the turn carries the heading What the agent needs with a numbered row under it |
