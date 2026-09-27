@@ -277,3 +277,7 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The accept passes with the point `commit-stages-a-moved-path`, and the group waits at accept for it. The pull refuses that ticket to the session minting it, and `branch done` frees group children alone, so the retro leaf stays off this box. The next box takes the point, and the group walks on to its retro.
+
+`the-retro-reads-the-backlog` lands its code and tests green, then closes became `a-rewind-spares-landed-tests`. A rename rewrites its draft and the review goes stale. The rewind then reaches `tests-red`, which the landed change keeps green.
