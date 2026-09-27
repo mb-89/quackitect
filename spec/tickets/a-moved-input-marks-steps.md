@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -104,6 +104,23 @@ record:
         exit: 0
         said: "spec/tickets/the-retro-reads-the-backlog.md:145:1: Sentence: A sentence holds 25 words. Cut this one in two."
     def: 21d63335f32dfcda
+  - step: implement/tests-green
+    hand: box d7d9b0d5dfcf · claude-code-remote
+    hash_before: 9858b4b7b1cf2b0389ae530371db3f363f75c486
+    hash_after: e84a5158d681f84aab41f200d30c19f11795577d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s); green, src/index passes
+      - name: check
+        exit: 0
+        said: "test/level0/pull-stale.test.js:322:37: Modal: This register holds the modals can, must, will. Say what is, or name the o"
+    inputs:
+      - name: implement/tests-red
+        hash: ea622bb3399ff93c
+        size: 1017
+    def: a27db29c1d1562f2
+reason: done
 ---
 
 # Ask
@@ -238,26 +255,34 @@ both review rows stand fixed: the bless reads chapterText from pull-stale.js, an
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/pull-stale.test.js src/index
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A passed leaf now records the hash and size of each input it reads, the hash of each note an input chapter links, and the hash of its own definition. The index answers a hashes method, which ports hashText to Go so both sides agree. Before a hand-out the pull reads each passed leaf again. An input whose text no longer opens with the text its hash read marks the leaf stale, naming the input, and the first stale leaf takes the step. An append keeps the leaf whole, because only the head the hash read counts. A process whose hash moves gives the ticket its new route where the step and every recorded leaf stand in it: an edit past the step copies onto the leaves ahead, and an edit at or before the step sends the step to the first leaf whose definition moves. A route that strands a recorded leaf waits for ticket update. The bless reads its chapters through the same chapterText, and the record schema admits blessed, stale, def and inputs.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, plus the index door on the CLI hand and the fake index
+every door the cases reach runs on a fake, and the Go door takes its own case
+each new function points at the design section on inputs
+the hash stands once in hash.js, and the Go port points at it
+both review rows stand fixed
 
 # Discussion
 
