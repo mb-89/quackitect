@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -220,6 +220,15 @@ record:
     hash_before: cb283afbeb2e92103d450464c2457412c8865039
     hash_after: cb283afbeb2e92103d450464c2457412c8865039
     def: de8d3ba136f0aaf6
+  - step: design/draft-2
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: a12f7b5fd431de985d6dbc43ded88f2dcec2e8aa
+    hash_after: a12f7b5fd431de985d6dbc43ded88f2dcec2e8aa
+    inputs:
+      - name: ask
+        hash: 51cba604bf4d0a4a
+        size: 822
+    def: 2fcb4abe3d77d8a2
 ---
 
 # Ask
@@ -372,38 +381,89 @@ I rewire by hand
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The keep reads the pass commit, follows renames, and holds only after the change lands. A red leaf is a leaf whose evidence holds a command field expecting `assertion`.
+
+`keptRed(it, text, leaf)` answers a kept entry where all four hold, and null otherwise:
+
+| read | how | the finding it answers |
+|---|---|---|
+| the red pass | the last entry of the leaf carrying `def`, with no `stale`, `skipped` or `returns` | |
+| a later pass | an entry after it, of a leaf past the red leaf in route order, carrying `def` and no `returns` or `stale` | the keep runs before the change lands |
+| the red commit | `git log --reverse --ancestry-path --format=%H%x09%s <hash_after>..HEAD`, the first subject reading `<ticket>: passes <leaf>` | keptRed reads the wrong tree |
+| the red tests stand | `git show --name-status --format= <red commit>` names the test files the red pass lands. `git diff -M --name-status <red commit> HEAD` maps each through a rename. Each one stands at HEAD | a whole-file hash fails an appended case |
+
+The entry reads `{ step, skipped: true, kept: <red commit>, why }`. `passedSteps` counts a skipped entry as passed, and `inputRead` passes over an entry with no `def`.
+
+A red pass landing no test file keeps nothing, and a private ticket keeps nothing, since its `hash_after` stands empty. Either hands the leaf out as today.
+
+| part | where |
+|---|---|
+| `keptRed` answers the four reads | `src/scripts/pull-kept.js`, the stub today |
+| the walk after a pass writes the kept entry and goes on | `stepOn` in `src/scripts/pull-writes.js`, beside the `when` read |
+| the walk at a pull does the same, so a stranded ticket walks on | `advanced` in `src/scripts/pull-hand.js`, beside the `when` read |
+| the design note gains the kept leaf | `spec/design_output/pull.md`, under the stale read |
+
+The cost: once the change lands, a case a later draft appends to a standing red file runs green, never red. A red run at that point proves nothing, because the change it guards already stands.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/scripts/pull-writes.js`, `passed`, which runs `stepOn`
+- `src/scripts/pull-bless.js`, `bless`, which runs `stepOn`
+- `src/scripts/pull-hand.js`, `offer`, which runs `advanced`
+- `src/scripts/pull-kept.js`, `keptRed`, which `stepOn` and `advanced` call
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/pull-kept.test.js`, a red leaf whose tests land in its pass commit, and stand there, is kept once the change passes
+- `test/level0/pull-kept.test.js`, the rewind the-retro-reads-the-backlog meets keeps its red leaf: red commit f27f6c9fc, cases appended at 7c8c13970, the route test renamed, and the review going stale
+- `test/level0/pull-kept.test.js`, a red test deleted with no rename hands the red leaf out again
+- `test/level0/pull-kept.test.js`, a red leaf rewound before a later leaf passes hands out again, so a case the edited draft adds runs red
+- `test/level0/pull-kept.test.js`, a pull meeting a ticket stranded at its red leaf walks it on to the change
+
+The done lines and the case deciding each:
+
+- the rewind keeps a landed `tests-red`: the first case
+- the replay of the rename: the second case
+- the check: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- keptRed reads the wrong tree: the keep reads the pass commit, found as the first commit after `hash_after` whose subject passes the leaf
+- a whole-file hash fails an appended case: the keep asks that each red test file stand at HEAD, through a rename, and reads no content
+- the replay replays no real rewind: the second case carries the record and commits of the-retro-reads-the-backlog, so a keep answering null fails it
+- the keep runs before the change lands: a later leaf's pass must follow the red pass, and the fourth case holds it
+- the callers list names `blessed`: it names `bless` in `pull-bless.js` and `offer` in `pull-hand.js`
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/scripts/pull-kept.js`
+- `src/scripts/pull-writes.js`
+- `src/scripts/pull-hand.js`
+- `test/level0/pull-kept.test.js`
+- `spec/design_output/pull.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `stepOn`, `passed`, `bless`, `offer`, `advanced`, `inputRead` and the record of the-retro-reads-the-backlog stand opened. `f27f6c9fc` is the child of its recorded `hash_after` and lands its three red tests
+- the callers come off a search for `stepOn(` and `advanced(` over `src/scripts`
+- each done line names the case deciding it
 
 ## tests-red-2
 
