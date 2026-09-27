@@ -7,6 +7,7 @@ import { test } from "node:test";
 import said from "../../spec/config/level0.json" with { type: "json" };
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { partOf } from "../../src/scripts/pull-cap.js";
+import { stillHeld } from "../../src/scripts/pull-route.js";
 import { pulling } from "../../src/scripts/work.js";
 import { at, doors, HOLD, heard, ROOT, standing } from "./pull-doors.js";
 
@@ -94,5 +95,20 @@ test("a hand-out under the margin prints whole, and the hold carries no rest", (
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
   assert.equal(code, 0);
   assert.doesNotMatch(said, /for the rest/);
+  assert.equal(JSON.parse(disk.read(HOLD)).rest, undefined);
+});
+
+// [[spec/design_input/level-two#the-size-cap]]
+test("stillHeld prints the rest a hold carries, and drops it from the hold", () => {
+  const { it, disk } = doors({}, {}, { cap: CAP, root: ROOT });
+  const hold = {
+    ticket: "a-child",
+    step: "design/draft",
+    hand: "box d462e994b4cef",
+    rest: "the rest of it",
+  };
+  const { code, said } = heard(() => stillHeld(it, hold));
+  assert.equal(code, 0);
+  assert.equal(said, "the rest of it");
   assert.equal(JSON.parse(disk.read(HOLD)).rest, undefined);
 });

@@ -553,6 +553,14 @@
         }
       }
     },
+    "pull": {
+      "type": "object",
+      "properties": {
+        "comment": { "type": "string" },
+        "cap": { "type": "number", "unit": "bytes", "help": "The size up to which one tool answer reaches the model whole. Past it, the client hands back a preview." },
+        "margin": { "type": "number", "unit": "bytes", "help": "The room the pull keeps free below the cap. A hand-out past cap less margin splits, and the next pull on the step prints the rest." }
+      }
+    },
     "ops": {
       "type": "object",
       "properties": {
