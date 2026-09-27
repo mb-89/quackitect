@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: e79762df3f357759
         size: 996
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 869d66856792547238e749c759d44f79ea364618
+    hash_after: 869d66856792547238e749c759d44f79ea364618
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: a13575bf18fdd4bf
+        size: 2443
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -243,26 +256,31 @@ The done lines and the case deciding each:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/cloud-ask.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/cloud-ask.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Over the stub, the refusal case fails on its own assertion: the deny text stands empty. The desk case and the other-tool case pass over the stub, because each guards the side where the door answers null. Nothing surprises: `cloudHere` reads `box.cloud` first, so a case sets the flag and needs no environment.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a case: the cloud refusal fails red, the desk pass guards the other side, and the note and the check wait for the change
+- the door reaches no outside: the case hands it a box whose log records in memory
 
 # gate
 
