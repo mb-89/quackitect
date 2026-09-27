@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -180,6 +180,29 @@ record:
         exit: 0
         said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: 3784ee3fcaba17e956624a65583d888146dbb787
+    hash_after: 3784ee3fcaba17e956624a65583d888146dbb787
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 24 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    inputs:
+      - name: design/tests-red
+        hash: a22f7e8ffed41ca9
+        size: 826
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -366,26 +389,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/bash-engine.test.js test/level0/prepush.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every push from a desk waited on a green check, so a test red on one platform held the owner's commits off origin. The Bash door now marks a push, and every `./RUNME.sh` verb, with `export SE_ENGINE=1`, through `markedPush` in `src/bridge/bash.js`. The push door reads the battery on `main` only where that mark stands. A terminal push with no session carries no mark and lands at once. The version, to-do, cloud and hold rules hold with or without it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list alone
+- the cases hand the door commands and flags alone
+- the code points at this ticket
+- the variable's name stands once
 
 # accept
 
