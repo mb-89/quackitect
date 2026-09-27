@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: do
 steps:
   - name: answer
@@ -68,6 +68,23 @@ record:
         hash: 217a401698f56467
         size: 4030
     def: 2280015d497a3abd
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: c9e50b5f92bbb2e27e36930330a6533ccc7df825
+    hash_after: c9e50b5f92bbb2e27e36930330a6533ccc7df825
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 24 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/queue-approach-sentence-split.md:79:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: answer
+        hash: 74d4a9d69648aef3
+        size: 181
+    def: 9395391d8c0e6392
+reason: done
 ---
 
 # Ask
@@ -108,26 +125,32 @@ Split the sentence. The owner rules the split is the answer, and the tests gate 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/contract/vale.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The owner rules the split is the answer. The queue ticket closes done, and ./RUNME.sh lint spec/tickets/the-queue-moves-to-plan.md names no sentence past the cap. rationale-drops-release-row passes do on a green check, so nothing waits on the split.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the answer: the lint over the queue ticket passes, and the release row ticket closes
+- the cleanup it reveals stands as notes: the pull tool records a person as the hand
+- the change adds no fact
 
 # Discussion
 
