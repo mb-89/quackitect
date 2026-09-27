@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/tests-red
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -87,6 +87,14 @@ record:
     hand: box d7d598fb92101 · claude-code-remote
     hash_before: 2e2ccb8fb617e7976869e3e568d6c1ae15724aa3
     hash_after: 2e2ccb8fb617e7976869e3e568d6c1ae15724aa3
+  - step: implement/tests-red
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: e8f6d94cc0912588c06ecf1dd90e0ddea0afdeb8
+    hash_after: e8f6d94cc0912588c06ecf1dd90e0ddea0afdeb8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -213,17 +221,29 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/front/front_test.go test/level0/front-writer.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Every Go case but one fails against stand-ins that hand the note back. `TestNormaliseRunsTwiceAsOnce` passes on the stand-in, since a writer that moves nothing moves nothing twice. The three JavaScript cases fail on their own assertions.
+
+The surprise: the tree's JavaScript reader strips a quote and unescapes nothing. A rewrite between quoted and plain keeps every value it reads.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the new package, the front door and their tests, which the ask names
+- the JavaScript case runs over the fake disk and the fake process
+- each new file opens on the approach and links this ticket
+- the quoting rule stands in `Quote` alone, and the cases read it
+- the review passes with no rows
 
 ## change
 
