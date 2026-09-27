@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -145,6 +145,18 @@ record:
         hash: eee784babc19ef92
         size: 2192
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e1c5ea2bd1 · claude-code-remote · helper-3
+    hash_before: 0d06619dbd6f9236e6b1c5eaa21caa473e482e0a
+    hash_after: 0d06619dbd6f9236e6b1c5eaa21caa473e482e0a
+    inputs:
+      - name: design/draft
+        hash: eee784babc19ef92
+        size: 2192
+      - name: design/tests-red
+        hash: dda7a3cac8ec23ec
+        size: 714
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -275,8 +287,13 @@ the cases run over a catalog and a store in memory, and the spawn hand stands in
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the draft says a case hands spawn a run it controls, and both cases hand it `go run()`: the builder aligns the approach line or the cases in place
+- Settle has to count a run from the kick, before spawn starts it, or it answers before a `go` run begins: the builder holds that in the run loop
+- a derived provider reading its own output, or a cycle of two, reruns without end under the run loop: the builder names the catalog check that refuses it, or leaves it to one-wave-settles-a-change
+- Serve starts the scheduler with no stop, so a run goroutine outlives the door: the builder ties it to the stop func Serve answers
 
 # implement
 
