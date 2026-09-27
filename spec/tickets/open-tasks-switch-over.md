@@ -77,6 +77,10 @@ process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [open-tasks-land-in-shadow]
 enabled_by: migration.phase2switch
+record:
+  - step: sync
+    hand: box d7d80931cecf · claude-code-remote
+    hash_before: ef191748722031f7e521c65f9fb70c78629bde96
 ---
 
 # Ask
