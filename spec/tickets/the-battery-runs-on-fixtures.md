@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d6327f2b101 · claude-code-remote
+    hash_before: 7c7ad58434ec4e6f05d1efa0eab61623176145af
+    hash_after: 7c7ad58434ec4e6f05d1efa0eab61623176145af
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-verbs-need-no-wrapper.md:184:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
 ---
 
 # Ask
@@ -250,11 +258,19 @@ The bundle case fails on its claim that the script lands in the temp folder, bec
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change touches `src/scripts/bundle.js` alone, which the ask's drawing-bundle line names.
+- The change reaches the disk through esbuild as before, and the contract case drives it for real.
+- The comment over `bundle` links this ticket, whose approach item 4 it implements.
+- `ENTRY` and `OUT` stay the one place the drawing's paths stand, as the defaults.
+- The review's one finding stands fixed on the ask.
 
 ## tests-green
 
