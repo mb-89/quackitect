@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"quackitect/src/config"
 	"quackitect/src/q"
 )
 
@@ -282,4 +283,29 @@ func TestTheDoorRunsAProviderWhenAnIOModuleMovesItsInput(t *testing.T) {
 		time.Sleep(100 * time.Millisecond)
 	}
 	t.Fatalf("t/double reads %#v after t/n moves to 3", said.Result)
+}
+
+// The index holds a lease, and the work loop's idle tick renews it. [[spec/design_output/model#a-lease]]
+func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
+	root := tree(t)
+	write(t, root, config.Tracked, `{"watchdog":{"beat":1,"lease":5}}`)
+	one, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	if one.dog == nil {
+		t.Fatal("the index starts no watchdog")
+	}
+	first, held := one.dog.Lease(leasePart)
+	if !held {
+		t.Fatalf("the index holds no lease under %s", leasePart)
+	}
+	for range topicPolls {
+		if later, _ := one.dog.Lease(leasePart); later.Renewed.After(first.Renewed) {
+			return
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
+	t.Fatalf("the lease of %s stands at %v, and the work loop renews nothing", leasePart, first.Renewed)
 }

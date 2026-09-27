@@ -90,6 +90,11 @@ func (d *Dog) Beat(part string) {
 	}
 }
 
+// The lease a part holds, which a case reads. [[spec/design_output/model#a-lease]]
+func (d *Dog) Lease(part string) (Lease, bool) {
+	return Lease{}, false
+}
+
 // An expired lease marks its part stale, and the next commit of the part clears it. [[spec/design_output/model#a-stale-mark]]
 func (d *Dog) Check() []string {
 	d.mu.Lock()

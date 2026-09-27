@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -129,6 +129,19 @@ record:
         hash: 0166fa6e285204cc
         size: 416
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 07f3abdbdfd4607a3c74c570cc32c057f6d7c7e5
+    hash_after: 07f3abdbdfd4607a3c74c570cc32c057f6d7c7e5
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: 7937c3edef8d23d5
+        size: 2033
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -229,26 +242,32 @@ each done_when line names its case, or the command go test or the check
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/door_test.go src/watchdog/lease_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/index/door_test.go
+src/watchdog/lease_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The nil fault panics on err.Error in the alarm branch, and the recover turns it into the case's own failure. The lease case stops on the door with no dog. The surprise: serves already names the main verb, so the door that answers itself is opens.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each done_when line meets a red case, or the command go test or the check
+the lease case reads a real door over a temp tree, and the fault case runs over the store in memory, so no door stands unfaked
 
 # gate
 

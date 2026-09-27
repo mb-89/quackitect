@@ -122,3 +122,15 @@ func TestAHeartbeatRenewsTheLease(t *testing.T) {
 		t.Fatalf("a renewed lease expires: %v", expired)
 	}
 }
+
+func TestAFaultWithNoErrorRaisesNoPanic(t *testing.T) {
+	dog, _, _ := dogOf(t, Settings{First: time.Second, Cap: time.Minute, Faults: 1, Window: time.Minute}, nil)
+	defer func() {
+		if said := recover(); said != nil {
+			t.Fatalf("a fault with no error panics: %v", said)
+		}
+	}()
+	if _, restarts := dog.Fault("t/part", nil); restarts {
+		t.Fatal("one fault in a window of one raises no alarm")
+	}
+}

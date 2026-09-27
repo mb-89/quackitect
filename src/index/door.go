@@ -63,6 +63,7 @@ type answer struct {
 }
 
 type door struct {
+	dog   *watchdog.Dog
 	db    *sql.DB
 	book  *ops.Book
 	v1    net.Listener
@@ -148,6 +149,15 @@ type Commit func(as q.Writer, values map[string]any) error
 type Start func(root string, commit Commit) (stop func(), err error)
 
 func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Listener, error) {
+	_, stop, listen, err := opens(root, at, catalog, starts...)
+	return stop, listen, err
+}
+
+// The part the index holds its lease under. [[spec/design_output/model#a-lease]]
+const leasePart = "index"
+
+// Answers the door beside its stop, so a case reads the lease the work loop renews. [[spec/design_output/model#a-lease]]
+func opens(root, at string, catalog *q.Catalog, starts ...Start) (*door, func(), net.Listener, error) {
 	topics := registersTopics(catalog)
 	watchdog.Registers(catalog)
 	// The catalog check runs before the database opens, so a fault refuses the start. [[spec/design_output/model#the-index-resolves-in-passes]]
@@ -156,16 +166,16 @@ func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Li
 		for _, one := range faults {
 			said = append(said, one.String())
 		}
-		return nil, nil, fmt.Errorf("the catalog refuses the start:\n  %s", strings.Join(said, "\n  "))
+		return nil, nil, nil, fmt.Errorf("the catalog refuses the start:\n  %s", strings.Join(said, "\n  "))
 	}
 	db, err := Open(root, at)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	// The door comes up on a sweep against the rows it finds, so a restart rewrites what moved while it stood down. [[spec/design_output/index#a-change-moves-its-rows]]
 	tracked := trackedIn(root)
 	if _, _, err := sweep(db, root, tracked); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
@@ -177,20 +187,20 @@ func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Li
 	})
 	if err := one.opensBook(); err != nil {
 		db.Close()
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	stops, err := one.starts(starts)
 	if err != nil {
 		db.Close()
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	if err := one.publishes(nil); err != nil {
 		db.Close()
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	listen, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	mux := http.NewServeMux()
@@ -205,7 +215,7 @@ func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Li
 	if err != nil {
 		server.Close()
 		db.Close()
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	one.v1 = v1
 
@@ -226,7 +236,7 @@ func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Li
 		}
 		one.db.Close()
 	}
-	return stop, listen, one.stands(listen)
+	return one, stop, listen, one.stands(listen)
 }
 
 // Each IO module commits through the store at its own revision, and a start that fails stops the ones before it. [[spec/design_output/model#io-modules-are-modules]]
