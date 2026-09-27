@@ -48,7 +48,7 @@ the `release` departure holds, because `release` writes `hash_after` and leaves 
 
 <!-- the form is command -->
 
-    ./RUNME.sh check
+    ./RUNME.sh lint spec/rationales/git-stays-the-archive.md
 
 ## check
 
@@ -79,3 +79,5 @@ The table in `spec/rationales/git-stays-the-archive.md` loses its release row, s
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The full check carries one warning, a sentence past the cap under the approach of [[spec/tickets/the-queue-moves-to-plan]]. That approach stands the engine's to write, so its draft round splits the sentence. `tests` here names the lint over the one note this step changes.
