@@ -82,7 +82,7 @@ cloud: true
 
 # Ask
 
-Phase 4 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the actions and the command line. A generated `quack`, verbs ported topic by topic as actions returning operations, and the tool list the index generates. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/verbs`, which the `migration` module declares as a shared key in the default file.
+Phase 4 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the actions and the command line. A generated `quack`, verbs ported topic by topic as actions answering within the wait their caller sets, and the tool list the index generates. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/verbs`, which the `migration` module declares as a shared key in the default file.
 
 Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 

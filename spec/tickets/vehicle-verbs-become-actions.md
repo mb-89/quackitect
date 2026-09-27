@@ -83,7 +83,7 @@ depends_on: [runme-hands-verbs-to-quack]
 
 # Ask
 
-The `vehicle` and `stub` verbs become actions returning operations, in shadow against `cli.js`.
+The `vehicle` and `stub` verbs become actions answering within the wait their caller sets, in shadow against `cli.js`.
 
 Every verb then answers through the index.
 

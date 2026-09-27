@@ -83,7 +83,7 @@ depends_on: [runme-hands-verbs-to-quack]
 
 # Ask
 
-The `ticket` verbs become actions returning operations, each in shadow against its `cli.js` twin.
+The `ticket` verbs become actions answering within the wait their caller sets, each in shadow against its `cli.js` twin.
 
 An agent calls the index, and parses no standard output.
 

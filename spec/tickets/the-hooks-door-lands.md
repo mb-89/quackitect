@@ -89,6 +89,8 @@ Every cage rule after this one runs on it.
 - `go test ./...` from the root passes
 - an inbound fake replays a recorded hook event, and `session/<id>/events` holds it
 - the IO module's test runs over `qtest` and its inbound fake
+- a case ends an operation after its call answers, and reads the result in the session's next turn
+- a case ends a turn with an operation running, and reads the Stop hook name it
 - `./RUNME.sh check` exits 0
 
 # design

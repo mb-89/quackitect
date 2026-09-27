@@ -867,6 +867,13 @@
     "standing": "done"
   },
   {
+    "name": "every-call-takes-a-record",
+    "hash": "c83e234651ea7633",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "Every call of an action takes a record, `ops/\u003cid\u003e`, and carries the wait its caller sets, per [[spec/design_output/model#a-caller-sets-its-wait]]. A call ending within the wait answers the result. One running past it answers `still running`, with the handle, the fraction done and the time gone by.\n\nThe split between `q.Action` and `q.Op` then leaves, and an author guesses no length. An agent holds no handle, because `ops/wait` with none waits on its session's open operations.\n\n- `go test ./...` from the root passes\n- `q.Op` and the field `Declared.Op` stand nowhere under `src`, which `grep -rn 'Op()' src/q` shows\n- a case calls a quick action, and reads the result within the wait\n- a case calls a slow action with steps, and reads `still running`, the handle and the fraction done\n- a case calls `ops/wait` with no handle, and reads the session's open operations end\n- `watchdog.deadlineOp` folds into `watchdog.deadlineAction`\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
     "name": "every-landing-takes-a-verb",
     "hash": "bcd65204460cd6ae",
     "group_hash": "90c8ec2acc34285f",
@@ -1357,9 +1364,9 @@
   },
   {
     "name": "operations-get-specified",
-    "hash": "8c082f5d3ddc2250",
+    "hash": "7f66cc991394166d",
     "group_hash": "e98c0716a9c298ab",
-    "ask": "A design note specifies operations: the handle `ops/\u003cid\u003e`, its states, the one writer per tree, and what stays for how long. [[spec/design_input/the-index-holds-the-model#operations-carry-a-handle]] asks it.\n\nA pull, the check and a retro each run past a hook's patience. A handle keeps the caller free and the hang in sight.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- `./RUNME.sh check` exits 0",
+    "ask": "A design note specifies operations: the handle `ops/\u003cid\u003e`, its states, the one writer per tree, and what stays for how long. [[spec/design_input/the-index-holds-the-model#a-caller-sets-its-wait]] asks it.\n\nA pull, the check and a retro each run past a hook's patience. A handle keeps the caller free and the hang in sight.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- `./RUNME.sh check` exits 0",
     "standing": "done"
   },
   {
@@ -1434,9 +1441,9 @@
   },
   {
     "name": "pull-verbs-become-actions",
-    "hash": "4986158854d2c3eb",
-    "group_hash": "b62e0516238f534e",
-    "ask": "The pull becomes an action returning an operation, in shadow against `cli.js`.\n\nThe hand-back is the longest road a hook waits on, and a handle frees it.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
+    "hash": "cff8e357e6f4d78a",
+    "group_hash": "bdcecf4ff613c42f",
+    "ask": "The pull becomes an action answering within the wait its caller sets, in shadow against `cli.js`.\n\nThe hand-back is the longest road a hook waits on, and the wait frees it.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -1454,8 +1461,8 @@
   },
   {
     "name": "quack-verbs-land-in-shadow",
-    "hash": "b62e0516238f534e",
-    "ask": "Phase 4 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the actions and the command line. A generated `quack`, verbs ported topic by topic as actions returning operations, and the tool list the index generates. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/verbs`, which the `migration` module declares as a shared key in the default file.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
+    "hash": "bdcecf4ff613c42f",
+    "ask": "Phase 4 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the actions and the command line. A generated `quack`, verbs ported topic by topic as actions answering within the wait their caller sets, and the tool list the index generates. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/verbs`, which the `migration` module declares as a shared key in the default file.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
     "standing": "todo"
   },
   {
@@ -1584,9 +1591,9 @@
   },
   {
     "name": "retro-verbs-become-actions",
-    "hash": "6fbd97346af515fc",
-    "group_hash": "b62e0516238f534e",
-    "ask": "The `retro` verbs become actions returning operations, in shadow against `cli.js`.\n\nA retro collect runs long, and a handle keeps its caller free.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
+    "hash": "2f663c3928cc1c40",
+    "group_hash": "bdcecf4ff613c42f",
+    "ask": "The `retro` verbs become actions answering within the wait their caller sets, in shadow against `cli.js`.\n\nA retro collect runs long, and the wait keeps its caller free.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -1598,7 +1605,7 @@
   {
     "name": "runme-hands-verbs-to-quack",
     "hash": "a19aad7cc0d2ac8e",
-    "group_hash": "b62e0516238f534e",
+    "group_hash": "bdcecf4ff613c42f",
     "ask": "`./RUNME.sh` hands a verb `quack` knows to it, and every other verb to `cli.js`. The key `migration/config/slices/verbs` holds the road.\n\nThe old verbs keep working while each topic ports.\n\n- a case runs one ported verb and one unported verb through `./RUNME.sh`\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
@@ -2298,7 +2305,7 @@
   {
     "name": "the-hook-registers-index-tools",
     "hash": "e18474f9d7e5a043",
-    "group_hash": "b62e0516238f534e",
+    "group_hash": "bdcecf4ff613c42f",
     "ask": "The hook module registers the tool list the index generates, beside the tools it registers today.\n\nA tool then costs one action, and every harness picks it up.\n\n- a case under `test/level0` reads the generated list and registers each tool\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
@@ -2317,9 +2324,9 @@
   },
   {
     "name": "the-hooks-door-lands",
-    "hash": "6ba1d913b78caa6d",
+    "hash": "2c24f3c4b341e551",
     "group_hash": "c8f5eaf75447c212",
-    "ask": "The `hooks` IO module stands under `src/modules/hooks`, flagged with `q.IO()`, and writes `session/\u003cid\u003e/events`. The fold modules answer `session/`, and the cage answers each event beside the bridge server.\n\nEvery cage rule after this one runs on it.\n\n- `go test ./...` from the root passes\n- an inbound fake replays a recorded hook event, and `session/\u003cid\u003e/events` holds it\n- the IO module's test runs over `qtest` and its inbound fake\n- `./RUNME.sh check` exits 0",
+    "ask": "The `hooks` IO module stands under `src/modules/hooks`, flagged with `q.IO()`, and writes `session/\u003cid\u003e/events`. The fold modules answer `session/`, and the cage answers each event beside the bridge server.\n\nEvery cage rule after this one runs on it.\n\n- `go test ./...` from the root passes\n- an inbound fake replays a recorded hook event, and `session/\u003cid\u003e/events` holds it\n- the IO module's test runs over `qtest` and its inbound fake\n- a case ends an operation after its call answers, and reads the result in the session's next turn\n- a case ends a turn with an operation running, and reads the Stop hook name it\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -2726,9 +2733,9 @@
   },
   {
     "name": "the-quack-cli-gets-generated",
-    "hash": "425264821f998937",
-    "group_hash": "b62e0516238f534e",
-    "ask": "`quack` builds its command tree off the registry, with help from each `q.Doc`. [[spec/design_input/the-index-holds-the-model#the-registry-builds-each-surface]] asks it.\n\nA command then costs no hand-written verb.\n\n- `go test ./...` from the root passes\n- a case reads the help of a fake action off `quack --help`\n- `./RUNME.sh check` exits 0",
+    "hash": "42a601f409ac0836",
+    "group_hash": "bdcecf4ff613c42f",
+    "ask": "`quack` builds its command tree off the registry, with help from each `q.Doc`. [[spec/design_input/the-index-holds-the-model#the-registry-builds-each-surface]] asks it.\n\nA command then costs no hand-written verb.\n\n- `go test ./...` from the root passes\n- a case reads the help of a fake action off `quack --help`\n- a case runs a slow fake action, and reads `quack run` follow it and `--detach` answer at once\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -3445,9 +3452,9 @@
   },
   {
     "name": "ticket-verbs-become-actions",
-    "hash": "6d31ef2fc8837a9b",
-    "group_hash": "b62e0516238f534e",
-    "ask": "The `ticket` verbs become actions returning operations, each in shadow against its `cli.js` twin.\n\nAn agent calls the index, and parses no standard output.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
+    "hash": "8d775c1ad6aee1e0",
+    "group_hash": "bdcecf4ff613c42f",
+    "ask": "The `ticket` verbs become actions answering within the wait their caller sets, each in shadow against its `cli.js` twin.\n\nAn agent calls the index, and parses no standard output.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -3498,9 +3505,9 @@
   },
   {
     "name": "vehicle-verbs-become-actions",
-    "hash": "f213f9a3780a9e92",
-    "group_hash": "b62e0516238f534e",
-    "ask": "The `vehicle` and `stub` verbs become actions returning operations, in shadow against `cli.js`.\n\nEvery verb then answers through the index.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
+    "hash": "7742ec8dedc11d86",
+    "group_hash": "bdcecf4ff613c42f",
+    "ask": "The `vehicle` and `stub` verbs become actions answering within the wait their caller sets, in shadow against `cli.js`.\n\nEvery verb then answers through the index.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -3566,9 +3573,9 @@
   },
   {
     "name": "work-verbs-become-actions",
-    "hash": "cb300f938efae586",
-    "group_hash": "b62e0516238f534e",
-    "ask": "The `branch` verbs become work actions returning operations, and each runs in shadow against its `cli.js` twin.\n\nAn agent calls the index, and parses no standard output.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
+    "hash": "9291ce76a19162ac",
+    "group_hash": "bdcecf4ff613c42f",
+    "ask": "The `branch` verbs become work actions answering within the wait their caller sets, and each runs in shadow against its `cli.js` twin.\n\nAn agent calls the index, and parses no standard output.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
