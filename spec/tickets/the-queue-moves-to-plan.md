@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-red
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 depends_on: [the-tickets-topic-lands]
@@ -83,6 +83,18 @@ record:
     hand: box d7d70c069f441 · claude-code-remote
     hash_before: 4ea861630244956d5302df5592328b58086c84a7
     hash_after: 4ea861630244956d5302df5592328b58086c84a7
+  - step: design/review
+    hand: person
+    hash_before: 400c37251348d421c9cd8b85a0aff6bc6fd2e105
+    hash_after: 400c37251348d421c9cd8b85a0aff6bc6fd2e105
+    inputs:
+      - name: design/draft
+        hash: 901c79457eef0b11
+        size: 2994
+      - name: [[spec/tickets/open-tasks-come-from-work]]
+        hash: 797f76553282bfa6
+        size: 5566
+    def: 0f8c340e80e8ece6
 ---
 
 # Ask
@@ -177,8 +189,9 @@ The done lines and the test deciding each:
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
 
 # implement
 
