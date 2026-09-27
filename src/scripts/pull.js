@@ -22,6 +22,7 @@ import {
 } from "../engine/group.js";
 import { inHand } from "../engine/named.js";
 import { ephemeralPull } from "./ephemeral-pull.js";
+import { dropsClosedHolds } from "./ephemeral.js";
 import { rejected } from "./pull-gate.js";
 import { asksBless, blessKept } from "./pull-bless.js";
 import { dropHold, holdOf, writeHold } from "./guidance-hand.js";
@@ -107,6 +108,8 @@ export function pull(it, argv) {
   const took = as ? `${handOf(it)} · ${as}` : handOf(it);
   const hand = it.ownerSays ? `${took} · ${SAYS}` : took;
   const plainHand = took;
+  // A hold on a closed ticket leaves before the pull reads the hand. [[spec/design_output/pull#the-hand-and-the-hold]]
+  dropsClosedHolds(it.disk, it.root);
   const held = holdOf(it, hand);
   const who = { hand, plainHand, branch, group, held, oneStep: Boolean(as) };
   it.argv = rest;

@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -155,6 +155,15 @@ record:
         hash: b1d5d7b286e9be5f
         size: 907
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 035693a5ff2e121b318ba71e0c171312f9359cff
+    hash_after: 035693a5ff2e121b318ba71e0c171312f9359cff
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 todo: true
 ---
 
@@ -346,14 +355,19 @@ Rows for the implement step to fix in place:
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/engine/named.js src/scripts/ephemeral.js src/scripts/guidance-hand.js src/bridge/stop.js src/scripts/pull.js src/scripts/ticket.js src/extension/lib/lens.js spec/design_output/pull.md test/level0/holds-leave.test.js test/level0/ticket-verb.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files match the draft size, plus the lens and the older hold file readers the gate rows name
+- the change reaches the disk door alone, and every case runs over the fake disk
+- each changed reader links the hold chapter of `spec/design_output/pull.md`, which says the state decides
+- `stillHeld` in `src/engine/named.js` owns the rule, and every hold reader calls it
 
 ## tests-green
 

@@ -13,7 +13,7 @@ import {
   OFF,
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
-import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
+import { TICKETS } from "../../.claude/skills/level0/lib/folders.js";
 import { SESSION, tallied } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import {
@@ -429,14 +429,9 @@ function groupInHand(box) {
   }
 }
 
-function holdStands(box) {
-  try {
-    return box.disk
-      .list(join(box.work, HOLDS))
-      .some((one) => one.name.endsWith(".json"));
-  } catch {
-    return false;
-  }
+// A hold keeps the turn open while its ticket stands, so a closed ticket keeps none. [[spec/design_output/pull#the-hand-and-the-hold]]
+export function holdStands(box) {
+  return holdsIn(box.disk, box.work).length > 0;
 }
 
 function privateStands(box) {

@@ -223,6 +223,15 @@ pull refuses a second hand-out while a hold stands, and `ticket pull --drop`
 drops the hold with the leaf where it stands. The stop hook reads the
 folder, so a turn ending with a hold standing carries on.
 
+A hold stands while its ticket does. The readers stay pure, and the pull alone
+removes a file.
+
+| the hold | what the readers and the pull do |
+|---|---|
+| its ticket file reads `state: closed` | the readers skip it, and the next pull removes it before it reads the hand |
+| it names no path, as an ephemeral ticket's does | the readers read it |
+| its ticket file stands on another branch alone | the readers read it |
+
 A clear and a compaction each empty `reads` in every hold on the box, and the
 ticket and the step stay. So the next pull hands the notes again. For details,
 see [[spec/design_output/stop#the-context-hands-over]].
