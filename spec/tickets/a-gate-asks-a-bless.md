@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d7d8cca563b1 · claude-code-remote
@@ -105,6 +105,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 20 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d9b0d5dfcf · claude-code-remote
+    hash_before: c0c5cddc14c0679f1b03c1964481028af39b5447
+    hash_after: ce412af74363d9fae5816fd422e7497e768448c0
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-retro-reads-the-backlog.md:145:1: Sentence: A sentence holds 25 words. Cut this one in two."
 ---
 
 # Ask
@@ -144,7 +152,7 @@ src/scripts/pull.js handBack, which calls passed and then blessKept,src/scripts/
 <!-- every test the change adds, one a line, as a file and a test name -->
 <!-- the form is list -->
 
-test/level0/pull-bless.test.js an accept at a bless gate leaves the step on the gate,test/level0/pull-bless.test.js an agent at a desk without the bless file is refused the bless,test/level0/pull-bless.test.js an agent at a desk blesses where the bless file holds agent true,test/level0/pull-bless.test.js an agent on a cloud box blesses,test/level0/pull-bless.test.js a payload into an input chapter strips the bless,test/level0/pull-bless.test.js an edit off the engine puts the step back on the gate,test/level0/write-bless.test.js the write door refuses an agent's write to the bless file,test/level0/bash-bless.test.js the shell door refuses a command naming the bless file,test/level0/bash-bless.test.js the shell door refuses a command setting, exporting or unsetting a harness variable,test/level0/schema-bless.test.js the ticket schema admits bless on a gate
+test/level0/pull-bless.test.js an accept at a bless gate leaves the step on the gate,test/level0/pull-bless.test.js an agent at a desk without the bless file is refused the bless,test/level0/pull-bless.test.js an agent at a desk blesses where the bless file holds agent true,test/level0/pull-bless.test.js an agent on a cloud box blesses,test/level0/pull-bless.test.js a payload into an input chapter strips the bless,test/level0/pull-bless.test.js an edit off the engine puts the step back on the gate,test/level0/write-bless.test.js the write door refuses an agent's write to the bless file,test/level0/bash-bless.test.js the shell door refuses a command naming the bless file,test/level0/bash-bless.test.js the shell door refuses a command setting, exporting or unsetting a harness variable,test/contract/schema-bless.test.js the ticket schema admits bless on a gate
 
 ### answers
 
@@ -188,7 +196,7 @@ pass with findings
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh branch test test/level0/pull-bless.test.js test/level0/write-bless.test.js test/level0/bash-bless.test.js test/level0/schema-bless.test.js test/level0/sidebar.test.js
+./RUNME.sh branch test test/level0/pull-bless.test.js test/level0/write-bless.test.js test/level0/bash-bless.test.js test/contract/schema-bless.test.js test/level0/sidebar.test.js
 
 ### seen
 
@@ -219,14 +227,20 @@ the four review rows each meet a case: script targets, the button, a process fil
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft callers name, plus src/bridge/bless.js for the shell guard, panel.js and clicks.js for the button, the move of the schema case into test/contract, and a landing fix the hand-back met
+the doors the change reaches run on fakes in every level0 case, and the schema case reads the tracked schemas from test/contract
+each new function carries a pointer at the bless section of the pull design
+the bless path stands once in pull-bless.js, and the sidebar copy names folders.js beside it because the extension loads CommonJS
+the four review rows each stand fixed: the guard reads scripts under .se, the button draws off no schema, a process file passes the schema, and the guard reads HARNESS and CLOUD both
 
 ## tests-green
 
