@@ -122,7 +122,7 @@ export function placesIn(it, read, stood) {
   // A sentence todo stands in the queue as a row of its own, placed by its anchor and held by nobody. [[spec/design_output/stop#the-plan]]
   const all = [...ticketsIn(read), ...todoRows(plan)];
   // A row a standing branch holds belongs to the cloud, so it leaves this box's lists and stands at infinity. [[spec/design_output/pull#the-queue-is-an-outline]]
-  // A group trunk marks for the cloud belongs there with its tickets too, whatever its branch reads. [[spec/tickets/marked-groups-stand-in-the-cloud]]
+  // A group trunk marks for the cloud belongs there with its tickets too, whatever its branch reads. [[spec/tickets/marked-groups-stay-cloud]]
   const marked = new Set(
     all
       .filter((one) => fieldOf(one.text, CLOUD_MARK) === "true")

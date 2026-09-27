@@ -74,7 +74,7 @@ func PlacesIn(said []byte) (Places, error) {
 	}
 	out := Places{Queue: map[string]string{}, Cloud: map[string]bool{}, Todo: map[string]bool{}}
 	for _, one := range answer.Branches {
-		// A branch row stands for its group, and a merged one stands for a group off the cloud unless the queue places it there. [[spec/design_output/work#a-row-per-group]] [[spec/tickets/marked-groups-stand-in-the-cloud]]
+		// A branch row stands for its group, and a merged one stands for a group off the cloud unless the queue places it there. [[spec/design_output/work#a-row-per-group]] [[spec/tickets/marked-groups-stay-cloud]]
 		// A group's tickets inherit its cloud, because the branch carries them all. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 		cloud := !one.Merged || one.Queue == cloudPlace
 		if cloud {
@@ -90,7 +90,7 @@ func PlacesIn(said []byte) (Places, error) {
 	}
 	for _, one := range answer.Loose {
 		out.place(one)
-		// A loose row the queue places on the cloud is a marked group's, or one of its tickets. [[spec/tickets/marked-groups-stand-in-the-cloud]]
+		// A loose row the queue places on the cloud is a marked group's, or one of its tickets. [[spec/tickets/marked-groups-stay-cloud]]
 		if one.Queue == cloudPlace {
 			out.Cloud[one.Name] = true
 		}

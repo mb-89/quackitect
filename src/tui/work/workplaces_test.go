@@ -15,7 +15,7 @@ func TestThePlacesOffARootHoldingNoVerbAnswerWhy(t *testing.T) {
 	}
 }
 
-// A marked group the queue places on the cloud lights the letter on a merged branch or none, and its ticket inherits it. [[spec/tickets/marked-groups-stand-in-the-cloud]]
+// A marked group the queue places on the cloud lights the letter on a merged branch or none, and its ticket inherits it. [[spec/tickets/marked-groups-stay-cloud]]
 func TestARowPlacedOnTheCloudLightsTheLetter(t *testing.T) {
 	t.Parallel()
 	marked, err := PlacesIn([]byte(`{"branches":[{"name":"marked-group","merged":true,"queue":"∞","tickets":[{"name":"its-child","queue":"∞"}]}],"loose":[{"name":"bare-group","queue":"∞"},{"name":"free","queue":"1"}]}`))

@@ -1,6 +1,6 @@
 // A group trunk marks `cloud: true` stands on the cloud with its tickets,
 // whatever its branch reads, so the desk's count leaves them out.
-// [[spec/tickets/marked-groups-stand-in-the-cloud]]
+// [[spec/tickets/marked-groups-stay-cloud]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
