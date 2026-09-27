@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d7d8cca563b1 · claude-code-remote
@@ -101,6 +101,15 @@ record:
         exit: 1
         said: assertion, 8 test(s) fail on their own assertion
     def: 06865600120e8b38
+  - step: implement/change
+    hand: box d7da794434cd · claude-code-remote
+    hash_before: f27f6c9fc2b3d6e1663f6aaf5deb9d89aa274361
+    hash_after: 7c8c139709b0bba508abf2850e2976ebdbb79461
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: 21d63335f32dfcda
 ---
 
 # Ask
@@ -214,14 +223,20 @@ the design review row rides as retro-check-names-the-process, which lands the fi
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/engine/retro/backlog.js src/engine/retro/mint.js src/scripts/retro-collect.js src/scripts/retro.js spec/processes/retro.yaml test/level0/retro-backlog.test.js test/contract/retro-route.test.js test/level0/retro-mint.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, and the route test stands under test/contract, since it reads the tree
+the mint and backlog cases run on fakeDisk, fakeProc and fakeTrunk, and the contract case reads through the disk door
+backlog.js opens on a header naming this ticket, and each new function points at it
+closedIn stands once in retro-collect.js, and both cloudInto and the backlog verb call it
+the row the design review passes with lands as retro-check-names-the-process
 
 ## tests-green
 
