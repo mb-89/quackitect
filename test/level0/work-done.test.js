@@ -471,4 +471,9 @@ test("branch done closes on the branch alone, files the children and drops the m
   assert.equal(fieldOf(disk.read(on("a-child")), "group"), "big-move");
   const pushes = ranGit(outside).filter((one) => one.startsWith("git push"));
   assert.deepEqual(pushes, ["git push origin work/one-group"], "main takes no push");
+  assert.match(
+    said,
+    /Open the pull request over work\/one-group against main, with auto-merge on/,
+  );
+  assert.doesNotMatch(said, /branch merge/);
 });

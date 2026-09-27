@@ -3,16 +3,15 @@
 // [[spec/design_output/work#the-round-trip]]
 
 import { cloudHere, deskRefusal } from "../../.claude/skills/level0/lib/cloud.js";
-import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import {
   STAMP,
   saysGreen,
   shortOf,
   stampOf,
 } from "../../.claude/skills/level0/lib/runs.js";
+import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import { TODO as PARKED } from "../../.claude/skills/level0/lib/todo.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
-import { USAGE } from "./work-usage.js";
 import {
   askOf,
   CLOSED,
@@ -28,8 +27,8 @@ import {
   urgent,
   WORK_BRANCH,
   withEntry,
-  withField,
   withEveryTakeClosed,
+  withField,
   withHashAfter,
   withoutField,
 } from "../engine/group.js";
@@ -50,14 +49,12 @@ import {
   stepPathOf,
   takeable,
 } from "./pull.js";
-import { readyToMerge, review } from "./work-review.js";
 import { serving } from "./serve.js";
-import { handsStuck, readFree, stuckFirst, trigger } from "./work-free.js";
 import { fixRefuses } from "./work-fix.js";
-import { testVerb } from "./work-test.js";
-import { unblock } from "./work-unblock.js";
+import { handsStuck, readFree, stuckFirst, trigger } from "./work-free.js";
 import { list } from "./work-list.js";
 import { close, filesUp, marks, marksTrunk, merge, offTrunk } from "./work-merge.js";
+import { readyToMerge, review } from "./work-review.js";
 import {
   childrenHere,
   DONE,
@@ -72,6 +69,9 @@ import {
   waitsOf,
   workBranchHere,
 } from "./work-stands.js";
+import { testVerb } from "./work-test.js";
+import { unblock } from "./work-unblock.js";
+import { USAGE } from "./work-usage.js";
 
 export * from "./work-stands.js";
 
@@ -520,7 +520,10 @@ function leaves(it, branch, at, path, says, moved = []) {
     console.log(
       `${name} stands ${CLOSED}, and hands ${moved.join(", ")} to ${fieldOf(it.disk.read(path), GROUP) || "the top"}.`,
     );
-  console.log(`Run ./RUNME.sh branch merge ${name} from ${TRUNK}.`);
+  // The work skill opens the pull request, and the merge lands once the check stands green. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+  console.log(
+    `Open the pull request over ${branch} against ${TRUNK}, with auto-merge on, as the work skill says.`,
+  );
   return 0;
 }
 
