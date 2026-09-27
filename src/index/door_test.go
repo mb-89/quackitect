@@ -217,3 +217,10 @@ func TestTheDoorAnswersWhy(t *testing.T) {
 		t.Fatalf("why t/n answers %#v, %q", said.Result, said.Error)
 	}
 }
+
+func TestTheWhyVerbAsksTheName(t *testing.T) {
+	method, params := asked([]string{"why", "t/n"})
+	if method != "why" || string(params) != `{"name":"t/n"}` {
+		t.Fatalf("the verb asks %s with %s", method, params)
+	}
+}

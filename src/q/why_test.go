@@ -108,3 +108,22 @@ func TestWhyOfANameTheCatalogLacksRefuses(t *testing.T) {
 		t.Fatalf("why t/none answers %v", err)
 	}
 }
+
+type xOf struct {
+	X int `q:"c/x"`
+}
+
+type yOf struct {
+	Y int `q:"c/y"`
+}
+
+func TestWhyAnswersACycleOnce(t *testing.T) {
+	c := New()
+	DerivedIn(c, "c/x", 0, func(in yOf) int { return in.Y })
+	DerivedIn(c, "c/y", 0, func(in xOf) int { return in.X })
+	said := whyOf(t, NewStore(c, nil), "c/x")
+	back := said.Inputs[0].Why.Inputs
+	if len(back) != 1 || back[0].Why.Name != "c/x" || len(back[0].Why.Inputs) != 0 {
+		t.Fatalf("the walk reads %+v", said.Inputs)
+	}
+}

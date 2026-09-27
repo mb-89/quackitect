@@ -28,7 +28,7 @@ const (
 func main() {
 	argv := argsOf()[1:]
 	if len(argv) == 0 {
-		fmt.Fprintln(stderr, "usage: se-index <serve|find|notes|links|dangling|same|tickets|changes|reindex|standing> [words]\n       se-index call <method> <json params>")
+		fmt.Fprintln(stderr, "usage: se-index <serve|find|notes|links|dangling|same|tickets|changes|reindex|standing|why> [words]\n       se-index call <method> <json params>")
 		exits(2)
 	}
 
@@ -93,6 +93,11 @@ func asks(root string, argv []string) int {
 	if said.Error != "" {
 		fmt.Fprintln(stderr, said.Error)
 		return 1
+	}
+	// why prints the tree the design input draws. [[spec/design_output/model#quack-why]]
+	if found, ok := said.Result.(map[string]any); ok && argv[0] == "why" {
+		fmt.Println(found["text"])
+		return 0
 	}
 
 	out, err := json.MarshalIndent(said.Result, "", "  ")
@@ -189,6 +194,8 @@ func asked(argv []string) (string, json.RawMessage) {
 			}
 		case "links":
 			params["target"] = argv[1]
+		case "why":
+			params["name"] = argv[1]
 		case "same":
 			params["path"] = argv[1]
 		case "changes":

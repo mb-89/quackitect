@@ -406,6 +406,8 @@ func (one *door) answers(said call) (any, error) {
 	}
 
 	switch strings.ToLower(said.Method) {
+	case "why":
+		return one.store.Why(asked.Name)
 	case "files":
 		return Files(one.db)
 	case "read":

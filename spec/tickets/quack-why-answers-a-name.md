@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -96,6 +96,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, a test of src/q fails
+  - step: implement/change
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 93f419805eeceac247d56040da17227205c71761
+    hash_after: 93f419805eeceac247d56040da17227205c71761
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/sqlite-runs-pure-go.md:111:1: Sentence: A sentence holds 25 words. Cut this one in two."
 ---
 
 # Ask
@@ -244,11 +252,19 @@ Every new test fails on its assertion against a stub. `TestWhyAnswersEachKeyOfAF
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `src/q/why.go`, `answers` and `main`, which the draft names
+- the catalog is a fake of its own, and the door test runs a real door
+- `why.go` opens on a comment pointing at the model note
+- the parts of the answer stand in the model note, and the code points there
+- the stale state stands in the change, and the review row stands fixed
 
 ## tests-green
 
