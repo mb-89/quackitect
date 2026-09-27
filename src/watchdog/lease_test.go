@@ -123,6 +123,17 @@ func TestAHeartbeatRenewsTheLease(t *testing.T) {
 	}
 }
 
+func TestAHeldLeaseReadsBack(t *testing.T) {
+	dog, _, _ := dogOf(t, Settings{}, nil)
+	if _, held := dog.Lease("t/part"); held {
+		t.Fatal("a part holding no lease reads one")
+	}
+	dog.Hold("t/part", time.Minute)
+	if one, held := dog.Lease("t/part"); !held || one.Part != "t/part" || one.Term != time.Minute {
+		t.Fatalf("the held lease reads %+v, %v", one, held)
+	}
+}
+
 func TestAFaultWithNoErrorRaisesNoPanic(t *testing.T) {
 	dog, _, _ := dogOf(t, Settings{First: time.Second, Cap: time.Minute, Faults: 1, Window: time.Minute}, nil)
 	defer func() {

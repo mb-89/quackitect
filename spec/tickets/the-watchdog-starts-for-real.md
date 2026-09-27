@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -154,6 +154,15 @@ record:
         hash: 4494a4079413700d
         size: 620
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 0488d68da8a4a19b9489194bb27f5b7a51ee1cc7
+    hash_after: 0488d68da8a4a19b9489194bb27f5b7a51ee1cc7
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -305,14 +314,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/index/door.go src/index/beats.go src/index/beats_test.go src/watchdog/lease.go src/watchdog/lease_test.go spec/config/level0.json spec/config/level0.schema.json
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, and src/index/beats.go with its test, which hold the lease pieces so door.go stays under the file ceiling
+the lease case reads a real door over a temp tree, and the fault case runs over the store in memory
+beats.go points at the lease chapter of the model over each piece it adds
+the built-in spans stand in beats.go, and the tree values in spec/config/level0.json
 
 ## tests-green
 

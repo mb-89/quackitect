@@ -128,6 +128,8 @@
     "backoffCap": 60,
     "faults": 5,
     "window": 300,
+    "beat": 5,
+    "lease": 30,
     "deadlineDerived": 30,
     "deadlineFold": 30,
     "deadlineAction": 600

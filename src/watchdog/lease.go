@@ -92,7 +92,10 @@ func (d *Dog) Beat(part string) {
 
 // The lease a part holds, which a case reads. [[spec/design_output/model#a-lease]]
 func (d *Dog) Lease(part string) (Lease, bool) {
-	return Lease{}, false
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	one, ok := d.leases[part]
+	return one, ok
 }
 
 // An expired lease marks its part stale, and the next commit of the part clears it. [[spec/design_output/model#a-stale-mark]]
@@ -123,7 +126,11 @@ func (d *Dog) Fault(part string, err error) (time.Duration, bool) {
 	}
 	d.faults[part] = kept
 	if d.settings.Faults > 0 && len(kept) >= d.settings.Faults {
-		d.alarms[part] = Alarm{Part: part, Since: kept[0], Faults: len(kept), Error: err.Error(), Clears: "quack restart " + part}
+		said := ""
+		if err != nil {
+			said = err.Error()
+		}
+		d.alarms[part] = Alarm{Part: part, Since: kept[0], Faults: len(kept), Error: said, Clears: "quack restart " + part}
 		d.publish()
 		return 0, false
 	}

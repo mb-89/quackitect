@@ -647,6 +647,16 @@
           "unit": "seconds",
           "help": "The span the faults of an alarm fall inside."
         },
+        "beat": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The span between two beats of the index's work loop."
+        },
+        "lease": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The term a lease runs without a beat before its part reads stale."
+        },
         "deadlineDerived": {
           "type": "number",
           "unit": "seconds",

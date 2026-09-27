@@ -153,13 +153,11 @@ func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Li
 	return stop, listen, err
 }
 
-// The part the index holds its lease under. [[spec/design_output/model#a-lease]]
-const leasePart = "index"
-
 // Answers the door beside its stop, so a case reads the lease the work loop renews. [[spec/design_output/model#a-lease]]
 func opens(root, at string, catalog *q.Catalog, starts ...Start) (*door, func(), net.Listener, error) {
 	topics := registersTopics(catalog)
-	watchdog.Registers(catalog)
+	barks := watchdog.Registers(catalog)
+	beat, term := spanOf(root, "watchdog.beat", builtInBeat), spanOf(root, "watchdog.lease", builtInLease)
 	// The catalog check runs before the database opens, so a fault refuses the start. [[spec/design_output/model#the-index-resolves-in-passes]]
 	if faults := catalog.Check(); len(faults) > 0 {
 		said := make([]string, 0, len(faults))
@@ -181,6 +179,8 @@ func opens(root, at string, catalog *q.Catalog, starts ...Start) (*door, func(),
 	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
 	one.store, one.writers = q.NewStore(catalog), topics
+	one.dog = watchdog.New(time.Now, one.store, barks, watchdog.SettingsOf(root))
+	one.dog.Hold(leasePart, term)
 	// The scheduler hears every commit from here on, the IO modules' first ones too. [[spec/design_output/model#the-provider-kinds]]
 	scheduler := q.NewScheduler(one.store, func(run func()) { go run() }, func(name string, err error) {
 		fmt.Fprintln(stderr, "the run of", name, "did not commit:", err)
@@ -209,6 +209,7 @@ func opens(root, at string, catalog *q.Catalog, starts ...Start) (*door, func(),
 
 	go one.sweeps()
 	go one.guards()
+	beats := one.beats(beat)
 	go server.Serve(listen)
 	// The old API keeps its port, and /v1 stands on a port of its own. [[spec/design_output/model#surfaces]]
 	v1, served, err := one.servesV1()
@@ -225,6 +226,7 @@ func opens(root, at string, catalog *q.Catalog, starts ...Start) (*door, func(),
 	}
 	// The stop lets go of the database and the watch too, so a test's folder clears on Windows. [[spec/design_output/index#the-door-owns-the-database]]
 	stop := func() {
+		beats()
 		for _, one := range stops {
 			one()
 		}
@@ -302,6 +304,7 @@ func (one *door) sweeps() {
 	for range one.dirty {
 		time.Sleep(burstSettleDelay)
 		one.guard.Lock()
+		one.dog.Beat(leasePart)
 		one.settles()
 		one.guard.Unlock()
 	}
