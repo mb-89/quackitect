@@ -26,7 +26,7 @@ steps:
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
-group: open-tasks-land-in-shadow
+group: tui-shell-lands-in-shadow
 parent: the-tickets-topic-lands
 ---
 
@@ -69,3 +69,5 @@ parent: the-tickets-topic-lands
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The tickets topic leaves this reading to the window phase. The row at the queue's in-hand place is the one this box works now, and the window reshapes `Placed` there. [[spec/tickets/the-tickets-topic-lands]]
