@@ -5,7 +5,12 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { formatFaults, goEnvOf, goModulesIn } from "../../src/scripts/cli-go.js";
+import {
+  formatFaults,
+  goEnvOf,
+  goGate,
+  goModulesIn,
+} from "../../src/scripts/cli-go.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const ROOT = "/tree";
@@ -45,4 +50,28 @@ test("a formatter answering nothing leaves the check green", () => {
   assert.deepEqual(formatFaults("src/config", ""), []);
   assert.deepEqual(formatFaults("src/config", "\n  \n"), []);
   assert.deepEqual(formatFaults("src/config", undefined), []);
+});
+
+// A check passing with no Go passes nothing. [[spec/tickets/go-checks-need-go]]
+test("the Go gate on a box with no Go answers red and names the refusal", () => {
+  const said = [];
+  const run = () => {
+    throw new Error("spawn go ENOENT");
+  };
+  assert.equal(goGate({ go: "go", run, say: (line) => said.push(line) }), 1);
+  assert.match(said.join("\n"), /go stands nowhere/);
+});
+
+// [[spec/tickets/go-checks-need-go]]
+test("the Go gate runs the tests and the formatter at the root", () => {
+  const ran = [];
+  const run = (argv) => {
+    ran.push(argv);
+    return { exitCode: 0, stdout: "" };
+  };
+  assert.equal(goGate({ go: "go", run, say: () => {} }), 0);
+  assert.deepEqual(ran, [
+    ["go", "test", "./..."],
+    ["gofmt", "-l", "src"],
+  ]);
 });

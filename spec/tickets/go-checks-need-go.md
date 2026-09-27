@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -128,6 +128,19 @@ record:
         hash: 554bb47330e89572
         size: 356
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: af83981c19988ab82d0c9bd1389dc12b0f38363e
+    hash_after: af83981c19988ab82d0c9bd1389dc12b0f38363e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 4e285ca88c4e39a0
+        size: 1962
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -206,26 +219,31 @@ the first done_when line meets the no-Go gate case, and the check decides the se
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/go-tests.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/level0/go-tests.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both gate cases fail on their assertions, since goGate stands as a stub answering 0, which is what goHolds answers on a box with no Go today. The surprise: the formatter runs over src at the root, so the gate case pins that path, and formatFaults keeps its folder until the change drops it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the first done_when line meets the no-Go gate case, red on its assertion, and the check decides the second
+the gate takes its run door, and each case hands it a fake run, so no go binary runs
 
 # gate
 

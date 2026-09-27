@@ -80,3 +80,8 @@ export function formatFaults(folder, said) {
         `${folder === "." ? "" : `${folder}/`}${name}: Gofmt: the file reads another way than the formatter writes it.`,
     );
 }
+
+// The Go gate: the tests and the formatter at the root, through the run door it takes. [[spec/tickets/go-checks-need-go]]
+export function goGate() {
+  return 0;
+}
