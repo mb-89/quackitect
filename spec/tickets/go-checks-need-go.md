@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -162,6 +162,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: cedf23133fdcf50532200fcae78b7f6b8b33711c
+    hash_after: cedf23133fdcf50532200fcae78b7f6b8b33711c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 7 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
+    inputs:
+      - name: design/tests-red
+        hash: c1a2d73285bb128f
+        size: 613
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -307,26 +330,33 @@ the skip stands in skipOf alone, and goHolds hands it to goGate, as the gate not
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/go-tests.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The check no longer walks folders for Go modules, since one module stands at the root. goGate in cli-go.js runs go test at the root with the skip of the red tests, then gofmt over src, through the run door it takes. A box with no Go now answers red and says to run the tools verb, where it passed with nothing run. goHolds keeps its name and quiet flag, and hands the gate the outside run door.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the size list and the goHolds source case alone
+the gate takes its run door, and each case hands it a fake run
+goGate and goHolds point at spec/tickets/go-checks-need-go
+the skip stands in skipOf alone
 
 # accept
 
