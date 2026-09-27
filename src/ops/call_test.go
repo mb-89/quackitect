@@ -14,7 +14,7 @@ import (
 
 const (
 	quick    = 2 * time.Second
-	slow     = 50 * time.Millisecond
+	slow     = 250 * time.Millisecond
 	patience = 2 * time.Second
 )
 
