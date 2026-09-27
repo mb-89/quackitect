@@ -6,9 +6,7 @@
 const FOLDERS = ["spec/tickets", ".se/tickets"];
 // The hold folder of [[spec/design_output/pull#the-hand-and-the-hold]], owned by .claude/skills/level0/lib/folders.js and spelled again here because the extension bundles alone.
 const HOLDS = ".se/.runtime/hold";
-// The one-hand hold file, which folders.js owns beside the hold folder. [[spec/design_output/pull#the-hand-and-the-hold]]
-const HOLD = ".se/.runtime/hold.json";
-const HOLD_WATCHES = [`${HOLDS}/*.json`, HOLD];
+const HOLD_WATCHES = [`${HOLDS}/*.json`];
 const CLI = "src/scripts/cli.js";
 const COMMAND = "quackitect.ticket";
 // The names the pull reads a harness off, from [[spec/design_output/pull#the-hand-rule]].
@@ -200,13 +198,23 @@ function answerOf(ran) {
 }
 
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
-function holdsIn(names, readOf) {
+async function holdsIn(names, readOf) {
   const paths = (names ?? [])
     .filter((one) => one.endsWith(".json"))
     .map((one) => `${HOLDS}/${one}`);
-  return Promise.all([...paths, HOLD].map(readOf)).then((texts) =>
-    texts.map(parsedOrNull).filter(Boolean),
-  );
+  const holds = (await Promise.all(paths.map(readOf)))
+    .map(parsedOrNull)
+    .filter(Boolean);
+  const stands = await Promise.all(holds.map((one) => stillHeld(one, readOf)));
+  return holds.filter((_, at) => stands[at]);
+}
+
+// A hold stands while its ticket does, as the engine's stillHeld reads it. [[spec/design_output/pull#the-hand-and-the-hold]]
+async function stillHeld(hold, readOf) {
+  const path = String(hold?.path ?? "").trim();
+  if (!path) return true;
+  const text = await readOf(path);
+  return !text || fieldOf(text, "state") !== "closed";
 }
 
 function parsedOrNull(text) {
@@ -259,7 +267,6 @@ module.exports = {
   CLI,
   COMMAND,
   HARNESS,
-  HOLD,
   HOLDS,
   HOLD_WATCHES,
   answerOf,
