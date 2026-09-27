@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -172,6 +172,19 @@ record:
         hash: 095e262b0b5667dc
         size: 2735
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 903ffafe8dd8380d5b8e10e8e2c7661a2edcf496
+    hash_after: 903ffafe8dd8380d5b8e10e8e2c7661a2edcf496
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: f134a7899a5eeb1c
+        size: 3048
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -306,15 +319,16 @@ I assume a connector names the session tool and the pull request tool, so the sk
 
 All three cases fail on their own assertion, because neither skill file stands yet.
 
-One thing surprises me. No test under test/level0 reads a tracked file today, and this one reads both skills with node:fs. It reaches no door, so it stands as a check over the tree, and the verb list comes from the verbs table in cli.js, the one help prints.
+The test reads the real skill files through the disk door, so FakeDoorsInTest puts it under test/contract. The verb list comes from the verbs table in cli.js, the one help prints.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- each done_when line on the skills and the verbs meets a failing case, and the guidance pointer and the check stand as checkpoints
-- the test reaches no door: it reads two tracked files and imports the verbs table
+- each done_when line on the skills and the verbs meets a failing case
+- the guidance pointer and the check stand as checkpoints
+- the disk door is the one door the test reaches, and the contract folder holds real doors
 
 # gate
 
