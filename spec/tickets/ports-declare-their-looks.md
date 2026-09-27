@@ -114,11 +114,24 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [the-wiring-file-binds-ports]
+record:
+  - step: design/draft
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 37569899b2f7451ce68cda56c901050768699195
+    hash_after: 37569899b2f7451ce68cda56c901050768699195
+    inputs:
+      - name: ask
+        hash: 2224b695bf6460e9
+        size: 845
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -152,38 +165,70 @@ Every surface then reads one text off the registration, and no view or surface w
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Four pieces, following spec/design_output/model at a module is one file and the options.
+
+One, the options: src/q/q.go adds label, icon and looks to the registration, and the options q.Label, q.Icon and q.Looks beside q.Doc. A look is a named kind, type Look string, with the constants q.Count, q.Rows and q.State the options table names.
+
+Two, the fields: actionOf in src/q/action.go keeps the input type. A struct input answers one Field a exported field: its json name, its label tag and its doc tag. An input of another kind, such as a string, answers no fields.
+
+Three, the reading: a new src/q/looks.go adds type Presentation, holding Doc, Label, Icon, Looks and Fields, and Catalog.Presentation(name), which answers it off the registration. Every surface reads its text there.
+
+Four, the refusal: looks.go adds Catalog.Undescribed, which answers a fault of the new kind NoDoc for each registration with no doc and each action field with no doc tag, naming the registration's file and line and the field. Start in src/q/wiring.go appends these faults beside Load and Check.
+
+Weighed: the refusal runs in Start alone, against Check. Check runs under qtest, the door and the watchdog, so a doc fault there breaks every test catalog in the tree. Every production registration carries a q.Doc today, and nothing past the tests calls Start, so the refusal breaks the start cases alone. Assumed: an exposed name is every registration a module type holds, and a field is a field of an action's input. The output of an action answers requests, and carries no fields to describe, so the output tags wait for an action answering a typed result.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/q.go: registration, and the options Doc, Label, Icon and Looks
+src/q/action.go: actionOf, which keeps the input type
+src/q/wiring.go: Start, which appends the undescribed faults
+src/q/check.go: Kind, which gains NoDoc
+src/q/wiring_test.go: source and counter, which take a q.Doc
+src/q/start_test.go: labeller and the types of each start case, which take a q.Doc
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/q/looks_test.go: TestAPortCarriesItsLabelIconAndLook
+src/q/looks_test.go: TestTheStartRefusesAnActionWithNoDocNamingItsFileAndLine
+src/q/looks_test.go: TestTheStartRefusesAnInputFieldWithNoDocTag
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/q.go
+src/q/action.go
+src/q/check.go
+src/q/wiring.go
+src/q/looks.go
+src/q/looks_test.go
+src/q/wiring_test.go
+src/q/start_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened spec/design_output/model at a module is one file and the options, src/q/q.go, src/q/action.go, src/q/check.go, src/q/wiring.go Start and src/q/start_test.go, and checked each claim there
+the callers come off a grep for Start, Check and every registration outside src/q, which shows each production registration carrying a q.Doc
+each done_when line names its test: the three looks cases decide the port, the action and the field, and go test and the check decide the first and last
 
 ## tests-red
 
