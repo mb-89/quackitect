@@ -85,6 +85,7 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase2switch
 depends_on: [open-tasks-shadow-lands]
+cloud: true
 ---
 
 # Ask
