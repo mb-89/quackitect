@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -163,6 +163,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: b4c5e8b13c9e959fc2eec8cd47ef443d8cb0b14d
+    hash_after: b4c5e8b13c9e959fc2eec8cd47ef443d8cb0b14d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/watchdog passes
+      - name: check
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    inputs:
+      - name: design/tests-red
+        hash: 4494a4079413700d
+        size: 620
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -335,26 +358,33 @@ the built-in spans stand in beats.go, and the tree values in spec/config/level0.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/door_test.go src/watchdog/lease_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index builds its watchdog at the open and holds a lease under the part index. A ticker at watchdog.beat asks the work loop for a step, and each step of sweeps beats the lease. The ticker checks the leases itself, off the loop, so a hung loop lets its lease expire. A beat or lease the tree sets at zero takes a built-in span, since a ticker takes no zero. Fault with no error raises its alarm with an empty text. The gate points check-runs-off-the-loop and zero-beat-refuses-the-start ride this change, and index-lease-names-a-provider stays open.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, and beats.go beside door.go
+the lease case reads a real door over a temp tree, and the fault case reads the store in memory
+beats.go points at the lease chapter of the model
+the built-in spans stand in beats.go alone
 
 # accept
 
