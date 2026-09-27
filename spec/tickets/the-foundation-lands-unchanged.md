@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -113,6 +113,11 @@ record:
     hand: box d7d598fb92101 · claude-code-remote
     hash_before: c6021f4fa4bca79718b6f548ea7a06e21bdf603e
     hash_after: c6021f4fa4bca79718b6f548ea7a06e21bdf603e
+  - step: retro/cloud
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: e1bfbe89dc4606f72510ad888625dad36da8cf62
+    hash_after: 763068592f93fb08fca0a795a724c0d18c31a2d7
+reason: done
 ---
 
 # Ask
@@ -276,17 +281,28 @@ The run wrote this retro off its own window, because `retro collect` stood refus
 
 <!-- the form is list -->
 
+- 02:08, biome stands off the path, and the tools file names its place under the runtime folder
+- the box runs no Windows, so a Windows fault shows in the CI job alone
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- 02:05, sync met five conflicted files, and the merge kept both sides
+- 02:15, the Windows job failed two tests that build posix paths, and a fix landed
+- 02:17, the import rule refused a posix path import, and the test took posix off the path module
+- the three split warnings stand, and the door keeps them off every hand
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- no person step stands parked, and no ticket stands minted with no group
+- the handover names the branch at done, and the split warnings for a reader to clear
 
 # Discussion
 
