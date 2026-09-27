@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: open-tasks-land-in-shadow
 parent: the-tickets-topic-lands
+record:
+  - step: do
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: 32b33ba405ac219673815eecb82ca166c4291e32
+    hash_after: 32b33ba405ac219673815eecb82ca166c4291e32
+    why: the-tickets-topic-lands answers this ask
+reason: answered
 ---
 
 # Ask
