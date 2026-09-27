@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: sync
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -17,7 +18,6 @@ steps:
     from: anyone
     by: anyone
     input: ask
-    reads: [[spec/guidance/working]]
     checklist: ["every child is small enough to review whole, or is a group itself", "the children add up to the goal, and nothing of the goal stands outside them", "a child that waits on another names it under depends_on"]
     evidence:
       - name: children
@@ -26,8 +26,17 @@ steps:
   - name: children
     by: children
     on_fail: split
+  - name: accept
+    gate: does the work of every child add up to the goal, and does every command of the route pass
+    final: true
+    does: reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points
+    tags: ["review", "accept"]
+    input: ["ask", "children"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
   - name: retro
-    reads: [[spec/guidance/working]]
     to: retro
     steps:
       - name: notes
@@ -41,7 +50,7 @@ steps:
       - name: write
         does: writes the retro over the box's own window
         input: ["children", "notes"]
-        checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every number the change adds carries a name in one place, and a copy a technical reason forces says so beside it", "every header the change writes says what its file is for, and counts nothing"]
+        checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every number the change adds carries a name in one place, and a copy a technical reason forces says so beside it", "every header the change writes says what its file is for, and counts nothing", "the chapter carries the run's owner prompts and errors off the transcript, each with its time", "the chapter says the role, and carries no name, address or path of the box"]
         evidence:
           - name: done
             form: list
@@ -51,7 +60,7 @@ steps:
             says: what went well, and what made it go well
           - name: badly
             form: list
-            says: what did not, each with its moment in the log or the transcript
+            says: what did not go well, each error of the run and each owner prompt turning it, with its time
           - name: improve
             form: list
             says: how each bad line stops happening, named by its home
@@ -73,9 +82,7 @@ steps:
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
-process_hash: 94d924fb96257431
-depends_on: [the-engine-holds-the-route]
-step: sync
+process_hash: 5d4a884bfb2491ff
 record:
   - step: sync
     hand: box d7d8cca563b1 · claude-code-remote
@@ -88,6 +95,7 @@ record:
   - step: sync
     hand: box d7da794434cd · claude-code-remote
     hash_before: 1f2402558127390067e1cb890857e9d6213f6b61
+depends_on: ["the-engine-holds-the-route"]
 ---
 
 # Ask
@@ -121,6 +129,16 @@ A moved input marks exactly the steps that read it, and a process stays editable
 <!-- the form is checklist -->
 
 # children
+
+# accept
+
+<!-- reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
 
 # retro
 
