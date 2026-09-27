@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -132,6 +132,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 80c530f574bd8827ddd20430f2b78482ea691f72
+    hash_after: 80c530f574bd8827ddd20430f2b78482ea691f72
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/index fails
+    inputs:
+      - name: design/draft
+        hash: 78d6bc5b0523f970
+        size: 6491
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -292,26 +305,32 @@ each done_when line names its case: go test, TestTheManagerFoldsOpsAndTheWatchdo
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/index/manager_test.go src/quack/manager_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/index/manager_test.go
+src/quack/manager_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion over a stub manager.go that registers nothing and starts nothing. The stub alone makes go list show the package, so the fold case stays red on go list -deps of src/quack, which still names src/ops. Three of the four module cases lean on the step hook Start takes. The root case builds quack into a temp folder and asks why of session/alarms, so it holds unchanged through the implement step.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a failing case: the fold, the load with no other module and the writer of the three names, and go test and the check as commands
+the module cases run over an op table in memory and a work loop stepped by hand, and the root case runs the built binary over a temp root
 
 # gate
 
