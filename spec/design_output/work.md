@@ -556,7 +556,7 @@ them, in the order the score sets. [[spec/tickets/the-queue-is-a-score]]
 
 ## A dependency waits for trunk
 
-A branch meets its dependency once trunk carries the dependency's ticket closed:
+A branch meets its dependency once the dependency's ticket stands closed on trunk:
 
 | the dependency | the dependent |
 |---|---|
