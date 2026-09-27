@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 9c81edc6690b5a6fefe40c86e7fdadbb36febcd2
+    hash_after: 53120d5791dfe4a210d6a505d9e7344de319dca6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/ops passes
+      - name: check
+        exit: 0
+        said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
+    inputs:
+      - name: design/tests-red
+        hash: 28f78e33c9a88d43
+        size: 952
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -353,26 +376,33 @@ the deadline stands once, in spec/config/level0.json under watchdog.deadlineActi
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/ops/call_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every call of an action now runs through ops.Call. It starts a record in the book, runs the requests on a goroutine through q.Store.Deliver, and waits the span its caller hands. A call ending within the span answers its result or its reason. One running past it answers still running, with the handle, the fraction of requests answered, and the time gone by. The book wakes its waiters on each move, so Book.Wait and Book.WaitCaller answer the moment an operation ends, and ops/wait with no handle waits on the session's open operations. A writer queues behind the running one, and each writer's end starts the next. The q.Op option and Declared.Op leave, since every action now takes a record. The config holds one span, watchdog.deadlineAction, which takes the operation's 600 seconds.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the files stand within the size, plus src/q/send.go for Deliver and the projected command, both named at the gate
+the cases run over the memory keep, a moved clock and a fake accept, and reach no disk or git
+call.go opens on a header naming the model's section on a caller's wait
+the span stands once, in the config under the watchdog, and the schema carries its help line
 
 # accept
 
