@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -155,6 +155,23 @@ record:
         exit: 0
         said: "src/scripts/pull-hand-of.js:61:38: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
     def: 21d63335f32dfcda
+  - step: implement/tests-green
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: a5f7c20414ea24d5b17b7117862b2a27dd3d4a16
+    hash_after: a5f7c20414ea24d5b17b7117862b2a27dd3d4a16
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 28 test(s) pass in 2 file(s); green, src/tui passes
+      - name: check
+        exit: 0
+        said: "src/scripts/pull-hand-of.js:61:38: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
+    inputs:
+      - name: implement/tests-red
+        hash: d9cfbca89cb39c57
+        size: 1298
+    def: a27db29c1d1562f2
+reason: done
 ---
 
 # Ask
@@ -352,26 +369,43 @@ The row cases pass the file ceiling in the group test file, so they stand in a f
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/work-rows.test.js test/level0/lens.test.js src/tui/workplaces_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The work tab and the branch list now draw each ticket once, with what it waits on.
+
+| where | before | now |
+|---|---|---|
+| the work tab | a plan todo under its group drew again at the left | it draws once, where the index nests it |
+| a child row in the branch list | its step, even while it waits | the open tickets it waits on, else its step |
+| a group row | no word on a stale base | behind main, where its base stands short of trunk |
+| the ticket lens | a take over a ticket the cloud holds | no lens where the ticket or its group carries the cloud marker |
+
+The badge lines leave for phase two, as the owner answers. The commit door also reads the bare test command a leaf writes, so a leaf test counts for the change commit.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the tests-green commit touches no file past the change leaf
+- the fakes carry the listing and the lens
+- each case links this ticket
+- each fact stands once, and the note points at the code
+- the review rows stand as the change leaf lands them
 
 # Discussion
 
