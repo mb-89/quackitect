@@ -16,7 +16,7 @@ type Index struct {
 	commits []map[string]any
 }
 
-// The input families the index provides itself, per proposal (k) of [[spec/funnel/the-owner-rules-the-specs]].
+// The input families the index provides itself. [[spec/design_output/model#the-fake-index]]
 func New(t testing.TB, register func(*q.Catalog)) *Index {
 	t.Helper()
 	c := q.New()

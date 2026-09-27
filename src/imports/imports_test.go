@@ -56,7 +56,7 @@ func TestAModuleImportingAModulePasses(t *testing.T) {
 	analysistest.Run(t, dir, NoName, "quackitect/src/modules/work")
 }
 
-// [[spec/design_output/go-doors#the-build-checks-imports]]
+// [[spec/design_output/model#the-build-checks-imports]]
 func TestAModuleImportingOsIsNamed(t *testing.T) {
 	analysistest.Run(t, plant(t), OnlyQ, "quackitect/src/modules/nosy")
 }
