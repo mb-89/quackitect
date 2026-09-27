@@ -74,6 +74,22 @@ One piece of it.
 # Discussion
 `;
 
+// A route whose red pass ran before its final gate, the verdict written. [[spec/tickets/accept-reads-red-as-green]]
+const REDDENED = filled(
+  FINAL()
+    .replace(
+      "  - name: accept\n",
+      "  - name: tests-red\n    does: writes the failing cases\n    evidence:\n      - name: tests\n        form: command\n        expects: assertion\n        says: the cases fail\n  - name: accept\n",
+    )
+    .replace(
+      "# accept\n",
+      "# tests-red\n\n## tests\n\n./RUNME.sh test test/one.test.js\n\n# accept\n",
+    ),
+  "## verdict",
+  "accept",
+);
+const RED_RUN = "sh -c ./RUNME.sh test test/one.test.js";
+
 // A fix ticket the acceptance minted, standing open under it. [[spec/tickets/the-last-gate-accepts]]
 const FIX = `---
 kind: [[ticket]]
@@ -169,6 +185,38 @@ test("a rerun names the diff since its last verdict, and runs every command", ()
   assert.ok(
     ranGit(made.outside).some((one) => one.includes("./RUNME.sh lint")),
     "the hand-back runs every command field of the route",
+  );
+});
+
+// [[spec/tickets/accept-reads-red-as-green]]
+test("a final gate passes over a red pass whose cases now run green", () => {
+  const made = doors(standing(REDDENED), {
+    [RED_RUN]: { stdout: "green, 2 test(s) pass in 1 file(s)\n" },
+  });
+  heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+  const back = heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+
+  assert.doesNotMatch(back.said, /refused/, "the gate takes the verdict");
+  const text = made.disk.read(at("spec/tickets/a-child.md"));
+  assert.ok(
+    entriesOf(frontOf(text)).some((one) => one.step === "accept"),
+    "the record keeps the verdict",
+  );
+});
+
+// [[spec/tickets/accept-reads-red-as-green]]
+test("a final gate refuses a red pass whose cases still fail", () => {
+  const made = doors(standing(REDDENED), {
+    [RED_RUN]: { stdout: "assertion, 1 test(s) fail on their own assertion\n" },
+  });
+  heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+  const back = heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+
+  assert.match(back.said, /refused/, "the gate refuses the verdict");
+  assert.match(
+    back.said,
+    /tests under tests-red expects green/,
+    "the refusal names the red field",
   );
 });
 

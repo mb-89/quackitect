@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ urgent: true
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 4c1e65b584fa01839c9ae3d17863c20b4fc684c5
+    hash_after: 4c1e65b584fa01839c9ae3d17863c20b4fc684c5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 12 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:265:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: f5eeebc90c59b4ee
+        size: 667
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ Without it, `routeRun` in `src/scripts/pull.js` reruns the `tests` field under `
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-accept.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A final gate reruns every command field of the route. A red pass among them now reruns expecting `green` in place of `assertion`, because the green pass after it turns those cases green. So a standard-route ticket passes its acceptance again, and the rerun proves the red cases pass. The row stands in the final acceptance chapter of `spec/design_output/pull.md`.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: two cases in test/level0/pull-accept.test.js hold the pass and the refusal, and the file answers green
+- the change reveals one cleanup, the note accept-reruns-the-red-tests, which the retro closes onto this ticket
+- the fact stands once, in the final acceptance table of spec/design_output/pull.md, and the code points there
 
 # Discussion
 
