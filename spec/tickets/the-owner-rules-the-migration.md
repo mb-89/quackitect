@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
-todo: true
+state: closed
+todo: false
 step: decide
 steps:
   - name: decide
@@ -20,6 +20,17 @@ steps:
         says: why, in a line, or what the successor carries
 process: [[spec/processes/note]]
 process_hash: e02a0935ed78eb92
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: 4d7cc6fef3be3ba0ad5dc148f17c5dd5ff37ba89
+    hash_after: 4d7cc6fef3be3ba0ad5dc148f17c5dd5ff37ba89
+    inputs:
+      - name: ask
+        hash: 8025c09c1e2f6b05
+        size: 889
+    def: 9e2520e6318baf46
+reason: done
 ---
 
 # Ask
@@ -48,14 +59,16 @@ The owner rules four questions of the migration, and a rationale note carries ea
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+done
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+The four rulings stand in spec/rationales: the-index-drops-cgo, go-stands-as-one-module, git-stays-the-archive and the-cage-refuses-while-down, and the migration design input lists them under The settled rulings.
 
 # Discussion
 
