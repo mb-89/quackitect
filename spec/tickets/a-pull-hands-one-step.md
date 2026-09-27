@@ -77,12 +77,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-engine-holds-the-route
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d7d6cb0fb1105 · claude-code-remote
     hash_before: 0ed9f2304ae306816eb89b2a0d01107eaa9ff949
     hash_after: 0ed9f2304ae306816eb89b2a0d01107eaa9ff949
+  - step: design/review
+    hand: box d7d6cb0fb1105 · claude-code-remote · helper-2
+    hash_before: efb1c7dda5c5f9ce54ce3b734e77df85fffe55e8
+    hash_after: efb1c7dda5c5f9ce54ce3b734e77df85fffe55e8
 ---
 
 # Ask
@@ -173,6 +177,12 @@ Weighed: the formatter runs in the engine as text in and text out, so the pull s
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- `workAnswer` tells the hand to write the file: the builder names `--fields` there instead.
+- The ticket door refuses a write under Discussion too: the builder admits that chapter.
+- `formatted` runs on the payload fields alone, so it rewrites no line of another leaf.
+- The tab case belongs in `src/tui/work`, beside `work.go`, since the package stands there.
 
 # implement
 
