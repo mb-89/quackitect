@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -131,6 +131,19 @@ record:
         hash: 313be7c0f847c084
         size: 1574
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: c938df9cee1071e3c8e0a9cab462ece048f70785
+    hash_after: c938df9cee1071e3c8e0a9cab462ece048f70785
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: f5a11fbea75be2a5
+        size: 1778
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -210,26 +223,31 @@ the first two done_when lines meet the two queue-cloud cases, and the check deci
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/queue-cloud.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/level0/queue-cloud.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The marked-group case fails on its assertion, since cloudsIn stands as a stub answering no name. The branch-and-no-marker case passes already, since it asks for no name, and it holds the desk side once placesIn reads the marker. The surprise: the cloud set lived inside placesIn, so no case ever reached it without a git read.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the first done_when line meets the marked-group case, red on its assertion, the second meets the no-marker case, and the check decides the third
+cloudsIn reads the ticket texts a case plants, so no door stands in the case
 
 # gate
 

@@ -115,6 +115,11 @@ function ownTickets(held) {
   );
 }
 
+// The names the cloud holds, off the marker on each group ticket and no git ref. [[spec/tickets/the-queue-reads-the-marker]]
+export function cloudsIn(all) {
+  return new Set();
+}
+
 // The order the pull hands out, as an outline place a name. A person's open steps order first and count down, and the agent's takeable ones count up. [[spec/design_output/pull#the-queue-is-an-outline]]
 export function placesIn(it, read, stood) {
   const plan = planHere(it);
