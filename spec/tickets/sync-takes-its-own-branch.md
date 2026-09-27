@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 0e65d3bce77dde27
         size: 2352
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: d07ee270beb53d317101f8f0bebae243043042e2
+    hash_after: d07ee270beb53d317101f8f0bebae243043042e2
+    inputs:
+      - name: design/draft
+        hash: 0e65d3bce77dde27
+        size: 2352
+      - name: design/tests-red
+        hash: 2622c78095a29ba1
+        size: 659
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -289,8 +301,9 @@ Two cases fail on their own assertion: the diverged merge, and the conflict with
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
