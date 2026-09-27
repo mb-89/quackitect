@@ -20,10 +20,11 @@ import {
 } from "../../.claude/skills/level0/lib/trunk.js";
 import { CONFIG, fromJson, PROSE } from "../../.claude/skills/level0/lib/vale.js";
 import { readThrough } from "../bridge/findings.js";
-import { WORK_BRANCH } from "../engine/group.js";
+import { heldIn, TICKETS, WORK_BRANCH } from "../engine/group.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
+import { boxIdHere } from "./pull-hand-of.js";
 
 export const STDIN = 0;
 export const ZEROS = /^0+$/;
@@ -84,8 +85,7 @@ export function holds(
     if (!branch.startsWith(WORK_BRANCH)) continue;
     const hand = String(heldBy(one) ?? "");
     const holder = BOX.exec(hand)?.[1] ?? "";
-    if (holder && box && holder !== box)
-      return { code: 1, said: heldElsewhere(branch, hand) };
+    if (hand && holder !== box) return { code: 1, said: heldElsewhere(branch, hand) };
   }
 
   // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
@@ -106,6 +106,17 @@ export function cloudLeavesTrunk() {
     `Push your work branch. ${TRUNK} takes its work through`,
     "`./RUNME.sh branch merge <name>` on a desk, where the owner reads it first.",
   ].join("\n");
+}
+
+// The hand holding a work branch, off its group ticket at the remote tip. [[spec/tickets/one-writer-holds-a-branch]]
+export function heldBy(repo) {
+  return (ref) => {
+    const branch = String(ref?.remote ?? "").replace(HEADS, "");
+    if (!branch.startsWith(WORK_BRANCH)) return "";
+    const group = branch.slice(WORK_BRANCH.length);
+    const said = repo.run(["show", `origin/${branch}:${TICKETS}/${group}.md`], true);
+    return said.ok ? (heldIn(said.out)?.hand ?? "") : "";
+  };
 }
 
 // [[spec/tickets/one-writer-holds-a-branch]]
@@ -176,6 +187,8 @@ async function main() {
     stamp,
     carriedBy(git(outside, root)),
     inCloud(process.env),
+    heldBy(git(outside, root)),
+    boxIdHere({ root, method: root, join, disk: files }),
   );
   if (said.code !== 0) console.error(said.said);
   return said.code;

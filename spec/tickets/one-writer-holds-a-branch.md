@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: be19dc2209ff9a8e
         size: 770
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: 62ad8ae00aa1bb4d35f41b1cb2cbab5cd5b0a732
+    hash_after: 62ad8ae00aa1bb4d35f41b1cb2cbab5cd5b0a732
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -320,14 +329,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list: `prepush.js`, `pull-hand-of.js` and their two test files
+- `heldBy` reaches git through the repo it takes, and the cases hand it the fake repo
+- each read points at the ticket it serves
+- the refusal words stand once, in `heldElsewhere`
 
 ## tests-green
 

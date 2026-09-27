@@ -9,6 +9,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import {
   carriedBy,
+  heldBy as readsHold,
   holds,
   lintedBy,
   namesIn,
@@ -255,4 +256,27 @@ test("a push carrying no prose asks Vale nothing", () => {
   const outside = fakeProc();
   assert.deepEqual(lintedBy(outside, "/tree", "vale", fakeDisk())(["a.js"]), []);
   assert.deepEqual(outside.ran, []);
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("the hold reads the group ticket at the remote tip, and a trunk push or an unread ticket reads free", () => {
+  const held = `---\nkind: [[ticket]]\nstate: open\nrecord:\n  - step: sync\n    hand: ${HOLDER}\n    hash_before: ${SHA}\n---\n`;
+  const repo = fakeRepo([], { "spec/tickets/x.md": held });
+  const [work] = refsIn(toWork);
+  assert.equal(readsHold(repo)(work), HOLDER);
+  assert.deepEqual(repo.runs.at(-1), ["show", "origin/work/x:spec/tickets/x.md"]);
+  assert.equal(readsHold(repo)(refsIn(toTrunk)[0]), "");
+  assert.equal(readsHold(fakeRepo([], {}))(work), "");
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("a box's hold refuses a hand that names no box, and a hold naming no box refuses a box", () => {
+  assert.equal(
+    holds(refsIn(toWork), stamp(), () => [], false, heldBy(HOLDER), "").code,
+    1,
+  );
+  assert.equal(
+    holds(refsIn(toWork), stamp(), () => [], false, heldBy("person"), "myb0x").code,
+    1,
+  );
 });
