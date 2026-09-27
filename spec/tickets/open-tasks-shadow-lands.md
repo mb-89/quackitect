@@ -85,6 +85,7 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase2shadow
 depends_on: [the-foundation-closes-its-gaps]
+cloud: true
 ---
 
 # Ask
