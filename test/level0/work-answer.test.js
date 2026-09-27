@@ -66,14 +66,32 @@ test("a ticket on disk that origin lacks still draws a loose row with a place", 
   it.clock = fakeClock("2026-01-01T03:00:00.000Z");
   const said = answerOf(it);
 
-  assert.deepEqual(
-    said.loose.map((held) => held.name).sort(),
-    ["a-disk-only", "a-loose-one"],
-  );
+  assert.deepEqual(said.loose.map((held) => held.name).sort(), [
+    "a-disk-only",
+    "a-loose-one",
+  ]);
   const row = said.loose.find((one) => one.name === "a-disk-only");
   assert.equal(row.state, "open");
   assert.equal(row.step, "do");
   assert.equal("queue" in row, true, "the disk-only row takes a queue place too");
+});
+
+// The capture hears one real run, so a golden file holds what the Go port replays. [[spec/tickets/the-queue-moves-to-plan]]
+test("the capture hears the lists the queue sorts and the places it answers", () => {
+  const { it } = doors();
+  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
+  const caught = [];
+  it.capture = (said) => caught.push(said);
+  const answer = answerOf(it);
+
+  assert.equal(caught.length, 1);
+  const said = caught[0];
+  for (const key of ["persons", "held", "agents", "back", "all"]) {
+    assert.ok(Array.isArray(said[key]), `the capture carries ${key}`);
+  }
+  assert.equal(said.at.now, it.clock.now().getTime());
+  const loose = answer.loose.find((one) => one.name === "a-loose-one");
+  assert.equal(said.answer.get("a-loose-one"), loose.queue);
 });
 
 // The queue rides every answer, so the tab draws each row's place. [[spec/design_output/pull#the-queue-is-a-score]]
@@ -445,7 +463,8 @@ test("a todo anchored at the end or on a ticket stands before every ticket", () 
     .map((one) => Number(one.queue));
   assert.equal(todos.length, 4);
   for (const place of todos) {
-    for (const ticket of tickets) assert.ok(Number(place) < ticket, `todo ${place} before ticket ${ticket}`);
+    for (const ticket of tickets)
+      assert.ok(Number(place) < ticket, `todo ${place} before ticket ${ticket}`);
   }
 });
 

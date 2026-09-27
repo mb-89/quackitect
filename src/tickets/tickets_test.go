@@ -34,6 +34,22 @@ Two tickets that land as one.
 # children
 `
 
+// [[spec/tickets/the-queue-moves-to-plan]]
+func TestOfReadsTheWaitsAndTheFails(t *testing.T) {
+	flow := "---\nstate: open\ndepends_on: [a-first, \"a-second\"]\nrecord:\n  - step: do\n    returns: 2\n  - step: do\n    returns: 0\n  - step: review\n    returns: 1\n---\n"
+	one := Of("spec/tickets/one.md", "one", flow, 0)
+	if want := []string{"a-first", "a-second"}; !reflect.DeepEqual(one.DependsOn, want) {
+		t.Errorf("the waits read %v, and want %v", one.DependsOn, want)
+	}
+	if one.Fails != 2 {
+		t.Errorf("the fails read %d, and two hand-backs carry returns", one.Fails)
+	}
+	block := "---\nstate: open\ndepends_on:\n  - one\n  - two, three\n---\n"
+	if said := Of("spec/tickets/two.md", "two", block, 0).DependsOn; !reflect.DeepEqual(said, []string{"one", "two", "three"}) {
+		t.Errorf("the waits read %v off a list, and a comma splits a line", said)
+	}
+}
+
 func TestAskDropsComments(t *testing.T) {
 	text := "---\nkind: [[ticket]]\n---\n\n# Ask\n\nline one\n<!-- one row -->\nline two\n<!--\nmany rows\n-->\nline three\n\n# design\n\nnot the ask\n"
 	if said := Ask(text); said != "line one\nline two\nline three" {

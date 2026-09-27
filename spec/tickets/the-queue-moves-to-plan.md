@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/tests-red
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 depends_on: [the-tickets-topic-lands]
@@ -95,6 +95,15 @@ record:
         hash: 797f76553282bfa6
         size: 5566
     def: 0f8c340e80e8ece6
+  - step: implement/tests-red
+    hand: person
+    hash_before: 1a00aa0fac92da4157519552de22856b26a983e5
+    hash_after: 1a00aa0fac92da4157519552de22856b26a983e5
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    def: 06865600120e8b38
 ---
 
 # Ask
@@ -202,20 +211,27 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/work-answer.test.js src/plan/queue_test.go src/plan/outline_test.go src/plan/golden_test.go src/tickets/tickets_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its own assertion over stubs that answer nothing: the queue reads an empty list, the outline an empty map, and every compare reads even. The tickets case reads no waits and no fails, the golden case finds no file, and the capture case hears no run. The approach names a byte compare for a tie. The port folds the case first, because `localeCompare` sorts a capital beside its small letter, and a todo title carries capitals.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names: `src/plan`, `src/tickets`, and `test/level0/work-answer.test.js`
+- the tests reach no door: the Go cases read rows a caller hands in, and the capture case runs over the fake doors in `work-doors.js`
+- a comment in each new file names the ticket the change implements
+- every fact stands once: the row's fields in `src/plan/queue.go`, and the four words in `src/plan/outline.go`
+- the design review passes with no row
 
 ## change
 

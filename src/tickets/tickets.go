@@ -55,6 +55,9 @@ type Ticket struct {
 	Progress string `json:"progress"`
 	// The time the file last changed, off the file table, so a view sorts the newest done ticket first. [[spec/design_output/index#the-index-answers-the-tickets]]
 	Changed int64 `json:"changed"`
+	// The tickets this one waits on, and the hand-backs that failed on it, which the queue weighs. [[spec/tickets/the-queue-moves-to-plan]]
+	DependsOn []string `json:"depends_on"`
+	Fails     int      `json:"fails"`
 }
 
 // [[spec/tickets/the-tickets-topic-lands]]
