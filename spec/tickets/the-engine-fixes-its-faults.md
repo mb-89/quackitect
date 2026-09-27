@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: sync
+step: split
 cloud: true
 record:
   - step: sync
@@ -92,6 +92,15 @@ record:
   - step: sync
     hand: box d7e2385398cd · claude-code-remote
     hash_before: 469985e4e6e89b85e545bc0479617222c0afb143
+  - step: sync
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: ff04e84d71b1e5845bbdab14618f9a6ad2c5f792
+    hash_after: ff04e84d71b1e5845bbdab14618f9a6ad2c5f792
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-engine-fixes-its-faults already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -109,8 +118,9 @@ Done when every child closes through the command it names.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
