@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,24 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: e76d0a4d56d0380bca00b72b3c516b7e899ab461
+    hash_after: e76d0a4d56d0380bca00b72b3c516b7e899ab461
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 1 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:265:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: b7dca66abb6cb9be
+        size: 434
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -46,26 +64,32 @@ The push meets a clear lint, so `main` reaches the remote with the bridge draft 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/desk-start.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The comment that stood mid-file in `test/contract/desk-start.test.js` now stands in the file header, so the `CodeComment` rule finds nothing there and the push meets a clear lint. The case and its stub are unchanged. The ticket took a five-word name, because the mint took a six-word one the name rule refuses.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the comment moves into the header, and the lint and the test on the file answer clean
+- the change reveals no cleanup beyond the comment it moves
+- the change adds no fact: the moved line says what it said before, in the header
 
 # Discussion
 
