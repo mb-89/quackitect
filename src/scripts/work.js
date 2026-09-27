@@ -52,7 +52,7 @@ import {
 } from "./pull.js";
 import { readyToMerge, review } from "./work-review.js";
 import { serving } from "./serve.js";
-import { freeIn, trigger } from "./work-free.js";
+import { readFree, trigger } from "./work-free.js";
 import { fixRefuses } from "./work-fix.js";
 import { testVerb } from "./work-test.js";
 import { unblock } from "./work-unblock.js";
@@ -227,8 +227,7 @@ function take(it, name = "") {
     brief(mine.branch, mine.name, mine.hand, mine.text);
     return 0;
   }
-  const stand = standOf(it);
-  const standing = standingAll(stand);
+  const { stand, standing, trunk, free: all } = readFree(it);
   const open = stand.filter((one) => standing.get(one.branch) === TODO);
   // A branch sharing no ancestor with trunk reaches no sync, so the take says which it passes over. [[spec/design_output/work#the-listing-reads-git-once]]
   for (const one of stand.filter((held) => standing.get(held.branch) === ORPHAN)) {
@@ -240,9 +239,7 @@ function take(it, name = "") {
     return 0;
   }
 
-  const free = name
-    ? freeIn(stand, standing).filter((one) => one.branch === `work/${name}`)
-    : freeIn(stand, standing);
+  const free = name ? all.filter((one) => one.branch === `work/${name}`) : all;
   if (name && !free.length) {
     console.error(
       `work/${name} stands at no free ${TODO}. Run ./RUNME.sh branch list to read where it stands.`,
@@ -252,7 +249,9 @@ function take(it, name = "") {
   if (!free.length) {
     console.log(`Every branch at ${TODO} waits for another. Nothing to take.`);
     for (const one of open) {
-      console.log(`  ${one.branch} waits for ${waitsOf(one, standing).join(", ")}`);
+      console.log(
+        `  ${one.branch} waits for ${waitsOf(one, standing, trunk).join(", ")}`,
+      );
     }
     return 0;
   }

@@ -4,7 +4,8 @@
 // [[spec/design_output/work#a-stale-group-is-yours]]
 
 import { aged, parentsIn, STALE, spanOf } from "../engine/group.js";
-import { MS, ROUTINE, standingAll, standOf, TODO, waitsOf } from "./work.js";
+import { MS, ROUTINE, standingAll, TODO, waitsOf } from "./work.js";
+import { readWork, trunkOf } from "./work-stands.js";
 
 // The read carries the tip's own time, so the age costs no process. [[spec/design_output/work#the-listing-reads-git-once]]
 export function tipAge(one, now) {
@@ -38,6 +39,15 @@ export function freeIn(stand, standing, it = null, now = 0, trunk = new Map()) {
     .filter((one) => !waitsOf(one, standing, trunk).length);
 }
 
+// The branches free off one read of the refs and main, so a parent standing on main alone holds its child. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+export function readFree(it, now = 0) {
+  const read = readWork(it, true);
+  const standing = standingAll(read.stand);
+  const trunk = trunkOf(read.loose);
+  const free = freeIn(read.stand, standing, it, now, trunk);
+  return { stand: read.stand, standing, trunk, free };
+}
+
 // [[spec/design_output/work#a-stale-group-is-yours]]
 function staleHere(it, now, one, standing) {
   if (!it || !now || standing.get(one.branch) !== "held") return false;
@@ -58,9 +68,8 @@ export function freeNow(tickets, merged = new Set()) {
 export function trigger(it) {
   // The trigger reads the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
   it.git.fetch();
-  const stand = standOf(it);
   const now = it.clock ? it.clock.now().getTime() : 0;
-  const free = freeIn(stand, standingAll(stand), it, now).map((one) => one.branch);
+  const free = readFree(it, now).free.map((one) => one.branch);
 
   console.log(
     `${ROUTINE.name} runs ./RUNME.sh ticket pull on a cloud box, and the engine takes a branch there.`,
