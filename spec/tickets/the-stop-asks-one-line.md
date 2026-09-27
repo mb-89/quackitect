@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,24 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 317a6968d7f567026b417524fc80d939a52907b3
+    hash_after: 317a6968d7f567026b417524fc80d939a52907b3
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 29 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/queue-approach-sentence-split.md:61:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 83409f9560588a86
+        size: 656
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -49,26 +67,32 @@ The reply of a claim that stands tells the agent to write the answer again. So e
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/stop-said.test.js test/level0/stop-door.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The reply of a standing stop claim asks for the line stop: <reason> alone, because the answer before the call carries the report. The answer before the call streams as turn.said, and saidReport marks its report, so the lone line passes a-report-stands. The owner reads each answer once, and the cold probe stops repeating its canary.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and the reply case stands in test/level0/stop-said.test.js, as the Discussion says
+- the cleanup it reveals rides the probe's commit, which carries the login
+- the reply stands once, in claims in src/bridge/stop.js
 
 # Discussion
 
