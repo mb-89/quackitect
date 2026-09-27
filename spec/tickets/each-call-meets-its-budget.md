@@ -77,12 +77,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d7d8cca5d3cd · claude-code-remote
     hash_before: be3fa3f7d2b43883f8d204063e9413c537680b7a
     hash_after: be3fa3f7d2b43883f8d204063e9413c537680b7a
+  - step: design/review
+    hand: box d7d8cca5d3cd · claude-code-remote · helper-2
+    hash_before: e8e5d80d56770f1313586ed2ebe62f5809ff7cec
+    hash_after: e8e5d80d56770f1313586ed2ebe62f5809ff7cec
 ---
 
 # Ask
@@ -150,8 +154,12 @@ first
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- budget-fixture-grows-with-work: the draft times each call over the doors of test/level0/pull-doors.js, whose map carries one ticket and one group, so the test misses the growth the ask names; build the fixture with many tickets, holds and groups, and time each call at that size
+- budget-names-the-resolver-call: the draft names the resolver by the sibling ticket alone; name resolved and readsFor in src/scripts/guidance-hand.js as guidance-resolves-by-tags adds them, and time readsOf with handsAgain, since readsOf reads and hashes the notes while handsAgain compares arrays
+- budget-headroom-on-cloud-boxes: a wall-clock budget over fakes flakes on a loaded cloud box; set each budget with headroom over a measured median, and say the unit and the headroom in the help of spec/config/level0.schema.json
 
 # implement
 
