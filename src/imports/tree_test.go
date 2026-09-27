@@ -4,6 +4,7 @@
 package imports
 
 import (
+	"strings"
 	"testing"
 
 	"golang.org/x/tools/go/packages"
@@ -18,6 +19,9 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 		t.Fatal("the load answers no package")
 	}
 	for _, one := range loaded {
+		if strings.HasSuffix(one.PkgPath, ".test") {
+			continue
+		}
 		var imported []string
 		for path := range one.Imports {
 			imported = append(imported, path)

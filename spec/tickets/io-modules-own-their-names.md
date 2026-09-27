@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -135,6 +135,19 @@ record:
         hash: c21e482c59aaf856
         size: 5915
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: dbd629865e6fe85bdd99a364aab70ca5e636f029
+    hash_after: dbd629865e6fe85bdd99a364aab70ca5e636f029
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/files fails
+    inputs:
+      - name: design/draft
+        hash: 4bb243c676234557
+        size: 6140
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -273,26 +286,39 @@ each done_when line names its test: TestTheCoreWritesNoInputName decides the cor
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/files src/modules/clock src/modules/env
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/send_test.go
+src/modules/files/files_test.go
+src/modules/files/disk_contract_test.go
+src/modules/files/watch_contract_test.go
+src/modules/clock/clock_test.go
+src/modules/clock/clock_contract_test.go
+src/modules/env/env_test.go
+src/modules/env/env_contract_test.go
+src/index/core_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion over stubs that import no os: Send runs no request, the fakes hand no change, the minute reads 0, env commits nothing, and the core still writes files/a.md. The contract suites stand under the tag contract, so go test with -tags contract runs them red on both the fake and the real side. The surprise: the tree test read the generated <package>.test main of each module package as a module, which imports os and the package under test, so the test now skips those mains. The tests call q.NewStore(c, nil), so the implement of the-wiring-file-binds-ports drops the nil here too. Each module commits by its local names, and the loader binds them once the wiring lands.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a test that fails: TestTheCoreWritesNoInputName, TestADiskWriteComesBackThroughWatch, each module test and each contract suite, and go test and the check decide the rest as commands
+each IO module file carries its fake, FakeDisk, FakeWatch, FakeClock and FakeEnv, and each untagged test runs over the fake alone
 
 # gate
 

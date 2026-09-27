@@ -1,0 +1,23 @@
+// The index core writes no input name: files/, clock/ and env/ come from the
+// IO modules the wiring loads.
+// [[spec/design_output/model#io-modules-are-modules]]
+package main
+
+import (
+	"testing"
+
+	"quackitect/src/q"
+	"quackitect/src/watchdog"
+)
+
+func TestTheCoreWritesNoInputName(t *testing.T) {
+	c := q.New()
+	registersTopics(c)
+	watchdog.Registers(c)
+	read := q.NewStore(c, nil).Snapshot()
+	for _, name := range []string{"files/a.md", "clock/minute", "env/SE_ROLE"} {
+		if got := read.Read(name); got != nil {
+			t.Fatalf("the core writes %s, which reads %v", name, got)
+		}
+	}
+}
