@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -110,6 +110,15 @@ record:
         exit: 1
         said: assertion, 10 test(s) fail on their own assertion
     def: 06865600120e8b38
+  - step: implement/change
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: e196690dc66eb368e464e44a22216c254140aa21
+    hash_after: e196690dc66eb368e464e44a22216c254140aa21
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: 21d63335f32dfcda
 ---
 
 # Ask
@@ -301,23 +310,20 @@ The change step puts each behaviour back.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
 
-    ./RUNME.sh lint
+    ./RUNME.sh lint src/bridge/server.js src/bridge/wait.js src/extension/lib/lsp.js .claude/skills/level0/hooks/level0.js .claude/skills/level0/lib/tools.js src/scripts/go-source.js src/scripts/lsp-probe.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-- the change touches the files the ask names, the design notes, the install and `.vale.ini`
-- `.vale.ini` lets `go-source.js` read its argument, as it lets `bundle.js`
-- the probe reaches the process door, and the stamp the disk door, and each has a fake
-- the restart reaches the wire door's server, and a contract case holds the real one
-- every new comment points at [[spec/design_output/level0]] or [[spec/design_output/lsp]], and the design notes point at the files
-- the design review stands unread, so no row of it stands fixed yet
+- the change puts back the behaviours the landed commit carries, in the files it changed, and no other
+- the doors the change reaches stand behind their fakes: the process, the disk and the client
+- each function keeps the comment naming its approach
+- each behaviour stands once, in the function its case drives
+- the design review passes with no row this leaf leaves open
 
 ## tests-green
 

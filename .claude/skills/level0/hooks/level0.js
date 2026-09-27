@@ -296,7 +296,7 @@ function stamped(event, e) {
 }
 
 function waited(event, e) {
-  return event === "tool.call" && String(e?.tool ?? "") === WAIT_CALL && false;
+  return event === "tool.call" && String(e?.tool ?? "") === WAIT_CALL;
 }
 
 // A fall with no status, after the post ran the span, reads as the host's cut. A fault falls at once. [[spec/design_output/level0#the-bridge-says-it-falls]]

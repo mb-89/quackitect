@@ -17,7 +17,10 @@ export const BUILDS = {
 
 // The binary's folder, every tree package it imports, and the root module files, which pin every dependency. [[spec/tickets/go-code-shares-one-module]]
 export function foldersOf(files, root, folder) {
-  return [`${root}/${folder}`];
+  return [
+    ...goFoldersOf(files, root, folder).map((one) => `${root}/${one}`),
+    ...MODULE_FILES.map((one) => `${root}/${one}`),
+  ];
 }
 
 function stampOf(root, name) {
