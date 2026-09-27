@@ -77,7 +77,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: be3fa3f7d2b43883f8d204063e9413c537680b7a
+    hash_after: be3fa3f7d2b43883f8d204063e9413c537680b7a
 ---
 
 # Ask
@@ -99,32 +104,44 @@ Today the pull grows slower with each piece of work it carries, and nothing name
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+- `spec/config/level0.json` gains a `budget` key: `pull`, `handBack`, `resolver` and `stale`, each in milliseconds. `spec/config/level0.schema.json` declares each with its unit.
+- The pull is `pull` in `src/scripts/pull.js` handing out a leaf. The hand-back is the same verb under `--pass`.
+- The resolver is the function guidance-resolves-by-tags adds to `src/scripts/guidance-hand.js`, so this child waits on that one.
+- The query for stale steps is `handsAgain` over `readsOf` in `src/scripts/guidance-hand.js`. It answers whether the notes a held step reads moved since the take. The index query of the design input's chapter Evidence and stale steps takes its place once it stands.
+- `test/level0/budget.test.js` reads the budgets from the tracked config, drives each call over the fake doors of `test/level0/pull-doors.js`, and fails a call past its budget. A slow call turns the battery red, so the hand meets it at the check.
+- The engine code stays as it stands. The budget is a requirement a test holds.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+none: the change adds config keys and a test, and changes no function
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/budget.test.js the config names a time budget for the pull, the hand-back, the resolver and the query for stale steps,test/level0/budget.test.js each call meets its budget over the fixture
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: pull, handsAgain, readsOf, pull-doors, level0.json and its schema
+- the change calls no new function from engine code, so the callers list stands empty
+- each done_when line names a case in test/level0/budget.test.js, and the check line names ./RUNME.sh check
 
 ## review
 
