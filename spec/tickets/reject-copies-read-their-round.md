@@ -118,11 +118,20 @@ urgent: true
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 34d5b55f402412744df52d2ef9b01f92d9661648
+    hash_after: 34d5b55f402412744df52d2ef9b01f92d9661648
+    inputs:
+      - name: ask
+        hash: c2d9d8a68a724897
+        size: 824
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -167,38 +176,51 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Commit `34d5b55f` lets a stuck ticket move: the route check counts a copy read where its origin leaf is read. What stays is the input each copy hands on. `tests-red-2` reads `draft`, so its hand gets the first round, and the gate and implement read the first round alone.
+
+In `reworked` in `src/scripts/pull-gate.js`, a copy whose `input` names a sibling that also takes a copy reads that copy instead: `draft` becomes `draft-2`. Every step after the copies that reads a copied leaf by path gains the copy path beside it, so the gate and implement read every round.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/scripts/pull-gate.js`: `rejected` calls `reworked`, which rewires the copies
+- `.claude/skills/level0/lib/schema-route.js`: `slotFaults` reads the rewired route at every hand-back
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/pull-gate.test.js`: a reject's copy reads the copy of its sibling
+- `test/level0/pull-gate.test.js`: after a reject the gate and implement read both rounds
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/scripts/pull-gate.js`
+- `test/level0/pull-gate.test.js`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened `reworked`, `readIn`, `entryNamed` and the reject cases, and each claim stands there
+- the callers list names the reject and the route check
+- the first two `done_when` lines meet a case each, the schema-slots case holds the third, and the check decides the last
 
 ## tests-red
 
