@@ -24,6 +24,9 @@ func TestTheMinuteMovesOnTick(t *testing.T) {
 	if got := s.Snapshot().Read(Port); got != first {
 		t.Fatalf("the minute reads %v at start, not %d", got, first)
 	}
+	if fake.Now() != at {
+		t.Fatalf("the fake reads %v with no tick, not %v", fake.Now(), at)
+	}
 	fake.Tick(time.Minute)
 	if got := s.Snapshot().Read(Port); got != first+1 {
 		t.Fatalf("the minute reads %v after a tick, not %d", got, first+1)

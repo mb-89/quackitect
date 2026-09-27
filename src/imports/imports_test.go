@@ -13,14 +13,14 @@ import (
 )
 
 var planted = map[string]string{
-	"doors/disk/disk.go":     "package disk\n\nfunc Read() string { return \"\" }\n",
-	"doors/nosy/nosy.go":     "package nosy\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/doors/nosy imports quackitect/src/modules/work`\n\nfunc Name() string { return work.Name() }\n",
-	"modules/leaky/leaky.go": "package leaky\n\nimport \"quackitect/src/doors/disk\" // want `quackitect/src/modules/leaky imports quackitect/src/doors/disk`\n\nfunc Name() string { return disk.Read() }\n",
-	"modules/nosy/nosy.go":   "package nosy\n\nimport \"os\" // want `quackitect/src/modules/nosy imports os`\n\nfunc Name() string { return os.Getenv(\"NAME\") }\n",
-	"modules/work/work.go":   "package work\n\nimport \"quackitect/src/modules/names\"\n\nfunc Name() string { return names.Of() }\n",
-	"modules/names/names.go": "package names\n\nfunc Of() string { return \"work\" }\n",
+	"doors/disk/disk.go":       "package disk\n\nfunc Read() string { return \"\" }\n",
+	"doors/nosy/nosy.go":       "package nosy\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/doors/nosy imports quackitect/src/modules/work`\n\nfunc Name() string { return work.Name() }\n",
+	"modules/leaky/leaky.go":   "package leaky\n\nimport \"quackitect/src/doors/disk\" // want `quackitect/src/modules/leaky imports quackitect/src/doors/disk`\n\nfunc Name() string { return disk.Read() }\n",
+	"modules/nosy/nosy.go":     "package nosy\n\nimport \"os\" // want `quackitect/src/modules/nosy imports os`\n\nfunc Name() string { return os.Getenv(\"NAME\") }\n",
+	"modules/work/work.go":     "package work\n\nimport \"quackitect/src/modules/names\"\n\nfunc Name() string { return names.Of() }\n",
+	"modules/names/names.go":   "package names\n\nfunc Of() string { return \"work\" }\n",
 	"modules/greedy/greedy.go": "package greedy\n\nimport \"quackitect/src/modules/names\" // want `quackitect/src/modules/greedy imports quackitect/src/modules/names`\n\nfunc Name() string { return names.Of() }\n",
-	"tui/frame/frame.go":     "package frame\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/tui/frame imports quackitect/src/modules/work`\n\nfunc Title() string { return work.Name() }\n",
+	"tui/frame/frame.go":       "package frame\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/tui/frame imports quackitect/src/modules/work`\n\nfunc Title() string { return work.Name() }\n",
 }
 
 // [[spec/design_output/model#the-build-checks-imports]]

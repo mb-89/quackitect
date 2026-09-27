@@ -33,7 +33,7 @@ func NewFake(at time.Time) *FakeClock { return &FakeClock{} }
 
 func (one *FakeClock) Now() time.Time                                     { return time.Time{} }
 func (one *FakeClock) Every(time.Duration, func(time.Time)) (stop func()) { return func() {} }
-func (one *FakeClock) Tick(span time.Duration)                           {}
+func (one *FakeClock) Tick(span time.Duration)                            {}
 
 // The minute of a time, counted from the Unix epoch. [[spec/design_output/model#io-modules-and-their-fakes]]
 func Minute(at time.Time) int64 { return 0 }
