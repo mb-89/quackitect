@@ -10,6 +10,7 @@ import {
   CLOSED,
   fieldOf,
   frontOf,
+  isGroup,
   OPEN,
   recordIn,
   TICKETS,
@@ -18,6 +19,8 @@ import {
 } from "../engine/group.js";
 import { dropHold } from "./guidance-hand.js";
 import { processAt } from "./process.js";
+import { asksBless } from "./pull-bless.js";
+import { defOf, inputsOf } from "./pull-stale.js";
 import { roleOf } from "./pull-hand-of.js";
 import { landed, unlandedRows } from "./pull-landed.js";
 import { childrenSay, handOut, ticketsHere, withPersonStep } from "./pull-hand.js";
@@ -32,7 +35,7 @@ export { pushed, sentOut };
 // `more` carries what rides the pass commit beside the ticket: the changes its subject names, and the files it wrote, which a refused commit takes back. [[spec/design_output/pull#a-finding-rides-out]]
 export function passed(it, who, one, leaf, held, answered, more = {}) {
   const tip = one.private ? "" : tipOf(it);
-  let text = withEntry(
+  const text = withEntry(
     one.text,
     {
       step: leaf.path,
@@ -40,15 +43,32 @@ export function passed(it, who, one, leaf, held, answered, more = {}) {
       hash_before: held.hash,
       hash_after: tip,
       answered,
+      // [[spec/design_output/pull#an-input-marks-its-steps]]
+      inputs: inputsOf(it, one.text, leaf),
+      def: defOf(it, one.text, leaf),
     },
     it.front,
   );
   const changes = [`passes ${leaf.path}`, ...(more.changes ?? [])];
+  one.text = stepOn(it, one, leaf, text, changes, more.stays);
+  const finding = landed(it, one, changes, more.wrote ?? []);
+  if (finding) {
+    for (const at of more.wrote ?? []) it.disk.remove(at);
+    return unlanded(one, leaf, finding);
+  }
+  dropHold(it, who.hand);
+  const sent = sentOut(it, one, who.branch);
+  if (!sent.ok) return refusedPush(sent);
+  return onward(it, who, [`${one.name} ${changes.join(", ")}.`, ...sent.why]);
+}
 
+// The step past a leaf: the next leaf whose condition holds, a waiting child, or done. [[spec/design_output/pull#the-pass]]
+export function stepOn(it, one, leaf, before, changes, stays = false) {
+  let text = before;
   // A final gate's points leave the step on the gate, so it waits on them and reads again. [[spec/design_output/pull#the-final-acceptance]]
-  if (more.stays) changes.push(`waits at ${leaf.path}`);
-  let next = more.stays ? leaf : leaf.leaves[leaf.at + 1];
-  while (next && !more.stays) {
+  if (stays) changes.push(`waits at ${leaf.path}`);
+  let next = stays ? leaf : leaf.leaves[leaf.at + 1];
+  while (next && !stays) {
     const when = holdsHere(it, String(next.said.when ?? ""), frontOf(text), text);
     if (when.holds) break;
     text = withEntry(text, { step: next.path, skipped: true, why: when.why }, it.front);
@@ -78,17 +98,7 @@ export function passed(it, who, one, leaf, held, answered, more = {}) {
       changes.push(`closes ${DONE}`);
     }
   }
-
-  one.text = text;
-  const finding = landed(it, one, changes, more.wrote ?? []);
-  if (finding) {
-    for (const at of more.wrote ?? []) it.disk.remove(at);
-    return unlanded(one, leaf, finding);
-  }
-  dropHold(it, who.hand);
-  const sent = sentOut(it, one, who.branch);
-  if (!sent.ok) return refusedPush(sent);
-  return onward(it, who, [`${one.name} ${changes.join(", ")}.`, ...sent.why]);
+  return text;
 }
 
 // A design review passing with findings mints a draft child a row on the trivial route, and every child is built before any is written. The children ride the parent's pass commit. A gate's points stand open at the front of the queue. [[spec/design_output/pull#a-finding-rides-out]]
@@ -97,7 +107,8 @@ export function minted(it, who, one, leaf, held, findings, answered) {
   const route = processAt(it.disk, it.method ?? it.root, it.join, CHILD_ROUTE);
   if (route.why) return unminted(one, leaf, route.why);
   const folder = one.private ? NOTES : TICKETS;
-  const group = fieldOf(one.text, "group");
+  // A group's own gate mints into that group, so its points stand among the children the pull reads. [[spec/design_output/pull#a-finding-rides-out]]
+  const group = fieldOf(one.text, "group") || (isGroup(one.text) ? one.name : "");
   const built = [];
   for (const { name, line } of findings) {
     const path = `${folder}/${name}.md`;
@@ -115,7 +126,7 @@ export function minted(it, who, one, leaf, held, findings, answered) {
   return passed(it, who, one, leaf, held, answered, {
     changes: [`mints ${names}`],
     wrote: built.map((child) => child.at),
-    stays: leaf.final,
+    stays: leaf.final || asksBless(leaf),
   });
 }
 

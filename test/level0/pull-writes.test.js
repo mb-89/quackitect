@@ -48,6 +48,7 @@ test("a pass with findings stages its children, the ticket and the hand's own pa
     GROUP_NOTE,
     {
       [at("spec/processes/trivial.yaml")]: ROUTE,
+      [at("src/mine.js")]: "export const one = 1;\n",
       [at(".se/.runtime/undo/99990101000000000000.json")]: journal(
         "a-child",
         "src/mine.js",

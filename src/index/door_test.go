@@ -224,3 +224,27 @@ func TestTheWhyVerbAsksTheName(t *testing.T) {
 		t.Fatalf("the verb asks %s with %s", method, params)
 	}
 }
+
+// The engine asks the door for the hash of a note, so the door answers the hashes method. [[spec/design_output/pull#an-input-marks-its-steps]]
+func TestTheDoorAnswersTheHashesOfThePathsAsked(t *testing.T) {
+	root := tree(t)
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	said, err := posts(standing, []string{"call", "hashes", `{"asks":[{"path":"src/plain.js","size":10}]}`})
+	if err != nil {
+		t.Fatal(err)
+	}
+	rows, ok := said.Result.(map[string]any)
+	one, found := rows["src/plain.js"].(map[string]any)
+	if !ok || !found || one["hash"] != "8f93e4f24776ff1d" || one["head"] != "e0ce802675de49b5" {
+		t.Fatalf("hashes answered %#v", said.Result)
+	}
+}

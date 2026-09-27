@@ -670,6 +670,34 @@ A gate carrying `final: true` reads the whole work, and the process closes on it
 
 The standard route carries its acceptance under `when: backlog`, which holds where the ticket names no group. So a process inside a delivery ends after implement, and the group route's acceptance after `children` reads it.
 
+## The bless
+
+A gate carrying `bless: true` waits for a bless after its verdict. [[spec/design_input/level-two#the-bless]] asks it, and `src/scripts/pull-bless.js` holds it.
+
+| the moment | what the engine does |
+|---|---|
+| an `accept` at the gate | records the verdict and leaves the step on the gate, as a final gate's points do |
+| a pull of the waiting gate | prints that the gate waits for a bless, and takes no hold |
+| `./RUNME.sh ticket bless <ticket>` | records `blessed` with the hash of what it blesses, and moves the step on |
+| an edit to a chapter the bless reads | `blessKept` drops the bless entry whose hash no longer matches, and the gate waits again |
+| a hand-out past a bless gate | `blessHolds` reads the hash again, and a bless that fails it puts `step` back on the gate |
+
+- `hashText` hashes the gate's own chapter, then the chapter of each leaf under its `input`.
+- `handBack` runs `blessKept` after it merges a payload. `blessHolds` catches an edit off the engine, a person's in the editor among them.
+
+| the hand | where it blesses |
+|---|---|
+| a person | anywhere |
+| an agent on a cloud box | where `inCloud` holds |
+| an agent at a desk | where `.se/.runtime/bless.json` holds `agent: true` |
+
+- The bless file stands outside the config, so no config verb and no variable reaches it.
+- The sidebar button writes it through a `bless` message in `src/extension/sidebar.js`.
+- The write door refuses an agent's write to the bless file.
+- The shell door refuses a command naming the bless file.
+- `HARNESS` in `src/scripts/pull-hand-of.js` names the variables naming the hand and the box.
+- The shell door refuses a command that sets, exports, unsets or clears one of them, off that one list.
+
 # A leaf comes back
 
 `ticket pull <ticket> --back <leaf>` puts a leaf back into the hand that
@@ -677,6 +705,30 @@ holds its record entry. The record names this hand on that leaf, or the pull
 refuses, so nobody takes another hand's work back. The pull writes a return with the
 reason, sets `step` to the leaf, commits, pushes and hands the leaf out again.
 So a hand fixes what the sweep names later through the one road there is.
+
+## An input marks its steps
+
+A passed leaf keeps the hash of each input and of its own definition. A pull finds the leaves whose hashes no longer match. [[spec/design_input/level-two#evidence-and-stale-steps]] asks it, and `src/scripts/pull-stale.js` holds it.
+
+| the record field | what it holds |
+|---|---|
+| `inputs` | one entry an input: its name, the hash, and the size of the text the hash reads |
+| `def` | `hashOf` over the leaf's entry in the process file |
+
+| the input | where its hash comes from |
+|---|---|
+| `ask`, or a leaf path | `hashText` over that chapter of the ticket |
+| a note link | the `hashes` method of the index, and `hashText` over the disk where the index stands dead |
+
+- An input matches where `hashText` over its first `size` bytes answers the hash. So an append keeps the steps reading it whole.
+- Any other input differs, and the pull marks each leaf reading it `stale` in the record, naming the input.
+- The first stale leaf takes `step`, and a leaf reading no moved input keeps its record.
+- Redoing a stale leaf moves its own chapter, so the next pull marks the leaves reading that chapter.
+
+| the process edit | what the pull does |
+|---|---|
+| a leaf past `step` | copies the new route onto the leaves ahead, as `updated` does |
+| a leaf at or before `step` | copies the new route, and sets `step` to the first leaf whose `def` differs |
 
 # Done leaves no takeable step
 

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -77,7 +77,54 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: design/draft
+step: implement/tests-green
+record:
+  - step: design/draft
+    hand: box d7d8cca563b1 · claude-code-remote
+    hash_before: 64523823009cf9c060fde1537507f05ec76fb700
+    hash_after: 64523823009cf9c060fde1537507f05ec76fb700
+  - step: design/review
+    hand: box d7d8cca563b1 · claude-code-remote · helper-2
+    hash_before: 7906727a23f0f93bccd2aab8805031d3c9868014
+    hash_after: 7906727a23f0f93bccd2aab8805031d3c9868014
+    returns: 1
+    why: "the desk guard leaves bless.agent open: `./RUNME.sh config bless.agent true` writes it through `settings.write` in .claude/skills/level0/lib/config.js, and the write door never sees that write; a shell write into .se/.runtime/config.json passes, since `FREE` in .claude/skills/level0/lib/bash.js frees every path under .se; the env layer answers bless.agent from `SE_BLESS_AGENT` through `varOf`, and the approach guards the `HARNESS` names alone, so an agent sets it on its own command line; the strip on an edit rests on src/scripts/pull-stale.js, which stands unbuilt, and the chapter says a merge where the ask says an edit; name the function that drops the bless and the ticket it waits on; the callers list leaves out spec/config/level0.schema.json, which needs the bless.agent entry the sidebar button draws, and the new src/scripts/pull-bless.js; `HARNESS` in src/extension/lib/lens.js copies the list in src/scripts/pull-hand-of.js; point the shell door at one list"
+  - step: design/draft
+    hand: box d7d8cca563b1 · claude-code-remote
+    hash_before: 64040d1db173ca87b25d8f6440d24a739f81d48d
+    hash_after: 64040d1db173ca87b25d8f6440d24a739f81d48d
+  - step: design/review
+    hand: box d7d8cca563b1 · claude-code-remote · helper-4
+    hash_before: 562b42d790624630618dc6a84a48234302f41c07
+    hash_after: 562b42d790624630618dc6a84a48234302f41c07
+  - step: implement/tests-red
+    hand: box d7d8cca563b1 · claude-code-remote
+    hash_before: d6dfdc6b40f22ef491f0416a0b350a2ab6ceb149
+    hash_after: d6dfdc6b40f22ef491f0416a0b350a2ab6ceb149
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 20 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d9b0d5dfcf · claude-code-remote
+    hash_before: c0c5cddc14c0679f1b03c1964481028af39b5447
+    hash_after: ce412af74363d9fae5816fd422e7497e768448c0
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-retro-reads-the-backlog.md:145:1: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: implement/tests-green
+    hand: box d7d9b0d5dfcf · claude-code-remote
+    hash_before: 2946d1d369e3dd827ec7aa937b1bb1d9bcc2a9d7
+    hash_after: 2946d1d369e3dd827ec7aa937b1bb1d9bcc2a9d7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 53 test(s) pass in 5 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-retro-reads-the-backlog.md:145:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -101,32 +148,39 @@ Today nothing tells a verdict from a bless, and an agent passes a gate the owner
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+For details, see [[spec/design_output/pull#the-bless]].
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/pull.js handBack, which calls passed and then blessKept,src/scripts/pull-writes.js passed, which leaves a bless gate on its step,src/scripts/pull-hand.js handOut, which calls blessHolds before a leaf past a bless gate,src/scripts/pull-bless.js blessKept, blessHolds and bless, which the change adds,src/scripts/ticket.js the verb table, which gains bless,src/extension/sidebar.js the message handler, which gains the bless message,src/bridge/write.js the write door, which refuses an agent's write to the bless file,src/bridge/bash.js onBash, whose check list gains the bless file guard and the harness guard,.claude/skills/level0/lib/bash.js FREE, which the bless file guard runs ahead of,spec/schemas/ticket.schema.yaml the step properties, which gain bless
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/pull-bless.test.js an accept at a bless gate leaves the step on the gate,test/level0/pull-bless.test.js an agent at a desk without the bless file is refused the bless,test/level0/pull-bless.test.js an agent at a desk blesses where the bless file holds agent true,test/level0/pull-bless.test.js an agent on a cloud box blesses,test/level0/pull-bless.test.js a payload into an input chapter strips the bless,test/level0/pull-bless.test.js an edit off the engine puts the step back on the gate,test/level0/write-bless.test.js the write door refuses an agent's write to the bless file,test/level0/bash-bless.test.js the shell door refuses a command naming the bless file,test/level0/bash-bless.test.js the shell door refuses a command setting, exporting or unsetting a harness variable,test/contract/schema-bless.test.js the ticket schema admits bless on a gate
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+the config verb writes bless.agent: the key leaves the config for its own file, which no config verb writes,a shell write under .se passes FREE: the shell door refuses a command naming the bless file, ahead of FREE,SE_BLESS_AGENT reaches the key through varOf: the bless file stands outside the config, so no variable maps to it,the strip leans on pull-stale.js: blessKept and blessHolds stand in pull-bless.js, and the chapter says edit,the callers miss pull-bless.js and the config schema: the callers name pull-bless.js, and the config schema drops out with the key,lens.js copies HARNESS: the shell guard reads the one list in pull-hand-of.js, and the copy in lens.js goes to the retro as a note
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+passed, handBack, handOut, HARNESS, FREE, the config write and varOf stand opened, and each claim checked there
+the callers list names each function the bless changes, pull-bless.js among them
+each done_when line maps to a test above: schema and wait, desk file, cloud and shell door, hash and strip
 
 ## review
 
@@ -135,8 +189,13 @@ Today nothing tells a verdict from a bless, and an agent passes a gate the owner
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- bless-guard-reads-scripts: the bless file guard and the harness guard in onBash read the command line alone, and scriptsIn and scriptWrites in .claude/skills/level0/lib/scripted.js pass a script under .se, so `node .se/scripts/x.js` writing .se/.runtime/bless.json or spawning `ticket bless` with CLAUDECODE deleted passes; run both guards over the targets writesAPath and scriptWrites resolve, ahead of FREE, and add a case for each
+- bless-button-draws-itself: the key leaves the config tree, so no level0.schema.json entry draws the sidebar button; name the file that draws it beside the `bless` kind in `took` in src/extension/sidebar.js, and add a case that the button writes the bless file
+- process-case-for-bless: the ask names spec/schemas/process.schema.yaml, which takes its steps by $ref from ticket.schema.yaml; the schema case reads a process file carrying bless on a gate, so it decides the line the ask names
+- cloud-list-reads-harness: inCloud reads CLOUD in .claude/skills/level0/lib/cloud.js, a second list beside HARNESS, and the one-list claim holds only while HARNESS carries every CLOUD name; point the guard at both, or derive one from the other
 
 # implement
 
@@ -147,20 +206,31 @@ Today nothing tells a verdict from a bless, and an agent passes a gate the owner
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/pull-bless.test.js test/level0/write-bless.test.js test/level0/bash-bless.test.js test/contract/schema-bless.test.js test/level0/sidebar.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+- Every case fails on its own assertion, and src/scripts/pull-bless.js stands as a stub so no import breaks.
+- The ticket schema stands in three places: spec/schemas/ticket.schema.yaml, SCHEMA in test/level0/pull-schema.js and TICKET_SCHEMA in test/level0/fixtures.js. The change adds bless to each, and a note takes the copies to the retro.
+- The write door calls box.biome.stands, so write-bless.test.js fakes biome.
+- A script under .se writes any .se path unread today, since scriptsIn drops the targets FREE admits.
+- schema-bless.test.js reads the tracked schemas off the disk, since the ask names those files.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the tests touch the files the draft names, and sidebar.test.js takes two cases at its end
+every door the tests reach runs on a fake from src/doors/fake, and biome takes one in write-bless
+the header of each new file links spec/design_output/pull#the-bless
+the bless file path stands once in pull-bless.js for the change to import
+the four review rows each meet a case: script targets, the button, a process file, HARNESS over CLOUD
 
 ## change
 
@@ -169,14 +239,20 @@ Today nothing tells a verdict from a bless, and an agent passes a gate the owner
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft callers name, plus src/bridge/bless.js for the shell guard, panel.js and clicks.js for the button, the move of the schema case into test/contract, and a landing fix the hand-back met
+the doors the change reaches run on fakes in every level0 case, and the schema case reads the tracked schemas from test/contract
+each new function carries a pointer at the bless section of the pull design
+the bless path stands once in pull-bless.js, and the sidebar copy names folders.js beside it because the extension loads CommonJS
+the four review rows each stand fixed: the guard reads scripts under .se, the button draws off no schema, a process file passes the schema, and the guard reads HARNESS and CLOUD both
 
 ## tests-green
 
@@ -185,26 +261,34 @@ Today nothing tells a verdict from a bless, and an agent passes a gate the owner
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/pull-bless.test.js test/level0/write-bless.test.js test/level0/bash-bless.test.js test/contract/schema-bless.test.js test/level0/sidebar.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A gate carrying bless true now waits after its verdict: the accept records the verdict and leaves the step on the gate, and the pull says the gate waits for a bless. The verb ticket bless records the hash of the gate chapter and its input chapters, and moves the step on. An edit to one of those chapters drops the bless, and the next hand-out puts the step back on the gate. A person blesses anywhere, an agent on a cloud box blesses, and an agent at a desk blesses where the bless file under .se/.runtime holds agent true. The sidebar button writes that file, the write door refuses an agent writing it, and the shell door refuses a command or a script under .se naming it or moving a variable that names the hand or the box. The schema case moves to test/contract, because it reads the tracked schema files. The landing now leaves out a journaled path that git knows nowhere, because a moved file broke the hand-back.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft callers name, plus the shell guard module, the panel and click modules for the button, and the landing fix the hand-back met
+every door the cases reach runs on a fake, and the schema case reads the tracked files from test/contract
+each new function carries a pointer at the bless section of the pull design
+the bless path stands once in pull-bless.js, and the sidebar copy names folders.js beside it
+the four review rows stand fixed, each with a case
 
 # Discussion
 

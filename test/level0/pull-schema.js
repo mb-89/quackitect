@@ -78,6 +78,9 @@ frontmatter:
           final:
             type: boolean
             description: whether this gate reads the whole work
+          bless:
+            type: boolean
+            description: whether this gate waits for a bless after its verdict
           asks:
             type: string
             description: the question a person answers
@@ -166,6 +169,32 @@ frontmatter:
           why:
             type: string
             description: the reason
+          blessed:
+            type: string
+            description: the hash a bless reads
+          stale:
+            type: string
+            description: the inputs that moved
+          def:
+            type: string
+            description: the hash of the definition
+          inputs:
+            type: array
+            description: one entry per input
+            items:
+              type: object
+              additionalProperties: false
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  description: the input
+                hash:
+                  type: string
+                  description: its hash
+                size:
+                  type: integer
+                  description: the length the hash reads
           answered:
             type: array
             description: one entry per command field

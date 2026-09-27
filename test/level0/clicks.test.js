@@ -220,3 +220,15 @@ test("the open press opens every group of the config section, and the shut press
     "every group shuts",
   );
 });
+
+// [[spec/design_output/pull#the-bless]]
+test("a click on the bless button asks the value it does not hold", () => {
+  assert.deepEqual(messageFor({ widget: "bless", key: "bless", value: "false" }), {
+    kind: "bless",
+    value: true,
+  });
+  assert.deepEqual(messageFor({ widget: "bless", key: "bless", value: "true" }), {
+    kind: "bless",
+    value: false,
+  });
+});

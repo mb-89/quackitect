@@ -430,6 +430,15 @@ func (one *door) answers(said call) (any, error) {
 		return nil, errorOf("no name called " + asked.Name)
 	case "texts":
 		return Texts(one.db, asked.Paths)
+	case "hashes":
+		// [[spec/design_output/pull#an-input-marks-its-steps]]
+		var ask struct {
+			Asks []HashAsk `json:"asks"`
+		}
+		if err := json.Unmarshal(said.Params, &ask); err != nil {
+			return nil, err
+		}
+		return Hashes(one.db, ask.Asks)
 	case "grep":
 		var ask GrepAsk
 		if err := json.Unmarshal(said.Params, &ask); err != nil {

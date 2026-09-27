@@ -9,7 +9,14 @@ import { LOG, PRIVATE, RETRO } from "../../.claude/skills/level0/lib/folders.js"
 import { STAMP, saysGreen, stampOf } from "../../.claude/skills/level0/lib/runs.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
-import { CLOSED, NOTE_END, TICKETS, fieldOf, isGroup, ticketNamed } from "../engine/group.js";
+import {
+  CLOSED,
+  NOTE_END,
+  TICKETS,
+  fieldOf,
+  isGroup,
+  ticketNamed,
+} from "../engine/group.js";
 import { BATTERY } from "../engine/retro/effect.js";
 import { medianParts } from "./battery.js";
 import { holdsAnywhere } from "./guidance-hand.js";
@@ -91,7 +98,12 @@ export function collect(it, name, again = false) {
   const kept = keptInto(it, into, again ? since : 0);
   const outside = outsideInto(it, into, since, window);
   const groups = cloudInto(it, into, since);
-  const refused = [...moved.refused, ...kept.refused, ...outside.refused, ...groups.refused];
+  const refused = [
+    ...moved.refused,
+    ...kept.refused,
+    ...outside.refused,
+    ...groups.refused,
+  ];
 
   const rows = [...linesOf(it, into), ...refused];
   it.disk.write(
@@ -106,43 +118,29 @@ export function collect(it, name, again = false) {
   );
   // The battery's report the retro opens on, kept one a retro, so the next effect step reads the two side by side. [[spec/guidance/retro/effect]]
   const report = keptReport(parsed(read(it, it.join(it.root, ...STAMP.split("/")))));
-  if (report) it.disk.write(it.join(home, BATTERY), `${JSON.stringify(report, null, 2)}\n`);
+  if (report)
+    it.disk.write(it.join(home, BATTERY), `${JSON.stringify(report, null, 2)}\n`);
 
   said(name, counts, outside.folders, since);
-  for (const one of groups.bare) console.log(`  ${one} closes with no retro text, so it writes nothing.`);
+  for (const one of groups.bare)
+    console.log(`  ${one} closes with no retro text, so it writes nothing.`);
   for (const one of refused) console.error(`  refused ${one.path}: ${one.refused}`);
   return stands(it) && !refused.length ? 0 : 1;
 }
 
-// Every group trunk takes closed since the window, its box's retro chapter and the time of the trunk commit landing it. The first-parent line reads the merge, so a group the box closes before the window and trunk takes after it still counts. [[spec/tickets/the-retro-reads-cloud-retros]]
+// Every group trunk takes closed since the window, its box's retro chapter and the time of the trunk commit landing it. [[spec/tickets/the-retro-reads-cloud-retros]]
 function cloudInto(it, into, since) {
   const out = { refused: [], bare: [] };
-  const log = it.git.run(
-    [
-      "log",
-      TRUNK,
-      "--first-parent",
-      "--diff-merges=first-parent",
-      "-G",
-      `^state: ${CLOSED}`,
-      `--format=${COMMIT_MARK}%H %cI`,
-      "--name-only",
-      ...(since ? [`--since=${new Date(since).toISOString()}`] : []),
-      "--",
-      TICKETS,
-    ],
-    true,
-  );
-  if (!log.ok) {
-    out.refused.push({ path: GROUPS, refused: log.err || "git log" });
+  const closed = closedIn(it, since);
+  if (!closed.ok) {
+    out.refused.push({ path: GROUPS, refused: closed.err });
     return out;
   }
   const at = it.join(into, GROUPS);
   const closesAt = it.join(at, CLOSES);
   const closes = parsed(read(it, closesAt)) ?? {};
   let wrote = false;
-  for (const [name, landing] of landingsOf(log.out)) {
-    if (since && Date.parse(landing.at) < since) continue;
+  for (const [name, landing] of closed.landings) {
     // A group the input holds already stays as the first pass takes it. [[spec/tickets/the-retro-reads-cloud-retros]]
     if (it.disk.exists(it.join(at, `${name}${NOTE_END}`))) continue;
     const path = `${TICKETS}/${name}${NOTE_END}`;
@@ -164,6 +162,31 @@ function cloudInto(it, into, since) {
   }
   if (wrote) it.disk.write(closesAt, `${JSON.stringify(closes, null, 2)}\n`);
   return out;
+}
+
+// Every ticket trunk takes closed since the window, and the trunk commit landing each. The first-parent line reads the merge, so a ticket a box closes before the window and trunk takes after it still counts. [[spec/tickets/the-retro-reads-the-backlog]]
+export function closedIn(it, since) {
+  const log = it.git.run(
+    [
+      "log",
+      TRUNK,
+      "--first-parent",
+      "--diff-merges=first-parent",
+      "-G",
+      `^state: ${CLOSED}`,
+      `--format=${COMMIT_MARK}%H %cI`,
+      "--name-only",
+      ...(since ? [`--since=${new Date(since).toISOString()}`] : []),
+      "--",
+      TICKETS,
+    ],
+    true,
+  );
+  if (!log.ok) return { ok: false, err: log.err || "git log", landings: new Map() };
+  const landings = [...landingsOf(log.out)].filter(
+    ([, landing]) => !since || Date.parse(landing.at) >= since,
+  );
+  return { ok: true, landings: new Map(landings) };
 }
 
 // The newest trunk commit naming each ticket, off a log of marked commit rows and the paths under each. [[spec/tickets/the-retro-reads-cloud-retros]]
@@ -196,7 +219,9 @@ function retroChapterOf(text) {
   const next = sections.findIndex((one, at) => at > found && one.level <= 1);
   const inside = sections.slice(found, next < 0 ? sections.length : next);
   if (!inside.some((one) => lines(one.own).length)) return "";
-  const kept = rows.slice(sections[found].line - 1, end).filter((row) => !COMMENT.test(row));
+  const kept = rows
+    .slice(sections[found].line - 1, end)
+    .filter((row) => !COMMENT.test(row));
   return `${kept.join("\n").trim()}\n`;
 }
 
@@ -204,7 +229,8 @@ function retroChapterOf(text) {
 export function keptReport(stamp) {
   const report = stamp?.battery;
   if (!report) return null;
-  const runs = Array.isArray(stamp.runs) && stamp.runs.length ? stamp.runs : [report.parts ?? {}];
+  const runs =
+    Array.isArray(stamp.runs) && stamp.runs.length ? stamp.runs : [report.parts ?? {}];
   const parts = medianParts(runs);
   const total = Object.values(parts).reduce((sum, ms) => sum + ms, 0);
   return { ...report, parts, total, runs: runs.length };

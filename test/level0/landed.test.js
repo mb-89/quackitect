@@ -102,6 +102,7 @@ test("a pass stages the ticket and the hand's own paths, and leaves a sibling's 
   const git = fakeGit({}, "/tree");
   const disk = fakeDisk({
     [AT]: WROTE,
+    "/tree/src/mine.js": "export const one = 1;\n",
     "/tree/.se/.runtime/hold/a-hand.json": JSON.stringify({
       ticket: "a-child",
       taken: "2026-01-02T00:00:00.000Z",
@@ -164,6 +165,8 @@ test("a pass leaves out a journaled path git ignores", () => {
   );
   const disk = fakeDisk({
     [AT]: WROTE,
+    "/tree/src/mine.js": "export const one = 1;\n",
+    [IGNORED]: "# Handover\n",
     "/tree/.se/.runtime/hold/a-hand.json": JSON.stringify({
       ticket: "a-child",
       taken: "2026-01-02T00:00:00.000Z",

@@ -12,6 +12,7 @@ import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { front } from "../doors/front.js";
+import { index } from "../doors/index.js";
 import { homeIn } from "./editor.js";
 import { handDoors } from "./pull-hand-of.js";
 import { readTools, whereIs } from "../engine/tools.js";
@@ -52,6 +53,8 @@ export async function doorsHere() {
     git: git(outside, roots.work),
     // [[spec/tickets/go-writes-the-frontmatter]]
     front: front(files, outside, roots.method),
+    // The stale read asks the index for the hash of a note. [[spec/design_output/pull#an-input-marks-its-steps]]
+    index: index(files, outside, time, roots.method, roots.work),
     log: log(files, time, {
       folder: join(roots.work, LOG_FOLDER),
       level: await said.ask("log.level"),

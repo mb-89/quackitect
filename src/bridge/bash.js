@@ -41,6 +41,7 @@ import { formIn, refusesIn, rowOf } from "../../.claude/skills/level0/lib/warnin
 import { WORK_BRANCH } from "../engine/group.js";
 import { DESCRIPTION_HOW, inHand, ticketFault, ticketOf } from "../engine/named.js";
 import { heldTests } from "../scripts/guidance-hand.js";
+import { blessGuard } from "./bless.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
 
@@ -51,6 +52,7 @@ export async function onBash(e, box) {
   const command = String(e?.command ?? "");
   const checks = [
     ticketDoor,
+    blessGuard,
     commandRules,
     privateDelta,
     testedDelta,

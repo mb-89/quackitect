@@ -32,6 +32,7 @@ import { noteRows, readsFor, readsOf } from "./guidance-hand.js";
 import { workAnswer } from "./pull-chapter.js";
 import { printPart } from "./pull-cap.js";
 import { acceptWaits } from "./pull-accept.js";
+import { blessWait, readAgain } from "./pull-bless.js";
 import { cleanupOf } from "./pull-cleanup.js";
 import { roleOf } from "./pull-hand-of.js";
 import { landedAlone } from "./pull-landed.js";
@@ -274,7 +275,7 @@ export function takeable(it, one, all = [], group = "") {
   if (dependsOn(front).some((dep) => !closedHere(it, all, dep))) return "";
   const path = stepPathOf(front);
   const leaf = leafOf(front, path);
-  if (!leaf || (leaf.final && acceptWaits(one, all))) return "";
+  if (!leaf || (leaf.final && acceptWaits(one, all)) || blessWait(one, leaf)) return "";
   // [[spec/tickets/the-one-answer-takes-shape]]
   // The session spawns the hand a helper leaf waits for, so a harness on the box holds the group. [[spec/tickets/the-spawn-answers-a-helper]]
   if (!writesHere(leaf, handRule(it, front, all, group, it.agent)).writes) return "";
@@ -294,10 +295,11 @@ export function offer(it, who, one, all) {
       : dependsOn(one.front).filter((dep) => !closedHere(it, all, dep));
   if (open.length) return { why: `waits for ${open.join(", ")}` };
 
-  const moved = advanced(it, one, all);
+  const moved = advanced(it, readAgain(it, one), all);
   if (moved.why) return { why: moved.why };
   if (!moved.leaf) return {};
-  if (moved.leaf.final && acceptWaits(one, all)) return { why: acceptWaits(one, all) };
+  const why = (moved.leaf.final && acceptWaits(one, all)) || blessWait(one, moved.leaf);
+  if (why) return { why };
   return admits(it, who, one, moved.leaf, all);
 }
 

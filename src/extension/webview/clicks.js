@@ -7,6 +7,8 @@ const GONE = "gone";
 
 export function messageFor(said, shift = false) {
   if (said?.widget === "action") return { kind: "run", key: said.key, runs: said.runs };
+  // [[spec/design_output/pull#the-bless]]
+  if (said?.widget === "bless") return { kind: "bless", value: said.value !== "true" };
   if (!said?.key) return undefined;
   // [[spec/design_output/extension#the-hook-button]]
   if (said.widget === "process")
@@ -53,7 +55,8 @@ export function picked(root, picks) {
 
 // One press opens or shuts every group the config tree holds. [[spec/design_output/extension#the-folds-press-at-once]]
 export function folded(root, open) {
-  for (const node of root.querySelectorAll("details.file, details.keys")) node.open = open;
+  for (const node of root.querySelectorAll("details.file, details.keys"))
+    node.open = open;
 }
 
 // [[spec/design_output/extension#a-click-becomes-a-message]]

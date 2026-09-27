@@ -8,7 +8,12 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { faultsOf } from "../../src/engine/retro/classes.js";
-import { askOf, mintFaults, promotionName, withAsk } from "../../src/engine/retro/mint.js";
+import {
+  askOf,
+  mintFaults,
+  promotionName,
+  withAsk,
+} from "../../src/engine/retro/mint.js";
 import { retro } from "../../src/scripts/retro.js";
 
 const ROOT = "/tree";
@@ -20,6 +25,10 @@ const RETRO = "retro-a1b2c3";
 const at = (path) => join(ROOT, ".se", ".retro", RETRO, ...path.split("/"));
 const TICKET = join(ROOT, "spec", "tickets", "the-land-verb-lands.md");
 const PROMOTED = join(ROOT, "spec", "tickets", "the-rule-lands.md");
+const ROUTES = {
+  [join(ROOT, "spec", "processes", "standard.yaml")]: "steps: []\n",
+  [join(ROOT, "spec", "processes", "trivial.yaml")]: "steps: []\n",
+};
 const DRAFT =
   "---\nkind: [[ticket]]\nstate: draft\n---\n\n# Ask\n\n<!-- gain, as text -->\n<!-- breaks, as text -->\n\n# design\n\n## approach\n";
 
@@ -34,6 +43,7 @@ const CLASS = {
   status: "open",
   ticket: {
     name: "the-land-verb-lands",
+    process: "standard",
     gain: "a commit lands in one call",
     breaks: "every commit costs a round of refusals",
     done_when: ["./RUNME.sh land answers 0 over a clean tree"],
@@ -49,6 +59,7 @@ const FIXED = {
 
 function doors(classes, promotions = []) {
   const disk = fakeDisk({
+    ...ROUTES,
     [at("classes.json")]: JSON.stringify({ classes, dispositions: {}, promotions }),
   });
   const proc = fakeProc({
@@ -58,7 +69,7 @@ function doors(classes, promotions = []) {
         return { exitCode: 0 };
       },
     [`${CLI} ticket open the-land-verb-lands`]: { exitCode: 0 },
-    [`${CLI} mint ticket spec/tickets/the-rule-lands.md --process=standard`]: () => {
+    [`${CLI} mint ticket spec/tickets/the-rule-lands.md --process=trivial`]: () => {
       disk.write(PROMOTED, DRAFT);
       return { exitCode: 0 };
     },
@@ -154,7 +165,12 @@ test("a promotion carrying no ticket mints nothing, and the verb names it by its
   const promotions = [
     { what: "the land rule", from: "memory", to: "spec/guidance/working" },
     { what: "", from: "memory", to: "spec/guidance/voice" },
-    { what: "a rule minted already", from: "memory", to: "spec/guidance/retro", tickets: ["the-land-verb-lands"] },
+    {
+      what: "a rule minted already",
+      from: "memory",
+      to: "spec/guidance/retro",
+      tickets: ["the-land-verb-lands"],
+    },
   ];
   const { code, said } = heard(() =>
     retro(ROOT, ["mint", RETRO], doors([FIXED], promotions)),
@@ -167,7 +183,10 @@ test("a promotion carrying no ticket mints nothing, and the verb names it by its
 });
 
 test("a promotion's name reads its what, and its place where the what stands empty", () => {
-  assert.equal(promotionName({ what: " the land rule " }, 0), 'promotion "the land rule"');
+  assert.equal(
+    promotionName({ what: " the land rule " }, 0),
+    'promotion "the land rule"',
+  );
   assert.equal(promotionName({}, 2), "promotion 3");
 });
 
@@ -176,12 +195,73 @@ test("a promotion's ticket stands checked by the mint alone, and classes read it
   const record = {
     classes: [],
     dispositions: {},
-    promotions: [{ what: "the land rule", from: "memory", to: "spec/guidance/working" }],
+    promotions: [
+      { what: "the land rule", from: "memory", to: "spec/guidance/working" },
+    ],
     limits: [],
     checklist: [],
   };
   assert.deepEqual(faultsOf(record, []), []);
-  assert.equal(mintFaults(record).length, 4);
+  assert.equal(mintFaults(record).length, 5);
+});
+
+// [[spec/tickets/the-retro-reads-the-backlog]]
+test("a promotion naming a process that stands nowhere is refused by its what", () => {
+  const promotion = {
+    what: "the land rule",
+    ticket: { ...CLASS.ticket, name: "the-rule-lands", process: "nowhere" },
+  };
+  const it = doors([], [promotion]);
+
+  assert.deepEqual(mintFaults({ classes: [], promotions: [promotion] }, it), [
+    'promotion "the land rule" waits, and its ticket names process nowhere: spec/processes holds no nowhere. It holds standard, trivial.',
+  ]);
+});
+
+// [[spec/tickets/the-retro-reads-the-backlog]]
+test("a class naming trivial mints a trivial ticket", () => {
+  const trivial = {
+    ...CLASS,
+    ticket: { ...CLASS.ticket, name: "the-rule-lands", process: "trivial" },
+  };
+  const it = doors([trivial]);
+
+  const { code, said } = heard(() => retro(ROOT, ["mint", RETRO], it));
+
+  assert.equal(code, 0, said);
+  assert.ok(
+    it.proc.ran.some((one) =>
+      one.argv.join(" ").endsWith("the-rule-lands.md --process=trivial"),
+    ),
+    "the mint names the class's process",
+  );
+});
+
+// [[spec/tickets/the-retro-reads-the-backlog]]
+test("a class naming no process is refused", () => {
+  const bare = { ...CLASS, ticket: { ...CLASS.ticket, process: "" } };
+  const it = doors([bare]);
+
+  const { code, said } = heard(() => retro(ROOT, ["mint", RETRO], it));
+
+  assert.equal(code, 1);
+  assert.match(said, /k1 stands open, and its ticket carries no process/);
+  assert.equal(it.proc.ran.length, 0, "nothing mints");
+});
+
+// [[spec/tickets/the-retro-reads-the-backlog]]
+test("a class naming a process that stands nowhere is refused", () => {
+  const lost = { ...CLASS, ticket: { ...CLASS.ticket, process: "nowhere" } };
+  const it = doors([lost]);
+
+  const { code, said } = heard(() => retro(ROOT, ["mint", RETRO], it));
+
+  assert.equal(code, 1);
+  assert.match(
+    said,
+    /k1 stands open, and its ticket names process nowhere: spec\/processes holds no nowhere/,
+  );
+  assert.equal(it.proc.ran.length, 0, "nothing mints");
 });
 
 // [[spec/tickets/the-retro-finishes-its-asks]]
@@ -192,6 +272,7 @@ test("every promotion mints one ticket with its ask, after the classes", () => {
     to: "spec/guidance/working",
     ticket: {
       name: "the-rule-lands",
+      process: "trivial",
       gain: "the owner states the rule once",
       breaks: "the owner repeats the rule the next day",
       done_when: ["spec/guidance/working holds the rule"],

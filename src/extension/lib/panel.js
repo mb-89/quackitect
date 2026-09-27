@@ -23,6 +23,7 @@ function panelHtml(model) {
     '<div class="top">',
     ...groups.map((one) => section(one)),
     "</div>",
+    blessButton(Boolean(model?.bless)),
     tree(model),
     `<script type="module" nonce="${nonce}" src="${escaped(model?.script ?? "")}"></script>`,
     "</body>",
@@ -57,6 +58,19 @@ function section(group) {
     "</div>",
     "</details>",
   ].join("\n");
+}
+
+// The button that lets an agent at this desk bless a gate, drawn off no schema entry. [[spec/design_output/pull#the-bless]]
+function blessButton(held) {
+  const says = held
+    ? "an agent at this desk blesses a gate"
+    : "a person alone blesses a gate at this desk";
+  return [
+    `<button class="widget bless${held ? " held" : ""}" data-key="bless" data-widget="bless"`,
+    ` data-value="${held}" title="${escaped(says)}">`,
+    `<span class="mark">${escaped(markOf("U+2713"))}</span>`,
+    "</button>",
+  ].join("");
 }
 
 // [[spec/design_output/extension#a-mark-alone-says-it]]
