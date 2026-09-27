@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: do
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -17,7 +18,6 @@ steps:
     by: anyone
     to: retro
     input: answer
-    reads: [[spec/guidance/working]]
     needs: ["branch test"]
     checklist: ["the change follows the answer, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     evidence:
@@ -33,8 +33,23 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
-process_hash: 1f3006ec4b044a89
-step: answer
+process_hash: d1a6e26348695e24
+record:
+  - step: answer
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: 073ee8bceb5f741069f3b62ef927ce9165d4395e
+    hash_after: 073ee8bceb5f741069f3b62ef927ce9165d4395e
+    inputs:
+      - name: ask
+        hash: 0aae906b76d1f73b
+        size: 961
+      - name: [[spec/tickets/the-queue-moves-to-plan]]
+        hash: ec8f43b68ad91062
+        size: 13436
+      - name: [[spec/tickets/rationale-drops-release-row]]
+        hash: baca88acba217ea8
+        size: 3558
+    def: 2280015d497a3abd
 ---
 
 # Ask
@@ -64,8 +79,9 @@ Open the file on `work/open-tasks-land-in-shadow` and cut the sentence at line 1
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+Split the sentence. The owner rules the split is the answer, and no change to the tests gate. The approach of the-queue-moves-to-plan now stands closed, so a hand writes the split there.
 
 # do
 
@@ -98,3 +114,14 @@ Open the file on `work/open-tasks-land-in-shadow` and cut the sentence at line 1
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The owner rules the split is the answer. The door keeps every agent out of `approach` and `seen`, closed ticket or open, so the owner's hand in the editor makes the split. In `spec/tickets/the-queue-moves-to-plan.md`:
+
+| the line | the text it takes |
+|---|---|
+| the approach, the row sentence | A row carries what the two read off a ticket. That is the name, the path, the group, the todo and the mark, then `depends_on`, the failed hand-backs and the plan's order. |
+| the approach, the capture sentence | `placesIn` in `src/scripts/work-answer.js` takes an optional `it.capture`. It hands the hook the free lists before the sort, the rows in hand and every row. It hands it the overrides, the add days, the weights, the clock and the answer too. |
+| tests-red, `seen` | Every new case fails on its own assertion over stubs that answer nothing. The queue reads an empty list, the outline an empty map, and every compare reads even. |
+| tests-red, `checked` | two items: the Go cases read the rows a caller hands in, and the capture case runs over the fake doors in `work-doors.js` |
+
+The `do` step passes on `./RUNME.sh lint spec/tickets/the-queue-moves-to-plan.md` once the split stands.

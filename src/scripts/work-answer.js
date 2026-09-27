@@ -140,22 +140,33 @@ export function placesIn(it, read, stood) {
     (one) => Boolean(heldIn(one.text)) || one.name === plan.working,
   );
   const free = open.filter((one) => !inHand.includes(one));
-  const persons = queued(free.filter(waitsOnPerson), all, at);
-  const agents = queued(
-    free.filter((one) => !waitsOnPerson(one) && takeable(it, one, all)),
-    all,
-    at,
-  );
-  const back = queued(
-    free.filter((one) => !waitsOnPerson(one) && !takeable(it, one, all)),
-    all,
-    at,
-  );
-  const out = outlineIn(persons, inHand, [...agents, ...back], all, overridesOf(plan));
+  const lists = {
+    persons: free.filter(waitsOnPerson),
+    agents: free.filter((one) => !waitsOnPerson(one) && takeable(it, one, all)),
+    back: free.filter((one) => !waitsOnPerson(one) && !takeable(it, one, all)),
+  };
+  const persons = queued(lists.persons, all, at);
+  const agents = queued(lists.agents, all, at);
+  const back = queued(lists.back, all, at);
+  const places = overridesOf(plan);
+  const out = outlineIn(persons, inHand, [...agents, ...back], all, places);
   for (const one of all) {
     if (onCloud.has(one.name) && fieldOf(one.text, "state") !== CLOSED)
       out.set(one.name, CLOUD_PLACE);
   }
+  // The capture hears the lists before the sort and the places after, so a golden file holds one real run the Go port replays. [[spec/tickets/the-queue-moves-to-plan]]
+  it.capture?.({
+    ...lists,
+    held: inHand,
+    all,
+    places,
+    at: {
+      now: it.clock ? it.clock.now().getTime() : 0,
+      weights: it.weights ?? {},
+      stood,
+    },
+    answer: out,
+  });
   return out;
 }
 

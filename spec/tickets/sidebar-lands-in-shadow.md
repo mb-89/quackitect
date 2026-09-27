@@ -191,3 +191,13 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The owner's word on the sidebar, for the split:
+
+- the plugin opens as a dumb little adapter
+- a value it cannot know yet draws as a question mark, the Work count among them
+- once the whole engine stands, the sidebar pulls the right values
+- the sidebar rebuilds nothing and restarts nothing
+- the same holds for every adapter
+
+Today the first draw waits on `./RUNME.sh tui work --count`, which can build the Go viewer before it answers. `counted` in `src/extension/sidebar.js` runs it, and `it.viewer()` in `src/scripts/tui.js` builds.
