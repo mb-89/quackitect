@@ -87,6 +87,7 @@ group: go-cage-switches-over
 A fault then shows on the first call, and gets fixed early.
 
 - a case stops the fake index, and reads a refusal naming `session/alarms`
+- a case lets the index fall while another writer appends to the session log, and reads every row kept. [[spec/tickets/the-hook-log-loses-lines]] shows the loss
 - `./RUNME.sh check` exits 0
 
 # design
