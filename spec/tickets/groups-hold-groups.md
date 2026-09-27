@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -151,6 +151,18 @@ record:
         hash: c76b3dbde22c5f22
         size: 5112
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: c0362c7dc22e6e55b701481cee32b40cf5f75962
+    hash_after: c0362c7dc22e6e55b701481cee32b40cf5f75962
+    inputs:
+      - name: design/draft
+        hash: c76b3dbde22c5f22
+        size: 5112
+      - name: design/tests-red
+        hash: 76adb2a2ca4b60c0
+        size: 1399
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -345,8 +357,10 @@ The Go cases read `person` through the JSON row, so a missing key reads false an
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- take-reads-the-parent-chain: `branch take`, the trigger and `pull-hand.js` call `freeIn` over `readWork(it)` with no trunk, so they miss an ancestor's wait and a parent standing on `main` alone. Only the dispatch reads the chain after this ticket.
 
 # implement
 
