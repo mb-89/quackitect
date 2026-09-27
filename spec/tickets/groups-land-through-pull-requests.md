@@ -118,11 +118,23 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [the-skills-start-the-workers, groups-hold-groups]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: c1e6be7fe17b7d12eec357b5ca71cd8aceb2bd88
+    hash_after: c1e6be7fe17b7d12eec357b5ca71cd8aceb2bd88
+    inputs:
+      - name: ask
+        hash: 349760fba59859ea
+        size: 1911
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 5a2557d24d86ab34
+        size: 13510
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -171,38 +183,74 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A worker lands its group through a pull request, and the verbs keep main untouched. Each part reuses a function standing already.
+
+1. The close. `leaves` in `src/scripts/work.js` drops the cloud marker on the branch copy through `marks(it, name, false)` from `src/scripts/work-merge.js`, in the same commit as the close. `ready` refuses a branch behind main, so the branch copy carries the marker main wrote. The filing of open children stands from groups-hold-groups. The verb pushes the branch alone.
+2. The skills. `.claude/skills/work/SKILL.md` ends on the pull request with auto-merge on, and `.claude/skills/dispatch/SKILL.md` opens its write branch the same way. Both stand from the-skills-start-the-workers, so this ticket checks them and adds nothing.
+3. The workflow. `.github/workflows/check.yml` takes `pull_request` on `main` beside `push`, and `test/contract/check-workflow.test.js` reads both triggers.
+4. The take. `stuckWhy` moves from `src/scripts/dispatch.js` into `src/scripts/work-free.js` as `stuckIn`, and the dispatch imports it. `take` in `src/scripts/work.js` reads each branch at done first. Where `stuckIn` answers behind or stale, it moves onto that branch through `onBranch`, and prints the ask: run `./RUNME.sh branch sync`, then `./RUNME.sh check`, then push. It writes no record, because the group stands closed.
+5. The refusal. `merge` in `src/scripts/work-merge.js` reads `git ls-remote origin refs/pull/*/head` once. Where a row carries the tip of `origin/work/<name>`, it refuses and names the pull request by its number.
+6. The notes. `spec/design_output/work.md` gives the round trip its pull request step. `AGENTS.md` and rule 13 of `spec/guidance/cloud/cloud.md` say the work skill opens the pull request. `spec/funnel/work-lands-through-pull-requests.md` leaves.
+
+I assume two boxes taking one stuck branch at once cost a duplicate sync and nothing more, because a sync is idempotent. A claim on a closed group reopens it, so the take writes none.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/work.js leaves: drops the marker
+- src/scripts/work.js take: hands a stuck branch first
+- src/scripts/dispatch.js planned: imports stuckIn in place of stuckWhy
+- src/scripts/work-merge.js merge: reads the pull refs
+- src/scripts/work-merge.js marks: called by leaves
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/work-done.test.js: branch done closes on the branch alone, files the children and drops the marker
+- test/contract/check-workflow.test.js: the check runs on a push and on a pull request against main
+- test/level0/work.test.js: branch take hands out a stuck hand-over first, and prints sync, check and push
+- test/level0/work-merge-cloud.test.js: branch merge refuses a branch a pull request carries, and names it
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/scripts/work.js
+- src/scripts/work-free.js
+- src/scripts/dispatch.js
+- src/scripts/work-merge.js
+- .github/workflows/check.yml
+- spec/design_output/work.md
+- AGENTS.md
+- spec/guidance/cloud/cloud.md
+- spec/funnel/work-lands-through-pull-requests.md
+- test/level0/work-done.test.js
+- test/contract/check-workflow.test.js
+- test/level0/work.test.js
+- test/level0/work-merge-cloud.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened leaves, ready and take in work.js, marks and merge in work-merge.js, stuckWhy in dispatch.js, check.yml and both skills
+- the callers list names every caller of stuckWhy, marks, leaves, take and merge
+- each done_when line maps to a case in the tests list, the skill lines stand met, and the notes and the check stand as checkpoints
 
 ## tests-red
 
