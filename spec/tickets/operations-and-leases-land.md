@@ -278,3 +278,6 @@ pass with findings
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- `ops/cancel` lands in this change, as `Book.Cancel`. It moves a `queued` or `running` operation to `cancelled`, per the states table. [[spec/tickets/op-moves-reach-the-log]]
+- The session log rows of kind `op` and `watchdog` wait on a Go writer of the session log. `lib/log.js` owns that log today, per [[spec/design_output/migration]]. Meanwhile the index pushes each move under `ops/<id>`.

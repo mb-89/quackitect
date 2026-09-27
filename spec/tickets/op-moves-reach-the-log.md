@@ -48,11 +48,15 @@ land the session log rows of kind `op` and `watchdog`, and `ops/cancel`. Otherwi
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +64,17 @@ land the session log rows of kind `op` and `watchdog`, and `ops/cancel`. Otherwi
 
 <!-- the form is text -->
 
+The parent's discussion takes both. `ops/cancel` lands with the Book the parent's implement step builds, since no Book stands before it. The rows of kind `op` and `watchdog` wait on a Go writer of the session log, which `lib/log.js` owns today. The change touches no code, so the check covers it.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: `ops/cancel` lands in the parent, and the log rows stand under what waits
+- the change reveals no cleanup
+- the parent's discussion holds both lines, and this ticket points there
 
 # Discussion
 
