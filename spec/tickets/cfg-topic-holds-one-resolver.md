@@ -82,7 +82,7 @@ group: read-topics-land-in-shadow
 
 # Ask
 
-The five readers [[spec/design_output/migration#the-duplications]] names read `cfg/` in shadow, off the config module [[spec/tickets/the-config-module-resolves-layers]] builds. A mismatch writes a `shadow` row.
+The five readers [[spec/design_output/migration#the-duplications]] names read each `<module>/config/` subtopic in shadow. The config module [[spec/tickets/the-config-module-resolves-layers]] builds answers them. A mismatch writes a `shadow` row.
 
 One key then answers one value, whoever reads it. [[spec/tickets/config-reads-differ-by-reader]] shows the cost today.
 

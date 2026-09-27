@@ -123,11 +123,12 @@ depends_on: [projections-read-the-mirror, the-manager-becomes-a-module, reads-re
 
 # Ask
 
-The config module stands under `src/modules/config`, loaded always, per [[spec/design_output/model#the-config-module]]. It owns every topic carrying the flag `config`, and resolves each key off its layers: override, context, environment, local, default and built-in. Its tests run through `qtest`.
+The config module stands under `src/modules/config`, loaded always, per [[spec/design_output/model#the-config-module]]. It owns every `<module>/config/<key>`, and resolves each key off its layers: override, context, environment, local, default and built-in. A declaring module names its keys locally, and reads them like any other input.
 
 A key then answers one value off one resolver, and a script's own values leave with the script, even on a crash.
 
 - `go test ./...` from the root passes
+- a case declares `weight` in a module, and reads `<module>/config/weight` as its input
 - a case lets a context's lease run out, and reads the layer below
 - a case nests two contexts, and reads the inner one win and hand back on exit
 - a case opens two unrelated contexts on one key, and reads the refusal naming the holder

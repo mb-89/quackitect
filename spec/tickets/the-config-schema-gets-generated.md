@@ -82,7 +82,7 @@ group: sidebar-lands-in-shadow
 
 # Ask
 
-`spec/config/level0.schema.json` comes off the `q.Cfg` registrations and the `q.Show` declarations. `spec/config/level0.json`, the default file, keeps the values someone sets alone. The `migration` switches stay in it, as shared keys the queue module registers.
+`spec/config/level0.schema.json` comes off the `q.Cfg` registrations and the `q.Show` declarations. `spec/config/level0.json`, the default file, keys by module and then by key, and keeps the values someone sets alone. The `migration` switches keep their block, as shared keys of the `migration` module.
 
 The schema then says what the code declares. It waits for this phase, because the extension's own keys leave JavaScript here.
 
