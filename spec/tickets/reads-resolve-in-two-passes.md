@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: b8e08227a453a005edb4d00a5acb5d17b3bbe527
+    hash_after: b8e08227a453a005edb4d00a5acb5d17b3bbe527
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes
+      - name: check
+        exit: 0
+        said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
+    inputs:
+      - name: design/tests-red
+        hash: 205ea49bec3293cf
+        size: 1067
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -330,26 +353,33 @@ the port name stands once in `portName`, and the down mark once in `Store.down`
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/start_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index now starts through `Start`, which loads the wiring, checks the catalog, and answers every fault at once in a `Refused` error. Each fault names its port as `<instance>.<port>`. Two writers of one standard name name both out-ports, and a type apart names both ports and both types. `Load` already named every writer before it bound an in-port, so a reader loaded before its writer binds. `Store.Down` marks an instance that runs nowhere. Its names then read their built-in value, `NotProvided` answers true, and `Why` reads the state `not provided`. The index manager calls `Down` on a crash in a later ticket.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft size names, and `src/q/start_test.go`
+every case runs over a catalog and a store in memory, so the change reaches no door
+each new function points at the design section on passes, the approach it implements
+the port name stands once in `portName`, and the down mark once in `Store.down`
 
 # accept
 
