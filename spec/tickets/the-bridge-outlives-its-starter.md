@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "src/scripts/pull-hand-of.js:61:38: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 1a1a1f91a95d1c90bfe2f15852e291356f0824f0
+    hash_after: 1a1a1f91a95d1c90bfe2f15852e291356f0824f0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "src/scripts/pull-hand-of.js:61:38: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
+    inputs:
+      - name: design/tests-red
+        hash: 61870ef475e8bd94
+        size: 1345
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -365,26 +388,43 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/serve.test.js test/contract/desk-start.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The bridge on a desk now outlives whatever starts it.
+
+| start | before | now |
+|---|---|---|
+| the hook button | a child of the editor, killed when the window goes | detached through the proc door, adopted again on the next open |
+| `./RUNME.sh serve` | a child of the shell | detached, and the verb returns; a second run finds it standing |
+| `./RUNME.sh serve --inspect` | a child of the shell | the same, because the debugger holds it |
+
+A start that falls inside its window names the line it writes to the serve log.
+
+The owner checks one thing on a Windows desk, since no case reads the editor job: press the hook button, close the editor, then ask `/health` on the bridge port. An answer there closes the job doubt, and silence sends the start through WMI next.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the tests-green commit touches no file past the change leaf
+- the proc and disk doors the start reaches carry fakes, and the contract case drives the real proc door
+- the comments link the sections that hold each road
+- the log read stands once in lib/log.js, and both roads call it
 
 # accept
 
