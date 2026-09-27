@@ -77,7 +77,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d7d8cca563b1 · claude-code-remote
+    hash_before: 64523823009cf9c060fde1537507f05ec76fb700
+    hash_after: 64523823009cf9c060fde1537507f05ec76fb700
 ---
 
 # Ask
@@ -101,32 +106,39 @@ Today nothing tells a verdict from a bless, and an agent passes a gate the owner
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+For details, see [[spec/design_output/pull#the-bless]].
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/pull.js handBack, which calls passed and withPayload,src/scripts/pull-writes.js passed, which leaves a bless gate on its step,src/scripts/ticket.js the verb table, which gains bless,src/extension/sidebar.js set, which the bless button calls,src/bridge/write.js the write door, which gains the bless key guard,src/bridge/bash.js onBash, whose check list gains the harness guard,spec/schemas/ticket.schema.yaml the step properties, which gain bless
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/pull-bless.test.js an accept at a bless gate leaves the step on the gate,test/level0/pull-bless.test.js an agent at a desk without bless.agent is refused the bless,test/level0/pull-bless.test.js an agent on a cloud box blesses,test/level0/pull-bless.test.js an edit to an input chapter strips the bless,test/level0/write-bless.test.js the write door refuses an agent's write to bless.agent,test/level0/bash-harness.test.js the shell door refuses a command setting a harness variable,test/level0/schema-bless.test.js the ticket schema admits bless on a gate
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+passed, handFaults, HARNESS, set, onBash and the verdict branch of handBack stand opened, and each claim checked there
+the callers list names each function whose behaviour the bless changes
+each done_when line maps to a test above: schema and wait, desk key, cloud and shell door, hash and strip
 
 ## review
 

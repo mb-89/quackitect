@@ -670,6 +670,24 @@ A gate carrying `final: true` reads the whole work, and the process closes on it
 
 The standard route carries its acceptance under `when: backlog`, which holds where the ticket names no group. So a process inside a delivery ends after implement, and the group route's acceptance after `children` reads it.
 
+## The bless
+
+A gate carrying `bless: true` waits for a bless after its verdict. [[spec/design_input/level-two#the-bless]] asks it, and `src/scripts/pull-bless.js` holds it.
+
+| the moment | what the engine does |
+|---|---|
+| an `accept` at the gate | records the verdict and leaves the step on the gate, as a final gate's points do |
+| a pull of the waiting gate | prints that the gate waits for a bless, and takes no hold |
+| `./RUNME.sh ticket bless <ticket>` | records `blessed` with the hash of what it blesses, and moves the step on |
+| a merge into a chapter the bless reads | drops the bless entry whose hash no longer matches, and the gate waits again |
+
+- `hashText` hashes the gate's own chapter, then the chapter of each leaf under its `input`.
+- A person blesses anywhere. An agent blesses on a cloud box, where `inCloud` holds.
+- An agent at a desk blesses where the local layer holds `bless.agent` as `true`. The sidebar button writes it through `set` in `src/extension/sidebar.js`.
+- The write door refuses an agent's write that moves `bless.agent` in `.se/.runtime/config.json`.
+- `HARNESS` in `src/scripts/pull-hand-of.js` names the variables naming the hand and the box.
+- The shell door refuses a command that sets, exports, unsets or clears one of them.
+
 # A leaf comes back
 
 `ticket pull <ticket> --back <leaf>` puts a leaf back into the hand that
