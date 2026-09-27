@@ -289,7 +289,7 @@ each done_when line names its test: go test and the check decide the first and l
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
 <!-- the form is list -->
 
-src/q/action_test.go,src/q/qtest/qtest_test.go,src/index/contract_test.go
+src/q/action_test.go,src/q/qtest/qtest_test.go,src/index/contract_test.go,src/imports/imports_test.go
 
 ### seen
 
