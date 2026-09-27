@@ -107,8 +107,8 @@ export function minted(it, who, one, leaf, held, findings, answered) {
   const route = processAt(it.disk, it.method ?? it.root, it.join, CHILD_ROUTE);
   if (route.why) return unminted(one, leaf, route.why);
   const folder = one.private ? NOTES : TICKETS;
-  // A group's own gate mints into that group, so its points stand among the children the pull reads. [[spec/design_output/pull#a-finding-rides-out]]
-  const group = fieldOf(one.text, "group") || (isGroup(one.text) ? one.name : "");
+  // A gate files its points into the group whose work it reads: a group's gate into that group, whatever parent its group line names, and a child's gate into the child's group. [[spec/design_output/pull#a-finding-rides-out]]
+  const group = isGroup(one.text) ? one.name : fieldOf(one.text, "group");
   const built = [];
   for (const { name, line } of findings) {
     const path = `${folder}/${name}.md`;
