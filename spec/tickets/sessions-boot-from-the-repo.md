@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -36,6 +37,45 @@ steps:
             form: list
             says: every file the approach touches, one a line
       - name: tests-red
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+      - name: draft-2
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red-2
         does: writes the tests the ask calls for
         tags: ["code", "testing"]
         needs: ["branch test"]
@@ -116,8 +156,6 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-cloud-works-its-queue
-step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -150,6 +188,13 @@ record:
         hash: 339ee683d0a385a5
         size: 2318
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: b0653205decb3411bc2de87b943e57db6942b91e
+    hash_after: b0653205decb3411bc2de87b943e57db6942b91e
+    returns: 1
+    why: The install writes the plugin manifest, which git ignores, and the client scans plugins as a session starts. So the session running the first install holds no level zero, and the draft names no road for it. A probe on a fresh clone decides the order.; The draft says the client reads the trust before any hook runs, and neither a probe nor a note line backs it. Name the probe, and whether an untrusted project runs a project SessionStart hook at all.; The stamp holds the install hash and HEAD, and the cases hold the install hash alone. HEAD in the stamp runs the install again after every commit, against the ask's line on returning at once. Drop HEAD, or add the case holding it.; No case holds a matching stamp with a tool gone, as node_modules, running the install.; The draft picks node because sh stands on no Windows desk, then runs sh from boots. RUNME.ps1 runs RUNME.sh through the sh Git ships, so name that road in boots, or what the hook does on win32.
+group: the-cloud-works-its-queue
 ---
 
 # Ask
@@ -269,6 +314,74 @@ Three cases fail on their own assertion against a stub boot that runs nothing, a
 - every done_when line on the hook meets a case, the note lines meet the review, and ./RUNME.sh check decides the last
 - the boot cases reach the disk and the process through fakeDisk and fakeProc alone, and the settings case reads the tracked file the ask names
 
+## draft-2
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
+<!-- the form is text -->
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+
+<!-- the form is list -->
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+
+<!-- the form is list -->
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+
+<!-- the form is list -->
+
+### size
+
+<!-- every file the approach touches, one a line -->
+
+<!-- the form is list -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+## tests-red-2
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+
+<!-- the form is command -->
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+
+<!-- the form is list -->
+
+### seen
+
+<!-- what you see, and what surprises you -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 # gate
 
 <!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
@@ -276,8 +389,14 @@ Three cases fail on their own assertion against a stub boot that runs nothing, a
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+reject
+- The install writes the plugin manifest, which git ignores, and the client scans plugins as a session starts. So the session running the first install holds no level zero, and the draft names no road for it. A probe on a fresh clone decides the order.
+- The draft says the client reads the trust before any hook runs, and neither a probe nor a note line backs it. Name the probe, and whether an untrusted project runs a project SessionStart hook at all.
+- The stamp holds the install hash and HEAD, and the cases hold the install hash alone. HEAD in the stamp runs the install again after every commit, against the ask's line on returning at once. Drop HEAD, or add the case holding it.
+- No case holds a matching stamp with a tool gone, as node_modules, running the install.
+- The draft picks node because sh stands on no Windows desk, then runs sh from boots. RUNME.ps1 runs RUNME.sh through the sh Git ships, so name that road in boots, or what the hook does on win32.
 
 # implement
 
