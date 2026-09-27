@@ -252,6 +252,14 @@ test("the judge reads its switch through the layers, so the per-box file beats t
   assert.match(on.said, /^refused\n/);
 });
 
+// The engine holds no model call, so a config naming the old switch still runs the pull alone. [[spec/tickets/the-judge-leaves-the-code]]
+test("the pull tool answers what the pull prints, and asks no model", async () => {
+  const ran = await handedBack({ "spec/config/level0.json": judging(true, "haiku") });
+  assert.equal(ran.judged, false, "the tool runs no --judge road");
+  assert.deepEqual(ran.asked, [], "the tool asks no model");
+  assert.equal(ran.said, "work");
+});
+
 // A stub holds no tracked file of its own, so the defaults come off the vehicle's. [[spec/design_output/vehicle#the-work-root-inherits]]
 test("the judge takes its defaults off the method root, and the work root's own file beats them", async () => {
   const under = await handedBack(

@@ -78,7 +78,7 @@ process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 depends_on: [every-road-has-a-caller]
 group: the-engine-holds-the-route
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d7d6cb0fb1105 · claude-code-remote
@@ -88,6 +88,14 @@ record:
     hand: box d7d6cb0fb1105 · claude-code-remote · helper-2
     hash_before: b7372e2e78a95b734c525def47fc74405fc6c3f1
     hash_after: b7372e2e78a95b734c525def47fc74405fc6c3f1
+  - step: implement/tests-red
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: 8f807b6239f9a6e8a4bd8bd8acf1a767a2e670e2
+    hash_after: 8f807b6239f9a6e8a4bd8bd8acf1a767a2e670e2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -191,20 +199,27 @@ pass with findings
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/level1.test.js test/level0/config.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertion. With judge.enabled true in the tracked config, the pull tool runs the --judge road and asks the model once, and the tracked config and its schema both still name a judge key. The existing handedBack harness in level1.test.js already fakes the process and the model, so the case needs no new door.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches two test files, both of which the draft names.
+The doors the cases reach, the process and the model, are the fakes handedBack already builds.
+Each case carries a comment linking this ticket, which names the approach.
+The cases add no fact, and point at this ticket.
+The rows the review passes with, the helpers, the checks chapter, the .claude door and the pointers, stand fixed or in the parent Discussion, and the change step takes the helpers.
 
 ## change
 

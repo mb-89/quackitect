@@ -216,3 +216,15 @@ test("a flat reading skips a comment and holds every leaf", () => {
     ],
   );
 });
+
+// The engine holds no model call, so no key turns one on. [[spec/tickets/the-judge-leaves-the-code]]
+test("the config names no judge key", async () => {
+  const { default: config } = await import("../../spec/config/level0.json", {
+    with: { type: "json" },
+  });
+  const { default: schema } = await import("../../spec/config/level0.schema.json", {
+    with: { type: "json" },
+  });
+  assert.equal(config.judge, undefined, "the tracked config names no judge");
+  assert.equal(schema.properties.judge, undefined, "the schema declares no judge");
+});
