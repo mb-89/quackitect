@@ -102,6 +102,7 @@ test("a pass stages the ticket and the hand's own paths, and leaves a sibling's 
   const git = fakeGit({}, "/tree");
   const disk = fakeDisk({
     [AT]: WROTE,
+    "/tree/src/mine.js": "export const one = 1;\n",
     "/tree/.se/.runtime/hold/a-hand.json": JSON.stringify({
       ticket: "a-child",
       taken: "2026-01-02T00:00:00.000Z",
@@ -164,6 +165,8 @@ test("a pass leaves out a journaled path git ignores", () => {
   );
   const disk = fakeDisk({
     [AT]: WROTE,
+    "/tree/src/mine.js": "export const one = 1;\n",
+    [IGNORED]: "# Handover\n",
     "/tree/.se/.runtime/hold/a-hand.json": JSON.stringify({
       ticket: "a-child",
       taken: "2026-01-02T00:00:00.000Z",
@@ -188,5 +191,47 @@ test("a pass leaves out a journaled path git ignores", () => {
   assert.ok(
     !ran().some((row) => row.startsWith("git add") && row.includes(IGNORED)),
     "the ignored path stays out",
+  );
+});
+
+// A journal names a path a later commit takes away, and git refuses a pathspec it knows nowhere. [[spec/design_output/pull#the-refused-commit]]
+test("a pass leaves out a journaled path gone from disk and git, and stages a deleted tracked one", () => {
+  const GONE = "/tree/test/moved.test.js";
+  const DELETED = "/tree/src/deleted.js";
+  const git = fakeGit(
+    {
+      [`git ls-files -- ${GONE} ${DELETED}`]: {
+        exitCode: 0,
+        stdout: "src/deleted.js\n",
+      },
+    },
+    "/tree",
+  );
+  const disk = fakeDisk({
+    [AT]: WROTE,
+    "/tree/.se/.runtime/hold/a-hand.json": JSON.stringify({
+      ticket: "a-child",
+      taken: "2026-01-02T00:00:00.000Z",
+    }),
+    "/tree/.se/.runtime/undo/20260103000000000000.json": `${JSON.stringify({
+      ticket: "a-child",
+      at: "2026-01-03T00:00:00.000Z",
+      files: [{ file: "test/moved.test.js" }, { file: "src/deleted.js" }],
+    })}\n`,
+  });
+  const ran = () => git.ran.map((it) => it.argv.join(" "));
+
+  const finding = landed({ disk, git, root: "/tree", join }, one, [
+    "passes design/draft",
+  ]);
+
+  assert.equal(finding, "");
+  assert.ok(
+    ran().includes(`git add -- ${AT} ${DELETED}`),
+    "the deleted tracked path stages",
+  );
+  assert.ok(
+    !ran().some((row) => row.startsWith("git add") && row.includes(GONE)),
+    "the path git knows nowhere stays out",
   );
 });
