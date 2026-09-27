@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: guidance-rides-each-step
 parent: each-call-meets-its-budget
+record:
+  - step: do
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: db25c64e5d75faa69f0386246bdc259e62964e68
+    hash_after: db25c64e5d75faa69f0386246bdc259e62964e68
+reason: became
+successors: [each-call-meets-its-budget]
 ---
 
 # Ask
