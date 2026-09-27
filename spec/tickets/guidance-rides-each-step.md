@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -112,6 +112,11 @@ record:
     hand: box d7d9cc78d3ce · claude-code-remote
     hash_before: 4c63277de0056af1b21853e07960ecdf3aa03b4a
     hash_after: 4c63277de0056af1b21853e07960ecdf3aa03b4a
+  - step: retro/cloud
+    hand: box d7d9cc78d3ce · claude-code-remote
+    hash_before: 23a7f29f69e6f1c5db8cc7361174ae6e07a86ef4
+    hash_after: 23a7f29f69e6f1c5db8cc7361174ae6e07a86ef4
+reason: done
 ---
 
 # Ask
@@ -238,20 +243,27 @@ The ask treated the cloud move as a file move, and the review found that the mov
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: every tool, host and right the branch needed stood on the box
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the commit door asking a test beside each code file, at the change commit of the-style-carries-the-top
+- the ticket door refusing a hand edit to closed tickets the rename rewrote
+- the gate rule refusing a pull joined to another command by a pipe
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- rename-rewrites-each-link-once stands open with no group, for the next pull
+- no person step stands parked
+- the handover names the rename ticket as the next free work
 
 # Discussion
 
