@@ -101,9 +101,21 @@ ifBuilt("a ticket's standing reads off its group's branch through the ticket", (
   const it = index(files, proc(), clock(), root, work);
   try {
     const rows = new Map(it.ask("tickets", {}).map((one) => [one.name, one]));
-    assert.equal(rows.get("one-group").standing, "held", "an open record entry holds the group");
-    assert.equal(rows.get("a-child").standing, "held", "a child stands where its group's branch stands");
-    assert.equal(rows.get("a-loose-one").standing, "", "a ticket in no group carries no standing");
+    assert.equal(
+      rows.get("one-group").standing,
+      "held",
+      "an open record entry holds the group",
+    );
+    assert.equal(
+      rows.get("a-child").standing,
+      "held",
+      "a child stands where its group's branch stands",
+    );
+    assert.equal(
+      rows.get("a-loose-one").standing,
+      "",
+      "a ticket in no group carries no standing",
+    );
     assert.equal(rows.get("a-child").group, "one-group");
     assert.equal(rows.get("a-child").state, "open");
     assert.equal(rows.get("a-child").step, "do");
@@ -121,7 +133,10 @@ ifBuilt("a changes call fires within a second of a ticket write", () => {
   const it = index(files, proc(), time, root, work);
   try {
     const first = it.ask("changes", { since: 0 });
-    assert.ok(first?.tick >= 1, `the walk on the way up counts one, and the tick reads ${first?.tick}`);
+    assert.ok(
+      first?.tick >= 1,
+      `the walk on the way up counts one, and the tick reads ${first?.tick}`,
+    );
     files.write(join(work, "spec", "tickets", "late.md"), child(""));
     const started = time.now().getTime();
     const next = it.ask("changes", { since: first.tick });
@@ -131,4 +146,26 @@ ifBuilt("a changes call fires within a second of a ticket write", () => {
   } finally {
     it.ask("stop", {});
   }
+});
+
+// A leaked index holds its port and its database into the next run. [[spec/tickets/windows-ci-turns-green]]
+ifBuilt("a stopped index leaves no se-index process past the case", () => {
+  const work = files.tempDir("leak-");
+  files.makeDir(join(work, "spec", "tickets"));
+  const time = clock();
+  const it = index(files, proc(), time, root, work);
+  it.ask("changes", { since: 0 });
+  const { pid } = JSON.parse(files.read(join(work, ".se", ".runtime", "index.json")));
+  assert.ok(pid > 0, `the standing file names pid ${pid}`);
+  it.ask("stop", {});
+  const until = time.now().getTime() + 5000;
+  let alive = true;
+  while (alive && time.now().getTime() < until) {
+    try {
+      process.kill(pid, 0);
+    } catch {
+      alive = false;
+    }
+  }
+  assert.equal(alive, false, `se-index at pid ${pid} stands past its stop`);
 });

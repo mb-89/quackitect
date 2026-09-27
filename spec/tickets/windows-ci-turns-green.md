@@ -128,6 +128,16 @@ record:
         hash: 99b403a86cb2dc33
         size: 536
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 679a566c766fd01511c2bfd072683a330fc584f5
+    hash_after: 679a566c766fd01511c2bfd072683a330fc584f5
+    returns: 1
+    why: "The fault stands on Windows alone, and no Linux box turns it red: the Windows job passes on main at run 36322578200, and the new leak case passes here."
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
 ---
 
 # Ask
@@ -207,26 +217,31 @@ the first done_when line meets the Windows job of check.yml, the second meets th
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/index.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/contract/index.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The new case, a stopped index leaves no se-index process past the case, passes on this Linux box, and the Windows job of check.yml passes on main at run 36322578200, so neither fault the ask names reproduces here. A Windows hand runs the command above there, and the ticket closes as answered where it passes too.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the leak line meets the new contract case, green here, so a Windows run decides it; the Windows job line meets check.yml on main, green
+the case starts the real index on a temporary tree, which the contract folder allows
 
 # gate
 
