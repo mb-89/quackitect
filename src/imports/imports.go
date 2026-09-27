@@ -45,6 +45,27 @@ var OnlyQ = &analysis.Analyzer{
 	Run:  onlyQ.run,
 }
 
+// [[spec/design_output/model#the-build-checks-imports]]
+var IOOnly = &analysis.Analyzer{
+	Name: "ioonly",
+	Doc:  "the core and a renderer import no os, os/exec, net or net/http, and call no time.Now",
+	Run:  unbuilt,
+}
+
+// [[spec/design_output/model#the-build-checks-imports]]
+var FakeSuite = &analysis.Analyzer{
+	Name: "fakesuite",
+	Doc:  "a package declaring a fake keeps a contract suite beside it",
+	Run:  unbuilt,
+}
+
+func unbuilt(pass *analysis.Pass) (any, error) {
+	if len(pass.Files) > 0 {
+		pass.Reportf(pass.Files[0].Package, "%s stands unbuilt", pass.Pkg.Path())
+	}
+	return nil, nil
+}
+
 // The one nomodule rule, which analyzers-read-the-io-flag reuses. [[spec/tickets/the-wiring-file-binds-ports]]
 var NoModule = &analysis.Analyzer{
 	Name: "nomodule",

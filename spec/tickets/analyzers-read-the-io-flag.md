@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -132,6 +132,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 88bcb0ee1ddb6c486fe341b923ce29372467a3c9
+    hash_after: 88bcb0ee1ddb6c486fe341b923ce29372467a3c9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/imports fails
+    inputs:
+      - name: design/draft
+        hash: 5c3d72c7578d0e01
+        size: 2340
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -235,26 +248,31 @@ each done_when line names its test above, or a command
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/imports/analyzers_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/imports/analyzers_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion: the stub analyzers report the package as unbuilt, so the planted IO module draws diagnostics and the want lines find none. The surprise: a contract test file beside a module makes the harness build the generated `disk.test` main, and `onlyq` and `nomodule` name it. The implement skips a package whose path ends in `.test`, as the tree test does.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each done_when line meets a case: the IO module over every analyzer, the fake with no suite, and the core importing os each in `analyzers_test.go`, and the module cases standing in `imports_test.go`
+the cases plant their packages in a folder of the test, so they reach no door
 
 # gate
 
