@@ -39,6 +39,7 @@ import { onBash, onDescribe, onPowerShell } from "./bash.js";
 import { bindingLine } from "./binding.js";
 import { dropsAll, dropsMoved } from "./caches.js";
 import { asks, asksText } from "./config.js";
+import { holdsCloudAsk } from "./cloud-ask.js";
 import { holdsGrace } from "./grace.js";
 import {
   onAgentSpawn,
@@ -288,8 +289,12 @@ async function onToolCall(e, box) {
     asksForPlan(box, box.calls);
   }
   // The engine's own ask meets the call after the owner's hold and before the answer door. [[spec/design_output/stop#the-grace]]
+  // A cloud box's ask meets its door first of these. [[spec/design_output/level0#the-cloud-ask-door]]
   const held = letsThrough(
-    holdsCall(e, box) ?? holdsGrace(e, box, ENDS_TURN) ?? holdsForAnswer(e, box),
+    holdsCall(e, box) ??
+      holdsCloudAsk(e, box) ??
+      holdsGrace(e, box, ENDS_TURN) ??
+      holdsForAnswer(e, box),
     { e },
     box,
   );

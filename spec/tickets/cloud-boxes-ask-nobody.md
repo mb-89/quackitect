@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 355ea8bb07b76d81
         size: 668
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: 187d7fdae76fa937b949d7daa7938ed094f70319
+    hash_after: 187d7fdae76fa937b949d7daa7938ed094f70319
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -315,14 +324,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the four files of the size list
+- the door reads `box.log` and `cloudHere` alone, and the tests hand it a box logging in memory
+- `cloud-ask.js` and the wire in `onToolCall` point at `spec/design_output/level0#the-cloud-ask-door`
+- the door stands once, under The cloud ask door, and the two lists and the hold line point there
 
 ## tests-green
 

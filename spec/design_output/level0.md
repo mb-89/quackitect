@@ -1272,7 +1272,7 @@ the answer paying it says what the agent does next and the work goes on.
 These roads stay open, because this session's own debt reaches past them:
 
 - a subagent carries a canary of its own, so `e.agentId` passes
-- `AskUserQuestion` is the road to the owner, so `reachesTheOwner` passes
+- `AskUserQuestion` is the road to the owner, so `reachesTheOwner` passes. A cloud box meets [[spec/design_output/level0#the-cloud-ask-door]] instead
 - `godPasses` wraps the door, so the binding at `god` passes the refusal
 
 The probe after a compaction pays nothing. It reads the canary through
@@ -1419,9 +1419,8 @@ writes the reply meets a refusal, writes the reply, and calls again.
 An ask pressed while a prompt stands unpaid waits for the pay, so the first
 call still meets the gate. A call with nothing new comes back refused. The
 refusal quotes the last text seen and its length, so a stale read and a wrong
-reply read apart. `AskUserQuestion` and the report tool pass the hold. On a
-cloud box `holdsCloudAsk` in `src/bridge/cloud-ask.js` refuses the ask first,
-because nobody sits there to answer.
+reply read apart. `AskUserQuestion` and the report tool pass the hold. A cloud
+box meets [[spec/design_output/level0#the-cloud-ask-door]] first.
 
 Each refusal writes a `gate` line at `debug`, because the agent reads the
 refusal itself.
@@ -1521,7 +1520,8 @@ asserts each line of them.
 - A helper's call. A subagent's `tool.call` carries `agentId`, and a helper owes
   the owner no readback.
 - `AskUserQuestion`, which reaches the owner itself. A door refusing it stops a
-  session from asking the one thing it needs.
+  session from asking the one thing it needs. A cloud box is the exception, as
+  [[spec/design_output/level0#the-cloud-ask-door]] says.
 
 `answer.enabled` in `spec/config/level0.json` turns the door off, the way the tooth
 turns off. A rule nobody can turn off stops the tree on the day it
@@ -1530,6 +1530,14 @@ reads something wrongly.
 The door sits inside the write door's own `tool.call` hook, after the log line
 and before the linting. The engine refuses a second `tool.call` hook carrying no
 matcher, so one hook holds both.
+
+## The cloud ask door
+
+Nobody sits beside a cloud box, so an `AskUserQuestion` there meets nobody. `holdsCloudAsk` in `src/bridge/cloud-ask.js` refuses it where `cloudHere` holds. The refusal names the question ticket and the push, and points at [[spec/guidance/cloud/cloud]].
+
+- `onToolCall` in `src/bridge/server.js` reads it after the owner's hold and before the grace.
+- A helper's call meets it too, since nobody sits beside a helper on a cloud box either.
+- A desk asks as it always does.
 
 ## Guidance a variable switches on
 
