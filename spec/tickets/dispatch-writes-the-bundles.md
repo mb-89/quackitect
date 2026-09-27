@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -169,6 +169,29 @@ record:
         exit: 0
         said: "spec/tickets/the-queue-views-agree.md:271:115: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 620ae89ca1419b6a583ed6abe2d56e8fcbc47202
+    hash_after: 620ae89ca1419b6a583ed6abe2d56e8fcbc47202
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 24 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:271:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: f77d5a0fe7fea05e
+        size: 746
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -344,26 +367,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/dispatch.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The dispatch verb now carries its plan out. It writes a fix group holding the loose agent tickets, and opens a work branch for each ready group standing with none. Every write rides one commit on a dispatch branch named after the trunk commit it reads, so no push names the trunk. Earlier the plan printed and nobody acted on it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays inside the files the ask and its point tickets name
+- the git, front and clock doors each take a fake in the dispatch tests
+- the head comment of the write module names the approach and links its design
+- the branch cut and the name cut each call the one function standing in the work and ticket modules
 
 # accept
 
