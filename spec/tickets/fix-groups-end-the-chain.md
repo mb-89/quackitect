@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,18 @@ record:
         hash: 73c915269fbb03e7
         size: 2317
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e093d924e2 · claude-code-remote · helper-4
+    hash_before: 45d90f96344278d3751e986cd6bd55f77dff5988
+    hash_after: 45d90f96344278d3751e986cd6bd55f77dff5988
+    inputs:
+      - name: design/draft
+        hash: 73c915269fbb03e7
+        size: 2317
+      - name: design/tests-red
+        hash: 8b4209e6b4a73d66
+        size: 755
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -275,8 +287,10 @@ The refusal case fails on its own assertion, since done closes a fix group today
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- fix-schema-case-reads-fix: no red test decides the schema done_when line. The ticket front sets additionalProperties false, but no tracked ticket carries fix: true, so ./RUNME.sh check passes with or without the field. Add a case validating a group front carrying fix: true against spec/schemas/ticket.schema.yaml, or record the line as a checkpoint the implementer answers.
 
 # implement
 

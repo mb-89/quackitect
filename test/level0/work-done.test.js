@@ -357,7 +357,11 @@ Nothing yet.
 
 // [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
 test("done on a fix group refuses an agent ticket it leaves, and names the mint of a question ticket for it", () => {
-  const { it, disk, outside } = leaving(true, { "a-follow-up": looseAgent });
+  const { it, disk, outside } = leaving(true, {
+    "a-follow-up": looseAgent,
+    "b-follow-up": looseAgent,
+    "a-question": loosePerson,
+  });
 
   const { code, said } = heard(() => work(ROOT, ["done"], it));
 
@@ -367,15 +371,19 @@ test("done on a fix group refuses an agent ticket it leaves, and names the mint 
     "open",
     "the group stays open",
   );
-  assert.match(said, /a-follow-up/);
-  assert.match(
-    said,
-    /\.\/RUNME\.sh mint ticket spec\/tickets\/a-follow-up-question\.md --process=question/,
-  );
-  assert.match(
-    said,
-    /\.\/RUNME\.sh ticket pull a-follow-up --became a-follow-up-question/,
-  );
+  for (const name of ["a-follow-up", "b-follow-up"]) {
+    assert.match(
+      said,
+      new RegExp(
+        `\\./RUNME\\.sh mint ticket spec/tickets/${name}-question\\.md --process=question`,
+      ),
+    );
+    assert.match(
+      said,
+      new RegExp(`\\./RUNME\\.sh ticket pull ${name} --became ${name}-question`),
+    );
+  }
+  assert.doesNotMatch(said, /a-question/, "a person's ticket stands unnamed");
   assert.ok(
     !ranGit(outside).some((one) => one.startsWith("git push")),
     "nothing is pushed",
