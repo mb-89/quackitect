@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: dc0dc6caa1a47e1649768283bfcff714ad7a29c6
+    hash_after: dc0dc6caa1a47e1649768283bfcff714ad7a29c6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    inputs:
+      - name: design/tests-red
+        hash: 355ea8bb07b76d81
+        size: 668
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -345,26 +368,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/cloud-ask.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A cloud box used to reach `AskUserQuestion` like a desk, and the question waited in a chat nobody reads. `holdsCloudAsk` in `src/bridge/cloud-ask.js` now refuses it where `cloudHere` holds. The refusal tells the box to decide what it can, and to mint a question ticket with every command a person needs, then push and go on. `onToolCall` reads the door after the owner's hold. A desk asks as before. `spec/design_output/level0#the-cloud-ask-door` holds the door, and the lists of roads a door leaves open point there.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list alone
+- the tests hand the door a box logging in memory, and the server case drives fake doors
+- the code points at `spec/design_output/level0#the-cloud-ask-door`
+- the door stands once, in `level0.md`
 
 # accept
 
