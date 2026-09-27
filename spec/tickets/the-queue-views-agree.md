@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -137,6 +137,15 @@ record:
         hash: 7c7cba5a828521e1
         size: 4191
     def: 0f8c340e80e8ece6
+  - step: implement/tests-red
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: b9cfc4d4a0d9d85929f780392244362bd9b8932b
+    hash_after: b9cfc4d4a0d9d85929f780392244362bd9b8932b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    def: 06865600120e8b38
 ---
 
 # Ask
@@ -273,20 +282,37 @@ pass with findings
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/work-rows.test.js test/level0/lens.test.js src/tui/workplaces_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The Go case counts the nested todo twice, which is the fault the ask names.
+
+| the case | the fault it guards |
+|---|---|
+| a todo under its group draws once | a plan todo drawn again at the left |
+| a child row names what it waits on | a child row naming its step while it waits |
+| a group row names a branch behind main | a stale group branch that reads as level |
+| a cloud-marked ticket draws no lens | a take offered on a ticket the cloud holds |
+| the lens door reads the group file | a lens that spawns a verb on each draw |
+
+The row cases pass the file ceiling in the group test file, so they stand in a file of their own. The fake git learns the trunk tip and the merge base inside the case, since the review names that gap.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the cases reach the files the draft names, plus the new row test file the ceiling asks for
+- the listing cases run over the fake git, and the lens cases over the fake door
+- each case links this ticket
+- each case asserts its claim once, and the fixtures stand in the files that own them
+- the review rows stand: the badge lines go to phase two, and the fake learns the trunk tip
 
 ## change
 
