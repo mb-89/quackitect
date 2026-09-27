@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
-todo: true
+state: closed
+todo: false
 step: decide
 steps:
   - name: decide
@@ -20,6 +20,20 @@ steps:
         says: why, in a line, or what the successor carries
 process: [[spec/processes/note]]
 process_hash: e02a0935ed78eb92
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: 4b5123b60c63be9bce95020b955901362c97c2d5
+    hash_after: 4b5123b60c63be9bce95020b955901362c97c2d5
+    inputs:
+      - name: ask
+        hash: cdc3940e9b9938b2
+        size: 689
+      - name: [[spec/design_output/work]]
+        hash: b7f02b4b69038b04
+        size: 36721
+    def: 9e2520e6318baf46
+reason: done
 ---
 
 # Ask
@@ -43,14 +57,16 @@ The fix lands with this note. The take reads each free group in turn and claims 
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+done
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+The fix stands on main: take in src/scripts/work.js walks each free group and claims the first holding a step a hand takes, and test/level0/work-gate.test.js holds it.
 
 # Discussion
 
