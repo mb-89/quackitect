@@ -5,13 +5,14 @@
 
 import assert from "node:assert/strict";
 // The fixtures stand on posix paths, so the verb joins them the same way on every platform. [[spec/tickets/ci-runs-a-windows-job]]
-import { join } from "node:path/posix";
+import { posix } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { landed, landedAlone, unlandedRows } from "../../src/scripts/pull-landed.js";
 
 const AT = "/tree/spec/tickets/a-child.md";
+const { join } = posix;
 const WROTE = "---\nstate: open\n---\n\n# Ask\n\nA thing.\n";
 const RECORDED = `${WROTE}\nrecord: one\n`;
 
