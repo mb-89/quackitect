@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: sync
+step: split
 record:
   - step: sync
     hand: box d1fe1ca62214 · claude-code-remote
@@ -99,6 +99,14 @@ record:
   - step: sync
     hand: box d7d6327f2b101 · claude-code-remote
     hash_before: 505e8c4d28fb204a1aaad18e9a179c1faaaf686a
+  - step: sync
+    hand: box d7d6327f2b101 · claude-code-remote
+    hash_before: c45ed6fe8a260bd5075f4ddd0238eb8e17ee01dc
+    hash_after: c45ed6fe8a260bd5075f4ddd0238eb8e17ee01dc
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-verbs-land-whole already carries every commit on main.
 ---
 
 # Ask
@@ -114,6 +122,8 @@ Every mechanical step runs through a verb that lands it whole, and the agent rea
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
