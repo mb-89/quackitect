@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/tests-red
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: open-tasks-land-in-shadow
@@ -87,6 +87,14 @@ record:
     hand: box d7d70c069f441 · claude-code-remote · helper-2
     hash_before: 5e5d6e8c72b4ccd31ea1458bdb5799ae1d6c6550
     hash_after: 5e5d6e8c72b4ccd31ea1458bdb5799ae1d6c6550
+  - step: implement/tests-red
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: 838a6c982089d74d7041c6d7d865603235f8737f
+    hash_after: 838a6c982089d74d7041c6d7d865603235f8737f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 6 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -195,20 +203,29 @@ pass with findings
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/work-cloud-marker.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Six cases fail on their own assertion: open writes no marker and runs off trunk, the merge and the close leave the marker, and the close runs off trunk. The refused-push case and the release case pass already, because each asserts what stays as it stands. They hold the two roads the change must leave alone.
+
+The fake git answers every command a case leaves unlisted with success, so each case reads the order of the pushes off `ran` and the marker off the fake disk.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the tests touch the four verbs and the marker alone
+- every case drives the fake git, the fake disk and the fake front
+- the file header points at this ticket
+- the marker's name stands in the schema, and the cases read it through `fieldOf`
+- the four review rows each hold a case: the refused push, the release, the close off trunk, and the standing branch
 
 ## change
 
