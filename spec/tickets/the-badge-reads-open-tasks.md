@@ -76,6 +76,7 @@ steps:
             says: what changes and why, for a reader who was not there
 step: design/draft
 process: [[spec/processes/standard]]
+depends_on: [open-tasks-run-in-shadow]
 process_hash: 9d870e3fd3c577a6
 group: open-tasks-switch-over
 ---
