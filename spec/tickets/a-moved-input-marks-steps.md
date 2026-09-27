@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d7d8cca563b1 · claude-code-remote
@@ -95,6 +95,15 @@ record:
       - name: tests
         exit: 1
         said: assertion, 5 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d9b0d5dfcf · claude-code-remote
+    hash_before: 5cddadd94c9ce6ba4beba59743e65871cc655c85
+    hash_after: 5684a6d831ca4664cc9db8cfd8c301227d29e94f
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-retro-reads-the-backlog.md:145:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: 21d63335f32dfcda
 ---
 
 # Ask
@@ -207,14 +216,20 @@ the two review rows meet the change: the bless hash and the test schema copy
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft callers name, plus cli-doors.js for the index door, the fake index, and the bless module the review row names
+the index takes a fake in src/doors/fake/index.js, and the Go door takes a case over the real method
+each new function carries a pointer at the design section on inputs
+the hash stands once in hash.js, and the Go port names its constants beside a pointer at that file
+both review rows stand fixed: the bless reads chapterText from pull-stale.js, and the test schema copy carries inputs, def, stale and blessed
 
 ## tests-green
 
