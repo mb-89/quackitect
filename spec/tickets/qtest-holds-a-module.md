@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -208,6 +208,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: ae3db181c69ece2e076304edcd334f9e562ec878
+    hash_after: ae3db181c69ece2e076304edcd334f9e562ec878
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q/qtest passes
+      - name: check
+        exit: 0
+        said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
+    inputs:
+      - name: design/tests-red
+        hash: 686af89acd561d42
+        size: 1153
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -369,26 +392,33 @@ the list of outside packages stands once in src/imports/imports.go, and the mode
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/qtest
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+An action now answers the requests its function lists, so Store.Act hands the index and the fake the same list, and each Then reads the answers a case hands it. A commit reaches every OnCommit listener after the store lets go of its lock, so the fake index reads each commit and a listener reading a snapshot waits on nothing. The onlyq analyzer refuses a module import past q, q/qtest and the standard library packages that stay inside the process, and leaves a door import to nodoor. src/modules stands as the folder the module packages live under. The contract suite runs against qtest and against the index catalog in process, with no port and no NATS.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the four files of the change leaf and their tests, and no file the ask leaves out
+the listener call and the action run in memory, and the contract suite holds the fake to the index in process
+each changed file points at spec/design_output/model at the section it implements
+the list of outside packages stands once in src/imports/imports.go
 
 # accept
 
