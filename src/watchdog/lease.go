@@ -98,14 +98,15 @@ func (d *Dog) Lease(part string) (Lease, bool) {
 	return one, ok
 }
 
-// An expired lease marks its part stale, and the next commit of the part clears it. [[spec/design_output/model#a-stale-mark]]
+// An expired lease marks its part stale where a provider owns the part, and the next commit of the part clears it. A part with no provider, as the index, still reads expired. [[spec/design_output/model#a-stale-mark]]
 func (d *Dog) Check() []string {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	now, expired := d.now(), []string{}
 	for part, one := range d.leases {
 		since := one.Renewed.Add(one.Term)
-		if now.After(since) && d.store.Stale(part, since) == nil {
+		if now.After(since) {
+			d.store.Stale(part, since)
 			expired = append(expired, part)
 		}
 	}

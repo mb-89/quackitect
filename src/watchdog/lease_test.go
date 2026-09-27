@@ -126,6 +126,15 @@ func TestAHeartbeatRenewsTheLease(t *testing.T) {
 	}
 }
 
+func TestAnExpiredPartWithNoProviderReadsExpired(t *testing.T) {
+	dog, _, now := dogOf(t, Settings{}, nil)
+	dog.Hold("index", time.Second)
+	now.pass(2 * time.Second)
+	if expired := dog.Check(); len(expired) != 1 || expired[0] != "index" {
+		t.Fatalf("the check answers %v", expired)
+	}
+}
+
 func TestAHeldLeaseReadsBack(t *testing.T) {
 	dog, _, _ := dogOf(t, Settings{}, nil)
 	if _, held := dog.Lease("t/part"); held {
