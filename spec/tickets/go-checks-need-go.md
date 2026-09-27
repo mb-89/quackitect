@@ -114,10 +114,20 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
+record:
+  - step: design/draft
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 00fcf573a61d16fd128e6507fd4309dedb5d4126
+    hash_after: 00fcf573a61d16fd128e6507fd4309dedb5d4126
+    inputs:
+      - name: ask
+        hash: 554bb47330e89572
+        size: 356
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -148,38 +158,46 @@ One Go module stands now, so the plumbing reads folders that no longer answer. A
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+cli-go.js drops goModulesIn and modulesUnder, since the one module stands at the root. It gains goGate(run, say, quiet), which runs go test ./... at the root through the run door it takes, and then gofmt -l src. Where run throws because no go stands on the box, goGate says so and answers 1, where goHolds answers 0 today. formatFaults drops its folder, since every path it names sits under the root. goHolds in cli-check.js keeps its name and its quiet flag, and hands goGate the outside run door, so the contract case reading its source still finds it. goFoldersOf and goEnvOf stay, since tui-build, go-source and work-test read them and no module list. Weighed: a gate taking its door over a stub of the Go binary on PATH, since the case then runs on every box. Assumed: every box the check runs on carries go, which the install verb puts there.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/cli-check.js: goHolds, goFormat,src/scripts/cli.js: the go part of the check, through goHolds,test/level0/go-tests.test.js: goModulesIn and formatFaults cases,test/level0/go-modules.test.js: the goModulesIn cases,test/contract/go-module.test.js: the one go.mod case,test/contract/cli-check-doors.test.js: the goHolds source case
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/go-tests.test.js: the Go gate on a box with no Go answers red and names the refusal,test/level0/go-tests.test.js: the Go gate runs the tests and the formatter at the root,test/contract/go-module.test.js: the tree holds one go.mod, at the root, read off the disk
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/scripts/cli-go.js,src/scripts/cli-check.js,test/level0/go-tests.test.js,test/level0/go-modules.test.js,test/contract/go-module.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened cli-go.js, goHolds and goFormat in cli-check.js, and the four test files, and checked each claim there
+the callers come off a grep for every export of cli-go.js and for goHolds
+the first done_when line meets the no-Go gate case, and the check decides the second
 
 ## tests-red
 
