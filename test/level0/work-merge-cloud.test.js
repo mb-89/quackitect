@@ -74,14 +74,21 @@ test("merge builds the merged tree's tools before its check", () => {
 test("merge of a work branch pushes main and closes the branch, and keeps it where the push comes back refused", () => {
   const closed = doorsSaying(merging());
   closed.it.node = "node";
-  const shut = heard(() => work(ROOT, ["merge", "one-group"], { ...closed.it, cloud: false }));
+  const shut = heard(() =>
+    work(ROOT, ["merge", "one-group"], { ...closed.it, cloud: false }),
+  );
   assert.equal(shut.code, 0, shut.said);
   const ran = ranGit(closed.outside);
-  assert.ok(ran.indexOf("git push origin main") < ran.indexOf("git push origin --delete work/one-group"));
+  assert.ok(
+    ran.indexOf("git push origin main") <
+      ran.indexOf("git push origin --delete work/one-group"),
+  );
 
   const kept = doorsSaying(merging({ "git push origin main": { exitCode: 1 } }));
   kept.it.node = "node";
-  const held = heard(() => work(ROOT, ["merge", "one-group"], { ...kept.it, cloud: false }));
+  const held = heard(() =>
+    work(ROOT, ["merge", "one-group"], { ...kept.it, cloud: false }),
+  );
   assert.equal(held.code, 0, held.said);
   assert.ok(!ranGit(kept.outside).includes("git push origin --delete work/one-group"));
   assert.match(held.said, /then run \.\/RUNME\.sh branch close one-group/);
@@ -90,7 +97,33 @@ test("merge of a work branch pushes main and closes the branch, and keeps it whe
     merging({ "git push origin --delete work/one-group": { exitCode: 1 } }),
   );
   refused.it.node = "node";
-  const left = heard(() => work(ROOT, ["merge", "one-group"], { ...refused.it, cloud: false }));
+  const left = heard(() =>
+    work(ROOT, ["merge", "one-group"], { ...refused.it, cloud: false }),
+  );
   assert.equal(left.code, 0, "a refused delete leaves the merge green");
   assert.match(left.said, /stands on the remote, and trunk carries its ticket closed/);
+});
+
+// GitHub lands a branch a pull request carries, so the desk merge leaves it alone. [[spec/tickets/groups-land-through-pull-requests]]
+test("branch merge refuses a branch a pull request carries, and names it", () => {
+  const { it, outside } = doorsSaying(
+    merging({
+      "git rev-parse origin/work/one-group": { stdout: "tip999\n" },
+      "git ls-remote origin refs/pull/*/head": {
+        stdout: "abc000\trefs/pull/7/head\ntip999\trefs/pull/42/head\n",
+      },
+    }),
+  );
+  it.node = "node";
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["merge", "one-group"], { ...it, cloud: false }),
+  );
+
+  assert.equal(code, 1, said);
+  assert.match(said, /pull request #42/);
+  assert.ok(
+    !ranGit(outside).some((one) => one.startsWith("git merge")),
+    "nothing merges",
+  );
 });

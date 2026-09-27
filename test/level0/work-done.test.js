@@ -452,3 +452,23 @@ test("a top group leaves them loose", () => {
   for (const one of ["a-child", "a-follow-up"])
     assert.equal(fieldOf(disk.read(on(one)), "group"), "", `${one} stands loose`);
 });
+
+// The close rides the branch, and main takes nothing, so the pull request carries the whole hand-over. [[spec/tickets/groups-land-through-pull-requests]]
+test("branch done closes on the branch alone, files the children and drops the marker", () => {
+  const { it, disk, outside } = nested(leaving(false, {}));
+  disk.write(
+    on("one-group"),
+    withField(disk.read(on("one-group")), "cloud", "true", fakeFront()),
+  );
+  disk.write(on("a-child"), CHILD("one-group", "open"));
+
+  const { code, said } = heard(() => work(ROOT, ["done"], it));
+
+  assert.equal(code, 0, said);
+  const now = disk.read(on("one-group"));
+  assert.equal(fieldOf(now, "state"), "closed");
+  assert.equal(fieldOf(now, "cloud"), "", "the marker drops on the branch");
+  assert.equal(fieldOf(disk.read(on("a-child")), "group"), "big-move");
+  const pushes = ranGit(outside).filter((one) => one.startsWith("git push"));
+  assert.deepEqual(pushes, ["git push origin work/one-group"], "main takes no push");
+});

@@ -420,3 +420,39 @@ test("read prints the group a branch carries, and refuses a branch carrying none
   assert.equal(none.code, 1);
   assert.match(none.said, /carries no group at spec\/tickets\/fix-lsp\.md/);
 });
+
+// A group at done whose branch stands behind main is open work, and the take hands it out first. [[spec/tickets/groups-land-through-pull-requests]]
+test("branch take hands out a stuck hand-over first, and prints sync, check and push", () => {
+  const shut = withField(GROUP_NOTE, "state", CLOSED, fakeFront());
+  const { it, disk } = doorsSaying(
+    {
+      ...remoteSaying(
+        [
+          { branch: "work/landing", tip: "tip-landing" },
+          { branch: "work/one-group", tip: "tip-one" },
+        ],
+        {
+          "work/landing:spec/tickets/landing.md": shut,
+          [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+        },
+      ),
+      "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+      "git rev-list --count origin/work/landing..origin/main": { stdout: "2\n" },
+    },
+    { [on("landing")]: shut, [on("one-group")]: GROUP_NOTE },
+  );
+
+  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, cloud: true }));
+
+  assert.equal(code, 0, said);
+  assert.match(said, /work\/landing/);
+  assert.match(said, /\.\/RUNME\.sh branch sync/);
+  assert.match(said, /\.\/RUNME\.sh check/);
+  assert.match(said, /push/);
+  assert.equal(
+    disk.read(on("landing")),
+    shut,
+    "the take writes no record on a closed group",
+  );
+  assert.equal(disk.read(on("one-group")), GROUP_NOTE, "the free group waits");
+});

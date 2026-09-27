@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [the-skills-start-the-workers, groups-hold-groups]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -135,6 +135,19 @@ record:
         hash: 5a2557d24d86ab34
         size: 13510
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: ce4c9b7a3dad50f68331a9b0d4602eebe5e680d0
+    hash_after: ce4c9b7a3dad50f68331a9b0d4602eebe5e680d0
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 90735f2272a798bc
+        size: 3526
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -259,26 +272,38 @@ I assume two boxes taking one stuck branch at once cost a duplicate sync and not
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/work-done.test.js test/contract/check-workflow.test.js test/level0/work.test.js test/level0/work-merge-cloud.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/work-done.test.js
+- test/contract/check-workflow.test.js
+- test/level0/work.test.js
+- test/level0/work-merge-cloud.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each new case fails on its own assertion, and every earlier case in the four files passes.
+
+- the done case reads the marker still standing on the branch
+- the merge case reads the merge going ahead over a branch a pull request carries
+- the take case reads the take claiming the free group before the stuck one
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line on code meets a failing case, and the skill lines, the notes and the check stand as checkpoints
+- git and the disk take the fakes the earlier cases use, and the workflow case reads the real file under test/contract
 
 # gate
 
