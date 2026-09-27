@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 6badf2fef8cc2c49
         size: 930
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 0e3084f212ce2189d4f8ad3397be7c47079dd9f2
+    hash_after: 0e3084f212ce2189d4f8ad3397be7c47079dd9f2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 0e65d3bce77dde27
+        size: 2352
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -243,26 +256,31 @@ The done lines and the case deciding each:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/work-sync.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/work-sync.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Two cases fail on their own assertion: the diverged merge, and the conflict with the remote branch. The case where the remote carries nothing new passes today, because it guards the side the change leaves alone. The fake git answers an unknown count with nothing, so the older cases read the remote branch as carrying nothing and stand as they are.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a case: the diverged merge and the conflict fail red, and the nothing-new case guards the other side
+- every git call reaches the fake git of work-doors.js
 
 # gate
 
