@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [the-skills-start-the-workers, groups-hold-groups]
-step: design/tests-red
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -184,6 +184,12 @@ record:
         hash: 591680bf2c6fc6d6
         size: 13376
     def: 7883b3d10633c780
+  - step: implement/change
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 74e21337bbe2e41252c4e747fa16e15eb3bd8499
+    hash_after: 74e21337bbe2e41252c4e747fa16e15eb3bd8499
+    returns: 1
+    why: the hand takes it back
 ---
 
 # Ask
