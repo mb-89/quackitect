@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-engine-holds-the-route
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d7d6cb0fb1105 · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: d77b4471fd3a216a3112039b8c9c2f2df499bac0
+    hash_after: ce28196ea03894b0d0f8384333989f9d5df0a1b2
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-queue-moves-to-plan.md:121:99: Sentence: A sentence holds 25 words. Cut this one in two."
 ---
 
 # Ask
@@ -225,14 +233,20 @@ The one review row, the first base, stands in the parent Discussion, and the cha
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the draft names, the fixture of the route contract case, and no other.
+The cases reach the disk, git and the shell through the fakes pull-doors.js builds, and the route shape stands in the contract case.
+src/scripts/pull-accept.js links the chapter The final acceptance, which names the approach.
+The chapter owns the bases and the moments, and each code comment points at it.
+The one review row, the first base, stands in acceptBase and in the chapter, and a case decides it.
 
 ## tests-green
 
