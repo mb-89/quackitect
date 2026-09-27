@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -151,6 +151,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: ae20021353c1f25ffb3df9db6d529c09f8498c37
+    hash_after: ae20021353c1f25ffb3df9db6d529c09f8498c37
+    inputs:
+      - name: retro/write
+        hash: 2d5e441b8968dccd
+        size: 3237
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -314,20 +324,30 @@ The pull hands gates and builds of one group to one box, so the builder reads th
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing the work needed: every tool stood installed, and no host or right came back refused
+- 21:36 the level0 server stood down at session start, and `./RUNME.sh serve` brought it up
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the push door's todo refusal on each gate hand-back
+- the Bash door's git write and landing rules
+- the commit hook's test-beside-code rule, on a split module and a server wire
+- the file ceiling on `pull-hand.js`
+- no conflict at sync, since the branch already carried main
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- gate-points-pass-the-push stands as a draft in no group, for the owner to open
+- the desk trials in the group's Discussion stand as person question tickets, such as a-desk-runs-probe-reply
+- the handover says the branch stands done, and the next session takes the next free branch
 
 # Discussion
 
