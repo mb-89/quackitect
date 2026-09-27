@@ -142,7 +142,7 @@ record:
       - name: ask
         hash: 7b7b7a2d0a5b5975
         size: 511
-      - name: [[spec/funnel/the-owner-rules-the-specs]]
+      - name: [[spec/design_input/the-index-holds-the-model]]
         hash: 632da9d1c9abae9f
         size: 3518
     def: 7883b3d10633c780
