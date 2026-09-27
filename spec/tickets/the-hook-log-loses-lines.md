@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
-todo: true
+state: closed
+todo: false
 step: decide
 steps:
   - name: decide
@@ -20,6 +20,13 @@ steps:
         says: why, in a line, or what the successor carries
 process: [[spec/processes/note]]
 process_hash: e02a0935ed78eb92
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: 77f4753fb0bc44dc8893372b19dd45d72c0c59e0
+    hash_after: 77f4753fb0bc44dc8893372b19dd45d72c0c59e0
+reason: became
+successors: [a-down-index-refuses-calls]
 ---
 
 # Ask
@@ -43,14 +50,16 @@ The bridgehead writes a log row by reading `.se/.log/session.jsonl` and writing 
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+became
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+The cage switch rewrites the fall road that holds wrote, and a-down-index-refuses-calls now asks a case keeping every row of the session log.
 
 # Discussion
 
