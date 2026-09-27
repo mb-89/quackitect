@@ -875,7 +875,9 @@ check runs it on Linux and Windows, and reads a package's flag off its
 | `nomodule` | an import of a package under `src/modules/` from another module, the index core or a renderer |
 
 An IO module imports what its IO needs, and reaches another module through the
-index alone, which `nomodule` holds. The index process,
+index alone, which `nomodule` holds. `nomodule` checks imports between packages
+alone, and modules inside one topic package call each other's functions on
+purpose. The index process,
 `src/index`, runs the server: it keeps the outside's own libraries, its store and
 the NATS server, and stands outside `ioonly`. The core, `src/q`, stays inside it.
 
@@ -1413,10 +1415,11 @@ The work view declares these:
       - { key: enter, edits: cell, writes: tickets/set-field }
       - { button: pull, calls: work/pull }
 
-An action answers a result, or a handle for a longer one. The renderer draws a
-handle's state on the last line, off `ops/<id>`, until it ends. A refusal comes
+The renderer calls an action with a wait of its own. A call ending within it
+answers the result, and while one runs on, the last line draws its fraction
+done, off `ops/<id>`, until it ends. A refusal comes
 back as the action's failure, with its reason, and the last line draws it. For
-the handle, see
+the wait, see
 [[spec/design_input/the-index-holds-the-model#a-caller-sets-its-wait]].
 
 ## The log is a view

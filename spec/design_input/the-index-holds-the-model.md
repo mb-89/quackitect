@@ -186,8 +186,10 @@ the other modules stay as they stand.
 
 A module is one file. A topic folder is one Go package holding several modules,
 one file each. A new file in `src/modules/work/` joins the work package at its
-next build, and its `init` registers the module and its ports. The module
-names no HTTP library, no MCP and no editor, because only the IO modules know those.
+next build, and its `init` registers the module and its ports. `nomodule` checks
+imports between packages alone, so modules in one topic package call each
+other's functions directly, on purpose. The module names no HTTP library, no
+MCP and no editor, because only the IO modules know those.
 
         var OpenTasks = q.Derived("open-tasks", 0,
         q.Doc("The tickets this box can take."),
