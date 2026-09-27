@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-foundation-lands-unchanged
 parent: operations-and-leases-land
+record:
+  - step: do
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: af0791a43353815af9cfe53fffb467fdc683664f
+    hash_after: e6d428a86b3346925720048b8601fd33ceb144ab
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/sqlite-runs-pure-go.md:111:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -48,7 +61,7 @@ add `q.Op` and `q.Writes` beside `q.Deadline` in `src/q/q.go`. An action then de
 
 <!-- the form is command -->
 
-`go test ./src/q -run TestAnActionDeclaresItsHandleAndItsWrite`
+    ./RUNME.sh test src/q
 
 ## check
 
@@ -56,7 +69,7 @@ add `q.Op` and `q.Writes` beside `q.Deadline` in `src/q/q.go`. An action then de
 
 <!-- the form is command -->
 
-`./RUNME.sh check`
+    ./RUNME.sh check
 
 ## says
 
