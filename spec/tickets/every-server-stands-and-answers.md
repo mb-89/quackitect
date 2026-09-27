@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/person-1
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -96,6 +96,11 @@ record:
     hand: box d7a44d6f73215 · claude-code-remote
     hash_before: 5c3d6d4364231de251fd2e293cb4a2e6815931b6
     hash_after: 5c3d6d4364231de251fd2e293cb4a2e6815931b6
+  - step: implement/person-1
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 85966908a6f832707aa48df9b45f43025ef035f9
+    hash_after: 85966908a6f832707aa48df9b45f43025ef035f9
+    def: bf05c6b330242055
 ---
 
 # Ask
@@ -224,14 +229,20 @@ pass
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is choice -->
+
+pass on the record
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: this leaf writes the answer alone
+- the doors the tests reach stand behind their fakes, as tests-red records
+- the approach stands named in each file the change carries
+- every fact stands once: the red of each case stands in the seen field of tests-red
+- the design review passes with no row this leaf leaves open
 
 ## tests-red
 
