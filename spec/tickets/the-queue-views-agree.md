@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -128,6 +128,15 @@ record:
         hash: fa8da1e99d07158b
         size: 1688
     def: 71651f49796eeda4
+  - step: design/review
+    hand: box d7e124b659cd · claude-code-remote · helper-6
+    hash_before: 0ed4fef88ca5f741a0fed7ca735e590468f39c11
+    hash_after: 0ed4fef88ca5f741a0fed7ca735e590468f39c11
+    inputs:
+      - name: design/draft
+        hash: 7c7cba5a828521e1
+        size: 4191
+    def: 0f8c340e80e8ece6
 ---
 
 # Ask
@@ -251,10 +260,9 @@ The listing's `behind` read waits on nothing. The lens reads the marker alone, s
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 <!-- the form is verdict -->
 
-fail
-
-- the redraw runs `./RUNME.sh tui work --count` on every burst of ticket, plan and hold writes. Each run starts node, can build the viewer, and reads git over every work branch. That takes thirteen seconds on the owner's desk. The owner rules on sidebar-lands-in-shadow that the sidebar builds and restarts nothing. It draws a question mark until the engine answers. The redraft reads a count the engine already keeps, and spawns no verb on a draw
-- the count stands at 68 on the owner's desk. The queue reads a group as the cloud's by its branch alone. the-queue-reads-the-marker reads `cloud: true` in its place. So the redraft names it under `depends_on`. The badge and the brackets agree on the local count once it lands
+pass with findings
+- phase-two-carries-badge-lines: the-badge-reads-open-tasks carries none of the lines the owner moves at person-2: the sidebar redraw after a burst of ticket, plan and hold writes, its case in `test/level0/sidebar.test.js`, and the person step comparing the badge with the brackets. This ask still carries all three, so they land on that ticket's ask and leave this one, or this ticket closes on lines nobody builds
+- behind-read-reaches-past-ask: the behind read touches `refsHere` in `src/scripts/work-stands.js`, `spec/design_output/work.md` and `remoteSaying` in `test/level0/work-doors.js`, which the ask leaves out. The group-row line needs them. `remoteSaying` answers neither `rev-parse origin/main` nor a `merge-base` per listed ref today, though the callers list says it does, so the builder adds both answers to the fake
 
 # implement
 
