@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -199,6 +199,29 @@ record:
         exit: 0
         said: "src/scripts/work.js:67:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 9eb8c50a490358750ebe289322adaef20984f137
+    hash_after: 9eb8c50a490358750ebe289322adaef20984f137
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 51 test(s) pass in 4 file(s)
+      - name: check
+        exit: 0
+        said: "test/level0/dispatch.test.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 609. Split it by topic."
+    inputs:
+      - name: design/tests-red
+        hash: 446e87edebf6c435
+        size: 880
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -402,26 +425,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/work-done.test.js test/contract/check-workflow.test.js test/level0/work.test.js test/level0/work-merge-cloud.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A group now lands through a pull request. The branch done verb writes the close on the work branch alone. It closes the group ticket, moves every open child to the parent or leaves it loose, and drops the cloud marker, and main stays untouched. The work skill and the dispatch skill then open a pull request against main with auto-merge on, and the check workflow runs on that pull request. The take verb hands out a stuck hand-over first, one standing behind main or past its stale age, with the ask to sync, check and push. The merge verb refuses a branch that an open pull request carries, so a desk merge never races the pull request.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the green run reaches the size list's files, the design input line and the take case alone
+- every case reaches git and the disk through the fakes the earlier cases use
+- each new function keeps the comment naming the hand-over it implements
+- one function in work-free.js answers a stuck hand-over, and the notes point at it
 
 # accept
 
