@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,21 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: design/draft
+  - step: design/draft
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 7c52096aa4d4c15f675aa6635125fb770a3c3fe1
+    hash_after: 7c52096aa4d4c15f675aa6635125fb770a3c3fe1
+    inputs:
+      - name: ask
+        hash: c0a5647ee3b28623
+        size: 1295
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 5a2557d24d86ab34
+        size: 13510
+      - name: [[spec/guidance/cloud/cloud]]
+        hash: 095e262b0b5667dc
+        size: 2735
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -216,7 +231,7 @@ The work skill, `.claude/skills/work/SKILL.md`:
 
 Each file opens with the `name` and `description` the skill loader reads.
 
-The test, `test/contract/skills.test.js`, reads both files off the disk. It parses the frontmatter, and gathers every `./RUNME.sh <verb>` the body names. It imports `verbs` from `src/scripts/cli.js`, the table `help` prints, so the verb list stands in one place.
+The test, `test/contract/skills.test.js`, reads both files through the disk door, so it stands under test/contract, where FakeDoorsInTest puts a test driving the real thing. It parses the frontmatter, and gathers every `./RUNME.sh <verb>` the body names. It imports `verbs` from `src/scripts/cli.js`, the table `help` prints, so the verb list stands in one place.
 
 `spec/guidance/cloud/cloud.md` gains a rule pointing a worker at the work skill for its road, and the skill links the guidance back for the rules.
 
@@ -245,7 +260,7 @@ I assume a connector names the session tool and the pull request tool, so the sk
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- first
+- the rename moves the test under test/contract, and the approach names the new path
 
 ### size
 
