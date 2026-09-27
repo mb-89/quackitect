@@ -553,6 +553,31 @@ test("release writes hash_after onto a held group, and frees it for anybody", ()
   assert.ok(ranGit(outside).includes("git push origin work/one-group"));
 });
 
+// A merge that keeps two boxes' sync rows leaves both open. [[spec/design_output/work#held-derives-from-the-record]]
+test("release closes every open take a merge left, so the group reads free", () => {
+  const first = withEntry(
+    GROUP_NOTE,
+    { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" },
+    fakeFront(),
+  );
+  const both = withEntry(
+    first,
+    { step: "sync", hand: "box 7c1d", hash_before: "d4e5f6" },
+    fakeFront(),
+  );
+  const { it, disk } = doorsSaying(groupRemote(both), { [on("one-group")]: both });
+
+  const { code } = heard(() => work(ROOT, ["release"], it));
+
+  assert.equal(code, 0);
+  const rows = recordIn(disk.read(on("one-group")));
+  assert.deepEqual(
+    rows.map((one) => one.hash_after),
+    [SHA, SHA],
+  );
+  assert.equal(groupStanding(disk.read(on("one-group"))), TODO);
+});
+
 // [[spec/design_output/work#a-stale-group-is-yours]]
 test("release on a group nobody holds writes nothing, and says so", () => {
   const { it, outside } = doorsSaying(groupRemote(), { [on("one-group")]: GROUP_NOTE });

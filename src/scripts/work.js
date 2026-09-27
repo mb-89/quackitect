@@ -568,8 +568,15 @@ function letGo(it, branch, name, here) {
     return 0;
   }
 
+  // A merge that keeps two boxes' rows leaves more than one take open, and the release closes each, so the group reads free. [[spec/design_output/work#held-derives-from-the-record]]
   const tip = it.git.run(["rev-parse", "HEAD"], true).out;
-  it.disk.write(path, withHashAfter(it.disk.read(path), tip, it.front));
+  let text = it.disk.read(path);
+  for (let open = heldIn(text); open; open = heldIn(text)) {
+    const next = withHashAfter(text, tip, it.front);
+    if (next === text) break;
+    text = next;
+  }
+  it.disk.write(path, text);
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${branch}: ${held.hand} lets it go`], true);
   if (!it.git.run(["push", "origin", branch]).ok) return 1;
