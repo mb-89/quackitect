@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -147,6 +147,11 @@ record:
       - name: tests
         exit: 0
         said: green, 5 test(s) pass in 1 file(s)
+  - step: design/person-1
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 8408a922065a92982ea01eaa7671f08e158b7fb5
+    hash_after: 8408a922065a92982ea01eaa7671f08e158b7fb5
+    def: 99d61fd78ece9ad4
 group: the-foundation-closes-its-gaps
 ---
 
@@ -227,8 +232,9 @@ the first done_when line meets the Windows job of check.yml, the second meets th
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is choice -->
+
+passes
 
 ## tests-red
 
