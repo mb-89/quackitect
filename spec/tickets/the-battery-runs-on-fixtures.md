@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box d7a71af6d6103 · claude-code-remote
     hash_before: 08c339f3a70a654a86fe8c26711d4ca84286832d
     hash_after: 08c339f3a70a654a86fe8c26711d4ca84286832d
+  - step: implement/tests-red
+    hand: box d7d6327f2b101 · claude-code-remote
+    hash_before: 92ea4084e640639baee8fa5f38177ae0f07f1df6
+    hash_after: 92ea4084e640639baee8fa5f38177ae0f07f1df6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -210,17 +218,27 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/contract/vehicle.test.js test/contract/process.test.js test/contract/cli-verbs.test.js test/contract/drawing-bundle.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The bundle case fails on its claim that the script lands in the temp folder, because `bundle` still writes to `OUT`. The vehicle, process and cli-verbs cases pass at once, because each drops a spawn and asks no code change. A surprise: the identity case failed on some runs. Two ids made in one millisecond with one pid come out equal. The method's identity now carries another pid, as a second hand makes it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The tests touch the four files the ask names, and `bundle.js` the ask's drawing-bundle line names.
+- The bundle case writes into a temp folder, and the vehicle case builds its fixture there. Neither reaches the tree.
+- Each file's head comment names what the case proves, and each case links the design note it follows.
+- The ticket names each test once, and the cases point at the design notes.
+- The review passes with one finding, and `battery-ask-names-the-bundle` closes it on the ask.
 
 ## change
 

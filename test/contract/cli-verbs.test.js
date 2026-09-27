@@ -7,7 +7,6 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
-import { proc } from "../../src/doors/proc.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const source = disk().read(join(root, "src", "scripts", "cli.js"));
@@ -49,22 +48,18 @@ test("the find verb reads the log through the log verb, and the tree through the
   assert.match(row, /asksIndex\(\["find", \.\.\.rest\]\)/);
 });
 
-// The verb over one named file runs the real runner, and answers the branch runner's word. [[spec/design_output/pull#the-test-verb]]
-test("the test verb runs the file you name, and answers one word on it", () => {
+// The verb over named files hands them to the branch runner, and test/level0/test-verb.test.js proves that runner's word over a fake. [[spec/design_output/pull#the-test-verb]]
+test("the test verb hands the files you name to the branch runner", () => {
   const row = /^ {2}test: \{[\s\S]*?^ {2}\},/m.exec(source)?.[0] ?? "";
-  assert.match(row, /rest/, "the row hands what you name through");
-  const ran = proc().run(
-    [
-      process.execPath,
-      join(root, "src", "scripts", "cli.js"),
-      "test",
-      "test/level0/go-modules.test.js",
-    ],
-    // The runner marks its own children, and a child so marked writes no report to its output. [[spec/design_output/pull#the-test-verb]]
-    { cwd: root, env: { NODE_TEST_CONTEXT: undefined } },
+  assert.match(
+    row,
+    /rest\.length \? namedTests\(rest\)/,
+    "the row hands what you name through",
   );
-  assert.equal(ran.exitCode, 0, ran.stdout + ran.stderr);
-  assert.match(ran.stdout, /^green, \d+ test\(s\) pass in 1 file\(s\)/m);
+  const named =
+    /^export function namedTests\(names\) \{[\s\S]*?^\}/m.exec(source)?.[0] ?? "";
+  assert.match(named, /testVerb\(/, "and the named files reach the branch runner");
+  assert.match(named, /\["test", \.\.\.names\]/, "every one of them");
 });
 
 // A desk's verb pushes nothing, so the commit verb says where it pushes. [[spec/guidance/working]]
