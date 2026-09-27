@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: 189779364211379c9018d016435ed3107c2b12b8
+    hash_after: 189779364211379c9018d016435ed3107c2b12b8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 18 test(s) pass in 2 file(s); green, src/index passes; green, src/tui passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/a-pull-hands-one-step.md:258:1: ListItem: A sentence in a list item holds 20 words, and this one holds 24. "
+reason: done
 ---
 
 # Ask
@@ -264,26 +276,34 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test test/level0/pull-format.test.js test/level0/write.test.js src/index/ticket_test.go src/tui/work/workitems_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hand-out names the step in hand alone and asks for the payload, and the spawn prompt asks a helper for the same. The engine formats each answer before it merges it. The write door refuses an agent a write to an open ticket past its Discussion. The index row carries the progress of a route, and the work tab draws it. For details, see [[spec/design_output/pull#the-fields-ride-the-payload]].
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the hand-out, the payload, the spawn prompt, the door, the index row, the tab and their cases
+- the door cases run over the fake disk, and the Go cases over a tree each case writes
+- each new function links the chapter it implements
+- the chapter owns the formatter and the door, and the comments point at it
+- the review rows stand fixed, and the says field names where each lands
 
 # Discussion
 

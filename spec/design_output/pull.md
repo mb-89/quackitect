@@ -391,11 +391,18 @@ hash is no ancestor of the tip. Then the hold drops, and the hand pulls again.
 
 ## The fields ride the payload
 
-A hand fills the slots through the write door, or hands the fields back as
-the pull's payload. `--fields '{"verdict": "pass"}'` carries one key per
-field of the leaf in hand, and `checked` where a checklist stands. The engine
-puts each text under its heading in memory, past the mint's comments, and runs
-the checks over that text. The pull refuses a key naming no field of the leaf.
+A hand hands the fields back as the pull's payload, and the engine writes the
+ticket file. `--fields '{"verdict": "pass"}'` carries one key per field of
+the leaf in hand, and `checked` where a checklist stands. `formatted` in
+`src/scripts/pull-format.js` formats each answer first. The engine puts each
+text under its heading in memory, past the mint's comments, and runs the
+checks over that text. The pull refuses a key naming no field of the leaf.
+
+The write door refuses an agent a write to an open ticket under
+`spec/tickets`, past its Discussion. A draft and a closed ticket take one.
+`ticketDoor` in `src/bridge/write.js` holds it. The work tab draws the
+progress the index row carries: the leaves the record closes over the leaves
+of the route.
 
 A refused payload reaches no disk. It rides the hold, so the next hand-back
 with no `--fields` meets the same checks over the same text. A refusal at the
