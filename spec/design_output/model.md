@@ -105,6 +105,7 @@ names what it does, and the code holds it in `src/q`:
 | takes a write from the name's registered writer alone | `Commit`, which names the writer and refuses every other name |
 | hands out one snapshot | `Snapshot` |
 | pushes changes | `val.<name>` on the bus, per [[spec/design_output/model#the-inner-protocol]] |
+| settles each change in one wave, lowest height first | the scheduler, per [[spec/design_output/model#one-wave-settles-a-change]] |
 | answers the built-in value | where no value stands, or where its writer runs nowhere, with the mark `not provided` |
 
 
@@ -306,9 +307,10 @@ session.
 | `q.Fold` | a state reduced over the events of `session/`, one event at a time | when an event lands |
 | `q.Action` and `q.Op` | a list of requests to IO modules | when a caller calls it |
 
-A provider runs once at a time, and a change during a run leaves one run
-pending. A provider runs when a name it reads moves, and one reading nothing
-that moves stays where it stands. So a save moving one file runs the providers
+A provider runs once at a time. A change during a run waits for the next wave,
+per [[spec/design_output/model#one-wave-settles-a-change]]. A provider
+runs when a name it reads moves, and one reading nothing that moves stays where
+it stands. So a save moving one file runs the providers
 reading that path alone.
 
 ## The events of a session
@@ -353,10 +355,97 @@ The model carries one revision, and every commit raises it.
 | input | the index reads every input at one revision, and hands the struct over |
 | run | the provider reads the struct alone |
 | commit | the output names the revision it reads, and lands in one transaction |
-| a change during the run | the commit lands, and the next run starts at once |
+| a change during the run | the commit lands, and the change waits for the next wave |
 
 So a value always reads as a function of one consistent snapshot, and a busy
 input still lets values through.
+
+## One wave settles a change
+
+X feeds A and B, and A feeds B too. A module running on every push runs B once
+on the new X and the old A, and then again. So a change settles as one wave, in
+an order that stays fixed while the process lives:
+
+| what the index keeps | when it builds it | what it holds |
+|---|---|---|
+| a module's height | at start, in the passes over the wiring | one past the highest height among the writers of its in-ports. The IO modules stand at 0 |
+| a name's run list | the first time the name changes | the modules downstream of it, sorted by height |
+
+Both stay for the life of the process, and no list needs clearing, because
+modules load at start alone. A change of modules restarts the index. The passes
+refuse a cycle, per [[spec/design_output/model#the-index-resolves-in-passes]], so
+every module gets a height. A tick is such a name too, so modules on one tick
+share one kept list, run lowest height first.
+
+```mermaid
+flowchart LR
+  subgraph h0["height 0"]
+    watch["watch, flagged io: writes X"]
+    clock["clock, flagged io: writes Y"]
+  end
+  subgraph h1["height 1"]
+    A["module A: reads X, writes A"]
+    C["module C: reads Y, writes C"]
+  end
+  subgraph h2["height 2"]
+    B["module B: reads X and A, writes B"]
+  end
+  watch --> A
+  watch --> B
+  A --> B
+  clock --> C
+  B --> readers["the sidebar and the window, watching B"]
+```
+
+| the step | what holds |
+|---|---|
+| a commit to names at revision r | marks their run lists pending at r, building a list the first time its name changes |
+| a run request | goes to a module once none of its in-ports reads a pending name |
+| one height | its modules run in parallel, each in its own process |
+| a change arriving during a wave | waits for the next wave |
+| a read | waits on nothing, and gets the last settled value |
+
+```mermaid
+sequenceDiagram
+  participant I as the index
+  participant A as module A
+  participant B as module B
+  participant R as the readers
+  I->>I: X lands at r7, and A and B stand pending
+  I->>A: run, reading X at r7
+  A->>I: A lands at r8
+  I->>I: X lands at r10, and waits for the next wave
+  I->>B: run, reading X at r7 and A at r8
+  B->>I: B lands at r9, and nothing stands pending
+  I->>R: one push, and B reads settled
+  I->>I: the next wave starts, with X at r10
+```
+
+So B runs once, after A, and a reader sees no half-settled mix. A value settles
+once its `from` revision, `cell.from` in `src/q/store.go`, reaches the last
+change upstream of it. `quack why` shows `pending since r7` for a value a wave
+still holds.
+
+These savings change no result:
+
+| the saving | what holds |
+|---|---|
+| early cutoff | a commit whose value equals the old one clears the pending marks below it, with no run and no push. The index compares the hash of the serialized form the mirror uses |
+| demand | a watched name runs by itself, and an unwatched pending name runs when something reads it |
+
+A name stands watched with a subscriber, a view, or a watched reader below it.
+The read of an unwatched pending name is the one read that waits, and it waits
+for a run alone, and for no write.
+
+A module that runs when told reads a tick. A tick is a name whose value changes,
+such as a counter an action raises, or `clock/minute`. The wiring binds a tick
+like any in-port, so no event port stands. A push goes out on a real change
+alone. So a tick is a counter or a time, and a flag holding one value moves
+nothing.
+
+The waves schedule and hold no business logic, so they stand in the index core
+beside the resolution and the push. For the earlier work behind them, see
+[[spec/rationales/changes-settle-in-waves]].
 
 ## An action lists requests
 
@@ -432,7 +521,7 @@ so it answers where a value comes from:
 
 | the part of the answer | what it holds |
 |---|---|
-| the value | the value, and whether a provider answers it, it stands at its built-in value, or it stands stale since a time |
+| the value | the value, and whether a provider answers it, or it stands `pending since r`, stale since a time, or at its built-in value |
 | the writer | the out-port writing the name, its instance, and the module file and line |
 | the inputs | that instance's in-ports, the names their wires bind, and their writers, down to the IO modules: `files/` paths, `session/` events and `clock/minute` |
 | the readers | every provider, view and surface reading it |

@@ -38,6 +38,7 @@ A box reads the argument here before it asks about a ruling:
 | `files/` mirrors the disk, and each structured file is a projection with a codec | [[spec/rationales/the-disk-is-one-mirror]] |
 | config as a flag on a topic, its layers, contexts and the config module | [[spec/rationales/config-comes-in-layers]] |
 | local ports in each module, and one wiring file binding them | [[spec/rationales/modules-stay-local]] |
+| a change settling as one wave, in the order the start fixes | [[spec/rationales/changes-settle-in-waves]] |
 
 # Where each folder goes
 

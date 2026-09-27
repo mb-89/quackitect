@@ -119,8 +119,13 @@ name its in-ports by local name:
 | output | one atomic commit: the names it provides, or the list of requests an action makes |
 
 A run reads no old value beside a new one, and it costs one round trip. Its
-output carries the revision it comes from, and a change during the run starts
-the next run.
+output carries the revision it comes from.
+
+A change settles as one wave. The start gives every module a height, and a name
+builds its run list of the modules below it the first time it changes. A commit marks its run
+list pending, and a module runs once none of its in-ports reads a pending name.
+So a module fed twice by one change runs once. A change during a wave waits for
+the next one, and a read waits on nothing and gets the last settled value.
 
 | what a module provides | what it answers |
 |---|---|
@@ -298,6 +303,7 @@ Every ruling stands, and a box builds on it with no question:
 | `files/` mirrors the disk, and each structured file is a projection with a codec and a kind | [[spec/design_output/model#everything-on-disk-mirrors]] |
 | a module declares local ports alone, and `spec/wiring.yaml` names the instances and binds each port | [[spec/rationales/modules-stay-local]] |
 | the passes resolve the wiring, and refuse loudly, naming the port | [[spec/design_output/model#the-index-resolves-in-passes]] |
+| a change settles as one wave, off heights and run lists the start fixes, with early cutoff and demand | [[spec/rationales/changes-settle-in-waves]] |
 | no central config topic stands: each module's keys stand under `<instance>/config/`, and the config module resolves them off their layers | [[spec/design_output/model#the-config-module]] |
 | a module knows nothing about where its config values come from | [[spec/design_output/model#config-comes-off-the-registrations]] |
 | a script opens a context with a lease, and an override wins over every context | [[spec/design_output/model#a-context-holds-a-lease]] |
