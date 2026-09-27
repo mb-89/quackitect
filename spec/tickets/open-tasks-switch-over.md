@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: retro/write
+step: retro/cloud
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [open-tasks-land-in-shadow]
@@ -105,6 +105,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box d7d80931cecf · claude-code-remote
+    hash_before: c115be15dead0c5ec7da65764ca7d4aa2930e7f8
+    hash_after: c115be15dead0c5ec7da65764ca7d4aa2930e7f8
 ---
 
 # Ask
@@ -174,11 +178,18 @@ Done when the badge and the work tab's brackets read one name.
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-badge-reads-open-tasks]]: waits on [[spec/tickets/open-tasks-run-in-shadow]] under `depends_on`.
+- The sync and split steps pass, and both children leave the group at `branch done`.
+- The switch itself waits: `work/open-tasks` and the `slices` key stand nowhere in the tree.
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- A grep and the shadow log show the missing path before any code changes.
+- The commit verb runs the check, so the one push lands green.
 
 ### badly
 
@@ -186,11 +197,21 @@ Done when the badge and the work tab's brackets read one name.
 
 <!-- the form is list -->
 
+- 04:20 UTC: the switch key reads true while the shadow group closes with its children open.
+- 04:22 UTC: a Bash call and a commit name no ticket, and the doors refuse them.
+- 04:26 UTC: the pull reads the group as a todo in hand and hands nothing out.
+- 04:27 UTC: a patch naming the group refuses, because the plan names a todo title.
+- 04:29 UTC: the stop hook turns the turn toward the pull and `branch done`.
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- The switch key: [[spec/design_output/work#a-switch-holds-a-group]] reads the shadow log before a box takes the group.
+- The plan: a group named as working adds no todo that blocks the pull.
+- The door: a patch serves the ticket the plan names, whatever todo stands in hand.
 
 ### thoughts
 
@@ -198,11 +219,19 @@ Done when the badge and the work tab's brackets read one name.
 
 <!-- the form is text -->
 
+The agent weighs building the shadow path here, and refuses it, because four tickets outside the group own it. It holds `branch done` back first, since the children leave the group there. The stop hook then names `branch done`, and the agent follows it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- Each fact points at the ticket owning it.
+- The chapter adds no number past the times of the run.
+- The chapter writes no header.
+- The run carries the stop hook's prompt, and every error stands with its time in UTC.
+- The chapter names the agent and the owner by role, and no path of the box.
 
 ## cloud
 
