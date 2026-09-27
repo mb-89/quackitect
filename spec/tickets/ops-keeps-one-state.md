@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -144,6 +144,18 @@ record:
         hash: c8c85f5e2d46f43b
         size: 2000
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: b6deae09f99bb6469af254dbe4a31302f4928cbf
+    hash_after: b6deae09f99bb6469af254dbe4a31302f4928cbf
+    inputs:
+      - name: design/draft
+        hash: c8c85f5e2d46f43b
+        size: 2000
+      - name: design/tests-red
+        hash: e0793d011fade350
+        size: 979
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -256,8 +268,10 @@ the index case keeps the book in memory and moves its own clock, so it opens no 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- a-drop-refuses-another-writer: once commits-name-their-writer lands, Store.Drop refuses a name another writer owns, the way Commit then does, with a case beside TestADropRefusesANameNobodyProvides
 
 # implement
 
