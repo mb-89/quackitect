@@ -164,7 +164,7 @@ test("the dry run writes no file, makes no commit and pushes nothing", () => {
   assert.match(said.said, /work\/first/);
   assert.deepEqual([...disk.files.keys()], before);
   const writes = ranGit(outside).filter((row) =>
-    /^git (commit|push|merge|switch|reset|checkout|add)\b/.test(row),
+    /^git (commit|push|merge|switch|reset|checkout|add)( |$)/.test(row),
   );
   assert.deepEqual(writes, []);
 });
@@ -201,4 +201,32 @@ test("freeNow and the plan name the same ready groups", () => {
 // The verb table carries the row `./RUNME.sh dispatch` reaches. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
 test("the verb table carries dispatch", () => {
   assert.equal(typeof verbs.dispatch?.run, "function");
+});
+
+test("a child reads off its own group's branch, and another branch's older copy counts nowhere", () => {
+  const moved = CHILD("first", "open");
+  const { it } = doorsSaying(
+    remoteSaying(
+      [
+        { branch: "work/first", tip: "tip-first", when: NOW },
+        { branch: "work/second", tip: "tip-second", when: NOW },
+      ],
+      {
+        "work/first:spec/tickets/first.md": GROUP_NOTE,
+        "work/first:spec/tickets/a-child.md": moved,
+        "work/second:spec/tickets/second.md": GROUP_NOTE,
+        "work/second:spec/tickets/a-child.md": forPerson.replace(
+          "state: open\n",
+          "state: open\ngroup: first\n",
+        ),
+        "origin/main:spec/tickets/a-child.md": forPerson.replace(
+          "state: open\n",
+          "state: open\ngroup: first\n",
+        ),
+      },
+    ),
+  );
+  it.clock = fakeClock(FROM);
+  it.stale = "12h";
+  assert.deepEqual(planOf(it).questions, []);
 });

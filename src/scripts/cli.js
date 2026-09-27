@@ -66,6 +66,7 @@ import {
 } from "./vehicle.js";
 import { voice } from "./voice.js";
 import { cloud, pulling, work } from "./work.js";
+import { dispatch } from "./dispatch.js";
 import { testVerb } from "./work-test.js";
 
 // The root reads the platform once, and the register road takes it off the hand. [[spec/design_output/doors#a-door-reads-the-outside]]
@@ -150,6 +151,11 @@ export const verbs = {
   cloud: {
     says: "the cloud routine: trigger",
     run: async () => cloud(it.work, rest, it),
+  },
+  // [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
+  dispatch: {
+    says: "the dispatcher's plan: --dry prints it, and --json prints it as JSON",
+    run: async () => dispatch(it.work, rest, it),
   },
   ticket: {
     says: "tickets: pull, note, update, open, todo, route, yours, fill",

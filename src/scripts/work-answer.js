@@ -296,7 +296,7 @@ function ephemeralRows(it) {
 }
 
 // [[spec/design_output/pull#the-queue-is-an-outline]]
-function waitsOnPerson(one) {
+export function waitsOnPerson(one) {
   return (
     personStep(one.text) ||
     (fieldOf(one.text, "state") === DRAFT && !agentOpens(one.text))

@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -159,6 +159,15 @@ record:
         hash: e58eac2283e8490b
         size: 779
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: a2c1998d689c09272dc3e56d7142deffd8c4edb5
+    hash_after: a2c1998d689c09272dc3e56d7142deffd8c4edb5
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -313,14 +322,19 @@ accept: the approach answers the ask, and a red case decides every done_when lin
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/dispatch.js src/scripts/cli.js src/scripts/work-answer.js test/level0/dispatch.test.js test/level0/work-answer.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and the case beside the waitsOnPerson export
+- the cases reach git, the disk and the clock through the fakes alone
+- the header of src/scripts/dispatch.js names the dispatcher chapter it implements
+- the parts of the plan stand once in PARTS, and the stale span stays in work-free.js
 
 ## tests-green
 
