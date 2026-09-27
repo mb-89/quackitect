@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d7d8cca563b1 · claude-code-remote
@@ -89,6 +89,10 @@ record:
     hash_after: 7906727a23f0f93bccd2aab8805031d3c9868014
     returns: 1
     why: "the desk guard leaves bless.agent open: `./RUNME.sh config bless.agent true` writes it through `settings.write` in .claude/skills/level0/lib/config.js, and the write door never sees that write; a shell write into .se/.runtime/config.json passes, since `FREE` in .claude/skills/level0/lib/bash.js frees every path under .se; the env layer answers bless.agent from `SE_BLESS_AGENT` through `varOf`, and the approach guards the `HARNESS` names alone, so an agent sets it on its own command line; the strip on an edit rests on src/scripts/pull-stale.js, which stands unbuilt, and the chapter says a merge where the ask says an edit; name the function that drops the bless and the ticket it waits on; the callers list leaves out spec/config/level0.schema.json, which needs the bless.agent entry the sidebar button draws, and the new src/scripts/pull-bless.js; `HARNESS` in src/extension/lib/lens.js copies the list in src/scripts/pull-hand-of.js; point the shell door at one list"
+  - step: design/draft
+    hand: box d7d8cca563b1 · claude-code-remote
+    hash_before: 64040d1db173ca87b25d8f6440d24a739f81d48d
+    hash_after: 64040d1db173ca87b25d8f6440d24a739f81d48d
 ---
 
 # Ask
@@ -121,30 +125,30 @@ For details, see [[spec/design_output/pull#the-bless]].
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-src/scripts/pull.js handBack, which calls passed and withPayload,src/scripts/pull-writes.js passed, which leaves a bless gate on its step,src/scripts/ticket.js the verb table, which gains bless,src/extension/sidebar.js set, which the bless button calls,src/bridge/write.js the write door, which gains the bless key guard,src/bridge/bash.js onBash, whose check list gains the harness guard,spec/schemas/ticket.schema.yaml the step properties, which gain bless
+src/scripts/pull.js handBack, which calls passed and then blessKept,src/scripts/pull-writes.js passed, which leaves a bless gate on its step,src/scripts/pull-hand.js handOut, which calls blessHolds before a leaf past a bless gate,src/scripts/pull-bless.js blessKept, blessHolds and bless, which the change adds,src/scripts/ticket.js the verb table, which gains bless,src/extension/sidebar.js the message handler, which gains the bless message,src/bridge/write.js the write door, which refuses an agent's write to the bless file,src/bridge/bash.js onBash, whose check list gains the bless file guard and the harness guard,.claude/skills/level0/lib/bash.js FREE, which the bless file guard runs ahead of,spec/schemas/ticket.schema.yaml the step properties, which gain bless
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
 <!-- the form is list -->
 
-test/level0/pull-bless.test.js an accept at a bless gate leaves the step on the gate,test/level0/pull-bless.test.js an agent at a desk without bless.agent is refused the bless,test/level0/pull-bless.test.js an agent on a cloud box blesses,test/level0/pull-bless.test.js an edit to an input chapter strips the bless,test/level0/write-bless.test.js the write door refuses an agent's write to bless.agent,test/level0/bash-harness.test.js the shell door refuses a command setting a harness variable,test/level0/schema-bless.test.js the ticket schema admits bless on a gate
+test/level0/pull-bless.test.js an accept at a bless gate leaves the step on the gate,test/level0/pull-bless.test.js an agent at a desk without the bless file is refused the bless,test/level0/pull-bless.test.js an agent at a desk blesses where the bless file holds agent true,test/level0/pull-bless.test.js an agent on a cloud box blesses,test/level0/pull-bless.test.js a payload into an input chapter strips the bless,test/level0/pull-bless.test.js an edit off the engine puts the step back on the gate,test/level0/write-bless.test.js the write door refuses an agent's write to the bless file,test/level0/bash-bless.test.js the shell door refuses a command naming the bless file,test/level0/bash-bless.test.js the shell door refuses a command setting, exporting or unsetting a harness variable,test/level0/schema-bless.test.js the ticket schema admits bless on a gate
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-first
+the config verb writes bless.agent: the key leaves the config for its own file, which no config verb writes,a shell write under .se passes FREE: the shell door refuses a command naming the bless file, ahead of FREE,SE_BLESS_AGENT reaches the key through varOf: the bless file stands outside the config, so no variable maps to it,the strip leans on pull-stale.js: blessKept and blessHolds stand in pull-bless.js, and the chapter says edit,the callers miss pull-bless.js and the config schema: the callers name pull-bless.js, and the config schema drops out with the key,lens.js copies HARNESS: the shell guard reads the one list in pull-hand-of.js, and the copy in lens.js goes to the retro as a note
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-passed, handFaults, HARNESS, set, onBash and the verdict branch of handBack stand opened, and each claim checked there
-the callers list names each function whose behaviour the bless changes
-each done_when line maps to a test above: schema and wait, desk key, cloud and shell door, hash and strip
+passed, handBack, handOut, HARNESS, FREE, the config write and varOf stand opened, and each claim checked there
+the callers list names each function the bless changes, pull-bless.js among them
+each done_when line maps to a test above: schema and wait, desk file, cloud and shell door, hash and strip
 
 ## review
 

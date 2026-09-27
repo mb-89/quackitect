@@ -679,14 +679,24 @@ A gate carrying `bless: true` waits for a bless after its verdict. [[spec/design
 | an `accept` at the gate | records the verdict and leaves the step on the gate, as a final gate's points do |
 | a pull of the waiting gate | prints that the gate waits for a bless, and takes no hold |
 | `./RUNME.sh ticket bless <ticket>` | records `blessed` with the hash of what it blesses, and moves the step on |
-| a merge into a chapter the bless reads | drops the bless entry whose hash no longer matches, and the gate waits again |
+| an edit to a chapter the bless reads | `blessKept` drops the bless entry whose hash no longer matches, and the gate waits again |
+| a hand-out past a bless gate | `blessHolds` reads the hash again, and a bless that fails it puts `step` back on the gate |
 
 - `hashText` hashes the gate's own chapter, then the chapter of each leaf under its `input`.
-- A person blesses anywhere. An agent blesses on a cloud box, where `inCloud` holds.
-- An agent at a desk blesses where the local layer holds `bless.agent` as `true`. The sidebar button writes it through `set` in `src/extension/sidebar.js`.
-- The write door refuses an agent's write that moves `bless.agent` in `.se/.runtime/config.json`.
+- `handBack` runs `blessKept` after it merges a payload. `blessHolds` catches an edit off the engine, a person's in the editor among them.
+
+| the hand | where it blesses |
+|---|---|
+| a person | anywhere |
+| an agent on a cloud box | where `inCloud` holds |
+| an agent at a desk | where `.se/.runtime/bless.json` holds `agent: true` |
+
+- The bless file stands outside the config, so no config verb and no variable reaches it.
+- The sidebar button writes it through a `bless` message in `src/extension/sidebar.js`.
+- The write door refuses an agent's write to the bless file.
+- The shell door refuses a command naming the bless file.
 - `HARNESS` in `src/scripts/pull-hand-of.js` names the variables naming the hand and the box.
-- The shell door refuses a command that sets, exports, unsets or clears one of them.
+- The shell door refuses a command that sets, exports, unsets or clears one of them, off that one list.
 
 # A leaf comes back
 
