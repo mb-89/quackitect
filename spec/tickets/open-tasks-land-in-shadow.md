@@ -182,11 +182,21 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 
 <!-- the form is list -->
 
+- [[spec/tickets/close-force-guards-trunk-checkout]]: a test for the dirty-tree refusal of `close`
+- [[spec/tickets/open-marker-outlives-refused-push]]: closes on the code standing, under its test
+- [[spec/tickets/open-marks-standing-branches]]: closes on the code standing, under its test
+- [[spec/tickets/rationale-drops-release-row]]: the row leaves the rationale, and the step stays at do
+- [[spec/tickets/queue-approach-sentence-split]]: a question for the owner
+- [[spec/tickets/holds-leave-with-their-ticket]]: the successor of the stale-hold note
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- Two trivial asks close on a read of the code, because the parent's build already carries the change.
+- The commit verb runs the check on each commit, so every push lands green.
 
 ### badly
 
@@ -194,11 +204,26 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 
 <!-- the form is list -->
 
+- 03:33 UTC: a clear by level zero opens the run, and the first Bash call names no ticket.
+- 03:37 UTC: a hand-back refuses two command fields written in backticks.
+- 03:38 UTC and 03:52 UTC: a commit piped into `tail`, then a pull, meets `LandingFollowsItsGate`.
+- 03:46 UTC: the pass of `rationale-drops-release-row` refuses on a warning under another ticket's approach.
+- 03:47 UTC: the door refuses the split of that sentence, because the approach is the engine's.
+- 03:49 UTC to 04:01 UTC: the queue hands the same step back after a fail, and the stop claim falls three times.
+- 03:59 UTC: a group field on a question ticket reddens the check through `GroupAsksNobody`.
+- 04:01 UTC: the stop hook turns the turn toward `branch done`.
+- Through the run: a working todo in the plan blocks the pull, and each pull names two closed tickets as in hand.
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- The pass gate: a `tests` field on a change touching no code reads the lint over the files the step changes.
+- [[spec/tickets/holds-leave-with-their-ticket]]: a hold leaves when its ticket closes.
+- The plan: naming a ticket as working adds no todo that blocks the pull.
+- [[spec/tickets/queue-approach-sentence-split]]: the owner splits the sentence, and the review goes on.
 
 ### thoughts
 
@@ -206,11 +231,19 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 
 <!-- the form is text -->
 
+The agent weighs a `--became` hand-back for the stuck step, and refuses it, because the change stands done and `became` names work moving elsewhere. It reads the stop reasons as unclaimable from a cloud box with a sibling blocked, and the hook's pointer at `branch done` resolves that.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- Each fact points at the ticket owning it.
+- The chapter adds no number past the times of the run.
+- The chapter writes no header.
+- The run carries no owner prompt, and every error stands with its time in UTC.
+- The chapter names the agent and the owner by role, and no path of the box.
 
 ## cloud
 
