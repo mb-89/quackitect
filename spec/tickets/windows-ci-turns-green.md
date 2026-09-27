@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -165,6 +165,18 @@ record:
         hash: 41f1af84a07bf38f
         size: 1533
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7dfbbf7a2d0 · claude-code-remote
+    hash_before: c0b36d7336a75a2a31535011530d16e51d25b57c
+    hash_after: c0b36d7336a75a2a31535011530d16e51d25b57c
+    inputs:
+      - name: design/draft
+        hash: 41f1af84a07bf38f
+        size: 1533
+      - name: design/tests-red
+        hash: 84472a113fb13fb0
+        size: 805
+    def: dc4904ab364efa10
 group: the-foundation-closes-its-gaps
 ---
 
@@ -289,8 +301,9 @@ the cases start the real index on temporary trees, which the contract folder all
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept: the leak case and the source case stand in test/contract/index.test.js, the source case fails on its assertion, the Windows job line meets check.yml, and the check decides the last line
 
 # implement
 
