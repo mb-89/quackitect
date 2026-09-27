@@ -48,11 +48,15 @@ approach items 1 and 4 change `src/scripts/cli-check.js`, `src/scripts/cli-read.
 
 <!-- the form is command -->
 
+    ./RUNME.sh check > /dev/null 2>&1 && echo green
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +64,17 @@ approach items 1 and 4 change `src/scripts/cli-check.js`, `src/scripts/cli-read.
 
 <!-- the form is text -->
 
+The wrapper ask's check line names `goHolds` in `src/scripts/cli-check.js` and `lint` in `src/scripts/cli-read.js`. Its tools line names `toolsText` in `src/bridge/guidance.js`. The approach changes all three, and the implement checklist refuses a file the ask leaves out.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change names each file on the ask line whose approach item changes it.
+- The change reveals no cleanup.
+- Each file stands once on the ask, and the approach carries the detail.
 
 # Discussion
 

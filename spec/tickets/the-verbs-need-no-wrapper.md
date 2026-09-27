@@ -95,10 +95,10 @@ A hand reads the failing case off the last lines of `check`, `test` and `branch 
 
 `check` ends on the whole run's output and takes no `--errors`, `test` counts failing tests and names none, and `branch merge` prints the check's last line alone. The tools block names tools and no verb, so a fresh session runs `--help` and calls Biome by path where `./RUNME.sh fix <file>` and `./RUNME.sh lint <file>` stand.
 
-- `./RUNME.sh check --errors` prints the failing cases and the findings at error alone, with a case in a new `test/level0/check-errors.test.js`
+- `./RUNME.sh check --errors` prints the failing cases and the findings at error alone, with a case in a new `test/level0/check-errors.test.js`. It quiets `goHolds` in `src/scripts/cli-check.js` and keeps the errors of `lint` in `src/scripts/cli-read.js`.
 - `testSays` in `src/scripts/work-test.js` names each failing case above its verdict line, with a case in `test/level0/test-verb.test.js`
 - `checkSays` in `src/scripts/work-merge.js` prints the failing cases the check names, with a case in `test/level0/work-group.test.js`
-- the `level0-tools` block names each verb of `src/scripts/cli.js` with its usage line, with a case in `test/level0/tools-door.test.js`
+- the `level0-tools` block names each verb of `src/scripts/cli.js` with its usage line, with a case in `test/level0/tools-door.test.js`. `toolsText` in `src/bridge/guidance.js` writes it.
 - `./RUNME.sh ticket note` names a standing note whose words match the line before it writes, with a case in `test/level0/ticket-verb.test.js`
 - `./RUNME.sh check` exits 0
 
