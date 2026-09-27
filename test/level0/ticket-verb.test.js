@@ -196,6 +196,36 @@ test("ticket note writes a private ticket off the note process, and says so", ()
   assert.match(ran.said, /waits for a retro to decide it/);
 });
 
+// A line a standing note already carries belongs there, so the verb names that note before it writes a twin. [[spec/tickets/the-verbs-need-no-wrapper]]
+test("ticket note names a standing note whose words match the line, before it writes", () => {
+  const said = treeWithProcesses({
+    [at("spec/tickets/lint-drags.md")]:
+      "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nThe lint drags past a minute.\n\n# Discussion\n",
+    [at("spec/tickets/lint-closed.md")]:
+      "---\nkind: [[ticket]]\nstate: done\n---\n\n# Ask\n\nThe lint drags past a minute.\n\n# Discussion\n",
+  });
+  const ran = heard(() =>
+    ticket(
+      ROOT,
+      ["note", "slow-lint", "The lint drags past a minute on each run."],
+      said.it,
+    ),
+  );
+
+  assert.equal(ran.code, 0);
+  assert.match(ran.said, /spec\/tickets\/lint-drags\.md/, "it names the open note");
+  assert.doesNotMatch(ran.said, /lint-closed/, "and no closed one");
+  assert.ok(
+    ran.said.indexOf("lint-drags") < ran.said.indexOf("slow-lint.md stands"),
+    "before it writes",
+  );
+  assert.equal(
+    said.disk.exists(at(`${NOTES}/slow-lint.md`)),
+    true,
+    "and the note lands",
+  );
+});
+
 // A note asking for a discussion waits for a person, so the pull hands it to no agent at a desk. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 test("ticket note --talk marks the decide step a person's, and the line loses the flag", () => {
   const said = treeWithProcesses();

@@ -439,7 +439,7 @@ test("a group held past staleAfter stands under yours, with its three answers", 
 // [[spec/design_output/work#the-merge-lands-the-truth]]
 test("merge runs the check on the merge commit, and undoes the merge on red", () => {
   const red = {
-    [`node ${join(ROOT, "src/scripts/cli.js")} check`]: {
+    [`node ${join(ROOT, "src/scripts/cli.js")} check --errors`]: {
       exitCode: 1,
       stdout: "two tests fail\n",
     },
@@ -456,6 +456,25 @@ test("merge runs the check on the merge commit, and undoes the merge on red", ()
     ranGit(outside).includes(`git reset --hard ${SHA}`),
     "trunk stands where it was",
   );
+});
+
+// The check under --errors prints the red cases alone, and the merge hands each one on. [[spec/tickets/the-verbs-need-no-wrapper]]
+test("merge on a red check prints each failing case the check names", () => {
+  const red = {
+    [`node ${join(ROOT, "src/scripts/cli.js")} check --errors`]: {
+      exitCode: 1,
+      stdout:
+        "test/level0/one.test.js: a first case: it broke\ntest/level0/two.test.js: a second case: it broke\n",
+    },
+  };
+  const { it } = doorsSaying(merging(red));
+  it.node = "node";
+
+  const { code, said } = heard(() => work(ROOT, ["merge", "one-group"], it));
+
+  assert.equal(code, 1);
+  assert.match(said, /one\.test\.js: a first case/, "the first case");
+  assert.match(said, /two\.test\.js: a second case/, "and the second");
 });
 
 // [[spec/design_output/work#the-merge-lands-the-truth]]
@@ -542,7 +561,7 @@ test("close drops a group's branch once trunk holds it", () => {
 
 // A cloud branch reads against trunk by its commits, and takes no group. [[spec/design_output/work#a-cloud-branch-comes-in]]
 const CLOUD = "claude/a-thing";
-const CHECK = `node ${join(ROOT, "src/scripts/cli.js")} check`;
+const CHECK = `node ${join(ROOT, "src/scripts/cli.js")} check --errors`;
 function cloudMerge(cherry, more = {}) {
   const { it, outside } = doorsSaying(
     merging({ [`git cherry main origin/${CLOUD}`]: { stdout: cherry }, ...more }),

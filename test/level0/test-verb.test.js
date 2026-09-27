@@ -184,3 +184,28 @@ test("test --red refuses where the test passes with the sources set aside", () =
   assert.equal(disk.read(`${ROOT}/${FRESH}`), "a new file\n");
   assert.equal(disk.exists(ASIDE), false);
 });
+
+// A hand reads the failing case off the verb's own lines, and the verdict stays last for the reader of its first word. [[spec/tickets/the-verbs-need-no-wrapper]]
+test("a red run names each failing case above its verdict line, and the verdict stays last", () => {
+  const stdout = [
+    "ok 1 - a green case",
+    "not ok 2 - a first red case",
+    "  ---",
+    "  error: AssertionError [ERR_ASSERTION]: it broke",
+    "  ...",
+    "not ok 3 - a second red case",
+    "# tests 3",
+    "# pass 1",
+    "# fail 2",
+  ].join("\n");
+
+  const rows = verbs
+    .testSays({ exitCode: 1, stdout, stderr: "" }, ["a.test.js"])
+    .split("\n");
+
+  assert.deepEqual(rows.slice(0, -1), [
+    "  not ok: a first red case",
+    "  not ok: a second red case",
+  ]);
+  assert.match(rows.at(-1), /^assertion, 2 test\(s\) fail on their own assertion/);
+});

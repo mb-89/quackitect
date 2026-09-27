@@ -77,7 +77,7 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box d7d6327f2b101 · claude-code-remote
     hash_before: 545a42b269093f13f9e77ade788d3a21baebc76b
     hash_after: 545a42b269093f13f9e77ade788d3a21baebc76b
+  - step: implement/tests-red
+    hand: box d7d6327f2b101 · claude-code-remote
+    hash_before: 72177427e718767e41714ad1e6a875948d546d31
+    hash_after: e75e95e4306e2eb2b20ae508f9e0b428b210f3c8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 9 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -214,17 +222,27 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/check-errors.test.js test/level0/test-verb.test.js test/level0/work-group.test.js test/level0/tools-door.test.js test/level0/ticket-verb.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Each new case fails on its own assertion, and the merge cases keyed on `check --errors` fail until `checkSays` passes the flag. A surprise: `cli.js` exits at import, so no case reaches a pure `errorsSaid` there. It stands in `src/scripts/cli-read.js` beside `warningsStood`, a file the ask names, and a case imports it there.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The tests touch the five test files the ask names.
+- Each case drives a fake disk or process, or a pure function.
+- Each new case links this ticket, whose approach it tests.
+- The help rows stay the one source of the verbs, and the case teaches the fake those rows.
+- The review's one finding stands fixed on the ask, in `wrapper-ask-names-its-files`.
 
 ## change
 
