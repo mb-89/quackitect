@@ -145,10 +145,11 @@ export function pairOf(method, work) {
 
 // A Windows path reads the same in any case, because the editor hands its drive letter in lower case and a shell in upper. [[spec/design_output/vehicle#the-register-holds-the-port]]
 export function same(one, other) {
-  return rooted(one) === rooted(other);
+  return rootKey(one) === rootKey(other);
 }
 
-function rooted(said) {
+// A path as `same` compares it: forward slashes, no trailing slash, and a drive letter's case folded. [[spec/tickets/box-keys-fold-drive-letters]]
+export function rootKey(said) {
   const path = slashed(said).replace(/\/+$/, "");
   return DRIVE.test(path) ? path.toLowerCase() : path;
 }

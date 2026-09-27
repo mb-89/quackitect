@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { BINDING, GOD } from "../../.claude/skills/level0/lib/config.js";
 import { FOLDER as LOG_FOLDER, SERVE } from "../../.claude/skills/level0/lib/log.js";
 import { runsHere } from "../../.claude/skills/level0/lib/paths.js";
-import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
+import { PORT_BASE, rootKey } from "../../.claude/skills/level0/lib/vehicle.js";
 import { awake } from "../doors/awake.js";
 import { biome } from "../doors/biome.js";
 import { clock } from "../doors/clock.js";
@@ -343,8 +343,8 @@ export function boxesOf(method, doors = {}) {
   const held = new Map();
   return (root) => {
     const work = String(root || method);
-    if (!held.has(work)) held.set(work, boxOf(method, work, doors));
-    return held.get(work);
+    if (!held.has(rootKey(work))) held.set(rootKey(work), boxOf(method, work, doors));
+    return held.get(rootKey(work));
   };
 }
 
