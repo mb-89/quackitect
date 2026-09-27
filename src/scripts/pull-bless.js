@@ -4,16 +4,15 @@
 
 import { cloudHere } from "../../.claude/skills/level0/lib/cloud.js";
 import { inRun } from "../../.claude/skills/level0/lib/folders.js";
-import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
+import { hashText } from "../../.claude/skills/level0/lib/hash.js";
 import { frontOf, recordIn, withEntry, withField } from "../engine/group.js";
-import { chapterText, staleRead } from "./pull-stale.js";
 import { agentOf, handOf, roleOf } from "./pull-hand-of.js";
 import { landedAlone } from "./pull-landed.js";
 import { leafOf, leavesOf, REFUSED, say, stepPathOf, walkOf } from "./pull-route.js";
+import { chapterText, staleRead } from "./pull-stale.js";
 import { stepOn } from "./pull-writes.js";
 
 export const BLESS_FILE = inRun("bless.json");
-const HASH = 16;
 const ENTRY = /^\s*- /;
 
 // What a door says to an agent reaching the bless file. [[spec/design_output/pull#the-bless]]
@@ -26,8 +25,8 @@ export function asksBless(leaf) {
   return Boolean(leaf?.gate) && leaf.said?.bless === true;
 }
 
-// The gate's own chapter, then the chapter of each leaf under its input. [[spec/design_output/pull#the-bless]]
-export function hashText(text, leaf) {
+// The gate's own chapter, then the chapter of each leaf under its input, through the hash the stale read takes. [[spec/design_output/pull#the-bless]]
+export function blessHash(text, leaf) {
   const inputs = [leaf.said?.input ?? []].flat().map(String);
   const under = walkOf(frontOf(text))
     .filter((one) => one.leaf)
@@ -36,7 +35,7 @@ export function hashText(text, leaf) {
       inputs.some((input) => path === input || path.startsWith(`${input}/`)),
     );
   const read = [leaf.path, ...under].map((path) => [path, chapterText(text, path)]);
-  return hashOf(JSON.stringify(read)).slice(0, HASH);
+  return hashText(JSON.stringify(read));
 }
 
 const blessedEntry = (entry) => Boolean(String(entry.blessed ?? "").trim());
@@ -50,7 +49,7 @@ const verdictEntry = (entry) =>
 export function blessedAt(text, leaf) {
   const mine = recordIn(text).filter((entry) => String(entry.step) === leaf.path);
   const verdict = mine.findLastIndex(verdictEntry);
-  const hash = hashText(text, leaf);
+  const hash = blessHash(text, leaf);
   const blessed = mine.findLastIndex(
     (entry) => blessedEntry(entry) && String(entry.blessed).trim() === hash,
   );
@@ -73,7 +72,7 @@ export function blessKept(text) {
   for (const entry of recordIn(text).filter(blessedEntry)) {
     const leaf = leafOf(front, String(entry.step));
     const hash = String(entry.blessed).trim();
-    if (!leaf || hashText(text, leaf) !== hash) kept = withoutBlessed(kept, hash);
+    if (!leaf || blessHash(text, leaf) !== hash) kept = withoutBlessed(kept, hash);
   }
   return kept;
 }
@@ -169,7 +168,7 @@ export function bless(it, at, name) {
   const changes = [`blesses ${leaf.path}`];
   const text = withEntry(
     one.text,
-    { step: leaf.path, hand: roleOf(handOf(it)), blessed: hashText(one.text, leaf) },
+    { step: leaf.path, hand: roleOf(handOf(it)), blessed: blessHash(one.text, leaf) },
     it.front,
   );
   one.text = stepOn(it, one, leaf, text, changes);

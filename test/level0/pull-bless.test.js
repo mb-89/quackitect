@@ -4,12 +4,13 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { fieldOf } from "../../src/engine/group.js";
-import { blessKept, readAgain } from "../../src/scripts/pull-bless.js";
+import { hashText } from "../../.claude/skills/level0/lib/hash.js";
+import { fieldOf, frontOf } from "../../src/engine/group.js";
+import { blessHash, blessKept, readAgain } from "../../src/scripts/pull-bless.js";
 import { takeable } from "../../src/scripts/pull-hand.js";
-import { stepOn } from "../../src/scripts/pull-writes.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
-import { frontOf } from "../../src/engine/group.js";
+import { chapterText } from "../../src/scripts/pull-stale.js";
+import { stepOn } from "../../src/scripts/pull-writes.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { pulling } from "../../src/scripts/work.js";
 import {
@@ -311,4 +312,15 @@ test("the read again before a hand-out puts a ticket whose bless an edit strips 
   assert.equal(read, one, "the read answers the ticket it reads");
   assert.equal(fieldOf(read.text, "step"), "gate");
   assert.equal(fieldOf(textOf(made), "step"), "gate", "the disk takes the move");
+});
+
+// [[spec/tickets/stale-shares-the-bless-hash]]
+test("the bless hashes a chapter with the hashText the stale read takes", () => {
+  const text =
+    "---\nstate: open\n---\n\n# Ask\n\nOne piece.\n\n# gate\n\n## verdict\n\naccept\n";
+  const read = [["gate", chapterText(text, "gate")]];
+  assert.equal(
+    blessHash(text, { path: "gate", said: {} }),
+    hashText(JSON.stringify(read)),
+  );
 });
