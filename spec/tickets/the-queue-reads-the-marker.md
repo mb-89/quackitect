@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -172,6 +172,18 @@ record:
         hash: 89f623ce88a3da39
         size: 2316
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 21241447370c588bee379f2eedac7172e058195e
+    hash_after: 21241447370c588bee379f2eedac7172e058195e
+    inputs:
+      - name: design/draft
+        hash: 89f623ce88a3da39
+        size: 2316
+      - name: design/tests-red
+        hash: 93ef7f626e9673f1
+        size: 721
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -284,8 +296,12 @@ cloudsIn reads the ticket texts a case plants, so no door stands in the case
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the second cloudsIn case passes today and takes no branch, so it decided no line: the gate adds a case in test/level0/queue-cloud.test.js calling answerOf with an unmerged branch whose group carries no marker, and it stands red on the branch union until placesIn reads the marker alone.
+- every group standing on a remote work branch with no marker stands closed and merged on main, so the change moves no live group to the desk.
+- the callers list reads as one line joined by commas: the builder reads it as the eight callers it names, and the golden replay in src/plan passes over the places as they stand.
 
 # implement
 
