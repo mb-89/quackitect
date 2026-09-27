@@ -178,3 +178,20 @@ test("the keep reads the leaf's red list, so a fixture the red commit lands and 
   assert.notEqual(listed, text);
   assert.equal(keptRed(it, listed, leaf)?.kept, RED_COMMIT);
 });
+
+// [[spec/tickets/kept-red-subject-matches-whole]]
+test("the red commit search passes over a longer leaf name and another ticket passing the same leaf", () => {
+  const LONGER = "1111222211112222111122221111222211112222";
+  const OTHER = "3333444433334444333344443333444433334444";
+  const { it, text } = built(RED_LEAF, [redPass(), changePass], {
+    ...logSince(AFTER, [
+      [LONGER, `a-child: passes ${RED_LEAF}-2`],
+      [OTHER, `b-child: passes ${RED_LEAF}`],
+      [RED_COMMIT, `a-child: passes ${RED_LEAF}, skips ${CHANGE}.`],
+    ]),
+    ...landsIn(RED_COMMIT, [`A\t${TEST}`]),
+    ...movedSince(RED_COMMIT, []),
+  });
+  const kept = keptRed(it, text, leafOf(frontOf(text), RED_LEAF), "a-child");
+  assert.equal(kept?.kept, RED_COMMIT);
+});
