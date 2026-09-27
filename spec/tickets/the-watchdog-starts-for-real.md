@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -142,6 +142,18 @@ record:
         hash: 7937c3edef8d23d5
         size: 2033
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-3
+    hash_before: 2835c3b6f5c0e5e5952cb5f31ae83f0844426929
+    hash_after: 2835c3b6f5c0e5e5952cb5f31ae83f0844426929
+    inputs:
+      - name: design/draft
+        hash: 7937c3edef8d23d5
+        size: 2033
+      - name: design/tests-red
+        hash: 4494a4079413700d
+        size: 620
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -276,8 +288,13 @@ the lease case reads a real door over a temp tree, and the fault case runs over 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- check-runs-off-the-loop: the approach runs Dog.Check inside sweeps, the loop it watches, so a hung loop never marks its own lease expired; run Check on the ticker goroutine or in guards, and keep Beat as a step of sweeps
+- index-lease-names-a-provider: the part index names no catalog provider, so Store.Stale errors and Dog.Check drops the expired index lease silently; register a name for the part, or have Check answer an expired part with no provider
+- zero-beat-refuses-the-start: config.Count answers 0 for a missing watchdog.beat, and time.NewTicker panics on 0; refuse the start or take a default where the beat stands at 0
+- approach-names-opens: the approach says Serve wraps a new serves, and the tree names it opens, as tests-red saw; the callers list names Book.Expire, a callee the change leaves alone
 
 # implement
 
