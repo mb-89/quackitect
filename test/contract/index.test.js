@@ -169,3 +169,13 @@ ifBuilt("a stopped index leaves no se-index process past the case", () => {
   }
   assert.equal(alive, false, `se-index at pid ${pid} stands past its stop`);
 });
+
+// The Windows runner ends a battery by killing an orphan se-index, so a case starting one leaves it behind. [[spec/tickets/windows-ci-turns-green]]
+test("every case starting the index asks it to stop", () => {
+  const source = files.read(fileURLToPath(import.meta.url));
+  const cases = source.split(/\nifBuilt\(/).slice(1);
+  const loose = cases
+    .filter((body) => /index\(files, proc\(\)/.test(body) && !/ask\("stop"/.test(body))
+    .map((body) => body.split("\n")[0].trim());
+  assert.deepEqual(loose, [], "these cases start an index and leave it standing");
+});

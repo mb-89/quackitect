@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -152,6 +152,19 @@ record:
     hash_before: 8408a922065a92982ea01eaa7671f08e158b7fb5
     hash_after: 8408a922065a92982ea01eaa7671f08e158b7fb5
     def: 99d61fd78ece9ad4
+  - step: design/tests-red
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 72b7150569fabe24058e6527e1a54359a9d7662a
+    hash_after: 72b7150569fabe24058e6527e1a54359a9d7662a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 41f1af84a07bf38f
+        size: 1533
+    def: 08e16d07b0de477c
 group: the-foundation-closes-its-gaps
 ---
 
@@ -259,15 +272,15 @@ test/contract/index.test.js
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-The new case, a stopped index leaves no se-index process past the case, passes on this Linux box, and the Windows job of check.yml passes on main at run 36322578200, so neither fault the ask names reproduces here. A Windows hand runs the command above there, and the ticket closes as answered where it passes too.
+The Windows job of run 36322960902 passes every JS case, the new leak case among them, and its cleanup kills an orphan se-index at pid 7408. The first contract case warms the index on the real tree and asks no stop, so the new source case, every case starting the index asks it to stop, names it and fails on its assertion. The surprise: the leak comes from a case, and the index stop itself holds on both systems.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-the leak line meets the new contract case, green here, so a Windows run decides it; the Windows job line meets check.yml on main, green
-the case starts the real index on a temporary tree, which the contract folder allows
+the leak line meets the source case, red on its assertion, and the Windows job line meets check.yml, whose JS battery passes on Windows
+the cases start the real index on temporary trees, which the contract folder allows, and the source case reads the file alone
 
 # gate
 
