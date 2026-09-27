@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-style-carries-the-top.md:143:56: Vocabulary: blocksof stands outside the words this tree writes. Write "
+  - step: implement/tests-green
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: 1d4a5ecea0550a0a50fdac33191a9eabf63a8ed6
+    hash_after: 1d4a5ecea0550a0a50fdac33191a9eabf63a8ed6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-style-carries-the-top.md:143:56: Vocabulary: blocksof stands outside the words this tree writes. Write "
+reason: done
 ---
 
 # Ask
@@ -244,26 +256,34 @@ every row the design review passes with stands fixed in the change: process.test
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/guidance-tags.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A step now meets its notes through tags, and no process names a note by hand. A note under a subfolder of spec/guidance carries its folder names plus the tags its frontmatter lists. It reaches every leaf whose own tags and inherited tags hold all of them, where its env binds. The processes trade reads for tags: code steps carry code and testing, gates carry review, and final accepts add accept. Each retro step carries retro and the name of its note. A trivial fix to code now meets the code and testing notes. The pull prints each resolved note as a heading with its numbered rules and its Examples table. The guidance verb takes --step process:path to show what a step resolves. A contract case asserts every subfolder note reaches some leaf, so the check refuses an orphan. An inline env list in a note now binds as a list, which the old reader took as one word. A ticket minted before tags keeps its reads, and the resolver adds them after the tagged notes. The schema and tree cases stand in test/contract, since they read the real tree.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: the schemas, the resolver, its callers, the verb, the processes, the notes and the cases beside each module
+every door the change reaches has a fake: the resolver reads the disk door alone, fakeDisk stands in for it, and the contract cases drive the real disk
+a comment names the approach the change implements: each new function links level-two#guidance
+every fact the change adds stands in one place: listOf serves envOf and tagsOf, and notesSaid prints through rulesOf
+every row the design review passes with stands fixed in the change: the process and pull cases meet the new form, reviewing takes accept, retro notes take their names, and trivial do carries code and testing
 
 # Discussion
 
