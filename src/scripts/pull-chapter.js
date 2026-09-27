@@ -16,6 +16,7 @@ import { PERSON, roleOf } from "./pull-hand-of.js";
 import { overLong } from "../../.claude/skills/level0/lib/names.js";
 import { excludes, handRule, ticketsHere } from "./pull-hand.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
+import { formatted } from "./pull-format.js";
 import { changedSince, commitsFor, tipOf } from "./pull-writes.js";
 
 // A shell answers this where it finds no command, which a backtick or a fence around the line earns. [[spec/design_output/pull#the-fields-hold-their-forms]]
@@ -30,21 +31,17 @@ export function workAnswer(it, one, leaf) {
   if (leaf.does) rows.push(`      ${leaf.does}`);
   rows.push("", "# Ask", "", askOf(one.text) || "(the ask stands empty)", "");
 
-  const deep = "#".repeat(leaf.path.split("/").length);
-  rows.push(`Write under ${deep} ${leaf.name} in ${one.path}, one heading a field:`);
+  // The engine writes the ticket file, so the hand answers the payload alone. [[spec/design_output/pull#the-fields-ride-the-payload]]
+  rows.push("Answer with --fields, a JSON object holding one key a field:");
   for (const field of leaf.evidence) {
     const more = field.expects !== undefined ? `, expects ${field.expects}` : "";
     const options = field.options
       ? `, one of ${[field.options].flat().join(", ")}`
       : "";
-    rows.push(
-      `  ${deep}# ${field.name}  ${field.form}${more}${options}: ${field.says ?? ""}`,
-    );
+    rows.push(`  ${field.name}  ${field.form}${more}${options}: ${field.says ?? ""}`);
   }
   if (leaf.checklist.length) {
-    rows.push(
-      `  ${deep}# ${CHECKED}  one line per item below, on how you take it into account`,
-    );
+    rows.push(`  ${CHECKED}  one line per item below, on how you take it into account`);
     rows.push("", "Checklist:");
     for (const item of leaf.checklist) rows.push(`  - ${item}`);
   }
@@ -55,11 +52,11 @@ export function workAnswer(it, one, leaf) {
   rows.push("");
   if (leaf.evidence.some((field) => field.form === "verdict")) {
     rows.push(
-      `Hand it back with ./RUNME.sh ticket pull ${one.name}, and the verdict field decides.`,
+      `Hand it back with ./RUNME.sh ticket pull ${one.name} --fields '<json>', and the verdict field decides.`,
     );
   } else {
     rows.push(
-      `Hand it back: ./RUNME.sh ticket pull ${one.name} --pass, or --fail "why", or --became <ticket>, or --answered <ticket>.`,
+      `Hand it back: ./RUNME.sh ticket pull ${one.name} --pass --fields '<json>', or --fail "why", or --became <ticket>, or --answered <ticket>.`,
     );
   }
   return rows.join("\n");
@@ -88,7 +85,7 @@ export function withPayload(text, path, payload) {
   }
   let now = String(text ?? "");
   for (const [name, said] of Object.entries(fields)) {
-    const put = withFieldText(now, path, name, String(said ?? ""));
+    const put = withFieldText(now, path, name, formatted(said));
     if (put.why) return put;
     now = put.text;
   }

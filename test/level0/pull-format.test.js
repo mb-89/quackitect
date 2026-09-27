@@ -7,6 +7,7 @@ import { test } from "node:test";
 import { withField } from "../../src/engine/group.js";
 import { withPayload } from "../../src/scripts/pull-chapter.js";
 import { formatted } from "../../src/scripts/pull-format.js";
+import { spawnPrompt } from "../../src/scripts/pull-spawn.js";
 import { pulling } from "../../src/scripts/work.js";
 import { CHILD, doors, GROUP_NOTE, heard, ROOT, standing } from "./pull-doors.js";
 
@@ -31,4 +32,17 @@ test("a payload lands formatted before the checks read it", () => {
     JSON.stringify({ tests: "node --test   " }),
   );
   assert.match(put.text, /### tests\n\nnode --test\n\n## change/);
+});
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+test("the spawn prompt hands a helper the payload, and sends it into no file", () => {
+  const leaf = {
+    path: "design/review",
+    evidence: [{ name: "verdict", form: "verdict" }],
+  };
+  const said = spawnPrompt("a-child", leaf, "helper-2");
+
+  assert.match(said, /--as helper-2 --fields '<json>'/);
+  assert.match(said, /The engine writes the ticket/);
+  assert.doesNotMatch(said, /Write the fields into the ticket/);
 });

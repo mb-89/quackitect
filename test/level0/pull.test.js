@@ -159,7 +159,7 @@ test("the pull hands out the child's first leaf, writes the hold, and the answer
   assert.match(said, /^work {2}a-child at design\/draft, leaf 1 of 4 under design/);
   assert.match(said, /writes the approach the ask calls for/);
   assert.match(said, /One piece of it\./);
-  assert.match(said, /### approach {2}text: the approach/);
+  assert.match(said, /\n {2}approach {2}text: the approach/);
   assert.match(said, /Reads spec\/guidance\/voice:\n {2}1\. Say what is\./);
   assert.match(said, /ticket pull a-child --pass/);
   const hold = JSON.parse(disk.read(HOLD));
@@ -335,7 +335,10 @@ test("a step that excludes the only hand answers spawn, with the helper's name a
   );
   assert.match(said, /named helper-2, and you work one step of one ticket/);
   assert.match(said, /ticket pull --as helper-2/);
-  assert.match(said, /ticket pull a-child --as helper-2`\. It checks/);
+  assert.match(
+    said,
+    /ticket pull a-child --as helper-2 --fields '<json>'`\. It checks/,
+  );
   assert.equal(disk.exists(HOLD), false, "the spawn answer holds nothing");
   assert.equal(
     takeable(it, { text: took }),

@@ -33,6 +33,7 @@ type ticketRow struct {
 	Todo     bool   `json:"todo"`
 	Standing string `json:"standing"`
 	Says     string `json:"says"`
+	Progress string `json:"progress"`
 	Changed  int64  `json:"changed"`
 }
 
@@ -98,6 +99,7 @@ func itemOfTicket(one ticketRow) tree.Item {
 		"path":     one.Path,
 		"state":    one.State,
 		"step":     one.Step,
+		"progress": one.Progress,
 		"route":    one.Route,
 		"group":    one.Group,
 		"standing": one.Standing,

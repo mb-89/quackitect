@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-engine-holds-the-route
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d7d6cb0fb1105 · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: e07cd81b3fd63667d446738d4415f37ad6a08ff9
+    hash_after: e07cd81b3fd63667d446738d4415f37ad6a08ff9
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -234,14 +242,20 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/scripts/pull-chapter.js src/scripts/pull-format.js src/scripts/pull-spawn.js src/bridge/write.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the hand-out, the payload, the spawn prompt, the door, the index row, the tab and their cases
+- the door cases run over the fake disk, and the Go cases over a tree each case writes
+- each new function links the chapter it implements
+- the formatter stands in one module, and the payload reader calls it
+- the review rows stand fixed: the payload in the hand-out, the Discussion admitted, the formatter over one field, the tab case in its package
 
 ## tests-green
 

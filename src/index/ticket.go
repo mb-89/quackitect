@@ -7,6 +7,7 @@ package main
 import (
 	"database/sql"
 	"path"
+	"strconv"
 	"strings"
 )
 
@@ -101,16 +102,17 @@ func ticketOf(path, id, text string, changed int64) Ticket {
 		state = openState
 	}
 	one := Ticket{
-		Name:    id,
-		Path:    path,
-		State:   state,
-		Step:    front["step"],
-		Route:   routeOf(front["process"]),
-		Group:   front["group"],
-		Urgent:  front["urgent"] == "true",
-		Todo:    todoIn(front["todo"]),
-		Says:    askLine(body),
-		Changed: changed,
+		Name:     id,
+		Path:     path,
+		State:    state,
+		Step:     front["step"],
+		Route:    routeOf(front["process"]),
+		Group:    front["group"],
+		Urgent:   front["urgent"] == "true",
+		Todo:     todoIn(front["todo"]),
+		Says:     askLine(body),
+		Progress: progressOf(head),
+		Changed:  changed,
 	}
 	if one.Route == groupRoute {
 		one.Standing = groupStanding(state, head)
@@ -220,4 +222,62 @@ func topOf(head string) map[string]string {
 // The name a link carries, with the brackets off. [[spec/design_output/index#a-note-and-its-links]]
 func linkName(said string) string {
 	return strings.TrimSpace(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSpace(said), "[["), "]]"))
+}
+
+// The leaves the record passes, closed or skipped, over the leaves the route holds, as done/all, and nothing where the route holds none. A step item is a `- name:` line whose nearest line two columns in is a `steps:` key, so an evidence item counts nothing. [[spec/design_output/index#the-index-answers-the-tickets]]
+func progressOf(head string) string {
+	lines := strings.Split(head, "\n")
+	last := map[int]string{}
+	indents := []int{}
+	inSteps := false
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" {
+			continue
+		}
+		indent := len(line) - len(strings.TrimLeft(line, " "))
+		if indent == 0 {
+			inSteps = trimmed == "steps:"
+		}
+		if inSteps && indent >= 2 && strings.HasPrefix(trimmed, "- name:") && last[indent-2] == "steps:" {
+			indents = append(indents, indent)
+		}
+		last[indent] = trimmed
+	}
+	all := 0
+	for at, indent := range indents {
+		if at+1 == len(indents) || indents[at+1] <= indent {
+			all++
+		}
+	}
+	if all == 0 {
+		return ""
+	}
+	return strconv.Itoa(len(passedSteps(lines))) + "/" + strconv.Itoa(all)
+}
+
+// The steps a record entry closes, by a hash after or a skip. [[spec/design_output/index#the-index-answers-the-tickets]]
+func passedSteps(lines []string) map[string]bool {
+	out := map[string]bool{}
+	inRecord := false
+	step := ""
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if line != "" && line[0] != ' ' {
+			inRecord = trimmed == "record:"
+			continue
+		}
+		if !inRecord {
+			continue
+		}
+		if said, found := strings.CutPrefix(trimmed, "- step:"); found {
+			step = strings.TrimSpace(said)
+			continue
+		}
+		after, isAfter := strings.CutPrefix(trimmed, "hash_after:")
+		if (isAfter && strings.TrimSpace(after) != "" && strings.TrimSpace(after) != `""`) || trimmed == "skipped: true" {
+			out[step] = true
+		}
+	}
+	return out
 }

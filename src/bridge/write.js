@@ -75,6 +75,8 @@ export async function onWrite(asked, box) {
   if (!writing) return PASS;
   const where = relativeTo(box.root, writing.path);
   if (outside(where) || isDraft(where)) return PASS;
+  const payload = ticketDoor(e, writing, where, box);
+  if (payload) return { result: { deny: payload } };
   // The engine's fields come back first, so every door reads the write that lands. [[spec/design_output/schema#the-verbs-own-their-fields]]
   const restored = engineRestores(e, writing, where, box);
   if (restored?.deny) return { result: { deny: restored.deny } };
@@ -120,6 +122,24 @@ function strangerFile(e, where, governor, box) {
   });
   return found.message;
 }
+
+// An open ticket on git takes its answers through the pull's payload, and its Discussion from anybody. A draft and a closed ticket take a hand's write. [[spec/design_output/pull#the-fields-ride-the-payload]]
+function ticketDoor(e, writing, where, box) {
+  if (!where.startsWith(TICKETS_ON_GIT) || !where.endsWith(".md")) return "";
+  const was = textAt(box.disk, writing.path);
+  if (was === null || kindOf(was) !== TICKET_KIND || fieldOf(was, "state") !== "open")
+    return "";
+  const talkless = (text) =>
+    String(text).replace(/\r\n/g, "\n").split("\n# Discussion\n")[0];
+  if (talkless(wholeAfter(e, writing, box.disk)) === talkless(was)) return "";
+  box.log.say("warn", "ticket", `refused a hand's write to the open ticket ${where}`, {
+    file: where,
+    tool: String(e.tool),
+  });
+  return `${where} stands open, and the engine writes it. Hand the answer back with ./RUNME.sh ticket pull <ticket> --fields '{"<field>": "..."}', or write under # Discussion alone.`;
+}
+
+const TICKETS_ON_GIT = "spec/tickets/";
 
 // A write to a ticket carrying an engine field, turned into one carrying the disk's value there. An edit whose text the field reaches past takes the refusal the ticket door gives. [[spec/design_output/schema#the-verbs-own-their-fields]]
 function engineRestores(e, writing, where, box) {
