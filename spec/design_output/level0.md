@@ -762,7 +762,8 @@ The probe runs one cold box from start to end:
 3. It writes the clone's pointer at a port of its own, so a desk server keeps
    its port.
 4. It runs the client headless with `--plugin-dir`, which skips the trust
-   gate, under a config folder of its own.
+   gate, under a config folder of its own. The desk's login file rides into
+   that folder, so the client signs in and reads nothing else of the desk.
 5. It reads the clone's session log and the client's stream.
 6. It stops the server the clone launched, and removes the folder.
 

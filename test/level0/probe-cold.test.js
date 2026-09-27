@@ -12,6 +12,7 @@ import { fakeProc } from "../../src/doors/fake/proc.js";
 import {
   COLD,
   COLD_PATH,
+  carriesLogin,
   coldIn,
   coldLines,
   coldPort,
@@ -306,6 +307,24 @@ test("the runner clones, installs, runs the client, reads the log, and removes t
   assert.equal(client.init.env.CLAUDE_CONFIG_DIR, "/tmp/se-cold-1/config");
   assert.equal(client.init.env.SE_BRIDGE_PORT, String(coldPort(12345)));
   assert.equal(disk.exists("/tmp/se-cold-1"), false);
+});
+
+// The client under a fresh config folder signs in off the desk's login alone. [[spec/tickets/the-probe-carries-the-login]]
+test("the desk's login file rides into the fresh config folder, and nothing else of the desk", () => {
+  const { disk, it } = runner(() => ({ exitCode: 0 }));
+  it.home = "/home/somebody";
+  disk.write("/home/somebody/.claude/.credentials.json", '{"login":1}');
+  disk.write("/home/somebody/.claude/settings.json", "{}");
+  assert.equal(carriesLogin(it, "/tmp/cold/config"), true);
+  assert.equal(disk.read("/tmp/cold/config/.credentials.json"), '{"login":1}');
+  assert.equal(disk.exists("/tmp/cold/config/settings.json"), false);
+});
+
+test("a desk keeping no login file carries none", () => {
+  const { disk, it } = runner(() => ({ exitCode: 0 }));
+  it.env = { HOME: "/home/nobody" };
+  assert.equal(carriesLogin(it, "/tmp/cold/config"), false);
+  assert.equal(disk.exists("/tmp/cold/config/.credentials.json"), false);
 });
 
 test("a client standing nowhere fails the probe, and the clone still goes", async () => {
