@@ -110,7 +110,7 @@ func TestAGoneFolderTakesItsRowsAndItsLinksTurnDead(t *testing.T) {
 func doorOver(t *testing.T, root string, db *sql.DB) *door {
 	t.Helper()
 	catalog := q.New()
-	registersFiles(catalog)
+	registersTopics(catalog)
 	return &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}),
 		touched: map[string]bool{}, tracked: func(string) bool { return true },
 		store: q.NewStore(catalog, nil), published: map[string]bool{}}

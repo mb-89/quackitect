@@ -69,6 +69,9 @@ func TestTreeGolden(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		if err := os.MkdirAll(filepath.Dir(goldenAt), 0o755); err != nil {
+			t.Fatal(err)
+		}
 		if err := os.WriteFile(goldenAt, append(written, '\n'), 0o644); err != nil {
 			t.Fatal(err)
 		}

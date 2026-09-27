@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: open-tasks-land-in-shadow
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, a test of src/tickets fails
+  - step: implement/change
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: a0ad8ab4b016af12ced52ec10524204d5f1472b8
+    hash_after: a0ad8ab4b016af12ced52ec10524204d5f1472b8
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -246,14 +254,20 @@ The review's findings shape the tests:
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/tickets src/index
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `src/tickets` and the index's tickets reading and wiring, which the ask names
+- the package reads text alone, and the index reads its note rows as it does today
+- each header and function points at this ticket or the design section it holds
+- the ticket fields, the Ask and the held rule stand in `src/tickets`, and the index calls it
+- the catalog, the golden key, the private tickets and the root test stand fixed. The Ask differences stand under tests-green
 
 ## tests-green
 

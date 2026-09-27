@@ -7,6 +7,7 @@ import (
 	"database/sql"
 
 	"quackitect/src/q"
+	"quackitect/src/tickets"
 )
 
 const filesFamily = "files/<path...>"
@@ -19,8 +20,10 @@ type Content struct {
 	Text string `json:"text"`
 }
 
-func registersFiles(catalog *q.Catalog) {
+// The topics the index commits itself: the files, and the tickets it reads off the note rows. [[spec/tickets/the-tickets-topic-lands]]
+func registersTopics(catalog *q.Catalog) {
 	q.GivenIn(catalog, filesFamily, Content{}, q.Doc("the hash and the text of a tracked file"))
+	tickets.Registers(catalog)
 }
 
 // The tracked rows among the paths named, or every tracked row where none is named. [[spec/tickets/files-topic-reads-the-rows]]
@@ -73,9 +76,12 @@ func (one *door) publishes(paths []string) error {
 	for path := range held {
 		one.published[path] = true
 	}
-	if len(values) == 0 {
-		return nil
+	// The note rows carry the private tickets the tracked rows leave out, so tickets/all reads them there. [[spec/tickets/the-tickets-topic-lands]]
+	all, err := Tickets(one.db)
+	if err != nil {
+		return err
 	}
+	values[tickets.AllName] = all
 	_, err = one.store.Commit(one.store.Snapshot().Revision, values)
 	return err
 }

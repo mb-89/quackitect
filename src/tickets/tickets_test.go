@@ -48,12 +48,12 @@ func TestAskReadsFencesAsText(t *testing.T) {
 	}
 }
 
-func TestHeldReadsTheLastOpenItem(t *testing.T) {
+func TestHeldReadsAnyOpenItem(t *testing.T) {
 	cases := map[string]bool{
 		"---\nstate: open\nrecord:\n  - step: sync\n    hash_before: aaa\n    hash_after: bbb\n---\n":                        false,
 		"---\nstate: open\nsteps:\n  - name: do\n---\n":                                                                      false,
 		"---\nrecord:\n  - step: sync\n    hash_before: aaa\nurgent: true\n---\n":                                            true,
-		"---\nrecord:\n  - step: sync\n    hash_before: aaa\n  - step: do\n    hash_before: bbb\n    hash_after: ccc\n---\n": false,
+		"---\nrecord:\n  - step: sync\n    hash_before: aaa\n  - step: do\n    hash_before: bbb\n    hash_after: ccc\n---\n": true,
 		heldGroup: true,
 	}
 	for text, want := range cases {
@@ -112,5 +112,23 @@ func TestRegistersTakeTheCatalogServeTakes(t *testing.T) {
 	}
 	if said, _ := store.Snapshot().Read(AllName).([]Ticket); len(said) != 1 || said[0].Name != "one" {
 		t.Fatalf("%s reads %#v", AllName, said)
+	}
+}
+
+// A note keeps its state, and its route says what it is, which the tab draws as a letter. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+func TestANoteKeepsItsStateAndNamesItsRoute(t *testing.T) {
+	said := Of(".se/tickets/parked.md", "parked", "---\nkind: [[ticket]]\nstate: open\nprocess: [[note]]\n---\n\n# Ask\n\nA thought.\n", 1)
+	if said.State != openState || said.Route != "note" {
+		t.Fatalf("a note reads open on the route note, and reads %+v", said)
+	}
+}
+
+// A todo names the row the ticket stands before, or reads true, and either lights the flag. [[spec/design_output/pull#the-queue-is-an-outline]]
+func TestATodoNamingARowLightsTheFlag(t *testing.T) {
+	for said, want := range map[string]bool{"true": true, "a-loose-one": true, `"a-loose-one"`: true, "false": false, "": false} {
+		one := Of("spec/tickets/one.md", "one", "---\nkind: [[ticket]]\ntodo: "+said+"\n---\n", 1)
+		if one.Todo != want {
+			t.Errorf("todo %q reads %v", said, one.Todo)
+		}
 	}
 }
