@@ -69,3 +69,12 @@ the draft misses helpers of the judge and their cases. forEvidence and labelOf i
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The answer mark keeps rules out of the judge's material while `forEvidence` stands, so it leaves here, beside `forEvidence`:
+
+- `answerMarker` and its comment in `spec/schemas/guidance.schema.yaml`
+- the two `^` marks in `spec/guidance/voice.md`
+- `ANSWER_MARK`, and the `^` in `MARK`, in `.claude/skills/level0/lib/guidance.js`
+- the answer mark row of `spec/design_output/pull.md`
+- the `^` case in `test/level0/guidance.test.js`
+- the `^` assertions in `test/contract/guidance-rules.test.js`

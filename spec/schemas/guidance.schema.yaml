@@ -9,8 +9,9 @@
 # rule takes several, one or none.
 #
 # A rule ending in the answer marker describes an answer, which evidence carries
-# nowhere, so the judge of spec/design_output/pull.md reads it over none. Every
-# reader strips both marks.
+# nowhere, so forEvidence in .claude/skills/level0/lib/guidance.js leaves it out.
+# The marker leaves with forEvidence, under the judge-cut-takes-its-helpers ticket.
+# Every reader strips both marks.
 #
 # The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
 # The body half is this project's own, borrowed from https://document-schema.org.
