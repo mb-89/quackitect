@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: c3586c7b68e6ce15e541c6dc7a7cbb92a243da67
+    hash_after: bb235c6e16329079e8de4f92dd213b9557044faf
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/index passes
+      - name: check
+        exit: 0
+        said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
+    inputs:
+      - name: design/tests-red
+        hash: e0793d011fade350
+        size: 979
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -312,26 +335,33 @@ the windows stay in ops.SettingsOf alone, and sweepsOps reads what Book.Sweep an
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/store_test.go src/index/ops_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The store drops a name in one revision: Store.Drop removes the values its writer names, and refuses the whole drop where one name has no provider. The index guard tick now runs sweepsOps, which takes every operation Book.Sweep answers past its window out of the store too, so the book, its table and the store let go of an ended operation together, and the store stops growing with every operation. On the way, branch test gives a named Go test file the -run of its own cases, because src/q and src/index hold other tickets red cases, and a whole-package run answers none of them green.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/q/store.go, src/index/ops.go and src/index/door.go and their tests, and the branch test verb this leaf needs
+the cases run over a memory keep and a moved clock, and no door stands unfaked
+the changed functions point at spec/design_output/model#what-stays-how-long
+the windows stand in ops.SettingsOf alone, and the Go test names in cli-go.js alone
 
 # accept
 
