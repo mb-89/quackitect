@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -333,6 +333,19 @@ record:
         hash: 6f01f3b4488cf7dc
         size: 88120
     def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box d7e3869061cf · claude-code-remote
+    hash_before: 877985f3da67632d1a2fcf9a7c0ba6b3975bac7d
+    hash_after: 877985f3da67632d1a2fcf9a7c0ba6b3975bac7d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 805f822e49c509fa
+        size: 3263
+    def: 897ac034247c0bca
 group: the-cloud-works-its-queue
 ---
 
@@ -516,22 +529,22 @@ each `done_when` line meets a case or the note, and the check decides the last
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
 <!-- the form is list -->
 
-- test/level0/hooks.test.js
+test/level0/hooks.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Four cases fail on their own assertion against the stub boot, and the settings file carries no SessionStart hook yet. The case where everything stands and the case off a cloud box pass on the stub, as negative cases do. The run after the restale reads the same four.
+Four cases fail on their own assertion against the stub boot, and the settings file carries no SessionStart hook yet. The case where everything stands and the case off a cloud box pass on the stub, as negative cases do. The run after the merge of main reads the same four.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- every done_when line on the hook meets a case, the note lines meet the review, and ./RUNME.sh check decides the last
-- the boot cases reach the disk and the process through fakeDisk and fakeProc alone
+every done_when line on the hook meets a case, the note lines meet the review, and ./RUNME.sh check decides the last
+the boot cases reach the disk and the process through fakeDisk and fakeProc alone
 
 # gate
 
