@@ -76,6 +76,10 @@ process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
 depends_on: [each-thing-stands-in-place, the-gates-read-the-state, the-owners-word-reaches-work, the-servers-and-views-hold, the-verbs-land-whole]
 step: sync
+record:
+  - step: sync
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: 0c7092033b9aea4d01399c8cb050aeb2f4f4b126
 ---
 
 # Ask
