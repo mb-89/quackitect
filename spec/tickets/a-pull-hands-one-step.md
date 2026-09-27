@@ -77,7 +77,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-engine-holds-the-route
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: 0ed9f2304ae306816eb89b2a0d01107eaa9ff949
+    hash_after: 0ed9f2304ae306816eb89b2a0d01107eaa9ff949
 ---
 
 # Ask
@@ -105,11 +110,29 @@ Today the agent reads the whole route on the ticket, writes the file by hand, an
 
 <!-- the form is text -->
 
+The hand-out and the payload stand today. The change pins them with cases, and adds the formatter, the door and the progress.
+
+| done_when line | what stands | the change |
+|---|---|---|
+| the step in hand alone | `workAnswer` in `src/scripts/pull-chapter.js` prints the leaf, its fields and its checklist | a case pins that the hand-out names no field of another leaf |
+| the payload | `withPayload` merges `--fields` into the ticket in `handBack` | the case in `test/level0/pull-fields.test.js` decides it, and stands |
+| the formatter | nothing formats a payload | `formatted` in a new `src/scripts/pull-format.js` trims trailing blanks, writes a bullet as a dash and folds a run of blank lines. `handBack` runs it on the merged text before `checkNote` |
+| the door | `engineRestores` in `src/bridge/write.js` guards the engine fields alone | a new `ticketDoor` there refuses an agent write to a ticket under `spec/tickets` whose state reads open, and names `--fields` |
+| the progress | the index row carries the step alone | `progressOf` in `src/index/ticket.go` counts the leaves of the route and the record entries, and the row carries `progress`. The work tab lists it among `detailKeys` in `src/tui/work/work.go` |
+
+Weighed: the formatter runs in the engine as text in and text out, so the pull stays cold and reads no Vale. Assumed: a draft and a closed ticket stay writable, since a hand writes a draft's ask, and a closed ticket takes history.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/scripts/pull.js` `handBack`, which runs the formatter
+- `src/bridge/write.js` the write door, which runs the ticket door beside the engine fields
+- `src/index/ticket.go` `ticketOf`, which fills the progress
+- `src/tui/work/workitems.go` `itemOfTicket`, which carries the progress into the keys
+- `src/tui/work/work.go` the detail pane, which reads `detailKeys`
 
 ### tests
 
@@ -117,17 +140,29 @@ Today the agent reads the whole route on the ticket, writes the file by hand, an
 
 <!-- the form is list -->
 
+- `test/level0/pull-format.test.js` the hand-out names the step in hand and no other leaf
+- `test/level0/pull-format.test.js` a payload lands formatted before the checks read it
+- `test/level0/write.test.js` the door refuses an agent write to an open ticket, and a draft takes one
+- `src/index/ticket_test.go` a ticket row carries the progress of its route
+- `src/tui/work_test.go` the detail pane shows the progress
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every file and function named stands opened: the hand-out, the payload, the door, the index and the tab
+- the callers list follows each changed function to the file calling it
+- every done_when line maps to a test row above, and `./RUNME.sh check` decides the last
 
 ## review
 
