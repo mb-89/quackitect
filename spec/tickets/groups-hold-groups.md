@@ -118,11 +118,26 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: f2bfdfa1bf4db9102f548232b2e69a0d05a98ece
+    hash_after: f2bfdfa1bf4db9102f548232b2e69a0d05a98ece
+    inputs:
+      - name: ask
+        hash: 3bc8b3019abe9755
+        size: 2421
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 5a2557d24d86ab34
+        size: 13510
+      - name: [[spec/design_output/tree-view]]
+        hash: 41f88d071009b333
+        size: 14929
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -172,38 +187,98 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A group names its parent under `group`, and one walk reads the chain. Each rule below takes that walk.
+
+1. The chain. `ancestorsOf` in `src/engine/group.js` walks `group` up from a group ticket on `origin/main`. It stops on a loop, and a group some group names is a parent.
+2. The wait. `waitingOn` in `src/scripts/work-stands.js` reads a dependency off its group ticket on `origin/main` alone. It holds while that ticket stands short of `state: closed`, so a parent with no branch holds its dependents. `waitsOf` joins the waits of every ancestor.
+3. The hand. `freeIn` in `src/scripts/work-free.js` drops every parent, so its children reach workers and the parent reaches none.
+4. The close. The plan gains a `closes` part: each parent open on `origin/main` whose children all stand closed there. `writesOf` writes `state: closed` on each into the one dispatch commit. A second run meets the unmerged dispatch branch and writes nothing, so a close lands once.
+5. The bundle. `bundlesOf` keys the loose agent tickets by the parent their `group` names, and the top stands as the parent named by nothing. Each bundle becomes a fix group whose `group` names that parent.
+6. The filing. `branch done` files where it refused before. Each open child and each ticket the branch adds with no group takes the group's parent under `group`. A top group leaves them loose. `fixRefuses` keeps its refusal, so a fix group still finishes its own tickets. The filing reuses `withoutField` and the write `freeChildren` makes in `src/scripts/work-merge.js`.
+7. The mark. The index row gains `person`: the ticket stands open, and its current step says `by: person`. That reading follows `personStep` in `src/scripts/work-answer.js`, and a comment in each file names the other. `itemsOfTickets` lifts `person` up the nest, so a group row lights while any row under it holds one. `spec/views/work.base` adds the letter P on the key `person`.
+
+The cost: the person rule stands in a JavaScript reader and a Go reader. A single reader asks the index to carry every step's hand, which widens this move. The objection is drift between the two, and a case on each side reading one fixture ticket answers it.
+
+I assume a parent needs no route step of its own. It stands open until the dispatch closes it, and `split` takes a child group as it takes a ticket.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/dispatch.js planned: reads waitsOf, freeIn and bundlesOf, and gains the closes part
+- src/scripts/dispatch.js bundlesOf: keys bundles by parent
+- src/scripts/dispatch-write.js opensOf: calls waitingOn
+- src/scripts/dispatch-write.js writesOf: writes each fix group's parent and each close
+- src/scripts/work-stands.js waitsOf: calls waitingOn and joins the ancestors' waits
+- src/scripts/work-free.js freeIn: drops parents, and feeds the trigger
+- src/scripts/work-list.js: calls waitsOf
+- src/scripts/work.js: calls waitsOf, and finish calls childrenStand
+- src/scripts/work.js childrenStand: files in place of the refusal
+- src/scripts/work-merge.js freeChildren: shares the write the filing takes
+- test/level0/work.test.js: calls waitingOn
+- src/tickets/tickets.go Ticket and All: gain the person field
+- src/tui/work/workitems.go itemsOfTickets and itemOfTicket: lift the person key
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/dispatch.test.js: a parent reaches no worker
+- test/level0/dispatch.test.js: a parent closes once every child stands closed on main
+- test/level0/dispatch.test.js: a grandparent's open dependency holds a group back
+- test/level0/dispatch.test.js: that group comes free once the dependency closes
+- test/level0/dispatch.test.js: a parent's close lands once over two runs
+- test/level0/dispatch.test.js: each parent's loose agent tickets bundle into a fix group under it
+- test/level0/work-stands.test.js: a parent with no branch holds its dependents
+- test/level0/work-done.test.js: branch done files each open child under the parent
+- test/level0/work-done.test.js: branch done files each added loose ticket under the parent
+- test/level0/work-done.test.js: a top group leaves them loose
+- src/tui/work/workitems_test.go: TestPersonLightsTwoLevelsUp
+- src/tickets/tickets_test.go: TestPersonReadsTheStepHand
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/engine/group.js
+- src/scripts/work-stands.js
+- src/scripts/work-free.js
+- src/scripts/dispatch.js
+- src/scripts/dispatch-write.js
+- src/scripts/work.js
+- src/scripts/work-merge.js
+- src/tickets/tickets.go
+- src/tui/work/workitems.go
+- spec/views/work.base
+- spec/design_output/work.md
+- spec/design_output/tree-view.md
+- spec/guidance/tickets.md
+- test/level0/dispatch.test.js
+- test/level0/work-stands.test.js
+- test/level0/work-done.test.js
+- src/tui/work/workitems_test.go
+- src/tickets/tickets_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- a survey helper opened each file and function the approach names, with its line; I opened work-answer.js, work.base and tickets.go myself
+- the callers list takes every caller of waitingOn, waitsOf, freeIn, bundlesOf and childrenStand the survey found
+- each done_when line maps to a test in the tests list, and the doc lines and the check need none
 
 ## tests-red
 
