@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: eea325d3fdfff38dec2e5b4a381feb4ce422f13f
+    hash_after: eea325d3fdfff38dec2e5b4a381feb4ce422f13f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 21 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    inputs:
+      - name: design/tests-red
+        hash: c22c9f5e28a58838
+        size: 623
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -340,26 +363,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/prepush.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A cloud box could push `main`, so unread work landed there. The push door `holds` in `src/scripts/prepush.js` now takes a `cloud` flag, and refuses a push to `main` where it holds. The refusal names the work branch and `./RUNME.sh branch merge` on a desk. `main` passes `inCloud(process.env)`. `holds` also takes the hold and engine reads that one-writer-holds-a-branch and push-gate-needs-the-engine name, since the three share one red test file.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `prepush.js` alone
+- the cases hand `holds` every read
+- each read points at its ticket
+- the words stand once
 
 # accept
 
