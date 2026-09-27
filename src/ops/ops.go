@@ -1,6 +1,6 @@
 // The book of operations: the handle a longer action answers, its states,
 // one writer per tree, the restart, the deadline and the retention.
-// [[spec/design_output/operations]]
+// [[spec/design_output/model#operations]]
 package ops
 
 import (
@@ -30,7 +30,7 @@ type Progress struct {
 	Step  string `json:"step"`
 }
 
-// [[spec/design_output/operations#the-handle-is-a-name]]
+// [[spec/design_output/model#the-handle-is-a-name]]
 type Op struct {
 	ID       string    `json:"id"`
 	Action   string    `json:"action"`
@@ -47,14 +47,14 @@ type Op struct {
 	Ended    time.Time `json:"ended"`
 }
 
-// The seam the index fills, so an operation outlives a restart. [[spec/design_output/operations#an-operation-outlives-callers]]
+// The seam the index fills, so an operation outlives a restart. [[spec/design_output/model#an-operation-outlives-callers]]
 type Keep interface {
 	Save(one Op) error
 	All() ([]Op, error)
 	Drop(id string) error
 }
 
-// [[spec/design_output/operations#what-stays-how-long]]
+// [[spec/design_output/model#what-stays-how-long]]
 type Settings struct {
 	Done   time.Duration
 	Failed time.Duration
@@ -70,18 +70,18 @@ type Book struct {
 	moved    func(Op)
 }
 
-// [[spec/design_output/operations#the-states]]
+// [[spec/design_output/model#the-states]]
 var moves = map[State][]State{
 	Queued:  {Running, Failed, Cancelled},
 	Running: {Done, Failed, Cancelled},
 }
 
-// The family ops/<id>, one key a call. [[spec/design_output/operations#the-handle-is-a-name]]
+// The family ops/<id>, one key a call. [[spec/design_output/model#the-handle-is-a-name]]
 func Registers(c *q.Catalog) q.Writer {
 	return q.GivenIn(c, "ops/<id>", Op{}, q.Doc("the handle of a longer action, its state and its result"))
 }
 
-// [[spec/design_output/operations#what-stays-how-long]]
+// [[spec/design_output/model#what-stays-how-long]]
 func SettingsOf(root string) Settings {
 	return Settings{
 		Done:   time.Duration(config.Count(root, "ops.keepDone")) * time.Second,
@@ -102,7 +102,7 @@ func New(now func() time.Time, keep Keep, settings Settings) (*Book, error) {
 	return b, nil
 }
 
-// The index pushes each move under ops/<id>. [[spec/design_output/operations#the-states]]
+// The index pushes each move under ops/<id>. [[spec/design_output/model#the-states]]
 func (b *Book) OnMove(fn func(Op)) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
@@ -111,7 +111,7 @@ func (b *Book) OnMove(fn func(Op)) {
 
 func Name(id string) string { return "ops/" + id }
 
-// [[spec/design_output/operations#the-handle-is-a-name]]
+// [[spec/design_output/model#the-handle-is-a-name]]
 func (b *Book) Start(action string, input any, caller string, declared q.Declared) (string, error) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
@@ -139,7 +139,7 @@ func (b *Book) Start(action string, input any, caller string, declared q.Declare
 	return one.ID, nil
 }
 
-// The writer queue: one writer per tree, in the order they arrive. [[spec/design_output/operations#one-writer-per-tree]]
+// The writer queue: one writer per tree, in the order they arrive. [[spec/design_output/model#one-writer-per-tree]]
 func (b *Book) Next() []string {
 	b.mu.Lock()
 	defer b.mu.Unlock()
@@ -161,7 +161,7 @@ func (b *Book) Next() []string {
 func (b *Book) Finish(id string, result any) error { return b.end(id, Done, "", result) }
 func (b *Book) Fail(id, reason string) error       { return b.end(id, Failed, reason, nil) }
 
-// ops/cancel: a running one stops before its next door call. [[spec/design_output/operations#the-states]]
+// ops/cancel: a running one stops before its next door call. [[spec/design_output/model#the-states]]
 func (b *Book) Cancel(id, reason string) error { return b.end(id, Cancelled, reason, nil) }
 
 func (b *Book) Get(id string) (Op, bool) {
@@ -174,7 +174,7 @@ func (b *Book) Get(id string) (Op, bool) {
 	return *one, true
 }
 
-// An operation in flight at a crash ends loud. [[spec/design_output/operations#an-operation-outlives-callers]]
+// An operation in flight at a crash ends loud. [[spec/design_output/model#an-operation-outlives-callers]]
 func (b *Book) Restart() error {
 	b.mu.Lock()
 	defer b.mu.Unlock()
@@ -186,7 +186,7 @@ func (b *Book) Restart() error {
 	return nil
 }
 
-// [[spec/design_output/watchdogs#deadlines]]
+// [[spec/design_output/model#deadlines]]
 func (b *Book) Expire() []string {
 	b.mu.Lock()
 	defer b.mu.Unlock()
@@ -199,7 +199,7 @@ func (b *Book) Expire() []string {
 	return ended
 }
 
-// A window of zero keeps the operation. [[spec/design_output/operations#what-stays-how-long]]
+// A window of zero keeps the operation. [[spec/design_output/model#what-stays-how-long]]
 func (b *Book) Sweep() []string {
 	b.mu.Lock()
 	defer b.mu.Unlock()

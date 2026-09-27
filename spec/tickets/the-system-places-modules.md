@@ -86,7 +86,7 @@ The index places each module topic in a process and supervises it. [[spec/design
 
 A crash stays in one module, and a changed module restarts alone.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a case restarts one module, and the index stays warm
 - `./RUNME.sh check` exits 0
 

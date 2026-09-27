@@ -90,7 +90,7 @@ cloud: true
 
 # Ask
 
-Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase2switch` to read true in the tracked config on `main`.
+Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration/config/slices/` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase2switch` to read true in the tracked config on `main`.
 
 Done when the badge and the work tab's brackets read one name, and every child closes through the command it names.
 

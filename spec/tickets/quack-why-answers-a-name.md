@@ -153,7 +153,7 @@ An agent asks where a value comes from, and one command answers where a search o
 - A name the catalog lacks refuses, and says so.
 - A family answers for each key, so `why files/spec/one.md` walks the family `files/<path...>`.
 - The walk stops at a name it meets twice, so a cycle the check misses answers once.
-- A view and a surface join the readers once the views land, per [[spec/design_output/views]].
+- A view and a surface join the readers once the views land, per [[spec/design_output/model#views]].
 - The state `stale since <time>` joins once `operations-and-leases-land` gives the store its stale mark.
 
 The command line:

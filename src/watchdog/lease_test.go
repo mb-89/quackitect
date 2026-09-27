@@ -1,6 +1,6 @@
 // The watchdog: an expired lease marks its provider's names stale, the wait
 // doubles to its cap, and faults in a window raise an alarm.
-// [[spec/design_output/watchdogs]]
+// [[spec/design_output/model#watchdogs]]
 package watchdog
 
 import (

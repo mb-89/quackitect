@@ -1,6 +1,6 @@
 // The watchdog: the leases, the wait before a restart, the alarms, and the
 // given name session/alarms.
-// [[spec/design_output/watchdogs]]
+// [[spec/design_output/model#watchdogs]]
 package watchdog
 
 import (
@@ -14,14 +14,14 @@ import (
 
 const AlarmsName = "session/alarms"
 
-// [[spec/design_output/watchdogs#a-lease]]
+// [[spec/design_output/model#a-lease]]
 type Lease struct {
 	Part    string
 	Renewed time.Time
 	Term    time.Duration
 }
 
-// [[spec/design_output/watchdogs]]
+// [[spec/design_output/model#watchdogs]]
 type Alarm struct {
 	Part   string    `json:"part"`
 	Since  time.Time `json:"since"`
@@ -30,7 +30,7 @@ type Alarm struct {
 	Clears string    `json:"clears"`
 }
 
-// [[spec/design_output/watchdogs#restarts]]
+// [[spec/design_output/model#restarts]]
 type Settings struct {
 	First  time.Duration
 	Cap    time.Duration
@@ -50,12 +50,12 @@ type Dog struct {
 	alarms   map[string]Alarm
 }
 
-// [[spec/design_output/watchdogs]]
+// [[spec/design_output/model#watchdogs]]
 func Registers(c *q.Catalog) q.Writer {
 	return q.GivenIn(c, AlarmsName, []Alarm{}, q.Doc("the alarms standing, one row a part"))
 }
 
-// [[spec/design_output/watchdogs#restarts]]
+// [[spec/design_output/model#restarts]]
 func SettingsOf(root string) Settings {
 	return Settings{
 		First:  time.Duration(config.Count(root, "watchdog.backoffFirst")) * time.Second,
@@ -74,7 +74,7 @@ func New(now func() time.Time, store *q.Store, as q.Writer, settings Settings) *
 	}
 }
 
-// A part takes a lease under its provider's name. [[spec/design_output/watchdogs#a-lease]]
+// A part takes a lease under its provider's name. [[spec/design_output/model#a-lease]]
 func (d *Dog) Hold(part string, term time.Duration) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -90,7 +90,7 @@ func (d *Dog) Beat(part string) {
 	}
 }
 
-// An expired lease marks its part stale, and the next commit of the part clears it. [[spec/design_output/watchdogs#a-stale-mark]]
+// An expired lease marks its part stale, and the next commit of the part clears it. [[spec/design_output/model#a-stale-mark]]
 func (d *Dog) Check() []string {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -105,7 +105,7 @@ func (d *Dog) Check() []string {
 	return expired
 }
 
-// The wait doubles from the first to the cap, and a run of faults in the window raises an alarm and stops the restarts. [[spec/design_output/watchdogs#restarts]]
+// The wait doubles from the first to the cap, and a run of faults in the window raises an alarm and stops the restarts. [[spec/design_output/model#restarts]]
 func (d *Dog) Fault(part string, err error) (time.Duration, bool) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -136,7 +136,7 @@ func (d *Dog) Alarms() []Alarm {
 	return d.standing()
 }
 
-// The clear takes the alarm off session/alarms, and the next fault starts a new run. [[spec/design_output/watchdogs#restarts]]
+// The clear takes the alarm off session/alarms, and the next fault starts a new run. [[spec/design_output/model#restarts]]
 func (d *Dog) Clear(part string) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()

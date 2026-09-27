@@ -150,7 +150,7 @@ func providersOf(root string, catalog *q.Catalog) map[string]string {
 func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 	topics := registersTopics(catalog)
 	watchdog.Registers(catalog)
-	// The catalog check runs before the database opens, so a fault refuses the start and no provider key stands yet. [[spec/design_output/model#the-catalog-check]]
+	// The catalog check runs before the database opens, so a fault refuses the start and no provider key stands yet. [[spec/design_output/model#the-index-resolves-in-passes]]
 	if faults := catalog.Check(nil); len(faults) > 0 {
 		said := make([]string, 0, len(faults))
 		for _, one := range faults {
@@ -191,7 +191,7 @@ func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 	go one.sweeps()
 	go one.guards()
 	go server.Serve(listen)
-	// The old API keeps its port, and /v1 stands on a port of its own. [[spec/design_output/surfaces]]
+	// The old API keeps its port, and /v1 stands on a port of its own. [[spec/design_output/model#surfaces]]
 	v1, served, err := one.servesV1()
 	if err != nil {
 		server.Close()

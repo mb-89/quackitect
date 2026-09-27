@@ -1,6 +1,6 @@
 // The table op keeps each operation past the door, and the door's start
 // fails every one it finds in flight.
-// [[spec/design_output/operations#an-operation-outlives-callers]]
+// [[spec/design_output/model#an-operation-outlives-callers]]
 package main
 
 import (

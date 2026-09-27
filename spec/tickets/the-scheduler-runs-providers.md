@@ -118,14 +118,14 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
-depends_on: [commits-name-their-writer]
+depends_on: [reads-resolve-in-two-passes]
 ---
 
 # Ask
 
 The index runs a derived provider when an input moves, and keeps one run pending while one runs. It runs no provider twice at once, per [[spec/design_output/model#the-provider-kinds]].
 
-Nothing runs a provider today when its input moves, so a value stands at its default until a caller runs it by hand.
+Nothing runs a provider today when its input moves, so a value stands at its built-in value until a caller runs it by hand.
 
 - `go test ./...` from the root passes
 - a case moves an input and reads the provider's new value

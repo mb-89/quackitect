@@ -1,6 +1,6 @@
 // The catalog check, one case a fault. Each case builds its own catalog, so
 // every case runs beside every other.
-// [[spec/design_output/model#the-catalog-check]]
+// [[spec/design_output/model#the-index-resolves-in-passes]]
 package q
 
 import (

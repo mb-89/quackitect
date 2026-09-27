@@ -1,6 +1,6 @@
 // One running index answers a name over /v1 and over the old API, a name the
 // catalog lacks as a problem, and its OpenAPI document.
-// [[spec/design_output/surfaces]]
+// [[spec/design_output/model#surfaces]]
 package main
 
 import (
@@ -82,7 +82,7 @@ func TestV1WritesItsOpenAPIDocument(t *testing.T) {
 	}
 }
 
-// The value carries its stale mark. [[spec/design_output/watchdogs#a-stale-mark]]
+// The value carries its stale mark. [[spec/design_output/model#a-stale-mark]]
 func TestV1ReadsAStaleName(t *testing.T) {
 	c := q.New()
 	q.GivenIn(c, "t/n", 0)

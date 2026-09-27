@@ -69,7 +69,7 @@ it the split lands as each box sees fit.
 
 ## says
 
-[[spec/design_output/processes]] specifies how the system places the
+[[spec/design_output/model#processes]] specifies how the system places the
 processes:
 
 - one binary, `quack`, with a verb for the index, the doors and a module
@@ -79,7 +79,7 @@ processes:
 - a crash against a hang: defaults for an exit, a stale mark for a lease
 - a module that rebuilds and restarts alone
 
-The note reveals a clash in [[spec/design_output/inner-protocol]]. A stamp of
+The note reveals a clash in [[spec/design_output/model#the-inner-protocol]]. A stamp of
 the whole build refuses a module rebuilt alone, so the stamp now covers the `q`
 package. The protocol's rationale says the same.
 

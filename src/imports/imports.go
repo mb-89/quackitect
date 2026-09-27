@@ -1,6 +1,6 @@
 // The import rules, as go/analysis analyzers: a module imports no door, and a
 // door, the index or a renderer imports no module.
-// [[spec/design_output/go-doors#the-build-checks-imports]]
+// [[spec/design_output/model#the-build-checks-imports]]
 package imports
 
 import (
@@ -44,7 +44,7 @@ var NoName = &analysis.Analyzer{
 	Run:  noName.run,
 }
 
-// [[spec/design_output/go-doors#the-build-checks-imports]]
+// [[spec/design_output/model#the-build-checks-imports]]
 func Faults(from string, imported []string) []string {
 	out := []string{}
 	for _, one := range []rule{noDoor, noName} {

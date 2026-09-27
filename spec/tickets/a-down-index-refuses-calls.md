@@ -82,7 +82,7 @@ group: go-cage-switches-over
 
 # Ask
 
-`slices.cage` moves to `new`. While the index stands down, the cage refuses, and the refusal names the alarm. [[spec/rationales/the-cage-refuses-while-down]] names the chapters this rewrites.
+`migration/config/slices/cage` moves to `new`. While the index stands down, the cage refuses, and the refusal names the alarm. [[spec/rationales/the-cage-refuses-while-down]] names the chapters this rewrites.
 
 A fault then shows on the first call, and gets fixed early.
 

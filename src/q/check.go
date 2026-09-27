@@ -1,6 +1,6 @@
 // The catalog check: every fault at once, each naming its file and line, so
 // the index refuses to start on any of them.
-// [[spec/design_output/model#the-catalog-check]]
+// [[spec/design_output/model#the-index-resolves-in-passes]]
 package q
 
 import (

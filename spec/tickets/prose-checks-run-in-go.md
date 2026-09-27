@@ -86,7 +86,7 @@ The prose checks run in Go: the tagger, an exception list and the domain words, 
 
 The prose checks are the last reason Node runs at runtime.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - `./RUNME.sh log --kind shadow` names each finding the two disagree on
 - `./RUNME.sh check` exits 0
 

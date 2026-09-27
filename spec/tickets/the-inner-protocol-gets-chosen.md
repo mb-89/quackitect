@@ -74,7 +74,7 @@ Both questions of the funnel stand answered, and the funnel leaves the tree.
 | the protocol inside | NATS, with the server inside the index, on loopback TCP | [[spec/rationales/the-processes-speak-nats]] |
 | the road to the LSP door | the editor starts `quack lsp`, which relays stdio to the doors process | [[spec/rationales/the-editor-starts-quack-lsp]] |
 
-[[spec/design_output/inner-protocol]] maps names onto subjects and names the
+[[spec/design_output/model#the-inner-protocol]] maps names onto subjects and names the
 header. A gap in the revisions asks for a read again, and a peer from another
 build meets a refusal. The model's design input names both answers in its
 platform table. The migration's design input and the group's ask point at the

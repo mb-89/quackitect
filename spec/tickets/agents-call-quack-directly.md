@@ -82,7 +82,7 @@ group: quack-verbs-switch-over
 
 # Ask
 
-`slices.verbs` moves to `new`. Agents call the index's tools, and shell out to no `./RUNME.sh` verb.
+`migration/config/slices/verbs` moves to `new`. Agents call the index's tools, and shell out to no `./RUNME.sh` verb.
 
 A call then costs one round trip and no parse.
 

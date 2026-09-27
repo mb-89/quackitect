@@ -18,8 +18,9 @@ reaching every surface removed the copies.
 
 ## 2. What it gave up
 
-A surface could not special-case a name, so a screen needing a tweak for one
-value declared it through `q.Show`. A surface's author worked through the
+A surface could not special-case a name. A module declares how its ports present
+themselves, and a view file decides where they show. So a screen needing a tweak
+for one value changes a declaration or a view. A surface's author worked through the
 registry's shapes and wrote no handler.
 
 ## 3. What would make it wrong
