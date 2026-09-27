@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 0009be55b77a93cf73cbcf38ddd955942d818d7d
+    hash_after: 0009be55b77a93cf73cbcf38ddd955942d818d7d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "src/scripts/work.js:67:1: correctness/noUnusedImports: Several of these imports are unused."
+    inputs:
+      - name: design/tests-red
+        hash: f004df8bc19e41fc
+        size: 568
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -332,26 +355,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-gate.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A gate's reject copies the phase before it as a new round. The copies now read the copies of their own round, so tests-red-2 reads draft-2. Every later step that reads a copied leaf by path reads its copy beside it, so the gate and implement read each round. Before this, the copies read the first round alone, and the next hand got the old draft as its input. The route check counts a copy as read where its origin is read, which lets a ticket stuck before this fix move.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/scripts/pull-gate.js and its test alone
+- the change reaches no door, since reworked reshapes the route in memory
+- rewired and readsBoth each carry a comment naming the approach
+- the copy suffix stands once in reworked, and the route check reads its own ROUND
 
 # accept
 
