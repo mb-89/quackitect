@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -177,6 +177,15 @@ record:
         hash: 84472a113fb13fb0
         size: 805
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7dfbbf7a2d0 · claude-code-remote
+    hash_before: 0d7c8a95778b0dba4b217e7adf7930c9557a5143
+    hash_after: 0d7c8a95778b0dba4b217e7adf7930c9557a5143
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 group: the-foundation-closes-its-gaps
 ---
 
@@ -314,14 +323,19 @@ accept: the leak case and the source case stand in test/contract/index.test.js, 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint test/contract/index.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches test/contract/index.test.js alone, which the approach names
+the glob case reaches the real index, which the contract folder drives, and the disk, process and clock doors each have a fake under src/doors/fake
+the glob case header in the test file points at spec/tickets/windows-ci-turns-green through the source case beside it
+the temporary tree holds one file the case writes, and no note repeats it
 
 ## tests-green
 

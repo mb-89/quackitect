@@ -20,12 +20,19 @@ const ifBuilt = built ? test : skip;
 ifBuilt(
   "the door stands where the binary is built, and a glob comes out of the rows",
   () => {
-    const it = index(files, proc(), clock(), root, root);
-    assert.equal(it.stands(), true);
-    assert.deepEqual(it.warm(), { warmed: true, dead: "" });
-    const answer = it.ask("glob", { pattern: "src/doors/*.js", path: "" });
-    assert.ok(Array.isArray(answer?.paths), "a glob answers paths");
-    assert.ok(answer.paths.includes("src/doors/index.js"), "the door finds itself");
+    const work = files.tempDir("glob-");
+    files.makeDir(join(work, "src", "doors"));
+    files.write(join(work, "src", "doors", "index.js"), "export {};\n");
+    const it = index(files, proc(), clock(), root, work);
+    try {
+      assert.equal(it.stands(), true);
+      assert.deepEqual(it.warm(), { warmed: true, dead: "" });
+      const answer = it.ask("glob", { pattern: "src/doors/*.js", path: "" });
+      assert.ok(Array.isArray(answer?.paths), "a glob answers paths");
+      assert.ok(answer.paths.includes("src/doors/index.js"), "the door finds the file");
+    } finally {
+      it.ask("stop", {});
+    }
   },
 );
 
