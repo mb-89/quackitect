@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: b94c209a9a9c825afbc56be25d1ab0183a6e1a54
+    hash_after: b94c209a9a9c825afbc56be25d1ab0183a6e1a54
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes
+      - name: check
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    inputs:
+      - name: design/tests-red
+        hash: fc25582a6d83a8e0
+        size: 644
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -341,26 +364,33 @@ the fields, the options and the refusal stand in looks.go alone, and Start calls
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/looks_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The core takes a label, an icon and a look beside q.Doc, and an action keeps the fields of its struct input off their json, label and doc tags. Catalog.Presentation answers that one text for a name, and every surface reads it there. The start refuses a registration with no q.Doc, and an input field with no doc tag, naming the file, the line and the field. Output field tags wait on actions-answer-typed-results, because an action answers requests and no typed result. The check reading every production module for its doc waits on the-check-refuses-undescribed-modules.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, and looks_test.go gains the field label case the gate asked for
+the cases run over a catalog and a wiring in memory, and reach no door
+looks.go points at the options section of the model over each piece it implements
+the fields, the options and the refusal stand in looks.go alone, and Start calls Undescribed there
 
 # accept
 
