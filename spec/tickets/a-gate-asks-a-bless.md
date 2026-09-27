@@ -77,12 +77,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d7d8cca563b1 · claude-code-remote
     hash_before: 64523823009cf9c060fde1537507f05ec76fb700
     hash_after: 64523823009cf9c060fde1537507f05ec76fb700
+  - step: design/review
+    hand: box d7d8cca563b1 · claude-code-remote · helper-2
+    hash_before: 7906727a23f0f93bccd2aab8805031d3c9868014
+    hash_after: 7906727a23f0f93bccd2aab8805031d3c9868014
+    returns: 1
+    why: "the desk guard leaves bless.agent open: `./RUNME.sh config bless.agent true` writes it through `settings.write` in .claude/skills/level0/lib/config.js, and the write door never sees that write; a shell write into .se/.runtime/config.json passes, since `FREE` in .claude/skills/level0/lib/bash.js frees every path under .se; the env layer answers bless.agent from `SE_BLESS_AGENT` through `varOf`, and the approach guards the `HARNESS` names alone, so an agent sets it on its own command line; the strip on an edit rests on src/scripts/pull-stale.js, which stands unbuilt, and the chapter says a merge where the ask says an edit; name the function that drops the bless and the ticket it waits on; the callers list leaves out spec/config/level0.schema.json, which needs the bless.agent entry the sidebar button draws, and the new src/scripts/pull-bless.js; `HARNESS` in src/extension/lib/lens.js copies the list in src/scripts/pull-hand-of.js; point the shell door at one list"
 ---
 
 # Ask
@@ -147,8 +153,15 @@ each done_when line maps to a test above: schema and wait, desk key, cloud and s
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+- the desk guard leaves bless.agent open: `./RUNME.sh config bless.agent true` writes it through `settings.write` in .claude/skills/level0/lib/config.js, and the write door never sees that write
+- a shell write into .se/.runtime/config.json passes, since `FREE` in .claude/skills/level0/lib/bash.js frees every path under .se
+- the env layer answers bless.agent from `SE_BLESS_AGENT` through `varOf`, and the approach guards the `HARNESS` names alone, so an agent sets it on its own command line
+- the strip on an edit rests on src/scripts/pull-stale.js, which stands unbuilt, and the chapter says a merge where the ask says an edit; name the function that drops the bless and the ticket it waits on
+- the callers list leaves out spec/config/level0.schema.json, which needs the bless.agent entry the sidebar button draws, and the new src/scripts/pull-bless.js
+- `HARNESS` in src/extension/lib/lens.js copies the list in src/scripts/pull-hand-of.js; point the shell door at one list
 
 # implement
 
