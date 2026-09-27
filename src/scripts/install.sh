@@ -235,37 +235,7 @@ get_vale_ls() {
   rm -rf "$tmp"
 }
 
-# THE INDEX IS C, SO A BUILD NEEDS A C COMPILER. The pinned Zig is one download
-# and no system toolchain, and a box that already carries a working compiler
-# uses that. A name on the PATH is no proof, so this compiles a probe file.
-# [[spec/design_output/index#the-compiler-it-needs]]
-zig_version=0.16.0
-
-working_compiler() {
-  tmp=$(mktemp -d) || return 1
-  printf 'int probe(void) { return 0; }\n' > "$tmp/probe.c"
-  for one in cc gcc clang; do
-    have "$one" || continue
-    if (cd "$tmp" && "$one" -c probe.c -o probe.o) >/dev/null 2>&1; then
-      rm -rf "$tmp"; printf '%s' "$one"; return 0
-    fi
-  done
-  rm -rf "$tmp"; return 1
-}
-
-# zig is a toolbox and its C compiler is a subcommand, so the pinned answer is
-# two words. A compiler that is already a compiler is one.
-compiler_here() {
-  if [ -x "$bin/zig/zig${exe}" ]; then
-    printf '%s' "$bin/zig/zig${exe} cc"
-    return 0
-  fi
-  working_compiler
-}
-
-# THE SERVER IS PURE GO, SO IT NEEDS NO COMPILER AND NO NETWORK. It shares no
-# step with the index above: that one is C and waits on a toolchain, and this
-# one builds beside it in under a second on every box.
+# THE SERVER AND THE INDEX ARE PURE GO, SO THEY NEED NO COMPILER.
 # [[spec/design_output/index#the-compiler-it-needs]]
 # A binary built off other source lints against rules the tree no longer
 # carries, so a hash of its folder, of each tree package it imports and of the
@@ -344,43 +314,9 @@ index_here() {
 }
 
 # [[spec/design_output/index#the-compiler-it-needs]]
-get_zig() {
-  case "$os" in
-    Windows) platform=windows; ending=zip ;;
-    macOS)   platform=macos;   ending=tar.xz ;;
-    *)       platform=linux;   ending=tar.xz ;;
-  esac
-  case "$arch" in
-    arm64) machine=aarch64 ;;
-    *)     machine=x86_64 ;;
-  esac
-  name="zig-${machine}-${platform}-${zig_version}"
-  from="https://ziglang.org/download/${zig_version}/${name}.${ending}"
-
-  say "  downloading Zig ${zig_version}, the C compiler the index builds with"
-  mkdir -p "$bin"
-  tmp=$(mktemp -d)
-  if have curl; then curl -fsSL "$from" -o "$tmp/zig.$ending" || return 1
-  elif have wget; then wget -q "$from" -O "$tmp/zig.$ending" || return 1
-  else say "Neither curl nor wget downloads Zig here." >&2; return 1
-  fi
-  if [ "$ending" = zip ]; then unpack "$tmp/zig.$ending" "$tmp" || return 1
-  else tar -xJf "$tmp/zig.$ending" -C "$tmp" || return 1
-  fi
-  rm -rf "$bin/zig"
-  mv "$tmp/$name" "$bin/zig" || return 1
-  rm -rf "$tmp"
-  [ -x "$bin/zig/zig${exe}" ]
-}
-
 get_index() {
-  cc=$(compiler_here) || { get_zig && cc=$(compiler_here); } || {
-    say "  no C compiler stands here, and Zig failed to download, so the index waits." >&2
-    return 1
-  }
-  say "  building the index with $cc"
-  (cd "$root" && CC="$cc" CGO_ENABLED=1 GOFLAGS=-tags=sqlite_fts5 \
-    go build -o "$bin/se-index${exe}.new" ./src/index) || return 1
+  say "  building the index"
+  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-index${exe}.new" ./src/index) || return 1
   swap_in "$bin/se-index${exe}.new" "$bin/se-index${exe}" || return 1
   (cd "$root" && node src/scripts/go-source.js stamp se-index) || return 1
   index_here

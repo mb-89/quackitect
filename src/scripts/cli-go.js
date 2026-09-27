@@ -1,18 +1,13 @@
 // The one Go module this tree holds, and how a battery runs its tests. The
 // module stands at the root, and a package folder under src joins it, so every
-// import names the folder. A package reaching C through cgo builds with the
-// Zig the install pins, so every package runs on every box.
+// import names the folder. Every package builds with Go alone, so it runs on every box.
 // [[spec/rationales/go-stands-as-one-module]]
 // [[spec/design_output/index#the-compiler-it-needs]]
-
-import { BIN } from "../../.claude/skills/level0/lib/tools.js";
 
 const SRC = "src";
 const MOD = "go.mod";
 // The module path every tree import opens on. [[spec/tickets/go-code-shares-one-module]]
 const MODULE = "quackitect";
-// The tag the index builds its full-text search under, which every package ignores but the index. [[spec/design_output/index#the-compiler-it-needs]]
-const TAGS = "-tags=sqlite_fts5";
 
 // The root holds the module, and a module a folder under src still holds stands beside it, so a stray one runs and shows. [[spec/tickets/go-code-shares-one-module]]
 export function goModulesIn(it) {
@@ -69,14 +64,9 @@ function importsOf(disk, at) {
   return out;
 }
 
-// The environment a Go test runs under, naming the pinned Zig where it stands. [[spec/design_output/index#the-compiler-it-needs]]
-export function goEnvOf(it) {
-  for (const name of ["zig.exe", "zig"]) {
-    const zig = it.join(it.root, ...BIN.split("/"), "zig", name);
-    if (it.disk.exists(zig))
-      return { CC: `${zig} cc`, CGO_ENABLED: "1", GOFLAGS: TAGS };
-  }
-  return { GOFLAGS: TAGS };
+// The environment a Go test runs under: Go alone, and no C compiler. [[spec/design_output/index#the-compiler-it-needs]]
+export function goEnvOf() {
+  return { CGO_ENABLED: "0" };
 }
 
 // The findings the Go formatter's list reads as, one a file it names, under the module that ran it. [[spec/design_output/index#the-compiler-it-needs]]

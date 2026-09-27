@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -96,6 +96,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: ef21a01fbab56ab16a672af1e1316ebbf0133e1c
+    hash_after: ef21a01fbab56ab16a672af1e1316ebbf0133e1c
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/sqlite-runs-pure-go.md:123:1: Sentence: A sentence holds 25 words. Cut this one in two."
 ---
 
 # Ask
@@ -236,11 +244,19 @@ Three node cases fail on their own assertion. `TestTheIndexOpensWithoutCgo` fail
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the draft and its review name, and `sqlite` joins the dictionary
+- the disk and the process take fakes, and the index test opens a real file
+- the index note's compiler chapter names the parts, and the code points at it
+- the pin stands in `go.mod` alone, and the note points there
+- the review row stands fixed in the review list, its test and the survey fixture
 
 ## tests-green
 

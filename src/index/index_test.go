@@ -339,3 +339,26 @@ func TestTheIndexOpensWithoutCgo(t *testing.T) {
 		t.Fatalf("bm25 ranks line %d first", n)
 	}
 }
+
+// The journal, the busy timeout and the sync ride the file name as pragmas. [[spec/design_output/index#the-compiler-it-needs]]
+func TestTheIndexOpensWithItsPragmas(t *testing.T) {
+	db, err := Open(tree(t), filepath.Join(t.TempDir(), "index.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	var mode string
+	var wait, sync int
+	if err := db.QueryRow(`PRAGMA journal_mode`).Scan(&mode); err != nil {
+		t.Fatal(err)
+	}
+	if err := db.QueryRow(`PRAGMA busy_timeout`).Scan(&wait); err != nil {
+		t.Fatal(err)
+	}
+	if err := db.QueryRow(`PRAGMA synchronous`).Scan(&sync); err != nil {
+		t.Fatal(err)
+	}
+	if mode != "wal" || wait != 5000 || sync != 1 {
+		t.Fatalf("the index opens at %s, %d and %d", mode, wait, sync)
+	}
+}
