@@ -89,6 +89,7 @@ The hand-back is the longest road a hook waits on, and the wait frees it.
 
 - `go test ./...` from the root passes
 - `./RUNME.sh log --kind shadow` names each answer the two disagree on
+- a case names `branch open` under `needs`, and the pull finds it among the registry's actions. [[spec/tickets/the-need-list-lacks-verbs]] shows the drift
 - `./RUNME.sh check` exits 0
 
 # design
