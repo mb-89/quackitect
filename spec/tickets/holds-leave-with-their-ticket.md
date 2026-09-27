@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -143,6 +143,18 @@ record:
         hash: 5a2cadb20cc0ce0b
         size: 2807
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d6f05e3a585030 · claude-code · helper-4
+    hash_before: 8b5abad781707f4d1fe90d44877c539aab43cc4b
+    hash_after: 8b5abad781707f4d1fe90d44877c539aab43cc4b
+    inputs:
+      - name: design/draft
+        hash: 5a2cadb20cc0ce0b
+        size: 2807
+      - name: design/tests-red
+        hash: b1d5d7b286e9be5f
+        size: 907
+    def: dc4904ab364efa10
 todo: true
 ---
 
@@ -305,8 +317,25 @@ The ephemeral case reads red because the closed hold stands beside it today.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept: the approach answers the ask, and a red test decides each done line.
+
+- The case where a hold drops at the next pull decides the first done line.
+- The case where a pull names no closed ticket in hand decides the second.
+- Every case fails on its own assertion over the tree as it stands.
+
+Rows for the implement step to fix in place:
+
+- The pull removes each closed hold before `holdOf` reads the hand, and keeps each ephemeral hold.
+- A case pins an ephemeral hold standing after a pull, because the clear runs on it.
+- The draft lists a case for the door and the stop, and the file carries none for the stop.
+- A case over `holdStands` in `src/bridge/stop.js` closes that gap.
+- The callers line for `src/bridge/stop.js` names a helper hold, and its `holdsIn` caller is `stepWaitsOnPerson`.
+- `everyHold` reads the older `hold.json` too, and no verb writes that file.
+- A drop on a gone ticket reaches past the ask, so a case pins it, or it leaves.
+- `lensesOf` in `src/extension/lib/lens.js` reads the holds before the state, so a closed ticket draws a held lens.
+- Read the state first there, since the draft misses that reader of the hold folder.
 
 # implement
 
