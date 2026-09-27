@@ -299,3 +299,5 @@ The source: none.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft reads [[spec/design_input/the-cloud-runs-itself]] first. There a cloud group lands through a pull request, per [[spec/tickets/groups-land-through-pull-requests]]. A rule on `main` takes pull requests alone, and its last chapter leaves that rule open. This ticket holds the refusal on the cloud box itself, so it holds while the rule stands open.
