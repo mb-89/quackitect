@@ -316,6 +316,10 @@ frontmatter:
       type: string
       description: the config key a group waits on, which the tracked file on main turns on with true
 
+    fix:
+      type: boolean
+      description: whether a group is a fix group, which hands back no ticket for an agent, and which the dispatch writes
+
     cloud:
       type: boolean
       x-engine: true
