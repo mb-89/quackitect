@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
+step: split
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [the-foundation-lands-unchanged]
@@ -81,6 +81,14 @@ record:
   - step: sync
     hand: box d7d70c069f441 · claude-code-remote
     hash_before: ef191748722031f7e521c65f9fb70c78629bde96
+  - step: sync
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: 277c2c5207c7b788ff9aa47aeaeb7dfb8f0e06da
+    hash_after: 370d487478c1ceefe54a3aa27dcf7034b3adb3a9
+    answered:
+      - name: sync
+        exit: 0
+        said: work/open-tasks-land-in-shadow already carries every commit on main.
 ---
 
 # Ask
