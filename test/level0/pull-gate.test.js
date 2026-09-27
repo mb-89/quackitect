@@ -97,6 +97,19 @@ The approach.
 # Discussion
 `;
 
+// The standard route's shape: the implement phase reads the design, and tests-green reads the red tests. [[spec/processes/standard]]
+const STANDARD = GATED()
+  .replace(
+    "  - name: implement\n    steps:\n",
+    "  - name: implement\n    input: [design/draft, gate]\n    steps:\n",
+  )
+  .replace("        input: design/draft\n", "")
+  .replace(
+    "group: one-group\n",
+    "      - name: tests-green\n        does: makes the tests pass\n        input: design/tests-red\n        to: retro\ngroup: one-group\n",
+  )
+  .replace("## change\n\n### says\n", "## change\n\n### says\n\n## tests-green\n");
+
 const REJECTED_ONCE = `record:
   - step: gate
     hand: box other
@@ -105,8 +118,8 @@ const REJECTED_ONCE = `record:
 `;
 
 // The ticket at its gate, the verdict filled, handed out and handed back. [[spec/design_output/pull#the-gate]]
-function gated(rows, record = "") {
-  const files = standing(filled(GATED(record), "## verdict", rows), undefined, {
+function gated(rows, record = "", note = GATED(record)) {
+  const files = standing(filled(note, "## verdict", rows), undefined, {
     [at("spec/processes/trivial.yaml")]: TRIVIAL,
   });
   const made = doors(files, {}, { words: 5 });
@@ -213,6 +226,22 @@ test("after a reject the gate and implement read both rounds", () => {
   assert.deepEqual(inputAt(text, "implement/change"), [
     "design/draft",
     "design/draft-2",
+  ]);
+});
+
+// [[spec/design_output/pull#the-gate]]
+test("after a reject on the standard route, implement and tests-green read both rounds", () => {
+  const { back, text } = gated("reject\n- the fail road is missing", "", STANDARD);
+
+  assert.equal(back.code, 0, back.said);
+  assert.deepEqual(inputAt(text, "implement"), [
+    "design/draft",
+    "gate",
+    "design/draft-2",
+  ]);
+  assert.deepEqual(inputAt(text, "implement/tests-green"), [
+    "design/tests-red",
+    "design/tests-red-2",
   ]);
 });
 
