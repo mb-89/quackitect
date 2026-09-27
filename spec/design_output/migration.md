@@ -37,6 +37,7 @@ A box reads the argument here before it asks about a ruling:
 | golden files per twin, Go alone writing frontmatter, the prose checks in Go | [[spec/rationales/one-implementation-survives]] |
 | `files/` mirrors the disk, and each structured file is a projection with a codec | [[spec/rationales/the-disk-is-one-mirror]] |
 | config as a flag on a topic, its layers, contexts and the config module | [[spec/rationales/config-comes-in-layers]] |
+| local ports in each module, and one wiring file binding them | [[spec/rationales/modules-stay-local]] |
 
 # Where each folder goes
 
@@ -46,7 +47,7 @@ A box reads the argument here before it asks about a ruling:
 | `src/q` | the model's core: names, providers, the store and the catalog check, which the index and every module import | new |
 | `src/lsp` | the `lsp` IO module keeps the protocol, and the checks and schema rules become the check module | splits |
 | `src/tui` | `quack tui`: `frame` becomes the generic shell and `tree` the base-view renderer, and the log and the work become declared views | reshaped |
-| `src/config`, `src/yaml`, `src/pointer`, `src/engine/swap` | the config module and every `<module>/config/` subtopic, and the index manager's supervision | merged |
+| `src/config`, `src/yaml`, `src/pointer`, `src/engine/swap` | the config module and every `<instance>/config/` subtopic, and the index manager's supervision | merged |
 | `src/scripts` | the module processes, such as work, pull, retro and vehicle, and a Go command line in place of `cli.js` | ported, topic by topic |
 | `src/bridge` | the `hooks` IO module, and modules for the write, bash, stop, answer and handover rules | ported |
 | `src/engine`, `src/doors` | modules, such as retro, projection and group, and the outbound IO modules | ported |

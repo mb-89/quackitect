@@ -25,8 +25,8 @@ such as `ops/` stood in the catalog once, and its keys stayed inside it.
 ## 3. What it gave up
 
 A module could no longer answer a name it had not declared. So a value for one
-screen cost a declaration and a built-in value. A second calculation stood in a file
-of its own, and config picked one of the two.
+screen cost a declaration and a built-in value. A second calculation stood as a module type of its own, and the wiring picked
+one of the two, per [[spec/rationales/modules-stay-local]].
 
 ## 4. What would make it wrong
 

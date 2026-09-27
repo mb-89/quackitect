@@ -26,10 +26,11 @@ path for them.
 
 ## 2. Why two passes
 
-Modules loaded in any order, so a read named a name no module had registered
-yet. A second pass, once every module had registered, closed those reads. A read
-open after it was a bug, and the start refused loudly. A writer that registered and ran nowhere left no read open. A crash then showed
-as a built-in value marked `not provided`, and no start failed for it.
+Modules loaded in any order, so a wire named a port no instance had registered
+yet. A second pass, once every instance had registered, closed those wires. An
+in-port open after it was a bug, and the start refused loudly. An instance that
+ran nowhere left no in-port open. A crash then showed as a built-in value marked
+`not provided`, and no start failed for it.
 
 ## 3. What it gave up
 

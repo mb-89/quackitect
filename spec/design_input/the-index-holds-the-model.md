@@ -18,7 +18,8 @@ The asks, one to a line:
 - Generate the config schema, the built-in values, the slash commands, the command-line help and the index tab off the registrations.
 - Mirror the disk in `files/`, and let each owner project its files through one codec and write back through `disk`.
 - Layer each config key: override, context, environment, local, default and built-in, with shared keys the whole project sees alike.
-- Resolve every read to its writer at start-up in two passes, and refuse loudly on a read still open.
+- Let a module declare local ports alone, and let one wiring file bind them at start-up.
+- Resolve the wiring at start-up in two passes, and refuse loudly on an in-port still open.
 - Hand a provider one snapshot in, let it work pure, and take one commit out.
 - Answer, for any name, who writes it, who reads it and where it comes from.
 - Let a module flagged `io` alone talk to the outside world, one file each, with its fake inside.
@@ -59,6 +60,7 @@ the config, and the index's own management.
 | an IO module | a module flagged `io`: it owns the names of what comes in, and accepts requests going out, with no business logic |
 | the config module | a small module the index always loads. It owns every `*/config/*` subtopic, resolves the layers and writes the value that wins |
 | the `watch` and `disk` IO modules | the only ones touching the disk: `watch` brings changes in as `files/`, and `disk` writes on request |
+| the wiring file | `spec/wiring.yaml`: the instances to load, and a name for each port |
 | the index manager | a module the index always loads, holding supervision, leases, alarms, operations and retention |
 
 A module passing a value through from outside writes it the way a module
@@ -83,30 +85,31 @@ keys and reads them like any other input, and names no file, environment,
 context, override or layer. The config module and the surfaces alone know the
 layers.
 
-Modules load in any order, so a read names a name no module registers yet. The
-index resolves in two passes. A read still open after the second is a bug, and
-the start refuses, naming the reader and the name. A writer that registers and
-runs nowhere leaves no read open, such as one that crashes, or an alternative
-nobody loads. Its readers take the built-in value, with the mark `not provided`.
+A module declares local ports alone, and spells no other module's name or path.
+The wiring file names the instances to load, and binds each port to a name.
+Modules load in any order, so the index resolves the wiring in two passes. An
+in-port still open after the second is a bug, and the start refuses, naming the
+port. An instance that runs nowhere leaves its readers the built-in value, with
+the mark `not provided`.
 
 # One owner per name
 
 | the rule | what it gives |
 |---|---|
-| a key a module declares under `<module>/config/` has the config module as its writer, the one place a module declares a name another writes | the declaring module reads the key as an input, and the start resolves its writer in its passes |
-| a module names its own values locally, and the framework adds its topic prefix | a module spells a full name only for what it reads from another |
+| a key a module declares under `<instance>/config/` has the config module as its writer, the one place a module declares a name another writes | the declaring module reads the key as an input, and the start resolves its writer in its passes |
+| a module names its ports and keys locally, and spells no other module's name | an agent writes and tests a module alone, and the wiring file holds the layout |
 | each name has one provider and a built-in value | no value stands computed in two places, so two numbers cannot disagree |
-| an alternative provider lives in a file of its own, and config picks one at start-up | a box chooses its calculation, and the name stays one |
+| an alternative calculation is another module type, which the wiring binds to the same name | a box chooses its calculation, and the name stays one |
 | the index adds no name at runtime | the catalog a reader sees is the whole catalog |
-| the index refuses to start on a broken catalog, such as a name twice, a built-in value missing, or a read no writer answers | the fault shows at start, and the check starts the index, so it shows before a merge |
+| the index refuses to start on a broken catalog, such as a name with two writers, or an in-port no writer answers | the fault shows at start, and the check starts the index, so it shows before a merge |
 
 # Input, processing, output
 
 A provider or an action declares its inputs up front, as a struct whose fields
-name the values they read:
+name its in-ports by local name:
 
     type openTasksIn struct {
-        Places Places `q:"work/places"`
+        Places Places `q:"places"`
     }
 
 | the stage | what holds |
@@ -127,17 +130,18 @@ the next run.
 
 # The wiring analyzer
 
-Declared inputs make the whole wiring known before anything runs. The index
-keeps the file and the line of each registration. `quack why <name>` answers
-the provider and its file, the inputs down to the files, the clock and the
-events, and every reader:
+Declared ports and the wiring file make the whole wiring known before anything
+runs. The index keeps the file and the line of each registration. `quack why
+<name>` follows the wiring. It answers the port writing the name and its module
+file, and that instance's in-ports and the names they read. It goes down to the
+files, the clock and the events, and names every reader:
 
     $ quack why work/open-tasks
-    work/open-tasks = 3                 provided by work.local
-      provider   modules/work/open_tasks.go:9
-      reads      work/places            modules/work/places.go:14
-                   reads tickets/*      modules/tickets/ticket.go:22
-      read by    the sidebar badge, the work view header
+    work/open-tasks = 3                   written by work.open-tasks
+      module      modules/work/open_tasks.go:9
+      in-port     work.places  <- queue/places     modules/queue/places.go:14
+                    in-port queue.rows  <- tickets/all   modules/tickets/ticket.go:22
+      read by     the sidebar badge, the work view header
 
 The same answer stands as an agent tool and as a view in the window's index tab.
 
@@ -173,10 +177,10 @@ the other modules stay as they stand.
 # A module is one file
 
 A topic folder is one module. A new file in `src/modules/work/` joins the
-work package at its next build, and its `init` registers the name. The module
+work package at its next build, and its `init` registers the port. The module
 names no HTTP library, no MCP and no editor, because only the IO modules know those.
 
-    var OpenTasks = q.Derived("work/open-tasks", 0,
+        var OpenTasks = q.Derived("open-tasks", 0,
         q.Doc("The tickets this box can take."),
         q.Show(q.Badge{On: "work/editor"}),
         func(in openTasksIn) (int, error) {
@@ -292,7 +296,9 @@ Every ruling stands, and a box builds on it with no question:
 | the editor starts `quack lsp`, which relays stdio to the IO process over a TCP stream of its own | [[spec/rationales/the-editor-starts-quack-lsp]] |
 | a value past the bus's payload cap rides in numbered chunks | [[spec/design_output/model#large-values-ride-in-chunks]] |
 | `files/` mirrors the disk, and each structured file is a projection with a codec and a kind | [[spec/design_output/model#everything-on-disk-mirrors]] |
-| no central config topic stands: each module's keys stand under `<module>/config/`, and the config module resolves them off their layers | [[spec/design_output/model#the-config-module]] |
+| a module declares local ports alone, and `spec/wiring.yaml` names the instances and binds each port | [[spec/rationales/modules-stay-local]] |
+| the passes resolve the wiring, and refuse loudly, naming the port | [[spec/design_output/model#the-index-resolves-in-passes]] |
+| no central config topic stands: each module's keys stand under `<instance>/config/`, and the config module resolves them off their layers | [[spec/design_output/model#the-config-module]] |
 | a module knows nothing about where its config values come from | [[spec/design_output/model#config-comes-off-the-registrations]] |
 | a script opens a context with a lease, and an override wins over every context | [[spec/design_output/model#a-context-holds-a-lease]] |
 | a shared key reads the default file alone | [[spec/design_output/model#a-keys-layers]] |
@@ -309,7 +315,9 @@ the split buys isolation:
 - The operating system holds the boundary, because a module process reaches disk and git through the index alone.
 
 Every read of a module crosses a local socket, and the index supervises the
-processes. Where each module runs is the system's choice. An author writes one
+processes. The wiring file says which instances run, and
+`processes.placements` says where. Where each module runs is the system's
+choice. An author writes one
 file, and a user starts one program.
 
 # The languages and the platforms

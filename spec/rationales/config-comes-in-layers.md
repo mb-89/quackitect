@@ -5,7 +5,7 @@ kind: [[rationale]]
 # Why
 
 The owner decided this for the model, and the decision is final. No central
-config topic stood: each module's keys stood under `<module>/config/`, and a key
+config topic stood: each module's keys stood under `<instance>/config/`, and a key
 came off its layers. The layers ran override, context, environment, local,
 default and built-in. A small config module the index always loaded
 resolved them. An agent reads this note before it asks again.
@@ -27,7 +27,7 @@ Overrides replaced the wipe of the local file a new editor window made in
 
 The core stayed dumb, and the index manager stayed about the system's health.
 So the layers went to a module of their own. Declaring a key under
-`<module>/config/` registered an input, and the config module stood as its
+`<instance>/config/` registered an input, and the config module stood as its
 writer. That was the
 one place a module declared a name another wrote, and the ownership rule said
 so.

@@ -47,6 +47,8 @@ flowchart LR
     work["work"]
   end
   core["the index core: resolves, stores, takes a write from its writer, snapshots, pushes, answers built-in values"]
+  wiring["spec/wiring.yaml, read at start"]
+  wiring -. "names the instances, and binds their ports" .-> core
   outside <--> io
   io -- "commits its names, takes requests" --> core
   compute -- "reads a snapshot, commits its names" --> core
@@ -59,25 +61,26 @@ through the index alone.
 
 ## A name
 
-A name is a path of lowercase segments, such as `work/open-tasks`. The first
-segment is its topic, the module folder that provides it.
+A name is a path of segments in the index, such as `work/open-tasks`. The wiring gives it, per [[spec/design_output/model#the-wiring-file]]. It is a
+standard name a wire binds, or `<instance>/<port>` for an out-port with a wire
+to a port or with no wire.
 
-A module names its own values locally. The framework adds its topic prefix to
-everything it writes, so `weight` in the queue module becomes
-`queue/config/weight`. A module spells a full name only for what it reads from
-another module.
+A module names everything locally: its in-ports, its out-ports and its config
+keys. It spells no other module's name or path, and its reads name local ports too. The
+wiring binds each port to a name, and a config key stands under
+`<instance>/config/<key>`, such as `queue/config/weight`.
 
 | the part | what it holds |
 |---|---|
 | the name | the path, unique in the catalog |
 | the type | the Go type of its value, which the catalog records |
 | the built-in value | the value a reader gets while no provider answers |
-| the provider | the one registration answering it |
+| the writer | the one out-port the wiring binds to it |
 | the deadline | `q.Deadline`, or the deadline its kind's config key holds |
 | the doc | `q.Doc`, which every surface shows |
 
 A family is a name with a key segment, such as `ops/<id>` or
-`session/<id>/fill`. The catalog holds a family once, with one provider, one
+`session/<id>/fill`. The catalog holds a family once, with one writer, one
 type and one built-in value. Keys come and go inside it, so the index adds no name at
 runtime.
 
@@ -86,8 +89,7 @@ runtime.
 | `<key>` | one segment | `ops/<id>` |
 | `<key...>` | the rest of the name, one segment or more, and it stands last | `files/<path...>` |
 
-A module declares a family the way it declares a name, and the registration's
-name carries the key segment. `matches` in `src/q/q.go` answers each key in its
+An out-port declares a family, and its local name carries the key segment. `matches` in `src/q/q.go` answers each key in its
 place.
 
 ## The index core
@@ -114,8 +116,8 @@ Every module, an IO module among them, registers these groups at `Register`:
 ```mermaid
 flowchart LR
   module["a module, one file"]
-  module --> inputs["inputs: the names it reads"]
-  module --> outputs["outputs: the names it writes, each with its built-in value"]
+  module --> inputs["inputs: its in-ports, by local name"]
+  module --> outputs["outputs: its out-ports, by local name, each with its built-in value"]
   module --> config["config: its keys, each with a type, a built-in value and help"]
   module -.-> state["state: its insides, for diagnosis, later"]
   module -.-> debug["debug: its diagnosis flags, later"]
@@ -123,8 +125,8 @@ flowchart LR
 
 | the group | how a module declares it | built |
 |---|---|---|
-| inputs | the struct fields a provider reads, each with the tag `q:"<name>"`, and the events a fold takes | now |
-| outputs | each `q.Derived`, `q.Fold` and `q.Action` it registers, with its built-in value | now |
+| inputs | its in-ports: the struct fields a provider reads, each with the tag `q:"<port>"` by local name, and the events a fold takes | now |
+| outputs | its out-ports: each `q.Derived`, `q.Fold` and `q.Action` it registers by local name, with its built-in value | now |
 | config | `q.Cfg(key, builtin, help)` by local name, the type read off the built-in value | now |
 | state | `q.State(name, reader)`, its insides, readable for diagnosis | later |
 | debug | `q.Debug(flag, help)`, a switch for a diagnosis | later |
@@ -135,9 +137,53 @@ another. A module knows nothing about where its config values come from. It
 reads a key like any other input, per
 [[spec/design_output/model#config-comes-off-the-registrations]].
 
+## The wiring file
+
+`spec/wiring.yaml` is the one place that knows the global layout, and the index
+reads it at start. It lists the instances to load, and binds each port:
+
+| the part | what it holds |
+|---|---|
+| an instance | a name and its module type, such as `queue: { module: queue }`. One type runs as two instances with different config |
+| a wire to a standard name | `tickets.all: tickets/all` and `queue.rows: tickets/all`. Ports on one standard name connect, and neither side knows the other |
+| a wire port to port | `work.places: queue.places`. The index still names the value by its writer, `queue/places` |
+| an out-port with no wire | readable as `<instance>/<port>` |
+| an in-port | a wire, or the mark `built-in` in the wiring. The start refuses anything else |
+| a name | one writer, and any number of readers |
+
+An alternative calculation is another module type, and a wire binds it to the
+same name. The wiring replaces the selection by `providers.*` config keys.
+
+```mermaid
+flowchart LR
+  subgraph modules["each module knows its own ports alone"]
+    tall["tickets.all, out"]
+    qrows["queue.rows, in"]
+    qmin["queue.minute, in"]
+    qplaces["queue.places, out"]
+    wplaces["work.places, in"]
+    wopen["work.open-tasks, out"]
+    cmin["clock.minute, out"]
+  end
+  subgraph names["names in the index, which the wiring binds"]
+    ntickets["tickets/all"]
+    nplaces["queue/places"]
+    nminute["clock/minute"]
+    nopen["work/open-tasks"]
+  end
+  tall --> ntickets --> qrows
+  qplaces --> nplaces --> wplaces
+  cmin --> nminute --> qmin
+  wopen --> nopen
+```
+
+An author writes and tests a module alone: `qtest` feeds its in-ports and reads its
+out-ports by their local names. Where each instance runs stands apart, in
+[[spec/design_output/model#the-placements]].
+
 ## The topics and their writers
 
-Every topic has a module writing it:
+The first wiring binds these names, each to one writing instance:
 
 | the topic | the module writing it | what it holds |
 |---|---|---|
@@ -146,7 +192,7 @@ Every topic has a module writing it:
 | `clock/minute` | the `clock` IO module | the time, cut to the minute, and a push each minute |
 | `session/<id>/events` | the `hooks` IO module | the events of a session |
 | `session/<id>/` | the modules folding the events | the values the folds answer |
-| `<module>/config/<key>`, each carrying the flag `config` | the config module | every key a module declares, as its layers set it |
+| `<instance>/config/<key>`, each carrying the flag `config` | the config module | every key a module declares, as its layers set it |
 | `env/<name>` | the `env` IO module | the `SE_` variables, read at start |
 | `tickets/` | the tickets module | every ticket, read off `files/` |
 | `queue/` | the queue module | the score, the outline and the places, read off `tickets/` |
@@ -188,7 +234,7 @@ The module declares a glob, a codec that parses and serializes, and a kind:
 | the files | the module | its codec | its topic |
 |---|---|---|---|
 | `spec/tickets/*.md` | tickets | markdown with its frontmatter | `tickets/` |
-| `spec/config/level0.json`, `.se/.runtime/config.json` | config | JSON, keyed by module and then by key | every `<module>/config/` |
+| `spec/config/level0.json`, `.se/.runtime/config.json` | config | JSON, keyed by module and then by key | every `<instance>/config/` |
 | `.se/.runtime/plan.json` | queue | JSON | `queue/` |
 | `.se/.runtime/hold/<hand>.json` | holds | JSON | `hold/` |
 
@@ -295,9 +341,8 @@ A fold registers with a step over one event:
 A fold reads no other name. A value reading a fold and another name is a
 `q.Derived` over both.
 
-An alternative provider stands in a file of its own, and registers with
-`q.Alt("work.remote")`. The config key `providers.<name>` picks one at start,
-and the registration with no `q.Alt` stands where the key is empty.
+An alternative calculation is another module type. The wiring binds it to the
+name in place of the first, per [[spec/design_output/model#the-wiring-file]].
 
 ## Snapshots and revisions
 
@@ -339,41 +384,42 @@ before it, newest first, and the action fails with the reason.
 
 ## The index resolves in passes
 
-Modules load in any order, so a read names a name no module registers yet. The
-index resolves each read to its writer in passes:
+Modules load in any order, so a wire names a port no instance registers yet.
+The index resolves the wiring in passes:
 
 | the pass | what it does |
 |---|---|
-| the first | matches every read to a registered writer, and leaves the rest open |
-| the second | matches what the first leaves open, once every module registers |
-| the start | runs once every read has its writer, and refuses on a read still open |
+| the first | matches every in-port with a wire to the out-port writing its name, and leaves the rest open |
+| the second | matches what the first leaves open, once every instance registers |
+| the start | runs once every in-port has its writer or its `built-in` mark, the types match, and each standard name has one writer |
 
 ```mermaid
 flowchart TD
-  load["every module registers, in any order"] --> first["the first pass matches each read to a registered writer"]
+  load["the wiring loads, and every instance registers, in any order"] --> first["the first pass matches each wired in-port to its writer"]
   first --> second["the second pass matches what the first left open"]
-  second --> open{"a read still open?"}
-  open -- "yes" --> refuse["the start refuses loudly, naming the reader, its file and line, and the name"]
+  second --> open{"an in-port still open, a type apart, or a name with two writers?"}
+  open -- "yes" --> refuse["the start refuses loudly, naming the port"]
   open -- "no" --> start["the index starts"]
   start --> running{"its writer runs?"}
   running -- "yes" --> value["the reader gets the value"]
   running -- "no" --> fallback["the reader gets the built-in value, marked not provided"]
 ```
 
-A read still open after the second pass is a bug. The start refuses loudly,
-naming the reader, its file and line, and the name. A writer that registers and
-runs nowhere leaves no read open, such as one that crashes, or an alternative
-nobody loads. Its readers take the built-in value, with the mark `not provided`.
+An in-port still open after the second pass is a bug. The start refuses
+loudly, naming the port, its instance, its file and line, and the name. An
+instance the wiring names and that runs nowhere leaves no in-port open, such as
+one that crashes. Its readers take the built-in value, with the mark `not
+provided`.
 
 The index checks the rest of the catalog at start, and refuses on each fault:
 
 | the fault | what the refusal names |
 |---|---|
-| a name with two registrations | both files and lines |
-| a name with no built-in value | the file and line |
-| two providers active for one name | both, and the config key that picks |
-| a read naming no name in the catalog after the second pass | the reader, the struct field, and the name |
-| an input whose type differs from the name's type | the field, and both types |
+| a name two out-ports write | both ports, and the lines of the wiring |
+| a port with no built-in value | the file and line |
+| an in-port with no wire and no `built-in` mark | the instance, the port, and its file and line |
+| a wired in-port whose type differs from its writer's | both ports, and both types |
+| a wire naming a port no instance declares | the line of the wiring |
 | a cycle among derived names | the names round the cycle |
 | a view reading or calling what the catalog lacks | the base file, and the key |
 
@@ -381,14 +427,14 @@ The check starts the index, so a fault shows before a merge.
 
 ## `quack why`
 
-The index keeps the file and line of each registration, so it answers where a
-value comes from:
+The index keeps the file and line of each registration, and follows the wiring,
+so it answers where a value comes from:
 
 | the part of the answer | what it holds |
 |---|---|
 | the value | the value, and whether a provider answers it, it stands at its built-in value, or it stands stale since a time |
-| the provider | its registration, and the file and line |
-| the inputs | each input's provider, down to `files/` paths, `session/` events and `clock/minute` |
+| the writer | the out-port writing the name, its instance, and the module file and line |
+| the inputs | that instance's in-ports, the names their wires bind, and their writers, down to the IO modules: `files/` paths, `session/` events and `clock/minute` |
 | the readers | every provider, view and surface reading it |
 
 The same answer stands as the agent tool `index/why`, and as the details of a
@@ -398,7 +444,8 @@ input nowhere, per [[spec/rationales/git-stays-the-archive]].
 ## Config comes off the registrations
 
 No central config topic stands. A module declares its keys with `q.Cfg` by
-their local names, and the framework files each under `<module>/config/<key>`.
+their local names, and the framework files each under `<instance>/config/<key>`
+for every instance the wiring loads.
 That subtopic carries the flag `config`. Each key takes a type, a built-in
 value, a help line, and the mark `shared` where the project shares it.
 
@@ -529,9 +576,9 @@ past them.
 | the step | what it does |
 |---|---|
 | build | a catalog off the module's `Register` alone, and the catalog check over it |
-| seed | the names a case names: `files/`, `buffers/`, a `<module>/config/<key>`, `clock/minute` and `session/` events |
+| seed | the in-ports a case feeds, by their local names, config keys among them, and the events a fold takes |
 | run | a derived provider, a fold over the seeded events, or an action with its input |
-| assert | the commits the run makes, and the list of requests an action answers |
+| assert | the out-ports the run writes, by their local names, and the list of requests an action answers |
 
 A request in the list takes the answer the case hands it, so a `then` reads it.
 The harness opens no database, no disk, no git and no port.
@@ -618,19 +665,20 @@ module carry over from there.
 
 ## IO modules are modules
 
-An IO module registers inputs, outputs and config like every other module, per
+An IO module registers its in-ports, out-ports and config by local name, like
+every other module. For the contract, see
 [[spec/design_input/the-index-holds-the-model#every-part-is-a-module]]. Its
 registration carries `q.IO()`. It stands under `src/modules/<topic>`
 beside the others, and no separate tree holds it.
 
 | what it does | such as |
 |---|---|
-| writes the names of what comes in, as its outputs | `watch` writes `files/<path...>`, `hooks` writes `session/<id>/events`, `clock` writes `clock/minute` |
+| writes what comes in on its out-ports, which the wiring binds to names | `watch` writes `files/<path...>`, `hooks` writes `session/<id>/events`, `clock` writes `clock/minute` |
 | accepts the requests going out, which an action's commit carries | `git` takes a commit or a push, `disk` takes a write |
 
 It holds no business logic, only IO. A value it passes through counts the same
-as one a module computes. It is an output, and the core takes it from the IO
-module that registers it alone.
+as one a module computes. It is an out-port, and the core takes the name it
+binds from that IO module alone.
 
 ## Its file carries its fake
 
@@ -1084,9 +1132,13 @@ whose `pid` runs nowhere reads as absent.
 
 ## The placements
 
+The wiring says which instances run and how their ports meet. Where they run
+stands apart, the way the IEC standard for function blocks splits an application
+from its mapping onto devices. [[spec/rationales/modules-stay-local]] names it.
+
 The config key `processes.placements` lists the placements, each a list of
-topics that share a process. A topic in no list gets a process of its own.
-A placement changes where a topic runs, and no file of the topic.
+instances that share a process. An instance in no list gets a process of its
+own. A placement changes where an instance runs, and no file of its module.
 
 ## A process ends
 
@@ -1120,7 +1172,7 @@ registration, its input struct, and a test beside it:
 
 | the file | what it holds |
 |---|---|
-| `src/modules/work/open_tasks.go` | the input struct, and `q.Derived("work/open-tasks", ...)` in a package variable |
+| `src/modules/work/open_tasks.go` | the input struct, and `q.Derived("open-tasks", ...)` in a package variable |
 | `src/modules/work/open_tasks_test.go` | the cases, run through `q/qtest` against the fake index |
 
 A module meets the index alone. For the fake index and the rule holding a
