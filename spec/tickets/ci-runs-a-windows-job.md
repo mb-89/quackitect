@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 9c5d9dfa9d5f424350e09914e6675030071a275d
+    hash_after: 9c5d9dfa9d5f424350e09914e6675030071a275d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -221,11 +229,19 @@ The one case fails on its first assertion, the matrix line, since the workflow n
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .github/workflows/check.yml test/contract/check-workflow.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the workflow and its test, both inside the ask
+- the test reads the real workflow, so it moves to `test/contract/check-workflow.test.js`, where `FakeDoorsInTest` puts it
+- the workflow names this ticket beside the matrix
+- the runner list stands in the workflow alone
+- the review passes with no rows
 
 ## tests-green
 
