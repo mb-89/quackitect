@@ -77,12 +77,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d7d8cca5d3cd · claude-code-remote
     hash_before: fa5a46b626147f54ea022bc86ae22494ccf7e30e
     hash_after: fa5a46b626147f54ea022bc86ae22494ccf7e30e
+  - step: design/review
+    hand: box d7d8cca5d3cd · claude-code-remote · helper-2
+    hash_before: 720e1907f4f48d37bb382e6c2516b989a860333b
+    hash_after: 720e1907f4f48d37bb382e6c2516b989a860333b
 ---
 
 # Ask
@@ -149,8 +153,13 @@ first
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- rest-line-names-plain-pull: the closing line of a cut hand-out names the plain pull, with --as where the hold carries one, and no ticket name, because pull in src/scripts/pull.js sends a name with a held leaf to handBack, and stillHeld stands behind that road
+- long-line-cuts-by-bytes: partOf in src/scripts/pull-chapter.js cuts at a UTF-8 boundary inside room where one line alone runs past room, because a cut at the last line ending finds none there
+- refusals-stay-under-cap: the refusals of stillHeld and handBack print the guidance again through notesSaid, and the draft cuts the work answer alone, so a refusal past the margin still lands on disk as a preview
+- the-callers-name-dueHandOut: the callers list names ephemeralPull as a caller of handed, and dueHandOut in src/scripts/ephemeral-pull.js makes that call
 
 # implement
 
