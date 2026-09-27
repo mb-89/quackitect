@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-red
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: open-tasks-land-in-shadow
@@ -83,6 +83,10 @@ record:
     hand: box d7d70c069f441 · claude-code-remote
     hash_before: da11ae9b47e9d173880efc7d04b8881e32144a75
     hash_after: da11ae9b47e9d173880efc7d04b8881e32144a75
+  - step: design/review
+    hand: box d7d70c069f441 · claude-code-remote · helper-2
+    hash_before: 5e5d6e8c72b4ccd31ea1458bdb5799ae1d6c6550
+    hash_after: 5e5d6e8c72b4ccd31ea1458bdb5799ae1d6c6550
 ---
 
 # Ask
@@ -174,6 +178,13 @@ The done lines and the test deciding each:
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- open-marker-outlives-refused-push: `openGroup` pushes trunk with `cloud: true` before the branch push, so a refused branch push leaves the marker on trunk with no branch. Drop the marker on that refusal, or push the branch first, and add the case to the test file.
+- rationale-drops-release-row: the `release` departure holds, because `release` writes `hash_after` and leaves the branch at `todo` in the cloud. Rewrite the row in `spec/rationales/git-stays-the-archive.md` to name the merge and the close alone, since the ask points at that note.
+- close-force-guards-trunk-checkout: `close` reads neither `HEAD` nor a dirty tree today, and the forced close now commits on trunk. Add the trunk and `dirty` guards `merge` carries.
+- open-marks-standing-branches: the `already stands in the cloud` return in `openGroup` writes nothing, so a branch opened before the change carries no marker. Write the marker on that road too.
 
 # implement
 
