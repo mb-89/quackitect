@@ -77,7 +77,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d7d8cca563b1 · claude-code-remote
+    hash_before: 37121f76c6fc6552e82d6eeb72f418a6a6bf03ed
+    hash_after: 37121f76c6fc6552e82d6eeb72f418a6a6bf03ed
 ---
 
 # Ask
@@ -101,32 +106,39 @@ Today a changed input leaves every step that read it standing as done, and a rou
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+For details, see [[spec/design_output/pull#an-input-marks-its-steps]].
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/pull-writes.js passed, which writes inputs and def into the record entry,src/scripts/pull-hand.js handOut, which runs the stale read before it takes a leaf,src/scripts/pull.js pull, which reaches handOut,src/scripts/ticket.js update and updated, which the process edit reuses,src/doors/index.js ask, which gains the hashes method,src/index/door.go the method switch, which gains hashes,spec/schemas/ticket.schema.yaml the record entry, which gains inputs, def and stale
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/pull-stale.test.js a passed leaf records the hash of each input and of its definition,test/level0/pull-stale.test.js a note input takes its hash from the index,test/level0/pull-stale.test.js a moved input marks exactly the leaves reading it,test/level0/pull-stale.test.js an append to an input keeps the leaves reading it whole,test/level0/pull-stale.test.js a process edit past the step keeps the earlier leaves,test/level0/pull-stale.test.js a process edit before the step sends it back to the last whole leaf,src/index/files_test.go TestHashesAnswersTheHashOfEachPath
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+processAt, updated, reachedOf, handOut, the index door and Files stand opened, and each claim checked there
+the callers list names each function the stale read and the record fields change
+each done_when line maps to a pull-stale case: hashes, marks, append, edit
 
 ## review
 

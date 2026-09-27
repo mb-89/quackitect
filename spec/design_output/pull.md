@@ -696,6 +696,30 @@ refuses, so nobody takes another hand's work back. The pull writes a return with
 reason, sets `step` to the leaf, commits, pushes and hands the leaf out again.
 So a hand fixes what the sweep names later through the one road there is.
 
+## An input marks its steps
+
+A passed leaf keeps the hash of each input and of its own definition. A pull finds the leaves whose hashes no longer match. [[spec/design_input/level-two#evidence-and-stale-steps]] asks it, and `src/scripts/pull-stale.js` holds it.
+
+| the record field | what it holds |
+|---|---|
+| `inputs` | one entry an input: its name, the hash, and the size of the text the hash reads |
+| `def` | `hashOf` over the leaf's entry in the process file |
+
+| the input | where its hash comes from |
+|---|---|
+| `ask`, or a leaf path | `hashText` over that chapter of the ticket |
+| a note link | the `hashes` method of the index, and `hashText` over the disk where the index stands dead |
+
+- An input matches where `hashText` over its first `size` bytes answers the hash. So an append keeps the steps reading it whole.
+- Any other input differs, and the pull marks each leaf reading it `stale` in the record, naming the input.
+- The first stale leaf takes `step`, and a leaf reading no moved input keeps its record.
+- Redoing a stale leaf moves its own chapter, so the next pull marks the leaves reading that chapter.
+
+| the process edit | what the pull does |
+|---|---|
+| a leaf past `step` | copies the new route onto the leaves ahead, as `updated` does |
+| a leaf at or before `step` | copies the new route, and sets `step` to the first leaf whose `def` differs |
+
 # Done leaves no takeable step
 
 `branch done` frees every open ticket of the group, so the group it hands back
