@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"reflect"
 	"sync"
+	"time"
 )
 
 type cell struct {
@@ -102,6 +103,21 @@ func (s *Store) Land(name string, event any) error {
 	}
 	_, err = s.Commit(snap.Revision, map[string]any{name: next})
 	return err
+}
+
+// [[spec/design_output/operations#an-action-declares-its-length]]
+type Declared struct {
+	Op       bool
+	Writes   bool
+	Deadline time.Duration
+}
+
+func (s *Store) Declared(name string) (Declared, bool) {
+	one := s.owner(name)
+	if one == nil {
+		return Declared{}, false
+	}
+	return Declared{Op: one.op, Writes: one.writes, Deadline: one.deadline}, true
 }
 
 func (one Snapshot) Read(name string) any {

@@ -48,11 +48,15 @@ add `q.Op` and `q.Writes` beside `q.Deadline` in `src/q/q.go`. An action then de
 
 <!-- the form is command -->
 
+`go test ./src/q -run TestAnActionDeclaresItsHandleAndItsWrite`
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+`./RUNME.sh check`
 
 ## says
 
@@ -60,11 +64,17 @@ add `q.Op` and `q.Writes` beside `q.Deadline` in `src/q/q.go`. An action then de
 
 <!-- the form is text -->
 
+`q.Op` and `q.Writes` stand beside `q.Deadline` as options, so an action declares its handle and its write at registration. `Store.Declared` answers what the active provider of a name declares. The writer queue of the parent reads it to queue a writing operation.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask, and adds `Store.Declared` so a caller outside `q` reads the options
+- the change reveals no cleanup
+- the options point at the operations note, and no note repeats them
 
 # Discussion
 

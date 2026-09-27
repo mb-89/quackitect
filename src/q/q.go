@@ -35,6 +35,8 @@ type registration struct {
 	alt      string
 	doc      string
 	deadline time.Duration
+	op       bool
+	writes   bool
 	where    string
 	inputs   []input
 	run      func(Snapshot) any
@@ -55,6 +57,10 @@ type Option func(*registration)
 func Doc(text string) Option             { return func(one *registration) { one.doc = text } }
 func Alt(name string) Option             { return func(one *registration) { one.alt = name } }
 func Deadline(span time.Duration) Option { return func(one *registration) { one.deadline = span } }
+
+// An action declares its length and its writes. [[spec/design_output/operations#an-action-declares-its-length]]
+func Op() Option     { return func(one *registration) { one.op = true } }
+func Writes() Option { return func(one *registration) { one.writes = true } }
 
 func Given[T any](name string, def T, opts ...Option) {
 	Main.add(givenOf(name, def), callerAt(2), opts)

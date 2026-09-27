@@ -118,3 +118,19 @@ func TestAKeyOfManySegmentsFollowsAKeyOfOne(t *testing.T) {
 		t.Fatal("a name with an empty segment for the key lands")
 	}
 }
+
+func TestAnActionDeclaresItsHandleAndItsWrite(t *testing.T) {
+	c := New()
+	GivenIn(c, "t/pull", 0, Op(), Writes())
+	GivenIn(c, "t/read", 0)
+	s := NewStore(c, nil)
+	if got, ok := s.Declared("t/pull"); !ok || !got.Op || !got.Writes {
+		t.Fatalf("t/pull declares %+v", got)
+	}
+	if got, ok := s.Declared("t/read"); !ok || got.Op || got.Writes {
+		t.Fatalf("t/read declares %+v", got)
+	}
+	if _, ok := s.Declared("t/none"); ok {
+		t.Fatal("a name nobody provides declares a shape")
+	}
+}
