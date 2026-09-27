@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/tests-red
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -88,6 +88,14 @@ record:
     hand: box d7d598fb92101 · claude-code-remote
     hash_before: a82aebfdbb184ffc29b3d2bd9b4d7c58779d652a
     hash_after: a82aebfdbb184ffc29b3d2bd9b4d7c58779d652a
+  - step: implement/tests-red
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 761ddd5ff9d849118cebb49b31859f4154eaf4ac
+    hash_after: 761ddd5ff9d849118cebb49b31859f4154eaf4ac
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
 ---
 
 # Ask
@@ -204,17 +212,27 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/q src/index
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Every new test fails on its assertion against a stub. `TestWhyAnswersEachKeyOfAFamily` joins the list for the family row of the draft. The stale state rides in `TestWhyReadsWhetherTheValueStandsAtItsDefault` and answers [[spec/tickets/why-reads-the-stale-mark]].
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch `src/q` and `src/index`, which the draft names
+- the catalog is a fake of its own, and the door test runs a real door
+- each test file opens on a comment pointing at the model note
+- each fact points at the model note
+- the review row stands answered by the stale case
 
 ## change
 

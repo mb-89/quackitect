@@ -194,3 +194,26 @@ func tickOf(t *testing.T, said answer) int64 {
 	}
 	return int64(tick)
 }
+
+func TestTheDoorAnswersWhy(t *testing.T) {
+	root := tree(t)
+	catalog := q.New()
+	q.GivenIn(catalog, "t/n", 0)
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	said, err := posts(standing, []string{"why", "t/n"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	found, ok := said.Result.(map[string]any)
+	if said.Error != "" || !ok || found["name"] != "t/n" || found["state"] != "default" {
+		t.Fatalf("why t/n answers %#v, %q", said.Result, said.Error)
+	}
+}
