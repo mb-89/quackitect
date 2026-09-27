@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: gate
+step: design/draft
 record:
   - step: design/owner-read
     skipped: true
@@ -151,6 +151,12 @@ record:
         hash: 6f2fc1b0d0385faf
         size: 2860
     def: 08e16d07b0de477c
+  - step: design/draft
+    hand: the engine
+    stale: ask
+  - step: design/tests-red
+    hand: the engine
+    stale: design/draft
 ---
 
 # Ask
