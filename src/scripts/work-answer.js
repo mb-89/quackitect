@@ -32,6 +32,7 @@ const HELD_PLACE = "0";
 const HELD = "held";
 import { queued, stoodHere } from "./pull-queue.js";
 import { staleClaim } from "./work-free.js";
+import { CLOUD_MARK } from "./work-merge.js";
 import { readWork, standingAll } from "./work-stands.js";
 
 // [[spec/design_output/work#one-reading-answers-git]]
@@ -121,11 +122,20 @@ export function placesIn(it, read, stood) {
   // A sentence todo stands in the queue as a row of its own, placed by its anchor and held by nobody. [[spec/design_output/stop#the-plan]]
   const all = [...ticketsIn(read), ...todoRows(plan)];
   // A row a standing branch holds belongs to the cloud, so it leaves this box's lists and stands at infinity. [[spec/design_output/pull#the-queue-is-an-outline]]
-  const onCloud = new Set(
-    read.stand
+  // A group trunk marks for the cloud belongs there with its tickets too, whatever its branch reads. [[spec/tickets/marked-groups-stand-in-the-cloud]]
+  const marked = new Set(
+    all
+      .filter((one) => fieldOf(one.text, CLOUD_MARK) === "true")
+      .map((one) => one.name),
+  );
+  const onCloud = new Set([
+    ...read.stand
       .filter((held) => !held.merged)
       .flatMap((held) => [held.name, ...ownTickets(held).map((one) => one.name)]),
-  );
+    ...all
+      .filter((one) => marked.has(one.name) || marked.has(fieldOf(one.text, GROUP)))
+      .map((one) => one.name),
+  ]);
   // A note waits for its retro, so it takes no place. [[spec/design_output/pull#the-queue-is-an-outline]]
   const open = all.filter(
     (one) =>

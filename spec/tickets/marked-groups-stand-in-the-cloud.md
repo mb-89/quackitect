@@ -72,3 +72,7 @@ Breaks: the desk pull hands out a cloud group's tickets, and the count reads eve
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The Breaks line overstates the pull: a desk pull hands no child of an open group out, because a group works on a branch. What breaks is the count and the queue listing, which read every migration ticket as the desk's.
+
+Every open group on trunk carries the marker already, so no group waits for one. `./RUNME.sh branch list --json` reads the marked groups whose branch holds no commit past trunk as merged.
