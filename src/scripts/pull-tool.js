@@ -4,7 +4,6 @@
 // [[spec/design_output/pull#the-hand-out]]
 
 const TOOL = "--tool";
-const JUDGE = "--judge";
 
 // [[spec/design_output/pull#the-hand-out]]
 export function toolArgv(said = {}) {
@@ -24,7 +23,7 @@ export function toolArgv(said = {}) {
   return out;
 }
 
-// The argv a pull runs under: the tool's input where --tool names one, and the argv as typed otherwise. The judge reads the ticket alone. [[spec/design_output/pull#the-checks]]
+// The argv a pull runs under: the tool's input where --tool names one, and the argv as typed otherwise. [[spec/design_output/pull#the-hand-out]]
 export function pullArgvOf(argv) {
   const at = (argv ?? []).indexOf(TOOL);
   if (at < 0) return argv;
@@ -32,6 +31,5 @@ export function pullArgvOf(argv) {
   try {
     said = JSON.parse(String(argv[at + 1] ?? "{}")) ?? {};
   } catch {}
-  const out = toolArgv(said);
-  return argv.includes(JUDGE) ? [...out.slice(0, 2), JUDGE] : out;
+  return toolArgv(said);
 }

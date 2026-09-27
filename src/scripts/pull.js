@@ -4,7 +4,6 @@
 // [[spec/design_output/pull#the-answers]]
 
 import { onDesk } from "../../.claude/skills/level0/lib/cloud.js";
-import { forEvidence } from "../../.claude/skills/level0/lib/guidance.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { checkNote } from "../../.claude/skills/level0/lib/schema.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
@@ -24,7 +23,7 @@ import {
 import { inHand } from "../engine/named.js";
 import { ephemeralPull } from "./ephemeral-pull.js";
 import { rejected } from "./pull-gate.js";
-import { dropHold, guidanceText, holdOf, writeHold } from "./guidance-hand.js";
+import { dropHold, holdOf, writeHold } from "./guidance-hand.js";
 import {
   chapterOf,
   commandsRun,
@@ -111,7 +110,6 @@ export function pull(it, argv) {
   const who = { hand, plainHand, branch, group, held, oneStep: Boolean(as) };
   it.argv = rest;
 
-  if (rest.includes("--judge")) return judgeMaterial(it, held, name);
   if (rest.includes("--drop")) return dropped(it, who);
   // An ephemeral ticket stands in the hold alone, so its hand-back reads no file. [[spec/design_input/the-clear-hands-ephemeral-tickets#an-ephemeral-ticket-stands-held]]
   if (held?.ephemeral) return ephemeralPull(it, who, verdict);
@@ -209,42 +207,6 @@ export function dropped(it, who) {
   say(WORK, [
     `the hold drops, and ${who.held.ticket} stays at ${who.held.step} for the next pull.`,
   ]);
-  return 0;
-}
-
-// [[spec/design_output/pull#the-checks]]
-export function judgeMaterial(it, held, name) {
-  if (!held?.path || (name && name !== held.ticket)) {
-    console.log("null");
-    return 1;
-  }
-  const at = it.join(it.root, ...held.path.split("/"));
-  if (!it.disk.exists(at)) {
-    console.log("null");
-    return 1;
-  }
-  const text = it.disk.read(at);
-  const leaf = leafOf(frontOf(text), held.step);
-  const chapter = chapterOf(text, held.step);
-  // The judge reads prose, and the leaf names which fields hold a line a shell runs. [[spec/tickets/the-group-leaves-at-todo]]
-  const commands = new Set(
-    (leaf?.evidence ?? [])
-      .filter((field) => String(field.form) === "command")
-      .map((field) => String(field.name)),
-  );
-  const evidence = [
-    ...chapter.own,
-    ...[...chapter.fields]
-      .filter(([field, rows]) => rows.length && !commands.has(field))
-      .flatMap(([field, rows]) => [`${field}:`, ...rows]),
-  ].join("\n");
-  // A label names the note beside the number, so one label reaches one rule. [[spec/design_output/pull#the-checks]]
-  const rules = (leaf?.reads ?? []).flatMap((path) =>
-    forEvidence(guidanceText(it, path), path),
-  );
-  console.log(
-    JSON.stringify({ ticket: held.ticket, step: held.step, evidence, rules }),
-  );
   return 0;
 }
 

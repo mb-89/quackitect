@@ -92,34 +92,34 @@ test("an editor changed in the bottom section posts the key and what stands in i
   const posted = [];
   wire(root, (one) => posted.push(one), { get: () => ({}), set: () => {} });
   root.fire("change", {
-    dataset: { key: "judge.model" },
+    dataset: { key: "helper.find" },
     value: "sonnet",
     closest: () => null,
   });
-  assert.deepEqual(posted, [{ kind: "set", key: "judge.model", value: "sonnet" }]);
+  assert.deepEqual(posted, [{ kind: "set", key: "helper.find", value: "sonnet" }]);
 });
 
 // [[spec/design_output/extension#the-filter-reads-an-expression]]
 test("the filter reads a regular expression, and a bad one reads as plain words", () => {
   assert.equal(matches("stop.hold running", "^stop\\."), true);
-  assert.equal(matches("stop.hold running", "judge"), false);
-  assert.equal(matches("judge.model haiku", "mod(el"), false);
-  assert.equal(matches("judge.mod(el haiku", "mod(el"), true);
+  assert.equal(matches("stop.hold running", "helper"), false);
+  assert.equal(matches("helper.find haiku", "fi(nd"), false);
+  assert.equal(matches("helper.fi(nd haiku", "fi(nd"), true);
   assert.equal(matches("anything", ""), true);
 });
 
 test("a node shows where a row under it matches, and goes where none does", () => {
   const hold = node(".row", { dataset: { said: "stop.hold running" } });
-  const model = node(".row", { dataset: { said: "judge.model haiku" } });
+  const model = node(".row", { dataset: { said: "helper.find haiku" } });
   const stop = node("details.keys", { rows: [hold] });
-  const judge = node("details.keys", { rows: [model] });
-  const root = page([hold, model, stop, judge]);
+  const helper = node("details.keys", { rows: [model] });
+  const root = page([hold, model, stop, helper]);
 
   show(root, "^stop");
   assert.equal(hold.classList.contains("gone"), false);
   assert.equal(model.classList.contains("gone"), true);
   assert.equal(stop.classList.contains("gone"), false);
-  assert.equal(judge.classList.contains("gone"), true);
+  assert.equal(helper.classList.contains("gone"), true);
 });
 
 test("the page takes back the filter and the sections the last look held", () => {
@@ -127,8 +127,8 @@ test("the page takes back the filter and the sections the last look held", () =>
   const one = node("details.section", { dataset: { section: "config" }, open: false });
   const root = page([box, one]);
 
-  restore(root, { filter: "judge", open: { config: true } });
-  assert.equal(box.value, "judge");
+  restore(root, { filter: "helper", open: { config: true } });
+  assert.equal(box.value, "helper");
   assert.equal(one.open, true);
 });
 

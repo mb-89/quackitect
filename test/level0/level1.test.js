@@ -1,15 +1,11 @@
-// The pull tool's pure half. The argv it hands the shell and the question it
-// puts to the judge, read with no harness standing.
-// [[spec/design_output/pull#the-checks]]
+// The pull tool's pure half. The argv it hands the shell, the spawn and the
+// session, read with no harness standing.
+// [[spec/design_output/pull#the-hand-out]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import * as lib from "../../.claude/skills/level0/lib/pull.js";
-// The whole module, so a name the wrapper answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
-import * as level1 from "../../.claude/skills/level0/lib/pull.js";
 import {
-  judgeAsk,
-  judgeRefusal,
   PULL_CALL,
   pullSpec,
   sessionOf,
@@ -18,21 +14,6 @@ import {
 import { pullArgvOf } from "../../src/scripts/pull-tool.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
-// The rules a leaf hands the judge, each label naming one rule. [[spec/tickets/the-judge-reads-answer-rules]]
-const RULES = [
-  {
-    label: "voice-1",
-    note: "spec/guidance/voice",
-    number: 1,
-    rule: "Say what is.",
-  },
-  {
-    label: "voice-3",
-    note: "spec/guidance/voice",
-    number: 3,
-    rule: "Put the bottom line first.",
-  },
-];
 // The hooks level one registers, keyed by their event. A registration carries a filter between the event and the handler, so the last argument is the handler. [[spec/design_output/pull#the-checks]]
 async function hooksHere() {
   const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
@@ -124,11 +105,6 @@ test("the tool's input reads into the same words a person types", () => {
     tool({ ticket: "a-child", verdict: "pass", fields: { approach: "x" } }),
     ["pull", "a-child", "--pass", "--fields", '{"approach":"x"}'],
   );
-  assert.deepEqual(tool({ ticket: "a-child", verdict: "pass" }, "--judge"), [
-    "pull",
-    "a-child",
-    "--judge",
-  ]);
   assert.deepEqual(pullArgvOf(["pull", "a-child", "--pass"]), [
     "pull",
     "a-child",
@@ -145,46 +121,7 @@ test("the tool's input reads into the same words a person types", () => {
   ]);
 });
 
-// [[spec/design_output/pull#the-checks]]
-test("the judge's question names each rule by its label and carries the evidence whole", () => {
-  const ask = judgeAsk("The approach.\nchecked:\n- one", RULES);
-  assert.match(ask, /voice-1: Say what is\.\nvoice-3: Put the bottom line first\./);
-  assert.match(ask, /Evidence:\nThe approach\.\nchecked:\n- one$/);
-  assert.match(
-    judgeRefusal("the judge answers breaks over design/draft"),
-    /^refused\n/,
-  );
-});
-
-// [[spec/tickets/the-judge-reads-answer-rules]]
-test("the labels the judge picks from open on follows, one label a rule after it", () => {
-  assert.equal(
-    typeof level1.judgeLabels,
-    "function",
-    "the wrapper answers judgeLabels",
-  );
-  assert.deepEqual(level1.judgeLabels(RULES), ["follows", "voice-1", "voice-3"]);
-  assert.deepEqual(level1.judgeLabels([]), ["follows"]);
-});
-
-// [[spec/tickets/the-judge-reads-answer-rules]]
-test("a label reads back to the note, the number and the rule's own line", () => {
-  assert.equal(typeof level1.ruleBroken, "function", "the wrapper answers ruleBroken");
-  const said = level1.ruleBroken("voice-3", RULES);
-  assert.match(said, /spec\/guidance\/voice/, "the refusal names the note");
-  assert.match(said, /rule 3/, "the refusal names the number");
-  assert.match(said, /Put the bottom line first\./, "the refusal names the line");
-});
-
-// [[spec/tickets/the-judge-reads-answer-rules]]
-test("a label outside the set reads as follows, so a judge naming nothing refuses nothing", () => {
-  assert.equal(typeof level1.ruleBroken, "function", "the wrapper answers ruleBroken");
-  assert.equal(level1.ruleBroken("follows", RULES), "");
-  assert.equal(level1.ruleBroken("voice-9", RULES), "");
-  assert.equal(level1.ruleBroken("", RULES), "");
-});
-
-// The hand-back the judge reads, over a box whose files a fake disk holds. It answers what the shell ran, what the model was asked, and what the tool answered. [[spec/design_output/pull#the-checks]]
+// A hand-back through the tool, over a box whose files a fake disk holds. It answers what the shell ran, what the model was asked, and what the tool answered. [[spec/tickets/the-judge-leaves-the-code]]
 async function handedBack(seed, method = "") {
   const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
   const calls = [];
@@ -198,14 +135,12 @@ async function handedBack(seed, method = "") {
   const files = fakeDisk(seed);
   const ran = [];
   const asked = [];
-  const material = { step: "design/draft", evidence: "The approach.", rules: RULES };
   const $ = {
     fs: { read: async (path) => files.read(path) },
     process: {
       run: async (argv) => {
         ran.push(argv);
-        const asks = argv.at(-1) === "--judge";
-        return { stdout: asks ? JSON.stringify(material) : "work", exitCode: 0 };
+        return { stdout: "work", exitCode: 0 };
       },
     },
     model: {
@@ -229,54 +164,12 @@ async function handedBack(seed, method = "") {
 
 const judging = (enabled, model) => JSON.stringify({ judge: { enabled, model } });
 
-// The slash command writes the per-box file, so the switch reaches the judge through the one resolver. [[spec/design_output/config#the-layers]]
-test("the judge reads its switch through the layers, so the per-box file beats the tracked one", async () => {
-  const off = await handedBack({
-    "spec/config/level0.json": judging(true, "haiku"),
-    ".se/.runtime/config.json": judging(false),
-  });
-  assert.equal(off.judged, false, "the per-box off stops the judge");
-  assert.equal(off.said, "work");
-  assert.deepEqual(off.asked, []);
-
-  const on = await handedBack({
-    "spec/config/level0.json": judging(false, "haiku"),
-    ".se/.runtime/config.json": judging(true, "opus"),
-  });
-  assert.equal(on.judged, true, "the per-box on starts the judge");
-  assert.deepEqual(
-    on.asked,
-    [{ model: "opus" }],
-    "the per-box model reaches the judge",
-  );
-  assert.match(on.said, /^refused\n/);
-});
-
 // The engine holds no model call, so a config naming the old switch still runs the pull alone. [[spec/tickets/the-judge-leaves-the-code]]
 test("the pull tool answers what the pull prints, and asks no model", async () => {
   const ran = await handedBack({ "spec/config/level0.json": judging(true, "haiku") });
   assert.equal(ran.judged, false, "the tool runs no --judge road");
   assert.deepEqual(ran.asked, [], "the tool asks no model");
   assert.equal(ran.said, "work");
-});
-
-// A stub holds no tracked file of its own, so the defaults come off the vehicle's. [[spec/design_output/vehicle#the-work-root-inherits]]
-test("the judge takes its defaults off the method root, and the work root's own file beats them", async () => {
-  const under = await handedBack(
-    { "/vehicle/spec/config/level0.json": judging(true, "haiku") },
-    "/vehicle/",
-  );
-  assert.equal(under.judged, true, "the method root's switch reaches a stub");
-  assert.deepEqual(under.asked, [{ model: "haiku" }]);
-
-  const over = await handedBack(
-    {
-      "/vehicle/spec/config/level0.json": judging(true, "haiku"),
-      "spec/config/level0.json": judging(false),
-    },
-    "/vehicle/",
-  );
-  assert.equal(over.judged, false, "the work root's file beats the method root's");
 });
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
@@ -392,144 +285,4 @@ test("the pull tool runs the verb under the harness env the shell verb reads", a
     HARNESS.map(([key]) => key),
     "the copy stands equal",
   );
-});
-
-// The pull hook over a config, answering whether the judge ran and how often it asked the model. [[spec/tickets/every-road-has-a-caller]]
-async function judgeRuns(config) {
-  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
-  const calls = [];
-  register((event, ...rest) => {
-    if (event === "tool.call" && rest.length > 1) calls.push(rest);
-  }, {});
-  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
-  const ran = [];
-  const asked = [];
-  const material = {
-    ticket: "a-child",
-    step: "design/draft",
-    evidence: "x",
-    rules: RULES,
-  };
-  const $ = {
-    fs: { read: async () => JSON.stringify(config) },
-    process: {
-      run: async (argv) => {
-        ran.push(argv);
-        const judging = argv.includes("--judge");
-        return {
-          stdout: judging ? JSON.stringify(material) : "done",
-          stderr: "",
-          exitCode: 0,
-        };
-      },
-    },
-    model: {
-      classify: async (...said) => {
-        asked.push(said);
-        return "follows";
-      },
-    },
-  };
-  await handler($, { ticket: "a-child", verdict: "pass" }, async () => null);
-  return { judged: ran.some((argv) => argv.includes("--judge")), asked: asked.length };
-}
-
-// The pull hook over a config and a model answering one label and one line, the leaf's ticket apart, so each case keeps its own count. [[spec/tickets/prose-verbs-land-first-try]]
-async function judgeHook(config, { ticket, label, quote }) {
-  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
-  const calls = [];
-  register((event, ...rest) => {
-    if (event === "tool.call" && rest.length > 1) calls.push(rest);
-  }, {});
-  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
-  const material = { ticket, step: "design/draft", evidence: "one\ntwo", rules: RULES };
-  const $ = {
-    fs: { read: async () => JSON.stringify(config) },
-    process: {
-      run: async (argv) => ({
-        stdout: argv.includes("--judge") ? JSON.stringify(material) : "done",
-        stderr: "",
-        exitCode: 0,
-      }),
-    },
-    model: {
-      classify: async () => label,
-      complete: async () => ({ isAnswered: true, text: quote }),
-    },
-  };
-  return async () =>
-    (await handler($, { ticket, verdict: "pass" }, async () => null)).result;
-}
-
-// [[spec/tickets/prose-verbs-land-first-try]]
-test("the judge asks for the line that breaks the rule, and the refusal quotes it", async () => {
-  const ask = judgeAsk("one\ntwo", RULES, "voice-3");
-  assert.match(ask, /voice-3: Put the bottom line first\./);
-  assert.match(ask, /word for word/);
-  assert.match(
-    judgeRefusal("at design/draft, voice-3", "two"),
-    /\n {2}the line: two\n/,
-  );
-
-  const on = { judge: { enabled: true } };
-  const quoted = await judgeHook(on, {
-    ticket: "a-quote",
-    label: "voice-3",
-    quote: "two",
-  });
-  assert.match(await quoted(), /\n {2}the line: two\n/);
-  const loose = await judgeHook(on, {
-    ticket: "a-loose",
-    label: "voice-3",
-    quote: "nowhere",
-  });
-  const said = await loose();
-  assert.match(said, /^refused/);
-  assert.doesNotMatch(said, /nowhere/, "a line the evidence holds nowhere stays out");
-});
-
-// [[spec/tickets/prose-verbs-land-first-try]]
-test("the judge lets a hand-back through past the count of refusals on one leaf", async () => {
-  const { default: config } = await import("../../spec/config/level0.json", {
-    with: { type: "json" },
-  });
-  assert.equal(config.judge.refusalsBeforePass, 3);
-
-  const on = { judge: { enabled: true, refusalsBeforePass: 2 } };
-  const hand = await judgeHook(on, {
-    ticket: "a-count",
-    label: "voice-1",
-    quote: "one",
-  });
-  assert.match(await hand(), /^refused/);
-  assert.match(await hand(), /^refused/);
-  assert.equal(await hand(), "done", "past the count the pull runs");
-  assert.match(await hand(), /^refused/, "the pass clears the count");
-});
-
-// The judge runs where the config turns it on alone. The hook's line waits on the owner, because the hand working the ticket holds no write under .claude. [[spec/tickets/the-judge-waits-on-true]]
-const HOOK_WAITS =
-  "judged in the pull hook reads enabled !== true once the owner lands it";
-test("a config naming no judge runs no judge, and true alone turns it on", {
-  todo: HOOK_WAITS,
-}, async () => {
-  assert.deepEqual(await judgeRuns({}), { judged: false, asked: 0 });
-  assert.deepEqual(await judgeRuns({ judge: {} }), { judged: false, asked: 0 });
-  assert.deepEqual(await judgeRuns({ judge: { enabled: false } }), {
-    judged: false,
-    asked: 0,
-  });
-  assert.deepEqual(await judgeRuns({ judge: { enabled: true } }), {
-    judged: true,
-    asked: 1,
-  });
-});
-
-// [[spec/tickets/every-road-has-a-caller]]
-test("the config schema declares the judge off by default", async () => {
-  const { default: schema } = await import("../../spec/config/level0.schema.json", {
-    with: { type: "json" },
-  });
-  assert.equal(schema.properties.judge?.properties?.enabled?.type, "boolean");
-  assert.equal(schema.properties.judge?.properties?.enabled?.default, false);
 });

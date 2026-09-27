@@ -78,7 +78,7 @@ process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 depends_on: [every-road-has-a-caller]
 group: the-engine-holds-the-route
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d7d6cb0fb1105 · claude-code-remote
@@ -96,6 +96,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: df5e709da4c626455d903f5da95a89d72b1e5b46
+    hash_after: df5e709da4c626455d903f5da95a89d72b1e5b46
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-queue-moves-to-plan.md:121:99: Sentence: A sentence holds 25 words. Cut this one in two."
 ---
 
 # Ask
@@ -228,14 +236,20 @@ The rows the review passes with, the helpers, the checks chapter, the .claude do
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the draft names, the helpers the review adds, and the fixtures that name the judge key, and no other.
+The change adds no door, and the pull tool case runs over the process and model fakes handedBack builds.
+The plugin tool and library headers link this ticket, which names the approach.
+The change adds no fact, and the answer mark leaves the schema, voice.md and the library at once.
+Each review row stands fixed: the helpers leave with their cases, pull.md lists the shell checks, the .claude writes land through the patch door, the answer mark leaves, and the pointers leave the other notes.
 
 ## tests-green
 

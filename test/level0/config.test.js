@@ -182,7 +182,7 @@ test("the schema passes a whole file, and reads every key out of it", () => {
 test("a key names one variable, and that variable names the key back", () => {
   const both = [
     ["stop.mostInARow", "SE_STOP_MOST_IN_A_ROW"],
-    ["judge.maxSpans", "SE_JUDGE_MAX_SPANS"],
+    ["plan.everyCalls", "SE_PLAN_EVERY_CALLS"],
     ["log.level", "SE_LOG_LEVEL"],
     ["names.words", "SE_NAMES_WORDS"],
   ];
