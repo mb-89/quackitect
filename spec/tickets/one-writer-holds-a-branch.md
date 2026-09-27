@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 0f14bd33d54f26c5
         size: 2686
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: d9b41502336aa88a70f5711d989641c5e98b91ed
+    hash_after: d9b41502336aa88a70f5711d989641c5e98b91ed
+    inputs:
+      - name: design/draft
+        hash: 0f14bd33d54f26c5
+        size: 2686
+      - name: design/tests-red
+        hash: be19dc2209ff9a8e
+        size: 770
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -295,8 +307,9 @@ Two cases fail on their own assertion over the stubs: the refusal of a branch an
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
