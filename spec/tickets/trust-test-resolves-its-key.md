@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,24 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: 65cf3783cd915bc24e18dc1a7bc91569a6be8cd5
+    hash_after: 65cf3783cd915bc24e18dc1a7bc91569a6be8cd5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/trust-test-resolves-its-key.md:33:1: CodeSpans: A sentence holds 4 code spans, and this one holds 5. Carry "
+    inputs:
+      - name: ask
+        hash: 2bf0feb5d64326db
+        size: 630
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -46,26 +64,32 @@ Without it the check stays red on a Windows desk, and the pre-push hook refuses 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/trust.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The trust test reads the project key through `resolve`, as `main` in `src/scripts/trust.js` writes it. The test read it through `join`, which keeps no drive letter. On Linux the two agree, so the test passed on the box that wrote it and failed on a Windows desk.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the test reads the key the way `main` writes it
+- the cleanup it reveals: no check runs on Windows before trunk takes a push, parked as the note `check-runs-on-no-windows`
+- the key stands in `main` alone, and the test reads it through the same call
 
 # Discussion
 
