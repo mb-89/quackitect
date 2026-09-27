@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -134,6 +134,19 @@ record:
         hash: 5a2557d24d86ab34
         size: 13510
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: e41775d65d82a50eea7c2dc0d1cf14a807acfb5e
+    hash_after: e41775d65d82a50eea7c2dc0d1cf14a807acfb5e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 10 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: a8e6e03e1f365b94
+        size: 3074
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -238,26 +251,31 @@ A new module src/scripts/dispatch.js holds planOf(it, now), which reads git once
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/dispatch.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/dispatch.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Ten cases fail on their own assertion against a stub planOf answering empty lists, and the case keeping a fresh group at done off the stuck list passes, as a negative case does. The json case parsed empty output first and threw a SyntaxError, which the runner reads as a build fault, so it asserts an object before it parses one. The fake git answers a command no case names with exit 0 and no output, so merge-base reads a shared base and no branch reads orphan.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a failing case, and ./RUNME.sh check decides the last at tests-green
+- the cases reach git, the disk and the clock through fakeGit, fakeDisk and fakeClock alone
 
 # gate
 
