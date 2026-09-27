@@ -75,7 +75,7 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
 depends_on: [the-engine-holds-the-route]
-step: sync
+step: split
 record:
   - step: sync
     hand: box d7d8cca5d3cd · claude-code-remote
@@ -84,6 +84,14 @@ record:
   - step: sync
     hand: box d7d9cc78d3ce · claude-code-remote
     hash_before: efcb4bfc6270ca01ac2cea3afba6f4868d5dd8e2
+  - step: sync
+    hand: box d7d9cc78d3ce · claude-code-remote
+    hash_before: 42ed19a6ae2bedf2ffb80f7d6aa5b3161ff8e9b5
+    hash_after: c3ceb39c5e0fe171917fda55ce070925d70e83f4
+    answered:
+      - name: sync
+        exit: 0
+        said: work/guidance-rides-each-step already carries every commit on main.
 ---
 
 # Ask
@@ -97,8 +105,9 @@ Each step carries the guidance its tags resolve, and the notes at the top ride t
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
