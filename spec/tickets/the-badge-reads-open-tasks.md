@@ -206,3 +206,10 @@ The two numbers stop disagreeing. One commit on the key rolls it back.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The owner moves three parts of [[spec/tickets/the-queue-views-agree]] here, at its `design/person-2`. The draft here takes them into its approach:
+
+- the sidebar redraws once after a burst of writes to a ticket folder, the plan file or the hold folder
+- that redraw stands in `src/extension/sidebar.js`
+- a case in `test/level0/sidebar.test.js` holds a ticket write changing the badge
+- a person step: the owner compares the sidebar badge with the work tab's brackets. The compare runs before and after a ticket moves, with no window reload

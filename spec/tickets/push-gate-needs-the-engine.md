@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/draft
 steps:
   - name: design
     steps:
@@ -131,6 +131,11 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/person-1
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: 3752d7c680606a3bf24f5a66b8f935b937abe177
+    hash_after: 3752d7c680606a3bf24f5a66b8f935b937abe177
+    def: 010b0c27b3192cab
 ---
 
 # Ask
@@ -164,8 +169,9 @@ Without it every push from a desk waits on a green `./RUNME.sh check`. A test re
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is choice -->
+
+the level0 hooks load in the session
 
 ## draft
 
