@@ -118,11 +118,23 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [ports-declare-their-looks]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: bc1c9dddf0885d22730565765d40875f75786a98
+    hash_after: bc1c9dddf0885d22730565765d40875f75786a98
+    inputs:
+      - name: ask
+        hash: 5e3a08e9f018fdfc
+        size: 704
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -159,38 +171,62 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A caller receives the answer of an action's last request, which Store.Deliver hands back and ops.Call passes on. The output is that answer, so the design declares its type beside the requests and changes no action function.
+
+One, the option: src/q/looks.go adds q.Answers[Out](), a generic Option that sets the registration's out fields off fieldsOf over Out. An action with no q.Answers answers an untyped result, and presents no output fields.
+
+Two, the reading: Presentation gains Out, the output fields, beside Fields.
+
+Three, the refusal: Undescribed answers a NoDoc fault for each output field with no doc tag, saying output field and its name, so the start refuses it.
+
+Four, the note: spec/design_output/model at an action lists requests says the caller receives the last answer and q.Answers declares its type, and the options table gains the row for q.Answers.
+
+Weighed: a second type parameter on q.Action checks the answer at compile time, and changes every action and every test that registers one. The option adds to the API alone. Assumed: Deliver checks no answer against the declared type, and a later ticket adds that check where a surface needs it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/q.go: registration, which gains the out fields
+src/q/looks.go: Presentation and Undescribed, which read them
+spec/design_output/model.md: an action lists requests, and the options
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/q/looks_test.go: TestAnActionOutputCarriesItsLabelAndDoc
+src/q/looks_test.go: TestTheStartRefusesAnOutputFieldWithNoDocTag
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/q.go
+src/q/looks.go
+src/q/looks_test.go
+spec/design_output/model.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened src/q/send.go Deliver, src/ops/call.go Call, src/q/looks.go and the model at an action lists requests, and checked each claim there
+the callers come off a grep for Presentation and Undescribed, which nothing past the tests and Start reads
+the two looks cases decide the output label and doc line and the refusal line, the note edit decides the design line, and the check decides the last
 
 ## tests-red
 
