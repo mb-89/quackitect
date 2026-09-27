@@ -3,6 +3,7 @@
 // stand in work.js and work-merge.js beside this file.
 // [[spec/design_output/work#a-group-is-a-ticket]]
 
+import { flatten, TRACKED } from "../../.claude/skills/level0/lib/config.js";
 import { MS } from "../../.claude/skills/level0/lib/log.js";
 import { isTagged, reaches } from "../../.claude/skills/level0/lib/todo.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
@@ -28,6 +29,8 @@ export const TODO = "todo";
 export const HELD = "held";
 // A branch sharing no ancestor with trunk reaches no sync, so no box takes it. [[spec/design_output/work#the-listing-reads-git-once]]
 export const ORPHAN = "orphan";
+// The field a group names a config key under. [[spec/design_output/work#a-switch-holds-a-group]]
+export const SWITCH = "enabled_by";
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
 export const ROUTINE = { name: "do_work", id: "trig_01EenLoDAB3NdmANnRM9mSh6" };
@@ -74,6 +77,19 @@ export function frontField(text, key) {
   if (!front) return "";
   const said = new RegExp(`^${key}:\\s*(.+?)\\s*$`, "m").exec(front[1]);
   return said ? said[1] : "";
+}
+
+// What a branch waits for: the groups its ticket names, then its switch. [[spec/design_output/work#a-switch-holds-a-group]]
+export function waitsOf(one, standing) {
+  const off = one.shut ? [`${one.shut} to read true`] : [];
+  return [...waitingOn(one.ticket, standing), ...off];
+}
+
+// The key a group waits on, or nothing where the shared config turns it on. [[spec/design_output/work#a-switch-holds-a-group]]
+export function shutBy(text, shared) {
+  const key = fieldOf(text, SWITCH);
+  if (!key) return "";
+  return shared.get(key) === true ? "" : key;
 }
 
 // [[spec/design_output/work#a-dependency-waits-for-trunk]]
@@ -151,8 +167,20 @@ export function refsHere(it) {
 
 // The commit trunk and a branch share. git answers red where they share none, which is what a rewrite of trunk leaves behind. [[spec/design_output/work#the-listing-reads-git-once]]
 export function baseOnTrunk(it, branch) {
-  const said = it.git.run(["merge-base", `origin/${TRUNK}`, `origin/${branch}`], true);
+  const ask = () =>
+    it.git.run(["merge-base", `origin/${TRUNK}`, `origin/${branch}`], true);
+  let said = ask();
+  // A shallow clone holds no base older than its depth, so an empty answer there fetches the rest and asks again. [[spec/design_output/work#the-listing-reads-git-once]]
+  if (!said.ok && shallowHere(it)) {
+    it.git.run(["fetch", "--unshallow", "origin"], true);
+    said = ask();
+  }
   return { shares: said.ok, base: said.ok ? said.out.trim() : "" };
+}
+
+function shallowHere(it) {
+  const said = it.git.run(["rev-parse", "--is-shallow-repository"], true);
+  return String(said.out ?? "").trim() === "true";
 }
 
 // The refs, then the paths, then the contents. [[spec/design_output/work#the-listing-reads-git-once]]
@@ -176,10 +204,25 @@ export function readWork(it, trunk = false) {
       text: held(`${one}:${TICKETS}/${name}`),
     }));
 
+  const stand = refs.map((one) => standing(one, held, ticketsAt));
+  const shared = sharedOn(
+    it,
+    stand.map((one) => one.ticket),
+  );
   return {
-    stand: refs.map((one) => standing(one, held, ticketsAt)),
+    stand: stand.map((one) => ({ ...one, shut: shutBy(one.ticket, shared) })),
     loose: trunk ? ticketsAt(`origin/${TRUNK}`) : [],
   };
+}
+
+// The tracked config trunk carries, flattened by the one resolver's reader. Every box shares that file, so no local layer and no variable turns a group on. It reads where a group names a switch alone. [[spec/design_output/work#a-switch-holds-a-group]]
+function sharedOn(it, texts) {
+  if (!texts.some((text) => fieldOf(text, SWITCH))) return new Map();
+  try {
+    return flatten(JSON.parse(textAt(it, `origin/${TRUNK}`, TRACKED)));
+  } catch {
+    return new Map();
+  }
 }
 
 // [[spec/design_output/work#the-listing-reads-git-once]]

@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { dirname } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fileURLToPath } from "node:url";
 import {
   allSchemasIn,
@@ -39,7 +40,7 @@ const process = data.get("process");
 
 const TICKET = "spec/tickets/a-name.md";
 const weighed = (text, where = TICKET) => checkNote(text, ticket, where, every);
-const good = mintNote(ticket);
+const good = mintNote(ticket, {}, fakeFront());
 
 const routed = `---
 kind: [[ticket]]

@@ -39,7 +39,7 @@ const SHAPES = {
   [PLUGIN]: {
     name: "level0",
     description:
-      "Level zero: the rules that shape what the agent writes, taken inside the harness process, and the pull as a tool with the judge behind it. The voice rules hold at the write door on turn one of a clone that has never been built.",
+      "Level zero: the rules that shape what the agent writes, taken inside the harness process, and the pull as a tool. The voice rules hold at the write door on turn one of a clone that has never been built.",
     author: { name: "" },
   },
 };

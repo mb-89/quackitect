@@ -141,8 +141,9 @@ reload and dies on a quit, so `process.ppid` draws that line:
 | the engine restarts | no |
 
 The id stands beside the values as `session.pid`. A view opening under an id
-that differs writes a file holding the new id alone. So a hold lasts as long as
-the window a person sets it in.
+that differs writes a file holding the new id and `engine.binding` alone. So a
+hold lasts as long as the window a person sets it in, and the binding holds
+until the owner changes it.
 
 A cloud box proves the rule and a person proves the id. `opened` answers what
 one id clears, and the reload row above waits for the first person to open the
@@ -283,9 +284,10 @@ Every press that writes, every run and every edit in the config tree writes a
 - The log button writes `log.open runs ./RUNME.sh tui`.
 - An edit in the config tree writes `stop.mostInARow is 5`, with the detail `the config tree`.
 
-A window writes one file, named by its first line, and writes it whole on every
-line. The row shape comes from `lib/log.js`, the module every writer reads. The
-line honours `log.level`, the same as every other door.
+A window appends each line to the one file its first line names, through the
+editor door. The row shape comes from `lib/log.js`, the module every writer
+reads. The line honours `log.level`, the same as every other door. For details,
+see [[spec/design_output/log#every-writer-appends]].
 
 ## A button names its commands
 
@@ -306,6 +308,7 @@ argument, and a fake door drives the whole path.
 | the door gives | what it reaches |
 |---|---|
 | `read`, `write` | `vscode.workspace.fs`, under the workspace folder |
+| `append` | node's `appendFile`, because `vscode.workspace.fs` offers none |
 | `watch` | `createFileSystemWatcher`, over the three files |
 | `runs` | a terminal, and the line an action names |
 | `registerView` | the webview view a person opens |

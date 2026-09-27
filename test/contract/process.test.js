@@ -4,20 +4,21 @@
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
+import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { skip, test } from "node:test";
-import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
-import { voiceOver } from "../../src/bridge/findings.js";
-import { disk } from "../../src/doors/disk.js";
-import { proc } from "../../src/doors/proc.js";
-import { firstLeaf } from "../../src/engine/group.js";
-import { readTools, whereIs } from "../../src/engine/tools.js";
-import { askRows, processAt } from "../../src/scripts/process.js";
+import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { slotFaults } from "../../.claude/skills/level0/lib/schema-route.js";
+import { REFUSES } from "../../src/bridge/findings.js";
+import { disk } from "../../src/doors/disk.js";
+import { fakeFront } from "../../src/doors/fake/front.js";
+import { firstLeaf } from "../../src/engine/group.js";
+import { withoutFalsePast } from "../../src/engine/tense.js";
+import { askRows, processAt } from "../../src/scripts/process.js";
 import { leafOf, stepPathOf } from "../../src/scripts/pull.js";
 import { leavesOf, walkOf } from "../../src/scripts/pull-route.js";
 import { schemasHere } from "../../src/scripts/ticket.js";
+import { at, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -34,61 +35,96 @@ test("the question route opens at a step waiting for a person", () => {
 });
 
 // A standard ticket meets one review, on its design, and goes on to the code. [[spec/tickets/one-review-a-ticket]]
-test("the standard route reviews the design once, and its last leaf hands on to the retro", () => {
+// [[spec/design_output/pull#the-gate]]
+// A process inside a delivery ends after implement, so the delivery's own acceptance reads its children. [[spec/tickets/the-last-gate-accepts]]
+test("the group route reads its children through a final acceptance", () => {
+  const steps = routeOf("group").steps;
+  const names = steps.map((one) => one.name);
+  const gate = steps.find((one) => String(one.final) === "true");
+  assert.ok(gate, "the group route carries a final gate");
+  assert.ok(
+    names.indexOf(gate.name) > names.indexOf("children"),
+    "it follows the children",
+  );
+});
+
+test("the standard route gates the design once, and its last leaf hands on to the retro", () => {
   const front = routeOf("standard");
 
   assert.deepEqual(
     leavesOf(front).map((one) => one.path),
     [
+      "design/owner-read",
       "design/draft",
-      "design/review",
-      "implement/tests-red",
+      "design/tests-red",
+      "gate",
       "implement/change",
       "implement/tests-green",
+      "accept",
+      "view",
     ],
-    "one review, and no verdict step after the code",
+    "one gate on the design, then the final acceptance and the owner's view after the code",
   );
-  const review = leafOf(front, "design/review");
-  assert.ok(review.reads.includes("spec/guidance/review/design"), "the review reads the design note");
-  assert.ok(!review.reads.includes("spec/guidance/review/reviewing"), "and no other review note");
-  assert.equal(review.on_fail, "draft", "a fail goes back to the draft");
+  const gate = leafOf(front, "gate");
+  assert.ok(gate.gate, "the gate names its question, and the schema admits it");
+  assert.ok(
+    gate.reads.includes("spec/guidance/review/design"),
+    "the gate reads the design note",
+  );
+  assert.ok(
+    !gate.reads.includes("spec/guidance/review/reviewing"),
+    "and no other review note",
+  );
+  assert.equal(
+    gate.not,
+    "design/draft",
+    "the author of the draft reviews nothing of it",
+  );
   const draft = leafOf(front, "design/draft");
   assert.equal(
     draft.evidence.find((one) => one.name === "tests")?.form,
     "list",
     "the draft names its tests, one a line",
   );
-  assert.ok([draft.said.checklist ?? []].flat().length > 0, "the draft leaf holds its own checklist");
+  assert.ok(
+    [draft.said.checklist ?? []].flat().length > 0,
+    "the draft leaf holds its own checklist",
+  );
+  // The review weighs the spread against the ask. [[spec/tickets/a-small-ask-stays-small]]
+  assert.equal(
+    draft.evidence.find((one) => one.name === "size")?.form,
+    "list",
+    "the draft names every file it touches, one a line",
+  );
   assert.equal(leafOf(front, "implement/tests-green").said.to, "retro");
   assert.deepEqual(
     walkOf(front).find((one) => one.path === "implement")?.said.input,
-    ["design/draft", "design/review"],
-    "the code reads the draft and the review's findings",
+    ["design/draft", "gate"],
+    "the code reads the draft and the gate's verdict",
   );
-  assert.deepEqual(slotFaults(front, "spec/processes/standard.yaml"), [], "every slot fills");
+  assert.deepEqual(
+    slotFaults(front, "spec/processes/standard.yaml"),
+    [],
+    "every slot fills",
+  );
 });
 
-const vale = whereIs(files, root, "vale", readTools(files, root));
-const ifVale = files.exists(vale) ? test : skip;
+const ruled = rulesIn(root);
 const CLEAN = "A line the voice passes.";
 
-// Every route renders a ticket at its mint, and real Vale reads it the way the verbs read an Ask. A line the route writes carries no finding, so no verb meets the door on its first write. [[spec/design_output/pull#the-voice-reads-the-evidence]]
-ifVale(
-  "a ticket minted off every route under spec/processes draws no finding from the voice rules",
-  () => {
-    const it = { disk: files, proc: proc(), root, join, vale };
-    const names = files
-      .list(join(root, "spec", "processes"))
-      .filter((one) => one.name.endsWith(".yaml"))
-      .map((one) => one.name.replace(/\.yaml$/, ""));
-    assert.ok(names.length > 1, "the tree ships its routes");
-    const found = [];
-    for (const name of names) {
-      const held = processAt(files, root, join, name);
-      const path = `spec/tickets/${name}-rendered.md`;
-      const made = mintedNote(schemasHere(it), {
+// Every route's minted ticket, declared up front, so one Vale run reads them all. [[spec/design_output/doors#one-contract-test-per-door]]
+const routes = files
+  .list(join(root, "spec", "processes"))
+  .filter((one) => one.name.endsWith(".yaml"))
+  .map((one) => one.name.replace(/\.yaml$/, ""));
+const minted = new Map(
+  routes.map((name) => {
+    const held = processAt(files, root, join, name);
+    const made = mintedNote(
+      schemasHere({ disk: files, root, join }),
+      {
         kind: "ticket",
-        path,
+        path: `spec/tickets/${name}-rendered.md`,
         fields: {
           state: "open",
           process: held.link,
@@ -97,15 +133,39 @@ ifVale(
           step: firstLeaf(held.route),
           Ask: [askRows(held.ask), "", CLEAN].join("\n").trim(),
         },
-      });
-      assert.equal(made.why, undefined, `${name} mints: ${made.why}`);
-      const rows = made.text.split("\n");
-      for (const one of voiceOver(it, path, made.text)) {
-        found.push(`${name}:${one.line} ${one.rule} | ${rows[one.line - 1]}`);
+      },
+      fakeFront(),
+    );
+    return [name, made];
+  }),
+);
+
+// Every route renders a ticket at its mint, and real Vale reads it the way the verbs read an Ask: the rows past the tense reader, at a severity that refuses. A line the route writes carries no finding, so no verb meets the door on its first write. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+ruled.ifVale(
+  "a ticket minted off every route draws no finding from the voice rules, in one Vale run",
+  ruled.proves(
+    Object.fromEntries(
+      routes.map((name) => [
+        name,
+        at(minted.get(name).text ?? "", `spec/tickets/${name}-rendered.md`),
+      ]),
+    ),
+    ({ found, text }) => {
+      assert.ok(routes.length > 1, "the tree ships its routes");
+      const faults = [];
+      for (const name of routes) {
+        const made = minted.get(name);
+        assert.equal(made.why, undefined, `${name} mints: ${made.why}`);
+        const rows = text(name).split("\n");
+        for (const one of withoutFalsePast(text(name), found(name))) {
+          if (!REFUSES.has(one.severity)) continue;
+          faults.push(`${name}:${one.line} ${one.rule} | ${rows[one.line - 1]}`);
+        }
       }
-    }
-    assert.deepEqual(found, [], "a route writes no line the voice refuses");
-  },
+      assert.deepEqual(faults, [], "a route writes no line the voice refuses");
+      assert.equal(ruled.spawned(), 1, "one Vale run reads every route");
+    },
+  ),
 );
 
 const guidanceOf = (name) =>
@@ -132,7 +192,10 @@ test("the retro route ends on the report the owner passes, then the mint", () =>
 // [[spec/tickets/the-retro-finishes-its-asks]]
 test("the audit checklist reads whole, and collect names .se/scripts beside the dot folders", () => {
   const audit = routeOf("retro").steps.find((one) => one.name === "audit");
-  assert.ok(audit.checklist.every((one) => typeof one === "string"), "every item reads as text");
+  assert.ok(
+    audit.checklist.every((one) => typeof one === "string"),
+    "every item reads as text",
+  );
   assert.match(guidanceOf("collect"), /`\.se\/scripts`/);
   const collect = routeOf("retro").steps.find((one) => one.name === "collect");
   assert.match(collect.evidence[0].says, /\.se\/scripts/);
@@ -169,5 +232,44 @@ test("the reader rule hands each group chapter to the reader whose hours hold it
   assert.match(reach, /`input\/groups\/<group>\.md`/);
   assert.match(reach, /hours hold/);
   const number = reach.split(".")[0];
-  assert.match(rules[0], new RegExp(`the one reach rule ${number} names`), "rule one names the reach");
+  assert.match(
+    rules[0],
+    new RegExp(`the one reach rule ${number} names`),
+    "rule one names the reach",
+  );
+});
+
+// The owner names the view and its number, and the owner's view closes the route. [[spec/tickets/the-owner-view-decides-done]]
+test("the standard route asks for the view the owner reads, in the owner's words", () => {
+  const held = processAt(files, root, join, "standard");
+  const view = held.ask.find((one) => one.name === "view");
+
+  assert.equal(view?.form, "text", "the ask carries a view field");
+  assert.match(view.says, /owner's words/, "in the owner's words");
+  const last = held.route.at(-1);
+  assert.equal(last.name, "view", "the view step closes the route");
+  assert.equal(last.by, "person", "and a person passes it");
+  assert.equal(last.when, "view", "where the ask names a view");
+  assert.equal(last.on_fail, "implement", "a fail goes back to the code");
+});
+
+// The owner's words travel as quoted, and a ticket off a handover waits on the owner's read. [[spec/tickets/the-owners-words-travel-verbatim]]
+test("the note route asks for the owner's quoted words with their transcript line", () => {
+  const said = processAt(files, root, join, "note").ask.find(
+    (one) => one.name === "said",
+  );
+  assert.equal(said?.form, "list", "the note asks for the owner's words, one a line");
+  assert.match(said.says, /transcript line/, "each with its transcript line");
+});
+
+test("the standard route opens on the owner's read where the ask comes off a handover", () => {
+  const held = processAt(files, root, join, "standard");
+  assert.equal(held.ask.find((one) => one.name === "from")?.form, "text");
+  const first = leavesOf(
+    readYaml(files.read(join(root, "spec", "processes", "standard.yaml"))),
+  )[0];
+  assert.equal(first.path, "design/owner-read", "the owner's read stands first");
+  const read = leafOf(routeOf("standard"), "design/owner-read");
+  assert.equal(read.by, "person");
+  assert.equal(read.when, "handed");
 });

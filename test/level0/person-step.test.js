@@ -1,6 +1,5 @@
-// A group whose one open child waits for a person. The pull takes no step here,
-// and the answer it writes is the whole point: the commands that carry the
-// question out of the branch, so the rest of the group lands.
+// A group whose one open child waits for a person. A cloud box answers the
+// step, a desk takes no leaf of the branch, and the owner's word sends a hand in.
 // [[spec/design_output/work#a-person-step-leaves]]
 
 import assert from "node:assert/strict";
@@ -10,7 +9,6 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { onward } from "../../src/scripts/pull-writes.js";
-import { unblockPrompt } from "../../src/scripts/pull-spawn.js";
 import { pulling } from "../../src/scripts/work.js";
 import { SCHEMA } from "./pull-schema.js";
 
@@ -193,13 +191,4 @@ test("the owner's word covers one step, and the hand after it reads plain", () =
 
   assert.equal(who.hand, "box one", "the hand after it reads plain");
   assert.equal(it.ownerSays, false, "the word reaches no leaf past its own");
-});
-
-// The verb refuses a successor opening under any other hand, so the route it names opens under a person. [[spec/design_output/work#a-person-step-leaves]]
-test("the prompt names one route, and that route opens under a person", () => {
-  const said = unblockPrompt("a-child", { path: "design/person-1" });
-
-  assert.match(said, /a-child stands at design\/person-1/);
-  assert.equal(said.includes("--process=question"), true);
-  assert.match(said, /Stop for no person\./);
 });

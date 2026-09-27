@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"quackitect/tui/tree"
+	"quackitect/src/tui/tree"
 )
 
 // The kinds a row carries, off the route a group rides, which the mark draws and the filter reads. [[spec/design_output/tree-view#the-name-column-nests]]
@@ -33,6 +33,7 @@ type ticketRow struct {
 	Todo     bool   `json:"todo"`
 	Standing string `json:"standing"`
 	Says     string `json:"says"`
+	Progress string `json:"progress"`
 	Changed  int64  `json:"changed"`
 }
 
@@ -98,6 +99,7 @@ func itemOfTicket(one ticketRow) tree.Item {
 		"path":     one.Path,
 		"state":    one.State,
 		"step":     one.Step,
+		"progress": one.Progress,
 		"route":    one.Route,
 		"group":    one.Group,
 		"standing": one.Standing,

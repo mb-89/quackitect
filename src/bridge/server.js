@@ -11,6 +11,7 @@ import { awake } from "../doors/awake.js";
 import { biome } from "../doors/biome.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
+import { front } from "../doors/front.js";
 import { index } from "../doors/index.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
@@ -30,6 +31,7 @@ import { answerRides, gatesAnswer } from "./answer-read.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe, onPowerShell } from "./bash.js";
+import { bindingLine } from "./binding.js";
 import { dropsAll, dropsMoved } from "./caches.js";
 import { asks, asksText } from "./config.js";
 import { holdsGrace } from "./grace.js";
@@ -40,6 +42,7 @@ import {
   onSessionEnd,
   onSessionStart,
   onTurnComplete,
+  layerRides,
   onTurnSaid,
   owesCanary,
   surveyHere,
@@ -74,6 +77,8 @@ import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.
 import {
   dropsHold,
   ENDS_TURN,
+  helperEnds,
+  helperSpawns,
   holdsCall,
   onStop,
   sawCall,
@@ -84,7 +89,7 @@ import {
 import { TOOLS as handTools, SPECS as toolSpecs } from "./tools.js";
 import { registeredPort } from "./vehicle.js";
 import { helperReports, SPECS as waitSpecs, TOOLS as waitTools } from "./wait.js";
-import { marksKept, onRead, onToolWrite, schemasHere } from "./write.js";
+import { onToolWrite, schemasHere } from "./write.js";
 
 const OK = 200;
 const NOT_FOUND = 404;
@@ -111,12 +116,21 @@ const DOORS = {
   "turn.said": onTurnSaid,
   "turn.complete": endsTurn,
   // A helper's stop reports, a session due holds for the handover, and the answer gate holds ahead of the tooth. [[spec/design_output/stop#the-context-hands-over]] [[spec/design_output/level0#the-gate-reads-the-answer]]
-  "classic.Stop": async (e, box) =>
-    helperReports(e, box) ??
-    holdsForHandover(e, box) ??
-    (await gatesAnswer(e, box)) ??
-    onStop(e, box),
-  "agent.spawn": onAgentSpawn,
+  "classic.Stop": async (e, box) => {
+    // A helper's stop takes its mark off. [[spec/tickets/helper-mark-drops-at-stop]]
+    helperEnds(e, box);
+    return (
+      helperReports(e, box) ??
+      holdsForHandover(e, box) ??
+      (await gatesAnswer(e, box)) ??
+      onStop(e, box)
+    );
+  },
+  // A helper spawned in the background marks the box, so the stop call reads it running. [[spec/tickets/the-stop-reads-the-state]]
+  "agent.spawn": (e, box) => {
+    helperSpawns(e, box);
+    return onAgentSpawn(e, box);
+  },
   "tool.describe": onDescribe,
   "tool.call": onToolCall,
   [ANSWERED]: onAgentAnswered,
@@ -125,7 +139,6 @@ const DOORS = {
 const TOOLS = {
   Grep: answersFromIndex,
   Glob: answersFromIndex,
-  Read: onRead,
   // [[spec/design_output/level0#a-write-names-its-ticket]]
   Write: onToolWrite,
   Edit: onToolWrite,
@@ -155,9 +168,9 @@ export async function decide(said, box) {
   if (said?.fill !== undefined) measures(box, said.fill);
   const door = DOORS[String(said?.event ?? "")] ?? pass;
   const answer = letsThrough((await door(said?.e ?? {}, box)) ?? PASS, said, box);
-  // The call's marks reach the file once, after the door answers. [[spec/design_output/level0#the-marks-survive-a-restart]]
-  marksKept(box);
-  if (box.registered || String(said?.event ?? "") === "engine.create") return answer;
+  // A module the client loads again marks its post fresh, since the load drops the tools the client held. [[spec/design_output/level0#the-first-call-pays]]
+  if ((box.registered && !said?.fresh) || String(said?.event ?? "") === "engine.create")
+    return answer;
   box.registered = true;
   return { ...answer, register: answer.register ?? box.specs };
 }
@@ -251,6 +264,8 @@ function opensSession(e, box) {
 
 function submitsPrompt(e, box) {
   sawPrompt(e, box);
+  // A change of the binding writes its line at the next prompt, naming the file that sets it. [[spec/tickets/the-retro-holds-the-clear]]
+  bindingLine(box);
   return onPromptSubmit(e, box);
 }
 
@@ -271,9 +286,10 @@ async function onToolCall(e, box) {
   );
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
-  if (!passes(said)) return said;
+  // The standing layer rides the first call a session takes where no context read reached the server. [[spec/design_output/level0#rules-ride-the-first-answer]]
+  if (!passes(said)) return layerRides(e, box, said);
   // [[spec/design_output/level0#the-findings-ride-the-call]]
-  return held ?? answerRides(e, box, owesCanary(e, box)) ?? PASS;
+  return layerRides(e, box, held ?? answerRides(e, box, owesCanary(e, box)) ?? PASS);
 }
 
 function passes(said) {
@@ -301,6 +317,8 @@ export function boxOf(method, work = method, doors = {}) {
     disk: files,
     clock: time,
     proc: outside,
+    // [[spec/tickets/go-writes-the-frontmatter]]
+    front: doors.front ?? front(files, outside, method),
     index: doors.index ?? index(files, outside, time, method, work),
     vale: doors.vale ?? vale(files, outside, method, work),
     biome: doors.biome ?? biome(files, outside, method),
@@ -342,7 +360,9 @@ export function serve(method, port = PORT_BASE, say = console.log) {
   const restart = () => {
     held.release();
     own.log.say("info", "bridge", `the server restarts at ${where}`);
-    server.close(() => respawned(own, [process.execPath, ...process.argv.slice(1)]));
+    restarts(server, () =>
+      respawned(own, [process.execPath, ...process.argv.slice(1)]),
+    );
   };
 
   const onRequest = (request, response) => {
@@ -422,6 +442,13 @@ export async function respawned(own, argv, exit = process.exit, wait = RESPAWN_W
     );
   } catch {}
   exit(1);
+}
+
+// The listen ends at once, and the child starts on the next turn of the loop. Node's own close callback waits on every open connection, and a wait or a kept socket holds one for minutes, so the restart hands it nothing. The old process exits once the child stands, which ends the rest. [[spec/design_output/level0#a-restart-watches-its-child]]
+export function restarts(server, then, soon = setImmediate) {
+  server.close();
+  server.closeIdleConnections?.();
+  soon(then);
 }
 
 // The line naming the fault, out of what the child wrote: the first naming an error, else the last. [[spec/design_output/level0#a-restart-watches-its-child]]

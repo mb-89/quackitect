@@ -55,13 +55,6 @@ export function asLines(rows) {
   return `${rows.map((one) => JSON.stringify(one)).join("\n")}\n`;
 }
 
-// [[spec/design_output/log#every-writer-appends]]
-export function appended(was, row) {
-  const text = String(was ?? "");
-  const joint = text && !text.endsWith("\n") ? "\n" : "";
-  return `${text}${joint}${JSON.stringify(row)}\n`;
-}
-
 // [[spec/design_output/log#a-session-rotates-its-file]]
 export function archiveOf(text, now, id) {
   const first = String(text ?? "").split("\n")[0];

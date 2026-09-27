@@ -5,8 +5,9 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fieldOf, recordIn, withEntry, withField } from "../../src/engine/group.js";
-import { takeable, withPayload } from "../../src/scripts/pull.js";
+import { takeable } from "../../src/scripts/pull.js";
 import { probeOf, startOf } from "../../src/scripts/serve.js";
 import { pulling } from "../../src/scripts/work.js";
 import {
@@ -156,10 +157,10 @@ test("the pull hands out the child's first leaf, writes the hold, and the answer
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
 
   assert.equal(code, 0);
-  assert.match(said, /^work {2}a-child at design\/draft, leaf 1 of 5 under design/);
+  assert.match(said, /^work {2}a-child at design\/draft, leaf 1 of 4 under design/);
   assert.match(said, /writes the approach the ask calls for/);
   assert.match(said, /One piece of it\./);
-  assert.match(said, /### approach {2}text: the approach/);
+  assert.match(said, /\n {2}approach {2}text: the approach/);
   assert.match(said, /Reads spec\/guidance\/voice:\n {2}1\. Say what is\./);
   assert.match(said, /ticket pull a-child --pass/);
   const hold = JSON.parse(disk.read(HOLD));
@@ -246,14 +247,18 @@ test("the voice rules read the evidence at the hand-back, and a break of form wa
 
 // [[spec/design_output/pull#a-leaf-comes-back]]
 test("a hand takes a leaf it passed back, and another hand's leaf stays", () => {
-  const passed = withEntry(CHILD("open", "design/review"), {
-    step: "design/draft",
-    hand: HAND,
-    hash_before: SHA,
-    hash_after: SHA,
-  });
+  const passed = withEntry(
+    CHILD("open", "design/review"),
+    {
+      step: "design/draft",
+      hand: HAND,
+      hash_before: SHA,
+      hash_after: SHA,
+    },
+    fakeFront(),
+  );
   const { it, disk, outside } = doors(
-    standing(passed, withField(GROUP_NOTE, "step", "children")),
+    standing(passed, withField(GROUP_NOTE, "step", "children", fakeFront())),
   );
 
   const { code, said } = heard(() =>
@@ -284,7 +289,7 @@ test("a hand takes a leaf it passed back, and another hand's leaf stays", () => 
 // [[spec/design_output/pull#the-pass]]
 test("a pass writes the record, moves the step, commits by ticket and step, pushes, and hands out the next", () => {
   const { it, disk, outside } = doors(
-    standing(CHILD(), withField(GROUP_NOTE, "step", "children")),
+    standing(CHILD(), withField(GROUP_NOTE, "step", "children", fakeFront())),
   );
   heard(() => pulling(ROOT, ["pull"], it));
   disk.write(
@@ -318,13 +323,19 @@ test("a pass writes the record, moves the step, commits by ticket and step, push
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("a step that excludes the only hand answers spawn, with the helper's name and its prompt", () => {
-  const took = withEntry(CHILD("open", "design/review"), {
-    step: "design/draft",
-    hand: HAND,
-    hash_before: SHA,
-    hash_after: SHA,
-  });
-  const { it, disk } = doors(standing(took, withField(GROUP_NOTE, "step", "children")));
+  const took = withEntry(
+    CHILD("open", "design/review"),
+    {
+      step: "design/draft",
+      hand: HAND,
+      hash_before: SHA,
+      hash_after: SHA,
+    },
+    fakeFront(),
+  );
+  const { it, disk } = doors(
+    standing(took, withField(GROUP_NOTE, "step", "children", fakeFront())),
+  );
 
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
 
@@ -335,7 +346,10 @@ test("a step that excludes the only hand answers spawn, with the helper's name a
   );
   assert.match(said, /named helper-2, and you work one step of one ticket/);
   assert.match(said, /ticket pull --as helper-2/);
-  assert.match(said, /ticket pull a-child --as helper-2`\. It checks/);
+  assert.match(
+    said,
+    /ticket pull a-child --as helper-2 --fields '<json>'`\. It checks/,
+  );
   assert.equal(disk.exists(HOLD), false, "the spawn answer holds nothing");
   assert.equal(
     takeable(it, { text: took }),
@@ -358,7 +372,7 @@ const WANTS_HELPER = CHILD("open", "design/draft").replace(
 // [[spec/tickets/the-spawn-answers-a-helper]]
 test("a leaf wanting a helper answers spawn on a box carrying a harness", () => {
   const { it, disk } = doors(
-    standing(WANTS_HELPER, withField(GROUP_NOTE, "step", "children")),
+    standing(WANTS_HELPER, withField(GROUP_NOTE, "step", "children", fakeFront())),
   );
 
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
@@ -377,7 +391,7 @@ test("a leaf wanting a helper answers spawn on a box carrying a harness", () => 
 // [[spec/tickets/the-spawn-answers-a-helper]]
 test("a leaf wanting a helper parks on a box off a harness, and the box leaves", () => {
   const { it } = doors(
-    standing(WANTS_HELPER, withField(GROUP_NOTE, "step", "children")),
+    standing(WANTS_HELPER, withField(GROUP_NOTE, "step", "children", fakeFront())),
     {},
     { agent: false },
   );
@@ -396,7 +410,7 @@ test("a leaf wanting a helper parks on a box off a harness, and the box leaves",
 // [[spec/tickets/the-spawn-answers-a-helper]]
 test("a hand under --as takes the leaf wanting a helper", () => {
   const { it, disk } = doors(
-    standing(WANTS_HELPER, withField(GROUP_NOTE, "step", "children")),
+    standing(WANTS_HELPER, withField(GROUP_NOTE, "step", "children", fakeFront())),
   );
 
   const { code, said } = heard(() => pulling(ROOT, ["pull", "--as", "helper-1"], it));
@@ -412,13 +426,19 @@ test("a hand under --as takes the leaf wanting a helper", () => {
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("the spawn comes before the group's own leaves, and the box leaves children past no takeable child", () => {
-  const took = withEntry(CHILD("open", "design/review"), {
-    step: "design/draft",
-    hand: HAND,
-    hash_before: SHA,
-    hash_after: SHA,
-  });
-  const { it, disk } = doors(standing(took, withField(GROUP_NOTE, "step", "children")));
+  const took = withEntry(
+    CHILD("open", "design/review"),
+    {
+      step: "design/draft",
+      hand: HAND,
+      hash_before: SHA,
+      hash_after: SHA,
+    },
+    fakeFront(),
+  );
+  const { it, disk } = doors(
+    standing(took, withField(GROUP_NOTE, "step", "children", fakeFront())),
+  );
 
   const { said } = heard(() => pulling(ROOT, ["pull"], it));
 
@@ -454,12 +474,16 @@ test("a hold drops on request, and the leaf stays where it stands", () => {
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("a hand under --as works one step under its own name, and the pull answers done after it", () => {
-  const took = withEntry(CHILD("open", "design/review"), {
-    step: "design/draft",
-    hand: HAND,
-    hash_before: SHA,
-    hash_after: SHA,
-  });
+  const took = withEntry(
+    CHILD("open", "design/review"),
+    {
+      step: "design/draft",
+      hand: HAND,
+      hash_before: SHA,
+      hash_after: SHA,
+    },
+    fakeFront(),
+  );
   const { it, disk } = doors(standing(took));
   const helper = join(ROOT, ".se/.runtime/hold/box-d462e994b4cef-helper-2.json");
 
@@ -484,12 +508,16 @@ test("a hand under --as works one step under its own name, and the pull answers 
 
 // [[spec/design_output/pull#the-hand-rule]]
 test("another hand takes the review, and the same hand waits", () => {
-  const took = withEntry(CHILD("open", "design/review"), {
-    step: "design/draft",
-    hand: "box other",
-    hash_before: SHA,
-    hash_after: SHA,
-  });
+  const took = withEntry(
+    CHILD("open", "design/review"),
+    {
+      step: "design/draft",
+      hand: "box other",
+      hash_before: SHA,
+      hash_after: SHA,
+    },
+    fakeFront(),
+  );
   const { it } = doors(standing(took));
 
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
@@ -498,92 +526,3 @@ test("another hand takes the review, and the same hand waits", () => {
   assert.match(said, /^work {2}a-child at design\/review/);
   assert.match(said, /the verdict field decides/);
 });
-
-// [[spec/design_output/pull#the-fail]]
-test("a verdict field decides, the flag is refused there, and a fail sends the ticket back with a return", () => {
-  const took = withEntry(CHILD("open", "design/review"), {
-    step: "design/draft",
-    hand: "box other",
-    hash_before: SHA,
-    hash_after: SHA,
-  });
-  const { it, disk } = doors(standing(took));
-  heard(() => pulling(ROOT, ["pull"], it));
-
-  const flagged = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], it));
-  assert.equal(flagged.code, 1);
-  assert.match(flagged.said, /the field decides and the flag stays off/);
-
-  disk.write(
-    at("spec/tickets/a-child.md"),
-    filled(took, "### verdict", "fail\n- the approach names no test"),
-  );
-  const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child"], it));
-
-  assert.equal(code, 0);
-  const now = disk.read(at("spec/tickets/a-child.md"));
-  assert.equal(fieldOf(now, "step"), "design/draft");
-  const entry = recordIn(now).at(-1);
-  assert.equal(entry.step, "design/review");
-  assert.equal(entry.returns, 1);
-  assert.equal(entry.why, "the approach names no test");
-  assert.match(said, /fails design\/review back to design\/draft/);
-});
-
-// A craft question rides the fail verdict, so the route grows no person step. [[spec/tickets/a-question-reaches-its-owner]]
-test("a craft question reaches the drafter, and the route takes on no person step", () => {
-  const took = withEntry(CHILD("open", "design/review"), {
-    step: "design/draft",
-    hand: "box other",
-    hash_before: SHA,
-    hash_after: SHA,
-  });
-  const { it, disk } = doors(standing(took));
-  heard(() => pulling(ROOT, ["pull"], it));
-
-  const craft = "which road the reader takes inside the design";
-  disk.write(
-    at("spec/tickets/a-child.md"),
-    filled(took, "### verdict", `fail\n- ${craft}`),
-  );
-  const { code } = heard(() => pulling(ROOT, ["pull", "a-child"], it));
-
-  assert.equal(code, 0);
-  const now = disk.read(at("spec/tickets/a-child.md"));
-  assert.equal(fieldOf(now, "step"), "design/draft", "the drafter takes it back");
-  assert.match(recordIn(now).at(-1).why, /which road the reader takes/);
-  assert.doesNotMatch(now, /person-\d/, "a craft question inserts no person step");
-  assert.doesNotMatch(now, /by: person/, "and names no person as its hand");
-});
-
-// A step whose evidence stands red is a step a hand fails. [[spec/design_output/pull#the-fail]]
-test("a fail runs the step's commands for the record, and none of them refuses it", () => {
-  const child = withPayload(
-    CHILD("open", "implement/tests-red"),
-    "implement/tests-red",
-    '{"tests": "node --test", "checked": "- the ask names them\\n- every door has a fake"}',
-  ).text;
-  const { it, disk } = doors(standing(child));
-  it.proc.teach(["sh", "-c", "node --test"], {
-    exitCode: 0,
-    stdout: "green, every test passes",
-  });
-  heard(() => pulling(ROOT, ["pull"], it));
-
-  const { code, said } = heard(() =>
-    pulling(
-      ROOT,
-      ["pull", "a-child", "--fail", "no test stands red, so the step reads wrong"],
-      it,
-    ),
-  );
-
-  assert.equal(code, 0, said);
-  const entry = recordIn(disk.read(at("spec/tickets/a-child.md"))).at(-1);
-  assert.equal(entry.returns, 1);
-  assert.equal(entry.why, "no test stands red, so the step reads wrong");
-  assert.equal(entry.answered[0].name, "tests");
-  assert.equal(entry.answered[0].exit, 0);
-});
-
-// [[spec/design_output/pull#a-person-step-goes-in]]

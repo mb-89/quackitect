@@ -155,8 +155,8 @@ test("the worktree carries the caller's brand before the check runs", () => {
   assert.deepEqual(stamped, [true], "the plugin manifest lands before the check");
 });
 
-test("the worktree borrows the caller's modules and compiler, and gives them back before git removes it", () => {
-  const kept = ["node_modules", `${BIN}/zig`];
+test("the worktree borrows the caller's modules, and gives them back before git removes it", () => {
+  const kept = ["node_modules", "src/extension/webview/node_modules"];
   const { it, disk } = doorsSaying(
     standing(),
     Object.fromEntries(kept.map((rel) => [join(ROOT, rel, "held"), ""])),
@@ -200,7 +200,11 @@ test("the worktree borrows the webview's modules, and gives them back before git
 
   assert.equal(seen, true, "the check runs on the caller's webview modules");
   assert.equal(disk.isLink(join(AT, rel)), false, "the link leaves with the worktree");
-  assert.equal(disk.exists(join(ROOT, rel, "held")), true, "the caller's modules stand");
+  assert.equal(
+    disk.exists(join(ROOT, rel, "held")),
+    true,
+    "the caller's modules stand",
+  );
 });
 
 test("the worktree borrows nothing out of the caller's bin but the compiler", () => {

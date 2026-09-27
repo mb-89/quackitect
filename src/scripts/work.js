@@ -20,7 +20,6 @@ import {
   frontOf,
   heldIn,
   isGroup,
-  OPEN,
   stepOf,
   TICKETS,
   ticketAt,
@@ -36,11 +35,14 @@ import { guidance } from "./guidance-verb.js";
 import {
   closedHere,
   dependsOn,
+  entriesOf,
   escalate,
   handOf,
   handRule,
+  holdsHere,
   holdsVerb,
   leafOf,
+  leavesOf,
   pull,
   roleOf,
   stepPathOf,
@@ -52,7 +54,7 @@ import { freeIn, trigger } from "./work-free.js";
 import { testVerb } from "./work-test.js";
 import { unblock } from "./work-unblock.js";
 import { list } from "./work-list.js";
-import { close, merge } from "./work-merge.js";
+import { close, freeChildren, marksTrunk, merge, offTrunk } from "./work-merge.js";
 import {
   childrenHere,
   DONE,
@@ -65,7 +67,7 @@ import {
   sync,
   TODO,
   textAt,
-  waitingOn,
+  waitsOf,
   workBranchHere,
 } from "./work-stands.js";
 
@@ -137,6 +139,7 @@ function openGroup(it, name) {
     );
     return 2;
   }
+  if (offTrunk(it, "open")) return 2;
   const at = ticketAt(name);
   const text = textAt(it, `origin/${TRUNK}`, at);
   if (!text) {
@@ -156,7 +159,7 @@ function openGroup(it, name) {
   it.git.fetch();
   if (standOf(it).some((one) => one.branch === branch)) {
     console.log(`${branch} already stands in the cloud, carrying ${at}.`);
-    return 0;
+    return marksTrunk(it, name) ? 0 : 1;
   }
   const mark = markOff(it, branch);
   if (!mark) {
@@ -171,6 +174,7 @@ function openGroup(it, name) {
   }
 
   console.log(`${branch} stands at ${TODO} in the cloud, carrying ${at}.`);
+  if (!marksTrunk(it, name)) return 1;
   console.log("Run ./RUNME.sh cloud trigger to fire a box at it.");
   return 0;
 }
@@ -208,6 +212,18 @@ function take(it, name = "") {
 
   // A take acts on the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
   it.git.fetch();
+  // [[spec/design_output/work#the-take-writes-the-record]]
+  const mine = heldHere(it);
+  if (mine) {
+    console.log(`You already hold ${mine.branch}, so the take hands its ask again.`);
+    if (name && `${WORK_BRANCH}${name}` !== mine.branch) {
+      console.log(
+        `The take names ${WORK_BRANCH}${name}, and one branch a session keeps this box on ${mine.branch}.`,
+      );
+    }
+    brief(mine.branch, mine.name, mine.hand, mine.text);
+    return 0;
+  }
   const stand = standOf(it);
   const standing = standingAll(stand);
   const open = stand.filter((one) => standing.get(one.branch) === TODO);
@@ -233,9 +249,7 @@ function take(it, name = "") {
   if (!free.length) {
     console.log(`Every branch at ${TODO} waits for another. Nothing to take.`);
     for (const one of open) {
-      console.log(
-        `  ${one.branch} waits for ${waitingOn(one.ticket, standing).join(", ")}`,
-      );
+      console.log(`  ${one.branch} waits for ${waitsOf(one, standing).join(", ")}`);
     }
     return 0;
   }
@@ -247,20 +261,22 @@ function take(it, name = "") {
       a.branch.localeCompare(b.branch),
   );
 
-  const one = wanted[0];
-  // The reset under onBranch lands on the branch this take picks, so that branch meets the same read as the one the box stands on. [[spec/design_output/work#a-branch-moves-clean]]
-  if (dirty(it, one.branch)) return 2;
-  if (!onBranch(it, one.branch)) return 1;
-  // A box with nothing at a step it can take leaves the group at todo, before it writes a line. [[spec/tickets/the-group-leaves-at-todo]]
-  const stands = standsOpen(it, one.name, it.join(it.root, ticketAt(one.name)));
-  if (stands.open.length && !stands.busy.length) {
-    console.log(`${one.branch} stays at ${TODO}, because no hand here takes an open step.`);
+  // A group nothing here takes stands aside, and the take reads the next, so one gate holds no other work up. [[spec/design_output/work#the-take-writes-the-record]]
+  for (const one of wanted) {
+    // The reset under onBranch lands on the branch this take picks, so that branch meets the same read as the one the box stands on. [[spec/design_output/work#a-branch-moves-clean]]
+    if (dirty(it, one.branch)) return 2;
+    if (!onBranch(it, one.branch)) return 1;
+    // A box with nothing at a step it can take leaves the group at todo, before it writes a line. [[spec/tickets/the-group-leaves-at-todo]]
+    const stands = standsOpen(it, one.name, it.join(it.root, ticketAt(one.name)));
+    if (!stands.open.length || stands.busy.length) return claimGroup(it, one);
+    console.log(
+      `${one.branch} stays at ${TODO}, because no hand here takes an open step.`,
+    );
     for (const child of stands.open)
       console.log(`  ${waitsAt(it, child, stands.children)}`);
-    console.log(`Answer it, then run ./RUNME.sh branch take again.`);
-    return 0;
   }
-  return claimGroup(it, one);
+  console.log(`Answer it, then run ./RUNME.sh branch take again.`);
+  return 0;
 }
 
 // The step a child stands at, and what it waits for, read in the order takeable reads it. [[spec/tickets/the-small-faults-land]]
@@ -325,15 +341,20 @@ function claimGroup(it, one) {
   const role = roleOf(hand);
   it.disk.write(
     path,
-    withEntry(was, { step: stepOf(was), hand: role, hash_before: before }),
+    withEntry(was, { step: stepOf(was), hand: role, hash_before: before }, it.front),
   );
   it.git.run(["add", at], true);
-  const committed = it.git.run(["commit", "-m", `${one.branch}: ${role} takes it`], true);
+  const committed = it.git.run(
+    ["commit", "-m", `${one.branch}: ${role} takes it`],
+    true,
+  );
   // A refused commit puts the ticket back as it stood, so the next move carries a clean tree. [[spec/design_output/work#the-take-writes-the-record]]
   if (!committed.ok) {
     it.git.run(["reset", "--", at], true);
     it.disk.write(path, was);
-    console.error(`The claim on ${one.branch} would not commit, so the take stands undone.`);
+    console.error(
+      `The claim on ${one.branch} would not commit, so the take stands undone.`,
+    );
     console.error(committed.err || committed.out);
     return 1;
   }
@@ -344,16 +365,41 @@ function claimGroup(it, one) {
     return 1;
   }
 
+  // [[spec/design_output/work#the-take-writes-the-record]]
   if (sync(it) === 1) {
-    console.error(`Resolve the conflict on ${one.branch}, then read the group again.`);
+    console.error(
+      `Resolve the conflict on ${one.branch} and commit it, then work the ask below.`,
+    );
+    brief(one.branch, one.name, hand, was);
     return 1;
   }
 
-  console.log(`You are on ${one.branch}, and ${hand} holds it.`);
-  console.log(`Its tickets stand in ${TICKETS}, and ${at} is the group itself.`);
-  console.log(`Run ./RUNME.sh branch done when the last of them closes.\n`);
-  console.log(askOf(was));
+  brief(one.branch, one.name, hand, was);
   return 0;
+}
+
+// [[spec/design_output/work#the-take-writes-the-record]]
+function brief(branch, name, hand, text) {
+  console.log(`You are on ${branch}, and ${hand} holds it.`);
+  console.log(
+    `Its tickets stand in ${TICKETS}, and ${ticketAt(name)} is the group itself.`,
+  );
+  console.log(`Run ./RUNME.sh branch done when the last of them closes.\n`);
+  console.log(askOf(text));
+}
+
+// [[spec/design_output/work#the-take-writes-the-record]]
+function heldHere(it) {
+  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  if (!branch?.startsWith(WORK_BRANCH)) return null;
+  const name = ticketNamed(branch);
+  const path = it.join(it.root, ticketAt(name));
+  if (!it.disk.exists(path)) return null;
+  const text = it.disk.read(path);
+  const held = heldIn(text);
+  if (!held) return null;
+  const hand = handOf(it);
+  return held.hand === roleOf(hand) ? { branch, name, hand, text } : null;
 }
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
@@ -373,7 +419,47 @@ function finish(it) {
   const stopped = ready(it, branch);
   if (stopped.code) return stopped.code;
 
+  const open = retroOpen(it, it.disk.read(path));
+  if (open) return retroFirst(it, branch, name, open);
+
   return leaves(it, branch, at, path, stopped.says);
+}
+
+// The retro step of a group, which the box writes before it leaves. [[spec/processes/group.yaml]]
+const RETRO = "retro";
+
+// The first retro leaf that applies on this box and stands unwritten, or nothing. [[spec/design_output/work#a-box-leaves]]
+export function retroOpen(it, text) {
+  const front = frontOf(text);
+  const here = { ...it, cloud: cloudHere(it) };
+  const record = entriesOf(front);
+  const written = (path) => {
+    const last = record.filter((one) => String(one.step).trim() === path).at(-1);
+    return Boolean(last?.skipped || (last?.hash_after && !last.returns));
+  };
+  const open = leavesOf(front)
+    .filter((one) => one.path.split("/")[0] === RETRO)
+    .filter((one) => holdsHere(here, String(one.said.when ?? ""), front).holds)
+    .find((one) => !written(one.path));
+  return open?.path ?? "";
+}
+
+// The open tickets leave first, because the pull hands no retro out while one stands in the group. [[spec/design_output/work#a-box-leaves]]
+function retroFirst(it, branch, name, open) {
+  const freed = freeChildren(it, name);
+  if (freed.length) {
+    it.git.run(["commit", "-m", `${branch}: the open tickets leave the group`], true);
+    it.git.run(["push", "origin", branch], true);
+  }
+  console.error(
+    `${name} stands with ${open} unwritten, and the retro comes before the box leaves.`,
+  );
+  for (const one of freed)
+    console.error(`  ${one} leaves the group, so the pull reaches the retro.`);
+  console.error(
+    `Run ./RUNME.sh ticket pull ${name}, write each retro leaf it hands out, then run ./RUNME.sh branch done.`,
+  );
+  return 1;
 }
 
 // [[spec/design_output/work#trunk-comes-in-last-too]]
@@ -398,7 +484,7 @@ function ready(it, branch) {
   return { code: 0, says: said.says };
 }
 
-// One place answers what a hand can take across a group, so the take and the leave read the same line. [[spec/design_output/work#a-box-leaves]]
+// One place answers what a hand can take across a group, which the take reads before it claims. [[spec/design_output/work#the-take-writes-the-record]]
 export function standsOpen(it, name, path) {
   const children = childrenHere(it, name);
   const open = children.filter((one) => fieldOf(one.text, "state") !== CLOSED);
@@ -413,41 +499,28 @@ export function standsOpen(it, name, path) {
 function leaves(it, branch, at, path, says) {
   const name = branch.replace(/^work\//, "");
   const after = it.git.run(["rev-parse", "HEAD"], true).out;
-  const { open, busy } = standsOpen(it, name, path);
+  const freed = freeChildren(it, name);
 
-  if (busy.length) {
-    for (const one of busy) {
-      console.error(`${one.name} stands at ${one.step}, and a hand can take it.`);
-    }
-    console.error(
-      "Run ./RUNME.sh ticket pull, and spawn the hand a spawn answer names.",
-    );
-    console.error(
-      "branch done leaves a group only when every open step waits for a person.",
-    );
-    return 1;
-  }
-
-  let now = withHashAfter(it.disk.read(path), after);
   // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]] takes the tag off.
-  if (!open.length) {
-    now = withoutField(
-      withField(withField(now, "state", CLOSED), "reason", DONE),
-      PARKED,
-    );
-  }
+  const was = withHashAfter(it.disk.read(path), after, it.front);
+  const shut = withField(
+    withField(was, "state", CLOSED, it.front),
+    "reason",
+    DONE,
+    it.front,
+  );
+  const now = withoutField(shut, PARKED, it.front);
   it.disk.write(path, now);
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${branch}: the box leaves`], true);
   if (!it.git.run(["push", "origin", branch]).ok) return 1;
 
   console.log(`${branch} carries ${shortOf(after)}, and ${says}.`);
-  if (open.length) {
-    console.log(`${name} stays ${OPEN}, because ${open.length} ticket(s) stand open:`);
-    for (const one of open) console.log(`  ${one.name}`);
-  } else {
-    console.log(`${name} stands ${CLOSED}, because every ticket in it is closed.`);
-  }
+  console.log(`${name} stands ${CLOSED}, and every ticket in it is closed.`);
+  for (const one of freed)
+    console.log(
+      `  ${one} leaves the group, and stands loose on ${TRUNK} after the merge.`,
+    );
   console.log(`Run ./RUNME.sh branch merge ${name} from ${TRUNK}.`);
   return 0;
 }
@@ -490,10 +563,8 @@ function letGo(it, branch, name, here) {
     return 0;
   }
 
-  it.disk.write(
-    path,
-    withHashAfter(it.disk.read(path), it.git.run(["rev-parse", "HEAD"], true).out),
-  );
+  const tip = it.git.run(["rev-parse", "HEAD"], true).out;
+  it.disk.write(path, withHashAfter(it.disk.read(path), tip, it.front));
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${branch}: ${held.hand} lets it go`], true);
   if (!it.git.run(["push", "origin", branch]).ok) return 1;

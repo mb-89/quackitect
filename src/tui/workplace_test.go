@@ -10,9 +10,9 @@ import (
 	"strings"
 	"testing"
 
-	"quackitect/tui/frame"
-	"quackitect/tui/tree"
-	"quackitect/tui/work"
+	"quackitect/src/tui/frame"
+	"quackitect/src/tui/tree"
+	"quackitect/src/tui/work"
 )
 
 // A window whose roots carry places, with every ticket on disk. [[spec/design_output/tui#the-work-tab-takes-edits]]

@@ -7,6 +7,9 @@ import { git } from "../git.js";
 import { behaves } from "./behaves.js";
 import { fakeProc } from "./proc.js";
 
+// The pieces the real batch cuts, which a case sizes its buffer by. [[spec/design_output/work#the-listing-reads-git-once]]
+export { BATCH_ASKS } from "../git.js";
+
 export function fakeGit(answers = {}, root = "/tree") {
   const outside = fakeProc({ git: { exitCode: 0 }, ...answers });
   return behaves({ ...git(outside, root), proc: outside, ran: outside.ran }, "git");

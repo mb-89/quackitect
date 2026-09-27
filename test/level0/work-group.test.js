@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import {
   fieldOf,
@@ -30,13 +31,11 @@ import {
   doorsSaying,
   GROUP_AT,
   GROUP_NOTE,
-  green,
   groupRemote,
   HAND,
   heard,
   merging,
   on,
-  onBranch,
   ROOT,
   ranGit,
   remoteSaying,
@@ -122,7 +121,7 @@ test("take leaves a group whose open children no hand on this box can take at to
     '    does: makes the change the ask names\n    needs: ["nowhere here"]\n',
   );
   const { it, outside } = doorsSaying(groupRemote(), {
-    [on("one-group")]: withField(GROUP_NOTE, "step", "children"),
+    [on("one-group")]: withField(GROUP_NOTE, "step", "children", fakeFront()),
     [on("a-child")]: parked,
     ...HAND,
   });
@@ -151,7 +150,7 @@ const NEEDS = CHILD("one-group", "open").replace(
 );
 const taking = (files) => {
   const { it } = doorsSaying(groupRemote(), {
-    [on("one-group")]: withField(GROUP_NOTE, "step", "children"),
+    [on("one-group")]: withField(GROUP_NOTE, "step", "children", fakeFront()),
     ...files,
     ...HAND,
   });
@@ -196,7 +195,9 @@ test("branch take with a name takes that branch alone, and refuses a name nobody
     { ...groupRemote(), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
     { [on("one-group")]: GROUP_NOTE, ...HAND },
   );
-  const { code } = heard(() => work(ROOT, ["take", "one-group"], { ...it, cloud: true }));
+  const { code } = heard(() =>
+    work(ROOT, ["take", "one-group"], { ...it, cloud: true }),
+  );
   assert.equal(code, 0);
   assert.ok(ranGit(outside).includes("git switch work/one-group"));
 
@@ -250,22 +251,94 @@ test("a take whose claim will not commit stops, and puts the ticket back", () =>
 
   assert.equal(code, 1, said);
   assert.match(said, /would not commit, so the take stands undone/);
-  assert.equal(it.disk.read(on("one-group")), GROUP_NOTE, "the ticket stands as it stood");
-  assert.ok(!ranGit(outside).includes("git push origin work/one-group"), "and nothing pushes");
+  assert.equal(
+    it.disk.read(on("one-group")),
+    GROUP_NOTE,
+    "the ticket stands as it stood",
+  );
+  assert.ok(
+    !ranGit(outside).includes("git push origin work/one-group"),
+    "and nothing pushes",
+  );
+});
+
+// [[spec/design_output/work#the-take-writes-the-record]]
+test("a take whose sync conflicts after the claim still hands the box its ask", () => {
+  const { it } = doorsSaying(
+    {
+      ...groupRemote(),
+      "git rev-list --count HEAD..origin/main": { stdout: "2\n" },
+      "git merge origin/main --no-edit -m work/one-group: take main in": {
+        exitCode: 1,
+      },
+    },
+    { [on("one-group")]: GROUP_NOTE, ...HAND },
+  );
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["take"], { ...it, agent: true, cloud: true }),
+  );
+
+  assert.equal(code, 1, said);
+  assert.match(said, /Resolve the conflict on work\/one-group and commit it/);
+  assert.match(said, /You are on work\/one-group, and box d462e994b4cef holds it/);
+  assert.match(
+    said,
+    /Two tickets that land as one/,
+    "the ask stands under the conflict",
+  );
+});
+
+// [[spec/design_output/work#the-take-writes-the-record]]
+test("a take on a box holding its branch hands the ask again, and claims nothing new", () => {
+  const held = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box d462e994b4cef",
+      hash_before: SHA,
+    },
+    fakeFront(),
+  );
+  for (const argv of [["take"], ["take", "another-group"]]) {
+    const { it, outside } = doorsSaying(groupRemote(held), {
+      [on("one-group")]: held,
+      ...HAND,
+    });
+
+    const { code, said } = heard(() =>
+      work(ROOT, argv, { ...it, agent: true, cloud: true }),
+    );
+
+    assert.equal(code, 0, said);
+    assert.match(said, /You already hold work\/one-group/);
+    assert.match(said, /Two tickets that land as one/, "the ask comes again");
+    assert.ok(
+      !ranGit(outside).some(
+        (one) => one.startsWith("git switch") || one.startsWith("git commit"),
+      ),
+      "the box stays where it stands and writes no second claim",
+    );
+    if (argv[1]) assert.match(said, /one branch a session/);
+  }
 });
 
 // [[spec/design_output/work#held-derives-from-the-record]]
 test("a group holds where the record says so, and stands free where it says nothing", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const took = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
 
   assert.equal(groupStanding(GROUP_NOTE), TODO);
   assert.equal(groupStanding(took), HELD);
-  assert.equal(groupStanding(withHashAfter(took, "d4e5f6")), TODO);
-  assert.equal(groupStanding(withField(took, "state", "closed")), DONE);
+  assert.equal(groupStanding(withHashAfter(took, "d4e5f6", fakeFront())), TODO);
+  assert.equal(groupStanding(withField(took, "state", "closed", fakeFront())), DONE);
   assert.equal(groupStanding(""), "");
 });
 
@@ -274,7 +347,11 @@ test("list names a group and a loose ticket, each on its own row", () => {
   const loose = CHILD("one-group", "open").replace("group: one-group\n", "");
   const { it } = doorsSaying(
     groupRemote(
-      withEntry(GROUP_NOTE, { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" }),
+      withEntry(
+        GROUP_NOTE,
+        { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" },
+        fakeFront(),
+      ),
       {
         when: 1767225600,
         objects: {
@@ -351,11 +428,15 @@ test("a branch carrying no group names no ticket, and a child with no step says 
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
 test("a group held past staleAfter stands under yours, with its three answers", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const took = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
   const doors = (stale) => {
     const said = doorsSaying(groupRemote(took, { when: 1767225600 }));
     said.it.clock = fakeClock("2026-01-01T03:00:00.000Z");
@@ -371,129 +452,10 @@ test("a group held past staleAfter stands under yours, with its three answers", 
   assert.match(asking, /one-group held 3h\. Release it, take it over, or close it\./);
 });
 
-// [[spec/design_output/work#a-box-leaves]]
-test("done writes hash_after, and closes a group whose every ticket is closed", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
-  const { it, outside, disk } = doorsSaying(onBranch("work/one-group"), {
-    [on("one-group")]: withField(took, "step", "children"),
-    [on("a-child")]: CHILD("one-group", "closed"),
-    ...green,
-  });
-
-  const { code, said } = heard(() => work(ROOT, ["done"], it));
-
-  assert.equal(code, 0);
-  const now = disk.read(on("one-group"));
-  assert.equal(recordIn(now).at(-1).hash_after, SHA);
-  assert.equal(fieldOf(now, "state"), "closed");
-  assert.equal(fieldOf(now, "reason"), DONE);
-  assert.match(said, /every ticket in it is closed/);
-  assert.ok(ranGit(outside).includes("git push origin work/one-group"));
-});
-
-// [[spec/design_output/work#a-box-leaves]]
-// [[spec/design_output/pull#done-leaves-no-takeable-step]]
-test("done refuses while a ticket of the group stands at a step a hand can take", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
-  const { it, disk, outside } = doorsSaying(onBranch("work/one-group"), {
-    [on("one-group")]: withField(took, "step", "children"),
-    [on("a-child")]: CHILD("one-group", "open"),
-    ...green,
-  });
-
-  const { code, said } = heard(() => work(ROOT, ["done"], it));
-
-  assert.equal(code, 1);
-  assert.match(said, /a-child stands at do, and a hand can take it/);
-  assert.match(said, /ticket pull/);
-  assert.equal(recordIn(disk.read(on("one-group"))).at(-1).hash_after, undefined);
-  assert.ok(!ranGit(outside).some((one) => one.startsWith("git push")));
-});
-
-test("done leaves a group open where a ticket in it stands open, and names it", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
-  const { it, disk } = doorsSaying(onBranch("work/one-group"), {
-    [on("one-group")]: withField(took, "step", "children"),
-    [on("a-child")]: CHILD("one-group", "open").replace(
-      "    does: makes",
-      "    by: helper\n    does: makes",
-    ),
-    [on("elsewhere")]: CHILD("another-group", "open"),
-    ...green,
-  });
-
-  const { code, said } = heard(() => work(ROOT, ["done"], it));
-
-  assert.equal(code, 0);
-  const now = disk.read(on("one-group"));
-  assert.equal(recordIn(now).at(-1).hash_after, SHA, "the box leaves either way");
-  assert.equal(fieldOf(now, "state"), "open");
-  assert.match(said, /1 ticket\(s\) stand open/);
-  assert.match(said, /a-child/);
-  assert.doesNotMatch(said, /elsewhere/, "a ticket of another group counts nowhere");
-});
-
-// [[spec/design_output/work#a-box-leaves]]
-test("done on a group refuses while the battery answers nothing green", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
-  const { it, disk } = doorsSaying(onBranch("work/one-group"), {
-    [on("one-group")]: took,
-  });
-
-  const { code, said } = heard(() => work(ROOT, ["done"], it));
-
-  assert.equal(code, 1);
-  assert.match(said, /no check has run here/);
-  assert.equal(recordIn(disk.read(on("one-group"))).at(-1).hash_after, undefined);
-});
-
-// [[spec/design_output/work#trunk-comes-in-last-too]]
-test("done on a group refuses where trunk stands ahead of it, and names the sync", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
-  const { it, disk } = doorsSaying(
-    {
-      ...onBranch("work/one-group"),
-      "git rev-list --count HEAD..origin/main": { stdout: "3\n" },
-    },
-    { [on("one-group")]: took, ...green },
-  );
-
-  const { code, said } = heard(() => work(ROOT, ["done"], it));
-
-  assert.equal(code, 1);
-  assert.match(said, /main holds 3 commit\(s\) work\/one-group lacks/);
-  assert.match(said, /branch sync/);
-  assert.equal(
-    recordIn(disk.read(on("one-group"))).at(-1).hash_after,
-    undefined,
-    "the record stands where the sync is owed",
-  );
-});
-
 // [[spec/design_output/work#the-merge-lands-the-truth]]
 test("merge runs the check on the merge commit, and undoes the merge on red", () => {
   const red = {
-    [`node ${join(ROOT, "src/scripts/cli.js")} check`]: {
+    [`node ${join(ROOT, "src/scripts/cli.js")} check --errors`]: {
       exitCode: 1,
       stdout: "two tests fail\n",
     },
@@ -510,6 +472,25 @@ test("merge runs the check on the merge commit, and undoes the merge on red", ()
     ranGit(outside).includes(`git reset --hard ${SHA}`),
     "trunk stands where it was",
   );
+});
+
+// The check under --errors prints the red cases alone, and the merge hands each one on. [[spec/tickets/the-verbs-need-no-wrapper]]
+test("merge on a red check prints each failing case the check names", () => {
+  const red = {
+    [`node ${join(ROOT, "src/scripts/cli.js")} check --errors`]: {
+      exitCode: 1,
+      stdout:
+        "test/level0/one.test.js: a first case: it broke\ntest/level0/two.test.js: a second case: it broke\n",
+    },
+  };
+  const { it } = doorsSaying(merging(red));
+  it.node = "node";
+
+  const { code, said } = heard(() => work(ROOT, ["merge", "one-group"], it));
+
+  assert.equal(code, 1);
+  assert.match(said, /one\.test\.js: a first case/, "the first case");
+  assert.match(said, /two\.test\.js: a second case/, "and the second");
 });
 
 // [[spec/design_output/work#the-merge-lands-the-truth]]
@@ -550,11 +531,15 @@ test("merge frees an open ticket of the group it takes in, and leaves a closed o
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
 test("release writes hash_after onto a held group, and frees it for anybody", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const took = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
   const { it, outside, disk } = doorsSaying(groupRemote(took), {
     [on("one-group")]: took,
   });
@@ -582,6 +567,7 @@ test("release on a group nobody holds writes nothing, and says so", () => {
 // [[spec/design_output/work#a-merged-branch-closes]]
 test("close drops a group's branch once trunk holds it", () => {
   const { it, outside } = doorsSaying({
+    "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
     "git rev-list --count origin/main..main": { stdout: "0\n" },
     "git branch -r --merged origin/main": {
       stdout: "  origin/main\n  origin/work/one-group\n",

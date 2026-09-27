@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
@@ -53,6 +54,7 @@ function doors(files = {}, more = {}) {
     disk,
     git: said,
     join,
+    front: fakeFront(),
     clock: fakeClock(),
     node: "node",
     words: 5,

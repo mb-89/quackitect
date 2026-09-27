@@ -30,7 +30,7 @@ test("every stop the agent claims over its own work yields to a check", () => {
 
 // [[spec/design_output/stop#a-check-beats-a-claim]]
 test("a stop the owner drives stands over a check", () => {
-  assert.equal(by("the-owner-asks-to-talk")?.yields, undefined);
+  assert.equal(by("the-owner-holds-the-step")?.yields, undefined);
   assert.equal(by("the-chat-is-new")?.yields, undefined);
 });
 
@@ -53,7 +53,7 @@ test("the stops asking the owner wait for the owner, and a claim of done waits f
   const box = { stopRules: rules };
   const ends = (reason) => ({ last_assistant_message: `Text.\n\nstop: ${reason}` });
   for (const id of [
-    "the-owner-asks-to-talk",
+    "the-owner-holds-the-step",
     "the-chat-is-new",
     "a-wrong-answer-leaves-the-box",
   ]) {
@@ -100,5 +100,18 @@ test("the door answers every check the shipped rules name, and the gate names fo
   for (const name of ENGINE_CHECKS) {
     assert.ok(shipped.includes(name), `${name} stands in the shipped rules`);
     assert.equal(standsDown(name, "god"), true, name);
+  }
+});
+
+// The talk rule goes, and a turn waiting on the owner's step ends on a reason naming that step. [[spec/tickets/the-stop-reads-the-state]]
+test("no rule carries the talk id, and the owner's step outranks every continue that loops the wait", () => {
+  assert.equal(by("the-owner-asks-to-talk"), undefined);
+  const said = by("the-owner-holds-the-step");
+  assert.equal(said?.side, "stop");
+  assert.equal(said?.decides, "claimed");
+  assert.equal(said?.waits, "owner");
+  assert.equal(said?.runs, "step-waits-on-person");
+  for (const id of ["work-still-stands", "the-last-line-names-no-stop"]) {
+    assert.ok(said.priority > by(id).priority, `it outranks ${id}`);
   }
 });

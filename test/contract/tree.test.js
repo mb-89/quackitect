@@ -413,13 +413,13 @@ test("a tracked name past the cap is refused", () => {
 test("an install of a tool the survey misses is refused", () => {
   const found = surveyNamesInstalls(
     fakeTree({
-      [INSTALL]: `${text(INSTALL)}\nhere() {\n  case $1 in\n    zig) [ -x "$bin/zig" ] ;;\n  esac\n}\n`,
+      [INSTALL]: `${text(INSTALL)}\nhere() {\n  case $1 in\n    probe) [ -x "$bin/probe" ] ;;\n  esac\n}\n`,
     }),
   );
 
   assert.equal(found.length, 1);
   assert.equal(found[0].rule, "SurveyNamesInstalls");
-  assert.match(found[0].message, /zig/);
+  assert.match(found[0].message, /probe/);
 });
 
 // [[spec/design_output/tools#what-the-survey-writes]]

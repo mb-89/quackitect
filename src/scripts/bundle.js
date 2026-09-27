@@ -31,12 +31,12 @@ export function bundled(files = disk()) {
   return files.modified(OUT) >= newest(dirname(ENTRY), files);
 }
 
-// esbuild lands beside the webview, so the step imports it by its path. [[spec/design_input/the-editor-draws-the-ticket#the-owner-rules]]
-export async function bundle() {
+// esbuild lands beside the webview, so the step imports it by its path. A case names its own entry and out, and the drawing's stand as the defaults. [[spec/tickets/the-battery-runs-on-fixtures]]
+export async function bundle({ entry = ENTRY, out = OUT } = {}) {
   const said = await import(pathToFileURL(ESBUILD).href);
   await (said.build ?? said.default.build)({
-    entryPoints: [ENTRY],
-    outfile: OUT,
+    entryPoints: [entry],
+    outfile: out,
     bundle: true,
     minify: true,
     format: "iife",

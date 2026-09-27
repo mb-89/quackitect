@@ -8,8 +8,8 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"quackitect/tui/draw"
-	"quackitect/tui/frame"
+	"quackitect/src/tui/draw"
+	"quackitect/src/tui/frame"
 )
 
 func click(m frame.Model, x, y int) frame.Model {

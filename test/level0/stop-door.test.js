@@ -6,6 +6,9 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { STOP_CALL } from "../../.claude/skills/level0/lib/stop.js";
+import { leafBy } from "../../.claude/skills/level0/lib/ticket.js";
+import { onPromptSubmit } from "../../src/bridge/answer.js";
 import {
   dropsHold,
   onStop,
@@ -13,8 +16,6 @@ import {
   sawPrompt,
   TOOLS,
 } from "../../src/bridge/stop.js";
-import { STOP_CALL } from "../../.claude/skills/level0/lib/stop.js";
-import { onPromptSubmit } from "../../src/bridge/answer.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -136,6 +137,57 @@ test("four stop lines over a queue holding work: three hold, the fourth ends, an
   const last = it.said.filter((row) => row[1] === "stop").at(-1);
   assert.equal(last[0], "warn", "the runaway writes at warn");
   assert.match(last[2], /the turn ends: the tooth lets go after 3 holds in a row/);
+});
+
+// The group rule of spec/config/stop/level1.yml, whose hold names the exit. [[spec/design_output/stop#three-in-a-row]]
+const LEVEL1 = `
+- id: the-group-stands-in-hand
+  side: continue
+  priority: 82
+  decides: mechanical
+  runs: group-in-hand
+  says: This box holds a group, so run ./RUNME.sh ticket pull, spawn the hand a spawn answer names, and run ./RUNME.sh branch done once the pull answers wait.
+`;
+const HELD_GROUP =
+  "---\nkind: [[ticket]]\nstate: open\nprocess: [[spec/processes/group]]\nrecord:\n  - hash_before: abc123\n---\n\n# Ask\n\nA group.\n";
+
+function holdingGroup(env) {
+  const it = box({
+    [at("spec/config/stop/level1.yml")]: LEVEL1,
+    [at("spec/tickets/a-group.md")]: HELD_GROUP,
+  });
+  it.box.env = env;
+  it.box.proc = fakeProc({
+    "git rev-parse --abbrev-ref HEAD": { stdout: "work/a-group\n" },
+  });
+  return it;
+}
+
+// A cloud box ends only with its branch handed back, so the cap frees none holding a group. [[spec/design_output/stop#three-in-a-row]]
+test("a cloud box holding a group holds past the cap, and the hold names branch done", () => {
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+  const it = holdingGroup({ CLAUDE_CODE_REMOTE: "true" });
+  const carried = [];
+  for (let turn = 0; turn < 5; turn++) carried.push(onStop(done, it.box));
+  assert.deepEqual(
+    carried.map((one) => one.pass === true),
+    [false, false, false, false, false],
+    "the fourth hold and the fifth still hold",
+  );
+  assert.match(carried[3].result.block, /\.\/RUNME\.sh branch done/);
+});
+
+// [[spec/design_output/stop#three-in-a-row]]
+test("a desk holding a group ends at the cap as before", () => {
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+  const it = holdingGroup({});
+  const carried = [];
+  for (let turn = 0; turn < 4; turn++) carried.push(onStop(done, it.box));
+  assert.deepEqual(
+    carried.map((one) => one.pass === true),
+    [false, false, false, true],
+  );
+  assert.match(carried[0].result.block, /This box holds a group/);
 });
 
 test("a standing stop line ends the turn, and nothing prompts after it", () => {
@@ -446,4 +498,100 @@ test("a prompt opens a turn, so the hold of the turn before ends nothing", () =>
     /names no stop reason/,
     "the next turn holds open on its own reasons",
   );
+});
+
+// A turn waiting on the owner's step ends on a reason naming that step. [[spec/tickets/the-stop-reads-the-state]]
+const STEP_RULES = `
+- id: the-owner-holds-the-step
+  side: stop
+  priority: 88
+  decides: claimed
+  waits: owner
+  runs: step-waits-on-person
+  asks: Does the ticket in hand, or its group, stand at a step a person takes?
+  says: The ticket in hand waits on the owner's step, so this turn ends and waits.
+`;
+
+const ticketAt = (step, by, more = "") =>
+  `---\nkind: [[ticket]]\nstate: open\n${more}steps:\n  - name: design\n    steps:\n      - name: draft\n        by: anyone\n      - name: person-1\n        by: ${by}\nstep: ${step}\n---\n\n# Ask\n\nA thing.\n`;
+
+function stepBox(files) {
+  const it = box({ [at("spec/config/stop/level0.yml")]: STEP_RULES, ...files });
+  return it.box;
+}
+
+const hold = (ticket) =>
+  JSON.stringify({
+    ticket,
+    path: `spec/tickets/${ticket}.md`,
+    step: "design/person-1",
+    hand: "box b1",
+  });
+
+// [[spec/tickets/the-stop-reads-the-state]]
+test("a ticket in hand at a person's step stands the owner-step claim", () => {
+  const it = stepBox({
+    [at(".se/.runtime/hold/b1.json")]: hold("a-ticket"),
+    [at("spec/tickets/a-ticket.md")]: ticketAt("design/person-1", "person"),
+  });
+  const said = TOOLS[STOP_CALL]({ reason: "the-owner-holds-the-step" }, it);
+  assert.match(said.result.result, /The claim stands/);
+});
+
+// [[spec/tickets/the-stop-reads-the-state]]
+test("a ticket in hand at an agent's step refuses the owner-step claim", () => {
+  const it = stepBox({
+    [at(".se/.runtime/hold/b1.json")]: hold("a-ticket"),
+    [at("spec/tickets/a-ticket.md")]: ticketAt("design/draft", "person"),
+  });
+  const said = TOOLS[STOP_CALL]({ reason: "the-owner-holds-the-step" }, it);
+  assert.match(said.result.result, /The claim falls/);
+});
+
+// [[spec/tickets/the-stop-reads-the-state]]
+test("a ticket in hand whose group stands at a person's step stands the owner-step claim", () => {
+  const it = stepBox({
+    [at(".se/.runtime/hold/b1.json")]: hold("a-child"),
+    [at("spec/tickets/a-child.md")]: ticketAt(
+      "design/draft",
+      "anyone",
+      "group: a-group\n",
+    ),
+    [at("spec/tickets/a-group.md")]: ticketAt("design/person-1", "person"),
+  });
+  const said = TOOLS[STOP_CALL]({ reason: "the-owner-holds-the-step" }, it);
+  assert.match(said.result.result, /The claim stands/);
+});
+
+// A group whose work branch stands is taken, so the queue holds nothing of it for this box. [[spec/tickets/the-stop-reads-the-state]]
+test("an urgent group whose work branch stands leaves the queue with no wait", () => {
+  const group =
+    "---\nkind: [[ticket]]\nstate: open\nurgent: true\nprocess: [[spec/processes/group]]\n---\n\n# Ask\n\nA group.\n";
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+  const refs =
+    "git for-each-ref --format=%(refname:short) refs/heads/work refs/remotes/origin/work";
+
+  const taken = box({ [at("spec/tickets/a-group.md")]: group });
+  taken.box.proc = fakeProc({
+    "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+    [refs]: { stdout: "origin/work/a-group\n" },
+  });
+  assert.deepEqual(onStop(done, taken.box), { pass: true });
+
+  const free = box({ [at("spec/tickets/a-group.md")]: group });
+  free.box.proc = fakeProc({
+    "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+    [refs]: { stdout: "" },
+  });
+  assert.match(
+    onStop(done, free.box).result.block,
+    /The queue holds work for this box/,
+  );
+});
+
+// [[spec/tickets/the-stop-reads-the-state]]
+test("the leaf a pointer names answers who takes it, and a ticket with no leaf answers null", () => {
+  assert.equal(leafBy(ticketAt("design/person-1", "person")), "person");
+  assert.equal(leafBy(ticketAt("design/draft", "person")), "anyone");
+  assert.equal(leafBy("---\nkind: [[ticket]]\n---\n"), null);
 });

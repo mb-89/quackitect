@@ -30,6 +30,7 @@ import { isDue } from "./ephemeral.js";
 import { dueHandOut } from "./ephemeral-pull.js";
 import { noteRows, readsOf, writeHold } from "./guidance-hand.js";
 import { workAnswer } from "./pull-chapter.js";
+import { acceptWaits } from "./pull-accept.js";
 import { cleanupOf } from "./pull-cleanup.js";
 import { roleOf } from "./pull-hand-of.js";
 import { landedAlone } from "./pull-landed.js";
@@ -46,9 +47,12 @@ import {
   WAIT,
   walkOf,
 } from "./pull-route.js";
-import { HELPER, SPAWN, spawnPrompt, unblockPrompt } from "./pull-spawn.js";
+import { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 import { entriesOf, pushed, returnsOf, shut, target, tipOf } from "./pull-writes.js";
 import { NOTES, opensDraft, schemasHere } from "./ticket.js";
+import { holdsHere } from "./pull-when.js";
+
+export { holdsHere };
 
 export function ticketsHere(it) {
   const out = [];
@@ -130,21 +134,21 @@ export function handOut(it, who) {
   repairPersonSteps(it, who);
   const all = ticketsHere(it);
   // A session due takes the clear's tickets once the ticket in hand stands done, and a helper takes none. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
-  if (!who.wanted && !who.oneStep && isDue(it.disk, it.root)) return dueHandOut(it, who, all);
+  if (!who.wanted && !who.oneStep && isDue(it.disk, it.root))
+    return dueHandOut(it, who, all);
   const groupTicket = all.find((one) => !one.private && one.name === who.group);
   // The tag says the next pull hands it first, on a note and on a ticket alike. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
   const tagged = taggedIn(all);
   const privates = all.filter((one) => one.private && !tagged.includes(one));
   const at = weighing(it, all);
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
+  // A group at a retro step waits on the notes, so they come out before it. [[spec/design_output/pull#the-private-queue]]
+  const own = groupTicket ? [groupTicket] : [];
+  const notes = sorted(privates, at);
+  const late = atRetro(all, who.group) ? [notes, own] : [own, notes];
   const pools = who.group
-    ? [
-        tagged,
-        sorted(childrenOf(all, who.group), at),
-        groupTicket ? [groupTicket] : [],
-        sorted(privates, at),
-      ]
-    : [tagged, sorted(freeIn(all), at), sorted(privates, at)];
+    ? [tagged, sorted(childrenOf(all, who.group), at), ...late]
+    : [tagged, sorted(freeIn(all), at), notes];
   if (!who.group) cutForGroups(it, all);
   // A name on the pull asks for one ticket, so the pools carry that one alone. [[spec/design_output/pull#the-hand-out]]
   const asked = who.wanted
@@ -153,7 +157,6 @@ export function handOut(it, who) {
 
   const why = [];
   let other = null;
-  let person = null;
   for (const pool of asked) {
     for (const found of pool) {
       const one = agentOpens(found.text) ? openedHere(it, found, all) : found;
@@ -164,20 +167,16 @@ export function handOut(it, who) {
       const said = offer(it, who, one, all);
       if (said.leaf) return handed(it, who, one, said.leaf);
       if (said.why) why.push(`${one.name} ${said.why}`);
-      // A hand-out frees a group, so a ticket in no group waits for its person where it stands. [[spec/tickets/the-desk-findings-wait]]
-      if (said.person && !person && fieldOf(one.text, GROUP))
-        person = { name: one.name, leaf: said.person };
       if (said.other && !other) other = { one, leaf: said.other, why: said.why };
     }
     if (other && !who.oneStep) return spawnAnswer(other);
   }
 
   // [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
-  const cleanup = who.wanted || why.length || person ? null : cleanupOf(it);
+  // A person's step waits under its reason, and the note names who answers it. [[spec/design_output/work#a-person-step-leaves]]
+  const cleanup = who.wanted || why.length ? null : cleanupOf(it);
   if (cleanup) say(cleanup.word, cleanup.rows);
   else say(WAIT, why.length ? why : [nothingFor(who)]);
-  // A person's question leaves the branch, so the group lands. [[spec/design_output/work#a-person-step-leaves]]
-  if (person) console.log(`\n${unblockPrompt(person.name, person.leaf)}`);
   return 0;
 }
 
@@ -258,7 +257,7 @@ export function spawnAnswer(other) {
   const helper = `${HELPER}-${entriesOf(other.one.front).length + 1}`;
   say(SPAWN, [
     `${other.one.name} at ${other.leaf.path} ${other.why}.`,
-    "Spawn a hand of its own with the prompt below, and pull again once it answers.",
+    "Spawn a hand of its own with the prompt below in the background, and take the next item. Pull again once it answers.",
   ]);
   console.log("");
   console.log(spawnPrompt(other.one.name, other.leaf, helper));
@@ -274,7 +273,7 @@ export function takeable(it, one, all = [], group = "") {
   if (dependsOn(front).some((dep) => !closedHere(it, all, dep))) return "";
   const path = stepPathOf(front);
   const leaf = leafOf(front, path);
-  if (!leaf) return "";
+  if (!leaf || (leaf.final && acceptWaits(one, all))) return "";
   // [[spec/tickets/the-one-answer-takes-shape]]
   // The session spawns the hand a helper leaf waits for, so a harness on the box holds the group. [[spec/tickets/the-spawn-answers-a-helper]]
   if (!writesHere(leaf, handRule(it, front, all, group, it.agent)).writes) return "";
@@ -297,6 +296,7 @@ export function offer(it, who, one, all) {
   const moved = advanced(it, one, all);
   if (moved.why) return { why: moved.why };
   if (!moved.leaf) return {};
+  if (moved.leaf.final && acceptWaits(one, all)) return { why: acceptWaits(one, all) };
   return admits(it, who, one, moved.leaf, all);
 }
 
@@ -325,20 +325,28 @@ export function advanced(it, one, all) {
       return { why: `stands at ${path || "no step"}, which its route lacks` };
     }
 
-    const when = holdsHere(it, leaf.when, front);
+    const when = holdsHere(it, leaf.when, front, text);
     if (!when.holds) {
-      text = withEntry(text, { step: leaf.path, skipped: true, why: when.why });
+      text = withEntry(
+        text,
+        { step: leaf.path, skipped: true, why: when.why },
+        it.front,
+      );
       changes.push(`skips ${leaf.path}`);
     } else if (leaf.by === "children") {
       const said = childrenSay(all, one.name);
       if (said.dropped.length) {
         const back = target(leaf, leaf.on_fail);
-        text = withEntry(text, {
-          step: leaf.path,
-          hand: ENGINE,
-          returns: returnsOf(front, leaf.path) + 1,
-          why: `${said.dropped.join(", ")} closed dropped`,
-        });
+        text = withEntry(
+          text,
+          {
+            step: leaf.path,
+            hand: ENGINE,
+            returns: returnsOf(front, leaf.path) + 1,
+            why: `${said.dropped.join(", ")} closed dropped`,
+          },
+          it.front,
+        );
         changes.push(`${leaf.path} fails back to ${back}`);
         moved = true;
         front = frontOf(text);
@@ -355,17 +363,21 @@ export function advanced(it, one, all) {
         // Every open child waits for a person, so the group stands here and hands no retro out. [[spec/tickets/the-group-leaves-at-todo]]
         return { why: `waits for ${said.open.join(", ")}` };
       } else {
-        text = withEntry(text, {
-          step: leaf.path,
-          hand: ENGINE,
-          hash_before: tipOf(it),
-          hash_after: tipOf(it),
-        });
+        text = withEntry(
+          text,
+          {
+            step: leaf.path,
+            hand: ENGINE,
+            hash_before: tipOf(it),
+            hash_after: tipOf(it),
+          },
+          it.front,
+        );
         changes.push(`passes ${leaf.path}`);
       }
     } else {
       if (moved) {
-        text = withField(text, "step", path);
+        text = withField(text, "step", path, it.front);
         one.text = text;
         one.front = frontOf(text);
         landedAlone(it, one, changes);
@@ -377,7 +389,7 @@ export function advanced(it, one, all) {
     front = frontOf(text);
     const next = leaf.leaves[leaf.at + 1];
     if (!next) {
-      text = shut(text, front, DONE);
+      text = shut(text, front, DONE, it.front);
       one.text = text;
       one.front = frontOf(text);
       landedAlone(it, one, changes.concat(`closes ${DONE}`));
@@ -386,24 +398,6 @@ export function advanced(it, one, all) {
     path = next.path;
   }
   return { why: "loops in its route" };
-}
-
-// [[spec/design_output/pull#a-condition-skips-a-leaf]]
-export function holdsHere(it, when, front) {
-  if (!when) return { holds: true };
-  if (when === "cloud")
-    return { holds: Boolean(it.cloud), why: "the box runs off the cloud" };
-  if (when === "desk") return { holds: !it.cloud, why: "the box runs on the cloud" };
-  if (when === "returned") {
-    const last = entriesOf(front)
-      .filter((one) => !one.skipped)
-      .at(-1);
-    return {
-      holds: Number(last?.returns ?? 0) > 0,
-      why: "the ticket arrives here by no on_fail",
-    };
-  }
-  return { holds: false, why: `${when} names no condition the pull reads` };
 }
 
 // [[spec/design_output/pull#children-before-their-group]]
@@ -431,7 +425,6 @@ export function admits(it, who, one, leaf, all) {
     const spawns = String(leaf.by) === HELPER && Boolean(it.agent);
     return {
       why: said.why,
-      ...(said.person ? { person: leaf } : {}),
       ...(spawns ? { other: leaf } : {}),
     };
   }
@@ -537,7 +530,7 @@ export function withEngineReader(it, one) {
     if (step) step.to = "engine";
   }
   const schema = schemasHere(it).get("ticket");
-  return schema ? reRouted(one.text, schema, steps, "") : "";
+  return schema ? reRouted(one.text, schema, steps, "", it.front) : "";
 }
 
 // [[spec/design_output/pull#a-person-step-goes-in]]
@@ -590,8 +583,13 @@ function inserted(it, one, before, name, said) {
 
   const path = [...parts.slice(0, -1), name].join("/");
   const schema = schemasHere(it).get("ticket");
-  const text = schema ? reRouted(one.text, schema, steps, "") : one.text;
-  one.text = withField(withField(text, "step", path), "state", OPEN);
+  const text = schema ? reRouted(one.text, schema, steps, "", it.front) : one.text;
+  one.text = withField(
+    withField(text, "step", path, it.front),
+    "state",
+    OPEN,
+    it.front,
+  );
   return { path };
 }
 

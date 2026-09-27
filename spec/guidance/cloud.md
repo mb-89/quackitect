@@ -15,13 +15,13 @@ rationale: [[spec/rationales/cloud]]
 4. Work the branch you hold, and stop at its edge. A change nobody wants buries the one somebody wants. *
 5. Commit and push each time you finish a thing. This box dies and takes its working tree with it. *
 6. Decide every question this branch meets, a step under `by: person` among them, and hand none out. The merge is where a person reads your call. *
-7. Mint a question ticket for work a person alone can do: a permission, a setting, a desk trial. Write every command they need into its ask, push it, and finish the branch. An ask in the chat meets nobody. *
+7. Mint a question ticket for work a person alone can do: a permission, a setting, a desk trial, a refusal. Write every command they need into its ask, push it, and finish the branch. An ask in the chat meets nobody. *
 8. Say beside each answer what you weigh and what you assume. The hand at the merge judges the call on that. *
 9. Carry the branch to done, and stop for no answer you can write yourself. A branch standing mid-step costs the next box a session. *
 10. Finish every step an agent takes before you leave. A step you leave meets the next box and waits again. *
 11. Green the check before you hand the branch back, whatever hand puts the fault there. A fault with no owner outlives every hand that meets it. *
 12. Write your result, your retro and every script under `.se/scripts` into the group's retro. Git carries what this box learns, and nothing else does.
-13. Run `./RUNME.sh branch done` last, and stop at the push. It sets the standing the next box reads.
+13. Run `./RUNME.sh branch done` last, and stop at the push. It refuses while the retro stands unwritten, then hands the branch back, and each open ticket leaves the group.
 14. Work one branch a session, and leave the next branch to the next session. A second branch buries the first in one review. *
 15. Say which commit you stand on, and whether it matches origin. This box reports itself current while somebody pushes past it. *
 

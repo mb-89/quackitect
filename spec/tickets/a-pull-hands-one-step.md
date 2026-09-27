@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -77,7 +77,44 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-engine-holds-the-route
-step: design/draft
+step: implement/tests-green
+record:
+  - step: design/draft
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: 0ed9f2304ae306816eb89b2a0d01107eaa9ff949
+    hash_after: 0ed9f2304ae306816eb89b2a0d01107eaa9ff949
+  - step: design/review
+    hand: box d7d6cb0fb1105 · claude-code-remote · helper-2
+    hash_before: efb1c7dda5c5f9ce54ce3b734e77df85fffe55e8
+    hash_after: efb1c7dda5c5f9ce54ce3b734e77df85fffe55e8
+  - step: implement/tests-red
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: a25354675be4e8ad9c1f15d89b5bc9ec02084156
+    hash_after: a25354675be4e8ad9c1f15d89b5bc9ec02084156
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: e07cd81b3fd63667d446738d4415f37ad6a08ff9
+    hash_after: e07cd81b3fd63667d446738d4415f37ad6a08ff9
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: 189779364211379c9018d016435ed3107c2b12b8
+    hash_after: 189779364211379c9018d016435ed3107c2b12b8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 18 test(s) pass in 2 file(s); green, src/index passes; green, src/tui passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/a-pull-hands-one-step.md:258:1: ListItem: A sentence in a list item holds 20 words, and this one holds 24. "
+reason: done
 ---
 
 # Ask
@@ -105,11 +142,29 @@ Today the agent reads the whole route on the ticket, writes the file by hand, an
 
 <!-- the form is text -->
 
+The hand-out and the payload stand today. The change pins them with cases, and adds the formatter, the door and the progress.
+
+| done_when line | what stands | the change |
+|---|---|---|
+| the step in hand alone | `workAnswer` in `src/scripts/pull-chapter.js` prints the leaf, its fields and its checklist | a case pins that the hand-out names no field of another leaf |
+| the payload | `withPayload` merges `--fields` into the ticket in `handBack` | the case in `test/level0/pull-fields.test.js` decides it, and stands |
+| the formatter | nothing formats a payload | `formatted` in a new `src/scripts/pull-format.js` trims trailing blanks, writes a bullet as a dash and folds a run of blank lines. `handBack` runs it on the merged text before `checkNote` |
+| the door | `engineRestores` in `src/bridge/write.js` guards the engine fields alone | a new `ticketDoor` there refuses an agent write to a ticket under `spec/tickets` whose state reads open, and names `--fields` |
+| the progress | the index row carries the step alone | `progressOf` in `src/index/ticket.go` counts the leaves of the route and the record entries, and the row carries `progress`. The work tab lists it among `detailKeys` in `src/tui/work/work.go` |
+
+Weighed: the formatter runs in the engine as text in and text out, so the pull stays cold and reads no Vale. Assumed: a draft and a closed ticket stay writable, since a hand writes a draft's ask, and a closed ticket takes history.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/scripts/pull.js` `handBack`, which runs the formatter
+- `src/bridge/write.js` the write door, which runs the ticket door beside the engine fields
+- `src/index/ticket.go` `ticketOf`, which fills the progress
+- `src/tui/work/workitems.go` `itemOfTicket`, which carries the progress into the keys
+- `src/tui/work/work.go` the detail pane, which reads `detailKeys`
 
 ### tests
 
@@ -117,17 +172,29 @@ Today the agent reads the whole route on the ticket, writes the file by hand, an
 
 <!-- the form is list -->
 
+- `test/level0/pull-format.test.js` the hand-out names the step in hand and no other leaf
+- `test/level0/pull-format.test.js` a payload lands formatted before the checks read it
+- `test/level0/write.test.js` the door refuses an agent write to an open ticket, and a draft takes one
+- `src/index/ticket_test.go` a ticket row carries the progress of its route
+- `src/tui/work_test.go` the detail pane shows the progress
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every file and function named stands opened: the hand-out, the payload, the door, the index and the tab
+- the callers list follows each changed function to the file calling it
+- every done_when line maps to a test row above, and `./RUNME.sh check` decides the last
 
 ## review
 
@@ -139,6 +206,12 @@ Today the agent reads the whole route on the ticket, writes the file by hand, an
 
 <!-- the form is verdict -->
 
+pass
+- `workAnswer` tells the hand to write the file: the builder names `--fields` there instead.
+- The ticket door refuses a write under Discussion too: the builder admits that chapter.
+- `formatted` runs on the payload fields alone, so it rewrites no line of another leaf.
+- The tab case belongs in `src/tui/work`, beside `work.go`, since the package stands there.
+
 # implement
 
 ## tests-red
@@ -148,20 +221,31 @@ Today the agent reads the whole route on the ticket, writes the file by hand, an
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test test/level0/pull-format.test.js test/level0/write.test.js src/index/ticket_test.go src/tui/work/workitems_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+- the hand-out still sends the hand into the file, and names no payload
+- the formatter answers its input, so the payload keeps its blanks
+- the door lets an agent write an open ticket
+- the index row and the tab carry no progress
+- what surprises the hand: the engine-field cases wrote over an open ticket, so they take a draft now
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the hand-out, the payload, the door, the index row, the tab and the cases
+- the door cases run over the fake disk, and the Go cases over a tree each case writes
+- each new file links the chapter it implements
+- the formatter stands in one module, and the payload reader calls it
+- the review rows stand fixed: the payload in the hand-out, the Discussion admitted, the formatter over the payload alone, the tab case in its package
 
 ## change
 
@@ -170,14 +254,20 @@ Today the agent reads the whole route on the ticket, writes the file by hand, an
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/scripts/pull-chapter.js src/scripts/pull-format.js src/scripts/pull-spawn.js src/bridge/write.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the hand-out, the payload, the spawn prompt, the door, the index row, the tab and their cases
+- the door cases run over the fake disk, and the Go cases over a tree each case writes
+- each new function links the chapter it implements
+- the formatter stands in one module, and the payload reader calls it
+- the review rows stand fixed: the payload in the hand-out, the Discussion admitted, the formatter over one field, the tab case in its package
 
 ## tests-green
 
@@ -186,26 +276,34 @@ Today the agent reads the whole route on the ticket, writes the file by hand, an
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test test/level0/pull-format.test.js test/level0/write.test.js src/index/ticket_test.go src/tui/work/workitems_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hand-out names the step in hand alone and asks for the payload, and the spawn prompt asks a helper for the same. The engine formats each answer before it merges it. The write door refuses an agent a write to an open ticket past its Discussion. The index row carries the progress of a route, and the work tab draws it. For details, see [[spec/design_output/pull#the-fields-ride-the-payload]].
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the hand-out, the payload, the spawn prompt, the door, the index row, the tab and their cases
+- the door cases run over the fake disk, and the Go cases over a tree each case writes
+- each new function links the chapter it implements
+- the chapter owns the formatter and the door, and the comments point at it
+- the review rows stand fixed, and the says field names where each lands
 
 # Discussion
 

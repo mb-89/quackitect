@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"quackitect/tui/tree"
-	"quackitect/tui/work"
+	"quackitect/src/tui/tree"
+	"quackitect/src/tui/work"
 )
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]

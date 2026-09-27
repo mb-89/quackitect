@@ -5,8 +5,8 @@
 package main
 
 import (
-	"quackitect/pointer"
-	"quackitect/yaml"
+	"quackitect/src/pointer"
+	"quackitect/src/yaml"
 
 	"regexp"
 	"strings"

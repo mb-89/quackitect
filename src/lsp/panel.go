@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"quackitect/yaml"
+	"quackitect/src/yaml"
 )
 
 const (

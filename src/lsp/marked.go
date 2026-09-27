@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"quackitect/yaml"
+	"quackitect/src/yaml"
 )
 
 var (

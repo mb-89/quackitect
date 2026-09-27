@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quackitect Migration Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --bg:#F4F6F3; --panel:#FFFFFF; --ink:#18201C; --muted:#5A665F; --line:#CDD5CF;
+  --accent:#A95A14; --accent-soft:#F5E6D4; --door-bg:#E2E9EF; --hot:#B23A2A; --code:#EAEEE9;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --cond:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111613; --panel:#19201C; --ink:#E3E9E4; --muted:#9AA79F; --line:#34403A;
+    --accent:#E59A4C; --accent-soft:#3B2B1B; --door-bg:#1E2A33; --hot:#F07A66; --code:#1D2521;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111613; --panel:#19201C; --ink:#E3E9E4; --muted:#9AA79F; --line:#34403A;
+  --accent:#E59A4C; --accent-soft:#3B2B1B; --door-bg:#1E2A33; --hot:#F07A66; --code:#1D2521;
+  color-scheme:dark;
+}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:15.5px; line-height:1.6; padding-inline:16px; padding-block:40px 72px;}
+main{max-width:1000px; margin:0 auto; display:flex; flex-direction:column; gap:56px;}
+.prose{max-width:68ch;}
+header{display:flex; flex-direction:column; gap:14px;}
+.eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);}
+h1{font-family:var(--cond); font-weight:600; font-size:clamp(30px,5vw,46px); line-height:1.08; margin:0; text-wrap:balance;}
+h1 em{font-style:normal; color:var(--accent);}
+h2{font-family:var(--cond); font-weight:600; font-size:25px; line-height:1.2; margin:0 0 10px; text-wrap:balance;}
+p{margin:0 0 12px;}
+.lede{font-size:18px; color:var(--ink); max-width:62ch; margin:0;}
+section{display:flex; flex-direction:column; gap:14px;}
+code,.mono{font-family:var(--mono); font-size:.9em;}
+p code, li code, td code{background:var(--code); padding:1px 5px; border-radius:3px;}
+.decisions{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+.decisions div{background:var(--panel); padding:14px 16px; display:flex; flex-direction:column; gap:4px;}
+.decisions b{font-family:var(--cond); font-weight:600; font-size:15px;}
+.decisions span{color:var(--muted); font-size:14px; line-height:1.45;}
+figure{margin:0; display:flex; flex-direction:column; gap:10px;}
+.scroll{overflow-x:auto; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:12px;}
+.scroll svg{display:block; width:100%; min-width:760px; height:auto; color:var(--ink);}
+figcaption{font-size:14px; color:var(--muted); max-width:78ch; line-height:1.5;}
+figcaption ol{margin:6px 0 0; padding-left:22px;}
+/* svg classes */
+.bx{fill:var(--panel); stroke:var(--line); stroke-width:1.2;}
+.bx-strong{fill:var(--panel); stroke:var(--ink); stroke-width:1.2;}
+.bx-accent{fill:var(--accent-soft); stroke:var(--accent); stroke-width:1.6;}
+.frame{fill:none; stroke:var(--muted); stroke-width:1; stroke-dasharray:5 4;}
+.frame-accent{fill:none; stroke:var(--accent); stroke-width:2;}
+.door{fill:var(--panel); stroke:var(--ink); stroke-width:1.3;}
+.fake{fill:var(--bg); stroke:var(--muted); stroke-width:1; stroke-dasharray:3 2;}
+.fk{font-family:var(--mono); font-size:10.5px; fill:var(--muted);}
+.lab-door{font-family:var(--cond); font-size:12.5px; font-weight:600; fill:currentColor;}
+.term{fill:var(--code); stroke:var(--ink); stroke-width:1.3;}
+.tt{font-family:var(--mono); font-size:12.5px; fill:currentColor;}
+.tm{font-family:var(--mono); font-size:12.5px; fill:var(--muted);}
+.ta{font-family:var(--mono); font-size:12.5px; fill:var(--accent); font-weight:500;}
+.tabon{fill:var(--accent-soft); stroke:var(--accent); stroke-width:1.2;}
+.sel{fill:var(--accent-soft);}
+.div{stroke:var(--line); stroke-width:1.2;}
+.chip{fill:var(--panel); stroke:var(--ink); stroke-width:1;}
+.chip-in{fill:var(--panel); stroke:var(--ink); stroke-width:1; stroke-dasharray:4 3;}
+.ln{stroke:currentColor; stroke-width:1.3; fill:none;}
+.hot{stroke:var(--hot); stroke-width:2; fill:none;}
+.hotfill{fill:var(--hot);}
+.accfill{fill:var(--accent);}
+.inkfill{fill:currentColor;}
+.t{font-family:var(--sans); font-size:13px; font-weight:600; fill:currentColor;}
+.s{font-family:var(--sans); font-size:11px; fill:var(--muted);}
+.m{font-family:var(--mono); font-size:11.5px; fill:currentColor;}
+.lab{font-family:var(--sans); font-size:11px; font-style:italic; fill:var(--muted);}
+.lab-hot{font-family:var(--sans); font-size:11.5px; font-weight:600; fill:var(--hot);}
+.lab-acc{font-family:var(--cond); font-size:13px; font-weight:600; fill:var(--accent);}
+/* code + tables */
+pre{margin:0; background:var(--code); border:1px solid var(--line); border-radius:6px; padding:16px 18px; overflow-x:auto; font-family:var(--mono); font-size:13px; line-height:1.55;}
+pre .c{color:var(--muted);}
+pre .k{color:var(--accent); font-weight:500;}
+.tablewrap{overflow-x:auto; border:1px solid var(--line); border-radius:6px; background:var(--panel);}
+table{border-collapse:collapse; width:100%; font-size:14px; min-width:640px;}
+th,td{text-align:left; vertical-align:top; padding:9px 12px; border-bottom:1px solid var(--line);}
+th{font-family:var(--cond); font-weight:600; font-size:13px; letter-spacing:.03em; color:var(--muted); background:var(--bg);}
+tr:last-child td{border-bottom:none;}
+td.num{font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--muted);}
+.pill{display:inline-block; font-family:var(--mono); font-size:11.5px; padding:1px 7px; border-radius:10px; border:1px solid var(--line); white-space:nowrap;}
+.pill.grow{border-color:var(--accent); color:var(--accent);}
+.pill.port{border-color:var(--ink);}
+.pill.shrink{color:var(--muted);}
+.pill.gen{border-style:dashed;}
+.two{display:grid; grid-template-columns:1fr; gap:18px;}
+@media (max-width:760px){ .two{grid-template-columns:1fr;} .decisions{grid-template-columns:1fr;} }
+ul.rules{margin:0; padding-left:20px; display:flex; flex-direction:column; gap:6px; max-width:74ch;}
+ul.rules b{font-weight:600;}
+
+.stats{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+.stats div{background:var(--panel); padding:14px 16px; display:flex; flex-direction:column; gap:2px;}
+.stats b{font-family:var(--cond); font-size:30px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1.1;}
+.stats span{font-size:13.5px; color:var(--muted); line-height:1.4;}
+@media (max-width:760px){ .stats{grid-template-columns:repeat(2,minmax(0,1fr));} }
+.gaps{display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+.gaps div{background:var(--panel); padding:12px 16px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:16px;}
+.gaps b{font-family:var(--cond); font-weight:600; font-size:15px; display:block; margin-bottom:2px;}
+.gaps p{margin:0; font-size:14px; color:var(--muted); line-height:1.5;}
+.gaps .fix{color:var(--ink);}
+.gaps .fix::before{content:"Proposal: "; font-weight:600; color:var(--accent);}
+@media (max-width:760px){ .gaps div{grid-template-columns:1fr; gap:6px;} }
+td b{font-weight:600;}
+</style>
+</head>
+<body>
+
+<main>
+<div style="border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:10px 14px;font-size:14px;color:var(--muted)">Snapshot of the design conversation of 26 Sep 2026. Where this page and the notes differ, the notes win: <code>spec/design_input/the-index-holds-the-model.md</code>, <code>spec/design_input/the-migration-runs-in-slices.md</code>, <code>spec/design_output/migration.md</code> and <code>spec/rationales/</code>.</div>
+<header>
+  <div class="eyebrow">Order of work · quackitect · 26 Sep 2026</div>
+  <h1>From today's tree <em>to the index</em></h1>
+  <p class="lede">This is the order of the work, and the decisions it rests on. The architecture is on its own page, <a href="the-index-holds-the-model.html">Quackitect Around the Index</a>, and the folder-by-folder findings are on <a href="the-migration-inventory.html">Quackitect Migration Inventory</a>.</p>
+</header>
+
+<section>
+  <h2>How every slice moves</h2>
+  <p class="prose">Everything lands on main, because cloud boxes and routines pull only main, and the cage guards every session, so main never breaks. The new system grows next to the old one and takes over one slice at a time.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Stage</th><th>What happens</th><th>Done when</th></tr></thead>
+      <tbody>
+        <tr><td>build</td><td>The new module is on main, and nothing reads it yet</td><td>its tests and the generic contract tests pass</td></tr>
+        <tr><td>shadow</td><td>Old and new both compute; every mismatch is written to the session log</td><td>zero mismatches for an agreed time</td></tr>
+        <tr><td>switch</td><td>One config key per slice (<code>old</code> / <code>shadow</code> / <code>new</code>) moves the readers over. Rolling back is one commit</td><td>the readers run on the new path</td></tr>
+        <tr><td>delete</td><td>The old code and its tests are removed, in the same ticket group</td><td>no reference to the old path remains</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="prose">Each slice is one ticket group in the existing process. The retro counts files touched per content ticket before and after, to check that changes really do become local.</p>
+</section>
+
+<section>
+  <h2>Phases</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>#</th><th>Phase</th><th>Work</th><th>Done when</th></tr></thead>
+      <tbody>
+        <tr><td class="num">0</td><td><b>Decisions and specs</b></td><td>Write the decisions below into <code>spec/rationales</code>. Write design notes for: the index model (names, providers, folds, input-processing-output, revisions), operations, watchdogs, doors, the hook answer protocol, and declared views</td><td>every open question below is answered</td></tr>
+        <tr><td class="num">1</td><td><b>Foundation</b>, with no change in behaviour</td><td>One Go module and one Go version. modernc SQLite in place of cgo, which removes Zig from the install. The <code>q</code> core: names, providers, folds, snapshots, revisions, operations, leases and watchdogs, <code>quack why</code>. <code>files/</code> from the existing rows. The <code>/v1</code> HTTP door on the index's existing port. The import-rule check. A Windows job in CI. The Go frontmatter writer, plus one normalising commit over all tickets</td><td>the index answers <code>/v1</code> and the old API side by side; the check is green on Linux and Windows</td></tr>
+        <tr><td class="num">2</td><td><b>Pilot:</b> <code>work/open-tasks</code></td><td>2a the cloud marker: opening a group writes <code>cloud: true</code> to its ticket on main, and the merge, release or close clears it. 2b <code>tickets/</code>, ported from <code>index/ticket.go</code>, with one Ask reading and one held rule. 2c <code>plan/</code> and the queue, from <code>pull-outline.js</code> and <code>pull-queue.js</code>. 2d <code>work/rows</code> and <code>work/open-tasks</code>, from <code>work-answer.js</code>. 2e shadow against <code>branch list --json</code>, switch the badge and the TUI header, delete the count chain</td><td>the badge and the work tab's brackets read one name</td></tr>
+        <tr><td class="num">3</td><td><b>Read-only topics</b></td><td><code>cfg/</code> with one resolver, which removes five copies. <code>log/</code> rows, <code>guidance/</code>, and the <code>check/</code> names, reviewing each twin's differences as golden files. Prose checks in Go (golem, an exception list, domain words), with wink as the reference until its differences are accepted</td><td>every JS twin of a Go check is gone</td></tr>
+        <tr><td class="num">4</td><td><b>Actions and the CLI</b></td><td>The generated <code>quack</code> CLI. <code>RUNME.sh</code> sends verbs <code>quack</code> knows to it, and everything else to <code>cli.js</code>. Verbs are ported topic by topic (work, ticket, pull, retro, vehicle) as actions that return operations. The hook module registers the tool list the index generates</td><td>agents no longer shell out to <code>RUNME.sh</code>; <code>cli.js</code> is gone</td></tr>
+        <tr><td class="num">5</td><td><b>The cage</b></td><td>The hooks door, and fold providers for <code>session/</code>. Rules are ported one at a time and checked by replaying recorded session logs. Copilot moves onto the same door, and <code>copilot-runtime.js</code> is deleted. When the index is down, the cage refuses</td><td>the bridge server is gone</td></tr>
+        <tr><td class="num">6</td><td><b>TUI</b></td><td>The generic shell. <code>work.base</code> gains <code>reads</code> and <code>actions</code>; log becomes a declared view. The index and cli tabs</td><td>the TUI's own data paths are gone</td></tr>
+        <tr><td class="num">7</td><td><b>LSP door and checks</b></td><td>The rules move into the <code>check</code> module. A <code>buffers/</code> input for unsaved editor text</td><td>the LSP's own server, port and index client are gone</td></tr>
+        <tr><td class="num">8</td><td><b>Extension</b></td><td>The generic sidebar and form renderer. <code>level0.schema.json</code> is generated</td><td>the extension spawns no verbs and reads no files itself</td></tr>
+        <tr><td class="num">9</td><td><b>Deployment</b></td><td>The doors process, and module processes placed by the system, with watchdogs across processes</td><td>a crash in one part leaves the others running, and raises an alarm</td></tr>
+        <tr><td class="num">10</td><td><b>Node leaves the boxes</b></td><td>The Go prose checks become the only copy, and the webview ships prebuilt</td><td><code>install.sh</code> installs no Node</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Decided</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Decision</th><th>Why, in one line</th></tr></thead>
+      <tbody>
+        <tr><td>The index is the central model, and grows in place</td><td>Its watcher and SQLite already are the input layer; a second one would be the duplication we are removing</td></tr>
+        <tr><td>One owner per name, with a default; alternative providers are chosen by config at start-up</td><td>No value is computed in two places, so no two numbers can disagree</td></tr>
+        <tr><td>Input, processing, output</td><td>Every run reads one consistent snapshot, costs one round trip, and commits all its outputs at once</td></tr>
+        <tr><td>The wiring analyzer, <code>quack why</code></td><td>Any name answers who writes it, who reads it, where it comes from, and which file holds the function</td></tr>
+        <tr><td>Doors on both sides, one file each, with the fake inside</td><td>Only doors cross the boundary; adding an adapter adds one file</td></tr>
+        <tr><td>Go core; JS only for the extension and the hook module</td><td>Those two run inside VS Code and Claude Code</td></tr>
+        <tr><td>Huma and OpenAPI 3.1 for the HTTP door</td><td>A module stays one file, and <code>/docs</code> and <code>openapi.json</code> come with it</td></tr>
+        <tr><td><b>modernc (pure-Go SQLite). cgo is out</b></td><td>No C compiler and no Zig, one static binary. Final; not to be reopened</td></tr>
+        <tr><td><b>One Go module</b></td><td>Packages separate the code, and a module is only a release unit. Final; not to be reopened</td></tr>
+        <tr><td>Views are declared, not generated per topic</td><td>Work and log are real views; <code>.base</code> files grow <code>reads</code> and <code>actions</code></td></tr>
+        <tr><td>Watchdogs and dead-man switches on every part</td><td>A silent part turns stale and loud; it never looks healthy</td></tr>
+        <tr><td><b>The cage refuses while the index is down</b></td><td>Failures should be loud, so they get fixed early</td></tr>
+        <tr><td>Only Go writes frontmatter, after one normalising commit</td><td>Five parsers and three writers become one of each</td></tr>
+        <tr><td>Every pair of duplicate implementations is reviewed as golden files before its JS copy goes</td><td>Several pairs already disagree</td></tr>
+        <tr><td>Prose checks move to Go</td><td>They are the last runtime reason for Node. golem agrees with wink on 97–99% of the decisions measured</td></tr>
+        <tr><td><b>Operations: every longer action returns a handle</b> (<code>ops/&lt;id&gt;</code>)</td><td>The caller never blocks. The watchdog ends a stuck operation loudly. Writes queue one at a time per tree. Only recent operations are kept; the session log keeps every state change for good</td></tr>
+        <tr><td><b>How modules are split into processes is the system's choice</b></td><td>Module authors and users never see it. A module is always one self-contained file, and the system places modules in processes so the cores are used well and a crash stays contained</td></tr>
+        <tr><td><b>A group in the cloud is marked in its ticket on main</b></td><td>Sending a group to the cloud writes <code>cloud: true</code> into its ticket on main; merging it back, or releasing or closing the branch, clears it. The queue and the count read only files</td></tr>
+        <tr><td><b>Git is archive and transport, never live input</b></td><td>No live value in the index depends on git state. Commits and pushes are actions through the git door. Reading the archive (old logs, closed work, history) is an explicit operation through the git door, which the caller asks for by name; it is not in the index</td></tr>
+        <tr><td>Linux and Windows behave the same</td><td>Cloud boxes run Linux; some people work on Windows</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Open</h2>
+  <p class="prose">Nothing is open right now. New questions go here as the specs in phase 0 raise them.</p>
+</section>
+</main>
+
+</body>
+</html>

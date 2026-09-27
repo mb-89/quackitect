@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quackitect Around the Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --bg:#F4F6F3; --panel:#FFFFFF; --ink:#18201C; --muted:#5A665F; --line:#CDD5CF;
+  --accent:#A95A14; --accent-soft:#F5E6D4; --door-bg:#E2E9EF; --hot:#B23A2A; --code:#EAEEE9;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --cond:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111613; --panel:#19201C; --ink:#E3E9E4; --muted:#9AA79F; --line:#34403A;
+    --accent:#E59A4C; --accent-soft:#3B2B1B; --door-bg:#1E2A33; --hot:#F07A66; --code:#1D2521;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111613; --panel:#19201C; --ink:#E3E9E4; --muted:#9AA79F; --line:#34403A;
+  --accent:#E59A4C; --accent-soft:#3B2B1B; --door-bg:#1E2A33; --hot:#F07A66; --code:#1D2521;
+  color-scheme:dark;
+}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:15.5px; line-height:1.6; padding-inline:16px; padding-block:40px 72px;}
+main{max-width:1000px; margin:0 auto; display:flex; flex-direction:column; gap:56px;}
+.prose{max-width:68ch;}
+header{display:flex; flex-direction:column; gap:14px;}
+.eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);}
+h1{font-family:var(--cond); font-weight:600; font-size:clamp(30px,5vw,46px); line-height:1.08; margin:0; text-wrap:balance;}
+h1 em{font-style:normal; color:var(--accent);}
+h2{font-family:var(--cond); font-weight:600; font-size:25px; line-height:1.2; margin:0 0 10px; text-wrap:balance;}
+p{margin:0 0 12px;}
+.lede{font-size:18px; color:var(--ink); max-width:62ch; margin:0;}
+section{display:flex; flex-direction:column; gap:14px;}
+code,.mono{font-family:var(--mono); font-size:.9em;}
+p code, li code, td code{background:var(--code); padding:1px 5px; border-radius:3px;}
+.decisions{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+.decisions div{background:var(--panel); padding:14px 16px; display:flex; flex-direction:column; gap:4px;}
+.decisions b{font-family:var(--cond); font-weight:600; font-size:15px;}
+.decisions span{color:var(--muted); font-size:14px; line-height:1.45;}
+figure{margin:0; display:flex; flex-direction:column; gap:10px;}
+.scroll{overflow-x:auto; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:12px;}
+.scroll svg{display:block; width:100%; min-width:760px; height:auto; color:var(--ink);}
+figcaption{font-size:14px; color:var(--muted); max-width:78ch; line-height:1.5;}
+figcaption ol{margin:6px 0 0; padding-left:22px;}
+/* svg classes */
+.bx{fill:var(--panel); stroke:var(--line); stroke-width:1.2;}
+.bx-strong{fill:var(--panel); stroke:var(--ink); stroke-width:1.2;}
+.bx-accent{fill:var(--accent-soft); stroke:var(--accent); stroke-width:1.6;}
+.frame{fill:none; stroke:var(--muted); stroke-width:1; stroke-dasharray:5 4;}
+.frame-accent{fill:none; stroke:var(--accent); stroke-width:2;}
+.door{fill:var(--door-bg); stroke:var(--ink); stroke-width:1.3;}
+.fake{fill:var(--bg); stroke:var(--muted); stroke-width:1; stroke-dasharray:3 2;}
+.fk{font-family:var(--mono); font-size:10.5px; fill:var(--muted);}
+.lab-door{font-family:var(--cond); font-size:12.5px; font-weight:600; fill:currentColor;}
+.term{fill:var(--code); stroke:var(--ink); stroke-width:1.3;}
+.tt{font-family:var(--mono); font-size:12.5px; fill:currentColor;}
+.tm{font-family:var(--mono); font-size:12.5px; fill:var(--muted);}
+.ta{font-family:var(--mono); font-size:12.5px; fill:var(--accent); font-weight:500;}
+.tabon{fill:var(--accent-soft); stroke:var(--accent); stroke-width:1.2;}
+.sel{fill:var(--accent-soft);}
+.div{stroke:var(--line); stroke-width:1.2;}
+.proc{fill:var(--panel); stroke:var(--ink); stroke-width:1.3;}
+.chip{fill:var(--panel); stroke:var(--ink); stroke-width:1;}
+.chip-in{fill:var(--panel); stroke:var(--ink); stroke-width:1; stroke-dasharray:4 3;}
+.ln{stroke:currentColor; stroke-width:1.3; fill:none;}
+.hot{stroke:var(--hot); stroke-width:2; fill:none;}
+.hotfill{fill:var(--hot);}
+.accfill{fill:var(--accent);}
+.inkfill{fill:currentColor;}
+.t{font-family:var(--sans); font-size:13px; font-weight:600; fill:currentColor;}
+.s{font-family:var(--sans); font-size:11px; fill:var(--muted);}
+.m{font-family:var(--mono); font-size:11.5px; fill:currentColor;}
+.lab{font-family:var(--sans); font-size:11px; font-style:italic; fill:var(--muted);}
+.lab-hot{font-family:var(--sans); font-size:11.5px; font-weight:600; fill:var(--hot);}
+.lab-acc{font-family:var(--cond); font-size:13px; font-weight:600; fill:var(--accent);}
+/* code + tables */
+pre{margin:0; background:var(--code); border:1px solid var(--line); border-radius:6px; padding:16px 18px; overflow-x:auto; font-family:var(--mono); font-size:13px; line-height:1.55;}
+pre .c{color:var(--muted);}
+pre .k{color:var(--accent); font-weight:500;}
+.tablewrap{overflow-x:auto; border:1px solid var(--line); border-radius:6px; background:var(--panel);}
+table{border-collapse:collapse; width:100%; font-size:14px; min-width:640px;}
+th,td{text-align:left; vertical-align:top; padding:9px 12px; border-bottom:1px solid var(--line);}
+th{font-family:var(--cond); font-weight:600; font-size:13px; letter-spacing:.03em; color:var(--muted); background:var(--bg);}
+tr:last-child td{border-bottom:none;}
+td.num{font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--muted);}
+.pill{display:inline-block; font-family:var(--mono); font-size:11.5px; padding:1px 7px; border-radius:10px; border:1px solid var(--line); white-space:nowrap;}
+.pill.grow{border-color:var(--accent); color:var(--accent);}
+.pill.port{border-color:var(--ink);}
+.pill.shrink{color:var(--muted);}
+.pill.gen{border-style:dashed;}
+.two{display:grid; grid-template-columns:1fr; gap:18px;}
+@media (max-width:760px){ .two{grid-template-columns:1fr;} .decisions{grid-template-columns:1fr;} }
+ul.rules{margin:0; padding-left:20px; display:flex; flex-direction:column; gap:6px; max-width:74ch;}
+ul.rules b{font-weight:600;}
+</style>
+</head>
+<body>
+
+
+<main>
+<div style="border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:10px 14px;font-size:14px;color:var(--muted)">Snapshot of the design conversation of 26 Sep 2026. Where this page and the notes differ, the notes win: <code>spec/design_input/the-index-holds-the-model.md</code>, <code>spec/design_input/the-migration-runs-in-slices.md</code>, <code>spec/design_output/migration.md</code> and <code>spec/rationales/</code>.</div>
+<header>
+  <div class="eyebrow">Architecture sketch · quackitect · 26 Sep 2026</div>
+  <h1>Quackitect around <em>the index</em></h1>
+  <p class="lede">The index is one process that owns every value quackitect knows. Modules compute values and doors connect to the outside, each in its own process. The sidebar, the TUI, the CLI, hooks and any script read a value by name from the index; none of them compute it themselves.</p>
+</header>
+
+<section>
+  <h2>Decided so far</h2>
+  <div class="decisions">
+    <div><b>The index is the model</b><span>The whole central model. Files are one topic in it, <code>files/</code>.</span></div>
+    <div><b>One owner per name</b><span>Each name has one provider and a default. Alternative calculations are chosen by config at start-up, and no names are added at runtime.</span></div>
+    <div><b>Three kinds of process</b><span>One doors process, one index process, and one process per module topic, so a machine with many small cores runs them side by side.</span></div>
+    <div><b>Go core, JS satellites</b><span>JS stays only where a JS runtime is required: the VS Code extension and the function-hook module.</span></div>
+    <div><b>Huma for the HTTP door</b><span>OpenAPI 3.1 and the <code>/docs</code> page come with it. A module is one file that registers itself.</span></div>
+    <div><b>Pure-Go SQLite, one Go module</b><span>No cgo and no Zig. Measured at 1.3k, 20k and 50k files: about 1.2–1.4× slower than cgo, under 1 ms per query either way. One module, with packages for boundaries.</span></div>
+    <div><b>Watchdogs on everything</b><span>Every process and door has a dead-man switch. Silence past its deadline marks its names stale, restarts it, and raises an alarm. The cage refuses while the index is down.</span></div>
+    <div><b>Linux and Windows</b><span>Cloud boxes run Linux, and some people work on Windows. Both behave the same, and CI tests both.</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Today</h2>
+  <p class="prose">Five long-running processes, four of them with their own loopback port, in two languages. Three of them parse tickets on their own. The red path is how the sidebar's open-task count is computed today.</p>
+  <figure>
+    <div class="scroll">
+<svg viewBox="0 0 960 460" role="img" aria-label="Today: the sidebar count crosses from the VS Code extension through a Node verb into the Go TUI binary, which spawns another Node verb, while LSP, bridge, index and TUI each run as separate processes with their own ports.">
+      <defs>
+        <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="inkfill"/></marker>
+        <marker id="h1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="hotfill"/></marker>
+      </defs>
+      <!-- host frames -->
+      <rect class="frame" x="20" y="40" width="300" height="112" rx="6"/>
+      <text class="s" x="32" y="58">VS Code window</text>
+      <rect class="frame" x="340" y="40" width="280" height="112" rx="6"/>
+      <text class="s" x="352" y="58">Claude Code session</text>
+      <rect class="frame" x="640" y="40" width="300" height="112" rx="6"/>
+      <text class="s" x="652" y="58">Terminal</text>
+      <!-- inner boxes -->
+      <rect class="bx" x="36" y="70" width="268" height="64" rx="4"/>
+      <text class="t" x="170" y="97" text-anchor="middle">extension (JS)</text>
+      <text class="s" x="170" y="117" text-anchor="middle">sidebar · lens · route webview</text>
+      <rect class="bx" x="356" y="70" width="248" height="64" rx="4"/>
+      <text class="t" x="480" y="97" text-anchor="middle">level0 hook module (JS)</text>
+      <text class="s" x="480" y="117" text-anchor="middle">in-process · forwards every event</text>
+      <rect class="bx" x="656" y="70" width="268" height="64" rx="4"/>
+      <text class="t" x="790" y="97" text-anchor="middle">cli.js verbs (Node)</text>
+      <text class="s" x="790" y="117" text-anchor="middle">via RUNME.sh · one process per call</text>
+      <!-- resident processes -->
+      <rect class="bx-strong" x="20" y="230" width="200" height="70" rx="4"/>
+      <text class="t" x="120" y="259" text-anchor="middle">LSP server (Go)</text>
+      <text class="s" x="120" y="279" text-anchor="middle">stdio + own port</text>
+      <rect class="bx-strong" x="250" y="230" width="200" height="70" rx="4"/>
+      <text class="t" x="350" y="259" text-anchor="middle">bridge server (Node)</text>
+      <text class="s" x="350" y="279" text-anchor="middle">own port · 30 doors</text>
+      <rect class="bx-strong" x="480" y="230" width="200" height="70" rx="4"/>
+      <text class="t" x="580" y="259" text-anchor="middle">index (Go)</text>
+      <text class="s" x="580" y="279" text-anchor="middle">own port · SQLite · fsnotify</text>
+      <rect class="bx-strong" x="740" y="230" width="200" height="70" rx="4"/>
+      <text class="t" x="840" y="259" text-anchor="middle">TUI window (Go)</text>
+      <text class="s" x="840" y="279" text-anchor="middle">own port · also answers --count</text>
+      <!-- bottom -->
+      <rect class="bx" x="20" y="380" width="330" height="58" rx="4"/>
+      <text class="m" x="185" y="404" text-anchor="middle">spec/config/level0.schema.json</text>
+      <text class="s" x="185" y="424" text-anchor="middle">read by 4 readers: extension, bridge, lsp, Go config</text>
+      <rect class="bx" x="480" y="380" width="460" height="58" rx="4"/>
+      <text class="t" x="710" y="404" text-anchor="middle">the tree on disk + git</text>
+      <text class="s" x="710" y="424" text-anchor="middle">Vale · Biome · go run as separate tools</text>
+      <!-- normal arrows -->
+      <path class="ln" d="M120 134 L120 226" marker-end="url(#a1)"/>
+      <text class="lab" x="128" y="186">stdio</text>
+      <path class="ln" d="M430 134 L370 226" marker-end="url(#a1)"/>
+      <text class="lab" x="410" y="186">POST /event</text>
+      <path class="ln" d="M450 265 L476 265" marker-end="url(#a1)"/>
+      <text class="lab" x="463" y="222" text-anchor="middle">reads</text>
+      <path class="ln" d="M120 300 L120 340 L560 340 L560 304" marker-end="url(#a1)"/>
+      <text class="lab" x="340" y="356" text-anchor="middle">reads the tree, follows its changes</text>
+      <path class="ln" d="M720 134 L620 226" marker-end="url(#a1)"/>
+      <text class="lab" x="660" y="170" text-anchor="end">doors/index.js</text>
+      <path class="ln" d="M740 265 L684 265" marker-end="url(#a1)"/>
+      <text class="lab" x="712" y="222" text-anchor="middle">rows</text>
+      <path class="ln" d="M620 300 L620 376" marker-end="url(#a1)"/>
+      <text class="lab" x="628" y="345">watches · writes rows</text>
+      <!-- hot path: the count -->
+      <path class="hot" d="M240 70 L240 24 L800 24 L800 66" marker-end="url(#h1)"/>
+      <text class="lab-hot" x="520" y="17" text-anchor="middle">① tui work --count</text>
+      <path class="hot" d="M830 134 L830 226" marker-end="url(#h1)"/>
+      <text class="lab-hot" x="822" y="186" text-anchor="end">② --count</text>
+      <path class="hot" d="M895 230 L895 138" marker-end="url(#h1)"/>
+      <text class="lab-hot" x="903" y="186">③ places</text>
+    </svg>
+    </div>
+    <figcaption>The sidebar count today, in red:
+      <ol>
+        <li>The extension runs <code>./RUNME.sh tui work --count</code>, which starts a Node process.</li>
+        <li><code>tui.js</code> starts the Go TUI binary with <code>--count</code>.</li>
+        <li>The Go binary starts another Node verb to learn the places, then prints JSON. The JSON is passed back through two stdouts to the sidebar.</li>
+      </ol>
+      The TUI's own tab header computed the same number a different way. That is why the two numbers disagreed, and why the fix touched 11 files.
+    </figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Target</h2>
+  <p class="prose">A door is anything that crosses the boundary, so each one is drawn half inside and half outside. Inbound doors let the outside reach quackitect: LSP, hooks, MCP, HTTP, SSE. Outbound doors let quackitect reach the outside: disk, git, processes, the clock, file watching, Vale, Biome. All doors run in one doors process, which translates between each outside protocol and the internal one. The index process holds the model. Each module topic runs in its own process, reads names from the index, and provides names back to it.</p>
+  <figure>
+    <div class="scroll">
+<svg viewBox="0 0 960 640" role="img" aria-label="Target: clients reach quackitect only through inbound doors that straddle the boundary. Inside, all doors run in one doors process, the index is one process holding the model, and each module topic is its own process. The index reaches the outside only through outbound doors that also straddle the boundary.">
+<defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="inkfill"/></marker></defs>
+<rect class="bx" x="20" y="12" width="172" height="50" rx="4"/>
+<text class="t" x="106" y="33" text-anchor="middle">VS Code extension</text>
+<text class="s" x="106" y="51" text-anchor="middle">JS · sidebar + views</text>
+<rect class="bx" x="207" y="12" width="172" height="50" rx="4"/>
+<text class="t" x="293" y="33" text-anchor="middle">Claude Code · Copilot</text>
+<text class="s" x="293" y="51" text-anchor="middle">hook module · command hooks</text>
+<rect class="bx" x="394" y="12" width="172" height="50" rx="4"/>
+<text class="m" x="480" y="33" text-anchor="middle">quack tui</text>
+<text class="s" x="480" y="51" text-anchor="middle">Go · generic shell + views</text>
+<rect class="bx" x="581" y="12" width="172" height="50" rx="4"/>
+<text class="m" x="667" y="33" text-anchor="middle">quack work pull</text>
+<text class="s" x="667" y="51" text-anchor="middle">Go · CLI</text>
+<rect class="bx" x="768" y="12" width="172" height="50" rx="4"/>
+<text class="t" x="854" y="33" text-anchor="middle">any script</text>
+<text class="s" x="854" y="51" text-anchor="middle">Python, … via OpenAPI</text>
+<path class="ln" d="M106 62 L113 96" marker-end="url(#a2)"/>
+<text class="lab" x="118" y="84">socket</text>
+<path class="ln" d="M280 62 L295 96" marker-end="url(#a2)"/>
+<text class="lab" x="282" y="84" text-anchor="end">events · tools</text>
+<path class="ln" d="M312 62 L470 96" marker-end="url(#a2)"/>
+<text class="lab" x="400" y="72">Copilot tools</text>
+<path class="ln" d="M480 62 L480 80 M667 62 L667 80 M854 62 L854 80 M480 80 L854 80"/>
+<path class="ln" d="M661 80 L661 96" marker-end="url(#a2)"/>
+<path class="ln" d="M843 80 L843 96" marker-end="url(#a2)"/>
+<text class="lab" x="752" y="92" text-anchor="middle">call · watch</text>
+<rect class="frame-accent" x="20" y="124" width="920" height="396" rx="8"/>
+<path class="ln" d="M115 148 L115 170"/>
+<path class="ln" d="M297 148 L297 170"/>
+<path class="ln" d="M479 148 L479 170"/>
+<path class="ln" d="M661 148 L661 170"/>
+<path class="ln" d="M843 148 L843 170"/>
+<path class="ln" d="M115 170 L843 170"/>
+<path class="ln" d="M480 170 L480 196" marker-end="url(#a2)"/>
+<text class="lab" x="490" y="188">internal protocol</text>
+<text class="lab-door" x="124" y="162">doors process</text>
+<text class="lab-door" x="110" y="484">doors process</text>
+<rect class="door" x="40" y="100" width="150" height="48" rx="4"/>
+<text class="t" x="115" y="119" text-anchor="middle">LSP</text>
+<rect class="fake" x="93" y="126" width="44" height="15" rx="7"/><text class="fk" x="115" y="137" text-anchor="middle">fake</text>
+<rect class="door" x="222" y="100" width="150" height="48" rx="4"/>
+<text class="t" x="297" y="119" text-anchor="middle">hooks</text>
+<rect class="fake" x="275" y="126" width="44" height="15" rx="7"/><text class="fk" x="297" y="137" text-anchor="middle">fake</text>
+<rect class="door" x="404" y="100" width="150" height="48" rx="4"/>
+<text class="t" x="479" y="119" text-anchor="middle">MCP</text>
+<rect class="fake" x="457" y="126" width="44" height="15" rx="7"/><text class="fk" x="479" y="137" text-anchor="middle">fake</text>
+<rect class="door" x="586" y="100" width="150" height="48" rx="4"/>
+<text class="t" x="661" y="119" text-anchor="middle">HTTP + /docs</text>
+<rect class="fake" x="639" y="126" width="44" height="15" rx="7"/><text class="fk" x="661" y="137" text-anchor="middle">fake</text>
+<rect class="door" x="768" y="100" width="150" height="48" rx="4"/>
+<text class="t" x="843" y="119" text-anchor="middle">SSE watch</text>
+<rect class="fake" x="821" y="126" width="44" height="15" rx="7"/><text class="fk" x="843" y="137" text-anchor="middle">fake</text>
+<rect class="bx-accent" x="300" y="200" width="360" height="204" rx="6"/>
+<text class="t" x="480" y="226" text-anchor="middle">index process</text>
+<text class="s" x="480" y="246" text-anchor="middle">names · one provider each · defaults</text>
+<text class="s" x="480" y="263" text-anchor="middle">dependency tracking · pushes only changes</text>
+<text class="s" x="480" y="280" text-anchor="middle">holds files/ · SQLite inside</text>
+<line class="div" x1="324" y1="296" x2="636" y2="296"/>
+<text class="m" x="324" y="320">work/open-tasks</text><text class="m" x="636" y="320" text-anchor="end" style="fill:var(--accent)">3</text>
+<text class="m" x="324" y="340">tickets/x</text><text class="m" x="636" y="340" text-anchor="end" style="fill:var(--accent)">{state: open, …}</text>
+<text class="m" x="324" y="360">files/spec/tickets/x.md</text><text class="m" x="636" y="360" text-anchor="end" style="fill:var(--accent)">"---\nkind: …"</text>
+<text class="m" x="324" y="380">cfg/work/score-refused</text><text class="m" x="636" y="380" text-anchor="end" style="fill:var(--accent)">3</text>
+<text class="lab-door" x="40" y="194">module processes</text>
+<text class="lab-door" x="920" y="194" text-anchor="end">module processes</text>
+<rect class="proc" x="40" y="204" width="180" height="44" rx="4"/>
+<text class="m" x="130" y="231" text-anchor="middle">work</text>
+<path class="ln" d="M224 226 L296 226" marker-start="url(#a2)" marker-end="url(#a2)"/>
+<rect class="proc" x="40" y="256" width="180" height="44" rx="4"/>
+<text class="m" x="130" y="283" text-anchor="middle">pull</text>
+<path class="ln" d="M224 278 L296 278" marker-start="url(#a2)" marker-end="url(#a2)"/>
+<rect class="proc" x="40" y="308" width="180" height="44" rx="4"/>
+<text class="m" x="130" y="335" text-anchor="middle">hold</text>
+<path class="ln" d="M224 330 L296 330" marker-start="url(#a2)" marker-end="url(#a2)"/>
+<rect class="proc" x="40" y="360" width="180" height="44" rx="4"/>
+<text class="m" x="130" y="387" text-anchor="middle">ask</text>
+<path class="ln" d="M224 382 L296 382" marker-start="url(#a2)" marker-end="url(#a2)"/>
+<rect class="proc" x="740" y="204" width="180" height="44" rx="4"/>
+<text class="m" x="830" y="231" text-anchor="middle">check</text>
+<path class="ln" d="M664 226 L736 226" marker-start="url(#a2)" marker-end="url(#a2)"/>
+<rect class="proc" x="740" y="256" width="180" height="44" rx="4"/>
+<text class="m" x="830" y="283" text-anchor="middle">retro</text>
+<path class="ln" d="M664 278 L736 278" marker-start="url(#a2)" marker-end="url(#a2)"/>
+<rect class="proc" x="740" y="308" width="180" height="44" rx="4"/>
+<text class="m" x="830" y="335" text-anchor="middle">guidance</text>
+<path class="ln" d="M664 330 L736 330" marker-start="url(#a2)" marker-end="url(#a2)"/>
+<rect class="proc" x="740" y="360" width="180" height="44" rx="4"/>
+<text class="m" x="830" y="387" text-anchor="middle">vehicle</text>
+<path class="ln" d="M664 382 L736 382" marker-start="url(#a2)" marker-end="url(#a2)"/>
+<text class="lab" x="260" y="252" text-anchor="middle">get · provide</text>
+<text class="lab" x="700" y="252" text-anchor="middle">get · provide</text>
+<path class="ln" d="M480 404 L480 460"/>
+<path class="ln" d="M96 460 L864 460"/>
+<path class="ln" d="M96 460 L96 492" marker-end="url(#a2)"/>
+<path class="ln" d="M224 460 L224 492" marker-end="url(#a2)"/>
+<path class="ln" d="M352 460 L352 492" marker-end="url(#a2)"/>
+<path class="ln" d="M480 460 L480 492" marker-end="url(#a2)"/>
+<path class="ln" d="M608 460 L608 492" marker-end="url(#a2)"/>
+<path class="ln" d="M736 460 L736 492" marker-end="url(#a2)"/>
+<path class="ln" d="M864 460 L864 492" marker-end="url(#a2)"/>
+<text class="lab" x="490" y="440">door calls · file events</text>
+<text class="lab-acc" x="40" y="446">quackitect · inside, everything speaks the internal protocol</text>
+<rect class="door" x="40" y="496" width="112" height="48" rx="4"/>
+<text class="t" x="96" y="515" text-anchor="middle">disk</text>
+<rect class="fake" x="74" y="522" width="44" height="15" rx="7"/><text class="fk" x="96" y="533" text-anchor="middle">fake</text>
+<rect class="door" x="168" y="496" width="112" height="48" rx="4"/>
+<text class="t" x="224" y="515" text-anchor="middle">git</text>
+<rect class="fake" x="202" y="522" width="44" height="15" rx="7"/><text class="fk" x="224" y="533" text-anchor="middle">fake</text>
+<rect class="door" x="296" y="496" width="112" height="48" rx="4"/>
+<text class="t" x="352" y="515" text-anchor="middle">proc</text>
+<rect class="fake" x="330" y="522" width="44" height="15" rx="7"/><text class="fk" x="352" y="533" text-anchor="middle">fake</text>
+<rect class="door" x="424" y="496" width="112" height="48" rx="4"/>
+<text class="t" x="480" y="515" text-anchor="middle">clock</text>
+<rect class="fake" x="458" y="522" width="44" height="15" rx="7"/><text class="fk" x="480" y="533" text-anchor="middle">fake</text>
+<rect class="door" x="552" y="496" width="112" height="48" rx="4"/>
+<text class="t" x="608" y="515" text-anchor="middle">watch</text>
+<rect class="fake" x="586" y="522" width="44" height="15" rx="7"/><text class="fk" x="608" y="533" text-anchor="middle">fake</text>
+<rect class="door" x="680" y="496" width="112" height="48" rx="4"/>
+<text class="t" x="736" y="515" text-anchor="middle">Vale</text>
+<rect class="fake" x="714" y="522" width="44" height="15" rx="7"/><text class="fk" x="736" y="533" text-anchor="middle">fake</text>
+<rect class="door" x="808" y="496" width="112" height="48" rx="4"/>
+<text class="t" x="864" y="515" text-anchor="middle">Biome</text>
+<rect class="fake" x="842" y="522" width="44" height="15" rx="7"/><text class="fk" x="864" y="533" text-anchor="middle">fake</text>
+<path class="ln" d="M96 544 L96 566"/>
+<path class="ln" d="M224 544 L224 566"/>
+<path class="ln" d="M352 544 L352 566"/>
+<path class="ln" d="M480 544 L480 566"/>
+<path class="ln" d="M608 544 L608 566"/>
+<path class="ln" d="M736 544 L736 566"/>
+<path class="ln" d="M864 544 L864 566"/>
+<path class="ln" d="M96 566 L864 566"/>
+<path class="ln" d="M480 566 L480 592" marker-end="url(#a2)"/>
+<text class="lab" x="490" y="584">real in use, fake in tests</text>
+<rect class="bx" x="300" y="596" width="360" height="34" rx="4"/>
+<text class="t" x="480" y="618" text-anchor="middle">outside: the tree on disk, git, Vale, Biome</text>
+</svg>
+    </div>
+    <figcaption>Every door carries its own fake. <code>/docs</code> is not a door of its own: Huma serves it as part of the HTTP door. Module processes never touch the outside. They read file contents from <code>files/</code> in the index, and they change the world by calling a door. Claude Code gets its tools through the hook module; Copilot has no function hooks, so it gets the same tools over MCP.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Why separate processes</h2>
+  <p class="prose">Go doesn't need separate processes to use every core. Inside one Go process, the runtime spreads goroutines over as many OS threads as the machine has cores. So the reason to split is isolation, not speed:</p>
+  <ul class="rules">
+    <li><b>A crash stays in one module.</b> If the <code>retro</code> process dies, the index keeps running, and <code>retro/*</code> names show their defaults marked as not provided until it restarts.</li>
+    <li><b>A changed module restarts alone.</b> Edit a file in <code>modules/work/</code>, and only the work process rebuilds and restarts. The index stays warm with every file already loaded.</li>
+    <li><b>The boundary is enforced by the OS, not by discipline.</b> A module process has no way to reach disk or git except through the doors process.</li>
+  </ul>
+  <p class="prose">The cost: every read by a module crosses a local socket, which takes tens of microseconds, and values must be serialized. Someone also has to supervise the processes. The index can do that: it starts the module processes, restarts them, and knows which names each one provides.</p>
+</section>
+
+<section>
+  <h2>A module is one file</h2>
+  <p class="prose">A topic folder is one module process. Drop a file into <code>modules/work/</code>, and the work process picks it up at its next build: Go compiles every file in the folder into the same package, and <code>init()</code> registers the name. The module never mentions Huma, MCP or VS Code; only the doors know about those.</p>
+<pre><span class="c">// modules/work/open_tasks.go, the whole module</span>
+<span class="k">package</span> work
+
+<span class="k">import</span> "quackitect/index/q"
+
+<span class="k">type</span> openTasksIn <span class="k">struct</span> {
+	Places Places `q:"work/places"`            <span class="c">// input: declared, delivered as one snapshot</span>
+}
+
+<span class="k">var</span> OpenTasks = q.Derived("work/open-tasks", 0,
+	q.Doc("The tickets this box can take: the number in the work tab's brackets."),
+	q.Show(q.Badge{On: "work/editor"}),
+	<span class="k">func</span>(in openTasksIn) (int, error) {     <span class="c">// processing: pure, no index access</span>
+		<span class="k">return</span> in.Places.Takeable, nil          <span class="c">// output: committed at once</span>
+	})
+
+<span class="c">// an alternative calculation lives in its own file,
+// open_tasks_cloud.go, and config picks one at start-up:
+//   q.Provide(OpenTasks, "cloud", cloudCount)
+// input · processing · output: one snapshot in, pure work, one commit out.
+// `quack why work/open-tasks` shows this file, its inputs and its readers.</span></pre>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Where it shows up</th><th>What that one file gives it</th></tr></thead>
+      <tbody>
+        <tr><td>CLI</td><td><code>quack get work/open-tasks</code>, help from <code>Doc</code></td></tr>
+        <tr><td>HTTP door</td><td><code>GET /v1/values/work/open-tasks</code>, typed in the OpenAPI spec and on <code>/docs</code></td></tr>
+        <tr><td>SSE door</td><td>a stream that pushes only on change</td></tr>
+        <tr><td>Hook module, MCP door</td><td>readable by Claude, Copilot and other agents</td></tr>
+        <tr><td>VS Code</td><td>the badge on the work editor button</td></tr>
+        <tr><td>TUI</td><td>the value and its help in the index tab</td></tr>
+        <tr><td>Start-up checks</td><td>unique name, default present, one provider</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Views are declared once</h2>
+  <p class="prose">Generating one tab per topic doesn't work: quackitect has two real views today, log and work, and neither is a form. So views are declared, not generated. The work editor already is half-declared. <code>spec/views/work.base</code> names its columns, flag letters, presets, filters and sorts, and <code>src/tui/tree</code> draws any base file. What the file doesn't say yet is which name the view reads and which actions its buttons and keys call. Adding that makes the view complete:</p>
+<pre><span class="c"># spec/views/work.base: what it holds today (excerpt)</span>
+columnSize: { name: 44, flags: 6, queue: 6 }
+flags:
+  - { letter: U, key: urgent, tone: bad }
+  - { letter: C, key: cloud }
+groups:
+  - name: queue
+    pressed: true
+    filters: [ { queue: /./ } ]
+    sort:    [ { key: queue } ]
+
+<span class="c"># sketch: what makes it a complete view</span>
+<span class="k">reads</span>: work/rows
+<span class="k">actions</span>:
+  - { key: p,     calls: work/place }      <span class="c"># the place chord</span>
+  - { key: enter, edits: cell }
+  - { button: pull, calls: work/pull }</pre>
+  <p class="prose">A renderer implements "base view" once, and every declared view works in it. The TUI is the first renderer. A web renderer, or the VS Code webview, could come later and show the same work editor from the same file.</p>
+</section>
+
+<section>
+  <h2>The TUI</h2>
+  <p class="prose">pylib's idea carries over: the TUI is the CLI with tabs, and nothing is written twice. Tabs on the left are declared views. Tabs on the right are generic and the same in every tool built on quackitect:</p>
+  <ul class="rules">
+    <li><b>index</b>: every name with its value, provider, and whether it's provided or still the default, updating live.</li>
+    <li><b>cli</b>: the full command tree, as in pylib.</li>
+    <li><b>help</b>.</li>
+  </ul>
+  <figure>
+    <div class="scroll">
+<svg viewBox="0 0 960 400" role="img" aria-label="The quackitect TUI: declared views on the left (work and log), generic tabs on the right (index, cli, help). The cli tab shows the command tree, a form for the selected action, and the command line it equals.">
+<text class="lab-door" x="24" y="16">views · declared, one base file each</text>
+<text class="lab-door" x="936" y="16" text-anchor="end">generic · the same in every quackitect tool</text>
+<rect class="term" x="20" y="26" width="920" height="360" rx="6"/>
+<text class="tt" x="39" y="50" xml:space="preserve">work</text>
+<text class="tt" x="97" y="50" xml:space="preserve">log</text>
+<line class="div" x1="672" y1="36" x2="672" y2="54"/>
+<text class="tm" x="709" y="50" xml:space="preserve">index</text>
+<rect class="tabon" x="764" y="34" width="41" height="22" rx="3"/>
+<text class="ta" x="773" y="50" xml:space="preserve">cli</text>
+<text class="tm" x="825" y="50" xml:space="preserve">help</text>
+<line class="div" x1="20" y1="64" x2="940" y2="64"/>
+<line class="div" x1="560" y1="64" x2="560" y2="358"/>
+<text class="tt" x="36" y="90" xml:space="preserve">▾ work</text>
+<rect class="sel" x="28" y="99" width="524" height="21"/>
+<text class="ta" x="36" y="114" xml:space="preserve">    ▸ pull</text>
+<text class="tm" x="190" y="114" xml:space="preserve">take the next leaf of a ticket</text>
+<text class="tt" x="36" y="138" xml:space="preserve">      new</text>
+<text class="tm" x="190" y="138" xml:space="preserve">write a new ticket</text>
+<text class="tt" x="36" y="162" xml:space="preserve">      merge</text>
+<text class="tm" x="190" y="162" xml:space="preserve">take a done branch into trunk</text>
+<text class="tt" x="36" y="186" xml:space="preserve">      unblock</text>
+<text class="tm" x="190" y="186" xml:space="preserve">hand a person's work out of its branch</text>
+<text class="tt" x="36" y="210" xml:space="preserve">▸ hold</text>
+<text class="tt" x="36" y="234" xml:space="preserve">▸ ask</text>
+<text class="tt" x="36" y="258" xml:space="preserve">▸ check</text>
+<text class="tt" x="36" y="282" xml:space="preserve">▸ retro</text>
+<text class="tt" x="36" y="306" xml:space="preserve">▸ vehicle</text>
+<text class="ta" x="576" y="88" xml:space="preserve">work pull</text>
+<text class="tt" x="576" y="110" xml:space="preserve">Take the next leaf of a ticket.</text>
+<text class="tm" x="576" y="142" xml:space="preserve">ticket</text>
+<rect x="650" y="128" width="190" height="20" rx="2" fill="none" class="div"/>
+<text class="tt" x="658" y="142" xml:space="preserve">one</text>
+<text class="tm" x="576" y="168" xml:space="preserve">next</text>
+<text class="tt" x="650" y="168" xml:space="preserve">[x]</text>
+<text class="tm" x="576" y="194" xml:space="preserve">judge</text>
+<text class="tt" x="650" y="194" xml:space="preserve">[ ]</text>
+<text class="tm" x="576" y="236" xml:space="preserve">same as</text>
+<text class="ta" x="576" y="258" xml:space="preserve">quack work pull --ticket one --next</text>
+<text class="tm" x="576" y="300" xml:space="preserve">F5 run   ctrl+y copy line</text>
+<text class="tm" x="576" y="322" xml:space="preserve">help, form and line come from</text>
+<text class="tm" x="576" y="342" xml:space="preserve">the action's Doc and input struct</text>
+<line class="div" x1="20" y1="358" x2="940" y2="358"/>
+<text class="tm" x="36" y="376" xml:space="preserve">alt+? help   ctrl+l log   alt+1…9 tab   / filter</text>
+</svg>
+    </div>
+    <figcaption>In the cli tab, selecting an action shows a form built from its input struct and the exact command line it corresponds to. F5 makes the same call the CLI makes. The current Go TUI already has most of the generic shell: <code>frame</code> has the tab strip, the right pane, keys, help and the filter pane, and <code>tree</code> draws any base file.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Operations: a handle for every action</h2>
+  <p class="prose">An action that takes longer than a moment (a pull, the check, a review, a retro collect) returns a handle at once instead of making the caller wait. The operation itself is a name in the index, <code>ops/&lt;id&gt;</code>, with its state, progress, deadline and result. They are called operations because "ticket" already means a work ticket here.</p>
+  <ul class="rules">
+    <li><b>Callback or poll, with nothing new to learn.</b> The caller subscribes to <code>ops/&lt;id&gt;</code> to be called when it finishes, or reads it to ask for the state. It is the same get and watch every other name uses.</li>
+    <li><b>States:</b> queued → running → done, or failed, or cancelled. Each move is pushed to subscribers.</li>
+    <li><b>The watchdog owns the deadline.</b> An operation that misses its deadline is failed loudly and its undo steps run. The handle alone doesn't prevent hanging; it moves the hang somewhere a watchdog can see it and end it.</li>
+    <li><b>One writer at a time.</b> Writing operations queue per tree, so a git hook calling back in while a hand-back runs waits in the queue instead of deadlocking.</li>
+    <li><b>It outlives the caller.</b> A hook that times out, or a closed terminal, leaves the operation running and readable. Another client can pick up the result.</li>
+    <li><b>Only recent operations are kept.</b> Running and queued operations are never evicted. Finished ones stay for a window (the last few hundred, or a few days, set in config), and failed ones stay longer, so a loud failure is still there when someone looks. Every state change is also written to the session log, so the history outlives the window.</li>
+    <li><b>Not for reads.</b> Values are already pushed, so reading a name never needs a handle. The cage's allow-or-deny answer inside a hook call stays synchronous too, because the harness waits for it.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Watchdogs and dead-man switches</h2>
+  <p class="prose">A part that has stopped working must never look like a part that is working. So every process, door and provider holds a lease that its own work loop renews. When the loop stops, the renewals stop, and the watchdog acts.</p>
+  <ul class="rules">
+    <li><b>The heartbeat comes from the work loop itself,</b> not from a separate timer. A loop that hangs while a timer keeps ticking is exactly the case a dead-man switch must catch.</li>
+    <li><b>Alive is not enough.</b> A provider with a pending input change must commit a result within its deadline, and an action must finish within its deadline. A run that misses its deadline is cancelled, the action's undo steps run, and the process restarts.</li>
+    <li><b>Silence is visible.</b> When a lease expires, every name that provider owns is marked <em>stale since &lt;time&gt;</em>. It never quietly falls back to its default. Subscribers get the change: the badge greys out, and the TUI and <code>quack why</code> show it.</li>
+    <li><b>Restart, then escalate.</b> The index supervises its processes and restarts them with backoff. After repeated failures it raises an alarm name (<code>session/alarms</code>), which the sidebar shows and the hook module adds to the agent's context.</li>
+    <li><b>The watchdog is watched too.</b> The doors process and the hook module both watch the index's lease and restart it when it goes silent. While the index is down, the cage refuses, and the refusal names the alarm. Failures should be loud, so they get fixed early.</li>
+    <li><b>Deadlines are declared.</b> Each name and action states its deadline in its declaration (<code>q.Deadline(2*time.Second)</code>), with a default for every kind, so no part runs without one.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Doors, one file each</h2>
+  <p class="prose">A door is an interface, a real implementation and a fake, all in one file. The doors process picks the real one in use and the fake one in tests. A new adapter (say a Slack door, or a second VCS) is one more file; the index and the modules stay the same.</p>
+<pre><span class="c">quackitect/
+  index/             the index process: model, supervision, files/
+  doors/
+    in/              lsp.go  hooks.go  mcp.go  http.go  sse.go
+    out/             disk.go  git.go  proc.go  clock.go  watch.go  vale.go  biome.go
+  modules/           one process per folder
+    work/  pull/  hold/  ask/  check/  retro/  guidance/  vehicle/  …</span>
+
+<span class="c">// doors/out/git.go: one adapter with its fake inside</span>
+<span class="k">package</span> out
+
+<span class="k">type</span> Git <span class="k">interface</span>{ Run(args ...string) (string, error) }
+
+<span class="k">type</span> realGit <span class="k">struct</span>{}                            <span class="c">// runs the git binary</span>
+<span class="k">type</span> fakeGit <span class="k">struct</span>{ Answers map[string]string } <span class="c">// answers from a table</span>
+
+<span class="k">func</span> init() { q.Door[Git]("git", realGit{}, &amp;fakeGit{}) }</pre>
+</section>
+
+<section>
+  <h2>The count, afterwards</h2>
+  <figure>
+    <div class="scroll">
+<svg viewBox="0 0 960 150" role="img" aria-label="After: saving a ticket changes files, which re-parses the ticket, recomputes work places and the open-task count, and pushes the new count to every subscriber.">
+      <defs>
+        <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="inkfill"/></marker>
+      </defs>
+      <rect class="bx" x="20" y="30" width="130" height="64" rx="4"/>
+      <text class="t" x="85" y="57" text-anchor="middle">you save</text>
+      <text class="s" x="85" y="77" text-anchor="middle">spec/tickets/x.md</text>
+      <rect class="chip-in" x="178" y="30" width="130" height="64" rx="4"/>
+      <text class="m" x="243" y="57" text-anchor="middle">files/…/x.md</text>
+      <text class="s" x="243" y="77" text-anchor="middle">input · watcher owns it</text>
+      <rect class="chip" x="336" y="30" width="130" height="64" rx="4"/>
+      <text class="m" x="401" y="57" text-anchor="middle">tickets/x</text>
+      <text class="s" x="401" y="77" text-anchor="middle">derived · one parse</text>
+      <rect class="chip" x="494" y="30" width="130" height="64" rx="4"/>
+      <text class="m" x="559" y="57" text-anchor="middle">work/places</text>
+      <text class="s" x="559" y="77" text-anchor="middle">derived</text>
+      <rect class="bx-accent" x="652" y="30" width="130" height="64" rx="4"/>
+      <text class="m" x="717" y="57" text-anchor="middle">work/open-tasks</text>
+      <text class="s" x="717" y="77" text-anchor="middle">derived · 2 → 3</text>
+      <rect class="bx" x="810" y="30" width="130" height="64" rx="4"/>
+      <text class="t" x="875" y="57" text-anchor="middle">subscribers</text>
+      <text class="s" x="875" y="77" text-anchor="middle">badge · TUI · scripts</text>
+      <path class="ln" d="M150 62 L174 62" marker-end="url(#a3)"/>
+      <path class="ln" d="M308 62 L332 62" marker-end="url(#a3)"/>
+      <path class="ln" d="M466 62 L490 62" marker-end="url(#a3)"/>
+      <path class="ln" d="M624 62 L648 62" marker-end="url(#a3)"/>
+      <path class="ln" d="M782 62 L806 62" marker-end="url(#a3)"/>
+      <text class="lab" x="164" y="120" text-anchor="middle">fsnotify</text>
+      <text class="lab" x="322" y="120" text-anchor="middle">parse</text>
+      <text class="lab" x="480" y="120" text-anchor="middle">reads tickets/*</text>
+      <text class="lab" x="638" y="120" text-anchor="middle">reads places</text>
+      <text class="lab" x="796" y="120" text-anchor="middle">push if changed</text>
+    </svg>
+    </div>
+    <figcaption>The count is computed in one place: the work module process provides it, and the index pushes each change. The badge and the TUI header both subscribe to <code>work/open-tasks</code>, so they can't disagree. Values the saved file doesn't affect are not recomputed. The whole <code>the-queue-views-agree</code> count change would have been <code>open_tasks.go</code> plus its test.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>What changes for the agent</h2>
+  <p class="prose">Once the system stands, most work is content, not infrastructure. Content work means adding or changing a module, a view or a door, and each of those is one file with a known shape. The context the agent needs shrinks to that file plus the names it reads, which the index lists.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th></th><th>Today</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td>Finding where a value comes from</td><td>grep across JS and Go; facts are "spelled again here" in several languages</td><td>ask the index: every name lists its provider and the file it lives in</td></tr>
+        <tr><td>Changing what a value means</td><td>every reader that computes it (the count: 11 files)</td><td>the one provider file and its test</td></tr>
+        <tr><td>Adding a tool or a command</td><td>a verb in <code>cli.js</code>, a tool spec in the hook module, a handler in the bridge</td><td>one action in a module; the hook module, MCP, CLI and TUI pick it up</td></tr>
+        <tr><td>Calling quackitect</td><td>shelling out to <code>./RUNME.sh &lt;verb&gt;</code> and parsing stdout</td><td>a tool call answered by the index directly</td></tr>
+        <tr><td>Testing</td><td>fakes written per test case</td><td>every door brings its fake; a generic test covers every registered name</td></tr>
+        <tr><td>Scope of a ticket</td><td>"touches no file the ask leaves out" is checked by review</td><td>a content ticket can be limited to one topic folder, and level0 can refuse writes outside it</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="prose">This only holds if the rules below hold. As soon as a door or a renderer special-cases one name, the 20-files problem comes back. Infrastructure work, such as changing the index, the protocol or a renderer, stays broad. It should also be rare, and done in tickets of its own.</p>
+</section>
+
+<section>
+  <h2>Where today's code goes</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Today</th><th>Size</th><th>Becomes</th><th>Fate</th></tr></thead>
+      <tbody>
+        <tr><td><code>src/index</code> (Go)</td><td class="num">3.4k</td><td>The index process: model, supervision, <code>files/</code>, SQLite</td><td><span class="pill grow">grows</span></td></tr>
+        <tr><td><code>src/lsp</code> (Go)</td><td class="num">10k</td><td>The LSP door keeps the protocol; the checks and schema rules become the <code>check</code> module</td><td><span class="pill grow">splits</span></td></tr>
+        <tr><td><code>src/tui</code> (Go)</td><td class="num">10k</td><td><code>quack tui</code>: <code>frame</code> becomes the generic shell, <code>tree</code> the base-view renderer; log and work become declared views</td><td><span class="pill grow">reshaped</span></td></tr>
+        <tr><td><code>src/config</code>, <code>yaml</code>, <code>pointer</code>, <code>engine/swap</code> (Go)</td><td class="num">1k</td><td>The index (<code>cfg/</code> topic) and process supervision</td><td><span class="pill grow">merged</span></td></tr>
+        <tr><td><code>src/scripts</code> (Node)</td><td class="num">12k</td><td>Module processes <code>work</code>, <code>pull</code>, <code>retro</code>, <code>vehicle</code> and others; the Go CLI replaces <code>cli.js</code></td><td><span class="pill port">ported, topic by topic</span></td></tr>
+        <tr><td><code>src/bridge</code> (Node)</td><td class="num">5.3k</td><td>The hooks door, plus modules for the write, bash, stop, answer and handover rules</td><td><span class="pill port">ported</span></td></tr>
+        <tr><td><code>src/engine</code>, <code>src/doors</code> (JS)</td><td class="num">3k</td><td>Modules (<code>retro</code>, projection, group) and the outbound doors</td><td><span class="pill port">ported</span></td></tr>
+        <tr><td><code>.claude/skills/level0/lib</code> (JS)</td><td class="num">11k</td><td>Mostly modules. Only what the hook module itself imports stays JS</td><td><span class="pill port">ported</span></td></tr>
+        <tr><td><code>src/extension</code> (JS)</td><td class="num">4.1k</td><td>A generic renderer for the sidebar and forms, plus the route drawing, lens and inset</td><td><span class="pill shrink">shrinks</span></td></tr>
+        <tr><td>level0 hook module (JS)</td><td class="num">1.7k</td><td>Forwards events, registers the tools the index lists, spawns agents. Nothing else</td><td><span class="pill shrink">shrinks</span></td></tr>
+        <tr><td><code>copilot.js</code>, <code>precommit.js</code>, <code>prepush.js</code></td><td class="num">·</td><td>Calls into the hooks door: <code>quack hook &lt;event&gt;</code></td><td><span class="pill port">ported</span></td></tr>
+        <tr><td><code>level0.schema.json</code></td><td class="num">·</td><td>Generated from <code>q.Cfg</code> and <code>q.Show</code> declarations</td><td><span class="pill gen">generated</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Rules the build enforces</h2>
+  <ul class="rules">
+    <li><b>Only doors cross the boundary, in either direction.</b> Each door carries its own fake. An outbound fake answers from a table. An inbound fake replays recorded traffic, such as a hook event or an HTTP call.</li>
+    <li><b>Doors and renderers import no module.</b> They see only the registry, so they can never special-case one name.</li>
+    <li><b>Only providers write a name.</b> Everyone else reads it or watches it. Only the watch door feeds <code>files/</code>, and actions change files, never derived values.</li>
+    <li><b>Modules touch nothing outside.</b> They read file contents from <code>files/</code> and act on the world by calling a door.</li>
+    <li><b>Views get data only by reading names.</b> A view decides how things look, never what they mean.</li>
+    <li><b>The index refuses to start on a broken catalog:</b> a duplicate name, a missing default, two active providers for one name. CI starts it, so these failures show up before merge.</li>
+    <li><b>Linux and Windows.</b> Loopback TCP plus the standing file, no Unix sockets, no named pipes, and a Windows job in CI.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Still open</h2>
+  <ul class="rules">
+    <li><b>The internal protocol.</b> Every peer inside is Go, so gRPC streams (typed, no broker) and NATS (the index embeds the server; subjects as names, request/reply and watch built in) are the two candidates. The outside never sees it, because the doors translate.</li>
+    <li><b>The LSP door.</b> VS Code expects to start its language server itself. Either a thin <code>quack lsp</code> relays stdio into the doors process, or the extension connects to the doors process's port.</li>
+    <li><b>Which views exist.</b> Work and log today. The work view's <code>reads</code> and <code>actions</code> need to be written down before the TUI renderer can be generic.</li>
+    <li><b>Running old and new side by side.</b> The Go CLI hands verbs it doesn't know to <code>cli.js</code> until each topic is ported.</li>
+    <li><b>The pilot slice.</b> <code>work/open-tasks</code> end to end: the watch door → <code>files/</code> → <code>tickets/</code> → <code>work/places</code> → the badge and the TUI header.</li>
+  </ul>
+</section>
+</main>
+
+</body>
+</html>

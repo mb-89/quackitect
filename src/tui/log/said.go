@@ -9,7 +9,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 
-	"quackitect/tui/draw"
+	"quackitect/src/tui/draw"
 )
 
 func saidStyle(r Record) lipgloss.Style {

@@ -15,6 +15,7 @@ export const HEARD = {
   same: "the canary opens the answer whole",
   other: "the canary opens the answer with other counts",
   none: "the canary opens no answer",
+  again: "the canary opens a second answer in one context",
 };
 
 // The line stands set in, on a line of its own. A reader finds it there without reading the wording around it. [[spec/design_output/level0#the-canary]]
@@ -108,15 +109,8 @@ function frontOf(text) {
   return out;
 }
 
-// The mark a rule describing an answer carries, beside the star a rule wanting argument carries. [[spec/design_output/pull#the-checks]]
-export const ANSWER_MARK = "^";
-
-// A note writes the mark in a code span, because a paragraph admits the character nowhere else. [[spec/design_output/pull#the-checks]]
-const MARK = /\s*`?([*^])`?$/;
-
-function markOf(raw) {
-  return MARK.exec(String(raw).trimEnd())?.[1] ?? "";
-}
+// The star a rule wanting argument ends in, bare or in a code span. [[spec/schemas]]
+const MARK = /\s*`?\*`?$/;
 
 function itemsIn(text) {
   const chapter = parse(text).chapters.Actionables;
@@ -164,28 +158,6 @@ export function rulesOf(text) {
   const rules = actionables(text).map((one, i) => `${i + 1}. ${one}`);
   const shown = examples(text);
   return shown.length ? [...rules, "", ...shown] : rules;
-}
-
-// The label naming one rule: the note's path under the guidance folder, then its number in that note. [[spec/design_output/pull#the-checks]]
-export function labelOf(path, number) {
-  const bare = String(path ?? "")
-    .replace(/\.md$/, "")
-    .replace(/^spec\/guidance\//, "");
-  return `${bare.replace(/\//g, "-")}-${number}`;
-}
-
-// The rules the judge reads over evidence: the chapter's own numbering, with the marked rules out. [[spec/design_output/pull#the-checks]]
-export function forEvidence(text, path) {
-  const out = [];
-  let number = 0;
-  for (const raw of itemsIn(text)) {
-    const rule = stripped(raw);
-    if (!rule) continue;
-    number += 1;
-    if (markOf(raw) === ANSWER_MARK) continue;
-    out.push({ label: labelOf(path, number), note: String(path ?? ""), number, rule });
-  }
-  return out;
 }
 
 // The entries of a note's scope, whether the frontmatter writes them inline or one to a line. [[spec/tickets/the-spawn-reaches-its-guidance]]

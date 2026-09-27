@@ -12,8 +12,8 @@ import (
 	"sort"
 	"strings"
 
-	"quackitect/tui/draw"
-	"quackitect/tui/frame"
+	"quackitect/src/tui/draw"
+	"quackitect/src/tui/frame"
 )
 
 const SortNone = -1

@@ -86,7 +86,10 @@ test("the identity lives in the method tree", () => {
   const made = identityHere(bare, fakeClock(), "/tools", 7);
   assert.ok(made);
   assert.equal(identityHere(bare, fakeClock(), "/tools", 7), made);
-  assert.ok(made.endsWith("7"), "the pid the hand gives ends the identity, so a case replays it");
+  assert.ok(
+    made.endsWith("7"),
+    "the pid the hand gives ends the identity, so a case replays it",
+  );
 });
 
 test("a root is found by the marker it carries", () => {
@@ -237,7 +240,7 @@ function plugin(hook = 'import { a } from "../lib/apply.js";\n') {
   return {
     [`${PLUGIN}/hooks/hooks.json`]: '{"modules":["./pull-tool.js"]}',
     [`${PLUGIN}/hooks/pull-tool.js`]:
-      'import { register } from "./level0.js";\nimport {\n  judgeAsk,\n} from "../lib/pull.js";\n',
+      'import { register } from "./level0.js";\nimport {\n  spawnPromptIn,\n} from "../lib/pull.js";\n',
     [`${PLUGIN}/hooks/level0.js`]: hook,
     [`${PLUGIN}/lib/apply.js`]:
       'import { inRun } from "./folders.js";\nexport const a = 1;\n',
@@ -320,7 +323,14 @@ test("a hook taking a new import hands the copy that file", () => {
 
 test("attach writes the driver, the register entry with its port, the pointer and the hook's closure", () => {
   const files = tree(plugin());
-  const said = attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools", 7);
+  const said = attachTo(
+    files,
+    { HOME: "/home/agent" },
+    fakeClock(),
+    "/stub",
+    "/tools",
+    7,
+  );
   assert.equal(said.method, "/tools");
   assert.equal(said.port, 6510);
   assert.equal(

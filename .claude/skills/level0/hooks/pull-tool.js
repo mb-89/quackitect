@@ -1,21 +1,11 @@
 // The plugin's one hook module: the bridgehead, then the pull as a tool. A
-// shell verb reaches no model and no agent, and the hook process reaches both,
-// so the judge and the spawn run here.
-// [[spec/design_output/pull#the-checks]]
+// shell verb reaches no agent, and the hook process does, so the spawn runs
+// here. The tool asks no model, so a hand-back answers the same way twice.
+// [[spec/tickets/the-judge-leaves-the-code]]
 
+import { PULL_CALL, pullSpec, SESSION, sessionOf, spawnPromptIn } from "../lib/pull.js";
 // One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
-import { READ_TOOLS, register as bridgehead } from "./level0.js";
-import {
-  judgeAsk,
-  judgeLabels,
-  judgeRefusal,
-  PULL_CALL,
-  pullSpec,
-  ruleBroken,
-  SESSION,
-  sessionOf,
-  spawnPromptIn,
-} from "../lib/pull.js";
+import { register as bridgehead, READ_TOOLS } from "./level0.js";
 
 const CLI_SCRIPT = "src/scripts/cli.js";
 // The script stands under the method root, which a project root holds nowhere, so the call names it whole. [[spec/design_output/vehicle#the-work-root-inherits]]
@@ -23,10 +13,9 @@ let cli = ["node", CLI_SCRIPT];
 // The verb and the flag src/scripts/pull-tool.js reads, fixed while the argv behind them moves. [[spec/design_output/pull#the-hand-out]]
 const PULL = ["ticket", "pull"];
 const TOOL = "--tool";
-const CONFIG = "spec/config/level0.json";
 const RUNNING = 600000;
-const JUDGE = "--judge";
-const SPAWNS = 3;
+const BACKGROUND =
+  "The hand works in the background. Take the next item, and pull again once it answers.";
 
 export function register(on, options) {
   const method = String(options?.method ?? "").replace(/[\\/]+$/, "");
@@ -45,20 +34,12 @@ export function register(on, options) {
   });
 
   on("tool.call", { tool: PULL_CALL }, async ($, e, _next) => {
-    if (String(e?.ticket ?? "").trim()) {
-      const said = await judged($, e);
-      if (said) return { result: said };
-    }
-    let answer = await pulled($, e);
-    // [[spec/design_output/pull#a-hand-of-its-own]]
-    for (let round = 0; round < SPAWNS; round++) {
-      const prompt = spawnPromptIn(answer);
-      if (!prompt) break;
-      const said = await spawned($, prompt);
-      if (said) return { result: `${answer}\n\n${said}` };
-      answer = await pulled($, {});
-    }
-    return { result: answer };
+    const answer = await pulled($, e);
+    // The hand works in the background, and the lead takes the next item. [[spec/tickets/the-hook-awaits-the-spawn]]
+    const prompt = spawnPromptIn(answer);
+    if (!prompt) return { result: answer };
+    const said = (await spawned($, prompt)) || BACKGROUND;
+    return { result: `${answer}\n\n${said}` };
   });
 }
 
@@ -87,8 +68,35 @@ function toolCall(e) {
   return [...cli, ...PULL, TOOL, JSON.stringify(e ?? {})];
 }
 
+// The verb runs under the harness keys the session carries, so it reads the hand the shell verb reads. The engine merges this env over its own, and `$.env.get` reads a key where the hook scope holds no process. [[spec/tickets/pull-env-meets-the-engine]]
+// A copy of the keys `HARNESS` in src/scripts/pull-hand-of.js names, because a hook reaches no file past the plugin. The level1 case reads both. [[spec/tickets/pull-env-meets-the-engine]]
+export const HARNESS_KEYS = ["CLAUDE_CODE_REMOTE", "SE_CLOUD", "CLAUDECODE"];
+
+async function running($) {
+  // The engine reads each env call off the source, so every key stands spelled at its own call. [[spec/tickets/pull-env-meets-the-engine]]
+  const said = [
+    await envOf(() => $.env.get("CLAUDE_CODE_REMOTE")),
+    await envOf(() => $.env.get("SE_CLOUD")),
+    await envOf(() => $.env.get("CLAUDECODE")),
+  ];
+  const env = {};
+  HARNESS_KEYS.forEach((key, at) => {
+    const value = said[at] ?? globalThis.process?.env?.[key];
+    if (value) env[key] = String(value);
+  });
+  return Object.keys(env).length ? { timeoutMs: RUNNING, env } : { timeoutMs: RUNNING };
+}
+
+async function envOf(read) {
+  try {
+    return await read();
+  } catch {
+    return undefined;
+  }
+}
+
 async function pulled($, e) {
-  const ran = await $.process.run(toolCall(e), { timeoutMs: RUNNING });
+  const ran = await $.process.run(toolCall(e), await running($));
   return `${ran.stdout ?? ""}${ran.stderr ?? ""}`.trim() || `exit ${ran.exitCode}`;
 }
 
@@ -99,6 +107,7 @@ async function spawned($, prompt) {
     said = await $.agent.spawn({
       prompt,
       own: true,
+      background: true,
       description: "a hand of its own works one step",
       subagentType: "general-purpose",
     });
@@ -108,44 +117,4 @@ async function spawned($, prompt) {
   if (said?.deny) return `the spawn is refused: ${said.deny}`;
   if (said?.isError) return `the hand failed: ${said.text ?? ""}`;
   return "";
-}
-
-// [[spec/design_output/pull#the-checks]]
-async function judged($, e) {
-  const settings = await readJson($, CONFIG);
-  const judge = settings?.judge ?? {};
-  if (judge.enabled === false) return "";
-
-  const ran = await $.process.run([...toolCall(e), JUDGE], { timeoutMs: RUNNING });
-  const material = parsed(ran.stdout);
-  if (!material?.rules?.length || !String(material.evidence ?? "").trim()) return "";
-
-  let said;
-  try {
-    said = await $.model.classify(
-      judgeAsk(material.evidence, material.rules),
-      judgeLabels(material.rules),
-      { model: judge.model },
-    );
-  } catch {
-    return "";
-  }
-  const broke = ruleBroken(said, material.rules);
-  return broke ? judgeRefusal(`at ${material.step}, ${broke}`) : "";
-}
-
-function parsed(text) {
-  try {
-    return JSON.parse(String(text ?? "").trim() || "null");
-  } catch {
-    return null;
-  }
-}
-
-async function readJson($, path) {
-  try {
-    return JSON.parse(await $.fs.read(path));
-  } catch {
-    return {};
-  }
 }

@@ -11,6 +11,7 @@ import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
+import { front } from "../doors/front.js";
 import { homeIn } from "./editor.js";
 import { handDoors } from "./pull-hand-of.js";
 import { readTools, whereIs } from "../engine/tools.js";
@@ -49,6 +50,8 @@ export async function doorsHere() {
     disk: files,
     clock: time,
     git: git(outside, roots.work),
+    // [[spec/tickets/go-writes-the-frontmatter]]
+    front: front(files, outside, roots.method),
     log: log(files, time, {
       folder: join(roots.work, LOG_FOLDER),
       level: await said.ask("log.level"),

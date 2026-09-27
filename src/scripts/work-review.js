@@ -11,7 +11,7 @@ import {
   retroOnTicket,
   WORKTREE,
 } from "../../.claude/skills/level0/lib/review.js";
-import { BIN, TOOLS } from "../../.claude/skills/level0/lib/tools.js";
+import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { brandOf } from "../../.claude/skills/level0/lib/vehicle.js";
 import { stamps } from "./brand.js";
@@ -21,7 +21,7 @@ const LOUD = 5;
 
 // What the install writes and git ignores, which the check reads alone. [[spec/design_output/review#a-worktree-runs-the-check]]
 // The webview builds off packages of its own. [[spec/tickets/the-small-faults-land]]
-const BORROWED = ["node_modules", "src/extension/webview/node_modules", `${BIN}/zig`];
+const BORROWED = ["node_modules", "src/extension/webview/node_modules"];
 
 export function review(it, name, argv) {
   if (!name) {

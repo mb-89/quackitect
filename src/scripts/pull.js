@@ -4,7 +4,6 @@
 // [[spec/design_output/pull#the-answers]]
 
 import { onDesk } from "../../.claude/skills/level0/lib/cloud.js";
-import { forEvidence } from "../../.claude/skills/level0/lib/guidance.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { checkNote } from "../../.claude/skills/level0/lib/schema.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
@@ -21,10 +20,10 @@ import {
   withEntry,
   withField,
 } from "../engine/group.js";
+import { inHand } from "../engine/named.js";
 import { ephemeralPull } from "./ephemeral-pull.js";
-import { dropHold, guidanceText, holdOf, writeHold } from "./guidance-hand.js";
-import { byPerson, handOf, roleOf, SAYS } from "./pull-hand-of.js";
-import { landed } from "./pull-landed.js";
+import { rejected } from "./pull-gate.js";
+import { dropHold, holdOf, writeHold } from "./guidance-hand.js";
 import {
   chapterOf,
   commandsRun,
@@ -43,6 +42,8 @@ import {
   namedGroup,
   ticketsHere,
 } from "./pull-hand.js";
+import { byPerson, handOf, roleOf, SAYS } from "./pull-hand-of.js";
+import { landed } from "./pull-landed.js";
 import {
   DONE,
   handsOut,
@@ -109,11 +110,21 @@ export function pull(it, argv) {
   const who = { hand, plainHand, branch, group, held, oneStep: Boolean(as) };
   it.argv = rest;
 
-  if (rest.includes("--judge")) return judgeMaterial(it, held, name);
   if (rest.includes("--drop")) return dropped(it, who);
   // An ephemeral ticket stands in the hold alone, so its hand-back reads no file. [[spec/design_input/the-clear-hands-ephemeral-tickets#an-ephemeral-ticket-stands-held]]
   if (held?.ephemeral) return ephemeralPull(it, who, verdict);
   if (verdict.said === "back") return takeBack(it, who, name, verdict.reason);
+  // A working todo holds the hand as a ticket does, so the pull answers it ahead of every road that hands work out. [[spec/tickets/the-todo-joins-the-queue]] [[spec/tickets/the-todo-road-stands-first]]
+  // A pull naming the working item itself takes that ticket, because the shell door wants it named there first. [[spec/design_output/pull#the-hand-out]]
+  const todo =
+    held || verdict.said ? "" : inHand({ disk: it.disk, root: it.root }).todo;
+  if (todo && todo !== name) {
+    say(WAIT, [
+      `the todo ${todo} stands in hand, so the pull hands nothing else out.`,
+      "Finish it, and take it off the plan, then pull again.",
+    ]);
+    return 0;
+  }
   // A name on trunk that is a group takes its branch on a cloud box, and a desk refuses it. [[spec/design_output/pull#the-engine-takes-the-branch]]
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
   // A name with a leaf in hand hands that leaf back. A name with none asks for that ticket. [[spec/design_output/pull#the-hand-out]]
@@ -199,42 +210,6 @@ export function dropped(it, who) {
   return 0;
 }
 
-// [[spec/design_output/pull#the-checks]]
-export function judgeMaterial(it, held, name) {
-  if (!held?.path || (name && name !== held.ticket)) {
-    console.log("null");
-    return 1;
-  }
-  const at = it.join(it.root, ...held.path.split("/"));
-  if (!it.disk.exists(at)) {
-    console.log("null");
-    return 1;
-  }
-  const text = it.disk.read(at);
-  const leaf = leafOf(frontOf(text), held.step);
-  const chapter = chapterOf(text, held.step);
-  // The judge reads prose, and the leaf names which fields hold a line a shell runs. [[spec/tickets/the-group-leaves-at-todo]]
-  const commands = new Set(
-    (leaf?.evidence ?? [])
-      .filter((field) => String(field.form) === "command")
-      .map((field) => String(field.name)),
-  );
-  const evidence = [
-    ...chapter.own,
-    ...[...chapter.fields]
-      .filter(([field, rows]) => rows.length && !commands.has(field))
-      .flatMap(([field, rows]) => [`${field}:`, ...rows]),
-  ].join("\n");
-  // A label names the note beside the number, so one label reaches one rule. [[spec/design_output/pull#the-checks]]
-  const rules = (leaf?.reads ?? []).flatMap((path) =>
-    forEvidence(guidanceText(it, path), path),
-  );
-  console.log(
-    JSON.stringify({ ticket: held.ticket, step: held.step, evidence, rules }),
-  );
-  return 0;
-}
-
 // [[spec/design_output/pull#the-hand-out]]
 export function verdictFlag(rest) {
   const said = rest.find((one) => /^--(pass|fail|became|answered|back)(=|$)/.test(one));
@@ -310,15 +285,24 @@ export function takeBack(it, who, name, path) {
     return 1;
   }
   const tip = one.private ? "" : tipOf(it);
-  const text = withEntry(one.text, {
-    step: path,
-    hand: role,
-    hash_before: tip,
-    hash_after: tip,
-    returns: returnsOf(one.front, path) + 1,
-    why: "the hand takes it back",
-  });
-  one.text = withField(withField(text, "step", path), "state", OPEN);
+  const text = withEntry(
+    one.text,
+    {
+      step: path,
+      hand: role,
+      hash_before: tip,
+      hash_after: tip,
+      returns: returnsOf(one.front, path) + 1,
+      why: "the hand takes it back",
+    },
+    it.front,
+  );
+  one.text = withField(
+    withField(text, "step", path, it.front),
+    "state",
+    OPEN,
+    it.front,
+  );
   landed(it, one, [`${role} takes ${path} back`]);
   const sent = one.private ? { ok: true } : pushed(it, who.branch);
   if (!sent.ok) {
@@ -374,7 +358,7 @@ export function handBack(it, who, name, verdict) {
   );
   if (done) {
     // The record holds this hand-back already, so the pull pushes it again. [[spec/design_output/pull#the-rejected-push]]
-    const sent = sentOut(it, one, who.branch, leafOf(one.front, held.step));
+    const sent = sentOut(it, one, who.branch);
     if (!sent.ok) {
       say(REFUSED, [
         `${held.ticket} at ${held.step} answered, and the record holds this hand-back already. Its push reaches no origin.`,
@@ -457,6 +441,9 @@ export function handBack(it, who, name, verdict) {
   const fails = verdict.said === "fail";
   const answered =
     found.length || becomes ? [] : commandsRun(it, leaf, chapter, fails ? [] : found);
+  // A final gate runs every command field of the route, and the record keeps each answer. [[spec/design_output/pull#the-final-acceptance]]
+  if (leaf.final && !becomes && !found.length)
+    answered.push(...routeRun(it, one, leaf, fails ? [] : found));
   found.push(...handFaults(it, one, leaf, who.hand, held));
 
   if (found.length) return refused(it, who, one, leaf, held, found);
@@ -470,11 +457,36 @@ export function handBack(it, who, name, verdict) {
     return became(it, who, one, leaf, held, said.reason, answered);
   if (said.said === "answered")
     return answeredBy(it, who, one, leaf, held, said.reason, answered);
+  // A gate's reject puts the phase in again, where a review's fail sends the ticket back. [[spec/design_output/pull#the-gate]]
+  if (said.said === "fail" && leaf.gate)
+    return rejected(it, who, one, leaf, held, said.reason, answered);
   if (said.said === "fail")
     return failed(it, who, one, leaf, held, said.reason, answered);
   // [[spec/design_output/pull#a-finding-rides-out]]
   if (said.findings) return minted(it, who, one, leaf, held, said.findings, answered);
   return passed(it, who, one, leaf, held, answered);
+}
+
+// Every command field the route's other leaves hold a line under, run as the leaf's own run does. [[spec/design_output/pull#the-final-acceptance]]
+function routeRun(it, one, leaf, found) {
+  return leaf.leaves
+    .filter((other) => other.path !== leaf.path)
+    .flatMap((other) => {
+      const chapter = chapterOf(one.text, other.path);
+      const evidence = [other.said.evidence ?? []]
+        .flat()
+        .filter((field) => String(field?.form) === "command")
+        .filter((field) =>
+          String((chapter.fields.get(field.name) ?? [])[0] ?? "").trim(),
+        );
+      if (!evidence.length) return [];
+      return commandsRun(it, { path: other.path, evidence }, chapter, found).map(
+        (ran) => ({
+          ...ran,
+          name: `${other.path}/${ran.name}`,
+        }),
+      );
+    });
 }
 
 // [[spec/design_output/pull#the-hand-back-refused]]

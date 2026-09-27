@@ -5,7 +5,16 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { chapterOf, verdictIn, voiceFaults } from "../../src/scripts/pull-chapter.js";
+import { frontOf } from "../../src/engine/group.js";
+import {
+  BEFORE_CLEAR,
+  chapterOf,
+  verdictIn,
+  voiceFaults,
+  workAnswer,
+} from "../../src/scripts/pull-chapter.js";
+import { leafOf } from "../../src/scripts/pull-route.js";
+import { doors } from "./pull-doors.js";
 import { CHARACTERS, semicolonVale } from "./semicolon-vale.js";
 
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
@@ -57,7 +66,8 @@ test("a private name on the leaf's chapter refuses, and warns on nothing", () =>
 });
 
 test("chapterOf reads the fields under a step's chapter, and a missing one stands nowhere", () => {
-  const text = "# Ask\n\nA thing.\n\n# design\n\n## draft\n\n### approach\n\nIt reads.\n\n# Discussion\n";
+  const text =
+    "# Ask\n\nA thing.\n\n# design\n\n## draft\n\n### approach\n\nIt reads.\n\n# Discussion\n";
   const found = chapterOf(text, "design/draft");
   assert.equal(found.stands, true);
   assert.deepEqual(found.fields.get("approach"), ["It reads."]);
@@ -68,4 +78,55 @@ test("chapterOf reads the fields under a step's chapter, and a missing one stand
 test("a verdict's table rows ride one piece, and a plain row between two tables keeps them apart", () => {
   const said = verdictIn(["fail", "| a |", "| b |", "- after", "| c |"]);
   assert.equal(said.reason, "| a |\\n| b |; after; | c |");
+});
+
+// A ticket carrying a draft step and a gate after it. [[spec/tickets/a-gate-names-its-question]]
+const GATED = `---
+kind: [[ticket]]
+state: open
+step: gate
+steps:
+  - name: draft
+    does: drafts the approach
+    evidence:
+      - name: approach
+        form: text
+        says: the approach
+  - name: gate
+    gate: does the approach answer the ask
+    does: reads the draft against the ask
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points, or reject
+---
+
+# Ask
+
+One piece of it.
+
+# Discussion
+`;
+
+const handOut = (path) => {
+  const { it } = doors({});
+  const one = { name: "a-child", text: GATED, front: frontOf(GATED) };
+  return workAnswer(it, one, leafOf(frontOf(GATED), path));
+};
+
+// [[spec/tickets/a-gate-names-its-question]]
+test("a pull on a gate prints the question it answers", () => {
+  assert.match(handOut("gate"), /answers: does the approach answer the ask/);
+});
+
+// [[spec/tickets/a-gate-names-its-question]]
+test("a pull on a gate asks the question before the clear", () => {
+  assert.ok(handOut("gate").includes(`before the clear: ${BEFORE_CLEAR}`));
+});
+
+// [[spec/tickets/a-gate-names-its-question]]
+test("a pull on a step carrying no gate prints neither question", () => {
+  const said = handOut("draft");
+  assert.doesNotMatch(said, /answers:/);
+  assert.ok(!said.includes(BEFORE_CLEAR));
 });

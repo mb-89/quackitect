@@ -9,7 +9,7 @@ import { fieldOf } from "../../src/engine/group.js";
 import { chapterOf, commandsRun, verdictIn } from "../../src/scripts/pull-chapter.js";
 import { entriesOf } from "../../src/scripts/pull-writes.js";
 import { holdOf, leafOf, takeable } from "../../src/scripts/pull.js";
-import { goModulesOf, goSays, testSays } from "../../src/scripts/work-test.js";
+import { goPackagesOf, goSays, testSays } from "../../src/scripts/work-test.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { pulling, work } from "../../src/scripts/work.js";
 import {
@@ -233,9 +233,9 @@ test("a command line the box finds nothing for comes back naming the shape a com
 });
 
 // The tests stand in two languages, and the verb runs both. [[spec/design_output/pull#the-test-verb]]
-test("a changed Go test names its module, and the verb says what that run answered", () => {
+test("a changed Go test names its package folder, and the verb says what that run answered", () => {
   assert.deepEqual(
-    goModulesOf([
+    goPackagesOf([
       "src/tui/work_test.go",
       "src/tui/tree.go",
       "src/index/index_test.go",
@@ -245,7 +245,7 @@ test("a changed Go test names its module, and the verb says what that run answer
     ]),
     ["src/tui", "src/index"],
   );
-  assert.deepEqual(goModulesOf([]), []);
+  assert.deepEqual(goPackagesOf([]), []);
 
   assert.equal(goSays({ exitCode: 0 }, "src/tui"), "green, src/tui passes");
   assert.match(
@@ -383,83 +383,6 @@ test("the pull opens a trivial draft and hands its first leaf, and leaves any ot
     fieldOf(other.disk.read(at("spec/tickets/a-child.md")), "state"),
     "draft",
   );
-});
-
-// [[spec/design_output/pull#the-checks]]
-test("the judge's material is the leaf's evidence and the rules its reads name, as JSON", () => {
-  const { it } = doors(standing(filled(CHILD(), "### approach", "The approach.")));
-  heard(() => pulling(ROOT, ["pull"], it));
-
-  const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child", "--judge"], it));
-
-  assert.equal(code, 0);
-  assert.deepEqual(JSON.parse(said), {
-    ticket: "a-child",
-    step: "design/draft",
-    evidence: "approach:\nThe approach.",
-    rules: [
-      {
-        label: "voice-1",
-        note: "spec/guidance/voice",
-        number: 1,
-        rule: "Say what is.",
-      },
-      {
-        label: "voice-2",
-        note: "spec/guidance/voice",
-        number: 2,
-        rule: "Put the bottom line first.",
-      },
-    ],
-  });
-  const none = doors(standing());
-  assert.equal(
-    heard(() => pulling(ROOT, ["pull", "a-child", "--judge"], none.it)).said,
-    "null",
-  );
-});
-
-// The judge reads the rules that fit evidence, and a rule describing an answer stands out. [[spec/tickets/the-judge-reads-answer-rules]]
-test("the judge's ask leaves the answer rules out, and labels the rules it keeps", () => {
-  const note =
-    "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say what is. *\n2. Open an answer with a table. ^\n3. Put the bottom line first.\n";
-  const { it } = doors(
-    standing(filled(CHILD(), "### approach", "The approach."), GROUP_NOTE, {
-      [at("spec/guidance/voice.md")]: note,
-    }),
-  );
-  heard(() => pulling(ROOT, ["pull"], it));
-
-  const { said } = heard(() => pulling(ROOT, ["pull", "a-child", "--judge"], it));
-
-  assert.deepEqual(JSON.parse(said).rules, [
-    {
-      label: "voice-1",
-      note: "spec/guidance/voice",
-      number: 1,
-      rule: "Say what is.",
-    },
-    {
-      label: "voice-3",
-      note: "spec/guidance/voice",
-      number: 3,
-      rule: "Put the bottom line first.",
-    },
-  ]);
-});
-
-// [[spec/tickets/the-group-leaves-at-todo]]
-test("the judge's material leaves a command field out, so a chapter of commands hands over nothing", () => {
-  const { it } = doors(
-    standing(filled(CHILD("open", "implement/change"), "### lint", "./RUNME.sh check")),
-  );
-  heard(() => pulling(ROOT, ["pull"], it));
-
-  const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child", "--judge"], it));
-
-  assert.equal(code, 0);
-  assert.equal(JSON.parse(said).step, "implement/change");
-  assert.equal(JSON.parse(said).evidence, "", "a command field is no prose");
 });
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]

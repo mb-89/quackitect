@@ -30,7 +30,8 @@ function nameless(at) {
     [`${at}/RUNME.sh`]: "run me",
     [`${at}/package.json`]: '{"version":"0.1.0"}',
     [`${at}/.claude/settings.json`]: "{}",
-    [`${at}/.se/.runtime/identity.json`]: '{"id":"abc","made":"2026-01-01T00:00:00.000Z"}',
+    [`${at}/.se/.runtime/identity.json`]:
+      '{"id":"abc","made":"2026-01-01T00:00:00.000Z"}',
   });
 }
 
@@ -82,7 +83,11 @@ test("a clone holding no manifest gets both, stamped with the brand", () => {
   const plugin = JSON.parse(files.read(`/v/acme/${PLUGIN}`));
   assert.equal(plugin.name, "level0");
   assert.equal(plugin.author.name, "acme");
-  assert.deepEqual(stamps(files, "/v/acme", "acme"), [], "a second stamp writes nothing");
+  assert.deepEqual(
+    stamps(files, "/v/acme", "acme"),
+    [],
+    "a second stamp writes nothing",
+  );
 });
 
 // [[spec/tickets/the-brand-names-the-plugin]]
@@ -126,8 +131,14 @@ test("a vehicle whose folder slugs to nothing refuses the stub, and writes nothi
 
 // The sources the brand folder holds, as the tree tracks them. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 const sources = {
-  [join("/v", BRAND, "marketplace.json")]: JSON.stringify({ name: "tree", owner: { name: "tree" } }),
-  [join("/v", BRAND, "plugin.json")]: JSON.stringify({ name: "level0", author: { name: "tree" } }),
+  [join("/v", BRAND, "marketplace.json")]: JSON.stringify({
+    name: "tree",
+    owner: { name: "tree" },
+  }),
+  [join("/v", BRAND, "plugin.json")]: JSON.stringify({
+    name: "level0",
+    author: { name: "tree" },
+  }),
   [join("/v", ICON_SOURCE)]: "<svg/>",
 };
 
@@ -196,9 +207,25 @@ test("a raised version in package.json reaches the plugin and the extension, and
     [join("/v", EXTENSION)]: JSON.stringify({ name: "level0", version: "0.1.0" }),
   });
   const done = stamps(files, "/v", "acme");
-  assert.ok(done.includes(PLUGIN) && done.includes(EXTENSION), `the stamp writes both, and it says ${done}`);
+  assert.ok(
+    done.includes(PLUGIN) && done.includes(EXTENSION),
+    `the stamp writes both, and it says ${done}`,
+  );
   assert.equal(JSON.parse(files.read(join("/v", PLUGIN))).version, "0.2.0");
   assert.equal(JSON.parse(files.read(join("/v", EXTENSION))).version, "0.2.0");
-  assert.equal(JSON.parse(files.read(join("/v", MARKETPLACE))).version, undefined, "the marketplace names no version");
+  assert.equal(
+    JSON.parse(files.read(join("/v", MARKETPLACE))).version,
+    undefined,
+    "the marketplace names no version",
+  );
   assert.deepEqual(stamps(files, "/v", "acme"), [], "a second stamp writes nothing");
+});
+
+// The pull stands as a tool with nothing behind it, since the judge leaves. [[spec/tickets/judge-pointers-leave-other-notes]]
+test("the plugin description a bare clone gets names the pull, and no judge", () => {
+  const files = fakeDisk({ [join("/v", "package.json")]: '{"version":"0.1.0"}' });
+  stamps(files, "/v", "acme");
+  const said = JSON.parse(files.read(join("/v", PLUGIN))).description;
+  assert.match(said, /the pull as a tool/);
+  assert.doesNotMatch(said, /judge/);
 });

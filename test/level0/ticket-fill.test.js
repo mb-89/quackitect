@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { verbs } from "../../src/scripts/cli.js";
 import { ticket } from "../../src/scripts/ticket.js";
@@ -31,7 +32,9 @@ function filled(text, flags = []) {
     [at("spec/processes/trivial.yaml")]: TRIVIAL_PROCESS,
     [at(PATH)]: text,
   });
-  const ran = heard(() => ticket(ROOT, ["fill", PATH, ...flags], { disk, join }));
+  const ran = heard(() =>
+    ticket(ROOT, ["fill", PATH, ...flags], { disk, join, front: fakeFront() }),
+  );
   return { ...ran, now: disk.read(at(PATH)) };
 }
 
@@ -42,7 +45,11 @@ test("fill --stdout prints the ticket the mint writes, and writes no file", () =
   assert.match(said.said, /^steps:\n\s+- name: do/m);
   assert.match(said.said, /^process_hash: [0-9a-f]{16}$/m);
   assert.match(said.said, /^# do$/m, "a chapter stands for the step");
-  assert.match(said.said, /The lint drags on every save\./, "the ask the person wrote stays");
+  assert.match(
+    said.said,
+    /The lint drags on every save\./,
+    "the ask the person wrote stays",
+  );
   assert.equal(said.now, SAVED);
 });
 
@@ -79,7 +86,13 @@ test("the command line's ticket entry names the fill verb", () => {
 
 test("fill over a path standing nowhere refuses with exit 2", () => {
   const disk = fakeDisk({ [at("spec/schemas/ticket.schema.yaml")]: TICKET_SCHEMA });
-  const ran = heard(() => ticket(ROOT, ["fill", "spec/tickets/nowhere.md"], { disk, join }));
+  const ran = heard(() =>
+    ticket(ROOT, ["fill", "spec/tickets/nowhere.md"], {
+      disk,
+      join,
+      front: fakeFront(),
+    }),
+  );
   assert.equal(ran.code, 2);
   assert.match(ran.said, /names no ticket/);
 });

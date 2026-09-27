@@ -17,16 +17,25 @@ async function hookHere() {
 }
 
 // The harness the bridgehead reaches: a wire, a file system, a process and the lines a person reads. [[spec/design_output/doors#a-fake-behaves]]
-function harness({ answers = false, exitCode = 0, stderr = "", ui = true, logs = true } = {}) {
+function harness({
+  answers = false,
+  exitCode = 0,
+  stderr = "",
+  ui = true,
+  logs = true,
+} = {}) {
   const wrote = new Map();
   const ran = [];
   const said = [];
   // Every write the log takes, failing or landing, so a case counts what the row's mark holds. [[spec/tickets/the-bridge-says-it-falls]]
   const tries = [];
+  // Every address the hook fetches, so a case reads that nothing polls. [[spec/design_output/level0#the-first-call-pays]]
+  const asked = [];
   let up = answers;
   const $ = {
     http: {
-      fetch: async () => {
+      fetch: async (where) => {
+        asked.push(String(where));
         if (!up) throw new Error("fetch failed");
         return { ok: true, status: 200, text: JSON.stringify({ pass: true }) };
       },
@@ -53,7 +62,7 @@ function harness({ answers = false, exitCode = 0, stderr = "", ui = true, logs =
   function serves(on) {
     up = on;
   }
-  return { wrote, ran, said, tries, $, serves };
+  return { wrote, ran, said, tries, asked, $, serves };
 }
 
 // One event through the bridgehead's own door, so a case drives the road event by event. [[spec/tickets/the-bridge-says-it-falls]]
@@ -114,7 +123,11 @@ test("a desk box reads no line off the start road, because a person starts it th
   const rows = [...box.wrote.values()].join("\n");
   assert.doesNotMatch(rows, /the start of the server fails/, "the road fails nowhere");
   assert.doesNotMatch(rows, /a person starts the server here/, "and says nothing");
-  assert.match(rows, /the server answers nothing/, "the log names the down server alone");
+  assert.match(
+    rows,
+    /the server answers nothing/,
+    "the log names the down server alone",
+  );
 });
 
 test("a box whose start road stands down says so in the first prompt", async () => {
@@ -236,4 +249,122 @@ test("a session log that takes no write takes one row a fall", async () => {
   const falls = box.tries.filter((one) => one.includes("answers nothing"));
   assert.equal(falls.length, 1, "the row's mark stands off the answer of the write");
   assert.equal(box.said.length, 1, "and the chat line stands at one");
+});
+
+const LAUNCHED = 0;
+
+// [[spec/design_output/level0#rules-ride-the-first-answer]]
+test("a prompt meeting no server starts the road once, and passes on", async () => {
+  const hook = await hookHere();
+  const box = harness({ exitCode: LAUNCHED });
+  const runs = runner(hook, box);
+
+  const said = await runs("prompt.context", { blocks: [] });
+  await runs("prompt.context", { blocks: [] });
+
+  assert.equal(
+    box.ran.length,
+    1,
+    "the prompt starts the road, and a second one starts none",
+  );
+  assert.deepEqual(said, { blocks: [] }, "the prompt passes on as it came");
+});
+
+// [[spec/design_output/level0#the-first-call-pays]]
+test("a read tool before the server answers says level zero starts, and polls nothing", async () => {
+  const hook = await hookHere();
+  const box = harness({ exitCode: LAUNCHED });
+  const runs = runner(hook, box);
+  await runs("session.start", { cwd: HERE });
+
+  const said = await runs("tool.call", { tool: "mcp__level0__find" });
+
+  assert.match(String(said?.result ?? ""), /level zero is starting/i);
+  assert.match(
+    String(said.result),
+    /call it again/i,
+    "the line says what the agent does",
+  );
+  assert.equal(
+    box.asked.some((one) => one.endsWith("/health")),
+    false,
+    "the call reads no health, so it waits on nothing",
+  );
+});
+
+// [[spec/design_output/level0#the-first-call-pays]]
+test("a read tool after the server answered and fell names the dead server", async () => {
+  const hook = await hookHere();
+  const box = harness({ answers: true, exitCode: LAUNCHED });
+  const runs = runner(hook, box);
+  await runs("session.start", { cwd: HERE });
+  box.serves(false);
+
+  const said = await runs("tool.call", { tool: "mcp__level0__find" });
+
+  assert.match(String(said?.result ?? ""), /no server answers/);
+});
+
+// [[spec/design_output/level0#rules-ride-the-first-answer]]
+test("a cloud stop before any server answers holds with the starting line", async () => {
+  const hook = await hookHere();
+  const box = harness({ exitCode: LAUNCHED });
+  const runs = runner(hook, box);
+  await runs("session.start", { cwd: HERE });
+
+  const said = await runs("classic.Stop", {});
+
+  assert.match(String(said?.block ?? ""), /level zero is starting/i);
+  assert.match(String(said.block), /next event carries its rules/i);
+});
+
+// [[spec/design_output/level0#rules-ride-the-first-answer]]
+test("a cloud stop holds a few times at most, so a server that never stands frees the turn", async () => {
+  const hook = await hookHere();
+  const box = harness({ exitCode: LAUNCHED });
+  const runs = runner(hook, box);
+  await runs("session.start", { cwd: HERE });
+
+  const blocks = [];
+  for (let at = 0; at < 6; at++)
+    blocks.push(Boolean((await runs("classic.Stop", {}))?.block));
+
+  assert.ok(blocks[0], "the first stop holds");
+  assert.equal(blocks.at(-1), false, "a later stop passes");
+});
+
+// [[spec/design_output/level0#rules-ride-the-first-answer]]
+test("a helper's stop passes while the server starts", async () => {
+  const hook = await hookHere();
+  const box = harness({ exitCode: LAUNCHED });
+  const runs = runner(hook, box);
+  await runs("session.start", { cwd: HERE });
+
+  const said = await runs("classic.Stop", { agentId: "a1" });
+
+  assert.equal(said?.block, undefined);
+});
+
+// [[spec/design_output/level0#a-session-says-its-cage]]
+test("a cloud stop where the start road stood down passes, so a caged box loops nowhere", async () => {
+  const hook = await hookHere();
+  const box = harness({ exitCode: NO_MODULES, stderr: "npm stands nowhere" });
+  const runs = runner(hook, box);
+  await runs("session.start", { cwd: HERE });
+
+  const said = await runs("classic.Stop", { stop_hook_active: false });
+
+  assert.deepEqual(said, { stop_hook_active: false }, "the stop passes as it came");
+});
+
+// [[spec/design_output/level0#rules-ride-the-first-answer]]
+test("a desk stop meeting no server passes, because a person starts it there", async () => {
+  const hook = await hookHere();
+  const box = harness({ exitCode: 3 });
+  const runs = runner(hook, box);
+  await runs("session.start", { cwd: HERE });
+
+  const said = await runs("classic.Stop", {});
+
+  assert.equal(said?.block, undefined);
 });

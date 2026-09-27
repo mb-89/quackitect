@@ -2,16 +2,19 @@
 // so the door parses the command line and reads what it lands.
 // [[spec/design_output/bash#what-the-door-reads]]
 
+import { testIn } from "./bash-test.js";
 import { CODE } from "./code.js";
+import { gitWriteRows } from "./git-writes.js";
 import { overLong } from "./names.js";
 import { NOTES } from "./private.js";
 import { pullCommitsIn } from "./pulled.js";
 import { scriptWrites } from "./scripted.js";
 import { assigned, holdsAName, resolved } from "./shell-values.js";
-import { baseName, BREAKS, clean, READERS, SHELLS, tokensOf } from "./tokens.js";
+import { BREAKS, baseName, clean, READERS, SHELLS, tokensOf } from "./tokens.js";
 import { PROSE } from "./vale.js";
 
 export { tokensOf };
+export { testIn };
 
 export const VERBS = ["check", "branch", "tui", "doctor"];
 
@@ -32,13 +35,14 @@ export const FREE = [
   /(^|\/)node_modules(\/|$)/,
   /^\$\{?(TMPDIR|TMP|TEMP)\b/i,
   /^%(TMP|TEMP)%/i,
+  // The harness scratchpad, under a claude folder of the temp root, which a desk holds outside /tmp. It reads absolute alone, so a tree path of the same shape meets the rules. [[spec/tickets/doors-read-what-commands-do]]
+  /^(?:[A-Za-z]:)?\/(?:[^/]+\/)*claude(?:-[^/]*)?\/[^/]+\/[^/]+\/scratchpad(\/|$)/,
 ];
 
 const PASSES = new Set(["sudo", "env", "command", "nohup", "time", "exec"]);
 const EDITS = new Set(["sed", "perl"]);
 const COPIES = new Set(["cp", "mv"]);
 const TAKES = new Set(["-I", "-n", "-P", "-L", "-d", "-s", "-a", "-E"]);
-const RUNNERS = new Set(["npm", "pnpm", "yarn", "bun"]);
 
 const VALUED = ["m", "F", "C", "c", "t", "S", "u"];
 const IN_PLACE = /^(--in-place(=.*)?|-[A-Za-z]*i[A-Za-z]*(\.\S+)?)$/;
@@ -172,26 +176,6 @@ export function branchIn(command) {
   return out;
 }
 
-// [[spec/design_output/bash#a-test-run-points-somewhere]]
-export function testIn(command) {
-  const out = [];
-  for (const one of partsOf(command).segments) {
-    const words = wordsIn(one);
-    const name = baseName(words[0]);
-    const args = words.slice(1);
-
-    if (name === "node" && args.includes("--test") && !narrowed(args)) {
-      out.push(words.join(" "));
-      continue;
-    }
-    const suite = wholeSuite(args);
-    if (RUNNERS.has(name) && suite.whole && !narrowed(suite.rest)) {
-      out.push(words.join(" "));
-    }
-  }
-  return out;
-}
-
 // [[spec/design_output/private#the-second-door]]
 export function addsIn(command) {
   const out = [];
@@ -213,6 +197,8 @@ export function addsIn(command) {
 
 // [[spec/design_output/level0#a-shell-names-its-ticket]]
 const TICKET_FREE = [
+  ["branch", "take"],
+  ["branch", "list"],
   ["ticket", "pull"],
   ["mint", "ticket"],
   ["ticket", "note"],
@@ -308,6 +294,7 @@ export function findings(command, most, it = {}) {
       ]),
     );
   }
+  out.push(...gitWriteRows(said));
   return out;
 }
 
@@ -319,7 +306,8 @@ export function verbLine() {
     "Reach for the verb before the raw command.",
     "Level zero refuses a shell write to a file the rules reach, a commit carrying",
     "no message, a branch name past five words, a test run naming no file, a commit",
-    "whose delta carries something private, and a revert or a reset over a pull commit.",
+    "whose delta carries something private, a revert or a reset over a pull commit,",
+    "and every git command that writes the repository, naming the verb standing for it.",
   ].join(" ");
 }
 
@@ -470,10 +458,11 @@ function landingsAfterGates(command) {
   const { text } = withoutHeredocs(String(command ?? ""));
   const out = [];
   let segment = [];
-  let gate = "";
+  let pipeline = [];
+  let before = { pipeline: [], op: "" };
   const settle = () => {
     const landing = landingOf(segment);
-    if (gate && landing) out.push(landing);
+    if (landing && gatesLoosely(before)) out.push(landing);
   };
   for (const one of tokensOf(text)) {
     if (!(one.op && BREAKS.has(one.text))) {
@@ -481,11 +470,46 @@ function landingsAfterGates(command) {
       continue;
     }
     settle();
-    if (segment.length) gate = GATES.has(one.text) ? one.text : "";
+    if (segment.length) pipeline.push(segment);
+    if (one.text !== "|" && pipeline.length) {
+      before = { pipeline, op: one.text };
+      pipeline = [];
+    }
     segment = [];
   }
   settle();
   return out;
+}
+
+// A read gates nothing, so the landing after it waits on no answer. A gate before `;`, `||` or `&` runs the landing whatever it answers, and so does a gate piped into a read, because the pipe answers its last command. [[spec/tickets/doors-read-what-commands-do]]
+function gatesLoosely({ pipeline, op }) {
+  if (!pipeline.length || pipeline.every(isRead)) return false;
+  if (GATES.has(op)) return true;
+  return op === "&&" && pipeline.length > 1;
+}
+
+// The commands that read and land nothing, so none of them is a gate. [[spec/tickets/doors-read-what-commands-do]]
+const READS = new Set([
+  "cat",
+  "grep",
+  "rg",
+  "ls",
+  "head",
+  "tail",
+  "wc",
+  "cd",
+  "pwd",
+  "echo",
+  "printf",
+  "find",
+]);
+const GIT_READS = new Set(["status", "log", "diff", "show", "branch", "rev-parse"]);
+
+function isRead(segment) {
+  const words = wordsIn(segment);
+  const name = baseName(words[0]);
+  if (name === "git") return GIT_READS.has(afterGit(words)[0]);
+  return READS.has(name);
 }
 
 // What a segment lands, where it lands at all: a ticket pull, a ticket open, a git commit or the commit verb. [[spec/design_output/bash#a-landing-follows-its-gate]]
@@ -577,30 +601,6 @@ function steps(args) {
     }
   }
   return false;
-}
-
-function narrowed(args) {
-  return args.some(
-    (one) =>
-      (!one.startsWith("-") && one !== "--" && one !== "--test") ||
-      one.startsWith("--test-name-pattern") ||
-      one.startsWith("--test-only"),
-  );
-}
-
-function wholeSuite(args) {
-  const bare = args.filter((one) => !one.startsWith("-"));
-  const took =
-    bare[0] === "run" && bare[1] === "test"
-      ? 2
-      : bare[0] === "test" || bare[0] === "t"
-        ? 1
-        : 0;
-  if (!took) return { whole: false, rest: [] };
-  return {
-    whole: true,
-    rest: args.filter((one) => !bare.slice(0, took).includes(one)),
-  };
 }
 
 export function row(command, rule, said, message) {

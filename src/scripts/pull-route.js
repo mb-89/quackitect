@@ -168,6 +168,8 @@ export function leafOf(front, path) {
     not: nearest("not") === undefined ? "" : String(nearest("not")),
     on_fail: nearest("on_fail") === undefined ? "" : String(nearest("on_fail")),
     when: String(leaf.said.when ?? ""),
+    gate: String(leaf.said.gate ?? ""),
+    final: String(leaf.said.final ?? "") === "true",
     does: String(leaf.said.does ?? ""),
     asks: String(leaf.said.asks ?? ""),
     options: [leaf.said.options ?? []].flat().map(String),
