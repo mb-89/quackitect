@@ -210,6 +210,19 @@ test("a take marks every field the step still wants, and the door draws them in 
   );
 });
 
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+test("a person's hold on a ticket that reads closed carries no mark", async () => {
+  const closed = TEXT.replace("state: open", "state: closed");
+  const door = doorOf({
+    [HOLD_FILE]: JSON.stringify({ ...HOLD, path: PATH }),
+    [PATH]: closed,
+  });
+  const host = fieldMarksOf(door);
+  await host.starts();
+  await host.sees(PATH, closed);
+  assert.deepEqual(door.said.marks, [[PATH, []]]);
+});
+
 // [[spec/design_output/extension#a-take-marks-the-fields]]
 test("a ticket nobody holds carries no mark", async () => {
   const other = { ...HOLD, hand: "box abc · claude-code" };

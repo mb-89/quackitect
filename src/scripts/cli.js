@@ -90,7 +90,7 @@ export const verbs = {
         ran = await batteryRun(
           [
             ["tests", () => test(errors)],
-            ["go", () => goHolds(errors)],
+            ["go", () => goHolds(errors, redHere())],
             ["doors", () => doorsHold()],
             ["projections", () => projectionsHold()],
             ["plugin", () => pluginHolds()],

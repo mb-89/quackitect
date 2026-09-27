@@ -118,14 +118,15 @@ export function viewerHere() {
 
 // Every Go module's tests run in the battery, the import rules among them. The one module stands at the root. [[spec/tickets/go-code-shares-one-module]]
 // Under `check --errors` the run stays quiet, and each failing Go test reaches the error stream alone. [[spec/tickets/the-verbs-need-no-wrapper]]
-export function goHolds(quiet = false) {
+export function goHolds(quiet = false, red = []) {
   const at = { disk: files, join, root };
   const env = goEnvOf(at);
+  const skip = skipOf(red, (path) => files.read(join(root, path)));
   let worst = 0;
   for (const folder of goModulesIn(at)) {
     let ran;
     try {
-      ran = outside.run([go, "test", "./..."], {
+      ran = outside.run([go, "test", ...skip, "./..."], {
         cwd: join(root, folder),
         env,
         inherit: !quiet,
@@ -142,6 +143,19 @@ export function goHolds(quiet = false) {
     worst = worst || ran.exitCode || goFormat(folder, env);
   }
   return worst;
+}
+
+// A red Go test file stands apart until its tests-green closes, as a red JavaScript one does, so the Go run skips the tests it names. [[spec/design_output/pull#the-gate]]
+export function skipOf(red, read) {
+  const names = [];
+  for (const path of red.filter((one) => one.endsWith("_test.go"))) {
+    let text = "";
+    try {
+      text = read(path);
+    } catch {}
+    for (const found of text.matchAll(/^func (Test\w+)\(/gm)) names.push(found[1]);
+  }
+  return names.length ? ["-skip", `^(${[...new Set(names)].sort().join("|")})$`] : [];
 }
 
 // Go's own format rides in no other gate, so the check holds it. [[spec/design_output/index#the-compiler-it-needs]]

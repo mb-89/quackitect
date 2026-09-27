@@ -9,6 +9,7 @@ import {
   argvOf,
   fillArgvOf,
   HOLDS,
+  holdsIn,
   lensesOf,
   personEnv,
   routeArgvOf,
@@ -238,7 +239,28 @@ test("the lenses read the holds off the hold folder", async () => {
   );
   const said = await lens.lenses(PATH, ticket("open", "design/draft"));
   assert.equal(said[0].arguments[0], "pass");
-  assert.deepEqual(lens.watches, [`${HOLDS}/*.json`, ".se/.runtime/hold.json"]);
+  assert.deepEqual(lens.watches, [`${HOLDS}/*.json`]);
+});
+
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+test("the holds skip the older hold file and one whose ticket reads closed, and keep one naming no path or no file", async () => {
+  const door = doorOf({
+    [`${HOLDS}/a.json`]: JSON.stringify({
+      ticket: "shut",
+      path: "spec/tickets/shut.md",
+    }),
+    [`${HOLDS}/b.json`]: JSON.stringify({ ticket: "loose" }),
+    [`${HOLDS}/c.json`]: JSON.stringify({
+      ticket: "away",
+      path: "spec/tickets/away.md",
+    }),
+    [`${HOLDS}/d.json`]: JSON.stringify({ ticket: "one", path: PATH }),
+    ".se/.runtime/hold.json": JSON.stringify({ ticket: "old" }),
+    "spec/tickets/shut.md": ticket("closed"),
+    [PATH]: ticket("open"),
+  });
+  const holds = await holdsIn(await door.list(HOLDS), door.read);
+  assert.deepEqual(holds.map((one) => one.ticket).sort(), ["away", "loose", "one"]);
 });
 
 test("a pass saves the ticket, runs the pull, and says the answer", async () => {
@@ -300,11 +322,10 @@ test("a save over a picked process and an empty route runs the fill on the path"
     "fill",
     PATH,
   ]);
-  assert.deepEqual(fillArgvOf(PATH, picked("[[spec/processes/trivial]]", ["steps: []"])), [
-    "ticket",
-    "fill",
-    PATH,
-  ]);
+  assert.deepEqual(
+    fillArgvOf(PATH, picked("[[spec/processes/trivial]]", ["steps: []"])),
+    ["ticket", "fill", PATH],
+  );
 });
 
 test("a save over a ticket whose route stands runs nothing", () => {
@@ -314,7 +335,10 @@ test("a save over a ticket whose route stands runs nothing", () => {
 test("a save over an empty process, or a file outside the ticket folders, runs nothing", () => {
   assert.deepEqual(fillArgvOf(PATH, picked("")), []);
   assert.deepEqual(fillArgvOf(PATH, picked('""')), []);
-  assert.deepEqual(fillArgvOf("spec/notes/one.md", picked("[[spec/processes/trivial]]")), []);
+  assert.deepEqual(
+    fillArgvOf("spec/notes/one.md", picked("[[spec/processes/trivial]]")),
+    [],
+  );
 });
 
 test("a saved ticket the fill takes runs the verb, and says the answer", async () => {

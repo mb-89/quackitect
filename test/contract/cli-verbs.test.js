@@ -67,7 +67,7 @@ test("the check verb under --errors runs its parts quiet, and prints what errors
   const row = /^ {2}check: \{[\s\S]*?^ {2}\},/m.exec(source)?.[0] ?? "";
   assert.match(row, /rest\.includes\("--errors"\)/, "the row reads the flag");
   assert.match(row, /test\(errors\)/, "the tests run quiet");
-  assert.match(row, /goHolds\(errors\)/, "and the Go tests");
+  assert.match(row, /goHolds\(errors, redHere\(\)\)/, "and the Go tests, the red list apart");
   assert.match(
     row,
     /errorsSaid\(timesHere\(\), errorsStood\(\)\)/,
