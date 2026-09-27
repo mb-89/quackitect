@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -305,6 +305,19 @@ record:
         hash: 6f01f3b4488cf7dc
         size: 88120
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e3869061cf · claude-code-remote
+    hash_before: 99b67ed685fd54c5ced80260e9f8dcf62364f05c
+    hash_after: 99b67ed685fd54c5ced80260e9f8dcf62364f05c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 805f822e49c509fa
+        size: 3263
+    def: 08e16d07b0de477c
 group: the-cloud-works-its-queue
 ---
 
@@ -404,22 +417,22 @@ each `done_when` line meets a case or the note, and the check decides the last
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
 <!-- the form is list -->
 
-- test/level0/hooks.test.js
+test/level0/hooks.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Four cases fail on their own assertion against the stub boot, and the settings file carries no SessionStart hook yet. The case where everything stands and the case off a cloud box pass on the stub, as negative cases do. The run after the restale reads the same four.
+Four cases fail on their own assertion against the stub boot, and the settings file carries no SessionStart hook yet. The case where everything stands and the case off a cloud box pass on the stub, as negative cases do. The run after the merge of main reads the same four.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- every done_when line on the hook meets a case, the note lines meet the review, and ./RUNME.sh check decides the last
-- the boot cases reach the disk and the process through fakeDisk and fakeProc alone
+every done_when line on the hook meets a case, the note lines meet the review, and ./RUNME.sh check decides the last
+the boot cases reach the disk and the process through fakeDisk and fakeProc alone
 
 ## draft-2
 
