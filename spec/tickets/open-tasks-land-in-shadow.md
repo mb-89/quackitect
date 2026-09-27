@@ -99,6 +99,8 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch sync
+
 # split
 
 <!-- reads the standing children, and mints more where the goal needs them, each naming this group -->
