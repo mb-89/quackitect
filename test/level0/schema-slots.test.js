@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import {
   checkData,
   isDataSchema,
@@ -12,7 +13,10 @@ import {
   schemaFaults,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
-import { processHash, slotFaults } from "../../.claude/skills/level0/lib/schema-route.js";
+import {
+  processHash,
+  slotFaults,
+} from "../../.claude/skills/level0/lib/schema-route.js";
 import { GOVERNED, ROUTED, routed, treeWith } from "./schema-notes.js";
 
 const PROCESS = readYaml(`
@@ -290,16 +294,22 @@ The approach stands here.
 
 <!-- reads the design -->
 `;
-  const now = reRouted(was, ROUTED, [
-    {
-      name: "design",
-      steps: [
-        { name: "draft", does: "writes the design" },
-        { name: "review", does: "reads the design" },
-      ],
-    },
-    { name: "ship", does: "ships it" },
-  ]);
+  const now = reRouted(
+    was,
+    ROUTED,
+    [
+      {
+        name: "design",
+        steps: [
+          { name: "draft", does: "writes the design" },
+          { name: "review", does: "reads the design" },
+        ],
+      },
+      { name: "ship", does: "ships it" },
+    ],
+    "",
+    fakeFront(),
+  );
   assert.match(now, /The approach stands here\./);
   assert.match(now, /^# ship$/m);
   assert.match(now, /<!-- ships it -->/);
@@ -342,7 +352,13 @@ The red evidence.
 
 The green evidence.
 `;
-  const now = reRouted(was, ROUTED, [...route, { name: "ship", does: "ships it" }]);
+  const now = reRouted(
+    was,
+    ROUTED,
+    [...route, { name: "ship", does: "ships it" }],
+    "",
+    fakeFront(),
+  );
   const red = now.indexOf("The red evidence.");
   const green = now.indexOf("The green evidence.");
   assert.ok(red > now.indexOf("# red") && red < now.indexOf("# green"));
@@ -371,8 +387,12 @@ What it asks for.
 
 The approach stands here.
 `;
-  const now = reRouted(was, ROUTED, [
-    { name: "plan", steps: [{ name: "draft", does: "writes the design" }] },
-  ]);
+  const now = reRouted(
+    was,
+    ROUTED,
+    [{ name: "plan", steps: [{ name: "draft", does: "writes the design" }] }],
+    "",
+    fakeFront(),
+  );
   assert.match(now, /The approach stands here\./);
 });

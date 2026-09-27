@@ -298,6 +298,21 @@ get_lsp() {
   lsp_here
 }
 
+# The one writer of frontmatter, which every ticket write reaches, builds the
+# way the language server does. [[spec/tickets/go-writes-the-frontmatter]]
+front_here() {
+  if [ ! -x "$bin/se-front${exe}" ]; then return 1; fi
+  (cd "$root" && node src/scripts/go-source.js fresh se-front) 2>/dev/null
+}
+
+get_front() {
+  say "  building the front writer"
+  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-front${exe}.new" ./src/front/cmd) || return 1
+  swap_in "$bin/se-front${exe}.new" "$bin/se-front${exe}" || return 1
+  (cd "$root" && node src/scripts/go-source.js stamp se-front) || return 1
+  front_here
+}
+
 # THE MODULES LAND AT THE INSTALL, SO THE FIRST CHECK FETCHES NOTHING. A stamp
 # holds the checksum of every go.sum, so a changed dependency fetches again and
 # a still tree asks no network. A box with no Go wants no modules.
@@ -474,7 +489,7 @@ set_hooks() {
 wanted() {
   [ "$1" = "vale-ls" ] || [ "$1" = "go" ] || [ "$1" = "go-modules" ] || [ "$1" = "git-hooks" ] ||
     [ "$1" = "editor-link" ] || [ "$1" = "editor-extensions" ] ||
-    [ "$1" = "index" ] || [ "$1" = "se-lsp" ] || [ "$1" = "editor-client" ] ||
+    [ "$1" = "index" ] || [ "$1" = "se-lsp" ] || [ "$1" = "se-front" ] || [ "$1" = "editor-client" ] ||
     [ "$1" = "drawing" ] || [ "$1" = "browser" ]
 }
 
@@ -485,6 +500,7 @@ missed() {
     go-modules) say "  the Go modules stay unfetched, so the first check downloads them." >&2 ;;
     index) say "  the index stays unbuilt, so find and links read the files." >&2 ;;
     se-lsp) say "  the language server stays unbuilt, so lint reads the node rules." >&2 ;;
+    se-front) say "  the front writer stays unbuilt, so every ticket write refuses until Go stands here." >&2 ;;
     editor-client) say "  no language client here, so the editor draws no server line." >&2 ;;
     drawing) say "  the drawing stays unbundled, so the editor draws no route." >&2 ;;
     browser) say "  no browser here, so the check skips the drawing's test." >&2 ;;
@@ -505,6 +521,7 @@ here() {
     go-modules) modules_here ;;
     index) index_here ;;
     se-lsp) lsp_here || ! have go ;;
+    se-front) front_here || ! have go ;;
     editor-client) [ -d "$client_folder" ] ;;
     drawing) drawing_here ;;
     browser) browser_here ;;
@@ -525,6 +542,7 @@ why() {
     go-modules) say "go-modules: the modules every Go module names, so the first check fetches nothing" ;;
     index) say "index: the warm model of this tree, which find and links ask" ;;
     se-lsp) say "se-lsp: this tree's own language server, which draws the note shape and the names" ;;
+    se-front) say "se-front: the one writer of frontmatter, which every ticket write reaches" ;;
     editor-client) say "editor-client: the language client the extension starts the server through" ;;
     drawing) say "drawing: the modules the route drawing takes, bundled into the one script a webview loads" ;;
     browser) say "browser: the chromium the drawing's test drives" ;;
@@ -545,6 +563,7 @@ get() {
     go-modules) get_modules ;;
     index) get_index ;;
     se-lsp) get_lsp ;;
+    se-front) get_front ;;
     editor-client) get_client ;;
     drawing) get_drawing ;;
     browser) get_browser ;;
@@ -557,7 +576,7 @@ get() {
 # SE_INSTALL_SKIP names the wants a caller leaves out, so a test vehicle builds
 # no index and links no editor while it proves the vehicle stands alone.
 missing=""
-for one in node modules vale biome vale-ls go go-modules index se-lsp editor-client drawing browser editor-link \
+for one in node modules vale biome vale-ls go go-modules index se-lsp se-front editor-client drawing browser editor-link \
   editor-extensions git-hooks; do
   case " ${SE_INSTALL_SKIP:-} " in *" $one "*) continue ;; esac
   here "$one" || missing="$missing $one"

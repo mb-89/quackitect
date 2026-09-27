@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { skip, test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fileURLToPath } from "node:url";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
@@ -107,18 +108,22 @@ ifVale(
     for (const name of names) {
       const held = processAt(files, root, join, name);
       const path = `spec/tickets/${name}-rendered.md`;
-      const made = mintedNote(schemasHere(it), {
-        kind: "ticket",
-        path,
-        fields: {
-          state: "open",
-          process: held.link,
-          process_hash: held.hash,
-          steps: held.route,
-          step: firstLeaf(held.route),
-          Ask: [askRows(held.ask), "", CLEAN].join("\n").trim(),
+      const made = mintedNote(
+        schemasHere(it),
+        {
+          kind: "ticket",
+          path,
+          fields: {
+            state: "open",
+            process: held.link,
+            process_hash: held.hash,
+            steps: held.route,
+            step: firstLeaf(held.route),
+            Ask: [askRows(held.ask), "", CLEAN].join("\n").trim(),
+          },
         },
-      });
+        fakeFront(),
+      );
       assert.equal(made.why, undefined, `${name} mints: ${made.why}`);
       const rows = made.text.split("\n");
       for (const one of voiceOver(it, path, made.text)) {

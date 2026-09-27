@@ -105,7 +105,9 @@ function note(it, name, argv) {
     return 2;
   }
   if (overLong(name, it.words)) {
-    console.error(`A ticket name holds at most ${it.words} words, and ${name} holds more.`);
+    console.error(
+      `A ticket name holds at most ${it.words} words, and ${name} holds more.`,
+    );
     return 2;
   }
 
@@ -148,18 +150,22 @@ function note(it, name, argv) {
 
 // A ticket minted off a route, the hand's line as its Ask. The Ask reads through the lint's road before any write, so a refusal writes nothing. [[spec/design_output/pull#a-draft-opens]]
 export function routedTicket(it, path, held, { steps, line, fields }) {
-  const made = mintedNote(schemasHere(it), {
-    kind: "ticket",
-    path,
-    fields: {
-      ...fields,
-      process: held.link,
-      process_hash: held.hash,
-      steps,
-      step: firstLeafOf(held.route),
-      Ask: [askRows(held.ask), "", line].join("\n").trim(),
+  const made = mintedNote(
+    schemasHere(it),
+    {
+      kind: "ticket",
+      path,
+      fields: {
+        ...fields,
+        process: held.link,
+        process_hash: held.hash,
+        steps,
+        step: firstLeafOf(held.route),
+        Ask: [askRows(held.ask), "", line].join("\n").trim(),
+      },
     },
-  });
+    it.front,
+  );
   if (made.why) return made;
   const found = askFaults(it, path, made.text);
   if (found.refused.length) return { why: lineRefusal(path, found.refused) };
@@ -196,7 +202,7 @@ function todo(it, name, argv) {
 
   it.disk.write(
     at.path,
-    off ? withoutField(text, TODO) : withField(text, TODO, "true"),
+    off ? withoutField(text, TODO, it.front) : withField(text, TODO, "true", it.front),
   );
   console.log(
     off
@@ -336,7 +342,7 @@ function update(it, name, argv) {
   }
 
   const schema = schemasHere(it).get("ticket");
-  it.disk.write(at.path, reRouted(text, schema, route.steps, held.hash));
+  it.disk.write(at.path, reRouted(text, schema, route.steps, held.hash, it.front));
   console.log(
     `${at.said} carries ${held.name} again, and ${route.kept} leaf/leaves keep what they hold.`,
   );
@@ -420,7 +426,12 @@ export function opensDraft(it, at) {
     it,
     {
       at: at.path,
-      text: withField(withField(text, "state", "open"), "step", step),
+      text: withField(
+        withField(text, "state", "open", it.front),
+        "step",
+        step,
+        it.front,
+      ),
       name: called,
       private: at.said.startsWith(`${NOTES}/`),
     },

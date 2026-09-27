@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 249955eac153111c26a8822f62be67bd4141f661
+    hash_after: af268f380181bc6b93687ddb506b6f749806e25c
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -255,11 +263,20 @@ The surprise: the tree's JavaScript reader strips a quote and unescapes nothing.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/front src/doors/front.js src/doors/fake/front.js src/engine/group.js src/scripts src/bridge src/tui/work .claude/skills/level0/lib/schema-mint.js test/contract/front.test.js test/level0/front-writer.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the callers the design lists, their tests, and the door bags that hand the writer in
+- the front door has a fake in `src/doors/fake/front.js`, and `test/contract/front.test.js` holds it to the binary
+- each new file opens on the approach and links this ticket
+- the quoting rule stands in `Quote` in Go, and the fake's `quote` mirrors it under the contract test
+- the review passes with no rows
+- `test/level0/pull.test.js` passes the ceiling, so its fail cases move to `test/level0/pull-fail-verdict.test.js`
 
 ## tests-green
 
@@ -292,3 +309,6 @@ The surprise: the tree's JavaScript reader strips a quote and unescapes nothing.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The build refines one line of the approach. A writer takes the front door as its last argument, in place of one function in `group.js` reaching the binary. Every verb hands in `it.front`, and every test hands in `fakeFront()`, so a memory-only test spawns no process. `test/contract/front.test.js` holds the fake to the binary over tickets of this tree.
+- `set` writes a flow list or a flow map as written, since `successors` takes a list, and normalise leaves a flow as written too.

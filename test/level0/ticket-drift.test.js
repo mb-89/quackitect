@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { processHash } from "../../.claude/skills/level0/lib/schema.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
@@ -80,7 +81,14 @@ function updating(text, versions, flags = []) {
     [at(PATH)]: text,
   });
   const git = history(versions);
-  const ran = heard(() => ticket(ROOT, ["update", "slow-lint", ...flags], { disk, join, git }));
+  const ran = heard(() =>
+    ticket(ROOT, ["update", "slow-lint", ...flags], {
+      disk,
+      join,
+      git,
+      front: fakeFront(),
+    }),
+  );
   return { ...ran, now: disk.read(at(PATH)) };
 }
 
@@ -106,7 +114,10 @@ test("a step a person edited past the pointer is named as drift, and nothing cha
 });
 
 test("an edit to a reached leaf is no drift, since the leaf keeps what it holds", () => {
-  const said = updating(ticketText({ doing: "makes the change, and its test" }), VERSIONS);
+  const said = updating(
+    ticketText({ doing: "makes the change, and its test" }),
+    VERSIONS,
+  );
   assert.equal(said.code, 0);
   assert.match(said.now, /makes the change, and its test/);
   assert.match(said.now, /checks it twice/);
@@ -121,7 +132,9 @@ test("a hash no version answers is refused, and nothing changes", () => {
 });
 
 test("--over copies the new route over the drift", () => {
-  const said = updating(ticketText({ check: "checks it by hand" }), VERSIONS, ["--over"]);
+  const said = updating(ticketText({ check: "checks it by hand" }), VERSIONS, [
+    "--over",
+  ]);
   assert.equal(said.code, 0);
   assert.match(said.now, /checks it twice/);
 });

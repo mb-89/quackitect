@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import {
@@ -176,7 +177,7 @@ function treeWithProcesses(files = {}) {
     [at("spec/processes/trivial.yaml")]: TRIVIAL_PROCESS,
     ...files,
   });
-  return { it: { disk, join, words: 5 }, disk };
+  return { it: { disk, join, words: 5, front: fakeFront() }, disk };
 }
 
 test("ticket note writes a private ticket off the note process, and says so", () => {
@@ -282,7 +283,10 @@ test("ticket note refuses a name past the cap, and says a name holds at most the
   const long = "one-two-three-four-five-six";
   const refused = heard(() => ticket(ROOT, ["note", long, "A line."], said.it));
   assert.equal(refused.code, 2);
-  assert.match(refused.said, /A ticket name holds at most 5 words, and one-two-three-four-five-six holds more/);
+  assert.match(
+    refused.said,
+    /A ticket name holds at most 5 words, and one-two-three-four-five-six holds more/,
+  );
   assert.equal(said.disk.exists(at(`${NOTES}/${long}.md`)), false, "no note lands");
 });
 

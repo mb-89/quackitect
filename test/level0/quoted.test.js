@@ -5,7 +5,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
-import { quoted, recordIn, withEntry } from "../../src/engine/group.js";
+import { fakeFront, quote as quoted } from "../../src/doors/fake/front.js";
+import { recordIn, withEntry } from "../../src/engine/group.js";
 
 const NOTE = "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nA thing.\n";
 
@@ -29,21 +30,25 @@ test("a plain value stays plain", () => {
     "the box leaves it while step-changes-hand",
   );
   assert.equal(quoted("design/review"), "design/review");
-  assert.equal(quoted(3), "3");
+  assert.equal(quoted("3"), "3");
 });
 
 test("a reader takes back the reason a hand-back writes, colon and all", () => {
   const why =
     "The approach names no server: `./RUNME.sh serve` starts it.; Step 8 installs the plugin, and the approach writes a hook.";
-  const text = withEntry(NOTE, {
-    step: "design/review",
-    hand: "box 99aa60a14c3f",
-    returns: 1,
-    why,
-    answered: [
-      { name: "check", exit: 0, said: "64 stand at warning: the panel draws them" },
-    ],
-  });
+  const text = withEntry(
+    NOTE,
+    {
+      step: "design/review",
+      hand: "box 99aa60a14c3f",
+      returns: 1,
+      why,
+      answered: [
+        { name: "check", exit: 0, said: "64 stand at warning: the panel draws them" },
+      ],
+    },
+    fakeFront(),
+  );
   assert.equal(readNote(text).front.stands, true, "the frontmatter reads whole");
   const entry = recordIn(text).at(-1);
   assert.equal(entry.why, why);

@@ -5,6 +5,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { heldIn, withField } from "../../src/engine/group.js";
 import { work } from "../../src/scripts/work.js";
 import {
@@ -43,8 +44,8 @@ Nothing yet.
 
 // Two free groups: the first waits on the gate, and the second holds a child a hand takes. [[spec/design_output/work#the-take-writes-the-record]]
 function twoGroups(gate) {
-  const first = gated(withField(GROUP_NOTE, "step", "children"));
-  const second = withField(GROUP_NOTE, "step", "children");
+  const first = gated(withField(GROUP_NOTE, "step", "children", fakeFront()));
+  const second = withField(GROUP_NOTE, "step", "children", fakeFront());
   const answers = {
     ...remoteSaying(
       [

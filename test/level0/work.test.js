@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import {
@@ -99,13 +100,17 @@ test("close reaches a work branch and a branch the platform cut", () => {
 });
 
 test("done says one line to the log, naming the branch and the code", async () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const took = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
   const { it, disk } = doorsSaying(onBranch("work/one-group"), {
-    [on("one-group")]: withField(took, "state", CLOSED),
+    [on("one-group")]: withField(took, "state", CLOSED, fakeFront()),
     ...green,
   });
   // A verb answering zero writes at debug, so the row shows on a box writing that floor and on no other. [[spec/design_output/log#which-kind-says-what]]
@@ -312,7 +317,7 @@ test("release refuses a branch already standing at done", () => {
   const { it, disk } = doorsSaying({
     "git rev-parse --abbrev-ref HEAD": { stdout: "work/one-group\n" },
     [`git show origin/work/one-group:${GROUP_AT}`]: {
-      stdout: withField(GROUP_NOTE, "state", CLOSED),
+      stdout: withField(GROUP_NOTE, "state", CLOSED, fakeFront()),
     },
   });
 

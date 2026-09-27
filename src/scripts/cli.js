@@ -478,7 +478,7 @@ export function mint(argv) {
   }
 
   const fields = handover ? fromHandover(copied.fields) : copied.fields;
-  const made = mintedNote(schemas, { kind, path, fields });
+  const made = mintedNote(schemas, { kind, path, fields }, it.front);
   if (made.why) {
     console.error(made.why);
     return 2;

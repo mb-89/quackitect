@@ -17,6 +17,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"quackitect/src/front"
 	"quackitect/src/tui/draw"
 	"quackitect/src/tui/tree"
 	"quackitect/src/yaml"
@@ -306,56 +307,15 @@ func writeTicket(root string, one tree.Item) error {
 	return writeFile(file, []byte(said), 0o644)
 }
 
-// The front with one top-level field set, or dropped where the value is empty or a flag standing off. A front fenced with CRLF keeps its line ends. [[spec/design_output/tui#the-work-tab-takes-edits]]
+// The front with one top-level field set, or dropped where the value is empty or a flag standing off. The one writer holds the form. [[spec/tickets/go-writes-the-frontmatter]]
 func WithField(text, key, value string) (string, bool) {
-	lines := strings.Split(text, "\n")
-	fence := func(at int) bool { return strings.TrimSuffix(lines[at], "\r") == "---" }
-	if !fence(0) {
+	write := func() (string, error) { return front.Set(text, key, value) }
+	if value == "" || value == FlagOff {
+		write = func() (string, error) { return front.Drop(text, key) }
+	}
+	said, err := write()
+	if err != nil {
 		return text, false
 	}
-	shut := -1
-	for at := 1; at < len(lines); at++ {
-		if fence(at) {
-			shut = at
-			break
-		}
-	}
-	if shut < 0 {
-		return text, false
-	}
-	drop := value == "" || value == FlagOff
-	row := key + ": " + quotedValue(value)
-	if strings.HasSuffix(lines[0], "\r") {
-		row += "\r"
-	}
-	for at := 1; at < shut; at++ {
-		if !strings.HasPrefix(lines[at], key+":") {
-			continue
-		}
-		// A block value runs on in the lines under the key, and the write takes them with it. [[spec/design_output/tui#the-work-tab-takes-edits]]
-		end := at + 1
-		for end < shut && strings.ContainsAny(lines[end][:min(1, len(lines[end]))], " \t-") {
-			end++
-		}
-		kept := lines[:at:at]
-		if !drop {
-			kept = append(kept, row)
-		}
-		return strings.Join(append(kept, lines[end:]...), "\n"), true
-	}
-	if drop {
-		return text, true
-	}
-	out := append(lines[:shut:shut], append([]string{row}, lines[shut:]...)...)
-	return strings.Join(out, "\n"), true
-}
-
-// A value every YAML reader takes as one string, the way the record quotes its own. [[spec/design_output/work#the-record-quotes-its-value]]
-func quotedValue(said string) string {
-	plain := said != "" && !strings.Contains(said, ": ") && !strings.Contains(said, " #") &&
-		!strings.ContainsAny(said[:1], "\"'[{&*!|>%@`#") && !strings.HasSuffix(said, " ")
-	if plain {
-		return said
-	}
-	return `"` + strings.NewReplacer(`\`, `\\`, `"`, `\"`).Replace(said) + `"`
+	return said, true
 }

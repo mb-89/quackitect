@@ -24,8 +24,12 @@ const tree = () =>
     [`${ROOT}/src/tui/main.go`]: "package main\n",
   });
 
-test("the two binaries name their folders", () => {
-  assert.deepEqual(BUILDS, { "se-lsp": "src/lsp", "se-index": "src/index" });
+test("the three binaries name their folders", () => {
+  assert.deepEqual(BUILDS, {
+    "se-lsp": "src/lsp",
+    "se-index": "src/index",
+    "se-front": "src/front/cmd",
+  });
 });
 
 // [[spec/tickets/go-code-shares-one-module]]

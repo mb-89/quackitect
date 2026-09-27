@@ -120,7 +120,7 @@ export function freeChildren(it, name) {
   for (const one of childrenHere(it, name)) {
     if (fieldOf(one.text, "state") === CLOSED) continue;
     const at = ticketAt(one.name);
-    it.disk.write(it.join(it.root, at), withoutField(one.text, GROUP));
+    it.disk.write(it.join(it.root, at), withoutField(one.text, GROUP, it.front));
     it.git.run(["add", at], true);
     out.push(one.name);
   }

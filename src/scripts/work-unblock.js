@@ -72,9 +72,15 @@ export function unblock(it, name, argv) {
   it.disk.write(successor.at, successor.text);
 
   child.text = withField(
-    withField(withField(child.text, "state", CLOSED), "reason", "became"),
+    withField(
+      withField(child.text, "state", CLOSED, it.front),
+      "reason",
+      "became",
+      it.front,
+    ),
     "successors",
     `[${nextName}]`,
+    it.front,
   );
   const finding = landedAlone(it, child, [`closes became ${nextName}`], [successor.at]);
   if (finding) {

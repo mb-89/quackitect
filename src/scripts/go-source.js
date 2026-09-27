@@ -9,7 +9,11 @@ import { runsHere } from "../../.claude/skills/level0/lib/paths.js";
 import { goFoldersOf } from "./cli-go.js";
 import { MODULE_FILES, sourceHash } from "./tui-build.js";
 
-export const BUILDS = { "se-lsp": "src/lsp", "se-index": "src/index" };
+export const BUILDS = {
+  "se-lsp": "src/lsp",
+  "se-index": "src/index",
+  "se-front": "src/front/cmd",
+};
 
 // The binary's folder, every tree package it imports, and the root module files, which pin every dependency. [[spec/tickets/go-code-shares-one-module]]
 export function foldersOf(files, root, folder) {

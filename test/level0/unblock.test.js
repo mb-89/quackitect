@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { schemasFrom } from "../../.claude/skills/level0/lib/schema.js";
 import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
@@ -156,6 +157,7 @@ function doors(files, answers = {}, more = {}) {
       disk,
       git: said,
       join,
+      front: fakeFront(),
       clock: fakeClock(),
       agent: true,
       // This verb is a desk's, and a case driving the cloud road says so. [[spec/guidance/cloud]]
@@ -301,7 +303,11 @@ test("a failed verdict keeps its table rows as rows", () => {
     said.reason,
     "the rows split:; | road | cost |\\n| --- | --- |\\n| one | two |; no test drives the hook",
   );
-  const rows = ["pass with findings", "- cut-the-rows: the rows split", ...TABLED.slice(2, 5)];
+  const rows = [
+    "pass with findings",
+    "- cut-the-rows: the rows split",
+    ...TABLED.slice(2, 5),
+  ];
   assert.deepEqual(
     verdictIn(rows).findings.map((one) => one.name),
     ["cut-the-rows"],
@@ -315,16 +321,25 @@ test("a findings table a verdict fails with lands under unblock as that table", 
   const one = { name: "a-child", text: CHILD("implement/change") };
   const asks = `implement/change fails back 2 times: ${verdictIn(TABLED).reason}`;
   const held = doors(schema).it;
-  assert.equal(withPersonStep({ ...held, root: ROOT }, one, "implement/change", asks).path, "implement/person-2");
+  assert.equal(
+    withPersonStep({ ...held, root: ROOT }, one, "implement/change", asks).path,
+    "implement/person-2",
+  );
   const { it, disk } = doors(standing(one.text, schema));
 
-  const { code, said } = heard(() => work(ROOT, ["unblock", "a-child", "a-successor"], it));
+  const { code, said } = heard(() =>
+    work(ROOT, ["unblock", "a-child", "a-successor"], it),
+  );
 
   assert.equal(code, 0, said);
   const successor = disk.read(at("spec/tickets/a-successor.md"));
   assert.match(successor, /^\| road \| cost \|$/m, "the table keeps its own line");
   assert.match(successor, /^\| one \| two \|$/m, "every row keeps its own line");
-  assert.match(successor, /^ {2}- no test drives the hook$/m, "a plain row stays an item");
+  assert.match(
+    successor,
+    /^ {2}- no test drives the hook$/m,
+    "a plain row stays an item",
+  );
 });
 
 // A successor minted off trivial opens under by: anyone, so the pull hands a person's question to an agent. [[spec/design_output/work#a-person-step-leaves]]
@@ -511,11 +526,15 @@ function mintedOffQuestion() {
   });
   assert.equal(copied.why, undefined, "the route copies onto the ticket");
 
-  const made = mintedNote(schemas, {
-    kind: "ticket",
-    path: "spec/tickets/a-successor.md",
-    fields: copied.fields,
-  });
+  const made = mintedNote(
+    schemas,
+    {
+      kind: "ticket",
+      path: "spec/tickets/a-successor.md",
+      fields: copied.fields,
+    },
+    fakeFront(),
+  );
   assert.equal(made.why, undefined, "the mint answers a note");
   return made.text;
 }
