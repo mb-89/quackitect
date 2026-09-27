@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -168,6 +168,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 34c0e142271ace9a07627e50e675f28d909e3787
+    hash_after: 60c97257be9ce2cc62c5dff96369a78d19f9134c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 13 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:271:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: e58eac2283e8490b
+        size: 779
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -343,26 +366,33 @@ accept: the approach answers the ask, and a red case decides every done_when lin
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/dispatch.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+./RUNME.sh dispatch --dry prints the dispatcher plan off origin/main and the work branches, and --json prints it as one JSON line. The plan names the ready groups, the stuck hand-overs, the fresh holds, the groups waiting on another, one bundle of the loose agent tickets, and the tickets waiting on a person. It writes nothing, so a desk runs it beside its own work and compares. Ready reads freeIn, the rule the take reads, so the plan and the take agree on a stale hold. waitsOnPerson in work-answer.js is now an export, and the queue and the plan read one rule. A branch answers for its own children alone, because every branch carries the whole ticket folder, and an older copy on another branch read as a question before that.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, the case beside the export, and the hooks case the check refused
+- the cases reach git, the disk and the clock through the fakes alone
+- the header of src/scripts/dispatch.js names the dispatcher chapter it implements
+- the parts of the plan stand once in PARTS, and the stale span stays in work-free.js
 
 # accept
 
