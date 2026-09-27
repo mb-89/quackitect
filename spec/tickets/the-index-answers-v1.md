@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-red
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -84,6 +84,10 @@ record:
     hand: box d7a69cb6601d7 · claude-code-remote
     hash_before: 716bca3afa186597b44a458cdd0174475a43b04a
     hash_after: 68b96490bf77f4ca010ecaa9f22ae146908ced3d
+  - step: design/review
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 4c5ddb62b84b3a2766d520e8343244f69d7f696a
+    hash_after: 4c5ddb62b84b3a2766d520e8343244f69d7f696a
 ---
 
 # Ask
@@ -178,6 +182,11 @@ This ticket stands on `files-topic-reads-the-rows`, which puts the store in the 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- serve-callers-take-the-listener: `start_test.go`, `topic_test.go` and `ops_test.go` under `src/index` call `Serve` too. Each takes the second listener the change adds.
+- v1-values-read-stale: `Snapshot.Stale` stands now. So `GET /v1/values` answers `stale since <time>` beside the value, per [[spec/design_output/watchdogs#a-stale-mark]].
 
 # implement
 
