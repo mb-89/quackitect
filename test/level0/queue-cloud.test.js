@@ -34,15 +34,15 @@ test("a group with a branch and no marker reads as the desk's", () => {
   assert.deepEqual([...said], []);
 });
 
-test("an unmerged branch whose group carries no marker stands on the desk", () => {
-  const said = answerOf({
+const onBranch = (group) =>
+  answerOf({
     ...doorsSaying(
       remoteSaying(
         [{ branch: "work/one-group", tip: "aaa", when: 1767225600, merged: false }],
         {
-          [`origin/main:${GROUP_AT}`]: GROUP_NOTE,
+          [`origin/main:${GROUP_AT}`]: group,
           "origin/main:spec/tickets/a-child.md": CHILD("one-group", "open"),
-          [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+          [`work/one-group:${GROUP_AT}`]: group,
           "work/one-group:spec/tickets/a-child.md": CHILD("one-group", "open"),
         },
       ),
@@ -51,5 +51,11 @@ test("an unmerged branch whose group carries no marker stands on the desk", () =
     clock: fakeClock("2026-01-01T03:00:00.000Z"),
   });
 
-  assert.notEqual(said.branches[0].queue, "∞");
+test("an unmerged branch whose group carries no marker stands on the desk", () => {
+  assert.notEqual(onBranch(GROUP_NOTE).branches[0].queue, "∞");
+});
+
+test("an unmerged branch whose group carries the marker stands on the cloud", () => {
+  const marked = GROUP_NOTE.replace("state: open\n", "state: open\ncloud: true\n");
+  assert.equal(onBranch(marked).branches[0].queue, "∞");
 });

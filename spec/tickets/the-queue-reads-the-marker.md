@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -184,6 +184,15 @@ record:
         hash: 93ef7f626e9673f1
         size: 721
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 2938ed0078921b4f34748bb09793c9af3f241ecd
+    hash_after: 2938ed0078921b4f34748bb09793c9af3f241ecd
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -312,14 +321,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/work-answer.js test/level0/queue-cloud.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/scripts/work-answer.js alone, plus the cases in test/level0/queue-cloud.test.js
+the cases run over the door fakes of work-doors.js and a fake clock
+cloudsIn and placesIn carry a comment naming this ticket
+the marker key stands once, as CLOUD_MARK in work-merge.js, and cloudsIn imports it
 
 ## tests-green
 
