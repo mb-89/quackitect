@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: design/tests-red
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -190,6 +190,12 @@ record:
         hash: a188bdfeed9395a9
         size: 15128
     def: 7883b3d10633c780
+  - step: implement/change
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 40f373115adbb759f87d141272aa0bb9c79737b9
+    hash_after: 40f373115adbb759f87d141272aa0bb9c79737b9
+    returns: 1
+    why: the hand takes it back
 ---
 
 # Ask
