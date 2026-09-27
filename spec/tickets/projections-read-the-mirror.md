@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -145,6 +145,18 @@ record:
         hash: a55f08634181c2f9
         size: 4172
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: a4b49f89ab11dfa1d574fe80bb038de51d53e985
+    hash_after: a4b49f89ab11dfa1d574fe80bb038de51d53e985
+    inputs:
+      - name: design/draft
+        hash: a55f08634181c2f9
+        size: 4172
+      - name: design/tests-red
+        hash: ccfd8911c1f05b99
+        size: 1111
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -313,8 +325,13 @@ the disk cases run over the fake disk, and the store cases over a catalog in mem
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the dump case reads dumpPath alone, and the done_when line asks a dump through quack dump: the builder drives the verb in the case, and reads the file under .se/dump/
+- the round trip passes once any projection reads a file, so a projection whose glob meets nothing passes silently: the builder counts reads per projection, and fails a projection with none
+- plan.json and the hold files stand untracked, so a CI box round-trips nothing of the queue and the holds: the builder seeds a fixture of each through the case, or names the gap
+- the draft names TestAStaleWriteIsRefused in files_test.go, and the case stands in disk_test.go, which the size list leaves out: the builder aligns the draft lines
 
 # implement
 
