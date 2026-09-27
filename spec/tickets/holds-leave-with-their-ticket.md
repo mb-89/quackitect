@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -121,6 +121,15 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 22e19c6f6aef1f50ee12c0cd673c94fec2f6451c
+    hash_after: 22e19c6f6aef1f50ee12c0cd673c94fec2f6451c
+    inputs:
+      - name: ask
+        hash: 260b59b15e28d7e0
+        size: 565
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -161,38 +170,77 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The owner rules that a hold is a state of the ticket, so a closed ticket stands in no hand. The ticket's state decides, and the hold file keeps what a ticket carries nowhere: the reads, the refusals, the part of a split hand-out, the ephemeral tickets.
+
+| part | where |
+|---|---|
+| `holdsIn` answers a hold only where its ticket stands open, and an ephemeral hold, which names no path, stands | `src/scripts/ephemeral.js` |
+| `everyHold`, `holdsAnywhere` and `holdOf` read through it | `src/scripts/guidance-hand.js` |
+| `inHand` reads through it, so the door names no closed ticket in hand | `src/engine/named.js` |
+| `holdStands` reads through it, so a closed ticket holds no turn open | `src/bridge/stop.js` |
+| the pull removes each hold file whose ticket stands closed or gone, before it reads the hand | `src/scripts/pull.js` |
+| the design says the state decides | `spec/design_output/pull.md`, chapter The hand and the hold |
+
+The readers stay pure, and the pull alone removes a file.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/scripts/pull.js`, `pull`, which reads `holdOf` for the hand
+- `src/scripts/work-answer.js`, the held rows, off `holdsIn`
+- `src/bridge/handover.js`, the retro holds and the handover reads, off `holdsIn`
+- `src/bridge/stop.js`, the checks `ticket-in-hand` and the helper hold, off `holdStands` and `holdsIn`
+- `src/engine/named.js`, `ticketFault`, and `src/bridge/bash.js`, the shell door, off `inHand`
+- `src/scripts/guidance-hand.js`, `heldTests`, off `everyHold`
+- `src/scripts/retro-collect.js`, `src/scripts/pull-landed.js`, `src/scripts/rename.js`, `src/scripts/ticket.js`, `src/scripts/work-test.js`, `src/scripts/guidance-verb.js`, `src/scripts/pull-escalate.js`, off `holdOf`, `everyHold` or `holdsAnywhere`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/holds-leave.test.js`, a hold on a ticket another hand closes drops at the next pull
+- `test/level0/holds-leave.test.js`, a pull after that close names no closed ticket in hand
+- `test/level0/holds-leave.test.js`, the door and the stop read no closed ticket in hand
+- `test/level0/holds-leave.test.js`, an ephemeral hold stands, since it names no ticket file
+
+The done lines and the case deciding each:
+
+- the hold drops at the next pull: the first case
+- no closed ticket in hand: the second and third cases
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/scripts/ephemeral.js`
+- `src/scripts/guidance-hand.js`
+- `src/engine/named.js`
+- `src/bridge/stop.js`
+- `src/scripts/pull.js`
+- `test/level0/holds-leave.test.js`
+- `spec/design_output/pull.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `holdsIn`, `everyHold`, `holdOf`, `inHand` and `holdStands` stand opened, and none reads the ticket's state today
+- the callers come off a search for `holdOf(`, `everyHold(`, `holdsAnywhere(`, `holdsIn(` and `inHand(` over `src`
+- each done line names the case deciding it
 
 ## tests-red
 
