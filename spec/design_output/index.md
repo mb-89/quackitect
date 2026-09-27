@@ -224,6 +224,10 @@ A reach stands on a word edge, so `renamedText` leaves a longer word alone. The
 prove move reads rows, because `links` calls `dangling` and answers a clean exit
 over every row it prints. So the verb asserts no row names the old name.
 
+`renamedForms` rewrites the path form and the link form in one pass, the longer
+first. So a move into a folder of its own name rewrites each link once. A closed
+ticket keeps its text, because the ticket door refuses its fields to every hand.
+
 ## The rank is BM25
 
 FTS5 ranks with BM25, and `ORDER BY rank` takes it. Both word questions carry

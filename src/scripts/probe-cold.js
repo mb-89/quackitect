@@ -11,6 +11,7 @@ import {
   PORT_BASE,
 } from "../../.claude/skills/level0/lib/vehicle.js";
 import { INSTALL_SKIP, READ_TOOLS } from "../../.claude/skills/level0/hooks/level0.js";
+import { homeIn } from "./editor.js";
 import { logRows } from "./probe.js";
 
 const SERVED = "mcp__level0__";
@@ -21,6 +22,9 @@ const WAIT = 900000;
 const SPREAD = 200;
 const PAST = 200;
 const TAIL = 6;
+// The file a desk's client keeps its login in, under the config folder the client reads. [[spec/design_output/level0#the-cold-probe]]
+const LOGIN = ".credentials.json";
+const CONFIG_FOLDER = ".claude";
 
 // [[spec/design_output/level0#the-cold-probe]]
 export const COLD = {
@@ -238,6 +242,7 @@ function coldRun(root, it, client, say, { temp, tree, port, delta }) {
   it.disk.write(it.join(tree, POINTER), `${JSON.stringify({ method: tree, port })}\n`);
   const config = it.join(temp, "config");
   it.disk.makeDir(config);
+  carriesLogin(it, config);
 
   let ran = { exitCode: 1, stdout: "", stderr: "" };
   try {
@@ -267,6 +272,15 @@ function coldRun(root, it, client, say, { temp, tree, port, delta }) {
   if (ran.exitCode !== 0)
     say(`The client answers ${ran.exitCode}: ${tail(ran.stderr)}`);
   return checks.every((one) => one.pass) ? 0 : 1;
+}
+
+// The desk's login rides into the fresh config folder, so the client signs in and reads nothing else of the desk. The folder goes with the probe. [[spec/design_output/level0#the-cold-probe]]
+export function carriesLogin(it, config) {
+  const home = it.home || homeIn(it.env ?? {});
+  const login = home ? it.join(home, CONFIG_FOLDER, LOGIN) : "";
+  if (!login || !it.disk.exists(login)) return false;
+  it.disk.write(it.join(config, LOGIN), it.disk.read(login));
+  return true;
 }
 
 // [[spec/design_output/level0#the-cold-probe]]

@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
+step: do
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -23,10 +24,16 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
-step: do
 process: [[spec/processes/trivial]]
-process_hash: 05e53b89dab63152
+process_hash: 2b5ab398855a1aba
 parent: every-road-has-a-caller
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 797dfe8c80560b95749edb55baa881def9465fe1
+    hash_after: 797dfe8c80560b95749edb55baa881def9465fe1
+    why: write-marks-leave-the-plugin answers this ask
+reason: answered
 ---
 
 # Ask

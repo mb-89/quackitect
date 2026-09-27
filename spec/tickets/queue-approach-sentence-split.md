@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: do
 steps:
   - name: answer
@@ -50,6 +50,41 @@ record:
         hash: baca88acba217ea8
         size: 3558
     def: 2280015d497a3abd
+  - step: answer
+    hand: the engine
+    stale: [[spec/tickets/rationale-drops-release-row]]
+  - step: answer
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: 00f01a2b5ac11890412d3d2bf00bf3cf83aa5792
+    hash_after: 00f01a2b5ac11890412d3d2bf00bf3cf83aa5792
+    inputs:
+      - name: ask
+        hash: 0aae906b76d1f73b
+        size: 961
+      - name: [[spec/tickets/the-queue-moves-to-plan]]
+        hash: ec8f43b68ad91062
+        size: 13436
+      - name: [[spec/tickets/rationale-drops-release-row]]
+        hash: 217a401698f56467
+        size: 4030
+    def: 2280015d497a3abd
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: c9e50b5f92bbb2e27e36930330a6533ccc7df825
+    hash_after: c9e50b5f92bbb2e27e36930330a6533ccc7df825
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 24 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/queue-approach-sentence-split.md:79:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: answer
+        hash: 74d4a9d69648aef3
+        size: 181
+    def: 9395391d8c0e6392
+reason: done
 ---
 
 # Ask
@@ -58,7 +93,7 @@ record:
 <!-- waits, as list: one line each, naming what stands still until the answer lands -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-Split the sentence naming `it.capture` under the approach of [[spec/tickets/the-queue-moves-to-plan]], or rule that the `tests` gate reads `check --errors` where a change touches no code. The door keeps every agent out of that approach. The queue hands [[spec/tickets/rationale-drops-release-row]] out ahead of the review that sends the draft back, so no agent reaches the fix.
+Split the sentence naming `it.capture` under the approach of [[spec/tickets/the-queue-moves-to-plan]]. Or rule that the `tests` gate reads `check --errors` where a change touches no code. The door keeps every agent out of that approach. The queue hands [[spec/tickets/rationale-drops-release-row]] out ahead of the review that sends the draft back, so no agent reaches the fix.
 
 Open the file on `work/open-tasks-land-in-shadow` and cut the sentence at line 122 in two:
 
@@ -81,7 +116,7 @@ Open the file on `work/open-tasks-land-in-shadow` and cut the sentence at line 1
 <!-- the answer, which the step behind this one reads -->
 <!-- the form is text -->
 
-Split the sentence. The owner rules the split is the answer, and no change to the tests gate. The approach of the-queue-moves-to-plan now stands closed, so a hand writes the split there.
+Split the sentence. The owner rules the split is the answer, and the tests gate stays as it stands. The queue ticket closes, and its lint names no sentence past the cap.
 
 # do
 
@@ -90,26 +125,32 @@ Split the sentence. The owner rules the split is the answer, and no change to th
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/contract/vale.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The owner rules the split is the answer. The queue ticket closes done, and ./RUNME.sh lint spec/tickets/the-queue-moves-to-plan.md names no sentence past the cap. rationale-drops-release-row passes do on a green check, so nothing waits on the split.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the answer: the lint over the queue ticket passes, and the release row ticket closes
+- the cleanup it reveals stands as notes: the pull tool records a person as the hand
+- the change adds no fact
 
 # Discussion
 

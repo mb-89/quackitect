@@ -1,9 +1,9 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/draft
 steps:
   - name: design
-    reads: [[spec/guidance/voice]]
     steps:
       - name: owner-read
         does: reads the ask a handover carries, before any draft
@@ -36,35 +36,41 @@ steps:
           - name: size
             form: list
             says: every file the approach touches, one a line
-      - name: review
-        does: reads the approach against the ask
-        not: draft
-        on_fail: draft
-        reads: [[spec/guidance/review/design]]
-        input: design/draft
-        evidence:
-          - name: verdict
-            form: verdict
-            says: pass, pass with findings naming a child a line, or fail with findings one a line
-  - name: implement
-    reads: [[spec/guidance/code/testing]]
-    needs: ["branch test"]
-    input: ["design/draft", "design/review"]
-    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every row the design review passes with stands fixed in the change"]
-    steps:
       - name: tests-red
         does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
         evidence:
           - name: tests
             form: command
             expects: assertion
             says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
           - name: seen
             form: text
             says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
       - name: change
         does: makes the change
-        reads: [[spec/guidance/code/code]]
         evidence:
           - name: lint
             form: command
@@ -72,7 +78,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: tests-red
+        input: design/tests-red
         to: retro
         evidence:
           - name: tests
@@ -86,6 +92,18 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
   - name: view
     does: reads the change in the view the ask names
     by: person
@@ -98,8 +116,11 @@ steps:
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: f89405f9e77ea3be
-step: design/owner-read
+process_hash: 22b42ea1501e8967
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
 ---
 
 # Ask
@@ -173,18 +194,6 @@ none
 
 <!-- the form is checklist -->
 
-## review
-
-<!-- reads the approach against the ask -->
-
-### verdict
-
-<!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
-<!-- the form is verdict -->
-
-# implement
-
 ## tests-red
 
 <!-- writes the tests the ask calls for -->
@@ -194,6 +203,12 @@ none
 <!-- the tests you write fail on their own assertion -->
 
 <!-- the form is command -->
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+
+<!-- the form is list -->
 
 ### seen
 
@@ -206,6 +221,18 @@ none
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# implement
 
 ## change
 
@@ -251,6 +278,16 @@ none
 
 <!-- the form is checklist -->
 
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
 # view
 
 <!-- reads the change in the view the ask names -->
@@ -264,3 +301,17 @@ none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The owner's words, as said:
+
+```text
+Hold is a state of the ticket and the ticket can only ever be in one state.
+So it's either held or it's closed. When it's closed, it can't be held.
+```
+
+So the draft reads a hand's hold off the ticket's record, where held derives already. For details, see [[spec/design_output/work#held-derives-from-the-record]]. The hold file under `.se/.runtime/hold` keeps what a ticket carries nowhere:
+
+- the guidance reads
+- the refusals
+- the part of a split hand-out
+- the ephemeral tickets

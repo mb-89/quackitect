@@ -29,19 +29,19 @@ step: do
 record:
   - step: do
     hand: box d6f05e3a585030 · claude-code
-    hash_before: 4ec6444d5001a4ec9812bb6abf5598989ef79c0c
-    hash_after: 4ec6444d5001a4ec9812bb6abf5598989ef79c0c
+    hash_before: 2d27a1e74c4962165211208ab7e83b8d1204d9da
+    hash_after: aaf4b13440af0c8f245bc5a3fce22f999a733ae9
     answered:
       - name: tests
         exit: 0
-        said: green, 43 test(s) pass in 2 file(s)
+        said: green, 28 test(s) pass in 1 file(s)
       - name: check
         exit: 0
         said: "spec/tickets/queue-approach-sentence-split.md:61:1: Sentence: A sentence holds 25 words. Cut this one in two."
     inputs:
       - name: ask
-        hash: 9e155ab4ed5bf189
-        size: 704
+        hash: d6a60537030d0ef4
+        size: 596
     def: df12650931d480c9
 reason: done
 ---
@@ -52,19 +52,13 @@ reason: done
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-A desk session that commits on `main` takes the remote's `main` in through a verb. So its push lands after another box pushes first.
+The cold probe passes on a desk, so a desk lands its own commit on the cold path.
 
-Today a desk whose `main` parts from the remote stands with no road to push:
+The probe runs the client under an empty config folder, and the client answers `Not logged in`. So every cold probe fails on a desk, and every commit touching the bridgehead or the server stays refused there.
 
-- `branch sync` refuses on `main`
-- `branch merge` takes work and cloud branches alone
-- level zero refuses `git pull` and `git merge`
-
-Done when:
-
-- `./RUNME.sh branch sync` on `main` merges `origin/main` in. A case in `test/level0/work-sync.test.js` decides it
-- on a conflict it stops, names the files, and leaves the merge to the hand. The same file holds a case for it
-- on a work branch it takes `main` in as it does today. The same file holds a case for it
+- the probe copies the desk's login file into its fresh config folder, where one stands. A case in `test/level0/probe-cold.test.js` decides it
+- a desk with no login file carries none, and the same file holds a case for it
+- `./RUNME.sh probe cold` answers PASS on this desk
 - `./RUNME.sh check` exits 0
 
 # do
@@ -76,7 +70,7 @@ Done when:
 <!-- the tests that cover the change, or the check where it touches no code -->
 <!-- the form is command -->
 
-    ./RUNME.sh test test/level0/work-sync.test.js test/level0/bash.test.js
+    ./RUNME.sh test test/level0/probe-cold.test.js
 
 ## check
 
@@ -90,16 +84,16 @@ Done when:
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-On main, branch sync merges origin/main into the desk's main, and stops on a conflict with the files named. A work branch takes main in as before. The refusal of git pull names the verb on main too. A desk committing on main now takes a push from another box in, and pushes after it.
+The cold probe copies the desk's login file into its fresh config folder where one stands, so its client signs in and reads nothing else of the desk. The folder goes with the probe. On a desk the probe then passes every check, and a commit on the cold path lands from the desk.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change follows the ask, and the first run merged the lead session's phase 2 groups in
-- the cleanup it reveals is a note of its own: the commit verb stages the old path of a renamed draft, which git never tracked
-- the rule stands once, in sync in src/scripts/work-stands.js, and the design chapter points at it
+- the change follows the ask: the login rides in, a desk with none carries none, and the probe passes on this desk
+- the cleanup it reveals rides the same commit: the stop reply that made the probe repeat its canary
+- the login file's name stands once, in src/scripts/probe-cold.js, and the design chapter points at the probe
 
 # Discussion
 

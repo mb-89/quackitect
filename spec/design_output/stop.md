@@ -413,7 +413,10 @@ So a rule running `a-report-stands` fires where a message of this turn
 carries the needs table, and otherwise the turn holds. No shipped rule runs it,
 and a level file's rule reaches it by name. The
 owner's view shows every message of the turn. A missing stop line comes alone
-in the next message, and the report stands once. An owner's prompt
+in the next message, and the report stands once.
+
+The answer before the stop call streams as `turn.said`, and `saidReport` marks
+its report, so the line after the call comes alone too. An owner's prompt
 opens a new turn, and the report before it counts no more.
 
 The band table puts `90` to `100` in the owner's hands. A claim about the agent's

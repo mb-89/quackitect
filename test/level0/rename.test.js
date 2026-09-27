@@ -214,6 +214,28 @@ test("a note moves as a file, and both forms of its name rewrite", () => {
   );
 });
 
+// A move under a folder of its own name rewrites each link once, and a closed ticket keeps its text. [[spec/tickets/rename-rewrites-each-link-once]]
+test("a move under a folder of its own name rewrites every link once, and leaves a closed ticket as it stands", () => {
+  const closed =
+    "---\nkind: [[ticket]]\nstate: closed\n---\n\n# Ask\n\nSee [[spec/a]].\n";
+  const disk = fakeDisk({
+    [at("spec/a.md")]: "# A\n",
+    [at("spec/b.md")]: "See [[spec/a]] and spec/a.md, and [[spec/a#one]].\n",
+    [at("spec/tickets/done-one.md")]: closed,
+  });
+  const it = { disk, join, root: ROOT };
+
+  const said = rename.renaming(it, "spec/a.md", "spec/a/a.md");
+
+  assert.equal(said.why, "");
+  assert.equal(disk.read(at("spec/a/a.md")), "# A\n");
+  assert.equal(
+    disk.read(at("spec/b.md")),
+    "See [[spec/a/a]] and spec/a/a.md, and [[spec/a/a#one]].\n",
+  );
+  assert.equal(disk.read(at("spec/tickets/done-one.md")), closed);
+});
+
 // A module's name stands as no path, and the rewrite reaches it anyway. [[spec/tickets/a-rename-reaches-every-note]]
 test("a name standing as no path rewrites, and moves nothing", () => {
   assert.equal(typeof rename.renamingText, "function", "the verb answers renamingText");

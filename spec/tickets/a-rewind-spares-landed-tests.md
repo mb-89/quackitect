@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -36,6 +37,45 @@ steps:
             form: list
             says: every file the approach touches, one a line
       - name: tests-red
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+      - name: draft-2
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red-2
         does: writes the tests the ask calls for
         tags: ["code", "testing"]
         needs: ["branch test"]
@@ -116,6 +156,38 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 8ac6708a8e1ef2ee9c5b65e70efa7b64e168f0aa
+    hash_after: 8ac6708a8e1ef2ee9c5b65e70efa7b64e168f0aa
+    inputs:
+      - name: ask
+        hash: 51cba604bf4d0a4a
+        size: 822
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: d8a6b89ab773213fb04e947113907f223cbe83fe
+    hash_after: d8a6b89ab773213fb04e947113907f223cbe83fe
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 202c93b0d8e8b6f7
+        size: 2365
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d6f05e3a585030 · claude-code · helper-4
+    hash_before: 172fd0c19e906958617353edd36f0758fc0e6d66
+    hash_after: 172fd0c19e906958617353edd36f0758fc0e6d66
+    returns: 1
+    why: "keptRed reads the wrong tree. `passed` in pull-writes.js writes `hash_after` as the tip before the pass commit, and `landed` stages the red tests of the hand into that pass commit, so `git ls-tree -r <hash_after>` holds no new red test and the keep never holds. The own red pass of this ticket shows it: d8a6b89ab lacks test/level0/pull-kept.test.js, and the pass commit f46fe8257 carries it. The red pass of the-retro-reads-the-backlog shows it too: 916443192 lacks retro-backlog.test.js and retro-route.test.js, and its pass commit f27f6c9fc carries them.; A whole-file blob check fails the case the ask names. implement/change 7c8c13970 appends cases to retro-mint.test.js and retro-backlog.test.js, so their blobs move while their red cases stand, and only the renamed route test keeps its blob 312a209. That ticket still strands at implement/tests-red. Pick a keep that survives an appended case, or take the other branch of the ask: a rerun at the recorded commit.; The replay case replays no real rewind. Its fake answers `git ls-tree -r <hash_after>` with the test present, and its record holds the red pass alone: no change pass, no stale review, no appended case. Build the fixture off the record of the-retro-reads-the-backlog, so the case fails on a keep that rescues nothing.; The keep also runs before the change lands. On the standard route a draft edit marks design/tests-red stale, `inputRead` puts the step there, and `advanced` keeps it, so a case the edited draft adds is never written red. Keep a red leaf only where a pass of a later leaf follows its red pass.; The callers list names `blessed` in pull-bless.js, which stands nowhere. The caller is `bless`, and `offer` in pull-hand.js calls `advanced`."
 ---
 
 # Ask
@@ -145,6 +217,120 @@ from: none
 <!-- the form is verdict -->
 
 ## draft
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+<!-- the form is text -->
+
+A red leaf is a leaf whose evidence holds a command field expecting `assertion`. The walk meets one that a pass in the record already carries. Where every test its command names holds content that stood in the tree of that pass's `hash_after`, the walk keeps the leaf and goes past it. The entry reads `{ step, skipped: true, kept: <hash_after>, why }`, so the progress counts it passed and the stale read reads the red pass behind it.
+
+The check reads content, so a rename moving a test keeps the leaf. A test whose content moved hands the leaf out again, as today.
+
+| part | where |
+|---|---|
+| `keptRed(it, text, leaf)` answers the check | `src/scripts/pull-kept.js`, new |
+| the walk after a pass calls it beside the `when` condition | `stepOn` in `src/scripts/pull-writes.js` |
+| the walk at a pull calls it, so a ticket already stranded walks on | `advanced` in `src/scripts/pull-hand.js` |
+| the blobs of the red commit | `git ls-tree -r <hash_after>` through the git door |
+| the blob of each working test | `git hash-object <path>` through the git door |
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+<!-- the form is list -->
+
+- `src/scripts/pull-writes.js`, `stepOn`, which a pass runs
+- `src/scripts/pull-bless.js`, `blessed`, which runs `stepOn`
+- `src/scripts/pull-hand.js`, `advanced`, which a pull runs
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+<!-- the form is list -->
+
+- `test/level0/pull-kept.test.js`, a rewound ticket walks past a red leaf whose tests stand as they stood red
+- `test/level0/pull-kept.test.js`, a rename moving a test the draft names keeps the red leaf, the rewind the-retro-reads-the-backlog meets
+- `test/level0/pull-kept.test.js`, a test whose content moved hands the red leaf out again
+- `test/level0/pull-kept.test.js`, a pull meeting a ticket stranded at a red leaf walks it on
+
+The done lines and the case deciding each:
+
+- the rewind keeps a landed `tests-red`: the first case
+- the replay of the rename: the second case
+- the check: `./RUNME.sh check`
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+<!-- the form is list -->
+
+- first
+
+### size
+
+<!-- every file the approach touches, one a line -->
+<!-- the form is list -->
+
+- `src/scripts/pull-kept.js`
+- `src/scripts/pull-writes.js`
+- `src/scripts/pull-hand.js`
+- `test/level0/pull-kept.test.js`
+- `spec/design_output/pull.md`
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- `stepOn`, `advanced`, `inputRead` and `lastOf` stand opened, and a skipped entry counts as passed in `passedSteps` of `src/tickets/tickets.go`
+- the callers come off a search for `stepOn(` and `advanced(` over `src`
+- each done line names the case deciding it
+
+## tests-red
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+<!-- the form is command -->
+
+    ./RUNME.sh test test/level0/pull-kept.test.js
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- test/level0/pull-kept.test.js
+
+### seen
+
+<!-- what you see, and what surprises you -->
+<!-- the form is text -->
+
+Over a keptRed that keeps nothing, four cases fail on their own assertion: the kept leaf, the rename, the rewound review walking past, and the stranded ticket walking on. The case where a test's content moved passes over the stub, because it guards the other side: a leaf whose tests moved goes out again.
+
+| the case | the class of fault it guards |
+|---|---|
+| a red leaf whose tests hold their red content | a rewind asks a landed change to fail again |
+| a rename moving a test | a move of a file reads as a change of its tests |
+| a test whose content moved | a keep passes over tests that no longer stand as they stood red |
+| a rewound review walking past | the pass after a rewind strands the ticket at its red leaf |
+| a stranded ticket at a pull | a ticket stranded today stays stranded |
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- each done line meets a case above: the keep, the rename replay, and the check at tests-green
+- the git door the cases reach answers through the fake git of pull-doors.js
+
+## draft-2
 
 <!-- writes the approach the ask calls for -->
 
@@ -184,7 +370,7 @@ from: none
 
 <!-- the form is checklist -->
 
-## tests-red
+## tests-red-2
 
 <!-- writes the tests the ask calls for -->
 
@@ -219,8 +405,14 @@ from: none
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+reject
+- keptRed reads the wrong tree. `passed` in pull-writes.js writes `hash_after` as the tip before the pass commit, and `landed` stages the red tests of the hand into that pass commit, so `git ls-tree -r <hash_after>` holds no new red test and the keep never holds. The own red pass of this ticket shows it: d8a6b89ab lacks test/level0/pull-kept.test.js, and the pass commit f46fe8257 carries it. The red pass of the-retro-reads-the-backlog shows it too: 916443192 lacks retro-backlog.test.js and retro-route.test.js, and its pass commit f27f6c9fc carries them.
+- A whole-file blob check fails the case the ask names. implement/change 7c8c13970 appends cases to retro-mint.test.js and retro-backlog.test.js, so their blobs move while their red cases stand, and only the renamed route test keeps its blob 312a209. That ticket still strands at implement/tests-red. Pick a keep that survives an appended case, or take the other branch of the ask: a rerun at the recorded commit.
+- The replay case replays no real rewind. Its fake answers `git ls-tree -r <hash_after>` with the test present, and its record holds the red pass alone: no change pass, no stale review, no appended case. Build the fixture off the record of the-retro-reads-the-backlog, so the case fails on a keep that rescues nothing.
+- The keep also runs before the change lands. On the standard route a draft edit marks design/tests-red stale, `inputRead` puts the step there, and `advanced` keeps it, so a case the edited draft adds is never written red. Keep a red leaf only where a pass of a later leaf follows its red pass.
+- The callers list names `blessed` in pull-bless.js, which stands nowhere. The caller is `bless`, and `offer` in pull-hand.js calls `advanced`.
 
 # implement
 

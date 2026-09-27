@@ -81,6 +81,7 @@ import {
   helperSpawns,
   holdsCall,
   onStop,
+  saidReport,
   sawCall,
   sawPrompt,
   SPECS as stopSpecs,
@@ -113,7 +114,10 @@ const DOORS = {
   "session.compact": onSessionCompact,
   "session.end": onSessionEnd,
   "session.measure": onSessionMeasure,
-  "turn.said": onTurnSaid,
+  "turn.said": (e, box) => {
+    saidReport(e, box);
+    return onTurnSaid(e, box);
+  },
   "turn.complete": endsTurn,
   // A helper's stop reports, a session due holds for the handover, and the answer gate holds ahead of the tooth. [[spec/design_output/stop#the-context-hands-over]] [[spec/design_output/level0#the-gate-reads-the-answer]]
   "classic.Stop": async (e, box) => {

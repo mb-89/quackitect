@@ -168,9 +168,14 @@ function claims(e, box) {
   });
   return {
     result: {
-      result: `The claim stands. Write the answer, and end that same message with the line stop: ${reason} on a line of its own, last. The owner reads that one message.`,
+      result: `The claim stands. The answer before this call carries the report, so end the turn with the line stop: ${reason} alone. The owner reads the answer once.`,
     },
   };
+}
+
+// The answer before the stop call streams as turn.said, so a report there stands for the turn, and the line after the call comes alone. [[spec/design_output/stop#a-talk-follows-a-report]]
+export function saidReport(e, box) {
+  if (!e?.agentId && reportStands(e?.text)) box.reported = true;
 }
 
 // The message ending the turn carries the report, so the owner reads what the talk is about where the stop line stands. [[spec/design_output/stop#a-talk-follows-a-report]]

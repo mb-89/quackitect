@@ -76,12 +76,18 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 63693613eded · claude-code-remote
     hash_before: 3062638584d4132b1819045f9190e198799a1d2d
     hash_after: 3062638584d4132b1819045f9190e198799a1d2d
+  - step: design/review
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: b4d3c8ed536c28bad242530e350e48a8db83a241
+    hash_after: b4d3c8ed536c28bad242530e350e48a8db83a241
+    returns: 1
+    why: "the redraw runs `./RUNME.sh tui work --count` on every burst of ticket, plan and hold writes. Each run starts node, can build the viewer, and reads git over every work branch, thirteen seconds on the owner's desk. The owner rules on sidebar-lands-in-shadow that the sidebar builds and restarts nothing, and draws a question mark until the engine answers. The redraft reads a count the engine already keeps, and spawns no verb on a draw; the count stands at 68 on the owner's desk, because the queue reads a group as the cloud's by its branch alone. the-queue-reads-the-marker reads `cloud: true` in its place, so the redraft names it under `depends_on`, and the badge and the brackets agree on the local count once it lands"
 ---
 
 # Ask
@@ -205,8 +211,12 @@ The owner's compare in the editor stays a person step, and no test decides it.
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- the redraw runs `./RUNME.sh tui work --count` on every burst of ticket, plan and hold writes. Each run starts node, can build the viewer, and reads git over every work branch, thirteen seconds on the owner's desk. The owner rules on sidebar-lands-in-shadow that the sidebar builds and restarts nothing, and draws a question mark until the engine answers. The redraft reads a count the engine already keeps, and spawns no verb on a draw
+- the count stands at 68 on the owner's desk, because the queue reads a group as the cloud's by its branch alone. the-queue-reads-the-marker reads `cloud: true` in its place, so the redraft names it under `depends_on`, and the badge and the brackets agree on the local count once it lands
 
 # implement
 
