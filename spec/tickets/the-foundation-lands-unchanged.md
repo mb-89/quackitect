@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: children
+step: retro/notes
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [the-migration-writes-its-specs]
@@ -97,6 +97,10 @@ record:
     hand: box d7d598fb92101 · claude-code-remote
     hash_before: 3e064c85f62618d412b45d64f7b37483b0e32c32
     hash_after: 3e064c85f62618d412b45d64f7b37483b0e32c32
+  - step: children
+    hand: the engine
+    hash_before: f67d97ff5c7a88dd659f452060e6ff41bf6cc803
+    hash_after: f67d97ff5c7a88dd659f452060e6ff41bf6cc803
 ---
 
 # Ask
