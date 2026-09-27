@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-foundation-lands-unchanged
 parent: the-import-rules-get-checked
+record:
+  - step: do
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 04ba6e13b56f13ead1dcd89189b9f38659c248f2
+    hash_after: 04ba6e13b56f13ead1dcd89189b9f38659c248f2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 26 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ add the analyzer `nodoor` to the table of [[spec/design_output/go-doors#the-buil
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/contract/tree.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ add the analyzer `nodoor` to the table of [[spec/design_output/go-doors#the-buil
 
 <!-- the form is text -->
 
+The analyzer table of the Go doors note gains `nodoor`, so the note owns every analyzer [[spec/tickets/the-import-rules-get-checked]] builds. The change touches no code, and the tree test reads every pointer to the note.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask
+- the change reveals no cleanup
+- the note owns the analyzers, and the code points there
 
 # Discussion
 
