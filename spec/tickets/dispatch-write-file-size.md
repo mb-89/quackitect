@@ -69,3 +69,5 @@ size names src/scripts/dispatch-write.js and test/level0/work-doors.js, and the 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The `size` list stands under the draft leaf of the closed parent, so the files the build touches land as a list under the parent's `Discussion`. That list leaves out `test/level0/work-doors.js`. The refusal naming this ticket stands nowhere in `src/scripts/dispatch.js`.

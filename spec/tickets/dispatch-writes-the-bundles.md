@@ -419,4 +419,9 @@ The dispatch verb now carries its plan out. It writes a fix group holding the lo
 
 <!-- what anybody adds, at any time, on this ticket -->
 
-- The build touches `src/scripts/work.js` too: commit `061bd246` exports `markOff` there, and `dispatch-write.js` calls it. The `size` list under the draft leaves that file out.
+- The build commit `061bd246` touches these files, and the `size` list under the draft stands in its place:
+  - `src/scripts/dispatch.js`
+  - `src/scripts/dispatch-write.js`
+  - `src/scripts/ticket.js`
+  - `src/scripts/work.js`
+  - `test/level0/dispatch.test.js`
