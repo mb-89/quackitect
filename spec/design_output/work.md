@@ -398,6 +398,47 @@ work it costs still sits ahead.
 On `main`, `branch sync` merges `origin/main` into the desk's `main`. So a desk
 committing on `main` pushes after another box pushes first.
 
+## A conflicted front resolves itself
+
+A group ticket conflicts on nearly every sync. The branch appends to `record`,
+and `main` adds a key such as `cloud` or `depends_on`. So `branch sync` reads
+each unmerged ticket under `spec/tickets` through its stages, the base, the
+branch and `main`, and `mergedFront` in `src/engine/front-merge.js` merges
+the front key by key:
+
+| what the two sides do to a key | what the merge takes |
+|---|---|
+| the same thing, or one side alone changes it | that side |
+| both append entries to `record` | the base's entries, then the branch's, then `main`'s |
+| both change it apart | nothing, and the ticket waits for a hand |
+
+The text past the front merges whole the same way, and a change on both sides
+leaves the ticket for a hand. The sync writes and stages each ticket it merges.
+Where nothing waits for a hand, it commits the merge with its own message.
+
+Where a file waits, the sync names each one, and the merge stands open. A
+ticket `main` deletes while the branch changes it waits too, and the sync says
+`main` retires it. The write door lets a hand write each unmerged ticket until
+the merge commits. For details, see [[spec/design_output/pull#a-merge-opens-the-ticket]].
+`./RUNME.sh commit` then lands the merge.
+
+## No commit carries a marker
+
+A merge conflict leaves marker lines in a file, and a verb staging the whole
+tree stages them as resolved. A step verb running past a stopped sync
+commits them into the merge. So each commit road reads the marks in `.claude/skills/level0/lib/markers.js`:
+
+| the road | what it refuses |
+|---|---|
+| a step verb's landing, in `src/scripts/pull-landed.js` | any path git lists unmerged, before it writes, and a marker the index carries, before it commits |
+| `./RUNME.sh commit` | an unmerged file carrying a marker on disk, before the tests run, and a marker the index carries |
+| the pre-commit hook | a marker line the staged delta adds |
+| the sweep, as `NoConflictMarkers` in `src/lsp/conflict.go` | a marker in a tracked file under `spec`, `src`, `.claude` or `test` |
+
+An opener line marks alone. A split line or a closer marks past an opener, so
+a heading's underline reads as prose. Each refusal names the files, and says to
+resolve the merge first.
+
 ## Trunk comes in last too
 
 A branch greens its own tip, and the merge result reads green nowhere. So a

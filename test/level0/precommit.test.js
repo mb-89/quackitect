@@ -8,6 +8,7 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { boxOf, holds, merging, notesOf } from "../../src/scripts/precommit.js";
+import { conflicted } from "./fixtures.js";
 
 const ROOT = "/tree";
 
@@ -221,4 +222,18 @@ test("a test any hold's ticket carries answers the change at the hook", async ()
 
   assert.deepEqual(await holds(here, code), { code: 0, said: "" });
   assert.equal((await holds(box(), code)).code, 1, "no hold carries nothing");
+});
+
+// A marker the delta adds refuses the commit, whichever road makes it. [[spec/design_output/work#no-commit-carries-a-marker]]
+test("a delta adding a conflict marker answers one, and names the file and line", async () => {
+  const marked = [
+    "diff --git a/spec/tickets/a.md b/spec/tickets/a.md",
+    "+++ b/spec/tickets/a.md",
+    "@@ -3,0 +4,3 @@",
+    ...conflicted([], []).map((row) => `+${row}`),
+    "",
+  ].join("\n");
+  const said = await holds(box(), marked);
+  assert.equal(said.code, 1);
+  assert.match(said.said, /spec\/tickets\/a\.md:4 {2}a conflict marker/);
 });

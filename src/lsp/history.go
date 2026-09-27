@@ -33,7 +33,8 @@ func isHistory(tree *Tree, path string) bool {
 func pastHistory(tree *Tree, found []Finding) []Finding {
 	out := []Finding{}
 	for _, one := range found {
-		if !isHistory(tree, one.File) {
+		// A merge's marks break a closed ticket too, so that rule reads history. [[spec/design_output/work#no-commit-carries-a-marker]]
+		if one.Rule == conflictMarkers || !isHistory(tree, one.File) {
 			out = append(out, one)
 		}
 	}
