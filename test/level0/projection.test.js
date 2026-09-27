@@ -484,9 +484,8 @@ test("the style shape writes one file, from every note at the top", () => {
 });
 
 test("no note carrying rules writes no style file", () => {
-  const bare = '---\nkind: [[guidance]]\nscope: ["everybody"]\n---\n\n# Actionables\n';
-  const files = writesOf(STYLED, new Map([["spec/guidance/tickets.md", bare]]));
-  assert.equal(files.size, 0);
+  const bare = new Map([["spec/guidance/a.md", plain.split("1.")[0]]]);
+  assert.equal(writesOf(STYLED, bare).size, 0);
 });
 
 test("the style reads every note in its folder, and the other shapes read their two files", () => {
