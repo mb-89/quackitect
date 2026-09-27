@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box d1fe1ca62214 · claude-code-remote
@@ -123,6 +123,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box d7d6327f2b101 · claude-code-remote
+    hash_before: 96685d9cfacca7ad6c10e223c4bd557da37cbf35
+    hash_after: 96685d9cfacca7ad6c10e223c4bd557da37cbf35
 ---
 
 # Ask
@@ -210,11 +214,23 @@ Every mechanical step runs through a verb that lands it whole, and the agent rea
 
 <!-- the form is list -->
 
+- battery-ask-names-the-bundle: passed its standing do leaf.
+- the-battery-runs-on-fixtures: four slow cases run on fixtures, and `bundle` takes an entry and out.
+- the-verbs-need-no-wrapper: reviewed, then built. The verbs name their red cases, and the tools block names the verbs.
+- wrapper-ask-names-its-files: the wrapper ask names the three files its approach changes.
+- verb-line-names-new-refusals: the `verbLine` case holds the git-write clause.
+- The ticket and merge cases split by topic, under the file ceiling.
+- A TODO case reads as no red case in the battery and the test verb.
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- The pull handed each leaf with its checklist, so no step waited on a guess.
+- `check --errors` found the TODO case on its first real run, which proves the verb earns its place.
+- The split verb moved the cases whole, so no case went missing.
 
 ### badly
 
@@ -222,11 +238,31 @@ Every mechanical step runs through a verb that lands it whole, and the agent rea
 
 <!-- the form is list -->
 
+- The first shell call named no ticket, and the door refused it.
+- The vehicle identity case failed on some runs. Two ids made in one millisecond with one pid match.
+- The review's hand-back with `--pass` came back refused, because the verdict field decides.
+- The child's pass came back refused while its parent stood in hand.
+- The wrapper approach put `errorsSaid` in `cli.js`, which exits at import, so no case reaches it.
+- `check --errors` named a TODO case as red, because the reporter's row carried no mark.
+- The door refused a git write set beside a test run, and a pull chained after a pipe.
+- The commit hook refused `cli.js` and `cli-check.js` with no test beside them.
+- The push waited on two file ceilings, which the new cases pushed over.
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- The session's first hook block names the ticket rule beside the shell tool.
+- `test/contract/vehicle.test.js` makes the source's identity under another pid.
+- The review leaf's prompt says a verdict field hands back with no flag.
+- `spec/processes/group.yaml` lets a review's child pass while its parent stands in hand.
+- The design review checklist asks whether each new function stands where a case imports it.
+- `src/scripts/battery-reporter.js` marks a TODO case, and `redIn` passes over it.
+- The shell door's refusal names a read-only road, as `git diff` against `HEAD`.
+- The implement checklist asks for a case beside each source file the change touches.
+- The draft's size list names each test file near the ceiling, with its split.
 
 ### thoughts
 
@@ -234,11 +270,17 @@ Every mechanical step runs through a verb that lands it whole, and the agent rea
 
 <!-- the form is text -->
 
+The tests-red leaf asks each test to fail on its assertion, and a pure test refactor passes at once. The bundle case alone carried the red for the battery ticket. The wrapper review weighed failing on the `cli.js` placement, and passed because the builder fixes it in place.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- Each line points at the file owning its fix, and repeats no rule.
+- The retro adds no number.
+- The retro writes no file header, and the new test files' heads say what each file proves.
 
 ## cloud
 
