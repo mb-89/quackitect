@@ -33,7 +33,6 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
-group: open-tasks-land-in-shadow
 process_hash: 1f3006ec4b044a89
 step: answer
 ---
