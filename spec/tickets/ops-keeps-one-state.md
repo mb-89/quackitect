@@ -114,10 +114,23 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
+record:
+  - step: design/draft
+    hand: box d7dfbbf7a2d0 · claude-code-remote
+    hash_before: cbbadaceb9cc703f01a71bbc8a99c707174c9e42
+    hash_after: cbbadaceb9cc703f01a71bbc8a99c707174c9e42
+    inputs:
+      - name: ask
+        hash: e94a1934ce8cfdff
+        size: 434
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -149,38 +162,46 @@ The store grows with every operation today, and two places hold one operation's 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Three pieces, per spec/design_output/model#what-stays-how-long. One: src/q/store.go gains Store.Drop(read, as, names), which removes the values the writer owns in one revision and refuses a name another writer owns, the way Commit refuses it. Two: src/index/ops.go gains door.sweepsOps, which runs book.Sweep and drops ops/<id> of every operation the sweep answers, through the ops writer. Three: the guard loop in src/index/door.go calls sweepsOps on each tick, so a window that passes takes the operation out of the book, the table and the store together. Weighed: a drop verb on the store over a nil value through Commit, since Commit refuses a nil and a value of the wrong type alike, and a drop names its intent. Assumed: Book.Sweep keeps its windows off ops.SettingsOf, the keys ops.keepDone and ops.keepFailed stand as they are, and the guard tick is fine grained enough for a window measured in minutes.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/index/door.go: door.guards, which calls sweepsOps each tick,src/index/ops.go: door.opensBook, which opens the book sweepsOps reads,src/ops/ops.go: Book.Sweep, whose answer sweepsOps reads,src/q/store.go: Store.Commit, the sibling Drop follows
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/q/store_test.go: TestADropRemovesTheValuesItsWriterOwns,src/q/store_test.go: TestADropRefusesANameAnotherWriterOwns,src/index/ops_test.go: TestAnOperationPastItsWindowLeavesTheStore
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/store.go,src/q/store_test.go,src/index/ops.go,src/index/ops_test.go,src/index/door.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened spec/design_output/model at what stays how long, src/ops/ops.go Sweep and Registers, src/index/ops.go opensBook, src/index/door.go guards and src/q/store.go Commit, and checked each claim there
+the callers come off a grep for Sweep, OnMove and Commit over src, which shows Sweep runs in tests alone today
+each done_when line names its test: TestAnOperationPastItsWindowLeavesTheStore decides the case, and go test and the check decide the first and last as commands
 
 ## tests-red
 
