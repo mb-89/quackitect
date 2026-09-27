@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"quackitect/src/ops"
 	"quackitect/src/q"
@@ -65,5 +66,47 @@ func TestADroppedOpLeavesTheTable(t *testing.T) {
 	}
 	if len(all) != 1 || all[0].ID != "2-b" {
 		t.Fatalf("the table op holds %+v", all)
+	}
+}
+
+type heldOps map[string]ops.Op
+
+func (h heldOps) Save(one ops.Op) error { h[one.ID] = one; return nil }
+func (h heldOps) Drop(id string) error  { delete(h, id); return nil }
+func (h heldOps) All() ([]ops.Op, error) {
+	out := []ops.Op{}
+	for _, one := range h {
+		out = append(out, one)
+	}
+	return out, nil
+}
+
+func TestAnOperationPastItsWindowLeavesTheStore(t *testing.T) {
+	c := q.New()
+	one := &door{writers: registersTopics(c)}
+	one.store = q.NewStore(c, nil)
+	now := time.Unix(0, 0)
+	book, err := ops.New(func() time.Time { return now }, heldOps{}, ops.Settings{Done: time.Minute, Failed: time.Minute})
+	if err != nil {
+		t.Fatal(err)
+	}
+	one.hears(book)
+	id, err := book.Start("t/read", nil, "s1", q.Declared{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := book.Finish(id, "ok"); err != nil {
+		t.Fatal(err)
+	}
+	if _, held := one.store.Snapshot().Read(ops.Name(id)).(ops.Op); !held {
+		t.Fatalf("%s stands nowhere before the window passes", ops.Name(id))
+	}
+	now = now.Add(time.Hour)
+	one.sweepsOps()
+	if _, held := book.Get(id); held {
+		t.Fatalf("the book holds %s past its window", id)
+	}
+	if got := one.store.Snapshot().Read(ops.Name(id)); got != nil && got.(ops.Op).ID == id {
+		t.Fatalf("the store holds %s past its window: %+v", ops.Name(id), got)
 	}
 }

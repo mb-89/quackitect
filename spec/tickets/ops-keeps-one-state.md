@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -131,6 +131,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7dfbbf7a2d0 · claude-code-remote
+    hash_before: 1a9d52edf886b618ed81fff8e9d957114ac15d8b
+    hash_after: 1a9d52edf886b618ed81fff8e9d957114ac15d8b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: c8c85f5e2d46f43b
+        size: 2000
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -210,26 +223,31 @@ each done_when line names its test: TestAnOperationPastItsWindowLeavesTheStore d
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/store_test.go src/index/ops_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/store_test.go,src/index/ops_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The drop case keeps both values, since the Drop stub removes nothing. The refusal case takes a name nobody provides. The index case finds the ended operation still in the book past its window, since sweepsOps runs no sweep. The surprise: Commit checks the owner of a name and never compares it with the writer that commits, so the refusal case asks for a name nobody provides, the way Commit refuses, in place of a name another writer owns. The index test builds a door with no database, over a memory keep and a clock the case moves.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a case: TestAnOperationPastItsWindowLeavesTheStore ends an operation past its window and reads the store, and go test and the check decide the rest as commands
+the index case keeps the book in memory and moves its own clock, so it opens no database and no port
 
 # gate
 

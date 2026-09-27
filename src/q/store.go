@@ -92,6 +92,11 @@ func (s *Store) Commit(read int64, as Writer, values map[string]any) (int64, err
 	return s.revision, nil
 }
 
+// Takes the names out of the store in one revision, so a value past its window leaves. [[spec/design_output/model#what-stays-how-long]]
+func (s *Store) Drop(read int64, as Writer, names ...string) (int64, error) {
+	return s.revision, nil
+}
+
 // Each commit reaches every hand that listens, which the fake index reads. [[spec/design_output/model#the-fake-index]]
 func (s *Store) OnCommit(fn func(values map[string]any)) {
 	s.mu.Lock()

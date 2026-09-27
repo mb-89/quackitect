@@ -54,9 +54,17 @@ func (one *door) opensBook() error {
 	if err != nil {
 		return err
 	}
+	one.hears(book)
+	return book.Restart()
+}
+
+// The door pushes each move of the book under ops/<id>. [[spec/design_output/model#the-states]]
+func (one *door) hears(book *ops.Book) {
 	book.OnMove(func(moved ops.Op) {
 		one.store.Commit(one.store.Snapshot().Revision, one.writers.ops, map[string]any{ops.Name(moved.ID): moved})
 	})
 	one.book = book
-	return book.Restart()
 }
+
+// An operation past its window leaves the book, the table and the store together. [[spec/design_output/model#what-stays-how-long]]
+func (one *door) sweepsOps() {}

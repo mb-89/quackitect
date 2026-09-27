@@ -168,3 +168,32 @@ func TestAStaleMarkOnANameNobodyProvidesRefuses(t *testing.T) {
 		t.Fatalf("the mark answers %v", err)
 	}
 }
+
+func TestADropRemovesTheValuesItsWriterOwns(t *testing.T) {
+	c := New()
+	n := GivenIn(c, "t/<id>", 0)
+	s := NewStore(c, nil)
+	if _, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/a": 1, "t/b": 2}); err != nil {
+		t.Fatal(err)
+	}
+	before := s.Snapshot()
+	if _, err := s.Drop(before.Revision, n, "t/a"); err != nil {
+		t.Fatal(err)
+	}
+	after := s.Snapshot()
+	if _, held := after.values["t/a"]; held || after.Read("t/b") != 2 || after.Revision <= before.Revision {
+		t.Fatalf("the drop leaves %v at %d", after.values, after.Revision)
+	}
+	if before.Read("t/a") != 1 {
+		t.Fatal("the drop reaches the snapshot before it")
+	}
+}
+
+func TestADropRefusesANameNobodyProvides(t *testing.T) {
+	c := New()
+	n := GivenIn(c, "t/n", 0)
+	s := NewStore(c, nil)
+	if _, err := s.Drop(s.Snapshot().Revision, n, "t/gone"); err == nil {
+		t.Fatal("the drop takes a name nobody provides")
+	}
+}
