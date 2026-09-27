@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-foundation-lands-unchanged
 parent: quack-why-answers-a-name
+record:
+  - step: do
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 4c20894d5f44f5372522beecd367a8254d772f68
+    hash_after: 4c20894d5f44f5372522beecd367a8254d772f68
+    why: quack-why-answers-a-name answers this ask
+reason: answered
 ---
 
 # Ask
