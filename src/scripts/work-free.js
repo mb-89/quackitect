@@ -59,8 +59,12 @@ export function stuckIn(it, one, at) {
   return staleClaim(one, at, it).stale ? "stale" : "";
 }
 
-// The first stuck hand-over, which the take hands out ahead of a free group. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
-export function stuckFirst(it, stand, standing, at = 0) {
+export function nowOf(it) {
+  return it.clock ? it.clock.now().getTime() : 0;
+}
+
+// The first stuck hand-over, which the take hands out ahead of a free group. A hand-over past work.staleAfter reads stuck by the clock. [[spec/tickets/take-hands-a-stale-handover]]
+export function stuckFirst(it, stand, standing, at = nowOf(it)) {
   for (const one of stand.filter((held) => standing.get(held.branch) === DONE)) {
     const why = stuckIn(it, one, at);
     if (why) return { one, why };
@@ -98,7 +102,7 @@ export function freeNow(tickets, merged = new Set()) {
 export function trigger(it) {
   // The trigger reads the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
   it.git.fetch();
-  const now = it.clock ? it.clock.now().getTime() : 0;
+  const now = nowOf(it);
   const free = readFree(it, now).free.map((one) => one.branch);
 
   console.log(

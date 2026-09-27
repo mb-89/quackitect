@@ -5,8 +5,8 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import {
   CLOSED,
@@ -28,9 +28,9 @@ import {
 } from "../../src/scripts/work.js";
 import {
   doorsSaying,
-  green,
   GROUP_AT,
   GROUP_NOTE,
+  green,
   groupRemote,
   HAND,
   heard,
@@ -460,4 +460,39 @@ test("branch take hands out a stuck hand-over first, and prints sync, check and 
     "the take writes no record on a closed group",
   );
   assert.equal(disk.read(on("one-group")), GROUP_NOTE, "the free group waits");
+});
+
+// A hand-over up to date with main but past work.staleAfter reads stuck by the clock. [[spec/tickets/take-hands-a-stale-handover]]
+test("branch take hands out a hand-over past work.staleAfter, by the clock", () => {
+  const shut = withField(GROUP_NOTE, "state", CLOSED, fakeFront());
+  const from = "2026-01-02T00:00:00.000Z";
+  const twoDaysBack = Math.floor(new Date(from).getTime() / 1000) - 2 * 24 * 3600;
+  const { it, outside } = doorsSaying(
+    {
+      ...remoteSaying(
+        [
+          { branch: "work/landing", tip: "tip-landing", when: twoDaysBack },
+          { branch: "work/one-group", tip: "tip-one" },
+        ],
+        {
+          "work/landing:spec/tickets/landing.md": shut,
+          [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+        },
+      ),
+      "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+      "git rev-list --count origin/work/landing..origin/main": { stdout: "0\n" },
+    },
+    { [on("landing")]: shut, [on("one-group")]: GROUP_NOTE },
+  );
+  it.clock = fakeClock(from);
+  it.stale = "12h";
+
+  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, cloud: true }));
+
+  assert.equal(code, 0, said);
+  assert.ok(
+    ranGit(outside).includes("git switch work/landing"),
+    "the take moves onto the stale branch",
+  );
+  assert.match(said, /You are on work\/landing, whose hand-over stands stale/);
 });

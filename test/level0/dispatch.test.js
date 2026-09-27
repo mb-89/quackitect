@@ -13,7 +13,7 @@ import { fixName } from "../../src/scripts/dispatch-write.js";
 import { cutTo } from "../../src/scripts/ticket.js";
 import { askFaults } from "../../src/scripts/ticket-ask-lint.js";
 import { markOff } from "../../src/scripts/work.js";
-import { freeNow, stuckIn } from "../../src/scripts/work-free.js";
+import { freeNow, nowOf, stuckIn } from "../../src/scripts/work-free.js";
 import {
   commits,
   done,
@@ -108,6 +108,12 @@ test("a group at done past work.staleAfter reads as a stuck hand-over", () => {
     },
   );
   assert.deepEqual(planOf(it).stuck, [{ group: "landing", why: "stale" }]);
+});
+
+// The take and the trigger read one clock. [[spec/tickets/take-hands-a-stale-handover]]
+test("nowOf answers the clock time, and nothing on a run without a clock", () => {
+  assert.equal(nowOf({ clock: fakeClock(FROM) }), new Date(FROM).getTime());
+  assert.equal(nowOf({}), 0);
 });
 
 test("stuckIn answers behind where main holds commits the branch lacks, and nothing where it holds none", () => {
