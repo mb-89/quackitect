@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/tests-red
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: open-tasks-land-in-shadow
@@ -87,6 +87,14 @@ record:
     hand: box d7d70c069f441 · claude-code-remote · helper-2
     hash_before: d59ca81ff3d975bf503d26803866c28fb810546b
     hash_after: d59ca81ff3d975bf503d26803866c28fb810546b
+  - step: implement/tests-red
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: 2c2a3f5cdcf3bc485ab65eb7ab0e66552c61eafa
+    hash_after: 2c2a3f5cdcf3bc485ab65eb7ab0e66552c61eafa
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tickets fails
 ---
 
 # Ask
@@ -203,20 +211,33 @@ pass with findings
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/tickets src/index
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new test fails on its own assertion: the stubs answer empty values, `tickets/all` stands outside the catalog, and the golden file stands nowhere yet. The index test waits its full poll before it fails, because the name never lands.
+
+The review's findings shape the tests:
+
+- `TestRegistersTakeTheCatalogServeTakes` registers into a fresh catalog, the way `Serve` takes one
+- the golden rows carry the group's hash beside the ticket's own, so a take on a group sets its children's rows aside
+- `TestPublishesTickets` plants a private ticket under `.se/tickets`, which the index's note rows carry and the tracked file rows leave out
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `src/tickets` and the index's tickets reading, which the ask names
+- the golden test reads the tree's own ticket folder as its fixture, and reaches no door
+- each file header points at this ticket
+- the ticket fields stand in `src/tickets` alone, and the index points there
+- five review rows stand fixed in the tests, and the window's held override moves to the window's own phase
 
 ## change
 
