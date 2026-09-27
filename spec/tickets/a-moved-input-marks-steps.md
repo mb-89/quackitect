@@ -77,12 +77,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d7d8cca563b1 · claude-code-remote
     hash_before: 37121f76c6fc6552e82d6eeb72f418a6a6bf03ed
     hash_after: 37121f76c6fc6552e82d6eeb72f418a6a6bf03ed
+  - step: design/review
+    hand: box d7d9b0d5dfcf · claude-code-remote
+    hash_before: faad7c206edabd9c8a3d276f9671f9e12f3eebd8
+    hash_after: faad7c206edabd9c8a3d276f9671f9e12f3eebd8
 ---
 
 # Ask
@@ -147,8 +151,11 @@ each done_when line maps to a pull-stale case: hashes, marks, append, edit
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- stale-shares-the-bless-hash: hashText in src/scripts/pull-bless.js hashes a chapter for the bless already, so the stale read takes its chapter hash from one function both modules import
+- stale-fields-reach-test-schema: SCHEMA in test/level0/pull-schema.js copies the record shape of the ticket schema, so inputs, def and stale land there beside spec/schemas/ticket.schema.yaml
 
 # implement
 
