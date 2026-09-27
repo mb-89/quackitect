@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -147,6 +147,18 @@ record:
   - step: design/draft
     hand: the engine
     stale: [[spec/rationales/git-stays-the-archive]]
+  - step: design/draft
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 621f88114f824f3e682476ef3069dc071c6d533c
+    hash_after: 621f88114f824f3e682476ef3069dc071c6d533c
+    inputs:
+      - name: ask
+        hash: 1c990e737b4c9045
+        size: 442
+      - name: [[spec/rationales/git-stays-the-archive]]
+        hash: 2bf04f9d82d2183d
+        size: 1605
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -180,28 +192,28 @@ The marker exists so the queue reads files alone. Until the queue reads it, ever
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-work-answer.js gains cloudsIn(all), which answers the names the cloud holds off the tickets alone: each group whose ticket carries cloud: true, read by CLOUD_MARK from work-merge.js, and each ticket whose group field names one of them. placesIn builds its onCloud set with cloudsIn over the tickets it already reads, in place of the standing branches out of read.stand, so a branch with no marker stays on the desk, and a marker with no branch goes to the cloud. read.stand still feeds ticketsIn, since a branch carries its own tickets. Weighed: the marker lives in work-merge.js already, so the reader imports it and spells no second key. Assumed: a closed ticket leaves the cloud as it does today, and the state check stays beside the set.
+work-answer.js fills cloudsIn(all): it answers the names the cloud holds off the tickets alone, each group whose ticket carries cloud: true (read by CLOUD_MARK from work-merge.js) and each ticket whose group field names one of them. placesIn sets onCloud to cloudsIn(all), in place of the inline marked set that marked-groups-stay-cloud added and the union with the unmerged branches of read.stand. So a branch with no marker stays on the desk, and a marker with no branch goes to the cloud. read.stand still feeds ticketsIn, since a branch carries its own tickets. Weighed: the marker key lives in work-merge.js, so the reader imports it and spells no second key; the rationale change that staled this draft renames the git door to the git IO module and leaves the marker rows as they stand, so the approach holds. Assumed: a closed ticket leaves the cloud as it does today, and the state check stays beside the set.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-src/scripts/work-answer.js: placesIn,src/scripts/work-list.js: queueOnly, which reads CLOUD_PLACE off answerOf,src/scripts/ticket-yours.js: queueIn, which reads CLOUD_PLACE,src/tui/work/workplaces.go: countTakeable and Placed, which read the place off the answer,src/plan/golden_test.go: the golden replay, which reads the places placesIn captures
+src/scripts/work-answer.js: placesIn, which builds onCloud,src/scripts/work-answer.js: answerOf, which calls placesIn,src/scripts/work-list.js: queueOnly, which reads CLOUD_PLACE off answerOf,src/scripts/ticket-yours.js: queueIn, which reads CLOUD_PLACE,src/tui/work/workplaces.go: countTakeable and Placed, which read the place off the answer,src/plan/golden_test.go: the golden replay, which reads the places placesIn captures,test/level0/work-answer-cloud.test.js: both cases, which plant a marker and keep passing,test/level0/work-marked.test.js: both cases, which plant a marker and keep passing
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
 <!-- the form is list -->
 
-test/level0/queue-cloud.test.js: a marked group with no branch reads as the cloud s, and its child with it,test/level0/queue-cloud.test.js: a group with a branch and no marker reads as the desk s
+test/level0/queue-cloud.test.js: a marked group with no branch reads as the cloud's, and its child with it,test/level0/queue-cloud.test.js: a group with a branch and no marker reads as the desk's
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-first
+first: no review has read this draft; the engine staled it on the rationale change alone
 
 ### size
 
@@ -215,8 +227,8 @@ src/scripts/work-answer.js,test/level0/queue-cloud.test.js
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-opened placesIn, ownTickets and ticketsIn in work-answer.js, marks in work-merge.js, refsHere in work-stands.js, and the readers of CLOUD_PLACE, and checked each claim there
-the callers come off a grep for placesIn and CLOUD_PLACE over src and test
+opened placesIn, cloudsIn, ownTickets, ticketsIn and answerOf in work-answer.js, CLOUD_MARK in work-merge.js, and the readers of CLOUD_PLACE, and checked each claim there
+the callers come off a grep for placesIn and CLOUD_PLACE over src and test, the marker tests among them
 the first two done_when lines meet the two queue-cloud cases, and the check decides the third
 
 ## tests-red
