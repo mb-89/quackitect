@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
-todo: true
+state: closed
+todo: false
 step: decide
 steps:
   - name: decide
@@ -20,6 +20,17 @@ steps:
         says: why, in a line, or what the successor carries
 process: [[spec/processes/note]]
 process_hash: e02a0935ed78eb92
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: 841b0b57e2bdccdb436192d06ef3b938d9299f84
+    hash_after: 841b0b57e2bdccdb436192d06ef3b938d9299f84
+    inputs:
+      - name: ask
+        hash: c1ef18e1b9acb394
+        size: 720
+    def: 9e2520e6318baf46
+reason: done
 ---
 
 # Ask
@@ -43,14 +54,16 @@ The language server takes its root as `filepath.Abs` answers it, and compares a 
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+done
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+Fixed in cb50e5323: rootHere and current in src/lsp/main.go fold the drive letter the way rooted in src/index does, and a case in src/lsp/serve_test.go holds it. The file leaves with the lsp switch.
 
 # Discussion
 
