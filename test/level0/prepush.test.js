@@ -56,6 +56,24 @@ test("a push to a work branch meets no door, whatever the stamp says", () => {
   assert.deepEqual(holds(refsIn(toWork), stamp({ ok: false })), { code: 0, said: "" });
 });
 
+// [[spec/tickets/cloud-boxes-leave-trunk-alone]]
+test("a cloud box pushing main meets the refusal, whatever the battery says", () => {
+  for (const text of [stamp(), ""]) {
+    const said = holds(refsIn(toTrunk), text, () => [], true);
+    assert.equal(said.code, 1);
+    assert.match(said.said, /its own work branch/);
+    assert.match(said.said, /\.\/RUNME\.sh branch merge/);
+  }
+});
+
+// [[spec/tickets/cloud-boxes-leave-trunk-alone]]
+test("a cloud box pushes its own work branch", () => {
+  assert.deepEqual(
+    holds(refsIn(toWork), stamp(), () => [], true),
+    { code: 0, said: "" },
+  );
+});
+
 test("a push to trunk on a green stamp lands", () => {
   assert.deepEqual(holds(refsIn(toTrunk), stamp()), { code: 0, said: "" });
 });
@@ -85,8 +103,14 @@ test("a push to trunk over a stamp counting warnings refuses, and names the lint
   assert.equal(said.code, 1);
   assert.match(said.said, /2 warning\(s\) stand in 2 file\(s\)/);
   assert.match(said.said, /RUNME\.sh lint/);
-  assert.deepEqual(holds(refsIn(toWork), stamp({ warnings: 2 })), { code: 0, said: "" });
-  assert.deepEqual(holds(refsIn(toTrunk), stamp({ warnings: 0 })), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toWork), stamp({ warnings: 2 })), {
+    code: 0,
+    said: "",
+  });
+  assert.deepEqual(holds(refsIn(toTrunk), stamp({ warnings: 0 })), {
+    code: 0,
+    said: "",
+  });
 });
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
@@ -106,7 +130,11 @@ test("a push whose delta carries an untagged note lands", () => {
   const carried = () => [{ name: "spec/tickets/slow-lint.md", text: FREE }];
   assert.deepEqual(holds(refsIn(toWork), "", carried), { code: 0, said: "" });
   // A warning holds no push, so the door takes no lint. [[spec/design_output/config#the-engine-controls]]
-  assert.equal(holds.length, 2, "the door reads the refs and the stamp, then the delta, and no warnings");
+  assert.equal(
+    holds.length,
+    2,
+    "the door reads the refs and the stamp, then the delta, and no warnings",
+  );
 });
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]

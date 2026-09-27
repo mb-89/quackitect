@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: ec90a86efbfacd2b
         size: 629
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 3278daa60e7999129cfe1ea3568177d127f2e7ec
+    hash_after: 3278daa60e7999129cfe1ea3568177d127f2e7ec
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 33ddc7cac7b78a33
+        size: 1980
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -238,26 +251,31 @@ The done lines and the case deciding each:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/prepush.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/prepush.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The cloud refusal fails on its own assertion: `holds` reads no fourth argument yet, so a green stamp lets the push to main through. The work branch case passes, because it guards the side a cloud box keeps. The refusal holds on an empty stamp too, so the cloud rule answers before the battery.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a case: the refusal of main fails red, and the work branch case guards the other side
+- the door reaches no outside: the case hands `holds` the refs, the stamp and an empty delta
 
 # gate
 
