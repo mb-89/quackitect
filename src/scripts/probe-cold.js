@@ -124,12 +124,12 @@ function rulesReached(rows) {
   if (!reads.length) return { pass: false, evidence: "no context row" };
   const whole = reads.find((one) => {
     const names = String(one.detail ?? "").split(/\s+/);
-    return names.includes("level0-rules") && names.includes("level0-canary");
+    return names.includes("level0-canary");
   });
   if (!whole) {
     return {
       pass: false,
-      evidence: `no context row names level0-rules and level0-canary: ${reads[0].detail ?? ""}`,
+      evidence: `no context row names level0-canary: ${reads[0].detail ?? ""}`,
     };
   }
   return { pass: true, evidence: `context row, ${whole.detail}` };

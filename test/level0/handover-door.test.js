@@ -51,7 +51,7 @@ test("a handover on the box reaches the session after the rules, and the read de
   const handover = blocks.find((one) => one.name === HANDOVER_BLOCK);
 
   assert.equal(names(blocks).at(-1), HANDOVER_BLOCK, "the handover comes last");
-  assert.ok(names(blocks).includes("level0-rules"), "the rules come before it");
+  assert.ok(names(blocks).includes("level0-canary"), "the canary comes before it");
   assert.match(handover.text, /The probe runs next\./);
   assert.match(handover.text, /Write a new one before you finish\./);
   assert.equal(it.disk.exists(at(HANDOVER)), false, "the read deletes the file");

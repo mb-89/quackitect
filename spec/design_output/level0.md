@@ -773,7 +773,7 @@ and the stream:
 |---|---|
 | hook | a bridgehead `session.start` row or a `context` row stands |
 | server | a row the bridgehead leaves unwritten stands |
-| rules | a `context` row names `level0-rules` and `level0-canary` |
+| rules | a `context` row names `level0-canary` |
 | tools | a `mcp__level0__` name past the read tools reaches the session |
 | canary | the first text opens on the sentence, and no later text repeats it |
 
@@ -1173,24 +1173,25 @@ the table under them, so every reader carries one shape. The canary counts the
 rules alone, because a row shows a rule and adds none.
 [[spec/guidance/guidance]]
 
-## The style carries a note
+## The style carries the top
 
 The client sends an output style with every request and reminds the model of
-it during the conversation, where a context block arrives once. So a guidance
-note carrying `style: true` in its frontmatter goes into the style, and the
-projection writes `.claude/output-styles/level0.md` from every such note.
+it during the conversation, where a context block arrives once. So every note
+at the top of `spec/guidance` goes into the style, and the projection writes
+`.claude/output-styles/level0.md` from them. A note binding a machine stands
+under a subfolder, where its `env` hands it to every step on that machine.
 
 | who reads | what it gets |
 |---|---|
-| the session | the standing block without the flagged notes, and the style beside it |
-| a helper | every note in its prompt, because a subagent reads no style |
-| the canary | the count of every note, because the style holds the session too |
+| the session | the canary and the handover as blocks, and the style beside them |
+| a helper | every top note in its prompt, because a subagent reads no style |
+| the canary | the count of every top note, because the style holds them |
 
 The style sits in the cached prefix, so the same text costs full price once a
 session. A line injected into a user turn sits behind the cache line, and it
 costs full price every turn. So the style carries the rules, and no hook does.
-`guidanceHere` in `src/bridge/guidance.js` splits the standings, and
-`styled` in `lib/guidance.js` reads the flag.
+`guidanceHere` in `src/bridge/guidance.js` counts the top notes and writes the
+helper's text, and `styleFrom` in `lib/projection.js` writes the style.
 
 ## The canary
 
@@ -1525,7 +1526,7 @@ naming none binds every box, and `0`, `false` and an empty string count as no
 value.
 
 The variable does the deciding, so a new kind of box needs a new note and no
-code. `spec/guidance/cloud.md` waits for the two above, which is how a cloud
+code. `spec/guidance/cloud/cloud.md` waits for the two above, which is how a cloud
 session reads its own rules and a desk session skips them.
 
 `./RUNME.sh standing` reads the same variables, so setting one shows a person

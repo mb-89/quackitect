@@ -46,7 +46,7 @@ file on `main`. So the owner turns a phase on by setting its key to `true` on
 `main`, once the shadow before it runs clean. The mechanism and the owner's
 edit stand in [[spec/design_output/work#a-switch-holds-a-group]].
 
-The cloud answers every other question itself, as [[spec/guidance/cloud]] asks.
+The cloud answers every other question itself, as [[spec/guidance/cloud/cloud]] asks.
 Every group outside the migration keeps moving.
 
 # The phases

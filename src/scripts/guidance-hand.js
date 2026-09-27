@@ -215,12 +215,13 @@ export function resolved(it, tags, env = {}) {
     .sort();
 }
 
-// Every note under a subfolder whose tags no leaf of any process carries whole. The env stays out, since a cloud note still reaches its cloud step. [[spec/design_input/level-two#guidance]]
+// Every note under a subfolder whose tags no leaf of any process carries whole. A note binding an env reaches every leaf where it binds, so it stands reached. [[spec/tickets/cloud-note-reaches-every-step]]
 export function unreached(it) {
   const at = it.join(it.root, ...GUIDANCE.split("/"));
   if (!it.disk.exists(at)) return [];
   const leaves = everyLeafTags(it);
   return underFolders(it, at)
+    .filter((path) => !envOf(guidanceText(it, path)).length)
     .filter(
       (path) => !leaves.some((has) => tagsOf(it, path).every((one) => has.has(one))),
     )

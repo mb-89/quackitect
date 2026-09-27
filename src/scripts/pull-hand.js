@@ -545,7 +545,7 @@ export function withPersonStep(it, one, before, asks, options) {
   }
   return inserted(it, one, before, `person-${standing + 1}`, {
     does: "answers the question the engine asks",
-    // A cloud box answers its own questions, so the step it inserts waits for nobody. [[spec/guidance/cloud]]
+    // A cloud box answers its own questions, so the step it inserts waits for nobody. [[spec/guidance/cloud/cloud]]
     by: it.cloud ? "anyone" : "person",
     to: "engine",
     asks,

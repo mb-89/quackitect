@@ -83,7 +83,6 @@ test("the standing layer carries the canary and the handover alone", () => {
 
   assert.deepEqual(names, ["level0-canary", HANDOVER_BLOCK]);
   const said = guidanceHere(it.disk, ROOT, ROOT, {}, true);
-  assert.equal(said.standing, "", "the session layer hands no note");
   assert.match(
     said.sentence,
     /3 rules, 2 notes/,

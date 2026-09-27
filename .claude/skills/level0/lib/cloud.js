@@ -1,13 +1,13 @@
 // Whether this session runs on a cloud box, where nobody sits beside it. Every
 // door reading that fact reads it here, so one name says what a cloud box is.
-// [[spec/guidance/cloud]]
+// [[spec/guidance/cloud/cloud]]
 
 import { WORK_BRANCH } from "../../../../src/engine/group.js";
 import { TRUNK } from "./trunk.js";
 
 export const CLOUD = ["CLAUDE_CODE_REMOTE", "SE_CLOUD"];
 
-// [[spec/guidance/cloud]]
+// [[spec/guidance/cloud/cloud]]
 export function inCloud(env = {}) {
   return CLOUD.some((name) => truthy(env?.[name]));
 }

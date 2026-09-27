@@ -356,7 +356,7 @@ test("a step that excludes the only hand answers spawn, with the helper's name a
     "design/review",
     "a spawned hand can take it",
   );
-  // A cloud box takes a person's step, and a desk leaves it. [[spec/guidance/cloud]]
+  // A cloud box takes a person's step, and a desk leaves it. [[spec/guidance/cloud/cloud]]
   const asks = { text: took.replace("not: draft", "by: person") };
   assert.equal(takeable(it, asks), "design/review");
   assert.equal(takeable({ ...it, cloud: false }, asks), "");

@@ -292,7 +292,7 @@ const CHECKS = {
   "step-waits-on-person": (held) => stepWaitsOnPerson(held.box),
   // A claim a fact denies reads as no stop line, so the turn holds and the fact re-prompts. [[spec/design_output/stop#a-talk-follows-a-report]]
   "no-stop-line": (held) => !claimStands(held),
-  // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
+  // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud/cloud]]
   "a-person-sits-here": (held) => !cloudHere(held.box),
   // [[spec/design_output/stop#a-talk-follows-a-report]]
   // A report an earlier message of this turn carries stands too, so a stop line sent alone repeats nothing. [[spec/design_output/stop#a-talk-follows-a-report]]

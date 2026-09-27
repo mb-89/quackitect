@@ -425,7 +425,6 @@ const STYLED = {
 const flagged = `---
 kind: [[guidance]]
 scope: ["everybody"]
-style: true
 ---
 
 # Actionables
@@ -451,7 +450,7 @@ scope: ["everybody"]
 1. Work one ticket at a time.
 `;
 
-test("the style shape writes one file, from the flagged notes alone", () => {
+test("the style shape writes one file, from every note at the top", () => {
   const files = writesOf(
     STYLED,
     new Map([
@@ -473,15 +472,20 @@ test("the style shape writes one file, from the flagged notes alone", () => {
     /2\. Say a thing once\.\n\n\| the rule \| do \| do not \|\n\|---\|---\|---\|\n\| 1 \| the answer first \| the road to it first \|\n\| 2 \| one owner and a link \| a second wording \|\n/,
     "the Examples table rides under the rules",
   );
-  assert.ok(!said.includes("Work one ticket"), "an unflagged note stays out");
+  assert.match(
+    said,
+    /## tickets\n\n1\. Work one ticket at a time\./,
+    "a note carrying no flag rides too",
+  );
   assert.ok(
     said.includes(saysGenerated("spec/guidance")),
     "the file says it is generated",
   );
 });
 
-test("no flagged note writes no style file", () => {
-  const files = writesOf(STYLED, new Map([["spec/guidance/tickets.md", plain]]));
+test("no note carrying rules writes no style file", () => {
+  const bare = '---\nkind: [[guidance]]\nscope: ["everybody"]\n---\n\n# Actionables\n';
+  const files = writesOf(STYLED, new Map([["spec/guidance/tickets.md", bare]]));
   assert.equal(files.size, 0);
 });
 

@@ -18,7 +18,7 @@ const AT = "2026-09-12T08:00:00.000Z";
 
 const context = (reason) =>
   rowOf(AT, "info", "context", "5 block(s) reach the session", {
-    detail: "level0-rules level0-canary",
+    detail: "level0-canary",
     reason,
   });
 
@@ -98,7 +98,10 @@ test("an empty log leaves the road unproven, and names no read", () => {
 
 // Two writers appending at once tear one line, and the probe reads the rest. [[spec/design_output/log#every-writer-appends]]
 test("a torn line in the log drops alone, and the rows around it read", () => {
-  const files = { read: () => `${JSON.stringify(context("first"))}\n{"at":"2026\n${JSON.stringify(compaction())}\n` };
+  const files = {
+    read: () =>
+      `${JSON.stringify(context("first"))}\n{"at":"2026\n${JSON.stringify(compaction())}\n`,
+  };
 
   assert.deepEqual(
     logRows(files, "log").map((one) => one.kind),
