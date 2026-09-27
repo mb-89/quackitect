@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: retro/write
+step: retro/cloud
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [the-migration-writes-its-specs]
@@ -109,6 +109,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: c6021f4fa4bca79718b6f548ea7a06e21bdf603e
+    hash_after: c6021f4fa4bca79718b6f548ea7a06e21bdf603e
 ---
 
 # Ask
@@ -202,11 +206,18 @@ Done when the index answers `/v1` and the old API side by side, and the check st
 
 <!-- the form is list -->
 
+- `why-reads-the-stale-mark` closes answered by `quack-why-answers-a-name`, whose test covers the stale state
+- main merges into the branch, with five conflicts resolved and the check green
+- the group passes sync, split, children and notes, and every child stands closed
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- the handover named the answer to the stale ticket, so one read of `why.go` closed it
+- the merge kept both sides, because the agent read each hunk against the diff from the merge base
 
 ### badly
 
@@ -214,11 +225,26 @@ Done when the index answers `/v1` and the old API side by side, and the check st
 
 <!-- the form is list -->
 
+- no owner prompt reaches this run, and the schedule fires the stored prompt alone
+- 02:04, the first command named no ticket in its description, and the door refused it
+- 02:04, a landing verb followed a pipe, and `LandingFollowsItsGate` refused it
+- 02:06, `git checkout --theirs` on `ticket.js` dropped this branch's side, and `checkout -m` put the conflict back
+- 02:07, a regex looked for the merge's own conflict markers, where `checkout -m` writes ours and theirs
+- 02:08, `git commit` ran bare, and `GitWritesThroughAVerb` refused it
+- 02:10, the sync command stood in a fence, and the hand-back read no line
+- 02:11, the split checklist landed three lines at warning, and the hand-back took them
+- 02:12, the collect verb refused on those three warnings, and the door refused their fix
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- `src/scripts/pull-writes.js`: a hand-back refuses evidence at warning, since `retro collect` refuses the same lines later
+- `src/scripts/retro-collect.js`: or collect weighs warnings on passed fields apart, since no hand may fix them
+- `spec/guidance/cloud`: the merge verb names `checkout -m` markers, and warns off `--theirs` on a file both sides change
+- the command form under a step says it takes a bare line, not a fence
 
 ### thoughts
 
@@ -226,11 +252,19 @@ Done when the index answers `/v1` and the old API side by side, and the check st
 
 <!-- the form is text -->
 
+The run wrote this retro off its own window, because `retro collect` stood refused. The three warnings sit on passed fields, which only the engine writes. So no hand on this branch clears them, and the check stays at warning until a verb reopens split.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each finding names the file that owns its fix, and repeats none of that file
+- the retro adds no number, so no name for one is due
+- the retro writes no header over a file
+- the run's errors stand under badly with their times, and no owner prompt reaches this run
+- the retro names roles and verbs, and carries no name, address or box path
 
 ## cloud
 
