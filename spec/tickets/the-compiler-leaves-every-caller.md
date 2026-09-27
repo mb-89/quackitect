@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-foundation-lands-unchanged
 parent: sqlite-runs-pure-go
+record:
+  - step: do
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 495f2e709fe6fdf42810b0c2f53b99ad91e3150b
+    hash_after: 495f2e709fe6fdf42810b0c2f53b99ad91e3150b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 54 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ take Zig out of `BORROWED` in `src/scripts/work-review.js` and its row in `test/
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/review.test.js test/contract/tree.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ take Zig out of `BORROWED` in `src/scripts/work-review.js` and its row in `test/
 
 <!-- the form is text -->
 
+The change of [[spec/tickets/sqlite-runs-pure-go]] lands it. `BORROWED` holds the two module folders alone, the review case borrows those two, and the survey fixture probes a tool of its own.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask, inside the parent's change
+- the change reveals no cleanup
+- the index note owns the compiler chapter, and the code points there
 
 # Discussion
 
