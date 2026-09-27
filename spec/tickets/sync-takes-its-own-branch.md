@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "spec/tickets/sync-takes-its-own-branch.md:294:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: c78a561d0a46466c3af331aaf2bf2bf44b3d69f5
+    hash_after: c78a561d0a46466c3af331aaf2bf2bf44b3d69f5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:303:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    inputs:
+      - name: design/tests-red
+        hash: 2622c78095a29ba1
+        size: 659
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -344,26 +367,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/work-sync.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A box whose branch another hand pushed to met a pull that asks for a rebase, which level zero refuses, and it stopped. `branch sync` on a work branch now merges `origin/<the branch>` first, through `ownIn` in `src/scripts/work-stands.js`, then takes trunk as before. A plain merge keeps both sides, and a conflict stops through the same `settles` the trunk merge uses, naming the files, with trunk waiting.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list alone
+- every git call reaches the fake git
+- the code points at the design note
+- the step stands once
 
 # accept
 
