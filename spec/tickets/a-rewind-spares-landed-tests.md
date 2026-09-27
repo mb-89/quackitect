@@ -125,7 +125,7 @@ A ticket whose design review goes stale after its change lands walks back to gre
 A stale design review sends a ticket back to `implement/tests-red`, whose evidence expects a failing assertion. Once the change lands the tests pass, so no rerun passes the step and the ticket strands mid-route. `the-retro-reads-the-backlog` stands there: a rename moves its route test, rewrites the draft's test list, and marks `design/review` stale after `implement/change` passes.
 
 - a rewind keeps a landed `tests-red` whole while its tests stand unmoved, or reruns it at its recorded commit. A case under `test/level0` decides it
-- `the-retro-reads-the-backlog` passes `tests-red`, which `./RUNME.sh ticket pull the-retro-reads-the-backlog` decides
+- the case replays the rewind `the-retro-reads-the-backlog` meets, a rename moving a test the draft names
 - `./RUNME.sh check` exits 0
 
 view: none
