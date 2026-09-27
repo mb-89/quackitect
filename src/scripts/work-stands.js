@@ -100,12 +100,9 @@ export function shutBy(text, shared) {
   return shared.get(key) === true ? "" : key;
 }
 
-// [[spec/design_output/work#a-dependency-waits-for-trunk]]
+// A dependency waits while its branch stands, and a closed branch is a finished one, so no history is read. [[spec/design_output/work#a-dependency-waits-for-trunk]]
 export function waitingOn(text, standing) {
-  return dependsOn(text).filter((name) => {
-    const status = standing.get(`work/${name}`);
-    return status === TODO || status === HELD || status === DONE;
-  });
+  return dependsOn(text).filter((name) => standing.has(`work/${name}`));
 }
 
 export function standingOf(tickets, merged = new Set()) {
@@ -119,9 +116,6 @@ export function standingOf(tickets, merged = new Set()) {
 
 // A branch whose tip stands on trunk's own line is a cut waiting for a box while trunk moves on, and a landed branch joins through a merge commit, off that line. [[spec/design_output/work#a-merged-branch-closes]]
 export function mergedHere(it) {
-  // A cloud clone holds the last commits alone, and a merge older than them reads as unmerged, so the read takes the whole history first. [[spec/design_output/work#a-merged-branch-closes]]
-  if (it.git.run(["rev-parse", "--is-shallow-repository"], true).out === "true")
-    it.git.run(["fetch", "--unshallow", "--quiet", "origin"], true);
   const fresh = branchesIn(it, ["branch", "-r", "--points-at", `origin/${TRUNK}`]);
   const line = linesOf(
     it.git.run(["rev-list", "--first-parent", `origin/${TRUNK}`], true).out,

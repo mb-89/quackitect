@@ -556,11 +556,12 @@ them, in the order the score sets. [[spec/tickets/the-queue-is-a-score]]
 
 ## A dependency waits for trunk
 
-A branch meets its dependency once trunk holds the branch it names, or once that
-branch goes because somebody merges and closes it. `done` alone holds the
-dependent, because `done` waits on the merge, which a box off the cloud runs.
-So a chain of work runs
-itself in order, and each link starts from the one before it.
+A branch meets its dependency once the branch it names stands no more. A merge lands
+the branch on trunk and closes it, so a closed branch is a finished one. The
+read looks for the branch on the remote alone, and reads no history. So a
+shallow clone reads the same answer as a full one. A branch standing at `done`
+holds the dependent. So does a merged branch nobody closes yet. So a
+chain of work runs itself in order, and each link starts from the one before it.
 
 `take` merges trunk in. A dependent taken before its dependency lands starts
 from a trunk carrying none of that work. It then builds that work a second time.
