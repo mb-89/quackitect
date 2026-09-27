@@ -114,11 +114,24 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [io-modules-own-their-names]
+record:
+  - step: design/draft
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 4dce973c740021fb08485246d93cfcaa32b0bf5f
+    hash_after: 4dce973c740021fb08485246d93cfcaa32b0bf5f
+    inputs:
+      - name: ask
+        hash: 32dff8229e6ea3bf
+        size: 741
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +166,67 @@ A module without the flag then reaches the outside nowhere. A fake with no contr
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The analyzers in `src/imports/imports.go` become the four the model names, and the tree test runs all four.
+
+1. `nodoor` leaves, with its rule and its case. `noname` stands nowhere in the code, so nothing leaves for it.
+2. `onlyq` keeps the flag cut `io-modules-own-their-names` lands: `CarriesIO` reads a `q.IO()` call, and `FaultsIn` passes a flagged package. It refuses a call to `time.Now` in a module without the flag too, which a new check over the syntax finds.
+3. `ioonly` is new. It refuses an import of `os`, `os/exec`, `net` or `net/http`, and a call to `time.Now`, in `src/q` and in a renderer. `src/index` stands outside it, as the model says.
+4. `fakesuite` is new. A package declaring a type or function named `Fake` and more needs a file ending `_contract_test.go` beside it, and `q/qtest` needs its `suite.go`. It reads the file names of the package, so the tree test loads them.
+5. `nomodule` stands as it is.
+
+A call check reads the syntax, so `Faults` keeps the import rules and a new `CallFaults(from, files)` answers the call rules. The tree test runs both over every package.
+
+The Vale rules `DoorsOnly`, `FakeDoorsInTest` and `OutsideInDoors` leave the Go code. A `[*.go]` section in `.vale.ini` switches them off, and the per-file sections the IO modules and the root took leave.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/imports/tree_test.go: TestTheTreeHoldsTheImportRules, which runs every analyzer
+src/imports/imports_test.go: the planted cases, which take the new analyzers
+.vale.ini: the Go sections of the three Vale rules
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+./...: `go test ./...` from the root
+src/imports/imports_test.go: TestAModuleImportingOsIsNamed, which stands
+src/imports/imports_test.go: TestAnIOModuleImportingOsIsNamedByNone
+src/imports/imports_test.go: TestAFakeWithNoSuiteIsNamed
+src/imports/imports_test.go: TestAModuleImportingAModuleIsNamed, which stands
+src/imports/imports_test.go: TestTheCoreImportingOsIsNamed
+RUNME.sh: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/imports/imports.go
+src/imports/imports_test.go
+src/imports/tree_test.go
+.vale.ini
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened `imports.go`, its tests, the tree test and `.vale.ini`, and checked each claim there, `noname` among them
+I grepped every user of the analyzers across `src`, and the list names each
+each done_when line names its test above, or a command
 
 ## tests-red
 
