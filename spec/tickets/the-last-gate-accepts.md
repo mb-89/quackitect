@@ -77,12 +77,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-engine-holds-the-route
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d7d6cb0fb1105 · claude-code-remote
     hash_before: e62c46fa9c1ce125d64867fb5b4f7989d4af09ea
     hash_after: e62c46fa9c1ce125d64867fb5b4f7989d4af09ea
+  - step: design/review
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: 93de6ad203c16d608808bfe7316f782346ecc4d3
+    hash_after: 93de6ad203c16d608808bfe7316f782346ecc4d3
 ---
 
 # Ask
@@ -170,8 +174,10 @@ Weighed: the cap reuses the key the fail reads, so the config grows no key. Assu
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- first-accept-names-its-base: the approach bases the rerun diff on the hash_after of the gate last verdict, and names no base for the first run, where no verdict stands. The first run reads the diff since the first take of the ticket, and a group reads it since its merge base with trunk
 
 # implement
 
