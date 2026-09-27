@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -148,6 +148,18 @@ record:
         hash: 4bb243c676234557
         size: 6140
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 011ac6ac8e7388aa60b22661ee29df95f7007f36
+    hash_after: 011ac6ac8e7388aa60b22661ee29df95f7007f36
+    inputs:
+      - name: design/draft
+        hash: 4bb243c676234557
+        size: 6140
+      - name: design/tests-red
+        hash: 60198dd1c4b48de3
+        size: 1461
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -327,8 +339,9 @@ each IO module file carries its fake, FakeDisk, FakeWatch, FakeClock and FakeEnv
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
@@ -399,3 +412,8 @@ each IO module file carries its fake, FakeDisk, FakeWatch, FakeClock and FakeEnv
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The gate passes these to the implementer, to fix in place:
+
+- The draft names `TestTheCoreWritesNoInputName` under `src/index/topic_test.go`, and the case stands in `src/index/core_test.go`.
+- `q.Start` stands now, so the composition root calls it in place of `Load` and `Check`.
