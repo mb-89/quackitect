@@ -77,12 +77,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d7d8cca5d3cd · claude-code-remote
     hash_before: 946f720fba4dae3be85f3897102af0696733ceac
     hash_after: 946f720fba4dae3be85f3897102af0696733ceac
+  - step: design/review
+    hand: box d7d9cc78d3ce · claude-code-remote
+    hash_before: ac4e5372d7cb31e9ca0410f436ee4c4ad7fcff91
+    hash_after: ac4e5372d7cb31e9ca0410f436ee4c4ad7fcff91
 ---
 
 # Ask
@@ -150,8 +154,10 @@ first
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- cloud-note-reaches-every-step: once spec/guidance/cloud.md moves under a subfolder, the tag resolver hands it only at steps tagged cloud, so on a cloud box its session-wide rules (pull first on main, commit and push each finished thing, branch done last) reach no standard-process leaf and no moment before the first pull; hand the note on every leaf where its env binds, or tag every process leaf cloud
 
 # implement
 
