@@ -157,7 +157,6 @@ func (s *Store) Land(name string, event any) error {
 
 // [[spec/design_output/model#a-caller-sets-its-wait]]
 type Declared struct {
-	Op       bool
 	Writes   bool
 	Deadline time.Duration
 }
@@ -167,7 +166,7 @@ func (s *Store) Declared(name string) (Declared, bool) {
 	if one == nil {
 		return Declared{}, false
 	}
-	return Declared{Op: one.op, Writes: one.writes, Deadline: one.deadline}, true
+	return Declared{Writes: one.writes, Deadline: one.deadline}, true
 }
 
 // A stale mark keys by provider, so a sibling under the same topic stays current. [[spec/design_output/model#a-stale-mark]]

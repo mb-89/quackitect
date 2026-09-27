@@ -68,6 +68,8 @@ type Book struct {
 	ops      map[string]*Op
 	count    int
 	moved    func(Op)
+	// Each save closes it and lays a new one, so a waiter wakes on every move. [[spec/design_output/model#the-agent-does-not-poll]]
+	changed chan struct{}
 }
 
 // [[spec/design_output/model#the-states]]
@@ -94,7 +96,7 @@ func New(now func() time.Time, keep Keep, settings Settings) (*Book, error) {
 	if err != nil {
 		return nil, err
 	}
-	b := &Book{now: now, keep: keep, settings: settings, ops: map[string]*Op{}}
+	b := &Book{now: now, keep: keep, settings: settings, ops: map[string]*Op{}, changed: make(chan struct{})}
 	for _, one := range all {
 		held := one
 		b.ops[one.ID] = &held
@@ -260,5 +262,7 @@ func (b *Book) save(one *Op) error {
 	if b.moved != nil {
 		b.moved(*one)
 	}
+	close(b.changed)
+	b.changed = make(chan struct{})
 	return nil
 }

@@ -30,8 +30,8 @@ func (m *memory) All() ([]Op, error) {
 }
 
 var (
-	writer = q.Declared{Op: true, Writes: true, Deadline: time.Minute}
-	reader = q.Declared{Op: true, Deadline: time.Minute}
+	writer = q.Declared{Writes: true, Deadline: time.Minute}
+	reader = q.Declared{Deadline: time.Minute}
 )
 
 func bookOf(t *testing.T, rows ...Op) (*Book, *clock, *memory) {

@@ -3,35 +3,54 @@
 // [[spec/design_output/model#an-action-lists-requests]]
 package q
 
-import (
-	"errors"
-	"fmt"
-)
+import "errors"
 
 // Runs the action's requests through accept, which reaches the IO module each names. [[spec/design_output/model#an-action-lists-requests]]
 func (s *Store) Send(name string, input any, accept func(Request) (any, error)) error {
+	_, err := s.Deliver(name, input, accept, nil)
+	return err
+}
+
+// A request the IO module refuses, and the reason it gives. [[spec/design_output/model#an-action-lists-requests]]
+type Refusal struct {
+	Module, Verb string
+	Err          error
+}
+
+func (r Refusal) Error() string { return r.Module + "." + r.Verb + " refuses: " + r.Err.Error() }
+func (r Refusal) Unwrap() error { return r.Err }
+
+// Send, answering the last answer, and telling moved each request answered against the requests known. [[spec/design_output/model#a-caller-sets-its-wait]]
+func (s *Store) Deliver(name string, input any, accept func(Request) (any, error), moved func(done, known int, step string)) (any, error) {
 	list, err := s.Act(name, input)
 	if err != nil {
-		return err
+		return nil, err
+	}
+	if moved == nil {
+		moved = func(int, int, string) {}
 	}
 	var done []Request
+	var said any
+	known := len(list)
 	for len(list) > 0 {
 		answers := make([]any, 0, len(list))
 		for _, one := range list {
-			said, err := accept(one)
+			said, err = accept(one)
 			if err != nil {
-				return errors.Join(fmt.Errorf("%s.%s refuses: %w", one.Module, one.Verb, err), undo(done, accept))
+				return nil, errors.Join(Refusal{one.Module, one.Verb, err}, undo(done, accept))
 			}
 			answers = append(answers, said)
 			done = append(done, one)
+			moved(len(done), known, one.Module+"."+one.Verb)
 		}
 		last := list[len(list)-1]
 		if last.Then == nil {
 			break
 		}
 		list = last.Then(answers)
+		known += len(list)
 	}
-	return nil
+	return said, nil
 }
 
 // The undo of each request that ran, newest first. [[spec/design_output/model#an-action-lists-requests]]

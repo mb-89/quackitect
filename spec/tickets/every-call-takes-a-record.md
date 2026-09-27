@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -157,6 +157,15 @@ record:
         hash: 28f78e33c9a88d43
         size: 952
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 142afab84d846e6dd94b63b85b7de11c36a151bf
+    hash_after: 8d78017b0b422bf28e642b539c27aa4f3ebf914f
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -323,14 +332,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/ops/call.go src/ops/ops.go src/q/send.go src/q/q.go src/q/store.go src/q/store_test.go src/ops/ops_test.go spec/config/level0.json spec/config/level0.schema.json
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size names, plus src/q/send.go, where Deliver widens Send rather than copy its loop, and the deadlineAction command the projection rewrites, which the gate names
+every door the change reaches has a fake: the call cases run over the memory keep, a moved clock and a fake accept
+call.go opens on a header naming the model's a-caller-sets-its-wait, and each function points at its section
+the deadline stands once, in spec/config/level0.json under watchdog.deadlineAction, and the schema carries its help line alone
 
 ## tests-green
 

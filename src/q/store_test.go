@@ -123,15 +123,15 @@ func TestAKeyOfManySegmentsFollowsAKeyOfOne(t *testing.T) {
 	}
 }
 
-func TestAnActionDeclaresItsHandleAndItsWrite(t *testing.T) {
+func TestAnActionDeclaresItsDeadlineAndItsWrite(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/pull", 0, Op(), Writes())
+	GivenIn(c, "t/pull", 0, Deadline(time.Minute), Writes())
 	GivenIn(c, "t/read", 0)
 	s := NewStore(c)
-	if got, ok := s.Declared("t/pull"); !ok || !got.Op || !got.Writes {
+	if got, ok := s.Declared("t/pull"); !ok || got.Deadline != time.Minute || !got.Writes {
 		t.Fatalf("t/pull declares %+v", got)
 	}
-	if got, ok := s.Declared("t/read"); !ok || got.Op || got.Writes {
+	if got, ok := s.Declared("t/read"); !ok || got.Deadline != 0 || got.Writes {
 		t.Fatalf("t/read declares %+v", got)
 	}
 	if _, ok := s.Declared("t/none"); ok {

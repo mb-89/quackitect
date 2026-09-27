@@ -130,7 +130,6 @@
     "window": 300,
     "deadlineDerived": 30,
     "deadlineFold": 30,
-    "deadlineAction": 30,
-    "deadlineOp": 600
+    "deadlineAction": 600
   }
 }

@@ -38,7 +38,6 @@ type registration struct {
 	missing  bool
 	doc      string
 	deadline time.Duration
-	op       bool
 	writes   bool
 	io       bool
 	where    string
@@ -90,8 +89,7 @@ type Option func(*registration)
 func Doc(text string) Option             { return func(one *registration) { one.doc = text } }
 func Deadline(span time.Duration) Option { return func(one *registration) { one.deadline = span } }
 
-// An action declares its writes; the Op option stands until every call takes a record and a wait. [[spec/design_output/model#a-caller-sets-its-wait]]
-func Op() Option     { return func(one *registration) { one.op = true } }
+// An action declares its writes, and every call of it takes a record and a wait. [[spec/design_output/model#a-caller-sets-its-wait]]
 func Writes() Option { return func(one *registration) { one.writes = true } }
 
 // Marks the registration of an IO module, whose package reaches the outside. [[spec/design_output/model#io-modules-are-modules]]

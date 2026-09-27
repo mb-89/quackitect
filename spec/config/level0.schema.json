@@ -660,12 +660,7 @@
         "deadlineAction": {
           "type": "number",
           "unit": "seconds",
-          "help": "The span an action answers within."
-        },
-        "deadlineOp": {
-          "type": "number",
-          "unit": "seconds",
-          "help": "The span an operation ends within."
+          "help": "The span an action's operation ends within."
         }
       }
     }
