@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -162,6 +162,18 @@ record:
   - step: design/draft
     hand: the engine
     stale: ask, [[spec/design_output/model]]
+  - step: design/draft
+    hand: box d7dfbbf7a2d0 · claude-code-remote
+    hash_before: de61aff46df736e58960d56e9eff7c4f7e67a731
+    hash_after: de61aff46df736e58960d56e9eff7c4f7e67a731
+    inputs:
+      - name: ask
+        hash: 46d959dff24d2f04
+        size: 892
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -209,44 +221,44 @@ not yet
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-Four pieces. One: q gains the action of spec/design_output/model#an-action-lists-calls, which no ticket builds yet: a Call struct (Door, Verb, Args, Undo, NoUndo, Then), and ActionIn and Action, which register a function from its input to a list of calls. Two: src/q/qtest, the fake index. New takes the test and a register function, builds a catalog, runs the catalog check and fails the test on a fault. It registers the input families files/, buffers/, cfg/, clock/minute and session/ itself, per proposal (k), and Seed commits the values a case names through those writers. Run runs a derived provider, Land folds events, and Act runs an action, hands each call the answer the case gives it, and follows Then. Commits answers every commit since the build, off a hook the store gains (Store.OnCommit). Three: src/modules/modules.go, a package that stands so the rules read a package there. Four: src/imports gains the onlyq rule in Faults and as an analyzer: a package under src/modules imports q, q/qtest and a listed pure standard library alone, and calls no time.Now. Weighed: a hook on the store over a diff of snapshots, since a diff misses a commit that lands the same value. Assumed: the action need not reach the index runner here, since the index runs no action yet.
+Five pieces, following spec/design_output/model#an-action-lists-requests, which renames the call of the stale draft to a request. One: src/q/action.go renames Call to Request, with Module, Verb, Args, Undo, NoUndo and Then, and Store.Act answers the list the action function returns, in place of the stub answering none. Two: src/q/qtest/qtest.go keeps the fake index as it stands: New builds the catalog off the register function and fails the test on a catalog fault. It registers files/, buffers/, cfg/ and clock/minute itself, so Seed takes a config key like any in-port. Run, Land and Act drive a derived provider, a fold and an action, and Commits reads every commit off Store.OnCommit. Act answers every request it runs, following Then with the answers the case hands it. Three: src/q/qtest/suite.go holds the contract of spec/design_output/model#the-fake-keeps-a-contract. A Harness interface names Seed, Read, Run, Land, Act and Commits, and Suite(t, open) runs every case against the harness open builds. qtest_test.go runs Suite against qtest.New. Four: src/index/contract_test.go runs the same Suite against the real index in process: a q.Store over a catalog carrying registersTopics and watchdog.Registers, the way Serve builds it, with no database, no port and no NATS. Five: src/modules/modules.go stands, so onlyq in src/imports reads a package there, and the planted modules/nosy keeps its want comment. Weighed: the suite takes a Harness over a second copy of each case, since two copies drift. Assumed: the in-process index seeds files/ through its own writer as a Content, so the suite seeds cfg/ and clock/minute alone, which both sides type alike, and leaves files/ to a later ticket naming one type in q.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-src/q/store.go: Store.Commit, which calls the OnCommit hook,src/imports/imports.go: Faults, which gains the onlyq rule,src/imports/tree_test.go: TestTheTreeHoldsTheImportRules, which reads Faults over every package
+src/q/q.go: registration.act, which answers the renamed []Request,src/q/action.go: Action, ActionIn and Store.Act,src/q/action_test.go: the action case, which names Request,src/q/qtest/qtest.go: Index.Act, which answers []q.Request,src/q/qtest/qtest_test.go: the action case, which moves into Suite,src/imports/imports.go: OnlyQ, which reads src/modules,src/imports/tree_test.go: TestTheTreeHoldsTheImportRules, which reads Faults over every package
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
 <!-- the form is list -->
 
-src/q/qtest/qtest_test.go: TestADerivedProviderRunsThroughTheFake,src/q/qtest/qtest_test.go: TestAFoldReducesTheSeededEvents,src/q/qtest/qtest_test.go: TestAnActionAnswersItsCallsAndThen,src/q/qtest/qtest_test.go: TestCommitsReadEveryCommitOfTheRun,src/imports/imports_test.go: a planted modules/nosy importing os, with its want comment,src/imports/imports_test.go: TestFaultsNameAModuleImportingOs
+src/q/qtest/suite.go: Suite, holding a derived provider, a fold, an action with its requests and Then, the commits of a run, and a seeded config key,src/q/qtest/qtest_test.go: TestTheFakeKeepsTheContract, which runs Suite against qtest.New,src/index/contract_test.go: TestTheIndexKeepsTheContract, which runs Suite against the index in process,src/q/action_test.go: TestAnActionAnswersItsRequests,src/imports/imports_test.go: the planted modules/nosy importing os, with its want comment
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-first
+the stale mark: the model renames the calls of an action to requests, and a request names its module in place of a door, so the approach renames Call to Request and Door to Module,the ask adds the contract suite against the real index, and a seeded config key, so the approach adds Suite, its run in src/index, and the cfg case
 
 ### size
 
 <!-- every file the approach touches, one a line -->
 <!-- the form is list -->
 
-src/q/action.go,src/q/store.go,src/q/qtest/qtest.go,src/q/qtest/qtest_test.go,src/modules/modules.go,src/imports/imports.go,src/imports/imports_test.go
+src/q/action.go,src/q/q.go,src/q/action_test.go,src/q/qtest/qtest.go,src/q/qtest/suite.go,src/q/qtest/qtest_test.go,src/index/contract_test.go,src/modules/modules.go,src/imports/imports.go,src/imports/imports_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-opened spec/design_output/model (the fake index, actions), go-doors (the build checks imports), src/q, and src/imports, and checked each claim there
-the callers come off a grep for Commit and Faults over src
-each done_when line names its test: go test and the check for the first and the last, the qtest cases for the run and the commits, the planted package for onlyq
+opened spec/design_output/model at the fake index, the fake keeps a contract and an action lists requests, src/q/action.go, src/q/qtest/qtest.go, src/index/door.go Serve and src/index/topic.go registersTopics, and checked each claim there
+the callers come off a grep for Call, Act, OnCommit and OnlyQ over src
+each done_when line names its test: go test and the check decide the first and last, Suite decides the run, the requests, the commits and the config key, and TestTheIndexKeepsTheContract decides the suite against the real index
 
 ## tests-red
 
