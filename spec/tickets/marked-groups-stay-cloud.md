@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,24 @@ steps:
 process: [[trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 14bfa647339652d1936dc6828102d64d952fdb12
+    hash_after: 14bfa647339652d1936dc6828102d64d952fdb12
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 2 test(s) pass in 1 file(s); green, src/tui passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:265:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: cc66aea03239d315
+        size: 937
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -48,26 +66,34 @@ Breaks: the desk pull hands out a cloud group's tickets, and the count reads eve
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/work-marked.test.js src/tui/workplaces_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The code the ask names stands on main already. `placesIn` in `src/scripts/work-answer.js` reads the marker, and `PlacesIn` in `src/tui/work/workplaces.go` lights a merged group the queue places at infinity. This step adds the cases that hold it.
+
+The two queue cases stand in `test/level0/work-marked.test.js`, because `test/level0/work-answer.test.js` stands at its line ceiling. The Go case stands in `src/tui/workplaces_test.go`.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and departs in one place: the queue cases stand in a file of their own, because the named file stands at its line ceiling
+- the cleanup it reveals: a merged branch carries its children in the fixture, as a branch cut from trunk does
+- the marker read stands in `placesIn` alone, and the cases point at the ticket
 
 # Discussion
 
