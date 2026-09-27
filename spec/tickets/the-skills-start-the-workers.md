@@ -161,7 +161,7 @@ Without them a routine's prompt carries the road in its own words, outside git. 
 
 - `.claude/skills/dispatch/SKILL.md` and `.claude/skills/work/SKILL.md` stand, each with its `name` and `description`
 - the dispatch skill acts on the verb's JSON alone, and computes nothing the verb answers
-- a case in `test/level0/skills.test.js` reads both skills
+- a case in `test/contract/skills.test.js` reads both skills
 - that case finds every `./RUNME.sh` verb they name among the verbs `./RUNME.sh help` lists
 - `spec/guidance/cloud/cloud.md` points a worker at the work skill for its road
 - `./RUNME.sh check` exits 0
@@ -210,7 +210,7 @@ The work skill, `.claude/skills/work/SKILL.md`:
 
 Each file opens with the `name` and `description` the skill loader reads.
 
-The test, `test/level0/skills.test.js`, reads both files off the disk. It parses the frontmatter, and gathers every `./RUNME.sh <verb>` the body names. It imports `verbs` from `src/scripts/cli.js`, the table `help` prints, so the verb list stands in one place.
+The test, `test/contract/skills.test.js`, reads both files off the disk. It parses the frontmatter, and gathers every `./RUNME.sh <verb>` the body names. It imports `verbs` from `src/scripts/cli.js`, the table `help` prints, so the verb list stands in one place.
 
 `spec/guidance/cloud/cloud.md` gains a rule pointing a worker at the work skill for its road, and the skill links the guidance back for the rules.
 
@@ -230,9 +230,9 @@ I assume a connector names the session tool and the pull request tool, so the sk
 <!-- every test the change adds, one a line, as a file and a test name -->
 <!-- the form is list -->
 
-- test/level0/skills.test.js: both skills carry a name and a description
-- test/level0/skills.test.js: every verb a skill names stands among the verbs help lists
-- test/level0/skills.test.js: the dispatch skill reads each key the verb's JSON answers
+- test/contract/skills.test.js: both skills carry a name and a description
+- test/contract/skills.test.js: every verb a skill names stands among the verbs help lists
+- test/contract/skills.test.js: the dispatch skill reads each key the verb's JSON answers
 
 ### answers
 
@@ -248,7 +248,7 @@ I assume a connector names the session tool and the pull request tool, so the sk
 
 - .claude/skills/dispatch/SKILL.md
 - .claude/skills/work/SKILL.md
-- test/level0/skills.test.js
+- test/contract/skills.test.js
 - spec/guidance/cloud/cloud.md
 
 ### checked
@@ -269,14 +269,14 @@ I assume a connector names the session tool and the pull request tool, so the sk
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh test test/level0/skills.test.js
+./RUNME.sh test test/contract/skills.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
 <!-- the form is list -->
 
-- test/level0/skills.test.js
+- test/contract/skills.test.js
 
 ### seen
 
@@ -374,3 +374,5 @@ One thing surprises me. No test under test/level0 reads a tracked file today, an
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The test reads the real skill files through the disk door, so it stands at `test/contract/skills.test.js`, where `FakeDoorsInTest` puts a test driving the real thing. The rename rewrites every line naming the old path, the ask among them.

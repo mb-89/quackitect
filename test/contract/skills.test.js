@@ -1,21 +1,22 @@
-// The two skills the cloud routines run: each carries the frontmatter the
+// The skills the cloud routines run: each carries the frontmatter the
 // loader reads, names verbs this tree has, and acts on the dispatch JSON.
 // [[spec/tickets/the-skills-start-the-workers]]
 
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
+import { disk } from "../../src/doors/disk.js";
 import { verbs } from "../../src/scripts/cli.js";
 
 const ROOT = join(import.meta.dirname, "..", "..");
 const SKILLS = ["dispatch", "work"];
-// The keys `./RUNME.sh dispatch --json` answers, which the dispatch skill acts on.
+// The keys `./RUNME.sh dispatch --json` answers, which the dispatch skill acts on. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
 const ACTED = ["ready", "stuck", "questions", "write"];
 
 function skill(name) {
   const at = join(ROOT, ".claude", "skills", name, "SKILL.md");
-  return existsSync(at) ? readFileSync(at, "utf8") : "";
+  const tree = disk();
+  return tree.exists(at) ? tree.read(at) : "";
 }
 
 function front(text) {
