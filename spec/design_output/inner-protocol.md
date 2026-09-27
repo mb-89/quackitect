@@ -9,7 +9,8 @@ refines:
 How the index speaks to its own processes, and how the editor reaches the LSP
 door. Every peer here is Go, in one module, and the doors translate for the
 outside. For the argument, see [[spec/rationales/the-processes-speak-nats]] and
-[[spec/rationales/the-editor-starts-quack-lsp]].
+[[spec/rationales/the-editor-starts-quack-lsp]]. Both stand as proposals (h)
+and (i) in [[spec/funnel/the-owner-rules-the-specs]], and the chunks as (j).
 
 # The index runs NATS
 
@@ -35,12 +36,19 @@ A name's segments become a subject's tokens: `work/open-tasks` rides as
 | the subject | the shape | who answers |
 |---|---|---|
 | `get.<name>` | request and reply: the value, its revision, and whether it stands stale | the index |
-| `val.<name>` | publish: each new value with its revision | the index, on every commit |
+| `val.<name>` | publish: each new value with its revision, and the revision of the value before it | the index, on every commit |
+| `sum.<topic>` | publish: every name of the topic with its revision, each resync span | the index |
+| `run.<provider>` | publish: an input of the provider moves, with the revision the next snapshot stands at | the index sends it, and the module process holding the provider takes it |
 | `in.<provider>` | request and reply: one snapshot of a provider's inputs | the index |
-| `commit.<provider>` | request and reply: the names a run provides, and the revision it reads | the index takes it, and starts the next run where an input moves |
-| `act.<name>` | request and reply: an action's input in, its handle or result out | the module process holding the action |
-| `door.<door>.<verb>` | request and reply: one door call | the doors process |
+| `commit.<provider>` | request and reply: the names a run provides, or the list of door calls an action answers, and the revision it reads | the index takes it, runs the door calls, and starts the next run where an input moves |
+| `act.<name>` | request and reply: an action's input in, its handle or result out | the index, which runs the action through its module process |
+| `door.<door>.<verb>` | request and reply: one door call | the doors process answers, and the index alone sends one |
 | `lease.<part>` | publish: a heartbeat off the part's work loop | the index listens |
+
+A module process subscribes to `run.` for its own providers alone, and sends
+`in.`, `commit.` and `lease.`. It sends no `door.` request, so a module reaches
+the outside through the index alone, per
+[[spec/design_output/model#a-module-meets-the-index]].
 
 A watch is a subscription. `val.work.>` watches every name under `work/`.
 
@@ -55,18 +63,49 @@ whose stamp differs from its own, so both ends of a message read one set of
 types. A module rebuilt alone keeps the stamp, per
 [[spec/design_output/processes#a-module-rebuilds-alone]].
 
-A subscriber missing a push sees a gap in the revisions, and sends a `get` for
-the name. So a push that goes missing costs one round trip, and no value stays
-wrong.
+# A push names its predecessor
+
+The model carries one revision, and a commit raises it whether a name moves or
+not. So a jump in the revisions a subscriber sees says nothing about a name it
+watches. Each `val` names the name's own previous revision instead:
+
+| the subscriber holds | what it does |
+|---|---|
+| the name at the push's previous revision | takes the push |
+| the name at another revision, or none | sends a `get` for the name |
+
+A missing push with no push after it leaves no trace. So every resync span, the
+index publishes `sum.<topic>` for each topic a peer watches. A subscriber sends a
+`get` for each name whose revision differs from its own. The
+config key `bus.resync` holds the span.
+
+# Large values ride in chunks
+
+The NATS server caps a message's payload, and a file under `files/` or a
+snapshot can run past it. The index sets the server's cap from `bus.maxPayload`,
+and a value past `bus.chunk` rides in chunks:
+
+| the step | what holds |
+|---|---|
+| a push | `val.<name>` carries the revision and the count of chunks, and leaves the value out |
+| a read | the reply to `get.<name>` carries the first chunk and the count, and the rest follow on the same reply subject, each numbered |
+| a chunk missing | the reader asks again, and takes the value whole or not at all |
+
+A snapshot on `in.<provider>` rides the same way. The foundation adds each key
+and its default to `spec/config/level0.json`.
 
 # The editor starts `quack lsp`
 
 VS Code starts `quack lsp` as its language server, over stdio. The command
-relays stdio onto the doors process, which holds the LSP door.
+relays stdio over a plain TCP stream to the doors process, which holds the LSP
+door. An LSP message rides that stream alone and stays off the bus. Core NATS
+drops a message where a subscriber falls behind, and the LSP reads every message
+in order.
 
 | the step | what holds |
 |---|---|
 | start | `quack lsp` reads the standing file, and starts the index and the doors where none answers |
+| connect | it dials the LSP port the standing file names, on loopback, with the token |
 | relay | each LSP message rides whole, and the command parses none of it |
 | end | the editor closing stdio ends the command, and the doors process stays for the next client |
 

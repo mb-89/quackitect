@@ -4,10 +4,10 @@ kind: [[rationale]]
 
 # Why
 
-The migration decided this in its specs, and the owner read the call at the
-merge. The editor started `quack lsp` over stdio, and the command relayed each
-message to the LSP door in the doors process. An agent reads this note before
-it asks again.
+The migration's specs proposed this. It stood a proposal until the owner
+confirmed it, as (i) in [[spec/funnel/the-owner-rules-the-specs]]. The editor started `quack lsp` over stdio.
+The command relayed each message to the LSP door in the doors process, over a
+TCP stream of its own.
 
 ## 1. What it weighed
 

@@ -20,6 +20,7 @@ The asks, one to a line:
 - Answer, for any name, who writes it, who reads it and where it comes from.
 - Put a door on each side of the boundary, one file each, with its fake inside.
 - Keep a module to one file that registers itself.
+- Let a module talk to the index alone, and test every module in isolation against a fake index.
 - Build every surface from the registry: the command line, the window, the sidebar, HTTP and MCP.
 - Declare the views, and let one renderer draw every one of them.
 - Hand every longer action a handle, and keep recent ones.
@@ -116,7 +117,7 @@ the modules stay as they stand.
 
 # A module is one file
 
-A topic folder is one module. A new file in `modules/work/` joins the
+A topic folder is one module. A new file in `src/modules/work/` joins the
 work package at its next build, and its `init` registers the name. The module
 names no HTTP library, no MCP and no editor, because only the doors know those.
 
@@ -126,6 +127,24 @@ names no HTTP library, no MCP and no editor, because only the doors know those.
         func(in openTasksIn) (int, error) {
             return in.Places.Takeable, nil
         })
+
+# Modules test in isolation
+
+The owner rules that every module tests in isolation against a fake index. A
+module talks to the index, and to nothing else. A door call goes through the
+index, as part of an action's commit, and the index runs it. So the module's
+one peer is the index, and a fake index stands in for it in every test of the
+module.
+
+The point is that an agent reasons locally. A change to a module reads the
+module's file and the names it reads. Its test runs with no disk, no git, no
+database and no port.
+
+| what holds | where it stands |
+|---|---|
+| the fake index, `q/qtest` | [[spec/design_output/model#the-fake-index]] |
+| the analyzer holding a module to `q` and `q/qtest` | [[spec/design_output/go-doors#the-build-checks-imports]] |
+| the rule a test of a module follows | [[spec/guidance/code/testing]] |
 
 # The registry builds each surface
 
@@ -231,7 +250,7 @@ file, and a user starts one program.
 - Doors alone cross the boundary, and each door carries its fake.
 - Doors and renderers import no module. They see the registry, so they special-case no name.
 - A provider alone writes its name. Actions change files, and the watch door alone feeds `files/`.
-- A module touches nothing outside. It reads contents from `files/`, and calls a door to act.
+- A module talks to the index alone. It reads contents from `files/`, and names the door calls its action commits, which the index runs.
 - A view reads names. It decides how things look, and the providers decide what they mean.
 - The index refuses to start on a broken catalog, and CI starts it.
 
@@ -246,7 +265,7 @@ change. So a check over the imports holds these rules in the build.
 | changing what a value means | every reader computing it | the one provider file and its test |
 | adding a tool or a command | a verb, a tool spec and a handler | one action, which every surface picks up |
 | calling quackitect | a shell verb, and a parse of its output | a tool call the index answers |
-| testing | a fake a case writes | the fake each door brings, and a generic case over every name |
+| testing | a fake a case writes | a fake index for a module, the fake each door brings, and a generic case over every name |
 | a ticket's scope | a review reading the files a change reaches | one topic folder, which level zero can hold |
 
 Changing the index, the protocol or a renderer stays broad work, in tickets of

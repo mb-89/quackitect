@@ -83,3 +83,18 @@ the claim it names.
 Weigh the doc against the change. A doc costs a paragraph to change, and the
 same design in code costs the code. Write one where the design holds a decision
 somebody else would make differently, and skip it on a one-line fix.
+
+## 11. The fake index
+
+The owner ruled that every module tested in isolation against a fake index. A
+module talked to the index alone, and a door call went through the index as part
+of an action's commit. So the module had one peer, and one fake stood in for it.
+
+| what the rule bought | what it cost |
+|---|---|
+| an agent reading one module and the names it read, and nothing past them | a harness, `q/qtest`, standing beside the index |
+| a module test with no disk, no git, no database and no port | a module naming door calls, and leaving the running to the index |
+
+A door fake in a module test made the module reach past the index. The fake
+index held it to the one peer the design gave it. For the harness, see
+[[spec/design_output/model#the-fake-index]].

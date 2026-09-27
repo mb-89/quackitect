@@ -49,13 +49,15 @@ A caller watches `ops/<id>` or reads it, the way it reads every name.
 | the move | who makes it | what follows |
 |---|---|---|
 | to `queued` | the call | the handle goes back to the caller |
-| `queued` to `running` | the writer queue, or at once for an action that writes nothing | the module process takes the input snapshot |
-| `running` to `done` | the last door call answering | `result` stands |
+| `queued` to `running` | the writer queue, or at once for an action that writes nothing | the index hands the module process the input snapshot, and the module answers its list of door calls |
+| `running` to `done` | the last door call the index runs answering | `result` stands |
 | `running` to `failed` | a door call failing, a process ending, or the deadline passing | the undo steps run, newest first |
 | `queued` or `running` to `cancelled` | `ops/cancel` with the handle | a running one stops before its next door call, and its undo steps run |
 
 The index pushes each move, and the session log carries it as a row of kind
-`op`.
+`op`. The index runs every door call of an operation, per
+[[spec/design_output/model#an-action-lists-calls]], so a module process reaches
+no door.
 
 # One writer per tree
 
@@ -64,7 +66,8 @@ operations queue one at a time per checkout, in the order they arrive. A
 reading operation runs beside them.
 
 A git hook reads names alone. So a hook the operation's own commit fires reads
-and answers, and waits behind nothing.
+and answers, and waits behind nothing. This stands as proposal (e) in
+[[spec/funnel/the-owner-rules-the-specs]].
 
 # An operation outlives callers
 

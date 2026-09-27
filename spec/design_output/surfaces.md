@@ -12,13 +12,16 @@ kinds and the catalog stand in [[spec/design_output/model]].
 
 # A module is one file
 
-A topic folder under `modules/` is one Go package. Each file in it holds one
+A topic folder under `src/modules/` is one Go package. Each file in it holds one
 registration, its input struct, and a test beside it:
 
 | the file | what it holds |
 |---|---|
-| `modules/work/open_tasks.go` | the input struct, and `q.Derived("work/open-tasks", ...)` in a package variable |
-| `modules/work/open_tasks_test.go` | the cases, over the struct and the door fakes |
+| `src/modules/work/open_tasks.go` | the input struct, and `q.Derived("work/open-tasks", ...)` in a package variable |
+| `src/modules/work/open_tasks_test.go` | the cases, run through `q/qtest` against the fake index |
+
+A module meets the index alone. For the fake index and the rule holding a
+module to it, see [[spec/design_output/model#the-fake-index]].
 
 The package variable registers at `init`, so a new file joins the topic at the
 next build. The file names no HTTP library, no MCP and no editor.

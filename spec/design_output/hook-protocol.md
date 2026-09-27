@@ -88,4 +88,6 @@ that stands down gets the cage's refusal. Copilot takes the same list over MCP.
 | still no answer | refuses a guarded call, names the alarm, and passes the rest |
 | every case | writes a row to the session log file, which the index reads in when it starts |
 
-For the refusal, see [[spec/rationales/the-cage-refuses-while-down]].
+For the refusal, see [[spec/rationales/the-cage-refuses-while-down]]. The hook
+module reads no lease, and that stands as proposal (g) in
+[[spec/funnel/the-owner-rules-the-specs]].
