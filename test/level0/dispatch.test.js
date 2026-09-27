@@ -444,6 +444,24 @@ test("the run removes its worktree after the push, and moves the box's own check
   );
 });
 
+test("a refused push still removes the worktree, and the run answers refused", () => {
+  const { it, outside } = writing({ "a-loose-one": loose });
+  outside.proc.teach(
+    ["git", "-C", WORKTREE, "push", "origin", `HEAD:refs/heads/${WRITE_BRANCH}`],
+    { exitCode: 1, stderr: "rejected" },
+  );
+  assert.equal(heard(() => dispatch(ROOT, [], it)).code, 1);
+  const rows = gitRows(outside);
+  const pushed = rows.findIndex((row) =>
+    row.endsWith(`HEAD:refs/heads/${WRITE_BRANCH}`),
+  );
+  const removed = rows.lastIndexOf(`git worktree remove --force ${WORKTREE}`);
+  assert.ok(
+    pushed >= 0 && removed > pushed,
+    "the worktree goes after the refused push",
+  );
+});
+
 test("the fix group's name cuts to a cap below its own words", () => {
   assert.equal(cutTo("loose-fixes-abc", 2), "loose-fixes");
   assert.equal(fixName({ words: 2 }, MAIN), "loose-fixes");
