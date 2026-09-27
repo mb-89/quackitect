@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/person-1
 steps:
   - name: design
     steps:
@@ -13,6 +14,16 @@ steps:
           - name: read
             form: verdict
             says: pass where the ask says what the owner said, or fail with the owner's words
+      - name: person-1
+        does: answers the question the engine asks
+        by: anyone
+        to: engine
+        asks: "The take of work/the-foundation-closes-its-gaps commits main's merge with conflict markers at lines 88 to 98 of spec/tickets/the-foundation-closes-its-gaps.md, so Vale fails the check and the push verb refuses every push. The door refuses an agent write to the open group ticket. On origin, delete the three marker lines, keep both record and cloud: true, and push. Did that land?"
+        evidence:
+          - name: answer
+            form: choice
+            says: the answer, which the step behind this one reads
+            options: ["landed", "not yet"]
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -114,7 +125,6 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -143,6 +153,16 @@ A module tests against a fake index alone, per the owner's rule. Without the har
 <!-- pass where the ask says what the owner said, or fail with the owner's words -->
 
 <!-- the form is verdict -->
+
+## person-1
+
+<!-- The take of work/the-foundation-closes-its-gaps commits main's merge with conflict markers at lines 88 to 98 of spec/tickets/the-foundation-closes-its-gaps.md, so Vale fails the check and the push verb refuses every push. The door refuses an agent write to the open group ticket. On origin, delete the three marker lines, keep both record and cloud: true, and push. Did that land? -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is choice -->
 
 ## draft
 
