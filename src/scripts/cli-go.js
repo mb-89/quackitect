@@ -64,6 +64,19 @@ function importsOf(disk, at) {
   return out;
 }
 
+// The test functions the named Go test files declare, each once, in order. [[spec/design_output/pull#the-test-verb]]
+export function goTestNames(paths, read) {
+  const names = [];
+  for (const path of paths.filter((one) => one.endsWith("_test.go"))) {
+    let text = "";
+    try {
+      text = read(path);
+    } catch {}
+    for (const found of text.matchAll(/^func (Test\w+)\(/gm)) names.push(found[1]);
+  }
+  return [...new Set(names)].sort();
+}
+
 // The environment a Go test runs under: Go alone, and no C compiler. [[spec/design_output/index#the-compiler-it-needs]]
 export function goEnvOf() {
   return { CGO_ENABLED: "0" };

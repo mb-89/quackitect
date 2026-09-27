@@ -49,7 +49,7 @@ import { browserSays } from "./browser.js";
 import { namesIn, show, walk } from "./cli-read.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { FIX_USAGE, fixFlags } from "./cli-fix.js";
-import { formatFaults, goEnvOf, goModulesIn } from "./cli-go.js";
+import { formatFaults, goEnvOf, goModulesIn, goTestNames } from "./cli-go.js";
 import { HOOKS } from "./precommit.js";
 import { whereIs, writeSurvey } from "../engine/tools.js";
 import { viewerOf } from "./tui-build.js";
@@ -147,17 +147,10 @@ export function goHolds(quiet = false, red = []) {
 
 // A red Go test file stands apart until its tests-green closes, as a red JavaScript one does, so the Go run skips the tests it names. [[spec/design_output/pull#the-gate]]
 export function skipOf(red, read) {
-  const names = [];
   // A ticket names its red files in one comma-separated line. [[spec/design_output/pull#the-gate]]
   const paths = red.flatMap((one) => String(one).split(",")).map((one) => one.trim());
-  for (const path of paths.filter((one) => one.endsWith("_test.go"))) {
-    let text = "";
-    try {
-      text = read(path);
-    } catch {}
-    for (const found of text.matchAll(/^func (Test\w+)\(/gm)) names.push(found[1]);
-  }
-  return names.length ? ["-skip", `^(${[...new Set(names)].sort().join("|")})$`] : [];
+  const names = goTestNames(paths, read);
+  return names.length ? ["-skip", `^(${names.join("|")})$`] : [];
 }
 
 // Go's own format rides in no other gate, so the check holds it. [[spec/design_output/index#the-compiler-it-needs]]
