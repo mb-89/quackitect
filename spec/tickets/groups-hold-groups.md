@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -196,6 +196,15 @@ record:
     hash_after: 40f373115adbb759f87d141272aa0bb9c79737b9
     returns: 1
     why: the hand takes it back
+  - step: implement/change
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 3418f71b8d94f68dce270ebf20d510e52830e8a7
+    hash_after: 3418f71b8d94f68dce270ebf20d510e52830e8a7
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
