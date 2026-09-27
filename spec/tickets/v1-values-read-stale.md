@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-foundation-lands-unchanged
 parent: the-index-answers-v1
+record:
+  - step: do
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 5a61dd0bd173a55b8516a92fc15c70b492905dc7
+    hash_after: 5a61dd0bd173a55b8516a92fc15c70b492905dc7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ parent: the-index-answers-v1
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/index
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ parent: the-index-answers-v1
 
 <!-- the form is text -->
 
+The change of [[spec/tickets/the-index-answers-v1]] lands it. `valueOf` reads `Snapshot.Stale`, and the answer carries `stale` with its time. `TestV1ReadsAStaleName` covers it.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask, inside the parent's change
+- the change reveals no cleanup
+- the watchdogs note owns the stale mark, and the code points there
 
 # Discussion
 
