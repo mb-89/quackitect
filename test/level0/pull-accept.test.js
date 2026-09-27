@@ -255,6 +255,27 @@ test("accept with points at a final gate mints the fix and waits at the gate", (
   );
 });
 
+// [[spec/tickets/commit-stages-a-moved-path]]
+test("a group's own acceptance mints its points into the group", () => {
+  const group = FINAL().replace("group: one-group\n", "process: [[group]]\n");
+  const files = standing(
+    FIX.replace("state: open", "state: closed"),
+    filled(
+      group,
+      "## verdict",
+      "accept with points\n- cut-the-long-line: the list runs long",
+    ),
+    { [at("spec/processes/trivial.yaml")]: TRIVIAL },
+  );
+  const made = doors(files);
+  heard(() => pulling(ROOT, ["pull", "one-group"], made.it));
+  heard(() => pulling(ROOT, ["pull", "one-group"], made.it));
+
+  const fix = made.disk.read(at("spec/tickets/cut-the-long-line.md"));
+  assert.equal(fieldOf(fix, "parent"), "one-group");
+  assert.equal(fieldOf(fix, "group"), "one-group", "the point stands in the group");
+});
+
 // [[spec/tickets/the-last-gate-accepts]]
 test("the reject road closes a final gate past its cap", () => {
   const record = `record:\n${SHORT(1)}${SHORT(2)}`;

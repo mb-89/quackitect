@@ -10,6 +10,7 @@ import {
   CLOSED,
   fieldOf,
   frontOf,
+  isGroup,
   OPEN,
   recordIn,
   TICKETS,
@@ -106,7 +107,8 @@ export function minted(it, who, one, leaf, held, findings, answered) {
   const route = processAt(it.disk, it.method ?? it.root, it.join, CHILD_ROUTE);
   if (route.why) return unminted(one, leaf, route.why);
   const folder = one.private ? NOTES : TICKETS;
-  const group = fieldOf(one.text, "group");
+  // A group's own gate mints into that group, so its points stand among the children the pull reads. [[spec/design_output/pull#a-finding-rides-out]]
+  const group = fieldOf(one.text, "group") || (isGroup(one.text) ? one.name : "");
   const built = [];
   for (const { name, line } of findings) {
     const path = `${folder}/${name}.md`;
