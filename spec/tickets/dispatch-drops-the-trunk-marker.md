@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -35,6 +35,23 @@ record:
     hash_after: 307f4f1325405df36ec13a3525ac11f641ff1d72
     returns: 1
     why: "the hand-back met refused 5 times: tests under do expects green, and ./RUNME.sh check --errors answers The check names no red case and no finding at error."
+  - step: do
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: d0a5d09eb7b412c2f13e45fd08db6e065ed012ac
+    hash_after: d0a5d09eb7b412c2f13e45fd08db6e065ed012ac
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 31 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:271:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 1853c3d0f5d12c97
+        size: 194
+    def: 76beff46e9d5f076
+reason: done
 ---
 
 # Ask
@@ -52,26 +69,32 @@ marksTrunk in src/scripts/work-merge.js commits and pushes main, so the open roa
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/dispatch.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The dispatch writes the cloud marker into its own worktree commit, and calls neither `marksTrunk` nor `openGroup`, because both push main. The comment beside the write in `writesOf` in `src/scripts/dispatch-write.js` names both. The earlier hand-back named `check --errors` as its test command, which answers no green line, so this one names the dispatch cases.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and the comment names the two functions
+- the cleanup is the test command alone, and it rides this hand-back
+- the reason stands once, in the comment beside the write
 
 # Discussion
 
