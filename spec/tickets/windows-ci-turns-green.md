@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/person-1
 steps:
   - name: design
     steps:
@@ -35,6 +36,16 @@ steps:
           - name: size
             form: list
             says: every file the approach touches, one a line
+      - name: person-1
+        does: answers the question the engine asks
+        by: anyone
+        to: engine
+        asks: On a Windows desk, run ./RUNME.sh branch test test/contract/index.test.js on work/the-foundation-closes-its-gaps. Does the case a stopped index leaves no se-index process past the case pass there? The Windows job of check.yml passes on main at run 36322578200, and the case passes on Linux.
+        evidence:
+          - name: answer
+            form: choice
+            says: the answer, which the step behind this one reads
+            options: ["passes", "fails"]
       - name: tests-red
         does: writes the tests the ask calls for
         tags: ["code", "testing"]
@@ -114,10 +125,8 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-foundation-closes-its-gaps
 record:
   - step: design/draft
     hand: box d7dd59fe93d6 · claude-code-remote
@@ -138,6 +147,7 @@ record:
       - name: tests
         exit: 0
         said: green, 5 test(s) pass in 1 file(s)
+group: the-foundation-closes-its-gaps
 ---
 
 # Ask
@@ -209,6 +219,16 @@ test/contract/index.test.js,src/index/door.go
 opened check.yml runs on main, the index door, the contract cases, and the Standing struct and stop call in door.go, and checked each claim there
 the callers come off a grep for index( and stop over test and src/index
 the first done_when line meets the Windows job of check.yml, the second meets the new contract case, and the check decides the third
+
+## person-1
+
+<!-- On a Windows desk, run ./RUNME.sh branch test test/contract/index.test.js on work/the-foundation-closes-its-gaps. Does the case a stopped index leaves no se-index process past the case pass there? The Windows job of check.yml passes on main at run 36322578200, and the case passes on Linux. -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is choice -->
 
 ## tests-red
 
