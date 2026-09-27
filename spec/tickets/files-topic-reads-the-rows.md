@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -104,6 +104,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: bef567ca7edc3ce6ea0f20c5b73b0c0cb3835bbb
+    hash_after: bef567ca7edc3ce6ea0f20c5b73b0c0cb3835bbb
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/sqlite-runs-pure-go.md:111:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -268,11 +280,15 @@ The two `src/q` cases fail on the name check and on the commit, since a key take
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/q src/index
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -280,11 +296,23 @@ The two `src/q` cases fail on the name check and on the commit, since a key take
 
 <!-- the form is text -->
 
+The index registers `files/<path...>` on the catalog it takes, and commits every tracked row into a `q.Store` at the start. A settle commits the paths it moves, and a sweep or a retrack commits the whole list, so a removed path reads the empty `Content`. The door answers `read`, the value of a name at the latest revision.
+
+`src/q` learns a key `<name...>` taking the rest of the name. The check places it last, after one plain segment at least.
+
+A bare `go test ./...` still fails every index case on `no such module: fts5`, as it does on main, since the cgo driver wants the `sqlite_fts5` tag. [[spec/tickets/sqlite-runs-pure-go]] owns that line. The verb passes the tag, and every case passes under it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `src/q` and `src/index` alone
+- the topic reads the rows the database door holds
+- `src/index/topic.go` opens on the approach and links this ticket
+- the family name stands once, in `topic.go`
+- the review passes with no rows
 
 # Discussion
 
