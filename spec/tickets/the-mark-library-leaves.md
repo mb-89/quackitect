@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: do
 steps:
   - name: do
@@ -27,6 +27,13 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 parent: every-road-has-a-caller
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 797dfe8c80560b95749edb55baa881def9465fe1
+    hash_after: 797dfe8c80560b95749edb55baa881def9465fe1
+    why: write-marks-leave-the-plugin answers this ask
+reason: answered
 ---
 
 # Ask
