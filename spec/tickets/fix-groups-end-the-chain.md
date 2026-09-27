@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -134,6 +134,19 @@ record:
         hash: 5a2557d24d86ab34
         size: 13510
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 44a24eefed0ec2f7d97269e00994a7c28bd03e35
+    hash_after: 44a24eefed0ec2f7d97269e00994a7c28bd03e35
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 73c915269fbb03e7
+        size: 2317
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -229,26 +242,31 @@ The schema spec/schemas/ticket.schema.yaml gains fix, a boolean on a group ticke
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/work-done.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/work-done.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The refusal case fails on its own assertion, since done closes a fix group today whatever it leaves. The two cases where done passes stand green already, as they should: the one on a feature group holds what done does today, and the one on a person ticket holds the road the fix leaves open. The fixture reuses the group at children with no retro, which the hash_after case uses, so no retro leaf holds done back.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line on done meets a case, the schema line meets the check reading ticket fronts, and ./RUNME.sh check decides the last
+- the cases reach git and the disk through the fakes of work-doors.js alone
 
 # gate
 

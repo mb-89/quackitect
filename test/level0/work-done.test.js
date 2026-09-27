@@ -305,3 +305,99 @@ test("done hands the group back once the retro leaves that apply here stand writ
   assert.equal(fieldOf(now, "state"), "closed");
   assert.equal(fieldOf(disk.read(on("shut-one")), "group"), "one-group");
 });
+
+// A group at children with its hold, and the loose tickets its branch adds. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
+function leaving(fix, added) {
+  const took = withEntry(
+    GROUP_NOTE,
+    { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" },
+    fakeFront(),
+  );
+  const group = withField(took, "step", "children", fakeFront());
+  const files = {
+    [on("one-group")]: fix
+      ? group.replace("state: open\n", "state: open\nfix: true\n")
+      : group,
+    ...green,
+  };
+  for (const [name, text] of Object.entries(added)) files[on(name)] = text;
+  const listed = Object.keys(added).map((name) => `spec/tickets/${name}.md`);
+  return doorsSaying(
+    {
+      ...onBranch("work/one-group"),
+      "git diff --name-only --diff-filter=A origin/main...HEAD -- spec/tickets": {
+        stdout: listed.length ? `${listed.join("\n")}\n` : "",
+      },
+    },
+    files,
+  );
+}
+
+const looseAgent = CHILD("", "open").replace("group: \n", "");
+const loosePerson = `---
+kind: [[ticket]]
+state: open
+step: ask
+steps:
+  - name: ask
+    does: asks the owner a question
+    by: person
+---
+
+# Ask
+
+A question for the owner.
+
+# ask
+
+# Discussion
+
+Nothing yet.
+`;
+
+// [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
+test("done on a fix group refuses an agent ticket it leaves, and names the mint of a question ticket for it", () => {
+  const { it, disk, outside } = leaving(true, { "a-follow-up": looseAgent });
+
+  const { code, said } = heard(() => work(ROOT, ["done"], it));
+
+  assert.equal(code, 1);
+  assert.equal(
+    fieldOf(disk.read(on("one-group")), "state"),
+    "open",
+    "the group stays open",
+  );
+  assert.match(said, /a-follow-up/);
+  assert.match(
+    said,
+    /\.\/RUNME\.sh mint ticket spec\/tickets\/a-follow-up-question\.md --process=question/,
+  );
+  assert.match(
+    said,
+    /\.\/RUNME\.sh ticket pull a-follow-up --became a-follow-up-question/,
+  );
+  assert.ok(
+    !ranGit(outside).some((one) => one.startsWith("git push")),
+    "nothing is pushed",
+  );
+});
+
+// [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
+test("done on a fix group passes where every ticket it leaves waits on a person", () => {
+  const { it, disk } = leaving(true, { "a-question": loosePerson });
+
+  const { code } = heard(() => work(ROOT, ["done"], it));
+
+  assert.equal(code, 0);
+  assert.equal(fieldOf(disk.read(on("one-group")), "state"), "closed");
+});
+
+// [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
+test("done on a feature group hands back an open agent ticket it adds, as it does today", () => {
+  const { it, disk } = leaving(false, { "a-follow-up": looseAgent });
+
+  const { code } = heard(() => work(ROOT, ["done"], it));
+
+  assert.equal(code, 0);
+  assert.equal(fieldOf(disk.read(on("one-group")), "state"), "closed");
+});
