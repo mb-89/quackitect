@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -130,6 +130,19 @@ record:
         hash: 51cba604bf4d0a4a
         size: 822
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: d8a6b89ab773213fb04e947113907f223cbe83fe
+    hash_after: d8a6b89ab773213fb04e947113907f223cbe83fe
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 202c93b0d8e8b6f7
+        size: 2365
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -238,26 +251,39 @@ The done lines and the case deciding each:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/pull-kept.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/pull-kept.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Over a keptRed that keeps nothing, four cases fail on their own assertion: the kept leaf, the rename, the rewound review walking past, and the stranded ticket walking on. The case where a test's content moved passes over the stub, because it guards the other side: a leaf whose tests moved goes out again.
+
+| the case | the class of fault it guards |
+|---|---|
+| a red leaf whose tests hold their red content | a rewind asks a landed change to fail again |
+| a rename moving a test | a move of a file reads as a change of its tests |
+| a test whose content moved | a keep passes over tests that no longer stand as they stood red |
+| a rewound review walking past | the pass after a rewind strands the ticket at its red leaf |
+| a stranded ticket at a pull | a ticket stranded today stays stranded |
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a case above: the keep, the rename replay, and the check at tests-green
+- the git door the cases reach answers through the fake git of pull-doors.js
 
 # gate
 
