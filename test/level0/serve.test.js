@@ -140,12 +140,18 @@ test("a desk serve finds a standing server and starts nothing", async () => {
 
 // [[spec/tickets/the-bridge-outlives-its-starter]]
 test("a detached start that falls names what the server wrote", async () => {
-  const { it } = desk(
+  const { it, proc } = desk(
     { probe: 1, exitCode: 1 },
-    {
-      [SERVE_LOG]:
-        "the server stands at http://127.0.0.1:6510\nError: listen EADDRINUSE\n",
-    },
+    { [SERVE_LOG]: "Error: an earlier run\n" },
   );
-  assert.match(await servesDetached(it), /falls: Error: listen EADDRINUSE/);
+  proc.teach(["node", SERVER_AT, ROOT], () => {
+    it.disk.append(
+      SERVE_LOG,
+      "the server stands at http://127.0.0.1:6510\nError: listen EADDRINUSE\n",
+    );
+    return { exitCode: 1 };
+  });
+  const said = await servesDetached(it);
+  assert.match(said, /falls: Error: listen EADDRINUSE/);
+  assert.doesNotMatch(said, /an earlier run/);
 });

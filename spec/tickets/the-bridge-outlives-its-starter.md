@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 61870ef475e8bd94
         size: 1345
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 5c34e479c09290f225becedc368a4be55d8c77ed
+    hash_after: 5c34e479c09290f225becedc368a4be55d8c77ed
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/scripts/pull-hand-of.js:61:38: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -335,14 +344,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change adds lib/log.js and server.js to the drafted files, so serve.js calls the log read and keeps no copy
+- the desk start reaches the proc and disk doors, and both carry fakes under src/doors/fake
+- each new function links its section, and the serve verb links a-desk-serve-returns
+- the log read stands once in lib/log.js, and the design notes point at the function that holds each road
 
 ## tests-green
 

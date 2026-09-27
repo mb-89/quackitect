@@ -4,7 +4,12 @@
 
 import { join } from "node:path";
 import { BINDING, GOD } from "../../.claude/skills/level0/lib/config.js";
-import { FOLDER as LOG_FOLDER, SERVE } from "../../.claude/skills/level0/lib/log.js";
+import {
+  FOLDER as LOG_FOLDER,
+  reasonIn,
+  SERVE,
+  wroteSince,
+} from "../../.claude/skills/level0/lib/log.js";
 import { runsHere } from "../../.claude/skills/level0/lib/paths.js";
 import { PORT_BASE, rootKey } from "../../.claude/skills/level0/lib/vehicle.js";
 import { awake } from "../doors/awake.js";
@@ -436,7 +441,7 @@ export async function respawned(own, argv, exit = process.exit, wait = RESPAWN_W
   const born = await own.proc.respawn(argv, { out, waitMs: wait });
   if (!born.fell) return exit(0);
   const now = own.disk.exists(out) ? String(own.disk.read(out)) : "";
-  const wrote = (now.startsWith(was) ? now.slice(was.length) : now).trim();
+  const wrote = wroteSince(was, now);
   try {
     await own.log.say(
       "fatal",
@@ -453,19 +458,6 @@ export function restarts(server, then, soon = setImmediate) {
   server.close();
   server.closeIdleConnections?.();
   soon(then);
-}
-
-// The line naming the fault, out of what the child wrote: the first naming an error, else the last. [[spec/design_output/level0#a-restart-watches-its-child]]
-function reasonIn(wrote) {
-  const lines = wrote
-    .split("\n")
-    .map((one) => one.trim())
-    .filter(Boolean);
-  return (
-    lines.find((one) => /error/i.test(one)) ??
-    lines.at(-1) ??
-    `it wrote nothing to ${SERVE}`
-  );
 }
 
 // A crash writes its error last, so the log says why the server falls. [[spec/design_output/level0#a-crash-writes-its-error]]

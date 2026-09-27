@@ -4,10 +4,23 @@
 // [[spec/design_output/level0#the-cloud-starts-the-server]]
 
 import { reasonOf, START } from "../../.claude/skills/level0/hooks/level0.js";
+import {
+  FOLDER as LOG_FOLDER,
+  reasonIn,
+  SERVE,
+  wroteSince,
+} from "../../.claude/skills/level0/lib/log.js";
 import { POINTER, pointerOf } from "../../.claude/skills/level0/lib/vehicle.js";
 import { registeredPort } from "../bridge/vehicle.js";
 
 const HEALTH_WAIT = 2000;
+// The window a desk start watches before it takes the server as standing, the span a restart watches its child. [[spec/design_output/level0#a-restart-watches-its-child]]
+const DETACH_WAIT = 3000;
+const SERVER = "src/bridge/server.js";
+
+const answersAt = (port) => `The server answers at port ${port}.`;
+const startsAt = (port) =>
+  `The server starts detached at port ${port}, because nothing answered there.`;
 
 export function portIn(it) {
   try {
@@ -41,21 +54,43 @@ export function startOf(root, node = "node") {
   return [node, "-e", START, root, root];
 }
 
-// A desk start stands detached, so the shell that asks returns and the server stays. [[spec/tickets/the-bridge-outlives-its-starter]]
-export async function servesDetached() {
-  return "";
+// A desk start stands detached, so the shell that asks returns and the server stays. [[spec/design_output/level0#a-desk-serve-returns]]
+export async function servesDetached(it) {
+  return (await detachedStart(it)).said;
+}
+
+// [[spec/design_output/level0#a-desk-serve-returns]]
+export async function detachedStart(it) {
+  const port = portIn(it);
+  const node = it.node ?? "node";
+  if (it.proc.run(probeOf(node, port), { cwd: it.root }).exitCode === 0) {
+    return { code: 0, said: answersAt(port) };
+  }
+  const out = it.join(it.root, ...SERVE.split("/"));
+  it.disk.makeDir(it.join(it.root, ...LOG_FOLDER.split("/")));
+  const was = it.disk.exists(out) ? String(it.disk.read(out)) : "";
+  const born = await it.proc.respawn(
+    [node, it.join(it.root, ...SERVER.split("/")), it.root],
+    { cwd: it.root, out, waitMs: DETACH_WAIT },
+  );
+  if (!born.fell) return { code: 0, said: startsAt(port) };
+  const now = it.disk.exists(out) ? String(it.disk.read(out)) : "";
+  return {
+    code: 1,
+    said: `The server at port ${port} falls: ${reasonIn(wroteSince(was, now))}`,
+  };
 }
 
 // [[spec/design_output/level0#the-cloud-starts-the-server]]
 export function servesHere(it) {
   const port = portIn(it);
   if (it.proc.run(probeOf(it.node ?? "node", port), { cwd: it.root }).exitCode === 0) {
-    return `The server answers at port ${port}.`;
+    return answersAt(port);
   }
   const started = it.proc.run(startOf(it.root, it.node ?? "node"), { cwd: it.root });
   const [, why] = reasonOf(started.exitCode);
   return started.exitCode === 0
-    ? `The server starts detached at port ${port}, because nothing answered there.`
+    ? startsAt(port)
     : `No server answers at port ${port}, and the start fails: ${started.stderr.trim() || why}`;
 }
 
