@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-engine-holds-the-route
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d7d6cb0fb1105 · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box d7d809305dcf · claude-code-remote
     hash_before: 93de6ad203c16d608808bfe7316f782346ecc4d3
     hash_after: 93de6ad203c16d608808bfe7316f782346ecc4d3
+  - step: implement/tests-red
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: 68816f0d90e9ccc32bb563eef721bc924733b903
+    hash_after: 68816f0d90e9ccc32bb563eef721bc924733b903
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -188,20 +196,27 @@ pass with findings
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-accept.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+All four cases fail on their own assertion. Today the pull hands the final gate out while a fix ticket under it stands open, the hand-out names no base for the diff, a reject past the cap inserts the phase again instead of closing, and holdsHere reads backlog as a condition it does not know. The fixture schema in pull-schema.js takes the final key today without a refusal.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches one new test file, which the draft names.
+The cases reach the disk, git and the shell through the fakes pull-doors.js builds.
+The file header links this ticket, which names the approach.
+The cases add no fact, and point at this ticket.
+The one review row, the first base, stands in the parent Discussion, and the change step carries it.
 
 ## change
 
