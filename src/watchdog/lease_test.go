@@ -19,7 +19,7 @@ func (c *clock) pass(span time.Duration) { c.now = c.now.Add(span) }
 func dogOf(t *testing.T, settings Settings, register func(*q.Catalog)) (*Dog, *q.Store, *clock) {
 	t.Helper()
 	c := q.New()
-	Registers(c)
+	as := Registers(c)
 	if register != nil {
 		register(c)
 	}
@@ -28,7 +28,7 @@ func dogOf(t *testing.T, settings Settings, register func(*q.Catalog)) (*Dog, *q
 	}
 	store := q.NewStore(c, nil)
 	now := &clock{now: time.Unix(1_700_000_000, 0)}
-	return New(now.Now, store, settings), store, now
+	return New(now.Now, store, as, settings), store, now
 }
 
 func alarmsIn(store *q.Store) []Alarm {
@@ -37,11 +37,15 @@ func alarmsIn(store *q.Store) []Alarm {
 }
 
 func TestAnExpiredLeaseMarksEachNameOfItsPartStale(t *testing.T) {
+	var items, count q.Writer
 	dog, store, now := dogOf(t, Settings{}, func(c *q.Catalog) {
-		q.GivenIn(c, "w/items/<id>", 0)
-		q.GivenIn(c, "w/count", 0)
+		items = q.GivenIn(c, "w/items/<id>", 0)
+		count = q.GivenIn(c, "w/count", 0)
 	})
-	if _, err := store.Commit(0, map[string]any{"w/items/a": 1, "w/items/b": 2, "w/count": 2}); err != nil {
+	if _, err := store.Commit(0, items, map[string]any{"w/items/a": 1, "w/items/b": 2}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.Commit(0, count, map[string]any{"w/count": 2}); err != nil {
 		t.Fatal(err)
 	}
 	dog.Hold("w/items/<id>", 10*time.Second)

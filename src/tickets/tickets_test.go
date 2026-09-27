@@ -129,9 +129,9 @@ func TestPathTakesTheTwoFoldersAlone(t *testing.T) {
 
 func TestRegistersTakeTheCatalogServeTakes(t *testing.T) {
 	catalog := q.New()
-	Registers(catalog)
+	all := Registers(catalog)
 	store := q.NewStore(catalog, nil)
-	if _, err := store.Commit(0, map[string]any{AllName: []Ticket{{Name: "one"}}}); err != nil {
+	if _, err := store.Commit(0, all, map[string]any{AllName: []Ticket{{Name: "one"}}}); err != nil {
 		t.Fatal(err)
 	}
 	if said, _ := store.Snapshot().Read(AllName).([]Ticket); len(said) != 1 || said[0].Name != "one" {

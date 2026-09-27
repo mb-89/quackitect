@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -145,6 +145,19 @@ record:
         hash: 632da9d1c9abae9f
         size: 3518
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 5dca0f65e88fba2dc898e81d5e9864793d801d2c
+    hash_after: 5dca0f65e88fba2dc898e81d5e9864793d801d2c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: b4c4261b71323728
+        size: 2103
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -235,26 +248,31 @@ go test ./... decides the first done_when line, TestCommitRefusesANameOfAnotherP
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/writer_test.go,src/index/topic_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestCommitRefusesANameOfAnotherProvider, TestCommitRefusesAnInactiveAlternative and TestTheTopicsCommitThroughTheirOwnWriters fail on their assertions, since Commit takes a writer and checks nothing yet. The step carries the Writer plumbing across q, watchdog, tickets, ops and index, since Go refuses a changed signature at build. The surprise: the index commits files and tickets/all in one commit, so a writer holds several registrations, and q.Join merges them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the second done_when line meets TestCommitRefusesANameOfAnotherProvider, red on its assertion, and go test plus the check decide the first and the third as commands
+the store stands in memory and reaches no door, so the cases need no fake
 
 # gate
 

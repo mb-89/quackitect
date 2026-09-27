@@ -63,8 +63,8 @@ type Ticket struct {
 }
 
 // [[spec/tickets/the-tickets-topic-lands]]
-func Registers(catalog *q.Catalog) {
-	q.GivenIn(catalog, AllName, []Ticket{}, q.Doc("every ticket under the two ticket folders, with its Ask and its standing"))
+func Registers(catalog *q.Catalog) q.Writer {
+	return q.GivenIn(catalog, AllName, []Ticket{}, q.Doc("every ticket under the two ticket folders, with its Ask and its standing"))
 }
 
 // Whether a path stands directly under one of the two ticket folders, and no deeper: a ticket-kind note elsewhere, such as inside a leftover git worktree, is no ticket. [[spec/design_output/index#the-index-answers-the-tickets]]

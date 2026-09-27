@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/tickets"
 )
 
 const topicPolls = 100
@@ -116,4 +117,18 @@ func TestPublishesTickets(t *testing.T) {
 		time.Sleep(100 * time.Millisecond)
 	}
 	t.Fatalf("tickets/all reads %#v", said)
+}
+
+// Each topic the index registers commits through its own writer, and through no other. [[spec/tickets/commits-name-their-writer]]
+func TestTheTopicsCommitThroughTheirOwnWriters(t *testing.T) {
+	catalog := q.New()
+	as := registersTopics(catalog)
+	store := q.NewStore(catalog, nil)
+	both := map[string]any{filesPrefix + "a.md": Content{Text: "a"}, tickets.AllName: []tickets.Ticket{}}
+	if _, err := store.Commit(0, q.Join(as.files, as.tickets), both); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.Commit(0, as.ops, map[string]any{filesPrefix + "a.md": Content{}}); err == nil {
+		t.Fatal("the ops writer commits a file")
+	}
 }

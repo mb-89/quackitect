@@ -48,6 +48,18 @@ type Catalog struct {
 	regs []*registration
 }
 
+// The hand a registration gives its module, which a commit names as its writer. [[spec/tickets/commits-name-their-writer]]
+type Writer struct{ ones []*registration }
+
+// [[spec/tickets/commits-name-their-writer]]
+func Join(hands ...Writer) Writer {
+	var joined Writer
+	for _, hand := range hands {
+		joined.ones = append(joined.ones, hand.ones...)
+	}
+	return joined
+}
+
 var Main = New()
 
 func New() *Catalog { return &Catalog{} }
@@ -62,28 +74,28 @@ func Deadline(span time.Duration) Option { return func(one *registration) { one.
 func Op() Option     { return func(one *registration) { one.op = true } }
 func Writes() Option { return func(one *registration) { one.writes = true } }
 
-func Given[T any](name string, def T, opts ...Option) {
-	Main.add(givenOf(name, def), callerAt(2), opts)
+func Given[T any](name string, def T, opts ...Option) Writer {
+	return Main.add(givenOf(name, def), callerAt(2), opts)
 }
 
-func GivenIn[T any](c *Catalog, name string, def T, opts ...Option) {
-	c.add(givenOf(name, def), callerAt(2), opts)
+func GivenIn[T any](c *Catalog, name string, def T, opts ...Option) Writer {
+	return c.add(givenOf(name, def), callerAt(2), opts)
 }
 
-func Derived[In, Out any](name string, def Out, fn func(In) Out, opts ...Option) {
-	Main.add(derivedOf(name, def, fn), callerAt(2), opts)
+func Derived[In, Out any](name string, def Out, fn func(In) Out, opts ...Option) Writer {
+	return Main.add(derivedOf(name, def, fn), callerAt(2), opts)
 }
 
-func DerivedIn[In, Out any](c *Catalog, name string, def Out, fn func(In) Out, opts ...Option) {
-	c.add(derivedOf(name, def, fn), callerAt(2), opts)
+func DerivedIn[In, Out any](c *Catalog, name string, def Out, fn func(In) Out, opts ...Option) Writer {
+	return c.add(derivedOf(name, def, fn), callerAt(2), opts)
 }
 
-func Fold[S, E any](name string, def S, step func(S, E) S, opts ...Option) {
-	Main.add(foldOf(name, def, step), callerAt(2), opts)
+func Fold[S, E any](name string, def S, step func(S, E) S, opts ...Option) Writer {
+	return Main.add(foldOf(name, def, step), callerAt(2), opts)
 }
 
-func FoldIn[S, E any](c *Catalog, name string, def S, step func(S, E) S, opts ...Option) {
-	c.add(foldOf(name, def, step), callerAt(2), opts)
+func FoldIn[S, E any](c *Catalog, name string, def S, step func(S, E) S, opts ...Option) Writer {
+	return c.add(foldOf(name, def, step), callerAt(2), opts)
 }
 
 func callerAt(skip int) string {
@@ -94,7 +106,7 @@ func callerAt(skip int) string {
 	return fmt.Sprintf("%s:%d", file, line)
 }
 
-func (c *Catalog) add(one *registration, where string, opts []Option) {
+func (c *Catalog) add(one *registration, where string, opts []Option) Writer {
 	one.where = where
 	for _, opt := range opts {
 		opt(one)
@@ -102,6 +114,7 @@ func (c *Catalog) add(one *registration, where string, opts []Option) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.regs = append(c.regs, one)
+	return Writer{[]*registration{one}}
 }
 
 func (c *Catalog) all() []*registration {

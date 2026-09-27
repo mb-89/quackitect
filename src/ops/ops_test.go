@@ -212,3 +212,16 @@ func TestEveryMoveReachesTheIndex(t *testing.T) {
 		t.Fatalf("the index hears %v", heard)
 	}
 }
+
+// [[spec/tickets/commits-name-their-writer]]
+func TestRegistersHandsTheWriterOfItsFamily(t *testing.T) {
+	c := q.New()
+	as := Registers(c)
+	store := q.NewStore(c, nil)
+	if _, err := store.Commit(0, as, map[string]any{Name("7"): Op{ID: "7"}}); err != nil {
+		t.Fatal(err)
+	}
+	if held, _ := store.Snapshot().Read(Name("7")).(Op); held.ID != "7" {
+		t.Fatalf("%s reads %#v", Name("7"), held)
+	}
+}

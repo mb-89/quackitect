@@ -11,14 +11,14 @@ import (
 
 func TestASnapshotReadsOneRevision(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/n", 0)
+	n := GivenIn(c, "t/n", 0)
 	s := NewStore(c, nil)
-	first, err := s.Commit(s.Snapshot().Revision, map[string]any{"t/n": 1})
+	first, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/n": 1})
 	if err != nil {
 		t.Fatal(err)
 	}
 	before := s.Snapshot()
-	second, err := s.Commit(before.Revision, map[string]any{"t/n": 2})
+	second, err := s.Commit(before.Revision, n, map[string]any{"t/n": 2})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,10 +41,10 @@ func TestANameNobodyWritesReadsItsDefault(t *testing.T) {
 
 func TestARunCommitsTheRevisionItRead(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/n", 0)
+	n := GivenIn(c, "t/n", 0)
 	DerivedIn(c, "t/two", 0, func(in twoOf) int { return in.N * 2 })
 	s := NewStore(c, nil)
-	read, err := s.Commit(0, map[string]any{"t/n": 3})
+	read, err := s.Commit(0, n, map[string]any{"t/n": 3})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -73,16 +73,16 @@ func TestAFoldReducesEachEvent(t *testing.T) {
 
 func TestAFamilyAnswersEachKey(t *testing.T) {
 	c := New()
-	GivenIn(c, "ops/<id>", "none")
+	ops := GivenIn(c, "ops/<id>", "none")
 	s := NewStore(c, nil)
-	if _, err := s.Commit(0, map[string]any{"ops/7": "running"}); err != nil {
+	if _, err := s.Commit(0, ops, map[string]any{"ops/7": "running"}); err != nil {
 		t.Fatal(err)
 	}
 	now := s.Snapshot()
 	if now.Read("ops/7") != "running" || now.Read("ops/8") != "none" {
 		t.Fatalf("the family reads %v and %v", now.Read("ops/7"), now.Read("ops/8"))
 	}
-	if _, err := s.Commit(0, map[string]any{"nobody/7": 1}); err == nil {
+	if _, err := s.Commit(0, ops, map[string]any{"nobody/7": 1}); err == nil {
 		t.Fatal("a commit to a name the catalog lacks lands")
 	}
 }
@@ -90,16 +90,16 @@ func TestAFamilyAnswersEachKey(t *testing.T) {
 // [[spec/tickets/files-topic-reads-the-rows]]
 func TestAKeyOfManySegmentsTakesTheRestOfTheName(t *testing.T) {
 	c := New()
-	GivenIn(c, "files/<path...>", "")
+	files := GivenIn(c, "files/<path...>", "")
 	s := NewStore(c, nil)
-	if _, err := s.Commit(0, map[string]any{"files/spec/deep/One.md": "said"}); err != nil {
+	if _, err := s.Commit(0, files, map[string]any{"files/spec/deep/One.md": "said"}); err != nil {
 		t.Fatal(err)
 	}
 	now := s.Snapshot()
 	if now.Read("files/spec/deep/One.md") != "said" || now.Read("files/two.md") != "" {
 		t.Fatalf("the family reads %v and %v", now.Read("files/spec/deep/One.md"), now.Read("files/two.md"))
 	}
-	if _, err := s.Commit(0, map[string]any{"files": "bare"}); err == nil {
+	if _, err := s.Commit(0, files, map[string]any{"files": "bare"}); err == nil {
 		t.Fatal("a name with no segment for the key lands")
 	}
 }
@@ -107,18 +107,18 @@ func TestAKeyOfManySegmentsTakesTheRestOfTheName(t *testing.T) {
 // [[spec/tickets/files-topic-reads-the-rows]]
 func TestAKeyOfManySegmentsFollowsAKeyOfOne(t *testing.T) {
 	c := New()
-	GivenIn(c, "trees/<tree>/<path...>", 0)
+	trees := GivenIn(c, "trees/<tree>/<path...>", 0)
 	if faults := c.Check(nil); len(faults) > 0 {
 		t.Fatalf("the check answers %+v", faults)
 	}
 	s := NewStore(c, nil)
-	if _, err := s.Commit(0, map[string]any{"trees/a/spec/one.md": 1}); err != nil {
+	if _, err := s.Commit(0, trees, map[string]any{"trees/a/spec/one.md": 1}); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Commit(0, map[string]any{"trees/a": 1}); err == nil {
+	if _, err := s.Commit(0, trees, map[string]any{"trees/a": 1}); err == nil {
 		t.Fatal("a name with no segment for the rest lands")
 	}
-	if _, err := s.Commit(0, map[string]any{"trees//one.md": 1}); err == nil {
+	if _, err := s.Commit(0, trees, map[string]any{"trees//one.md": 1}); err == nil {
 		t.Fatal("a name with an empty segment for the key lands")
 	}
 }
@@ -141,7 +141,7 @@ func TestAnActionDeclaresItsHandleAndItsWrite(t *testing.T) {
 
 func TestACommitOfThePartClearsItsStaleMark(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/n", 0)
+	n := GivenIn(c, "t/n", 0)
 	GivenIn(c, "t/m", 0)
 	s := NewStore(c, nil)
 	since := time.Unix(1_700_000_000, 0)
@@ -154,7 +154,7 @@ func TestACommitOfThePartClearsItsStaleMark(t *testing.T) {
 	if _, stale := s.Snapshot().Stale("t/m"); stale {
 		t.Fatal("t/m reads stale beside t/n")
 	}
-	if _, err := s.Commit(0, map[string]any{"t/n": 1}); err != nil {
+	if _, err := s.Commit(0, n, map[string]any{"t/n": 1}); err != nil {
 		t.Fatal(err)
 	}
 	if _, stale := s.Snapshot().Stale("t/n"); stale {

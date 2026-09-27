@@ -87,6 +87,7 @@ type door struct {
 
 	// The values modules read, and the paths committed under files/ so far. [[spec/tickets/files-topic-reads-the-rows]]
 	store     *q.Store
+	writers   writers
 	published map[string]bool
 }
 
@@ -142,8 +143,7 @@ func trackedIn(root string) func(rel string) bool {
 }
 
 func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
-	registersTopics(catalog)
-	ops.Registers(catalog)
+	topics := registersTopics(catalog)
 	watchdog.Registers(catalog)
 	// The catalog check runs before the database opens, so a fault refuses the start and no provider key stands yet. [[spec/design_output/model#the-catalog-check]]
 	if faults := catalog.Check(nil); len(faults) > 0 {
@@ -165,7 +165,7 @@ func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 
 	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
-	one.store, one.published = q.NewStore(catalog, nil), map[string]bool{}
+	one.store, one.writers, one.published = q.NewStore(catalog, nil), topics, map[string]bool{}
 	if err := one.opensBook(); err != nil {
 		db.Close()
 		return nil, nil, err

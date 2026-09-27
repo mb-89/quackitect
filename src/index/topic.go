@@ -6,6 +6,7 @@ package main
 import (
 	"database/sql"
 
+	"quackitect/src/ops"
 	"quackitect/src/q"
 	"quackitect/src/tickets"
 )
@@ -21,10 +22,16 @@ type Content struct {
 }
 
 // The topics the index commits itself: the files, and the tickets it reads off the note rows. [[spec/tickets/the-tickets-topic-lands]]
-func registersTopics(catalog *q.Catalog) {
-	q.GivenIn(catalog, filesFamily, Content{}, q.Doc("the hash and the text of a tracked file"))
-	tickets.Registers(catalog)
+func registersTopics(catalog *q.Catalog) writers {
+	return writers{
+		files:   q.GivenIn(catalog, filesFamily, Content{}, q.Doc("the hash and the text of a tracked file")),
+		tickets: tickets.Registers(catalog),
+		ops:     ops.Registers(catalog),
+	}
 }
+
+// The hands the index commits its topics with, one a registration. [[spec/tickets/commits-name-their-writer]]
+type writers struct{ files, tickets, ops q.Writer }
 
 // The tracked rows among the paths named, or every tracked row where none is named. [[spec/tickets/files-topic-reads-the-rows]]
 func contentsOf(db *sql.DB, paths []string) (map[string]Content, error) {
@@ -82,6 +89,6 @@ func (one *door) publishes(paths []string) error {
 		return err
 	}
 	values[tickets.AllName] = all
-	_, err = one.store.Commit(one.store.Snapshot().Revision, values)
+	_, err = one.store.Commit(one.store.Snapshot().Revision, q.Join(one.writers.files, one.writers.tickets), values)
 	return err
 }

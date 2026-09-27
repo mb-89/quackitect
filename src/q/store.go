@@ -57,7 +57,7 @@ func (s *Store) Snapshot() Snapshot {
 }
 
 // [[spec/design_output/model#snapshots-and-revisions]]
-func (s *Store) Commit(read int64, values map[string]any) (int64, error) {
+func (s *Store) Commit(read int64, as Writer, values map[string]any) (int64, error) {
 	for name, value := range values {
 		one := s.owner(name)
 		if one == nil {
@@ -97,7 +97,7 @@ func (s *Store) Run(name string) error {
 		return fmt.Errorf("%s names no derived provider", name)
 	}
 	snap := s.Snapshot()
-	_, err := s.Commit(snap.Revision, map[string]any{name: one.run(snap)})
+	_, err := s.Commit(snap.Revision, Writer{[]*registration{one}}, map[string]any{name: one.run(snap)})
 	return err
 }
 
@@ -113,7 +113,7 @@ func (s *Store) Land(name string, event any) error {
 	if err != nil {
 		return err
 	}
-	_, err = s.Commit(snap.Revision, map[string]any{name: next})
+	_, err = s.Commit(snap.Revision, Writer{[]*registration{one}}, map[string]any{name: next})
 	return err
 }
 

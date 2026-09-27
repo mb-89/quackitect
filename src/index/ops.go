@@ -55,7 +55,7 @@ func (one *door) opensBook() error {
 		return err
 	}
 	book.OnMove(func(moved ops.Op) {
-		one.store.Commit(one.store.Snapshot().Revision, map[string]any{ops.Name(moved.ID): moved})
+		one.store.Commit(one.store.Snapshot().Revision, one.writers.ops, map[string]any{ops.Name(moved.ID): moved})
 	})
 	one.book = book
 	return book.Restart()

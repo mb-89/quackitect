@@ -80,7 +80,7 @@ func TestWhyReadsWhetherTheValueStandsAtItsDefault(t *testing.T) {
 	if said := whyOf(t, s, "t/n"); said.State != "default" || said.Value != 0 {
 		t.Fatalf("t/n reads %v at %s", said.Value, said.State)
 	}
-	if _, err := s.Commit(0, map[string]any{"t/n": 3}); err != nil {
+	if _, err := s.Commit(0, Writer{c.all()[:1]}, map[string]any{"t/n": 3}); err != nil {
 		t.Fatal(err)
 	}
 	if said := whyOf(t, s, "t/n"); said.State != "answered" || said.Value != 3 {

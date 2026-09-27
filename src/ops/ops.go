@@ -77,8 +77,8 @@ var moves = map[State][]State{
 }
 
 // The family ops/<id>, one key a call. [[spec/design_output/operations#the-handle-is-a-name]]
-func Registers(c *q.Catalog) {
-	q.GivenIn(c, "ops/<id>", Op{}, q.Doc("the handle of a longer action, its state and its result"))
+func Registers(c *q.Catalog) q.Writer {
+	return q.GivenIn(c, "ops/<id>", Op{}, q.Doc("the handle of a longer action, its state and its result"))
 }
 
 // [[spec/design_output/operations#what-stays-how-long]]

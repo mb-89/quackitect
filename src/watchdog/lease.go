@@ -42,6 +42,7 @@ type Dog struct {
 	mu       sync.Mutex
 	now      func() time.Time
 	store    *q.Store
+	as       q.Writer
 	settings Settings
 	leases   map[string]Lease
 	faults   map[string][]time.Time
@@ -50,8 +51,8 @@ type Dog struct {
 }
 
 // [[spec/design_output/watchdogs]]
-func Registers(c *q.Catalog) {
-	q.GivenIn(c, AlarmsName, []Alarm{}, q.Doc("the alarms standing, one row a part"))
+func Registers(c *q.Catalog) q.Writer {
+	return q.GivenIn(c, AlarmsName, []Alarm{}, q.Doc("the alarms standing, one row a part"))
 }
 
 // [[spec/design_output/watchdogs#restarts]]
@@ -64,9 +65,10 @@ func SettingsOf(root string) Settings {
 	}
 }
 
-func New(now func() time.Time, store *q.Store, settings Settings) *Dog {
+// The dog commits its alarms as the writer Registers hands back. [[spec/tickets/commits-name-their-writer]]
+func New(now func() time.Time, store *q.Store, as q.Writer, settings Settings) *Dog {
 	return &Dog{
-		now: now, store: store, settings: settings,
+		now: now, store: store, as: as, settings: settings,
 		leases: map[string]Lease{}, faults: map[string][]time.Time{},
 		waits: map[string]time.Duration{}, alarms: map[string]Alarm{},
 	}
@@ -154,6 +156,6 @@ func (d *Dog) standing() []Alarm {
 }
 
 func (d *Dog) publish() error {
-	_, err := d.store.Commit(d.store.Snapshot().Revision, map[string]any{AlarmsName: d.standing()})
+	_, err := d.store.Commit(d.store.Snapshot().Revision, d.as, map[string]any{AlarmsName: d.standing()})
 	return err
 }
