@@ -1046,7 +1046,8 @@ A call chaining one of these with another command still names its ticket.
 free form. A segment that changes nothing rides beside a free form:
 
 - a step into the tree, `cd` or `pushd`
-- a reader of what the verb prints: `tail`, `head`, `grep`, `wc` or `cat`
+- a reader of what the verb prints, `tail`, `head` or `grep`
+- a count or a copy of it, `wc` or `cat`
 
 A cloud box starts one folder above the tree, so its take opens with a step.
 
