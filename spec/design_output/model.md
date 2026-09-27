@@ -1129,7 +1129,7 @@ operating system picks, and the standing file names the port and a token.
 | the index | runs the server, answers reads, takes commits, pushes changes |
 | a module process | subscribes to its inputs, answers its actions, publishes its commits |
 | the IO process | answers the requests going out, and relays the outside onto the bus |
-| `quack` | dials the port the standing file names, and starts the index where none answers |
+| `quack` | starts the index where none answers. As a client it reaches the index over HTTP `/v1`, the way every other client does, with no path of its own |
 
 The server stores nothing: no JetStream, and no disk. The index owns every value,
 so a message that goes missing gets read again from the index.
@@ -1247,7 +1247,7 @@ command names. So an author writes one file, and a person starts one program.
 | the index manager spawns | the IO process, then one process a placement |
 
 The same road runs on Linux and Windows: a detached process, loopback TCP, and
-no signal. `quack stop` asks the index over the bus, and the index stops the
+no signal. `quack stop` asks the index over `/v1`, and the index stops the
 modules, the IO process and then itself.
 
 ## The standing file
@@ -1320,6 +1320,16 @@ and a test beside it:
 A module meets the index alone. For the fake index and the rule holding a
 module to it, see [[spec/design_output/model#the-fake-index]].
 
+A module declares how everything it exposes presents itself: its in-ports,
+out-ports, config keys and actions. A view decides where they show, per [[spec/design_output/model#views]]. An action's input
+and output types carry a name and a description on each field, as struct tags:
+
+    type pullIn struct {
+        Ticket string `json:"ticket" label:"Ticket" doc:"the ticket to pull, or the next one when empty"`
+    }
+
+Every declaration stays local to the module, about its own ports alone.
+
 The package variable registers at `init`, so a new file joins the topic at the
 next build. The file names no HTTP library, no MCP and no editor.
 
@@ -1329,9 +1339,10 @@ A registration takes options beside its function:
 
 | the option | what it declares | who reads it |
 |---|---|---|
-| `q.Doc` | one line on what the value or the action is | every surface, as its help |
-| `q.Show` | where the editor draws it, such as `q.Badge{On: "work/editor"}` | the sidebar |
-| `q.Tool` | that agents call it | the hook tools and MCP |
+| `q.Doc` | one line on what the port, the key or the action is | every surface, as its help |
+| `q.Label` | its display name | every renderer, and the generic surfaces |
+| `q.Icon` | a proposed icon, which a view uses or leaves out | the renderers |
+| `q.Looks` | the kind of value, such as `q.Count`, `q.Rows` or `q.State`, so a renderer knows how to draw it | the renderers |
 | `q.Deadline` | how long a run takes at most | the watchdog |
 | `q.Cfg` | a config key the module reads, with its type, built-in value and help | the config module, and every list of keys, per [[spec/design_output/model#config-comes-off-the-registrations]] |
 
@@ -1342,20 +1353,31 @@ A registration takes options beside its function:
 | the command line | `quack get <name>`, `quack watch <name>`, `quack run <action>` with a flag per input field, and help off `q.Doc` |
 | HTTP | `GET /v1/values/<name>` and `POST /v1/actions/<name>`, each with its type through Huma in the OpenAPI 3.1 document at `/v1/openapi.json`, with pages at `/docs` |
 | SSE | `GET /v1/watch` with the names or a topic, pushing each change with its revision |
-| MCP | a tool per action marked `q.Tool`, beside `index/get` and `index/why` |
+| MCP | a tool per action, with the action's name and its `q.Doc`. Its input schema comes off the input type and its field tags, the source OpenAPI reads through Huma. The module adds the `wait` argument to every tool |
 | the hook tools | the same list, in the file [[spec/design_output/model#the-tool-list]] names |
-| the editor | the `index/shows` rows, which the sidebar draws |
+| the editor | the base files under `spec/views`, drawn with the labels, docs, icons and looks the registrations declare |
 | the window | the registry tabs, per [[spec/design_output/model#the-registry-tabs]] |
-| the config schema | `spec/config/level0.schema.json`, the built-in values, the slash commands and the command-line help, generated from every `q.Cfg` and `q.Show` |
+| the config schema | `spec/config/level0.schema.json`, the built-in values, the slash commands and the command-line help, generated from every `q.Cfg` and its `q.Doc` |
 
 A name's segments become the path's segments. A call over HTTP shows the token
-the standing file names.
+the standing file names. The command line is one more client of `/v1`, and takes
+no path of its own.
+
+One source gives the same text everywhere. A thing's name, label, description and help read alike in the command line, the
+window, the sidebar, OpenAPI and MCP. Every surface reads them off the module's
+registration. A new action reaches every row above at the next start.
+No surface keeps a list of its own: the command line, OpenAPI and MCP read
+the same declarations.
 
 ## The generic contract tests
 
 The contract tests run over every registration, so a new file meets them with
 no case of its own. For the list, see
 [[spec/design_output/migration#the-tests-after-the-move]].
+
+One case holds the rule of one source. For one action, the command-line help,
+the OpenAPI description, the MCP tool description and the `help` tab show one
+text.
 
 # Views
 
@@ -1456,7 +1478,10 @@ names, and the registry tabs stand after them.
 |---|---|
 | one renderer | the window and the sidebar each draw every base file, and neither names a view in its code |
 | the check at start | each `reads`, `badge`, `calls` and `writes` names a name or an action in the catalog, or the index refuses to start |
-| no meaning | a view decides how a row looks, and a provider decides what it says |
+| a description | an exposed port, key, action or field with no `q.Doc` or `doc` tag is a fault at start, so the check refuses it before a merge |
+| no meaning | a view decides whether and where a value shows, the registration how it presents itself, and a provider what it says |
+| the presentation | a label, a doc, an icon and a look come off the registration. A view writes none of them, and uses or leaves out any |
+| no view file | the generic surfaces draw off the same declarations: the `index`, `cli` and `help` tabs, the command-line help, OpenAPI and the MCP tools |
 | a new view | a new base file and no change to a renderer |
 | a new renderer | a web page or the editor's webview draws the same base files, as a renderer of its own |
 

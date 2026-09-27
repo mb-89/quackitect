@@ -27,3 +27,17 @@ a key in [[spec/design_output/model#views]].
 A view that needed logic no key expressed, such as a drawing of a route. Such a
 view stood outside the renderer, the way the route drawing stayed in the
 extension.
+
+## 4. Looks apart from place
+
+A module declares how everything it exposes presents itself: a label, a
+description, help on each field, and a proposed icon and look. A view file
+decides whether and where it shows, and writes no text of its own. The generic
+surfaces read the same declarations with no view file, so one text reads alike
+everywhere.
+
+| the earlier work | what it lent |
+|---|---|
+| Apache Causeway and Naked Objects | annotations on the member, and a separate `layout.xml` per class |
+| SCADA and HMI tag databases | a tag carrying its unit, range and description, and screens binding to tag names |
+| OPC UA | variables carrying DisplayName, Description and EngineeringUnits, and clients laying them out |
