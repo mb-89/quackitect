@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -104,6 +104,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-queue-moves-to-plan.md:121:99: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: implement/tests-green
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: e2072ece49edd18f89294eba5daeabb3cd9a612d
+    hash_after: afa66c3bd6d55b87a4fa4c4e79ec339c944bf576
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 28 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-moves-to-plan.md:121:99: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -258,26 +270,34 @@ Each review row stands fixed: the helpers leave with their cases, pull.md lists 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/level1.test.js test/level0/config.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The pull asks no model any more, so a hand-back meets the same checks every time. judged and its helpers leave the plugin tool and library, the --judge road and judgeMaterial leave the shell pull, forEvidence and labelOf leave the guidance library, and the answer mark leaves the schema and voice.md. The judge key leaves the config and its schema, and the projection drops its three slash commands. The judge cases leave, and the fixtures naming judge.model take helper.find.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the draft names, the helpers the review adds, and the fixtures that name the judge key, and no other.
+The change adds no door, and the pull tool case runs over the process and model fakes the harness in level1.test.js builds.
+The plugin tool and library headers link this ticket, which names the approach.
+The change adds no fact, and the answer mark leaves the schema, voice.md and the library at once.
+Each review row stands fixed: the helpers leave with their cases, pull.md lists the shell checks, the .claude writes land through the patch door, the answer mark leaves, and the pointers leave the other notes.
 
 # Discussion
 
