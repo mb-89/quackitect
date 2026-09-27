@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-engine-fixes-its-faults
 parent: cloud-boxes-leave-trunk-alone
+record:
+  - step: do
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: 0c5956449dfc370ee64e0a93ed06900953485145
+    hash_after: 0c5956449dfc370ee64e0a93ed06900953485145
+    why: cloud-boxes-leave-trunk-alone answers this ask
+reason: answered
 ---
 
 # Ask
