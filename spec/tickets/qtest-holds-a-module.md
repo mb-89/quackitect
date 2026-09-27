@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/draft
 steps:
   - name: design
     steps:
@@ -128,6 +128,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
+record:
+  - step: design/person-1
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 55a8671f3798f48fdd45818f1333ed408f70e51d
+    hash_after: 55a8671f3798f48fdd45818f1333ed408f70e51d
+    def: 445cd911acc62c3a
 ---
 
 # Ask
@@ -161,8 +167,9 @@ A module tests against a fake index alone, per the owner's rule. Without the har
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is choice -->
+
+not yet
 
 ## draft
 
