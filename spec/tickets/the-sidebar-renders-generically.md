@@ -82,11 +82,12 @@ group: sidebar-lands-in-shadow
 
 # Ask
 
-The sidebar and its forms draw off the registry, beside the sidebar that draws today.
+The sidebar and its forms draw the base files under `spec/views`, beside the sidebar that draws today. Each label, doc, icon and look comes off the registrations, and the sidebar writes none.
 
 A new value then shows in the sidebar with no extension change.
 
 - a case under `test/level0` draws the sidebar over a fake catalog
+- a case reads a badge's label equal to the one the window draws
 - `./RUNME.sh check` exits 0
 
 # design
