@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -112,6 +112,11 @@ record:
     hand: box d7d809305dcf · claude-code-remote
     hash_before: 3e4f6dc204eb8e0e41d98e086d7630d72d99620e
     hash_after: 3e4f6dc204eb8e0e41d98e086d7630d72d99620e
+  - step: retro/cloud
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: 3b3fb4321922983d5a447892b550e981d5593e70
+    hash_after: 3b3fb4321922983d5a447892b550e981d5593e70
+reason: done
 ---
 
 # Ask
@@ -239,20 +244,29 @@ the new test file's header says what it proves, and counts nothing
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+the proxy refuses www.google.com during a commit, and the commit lands anyway
+the auto mode check refuses a read of a committed diff after a checkout
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+sync takes the trunk commits in with no conflict
+the server on its port drops for a moment while the check runs, and the plan call fails once
+the commit door refuses a change whose test file stands untracked
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step stands parked
+write-marks-leave-the-plugin stands free, with no group
+a-retro-hand-decides-notes stands free, its fix already landed in e1fe50650
+the handover names both, and the group at done
 
 # Discussion
 
