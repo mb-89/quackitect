@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -205,6 +205,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: cd809659fe7f0fb55ea837f7e91e34149d0589b6
+    hash_after: cd809659fe7f0fb55ea837f7e91e34149d0589b6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 52 test(s) pass in 4 file(s); green, src/tui/work passes; green, src/tickets passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-skills-start-the-workers.md:295:1: ListItem: A sentence in a list item holds 20 words, and this one hol"
+    inputs:
+      - name: design/tests-red
+        hash: 76adb2a2ca4b60c0
+        size: 1399
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -434,26 +457,42 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/dispatch.test.js test/level0/work-stands.test.js test/level0/work-done.test.js test/level0/work-fix.test.js src/tui/work src/tickets
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A group now holds groups. A child group names its parent under `group`, and the dispatch reads that chain off trunk.
+
+- A parent reaches no worker and opens no branch. Its children do.
+- A child waits on its own `depends_on` and on every ancestor's.
+- A dependency on no branch reads off its ticket on trunk, so a parent holds its dependents. A dependency with a branch still reads the branch, so the earlier table of the design output holds.
+- A group on trunk that no hand reaches closes in the dispatch commit once no ticket naming it stands open. Its open agent tickets bundle into a fix group under it.
+- `branch done` files every open child, and every open ticket the branch adds with no group, into the group's parent. A top group leaves them loose. The refusal on open children goes, and three earlier cases now expect the filing.
+- The index row reads `person`, and the work tab lifts it up the nest to light P on each group over it.
+
+I assume a parent needs no route step of its own. The take, the trigger and the pull still read no trunk, and take-reads-the-parent-chain carries that.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list and `src/scripts/work-fix.js`, whose `addedHere` the filing shares
+- git and the disk are the doors, and every case drives their fakes
+- each new function links the groups-hold-groups chapter of the design input
+- the parent rules stand once, in `spec/design_output/work.md`, and the other notes link there
 
 # accept
 
