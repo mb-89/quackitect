@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -119,6 +119,23 @@ record:
         exit: 0
         said: The rules pass.
     def: 21d63335f32dfcda
+  - step: implement/tests-green
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 2e3dc623bbeb63aca7632d948175a726c8fd965b
+    hash_after: 2e3dc623bbeb63aca7632d948175a726c8fd965b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 76 test(s) pass in 7 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/holds-leave-with-their-ticket.md:138:1: ListItem: A sentence in a list item holds 20 words, and this one ho"
+    inputs:
+      - name: implement/tests-red
+        hash: de5823c9e8724438
+        size: 1810
+    def: a27db29c1d1562f2
+reason: done
 ---
 
 # Ask
@@ -332,7 +349,6 @@ The change step puts each behaviour back.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
 
     ./RUNME.sh test test/level0/bridgehead.test.js test/level0/wait.test.js test/level0/server-crash.test.js test/level0/go-source.test.js test/level0/tools.test.js test/level0/lsp.test.js test/level0/doctor-hooks.test.js
@@ -340,7 +356,6 @@ The change step puts each behaviour back.
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
 
     ./RUNME.sh check
@@ -348,30 +363,20 @@ The change step puts each behaviour back.
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
 
-Every server comes back on its own now.
-
-| server | what changes | why |
-|---|---|---|
-| level zero | the hook posts a cut wait again where `/health` answers, and the server carries on the wait under its `since` | the host cut a long wait, and the hook read the cut as a dead server |
-| level zero | a restart starts the child once the listen ends | node's close waited on every open connection, a wait among them |
-| `se-lsp` and `se-index` | each keys on a hash of its folder and every folder its `go.mod` replaces | a move in a shared package left the binary stale |
-| the editor's client | every close starts `se-lsp` again, after a second | the client stopped at its own cap, and a rebuild ends the server |
-| `doctor` | a `se-lsp lsp` row off a probe naming each diagnostic, or the exit | a person read no sign of a server that falls |
+The landed code runs again, and the cases that showed red with each behaviour off pass. A wait the host cuts on a live server answers its signal or its cap. A restart starts its child with a connection open. A binary rebuilds after a change in any source it reads. The editor starts se-lsp again after every fall, and the doctor tells a live server from a dead one.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-- the change touches the files the design names, the design notes, the install and `.vale.ini`
-- every door the change reaches has a fake, and the wire a contract case beside it
-- the wait's name stands in `wait.js`, and the hook spells it again with a pointer
-- the hash stands in `tui-build.js`, and `go-source.js` calls it
-- the design review stands unread, so no row of it stands fixed yet
+- the change touches the files the landed commit changed, and no other
+- the doors the cases reach stand behind their fakes
+- each function keeps the comment naming its approach
+- each behaviour stands once, in the function its case drives
+- the design review passes with no row this leaf leaves open
 
 # Discussion
 
