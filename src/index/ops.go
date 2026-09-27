@@ -1,5 +1,5 @@
 // The table op, behind the seam ops.Keep, so an operation outlives the door.
-// [[spec/design_output/operations#an-operation-outlives-callers]]
+// [[spec/design_output/model#an-operation-outlives-callers]]
 package main
 
 import (
@@ -48,7 +48,7 @@ func (k opKeep) Drop(id string) error {
 	return err
 }
 
-// The door opens the book on its database, pushes each move under ops/<id>, and fails every operation in flight. [[spec/design_output/operations#an-operation-outlives-callers]]
+// The door opens the book on its database, pushes each move under ops/<id>, and fails every operation in flight. [[spec/design_output/model#an-operation-outlives-callers]]
 func (one *door) opensBook() error {
 	book, err := ops.New(time.Now, opKeep{one.db}, ops.SettingsOf(one.root))
 	if err != nil {

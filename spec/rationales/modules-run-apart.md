@@ -4,8 +4,7 @@ kind: [[rationale]]
 
 # Why
 
-The owner decided this for the model, and the decision is final. The doors, the
-index and each module topic ran as processes of their own, and the system placed
+The owner decided this for the model, and the decision is final. The IO modules, the index and each module topic ran as processes of their own, and the system placed
 them. An agent reads this note before it asks again.
 
 ## 1. What it bought
@@ -13,7 +12,7 @@ them. An agent reads this note before it asks again.
 Go already spread its work over every core in one process, so the split bought
 isolation. A crash stayed in its module. A changed module rebuilt
 and restarted alone while the index stayed warm. The operating system held the
-boundary, because a module reached disk and git through the doors process alone.
+boundary, because a module reached disk and git through an IO module alone.
 
 ## 2. What it gave up
 

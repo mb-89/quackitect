@@ -65,7 +65,7 @@ A pull, the check and a retro each run past a hook's patience. A handle keeps th
 
 ## says
 
-[[spec/design_output/operations]] specifies operations. An action declares
+[[spec/design_output/model#operations]] specifies operations. An action declares
 at registration whether it answers at once, `q.Action`, or with a handle,
 `q.Op`. The handle `ops/<id>` is a key under a family the catalog declares
 once, so the index adds no name at runtime.

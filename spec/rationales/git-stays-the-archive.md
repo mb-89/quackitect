@@ -15,8 +15,8 @@ before it asks again.
 | the files on the checkout | every live value: the queue, the standing, the hold |
 | a group ticket on `main` | carries `cloud: true` from the moment its branch opens in the cloud |
 | the merge and the close of that branch | clear the marker |
-| the git door | commits and pushes, as actions |
-| the git door, asked by name | reads the archive: old logs, closed work, history |
+| the `git` IO module | commits and pushes, as requests an action makes |
+| the `git` IO module, asked by name | reads the archive: old logs, closed work, history |
 | the index | holds none of the archive |
 
 So the queue reads files alone, and a question about the past says it wants

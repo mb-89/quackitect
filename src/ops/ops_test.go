@@ -1,6 +1,6 @@
 // The book of operations: a handle, its states, one writer per tree, the
 // restart, the deadline and the retention.
-// [[spec/design_output/operations]]
+// [[spec/design_output/model#operations]]
 package ops
 
 import (

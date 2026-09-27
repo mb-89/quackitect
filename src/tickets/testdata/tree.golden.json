@@ -673,7 +673,7 @@
     "name": "doors-get-specified",
     "hash": "16cbfdfced7720cb",
     "group_hash": "5739d30471f2d16d",
-    "ask": "A design note specifies the doors: one file each with its fake, the inbound replay, and the doors process. It names the import rules the build checks. [[spec/design_input/the-index-holds-the-model#doors-on-both-sides]] asks it. So does [[spec/design_input/the-index-holds-the-model#the-build-holds-the-rules]].\n\nA door is the one road to the outside, and a fake in the same file keeps every test in memory.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- `./RUNME.sh check` exits 0",
+    "ask": "A design note specifies the doors: one file each with its fake, the inbound replay, and the doors process. It names the import rules the build checks. [[spec/design_input/the-index-holds-the-model#io-modules-on-both-sides]] asks it. So does [[spec/design_input/the-index-holds-the-model#the-build-holds-the-rules]].\n\nA door is the one road to the outside, and a fake in the same file keeps every test in memory.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- `./RUNME.sh check` exits 0",
     "standing": "done"
   },
   {

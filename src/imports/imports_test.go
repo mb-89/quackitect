@@ -1,7 +1,7 @@
 // The import rules over planted packages: each refused import carries a want
 // comment, and a clean one carries none. The test writes the packages to a
 // folder of its own, so no fixture stands in the tree.
-// [[spec/design_output/go-doors#the-build-checks-imports]]
+// [[spec/design_output/model#the-build-checks-imports]]
 package imports
 
 import (
@@ -21,7 +21,7 @@ var planted = map[string]string{
 	"tui/frame/frame.go":     "package frame\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/tui/frame imports quackitect/src/modules/work`\n\nfunc Title() string { return work.Name() }\n",
 }
 
-// [[spec/design_output/go-doors#the-build-checks-imports]]
+// [[spec/design_output/model#the-build-checks-imports]]
 func plant(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()

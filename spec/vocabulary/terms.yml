@@ -253,6 +253,7 @@ terms:
   - {word: ruleset, means: "the repository settings that name the checks and approvals a change needs before it merges"}
   - {word: truncate, means: "to cut text or a file short at a set length and drop the rest"}
   - {word: vscode, means: "the code editor whose sidebar panel draws this tree", source: "https://code.visualstudio.com"}
+  - {word: golem, means: "a Go language library the prose checks use to find the base form of each word in place of wink-nlp", source: "https://github.com/aaaton/golem"}
   - {word: wink-nlp, means: "a language library the tense reader uses to find the base form of each word", source: "https://github.com/winkjs/wink-nlp"}
   - {word: adjective, means: "a word that describes a noun which the tense reader must not mistake for a past verb"}
   - {word: starfish, means: "the retro form that asks what to start and stop and keep and do more and less"}
