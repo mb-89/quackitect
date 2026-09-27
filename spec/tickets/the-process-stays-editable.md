@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -95,6 +95,15 @@ record:
   - step: sync
     hand: box d7da794434cd · claude-code-remote
     hash_before: 1f2402558127390067e1cb890857e9d6213f6b61
+  - step: sync
+    hand: box d7da794434cd · claude-code-remote
+    hash_before: d4eea94d71c98d5fd0a6c23f59f392af6f9cf0b3
+    hash_after: d4eea94d71c98d5fd0a6c23f59f392af6f9cf0b3
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-process-stays-editable already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["the-engine-holds-the-route"]
 ---
 
@@ -109,8 +118,9 @@ A moved input marks exactly the steps that read it, and a process stays editable
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
