@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: d638b7cc45e4f30b61fbdd00581f1d1cf06e344f
+    hash_after: f3315fe847b944cba446c2f1c0ac6c041153c1a3
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-style-carries-the-top.md:143:56: Vocabulary: blocksof stands outside the words this tree writes. Write "
+reason: done
 ---
 
 # Ask
@@ -237,26 +249,34 @@ Every case fails on its own assertion: the config names no budget yet, and guida
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/budget.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+spec/config/level0.json names a time budget in milliseconds for the pull, the hand-back, the resolver and the query for stale steps. test/level0/budget.test.js times the median of several runs of each call over a group of many tickets and many notes, and fails a call past its budget, so a call slowing with the work it carries turns the battery red. Each budget stands about ten times over the median a box measures, and at 10 where that stays under a millisecond. The resolver is resolved in src/scripts/guidance-hand.js, whose core lands here since the queue handed this ticket first; guidance-resolves-by-tags builds the rest on it. The stale query is readsOf with handsAgain, until the index query of the chapter Evidence and stale steps stands.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the config, its schema, the budget test, and the resolver core the ask names as a call it times
+- the cases drive the fake disk, git and clock
+- the comment on budget names the chapter Time budgets and the test
+- each budget stands once, in spec/config/level0.json
+- the review's rows stand fixed: a fixture of many tickets and notes, the resolver named as resolved, readsOf timed with handsAgain, and headroom over a measured median
 
 # Discussion
 
