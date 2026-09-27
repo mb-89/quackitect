@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-cloud-works-its-queue
 parent: dispatch-writes-the-bundles
+record:
+  - step: do
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 3283b3705e2e7d56da2e02c63522c1ddd2856998
+    hash_after: 307f4f1325405df36ec13a3525ac11f641ff1d72
+    returns: 1
+    why: "the hand-back met refused 5 times: tests under do expects green, and ./RUNME.sh check --errors answers The check names no red case and no finding at error."
 ---
 
 # Ask
