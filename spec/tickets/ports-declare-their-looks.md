@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -132,6 +132,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 231fdf5229e1f851fb72f9e379472f5676ef977a
+    hash_after: 231fdf5229e1f851fb72f9e379472f5676ef977a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: fdd4f3f45b32d5c5
+        size: 2927
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -237,26 +250,31 @@ each done_when line names its test: the three looks cases decide the port, the a
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/looks_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/looks_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion over the stubs. The catalog presents no port, and the start answers a store for an action with no doc and for a field with no doc tag. The surprise: nothing past the tests calls Start yet, so the refusal meets the start cases alone. Their types source, counter and labeller take a q.Doc at implement.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a failing case: the port, the action and the field cases, and go test and the check as commands
+the cases run over a catalog and a wiring in memory, and reach no door
 
 # gate
 

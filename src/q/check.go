@@ -18,6 +18,7 @@ const (
 	OtherType Kind = "an input of another type"
 	Cycle     Kind = "a cycle among derived names"
 	BadName   Kind = "a name of other than lowercase segments"
+	NoDoc     Kind = "a name or a field with no description"
 )
 
 type Fault struct {
