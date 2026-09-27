@@ -114,11 +114,24 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [qtest-holds-a-module]
+record:
+  - step: design/draft
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 0021c6a5274f7ab441ac241308a519decb197279
+    hash_after: 0021c6a5274f7ab441ac241308a519decb197279
+    inputs:
+      - name: ask
+        hash: 6406669fb6ef6554
+        size: 872
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -154,38 +167,82 @@ A module then stays local, and one file holds the layout. An alternative calcula
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Six pieces, following spec/design_output/model#the-wiring-file and #a-name. One: src/q/wiring.go holds Wiring, a list of instances, each a name and a module type, and a map of wires from `<instance>.<port>` to a standard name, to `<instance>.<port>` of a writer, or to the mark built-in. ReadWiring reads that shape off YAML through src/yaml, with instances as a block map, since src/yaml reads no flow map. Two: Load(w, types) builds one catalog. For each instance it calls the type's register function on a fresh catalog, so each instance holds registrations of its own. It then renames them in place, so every Writer a module holds stays valid. An out-port takes the standard name its wire names, or `<instance>/<port>`. An in-port takes its wire: a standard name, the name of the writer a port-to-port wire names, or no name under built-in, where the field keeps its zero value. An in-port under `config/` binds to `<instance>/config/<key>` with no wire. Any other in-port with no wire answers a Fault of the new kind Unwired, naming the instance, the port and the file and line. Load answers every fault at once, and Check runs over the loaded catalog as it stands. Three: derivedOf's run reads the registration's inputs, so a rename reaches the run. Four: CfgIn(c, key, builtin, opts) declares a config key at the local name `config/<key>`, and Load files it under `<instance>/config/<key>`, so one type loads as two instances with a key each. The declaring registration writes the key until the-config-module-resolves-layers moves the writer to the config module. Five: the providers.* selection leaves. Alt, providerKey, pick's key reading, NoAlt and TwoActive go, and NewStore and Check drop their keys argument, because an alternative calculation is another module type in the wiring. Two registrations of one name answer Twice. Six: the analyzer NoName becomes NoModule, named nomodule, and refuses an import of a package under src/modules from another module package, a door, the index or a renderer. onlyq leaves a module path to it, so one import names one fault. spec/wiring.yaml stands with no instance and a header pointing at the model, because no module type registers yet. Assumed: the index reads spec/wiring.yaml at start once a module package stands to load, under reads-resolve-in-two-passes, since the index imports no module and the start's passes are that ticket's. Weighed: Load renames the registrations in place against copying them, since a copy leaves every Writer a module holds pointing at a name nobody reads.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/store.go: NewStore, which drops keys
+src/q/check.go: Catalog.Check, pick, providerKey, which drop keys
+src/q/q.go: Alt, derivedOf
+src/q/qtest/qtest.go: Over, which calls Check and NewStore
+src/index/door.go: Serve, which calls NewStore
+src/imports/imports.go: NoName, onlyQ, Faults
+src/imports/imports_test.go: the NoName cases and TestAModuleImportingAModulePasses
+src/q/catalog_test.go: TestTwoActiveProvidersRefuseTheStart and the alt pick case
+src/q/writer_test.go: TestCommitRefusesAnInactiveAlternative, which leaves, and the NewStore calls
+src/q/store_test.go, src/q/why_test.go, src/q/action_test.go, src/ops/ops_test.go, src/watchdog/lease_test.go, src/tickets/tickets_test.go, src/index/v1_test.go, src/index/ops_test.go, src/index/topic_test.go, src/index/sweep_test.go: the NewStore and Check calls, which drop nil
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/q/wiring_test.go: TestAStandardNameCarriesTheValueFromOutPortToInPort
+src/q/wiring_test.go: TestAPortToPortWireReadsTheWritersName
+src/q/wiring_test.go: TestAnUnwiredOutPortReadsAsInstanceAndPort
+src/q/wiring_test.go: TestOneTypeLoadsAsTwoInstancesEachWithItsConfig
+src/q/wiring_test.go: TestAnUnwiredInPortAnswersAFault
+src/q/wiring_test.go: TestReadWiringReadsInstancesAndWires
+src/imports/imports_test.go: TestAModuleImportingAModuleIsNamed, the planted modules/work with its want comment under NoModule
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/wiring.go
+src/q/wiring_test.go
+src/q/q.go
+src/q/check.go
+src/q/store.go
+src/q/qtest/qtest.go
+src/q/catalog_test.go
+src/q/writer_test.go
+src/q/store_test.go
+src/q/why_test.go
+src/q/action_test.go
+src/ops/ops_test.go
+src/watchdog/lease_test.go
+src/tickets/tickets_test.go
+src/index/door.go
+src/index/v1_test.go
+src/index/ops_test.go
+src/index/topic_test.go
+src/index/sweep_test.go
+src/imports/imports.go
+src/imports/imports_test.go
+spec/wiring.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened spec/design_output/model at a name, the wiring file, config comes off the registrations and the build checks imports, src/q/q.go, src/q/check.go, src/q/store.go, src/yaml/yaml.go and src/imports/imports.go, and checked each claim there
+the callers come off a grep for NewStore, Check, Alt, providerKey and NoName over src
+each done_when line names its test: the four wiring cases decide the wires and the instances, TestAModuleImportingAModuleIsNamed decides nomodule, and go test and the check decide the first and last
 
 ## tests-red
 
