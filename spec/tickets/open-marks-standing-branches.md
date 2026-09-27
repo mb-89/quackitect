@@ -48,11 +48,15 @@ the `already stands in the cloud` return in `openGroup` writes nothing, so a bra
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/work-cloud-marker.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +64,17 @@ the `already stands in the cloud` return in `openGroup` writes nothing, so a bra
 
 <!-- the form is text -->
 
+The ask stands met on this branch, so the step changes no code. The `already stands in the cloud` road in `openGroup`, in `src/scripts/work.js`, returns through `marksTrunk`, so a branch opened before the marker takes it on the next open. The test `branch open marks a branch already standing in the cloud` in `test/level0/work-cloud-marker.test.js` holds the case.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The ask stands met by the `marksTrunk` call on that road, with its test.
+- The reading reveals no cleanup.
+- The marker write stands in `marksTrunk` alone, and both roads of `openGroup` call it.
 
 # Discussion
 
