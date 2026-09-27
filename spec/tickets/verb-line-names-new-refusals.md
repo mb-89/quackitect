@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-verbs-land-whole
 parent: every-landing-takes-a-verb
+record:
+  - step: do
+    hand: box d7d6327f2b101 · claude-code-remote
+    hash_before: 1c0a6f6089b59089d12293f419451ba9cee5a6a4
+    hash_after: 0e413741318f405ffba4e36f914581fea1e47915
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 39 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ parent: every-landing-takes-a-verb
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/bash.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ parent: every-landing-takes-a-verb
 
 <!-- the form is text -->
 
+`verbLine` names every git command that writes the repository, and the verb standing for it. That clause covers both refusals the parent's approach adds: a git write, and `git mv` under the tickets. The parent's change wrote the clause, and the `verbLine` case in `test/level0/bash.test.js` now holds it.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change is the assertion the ask wants held, and the line stood written already.
+- The change reveals no cleanup.
+- The clause stands once, in `verbLine`, and the case matches it.
 
 # Discussion
 

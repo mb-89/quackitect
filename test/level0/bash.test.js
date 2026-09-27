@@ -438,6 +438,11 @@ test("the description names the verbs, and answers the same string twice", () =>
   const said = verbLine();
   assert.equal(said, verbLine());
   for (const verb of VERBS) assert.match(said, new RegExp(`./RUNME.sh ${verb}`));
+  // A git write, `git mv` under the tickets among them, meets the door, so the line names it. [[spec/tickets/verb-line-names-new-refusals]]
+  assert.match(
+    said,
+    /every git command that writes the repository, naming the verb standing for it/,
+  );
 });
 
 // A landing waits on its gate, so a chain running it whatever the gate answers comes back refused. [[spec/design_output/bash#a-landing-follows-its-gate]]
