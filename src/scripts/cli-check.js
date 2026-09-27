@@ -117,7 +117,8 @@ export function viewerHere() {
 }
 
 // Every Go module's tests run in the battery, the index's through the pinned Zig. [[spec/design_output/index#the-compiler-it-needs]]
-export function goHolds() {
+// Under `check --errors` the run stays quiet, and each failing Go test reaches the error stream alone. [[spec/tickets/the-verbs-need-no-wrapper]]
+export function goHolds(quiet = false) {
   const at = { disk: files, join, root };
   const env = goEnvOf(at);
   let worst = 0;
@@ -127,11 +128,16 @@ export function goHolds() {
       ran = outside.run([go, "test", "./..."], {
         cwd: join(root, folder),
         env,
-        inherit: true,
+        inherit: !quiet,
       });
     } catch {
       console.log("go stands nowhere, so the Go tests go unrun here.");
       return 0;
+    }
+    if (quiet && ran.exitCode) {
+      for (const row of String(ran.stdout ?? "").split("\n")) {
+        if (/^\s*--- FAIL/.test(row)) console.error(`${folder}: ${row.trim()}`);
+      }
     }
     worst = worst || ran.exitCode || goFormat(folder, env);
   }

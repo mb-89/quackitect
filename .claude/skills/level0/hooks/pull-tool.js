@@ -3,8 +3,6 @@
 // so the judge and the spawn run here.
 // [[spec/design_output/pull#the-checks]]
 
-// One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
-import { READ_TOOLS, register as bridgehead } from "./level0.js";
 import { configOf, SCHEMA, TRACKED } from "../lib/config.js";
 import {
   judgeAsk,
@@ -17,6 +15,8 @@ import {
   sessionOf,
   spawnPromptIn,
 } from "../lib/pull.js";
+// One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
+import { register as bridgehead, READ_TOOLS } from "./level0.js";
 
 const CLI_SCRIPT = "src/scripts/cli.js";
 // The script stands under the method root, which a project root holds nowhere, so the call names it whole. [[spec/design_output/vehicle#the-work-root-inherits]]
@@ -29,6 +29,11 @@ const PULL = ["ticket", "pull"];
 const TOOL = "--tool";
 const ENABLED = "judge.enabled";
 const MODEL = "judge.model";
+const REFUSALS = "judge.refusalsBeforePass";
+// The quote call names a model, and classify's default is the small one. [[spec/tickets/prose-verbs-land-first-try]]
+const QUOTE_MODEL = "haiku";
+// The refusals each leaf meets, by ticket and step, so a hand-back past the count goes through. [[spec/tickets/prose-verbs-land-first-try]]
+const refusals = new Map();
 const RUNNING = 600000;
 const JUDGE = "--judge";
 const BACKGROUND =
@@ -91,8 +96,35 @@ function toolCall(e) {
   return [...cli, ...PULL, TOOL, JSON.stringify(e ?? {})];
 }
 
+// The verb runs under the harness keys the session carries, so it reads the hand the shell verb reads. The engine merges this env over its own, and `$.env.get` reads a key where the hook scope holds no process. [[spec/tickets/pull-env-meets-the-engine]]
+// A copy of the keys `HARNESS` in src/scripts/pull-hand-of.js names, because a hook reaches no file past the plugin. The level1 case reads both. [[spec/tickets/pull-env-meets-the-engine]]
+export const HARNESS_KEYS = ["CLAUDE_CODE_REMOTE", "SE_CLOUD", "CLAUDECODE"];
+
+async function running($) {
+  // The engine reads each env call off the source, so every key stands spelled at its own call. [[spec/tickets/pull-env-meets-the-engine]]
+  const said = [
+    await envOf(() => $.env.get("CLAUDE_CODE_REMOTE")),
+    await envOf(() => $.env.get("SE_CLOUD")),
+    await envOf(() => $.env.get("CLAUDECODE")),
+  ];
+  const env = {};
+  HARNESS_KEYS.forEach((key, at) => {
+    const value = said[at] ?? globalThis.process?.env?.[key];
+    if (value) env[key] = String(value);
+  });
+  return Object.keys(env).length ? { timeoutMs: RUNNING, env } : { timeoutMs: RUNNING };
+}
+
+async function envOf(read) {
+  try {
+    return await read();
+  } catch {
+    return undefined;
+  }
+}
+
 async function pulled($, e) {
-  const ran = await $.process.run(toolCall(e), { timeoutMs: RUNNING });
+  const ran = await $.process.run(toolCall(e), await running($));
   return `${ran.stdout ?? ""}${ran.stderr ?? ""}`.trim() || `exit ${ran.exitCode}`;
 }
 
@@ -120,22 +152,51 @@ async function judged($, e) {
   const settings = configOf({ tracked, schema, read: async (path) => $.fs.read(path) });
   if ((await settings.ask(ENABLED)) === false) return "";
 
-  const ran = await $.process.run([...toolCall(e), JUDGE], { timeoutMs: RUNNING });
+  const ran = await $.process.run([...toolCall(e), JUDGE], await running($));
   const material = parsed(ran.stdout);
   if (!material?.rules?.length || !String(material.evidence ?? "").trim()) return "";
 
+  const model = await settings.ask(MODEL);
   let said;
   try {
     said = await $.model.classify(
       judgeAsk(material.evidence, material.rules),
       judgeLabels(material.rules),
-      { model: await settings.ask(MODEL) },
+      { model },
     );
   } catch {
     return "";
   }
+  const key = `${material.ticket} ${material.step}`;
   const broke = ruleBroken(said, material.rules);
-  return broke ? judgeRefusal(`at ${material.step}, ${broke}`) : "";
+  if (!broke) {
+    refusals.delete(key);
+    return "";
+  }
+  // Past the count the hand-back goes through, and the count starts over. [[spec/tickets/prose-verbs-land-first-try]]
+  const most = Number(await settings.ask(REFUSALS)) || 0;
+  const count = (refusals.get(key) ?? 0) + 1;
+  if (most && count > most) {
+    refusals.delete(key);
+    return "";
+  }
+  refusals.set(key, count);
+  const line = await quoted($, material, said, model || QUOTE_MODEL);
+  return judgeRefusal(`at ${material.step}, ${broke}`, line);
+}
+
+// The model names the line, and the line stands where the evidence holds it word for word. [[spec/tickets/prose-verbs-land-first-try]]
+async function quoted($, material, label, model) {
+  try {
+    const said = await $.model.complete({
+      model,
+      prompt: judgeAsk(material.evidence, material.rules, label),
+    });
+    const line = said?.isAnswered ? String(said.text ?? "").trim() : "";
+    return line && String(material.evidence).includes(line) ? line : "";
+  } catch {
+    return "";
+  }
 }
 
 function parsed(text) {
