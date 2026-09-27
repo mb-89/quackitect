@@ -15,7 +15,6 @@ before it asks again.
 | the files on the checkout | every live value: the queue, the standing, the hold |
 | a group ticket on `main` | carries `cloud: true` from the moment its branch opens in the cloud |
 | the merge and the close of that branch | clear the marker |
-| the release of that branch | leaves the marker, because the branch stays in the cloud at `todo` |
 | the git door | commits and pushes, as actions |
 | the git door, asked by name | reads the archive: old logs, closed work, history |
 | the index | holds none of the archive |

@@ -48,11 +48,15 @@ the `release` departure holds, because `release` writes `hash_after` and leaves 
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +64,17 @@ the `release` departure holds, because `release` writes `hash_after` and leaves 
 
 <!-- the form is text -->
 
+The table in `spec/rationales/git-stays-the-archive.md` loses its release row, so it names the merge and the close alone as the verbs clearing the marker. What `release` does stands in its code and in `test/level0/work-cloud-marker.test.js`, and the rationale points at no verb that leaves the marker alone.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change follows the ask: the row naming the merge and the close stands, and the release row goes.
+- The change reveals no cleanup.
+- The change adds no fact, and drops one the code and its test already own.
 
 # Discussion
 
