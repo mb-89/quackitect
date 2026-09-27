@@ -96,3 +96,10 @@ func TestV1ReadsAStaleName(t *testing.T) {
 		t.Fatalf("the value reads %+v, %v", said, err)
 	}
 }
+
+func TestV1DrawsItsDocs(t *testing.T) {
+	said, body := getV1(t, standingV1(t), "/v1/docs")
+	if said.StatusCode != http.StatusOK || !strings.Contains(string(body), "openapi") {
+		t.Fatalf("the docs answer %d: %.200s", said.StatusCode, body)
+	}
+}

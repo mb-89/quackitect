@@ -4,12 +4,18 @@
 package main
 
 import (
+	"context"
 	"net"
 	"net/http"
 	"time"
 
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humago"
 	"quackitect/src/q"
 )
+
+const v1Title = "the quackitect index"
+const v1Version = "1.0.0"
 
 type valueOut struct {
 	Body struct {
@@ -26,9 +32,33 @@ func (one *door) servesV1() (net.Listener, *http.Server, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	server := &http.Server{Handler: http.NewServeMux(), ReadHeaderTimeout: headerReadTimeout}
+	mux := http.NewServeMux()
+	api := humago.NewWithPrefix(mux, "/v1", huma.DefaultConfig(v1Title, v1Version))
+	huma.Register(api, huma.Operation{
+		OperationID: "get-value",
+		Method:      http.MethodGet,
+		Path:        "/values/{name...}",
+		Summary:     "the value of a name at the latest revision",
+	}, func(_ context.Context, in *struct {
+		Name string `path:"name"`
+	}) (*valueOut, error) {
+		return valueOf(one.store, in.Name)
+	})
+	server := &http.Server{Handler: mux, ReadHeaderTimeout: headerReadTimeout}
 	go server.Serve(listen)
 	return listen, server, nil
 }
 
-func valueOf(store *q.Store, name string) (*valueOut, error) { return &valueOut{}, nil }
+// A name the catalog lacks answers a problem, and a stale one carries its mark. [[spec/design_output/watchdogs#a-stale-mark]]
+func valueOf(store *q.Store, name string) (*valueOut, error) {
+	if _, ok := store.Declared(name); !ok {
+		return nil, huma.Error404NotFound("the catalog holds no provider of " + name)
+	}
+	snap := store.Snapshot()
+	out := &valueOut{}
+	out.Body.Name, out.Body.Value, out.Body.Revision = name, snap.Read(name), snap.Revision
+	if since, stale := snap.Stale(name); stale {
+		out.Body.Stale = &since
+	}
+	return out, nil
+}

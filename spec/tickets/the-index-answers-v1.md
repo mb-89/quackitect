@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -96,6 +96,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, a test of src/index fails
+  - step: implement/change
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 420cd9926b42d96d4feaf647c4a006fea046c556
+    hash_after: 420cd9926b42d96d4feaf647c4a006fea046c556
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-index-answers-v1.md:196:1: CodeSpans: A sentence holds 4 code spans, and this one holds 5. Carry the re"
 ---
 
 # Ask
@@ -240,11 +248,19 @@ The three door cases meet a `404` from a listener holding no route, and the stal
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `src/index`, `go.mod` and `go.sum`, which the draft names
+- the door tests run a real door, and the stale case a store of its own
+- `v1.go` opens on a comment pointing at the surfaces note
+- the routes stand in the surfaces note, and the code points there
+- both review rows stand fixed, one of them by keeping the signature of `Serve`
 
 ## tests-green
 
