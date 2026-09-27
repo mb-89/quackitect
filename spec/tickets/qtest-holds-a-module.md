@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -187,6 +187,18 @@ record:
         hash: 86c2562aecacf92a
         size: 3833
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 127cd2274bb3aa6b01b1b8170bcd0296edc2e98f
+    hash_after: 127cd2274bb3aa6b01b1b8170bcd0296edc2e98f
+    inputs:
+      - name: design/draft
+        hash: 86c2562aecacf92a
+        size: 3833
+      - name: design/tests-red
+        hash: 686af89acd561d42
+        size: 1153
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -313,8 +325,10 @@ the index side runs with no database, no port and no NATS, and the fake side ope
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- files-seed-one-type: the contract suite seeds cfg/ and clock/minute alone, because the fake seeds files/ as a string and the index seeds it through its own writer as a Content; name one type for files/ in q and add a files/ case to Suite
 
 # implement
 
