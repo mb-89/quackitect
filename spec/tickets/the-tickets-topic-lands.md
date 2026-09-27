@@ -74,10 +74,15 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+step: design/review
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: open-tasks-land-in-shadow
+record:
+  - step: design/draft
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: 97cf64d82fe5c3d221b61bb2511f50641f372d21
+    hash_after: 97cf64d82fe5c3d221b61bb2511f50641f372d21
 ---
 
 # Ask
@@ -102,11 +107,33 @@ Three readers of the Ask and three of the held rule disagree today, as [[spec/de
 
 <!-- the form is text -->
 
+A new package `src/tickets` holds the one reading of a ticket, as pure functions over a note's text, and registers the topic in `q.Main`.
+
+| the part | the one reading |
+|---|---|
+| `Of(path, text, changed)` | the fields `src/index/ticket.go` answers today, with the front read through `src/yaml` in place of a line scan |
+| `Ask(text)` | the rows of the `# Ask` chapter up to the next heading of any level. A fenced block reads as text, so a `#` inside it closes nothing. Every comment drops, a comment over several rows included. This is the reading of `pull-chapter.js`, and `group.js` alone keeps comments |
+| `Held(text)` | the last record item carrying `hash_before` and no `hash_after`, the rule of `group.js`, read off the parsed record |
+| `Standing(text)` | `done` where the state reads closed, `held` where `Held` answers, `todo` otherwise |
+| `All(tickets)` | every child reads its group's standing |
+| `tickets/all` | a given name of type `[]tickets.Ticket`, which the index commits in the same commit as the `files/` rows it reads |
+
+`src/index/ticket.go` keeps the SQL read of the note rows and calls `tickets.Of` and `tickets.All`, so the index's old `tickets` verb and the window answer the one reading. Its own parse, `askLine`, `heldIn` and `topOf` go.
+
+The golden file `src/tickets/testdata/tree.golden.json` holds a row for every ticket under `spec/tickets` at the commit that writes it. A row carries the name, the hash of its text, its Ask and its standing. The test compares each row whose file still carries that hash, and logs a ticket whose text moves on. So a mint or a take leaves `go test ./...` green. `go test ./src/tickets -update` writes the file again, and the owner reads the difference at the merge.
+
+The JavaScript readers stay, and the shadow child [[spec/tickets/open-tasks-run-in-shadow]] compares them against this reading at runtime.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/index/door.go`, the `tickets` case of the verb switch, through `Tickets`
+- `src/index/topic.go`, `publishes`, which commits `tickets/all` beside the `files/` rows
+- `src/index/ticket_test.go`, every test of the parse there, which moves to `src/tickets`
+- `src/tui/work/workitems.go`, `itemsOfTickets`, which reads the rows the index answers
 
 ### tests
 
@@ -114,17 +141,35 @@ Three readers of the Ask and three of the held rule disagree today, as [[spec/de
 
 <!-- the form is list -->
 
+- `src/tickets/tickets_test.go`, `TestAskDropsComments`, a comment over one row and over several
+- `src/tickets/tickets_test.go`, `TestAskReadsFencesAsText`, a `#` inside a fence
+- `src/tickets/tickets_test.go`, `TestHeldReadsTheLastOpenItem`, the cases `heldIn` holds in `src/index/ticket_test.go` today
+- `src/tickets/tickets_test.go`, `TestChildReadsItsGroup`
+- `src/tickets/golden_test.go`, `TestTreeGolden`, which decides the golden line of the ask
+- `src/index/topic_test.go`, `TestPublishesTickets`, where a ticket row lands under `tickets/all` in the files commit
+
+The done lines and the test deciding each:
+
+- `go test ./...` passes: `./RUNME.sh test src/tickets src/index`
+- the golden file: `TestTreeGolden`
+- the check: `./RUNME.sh check`
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened: `src/index/ticket.go`, `src/index/topic.go`, `src/index/door.go`, `src/yaml/yaml.go`, `src/engine/group.js`, `src/scripts/pull-chapter.js` and `schema-read.js`
+- the callers list comes off a search for every Go function `src/index/ticket.go` exports or tests
+- each done line names its test: `TestTreeGolden` for the golden file, the test verb for `go test`, and the check verb
 
 ## review
 
