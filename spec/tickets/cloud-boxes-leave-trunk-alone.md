@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: a35f3ec45b7a093d1a54b414463d558a50e88bf3
+    hash_after: a35f3ec45b7a093d1a54b414463d558a50e88bf3
+    inputs:
+      - name: ask
+        hash: ec90a86efbfacd2b
+        size: 629
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -163,38 +172,64 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The push door every push meets refuses `main` on a cloud box, before it reads the battery.
+
+| part | where | what it does |
+|---|---|---|
+| the refusal | `holds(refs, stampText, carried, cloud)` in `src/scripts/prepush.js` | where `cloud` holds and a ref names `refs/heads/main`, answers code 1 with `cloudLeavesTrunk()` |
+| the words | `cloudLeavesTrunk` in the same file | says a cloud box pushes its own work branch alone, and `main` takes its work through `./RUNME.sh branch merge <name>` on a desk |
+| the read | `main` in the same file | passes `inCloud(process.env)` out of `.claude/skills/level0/lib/cloud.js`, the one answer to where the session runs |
+
+The hook stands at `.githooks/pre-push`, and `install.sh` points `core.hooksPath` there, so a raw `git push`, `./RUNME.sh push` and a push from a verb all meet it. The session's Bash door already sends a trunk push through the verb, and `trunkGuard` in `src/bridge/bash.js` stands unchanged. A desk passes `cloud` false, so its green push to `main` lands as today.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/scripts/prepush.js`, `main`, the one caller of `holds` in `src`
+- `.githooks/pre-push`, which runs `prepush.js`
+- `test/level0/prepush.test.js`, which calls `holds` with the stamp alone, and reads `cloud` as false
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/prepush.test.js`, a cloud box pushing main meets the refusal, whatever the battery says
+- `test/level0/prepush.test.js`, a cloud box pushes its own work branch
+
+The done lines and the case deciding each:
+
+- the refusal of main: the first case
+- the work branch: the second case
+- the check: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/scripts/prepush.js`
+- `test/level0/prepush.test.js`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `holds`, `main`, `.githooks/pre-push`, `trunkGuard`, `inCloud` and the hooks path in `install.sh` stand opened, and each reads as the table says
+- a search for `holds(` over `src` and `test` names the callers
+- each done line names the case deciding it
 
 ## tests-red
 
