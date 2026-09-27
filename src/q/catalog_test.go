@@ -141,3 +141,14 @@ func TestANameOfOtherThanLowercaseSegmentsRefuses(t *testing.T) {
 		t.Fatalf("the check answers %+v", found)
 	}
 }
+
+// [[spec/tickets/files-topic-reads-the-rows]]
+func TestAKeyOfManySegmentsStandsLast(t *testing.T) {
+	c := New()
+	GivenIn(c, "files/<path...>", "")
+	GivenIn(c, "t/<rest...>/tail", "")
+	found := faultsOf(t, c.Check(nil), BadName)
+	if len(found) != 1 || found[0].Name != "t/<rest...>/tail" {
+		t.Fatalf("the check answers %+v", found)
+	}
+}

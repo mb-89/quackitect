@@ -82,3 +82,20 @@ func TestAFamilyAnswersEachKey(t *testing.T) {
 		t.Fatal("a commit to a name the catalog lacks lands")
 	}
 }
+
+// [[spec/tickets/files-topic-reads-the-rows]]
+func TestAKeyOfManySegmentsTakesTheRestOfTheName(t *testing.T) {
+	c := New()
+	GivenIn(c, "files/<path...>", "")
+	s := NewStore(c, nil)
+	if _, err := s.Commit(0, map[string]any{"files/spec/deep/One.md": "said"}); err != nil {
+		t.Fatal(err)
+	}
+	now := s.Snapshot()
+	if now.Read("files/spec/deep/One.md") != "said" || now.Read("files/two.md") != "" {
+		t.Fatalf("the family reads %v and %v", now.Read("files/spec/deep/One.md"), now.Read("files/two.md"))
+	}
+	if _, err := s.Commit(0, map[string]any{"files": "bare"}); err == nil {
+		t.Fatal("a name with no segment for the key lands")
+	}
+}

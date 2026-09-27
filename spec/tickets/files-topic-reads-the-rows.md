@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/tests-red
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -88,6 +88,14 @@ record:
     hand: box d7d598fb92101 · claude-code-remote
     hash_before: 9eb7eccbcf2afc7735d19f2ef0ed67493a3024d6
     hash_after: 9eb7eccbcf2afc7735d19f2ef0ed67493a3024d6
+  - step: implement/tests-red
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 046df8259fcf3e9b97014cfdb924c546a70092e9
+    hash_after: 046df8259fcf3e9b97014cfdb924c546a70092e9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
 ---
 
 # Ask
@@ -196,17 +204,27 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/q src/index
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The two `src/q` cases fail on the name check and on the commit, since a key takes one segment alone. The two `src/index` cases fail on `no method called read`. The surprise: a bare `go test` of `src/index` fails on `no such module: fts5`, so the index runs under the verb or under `-tags=sqlite_fts5`.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the tests of `src/q` and `src/index` alone
+- the index cases drive the door over loopback on a temp tree, as the door's own tests do
+- each new case links this ticket
+- the read method and the family name stand in the tests once each
+- the review passes with no rows
 
 ## change
 
