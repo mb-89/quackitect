@@ -38,6 +38,27 @@ func TestAnInputFieldCarriesItsLabelAndDoc(t *testing.T) {
 	}
 }
 
+type pulled struct {
+	Ticket string `json:"ticket" label:"Ticket" doc:"the ticket the pull hands out"`
+	Leaf   string `json:"leaf" label:"Leaf"`
+}
+
+func TestAnActionOutputCarriesItsLabelAndDoc(t *testing.T) {
+	c := New()
+	ActionIn(c, "pull", func(pullIn) []Request { return nil }, Doc("pulls a ticket"), Answers[pulled]())
+	got, _ := c.Presentation("pull")
+	if len(got.Out) != 2 || got.Out[0] != (Field{Name: "Ticket", Key: "ticket", Label: "Ticket", Doc: "the ticket the pull hands out"}) {
+		t.Fatalf("pull presents the output %+v", got.Out)
+	}
+}
+
+func TestTheStartRefusesAnOutputFieldWithNoDocTag(t *testing.T) {
+	types := map[string]func(*Catalog){"puller": func(c *Catalog) {
+		ActionIn(c, "pull", func(string) []Request { return nil }, Doc("pulls a ticket"), Answers[pulled]())
+	}}
+	refused(t, Wiring{Instances: []Instance{{"work", "puller"}}}, types, "output field Leaf")
+}
+
 func TestTheStartRefusesAnInputFieldWithNoDocTag(t *testing.T) {
 	types := map[string]func(*Catalog){"puller": func(c *Catalog) {
 		ActionIn(c, "pull", func(pullIn) []Request { return nil }, Doc("pulls a ticket"))

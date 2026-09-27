@@ -62,7 +62,11 @@ type Presentation struct {
 	Icon   string
 	Looks  Look
 	Fields []Field
+	Out    []Field
 }
+
+// The type an action's last request answers, which its caller receives. [[spec/tickets/actions-answer-typed-results]]
+func Answers[Out any]() Option { return func(one *registration) {} }
 
 // [[spec/design_output/model#the-options]]
 func (c *Catalog) Presentation(name string) (Presentation, bool) {

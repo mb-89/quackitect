@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [ports-declare-their-looks]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -135,6 +135,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: f396f1bd679bdbfd0882b3f7199b6cb211ac9872
+    hash_after: f396f1bd679bdbfd0882b3f7199b6cb211ac9872
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: ddcc59b153cf41ef
+        size: 2046
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -235,26 +248,31 @@ the two looks cases decide the output label and doc line and the refusal line, t
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/looks_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/looks_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertion over the stub. The catalog presents no output fields, and the start answers a store for an output field with no doc tag. The stub q.Answers sets nothing, so the two cases meet it alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the output case and the refusal case decide the second and third lines, the note edit at implement decides the first, and the check decides the last
+the cases run over a catalog and a wiring in memory, and reach no door
 
 # gate
 
