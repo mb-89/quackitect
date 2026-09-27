@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -151,6 +151,25 @@ record:
   - step: accept
     hand: box d7db8e8df0103 · claude-code-remote
     hash_before: 9131daf2f67991683d7e10cf0f9929d36a71ca1a
+  - step: accept
+    hand: box d7db8e8df0103 · claude-code-remote
+    hash_before: 72d5e1f4e39fc63741741ac9840a64faef83ba1a
+    hash_after: 72d5e1f4e39fc63741741ac9840a64faef83ba1a
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-process-stays-editable already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: f62f4ae3f6fd31d9
+        size: 289
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/level-two]]
+        hash: b8bf73d993bb8909
+        size: 15501
+    def: 07c43ae7253713ec
 depends_on: ["the-engine-holds-the-route"]
 ---
 
@@ -209,8 +228,8 @@ no child waits on another, since each review row lands after its parent passes d
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- commit-stages-a-moved-path: movedFrom in src/scripts/commit-verb.js adds the old path of a rename the rename verb journals, after the rename stages its deletion, so git add refuses the pathspec and the commit stands undone; keep a from path out where it stands neither on disk nor in the index
+accept
+- commit-stages-a-moved-path closes: the add in src/scripts/commit-verb.js takes a moved path only where it stands on disk or in the index, the commit still names it, and test/level0/commit-verb.test.js asserts both
 
 # retro
 
