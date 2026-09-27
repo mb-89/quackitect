@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
-step: split
+step: children
 record:
   - step: sync
     hand: box d1fe1ca62214 · claude-code-remote
@@ -107,6 +107,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-verbs-land-whole already carries every commit on main.
+  - step: split
+    hand: box d7d6327f2b101 · claude-code-remote
+    hash_before: 8b2b3e54c5e55e46a8737a7beaf96efb3ec7928e
+    hash_after: 8b2b3e54c5e55e46a8737a7beaf96efb3ec7928e
 ---
 
 # Ask
@@ -135,11 +139,38 @@ Every mechanical step runs through a verb that lands it whole, and the agent rea
 
 <!-- the form is list -->
 
+- [[spec/tickets/a-nested-git-still-lands]] trivial
+- [[spec/tickets/a-reorder-asks-a-test]] trivial
+- [[spec/tickets/battery-ask-names-the-bundle]] trivial
+- [[spec/tickets/doors-read-what-commands-do]] standard
+- [[spec/tickets/every-landing-takes-a-verb]] standard
+- [[spec/tickets/git-write-tests-outside-ask]] trivial
+- [[spec/tickets/git-writes-lacking-a-verb]] trivial
+- [[spec/tickets/journal-the-rename-verb]] trivial
+- [[spec/tickets/judge-cases-turn-it-on]] trivial
+- [[spec/tickets/judge-quote-proves-its-call]] trivial
+- [[spec/tickets/merge-deletes-after-the-push]] trivial
+- [[spec/tickets/one-row-for-git-mv]] trivial
+- [[spec/tickets/only-a-read-gates-nothing]] trivial
+- [[spec/tickets/prose-verbs-land-first-try]] standard
+- [[spec/tickets/pull-env-meets-the-engine]] trivial
+- [[spec/tickets/red-verb-meets-new-sources]] trivial
+- [[spec/tickets/rename-detection-misses-rewrites]] trivial
+- [[spec/tickets/the-battery-runs-on-fixtures]] standard
+- [[spec/tickets/the-scratchpad-reads-absolute]] trivial
+- [[spec/tickets/the-verbs-need-no-wrapper]] standard
+- [[spec/tickets/verb-line-names-new-refusals]] trivial
+- [[spec/tickets/wrapper-ask-names-its-files]] trivial
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- Each child is a trivial fix or one standard change, small enough to review whole.
+- The five standard children carry the goal: the verbs, the doors, the prose, the battery and the wrapper. The trivial ones close their review findings.
+- Every child stands closed, so none waits on another.
 
 # children
 
