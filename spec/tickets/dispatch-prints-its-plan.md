@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,18 @@ record:
         hash: a8e6e03e1f365b94
         size: 3074
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e093d924e2 · claude-code-remote · helper-4
+    hash_before: 677b96e98418fca7614cde82485f40af9e781d63
+    hash_after: 677b96e98418fca7614cde82485f40af9e781d63
+    inputs:
+      - name: design/draft
+        hash: a8e6e03e1f365b94
+        size: 3074
+      - name: design/tests-red
+        hash: e58eac2283e8490b
+        size: 779
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -284,8 +296,13 @@ Ten cases fail on their own assertion against a stub planOf answering empty list
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept: the approach answers the ask, and a red case decides every done_when line but the check, which tests-green runs
+- the gate adds the case the verb table carries dispatch to test/level0/dispatch.test.js, since no case reached the row ./RUNME.sh dispatch runs
+- the implementer reads now off it.clock where planOf takes no now, since every case calls planOf(it) alone
+- the implementer prints --json on one line, since the case matches the output against ^{.*}$ with no s flag
+- a ready row carries both group and branch, since names reads group and the freeNow case reads branch
 
 # implement
 

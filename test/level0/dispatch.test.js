@@ -8,6 +8,7 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { withEntry, withField, withHashAfter } from "../../src/engine/group.js";
 import { dispatch, planOf } from "../../src/scripts/dispatch.js";
+import { verbs } from "../../src/scripts/cli.js";
 import { freeNow } from "../../src/scripts/work-free.js";
 import {
   CHILD,
@@ -195,4 +196,9 @@ test("freeNow and the plan name the same ready groups", () => {
       .sort(),
     [...free].sort(),
   );
+});
+
+// The verb table carries the row `./RUNME.sh dispatch` reaches. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
+test("the verb table carries dispatch", () => {
+  assert.equal(typeof verbs.dispatch?.run, "function");
 });
