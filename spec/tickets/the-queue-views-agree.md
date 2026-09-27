@@ -1,10 +1,21 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: The badge follows the queue with no window reload. Does that line wait for the-badge-reads-open-tasks in phase 2, while this ticket lands the rest now?
+        evidence:
+          - name: answer
+            form: choice
+            says: the answer, which the step behind this one reads
+            options: ["wait for phase 2 and land the rest now", "an interim redraw off the bridge now"]
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -76,7 +87,6 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
 record:
   - step: design/draft
     hand: box 63693613eded · claude-code-remote
@@ -111,6 +121,16 @@ The badge counts the rows the tab draws, and the sidebar redraws on a config cha
 - `./RUNME.sh check` exits 0
 
 # design
+
+## person-1
+
+<!-- The badge follows the queue with no window reload. Does that line wait for the-badge-reads-open-tasks in phase 2, while this ticket lands the rest now? -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is choice -->
 
 ## draft
 
