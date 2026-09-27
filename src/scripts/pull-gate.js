@@ -98,7 +98,8 @@ function reworked(it, one, gatePath, round) {
       [...prefix, to].join("/"),
     ]),
   );
-  for (const copy of copies) copy.input = rewired(copy.input, named, pathed);
+  for (const copy of copies)
+    if (copy.input !== undefined) copy.input = rewired(copy.input, named, pathed);
   into.splice(nested ? into.length : at, 0, ...copies);
   readsBoth(steps, new Set(copies), pathed);
 
@@ -116,7 +117,6 @@ function reworked(it, one, gatePath, round) {
 
 // A copy reads the copies of its own round, in place of the leaves they copy. [[spec/design_output/pull#the-gate]]
 function rewired(input, named, pathed) {
-  if (input === undefined) return input;
   const list = [input]
     .flat()
     .map((one) => named.get(String(one)) ?? pathed.get(String(one)) ?? one);

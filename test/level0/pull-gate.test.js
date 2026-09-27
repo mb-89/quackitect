@@ -246,6 +246,20 @@ test("after a reject on the standard route, implement and tests-green read both 
 });
 
 // [[spec/design_output/pull#the-gate]]
+test("after a reject the pass of draft-2 lands", () => {
+  const { it, back } = gated("reject\n- the fail road is missing");
+  assert.equal(back.code, 0, back.said);
+
+  heard(() => pulling(ROOT, ["pull"], it));
+  const fields = JSON.stringify({ approach: "The approach takes the fail road." });
+  const passed = heard(() =>
+    pulling(ROOT, ["pull", "a-child", "--pass", "--fields", fields], it),
+  );
+  assert.equal(passed.code, 0, passed.said);
+  assert.match(passed.said, /a-child passes design\/draft-2/);
+});
+
+// [[spec/design_output/pull#the-gate]]
 test("a second reject inserts a person step", () => {
   const { back, text } = gated(
     "reject\n- the fail road is missing still",
