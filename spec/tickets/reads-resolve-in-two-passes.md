@@ -118,18 +118,21 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
+depends_on: [the-wiring-file-binds-ports]
 ---
 
 # Ask
 
-The catalog resolves each read to its writer in two passes, per [[spec/design_output/model#the-index-resolves-in-passes]]. A read still open after the second refuses the start loudly. A reader whose writer registers and runs nowhere takes the built-in value, marked `not provided`.
+The index resolves the wiring in two passes, per [[spec/design_output/model#the-index-resolves-in-passes]]. Every wired in-port finds its writer, the types match, and each standard name has one writer. The start refuses loudly on each fault, naming the port.
 
-Modules load in any order, so one pass refuses a sound catalog. A writer that crashes then fails the start, where its readers could run on the built-in value.
+Modules load in any order, so one pass refuses a sound wiring. An instance that crashes then fails the start, where its readers could run on the built-in value.
 
 - `go test ./...` from the root passes
 - a case registers a reader before its writer, and the index starts
-- a case leaves a read open, and reads the refusal naming the reader, its file and line, and the name
-- a case registers a writer that runs nowhere, and reads the built-in value marked `not provided`
+- a case leaves an in-port with no wire and no `built-in` mark, and reads the refusal naming the port
+- a case wires two out-ports to one standard name, and reads the refusal naming both
+- a case wires an in-port to a writer of another type, and reads the refusal naming both types
+- a case names an instance that runs nowhere, and reads the built-in value marked `not provided`
 - `./RUNME.sh check` exits 0
 
 # design

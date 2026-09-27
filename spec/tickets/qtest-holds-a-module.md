@@ -122,13 +122,14 @@ group: the-foundation-closes-its-gaps
 
 # Ask
 
-`q/qtest` stands as [[spec/design_output/model#the-fake-index]] says, and `src/modules/` holds the module packages. The fake index keeps one contract suite, run against `qtest` and the real index in process, per [[spec/design_output/model#the-fake-keeps-a-contract]].
+`q/qtest` stands as [[spec/design_output/model#the-fake-index]] says, and `src/modules/` holds the module packages. A case feeds a module's in-ports and reads its out-ports by their local names. The fake index keeps one contract suite, run against `qtest` and the real index in process, per [[spec/design_output/model#the-fake-keeps-a-contract]].
 
 A module tests against a fake index alone, per the owner's rule. Without the suite, the fake drifts from the index it stands for, and a green module test proves the fake.
 
 - `go test ./...` from the root passes
-- a case runs a derived provider, a fold and an action through `qtest`
+- a case runs a derived provider, a fold and an action through `qtest`, by local port names
 - a case reads the commits and the requests each run answers
+- a case seeds a config key the way it seeds any other in-port
 - the contract suite passes against `qtest` and the real index, with no port and no NATS
 - `./RUNME.sh check` exits 0
 

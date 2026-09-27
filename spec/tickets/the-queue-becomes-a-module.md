@@ -123,7 +123,7 @@ depends_on: [qtest-holds-a-module]
 
 # Ask
 
-The queue, its score, its outline and its places, becomes `src/modules/queue`, and its tests run through `q/qtest` alone. It reads the names of `tickets/`, the plan file through `files/`, the cloud marker and `clock/minute`, and no git ref. The port [[spec/tickets/the-queue-moves-to-plan]] lands is where it starts, with its golden file.
+The queue, its score, its outline and its places, becomes `src/modules/queue`, and its tests run through `q/qtest` alone. Its in-ports take the tickets, the plan file, the cloud marker and the minute, and the wiring binds them. It reads no git ref. The port [[spec/tickets/the-queue-moves-to-plan]] lands is where it starts, with its golden file.
 
 The count reads the queue. Without the move the pilot reads a port the owner's rule of a fake index leaves outside.
 

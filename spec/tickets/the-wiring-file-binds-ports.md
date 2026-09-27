@@ -118,16 +118,21 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
+depends_on: [qtest-holds-a-module]
 ---
 
 # Ask
 
-The index hands the `providers.*` keys to `Check` at start. So the alternative provider a key picks reaches the catalog check, per [[spec/design_output/model#the-provider-kinds]].
+A module declares local ports alone, with the tag `q:"<port>"` on an in-port, and spells no other module's name. `spec/wiring.yaml` names the instances to load and binds each port to a name, per [[spec/design_output/model#the-wiring-file]].
 
-A key picking a provider changes nothing today, because the check reads no key.
+A module then stays local, and one file holds the layout. An alternative calculation is another module type in the wiring, so the `providers.*` keys leave.
 
 - `go test ./...` from the root passes
-- a case sets `providers.<name>`, and reads the pick in the catalog check's answer
+- a case wires an out-port and an in-port to one standard name, and reads the value arrive
+- a case wires an in-port port to port, and reads the name `<instance>/<port>` of its writer
+- a case reads an out-port with no wire as `<instance>/<port>`
+- a case loads one module type as two instances, each with its own config
+- no module under `src/modules` spells another module's path, which `onlyq` holds
 - `./RUNME.sh check` exits 0
 
 # design

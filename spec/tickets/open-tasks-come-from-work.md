@@ -83,12 +83,12 @@ group: open-tasks-shadow-lands
 
 # Ask
 
-`work/rows` and `work/open-tasks` stand in `src/modules/work`, ported from `work-answer.js`. They read the names of the queue module and the cloud marker, and no git. The tests run through `q/qtest` alone.
+The out-ports `rows` and `open-tasks` stand in `src/modules/work`, ported from `work-answer.js`. Its in-ports take the queue's places and the cloud marker, and the wiring binds them, with no git. The tests run through `q/qtest` alone, by the local port names.
 
-The badge and the header then read one provider. Without it they keep counting two ways.
+The badge and the header then read one name, `work/open-tasks`. Without it they keep counting two ways.
 
 - `go test ./...` from the root passes
-- a case reads `work/open-tasks` over a fake tree of tickets
+- a case reads the out-port `open-tasks` over a fake tree of tickets
 - `./RUNME.sh check` exits 0
 
 # design

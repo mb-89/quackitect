@@ -128,7 +128,7 @@ A fake module drives the index through every transaction a module makes, per [[s
 The index then tests against the contract its modules see. A change to the core shows its effect on every module at once.
 
 - `go test ./...` from the root passes
-- a case reads the two passes, and the refusal of a read left open
+- a case reads the passes over the wiring, and the refusal of an in-port left open
 - a case reads a write refused from a module registering no such output
 - a case reads one snapshot, the commit and the push
 - a case reads the built-in value marked `not provided` for a writer running nowhere
