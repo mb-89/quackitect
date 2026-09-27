@@ -319,7 +319,7 @@ test("a pass writes the inputs and the definition hash beside the tips it record
   assert.equal(entry.hash_before, SHA);
 });
 
-// A copy stranding a recorded leaf would leave the record pointing nowhere, so the ticket waits for ticket update. [[spec/design_output/pull#an-input-marks-its-steps]]
+// A copy stranding a recorded leaf leaves the record pointing nowhere, so the ticket waits for ticket update. [[spec/design_output/pull#an-input-marks-its-steps]]
 test("a process edit dropping a leaf the record names leaves the ticket as it stands", () => {
   const hash = processHash(`for: a route in two phases\n${ROUTE()}`);
   const built = made(CHILD("implement/tests", hash));
