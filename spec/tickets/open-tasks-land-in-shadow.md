@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: retro/notes
+step: retro/write
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [the-foundation-lands-unchanged]
@@ -97,6 +97,14 @@ record:
     hand: the engine
     hash_before: f10a75f63c7a669a2af11294d6d87314a5e427c9
     hash_after: f10a75f63c7a669a2af11294d6d87314a5e427c9
+  - step: retro/notes
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: 27839b589dad1a5910262f32c288258ed6e86dfa
+    hash_after: a36c608b86cb373a634999aa9161e9ef5bd0f863
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
