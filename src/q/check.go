@@ -123,11 +123,6 @@ func twice(group named) []Fault {
 	return faults
 }
 
-// Every name the catalog registers, one a group, which the index reads a providers key for. [[spec/tickets/providers-keys-reach-check]]
-func (c *Catalog) Names() []string {
-	return nil
-}
-
 func (c *Catalog) Check(keys map[string]string) []Fault {
 	regs := c.all()
 	var faults []Fault
