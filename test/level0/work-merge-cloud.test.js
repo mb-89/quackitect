@@ -85,4 +85,12 @@ test("merge of a work branch pushes main and closes the branch, and keeps it whe
   assert.equal(held.code, 0, held.said);
   assert.ok(!ranGit(kept.outside).includes("git push origin --delete work/one-group"));
   assert.match(held.said, /then run \.\/RUNME\.sh branch close one-group/);
+
+  const refused = doorsSaying(
+    merging({ "git push origin --delete work/one-group": { exitCode: 1 } }),
+  );
+  refused.it.node = "node";
+  const left = heard(() => work(ROOT, ["merge", "one-group"], { ...refused.it, cloud: false }));
+  assert.equal(left.code, 0, "a refused delete leaves the merge green");
+  assert.match(left.said, /stands on the remote, and trunk carries its ticket closed/);
 });

@@ -556,17 +556,17 @@ them, in the order the score sets. [[spec/tickets/the-queue-is-a-score]]
 
 ## A dependency waits for trunk
 
-A branch meets its dependency once the branch it names stands no more:
+A branch meets its dependency once the dependency's ticket stands closed on trunk:
 
-| the dependency's branch | the dependent |
+| the dependency | the dependent |
 |---|---|
-| stands at `todo`, held or `done` | waits |
-| merged, and still on the remote | waits |
-| gone | runs |
+| its ticket on trunk stands at `state: closed` | runs |
+| its branch stands no more | runs |
+| `todo`, held, or `done` on its own branch | waits |
 
-The read looks for the branch on the remote alone, and reads no history. So a
-shallow clone reads the same answer as a full one. A merge closes the branch
-once trunk holds all of it, so a chain of work runs itself in order.
+A box closes the group's ticket on its branch, and trunk carries it that way
+after the merge alone. So the read looks at trunk's copy of one file, and reads no
+history. A shallow clone reads the same answer as a full one.
 
 `take` merges trunk in. A dependent taken before its dependency lands starts
 from a trunk carrying none of that work. It then builds that work a second time.

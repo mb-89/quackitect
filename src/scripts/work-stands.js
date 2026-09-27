@@ -100,9 +100,12 @@ export function shutBy(text, shared) {
   return shared.get(key) === true ? "" : key;
 }
 
-// A dependency waits while its branch stands, and a closed branch is a finished one, so no history is read. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+// A dependency waits until trunk carries its ticket closed, or its branch goes. [[spec/design_output/work#a-dependency-waits-for-trunk]]
 export function waitingOn(text, standing) {
-  return dependsOn(text).filter((name) => standing.has(`work/${name}`));
+  return dependsOn(text).filter((name) => {
+    const status = standing.get(`work/${name}`);
+    return status === TODO || status === HELD || status === DONE;
+  });
 }
 
 export function standingOf(tickets, merged = new Set()) {
@@ -150,6 +153,17 @@ function branchesIn(it, argv) {
   );
 }
 
+// A group landed once trunk carries its ticket closed: a box closes it on the branch, and trunk reads it closed after the merge alone. No history is read. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+export function landedHere(it, branches) {
+  return new Set(
+    branches.filter(
+      (branch) =>
+        fieldOf(textAt(it, `origin/${TRUNK}`, ticketAt(ticketNamed(branch))), "state") ===
+        CLOSED,
+    ),
+  );
+}
+
 // [[spec/design_output/work#held-derives-from-the-record]]
 export function groupStanding(text) {
   if (!text) return "";
@@ -164,7 +178,8 @@ export function refsHere(it) {
     true,
   );
   if (!said.ok) return [];
-  return refsIn(said.out, mergedHere(it)).map((one) => ({
+  const branches = refsIn(said.out).map((one) => one.branch);
+  return refsIn(said.out, landedHere(it, branches)).map((one) => ({
     ...one,
     orphan: !baseOnTrunk(it, one.branch).shares,
   }));
