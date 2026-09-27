@@ -319,3 +319,4 @@ fail
 - the count lands on main, so the badge and the brackets read `Places.Takeable` off `PlacesAt`
 - `src/tui/workcount_test.go` holds the printed count equal to the brackets
 - the briefcase icon and the rest of the ask stand open
+- the owner answers person-1 with a yes, and doubts it. Word for word: "Does the badge redraw wait for phase two? Yeah, I guess. I'm not sure. Yeah, I guess." The redraft asks again where phase 2 moves the badge elsewhere
