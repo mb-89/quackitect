@@ -1,5 +1,5 @@
-// The server keys a box on its root as `same` compares two paths, so a drive
-// letter's case and a slash's direction build no second box.
+// The server keys a box on its root as `same` folds it, so a drive letter's
+// case and a slash's direction reach the box that root already holds.
 // [[spec/tickets/box-keys-fold-drive-letters]]
 
 import assert from "node:assert/strict";
