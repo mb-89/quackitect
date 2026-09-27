@@ -42,6 +42,13 @@ var OnlyQ = &analysis.Analyzer{
 	Run:  onlyQ.run,
 }
 
+// [[spec/design_output/model#the-build-checks-imports]]
+var NoModule = &analysis.Analyzer{
+	Name: "nomodule",
+	Doc:  "a module, a door, the index or a renderer imports no package under src/modules past its own",
+	Run:  func(*analysis.Pass) (any, error) { return nil, nil },
+}
+
 var NoName = &analysis.Analyzer{
 	Name: "noname",
 	Doc:  "a door, the index or a renderer imports no package under src/modules",

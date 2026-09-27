@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -132,6 +132,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: e1c5cff8e115ed94f00771ce4ac6f5ac1a8559ad
+    hash_after: e1c5cff8e115ed94f00771ce4ac6f5ac1a8559ad
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: 58296f0a043bc171
+        size: 4966
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -251,26 +264,32 @@ each done_when line names its test: the four wiring cases decide the wires and t
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q src/imports
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/wiring_test.go
+src/imports/imports_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every wiring case fails on its own assertion over the stubs: Load answers an empty catalog, so a seed finds no provider and an unwired out-port reads nil, and ReadWiring answers no instance. The planted modules/greedy imports modules/names, and the stub NoModule reports nothing. The surprise: src/yaml reads a dotted key such as queue.rows as one key, so the wiring keeps the port notation the model writes. CfgIn stands real already, since it registers a given at config/<key> and Load does the rest.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a case: the standard name, the port-to-port wire, the unwired out-port and the two instances each have a wiring case, TestAModuleImportingAModuleIsNamed decides nomodule, and go test and the check decide the rest as commands
+the cases run over a catalog in memory, and the import case plants its packages in a folder of its own, so no door stands unfaked
 
 # gate
 

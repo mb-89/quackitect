@@ -19,6 +19,7 @@ var planted = map[string]string{
 	"modules/nosy/nosy.go":   "package nosy\n\nimport \"os\" // want `quackitect/src/modules/nosy imports os`\n\nfunc Name() string { return os.Getenv(\"NAME\") }\n",
 	"modules/work/work.go":   "package work\n\nimport \"quackitect/src/modules/names\"\n\nfunc Name() string { return names.Of() }\n",
 	"modules/names/names.go": "package names\n\nfunc Of() string { return \"work\" }\n",
+	"modules/greedy/greedy.go": "package greedy\n\nimport \"quackitect/src/modules/names\" // want `quackitect/src/modules/greedy imports quackitect/src/modules/names`\n\nfunc Name() string { return names.Of() }\n",
 	"tui/frame/frame.go":     "package frame\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/tui/frame imports quackitect/src/modules/work`\n\nfunc Title() string { return work.Name() }\n",
 }
 
@@ -71,4 +72,9 @@ func TestFaultsNameADoorImportOnce(t *testing.T) {
 	if said := Faults("quackitect/src/modules/work", []string{"quackitect/src/q/qtest", "quackitect/src/doors/disk"}); len(said) != 1 {
 		t.Fatalf("the faults read %v", said)
 	}
+}
+
+// [[spec/design_output/model#the-build-checks-imports]]
+func TestAModuleImportingAModuleIsNamed(t *testing.T) {
+	analysistest.Run(t, plant(t), NoModule, "quackitect/src/modules/greedy")
 }
