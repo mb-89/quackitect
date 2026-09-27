@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -72,11 +72,49 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
+step: retro/cloud
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [open-tasks-land-in-shadow]
 enabled_by: migration.phase2switch
+record:
+  - step: sync
+    hand: box d7d80931cecf · claude-code-remote
+    hash_before: ef191748722031f7e521c65f9fb70c78629bde96
+    hash_after: 2b32262550cc80db1665a67461adbb90cb75bc9e
+  - step: sync
+    hand: box d7d80931cecf · claude-code-remote
+    hash_before: 832b75de0163512a2cf31f3d96500da425749116
+    hash_after: 832b75de0163512a2cf31f3d96500da425749116
+    answered:
+      - name: sync
+        exit: 0
+        said: work/open-tasks-switch-over already carries every commit on main.
+  - step: split
+    hand: box d7d80931cecf · claude-code-remote
+    hash_before: 6bf3f8303b230669979340d08e654ca7d7c6019b
+    hash_after: 6bf3f8303b230669979340d08e654ca7d7c6019b
+  - step: children
+    hand: the engine
+    hash_before: 2635e46d354e6697f658e662212f277ccfbdea46
+    hash_after: 2635e46d354e6697f658e662212f277ccfbdea46
+  - step: retro/notes
+    hand: box d7d80931cecf · claude-code-remote
+    hash_before: d7548184cc20546204b7ec51606d33d99f9ab4f1
+    hash_after: d7548184cc20546204b7ec51606d33d99f9ab4f1
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box d7d80931cecf · claude-code-remote
+    hash_before: c115be15dead0c5ec7da65764ca7d4aa2930e7f8
+    hash_after: c115be15dead0c5ec7da65764ca7d4aa2930e7f8
+  - step: retro/cloud
+    hand: box d7d80931cecf · claude-code-remote
+    hash_before: cd02f0ab67541592b7a1dfbed8f6a5cd9d8cc9d7
+    hash_after: cd02f0ab67541592b7a1dfbed8f6a5cd9d8cc9d7
+reason: done
 ---
 
 # Ask
@@ -93,6 +131,8 @@ Done when the badge and the work tab's brackets read one name.
 
 <!-- branch sync, so the branch carries trunk -->
 
+    ./RUNME.sh branch sync
+
 <!-- the form is command -->
 
 # split
@@ -105,11 +145,18 @@ Done when the badge and the work tab's brackets read one name.
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-badge-reads-open-tasks]], standard
+- [[spec/tickets/the-count-chain-leaves]], standard
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- Each child changes one reader or one delete, and a reviewer reads it whole.
+- The badge child moves the key, and the count child takes the old path out.
+- The count child waits on the badge child, which waits on [[spec/tickets/open-tasks-run-in-shadow]].
 
 # children
 
@@ -125,6 +172,8 @@ Done when the badge and the work tab's brackets read one name.
 
 <!-- the form is command -->
 
+    ./RUNME.sh retro notes
+
 ## write
 
 <!-- writes the retro over the box's own window -->
@@ -135,11 +184,18 @@ Done when the badge and the work tab's brackets read one name.
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-badge-reads-open-tasks]]: waits on [[spec/tickets/open-tasks-run-in-shadow]] under `depends_on`.
+- The sync and split steps pass, and both children leave the group at `branch done`.
+- The switch itself waits: `work/open-tasks` and the `slices` key stand nowhere in the tree.
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- A grep and the shadow log show the missing path before any code changes.
+- The commit verb runs the check, so the one push lands green.
 
 ### badly
 
@@ -147,11 +203,21 @@ Done when the badge and the work tab's brackets read one name.
 
 <!-- the form is list -->
 
+- 04:20 UTC: the switch key reads true while the shadow group closes with its children open.
+- 04:22 UTC: a Bash call and a commit name no ticket, and the doors refuse them.
+- 04:26 UTC: the pull reads the group as a todo in hand and hands nothing out.
+- 04:27 UTC: a patch naming the group refuses, because the plan names a todo title.
+- 04:29 UTC: the stop hook turns the turn toward the pull and `branch done`.
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- The switch key: [[spec/design_output/work#a-switch-holds-a-group]] reads the shadow log before a box takes the group.
+- The plan: a group named as working adds no todo that blocks the pull.
+- The door: a patch serves the ticket the plan names, whatever todo stands in hand.
 
 ### thoughts
 
@@ -159,11 +225,19 @@ Done when the badge and the work tab's brackets read one name.
 
 <!-- the form is text -->
 
+The agent weighs building the shadow path here, and refuses it, because four tickets outside the group own it. It holds `branch done` back first, since the children leave the group there. The stop hook then names `branch done`, and the agent follows it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- Each fact points at the ticket owning it.
+- The chapter adds no number past the times of the run.
+- The chapter writes no header.
+- The run carries the stop hook's prompt, and every error stands with its time in UTC.
+- The chapter names the agent and the owner by role, and no path of the box.
 
 ## cloud
 
@@ -175,17 +249,27 @@ Done when the badge and the work tab's brackets read one name.
 
 <!-- the form is list -->
 
+- none: every tool and host this run needs answers on the box
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the ticket door, on a Bash call and a commit naming no ticket
+- the plan gate, which blocks the pull while a todo stands in hand
+- the stop hook, which turns the turn toward `branch done`
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/queue-approach-sentence-split]], the person step the whole chain waits on
+- [[spec/tickets/the-badge-reads-open-tasks]] and [[spec/tickets/the-count-chain-leaves]], out of the group at `branch done`
+- the owner decides whether `migration.phase2switch` stays true before the shadow runs
 
 # Discussion
 
