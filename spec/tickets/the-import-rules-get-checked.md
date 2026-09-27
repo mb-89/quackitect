@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -104,6 +104,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 4d0d0a52a7ffd507f0f7986667a8f7169d970960
+    hash_after: 4d0d0a52a7ffd507f0f7986667a8f7169d970960
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/imports passes
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -272,11 +284,15 @@ The three planted cases fail on their want comments, and `TestFaultsNameAModuleI
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/imports
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -284,11 +300,31 @@ The three planted cases fail on their want comments, and `TestFaultsNameAModuleI
 
 <!-- the form is text -->
 
+The battery holds the import rules, so a single import breaking one turns the check red.
+
+| the part | what it does |
+|---|---|
+| `nodoor` | names an import of a door from a module |
+| `noname` | names an import of a module from a door, the index or a renderer |
+| `Faults` | the predicate both analyzers and the tree test share |
+| the tree test | loads every package of the module, and fails on each fault |
+
+What I assume, for the reader at the merge:
+
+- No Go door and no Go module stands yet, so the tree passes today. Each rule holds from the first file under those folders.
+- The planted packages stand in a temp folder, because the commit hook reads a Go file under `testdata` as code.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the draft names
+- the planted packages stand in for doors and modules
+- each file opens on a comment pointing at the Go doors note
+- the note owns the analyzers
+- the review row stands fixed, and `says` names each assumption
 
 # Discussion
 
