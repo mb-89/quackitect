@@ -483,7 +483,7 @@ why() {
     drawing) say "drawing: the modules the route drawing takes, bundled into the one script a webview loads" ;;
     browser) say "browser: the chromium the drawing's test drives" ;;
     editor-link) say "editor-link: this tree's own sidebar, linked into the editor and named in its list" ;;
-    editor-extensions) say "editor-extensions: the Vale and Biome extensions the tracked settings point at" ;;
+    editor-extensions) say "editor-extensions: the Vale, Biome and Mermaid extensions the tracked settings point at" ;;
     git-hooks) say "git-hooks: the pre-commit and pre-push doors, so a commit by hand meets the privacy check and a push to main meets the battery" ;;
   esac
 }
