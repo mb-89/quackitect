@@ -69,3 +69,5 @@ Today the hold refuses the note. A pull naming it answers that one hand holds on
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The fix stands in commit `e1fe50650` on `work/the-engine-holds-the-route`, with `test/level0/retro-notes-pull.test.js`. The next hand runs the tests and the check, and hands the evidence back.

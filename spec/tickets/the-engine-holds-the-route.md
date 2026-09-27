@@ -75,7 +75,7 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
 depends_on: [each-thing-stands-in-place, the-gates-read-the-state, the-owners-word-reaches-work, the-servers-and-views-hold, the-verbs-land-whole]
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box d7d6cb0fb1105 · claude-code-remote
@@ -108,6 +108,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: 3e4f6dc204eb8e0e41d98e086d7630d72d99620e
+    hash_after: 3e4f6dc204eb8e0e41d98e086d7630d72d99620e
 ---
 
 # Ask
@@ -177,38 +181,56 @@ a-gate-names-its-question waits on no open ticket, since every other child stand
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+sync takes trunk into the branch
+the split reads the three chapters against the closed children, and mints a-gate-names-its-question
+a-gate-names-its-question closes done: a gate hand-out prints its question and the question before the clear
+a-moved-input-marks-steps carries the gate-commit line in its Discussion
+the private note becomes write-marks-leave-the-plugin
+a-retro-hand-decides-notes: a group at a retro step hands its notes before itself
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+the split reads each chapter line against the done_when lines, and finds the one gap in the code
+the live tree proves the engine fix: the next bare pull hands the note
 
 ### badly
 
 <!-- what did not, each with its moment in the log or the transcript -->
-
 <!-- the form is list -->
+
+the fix verb reflows the whole tree before a commit, and a checkout puts the reflow back
+the auto mode check then refuses a read of the committed diff
+the retro hand meets a refusal on every road to the note, over many calls
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+the commit verb alone formats what it lands, so no hand runs the fix verb before a commit
+a-retro-hand-decides-notes closes the road the retro lacks
+the pull names the road to a note where a group stands at retro/notes
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The plan's working todo and the queue binding each refuse a pull the design sends. The hand reads the pull code before it reads the refusal as final.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+BEFORE_CLEAR stands in pull-chapter.js alone, and pull.md points at it
+the change adds no number
+the new test file's header says what it proves, and counts nothing
 
 ## cloud
 
