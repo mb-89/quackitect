@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -159,6 +159,15 @@ record:
         hash: 8b4209e6b4a73d66
         size: 755
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 70721e8b6cc944ccce9ad6a786431ad1992210b2
+    hash_after: 70721e8b6cc944ccce9ad6a786431ad1992210b2
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -301,14 +310,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/work-fix.js src/scripts/work.js test/level0/work-done.test.js test/level0/work-fix.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches work-fix.js, the one line in finish, its import, and the cases, and the schema field landed with fix-schema-case-reads-fix
+- the cases reach git and the disk through the fakes of work-doors.js alone
+- the header of src/scripts/work-fix.js names the feature groups and fix groups chapter it implements
+- the fix field stands once as FIX in work-fix.js and once in the schema, and waitsOnPerson stays the one reader of a hand
 
 ## tests-green
 

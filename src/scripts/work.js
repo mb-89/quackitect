@@ -52,6 +52,7 @@ import {
 import { readyToMerge, review } from "./work-review.js";
 import { serving } from "./serve.js";
 import { freeIn, trigger } from "./work-free.js";
+import { fixRefuses } from "./work-fix.js";
 import { testVerb } from "./work-test.js";
 import { unblock } from "./work-unblock.js";
 import { list } from "./work-list.js";
@@ -403,8 +404,6 @@ function heldHere(it) {
   return held.hand === roleOf(hand) ? { branch, name, hand, text } : null;
 }
 
-// [[spec/design_output/work#the-routine-a-verb-names]]
-
 // [[spec/design_output/work#a-group-is-a-ticket]]
 function finish(it) {
   const branch = workBranchHere(it, "done");
@@ -419,7 +418,7 @@ function finish(it) {
 
   const stopped = ready(it, branch);
   if (stopped.code) return stopped.code;
-  if (childrenStand(it, name)) return 1;
+  if (childrenStand(it, name) || fixRefuses(it, it.disk.read(path))) return 1;
 
   const open = retroOpen(it, it.disk.read(path));
   if (open) return retroFirst(name, open);
