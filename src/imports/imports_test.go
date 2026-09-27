@@ -66,3 +66,9 @@ func TestFaultsNameAModuleImportingOs(t *testing.T) {
 		t.Fatalf("the faults read %v", said)
 	}
 }
+
+func TestFaultsNameADoorImportOnce(t *testing.T) {
+	if said := Faults("quackitect/src/modules/work", []string{"quackitect/src/q/qtest", "quackitect/src/doors/disk"}); len(said) != 1 {
+		t.Fatalf("the faults read %v", said)
+	}
+}

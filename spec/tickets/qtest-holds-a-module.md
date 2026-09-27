@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -199,6 +199,15 @@ record:
         hash: 686af89acd561d42
         size: 1153
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 5ab56d92fba07fffbc355d656a1349c6abb09434
+    hash_after: 5ab56d92fba07fffbc355d656a1349c6abb09434
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -339,14 +348,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q/action.go src/q/store.go src/modules/modules.go src/imports/imports.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/q/action.go, src/q/store.go, src/modules/modules.go and src/imports/imports.go and their tests, and store.go carries the listener call the seen field names
+the change reaches no door: the store calls its listeners in memory, and the fake index and the index in process run the same suite
+every changed file opens on a header or a pointer at spec/design_output/model
+the list of outside packages stands once in src/imports/imports.go, and the model note points at the analyzer for it
 
 ## tests-green
 

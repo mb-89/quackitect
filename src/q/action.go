@@ -40,5 +40,5 @@ func (s *Store) Act(name string, input any) ([]Request, error) {
 	if one == nil || one.kind != action {
 		return nil, fmt.Errorf("%s names no action", name)
 	}
-	return nil, nil
+	return one.act(input)
 }

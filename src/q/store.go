@@ -59,13 +59,22 @@ func (s *Store) Snapshot() Snapshot {
 
 // [[spec/design_output/model#snapshots-and-revisions]]
 func (s *Store) Commit(read int64, as Writer, values map[string]any) (int64, error) {
+	revision, heard, err := s.commit(read, as, values)
+	for _, hand := range heard {
+		hand(values)
+	}
+	return revision, err
+}
+
+// The hands hear a commit after the lock lets go, so a hand reading a snapshot waits on nothing. [[spec/design_output/model#the-fake-index]]
+func (s *Store) commit(read int64, as Writer, values map[string]any) (int64, []func(values map[string]any), error) {
 	for name, value := range values {
 		one := s.owner(name)
 		if one == nil {
-			return 0, fmt.Errorf("the catalog holds no active provider of %s", name)
+			return 0, nil, fmt.Errorf("the catalog holds no active provider of %s", name)
 		}
 		if got := reflect.TypeOf(value); got == nil || !got.AssignableTo(one.typ) {
-			return 0, fmt.Errorf("%s holds a %s, not a %T", name, one.typ, value)
+			return 0, nil, fmt.Errorf("%s holds a %s, not a %T", name, one.typ, value)
 		}
 	}
 	s.mu.Lock()
@@ -89,7 +98,7 @@ func (s *Store) Commit(read int64, as Writer, values map[string]any) (int64, err
 	}
 	s.revision++
 	s.values = next
-	return s.revision, nil
+	return s.revision, s.heard, nil
 }
 
 // Takes the names out of the store in one revision, so a value past its window leaves. [[spec/design_output/model#what-stays-how-long]]

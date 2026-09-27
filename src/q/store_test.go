@@ -197,3 +197,18 @@ func TestADropRefusesANameNobodyProvides(t *testing.T) {
 		t.Fatal("the drop takes a name nobody provides")
 	}
 }
+
+// [[spec/design_output/model#the-fake-index]]
+func TestAListenerReadsTheSnapshotOfItsCommit(t *testing.T) {
+	c := New()
+	n := GivenIn(c, "t/n", 0)
+	s := NewStore(c, nil)
+	var read []any
+	s.OnCommit(func(values map[string]any) { read = append(read, values["t/n"], s.Snapshot().Read("t/n")) })
+	if _, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/n": 1}); err != nil {
+		t.Fatal(err)
+	}
+	if len(read) != 2 || read[0] != 1 || read[1] != 1 {
+		t.Fatalf("the listener reads %v", read)
+	}
+}

@@ -24,7 +24,11 @@ type rule struct {
 var (
 	noDoor = rule{isModule, isDoor, "a module imports no door"}
 	noName = rule{seesNames, isModule, "a door, the index or a renderer imports no module"}
+	onlyQ  = rule{isModule, pastQ, "a module imports q, q/qtest and the pure standard library alone"}
 )
+
+// The standard library packages that reach the outside, per [[spec/design_output/model#the-build-checks-imports]].
+var impure = []string{"os", "io/fs", "io/ioutil", "net", "database/sql", "syscall", "unsafe", "plugin", "log/syslog", "runtime/cgo"}
 
 var NoDoor = &analysis.Analyzer{
 	Name: "nodoor",
@@ -35,7 +39,7 @@ var NoDoor = &analysis.Analyzer{
 var OnlyQ = &analysis.Analyzer{
 	Name: "onlyq",
 	Doc:  "a package under src/modules imports q, q/qtest and the pure standard library alone",
-	Run:  func(*analysis.Pass) (any, error) { return nil, nil },
+	Run:  onlyQ.run,
 }
 
 var NoName = &analysis.Analyzer{
@@ -47,7 +51,7 @@ var NoName = &analysis.Analyzer{
 // [[spec/design_output/model#the-build-checks-imports]]
 func Faults(from string, imported []string) []string {
 	out := []string{}
-	for _, one := range []rule{noDoor, noName} {
+	for _, one := range []rule{noDoor, noName, onlyQ} {
 		for _, path := range imported {
 			if fault := one.fault(from, path); fault != "" {
 				out = append(out, fault)
@@ -86,6 +90,22 @@ func under(path, folder string) bool {
 
 func isModule(path string) bool { return under(path, "src/modules") }
 func isDoor(path string) bool   { return under(path, "src/doors") }
+
+func pastQ(path string) bool {
+	if path == module+"src/q" || path == module+"src/q/qtest" || isDoor(path) {
+		return false
+	}
+	first, _, _ := strings.Cut(path, "/")
+	if strings.Contains(first, ".") || strings.HasPrefix(path, module) {
+		return true
+	}
+	for _, one := range impure {
+		if path == one || strings.HasPrefix(path, one+"/") {
+			return true
+		}
+	}
+	return false
+}
 
 func seesNames(path string) bool {
 	if isDoor(path) || under(path, "src/index") {
