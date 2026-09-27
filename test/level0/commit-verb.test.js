@@ -281,7 +281,10 @@ test("a commit naming a renamed ticket lands the old path's deletion with it", a
   assert.equal(code, 0);
   const ran = ranGit(git);
   const both = "-- spec/tickets/new-name.md spec/tickets/old-name.md";
-  assert.ok(ran.includes(`git add -A ${both}`), "the old path stages with the new");
+  assert.ok(
+    ran.includes("git add -A -- spec/tickets/new-name.md"),
+    "the staged-away old path stays out of the add",
+  );
   assert.ok(ran.includes(`git commit -m ${CLEAN} ${both}`), "the commit takes both");
   assert.ok(!ran.some((one) => one.includes("src/a.js")), "an unnamed path stays out");
 });
@@ -309,10 +312,41 @@ test("a commit naming a renamed path lands the old path the rename journal names
 
   assert.equal(code, 0);
   const both = "-- spec/tickets/new-name.md spec/tickets/old-name.md";
+  const ran = ranGit(git);
   assert.ok(
-    ranGit(git).includes(`git add -A ${both}`),
-    "the old path stages with the new",
+    ran.includes("git add -A -- spec/tickets/new-name.md"),
+    "the old path the rename staged away stays out of the add",
   );
+  assert.ok(ran.includes(`git commit -m ${CLEAN} ${both}`), "the commit takes both");
+});
+
+// git add refuses a path standing neither on disk nor in the index, so a journaled old path stages only where it stands. [[spec/tickets/commit-stages-a-moved-path]]
+test("a journaled old path the index still holds stages with the new path", async () => {
+  const { it, git } = doors([], {
+    "git diff --cached --name-status -M": { stdout: "A\tspec/tickets/new-name.md\n" },
+    "git ls-files --cached -- spec/tickets/old-name.md": {
+      stdout: "spec/tickets/old-name.md\n",
+    },
+  });
+  it.disk.makeDir(join(ROOT, ".se", ".runtime", "undo"));
+  it.disk.write(
+    join(ROOT, ".se", ".runtime", "undo", "20260101000000000000.json"),
+    JSON.stringify({
+      by: "rename",
+      files: [],
+      moved: { from: "spec/tickets/old-name.md", to: "spec/tickets/new-name.md" },
+    }),
+  );
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "spec/tickets/new-name.md", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const both = "-- spec/tickets/new-name.md spec/tickets/old-name.md";
+  const ran = ranGit(git);
+  assert.ok(ran.includes(`git add -A ${both}`), "the old path stages with the new");
+  assert.ok(ran.includes(`git commit -m ${CLEAN} ${both}`), "the commit takes both");
 });
 
 // [[spec/design_output/level0#the-cold-probe]]

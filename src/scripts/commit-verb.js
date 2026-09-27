@@ -79,9 +79,15 @@ async function landsAndPushes(it, argv, message, paths) {
     return 1;
   }
   // The paths a call names land alone, so one hand's landing leaves another's files standing. [[spec/design_output/work#one-verb-feeds-that-stamp]]
-  const named = [...paths, ...movedFrom(it, paths)];
+  const moved = movedFrom(it, paths);
+  const named = [...paths, ...moved];
   const only = named.length ? ["--", ...named] : [];
-  const staged = it.git.run(["add", "-A", ...only], true);
+  // git add refuses a path standing neither on disk nor in the index, and the commit still reaches it through HEAD. [[spec/tickets/commit-stages-a-moved-path]]
+  const adds = [...paths, ...moved.filter((from) => stagable(it, from))];
+  const staged = it.git.run(
+    ["add", "-A", ...(adds.length ? ["--", ...adds] : [])],
+    true,
+  );
   if (!staged.ok) {
     console.error("The staging comes back refused, so the commit stands undone:");
     console.error(saidBy(staged));
@@ -145,6 +151,12 @@ function movedFrom(it, paths) {
     }
   }
   return out;
+}
+
+// A path git add matches stands on disk or in the index. [[spec/tickets/commit-stages-a-moved-path]]
+function stagable(it, path) {
+  if (it.disk?.exists?.(it.join(it.root, ...path.split("/")))) return true;
+  return Boolean(it.git.run(["ls-files", "--cached", "--", path], true).out?.trim());
 }
 
 // The rename verb journals each move, so a rewrite past git's similarity cut still names its old path. [[spec/tickets/rename-detection-misses-rewrites]]
