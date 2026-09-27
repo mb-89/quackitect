@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
-todo: true
+state: closed
+todo: false
 step: decide
 steps:
   - name: decide
@@ -20,6 +20,13 @@ steps:
         says: why, in a line, or what the successor carries
 process: [[spec/processes/note]]
 process_hash: e02a0935ed78eb92
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: 5d66ab50b9c9ff08978404bec94b5cf8326ff7a9
+    hash_after: 5d66ab50b9c9ff08978404bec94b5cf8326ff7a9
+reason: became
+successors: [pull-verbs-become-actions]
 ---
 
 # Ask
@@ -47,14 +54,16 @@ process_hash: e02a0935ed78eb92
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+became
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+No process names branch open or unblock under needs today, and the pull action reads needs off the registry, which pull-verbs-become-actions now asks a case for.
 
 # Discussion
 
