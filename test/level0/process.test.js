@@ -3,10 +3,12 @@
 // [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { processHash, readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { FOUND, verdictIn } from "../../src/scripts/pull-chapter.js";
 import {
   askRows,
   fromHandover,
@@ -112,6 +114,45 @@ test("a kind carrying no route takes no copy", () => {
 test("a mint naming no process copies nothing", () => {
   const made = withRoute(diskWith(), ROOT, join, SCHEMA, { urgency: "soon" });
   assert.deepEqual(made.fields, { urgency: "soon" });
+});
+
+// A gate carries the question it answers, and its verdict field reads the gate's words. [[spec/design_output/pull#the-gate]]
+test("a gate step and its verdicts meet the schema", () => {
+  const schema = readYaml(readFileSync("spec/schemas/ticket.schema.yaml", "utf8"));
+  const step = schema.frontmatter.properties.steps.items.properties;
+  assert.equal(step.gate?.type, "string", "a step admits gate");
+  assert.equal(verdictIn(["accept"]).said, "pass", "accept reads as pass");
+  assert.equal(verdictIn(["reject", "- the fail road is missing"]).said, "fail");
+  const points = verdictIn([
+    "accept with points",
+    "- cut-the-line: the line runs long",
+  ]);
+  assert.equal(points.said, FOUND, "accept with points reads as findings");
+  assert.deepEqual(points.findings, [
+    { name: "cut-the-line", line: "the line runs long" },
+  ]);
+});
+
+// [[spec/design_output/pull#the-gate]]
+test("the standard process runs design, the gate, then implement", () => {
+  const route = readYaml(readFileSync(`${PROCESSES}/standard.yaml`, "utf8")).steps;
+  const names = (steps) => steps.map((one) => one.name);
+  const at = (name) => route.find((one) => one.name === name);
+  const top = names(route);
+  assert.ok(
+    top.indexOf("design") < top.indexOf("gate"),
+    "design stands before the gate",
+  );
+  assert.ok(
+    top.indexOf("gate") < top.indexOf("implement"),
+    "the gate stands before implement",
+  );
+  assert.deepEqual(
+    names(at("design").steps).filter((one) => one !== "owner-read"),
+    ["draft", "tests-red"],
+  );
+  assert.equal(typeof at("gate").gate, "string", "the gate names its question");
+  assert.deepEqual(names(at("implement").steps).slice(0, 2), ["change", "tests-green"]);
 });
 
 // [[spec/tickets/the-owners-words-travel-verbatim]]

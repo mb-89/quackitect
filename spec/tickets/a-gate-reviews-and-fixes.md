@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-engine-holds-the-route
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d7d6cb0fb1105 · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box d7d6cb0fb1105 · claude-code-remote · helper-2
     hash_before: 46efa876a4c88d1dd62e695ed14eaa13bf52786f
     hash_after: 46efa876a4c88d1dd62e695ed14eaa13bf52786f
+  - step: implement/tests-red
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: 40a02567706d2c8a56905f749582f078b25c745e
+    hash_after: 40a02567706d2c8a56905f749582f078b25c745e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 7 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -201,20 +209,30 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test test/level0/process.test.js test/level0/pull-gate.test.js test/level0/red-list.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+- the schema, the verdict reader and the standard route carry no gate yet, so each process case fails on its own assertion
+- the guard refuses the reviewer's commit, the points mint a draft, and a reject fails back with no copy, so each gate case fails
+- the red list answers empty, so its case fails
+- what surprises the hand: the pull's schema fixture copies the step keys, so it takes `gate` and `final` beside the real schema
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the pull, the check's test run, both schemas, the standard route, the fixture and the cases
+- the gate cases drive the fake disk and the fake git alone
+- each new file opens with a comment linking the chapter The gate
+- the red list reads the tickets, and the check points at it
+- the review rows stand fixed: the verdict map in `src/scripts/pull-tool.js`, the form fault, the reject road, the fix flag on a gate alone, and the red list's home in the design output
 
 ## change
 
