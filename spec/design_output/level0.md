@@ -1043,10 +1043,12 @@ A session holds no ticket before its first take or pull, so `freeOfTicket` in
 
 A call chaining one of these with another command still names its ticket.
 `freeOfTicket` checks every segment, and passes only where each one matches a
-free form. A segment that changes nothing rides beside a free form: a `cd` or
-`pushd` into the tree, and a `tail`, `head`, `grep`, `wc` or `cat` reading
-what the verb prints. A cloud box starts one folder above the tree, so its
-take opens with a `cd`.
+free form. A segment that changes nothing rides beside a free form:
+
+- a step into the tree, `cd` or `pushd`
+- a reader of what the verb prints: `tail`, `head`, `grep`, `wc` or `cat`
+
+A cloud box starts one folder above the tree, so its take opens with a step.
 
 ## The panel holds a warning
 
