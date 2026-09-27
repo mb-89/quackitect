@@ -198,6 +198,23 @@ func TestADropRefusesANameNobodyProvides(t *testing.T) {
 	}
 }
 
+// [[spec/tickets/commits-name-their-writer]]
+func TestADropRefusesANameAnotherWriterOwns(t *testing.T) {
+	c := New()
+	n := GivenIn(c, "t/n", 0)
+	other := GivenIn(c, "t/m", 0)
+	s := NewStore(c, nil)
+	if _, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/n": 1}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.Drop(s.Snapshot().Revision, other, "t/n"); err == nil || !strings.Contains(err.Error(), "t/n") {
+		t.Fatalf("a drop of t/n as the writer of t/m answers %v", err)
+	}
+	if got := s.Snapshot().Read("t/n"); got != 1 {
+		t.Fatalf("t/n reads %v after the refusal", got)
+	}
+}
+
 // [[spec/design_output/model#what-stays-how-long]]
 func TestARefusedDropLeavesEveryValue(t *testing.T) {
 	c := New()

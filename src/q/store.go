@@ -104,8 +104,12 @@ func (s *Store) commit(read int64, as Writer, values map[string]any) (int64, []f
 // Takes the names out of the store in one revision, so a value past its window leaves. [[spec/design_output/model#what-stays-how-long]]
 func (s *Store) Drop(read int64, as Writer, names ...string) (int64, error) {
 	for _, name := range names {
-		if s.owner(name) == nil {
+		one := s.owner(name)
+		if one == nil {
 			return 0, fmt.Errorf("the catalog holds no active provider of %s", name)
+		}
+		if !as.holds(one) {
+			return 0, fmt.Errorf("%s belongs to %s, and the drop names another writer", name, one.name)
 		}
 	}
 	s.mu.Lock()

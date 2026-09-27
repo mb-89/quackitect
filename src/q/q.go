@@ -53,6 +53,16 @@ type Catalog struct {
 // The hand a registration gives its module, which a commit names as its writer. [[spec/tickets/commits-name-their-writer]]
 type Writer struct{ ones []*registration }
 
+// Whether the hand carries the registration. [[spec/tickets/commits-name-their-writer]]
+func (w Writer) holds(one *registration) bool {
+	for _, held := range w.ones {
+		if held == one {
+			return true
+		}
+	}
+	return false
+}
+
 // [[spec/tickets/commits-name-their-writer]]
 func Join(hands ...Writer) Writer {
 	var joined Writer
