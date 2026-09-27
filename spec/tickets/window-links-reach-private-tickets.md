@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
-todo: true
+state: closed
+todo: false
 step: decide
 steps:
   - name: decide
@@ -20,6 +20,17 @@ steps:
         says: why, in a line, or what the successor carries
 process: [[spec/processes/note]]
 process_hash: e02a0935ed78eb92
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: bd54ac28b16e5cea18aa1104c711cbeef28c0d69
+    hash_after: bd54ac28b16e5cea18aa1104c711cbeef28c0d69
+    inputs:
+      - name: ask
+        hash: 34340ca527c1507d
+        size: 739
+    def: 9e2520e6318baf46
+reason: done
 ---
 
 # Ask
@@ -43,14 +54,16 @@ process_hash: e02a0935ed78eb92
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+done
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+The window already links a row through the path the index answers, and the index reads .se/tickets with its own path. Commit 63270f0a2 adds a case in src/tui/work/workitems_test.go holding a private note there.
 
 # Discussion
 
