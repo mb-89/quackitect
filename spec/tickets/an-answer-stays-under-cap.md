@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: d6857f1626577d8dd78cee99ba2ca35add07dc3f
+    hash_after: 5e8626274124514520f6b6a3ff4acbced966fe0c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-style-carries-the-top.md:143:56: Vocabulary: blocksof stands outside the words this tree writes. Write "
+reason: done
 ---
 
 # Ask
@@ -237,26 +249,34 @@ The config case fails on the missing pull key, and the split case fails on the m
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/pull-cap.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The pull keeps each answer under the size cap. spec/config/level0.json names the cap and its margin under pull, and the doors read them. A hand-out past the cap less the margin prints the lines that fit, and a closing line names the plain pull that prints the rest. The hold carries the rest, so the step stays whole and the hand-back reads as before. A refusal reprinting the notes cuts the same way, and points at the guidance verb.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the config, its schema, the doors, the pull's hand-out and still-held answer, and the new module src/scripts/pull-cap.js
+- the cases drive the fake disk, and the doors case stands under test/contract
+- the header of src/scripts/pull-cap.js names the chapter The size cap
+- the cap stands once, in spec/config/level0.json
+- the review's rows stand fixed in the change
 
 # Discussion
 
