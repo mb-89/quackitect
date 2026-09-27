@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-prints-its-plan, fix-groups-end-the-chain]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -160,6 +160,15 @@ record:
         hash: f77d5a0fe7fea05e
         size: 746
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 4b24003f2daeecd22417108335f19badc4066f9b
+    hash_after: 4b24003f2daeecd22417108335f19badc4066f9b
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:271:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -314,14 +323,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches dispatch.js, dispatch-write.js and dispatch.test.js, which the ask names; work.js exports markOff for dispatch-reuses-mark-off, and ticket.js exports cutTo for dispatch-cuts-the-fix-name, each on a point ticket's ask
+- the git and front doors each take a fake in test/level0/dispatch.test.js, and the clock takes fakeClock
+- the head comment of src/scripts/dispatch-write.js names the approach and links the-writes-ride-a-branch
+- the branch cut calls markOff and the name cut calls cutTo, so neither stands twice
 
 ## tests-green
 
