@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: answer
+step: do
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -53,6 +53,21 @@ record:
   - step: answer
     hand: the engine
     stale: [[spec/tickets/rationale-drops-release-row]]
+  - step: answer
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: 00f01a2b5ac11890412d3d2bf00bf3cf83aa5792
+    hash_after: 00f01a2b5ac11890412d3d2bf00bf3cf83aa5792
+    inputs:
+      - name: ask
+        hash: 0aae906b76d1f73b
+        size: 961
+      - name: [[spec/tickets/the-queue-moves-to-plan]]
+        hash: ec8f43b68ad91062
+        size: 13436
+      - name: [[spec/tickets/rationale-drops-release-row]]
+        hash: 217a401698f56467
+        size: 4030
+    def: 2280015d497a3abd
 ---
 
 # Ask
@@ -84,7 +99,7 @@ Open the file on `work/open-tasks-land-in-shadow` and cut the sentence at line 1
 <!-- the answer, which the step behind this one reads -->
 <!-- the form is text -->
 
-Split the sentence. The owner rules the split is the answer, and no change to the tests gate. The approach of the-queue-moves-to-plan now stands closed, so a hand writes the split there.
+Split the sentence. The owner rules the split is the answer, and the tests gate stays as it stands. The queue ticket closes, and its lint names no sentence past the cap.
 
 # do
 
