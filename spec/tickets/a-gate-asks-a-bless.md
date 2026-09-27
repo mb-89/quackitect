@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d7d8cca563b1 · claude-code-remote
@@ -93,6 +93,10 @@ record:
     hand: box d7d8cca563b1 · claude-code-remote
     hash_before: 64040d1db173ca87b25d8f6440d24a739f81d48d
     hash_after: 64040d1db173ca87b25d8f6440d24a739f81d48d
+  - step: design/review
+    hand: box d7d8cca563b1 · claude-code-remote · helper-4
+    hash_before: 562b42d790624630618dc6a84a48234302f41c07
+    hash_after: 562b42d790624630618dc6a84a48234302f41c07
 ---
 
 # Ask
@@ -159,13 +163,11 @@ each done_when line maps to a test above: schema and wait, desk file, cloud and 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 <!-- the form is verdict -->
 
-fail
-- the desk guard leaves bless.agent open: `./RUNME.sh config bless.agent true` writes it through `settings.write` in .claude/skills/level0/lib/config.js, and the write door never sees that write
-- a shell write into .se/.runtime/config.json passes, since `FREE` in .claude/skills/level0/lib/bash.js frees every path under .se
-- the env layer answers bless.agent from `SE_BLESS_AGENT` through `varOf`, and the approach guards the `HARNESS` names alone, so an agent sets it on its own command line
-- the strip on an edit rests on src/scripts/pull-stale.js, which stands unbuilt, and the chapter says a merge where the ask says an edit; name the function that drops the bless and the ticket it waits on
-- the callers list leaves out spec/config/level0.schema.json, which needs the bless.agent entry the sidebar button draws, and the new src/scripts/pull-bless.js
-- `HARNESS` in src/extension/lib/lens.js copies the list in src/scripts/pull-hand-of.js; point the shell door at one list
+pass with findings
+- bless-guard-reads-scripts: the bless file guard and the harness guard in onBash read the command line alone, and scriptsIn and scriptWrites in .claude/skills/level0/lib/scripted.js pass a script under .se, so `node .se/scripts/x.js` writing .se/.runtime/bless.json or spawning `ticket bless` with CLAUDECODE deleted passes; run both guards over the targets writesAPath and scriptWrites resolve, ahead of FREE, and add a case for each
+- bless-button-draws-itself: the key leaves the config tree, so no level0.schema.json entry draws the sidebar button; name the file that draws it beside the `bless` kind in `took` in src/extension/sidebar.js, and add a case that the button writes the bless file
+- process-case-for-bless: the ask names spec/schemas/process.schema.yaml, which takes its steps by $ref from ticket.schema.yaml; the schema case reads a process file carrying bless on a gate, so it decides the line the ask names
+- cloud-list-reads-harness: inCloud reads CLOUD in .claude/skills/level0/lib/cloud.js, a second list beside HARNESS, and the one-list claim holds only while HARNESS carries every CLOUD name; point the guard at both, or derive one from the other
 
 # implement
 
