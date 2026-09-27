@@ -716,7 +716,7 @@ names where the work goes on, and `answered` names where it stands done.
 
 A private ticket takes no hash, no commit and no push, because git ignores
 `.se`. A note, `by: retro`, goes to the hand whose group stands at a retro
-step. A note with the tag goes first, to anybody.
+step, and `handOut` hands it before the group, whose step waits on it. A note with the tag goes first, to anybody.
 
 The stop hook counts an open private ticket the way it counts a hold, so a
 breakdown a hand mints carries the turn. A note carries nothing, because it

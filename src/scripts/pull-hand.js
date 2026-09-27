@@ -142,14 +142,13 @@ export function handOut(it, who) {
   const privates = all.filter((one) => one.private && !tagged.includes(one));
   const at = weighing(it, all);
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
+  // A group at a retro step waits on the notes, so they come out before it. [[spec/design_output/pull#the-private-queue]]
+  const own = groupTicket ? [groupTicket] : [];
+  const notes = sorted(privates, at);
+  const late = atRetro(all, who.group) ? [notes, own] : [own, notes];
   const pools = who.group
-    ? [
-        tagged,
-        sorted(childrenOf(all, who.group), at),
-        groupTicket ? [groupTicket] : [],
-        sorted(privates, at),
-      ]
-    : [tagged, sorted(freeIn(all), at), sorted(privates, at)];
+    ? [tagged, sorted(childrenOf(all, who.group), at), ...late]
+    : [tagged, sorted(freeIn(all), at), notes];
   if (!who.group) cutForGroups(it, all);
   // A name on the pull asks for one ticket, so the pools carry that one alone. [[spec/design_output/pull#the-hand-out]]
   const asked = who.wanted
