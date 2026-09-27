@@ -114,11 +114,24 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [io-modules-own-their-names]
+record:
+  - step: design/draft
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: f21b27ff6cb75cde48977ddbd22c65f4d2fc72e1
+    hash_after: f21b27ff6cb75cde48977ddbd22c65f4d2fc72e1
+    inputs:
+      - name: ask
+        hash: 3b3ed3a2827d6a53
+        size: 796
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +166,99 @@ The codec is then the one code knowing a file format. A write goes back one way,
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The draft takes seven pieces. Each keeps to the model section on mirrors.
+
+1. `src/q/projection.go` adds the kinds as a type `Mirror`, with `Loaded`, `Saved` and `Dump`, since `Kind` names a fault already.
+2. It adds `Codec[T]`, an interface with `Parse` and `Serialize` over bytes.
+3. `ProjectIn[T](c, name, glob, codec, kind, def)` registers a family `<name>/<path...>`. For `Loaded`, the store runs it per key when `files/<key>` moves, and the value is the parse of that file. A path outside the glob answers nothing.
+4. `Store.Run` takes a concrete key of such a family, so a scheduler run and a case reach one file.
+5. `src/q/codec.go` holds `JSON`, an order-keeping JSON codec. It parses into ordered nodes, keeps each number literal, and serializes with two spaces and a closing newline, as the JavaScript writes the files today. It lives in `q`, because `onlyq` lets a module import `q` alone.
+6. `Saved` restores once at start through `Store.Restore(bytes)`, over a JSON map of name to type and value. It skips a name nobody registers, refuses and reports a changed type, and leaves a missing name at its built-in value. `Store.Save(prefix)` answers the bytes, and the saved file stands under `.se/state/`.
+7. `Dump` answers `Store.Dump(prefix)`, and `quack dump <prefix>` writes it under `.se/dump/` through `disk`. No projection covers that folder, so nothing reads it back.
+
+A write goes one way. `files.Write` gains `Read`, the hash of the file its writer read, and `disk` refuses a write where the file hash moves since. The fake disk refuses the same way.
+
+The loaded projections:
+
+- `src/modules/config`: `spec/config/level0.json` and `.se/.runtime/config.json`, as `config/`
+- `src/modules/queue`: `.se/.runtime/plan.json`, as `queue/`
+- `src/modules/holds`: `.se/.runtime/hold/*.json`, as `hold/`
+
+`spec/wiring.yaml` names the three instances, and the watch adds `.se/.runtime` and its hold folder by name, since it stands off dot folders under `.se`.
+
+The round-trip suite stands in `src/quack`, the one package that may read the tree. It runs every codec over every file `git ls-files` names under the glob of each projection it wires, and over the local files where they stand. A module test cannot read the disk.
+
+Assumed: `the-config-module-resolves-layers` builds the resolver over `config/`, and `tickets-becomes-a-module` brings the markdown codec. This ticket builds the JSON codec alone.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/store.go: Run, which takes a key of a projected family
+src/modules/files/disk.go: Accept and disk.Write, which read the revision
+src/modules/files/watch.go: watch.adds, which adds the runtime folders
+src/quack/main.go: modules and load, which take the three projection modules
+src/index/main.go: asked, which takes the verb dump
+src/index/door.go: the handler that answers dump
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+./...: `go test ./...` from the root
+src/quack/codec_test.go: TestEveryCodecRoundTripsItsCommittedFiles
+src/q/codec_test.go: TestJSONRoundTripsItsEdgeCases
+src/modules/files/files_test.go: TestAStaleWriteIsRefused
+src/q/projection_test.go: TestASavedFileRestoresNameByName
+src/q/projection_test.go: TestALoadedProjectionParsesItsFile
+src/quack/dump_test.go: TestADumpIsReadByNothing
+RUNME.sh: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/projection.go
+src/q/projection_test.go
+src/q/codec.go
+src/q/codec_test.go
+src/q/store.go
+src/modules/files/disk.go
+src/modules/files/watch.go
+src/modules/files/files_test.go
+src/modules/config/config.go
+src/modules/config/config_test.go
+src/modules/queue/queue.go
+src/modules/queue/queue_test.go
+src/modules/holds/holds.go
+src/modules/holds/holds_test.go
+src/quack/main.go
+src/quack/codec_test.go
+src/quack/dump_test.go
+src/index/main.go
+src/index/door.go
+spec/wiring.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened `Store.Run`, `Store.owner`, `files.Accept`, `watch.adds`, `load` in `src/quack`, `asked` in the index, and the plan, hold and config files, and checked each claim there
+I grepped the callers of `Run`, `Accept`, `Write` and `load` across `src`, and the list names each the change touches
+each done_when line names its test above, or the command `go test ./...` or `./RUNME.sh check`
 
 ## tests-red
 
