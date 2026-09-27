@@ -23,25 +23,26 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
+urgent: true
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
 record:
   - step: do
     hand: box d6f05e3a585030 · claude-code
-    hash_before: e76d0a4d56d0380bca00b72b3c516b7e899ab461
-    hash_after: e76d0a4d56d0380bca00b72b3c516b7e899ab461
+    hash_before: 4c1e65b584fa01839c9ae3d17863c20b4fc684c5
+    hash_after: 4c1e65b584fa01839c9ae3d17863c20b4fc684c5
     answered:
       - name: tests
         exit: 0
-        said: green, 1 test(s) pass in 1 file(s)
+        said: green, 12 test(s) pass in 1 file(s)
       - name: check
         exit: 0
         said: "spec/tickets/the-queue-views-agree.md:265:115: Sentence: A sentence holds 25 words. Cut this one in two."
     inputs:
       - name: ask
-        hash: b7dca66abb6cb9be
-        size: 434
+        hash: f5eeebc90c59b4ee
+        size: 667
     def: df12650931d480c9
 reason: done
 ---
@@ -52,10 +53,13 @@ reason: done
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-The push meets a clear lint, so `main` reaches the remote with the bridge draft and its red cases on it. Without the fix, every push from a desk stops on the `CodeComment` warning in `test/contract/desk-start.test.js`, a comment standing mid-file. The fix folds that comment into the file header.
+A final gate reruns the red pass and expects its cases green, so a standard-route ticket passes its acceptance. The rerun then proves the red cases now pass.
 
-- `./RUNME.sh lint test/contract/desk-start.test.js` names no finding
-- `./RUNME.sh test test/contract/desk-start.test.js` answers green
+Without it, `routeRun` in `src/scripts/pull.js` reruns the `tests` field under `design/tests-red` expecting `assertion`. The green that `implement/tests-green` made refuses it. So every standard-route accept refuses, and `holds-leave-with-their-ticket` stands stuck there.
+
+- a case in `test/level0/pull-accept.test.js` passes a final gate over a red field that runs green
+- a case there refuses a final gate over a red field that still fails
+- `./RUNME.sh test test/level0/pull-accept.test.js` answers green
 
 # do
 
@@ -66,7 +70,7 @@ The push meets a clear lint, so `main` reaches the remote with the bridge draft 
 <!-- the tests that cover the change, or the check where it touches no code -->
 <!-- the form is command -->
 
-./RUNME.sh test test/contract/desk-start.test.js
+./RUNME.sh test test/level0/pull-accept.test.js
 
 ## check
 
@@ -80,16 +84,16 @@ The push meets a clear lint, so `main` reaches the remote with the bridge draft 
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-The comment that stood mid-file in `test/contract/desk-start.test.js` now stands in the file header, so the `CodeComment` rule finds nothing there and the push meets a clear lint. The case and its stub are unchanged. The ticket took a five-word name, because the mint took a six-word one the name rule refuses.
+A final gate reruns every command field of the route. A red pass among them now reruns expecting `green` in place of `assertion`, because the green pass after it turns those cases green. So a standard-route ticket passes its acceptance again, and the rerun proves the red cases pass. The row stands in the final acceptance chapter of `spec/design_output/pull.md`.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change follows the ask: the comment moves into the header, and the lint and the test on the file answer clean
-- the change reveals no cleanup beyond the comment it moves
-- the change adds no fact: the moved line says what it said before, in the header
+- the change follows the ask: two cases in test/level0/pull-accept.test.js hold the pass and the refusal, and the file answers green
+- the change reveals one cleanup, the note accept-reruns-the-red-tests, which the retro closes onto this ticket
+- the fact stands once, in the final acceptance table of spec/design_output/pull.md, and the code points there
 
 # Discussion
 

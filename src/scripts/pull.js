@@ -79,6 +79,10 @@ export * from "./pull-hand.js";
 export * from "./pull-route.js";
 export * from "./pull-writes.js";
 
+// [[spec/design_output/pull#the-final-acceptance]]
+const RED = "assertion";
+const GREEN = "green";
+
 export function pull(it, argv) {
   const rest = (argv ?? []).slice(1);
   const name = positionalOf(rest);
@@ -483,6 +487,10 @@ function routeRun(it, one, leaf, found) {
         .filter((field) => String(field?.form) === "command")
         .filter((field) =>
           String((chapter.fields.get(field.name) ?? [])[0] ?? "").trim(),
+        )
+        // A red pass reruns expecting its cases green, since the green pass after it turns those cases green. [[spec/design_output/pull#the-final-acceptance]]
+        .map((field) =>
+          String(field.expects) === RED ? { ...field, expects: GREEN } : field,
         );
       if (!evidence.length) return [];
       return commandsRun(it, { path: other.path, evidence }, chapter, found).map(
