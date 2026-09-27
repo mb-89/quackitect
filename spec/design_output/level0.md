@@ -1037,9 +1037,13 @@ A session holds no ticket before its first take or pull, so `freeOfTicket` in
 
 - `./RUNME.sh branch take`
 - `./RUNME.sh branch list`
+- `./RUNME.sh branch sync`
 - `./RUNME.sh ticket pull`
 - `./RUNME.sh mint ticket`
 - `./RUNME.sh ticket note`
+
+A branch cut while its group stands a draft carries the draft, and `branch
+sync` is the verb that brings the opened group in. So the sync names no ticket.
 
 A call chaining one of these with another command still names its ticket.
 `freeOfTicket` checks every segment, and passes only where each one matches a

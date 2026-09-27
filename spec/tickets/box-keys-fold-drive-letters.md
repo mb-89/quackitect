@@ -26,6 +26,7 @@ steps:
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
+group: the-engine-fixes-its-faults
 parent: the-bridge-outlives-its-starter
 ---
 
