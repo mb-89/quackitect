@@ -152,3 +152,14 @@ func TestAKeyOfManySegmentsStandsLast(t *testing.T) {
 		t.Fatalf("the check answers %+v", found)
 	}
 }
+
+// [[spec/tickets/providers-keys-reach-check]]
+func TestNamesListEveryGroupOnce(t *testing.T) {
+	c := New()
+	GivenIn(c, "t/n", 0, Alt("t.local"))
+	GivenIn(c, "t/n", 0, Alt("t.remote"))
+	GivenIn(c, "t/m", 0)
+	if said := c.Names(); len(said) != 2 || said[0] != "t/m" || said[1] != "t/n" {
+		t.Fatalf("the names read %v", said)
+	}
+}

@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -131,6 +131,19 @@ record:
         hash: 518103d9494e50d7
         size: 9128
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 4491deab5516ba3b6dab5f13dfb55b87512a995d
+    hash_after: 4491deab5516ba3b6dab5f13dfb55b87512a995d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: 6030b12e6317e462
+        size: 1576
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -210,26 +223,31 @@ the second done_when line meets TestAProviderKeyNamingNoAltRefusesTheStart, and 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/catalog_test.go,src/index/start_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The three cases fail on their assertions: Names answers nothing, providersOf answers no key, and the start refuses on two active providers where the key names t.none, so the refusal never names the key the owner set. The surprise: the refusal today already says providers.t/n, so the case pins the value t.none to tell the two apart.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the second done_when line meets TestAProviderKeyNamingNoAltRefusesTheStart, red on its assertion, and go test and the check decide the rest
+the config door reads a local file under the temporary root the case plants, so no box config reaches the case
 
 # gate
 

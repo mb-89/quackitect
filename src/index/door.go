@@ -142,6 +142,11 @@ func trackedIn(root string) func(rel string) bool {
 	return func(rel string) bool { return held[rel] }
 }
 
+// The providers.<name> key over every layer, for each name the catalog holds. [[spec/tickets/providers-keys-reach-check]]
+func providersOf(root string, catalog *q.Catalog) map[string]string {
+	return nil
+}
+
 func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 	topics := registersTopics(catalog)
 	watchdog.Registers(catalog)
