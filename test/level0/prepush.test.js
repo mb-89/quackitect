@@ -107,6 +107,35 @@ test("a push to a work branch nobody holds lands", () => {
   assert.deepEqual(said, { code: 0, said: "" });
 });
 
+// [[spec/tickets/push-gate-needs-the-engine]]
+test("a push with no engine running and a stale stamp lands", () => {
+  const said = holds(
+    refsIn(toTrunk),
+    stamp({ sha: "ffff" }),
+    () => [],
+    false,
+    () => "",
+    "",
+    false,
+  );
+  assert.deepEqual(said, { code: 0, said: "" });
+});
+
+// [[spec/tickets/push-gate-needs-the-engine]]
+test("a push with the engine running and a stale stamp comes back refused", () => {
+  const said = holds(
+    refsIn(toTrunk),
+    stamp({ sha: "ffff" }),
+    () => [],
+    false,
+    () => "",
+    "",
+    true,
+  );
+  assert.equal(said.code, 1);
+  assert.match(said.said, /ran against ffff/);
+});
+
 test("a push to trunk on a green stamp lands", () => {
   assert.deepEqual(holds(refsIn(toTrunk), stamp()), { code: 0, said: "" });
 });

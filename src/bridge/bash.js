@@ -70,6 +70,11 @@ export async function onBash(e, box) {
   return messageWarns(held.warned ?? [], box) ?? PASS;
 }
 
+// A push or a verb the engine lets through carries the mark, so the push door gates it. [[spec/tickets/push-gate-needs-the-engine]]
+export function markedPush(_command, _e) {
+  return null;
+}
+
 // [[spec/design_output/level0#a-shell-names-its-ticket]]
 export async function onPowerShell(e, box) {
   const command = String(e?.command ?? "");

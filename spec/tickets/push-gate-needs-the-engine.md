@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -146,6 +146,19 @@ record:
         hash: 4028c18b8dc89090
         size: 716
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: e87299baa39c87ba620f28205687ee8b7b2fbcc4
+    hash_after: e87299baa39c87ba620f28205687ee8b7b2fbcc4
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 06a30175056ddca0
+        size: 2916
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -264,26 +277,32 @@ The done lines and the case deciding each:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/prepush.test.js test/level0/bash-engine.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/prepush.test.js
+- test/level0/bash-engine.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Two cases fail on their own assertion over the stubs: the push with no engine lands nowhere yet, and the Bash door marks nothing. The engine case passes, because the gate refuses a stale stamp today, and it guards that side. The older trunk cases call `holds` with no engine argument, so the gate reads `engine` true by default and they stand as they are.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a case: the push with no engine fails red, the push with the engine guards the gate, and the check waits for the change
+- the gate takes the engine as an argument, and the Bash door's rewrite is a pure function, so no case reaches the environment or git
 
 # gate
 
