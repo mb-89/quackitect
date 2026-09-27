@@ -151,6 +151,7 @@ record:
   - step: accept
     hand: box d7db8e8df0103 · claude-code-remote
     hash_before: 9131daf2f67991683d7e10cf0f9929d36a71ca1a
+    hash_after: 1ffab4f78a24ea4c3e59c7209752da3eeda4e6e1
   - step: accept
     hand: box d7db8e8df0103 · claude-code-remote
     hash_before: 72d5e1f4e39fc63741741ac9840a64faef83ba1a
