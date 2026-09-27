@@ -10,7 +10,8 @@ import { test } from "node:test";
 import { wholeAfter } from "../../src/bridge/write.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { boots, stampOf } from "../../src/scripts/boot.js";
+import { INSTALL_SKIP } from "../../.claude/skills/level0/hooks/level0.js";
+import { boots } from "../../src/scripts/boot.js";
 
 const PATH = "/tree/spec/vocabulary/terms.yml";
 const WAS = [
@@ -65,21 +66,26 @@ test("an edit to a file nobody wrote yet reads as the new text alone", () => {
   assert.equal(wholeAfter(e, { path: PATH, text: "b" }, disk), "b");
 });
 
-// The session start installs what the tree needs, and a box where it all stands pays nothing. [[spec/design_input/the-cloud-runs-itself#the-boot]]
+// The session start brings the manifest and the modules to a cloud box lacking either, for its next session. [[spec/design_input/the-cloud-runs-itself#the-boot]]
 const BOOT_ROOT = "/tree";
 const INSTALL = `${BOOT_ROOT}/src/scripts/install.sh`;
-const STAMP_AT = `${BOOT_ROOT}/.se/.runtime/boot.json`;
+const MANIFEST = `${BOOT_ROOT}/.claude/skills/level0/.claude-plugin/plugin.json`;
+const MODULE = `${BOOT_ROOT}/node_modules/wink-nlp/package.json`;
+const CLOUD = { CLAUDE_CODE_REMOTE: "true" };
 const STANDING = {
   [INSTALL]: "#!/usr/bin/env sh\necho installs\n",
-  [`${BOOT_ROOT}/.claude/skills/level0/.claude-plugin/plugin.json`]: "{}",
-  [`${BOOT_ROOT}/node_modules/wink-nlp/package.json`]: "{}",
+  [MANIFEST]: "{}",
+  [MODULE]: "{}",
 };
 
-function booting(files) {
+function booting(files, env = CLOUD) {
   const disk = fakeDisk(files);
   const proc = fakeProc({ [`sh ${INSTALL}`]: { exitCode: 0 } });
-  return { it: { root: BOOT_ROOT, disk, proc, join: posix.join, env: {} }, disk, proc };
+  return { it: { root: BOOT_ROOT, disk, proc, join: posix.join, env }, disk, proc };
 }
+
+const without = (path) =>
+  Object.fromEntries(Object.entries(STANDING).filter(([at]) => at !== path));
 
 // [[spec/design_input/the-cloud-runs-itself#the-boot]]
 test("the project settings carry a SessionStart hook running src/scripts/boot.js", () => {
@@ -94,39 +100,44 @@ test("the project settings carry a SessionStart hook running src/scripts/boot.js
 });
 
 // [[spec/design_input/the-cloud-runs-itself#the-boot]]
-test("boot runs no install where the stamp matches and every tool stands", () => {
-  const { it, proc } = booting({
-    ...STANDING,
-    [STAMP_AT]: JSON.stringify({ install: stampOf(STANDING[INSTALL]) }),
-  });
+test("boot runs no install where the manifest and the modules stand", () => {
+  const { it, proc } = booting(STANDING);
   assert.equal(boots(it), 0);
   assert.deepEqual(proc.ran, []);
 });
 
 // [[spec/design_input/the-cloud-runs-itself#the-boot]]
-test("boot runs the install under the skip list, and writes the stamp, where the stamp is stale", () => {
-  const { it, proc, disk } = booting({
-    ...STANDING,
-    [STAMP_AT]: JSON.stringify({ install: "old" }),
-  });
+test("boot runs the install under the skip list where the manifest stands nowhere", () => {
+  const { it, proc } = booting(without(MANIFEST));
   assert.equal(boots(it), 0);
   assert.deepEqual(
     proc.ran.map((one) => one.argv.join(" ")),
     [`sh ${INSTALL}`],
   );
-  assert.equal(
-    proc.ran[0].init.env.SE_INSTALL_SKIP,
-    "editor-link editor-extensions editor-client go index se-lsp",
-  );
-  assert.equal(JSON.parse(disk.read(STAMP_AT)).install, stampOf(STANDING[INSTALL]));
-  assert.notEqual(stampOf(STANDING[INSTALL]), "", "the stamp holds a hash");
+  assert.equal(proc.ran[0].init.env.SE_INSTALL_SKIP, INSTALL_SKIP);
 });
 
 // [[spec/design_input/the-cloud-runs-itself#the-boot]]
-test("boot answers 0 where the install fails, and writes no stamp", () => {
-  const { it, proc, disk } = booting({ ...STANDING });
+test("boot runs the install where the modules stand nowhere", () => {
+  const { it, proc } = booting(without(MODULE));
+  assert.equal(boots(it), 0);
+  assert.deepEqual(
+    proc.ran.map((one) => one.argv.join(" ")),
+    [`sh ${INSTALL}`],
+  );
+});
+
+// [[spec/design_input/the-cloud-runs-itself#the-boot]]
+test("boot runs nothing off a cloud box", () => {
+  const { it, proc } = booting(without(MANIFEST), {});
+  assert.equal(boots(it), 0);
+  assert.deepEqual(proc.ran, []);
+});
+
+// [[spec/design_input/the-cloud-runs-itself#the-boot]]
+test("boot answers 0 where the install fails", () => {
+  const { it, proc } = booting(without(MANIFEST));
   proc.teach(["sh", INSTALL], { exitCode: 1, stderr: "no network" });
   assert.equal(boots(it), 0);
   assert.equal(proc.ran.length, 1);
-  assert.equal(disk.exists(STAMP_AT), false);
 });

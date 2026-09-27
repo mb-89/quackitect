@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -209,6 +209,19 @@ record:
         hash: 22fc99331ec488bc
         size: 87937
     def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 2cbf1fed704e447b09efb481309f4dff26d597d9
+    hash_after: 2cbf1fed704e447b09efb481309f4dff26d597d9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 339ee683d0a385a5
+        size: 2318
+    def: 897ac034247c0bca
 group: the-cloud-works-its-queue
 ---
 
@@ -405,26 +418,31 @@ The approach takes this as unmeasured: the client reads the plugins before any S
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/hooks.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/hooks.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Four cases fail on their own assertion against the stub boot, and the settings file carries no SessionStart hook yet. The case where everything stands and the case off a cloud box pass on the stub, as negative cases do. The skip list case reads INSTALL_SKIP from the hooks module, so the list stands in one place.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line on the hook meets a case, the note lines meet the review, and ./RUNME.sh check decides the last
+- the boot cases reach the disk and the process through fakeDisk and fakeProc alone
 
 # gate
 
