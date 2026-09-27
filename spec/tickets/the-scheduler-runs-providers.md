@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -132,6 +132,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: d82d3556976bce8e73c1b274a23f82fdb8c413c8
+    hash_after: d82d3556976bce8e73c1b274a23f82fdb8c413c8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: eee784babc19ef92
+        size: 2192
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -229,26 +242,31 @@ each done_when line names its test in `src/q/scheduler_test.go`, or the command 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/scheduler_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/scheduler_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertion over the stub. The stub scheduler hears no commit, so `t/double` stays at its built-in value, and no run of `t/slow` starts within the wait. The surprise: `seed` in the wiring cases commits through `Store.Commit`, so the scheduler hears a case seed as it hears a real move.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each done_when line meets a case: the moved input and the burst during a run each have one in `src/q/scheduler_test.go`, and the commands decide the rest
+the cases run over a catalog and a store in memory, and the spawn hand stands in for the run thread, so no door stands unfaked
 
 # gate
 
