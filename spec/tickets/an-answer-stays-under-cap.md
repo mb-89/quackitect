@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d7d8cca5d3cd · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box d7d8cca5d3cd · claude-code-remote · helper-2
     hash_before: 720e1907f4f48d37bb382e6c2516b989a860333b
     hash_after: 720e1907f4f48d37bb382e6c2516b989a860333b
+  - step: implement/tests-red
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: 7f6e20750882f74e462a1b22e394a0efbeac3434
+    hash_after: 7f6e20750882f74e462a1b22e394a0efbeac3434
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -170,20 +178,27 @@ pass with findings
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/pull-cap.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The config case fails on the missing pull key, and the split case fails on the missing closing line, since the pull prints the hand-out whole. The case under the margin passes already, which holds the plain hand-out as it stands. The fixture carries the cap on it, so the case reads no config and no box.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the tests touch test/level0/pull-cap.test.js alone
+- the cases drive the fake disk, git and clock of test/level0/pull-doors.js
+- the file header names the chapter The size cap it implements
+- the cap and its margin stand once, in spec/config/level0.json, and the case reads them there
+- the review's rows ride the implement step: the closing line names the plain pull, a long line cuts at a character, and the refusal stays under the cap
 
 ## change
 
