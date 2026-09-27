@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -130,6 +130,19 @@ record:
         hash: 260b59b15e28d7e0
         size: 565
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 2be1307f1e3eff1b9e49f05a53b7507619990f40
+    hash_after: 2be1307f1e3eff1b9e49f05a53b7507619990f40
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 5a2cadb20cc0ce0b
+        size: 2807
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -249,26 +262,40 @@ The done lines and the case deciding each:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/holds-leave.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/holds-leave.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion over the tree as it stands:
+
+| the case | the class of fault it guards |
+|---|---|
+| the readers answer no hold on a closed ticket | a hold file stands over the ticket's own state |
+| an ephemeral hold stands | a state read drops a hold that names no ticket file |
+| the hold drops at the next pull | a closed ticket blocks every other take by its hand |
+| a pull names no closed ticket in hand | the door and the stop read a closed ticket as work |
+
+The ephemeral case reads red because the closed hold stands beside it today.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a case above that fails: the drop at the next pull, and no closed ticket in hand
+- the doors the cases reach stand behind their fakes: the fake disk and the fake git of pull-doors.js
 
 # gate
 
