@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -159,6 +159,19 @@ record:
         hash: 2bf04f9d82d2183d
         size: 1605
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 34fe9347b42caff1977dd18824474a48988fd79d
+    hash_after: 34fe9347b42caff1977dd18824474a48988fd79d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 89f623ce88a3da39
+        size: 2316
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -254,7 +267,7 @@ test/level0/queue-cloud.test.js
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-The marked-group case fails on its assertion, since cloudsIn stands as a stub answering no name. The branch-and-no-marker case passes already, since it asks for no name, and it holds the desk side once placesIn reads the marker. The surprise: the cloud set lived inside placesIn, so no case ever reached it without a git read.
+The marked-group case fails on its assertion, since cloudsIn stands as a stub answering no name. The no-marker case passes already, since it asks for no name, and it holds the desk side once placesIn reads the marker alone. The surprise: the marker read that marked-groups-stay-cloud added sits inline in placesIn, so no case reaches it without the whole answer.
 
 ### checked
 
