@@ -3,7 +3,12 @@
 // [[spec/design_output/pull#an-input-marks-its-steps]]
 
 import { hashText } from "../../.claude/skills/level0/lib/hash.js";
-import { hashOf, readNote, sectionAt } from "../../.claude/skills/level0/lib/schema.js";
+import {
+  checkNote,
+  hashOf,
+  readNote,
+  sectionAt,
+} from "../../.claude/skills/level0/lib/schema.js";
 import { reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 import {
   fieldOf,
@@ -147,6 +152,13 @@ function processRead(it, one) {
   const front = frontOf(one.text);
   if (held.why || String(front.process_hash ?? "") === held.hash) return;
   const fresh = walkOf({ steps: held.route });
+  // A route that strands the step or a leaf the record names waits for ticket update, where a hand reads the drift. [[spec/design_output/pull#an-input-marks-its-steps]]
+  const stands = new Set(fresh.filter((each) => each.leaf).map((each) => each.path));
+  const reached = [
+    stepPathOf(front),
+    ...recordIn(one.text).map((entry) => String(entry.step)),
+  ];
+  if (reached.some((path) => !stands.has(path))) return;
   const leaves = leavesOf(front);
   const now = leaves.findIndex((leaf) => leaf.path === stepPathOf(front));
   const moved = leaves.slice(0, Math.max(now, 0) + 1).find((leaf) => {
@@ -160,6 +172,7 @@ function processRead(it, one) {
   const schema = schemasHere(it).get("ticket");
   let text = reRouted(one.text, schema, route.steps, held.hash, it.front);
   if (moved) text = withField(text, "step", moved.path, it.front);
+  if (schema && checkNote(text, schema, one.path, schemasHere(it)).length) return;
   one.text = text;
   one.front = frontOf(text);
   landedAlone(it, one, [

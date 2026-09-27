@@ -1,20 +1,10 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
-      - name: owner-read
-        does: reads the ask a handover carries, before any draft
-        by: person
-        when: handed
-        input: ask
-        evidence:
-          - name: read
-            form: verdict
-            says: pass where the ask says what the owner said, or fail with the owner's words
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -34,39 +24,32 @@ steps:
           - name: answers
             form: list
             says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+      - name: review
+        does: reads the approach against the ask
+        not: draft
+        on_fail: draft
+        reads: [[spec/guidance/review/design]]
+        input: design/draft
+        evidence:
+          - name: verdict
+            form: verdict
+            says: pass, pass with findings naming a child a line, or fail with findings one a line
+  - name: implement
+    reads: [[spec/guidance/code/testing]]
+    needs: ["branch test"]
+    input: ["design/draft", "design/review"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every row the design review passes with stands fixed in the change"]
+    steps:
       - name: tests-red
         does: writes the tests the ask calls for
-        reads: [[spec/guidance/code/testing]]
-        needs: ["branch test"]
-        input: draft
-        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
         evidence:
           - name: tests
             form: command
             expects: assertion
             says: the tests you write fail on their own assertion
-          - name: red
-            form: list
-            says: every test file standing red until tests-green closes, one a line, which the check leaves out
           - name: seen
             form: text
             says: what you see, and what surprises you
-  - name: gate
-    gate: does the approach answer the ask, and does a red test decide every done_when line
-    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
-    not: design/draft
-    reads: [[spec/guidance/review/design]]
-    input: ["design/draft", "design/tests-red"]
-    evidence:
-      - name: verdict
-        form: verdict
-        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
-  - name: implement
-    reads: [[spec/guidance/code/testing]]
-    needs: ["branch test"]
-    input: ["design/draft", "gate"]
-    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
-    steps:
       - name: change
         does: makes the change
         reads: [[spec/guidance/code/code]]
@@ -91,31 +74,10 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-  - name: accept
-    gate: does the whole work answer the ask, and does every command of the route pass
-    final: true
-    when: backlog
-    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
-    not: implement/change
-    reads: [[spec/guidance/review/design]]
-    input: ["ask", "implement"]
-    evidence:
-      - name: verdict
-        form: verdict
-        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
-  - name: view
-    does: reads the change in the view the ask names
-    by: person
-    when: view
-    on_fail: implement
-    to: retro
-    input: ["ask", "implement/tests-green"]
-    evidence:
-      - name: seen
-        form: verdict
-        says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 232901a63743b1a3
+process_hash: 9d870e3fd3c577a6
+group: the-process-stays-editable
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d7d8cca563b1 · claude-code-remote
@@ -142,7 +104,6 @@ record:
         exit: 0
         said: "spec/tickets/the-retro-reads-the-backlog.md:145:1: Sentence: A sentence holds 25 words. Cut this one in two."
     def: 21d63335f32dfcda
-group: the-process-stays-editable
 ---
 
 # Ask
@@ -158,16 +119,6 @@ Today a changed input leaves every step that read it standing as done, and a rou
 - `./RUNME.sh check` exits 0
 
 # design
-
-## owner-read
-
-<!-- reads the ask a handover carries, before any draft -->
-
-### read
-
-<!-- pass where the ask says what the owner said, or fail with the owner's words -->
-
-<!-- the form is verdict -->
 
 ## draft
 
@@ -210,6 +161,21 @@ processAt, updated, reachedOf, handOut, the index door and Files stand opened, a
 the callers list names each function the stale read and the record fields change
 each done_when line maps to a pull-stale case: hashes, marks, append, edit
 
+## review
+
+<!-- reads the approach against the ask -->
+
+### verdict
+
+<!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
+<!-- the form is verdict -->
+
+pass with findings
+- stale-shares-the-bless-hash: hashText in src/scripts/pull-bless.js hashes a chapter for the bless already, so the stale read takes its chapter hash from one function both modules import
+- stale-fields-reach-test-schema: SCHEMA in test/level0/pull-schema.js copies the record shape of the ticket schema, so inputs, def and stale land there beside spec/schemas/ticket.schema.yaml
+
+# implement
+
 ## tests-red
 
 <!-- writes the tests the ask calls for -->
@@ -217,14 +183,9 @@ each done_when line maps to a pull-stale case: hashes, marks, append, edit
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
 
-### red
-
-<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
-<!-- the form is list -->
+./RUNME.sh branch test test/level0/pull-stale.test.js src/index
 
 ### seen
 
@@ -240,20 +201,13 @@ each done_when line maps to a pull-stale case: hashes, marks, append, edit
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-# gate
-
-<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
-
-## verdict
-
-<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
-<!-- the form is verdict -->
-
-# implement
+the tests touch the files the draft names, plus the fake index
+every door the tests reach runs on a fake, and the index takes one in src/doors/fake/index.js
+the header of each new file links the design section
+the hash stands once in hash.js, and the Go side ports it with a case pinning both to one value
+the two review rows meet the change: the bless hash and the test schema copy
 
 ## change
 
@@ -304,26 +258,6 @@ both review rows stand fixed: the bless reads chapterText from pull-stale.js, an
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
-
-# accept
-
-<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
-
-## verdict
-
-<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
-<!-- the form is verdict -->
-
-# view
-
-<!-- reads the change in the view the ask names -->
-
-## seen
-
-<!-- pass where the view shows the ask's number, or fail with what it shows -->
-
-<!-- the form is verdict -->
 
 # Discussion
 

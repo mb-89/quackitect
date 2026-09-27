@@ -318,3 +318,25 @@ test("a pass writes the inputs and the definition hash beside the tips it record
   assert.equal(entry.def, defOf(built.it, text, leaf));
   assert.equal(entry.hash_before, SHA);
 });
+
+// A copy stranding a recorded leaf would leave the record pointing nowhere, so the ticket waits for ticket update. [[spec/design_output/pull#an-input-marks-its-steps]]
+test("a process edit dropping a leaf the record names leaves the ticket as it stands", () => {
+  const hash = processHash(`for: a route in two phases\n${ROUTE()}`);
+  const built = made(CHILD("implement/tests", hash));
+  const before = passedUpTo(built, "implement/tests");
+  const renamed = ROUTE()
+    .replace("      - name: review\n", "      - name: read\n")
+    .replace("input: [ask, design/review]", "input: [ask, design/read]");
+  built.disk.write(PROCESS, `for: a route in two phases\n${renamed}`);
+  pull(built);
+
+  const text = textOf(built);
+  assert.equal(fieldOf(text, "step"), "implement/tests");
+  assert.equal(
+    fieldOf(text, "process_hash"),
+    hash,
+    "the ticket keeps the route it copied",
+  );
+  assert.equal(frontOf(text).steps.length, frontOf(before).steps.length);
+  assert.match(text, /- name: review\n/, "the recorded leaf stands in the route");
+});
