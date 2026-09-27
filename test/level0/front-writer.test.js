@@ -3,6 +3,7 @@
 // [[spec/tickets/go-writes-the-frontmatter]]
 
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import { test } from "node:test";
 import { BIN } from "../../.claude/skills/level0/lib/tools.js";
 import { withField } from "../../src/engine/group.js";
@@ -11,7 +12,8 @@ import { fakeProc } from "../../src/doors/fake/proc.js";
 import { front } from "../../src/doors/front.js";
 
 const METHOD = "/tree";
-const BINARY = `${METHOD}/${BIN}/se-front`;
+// The door joins with the platform's separator, so the binary's path does too. [[spec/tickets/ci-runs-a-windows-job]]
+const BINARY = join(METHOD, BIN, "se-front");
 const NOTE = "---\nstate: open\n---\n\n# Ask\n";
 
 test("a group writer hands the note to the binary and writes its answer", () => {

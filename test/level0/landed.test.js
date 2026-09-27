@@ -4,7 +4,8 @@
 // [[spec/design_output/pull#the-refused-commit]]
 
 import assert from "node:assert/strict";
-import { join } from "node:path";
+// The fixtures stand on posix paths, so the verb joins them the same way on every platform. [[spec/tickets/ci-runs-a-windows-job]]
+import { join } from "node:path/posix";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
