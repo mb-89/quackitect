@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
-todo: true
+state: closed
+todo: false
 step: decide
 steps:
   - name: decide
@@ -20,6 +20,17 @@ steps:
         says: why, in a line, or what the successor carries
 process: [[spec/processes/note]]
 process_hash: e02a0935ed78eb92
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: 6ebb37fadc18f1b5b18c4cf3ca04060812b455e0
+    hash_after: 6ebb37fadc18f1b5b18c4cf3ca04060812b455e0
+    inputs:
+      - name: ask
+        hash: ed0dc80399ca1e77
+        size: 962
+    def: 9e2520e6318baf46
+reason: done
 ---
 
 # Ask
@@ -49,14 +60,16 @@ Four places pick the home folder, each in its own order, and one of them reads `
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+done
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+Fixed in 0c35f56f6: trust.js and browser.js call homeIn in src/scripts/editor.js, the stub bridgehead spells its order again, and cases in test/level0/trust.test.js and browser.test.js hold a box naming USERPROFILE alone.
 
 # Discussion
 
