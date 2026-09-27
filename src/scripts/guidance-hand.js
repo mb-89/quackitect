@@ -8,7 +8,11 @@ import {
   HOLDS as OWNED_HOLDS,
 } from "../../.claude/skills/level0/lib/folders.js";
 
-import { actionables, bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
+import {
+  actionables,
+  bindsHere,
+  parse,
+} from "../../.claude/skills/level0/lib/guidance.js";
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { carriedIn } from "../../.claude/skills/level0/lib/tested.js";
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
@@ -171,6 +175,37 @@ export function notesSaid(it, paths) {
     for (const [i, item] of items.entries()) rows.push(`  ${i + 1}. ${item}`);
   }
   return rows;
+}
+
+// A note under a subfolder carries a tag for each folder on its path, then the tags its frontmatter names. A note at the top carries none, since it rides the output style. [[spec/design_input/level-two#guidance]]
+export function tagsOf(it, path) {
+  const folders = String(path)
+    .slice(GUIDANCE.length + 1)
+    .split("/")
+    .slice(0, -1);
+  if (!folders.length) return [];
+  const said = parse(guidanceText(it, path)).front.tags;
+  // The frontmatter reader answers an inline list as its text, so the brackets and commas split here. [[spec/design_input/level-two#guidance]]
+  const own = (
+    Array.isArray(said)
+      ? said
+      : String(said ?? "")
+          .replace(/^\[|\]$/g, "")
+          .split(",")
+  ).map((one) => String(one).trim());
+  return [...new Set([...folders, ...own.filter(Boolean)])];
+}
+
+// Every note under a subfolder whose tags all stand among the step's, where its env binds here. [[spec/design_input/level-two#guidance]]
+export function resolved(it, tags, env = {}) {
+  const at = it.join(it.root, ...GUIDANCE.split("/"));
+  if (!it.disk.exists(at)) return [];
+  const has = new Set([tags ?? []].flat().map(String));
+  return namesUnder(it, at, GUIDANCE)
+    .filter((path) => path.split("/").length > GUIDANCE.split("/").length + 1)
+    .filter((path) => tagsOf(it, path).every((one) => has.has(one)))
+    .filter((path) => bindsHere(guidanceText(it, path), env))
+    .sort();
 }
 
 // [[spec/design_output/level0#the-standing-layer]]

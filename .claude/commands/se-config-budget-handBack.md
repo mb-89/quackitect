@@ -1,0 +1,14 @@
+---
+description: "config / budget / handBack: sets budget.handBack to what you type. The median time a hand-back takes to land over a group of many tickets, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond."
+argument-hint: "<value>"
+allowed-tools: Bash(./RUNME.sh config:*)
+disable-model-invocation: true
+generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
+---
+
+!`./RUNME.sh config budget.handBack $ARGUMENTS`
+
+The line above runs before this turn opens, so `budget.handBack` reads what you type
+after the name. Run `./RUNME.sh config` to read which layer answers a key:
+`.se/.runtime/config.json` beats the environment, and the environment beats
+`spec/config/level0.json`.
