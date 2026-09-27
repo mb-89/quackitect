@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -98,6 +98,11 @@ record:
     hash_after: b4d3c8ed536c28bad242530e350e48a8db83a241
     returns: 1
     why: "the redraw runs `./RUNME.sh tui work --count` on every burst of ticket, plan and hold writes. Each run starts node, can build the viewer, and reads git over every work branch, thirteen seconds on the owner's desk. The owner rules on sidebar-lands-in-shadow that the sidebar builds and restarts nothing, and draws a question mark until the engine answers. The redraft reads a count the engine already keeps, and spawns no verb on a draw; the count stands at 68 on the owner's desk, because the queue reads a group as the cloud's by its branch alone. the-queue-reads-the-marker reads `cloud: true` in its place, so the redraft names it under `depends_on`, and the badge and the brackets agree on the local count once it lands"
+  - step: design/person-1
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: ccc6f854a3a0c823c6ef7aabd3a6a948366ce048
+    hash_after: ccc6f854a3a0c823c6ef7aabd3a6a948366ce048
+    def: 3acd0a8c729a3d0a
 ---
 
 # Ask
@@ -129,8 +134,9 @@ The badge counts the rows the tab draws, and the sidebar redraws on a config cha
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is choice -->
+
+wait for phase 2 and land the rest now
 
 ## draft
 
