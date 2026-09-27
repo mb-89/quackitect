@@ -146,7 +146,7 @@ function sidebarOf(door) {
         return door.startProcess?.(key, how);
       }
       if (message?.kind === "press" && message.key) return press(String(message.key));
-      // The bless file stands outside the config, so no config key draws or writes it. [[spec/design_output/pull#the-bless]]
+      // The bless file stands outside the config, so no config key draws or writes it: src/extension/lib/panel.js draws the button, and src/extension/webview/clicks.js sends this kind. [[spec/design_output/pull#the-bless]]
       if (message?.kind === "bless") {
         const agent = message.value === true || message.value === "true";
         await logbook.say("info", "sidebar", `an agent at this desk blesses: ${agent}`);
