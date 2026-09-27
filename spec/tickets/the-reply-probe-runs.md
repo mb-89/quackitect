@@ -34,6 +34,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
+group: the-engine-fixes-its-faults
 record:
   - step: answer
     hand: box d6f05e3a585030 · claude-code · the owner says so
