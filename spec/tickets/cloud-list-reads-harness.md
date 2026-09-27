@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-process-stays-editable
 parent: a-gate-asks-a-bless
+record:
+  - step: do
+    hand: box d7d9b0d5dfcf · claude-code-remote
+    hash_before: b7745fde7bfbcfc1475615c07a495b754769a371
+    hash_after: b7745fde7bfbcfc1475615c07a495b754769a371
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-retro-reads-the-backlog.md:145:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 55dcb25669926c7b
+        size: 216
+    def: 99fa1a62aef2e988
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ inCloud reads CLOUD in .claude/skills/level0/lib/cloud.js, a second list beside 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/bash-bless.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The change landed in 0072297d0 under a-gate-asks-a-bless. blessGuard in src/bridge/bless.js guards the union of the HARNESS names out of src/scripts/pull-hand-of.js and CLOUD out of .claude/skills/level0/lib/cloud.js. A name in CLOUD alone stays guarded if HARNESS drops it.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask by its first road: the guard points at both lists
+no cleanup revealed
+the guard reads each list where it stands and copies no name
 
 # Discussion
 
