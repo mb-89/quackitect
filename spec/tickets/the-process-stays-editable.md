@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/the-process-stays-editable already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d7da794434cd · claude-code-remote
+    hash_before: 430f30017e9d102c018f813f8ed80c007f4d3b29
+    hash_after: 430f30017e9d102c018f813f8ed80c007f4d3b29
+    inputs:
+      - name: ask
+        hash: f62f4ae3f6fd31d9
+        size: 289
+      - name: [[spec/design_input/level-two]]
+        hash: b8bf73d993bb8909
+        size: 15501
+    def: cb8f90bc86fc7d39
 depends_on: ["the-engine-holds-the-route"]
 ---
 
@@ -129,14 +141,27 @@ A moved input marks exactly the steps that read it, and a process stays editable
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/a-moved-input-marks-steps]] standard
+[[spec/tickets/a-gate-asks-a-bless]] standard
+[[spec/tickets/the-retro-reads-the-backlog]] standard, closes became [[spec/tickets/a-rewind-spares-landed-tests]]
+[[spec/tickets/stale-shares-the-bless-hash]] trivial
+[[spec/tickets/stale-fields-reach-test-schema]] trivial
+[[spec/tickets/bless-guard-reads-scripts]] trivial
+[[spec/tickets/bless-button-draws-itself]] trivial
+[[spec/tickets/process-case-for-bless]] trivial
+[[spec/tickets/cloud-list-reads-harness]] trivial
+[[spec/tickets/retro-check-names-the-process]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each child is one ask with its own tests, small enough to review whole
+the three standard children carry the three chapters the goal names, and each trivial child carries a review row of one of them
+no child waits on another, since each review row lands after its parent passes design
 
 # children
 
