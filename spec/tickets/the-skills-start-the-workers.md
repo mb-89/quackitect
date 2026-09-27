@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -138,6 +138,19 @@ record:
         hash: 095e262b0b5667dc
         size: 2735
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: edee5580adcac419419ffd8da6fc530f2058fdca
+    hash_after: edee5580adcac419419ffd8da6fc530f2058fdca
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 6f2fc1b0d0385faf
+        size: 2860
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -254,26 +267,33 @@ I assume a connector names the session tool and the pull request tool, so the sk
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/skills.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/skills.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+All three cases fail on their own assertion, because neither skill file stands yet.
+
+One thing surprises me. No test under test/level0 reads a tracked file today, and this one reads both skills with node:fs. It reaches no door, so it stands as a check over the tree, and the verb list comes from the verbs table in cli.js, the one help prints.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line on the skills and the verbs meets a failing case, and the guidance pointer and the check stand as checkpoints
+- the test reaches no door: it reads two tracked files and imports the verbs table
 
 # gate
 
