@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -145,6 +145,18 @@ record:
         hash: fdd4f3f45b32d5c5
         size: 2927
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 5151dd687ae0221266772493cef57f604ffd3e67
+    hash_after: 5151dd687ae0221266772493cef57f604ffd3e67
+    inputs:
+      - name: design/draft
+        hash: fdd4f3f45b32d5c5
+        size: 2927
+      - name: design/tests-red
+        hash: fc25582a6d83a8e0
+        size: 644
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -283,8 +295,12 @@ the cases run over a catalog and a wiring in memory, and reach no door
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- action-outputs-carry-field-tags: the ask has output fields carry label and doc tags; the draft defers them because an action answers []Request, so a typed result and its field tags wait on a ticket of their own
+- the-check-refuses-undescribed-modules: the ask has the check refuse a missing description before a merge, and nothing past the tests calls q.Start, so a production module with no q.Doc passes the check; a test in a package importing every module runs Catalog.Undescribed over the full catalog
+- looks-reads-a-field-label: no case reads a field label off Presentation.Fields; the builder adds that assertion to the field case in place
 
 # implement
 
