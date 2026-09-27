@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [the-skills-start-the-workers, groups-hold-groups]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -190,6 +190,15 @@ record:
     hash_after: 74e21337bbe2e41252c4e747fa16e15eb3bd8499
     returns: 1
     why: the hand takes it back
+  - step: implement/change
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 32669a9a0607f7a02a864178e9763db5a005f69f
+    hash_after: 32669a9a0607f7a02a864178e9763db5a005f69f
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/scripts/work.js:67:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -381,10 +390,10 @@ accept with points
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches the files the size list names, and two more: the design input drops its line on the funnel note, which it says leaves with this ticket, and the take case gains the assertions a point asks for
+- the change touches the files the size list names, and two more: the design input drops its line on the funnel note, and the take case gains the assertions a point asks for
 - the change reaches git through the git door alone, which the fake process answers in every case
 - each new function carries a comment naming the hand-over it implements
-- stuckIn moves from the dispatch into work-free.js, so one function answers a stuck hand-over for the dispatch and the take
+- one function in work-free.js answers a stuck hand-over for the dispatch and the take
 
 ## tests-green
 
