@@ -560,7 +560,7 @@ A branch meets its dependency once the dependency's ticket stands closed on trun
 
 | the dependency | the dependent |
 |---|---|
-| its ticket on trunk stands closed | runs |
+| its ticket on trunk stands at `state: closed` | runs |
 | its branch stands no more | runs |
 | `todo`, held, or `done` on its own branch | waits |
 
