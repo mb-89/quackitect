@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: design/draft
 steps:
   - name: design
     steps:
@@ -284,6 +284,12 @@ record:
         hash: 0dbbf5047a23c593
         size: 3078
     def: 897ac034247c0bca
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/design_output/level0]]
+  - step: design/draft-2
+    hand: the engine
+    stale: [[spec/design_output/level0]]
 group: the-cloud-works-its-queue
 ---
 
