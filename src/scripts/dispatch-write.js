@@ -4,6 +4,7 @@
 // names main and the box's checkout moves nowhere.
 // [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
 
+import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import {
@@ -24,7 +25,7 @@ import { waitingOn } from "./work-stands.js";
 
 // The branch prefix the writes ride, and the worktree they are made in. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
 export const WRITES = "claude/dispatch-";
-const WORKTREE = ".se/.runtime/dispatch";
+const WORKTREE = `${RUN}/dispatch`;
 // A commit's short name, as git prints it. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
 const SHORT = 7;
 

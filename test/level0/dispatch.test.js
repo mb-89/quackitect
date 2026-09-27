@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import {
@@ -244,7 +245,7 @@ test("a child reads off its own group's branch, and another branch's older copy 
 const MAIN = "c0ffee1234abcdef";
 const SHORT = MAIN.slice(0, 7);
 const WRITE_BRANCH = `claude/dispatch-${SHORT}`;
-const WORKTREE = `${ROOT}/.se/.runtime/dispatch`;
+const WORKTREE = `${ROOT}/${RUN}/dispatch`;
 const FIX_NAME = `loose-fixes-${SHORT}`;
 const VALE = `${ROOT}/.se/.runtime/bin/vale`;
 const GROUP_PROCESS = `for: work that lands as one
