@@ -114,11 +114,24 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [ops-keeps-one-state, stale-names-keep-their-value]
+record:
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 18daf684614f8684798996e413e5830344dbe0d0
+    hash_after: 18daf684614f8684798996e413e5830344dbe0d0
+    inputs:
+      - name: ask
+        hash: 93d7bf73eb9595f4
+        size: 820
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -152,38 +165,125 @@ The core then holds no logic of its own. The manager tests like every IO module,
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+One, src/ops and src/watchdog move into package index under src/modules/index as ops.go, call.go and lease.go, with their tests.
+Two, colliding names take prefixes: NewBook, BookSettings, NewDog, DogSettings. Each SettingsOf turns unexported.
+Three, manager.go holds Registers. It calls q.GivenIn for ops/<id>, session/alarms and index/health by full name, one carrying q.IO().
+Four, manager.go holds Start over an Outside: the root, the store, its writer, the op rows, a step hook, a now and an every.
+Five, Start opens the book over the rows, commits each move under ops/<id>, and fails every operation in flight.
+Six, Start builds the dog and holds the lease index at watchdog.lease.
+Seven, each loop step renews that lease and commits index/health as part, renewed and term.
+Eight, a tick at watchdog.beat runs Check, Expire and Sweep, and drops each swept ops/<id> from the store.
+Nine, ops.go gains rowsKeep, which turns raw JSON rows into the Keep the book reads.
+Ten, src/index keeps the work loop and the op table, and imports neither ops nor watchdog.
+Eleven, the op table answers id and body bytes, so neither side names the other's types.
+Twelve, the door takes a Manage start and hands it the store, the op rows and a step hook.
+Thirteen, sweeps calls each step hand where it beats today. beats drops Check, and guards drops sweepsOps.
+Fourteen, Serve keeps its signature and runs no manager. ServeManaged and Main take one.
+Fifteen, src/quack registers the manager into q.Main before the wiring loads.
+Sixteen, src/quack hands index.Main an adapter over manager.Start, with or without a wiring file.
+Weighed: src/index importing src/modules/index directly. nomodule and TestTheIndexImportsNoModule refuse it.
+Weighed also: an index instance in spec/wiring.yaml. A tree with no wiring file never loads it.
+Assumed: index/ means index/health alone in this ticket.
+Assumed: the manager reads its keys through src/config, which its q.IO() flag lets past onlyq.
+Assumed: manager cases run over q.NewStore as clock does, since qtest hides its store. This departs from the ask's qtest line.
+Assumed: the tick calls Expire, the deadline watch nothing calls today.
+Assumed: this change lands after tickets-becomes-a-module, which edits topic.go, main.go and their tests too, and takes its topic.go as the base.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/index/door.go: door struct, drops dog and book, gains the step hands
+src/index/door.go: Serve, wraps ServeManaged with no manager
+src/index/door.go: opens, takes a Manage, drops watchdog.Registers, New, Hold, the lease span and opensBook, and calls the manage after the database opens
+src/index/door.go: sweeps, calls each step hand in place of dog.Beat
+src/index/door.go: guards, drops sweepsOps
+src/index/beats.go: beats, drops dog.Check. leasePart and builtInLease leave for the manager
+src/index/ops.go: opKeep, becomes the raw op table. opensBook, hears and sweepsOps leave
+src/index/topic.go: registersTopics and writers, drop ops.Registers and the ops writer
+src/index/main.go: Main and serves, take the Manage and pass it to ServeManaged
+src/quack/main.go: main, registers the manager into q.Main and hands index.Main the adapter
+src/quack/main.go: manages, new adapter from index.Manage to manager.Start
+src/modules/index/ops.go: New, Settings, SettingsOf renamed. Registers leaves for manager.go. rowsKeep added
+src/modules/index/lease.go: New, Settings, SettingsOf renamed. Registers leaves for manager.go. Lease gains json tags
+src/modules/index/call.go: Call, Wait, WaitCaller, package clause alone
+src/index/core_test.go: TestTheCoreWritesNoInputName, drops watchdog.Registers
+src/index/contract_test.go: inProcess, drops watchdog.Registers
+src/index/ops_test.go: TestTheOpRowsOutliveTheDoor and TestADroppedOpLeavesTheTable, read raw bodies. TestAnOperationPastItsWindowLeavesTheStore moves to the manager. TestASweepWithNoBookDropsNothing leaves
+src/index/door_test.go: TestTheIndexLeaseRenewsOffItsWorkLoop, reads a step hand fire off the loop in place of dog.Lease
+src/index/beats_test.go: TestABeatAtZeroTakesTheBuiltInSpan, keeps the beat half, and the lease half moves to the manager
+src/index/topic_test.go: TestTheTopicsCommitThroughTheirOwnWriters, drops the as.ops half
+src/modules/index/ops_test.go: bookOf and TestRegistersHandsTheWriterOfItsFamily, take the new names and the manager's Registers
+src/modules/index/lease_test.go: dogOf, takes the new names, and one clock helper serves both test files
+src/modules/index/call_test.go: TestTheConfigHoldsOneActionDeadline, reads config at ../../..
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+./...: go test ./... from the root
+src/quack/main_test.go: TestTheManagerFoldsOpsAndTheWatchdog
+src/quack/main_test.go: TestTheIndexLoadsTheManagerWithNoOtherModule
+src/modules/index/manager_test.go: TestTheManagerWritesItsNames
+src/modules/index/manager_test.go: TestAStartFailsTheOpsInFlightUnderOpsId
+src/modules/index/manager_test.go: TestEachStepRenewsIndexHealth
+src/modules/index/manager_test.go: TestAnOperationPastItsWindowLeavesTheStore
+src/modules/index/manager_test.go: TestALeaseAtZeroTakesTheBuiltInTerm
+src/index/door_test.go: TestTheIndexLeaseRenewsOffItsWorkLoop
+RUNME.sh: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/modules/index/ops.go
+src/modules/index/call.go
+src/modules/index/ops_test.go
+src/modules/index/call_test.go
+src/modules/index/lease.go
+src/modules/index/lease_test.go
+src/modules/index/manager.go
+src/modules/index/manager_test.go
+src/ops/ops.go
+src/ops/call.go
+src/ops/ops_test.go
+src/ops/call_test.go
+src/watchdog/lease.go
+src/watchdog/lease_test.go
+src/index/door.go
+src/index/beats.go
+src/index/beats_test.go
+src/index/ops.go
+src/index/ops_test.go
+src/index/topic.go
+src/index/topic_test.go
+src/index/core_test.go
+src/index/contract_test.go
+src/index/door_test.go
+src/index/main.go
+src/quack/main.go
+src/quack/main_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened ops.go, call.go, lease.go, door.go, beats.go, ops.go, topic.go and main.go under src/index, src/quack/main.go, the clock, files and tickets modules, qtest, q.GivenIn, Why, Stale and Load, and imports.go with its tests, and checked each claim there
+grepped every importer of quackitect/src/ops and quackitect/src/watchdog, every use of book, dog and leasePart, and every caller of Serve, opens and Main, and the callers list names each
+each done_when line names its case: go test, TestTheManagerFoldsOpsAndTheWatchdog, TestTheIndexLoadsTheManagerWithNoOtherModule, TestTheManagerWritesItsNames, and the check
 
 ## tests-red
 
