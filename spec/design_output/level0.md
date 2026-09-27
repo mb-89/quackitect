@@ -717,6 +717,18 @@ asks for the canary, and reads the log that run leaves:
 The numbers come out of the standing block alone. So an answer carrying them
 proves the block stands in front of the model past the compaction.
 
+`./RUNME.sh probe reply` runs the client headless on the prompt
+`REPLY_PROBE.opens` in `.claude/skills/level0/lib/guidance.js` names:
+
+1. The prompt's marker arms the bridgehead at `prompt.submit`.
+2. The next `tool.call` writes one `probe.reply` row, whose detail holds the
+   event's short fields.
+3. `readsReply` in `src/scripts/probe-reply.js` names each field carrying the
+   line the prompt asks for, and reads whether the answer quotes the warning
+   as the prompt's first line.
+4. The verb answers green where the row stands, and red where the client
+   loads no function hooks.
+
 ## What the probe reads
 
 `readsCompaction` in `src/scripts/probe.js` is a pure function over log rows:
