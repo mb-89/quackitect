@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: retro/notes
+step: retro/write
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [open-tasks-land-in-shadow]
@@ -97,6 +97,14 @@ record:
     hand: the engine
     hash_before: 2635e46d354e6697f658e662212f277ccfbdea46
     hash_after: 2635e46d354e6697f658e662212f277ccfbdea46
+  - step: retro/notes
+    hand: box d7d80931cecf · claude-code-remote
+    hash_before: d7548184cc20546204b7ec51606d33d99f9ab4f1
+    hash_after: d7548184cc20546204b7ec51606d33d99f9ab4f1
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -153,6 +161,8 @@ Done when the badge and the work tab's brackets read one name.
 <!-- retro notes, which passes when the private folder is empty -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh retro notes
 
 ## write
 
