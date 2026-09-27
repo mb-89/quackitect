@@ -107,3 +107,14 @@ func TestAClearedAlarmLeavesSessionAlarms(t *testing.T) {
 		t.Fatalf("one fault answers %v and %v, and one fault raises the alarm", wait, restart)
 	}
 }
+
+func TestAHeartbeatRenewsTheLease(t *testing.T) {
+	dog, _, now := dogOf(t, Settings{}, func(c *q.Catalog) { q.GivenIn(c, "w/count", 0) })
+	dog.Hold("w/count", 10*time.Second)
+	now.pass(8 * time.Second)
+	dog.Beat("w/count")
+	now.pass(8 * time.Second)
+	if expired := dog.Check(); len(expired) != 0 {
+		t.Fatalf("a renewed lease expires: %v", expired)
+	}
+}

@@ -81,8 +81,8 @@ flight at a crash ends loud.
 | the operation | stays | the config key |
 |---|---|---|
 | `queued` or `running` | until it ends | none |
-| `done` or `cancelled` | a window | `ops.keep.done` |
-| `failed` | a longer window | `ops.keep.failed` |
+| `done` or `cancelled` | a window | `ops.keepDone` |
+| `failed` | a longer window | `ops.keepFailed` |
 
 The session log keeps every move past both windows. The foundation adds each
 key and its default to `spec/config/level0.json`.

@@ -201,3 +201,14 @@ func TestAnEndedOpLeavesAfterItsWindow(t *testing.T) {
 		t.Fatal("the failed op leaves inside its longer window")
 	}
 }
+
+func TestEveryMoveReachesTheIndex(t *testing.T) {
+	b, _, _ := bookOf(t)
+	var heard []State
+	b.OnMove(func(one Op) { heard = append(heard, one.State) })
+	id, _ := b.Start("t/read", nil, "s1", reader)
+	b.Finish(id, "ok")
+	if len(heard) != 3 || heard[0] != Queued || heard[1] != Running || heard[2] != Done {
+		t.Fatalf("the index hears %v", heard)
+	}
+}

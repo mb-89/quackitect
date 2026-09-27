@@ -5,7 +5,6 @@ package main
 
 import (
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"quackitect/src/config"
@@ -34,19 +33,7 @@ func restatedHere(root string) (int, int) {
 
 // A count the shared reader answers, or zero where the key stands nowhere. [[spec/design_output/config#the-go-reader]]
 func countAt(root, key string) int {
-	said, held := config.Value(root, key)
-	if !held {
-		return 0
-	}
-	switch one := said.(type) {
-	case float64:
-		return int(one)
-	case string:
-		if whole, err := strconv.Atoi(one); err == nil {
-			return whole
-		}
-	}
-	return 0
+	return config.Count(root, key)
 }
 
 // [[spec/design_output/tools#what-the-survey-writes]]

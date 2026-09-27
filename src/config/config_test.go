@@ -128,3 +128,20 @@ func TestAListReadsInTheOrderTheFileWrites(t *testing.T) {
 		t.Fatalf("a key the file holds nowhere answers %v", held)
 	}
 }
+
+// [[spec/design_output/config#the-go-reader]]
+func TestACountReadsANumberOrATextAndZeroWhereNoneStands(t *testing.T) {
+	root := rootWith(t, map[string]string{
+		Tracked: `{"ops": {"keepDone": 3600, "keepFailed": 60}}`,
+		Local:   `{"ops": {"keepFailed": " 90 "}}`,
+	})
+	if said := Count(root, "ops.keepDone"); said != 3600 {
+		t.Fatalf("the tracked number reads %d", said)
+	}
+	if said := Count(root, "ops.keepFailed"); said != 90 {
+		t.Fatalf("the local text reads %d", said)
+	}
+	if said := Count(root, "ops.none"); said != 0 {
+		t.Fatalf("a key standing nowhere reads %d", said)
+	}
+}

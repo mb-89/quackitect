@@ -48,6 +48,7 @@ CREATE INDEX IF NOT EXISTS link_target ON link (target);
 CREATE INDEX IF NOT EXISTS link_to ON link (to_path);
 CREATE VIRTUAL TABLE IF NOT EXISTS note_text USING fts5 (path UNINDEXED, id, body);
 CREATE VIRTUAL TABLE IF NOT EXISTS line_text USING fts5 (path UNINDEXED, n UNINDEXED, text);
+CREATE TABLE IF NOT EXISTS op (id TEXT PRIMARY KEY, body TEXT NOT NULL);
 `
 
 const version = "3"

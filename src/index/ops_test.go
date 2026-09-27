@@ -43,3 +43,27 @@ func TestTheOpRowsOutliveTheDoor(t *testing.T) {
 		t.Fatalf("the table op holds %+v", all)
 	}
 }
+
+func TestADroppedOpLeavesTheTable(t *testing.T) {
+	db, err := Open(tree(t), filepath.Join(t.TempDir(), "index.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	keep := opKeep{db}
+	for _, id := range []string{"1-a", "2-b"} {
+		if err := keep.Save(ops.Op{ID: id, State: ops.Done}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := keep.Drop("1-a"); err != nil {
+		t.Fatal(err)
+	}
+	all, err := keep.All()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(all) != 1 || all[0].ID != "2-b" {
+		t.Fatalf("the table op holds %+v", all)
+	}
+}

@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -96,6 +96,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, a test of src/ops fails
+  - step: implement/change
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: e070756c6a132a981645e608f79512aad0d0d3cf
+    hash_after: e070756c6a132a981645e608f79512aad0d0d3cf
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/sqlite-runs-pure-go.md:111:1: Sentence: A sentence holds 25 words. Cut this one in two."
 ---
 
 # Ask
@@ -259,11 +267,19 @@ Every new test fails on its assertion against stubs that compile. The rest of ea
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the draft names. `config.Count` moves out of `src/lsp`, so one place reads a count
+- the clock and the keep take fakes, and the store stands real in each test
+- each file opens on a comment pointing at the operations or the watchdogs note
+- the key names stand in the config and both notes point at them
+- the stale mark keys by provider, and `Book.Cancel` answers `ops/cancel`
 
 ## tests-green
 

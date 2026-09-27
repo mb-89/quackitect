@@ -19,7 +19,9 @@ import (
 	"strings"
 	"sync"
 
+	"quackitect/src/ops"
 	"quackitect/src/q"
+	"quackitect/src/watchdog"
 	"sync/atomic"
 	"syscall"
 	"time"
@@ -61,6 +63,7 @@ type answer struct {
 
 type door struct {
 	db    *sql.DB
+	book  *ops.Book
 	root  string
 	guard sync.Mutex
 	dirty chan struct{}
@@ -138,6 +141,8 @@ func trackedIn(root string) func(rel string) bool {
 
 func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 	registersFiles(catalog)
+	ops.Registers(catalog)
+	watchdog.Registers(catalog)
 	// The catalog check runs before the database opens, so a fault refuses the start and no provider key stands yet. [[spec/design_output/model#the-catalog-check]]
 	if faults := catalog.Check(nil); len(faults) > 0 {
 		said := make([]string, 0, len(faults))
@@ -159,6 +164,10 @@ func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
 	one.store, one.published = q.NewStore(catalog, nil), map[string]bool{}
+	if err := one.opensBook(); err != nil {
+		db.Close()
+		return nil, nil, err
+	}
 	if err := one.publishes(nil); err != nil {
 		db.Close()
 		return nil, nil, err

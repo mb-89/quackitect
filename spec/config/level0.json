@@ -107,5 +107,21 @@
     "phase9shadow": false,
     "phase9switch": false,
     "phase10": false
+  },
+  "ops": {
+    "comment": "How long an ended operation stays, in seconds. A window of zero keeps it. spec/design_output/operations.md, chapter What stays how long, says the rest.",
+    "keepDone": 3600,
+    "keepFailed": 86400
+  },
+  "watchdog": {
+    "comment": "The spans of the watchdog, in seconds, and the faults that raise an alarm. spec/design_output/watchdogs.md says the rest.",
+    "backoffFirst": 1,
+    "backoffCap": 60,
+    "faults": 5,
+    "window": 300,
+    "deadlineDerived": 30,
+    "deadlineFold": 30,
+    "deadlineAction": 30,
+    "deadlineOp": 600
   }
 }

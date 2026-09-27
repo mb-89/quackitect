@@ -4,6 +4,7 @@
 package q
 
 import (
+	"strings"
 	"testing"
 	"time"
 )
@@ -158,5 +159,12 @@ func TestACommitOfThePartClearsItsStaleMark(t *testing.T) {
 	}
 	if _, stale := s.Snapshot().Stale("t/n"); stale {
 		t.Fatal("t/n reads stale after its commit")
+	}
+}
+
+func TestAStaleMarkOnANameNobodyProvidesRefuses(t *testing.T) {
+	s := NewStore(New(), nil)
+	if err := s.Stale("t/none", time.Unix(0, 0)); err == nil || !strings.Contains(err.Error(), "t/none") {
+		t.Fatalf("the mark answers %v", err)
 	}
 }

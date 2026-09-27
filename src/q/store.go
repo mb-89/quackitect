@@ -22,11 +22,13 @@ type Store struct {
 	active   map[string]*registration
 	revision int64
 	values   map[string]cell
+	stale    map[*registration]time.Time
 }
 
 type Snapshot struct {
 	Revision int64
 	values   map[string]cell
+	stale    map[*registration]time.Time
 	store    *Store
 }
 
@@ -51,7 +53,7 @@ func (s *Store) owner(name string) *registration {
 func (s *Store) Snapshot() Snapshot {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return Snapshot{Revision: s.revision, values: s.values, store: s}
+	return Snapshot{Revision: s.revision, values: s.values, stale: s.stale, store: s}
 }
 
 // [[spec/design_output/model#snapshots-and-revisions]]
@@ -73,6 +75,16 @@ func (s *Store) Commit(read int64, values map[string]any) (int64, error) {
 	}
 	for name, value := range values {
 		next[name] = cell{value: value, from: read}
+	}
+	if len(s.stale) > 0 {
+		current := make(map[*registration]time.Time, len(s.stale))
+		for held, at := range s.stale {
+			current[held] = at
+		}
+		for name := range values {
+			delete(current, s.owner(name))
+		}
+		s.stale = current
 	}
 	s.revision++
 	s.values = next
@@ -120,9 +132,31 @@ func (s *Store) Declared(name string) (Declared, bool) {
 	return Declared{Op: one.op, Writes: one.writes, Deadline: one.deadline}, true
 }
 
-func (s *Store) Stale(provider string, since time.Time) error { return nil }
+// A stale mark keys by provider, so a sibling under the same topic stays current. [[spec/design_output/watchdogs#a-stale-mark]]
+func (s *Store) Stale(provider string, since time.Time) error {
+	one := s.owner(provider)
+	if one == nil {
+		return fmt.Errorf("the catalog holds no active provider of %s", provider)
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	next := make(map[*registration]time.Time, len(s.stale)+1)
+	for held, at := range s.stale {
+		next[held] = at
+	}
+	next[one] = since
+	s.stale = next
+	return nil
+}
 
-func (one Snapshot) Stale(name string) (time.Time, bool) { return time.Time{}, false }
+func (one Snapshot) Stale(name string) (time.Time, bool) {
+	owner := one.store.owner(name)
+	if owner == nil {
+		return time.Time{}, false
+	}
+	since, ok := one.stale[owner]
+	return since, ok
+}
 
 func (one Snapshot) Read(name string) any {
 	if held, ok := one.values[name]; ok {
