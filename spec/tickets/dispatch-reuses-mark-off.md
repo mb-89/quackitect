@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-cloud-works-its-queue
 parent: dispatch-writes-the-bundles
+record:
+  - step: do
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: fed248a140a261d0783c5b67d7c407254d11c117
+    hash_after: 8269139533e5b20b234f429bfaf85a02ff5a6b6a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 32 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:271:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 1426f0bce0761427
+        size: 234
+    def: 76beff46e9d5f076
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ the approach opens work/<name> on a commit off the trunk tree, which markOff in 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/dispatch.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Commit 061bd246 makes the change: work.js exports markOff, dispatch-write.js calls it, and the dispatch tests hold the commit it answers. The size list stands under the draft leaf of the closed parent, so the parent's Discussion names work.js in its place.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask in code, and the Discussion says why the size line lands under Discussion
+- the cleanup is none: one markOff stands, and dispatch-write.js imports it
+- the parent's Discussion points at the commit, and repeats no code
 
 # Discussion
 
