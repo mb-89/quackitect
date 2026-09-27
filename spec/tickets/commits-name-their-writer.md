@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/draft
 steps:
   - name: design
     steps:
@@ -127,6 +127,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
+record:
+  - step: design/person-1
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: fac6090e3f77aa3f4601a712d472ea9a0114c852
+    hash_after: fac6090e3f77aa3f4601a712d472ea9a0114c852
+    def: 799c3bd685e25728
 ---
 
 # Ask
@@ -158,8 +164,9 @@ Only a provider writes its name. Without a writer on the commit, any caller writ
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+Keep both keys and commit the merge. record: (the sync rows) and cloud: true are distinct keys, so the union loses nothing from either side. Weighed: the conflict markers break every frontmatter read of the group ticket, so the fix cannot wait on a person. Assumed: the engine or the sync verb rewrites the group frontmatter, since the door refuses an agent write there.
 
 ## draft
 
