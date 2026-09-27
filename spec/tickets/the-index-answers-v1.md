@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/tests-red
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -88,6 +88,14 @@ record:
     hand: box d7d598fb92101 · claude-code-remote
     hash_before: 4c5ddb62b84b3a2766d520e8343244f69d7f696a
     hash_after: 4c5ddb62b84b3a2766d520e8343244f69d7f696a
+  - step: implement/tests-red
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 085fd8b4f85f6e5c5299d0a4e6487d4440231d65
+    hash_after: 085fd8b4f85f6e5c5299d0a4e6487d4440231d65
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
 ---
 
 # Ask
