@@ -118,7 +118,7 @@ urgent: true
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: f004df8bc19e41fc
         size: 568
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 8aa38c50ac3ebba5174c727c6da9c04c5321ab3b
+    hash_after: 8aa38c50ac3ebba5174c727c6da9c04c5321ab3b
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -302,14 +311,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/pull-gate.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/scripts/pull-gate.js alone, which the size list names
+- the change reaches no door, since reworked reshapes the route in memory
+- rewired and readsBoth each carry a comment naming the approach, with a link to the gate section
+- the copy suffix stands in reworked once, and the route check reads its own ROUND
 
 ## tests-green
 

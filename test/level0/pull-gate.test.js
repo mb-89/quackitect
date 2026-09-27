@@ -192,6 +192,14 @@ test("a reject's copy reads the copy of its sibling", () => {
 });
 
 // [[spec/design_output/pull#the-gate]]
+test("a reject leaves the first round reading itself", () => {
+  const { back, text } = gated("reject\n- the fail road is missing");
+
+  assert.equal(back.code, 0, back.said);
+  assert.deepEqual(inputAt(text, "design/tests-red"), ["draft"]);
+});
+
+// [[spec/design_output/pull#the-gate]]
 test("after a reject the gate and implement read both rounds", () => {
   const { back, text } = gated("reject\n- the fail road is missing");
 
