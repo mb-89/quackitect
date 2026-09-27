@@ -114,10 +114,23 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
+record:
+  - step: design/draft
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: bfd961e3a1a115624ec4e332bf6fce7f032e00f7
+    hash_after: bfd961e3a1a115624ec4e332bf6fce7f032e00f7
+    inputs:
+      - name: ask
+        hash: 1c990e737b4c9045
+        size: 442
+      - name: [[spec/rationales/git-stays-the-archive]]
+        hash: 313be7c0f847c084
+        size: 1574
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -149,38 +162,46 @@ The marker exists so the queue reads files alone. Until the queue reads it, ever
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+work-answer.js gains cloudsIn(all), which answers the names the cloud holds off the tickets alone: each group whose ticket carries cloud: true, read by CLOUD_MARK from work-merge.js, and each ticket whose group field names one of them. placesIn builds its onCloud set with cloudsIn over the tickets it already reads, in place of the standing branches out of read.stand, so a branch with no marker stays on the desk, and a marker with no branch goes to the cloud. read.stand still feeds ticketsIn, since a branch carries its own tickets. Weighed: the marker lives in work-merge.js already, so the reader imports it and spells no second key. Assumed: a closed ticket leaves the cloud as it does today, and the state check stays beside the set.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/work-answer.js: placesIn,src/scripts/work-list.js: queueOnly, which reads CLOUD_PLACE off answerOf,src/scripts/ticket-yours.js: queueIn, which reads CLOUD_PLACE,src/tui/work/workplaces.go: countTakeable and Placed, which read the place off the answer,src/plan/golden_test.go: the golden replay, which reads the places placesIn captures
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/queue-cloud.test.js: a marked group with no branch reads as the cloud s, and its child with it,test/level0/queue-cloud.test.js: a group with a branch and no marker reads as the desk s
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/scripts/work-answer.js,test/level0/queue-cloud.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened placesIn, ownTickets and ticketsIn in work-answer.js, marks in work-merge.js, refsHere in work-stands.js, and the readers of CLOUD_PLACE, and checked each claim there
+the callers come off a grep for placesIn and CLOUD_PLACE over src and test
+the first two done_when lines meet the two queue-cloud cases, and the check decides the third
 
 ## tests-red
 
