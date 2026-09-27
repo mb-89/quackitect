@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-engine-holds-the-route
 parent: the-judge-leaves-the-code
+record:
+  - step: do
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: d8a4a9c1ef57470a329e2b44247565131f6a0e69
+    hash_after: bf818324ba84e7c1e74fc6c96037b39f2b4350f8
+reason: became
+successors: [the-judge-leaves-the-code]
 ---
 
 # Ask
