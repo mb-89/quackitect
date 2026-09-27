@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-verbs-land-whole
 steps:
   - name: design
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: "test/level0/work-group.test.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 611. Split it by topic."
+  - step: implement/tests-green
+    hand: box d7d6327f2b101 · claude-code-remote
+    hash_before: 9d3168fe282b51693da5b6c17f94b8cbde6613c8
+    hash_after: 9d3168fe282b51693da5b6c17f94b8cbde6613c8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 82 test(s) pass in 8 file(s)
+      - name: check
+        exit: 0
+        said: "test/level0/work-group.test.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 611. Split it by topic."
+reason: done
 ---
 
 # Ask
@@ -286,11 +298,15 @@ Each new case fails on its own assertion, and the merge cases keyed on `check --
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/check-errors.test.js test/level0/test-verb.test.js test/level0/work-group.test.js test/level0/tools-door.test.js test/level0/ticket-verb.test.js test/level0/battery-reporter.test.js test/contract/cli-verbs.test.js test/contract/cli-check-doors.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -298,11 +314,27 @@ Each new case fails on its own assertion, and the merge cases keyed on `check --
 
 <!-- the form is text -->
 
+A hand now reads the failing case off each verb's own lines:
+
+- `./RUNME.sh check --errors` runs its parts quiet, then prints each red case and each finding at error.
+- `./RUNME.sh test` names each failing case above its verdict, and the verdict stays last.
+- `branch merge` hands on every row the check prints under `--errors`.
+- The `level0-tools` block names each verb with its usage line, off the command line's help rows.
+- `./RUNME.sh ticket note` names an open note whose Ask carries the line's words, before it writes.
+
+A TODO case now reads as no red case, so none of these names a case that turns nothing red.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The files past the ask stand in the Discussion, each with its reason.
+- Each case drives `fakeProc`, a fake disk, a pure function or the source text.
+- Each changed function links this ticket.
+- The help rows stand as the one source of the verbs.
+- The review's one finding stands fixed on the ask.
 
 # Discussion
 
