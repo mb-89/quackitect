@@ -75,7 +75,7 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [sidebar-lands-in-shadow]
+depends_on: [sidebar-lands-in-shadow, tui-shell-switches-over]
 enabled_by: migration.phase8switch
 cloud: true
 ---

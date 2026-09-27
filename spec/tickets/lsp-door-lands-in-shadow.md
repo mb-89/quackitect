@@ -75,7 +75,7 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [tui-shell-switches-over]
+depends_on: [read-topics-land-in-shadow, quack-verbs-land-in-shadow]
 enabled_by: migration.phase7shadow
 cloud: true
 ---

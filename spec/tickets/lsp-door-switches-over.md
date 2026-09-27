@@ -75,7 +75,7 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [lsp-door-lands-in-shadow]
+depends_on: [lsp-door-lands-in-shadow, read-topics-switch-over]
 enabled_by: migration.phase7switch
 cloud: true
 ---
