@@ -3,7 +3,10 @@
 // [[spec/design_output/model#snapshots-and-revisions]]
 package q
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestASnapshotReadsOneRevision(t *testing.T) {
 	c := New()
@@ -132,5 +135,28 @@ func TestAnActionDeclaresItsHandleAndItsWrite(t *testing.T) {
 	}
 	if _, ok := s.Declared("t/none"); ok {
 		t.Fatal("a name nobody provides declares a shape")
+	}
+}
+
+func TestACommitOfThePartClearsItsStaleMark(t *testing.T) {
+	c := New()
+	GivenIn(c, "t/n", 0)
+	GivenIn(c, "t/m", 0)
+	s := NewStore(c, nil)
+	since := time.Unix(1_700_000_000, 0)
+	if err := s.Stale("t/n", since); err != nil {
+		t.Fatal(err)
+	}
+	if at, stale := s.Snapshot().Stale("t/n"); !stale || !at.Equal(since) {
+		t.Fatalf("t/n reads stale %v since %v", stale, at)
+	}
+	if _, stale := s.Snapshot().Stale("t/m"); stale {
+		t.Fatal("t/m reads stale beside t/n")
+	}
+	if _, err := s.Commit(0, map[string]any{"t/n": 1}); err != nil {
+		t.Fatal(err)
+	}
+	if _, stale := s.Snapshot().Stale("t/n"); stale {
+		t.Fatal("t/n reads stale after its commit")
 	}
 }

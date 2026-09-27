@@ -120,6 +120,10 @@ func (s *Store) Declared(name string) (Declared, bool) {
 	return Declared{Op: one.op, Writes: one.writes, Deadline: one.deadline}, true
 }
 
+func (s *Store) Stale(provider string, since time.Time) error { return nil }
+
+func (one Snapshot) Stale(name string) (time.Time, bool) { return time.Time{}, false }
+
 func (one Snapshot) Read(name string) any {
 	if held, ok := one.values[name]; ok {
 		return held.value

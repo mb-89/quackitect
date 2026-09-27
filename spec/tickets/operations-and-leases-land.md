@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/tests-red
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -88,6 +88,14 @@ record:
     hand: box d7d598fb92101 · claude-code-remote
     hash_before: f091d93507b67cfdce7df777fa43755586beb1d3
     hash_after: f091d93507b67cfdce7df777fa43755586beb1d3
+  - step: implement/tests-red
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 4b4a6fa55005aab5370bcf6dc03bcc856fe7ef10
+    hash_after: 4b4a6fa55005aab5370bcf6dc03bcc856fe7ef10
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/ops fails
 ---
 
 # Ask
@@ -219,17 +227,27 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/ops src/watchdog src/q src/index
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Every new test fails on its assertion against stubs that compile. The rest of each package stays green. A bare `go test ./src/index` fails every test on `no such module: fts5`, because the tag lives in `src/scripts/cli-go.js`. The test verb passes it, and [[spec/tickets/sqlite-runs-pure-go]] owns the bare run. `TestACancelEndsAQueuedOrRunningOp` joins the list and answers [[spec/tickets/op-moves-reach-the-log]].
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch `src/ops`, `src/watchdog`, `src/q` and `src/index`, which the draft names
+- the clock and the keep have fakes in each test, and the index test runs the real table
+- each test file opens on a comment pointing at its design note
+- each fact points at the operations or the watchdogs note
+- the review rows stand answered: the stale mark keys by provider, and `ops/cancel` has its test
 
 ## change
 
