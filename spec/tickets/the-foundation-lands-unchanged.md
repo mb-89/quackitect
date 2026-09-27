@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
+step: split
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [the-migration-writes-its-specs]
@@ -85,6 +85,14 @@ record:
   - step: sync
     hand: box d7d598fb92101 · claude-code-remote
     hash_before: cc0d22d667f2e4cc30e00c7151403383dd75945b
+  - step: sync
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 78c6db313bb78c3777aba655c898d03e806a86cd
+    hash_after: f478158901b57c00906a51263b9b5ff3b4db4f25
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-foundation-lands-unchanged already carries every commit on main.
 ---
 
 # Ask
@@ -102,6 +110,8 @@ Done when the index answers `/v1` and the old API side by side, and the check st
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
