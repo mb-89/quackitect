@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: do
+step: answer
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -50,6 +50,9 @@ record:
         hash: baca88acba217ea8
         size: 3558
     def: 2280015d497a3abd
+  - step: answer
+    hand: the engine
+    stale: [[spec/tickets/rationale-drops-release-row]]
 ---
 
 # Ask
