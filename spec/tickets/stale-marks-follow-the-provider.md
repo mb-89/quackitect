@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-foundation-lands-unchanged
 parent: operations-and-leases-land
+record:
+  - step: do
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 47348aaf63b877c9ccdcc003a3dc563cc323cc34
+    hash_after: 47348aaf63b877c9ccdcc003a3dc563cc323cc34
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/watchdog passes
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -48,11 +61,15 @@ key a stale mark by the provider, not the topic. The watchdogs note names a part
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/q src/watchdog
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -60,11 +77,17 @@ key a stale mark by the provider, not the topic. The watchdogs note names a part
 
 <!-- the form is text -->
 
+The change of [[spec/tickets/operations-and-leases-land]] lands it. `Store.Stale` keys a mark by the provider's registration, and a lease names its provider. `TestAnExpiredLeaseMarksEachNameOfItsPartStale` reads a sibling provider under the same topic as current.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask, inside the parent's change
+- the change reveals no cleanup
+- the watchdogs note owns the part, and the code points there
 
 # Discussion
 
