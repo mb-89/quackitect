@@ -248,3 +248,38 @@ func TestTheDoorAnswersTheHashesOfThePathsAsked(t *testing.T) {
 		t.Fatalf("hashes answered %#v", said.Result)
 	}
 }
+
+// Serve builds the scheduler over its store, so a move an IO module commits runs the provider reading it. [[spec/tickets/the-scheduler-runs-providers]]
+func TestTheDoorRunsAProviderWhenAnIOModuleMovesItsInput(t *testing.T) {
+	type countOf struct {
+		N int `q:"t/n"`
+	}
+	root := tree(t)
+	catalog := q.New()
+	hand := q.GivenIn(catalog, "t/n", 0)
+	q.DerivedIn(catalog, "t/double", 0, func(in countOf) int { return in.N * 2 })
+	moves := func(_ string, commit Commit) (func(), error) {
+		return func() {}, commit(hand, map[string]any{"t/n": 3})
+	}
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog, moves)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var said answer
+	for range topicPolls {
+		said, err = posts(standing, []string{"call", "read", `{"name":"t/double"}`})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if said.Result == float64(6) {
+			return
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	t.Fatalf("t/double reads %#v after t/n moves to 3", said.Result)
+}

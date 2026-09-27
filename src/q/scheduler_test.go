@@ -76,3 +76,17 @@ func TestTwoMovesDuringARunLeaveOnePendingRunAndNoOverlap(t *testing.T) {
 		t.Fatalf("t/slow reads %v after the pending run", got)
 	}
 }
+
+func TestAMoveAfterStopRunsNothing(t *testing.T) {
+	c := New()
+	hand := GivenIn(c, "t/n", 0)
+	DerivedIn(c, "t/double", 0, func(in countOf) int { return in.N * 2 })
+	s := NewStore(c)
+	scheduler := NewScheduler(s, spawned, failOn(t))
+	scheduler.Stop()
+	seed(t, s, hand, "t/n", 3)
+	scheduler.Settle()
+	if got := s.Snapshot().Read("t/double"); got != 0 {
+		t.Fatalf("t/double reads %v after a move past the stop", got)
+	}
+}

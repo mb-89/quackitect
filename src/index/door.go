@@ -171,6 +171,10 @@ func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Li
 	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
 	one.store, one.writers = q.NewStore(catalog), topics
+	// The scheduler hears every commit from here on, the IO modules' first ones too. [[spec/design_output/model#the-provider-kinds]]
+	scheduler := q.NewScheduler(one.store, func(run func()) { go run() }, func(name string, err error) {
+		fmt.Fprintln(stderr, "the run of", name, "did not commit:", err)
+	})
 	if err := one.opensBook(); err != nil {
 		db.Close()
 		return nil, nil, err
@@ -214,6 +218,7 @@ func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Li
 		for _, one := range stops {
 			one()
 		}
+		scheduler.Stop()
 		server.Close()
 		served.Close()
 		if one.eyes != nil {

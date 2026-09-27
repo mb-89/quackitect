@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -157,6 +157,15 @@ record:
         hash: dda7a3cac8ec23ec
         size: 714
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 380b9dca127a94b130c589ef9d42e2de5b954da1
+    hash_after: 380b9dca127a94b130c589ef9d42e2de5b954da1
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -304,14 +313,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q/scheduler.go src/index/door.go src/q/scheduler_test.go src/index/door_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the scheduler, the Serve wiring, and a case beside each
+the scheduler reaches no door, since spawn is a hand the caller passes, and Serve hands it go and the door stderr
+scheduler.go carries a header naming the provider kinds and this ticket, and each function points at its design section
+the scheduler reuses the catalog key test and owner lookup, so no catalog rule stands twice. The gate points land in Settle, kick, the catalog Cycle fault and the Serve stop
 
 ## tests-green
 
