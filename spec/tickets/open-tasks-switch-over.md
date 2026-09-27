@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: split
+step: children
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [open-tasks-land-in-shadow]
@@ -89,6 +89,10 @@ record:
       - name: sync
         exit: 0
         said: work/open-tasks-switch-over already carries every commit on main.
+  - step: split
+    hand: box d7d80931cecf · claude-code-remote
+    hash_before: 6bf3f8303b230669979340d08e654ca7d7c6019b
+    hash_after: 6bf3f8303b230669979340d08e654ca7d7c6019b
 ---
 
 # Ask
@@ -119,11 +123,18 @@ Done when the badge and the work tab's brackets read one name.
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-badge-reads-open-tasks]], standard
+- [[spec/tickets/the-count-chain-leaves]], standard
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- Each child changes one reader or one delete, and a reviewer reads it whole.
+- The badge child moves the key, and the count child takes the old path out.
+- The count child waits on the badge child, which waits on [[spec/tickets/open-tasks-run-in-shadow]].
 
 # children
 
