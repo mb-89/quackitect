@@ -172,7 +172,9 @@ test("the dry run writes no file, makes no commit and pushes nothing", () => {
   assert.match(said.said, /work\/first/);
   assert.deepEqual([...disk.files.keys()], before);
   const writes = ranGit(outside).filter((row) =>
-    /^git (commit|push|merge|switch|reset|checkout|add)( |$)/.test(row),
+    /^git (-C \S+ )?(commit|push|merge|switch|reset|checkout|add|worktree)( |$)/.test(
+      row,
+    ),
   );
   assert.deepEqual(writes, []);
 });

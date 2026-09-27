@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-prints-its-plan, fix-groups-end-the-chain]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -148,6 +148,18 @@ record:
         hash: 199329f3676e2920
         size: 3307
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e093d924e2 · claude-code-remote · helper-4
+    hash_before: 483c0bab95cee6554a6fc18dfa8a0fba75a62ccb
+    hash_after: 483c0bab95cee6554a6fc18dfa8a0fba75a62ccb
+    inputs:
+      - name: design/draft
+        hash: 199329f3676e2920
+        size: 3307
+      - name: design/tests-red
+        hash: f77d5a0fe7fea05e
+        size: 746
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -284,8 +296,14 @@ Nine write cases fail on their own assertion, since the run without --dry answer
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- dispatch-reuses-mark-off: the approach opens work/<name> on a commit off the trunk tree, which markOff in src/scripts/work.js already makes but does not export; export it and call it from dispatch, and add src/scripts/work.js to size, in place of a second copy
+- dispatch-drops-the-trunk-marker: marksTrunk in src/scripts/work-merge.js commits and pushes main, so the open road must write cloud: true into the worktree and never call marksTrunk or openGroup; name that in the change comment
+- dispatch-cuts-the-fix-name: loose-fixes-<short> holds three words, so a names.words below three overruns it; cut the name through cutTo in src/scripts/ticket.js, as the mint does
+- dispatch-removes-its-worktree: no case holds the .se/.runtime/dispatch worktree removed and the box checkout unmoved after a run; add one beside the write cases
+- dispatch-write-file-size: size names src/scripts/dispatch-write.js and test/level0/work-doors.js, and the tests-red diff needed no work-doors change; drop what the build leaves untouched, and drop the --dry-alone refusal naming this ticket from dispatch.js
 
 # implement
 
