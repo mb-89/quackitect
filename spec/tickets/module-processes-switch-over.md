@@ -77,6 +77,7 @@ process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [module-processes-land-in-shadow]
 enabled_by: migration.phase9switch
+cloud: true
 ---
 
 # Ask

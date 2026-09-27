@@ -77,6 +77,7 @@ process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [lsp-door-switches-over]
 enabled_by: migration.phase8shadow
+cloud: true
 ---
 
 # Ask

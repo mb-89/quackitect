@@ -77,6 +77,7 @@ process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [read-topics-switch-over]
 enabled_by: migration.phase4shadow
+cloud: true
 ---
 
 # Ask
