@@ -99,3 +99,22 @@ func TestAKeyOfManySegmentsTakesTheRestOfTheName(t *testing.T) {
 		t.Fatal("a name with no segment for the key lands")
 	}
 }
+
+// [[spec/tickets/files-topic-reads-the-rows]]
+func TestAKeyOfManySegmentsFollowsAKeyOfOne(t *testing.T) {
+	c := New()
+	GivenIn(c, "trees/<tree>/<path...>", 0)
+	if faults := c.Check(nil); len(faults) > 0 {
+		t.Fatalf("the check answers %+v", faults)
+	}
+	s := NewStore(c, nil)
+	if _, err := s.Commit(0, map[string]any{"trees/a/spec/one.md": 1}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.Commit(0, map[string]any{"trees/a": 1}); err == nil {
+		t.Fatal("a name with no segment for the rest lands")
+	}
+	if _, err := s.Commit(0, map[string]any{"trees//one.md": 1}); err == nil {
+		t.Fatal("a name with an empty segment for the key lands")
+	}
+}

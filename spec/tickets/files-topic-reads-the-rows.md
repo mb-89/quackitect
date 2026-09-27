@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -96,6 +96,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, a test of src/q fails
+  - step: implement/change
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 563f2a5f92062f786fdc0ae6966acdf555511c20
+    hash_after: 563f2a5f92062f786fdc0ae6966acdf555511c20
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -236,11 +244,19 @@ The two `src/q` cases fail on the name check and on the commit, since a key take
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src/q src/index
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `src/q` and `src/index` alone, the two the callers list names
+- the topic reads the rows the database door holds, and reaches no disk of its own
+- `src/index/topic.go` opens on the approach and links this ticket
+- the family name and its prefix stand as constants in `topic.go` alone
+- the hand-built door in `sweep_test.go` takes a store, the one caller the design leaves out
 
 ## tests-green
 

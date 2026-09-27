@@ -10,6 +10,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"testing"
+
+	"quackitect/src/q"
 )
 
 func rowidOf(t *testing.T, db *sql.DB, query string, args ...any) int64 {
@@ -107,8 +109,11 @@ func TestAGoneFolderTakesItsRowsAndItsLinksTurnDead(t *testing.T) {
 
 func doorOver(t *testing.T, root string, db *sql.DB) *door {
 	t.Helper()
+	catalog := q.New()
+	registersFiles(catalog)
 	return &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}),
-		touched: map[string]bool{}, tracked: func(string) bool { return true }}
+		touched: map[string]bool{}, tracked: func(string) bool { return true },
+		store: q.NewStore(catalog, nil), published: map[string]bool{}}
 }
 
 // A change reads git's list off the door, so a saved file spawns no git. [[spec/design_output/index#a-change-moves-its-rows]]

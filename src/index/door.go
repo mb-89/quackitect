@@ -79,6 +79,10 @@ type door struct {
 	tick     atomic.Int64
 	wake     chan struct{}
 	wakeLock sync.Mutex
+
+	// The values modules read, and the paths committed under files/ so far. [[spec/tickets/files-topic-reads-the-rows]]
+	store     *q.Store
+	published map[string]bool
 }
 
 // What a changes call answers: the tick the rows stand at. [[spec/design_output/index#the-index-fires-on-change]]
@@ -133,6 +137,7 @@ func trackedIn(root string) func(rel string) bool {
 }
 
 func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
+	registersFiles(catalog)
 	// The catalog check runs before the database opens, so a fault refuses the start and no provider key stands yet. [[spec/design_output/model#the-catalog-check]]
 	if faults := catalog.Check(nil); len(faults) > 0 {
 		said := make([]string, 0, len(faults))
@@ -153,6 +158,11 @@ func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 
 	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
+	one.store, one.published = q.NewStore(catalog, nil), map[string]bool{}
+	if err := one.publishes(nil); err != nil {
+		db.Close()
+		return nil, nil, err
+	}
 	listen, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return nil, nil, err
@@ -248,6 +258,7 @@ func (one *door) settles() {
 	if len(paths) > 0 {
 		if rows, err := touches(one.db, one.root, paths, one.tracked); err == nil {
 			moved += rows
+			one.tells(one.publishes(paths))
 		} else {
 			one.keeps(paths, false, err)
 		}
@@ -255,6 +266,7 @@ func (one *door) settles() {
 	if retrack {
 		if rows, err := retracks(one.db, one.tracked); err == nil {
 			moved += rows
+			one.tells(one.publishes(nil))
 		} else {
 			one.keeps(nil, true, err)
 		}
@@ -279,7 +291,18 @@ func (one *door) keeps(paths []string, retrack bool, err error) {
 // A sweep reads git's list again, and the door holds what it reads. [[spec/design_output/index#a-change-moves-its-rows]]
 func (one *door) walks() (int, int, error) {
 	one.tracked = trackedIn(one.root)
-	return sweep(one.db, one.root, one.tracked)
+	count, moved, err := sweep(one.db, one.root, one.tracked)
+	if err == nil && moved > 0 {
+		one.tells(one.publishes(nil))
+	}
+	return count, moved, err
+}
+
+// A commit that fails says so, and the next settle of that path commits it again. [[spec/tickets/files-topic-reads-the-rows]]
+func (one *door) tells(err error) {
+	if err != nil {
+		fmt.Fprintln(stderr, "the files topic did not commit:", err)
+	}
 }
 
 // The sweep on a clock, which catches a change the watch misses and clears nothing. [[spec/design_output/index#a-change-moves-its-rows]]
@@ -363,6 +386,7 @@ func (one *door) took(w http.ResponseWriter, r *http.Request) {
 func (one *door) answers(said call) (any, error) {
 	var asked struct {
 		Words  string   `json:"words"`
+		Name   string   `json:"name"`
 		Target string   `json:"target"`
 		Path   string   `json:"path"`
 		Paths  []string `json:"paths"`
@@ -375,6 +399,12 @@ func (one *door) answers(said call) (any, error) {
 	switch strings.ToLower(said.Method) {
 	case "files":
 		return Files(one.db)
+	case "read":
+		// A module in its own process reads a name at the latest revision. [[spec/tickets/files-topic-reads-the-rows]]
+		if value := one.store.Snapshot().Read(asked.Name); value != nil {
+			return value, nil
+		}
+		return nil, errorOf("no name called " + asked.Name)
 	case "texts":
 		return Texts(one.db, asked.Paths)
 	case "grep":

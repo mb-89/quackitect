@@ -168,6 +168,14 @@ func matches(pattern, name string) bool {
 		return true
 	}
 	want, got := strings.Split(pattern, "/"), strings.Split(name, "/")
+	if last := len(want) - 1; isRest(want[last]) && len(got) > last {
+		for _, one := range got[last:] {
+			if one == "" {
+				return false
+			}
+		}
+		want, got = want[:last], got[:last]
+	}
 	if len(want) != len(got) {
 		return false
 	}
@@ -181,4 +189,9 @@ func matches(pattern, name string) bool {
 
 func isKey(segment string) bool {
 	return len(segment) > 2 && segment[0] == '<' && segment[len(segment)-1] == '>'
+}
+
+// A key <name...> takes the rest of the name, one segment or more. [[spec/tickets/files-topic-reads-the-rows]]
+func isRest(segment string) bool {
+	return isKey(segment) && strings.HasSuffix(segment, "...>")
 }

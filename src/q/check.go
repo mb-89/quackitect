@@ -33,13 +33,19 @@ func (one Fault) String() string {
 	return fmt.Sprintf("%s: %s, %s, at %s", one.Kind, one.Name, one.Says, strings.Join(one.Where, " and "))
 }
 
-var segment = regexp.MustCompile(`^([a-z0-9][a-z0-9-]*|<[a-z0-9][a-z0-9-]*>)$`)
+var (
+	segment = regexp.MustCompile(`^([a-z0-9][a-z0-9-]*|<[a-z0-9][a-z0-9-]*>)$`)
+	rest    = regexp.MustCompile(`^<[a-z0-9][a-z0-9-]*\.\.\.>$`)
+)
 
 func providerKey(name string) string { return "providers." + name }
 
+// A key taking the rest of the name stands last, after a segment of its own. [[spec/tickets/files-topic-reads-the-rows]]
 func wellNamed(name string) bool {
-	for _, one := range strings.Split(name, "/") {
-		if !segment.MatchString(one) {
+	parts := strings.Split(name, "/")
+	for i, one := range parts {
+		last := i > 0 && i == len(parts)-1
+		if !segment.MatchString(one) && !(last && rest.MatchString(one)) {
 			return false
 		}
 	}
