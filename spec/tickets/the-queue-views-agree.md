@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -146,6 +146,15 @@ record:
         exit: 1
         said: assertion, 4 test(s) fail on their own assertion
     def: 06865600120e8b38
+  - step: implement/change
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: f802e71b9735eb514f80cf0eac225d84c934931b
+    hash_after: f802e71b9735eb514f80cf0eac225d84c934931b
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/scripts/pull-hand-of.js:61:38: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
+    def: 21d63335f32dfcda
 ---
 
 # Ask
@@ -321,14 +330,20 @@ The row cases pass the file ceiling in the group test file, so they stand in a f
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the drafted files, plus the row test file the ceiling asks for
+- the listing reads git through the fake git, and the lens reads through the fake door
+- each changed function links this ticket or the note section it follows
+- the cloud marker and the group folder point at their owners, and the note gains one row
+- the review rows stand: the badge lines wait for phase two, and the fake learns the trunk tip
 
 ## tests-green
 

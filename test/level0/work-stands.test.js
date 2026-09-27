@@ -7,7 +7,8 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { standingIn } from "../../src/scripts/work-stands.js";
+import { refsHere, standingIn } from "../../src/scripts/work-stands.js";
+import { remoteSaying } from "./work-doors.js";
 
 const ROOT = "/tree";
 const TAGGED = "---\nkind: [[ticket]]\ntodo: true\n---\n\n# Ask\n\nLater.\n";
@@ -37,4 +38,25 @@ test("a tagged note inside an untracked folder reads as parked, because the stat
     git.ran.map((one) => one.argv.join(" ")),
     ["git status --porcelain -uall"],
   );
+});
+
+// [[spec/tickets/the-queue-views-agree]]
+test("a ref whose base stands short of the trunk tip reads behind, and one with no trunk tip reads level", () => {
+  const refs = (more) =>
+    refsHere({
+      git: fakeGit(
+        {
+          ...remoteSaying([{ branch: "work/one-group", tip: "aaa" }]),
+          "git merge-base origin/main origin/work/one-group": { stdout: "older\n" },
+          ...more,
+        },
+        ROOT,
+      ),
+    });
+
+  const [behind] = refs({ "git rev-parse origin/main": { stdout: "tip\n" } });
+  assert.equal(behind.behind, true);
+  assert.equal(behind.orphan, false);
+  const [level] = refs({ "git rev-parse origin/main": { exitCode: 1 } });
+  assert.equal(level.behind, false);
 });

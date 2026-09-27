@@ -136,10 +136,16 @@ func Placed(t *tree.Tree, p Places) {
 		}
 	})
 	// A sentence todo the tree lacks lands as a row of its own, at the left, with no path and no link. [[spec/design_output/stop#the-plan]]
+	// A todo the index nests under its group stands already, so every nested row counts. [[spec/tickets/the-queue-views-agree]]
 	standing := map[string]bool{}
-	for _, one := range t.Items {
-		standing[one.Name] = true
+	var mark func([]tree.Item)
+	mark = func(items []tree.Item) {
+		for _, one := range items {
+			standing[one.Name] = true
+			mark(one.Kids)
+		}
 	}
+	mark(t.Items)
 	added := []tree.Item{}
 	for _, row := range p.Rows {
 		if standing[row.Name] {

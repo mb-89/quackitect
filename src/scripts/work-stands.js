@@ -158,8 +158,10 @@ export function landedHere(it, branches) {
   return new Set(
     branches.filter(
       (branch) =>
-        fieldOf(textAt(it, `origin/${TRUNK}`, ticketAt(ticketNamed(branch))), "state") ===
-        CLOSED,
+        fieldOf(
+          textAt(it, `origin/${TRUNK}`, ticketAt(ticketNamed(branch))),
+          "state",
+        ) === CLOSED,
     ),
   );
 }
@@ -179,10 +181,17 @@ export function refsHere(it) {
   );
   if (!said.ok) return [];
   const branches = refsIn(said.out).map((one) => one.branch);
-  return refsIn(said.out, landedHere(it, branches)).map((one) => ({
-    ...one,
-    orphan: !baseOnTrunk(it, one.branch).shares,
-  }));
+  // A branch whose base with trunk stands short of trunk's tip reads behind. [[spec/design_output/work#the-listing-reads-git-once]]
+  const trunk = it.git.run(["rev-parse", `origin/${TRUNK}`], true);
+  const tip = trunk.ok ? String(trunk.out).trim() : "";
+  return refsIn(said.out, landedHere(it, branches)).map((one) => {
+    const base = baseOnTrunk(it, one.branch);
+    return {
+      ...one,
+      orphan: !base.shares,
+      behind: base.shares && Boolean(tip) && base.base !== tip,
+    };
+  });
 }
 
 // The commit trunk and a branch share. git answers red where they share none, which is what a rewrite of trunk leaves behind. [[spec/design_output/work#the-listing-reads-git-once]]
