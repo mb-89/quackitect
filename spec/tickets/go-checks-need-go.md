@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -141,6 +141,18 @@ record:
         hash: 4e285ca88c4e39a0
         size: 1962
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 9b13c38752f1f4d07ac852d9ac9efe9665f76dfb
+    hash_after: 9b13c38752f1f4d07ac852d9ac9efe9665f76dfb
+    inputs:
+      - name: design/draft
+        hash: 4e285ca88c4e39a0
+        size: 1962
+      - name: design/tests-red
+        hash: c1a2d73285bb128f
+        size: 613
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -252,8 +264,9 @@ the gate takes its run door, and each case hands it a fake run, so no go binary 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept: the approach drops the module list and refuses a box with no Go through goGate, the no-Go case and the root case fail on their own assertions, and the check decides the last line. The one gap, the skip of the red Go tests, stands under Discussion for the implement to close in place.
 
 # implement
 
@@ -324,3 +337,5 @@ the gate takes its run door, and each case hands it a fake run, so no go binary 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The gate reads one gap the implement closes in place: `goHolds` hands `goGate` the `-skip` that `skipOf` builds off the red list, so a red Go test file stays apart while its ticket stands open. `goTestNames` in `cli-go.js` stays too, since `skipOf` and the branch test verb read it.
