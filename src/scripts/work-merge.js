@@ -24,6 +24,7 @@ import {
   mergedHere,
   textAt,
 } from "./work-stands.js";
+import { addedHere } from "./work-fix.js";
 
 // A branch a cloud routine cuts carries no group, so it reads against trunk by its commits. [[spec/design_output/work#a-cloud-branch-comes-in]]
 const CLOUD = /^claude\//;
@@ -146,7 +147,8 @@ export function merge(it, name) {
     return 0;
   }
   // A remote refusing the delete leaves the branch, and trunk's closed ticket frees what waits. [[spec/design_output/work#a-dependency-waits-for-trunk]]
-  if (close(it, name, [])) console.log(`${branch} stands on the remote, and trunk carries its ticket closed.`);
+  if (close(it, name, []))
+    console.log(`${branch} stands on the remote, and trunk carries its ticket closed.`);
   return 0;
 }
 
@@ -219,17 +221,38 @@ function movedOnTrunk(it, branch) {
   return out;
 }
 
-// branch done frees them on the branch, and the merge frees what an older branch still holds. [[spec/design_output/work#the-merge-frees-the-tickets]]
-export function freeChildren(it, name) {
+// branch done frees them on the branch, and the merge frees what an older branch still holds. A parent named takes them in place of the top. [[spec/design_output/work#the-merge-frees-the-tickets]]
+export function freeChildren(it, name, parent = "") {
   const out = [];
   for (const one of childrenHere(it, name)) {
     if (fieldOf(one.text, "state") === CLOSED) continue;
-    const at = ticketAt(one.name);
-    it.disk.write(it.join(it.root, at), withoutField(one.text, GROUP, it.front));
-    it.git.run(["add", at], true);
+    filed(it, one, parent);
     out.push(one.name);
   }
   return out;
+}
+
+// branch done files each open child, and each open ticket the branch adds with no group, into the group's parent. A top group leaves them loose. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+export function filesUp(it, name, text) {
+  const parent = fieldOf(text, GROUP);
+  const out = freeChildren(it, name, parent);
+  if (!parent) return out;
+  for (const one of addedHere(it)) {
+    if (one.name === name || fieldOf(one.text, GROUP)) continue;
+    if (fieldOf(one.text, "state") === CLOSED) continue;
+    filed(it, one, parent);
+    out.push(one.name);
+  }
+  return out;
+}
+
+function filed(it, one, parent) {
+  const at = ticketAt(one.name);
+  const text = parent
+    ? withField(one.text, GROUP, parent, it.front)
+    : withoutField(one.text, GROUP, it.front);
+  it.disk.write(it.join(it.root, at), text);
+  it.git.run(["add", at], true);
 }
 
 // The install RUNME.sh runs before every verb, run again over the merged tree. [[spec/design_output/work#the-merge-lands-the-truth]]

@@ -8,7 +8,16 @@ import { CLOSED, fieldOf, GROUP, isGroup } from "../engine/group.js";
 import { land, opens, opensOf, writeState, writesOf } from "./dispatch-write.js";
 import { waitsOnPerson } from "./work-answer.js";
 import { freeIn, staleClaim } from "./work-free.js";
-import { DONE, HELD, readWork, standingAll, TODO, waitsOf } from "./work-stands.js";
+import {
+  DONE,
+  HELD,
+  readWork,
+  standingAll,
+  TODO,
+  trunkOf,
+  waitsIn,
+  waitsOf,
+} from "./work-stands.js";
 
 // The parts of the plan, in the order the dry run prints them. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
 const PARTS = [
@@ -18,6 +27,7 @@ const PARTS = [
   ["waiting", "groups waiting on another"],
   ["bundles", "loose agent tickets, one fix group per parent"],
   ["opens", "groups on main that open a branch"],
+  ["closes", "parent groups whose children all read closed"],
   ["questions", "tickets waiting on a person"],
 ];
 
@@ -32,9 +42,12 @@ function planned(it, now) {
   const read = readWork(it, true);
   const stand = read.stand.filter((one) => one.ticket);
   const standing = standingAll(stand);
-  const free = freeIn(stand, standing, it, at);
+  const trunk = trunkOf(read.loose);
+  const free = freeIn(stand, standing, it, at, trunk);
   const freed = new Set(free.map((one) => one.branch));
   const of = (one) => standing.get(one.branch);
+  const opened = opensOf(read, standing, trunk);
+  const idle = idleIn(read, standing, trunk, opened);
 
   const plan = {
     ready: free.map((one) => ({ group: one.name, branch: one.branch })),
@@ -46,14 +59,15 @@ function planned(it, now) {
         age: staleClaim(one, at, it).age,
       })),
     waiting: stand
-      .filter((one) => of(one) === TODO && waitsOf(one, standing).length)
-      .map((one) => ({ group: one.name, waits: waitsOf(one, standing) })),
+      .filter((one) => of(one) === TODO && waitsOf(one, standing, trunk).length)
+      .map((one) => ({ group: one.name, waits: waitsOf(one, standing, trunk) })),
     stuck: stand
       .filter((one) => of(one) === DONE)
       .map((one) => ({ group: one.name, why: stuckWhy(it, one, at) }))
       .filter((one) => one.why),
-    bundles: bundlesOf(read.loose),
-    opens: opensOf(read, standing),
+    bundles: bundlesOf(read.loose, idle),
+    opens: opened,
+    closes: closesOf(read, idle),
     questions: questionsOf(read, standing),
   };
   return { plan, read };
@@ -69,22 +83,59 @@ function stuckWhy(it, one, at) {
   return staleClaim(one, at, it).stale ? "stale" : "";
 }
 
-// An open ticket on trunk standing in no group. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
-function looseOpen(one) {
+// The groups on trunk no hand reaches: open, on no branch, opening none this run, and waiting on nothing. A ticket filed into one stands loose under it. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+function idleIn(read, standing, trunk, opened) {
+  const branched = new Set(read.stand.map((one) => one.name));
+  const opening = new Set(opened);
+  return new Set(
+    read.loose
+      .filter(
+        (one) =>
+          isGroup(one.text) &&
+          fieldOf(one.text, "state") !== CLOSED &&
+          !branched.has(one.name) &&
+          !opening.has(one.name) &&
+          !waitsIn(one.text, standing, trunk).length,
+      )
+      .map((one) => one.name),
+  );
+}
+
+// An open ticket on trunk standing in no group, or in a group no hand reaches. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+function looseOpen(one, idle) {
+  const group = fieldOf(one.text, GROUP);
   return (
     fieldOf(one.text, "state") !== CLOSED &&
-    !fieldOf(one.text, GROUP) &&
+    (!group || idle.has(group)) &&
     !isGroup(one.text)
   );
 }
 
-// Every loose agent ticket goes to one fix group, and the top stands as the one parent until groups hold groups. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
-function bundlesOf(loose) {
-  const tickets = loose
-    .filter((one) => looseOpen(one) && !waitsOnPerson(one))
-    .map((one) => one.name)
+// Each parent's loose agent tickets go to a fix group of its own, and the top stands as the parent named by nothing. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+function bundlesOf(loose, idle) {
+  const by = new Map();
+  for (const one of loose) {
+    if (!looseOpen(one, idle) || waitsOnPerson(one)) continue;
+    const parent = fieldOf(one.text, GROUP);
+    by.set(parent, [...(by.get(parent) ?? []), one.name]);
+  }
+  return [...by.keys()]
+    .sort()
+    .map((parent) => ({ parent, tickets: by.get(parent).sort() }));
+}
+
+// A group no hand reaches closes once every ticket naming it on trunk stands closed. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+function closesOf(read, idle) {
+  const children = new Map();
+  for (const one of read.loose) {
+    const group = fieldOf(one.text, GROUP);
+    if (idle.has(group)) children.set(group, [...(children.get(group) ?? []), one]);
+  }
+  return [...children.keys()]
+    .filter((name) =>
+      children.get(name).every((one) => fieldOf(one.text, "state") === CLOSED),
+    )
     .sort();
-  return tickets.length ? [{ parent: "", tickets }] : [];
 }
 
 // A ticket waiting on a person, on trunk or on a branch still open, with the group it holds open. Every branch carries the whole ticket folder, so a branch answers for its own children alone. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
@@ -126,7 +177,7 @@ function carried(it, plan, read) {
   const state = writeState(it);
   plan.write = { branch: state.branch, state: state.state, why: "" };
   if (state.state !== "free") return 0;
-  if (!plan.bundles.length && !plan.opens.length) {
+  if (!plan.bundles.length && !plan.opens.length && !plan.closes.length) {
     plan.write.state = "nothing";
     return 0;
   }
@@ -171,5 +222,6 @@ function rowOf(key, one) {
   if (key === "waiting") return `work/${one.group} waits for ${one.waits.join(", ")}`;
   if (key === "bundles") return `${one.parent || "the top"}: ${one.tickets.join(", ")}`;
   if (key === "opens") return `work/${one}`;
+  if (key === "closes") return one;
   return `${one.ticket}${one.group ? `, holding ${one.group} open` : ""}`;
 }

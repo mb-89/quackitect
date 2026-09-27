@@ -572,3 +572,10 @@ test("each parent's loose agent tickets bundle into a fix group under it", () =>
   assert.equal(fieldOf(written(disk, nested), "group"), "parent");
   assert.equal(fieldOf(written(disk, top), "group"), "");
 });
+
+// [[spec/tickets/groups-hold-groups]]
+test("a fix group's name carries its parent last, so the cut keeps the commit", () => {
+  assert.equal(fixName({}, MAIN, "big-move"), `${FIX_NAME}-big-move`);
+  assert.equal(fixName({ words: 4 }, MAIN, "big-move"), `${FIX_NAME}-big`);
+  assert.equal(fixName({ words: 3 }, MAIN, "big-move"), FIX_NAME);
+});

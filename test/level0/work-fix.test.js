@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { fixLeaves } from "../../src/scripts/work-fix.js";
+import { addedHere, fixLeaves } from "../../src/scripts/work-fix.js";
 import { CHILD, doorsSaying, GROUP_NOTE, on } from "./work-doors.js";
 
 const ADDED = "git diff --name-only --diff-filter=A origin/main...HEAD -- spec/tickets";
@@ -28,4 +28,14 @@ test("fixLeaves names the open loose agent tickets a fix group adds, and passes 
   const fix = GROUP_NOTE.replace("state: open\n", "state: open\nfix: true\n");
   assert.deepEqual(fixLeaves(it, fix), ["left"]);
   assert.deepEqual(fixLeaves(it, GROUP_NOTE), [], "a feature group reads no diff");
+});
+
+// The filing and the fix refusal read one list of what the branch adds. [[spec/tickets/groups-hold-groups]]
+test("addedHere reads each ticket the branch adds off the disk, and passes one the disk lacks", () => {
+  const { it } = doorsSaying(
+    { [ADDED]: { stdout: "spec/tickets/left.md\nspec/tickets/gone.md\n" } },
+    { [on("left")]: loose },
+  );
+  it.root = "/tree";
+  assert.deepEqual(addedHere(it), [{ name: "left", text: loose }]);
 });

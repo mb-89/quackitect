@@ -198,3 +198,18 @@ func TestPersonReadsTheStepHand(t *testing.T) {
 		}
 	}
 }
+
+// The step names a leaf under a phase, and the first leaf answers where no step stands. [[spec/tickets/groups-hold-groups]]
+func TestPersonReadsANestedLeaf(t *testing.T) {
+	nested := strings.Replace(forPerson, "  - name: ask\n    does: asks the owner a question\n    by: person\n", "  - name: design\n    steps:\n      - name: ask\n        does: asks the owner a question\n        by: person\n", 1)
+	cases := map[string]bool{
+		strings.Replace(nested, "step: ask", "step: design/ask", 1):  true,
+		strings.Replace(nested, "step: ask\n", "", 1):                true,
+		strings.Replace(nested, "step: ask", "step: design/gone", 1): false,
+	}
+	for text, want := range cases {
+		if got := Of("spec/tickets/a-question.md", "a-question", text, 1).Person; got != want {
+			t.Errorf("person reads %v, and wants %v, over %q", got, want, text)
+		}
+	}
+}

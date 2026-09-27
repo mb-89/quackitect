@@ -3,7 +3,7 @@
 // nothing, so the claim goes stale and the branch comes back to the queue.
 // [[spec/design_output/work#a-stale-group-is-yours]]
 
-import { aged, STALE, spanOf } from "../engine/group.js";
+import { aged, parentsIn, STALE, spanOf } from "../engine/group.js";
 import { MS, ROUTINE, standingAll, standOf, TODO, waitsOf } from "./work.js";
 
 // The read carries the tip's own time, so the age costs no process. [[spec/design_output/work#the-listing-reads-git-once]]
@@ -27,13 +27,15 @@ export function staleClaim(one, now, it) {
   };
 }
 
-// A branch stands free where nobody claims it, and where the claim on it goes stale. [[spec/design_output/work#a-stale-group-is-yours]]
-export function freeIn(stand, standing, it = null, now = 0) {
+// A branch stands free where nobody claims it, and where the claim on it goes stale. A parent's children reach workers, and the parent reaches none. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+export function freeIn(stand, standing, it = null, now = 0, trunk = new Map()) {
+  const parents = parentsIn([...stand.map((one) => one.ticket), ...trunk.values()]);
   return stand
     .filter(
       (one) => standing.get(one.branch) === TODO || staleHere(it, now, one, standing),
     )
-    .filter((one) => !waitsOf(one, standing).length);
+    .filter((one) => !parents.has(one.name))
+    .filter((one) => !waitsOf(one, standing, trunk).length);
 }
 
 // [[spec/design_output/work#a-stale-group-is-yours]]

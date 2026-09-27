@@ -12,6 +12,7 @@ import {
   fieldOf,
   GROUP,
   isGroup,
+  parentsIn,
   TICKETS,
   ticketAt,
   withField,
@@ -21,7 +22,7 @@ import { cutTo, schemasHere } from "./ticket.js";
 import { askFaults } from "./ticket-ask-lint.js";
 import { markOff } from "./work.js";
 import { FIX } from "./work-fix.js";
-import { waitingOn } from "./work-stands.js";
+import { waitsIn } from "./work-stands.js";
 
 // The branch prefix the writes ride, and the worktree they are made in. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
 export const WRITES = "claude/dispatch-";
@@ -29,9 +30,13 @@ const WORKTREE = `${RUN}/dispatch`;
 // A commit's short name, as git prints it. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
 const SHORT = 7;
 
-// The groups on main that open: open, marked for no cloud, with no branch, and waiting on nothing. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
-export function opensOf(read, standing) {
+// The groups on main that open: open, marked for no cloud, with no branch, holding no group, and waiting on nothing up the parent chain. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+export function opensOf(read, standing, trunk = new Map()) {
   const branched = new Set(read.stand.map((one) => one.name));
+  const parents = parentsIn([
+    ...read.stand.map((one) => one.ticket),
+    ...read.loose.map((one) => one.text),
+  ]);
   return read.loose
     .filter(
       (one) =>
@@ -39,7 +44,8 @@ export function opensOf(read, standing) {
         fieldOf(one.text, "state") !== CLOSED &&
         String(fieldOf(one.text, "cloud")) !== "true" &&
         !branched.has(one.name) &&
-        !waitingOn(one.text, standing).length,
+        !parents.has(one.name) &&
+        !waitsIn(one.text, standing, trunk).length,
     )
     .map((one) => one.name)
     .sort();
@@ -67,9 +73,9 @@ function rowsOf(it, argv) {
     .filter(Boolean);
 }
 
-// The fix group's name, cut to the words a name holds. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
-export function fixName(it, main) {
-  const name = `loose-fixes-${main.slice(0, SHORT)}`;
+// The fix group's name, cut to the words a name holds. A parent's name rides last, so the cut keeps the commit. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+export function fixName(it, main, parent = "") {
+  const name = ["loose-fixes", main.slice(0, SHORT), parent].filter(Boolean).join("-");
   return it.words ? cutTo(name, it.words) : name;
 }
 
@@ -90,16 +96,18 @@ const FIX_ASK = [
 // The files the run writes, by path under the tree, or a reason nothing is written. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
 export function writesOf(it, plan, read, main) {
   const out = new Map();
-  const bundle = plan.bundles.flatMap((one) => one.tickets);
-  if (bundle.length) {
-    const made = fixGroup(it, fixName(it, main));
+  const texts = new Map(read.loose.map((one) => [one.name, one.text]));
+  // Each bundle becomes a fix group under its parent. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+  for (const bundle of plan.bundles) {
+    const made = fixGroup(it, fixName(it, main, bundle.parent), bundle.parent);
     if (made.why) return { why: made.why };
     out.set(made.path, made.text);
-    const loose = new Map(read.loose.map((one) => [one.name, one.text]));
-    for (const name of bundle)
-      out.set(ticketAt(name), withField(loose.get(name), GROUP, made.name, it.front));
+    for (const name of bundle.tickets)
+      out.set(ticketAt(name), withField(texts.get(name), GROUP, made.name, it.front));
   }
-  const texts = new Map(read.loose.map((one) => [one.name, one.text]));
+  // A parent's close rides the same commit, so a second run over this main writes it no more. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+  for (const name of plan.closes ?? [])
+    out.set(ticketAt(name), withField(texts.get(name), "state", CLOSED, it.front));
   // The cloud marker rides this commit in place of marksTrunk and openGroup, because both of those push main. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
   for (const name of plan.opens)
     out.set(ticketAt(name), withField(texts.get(name), "cloud", true, it.front));
@@ -107,7 +115,7 @@ export function writesOf(it, plan, read, main) {
 }
 
 // [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
-function fixGroup(it, name) {
+function fixGroup(it, name, parent = "") {
   const path = `${TICKETS}/${name}.md`;
   const schemas = schemasHere(it);
   const copied = withRoute(
@@ -127,7 +135,8 @@ function fixGroup(it, name) {
     it.front,
   );
   if (made.why) return { why: made.why };
-  const text = withField(made.text, FIX, true, it.front);
+  const fixed = withField(made.text, FIX, true, it.front);
+  const text = parent ? withField(fixed, GROUP, parent, it.front) : fixed;
   const faults = askFaults(it, path, text).refused;
   if (faults.length)
     return {

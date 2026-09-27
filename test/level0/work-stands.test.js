@@ -9,7 +9,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { planOf } from "../../src/scripts/dispatch.js";
-import { standingIn } from "../../src/scripts/work-stands.js";
+import { standingIn, TODO, waitingOn } from "../../src/scripts/work-stands.js";
 import { CHILD, doorsSaying, GROUP_NOTE, remoteSaying } from "./work-doors.js";
 
 const ROOT = "/tree";
@@ -60,4 +60,19 @@ test("a parent with no branch holds its dependents", () => {
 
   assert.deepEqual(plan.ready, []);
   assert.deepEqual(plan.waiting, [{ group: "after", waits: ["move"] }]);
+});
+
+// A branch answers first, and trunk answers for a dependency on no branch. [[spec/tickets/groups-hold-groups]]
+test("waitingOn holds on a standing branch or an open ticket on trunk, and on no name trunk lacks", () => {
+  const text = GROUP_NOTE.replace(
+    "state: open\n",
+    "state: open\ndepends_on: [busy, parent, shut, gone]\n",
+  );
+  const standing = new Map([["work/busy", TODO]]);
+  const trunk = new Map([
+    ["parent", GROUP_NOTE],
+    ["shut", GROUP_NOTE.replace("state: open", "state: closed")],
+  ]);
+  assert.deepEqual(waitingOn(text, standing, trunk), ["busy", "parent"]);
+  assert.deepEqual(waitingOn(text, standing), ["busy"], "no trunk read, no parent");
 });

@@ -65,3 +65,17 @@ func TestPersonLightsTwoLevelsUp(t *testing.T) {
 		t.Errorf("elsewhere holds no ticket for a person, and reads person %q", said)
 	}
 }
+
+// A tree holding no ticket for a person lights no row. [[spec/tickets/groups-hold-groups]]
+func TestPersonStaysDarkWithNoPersonTicket(t *testing.T) {
+	items, err := ReadWorkItems(`[{"name": "big-move", "route": "group", "state": "open"},
+		{"name": "a-part", "route": "trivial", "state": "open", "group": "big-move"}]`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, one := range []string{items[0].Keys[PersonKey], items[0].Kids[0].Keys[PersonKey]} {
+		if one != "false" {
+			t.Errorf("a row reads person %q, and no ticket for a person stands", one)
+		}
+	}
+}

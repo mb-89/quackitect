@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -163,6 +163,15 @@ record:
         hash: 76adb2a2ca4b60c0
         size: 1399
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 63102090928a01535f6ac5e59cefa392b4c4fa1d
+    hash_after: 63102090928a01535f6ac5e59cefa392b4c4fa1d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -371,14 +380,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/engine/group.js src/scripts/work-stands.js src/scripts/work-free.js src/scripts/dispatch.js src/scripts/dispatch-write.js src/scripts/work.js src/scripts/work-merge.js src/scripts/work-fix.js src/tickets/tickets.go src/tui/work/workitems.go spec/views/work.base spec/design_output/work.md spec/design_output/tree-view.md spec/guidance/tickets.md test/level0/work-done.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names, and `src/scripts/work-fix.js` beside them, whose `addedHere` the filing shares with `fixLeaves`
+- the change reaches git and the disk alone, and the cases drive both through the fakes the earlier cases use
+- each new function carries a comment linking the groups-hold-groups chapter of the design input
+- the parent rules stand once, as a table in `spec/design_output/work.md` naming each function, and the tree view and the guidance link it
 
 ## tests-green
 

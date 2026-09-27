@@ -18,6 +18,7 @@ import {
   CLOSED,
   fieldOf,
   frontOf,
+  GROUP,
   heldIn,
   isGroup,
   stepOf,
@@ -56,7 +57,7 @@ import { fixRefuses } from "./work-fix.js";
 import { testVerb } from "./work-test.js";
 import { unblock } from "./work-unblock.js";
 import { list } from "./work-list.js";
-import { close, marksTrunk, merge, offTrunk } from "./work-merge.js";
+import { close, filesUp, marksTrunk, merge, offTrunk } from "./work-merge.js";
 import {
   childrenHere,
   DONE,
@@ -418,12 +419,13 @@ function finish(it) {
 
   const stopped = ready(it, branch);
   if (stopped.code) return stopped.code;
-  if (childrenStand(it, name) || fixRefuses(it, it.disk.read(path))) return 1;
+  if (fixRefuses(it, it.disk.read(path))) return 1;
 
   const open = retroOpen(it, it.disk.read(path));
   if (open) return retroFirst(name, open);
 
-  return leaves(it, branch, at, path, stopped.says);
+  const moved = filesUp(it, name, it.disk.read(path));
+  return leaves(it, branch, at, path, stopped.says, moved);
 }
 
 // The retro step of a group, which the box writes before it leaves. [[spec/processes/group.yaml]]
@@ -443,22 +445,6 @@ export function retroOpen(it, text) {
     .filter((one) => holdsHere(here, String(one.said.when ?? ""), front).holds)
     .find((one) => !written(one.path));
   return open?.path ?? "";
-}
-
-// A group closes where no ticket naming it stands open, so a box leaving work undone hands the group back and closes nothing. [[spec/design_output/work#a-box-leaves]]
-function childrenStand(it, name) {
-  const children = childrenHere(it, name);
-  const open = children.filter((one) => fieldOf(one.text, "state") !== CLOSED);
-  if (!open.length) return false;
-  console.error(`${name} closes once no ticket naming it stands open:`);
-  for (const one of open) console.error(`  ${waitsAt(it, one, children)}`);
-  console.error(
-    "Close each through the pull, or hand a person's step on with ./RUNME.sh branch unblock.",
-  );
-  console.error(
-    `Or run ./RUNME.sh branch release ${name}, and the group stands open for the next box.`,
-  );
-  return true;
 }
 
 // [[spec/design_output/work#a-box-leaves]]
@@ -506,7 +492,7 @@ export function standsOpen(it, name, path) {
 }
 
 // [[spec/design_output/work#a-box-leaves]]
-function leaves(it, branch, at, path, says) {
+function leaves(it, branch, at, path, says, moved = []) {
   const name = branch.replace(/^work\//, "");
   const after = it.git.run(["rev-parse", "HEAD"], true).out;
 
@@ -525,7 +511,13 @@ function leaves(it, branch, at, path, says) {
   if (!it.git.run(["push", "origin", branch]).ok) return 1;
 
   console.log(`${branch} carries ${shortOf(after)}, and ${says}.`);
-  console.log(`${name} stands ${CLOSED}, and every ticket in it is closed.`);
+  if (!moved.length)
+    console.log(`${name} stands ${CLOSED}, and every ticket in it is closed.`);
+  // [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+  else
+    console.log(
+      `${name} stands ${CLOSED}, and hands ${moved.join(", ")} to ${fieldOf(it.disk.read(path), GROUP) || "the top"}.`,
+    );
   console.log(`Run ./RUNME.sh branch merge ${name} from ${TRUNK}.`);
   return 0;
 }

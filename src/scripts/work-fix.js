@@ -20,6 +20,19 @@ export const FIX = "fix";
 // The agent tickets a fix group's branch adds and leaves standing, or none where the group is a feature group. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
 export function fixLeaves(it, text) {
   if (String(fieldOf(text, FIX)) !== "true") return [];
+  return addedHere(it)
+    .filter(
+      (one) =>
+        fieldOf(one.text, "state") !== CLOSED &&
+        !fieldOf(one.text, GROUP) &&
+        !isGroup(one.text) &&
+        !waitsOnPerson(one),
+    )
+    .map((one) => one.name);
+}
+
+// The tickets this branch adds over trunk, as the disk holds them. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+export function addedHere(it) {
   const said = it.git.run(
     ["diff", "--name-only", "--diff-filter=A", `origin/${TRUNK}...HEAD`, "--", TICKETS],
     true,
@@ -30,15 +43,7 @@ export function fixLeaves(it, text) {
     .filter((row) => row.endsWith(NOTE_END))
     .map((path) => ({ name: ticketNamed(path), path: it.join(it.root, path) }))
     .filter((one) => it.disk.exists(one.path))
-    .map((one) => ({ name: one.name, text: it.disk.read(one.path) }))
-    .filter(
-      (one) =>
-        fieldOf(one.text, "state") !== CLOSED &&
-        !fieldOf(one.text, GROUP) &&
-        !isGroup(one.text) &&
-        !waitsOnPerson(one),
-    )
-    .map((one) => one.name);
+    .map((one) => ({ name: one.name, text: it.disk.read(one.path) }));
 }
 
 // Whether done stops on a fix group, naming each ticket and the two lines turning it into a question. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]

@@ -15,6 +15,7 @@ import {
 import { isTagged, reaches } from "../../.claude/skills/level0/lib/todo.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import {
+  ancestorsOf,
   CLOSED,
   fieldOf,
   GROUP,
@@ -87,10 +88,16 @@ export function frontField(text, key) {
   return said ? said[1] : "";
 }
 
-// What a branch waits for: the groups its ticket names, then its switch. [[spec/design_output/work#a-switch-holds-a-group]]
-export function waitsOf(one, standing) {
+// What a branch waits for: the groups its ticket and every ancestor's name, then its switch. The ancestors read off trunk's tickets by name. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+export function waitsOf(one, standing, trunk = new Map()) {
   const off = one.shut ? [`${one.shut} to read true`] : [];
-  return [...waitingOn(one.ticket, standing), ...off];
+  return [...new Set([...waitsIn(one.ticket, standing, trunk), ...off])];
+}
+
+// The groups a group ticket and its ancestors wait on. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+export function waitsIn(text, standing, trunk = new Map()) {
+  const chain = [text, ...ancestorsOf(text, trunk).map((one) => one.text)];
+  return [...new Set(chain.flatMap((one) => waitingOn(one, standing, trunk)))];
 }
 
 // The key a group waits on, or nothing where the shared config turns it on. [[spec/design_output/work#a-switch-holds-a-group]]
@@ -100,12 +107,20 @@ export function shutBy(text, shared) {
   return shared.get(key) === true ? "" : key;
 }
 
-// A dependency waits until trunk carries its ticket closed, or its branch goes. [[spec/design_output/work#a-dependency-waits-for-trunk]]
-export function waitingOn(text, standing) {
+// A dependency waits while its branch stands, and a dependency on no branch, a parent among them, waits while trunk's copy of its ticket stands short of closed. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+export function waitingOn(text, standing, trunk = new Map()) {
   return dependsOn(text).filter((name) => {
     const status = standing.get(`work/${name}`);
-    return status === TODO || status === HELD || status === DONE;
+    if (status === TODO || status === HELD || status === DONE) return true;
+    if (status) return false;
+    const onTrunk = trunk.get(name);
+    return Boolean(onTrunk) && fieldOf(onTrunk, "state") !== CLOSED;
   });
+}
+
+// Trunk's tickets by name, which the waits and the chain read. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+export function trunkOf(loose) {
+  return new Map((loose ?? []).map((one) => [one.name, one.text]));
 }
 
 export function standingOf(tickets, merged = new Set()) {
@@ -158,8 +173,10 @@ export function landedHere(it, branches) {
   return new Set(
     branches.filter(
       (branch) =>
-        fieldOf(textAt(it, `origin/${TRUNK}`, ticketAt(ticketNamed(branch))), "state") ===
-        CLOSED,
+        fieldOf(
+          textAt(it, `origin/${TRUNK}`, ticketAt(ticketNamed(branch))),
+          "state",
+        ) === CLOSED,
     ),
   );
 }
