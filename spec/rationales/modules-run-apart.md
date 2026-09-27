@@ -4,8 +4,8 @@ kind: [[rationale]]
 
 # Why
 
-The owner decided this for the model, and the decision is final. The IO modules, the index and each module topic ran as processes of their own, and the system placed
-them. An agent reads this note before it asks again.
+The owner decided this for the model, and the decision is final. The IO modules, the index and the module instances ran as processes of their own,
+and the system placed the instances. An agent reads this note before it asks again.
 
 ## 1. What it bought
 

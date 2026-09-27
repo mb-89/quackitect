@@ -26,7 +26,7 @@ The asks, one to a line:
 |---|---|---|
 | build | the new module stands on `main`, and nothing reads it yet | its tests and the generic contract tests pass |
 | shadow | old and new both compute, and every mismatch writes a `shadow` row to the session log | `./RUNME.sh log --kind shadow` names no mismatch of the slice for the time the owner judges enough |
-| switch | the slice's one config key, under `slices`, moves from `old` through `shadow` to `new`, and one commit rolls it back | the readers run on the new path |
+| switch | the slice's one config key, `migration/config/slices/<slice>`, moves from `old` through `shadow` to `new`, and one commit rolls it back. The `migration` module declares it as a shared key, in the default file alone, and the slice's shadow adds it | the readers run on the new path |
 | delete | the old code and its tests go, in the same group | no reference to the old path remains |
 
 The retro counts the files a content ticket reaches, before the move and after

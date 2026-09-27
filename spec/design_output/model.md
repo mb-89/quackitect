@@ -145,7 +145,7 @@ reads it at start. It lists the instances to load, and binds each port:
 
 | the part | what it holds |
 |---|---|
-| an instance | a name and its module type, such as `queue: { module: queue }`. One type runs as two instances with different config |
+| an instance | a name and its module type, such as `queue: { module: queue }`. The type is the registration name of one file, here `src/modules/queue/queue.go`, and no folder. One type runs as two instances with different config |
 | a wire to a standard name | `tickets.all: tickets/all` and `queue.rows: tickets/all`. Ports on one standard name connect, and neither side knows the other |
 | a wire port to port | `work.places: queue.places`. The index still names the value by its writer, `queue/places` |
 | an out-port with no wire | readable as `<instance>/<port>` |
@@ -235,7 +235,7 @@ The module declares a glob, a codec that parses and serializes, and a kind:
 | the files | the module | its codec | its topic |
 |---|---|---|---|
 | `spec/tickets/*.md` | tickets | markdown with its frontmatter | `tickets/` |
-| `spec/config/level0.json`, `.se/.runtime/config.json` | config | JSON, keyed by module and then by key | every `<instance>/config/` |
+| `spec/config/level0.json`, `.se/.runtime/config.json` | config | JSON, keyed by instance and then by key | every `<instance>/config/` |
 | `.se/.runtime/plan.json` | queue | JSON | `queue/` |
 | `.se/.runtime/hold/<hand>.json` | holds | JSON | `hold/` |
 
@@ -368,11 +368,12 @@ an order that stays fixed while the process lives:
 
 | what the index keeps | when it builds it | what it holds |
 |---|---|---|
-| a module's height | at start, in the passes over the wiring | one past the highest height among the writers of its in-ports. The IO modules stand at 0 |
+| a module's height | at start, in the passes over the wiring | 0 for a module with no in-ports. Every other module stands one past the highest height among the writers of its in-ports, IO modules among them |
 | a name's run list | the first time the name changes | the modules downstream of it, sorted by height |
 
-Both stay for the life of the process, and no list needs clearing, because
-modules load at start alone. A change of modules restarts the index. The passes
+Both stay until the index restarts, and no list needs clearing, because
+modules load at start alone. A change to ports or to the wiring restarts the
+index, per [[spec/design_output/model#a-module-rebuilds-alone]]. The passes
 refuse a cycle, per [[spec/design_output/model#the-index-resolves-in-passes]], so
 every module gets a height. A tick is such a name too, so modules on one tick
 share one kept list, run lowest height first.
@@ -401,9 +402,9 @@ flowchart LR
 |---|---|
 | a commit to names at revision r | marks their run lists pending at r, building a list the first time its name changes |
 | a run request | goes to a module once none of its in-ports reads a pending name |
-| one height | its modules run in parallel, each in its own process |
+| one height | its modules run in parallel, and the placements decide the processes |
 | a change arriving during a wave | waits for the next wave |
-| a read | waits on nothing, and gets the last settled value |
+| a read | waits on nothing, except the read of an unwatched pending name, which waits for its run and for no write. It gets the last settled value |
 
 ```mermaid
 sequenceDiagram
@@ -554,7 +555,7 @@ Every list of keys comes off the registrations:
 | the command-line help, the window's `index` tab, and a config editor showing every `*/config` subtopic | nothing |
 
 `spec/config/level0.json`, the default file, keeps the values someone sets, and
-nothing else. The default file and the local file both key by module and then
+nothing else. The default file and the local file both key by instance and then
 by key, such as `{"queue": {"weight": 3}}`.
 
 The `migration` switches keep a namespace of their own. A `migration` module
@@ -619,8 +620,8 @@ an override standing keeps winning, with the file values listed under it.
 
 A shared key takes the default file alone, with no local file, environment,
 context or override. So the whole project reads it alike. The `migration`
-switches are such keys: the queue module declares them, and a take reads them
-off `main`, per [[spec/design_output/work#a-switch-holds-a-group]].
+switches are such keys: the `migration` module declares them, and the queue
+reads them off `main`, per [[spec/design_output/work#a-switch-holds-a-group]].
 
 Overrides replace the wipe of the local file when a new editor window opens,
 which `src/extension/lib/session.js` makes today.
@@ -650,8 +651,8 @@ Nothing about a context reaches the disk.
 
 ## A module meets the index
 
-A module package stands under `src/modules/<topic>`. It speaks to the index and
-to nothing else. It reads its inputs off the snapshot, and a request goes out
+A module is one file in a topic package under `src/modules/<topic>`. It speaks to
+the index and to nothing else. It reads its inputs off the snapshot, and a request goes out
 inside an action's commit alone. The index hands it to the IO module that accepts
 it. So its one peer, the
 index, has a fake, and every test of the module runs against that fake. An
@@ -757,8 +758,8 @@ module carry over from there.
 An IO module registers its in-ports, out-ports and config by local name, like
 every other module. For the contract, see
 [[spec/design_input/the-index-holds-the-model#every-part-is-a-module]]. Its
-registration carries `q.IO()`. It stands under `src/modules/<topic>`
-beside the others, and no separate tree holds it.
+registration carries `q.IO()`. It is one file in a topic package under
+`src/modules/<topic>` beside the others, and no separate tree holds it.
 
 | what it does | such as |
 |---|---|
@@ -791,15 +792,25 @@ stand local. The fake serves the contract suite, the replay and the system tests
 too. A module without the flag tests against `q/qtest` alone, per
 [[spec/design_output/model#the-test-matrix]], and needs no fake of an IO module.
 
-## The outbound IO modules
+## IO modules and their fakes
+
+The inbound side, the outside reaching quackitect:
+
+| the module | reaches | its fake answers from |
+|---|---|---|
+| `watch` | changes to the files, which it writes as `files/` | a change the test pushes |
+| `clock` | the time, and `clock/minute` | a time that stands still until a test calls `Tick` |
+| `env` | the `SE_` variables, which it writes as `env/<name>` at start | a map of variables the test hands in |
+| `hooks` | the hook events of a session | a recording it replays, per [[spec/design_output/model#an-inbound-fake-replays]] |
+| `lsp` | the LSP messages of an editor | a recording it replays |
+
+The outbound side, quackitect reaching the outside:
 
 | the module | reaches | its fake answers from |
 |---|---|---|
 | `disk` | the files | a map keyed by the forward-slash path, on every platform |
-| `proc` | a program | a table of commands, and a command outside it fails naming the module |
 | `git` | a repository, running `git` | `FakeGit`, a repository in memory: refs, commits and a tree a commit, which `Show`, `Commit`, `Push`, `Fetch` and `MergeBase` read and move |
-| `clock` | the time, and `clock/minute` | a time that stands still until a test calls `Tick` |
-| `watch` | changes to the files, which it writes as `files/` | a change the test pushes |
+| `proc` | a program | a table of commands, and a command outside it fails naming the module |
 | `vale` | the prose rules, running Vale | a table of findings by file |
 | `biome` | the JavaScript format and lint, running Biome | a table of findings by file |
 
@@ -859,13 +870,14 @@ check runs it on Linux and Windows, and reads a package's flag off its
 | the analyzer | what it refuses |
 |---|---|
 | `onlyq` | an import from a module without the flag, or its tests, past `q`, `q/qtest` and the pure standard library the analyzer lists. So `os`, `io/fs`, `os/exec`, `net`, `database/sql`, `src/config`, `src/index` and a call to `time.Now` stay out |
-| `ioonly` | an import of `os`, `os/exec`, `net` or `net/http`, and a call to `time.Now`, in `src/q` or a renderer |
+| `ioonly` | an import of `os`, `os/exec`, `net` or `net/http`, and a call to `time.Now`, in the core, `src/q`, or a renderer |
 | `fakesuite` | a fake with no contract suite beside it: an IO module's fake, and `q/qtest` |
 | `nomodule` | an import of a package under `src/modules/` from another module, the index core or a renderer |
 
 An IO module imports what its IO needs, and reaches another module through the
-index alone, which `nomodule` holds. The index core keeps the outside's own
-libraries, its store and the NATS server inside it, and stands outside `ioonly`.
+index alone, which `nomodule` holds. The index process,
+`src/index`, runs the server: it keeps the outside's own libraries, its store and
+the NATS server, and stands outside `ioonly`. The core, `src/q`, stays inside it.
 
 The analyzers replace `DoorsOnly`, `FakeDoorsInTest` and `OutsideInDoors` for
 the Go code, and the Vale rules keep the JavaScript that stays. The code holds
@@ -894,7 +906,7 @@ action.
 
 ## The handle is a name
 
-`ops/` is a family the catalog declares once, and the ops module provides it.
+`ops/` is a family the catalog declares once, and the index manager provides it.
 Each call of a `q.Op` action adds a key under it, so the catalog stays whole.
 The id sorts by start time.
 
@@ -931,8 +943,8 @@ reaches no IO module itself.
 
 An action that makes a writing request declares `q.Writes`. Writing operations
 queue one at a time per checkout, in the order they arrive. A read waits on
-nothing: a reading operation runs beside them, and a `get` answers off the last
-snapshot.
+nothing, except the read of an unwatched pending name, which waits for its run and for no write. A reading operation runs beside them, and a `get`
+answers off the last snapshot.
 
 A git hook reads names alone. So a hook the operation's own commit fires reads
 and answers, and waits behind nothing.
@@ -1185,9 +1197,9 @@ module that rebuilds alone too. For the argument, see [[spec/rationales/modules-
 |---|---|---|
 | the index | `quack index` | the core, the NATS server, SQLite, and the index manager module |
 | the IO process | `quack io` | the IO modules holding a listener, per [[spec/design_output/model#the-io-process]] |
-| a module | `quack module <topic>` | the registrations of the topics it names |
+| a placement | `quack module <instance>...` | the instances it names |
 
-The binary holds every module, and a module process runs the topics its
+The binary holds every module, and a module process runs the instances its
 command names. So an author writes one file, and a person starts one program.
 
 ## The start
@@ -1241,8 +1253,13 @@ The restarts follow [[spec/design_output/model#restarts]].
 
 ## A module rebuilds alone
 
-The `watch` IO module sees a change under `src/modules/<topic>`, and the index manager builds the binary again under `.se/.runtime/bin`, named by its stamp. Then it restarts the
-placement holding that topic on the new binary, and the index stays warm.
+The `watch` IO module sees a change under `src/modules/<topic>`, and the index
+manager builds the binary again under `.se/.runtime/bin`, named by its stamp:
+
+| the rebuild | what restarts |
+|---|---|
+| it keeps the module's ports and the wiring | the process holding that module's instances, on the new binary, and the index stays warm |
+| it changes ports, or the wiring changes | the index, which resolves again and builds the heights and run lists again |
 
 A change to the `q` package changes its stamp, and the index manager restarts every
 process on the new binary. The config key `processes.rebuild` turns the watch
@@ -1256,8 +1273,9 @@ kinds and the catalog stand in [[spec/design_output/model]].
 
 ## A module is one file
 
-A topic folder under `src/modules/` is one Go package. Each file in it holds one
-registration, its input struct, and a test beside it:
+A module is one file. A topic folder under `src/modules/` is one Go package
+holding several modules, and each file holds one registration, its input struct,
+and a test beside it:
 
 | the file | what it holds |
 |---|---|

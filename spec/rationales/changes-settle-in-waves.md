@@ -43,10 +43,13 @@ so the first tick paid nothing for it. Nobody builds it now.
 
 ## 4. What it gave up
 
-A module changed only at a restart, because the heights and run lists stayed
-for the life of the process. The first change of a name paid for its list. The read of an unwatched pending name waited for a run.
+A change to ports or to the wiring restarted the index, because the heights
+and run lists stayed until then. A rebuild keeping them restarted its module's
+process alone. The first change of a name paid for its list, and the read of an
+unwatched pending name waited for a run.
 
 ## 5. What would make it wrong
 
-A module set that changed while the index ran, so the kept lists went stale. The index then worked the order out again at each change, and the
-ruling bent there.
+Ports or a wiring that changed while the index ran, so the kept lists went
+stale. The index then worked the order out again at each change, and the ruling
+bent there.

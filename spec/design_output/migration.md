@@ -27,7 +27,7 @@ A box reads the argument here before it asks about a ruling:
 | a file declares each view, and one renderer draws them | [[spec/rationales/views-are-declarations]] |
 | a longer action answers a handle, and one writer runs per tree | [[spec/rationales/long-actions-take-a-handle]] |
 | every part holds a lease | [[spec/rationales/every-part-holds-a-lease]] |
-| the IO process, the index and each module topic run as processes | [[spec/rationales/modules-run-apart]] |
+| the IO process, the index and the placements of module instances run as processes | [[spec/rationales/modules-run-apart]] |
 | Go holds the core, and Linux and Windows behave the same | [[spec/rationales/go-holds-the-core]] |
 | the pure Go driver for SQLite | [[spec/rationales/the-index-drops-cgo]] |
 | one Go module | [[spec/rationales/go-stands-as-one-module]] |

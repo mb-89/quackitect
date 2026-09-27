@@ -122,10 +122,13 @@ A run reads no old value beside a new one, and it costs one round trip. Its
 output carries the revision it comes from.
 
 A change settles as one wave. The start gives every module a height, and a name
-builds its run list of the modules below it the first time it changes. A commit marks its run
-list pending, and a module runs once none of its in-ports reads a pending name.
-So a module fed twice by one change runs once. A change during a wave waits for
-the next one, and a read waits on nothing and gets the last settled value.
+builds its run list of the modules below it the first time it changes. A commit
+marks its run list pending, and a module runs once none of its in-ports reads a
+pending name. So a module fed twice by one change runs once.
+
+A change during a wave waits for the next one. A read waits on nothing, except
+the read of an unwatched pending name, which waits for its run and for no write.
+A read gets the last settled value.
 
 | what a module provides | what it answers |
 |---|---|
@@ -176,13 +179,14 @@ the other modules stay as they stand.
 | the folder | what it holds |
 |---|---|
 | `src/q` | the index core: names, values, one snapshot, the pushes |
-| `src/modules/<topic>` | one module a topic, such as `work`, `pull`, `check` and `retro` |
-| `src/modules/<topic>`, with `q.IO()` | one IO module a topic, such as `watch`, `hooks`, `lsp`, `git` and `disk` |
+| `src/modules/<topic>` | a topic package holding several modules, one file each, such as `work`, `pull`, `check` and `retro` |
+| `src/modules/<topic>`, with `q.IO()` | an IO module, one file carrying the flag `io` in its topic package, such as `watch`, `hooks`, `lsp`, `git` and `disk` |
 
 # A module is one file
 
-A topic folder is one module. A new file in `src/modules/work/` joins the
-work package at its next build, and its `init` registers the port. The module
+A module is one file. A topic folder is one Go package holding several modules,
+one file each. A new file in `src/modules/work/` joins the work package at its
+next build, and its `init` registers the module and its ports. The module
 names no HTTP library, no MCP and no editor, because only the IO modules know those.
 
         var OpenTasks = q.Derived("open-tasks", 0,
@@ -259,7 +263,7 @@ index, `ops/<id>`, with its state, progress, deadline and result.
 | callback or poll | a caller watches `ops/<id>` or reads it, the way it reads every name |
 | states | `queued`, `running`, then `done`, `failed` or `cancelled`, and the index pushes each move |
 | the deadline | the watchdog ends a late operation loudly as a failure, and its undo steps run |
-| one writer | writing operations queue one at a time per tree, and a read waits on nothing, so a git hook reading names answers at once |
+| one writer | writing operations queue one at a time per tree. A read waits on nothing, except the read of an unwatched pending name, which waits for its run and for no write. So a git hook reading names answers at once |
 | the caller | an operation outlives it, and another client reads the result |
 | retention | the running and queued ones stay, finished ones stay for a window config sets, a failure stays longer, and the session log keeps every change |
 | reads | a read takes no handle, and the cage's answer inside a hook stays synchronous |
@@ -294,7 +298,7 @@ Every ruling stands, and a box builds on it with no question:
 | a call with no undo names `q.NoUndo` and the reason | [[spec/design_output/model#an-action-lists-requests]] |
 | `quack why` follows an input down to `files/`, `session/` and `clock/minute`, and stops short of git | [[spec/design_output/model#quack-why]] |
 | every part is a module, and the core holds no input layer and no `q.Given` | [[spec/rationales/every-part-is-a-module]] |
-| a read waits on nothing, and writing actions line up one at a time | [[spec/design_output/model#one-writer-per-tree]] |
+| writing actions line up one at a time. A read waits on nothing, except the read of an unwatched pending name, which waits for its run and for no write | [[spec/design_output/model#one-writer-per-tree]] |
 | the restarts of a part stop after its alarm, until the alarm clears | [[spec/design_output/model#restarts]] |
 | the hook module watches the index's lease, so an index answering off a hung loop reads as down | [[spec/design_output/model#the-watcher-of-the-watchdog]] |
 | the index and its processes speak NATS, with the server inside the index | [[spec/rationales/the-processes-speak-nats]] |
@@ -312,8 +316,8 @@ Every ruling stands, and a box builds on it with no question:
 
 # The system places the processes
 
-Three kinds of process run: one for the IO modules holding a listener, one for the index, and one a
-module topic. Go spreads its work over every core in one process already, so
+Three kinds of process run: one for the IO modules holding a listener, one for
+the index, and one a placement of module instances. Go spreads its work over every core in one process already, so
 the split buys isolation:
 
 - A crash stays in its module, and the index shows that module's names at their built-in values, with the mark `not provided`, until it restarts.
