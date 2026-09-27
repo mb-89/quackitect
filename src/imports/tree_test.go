@@ -1,4 +1,4 @@
-// Both rules over every package of the module, so a single import that
+// Every rule over every package of the module, so a single import that
 // breaks one turns the battery red.
 // [[spec/design_output/model#the-build-checks-imports]]
 package imports
@@ -29,13 +29,9 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 		for _, fault := range FaultsIn(one.PkgPath, imported, CarriesIO(one.Syntax)) {
 			t.Error(fault)
 		}
-	}
-}
-
-func TestFaultsNameAModuleImportingADoor(t *testing.T) {
-	said := Faults("quackitect/src/modules/work", []string{"fmt", "quackitect/src/doors/disk"})
-	if len(said) != 1 {
-		t.Fatalf("the faults read %v", said)
+		for _, fault := range SuiteFaults(one.PkgPath, one.Fset, one.Syntax) {
+			t.Error(fault)
+		}
 	}
 }
 

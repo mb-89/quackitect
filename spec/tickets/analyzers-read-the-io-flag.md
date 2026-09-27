@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -157,6 +157,15 @@ record:
         hash: bce2b59d1790ecde
         size: 795
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 7890d331bbc6842ae9a4d71ea1bffa00ede5339f
+    hash_after: 7890d331bbc6842ae9a4d71ea1bffa00ede5339f
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -309,14 +318,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/imports/imports.go src/imports/imports_test.go src/imports/tree_test.go src/imports/analyzers_test.go .vale.ini
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the analyzers, their tests, the tree test and the Vale file, the size list's files
+the analyzers read planted packages in a folder of the test, and the tree test reads the tree, so no door stands unfaked
+imports.go opens on a header naming the four analyzers, and each new function points at the import chapter of the model
+the refused imports stand once in outside, and the file names of a suite once in the constants block. The time.Now call rule stays out, and ioonly holds src/q, with a note on the renderers
 
 ## tests-green
 

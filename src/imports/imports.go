@@ -1,15 +1,28 @@
-// The import rules, as go/analysis analyzers: a module imports no door, and a
-// module, a door, the index or a renderer imports no other module.
+// The import rules, as go/analysis analyzers: onlyq, ioonly, fakesuite and
+// nomodule, each reading a package's flag off its q.IO() registration.
 // [[spec/design_output/model#the-build-checks-imports]]
 package imports
 
 import (
 	"fmt"
 	"go/ast"
+	"go/token"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	"golang.org/x/tools/go/analysis"
+)
+
+// The generated main of a package's tests, which no rule reads, and the files naming a suite. [[spec/design_output/model#the-build-checks-imports]]
+const (
+	testMain     = ".test"
+	testFile     = "_test.go"
+	contractFile = "_contract_test.go"
+	fakePrefix   = "Fake"
+	qtestPath    = module + "src/q/qtest"
+	qtestSuite   = "suite.go"
 )
 
 const module = "quackitect/"
@@ -25,19 +38,16 @@ type rule struct {
 }
 
 var (
-	noDoor   = rule{from: isModule, to: isDoor, says: "a module imports no door"}
 	noModule = rule{from: seesModules, to: isModule, says: "a module, a door, the index or a renderer imports no other module", past: ownModule}
 	onlyQ    = rule{from: isModule, to: pastQ, says: "a module imports q, q/qtest and the pure standard library alone", flagged: true}
+	ioOnly   = rule{from: isCore, to: reachesOut, says: "the core imports no os, os/exec, net or net/http"}
 )
+
+// The imports ioonly refuses, per [[spec/design_output/model#the-build-checks-imports]].
+var outside = []string{"os", "os/exec", "net", "net/http"}
 
 // The standard library packages that reach the outside, per [[spec/design_output/model#the-build-checks-imports]].
 var impure = []string{"os", "io/fs", "io/ioutil", "net", "database/sql", "syscall", "unsafe", "plugin", "log/syslog", "runtime/cgo"}
-
-var NoDoor = &analysis.Analyzer{
-	Name: "nodoor",
-	Doc:  "a package under src/modules imports no package under src/doors",
-	Run:  noDoor.run,
-}
 
 var OnlyQ = &analysis.Analyzer{
 	Name: "onlyq",
@@ -48,22 +58,97 @@ var OnlyQ = &analysis.Analyzer{
 // [[spec/design_output/model#the-build-checks-imports]]
 var IOOnly = &analysis.Analyzer{
 	Name: "ioonly",
-	Doc:  "the core and a renderer import no os, os/exec, net or net/http, and call no time.Now",
-	Run:  unbuilt,
+	Doc:  "the core imports no os, os/exec, net or net/http",
+	Run:  ioOnly.run,
 }
 
 // [[spec/design_output/model#the-build-checks-imports]]
 var FakeSuite = &analysis.Analyzer{
 	Name: "fakesuite",
 	Doc:  "a package declaring a fake keeps a contract suite beside it",
-	Run:  unbuilt,
+	Run:  fakeSuite,
 }
 
-func unbuilt(pass *analysis.Pass) (any, error) {
-	if len(pass.Files) > 0 {
-		pass.Reportf(pass.Files[0].Package, "%s stands unbuilt", pass.Pkg.Path())
+func fakeSuite(pass *analysis.Pass) (any, error) {
+	if strings.HasSuffix(pass.Pkg.Path(), testMain) {
+		return nil, nil
+	}
+	for _, fault := range SuiteFaults(pass.Pkg.Path(), pass.Fset, pass.Files) {
+		pass.Reportf(fault.at, "%s", fault.says)
 	}
 	return nil, nil
+}
+
+// A fake the package declares with no suite beside it, and where it stands. [[spec/design_output/model#the-build-checks-imports]]
+type SuiteFault struct {
+	at   token.Pos
+	says string
+}
+
+func (one SuiteFault) String() string { return one.says }
+
+// Every fake the package's own files declare with no contract suite in its folder, and q/qtest with no suite.go. [[spec/design_output/model#the-build-checks-imports]]
+func SuiteFaults(path string, fset *token.FileSet, files []*ast.File) []SuiteFault {
+	var own []*ast.File
+	for _, file := range files {
+		if !strings.HasSuffix(fset.Position(file.Package).Filename, testFile) {
+			own = append(own, file)
+		}
+	}
+	if len(own) == 0 {
+		return nil
+	}
+	folder := filepath.Dir(fset.Position(own[0].Package).Filename)
+	if path == qtestPath {
+		if _, err := os.Stat(filepath.Join(folder, qtestSuite)); err != nil {
+			return []SuiteFault{{own[0].Package, fmt.Sprintf("%s keeps no %s beside its fake", path, qtestSuite)}}
+		}
+		return nil
+	}
+	if suiteIn(folder) {
+		return nil
+	}
+	var out []SuiteFault
+	for _, file := range own {
+		for _, decl := range file.Decls {
+			for _, one := range fakesIn(decl) {
+				out = append(out, SuiteFault{one.Pos(), fmt.Sprintf("%s declares %s with no contract suite beside it", path, one.Name)})
+			}
+		}
+	}
+	return out
+}
+
+// The top-level types and functions whose name opens with Fake. [[spec/design_output/model#the-build-checks-imports]]
+func fakesIn(decl ast.Decl) []*ast.Ident {
+	var out []*ast.Ident
+	switch one := decl.(type) {
+	case *ast.FuncDecl:
+		if one.Recv == nil && strings.HasPrefix(one.Name.Name, fakePrefix) {
+			out = append(out, one.Name)
+		}
+	case *ast.GenDecl:
+		for _, spec := range one.Specs {
+			if named, ok := spec.(*ast.TypeSpec); ok && strings.HasPrefix(named.Name.Name, fakePrefix) {
+				out = append(out, named.Name)
+			}
+		}
+	}
+	return out
+}
+
+// Whether a file of the folder ends in _contract_test.go. [[spec/design_output/model#the-fake-keeps-a-contract]]
+func suiteIn(folder string) bool {
+	found, err := os.ReadDir(folder)
+	if err != nil {
+		return false
+	}
+	for _, one := range found {
+		if strings.HasSuffix(one.Name(), contractFile) {
+			return true
+		}
+	}
+	return false
 }
 
 // The one nomodule rule, which analyzers-read-the-io-flag reuses. [[spec/tickets/the-wiring-file-binds-ports]]
@@ -81,7 +166,7 @@ func Faults(from string, imported []string) []string {
 // The faults of a package, where io says its registration carries q.IO(), which onlyq lets pass. [[spec/design_output/model#the-build-checks-imports]]
 func FaultsIn(from string, imported []string, io bool) []string {
 	out := []string{}
-	for _, one := range []rule{noDoor, noModule, onlyQ} {
+	for _, one := range []rule{noModule, onlyQ, ioOnly} {
 		if one.flagged && io {
 			continue
 		}
@@ -101,8 +186,9 @@ func (one rule) fault(from, path string) string {
 	return fmt.Sprintf("%s imports %s: %s", from, path, one.says)
 }
 
+// A package's generated test main reads as no package, so its imports name nothing. [[spec/design_output/model#the-build-checks-imports]]
 func (one rule) run(pass *analysis.Pass) (any, error) {
-	if one.flagged && CarriesIO(pass.Files) {
+	if strings.HasSuffix(pass.Pkg.Path(), testMain) || (one.flagged && CarriesIO(pass.Files)) {
 		return nil, nil
 	}
 	for _, file := range pass.Files {
@@ -146,6 +232,18 @@ func under(path, folder string) bool {
 
 func isModule(path string) bool { return under(path, "src/modules") }
 func isDoor(path string) bool   { return under(path, "src/doors") }
+
+// The core ioonly holds. The model names the renderers too, and src/tui/frame reaches the outside today, so they wait. [[spec/design_output/model#the-build-checks-imports]]
+func isCore(path string) bool { return under(path, "src/q") }
+
+func reachesOut(path string) bool {
+	for _, one := range outside {
+		if path == one {
+			return true
+		}
+	}
+	return false
+}
 
 // A module path falls to nomodule, so one import names one fault. [[spec/tickets/the-wiring-file-binds-ports]]
 func pastQ(path string) bool {

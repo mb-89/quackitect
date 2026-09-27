@@ -15,7 +15,6 @@ import (
 var planted = map[string]string{
 	"doors/disk/disk.go":       "package disk\n\nfunc Read() string { return \"\" }\n",
 	"doors/nosy/nosy.go":       "package nosy\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/doors/nosy imports quackitect/src/modules/work`\n\nfunc Name() string { return work.Name() }\n",
-	"modules/leaky/leaky.go":   "package leaky\n\nimport \"quackitect/src/doors/disk\" // want `quackitect/src/modules/leaky imports quackitect/src/doors/disk`\n\nfunc Name() string { return disk.Read() }\n",
 	"modules/nosy/nosy.go":     "package nosy\n\nimport \"os\" // want `quackitect/src/modules/nosy imports os`\n\nfunc Name() string { return os.Getenv(\"NAME\") }\n",
 	"modules/work/work.go":     "package work\n\nfunc Name() string { return \"work\" }\n",
 	"modules/names/names.go":   "package names\n\nfunc Of() string { return \"work\" }\n",
@@ -37,10 +36,6 @@ func plant(t *testing.T) string {
 		}
 	}
 	return dir
-}
-
-func TestAModuleImportingADoorIsNamed(t *testing.T) {
-	analysistest.Run(t, plant(t), NoDoor, "quackitect/src/modules/leaky")
 }
 
 func TestADoorImportingAModuleIsNamed(t *testing.T) {
@@ -82,12 +77,6 @@ func TestAnIOModuleImportingOsPassesOnlyQ(t *testing.T) {
 	}
 	if said := FaultsIn("quackitect/src/modules/files", []string{"quackitect/src/modules/names"}, true); len(said) != 1 {
 		t.Fatalf("an IO module importing a module reads %v", said)
-	}
-}
-
-func TestFaultsNameADoorImportOnce(t *testing.T) {
-	if said := Faults("quackitect/src/modules/work", []string{"quackitect/src/q/qtest", "quackitect/src/doors/disk"}); len(said) != 1 {
-		t.Fatalf("the faults read %v", said)
 	}
 }
 
