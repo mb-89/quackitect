@@ -4,8 +4,8 @@
 // [[spec/design_output/level0#the-write-door]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { posix } from "node:path";
+import settings from "../../.claude/settings.json" with { type: "json" };
 import { test } from "node:test";
 import { wholeAfter } from "../../src/bridge/write.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -83,9 +83,7 @@ function booting(files) {
 
 // [[spec/design_input/the-cloud-runs-itself#the-boot]]
 test("the project settings carry a SessionStart hook running src/scripts/boot.js", () => {
-  const said = JSON.parse(
-    readFileSync(new URL("../../.claude/settings.json", import.meta.url), "utf8"),
-  );
+  const said = settings;
   const commands = (said.hooks?.SessionStart ?? []).flatMap((one) =>
     (one.hooks ?? []).map((hook) => String(hook.command ?? "")),
   );
