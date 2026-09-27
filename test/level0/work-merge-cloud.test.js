@@ -5,9 +5,9 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { merge } from "../../src/scripts/work-merge.js";
 import { work } from "../../src/scripts/work.js";
-import { doorsSaying, heard, merging, ranGit, ROOT } from "./work-doors.js";
+import { merge } from "../../src/scripts/work-merge.js";
+import { doorsSaying, heard, merging, ROOT, ranGit } from "./work-doors.js";
 
 // A cloud branch reads against trunk by its commits, and takes no group. [[spec/design_output/work#a-cloud-branch-comes-in]]
 const CLOUD = "claude/a-thing";
@@ -122,9 +122,33 @@ test("branch merge refuses a branch a pull request carries, and names it", () =>
 
   assert.equal(code, 1, said);
   assert.match(said, /pull request #42/);
+  assert.match(said, /branch merge one-group --closed/);
   assert.ok(
     !ranGit(outside).some((one) => one.startsWith("git merge")),
     "nothing merges",
+  );
+});
+
+// A closed pull keeps its head ref, so --closed takes the merge past it. [[spec/tickets/merge-reads-open-pulls]]
+test("branch merge --closed runs past a pull request standing at the tip", () => {
+  const { it, outside } = doorsSaying(
+    merging({
+      "git rev-parse origin/work/one-group": { stdout: "tip999\n" },
+      "git ls-remote origin refs/pull/*/head": {
+        stdout: "tip999\trefs/pull/42/head\n",
+      },
+    }),
+  );
+  it.node = "node";
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["merge", "one-group", "--closed"], { ...it, cloud: false }),
+  );
+
+  assert.equal(code, 0, said);
+  assert.ok(
+    ranGit(outside).some((one) => one.startsWith("git merge")),
+    "the merge runs",
   );
 });
 

@@ -368,7 +368,9 @@ a rejected push and takes the next. For details, see
    retro chapter, then runs `./RUNME.sh branch done`.
 5. The work skill opens a pull request over `work/<name>` against `main`, with
    auto-merge on. GitHub lands it once the check stands green on Linux and
-   Windows, and `branch merge` refuses a branch a pull request carries.
+   Windows, and `branch merge` refuses a branch a pull request carries. A
+   closed pull keeps its head ref on origin, so `--closed` takes the merge
+   past it.
 6. `./RUNME.sh branch take` hands out a branch at `done` standing behind
    `main` or stale ahead of a free group, and asks for a sync, the check and a
    push.

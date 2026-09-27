@@ -14,6 +14,7 @@ import {
   withField,
   withoutField,
 } from "../engine/group.js";
+import { addedHere } from "./work-fix.js";
 import {
   baseOnTrunk,
   childrenHere,
@@ -24,7 +25,6 @@ import {
   mergedHere,
   textAt,
 } from "./work-stands.js";
-import { addedHere } from "./work-fix.js";
 
 // A branch a cloud routine cuts carries no group, so it reads against trunk by its commits. [[spec/design_output/work#a-cloud-branch-comes-in]]
 const CLOUD = /^claude\//;
@@ -74,7 +74,7 @@ export function offTrunk(it, verb) {
   return dirty(it);
 }
 
-export function merge(it, name) {
+export function merge(it, name, argv) {
   if (CLOUD.test(name ?? "")) return mergeCloud(it, name);
   if (dirty(it)) return 2;
   const branch = name ? `work/${name}` : "";
@@ -101,10 +101,14 @@ export function merge(it, name) {
     return 1;
   }
 
-  const pull = pullCarrying(it, branch);
+  // A closed pull keeps its head ref on origin, and git reads no pull state, so the person who sees it closed passes --closed. [[spec/tickets/merge-reads-open-pulls]]
+  const pull = (argv ?? []).includes("--closed") ? "" : pullCarrying(it, branch);
   if (pull) {
     console.error(
       `${branch} stands in pull request #${pull}, and GitHub lands it once the check passes.`,
+    );
+    console.error(
+      `Where #${pull} stands closed unmerged, run ./RUNME.sh branch merge ${name} --closed.`,
     );
     return 1;
   }
