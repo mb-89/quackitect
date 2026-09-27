@@ -204,10 +204,15 @@ const TICKET_FREE = [
   ["ticket", "note"],
 ];
 
+// A step into the tree, or a filter reading what the verb prints, changes nothing, so it rides beside a free verb. A box starts one folder above the tree and steps in first. [[spec/design_output/level0#a-shell-names-its-ticket]]
+const BESIDE_FREE = new Set(["cd", "pushd", "tail", "head", "grep", "wc", "cat"]);
+
 // [[spec/design_output/level0#a-shell-names-its-ticket]]
 export function freeOfTicket(command) {
   const { segments } = partsOf(command);
-  return segments.length > 0 && segments.every((one) => freeVerbIn(wordsIn(one)));
+  const words = segments.map((one) => wordsIn(one));
+  const verbs = words.filter((one) => !BESIDE_FREE.has(baseName(one[0] ?? "")));
+  return verbs.length > 0 && verbs.every((one) => freeVerbIn(one));
 }
 
 function freeVerbIn(words) {

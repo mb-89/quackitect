@@ -39,6 +39,9 @@ test("freeOfTicket reads a pull, a mint and a note as free, and every other comm
     './RUNME.sh ticket note a-thought "a line to keep"',
     "./RUNME.sh branch take",
     "./RUNME.sh branch list",
+    "cd /home/user/quackitect && ./RUNME.sh branch take",
+    "cd quackitect; ./RUNME.sh ticket pull",
+    "./RUNME.sh branch take 2>&1 | tail -20",
   ]) {
     assert.equal(freeOfTicket(command), true, command);
   }
@@ -47,6 +50,8 @@ test("freeOfTicket reads a pull, a mint and a note as free, and every other comm
     "git commit -m x",
     "./RUNME.sh branch done",
     "./RUNME.sh ticket pull && git commit -m x",
+    "cd /home/user/quackitect && git commit -m x",
+    "cd /home/user/quackitect",
     "",
   ]) {
     assert.equal(freeOfTicket(command), false, command);
