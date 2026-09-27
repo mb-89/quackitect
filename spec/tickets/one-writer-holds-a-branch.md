@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 1bbc468645a2588a
         size: 860
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: a8810adb2308946930e57e1a71670fa871072c30
+    hash_after: a8810adb2308946930e57e1a71670fa871072c30
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 0f14bd33d54f26c5
+        size: 2686
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -248,26 +261,32 @@ The done lines and the case deciding each:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/prepush.test.js test/level0/pull-hand-of.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/prepush.test.js
+- test/level0/pull-hand-of.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Two cases fail on their own assertion over the stubs: the refusal of a branch another box holds, and the box id read. The holder's push and the free branch pass, because each guards the side the door lets through. The cloud case of cloud-boxes-leave-trunk-alone stands red in the same file, since both tickets land in `holds`.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a case: the refusal and its words fail red, and the holder's push and the free branch guard the other side
+- the hold reader rides in as an argument, and the box read runs over a fake disk, so no case reaches git or the disk
 
 # gate
 

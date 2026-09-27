@@ -74,6 +74,39 @@ test("a cloud box pushes its own work branch", () => {
   );
 });
 
+// [[spec/tickets/one-writer-holds-a-branch]]
+const HOLDER = "box 0ther1d · session s1 · claude-code-remote";
+const heldBy = (hand) => () => hand;
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("a push to a work branch another box holds refuses, and names the holder and main", () => {
+  const said = holds(refsIn(toWork), stamp(), () => [], false, heldBy(HOLDER), "myb0x");
+  assert.equal(said.code, 1);
+  assert.match(said.said, /work\/x/);
+  assert.match(said.said, /box 0ther1d/);
+  assert.match(said.said, /main/);
+  assert.match(said.said, /branch sync/);
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("the holding box pushes its own branch", () => {
+  const said = holds(
+    refsIn(toWork),
+    stamp(),
+    () => [],
+    true,
+    heldBy(HOLDER),
+    "0ther1d",
+  );
+  assert.deepEqual(said, { code: 0, said: "" });
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("a push to a work branch nobody holds lands", () => {
+  const said = holds(refsIn(toWork), stamp(), () => [], false, heldBy(""), "myb0x");
+  assert.deepEqual(said, { code: 0, said: "" });
+});
+
 test("a push to trunk on a green stamp lands", () => {
   assert.deepEqual(holds(refsIn(toTrunk), stamp()), { code: 0, said: "" });
 });

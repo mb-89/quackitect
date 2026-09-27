@@ -58,6 +58,11 @@ export function handOf(it) {
   return parts.join(" · ");
 }
 
+// The id this box carries, read and never written, so a push names its box with no write. [[spec/tickets/one-writer-holds-a-branch]]
+export function boxIdHere(_it) {
+  return "";
+}
+
 // A tracked file holds no person's name, so the record takes the role off the hand. [[spec/design_output/pull#the-hand-rule]]
 export function roleOf(hand) {
   const said = String(hand ?? "").trim();
