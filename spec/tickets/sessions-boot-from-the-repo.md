@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -194,6 +194,21 @@ record:
     hash_after: b0653205decb3411bc2de87b943e57db6942b91e
     returns: 1
     why: The install writes the plugin manifest, which git ignores, and the client scans plugins as a session starts. So the session running the first install holds no level zero, and the draft names no road for it. A probe on a fresh clone decides the order.; The draft says the client reads the trust before any hook runs, and neither a probe nor a note line backs it. Name the probe, and whether an untrusted project runs a project SessionStart hook at all.; The stamp holds the install hash and HEAD, and the cases hold the install hash alone. HEAD in the stamp runs the install again after every commit, against the ask's line on returning at once. Drop HEAD, or add the case holding it.; No case holds a matching stamp with a tool gone, as node_modules, running the install.; The draft picks node because sh stands on no Windows desk, then runs sh from boots. RUNME.ps1 runs RUNME.sh through the sh Git ships, so name that road in boots, or what the hook does on win32.
+  - step: design/draft-2
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: ffc8f1d096ef70bf5994b7be009b24d017cda837
+    hash_after: 35ef1406a4a252f1704d96777cc4f1ec296d25c7
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 5a2557d24d86ab34
+        size: 13510
+      - name: [[spec/design_output/level0]]
+        hash: 22fc99331ec488bc
+        size: 87937
+    def: 2fcb4abe3d77d8a2
 group: the-cloud-works-its-queue
 ---
 
@@ -321,38 +336,67 @@ Three cases fail on their own assertion against a stub boot that runs nothing, a
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The level zero plugin loads off a manifest git ignores, and its bridgehead installs what a cloud box lacks once it loads. So the boot hook holds one job: it brings the manifest and the modules for the next session on a box where either stands nowhere.
+
+The approach takes this as unmeasured: the client reads the plugins before any SessionStart hook runs, because a plugin registers SessionStart hooks of its own. So the session running the first install holds no level zero, and the setup keeps its install line, its trust flag and its auto mode. The note says so, and names the probe that retires the install line.
+
+`src/scripts/boot.js` runs as the hook, through node. Its pure part `boots(it)` runs nothing off a cloud box, under the guard the bridgehead reads: `CLAUDE_CODE_REMOTE` or `SE_CLOUD`. Where the manifest and `node_modules` both stand, it runs nothing. Otherwise it runs `sh src/scripts/install.sh` through the proc door, under `SE_INSTALL_SKIP` set to `INSTALL_SKIP` from the hooks module. It answers 0 always, so a failed install holds no session up.
+
+`.claude/settings.json` gains `hooks.SessionStart` with one command hook running node over `boot.js`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `.claude/settings.json`: `hooks.SessionStart` runs `src/scripts/boot.js`
+- `src/scripts/boot.js`: `boots` runs `src/scripts/install.sh` through the proc door
+- `src/scripts/boot.js`: `boots` reads `INSTALL_SKIP` from `.claude/skills/level0/hooks/level0.js`
+- `spec/design_output/level0.md`: the setup chapter names the hook, and says why every setup line stays
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/hooks.test.js`: the project settings carry a SessionStart hook running `src/scripts/boot.js`
+- `test/level0/hooks.test.js`: boot runs no install where the manifest and the modules stand
+- `test/level0/hooks.test.js`: boot runs the install under the skip list where the manifest stands nowhere
+- `test/level0/hooks.test.js`: boot runs the install where the modules stand nowhere
+- `test/level0/hooks.test.js`: boot runs nothing off a cloud box
+- `test/level0/hooks.test.js`: boot answers 0 where the install fails
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- the first session: the setup keeps its install line, and the note names the probe that retires it
+- the trust claim: the approach drops it, and the setup keeps the trust flag and the mode
+- the stamp and HEAD: no stamp stands, and the manifest and the modules decide
+- a tool gone under a matching stamp: a case holds the modules gone
+- the Windows road: boot runs off a cloud box nowhere, so a desk keeps `RUNME`
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `.claude/settings.json`
+- `src/scripts/boot.js`
+- `test/level0/hooks.test.js`
+- `spec/design_output/level0.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened the bridgehead `START` and `starts`, `INSTALL_SKIP`, the manifest line in `.gitignore`, and the setup and mode chapters
+- the callers list names the hook, the install call, the skip list and the setup text
+- each `done_when` line meets a case or the note, and the check decides the last
 
 ## tests-red-2
 
