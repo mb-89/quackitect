@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-engine-holds-the-route
 parent: the-last-gate-accepts
+record:
+  - step: do
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: 857ed5408c52fa4a20afa6cc1c1194391a369cc5
+    hash_after: 5be0acff0cf21007dd8cdbd0675bb7109a00d434
+reason: became
+successors: [the-last-gate-accepts]
 ---
 
 # Ask
