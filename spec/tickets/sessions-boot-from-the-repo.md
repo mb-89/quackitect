@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -137,6 +137,19 @@ record:
         hash: 22fc99331ec488bc
         size: 87937
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 1a28c1e2ce1b4bc67660ee241c57b41efbf0dd7b
+    hash_after: 1a28c1e2ce1b4bc67660ee241c57b41efbf0dd7b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 339ee683d0a385a5
+        size: 2318
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -230,26 +243,31 @@ A new script src/scripts/boot.js runs as the SessionStart hook, through node, si
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/hooks.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/hooks.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Three cases fail on their own assertion against a stub boot that runs nothing, and the settings file carries no SessionStart hook yet. The case where the stamp matches passes on the stub, as a negative case does. The fake proc throws on a command nobody taught it, so each case teaches the install line and nothing else, and a stray run fails loud.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line on the hook meets a case, the note lines meet the review, and ./RUNME.sh check decides the last
+- the boot cases reach the disk and the process through fakeDisk and fakeProc alone, and the settings case reads the tracked file the ask names
 
 # gate
 
