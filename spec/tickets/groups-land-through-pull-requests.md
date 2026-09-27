@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [the-skills-start-the-workers, groups-hold-groups]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -148,6 +148,18 @@ record:
         hash: 90735f2272a798bc
         size: 3526
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2326ed644e · claude-code-remote · helper-4
+    hash_before: ddc4218d9ec5d09755c47414596ca9b0a5808206
+    hash_after: ddc4218d9ec5d09755c47414596ca9b0a5808206
+    inputs:
+      - name: design/draft
+        hash: 90735f2272a798bc
+        size: 3526
+      - name: design/tests-red
+        hash: 446e87edebf6c435
+        size: 880
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -312,8 +324,14 @@ Each new case fails on its own assertion, and every earlier case in the four fil
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- done-points-at-the-pull: leaves in src/scripts/work.js ends on "Run ./RUNME.sh branch merge <name> from main", and the approach leaves that line; point it at the pull request the work skill opens
+- take-hands-a-stale-handover: the take case covers a branch behind main alone; add a case whose tip stands past work.staleAfter, and hand stuckIn a clock time, since take calls readFree(it) with no now
+- merge-reads-open-pulls: refs/pull/<n>/head stays on origin after a pull request closes unmerged, so the refusal holds a closed pull's branch until a new commit; give the refusal a road past a closed pull
+- agents-keeps-the-desk-rule: AGENTS.md says a session opens no pull request; the edit keeps that for a desk and names the work skill as the one road opening one, so the two lines agree
+- take-case-asserts-the-switch: the take case's /push/ match passes on any line naming push; assert the switch onto work/landing and the full push line
 
 # implement
 
