@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -104,6 +104,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-index-answers-v1.md:196:1: CodeSpans: A sentence holds 4 code spans, and this one holds 5. Carry the re"
+  - step: implement/tests-green
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 601674c6049eb8ecc99188a6f547d4edc8bf0f34
+    hash_after: 601674c6049eb8ecc99188a6f547d4edc8bf0f34
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-index-answers-v1.md:204:1: CodeSpans: A sentence holds 4 code spans, and this one holds 5. Carry the re"
+reason: done
 ---
 
 # Ask
@@ -272,11 +284,15 @@ The three door cases meet a `404` from a listener holding no route, and the stal
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/index
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -284,11 +300,34 @@ The three door cases meet a `404` from a listener holding no route, and the stal
 
 <!-- the form is text -->
 
+The index answers `/v1` through Huma, on a port of its own, beside the old API.
+
+| the route | what it answers |
+|---|---|
+| `GET /v1/values/{name...}` | the name, its value, the revision, and its stale mark where one stands |
+| a name the catalog lacks | a `404` problem answer naming it |
+| `/v1/openapi.json` | the document Huma writes off the routes |
+| `/v1/docs` | the pages Huma draws off that document |
+
+The standing file names the port under `v1`, and `stop` closes both listeners.
+
+What I assume, for the reader at the merge:
+
+- The docs stand under the prefix, at `/v1/docs`, beside the document they read.
+- `Serve` keeps its signature, so every caller stands as it is.
+- The value answers typed `any` until the registry gives each name its type.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the draft names
+- the door tests run a real door, and the stale case a store of its own
+- `v1.go` opens on a comment pointing at the surfaces note
+- the routes stand in the surfaces note alone
+- both review rows stand fixed, and `says` names each assumption
 
 # Discussion
 
