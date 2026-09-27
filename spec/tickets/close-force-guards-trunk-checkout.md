@@ -48,7 +48,7 @@ parent: groups-carry-the-cloud-marker
 
 <!-- the form is command -->
 
-`./RUNME.sh test test/level0/work-cloud-marker.test.js`
+    ./RUNME.sh test test/level0/work-cloud-marker.test.js
 
 ## check
 
@@ -56,7 +56,7 @@ parent: groups-carry-the-cloud-marker
 
 <!-- the form is command -->
 
-`./RUNME.sh check`
+    ./RUNME.sh check
 
 ## says
 
