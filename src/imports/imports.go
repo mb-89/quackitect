@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"go/ast"
 	"go/token"
-	"os"
+	"os" // level0: OutsideInDoors - fakesuite reads the folder a package stands in, as a build check reads source
 	"path/filepath"
 	"strconv"
 	"strings"

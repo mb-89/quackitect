@@ -17,7 +17,7 @@ var flagged = map[string]string{
 	"q/clock/clock.go":                   "package clock\n\nimport \"os\" // want `quackitect/src/q/clock imports os`\n\nfunc Name() string { return os.Getenv(\"NAME\") }\n",
 	"modules/disk/disk.go":               "package disk\n\nimport (\n\t\"os\"\n\n\t\"quackitect/src/q\"\n)\n\nvar flag = q.IO()\n\nfunc Read() ([]byte, error) { return os.ReadFile(\"a\") }\n\ntype FakeDisk struct{}\n",
 	"modules/disk/disk_contract_test.go": "package disk\n",
-	"q/qtest/qtest.go":                  "package qtest // want `quackitect/src/q/qtest keeps no suite.go beside its fake`\n\ntype Index struct{}\n",
+	"q/qtest/qtest.go":                   "package qtest // want `quackitect/src/q/qtest keeps no suite.go beside its fake`\n\ntype Index struct{}\n",
 	"modules/lonely/lonely.go":           "package lonely\n\ntype FakeThing struct{} // want `quackitect/src/modules/lonely declares FakeThing with no contract suite beside it`\n",
 }
 
