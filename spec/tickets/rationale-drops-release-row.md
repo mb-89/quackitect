@@ -28,6 +28,20 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: open-tasks-land-in-shadow
 parent: groups-carry-the-cloud-marker
+record:
+  - step: do
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: f9713f2c9db701ca9dd4c610a84b2d3632e96cbc
+    hash_after: 73f6f0dd2c4e2058e840d11097559d390c007dff
+    returns: 1
+    why: the full check stops on a sentence past the cap under the approach of the-queue-moves-to-plan, which its draft round owns; the change itself lints clean
+    answered:
+      - name: tests
+        exit: 0
+        said: The rules pass.
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-moves-to-plan.md:122:99: Sentence: A sentence holds 25 words. Cut this one in two."
 ---
 
 # Ask
