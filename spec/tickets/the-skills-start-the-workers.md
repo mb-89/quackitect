@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -239,6 +239,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 6743a9972a8a2d3bd0e991c5e0236092964f12b0
+    hash_after: 6743a9972a8a2d3bd0e991c5e0236092964f12b0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 3 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-skills-start-the-workers.md:349:1: ListItem: A sentence in a list item holds 20 words, and this one hol"
+    inputs:
+      - name: design/tests-red
+        hash: 08402033f055fd7e
+        size: 610
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -425,26 +448,39 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/skills.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Two skill files carry the cloud road, and the verbs carry every decision.
+
+- The dispatch skill runs `./RUNME.sh dispatch --json`, opens a pull request over the write branch, starts a worker session per ready group and stuck hand-over, and messages the owner the questions.
+- The work skill takes a branch, works it through the pull, runs `branch done`, and opens the pull request.
+- Rule 2 of the cloud guidance points a worker at the work skill.
+
+I assume a connector names its own tools, so each skill names the connector and no tool id.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the four files the size list names
+- the skills reach no door, and the contract test reads the real disk
+- each skill links the design input or the guidance it carries out
+- the road stands once in each skill, and the cloud guidance points at the work skill
 
 # accept
 
