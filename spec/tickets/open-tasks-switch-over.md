@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
+step: split
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [open-tasks-land-in-shadow]
@@ -81,6 +81,14 @@ record:
   - step: sync
     hand: box d7d80931cecf · claude-code-remote
     hash_before: ef191748722031f7e521c65f9fb70c78629bde96
+  - step: sync
+    hand: box d7d80931cecf · claude-code-remote
+    hash_before: 832b75de0163512a2cf31f3d96500da425749116
+    hash_after: 832b75de0163512a2cf31f3d96500da425749116
+    answered:
+      - name: sync
+        exit: 0
+        said: work/open-tasks-switch-over already carries every commit on main.
 ---
 
 # Ask
@@ -96,6 +104,8 @@ Done when the badge and the work tab's brackets read one name.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
+
+    ./RUNME.sh branch sync
 
 <!-- the form is command -->
 
