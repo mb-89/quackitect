@@ -75,7 +75,7 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
 depends_on: [each-thing-stands-in-place, the-gates-read-the-state, the-owners-word-reaches-work, the-servers-and-views-hold, the-verbs-land-whole]
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box d7d6cb0fb1105 · claude-code-remote
@@ -100,6 +100,14 @@ record:
     hand: the engine
     hash_before: 99916e19232326f2f9ae7b078384dd76600decf5
     hash_after: 99916e19232326f2f9ae7b078384dd76600decf5
+  - step: retro/notes
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: e1fe50650afc0576e7c4d96559553ed71d845dc5
+    hash_after: e1fe50650afc0576e7c4d96559553ed71d845dc5
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -158,8 +166,9 @@ a-gate-names-its-question waits on no open ticket, since every other child stand
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
