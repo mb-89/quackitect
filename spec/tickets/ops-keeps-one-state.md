@@ -118,12 +118,11 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
-depends_on: [commits-name-their-writer]
 ---
 
 # Ask
 
-The ops retention drops an ended operation's `ops/<id>` value from the store once its window passes. One owner holds an operation's state, per [[spec/design_output/operations#what-stays-how-long]].
+The ops retention drops an ended operation's `ops/<id>` value from the store once its window passes. One owner holds an operation's state, per [[spec/design_output/model#what-stays-how-long]].
 
 The store grows with every operation today, and two places hold one operation's state.
 

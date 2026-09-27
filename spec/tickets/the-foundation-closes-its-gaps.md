@@ -90,7 +90,7 @@ cloud: true
 
 # Ask
 
-Phase 1 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], closing its gaps. It builds what the foundation group leaves unbuilt, and what the owner's rule of a fake index asks.
+Phase 1 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], closing its gaps. It builds what the foundation group leaves unbuilt. It also builds what the owner's rulings ask: a dumb core, every part a module, and the contract suites.
 
 Done when every child closes through the command it names, and `./RUNME.sh check` passes on Linux and Windows.
 

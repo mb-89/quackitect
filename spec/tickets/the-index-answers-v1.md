@@ -140,7 +140,7 @@ Every surface after this one reads names over `/v1`. The old API stays, so nothi
 
 <!-- the form is text -->
 
-The door puts up a second listener, and Huma answers `/v1` on it off the store the files topic gives the door. The old API stands on its own port, unchanged. The routes stand in [[spec/design_output/surfaces]].
+The door puts up a second listener, and Huma answers `/v1` on it off the store the files topic gives the door. The old API stands on its own port, unchanged. The routes stand in [[spec/design_output/model#surfaces]].
 
 | the part | what it holds |
 |---|---|
@@ -214,7 +214,7 @@ This ticket stands on `files-topic-reads-the-rows`, which puts the store in the 
 pass with findings
 
 - serve-callers-take-the-listener: `start_test.go`, `topic_test.go` and `ops_test.go` under `src/index` call `Serve` too. Each takes the second listener the change adds.
-- v1-values-read-stale: `Snapshot.Stale` stands now. So `GET /v1/values` answers `stale since <time>` beside the value, per [[spec/design_output/watchdogs#a-stale-mark]].
+- v1-values-read-stale: `Snapshot.Stale` stands now. So `GET /v1/values` answers `stale since <time>` beside the value, per [[spec/design_output/model#a-stale-mark]].
 
 # implement
 

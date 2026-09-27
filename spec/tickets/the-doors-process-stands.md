@@ -82,12 +82,12 @@ group: module-processes-land-in-shadow
 
 # Ask
 
-The doors run in one process of their own, and the index reaches them over the inner protocol.
+`quack io` runs the IO modules holding a listener in one process of their own, per [[spec/design_output/model#the-io-process]]. The index reaches them over the inner protocol.
 
 The operating system then holds the boundary.
 
-- - `go test ./...` from the root passes
-- a case kills the fake doors process, and reads its names as stale
+- `go test ./...` from the root passes
+- a case kills the fake IO process, and reads its names at their built-in values, with the mark `not provided`
 - `./RUNME.sh check` exits 0
 
 # design

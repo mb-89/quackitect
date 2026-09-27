@@ -20,7 +20,7 @@ gave, so it could not disagree.
 
 A view could not compute, so a column needing a new value waited on a
 provider. A renderer drew what the keys allowed, and a look the keys lacked cost
-a key in [[spec/design_output/views]].
+a key in [[spec/design_output/model#views]].
 
 ## 3. What would make it wrong
 

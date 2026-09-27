@@ -49,7 +49,7 @@ reason: done
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-add the analyzer `nodoor` to the table of [[spec/design_output/go-doors#the-build-checks-imports]]. The note then owns every analyzer, and the code points there.
+add the analyzer `nodoor` to the table of [[spec/design_output/model#the-build-checks-imports]]. The note then owns every analyzer, and the code points there.
 
 # do
 

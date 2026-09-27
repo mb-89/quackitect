@@ -140,7 +140,7 @@ Every action after this one returns a handle, and every part holds a lease. With
 
 <!-- the form is text -->
 
-The shape stands in [[spec/design_output/operations]] and [[spec/design_output/watchdogs]]. This slice lands the state each note holds, over an injected clock, and leaves the processes it acts on to the phase that brings them.
+The shape stands in [[spec/design_output/model#operations]] and [[spec/design_output/model#watchdogs]]. This slice lands the state each note holds, over an injected clock, and leaves the processes it acts on to the phase that brings them.
 
 | the package | what it holds |
 |---|---|

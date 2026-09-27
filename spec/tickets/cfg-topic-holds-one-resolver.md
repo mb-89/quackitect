@@ -82,12 +82,13 @@ group: read-topics-land-in-shadow
 
 # Ask
 
-The `cfg/` topic holds one resolver over every layer, and the five readers [[spec/design_output/migration#the-duplications]] names read it in shadow.
+The five readers [[spec/design_output/migration#the-duplications]] names read each `<instance>/config/` subtopic in shadow. The config module [[spec/tickets/the-config-module-resolves-layers]] builds answers them. A mismatch writes a `shadow` row.
 
 One key then answers one value, whoever reads it. [[spec/tickets/config-reads-differ-by-reader]] shows the cost today.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a golden file holds every key's value and layer, off the old readers and the new one
+- `./RUNME.sh log --kind shadow` names each key the readers disagree on
 - `./RUNME.sh check` exits 0
 
 # design

@@ -31,7 +31,11 @@ export function valeLsUrl(os, arch, version = VALE_LS_VERSION) {
 export const EDITOR_SETTINGS = ".vscode/settings.json";
 export const EDITOR_EXTENSIONS = ".vscode/extensions.json";
 
-export const EXTENSIONS = ["chrischinchilla.vale-vscode", "biomejs.biome"];
+export const EXTENSIONS = [
+  "chrischinchilla.vale-vscode",
+  "biomejs.biome",
+  "bierner.markdown-mermaid",
+];
 
 // The config the Vale extension reads, which turns on no style, so the panel draws Vale off the battery's list. [[spec/design_output/lsp#the-panel-reads-the-battery]]
 export const EDITOR_VALE_INI = "spec/config/editor.vale.ini";

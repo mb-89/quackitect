@@ -118,12 +118,12 @@
     "stale": 10
   },
   "ops": {
-    "comment": "How long an ended operation stays, in seconds. A window of zero keeps it. spec/design_output/operations.md, chapter What stays how long, says the rest.",
+    "comment": "How long an ended operation stays, in seconds. A window of zero keeps it. spec/design_output/model.md, chapter What stays how long, says the rest.",
     "keepDone": 3600,
     "keepFailed": 86400
   },
   "watchdog": {
-    "comment": "The spans of the watchdog, in seconds, and the faults that raise an alarm. spec/design_output/watchdogs.md says the rest.",
+    "comment": "The spans of the watchdog, in seconds, and the faults that raise an alarm. spec/design_output/model.md, chapter Watchdogs, says the rest.",
     "backoffFirst": 1,
     "backoffCap": 60,
     "faults": 5,

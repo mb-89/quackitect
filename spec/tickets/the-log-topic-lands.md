@@ -86,7 +86,7 @@ The `log/` topic holds the session rows and the level ladder once.
 
 Three readers of a row stand today, and the ladder stands twice.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a golden file holds the rows the old readers and the new one read off one session log
 - `./RUNME.sh check` exits 0
 

@@ -118,16 +118,18 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
+depends_on: [reads-resolve-in-two-passes, io-modules-own-their-names, tickets-becomes-a-module, the-manager-becomes-a-module]
 ---
 
 # Ask
 
-`Commit` names the registration writing, and the store refuses a name that registration does not provide. `q.Given` leaves, or stands for the index's own input topics alone, per proposal (k) in [[spec/funnel/the-owner-rules-the-specs]].
+`Commit` names the instance writing, and the store refuses a name the wiring binds to no out-port of that instance. `q.Given` leaves the core, because every name it registers today has a writer module by then, per [[spec/design_output/model#the-index-core]].
 
-Only a provider writes its name. Without a writer on the commit, any caller writes any name, and one owner per name holds on paper alone.
+Only a writer writes its name. Without a writer on the commit, any caller writes any name, and one owner per name holds on paper alone.
 
 - `go test ./...` from the root passes
-- a case commits a name as another provider, and reads the refusal
+- a case commits a name as another instance, and reads the refusal
+- `q.Given` and `q.GivenIn` stand nowhere under `src`, which `grep -rn GivenIn src` shows
 - `./RUNME.sh check` exits 0
 
 # design

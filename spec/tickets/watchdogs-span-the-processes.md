@@ -83,11 +83,11 @@ depends_on: [the-doors-process-stands]
 
 # Ask
 
-The leases and the alarms reach across the processes, and the doors process and the hook module watch the index.
+The leases and the alarms reach across the processes, and the IO process and the hook module watch the index's lease, `index/health`.
 
 A silent process then reads as silent.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a case silences each process in turn, and reads `session/alarms`
 - `./RUNME.sh check` exits 0
 

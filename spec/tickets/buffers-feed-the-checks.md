@@ -82,11 +82,11 @@ group: lsp-door-lands-in-shadow
 
 # Ask
 
-A `buffers/` input the LSP door owns carries unsaved editor text, and a check reads the buffer where one stands open.
+A `buffers/` input the `lsp` IO module writes carries unsaved editor text, and a check reads the buffer where one stands open.
 
 The editor checks what a person types, before a save.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a case opens a fake buffer and reads the finding off it
 - `./RUNME.sh check` exits 0
 

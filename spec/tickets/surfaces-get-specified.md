@@ -70,7 +70,7 @@ it each surface names its own shapes again.
 
 ## says
 
-[[spec/design_output/surfaces]] specifies a module as one file and the surfaces
+[[spec/design_output/model#surfaces]] specifies a module as one file and the surfaces
 the registry builds:
 
 - a topic folder is one package, and each file holds one registration and its test

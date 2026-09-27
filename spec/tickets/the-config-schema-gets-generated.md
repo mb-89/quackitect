@@ -82,12 +82,13 @@ group: sidebar-lands-in-shadow
 
 # Ask
 
-`spec/config/level0.schema.json` comes from the `q.Cfg` and `q.Show` declarations.
+`spec/config/level0.schema.json` comes off the `q.Cfg` registrations and the `q.Show` declarations. `spec/config/level0.json`, the default file, keys by instance and then by key, and keeps the values someone sets alone. The `migration` switches keep their block, as shared keys of the `migration` module.
 
-The schema then says what the code declares.
+The schema then says what the code declares. It waits for this phase, because the extension's own keys leave JavaScript here.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a regeneration over the tree leaves `git diff` empty
+- `spec/config/level0.json` holds no key at its built-in value
 - `./RUNME.sh check` exits 0
 
 # design

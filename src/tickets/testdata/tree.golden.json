@@ -109,24 +109,31 @@
   },
   {
     "name": "a-down-index-refuses-calls",
-    "hash": "9f064b31ebc5b72e",
-    "group_hash": "1e4a288a04fcb375",
-    "ask": "`slices.cage` moves to `new`. While the index stands down, the cage refuses, and the refusal names the alarm. [[spec/rationales/the-cage-refuses-while-down]] names the chapters this rewrites.\n\nA fault then shows on the first call, and gets fixed early.\n\n- a case stops the fake index, and reads a refusal naming `session/alarms`\n- `./RUNME.sh check` exits 0",
+    "hash": "c05290221de7e530",
+    "group_hash": "0c191a65ec5a72fc",
+    "ask": "`migration/config/slices/cage` moves to `new`. While the index stands down, the cage refuses, and the refusal names the alarm. [[spec/rationales/the-cage-refuses-while-down]] names the chapters this rewrites.\n\nA fault then shows on the first call, and gets fixed early.\n\n- a case stops the fake index, and reads a refusal naming `session/alarms`\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
     "name": "a-gate-asks-a-bless",
-    "hash": "933822624540e35c",
-    "group_hash": "5a8369129a22372f",
+    "hash": "8918bcc33a6703b1",
+    "group_hash": "e2e7fc62294dc664",
     "ask": "A gate that matters waits for a bless beside its verdict, and the owner decides who blesses on a desk. [[spec/design_input/level-two]] asks it in its chapter The bless.\n\nToday nothing tells a verdict from a bless, and an agent passes a gate the owner wants to hold.\n\n- `spec/schemas/process.schema.yaml` admits a bless on a gate, and a gate asking one waits after its verdict. A case under `test/level0` decides it\n- at a desk a sidebar button writes the key that lets the agent bless. The write door refuses the agent that key. A case under `test/level0` decides it\n- on a cloud box the environment decides. The shell door refuses a command setting the variables naming the box or the hand. A case under `test/level0` decides it\n- a bless binds to the hash of what it blesses, and an edit strips it. A case under `test/level0` decides it\n- `./RUNME.sh check` exits 0",
-    "standing": "todo"
+    "standing": "done"
+  },
+  {
+    "name": "a-gate-names-its-question",
+    "hash": "ab3a1e7ab349e3e4",
+    "group_hash": "f33fa4763db43a28",
+    "ask": "The reviewer at a gate reads the question the gate answers, and scopes its attack inside it. Before it clears, it asks whether anything here contradicts what it sees in the phase. [[spec/design_input/level-two#gates]] asks both.\n\nToday `workAnswer` in `src/scripts/pull-chapter.js` prints the `does` of a gate and leaves its `gate` out, so the reviewer guesses the question.\n\n- a pull on a gate prints its `gate` question under the header. A case in `test/level0/pull-chapter.test.js` decides it\n- a pull on a gate asks: does anything here contradict what you see in the phase. A case in `test/level0/pull-chapter.test.js` decides it\n- a pull on a step carrying no `gate` prints neither. A case in `test/level0/pull-chapter.test.js` decides it\n- `./RUNME.sh check` exits 0",
+    "standing": "done"
   },
   {
     "name": "a-gate-reviews-and-fixes",
-    "hash": "9c34c3727054e52e",
-    "group_hash": "552b1110aafd4b70",
+    "hash": "e746fea2677ea945",
+    "group_hash": "f33fa4763db43a28",
     "ask": "A reviewer with no stake in the work reads each phase at its gate. It fixes what it finds within its own diff, and lets the work go on. [[spec/design_input/level-two]] asks it in its chapters Gates and The standard process.\n\nToday a small fault costs a review round, and nobody reviews the code before the merge.\n\n- `spec/schemas/process.schema.yaml` admits a gate step with the verdicts accept, accept with points and reject. A case in `test/level0/process.test.js` decides it\n- `spec/processes/standard.yaml` carries design with draft and tests-red, a gate, and implement with change and tests-green\n- a gate hand-back admits the commit of the reviewer, where `commitsFor` in `src/scripts/pull-writes.js` refuses it today. A case under `test/level0` decides it\n- accept with points mints a fix ticket a point, a trivial child at the front of the queue. A case under `test/level0` decides it\n- a reject inserts the steps to work again, and a second reject inserts a person step. A case under `test/level0` decides it\n- the check reads the tests a process lists as expected red, until its tests-green closes. A case under `test/level0` decides it\n- `./RUNME.sh check` exits 0",
-    "standing": "todo"
+    "standing": "done"
   },
   {
     "name": "a-group-is-a-branch",
@@ -196,10 +203,10 @@
   },
   {
     "name": "a-moved-input-marks-steps",
-    "hash": "7097acd02eb71e29",
-    "group_hash": "5a8369129a22372f",
+    "hash": "3049c382e53a8c69",
+    "group_hash": "e2e7fc62294dc664",
     "ask": "A moved input marks exactly the steps that read it, and a process stays editable while it runs. [[spec/design_input/level-two]] asks it in its chapter Evidence and stale steps.\n\nToday a changed input leaves every step that read it standing as done, and a route edit reaches a ticket through `ticket update` alone.\n\n- the ticket file holds the hash of each input and of each step definition. The engine asks the index for them. A case under `test/level0` decides it\n- a moved input marks exactly the steps whose checks read it. A case under `test/level0` decides it\n- an append moves the hash of a node on, and the steps reading it stay whole. A case under `test/level0` decides it\n- an edit downstream of the step in hand keeps the earlier steps. An edit upstream sends the process back to the last whole step. A case under `test/level0` decides it\n- `./RUNME.sh check` exits 0",
-    "standing": "todo"
+    "standing": "done"
   },
   {
     "name": "a-nested-git-still-lands",
@@ -273,10 +280,10 @@
   },
   {
     "name": "a-pull-hands-one-step",
-    "hash": "1692bd77416cd89a",
-    "group_hash": "552b1110aafd4b70",
+    "hash": "1c62b9c56e093793",
+    "group_hash": "f33fa4763db43a28",
     "ask": "A hand holds one step and its guidance, and tracks no route, so a clear costs it nothing. The engine writes the ticket file, as [[spec/design_input/level-two]] asks in its chapters The loop and The ticket files.\n\nToday the agent reads the whole route on the ticket, writes the file by hand, and breaks its form.\n\n- a pull on a standard ticket prints the step in hand alone, with its fields and its checklist. A case under `test/level0` decides it\n- the hand-back takes the answer as the fields payload, and the engine writes it into the ticket file. A case under `test/level0` decides it\n- the engine runs the formatter and the mechanical checks before it merges an answer. A case under `test/level0` decides it\n- the write door refuses an agent a write to a ticket under `spec/tickets`. A case under `test/level0` decides it\n- the work tab draws the progress of a process from its ticket file. A case under `src/tui` decides it\n- `./RUNME.sh check` exits 0",
-    "standing": "todo"
+    "standing": "done"
   },
   {
     "name": "a-question-reaches-its-owner",
@@ -314,6 +321,12 @@
     "standing": "done"
   },
   {
+    "name": "a-retro-hand-decides-notes",
+    "hash": "c4cb25498dac0382",
+    "ask": "A hand holding a group at `retro/notes` decides each private note on the box, and the step passes. [[spec/design_output/pull#the-private-queue]] sends a note to that hand.\n\nToday the hold refuses the note. A pull naming it answers that one hand holds one ticket. A pull under `--as` answers that the todo in hand blocks it, whatever the plan names. So `retro notes` exits 1, and the group stands at `retro/notes` with no road to `branch done`.\n\n- a hand holding a group at `retro/notes` pulls a private note and hands it back `became`. A case under `test/level0` decides it\n- `./RUNME.sh retro notes` then exits 0, and the group passes `retro/notes`. A case under `test/level0` decides it\n- `./RUNME.sh check` exits 0",
+    "standing": ""
+  },
+  {
     "name": "a-retro-mints-itself",
     "hash": "2f3d5f12bfb14701",
     "group_hash": "95c0ef1e32048dc4",
@@ -326,6 +339,12 @@
     "group_hash": "01adf6b40d4bd8f3",
     "ask": "A step returning twice asks another agent hand. A person answers what a person\nowns.\n\n\n| what the engine reads | what it writes |\n|---|---|\n| a count of returns | a step stamped `by: person` |\n\n`withPersonStep` in `src/scripts/pull-hand.js` holds that. Two disagreements\nbetween an agent drafter and an agent reviewer read as a question for a human.\n\nThe count says the two hands disagree. It says nothing about who settles it. So\na group loses a child to a person over a call the box owns.\n\nThe rename reaches further than the one stamp:\n\n- `withEngineReader` repairs a step named `person-N` carrying `by: person`\n- `branch unblock` demands `by: person` on the successor's first step\n- the step name `person-N` reads wrong for a hand that is no person\n\n[[spec/rationales/cloud]] carries the argument.\n\n\n- a step returning twice inserts a step an agent takes, and the pull hands it out\n- a step returning past the split cap inserts the person step, as it does today\n- `./RUNME.sh test test/level0/pull-steps.test.js` answers green\n- `./RUNME.sh check` answers 0",
     "standing": "done"
+  },
+  {
+    "name": "a-rewind-spares-landed-tests",
+    "hash": "be1a0290801b0572",
+    "ask": "A ticket whose design review goes stale after its change lands walks back to green, so the box that builds it closes its group.\n\nA stale design review sends a ticket back to `implement/tests-red`, whose evidence expects a failing assertion. Once the change lands the tests pass, so no rerun passes the step and the ticket strands mid-route. `the-retro-reads-the-backlog` stands there: a rename moves its route test, rewrites the draft's test list, and marks `design/review` stale after `implement/change` passes.\n\n- a rewind keeps a landed `tests-red` whole while its tests stand unmoved, or reruns it at its recorded commit. A case under `test/level0` decides it\n- the case replays the rewind `the-retro-reads-the-backlog` meets, a rename moving a test the draft names\n- `./RUNME.sh check` exits 0\n\nview: none\n\nfrom: none",
+    "standing": ""
   },
   {
     "name": "a-route-closes-answered-asks",
@@ -451,17 +470,17 @@
   },
   {
     "name": "agents-call-quack-directly",
-    "hash": "b910c91f2d165320",
-    "group_hash": "59af2e51ae733d9f",
-    "ask": "`slices.verbs` moves to `new`. Agents call the index's tools, and shell out to no `./RUNME.sh` verb.\n\nA call then costs one round trip and no parse.\n\n- a case reads the tools a session registers, and finds every verb among them\n- `./RUNME.sh check` exits 0",
+    "hash": "f8b6e950690a343c",
+    "group_hash": "78b0c6355738abd7",
+    "ask": "`migration/config/slices/verbs` moves to `new`. Agents call the index's tools, and shell out to no `./RUNME.sh` verb.\n\nA call then costs one round trip and no parse.\n\n- a case reads the tools a session registers, and finds every verb among them\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
     "name": "an-answer-stays-under-cap",
-    "hash": "d0d49048b7d08d27",
-    "group_hash": "f9f25d046e5846f7",
+    "hash": "c5f12073a340aaa6",
+    "group_hash": "4724e6dc8e935df8",
     "ask": "Every answer of the pull reaches the model whole. [[spec/design_input/level-two]] asks it in its chapter The size cap.\n\nToday a step with long guidance lands on disk as a preview, and the hand works from a fragment.\n\n- `spec/config/level0.json` names the cap and its margin, and `spec/config/level0.schema.json` declares both. A case under `test/level0` reads them\n- the pull splits a hand-out past the margin, and the next pull on the same step prints the rest. A case under `test/level0` decides it\n- `./RUNME.sh check` exits 0",
-    "standing": "todo"
+    "standing": "done"
   },
   {
     "name": "an-empty-queue-hands-cleanup",
@@ -492,6 +511,20 @@
     "standing": "done"
   },
   {
+    "name": "analyzers-read-the-io-flag",
+    "hash": "143fe44ca343698c",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "The import analyzers become the ones [[spec/design_output/model#the-build-checks-imports]] names: `onlyq`, `ioonly`, `fakesuite` and `nomodule`. They read a package's flag off its `q.IO()` registration, and `nodoor` and `noname` leave.\n\nA module without the flag then reaches the outside nowhere. A fake with no contract suite beside it fails the build, `q/qtest` among them.\n\n- `go test ./...` from the root passes\n- a case plants a module without the flag importing `os`, and `onlyq` names it\n- a case plants an IO module importing `os`, and no analyzer names it\n- a case plants a fake with no suite beside it, and `fakesuite` names it\n- a case plants a module importing another module, and `nomodule` names it\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
+    "name": "answer-mark-loses-its-reader",
+    "hash": "54b42875c0705b59",
+    "group_hash": "f33fa4763db43a28",
+    "ask": "forEvidence is the one reader that acts on the answer mark, so the cut leaves the mark with no reader past the stripping. The mark stands in spec/schemas/guidance.schema.yaml, and its comment names the judge of pull.md. Decide whether the mark stays, and rewrite that comment either way",
+    "standing": "done"
+  },
+  {
     "name": "answers-read-the-last-text",
     "hash": "2c0705c463a62c79",
     "group_hash": "e5c9030ea0f46dcf",
@@ -507,16 +540,30 @@
   },
   {
     "name": "ask-reading-names-its-differences",
-    "hash": "c2e86d8bada025a4",
-    "group_hash": "365354e1371b531d",
+    "hash": "79ff5031f6d0ae75",
+    "group_hash": "0bd74940eb382a54",
     "ask": "the `Ask` row claims the reading of `pull-chapter.js`, yet `readNote` in `schema-read.js` drops every fenced row and `COMMENT` in `pull-route.js` drops a one-row comment alone. Name each difference, so the shadow compare expects it.",
-    "standing": "held"
+    "standing": "done"
   },
   {
     "name": "battery-ask-names-the-bundle",
     "hash": "7502b3f577b09a67",
     "group_hash": "90c8ec2acc34285f",
     "ask": "approach item 4 changes `bundle` in `src/scripts/bundle.js`, which the ask leaves out, and the implement checklist refuses a file the ask leaves out. Name it on the ask's drawing-bundle line",
+    "standing": "done"
+  },
+  {
+    "name": "bless-button-draws-itself",
+    "hash": "d86f3c5be5f3a714",
+    "group_hash": "e2e7fc62294dc664",
+    "ask": "the key leaves the config tree, so no level0.schema.json entry draws the sidebar button; name the file that draws it beside the `bless` kind in `took` in src/extension/sidebar.js, and add a case that the button writes the bless file",
+    "standing": "done"
+  },
+  {
+    "name": "bless-guard-reads-scripts",
+    "hash": "4260cec741a17fca",
+    "group_hash": "e2e7fc62294dc664",
+    "ask": "the bless file guard and the harness guard in onBash read the command line alone, and scriptsIn and scriptWrites in .claude/skills/level0/lib/scripted.js pass a script under .se, so `node .se/scripts/x.js` writing .se/.runtime/bless.json or spawning `ticket bless` with CLAUDECODE deleted passes; run both guards over the targets writesAPath and scriptWrites resolve, ahead of FREE, and add a case for each",
     "standing": "done"
   },
   {
@@ -548,17 +595,38 @@
     "standing": "done"
   },
   {
+    "name": "budget-fixture-grows-with-work",
+    "hash": "7b3744bcbabefc27",
+    "group_hash": "4724e6dc8e935df8",
+    "ask": "the draft times each call over the doors of test/level0/pull-doors.js, whose map carries one ticket and one group, so the test misses the growth the ask names; build the fixture with many tickets, holds and groups, and time each call at that size",
+    "standing": "done"
+  },
+  {
+    "name": "budget-headroom-on-cloud-boxes",
+    "hash": "9f42cbc2dd47b04a",
+    "group_hash": "4724e6dc8e935df8",
+    "ask": "a wall-clock budget over fakes flakes on a loaded cloud box; set each budget with headroom over a measured median, and say the unit and the headroom in the help of spec/config/level0.schema.json",
+    "standing": "done"
+  },
+  {
+    "name": "budget-names-the-resolver-call",
+    "hash": "5c4d847cfb675831",
+    "group_hash": "4724e6dc8e935df8",
+    "ask": "the draft names the resolver by the sibling ticket alone; name resolved and readsFor in src/scripts/guidance-hand.js as guidance-resolves-by-tags adds them, and time readsOf with handsAgain, since readsOf reads and hashes the notes while handsAgain compares arrays",
+    "standing": "done"
+  },
+  {
     "name": "buffers-feed-the-checks",
-    "hash": "1e8a2e640c1acd99",
-    "group_hash": "74e992859de1a0b2",
-    "ask": "A `buffers/` input the LSP door owns carries unsaved editor text, and a check reads the buffer where one stands open.\n\nThe editor checks what a person types, before a save.\n\n- - `go test ./...` from the root passes\n- a case opens a fake buffer and reads the finding off it\n- `./RUNME.sh check` exits 0",
+    "hash": "6884264c5170eb7f",
+    "group_hash": "c87c9084b3a3c500",
+    "ask": "A `buffers/` input the `lsp` IO module writes carries unsaved editor text, and a check reads the buffer where one stands open.\n\nThe editor checks what a person types, before a save.\n\n- `go test ./...` from the root passes\n- a case opens a fake buffer and reads the finding off it\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
     "name": "cage-rules-replay-session-logs",
-    "hash": "f8612d765d217265",
-    "group_hash": "5e3d3833f2887481",
-    "ask": "The cage rules port one at a time. A harness replays session logs recorded at `debug` into the hooks door, and asserts the decisions the bridge made.\n\nA rule ported with no replay changes what the cage refuses, and nobody sees it.\n\n- - `go test ./...` from the root passes\n- the replay of every recorded log answers the bridge's decisions, and each difference writes a `shadow` row\n- `./RUNME.sh check` exits 0",
+    "hash": "4c1891e8132c80bd",
+    "group_hash": "c8f5eaf75447c212",
+    "ask": "The cage rules port one at a time. A harness replays session logs recorded at `debug` into the `hooks` IO module, and asserts the decisions the bridge made.\n\nA rule ported with no replay changes what the cage refuses, and nobody sees it.\n\n- `go test ./...` from the root passes\n- the replay of every recorded log answers the bridge's decisions, and each difference writes a `shadow` row\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -591,16 +659,16 @@
   },
   {
     "name": "cfg-topic-holds-one-resolver",
-    "hash": "98593e62433a4337",
-    "group_hash": "9760080a11bfe86d",
-    "ask": "The `cfg/` topic holds one resolver over every layer, and the five readers [[spec/design_output/migration#the-duplications]] names read it in shadow.\n\nOne key then answers one value, whoever reads it. [[spec/tickets/config-reads-differ-by-reader]] shows the cost today.\n\n- - `go test ./...` from the root passes\n- a golden file holds every key's value and layer, off the old readers and the new one\n- `./RUNME.sh check` exits 0",
+    "hash": "0fe739ba062db0a8",
+    "group_hash": "51ea7078cf653973",
+    "ask": "The five readers [[spec/design_output/migration#the-duplications]] names read each `\u003cinstance\u003e/config/` subtopic in shadow. The config module [[spec/tickets/the-config-module-resolves-layers]] builds answers them. A mismatch writes a `shadow` row.\n\nOne key then answers one value, whoever reads it. [[spec/tickets/config-reads-differ-by-reader]] shows the cost today.\n\n- `go test ./...` from the root passes\n- a golden file holds every key's value and layer, off the old readers and the new one\n- `./RUNME.sh log --kind shadow` names each key the readers disagree on\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
     "name": "check-names-meet-their-goldens",
-    "hash": "3b828202b199a6ad",
-    "group_hash": "9760080a11bfe86d",
-    "ask": "The `check/` names stand, and each twin runs over the whole tree both ways. The golden files hold every difference, and the owner reads them at the merge.\n\nSeveral twins disagree today, so picking one changes findings. The golden files make each change a choice.\n\n- - `go test ./...` from the root passes\n- a golden file per twin stands under the check module\n- `./RUNME.sh check` exits 0",
+    "hash": "bb9e9dd0ab3ffeba",
+    "group_hash": "51ea7078cf653973",
+    "ask": "The `check/` names stand, and each twin runs over the whole tree both ways. The golden files hold every difference, and the owner reads them at the merge.\n\nSeveral twins disagree today, so picking one changes findings. The golden files make each change a choice.\n\n- `go test ./...` from the root passes\n- a golden file per twin stands under the check module\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -627,15 +695,49 @@
   {
     "name": "cli-js-leaves",
     "hash": "9e7224cfc88afdbd",
-    "group_hash": "59af2e51ae733d9f",
+    "group_hash": "78b0c6355738abd7",
     "ask": "`src/scripts/cli.js` and its dispatch leave the tree, with their cases.\n\nTwo roads to a verb drift apart again.\n\n- `git ls-files src/scripts/cli.js` answers nothing\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
+  },
+  {
+    "name": "close-force-guards-trunk-checkout",
+    "hash": "84e8c4771fa61227",
+    "group_hash": "0bd74940eb382a54",
+    "ask": "`close` reads neither `HEAD` nor a dirty tree today, and the forced close now commits on trunk. Add the trunk and `dirty` guards `merge` carries.",
+    "standing": "done"
+  },
+  {
+    "name": "cloud-list-reads-harness",
+    "hash": "42ce1d6a6dd5121e",
+    "group_hash": "e2e7fc62294dc664",
+    "ask": "inCloud reads CLOUD in .claude/skills/level0/lib/cloud.js, a second list beside HARNESS, and the one-list claim holds only while HARNESS carries every CLOUD name; point the guard at both, or derive one from the other",
+    "standing": "done"
+  },
+  {
+    "name": "cloud-note-reaches-every-step",
+    "hash": "19e862f8d0c39761",
+    "group_hash": "4724e6dc8e935df8",
+    "ask": "once spec/guidance/cloud.md moves under a subfolder, the tag resolver hands it only at steps tagged cloud, so on a cloud box its session-wide rules (pull first on main, commit and push each finished thing, branch done last) reach no standard-process leaf and no moment before the first pull; hand the note on every leaf where its env binds, or tag every process leaf cloud",
+    "standing": "done"
   },
   {
     "name": "code-has-a-size-ceiling",
     "hash": "5468c9275b3ce72e",
     "ask": "A function holds one thing and a file one topic, and the config names the ceiling: 150 lines a function and 600 lines a file. The write door and the check read it, so a function or a file past its ceiling meets a refusal with the line.\n\nWithout it a file grows past what a reader holds in one sitting. The rule lives in a memory note alone, where the door reads nothing.\n\n- `spec/config/level0.json` carries the two ceilings under one key, and `./RUNME.sh config` prints them\n- a write of a function past its ceiling meets a refusal naming it, and a test drives it\n- a write of a file past its ceiling meets a refusal naming it, and a test drives it\n- `./RUNME.sh check` names every function and file past its ceiling, and passes on this tree",
     "standing": ""
+  },
+  {
+    "name": "commit-stages-a-moved-path",
+    "hash": "51ac6ce5223fd139",
+    "ask": "movedFrom in src/scripts/commit-verb.js adds the old path of a rename the rename verb journals, after the rename stages its deletion, so git add refuses the pathspec and the commit stands undone; keep a from path out where it stands neither on disk nor in the index",
+    "standing": ""
+  },
+  {
+    "name": "commits-name-their-writer",
+    "hash": "9a11af14e656c398",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "`Commit` names the instance writing, and the store refuses a name the wiring binds to no out-port of that instance. `q.Given` leaves the core, because every name it registers today has a writer module by then, per [[spec/design_output/model#the-index-core]].\n\nOnly a writer writes its name. Without a writer on the commit, any caller writes any name, and one owner per name holds on paper alone.\n\n- `go test ./...` from the root passes\n- a case commits a name as another instance, and reads the refusal\n- `q.Given` and `q.GivenIn` stand nowhere under `src`, which `grep -rn GivenIn src` shows\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
   },
   {
     "name": "config-reads-differ-by-reader",
@@ -645,15 +747,15 @@
   },
   {
     "name": "copilot-meets-the-hooks-door",
-    "hash": "5701898b89335b81",
-    "group_hash": "5e3d3833f2887481",
-    "ask": "Copilot reaches the hooks door, through MCP and `quack hook \u003cevent\u003e`, in shadow against `copilot-runtime.js`.\n\nCopilot then meets the same rules as Claude, from one copy.\n\n- - `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each decision the two disagree on\n- `./RUNME.sh check` exits 0",
+    "hash": "944aa92be9f5fc65",
+    "group_hash": "c8f5eaf75447c212",
+    "ask": "Copilot reaches the `hooks` IO module, through MCP and `quack hook \u003cevent\u003e`, in shadow against `copilot-runtime.js`.\n\nCopilot then meets the same rules as Claude, from one copy.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each decision the two disagree on\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
     "name": "declared-views-get-specified",
-    "hash": "111de3a6ccfa9b2c",
-    "group_hash": "5739d30471f2d16d",
+    "hash": "494d51e32e584df9",
+    "group_hash": "e98c0716a9c298ab",
     "ask": "A design note specifies the declared views: the name `spec/views/work.base` reads, the actions its keys call, the log as a view, and the tabs `index`, `cli` and `help`. [[spec/design_input/the-index-holds-the-model#a-view-is-a-declaration]] asks it.\n\nPhase 6 builds one renderer, and it draws what the declarations say and nothing else.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- `./RUNME.sh check` exits 0",
     "standing": "done"
   },
@@ -670,17 +772,23 @@
     "standing": ""
   },
   {
+    "name": "done-waits-for-every-child",
+    "hash": "84d11080ce8274bd",
+    "ask": "`branch done` stripped the `group` field off every open ticket of the group, then closed the group `done`. So a group closed with its work unbuilt.\n\n| what | where |\n|---|---|\n| the smallest case | phase 2's shadow group: two tickets landed, five stood open at design, and `branch done` freed the five and closed the group |\n| why it matters | a merged group reads as built, and every group waiting on it starts over a hole |\n| where a stranger acts | `finish` in `src/scripts/work.js`, and [[spec/design_output/work#a-box-leaves]] |\n\nThe fix lands with this note. `branch done` refuses while a ticket naming the group stands open or draft, names each with its step, and frees none. The cases stand in `test/level0/work-done.test.js`.",
+    "standing": ""
+  },
+  {
     "name": "doors-get-specified",
-    "hash": "16cbfdfced7720cb",
-    "group_hash": "5739d30471f2d16d",
-    "ask": "A design note specifies the doors: one file each with its fake, the inbound replay, and the doors process. It names the import rules the build checks. [[spec/design_input/the-index-holds-the-model#doors-on-both-sides]] asks it. So does [[spec/design_input/the-index-holds-the-model#the-build-holds-the-rules]].\n\nA door is the one road to the outside, and a fake in the same file keeps every test in memory.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- `./RUNME.sh check` exits 0",
+    "hash": "637869030022e747",
+    "group_hash": "e98c0716a9c298ab",
+    "ask": "A design note specifies the doors: one file each with its fake, the inbound replay, and the doors process. It names the import rules the build checks. [[spec/design_input/the-index-holds-the-model#io-modules-on-both-sides]] asks it. So does [[spec/design_input/the-index-holds-the-model#the-build-holds-the-rules]].\n\nA door is the one road to the outside, and a fake in the same file keeps every test in memory.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- `./RUNME.sh check` exits 0",
     "standing": "done"
   },
   {
     "name": "doors-note-names-every-analyzer",
-    "hash": "f3b0f274af539d66",
+    "hash": "5788b66feaae8fa7",
     "group_hash": "a7084480bf119925",
-    "ask": "add the analyzer `nodoor` to the table of [[spec/design_output/go-doors#the-build-checks-imports]]. The note then owns every analyzer, and the code points there.",
+    "ask": "add the analyzer `nodoor` to the table of [[spec/design_output/model#the-build-checks-imports]]. The note then owns every analyzer, and the code points there.",
     "standing": "done"
   },
   {
@@ -699,10 +807,10 @@
   },
   {
     "name": "each-call-meets-its-budget",
-    "hash": "37d8c55ca76dd9a9",
-    "group_hash": "f9f25d046e5846f7",
+    "hash": "5edb298a0a287ff5",
+    "group_hash": "4724e6dc8e935df8",
     "ask": "The cold engine stays fast, and a slow call turns the battery red before a hand meets it. [[spec/design_input/level-two]] asks it in its chapter Time budgets.\n\nToday the pull grows slower with each piece of work it carries, and nothing names the call that slows.\n\n- `spec/config/level0.json` names a time budget for the pull, the hand-back, the resolver and the query for stale steps\n- a test in the battery times each call over a fixture against its budget, and fails past it\n- `./RUNME.sh check` exits 0",
-    "standing": "todo"
+    "standing": "done"
   },
   {
     "name": "each-check-reads-its-signal",
@@ -759,6 +867,13 @@
     "standing": "done"
   },
   {
+    "name": "every-call-takes-a-record",
+    "hash": "c83e234651ea7633",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "Every call of an action takes a record, `ops/\u003cid\u003e`, and carries the wait its caller sets, per [[spec/design_output/model#a-caller-sets-its-wait]]. A call ending within the wait answers the result. One running past it answers `still running`, with the handle, the fraction done and the time gone by.\n\nThe split between `q.Action` and `q.Op` then leaves, and an author guesses no length. An agent holds no handle, because `ops/wait` with none waits on its session's open operations.\n\n- `go test ./...` from the root passes\n- `q.Op` and the field `Declared.Op` stand nowhere under `src`, which `grep -rn 'Op()' src/q` shows\n- a case calls a quick action, and reads the result within the wait\n- a case calls a slow action with steps, and reads `still running`, the handle and the fraction done\n- a case calls `ops/wait` with no handle, and reads the session's open operations end\n- `watchdog.deadlineOp` folds into `watchdog.deadlineAction`\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
     "name": "every-landing-takes-a-verb",
     "hash": "bcd65204460cd6ae",
     "group_hash": "90c8ec2acc34285f",
@@ -781,7 +896,7 @@
   },
   {
     "name": "every-server-stands-and-answers",
-    "hash": "2f62f3c601da7f76",
+    "hash": "db668ae3ca7afdb7",
     "ask": "A level zero tool, the editor and `doctor` each tell a live server from a dead one. A server that restarts or runs stale code comes back with no hand running `./RUNME.sh serve` or reloading the window.\n\nThe host fetch cuts a `wait` post at its own timeout, and the plugin reads the cut as a dead server. A restart waits on open connections before it respawns. A Go binary rebuilds off its own folder alone. The language client gives up on `se-lsp` at its default cap.\n\n- a `mcp__level0__wait` call on a live server running past the host fetch's timeout answers its signal or its cap\n- that answer takes the place of the `no server answers` line, and a case in `test/level0/bridgehead.test.js` holds both\n- `restart` in `src/bridge/server.js` starts the child once the port stops listening, with no wait on open connections\n- a case in `test/level0/server-crash.test.js` holds a respawn with a connection open\n- a change to a `.go` file under `src/lsp`, `src/index` or a package their `go.mod` replaces rebuilds that binary\n- the rebuild keys on a source hash, as `sourceHash` in `src/scripts/tui-build.js` keys one, and a case under `test/level0` holds it\n- the language client `startsServer` in `src/extension/editor.js` builds restarts `se-lsp` on every close, and a case in `test/level0/lsp.test.js` holds it\n- `doctor` in `src/scripts/cli-check.js` prints an `se-lsp` row off a probe that starts `se-lsp lsp`\n- that row names the diagnostics the probe gets back\n- cases in `test/level0/doctor-hooks.test.js` hold a server that answers and one that exits\n- `./RUNME.sh check` exits 0",
     "standing": ""
   },
@@ -818,6 +933,13 @@
     "standing": ""
   },
   {
+    "name": "first-accept-names-its-base",
+    "hash": "c6ad41d1d72804ce",
+    "group_hash": "f33fa4763db43a28",
+    "ask": "the approach bases the rerun diff on the hash_after of the gate last verdict, and names no base for the first run, where no verdict stands. The first run reads the diff since the first take of the ticket, and a group reads it since its merge base with trunk",
+    "standing": "done"
+  },
+  {
     "name": "git-write-tests-outside-ask",
     "hash": "525b9c6bbc240adb",
     "group_hash": "90c8ec2acc34285f",
@@ -833,14 +955,21 @@
   },
   {
     "name": "go-cage-lands-in-shadow",
-    "hash": "5e3d3833f2887481",
-    "ask": "Phase 5 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the cage. The hooks door, the fold providers for `session/`, the rules ported one at a time, and Copilot on the same door. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
+    "hash": "c8f5eaf75447c212",
+    "ask": "Phase 5 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the cage. The `hooks` IO module, the fold modules over `session/`, the rules ported one at a time, and Copilot on the same IO module. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/cage`, which the `migration` module declares as a shared key in the default file.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
     "standing": "todo"
   },
   {
     "name": "go-cage-switches-over",
-    "hash": "1e4a288a04fcb375",
-    "ask": "Phase 5 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase5switch` to read true in the tracked config on `main`.\n\nDone when the bridge server leaves the tree.",
+    "hash": "0c191a65ec5a72fc",
+    "ask": "Phase 5 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration/config/slices/` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase5switch` to read true in the tracked config on `main`.\n\nDone when the bridge server leaves the tree.",
+    "standing": "todo"
+  },
+  {
+    "name": "go-checks-need-go",
+    "hash": "b9bee0048f29f769",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "The multi-module plumbing leaves `src/scripts/cli-go.js`, and the check answers red on a box with no Go, where `goHolds` passes today.\n\nOne Go module stands now, so the plumbing reads folders that no longer answer. A check passing with no Go passes nothing.\n\n- a case runs the Go gate on a box with no Go, and reads the refusal\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -852,17 +981,17 @@
   },
   {
     "name": "go-prose-checks-stand-alone",
-    "hash": "949b688531631413",
-    "group_hash": "d3dfd9854169ea00",
-    "ask": "The Go prose checks become the only copy, and wink leaves the tree.\n\nThe prose checks were the last reason Node runs at runtime.\n\n- - `go test ./...` from the root passes\n- `git grep -n wink -- package.json` answers nothing\n- `./RUNME.sh check` exits 0",
+    "hash": "862ac4255ced0b5f",
+    "group_hash": "5ce5d9a01efaf369",
+    "ask": "The Go prose checks become the only copy, and wink leaves the tree.\n\nThe prose checks were the last reason Node runs at runtime.\n\n- `go test ./...` from the root passes\n- `git grep -n wink -- package.json` answers nothing\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
     "name": "go-test-names-the-root",
-    "hash": "32532a6438ae3fff",
-    "group_hash": "365354e1371b531d",
+    "hash": "83a3ed812bf1523f",
+    "group_hash": "0bd74940eb382a54",
     "ask": "the done line reads `go test ./...` from the root, and its test runs two folders. Name `go test ./...` itself.",
-    "standing": "held"
+    "standing": "done"
   },
   {
     "name": "go-writes-the-frontmatter",
@@ -880,23 +1009,23 @@
   },
   {
     "name": "groups-carry-the-cloud-marker",
-    "hash": "cab9742c27e7c0b9",
-    "group_hash": "365354e1371b531d",
+    "hash": "b81f67365c2f9816",
+    "group_hash": "0bd74940eb382a54",
     "ask": "`branch open` writes `cloud: true` into the group's ticket on `main`, and the merge, the release and the close clear it. The ticket schema names the field. [[spec/rationales/git-stays-the-archive]] argues it.\n\nThe queue then reads files alone. Without the marker every count reads git on every call.\n\n- a case under `test/level0` drives each of the four verbs and reads the marker\n- `./RUNME.sh check` exits 0",
-    "standing": "held"
+    "standing": "done"
   },
   {
     "name": "guidance-resolves-by-tags",
-    "hash": "0475fb00e0cfdde3",
-    "group_hash": "f9f25d046e5846f7",
+    "hash": "d3cac2ef2ca757fd",
+    "group_hash": "4724e6dc8e935df8",
     "ask": "Each step meets the notes its work needs, and no step names a note by hand. [[spec/design_input/level-two]] asks it in its chapter Guidance.\n\nToday `spec/processes/trivial.yaml` reads working alone, so a trivial fix to code meets no code rule before the write door.\n\n- `spec/schemas/ticket.schema.yaml` admits `tags` on a step, and `spec/schemas/guidance.schema.yaml` admits `tags` on a note. A case under `test/level0` decides it\n- a note under a subfolder reaches a step carrying all its tags, folder names among them. Its `env` matches too. A case under `test/level0` decides it\n- the check refuses a note that reaches no step. A case under `test/level0` decides it\n- the pull prints each resolved note as a section of the ticket, its rules numbered as the note numbers them. A case under `test/level0` decides it\n- `./RUNME.sh branch guidance` prints the notes a named step resolves. A case under `test/level0` decides it\n- `./RUNME.sh check` exits 0",
-    "standing": "todo"
+    "standing": "done"
   },
   {
     "name": "guidance-rides-each-step",
-    "hash": "f9f25d046e5846f7",
+    "hash": "4724e6dc8e935df8",
     "ask": "Each step carries the guidance its tags resolve, and the notes at the top ride the output style. One answer stays under the cap and inside its time budget. [[spec/design_input/level-two]] asks it in its chapters Guidance, The size cap and Time budgets.",
-    "standing": "todo"
+    "standing": "done"
   },
   {
     "name": "guidance-rides-step",
@@ -933,10 +1062,23 @@
     "standing": "done"
   },
   {
+    "name": "holds-leave-with-their-ticket",
+    "hash": "0b03c017e83f4157",
+    "ask": "A hold leaves when its ticket closes, so a closed ticket never stands in hand. Today a hold outlives the close. The pull then names closed tickets as in hand, and a named pull under that hand refuses.\n\nWithout it, a helper that stops without a hand-back blocks its own name for good. A session reads closed tickets as its work, and the write door accepts writes against them.\n\n- `./RUNME.sh test` over a new case: a hold on a ticket that closes through another hand drops at the next pull\n- a pull after that close names no closed ticket under `In hand`\n\nnone\n\nnone",
+    "standing": ""
+  },
+  {
     "name": "install-drops-node",
     "hash": "db87dd4d2b1c07cc",
-    "group_hash": "d3dfd9854169ea00",
+    "group_hash": "5ce5d9a01efaf369",
     "ask": "`src/scripts/install.sh` installs no Node, and nothing past the extension and the hook module needs it.\n\nA box then carries one runtime.\n\n- `grep -c node src/scripts/install.sh` answers 0\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
+    "name": "io-modules-own-their-names",
+    "hash": "8a47aae3a7a5467a",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "The IO modules `watch`, `disk`, `clock` and `env` stand, each with the flag, per [[spec/design_output/model#io-modules]]. `watch` writes `files/\u003cpath...\u003e`, and `clock` writes `clock/minute`. `env` writes `env/\u003cname\u003e` at start, and `disk` writes a file on request. The `hooks` IO module lands in phase 5, with [[spec/tickets/the-hooks-door-lands]].\n\nThe core then stores what a module commits, and knows no input of its own. Each IO module keeps its fake inside, and its test needs no disk and no clock.\n\n- `go test ./...` from the root passes\n- a case reads the index core as the writer of no name under `files/`, `clock/` or `env/`\n- a case sends `disk` a write request, and reads the file come back through `watch`\n- each IO module's test runs over `qtest` and the fake of its outside\n- each fake of the outside passes one contract suite, run against the fake and the real outside\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -951,6 +1093,34 @@
     "hash": "01d2af691f1118a9",
     "group_hash": "90c8ec2acc34285f",
     "ask": "main sets `judge.enabled` to false in `spec/config/level0.json`, so the judge runs nowhere until the owner turns it on. The two judge cases in `test/level0/level1.test.js` hand the hook a config with `enabled: true`, as `judgeRuns` there does, or they prove a judge that never runs",
+    "standing": "done"
+  },
+  {
+    "name": "judge-cut-clears-the-checks",
+    "hash": "d3505027e6d5f366",
+    "group_hash": "f33fa4763db43a28",
+    "ask": "the ask wants no judge chapter in spec/design_output/pull.md, but the draft cuts only the two subchapters. The checks keeps item 5, the material paragraph, the layer table and the prose-fields paragraph, and each speaks of the judge. The cut takes them too, so the chapter lists the shell checks alone",
+    "standing": "done"
+  },
+  {
+    "name": "judge-cut-meets-claude-door",
+    "hash": "7d73cd3e36d4c62f",
+    "group_hash": "f33fa4763db43a28",
+    "ask": "every code file the cut touches stands under .claude, and every-road-has-a-caller records that the harness refuses this hand a write there. lib/marks.js still stands on that account. Where the refusal holds, the builder mints a question ticket carrying the owner's commands, per spec/guidance/cloud rule 7, in place of a hand-back on a red check",
+    "standing": "done"
+  },
+  {
+    "name": "judge-cut-takes-its-helpers",
+    "hash": "4f42a30c40765cdd",
+    "group_hash": "f33fa4763db43a28",
+    "ask": "the draft misses helpers of the judge and their cases. forEvidence and labelOf in .claude/skills/level0/lib/guidance.js have judgeMaterial as their one caller. ruleBroken, FOLLOWS, LABELS and BREAKS in .claude/skills/level0/lib/pull.js serve the judge alone. quoted, parsed, refusals, QUOTE_MODEL and the configOf import in hooks/pull-tool.js go with judged. Their cases are the --judge cases in test/level0/pull-leaves.test.js, the forEvidence and labelOf cases in test/level0/guidance.test.js, and test/contract/guidance-rules.test.js. The judge.model fixtures stand in test/level0/projection.test.js, sidebar.test.js and clicks.test.js, and judge.maxSpans stands in config.test.js",
+    "standing": "done"
+  },
+  {
+    "name": "judge-pointers-leave-other-notes",
+    "hash": "79a0876464bb48a8",
+    "group_hash": "f33fa4763db43a28",
+    "ask": "sentences outside pull.md name the pull's judge. They stand in spec/design_output/hook-protocol.md in the chapter on classify, in spec/design_output/level0.md beside answer.enabled, and in the hooks.json description, which brand.js does not stamp. The cut rewrites each, and the callers list names hooks.json beside brand.js",
     "standing": "done"
   },
   {
@@ -974,22 +1144,29 @@
     "standing": "done"
   },
   {
+    "name": "long-line-cuts-by-bytes",
+    "hash": "f73c11e208195cea",
+    "group_hash": "4724e6dc8e935df8",
+    "ask": "partOf in src/scripts/pull-chapter.js cuts at a UTF-8 boundary inside room where one line alone runs past room, because a cut at the last line ending finds none there",
+    "standing": "done"
+  },
+  {
     "name": "lsp-door-lands-in-shadow",
-    "hash": "74e992859de1a0b2",
-    "ask": "Phase 7 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the LSP door and the checks. The rules move into the check module, and a `buffers/` input carries unsaved editor text. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
+    "hash": "c87c9084b3a3c500",
+    "ask": "Phase 7 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the `lsp` IO module and the checks. The rules move into the check module, and a `buffers/` input carries unsaved editor text. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/lsp`, which the `migration` module declares as a shared key in the default file.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
     "standing": "todo"
   },
   {
     "name": "lsp-door-switches-over",
-    "hash": "136d4cd96f35cd9b",
-    "ask": "Phase 7 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase7switch` to read true in the tracked config on `main`.\n\nDone when the LSP's own server, port and index client leave the tree.",
+    "hash": "64bb9910aaf279f1",
+    "ask": "Phase 7 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration/config/slices/` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase7switch` to read true in the tracked config on `main`.\n\nDone when the LSP's own server, port and index client leave the tree.",
     "standing": "todo"
   },
   {
     "name": "lsp-rules-move-to-check",
-    "hash": "fa9787205358814b",
-    "group_hash": "74e992859de1a0b2",
-    "ask": "The LSP's rules and schema checks move into the check module, and run in shadow beside the LSP's own.\n\nOne copy of each rule then answers the editor, the check and the write door.\n\n- - `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each finding the two disagree on\n- `./RUNME.sh check` exits 0",
+    "hash": "f56c9d8adbb6e968",
+    "group_hash": "c87c9084b3a3c500",
+    "ask": "The LSP's rules and schema checks move into the check module, and run in shadow beside the LSP's own.\n\nOne copy of each rule then answers the editor, the check and the write door.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each finding the two disagree on\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -1021,19 +1198,19 @@
   },
   {
     "name": "module-processes-land-in-shadow",
-    "hash": "2e858d038e423c69",
-    "ask": "Phase 9 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the deployment. The doors process, and module processes the system places, with watchdogs across the processes. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
+    "hash": "4c327d864c2e851f",
+    "ask": "Phase 9 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the deployment. The IO process, and module processes the system places, with watchdogs across the processes. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/processes`, which the `migration` module declares as a shared key in the default file.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
     "standing": "todo"
   },
   {
     "name": "module-processes-switch-over",
-    "hash": "f66e6768114bd9c0",
-    "ask": "Phase 9 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase9switch` to read true in the tracked config on `main`.\n\nDone when a crash in one part leaves the others running, and raises an alarm.",
+    "hash": "f9ee34c04f6d62d1",
+    "ask": "Phase 9 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration/config/slices/` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase9switch` to read true in the tracked config on `main`.\n\nDone when a crash in one part leaves the others running, and raises an alarm.",
     "standing": "todo"
   },
   {
     "name": "node-leaves-the-boxes",
-    "hash": "d3dfd9854169ea00",
+    "hash": "5ce5d9a01efaf369",
     "ask": "Phase 10 of [[spec/design_input/the-migration-runs-in-slices#the-phases]]: Node leaves the boxes. The Go prose checks become the only copy, and the webview ships prebuilt.\n\nDone when `install.sh` installs no Node.",
     "standing": "todo"
   },
@@ -1106,6 +1283,13 @@
     "standing": "done"
   },
   {
+    "name": "one-wave-settles-a-change",
+    "hash": "64c2de8c70bec292",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "The start gives every module a height, and a name builds its run list the first time it changes. A change settles as one wave, per [[spec/design_output/model#one-wave-settles-a-change]]. Early cutoff and demand stand, and `quack why` names a value a wave holds as `pending since r`.\n\nA module fed twice by one change then runs once, off inputs of one settled state. A reader sees no half-settled mix. A read waits on nothing, except the read of an unwatched pending name, which waits for its run and for no write.\n\n- `go test ./...` from the root passes\n- a `qtest` case runs the diamond X, A and B, and reads B run once, after A\n- a `qtest` case commits X during a wave, and reads the change wait for the next wave\n- a case changes a name twice, and reads the second wave reuse the kept list\n- a case commits a value equal to the old one, and reads no run and no push below it\n- a case leaves a pending name unwatched, and reads it run only when a reader asks\n- a case reads `quack why` answer `pending since r` for a value a wave holds\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
     "name": "only-a-read-gates-nothing",
     "hash": "a113556337738b5c",
     "group_hash": "90c8ec2acc34285f",
@@ -1120,44 +1304,77 @@
     "standing": "done"
   },
   {
+    "name": "open-marker-outlives-refused-push",
+    "hash": "f00b1a65485c1324",
+    "group_hash": "0bd74940eb382a54",
+    "ask": "`openGroup` pushes trunk with `cloud: true` before the branch push, so a refused branch push leaves the marker on trunk with no branch. Drop the marker on that refusal, or push the branch first, and add the case to the test file.",
+    "standing": "done"
+  },
+  {
+    "name": "open-marks-standing-branches",
+    "hash": "d03396f1f60a1db9",
+    "group_hash": "0bd74940eb382a54",
+    "ask": "the `already stands in the cloud` return in `openGroup` writes nothing, so a branch opened before the change carries no marker. Write the marker on that road too.",
+    "standing": "done"
+  },
+  {
     "name": "open-tasks-come-from-work",
-    "hash": "7c72f486f68f7db3",
-    "group_hash": "365354e1371b531d",
-    "ask": "`work/rows` and `work/open-tasks` stand in the work module, ported from `work-answer.js`, and read the cloud marker and no git.\n\nThe badge and the header then read one provider. Without it they keep counting two ways.\n\n- - `go test ./...` from the root passes\n- a case reads `work/open-tasks` over a fake tree of tickets\n- `./RUNME.sh check` exits 0",
-    "standing": "held"
-  },
-  {
-    "name": "open-tasks-land-in-shadow",
-    "hash": "365354e1371b531d",
-    "ask": "Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the pilot. The cloud marker, the tickets topic, the queue, and `work/open-tasks`, computed beside the chain that counts them today. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
-    "standing": "held"
-  },
-  {
-    "name": "open-tasks-run-in-shadow",
-    "hash": "df56a3a227f785c9",
-    "group_hash": "365354e1371b531d",
-    "ask": "The key `slices.openTasks` takes `old`, `shadow` or `new`. Under `shadow`, the old count answers, the new one runs beside it, and a mismatch writes a `shadow` row.\n\nThe owner judges the switch off these rows. Without them the go rests on hope.\n\n- a case under `shadow` plants a mismatch, and `./RUNME.sh log --kind shadow` names it\n- `./RUNME.sh check` exits 0",
-    "standing": "held"
-  },
-  {
-    "name": "open-tasks-switch-over",
-    "hash": "89689ded83566c3a",
-    "ask": "Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase2switch` to read true in the tracked config on `main`.\n\nDone when the badge and the work tab's brackets read one name.",
+    "hash": "2c72e8d56cc19493",
+    "group_hash": "d2524f63ae4e34f1",
+    "ask": "The out-ports `rows` and `open-tasks` stand in `src/modules/work`, ported from `work-answer.js`. Its in-ports take the queue's places and the cloud marker, and the wiring binds them, with no git. The tests run through `q/qtest` alone, by the local port names.\n\nThe badge and the header then read one name, `work/open-tasks`. Without it they keep counting two ways.\n\n- `go test ./...` from the root passes\n- a case reads the out-port `open-tasks` over a fake tree of tickets\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
+    "name": "open-tasks-land-in-shadow",
+    "hash": "0bd74940eb382a54",
+    "ask": "Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the pilot. The cloud marker, the tickets topic, the queue, and `work/open-tasks`, computed beside the chain that counts them today. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
+    "standing": "done"
+  },
+  {
+    "name": "open-tasks-run-in-shadow",
+    "hash": "16a2c01776c4febe",
+    "group_hash": "d2524f63ae4e34f1",
+    "ask": "The key `migration/config/slices/openTasks` takes `old`, `shadow` or `new`. Under `shadow`, the old count answers, the new one runs beside it, and a mismatch writes a `shadow` row.\n\nThe owner judges the switch off these rows. Without them the go rests on hope.\n\n- a case under `shadow` plants a mismatch, and `./RUNME.sh log --kind shadow` names it\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
+    "name": "open-tasks-shadow-lands",
+    "hash": "d2524f63ae4e34f1",
+    "ask": "Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow. The queue and `work/open-tasks` stand as modules under `src/modules`, and run beside the chain that counts them today. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/openTasks`, which the `migration` module declares as a shared key in the default file.\n\nDone when every child closes through the command it names, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
+    "standing": "todo"
+  },
+  {
+    "name": "open-tasks-switch-lands",
+    "hash": "5b5a343774b742ba",
+    "ask": "Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration/config/slices/` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase2switch` to read true in the tracked config on `main`.\n\nDone when the badge and the work tab's brackets read one name, and every child closes through the command it names.",
+    "standing": "todo"
+  },
+  {
+    "name": "open-tasks-switch-over",
+    "hash": "9b081ec0806dd5ea",
+    "ask": "Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase2switch` to read true in the tracked config on `main`.\n\nDone when the badge and the work tab's brackets read one name.",
+    "standing": "done"
+  },
+  {
     "name": "operations-and-leases-land",
-    "hash": "1b6fe4f51d52bf48",
+    "hash": "415a612a22dfde63",
     "group_hash": "a7084480bf119925",
     "ask": "Operations and leases stand in the core: `ops/\u003cid\u003e` with its states and its retention, one writer per tree, the watchdog, the stale marks and `session/alarms`. The phase 0 notes on operations and watchdogs say the shape.\n\nEvery action after this one returns a handle, and every part holds a lease. Without them a hang looks like a part at work.\n\n- - `go test ./...` from the root passes\n- a case lets a lease expire, and reads each name of its provider as stale\n- `./RUNME.sh check` exits 0",
     "standing": "done"
   },
   {
     "name": "operations-get-specified",
-    "hash": "9d099dd3edbc2436",
-    "group_hash": "5739d30471f2d16d",
-    "ask": "A design note specifies operations: the handle `ops/\u003cid\u003e`, its states, the one writer per tree, and what stays for how long. [[spec/design_input/the-index-holds-the-model#operations-carry-a-handle]] asks it.\n\nA pull, the check and a retro each run past a hook's patience. A handle keeps the caller free and the hang in sight.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- `./RUNME.sh check` exits 0",
+    "hash": "7f66cc991394166d",
+    "group_hash": "e98c0716a9c298ab",
+    "ask": "A design note specifies operations: the handle `ops/\u003cid\u003e`, its states, the one writer per tree, and what stays for how long. [[spec/design_input/the-index-holds-the-model#a-caller-sets-its-wait]] asks it.\n\nA pull, the check and a retro each run past a hook's patience. A handle keeps the caller free and the hang in sight.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- `./RUNME.sh check` exits 0",
     "standing": "done"
+  },
+  {
+    "name": "ops-keeps-one-state",
+    "hash": "01a23ca44af95ee7",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "The ops retention drops an ended operation's `ops/\u003cid\u003e` value from the store once its window passes. One owner holds an operation's state, per [[spec/design_output/model#what-stays-how-long]].\n\nThe store grows with every operation today, and two places hold one operation's state.\n\n- `go test ./...` from the root passes\n- a case ends an operation past its window, and the store holds no `ops/\u003cid\u003e` for it\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
   },
   {
     "name": "owner-terms-await-question",
@@ -1175,23 +1392,37 @@
   },
   {
     "name": "private-tickets-reach-tickets-all",
-    "hash": "e9933788d4843ae2",
-    "group_hash": "365354e1371b531d",
+    "hash": "530e7123a192d45c",
+    "group_hash": "0bd74940eb382a54",
     "ask": "`contentsOf` reads tracked rows alone, so a `tickets/all` built beside the `files/` rows drops the `.se/tickets` notes the `tickets` verb answers. Build it off the note read `Tickets` runs.",
-    "standing": "held"
+    "standing": "done"
+  },
+  {
+    "name": "process-case-for-bless",
+    "hash": "9daa4a9e2b4e5606",
+    "group_hash": "e2e7fc62294dc664",
+    "ask": "the ask names spec/schemas/process.schema.yaml, which takes its steps by $ref from ticket.schema.yaml; the schema case reads a process file carrying bless on a gate, so it decides the line the ask names",
+    "standing": "done"
   },
   {
     "name": "processes-get-placed",
-    "hash": "523d845b2d6c7e7f",
-    "group_hash": "5739d30471f2d16d",
+    "hash": "0b9b87d138bf1603",
+    "group_hash": "e98c0716a9c298ab",
     "ask": "A design note specifies how the system places the processes. It covers the start\nof the index, the spawn of the doors and each module, and the standing file. It\ncovers how a changed module rebuilds and restarts alone. [[spec/design_input/the-index-holds-the-model#the-system-places-the-processes]]\nasks it.\n\nThe deployment phase splits the modules into processes on this note. Without\nit the split lands as each box sees fit.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- `./RUNME.sh check` exits 0",
     "standing": "done"
   },
   {
+    "name": "projections-read-the-mirror",
+    "hash": "b307a1ef13eea0c3",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "A module declares a projection of `files/` with a glob, a codec and a kind, per [[spec/design_output/model#everything-on-disk-mirrors]]. The kinds `loaded`, `saved` and `dump` stand. The config, the plan and the holds become loaded projections, and each codec keeps one contract suite.\n\nThe codec is then the one code knowing a file format. A write goes back one way, through `disk`, so no module writes a file past it.\n\n- `go test ./...` from the root passes\n- each codec's suite round-trips every committed file of its glob, byte for byte\n- a case writes through `disk` with a stale revision, and reads the refusal\n- a case restores a saved file with a removed name, a changed type and a new name\n- a case dumps a prefix with `quack dump`, and nothing reads it back\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
     "name": "prose-checks-run-in-go",
-    "hash": "79e9e61701b5a532",
-    "group_hash": "9760080a11bfe86d",
-    "ask": "The prose checks run in Go: the tagger, an exception list and the domain words, with wink as the reference. A mismatch writes a `shadow` row.\n\nThe prose checks are the last reason Node runs at runtime.\n\n- - `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each finding the two disagree on\n- `./RUNME.sh check` exits 0",
+    "hash": "7073e3a80be827a7",
+    "group_hash": "51ea7078cf653973",
+    "ask": "The prose checks run in Go: the tagger, an exception list and the domain words, with wink as the reference. A mismatch writes a `shadow` row.\n\nThe prose checks are the last reason Node runs at runtime.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each finding the two disagree on\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -1210,9 +1441,9 @@
   },
   {
     "name": "pull-verbs-become-actions",
-    "hash": "aac7aa89508760f5",
-    "group_hash": "ed7b6aa1a40118be",
-    "ask": "The pull becomes an action returning an operation, in shadow against `cli.js`.\n\nThe hand-back is the longest road a hook waits on, and a handle frees it.\n\n- - `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
+    "hash": "cff8e357e6f4d78a",
+    "group_hash": "bdcecf4ff613c42f",
+    "ask": "The pull becomes an action answering within the wait its caller sets, in shadow against `cli.js`.\n\nThe hand-back is the longest road a hook waits on, and the wait frees it.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -1222,41 +1453,67 @@
     "standing": ""
   },
   {
+    "name": "qtest-holds-a-module",
+    "hash": "cdccdf9f6960b3c5",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "`q/qtest` stands as [[spec/design_output/model#the-fake-index]] says, and `src/modules/` holds the module packages. A case feeds a module's in-ports and reads its out-ports by their local names. The fake index keeps one contract suite, run against `qtest` and the real index in process, per [[spec/design_output/model#the-fake-keeps-a-contract]].\n\nA module tests against a fake index alone, per the owner's rule. Without the suite, the fake drifts from the index it stands for, and a green module test proves the fake.\n\n- `go test ./...` from the root passes\n- a case runs a derived provider, a fold and an action through `qtest`, by local port names\n- a case reads the commits and the requests each run answers\n- a case seeds a config key the way it seeds any other in-port\n- the contract suite passes against `qtest` and the real index, with no port and no NATS\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
     "name": "quack-verbs-land-in-shadow",
-    "hash": "ed7b6aa1a40118be",
-    "ask": "Phase 4 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the actions and the command line. A generated `quack`, verbs ported topic by topic as actions returning operations, and the tool list the index generates. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
+    "hash": "bdcecf4ff613c42f",
+    "ask": "Phase 4 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the actions and the command line. A generated `quack`, verbs ported topic by topic as actions answering within the wait their caller sets, and the tool list the index generates. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/verbs`, which the `migration` module declares as a shared key in the default file.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
     "standing": "todo"
   },
   {
     "name": "quack-verbs-switch-over",
-    "hash": "59af2e51ae733d9f",
-    "ask": "Phase 4 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase4switch` to read true in the tracked config on `main`.\n\nDone when agents call `quack` and no `./RUNME.sh` verb, and `cli.js` leaves the tree.",
+    "hash": "78b0c6355738abd7",
+    "ask": "Phase 4 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration/config/slices/` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase4switch` to read true in the tracked config on `main`.\n\nDone when agents call `quack` and no `./RUNME.sh` verb, and `cli.js` leaves the tree.",
     "standing": "todo"
   },
   {
     "name": "quack-why-answers-a-name",
-    "hash": "f2e1da5bf74c413f",
+    "hash": "457f56942492f686",
     "group_hash": "a7084480bf119925",
     "ask": "`quack why \u003cname\u003e` answers the provider and its file, the inputs down to the files, and every reader. [[spec/design_input/the-index-holds-the-model#the-wiring-analyzer]] asks it.\n\nAn agent asks where a value comes from, and one command answers where a search over two languages answers today.\n\n- - `go test ./...` from the root passes\n- a case asks a name of a fake catalog, and reads the provider's file and line\n- `./RUNME.sh check` exits 0",
     "standing": "done"
   },
   {
+    "name": "queue-approach-sentence-split",
+    "hash": "639267b335fcd131",
+    "ask": "Split the sentence naming `it.capture` under the approach of [[spec/tickets/the-queue-moves-to-plan]]. Or rule that the `tests` gate reads `check --errors` where a change touches no code. The door keeps every agent out of that approach. The queue hands [[spec/tickets/rationale-drops-release-row]] out ahead of the review that sends the draft back, so no agent reaches the fix.\n\nOpen the file on `work/open-tasks-land-in-shadow` and cut the sentence at line 122 in two:\n\n    git checkout work/open-tasks-land-in-shadow \u0026\u0026 git pull\n    $EDITOR spec/tickets/the-queue-moves-to-plan.md\n    ./RUNME.sh lint spec/tickets/the-queue-moves-to-plan.md\n\n- the pass of `rationale-drops-release-row` stands still at do\n- the review of `the-queue-moves-to-plan` stands behind it in the queue\n\n- `./RUNME.sh lint spec/tickets/the-queue-moves-to-plan.md` names no sentence past the cap\n- `./RUNME.sh ticket pull rationale-drops-release-row --pass` answers that the step passes",
+    "standing": ""
+  },
+  {
+    "name": "rationale-drops-release-row",
+    "hash": "5f083e6f046872d4",
+    "ask": "the `release` departure holds, because `release` writes `hash_after` and leaves the branch at `todo` in the cloud. Rewrite the row in `spec/rationales/git-stays-the-archive.md` to name the merge and the close alone, since the ask points at that note.",
+    "standing": ""
+  },
+  {
     "name": "read-topics-land-in-shadow",
-    "hash": "9760080a11bfe86d",
-    "ask": "Phase 3 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the read-only topics. `cfg/`, `log/`, `guidance/` and the `check/` names, and the prose checks in Go, each with its own key. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
+    "hash": "51ea7078cf653973",
+    "ask": "Phase 3 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the read-only topics. Every `\u003cinstance\u003e/config/` subtopic, `log/`, `guidance/` and the `check/` names, and the prose checks in Go, each with its own key. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds each topic's key under `migration/config/slices/`, which the `migration` module declares as shared keys in the default file.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
     "standing": "todo"
   },
   {
     "name": "read-topics-switch-over",
-    "hash": "6a111dba45b91db9",
-    "ask": "Phase 3 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase3switch` to read true in the tracked config on `main`.\n\nDone when no JavaScript twin of a Go check stands.",
+    "hash": "08fb817e98fae66f",
+    "ask": "Phase 3 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration/config/slices/` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase3switch` to read true in the tracked config on `main`.\n\nDone when no JavaScript twin of a Go check stands.",
     "standing": "todo"
   },
   {
     "name": "readers-take-the-go-topics",
     "hash": "796fa446735434ef",
-    "group_hash": "6a111dba45b91db9",
+    "group_hash": "08fb817e98fae66f",
     "ask": "Each key of the phase moves to `new`, and every reader takes the Go topic.\n\nThe readers then agree by construction. One commit per key rolls one back.\n\n- a case reads each key's readers off the Go topic\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
+    "name": "reads-resolve-in-two-passes",
+    "hash": "a071f93f75dda0b8",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "The index resolves the wiring in two passes, per [[spec/design_output/model#the-index-resolves-in-passes]]. Every wired in-port finds its writer, the types match, and each standard name has one writer. The start refuses loudly on each fault, naming the port.\n\nModules load in any order, so one pass refuses a sound wiring. An instance that crashes then fails the start, where its readers could run on the built-in value.\n\n- `go test ./...` from the root passes\n- a case registers a reader before its writer, and the index starts\n- a case leaves an in-port with no wire and no `built-in` mark, and reads the refusal naming the port\n- a case wires two out-ports to one standard name, and reads the refusal naming both\n- a case wires an in-port to a writer of another type, and reads the refusal naming both types\n- a case names an instance that runs nowhere, and reads the built-in value marked `not provided`\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -1271,6 +1528,13 @@
     "hash": "8b589ca935208ee3",
     "group_hash": "58674cc9df813071",
     "ask": "The pull inserts no person step. A hand-back that meets the refusal cap fails the leaf back with the findings. A step that fails back past the cap drops its hold and answers wait. The owner rules that no step waits for a person on a box. So the escalation verb alone puts a person step in, and only where a person sits beside the box. Done is the two caps in the config gone or renamed, the two insertions in the pull replaced, and the tests reading the fail-back.",
+    "standing": "done"
+  },
+  {
+    "name": "refusals-stay-under-cap",
+    "hash": "aad9bbef8952fdb4",
+    "group_hash": "4724e6dc8e935df8",
+    "ask": "the refusals of stillHeld and handBack print the guidance again through notesSaid, and the draft cuts the work answer alone, so a refusal past the margin still lands on disk as a preview",
     "standing": "done"
   },
   {
@@ -1294,6 +1558,19 @@
     "standing": "done"
   },
   {
+    "name": "rename-rewrites-each-link-once",
+    "hash": "1a93f342d2420516",
+    "ask": "A move under a folder of its own name rewrites every link once, so the tree holds no dead link after it.\n\nA rename into a subfolder of its own name rewrites a link already naming the new path a second time. It also rewrites closed tickets, whose fields the ticket door refuses to any hand.\n\n- `./RUNME.sh rename spec/a.md spec/a/a.md` over a fake tree leaves every link at `spec/a/a`, and a case under `test/level0` decides it\n- the rename leaves a closed ticket as it stands, and the same case reads it\n- `./RUNME.sh check` exits 0",
+    "standing": ""
+  },
+  {
+    "name": "rest-line-names-plain-pull",
+    "hash": "fd5e1ce82fb0516b",
+    "group_hash": "4724e6dc8e935df8",
+    "ask": "the closing line of a cut hand-out names the plain pull, with --as where the hold carries one, and no ticket name, because pull in src/scripts/pull.js sends a name with a held leaf to handBack, and stillHeld stands behind that road",
+    "standing": "done"
+  },
+  {
     "name": "retro-65c3028",
     "hash": "2a372102f7983053",
     "ask": "The owner asks for a retro, and private notes stand open.",
@@ -1306,10 +1583,17 @@
     "standing": ""
   },
   {
+    "name": "retro-check-names-the-process",
+    "hash": "a11e418133ffad80",
+    "group_hash": "e2e7fc62294dc664",
+    "ask": "rules 4 and 5 of spec/guidance/retro/check name a ticket name, a gain, a breaks and a done_when as what an open class and a promotion carry, so a hand following them writes no process and the new ticketFaults refuses every mint; add process to both rules and to the fixtures of test/level0/retro-mint.test.js",
+    "standing": "done"
+  },
+  {
     "name": "retro-verbs-become-actions",
-    "hash": "afcd06c42f5e8a14",
-    "group_hash": "ed7b6aa1a40118be",
-    "ask": "The `retro` verbs become actions returning operations, in shadow against `cli.js`.\n\nA retro collect runs long, and a handle keeps its caller free.\n\n- - `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
+    "hash": "2f663c3928cc1c40",
+    "group_hash": "bdcecf4ff613c42f",
+    "ask": "The `retro` verbs become actions answering within the wait their caller sets, in shadow against `cli.js`.\n\nA retro collect runs long, and the wait keeps its caller free.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -1320,9 +1604,9 @@
   },
   {
     "name": "runme-hands-verbs-to-quack",
-    "hash": "4f334a307eb5b535",
-    "group_hash": "ed7b6aa1a40118be",
-    "ask": "`./RUNME.sh` hands a verb `quack` knows to it, and every other verb to `cli.js`. The key `slices.verbs` holds the road.\n\nThe old verbs keep working while each topic ports.\n\n- a case runs one ported verb and one unported verb through `./RUNME.sh`\n- `./RUNME.sh check` exits 0",
+    "hash": "a19aad7cc0d2ac8e",
+    "group_hash": "bdcecf4ff613c42f",
+    "ask": "`./RUNME.sh` hands a verb `quack` knows to it, and every other verb to `cli.js`. The key `migration/config/slices/verbs` holds the road.\n\nThe old verbs keep working while each topic ports.\n\n- a case runs one ported verb and one unported verb through `./RUNME.sh`\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -1368,8 +1652,8 @@
   },
   {
     "name": "sidebar-lands-in-shadow",
-    "hash": "f29d45acb51f5663",
-    "ask": "Phase 8 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the extension. A generic sidebar and form renderer, and `spec/config/level0.schema.json` generated from the declarations. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
+    "hash": "40eabb01a9ae9918",
+    "ask": "Phase 8 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the extension. A generic sidebar and form renderer, and `spec/config/level0.schema.json` generated from the declarations. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/sidebar`, which the `migration` module declares as a shared key in the default file.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
     "standing": "todo"
   },
   {
@@ -1381,8 +1665,8 @@
   },
   {
     "name": "sidebar-switches-over",
-    "hash": "6bb290f47d2281db",
-    "ask": "Phase 8 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase8switch` to read true in the tracked config on `main`.\n\nDone when the extension spawns no verb and reads no file itself.",
+    "hash": "12b43e82e40e1b77",
+    "ask": "Phase 8 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration/config/slices/` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase8switch` to read true in the tracked config on `main`.\n\nDone when the extension spawns no verb and reads no file itself.",
     "standing": "todo"
   },
   {
@@ -1407,10 +1691,31 @@
     "standing": "done"
   },
   {
+    "name": "stale-fields-reach-test-schema",
+    "hash": "06543ee20ccbbfe7",
+    "group_hash": "e2e7fc62294dc664",
+    "ask": "SCHEMA in test/level0/pull-schema.js copies the record shape of the ticket schema, so inputs, def and stale land there beside spec/schemas/ticket.schema.yaml",
+    "standing": "done"
+  },
+  {
     "name": "stale-marks-follow-the-provider",
     "hash": "73118a2dc96bdc5c",
     "group_hash": "a7084480bf119925",
     "ask": "key a stale mark by the provider, not the topic. The watchdogs note names a part as a process, a door or a provider. A sibling provider under the same topic stays current.",
+    "standing": "done"
+  },
+  {
+    "name": "stale-names-keep-their-value",
+    "hash": "b25f5eaaa71b246b",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "A name whose provider's lease expires keeps its last value, marked `stale since \u003ctime\u003e`, per [[spec/design_output/model#a-stale-mark]].\n\nA stale value falling back to its built-in value reads as a fact nobody computed.\n\n- `go test ./...` from the root passes\n- a case lets a lease expire, and reads the last value with its mark\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
+    "name": "stale-shares-the-bless-hash",
+    "hash": "8982fd5059b98759",
+    "group_hash": "e2e7fc62294dc664",
+    "ask": "hashText in src/scripts/pull-bless.js hashes a chapter for the bless already, so the stale read takes its chapter hash from one function both modules import",
     "standing": "done"
   },
   {
@@ -1443,10 +1748,16 @@
   },
   {
     "name": "surfaces-get-specified",
-    "hash": "d3b5211b67b70326",
-    "group_hash": "5739d30471f2d16d",
+    "hash": "206c35281ac31e8c",
+    "group_hash": "e98c0716a9c298ab",
     "ask": "A design note specifies a module as one file, and how the registry builds every\nsurface off it. The surfaces are the command line, HTTP with its OpenAPI\ndocument, SSE, MCP, the hook tools, the editor and the window. It names `q.Doc`, `q.Show` and `q.Cfg`.\n[[spec/design_input/the-index-holds-the-model#a-module-is-one-file]] asks it. So\ndoes [[spec/design_input/the-index-holds-the-model#the-registry-builds-each-surface]].\n\nThe foundation builds the `q` core and the `/v1` routes on this note. Without\nit each surface names its own shapes again.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- `./RUNME.sh check` exits 0",
     "standing": "done"
+  },
+  {
+    "name": "sync-takes-origin-main",
+    "hash": "ed83483b25faf640",
+    "ask": "A desk session that commits on `main` takes the remote's `main` in through a verb. So its push lands after another box pushes first.\n\nToday a desk whose `main` parts from the remote stands with no road to push:\n\n- `branch sync` refuses on `main`\n- `branch merge` takes work and cloud branches alone\n- level zero refuses `git pull` and `git merge`\n\nDone when:\n\n- `./RUNME.sh branch sync` on `main` merges `origin/main` in. A case in `test/level0/work-sync.test.js` decides it\n- on a conflict it stops, names the files, and leaves the merge to the hand. The same file holds a case for it\n- on a work branch it takes `main` in as it does today. The same file holds a case for it\n- `./RUNME.sh check` exits 0",
+    "standing": ""
   },
   {
     "name": "terms-mean-themselves",
@@ -1481,8 +1792,8 @@
   },
   {
     "name": "the-badge-reads-open-tasks",
-    "hash": "7cbe46ea6ddc7681",
-    "group_hash": "89689ded83566c3a",
+    "hash": "2edd4d1d9fe9c91d",
+    "group_hash": "5b5a343774b742ba",
     "ask": "The key moves to `new`, and the sidebar badge and the window's work header both read `work/open-tasks`.\n\nThe two numbers stop disagreeing. One commit on the key rolls it back.\n\n- a case holds the badge and the header to one value\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
@@ -1549,7 +1860,7 @@
   {
     "name": "the-bridge-server-leaves",
     "hash": "5b33dfa0269a41d9",
-    "group_hash": "1e4a288a04fcb375",
+    "group_hash": "0c191a65ec5a72fc",
     "ask": "`src/bridge`'s server and `copilot-runtime.js` leave the tree, with their cases.\n\nA second cage drifts from the first.\n\n- `git ls-files src/bridge/server.js .claude/skills/level0/lib/copilot-runtime.js` answers nothing\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
@@ -1590,6 +1901,13 @@
     "hash": "85118058e7230523",
     "group_hash": "e5c9030ea0f46dcf",
     "ask": "`ticketFaults` in `src/bridge/write.js` comes from `.claude/skills/level0/lib/ticket.js` and checks the ticket fields, so the callers list drops it",
+    "standing": "done"
+  },
+  {
+    "name": "the-callers-name-dueHandOut",
+    "hash": "030161cc0111bedd",
+    "group_hash": "4724e6dc8e935df8",
+    "ask": "the callers list names ephemeralPull as a caller of handed, and dueHandOut in src/scripts/ephemeral-pull.js makes that call",
     "standing": "done"
   },
   {
@@ -1702,10 +2020,17 @@
     "standing": "done"
   },
   {
+    "name": "the-config-module-resolves-layers",
+    "hash": "be10d1afe9947a50",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "The config module stands under `src/modules/config`, loaded always, per [[spec/design_output/model#the-config-module]]. It owns every `\u003cinstance\u003e/config/\u003ckey\u003e`, and resolves each key off its layers: override, context, environment, local, default and built-in. A declaring module names its keys locally, and reads them like any other input.\n\nA key then answers one value off one resolver, and a script's own values leave with the script, even on a crash.\n\n- `go test ./...` from the root passes\n- a case declares `weight` in a module, and reads `\u003cinstance\u003e/config/weight` as its input\n- a case lets a context's lease run out, and reads the layer below\n- a case nests two contexts, and reads the inner one win and hand back on exit\n- a case opens two unrelated contexts on one key, and reads the refusal naming the holder\n- a case sets a shared key in every other layer, and reads the default file's value\n- a case sets an override over a context, and reads the override win\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
     "name": "the-config-schema-gets-generated",
-    "hash": "5fb69273d47d8d08",
-    "group_hash": "f29d45acb51f5663",
-    "ask": "`spec/config/level0.schema.json` comes from the `q.Cfg` and `q.Show` declarations.\n\nThe schema then says what the code declares.\n\n- - `go test ./...` from the root passes\n- a regeneration over the tree leaves `git diff` empty\n- `./RUNME.sh check` exits 0",
+    "hash": "df4f79722eb064c5",
+    "group_hash": "40eabb01a9ae9918",
+    "ask": "`spec/config/level0.schema.json` comes off the `q.Cfg` registrations and the `q.Show` declarations. `spec/config/level0.json`, the default file, keys by instance and then by key, and keeps the values someone sets alone. The `migration` switches keep their block, as shared keys of the `migration` module.\n\nThe schema then says what the code declares. It waits for this phase, because the extension's own keys leave JavaScript here.\n\n- `go test ./...` from the root passes\n- a regeneration over the tree leaves `git diff` empty\n- `spec/config/level0.json` holds no key at its built-in value\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -1717,8 +2042,8 @@
   },
   {
     "name": "the-count-chain-leaves",
-    "hash": "f71a54e6beaf9635",
-    "group_hash": "89689ded83566c3a",
+    "hash": "609d080d6008b3be",
+    "group_hash": "5b5a343774b742ba",
     "ask": "The count chain leaves the tree: `./RUNME.sh tui work --count`, the window's own count, and the old path behind the key.\n\nFour processes a redraw leave the box. Without the delete the old path drifts beside the new one.\n\n- `grep -rn -- '--count' src/extension src/tui` finds no count chain\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
@@ -1731,7 +2056,7 @@
   {
     "name": "the-decisions-get-rationales",
     "hash": "c2b8b593a061b7c7",
-    "group_hash": "5739d30471f2d16d",
+    "group_hash": "e98c0716a9c298ab",
     "ask": "A rationale argues each ruling in [[spec/design_input/the-index-holds-the-model]] and [[spec/design_input/the-migration-runs-in-slices]] that none argues yet. [[spec/design_input/the-migration-runs-in-slices#the-settled-rulings]] names the ones argued already.\n\nThe owner settles these and wants no box to ask again. A box finds the argument before it decides.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- each rationale says the ruling is final, what it gives up, and what makes it wrong\n- `./RUNME.sh check` exits 0",
     "standing": "done"
   },
@@ -1798,9 +2123,9 @@
   },
   {
     "name": "the-doors-process-stands",
-    "hash": "49b7afebdd5240b9",
-    "group_hash": "2e858d038e423c69",
-    "ask": "The doors run in one process of their own, and the index reaches them over the inner protocol.\n\nThe operating system then holds the boundary.\n\n- - `go test ./...` from the root passes\n- a case kills the fake doors process, and reads its names as stale\n- `./RUNME.sh check` exits 0",
+    "hash": "fd65cad098139b7b",
+    "group_hash": "4c327d864c2e851f",
+    "ask": "`quack io` runs the IO modules holding a listener in one process of their own, per [[spec/design_output/model#the-io-process]]. The index reaches them over the inner protocol.\n\nThe operating system then holds the boundary.\n\n- `go test ./...` from the root passes\n- a case kills the fake IO process, and reads its names at their built-in values, with the mark `not provided`\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -1852,9 +2177,9 @@
   },
   {
     "name": "the-engine-holds-the-route",
-    "hash": "552b1110aafd4b70",
+    "hash": "f33fa4763db43a28",
     "ask": "A hand meets one step at a time. The engine holds the route, writes the ticket file, runs the gates and closes a process on its final acceptance. [[spec/design_input/level-two]] asks it, and its chapters The loop, Gates and The final acceptance hold the detail.",
-    "standing": "todo"
+    "standing": "done"
   },
   {
     "name": "the-engine-restores-its-fields",
@@ -1865,9 +2190,9 @@
   },
   {
     "name": "the-extension-reads-no-files",
-    "hash": "6baa88394e52d3ef",
-    "group_hash": "6bb290f47d2281db",
-    "ask": "`slices.sidebar` moves to `new`. The extension spawns no verb and reads no file itself.\n\nThe extension then shows what the index holds, and computes nothing.\n\n- `git grep -n 'spawn(' src/extension` names no verb spawn\n- `./RUNME.sh check` exits 0",
+    "hash": "a5d910d54a48225f",
+    "group_hash": "12b43e82e40e1b77",
+    "ask": "`migration/config/slices/sidebar` moves to `new`. The extension spawns no verb and reads no file itself. A new window sets its values as overrides, and wipes the local file no more.\n\nThe extension then shows what the index holds, and computes nothing.\n\n- `git grep -n 'spawn(' src/extension` names no verb spawn\n- a case opens a new window over a local file, and reads the file unchanged\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -1892,6 +2217,12 @@
     "standing": "done"
   },
   {
+    "name": "the-foundation-closes-its-gaps",
+    "hash": "aeedc84ef4c11364",
+    "ask": "Phase 1 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], closing its gaps. It builds what the foundation group leaves unbuilt. It also builds what the owner's rulings ask: a dumb core, every part a module, and the contract suites.\n\nDone when every child closes through the command it names, and `./RUNME.sh check` passes on Linux and Windows.",
+    "standing": "todo"
+  },
+  {
     "name": "the-foundation-lands-unchanged",
     "hash": "a7084480bf119925",
     "ask": "Phase 1 of [[spec/design_input/the-migration-runs-in-slices#the-phases]]: the foundation, with no change in behaviour. One Go module, the pure Go driver for SQLite, the `q` core, the `/v1` door, the import check, a Windows job, and the Go frontmatter writer.\n\nDone when the index answers `/v1` and the old API side by side, and the check stands green on Linux and Windows.",
@@ -1905,10 +2236,10 @@
   },
   {
     "name": "the-golden-keys-group-hash",
-    "hash": "eea2e62f049c861b",
-    "group_hash": "365354e1371b531d",
+    "hash": "31c76adf9fe8e12c",
+    "group_hash": "0bd74940eb382a54",
     "ask": "a golden row keys on the ticket's own hash, yet a child's standing reads its group. A take moves the group's record and flips the child's standing while the child's hash stands, so `TestTreeGolden` goes red. Key a child's row on its group's hash too.",
-    "standing": "held"
+    "standing": "done"
   },
   {
     "name": "the-group-leaves-at-todo",
@@ -1919,9 +2250,9 @@
   },
   {
     "name": "the-guidance-topic-lands",
-    "hash": "895c4c2355cb9032",
-    "group_hash": "9760080a11bfe86d",
-    "ask": "The `guidance/` topic answers the rules a step reads.\n\nThe guidance a step hands out then comes from one place.\n\n- - `go test ./...` from the root passes\n- a golden file holds the rules the old path and the new one hand for every leaf of every process\n- `./RUNME.sh check` exits 0",
+    "hash": "902255217d1d92e1",
+    "group_hash": "51ea7078cf653973",
+    "ask": "The `guidance/` topic answers the rules a step reads.\n\nThe guidance a step hands out then comes from one place.\n\n- `go test ./...` from the root passes\n- a golden file holds the rules the old path and the new one hand for every leaf of every process\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -1966,15 +2297,15 @@
   },
   {
     "name": "the-hook-protocol-gets-specified",
-    "hash": "6aa2a7df6a6c915a",
-    "group_hash": "5739d30471f2d16d",
+    "hash": "771c1553162e6fb7",
+    "group_hash": "e98c0716a9c298ab",
     "ask": "A design note specifies the answer protocol between the hook module and the index. It covers streaming, context fill, transcript rows, clear and resubmit, `model.classify` and `ui.log`. It names the tool list the build writes for the session start. [[spec/design_output/migration#the-gaps-and-their-answers]] asks it.\n\nPhase 5 ports the cage onto this protocol. The hook answers more than a forward, and a port missing a road breaks a session.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- `./RUNME.sh check` exits 0",
     "standing": "done"
   },
   {
     "name": "the-hook-registers-index-tools",
     "hash": "e18474f9d7e5a043",
-    "group_hash": "ed7b6aa1a40118be",
+    "group_hash": "bdcecf4ff613c42f",
     "ask": "The hook module registers the tool list the index generates, beside the tools it registers today.\n\nA tool then costs one action, and every harness picks it up.\n\n- a case under `test/level0` reads the generated list and registers each tool\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
@@ -1993,9 +2324,9 @@
   },
   {
     "name": "the-hooks-door-lands",
-    "hash": "34dea767729d74fe",
-    "group_hash": "5e3d3833f2887481",
-    "ask": "The hooks door stands, with fold providers for `session/`, and answers each event beside the bridge server.\n\nEvery cage rule after this one runs on it.\n\n- - `go test ./...` from the root passes\n- an inbound fake replays a recorded hook event, and the door answers it\n- `./RUNME.sh check` exits 0",
+    "hash": "2c24f3c4b341e551",
+    "group_hash": "c8f5eaf75447c212",
+    "ask": "The `hooks` IO module stands under `src/modules/hooks`, flagged with `q.IO()`, and writes `session/\u003cid\u003e/events`. The fold modules answer `session/`, and the cage answers each event beside the bridge server.\n\nEvery cage rule after this one runs on it.\n\n- `go test ./...` from the root passes\n- an inbound fake replays a recorded hook event, and `session/\u003cid\u003e/events` holds it\n- the IO module's test runs over `qtest` and its inbound fake\n- a case ends an operation after its call answers, and reads the result in the session's next turn\n- a case ends a turn with an operation running, and reads the Stop hook name it\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -2020,7 +2351,7 @@
   },
   {
     "name": "the-import-rules-get-checked",
-    "hash": "a6bd01d2605a0af9",
+    "hash": "e1313f0127305d19",
     "group_hash": "a7084480bf119925",
     "ask": "A `go/analysis` check holds the import rules: a module imports no door, and a door or a renderer imports no module. `./RUNME.sh check` runs it. [[spec/design_input/the-index-holds-the-model#the-build-holds-the-rules]] asks it.\n\nThe model stays whole only while a door special-cases no name. Without the check a single import brings the eleven-file change back.\n\n- - `go test ./...` from the root passes\n- a case plants a module importing a door, and the check names it\n- `./RUNME.sh check` exits 0",
     "standing": "done"
@@ -2041,7 +2372,7 @@
   },
   {
     "name": "the-index-answers-v1",
-    "hash": "ddb87cfda100ce89",
+    "hash": "e277d08114cb0c5a",
     "group_hash": "a7084480bf119925",
     "ask": "The index answers `/v1` over HTTP through Huma, on its own port, beside the API it answers today, with `openapi.json` and `/docs`. [[spec/design_input/the-index-holds-the-model#the-registry-builds-each-surface]] asks it.\n\nEvery surface after this one reads names over `/v1`. The old API stays, so nothing that reads it today breaks.\n\n- - `go test ./...` from the root passes\n- a case reads a name over `/v1` and over the old API from one running index\n- `./RUNME.sh check` exits 0",
     "standing": "done"
@@ -2054,16 +2385,23 @@
     "standing": "done"
   },
   {
+    "name": "the-index-meets-fake-modules",
+    "hash": "100270382296bad8",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "A fake module drives the index through every transaction a module makes, per [[spec/design_output/model#the-index-meets-fake-modules]]. The index's own tests run over it, and none of them leans on a real module.\n\nThe index then tests against the contract its modules see. A change to the core shows its effect on every module at once.\n\n- `go test ./...` from the root passes\n- a case reads the passes over the wiring, and the refusal of an in-port left open\n- a case reads a write refused from a module registering no such output\n- a case reads one snapshot, the commit and the push\n- a case reads the built-in value marked `not provided` for a writer running nowhere\n- a case reads the stale mark after a lease expires\n- a case reads writing actions run one at a time, and a read answering while one runs\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
     "name": "the-index-model-gets-specified",
     "hash": "d016217a68f93a49",
-    "group_hash": "5739d30471f2d16d",
+    "group_hash": "e98c0716a9c298ab",
     "ask": "A design note specifies the index model: names, providers and defaults, `q.Derived`, and `q.Fold` over `session/`. It covers actions as door calls with an undo each, snapshots and revisions, the catalog check at start, and `quack why`. [[spec/design_input/the-index-holds-the-model#one-owner-per-name]] asks it. So does [[spec/design_input/the-index-holds-the-model#input-processing-output]]. So does [[spec/design_input/the-index-holds-the-model#the-wiring-analyzer]].\n\nEvery later phase builds on this note. Without it each box writes a model of its own.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- the note names the `clock/minute` input and the names under `session/\u003cid\u003e/`, as [[spec/design_output/migration#the-gaps-and-their-answers]] asks\n- `./RUNME.sh check` exits 0",
     "standing": "done"
   },
   {
     "name": "the-inner-protocol-gets-chosen",
-    "hash": "45ccbd84dc14e243",
-    "group_hash": "5739d30471f2d16d",
+    "hash": "722b9be46ffe5bdd",
+    "group_hash": "e98c0716a9c298ab",
     "ask": "This ticket answers both questions in the funnel `spec/funnel/the-inner-protocol-stands-open`. One is the protocol between the index and its processes, and the other is how the editor reaches the LSP door.\n\nThe `q` core of phase 1 speaks the protocol, and phase 7 builds the door. The cloud decides a question itself, and the owner reads the call at the merge.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- a rationale under `spec/rationales` argues each answer\n- the funnel note leaves the tree, and the model's design input names the answers\n- `./RUNME.sh check` exits 0",
     "standing": "done"
   },
@@ -2083,16 +2421,16 @@
   {
     "name": "the-js-twins-leave",
     "hash": "548dfd970bcd665b",
-    "group_hash": "6a111dba45b91db9",
+    "group_hash": "08fb817e98fae66f",
     "ask": "The JavaScript twins leave the tree, with their cases, as the twins row of [[spec/design_output/migration#what-goes-with-no-successor]] lists them.\n\nA twin left standing drifts from its Go copy again.\n\n- `./RUNME.sh check` names no module importing a removed twin\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
     "name": "the-judge-leaves-the-code",
-    "hash": "7616a336d664c29a",
-    "group_hash": "552b1110aafd4b70",
+    "hash": "22c2454bd83616c4",
+    "group_hash": "f33fa4763db43a28",
     "ask": "The engine holds no model call, so every check a hand meets answers the same way twice. [[spec/design_input/level-two]] asks it in its chapter Gates.\n\nToday a dead road stands in the plugin, and a config key turns a model call back on.\n\n- `judged` in `.claude/skills/level0/hooks/pull-tool.js` and every helper of the judge leave the code, with their cases\n- the `judge` key leaves `spec/config/level0.json` and `spec/config/level0.schema.json`\n- `spec/design_output/pull.md` carries no chapter on the judge\n- `./RUNME.sh check` exits 0",
-    "standing": "todo"
+    "standing": "done"
   },
   {
     "name": "the-judge-reads-answer-rules",
@@ -2115,10 +2453,10 @@
   },
   {
     "name": "the-last-gate-accepts",
-    "hash": "840df379cd4105e4",
-    "group_hash": "552b1110aafd4b70",
+    "hash": "23b1b30ae6e23a43",
+    "group_hash": "f33fa4763db43a28",
     "ask": "One acceptance at the top reads the whole work and every prose criterion under it, and the process closes on its verdict. [[spec/design_input/level-two]] asks it in its chapter The final acceptance.\n\nToday a process closes on the claim of its last hand, and a prose criterion stays unread.\n\n- a final acceptance waits until every step and fix ticket under it closes. A case under `test/level0` decides it\n- its second run reads the diff since the tip of its last verdict, with the merges, and runs every command. A case under `test/level0` decides it\n- past its cap, the process closes `became` onto a question ticket. A case under `test/level0` decides it\n- a process inside a delivery ends after implement, and the final acceptance of the delivery reads it. A case under `test/level0` decides it\n- `./RUNME.sh check` exits 0",
-    "standing": "todo"
+    "standing": "done"
   },
   {
     "name": "the-layer-reaches-sessions",
@@ -2148,23 +2486,23 @@
   },
   {
     "name": "the-log-becomes-a-view",
-    "hash": "9eff9a60a35808b0",
-    "group_hash": "1a169c0d3e0bd644",
-    "ask": "The log becomes a declared view over `log/`.\n\nThe log view then reads the rows one owner holds.\n\n- - `go test ./...` from the root passes\n- a case draws the log view over fake rows\n- `./RUNME.sh check` exits 0",
+    "hash": "a460caac89ecd604",
+    "group_hash": "9cd93ef2ef136d9d",
+    "ask": "The log becomes a declared view over `log/`.\n\nThe log view then reads the rows one owner holds.\n\n- `go test ./...` from the root passes\n- a case draws the log view over fake rows\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
     "name": "the-log-topic-lands",
-    "hash": "6ce793caf7d53d0e",
-    "group_hash": "9760080a11bfe86d",
-    "ask": "The `log/` topic holds the session rows and the level ladder once.\n\nThree readers of a row stand today, and the ladder stands twice.\n\n- - `go test ./...` from the root passes\n- a golden file holds the rows the old readers and the new one read off one session log\n- `./RUNME.sh check` exits 0",
+    "hash": "32a7bdf327dc4b69",
+    "group_hash": "51ea7078cf653973",
+    "ask": "The `log/` topic holds the session rows and the level ladder once.\n\nThree readers of a row stand today, and the ladder stands twice.\n\n- `go test ./...` from the root passes\n- a golden file holds the rows the old readers and the new one read off one session log\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
     "name": "the-lsp-door-lands",
-    "hash": "902f02d6fd8fb0aa",
-    "group_hash": "74e992859de1a0b2",
-    "ask": "The LSP door stands, in the shape phase 0 chooses, and relays the editor to the check module.\n\nThe editor then reaches the one model.\n\n- - `go test ./...` from the root passes\n- an inbound fake replays a recorded LSP session, and the door answers it\n- `./RUNME.sh check` exits 0",
+    "hash": "ae0c7ee368b0e7c9",
+    "group_hash": "c87c9084b3a3c500",
+    "ask": "The `lsp` IO module stands, and `quack lsp` relays the editor's stdio to it, as [[spec/design_output/model#the-editor-starts-quack-lsp]] says. It hands each request to the check module through the index.\n\nThe editor then reaches the one model.\n\n- `go test ./...` from the root passes\n- an inbound fake replays a recorded LSP session, and the IO module answers it\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -2175,9 +2513,16 @@
   },
   {
     "name": "the-lsp-server-leaves",
-    "hash": "615a9fd2c06ddb5e",
-    "group_hash": "136d4cd96f35cd9b",
-    "ask": "`slices.lsp` moves to `new`, and the LSP's own server, port and index client leave the tree.\n\nA second server drifts from the model.\n\n- `git grep -n 'lsp.json' src` answers nothing\n- `./RUNME.sh check` exits 0",
+    "hash": "c14b3ac8fbe80799",
+    "group_hash": "64bb9910aaf279f1",
+    "ask": "`migration/config/slices/lsp` moves to `new`, and the LSP's own server, port and index client leave the tree.\n\nA second server drifts from the model.\n\n- `git grep -n 'lsp.json' src` answers nothing\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
+    "name": "the-manager-becomes-a-module",
+    "hash": "e622c8a12aa7c59b",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "The index's own management moves into one module file with `q.IO()`, in the package `src/modules/index`. The index always loads it, per [[spec/design_output/model#the-index-manager]]. It holds the operations, the leases and the alarms, and writes `index/`, `ops/\u003cid\u003e` and `session/alarms` as registered outputs.\n\nThe core then holds no logic of its own. The manager tests like every IO module, over `qtest` and the fakes of its outside.\n\n- `go test ./...` from the root passes\n- `src/ops` and `src/watchdog` fold into the package `src/modules/index` beside the manager's file, which `go list ./src/modules/index/...` shows\n- a case starts the index with no other module, and reads the manager loaded\n- a case reads the manager as the writer of `ops/\u003cid\u003e`, `session/alarms` and `index/health`\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -2188,8 +2533,8 @@
   },
   {
     "name": "the-migration-writes-its-specs",
-    "hash": "5739d30471f2d16d",
-    "ask": "Phase 0 of [[spec/design_input/the-migration-runs-in-slices#the-phases]]: the specs every later phase builds on, and every open question answered. A box reads the settled rulings there first, and asks none of them again.\n\nDone when [[spec/design_output/inner-protocol]] names the inner protocol and the LSP door. A design note covers each part of the model.",
+    "hash": "e98c0716a9c298ab",
+    "ask": "Phase 0 of [[spec/design_input/the-migration-runs-in-slices#the-phases]]: the specs every later phase builds on, and every open question answered. A box reads the settled rulings there first, and asks none of them again.\n\nDone when [[spec/design_output/model#the-inner-protocol]] names the inner protocol and the LSP door. A design note covers each part of the model.",
     "standing": "done"
   },
   {
@@ -2335,10 +2680,16 @@
     "standing": "done"
   },
   {
+    "name": "the-probe-carries-the-login",
+    "hash": "6c287707975403f8",
+    "ask": "The cold probe passes on a desk, so a desk lands its own commit on the cold path.\n\nThe probe runs the client under an empty config folder, and the client answers `Not logged in`. So every cold probe fails on a desk, and every commit touching the bridgehead or the server stays refused there.\n\n- the probe copies the desk's login file into its fresh config folder, where one stands. A case in `test/level0/probe-cold.test.js` decides it\n- a desk with no login file carries none, and the same file holds a case for it\n- `./RUNME.sh probe cold` answers PASS on this desk\n- `./RUNME.sh check` exits 0",
+    "standing": ""
+  },
+  {
     "name": "the-process-stays-editable",
-    "hash": "5a8369129a22372f",
+    "hash": "e2e7fc62294dc664",
     "ask": "A moved input marks exactly the steps that read it, and a process stays editable while it runs. A gate asks a bless where its process says, and the retro reads the backlog. [[spec/design_input/level-two]] asks it in its chapters Evidence and stale steps, The bless and The other processes.",
-    "standing": "todo"
+    "standing": "done"
   },
   {
     "name": "the-pull-names-the-unblock",
@@ -2375,16 +2726,16 @@
   },
   {
     "name": "the-q-core-holds-names",
-    "hash": "e3b4642a6e852667",
+    "hash": "2abc1a76fb13731a",
     "group_hash": "a7084480bf119925",
     "ask": "The `q` core stands: names, providers and defaults, `q.Derived` and `q.Fold`, snapshots and revisions, and the catalog check that refuses a start. The phase 0 note on the index model says the shape.\n\nEvery module after this one registers through it. Without it no name has one owner.\n\n- - `go test ./...` from the root passes\n- a case each refuses a catalog with a name twice, a missing default, and two active providers\n- `./RUNME.sh check` exits 0",
     "standing": "done"
   },
   {
     "name": "the-quack-cli-gets-generated",
-    "hash": "f302cd1503043ccb",
-    "group_hash": "ed7b6aa1a40118be",
-    "ask": "`quack` builds its command tree off the registry, with help from each `q.Doc`. [[spec/design_input/the-index-holds-the-model#the-registry-builds-each-surface]] asks it.\n\nA command then costs no hand-written verb.\n\n- - `go test ./...` from the root passes\n- a case reads the help of a fake action off `quack --help`\n- `./RUNME.sh check` exits 0",
+    "hash": "42a601f409ac0836",
+    "group_hash": "bdcecf4ff613c42f",
+    "ask": "`quack` builds its command tree off the registry, with help from each `q.Doc`. [[spec/design_input/the-index-holds-the-model#the-registry-builds-each-surface]] asks it.\n\nA command then costs no hand-written verb.\n\n- `go test ./...` from the root passes\n- a case reads the help of a fake action off `quack --help`\n- a case runs a slow fake action, and reads `quack run` follow it and `--detach` answer at once\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -2395,6 +2746,13 @@
     "standing": "done"
   },
   {
+    "name": "the-queue-becomes-a-module",
+    "hash": "62d5bcacbcc52f11",
+    "group_hash": "d2524f63ae4e34f1",
+    "ask": "The queue, its score, its outline and its places, becomes `src/modules/queue`, and its tests run through `q/qtest` alone. Its in-ports take the tickets, the plan file, the cloud marker and the minute, and the wiring binds them. It reads no git ref. The port [[spec/tickets/the-queue-moves-to-plan]] lands is where it starts, with its golden file.\n\nThe count reads the queue. Without the move the pilot reads a port the owner's rule of a fake index leaves outside.\n\n- `go test ./...` from the root passes\n- the golden file of the queue runs through `qtest`\n- `onlyq` passes over `src/modules/queue`\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
     "name": "the-queue-is-a-score",
     "hash": "eac9218b4493544b",
     "group_hash": "416f442cd965ab3d",
@@ -2403,10 +2761,16 @@
   },
   {
     "name": "the-queue-moves-to-plan",
-    "hash": "12fd9615fa5e330c",
-    "group_hash": "365354e1371b531d",
+    "hash": "367b5babc2dd7a0f",
     "ask": "The `plan/` module and the queue stand, ported from `pull-outline.js` and `pull-queue.js`.\n\nThe count reads the queue. Without the port the pilot reads JavaScript it means to replace.\n\n- - `go test ./...` from the root passes\n- a golden file holds the queue order `./RUNME.sh branch list --queue` answers today\n- `./RUNME.sh check` exits 0",
-    "standing": "held"
+    "standing": ""
+  },
+  {
+    "name": "the-queue-reads-the-marker",
+    "hash": "404678e8ad290d62",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "The queue reads `cloud: true` on a group ticket for the group's place in the cloud, and reads no git ref for it. [[spec/rationales/git-stays-the-archive]] argues it.\n\nThe marker exists so the queue reads files alone. Until the queue reads it, every count still reads git.\n\n- a case with a marked group and no branch reads the group as the cloud's\n- a case with a branch and no marker reads the group as the desk's\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
   },
   {
     "name": "the-queue-views-agree",
@@ -2497,10 +2861,10 @@
   },
   {
     "name": "the-retro-reads-the-backlog",
-    "hash": "2208bde44f40b598",
-    "group_hash": "5a8369129a22372f",
+    "hash": "0595ca655dffc731",
+    "group_hash": "e2e7fc62294dc664",
     "ask": "The retro mints each class onto the process it needs, and reads every prose criterion the backlog closes. [[spec/design_input/level-two]] asks it in its chapters The trivial ticket and The other processes.\n\nToday `src/engine/retro/mint.js` writes every class as a standard ticket, and a prose criterion in the backlog stays unread.\n\n- `retro mint` mints each class onto the process the class names, and refuses a class naming none. A case in `test/level0/retro-mint.test.js` decides it\n- `spec/processes/retro.yaml` carries a backlog check after the audit, which reads each prose criterion the window closes. A case under `test/level0` decides it\n- `./RUNME.sh check` exits 0",
-    "standing": "todo"
+    "standing": "done"
   },
   {
     "name": "the-retro-runs",
@@ -2561,6 +2925,13 @@
     "group_hash": "416f442cd965ab3d",
     "ask": "`.se` holds two unrelated things under one name. What the engine writes to know\nits own state sits beside work a reader wants, so no rule reaches one without\nreaching the other. The index skips the whole folder today, and a reader loses\nthe half worth reading.\n\n`.se/.runtimetime` takes the engine's own state, and the rest of `.se` stays what a\nreader reads:\n\n| what moves to `.se/.runtimetime` | what it is |\n|---|---|\n| `index.db`, `index.json` | the index, and where its door stands |\n| `log/` | the session log, the server log, and the rotations |\n| `level0.stamp`, `session.json` | what a session writes to know itself |\n| `config.json` | the values a window holds for its own session |\n| `check.json`, `check.log` | the battery |\n| `hold/`, `vehicle.json`, `show-panel` | the holds, the pointer, and the flag |\n| `bin/` | the binaries the install puts there |\n| `review/` | a git worktree, which is a second checkout of the whole tree |\n| `measure/` | what the voice verb writes, one file a span |\n\n| what stays under `.se` | why a reader wants it |\n|---|---|\n| `tickets/` | the to-dos a box mints, which a board draws |\n| `scripts/` | what a hand writes, and a handover names |\n| `retro/` | what a hand answers at the end |\n| `notes/` | what a hand writes down, which the privacy door reads |\n\n`review/` earns its place in `runtime` on its own. `git worktree add --detach\n.se/review/\u003cbranch\u003e` opens a whole checkout there. A walk over it reads the\ntree twice, so every row doubles and every search answers each line twice.\n[[spec/design_output/review#a-worktree-runs-the-check]]\n\n`~/.se/vehicles` sits in the home of the box, outside this tree, so nothing\nhere reaches it.\n\nThe index then skips `.se/.runtimetime` alone, and walks the rest. Two faults go\nwith that change:\n\n- The index walking `.se` reads its own database, and a write to it marks its\n  own rows dirty.\n- The session log grows a line a door call, so a walk over it sweeps on every\n  line.\n- `review/` holds a whole checkout, so a walk reads the tree a second time.\n\nBoth live under `runtime` after this, so the skip is one path and the reason is\none sentence.\n\nThe gain is a rule that reads. A folder named `runtime` says what it holds, and\na reader needs no list to know what the index passes.\n\n- `.se/.runtimetime` holds every file the table above names\n- the index skips `.se/.runtimetime`, and walks the rest of `.se`\n- a write under `.se/tickets` marks the rows dirty, and a reader sees it\n- a write to the log sweeps nothing\n- `node --test \"test/level0/*.test.js\"` is green\n- `./RUNME.sh check` is green",
     "standing": "done"
+  },
+  {
+    "name": "the-scheduler-runs-providers",
+    "hash": "4a7be6b6de574350",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "The index runs a derived provider when an input moves, and keeps one run pending while one runs. It runs no provider twice at once, per [[spec/design_output/model#the-provider-kinds]].\n\nNothing runs a provider today when its input moves, so a value stands at its built-in value until a caller runs it by hand.\n\n- `go test ./...` from the root passes\n- a case moves an input and reads the provider's new value\n- a case moves an input twice during a run, and reads one pending run and no overlap\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
   },
   {
     "name": "the-scratchpad-reads-absolute",
@@ -2631,7 +3002,7 @@
   {
     "name": "the-sidebar-renders-generically",
     "hash": "8a5198edf26decf8",
-    "group_hash": "f29d45acb51f5663",
+    "group_hash": "40eabb01a9ae9918",
     "ask": "The sidebar and its forms draw off the registry, beside the sidebar that draws today.\n\nA new value then shows in the sidebar with no extension change.\n\n- a case under `test/level0` draws the sidebar over a fake catalog\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
@@ -2665,9 +3036,9 @@
   },
   {
     "name": "the-split-deployment-takes-over",
-    "hash": "18c518f29bd9767c",
-    "group_hash": "f66e6768114bd9c0",
-    "ask": "`slices.processes` moves to `new`, and the one process gives way to the split.\n\nThe model's isolation then holds on every box.\n\n- a case kills one module process, and the others keep answering\n- `./RUNME.sh check` exits 0",
+    "hash": "c8992f10e38d9e7f",
+    "group_hash": "f9ee34c04f6d62d1",
+    "ask": "`migration/config/slices/processes` moves to `new`, and the one process gives way to the split.\n\nThe model's isolation then holds on every box.\n\n- a case kills one module process, and the others keep answering\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -2676,6 +3047,12 @@
     "group_hash": "e9b244cf6cb6c255",
     "ask": "The battery's stamp records what a retro reads for a regression. That is time a test file, and the spawns a run makes with how many are Vale. It is the parts a red run leaves unrun, and the red case's own words.\n\nThe stamp keys the slowest cases on a name two files share. It holds no spawn count, and hides the other parts' drift on a red run.\n\n- the stamp `./RUNME.sh check` writes carries a time a test file, a spawn count and the parts unrun\n- `test/level0/battery.test.js` covers each field off a fixture\n- the retro report draws the new fields under the battery chapter",
     "standing": "done"
+  },
+  {
+    "name": "the-stop-asks-one-line",
+    "hash": "6fff7ebfd4bcbd36",
+    "ask": "The owner reads each answer once. After the stop call, the agent writes the stop line alone, because the answer before the call carries the report.\n\nThe reply of a claim that stands tells the agent to write the answer again. So every stop shows the owner the same answer twice.\n\n- the reply of a claim that stands asks for the line `stop: \u003creason\u003e` alone, and asks for no second answer. A case in `test/level0/stop-door.test.js` decides it\n- a report the answer before the call carries stands for the turn, so the line alone ends it. A case in `test/level0/stop-said.test.js` drives `turn.said`, then the stop, through `decide`\n- `./RUNME.sh check` exits 0",
+    "standing": ""
   },
   {
     "name": "the-stop-line-loops-forever",
@@ -2712,10 +3089,10 @@
   },
   {
     "name": "the-style-carries-the-top",
-    "hash": "54275710c8fb9ff6",
-    "group_hash": "f9f25d046e5846f7",
+    "hash": "97b4f8b4b31e4124",
+    "group_hash": "4724e6dc8e935df8",
     "ask": "Every note at the top of `spec/guidance` reaches every request, and the client reminds the model of it. [[spec/design_input/level-two]] asks it in its chapter Guidance.\n\nToday working, tickets and guidance arrive once in the standing layer, and a long conversation buries them.\n\n- the projection writes every note at the top of `spec/guidance` into `.claude/output-styles/level0.md`. A case under `test/level0` decides it\n- the standing layer carries the canary and the handover alone. A case under `test/level0` decides it\n- `spec/guidance/cloud.md` moves under a subfolder and keeps its `env`. `./RUNME.sh check` reads the move\n- `./RUNME.sh check` exits 0",
-    "standing": "todo"
+    "standing": "done"
   },
   {
     "name": "the-successor-names-a-person",
@@ -2725,9 +3102,9 @@
   },
   {
     "name": "the-system-places-modules",
-    "hash": "4f9df3b8c654a927",
-    "group_hash": "2e858d038e423c69",
-    "ask": "The index places each module topic in a process and supervises it. [[spec/design_input/the-index-holds-the-model#the-system-places-the-processes]] asks it.\n\nA crash stays in one module, and a changed module restarts alone.\n\n- - `go test ./...` from the root passes\n- a case restarts one module, and the index stays warm\n- `./RUNME.sh check` exits 0",
+    "hash": "fe24ae05e78e4e8b",
+    "group_hash": "4c327d864c2e851f",
+    "ask": "The index places each module topic in a process and supervises it. [[spec/design_input/the-index-holds-the-model#the-system-places-the-processes]] asks it.\n\nA crash stays in one module, and a changed module restarts alone.\n\n- `go test ./...` from the root passes\n- a case restarts one module, and the index stays warm\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -2764,10 +3141,10 @@
   },
   {
     "name": "the-tickets-topic-lands",
-    "hash": "752d34400383aa34",
-    "group_hash": "365354e1371b531d",
+    "hash": "2890b339ce3ea8a8",
+    "group_hash": "0bd74940eb382a54",
     "ask": "The `tickets/` module stands, ported from `src/index/ticket.go`, with one reading of the Ask and one held rule.\n\nThree readers of the Ask and three of the held rule disagree today, as [[spec/design_output/migration#the-duplications]] shows.\n\n- - `go test ./...` from the root passes\n- a golden file holds the Ask and the standing of every ticket in the tree\n- `./RUNME.sh check` exits 0",
-    "standing": "held"
+    "standing": "done"
   },
   {
     "name": "the-todo-joins-the-queue",
@@ -2819,16 +3196,16 @@
   },
   {
     "name": "the-tui-becomes-a-shell",
-    "hash": "97e7f8f6d1dcc941",
-    "group_hash": "1a169c0d3e0bd644",
-    "ask": "The window becomes the generic shell: declared views on the left, and `index`, `cli` and `help` on the right.\n\nEvery tool built on this tree then draws in the same shell.\n\n- - `go test ./...` from the root passes\n- a case draws the `index` tab over a fake catalog\n- `./RUNME.sh check` exits 0",
+    "hash": "bca61f02faf6f0c7",
+    "group_hash": "9cd93ef2ef136d9d",
+    "ask": "The window becomes the generic shell: declared views on the left, and `index`, `cli` and `help` on the right.\n\nEvery tool built on this tree then draws in the same shell.\n\n- `go test ./...` from the root passes\n- a case draws the `index` tab over a fake catalog\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
     "name": "the-tui-data-paths-leave",
-    "hash": "3fc362149a7c18b9",
-    "group_hash": "0db8e3ecb84292c8",
-    "ask": "`slices.window` moves to `new`, and the window's own index client, its spawns and its own writes leave the tree.\n\nThe window stops computing a second copy of any value.\n\n- `git grep -n 'branch list --json' src/tui` answers nothing\n- `./RUNME.sh check` exits 0",
+    "hash": "436a4d46dcd6c5d6",
+    "group_hash": "2ea1cf6192c34862",
+    "ask": "`migration/config/slices/window` moves to `new`, and the window's own index client, its spawns and its own writes leave the tree.\n\nThe window stops computing a second copy of any value.\n\n- `git grep -n 'branch list --json' src/tui` answers nothing\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -2952,9 +3329,16 @@
     "standing": "done"
   },
   {
+    "name": "the-watchdog-starts-for-real",
+    "hash": "6f702b4a48163229",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "The index starts `ops` and the watchdog when it runs for real. The heartbeat comes off the index's own work loop, and `Fault(nil)` answers with no panic.\n\nA watchdog nothing starts watches nothing, so a hung part looks healthy.\n\n- `go test ./...` from the root passes\n- a case starts the index and reads its lease renewing off the work loop\n- a case calls `Fault(nil)` and reads no panic\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
     "name": "the-webview-ships-prebuilt",
     "hash": "16d5c243264eebd4",
-    "group_hash": "d3dfd9854169ea00",
+    "group_hash": "5ce5d9a01efaf369",
     "ask": "The webview ships prebuilt, so a box builds none of it.\n\nA box then needs no Node to draw the route.\n\n- a fresh clone opens the webview with no build\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
@@ -2974,10 +3358,10 @@
   },
   {
     "name": "the-window-held-override-goes",
-    "hash": "c65845c286bb1f4c",
-    "group_hash": "365354e1371b531d",
+    "hash": "f81c5128234fc32b",
+    "group_hash": "9cd93ef2ef136d9d",
     "ask": "`Placed` in `src/tui/work/workplaces.go` reads held off the queue place whatever the index answers, a held reading the approach leaves standing against the ask's one held rule.",
-    "standing": "held"
+    "standing": "todo"
   },
   {
     "name": "the-window-keeps-the-binding",
@@ -2992,6 +3376,13 @@
     "group_hash": "3f316d282946889a",
     "ask": "A reader opens one folder to read one tab, and the window's parts stand apart.\n\n`src/tui` holds every file the window builds from, and `ls src/tui/*.go | wc -l`\nanswers how many. A reader wanting the work tab reads them all.\n\n[[spec/tickets/a-rename-reaches-every-note]] carries the folder to its name.\n[[spec/design_output/tui#the-packages-the-window-holds]] names each package and\nwhat it imports. Every import there runs down, so no loop stands.\n\n- `ls src/tui/*.go` names the window's own files, and each tab stands under a folder of its own\n- `go build ./...` under `src/tui` answers 0, so no import loop stands\n- `./RUNME.sh check` answers 0",
     "standing": "done"
+  },
+  {
+    "name": "the-wiring-file-binds-ports",
+    "hash": "8fe24e5947b9326d",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "A module declares local ports alone, with the tag `q:\"\u003cport\u003e\"` on an in-port, and spells no other module's name. `spec/wiring.yaml` names the instances to load and binds each port to a name, per [[spec/design_output/model#the-wiring-file]].\n\nA module then stays local, and one file holds the layout. An alternative calculation is another module type in the wiring, so the `providers.*` keys leave.\n\n- `go test ./...` from the root passes\n- a case wires an out-port and an in-port to one standard name, and reads the value arrive\n- a case wires an in-port port to port, and reads the name `\u003cinstance\u003e/\u003cport\u003e` of its writer\n- a case reads an out-port with no wire as `\u003cinstance\u003e/\u003cport\u003e`\n- a case loads one module type as two instances, each with its own config\n- no module under `src/modules` spells another module's path, which `nomodule` holds\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
   },
   {
     "name": "the-work-answer-lands",
@@ -3042,9 +3433,9 @@
   },
   {
     "name": "the-work-view-gains-actions",
-    "hash": "03409b7ed54f3185",
-    "group_hash": "1a169c0d3e0bd644",
-    "ask": "`spec/views/work.base` gains the name it reads and the actions its keys call, and the window draws it off the index.\n\nThe work view stops computing what it shows.\n\n- - `go test ./...` from the root passes\n- a case draws the work view over a fake `work/rows`\n- `./RUNME.sh check` exits 0",
+    "hash": "5cb1030e7028beff",
+    "group_hash": "9cd93ef2ef136d9d",
+    "ask": "`spec/views/work.base` gains the name it reads and the actions its keys call, and the window draws it off the index.\n\nThe work view stops computing what it shows.\n\n- `go test ./...` from the root passes\n- a case draws the work view over a fake `work/rows`\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -3061,17 +3452,24 @@
   },
   {
     "name": "ticket-verbs-become-actions",
-    "hash": "949ca054c6f4c76c",
-    "group_hash": "ed7b6aa1a40118be",
-    "ask": "The `ticket` verbs become actions returning operations, each in shadow against its `cli.js` twin.\n\nAn agent calls the index, and parses no standard output.\n\n- - `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
+    "hash": "8d775c1ad6aee1e0",
+    "group_hash": "bdcecf4ff613c42f",
+    "ask": "The `ticket` verbs become actions answering within the wait their caller sets, each in shadow against its `cli.js` twin.\n\nAn agent calls the index, and parses no standard output.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
+    "name": "tickets-becomes-a-module",
+    "hash": "0192f182eda05a98",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "`src/tickets` moves to `src/modules/tickets`, as the loaded projection of `spec/tickets/*.md` with the markdown codec, per [[spec/design_output/model#everything-on-disk-mirrors]]. Its in-port takes `files/\u003cpath...\u003e`, and its out-port `all` answers every ticket. The wiring binds both, and its tests run through `q/qtest` by the local port names.\n\nThe index then holds no module's logic, and the tickets module tests like every other.\n\n- `go test ./...` from the root passes\n- the index imports no package under `src/modules`, which `go list -deps ./src/index` shows\n- the golden file of the tickets runs through `qtest`\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
     "name": "tickets-register-in-the-catalog",
-    "hash": "70aa1d99c4835c93",
-    "group_hash": "365354e1371b531d",
+    "hash": "d48103d8a6d988dd",
+    "group_hash": "0bd74940eb382a54",
     "ask": "`tickets/all` registers in `q.Main`, yet `door_test.go` hands `Serve` a `q.New()` catalog, and `Store.Commit` refuses a name its catalog holds no provider of, so the files commit fails. Register it beside `registersFiles`, in the catalog `Serve` takes.",
-    "standing": "held"
+    "standing": "done"
   },
   {
     "name": "tidy-writes-the-go-line",
@@ -3082,21 +3480,21 @@
   },
   {
     "name": "tui-shell-lands-in-shadow",
-    "hash": "1a169c0d3e0bd644",
-    "ask": "Phase 6 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the window. The generic shell, the work view reading names and calling actions, the log as a declared view, and the `index` and `cli` tabs. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
+    "hash": "9cd93ef2ef136d9d",
+    "ask": "Phase 6 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the window. The generic shell, the work view reading names and calling actions, the log as a declared view, and the `index` and `cli` tabs. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/window`, which the `migration` module declares as a shared key in the default file.\n\nDone when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.",
     "standing": "todo"
   },
   {
     "name": "tui-shell-switches-over",
-    "hash": "0db8e3ecb84292c8",
-    "ask": "Phase 6 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase6switch` to read true in the tracked config on `main`.\n\nDone when the window reads its data off the index alone.",
+    "hash": "2ea1cf6192c34862",
+    "ask": "Phase 6 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration/config/slices/` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase6switch` to read true in the tracked config on `main`.\n\nDone when the window reads its data off the index alone.",
     "standing": "todo"
   },
   {
     "name": "v1-values-read-stale",
-    "hash": "ae6e87e3b70a8ec2",
+    "hash": "69b06dd11c22daaf",
     "group_hash": "a7084480bf119925",
-    "ask": "`Snapshot.Stale` stands now. So `GET /v1/values` answers `stale since \u003ctime\u003e` beside the value, per [[spec/design_output/watchdogs#a-stale-mark]].",
+    "ask": "`Snapshot.Stale` stands now. So `GET /v1/values` answers `stale since \u003ctime\u003e` beside the value, per [[spec/design_output/model#a-stale-mark]].",
     "standing": "done"
   },
   {
@@ -3107,9 +3505,9 @@
   },
   {
     "name": "vehicle-verbs-become-actions",
-    "hash": "b02f34d65afb037a",
-    "group_hash": "ed7b6aa1a40118be",
-    "ask": "The `vehicle` and `stub` verbs become actions returning operations, in shadow against `cli.js`.\n\nEvery verb then answers through the index.\n\n- - `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
+    "hash": "7742ec8dedc11d86",
+    "group_hash": "bdcecf4ff613c42f",
+    "ask": "The `vehicle` and `stub` verbs become actions answering within the wait their caller sets, in shadow against `cli.js`.\n\nEvery verb then answers through the index.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -3141,16 +3539,16 @@
   },
   {
     "name": "watchdogs-get-specified",
-    "hash": "ef10355257c6a60f",
-    "group_hash": "5739d30471f2d16d",
+    "hash": "659299507623cf90",
+    "group_hash": "e98c0716a9c298ab",
     "ask": "A design note specifies the leases, the deadlines, the stale marks, the restarts and `session/alarms`. [[spec/design_input/the-index-holds-the-model#every-part-holds-a-lease]] asks it.\n\nA part that stops reads as stopped only where every part carries a lease.\n\n- a design note under `spec/design_output` says it, and `./RUNME.sh lint` passes over it\n- `./RUNME.sh check` exits 0",
     "standing": "done"
   },
   {
     "name": "watchdogs-span-the-processes",
-    "hash": "10e152ef6027d8f4",
-    "group_hash": "2e858d038e423c69",
-    "ask": "The leases and the alarms reach across the processes, and the doors process and the hook module watch the index.\n\nA silent process then reads as silent.\n\n- - `go test ./...` from the root passes\n- a case silences each process in turn, and reads `session/alarms`\n- `./RUNME.sh check` exits 0",
+    "hash": "6414ecb7988c9c95",
+    "group_hash": "4c327d864c2e851f",
+    "ask": "The leases and the alarms reach across the processes, and the IO process and the hook module watch the index's lease, `index/health`.\n\nA silent process then reads as silent.\n\n- `go test ./...` from the root passes\n- a case silences each process in turn, and reads `session/alarms`\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -3167,10 +3565,17 @@
     "standing": ""
   },
   {
+    "name": "windows-ci-turns-green",
+    "hash": "5702a3e683bbc042",
+    "group_hash": "aeedc84ef4c11364",
+    "ask": "The Windows job of the check workflow passes, and a test run leaves no `se-index` process behind. It fails today at `test/level0/work-merge-cloud.test.js`, and before that at `test/level0/level1.test.js`.\n\nA red job trains every reader to skip it, so a Windows fault lands unseen. A leaked index holds its port and its database into the next run.\n\n- the Windows job of `.github/workflows/check.yml` passes on the branch\n- a case starts the index in a test and reads no `se-index` process past the test's end\n- `./RUNME.sh check` exits 0",
+    "standing": "todo"
+  },
+  {
     "name": "work-verbs-become-actions",
-    "hash": "be4205aabcfe936e",
-    "group_hash": "ed7b6aa1a40118be",
-    "ask": "The `branch` verbs become work actions returning operations, and each runs in shadow against its `cli.js` twin.\n\nAn agent calls the index, and parses no standard output.\n\n- - `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
+    "hash": "9291ce76a19162ac",
+    "group_hash": "bdcecf4ff613c42f",
+    "ask": "The `branch` verbs become work actions answering within the wait their caller sets, and each runs in shadow against its `cli.js` twin.\n\nAn agent calls the index, and parses no standard output.\n\n- `go test ./...` from the root passes\n- `./RUNME.sh log --kind shadow` names each answer the two disagree on\n- `./RUNME.sh check` exits 0",
     "standing": "todo"
   },
   {
@@ -3179,6 +3584,12 @@
     "group_hash": "90c8ec2acc34285f",
     "ask": "approach items 1 and 4 change `src/scripts/cli-check.js`, `src/scripts/cli-read.js` and `src/bridge/guidance.js`. The ask names none of them, and the implement checklist refuses a file the ask leaves out. Name each on its ask line.",
     "standing": "done"
+  },
+  {
+    "name": "write-marks-leave-the-plugin",
+    "hash": "4c317feccd260354",
+    "ask": "The plugin carries the read marks of the write door alone where a road calls them. A reader of [[spec/design_output/level0]] meets the door as it stands.\n\nToday `.claude/skills/level0/lib/marks.js` and `MARKS` in `.claude/skills/level0/lib/runs.js` stand with no caller but their cases. Two chapters of the design describe a door that checks no mark.\n\n- `lib/marks.js` and `MARKS` in `lib/runs.js` leave, with the mark cases in `test/level0/apply.test.js`\n- the two mark chapters of the design leave, and `./RUNME.sh links` names no link reaching them\n- `./RUNME.sh check` exits 0",
+    "standing": ""
   },
   {
     "name": "yours-counts-the-waiting",

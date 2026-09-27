@@ -163,7 +163,7 @@ The check refuses these faults:
 
 What else holds:
 
-- the view row of the model's table waits for the views, per [[spec/design_output/views]]
+- the view row of the model's table waits for the views, per [[spec/design_output/model#views]]
 - the index runs `Check` over the one catalog at start, and exits with the faults where any stands
 - the catalog stands empty in this phase, so the index behaves as it did
 - Go takes a list of options last alone, so `q.Derived(name, def, fn, opts...)` takes the function before them

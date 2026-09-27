@@ -117,7 +117,7 @@ func (s *Store) Land(name string, event any) error {
 	return err
 }
 
-// [[spec/design_output/operations#an-action-declares-its-length]]
+// [[spec/design_output/model#a-caller-sets-its-wait]]
 type Declared struct {
 	Op       bool
 	Writes   bool
@@ -132,7 +132,7 @@ func (s *Store) Declared(name string) (Declared, bool) {
 	return Declared{Op: one.op, Writes: one.writes, Deadline: one.deadline}, true
 }
 
-// A stale mark keys by provider, so a sibling under the same topic stays current. [[spec/design_output/watchdogs#a-stale-mark]]
+// A stale mark keys by provider, so a sibling under the same topic stays current. [[spec/design_output/model#a-stale-mark]]
 func (s *Store) Stale(provider string, since time.Time) error {
 	one := s.owner(provider)
 	if one == nil {

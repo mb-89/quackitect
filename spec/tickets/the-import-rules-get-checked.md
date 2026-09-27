@@ -159,7 +159,7 @@ The module takes `golang.org/x/tools` at its last release asking Go 1.24. The ch
 
 No Go door and no Go module stands yet, so the tree passes today. Each rule holds from the first file that lands under those folders.
 
-The other analyzers of [[spec/design_output/go-doors#the-build-checks-imports]] wait for the Go doors, since each reads a door file.
+The other analyzers of [[spec/design_output/model#the-build-checks-imports]] wait for the Go doors, since each reads a door file.
 
 ### callers
 
@@ -214,7 +214,7 @@ The other analyzers of [[spec/design_output/go-doors#the-build-checks-imports]] 
 
 pass with findings
 
-- doors-note-names-every-analyzer: add the analyzer `nodoor` to the table of [[spec/design_output/go-doors#the-build-checks-imports]]. The note then owns every analyzer, and the code points there.
+- doors-note-names-every-analyzer: add the analyzer `nodoor` to the table of [[spec/design_output/model#the-build-checks-imports]]. The note then owns every analyzer, and the code points there.
 
 # implement
 

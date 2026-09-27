@@ -83,11 +83,11 @@ depends_on: [the-hooks-door-lands]
 
 # Ask
 
-The cage rules port one at a time. A harness replays session logs recorded at `debug` into the hooks door, and asserts the decisions the bridge made.
+The cage rules port one at a time. A harness replays session logs recorded at `debug` into the `hooks` IO module, and asserts the decisions the bridge made.
 
 A rule ported with no replay changes what the cage refuses, and nobody sees it.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - the replay of every recorded log answers the bridge's decisions, and each difference writes a `shadow` row
 - `./RUNME.sh check` exits 0
 

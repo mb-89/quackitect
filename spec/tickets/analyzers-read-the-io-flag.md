@@ -118,16 +118,20 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
+depends_on: [io-modules-own-their-names]
 ---
 
 # Ask
 
-The index hands the `providers.*` keys to `Check` at start. So the alternative provider a key picks reaches the catalog check, per [[spec/design_output/model#the-provider-kinds]].
+The import analyzers become the ones [[spec/design_output/model#the-build-checks-imports]] names: `onlyq`, `ioonly`, `fakesuite` and `nomodule`. They read a package's flag off its `q.IO()` registration, and `nodoor` and `noname` leave.
 
-A key picking a provider changes nothing today, because the check reads no key.
+A module without the flag then reaches the outside nowhere. A fake with no contract suite beside it fails the build, `q/qtest` among them.
 
 - `go test ./...` from the root passes
-- a case sets `providers.<name>`, and reads the pick in the catalog check's answer
+- a case plants a module without the flag importing `os`, and `onlyq` names it
+- a case plants an IO module importing `os`, and no analyzer names it
+- a case plants a fake with no suite beside it, and `fakesuite` names it
+- a case plants a module importing another module, and `nomodule` names it
 - `./RUNME.sh check` exits 0
 
 # design
