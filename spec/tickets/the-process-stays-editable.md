@@ -147,6 +147,7 @@ record:
   - step: accept
     hand: box d7db20e2accf · claude-code-remote
     hash_before: e72e5b1478ce9ab6e4f5493e59108c42551ba825
+    hash_after: b1a7ba59fe9736ba74970f82dba2f63f5bc4288e
 depends_on: ["the-engine-holds-the-route"]
 ---
 
