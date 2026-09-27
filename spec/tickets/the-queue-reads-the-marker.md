@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -144,6 +144,9 @@ record:
         hash: f5a11fbea75be2a5
         size: 1778
     def: 08e16d07b0de477c
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/rationales/git-stays-the-archive]]
 ---
 
 # Ask
