@@ -1,5 +1,6 @@
 // A server the proc door starts detached outlives the process that starts it,
-// the way the editor and the shell start one on a desk.
+// the way the editor and the shell start one on a desk. The stub writes its
+// marker past its starter's exit, so a marker proves it outlived the start.
 // [[spec/tickets/the-bridge-outlives-its-starter]]
 
 import assert from "node:assert/strict";
@@ -14,7 +15,6 @@ const MARKER = "started.txt";
 const WAITS = 60;
 const LATE = 1500;
 const WINDOW = 200;
-// The stub writes its marker past its starter's exit, so a marker proves it outlived the start.
 const SERVER = `setTimeout(() => require("fs").writeFileSync(process.argv[2] + "/${MARKER}", "up"), ${LATE});\n`;
 const DOOR = pathToFileURL(
   join(import.meta.dirname, "..", "..", "src", "doors", "proc.js"),
