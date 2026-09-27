@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -245,6 +245,18 @@ record:
         hash: 373bad37aa8acb37
         size: 672
     def: 5d2a6efe5d767d68
+  - step: gate
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: a445e6fd42300f1f3775c0f98641fa0c5069edf3
+    hash_after: a445e6fd42300f1f3775c0f98641fa0c5069edf3
+    inputs:
+      - name: design/draft-2
+        hash: 47e2a8aa183d46f9
+        size: 4331
+      - name: design/tests-red-2
+        hash: 894c4d79a61e9314
+        size: 1231
+    def: 4133e17eb1a59324
 ---
 
 # Ask
@@ -533,12 +545,9 @@ The real git answers the replay copies: `f27f6c9fc` is the first commit after `9
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- keptRed reads the wrong tree. `passed` in pull-writes.js writes `hash_after` as the tip before the pass commit. `landed` stages the hand's red tests into that pass commit. So `git ls-tree -r <hash_after>` holds no new red test, and the keep fails. This ticket's own red pass shows it. d8a6b89ab lacks test/level0/pull-kept.test.js, and the pass commit f46fe8257 carries it. The red pass of the-retro-reads-the-backlog shows it too. 916443192 lacks retro-backlog.test.js and retro-route.test.js, and its pass commit f27f6c9fc carries them.
-- A whole-file hash check fails the case the ask names. implement/change 7c8c13970 appends cases to retro-mint.test.js and retro-backlog.test.js. So their file hashes move while their red cases stand. The renamed route test alone keeps its hash 312a209. That ticket still strands at implement/tests-red. Pick a keep that survives an appended case. Or take the other branch of the ask: a rerun at the recorded commit.
-- The replay case replays no real rewind. Its fake answers `git ls-tree -r <hash_after>` with the test present. Its record holds the red pass alone: no change pass, no stale review, no appended case. Build the fixture off the record of the-retro-reads-the-backlog. Then the case fails on a keep that rescues nothing.
-- The keep also runs before the change lands. On the standard route a draft edit marks design/tests-red stale. `inputRead` puts the step there, and `advanced` keeps it. So a case the edited draft adds skips its red run. Keep a red leaf only where a pass of a later leaf follows its red pass.
-- The callers list names `blessed` in pull-bless.js, which stands nowhere. The caller is `bless`, and `offer` in pull-hand.js calls `advanced`.
+accept with points
+- kept-red-subject-matches-whole: the red commit search matches the whole change `passes <leaf>`, since `passes design/tests-red` is a prefix of `passes design/tests-red-2` on this very route, and a startsWith read takes the wrong commit
+- kept-red-reads-red-list: the keep reads the test files off the leaf's `red` evidence, since the red pass commit also lands the ticket file and a path filter guesses
 
 # implement
 
