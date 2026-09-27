@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -104,6 +104,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/sqlite-runs-pure-go.md:123:1: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: implement/tests-green
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 46d321728e9478c41cf91c4613484bcb902363e4
+    hash_after: 46d321728e9478c41cf91c4613484bcb902363e4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 67 test(s) pass in 5 file(s); green, src/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/sqlite-runs-pure-go.md:131:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -268,11 +280,15 @@ Three node cases fail on their own assertion. `TestTheIndexOpensWithoutCgo` fail
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/go-tests.test.js test/level0/test-verb.test.js test/contract/install.test.js test/level0/review.test.js test/contract/tree.test.js src/index
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -280,11 +296,34 @@ Three node cases fail on their own assertion. `TestTheIndexOpensWithoutCgo` fail
 
 <!-- the form is text -->
 
+The index builds with Go alone, so a box needs no C compiler.
+
+| the part | what changes |
+|---|---|
+| `go.mod` | the pure driver at `v1.46.1` stands in, and the cgo driver leaves |
+| `src/index/index.go` | opens `sqlite`, with the three settings as `_pragma` |
+| `src/scripts/install.sh` | builds the index with `CGO_ENABLED=0`, and the compiler probe and the download leave |
+| `goEnvOf` | answers `CGO_ENABLED=0` alone |
+| the review list | borrows the modules alone |
+
+`CGO_ENABLED=0 go test ./...` passes from the root, and the install names no Zig.
+
+What I assume, for the reader at the merge:
+
+- A box keeps a Zig folder an older install fetched. Nothing reads it, and a clean install leaves it out.
+- The pin stays at `v1.46.1` until the root `go.mod` asks for Go 1.25.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the draft and its review name, and the dictionary
+- the disk and the process take fakes in each node case
+- each new case carries a comment pointing at the index note
+- the pin stands in `go.mod` alone
+- the review row stands fixed, and `says` names each assumption
 
 # Discussion
 
