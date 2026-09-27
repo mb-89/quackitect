@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -137,6 +137,15 @@ record:
     hash_before: 3752d7c680606a3bf24f5a66b8f935b937abe177
     hash_after: 3752d7c680606a3bf24f5a66b8f935b937abe177
     def: 010b0c27b3192cab
+  - step: design/draft
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 5dc02c39354d13d46e6e2a09417f3bea2d46a10b
+    hash_after: 5dc02c39354d13d46e6e2a09417f3bea2d46a10b
+    inputs:
+      - name: ask
+        hash: 4028c18b8dc89090
+        size: 716
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -181,38 +190,72 @@ the level0 hooks load in the session
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The session's Bash door marks a push it lets through, and the push door gates the battery on that mark alone. The owner's answer names the level0 hooks loading in the session as the signal, and the mark rides only a command those hooks saw.
+
+| part | where | what it does |
+|---|---|---|
+| the mark | `ENGINE` in `.claude/skills/level0/lib/runs.js`, beside `STAMP` | names the variable, `SE_ENGINE` |
+| the rewrite | `markedPush(command, e)` in `src/bridge/bash.js`, the last step of `onBash` | where the command pushes, through `touchesGit(command).pushes`, or runs `./RUNME.sh`, answers `{ event: { ...e, command: "export SE_ENGINE=1; <command>" } }`, so every git the command starts carries the mark |
+| the gate | `holds(refs, stampText, carried, cloud, heldBy, box, engine)` in `src/scripts/prepush.js` | reads the battery on a push to `main` only where `engine` holds |
+| the read | `main` in `prepush.js` | passes `process.env.SE_ENGINE === "1"` |
+
+The bridgehead hands a rewritten event on through `next(answer.event)` for every event, as the helper prompt rewrite does. The version, to-do, cloud and hold rules stand with no engine, because none of them waits on a check. A person pushing from a terminal with no session carries no mark, so the owner's own commits land at once, as the ask asks.
+
+Unchecked, and nothing on this box backs it: the client runs the rewritten Bash input. A cloud box loads no function hooks, so the owner's desk decides it, and the gate case in the door's own test holds the rewrite itself.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/scripts/prepush.js`, `main`, the one caller of `holds` in `src`
+- `src/bridge/server.js`, `onToolCall`, which runs `onBash` and hands a non-pass answer through `layerRides`
+- `.claude/skills/level0/hooks/level0.js`, `seen`, which runs `next(answer.event)`
+- `test/level0/prepush.test.js`, which calls `holds` with no engine argument today, so its trunk cases pass `engine` true
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/prepush.test.js`, a push with no engine running and a stale stamp lands
+- `test/level0/prepush.test.js`, a push with the engine running and a stale stamp comes back refused
+- `test/level0/bash-engine.test.js`, the Bash door marks a push and a verb with the engine variable, and leaves every other command as written
+
+The done lines and the case deciding each:
+
+- the push with no engine: the first case
+- the push with the engine: the second case
+- the check: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `.claude/skills/level0/lib/runs.js`
+- `src/bridge/bash.js`
+- `src/scripts/prepush.js`
+- `test/level0/prepush.test.js`
+- `test/level0/bash-engine.test.js`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `holds`, `main`, `onBash`, `touchesGit`, `onToolCall` and the hook's `answer.event` road stand opened, and each reads as the table says
+- a search for `holds(` and `onBash(` over `src` and `test` names the callers
+- each done line names the case deciding it
 
 ## tests-red
 
