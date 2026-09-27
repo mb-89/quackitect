@@ -85,7 +85,7 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase1gaps
 depends_on: [the-foundation-lands-unchanged]
-<<<<<<< HEAD
+cloud: true
 record:
   - step: sync
     hand: box d7dcc17af0d5 · claude-code-remote
@@ -93,9 +93,6 @@ record:
   - step: sync
     hand: box d7dd59fe93d6 · claude-code-remote
     hash_before: a54e633ee4a6c4f37227c1d1c3fa35cc6e1d4478
-=======
-cloud: true
->>>>>>> origin/main
 ---
 
 # Ask
