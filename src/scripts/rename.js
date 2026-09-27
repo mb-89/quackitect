@@ -7,6 +7,7 @@ import {
   nameOf,
   FOLDER as UNDONE,
 } from "../../.claude/skills/level0/lib/undo.js";
+import { CLOSED, fieldOf, TICKETS } from "../engine/group.js";
 import { everyHold } from "./guidance-hand.js";
 
 export const BY = "rename";
@@ -17,10 +18,27 @@ const SKIP = new Set([".git", "node_modules", ".se", ".claude-plugin", "bin"]);
 const SNIFF = 4096;
 
 function edged(name) {
-  return new RegExp(
-    `(?<![\\w-])${String(name).replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&")}(?![\\w-])`,
-    "g",
+  return edgedAny([name]);
+}
+
+function edgedAny(names) {
+  const said = names.map((one) =>
+    String(one).replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&"),
   );
+  return new RegExp(`(?<![\\w-])(?:${said.join("|")})(?![\\w-])`, "g");
+}
+
+// Every form of a name rewrites in one pass, the longest first, so no rewrite meets the text an earlier form wrote. [[spec/tickets/rename-rewrites-each-link-once]]
+export function renamedForms(text, forms) {
+  const to = new Map(forms.map(([name, other]) => [String(name), String(other)]));
+  const names = [...to.keys()].sort((a, b) => b.length - a.length);
+  return String(text ?? "").replace(edgedAny(names), (found) => to.get(found));
+}
+
+// A closed ticket keeps its text, because the ticket door refuses its fields to every hand. [[spec/tickets/rename-rewrites-each-link-once]]
+function keepsItsText(it, file, text) {
+  const path = slashed(file.slice(it.root.length + 1));
+  return path.startsWith(`${TICKETS}/`) && fieldOf(text, "state") === CLOSED;
 }
 
 // A line naming the old name, with the number a reader opens. [[spec/design_output/index#a-rename-reaches-a-name]]
@@ -92,6 +110,7 @@ export function renamingText(it, from, to) {
   const held = writtenFiles(it, it.root);
   for (const file of held) {
     const text = it.disk.read(file);
+    if (keepsItsText(it, file, text)) continue;
     const said = renamedText(text, from, to);
     if (said === text) continue;
     it.disk.write(file, said);
@@ -135,10 +154,8 @@ export function renaming(it, from, to) {
   const read = writtenFiles(it, it.root);
   for (const file of read) {
     const text = it.disk.read(file);
-    const said = formsOf(from, to).reduce(
-      (one, [name, other]) => renamedText(one, name, other),
-      text,
-    );
+    if (keepsItsText(it, file, text)) continue;
+    const said = renamedForms(text, formsOf(from, to));
     if (said === text) continue;
     it.disk.write(file, said);
     const path = slashed(file.slice(it.root.length + 1));
