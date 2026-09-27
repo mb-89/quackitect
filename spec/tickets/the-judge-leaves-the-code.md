@@ -78,12 +78,16 @@ process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 depends_on: [every-road-has-a-caller]
 group: the-engine-holds-the-route
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d7d6cb0fb1105 · claude-code-remote
     hash_before: cb75bf7602af288ea431634cb6942860e6180ee0
     hash_after: cb75bf7602af288ea431634cb6942860e6180ee0
+  - step: design/review
+    hand: box d7d6cb0fb1105 · claude-code-remote · helper-2
+    hash_before: b7372e2e78a95b734c525def47fc74405fc6c3f1
+    hash_after: b7372e2e78a95b734c525def47fc74405fc6c3f1
 ---
 
 # Ask
@@ -169,8 +173,14 @@ The projection writes the config commands again, so `./RUNME.sh project` drops e
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- judge-cut-takes-its-helpers: the draft misses helpers of the judge and their cases. forEvidence and labelOf in .claude/skills/level0/lib/guidance.js have judgeMaterial as their one caller. ruleBroken, FOLLOWS, LABELS and BREAKS in .claude/skills/level0/lib/pull.js serve the judge alone. quoted, parsed, refusals, QUOTE_MODEL and the configOf import in hooks/pull-tool.js go with judged. Their cases are the --judge cases in test/level0/pull-leaves.test.js, the forEvidence and labelOf cases in test/level0/guidance.test.js, and test/contract/guidance-rules.test.js. The judge.model fixtures stand in test/level0/projection.test.js, sidebar.test.js and clicks.test.js, and judge.maxSpans stands in config.test.js
+- judge-cut-clears-the-checks: the ask wants no judge chapter in spec/design_output/pull.md, but the draft cuts only the two subchapters. The checks keeps item 5, the material paragraph, the layer table and the prose-fields paragraph, and each speaks of the judge. The cut takes them too, so the chapter lists the shell checks alone
+- judge-cut-meets-claude-door: every code file the cut touches stands under .claude, and every-road-has-a-caller records that the harness refuses this hand a write there. lib/marks.js still stands on that account. Where the refusal holds, the builder mints a question ticket carrying the owner's commands, per spec/guidance/cloud rule 7, in place of a hand-back on a red check
+- answer-mark-loses-its-reader: forEvidence is the one reader that acts on the answer mark, so the cut leaves the mark with no reader past the stripping. The mark stands in spec/schemas/guidance.schema.yaml, and its comment names the judge of pull.md. Decide whether the mark stays, and rewrite that comment either way
+- judge-pointers-leave-other-notes: sentences outside pull.md name the pull's judge. They stand in spec/design_output/hook-protocol.md in the chapter on classify, in spec/design_output/level0.md beside answer.enabled, and in the hooks.json description, which brand.js does not stamp. The cut rewrites each, and the callers list names hooks.json beside brand.js
 
 # implement
 
