@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d7d8cca563b1 · claude-code-remote
@@ -92,6 +92,15 @@ record:
         hash: abda20c0b5ff170c
         size: 2395
     def: 0f8c340e80e8ece6
+  - step: implement/tests-red
+    hand: box d7da794434cd · claude-code-remote
+    hash_before: 916443192a0a15ca1a3080ef1e36d66acccb758c
+    hash_after: 916443192a0a15ca1a3080ef1e36d66acccb758c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 8 test(s) fail on their own assertion
+    def: 06865600120e8b38
 ---
 
 # Ask
@@ -176,20 +185,27 @@ pass with findings
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/retro-mint.test.js test/level0/retro-backlog.test.js test/level0/retro-route.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Eight cases fail on their own assertion: the backlog verb stands nowhere, the mint passes --process=standard whatever the class names and refuses no bare process, and retro.yaml holds no backlog step. The case keeping a group ticket and a command criterion out passes before the change, since the missing verb prints its usage alone; it holds its ground once the verb prints criteria. The two standing promotion cases fail too, because their fixture now names trivial and the fault count grows by the process.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the tests touch the mint test and two new test files, each named in the ask or the draft
+the mint cases run on fakeDisk and fakeProc, the backlog cases on fakeDisk and fakeTrunk, and the route case reads the tree through the disk door
+each new test file opens on a header pointing at this ticket
+the fixtures name the process once each, and the route test reads retro.yaml instead of copying it
+the design review row rides as retro-check-names-the-process, which lands the fixtures and the guidance
 
 ## change
 

@@ -25,6 +25,10 @@ const RETRO = "retro-a1b2c3";
 const at = (path) => join(ROOT, ".se", ".retro", RETRO, ...path.split("/"));
 const TICKET = join(ROOT, "spec", "tickets", "the-land-verb-lands.md");
 const PROMOTED = join(ROOT, "spec", "tickets", "the-rule-lands.md");
+const ROUTES = {
+  [join(ROOT, "spec", "processes", "standard.yaml")]: "steps: []\n",
+  [join(ROOT, "spec", "processes", "trivial.yaml")]: "steps: []\n",
+};
 const DRAFT =
   "---\nkind: [[ticket]]\nstate: draft\n---\n\n# Ask\n\n<!-- gain, as text -->\n<!-- breaks, as text -->\n\n# design\n\n## approach\n";
 
@@ -55,6 +59,7 @@ const FIXED = {
 
 function doors(classes, promotions = []) {
   const disk = fakeDisk({
+    ...ROUTES,
     [at("classes.json")]: JSON.stringify({ classes, dispositions: {}, promotions }),
   });
   const proc = fakeProc({
@@ -64,7 +69,7 @@ function doors(classes, promotions = []) {
         return { exitCode: 0 };
       },
     [`${CLI} ticket open the-land-verb-lands`]: { exitCode: 0 },
-    [`${CLI} mint ticket spec/tickets/the-rule-lands.md --process=standard`]: () => {
+    [`${CLI} mint ticket spec/tickets/the-rule-lands.md --process=trivial`]: () => {
       disk.write(PROMOTED, DRAFT);
       return { exitCode: 0 };
     },
@@ -197,7 +202,53 @@ test("a promotion's ticket stands checked by the mint alone, and classes read it
     checklist: [],
   };
   assert.deepEqual(faultsOf(record, []), []);
-  assert.equal(mintFaults(record).length, 4);
+  assert.equal(mintFaults(record).length, 5);
+});
+
+// [[spec/tickets/the-retro-reads-the-backlog]]
+test("a class naming trivial mints a trivial ticket", () => {
+  const trivial = {
+    ...CLASS,
+    ticket: { ...CLASS.ticket, name: "the-rule-lands", process: "trivial" },
+  };
+  const it = doors([trivial]);
+
+  const { code, said } = heard(() => retro(ROOT, ["mint", RETRO], it));
+
+  assert.equal(code, 0, said);
+  assert.ok(
+    it.proc.ran.some((one) =>
+      one.argv.join(" ").endsWith("the-rule-lands.md --process=trivial"),
+    ),
+    "the mint names the class's process",
+  );
+});
+
+// [[spec/tickets/the-retro-reads-the-backlog]]
+test("a class naming no process is refused", () => {
+  const bare = { ...CLASS, ticket: { ...CLASS.ticket, process: "" } };
+  const it = doors([bare]);
+
+  const { code, said } = heard(() => retro(ROOT, ["mint", RETRO], it));
+
+  assert.equal(code, 1);
+  assert.match(said, /k1 stands open, and its ticket carries no process/);
+  assert.equal(it.proc.ran.length, 0, "nothing mints");
+});
+
+// [[spec/tickets/the-retro-reads-the-backlog]]
+test("a class naming a process that stands nowhere is refused", () => {
+  const lost = { ...CLASS, ticket: { ...CLASS.ticket, process: "nowhere" } };
+  const it = doors([lost]);
+
+  const { code, said } = heard(() => retro(ROOT, ["mint", RETRO], it));
+
+  assert.equal(code, 1);
+  assert.match(
+    said,
+    /k1 stands open, and its ticket names process nowhere: spec\/processes holds no nowhere/,
+  );
+  assert.equal(it.proc.ran.length, 0, "nothing mints");
 });
 
 // [[spec/tickets/the-retro-finishes-its-asks]]
