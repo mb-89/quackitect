@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
-todo: true
+state: closed
+todo: false
 step: decide
 steps:
   - name: decide
@@ -20,6 +20,17 @@ steps:
         says: why, in a line, or what the successor carries
 process: [[spec/processes/note]]
 process_hash: e02a0935ed78eb92
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: 0792b508ae61d105eee111d1e968953c2a01ae33
+    hash_after: 0792b508ae61d105eee111d1e968953c2a01ae33
+    inputs:
+      - name: ask
+        hash: fcf3b38e9837c736
+        size: 1040
+    def: 9e2520e6318baf46
+reason: done
 ---
 
 # Ask
@@ -51,14 +62,16 @@ Code nothing runs stands in the tree. A search for each name over `src`, `test` 
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+dropped
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+Every row but the probe stands in a file the migration ports and deletes, src/scripts in phase 4 and src/lsp in phase 7, and a port takes no dead export. The inset probe left in 7f7aaca27.
 
 # Discussion
 
