@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -153,6 +153,15 @@ record:
         hash: c1a2d73285bb128f
         size: 613
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: de6790aefb9442cb2cb2b13c70223f1f5c778e55
+    hash_after: de6790aefb9442cb2cb2b13c70223f1f5c778e55
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -277,14 +286,19 @@ accept: the approach drops the module list and refuses a box with no Go through 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/cli-go.js src/scripts/cli-check.js test/level0/go-tests.test.js test/level0/go-modules.test.js test/contract/go-module.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the five files of the size list, and the source case of cli-check-doors, which reads goHolds
+the gate takes its run door, and each case hands it a fake run, so no go binary runs in the level0 cases
+goGate and goHolds point at spec/tickets/go-checks-need-go, and the formatter line at go-code-shares-one-module
+the skip stands in skipOf alone, and goHolds hands it to goGate, as the gate note under Discussion asks
 
 ## tests-green
 

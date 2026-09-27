@@ -5,30 +5,8 @@
 // [[spec/design_output/index#the-compiler-it-needs]]
 
 const SRC = "src";
-const MOD = "go.mod";
 // The module path every tree import opens on. [[spec/tickets/go-code-shares-one-module]]
 const MODULE = "quackitect";
-
-// The root holds the module, and a module a folder under src still holds stands beside it, so a stray one runs and shows. [[spec/tickets/go-code-shares-one-module]]
-export function goModulesIn(it) {
-  const root = it.disk.exists(it.join(it.root, MOD)) ? ["."] : [];
-  return [...root, ...modulesUnder(it, SRC).sort()];
-}
-
-// Every module at or below a folder, read a folder at a time so a module inside a module stands. [[spec/tickets/an-engine-takes-bridge-work]]
-function modulesUnder(it, folder) {
-  const at = it.join(it.root, ...folder.split("/"));
-  if (!it.disk.exists(at)) return [];
-  const out = [];
-  for (const one of it.disk.list(at)) {
-    // A package folder holds no module of this tree, and it holds thousands of folders. [[spec/tickets/an-engine-takes-bridge-work]]
-    if (one.kind !== "dir" || one.name === "node_modules") continue;
-    const below = `${folder}/${one.name}`;
-    if (it.disk.exists(it.join(at, one.name, MOD))) out.push(below);
-    else out.push(...modulesUnder(it, below));
-  }
-  return out;
-}
 
 // A tree import names a package folder under the root, and a test file's import builds no binary. [[spec/tickets/go-code-shares-one-module]]
 const IMPORT = new RegExp(`"${MODULE}/(${SRC}/[^"]+)"`, "g");
@@ -82,19 +60,33 @@ export function goEnvOf() {
   return { CGO_ENABLED: "0" };
 }
 
-// The findings the Go formatter's list reads as, one a file it names, under the module that ran it. [[spec/design_output/index#the-compiler-it-needs]]
-export function formatFaults(folder, said) {
+// The findings the Go formatter's list reads as, one a file it names, each named from the root. [[spec/design_output/index#the-compiler-it-needs]]
+export function formatFaults(said) {
   return `${said ?? ""}`
     .split("\n")
     .map((one) => one.trim())
     .filter(Boolean)
     .map(
       (name) =>
-        `${folder === "." ? "" : `${folder}/`}${name}: Gofmt: the file reads another way than the formatter writes it.`,
+        `${name}: Gofmt: the file reads another way than the formatter writes it.`,
     );
 }
 
 // The Go gate: the tests and the formatter at the root, through the run door it takes. [[spec/tickets/go-checks-need-go]]
-export function goGate() {
-  return 0;
+export function goGate({ go, run, say, quiet = false, skip = [] }) {
+  let ran;
+  try {
+    ran = run([go, "test", ...skip, "./..."], { quiet });
+  } catch {
+    say(
+      "go stands nowhere, so the check refuses: run ./RUNME.sh tools, or install Go.",
+    );
+    return 1;
+  }
+  if (ran.exitCode) return ran.exitCode;
+  // The root holds more than Go, so the formatter reads src alone. [[spec/tickets/go-code-shares-one-module]]
+  const listed = run(["gofmt", "-l", SRC], { quiet: true });
+  const faults = formatFaults(listed.stdout);
+  for (const one of faults) say(one);
+  return faults.length ? 1 : 0;
 }

@@ -49,7 +49,7 @@ import { browserSays } from "./browser.js";
 import { namesIn, show, walk } from "./cli-read.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { FIX_USAGE, fixFlags } from "./cli-fix.js";
-import { formatFaults, goEnvOf, goModulesIn, goTestNames } from "./cli-go.js";
+import { goEnvOf, goGate, goTestNames } from "./cli-go.js";
 import { HOOKS } from "./precommit.js";
 import { whereIs, writeSurvey } from "../engine/tools.js";
 import { viewerOf } from "./tui-build.js";
@@ -119,30 +119,22 @@ export function viewerHere() {
 // Every Go module's tests run in the battery, the import rules among them. The one module stands at the root. [[spec/tickets/go-code-shares-one-module]]
 // Under `check --errors` the run stays quiet, and each failing Go test reaches the error stream alone. [[spec/tickets/the-verbs-need-no-wrapper]]
 export function goHolds(quiet = false, red = []) {
-  const at = { disk: files, join, root };
-  const env = goEnvOf(at);
   const skip = skipOf(red, (path) => files.read(join(root, path)));
-  let worst = 0;
-  for (const folder of goModulesIn(at)) {
-    let ran;
-    try {
-      ran = outside.run([go, "test", ...skip, "./..."], {
-        cwd: join(root, folder),
-        env,
-        inherit: !quiet,
-      });
-    } catch {
-      console.log("go stands nowhere, so the Go tests go unrun here.");
-      return 0;
-    }
+  // The gate names each run as quiet or not, and a quiet one keeps its output for the reader. [[spec/tickets/go-checks-need-go]]
+  const run = (argv, asked) => {
+    const ran = outside.run(argv, {
+      cwd: root,
+      env: goEnvOf(),
+      inherit: !quiet && !asked.quiet,
+    });
     if (quiet && ran.exitCode) {
       for (const row of String(ran.stdout ?? "").split("\n")) {
-        if (/^\s*--- FAIL/.test(row)) console.error(`${folder}: ${row.trim()}`);
+        if (/^\s*--- FAIL/.test(row)) console.error(row.trim());
       }
     }
-    worst = worst || ran.exitCode || goFormat(folder, env);
-  }
-  return worst;
+    return ran;
+  };
+  return goGate({ go, run, say: (line) => console.log(line), quiet, skip });
 }
 
 // A red Go test file stands apart until its tests-green closes, as a red JavaScript one does, so the Go run skips the tests it names. [[spec/design_output/pull#the-gate]]
@@ -151,21 +143,6 @@ export function skipOf(red, read) {
   const paths = red.flatMap((one) => String(one).split(",")).map((one) => one.trim());
   const names = goTestNames(paths, read);
   return names.length ? ["-skip", `^(${names.join("|")})$`] : [];
-}
-
-// Go's own format rides in no other gate, so the check holds it. [[spec/design_output/index#the-compiler-it-needs]]
-function goFormat(folder, env) {
-  let ran;
-  try {
-    // The root holds more than Go, so the formatter reads src alone there. [[spec/tickets/go-code-shares-one-module]]
-    const over = folder === "." ? "src" : ".";
-    ran = outside.run(["gofmt", "-l", over], { cwd: join(root, folder), env });
-  } catch {
-    return 0;
-  }
-  const faults = formatFaults(folder, ran.stdout);
-  for (const one of faults) console.log(one);
-  return faults.length ? 1 : 0;
 }
 
 // [[spec/design_output/config#the-verb-names-the-layer]]
