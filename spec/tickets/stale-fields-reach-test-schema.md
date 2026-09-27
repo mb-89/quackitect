@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-process-stays-editable
 parent: a-moved-input-marks-steps
+record:
+  - step: do
+    hand: box d7d9b0d5dfcf · claude-code-remote
+    hash_before: c0d54a7f1673923006a2e1addd450b62fcb29f03
+    hash_after: c0d54a7f1673923006a2e1addd450b62fcb29f03
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 37 test(s) pass in 4 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-retro-reads-the-backlog.md:145:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: e40b7e72eb84e9b3
+        size: 157
+    def: 90b8f9f7c0b698b1
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ SCHEMA in test/level0/pull-schema.js copies the record shape of the ticket schem
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/guidance-hand.test.js test/level0/restart-box.test.js test/level0/person-step.test.js test/level0/retro-new.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+SCHEMA in test/level0/pull-schema.js carries stale, def and inputs on a pass record, matching spec/schemas/ticket.schema.yaml, so a test ticket holding the pass hashes that a-moved-input-marks-steps writes passes the test schema.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: the three fields stand in the test schema
+no cleanup revealed
+the test schema copies the ticket schema by the ask own design, and the fields match it
 
 # Discussion
 
