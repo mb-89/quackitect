@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-red
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -83,6 +83,10 @@ record:
     hand: box d7a69cb6601d7 · claude-code-remote
     hash_before: bab88996cad2665b17b16d68f75a56c255689865
     hash_after: bab88996cad2665b17b16d68f75a56c255689865
+  - step: design/review
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: ce3805b0166862125192e187b7f332ccccb77cb1
+    hash_after: ce3805b0166862125192e187b7f332ccccb77cb1
 ---
 
 # Ask
@@ -160,6 +164,8 @@ A fault the Windows run shows is this ticket's to fix, in the file it names, unt
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
+
+pass
 
 <!-- the form is verdict -->
 
