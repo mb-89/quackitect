@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -229,6 +229,22 @@ record:
         hash: 51cba604bf4d0a4a
         size: 822
     def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: d934fbeb92967b7c43566ce77c881c6a85a8665c
+    hash_after: d934fbeb92967b7c43566ce77c881c6a85a8665c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft-2
+        hash: 47e2a8aa183d46f9
+        size: 4331
+      - name: design/tests-red
+        hash: 373bad37aa8acb37
+        size: 672
+    def: 5d2a6efe5d767d68
 ---
 
 # Ask
@@ -472,26 +488,41 @@ The done lines and the case deciding each:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/pull-kept.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/pull-kept.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Over the stub keptRed, three cases fail on their own assertion: the keep off the pass commit, the backlog replay, and the stranded ticket at a pull. Two cases pass over the stub, because they guard the other side: a deleted red test, and a rewind before the change passes.
+
+| the case | the class of fault it guards |
+|---|---|
+| a red test landing in its pass commit | a keep reading `hash_after`, the tree before the red tests land |
+| the backlog replay | a keep failing on appended cases or a rename |
+| a deleted red test | a keep passing over a test that no longer stands |
+| a rewind before the change passes | a keep skipping the red run a new case needs |
+| a stranded ticket at a pull | a ticket stranded today stays stranded |
+
+The real git answers the replay copies: `f27f6c9fc` is the first commit after `916443192` passing the red leaf, and `diff -M` reads `R100` for the route test.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a failing case: the keep off the pass commit, the backlog replay, and the check at tests-green
+- the git reads reach the fake git of pull-doors.js, keyed by the argv keptRed runs
 
 # gate
 

@@ -1,5 +1,5 @@
-// A rewind walks past a red leaf whose tests hold the content they held when
-// the leaf passed red, so a ticket whose change landed walks on to green.
+// A rewind walks past a red leaf once the change behind it lands, while every
+// test its pass commit lands still stands, so a ticket walks on to green.
 // [[spec/tickets/a-rewind-spares-landed-tests]]
 
 import assert from "node:assert/strict";
@@ -9,81 +9,147 @@ import { advanced } from "../../src/scripts/pull-hand.js";
 import { keptRed } from "../../src/scripts/pull-kept.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
 import { stepOn } from "../../src/scripts/pull-writes.js";
-import { CHILD, doors, filled, ROOT, standing } from "./pull-doors.js";
+import { CHILD, doors, ROOT, standing } from "./pull-doors.js";
 
-const RED = "0123abcd0123abcd0123abcd0123abcd0123abcd";
-const TEST = "test/level0/one.test.js";
-const MOVED = "test/level0/two.test.js";
 const RED_LEAF = "implement/tests-red";
+const CHANGE = "implement/change";
+const REVIEW = "design/review";
+const BEFORE = "a1b2c3a1b2c3a1b2c3a1b2c3a1b2c3a1b2c3a1b2";
+const AFTER = "0123abcd0123abcd0123abcd0123abcd0123abcd";
+const RED_COMMIT = "4567ef014567ef014567ef014567ef014567ef01";
+const CHANGED = "89ab234589ab234589ab234589ab234589ab2345";
+const TEST = "test/level0/one.test.js";
 
-const blobsAt = (path, blob) => ({
-  [`git ls-tree -r ${RED}`]: { stdout: `100644 blob ${blob}\t${path}\n` },
+// The three reads keptRed asks git, keyed as the fake hears them. [[spec/tickets/a-rewind-spares-landed-tests]]
+const logSince = (after, rows) => ({
+  [`git log --reverse --ancestry-path --format=%H%x09%s ${after}..HEAD`]: {
+    stdout: `${rows.map(([hash, subject]) => `${hash}\t${subject}`).join("\n")}\n`,
+  },
 });
-const blobNow = (path, blob) => ({
-  [`git hash-object ${path}`]: { stdout: `${blob}\n` },
+const landsIn = (commit, rows) => ({
+  [`git show --name-status --format= ${commit}`]: { stdout: `${rows.join("\n")}\n` },
+});
+const movedSince = (commit, rows) => ({
+  [`git diff -M --name-status ${commit} HEAD`]: {
+    stdout: rows.length ? `${rows.join("\n")}\n` : "",
+  },
 });
 
-// The child at a step, its red leaf passed at RED and its tests field naming the test. [[spec/tickets/a-rewind-spares-landed-tests]]
-function built(step, answers, named = TEST) {
+const redPass = (after = AFTER) => ({
+  step: RED_LEAF,
+  hand: "box one",
+  hash_before: BEFORE,
+  hash_after: after,
+  def: "d0",
+});
+const changePass = {
+  step: CHANGE,
+  hand: "box one",
+  hash_before: AFTER,
+  hash_after: CHANGED,
+  def: "d1",
+};
+const reviewStale = { step: REVIEW, hand: "the engine", stale: "design/draft" };
+
+// The child at a step with the record a case names, over the git answers it names. [[spec/tickets/a-rewind-spares-landed-tests]]
+function built(step, record, answers) {
   const front = doors({}).it.front;
-  const text = withEntry(
-    filled(CHILD("open", step), "### tests", `    ./RUNME.sh test ${named}`),
-    { step: RED_LEAF, hand: "box one", hash_before: "a1b2c3", hash_after: RED },
-    front,
-  );
+  let text = CHILD("open", step);
+  for (const entry of record) text = withEntry(text, entry, front);
   const made = doors(standing(text), answers);
   made.it.root = ROOT;
   return { ...made, text, one: { name: "a-child", text, front: frontOf(text) } };
 }
 
-test("a red leaf whose tests hold the content they held red stands kept", () => {
-  const { it, text } = built(RED_LEAF, {
-    ...blobsAt(TEST, "aaa"),
-    ...blobNow(TEST, "aaa"),
+const landed = {
+  ...logSince(AFTER, [
+    [RED_COMMIT, `a-child: passes ${RED_LEAF}`],
+    [CHANGED, `a-child: passes ${CHANGE}`],
+  ]),
+  ...landsIn(RED_COMMIT, ["M\tspec/tickets/a-child.md", `A\t${TEST}`]),
+};
+
+test("a red leaf whose tests land in its pass commit, and stand there, is kept once the change passes", () => {
+  const { it, text } = built(RED_LEAF, [redPass(), changePass], {
+    ...landed,
+    ...movedSince(RED_COMMIT, []),
   });
-  assert.equal(keptRed(it, text, leafOf(frontOf(text), RED_LEAF))?.kept, RED);
+  const kept = keptRed(it, text, leafOf(frontOf(text), RED_LEAF));
+  assert.equal(kept?.kept, RED_COMMIT);
+  assert.equal(kept?.step, RED_LEAF);
+  assert.equal(kept?.skipped, true);
 });
 
-// The rewind the-retro-reads-the-backlog meets: a rename moves a test the draft names. [[spec/tickets/a-rewind-spares-landed-tests]]
-test("a rename moving a test keeps the red leaf, because its content stands", () => {
-  const { it, text } = built(
-    RED_LEAF,
-    { ...blobsAt(TEST, "aaa"), ...blobNow(MOVED, "aaa") },
-    MOVED,
+// The rewind the-retro-reads-the-backlog meets, off its own record and commits. [[spec/tickets/a-rewind-spares-landed-tests]]
+const BACKLOG = {
+  after: "916443192a0a15ca1a3080ef1e36d66acccb758c",
+  red: "f27f6c9fc2b3d6e1663f6aaf5deb9d89aa274361",
+  change: "7c8c139709b0bba508abf2850e2976ebdbb79461",
+  passed: "e6b315d577e1221cb157cbd2c8caf1ca8891dd10",
+};
+
+test("the rewind the-retro-reads-the-backlog meets keeps its red leaf through appended cases and a rename", () => {
+  const { it, text, one } = built(
+    REVIEW,
+    [
+      redPass(BACKLOG.after),
+      { ...changePass, hash_before: BACKLOG.red, hash_after: BACKLOG.change },
+      reviewStale,
+    ],
+    {
+      ...logSince(BACKLOG.after, [
+        [BACKLOG.red, `a-child: passes ${RED_LEAF}`],
+        [BACKLOG.change, "a-child: a class mints onto the process it names"],
+        [BACKLOG.passed, `a-child: passes ${CHANGE}`],
+      ]),
+      ...landsIn(BACKLOG.red, [
+        "M\tspec/tickets/a-child.md",
+        "A\ttest/level0/retro-backlog.test.js",
+        "M\ttest/level0/retro-mint.test.js",
+        "A\ttest/level0/retro-route.test.js",
+      ]),
+      ...movedSince(BACKLOG.red, [
+        "R100\ttest/level0/retro-route.test.js\ttest/contract/retro-route.test.js",
+        "M\ttest/level0/retro-backlog.test.js",
+        "M\ttest/level0/retro-mint.test.js",
+      ]),
+    },
   );
-  assert.equal(keptRed(it, text, leafOf(frontOf(text), RED_LEAF))?.kept, RED);
-});
-
-test("a test whose content moved hands the red leaf out again", () => {
-  const { it, text } = built(RED_LEAF, {
-    ...blobsAt(TEST, "aaa"),
-    ...blobNow(TEST, "bbb"),
-  });
-  assert.equal(keptRed(it, text, leafOf(frontOf(text), RED_LEAF)), null);
-});
-
-test("a rewound review passing walks past the kept red leaf to the change", () => {
-  const { it, text, one } = built("design/review", {
-    ...blobsAt(TEST, "aaa"),
-    ...blobNow(TEST, "aaa"),
-  });
   const changes = [];
-  const said = stepOn(it, one, leafOf(frontOf(text), "design/review"), text, changes);
-  assert.equal(frontOf(said).step, "implement/change");
+  const said = stepOn(it, one, leafOf(frontOf(text), REVIEW), text, changes);
+  assert.equal(frontOf(said).step, CHANGE);
   const kept = recordIn(said).at(-1);
   assert.equal(kept.step, RED_LEAF);
-  assert.equal(kept.kept, RED);
+  assert.equal(kept.kept, BACKLOG.red);
   assert.ok(
     changes.some((line) => line.startsWith(`keeps ${RED_LEAF}`)),
     changes.join("\n"),
   );
 });
 
+test("a red test deleted with no rename hands the red leaf out again", () => {
+  const { it, text } = built(RED_LEAF, [redPass(), changePass], {
+    ...landed,
+    ...movedSince(RED_COMMIT, [`D\t${TEST}`]),
+  });
+  assert.equal(keptRed(it, text, leafOf(frontOf(text), RED_LEAF)), null);
+});
+
+test("a red leaf rewound before a later leaf passes hands out again, so a case the edited draft adds runs red", () => {
+  const { it, text, one } = built(REVIEW, [redPass(), reviewStale], {
+    ...landed,
+    ...movedSince(RED_COMMIT, []),
+  });
+  assert.equal(keptRed(it, text, leafOf(frontOf(text), RED_LEAF)), null);
+  const said = stepOn(it, one, leafOf(frontOf(text), REVIEW), text, []);
+  assert.equal(frontOf(said).step, RED_LEAF);
+});
+
 test("a pull meeting a ticket stranded at its red leaf walks it on to the change", () => {
-  const { it, one } = built(RED_LEAF, {
-    ...blobsAt(TEST, "aaa"),
-    ...blobNow(TEST, "aaa"),
+  const { it, one } = built(RED_LEAF, [redPass(), changePass], {
+    ...landed,
+    ...movedSince(RED_COMMIT, []),
   });
   const moved = advanced(it, one, [one]);
-  assert.equal(moved.leaf?.path, "implement/change");
+  assert.equal(moved.leaf?.path, CHANGE);
 });
