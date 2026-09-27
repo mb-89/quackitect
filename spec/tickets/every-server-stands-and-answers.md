@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -101,6 +101,15 @@ record:
     hash_before: 85966908a6f832707aa48df9b45f43025ef035f9
     hash_after: 85966908a6f832707aa48df9b45f43025ef035f9
     def: bf05c6b330242055
+  - step: implement/tests-red
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: da98c6cea41a4c341fb2fb8dc292c6911b45acd5
+    hash_after: da98c6cea41a4c341fb2fb8dc292c6911b45acd5
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 10 test(s) fail on their own assertion
+    def: 06865600120e8b38
 ---
 
 # Ask
@@ -251,7 +260,6 @@ pass on the record
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
 
     ./RUNME.sh test test/level0/bridgehead.test.js test/level0/wait.test.js test/level0/server-crash.test.js test/level0/go-source.test.js test/level0/tools.test.js test/level0/lsp.test.js test/level0/doctor-hooks.test.js
@@ -259,33 +267,32 @@ pass on the record
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
 
-Stubs of `restarts`, `clientOf`, `lspProbe` and the three `go-source.js` exports move each failure onto the assertions. Eleven cases stand red on their own assertion.
+The code landed ahead of its tests, so this leaf switches each landed behaviour off to its old form and runs the cases on this tree. Every case fails on its own assertion:
 
-| case | what it sees red |
+| the case | the class of fault it guards |
 |---|---|
-| the wait the host cuts | the plain `no server answers` line, because the hook reads the cut as a fall |
-| the wait posted again | the quiet counts from the second post, and the cap runs its whole span again |
-| the restart | the child waits on the open connection |
-| the three `go-source.js` cases | no folder, no stamp |
-| the here case | `rebuilt` reads `-newer` alone |
-| the client | the fake client's own cap stops at four starts again |
-| the three probe rows | an empty row |
+| a wait the host cuts answers its signal on a live server, and the line on a dead one | a host timeout on a long post reads as a dead server |
+| a wait posted again under its since carries on its watch | a post sent again restarts its own cap |
+| a restart starts the child once the port stops listening, with a connection open | an open connection holds a restart back |
+| a move in the folder, an imported folder or the module rebuilds the binary | a binary runs stale after a change in any source it reads |
+| the client the editor builds starts the server again on every close | the language client gives up on a server after a few falls |
+| a language server that answers, or exits, draws its doctor row | the doctor reads a dead server as a live one |
+| a here case asking go-source.js fresh names the binary that rebuilds | one form of the freshness ask, so it pins an instance and a second form slips past |
 
-The surprise: the probe that sends `initialized` waits five seconds on the sweep of the whole tree. The probe sends none, and answers in half a second.
+The change step puts each behaviour back.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-- the tests touch the seven test files the design names, and the one contract file the restart reaches
-- the probe runs over the fake process door, and the stamp over the fake disk
-- the restart runs over a server shaped as node's
-- each new case names the ticket as the approach it holds
+- the switch touches the files the landed commit changed, and no other
+- the doors the cases reach stand behind their fakes: the fake process, the fake disk and the fake client
+- each switched function keeps the comment naming its approach
+- each behaviour stands once, in the function its case drives
+- the design review passes with no row this leaf leaves open
 
 ## change
 

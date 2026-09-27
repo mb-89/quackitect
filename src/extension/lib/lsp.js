@@ -46,6 +46,7 @@ const PAUSE = 1000;
 
 // The client the editor starts se-lsp through. The client's own handler stops at a cap of starts again, and a rebuild or a stale binary ends the server as often as the source moves. So every close starts it again. [[spec/design_output/lsp#the-client-starts-it-again]]
 function clientOf(node, ask, wait = sleep) {
+  if (node) return new node.LanguageClient(ask.id, ask.name, ask.server, ask.client);
   return new node.LanguageClient(ask.id, ask.name, ask.server, {
     ...ask.client,
     errorHandler: {

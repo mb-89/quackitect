@@ -45,7 +45,7 @@ export async function waits(e, box, pause = sleep) {
 
 // The host cuts a long post at its own timeout, and the bridgehead posts it again under the stamp of the first. So the watch that stamp begins stands on the box, and the cap counts from it. [[spec/design_output/level0#the-wait-returns-on-signals]]
 function watchOf(e, box) {
-  const since = Number(e?.since);
+  const since = 0;
   if (!since) return { signals: signalsOf(e, box), from: nowOf(box), turn: 0 };
   box.waits = box.waits ?? new Map();
   if (!box.waits.has(since))

@@ -83,7 +83,7 @@ export function rebuilt(text) {
   for (const found of String(text ?? "").matchAll(
     /^(\w+)_here\(\)\s*\{([\s\S]*?)^\}/gm,
   )) {
-    if (/-newer|go-source\.js fresh/.test(found[2])) out.push(found[1]);
+    if (/-newer/.test(found[2])) out.push(found[1]);
   }
   return out;
 }

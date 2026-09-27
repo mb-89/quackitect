@@ -18,13 +18,20 @@ function framed(said) {
 
 // The row `se-lsp lsp` draws: the probe starts the server the editor starts, opens one note, and names each diagnostic code the server sends back. [[spec/design_output/lsp#the-doctor-probes-the-server]]
 export function lspProbe(door, exe, at) {
+  if (door) return "";
   if (!exe) return "missing, run ./RUNME.sh";
   const uri = pathToFileURL(join(at, ...PROBE_NOTE.split("/"))).href;
   const stdin = [
-    framed({ id: 1, method: "initialize", params: { rootUri: pathToFileURL(at).href, capabilities: {} } }),
+    framed({
+      id: 1,
+      method: "initialize",
+      params: { rootUri: pathToFileURL(at).href, capabilities: {} },
+    }),
     framed({
       method: "textDocument/didOpen",
-      params: { textDocument: { uri, languageId: "markdown", version: 1, text: PROBE_TEXT } },
+      params: {
+        textDocument: { uri, languageId: "markdown", version: 1, text: PROBE_TEXT },
+      },
     }),
     framed({ id: 2, method: "shutdown" }),
     framed({ method: "exit" }),
@@ -37,10 +44,15 @@ export function lspProbe(door, exe, at) {
   }
   const drawn = diagnosticsIn(ran.stdout);
   if (ran.exitCode !== 0 || !drawn) {
-    const why = String(ran.stderr ?? "").trim().split("\n")[0] || "it says nothing";
+    const why =
+      String(ran.stderr ?? "")
+        .trim()
+        .split("\n")[0] || "it says nothing";
     return `warn: se-lsp lsp exits with ${ran.exitCode} before it answers: ${why}`;
   }
-  const codes = [...new Set(drawn.map((one) => String(one?.code ?? "")).filter(Boolean))];
+  const codes = [
+    ...new Set(drawn.map((one) => String(one?.code ?? "")).filter(Boolean)),
+  ];
   return codes.length
     ? `answers, and draws ${codes.join(", ")} on the probe note`
     : "answers, and draws no diagnostic on the probe note";
