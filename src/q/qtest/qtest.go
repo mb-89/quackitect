@@ -21,7 +21,7 @@ func New(t testing.TB, register func(*q.Catalog)) *Index {
 	t.Helper()
 	c := q.New()
 	inputs := q.Join(
-		q.GivenIn(c, "files/<path...>", "", q.Doc("a file's text, as the case seeds it")),
+		q.GivenIn(c, "files/<path...>", q.Content{}, q.Doc("a file's hash and text, as the case seeds it")),
 		q.GivenIn(c, "buffers/<path...>", "", q.Doc("a buffer's text, as the case seeds it")),
 		q.GivenIn(c, "cfg/<key...>", "", q.Doc("a config value, as the case seeds it")),
 		q.GivenIn(c, "clock/minute", int64(0), q.Doc("the minute, as the case seeds it")),

@@ -14,14 +14,14 @@ func TestTheFakeKeepsTheContract(t *testing.T) {
 }
 
 type linesOf struct {
-	Text string `q:"files/a.md"`
+	File q.Content `q:"files/a.md"`
 }
 
 func TestADerivedProviderReadsASeededFile(t *testing.T) {
 	fake := New(t, func(c *q.Catalog) {
-		q.DerivedIn(c, "t/lines", 0, func(in linesOf) int { return strings.Count(in.Text, "\n") })
+		q.DerivedIn(c, "t/lines", 0, func(in linesOf) int { return strings.Count(in.File.Text, "\n") })
 	})
-	fake.Seed(map[string]any{"files/a.md": "one\ntwo\n"})
+	fake.Seed(map[string]any{"files/a.md": q.Content{Hash: "h", Text: "one\ntwo\n"}})
 	if got := fake.Run("t/lines"); got != 2 {
 		t.Fatalf("t/lines reads %v", got)
 	}

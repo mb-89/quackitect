@@ -45,6 +45,12 @@ type registration struct {
 	act      func(input any) ([]Request, error)
 }
 
+// The value under files/<path>, one type for every writer and reader of the family: the empty Content stands for a path the tree tracks nowhere. [[spec/tickets/files-seed-one-type]]
+type Content struct {
+	Hash string `json:"hash"`
+	Text string `json:"text"`
+}
+
 type Catalog struct {
 	mu   sync.Mutex
 	regs []*registration

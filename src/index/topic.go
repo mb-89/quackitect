@@ -15,16 +15,10 @@ const filesFamily = "files/<path...>"
 
 const filesPrefix = "files/"
 
-// The value under files/<path>: the empty Content stands for a path the tree tracks nowhere. [[spec/tickets/files-topic-reads-the-rows]]
-type Content struct {
-	Hash string `json:"hash"`
-	Text string `json:"text"`
-}
-
 // The topics the index commits itself: the files, and the tickets it reads off the note rows. [[spec/tickets/the-tickets-topic-lands]]
 func registersTopics(catalog *q.Catalog) writers {
 	return writers{
-		files:   q.GivenIn(catalog, filesFamily, Content{}, q.Doc("the hash and the text of a tracked file")),
+		files:   q.GivenIn(catalog, filesFamily, q.Content{}, q.Doc("the hash and the text of a tracked file")),
 		tickets: tickets.Registers(catalog),
 		ops:     ops.Registers(catalog),
 	}
@@ -34,7 +28,7 @@ func registersTopics(catalog *q.Catalog) writers {
 type writers struct{ files, tickets, ops q.Writer }
 
 // The tracked rows among the paths named, or every tracked row where none is named. [[spec/tickets/files-topic-reads-the-rows]]
-func contentsOf(db *sql.DB, paths []string) (map[string]Content, error) {
+func contentsOf(db *sql.DB, paths []string) (map[string]q.Content, error) {
 	rows, err := db.Query(`SELECT path, hash, text FROM file WHERE tracked = 1`)
 	if err != nil {
 		return nil, err
@@ -44,10 +38,10 @@ func contentsOf(db *sql.DB, paths []string) (map[string]Content, error) {
 	for _, one := range paths {
 		wanted[one] = true
 	}
-	out := map[string]Content{}
+	out := map[string]q.Content{}
 	for rows.Next() {
 		var path string
-		var held Content
+		var held q.Content
 		if err := rows.Scan(&path, &held.Hash, &held.Text); err != nil {
 			return nil, err
 		}
@@ -70,7 +64,7 @@ func (one *door) publishes(paths []string) error {
 	}
 	if len(paths) == 0 {
 		for path := range one.published {
-			values[filesPrefix+path] = Content{}
+			values[filesPrefix+path] = q.Content{}
 		}
 		for path, content := range held {
 			values[filesPrefix+path] = content

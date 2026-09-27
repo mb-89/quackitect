@@ -30,6 +30,14 @@ func wide(c *q.Catalog) {
 	q.DerivedIn(c, "t/wide", 0, func(in widthOf) int { return len(in.Width) })
 }
 
+type fileOf struct {
+	File q.Content `q:"files/a.md"`
+}
+
+func sized(c *q.Catalog) {
+	q.DerivedIn(c, "t/size", 0, func(in fileOf) int { return len(in.File.Text) })
+}
+
 func sums(c *q.Catalog) {
 	q.FoldIn(c, "t/sum", 0, func(sum, event int) int { return sum + event })
 }
@@ -52,6 +60,14 @@ func Suite(t *testing.T, open Opener) {
 		one.Seed(map[string]any{"cfg/width": "wide"})
 		if got := one.Run("t/wide"); got != 4 {
 			t.Fatalf("t/wide reads %v", got)
+		}
+	})
+	// [[spec/tickets/files-seed-one-type]]
+	t.Run("a derived provider reads a seeded file", func(t *testing.T) {
+		one := open(t, sized)
+		one.Seed(map[string]any{"files/a.md": q.Content{Hash: "h", Text: "abc"}})
+		if got := one.Run("t/size"); got != 3 {
+			t.Fatalf("t/size reads %v", got)
 		}
 	})
 	t.Run("a fold reduces the events it lands", func(t *testing.T) {

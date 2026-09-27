@@ -246,3 +246,12 @@ func TestAListenerReadsTheSnapshotOfItsCommit(t *testing.T) {
 		t.Fatalf("the listener reads %v", read)
 	}
 }
+
+// [[spec/tickets/files-seed-one-type]]
+func TestAnUntrackedPathReadsTheEmptyContent(t *testing.T) {
+	c := New()
+	GivenIn(c, "files/<path...>", Content{})
+	if got := NewStore(c, nil).Snapshot().Read("files/spec/a.md"); got != (Content{}) {
+		t.Fatalf("files/spec/a.md reads %+v", got)
+	}
+}
