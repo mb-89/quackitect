@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -104,6 +104,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/sqlite-runs-pure-go.md:111:1: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: implement/tests-green
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 2b2c54a2d10dfe800033e12c204f63d4a6cace70
+    hash_after: 2b2c54a2d10dfe800033e12c204f63d4a6cace70
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/sqlite-runs-pure-go.md:111:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -276,11 +288,15 @@ Every new test fails on its assertion against a stub. `TestWhyAnswersEachKeyOfAF
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/q src/index
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -288,11 +304,31 @@ Every new test fails on its assertion against a stub. `TestWhyAnswersEachKeyOfAF
 
 <!-- the form is text -->
 
+`se-index why <name>` answers where a value comes from.
+
+| the part | what it does |
+|---|---|
+| `q.Why` | answers the value and its state, the provider's file and line, the inputs down to the given names, and every reader |
+| the door | serves the method `why` |
+| `se-index why` | prints the tree, one line a name |
+
+What I assume, for the reader at the merge:
+
+- The walk stops at a provider it meets twice. A diamond input then answers its inputs once.
+- The file names the absolute path the Go runtime records at registration.
+- A bare `go test ./...` fails on `fts5` in `src/index`, so the first done line waits on [[spec/tickets/sqlite-runs-pure-go]].
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the draft names
+- the catalog is a fake of its own in each test
+- each file opens on a comment pointing at the model note
+- the parts of the answer stand in the model note alone
+- the stale state stands in the change, and the review row stands fixed
 
 # Discussion
 
